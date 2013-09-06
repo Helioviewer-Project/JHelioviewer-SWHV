@@ -1,0 +1,145 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<resourceDefinition>
+    <configuration name="mac-ppc">
+        <priority value="1" />
+        <requirements>
+            <requirement name="jhv.os" value="mac"/>
+            <requirement name="jhv.arch" value="ppc"/>
+        </requirements>
+        <files>
+            <file name="libkdu_jni-mac-ppc.jnilib" srcDir="kakadu" destDir="."  loadLibrary="true" md5="ae72ce23e87349e6e2147c7296d43111"/>
+        </files>
+    </configuration>
+    <configuration name="mac-x86-64">
+        
+    	<priority value="2" />
+        
+    	<requirements>
+            
+    		<requirement name="jhv.os" value="mac"/>
+            
+    		<requirement name="jhv.java.arch" value="64"/>
+        
+    	</requirements>
+        
+    	<files>
+            
+    		<file name="libkdu_jni-mac-x86-64.jnilib" srcDir="kakadu" destDir="."  loadLibrary="true" md5="65f550dce191854acc2fb9715353c5a6"/>
+        
+    	</files>
+    
+    </configuration>
+    
+    <configuration name="mac-x86-32">
+        
+    	<priority value="2" />
+        
+    	<requirements>
+            
+    		<requirement name="jhv.os" value="mac"/>
+            
+    		<requirement name="jhv.java.arch" value="32"/>
+        
+    	</requirements>
+        
+    	<files>
+            
+    		<file name="libkdu_jni-mac-x86-32.jnilib" srcDir="kakadu" destDir="."  loadLibrary="true" md5="003196a0a678c83506cbbc104d695318"/>
+        
+    	</files>
+    
+    </configuration>
+    
+   	<configuration name="windows-x86-64">
+        <priority value="1" />
+        <requirements>
+            <requirement name="jhv.os" value="windows"/>
+            <requirement name="jhv.java.arch" value="64"/>
+        </requirements>
+        <files>
+            <file name="msvcr100.dll" srcDir="Microsoft.VC100.CRT-x86-64" destDir="Microsoft.VC100.CRT-x86-64" loadLibrary="true" md5="aed6d63cfa5a3ef7021af9c457fee994" />
+            <file srcName="kdu_v63R-windows-x86-64.dll" srcDir="kakadu" destDir="kakadu-windows-x86-64" destName="kdu_v63R.dll" loadLibrary="true" md5="a5823c7df61c900a697c62013ec3137e"/>
+            <file srcName="kdu_a63R-windows-x86-64.dll" srcDir="kakadu" destDir="kakadu-windows-x86-64" destName="kdu_a63R.dll" loadLibrary="true" md5="e28ebf4592fb3347f4517cae38296e4c"/>
+            <file srcName="kdu_jni-windows-x86-64.dll" srcDir="kakadu" destDir="kakadu-windows-x86-64" destName="kdu_jni.dll" loadLibrary="true" md5="06fcd5797ecd92d10ca98dcf9f7e7384"/>
+        </files>
+    </configuration>
+    <configuration name="windows-x86-32">
+        <priority value="1" />
+        <requirements>
+            <requirement name="jhv.os" value="windows"/>
+            <requirement name="jhv.java.arch" value="32"/>
+        </requirements>
+        <files>
+            <file name="msvcr100.dll" srcDir="Microsoft.VC100.CRT-x86-32" destDir="Microsoft.VC100.CRTx86-32" loadLibrary="true" md5="67ec459e42d3081dd8fd34356f7cafc1" />
+            <file srcName="kdu_v63R-windows-x86-32.dll" srcDir="kakadu" destDir="kakadu-windows-x86-32" destName="kdu_v63R.dll" loadLibrary="true" md5="9b9cc574ecf7170f58b35b5c951b1f21"/>
+            <file srcName="kdu_a63R-windows-x86-32.dll" srcDir="kakadu" destDir="kakadu-windows-x86-32" destName="kdu_a63R.dll" loadLibrary="true" md5="bccfbe95d71eb8a9cfbcb7ab77d14fa9"/>
+            <file srcName="kdu_jni-windows-x86-32.dll" srcDir="kakadu" destDir="kakadu-windows-x86-32" destName="kdu_jni.dll" loadLibrary="true" md5="beabd2c26481c56d24283c93459f6dd7"/>
+        </files>
+    </configuration>
+    <configuration name="linux-x86-64-glibc-2-7">
+        <priority value="1" />
+        <requirements>
+            <requirement name="jhv.os" value="linux"/>
+            <requirement name="jhv.java.arch" value="64"/>
+            <requirement name="glibc.version" type="version" value=">=2.7"/>
+        </requirements>
+        <files>
+            <file name="libkdu_jni-linux-x86-64-glibc-2-7.so" srcDir="kakadu" destDir="."  loadLibrary="true" md5="e66c50c0d1106079e9f592a736d1a461"/>
+        </files>
+    </configuration>
+    <configuration name="linux-x86-32-glibc-2-7">
+        <priority value="1" />
+        <requirements>
+            <requirement name="jhv.os" value="linux"/>
+            <requirement name="jhv.java.arch" value="32"/>
+            <requirement name="glibc.version" type="version" value=">=2.7"/>
+        </requirements>
+        <files>
+            <file name="libkdu_jni-linux-x86-32-glibc-2-7.so" srcDir="kakadu" destDir="."  loadLibrary="true" md5="1a4c93565d9ddb7075be070be7c87a45"/>
+        </files>
+    </configuration>
+    <configuration name="linux-x86-64-glibc-2-5-42">
+        <priority value="1" />
+        <requirements>
+            <requirement name="jhv.os" value="linux"/>
+            <requirement name="jhv.java.arch" value="64"/>
+            <requirement name="glibc.version" type="version" value=">=2.5"/>
+        </requirements>
+        <files>
+            <file name="libkdu_jni-linux-x86-64-glibc-2-5-42.so" srcDir="kakadu" destDir="."  loadLibrary="true" md5="cf6554e582fe067885bf438f1aaaa624"/>
+        </files>
+    </configuration>
+    <configuration name="linux-x86-32-glibc-2-5-49">
+        <priority value="1" />
+        <requirements>
+            <requirement name="jhv.os" value="linux"/>
+            <requirement name="jhv.java.arch" value="32"/>
+            <requirement name="glibc.version" type="version" value=">=2.5"/>
+        </requirements>
+        <files>
+            <file name="libkdu_jni-linux-x86-32-glibc-2-5-49.so" srcDir="kakadu" destDir="."  loadLibrary="true" md5="9f31efe59a1016777b0b28feeb063211"/>
+        </files>
+    </configuration>
+    <configuration name="linux-x86-64-glibc-2-3-4">
+        <priority value="1" />
+        <requirements>
+            <requirement name="jhv.os" value="linux"/>
+            <requirement name="jhv.java.arch" value="64"/>
+            <requirement name="glibc.version" type="version" value=">=2.3"/>
+        </requirements>
+        <files>
+            <file name="libkdu_jni-linux-x86-64-glibc-2-3-4.so" srcDir="kakadu" destDir="."  loadLibrary="true" md5="fef120006f29c9e719a03117fa04bec9"/>
+        </files>
+    </configuration>
+    <configuration name="linux-x86-32-glibc-2-3-4">
+        <priority value="1" />
+        <requirements>
+            <requirement name="jhv.os" value="linux"/>
+            <requirement name="jhv.java.arch" value="32"/>
+            <requirement name="glibc.version" type="version" value=">=2.3"/>
+        </requirements>
+        <files>
+            <file name="libkdu_jni-linux-x86-32-glibc-2-3-4.so" srcDir="kakadu" destDir="."  loadLibrary="true" md5="7372fbf8cb1314ee0a369062df1bf508"/>
+        </files>
+    </configuration>
+</resourceDefinition>

@@ -1,0 +1,56 @@
+*************************************
+*  JHelioviewer HEK Plugin INSTALL  *
+*************************************
+
+IMPORTANT
+---------
+Note that a non-developer version is automatically installed since JHelioviewer 2.1.
+These instructions are only needed if you want do develop on the HEK Plugin.
+
+General Information
+-------------------
+
+General development information: See JHelioviewer Project + JHelioviewer Website.
+
+The source code of this plugin is hosted on Launchpad: https://launchpad.net/jhelioviewer
+
+This document serves only as a quick reference for building the source code. More detailed 
+instructions as well as development guidelines and information can be found on
+http://www.helioviewer.org/wiki/index.php?title=JHelioviewer_Development_Information
+and in JHelioviewer's INSTALL file.
+
+Build instructions
+------------------
+
+More general information about the build process can be found in JHelioviewer's INSTALL file - 
+this only represents one quick way to get the plugin running.
+
+IT IS STRONGLY RECOMMENDED TO PLACE THE HEK DIRECTORY INTO:
+    ${PATH_TO_JHELIOVIEWER_SRC}/plugins/hekplugin
+
+IF YOU PLACE THE SOURCE CODE IN AN OTHER DIRECTORY, YOU HAVE TO APPEND THE FOLLOWING
+STRING TO ALL 'ant' COMMANDS SHOWN FURTHER BELOW
+
+    '-Djhv.root="${PATH_TO_JHELIOVIEWER_SRC}"' 
+
+Thus, changing to ${PATH_TO_JHELIOVIEWER_SRC}/plugins/ and running one of the following commands
+will do the job:
+
+- To get a fresh copy of the latest development version, run
+    bzr branch lp:~jhelioviewer-dev/jhelioviewer/hekplugin
+
+- To update an existing version of the plugin, run
+    bzr pull lp:~jhelioviewer-dev/jhelioviewer/hekplugin
+
+After this, you need to build the source code. Change to ${PATH_TO_JHELIOVIEWER_SRC}/plugins/hekplugin
+and run:
+
+    ant                   - build HEKPlugin.jar
+    ant install-plugin    - build and copy/install HEKPlugin.jar into ~/JHelioviewer/Plugins/
+    ant clean             - clean-up workspace
+
+Eclipse
+-------
+
+It is recommended to import the HEK Sourcecode into the same workspace as the rest of the JHelioviewer
+sourcecode.

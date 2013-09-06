@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<classpath>
+	<classpathentry kind="src" path="src"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/base"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/viewmodel"/>
+	<classpathentry kind="lib" path="../lib/kdu_jni.jar"/>
+	<classpathentry kind="lib" path="../lib/json.jar"/>
+	<classpathentry kind="lib" path="../lib/log4j-1.2.16.jar"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/viewmodelplugin"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/basegui"/>
+	<classpathentry kind="lib" path="../lib/gluegen-rt.jar" />
+	<classpathentry kind="lib" path="../lib/jogl.jar"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/jhv-3d"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/jhv-3d-scenegraph"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/jhv-3d-math"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/jhv-3d-plugin"/>
+	<classpathentry kind="lib" path="../resources"/>
+	<classpathentry kind="output" path="bin"/>
+</classpath>

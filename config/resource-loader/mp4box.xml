@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<resourceDefinition>
+    <configuration name="mac">
+        <priority value="1" />
+        <requirements>
+            <requirement name="jhv.os" value="mac"/>
+        </requirements>
+        <files>
+            <file name="mp4box-mac" srcDir="mp4box" destDir="." registerExecutable="mp4box" md5="56ef9786ad466800d8598f7621d5a914"/>
+        </files>
+    </configuration>
+    <configuration name="linux-x86-32">
+        <priority value="1" />
+        <requirements>
+            <requirement name="jhv.os" value="linux"/>
+            <requirement name="jhv.arch" value="x86-32"/>
+        </requirements>
+        <files>
+            <file name="mp4box-linux-x86-32" srcDir="mp4box" destDir="." registerExecutable="mp4box" md5="30663f316c80671a7ef29f9e017c0360"/>
+        </files>
+    </configuration>
+    <configuration name="linux-x86-64">
+        <priority value="1" />
+        <requirements>
+            <requirement name="jhv.os" value="linux"/>
+            <requirement name="jhv.arch" value="x86-64"/>
+        </requirements>
+        <files>
+            <file name="mp4box-linux-x86-64" srcDir="mp4box" destDir="." registerExecutable="mp4box" md5="b0163b2ce4e873dada470ecf57cbfd5e"/>
+        </files>
+    </configuration>
+    <configuration name="windows">
+        <priority value="1" />
+        <requirements>
+            <requirement name="jhv.os" value="windows"/>
+        </requirements>
+        <files>
+            <file name="mp4box-windows.exe" srcDir="mp4box" destDir="." registerExecutable="mp4box" md5="454f93fd1725c01e9c14db87dea14948"/>
+        </files>
+    </configuration>
+</resourceDefinition>

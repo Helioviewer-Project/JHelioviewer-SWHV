@@ -1,0 +1,16 @@
+IDL Color Tables
+-- Helper scripts to create GIMP gradient files from idl tables
+
+In the solor physics community color tables are mostly stored as some idl
+function, like the aia color tables. To enable a easy conversion this
+includes some scripts trying to fit it into a gimp gradient file.
+
+It also includes the original aia color tables (aia_lct.pro) and
+the STEREO color tables.
+
+To fit some data for a color table see fit_gimp.pro.
+
+I just learnt IDL today so the script is very hacky. Also it just
+aids you to convert it and does not do any kind of automatic transformation.
+
+-- Helge Dietert

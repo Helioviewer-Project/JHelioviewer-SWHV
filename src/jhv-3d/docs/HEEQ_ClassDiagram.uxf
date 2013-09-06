@@ -1,0 +1,274 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<diagram program="umlet" version="11.3">
+  <help_text>// Uncomment the following line to change the fontsize and font:
+ fontsize=14
+ fontfamily=SansSerif //possible: SansSerif,Serif,Monospaced
+
+
+//////////////////////////////////////////////////////////////////////////////////////////////
+// Welcome to UMLet!
+//
+// Double-click on elements to add them to the diagram, or to copy them
+// Edit elements by modifying the text in this panel
+// Hold Cmd to select multiple elements
+// Use Cmd+mouse to select via lasso
+//
+// Use +/- or Cmd+mouse wheel to zoom
+// Drag a whole relation at its central square icon
+//
+// Press Cmd+C to copy the whole diagram to the system clipboard (then just paste it to, eg, Word)
+// Edit the files in the "palettes" directory to create your own element palettes
+//
+// Select "Custom Elements &gt; New..." to create new element types
+//////////////////////////////////////////////////////////////////////////////////////////////
+
+
+// This text will be stored with each diagram;  use it for notes.</help_text>
+  <zoom_level>9</zoom_level>
+  <element>
+    <type>com.umlet.element.Class</type>
+    <coordinates>
+      <x>351</x>
+      <y>207</y>
+      <w>351</w>
+      <h>90</h>
+    </coordinates>
+    <panel_attributes>&lt;&lt;Interface&gt;&gt;
+ch.fhnw.jhv.wcs::CoordinateSystem
+--
+
+--
++getDimensions(): int
++getCoordinateDimension(dim:int):CoordinateDimension
++createCoordinate(value:float...):CoordinateVector</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <type>com.umlet.element.Relation</type>
+    <coordinates>
+      <x>504</x>
+      <y>135</y>
+      <w>44</w>
+      <h>89</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;&lt;&lt;&lt;-</panel_attributes>
+    <additional_attributes>27;72;27;27</additional_attributes>
+  </element>
+  <element>
+    <type>com.umlet.element.Class</type>
+    <coordinates>
+      <x>747</x>
+      <y>207</y>
+      <w>270</w>
+      <h>72</h>
+    </coordinates>
+    <panel_attributes>&lt;&lt;Interface&gt;&gt;
+ch.fhnw.jhv.wcs::CoordinateReferenceSystem
+--
++getCoordinateSystem():CoordinateSystem
++getAnchor():Anchor</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <type>com.umlet.element.Relation</type>
+    <coordinates>
+      <x>990</x>
+      <y>216</y>
+      <w>98</w>
+      <h>44</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;-</panel_attributes>
+    <additional_attributes>81;27;27;27</additional_attributes>
+  </element>
+  <element>
+    <type>com.umlet.element.Class</type>
+    <coordinates>
+      <x>0</x>
+      <y>216</y>
+      <w>261</w>
+      <h>90</h>
+    </coordinates>
+    <panel_attributes>ch.fhnw.jhv.wcs::CoordinateVector
+--
+coordinates:double[]
+--
++getValue(dim:int):double
++setValue(dim:int, val:double):void
++getCoordinateSystem():CoordinateSystem</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <type>com.umlet.element.Relation</type>
+    <coordinates>
+      <x>225</x>
+      <y>234</y>
+      <w>154</w>
+      <h>63</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;.
+&lt;&lt;encoded in&gt;&gt;</panel_attributes>
+    <additional_attributes>126;45;36;45</additional_attributes>
+  </element>
+  <element>
+    <type>com.umlet.element.Relation</type>
+    <coordinates>
+      <x>675</x>
+      <y>225</y>
+      <w>89</w>
+      <h>44</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;-</panel_attributes>
+    <additional_attributes>27;27;72;27</additional_attributes>
+  </element>
+  <element>
+    <type>com.umlet.element.Class</type>
+    <coordinates>
+      <x>414</x>
+      <y>63</y>
+      <w>261</w>
+      <h>99</h>
+    </coordinates>
+    <panel_attributes>&lt;&lt;Interface&gt;&gt;
+ch.fhnw.jhv.wcs::CoordinateDimension
+--
++getDescription():String
++getUnit():Unit
++getMinValue():Float
++getMaxValue():Float</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <type>com.umlet.element.Relation</type>
+    <coordinates>
+      <x>234</x>
+      <y>180</y>
+      <w>134</w>
+      <h>63</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;.
+&lt;&lt;creates&gt;&gt;</panel_attributes>
+    <additional_attributes>27;45;117;45</additional_attributes>
+  </element>
+  <element>
+    <type>com.umlet.element.Class</type>
+    <coordinates>
+      <x>387</x>
+      <y>396</y>
+      <w>315</w>
+      <h>90</h>
+    </coordinates>
+    <panel_attributes>ch.fhnw.jhv.wcs.generic::CartesianCoordinateSystem
+--
+x:CoordinateDimension
+y:CoordinateDimension
+z:CoordinateDimension
+--
++createCoordiante(x, y, z):CartesianCoordinate</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <type>com.umlet.element.Relation</type>
+    <coordinates>
+      <x>477</x>
+      <y>270</y>
+      <w>44</w>
+      <h>143</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;&lt;-</panel_attributes>
+    <additional_attributes>27;27;27;126</additional_attributes>
+  </element>
+  <element>
+    <type>com.umlet.element.Class</type>
+    <coordinates>
+      <x>9</x>
+      <y>396</y>
+      <w>270</w>
+      <h>81</h>
+    </coordinates>
+    <panel_attributes>ch.fhnw.jhv.wcs.heeq::CartesianCoordinate
+--
+--
++getX(): double
++getY(): double
++getZ(): double</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <type>com.umlet.element.Relation</type>
+    <coordinates>
+      <x>90</x>
+      <y>279</y>
+      <w>44</w>
+      <h>134</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;&lt;-</panel_attributes>
+    <additional_attributes>27;27;27;117</additional_attributes>
+  </element>
+  <element>
+    <type>com.umlet.element.Class</type>
+    <coordinates>
+      <x>783</x>
+      <y>378</y>
+      <w>216</w>
+      <h>54</h>
+    </coordinates>
+    <panel_attributes>ch.fhnw.jhv.wcs.heeq::HEEQCRS
+--
+-anchor:HEEQAnchor
+-cs:CaertesianCoordinateSystem
+--
+</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <type>com.umlet.element.Relation</type>
+    <coordinates>
+      <x>837</x>
+      <y>252</y>
+      <w>44</w>
+      <h>143</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;&lt;-</panel_attributes>
+    <additional_attributes>27;27;27;126</additional_attributes>
+  </element>
+  <element>
+    <type>com.umlet.element.Class</type>
+    <coordinates>
+      <x>1044</x>
+      <y>414</y>
+      <w>225</w>
+      <h>45</h>
+    </coordinates>
+    <panel_attributes>ch.fhnw.jhv.wcs.heeq::HEEQAnchor
+--
+-observationDate:Calendar
+--
+</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <type>com.umlet.element.Class</type>
+    <coordinates>
+      <x>1071</x>
+      <y>216</y>
+      <w>171</w>
+      <h>45</h>
+    </coordinates>
+    <panel_attributes>&lt;&lt;Interface&gt;&gt;
+ch.fhnw.jhv.wcs::Anchor
+--
+</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <type>com.umlet.element.Relation</type>
+    <coordinates>
+      <x>1125</x>
+      <y>234</y>
+      <w>44</w>
+      <h>197</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;&lt;-</panel_attributes>
+    <additional_attributes>27;27;27;180</additional_attributes>
+  </element>
+</diagram>

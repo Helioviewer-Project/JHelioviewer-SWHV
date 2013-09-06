@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<resourceDefinition>
+    <configuration name="mac-ppc">
+        <priority value="1" />
+        <requirements>
+            <requirement name="jhv.os" value="mac"/>
+            <requirement name="jhv.arch" value="ppc"/>
+        </requirements>
+        <files>
+            <file name="ffmpeg-mac-ppc" srcDir="ffmpeg" destDir="." registerExecutable="ffmpeg" md5="a06c33f36d70c09af2b0f3d43b330882"/>
+        </files>
+    </configuration>
+    <configuration name="mac-x86-64">
+        <priority value="1" />
+        <requirements>
+            <requirement name="jhv.os" value="mac"/>
+            <requirement name="jhv.arch" value="x86-64"/>
+        </requirements>
+        <files>
+            <file name="ffmpeg-mac-x86-64" srcDir="ffmpeg" destDir="." registerExecutable="ffmpeg" md5="750686db696984e196b52fda01e2bded"/>
+        </files>
+    </configuration>
+    <configuration name="mac-x86-32">
+        <priority value="1" />
+        <requirements>
+            <requirement name="jhv.os" value="mac"/>
+            <requirement name="jhv.arch" value="x86-32"/>
+        </requirements>
+        <files>
+            <file name="ffmpeg-mac-x86-32" srcDir="ffmpeg" destDir="." registerExecutable="ffmpeg" md5="404b786333b53b33a932e76f37cfdb9c"/>
+        </files>
+    </configuration>
+    <configuration name="linux">
+        <priority value="1" />
+        <requirements>
+            <requirement name="jhv.os" value="linux"/>
+        </requirements>
+        <files>
+            <file name="ffmpeg-linux" srcDir="ffmpeg" destDir="." registerExecutable="ffmpeg" md5="c4b383f9a069259386c7e111dc5695b9"/>
+        </files>
+    </configuration>
+    <configuration name="windows">
+        <priority value="1" />
+        <requirements>
+            <requirement name="jhv.os" value="windows"/>
+        </requirements>
+        <files>
+            <file name="ffmpeg-windows.exe" srcDir="ffmpeg" destDir="." registerExecutable="ffmpeg" md5="2f6ce8c8ceeaadb129f6fb49fb7f942a"/>
+        </files>
+    </configuration>
+</resourceDefinition>

@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+
+<project name="build" default="all">
+
+	<target name="all" depends="copy-to-root-build" />
+
+	<target name="build-plugins" >
+		<subant target="jar-bundle" >
+			<fileset dir="." includes="*/build.xml" />
+		</subant>
+	</target>
+	<target name="bundle-src" >
+		<subant target="bundle-src" >
+			<fileset dir="." includes="*/build.xml" />
+		</subant>
+	</target>
+	<target name="doc" >
+		<subant target="doc" >
+			<fileset dir="." includes="*/build.xml" />
+		</subant>
+	</target>
+	<target name="clean" >
+		<subant target="clean" >
+			<fileset dir="." includes="*/build.xml" />
+		</subant>
+	</target>
+	
+	<target name="copy-to-root-build">
+		<subant target="copy-to-root-build" >
+			<fileset dir="." includes="*/build.xml" />
+		</subant>
+	</target>
+	
+	<target name="install-plugins" >
+		<subant target="install-plugin" >
+			<fileset dir="." includes="*/build.xml" />
+		</subant>
+	</target>		
+
+</project>

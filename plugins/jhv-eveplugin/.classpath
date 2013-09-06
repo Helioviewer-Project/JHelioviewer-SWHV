@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<classpath>
+	<classpathentry kind="src" path="src"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
+	<classpathentry kind="lib" path="resources"/>
+	<classpathentry kind="lib" path="lib/json.jar"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/base"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/basegui"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/jhv"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/viewmodel"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/viewmodelplugin"/>
+	<classpathentry kind="lib" path="lib/derby.jar"/>
+	<classpathentry kind="output" path="bin"/>
+</classpath>

@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<classpath>
+	<classpathentry kind="src" path="src"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/J2SE-1.5"/>
+	<classpathentry kind="src" path="/base"/>
+	<classpathentry kind="lib" path="../lib/json.jar"/>
+	<classpathentry kind="src" path="/viewmodelplugin"/>
+	<classpathentry kind="src" path="/viewmodel"/>
+	<classpathentry kind="src" path="/jhv"/>
+	<classpathentry kind="src" path="/basegui"/>
+	<classpathentry kind="lib" path="resources"/>
+	<classpathentry kind="lib" path="lib/poly2tri-core.jar"/>
+	<classpathentry kind="lib" path="lib/slf4j-api-1.6.1.jar"/>
+	<classpathentry kind="lib" path="lib/slf4j-log4j12-1.6.1.jar"/>
+	<classpathentry kind="output" path="bin"/>
+</classpath>

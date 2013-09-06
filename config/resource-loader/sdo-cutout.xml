@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<resourceDefinition>
+    <configuration name="all">
+        <priority value="1" />
+        <requirements>
+            <requirement name="jhv.version" type="version" value=">=2.2.0"/>        
+        </requirements>
+        <files>
+            <file name="SDOCutOutPlugin.jar" srcDir="default-plugins" destDir="." md5="aa33044c58eaec9de2d60bae6d837178"/>
+        </files>
+    </configuration>
+</resourceDefinition>

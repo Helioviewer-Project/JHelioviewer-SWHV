@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<resourceDefinition>
+    <configuration name="all">
+        <priority value="1"/>
+        <requirements>
+        </requirements>
+        <files>
+            <file srcName="HEKPlugin.jar" srcDir="default-plugins/" destName="HEKPlugin.jar" destDir="./" loadLibrary="false" md5="0bb9fd127d29fce6e492c9d821b099c8"/>
+        </files>
+    </configuration>
+</resourceDefinition>
