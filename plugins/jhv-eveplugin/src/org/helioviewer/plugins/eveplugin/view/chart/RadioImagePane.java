@@ -29,7 +29,7 @@ public class RadioImagePane {
 	Axis frequencyAxis;
 	Axis dateTimeAxis;
 	JHVJP2View view;
-	public RadioImagePane(){
+	public RadioImagePane(){/*
 		this.radioImage = new int[100][100];
 		for(int j=0;j<100;j++){
 			for(int i=0;i<100;i++){
@@ -53,7 +53,7 @@ public class RadioImagePane {
 		} catch (JHV_KduException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
-		}
+		}*/
 	}
 	public void display(Graphics g){
 		SingleChannelByte8ImageData imageData = (SingleChannelByte8ImageData)(view.getSubimageData());
