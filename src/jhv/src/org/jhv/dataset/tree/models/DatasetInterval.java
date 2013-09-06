@@ -17,10 +17,11 @@ public class DatasetInterval{
     public DatasetType getType(String title){
     	DatasetType datasetType = null;
     	int i=0;
-    	while( datasetTypes==null && i<datasetTypes.size()){
+    	while( datasetType==null && i<datasetTypes.size()){
     		if(datasetTypes.get(i).title == title){
     			datasetType = datasetTypes.get(i);
     		}
+    		i++;
     	}
     	return datasetType;
     }
