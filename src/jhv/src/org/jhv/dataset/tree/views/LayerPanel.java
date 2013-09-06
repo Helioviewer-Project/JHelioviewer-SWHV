@@ -3,6 +3,7 @@ package org.jhv.dataset.tree.views;
 import java.awt.BorderLayout;
 import java.awt.FlowLayout;
 
+import org.jhv.dataset.tree.models.DatasetLayer;
 import org.jhv.dataset.tree.views.FixedHeightButton;
 import javax.swing.JPanel;
 
@@ -15,10 +16,11 @@ public class LayerPanel extends JPanel{
 	private FixedHeightButton buttonLeft;
 	private FixedHeightButton buttonCenter;
 	private FixedHeightButton buttonRight;
-
+	private DatasetLayer model;
 	
-	public LayerPanel( LayerDescriptor descriptor ) {
+	public LayerPanel( DatasetLayer model ) {
 		super();
+		this.model = model;
 		setLayout(new BorderLayout(0, 0));
 		
 		buttonLeft = new FixedHeightButton("l");

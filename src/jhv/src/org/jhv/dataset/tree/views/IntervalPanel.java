@@ -6,6 +6,8 @@ import org.jhv.dataset.tree.views.FixedHeightButton;
 import javax.swing.JPanel;
 
 import org.helioviewer.jhv.layers.LayerDescriptor;
+import org.jhv.dataset.tree.actions.IntervalListener;
+import org.jhv.dataset.tree.models.DatasetInterval;
 import org.jhv.dataset.tree.models.DatasetLayerTreeModel;
 
 import java.awt.BorderLayout;
@@ -14,7 +16,7 @@ import java.awt.GridLayout;
 import java.util.ArrayList;
 import java.util.TreeMap;
 
-public class IntervalPanel extends JPanel{
+public class IntervalPanel extends JPanel implements IntervalListener{
 	private static final long serialVersionUID = 4342443227686604174L;
 	
 	private FixedHeightButton buttonLeft;
@@ -23,9 +25,11 @@ public class IntervalPanel extends JPanel{
 	
 	private JPanel typePanelContainer;
 	private ArrayList<JPanel> typePanels;
+	DatasetInterval model;
 	
-	public IntervalPanel(TreeMap<String, ArrayList<LayerDescriptor> > types) {
+	public IntervalPanel( DatasetInterval model) {
 		super();
+		this.model = model;
 		setLayout(new BorderLayout(0, 0));
 		
 		buttonLeft = new FixedHeightButton("l");
@@ -43,13 +47,12 @@ public class IntervalPanel extends JPanel{
 		buttonRight = new FixedHeightButton("r");
 		add(buttonRight, BorderLayout.EAST);
 		
+		typePanels = new ArrayList<JPanel> ();
 		typePanelContainer = new JPanel();
-		typePanelContainer.setLayout(new GridLayout(types.size(),1));
+		typePanelContainer.setLayout(new GridLayout(typePanels.size(),1));
 
 		add(typePanelContainer, BorderLayout.SOUTH);
 		
-		typePanels = new ArrayList<JPanel> ();
-		updatePanel(types);
 	}
 	
 	public void addTypePanel(JPanel typePanel){
@@ -62,6 +65,17 @@ public class IntervalPanel extends JPanel{
 			TypePanel typePanel = new TypePanel(type);
 			this.addTypePanel(typePanel);			
 		}
+	}
+
+	@Override
+	public void typeInserted(int idx) {
+		TypePanel typePanel = new TypePanel(this.model.getType(idx));
+		this.typePanels.add(idx, typePanel);		
+	}
+
+	@Override
+	public void typeRemoved(int idx) {
+		
 	}	
 }
 

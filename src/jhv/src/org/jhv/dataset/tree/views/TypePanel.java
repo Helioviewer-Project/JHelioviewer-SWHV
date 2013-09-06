@@ -2,6 +2,8 @@ package org.jhv.dataset.tree.views;
 /**
  * @author Freek Verstringe
  */
+import org.jhv.dataset.tree.actions.TypeListener;
+import org.jhv.dataset.tree.models.DatasetType;
 import org.jhv.dataset.tree.views.FixedHeightButton;
 import javax.swing.JPanel;
 
@@ -12,7 +14,7 @@ import java.awt.FlowLayout;
 import java.awt.GridLayout;
 import java.util.ArrayList;
 
-public class TypePanel extends JPanel{
+public class TypePanel extends JPanel implements TypeListener{
 	private static final long serialVersionUID = 8669761869598533103L;
 	
 	private FixedHeightButton buttonLeft;
@@ -22,8 +24,11 @@ public class TypePanel extends JPanel{
 	private JPanel layerContainer;
 	private ArrayList<JPanel> layerPanels;
 	
-	public TypePanel(ArrayList<LayerDescriptor> layers) {
+	DatasetType model;
+	
+	public TypePanel(DatasetType model) {
 		super();
+		this.model = model;
 		setLayout(new BorderLayout(0, 0));
 		
 		buttonLeft = new FixedHeightButton("l");
@@ -45,12 +50,13 @@ public class TypePanel extends JPanel{
 		buttonRight = new FixedHeightButton("l");
 		add(buttonRight, BorderLayout.EAST);
 		
+		layerPanels = new ArrayList<JPanel>();
+
 		layerContainer = new JPanel();
-		layerContainer.setLayout(new GridLayout(layers.size(),1));
+		layerContainer.setLayout(new GridLayout(layerPanels.size(),1));
 		
 		add(layerContainer, BorderLayout.SOUTH);
-		layerPanels = new ArrayList<JPanel>();
-		updatePanel(layers);
+
 	}
 	
 	public void addLayerPanel(JPanel layer){
@@ -58,10 +64,17 @@ public class TypePanel extends JPanel{
 		layerContainer.add(layer);
 	}
 	
-	public void updatePanel(ArrayList<LayerDescriptor> layers){
-		for( int i=0; i<layers.size(); i++){
-			LayerPanel layerPanel = new LayerPanel(layers.get(i));
-			this.addLayerPanel(layerPanel);			
-		}
+
+
+	@Override
+	public void layerInserted(int idx) {
+		LayerPanel layerPanel = new LayerPanel(this.model.getLayer(idx));
+		this.layerPanels.add(idx, layerPanel);
+
+	}
+
+	@Override
+	public void layerRemoved(int idx) {
+		this.layerPanels.remove(idx);
 	}	
 }
