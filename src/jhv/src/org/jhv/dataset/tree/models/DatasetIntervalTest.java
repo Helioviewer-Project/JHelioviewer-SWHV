@@ -12,14 +12,14 @@ import org.junit.Test;
 
 public class DatasetIntervalTest {
 	
-	NewDatasetLayerTreeModel modeltest;
+	DatasetIntervals modeltest;
 	LayersModel layersModel;
 	ArrayList<LayerDescriptor> descriptors;
     ArrayList<String> intervals;
     
 	@Before
 	public void setUp() throws Exception {
-		modeltest = new NewDatasetLayerTreeModel();
+		modeltest = new DatasetIntervals();
 		descriptors = new ArrayList<LayerDescriptor>();
 		intervals = new ArrayList<String>();
 		intervals.add(0, "first");
