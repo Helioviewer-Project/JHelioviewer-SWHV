@@ -59,13 +59,7 @@ public class IntervalPanel extends JPanel implements IntervalListener{
 		this.typePanels.add(typePanel);
 		typePanelContainer.add(typePanel);
 	}
-	
-	public void updatePanel(TreeMap<String, ArrayList<LayerDescriptor> > types){
-		for( ArrayList<LayerDescriptor> type : types.values()){
-			TypePanel typePanel = new TypePanel(type);
-			this.addTypePanel(typePanel);			
-		}
-	}
+
 
 	@Override
 	public void typeInserted(int idx) {
