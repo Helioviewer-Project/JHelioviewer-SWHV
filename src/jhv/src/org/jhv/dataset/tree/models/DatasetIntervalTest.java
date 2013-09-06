@@ -120,20 +120,25 @@ public class DatasetIntervalTest {
 
 		modeltest.addLayerDescriptor( descriptors.get(1), 0);
 		assertTrue( modeltest.getInterval(descriptors.get(1).interval)!=null );
-		assertTrue( modeltest.getNumTypes() == 1 );
+		assertTrue( modeltest.getNumTypes() == 2 );
 
 		assertTrue( modeltest.getInterval(descriptors.get(0).interval)!=null );
 		assertTrue( modeltest.getNumIntervals() == 2 );
 		assertTrue( modeltest.getNumLayers() == 2 );
-		assertTrue( modeltest.getNumTypes() == 1 );
+		assertTrue( modeltest.getNumTypes() == 2 );
 
 
 		modeltest.addLayerDescriptor( descriptors.get(2), 0);
+		assertTrue( modeltest.getNumIntervals() == 3 );
 		assertTrue( modeltest.getNumLayers() == 3 );
+		assertTrue( modeltest.getNumTypes() == 3 );
 
 		modeltest.addLayerDescriptor( descriptors.get(3), 0);
 		assertTrue( descriptors.get(3)!=null );
 		assertTrue( modeltest.getNumLayers() == 4 );
+		assertTrue( modeltest.getNumIntervals() == 3 );
+		assertTrue( modeltest.getNumTypes() == 3 );
+
 
 
 		modeltest.addLayerDescriptor( descriptors.get(4), 0);
@@ -144,30 +149,7 @@ public class DatasetIntervalTest {
 
 		modeltest.addLayerDescriptor( descriptors.get(6), 0);
 		assertTrue( modeltest.getNumLayers() == 7 );
-		
 
-		assertTrue(modeltest.getNumTypes() == 3);
-		assertTrue(modeltest.getNumIntervals() == 3);
-		
-		modeltest.addLayerDescriptor( descriptors.get(7), 0);
-		assertTrue(modeltest.getNumLayers() == 8);
-		assertTrue(modeltest.getNumTypes() == 4);
-		assertTrue(modeltest.getNumIntervals() == 3);
-		
-		modeltest.removeLayerDescriptor(descriptors.get(6), 0);
-		assertTrue(modeltest.getNumLayers() == 7);
-		assertTrue(modeltest.getNumTypes() == 4);
-		assertTrue(modeltest.getNumIntervals() == 3);
-		
-		modeltest.removeLayerDescriptor(descriptors.get(0), 0);
-		assertTrue(modeltest.getNumLayers() == 6);
-		assertTrue(modeltest.getNumTypes() == 4);
-		assertTrue(modeltest.getNumIntervals() == 3);
-		
-		modeltest.removeLayerDescriptor(descriptors.get(3), 0);
-		assertTrue(modeltest.getNumLayers() == 5);
-		assertTrue(modeltest.getNumTypes() == 3);
-		assertTrue(modeltest.getNumIntervals() == 2);
 		
 	}
 	
