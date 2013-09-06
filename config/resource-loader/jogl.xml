@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<resourceDefinition>
+    <configuration name="mac">
+        <priority value="1" />
+        <requirements>
+            <requirement name="jhv.os" value="mac"/>
+        </requirements>
+        <files>
+            <file name="libgluegen-rt-mac.jnilib" srcDir="jogl" destDir="." loadLibrary="true" md5="7d0e44f2736cccbcdbcfaf30dfb6373e"/>
+            <file name="libjogl-mac.jnilib" srcDir="jogl" destDir="."   loadLibrary="true" md5="bdd727ca53842c55291d29956ba6a230"/>
+            <file name="libjogl_awt-mac.jnilib" srcDir="jogl" destDir="."   loadLibrary="true" md5="c5aace9d639e12422778b5eaf4173eb9"/>
+        </files>
+    </configuration>
+    <configuration name="linux-x86-32">
+        <priority value="1" />
+        <requirements>
+            <requirement name="jhv.os" value="linux"/>
+            <requirement name="jhv.java.arch" value="32"/>
+        </requirements>
+        <files>
+            <file name="libgluegen-rt-linux-x86-32.so" srcDir="jogl" destDir="." loadLibrary="true" md5="62583c4b2e2f3eb4ca773d6b829ce006"/>
+            <file name="libjogl-linux-x86-32.so" srcDir="jogl" destDir="."   loadLibrary="true" md5="98abb71af935993d38166e2cee700d3f"/>
+            <file name="libjogl_awt-linux-x86-32.so" srcDir="jogl" destDir="."   loadLibrary="true" md5="9554525c753f5d786859a59b797415ea"/>
+        </files>
+    </configuration>
+    <configuration name="linux-x86-64">
+        <priority value="1" />
+        <requirements>
+            <requirement name="jhv.os" value="linux"/>
+            <requirement name="jhv.java.arch" value="64"/>
+        </requirements>
+        <files>
+            <file name="libgluegen-rt-linux-x86-64.so" srcDir="jogl" destDir="." loadLibrary="true" md5="d56d73e9ca8fca87cb5084c7e68d6651"/>
+            <file name="libjogl-linux-x86-64.so" srcDir="jogl" destDir="."   loadLibrary="true" md5="d3a649ef2c2d516eb34f2f6a8a258d8a"/>
+            <file name="libjogl_awt-linux-x86-64.so" srcDir="jogl" destDir="."   loadLibrary="true" md5="f7aae1e9c98d0bd26d24580b8be63924"/>
+        </files>
+    </configuration>
+    <configuration name="windows-x86-32">
+        <priority value="1" />
+        <requirements>
+            <requirement name="jhv.os" value="windows"/>
+            <requirement name="jhv.java.arch" value="32"/>
+        </requirements>
+        <files>
+            <file name="gluegen-rt-windows-x86-32.dll" srcDir="jogl" destDir="." loadLibrary="true" md5="02f297a9fa9edb422866c3bb41bea36f"/>
+            <file name="jogl-windows-x86-32.dll" srcDir="jogl" destDir="."   loadLibrary="true" md5="fd2b25b201edc3c2f1b814326c3fed31"/>
+            <file name="jogl_awt-windows-x86-32.dll" srcDir="jogl" destDir="."   loadLibrary="true" md5="c37e9fa6d9e3efa352b9f98d5e765f4f"/>
+        </files>
+    </configuration>
+    <configuration name="windows-x86-64">
+        <priority value="1" />
+        <requirements>
+            <requirement name="jhv.os" value="windows"/>
+            <requirement name="jhv.java.arch" value="64"/>
+        </requirements>
+        <files>
+            <file name="msvcm80.dll" srcDir="Microsoft.VC80.CRT-x86-64" destDir="Microsoft.VC80.CRT" md5="ba16a0a898ba93c2f113c7b034df015a" />
+            <file name="msvcp80.dll" srcDir="Microsoft.VC80.CRT-x86-64" destDir="Microsoft.VC80.CRT" md5="5ae0f01f02a03558da0cbd249e4df263" />
+            <file name="msvcr80.dll" srcDir="Microsoft.VC80.CRT-x86-64" destDir="Microsoft.VC80.CRT" md5="465cebd7da2ceaba5e552fc9118a1415" />
+            <file name="Microsoft.VC80.CRT.manifest" srcDir="Microsoft.VC80.CRT-x86-64" destDir="Microsoft.VC80.CRT" md5="922528bc7a23717a4480b6282871e4d3" />
+            <file name="gluegen-rt-windows-x86-64.dll" srcDir="jogl" destDir="." loadLibrary="true" md5="6a71a1fda29ca79625b3b484f5e3cbb7"/>
+            <file name="jogl-windows-x86-64.dll" srcDir="jogl" destDir="."   loadLibrary="true" md5="1844d561b1a69e55f204f145c3392145"/>
+            <file name="jogl_awt-windows-x86-64.dll" srcDir="jogl" destDir="."   loadLibrary="true" md5="52e06a1e48b8ff603e1af9d11e1d8d03"/>
+        </files>
+    </configuration>
+</resourceDefinition>

@@ -1,0 +1,19 @@
+*************************
+*  EVEPlugin README  *
+*************************
+
+This plug-in allows to access the Level 2 quick look data from 
+Extreme ultraviolet Variability Experiment (EVE). The data is provide by a
+web service which can be found at http://lasp.colorado.edu/eve/data_access/
+
+This plug-in visualizes the retrieved data from the web service within JHelioviewer. 
+
+Development Information
+------------------------
+Some short build and installing instructions can be found in the file
+INSTALL
+(only contained in the source code).
+
+For more detailed help or further information on the design concept,
+coding guidelines and other development information please visit
+http://www.helioviewer.org/wiki/index.php?title=JHelioviewer_Development_Information

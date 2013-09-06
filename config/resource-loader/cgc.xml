@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<resourceDefinition>
+    <configuration name="mac">
+        <priority value="1" />
+        <requirements>
+            <requirement name="jhv.os" value="mac"/>
+        </requirements>
+        <files>
+            <file name="cgc-mac" srcDir="jogl" destDir="." registerExecutable="cgc" md5="2c72e77d99cb86d3021ed88af865857c"/>
+        </files>
+    </configuration>
+    <configuration name="linux-x86-32">
+        <priority value="1" />
+        <requirements>
+            <requirement name="jhv.os" value="linux"/>
+            <requirement name="jhv.arch" value="x86-32"/>
+        </requirements>
+        <files>
+            <file name="cgc-linux-x86-32" srcDir="jogl" destDir="." registerExecutable="cgc" md5="aea1a0c0ecda0686d347b1fee509cec7"/>
+        </files>
+    </configuration>
+    <configuration name="linux-x86-64">
+        <priority value="1" />
+        <requirements>
+            <requirement name="jhv.os" value="linux"/>
+            <requirement name="jhv.arch" value="x86-64"/>
+        </requirements>
+        <files>
+            <file name="cgc-linux-x86-64" srcDir="jogl" destDir="." registerExecutable="cgc" md5="35a1ef695366d05dd384d7960464b42d"/>
+        </files>
+    </configuration>
+    <configuration name="windows-x86-32">
+        <priority value="1" />
+        <requirements>
+            <requirement name="jhv.os" value="windows"/>
+            <requirement name="jhv.arch" value="x86-32"/>
+        </requirements>
+        <files>
+            <file name="cgc-windows-x86-32.exe" srcDir="jogl" destDir="." registerExecutable="cgc" md5="99bba5a3df086db0ced82dc25cf7f4dc"/>
+        </files>
+    </configuration>
+    <configuration name="windows-x86-64">
+        <priority value="1" />
+        <requirements>
+            <requirement name="jhv.os" value="windows"/>
+            <requirement name="jhv.arch" value="x86-64"/>
+        </requirements>
+        <files>
+            <file name="cgc-windows-x86-64.exe" srcDir="jogl" destDir="." registerExecutable="cgc" md5="fd5b50aee0c9172bd1b2cd1001164a1e"/>            
+        </files>
+    </configuration>
+</resourceDefinition>

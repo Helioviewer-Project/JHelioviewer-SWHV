@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<resourceDefinition>
+    <configuration name="linux-x86-64">
+        <priority value="1" />
+        <requirements>
+            <requirement name="jhv.os">
+                <requirementValue value="linux" />
+            </requirement>
+            <requirement name="jhv.arch" value="x86-64"/>
+        </requirements>
+        <files>
+            <file name="glibc-version-linux-x86-64" srcDir="glibc-version" destDir="." registerExecutable="glibc-version" md5="90a5ebc82a92f57c924db3a2221f68e6"/>
+        </files>
+    </configuration>
+    <configuration name="linux-x86-32">
+        <priority value="1" />
+        <requirements>
+            <requirement name="jhv.os">
+                <requirementValue value="linux" />
+            </requirement>
+            <requirement name="jhv.arch" value="x86-32"/>
+        </requirements>
+        <files>
+            <file name="glibc-version-linux-x86-32" srcDir="glibc-version" destDir="." registerExecutable="glibc-version" md5="761f4e0fd39c340d7d7abdbad6ebfaa7"/>
+        </files>
+    </configuration>
+</resourceDefinition>
