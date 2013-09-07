@@ -1,7 +1,11 @@
 package org.jhv.dataset.tree.models;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Enumeration;
 import java.util.TreeMap;
+
+import javax.swing.tree.TreeNode;
 
 import org.helioviewer.base.logging.Log;
 import org.helioviewer.jhv.layers.LayerDescriptor;
@@ -12,7 +16,7 @@ import org.helioviewer.jhv.layers.LayersModel;
 * @author Freek Verstringe
 *
 */
-public class DatasetIntervals{
+public class DatasetIntervals implements TreeNode{
 	
 	/*
 	 * Layers sorted by an interval of dates.
@@ -56,7 +60,7 @@ public class DatasetIntervals{
     	int i=0;
     	while( datasetInterval==null && i<datasetIntervals.size()){
     		if(datasetIntervals.get(i).getTitle() == title){
-    			datasetInterval = datasetIntervals.get(i);
+    			datasetInterval = getInterval(i);
     		}
     		i++;
     	}
@@ -67,7 +71,11 @@ public class DatasetIntervals{
     	
     	return i;
     }	
-    
+
+	public DatasetInterval getInterval(int idx) {
+		// TODO Auto-generated method stub
+		return datasetIntervals.get(idx);
+	}    
 	/*
 	 * The interval and LayerTyper are inside the descriptor.
 	 */
@@ -84,7 +92,7 @@ public class DatasetIntervals{
     	
     	DatasetInterval datasetInterval = getInterval(intervalTitle);
 		if( datasetInterval==null ){
-			datasetInterval = new DatasetInterval(intervalTitle);
+			datasetInterval = new DatasetInterval(intervalTitle, this);
 			datasetIntervals.add(datasetInterval);
 		}
 		datasetInterval.addLayerDescriptor(descriptor, idx);
@@ -95,12 +103,9 @@ public class DatasetIntervals{
 	}
 	
 	public void addInterval(String title, int idx){
-		datasetIntervals.add(idx, new DatasetInterval(title));
+		datasetIntervals.add(idx, new DatasetInterval(title, this));
 	}
 	
-	public void addType(String title){
-		datasetIntervals.add( new DatasetInterval(title) );
-	}
 	
 	public void removeInterval( String title ){
 		int index = getIntervalIndex(title);
@@ -182,12 +187,51 @@ public class DatasetIntervals{
 			datasetInterval.addType(typeKey);
 		}
 	}   
-	public String toString(){
+	public String toLongString(){
 		String str = "";
 		for(int i=0; i< getNumIntervals() ;i++){
-			str += this.datasetIntervals.get(i).toString();
+			str += this.datasetIntervals.get(i).toLongString();
 		}
 		return str;
 	}
-		
+	public String toString() {
+		return "main";
+	}
+	@Override
+	public Enumeration children() {
+		return Collections.enumeration(this.datasetIntervals);
+	}
+
+	@Override
+	public boolean getAllowsChildren() {
+		return true;
+	}
+
+	@Override
+	public TreeNode getChildAt(int childIndex) {
+		return this.datasetIntervals.get(childIndex);
+	}
+
+	@Override
+	public int getChildCount() {
+		return this.getNumIntervals();
+	}
+
+	@Override
+	public int getIndex(TreeNode node) {
+		return this.getIntervalIndex(((DatasetInterval)node).getTitle());
+	}
+
+	@Override
+	public TreeNode getParent() {
+		return null;
+	}
+
+	@Override
+	public boolean isLeaf() {
+		if(this.getNumIntervals()==0){
+			return true;
+		}
+		return false;
+	}
 }

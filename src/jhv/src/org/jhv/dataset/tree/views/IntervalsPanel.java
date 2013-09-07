@@ -57,13 +57,13 @@ public class IntervalsPanel extends JPanel implements IntervalsListener{
 	}
 	
 
-	@Override
+	
 	public void intervalInserted(int idx) {
 		IntervalPanel intervalPanel = new IntervalPanel(this.model.getInterval(idx));
 		this.intervalPanels.add(idx, intervalPanel);
 	}
 
-	@Override
+	
 	public void intervalRemoved(int idx) {
 		this.intervalPanels.remove(idx);
 	}	
