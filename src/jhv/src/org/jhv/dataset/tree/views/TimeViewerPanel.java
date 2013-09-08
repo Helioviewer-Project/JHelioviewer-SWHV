@@ -6,6 +6,7 @@ import java.awt.BorderLayout;
 import javax.swing.JTree;
 
 public class TimeViewerPanel extends JPanel {
+	private static final long serialVersionUID = -2808981935328885943L;
 
 	/**
 	 * Create the panel.

@@ -20,6 +20,9 @@ public class DatasetIntervalTest {
 	@Before
 	public void setUp() throws Exception {
 		modeltest = new DatasetIntervals();
+		DatasetTreeModel model = new DatasetTreeModel(modeltest);
+		//modeltest.setModel(model);
+		
 		descriptors = new ArrayList<LayerDescriptor>();
 		intervals = new ArrayList<String>();
 		intervals.add(0, "first");

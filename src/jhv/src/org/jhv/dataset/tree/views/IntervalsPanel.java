@@ -18,7 +18,7 @@ import java.util.TreeMap;
 /**
  * @author Freek Verstringe
  */
-public class IntervalsPanel extends JPanel implements IntervalsListener{
+public class IntervalsPanel extends JPanel{
 
 	private static final long serialVersionUID = -4980121173310259804L;
 	
@@ -26,11 +26,9 @@ public class IntervalsPanel extends JPanel implements IntervalsListener{
 	private FixedHeightButton buttonCenter;
 	private FixedHeightButton buttonRight;
 	
-	private JPanel intervalPanelContainer;
-	private ArrayList<JPanel> intervalPanels;
 	DatasetIntervals model;
 	
-	public IntervalsPanel(DatasetIntervals model) {
+	public IntervalsPanel() {
 		super();
 		this.model = model;
 		setLayout(new BorderLayout(0, 0));
@@ -44,27 +42,5 @@ public class IntervalsPanel extends JPanel implements IntervalsListener{
 		buttonRight = new FixedHeightButton("r");
 		add(buttonRight, BorderLayout.EAST);
 		
-		intervalPanelContainer = new JPanel();
-		add(intervalPanelContainer, BorderLayout.SOUTH);
-		this.intervalPanelContainer.setLayout(new GridLayout(model.getNumIntervals(),1));
-		intervalPanels = new ArrayList<JPanel> ();
-		
-	}
-	
-	public void addIntervalPanel(JPanel intervalPanel){
-		this.intervalPanels.add(intervalPanel);
-		intervalPanelContainer.add(intervalPanel);
-	}
-	
-
-	
-	public void intervalInserted(int idx) {
-		IntervalPanel intervalPanel = new IntervalPanel(this.model.getInterval(idx));
-		this.intervalPanels.add(idx, intervalPanel);
-	}
-
-	
-	public void intervalRemoved(int idx) {
-		this.intervalPanels.remove(idx);
-	}	
+	}		
 }

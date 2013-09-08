@@ -7,8 +7,6 @@ import org.jhv.dataset.tree.models.DatasetLayer;
 import org.jhv.dataset.tree.views.FixedHeightButton;
 import javax.swing.JPanel;
 
-import org.helioviewer.jhv.layers.LayerDescriptor;
-
 public class LayerPanel extends JPanel{
 
 	private static final long serialVersionUID = 7214631588320087038L;

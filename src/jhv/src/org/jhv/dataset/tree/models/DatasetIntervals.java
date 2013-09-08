@@ -5,24 +5,29 @@ import java.util.Collections;
 import java.util.Enumeration;
 import java.util.TreeMap;
 
+import javax.swing.JComponent;
+import javax.swing.JPanel;
+import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreeNode;
 
 import org.helioviewer.base.logging.Log;
 import org.helioviewer.jhv.layers.LayerDescriptor;
 import org.helioviewer.jhv.layers.LayersModel;
+import org.jhv.dataset.tree.views.IntervalsPanel;
 
 
 /**
 * @author Freek Verstringe
 *
 */
-public class DatasetIntervals implements TreeNode{
+public class DatasetIntervals implements TreeNode, DatasetNode{
 	
 	/*
 	 * Layers sorted by an interval of dates.
 	 */
     private ArrayList<DatasetInterval> datasetIntervals;
     private boolean removeEmptyIntervals;
+    private DefaultTreeModel model;
     /*
      * Constructors
      */
@@ -31,6 +36,13 @@ public class DatasetIntervals implements TreeNode{
         this.removeEmptyIntervals = true;
         datasetIntervals = new ArrayList<DatasetInterval>();
     }
+	
+	public DefaultTreeModel getModel(){
+		return this.model;
+	}
+	public void setModel(DefaultTreeModel model){
+        this.model = model;
+	}
 	
 	public DatasetIntervals(boolean removeEmptyIntervals) {
         super();
@@ -87,15 +99,15 @@ public class DatasetIntervals implements TreeNode{
     /*
      * Layers are added often at position 0 all subsequent layers are shifted by 1
      */
-    public void addLayerDescriptor(final LayerDescriptor descriptor, final int idx) {
+    public DatasetLayer addLayerDescriptor(final LayerDescriptor descriptor, final int idx) {
     	final String intervalTitle = descriptor.getInterval();
     	
     	DatasetInterval datasetInterval = getInterval(intervalTitle);
 		if( datasetInterval==null ){
-			datasetInterval = new DatasetInterval(intervalTitle, this);
-			datasetIntervals.add(datasetInterval);
+			this.addInterval(intervalTitle);
+			datasetInterval = getInterval(intervalTitle);
 		}
-		datasetInterval.addLayerDescriptor(descriptor, idx);
+		return datasetInterval.addLayerDescriptor(descriptor, idx);
     }	
 	
 	public void addInterval(String title){
@@ -104,6 +116,7 @@ public class DatasetIntervals implements TreeNode{
 	
 	public void addInterval(String title, int idx){
 		datasetIntervals.add(idx, new DatasetInterval(title, this));
+		this.getModel().nodesWereInserted(this, new int[]{idx});
 	}
 	
 	
@@ -115,7 +128,10 @@ public class DatasetIntervals implements TreeNode{
 	}	
 	
 	public void removeInterval( int index ){
-		datasetIntervals.remove(index);
+		TreeNode[] toRemove = new TreeNode[]{datasetIntervals.get(index)};
+		int[]indices_to_remove = new int[]{index};
+		datasetIntervals.remove(index);	
+		this.getModel().nodesWereRemoved(this, indices_to_remove, toRemove);		
 	}
 	
 	/*
@@ -233,5 +249,9 @@ public class DatasetIntervals implements TreeNode{
 			return true;
 		}
 		return false;
+	}
+	
+    public JPanel getView() {
+		return new IntervalsPanel();
 	}
 }

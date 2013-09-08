@@ -1,12 +1,12 @@
 package org.jhv.dataset.tree.models;
 
 import java.awt.FlowLayout;
-import java.awt.GridLayout;
-
 import javax.swing.JComponent;
 import javax.swing.JPanel;
 
 public class DatasetNodePanel extends JPanel{
+
+	private static final long serialVersionUID = 7341425049867146441L;
 	JComponent [] components;
 	
 	DatasetNodePanel(JComponent [] components){

@@ -4,13 +4,16 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Enumeration;
 
+import javax.swing.JPanel;
+import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreeNode;
 
 import org.helioviewer.jhv.layers.LayerDescriptor;
 import org.jhv.dataset.tree.models.DatasetType;
+import org.jhv.dataset.tree.views.IntervalPanel;
 
-public class DatasetInterval implements TreeNode{
-	private String title;
+public class DatasetInterval implements TreeNode, DatasetNode{
+	public String title;
 	ArrayList<DatasetType> datasetTypes;
 	DatasetIntervals parent;
 	
@@ -18,6 +21,10 @@ public class DatasetInterval implements TreeNode{
 		this.parent = parent;
 		this.title = title;
 		datasetTypes = new ArrayList<DatasetType>();
+	}
+	
+	public DefaultTreeModel getModel(){
+		return this.parent.getModel();
 	}
 	
     public DatasetType getType(String title){
@@ -50,23 +57,27 @@ public class DatasetInterval implements TreeNode{
     /*
      * Layers are added often at position 0 all subsequent layers are shifted by 1
      */
-    public void addLayerDescriptor(final LayerDescriptor descriptor, final int idx) {
+    public DatasetLayer addLayerDescriptor(final LayerDescriptor descriptor, final int idx) {
     	final String typeTitle = descriptor.getType();
     	
     	DatasetType datasetType = getType(typeTitle);
 		if( datasetType==null ){
-			datasetType = new DatasetType(typeTitle, this);
-			datasetTypes.add(datasetType);
+			this.addType(typeTitle);
+			datasetType = getType(typeTitle);
 		}
-		datasetType.addLayerDescriptor(descriptor, idx);
+		return datasetType.addLayerDescriptor(descriptor, idx);
     }
     
 	public void addType(String title, int idx){
 		datasetTypes.add(idx, new DatasetType(title, this));
+		this.getModel().nodesWereInserted(this, new int[]{idx});
 	}
+	
 	public void addType(String title){
 		datasetTypes.add( new DatasetType(title, this) );
+		this.getModel().nodesWereInserted(this, new int[]{datasetTypes.size()-1});
 	}
+	
 	public void removeType(String title){
 		ArrayList<Integer> toRemove = new ArrayList<Integer>();
 		for(int i=0; i<datasetTypes.size(); i++){
@@ -74,9 +85,17 @@ public class DatasetInterval implements TreeNode{
 				toRemove.add(i);
 			}
 		}
+		
+		TreeNode[] children = new TreeNode[toRemove.size()];
+		int[] toRemoveints = new int[toRemove.size()];
+		for(int i=0; i<toRemove.size(); i++){
+			children[i] = datasetTypes.get(toRemove.get(i));
+			toRemoveints[i] = toRemove.get(i);
+		}				
 		for(int i=toRemove.size()-1; i>=0; i--){
 			datasetTypes.remove(i);
 		}
+		this.getModel().nodesWereRemoved(this, toRemoveints, children);
 	}
 
 	public void removeLayerDescriptor(LayerDescriptor descriptor, int idx) {
@@ -131,7 +150,7 @@ public class DatasetInterval implements TreeNode{
 	}
 
 	@Override
-	public Enumeration children() {
+	public Enumeration<DatasetType> children() {
 		return Collections.enumeration(this.datasetTypes);
 	}
 
@@ -157,14 +176,15 @@ public class DatasetInterval implements TreeNode{
 
 	@Override
 	public TreeNode getParent() {
-		// TODO Auto-generated method stub
-		return null;
+		return (TreeNode)(this.parent);
 	}
 
 	@Override
 	public boolean isLeaf() {
-		// TODO Auto-generated method stub
 		return false;
 	}
-
+	
+    public JPanel getView() {
+		return new IntervalPanel();
+	}
 };

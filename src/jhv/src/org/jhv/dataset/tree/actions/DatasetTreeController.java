@@ -1,7 +1,6 @@
 package org.jhv.dataset.tree.actions;
 import org.helioviewer.jhv.layers.LayersListener;
 import org.helioviewer.viewmodel.view.View;
-import org.jhv.dataset.tree.models.DatasetTreeBuilder;
 
 public class DatasetTreeController implements LayersListener{
 	

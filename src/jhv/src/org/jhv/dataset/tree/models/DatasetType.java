@@ -4,12 +4,15 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Enumeration;
 
+import javax.swing.JPanel;
+import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreeNode;
 
 import org.helioviewer.jhv.layers.LayerDescriptor;
 import org.jhv.dataset.tree.models.DatasetLayer;
+import org.jhv.dataset.tree.views.TypePanel;
 
-public class DatasetType implements TreeNode{
+public class DatasetType implements TreeNode, DatasetNode{
 	
 	private String title;
 	private DatasetInterval parent;
@@ -23,28 +26,42 @@ public class DatasetType implements TreeNode{
     /*
      * Layers are added often at position 0 all subsequent layers are shifted by 1
      */
-    public void addLayerDescriptor(final LayerDescriptor descriptor, final int idx) {
-    	datasetLayers.add(idx, new DatasetLayer(descriptor, this));
+    public DatasetLayer addLayerDescriptor(final LayerDescriptor descriptor, final int idx) {
+    	this.addLayer( descriptor, idx );
+    	return this.getLayer(idx);
     }
     
+	public DefaultTreeModel getModel(){
+		return this.parent.getModel();
+	}
+	
 	public void addLayer(LayerDescriptor descriptor, int idx){
 		datasetLayers.add(idx, new DatasetLayer(descriptor, this));
+		this.getModel().nodesWereInserted(this, new int[]{idx});
 	}
 	
-	public void addType(LayerDescriptor descriptor){
+	public void addLayer(LayerDescriptor descriptor){
 		datasetLayers.add( new DatasetLayer(descriptor, this) );
+		this.getModel().nodesWereInserted(this, new int[]{datasetLayers.size()-1});		
 	}
 	
-	public void removeType(LayerDescriptor descriptor){
+	public void removeLayer(LayerDescriptor descriptor){
 		ArrayList<Integer> toRemove = new ArrayList<Integer>();
 		for(int i=0; i<datasetLayers.size(); i++){
 			if(datasetLayers.get(i).getDescriptor() == descriptor){
 				toRemove.add(i);
 			}
 		}
+		TreeNode[] children = new TreeNode[toRemove.size()];
+		int[] toRemoveints = new int[toRemove.size()];
+		for(int i=0; i<toRemove.size(); i++){
+			children[i] = datasetLayers.get(toRemove.get(i));
+			toRemoveints[i] = toRemove.get(i);
+		}				
 		for(int i=toRemove.size()-1; i>=0; i--){
 			datasetLayers.remove(i);
 		}
+		this.getModel().nodesWereRemoved(this, toRemoveints, children);
 	}
 
 	public void removeLayerDescriptor(LayerDescriptor descriptor, int idx) {
@@ -84,7 +101,7 @@ public class DatasetType implements TreeNode{
 		return this.title;
 	}
 	@Override
-	public Enumeration children() {
+	public Enumeration<DatasetLayer> children() {
 		return Collections.enumeration(this.datasetLayers);
 	}
 	@Override
@@ -117,5 +134,8 @@ public class DatasetType implements TreeNode{
 			return false;
 		}
 		return true;
+	}
+    public JPanel getView() {
+		return new TypePanel();
 	}
 };

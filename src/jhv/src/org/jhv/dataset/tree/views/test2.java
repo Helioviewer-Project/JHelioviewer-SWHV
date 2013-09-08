@@ -8,11 +8,14 @@ import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.JTree;
 import javax.swing.SwingUtilities;
+import javax.swing.tree.DefaultTreeCellRenderer;
 
 import org.helioviewer.jhv.layers.LayerDescriptor;
 import org.helioviewer.jhv.layers.LayersModel;
 import org.jhv.dataset.tree.models.DatasetIntervals;
 import org.jhv.dataset.tree.models.DatasetLayerTreeModel;
+import org.jhv.dataset.tree.models.DatasetNodeRenderer;
+import org.jhv.dataset.tree.models.DatasetTreeCellEditor;
 
 public class test2 extends JFrame {
 	
@@ -64,8 +67,14 @@ public class test2 extends JFrame {
 		JTree tree = new JTree( modeltest );
 		for (int i = 0; i < tree.getRowCount(); i++) {
 	         tree.expandRow(i);
-		}		
+		}
+		tree.setCellRenderer( new DatasetNodeRenderer());
+        tree.setCellEditor(new DatasetTreeCellEditor(tree, (DefaultTreeCellRenderer) tree.getCellRenderer()));
+        tree.setRowHeight(30);
+        tree.setEditable(true);
+        tree.updateUI();
 		this.getContentPane().add(tree);
+
 		
     }
     
