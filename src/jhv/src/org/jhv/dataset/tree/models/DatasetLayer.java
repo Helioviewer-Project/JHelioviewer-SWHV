@@ -2,11 +2,14 @@ package org.jhv.dataset.tree.models;
 
 import java.util.Enumeration;
 
+import javax.swing.JPanel;
+import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreeNode;
 
 import org.helioviewer.jhv.layers.LayerDescriptor;
+import org.jhv.dataset.tree.views.LayerPanel;
 
-public class DatasetLayer implements TreeNode{
+public class DatasetLayer implements TreeNode, DatasetNode{
 	private LayerDescriptor descriptor;
 	private DatasetType parent;
 	
@@ -14,6 +17,11 @@ public class DatasetLayer implements TreeNode{
 		this.parent = parent;
 		this.descriptor = descriptor;
 	}
+	
+	public DefaultTreeModel getModel(){
+		return this.parent.getModel();
+	}
+	
 	public LayerDescriptor getDescriptor() {
 		return this.descriptor;
 	}
@@ -30,7 +38,7 @@ public class DatasetLayer implements TreeNode{
 	}
 	
 	@Override
-	public Enumeration children() {
+	public Enumeration<?> children() {
 		return null;
 	}
 	@Override
@@ -56,5 +64,9 @@ public class DatasetLayer implements TreeNode{
 	@Override
 	public boolean isLeaf() {
 		return true;
+	}
+	
+    public JPanel getView() {
+		return new LayerPanel(this);
 	}
 }

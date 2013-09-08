@@ -16,20 +16,16 @@ import java.awt.GridLayout;
 import java.util.ArrayList;
 import java.util.TreeMap;
 
-public class IntervalPanel extends JPanel implements IntervalListener{
+public class IntervalPanel extends JPanel{
 	private static final long serialVersionUID = 4342443227686604174L;
 	
 	private FixedHeightButton buttonLeft;
 	private FixedHeightButton buttonCenter;
 	private FixedHeightButton buttonRight;
 	
-	private JPanel typePanelContainer;
-	private ArrayList<JPanel> typePanels;
-	DatasetInterval model;
 	
-	public IntervalPanel( DatasetInterval model) {
+	public IntervalPanel() {
 		super();
-		this.model = model;
 		setLayout(new BorderLayout(0, 0));
 		
 		buttonLeft = new FixedHeightButton("l");
@@ -47,29 +43,8 @@ public class IntervalPanel extends JPanel implements IntervalListener{
 		buttonRight = new FixedHeightButton("r");
 		add(buttonRight, BorderLayout.EAST);
 		
-		typePanels = new ArrayList<JPanel> ();
-		typePanelContainer = new JPanel();
-		typePanelContainer.setLayout(new GridLayout(typePanels.size(),1));
-
-		add(typePanelContainer, BorderLayout.SOUTH);
 		
 	}
 	
-	public void addTypePanel(JPanel typePanel){
-		this.typePanels.add(typePanel);
-		typePanelContainer.add(typePanel);
-	}
-
-
-	@Override
-	public void typeInserted(int idx) {
-		TypePanel typePanel = new TypePanel(this.model.getType(idx));
-		this.typePanels.add(idx, typePanel);		
-	}
-
-	@Override
-	public void typeRemoved(int idx) {
-		
-	}	
 }
 
