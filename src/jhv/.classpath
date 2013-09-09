@@ -9,12 +9,13 @@
 	<classpathentry kind="lib" path="../lib/log4j-1.2.16.jar"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/viewmodelplugin"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/basegui"/>
-	<classpathentry kind="lib" path="../lib/gluegen-rt.jar" />
+	<classpathentry kind="lib" path="../lib/gluegen-rt.jar"/>
 	<classpathentry kind="lib" path="../lib/jogl.jar"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/jhv-3d"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/jhv-3d-scenegraph"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/jhv-3d-math"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/jhv-3d-plugin"/>
 	<classpathentry kind="lib" path="../resources"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.junit.JUNIT_CONTAINER/4"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
