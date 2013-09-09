@@ -4,6 +4,9 @@ package org.jhv.dataset.tree.views;
 import org.jhv.dataset.tree.views.FixedHeightButton;
 import javax.swing.JPanel;
 
+import org.helioviewer.jhv.gui.actions.CloseAllLayersAction;
+import org.helioviewer.jhv.gui.actions.ShowDialogAction;
+import org.helioviewer.jhv.gui.dialogs.observation.ImageDataPanel;
 import org.helioviewer.jhv.layers.LayerDescriptor;
 import org.jhv.dataset.tree.actions.IntervalsListener;
 import org.jhv.dataset.tree.models.DatasetIntervals;
@@ -31,15 +34,12 @@ public class IntervalsPanel extends JPanel{
 	public IntervalsPanel() {
 		super();
 		this.model = model;
-		setLayout(new BorderLayout(0, 0));
+		setLayout(new BorderLayout());
 		
-		buttonLeft = new FixedHeightButton("l");
-		add(buttonLeft, BorderLayout.WEST);
+		buttonCenter = new FixedHeightButton("Lay");
+		add(buttonCenter, BorderLayout.WEST);
 		
-		buttonCenter = new FixedHeightButton("c");
-		add(buttonCenter, BorderLayout.CENTER);
-		
-		buttonRight = new FixedHeightButton("r");
+		buttonRight = new FixedHeightButton(new CloseAllLayersAction());
 		add(buttonRight, BorderLayout.EAST);
 		
 	}		
