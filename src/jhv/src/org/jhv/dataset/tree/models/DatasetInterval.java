@@ -5,6 +5,7 @@ import java.util.Collections;
 import java.util.Enumeration;
 
 import javax.swing.JPanel;
+import javax.swing.event.TreeModelListener;
 import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreeNode;
 
@@ -13,7 +14,7 @@ import org.jhv.dataset.tree.models.DatasetType;
 import org.jhv.dataset.tree.views.IntervalPanel;
 
 public class DatasetInterval implements TreeNode, DatasetNode{
-	public String title;
+	private String title;
 	ArrayList<DatasetType> datasetTypes;
 	DatasetIntervals parent;
 	
@@ -23,7 +24,7 @@ public class DatasetInterval implements TreeNode, DatasetNode{
 		datasetTypes = new ArrayList<DatasetType>();
 	}
 	
-	public DefaultTreeModel getModel(){
+	public DatasetTreeModel getModel(){
 		return this.parent.getModel();
 	}
 	
@@ -31,7 +32,7 @@ public class DatasetInterval implements TreeNode, DatasetNode{
     	DatasetType datasetType = null;
     	int i=0;
     	while( datasetType==null && i<datasetTypes.size()){
-    		if(datasetTypes.get(i).getTitle() == title){
+    		if(datasetTypes.get(i).getTitle().equals(title)){
     			datasetType = this.getType(i);
     		}
     		i++;
@@ -43,7 +44,7 @@ public class DatasetInterval implements TreeNode, DatasetNode{
     	DatasetType datasetType = null;
     	int i=0;
     	while( datasetType==null && i<datasetTypes.size()){
-    		if(datasetTypes.get(i).getTitle() == title){
+    		if( datasetTypes.get(i).getTitle().equals(title) ){
     			datasetType = this.getType(i);
     		}
     		i++;
@@ -61,7 +62,7 @@ public class DatasetInterval implements TreeNode, DatasetNode{
     	final String typeTitle = descriptor.getType();
     	
     	DatasetType datasetType = getType(typeTitle);
-		if( datasetType==null ){
+		if( datasetType == null ){
 			this.addType(typeTitle);
 			datasetType = getType(typeTitle);
 		}
@@ -102,6 +103,7 @@ public class DatasetInterval implements TreeNode, DatasetNode{
     	final String typeTitle = descriptor.getType();
     	DatasetType datasetType = getType(typeTitle);
     	datasetType.removeLayerDescriptor(descriptor , idx);
+    	removeEmptyTypes();
     }
 
 	public boolean isEmpty() {
@@ -112,10 +114,10 @@ public class DatasetInterval implements TreeNode, DatasetNode{
 	}
 
 	/*
-	 * Removes empty intervals
+	 * Removes empty types
 	 */
     public void removeEmptyTypes() {
-    	for( int i = this.getNumTypes()-1; i>=0; i++ ){
+    	for( int i = this.getNumTypes()-1; i>=0; i-- ){
     		if(this.datasetTypes.get(i).isEmpty()){
     			this.datasetTypes.remove(i);
     		}
@@ -185,6 +187,6 @@ public class DatasetInterval implements TreeNode, DatasetNode{
 	}
 	
     public JPanel getView() {
-		return new IntervalPanel();
+		return new IntervalPanel(this);
 	}
 };

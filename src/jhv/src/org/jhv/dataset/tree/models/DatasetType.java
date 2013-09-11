@@ -31,7 +31,7 @@ public class DatasetType implements TreeNode, DatasetNode{
     	return this.getLayer(idx);
     }
     
-	public DefaultTreeModel getModel(){
+	public DatasetTreeModel getModel(){
 		return this.parent.getModel();
 	}
 	
@@ -65,7 +65,7 @@ public class DatasetType implements TreeNode, DatasetNode{
 	}
 
 	public void removeLayerDescriptor(LayerDescriptor descriptor, int idx) {
-		this.datasetLayers.remove(idx);
+		this.removeLayer(descriptor);
 	}
 	
 	public boolean isEmpty() {
@@ -136,6 +136,6 @@ public class DatasetType implements TreeNode, DatasetNode{
 		return true;
 	}
     public JPanel getView() {
-		return new TypePanel();
+		return new TypePanel(this);
 	}
 };

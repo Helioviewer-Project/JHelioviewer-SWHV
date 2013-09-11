@@ -27,7 +27,7 @@ public class DatasetIntervals implements TreeNode, DatasetNode{
 	 */
     private ArrayList<DatasetInterval> datasetIntervals;
     private boolean removeEmptyIntervals;
-    private DefaultTreeModel model;
+    private DatasetTreeModel model;
     /*
      * Constructors
      */
@@ -37,10 +37,10 @@ public class DatasetIntervals implements TreeNode, DatasetNode{
         datasetIntervals = new ArrayList<DatasetInterval>();
     }
 	
-	public DefaultTreeModel getModel(){
+	public DatasetTreeModel getModel(){
 		return this.model;
 	}
-	public void setModel(DefaultTreeModel model){
+	public void setModel(DatasetTreeModel model){
         this.model = model;
 	}
 	
@@ -56,7 +56,8 @@ public class DatasetIntervals implements TreeNode, DatasetNode{
     	DatasetInterval datasetInterval = null;
     	int i=0;
     	while( datasetInterval==null && i<datasetIntervals.size()){
-    		if(datasetIntervals.get(i).getTitle() == title){
+    		String ht = datasetIntervals.get(i).getTitle();
+    		if( ht.equals(title) ){
     			datasetInterval = datasetIntervals.get(i);
     		}
     		i++;
@@ -71,7 +72,7 @@ public class DatasetIntervals implements TreeNode, DatasetNode{
     	DatasetInterval datasetInterval = null;
     	int i=0;
     	while( datasetInterval==null && i<datasetIntervals.size()){
-    		if(datasetIntervals.get(i).getTitle() == title){
+    		if(datasetIntervals.get(i).getTitle().equals(title) ){
     			datasetInterval = getInterval(i);
     		}
     		i++;
@@ -141,13 +142,14 @@ public class DatasetIntervals implements TreeNode, DatasetNode{
     	final String intervalTitle = descriptor.getInterval();
     	DatasetInterval datasetInterval = getInterval(intervalTitle);
     	datasetInterval.removeLayerDescriptor(descriptor , idx);
+    	removeEmptyIntervals();
     }
     
 	/*
 	 * Removes empty intervals
 	 */
     public void removeEmptyIntervals() {
-    	for( int i = this.getNumIntervals()-1; i>=0; i++ ){
+    	for( int i = this.getNumIntervals()-1; i>=0; i-- ){
     		if(this.datasetIntervals.get(i).isEmpty()){
     			this.datasetIntervals.remove(i);
     		}
@@ -252,6 +254,6 @@ public class DatasetIntervals implements TreeNode, DatasetNode{
 	}
 	
     public JPanel getView() {
-		return new IntervalsPanel();
+		return new IntervalsPanel(this);
 	}
 }
