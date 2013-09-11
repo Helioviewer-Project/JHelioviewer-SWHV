@@ -14,7 +14,7 @@ import java.awt.BorderLayout;
 import java.awt.FlowLayout;
 
 
-public class TypePanel extends JPanel{
+public class TypePanel extends DatasetPanel{
 	private static final long serialVersionUID = 8669761869598533103L;
 	
 	private DatasetType model;

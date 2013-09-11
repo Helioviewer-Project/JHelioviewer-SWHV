@@ -23,7 +23,7 @@ import java.util.TreeMap;
 /**
  * @author Freek Verstringe
  */
-public class IntervalsPanel extends JPanel{
+public class IntervalsPanel extends DatasetPanel{
 
 	private static final long serialVersionUID = -4980121173310259804L;
 	

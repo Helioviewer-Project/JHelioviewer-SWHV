@@ -18,7 +18,6 @@ public class DatasetTree extends JTree{
 		this.model = model;
 		this.setCellRenderer( new DatasetNodeRenderer());
 		this.setCellEditor(new DatasetTreeCellEditor(this, (DefaultTreeCellRenderer) this.getCellRenderer()));
-		this.setRowHeight(30);
 		this.setUI(new DatasetTreeUI());
 		this.setEditable(true);
 		this.getModel().addTreeModelListener(new DatasetTreeModelListener(this));
