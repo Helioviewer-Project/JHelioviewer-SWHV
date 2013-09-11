@@ -2,6 +2,8 @@ package org.jhv.dataset.tree.views;
 
 
 import org.jhv.dataset.tree.views.FixedHeightButton;
+
+import javax.swing.JLabel;
 import javax.swing.JPanel;
 
 import org.helioviewer.jhv.gui.actions.CloseAllLayersAction;
@@ -25,22 +27,17 @@ public class IntervalsPanel extends JPanel{
 
 	private static final long serialVersionUID = -4980121173310259804L;
 	
-	private FixedHeightButton buttonLeft;
-	private FixedHeightButton buttonCenter;
-	private FixedHeightButton buttonRight;
 	
 	DatasetIntervals model;
 	
-	public IntervalsPanel() {
+	public IntervalsPanel( DatasetIntervals model ) {
 		super();
 		this.model = model;
 		setLayout(new BorderLayout());
-		
-		buttonCenter = new FixedHeightButton("Lay");
-		add(buttonCenter, BorderLayout.WEST);
-		
-		buttonRight = new FixedHeightButton(new CloseAllLayersAction());
-		add(buttonRight, BorderLayout.EAST);
+				
+		JLabel label = new JLabel("All layers");
+		label.setOpaque(true);
+		add(label, BorderLayout.CENTER);
 		
 	}		
 }
