@@ -79,6 +79,17 @@ public class DatasetInterval implements TreeNode, DatasetNode{
 		this.getModel().nodesWereInserted(this, new int[]{datasetTypes.size()-1});
 	}
 	
+	public void removeType(int[] toRemoveints){
+		TreeNode[] children = new TreeNode[toRemoveints.length];
+		for(int i=0; i<toRemoveints.length; i++){
+			children[i] = datasetTypes.get(toRemoveints[i]);
+		}				
+		for(int i=toRemoveints.length-1; i>=0; i--){
+			datasetTypes.remove(i);
+		}
+		this.getModel().nodesWereRemoved(this, toRemoveints, children);
+	}	
+	
 	public void removeType(String title){
 		ArrayList<Integer> toRemove = new ArrayList<Integer>();
 		for(int i=0; i<datasetTypes.size(); i++){
@@ -87,16 +98,12 @@ public class DatasetInterval implements TreeNode, DatasetNode{
 			}
 		}
 		
-		TreeNode[] children = new TreeNode[toRemove.size()];
 		int[] toRemoveints = new int[toRemove.size()];
 		for(int i=0; i<toRemove.size(); i++){
-			children[i] = datasetTypes.get(toRemove.get(i));
 			toRemoveints[i] = toRemove.get(i);
-		}				
-		for(int i=toRemove.size()-1; i>=0; i--){
-			datasetTypes.remove(i);
 		}
-		this.getModel().nodesWereRemoved(this, toRemoveints, children);
+		
+		removeType(toRemoveints);
 	}
 
 	public void removeLayerDescriptor(LayerDescriptor descriptor, int idx) {
@@ -121,7 +128,7 @@ public class DatasetInterval implements TreeNode, DatasetNode{
     public void removeEmptyTypes() {
     	for( int i = this.getNumTypes()-1; i>=0; i-- ){
     		if(this.datasetTypes.get(i).isEmpty()){
-    			this.datasetTypes.remove(i);
+    			this.removeType( new int[]{i} );
     		}
     	}
     }

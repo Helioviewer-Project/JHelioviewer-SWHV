@@ -1,13 +1,9 @@
 package org.jhv.dataset.tree.views;
 
 import javax.swing.JTree;
-import javax.swing.event.TreeModelEvent;
 import javax.swing.tree.DefaultTreeCellRenderer;
 import javax.swing.tree.DefaultTreeModel;
-import javax.swing.tree.TreePath;
-import javax.swing.tree.TreeSelectionModel;
 
-import org.jhv.dataset.tree.models.DatasetIntervals;
 import org.jhv.dataset.tree.models.DatasetNodeRenderer;
 import org.jhv.dataset.tree.models.DatasetTreeCellEditor;
 
@@ -25,6 +21,8 @@ public class DatasetTree extends JTree{
 		this.setRowHeight(30);
 		this.setUI(new DatasetTreeUI());
 		this.setEditable(true);
+		this.getModel().addTreeModelListener(new DatasetTreeModelListener(this));
 	}
+	
 
 }

@@ -41,7 +41,7 @@ public class DatasetType implements TreeNode, DatasetNode{
 	
 	public void addLayer(LayerDescriptor descriptor){
 		datasetLayers.add( new DatasetLayer(descriptor, this) );
-		this.getModel().nodesWereInserted(this, new int[]{datasetLayers.size()-1});		
+		this.getModel().nodesWereInserted(this, new int[]{datasetLayers.size()-1});	
 	}
 	
 	public void removeLayer(LayerDescriptor descriptor){
@@ -58,7 +58,7 @@ public class DatasetType implements TreeNode, DatasetNode{
 			toRemoveints[i] = toRemove.get(i);
 		}				
 		for(int i=toRemove.size()-1; i>=0; i--){
-			datasetLayers.remove(i);
+			datasetLayers.remove( toRemoveints[i] );
 		}
 		this.getModel().nodesWereRemoved(this, toRemoveints, children);
 	}
@@ -117,7 +117,7 @@ public class DatasetType implements TreeNode, DatasetNode{
 	}
 	@Override
 	public int getIndex(TreeNode node) {
-		int i=0;
+		int i = 0;
 		while(i<this.getNumLayers() && (this.datasetLayers.get(i) != ((DatasetLayer)(node)))){
 			i++;
 		}

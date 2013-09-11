@@ -150,7 +150,7 @@ public class DatasetIntervals implements TreeNode, DatasetNode{
     public void removeEmptyIntervals() {
     	for( int i = this.getNumIntervals()-1; i>=0; i-- ){
     		if(this.datasetIntervals.get(i).isEmpty()){
-    			this.datasetIntervals.remove(i);
+    			this.removeInterval(i);
     		}
     	}
     }
