@@ -23,7 +23,7 @@ public class LayersToDatasetLayers implements LayersListener{
 		LayerDescriptor descriptor = LayersModel.getSingletonInstance().getDescriptor(idx);
 		if(idx==0){
 			DatasetLayer node = intervals.addLayerDescriptor(descriptor, 0);
-			mappedNodes.add(node);
+			mappedNodes.add(0,node);
 		}
 	}
 
