@@ -5,7 +5,6 @@ import java.util.Collections;
 import java.util.Enumeration;
 
 import javax.swing.JPanel;
-import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreeNode;
 
 import org.helioviewer.jhv.layers.LayerDescriptor;
