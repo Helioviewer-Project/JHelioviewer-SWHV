@@ -5,8 +5,6 @@ import java.util.Collections;
 import java.util.Enumeration;
 
 import javax.swing.JPanel;
-import javax.swing.event.TreeModelListener;
-import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreeNode;
 
 import org.helioviewer.jhv.layers.LayerDescriptor;
@@ -17,8 +15,10 @@ public class DatasetInterval implements TreeNode, DatasetNode{
 	private String title;
 	ArrayList<DatasetType> datasetTypes;
 	DatasetIntervals parent;
+	boolean removeEmptyTypes;
 	
 	public DatasetInterval( String title, DatasetIntervals parent ){
+		this.removeEmptyTypes = true;
 		this.parent = parent;
 		this.title = title;
 		datasetTypes = new ArrayList<DatasetType>();
@@ -103,7 +103,9 @@ public class DatasetInterval implements TreeNode, DatasetNode{
     	final String typeTitle = descriptor.getType();
     	DatasetType datasetType = getType(typeTitle);
     	datasetType.removeLayerDescriptor(descriptor , idx);
-    	removeEmptyTypes();
+    	if(this.removeEmptyTypes){
+    		removeEmptyTypes();
+		}
     }
 
 	public boolean isEmpty() {

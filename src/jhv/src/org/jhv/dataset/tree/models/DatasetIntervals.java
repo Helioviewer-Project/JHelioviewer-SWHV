@@ -3,14 +3,11 @@ package org.jhv.dataset.tree.models;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Enumeration;
-import java.util.TreeMap;
 
-import javax.swing.JComponent;
+
 import javax.swing.JPanel;
-import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreeNode;
 
-import org.helioviewer.base.logging.Log;
 import org.helioviewer.jhv.layers.LayerDescriptor;
 import org.helioviewer.jhv.layers.LayersModel;
 import org.jhv.dataset.tree.views.IntervalsPanel;
@@ -142,7 +139,9 @@ public class DatasetIntervals implements TreeNode, DatasetNode{
     	final String intervalTitle = descriptor.getInterval();
     	DatasetInterval datasetInterval = getInterval(intervalTitle);
     	datasetInterval.removeLayerDescriptor(descriptor , idx);
-    	removeEmptyIntervals();
+    	if(this.removeEmptyIntervals){
+    		removeEmptyIntervals();
+    	}
     }
     
 	/*
@@ -215,8 +214,9 @@ public class DatasetIntervals implements TreeNode, DatasetNode{
 	public String toString() {
 		return "main";
 	}
+	
 	@Override
-	public Enumeration children() {
+	public Enumeration<DatasetInterval> children() {
 		return Collections.enumeration(this.datasetIntervals);
 	}
 

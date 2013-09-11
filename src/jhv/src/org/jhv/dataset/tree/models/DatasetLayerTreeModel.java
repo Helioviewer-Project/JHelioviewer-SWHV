@@ -5,7 +5,7 @@ package org.jhv.dataset.tree.models;
 import java.util.ArrayList;
 import java.util.TreeMap;
 
-import org.helioviewer.base.logging.Log;
+
 import org.helioviewer.jhv.layers.LayerDescriptor;
 import org.helioviewer.jhv.layers.LayersModel;
 
@@ -88,9 +88,7 @@ public class DatasetLayerTreeModel{
     	}
       	
     	ArrayList<LayerDescriptor> descriptors = sortedLayers.get(interval).get(type);
-    	
-    	int size = descriptors.size() - 1;	
-		descriptors.add(idx, descriptor);
+   		descriptors.add(idx, descriptor);
     }
     
 	/*

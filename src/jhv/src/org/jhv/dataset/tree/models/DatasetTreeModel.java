@@ -1,11 +1,6 @@
 package org.jhv.dataset.tree.models;
 
-import java.util.Vector;
- 
-import javax.swing.event.TreeModelEvent;
-import javax.swing.event.TreeModelListener;
 import javax.swing.tree.DefaultTreeModel;
-import javax.swing.tree.TreeNode;
  
 /**
 * @author Freek Verstringe
