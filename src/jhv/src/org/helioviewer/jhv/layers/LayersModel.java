@@ -672,26 +672,30 @@ public class LayersModel implements ViewListener {
         // if layers were changed, perform same operations on GUI
         if (layerReason != null) {
             // If layer was deleted, delete corresponding panel
-            if (layerReason.getLayerChangeType() == LayerChangedReason.LayerChangeType.LAYER_ADDED) {
+            if ( (!layerReason.getProcessed()) && layerReason.getLayerChangeType() == LayerChangedReason.LayerChangeType.LAYER_ADDED) {
+            	layerReason.setProcessed(true);
                 View view = layerReason.getSubView();
                 int newIndex = findView(view);
                 if (newIndex != -1) {
                     this.setActiveLayer(newIndex);
                     this.fireLayerAdded(newIndex);
                 }
-            } else if (layerReason.getLayerChangeType() == LayerChangedReason.LayerChangeType.LAYER_REMOVED) {
+            } else if ( (!layerReason.getProcessed()) && layerReason.getLayerChangeType() == LayerChangedReason.LayerChangeType.LAYER_REMOVED) {
+            	layerReason.setProcessed(true);
                 int oldIndex = this.invertIndexDeleted(layerReason.getLayerIndex());
                 this.fireLayerRemoved(layerReason.getView(), oldIndex);
                 int newIndex = determineNewActiveLayer(oldIndex);
                 this.setActiveLayer(newIndex);
 
-            } else if (layerReason.getLayerChangeType() == LayerChangedReason.LayerChangeType.LAYER_VISIBILITY) {
+            } else if ( (!layerReason.getProcessed()) && layerReason.getLayerChangeType() == LayerChangedReason.LayerChangeType.LAYER_VISIBILITY) {
+            	layerReason.setProcessed(true);
                 View view = layerReason.getSubView();
                 int idx = findView(view);
                 if (idx != -1) {
                     this.fireLayerChanged(idx);
                 }
-            } else if (layerReason.getLayerChangeType() == LayerChangedReason.LayerChangeType.LAYER_DOWNLOADED) {
+            } else if ( (!layerReason.getProcessed()) && layerReason.getLayerChangeType() == LayerChangedReason.LayerChangeType.LAYER_DOWNLOADED) {
+            	layerReason.setProcessed(true);
                 View view = layerReason.getSubView();
                 int idx = findView(view);
                 if (idx != -1) {
@@ -1317,22 +1321,29 @@ public class LayersModel implements ViewListener {
      */
     public LayerDescriptor getDescriptor(View view) {
     	ImageInfoView imageInfoView = view.getAdapter(ImageInfoView.class);
-		String typeString = "imageInfoView";
+		String typeString; 
 		String intervalString;
 
     	if(imageInfoView!=null){
     		Calendar cal = Calendar.getInstance();
-    		SimpleDateFormat format = new SimpleDateFormat("yyyy/mm/dd");
+    		SimpleDateFormat format = new SimpleDateFormat("yyyy/MM/dd HH:mm");
     		Interval<Date> interval = imageInfoView.getDateRange();
-    		
-    		String beginDate = format.format(interval.getStart());
-    		String endDate = format.format(interval.getStart());
+    		if(interval!=null){
+    			typeString = "JPEG2000-movie";
+    			String beginDate = format.format(interval.getStart());
+    			String endDate = format.format(interval.getEnd());
+        		intervalString = beginDate + "-" + endDate;
+    		}
+    		else{
+    			intervalString = layersModel.getCurrentFrameTimestampString(view);
+    			typeString = "Single image";
+    		}
 
     		
-    		intervalString = beginDate + "-" + endDate;
     	}
     	else{
     		intervalString = layersModel.getCurrentFrameTimestampString(view);
+    		typeString = "JPEG200-movie";
     	}
 		LayerDescriptor ld = new LayerDescriptor(intervalString, typeString);
 
