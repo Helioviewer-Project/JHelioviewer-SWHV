@@ -106,7 +106,12 @@ public class DatasetIntervals implements TreeNode, DatasetNode{
 			datasetInterval = getInterval(intervalTitle);
 		}
 		return datasetInterval.addLayerDescriptor(descriptor, idx);
-    }	
+    }
+	public void changeLayerDescriptor(LayerDescriptor descriptor) {
+    	final String intervalTitle = descriptor.getInterval();    	
+    	DatasetInterval datasetInterval = getInterval(intervalTitle);		
+		datasetInterval.changeLayerDescriptor(descriptor);
+	}
 	
 	public void addInterval(String title){
 		this.addInterval( title, 0 );
@@ -135,10 +140,10 @@ public class DatasetIntervals implements TreeNode, DatasetNode{
 	/*
 	 * The interval and LayerTyper are inside the descriptor.
 	 */
-    public void removeLayerDescriptor(final LayerDescriptor descriptor, final int idx) {
+    public void removeLayerDescriptor(final LayerDescriptor descriptor) {
     	final String intervalTitle = descriptor.getInterval();
     	DatasetInterval datasetInterval = getInterval(intervalTitle);
-    	datasetInterval.removeLayerDescriptor(descriptor , idx);
+    	datasetInterval.removeLayerDescriptor(descriptor);
     	if(this.removeEmptyIntervals){
     		removeEmptyIntervals();
     	}
@@ -256,4 +261,5 @@ public class DatasetIntervals implements TreeNode, DatasetNode{
     public JPanel getView() {
 		return new IntervalsPanel(this);
 	}
+
 }

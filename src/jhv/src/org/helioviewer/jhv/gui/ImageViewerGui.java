@@ -411,9 +411,10 @@ public class ImageViewerGui {
     	    
             DatasetIntervals intervals = new DatasetIntervals();
     	    DatasetTreeModel model = new DatasetTreeModel(intervals);
-    	    LayersToDatasetLayers converter = new LayersToDatasetLayers(intervals);
+    	    LayersToDatasetLayers converter = new LayersToDatasetLayers(model);
     	    LayersModel.getSingletonInstance().addLayersListener(converter);
     	    JTree tree = new DatasetTree(model);
+    	    model.setTree(tree);
     		
             leftPane.add("Tree", tree);
 

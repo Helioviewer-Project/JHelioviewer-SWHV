@@ -10,13 +10,14 @@ import javax.swing.tree.TreeNode;
 import org.helioviewer.jhv.layers.LayerDescriptor;
 import org.jhv.dataset.tree.models.DatasetLayer;
 import org.jhv.dataset.tree.views.TypePanel;
+import org.jhv.dataset.tree.views.LayerPanel;
 
 public class DatasetType implements TreeNode, DatasetNode{
 	
 	private String title;
 	private DatasetInterval parent;
 	
-	ArrayList<DatasetLayer> datasetLayers;
+	public ArrayList<DatasetLayer> datasetLayers;
 	public DatasetType( String title, DatasetInterval parent){
 		this.title = title;
 		datasetLayers = new ArrayList<DatasetLayer>();
@@ -38,6 +39,17 @@ public class DatasetType implements TreeNode, DatasetNode{
 		datasetLayers.add(idx, new DatasetLayer(descriptor, this));
 		this.getModel().nodesWereInserted(this, new int[]{idx});
 	}
+	
+	public void changeLayerDescriptor(LayerDescriptor descriptor) {
+		int i=0;
+
+		while( i<datasetLayers.size() && datasetLayers.get(i).getDescriptor() != descriptor){
+			i++;
+		}
+		LayerPanel panel = (LayerPanel)(datasetLayers.get(i).getView());
+		panel.updateChangeFast();
+		this.getModel().nodeChanged(datasetLayers.get(i) );
+	}	
 	
 	public void addLayer(LayerDescriptor descriptor){
 		datasetLayers.add( new DatasetLayer(descriptor, this) );
@@ -62,8 +74,8 @@ public class DatasetType implements TreeNode, DatasetNode{
 		}
 		this.getModel().nodesWereRemoved(this, toRemoveints, children);
 	}
-
-	public void removeLayerDescriptor(LayerDescriptor descriptor, int idx) {
+	
+	public void removeLayerDescriptor(LayerDescriptor descriptor) {
 		this.removeLayer(descriptor);
 	}
 	
@@ -137,4 +149,5 @@ public class DatasetType implements TreeNode, DatasetNode{
     public JPanel getView() {
 		return new TypePanel(this);
 	}
+
 };
