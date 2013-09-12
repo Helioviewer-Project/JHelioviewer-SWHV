@@ -118,7 +118,7 @@ public class LayersToDatasetLayers implements LayersListener{
 			if(index<this.mappedNodes.size()-1){
 					DatasetLayer layerToMove = this.mappedNodes.get(index);
 
-			    	DatasetType type = this.treemodel.getIntervals().getInterval(layerToMove.getDescriptor().getInterval()).getType(layerToMove.getDescriptor().getType());
+			    	DatasetType type = this.treemodel.getType(layerToMove);
 			    	type.datasetLayers.remove(index);
 			    	type.datasetLayers.add(index+1, layerToMove);
 					
