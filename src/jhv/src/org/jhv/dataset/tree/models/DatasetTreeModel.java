@@ -44,5 +44,9 @@ public class DatasetTreeModel extends DefaultTreeModel {
 	public DatasetLayer addLayerDescriptor(LayerDescriptor descriptor, int index) {
 		return this.intervals.addLayerDescriptor(descriptor, index);	
 	}
+
+	public DatasetType getType(DatasetLayer layer) {
+		return this.intervals.getInterval(layer.getDescriptor().getInterval()).getType(layer.getDescriptor().getType());
+	}
     
 }
