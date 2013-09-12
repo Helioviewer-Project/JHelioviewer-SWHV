@@ -461,7 +461,7 @@ public class LayersModel implements ViewListener {
      *            - View that can be associated with the layer in question
      * @return index of the layer that can be associated with the given view
      */
-    private int findView(View view) {
+    public int findView(View view) {
         LayeredView lv = getLayeredView();
         View theView = ViewHelper.findLastViewBeforeLayeredView(view);
         int idx = lv.getLayerLevel(theView);

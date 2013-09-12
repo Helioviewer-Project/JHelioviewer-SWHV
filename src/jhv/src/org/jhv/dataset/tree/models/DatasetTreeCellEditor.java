@@ -21,4 +21,8 @@ public class DatasetTreeCellEditor extends DefaultTreeCellEditor  {
 	public boolean isCellEditable(EventObject anEvent) {
 	    return true;
 	}
+	
+	public boolean shouldSelectCell(EventObject anEvent) {
+	    return false;
+	}
 }

@@ -6,6 +6,7 @@ import org.helioviewer.jhv.gui.IconBank;
 import org.helioviewer.jhv.gui.IconBank.JHVIcon;
 import org.helioviewer.jhv.layers.LayersModel;
 import org.helioviewer.viewmodel.view.View;
+import org.jhv.dataset.tree.models.LayersToDatasetLayers;
 
 /**
  * Action for a specific layer to move up a given layer.
@@ -35,7 +36,7 @@ public class MoveLayerUpAction extends AbstractAction {
      * {@inheritDoc}
      */
     public void actionPerformed(ActionEvent e) {
-        LayersModel.getSingletonInstance().moveLayerUp(view);
+    	LayersToDatasetLayers.getSingletonInstance().moveLayerUp(view);
     }
 
 }

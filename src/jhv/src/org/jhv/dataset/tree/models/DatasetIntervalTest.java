@@ -70,13 +70,13 @@ public class DatasetIntervalTest {
 		modeltest.getDescriptor(descriptors.get(2).getInterval(), descriptors.get(2).getType(), 2);
 		assertTrue(	descriptors.get(2) == modeltest.getDescriptor( descriptors.get(2).getInterval(), descriptors.get(2).getType(), 2 ) );
 		
-		modeltest.removeLayerDescriptor( descriptors.get(6), 0);
+		modeltest.removeLayerDescriptor( descriptors.get(6));
 		modeltest.getDescriptor(descriptors.get(5).getInterval(), descriptors.get(5).getType(), 0);
 		modeltest.getDescriptor(descriptors.get(2).getInterval(), descriptors.get(2).getType(), 1);
-		modeltest.removeLayerDescriptor( descriptors.get(5), 0);
+		modeltest.removeLayerDescriptor( descriptors.get(5));
 		modeltest.getDescriptor(descriptors.get(2).getInterval(), descriptors.get(2).getType(), 0);
 		assertTrue(	descriptors.get(2) == modeltest.getDescriptor( descriptors.get(2).getInterval(), descriptors.get(2).getType(), 0 ) );
-		modeltest.removeLayerDescriptor( descriptors.get(2), 0);		
+		modeltest.removeLayerDescriptor( descriptors.get(2));		
 	}
 	@Test
 	public void testAddRemove2() {

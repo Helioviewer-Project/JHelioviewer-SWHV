@@ -12,10 +12,12 @@ import org.jhv.dataset.tree.views.LayerPanel;
 public class DatasetLayer implements TreeNode, DatasetNode{
 	private LayerDescriptor descriptor;
 	private DatasetType parent;
+	private LayerPanel panel;
 	
 	public DatasetLayer( LayerDescriptor descriptor, DatasetType parent){
 		this.parent = parent;
 		this.descriptor = descriptor;
+		panel = new LayerPanel(this);
 	}
 	
 	public DefaultTreeModel getModel(){
@@ -67,6 +69,12 @@ public class DatasetLayer implements TreeNode, DatasetNode{
 	}
 	
     public JPanel getView() {
-		return new LayerPanel(this);
+    	return panel;
 	}
+
+	public void setDescriptor(LayerDescriptor desc) {
+		this.descriptor = desc;
+		this.getModel().nodeChanged(this);
+	}
+
 }

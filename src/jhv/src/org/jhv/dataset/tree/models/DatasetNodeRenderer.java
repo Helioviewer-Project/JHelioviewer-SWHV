@@ -1,12 +1,12 @@
 package org.jhv.dataset.tree.models;
 
 import java.awt.Component;
+import java.awt.event.MouseEvent;
 
+import javax.swing.JComponent;
 import javax.swing.JTree;
 import javax.swing.tree.DefaultTreeCellRenderer;
-
-
-
+import javax.swing.tree.TreePath;
  
 /**
 * This class is implemented to customize the display of a node.
@@ -18,8 +18,8 @@ public class DatasetNodeRenderer extends DefaultTreeCellRenderer {
 
     
     public Component getTreeCellRendererComponent( JTree tree, Object value, boolean sel, boolean expanded, boolean leaf, int row,boolean hasFocus) {
-       
-    	DatasetNode node = (DatasetNode) value;      
+        this.setToolTipText("sdf");
+    	DatasetNode node = (DatasetNode) value;
     	return node.getView();
     }
 }

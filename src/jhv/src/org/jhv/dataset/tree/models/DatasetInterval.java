@@ -59,8 +59,7 @@ public class DatasetInterval implements TreeNode, DatasetNode{
      * Layers are added often at position 0 all subsequent layers are shifted by 1
      */
     public DatasetLayer addLayerDescriptor(final LayerDescriptor descriptor, final int idx) {
-    	final String typeTitle = descriptor.getType();
-    	
+    	final String typeTitle = descriptor.getType();    	
     	DatasetType datasetType = getType(typeTitle);
 		if( datasetType == null ){
 			this.addType(typeTitle);
@@ -69,6 +68,12 @@ public class DatasetInterval implements TreeNode, DatasetNode{
 		return datasetType.addLayerDescriptor(descriptor, idx);
     }
     
+	public void changeLayerDescriptor(LayerDescriptor descriptor) {
+    	final String typeTitle = descriptor.getType();   	
+    	DatasetType datasetType = getType(typeTitle);
+		datasetType.changeLayerDescriptor(descriptor);
+	}  
+	
 	public void addType(String title, int idx){
 		datasetTypes.add(idx, new DatasetType(title, this));
 		this.getModel().nodesWereInserted(this, new int[]{idx});
@@ -106,10 +111,10 @@ public class DatasetInterval implements TreeNode, DatasetNode{
 		removeType(toRemoveints);
 	}
 
-	public void removeLayerDescriptor(LayerDescriptor descriptor, int idx) {
+	public void removeLayerDescriptor(LayerDescriptor descriptor) {
     	final String typeTitle = descriptor.getType();
     	DatasetType datasetType = getType(typeTitle);
-    	datasetType.removeLayerDescriptor(descriptor , idx);
+    	datasetType.removeLayerDescriptor(descriptor);
     	if(this.removeEmptyTypes){
     		removeEmptyTypes();
 		}
@@ -198,4 +203,6 @@ public class DatasetInterval implements TreeNode, DatasetNode{
     public JPanel getView() {
 		return new IntervalPanel(this);
 	}
+
+
 };
