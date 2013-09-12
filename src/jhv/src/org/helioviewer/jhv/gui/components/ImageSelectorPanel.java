@@ -33,6 +33,7 @@ import org.helioviewer.viewmodel.view.MovieView;
 import org.helioviewer.viewmodel.view.TimedMovieView;
 import org.helioviewer.viewmodel.view.View;
 import org.helioviewer.viewmodel.view.jp2view.datetime.ImmutableDateTime;
+import org.jhv.dataset.tree.models.LayersToDatasetLayers;
 
 /**
  * Panel for displaying all layers including the layer specific controls.
@@ -194,7 +195,7 @@ public class ImageSelectorPanel extends JPanel implements LayersListener {
          */
         public void actionPerformed(ActionEvent arg0) {
             if (LayersModel.getSingletonInstance().getActiveView() != null) {
-                LayersModel.getSingletonInstance().moveLayerDown(LayersModel.getSingletonInstance().getActiveView());
+            	LayersToDatasetLayers.getSingletonInstance().moveLayerDown(LayersModel.getSingletonInstance().getActiveView());
             }
         }
     };
@@ -223,7 +224,8 @@ public class ImageSelectorPanel extends JPanel implements LayersListener {
          */
         public void actionPerformed(ActionEvent arg0) {
             if (LayersModel.getSingletonInstance().getActiveView() != null) {
-                LayersModel.getSingletonInstance().moveLayerUp(LayersModel.getSingletonInstance().getActiveView());
+            	LayersToDatasetLayers.getSingletonInstance().moveLayerUp(LayersModel.getSingletonInstance().getActiveView());
+
             }
         }
     };

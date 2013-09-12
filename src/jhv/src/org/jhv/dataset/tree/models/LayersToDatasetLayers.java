@@ -82,7 +82,7 @@ public class LayersToDatasetLayers implements LayersListener{
         	if(mappedNodes.size()>idx){
         		mappedNodes.get(idx).setDescriptor(desc);
         		DatasetLayer node = mappedNodes.get(idx);
-        		//intervals.changeLayerDescriptor(node.getDescriptor());
+        		treemodel.getIntervals().changeLayerDescriptor(node.getDescriptor());
         	}
         }		
 	}
@@ -117,8 +117,10 @@ public class LayersToDatasetLayers implements LayersListener{
 	    	int index = LayersModel.getSingletonInstance().findView(view);
 			if(index<this.mappedNodes.size()-1){
 					DatasetLayer layerToMove = this.mappedNodes.get(index);
-			    	this.treemodel.removeLayerDescriptor(layerToMove.getDescriptor());
-			    	this.treemodel.addLayerDescriptor(layerToMove.getDescriptor(), index+1);
+
+			    	DatasetType type = this.treemodel.getIntervals().getInterval(layerToMove.getDescriptor().getInterval()).getType(layerToMove.getDescriptor().getType());
+			    	type.datasetLayers.remove(index);
+			    	type.datasetLayers.add(index+1, layerToMove);
 					
 			    	this.mappedNodes.remove(index);
 					this.mappedNodes.add(index+1, layerToMove);
@@ -137,8 +139,9 @@ public class LayersToDatasetLayers implements LayersListener{
 	    	
 			if(index>0){	      		
 					DatasetLayer layerToMove = this.mappedNodes.get(index);
-			    	this.treemodel.removeLayerDescriptor(layerToMove.getDescriptor());
-			    	this.treemodel.addLayerDescriptor(layerToMove.getDescriptor(), index-1);
+			    	DatasetType type = this.treemodel.getIntervals().getInterval(layerToMove.getDescriptor().getInterval()).getType(layerToMove.getDescriptor().getType());
+			    	type.datasetLayers.remove(index);
+			    	type.datasetLayers.add(index-1, layerToMove);
 			    	
 			    	this.mappedNodes.remove(index);
 					this.mappedNodes.add(index-1, layerToMove);

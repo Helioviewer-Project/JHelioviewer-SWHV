@@ -62,7 +62,7 @@ public class LayerPanel extends DatasetPanel{
 	public void updateChange(){
 		this.removeAll();
 		this.setPreferredSize(new Dimension(250, 25));
-		this.setBorder(BorderFactory.createEmptyBorder(5,5,5,5)) ;
+		this.setBorder(BorderFactory.createEmptyBorder(2,5,2,5)) ;
 
 		this.setLayout(new BoxLayout( this, BoxLayout.LINE_AXIS));
 		

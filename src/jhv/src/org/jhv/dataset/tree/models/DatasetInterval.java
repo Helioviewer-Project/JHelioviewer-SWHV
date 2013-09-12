@@ -13,7 +13,7 @@ import org.jhv.dataset.tree.views.IntervalPanel;
 
 public class DatasetInterval implements TreeNode, DatasetNode{
 	private String title;
-	ArrayList<DatasetType> datasetTypes;
+	public ArrayList<DatasetType> datasetTypes;
 	DatasetIntervals parent;
 	boolean removeEmptyTypes;
 	
