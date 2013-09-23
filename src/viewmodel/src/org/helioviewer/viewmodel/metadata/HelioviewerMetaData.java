@@ -78,7 +78,12 @@ public class HelioviewerMetaData extends AbstractMetaData implements SunMetaData
             observatory = m.get("TELESCOP");
             fullName = "SWAP " + measurement;
         }
-
+        else if (instrument.contains("GONG")) {
+            instrument = "GONG";
+            measurement = m.get("WAVELNTH");
+            observatory = m.get("TELESCOP");
+            fullName = "GONG " + measurement;
+        }
         else if (instrument.contains("HMI")) {
             instrument = "HMI";
             measurement = m.get("CONTENT");
@@ -142,7 +147,7 @@ public class HelioviewerMetaData extends AbstractMetaData implements SunMetaData
         double newSolarPixelRadius = -1.0;
         double allowedRelativeDifference = 0.01;
 
-        if (instrument.contains("AIA") || instrument.contains("SWAP")) {
+        if (instrument.contains("AIA") || instrument.contains("SWAP")|| instrument.contains("GONG")) {
             double arcsecPerPixelX = metaDataContainer.tryGetDouble("CDELT1");
             double arcsecPerPixelY = metaDataContainer.tryGetDouble("CDELT2");
             if (Double.isNaN(arcsecPerPixelX)) {
