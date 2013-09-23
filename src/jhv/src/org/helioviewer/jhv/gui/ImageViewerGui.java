@@ -409,14 +409,14 @@ public class ImageViewerGui {
             filterPanelContainer.setDefaultPanel(tab);
             leftPane.add("Adjustments", filterPanelContainer, false);
     	    
-            DatasetIntervals intervals = new DatasetIntervals();
+            /*DatasetIntervals intervals = new DatasetIntervals();
     	    DatasetTreeModel model = new DatasetTreeModel(intervals);
     	    LayersToDatasetLayers converter = new LayersToDatasetLayers(model);
     	    LayersModel.getSingletonInstance().addLayersListener(converter);
     	    JTree tree = new DatasetTree(model);
     	    model.setTree(tree);
     		
-            leftPane.add("Tree", tree);
+            leftPane.add("Tree", tree);*/
 
             return leftPane;
         }
