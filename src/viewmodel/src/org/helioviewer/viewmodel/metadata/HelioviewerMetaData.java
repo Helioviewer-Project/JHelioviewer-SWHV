@@ -71,12 +71,6 @@ public class HelioviewerMetaData extends AbstractMetaData implements SunMetaData
             observatory = m.get("TELESCOP");
             fullName = "AIA " + measurement;
         }
-        else if (instrument.contains("GONG")) {
-            instrument = "SWAP";
-            measurement = m.get("WAVELNTH");
-            observatory = m.get("TELESCOP");
-            fullName = "GONG " + measurement;
-        }
         else if (instrument.contains("SWAP")) {
             instrument = "SWAP";
             measurement = m.get("WAVELNTH");
@@ -262,7 +256,7 @@ public class HelioviewerMetaData extends AbstractMetaData implements SunMetaData
      */
     public void updateDateTime() {
         String observedDate;
-        if (instrument.contains("SWAP")) {
+        if (instrument.contains("SWAP")||instrument.contains("GONG")) {
             observedDate = metaDataContainer.get("DATE-OBS");
         } else {
             observedDate = metaDataContainer.get("DATE_OBS");
