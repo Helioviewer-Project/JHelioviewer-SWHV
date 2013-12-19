@@ -41,9 +41,12 @@ public class GL3DImageLayerFactory {
             } else if (hvMetaData.getInstrument().equalsIgnoreCase("AIA")) {
                 // AIA
                 return new GL3DAIAImageLayer(mainView);
-            } else {
+            } else if (hvMetaData.getInstrument().equalsIgnoreCase("SECCHI")) {
                 // STEREO
                 return new GL3DStereoImageLayer(mainView);
+            } else{
+            	//GENERIC
+                return new GL3DAIAImageLayer(mainView);
             }
         } else {
             Log.error("GL3DShaderFactory: Cannot create ImageMesh for given ImageTextureView, not recognized underlying data");

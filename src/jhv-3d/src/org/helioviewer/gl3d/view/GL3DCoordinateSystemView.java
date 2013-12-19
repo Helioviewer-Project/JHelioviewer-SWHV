@@ -51,7 +51,6 @@ public class GL3DCoordinateSystemView extends AbstractGL3DView implements GL3DVi
         if (this.metaDataView == null) {
             metaDataView = getAdapter(MetaDataView.class);
             MetaData metaData = metaDataView.getMetaData();
-
             initialiseCoordinateSystem(metaData);
         }
     }
@@ -83,8 +82,8 @@ public class GL3DCoordinateSystemView extends AbstractGL3DView implements GL3DVi
                 // AIA
                 Log.debug("GL3DCoordinateSystemView: Creating AIA Image Layer!");
                 this.coordinateSystem = getDefaultCoordinateSystem();
-                this.orientation = getDefaultOrientation();
-            } else {
+                this.orientation = getDefaultOrientation();                
+            } else if (hvMetaData.getInstrument().equalsIgnoreCase("SECCHI")) {
                 // STEREO
                 Log.debug("GL3DCoordinateSystemView: Creating STEREO Image Layer!");
                 if (metaData instanceof HelioviewerPositionedMetaData) {
@@ -108,6 +107,11 @@ public class GL3DCoordinateSystemView extends AbstractGL3DView implements GL3DVi
                         this.orientation = getDefaultOrientation();
                     }
                 }
+            } else{
+                // Generic Layer
+                Log.debug("GL3DCoordinateSystemView: Creating Generic Image Layer!");
+                this.coordinateSystem = getDefaultCoordinateSystem();
+                this.orientation = getDefaultOrientation();                
             }
         } else {
             Log.warn("GL3DCoordinateSystemView: Unknown Image Layer!");
