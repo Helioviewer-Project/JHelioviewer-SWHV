@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
+import java.util.Map;
 
 import javax.media.opengl.GL;
 
@@ -27,13 +28,13 @@ import org.helioviewer.gl3d.view.GL3DImageTextureView;
  */
 public class GL3DImageLayers extends GL3DGroup {
 
-    private HashMap<GL3DImageTextureView, GL3DImageLayer> imageLayerMap;
+    private Map<GL3DImageTextureView, GL3DImageLayer> imageLayerMap;
 
     private boolean coronaVisibility = true;
 
     public GL3DImageLayers() {
         super("Images");
-        this.imageLayerMap = new HashMap<GL3DImageTextureView, GL3DImageLayer>();
+        this.imageLayerMap = Collections.synchronizedMap(new HashMap<GL3DImageTextureView, GL3DImageLayer>());
     }
 
     public void shapeDraw(GL3DState state) {
@@ -59,107 +60,61 @@ public class GL3DImageLayers extends GL3DGroup {
     }
 
     private void drawImageLayers(GL3DState state) {
-        GL3DNode node = this.getFirst();
-
-        // Create sorted list of image layers
-        ArrayList<GL3DImageLayer> layers = new ArrayList<GL3DImageLayer>();
-        while (node != null) {
-            if (!node.isDrawBitOn(Bit.Hidden) && node instanceof GL3DImageLayer)
-                layers.add((GL3DImageLayer) node);
-            node = node.getNext();
-        }
-
-        Collections.sort(layers, new Comparator<GL3DImageLayer>() {
-            public int compare(GL3DImageLayer o1, GL3DImageLayer o2) {
-                if (o1.getLastViewAngle() == o2.getLastViewAngle())
-                    return 0;
-                return o1.getLastViewAngle() < o2.getLastViewAngle() ? 1 : -1;
-            }
-        });
-
-        // Draw the coronas first
-        if(this.coronaVisibility){
+    	synchronized(this.imageLayerMap){
+	        GL3DNode node = this.getFirst();
+	
+	        // Create sorted list of image layers
+	        ArrayList<GL3DImageLayer> layers = new ArrayList<GL3DImageLayer>();
+	        while (node != null) {
+	            if (!node.isDrawBitOn(Bit.Hidden) && node instanceof GL3DImageLayer)
+	                layers.add((GL3DImageLayer) node);
+	            node = node.getNext();
+	        }
+	
+	        Collections.sort(layers, new Comparator<GL3DImageLayer>() {
+	            public int compare(GL3DImageLayer o1, GL3DImageLayer o2) {
+	                if (o1.getLastViewAngle() == o2.getLastViewAngle())
+	                    return 0;
+	                return o1.getLastViewAngle() < o2.getLastViewAngle() ? 1 : -1;
+	            }
+	        });
+	
+	        // Draw the coronas first
+	        if(this.coronaVisibility){
+		        state.gl.glEnable(GL.GL_BLEND);
+		        state.gl.glDisable(GL.GL_DEPTH_TEST);
+		        state.gl.glDisable(GL.GL_CULL_FACE);
+		
+		        for (GL3DImageLayer layer : layers) {
+		            if (layer.getImageSphere() != null)
+		                layer.getImageSphere().getDrawBits().on(Bit.Hidden);
+		
+		            layer.draw(state);
+		
+		            if (layer.getImageSphere() != null)
+		                layer.getImageSphere().getDrawBits().off(Bit.Hidden);
+		        }
+	        }
+	
+	        state.gl.glEnable(GL.GL_CULL_FACE);
+	        state.gl.glEnable(GL.GL_DEPTH_TEST);
+	        // state.gl.glDisable(GL.GL_BLEND);
 	        state.gl.glEnable(GL.GL_BLEND);
-	        state.gl.glDisable(GL.GL_DEPTH_TEST);
-	        state.gl.glDisable(GL.GL_CULL_FACE);
 	
 	        for (GL3DImageLayer layer : layers) {
-	            if (layer.getImageSphere() != null)
-	                layer.getImageSphere().getDrawBits().on(Bit.Hidden);
+	            if (layer.getImageCorona() != null)
+	                layer.getImageCorona().getDrawBits().on(Bit.Hidden);
 	
 	            layer.draw(state);
 	
-	            if (layer.getImageSphere() != null)
-	                layer.getImageSphere().getDrawBits().off(Bit.Hidden);
+	            if (layer.getImageCorona() != null)
+	                layer.getImageCorona().getDrawBits().off(Bit.Hidden);
 	        }
-        }
-        /*
-         * while(node!=null) { if(!node.isDrawBitOn(Bit.Hidden)) { if(node
-         * instanceof GL3DImageLayer) { //
-         * System.out.println("Drawing GL3DImageLayer Corona");
-         * 
-         * GL3DImageLayer layer = ((GL3DImageLayer)node);
-         * if(layer.getImageSphere()!=null)
-         * layer.getImageSphere().getDrawBits().on(Bit.Hidden);
-         * 
-         * layer.draw(state);
-         * 
-         * if(layer.getImageSphere()!=null)
-         * layer.getImageSphere().getDrawBits().off(Bit.Hidden); } } node =
-         * node.getNext(); }
-         */
-
-        state.gl.glEnable(GL.GL_CULL_FACE);
-        state.gl.glEnable(GL.GL_DEPTH_TEST);
-        // state.gl.glDisable(GL.GL_BLEND);
-        state.gl.glEnable(GL.GL_BLEND);
-
-        for (GL3DImageLayer layer : layers) {
-            if (layer.getImageCorona() != null)
-                layer.getImageCorona().getDrawBits().on(Bit.Hidden);
-
-            layer.draw(state);
-
-            if (layer.getImageCorona() != null)
-                layer.getImageCorona().getDrawBits().off(Bit.Hidden);
-        }
-
-        /*
-         * node = this.getFirst(); while(node!=null) {
-         * if(!node.isDrawBitOn(Bit.Hidden)) { if(node instanceof
-         * GL3DImageLayer) { //
-         * System.out.println("Drawing GL3DImageLayer Sphere");
-         * 
-         * GL3DImageLayer layer = ((GL3DImageLayer)node);
-         * if(layer.getImageCorona()!=null)
-         * layer.getImageCorona().getDrawBits().on(Bit.Hidden);
-         * 
-         * layer.draw(state);
-         * 
-         * if(layer.getImageCorona()!=null)
-         * layer.getImageCorona().getDrawBits().off(Bit.Hidden); } } node =
-         * node.getNext(); }
-         */
-
-        state.gl.glDisable(GL.GL_BLEND);
-        state.gl.glEnable(GL.GL_DEPTH_TEST);
+	
+	        state.gl.glDisable(GL.GL_BLEND);
+	        state.gl.glEnable(GL.GL_DEPTH_TEST);
+    	}
     }
-
-    /*
-     * private void drawBlendedImageGroup(GL3DState state, GL3DGroup group,
-     * boolean depthTest, boolean cullFace) { GL3DNode node = group.getFirst();
-     * boolean first = true; // state.gl.glEnable(GL.GL_DEPTH_TEST); //
-     * state.gl.glEnable(GL.GL_CULL_FACE); while(node!=null) { //When a layer is
-     * disabled the Hidden bit is enabled. If the first layer was disabled, the
-     * logic should //skip to the next node... if(node.isDrawBitOn(Bit.Hidden))
-     * { node = node.getNext(); continue; } else { node.draw(state); node =
-     * node.getNext(); }
-     * 
-     * if(first) { // if(!depthTest) { // state.gl.glDisable(GL.GL_DEPTH_TEST);
-     * // state.gl.glEnable(GL.GL_BLEND); // state.gl.glDepthMask(true); // }
-     * first = false; } } state.gl.glDisable(GL.GL_BLEND);
-     * state.gl.glEnable(GL.GL_DEPTH_TEST); }
-     */
 
     public void shapeUpdate(GL3DState state) {
         super.shapeUpdate(state);
@@ -178,12 +133,6 @@ public class GL3DImageLayers extends GL3DGroup {
 
         LA.negate();
 
-        // for(GL3DImageLayer imageLayer : this.imageLayerMap.values()) {
-        // GL3DVec3d normal = GL3DHelper.toVec(imageLayer.getOrientation());
-        // double angle = Math.acos(normal.dot(LA));
-        // Log.debug("GL3DImageLayers: Angle to "+imageLayer.getName()+" is "+
-        // Math.toDegrees(angle)+"�");
-        // }
     }
 
     public void setCoronaVisibility(boolean visible) {
