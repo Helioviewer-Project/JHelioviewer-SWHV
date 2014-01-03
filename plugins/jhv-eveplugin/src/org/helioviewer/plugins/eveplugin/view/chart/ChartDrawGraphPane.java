@@ -13,6 +13,7 @@ import java.awt.image.BufferedImage;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -59,7 +60,7 @@ public class ChartDrawGraphPane extends JComponent implements DrawControllerList
     private Band[] bands = new Band[0];
     private EVEValues[] values = null;
     
-    private final LinkedList<ChartDrawGraphPane.GraphPolyline> graphPolylines = new LinkedList<ChartDrawGraphPane.GraphPolyline>();
+    private final List<GraphPolyline> graphPolylines = Collections.synchronizedList(new LinkedList<ChartDrawGraphPane.GraphPolyline>());
     
     private double logMinValue = Math.log10(Double.MAX_VALUE);
     private double logMaxValue = Math.log10(Double.MIN_VALUE);
