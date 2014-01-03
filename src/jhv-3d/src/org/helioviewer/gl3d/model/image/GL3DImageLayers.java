@@ -22,7 +22,7 @@ import org.helioviewer.gl3d.view.GL3DImageTextureView;
  * {@link GL3DImageLayer} nodes, because image nodes require special ordering
  * for the blending of different image layers.
  * 
- * @author Simon Spšrri (simon.spoerri@fhnw.ch)
+ * @author Simon Spï¿½rri (simon.spoerri@fhnw.ch)
  * 
  */
 public class GL3DImageLayers extends GL3DGroup {
@@ -78,20 +78,21 @@ public class GL3DImageLayers extends GL3DGroup {
         });
 
         // Draw the coronas first
-        state.gl.glEnable(GL.GL_BLEND);
-        state.gl.glDisable(GL.GL_DEPTH_TEST);
-        state.gl.glDisable(GL.GL_CULL_FACE);
-
-        for (GL3DImageLayer layer : layers) {
-            if (layer.getImageSphere() != null)
-                layer.getImageSphere().getDrawBits().on(Bit.Hidden);
-
-            layer.draw(state);
-
-            if (layer.getImageSphere() != null)
-                layer.getImageSphere().getDrawBits().off(Bit.Hidden);
+        if(this.coronaVisibility){
+	        state.gl.glEnable(GL.GL_BLEND);
+	        state.gl.glDisable(GL.GL_DEPTH_TEST);
+	        state.gl.glDisable(GL.GL_CULL_FACE);
+	
+	        for (GL3DImageLayer layer : layers) {
+	            if (layer.getImageSphere() != null)
+	                layer.getImageSphere().getDrawBits().on(Bit.Hidden);
+	
+	            layer.draw(state);
+	
+	            if (layer.getImageSphere() != null)
+	                layer.getImageSphere().getDrawBits().off(Bit.Hidden);
+	        }
         }
-
         /*
          * while(node!=null) { if(!node.isDrawBitOn(Bit.Hidden)) { if(node
          * instanceof GL3DImageLayer) { //
@@ -181,7 +182,7 @@ public class GL3DImageLayers extends GL3DGroup {
         // GL3DVec3d normal = GL3DHelper.toVec(imageLayer.getOrientation());
         // double angle = Math.acos(normal.dot(LA));
         // Log.debug("GL3DImageLayers: Angle to "+imageLayer.getName()+" is "+
-        // Math.toDegrees(angle)+"¡");
+        // Math.toDegrees(angle)+"ï¿½");
         // }
     }
 
