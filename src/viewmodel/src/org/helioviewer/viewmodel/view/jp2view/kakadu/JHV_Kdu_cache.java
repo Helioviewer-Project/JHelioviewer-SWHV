@@ -365,8 +365,10 @@ public class JHV_Kdu_cache extends Kdu_cache {
             while ((c = (char) fStream.read()) != '\n') {
                 str += c;
             }
-            if (!str.equalsIgnoreCase("hvc/1.0"))
+            if (!str.equalsIgnoreCase("hvc/1.0")){
+                fStream.close();
                 throw new JHV_KduException("Wrong cache file format.");
+            }
         } catch (Exception ex) {
             Log.error("Error in readFromCacheMethod in file and FileInputStream creation.");
             ex.printStackTrace();
