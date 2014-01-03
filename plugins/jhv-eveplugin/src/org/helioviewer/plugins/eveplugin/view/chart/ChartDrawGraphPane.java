@@ -34,6 +34,7 @@ import org.helioviewer.plugins.eveplugin.controller.DrawControllerListener;
 import org.helioviewer.plugins.eveplugin.controller.EVEValues;
 import org.helioviewer.plugins.eveplugin.controller.ZoomController;
 import org.helioviewer.plugins.eveplugin.model.EVEValue;
+import org.helioviewer.plugins.eveplugin.view.chart.ChartDrawGraphPane.GraphPolyline;
 import org.helioviewer.viewmodel.changeevent.ChangeEvent;
 import org.helioviewer.viewmodel.view.LinkedMovieManager;
 import org.helioviewer.viewmodel.view.jp2view.datetime.ImmutableDateTime;
@@ -265,14 +266,17 @@ public class ChartDrawGraphPane extends JComponent implements DrawControllerList
     private void drawGraphs(final Graphics g) {
         //if (!intervalAvailable)
         //    return;
-        
-        for (final GraphPolyline line : graphPolylines) {
-            g.setColor(line.color);
-            g.drawPolyline(line.xPoints, line.yPoints, line.numberOfPoints);
-            for(int j=0;j<line.warnLevels.length; j++){
-            	g.drawLine(graphArea.x,line.warnLevels[j], graphArea.x + graphArea.width, line.warnLevels[j]);
-            }
-        }
+    	synchronized(graphPolylines){
+    		Iterator<GraphPolyline> i = graphPolylines.iterator();
+    		while (i.hasNext()) {
+    			GraphPolyline line = i.next();
+	            g.setColor(line.color);
+	            g.drawPolyline(line.xPoints, line.yPoints, line.numberOfPoints);
+	            for(int j=0;j<line.warnLevels.length; j++){
+	            	g.drawLine(graphArea.x,line.warnLevels[j], graphArea.x + graphArea.width, line.warnLevels[j]);
+	            }
+	        }
+    	}
     }
     
     private void drawEvents(final Graphics g){
@@ -543,7 +547,7 @@ public class ChartDrawGraphPane extends JComponent implements DrawControllerList
     // Graph Polyline
     // //////////////////////////////////////////////////////////////////////////////
     
-    private class GraphPolyline {
+    public class GraphPolyline {
     
         // //////////////////////////////////////////////////////////////////////////
         // Definitions
