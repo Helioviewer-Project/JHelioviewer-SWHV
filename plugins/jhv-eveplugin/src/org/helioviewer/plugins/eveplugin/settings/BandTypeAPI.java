@@ -51,15 +51,8 @@ public class BandTypeAPI extends APIAbstract{
 	public BandTypeAPI() {
 		super();
         LogSettings.init("/settings/log4j.initial.properties", JHVDirectory.SETTINGS.getPath() + "log4j.properties", JHVDirectory.LOGS.getPath(), false);
-        //Settings.getSingletonInstance().load();
-        /*Settings.getSingletonInstance().setProperty("eveplugin.baseurl.bandtype","http://127.0.0.1/");
-        this.setBaseUrl(Settings.getSingletonInstance().getProperty("eveplugin.baseurl.bandtype"));
-		// TODO Auto-generated constructor stub
-        System.out.println(this.getBaseUrl());
-        */
         this.loadSettings();
 		this.setBaseUrl(defaultProperties.getProperty("plugin.eve.dataseturl"));
-		//this.setBaseUrl("http://swhv.oma.be");
 		this.updateDatasets();
 	}
 
@@ -87,8 +80,7 @@ public class BandTypeAPI extends APIAbstract{
 		try {
 			url = new URI(this.getDatasetUrl());
 		} catch (URISyntaxException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+        	Log.error("Malformed url", e);
 		}
         final File dstFile = new File(JHVDirectory.PLUGINS.getPath() + "/EVEPlugin/datasets.json");
         try {
@@ -99,7 +91,6 @@ public class BandTypeAPI extends APIAbstract{
         } catch (final IOException e1) {
             Log.error("Error downloading the bandtypes.", e1);
         } catch (URISyntaxException e2) {
-			// TODO Auto-generated catch block
         	Log.error("Malformed url", e2);
         }
         try {
@@ -118,6 +109,8 @@ public class BandTypeAPI extends APIAbstract{
 	
 	        	if(job.has("label"))
 	        		this.bandtypes[i].setLabel((String) job.get("label"));
+	        	if(job.has("name"))
+	        		this.bandtypes[i].setName((String) job.get("name"));
 	        	if(job.has("min"))
 	        		this.bandtypes[i].setMin( job.getDouble("min") );
 	        	if(job.has("max"))
@@ -135,23 +128,20 @@ public class BandTypeAPI extends APIAbstract{
 	        	}
 	        	if(job.has("group")){
 	        		BandGroup group = this.groups.get(job.getString("group"));
-	        		System.out.println(this.groups);
-	        		System.out.println(group);
-	        		System.out.println(job.getString("group"));
 	        		group.add(this.bandtypes[i]);
 	        		this.bandtypes[i].setGroup(group);
 	        	}
 	        	if(job.has("errorLevels")){
 	        		JSONArray errorLevels = job.getJSONArray("errorLevels");
 	        		double [] errlevels = new double[errorLevels.length()];
-	                for(int j=0; j<errorLevels.length(); j++){	                	
+	                for(int j=0; j<errorLevels.length(); j++){	
+	                	
 	                	errlevels[j]= errorLevels.getDouble(j);
 	                }
 	                this.bandtypes[i].setErrorLevels(errlevels);
 	        	}	        	
 	        }
 		} catch (JSONException e1) {
-			// TODO Auto-generated catch block
         	Log.error("JSON parsing error", e1);
 		}        	       
 	}
@@ -180,12 +170,8 @@ public class BandTypeAPI extends APIAbstract{
             JSONArray jsonGroupArray = (JSONArray)jsonmain.get("groups");
             updateBandGroups(jsonGroupArray);
             JSONArray jsonObjectArray = (JSONArray)jsonmain.get("objects");            
-            updateBandTypes(jsonObjectArray);
-        	for(int j=0; j<this.bandtypes.length; j++){
-        		System.out.println(this.bandtypes[j].toString());
-        	}            
+            updateBandTypes(jsonObjectArray);           
 		} catch (JSONException e1) {
-			// TODO Auto-generated catch block
         	Log.error("JSON parsing error", e1);
 		}	
         this.isUpdated = true;
@@ -202,7 +188,6 @@ public class BandTypeAPI extends APIAbstract{
 	            JSONArray jsonObjectArray = (JSONArray)jsonmain.get("objects");            
 	            updateBandTypes(jsonObjectArray);
 			} catch (JSONException e1) {
-				// TODO Auto-generated catch block
 	        	Log.error("JSON parsing error", e1);
 			}
 		}} );
@@ -211,7 +196,6 @@ public class BandTypeAPI extends APIAbstract{
 			t.join();
 			Log.warn("Thread is dead");
 		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
         BandTypeAPI.this.isUpdated = true;		
