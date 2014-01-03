@@ -269,7 +269,7 @@ public class BandController {
         // Definitions
         // //////////////////////////////////////////////////////////////////////////
     	
-        private BandGroup selectedBandGroup = BandTypeAPI.getSingletonInstance().getGroups()[0];
+        private BandGroup selectedBandGroup;
         
         private final HashMap<BandType, Band> lookupAvailableBandTypes = new HashMap<BandType, Band>();
         private final HashMap<BandGroup, LinkedList<Band>> availableBandsInGroupMap = new HashMap<BandGroup, LinkedList<Band>>();
@@ -279,6 +279,7 @@ public class BandController {
         // //////////////////////////////////////////////////////////////////////////
         
         public BandManager() {
+        	selectedBandGroup = BandTypeAPI.getSingletonInstance().getGroups()[0];
             for (final BandGroup type : BandTypeAPI.getSingletonInstance().getGroups()) {
                 availableBandsInGroupMap.put(type, new LinkedList<Band>());
             }
