@@ -1,8 +1,10 @@
 package org.helioviewer.gl3d.plugin.pfss;
 
+import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
 
+import org.helioviewer.base.logging.Log;
 import org.helioviewer.base.physics.Constants;
 import org.helioviewer.gl3d.GL3DHelper;
 import org.helioviewer.gl3d.plugin.pfss.data.PfssCurve;
@@ -30,7 +32,9 @@ public class GL3DPfssModel extends GL3DOrientedGroup {
     private CoordinateVector orientation;
 
     private int pointReductionModulo = 1;
-
+    Date date;
+    long interval;
+    
     public GL3DPfssModel(PfssDimension pfss) {
         super("PFSS Model");
 
@@ -53,11 +57,20 @@ public class GL3DPfssModel extends GL3DOrientedGroup {
                 }
             }
             this.addNode(new GL3DPolyLine(points, new GL3DVec4f(curve.color.x, curve.color.y, curve.color.z, 1.0f), GL3DMeshPrimitive.LINE_STRIP));
-        }
+        }    	
+        this.date = new Date();
+        this.interval = 1000*60*60*12;
     }
 
     public void shapeDraw(GL3DState state) {
-        super.shapeDraw(state);
+    	if(Math.abs(state.getCurrentObservationDate().getTime()-this.date.getTime())<this.interval){
+    		super.shapeDraw(state);
+    	}
+    	else{
+    		super.setUnchanged();
+    	}
+    	
+        
     }
 
     public CoordinateSystem getCoordinateSystem() {

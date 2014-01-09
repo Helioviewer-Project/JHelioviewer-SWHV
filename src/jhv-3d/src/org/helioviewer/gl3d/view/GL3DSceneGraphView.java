@@ -33,6 +33,7 @@ import org.helioviewer.gl3d.scenegraph.math.GL3DVec3d;
 import org.helioviewer.gl3d.scenegraph.math.GL3DVec4f;
 import org.helioviewer.gl3d.scenegraph.rt.GL3DRayTracer;
 import org.helioviewer.gl3d.scenegraph.visuals.GL3DArrow;
+import org.helioviewer.gl3d.scenegraph.visuals.GL3DSphere;
 import org.helioviewer.gl3d.scenegraph.visuals.GL3DSunGrid;
 import org.helioviewer.viewmodel.changeevent.ChangeEvent;
 import org.helioviewer.viewmodel.changeevent.LayerChangedReason;
@@ -275,6 +276,7 @@ public class GL3DSceneGraphView extends AbstractGL3DView implements GL3DView {
         synchronized (this.layersToAdd) {
             LayeredView layeredView = getAdapter(LayeredView.class);
             for (GL3DImageTextureView imageTextureView : this.layersToAdd) {
+            	
                 GL3DImageLayer imageLayer = GL3DImageLayerFactory.createImageLayer(state, imageTextureView);
 
                 ((GL3DCameraView) getAdapter(GL3DCameraView.class)).addCameraListener(imageLayer);
@@ -355,6 +357,8 @@ public class GL3DSceneGraphView extends AbstractGL3DView implements GL3DView {
 
         GL3DGroup indicatorArrows = new GL3DModel("Arrows", "Arrows indicating the viewspace axes");
         artificialObjects.addNode(indicatorArrows);
+        GL3DSphere sphere = new GL3DSphere(0.98*Constants.SunRadius, 20,20, new GL3DVec4f(0.0f, 0.0f, 0.0f, 1.0f) );
+        artificialObjects.addNode(sphere);
 
         GL3DShape xAxis = new GL3DArrow("X-Axis", Constants.SunRadius / 20, Constants.SunRadius, 32, new GL3DVec4f(1, 0, 0.5f, 0.2f));
         xAxis.modelView().rotate(Math.PI / 2, 0, 1, 0);
@@ -364,7 +368,6 @@ public class GL3DSceneGraphView extends AbstractGL3DView implements GL3DView {
         indicatorArrows.addNode(yAxis);
         GL3DShape zAxis = new GL3DArrow("Z-Axis", Constants.SunRadius / 20, Constants.SunRadius, 32, new GL3DVec4f(0, 0.5f, 1, 0.2f));
         indicatorArrows.addNode(zAxis);
-
         GL3DModel sunModel = new GL3DModel("Sun", "Spherical Grid depicting the Sun");
         this.sun = new GL3DSunGrid(Constants.SunRadius * 0.98, new GL3DVec4f(0.8f, 0.8f, 0, 0.2f));
         this.sun.getDrawBits().on(Bit.Wireframe);

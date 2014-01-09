@@ -90,7 +90,7 @@ public abstract class GL3DShape extends GL3DNode {
                 if (GL3DGroup.class.isAssignableFrom(this.getClass())) {
                     // Is it the root?
                     if (this.parent == null) {
-                        state.gl.glLineWidth(2.0f);
+                        state.gl.glLineWidth(4.0f);
                         this.aabb.drawOS(state, new GL3DVec4d(0, 1, 0, 1));
                         state.gl.glLineWidth(1.0f);
                     } else {
