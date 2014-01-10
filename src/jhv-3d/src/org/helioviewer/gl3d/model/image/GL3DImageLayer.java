@@ -41,7 +41,7 @@ import org.helioviewer.viewmodel.view.opengl.GLFilterView;
  * to the GL3DLayeredView. It represents exactly one image layer in the view
  * chain
  * 
- * @author Simon Spšrri (simon.spoerri@fhnw.ch)
+ * @author Simon Spï¿½rri (simon.spoerri@fhnw.ch)
  * 
  */
 public abstract class GL3DImageLayer extends GL3DOrientedGroup implements GL3DCameraListener {
@@ -146,12 +146,11 @@ public abstract class GL3DImageLayer extends GL3DOrientedGroup implements GL3DCa
     }
 
     public void cameraMoved(GL3DCamera camera) {
-        /*doUpdateROI = true;
+        doUpdateROI = true;
         this.accellerationShape.markAsChanged();
-        markAsChanged();
+        //markAsChanged();
 
         cameraMoving(camera);
-        */
     }
 
     public double getLastViewAngle() {
@@ -161,14 +160,12 @@ public abstract class GL3DImageLayer extends GL3DOrientedGroup implements GL3DCa
     public void cameraMoving(GL3DCamera camera) {
         // try {
         // Calculate camera direction vector
-    	
         GL3DMat4d camTrans = camera.getRotation().toMatrix().inverse();
         GL3DVec4d camDirection = new GL3DVec4d(0, 0, 1, 1);
         camDirection = camTrans.multiply(camDirection);
         camDirection.w = 0;
         camDirection.normalize();
-		
-    	
+
         // Convert layer orientation to heliocentric coordinate system
         CoordinateVector orientation = coordinateSystemView.getOrientation();
         CoordinateSystem targetSystem = new HeliocentricCartesianCoordinateSystem();
@@ -177,7 +174,7 @@ public abstract class GL3DImageLayer extends GL3DOrientedGroup implements GL3DCa
 
         GL3DVec4d layerDirection = new GL3DVec4d(orientation.getValue(0), orientation.getValue(1), orientation.getValue(2), 0);
         layerDirection.normalize();
-		
+
         // Calculate view angle
         double cos = camDirection.dot(layerDirection);
         lastViewAngle = Math.acos(cos) / 3.141592654 * 180.0;
@@ -185,19 +182,8 @@ public abstract class GL3DImageLayer extends GL3DOrientedGroup implements GL3DCa
         // angle can be NaN!
         if (Double.isNaN(lastViewAngle))
             lastViewAngle = 0.0;
-		/*
-        // opacityFilter.setOpacity((float) ((cos+1.0)/2.0));
-        opacityFilter.setOpacity((float) ((180.0 - lastViewAngle) / 180.0));
 
-        // System.out.println("--- Camera moving, updating layer[" + layerId +
-        // "], angle: " + angle + "°  (direction = " + layerDirection + ")");
-        // System.out.println("Layer orientation: " + orientation +
-        // " (coord system: " +
-        // orientation.getCoordinateSystem().getClass().getName() + ")");
-        */
-        /*
-         * } catch(Exception e) { e.printStackTrace(); }
-         */
+        //opacityFilter.setOpacity((float) ((180.0 - lastViewAngle) / 180.0));
 
     }
 

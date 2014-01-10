@@ -2,6 +2,8 @@ package org.helioviewer.gl3d.model.image;
 
 import java.util.List;
 
+import javax.media.opengl.GL;
+
 import org.helioviewer.base.math.Vector2dInt;
 import org.helioviewer.gl3d.scenegraph.GL3DState;
 import org.helioviewer.gl3d.scenegraph.math.GL3DVec2d;
@@ -20,7 +22,7 @@ import org.helioviewer.viewmodel.view.opengl.shader.GLVertexShaderProgram;
 /**
  * A GL3DImageCorona maps the coronal part of an image layer onto an image plane
  * 
- * @author Simon Spšrri (simon.spoerri@fhnw.ch)
+ * @author Simon Spï¿½rri (simon.spoerri@fhnw.ch)
  * 
  */
 public class GL3DImageCorona extends GL3DImageMesh {
@@ -38,7 +40,22 @@ public class GL3DImageCorona extends GL3DImageMesh {
     public GL3DImageCorona(GL3DImageTextureView imageTextureView, GLVertexShaderProgram vertexShaderProgram, GLFragmentShaderProgram fragmentShaderProgram) {
         this("Corona", imageTextureView, vertexShaderProgram, fragmentShaderProgram);
     }
-
+    
+    public void shapeDraw(GL3DState state) {
+        // this is the first one!
+        if (parent.getParent().getFirst() == this.getParent()) {
+            state.gl.glDisable(GL.GL_CULL_FACE);
+            state.gl.glEnable(GL.GL_DEPTH_TEST);
+            state.gl.glDisable(GL.GL_BLEND);
+        } else {
+            state.gl.glEnable(GL.GL_CULL_FACE);
+            state.gl.glDisable(GL.GL_DEPTH_TEST);
+            state.gl.glEnable(GL.GL_BLEND);
+        }
+        super.shapeDraw(state);
+        // state.gl.glDisable(GL.GL_CULL_FACE);
+    }
+    
     public GL3DMeshPrimitive createMesh(GL3DState state, List<GL3DVec3d> positions, List<GL3DVec3d> normals, List<GL3DVec2d> textCoords, List<Integer> indices, List<GL3DVec4d> colors) {
         Region region = this.capturedRegion;
 
