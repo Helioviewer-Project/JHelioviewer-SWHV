@@ -7,17 +7,23 @@ import org.helioviewer.gl3d.plugin.GL3DModelPlugin;
 import org.helioviewer.gl3d.plugin.GL3DPluginConfiguration;
 import org.helioviewer.gl3d.plugin.pfss.PfssPlugin;
 import org.helioviewer.gl3d.plugin.vectors.VectorsPlugin;
+import org.helioviewer.gl3d.view.GL3DSceneGraphView;
+
 
 /**
  * A static plugin configuration that includes the two internal plugins - PFSS -
  * Vectors
  * 
- * @author Simon Spšrri (simon.spoerri@fhnw.ch)
+ * @author Simon Spï¿½rri (simon.spoerri@fhnw.ch)
  * 
  */
 public class GL3DInternalPluginConfiguration implements GL3DPluginConfiguration {
+	GL3DSceneGraphView sceneGraph;
+	public GL3DInternalPluginConfiguration() {
+		this.sceneGraph = sceneGraph;
+	}
 
-    public List<GL3DModelPlugin> findPlugins() {
+	public List<GL3DModelPlugin> findPlugins() {
         List<GL3DModelPlugin> plugins = new ArrayList<GL3DModelPlugin>();
         plugins.add(new PfssPlugin());
         plugins.add(new VectorsPlugin());

@@ -17,12 +17,12 @@ import org.helioviewer.jhv.gui.ImageViewerGui;
  * @author Simon Sp�rri (simon.spoerri@fhnw.ch)
  * 
  */
-public class GL3DToggleCoronaVisibilityAction extends AbstractAction {
+public class GL3DToggleGridVisibilityAction extends AbstractAction {
 
     private static final long serialVersionUID = 1L;
 
-    public GL3DToggleCoronaVisibilityAction() {
-        super("Corona");
+    public GL3DToggleGridVisibilityAction() {
+        super("Grid");
     }
 
     /**
@@ -31,7 +31,7 @@ public class GL3DToggleCoronaVisibilityAction extends AbstractAction {
     public void actionPerformed(ActionEvent e) {
         GL3DSceneGraphView sceneGraph = ImageViewerGui.getSingletonInstance().getMainView().getAdapter(GL3DSceneGraphView.class);
         if (sceneGraph != null) {
-            sceneGraph.toggleCoronaVisibility();
+            sceneGraph.toggleGridVisibility();
         }
     }
 
