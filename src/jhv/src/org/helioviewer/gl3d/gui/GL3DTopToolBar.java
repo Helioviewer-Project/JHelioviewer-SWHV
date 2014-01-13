@@ -16,7 +16,7 @@ import org.helioviewer.jhv.gui.components.TopToolBar;
 /**
  * The ToolBar that is used for the 3D Mode.
  * 
- * @author Simon Spšrri (simon.spoerri@fhnw.ch)
+ * @author Simon Spï¿½rri (simon.spoerri@fhnw.ch)
  */
 public class GL3DTopToolBar extends TopToolBar implements MouseListener {
 
@@ -38,6 +38,8 @@ public class GL3DTopToolBar extends TopToolBar implements MouseListener {
 
     private JToggleButton trackSolarRotationButton;
     private JToggleButton coronaVisibilityButton;
+    private JToggleButton gridVisibilityButton;
+    
 
     /**
      * Default constructor.
@@ -144,6 +146,13 @@ public class GL3DTopToolBar extends TopToolBar implements MouseListener {
         coronaVisibilityButton.setSelectedIcon(IconBank.getIcon(JHVIcon.LAYER_IMAGE_OFF));
         coronaVisibilityButton.setToolTipText("Toggle Corona Visibility");
         addButton(coronaVisibilityButton);
+        
+        gridVisibilityButton = new JToggleButton(new GL3DToggleGridVisibilityAction());
+        gridVisibilityButton.setSelected(false);
+        gridVisibilityButton.setIcon(IconBank.getIcon(JHVIcon.LAYER_IMAGE));
+        gridVisibilityButton.setSelectedIcon(IconBank.getIcon(JHVIcon.LAYER_IMAGE_OFF));
+        gridVisibilityButton.setToolTipText("Toggle Grid Visibility");
+        addButton(gridVisibilityButton);
         // VSO Export - DEACTIVATED FOR NOW
         // addSeparator();
         // addButton(new JButton(new NewQueryAction(true)));
