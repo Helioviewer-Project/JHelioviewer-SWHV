@@ -14,7 +14,7 @@ import org.helioviewer.jhv.gui.ImageViewerGui;
  * current {@link GL3DCamera} to the
  * {@link GL3DSolarRotationTrackingTrackballCamera}
  * 
- * @author Simon Spšrri (simon.spoerri@fhnw.ch)
+ * @author Simon Spï¿½rri (simon.spoerri@fhnw.ch)
  * 
  */
 public class GL3DToggleCoronaVisibilityAction extends AbstractAction {

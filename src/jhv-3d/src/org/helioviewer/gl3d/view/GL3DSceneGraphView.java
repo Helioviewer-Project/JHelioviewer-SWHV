@@ -29,11 +29,10 @@ import org.helioviewer.gl3d.scenegraph.GL3DModel;
 import org.helioviewer.gl3d.scenegraph.GL3DNode;
 import org.helioviewer.gl3d.scenegraph.GL3DShape;
 import org.helioviewer.gl3d.scenegraph.GL3DState;
-import org.helioviewer.gl3d.scenegraph.math.GL3DVec3d;
+import org.helioviewer.gl3d.scenegraph.math.GL3DVec4d;
 import org.helioviewer.gl3d.scenegraph.math.GL3DVec4f;
 import org.helioviewer.gl3d.scenegraph.rt.GL3DRayTracer;
-import org.helioviewer.gl3d.scenegraph.visuals.GL3DArrow;
-import org.helioviewer.gl3d.scenegraph.visuals.GL3DSphere;
+import org.helioviewer.gl3d.scenegraph.visuals.GL3DGrid;
 import org.helioviewer.gl3d.scenegraph.visuals.GL3DSunGrid;
 import org.helioviewer.viewmodel.changeevent.ChangeEvent;
 import org.helioviewer.viewmodel.changeevent.LayerChangedReason;
@@ -52,7 +51,7 @@ import org.helioviewer.viewmodel.view.ViewListener;
  * {@link GL3DRayTracer} to find the maximally spanning image region within the
  * displayed scene.
  * 
- * @author Simon Spšrri (simon.spoerri@fhnw.ch)
+ * @author Simon Spï¿½rri (simon.spoerri@fhnw.ch)
  * 
  */
 public class GL3DSceneGraphView extends AbstractGL3DView implements GL3DView {
@@ -66,11 +65,13 @@ public class GL3DSceneGraphView extends AbstractGL3DView implements GL3DView {
     private GL3DHitReferenceShape hitReferenceShape;
     private GL3DFramebufferImage framebuffer;
     private GL3DGroup artificialObjects;
+    private GL3DGrid grid;
 
     private List<GL3DImageTextureView> layersToAdd = new ArrayList<GL3DImageTextureView>();
     private List<GL3DImageTextureView> layersToRemove = new ArrayList<GL3DImageTextureView>();
 
     private List<GL3DNode> nodesToDelete = new ArrayList<GL3DNode>();
+
 
     public GL3DSceneGraphView() {
         this.root = createRoot();
@@ -348,6 +349,8 @@ public class GL3DSceneGraphView extends AbstractGL3DView implements GL3DView {
 
         artificialObjects = new GL3DArtificialObjects();
         root.addNode(artificialObjects);
+        this.grid = new GL3DGrid("grid",12,24 , new GL3DVec4f(1.0f,1.0f,0.0f,0.0f), new GL3DVec4d(1.0,1.0,0.0,0.0));
+        root.addNode(grid);
 
         this.imageLayers = new GL3DImageLayers();
         root.addNode(this.imageLayers);
@@ -355,19 +358,7 @@ public class GL3DSceneGraphView extends AbstractGL3DView implements GL3DView {
         this.hitReferenceShape = new GL3DHitReferenceShape(true);
         root.addNode(this.hitReferenceShape);
 
-        GL3DGroup indicatorArrows = new GL3DModel("Arrows", "Arrows indicating the viewspace axes");
-        artificialObjects.addNode(indicatorArrows);
-        GL3DSphere sphere = new GL3DSphere(0.98*Constants.SunRadius, 20,20, new GL3DVec4f(0.0f, 0.0f, 0.0f, 1.0f) );
-        artificialObjects.addNode(sphere);
-
-        GL3DShape xAxis = new GL3DArrow("X-Axis", Constants.SunRadius / 20, Constants.SunRadius, 32, new GL3DVec4f(1, 0, 0.5f, 0.2f));
-        xAxis.modelView().rotate(Math.PI / 2, 0, 1, 0);
-        indicatorArrows.addNode(xAxis);
-        GL3DShape yAxis = new GL3DArrow("Y-Axis", Constants.SunRadius / 20, Constants.SunRadius, 32, new GL3DVec4f(0, 1, 0, 0.2f));
-        yAxis.modelView().rotate(-Math.PI / 2, GL3DVec3d.XAxis);
-        indicatorArrows.addNode(yAxis);
-        GL3DShape zAxis = new GL3DArrow("Z-Axis", Constants.SunRadius / 20, Constants.SunRadius, 32, new GL3DVec4f(0, 0.5f, 1, 0.2f));
-        indicatorArrows.addNode(zAxis);
+ 
         GL3DModel sunModel = new GL3DModel("Sun", "Spherical Grid depicting the Sun");
         this.sun = new GL3DSunGrid(Constants.SunRadius * 0.98, new GL3DVec4f(0.8f, 0.8f, 0, 0.2f));
         this.sun.getDrawBits().on(Bit.Wireframe);
@@ -429,4 +420,16 @@ public class GL3DSceneGraphView extends AbstractGL3DView implements GL3DView {
             }
         }
     }
+
+	public void toggleGridVisibility() {
+		if( grid.getParent()==root ){
+			root.removeNode(grid);
+		}
+		else{
+			root.addNode(grid);
+		}
+	}
+		
+		//grid.setUnchanged();		
 }
+
