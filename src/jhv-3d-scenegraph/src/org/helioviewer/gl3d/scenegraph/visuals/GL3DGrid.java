@@ -27,7 +27,7 @@ public class GL3DGrid extends GL3DGroup{
 		sphere.getDrawBits().on(Bit.Wireframe);
 		this.addNode(sphere);
         GL3DText rect;
-   	 	double letterSize = 0.03*Constants.SunRadius;
+   	 	double letterSize = 0.05*Constants.SunRadius;
    	 	double size = Constants.SunRadius*1.1; 
    	 	double zdist = Constants.SunRadius*0.001;
  
