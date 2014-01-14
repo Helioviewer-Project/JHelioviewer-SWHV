@@ -18,7 +18,7 @@ public class GL3DFontSettings {
     }
     
 	private void setup() {
-		this.fonts.put("default", "resources/fonts/default.png");
+		this.fonts.put("default", "/fonts/default.png");
 	}
 	
 	public String getFont(String key){
