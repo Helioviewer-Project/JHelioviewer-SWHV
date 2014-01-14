@@ -49,7 +49,6 @@ public class GL3DFont {
 			URL url;
 			BufferedImage img;
 			
-			GL3DFontSettings settt = GL3DFontSettings.getSingletonInstance();
 			String fontt = GL3DFontSettings.getSingletonInstance().getFont(font);
 			System.out.print(fontt);
 			url = GL3DFont.class.getResource(fontt);
