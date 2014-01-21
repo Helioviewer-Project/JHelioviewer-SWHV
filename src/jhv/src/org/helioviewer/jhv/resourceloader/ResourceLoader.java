@@ -93,7 +93,7 @@ public class ResourceLoader {
         try {
             ResourceConfiguration config = null;
             String resFile = resourceName + ".xml";
-            if (customResourceDefinitionDirectory != null) {
+        /*    if (customResourceDefinitionDirectory != null) {
                 config = loadResource(resourceName, customResourceDefinitionDirectory.resolve(resFile), installDirectory, systemProperties);
                 if (config != null) {
                     updateLastConfig(resourceName, config, configBackupDirectory);
@@ -111,12 +111,12 @@ public class ResourceLoader {
                     Log.error(logHeader + "Failed to load resources with default resource definition file. Try to use last known configuration.");
                 }
             }
-            if (configBackupDirectory != null) {
+            if (configBackupDirectory != null) {*/
                 config = loadResource(resourceName, configBackupDirectory.resolve(resFile), installDirectory, systemProperties);
-            }
+            /*}
             if (config == null) {
                 Log.error(logHeader + "Failed to load last known configuration!");
-            }
+            }*/
             return config;
         } catch (Throwable t) {
             Log.error(logHeader + "Could not load resources", t);
