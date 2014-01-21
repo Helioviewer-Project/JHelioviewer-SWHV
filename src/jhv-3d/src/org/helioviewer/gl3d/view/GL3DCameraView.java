@@ -11,7 +11,6 @@ import org.helioviewer.gl3d.GL3DKeyController;
 import org.helioviewer.gl3d.GL3DKeyController.GL3DKeyListener;
 import org.helioviewer.gl3d.camera.GL3DCamera;
 import org.helioviewer.gl3d.camera.GL3DCameraListener;
-import org.helioviewer.gl3d.camera.GL3DTrackballCamera;
 import org.helioviewer.gl3d.changeevent.CameraChangeChangedReason;
 import org.helioviewer.gl3d.scenegraph.GL3DState;
 import org.helioviewer.viewmodel.changeevent.ChangeEvent;

@@ -1,13 +1,9 @@
 package org.helioviewer.gl3d.camera;
 
-import java.util.Calendar;
 import java.util.Date;
-import java.util.GregorianCalendar;
 
 import org.helioviewer.base.logging.Log;
-import org.helioviewer.base.physics.Astronomy;
 import org.helioviewer.base.physics.DifferentialRotation;
-import org.helioviewer.gl3d.camera.GL3DBaseTrackballCamera;
 import org.helioviewer.gl3d.scenegraph.math.GL3DQuatd;
 import org.helioviewer.gl3d.scenegraph.math.GL3DVec3d;
 import org.helioviewer.gl3d.scenegraph.rt.GL3DRay;
@@ -27,16 +23,15 @@ import org.helioviewer.viewmodel.view.jp2view.datetime.ImmutableDateTime;
 
 /**
  * This camera is used when solar rotation tracking is enabled. It extends the
- * {@link GL3DBaseTrackballCamera} by automatically rotating the camera around the
+ * {@link GL3DTrackballCamera} by automatically rotating the camera around the
  * Y-Axis (pointing to solar north) by an amount calculated through
  * {@link DifferentialRotation}.
  * 
  * @author Simon Spšrri (simon.spoerri@fhnw.ch)
  * 
  */
-public class GL3DSolarRotationTrackingTrackballCamera extends GL3DBaseTrackballCamera implements ViewListener {
-	
-	private final Date startDate;
+public class GL3DSolarRotationTrackingTrackballCamera extends GL3DTrackballCamera implements ViewListener {
+    private Date startDate = null;
 
     private CoordinateVector startPosition = null;
 
@@ -49,9 +44,6 @@ public class GL3DSolarRotationTrackingTrackballCamera extends GL3DBaseTrackballC
 
     public GL3DSolarRotationTrackingTrackballCamera(GL3DSceneGraphView sceneGraphView) {
         super(sceneGraphView);
-        Calendar cal = new GregorianCalendar();
-        cal.set(2000, 1, 1, 0, 0, 0);
-        startDate = cal.getTime();
     }
 
     public void activate(GL3DCamera precedingCamera) {
@@ -62,19 +54,13 @@ public class GL3DSolarRotationTrackingTrackballCamera extends GL3DBaseTrackballC
     public void deactivate() {
         sceneGraphView.removeViewListener(this);
         this.startPosition = null;
+        this.startDate = null;
     };
 
     public String getName() {
         return "Solar Rotation Tracking Camera";
     }
-    public void rotateAll(double rotation){
-        this.setRotation(GL3DQuatd.createRotation(0.0, new GL3DVec3d(0, 1, 0)));
-        //this.getRotation().rotate(GL3DQuatd.createRotation(localrotation, new GL3DVec3d(0, 1, 0)));
-        if(this.currentDragRotation!=null){
-        	this.getRotation().rotate(this.currentDragRotation);
-        }
-        this.updateCameraTransformation();    	
-    }
+
     public void viewChanged(View sender, ChangeEvent aEvent) {
         TimestampChangedReason timestampReason = aEvent.getLastChangedReasonByType(TimestampChangedReason.class);
         if ((timestampReason != null) && (timestampReason.getView() instanceof TimedMovieView) && LinkedMovieManager.getActiveInstance().isMaster((TimedMovieView) timestampReason.getView())) {
@@ -83,9 +69,12 @@ public class GL3DSolarRotationTrackingTrackballCamera extends GL3DBaseTrackballC
                 long timediff = (currentDate.getTime() - startDate.getTime()) / 1000;
 
                 double theta = startPosition.getValue(StonyhurstHeliographicCoordinateSystem.THETA);
-                double rotation = -DifferentialRotation.calculateRotationInRadians(0, timediff);
-                rotateAll(rotation);
+                double rotation = DifferentialRotation.calculateRotationInRadians(theta, timediff);
+                // Log.debug("GL3DSolarRotationTracking: Rotating: "+rotation);
 
+                this.getRotation().rotate(GL3DQuatd.createRotation(currentRotation - rotation, new GL3DVec3d(0, 1, 0)));
+                this.updateCameraTransformation();
+                this.currentRotation = rotation;
             } else {
                 currentRotation = 0.0;
                 resetStartPosition();
@@ -96,6 +85,7 @@ public class GL3DSolarRotationTrackingTrackballCamera extends GL3DBaseTrackballC
     }
 
     private void resetStartPosition() {
+        this.startDate = getStartDate();
 
         GL3DRayTracer positionTracer = new GL3DRayTracer(sceneGraphView.getHitReferenceShape(), this);
         GL3DRay positionRay = positionTracer.castCenter();
