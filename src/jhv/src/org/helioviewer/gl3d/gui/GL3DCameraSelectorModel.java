@@ -8,6 +8,7 @@ import javax.swing.ComboBoxModel;
 import javax.swing.ListModel;
 
 import org.helioviewer.base.logging.Log;
+import org.helioviewer.gl3d.camera.GL3DBaseTrackballCamera;
 import org.helioviewer.gl3d.camera.GL3DCamera;
 import org.helioviewer.gl3d.camera.GL3DSolarRotationTrackingTrackballCamera;
 import org.helioviewer.gl3d.camera.GL3DTrackballCamera;
@@ -35,7 +36,7 @@ public class GL3DCameraSelectorModel extends AbstractListModel implements ComboB
 
     private GL3DCamera lastCamera;
 
-    private GL3DTrackballCamera trackballCamera;
+    private GL3DBaseTrackballCamera trackballCamera;
 
     private GL3DSolarRotationTrackingTrackballCamera solarRotationCamera;
 
@@ -131,7 +132,7 @@ public class GL3DCameraSelectorModel extends AbstractListModel implements ComboB
         return null;
     }
 
-    public GL3DTrackballCamera getTrackballCamera() {
+    public GL3DBaseTrackballCamera getTrackballCamera() {
         return trackballCamera;
     }
 

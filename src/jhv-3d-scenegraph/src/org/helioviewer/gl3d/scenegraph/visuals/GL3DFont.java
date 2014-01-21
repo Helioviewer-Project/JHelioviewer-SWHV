@@ -1,14 +1,16 @@
 package org.helioviewer.gl3d.scenegraph.visuals;
 
 import java.awt.image.BufferedImage;
+
 import java.io.IOException;
 import java.net.URL;
+
 import java.util.HashMap;
+
 
 import javax.imageio.ImageIO;
 import javax.media.opengl.GL;
 
-import org.helioviewer.base.logging.Log;
 import org.helioviewer.viewmodel.view.opengl.GLTextureHelper;
 
 
@@ -48,7 +50,7 @@ public class GL3DFont {
 			BufferedImage img;
 			
 			String fontt = GL3DFontSettings.getSingletonInstance().getFont(font);
-			Log.error(fontt);
+			System.out.print(fontt);
 			url = GL3DFont.class.getResource(fontt);
 			img = ImageIO.read(url);
 			return img;
