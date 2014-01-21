@@ -285,7 +285,6 @@ public class GL3DComponentView extends AbstractComponentView implements GLEventL
     }
 
     public void display(){
-    	Log.debug("displaying");
     	try{
     	    this.canvas.display();
     	}
