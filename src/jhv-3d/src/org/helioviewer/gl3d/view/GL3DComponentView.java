@@ -1,8 +1,12 @@
 package org.helioviewer.gl3d.view;
 
 import java.awt.Color;
+import java.awt.event.ComponentAdapter;
+import java.awt.event.ComponentEvent;
 import java.io.File;
 import java.io.IOException;
+import java.util.Calendar;
+import java.util.GregorianCalendar;
 import java.util.concurrent.locks.ReentrantLock;
 
 import javax.media.opengl.GL;
@@ -13,15 +17,22 @@ import javax.media.opengl.GLEventListener;
 import org.helioviewer.base.logging.Log;
 import org.helioviewer.base.math.Vector2dInt;
 import org.helioviewer.base.physics.Constants;
+import org.helioviewer.gl3d.camera.GL3DCamera;
+import org.helioviewer.gl3d.camera.GL3DCameraListener;
 import org.helioviewer.gl3d.scenegraph.GL3DState;
+import org.helioviewer.jhv.display.DisplayListener;
+import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.viewmodel.changeevent.ChangeEvent;
 import org.helioviewer.viewmodel.changeevent.LayerChangedReason;
+import org.helioviewer.viewmodel.changeevent.TimestampChangedReason;
 import org.helioviewer.viewmodel.changeevent.LayerChangedReason.LayerChangeType;
 import org.helioviewer.viewmodel.changeevent.ViewChainChangedReason;
 import org.helioviewer.viewmodel.renderer.screen.GLScreenRenderGraphics;
 import org.helioviewer.viewmodel.renderer.screen.ScreenRenderer;
 import org.helioviewer.viewmodel.view.AbstractComponentView;
 import org.helioviewer.viewmodel.view.ComponentView;
+import org.helioviewer.viewmodel.view.LinkedMovieManager;
+import org.helioviewer.viewmodel.view.TimedMovieView;
 import org.helioviewer.viewmodel.view.View;
 import org.helioviewer.viewmodel.view.ViewportView;
 import org.helioviewer.viewmodel.view.opengl.GLSharedContext;
@@ -46,7 +57,7 @@ import com.sun.opengl.util.FPSAnimator;
  * @author Simon Sp�rri (simon.spoerri@fhnw.ch)
  * 
  */
-public class GL3DComponentView extends AbstractComponentView implements GLEventListener, ComponentView {
+public class GL3DComponentView extends AbstractComponentView implements GLEventListener, ComponentView, DisplayListener {
     private GLCanvas canvas;
     private FPSAnimator animator;
 
@@ -66,34 +77,36 @@ public class GL3DComponentView extends AbstractComponentView implements GLEventL
     private Vector2dInt viewportSize;
 
     public GL3DComponentView() {
-        this.canvas = new GLCanvas(null, null, GLSharedContext.getSharedContext(), null);
-        this.canvas.setMinimumSize(new java.awt.Dimension(100,100));
-
+        this.setCanvas(new GLCanvas(null, null, GLSharedContext.getSharedContext(), null));
+        this.getCanvas().setMinimumSize(new java.awt.Dimension(100,100));
+        Displayer.getSingletonInstance().addListener(this);
 
         // Just for testing...
-        animator = new FPSAnimator(canvas, 30);
+        //animator = new FPSAnimator(canvas, 30);
 
-        this.canvas.addGLEventListener(this);
+        this.getCanvas().addGLEventListener(this);
+        //this.display(this.canvas);
     }
 
     public void deactivate() {
         if (this.animator != null) {
             this.animator.stop();
-            if (getAdapter(GL3DView.class) != null) {
+            /*if (getAdapter(GL3DView.class) != null) {
                 getAdapter(GL3DView.class).deactivate(GL3DState.get());
-            }
+            }*/
         }
-        animationLock.lock();
+        //animationLock.lock();
     }
 
     public void activate() {
-        this.animator.start();
-        if (this.animationLock.isLocked())
-            animationLock.unlock();
+    	//this.display(this.canvas);
+        //this.animator.start();
+        /*if (this.animationLock.isLocked())
+            animationLock.unlock();*/
     }
 
     public GLCanvas getComponent() {
-        return this.canvas;
+        return this.getCanvas();
     }
 
     public void displayChanged(GLAutoDrawable arg0, boolean arg1, boolean arg2) {
@@ -106,7 +119,7 @@ public class GL3DComponentView extends AbstractComponentView implements GLEventL
 
         GL gl = glAD.getGL();
         GL3DState.create(gl);
-
+        
         // GLTextureCoordinate.init(gl);
         textureHelper.delAllTextures(gl);
         GLTextureHelper.initHelper(gl);
@@ -165,6 +178,8 @@ public class GL3DComponentView extends AbstractComponentView implements GLEventL
     }
 
     public synchronized void display(GLAutoDrawable glAD) {
+    	
+    		
         GL gl = glAD.getGL();
 
         int width = this.viewportSize.getX();
@@ -269,6 +284,15 @@ public class GL3DComponentView extends AbstractComponentView implements GLEventL
         // this.orthoView.updateMainImagePanelSize(mainImagePanelSize);
     }
 
+    public void display(){
+    	Log.debug("displaying");
+    	try{
+    	    this.canvas.display();
+    	}
+    	catch( Exception e){
+            Log.warn("GL3DTrackballCamera.mouseDragged: Illegal Rotation ignored!", e);    		
+    	}
+    }
     public void viewChanged(View sender, ChangeEvent aEvent) {
         if (this.animationLock.isLocked()) {
             return;
@@ -282,6 +306,15 @@ public class GL3DComponentView extends AbstractComponentView implements GLEventL
             this.viewportView = getAdapter(ViewportView.class);
             this.updateViewport();
         }
+        TimestampChangedReason timestampReason = aEvent.getLastChangedReasonByType(TimestampChangedReason.class);
+        if ((timestampReason != null) && (timestampReason.getView() instanceof TimedMovieView) && LinkedMovieManager.getActiveInstance().isMaster((TimedMovieView) timestampReason.getView())) {
+        	try{
+        	    this.getCanvas().display();
+        	}
+        	catch( Exception e){
+        		
+        	}
+        }        
         // inform all listener of the latest change reason
         // frameUpdated++;
         notifyViewListeners(aEvent);
@@ -317,4 +350,13 @@ public class GL3DComponentView extends AbstractComponentView implements GLEventL
             vertexView.buildVertexShader(newShaderBuilder).compile();
         }
     }
+
+	public GLCanvas getCanvas() {
+		return canvas;
+	}
+
+	public void setCanvas(GLCanvas canvas) {
+		this.canvas = canvas;
+	}
+     
 }
