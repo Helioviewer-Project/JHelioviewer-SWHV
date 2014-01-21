@@ -6,9 +6,7 @@ import javax.swing.AbstractAction;
 
 import org.helioviewer.gl3d.camera.GL3DCamera;
 import org.helioviewer.gl3d.camera.GL3DSolarRotationTrackingTrackballCamera;
-import org.helioviewer.gl3d.view.GL3DComponentView;
 import org.helioviewer.gl3d.view.GL3DSceneGraphView;
-import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.gui.ImageViewerGui;
 
 /**
@@ -34,7 +32,6 @@ public class GL3DToggleGridVisibilityAction extends AbstractAction {
         GL3DSceneGraphView sceneGraph = ImageViewerGui.getSingletonInstance().getMainView().getAdapter(GL3DSceneGraphView.class);
         if (sceneGraph != null) {
             sceneGraph.toggleGridVisibility();
-        	Displayer.getSingletonInstance().display();
         }
     }
 

@@ -6,7 +6,6 @@ import java.awt.event.MouseEvent;
 import javax.media.opengl.GL;
 
 import org.helioviewer.base.logging.Log;
-import org.helioviewer.gl3d.camera.GL3DBaseTrackballCamera;
 import org.helioviewer.gl3d.scenegraph.GL3DState;
 import org.helioviewer.gl3d.scenegraph.math.GL3DVec3d;
 import org.helioviewer.gl3d.scenegraph.rt.GL3DRay;
@@ -14,7 +13,6 @@ import org.helioviewer.gl3d.scenegraph.rt.GL3DRayTracer;
 import org.helioviewer.gl3d.view.GL3DSceneGraphView;
 import org.helioviewer.gl3d.wcs.CoordinateVector;
 import org.helioviewer.gl3d.wcs.impl.SolarImageCoordinateSystem;
-import org.helioviewer.jhv.display.Displayer;
 
 /**
  * The zoom box interaction allows the user to select a region of interest in
@@ -34,7 +32,7 @@ public class GL3DZoomBoxInteraction extends GL3DDefaultInteraction {
 
     private SolarImageCoordinateSystem solarDiskCS;
 
-    public GL3DZoomBoxInteraction(GL3DBaseTrackballCamera camera, GL3DSceneGraphView sceneGraph) {
+    public GL3DZoomBoxInteraction(GL3DTrackballCamera camera, GL3DSceneGraphView sceneGraph) {
         super(camera, sceneGraph);
         this.solarDiskCS = new SolarImageCoordinateSystem();
     }
@@ -86,12 +84,10 @@ public class GL3DZoomBoxInteraction extends GL3DDefaultInteraction {
 
     public void mousePressed(MouseEvent e, GL3DCamera camera) {
         this.zoomBoxStartPoint = getHitPoint(e.getPoint());
-        Displayer.getSingletonInstance().display();
     }
 
     public void mouseDragged(MouseEvent e, GL3DCamera camera) {
         this.zoomBoxEndPoint = getHitPoint(e.getPoint());
-        Displayer.getSingletonInstance().display();
     }
 
     public void mouseReleased(MouseEvent e, GL3DCamera camera) {
@@ -121,8 +117,6 @@ public class GL3DZoomBoxInteraction extends GL3DDefaultInteraction {
         }
         this.zoomBoxEndPoint = null;
         this.zoomBoxStartPoint = null;
-        Displayer.getSingletonInstance().display();
-
     }
 
     private GL3DCameraRotationAnimation createRotationAnimation(GL3DVec3d startPoint) {

@@ -5,9 +5,7 @@ import java.awt.event.MouseEvent;
 
 import org.helioviewer.base.math.Vector2dDouble;
 import org.helioviewer.base.physics.Constants;
-import org.helioviewer.gl3d.camera.GL3DBaseTrackballCamera;
 import org.helioviewer.gl3d.view.GL3DSceneGraphView;
-import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.viewmodel.view.RegionView;
 import org.helioviewer.viewmodel.view.ViewHelper;
 
@@ -21,7 +19,7 @@ import org.helioviewer.viewmodel.view.ViewHelper;
 public class GL3DPanInteraction extends GL3DDefaultInteraction {
     private Point lastMousePoint;
 
-    protected GL3DPanInteraction(GL3DBaseTrackballCamera camera, GL3DSceneGraphView sceneGraph) {
+    protected GL3DPanInteraction(GL3DTrackballCamera camera, GL3DSceneGraphView sceneGraph) {
         super(camera, sceneGraph);
     }
 
@@ -42,6 +40,5 @@ public class GL3DPanInteraction extends GL3DDefaultInteraction {
         }
         this.lastMousePoint = e.getPoint();
         camera.updateCameraTransformation();
-        Displayer.getSingletonInstance().display();
     }
 }

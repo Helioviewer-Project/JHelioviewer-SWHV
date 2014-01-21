@@ -109,6 +109,8 @@ public class BandTypeAPI extends APIAbstract{
 	
 	        	if(job.has("label"))
 	        		this.bandtypes[i].setLabel((String) job.get("label"));
+	        	if(job.has("name"))
+	        		this.bandtypes[i].setName((String) job.get("name"));
 	        	if(job.has("min"))
 	        		this.bandtypes[i].setMin( job.getDouble("min") );
 	        	if(job.has("max"))

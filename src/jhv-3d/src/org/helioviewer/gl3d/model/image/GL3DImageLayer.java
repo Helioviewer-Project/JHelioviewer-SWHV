@@ -24,7 +24,7 @@ import org.helioviewer.gl3d.view.GL3DView;
 import org.helioviewer.gl3d.wcs.CoordinateConversion;
 import org.helioviewer.gl3d.wcs.CoordinateSystem;
 import org.helioviewer.gl3d.wcs.CoordinateVector;
-import org.helioviewer.gl3d.wcs.HeliocentricCartesian2000CoordinateSystem;
+import org.helioviewer.gl3d.wcs.HeliocentricCartesianCoordinateSystem;
 import org.helioviewer.jhv.internal_plugins.filter.opacity.DynamicOpacityFilter;
 import org.helioviewer.viewmodel.changeevent.ChangeEvent;
 import org.helioviewer.viewmodel.filter.Filter;
@@ -136,7 +136,6 @@ public abstract class GL3DImageLayer extends GL3DOrientedGroup implements GL3DCa
     protected abstract GL3DImageMesh getImageSphere();
 
     public void shapeUpdate(GL3DState state) {
-    	
         super.shapeUpdate(state);
         if (doUpdateROI) {
             // Log.debug("GL3DImageLayer: '"+getName()+" is updating its ROI");
@@ -148,10 +147,8 @@ public abstract class GL3DImageLayer extends GL3DOrientedGroup implements GL3DCa
 
     public void cameraMoved(GL3DCamera camera) {
         doUpdateROI = true;
-        if(this.accellerationShape!=null){
-        	this.accellerationShape.markAsChanged();
+        this.accellerationShape.markAsChanged();
         //markAsChanged();
-        }
 
         cameraMoving(camera);
     }
@@ -171,7 +168,7 @@ public abstract class GL3DImageLayer extends GL3DOrientedGroup implements GL3DCa
 
         // Convert layer orientation to heliocentric coordinate system
         CoordinateVector orientation = coordinateSystemView.getOrientation();
-        CoordinateSystem targetSystem = new HeliocentricCartesian2000CoordinateSystem();
+        CoordinateSystem targetSystem = new HeliocentricCartesianCoordinateSystem();
         CoordinateConversion converter = orientation.getCoordinateSystem().getConversion(targetSystem);
         orientation = converter.convert(orientation);
 
@@ -276,10 +273,4 @@ public abstract class GL3DImageLayer extends GL3DOrientedGroup implements GL3DCa
     protected GL3DImageTextureView getImageTextureView() {
         return this.imageTextureView;
     }
-    
-    public void draw(GL3DState state){
-        this.markAsChanged();
-    	super.draw(state);
-    }
-    
 }

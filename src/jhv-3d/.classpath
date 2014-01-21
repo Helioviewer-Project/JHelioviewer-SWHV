@@ -2,12 +2,18 @@
 <classpath>
 	<classpathentry kind="src" path="src"/>
 	<classpathentry kind="src" path="test"/>
+
+	<classpathentry kind="output" path="bin"/>
+	
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.junit.JUNIT_CONTAINER/4"/>
-	<classpathentry kind="lib" path="../lib/jogl.jar"/>
+
+	<classpathentry kind="lib" path="../lib/jogl.jar" />
 	<classpathentry kind="lib" path="../lib/gluegen-rt.jar"/>
 	<classpathentry kind="lib" path="../lib/log4j-1.2.16.jar"/>
+	
 	<classpathentry kind="lib" path="../resources"/>
+	
 	<classpathentry combineaccessrules="false" kind="src" path="/base"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/viewmodel"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/jhv-3d-math"/>
@@ -16,6 +22,4 @@
 	<classpathentry combineaccessrules="false" kind="src" path="/jhv-3d-wcs"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/jhv-3d-plugin-pfss"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/jhv-3d-plugin-vectors"/>
-	<classpathentry combineaccessrules="false" kind="src" path="/jhv-display"/>
-	<classpathentry kind="output" path="bin"/>
 </classpath>
