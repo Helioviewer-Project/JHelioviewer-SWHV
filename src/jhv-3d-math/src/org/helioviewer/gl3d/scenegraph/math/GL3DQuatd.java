@@ -1,5 +1,7 @@
 package org.helioviewer.gl3d.scenegraph.math;
 
+import org.helioviewer.base.logging.Log;
+
 public class GL3DQuatd {
     public static final double EPSILON = 0.000001;
 
@@ -8,15 +10,15 @@ public class GL3DQuatd {
     protected GL3DVec3d u;
 
     public static GL3DQuatd createRotation(double angle, GL3DVec3d axis) {
-        double halfAngle = angle / 2;
+        double halfAngle = angle / 2.0;
         return new GL3DQuatd(Math.cos(halfAngle), axis.normalize().multiply(Math.sin(halfAngle)));
     }
 
-    public GL3DQuatd(double a, double x, double y, double z) {
+    private GL3DQuatd(double a, double x, double y, double z) {
         this(a, new GL3DVec3d(x, y, z));
     }
 
-    public GL3DQuatd(double a, GL3DVec3d u) {
+    private GL3DQuatd(double a, GL3DVec3d u) {
         this.a = a;
         this.u = u;
     }
@@ -104,12 +106,14 @@ public class GL3DQuatd {
 
     public void rotate(GL3DQuatd q2) {
         GL3DQuatd q1 = this;
-
-        this.a = q1.a * q2.a - q1.u.x * q2.u.x - q1.u.y * q2.u.y - q1.u.z * q2.u.z;
-        this.u.x = q1.a * q2.u.x + q1.u.x * q2.a + q1.u.y * q2.u.z - q1.u.z * q2.u.y;
-        this.u.y = q1.a * q2.u.y + q1.u.y * q2.a + q1.u.z * q2.u.x - q1.u.x * q2.u.z;
-        this.u.z = q1.a * q2.u.z + q1.u.z * q2.a + q1.u.x * q2.u.y - q1.u.y * q2.u.x;
-
+        double atemp = q1.a * q2.a - q1.u.x * q2.u.x - q1.u.y * q2.u.y - q1.u.z * q2.u.z;
+        double xtemp = q1.a * q2.u.x + q1.u.x * q2.a + q1.u.y * q2.u.z - q1.u.z * q2.u.y;
+        double ytemp = q1.a * q2.u.y + q1.u.y * q2.a + q1.u.z * q2.u.x - q1.u.x * q2.u.z;
+        double ztemp = q1.a * q2.u.z + q1.u.z * q2.a + q1.u.x * q2.u.y - q1.u.y * q2.u.x;
+        this.a = atemp;
+        this.u.x = xtemp;
+        this.u.y = ytemp;
+        this.u.z = ztemp;
         this.normalize();
     }
 
