@@ -25,7 +25,9 @@ import javax.swing.JTree;
 import javax.swing.SwingUtilities;
 import javax.swing.tree.DefaultTreeCellRenderer;
 
+import org.helioviewer.base.logging.Log;
 import org.helioviewer.base.message.Message;
+import org.helioviewer.gl3d.view.GL3DSceneGraphView;
 import org.helioviewer.jhv.JHVSplashScreen;
 import org.helioviewer.jhv.gui.actions.ExitProgramAction;
 import org.helioviewer.jhv.gui.components.ControlPanelContainer;
@@ -73,11 +75,10 @@ import org.helioviewer.viewmodel.view.MovieView;
 import org.helioviewer.viewmodel.view.View;
 import org.helioviewer.viewmodelplugin.filter.FilterTabPanelManager;
 import org.jhv.dataset.tree.models.DatasetIntervals;
-import org.jhv.dataset.tree.models.DatasetNodeRenderer;
-import org.jhv.dataset.tree.models.DatasetTreeCellEditor;
 import org.jhv.dataset.tree.models.DatasetTreeModel;
 import org.jhv.dataset.tree.models.LayersToDatasetLayers;
 import org.jhv.dataset.tree.views.DatasetTree;
+
 
 
 /**
@@ -306,7 +307,27 @@ public class ImageViewerGui {
                 exitAction.actionPerformed(new ActionEvent(this, 0, ""));
             }
         });
+        /*
+        frame.addWindowFocusListener(new WindowAdapter() {
+        	int count=0;
+            public void windowGainedFocus(WindowEvent e) {
+            	if(count==0){
+            		count=count+1;
+            	}
+            	else{
+            	ComponentView cv = ImageViewerGui.getSingletonInstance().getMainView();
+            	cv.activate();       
+            	Log.error("WindowListener method called: windowActivated.");
+            	}
+            }
 
+            public void windowLostFocus(WindowEvent e) {
+            	ComponentView cv = ImageViewerGui.getSingletonInstance().getMainView();
+            	cv.deactivate();
+            	Log.error("WindowListener method called: windowDeactivated.");
+            }
+        });
+        */
         Dimension maxSize = Toolkit.getDefaultToolkit().getScreenSize();
         Dimension minSize = new Dimension(800, 600);
 
@@ -409,14 +430,14 @@ public class ImageViewerGui {
             filterPanelContainer.setDefaultPanel(tab);
             leftPane.add("Adjustments", filterPanelContainer, false);
     	    
-            /*DatasetIntervals intervals = new DatasetIntervals();
+            DatasetIntervals intervals = new DatasetIntervals();
     	    DatasetTreeModel model = new DatasetTreeModel(intervals);
     	    LayersToDatasetLayers converter = new LayersToDatasetLayers(model);
     	    LayersModel.getSingletonInstance().addLayersListener(converter);
     	    JTree tree = new DatasetTree(model);
     	    model.setTree(tree);
     		
-            leftPane.add("Tree", tree);*/
+            leftPane.add("Tree", tree);
 
             return leftPane;
         }

@@ -14,7 +14,7 @@ import org.helioviewer.gl3d.plugin.GL3DModelPlugin;
  * @author Simon Spšrri (simon.spoerri@fhnw.ch)
  * 
  */
-public class PfssPlugin extends GL3DAbstractModelPlugin implements GL3DModelPlugin {
+public class PfssPlugin extends GL3DAbstractModelPlugin {
 
     private PfssConfigPanel configPanel;
 
@@ -38,4 +38,8 @@ public class PfssPlugin extends GL3DAbstractModelPlugin implements GL3DModelPlug
     public JComponent getConfigurationComponent() {
         return this.configPanel;
     }
+    
+    public static void main(String[] args) {
+		// nothing
+	}
 }

@@ -23,7 +23,7 @@ public class SolarImageToSolarSphereConversionTest {
         Assert.assertEquals(0.0, sphere.getValue(SolarSphereCoordinateSystem.X_COORDINATE), 0.001);
         Assert.assertEquals(0.0, sphere.getValue(SolarSphereCoordinateSystem.Y_COORDINATE), 0.001);
         Assert.assertEquals(solarSphereCS.getSolarRadius(), sphere.getValue(SolarSphereCoordinateSystem.Z_COORDINATE), 0.001);
-
+                
         // Test Left
         sd = solarDiskCS.createCoordinateVector(-solarSphereCS.getSolarRadius(), 0);
         sphere = conversion.convert(sd);

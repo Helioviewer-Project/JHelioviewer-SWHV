@@ -1,6 +1,9 @@
 package org.helioviewer.viewmodel.view;
 
+import java.util.concurrent.ConcurrentSkipListSet;
+
 import org.helioviewer.viewmodel.renderer.physical.PhysicalRenderer;
+import org.helioviewer.viewmodel.view.opengl.OverlayPluginContainer;
 
 /**
  * View to add additional overlays to the image.
@@ -20,24 +23,28 @@ import org.helioviewer.viewmodel.renderer.physical.PhysicalRenderer;
  * @author Markus Langenberg
  * 
  */
-public interface OverlayView extends ModifiableInnerViewView, ViewListener {
+public interface OverlayView extends ModifiableInnerViewView, ViewListener{
 
-    /**
-     * Sets the renderer to draw overlays.
-     * 
-     * @param renderer
-     *            New renderer to draw overlays.
-     * @see #getRenderer
-     */
-    public void setRenderer(PhysicalRenderer renderer);
+	public void addOverlay(OverlayPluginContainer overlayPluginContainer);
+	public ConcurrentSkipListSet<OverlayPluginContainer> getOverlays();
+	public void removeOverlay(int index);
+	/**
+	 * Sets the renderer to draw overlays.
+	 * 
+	 * @param renderer
+	 *            New renderer to draw overlays.
+	 * @see #getRenderer
+	 */
+	public void setRenderer(PhysicalRenderer renderer);
 
-    /**
-     * Returns the currently used renderer.
-     * 
-     * If there is currently no renderer present, return null.
-     * 
-     * @return renderer currently in use, null if there is none.
-     * @see #setRenderer
-     */
-    public PhysicalRenderer getRenderer();
+	/**
+	 * Returns the currently used renderer.
+	 * 
+	 * If there is currently no renderer present, return null.
+	 * 
+	 * @return renderer currently in use, null if there is none.
+	 * @see #setRenderer
+	 */
+
+
 }

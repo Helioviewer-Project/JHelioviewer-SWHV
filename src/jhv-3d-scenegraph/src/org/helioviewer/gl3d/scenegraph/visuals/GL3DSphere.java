@@ -59,12 +59,12 @@ public class GL3DSphere extends GL3DMesh {
                 indices.add(first + 1);
                 indices.add(second + 1);
                 indices.add(second);
-
+                
                 // indices.add(second);
                 // indices.add(first + 1);
             }
         }
-
+        
         return GL3DMeshPrimitive.QUADS;
     }
 

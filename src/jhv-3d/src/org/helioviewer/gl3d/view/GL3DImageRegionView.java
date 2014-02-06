@@ -25,7 +25,7 @@ import org.helioviewer.viewmodel.viewportimagesize.ViewportImageSize;
  * converting incoming constraints to the 2D rectangle that needs to be
  * requested from the image source and sent through the 2D view chain part.
  * 
- * @author Simon Spšrri (simon.spoerri@fhnw.ch)
+ * @author Simon Spï¿½rri (simon.spoerri@fhnw.ch)
  * 
  */
 public class GL3DImageRegionView extends AbstractGL3DView implements GL3DView, RegionView, ViewportView {
@@ -49,18 +49,16 @@ public class GL3DImageRegionView extends AbstractGL3DView implements GL3DView, R
         // The child node will render a rect to a rect(lowerLeft, lowerRight,
         // regionWidth, regionHeight).
         // make sure that this will be in the lower left corner.
-
         double regionWidth = this.actualImageRegion.getWidth();
         double regionHeight = this.actualImageRegion.getHeight();
-
         double regionWidthOfViewport = regionWidth / this.innerViewport.getWidth() * maximalViewport.getWidth();
         double regionHeightOfViewport = regionHeight / this.innerViewport.getHeight() * maximalViewport.getHeight();
-
+        
         double left = this.actualImageRegion.getCornerX();
         double right = left + regionWidthOfViewport;
         double bottom = this.actualImageRegion.getCornerY();
         double top = bottom + regionHeightOfViewport;
-
+        
         gl.glMatrixMode(GL.GL_PROJECTION);
         gl.glPushMatrix();
         gl.glLoadIdentity();
@@ -68,7 +66,6 @@ public class GL3DImageRegionView extends AbstractGL3DView implements GL3DView, R
         gl.glMatrixMode(GL.GL_MODELVIEW);
         gl.glPushMatrix();
         gl.glLoadIdentity();
-
         this.renderChild(gl);
 
         // Resume Previous Projection
@@ -120,16 +117,13 @@ public class GL3DImageRegionView extends AbstractGL3DView implements GL3DView, R
     protected boolean updateRegionAndViewport(ChangeEvent event) {
         MetaData metaData = this.metaDataView.getMetaData();
         Region region = ViewHelper.cropRegionToImage(detectedRegion, metaData);
-
         ViewportImageSize requiredViewportSize = ViewHelper.calculateViewportImageSize(this.maximalViewport, region);
         // Log.debug("GL3DImageRegionView: requiredViewportSize: "+requiredViewportSize.getSizeVector());
-
         this.innerViewport = StaticViewport.createAdaptedViewport(requiredViewportSize.getSizeVector());
         // Log.debug("GL3DImageRegionView: Inner Viewport: "+innerViewport);
 
         this.renderOffset = new Vector2dInt(0, 0);
         // Log.debug("GL3DImageRegionView: Offset: "+renderOffset);
-
         this.actualImageRegion = region;
 
         return true;
@@ -138,7 +132,7 @@ public class GL3DImageRegionView extends AbstractGL3DView implements GL3DView, R
     public Region getRegion() {
         return this.actualImageRegion;
     }
-
+    
     public boolean setViewport(Viewport v, ChangeEvent event) {
         Log.debug("GL3DImageRegionView:setViewport() Viewport = " + v);
         this.maximalViewport = v;

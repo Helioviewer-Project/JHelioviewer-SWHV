@@ -26,6 +26,7 @@ import org.helioviewer.viewmodel.io.APIResponse;
 import org.helioviewer.viewmodel.io.APIResponseDump;
 import org.helioviewer.viewmodel.metadata.HelioviewerMetaData;
 import org.helioviewer.viewmodel.metadata.MetaData;
+import org.helioviewer.viewmodel.metadata.PixelBasedMetaData;
 import org.helioviewer.viewmodel.view.ImageInfoView;
 import org.helioviewer.viewmodel.view.MetaDataView;
 import org.helioviewer.viewmodel.view.ViewHelper;
@@ -63,7 +64,7 @@ public class APIRequestManager {
         Date date = new Date();
         boolean readDate = false;
         ImageInfoView view = null;
-
+        
         try {
             view = loadImage(false, observatory, instrument, detector, measurement, formatter.format(date));
             if (view != null) {
@@ -301,8 +302,8 @@ public class APIRequestManager {
         ImageInfoView view = ViewHelper.loadView(uri, range);
 
         if (addToViewChain) {
-            ViewchainFactory factory = StateController.getInstance().getCurrentState().getViewchainFactory();
-            factory.addLayerToViewchainMain(view, ImageViewerGui.getSingletonInstance().getMainView());
+	    	ViewchainFactory factory = StateController.getInstance().getCurrentState().getViewchainFactory();
+	        factory.addLayerToViewchainMain(view, ImageViewerGui.getSingletonInstance().getMainView());
         }
         return view;
     }

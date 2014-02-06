@@ -50,7 +50,7 @@ public class TimedHeliocentricCartesianToHeliocentricCartesian2000Conversion imp
 
         double timediff = (dt.getMillis()-cal.getTime().getTime())/1000.0;
         double rot = -DifferentialRotation.calculateRotationInRadians(0, timediff);
-
+        rot = 0.0;
         double xp = xheeq * Math.cos(rot) - yheeq * Math.sin(rot);
         double yp = xheeq * Math.sin(rot) + yheeq * Math.cos(rot);
         double zp = zheeq;

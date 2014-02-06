@@ -43,7 +43,7 @@ public class GLScalePowerOfTwoView extends AbstractGLView implements GLVertexSha
     /**
      * {@inheritDoc}
      */
-    public void renderGL(GL gl) {
+    public void renderGL(GL gl, boolean nextView) {
         gl.glEnable(GL.GL_VERTEX_PROGRAM_ARB);
         shader.bind(gl);
 

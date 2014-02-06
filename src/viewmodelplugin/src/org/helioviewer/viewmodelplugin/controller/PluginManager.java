@@ -18,6 +18,8 @@ import java.util.jar.JarFile;
 import java.util.jar.Manifest;
 
 import org.helioviewer.base.logging.Log;
+import org.helioviewer.gl3d.plugin.GL3DModelPlugin;
+import org.helioviewer.gl3d.plugin.GL3DPluginController;
 import org.helioviewer.viewmodelplugin.filter.FilterContainer;
 import org.helioviewer.viewmodelplugin.interfaces.Plugin;
 import org.helioviewer.viewmodelplugin.overlay.OverlayContainer;
@@ -401,6 +403,11 @@ public class PluginManager {
             Log.info("PluginManager: Load plugin class :" + className);
             Object o = classLoader.loadClass(className).newInstance();
 
+            if(o instanceof GL3DModelPlugin){
+            	GL3DPluginController.getInstance().loadPlugin((GL3DModelPlugin) o);
+            	return true;
+            }
+            
             if (o instanceof Plugin) {
                 addPlugin(classLoader, (Plugin) o, pluginLocation);
                 return true;

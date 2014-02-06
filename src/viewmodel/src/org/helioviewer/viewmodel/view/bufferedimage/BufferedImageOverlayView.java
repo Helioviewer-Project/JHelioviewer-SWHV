@@ -2,6 +2,7 @@ package org.helioviewer.viewmodel.view.bufferedimage;
 
 import java.awt.Graphics;
 import java.awt.image.BufferedImage;
+import java.util.concurrent.ConcurrentSkipListSet;
 
 import org.helioviewer.viewmodel.changeevent.ChangeEvent;
 import org.helioviewer.viewmodel.changeevent.RegionChangedReason;
@@ -20,6 +21,7 @@ import org.helioviewer.viewmodel.view.SubimageDataView;
 import org.helioviewer.viewmodel.view.View;
 import org.helioviewer.viewmodel.view.ViewHelper;
 import org.helioviewer.viewmodel.view.ScalingView.InterpolationMode;
+import org.helioviewer.viewmodel.view.opengl.OverlayPluginContainer;
 
 /**
  * Implementation of OverlayView for rendering in software mode.
@@ -144,4 +146,24 @@ public class BufferedImageOverlayView extends AbstractBasicView implements Overl
 
         imageData = new ARGBInt32ImageData(sourceData, target);
     }
+
+
+
+	@Override
+	public void addOverlay(OverlayPluginContainer overlayPluginContainer) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public ConcurrentSkipListSet<OverlayPluginContainer> getOverlays() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public void removeOverlay(int index) {
+		// TODO Auto-generated method stub
+		
+	}
 }

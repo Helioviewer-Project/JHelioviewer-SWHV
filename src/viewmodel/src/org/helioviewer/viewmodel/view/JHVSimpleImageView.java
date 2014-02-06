@@ -244,9 +244,15 @@ public class JHVSimpleImageView extends AbstractView implements ViewportView, Re
 	public Interval<Date> getDateRange() {
 		return this.range;
 	}
+	@Override
+	public MetaData getMetadata() {
+		// TODO Auto-generated method stub
+		return pixelBasedMetaData;
+	}
 
 	@Override
 	public void setDateRange(Interval<Date> range) {
-		this.range = range;		
+		// TODO Auto-generated method stub
+		
 	}
 }

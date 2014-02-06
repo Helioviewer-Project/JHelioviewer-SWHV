@@ -9,5 +9,6 @@
 	<classpathentry kind="lib" path="../lib/gluegen-rt.jar"/>
 	<classpathentry kind="lib" path="../lib/jogl.jar"/>
 	<classpathentry kind="lib" path="../lib/json.jar"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/jhv-3d-math"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

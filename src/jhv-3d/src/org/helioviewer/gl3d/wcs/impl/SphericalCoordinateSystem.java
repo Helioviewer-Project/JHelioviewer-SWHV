@@ -15,7 +15,7 @@ import org.helioviewer.gl3d.wcs.conversion.SphericalToSolarSphereConversion;
  * with a fixed radius. THETA defines the vertical angle in radians from solar
  * north. PHI specifies the vertical angle from the sun-eye line.
  * 
- * @author Simon Spšrri (simon.spoerri@fhnw.ch)
+ * @author Simon Spoerri (simon.spoerri@fhnw.ch)
  * 
  */
 public class SphericalCoordinateSystem extends AbstractCoordinateSystem implements CoordinateSystem {

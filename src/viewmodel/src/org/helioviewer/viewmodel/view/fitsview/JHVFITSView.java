@@ -35,6 +35,8 @@ import org.helioviewer.viewmodel.viewport.Viewport;
 import org.helioviewer.viewmodel.viewportimagesize.StaticViewportImageSize;
 import org.helioviewer.viewmodel.viewportimagesize.ViewportImageSizeAdapter;
 
+import com.sun.xml.internal.ws.api.addressing.WSEndpointReference.Metadata;
+
 /**
  * Implementation of ImageInfoView for FITS images.
  * 
@@ -76,7 +78,6 @@ public class JHVFITSView extends AbstractView implements ViewportView, RegionVie
         }
 
         initFITSImageView();
-
     }
 
     /**
@@ -93,7 +94,8 @@ public class JHVFITSView extends AbstractView implements ViewportView, RegionVie
         this.fits = fits;
         this.range = range;
         initFITSImageView();
-        
+
+        initFITSImageView();
     }
 
     /**
@@ -282,10 +284,15 @@ public class JHVFITSView extends AbstractView implements ViewportView, RegionVie
 	public Interval<Date> getDateRange() {
 		return this.range;
 	}
-
+    
 	@Override
 	public void setDateRange(Interval<Date> range) {
 		// TODO Auto-generated method stub
 		this.range = range;
+    }
+	@Override
+	public MetaData getMetadata() {
+		// TODO Auto-generated method stub
+		return m;
 	}
 }

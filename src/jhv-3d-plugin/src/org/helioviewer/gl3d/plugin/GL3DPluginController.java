@@ -33,10 +33,14 @@ public class GL3DPluginController {
         List<GL3DModelPlugin> pluginsToLoad = configuration.findPlugins();
 
         for (GL3DModelPlugin plugin : pluginsToLoad) {
-            plugin.load();
-            this.plugins.add(plugin);
-            firePluginLoaded(plugin);
+    		loadPlugin(plugin);
         }
+    }
+    
+    public void loadPlugin(GL3DModelPlugin plugin) {
+        plugin.load();
+        this.plugins.add(plugin);
+        firePluginLoaded(plugin);
     }
 
     public void setPluginConfiguration(GL3DPluginConfiguration configuration) {

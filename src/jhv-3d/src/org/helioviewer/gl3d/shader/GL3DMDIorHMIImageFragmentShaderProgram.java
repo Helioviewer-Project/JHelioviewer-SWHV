@@ -17,17 +17,17 @@ public class GL3DMDIorHMIImageFragmentShaderProgram extends GLFragmentShaderProg
     protected void buildImpl(GLShaderBuilder shaderBuilder) {
         try {
             String program = "\tfloat geometryRadius = -length(physicalPosition.zw);" + GLShaderBuilder.LINE_SEP;
-            program += "\toutput.a = output.a * step(-sunRadius, geometryRadius);";
-            // program +=
-            // "\toutput.rgb = output.gb * step(-sunRadius, geometryRadius);";
-            // program +=
-            // "\toutput.rgba = output.rgba * step(-sunRadius, geometryRadius);";
+            program += "\toutput.a = output.a * step(-sunRadius, geometryRadius);" + GLShaderBuilder.LINE_SEP;
+            program += "\toutput.a *= alpha;";
+            
+            //program += "\toutput.rgb = output.gb * step(-sunRadius, geometryRadius);";
+//            program += "\toutput.rgba = output.rgba * step(-sunRadius, geometryRadius);";
 
             program = program.replace("output", shaderBuilder.useOutputValue("float4", "COLOR"));
             program = program.replace("physicalPosition", shaderBuilder.useStandardParameter("float4", "TEXCOORD0"));
             program = program.replace("sunRadius", Double.toString(Constants.SunRadius * GLHelioviewerGeometryView.discFactor).replace(',', '.'));
-            // program = program.replace("sunRadius",
-            // Double.toString(Constants.SunRadius).replace(',', '.'));
+//            program = program.replace("sunRadius", Double.toString(Constants.SunRadius).replace(',', '.'));
+            program = program.replace("alpha", shaderBuilder.useStandardParameter("float", "TEXCOORD1"));
 
             shaderBuilder.addMainFragment(program);
         } catch (GLBuildShaderException e) {

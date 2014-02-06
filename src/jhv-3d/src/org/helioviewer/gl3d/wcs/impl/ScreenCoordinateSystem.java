@@ -12,7 +12,7 @@ import org.helioviewer.viewmodel.viewport.Viewport;
  * The ScreenCoordinateSystem can be used to convert Screen Points to other
  * {@link CoordinateSystem}s.
  * 
- * @author Simon Spšrri (simon.spoerri@fhnw.ch)
+ * @author Simon Spoerri (simon.spoerri@fhnw.ch)
  * 
  */
 public class ScreenCoordinateSystem extends Cartesian2DCoordinateSystem {

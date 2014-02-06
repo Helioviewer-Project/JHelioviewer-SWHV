@@ -45,6 +45,8 @@ public interface GLView extends View {
      * 
      * @param gl
      *            Valid reference to the current gl object
+     * @param nextView
+     *            Flag for recursive rendering
      */
-    public void renderGL(GL gl);
+    public void renderGL(GL gl, boolean nextView);
 }

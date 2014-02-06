@@ -21,7 +21,7 @@ import org.helioviewer.viewmodel.view.opengl.shader.GLVertexShaderProgram;
  * sub-chain onto a mesh. The image is provided as a texture that was created by
  * a {@link GL3DImageTextureView}.
  * 
- * @author Simon Spšrri (simon.spoerri@fhnw.ch)
+ * @author Simon Spï¿½rri (simon.spoerri@fhnw.ch)
  * 
  */
 public abstract class GL3DImageMesh extends GL3DMesh {
@@ -37,16 +37,16 @@ public abstract class GL3DImageMesh extends GL3DMesh {
     protected Vector2dDouble textureScale;
 
     private boolean reshapeRequested = false;
-
+    
     public GL3DImageMesh(String name, GL3DImageTextureView _imageTextureView, GLVertexShaderProgram vertexShaderProgram, GLFragmentShaderProgram fragmentShaderProgram) {
         super(name, new GL3DVec4f(0, 1, 0, 0.5f), new GL3DVec4f(0, 0, 0, 0));
         this.imageTextureView = _imageTextureView;
 
         this.vertexShaderProgram = vertexShaderProgram;
         this.fragmentShaderProgram = fragmentShaderProgram;
-
+        
         imageTextureView.addViewListener(new ViewListener() {
-
+        	
             public void viewChanged(View sender, ChangeEvent aEvent) {
                 ImageTextureRecapturedReason reason = aEvent.getLastChangedReasonByType(ImageTextureRecapturedReason.class);
                 if (reason != null) {
@@ -61,6 +61,19 @@ public abstract class GL3DImageMesh extends GL3DMesh {
         this.reshapeRequested = true;
         this.markAsChanged();
     }
+    
+    
+    public GL3DImageMesh(String name, GL3DImageTextureView _imageTextureView, GLVertexShaderProgram vertexShaderProgram, GLFragmentShaderProgram fragmentShaderProgram, boolean viewListener) {
+        super(name, new GL3DVec4f(0, 1, 0, 0.5f), new GL3DVec4f(0, 0, 0, 0));
+        this.imageTextureView = _imageTextureView;
+
+        this.vertexShaderProgram = vertexShaderProgram;
+        this.fragmentShaderProgram = fragmentShaderProgram;
+
+        this.reshapeRequested = true;
+        this.markAsChanged();
+    }
+    
 
     public void shapeInit(GL3DState state) {
         super.shapeInit(state);
@@ -81,9 +94,7 @@ public abstract class GL3DImageMesh extends GL3DMesh {
         th.bindTexture(state.gl, this.imageTextureView.getTextureId());
         state.gl.glTexParameteri(GL.GL_TEXTURE_2D, GL.GL_TEXTURE_MIN_FILTER, GL.GL_LINEAR);
         state.gl.glTexParameteri(GL.GL_TEXTURE_2D, GL.GL_TEXTURE_MAG_FILTER, GL.GL_NEAREST);
-        // state.gl.glTexParameteri(GL.GL_TEXTURE_2D, GL.GL_TEXTURE_MAG_FILTER,
-        // GL.GL_LINEAR);
-
+        
         GLVertexShaderProgram.pushShader(state.gl);
         GLFragmentShaderProgram.pushShader(state.gl);
         this.vertexShaderProgram.bind(state.gl);
@@ -100,4 +111,9 @@ public abstract class GL3DImageMesh extends GL3DMesh {
     public GL3DImageTextureView getImageTextureView() {
         return imageTextureView;
     }
+    
+    
+    protected GLVertexShaderProgram getVertexShader() { return vertexShaderProgram; }
+    
+    protected GLFragmentShaderProgram getFragmentShader() { return fragmentShaderProgram; }
 }

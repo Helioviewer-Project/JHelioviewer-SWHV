@@ -8,6 +8,7 @@ import org.helioviewer.gl3d.scenegraph.GL3DAABBox;
 import org.helioviewer.gl3d.scenegraph.GL3DDrawBits.Bit;
 import org.helioviewer.gl3d.scenegraph.GL3DMesh;
 import org.helioviewer.gl3d.scenegraph.GL3DState;
+import org.helioviewer.gl3d.scenegraph.math.GL3DMat4d;
 import org.helioviewer.gl3d.scenegraph.math.GL3DVec2d;
 import org.helioviewer.gl3d.scenegraph.math.GL3DVec3d;
 import org.helioviewer.gl3d.scenegraph.math.GL3DVec4d;
@@ -15,19 +16,20 @@ import org.helioviewer.gl3d.scenegraph.rt.GL3DRay;
 
 /**
  * The {@link GL3DHitReferenceShape} unifies all possible Image Layers (
- * {@link GL3DImageMesh} nodes in the Scene Graph)Êin a single mesh node. This
+ * {@link GL3DImageMesh} nodes in the Scene Graph)ï¿½in a single mesh node. This
  * node offers a mathematically simpler representation for faster hit point
  * detection when used for determining the region of interest on the image
  * meshes.
  * 
- * @author Simon Spšrri (simon.spoerri@fhnw.ch)
+ * @author Simon Spï¿½rri (simon.spoerri@fhnw.ch)
  * 
  */
 public class GL3DHitReferenceShape extends GL3DMesh {
     private static final double extremeValue = Constants.SunMeanDistanceToEarth * 10;
 
     private boolean allowBacksideHits;
-
+    private double angle = 0.0;
+    private GL3DMat4d phiRotation;
     public GL3DHitReferenceShape() {
         this(false);
     }
@@ -37,16 +39,22 @@ public class GL3DHitReferenceShape extends GL3DMesh {
         this.allowBacksideHits = allowBacksideHits;
     }
 
+    public GL3DHitReferenceShape(boolean allowBacksideHits, double angle) {
+        super("Hit Reference Shape");
+        this.allowBacksideHits = allowBacksideHits;
+        this.angle = angle;
+    }
+    
     public void shapeDraw(GL3DState state) {
         return;
     }
 
     public GL3DMeshPrimitive createMesh(GL3DState state, List<GL3DVec3d> positions, List<GL3DVec3d> normals, List<GL3DVec2d> textCoords, List<Integer> indices, List<GL3DVec4d> colors) {
-
-        GL3DVec3d ll = new GL3DVec3d(-extremeValue, -extremeValue, 0);
-        GL3DVec3d lr = new GL3DVec3d(extremeValue, -extremeValue, 0);
-        GL3DVec3d tr = new GL3DVec3d(extremeValue, extremeValue, 0);
-        GL3DVec3d tl = new GL3DVec3d(-extremeValue, extremeValue, 0);
+    	this.phiRotation = GL3DMat4d.rotation(angle, new GL3DVec3d(0, 1, 0));
+        GL3DVec3d ll = createVertex(-extremeValue, -extremeValue, 0);
+        GL3DVec3d lr = createVertex(extremeValue, -extremeValue, 0);
+        GL3DVec3d tr = createVertex(extremeValue, extremeValue, 0);
+        GL3DVec3d tl = createVertex(-extremeValue, extremeValue, 0);
 
         positions.add(ll);// normals.add(new GL3DVec3d(0,0,1));//colors.add(new
                           // GL3DVec4d(0, 0, 1, 0.0));
@@ -68,12 +76,20 @@ public class GL3DHitReferenceShape extends GL3DMesh {
         return GL3DMeshPrimitive.TRIANGLES;
     }
 
+    private GL3DVec3d createVertex(double x, double y, double z){
+    	double cx = x * phiRotation.m[0] + y * phiRotation.m[4] + z * phiRotation.m[8] + phiRotation.m[12];
+        double cy = x * phiRotation.m[1] + y * phiRotation.m[5] + z * phiRotation.m[9] + phiRotation.m[13];
+        double cz = x * phiRotation.m[2] + y * phiRotation.m[6] + z * phiRotation.m[10] + phiRotation.m[14];
+       return new GL3DVec3d(cx, cy, cz);
+    }
+    
     public boolean hit(GL3DRay ray) {
         // if its hidden, it can't be hit
-        if (isDrawBitOn(Bit.Hidden)) {
+    	if (isDrawBitOn(Bit.Hidden)) {
             return false;
+            
         }
-
+       	
         // Transform ray to object space for non-groups
         ray.setOriginOS(this.wmI.multiply(ray.getOrigin()));
         ray.setDirOS(this.wmI.multiply(ray.getDirection()).normalize());
@@ -84,11 +100,9 @@ public class GL3DHitReferenceShape extends GL3DMesh {
         // Hit detection happens in Object-Space
         boolean isSphereHit = isSphereHit(ray);
         // boolean isSphereHit = isSphereHitInOS(ray);
-
         if (isSphereHit) {
             // GL3DVec3d hitPoint = this.wmI.multiply(ray.getHitPoint()).;
-            // GL3DVec3d hitPoint = ray.getHitPoint();
-
+            GL3DVec3d hitPoint = ray.getHitPoint();
             GL3DVec3d projectionPlaneNormal = new GL3DVec3d(0, 0, 1);
             GL3DVec3d pointOnSphere = this.wmI.multiply(ray.getHitPoint());
             ray.setHitPointOS(pointOnSphere);
@@ -120,7 +134,7 @@ public class GL3DHitReferenceShape extends GL3DMesh {
     }
 
     private boolean isSphereHit(GL3DRay ray) {
-        GL3DVec3d l = new GL3DVec3d(0, 0, 0).subtract(ray.getOrigin());
+    	GL3DVec3d l = new GL3DVec3d(0, 0, 0).subtract(ray.getOrigin());
         double s = l.dot(ray.getDirection().copy().normalize());
         double l2 = l.length2();
         double r2 = Constants.SunRadius2;
@@ -131,7 +145,7 @@ public class GL3DHitReferenceShape extends GL3DMesh {
         double s2 = s * s;
         double m2 = l2 - s2;
         if (m2 > r2) {
-            return false;
+        	return false;
         }
 
         double q = Math.sqrt(r2 - m2);

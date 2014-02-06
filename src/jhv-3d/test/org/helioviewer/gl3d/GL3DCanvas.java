@@ -88,7 +88,6 @@ public class GL3DCanvas extends GLCanvas implements GLEventListener {
      */
 
     public void display(GLAutoDrawable autoDrawable) {
-        System.out.println("Display");
         GL gl = autoDrawable.getGL();
         gl.glClear(GL.GL_COLOR_BUFFER_BIT | GL.GL_DEPTH_BUFFER_BIT);
         gl.glEnable(GL.GL_DEPTH_TEST);
@@ -115,7 +114,7 @@ public class GL3DCanvas extends GLCanvas implements GLEventListener {
     }
 
     public void displayChanged(GLAutoDrawable arg0, boolean arg1, boolean arg2) {
-        System.out.println("DisplayChangex");
+        System.out.println("DisplayChange");
     }
 
     public void init(GLAutoDrawable autoDrawable) {

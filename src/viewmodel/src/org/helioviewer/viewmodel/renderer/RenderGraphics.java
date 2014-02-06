@@ -4,6 +4,8 @@ import java.awt.Color;
 import java.awt.Font;
 import java.awt.image.BufferedImage;
 
+import org.helioviewer.base.math.Vector3dDouble;
+
 /**
  * Interface for a renderer with basic graphical drawing functions.
  * 
@@ -316,6 +318,54 @@ public interface RenderGraphics<BaseType extends Number, VectorType> {
     public void drawImage(BufferedImage image, VectorType position, VectorType size);
 
     /**
+     * Draws an unscaled image.
+     * 
+     * @param image
+     *            BufferedImage to draw
+     * @param x
+     *            x-coordinate of the reference point
+     * @param y
+     *            y-coordinate of the reference point
+     * @param z
+     *            z-coordinate of the reference point
+     */
+    public void drawImage3d(BufferedImage image, BaseType x, BaseType y, BaseType z);
+
+    /**
+     * Draws an scaled image.
+     * 
+     * @param image
+     *            BufferedImage to draw
+     * @param x
+     *            x-coordinate of the reference point
+     * @param y
+     *            y-coordinate of the reference point
+     * @param z
+     *            z-coordinate of the reference point
+     * @param scale
+     *            scale factor used for the image size
+     */
+    public void drawImage3d(BufferedImage image, BaseType x, BaseType y, BaseType z, float scale);
+
+    /**
+     * Draws an scaled image.
+     * 
+     * @param image
+     *            BufferedImage to draw
+     * @param x
+     *            x-coordinate of the reference point
+     * @param y
+     *            y-coordinate of the reference point
+     * @param z
+     *            z-coordinate of the reference point
+     * @param width
+     *            width of the rectangle the image is drawn to
+     * @param height
+     *            height of the rectangle the image is drawn to
+     */
+    public void drawImage3d(BufferedImage image, BaseType x, BaseType y, BaseType z, BaseType width, BaseType height);
+    
+    /**
      * Draws a text.
      * 
      * @param text
@@ -336,4 +386,10 @@ public interface RenderGraphics<BaseType extends Number, VectorType> {
      *            coordinate of the reference point
      */
     public void drawText(String text, VectorType position);
+    
+    public void fillPolygon(Vector3dDouble[] points);
+
+    public void drawLine3d(BaseType x0, BaseType y0, BaseType z0, BaseType x1, BaseType y1, BaseType z1);
+    public void drawLine3d(Vector3dDouble p0, Vector3dDouble p1);
+ 
 }

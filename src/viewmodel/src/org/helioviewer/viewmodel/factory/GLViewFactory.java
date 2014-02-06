@@ -41,7 +41,7 @@ public class GLViewFactory extends StandardViewFactory {
         if (pattern.isAssignableFrom(ComponentView.class)) {
             return (T) new GLComponentView();
             // EventView
-        } else if (pattern.isAssignableFrom(OverlayView.class)) {
+        } else if (pattern.isAssignableFrom(GLOverlayView.class)) {
             return (T) new GLOverlayView();
             // LayeredView
         } else if (pattern.isAssignableFrom(LayeredView.class)) {

@@ -2,7 +2,11 @@ package org.helioviewer.gl3d.model.image;
 
 import javax.media.opengl.GL;
 
+import org.helioviewer.base.physics.Constants;
 import org.helioviewer.gl3d.model.GL3DHitReferenceShape;
+import org.helioviewer.gl3d.scenegraph.GL3DMesh;
+import org.helioviewer.gl3d.scenegraph.math.GL3DVec4f;
+import org.helioviewer.gl3d.shader.GL3DImageCoronaFragmentShaderProgram;
 import org.helioviewer.gl3d.shader.GL3DImageVertexShaderProgram;
 import org.helioviewer.gl3d.shader.GL3DLASCOImageFragmentShaderProgram;
 import org.helioviewer.gl3d.shader.GL3DShaderFactory;
@@ -20,12 +24,23 @@ public class GL3DLascoImageLayer extends GL3DImageLayer {
 
     protected void createImageMeshNodes(GL gl) {
         HelioviewerOcculterMetaData hvMetaData = (HelioviewerOcculterMetaData) metaDataView.getMetaData();
-        GLFragmentShaderProgram fragmentShader = GL3DShaderFactory.createFragmentShaderProgram(gl, new GL3DLASCOImageFragmentShaderProgram(hvMetaData));
-        GLVertexShaderProgram vertexShader = GL3DShaderFactory.createVertexShaderProgram(gl, new GL3DImageVertexShaderProgram());
-
-        lascoImageMesh = new GL3DImageCorona("LASCO", imageTextureView, vertexShader, fragmentShader);
-
+        this.fragmentShader = new GL3DImageCoronaFragmentShaderProgram();        
+        
+        GLFragmentShaderProgram fragmentShader = GL3DShaderFactory.createFragmentShaderProgram(gl, this.fragmentShader);
+        GL3DImageVertexShaderProgram vertex = new GL3DImageVertexShaderProgram();
+        GLVertexShaderProgram   vertexShader   = GL3DShaderFactory.createVertexShaderProgram(gl, vertex);
+        this.imageTextureView.setVertexShader(vertex);
+        
+        lascoImageMesh = new GL3DImageCorona("LASCO", imageTextureView, vertexShader, fragmentShader, this);
+        this.imageTextureView.metadata = this.metaDataView.getMetaData();
+        
         this.accellerationShape = new GL3DHitReferenceShape();
+        
+        double xOffset = (this.imageTextureView.metadata.getPhysicalUpperRight().getX()+this.imageTextureView.metadata.getPhysicalLowerLeft().getX())/(2.0*this.imageTextureView.metadata.getPhysicalImageWidth());
+        double yOffset = (this.imageTextureView.metadata.getPhysicalUpperRight().getY()+this.imageTextureView.metadata.getPhysicalLowerLeft().getY())/(2.0*this.imageTextureView.metadata.getPhysicalImageHeight());
+        vertex.setDefaultOffset(xOffset, yOffset);
+
+        this.fragmentShader.setCutOffRadius((Constants.SunRadius*hvMetaData.getOuterPhysicalOcculterRadius()/this.imageTextureView.metadata.getPhysicalImageWidth()));
 
         this.addNode(lascoImageMesh);
     }
@@ -37,4 +52,8 @@ public class GL3DLascoImageLayer extends GL3DImageLayer {
     protected GL3DImageMesh getImageSphere() {
         return null;
     }
+    
+
+
+
 }

@@ -13,6 +13,7 @@ import org.helioviewer.viewmodel.view.ComponentView;
 import org.helioviewer.viewmodel.view.LayeredView;
 import org.helioviewer.viewmodel.view.View;
 import org.helioviewer.viewmodel.view.opengl.GLLayeredView;
+import org.helioviewer.viewmodel.view.opengl.GLOverlayView;
 
 /**
  * The {@link ViewFactory} is responsible for creating new {@link View}s. The
@@ -20,7 +21,7 @@ import org.helioviewer.viewmodel.view.opengl.GLLayeredView;
  * Factory is required. The {@link ViewFactory} is provided by the
  * {@link ViewchainFactory}
  * 
- * @author Simon Spšrri (simon.spoerri@fhnw.ch)
+ * @author Simon Spï¿½rri (simon.spoerri@fhnw.ch)
  * 
  */
 public class GL3DViewFactory extends GLViewFactory {
@@ -44,6 +45,8 @@ public class GL3DViewFactory extends GLViewFactory {
             return (T) new GL3DComponentView();
         } else if (pattern.isAssignableFrom(GLLayeredView.class)) {
             return (T) new GL3DLayeredView();
+        } else if (pattern.isAssignableFrom(GLOverlayView.class)) {
+            return (T) new GLOverlayView();
         } else {
             return super.createNewView(pattern);
         }
@@ -72,7 +75,7 @@ public class GL3DViewFactory extends GLViewFactory {
                 throw new IllegalArgumentException("Cannot create View from Source " + source);
             }
         } else if (source instanceof ComponentView) {
-            return (T) new GL3DComponentView();
+			return (T) new GL3DComponentView();
         } else {
             return super.createViewFromSourceImpl(source);
         }

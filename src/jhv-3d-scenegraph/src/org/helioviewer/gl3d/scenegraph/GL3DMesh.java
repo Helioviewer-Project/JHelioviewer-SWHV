@@ -21,7 +21,7 @@ import org.helioviewer.gl3d.scenegraph.rt.GL3DRay;
  * must provide these attributes and indices which will be converted to
  * {@link GL3DBuffer}.
  * 
- * @author Simon Spšrri (simon.spoerri@fhnw.ch)
+ * @author Simon Spï¿½rri (simon.spoerri@fhnw.ch)
  * 
  */
 public abstract class GL3DMesh extends GL3DShape {
@@ -109,7 +109,7 @@ public abstract class GL3DMesh extends GL3DShape {
         colors.clear();
         textCoords.clear();
         indices.clear();
-
+        
         this.primitive = this.createMesh(state, positions, normals, textCoords, indices, colors);
 
         this.positionVBO = GL3DBuffer.createPositionBuffer(state, positions);
@@ -188,11 +188,11 @@ public abstract class GL3DMesh extends GL3DShape {
         gl.glColor3d(1, 1, 0);
         gl.glDisable(GL.GL_LIGHTING);
         gl.glDisable(GL.GL_TEXTURE_2D);
-
         if (primitive == GL3DMeshPrimitive.QUADS) {
 
             for (int i = 0; i < this.indices.size(); i++) {
                 if (i % 4 == 0)
+                	
                     gl.glBegin(GL.GL_LINE_LOOP);
                 int index = this.indices.get(i);
                 GL3DVec3d position = this.positions.get(index);
@@ -267,7 +267,7 @@ public abstract class GL3DMesh extends GL3DShape {
     public boolean shapeHit(GL3DRay ray) {
         for (GL3DTriangle t : this.triangles) {
             if (t.intersects(ray)) {
-                ray.setOriginShape(this);
+            	ray.setOriginShape(this);
                 ray.setHitPoint(ray.getOrigin().copy().add(ray.getDirection().copy().multiply(ray.getLength())));
                 // Log.debug("GL3DMesh.shapeHit: Ray intersects with Mesh " +
                 // this);

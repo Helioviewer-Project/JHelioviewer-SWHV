@@ -4,6 +4,8 @@ import java.awt.Dimension;
 import java.net.URI;
 import java.util.Date;
 
+import javax.swing.text.html.HTMLDocument.HTMLReader.IsindexAction;
+
 import kdu_jni.Jp2_palette;
 import kdu_jni.KduException;
 
@@ -20,6 +22,7 @@ import org.helioviewer.viewmodel.imagedata.ImageData;
 import org.helioviewer.viewmodel.metadata.MetaData;
 import org.helioviewer.viewmodel.metadata.MetaDataConstructor;
 import org.helioviewer.viewmodel.metadata.ObserverMetaData;
+import org.helioviewer.viewmodel.metadata.PixelBasedMetaData;
 import org.helioviewer.viewmodel.region.Region;
 import org.helioviewer.viewmodel.region.StaticRegion;
 import org.helioviewer.viewmodel.view.AbstractView;
@@ -137,8 +140,8 @@ public class JHVJP2View extends AbstractView implements JP2View, ViewportView, R
         }
 
         metaData = MetaDataConstructor.getMetaData(newJP2Image);
-
         if (region == null) {
+        	if (!(metaData instanceof PixelBasedMetaData)){
             region = StaticRegion.createAdaptedRegion(getMetaData().getPhysicalLowerLeft(), getMetaData().getPhysicalImageSize());
         }
 
@@ -166,6 +169,7 @@ public class JHVJP2View extends AbstractView implements JP2View, ViewportView, R
             startDecoding();
         } catch (Exception e) {
             e.printStackTrace();
+        }
         }
     }
 
@@ -782,5 +786,10 @@ public class JHVJP2View extends AbstractView implements JP2View, ViewportView, R
 	public void setDateRange(Interval<Date> range) {
 		// TODO Auto-generated method stub
 		this.range = range;
+	}
+	@Override
+	public MetaData getMetadata() {
+		// TODO Auto-generated method stub
+		return metaData;
 	}
 }

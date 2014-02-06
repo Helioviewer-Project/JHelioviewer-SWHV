@@ -82,12 +82,40 @@ class J2KRender implements Runnable {
 
     /** Maximum rendering iterations per layer allowed */
     // Is now calculated automatically as num_pix / MAX_RENDER_SAMPLES
-    // private final int MAX_RENDER_ITERATIONS = 150;
+     private final int MAX_RENDER_ITERATIONS = 150;
 
     /** It says if the render is going to play a movie instead of a single image */
     private boolean movieMode = false;
 
     private boolean linkedMovieMode = false;
+
+    /**
+     * Sets whether the byte and integer buffers should be reused between
+     * frames.
+     * <p>
+     * Normally this avoids garbage collection, but for some cases it must be
+     * deactivated
+     */
+    private boolean reuseBuffer = true;
+
+    /**
+     * Gets whether to reuse the buffer
+     * 
+     * @return the reuseBuffer
+     */
+    public boolean isReuseBuffer() {
+        return reuseBuffer;
+    }
+
+    /**
+     * Sets whether to reuse the buffer
+     * 
+     * @param reuseBuffer
+     *            the reuseBuffer to set
+     */
+    public void setReuseBuffer(boolean reuseBuffer) {
+        this.reuseBuffer = reuseBuffer;
+    }
 
     private int movieSpeed = 20;
     private float actualMovieFramerate = 0.0f;
@@ -137,6 +165,8 @@ class J2KRender implements Runnable {
                 } while (myThread.isAlive());
 
             } catch (InterruptedException ex) {
+                ex.printStackTrace();
+
             } catch (NullPointerException e) {
             } finally {
                 myThread = null;
@@ -236,15 +266,16 @@ class J2KRender implements Runnable {
 
                 parentImageRef.updateResolutionSet(numLayer);
 
-                MetaData metaData = parentViewRef.getMetaData();
+                    MetaData metaData = parentViewRef.getMetaData();
 
-                if (metaData instanceof NonConstantMetaData && ((NonConstantMetaData) metaData).checkForModifications()) {
+                    if (metaData instanceof NonConstantMetaData && ((NonConstantMetaData) metaData).checkForModifications()) {
 
-                    parentViewRef.updateParameter();
-                    currParams = parentViewRef.getImageViewParams();
+                        parentViewRef.updateParameter();
+                        currParams = parentViewRef.getImageViewParams();
 
-                    parentViewRef.addChangedReason(new NonConstantMetaDataChangedReason(parentViewRef, metaData));
-                }
+                        parentViewRef.addChangedReason(new NonConstantMetaDataChangedReason(parentViewRef, metaData));
+                    }
+                
             }
 
             compositorRef.Set_max_quality_layers(currParams.qualityLayers);
@@ -261,7 +292,7 @@ class J2KRender implements Runnable {
             actualOffset.Assign(actualBufferedRegion.Access_pos());
 
             Kdu_dims newRegion = new Kdu_dims();
-
+            
             if (parentImageRef.getNumComponents() < 3) {
                 currentByteBuffer = (currentByteBuffer + 1) % NUM_BUFFERS;
                 if (currParams.subImage.getNumPixels() != byteBuffer[currentByteBuffer].length || (!movieMode && !linkedMovieMode && !J2KRenderGlobalOptions.getDoubleBufferingOption())) {
@@ -277,9 +308,8 @@ class J2KRender implements Runnable {
                     Arrays.fill(intBuffer[currentIntBuffer], 0);
                 }
             }
-
             while (!compositorRef.Is_processing_complete()) {
-                compositorRef.Process(MAX_RENDER_SAMPLES, newRegion);
+            	compositorRef.Process(MAX_RENDER_SAMPLES, newRegion);            
                 Kdu_coords newOffset = newRegion.Access_pos();
                 Kdu_coords newSize = newRegion.Access_size();
 
@@ -290,7 +320,7 @@ class J2KRender implements Runnable {
                     continue;
 
                 localIntBuffer = newPixels > localIntBuffer.length ? new int[newPixels << 1] : localIntBuffer;
-
+                
                 compositorBuf.Get_region(newRegion, localIntBuffer);
 
                 int srcIdx = 0;
@@ -300,14 +330,14 @@ class J2KRender implements Runnable {
                 int newHeight = newSize.Get_y();
 
                 if (parentImageRef.getNumComponents() < 3) {
-                    for (int row = 0; row < newHeight; row++, destIdx += currParams.subImage.width, srcIdx += newWidth) {
-                        for (int col = 0; col < newWidth; ++col) {
-                            byteBuffer[currentByteBuffer][destIdx + col] = (byte) ((localIntBuffer[srcIdx + col] >> 8) & 0xFF);
-                        }
-                    }
+	                for (int row = 0; row < newHeight; row++, destIdx += currParams.subImage.width, srcIdx += newWidth) {
+	                    for (int col = 0; col < newWidth; ++col) {
+	                        byteBuffer[currentByteBuffer][destIdx + col] = (byte) ((localIntBuffer[srcIdx + col] >> 8) & 0xFF);
+	                    }
+	                }
                 } else {
-                    for (int row = 0; row < newHeight; row++, destIdx += currParams.subImage.width, srcIdx += newWidth)
-                        System.arraycopy(localIntBuffer, srcIdx, intBuffer[currentIntBuffer], destIdx, newWidth);
+                	for (int row = 0; row < newHeight; row++, destIdx += currParams.subImage.width, srcIdx += newWidth)
+                		System.arraycopy(localIntBuffer, srcIdx, intBuffer[currentIntBuffer], destIdx, newWidth);
                 }
             }
 

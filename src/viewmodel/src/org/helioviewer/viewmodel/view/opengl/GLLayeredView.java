@@ -41,7 +41,7 @@ public class GLLayeredView extends AbstractLayeredView implements GLFragmentShad
         if (newLayer == null) {
             return;
         }
-
+        
         if (!GLTextureHelper.textureNonPowerOfTwoAvailable() && newLayer.getAdapter(GLScalePowerOfTwoView.class) == null) {
             GLScalePowerOfTwoView scaleView = new GLScalePowerOfTwoView();
             scaleView.setView(newLayer);
@@ -91,7 +91,7 @@ public class GLLayeredView extends AbstractLayeredView implements GLFragmentShad
     /**
      * {@inheritDoc}
      */
-    public void renderGL(GL gl) {
+    public void renderGL(GL gl, boolean nextView) {
 
         layerLock.lock();
 
@@ -110,7 +110,7 @@ public class GLLayeredView extends AbstractLayeredView implements GLFragmentShad
 
                 // if layer is GLView, go on, otherwise render now
                 if (v instanceof GLView) {
-                    ((GLView) v).renderGL(gl);
+                    ((GLView) v).renderGL(gl, true);
                 } else {
                     textureHelper.renderImageDataToScreen(gl, layer.regionView.getRegion(), v.getAdapter(SubimageDataView.class).getSubimageData());
                 }

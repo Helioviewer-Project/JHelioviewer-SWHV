@@ -39,7 +39,6 @@ public class SolarImageToSolarSphereConversion implements CoordinateConversion {
     public CoordinateVector convert(CoordinateVector vector) {
         double x = vector.getValue(SolarImageCoordinateSystem.X_COORDINATE);
         double y = vector.getValue(SolarImageCoordinateSystem.Y_COORDINATE);
-
         double z = 0.0;
         if (this.solarImageCoordinateSystem.isInsideDisc(vector)) {
             z = extrudeZ(x, y);
@@ -63,7 +62,6 @@ public class SolarImageToSolarSphereConversion implements CoordinateConversion {
                 throw new IllegalCoordinateVectorException("Coordinates are not within solar disc, cannot convert to Spherical coordinates!");
             }
         }
-
         return this.solarSphereCoordinateSystem.createCoordinateVector(x, y, z);
     }
 
@@ -81,4 +79,11 @@ public class SolarImageToSolarSphereConversion implements CoordinateConversion {
         // double z = 0.0;
         return z;
     }
+
+    public CoordinateVector convertSolarToImage(CoordinateVector vector){
+    	double x = vector.getValue(SolarSphereCoordinateSystem.X_COORDINATE) * this.solarImageCoordinateSystem.getSolarRadius();
+    	double y = vector.getValue(SolarSphereCoordinateSystem.Y_COORDINATE) * this.solarImageCoordinateSystem.getSolarRadius();
+    	return this.solarImageCoordinateSystem.createCoordinateVector(x,y);
+    }
 }
+

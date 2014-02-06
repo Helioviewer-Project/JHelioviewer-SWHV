@@ -163,6 +163,12 @@ public abstract class GL3DCamera {
         this.updateCameraTransformation(true);
     }
 
+    public void updateCameraTransformation(GL3DMat4d transformation) {
+    	this.cameraTransformation = transformation;
+    	//fireCameraMoved();
+    }
+
+    
     /**
      * Updates the camera transformation by applying the rotation and
      * translation information.

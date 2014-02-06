@@ -51,7 +51,7 @@ public class GLHelioviewerGeometryView extends AbstractGLView implements Heliovi
     /**
      * {@inheritDoc}
      */
-    public void renderGL(GL gl) {
+    public void renderGL(GL gl, boolean nextView) {
         gl.glEnable(GL.GL_FRAGMENT_PROGRAM_ARB);
         gl.glEnable(GL.GL_VERTEX_PROGRAM_ARB);
 
@@ -129,7 +129,7 @@ public class GLHelioviewerGeometryView extends AbstractGLView implements Heliovi
          * {@inheritDoc}
          */
         protected void buildImpl(GLShaderBuilder shaderBuilder) {
-
+        	
             MetaData metaData = view.getAdapter(MetaDataView.class).getMetaData();
 
             if (metaData instanceof HelioviewerOcculterMetaData) {

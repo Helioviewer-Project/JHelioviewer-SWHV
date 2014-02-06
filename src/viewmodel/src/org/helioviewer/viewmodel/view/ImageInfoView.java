@@ -4,6 +4,7 @@ import java.net.URI;
 import java.util.Date;
 
 import org.helioviewer.base.math.Interval;
+import org.helioviewer.viewmodel.metadata.MetaData;
 
 /**
  * View to manage an image data source.
@@ -57,4 +58,6 @@ public interface ImageInfoView extends View {
     public URI getDownloadURI();
     public Interval<Date> getDateRange();
     public void setDateRange(Interval<Date> range);  
+
+    public MetaData getMetadata();
 }

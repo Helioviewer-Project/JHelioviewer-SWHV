@@ -119,7 +119,7 @@ import org.helioviewer.viewmodel.viewport.Viewport;
  * <p>
  * This class includes everything needed to export movies to an external format.
  * Therefore, it copies the existing view chain and performs all its operations
- * on this copy. To encode the final result, the command line toll from FFmpeg
+ * on this copy. To encode the final result, the command line tool from FFmpeg
  * is used.
  * 
  * @author Markus Langenberg

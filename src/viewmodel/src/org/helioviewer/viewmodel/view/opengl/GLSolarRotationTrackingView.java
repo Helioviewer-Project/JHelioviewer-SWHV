@@ -19,9 +19,9 @@ public class GLSolarRotationTrackingView extends StandardSolarRotationTrackingVi
     /**
      * {@inheritDoc}
      */
-    public void renderGL(GL gl) {
+    public void renderGL(GL gl, boolean nextView) {
         if (view instanceof GLView) {
-            ((GLView) view).renderGL(gl);
+            ((GLView) view).renderGL(gl, true);
         } else {
             textureHelper.renderImageDataToScreen(gl, view.getAdapter(RegionView.class).getRegion(), view.getAdapter(SubimageDataView.class).getSubimageData());
         }

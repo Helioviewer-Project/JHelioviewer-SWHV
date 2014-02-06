@@ -1,7 +1,7 @@
 package org.helioviewer.gl3d.wcs;
 
-import java.util.Date;
 import org.helioviewer.viewmodel.view.jp2view.datetime.ImmutableDateTime;
+
 
 public class TimedHeliocentricCartesianCoordinateSystem extends Cartesian3DCoordinateSystem {
 
