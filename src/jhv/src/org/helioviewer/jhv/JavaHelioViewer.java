@@ -33,6 +33,7 @@ import org.helioviewer.viewmodel.view.jp2view.kakadu.JHV_KduException;
 import org.helioviewer.viewmodelplugin.controller.PluginManager;
 import org.helioviewer.viewmodelplugin.interfaces.Plugin;
 
+
 /**
  * This class starts the applications.
  * 
@@ -55,13 +56,12 @@ public class JavaHelioViewer {
     }
 
     public static void main(String[] args, Plugin[] builtinPlugins) {
-
+    	
         // Prints the usage message
         if (args.length == 1 && (args[0].equals("-h") || args[0].equals("--help"))) {
             System.out.println(CommandLineProcessor.getUsageMessage());
             return;
         }
-
         // Uncaught runtime errors are displayed in a dialog box in addition
         JHVUncaughtExceptionHandler.setupHandlerForThread();
 
@@ -342,9 +342,10 @@ public class JavaHelioViewer {
         Plugin internalPlugin = new InternalFilterPlugin();
         PluginManager.getSingeltonInstance().addInternalPlugin(internalPlugin.getClass().getClassLoader(), internalPlugin);
 
+        
         if (builtinPlugins != null) {
             for (int i = 0; i < builtinPlugins.length; ++i) {
-                PluginManager.getSingeltonInstance().addPlugin(builtinPlugins[i].getClass().getClassLoader(), builtinPlugins[i], null);
+            	PluginManager.getSingeltonInstance().addPlugin(builtinPlugins[i].getClass().getClassLoader(), builtinPlugins[i], null);
             }
         }
 

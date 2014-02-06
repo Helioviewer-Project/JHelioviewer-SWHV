@@ -29,7 +29,15 @@ public abstract class GLVertexShaderProgram {
     private static Stack<Integer> shaderStack = new Stack<Integer>();
     private static int shaderCurrentlyUsed = -1;
     private int shaderID;
-
+    protected double xOffset = 0.0f;
+    protected double yOffset = 0.0f;
+    protected double xScale = 1.0f;
+    protected double yScale = 1.0f;
+    protected double xTextureScale = 1;
+    protected double yTextureScale = 1;
+    protected double defaultXOffset = 0;
+    protected double defaultYOffset = 0;
+    
     /**
      * Build the shader.
      * 
@@ -68,7 +76,7 @@ public abstract class GLVertexShaderProgram {
      *            Valid reference to the current gl object
      */
     public final void bind(GL gl) {
-        bind(gl, shaderID);
+    	bind(gl, shaderID, xOffset, yOffset, xScale, yScale, xTextureScale, yTextureScale, defaultXOffset, defaultYOffset);
     }
 
     /**
@@ -99,7 +107,7 @@ public abstract class GLVertexShaderProgram {
     public static void popShader(GL gl) {
         Integer restoreShaderObject = shaderStack.pop();
         int restoreShader = restoreShaderObject == 0 ? 0 : restoreShaderObject.intValue();
-        bind(gl, restoreShader);
+        bind(gl, restoreShader, 0.0f, 0.0f, 1.0f, 1.0f, 1.0f, 1.0f, 0.0f, 0.0f);
         // Log.debug("GL3DVertexShaderProgram:  popShader, current="+shaderCurrentlyUsed);
     }
 
@@ -109,11 +117,15 @@ public abstract class GLVertexShaderProgram {
      * @param gl
      *            Valid reference to the current gl object
      */
-    private static void bind(GL gl, int shader) {
+    private static void bind(GL gl, int shader, double xOffset, double yOffset, double xScale, double yScale, double xTextureScale, double yTextureScale, double defaultXOffset, double defaultYOffset) {
         if (shader != shaderCurrentlyUsed) {
             shaderCurrentlyUsed = shader;
             // Log.debug("GLVertexShaderProgram.bind shader="+shader);
             gl.glBindProgramARB(target, shader);
+            gl.glProgramLocalParameter4dARB(target, 0, xOffset, yOffset, xScale, yScale);
+            gl.glProgramLocalParameter4dARB(target, 1,xTextureScale, yTextureScale, 0, 0);
+            gl.glProgramLocalParameter4dARB(target, 2,defaultXOffset, defaultYOffset, 0, 0);
+
         }
     }
 

@@ -44,4 +44,9 @@ public class GL3DPanInteraction extends GL3DDefaultInteraction {
         camera.updateCameraTransformation();
         Displayer.getSingletonInstance().display();
     }
+    
+    @Override
+    public void mouseReleased(MouseEvent e, GL3DCamera camera) {
+    	camera.fireCameraMoved();
+    }
 }

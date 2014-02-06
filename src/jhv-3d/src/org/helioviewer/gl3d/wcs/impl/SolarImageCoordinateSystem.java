@@ -17,7 +17,7 @@ import org.helioviewer.gl3d.wcs.conversion.SolarImageToTextureConversion;
  * these points into other {@link CoordinateSystem}s. It's center is at the
  * center of the sun, the units are in kilometers.
  * 
- * @author Simon Spšrri (simon.spoerri@fhnw.ch)
+ * @author Simon Spoerri (simon.spoerri@fhnw.ch)
  * 
  */
 public class SolarImageCoordinateSystem extends Cartesian2DCoordinateSystem {

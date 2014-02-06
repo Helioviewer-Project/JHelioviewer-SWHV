@@ -29,7 +29,7 @@ import org.helioviewer.viewmodel.view.jp2view.datetime.ImmutableDateTime;
  * and the coordinate system should define in which coordinate system this
  * normal is defined in.
  * 
- * @author Simon Spšrri (simon.spoerri@fhnw.ch)
+ * @author Simon Spï¿½rri (simon.spoerri@fhnw.ch)
  * 
  */
 public class GL3DCoordinateSystemView extends AbstractGL3DView implements GL3DView {
@@ -44,6 +44,7 @@ public class GL3DCoordinateSystemView extends AbstractGL3DView implements GL3DVi
         MetaData metaData = metaDataView.getMetaData();
         initialiseCoordinateSystem(metaData);
         GL gl = state.gl;
+
         this.renderChild(gl);
     }
 
@@ -55,6 +56,7 @@ public class GL3DCoordinateSystemView extends AbstractGL3DView implements GL3DVi
         if (this.metaDataView == null) {
             metaDataView = getAdapter(MetaDataView.class);
             MetaData metaData = metaDataView.getMetaData();
+
             initialiseCoordinateSystem(metaData);
         }
     }
@@ -91,7 +93,7 @@ public class GL3DCoordinateSystemView extends AbstractGL3DView implements GL3DVi
                 // AIA
                 //Log.debug("GL3DCoordinateSystemView: Creating AIA Image Layer!");
                 //Log.warn(datetime.getFormattedTime()+hvMetaData.getMeasurement());
-
+            
                 this.coordinateSystem = getDefaultCoordinateSystem(datetime);
                 this.orientation = getDefaultOrientation(datetime);                
             } else if (hvMetaData.getInstrument().equalsIgnoreCase("SECCHI")) {

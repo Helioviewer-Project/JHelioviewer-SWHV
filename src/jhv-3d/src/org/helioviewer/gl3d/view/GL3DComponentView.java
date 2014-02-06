@@ -125,7 +125,8 @@ public class GL3DComponentView extends AbstractComponentView implements GLEventL
         GLTextureHelper.initHelper(gl);
 
         shaderHelper.delAllShaderIDs(gl);
-
+        //gl.glEnable(GL.GL_LINE_SMOOTH);
+        gl.glHint(GL.GL_LINE_SMOOTH_HINT, GL.GL_NICEST);
         // gl.glShadeModel(GL.GL_FLAT);
         gl.glShadeModel(GL.GL_SMOOTH);
         gl.glClear(GL.GL_COLOR_BUFFER_BIT | GL.GL_DEPTH_BUFFER_BIT);
@@ -145,7 +146,8 @@ public class GL3DComponentView extends AbstractComponentView implements GLEventL
         gl.glCullFace(GL.GL_BACK);
         gl.glFrontFace(GL.GL_CCW);
         gl.glEnable(GL.GL_DEPTH_TEST);
-        gl.glDepthFunc(GL.GL_LESS);
+        //gl.glDepthFunc(GL.GL_LESS);
+        gl.glDepthFunc(GL.GL_LEQUAL);
 
         gl.glLightfv(GL.GL_LIGHT0, GL.GL_AMBIENT, new float[] { 0.2f, 0.2f, 0.2f }, 0);
         gl.glLightfv(GL.GL_LIGHT0, GL.GL_DIFFUSE, new float[] { 0.6f, 0.6f, 0.6f }, 0);
@@ -212,7 +214,7 @@ public class GL3DComponentView extends AbstractComponentView implements GLEventL
         gl.glPushMatrix();
 
         if (this.getView() instanceof GLView) {
-            ((GLView) this.getView()).renderGL(gl);
+            ((GLView) this.getView()).renderGL(gl, true);
         }
         gl.glPopMatrix();
 
@@ -242,6 +244,8 @@ public class GL3DComponentView extends AbstractComponentView implements GLEventL
                     r.render(glRenderer);
                 }
             }
+            gl.glDisable(GL.GL_TEXTURE_2D);
+            
         }
         gl.glPopMatrix();
         GL3DState.get().checkGLErrors();

@@ -39,6 +39,7 @@ import org.helioviewer.jhv.internal_plugins.InternalPlugin;
 import org.helioviewer.viewmodel.factory.ViewFactory;
 import org.helioviewer.viewmodel.view.ImageInfoView;
 import org.helioviewer.viewmodel.view.LayeredView;
+import org.helioviewer.viewmodel.view.opengl.GLOverlayView;
 import org.helioviewer.viewmodelplugin.controller.PluginContainer;
 import org.helioviewer.viewmodelplugin.controller.PluginManager;
 
@@ -269,7 +270,8 @@ public class PluginsDialog extends JDialog implements ShowableDialog, ActionList
 
         // Update all OverlayViews which are included in the view chain above
         // the layered view
-        chainFactory.updateOverlayViewsInViewchainMain(ImageViewerGui.getSingletonInstance().getMainView());
+        GLOverlayView overlayView = ImageViewerGui.getSingletonInstance().getMainView().getAdapter(GLOverlayView.class);        
+        chainFactory.updateOverlayViewsInViewchainMain(overlayView);
     }
 
     /**

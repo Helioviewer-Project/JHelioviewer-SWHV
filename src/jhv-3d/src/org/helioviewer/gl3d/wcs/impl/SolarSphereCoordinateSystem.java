@@ -12,7 +12,7 @@ import org.helioviewer.gl3d.wcs.conversion.SolarSphereToStonyhurstHeliographicCo
  * The 3-dimensional coordinate system that is used for the 3D representations
  * of the solar images. It is also the coordinate system the cameras operate in.
  * 
- * @author Simon Spšrri (simon.spoerri@fhnw.ch)
+ * @author Simon Spoerri (simon.spoerri@fhnw.ch)
  * 
  */
 public class SolarSphereCoordinateSystem extends Cartesian3DCoordinateSystem {

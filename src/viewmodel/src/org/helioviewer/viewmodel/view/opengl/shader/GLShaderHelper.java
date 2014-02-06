@@ -199,7 +199,6 @@ public class GLShaderHelper {
     public void compileProgram(GL gl, int programType, String source, int target) {
         File tmpOut = new File(tmpPath + "tmp.cg");
         File tmpIn = new File(tmpPath + "tmp.asm");
-
         if (tmpIn.exists()) {
             tmpIn.delete();
         }
@@ -215,7 +214,7 @@ public class GLShaderHelper {
         args.add("-o");
         args.add(tmpPath + "tmp.asm");
         args.add(tmpPath + "tmp.cg");
-
+        
         try {
             Process p = FileUtils.invokeExecutable("cgc", args);
             FileUtils.logProcessOutput(p, "cgc", Level.DEBUG, true);
@@ -232,17 +231,15 @@ public class GLShaderHelper {
             Log.error(source);
             return;
         }
-
         // Log.debug("GLShaderHelper.compile Source: "+source);
-
+        
         String compiledProgram = getContents(tmpIn);
-
         // Log.debug("GLShaderHelper.compile Compiled Code: "+compiledProgram);
         gl.glBindProgramARB(programType, target);
-
+        
         CharBuffer programBuffer = CharBuffer.wrap(compiledProgram);
         gl.glProgramStringARB(programType, GL.GL_PROGRAM_FORMAT_ASCII_ARB, compiledProgram.length(), programBuffer.toString());
-
+        
     }
 
     /**

@@ -51,7 +51,8 @@ public class HeliocentricCartesian2000ToTimedHeliocentricCartesianConversion imp
         b0=0.0;
 
         double rot = DifferentialRotation.calculateRotationInRadians(0, timediff);
-        
+        rot = 0.0;
+
         double xp = xheeq * Math.cos(rot) - yheeq * Math.sin(rot);
         double yp = xheeq * Math.sin(rot) + yheeq * Math.cos(rot);
         double zp = zheeq;

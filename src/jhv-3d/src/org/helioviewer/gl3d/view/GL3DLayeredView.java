@@ -24,7 +24,7 @@ import org.helioviewer.viewmodel.view.opengl.GLView;
 /**
  * The GL3DLayeredView makes sure to add all required sub-views to a new layer.
  * 
- * @author Simon Spšrri (simon.spoerri@fhnw.ch)
+ * @author Simon Spï¿½rri (simon.spoerri@fhnw.ch)
  * 
  */
 public class GL3DLayeredView extends GLLayeredView implements GL3DView, LayeredView, RegionView, ViewportView {
@@ -54,12 +54,6 @@ public class GL3DLayeredView extends GLLayeredView implements GL3DView, LayeredV
             coordinateSystemView.setView(newLayer);
             newLayer = coordinateSystemView;
         }
-
-        // if(newLayer.getAdapter(GL3DViewportView.class)==null) {
-        // GL3DViewportView viewportView = new GL3DViewportView();
-        // viewportView.setView(newLayer);
-        // newLayer = viewportView;
-        // }
 
         if (newLayer.getAdapter(GL3DImageRegionView.class) == null) {
             GL3DImageRegionView imageRegionView = new GL3DImageRegionView();
@@ -99,7 +93,7 @@ public class GL3DLayeredView extends GLLayeredView implements GL3DView, LayeredV
             if (layerView instanceof GL3DView) {
                 ((GL3DView) layerView).render3D(state);
             } else if (layerView instanceof GLView) {
-                ((GLView) layerView).renderGL(state.gl);
+                ((GLView) layerView).renderGL(state.gl, true);
             }
         }
         renderLock.unlock();
@@ -118,28 +112,7 @@ public class GL3DLayeredView extends GLLayeredView implements GL3DView, LayeredV
     }
 
     protected boolean recalculateRegionsAndViewports(ChangeEvent event) {
-        /*
-         * boolean changed = false;
-         * 
-         * // check region and viewport if (region == null && metaData != null)
-         * region =
-         * StaticRegion.createAdaptedRegion(metaData.getPhysicalRectangle());
-         * 
-         * if (viewport != null && region != null) { viewportImageSize =
-         * ViewHelper.calculateViewportImageSize(viewport, region);
-         * 
-         * for (Layer layer : viewLookup.values()) { MetaData m =
-         * layer.metaDataView.getMetaData();
-         * 
-         * Region layerRegion =
-         * ViewHelper.cropInnerRegionToOuterRegion(m.getPhysicalRegion(),
-         * region); changed |= layer.regionView.setRegion(layerRegion, event);
-         * changed |=
-         * layer.viewportView.setViewport(ViewHelper.calculateInnerViewport
-         * (layerRegion, region, viewportImageSize), event); } }
-         * 
-         * return changed;
-         */
+        
         renderLock.lock();
 
         Log.debug("GL3DLayeredView: recalculateRegionsAndViewports: " + this.region + " " + this.viewport);
@@ -162,33 +135,7 @@ public class GL3DLayeredView extends GLLayeredView implements GL3DView, LayeredV
         return this.recalculateRegionsAndViewports(event);
     }
 
-    //
-    // public boolean setViewport(Viewport v, ChangeEvent event) {
-    // Log.debug("GL3DLayeredView:setViewport() "+v);
-    // for(int i=0;i<this.getNumLayers();i++) {
-    // View layerView = this.getLayer(i);
-    // ViewportView viewportView = layerView.getAdapter(ViewportView.class);
-    //
-    // if(viewportView !=null) {
-    // viewportView.setViewport(v, event);
-    // } else {
-    // Log.debug("GL3DLayeredView:setViewport() Layer is not a viewport View!");
-    // }
-    // }
-    // return true;
-    // }
-    //
-    //
-    // public boolean setRegion(Region r, ChangeEvent event) {
-    // for(int i=0;i<this.getNumLayers();i++) {
-    // View layerView = this.getLayer(i);
-    // if(layerView instanceof RegionView) {
-    // ((RegionView)layerView).setRegion(r, event);
-    // }
-    // }
-    // return true;
-    // }
-
+    
     protected void redrawBufferImpl() {
     }
 
@@ -196,7 +143,7 @@ public class GL3DLayeredView extends GLLayeredView implements GL3DView, LayeredV
         for (int i = 0; i < this.getNumLayers(); i++) {
             View layerView = this.getLayer(i);
             if (layerView instanceof GL3DView) {
-                ((GL3DView) layerView).renderGL(gl);
+            	((GL3DView) layerView).renderGL(gl, true);
             }
         }
     }

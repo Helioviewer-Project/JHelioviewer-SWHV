@@ -13,7 +13,7 @@ import org.helioviewer.viewmodel.region.Region;
  * that is stored in a GL Texture. It also provides the Region that is actually
  * captured by the texture.
  * 
- * @author Simon Spšrri (simon.spoerri@fhnw.ch)
+ * @author Simon Spoerri (simon.spoerri@fhnw.ch)
  * 
  */
 public class TextureCoordinateSystem extends Cartesian2DCoordinateSystem {

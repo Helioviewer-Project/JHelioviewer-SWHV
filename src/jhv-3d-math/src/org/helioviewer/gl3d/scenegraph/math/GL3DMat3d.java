@@ -1,7 +1,5 @@
 package org.helioviewer.gl3d.scenegraph.math;
 
-import org.helioviewer.base.logging.Log;
-
 public class GL3DMat3d {
     private double[] m = new double[9];/*
                                         * / 0 3 6 \ | 1 4 7 | \ 2 5 8 /
@@ -173,9 +171,7 @@ public class GL3DMat3d {
         double d = this.det();
 
         if (Math.abs(d) <= 0.0000000001f) {
-            // throw new
-            // IllegalStateException("Matrix is singular. Inversion impossible.");
-            Log.error("Matrix is singular. Inversion impossible. Matrix:\n" + this.toString());
+            throw new IllegalStateException("Matrix is singular. Inversion impossible.");
         }
 
         GL3DMat3d i = new GL3DMat3d();

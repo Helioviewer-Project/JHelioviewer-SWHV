@@ -158,4 +158,25 @@ public interface MovieView extends View {
      * @see #pauseMovie
      */
     public boolean isMoviePlaying();
+
+    /**
+     * Sets whether the byte and integer buffers should be reused between
+     * frames.
+     * <p>
+     * Normally this avoids garbage collection, but if you want to save the
+     * previous frame or similar this cause problems. By default this is true
+     * and views needing new buffers can request it
+     * 
+     * @param reuseBuffer
+     *            New boolean whether to reuse buffer
+     */
+    public void setReuseBuffer(boolean reuseBuffer);
+
+    /**
+     * Sets whether the buffers shall be reused between frames.
+     * 
+     * @return The current behaviour to reuse buffer
+     * @see #setReuseBuffer(boolean)
+     */
+    public boolean isReuseBuffer();
 }

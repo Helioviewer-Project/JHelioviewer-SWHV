@@ -812,10 +812,10 @@ public class ImageDataPanel extends ObservationDialogPanel {
          *             From inserting into the AWT Queue
          */
         public void setupSources() throws InterruptedException, InvocationTargetException {
-            final DataSources source = DataSources.getSingletonInstance();
+    		final DataSources source = DataSources.getSingletonInstance();
             EventQueue.invokeAndWait(new Runnable() {
                 public void run() {
-                    InstrumentsPanel.this.setComboBox(comboObservatory, source.getObservatories());
+                	InstrumentsPanel.this.setComboBox(comboObservatory, source.getObservatories());
                 }
             });
         }

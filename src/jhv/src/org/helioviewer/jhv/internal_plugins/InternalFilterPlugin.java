@@ -3,6 +3,8 @@ package org.helioviewer.jhv.internal_plugins;
 import java.net.URI;
 import java.net.URISyntaxException;
 
+import org.helioviewer.filter.runningdifference.RunningDifferenceContainer;
+import org.helioviewer.filter.runningdifference.RunningDifferencePlugin;
 import org.helioviewer.jhv.internal_plugins.filter.SOHOLUTFilterPlugin.SOHOLUTFilterPlugin;
 import org.helioviewer.jhv.internal_plugins.filter.channelMixer.ChannelMixerPlugin;
 import org.helioviewer.jhv.internal_plugins.filter.contrast.ContrastPlugin;
@@ -39,6 +41,7 @@ public class InternalFilterPlugin extends FilterPlugin implements InternalPlugin
         addFilterContainer(new ContrastPlugin());
         addFilterContainer(new GammaCorrectionPlugin());
         addFilterContainer(new SharpenPlugin());
+        addFilterContainer(new RunningDifferenceContainer());
     }
 
     /**

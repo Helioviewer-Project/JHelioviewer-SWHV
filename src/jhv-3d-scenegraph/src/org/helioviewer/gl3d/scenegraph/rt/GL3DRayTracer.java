@@ -11,7 +11,7 @@ import org.helioviewer.gl3d.scenegraph.math.GL3DVec3d;
  * Also, the rayTracer does necessarily need to traverse the whole scene graph,
  * also subnodes can be used as root nodes for the Ray Tracer.
  * 
- * @author Simon Spšrri (simon.spoerri@fhnw.ch)
+ * @author Simon Spï¿½rri (simon.spoerri@fhnw.ch)
  * 
  */
 public class GL3DRayTracer {
@@ -36,16 +36,14 @@ public class GL3DRayTracer {
 
         // isOutside flag set to true if the ray hit no object in the scene
         ray.isOutside = !this.sceneRoot.hit(ray);
-
         return ray;
     }
 
     public synchronized GL3DRay cast(int pixelX, int pixelY) {
-        GL3DRay ray = createPrimaryRay(this.camera, pixelX, pixelY);
+    	GL3DRay ray = createPrimaryRay(this.camera, pixelX, pixelY);
 
         // isOutside flag set to true if the ray hit no object in the scene
         ray.isOutside = !this.sceneRoot.hit(ray);
-
         return ray;
     }
 
@@ -76,12 +74,10 @@ public class GL3DRayTracer {
         LA.normalize();
         LU.normalize();
         LR.normalize();
-
         GL3DVec3d C = LA.multiply(camera.getClipNear());
         GL3DVec3d TL = C.subtract(LR.copy().multiply(hw)).add(LU.copy().multiply(hh));
 
         GL3DVec3d dir = TL.copy().add(LR.copy().multiply(x).subtract(LU.copy().multiply(y)).multiply(pixelSize));
-
         // dir = VM.copy().mat3().inverse().multiply(dir);
         // EYE = VM.copy().inverse().multiply(EYE);
 

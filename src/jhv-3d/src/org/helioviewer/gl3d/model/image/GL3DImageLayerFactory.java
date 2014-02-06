@@ -12,7 +12,7 @@ import org.helioviewer.viewmodel.view.MetaDataView;
  * Factory to be used for creating GL3DImageLayer Objects. This class is used by
  * the GL3DSceneGraphView.
  * 
- * @author Simon Spšrri (simon.spoerri@fhnw.ch)
+ * @author Simon Spï¿½rri (simon.spoerri@fhnw.ch)
  * 
  */
 public class GL3DImageLayerFactory {
@@ -27,6 +27,7 @@ public class GL3DImageLayerFactory {
             Log.debug("GL3DImageLayerFactory: Creating LASCO Image Layer");
             return new GL3DLascoImageLayer(mainView);
         } else if (metaData instanceof HelioviewerMetaData) {
+        	
             HelioviewerMetaData hvMetaData = (HelioviewerMetaData) metaData;
             if (hvMetaData.getInstrument().equalsIgnoreCase("MDI")) {
                 // MDI
@@ -39,9 +40,9 @@ public class GL3DImageLayerFactory {
                 // EIT
                 return new GL3DEITImageLayer(mainView);
             } else if (hvMetaData.getInstrument().equalsIgnoreCase("AIA")) {
-                // AIA
-                return new GL3DAIAImageLayer(mainView);
-            } else if (hvMetaData.getInstrument().equalsIgnoreCase("SECCHI")) {
+            	// AIA
+            	return new GL3DAIAImageLayer(mainView);
+            } else if(hvMetaData.getInstrument().equalsIgnoreCase("STEREO")){
                 // STEREO
                 return new GL3DStereoImageLayer(mainView);
             } else{
@@ -49,7 +50,7 @@ public class GL3DImageLayerFactory {
                 return new GL3DAIAImageLayer(mainView);
             }
         } else {
-            Log.error("GL3DShaderFactory: Cannot create ImageMesh for given ImageTextureView, not recognized underlying data");
+            Log.error("GL3DShaderFactory: Cannot create ImageMesh for given ImageTextureView, not recognized underlying data " + metaData);
         }
 
         return imageLayer;

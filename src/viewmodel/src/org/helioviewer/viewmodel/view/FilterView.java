@@ -16,6 +16,10 @@ import org.helioviewer.viewmodel.filter.Filter;
  * To get further informations about how to use filters, see
  * {@link org.helioviewer.viewmodel.filter}
  * 
+ * <p>
+ * If the view chain gets copied like for the overview chain, the same filter
+ * will be used for both FilterViews!
+ * 
  * @author Ludwig Schmidt
  * 
  */

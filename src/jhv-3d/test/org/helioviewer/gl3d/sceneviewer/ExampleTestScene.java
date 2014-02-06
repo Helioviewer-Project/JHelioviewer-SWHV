@@ -14,7 +14,7 @@ public class ExampleTestScene extends GL3DTestScene {
     public GL3DNode getSceneRoot() {
         GL3DGroup root = new GL3DGroup("Root");
 
-        GL3DArrow arrow = new GL3DArrow(0.5, 1, 12, new GL3DVec4f(1f, 1f, 1f, 1f));
+        GL3DArrow arrow = new GL3DArrow(0.5, 0, 1, 12, new GL3DVec4f(1f, 1f, 1f, 1f));
         // arrow.modelView().rotate(Math.PI/2, 0, 1, 1);
         root.addNode(arrow);
 

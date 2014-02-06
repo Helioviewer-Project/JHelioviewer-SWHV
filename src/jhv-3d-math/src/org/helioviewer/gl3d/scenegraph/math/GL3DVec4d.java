@@ -28,6 +28,13 @@ public class GL3DVec4d {
         this.z = vector.z;
         this.w = vector.w;
     }
+    
+	public GL3DVec4d(GL3DVec3d vector) {
+		this.x = vector.x;
+		this.y = vector.y;
+		this.z = vector.z;
+		this.w = 0.0;
+	}
 
     public GL3DVec4d() {
         this(0f, 0f, 0f, 0f);

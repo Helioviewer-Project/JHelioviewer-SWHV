@@ -332,6 +332,14 @@
     </target>
     
     <!-- plugins -->
+    <target name="plugin-compile" depends="jar-bundle">
+        <mkdir dir="${bin.plugins}/runningdifferenceplugin" />
+        <javac srcdir="${src.base}/filterPlugins/runningdifferenceplugin" destdir="${bin.plugins}/runningdifferenceplugin" target="1.5" source="1.5"
+                    classpath="${build}/JHelioviewer.jar" />
+        <mkdir dir="${bin.plugins}/softwaremodeplugin" />
+        <javac srcdir="${src.base}/filterPlugins/softwaremodeplugin" destdir="${bin.plugins}/softwaremodeplugin" target="1.5" source="1.5"
+            classpath="${build}/JHelioviewer.jar" />
+    </target>
     <target name="release-plugins" >
     	<ant antfile="plugins/build.xml" inheritAll="false" target="all"/>
     </target>

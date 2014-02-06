@@ -19,7 +19,7 @@ import com.sun.opengl.util.BufferUtil;
  * are used to store vertex positions, colors, normals, texture coordinates and
  * indices. The factory methods should be used to create a buffer object.
  * 
- * @author Simon Spšrri (simon.spoerri@fhnw.ch)
+ * @author Simon Spï¿½rri (simon.spoerri@fhnw.ch)
  * 
  */
 public class GL3DBuffer {
@@ -43,7 +43,9 @@ public class GL3DBuffer {
     private Buffer data;
 
     private boolean isInUse = true;
-
+    
+    
+    
     public static GL3DBuffer createIndexBuffer(GL3DState state, int[] indices) {
         IntBuffer buffer = IntBuffer.wrap(indices);
 
@@ -76,7 +78,7 @@ public class GL3DBuffer {
     public static GL3DBuffer create2DTextureCoordinateBuffer(GL3DState state, List<GL3DVec2d> texCoords) {
         DoubleBuffer buffer = DoubleBuffer.allocate(texCoords.size() * 2);
         for (GL3DVec2d coord : texCoords) {
-            buffer.put(coord.x);
+        	buffer.put(coord.x);
             buffer.put(coord.y);
         }
         buffer.flip();
@@ -279,7 +281,7 @@ public class GL3DBuffer {
                 // Log.debug("GL3DBuffer.enable Color    id="+this.id);
                 break;
             case TEXTURE:
-                state.gl.glTexCoordPointer(this.elementSize, this.dataType.id, this.stride * this.dataType.size, this.offset);
+            	state.gl.glTexCoordPointer(this.elementSize, this.dataType.id, this.stride * this.dataType.size, this.offset);
                 // Log.debug("GL3DBuffer.enable TexCoord id="+this.id);
                 break;
             case NONE:

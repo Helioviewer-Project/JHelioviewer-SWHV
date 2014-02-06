@@ -8,6 +8,7 @@ import java.awt.RenderingHints;
 import java.awt.image.BufferedImage;
 
 import org.helioviewer.base.math.Vector2dInt;
+import org.helioviewer.base.math.Vector3dDouble;
 
 /**
  * Implementation of ScreenRenderGraphics operating on Java BufferedImages.
@@ -160,4 +161,43 @@ public class BufferedImageScreenRenderGraphics extends AbstractScreenRenderGraph
     public void drawText(String text, Integer x, Integer y) {
         graphics.drawString(text, x, y + graphics.getFontMetrics().getAscent());
     }
+
+	@Override
+	public void drawImage3d(BufferedImage image, Integer x, Integer y, Integer z) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void drawImage3d(BufferedImage image, Integer x, Integer y,
+			Integer z, float scale) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void drawImage3d(BufferedImage image, Integer x, Integer y,
+			Integer z, Integer width, Integer height) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void fillPolygon(Vector3dDouble[] points) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void drawLine3d(Integer x0, Integer y0, Integer z0, Integer x1,
+			Integer y1, Integer z1) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void drawLine3d(Vector3dDouble p0, Vector3dDouble p1) {
+		// TODO Auto-generated method stub
+		
+	}
 }

@@ -66,7 +66,7 @@ public class HelioviewerMetaData extends AbstractMetaData implements SunMetaData
         setPhysicalImageSize(new Vector2dDouble(pixelImageSize.getX() * meterPerPixel, pixelImageSize.getY() * meterPerPixel));
 
         if (instrument.contains("AIA")) {
-            instrument = "AIA";
+        	instrument = "AIA";
             measurement = m.get("WAVELNTH");
             observatory = m.get("TELESCOP");
             fullName = "AIA " + measurement;

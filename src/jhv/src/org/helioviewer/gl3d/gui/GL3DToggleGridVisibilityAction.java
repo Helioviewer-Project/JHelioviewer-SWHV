@@ -33,7 +33,7 @@ public class GL3DToggleGridVisibilityAction extends AbstractAction {
     public void actionPerformed(ActionEvent e) {
         GL3DSceneGraphView sceneGraph = ImageViewerGui.getSingletonInstance().getMainView().getAdapter(GL3DSceneGraphView.class);
         if (sceneGraph != null) {
-            sceneGraph.toggleGridVisibility();
+            //sceneGraph.toggleGridVisibility();
         	Displayer.getSingletonInstance().display();
         }
     }

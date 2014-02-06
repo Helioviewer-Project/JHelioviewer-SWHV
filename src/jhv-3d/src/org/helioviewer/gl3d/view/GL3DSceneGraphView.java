@@ -1,8 +1,11 @@
 package org.helioviewer.gl3d.view;
 
 import java.awt.event.KeyEvent;
+import java.nio.IntBuffer;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
+import java.util.concurrent.ConcurrentSkipListSet;
 
 import javax.media.opengl.GL;
 
@@ -29,18 +32,24 @@ import org.helioviewer.gl3d.scenegraph.GL3DModel;
 import org.helioviewer.gl3d.scenegraph.GL3DNode;
 import org.helioviewer.gl3d.scenegraph.GL3DShape;
 import org.helioviewer.gl3d.scenegraph.GL3DState;
-import org.helioviewer.gl3d.scenegraph.math.GL3DVec4d;
+import org.helioviewer.gl3d.scenegraph.math.GL3DVec3d;
 import org.helioviewer.gl3d.scenegraph.math.GL3DVec4f;
 import org.helioviewer.gl3d.scenegraph.rt.GL3DRayTracer;
-import org.helioviewer.gl3d.scenegraph.visuals.GL3DGrid;
-import org.helioviewer.gl3d.scenegraph.visuals.GL3DSunGrid;
+import org.helioviewer.gl3d.scenegraph.visuals.GL3DArrow;
+import org.helioviewer.gl3d.scenegraph.visuals.GL3DSphere;
 import org.helioviewer.viewmodel.changeevent.ChangeEvent;
 import org.helioviewer.viewmodel.changeevent.LayerChangedReason;
 import org.helioviewer.viewmodel.region.Region;
+import org.helioviewer.viewmodel.renderer.physical.GLPhysicalRenderGraphics;
 import org.helioviewer.viewmodel.view.LayeredView;
 import org.helioviewer.viewmodel.view.MetaDataView;
+import org.helioviewer.viewmodel.view.RegionView;
+import org.helioviewer.viewmodel.view.SubimageDataView;
 import org.helioviewer.viewmodel.view.View;
 import org.helioviewer.viewmodel.view.ViewListener;
+import org.helioviewer.viewmodel.view.opengl.GLOverlayView;
+import org.helioviewer.viewmodel.view.opengl.GLView;
+import org.helioviewer.viewmodel.view.opengl.OverlayPluginContainer;
 
 /**
  * This is the most important view in the 3D viewchain. It assembles all 3D
@@ -59,19 +68,16 @@ public class GL3DSceneGraphView extends AbstractGL3DView implements GL3DView {
 
     // private GL3DImageGroup imageMeshes;
     private GL3DShape sun;
-
+    private GLOverlayView overlayView = null;
     private GL3DImageLayers imageLayers;
-
     private GL3DHitReferenceShape hitReferenceShape;
     private GL3DFramebufferImage framebuffer;
     private GL3DGroup artificialObjects;
-    private GL3DGrid grid;
 
     private List<GL3DImageTextureView> layersToAdd = new ArrayList<GL3DImageTextureView>();
     private List<GL3DImageTextureView> layersToRemove = new ArrayList<GL3DImageTextureView>();
 
     private List<GL3DNode> nodesToDelete = new ArrayList<GL3DNode>();
-
 
     public GL3DSceneGraphView() {
         this.root = createRoot();
@@ -111,7 +117,7 @@ public class GL3DSceneGraphView extends AbstractGL3DView implements GL3DView {
         }, KeyEvent.VK_I);
         GL3DKeyController.getInstance().addListener(new GL3DKeyListener() {
             public void keyHit(KeyEvent e) {
-                toggleCoronaVisibility();
+				toggleCoronaVisibility();
                 Log.debug("Toggling Corona Visibility");
             }
         }, KeyEvent.VK_C);
@@ -146,19 +152,17 @@ public class GL3DSceneGraphView extends AbstractGL3DView implements GL3DView {
     }
 
     public void render3D(GL3DState state) {
+        
         GL gl = state.gl;
-
+        
         gl.glBlendFunc(GL.GL_SRC_ALPHA, GL.GL_ONE_MINUS_SRC_ALPHA);
-        // gl.glBlendFunc(GL.GL_SRC_ALPHA, GL.GL_DST_ALPHA);
-        // gl.glBlendFunc(GL.GL_SRC_ALPHA, GL.GL_ONE);
-        // gl.glBlendFuncSeparate(GL.GL_SRC_ALPHA, GL.GL_ONE_MINUS_SRC_ALPHA,
-        // GL.GL_SRC_COLOR, GL.GL_ONE_MINUS_SRC_COLOR);
+
         gl.glBlendEquation(GL.GL_FUNC_ADD);
         deleteNodes(state);
+
         if (this.getView() != null) {
             state.pushMV();
             this.renderChild(gl);
-
             this.addLayersToSceneGraph(state);
             this.removeLayersFromSceneGraph(state);
 
@@ -183,8 +187,35 @@ public class GL3DSceneGraphView extends AbstractGL3DView implements GL3DView {
         state.getActiveCamera().applyPerspective(state);
         state.getActiveCamera().applyCamera(state);
 
-        this.root.draw(state);
+        //this.renderChild(gl);
+        
+        ConcurrentSkipListSet<OverlayPluginContainer> overlays = overlayView.getOverlays();
+        GLPhysicalRenderGraphics glRenderGraphics = new GLPhysicalRenderGraphics(gl, view);
+		
+        if (overlayView != null) overlayView.preRender3D(state.gl);
 
+        /*
+        for (OverlayPluginContainer overlay : overlayView.getOverlays()){
+        	if (overlay.getRenderer3d() != null && !overlay.getPostRender()){
+    	        GLPhysicalRenderGraphics glRenderGraphics = new GLPhysicalRenderGraphics(gl, overlayView.getView());
+    	        overlay.getRenderer3d().render(glRenderGraphics);
+        	}
+        }
+		*/
+        
+        this.root.draw(state);
+        
+        if (overlayView != null) overlayView.postRender3D(state.gl);
+
+        /*
+        for (OverlayPluginContainer overlay : overlayView.getOverlays()){
+        	if (overlay.getRenderer3d() != null && overlay.getPostRender()){
+    	        GLPhysicalRenderGraphics glRenderGraphics = new GLPhysicalRenderGraphics(gl, overlayView.getView());
+    	        overlay.getRenderer3d().render(glRenderGraphics);
+        	}
+        }
+        */
+        
         // Draw the camera or its interaction feedbacks
         state.getActiveCamera().drawCamera(state);
 
@@ -213,6 +244,7 @@ public class GL3DSceneGraphView extends AbstractGL3DView implements GL3DView {
             layeredView.addViewListener(new ViewListener() {
 
                 public void viewChanged(View sender, ChangeEvent aEvent) {
+                	Log.debug("viewChange: sender : " + sender);
                     if (aEvent.reasonOccurred(LayerChangedReason.class)) {
                         LayerChangedReason reason = aEvent.getLastChangedReasonByType(LayerChangedReason.class);
                         handleLayerChange(reason);
@@ -234,7 +266,7 @@ public class GL3DSceneGraphView extends AbstractGL3DView implements GL3DView {
 
             switch (reason.getLayerChangeType()) {
             case LAYER_ADDED:
-                addNewLayer(imageTextureView);
+            	addNewLayer(imageTextureView);
                 break;
             case LAYER_REMOVED:
                 removeLayer(imageTextureView);
@@ -277,17 +309,18 @@ public class GL3DSceneGraphView extends AbstractGL3DView implements GL3DView {
         synchronized (this.layersToAdd) {
             LayeredView layeredView = getAdapter(LayeredView.class);
             for (GL3DImageTextureView imageTextureView : this.layersToAdd) {
-            	
                 GL3DImageLayer imageLayer = GL3DImageLayerFactory.createImageLayer(state, imageTextureView);
-
+            	//GL3DImageLayer imageLayer = new GL3DAIAImageLayer(imageTextureView);
+            	
                 ((GL3DCameraView) getAdapter(GL3DCameraView.class)).addCameraListener(imageLayer);
 
                 this.imageLayers.insertLayer(imageLayer);
 
+                
                 imageTextureView.addViewListener(framebuffer);
-                int layerNumber = layeredView.getLayerLevel(imageTextureView);
+                //int layerNumber = layeredView.getLayerLevel(imageTextureView);
 
-                Log.debug("GL3DSceneGraphView: Add new ImageMesh for " + imageTextureView + " at position " + layerNumber);
+                //Log.debug("GL3DSceneGraphView: Add new ImageMesh for " + imageTextureView + " at position " + layerNumber);
 
             }
             if (!this.layersToAdd.isEmpty()) {
@@ -346,32 +379,40 @@ public class GL3DSceneGraphView extends AbstractGL3DView implements GL3DView {
 
     private GL3DGroup createRoot() {
         GL3DGroup root = new GL3DGroup("Scene Root");
-
+        
         artificialObjects = new GL3DArtificialObjects();
         root.addNode(artificialObjects);
-        this.grid = new GL3DGrid("grid",12,24 , new GL3DVec4f(1.0f,1.0f,0.0f,0.0f), new GL3DVec4d(1.0,1.0,0.0,0.0));
-        root.addNode(grid);
-
+        
         this.imageLayers = new GL3DImageLayers();
         root.addNode(this.imageLayers);
-
+        
+        //this.overlayPlugins = new GL3DOverlayPlugins();
+        //root.addNode(this.overlayPlugins);
+        
         this.hitReferenceShape = new GL3DHitReferenceShape(true);
         root.addNode(this.hitReferenceShape);
 
- 
+        GL3DGroup indicatorArrows = new GL3DModel("Arrows", "Arrows indicating the viewspace axes");
+        artificialObjects.addNode(indicatorArrows);
+
+        
+        GL3DShape north = new GL3DArrow("Northpole", Constants.SunRadius/16, Constants.SunRadius, Constants.SunRadius/2, 32, new GL3DVec4f(1.0f, 0.2f, 0.1f, 1.0f));
+        north.modelView().rotate(-Math.PI/2, GL3DVec3d.XAxis);
+        indicatorArrows.addNode(north);
+        
+        GL3DShape south = new GL3DArrow("Southpole", Constants.SunRadius/16, Constants.SunRadius, Constants.SunRadius/2, 32, new GL3DVec4f(0.1f, 0.2f, 1.0f, 1.0f));
+        south.modelView().rotate(Math.PI/2, GL3DVec3d.XAxis);
+        indicatorArrows.addNode(south);
+        
+               
         GL3DModel sunModel = new GL3DModel("Sun", "Spherical Grid depicting the Sun");
-        this.sun = new GL3DSunGrid(Constants.SunRadius * 0.98, new GL3DVec4f(0.8f, 0.8f, 0, 0.2f));
-        this.sun.getDrawBits().on(Bit.Wireframe);
-        sunModel.addNode(this.sun);
         artificialObjects.addNode(sunModel);
+        // Create the sungrid
+        this.sun = new GL3DSphere("Sun-grid", Constants.SunRadius, 200, 200, new GL3DVec4f(1.0f, 1.0f, 1.0f, 0.0f));
+        //this.sun = new GL3DSunGrid(Constants.SunRadius,200,200, new GL3DVec4f(0.8f, 0.8f, 0, 0.2f));
 
-        // imageMeshes.getDrawBits().on(Bit.Hidden);
-
-        // root.addNode(new GL3DVectorfield(null));
-        // artificialObjects.addNode(new
-        // GL3DTrianglesCone(Constants.SunRadius/10.0, Constants.SunRadius/10.0,
-        // 8, new GL3DVec4f(1.0f, 1.f, 0.f, 1.f)));
-
+        //sunModel.addNode(this.sun);
+    	
         framebuffer = new GL3DFramebufferImage();
         artificialObjects.addNode(framebuffer);
         framebuffer.getDrawBits().on(Bit.Hidden);
@@ -392,6 +433,10 @@ public class GL3DSceneGraphView extends AbstractGL3DView implements GL3DView {
 
         printNode(root, 0);
 
+    }
+    
+    public void setGLOverlayView(GLOverlayView overlayView){
+    	this.overlayView = overlayView;
     }
 
     private void printNode(GL3DNode node, int level) {
@@ -421,15 +466,13 @@ public class GL3DSceneGraphView extends AbstractGL3DView implements GL3DView {
         }
     }
 
-	public void toggleGridVisibility() {
-		if( grid.getParent()==root ){
-			root.removeNode(grid);
-		}
-		else{
-			root.addNode(grid);
-		}
-	}
-		
-		//grid.setUnchanged();		
-}
+    protected void renderChild(GL gl) {
+    	if (view instanceof GLView) {
+            ((GLView) view).renderGL(gl, true);
+        } else {
+            textureHelper.renderImageDataToScreen(gl, view.getAdapter(RegionView.class).getRegion(), view.getAdapter(SubimageDataView.class).getSubimageData());
+        }
+    }
 
+
+}

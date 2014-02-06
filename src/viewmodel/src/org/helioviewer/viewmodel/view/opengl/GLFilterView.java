@@ -27,10 +27,14 @@ import org.helioviewer.viewmodel.viewport.Viewport;
  * <p>
  * Since filters in OpenGL are implemented as shaders, it is not possible to use
  * every filter in OpenGL mode. In particular, only GLFilters should be used.
- * Never the less, the view chain still works, when a filter does not support
+ * Nevertheless, the view chain still works, when a filter does not support
  * OpenGL, but OpenGL will not be used to accelerate views beneath that filter.
  * Instead, it switches to standard mode for the remaining views. This behavior
  * is implemented in this class.
+ * 
+ * <p>
+ * For now it also switch to software mode beneath it, when a time machine is
+ * used. TODO
  * 
  * <p>
  * For further information on how to use filters, see
@@ -68,7 +72,7 @@ public class GLFilterView extends StandardFilterView implements GLFragmentShader
     /**
      * {@inheritDoc}
      */
-    public void renderGL(GL gl) {
+    public void renderGL(GL gl, boolean nextView) {
         if (filter instanceof GLFilter) {
             refilterPrepare();
 
@@ -79,7 +83,7 @@ public class GLFilterView extends StandardFilterView implements GLFragmentShader
             ((GLFilter) filter).applyGL(gl);
 
             if (view instanceof GLView) {
-                ((GLView) view).renderGL(gl);
+                ((GLView) view).renderGL(gl, true);
             } else {
                 if (subimageDataView != null) {
                     textureHelper.renderImageDataToScreen(gl, regionView.getRegion(), subimageDataView.getSubimageData());

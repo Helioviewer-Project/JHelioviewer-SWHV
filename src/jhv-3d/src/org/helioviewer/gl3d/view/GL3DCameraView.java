@@ -15,7 +15,11 @@ import org.helioviewer.gl3d.camera.GL3DTrackballCamera;
 import org.helioviewer.gl3d.changeevent.CameraChangeChangedReason;
 import org.helioviewer.gl3d.scenegraph.GL3DState;
 import org.helioviewer.viewmodel.changeevent.ChangeEvent;
+import org.helioviewer.viewmodel.view.RegionView;
+import org.helioviewer.viewmodel.view.SubimageDataView;
 import org.helioviewer.viewmodel.view.View;
+import org.helioviewer.viewmodel.view.opengl.GLOverlayView;
+import org.helioviewer.viewmodel.view.opengl.GLView;
 
 /**
  * The {@link GL3DCameraView} is responsible for applying the currently active
@@ -23,7 +27,7 @@ import org.helioviewer.viewmodel.view.View;
  * transformation to be applied in a scene, this view must be executed before
  * the {@link GL3DSceneGraphView}.
  * 
- * @author Simon Spšrri (simon.spoerri@fhnw.ch)
+ * @author Simon Spï¿½rri (simon.spoerri@fhnw.ch)
  * 
  */
 public class GL3DCameraView extends AbstractGL3DView implements GL3DView, GL3DCameraListener {
@@ -62,6 +66,7 @@ public class GL3DCameraView extends AbstractGL3DView implements GL3DView, GL3DCa
                 }
             }
         }, KeyEvent.VK_C);
+        
     }
 
     public void render3D(GL3DState state) {
@@ -113,5 +118,13 @@ public class GL3DCameraView extends AbstractGL3DView implements GL3DView, GL3DCa
 
     public void removeCameraListener(GL3DCameraListener listener) {
         this.listeners.remove(listener);
+    }
+ 
+    protected void renderChild(GL gl) {
+        if (view instanceof GLView) {
+        	((GLView) view).renderGL(gl, false);
+        } else {
+            textureHelper.renderImageDataToScreen(gl, view.getAdapter(RegionView.class).getRegion(), view.getAdapter(SubimageDataView.class).getSubimageData());
+        }
     }
 }

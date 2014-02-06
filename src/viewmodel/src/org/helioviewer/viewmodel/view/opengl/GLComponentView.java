@@ -339,7 +339,7 @@ public class GLComponentView extends AbstractComponentView implements ViewListen
 
             // Log.debug("GLComponentView: region.cornerX="+region.getCornerX()+", region.cornerY="+region.getCornerY()+", viewportImageHeight="+viewportImageSize.getHeight()+", viewportImageWidth="+viewportImageSize.getWidth()+", viewport.height="+viewport.getHeight()+", viewport.width="+viewport.getWidth());
             if (view instanceof GLView) {
-                ((GLView) view).renderGL(gl);
+                ((GLView) view).renderGL(gl, true);
             } else {
                 textureHelper.renderImageDataToScreen(gl, view.getAdapter(RegionView.class).getRegion(), view.getAdapter(SubimageDataView.class).getSubimageData());
             }

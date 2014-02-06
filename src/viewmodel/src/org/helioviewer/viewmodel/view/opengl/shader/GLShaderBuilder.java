@@ -239,13 +239,12 @@ public class GLShaderBuilder {
         if (!parameter.contains(".")) {
             parameter = parameter.toUpperCase();
         }
-
         for (String param : parameterList) {
             if (param.contains(parameter)) {
                 if (!param.toLowerCase().contains(type.toLowerCase())) {
                     throw new GLBuildShaderException("Conflict between parameter types for " + parameter + ": " + type + " vs. " + param.substring(0, param.indexOf(' ')));
                 }
-
+                
                 return param.substring(param.indexOf(' '), param.indexOf(' ', param.indexOf(' ') + 1));
             }
         }
@@ -355,6 +354,7 @@ public class GLShaderBuilder {
     public int addEnvParameter(String declaration) throws GLBuildShaderException {
         if (nextConstantRegister < maxConstantRegisters) {
             parameterList.add("uniform " + declaration.trim() + " : C" + nextConstantRegister);
+            //parameterList.add("uniform " + declaration.trim() + nextConstantRegister);
             return nextConstantRegister++;
         } else {
             throw new GLBuildShaderException("Number of available enviroment parameters exceeded (Max: " + maxConstantRegisters + ")");
@@ -418,7 +418,6 @@ public class GLShaderBuilder {
             shaderHelper.delShaderID(gl, shaderID);
             return;
         }
-
         if (type == GL.GL_VERTEX_PROGRAM_ARB) {
             for (int i = 0; i <= highestTexCoordEverUsed; i++) {
                 String searchFor = "TEXCOORD" + i;
@@ -546,4 +545,52 @@ public class GLShaderBuilder {
             super(target, offset, length, identifier);
         }
     }
+    
+    
+    
+    public String getCode()
+    {
+    	String finalCode = "struct outputStruct {" + LINE_SEP;
+
+        for (String output : outputStruct) {
+            finalCode += '\t' + outputTypes.get(output) + ' ' + output.toLowerCase() + " : " + output + ';' + LINE_SEP;
+        }
+
+        finalCode += "};" + LINE_SEP + LINE_SEP;
+
+        // other functions
+        if (functions.length() > 0) {
+            finalCode += functions + LINE_SEP + LINE_SEP;
+        }
+
+        // main function header
+        finalCode += "outputStruct main(";
+        for (String parameter : standardParameterList) {
+            if (parameter.contains(".")) {
+                finalCode += LINE_SEP + '\t' + standardParameterTypes.get(parameter) + ' ' + parameter.replace('.', '_') + " : " + parameter + ',';
+            } else {
+                finalCode += LINE_SEP + '\t' + standardParameterTypes.get(parameter) + ' ' + parameter.toLowerCase() + " : " + parameter + ',';
+            }
+        }
+
+        for (String parameter : parameterList) {
+            finalCode += LINE_SEP + '\t' + parameter + ',';
+        }
+
+        finalCode = finalCode.substring(0, finalCode.length() - 1);
+        finalCode += ')' + LINE_SEP + '{' + LINE_SEP + "\toutputStruct OUT;" + LINE_SEP;
+
+        for (String output : outputStruct) {
+            if (outputInit.containsKey(output)) {
+                finalCode += "\tOUT." + output.toLowerCase() + " = " + outputInit.get(output) + ";" + LINE_SEP;
+            }
+        }
+
+        // main function body
+        finalCode += LINE_SEP + mainBody + "\treturn OUT;" + LINE_SEP + '}';
+        
+        return finalCode;
+    }
+    
+    
 }

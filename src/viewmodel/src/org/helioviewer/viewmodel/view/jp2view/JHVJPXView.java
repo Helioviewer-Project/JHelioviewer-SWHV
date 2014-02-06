@@ -24,7 +24,7 @@ import org.helioviewer.viewmodel.view.jp2view.image.SubImage;
  * Implementation of TimedMovieView for JPX files.
  * 
  * <p>
- * This class is an extions of {@link JHVJP2View} for JPX-Files, providing
+ * This class is an extensions of {@link JHVJP2View} for JPX-Files, providing
  * additional movie commands.
  * 
  * <p>
@@ -41,11 +41,10 @@ public class JHVJPXView extends JHVJP2View implements TimedMovieView, CachedMovi
     protected DateTimeCache dateTimeCache;
     protected int lastRenderedCompositionLayer = -1;
 
-    // Linking movies
-    protected LinkedMovieManager linkedMovieManager; // if the move is not
-
-    // linked, this has to
-    // be null
+    /**
+     * Linking movies, if the movie is not linked, this has to be null
+     */
+    protected LinkedMovieManager linkedMovieManager;
 
     /**
      * Default constructor.
@@ -393,7 +392,7 @@ public class JHVJPXView extends JHVJP2View implements TimedMovieView, CachedMovi
     /**
      * Internal function for setting the current frame number.
      * 
-     * Before actually setting the new frame number, checks wheater that is
+     * Before actually setting the new frame number, checks whether that is
      * necessary. If the frame number has changed, also triggers an update of
      * the image.
      * 
@@ -440,5 +439,19 @@ public class JHVJPXView extends JHVJP2View implements TimedMovieView, CachedMovi
      */
     protected JP2ImageParameter calculateParameter() {
         return calculateParameter(getCurrentNumQualityLayers(), getCurrentFrameNumber());
+    }
+
+    /**
+     * @see org.helioviewer.viewmodel.view.MovieView#setReuseBuffer(boolean)
+     */
+    public void setReuseBuffer(boolean reuseBuffer) {
+        render.setReuseBuffer(reuseBuffer);
+    }
+
+    /**
+     * @see org.helioviewer.viewmodel.view.MovieView#isReuseBuffer()
+     */
+    public boolean isReuseBuffer() {
+        return render.isReuseBuffer();
     }
 }

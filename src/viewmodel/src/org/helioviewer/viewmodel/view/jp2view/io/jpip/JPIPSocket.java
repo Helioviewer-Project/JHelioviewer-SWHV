@@ -123,10 +123,11 @@ public class JPIPSocket extends HTTPSocket {
             }
 
         } catch (IOException e) {
-            e.printStackTrace();
+            //e.printStackTrace();
+        } finally{
+            super.close();
         }
 
-        super.close();
     }
 
     /**

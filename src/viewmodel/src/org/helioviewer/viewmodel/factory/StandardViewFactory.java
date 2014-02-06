@@ -62,7 +62,7 @@ public abstract class StandardViewFactory implements ViewFactory {
      * {@inheritDoc}
      */
     @SuppressWarnings("unchecked")
-    public <T extends View> T createViewFromSource(T source, boolean keepSource) {
+	public <T extends View> T createViewFromSource(T source, boolean keepSource) {
 
         // ComponentView
         if (source instanceof ComponentView) {
@@ -84,14 +84,7 @@ public abstract class StandardViewFactory implements ViewFactory {
         } else if (source instanceof OverlayView) {
             OverlayView sourceOverlay = (OverlayView) source;
             OverlayView newOverlay = (OverlayView) createViewFromSourceImpl(source);
-
-            PhysicalRenderer renderer = sourceOverlay.getRenderer();
-
-            if (!keepSource) {
-                sourceOverlay.setRenderer(null);
-            }
-            newOverlay.setRenderer(renderer);
-
+			
             return (T) newOverlay;
 
             // FilterView

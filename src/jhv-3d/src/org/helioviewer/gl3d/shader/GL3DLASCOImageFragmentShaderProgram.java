@@ -21,12 +21,14 @@ public class GL3DLASCOImageFragmentShaderProgram extends GLFragmentShaderProgram
 
         try {
             String program = "\tfloat geometryRadius = length(physicalPosition.zw);" + GLShaderBuilder.LINE_SEP;
-            program += "\toutput.a = output.a * step(innerRadius, geometryRadius) * step(-outerRadius, -geometryRadius);";
+            program += "\toutput.a = output.a * step(innerRadius, geometryRadius) * step(-outerRadius, -geometryRadius);" + GLShaderBuilder.LINE_SEP;
+            program += "\toutput.a *= alpha;";
 
             program = program.replace("output", shaderBuilder.useOutputValue("float4", "COLOR"));
             program = program.replace("physicalPosition", shaderBuilder.useStandardParameter("float4", "TEXCOORD0"));
             program = program.replace("innerRadius", Double.toString(metaData.getInnerPhysicalOcculterRadius() * HelioviewerGeometryView.roccInnerFactor).replace(',', '.'));
             program = program.replace("outerRadius", Double.toString(metaData.getOuterPhysicalOcculterRadius() * HelioviewerGeometryView.roccOuterFactor).replace(',', '.'));
+            program = program.replace("alpha", shaderBuilder.useStandardParameter("float", "TEXCOORD1"));
 
             shaderBuilder.addMainFragment(program);
         } catch (GLBuildShaderException e) {

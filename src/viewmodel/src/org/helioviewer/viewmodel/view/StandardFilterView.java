@@ -7,11 +7,13 @@ import org.helioviewer.viewmodel.changeevent.SubImageDataChangedReason;
 import org.helioviewer.viewmodel.changeevent.ViewChainChangedReason;
 import org.helioviewer.viewmodel.filter.Filter;
 import org.helioviewer.viewmodel.filter.FilterListener;
+import org.helioviewer.viewmodel.filter.FrameFilter;
 import org.helioviewer.viewmodel.filter.MetaDataFilter;
 import org.helioviewer.viewmodel.filter.ObservableFilter;
 import org.helioviewer.viewmodel.filter.RegionFilter;
 import org.helioviewer.viewmodel.filter.StandardFilter;
 import org.helioviewer.viewmodel.imagedata.ImageData;
+import org.helioviewer.viewmodel.view.bufferedimage.BufferedImageTimeMachineView;
 
 /**
  * Implementation of FilterView, providing the capability to apply filters on
@@ -39,6 +41,10 @@ public class StandardFilterView extends AbstractBasicView implements FilterView,
     protected RegionView regionView;
     protected MetaDataView metaDataView;
     protected SubimageDataView subimageDataView;
+    /**
+     * Underlying TimeMachineView for this layer.
+     */
+    protected TimeMachineView timeMachineView = null;
 
     /**
      * {@inheritDoc}
@@ -97,6 +103,30 @@ public class StandardFilterView extends AbstractBasicView implements FilterView,
         if (filter instanceof MetaDataFilter && metaDataView != null) {
             ((MetaDataFilter) filter).setMetaData(metaDataView.getMetaData());
         }
+        if (filter instanceof FrameFilter && ViewHelper.getViewAdapter(view, MovieView.class) != null) {
+            if (timeMachineView == null) {
+                // TODO This is only software mode
+                timeMachineView = new BufferedImageTimeMachineView();
+                timeMachineView.setView(view);
+                super.setView(timeMachineView);
+                updatePrecomputedViews();
+            }
+            ((FrameFilter) filter).setTimeMachineData(timeMachineView.getTimeMachineData());
+        }
+    }
+
+    /**
+     * If we have a time machine below we want to force it staying below the
+     * filter view
+     * 
+     * @see org.helioviewer.viewmodel.view.AbstractBasicView#setView(org.helioviewer.viewmodel.view.View)
+     */
+    @Override
+    public void setView(View newView) {
+        if (timeMachineView == null)
+            super.setView(newView);
+        else
+            timeMachineView.setView(newView);
     }
 
     /**
@@ -106,13 +136,15 @@ public class StandardFilterView extends AbstractBasicView implements FilterView,
      */
     protected void refilter() {
         if (filter != null && view != null) {
-            refilterPrepare();
+            synchronized (filter) {
+                refilterPrepare();
 
-            if (subimageDataView != null) {
-                if (filter instanceof StandardFilter) {
-                    filteredData = ((StandardFilter) filter).apply(subimageDataView.getSubimageData());
-                } else {
-                    filteredData = subimageDataView.getSubimageData();
+                if (subimageDataView != null) {
+                    if (filter instanceof StandardFilter) {
+                        filteredData = ((StandardFilter) filter).apply(subimageDataView.getSubimageData());
+                    } else {
+                        filteredData = subimageDataView.getSubimageData();
+                    }
                 }
             }
         } else {
@@ -126,7 +158,6 @@ public class StandardFilterView extends AbstractBasicView implements FilterView,
      * In this case, refilters the image, if there is one.
      */
     protected void setViewSpecificImplementation(View newView, ChangeEvent changeEvent) {
-
         updatePrecomputedViews();
 
         if (subimageDataView != null) {

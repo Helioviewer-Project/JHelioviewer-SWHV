@@ -8,7 +8,7 @@ import org.helioviewer.gl3d.scenegraph.rt.GL3DRay;
  * when calculating hit points of a {@link GL3DMesh}. Every Mesh is also stored
  * as a set of {@link GL3DTriangle}s.
  * 
- * @author Simon Spšrri (simon.spoerri@fhnw.ch)
+ * @author Simon Spï¿½rri (simon.spoerri@fhnw.ch)
  * 
  */
 public class GL3DTriangle {

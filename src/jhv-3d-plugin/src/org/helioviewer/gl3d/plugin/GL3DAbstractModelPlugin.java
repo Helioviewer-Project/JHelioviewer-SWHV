@@ -52,5 +52,4 @@ public abstract class GL3DAbstractModelPlugin implements GL3DModelPlugin {
     public void unload() {
         this.listeners.clear();
     }
-
 }

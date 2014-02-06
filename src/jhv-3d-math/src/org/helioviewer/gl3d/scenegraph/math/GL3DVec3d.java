@@ -206,7 +206,11 @@ public class GL3DVec3d {
     }
 
     public GL3DVec3d normalize() {
-        return this.divide(length());
+    	double len = length();
+    	if(len != 0.0)
+    		return this.divide(length());
+    	else
+    		return this;
     }
 
     public double[] toArray() {

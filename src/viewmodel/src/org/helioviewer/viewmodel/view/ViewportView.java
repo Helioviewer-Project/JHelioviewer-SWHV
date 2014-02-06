@@ -12,7 +12,7 @@ import org.helioviewer.viewmodel.viewport.Viewport;
  * 
  * <p>
  * Since the viewport represents a section of the screen or a comparable medium
- * (e.g. an output image), the size of the viewport is always given in pisels.
+ * (e.g. an output image), the size of the viewport is always given in pixels.
  * 
  * <p>
  * Note, that it is expected to have at least one ViewportView in every path of

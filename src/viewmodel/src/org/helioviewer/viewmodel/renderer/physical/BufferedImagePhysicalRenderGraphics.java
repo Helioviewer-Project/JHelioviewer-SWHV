@@ -11,6 +11,7 @@ import java.awt.image.BufferedImage;
 
 import org.helioviewer.base.math.Vector2dDouble;
 import org.helioviewer.base.math.Vector2dInt;
+import org.helioviewer.base.math.Vector3dDouble;
 import org.helioviewer.viewmodel.view.View;
 
 /**
@@ -229,4 +230,36 @@ public class BufferedImagePhysicalRenderGraphics extends AbstractPhysicalRenderG
         FontMetrics metrics = graphics.getFontMetrics();
         graphics.drawString(text, pos.getX() - metrics.getAscent() + metrics.getHeight() / 2, pos.getY() + metrics.stringWidth(text) / 2);
     }
+
+	@Override
+	public void drawImage3d(BufferedImage image, Double x, Double y, Double z) {
+		// TODO Auto-generated method stub
+	}
+
+	@Override
+	public void drawImage3d(BufferedImage image, Double x, Double y, Double z,
+			float scale) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void drawImage3d(BufferedImage image, Double x, Double y, Double z,
+			Double width, Double height) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void fillPolygon(Vector3dDouble[] points) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void drawLine3d(Double x0, Double y0, Double z0, Double x1, Double y1,
+			Double z1) {
+		// TODO Auto-generated method stub
+		
+	}
 }
