@@ -293,7 +293,7 @@ public class BufferedImageTimeMachineView extends AbstractBasicView implements S
     public boolean setRegion(Region r, ChangeEvent event) {
         Region oldRegion = regionView.getRegion();
         // Just a shift?
-        if (r.getHeight() == oldRegion.getHeight() && r.getWidth() == oldRegion.getWidth()) {
+        if (oldRegion!=null &&r.getHeight() == oldRegion.getHeight() && r.getWidth() == oldRegion.getWidth()) {
             // TODO Rounding, shifting, (recalculate sides?)
             previousCache.clear();
         } else {

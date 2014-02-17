@@ -194,7 +194,8 @@ public abstract class GL3DImageLayer extends GL3DOrientedGroup implements GL3DCa
 
     public void cameraMoved(GL3DCamera camera) {
         doUpdateROI = true;
-        this.accellerationShape.markAsChanged();
+        if(this.accellerationShape!=null)
+        	this.accellerationShape.markAsChanged();
         
         cameraMoving(camera);
     }
