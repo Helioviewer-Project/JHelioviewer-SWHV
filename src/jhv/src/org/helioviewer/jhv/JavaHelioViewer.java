@@ -56,7 +56,6 @@ public class JavaHelioViewer {
     }
 
     public static void main(String[] args, Plugin[] builtinPlugins) {
-    	
         // Prints the usage message
         if (args.length == 1 && (args[0].equals("-h") || args[0].equals("--help"))) {
             System.out.println(CommandLineProcessor.getUsageMessage());
