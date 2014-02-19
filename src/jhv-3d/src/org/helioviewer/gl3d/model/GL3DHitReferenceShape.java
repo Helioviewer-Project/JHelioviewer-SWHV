@@ -91,9 +91,14 @@ public class GL3DHitReferenceShape extends GL3DMesh {
         }
        	
         // Transform ray to object space for non-groups
-        ray.setOriginOS(this.wmI.multiply(ray.getOrigin()));
-        ray.setDirOS(this.wmI.multiply(ray.getDirection()).normalize());
-        return this.shapeHit(ray);
+    	if(ray !=null && this.wmI!=null){
+            ray.setOriginOS(this.wmI.multiply(ray.getOrigin()));
+           ray.setDirOS(this.wmI.multiply(ray.getDirection()).normalize());
+           return this.shapeHit(ray);
+    	}
+    	
+    	return false;
+    	
     }
 
     public boolean shapeHit(GL3DRay ray) {
