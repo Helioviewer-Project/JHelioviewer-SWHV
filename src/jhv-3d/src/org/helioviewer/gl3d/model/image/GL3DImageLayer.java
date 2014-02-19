@@ -2,7 +2,6 @@ package org.helioviewer.gl3d.model.image;
 
 import java.awt.Color;
 import java.awt.Graphics;
-import java.awt.Paint;
 import java.awt.Point;
 import java.util.ArrayList;
 import java.util.List;
@@ -18,7 +17,6 @@ import org.helioviewer.gl3d.camera.GL3DCamera;
 import org.helioviewer.gl3d.camera.GL3DCameraListener;
 import org.helioviewer.gl3d.model.GL3DHitReferenceShape;
 import org.helioviewer.gl3d.scenegraph.GL3DDrawBits.Bit;
-import org.helioviewer.gl3d.scenegraph.GL3DMesh;
 import org.helioviewer.gl3d.scenegraph.GL3DNode;
 import org.helioviewer.gl3d.scenegraph.GL3DOrientedGroup;
 import org.helioviewer.gl3d.scenegraph.GL3DState;

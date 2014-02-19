@@ -1,9 +1,7 @@
 package org.helioviewer.gl3d.view;
 
 import java.awt.event.KeyEvent;
-import java.nio.IntBuffer;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.ConcurrentSkipListSet;
 
@@ -411,8 +409,7 @@ public class GL3DSceneGraphView extends AbstractGL3DView implements GL3DView {
         this.sun = new GL3DSphere("Sun-grid", Constants.SunRadius, 200, 200, new GL3DVec4f(1.0f, 1.0f, 1.0f, 0.0f));
         //this.sun = new GL3DSunGrid(Constants.SunRadius,200,200, new GL3DVec4f(0.8f, 0.8f, 0, 0.2f));
 
-        //sunModel.addNode(this.sun);
-    	
+        //sunModel.addNode(this.sun);  
         framebuffer = new GL3DFramebufferImage();
         artificialObjects.addNode(framebuffer);
         framebuffer.getDrawBits().on(Bit.Hidden);
