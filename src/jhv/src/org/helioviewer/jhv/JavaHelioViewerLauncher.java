@@ -166,12 +166,13 @@ public class JavaHelioViewerLauncher {
                 System.out.println("JavaHelioviewerLauncher > Start JHelioviewer with the following java virtual machine parameters:" + jvmArgs);
 
                 // Pass arguments to process
+                commandLine.add(mainClass.getName());
+
                 argString = "";// "--use-existing-log-time-stamp";
                 for (int i = 0; i < args.length; ++i) {
                     argString += " \"" + args[i] + "\"";
                     commandLine.add(args[i]);
                 }
-                commandLine.add(mainClass.getName());
                 System.out.println("JavaHelioviewerLauncher > Start JHelioviewer with the following command-line options:" + argString);
 
                 String commandArray[] = new String[commandLine.size()];
