@@ -82,7 +82,6 @@ public abstract class StandardViewFactory implements ViewFactory {
 
             // OverlayView
         } else if (source instanceof OverlayView) {
-            OverlayView sourceOverlay = (OverlayView) source;
             OverlayView newOverlay = (OverlayView) createViewFromSourceImpl(source);
 			
             return (T) newOverlay;

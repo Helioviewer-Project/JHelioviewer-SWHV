@@ -147,7 +147,7 @@ public class RunningDifferenceFilter implements FrameFilter, StandardFilter, Obs
      * @see org.helioviewer.viewmodel.filter.FrameFilter#setTimeMachineData(org.helioviewer.viewmodel.view.TimeMachineData)
      */
     public void setTimeMachineData(TimeMachineData data) {
-        System.out.println("Time machine data is set");
+        //System.out.println("Time machine data is set");
         timeMachineData = data;
         if (timeMachineData != null)
             timeMachineData.setPreviousCache(1);

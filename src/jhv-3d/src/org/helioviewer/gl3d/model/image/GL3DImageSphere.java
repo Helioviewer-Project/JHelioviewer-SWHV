@@ -99,8 +99,8 @@ public class GL3DImageSphere extends GL3DImageMesh {
                 phiRotation = GL3DMat4d.rotation(phi, new GL3DVec3d(0, 1, 0));
              }
              
-    		 int resolutionX = 50;
-    		 int resolutionY = 250;
+    		 int resolutionX = 20;
+    		 int resolutionY = 20;
              
     		 for (int latNumber = 0; latNumber <= resolutionX; latNumber++) {
     	            double theta = latNumber * Math.PI / resolutionX;
