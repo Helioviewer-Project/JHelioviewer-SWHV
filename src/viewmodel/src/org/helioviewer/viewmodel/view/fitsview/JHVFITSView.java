@@ -35,7 +35,6 @@ import org.helioviewer.viewmodel.viewport.Viewport;
 import org.helioviewer.viewmodel.viewportimagesize.StaticViewportImageSize;
 import org.helioviewer.viewmodel.viewportimagesize.ViewportImageSizeAdapter;
 
-import com.sun.xml.internal.ws.api.addressing.WSEndpointReference.Metadata;
 
 /**
  * Implementation of ImageInfoView for FITS images.
