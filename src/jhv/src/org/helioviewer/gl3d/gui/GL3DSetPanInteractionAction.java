@@ -11,7 +11,7 @@ import org.helioviewer.gl3d.camera.GL3DInteraction;
  * Sets the current {@link GL3DInteraction} of the current {@link GL3DCamera} to
  * Panning (Camera Translation).
  * 
- * @author Simon Spšrri (simon.spoerri@fhnw.ch)
+ * @author Simon Spoerri (simon.spoerri@fhnw.ch)
  * 
  */
 public class GL3DSetPanInteractionAction extends AbstractAction {

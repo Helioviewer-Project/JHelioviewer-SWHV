@@ -54,7 +54,7 @@ import com.sun.opengl.util.FPSAnimator;
  * {@link GLCanvas}.
  * 
  * 
- * @author Simon Sp�rri (simon.spoerri@fhnw.ch)
+ * @author Simon Spoerri (simon.spoerri@fhnw.ch)
  * 
  */
 public class GL3DComponentView extends AbstractComponentView implements GLEventListener, ComponentView, DisplayListener {

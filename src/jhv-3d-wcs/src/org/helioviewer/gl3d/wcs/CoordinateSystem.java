@@ -6,7 +6,7 @@ package org.helioviewer.gl3d.wcs;
  * within its space. {@link CoordinateConversion} need to be provided to convert
  * {@link CoordinateVector} from one {@link CoordinateSystem} to another.
  * 
- * @author Simon Spšrri (simon.spoerri@fhnw.ch)
+ * @author Simon Spoerri (simon.spoerri@fhnw.ch)
  * 
  */
 public interface CoordinateSystem {

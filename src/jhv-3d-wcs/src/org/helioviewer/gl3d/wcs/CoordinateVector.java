@@ -7,7 +7,7 @@ package org.helioviewer.gl3d.wcs;
  * another {@link CoordinateSystem} by using a {@link CoordinateConversion} of
  * its source coordinate system.
  * 
- * @author Simon Spšrri (simon.spoerri@fhnw.ch)
+ * @author Simon Spoerri (simon.spoerri@fhnw.ch)
  * 
  */
 public class CoordinateVector {

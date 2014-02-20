@@ -23,7 +23,7 @@ import org.helioviewer.gl3d.wcs.HeliocentricCartesianCoordinateSystem;
 /**
  * Scene Graph representation of a PFSS Model.
  * 
- * @author Simon Spšrri (simon.spoerri@fhnw.ch)
+ * @author Simon Spoerri (simon.spoerri@fhnw.ch)
  * 
  */
 public class GL3DPfssModel extends GL3DOrientedGroup {

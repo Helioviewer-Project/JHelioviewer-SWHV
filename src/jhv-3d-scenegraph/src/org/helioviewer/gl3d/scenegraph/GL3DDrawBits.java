@@ -5,7 +5,7 @@ package org.helioviewer.gl3d.scenegraph;
  * draw bits object. An attribute applies to the node and all of its child
  * nodes.
  * 
- * @author Simon Spšrri (simon.spoerri@fhnw.ch)
+ * @author Simon Spoerri (simon.spoerri@fhnw.ch)
  * 
  */
 public class GL3DDrawBits {

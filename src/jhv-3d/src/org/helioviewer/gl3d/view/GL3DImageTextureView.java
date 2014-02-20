@@ -38,7 +38,7 @@ import sun.reflect.generics.visitor.Reifier;
  * {@link GL3DImageMesh} to connect the resulting texture to a mesh, or directly
  * use the {@link GL3DShaderFactory} to create standard Image Meshes.
  * 
- * @author Simon Sp�rri (simon.spoerri@fhnw.ch)
+ * @author Simon Spoerri (simon.spoerri@fhnw.ch)
  * 
  */
 public class GL3DImageTextureView extends AbstractGL3DView implements GL3DView {

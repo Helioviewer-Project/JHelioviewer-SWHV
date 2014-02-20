@@ -16,7 +16,7 @@ import org.helioviewer.gl3d.scenegraph.math.GL3DVec4f;
  * trianges, as to have mergable cones (e.g. to merge multiple cones into a
  * GL3DMergeMesh).
  * 
- * @author Simon Spšrri (simon.spoerri@fhnw.ch)
+ * @author Simon Spoerri (simon.spoerri@fhnw.ch)
  * 
  */
 public class GL3DTrianglesCone extends GL3DMesh {

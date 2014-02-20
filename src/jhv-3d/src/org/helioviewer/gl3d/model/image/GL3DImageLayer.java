@@ -52,7 +52,7 @@ import org.helioviewer.viewmodel.view.opengl.GLFilterView;
  * to the GL3DLayeredView. It represents exactly one image layer in the view
  * chain
  * 
- * @author Simon Sp�rri (simon.spoerri@fhnw.ch)
+ * @author Simon Spoerri (simon.spoerri@fhnw.ch)
  * 
  */
 public abstract class GL3DImageLayer extends GL3DOrientedGroup implements GL3DCameraListener {

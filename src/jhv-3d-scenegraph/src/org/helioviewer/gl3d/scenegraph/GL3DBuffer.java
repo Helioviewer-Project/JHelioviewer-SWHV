@@ -19,7 +19,7 @@ import com.sun.opengl.util.BufferUtil;
  * are used to store vertex positions, colors, normals, texture coordinates and
  * indices. The factory methods should be used to create a buffer object.
  * 
- * @author Simon Sp�rri (simon.spoerri@fhnw.ch)
+ * @author Simon Spoerri (simon.spoerri@fhnw.ch)
  * 
  */
 public class GL3DBuffer {

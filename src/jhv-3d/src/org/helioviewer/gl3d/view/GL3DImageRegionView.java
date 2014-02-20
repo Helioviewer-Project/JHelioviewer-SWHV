@@ -25,7 +25,7 @@ import org.helioviewer.viewmodel.viewportimagesize.ViewportImageSize;
  * converting incoming constraints to the 2D rectangle that needs to be
  * requested from the image source and sent through the 2D view chain part.
  * 
- * @author Simon Sp�rri (simon.spoerri@fhnw.ch)
+ * @author Simon Spoerri (simon.spoerri@fhnw.ch)
  * 
  */
 public class GL3DImageRegionView extends AbstractGL3DView implements GL3DView, RegionView, ViewportView {

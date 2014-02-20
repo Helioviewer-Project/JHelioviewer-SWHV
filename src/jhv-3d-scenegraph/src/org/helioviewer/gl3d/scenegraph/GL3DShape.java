@@ -12,7 +12,7 @@ import org.helioviewer.gl3d.wcs.CoordinateSystem;
  * bounding box within the scene graph. In practice, almost every
  * {@link GL3DNode} is also a {@link GL3DShape}.
  * 
- * @author Simon Sp�rri (simon.spoerri@fhnw.ch)
+ * @author Simon Spoerri (simon.spoerri@fhnw.ch)
  * 
  */
 public abstract class GL3DShape extends GL3DNode {

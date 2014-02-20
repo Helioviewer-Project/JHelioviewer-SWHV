@@ -5,7 +5,7 @@ import java.util.List;
 /**
  * A plugin Configuration provides a list of available plugins.
  * 
- * @author Simon Spšrri (simon.spoerri@fhnw.ch)
+ * @author Simon Spoerri (simon.spoerri@fhnw.ch)
  * 
  */
 public interface GL3DPluginConfiguration {

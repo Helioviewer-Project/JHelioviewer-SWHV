@@ -29,7 +29,7 @@ import org.helioviewer.viewmodel.view.jp2view.datetime.ImmutableDateTime;
  * and the coordinate system should define in which coordinate system this
  * normal is defined in.
  * 
- * @author Simon Sp�rri (simon.spoerri@fhnw.ch)
+ * @author Simon Spoerri (simon.spoerri@fhnw.ch)
  * 
  */
 public class GL3DCoordinateSystemView extends AbstractGL3DView implements GL3DView {

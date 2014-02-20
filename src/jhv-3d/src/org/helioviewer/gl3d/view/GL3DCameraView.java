@@ -27,7 +27,7 @@ import org.helioviewer.viewmodel.view.opengl.GLView;
  * transformation to be applied in a scene, this view must be executed before
  * the {@link GL3DSceneGraphView}.
  * 
- * @author Simon Sp�rri (simon.spoerri@fhnw.ch)
+ * @author Simon Spoerri (simon.spoerri@fhnw.ch)
  * 
  */
 public class GL3DCameraView extends AbstractGL3DView implements GL3DView, GL3DCameraListener {

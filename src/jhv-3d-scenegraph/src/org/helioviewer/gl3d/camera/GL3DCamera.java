@@ -25,7 +25,7 @@ import org.helioviewer.gl3d.wcs.CoordinateSystem;
  * The interactions then change the rotation and translation fields out of which
  * the resulting cameraTransformation is generated.
  * 
- * @author Simon Spšrri (simon.spoerri@fhnw.ch)
+ * @author Simon Spoerri (simon.spoerri@fhnw.ch)
  * 
  */
 public abstract class GL3DCamera {

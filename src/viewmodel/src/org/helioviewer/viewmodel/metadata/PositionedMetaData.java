@@ -6,7 +6,7 @@ package org.helioviewer.viewmodel.metadata;
  * Position data is required when the observer is significantly off the
  * earth-sun line, such as STEREO observations.
  * 
- * @author Simon Spšrri (simon.spoerri@fhnw.ch)
+ * @author Simon Spoerri (simon.spoerri@fhnw.ch)
  * 
  */
 public interface PositionedMetaData {

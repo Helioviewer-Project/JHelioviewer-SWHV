@@ -24,7 +24,7 @@ import org.helioviewer.jhv.display.Displayer;
  * is applied. When the zoom box intersects with the corona the rotation is
  * reset and only a panning is applied.
  * 
- * @author Simon Spšrri (simon.spoerri@fhnw.ch)
+ * @author Simon Spoerri (simon.spoerri@fhnw.ch)
  * 
  */
 public class GL3DZoomBoxInteraction extends GL3DDefaultInteraction {

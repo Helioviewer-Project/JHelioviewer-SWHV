@@ -10,7 +10,7 @@ import org.helioviewer.gl3d.scenegraph.GL3DDrawBits.Bit;
  * The Plugin Controller is responible for loading and unloading 3D plugins. Add
  * a GL3DPluginListener to be informed about changes in loaded plugins.
  * 
- * @author Simon Spšrri (simon.spoerri@fhnw.ch)
+ * @author Simon Spoerri (simon.spoerri@fhnw.ch)
  * 
  */
 public class GL3DPluginController {

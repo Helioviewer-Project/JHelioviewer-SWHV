@@ -13,7 +13,7 @@ import org.helioviewer.viewmodel.view.ViewportView;
  * underlying viewport is in turn adjusted by the {@link GL3DComponentView}s
  * updateImagePanelSize() method.
  * 
- * @author Simon Sp�rri (simon.spoerri@fhnw.ch)
+ * @author Simon Spoerri (simon.spoerri@fhnw.ch)
  * 
  */
 public class GL3DViewportView extends AbstractGL3DView implements GL3DView {

@@ -24,7 +24,7 @@ import org.helioviewer.base.logging.Log;
  * UI Configuration Panel for the Vectors Plugin. It allows reading file based
  * vector fields.
  * 
- * @author Simon Spšrri (simon.spoerri@fhnw.ch)
+ * @author Simon Spoerri (simon.spoerri@fhnw.ch)
  * 
  */
 public class VectorsConfigPanel extends JPanel {

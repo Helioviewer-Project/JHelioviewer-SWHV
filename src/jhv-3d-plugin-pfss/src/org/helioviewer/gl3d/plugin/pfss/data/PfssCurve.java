@@ -10,7 +10,7 @@ import org.helioviewer.gl3d.wcs.CoordinateVector;
  * PFSS Curve
  * 
  * @author Robin Oster (robin.oster@students.fhnw.ch)
- * @author Simon Spšrri (simon.spoerri@fhnw.ch), Changed to Coordinate Vectors
+ * @author Simon Spoerri (simon.spoerri@fhnw.ch), Changed to Coordinate Vectors
  */
 public class PfssCurve {
 

@@ -15,7 +15,7 @@ import org.helioviewer.viewmodel.view.opengl.shader.GLVertexShaderProgram;
  * image meshes need to be created. Depending on the image, several image meshes
  * are grouped created.
  * 
- * @author Simon Spšrri (simon.spoerri@fhnw.ch)
+ * @author Simon Spoerri (simon.spoerri@fhnw.ch)
  * 
  */
 public class GL3DShaderFactory {

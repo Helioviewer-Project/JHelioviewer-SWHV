@@ -58,7 +58,7 @@ import org.helioviewer.viewmodel.view.opengl.OverlayPluginContainer;
  * {@link GL3DRayTracer} to find the maximally spanning image region within the
  * displayed scene.
  * 
- * @author Simon Sp�rri (simon.spoerri@fhnw.ch)
+ * @author Simon Spoerri (simon.spoerri@fhnw.ch)
  * 
  */
 public class GL3DSceneGraphView extends AbstractGL3DView implements GL3DView {

@@ -23,7 +23,7 @@ import org.helioviewer.base.logging.Log;
 /**
  * The UI configuration component for the pfss plugin
  * 
- * @author Simon Spšrri (simon.spoerri@fhnw.ch)
+ * @author Simon Spoerri (simon.spoerri@fhnw.ch)
  * 
  */
 public class PfssConfigPanel extends JPanel {

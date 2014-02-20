@@ -22,7 +22,7 @@ import org.helioviewer.viewmodel.view.ViewHelper;
  * delegated to the {@link GL3DCamera} and Key Events to the singleton
  * {@link GL3DKeyController}.
  * 
- * @author Simon Spšrri (simon.spoerri@fhnw.ch)
+ * @author Simon Spoerri (simon.spoerri@fhnw.ch)
  * 
  */
 public class GL3DCameraMouseController extends AbstractImagePanelMouseController implements KeyListener {

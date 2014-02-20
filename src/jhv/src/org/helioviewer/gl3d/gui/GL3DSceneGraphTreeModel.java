@@ -19,7 +19,7 @@ import org.helioviewer.viewmodel.view.ComponentView;
  * Wraps the Scene managed by the {@link GL3DSceneGraphView} in a
  * {@link TreeModel}.
  * 
- * @author Simon Spšrri (simon.spoerri@fhnw.ch)
+ * @author Simon Spoerri (simon.spoerri@fhnw.ch)
  * 
  */
 public class GL3DSceneGraphTreeModel implements TreeModel {

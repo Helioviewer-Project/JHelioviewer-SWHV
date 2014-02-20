@@ -11,7 +11,7 @@ import java.util.List;
  * {@link GL3DCameraMouseController}. Register a GL3DKeyListener to be informed
  * about KeyEvents.
  * 
- * @author Simon Spšrri (simon.spoerri@fhnw.ch)
+ * @author Simon Spoerri (simon.spoerri@fhnw.ch)
  * 
  */
 public class GL3DKeyController extends KeyAdapter {

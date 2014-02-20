@@ -18,7 +18,7 @@ import org.helioviewer.gl3d.scenegraph.GL3DNode;
 /**
  * Internal representation of a file based vector field.
  * 
- * @author Simon Spšrri (simon.spoerri@fhnw.ch)
+ * @author Simon Spoerri (simon.spoerri@fhnw.ch)
  * 
  */
 public class VectorsFileModel {

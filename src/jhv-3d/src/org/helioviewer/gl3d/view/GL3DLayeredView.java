@@ -24,7 +24,7 @@ import org.helioviewer.viewmodel.view.opengl.GLView;
 /**
  * The GL3DLayeredView makes sure to add all required sub-views to a new layer.
  * 
- * @author Simon Sp�rri (simon.spoerri@fhnw.ch)
+ * @author Simon Spoerri (simon.spoerri@fhnw.ch)
  * 
  */
 public class GL3DLayeredView extends GLLayeredView implements GL3DView, LayeredView, RegionView, ViewportView {

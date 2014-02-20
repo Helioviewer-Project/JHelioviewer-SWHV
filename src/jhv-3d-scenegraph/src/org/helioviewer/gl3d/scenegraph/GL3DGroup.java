@@ -13,7 +13,7 @@ import org.helioviewer.gl3d.scenegraph.visuals.GL3DPolyLine;
  * is also a {@link GL3DShape} thus can be moved around in the world space, has its own
  * {@link GL3DDrawBits} and wraps its {@link GL3DAABBox} around its child nodes.
  * 
- * @author Simon Sp�rri (simon.spoerri@fhnw.ch)
+ * @author Simon Spoerri (simon.spoerri@fhnw.ch)
  *
  */
 public class GL3DGroup extends GL3DShape {

@@ -5,7 +5,7 @@ package org.helioviewer.gl3d.wcs;
  * provided {@link CoordinateVector} is not valid within its
  * {@link CoordinateSystem}.
  * 
- * @author Simon Spšrri (simon.spoerri@fhnw.ch)
+ * @author Simon Spoerri (simon.spoerri@fhnw.ch)
  * 
  */
 public class IllegalCoordinateVectorException extends IllegalArgumentException {

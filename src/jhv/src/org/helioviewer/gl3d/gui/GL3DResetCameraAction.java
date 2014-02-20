@@ -13,7 +13,7 @@ import org.helioviewer.jhv.gui.IconBank.JHVIcon;
  * Action that resets the view transformation of the current {@link GL3DCamera}
  * to its default settings.
  * 
- * @author Simon Spšrri (simon.spoerri@fhnw.ch)
+ * @author Simon Spoerri (simon.spoerri@fhnw.ch)
  * 
  */
 public class GL3DResetCameraAction extends AbstractAction {

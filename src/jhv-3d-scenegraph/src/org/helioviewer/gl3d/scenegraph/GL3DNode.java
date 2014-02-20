@@ -7,7 +7,7 @@ import org.helioviewer.gl3d.scenegraph.rt.GL3DRay;
  * A {@link GL3DNode} is the base class for all nodes within the scene graph. It
  * defines the structure and basic attributes of every node.
  * 
- * @author Simon Sp�rri (simon.spoerri@fhnw.ch)
+ * @author Simon Spoerri (simon.spoerri@fhnw.ch)
  * 
  */
 public abstract class GL3DNode {

@@ -7,7 +7,7 @@ import org.helioviewer.gl3d.scenegraph.GL3DGroup;
 /**
  * Every 3D plugin must implement this interface.
  * 
- * @author Simon Spšrri (simon.spoerri@fhnw.ch)
+ * @author Simon Spoerri (simon.spoerri@fhnw.ch)
  * 
  */
 public interface GL3DModelPlugin {

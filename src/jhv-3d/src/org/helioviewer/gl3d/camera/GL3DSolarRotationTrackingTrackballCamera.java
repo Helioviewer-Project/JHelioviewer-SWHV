@@ -31,7 +31,7 @@ import org.helioviewer.viewmodel.view.jp2view.datetime.ImmutableDateTime;
  * Y-Axis (pointing to solar north) by an amount calculated through
  * {@link DifferentialRotation}.
  * 
- * @author Simon Spšrri (simon.spoerri@fhnw.ch)
+ * @author Simon Spoerri (simon.spoerri@fhnw.ch)
  * 
  */
 public class GL3DSolarRotationTrackingTrackballCamera extends GL3DBaseTrackballCamera implements ViewListener {

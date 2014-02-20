@@ -22,7 +22,7 @@ import org.helioviewer.viewmodel.view.ComponentView;
  * active {@link GL3DCamera}. Also it implements the {@link ComboBoxModel} and
  * {@link ListModel} and can thus be used for GUI elements directly.
  * 
- * @author Simon Spšrri (simon.spoerri@fhnw.ch)
+ * @author Simon Spoerri (simon.spoerri@fhnw.ch)
  * 
  */
 public class GL3DCameraSelectorModel extends AbstractListModel implements ComboBoxModel {

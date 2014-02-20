@@ -30,7 +30,7 @@ import org.helioviewer.viewmodel.view.ViewListener;
  * {@link GL3DTrackballRotationInteraction}) when in rotation mode. It is
  * currently the default camera.
  * 
- * @author Simon Spšrri (simon.spoerri@fhnw.ch)
+ * @author Simon Spoerri (simon.spoerri@fhnw.ch)
  * 
  */
 public class GL3DBaseTrackballCamera extends GL3DCamera{

@@ -7,7 +7,7 @@ import org.helioviewer.gl3d.scenegraph.math.GL3DVec3d;
  * This animation rotates the camera from a startpoint to an endpoint by using
  * the {@link GL3DQuatd}'s slerp interpolation.
  * 
- * @author Simon Spšrri (simon.spoerri@fhnw.ch)
+ * @author Simon Spoerri (simon.spoerri@fhnw.ch)
  * 
  */
 public class GL3DCameraRotationAnimation implements GL3DCameraAnimation {

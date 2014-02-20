@@ -8,7 +8,7 @@ import javax.media.opengl.GLEventListener;
  * Adapter for a {@link GLEventListener}. Add an adapter to the
  * {@link GL3DComponentView}'s getComponent().
  * 
- * @author Simon Spšrri (simon.spoerri@fhnw.ch)
+ * @author Simon Spoerri (simon.spoerri@fhnw.ch)
  * 
  */
 public class GL3DGLEventAdapter implements GLEventListener {

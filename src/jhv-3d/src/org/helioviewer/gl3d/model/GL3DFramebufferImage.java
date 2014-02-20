@@ -18,7 +18,7 @@ import org.helioviewer.viewmodel.view.opengl.GLTextureHelper;
 /**
  * Helper Node to visualize the current content of the Framebuffer.
  * 
- * @author Simon Sp�rri (simon.spoerri@fhnw.ch)
+ * @author Simon Spoerri (simon.spoerri@fhnw.ch)
  * 
  */
 public class GL3DFramebufferImage extends GL3DMesh implements ViewListener {

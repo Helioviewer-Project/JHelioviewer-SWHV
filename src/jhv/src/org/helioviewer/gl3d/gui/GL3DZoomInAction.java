@@ -10,7 +10,7 @@ import org.helioviewer.jhv.gui.actions.ZoomInAction;
  * Action that zooms in, which reduces the distance of the {@link GL3DCamera} to
  * the sun.
  * 
- * @author Simon Spšrri (simon.spoerri@fhnw.ch)
+ * @author Simon Spoerri (simon.spoerri@fhnw.ch)
  * 
  */
 public class GL3DZoomInAction extends ZoomInAction {

@@ -17,7 +17,7 @@ import org.helioviewer.viewmodel.view.View;
  * the displayed viewport. For 3D this results in a change in the
  * {@link GL3DCamera}'s distance to the sun.
  * 
- * @author Simon Spšrri (simon.spoerri@fhnw.ch)
+ * @author Simon Spoerri (simon.spoerri@fhnw.ch)
  * 
  */
 public class GL3DZoomFitAction extends ZoomFitAction {
