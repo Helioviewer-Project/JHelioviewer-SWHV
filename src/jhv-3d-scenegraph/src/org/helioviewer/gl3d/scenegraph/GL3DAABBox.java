@@ -16,7 +16,7 @@ import org.helioviewer.gl3d.scenegraph.rt.GL3DRay;
  * intersection tests with Graph nodes. The Box is built by using the maximal
  * coordinates in each dimensions
  * 
- * @author Simon Spšrri (simon.spoerri@fhnw.ch)
+ * @author Simon Spoerri (simon.spoerri@fhnw.ch)
  * 
  */
 public class GL3DAABBox {

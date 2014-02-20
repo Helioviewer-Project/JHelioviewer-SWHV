@@ -9,7 +9,7 @@ import org.helioviewer.viewmodel.view.opengl.AbstractGLView;
  * Default super class for all {@link GL3DView}s. Provides default behavior like
  * view chain traversal.
  * 
- * @author Simon Sp�rri (simon.spoerri@fhnw.ch)
+ * @author Simon Spoerri (simon.spoerri@fhnw.ch)
  * 
  */
 public abstract class AbstractGL3DView extends AbstractGLView implements GL3DView {

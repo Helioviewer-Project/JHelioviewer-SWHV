@@ -13,7 +13,7 @@ import org.helioviewer.gl3d.scenegraph.GL3DNode;
 /**
  * Plugin Internal representation of a file based PFSS Model
  * 
- * @author Simon Spšrri (simon.spoerri@fhnw.ch)
+ * @author Simon Spoerri (simon.spoerri@fhnw.ch)
  * 
  */
 public class PfssFileModel {

@@ -3,7 +3,7 @@ package org.helioviewer.gl3d.wcs;
 /**
  * A generic 2-dimensional cartesian {@link CoordinateSystem}.
  * 
- * @author Simon Spšrri (simon.spoerri@fhnw.ch)
+ * @author Simon Spoerri (simon.spoerri@fhnw.ch)
  * 
  */
 public class Cartesian2DCoordinateSystem extends AbstractCoordinateSystem implements CoordinateSystem {

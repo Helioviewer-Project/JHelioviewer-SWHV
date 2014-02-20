@@ -4,11 +4,11 @@ package org.helioviewer.gl3d.wcs;
  * Defines the unit a {@link CoordinateDimension} is defined in. See the
  * {@link UnitConverterFactory} for ways to convert to different Units.
  * 
- * @author Simon Spšrri (simon.spoerri@fhnw.ch)
+ * @author Simon Spoerri (simon.spoerri@fhnw.ch)
  * 
  */
 public enum Unit {
-    Meter("m"), Kilometer("km"), Radian("rad"), Degree("¡"), Pixel("px");
+    Meter("m"), Kilometer("km"), Radian("rad"), Degree("Ëš"), Pixel("px");
 
     private String abbreviation;
 

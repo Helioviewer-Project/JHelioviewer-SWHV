@@ -4,7 +4,7 @@ package org.helioviewer.gl3d.wcs;
  * Provides {@link UnitConverter}s. These again provide factors that canb e used
  * convert {@link CoordinateVector} from one unit to others.
  * 
- * @author Simon Spšrri (simon.spoerri@fhnw.ch)
+ * @author Simon Spoerri (simon.spoerri@fhnw.ch)
  * 
  */
 public class UnitConverterFactory {

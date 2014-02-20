@@ -10,7 +10,7 @@ import org.helioviewer.gl3d.wcs.CoordinateSystem;
  * PFSS Dimension DataStructure
  * 
  * @author Robin Oster (robin.oster@students.fhnw.ch)
- * @author Simon Spšrri (simon.spoerri@fhnw.ch): Added b0, l0 and
+ * @author Simon Spoerri (simon.spoerri@fhnw.ch): Added b0, l0 and
  *         CoordinateSystem
  * 
  */

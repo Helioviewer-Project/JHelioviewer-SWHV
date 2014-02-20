@@ -25,7 +25,7 @@ import org.helioviewer.gl3d.view.GL3DImageTextureView;
  * {@link GL3DImageLayer} nodes, because image nodes require special ordering
  * for the blending of different image layers.
  * 
- * @author Simon SpÔøΩrri (simon.spoerri@fhnw.ch)
+ * @author Simon Spoerri (simon.spoerri@fhnw.ch)
  * 
  */
 public class GL3DImageLayers extends GL3DGroup {

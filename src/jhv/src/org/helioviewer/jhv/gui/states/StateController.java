@@ -10,7 +10,7 @@ import org.helioviewer.jhv.opengl.GLInfo;
  * {@link StateChangeListener}s can be added for notifications about the current
  * state. By default, the 3D state is enabled.
  * 
- * @author Simon Spšrri (simon.spoerri@fhnw.ch)
+ * @author Simon Spoerri (simon.spoerri@fhnw.ch)
  * 
  */
 public class StateController {

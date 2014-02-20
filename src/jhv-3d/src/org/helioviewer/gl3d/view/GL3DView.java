@@ -8,7 +8,7 @@ import org.helioviewer.viewmodel.view.opengl.GLView;
  * correctly when directly attached to another 3D view. Do not add a 3D view
  * after a 2D view!
  * 
- * @author Simon Spšrri (simon.spoerri@fhnw.ch)
+ * @author Simon Spoerri (simon.spoerri@fhnw.ch)
  * 
  */
 public interface GL3DView extends GLView {

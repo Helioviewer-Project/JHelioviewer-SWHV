@@ -33,7 +33,7 @@ import org.helioviewer.viewmodel.view.opengl.shader.GLVertexShaderProgram;
  * covers the entire solar disc or the just the part that is visible in the view
  * frustum.
  * 
- * @author Simon Sp�rri (simon.spoerri@fhnw.ch)
+ * @author Simon Spoerri (simon.spoerri@fhnw.ch)
  * 
  */
 public class GL3DImageSphere extends GL3DImageMesh {

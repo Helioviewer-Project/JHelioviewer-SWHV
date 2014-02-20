@@ -20,7 +20,7 @@ import org.helioviewer.viewmodel.viewportimagesize.ViewportImageSize;
  * projection. This is required so that the 2D sub-chain can still render with
  * an orthographic projection.
  * 
- * @author Simon Sp�rri (simon.spoerri@fhnw.ch)
+ * @author Simon Spoerri (simon.spoerri@fhnw.ch)
  * 
  */
 public class GL3DOrthoView extends AbstractGL3DView implements GL3DView {

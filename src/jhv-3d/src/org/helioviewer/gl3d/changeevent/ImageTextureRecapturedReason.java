@@ -10,7 +10,7 @@ import org.helioviewer.viewmodel.view.View;
  * The ChangedReason that is emitted when the {@link GL3DImageTextureView}
  * recaptured the image that was produced by the underlying 2D sub-viewchain.
  * 
- * @author Simon Spšrri (simon.spoerri@fhnw.ch)
+ * @author Simon Spoerri (simon.spoerri@fhnw.ch)
  */
 public class ImageTextureRecapturedReason implements ChangedReason {
 

@@ -15,7 +15,7 @@ import org.helioviewer.gl3d.scenegraph.visuals.GL3DTrianglesCone;
  * sun. It accelerates the rendering of multiple vectors by merging them
  * together into a GL3DMergeMesh, where all vectors are drawn in one draw call.
  * 
- * @author Simon Spšrri (simon.spoerri@fhnw.ch)
+ * @author Simon Spoerri (simon.spoerri@fhnw.ch)
  * 
  */
 public class GL3DVectorfield extends GL3DMergeMesh {

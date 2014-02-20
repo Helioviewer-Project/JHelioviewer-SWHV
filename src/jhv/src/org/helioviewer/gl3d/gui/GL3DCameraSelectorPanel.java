@@ -16,7 +16,7 @@ import javax.swing.JPanel;
  * the client, because the 3D solar rotation tracking is implemented by using a
  * special camera.
  * 
- * @author Simon Spšrri (simon.spoerri@fhnw.ch)
+ * @author Simon Spoerri (simon.spoerri@fhnw.ch)
  * 
  */
 public class GL3DCameraSelectorPanel extends JPanel {

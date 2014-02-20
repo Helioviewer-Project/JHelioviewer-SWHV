@@ -11,7 +11,7 @@ import org.helioviewer.gl3d.wcs.CoordinateVector;
  * provided by its superclass. Extend this class to implement Coordinate System
  * sensitive 3D content.
  * 
- * @author Simon Sp�rri (simon.spoerri@fhnw.ch)
+ * @author Simon Spoerri (simon.spoerri@fhnw.ch)
  * 
  */
 public abstract class GL3DOrientedGroup extends GL3DCoordinateSystemGroup {

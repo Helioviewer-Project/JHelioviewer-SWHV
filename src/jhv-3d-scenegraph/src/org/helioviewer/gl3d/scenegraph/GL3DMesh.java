@@ -22,7 +22,7 @@ import org.helioviewer.gl3d.scenegraph.rt.GL3DRay;
  * must provide these attributes and indices which will be converted to
  * {@link GL3DBuffer}.
  * 
- * @author Simon Sp�rri (simon.spoerri@fhnw.ch)
+ * @author Simon Spoerri (simon.spoerri@fhnw.ch)
  * 
  */
 public abstract class GL3DMesh extends GL3DShape {

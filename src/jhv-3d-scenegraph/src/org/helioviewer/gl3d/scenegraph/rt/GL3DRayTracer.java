@@ -11,7 +11,7 @@ import org.helioviewer.gl3d.scenegraph.math.GL3DVec3d;
  * Also, the rayTracer does necessarily need to traverse the whole scene graph,
  * also subnodes can be used as root nodes for the Ray Tracer.
  * 
- * @author Simon Sp�rri (simon.spoerri@fhnw.ch)
+ * @author Simon Spoerri (simon.spoerri@fhnw.ch)
  * 
  */
 public class GL3DRayTracer {

@@ -12,7 +12,7 @@ import org.helioviewer.gl3d.wcs.IllegalCoordinateVectorException;
  * TODO: let GL3DVec3d implement a CoordinateVector interface to get rid of this
  * class
  * 
- * @author Simon Spšrri (simon.spoerri@fhnw.ch)
+ * @author Simon Spoerri (simon.spoerri@fhnw.ch)
  * 
  */
 public class GL3DHelper {

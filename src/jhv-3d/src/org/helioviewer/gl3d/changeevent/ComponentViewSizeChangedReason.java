@@ -7,7 +7,7 @@ import org.helioviewer.viewmodel.view.View;
 /**
  * ChangedReason when the GL Component was resized.
  * 
- * @author Simon Spšrri (simon.spoerri@fhnw.ch)
+ * @author Simon Spoerri (simon.spoerri@fhnw.ch)
  * 
  */
 public class ComponentViewSizeChangedReason implements ChangedReason {

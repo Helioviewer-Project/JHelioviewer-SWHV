@@ -19,7 +19,7 @@ import org.helioviewer.gl3d.scenegraph.GL3DState;
  * Feedback by overriding the corresponding method, which is called at the end
  * of each renderloop.
  * 
- * @author Simon Spšrri (simon.spoerri@fhnw.ch)
+ * @author Simon Spoerri (simon.spoerri@fhnw.ch)
  * 
  */
 public abstract class GL3DInteraction implements MouseWheelListener, MouseMotionListener, MouseListener {

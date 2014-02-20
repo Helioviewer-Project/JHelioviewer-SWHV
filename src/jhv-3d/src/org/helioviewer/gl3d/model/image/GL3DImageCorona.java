@@ -26,7 +26,7 @@ import org.helioviewer.viewmodel.view.opengl.shader.GLVertexShaderProgram;
 /**
  * A GL3DImageCorona maps the coronal part of an image layer onto an image plane
  * 
- * @author Simon SpÔøΩrri (simon.spoerri@fhnw.ch)
+ * @author Simon Spoerri (simon.spoerri@fhnw.ch)
  * 
  */
 public class GL3DImageCorona extends GL3DImageMesh {

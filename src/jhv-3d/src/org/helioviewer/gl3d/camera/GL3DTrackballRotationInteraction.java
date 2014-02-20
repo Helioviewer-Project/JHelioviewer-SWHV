@@ -19,7 +19,7 @@ import org.helioviewer.jhv.display.Displayer;
  * Quaternion between two points on a sphere. These points are retrieved by
  * using the raycasting mechanism provided by {@link GL3DRayTracer}.
  * 
- * @author Simon Spšrri (simon.spoerri@fhnw.ch)
+ * @author Simon Spoerri (simon.spoerri@fhnw.ch)
  * 
  */
 public class GL3DTrackballRotationInteraction extends GL3DDefaultInteraction {

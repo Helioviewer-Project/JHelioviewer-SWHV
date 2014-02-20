@@ -21,7 +21,7 @@ import org.helioviewer.gl3d.scenegraph.rt.GL3DRay;
  * detection when used for determining the region of interest on the image
  * meshes.
  * 
- * @author Simon Sp�rri (simon.spoerri@fhnw.ch)
+ * @author Simon Spoerri (simon.spoerri@fhnw.ch)
  * 
  */
 public class GL3DHitReferenceShape extends GL3DMesh {

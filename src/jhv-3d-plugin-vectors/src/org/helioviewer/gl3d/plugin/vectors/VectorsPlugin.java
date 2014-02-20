@@ -9,7 +9,7 @@ import org.helioviewer.gl3d.plugin.GL3DModelPlugin;
  * This plugin visualizes vector fields derived from SOT/Hinode images using
  * colored vectors. It can read FITS files to import vector fields.
  * 
- * @author Simon Spšrri (simon.spoerri@fhnw.ch)
+ * @author Simon Spoerri (simon.spoerri@fhnw.ch)
  * 
  */
 public class VectorsPlugin extends GL3DAbstractModelPlugin implements GL3DModelPlugin {

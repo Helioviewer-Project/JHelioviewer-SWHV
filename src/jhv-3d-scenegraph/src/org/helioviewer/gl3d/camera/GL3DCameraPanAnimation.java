@@ -6,7 +6,7 @@ import org.helioviewer.gl3d.scenegraph.math.GL3DVec3d;
  * This animations changes the camera's panning (x- and y-translation) by the
  * specified amount.
  * 
- * @author Simon Spšrri (simon.spoerri@fhnw.ch)
+ * @author Simon Spoerri (simon.spoerri@fhnw.ch)
  * 
  */
 public class GL3DCameraPanAnimation implements GL3DCameraAnimation {

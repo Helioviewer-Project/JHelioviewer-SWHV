@@ -3,7 +3,7 @@ package org.helioviewer.gl3d.plugin.pfss.data;
 /**
  * Exception that is raised when the PfssPlugin cannot read a given input file.
  * 
- * @author Simon Spšrri (simon.spoerri@fhnw.ch)
+ * @author Simon Spoerri (simon.spoerri@fhnw.ch)
  * 
  */
 public class IncorrectPfssFileException extends Exception {

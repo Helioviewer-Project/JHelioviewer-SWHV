@@ -21,7 +21,7 @@ import org.helioviewer.viewmodel.view.opengl.shader.GLVertexShaderProgram;
  * sub-chain onto a mesh. The image is provided as a texture that was created by
  * a {@link GL3DImageTextureView}.
  * 
- * @author Simon Sp�rri (simon.spoerri@fhnw.ch)
+ * @author Simon Spoerri (simon.spoerri@fhnw.ch)
  * 
  */
 public abstract class GL3DImageMesh extends GL3DMesh {

@@ -7,7 +7,7 @@ import org.helioviewer.viewmodel.view.View;
 /**
  * ChangedReason when the active {@link GL3DCamera} has changed.
  * 
- * @author Simon Spšrri (simon.spoerri@fhnw.ch)
+ * @author Simon Spoerri (simon.spoerri@fhnw.ch)
  * 
  */
 public class CameraChangeChangedReason implements ChangedReason {

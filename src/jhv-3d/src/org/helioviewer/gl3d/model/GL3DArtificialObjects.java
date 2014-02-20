@@ -17,7 +17,7 @@ import org.helioviewer.gl3d.scenegraph.visuals.GL3DSunGrid;
  * Grouping Object for all artificial objects, that is visual assistance objects
  * that do not represent any real data.
  * 
- * @author Simon Sp�rri (simon.spoerri@fhnw.ch)
+ * @author Simon Spoerri (simon.spoerri@fhnw.ch)
  * 
  */
 public class GL3DArtificialObjects extends GL3DGroup {

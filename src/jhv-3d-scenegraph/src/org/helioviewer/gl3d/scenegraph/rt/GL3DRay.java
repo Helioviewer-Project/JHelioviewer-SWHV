@@ -11,7 +11,7 @@ import org.helioviewer.gl3d.scenegraph.math.GL3DVec3d;
  * stores required attributes for a fast ray casting. {@link GL3DRay}s should be
  * created by the {@link GL3DRayTracer}.
  * 
- * @author Simon Sp�rri (simon.spoerri@fhnw.ch)
+ * @author Simon Spoerri (simon.spoerri@fhnw.ch)
  * 
  */
 public class GL3DRay {

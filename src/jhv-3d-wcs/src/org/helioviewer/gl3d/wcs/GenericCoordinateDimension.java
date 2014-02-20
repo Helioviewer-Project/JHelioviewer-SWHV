@@ -3,7 +3,7 @@ package org.helioviewer.gl3d.wcs;
 /**
  * A standard implementation of a {@link CoordinateDimension}.
  * 
- * @author Simon Spšrri (simon.spoerri@fhnw.ch)
+ * @author Simon Spoerri (simon.spoerri@fhnw.ch)
  * 
  */
 public class GenericCoordinateDimension implements CoordinateDimension {

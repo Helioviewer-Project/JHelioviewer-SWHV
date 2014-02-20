@@ -16,7 +16,7 @@ import org.helioviewer.jhv.gui.components.TopToolBar;
 /**
  * The ToolBar that is used for the 3D Mode.
  * 
- * @author Simon Sp�rri (simon.spoerri@fhnw.ch)
+ * @author Simon Spoerri (simon.spoerri@fhnw.ch)
  */
 public class GL3DTopToolBar extends TopToolBar implements MouseListener {
 

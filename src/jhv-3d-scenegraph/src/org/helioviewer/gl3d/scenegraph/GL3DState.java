@@ -17,7 +17,7 @@ import org.helioviewer.gl3d.scenegraph.math.GL3DMat4d;
  * and stores some globally relevant information such as width and height of the
  * viewport, etc. Also it allows for the stacking of the view transformations.
  * 
- * @author Simon Spšrri (simon.spoerri@fhnw.ch)
+ * @author Simon Spoerri (simon.spoerri@fhnw.ch)
  * 
  */
 public class GL3DState {

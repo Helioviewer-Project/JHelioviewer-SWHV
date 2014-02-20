@@ -6,7 +6,7 @@ import java.util.List;
 /**
  * Basic implementation of a {@link CoordinateSystem}.
  * 
- * @author Simon Spšrri (simon.spoerri@fhnw.ch)
+ * @author Simon Spoerri (simon.spoerri@fhnw.ch)
  * 
  */
 public abstract class AbstractCoordinateSystem implements CoordinateSystem {

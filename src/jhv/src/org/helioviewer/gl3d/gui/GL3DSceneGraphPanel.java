@@ -16,7 +16,7 @@ import org.helioviewer.jhv.gui.ImageViewerGui;
  * Would show the Scene Graph managed by the {@link GL3DSceneGraphView} in a
  * JTree
  * 
- * @author Simon Spšrri (simon.spoerri@fhnw.ch)
+ * @author Simon Spoerri (simon.spoerri@fhnw.ch)
  * 
  */
 public class GL3DSceneGraphPanel extends JPanel {

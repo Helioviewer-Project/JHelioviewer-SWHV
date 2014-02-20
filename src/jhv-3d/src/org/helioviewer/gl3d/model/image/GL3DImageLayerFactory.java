@@ -12,7 +12,7 @@ import org.helioviewer.viewmodel.view.MetaDataView;
  * Factory to be used for creating GL3DImageLayer Objects. This class is used by
  * the GL3DSceneGraphView.
  * 
- * @author Simon Sp�rri (simon.spoerri@fhnw.ch)
+ * @author Simon Spoerri (simon.spoerri@fhnw.ch)
  * 
  */
 public class GL3DImageLayerFactory {
