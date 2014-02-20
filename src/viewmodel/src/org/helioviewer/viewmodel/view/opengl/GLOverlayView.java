@@ -91,7 +91,7 @@ public class GLOverlayView extends AbstractGLView implements OverlayView{
 	 * {@inheritDoc}
 	 */
 	public void viewChanged(View sender, ChangeEvent aEvent) {
-		Log.debug("viewChange: sender : " + sender);
+		//Log.debug("viewChange: sender : " + sender);
 		if (aEvent.reasonOccurred(RegionChangedReason.class)){
 				
 			GLLayeredView layeredView = sender.getAdapter(GLLayeredView.class);

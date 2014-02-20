@@ -211,7 +211,7 @@ public class BufferedImageTimeMachineView extends AbstractBasicView implements S
      * @see org.helioviewer.viewmodel.imagedata.ImageData.SubimataDataView#getSubimageData()
      */
     public ImageData getSubimageData() {
-        Log.info("TimeMachine::getSubimageData() -> pass through frame " + movieView.getCurrentFrameNumber());
+        //Log.info("TimeMachine::getSubimageData() -> pass through frame " + movieView.getCurrentFrameNumber());
         // Update and check the frame number
         int newFrameNumber = movieView.getCurrentFrameNumber();
         if (newFrameNumber - frameNumber != 1) {
@@ -225,8 +225,8 @@ public class BufferedImageTimeMachineView extends AbstractBasicView implements S
         previousCache.addFirst(newFrame);
         while (previousCache.size() > cacheSize)
             previousCache.removeLast();
-        System.out.println("New cache: ");
-        Log.info("TimeMachine::getSubimageData() -> new cache size " + previousCache.size());
+        //System.out.println("New cache: ");
+        //Log.info("TimeMachine::getSubimageData() -> new cache size " + previousCache.size());
         return newFrame;
     }
 
@@ -371,7 +371,7 @@ public class BufferedImageTimeMachineView extends AbstractBasicView implements S
      * @see org.helioviewer.viewmodel.view.ViewListener#viewChanged(org.helioviewer.viewmodel.view.View,org.helioviewer.viewmodel.changeevent.ChangeEvent)
      */
     public void viewChanged(View sender, ChangeEvent aEvent) {
-        System.out.println("Master view changed " + aEvent);
+        //System.out.println("Master view changed " + aEvent);
         // The region and viewport changes are already redirected to the slave
         // view chain
         if (aEvent.reasonOccurred(ViewChainChangedReason.class)) {

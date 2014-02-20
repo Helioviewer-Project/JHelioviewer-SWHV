@@ -242,7 +242,7 @@ public class GL3DSceneGraphView extends AbstractGL3DView implements GL3DView {
             layeredView.addViewListener(new ViewListener() {
 
                 public void viewChanged(View sender, ChangeEvent aEvent) {
-                	Log.debug("viewChange: sender : " + sender);
+                	//Log.debug("viewChange: sender : " + sender);
                     if (aEvent.reasonOccurred(LayerChangedReason.class)) {
                         LayerChangedReason reason = aEvent.getLastChangedReasonByType(LayerChangedReason.class);
                         handleLayerChange(reason);
@@ -253,7 +253,7 @@ public class GL3DSceneGraphView extends AbstractGL3DView implements GL3DView {
             for (int i = 0; i < layeredView.getNumLayers(); i++) {
                 View layer = layeredView.getLayer(i);
                 this.addNewLayer(layer.getAdapter(GL3DImageTextureView.class));
-                Log.debug("GL3DSceneGraphView: Adding Layer to Scene form LayeredView " + layer);
+                //Log.debug("GL3DSceneGraphView: Adding Layer to Scene form LayeredView " + layer);
             }
         }
     }

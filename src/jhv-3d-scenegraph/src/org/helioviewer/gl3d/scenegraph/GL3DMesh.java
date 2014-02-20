@@ -6,6 +6,7 @@ import java.util.concurrent.locks.ReentrantLock;
 
 import javax.media.opengl.GL;
 
+import org.helioviewer.base.logging.Log;
 import org.helioviewer.base.physics.Constants;
 import org.helioviewer.gl3d.scenegraph.GL3DDrawBits.Bit;
 import org.helioviewer.gl3d.scenegraph.math.GL3DVec2d;
@@ -164,6 +165,7 @@ public abstract class GL3DMesh extends GL3DShape {
                 state.gl.glDisable(GL.GL_TEXTURE_2D);
             }
             // GL3DState.get().checkGLErrors("GL3DImageMesh.beforeDrawCall "+getName());
+
             state.gl.glDrawElements(primitive.id, this.indexVBO.numberOfElements, this.indexVBO.dataType.id, 0);
             // state.gl.glFinish();
             GL3DState.get().checkGLErrors("GL3DImageMesh.afterDrawCall " + getName() + " IndexVBO: " + this.indexVBO.id);
