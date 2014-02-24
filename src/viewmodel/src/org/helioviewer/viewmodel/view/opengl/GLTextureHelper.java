@@ -859,7 +859,6 @@ public class GLTextureHelper {
          * {@inheritDoc}
          */
     	private int bytebufferlength;
-        private ByteBuffer b = ByteBuffer.allocate(4194304);
 
         public void genTexture1D(GL gl, int texID, int internalFormat, int width, int inputFormat, int inputType, Buffer buffer) {
 
@@ -921,15 +920,9 @@ public class GLTextureHelper {
                 bpp*=2;
                 break;
             }
-            int buflength = width2*height2*bpp;
-            if(buflength>this.bytebufferlength){
-            	this.bytebufferlength = buflength;
-            	b =ByteBuffer.allocate(this.bytebufferlength);
-            }
-            b.limit(width2*height2*bpp);
-            gl.glTexImage2D(GL.GL_TEXTURE_2D, 0, internalFormat, width2, height2, 0, inputFormat, inputType, b);
             
-            // Log.debug("GLTextureHelper.genTexture2D: Width="+width+", Height="+height+" Width2="+width2+", Height2="+height2);
+            gl.glTexImage2D(GL.GL_TEXTURE_2D, 0, internalFormat, width2, height2, 0, inputFormat, inputType, null);
+           
             if (buffer != null) {
             	gl.glTexSubImage2D(GL.GL_TEXTURE_2D, 0, 0, 0, width, height, inputFormat, inputType, buffer);
             }
