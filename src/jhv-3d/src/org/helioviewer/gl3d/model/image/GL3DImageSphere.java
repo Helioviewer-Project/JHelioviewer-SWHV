@@ -99,8 +99,8 @@ public class GL3DImageSphere extends GL3DImageMesh {
                 phiRotation = GL3DMat4d.rotation(phi, new GL3DVec3d(0, 1, 0));
              }
              
-    		 int resolutionX = 25;
-    		 int resolutionY = 25;
+    		 int resolutionX = 40;
+    		 int resolutionY = 40;
 
 			 for ( int stackNumber = 0; stackNumber <= resolutionX; ++stackNumber)
 			 {
