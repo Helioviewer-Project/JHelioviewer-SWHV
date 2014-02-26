@@ -335,7 +335,7 @@ public class APIRequestManager {
         if (addToViewChain) {
             // ViewchainFactory factory = new ViewchainFactory();
             ViewchainFactory factory = StateController.getInstance().getCurrentState().getViewchainFactory();
-            // FIXME: Simon Sp�rri, properly resolve State dependencies
+            // FIXME: Simon Sp���rri, properly resolve State dependencies
             factory.addLayerToViewchainMain(view, ImageViewerGui.getSingletonInstance().getMainView());
         }
         return view;
@@ -345,6 +345,9 @@ public class APIRequestManager {
      * Method does remote opening. If image series, file is downloaded. If
      * single frame, file is opened via JPIP on delphi.nascom.nasa.gov:8090.
      * 
+     * @param addToViewChain
+     *            specifies whether the generated ImageInfoView should be added
+     *            to the view chain of the main image
      * @param cadence
      *            cadence between two frames (null for single images).
      * @param startTime
@@ -362,11 +365,11 @@ public class APIRequestManager {
      * @return new view
      * @throws IOException
      */
-    public static ImageInfoView requestAndOpenRemoteFile(String cadence, String startTime, String endTime, String observatory, String instrument, String detector, String measurement) throws IOException {
+    public static ImageInfoView requestAndOpenRemoteFile(boolean addToViewChain, String cadence, String startTime, String endTime, String observatory, String instrument, String detector, String measurement) throws IOException {
         if (endTime.equals("")) {
-            return loadImage(true, observatory, instrument, detector, measurement, startTime);
+            return loadImage(addToViewChain, observatory, instrument, detector, measurement, startTime);
         } else {
-            return loadImageSeries(true, observatory, instrument, detector, measurement, startTime, endTime, cadence);
+            return loadImageSeries(addToViewChain, observatory, instrument, detector, measurement, startTime, endTime, cadence);
         }
     }
 }

@@ -19,14 +19,14 @@ import javax.swing.event.MouseInputListener;
 import org.helioviewer.base.math.Interval;
 import org.helioviewer.plugins.eveplugin.base.Range;
 import org.helioviewer.plugins.eveplugin.controller.Band;
-import org.helioviewer.plugins.eveplugin.controller.DrawController;
-import org.helioviewer.plugins.eveplugin.controller.DrawControllerListener;
+import org.helioviewer.plugins.eveplugin.controller.EVEDrawController;
+import org.helioviewer.plugins.eveplugin.controller.EVEDrawControllerListener;
 import org.helioviewer.plugins.eveplugin.controller.EVEValues;
 
 /**
  * @author Stephan Pagel
  * */
-public class ChartDrawValueRangePane extends JComponent implements DrawControllerListener, MouseInputListener{
+public class ChartDrawValueRangePane extends JComponent implements EVEDrawControllerListener, MouseInputListener{
 
     // //////////////////////////////////////////////////////////////////////////////
     // Definitions
@@ -34,7 +34,7 @@ public class ChartDrawValueRangePane extends JComponent implements DrawControlle
     
     private static final long serialVersionUID = 1L;
     
-    private DrawController drawController;
+    private EVEDrawController drawController;
     
     private Range availableRange = new Range();
     private Range selectedRange = new Range();
@@ -56,7 +56,7 @@ public class ChartDrawValueRangePane extends JComponent implements DrawControlle
     // Methods
     // //////////////////////////////////////////////////////////////////////////////
 
-    public ChartDrawValueRangePane(final DrawController drawController) {
+    public ChartDrawValueRangePane(final EVEDrawController drawController) {
         this.drawController = drawController;
         
         initVisualComponents();

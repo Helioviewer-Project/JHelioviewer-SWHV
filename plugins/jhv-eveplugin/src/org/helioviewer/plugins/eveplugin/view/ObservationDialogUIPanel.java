@@ -25,6 +25,7 @@ import org.helioviewer.jhv.gui.components.calendar.JHVCalendarListener;
 import org.helioviewer.jhv.gui.dialogs.observation.ObservationDialog;
 import org.helioviewer.jhv.gui.dialogs.observation.ObservationDialogPanel;
 import org.helioviewer.plugins.eveplugin.controller.BandController;
+import org.helioviewer.plugins.eveplugin.controller.EVECacheController;
 import org.helioviewer.plugins.eveplugin.controller.ZoomController;
 import org.helioviewer.plugins.eveplugin.settings.EVEAPI.API_URL_PARAMETER_TYPE_VALUES;
 import org.helioviewer.plugins.eveplugin.settings.BandType;
@@ -37,17 +38,17 @@ import org.helioviewer.plugins.eveplugin.view.plot.PlotsContainerPanel;
 /**
  * @author Stephan Pagel
  * */
-public class ObservationDialogUIPanel extends ObservationDialogPanel implements JHVCalendarListener, ActionListener {
+public class ObservationDialogUIPanel extends SimpleObservationDialogUIPanel{//ObservationDialogPanel implements JHVCalendarListener, ActionListener {
 
     // //////////////////////////////////////////////////////////////////////////////
     // Definitions
     // //////////////////////////////////////////////////////////////////////////////
     
-    private static final long serialVersionUID = 1L;
+    //private static final long serialVersionUID = 1L;
     
     private static final String[] DATA_LABEL_TEXTS = new String[] {"Band", "Band", "Diodes", "Lines"};
     
-    private final PlotsContainerPanel plotsContainerPanel;
+    /*private final PlotsContainerPanel plotsContainerPanel;
     
     private boolean enableLoadButton = true;
     
@@ -56,7 +57,7 @@ public class ObservationDialogUIPanel extends ObservationDialogPanel implements 
     private final JHVCalendarDatePicker calendarStartDate = new JHVCalendarDatePicker();
     private final JHVCalendarDatePicker calendarEndDate = new JHVCalendarDatePicker();
     
-    private final JComboBox plotComboBox = new JComboBox(new String[] {"Plot 1", "Plot 2"});
+    private final JComboBox plotComboBox = new JComboBox(new String[] {"Plot 1", "Plot 2"});*/
     
     private final JLabel labelGroup = new JLabel("Group");
     private final JLabel labelData = new JLabel();
@@ -72,7 +73,7 @@ public class ObservationDialogUIPanel extends ObservationDialogPanel implements 
     // //////////////////////////////////////////////////////////////////////////////
     
     public ObservationDialogUIPanel(final PlotsContainerPanel plotsContainerPanel) {
-        this.plotsContainerPanel = plotsContainerPanel;
+        super(plotsContainerPanel);
         
         initVisualComponents();
         initGroups();
@@ -80,7 +81,7 @@ public class ObservationDialogUIPanel extends ObservationDialogPanel implements 
     
     private void initVisualComponents() {
         // set up time settings
-        calendarStartDate.setDateFormat(Settings.getSingletonInstance().getProperty("default.date.format"));
+        /*calendarStartDate.setDateFormat(Settings.getSingletonInstance().getProperty("default.date.format"));
         calendarStartDate.addJHVCalendarListener(this);
         calendarStartDate.setToolTipText("Date in UTC starting the observation");
         
@@ -107,7 +108,7 @@ public class ObservationDialogUIPanel extends ObservationDialogPanel implements 
         plotPane.add(plotComboBox);
         
         plotComboBox.addActionListener(this);
-        
+        */
         // set up data selection
         comboBoxGroup.addActionListener(this);
         
@@ -119,9 +120,9 @@ public class ObservationDialogUIPanel extends ObservationDialogPanel implements 
         dataPane.add(comboBoxData);
         
         // set basic layout
-        this.setLayout(new BoxLayout(this, BoxLayout.PAGE_AXIS));
-        this.add(timePane);
-        this.add(plotPane);
+        //this.setLayout(new BoxLayout(this, BoxLayout.PAGE_AXIS));
+        //this.add(timePane);
+        //this.add(plotPane);
         this.add(dataPane);
     }
     
@@ -143,7 +144,7 @@ public class ObservationDialogUIPanel extends ObservationDialogPanel implements 
         final BandController bandController = BandController.getSingletonInstance();
         final DefaultComboBoxModel model = (DefaultComboBoxModel) comboBoxData.getModel(); 
         final BandGroup selectedGroup = (BandGroup) comboBoxGroup.getSelectedItem();
-        final String identifier = plotComboBox.getSelectedIndex() == 0 ? PlotsContainerPanel.PLOT_IDENTIFIER_MASTER : PlotsContainerPanel.PLOT_IDENTIFIER_SLAVE;
+        final String identifier = super.getPlotComboBoxSelectedIndex() == 0 ? PlotsContainerPanel.PLOT_IDENTIFIER_MASTER : PlotsContainerPanel.PLOT_IDENTIFIER_SLAVE;
         final BandType[] values = BandTypeAPI.getSingletonInstance().getBandTypes(selectedGroup);
         
         model.removeAllElements();
@@ -158,11 +159,11 @@ public class ObservationDialogUIPanel extends ObservationDialogPanel implements 
             comboBoxData.setSelectedIndex(0);   
         }
         
-        enableLoadButton = model.getSize() > 0;
-        ObservationDialog.getSingletonInstance().setLoadButtonEnabled(enableLoadButton);
+        super.setLoadButtonEnabled(model.getSize() > 0);
+        ObservationDialog.getSingletonInstance().setLoadButtonEnabled(super.getLoadButtonEnabled());
     }
     
-    public void setStartDate(final Date start) {
+    /*public void setStartDate(final Date start) {
         calendarStartDate.setDate(start);
     }
     
@@ -176,7 +177,7 @@ public class ObservationDialogUIPanel extends ObservationDialogPanel implements 
     
     public Date getEndDate() {
         return calendarEndDate.getDate();
-    }
+    }*/
 
     /**
      * Checks if the selected start date is before selected or equal to end
@@ -212,6 +213,7 @@ public class ObservationDialogUIPanel extends ObservationDialogPanel implements 
         final String identifier = plotComboBox.getSelectedIndex() == 0 ? PlotsContainerPanel.PLOT_IDENTIFIER_MASTER : PlotsContainerPanel.PLOT_IDENTIFIER_SLAVE;
         final BandGroup group = (BandGroup) comboBoxGroup.getSelectedItem();
         final BandType bandType = (BandType) comboBoxData.getSelectedItem();
+        bandType.setDataDownloader(EVECacheController.getSingletonInstance());
         
         if (!bandController.getSelectedGroup(identifier).equals(group)) {
             bandController.removeAllBands(identifier);
@@ -239,13 +241,13 @@ public class ObservationDialogUIPanel extends ObservationDialogPanel implements 
         plotComboBox.setSelectedIndex(0);
     }
     
-    @Override
+    /*@Override
     public void selected() {
         ObservationDialog.getSingletonInstance().setLoadButtonEnabled(enableLoadButton);
     }
 
     @Override
-    public void deselected() {}
+    public void deselected() {}*/
 
     @Override
     public boolean loadButtonPressed() {
@@ -261,13 +263,15 @@ public class ObservationDialogUIPanel extends ObservationDialogPanel implements 
         return true;
     }
 
+    /*
     @Override
     public void cancelButtonPressed() { }
+    */
 
     // //////////////////////////////////////////////////////////////////////////////
     // JHV Calendar Listener
     // //////////////////////////////////////////////////////////////////////////////
-    
+    /*
     public void actionPerformed(final JHVCalendarEvent e) {
         if (e.getSource() == calendarStartDate && !isStartDateBeforeOrEqualEndDate()) {
             calendarEndDate.setDate(calendarStartDate.getDate());
@@ -277,7 +281,7 @@ public class ObservationDialogUIPanel extends ObservationDialogPanel implements 
             calendarStartDate.setDate(calendarStartDate.getDate());
         }
     }
-    
+    */
     // //////////////////////////////////////////////////////////////////////////////
     // Action Listener
     // //////////////////////////////////////////////////////////////////////////////
@@ -285,11 +289,13 @@ public class ObservationDialogUIPanel extends ObservationDialogPanel implements 
     public void actionPerformed(final ActionEvent e) {
         if (e.getSource().equals(comboBoxGroup)) {
             updateGroupValues();
-        } else if (e.getSource().equals(plotComboBox)) {
+        } else {
+        	super.actionPerformed(e);
+        }/*if (e.getSource().equals(plotComboBox)) {
             final String identifier = plotComboBox.getSelectedIndex() == 0 ? PlotsContainerPanel.PLOT_IDENTIFIER_MASTER : PlotsContainerPanel.PLOT_IDENTIFIER_SLAVE;
             final BandGroup group = BandController.getSingletonInstance().getSelectedGroup(identifier);
             
             comboBoxGroup.setSelectedItem(group);
-        }
+        }*/
     }
 }

@@ -252,7 +252,7 @@ public class ImageDataPanel extends ObservationDialogPanel {
             public void run() {
 
                 try {
-                    APIRequestManager.requestAndOpenRemoteFile(null, getStartTime(), "", getObservation(), getInstrument(), getDetector(), getMeasurement());
+                    APIRequestManager.requestAndOpenRemoteFile(true,null, getStartTime(), "", getObservation(), getInstrument(), getDetector(), getMeasurement());
                 } catch (IOException e) {
                     Log.error("An error occured while opening the remote file!", e);
                     Message.err("An error occured while opening the remote file!", e.getMessage(), false);
@@ -280,7 +280,7 @@ public class ImageDataPanel extends ObservationDialogPanel {
 
             public void run() {
                 try {
-                    APIRequestManager.requestAndOpenRemoteFile(getCadence(), getStartTime(), getEndTime(), getObservation(), getInstrument(), getDetector(), getMeasurement());
+                    APIRequestManager.requestAndOpenRemoteFile(true,getCadence(), getStartTime(), getEndTime(), getObservation(), getInstrument(), getDetector(), getMeasurement());
                 } catch (IOException e) {
                     Log.error("An error occured while opening the remote file!", e);
                     Message.err("An error occured while opening the remote file!", e.getMessage(), false);

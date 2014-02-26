@@ -45,7 +45,7 @@ public class HelioviewerDateTimeCache extends DateTimeCache {
     private void checkForSwap() {
         if (!checkedForSwap) {
             String instrument = source.get("INSTRUME");
-            isSWAP = (instrument != null && instrument.contains("SWAP"));
+            isSWAP = (instrument != null && instrument.contains("SWAP") && instrument.contains("CALLISTO"));
             checkedForSwap = true;
         }
     }

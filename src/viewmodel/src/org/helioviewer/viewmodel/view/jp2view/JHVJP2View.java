@@ -9,6 +9,7 @@ import javax.swing.text.html.HTMLDocument.HTMLReader.IsindexAction;
 import kdu_jni.Jp2_palette;
 import kdu_jni.KduException;
 
+import org.helioviewer.base.logging.Log;
 import org.helioviewer.base.math.Interval;
 import org.helioviewer.base.math.Vector2dInt;
 import org.helioviewer.viewmodel.changeevent.ChangeEvent;
@@ -267,8 +268,7 @@ public class JHVJP2View extends AbstractView implements JP2View, ViewportView, R
      * {@inheritDoc}
      */
     public boolean setViewport(Viewport v, ChangeEvent event) {
-
-        boolean viewportChanged = (viewport == null ? v == null : !viewport.equals(v));
+    	boolean viewportChanged = (viewport == null ? v == null : !viewport.equals(v));
         viewport = v;
         if (setImageViewParams(calculateParameter())) {
             // sub image data will change because resolution level changed
@@ -660,7 +660,7 @@ public class JHVJP2View extends AbstractView implements JP2View, ViewportView, R
      *            {@link org.helioviewer.viewmodel.region.Region}
      */
     void setSubimageData(ImageData newImageData, SubImage roi, int compositionLayer) {
-        imageData = newImageData;
+    	imageData = newImageData;
         Region lastRegionSaved = lastRegion;
         subImageBuffer.setLastRegion(roi);
         this.event.addReason(new RegionUpdatedReason(this, lastRegion));

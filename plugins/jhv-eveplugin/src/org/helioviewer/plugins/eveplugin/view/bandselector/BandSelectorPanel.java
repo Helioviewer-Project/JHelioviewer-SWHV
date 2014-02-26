@@ -68,7 +68,7 @@ public class BandSelectorPanel extends JPanel implements DownloadControllerListe
     // //////////////////////////////////////////////////////////////////////////////
 
     public void downloadStarted(final Band band, final Interval<Date> interval) {
-        if (BandController.getSingletonInstance().isBandAvailable(identifier, band)) {
+        if (band.isAvailable()) {
             progressBar.setIndeterminate(true);
             progressBar.setToolTipText(PROGRESSBAR_TOOLTIP_ACTIVEDOWNLOAD);    
         }

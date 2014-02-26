@@ -152,7 +152,8 @@ public class HelioviewerMetaData extends AbstractMetaData implements SunMetaData
         double newSolarPixelRadius = -1.0;
         double allowedRelativeDifference = 0.01;
 
-        if (instrument.contains("AIA") || instrument.contains("SWAP")|| instrument.contains("GONG")|| instrument.contains("H-alpha")) {
+
+        if (instrument.contains("AIA") || instrument.contains("SWAP")|| instrument.contains("GONG")|| instrument.contains("H-alpha")||instrument.contains("CALLISTO")) {
             double arcsecPerPixelX = metaDataContainer.tryGetDouble("CDELT1");
             double arcsecPerPixelY = metaDataContainer.tryGetDouble("CDELT2");
             if (Double.isNaN(arcsecPerPixelX)) {
@@ -262,7 +263,7 @@ public class HelioviewerMetaData extends AbstractMetaData implements SunMetaData
      */
     public void updateDateTime() {
         String observedDate;
-        if (instrument.contains("SWAP")||instrument.contains("GONG")|| instrument.contains("GONG")) {
+        if (instrument.contains("SWAP")||instrument.contains("GONG")||instrument.contains("CALLISTO")) {
             observedDate = metaDataContainer.get("DATE-OBS");
         } else {
             observedDate = metaDataContainer.get("DATE_OBS");

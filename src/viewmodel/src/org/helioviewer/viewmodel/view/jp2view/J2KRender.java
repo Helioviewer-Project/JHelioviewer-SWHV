@@ -322,6 +322,7 @@ class J2KRender implements Runnable {
                 localIntBuffer = newPixels > localIntBuffer.length ? new int[newPixels << 1] : localIntBuffer;
                 
                 compositorBuf.Get_region(newRegion, localIntBuffer);
+                //Log.debug("Local Int Buffer : " + Arrays.toString(localIntBuffer));
 
                 int srcIdx = 0;
                 int destIdx = newOffset.Get_x() + newOffset.Get_y() * currParams.subImage.width;
@@ -339,6 +340,7 @@ class J2KRender implements Runnable {
                 	for (int row = 0; row < newHeight; row++, destIdx += currParams.subImage.width, srcIdx += newWidth)
                 		System.arraycopy(localIntBuffer, srcIdx, intBuffer[currentIntBuffer], destIdx, newWidth);
                 }
+                //Log.debug("byteBuffer : " + Arrays.toString(byteBuffer[currentByteBuffer]));
             }
 
             if (compositorBuf != null)
@@ -419,7 +421,10 @@ class J2KRender implements Runnable {
                         Log.warn("J2KRender: Params out of sync, skip frame");
                     }
                 }
-
+                //Log.debug("Data creation");
+                //Log.debug(parentImageRef.getNumComponents() < 3);
+                //Log.debug(parentViewRef);
+                //Log.debug("ByteBuffer : " + Arrays.toString(byteBuffer[currentByteBuffer]));
                 if (!movieMode)
                     break;
                 else {

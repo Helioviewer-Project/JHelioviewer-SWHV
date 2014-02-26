@@ -5,14 +5,19 @@ import java.util.LinkedList;
 
 import javax.swing.JComponent;
 
+import org.helioviewer.base.logging.Log;
 import org.helioviewer.jhv.JavaHelioViewerLauncher;
 import org.helioviewer.jhv.gui.ImageViewerGui;
 import org.helioviewer.jhv.gui.dialogs.observation.ObservationDialog;
 import org.helioviewer.jhv.gui.interfaces.MainContentPanelPlugin;
 import org.helioviewer.plugins.eveplugin.controller.DatabaseController;
+import org.helioviewer.plugins.eveplugin.radio.data.RadioDataManager;
+import org.helioviewer.plugins.eveplugin.radio.model.RadioPlotModel;
 import org.helioviewer.plugins.eveplugin.settings.EVESettings;
 import org.helioviewer.plugins.eveplugin.view.MainPanel;
 import org.helioviewer.plugins.eveplugin.view.ObservationDialogUIPanel;
+import org.helioviewer.plugins.eveplugin.view.SimpleObservationDialogUIPanel;
+import org.helioviewer.plugins.eveplugin.view.plot.PlotManagerDialog;
 import org.helioviewer.viewmodelplugin.interfaces.Plugin;
 
 /**
@@ -23,17 +28,23 @@ import org.helioviewer.viewmodelplugin.interfaces.Plugin;
 public class EVEPlugin implements Plugin, MainContentPanelPlugin {
 
     private final LinkedList<JComponent> pluginPanes = new LinkedList<JComponent>();
+    private MainPanel mainPanel;
     
     public void installPlugin() {
-        final MainPanel mainPanel = new MainPanel();
+    	Log.debug("EvePlugin : " + this);
+    	if (mainPanel == null){
+    		mainPanel = new MainPanel();
+    	}
+        
         
         pluginPanes.add(mainPanel);
         
         ImageViewerGui.getSingletonInstance().getMainContentPanel().addPlugin(this);        
         ObservationDialog.getSingletonInstance().addUserInterface(EVESettings.OBSERVATION_UI_NAME, new ObservationDialogUIPanel(mainPanel.getPlotContainerPanel()));
-        
+        ObservationDialog.getSingletonInstance().addUserInterface(EVESettings.RADIO_OBSERVATION_UI_NAME, new SimpleObservationDialogUIPanel(mainPanel.getPlotContainerPanel()));
         // initialize database connection
         DatabaseController.getSingletonInstance();
+        RadioPlotModel.getSingletonInstance();
     }
 
     public void uninstallPlugin() {
