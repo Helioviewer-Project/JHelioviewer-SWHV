@@ -1,5 +1,6 @@
 package org.helioviewer.viewmodel.view.cache;
 
+import org.helioviewer.base.logging.Log;
 import org.helioviewer.viewmodel.changeevent.CacheStatusChangedReason;
 import org.helioviewer.viewmodel.changeevent.ChangeEvent;
 import org.helioviewer.viewmodel.changeevent.CacheStatusChangedReason.CacheType;
@@ -128,7 +129,7 @@ public abstract class DateTimeCache {
 
             if (apiResponse != null) {
                 String rawFrames = apiResponse.getString("frames").replaceAll("\\[|\\]", "");
-
+                Log.debug("Raw Frames : " + rawFrames);
                 if (rawFrames != null) {
                     String[] frames = rawFrames.split(",");
 

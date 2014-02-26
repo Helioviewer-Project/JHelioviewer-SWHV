@@ -4,9 +4,11 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
 
+import org.helioviewer.plugins.eveplugin.download.DataDownloader;
 import org.helioviewer.plugins.eveplugin.settings.BandTypeAPI;
 import org.helioviewer.plugins.eveplugin.settings.BandType;
 import org.helioviewer.plugins.eveplugin.settings.BandGroup;
+import org.helioviewer.plugins.eveplugin.view.linedataselector.LineDataSelectorModel;
 
 /**
  * 
@@ -26,6 +28,8 @@ public class BandController {
     
     private final HashMap<String, BandManager> bandManagerMap = new HashMap<String, BandManager>();
     
+    private LineDataSelectorModel selectorModel;
+    
     // //////////////////////////////////////////////////////////////////////////////
     // Methods
     // //////////////////////////////////////////////////////////////////////////////
@@ -33,7 +37,9 @@ public class BandController {
     /**
      * The private constructor to support the singleton pattern.
      * */
-    private BandController() {}
+    private BandController() {
+    	selectorModel = LineDataSelectorModel.getSingletonInstance();
+    }
     
     /**
      * Method returns the sole instance of this class.
@@ -63,7 +69,8 @@ public class BandController {
             for (final BandControllerListener listener: bandControllerListeners) {
                 listener.bandAdded(band, identifier);
             }
-            
+            band.setPlotIndentifier(identifier);
+            selectorModel.addLineData(band);
             DownloadController.getSingletonInstance().updateBand(band, ZoomController.getSingletonInstance().getAvailableInterval(), ZoomController.getSingletonInstance().getSelectedInterval());      
         }
     }
@@ -82,7 +89,7 @@ public class BandController {
         for (final BandControllerListener listener: bandControllerListeners) {
             listener.bandRemoved(band, identifier);
         }
-        
+        selectorModel.removeLineData(band);
         // stop download (if it is running) if no instance is available anymore
         final BandType[] all = getAllAvailableBandTypes();
         boolean available = false;
@@ -126,6 +133,7 @@ public class BandController {
         for (final BandControllerListener listener: bandControllerListeners) {
             listener.bandUpdated(band, identifier);
         }
+        selectorModel.lineDataElementUpdated(band);
     }
     
     public void selectBandGroup(final String identifier, final BandGroup group) {
@@ -137,6 +145,7 @@ public class BandController {
         for (BandControllerListener listener: bandControllerListeners) {
             listener.bandGroupChanged(identifier);
         }
+        //TODO Check if I really need a method in LineDataSelectorModel for handling this. 
     }
     
     public BandGroup getSelectedGroup(final String identifier) {
@@ -294,9 +303,12 @@ public class BandController {
             
             lookupAvailableBandTypes.put(bandType, band);
             
-            final LinkedList<Band> availableBandTypes = availableBandsInGroupMap.get(bandType.getGroup());
+            LinkedList<Band> availableBandTypes = availableBandsInGroupMap.get(bandType.getGroup());
+            if(availableBandTypes == null){
+            	availableBandsInGroupMap.put(bandType.getGroup(), new LinkedList<Band>());
+            	availableBandTypes = availableBandsInGroupMap.get(bandType.getGroup());
+            }
             availableBandTypes.add(band);
-            
             return band;
         }
         

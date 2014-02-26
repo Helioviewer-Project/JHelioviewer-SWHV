@@ -2,14 +2,16 @@ package org.helioviewer.plugins.eveplugin.controller;
 
 import java.awt.Color;
 
+import org.helioviewer.plugins.eveplugin.download.DataDownloader;
 import org.helioviewer.plugins.eveplugin.settings.BandType;
+import org.helioviewer.plugins.eveplugin.view.linedataselector.LineDataSelectorElement;
 
 
 /**
  * 
  * @author Stephan Pagel
  * */
-public class Band {
+public class Band implements LineDataSelectorElement{
 
     // //////////////////////////////////////////////////////////////////////////////
     // Definitions
@@ -19,6 +21,8 @@ public class Band {
     
     private boolean isVisible = true;
     private Color graphColor = Color.BLACK;
+    
+    private String plotIdentifier;
     
     // //////////////////////////////////////////////////////////////////////////////
     // Methods
@@ -67,4 +71,52 @@ public class Band {
     public int hashCode() {
         return bandType.hashCode();
     }
+
+	@Override
+	public void removeLineData() {
+		BandController.getSingletonInstance().removeBand(plotIdentifier,this);		
+	}
+
+	@Override
+	public void setVisibility(boolean visible) {
+		this.setVisible(visible);
+		BandController.getSingletonInstance().setBandVisibility(plotIdentifier, bandType, visible);
+	}
+
+	@Override
+	public String getName() {
+		return this.getTitle();
+	}
+
+	@Override
+	public Color getDataColor() {
+		return this.getGraphColor();
+	}
+
+	@Override
+	public void setDataColor(Color c) {
+		this.setGraphColor(c);
+		
+	}
+
+	@Override
+	public boolean isDownloading() {
+		return DownloadController.getSingletonInstance().isDownloadActive(this);
+	}
+
+	@Override
+	public String getPlotIdentifier() {
+		return this.plotIdentifier;
+	}
+
+	@Override
+	public void setPlotIndentifier(String identifier) {
+		this.plotIdentifier = identifier;
+		
+	}
+
+	@Override
+	public boolean isAvailable() {
+		return BandController.getSingletonInstance().isBandAvailable(plotIdentifier,this);
+	}	
 }

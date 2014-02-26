@@ -1,242 +1,238 @@
 package org.helioviewer.plugins.eveplugin.controller;
 
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.LinkedList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
+import org.helioviewer.base.logging.Log;
 import org.helioviewer.base.math.Interval;
-import org.helioviewer.jhv.layers.LayersListener;
-import org.helioviewer.jhv.layers.LayersModel;
 import org.helioviewer.plugins.eveplugin.base.Range;
+import org.helioviewer.plugins.eveplugin.draw.DrawableElement;
+import org.helioviewer.plugins.eveplugin.draw.DrawableType;
+import org.helioviewer.plugins.eveplugin.draw.YAxisElement;
 import org.helioviewer.plugins.eveplugin.settings.EVEAPI.API_RESOLUTION_AVERAGES;
-import org.helioviewer.viewmodel.view.View;
-import org.helioviewer.viewmodel.view.jp2view.datetime.ImmutableDateTime;
+import org.helioviewer.plugins.eveplugin.view.linedataselector.LineDataSelectorElement;
+import org.helioviewer.plugins.eveplugin.view.linedataselector.LineDataSelectorModel;
+import org.helioviewer.plugins.eveplugin.view.linedataselector.LineDataSelectorModelListener;
 
-/**
- * @author Stephan Pagel
- * */
-public class DrawController implements BandControllerListener, ZoomControllerListener, EVECacheControllerListener, LayersListener {
+public class DrawController implements ZoomControllerListener, LineDataSelectorModelListener{
+	
+	private static DrawController instance;
+	private Map<String,DrawControllerData> drawControllerData;
+	//private Map<String,DrawControllerData> drawableElements;
+	//private Map<String,List<DrawControllerListener>> listeners;
+	//private Map<String,Integer> nrOfDrawableElement;
+	private Interval<Date> interval;
+	private Range selectedRange;
+	private Range availableRange;
+	//private Map<String,Set<YAxisElement>> yAxisSet; 
+	
+	private DrawController() {
+		this.drawControllerData = new HashMap<String, DrawControllerData>();
+		//this.nrOfDrawableElement = new HashMap<String, Integer>();
+		//this.drawableElements = new HashMap<String,Map<DrawableType, List<DrawableElement>>>();
+		//this.listeners = new HashMap<String,List<DrawControllerListener>>();
+		//this.yAxisSet = new HashMap<String,Set<YAxisElement>>();
+		ZoomController.getSingletonInstance().addZoomControllerListener(this);
+		LineDataSelectorModel.getSingletonInstance().addLineDataSelectorModelListener(this);
+	}
 
-    // //////////////////////////////////////////////////////////////////////////////
-    // Definitions
-    // //////////////////////////////////////////////////////////////////////////////
-    
-    private final String identifier;
-    
-    private final LinkedList<DrawControllerListener> listeners = new LinkedList<DrawControllerListener>();
-    private final HashMap<Band, EVEValues> dataMap = new HashMap<Band, EVEValues>();
-    
-    private Interval<Date> interval = new Interval<Date>(null, null);
-    private Range selectedRange = new Range();
-    
-    // //////////////////////////////////////////////////////////////////////////////
-    // Methods
-    // //////////////////////////////////////////////////////////////////////////////
-    
-    public DrawController(final String identifier) {
-        this.identifier = identifier;
-        
-        BandController.getSingletonInstance().addBandControllerListener(this);
-        ZoomController.getSingletonInstance().addZoomControllerListener(this);
-        EVECacheController.getSingletonInstance().addControllerListener(this);
-        LayersModel.getSingletonInstance().addLayersListener(this);
-    }
-    
-    public void addDrawControllerListener(final DrawControllerListener listener) {
-        listeners.add(listener);
-    }
-    
-    public void removeDrawControllerListener(final DrawControllerListener listener) {
-        listeners.remove(listener);
-    }
-    
-    private void addToMap(final Band band) {     
-        dataMap.put(band, retrieveData(band, interval));
-        fireRedrawRequest(true);
-    }
-    
-    private void removeFromMap(final Band band) {
-        if (dataMap.containsKey(band)) {
-            dataMap.remove(band);
-            
-            fireRedrawRequest(true);
-        }
-    }
-    
-    private void updateBand(final Band band) {
-        dataMap.put(band, retrieveData(band, interval));
-    }
-    
-    private void updateBands() {
-        for (final Band band : dataMap.keySet())
-            updateBand(band);
-        
-        fireRedrawRequest(true);
-    }
-    
-    public void setSelectedRange(final Range newSelectedRange) {
-        selectedRange = new Range(newSelectedRange);
-        
-        fireRedrawRequest(false);
-    }
-    
-    public void setSelectedRangeMaximal() {
-        fireRedrawRequest(true);
-    }
-    
-    private void fireRedrawRequest(final boolean maxRange) {
-        final Band[] bands = dataMap.keySet().toArray(new Band[0]);
-        final LinkedList<EVEValues> values = new LinkedList<EVEValues>();
-        final Range availableRange = new Range();
-        
-        for (EVEValues v : dataMap.values()) {
-            if (v != null) {
-            	
-                availableRange.setMin(v.getMinimumValue());
-                availableRange.setMax(v.getMaximumValue());
-                
-                values.add(v);
-            }
-        }
-        
-        if (maxRange)
-            selectedRange = new Range();
-        
-        adjustAvailableRangeBorders(availableRange);
-        checkSelectedRange(availableRange, selectedRange);
-        
-        for (DrawControllerListener listener : listeners) {
-            listener.drawRequest(interval, bands, values.toArray(new EVEValues[0]), availableRange, selectedRange);
-        }
-    }
-    
-    private void adjustAvailableRangeBorders(final Range availableRange) {
-        final double minLog10 = Math.log10(availableRange.min);
-        final double maxLog10 = Math.log10(availableRange.max);
-        
-        if (minLog10 < 0) {
-            availableRange.min = Math.pow(10, ((int)(minLog10 * 100 - 1)) / 100.0);    
-        } else {
-            availableRange.min = Math.pow(10, ((int)(minLog10 * 100)) / 100.0);
-        }
-            
-        if (maxLog10 < 0) {
-            availableRange.max = Math.pow(10, ((int)(maxLog10 * 100)) / 100.0);
-        } else {
-            availableRange.max = Math.pow(10, ((int)(maxLog10 * 100 + 1)) / 100.0);    
-        }
-    }
-    
-    private void checkSelectedRange(final Range availableRange, final Range selectedRange) {
-        if (selectedRange.min > availableRange.max || selectedRange.max < availableRange.min) {
-            selectedRange.min = availableRange.min;
-            selectedRange.max = availableRange.max;
-            
-            return;
-        }
-        
-        if (selectedRange.min < availableRange.min) {
-            selectedRange.min = availableRange.min;
-        }
-        
-        if (selectedRange.max > availableRange.max) {
-            selectedRange.max = availableRange.max;
-        }
-    }
-    
-    private void fireRedrawRequestMovieFrameChanged(final Date time) {
-        for (DrawControllerListener listener : listeners) {
-            listener.drawRequest(time);
-        }
-    }
-    
-    private final EVEValues retrieveData(final Band band, final Interval<Date> interval) {
-        return EVECacheController.getSingletonInstance().getDataInInterval(band, interval);
-    }
-    
-    // //////////////////////////////////////////////////////////////////////////////
-    // Zoom Controller Listener
-    // //////////////////////////////////////////////////////////////////////////////
-    public void availableIntervalChanged(final Interval<Date> newInterval) {}
-    
-    public void selectedIntervalChanged(final Interval<Date> newInterval) {
-        interval = newInterval;
-        
-        updateBands();
-    }
-    
-    public void selectedResolutionChanged(final API_RESOLUTION_AVERAGES newResolution) {}
-    
-    // //////////////////////////////////////////////////////////////////////////////
-    // Band Controller Listener
-    // //////////////////////////////////////////////////////////////////////////////
+	public static DrawController getSingletonInstance(){
+		if (instance == null){
+			instance = new DrawController();
+		}
+		return instance;
+	}
+	
+	private DrawControllerData getDrawControllerData(String identifier){
+		DrawControllerData dcd = new DrawControllerData();
+		if(drawControllerData.containsKey(identifier)){
+			dcd = drawControllerData.get(identifier);
+		}else{
+			drawControllerData.put(identifier, dcd);
+		}
+		return dcd;
+	}
+	
+	public void addDrawControllerListener(DrawControllerListener listener, String identifier){
+		DrawControllerData dcd = getDrawControllerData(identifier);
+		dcd.addDrawControllerListener(listener);
+		listener.drawRequest();
+	}
+	
+	public void removeDrawControllerListener(DrawControllerListener listener, String identifier){
+		DrawControllerData dcd = getDrawControllerData(identifier);
+		dcd.removeDrawControllerListener(listener);		
+	}
+	
+	public void addDrawableElement(DrawableElement element,String identifier){
+		DrawControllerData dcd = getDrawControllerData(identifier);
+		dcd.addDrawableElement(element);
+		
+		this.fireRedrawRequest(identifier);
+	}
+	
+	public void updateDrawableElement(DrawableElement drawableElement, String identifier){
+		this.removeDrawableElement(drawableElement, identifier);
+		this.addDrawableElement(drawableElement, identifier);
+		this.fireRedrawRequest(identifier);
+	}
+	
+	public void removeDrawableElement(DrawableElement element,String identifier){
+		DrawControllerData dcd = getDrawControllerData(identifier);
+		dcd.removeDrawableElement(element);
+		this.fireRedrawRequest(identifier);
+	}
+	
+	public int getNumberOfYAxis(String identifier){
+		DrawControllerData dcd = getDrawControllerData(identifier);
+		return dcd.getyAxisSet().size();
+	}
+	
+	public Set<YAxisElement> getYAxisElements(String identifier){
+		DrawControllerData dcd = getDrawControllerData(identifier);
+		return dcd.getyAxisSet();
+	}
+	
+	public Map<DrawableType, List<DrawableElement>> getDrawableElements(String identifier){
+		DrawControllerData dcd = getDrawControllerData(identifier);
+		return dcd.getDrawableElements();
+	}
+	
+	public List<DrawableElement> getAllDrawableElements(String identifier){
+		Collection<List<DrawableElement>> allValues = getDrawableElements(identifier).values();
+		ArrayList<DrawableElement> deList = new ArrayList<DrawableElement>();
+		for(List<DrawableElement> tempList: allValues){
+			deList.addAll(tempList);
+		}
+		return deList;
+	}
+	
+	public boolean hasElementsToBeDrawn(String identifier){
+		List<DrawableElement> allElements = this.getAllDrawableElements(identifier);
+		for (DrawableElement de : allElements){
+			if (de.hasElementsToDraw()){
+				return true;
+			}
+		}
+		return false;
+		//return nrOfDrawableElement > 0;
+	}
+	
+	public boolean getIntervalAvailable(){
+		if (interval == null) {
+			return false;
+		}else{
+			return interval.getStart() != null && interval.getEnd() != null;
+		}
+	}
+	
+	public Interval<Date> getInterval(){
+		return interval;
+	}
+	
+	public void setAvailableRange(Range availableRange){
+		this.availableRange = availableRange;
+		fireRedrawRequest();
+	}
+	
+	public void setSelectedRange(Range selectedRange){
+		this.selectedRange = selectedRange;
+		fireRedrawRequest();
+	}
+	
+	public void setInterval(Interval<Date> interval){
+		this.interval = interval;
+		fireRedrawRequest();
+	}
+	
+	private void fireRedrawRequest() {
+		for (DrawControllerData dcd : drawControllerData.values()){
+			for(DrawControllerListener l : dcd.getListeners()){
+				l.drawRequest();
+			}
+		}
+	}
+	
+	private void fireRedrawRequest(String identifier) {
+		DrawControllerData dcd = getDrawControllerData(identifier);
+		for(DrawControllerListener l : dcd.getListeners()){
+			l.drawRequest();
+		}
+	}
 
-    public void bandAdded(final Band band, final String identifier) {
-        if (this.identifier.equals(identifier)) {
-            addToMap(band);    
-        }
-    }
+	@Override
+	public void availableIntervalChanged(Interval<Date> newInterval) {
+		// TODO Auto-generated method stub
+		
+	}
 
-    public void bandRemoved(final Band band, final String identifier) {
-        if (this.identifier.equals(identifier)) {
-            removeFromMap(band);    
-        }
-    }
+	@Override
+	public void selectedIntervalChanged(Interval<Date> newInterval) {
+		interval = newInterval;
+		
+	}
 
-    public void bandUpdated(final Band band, final String identifier) {
-        if (this.identifier.equals(identifier)) {
-            if (band.isVisible())
-                addToMap(band);
-            else
-                removeFromMap(band);    
-        }
-    }
-    
-    public void bandGroupChanged(final String identifier) {
-        if (this.identifier.equals(identifier)) {
-            dataMap.clear();
-            
-            final Band[] activeBands = BandController.getSingletonInstance().getBands(identifier);
-            
-            for (final Band band : activeBands) {
-                dataMap.put(band, retrieveData(band, interval));    
-            }
-            
-            fireRedrawRequest(true);    
-        }
-    }
+	@Override
+	public void selectedResolutionChanged(API_RESOLUTION_AVERAGES newResolution) {
+		// TODO Auto-generated method stub
+		
+	}
 
-    // //////////////////////////////////////////////////////////////////////////////
-    // EVE Cache Controller Listener
-    // //////////////////////////////////////////////////////////////////////////////
-    
-    public void dataAdded(final Band band) {        
-        if (dataMap.containsKey(band)) {
-            updateBand(band);
-            fireRedrawRequest(true);
-        }
-    }
+	@Override
+	public void downloadStartded(LineDataSelectorElement element) {
+		// TODO Auto-generated method stub
+		
+	}
 
-    // //////////////////////////////////////////////////////////////////////////////
-    // Layers Listener
-    // //////////////////////////////////////////////////////////////////////////////
-    
-    public void layerAdded(int idx) {}
+	@Override
+	public void downloadFinished(LineDataSelectorElement element) {
+		// TODO Auto-generated method stub
+		
+	}
 
-    public void layerRemoved(View oldView, int oldIdx) {}
+	@Override
+	public void lineDataAdded(LineDataSelectorElement element) {
+		fireRedrawRequest(element.getPlotIdentifier());
+		
+	}
 
-    public void layerChanged(int idx) {}
+	@Override
+	public void lineDataRemoved(LineDataSelectorElement element) {
+		fireRedrawRequest(element.getPlotIdentifier());
+		
+	}
 
-    public void activeLayerChanged(int idx) {}
+	@Override
+	public void lineDataUpdated(LineDataSelectorElement element) {
+		fireRedrawRequest(element.getPlotIdentifier());
+		
+	}
 
-    public void viewportGeometryChanged() {}
 
-    public void timestampChanged(int idx) {
-        final ImmutableDateTime timestamp = LayersModel.getSingletonInstance().getCurrentFrameTimestamp(idx);
-        fireRedrawRequestMovieFrameChanged(timestamp.getTime());
-    }
-
-    public void subImageDataChanged() {}
-
-    public void layerDownloaded(int idx) {}
+	/*public double getLogMinValue(){
+		if (selectedRange == null){
+			return -1.0;
+		}else {
+			return Math.log10(selectedRange.min);
+		}
+	}
+	
+	public double getLogMaxValue(){
+		if (selectedRange == null){
+			return -1.0;
+		}else {
+			return Math.log10(selectedRange.max);
+		}
+	}
+	
+	public String getVerticalLabel(){
+		//TODO implement the method
+		return "";
+	}*/
 }

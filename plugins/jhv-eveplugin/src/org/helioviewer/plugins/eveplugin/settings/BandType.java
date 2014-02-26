@@ -9,6 +9,7 @@ import java.net.URL;
 
 import org.helioviewer.base.logging.Log;
 import org.helioviewer.base.math.Interval;
+import org.helioviewer.plugins.eveplugin.download.DataDownloader;
 import org.helioviewer.plugins.eveplugin.settings.EVEAPI;
 
 
@@ -22,6 +23,7 @@ public class BandType {
 	private double min;
 	private double max;
 	private double[] errorLevels;
+	private DataDownloader dataDownloader;
 	
 	public URL buildUrl(Interval<Date> interval){
 		final SimpleDateFormat eveAPIDateFormat = new SimpleDateFormat(EVEAPI.API_DATE_FORMAT);
@@ -103,5 +105,11 @@ public class BandType {
 	}
 	public void setErrorLevels(double[] errorlevels) {
 		this.errorLevels = errorlevels;
+	}
+	public DataDownloader getDataDownloader() {
+		return dataDownloader;
+	}
+	public void setDataDownloader(DataDownloader dataDownloader) {
+		this.dataDownloader = dataDownloader;
 	}
 }

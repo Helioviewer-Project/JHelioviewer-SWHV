@@ -4,13 +4,14 @@ import java.util.Date;
 import java.util.LinkedList;
 
 import org.helioviewer.base.math.Interval;
+import org.helioviewer.plugins.eveplugin.download.DownloadedData;
 import org.helioviewer.plugins.eveplugin.model.EVEValue;
 
 /**
  * 
  * @author Stephan Pagel
  * */
-public class EVEValues {
+public class EVEValues implements DownloadedData{
 
     // //////////////////////////////////////////////////////////////////////////////
     // Definitions

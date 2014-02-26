@@ -8,6 +8,8 @@ import java.util.List;
 
 import org.helioviewer.base.math.Interval;
 import org.helioviewer.plugins.eveplugin.base.Range;
+import org.helioviewer.plugins.eveplugin.download.DataDownloader;
+import org.helioviewer.plugins.eveplugin.download.DownloadedData;
 import org.helioviewer.plugins.eveplugin.model.EVEBandCache;
 import org.helioviewer.plugins.eveplugin.model.EVEValue;
 
@@ -16,7 +18,7 @@ import org.helioviewer.plugins.eveplugin.model.EVEValue;
  * 
  * @author Stephan Pagel
  * */
-public class EVECacheController {
+public class EVECacheController implements DataDownloader{
 
     // //////////////////////////////////////////////////////////////////////////////
     // Definitions
@@ -95,4 +97,12 @@ public class EVECacheController {
         for (EVECacheControllerListener listener : controllerListeners)
             listener.dataAdded(band);
     }
+
+	@Override
+	public DownloadedData downloadData(Band band, Interval<Date> interval) {
+		if (band == null || interval == null || interval.getStart() == null || interval.getEnd() == null)
+            return null;
+        
+        return cache.getValuesInInterval(band, interval);
+	}
 }

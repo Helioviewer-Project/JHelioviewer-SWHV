@@ -21,6 +21,8 @@ public class EVESettings {
      * */
     public static final int DOWNLOADER_MAX_DAYS_PER_BLOCK = 7;
     
+    public static final String RADIO_OBSERVATION_UI_NAME = "Radio Data";
+    
     public static final String OBSERVATION_UI_NAME = "EVE Averaged Level 2 Data";
     
     public static final String DATABASE_USERNAME = "eve";

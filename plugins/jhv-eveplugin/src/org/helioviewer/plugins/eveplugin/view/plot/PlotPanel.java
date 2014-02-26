@@ -5,11 +5,12 @@ import java.awt.Dimension;
 
 import javax.swing.JPanel;
 
-import org.helioviewer.plugins.eveplugin.controller.DrawController;
+import org.helioviewer.plugins.eveplugin.controller.EVEDrawController;
 import org.helioviewer.plugins.eveplugin.view.bandselector.BandSelectorPanel;
 import org.helioviewer.plugins.eveplugin.view.chart.ChartDrawGraphPane;
 import org.helioviewer.plugins.eveplugin.view.chart.ChartDrawIntervalPane;
 import org.helioviewer.plugins.eveplugin.view.chart.ChartDrawValueRangePane;
+import org.helioviewer.plugins.eveplugin.view.linedataselector.LineDataSelectorPanel;
 
 public class PlotPanel extends JPanel {
 
@@ -19,10 +20,10 @@ public class PlotPanel extends JPanel {
     
     private static final long serialVersionUID = 1L;
     
-    private final DrawController drawController;
+    private final EVEDrawController drawController;
     
     private final JPanel plotPane = new JPanel();
-    private final BandSelectorPanel bandSelectorPane;
+    private final LineDataSelectorPanel lineDataSelectorPane;
     private final ChartDrawGraphPane graphPane;
     private final ChartDrawValueRangePane valueRangePane;
     private ChartDrawIntervalPane intervalPane = null;
@@ -32,11 +33,11 @@ public class PlotPanel extends JPanel {
     // //////////////////////////////////////////////////////////////////////////////
     
     public PlotPanel(final String identifier, final String plotName) {
-        bandSelectorPane = new BandSelectorPanel(identifier, plotName);
+        lineDataSelectorPane = new LineDataSelectorPanel(identifier, plotName);
         
-        drawController = new DrawController(identifier);
+        drawController = new EVEDrawController(identifier);
         
-        graphPane = new ChartDrawGraphPane(drawController);
+        graphPane = new ChartDrawGraphPane(identifier);
         valueRangePane = new ChartDrawValueRangePane(drawController);
         
         initVisualComponents();
@@ -44,7 +45,7 @@ public class PlotPanel extends JPanel {
     
     private void initVisualComponents() {
         setLayout(new BorderLayout());
-        setMinimumSize(new Dimension(200, 80));
+        setMinimumSize(new Dimension(200, 300));
         
         
         plotPane.setLayout(new BorderLayout());
@@ -52,7 +53,7 @@ public class PlotPanel extends JPanel {
         plotPane.add(valueRangePane, BorderLayout.LINE_END);
         
         add(plotPane, BorderLayout.CENTER);
-        add(bandSelectorPane, BorderLayout.LINE_END);
+        add(lineDataSelectorPane, BorderLayout.LINE_END);
     }
     
     public void setIntervalSlider(final ChartDrawIntervalPane intervalPane) {

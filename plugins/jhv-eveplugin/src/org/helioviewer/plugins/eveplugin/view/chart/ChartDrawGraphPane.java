@@ -2,6 +2,7 @@ package org.helioviewer.plugins.eveplugin.view.chart;
 
 import java.awt.Color;
 import java.awt.Cursor;
+import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Point;
 import java.awt.Rectangle;
@@ -21,20 +22,32 @@ import java.util.List;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Set;
 
 import javax.swing.ImageIcon;
 import javax.swing.JComponent;
 import javax.swing.event.MouseInputListener;
 
 
+import org.helioviewer.base.logging.Log;
 import org.helioviewer.base.math.Interval;
 import org.helioviewer.plugins.eveplugin.base.Range;
 import org.helioviewer.plugins.eveplugin.controller.Band;
 import org.helioviewer.plugins.eveplugin.controller.DrawController;
 import org.helioviewer.plugins.eveplugin.controller.DrawControllerListener;
+import org.helioviewer.plugins.eveplugin.controller.EVEDrawController;
+import org.helioviewer.plugins.eveplugin.controller.EVEDrawControllerListener;
 import org.helioviewer.plugins.eveplugin.controller.EVEValues;
 import org.helioviewer.plugins.eveplugin.controller.ZoomController;
+import org.helioviewer.plugins.eveplugin.draw.DrawableElement;
+import org.helioviewer.plugins.eveplugin.draw.DrawableElementType;
+import org.helioviewer.plugins.eveplugin.draw.DrawableType;
+import org.helioviewer.plugins.eveplugin.draw.YAxisElement;
 import org.helioviewer.plugins.eveplugin.model.EVEValue;
+import org.helioviewer.plugins.eveplugin.radio.model.DrawableAreaMap;
+import org.helioviewer.plugins.eveplugin.radio.model.RadioPlotModel;
+import org.helioviewer.plugins.eveplugin.radio.model.RadioPlotModelListener;
+import org.helioviewer.plugins.eveplugin.radio.model.ZoomManager;
 import org.helioviewer.plugins.eveplugin.view.chart.ChartDrawGraphPane.GraphPolyline;
 import org.helioviewer.viewmodel.changeevent.ChangeEvent;
 import org.helioviewer.viewmodel.view.LinkedMovieManager;
@@ -45,7 +58,7 @@ import org.helioviewer.plugins.eveplugin.EVEPlugin;
  * 
  * @author Stephan Pagel
  * */
-public class ChartDrawGraphPane extends JComponent implements DrawControllerListener, MouseInputListener, ComponentListener {
+public class ChartDrawGraphPane extends JComponent implements MouseInputListener, ComponentListener, RadioPlotModelListener,DrawControllerListener {//EVEDrawControllerListener, MouseInputListener, ComponentListener, RadioPlotModelListener {
 
     // //////////////////////////////////////////////////////////////////////////////
     // Definitions
@@ -53,17 +66,20 @@ public class ChartDrawGraphPane extends JComponent implements DrawControllerList
 
     private static final long serialVersionUID = 1L;
     
-    private final DrawController drawController;
+    private DrawController drawController;
+    
+    //private final EVEDrawController drawController;
     private GraphEvent [] events;
-    private Interval<Date> interval = new Interval<Date>(null, null);
-    private boolean intervalAvailable = false;
-    private Band[] bands = new Band[0];
-    private EVEValues[] values = null;
+    //private Interval<Date> interval = new Interval<Date>(null, null);
+    //private boolean intervalAvailable = false;
+    //private Band[] bands = new Band[0];
+    //private EVEValues[] values = null;
+    private Map<YAxisElement, Double> yRatios; 
     
     private final List<GraphPolyline> graphPolylines = Collections.synchronizedList(new LinkedList<ChartDrawGraphPane.GraphPolyline>());
     
-    private double logMinValue = Math.log10(Double.MAX_VALUE);
-    private double logMaxValue = Math.log10(Double.MIN_VALUE);
+    //private double logMinValue = Math.log10(Double.MAX_VALUE);
+    //private double logMaxValue = Math.log10(Double.MIN_VALUE);
     
     private Date movieTimestamp = null;
     private int movieLinePosition = -1;
@@ -74,7 +90,7 @@ public class ChartDrawGraphPane extends JComponent implements DrawControllerList
     
     private Rectangle graphArea = new Rectangle();
     private double ratioX = 0;
-    private double ratioY = 0;
+    //private double ratioY = 0;
     
     private int lastKnownWidth = -1;
     private int lastKnownHeight = -1;
@@ -82,22 +98,36 @@ public class ChartDrawGraphPane extends JComponent implements DrawControllerList
 
     private BufferedImage screenImage = null;
     
+    private RadioPlotModel radioPlotModel;
+    
+    private ZoomManager zoomManager;
+    
+    private String identifier;
+    
+    private int twoYAxis = 0;
+    
     // //////////////////////////////////////////////////////////////////////////////
     // Methods
     // //////////////////////////////////////////////////////////////////////////////
     
-    public ChartDrawGraphPane(final DrawController drawController) {
-        this.drawController = drawController;
-        
+    public ChartDrawGraphPane(String identifier) {
+        //this.drawController = drawController;
+    	this.identifier = identifier;
+        this.drawController = DrawController.getSingletonInstance();
         initVisualComponents();
         
-        drawController.addDrawControllerListener(this);
+        //drawController.addDrawControllerListener(this);
         
         addMouseListener(this);
         addMouseMotionListener(this);
         addComponentListener(this);
 		pane = new RadioImagePane();
-
+        
+        radioPlotModel = RadioPlotModel.getSingletonInstance();
+        radioPlotModel.addRadioPlotModelListener(this);
+        zoomManager = ZoomManager.getSingletonInstance();
+        yRatios = new HashMap<YAxisElement, Double>();
+        this.drawController.addDrawControllerListener(this,identifier);
     }
     
     private void initVisualComponents() {
@@ -106,6 +136,7 @@ public class ChartDrawGraphPane extends JComponent implements DrawControllerList
     
     @Override
     protected void paintComponent(Graphics g) {
+    	Log.debug("Paint component called");
         super.paintComponent(g);
         
         if (lastKnownWidth != getWidth() || lastKnownHeight != getHeight()) {
@@ -114,34 +145,58 @@ public class ChartDrawGraphPane extends JComponent implements DrawControllerList
             lastKnownWidth = getWidth();
             lastKnownHeight = getHeight();
         }
-        
         if (screenImage != null) {
             g.drawImage(screenImage, 0, 0, screenImage.getWidth(), screenImage.getHeight(), null);
             
             drawMovieLine(g);
         }
+        
     }
+    
     private void updateGraph() {
         updateDrawInformation();
         redrawGraph();
     }
     
     private void redrawGraph() {
+    	Log.debug("redrawGraph called");
         if (getWidth() > 0 && getHeight() > 0) {
             screenImage = new BufferedImage(getWidth(), getHeight(), BufferedImage.OPAQUE);
+            Log.debug("--------------------Screen image : " + screenImage+"--------------------");
+            Log.debug("----------------------------this : " + System.identityHashCode(this));
             final Graphics g = screenImage.getGraphics();
             drawBackground(g);
-            drawZoomBox(g);
+            //drawRadio(g);
+            
+            
+            //drawGraphs(g); 
+            //drawEvents(g);
+            drawData(g);
             drawLabels(g);
-            drawGraphs(g); 
-            drawEvents(g);            
+            drawZoomBox(g);
         }
+        Log.debug("RedrawGraph finished");
+    }
+    
+    private void drawData(Graphics g){
+    	Map <DrawableType, List<DrawableElement>> drawableElements = drawController.getDrawableElements(identifier);
+    	List<DrawableType> drawTypeList = DrawableType.getZOrderedList();
+    	for(DrawableType dt : drawTypeList){
+    		List<DrawableElement> del = drawableElements.get(dt);
+    		if (del != null){
+    			Log.debug("grapArea when data should be drawn : "+ graphArea);
+    			for (DrawableElement de : del ){
+    				de.draw(g, graphArea);
+    				
+    			}
+    		}
+    	}
     }
     
     private void updateDrawInformation() {
         updateGraphArea();
         updateRatios();
-        updateGraphsData();
+        //updateGraphsData();
         updateMovieLineInformation();
         updateGraphEvents();
     }
@@ -169,102 +224,145 @@ public class ChartDrawGraphPane extends JComponent implements DrawControllerList
     }
 
     private void drawLabels(final Graphics g) {
-        if (!intervalAvailable)
-            return;
+    	Set<YAxisElement> yAxisElements = drawController.getYAxisElements(identifier);
+    	Interval <Date> interval = drawController.getInterval();
+    	if (!drawController.getIntervalAvailable())
+    		return;       
+    	        
+    	
+    	// draw vertical ticks
+    	int counter = 0;
+    	for(YAxisElement yAxisElement : yAxisElements){
+    		drawVerticalLabels(g, yAxisElement, counter==0?0:1);
+    		if (counter > 1){
+    			break;
+    		} 
+    		counter++;
+    	}
         
-        // draw vertical label
-        final String verticalLabel = bands.length > 0 ? "log( " + bands[0].getBandType().getUnitLabel().replace("^2", "²") + " )" : "";
-        final Rectangle2D verticalLabelBounds = g.getFontMetrics().getStringBounds(verticalLabel, g);
+    		// draw horizontal ticks and labels
+    	final Rectangle2D tickTextBounds = g.getFontMetrics().getStringBounds(ChartConstants.FULL_DATE_TIME_FORMAT.format(new Date(interval.getStart().getTime())), g);
+    	final int tickTextWidth = (int) tickTextBounds.getWidth();
+    	final int tickTextHeight = (int) tickTextBounds.getHeight();
+    	final int horizontalTickCount = Math.max(2, (graphArea.width - tickTextWidth * 2) / tickTextWidth);
+    	final long tickDifferenceHorizontal = (interval.getEnd().getTime() - interval.getStart().getTime()) / (horizontalTickCount - 1);
         
+    	for (int i = 0; i < horizontalTickCount; ++i) {
+    		final Date tickValue = new Date(interval.getStart().getTime() + i * tickDifferenceHorizontal);
+    		final int x = graphArea.x + (int)(i * tickDifferenceHorizontal * ratioX);
+    		final String tickText = ChartConstants.FULL_DATE_TIME_FORMAT.format(tickValue);
+           
+    		g.setColor(ChartConstants.TICK_LINE_COLOR);
+    		g.drawLine(x, graphArea.y, x, graphArea.y + graphArea.height + 3);
+            
+    		g.setColor(ChartConstants.LABEL_TEXT_COLOR);
+    		if (i == 0) {
+    			g.drawString(tickText, x - 10, graphArea.y + graphArea.height + 2 + tickTextHeight);
+    		} else if (i == (horizontalTickCount - 1)) {
+    			g.drawString(tickText, getWidth() - 1 - tickTextWidth, graphArea.y + graphArea.height + 2 + tickTextHeight);
+    		} else {
+    			g.drawString(tickText, x - (tickTextWidth / 2), graphArea.y + graphArea.height + 2 + tickTextHeight);
+    		}
+    	}
+        
+    	// inform when no data is available
+    	if (!drawController.hasElementsToBeDrawn(identifier)) {
+    		final String text = "No band / diode / line selected";
+    		final int textWidth = (int) g.getFontMetrics().getStringBounds(text, g).getWidth();
+    		final int x = graphArea.x + (graphArea.width / 2) - (textWidth / 2);
+    		final int y = graphArea.y + graphArea.height / 2;
+           
+    		g.setColor(ChartConstants.LABEL_TEXT_COLOR);
+    		g.drawString(text, x, y);
+           
+    	} 
+    	
+    	//TODO fit this somewhere in here :-)
+    	/*final String text = "No data available";
+		final int textWidth = (int) g.getFontMetrics().getStringBounds(text, g).getWidth();
+		final int x = graphArea.x + (graphArea.width / 2) - (textWidth / 2);
+		final int y = graphArea.y + graphArea.height / 2;
         g.setColor(ChartConstants.LABEL_TEXT_COLOR);
-        g.drawString(verticalLabel, ChartConstants.GRAPH_LEFT_SPACE, (int)verticalLabelBounds.getHeight());
-        
-        // draw vertical ticks
-        if (logMaxValue < logMinValue) {
-            g.setColor(ChartConstants.TICK_LINE_COLOR);
-            
-            final int sizeSteps = graphArea.height / ChartConstants.MIN_VERTICAL_TICK_SPACE;
-            final double diff = graphArea.height / (double)ChartConstants.MIN_VERTICAL_TICK_SPACE; 
-            
-            for (int i = 0; i <= sizeSteps; ++i) {
-                g.drawLine(graphArea.x - 3, (graphArea.y + graphArea.height) - (int)(i * ChartConstants.MIN_VERTICAL_TICK_SPACE * diff), graphArea.x + graphArea.width, (graphArea.y + graphArea.height) - (int)(i * ChartConstants.MIN_VERTICAL_TICK_SPACE * diff));    
-            }            
-        } else {
-            final int dataSteps = ((int)((logMaxValue - logMinValue) * 100));
-            final int sizeSteps = graphArea.height / ChartConstants.MIN_VERTICAL_TICK_SPACE;
-            final int verticalTicks = dataSteps < sizeSteps ? dataSteps : sizeSteps;
-            
-            if (verticalTicks == 0) {
-                final int y = graphArea.y + graphArea.height;
-                
-                g.setColor(ChartConstants.TICK_LINE_COLOR);
-                g.drawLine(graphArea.x - 3, y, graphArea.x + graphArea.width, y);
-            } else {            
-                final double tickDifferenceVertical = (logMaxValue - logMinValue) / verticalTicks;
-                
-                for (int i = 0; i <= verticalTicks; ++i) {
-                    final double tickValue = logMinValue + i * tickDifferenceVertical;
-                    final String tickText = ChartConstants.DECIMAL_FORMAT.format(tickValue);
-                    final int y = graphArea.y + graphArea.height - (int)(ratioY * (tickValue - logMinValue));
-                    
-                    g.setColor(ChartConstants.TICK_LINE_COLOR);
-                    g.drawLine(graphArea.x - 3, y, graphArea.x + graphArea.width, y);
-                    
-                    final Rectangle2D bounds = g.getFontMetrics().getStringBounds(tickText, g);
-                    final int x = graphArea.x - 6 - (int)bounds.getWidth();
-                    g.setColor(ChartConstants.LABEL_TEXT_COLOR);
-                    g.drawString(tickText, x, y + (int)(bounds.getHeight() / 2));
-                }
-            }
-        }
-        
-        // draw horizontal ticks and labels
-        final Rectangle2D tickTextBounds = g.getFontMetrics().getStringBounds(ChartConstants.FULL_DATE_TIME_FORMAT.format(new Date(interval.getStart().getTime())), g);
-        final int tickTextWidth = (int) tickTextBounds.getWidth();
-        final int tickTextHeight = (int) tickTextBounds.getHeight();
-        final int horizontalTickCount = Math.max(2, (graphArea.width - tickTextWidth * 2) / tickTextWidth);
-        final long tickDifferenceHorizontal = (interval.getEnd().getTime() - interval.getStart().getTime()) / (horizontalTickCount - 1);
-        
-        for (int i = 0; i < horizontalTickCount; ++i) {
-            final Date tickValue = new Date(interval.getStart().getTime() + i * tickDifferenceHorizontal);
-            final int x = graphArea.x + (int)(i * tickDifferenceHorizontal * ratioX);
-            final String tickText = ChartConstants.FULL_DATE_TIME_FORMAT.format(tickValue);
-            
-            g.setColor(ChartConstants.TICK_LINE_COLOR);
-            g.drawLine(x, graphArea.y, x, graphArea.y + graphArea.height + 3);
-            
-            g.setColor(ChartConstants.LABEL_TEXT_COLOR);
-            if (i == 0) {
-                g.drawString(tickText, x - 10, graphArea.y + graphArea.height + 2 + tickTextHeight);
-            } else if (i == (horizontalTickCount - 1)) {
-                g.drawString(tickText, getWidth() - 1 - tickTextWidth, graphArea.y + graphArea.height + 2 + tickTextHeight);
-            } else {
-                g.drawString(tickText, x - (tickTextWidth / 2), graphArea.y + graphArea.height + 2 + tickTextHeight);
-            }
-        }
-        
-        // inform when no data is available
-        if (bands.length == 0) {
-            final String text = "No band / diode / line selected";
-            final int textWidth = (int) g.getFontMetrics().getStringBounds(text, g).getWidth();
-            final int x = graphArea.x + (graphArea.width / 2) - (textWidth / 2);
-            final int y = graphArea.y + graphArea.height / 2;
-            
-            g.setColor(ChartConstants.LABEL_TEXT_COLOR);
-            g.drawString(text, x, y);
-            
-        } else if (logMinValue > logMaxValue) {
-            final String text = "No data available";
-            final int textWidth = (int) g.getFontMetrics().getStringBounds(text, g).getWidth();
-            final int x = graphArea.x + (graphArea.width / 2) - (textWidth / 2);
-            final int y = graphArea.y + graphArea.height / 2;
-            
-            g.setColor(ChartConstants.LABEL_TEXT_COLOR);
-            g.drawString(text, x, y);
-        }
+		g.drawString(text, x, y);
+		*/
+    	
     }
     
-    private void drawGraphs(final Graphics g) {
+    private void drawVerticalLabels(Graphics g, YAxisElement yAxisElement, int leftSide){
+    	// draw vertical label
+	   	//final String verticalLabel = bands.length > 0 ? "log( " + bands[0].getBandType().getUnitLabel().replace("^2", "��") + " )" : "";
+	   	final String verticalLabel = yAxisElement.getLabel();
+	   	final Rectangle2D verticalLabelBounds = g.getFontMetrics().getStringBounds(verticalLabel, g);
+	   	g.setColor(ChartConstants.LABEL_TEXT_COLOR);
+    	g.drawString(verticalLabel, ChartConstants.GRAPH_LEFT_SPACE + leftSide * graphArea.width-leftSide*(int)verticalLabelBounds.getWidth(), (int)verticalLabelBounds.getHeight());
+        
+    	double logMinValue = yAxisElement.getMinValue();
+    	double logMaxValue = yAxisElement.getMaxValue();
+    		
+    		
+    	if (logMaxValue < logMinValue) {
+    		g.setColor(ChartConstants.TICK_LINE_COLOR);
+        
+			final int sizeSteps = graphArea.height / ChartConstants.MIN_VERTICAL_TICK_SPACE;
+			final double diff = graphArea.height / (double)ChartConstants.MIN_VERTICAL_TICK_SPACE; 
+        
+			for (int i = 0; i <= sizeSteps; ++i) {
+				g.drawLine(graphArea.x - 3, (graphArea.y + graphArea.height) - (int)(i * ChartConstants.MIN_VERTICAL_TICK_SPACE * diff), graphArea.x + graphArea.width, (graphArea.y + graphArea.height) - (int)(i * ChartConstants.MIN_VERTICAL_TICK_SPACE * diff));    
+			}
+		} else {
+			final int dataSteps = ((int)((logMaxValue - logMinValue) * 100));
+			final int sizeSteps = graphArea.height / ChartConstants.MIN_VERTICAL_TICK_SPACE;
+			final int verticalTicks = dataSteps < sizeSteps ? dataSteps : sizeSteps;
+        
+			if (verticalTicks == 0) {
+				final int y = graphArea.y + graphArea.height;
+            
+				g.setColor(ChartConstants.TICK_LINE_COLOR);
+				g.drawLine(graphArea.x - 3, y, graphArea.x + graphArea.width, y);
+			} else {            
+				final double tickDifferenceVertical = (logMaxValue - logMinValue) / verticalTicks;
+            
+				for (int i = 0; i <= verticalTicks; ++i) {
+					final double tickValue = logMinValue + i * tickDifferenceVertical;
+					final String tickText = ChartConstants.DECIMAL_FORMAT.format(tickValue);
+					Double yAxisRatio = yRatios.get(yAxisElement);
+					if (yAxisRatio == null){
+						continue;
+					}
+					final int y = graphArea.y + graphArea.height - (int)(yAxisRatio * (tickValue - logMinValue));
+                
+					g.setColor(ChartConstants.TICK_LINE_COLOR);
+					if(leftSide == 0){
+						g.drawLine(graphArea.x - 3, y, graphArea.x + graphArea.width, y);
+					}
+                
+					final Rectangle2D bounds = g.getFontMetrics().getStringBounds(tickText, g);
+					final int x = graphArea.x - 6 - (int)bounds.getWidth()+leftSide * (graphArea.width + (int)bounds.getWidth() + 6);
+					g.setColor(ChartConstants.LABEL_TEXT_COLOR);
+					g.drawString(tickText, x, y + (int)(bounds.getHeight() / 2));
+				}
+			}
+			
+		}
+    }
+    
+    @Override
+	public void drawBufferedImage(BufferedImage image, DrawableAreaMap map){
+    	this.redrawGraph();
+	}
+    
+    @Override
+	public void removeDownloadRequestData(long iD) {
+		// TODO Auto-generated method stub
+    	this.redrawGraph();
+	}
+    
+	@Override
+	public void changeVisibility(long iD) {
+		this.redrawGraph();
+	}
+    
+    /*private void drawGraphs(final Graphics g) {
         //if (!intervalAvailable)
         //    return;
     	synchronized(graphPolylines){
@@ -278,27 +376,32 @@ public class ChartDrawGraphPane extends JComponent implements DrawControllerList
 	            }
 	        }
     	}
+    }*/
+    
+    private void drawRadio(final Graphics g){
+    	pane.display(g);   
+    	this.repaint();
     }
     
     private void drawEvents(final Graphics g){
 
-    	/*
-    	for(int i=0; i<events.length; i++){
+    	
+    	/*for(int i=0; i<events.length; i++){
     		final int x1 = (int)((events[i].beginDate.getTime().getTime() - interval.getStart().getTime()) * ratioX) + graphArea.x;
     		final int x2 = (int)((events[i].endDate.getTime().getTime() - interval.getStart().getTime()) * ratioX) + graphArea.x;
             g.setColor(Color.RED);
 
-    		g.drawLine(x1, 20, x2, 20);
+    		/*g.drawLine(x1, 20, x2, 20);
     		for(int j = 0;j<1000;j++){
     			g.drawImage(events[i].icon.getImage(), 100+j, 100, null);
     		}
-    	}
-    	pane.display(g);*/
+    	}*/
+    	
     	
     }     
     
     private void drawMovieLine(final Graphics g) {
-        if (movieLinePosition < 0 || !intervalAvailable ) {
+        if (movieLinePosition < 0 || !drawController.getIntervalAvailable()) {
             return;
         }
         
@@ -307,12 +410,15 @@ public class ChartDrawGraphPane extends JComponent implements DrawControllerList
     }
     
     private void zoomFromZoomBox() {
+    	Interval<Date> interval = drawController.getInterval();
+    	//double logMinValue = drawController.getLogMinValue();
+    	//double logMaxValue = drawController.getLogMaxValue();
         if (mousePressedPosition == null || mouseDragPosition == null) {
             return;
         }
         
-        if (!intervalAvailable || logMaxValue < logMinValue)
-            return;
+        //if (!drawController.getIntervalAvailable() || logMaxValue < logMinValue)
+        //    return;
         
         final int x0 = Math.max(graphArea.x, Math.min(graphArea.x + graphArea.width, mousePressedPosition.x));
         final int y0 = Math.max(graphArea.y, Math.min(graphArea.y + graphArea.height, mousePressedPosition.y));
@@ -322,27 +428,41 @@ public class ChartDrawGraphPane extends JComponent implements DrawControllerList
         final long start = interval.getStart().getTime() + (long)((Math.min(x0, x1) - graphArea.x) / ratioX);
         final long end = interval.getStart().getTime() + (long)((Math.max(x0, x1) - graphArea.x) / ratioX);
         
-        final double min = Math.pow(10, (graphArea.y + graphArea.height - Math.max(y0, y1)) / ratioY + logMinValue);
-        final double max = Math.pow(10, (graphArea.y + graphArea.height - Math.min(y0, y1)) / ratioY + logMinValue);
+        //final double min = Math.pow(10, (graphArea.y + graphArea.height - Math.max(y0, y1)) / ratioY + logMinValue);
+        //final double max = Math.pow(10, (graphArea.y + graphArea.height - Math.min(y0, y1)) / ratioY + logMinValue);
         
         ZoomController.getSingletonInstance().setSelectedInterval(new Interval<Date>(new Date(start), new Date(end)));
-        drawController.setSelectedRange(new Range(min, max));
+        //drawController.setSelectedRange(new Range(min, max));
+        //Log.debug("min : "+ min);
+        //Log.debug("max : "+ max);
+        
     }
     
 
     
     private void updateGraphArea() {
-        final int graphWidth = getWidth() - (ChartConstants.GRAPH_LEFT_SPACE + ChartConstants.GRAPH_RIGHT_SPACE);
+    	if (drawController.getYAxisElements(identifier).size() >= 2){
+    		twoYAxis = 1;
+    	}
+        final int graphWidth = getWidth() - (ChartConstants.GRAPH_LEFT_SPACE + ChartConstants.GRAPH_RIGHT_SPACE + twoYAxis*ChartConstants.TWO_AXIS_GRAPH_RIGHT);
         final int graphHeight = getHeight() - (ChartConstants.GRAPH_TOP_SPACE + ChartConstants.GRAPH_BOTTOM_SPACE);
         graphArea = new Rectangle(ChartConstants.GRAPH_LEFT_SPACE, ChartConstants.GRAPH_TOP_SPACE, graphWidth, graphHeight);
+        zoomManager.setDisplaySize(graphArea, identifier);
     }
     
     private void updateRatios() {
-        ratioX = !intervalAvailable ? 0 : (double)graphArea.width / (double)(interval.getEnd().getTime() - interval.getStart().getTime());
-        ratioY = logMaxValue < logMinValue ? 0 : graphArea.height / (logMaxValue - logMinValue);
+    	Interval<Date> interval = drawController.getInterval();
+    	ratioX = !drawController.getIntervalAvailable() ? 0 : (double)graphArea.width / (double)(interval.getEnd().getTime() - interval.getStart().getTime());
+    	yRatios = new HashMap<YAxisElement, Double>();
+    	for(YAxisElement yAxisElement : drawController.getYAxisElements(identifier)){
+    		double logMinValue = yAxisElement.getMinValue();
+    		double logMaxValue = yAxisElement.getMaxValue();
+    		double ratioY = logMaxValue < logMinValue ? 0 : graphArea.height / (logMaxValue - logMinValue);
+    		yRatios.put(yAxisElement, ratioY);
+    	}
     }
     
-    private void updateGraphsData() {
+    /*private void updateGraphsData() {
         graphPolylines.clear();
         //if (!intervalAvailable)
         //    return;
@@ -401,9 +521,10 @@ public class ChartDrawGraphPane extends JComponent implements DrawControllerList
     private int computeY(double orig){
     	return graphArea.y + graphArea.height - (int)(ratioY * (Math.log10(orig) - logMinValue));
     }
-    
+    */
     private void updateMovieLineInformation() {
-        if (movieTimestamp == null || !intervalAvailable) {
+    	Interval<Date> interval = drawController.getInterval();
+        if (movieTimestamp == null || !drawController.getIntervalAvailable()) {
             movieLinePosition = -1;
             return;
         }
@@ -426,7 +547,8 @@ public class ChartDrawGraphPane extends JComponent implements DrawControllerList
     }   
     
     private void setMovieFrameManually(final Point point) {
-        if (movieTimestamp == null || !intervalAvailable) {
+    	Interval<Date> interval = drawController.getInterval();
+        if (movieTimestamp == null || !drawController.getIntervalAvailable()) {
             return;
         }
         
@@ -443,7 +565,7 @@ public class ChartDrawGraphPane extends JComponent implements DrawControllerList
     // Draw Controller Listener
     // //////////////////////////////////////////////////////////////////////////////
     
-    public void drawRequest(final Interval<Date> interval, final Band[] bands, final EVEValues[] values, final Range availableRange, final Range selectedRange) {
+    /*public void drawRequest(final Interval<Date> interval, final Band[] bands, final EVEValues[] values, final Range availableRange, final Range selectedRange) {
         this.interval = interval;
         this.intervalAvailable = interval.getStart() != null && interval.getEnd() != null; 
         this.bands = bands;
@@ -462,7 +584,7 @@ public class ChartDrawGraphPane extends JComponent implements DrawControllerList
         updateMovieLineInformation();
         
         repaint();
-    }
+    }*/
     
     // //////////////////////////////////////////////////////////////////////////////
     // Mouse Input Listener
@@ -518,7 +640,7 @@ public class ChartDrawGraphPane extends JComponent implements DrawControllerList
     public void mouseMoved(final MouseEvent e) {
         final Rectangle frame = new Rectangle(movieLinePosition - 1, graphArea.y, 3, graphArea.height);
         
-        if (movieLinePosition >= 0 && intervalAvailable && frame.contains(e.getPoint())) {
+        if (movieLinePosition >= 0 && drawController.getIntervalAvailable() && frame.contains(e.getPoint())) {
             setCursor(new Cursor(Cursor.E_RESIZE_CURSOR));
         } else {
             setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
@@ -534,8 +656,11 @@ public class ChartDrawGraphPane extends JComponent implements DrawControllerList
     public void componentMoved(ComponentEvent e) {}
 
     public void componentResized(ComponentEvent e) {
-        lastKnownWidth = getWidth();
-        lastKnownHeight = getHeight();
+        lastKnownWidth = getWidth() - (ChartConstants.GRAPH_LEFT_SPACE + ChartConstants.GRAPH_RIGHT_SPACE + twoYAxis * ChartConstants.TWO_AXIS_GRAPH_RIGHT);
+        lastKnownHeight = getHeight() - (ChartConstants.GRAPH_TOP_SPACE + ChartConstants.GRAPH_BOTTOM_SPACE);
+        zoomManager.setDisplaySize(new Rectangle(ChartConstants.GRAPH_LEFT_SPACE,ChartConstants.GRAPH_TOP_SPACE,
+        		lastKnownWidth, lastKnownHeight),identifier);
+        
         
         updateGraph();
     }
@@ -613,5 +738,20 @@ public class ChartDrawGraphPane extends JComponent implements DrawControllerList
         	if (icon == null)
         		icon = new ImageIcon(url); 
         }
-    }    
+    }
+
+	@Override
+	public void drawRequest() {
+		/*Log.debug("repaint on "+ this);
+		revalidate();
+		*/
+		updateGraph();
+		repaint();
+	}
+
+	
+
+	
+
+	
 }

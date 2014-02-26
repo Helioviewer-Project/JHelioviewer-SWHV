@@ -54,13 +54,11 @@ public class SoftwareModeFilter implements StandardFilter {
         this.isLogging = isLogging;
     }
 
-	@Override
 	public void setState(String state) {
 		// TODO Auto-generated method stub
 		
 	}
 
-	@Override
 	public String getState() {
 		// TODO Auto-generated method stub
 		return null;

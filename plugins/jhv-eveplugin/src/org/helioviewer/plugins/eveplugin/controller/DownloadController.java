@@ -24,6 +24,7 @@ import org.helioviewer.plugins.eveplugin.settings.BandType;
 
 import org.helioviewer.plugins.eveplugin.settings.EVESettings;
 import org.helioviewer.plugins.eveplugin.settings.EVEAPI.API_URL_PARAMETER_TYPE_VALUES;
+import org.helioviewer.plugins.eveplugin.view.linedataselector.LineDataSelectorModel;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -52,12 +53,16 @@ public class DownloadController {
     
     private final DownloadManager downloadManager = new DownloadManager();
     
+    private final LineDataSelectorModel selectorModel;
+    
     // //////////////////////////////////////////////////////////////////////////////
     // Methods
     // //////////////////////////////////////////////////////////////////////////////
     
     private DownloadController() {
+    	selectorModel = LineDataSelectorModel.getSingletonInstance();
         new Thread(downloadManager, "EVEDownloadManager").start();
+        
     }
     
     public static final DownloadController getSingletonInstance() {
@@ -252,12 +257,14 @@ public class DownloadController {
         for(final DownloadControllerListener listener : listeners) {
             listener.downloadStarted(band, interval);
         }
+        selectorModel.downloadStarted(band);
     }
     
     private void fireDownloadFinished(final Band band, final Interval<Date> interval, final int activeBandDownloads) {
         for(final DownloadControllerListener listener : listeners) {
             listener.downloadFinished(band, interval, activeBandDownloads);
         }
+        selectorModel.downloadFinished(band);
     }
     
     private LinkedList<Interval<Date>> splitInterval(final Interval<Date> interval) {
