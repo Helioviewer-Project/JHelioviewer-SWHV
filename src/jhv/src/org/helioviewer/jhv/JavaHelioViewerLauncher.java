@@ -117,7 +117,7 @@ public class JavaHelioViewerLauncher {
                 commandLine.add(System.getProperty("java.home") + System.getProperty("file.separator") + "bin" + System.getProperty("file.separator") + "java");
 
                 // Initialize settings and variables
-                System.out.println("JavaHelioviewerLauncher > Initialize settings and read arguments for JVM");
+                System.out.println("JavaHelioviewerLauncher > Initialize settings and read argmuents for JVM");
                 // Load settings without logging (since this class cannot use
                 // the logger due to java 1.2 compatibility)
                 Settings.getSingletonInstance().load(false);
