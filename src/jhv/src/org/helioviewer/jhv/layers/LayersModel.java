@@ -216,34 +216,8 @@ public class LayersModel implements ViewListener {
      */
     public String getCurrentFrameTimestampString(View view) {
 
-        if (view == null) {
-            return null;
-        }
-
-        MetaData md = view.getAdapter(MetaDataView.class).getMetaData();
-
-        if (md instanceof ObserverMetaData) {
-
-            ObserverMetaData obsMetaData = (ObserverMetaData) md;
-
-            // get date and convert it to formatted string
-            SimpleDateFormat dateFormat;
-            try {
-                dateFormat = new SimpleDateFormat(Settings.getSingletonInstance().getProperty("default.date.format"));
-            } catch (IllegalArgumentException e1) {
-                dateFormat = new SimpleDateFormat("yyyy/MM/dd");
-            } catch (NullPointerException e2) {
-                dateFormat = new SimpleDateFormat("yyyy/MM/dd");
-            }
-
-            Date date = new GregorianCalendar(obsMetaData.getDateTime().getField(Calendar.YEAR), obsMetaData.getDateTime().getField(Calendar.MONTH), obsMetaData.getDateTime().getField(Calendar.DAY_OF_MONTH)).getTime();
-
-            // add time to name
-            return String.format(Locale.ENGLISH, "%s %02d:%02d:%02d\n", dateFormat.format(date), obsMetaData.getDateTime().getField(Calendar.HOUR_OF_DAY), obsMetaData.getDateTime().getField(Calendar.MINUTE), obsMetaData.getDateTime().getField(Calendar.SECOND));
-
-        } else {
-            return "N/A";
-        }
+    	ImmutableDateTime dt= getCurrentFrameTimestamp(view);
+    	return dt.toString();
     }
 
     /**

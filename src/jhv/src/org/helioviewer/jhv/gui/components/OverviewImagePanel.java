@@ -151,7 +151,7 @@ public class OverviewImagePanel extends BasicImagePanel {
         }
 
         // repaint the image
-        getView().getComponent().repaint();
+        //getView().getComponent().repaint();
     }
 
     /**
