@@ -30,6 +30,7 @@ import org.helioviewer.viewmodel.imagetransport.Byte8ImageTransport;
 import org.helioviewer.viewmodel.view.ImageInfoView;
 import org.helioviewer.viewmodel.view.View;
 import org.helioviewer.viewmodel.view.ViewListener;
+import org.helioviewer.viewmodel.view.jp2view.JHVJP2View;
 import org.helioviewer.viewmodel.view.jp2view.JHVJPXView;
 import org.helioviewer.viewmodel.view.jp2view.JP2Image;
 import org.helioviewer.viewmodel.view.jp2view.image.ResolutionSet;
@@ -44,7 +45,8 @@ public class RadioDataManager implements ViewListener, RadioDownloaderListener{/
 	private RadioImage previousRadioImage;
 	private Interval maxTimeRange;
 	private FrequencyInterval maxFrequencyInterval;
-	private JHVJPXView currentJPXView;
+	private JHVJP2View currentJP2View;
+	private boolean isCurrentJPX;
 	private JP2Image currentJP2Image;
 	
 	private RadioDownloader downloader;
@@ -60,7 +62,8 @@ public class RadioDataManager implements ViewListener, RadioDownloaderListener{/
 		downloadRequestData = new HashMap<Long,DownloadRequestData>();
 		downloader = RadioDownloader.getSingletonInstance();
 		downloader.addRadioDownloaderListener(this);
-		currentJPXView = null;
+		currentJP2View = null;
+		isCurrentJPX = false;
 		currentJP2Image = null;
 		this.acceptEvents = false;
 		this.eventReceived = false;
@@ -193,8 +196,9 @@ public class RadioDataManager implements ViewListener, RadioDownloaderListener{/
 			if (jpxView != null){
 				jpxView.addViewListener(this);
 				JP2Image image = jpxView.getJP2Image();
-				currentJPXView = jpxView;
-				currentJP2Image = currentJPXView.getJP2Image();
+				currentJP2View = jpxView;
+				isCurrentJPX = true;
+				currentJP2Image = currentJP2View.getJP2Image();
 				ResolutionSet rs = image.getResolutionSet();
 				Log.debug("the resolution set : " +rs.toString());
 				for (int i = 0; i < rs.getMaxResolutionLevels();i++){
@@ -276,6 +280,92 @@ public class RadioDataManager implements ViewListener, RadioDownloaderListener{/
 				fireNewDataAvailable(drd, ID);
 				fireDownloadRequestAnswered(maxFrequencyInterval, new Interval<Date>(requestedStartTime,requestedEndTime), ID, identifier);
 				
+			}else{
+				JHVJP2View jp2View = view.getAdapter(JHVJP2View.class);
+				jp2View.addViewListener(this);
+				JP2Image image = jp2View.getJP2Image();
+				currentJP2View = jp2View;
+				currentJP2Image = currentJP2View.getJP2Image();
+				ResolutionSet rs = image.getResolutionSet();
+				Log.debug("the resolution set : " +rs.toString());
+				for (int i = 0; i < rs.getMaxResolutionLevels();i++){
+					Log.debug("resolution level " + i + " : " + rs.getResolutionLevel(i));
+				}
+				Log.debug("++++++++++++++++++++++++++++++++++++++");
+				Interval<Integer> interval = image.getCompositionLayerRange();
+				Log.debug("the interval is : " + interval);
+				Log.debug("the start of the interval : " + interval.getStart());
+				Log.debug("the end of the interval : "+ interval.getEnd());
+				DownloadRequestData drd = new DownloadRequestData(ID,identifier);
+				drd.setDownloading(true);
+				lineDataSelectorModel.addLineData(drd); 
+				LineDataSelectorModel.getSingletonInstance().downloadStarted(drd);
+				for(int i=interval.getStart(); i<= interval.getEnd(); i++){
+					Log.debug("BITPIX : " + image.get("BITPIX",i));
+					Log.debug("NAXIS1 : " + image.get("NAXIS1",i));
+					Log.debug("NAXIS2 : " + image.get("NAXIS2",i));
+					Log.debug("DATE-OBS : " + image.get("DATE-OBS",i));
+					Log.debug("TELESCOP : " + image.get("TELESCOP",i));
+					Log.debug("INSTRUME : " + image.get("INSTRUME",i));
+					Log.debug("DETECTOR : " + image.get("DETECTOR",i));
+					Log.debug("WAVELNTH : " + image.get("WAVELNTH",i));
+					Log.debug("DATE-END : " + image.get("DATE-END",i));
+					Log.debug("TIMEDELT : " + image.get("TIMEDELT",i));
+					Log.debug("STARTFREQ : " + image.get("STARTFRQ",i));
+					Log.debug("END-FREQ : " + image.get("END-FREQ",i));
+					Log.debug("FREQDELT : " + image.get("FREQDELT",i));
+					Log.debug("CDELT1 : " + image.get("CDELT1",i));
+					Log.debug("CDELT2 : " + image.get("CDELT2",i));
+					Log.debug("CRPIX1 : " + image.get("CRPIX1",i));
+					Log.debug("CRPIX2 : " + image.get("CRPIX2",i));
+					SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
+					FrequencyInterval fi = new FrequencyInterval(
+							Integer.parseInt(image.get("STARTFRQ",i)),
+							Integer.parseInt(image.get("END-FREQ",i)));
+					Log.debug("Ratios : ");
+					Date start = null;
+					Date end = null;
+					try {
+						start = sdf.parse(image.get("DATE-OBS",i));
+						end = sdf.parse(image.get("DATE-END",i));
+					} catch (ParseException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+						Log.error("Could not parse  "+ image.get("DATE-OBS",i) +" or "+ image.get("DATE-END",i));
+					}
+					List<ResolutionSetting> resolutionSettings = new ArrayList<ResolutionSetting>();
+					if(start !=null && end != null){
+						Double freqStart = Double.parseDouble(image.get("STARTFRQ",i));
+						Double freqEnd = Double.parseDouble(image.get("END-FREQ",i));
+						Interval<Date> dateInterval = new Interval<Date>(start,end);
+						for (int j = 0; j < rs.getMaxResolutionLevels();j++){
+							ResolutionSetting tempResSet = new ResolutionSetting(
+									(1.0*(end.getTime()-start.getTime())/rs.getResolutionLevel(j).getResolutionBounds().width), 
+									((freqEnd-freqStart)/rs.getResolutionLevel(j).getResolutionBounds().height), 
+									j, 
+									rs.getResolutionLevel(j).getResolutionBounds().width,
+									rs.getResolutionLevel(j).getResolutionBounds().height, 
+									rs.getResolutionLevel(j).getZoomLevel());
+							resolutionSettings.add(tempResSet);
+							Log.debug("resolution level " + j + " : " +rs.getResolutionLevel(j));
+							Log.debug("Frequency Ratio : " + ((freqEnd-freqStart)/rs.getResolutionLevel(j).getResolutionBounds().height));
+							Log.debug("Date ratio: " + (1.0*(end.getTime()-start.getTime())/rs.getResolutionLevel(j).getResolutionBounds().width));
+							Log.debug("************************************");
+						}
+						RadioImage tempRs = new RadioImage(ID,dateInterval,fi,i,rs,resolutionSettings,identifier);
+						drd.addRadioImage(tempRs);
+					}else{
+						Log.debug("Start and/or stop is null");
+					}
+					Log.debug("++++++++++++++++++++++++++++++++++++++++++++++++++++++++");
+					
+				}
+				this.downloadRequestData.put(ID, drd);
+				defineMaxBounds(ID);
+				
+				//fireNewGlobalFrequencyInterval(maxFrequencyInterval);
+				fireNewDataAvailable(drd, ID);
+				fireDownloadRequestAnswered(maxFrequencyInterval, new Interval<Date>(requestedStartTime,requestedEndTime), ID, identifier);
 			}			
 		/*} catch (URISyntaxException e) {
 			// TODO Auto-generated catch block
@@ -337,73 +427,143 @@ public class RadioDataManager implements ViewListener, RadioDownloaderListener{/
 
 	public synchronized void requestForData(Date xStart, Date xEnd, double yStart, double yEnd,
 			double xRatio, double yRatio, List<Long> iDs) {
-		if(!(xRatio < 0) && !(yRatio < 0)){
-			fireClearAllSavedImages();
-			for (Long id : iDs){
-				DownloadRequestData drd = this.downloadRequestData.get(id);
-				if (drd != null){
-					drd.setDownloading(true);
-					lineDataSelectorModel.downloadStarted(downloadRequestData.get(id));
-					if(currentJP2Image != null && currentJPXView != null){
-						Log.debug("Received request for data: ");
-						Log.debug("x Start : "+ xStart.toString());
-						Log.debug("x End : "+ xEnd.toString());
-						Log.debug("y Start : "+ yStart);
-						Log.debug("y End : " + yEnd);
-						Log.debug("x Ratio : " + xRatio);
-						Log.debug("y Ratio : " + yRatio);
-						Log.debug("Search best resolution");
-						ChangeEvent e = new ChangeEvent();
-						Interval<Date> completeInterval = new Interval<Date>(xStart,xEnd);
-						FrequencyInterval completeFreqInterval = new FrequencyInterval((int)Math.round(yStart),(int)Math.round(yEnd));
-						List<RadioImage> radioImages = downloadRequestData.get(id).getRadioImages();
-						for (RadioImage tempIm : radioImages){
-							ResolutionSetting rs = tempIm.defineBestResolutionSetting(xRatio, yRatio);
-						
-							Log.debug("Resolution level : "+ rs.getResolutionLevel());
-							Log.debug("Ratio x : " + rs.getxRatio());
-							Log.debug("Ratio y : " + rs.getyRatio());
-						
-							if(tempIm.withinInterval(completeInterval,completeFreqInterval)){
-								currentJPXView.setViewport(new ViewportAdapter(new StaticViewport(rs.getVec2dIntRepresenation())), e);
-								Log.debug("Viewport set");
-								acceptEvents = true;
-								Log.debug("Will set the timestamp to " + tempIm.getFrameInJPX());
-								currentJPXView.setCurrentFrame(tempIm.getFrameInJPX(), e, true);
-								Log.debug("Changed the viewport and the timestamp wait for the event :-)");
-								byte[] data = new byte[0];
-								while(!eventReceived){
-									Log.debug("Wait for event");
-									try {
-										Thread.sleep(10);
-									} catch (InterruptedException ex) {
-										// TODO Auto-generated catch block
-										ex.printStackTrace();
+		if(isCurrentJPX){
+			JHVJPXView tempCurrent = currentJP2View.getAdapter(JHVJPXView.class);
+			if(!(xRatio < 0) && !(yRatio < 0)){
+				fireClearAllSavedImages();
+				for (Long id : iDs){
+					DownloadRequestData drd = this.downloadRequestData.get(id);
+					if (drd != null){
+						drd.setDownloading(true);
+						lineDataSelectorModel.downloadStarted(downloadRequestData.get(id));
+						if(currentJP2Image != null && tempCurrent != null){
+							Log.debug("Received request for data: ");
+							Log.debug("x Start : "+ xStart.toString());
+							Log.debug("x End : "+ xEnd.toString());
+							Log.debug("y Start : "+ yStart);
+							Log.debug("y End : " + yEnd);
+							Log.debug("x Ratio : " + xRatio);
+							Log.debug("y Ratio : " + yRatio);
+							Log.debug("Search best resolution");
+							ChangeEvent e = new ChangeEvent();
+							Interval<Date> completeInterval = new Interval<Date>(xStart,xEnd);
+							FrequencyInterval completeFreqInterval = new FrequencyInterval((int)Math.round(yStart),(int)Math.round(yEnd));
+							List<RadioImage> radioImages = downloadRequestData.get(id).getRadioImages();
+							for (RadioImage tempIm : radioImages){
+								ResolutionSetting rs = tempIm.defineBestResolutionSetting(xRatio, yRatio);
+							
+								Log.debug("Resolution level : "+ rs.getResolutionLevel());
+								Log.debug("Ratio x : " + rs.getxRatio());
+								Log.debug("Ratio y : " + rs.getyRatio());
+							
+								if(tempIm.withinInterval(completeInterval,completeFreqInterval)){
+									currentJP2View.setViewport(new ViewportAdapter(new StaticViewport(rs.getVec2dIntRepresenation())), e);
+									Log.debug("Viewport set");
+									acceptEvents = true;
+									Log.debug("Will set the timestamp to " + tempIm.getFrameInJPX());
+									tempCurrent.setCurrentFrame(tempIm.getFrameInJPX(), e, true);
+									Log.debug("Changed the viewport and the timestamp wait for the event :-)");
+									byte[] data = new byte[0];
+									while(!eventReceived){
+										Log.debug("Wait for event");
+										try {
+											Thread.sleep(10);
+										} catch (InterruptedException ex) {
+											// TODO Auto-generated catch block
+											ex.printStackTrace();
+										}
 									}
+									eventReceived = false;
+									acceptEvents = false;
+									SingleChannelByte8ImageData imageData = (SingleChannelByte8ImageData)(tempCurrent.getSubimageData());
+									Byte8ImageTransport bytetrs =  (Byte8ImageTransport) imageData.getImageTransport();
+									//byte[] data = bytetrs.getByte8PixelData();
+									//byte[] newData  = new byte[data.length];
+									data = bytetrs.getByte8PixelData();
+									Log.debug("Length of the data"+data.length);
+									int width = imageData.getWidth();
+									int height = imageData.getHeight();
+									Log.debug("width = "+ width);
+									Log.debug("height = " + height);
+									fireNewDataReceived(data, tempIm.getTimeInterval(),tempIm.getFreqInterval(), new Rectangle(rs.getWidth(),rs.getHeight()), id, drd.getPlotIdentifier());
 								}
-								eventReceived = false;
-								acceptEvents = false;
-								SingleChannelByte8ImageData imageData = (SingleChannelByte8ImageData)(currentJPXView.getSubimageData());
-								Byte8ImageTransport bytetrs =  (Byte8ImageTransport) imageData.getImageTransport();
-								//byte[] data = bytetrs.getByte8PixelData();
-								//byte[] newData  = new byte[data.length];
-								data = bytetrs.getByte8PixelData();
-								int width = imageData.getWidth();
-								int height = imageData.getHeight();
-								Log.debug("width = "+ width);
-								Log.debug("height = " + height);
-								fireNewDataReceived(data, tempIm.getTimeInterval(),tempIm.getFreqInterval(), new Rectangle(rs.getWidth(),rs.getHeight()), id, drd.getPlotIdentifier());
 							}
 						}
+						downloadRequestData.get(id).setDownloading(false);
+						lineDataSelectorModel.downloadFinished(downloadRequestData.get(id));
 					}
-					downloadRequestData.get(id).setDownloading(false);
-					lineDataSelectorModel.downloadFinished(downloadRequestData.get(id));
 				}
+			}else{
+				Log.error("One of the ratios where negative");
+				Log.error("xratio : " + xRatio);
+				Log.error("yratio : " + yRatio);
 			}
 		}else{
-			Log.error("One of the ratios where negative");
-			Log.error("xratio : " + xRatio);
-			Log.error("yratio : " + yRatio);
+			if(!(xRatio < 0) && !(yRatio < 0)){
+				fireClearAllSavedImages();
+				for (Long id : iDs){
+					DownloadRequestData drd = this.downloadRequestData.get(id);
+					if (drd != null){
+						drd.setDownloading(true);
+						lineDataSelectorModel.downloadStarted(downloadRequestData.get(id));
+						if(currentJP2Image != null && currentJP2View != null){
+							Log.debug("Received request for data: ");
+							Log.debug("x Start : "+ xStart.toString());
+							Log.debug("x End : "+ xEnd.toString());
+							Log.debug("y Start : "+ yStart);
+							Log.debug("y End : " + yEnd);
+							Log.debug("x Ratio : " + xRatio);
+							Log.debug("y Ratio : " + yRatio);
+							Log.debug("Search best resolution");
+							ChangeEvent e = new ChangeEvent();
+							Interval<Date> completeInterval = new Interval<Date>(xStart,xEnd);
+							FrequencyInterval completeFreqInterval = new FrequencyInterval((int)Math.round(yStart),(int)Math.round(yEnd));
+							List<RadioImage> radioImages = downloadRequestData.get(id).getRadioImages();
+							for (RadioImage tempIm : radioImages){
+								ResolutionSetting rs = tempIm.defineBestResolutionSetting(xRatio, yRatio);
+							
+								Log.debug("Resolution level : "+ rs.getResolutionLevel());
+								Log.debug("Ratio x : " + rs.getxRatio());
+								Log.debug("Ratio y : " + rs.getyRatio());
+							
+								if(tempIm.withinInterval(completeInterval,completeFreqInterval)){
+									currentJP2View.setViewport(new ViewportAdapter(new StaticViewport(rs.getVec2dIntRepresenation())), e);
+									Log.debug("Viewport set");
+									acceptEvents = true;
+									Log.debug("Changed the viewport");
+									byte[] data = new byte[0];
+									while(!eventReceived){
+										Log.debug("Wait for event");
+										try {
+											Thread.sleep(10);
+										} catch (InterruptedException ex) {
+											// TODO Auto-generated catch block
+											ex.printStackTrace();
+										}
+									}
+ 									SingleChannelByte8ImageData imageData = (SingleChannelByte8ImageData)(currentJP2View.getSubimageData());
+									Byte8ImageTransport bytetrs =  (Byte8ImageTransport) imageData.getImageTransport();
+									//byte[] data = bytetrs.getByte8PixelData();
+									//byte[] newData  = new byte[data.length];
+									data = bytetrs.getByte8PixelData();
+									Log.debug("Length of the data"+data.length);
+									int width = imageData.getWidth();
+									int height = imageData.getHeight();
+									Log.debug("width = "+ width);
+									Log.debug("height = " + height);
+									fireNewDataReceived(data, tempIm.getTimeInterval(),tempIm.getFreqInterval(), new Rectangle(rs.getWidth(),rs.getHeight()), id, drd.getPlotIdentifier());
+								}
+							}
+						}
+						downloadRequestData.get(id).setDownloading(false);
+						lineDataSelectorModel.downloadFinished(downloadRequestData.get(id));
+					}
+				}
+			}else{
+				Log.error("One of the ratios where negative");
+				Log.error("xratio : " + xRatio);
+				Log.error("yratio : " + yRatio);
+			}
 		}
 	}
 
