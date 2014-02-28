@@ -118,8 +118,8 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
         
         //drawController.addDrawControllerListener(this);
         
-        addMouseListener(this);
-        addMouseMotionListener(this);
+        //addMouseListener(this);
+        //addMouseMotionListener(this);
         addComponentListener(this);
 		pane = new RadioImagePane();
         
@@ -289,6 +289,14 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
     }
     
     private void drawVerticalLabels(Graphics g, YAxisElement yAxisElement, int leftSide){
+    	// draw rectangle hiding to big radio image
+    	g.setColor(Color.WHITE);
+    	if(leftSide == 0){
+    		g.fillRect(0, ChartConstants.GRAPH_TOP_SPACE, ChartConstants.GRAPH_LEFT_SPACE, graphArea.height);
+    		g.fillRect(ChartConstants.GRAPH_LEFT_SPACE + graphArea.width, ChartConstants.GRAPH_TOP_SPACE,ChartConstants.TWO_AXIS_GRAPH_RIGHT, graphArea.height);
+    	}else{
+    		g.fillRect(ChartConstants.GRAPH_LEFT_SPACE + graphArea.width, ChartConstants.GRAPH_TOP_SPACE,ChartConstants.TWO_AXIS_GRAPH_RIGHT+ChartConstants.GRAPH_RIGHT_SPACE, graphArea.height);
+    	}
     	// draw vertical label
 	   	//final String verticalLabel = bands.length > 0 ? "log( " + bands[0].getBandType().getUnitLabel().replace("^2", "��") + " )" : "";
 	   	final String verticalLabel = yAxisElement.getLabel();
