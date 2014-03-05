@@ -35,7 +35,7 @@ public interface ComponentView extends ModifiableInnerViewView, ViewListener {
      * Deactivate the Component View can be used to clean up the component view
      * when this view chain, i.e. this Component View is not in use anymore
      * 
-     * @Author Simon Sp�rri
+     * @Author Simon Spoerri
      */
     public void deactivate();
 
@@ -43,7 +43,7 @@ public interface ComponentView extends ModifiableInnerViewView, ViewListener {
      * Activate is called before the component view will be the active component
      * view displayed on the GUI.
      * 
-     * @Author Simon Sp�rri
+     * @Author Simon Spoerri
      */
     public void activate();
 

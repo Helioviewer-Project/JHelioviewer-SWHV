@@ -364,7 +364,7 @@ public class ViewchainFactory {
 				.getSingeltonInstance().getOverlayContainers(true);
 		OverlayControlComponentManager manager = new OverlayControlComponentManager();
 
-		// FIXME: Simon Sp�rri, check if this can be done more nicely
+		// FIXME: Simon Spoerri, check if this can be done more nicely
 		// View nextView = componentView.getView();
 
 		for (int i = overlayContainerList.size() - 1; i >= 0; i--) {
