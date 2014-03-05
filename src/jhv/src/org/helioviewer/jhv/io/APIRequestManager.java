@@ -335,7 +335,7 @@ public class APIRequestManager {
         if (addToViewChain) {
             // ViewchainFactory factory = new ViewchainFactory();
             ViewchainFactory factory = StateController.getInstance().getCurrentState().getViewchainFactory();
-            // FIXME: Simon Sp���rri, properly resolve State dependencies
+            // FIXME: Simon Spoerri, properly resolve State dependencies
             factory.addLayerToViewchainMain(view, ImageViewerGui.getSingletonInstance().getMainView());
         }
         return view;
