@@ -1,7 +1,6 @@
 package org.helioviewer.plugins.eveplugin.radio.model;
 
 import org.helioviewer.base.math.Vector2dInt;
-import org.helioviewer.viewmodel.view.jp2view.image.ResolutionSet.ResolutionLevel;
 
 public class ResolutionSetting {
 	private double xRatio;
@@ -78,6 +77,17 @@ public class ResolutionSetting {
 
 	public Vector2dInt getVec2dIntRepresenation(){
 		return new Vector2dInt(width,height);
+	}
+	
+	public boolean equals(Object other){
+		if (other != null && other instanceof ResolutionSetting){
+			ResolutionSetting temprs = (ResolutionSetting)other;
+			return 	temprs.getHeight() == height && 
+					temprs.getWidth() == width &&
+					temprs.getxRatio() == xRatio &&
+					temprs.getyRatio() == yRatio;
+		}
+		return false;
 	}
 	
 }

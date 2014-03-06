@@ -3,9 +3,7 @@ package org.helioviewer.plugins.eveplugin.radio.data;
 import java.awt.Rectangle;
 import java.io.IOException;
 import java.net.URI;
-import java.net.URISyntaxException;
 import java.text.ParseException;
-import java.text.ParsePosition;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -16,12 +14,13 @@ import java.util.Map;
 import org.helioviewer.base.logging.Log;
 import org.helioviewer.base.math.Interval;
 import org.helioviewer.plugins.eveplugin.controller.ZoomController;
-import org.helioviewer.plugins.eveplugin.controller.ZoomControllerListener;
 import org.helioviewer.plugins.eveplugin.radio.model.ResolutionSetting;
-import org.helioviewer.plugins.eveplugin.radio.model.ZoomManager;
-import org.helioviewer.plugins.eveplugin.settings.EVEAPI.API_RESOLUTION_AVERAGES;
-import org.helioviewer.plugins.eveplugin.view.linedataselector.LineDataSelectorElement;
+import org.helioviewer.plugins.eveplugin.radio.test.DataChecker;
+import org.helioviewer.plugins.eveplugin.radio.test.RadioImageTestFrame;
+import org.helioviewer.plugins.eveplugin.radio.test.SendDataTestFrame;
 import org.helioviewer.plugins.eveplugin.view.linedataselector.LineDataSelectorModel;
+import org.helioviewer.viewmodel.changeevent.CacheStatusChangedReason;
+import org.helioviewer.viewmodel.changeevent.CacheStatusChangedReason.CacheType;
 import org.helioviewer.viewmodel.changeevent.ChangeEvent;
 import org.helioviewer.viewmodel.changeevent.SubImageDataChangedReason;
 import org.helioviewer.viewmodel.changeevent.TimestampChangedReason;
@@ -34,7 +33,6 @@ import org.helioviewer.viewmodel.view.jp2view.JHVJP2View;
 import org.helioviewer.viewmodel.view.jp2view.JHVJPXView;
 import org.helioviewer.viewmodel.view.jp2view.JP2Image;
 import org.helioviewer.viewmodel.view.jp2view.image.ResolutionSet;
-import org.helioviewer.viewmodel.view.jp2view.kakadu.JHV_KduException;
 import org.helioviewer.viewmodel.viewport.StaticViewport;
 import org.helioviewer.viewmodel.viewport.ViewportAdapter;
 
@@ -43,7 +41,7 @@ public class RadioDataManager implements ViewListener, RadioDownloaderListener{/
 	private List<RadioDataManagerListener> listeners;
 	private Map<Long, DownloadRequestData> downloadRequestData;
 	private RadioImage previousRadioImage;
-	private Interval maxTimeRange;
+	private Interval<Date> maxTimeRange;
 	private FrequencyInterval maxFrequencyInterval;
 	private JHVJP2View currentJP2View;
 	private boolean isCurrentJPX;
@@ -51,13 +49,22 @@ public class RadioDataManager implements ViewListener, RadioDownloaderListener{/
 	
 	private RadioDownloader downloader;
 	private boolean eventReceived;
-	private boolean acceptEvents;
+	//private boolean acceptEvents;
+	private boolean expectEvent;
+	private int latestComplete;
+	private int waitingForFrame;
+	private DataChecker dataChecker;
 	
 	private ZoomController zoomController;
 	
 	private LineDataSelectorModel lineDataSelectorModel;
 	
+	//private RadioImageTestFrame testFrame;
+	//private SendDataTestFrame sendDataTestFrame;
+	
 	private RadioDataManager(){
+		//testFrame = new RadioImageTestFrame();
+		//sendDataTestFrame = new SendDataTestFrame();
 		listeners = new ArrayList<RadioDataManagerListener>();
 		downloadRequestData = new HashMap<Long,DownloadRequestData>();
 		downloader = RadioDownloader.getSingletonInstance();
@@ -65,11 +72,17 @@ public class RadioDataManager implements ViewListener, RadioDownloaderListener{/
 		currentJP2View = null;
 		isCurrentJPX = false;
 		currentJP2Image = null;
-		this.acceptEvents = false;
+		//this.acceptEvents = false;
 		this.eventReceived = false;
 		zoomController = ZoomController.getSingletonInstance();
 		//zoomController.addZoomControllerListener(this);
 		lineDataSelectorModel = LineDataSelectorModel.getSingletonInstance();
+		latestComplete = -1;
+		waitingForFrame = -1;
+		expectEvent = false;
+		dataChecker = new DataChecker();
+		//addRadioManagerListener(dataChecker);
+		//addRadioManagerListener(sendDataTestFrame);
 	}
 	
 	public static RadioDataManager getSingletonInstance(){
@@ -124,43 +137,108 @@ public class RadioDataManager implements ViewListener, RadioDownloaderListener{/
 	@Override
 	public void viewChanged(View sender, ChangeEvent aEvent) {
 		Log.debug("Sender object = " + sender);
-		try {
-			throw new Exception();
-		} catch (Exception e1) {
-			Log.error("Who send the event", e1);
-			//e1.printStackTrace();
+		Log.debug("Event number : "+ aEvent.hashCode());
+		RadioRequestReason rrr = aEvent.getLastChangedReasonByType(RadioRequestReason.class);
+		if (rrr != null){
+			Log.debug("------------------ ID of request " + rrr.getID() + "------------------");
+		}else{
+			Log.debug("------------------ rrr was null ---------------------");
 		}
-		Log.debug("What event" + aEvent);
-		try {
-			throw new Exception();
-		} catch (Exception e1) {
-			Log.error("Who send the event", e1);
-			//e1.printStackTrace();
+		CacheStatusChangedReason cscr = aEvent.getLastChangedReasonByType(CacheStatusChangedReason.class);
+		if (cscr != null){
+			if (cscr.getType() == CacheType.COMPLETE){
+				latestComplete = cscr.getValue();
+				Log.debug("Latest complete is : " + latestComplete);
+				if (waitingForFrame == cscr.getValue()){
+					eventReceived = true;
+					expectEvent = false;
+				}
+			}
 		}
-		if(acceptEvents){ //we only accept events if we changed the framenumber
-		//if (true){	
-			if(aEvent.reasonOccurred(SubImageDataChangedReason.class) && aEvent.reasonOccurred(TimestampChangedReason.class)){ 
-				Log.info("new view changed event");
-				Log.info(sender.toString());
-				Log.info(aEvent.toString());
-				eventReceived = true;
+		if (expectEvent){
+			JHVJPXView jpxView = sender.getAdapter(JHVJPXView.class);
+			if (jpxView != null){
+				try {
+					throw new Exception();
+				} catch (Exception e1) {
+					Log.error("Who send the event", e1);
+					//e1.printStackTrace();
+				}
+				Log.debug("What event" + aEvent);
+				try {
+					throw new Exception();
+				} catch (Exception e1) {
+					Log.error("Who send the event", e1);
+					//e1.printStackTrace();
+				}
+				//if(acceptEvents){ //we only accept events if we changed the framenumber
+				//if (true){	
+					if(aEvent.reasonOccurred(SubImageDataChangedReason.class) && aEvent.reasonOccurred(TimestampChangedReason.class)){ 
+						Log.info("new view changed event");
+						Log.info(sender.toString());
+						Log.info(aEvent.toString());
+						eventReceived = true;
+						expectEvent = false;
+					}else{
+						Log.info("ignore event");
+						Log.info(sender.toString());
+						Log.info(aEvent.toString());
+					}
+				//}else{
+					//Log.debug("Event not excepted. Not changed the framenumber");
+					//Log.info(sender.toString());
+					//Log.info(aEvent.toString());
+				//}
+				/*eventReceived = true;
+				try {
+					Thread.sleep(20);
+				} catch (InterruptedException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}*/
 			}else{
-				Log.info("ignore event");
-				Log.info(sender.toString());
-				Log.info(aEvent.toString());
+				try {
+					throw new Exception();
+				} catch (Exception e1) {
+					Log.error("Who send the event", e1);
+					//e1.printStackTrace();
+				}
+				Log.debug("What event" + aEvent);
+				try {
+					throw new Exception();
+				} catch (Exception e1) {
+					Log.error("Who send the event", e1);
+					//e1.printStackTrace();
+				}
+				//if(acceptEvents){ //we only accept events if we changed the framenumber
+				//if (true){	
+					if(aEvent.reasonOccurred(SubImageDataChangedReason.class) && aEvent.reasonOccurred(TimestampChangedReason.class)){ 
+						Log.info("new view changed event");
+						Log.info(sender.toString());
+						Log.info(aEvent.toString());
+						eventReceived = true;
+						expectEvent = false;
+					}else{
+						Log.info("ignore event");
+						Log.info(sender.toString());
+						Log.info(aEvent.toString());
+					}
+				//}else{
+				//	Log.debug("Event not excepted. Not changed the framenumber");
+				//	Log.info(sender.toString());
+				//	Log.info(aEvent.toString());
+				//}
+				/*eventReceived = true;
+				try {
+					Thread.sleep(20);
+				} catch (InterruptedException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}*/
 			}
 		}else{
-			Log.debug("Event not excepted. Not changed the framenumber");
-			Log.info(sender.toString());
-			Log.info(aEvent.toString());
+			Log.debug("We didn't expect the event");
 		}
-		/*eventReceived = true;
-		try {
-			Thread.sleep(20);
-		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}*/
 	}
 	
 	public void setVisibleParameters(Interval<Date> timeRange, FrequencyInterval freqInterval, Rectangle areaAvailable){
@@ -195,6 +273,7 @@ public class RadioDataManager implements ViewListener, RadioDownloaderListener{/
 			JHVJPXView jpxView = view.getAdapter(JHVJPXView.class);
 			if (jpxView != null){
 				jpxView.addViewListener(this);
+				//jpxView.addViewListener(testFrame);
 				JP2Image image = jpxView.getJP2Image();
 				currentJP2View = jpxView;
 				isCurrentJPX = true;
@@ -283,6 +362,7 @@ public class RadioDataManager implements ViewListener, RadioDownloaderListener{/
 			}else{
 				JHVJP2View jp2View = view.getAdapter(JHVJP2View.class);
 				jp2View.addViewListener(this);
+				//jp2View.addViewListener(testFrame);
 				JP2Image image = jp2View.getJP2Image();
 				currentJP2View = jp2View;
 				currentJP2Image = currentJP2View.getJP2Image();
@@ -437,7 +517,7 @@ public class RadioDataManager implements ViewListener, RadioDownloaderListener{/
 						drd.setDownloading(true);
 						lineDataSelectorModel.downloadStarted(downloadRequestData.get(id));
 						if(currentJP2Image != null && tempCurrent != null){
-							Log.debug("Received request for data: ");
+							Log.debug("Received request for data jpxview: ");
 							Log.debug("x Start : "+ xStart.toString());
 							Log.debug("x End : "+ xEnd.toString());
 							Log.debug("y Start : "+ yStart);
@@ -446,46 +526,58 @@ public class RadioDataManager implements ViewListener, RadioDownloaderListener{/
 							Log.debug("y Ratio : " + yRatio);
 							Log.debug("Search best resolution");
 							ChangeEvent e = new ChangeEvent();
+							e.addReason(new RadioRequestReason(tempCurrent, id));
 							Interval<Date> completeInterval = new Interval<Date>(xStart,xEnd);
 							FrequencyInterval completeFreqInterval = new FrequencyInterval((int)Math.round(yStart),(int)Math.round(yEnd));
 							List<RadioImage> radioImages = downloadRequestData.get(id).getRadioImages();
 							for (RadioImage tempIm : radioImages){
-								ResolutionSetting rs = tempIm.defineBestResolutionSetting(xRatio, yRatio);
-							
-								Log.debug("Resolution level : "+ rs.getResolutionLevel());
-								Log.debug("Ratio x : " + rs.getxRatio());
-								Log.debug("Ratio y : " + rs.getyRatio());
-							
+								
 								if(tempIm.withinInterval(completeInterval,completeFreqInterval)){
-									currentJP2View.setViewport(new ViewportAdapter(new StaticViewport(rs.getVec2dIntRepresenation())), e);
-									Log.debug("Viewport set");
-									acceptEvents = true;
-									Log.debug("Will set the timestamp to " + tempIm.getFrameInJPX());
-									tempCurrent.setCurrentFrame(tempIm.getFrameInJPX(), e, true);
-									Log.debug("Changed the viewport and the timestamp wait for the event :-)");
-									byte[] data = new byte[0];
-									while(!eventReceived){
-										Log.debug("Wait for event");
-										try {
-											Thread.sleep(10);
-										} catch (InterruptedException ex) {
-											// TODO Auto-generated catch block
-											ex.printStackTrace();
+									ResolutionSetting rs = tempIm.defineBestResolutionSetting(xRatio, yRatio);
+									//testFrame.setResolutionSetting(rs);
+									//sendDataTestFrame.setResolutionSetting(rs);
+									Log.debug("Resolution level : "+ rs.getResolutionLevel());
+									Log.debug("Ratio x : " + rs.getxRatio());
+									Log.debug("Ratio y : " + rs.getyRatio());
+									
+									if (rs.equals(tempIm.getLastUsedResolutionSetting())){
+										fireDataNotChanged(tempIm.getTimeInterval(),tempIm.getFreqInterval(), new Rectangle(rs.getWidth(),rs.getHeight()), id, drd.getPlotIdentifier(),tempIm.getRadioImageID());
+									}else{
+										tempIm.setLastUsedResolutionSetting(rs);
+										currentJP2View.setViewport(new ViewportAdapter(new StaticViewport(rs.getVec2dIntRepresenation())), e);
+										Log.debug("Viewport set");
+										//acceptEvents = true;
+										Log.debug("Will set the timestamp to " + tempIm.getFrameInJPX());
+										expectEvent = true;
+										waitingForFrame = tempIm.getFrameInJPX();
+										tempCurrent.setCurrentFrame(tempIm.getFrameInJPX(), e, true);
+										//testFrame.changeToFrame(tempIm.getFrameInJPX());
+										//sendDataTestFrame.changeToFrame(tempIm.getFrameInJPX());
+										Log.debug("Changed the viewport and the timestamp wait for the event :-)");
+										byte[] data = new byte[0];
+										while(latestComplete<tempIm.getFrameInJPX() || !eventReceived){
+											Log.debug("Wait for event");
+											try {
+												Thread.sleep(10);
+											} catch (InterruptedException ex) {
+												// TODO Auto-generated catch block
+												ex.printStackTrace();
+											}
 										}
+										eventReceived = false;
+										//acceptEvents = false;
+										SingleChannelByte8ImageData imageData = (SingleChannelByte8ImageData)(tempCurrent.getSubimageData());
+										Byte8ImageTransport bytetrs =  (Byte8ImageTransport) imageData.getImageTransport();
+										//byte[] data = bytetrs.getByte8PixelData();
+										//byte[] newData  = new byte[data.length];
+										data = bytetrs.getByte8PixelData();
+										Log.debug("Length of the data"+data.length);
+										int width = imageData.getWidth();
+										int height = imageData.getHeight();
+										Log.debug("width = "+ width);
+										Log.debug("height = " + height);
+										fireNewDataReceived(data, tempIm.getTimeInterval(),tempIm.getFreqInterval(), new Rectangle(rs.getWidth(),rs.getHeight()), id, drd.getPlotIdentifier(), tempIm.getRadioImageID());
 									}
-									eventReceived = false;
-									acceptEvents = false;
-									SingleChannelByte8ImageData imageData = (SingleChannelByte8ImageData)(tempCurrent.getSubimageData());
-									Byte8ImageTransport bytetrs =  (Byte8ImageTransport) imageData.getImageTransport();
-									//byte[] data = bytetrs.getByte8PixelData();
-									//byte[] newData  = new byte[data.length];
-									data = bytetrs.getByte8PixelData();
-									Log.debug("Length of the data"+data.length);
-									int width = imageData.getWidth();
-									int height = imageData.getHeight();
-									Log.debug("width = "+ width);
-									Log.debug("height = " + height);
-									fireNewDataReceived(data, tempIm.getTimeInterval(),tempIm.getFreqInterval(), new Rectangle(rs.getWidth(),rs.getHeight()), id, drd.getPlotIdentifier());
 								}
 							}
 						}
@@ -507,7 +599,7 @@ public class RadioDataManager implements ViewListener, RadioDownloaderListener{/
 						drd.setDownloading(true);
 						lineDataSelectorModel.downloadStarted(downloadRequestData.get(id));
 						if(currentJP2Image != null && currentJP2View != null){
-							Log.debug("Received request for data: ");
+							Log.debug("Received request for data jp2view: ");
 							Log.debug("x Start : "+ xStart.toString());
 							Log.debug("x End : "+ xEnd.toString());
 							Log.debug("y Start : "+ yStart);
@@ -516,42 +608,50 @@ public class RadioDataManager implements ViewListener, RadioDownloaderListener{/
 							Log.debug("y Ratio : " + yRatio);
 							Log.debug("Search best resolution");
 							ChangeEvent e = new ChangeEvent();
+							e.addReason(new RadioRequestReason(currentJP2View, id));
 							Interval<Date> completeInterval = new Interval<Date>(xStart,xEnd);
 							FrequencyInterval completeFreqInterval = new FrequencyInterval((int)Math.round(yStart),(int)Math.round(yEnd));
 							List<RadioImage> radioImages = downloadRequestData.get(id).getRadioImages();
 							for (RadioImage tempIm : radioImages){
-								ResolutionSetting rs = tempIm.defineBestResolutionSetting(xRatio, yRatio);
-							
-								Log.debug("Resolution level : "+ rs.getResolutionLevel());
-								Log.debug("Ratio x : " + rs.getxRatio());
-								Log.debug("Ratio y : " + rs.getyRatio());
-							
+								
 								if(tempIm.withinInterval(completeInterval,completeFreqInterval)){
-									currentJP2View.setViewport(new ViewportAdapter(new StaticViewport(rs.getVec2dIntRepresenation())), e);
-									Log.debug("Viewport set");
-									acceptEvents = true;
-									Log.debug("Changed the viewport");
-									byte[] data = new byte[0];
-									while(!eventReceived){
-										Log.debug("Wait for event");
-										try {
-											Thread.sleep(10);
-										} catch (InterruptedException ex) {
-											// TODO Auto-generated catch block
-											ex.printStackTrace();
-										}
+									ResolutionSetting rs = tempIm.defineBestResolutionSetting(xRatio, yRatio);
+									//testFrame.setResolutionSetting(rs);
+									//sendDataTestFrame.setResolutionSetting(rs);
+									Log.debug("Resolution level : "+ rs.getResolutionLevel());
+									Log.debug("Ratio x : " + rs.getxRatio());
+									Log.debug("Ratio y : " + rs.getyRatio());
+								
+									if (rs.equals(tempIm.getLastUsedResolutionSetting())){
+										fireDataNotChanged(tempIm.getTimeInterval(),tempIm.getFreqInterval(), new Rectangle(rs.getWidth(),rs.getHeight()), id, drd.getPlotIdentifier(), tempIm.getRadioImageID());
+									}else{
+										tempIm.setLastUsedResolutionSetting(rs);									
+										currentJP2View.setViewport(new ViewportAdapter(new StaticViewport(rs.getVec2dIntRepresenation())), e);
+										Log.debug("Viewport set");
+										//acceptEvents = true;
+										Log.debug("Changed the viewport");
+										byte[] data = new byte[0];
+										//while(!eventReceived){
+											Log.debug("Wait for event");
+											try {
+												Thread.sleep(100);
+											} catch (InterruptedException ex) {
+												// TODO Auto-generated catch block
+												ex.printStackTrace();
+											}
+										//}
+	 									SingleChannelByte8ImageData imageData = (SingleChannelByte8ImageData)(currentJP2View.getSubimageData());
+										Byte8ImageTransport bytetrs =  (Byte8ImageTransport) imageData.getImageTransport();
+										//byte[] data = bytetrs.getByte8PixelData();
+										//byte[] newData  = new byte[data.length];
+										data = bytetrs.getByte8PixelData();
+										Log.debug("Length of the data"+data.length);
+										int width = imageData.getWidth();
+										int height = imageData.getHeight();
+										Log.debug("width = "+ width);
+										Log.debug("height = " + height);
+										fireNewDataReceived(data, tempIm.getTimeInterval(),tempIm.getFreqInterval(), new Rectangle(rs.getWidth(),rs.getHeight()), id, drd.getPlotIdentifier(), tempIm.getRadioImageID());
 									}
- 									SingleChannelByte8ImageData imageData = (SingleChannelByte8ImageData)(currentJP2View.getSubimageData());
-									Byte8ImageTransport bytetrs =  (Byte8ImageTransport) imageData.getImageTransport();
-									//byte[] data = bytetrs.getByte8PixelData();
-									//byte[] newData  = new byte[data.length];
-									data = bytetrs.getByte8PixelData();
-									Log.debug("Length of the data"+data.length);
-									int width = imageData.getWidth();
-									int height = imageData.getHeight();
-									Log.debug("width = "+ width);
-									Log.debug("height = " + height);
-									fireNewDataReceived(data, tempIm.getTimeInterval(),tempIm.getFreqInterval(), new Rectangle(rs.getWidth(),rs.getHeight()), id, drd.getPlotIdentifier());
 								}
 							}
 						}
@@ -567,18 +667,28 @@ public class RadioDataManager implements ViewListener, RadioDownloaderListener{/
 		}
 	}
 
+	private void fireDataNotChanged(Interval<Date> timeInterval,
+			FrequencyInterval freqInterval, Rectangle rectangle, Long id,
+			String plotIdentifier, long imageID) {
+		List<Long> tempList = new ArrayList<Long>();
+		tempList.add(id);
+		for(RadioDataManagerListener l : listeners){
+			l.dataNotChanged(timeInterval, freqInterval, rectangle, tempList, plotIdentifier,imageID);
+		}		
+		
+	}
+
 	private void fireClearAllSavedImages() {
 		for(RadioDataManagerListener l : listeners){
 			l.clearAllSavedImages();
 		}	
 	}
 
-	private void fireNewDataReceived(byte[] data, Interval<Date> timeInterval,
-			FrequencyInterval freqInterval, Rectangle areaSize, Long ID, String identifier) {
+	private void fireNewDataReceived(byte[] data, Interval<Date> timeInterval,FrequencyInterval freqInterval, Rectangle areaSize, Long ID, String identifier, long imageID) {
 		List<Long> tempList = new ArrayList<Long>();
 		tempList.add(ID);
 		for(RadioDataManagerListener l : listeners){
-			l.newDataReceived(data, timeInterval, freqInterval, areaSize, tempList, identifier);
+			l.newDataReceived(data, timeInterval, freqInterval, areaSize, tempList, identifier, imageID);
 		}		
 	}
 
@@ -597,3 +707,5 @@ public class RadioDataManager implements ViewListener, RadioDownloaderListener{/
 		
 	}*/
 }
+
+	

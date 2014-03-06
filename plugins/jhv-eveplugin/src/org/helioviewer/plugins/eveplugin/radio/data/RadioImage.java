@@ -22,6 +22,8 @@ public class RadioImage {
 	private boolean isVisible;
 	private RadioDataManager radioDataManager;
 	private long ID;
+	private ResolutionSetting lastUsedResolutionSetting;
+	private long radioImageID;
 	
 	public RadioImage(long ID,Interval<Date> timeInterval,
 			FrequencyInterval freqInterval, int frameInJPX, ResolutionSet rs, List<ResolutionSetting> resolutionSettings, String plotIdentifier) {
@@ -35,8 +37,13 @@ public class RadioImage {
 		this.plotIdentifier = plotIdentifier;
 		this.isVisible = true;
 		this.radioDataManager = RadioDataManager.getSingletonInstance();
-	}
+		this.radioImageID = Math.round(Math.random()*1000000);
+	}	
 	
+	public long getRadioImageID() {
+		return radioImageID;
+	}
+
 	public long getID() {
 		return ID;
 	}
@@ -45,7 +52,15 @@ public class RadioImage {
 		ID = iD;
 	}
 
+	
 
+	public ResolutionSetting getLastUsedResolutionSetting() {
+		return lastUsedResolutionSetting;
+	}
+
+	public void setLastUsedResolutionSetting(ResolutionSetting resolutionSetting) {
+		this.lastUsedResolutionSetting = resolutionSetting;
+	}
 
 	public Interval<Date> getTimeInterval() {
 		return timeInterval;
