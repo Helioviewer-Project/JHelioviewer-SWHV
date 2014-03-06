@@ -21,6 +21,7 @@ public class ZoomManager implements ZoomControllerListener{
 	//private List<ZoomManagerListener> zoomManagerListeners;
 	//private boolean isAreaInitialized;
 	private ZoomController zoomController;
+	private Interval<Date> currentInterval;
 	
 	//private Map<String, Rectangle> displaySizeMap;
 	
@@ -69,12 +70,15 @@ public class ZoomManager implements ZoomControllerListener{
 	
 	public void addZoomDataConfig(FrequencyInterval freqInterval, Interval<Date> interval, ZoomDataConfigListener zoomDataConfigListener, long ID,String identifier){
 		ZoomManagerData zmd = getZoomManagerData(identifier);
+		if (currentInterval == null){
+			this.currentInterval = interval;
+		}
 		if(freqInterval != null && interval !=null ){
 			ZoomDataConfig config;
 			if(zmd.isAreaInitialized()){
-				config = new ZoomDataConfig(freqInterval.getStart(), freqInterval.getEnd(), interval.getStart(), interval.getEnd(), zmd.getDisplaySize(), ID);	
+				config = new ZoomDataConfig(freqInterval.getStart(), freqInterval.getEnd(), currentInterval.getStart(), currentInterval.getEnd(), zmd.getDisplaySize(), ID);	
 			}else{
-				config = new ZoomDataConfig(freqInterval.getStart(), freqInterval.getEnd(), interval.getStart(), interval.getEnd(), null, ID);
+				config = new ZoomDataConfig(freqInterval.getStart(), freqInterval.getEnd(), currentInterval.getStart(), currentInterval.getStart(), null, ID);
 			}
 			zmd.addToZoomDataConfigMap(ID, config);
 			config.addListener(zoomDataConfigListener);
@@ -146,10 +150,12 @@ public class ZoomManager implements ZoomControllerListener{
 
 	@Override
 	public void selectedIntervalChanged(Interval<Date> newInterval) {
+		currentInterval = newInterval;
 		for(ZoomManagerData zmd : zoomManagerData.values()){
 			for ( ZoomDataConfig zdc : zmd.getZoomDataConfigMap().values()){
 				zdc.setMinX(newInterval.getStart());
 				zdc.setMaxX(newInterval.getEnd());
+				zdc.update();
 			}
 		}
 	}

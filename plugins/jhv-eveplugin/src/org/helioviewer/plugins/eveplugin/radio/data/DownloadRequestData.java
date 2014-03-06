@@ -4,8 +4,9 @@ import java.awt.Color;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.helioviewer.plugins.eveplugin.download.DataDownloader;
+import org.helioviewer.plugins.eveplugin.radio.model.ResolutionSetting;
 import org.helioviewer.plugins.eveplugin.view.linedataselector.LineDataSelectorElement;
+import org.helioviewer.viewmodel.view.jp2view.image.ResolutionSet;
 
 public class DownloadRequestData implements LineDataSelectorElement{
 

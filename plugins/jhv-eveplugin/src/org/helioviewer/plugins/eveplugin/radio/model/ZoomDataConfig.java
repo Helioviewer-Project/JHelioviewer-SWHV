@@ -87,6 +87,10 @@ public class ZoomDataConfig implements ZoomManagerListener{
 		return displaySize;
 	}
 
+	public void update(){
+		this.requestData();
+	}
+	
 	public void setDisplaySize(Rectangle displaySize) {
 		this.displaySize = displaySize;
 		requestData();
