@@ -147,7 +147,9 @@ public class RadioDataManager implements ViewListener, RadioDownloaderListener{/
 		CacheStatusChangedReason cscr = aEvent.getLastChangedReasonByType(CacheStatusChangedReason.class);
 		if (cscr != null){
 			if (cscr.getType() == CacheType.COMPLETE){
-				latestComplete = cscr.getValue();
+				if(cscr.getValue()>latestComplete){
+					latestComplete = cscr.getValue();
+				}
 				Log.debug("Latest complete is : " + latestComplete);
 				if (waitingForFrame == cscr.getValue()){
 					eventReceived = true;
@@ -173,7 +175,7 @@ public class RadioDataManager implements ViewListener, RadioDownloaderListener{/
 				}
 				//if(acceptEvents){ //we only accept events if we changed the framenumber
 				//if (true){	
-					if(aEvent.reasonOccurred(SubImageDataChangedReason.class) && aEvent.reasonOccurred(TimestampChangedReason.class)){ 
+					if(aEvent.reasonOccurred(SubImageDataChangedReason.class)){// && aEvent.reasonOccurred(TimestampChangedReason.class)){ 
 						Log.info("new view changed event");
 						Log.info(sender.toString());
 						Log.info(aEvent.toString());
@@ -507,11 +509,14 @@ public class RadioDataManager implements ViewListener, RadioDownloaderListener{/
 
 	public synchronized void requestForData(Date xStart, Date xEnd, double yStart, double yEnd,
 			double xRatio, double yRatio, List<Long> iDs) {
+		Log.debug(" §§§§§§§§§§§§§§§§§ Request For Data opgeroepen §§§§§§§§§§§§§§§§§");
 		if(isCurrentJPX){
+			Log.debug(" §§§§§§§§§§§§§§§§§ 1 §§§§§§§§§§§§§§§§§");
 			JHVJPXView tempCurrent = currentJP2View.getAdapter(JHVJPXView.class);
 			if(!(xRatio < 0) && !(yRatio < 0)){
 				fireClearAllSavedImages();
 				for (Long id : iDs){
+					Log.debug(" §§§§§§§§§§§§§§§§§ 2 §§§§§§§§§§§§§§§§§");
 					DownloadRequestData drd = this.downloadRequestData.get(id);
 					if (drd != null){
 						drd.setDownloading(true);
@@ -531,7 +536,7 @@ public class RadioDataManager implements ViewListener, RadioDownloaderListener{/
 							FrequencyInterval completeFreqInterval = new FrequencyInterval((int)Math.round(yStart),(int)Math.round(yEnd));
 							List<RadioImage> radioImages = downloadRequestData.get(id).getRadioImages();
 							for (RadioImage tempIm : radioImages){
-								
+								Log.debug(" §§§§§§§§§§§§§§§§§ 3 §§§§§§§§§§§§§§§§§");
 								if(tempIm.withinInterval(completeInterval,completeFreqInterval)){
 									ResolutionSetting rs = tempIm.defineBestResolutionSetting(xRatio, yRatio);
 									//testFrame.setResolutionSetting(rs);
@@ -556,6 +561,7 @@ public class RadioDataManager implements ViewListener, RadioDownloaderListener{/
 										Log.debug("Changed the viewport and the timestamp wait for the event :-)");
 										byte[] data = new byte[0];
 										while(latestComplete<tempIm.getFrameInJPX() || !eventReceived){
+											Log.debug(" §§§§§§§§§§§§§§§§§ 4 §§§§§§§§§§§§§§§§§");
 											Log.debug("Wait for event");
 											try {
 												Thread.sleep(10);
@@ -665,6 +671,7 @@ public class RadioDataManager implements ViewListener, RadioDownloaderListener{/
 				Log.error("yratio : " + yRatio);
 			}
 		}
+		Log.debug(" §§§§§§§§§§§§§§§§§ Request For Data ended §§§§§§§§§§§§§§§§§");
 	}
 
 	private void fireDataNotChanged(Interval<Date> timeInterval,
