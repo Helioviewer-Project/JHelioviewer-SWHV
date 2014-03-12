@@ -16,21 +16,21 @@ import org.helioviewer.base.logging.Log;
 import org.helioviewer.base.logging.LogSettings;
 import org.helioviewer.jhv.JHVDirectory;
 import org.helioviewer.jhv.JHVGlobals;
-import org.helioviewer.jhv.Settings;
+//import org.helioviewer.jhv.Settings;
 import org.helioviewer.plugins.eveplugin.settings.APIAbstract;
-import org.helioviewer.base.logging.LogSettings;
-import org.helioviewer.jhv.io.FileDownloader;
+//import org.helioviewer.base.logging.LogSettings;
+//import org.helioviewer.jhv.io.FileDownloader;
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.helioviewer.plugins.eveplugin.view.chart.RadioImagePane;
+//import org.helioviewer.plugins.eveplugin.view.chart.RadioImagePane;
 import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
+//import org.json.JSONException;
+//import org.json.JSONObject;
 import org.helioviewer.plugins.eveplugin.EVEPlugin;
 
-import java.util.Collection;
+//import java.util.Collection;
 import java.util.HashMap;
-import java.util.Iterator;
+//import java.util.Iterator;
 import java.util.Properties;
 
 
@@ -43,7 +43,7 @@ public class BandTypeAPI extends APIAbstract{
 	private Properties defaultProperties = new Properties();
 	
 	public static void main(String []args){
-		BandTypeAPI bt = new BandTypeAPI();
+		//BandTypeAPI bt = new BandTypeAPI();
 	}
     public static BandTypeAPI getSingletonInstance() {
         return singletonInstance;
@@ -67,7 +67,7 @@ public class BandTypeAPI extends APIAbstract{
 	}
 	
 	public String getDatasetUrl() {
-		return this.getBaseUrl() + "/datasets";
+		return this.getBaseUrl() + "/datasets/index.php";
 	}
 	
 	public String getUrl() {
