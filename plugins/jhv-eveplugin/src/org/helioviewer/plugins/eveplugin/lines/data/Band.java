@@ -1,4 +1,4 @@
-package org.helioviewer.plugins.eveplugin.controller;
+package org.helioviewer.plugins.eveplugin.lines.data;
 
 import java.awt.Color;
 

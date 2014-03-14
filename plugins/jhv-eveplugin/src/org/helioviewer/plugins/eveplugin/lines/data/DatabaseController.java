@@ -1,4 +1,4 @@
-package org.helioviewer.plugins.eveplugin.controller;
+package org.helioviewer.plugins.eveplugin.lines.data;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -12,7 +12,6 @@ import java.util.Properties;
 
 import org.helioviewer.base.logging.Log;
 import org.helioviewer.base.math.Interval;
-import org.helioviewer.plugins.eveplugin.model.EVEValue;
 import org.helioviewer.plugins.eveplugin.settings.EVESettings;
 
 /**

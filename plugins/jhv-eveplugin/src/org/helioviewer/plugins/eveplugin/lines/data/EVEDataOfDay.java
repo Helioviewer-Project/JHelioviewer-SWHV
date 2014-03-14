@@ -1,4 +1,4 @@
-package org.helioviewer.plugins.eveplugin.model;
+package org.helioviewer.plugins.eveplugin.lines.data;
 
 import java.util.Arrays;
 import java.util.Calendar;
