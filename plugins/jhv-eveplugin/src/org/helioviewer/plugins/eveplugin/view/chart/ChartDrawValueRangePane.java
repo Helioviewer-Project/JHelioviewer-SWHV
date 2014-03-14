@@ -18,10 +18,10 @@ import javax.swing.event.MouseInputListener;
 
 import org.helioviewer.base.math.Interval;
 import org.helioviewer.plugins.eveplugin.base.Range;
-import org.helioviewer.plugins.eveplugin.controller.Band;
-import org.helioviewer.plugins.eveplugin.controller.EVEDrawController;
-import org.helioviewer.plugins.eveplugin.controller.EVEDrawControllerListener;
-import org.helioviewer.plugins.eveplugin.controller.EVEValues;
+import org.helioviewer.plugins.eveplugin.lines.data.Band;
+import org.helioviewer.plugins.eveplugin.lines.data.EVEValues;
+import org.helioviewer.plugins.eveplugin.lines.model.EVEDrawController;
+import org.helioviewer.plugins.eveplugin.lines.model.EVEDrawControllerListener;
 
 /**
  * @author Stephan Pagel

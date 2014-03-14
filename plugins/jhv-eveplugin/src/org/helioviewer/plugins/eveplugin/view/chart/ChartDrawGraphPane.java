@@ -4,8 +4,10 @@ import java.awt.Color;
 import java.awt.Cursor;
 import java.awt.Dimension;
 import java.awt.Graphics;
+import java.awt.Graphics2D;
 import java.awt.Point;
 import java.awt.Rectangle;
+import java.awt.RenderingHints;
 import java.awt.event.ComponentEvent;
 import java.awt.event.ComponentListener;
 import java.awt.event.MouseEvent;
@@ -32,18 +34,21 @@ import javax.swing.event.MouseInputListener;
 import org.helioviewer.base.logging.Log;
 import org.helioviewer.base.math.Interval;
 import org.helioviewer.plugins.eveplugin.base.Range;
-import org.helioviewer.plugins.eveplugin.controller.Band;
 import org.helioviewer.plugins.eveplugin.controller.DrawController;
 import org.helioviewer.plugins.eveplugin.controller.DrawControllerListener;
-import org.helioviewer.plugins.eveplugin.controller.EVEDrawController;
-import org.helioviewer.plugins.eveplugin.controller.EVEDrawControllerListener;
-import org.helioviewer.plugins.eveplugin.controller.EVEValues;
 import org.helioviewer.plugins.eveplugin.controller.ZoomController;
 import org.helioviewer.plugins.eveplugin.draw.DrawableElement;
 import org.helioviewer.plugins.eveplugin.draw.DrawableElementType;
 import org.helioviewer.plugins.eveplugin.draw.DrawableType;
 import org.helioviewer.plugins.eveplugin.draw.YAxisElement;
-import org.helioviewer.plugins.eveplugin.model.EVEValue;
+import org.helioviewer.plugins.eveplugin.lines.data.Band;
+import org.helioviewer.plugins.eveplugin.lines.data.EVEValue;
+import org.helioviewer.plugins.eveplugin.lines.data.EVEValues;
+import org.helioviewer.plugins.eveplugin.lines.model.EVEDrawController;
+import org.helioviewer.plugins.eveplugin.lines.model.EVEDrawControllerListener;
+import org.helioviewer.plugins.eveplugin.model.ChartModel;
+import org.helioviewer.plugins.eveplugin.model.ChartModelListener;
+import org.helioviewer.plugins.eveplugin.radio.gui.RadioImagePane;
 import org.helioviewer.plugins.eveplugin.radio.model.DrawableAreaMap;
 import org.helioviewer.plugins.eveplugin.radio.model.RadioPlotModel;
 import org.helioviewer.plugins.eveplugin.radio.model.RadioPlotModelListener;
@@ -58,7 +63,7 @@ import org.helioviewer.plugins.eveplugin.EVEPlugin;
  * 
  * @author Stephan Pagel
  * */
-public class ChartDrawGraphPane extends JComponent implements MouseInputListener, ComponentListener, RadioPlotModelListener,DrawControllerListener {//EVEDrawControllerListener, MouseInputListener, ComponentListener, RadioPlotModelListener {
+public class ChartDrawGraphPane extends JComponent implements MouseInputListener, ComponentListener, DrawControllerListener,ChartModelListener{//,RadioPlotModelListener {//EVEDrawControllerListener, MouseInputListener, ComponentListener, RadioPlotModelListener {
 
     // //////////////////////////////////////////////////////////////////////////////
     // Definitions
@@ -97,20 +102,21 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
 	public RadioImagePane pane;
 
     private BufferedImage screenImage = null;
-    
-    private RadioPlotModel radioPlotModel;
-    
+       
     private ZoomManager zoomManager;
     
     private String identifier;
     
     private int twoYAxis = 0;
     
+    private ChartModel chartModel;
+    
     // //////////////////////////////////////////////////////////////////////////////
     // Methods
     // //////////////////////////////////////////////////////////////////////////////
     
     public ChartDrawGraphPane(String identifier) {
+    	chartModel = ChartModel.getSingletonInstance();
         //this.drawController = drawController;
     	this.identifier = identifier;
         this.drawController = DrawController.getSingletonInstance();
@@ -123,11 +129,12 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
         addComponentListener(this);
 		pane = new RadioImagePane();
         
-        radioPlotModel = RadioPlotModel.getSingletonInstance();
-        radioPlotModel.addRadioPlotModelListener(this);
+        //radioPlotModel = RadioPlotModel.getSingletonInstance();
+        //radioPlotModel.addRadioPlotModelListener(this);
         zoomManager = ZoomManager.getSingletonInstance();
         yRatios = new HashMap<YAxisElement, Double>();
         this.drawController.addDrawControllerListener(this,identifier);
+        chartModel.addChartModelListener(this);
     }
     
     private void initVisualComponents() {
@@ -136,6 +143,7 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
     
     @Override
     protected void paintComponent(Graphics g) {
+    	Graphics2D g2 = (Graphics2D)g;
     	Log.debug("Paint component called");
         super.paintComponent(g);
         
@@ -146,6 +154,12 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
             lastKnownHeight = getHeight();
         }
         if (screenImage != null) {
+        	Log.debug("Width : "+ getWidth());
+        	Log.debug("Height : " + getHeight());
+        	Log.debug("SCreenWidth : "+ screenImage.getWidth());
+        	Log.debug("ScreenHeight : "+ screenImage.getHeight());
+        	g2.setRenderingHint(RenderingHints.KEY_INTERPOLATION,
+                    RenderingHints.VALUE_INTERPOLATION_BILINEAR);
             g.drawImage(screenImage, 0, 0, screenImage.getWidth(), screenImage.getHeight(), null);
             
             drawMovieLine(g);
@@ -164,7 +178,7 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
             screenImage = new BufferedImage(getWidth(), getHeight(), BufferedImage.OPAQUE);
             Log.debug("--------------------Screen image : " + screenImage+"--------------------");
             Log.debug("----------------------------this : " + System.identityHashCode(this));
-            final Graphics g = screenImage.getGraphics();
+            final Graphics2D g = screenImage.createGraphics();
             drawBackground(g);
             //drawRadio(g);
             
@@ -178,7 +192,7 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
         Log.debug("RedrawGraph finished");
     }
     
-    private void drawData(Graphics g){
+    private void drawData(Graphics2D g){
     	Map <DrawableType, List<DrawableElement>> drawableElements = drawController.getDrawableElements(identifier);
     	List<DrawableType> drawTypeList = DrawableType.getZOrderedList();
     	for(DrawableType dt : drawTypeList){
@@ -201,7 +215,7 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
         updateGraphEvents();
     }
     
-    private void drawBackground(final Graphics g) {
+    private void drawBackground(final Graphics2D g) {
         g.setColor(ChartConstants.SELECTED_INTERVAL_BACKGROUND_COLOR);
         g.fillRect(0, 0, getWidth(), getHeight());        
         if (mousePressedPosition != null && mouseDragPosition != null) {
@@ -210,7 +224,7 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
         }
     }
     
-    private void drawZoomBox(final Graphics g) {
+    private void drawZoomBox(final Graphics2D g) {
         if (mousePressedPosition == null || mouseDragPosition == null || mousePressedOnMovieFrame)
             return;
         
@@ -223,7 +237,7 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
         g.fillRect(x, y, width, height);
     }
 
-    private void drawLabels(final Graphics g) {
+    private void drawLabels(final Graphics2D g) {
     	Set<YAxisElement> yAxisElements = drawController.getYAxisElements(identifier);
     	Interval <Date> interval = drawController.getInterval();
     	if (!drawController.getIntervalAvailable())
@@ -268,11 +282,13 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
     	// inform when no data is available
     	if (!drawController.hasElementsToBeDrawn(identifier)) {
     		final String text = "No band / diode / line selected";
+    		Log.debug("@@@@@@@@@@@@@@@@@@@@@@@@@@@   Draw No band   @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@");
     		final int textWidth = (int) g.getFontMetrics().getStringBounds(text, g).getWidth();
     		final int x = graphArea.x + (graphArea.width / 2) - (textWidth / 2);
     		final int y = graphArea.y + graphArea.height / 2;
            
     		g.setColor(ChartConstants.LABEL_TEXT_COLOR);
+    		//g.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
     		g.drawString(text, x, y);
            
     	} 
@@ -354,7 +370,7 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
 		}
     }
     
-    @Override
+    /*@Override
 	public void drawBufferedImage(BufferedImage image, DrawableAreaMap map){
     	this.redrawGraph();
 	}
@@ -368,7 +384,7 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
 	@Override
 	public void changeVisibility(long iD) {
 		this.redrawGraph();
-	}
+	}*/
     
     /*private void drawGraphs(final Graphics g) {
         //if (!intervalAvailable)
@@ -757,9 +773,8 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
 		repaint();
 	}
 
-	
-
-	
-
-	
+	@Override
+	public void chartRedrawRequested() {
+		this.redrawGraph();		
+	}
 }

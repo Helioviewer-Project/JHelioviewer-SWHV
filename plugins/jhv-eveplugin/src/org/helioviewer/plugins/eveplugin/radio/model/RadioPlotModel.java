@@ -16,25 +16,26 @@ import java.util.Map;
 import org.helioviewer.base.logging.Log;
 import org.helioviewer.base.math.Interval;
 import org.helioviewer.plugins.eveplugin.base.Range;
-import org.helioviewer.plugins.eveplugin.controller.Band;
 import org.helioviewer.plugins.eveplugin.controller.DrawController;
-import org.helioviewer.plugins.eveplugin.controller.EVEDrawController;
-import org.helioviewer.plugins.eveplugin.controller.EVEDrawControllerListener;
-import org.helioviewer.plugins.eveplugin.controller.EVEValues;
 import org.helioviewer.plugins.eveplugin.controller.ZoomController;
 import org.helioviewer.plugins.eveplugin.controller.ZoomControllerListener;
 import org.helioviewer.plugins.eveplugin.draw.YAxisElement;
+import org.helioviewer.plugins.eveplugin.lines.data.Band;
+import org.helioviewer.plugins.eveplugin.lines.data.EVEValues;
+import org.helioviewer.plugins.eveplugin.lines.model.EVEDrawController;
+import org.helioviewer.plugins.eveplugin.lines.model.EVEDrawControllerListener;
+import org.helioviewer.plugins.eveplugin.model.ChartModel;
 import org.helioviewer.plugins.eveplugin.radio.data.DownloadRequestData;
 import org.helioviewer.plugins.eveplugin.radio.data.FrequencyInterval;
 import org.helioviewer.plugins.eveplugin.radio.data.RadioDataManager;
 import org.helioviewer.plugins.eveplugin.radio.data.RadioDataManagerListener;
 import org.helioviewer.plugins.eveplugin.radio.data.RadioDownloaderListener;
 import org.helioviewer.plugins.eveplugin.radio.data.RadioImage;
+import org.helioviewer.plugins.eveplugin.radio.gui.RadioImagePane;
 import org.helioviewer.plugins.eveplugin.settings.EVEAPI.API_RESOLUTION_AVERAGES;
-import org.helioviewer.plugins.eveplugin.view.chart.RadioImagePane;
 import org.helioviewer.viewmodel.view.ImageInfoView;
 
-public class RadioPlotModel implements RadioDataManagerListener,ZoomControllerListener,EVEDrawControllerListener, 
+public class RadioPlotModel implements RadioDataManagerListener,ZoomControllerListener,//EVEDrawControllerListener, 
 			ZoomDataConfigListener{
 	private static RadioPlotModel instance;
 	private Map<Long,DownloadRequestData> downloadRequestData;
@@ -49,6 +50,7 @@ public class RadioPlotModel implements RadioDataManagerListener,ZoomControllerLi
 	private RadioImagePane radioImagePane;
 	private DrawController drawController;
 	private Map<Long, BufferedImage> bufferedImages;
+	private ChartModel chartModel;
 	
 	
 	private RadioPlotModel(){
@@ -67,6 +69,7 @@ public class RadioPlotModel implements RadioDataManagerListener,ZoomControllerLi
 		radioImagePane = new RadioImagePane();
 		drawController = DrawController.getSingletonInstance();
 		bufferedImages = new HashMap<Long, BufferedImage>();
+		chartModel = ChartModel.getSingletonInstance();
 	}
 	
 	public static RadioPlotModel getSingletonInstance(){
@@ -167,7 +170,7 @@ public class RadioPlotModel implements RadioDataManagerListener,ZoomControllerLi
 		this.areaAvailable = area;
 	}*/
 
-	@Override
+	/*@Override
 	public void drawRequest(Interval<Date> interval, Band[] bands,
 			EVEValues[] values, Range availableRange, Range selectedRange) {
 		Log.debug("Draw Request: ");
@@ -181,7 +184,7 @@ public class RadioPlotModel implements RadioDataManagerListener,ZoomControllerLi
 	public void drawRequest(Date movieTimestamp) {
 		// TODO Auto-generated method stub
 		
-	}
+	}*/
 
 	
 	@Override
@@ -261,6 +264,7 @@ public class RadioPlotModel implements RadioDataManagerListener,ZoomControllerLi
 		}
 		this.radioImagePane.setYAxisElement(yAxisElement);
 		drawController.updateDrawableElement(this.radioImagePane, identifier);
+		chartModel.chartRedrawRequest();
 	}
 
 	public Collection<PlotConfig> getPlotConfigurations(){
@@ -298,7 +302,8 @@ public class RadioPlotModel implements RadioDataManagerListener,ZoomControllerLi
 	private void fireRemoveRadioImage(long ID) {
 		for (RadioPlotModelListener l : listeners){
 			l.removeDownloadRequestData(ID);			
-		}		
+		}
+		chartModel.chartRedrawRequest();
 	}
 
 	
@@ -316,6 +321,7 @@ public class RadioPlotModel implements RadioDataManagerListener,ZoomControllerLi
 		for (RadioPlotModelListener l : listeners){
 			l.changeVisibility(ID);			
 		}
+		chartModel.chartRedrawRequest();
 	}
 
 

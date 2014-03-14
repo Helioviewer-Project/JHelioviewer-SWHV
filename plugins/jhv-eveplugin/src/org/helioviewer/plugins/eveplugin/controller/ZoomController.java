@@ -6,6 +6,8 @@ import java.util.GregorianCalendar;
 import java.util.LinkedList;
 
 import org.helioviewer.base.math.Interval;
+import org.helioviewer.plugins.eveplugin.lines.data.BandController;
+import org.helioviewer.plugins.eveplugin.lines.data.DownloadController;
 import org.helioviewer.plugins.eveplugin.settings.EVEAPI.API_RESOLUTION_AVERAGES;
 import org.helioviewer.plugins.eveplugin.settings.BandType;
 
