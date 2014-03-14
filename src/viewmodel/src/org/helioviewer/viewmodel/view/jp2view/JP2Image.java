@@ -316,7 +316,7 @@ public class JP2Image implements MultiFrameMetaDataContainer {
                 {
                     int[] tempVar = new int[1];
                     jpxSrc.Count_compositing_layers(tempVar);
-                    layerRange = new Interval<Integer>(0, tempVar[0] - 1);
+                    layerRange = new Interval<Integer>(0, tempVar[0]-1);
                 }
 
                 Kdu_codestream stream = compositor.Access_codestream(compositor.Get_next_codestream(0, false, true));
@@ -419,7 +419,7 @@ public class JP2Image implements MultiFrameMetaDataContainer {
      * @return True, if the image contains multiple frames, false otherwise
      */
     public boolean isMultiFrame() {
-        int frameCount = getCompositionLayerRange().getEnd() - getCompositionLayerRange().getStart();
+        int frameCount = getCompositionLayerRange().getEnd() - getCompositionLayerRange().getStart() + 1;//fix for 2 images
         return isJpx && frameCount > 1;
     }
 
