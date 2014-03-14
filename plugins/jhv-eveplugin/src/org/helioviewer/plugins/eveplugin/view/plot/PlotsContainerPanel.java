@@ -6,9 +6,9 @@ import javax.swing.JPanel;
 import javax.swing.JSplitPane;
 
 import org.helioviewer.jhv.gui.ImageViewerGui;
-import org.helioviewer.plugins.eveplugin.controller.Band;
-import org.helioviewer.plugins.eveplugin.controller.BandController;
-import org.helioviewer.plugins.eveplugin.controller.BandControllerListener;
+import org.helioviewer.plugins.eveplugin.lines.data.Band;
+import org.helioviewer.plugins.eveplugin.lines.data.BandController;
+import org.helioviewer.plugins.eveplugin.lines.data.BandControllerListener;
 import org.helioviewer.plugins.eveplugin.view.chart.ChartDrawIntervalPane;
 
 public class PlotsContainerPanel extends JPanel implements BandControllerListener {

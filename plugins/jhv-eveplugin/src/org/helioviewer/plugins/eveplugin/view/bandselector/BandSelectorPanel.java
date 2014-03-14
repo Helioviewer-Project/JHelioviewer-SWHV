@@ -10,11 +10,11 @@ import javax.swing.JPanel;
 import javax.swing.JProgressBar;
 
 import org.helioviewer.base.math.Interval;
-import org.helioviewer.plugins.eveplugin.controller.Band;
-import org.helioviewer.plugins.eveplugin.controller.BandController;
-import org.helioviewer.plugins.eveplugin.controller.BandControllerListener;
-import org.helioviewer.plugins.eveplugin.controller.DownloadController;
-import org.helioviewer.plugins.eveplugin.controller.DownloadControllerListener;
+import org.helioviewer.plugins.eveplugin.lines.data.Band;
+import org.helioviewer.plugins.eveplugin.lines.data.BandController;
+import org.helioviewer.plugins.eveplugin.lines.data.BandControllerListener;
+import org.helioviewer.plugins.eveplugin.lines.data.DownloadController;
+import org.helioviewer.plugins.eveplugin.lines.data.DownloadControllerListener;
 
 public class BandSelectorPanel extends JPanel implements DownloadControllerListener, BandControllerListener {
 

@@ -10,6 +10,5 @@
 	<classpathentry combineaccessrules="false" kind="src" path="/viewmodel"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/viewmodelplugin"/>
 	<classpathentry kind="lib" path="lib/derby.jar"/>
-	<classpathentry combineaccessrules="false" kind="src" path="/jhv-3d-math"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

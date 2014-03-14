@@ -12,9 +12,9 @@ import org.helioviewer.base.logging.Log;
 import org.helioviewer.base.math.Interval;
 import org.helioviewer.base.message.Message;
 import org.helioviewer.jhv.gui.ImageViewerGui;
-import org.helioviewer.plugins.eveplugin.controller.Band;
 import org.helioviewer.plugins.eveplugin.download.DataDownloader;
 import org.helioviewer.plugins.eveplugin.download.DownloadedData;
+import org.helioviewer.plugins.eveplugin.lines.data.Band;
 import org.helioviewer.jhv.io.APIRequestManager;
 import org.helioviewer.viewmodel.view.ImageInfoView;
 
