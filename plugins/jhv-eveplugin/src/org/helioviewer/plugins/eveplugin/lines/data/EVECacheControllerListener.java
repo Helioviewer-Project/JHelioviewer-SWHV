@@ -1,4 +1,5 @@
-package org.helioviewer.plugins.eveplugin.controller;
+package org.helioviewer.plugins.eveplugin.lines.data;
+
 
 public interface EVECacheControllerListener {
 

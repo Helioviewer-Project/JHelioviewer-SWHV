@@ -1,9 +1,10 @@
-package org.helioviewer.plugins.eveplugin.controller;
+package org.helioviewer.plugins.eveplugin.lines.data;
 
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
 
+import org.helioviewer.plugins.eveplugin.controller.ZoomController;
 import org.helioviewer.plugins.eveplugin.download.DataDownloader;
 import org.helioviewer.plugins.eveplugin.settings.BandTypeAPI;
 import org.helioviewer.plugins.eveplugin.settings.BandType;

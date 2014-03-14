@@ -1,4 +1,4 @@
-package org.helioviewer.plugins.eveplugin.draw;
+package org.helioviewer.plugins.eveplugin.lines.gui;
 
 import java.awt.Color;
 import java.awt.Graphics;
@@ -17,10 +17,13 @@ import java.util.Map.Entry;
 
 import org.helioviewer.base.math.Interval;
 import org.helioviewer.plugins.eveplugin.base.Range;
-import org.helioviewer.plugins.eveplugin.controller.Band;
-import org.helioviewer.plugins.eveplugin.controller.EVEDrawControllerListener;
-import org.helioviewer.plugins.eveplugin.controller.EVEValues;
-import org.helioviewer.plugins.eveplugin.model.EVEValue;
+import org.helioviewer.plugins.eveplugin.draw.DrawableElement;
+import org.helioviewer.plugins.eveplugin.draw.DrawableElementType;
+import org.helioviewer.plugins.eveplugin.draw.YAxisElement;
+import org.helioviewer.plugins.eveplugin.lines.data.Band;
+import org.helioviewer.plugins.eveplugin.lines.data.EVEValue;
+import org.helioviewer.plugins.eveplugin.lines.data.EVEValues;
+import org.helioviewer.plugins.eveplugin.lines.model.EVEDrawControllerListener;
 
 public class EVEDrawableElement implements DrawableElement{
 	

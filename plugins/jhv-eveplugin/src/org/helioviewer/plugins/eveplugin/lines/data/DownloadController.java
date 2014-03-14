@@ -1,4 +1,4 @@
-package org.helioviewer.plugins.eveplugin.controller;
+package org.helioviewer.plugins.eveplugin.lines.data;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -18,7 +18,6 @@ import org.helioviewer.base.DownloadStream;
 import org.helioviewer.base.logging.Log;
 import org.helioviewer.base.math.Interval;
 import org.helioviewer.jhv.JHVGlobals;
-import org.helioviewer.plugins.eveplugin.model.EVEValue;
 import org.helioviewer.plugins.eveplugin.settings.EVEAPI;
 import org.helioviewer.plugins.eveplugin.settings.BandType;
 

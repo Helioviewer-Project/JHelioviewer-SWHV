@@ -1,4 +1,4 @@
-package org.helioviewer.plugins.eveplugin.controller;
+package org.helioviewer.plugins.eveplugin.lines.data;
 
 import java.util.Calendar;
 import java.util.Date;
@@ -10,8 +10,6 @@ import org.helioviewer.base.math.Interval;
 import org.helioviewer.plugins.eveplugin.base.Range;
 import org.helioviewer.plugins.eveplugin.download.DataDownloader;
 import org.helioviewer.plugins.eveplugin.download.DownloadedData;
-import org.helioviewer.plugins.eveplugin.model.EVEBandCache;
-import org.helioviewer.plugins.eveplugin.model.EVEValue;
 
 /**
  * 

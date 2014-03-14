@@ -1,4 +1,4 @@
-package org.helioviewer.plugins.eveplugin.controller;
+package org.helioviewer.plugins.eveplugin.lines.model;
 
 import java.awt.Color;
 import java.util.Date;
@@ -9,9 +9,18 @@ import org.helioviewer.base.math.Interval;
 import org.helioviewer.jhv.layers.LayersListener;
 import org.helioviewer.jhv.layers.LayersModel;
 import org.helioviewer.plugins.eveplugin.base.Range;
+import org.helioviewer.plugins.eveplugin.controller.DrawController;
+import org.helioviewer.plugins.eveplugin.controller.ZoomController;
+import org.helioviewer.plugins.eveplugin.controller.ZoomControllerListener;
 import org.helioviewer.plugins.eveplugin.download.DownloadedData;
-import org.helioviewer.plugins.eveplugin.draw.EVEDrawableElement;
 import org.helioviewer.plugins.eveplugin.draw.YAxisElement;
+import org.helioviewer.plugins.eveplugin.lines.data.Band;
+import org.helioviewer.plugins.eveplugin.lines.data.BandController;
+import org.helioviewer.plugins.eveplugin.lines.data.BandControllerListener;
+import org.helioviewer.plugins.eveplugin.lines.data.EVECacheController;
+import org.helioviewer.plugins.eveplugin.lines.data.EVECacheControllerListener;
+import org.helioviewer.plugins.eveplugin.lines.data.EVEValues;
+import org.helioviewer.plugins.eveplugin.lines.gui.EVEDrawableElement;
 import org.helioviewer.plugins.eveplugin.settings.EVEAPI.API_RESOLUTION_AVERAGES;
 import org.helioviewer.viewmodel.view.View;
 import org.helioviewer.viewmodel.view.jp2view.datetime.ImmutableDateTime;

@@ -1,9 +1,11 @@
-package org.helioviewer.plugins.eveplugin.controller;
+package org.helioviewer.plugins.eveplugin.lines.model;
 
 import java.util.Date;
 
 import org.helioviewer.base.math.Interval;
 import org.helioviewer.plugins.eveplugin.base.Range;
+import org.helioviewer.plugins.eveplugin.lines.data.Band;
+import org.helioviewer.plugins.eveplugin.lines.data.EVEValues;
 
 /**
  * @author Stephan Pagel
