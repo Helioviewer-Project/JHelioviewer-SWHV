@@ -309,7 +309,7 @@ public class JHVJPXView extends JHVJP2View implements TimedMovieView, CachedMovi
      * {@inheritDoc}
      */
     public void playMovie() {
-        if (getMaximumFrameNumber() > 1) {
+        if (getMaximumFrameNumber() > 0) {
             if (linkedMovieManager == null || !linkedMovieManager.playLinkedMovies()) {
                 if (linkedMovieManager == null || linkedMovieManager.isMaster(this)) {
                     if (render != null) {
