@@ -151,10 +151,10 @@ public class RadioDataManager implements ViewListener, RadioDownloaderListener{/
 					latestComplete = cscr.getValue();
 				}
 				Log.debug("Latest complete is : " + latestComplete);
-				if (waitingForFrame == cscr.getValue()){
+				/*if (waitingForFrame == cscr.getValue()){
 					eventReceived = true;
 					expectEvent = false;
-				}
+				}*/
 			}
 		}
 		if (expectEvent){
