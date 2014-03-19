@@ -573,16 +573,18 @@ public class RadioDataManager implements ViewListener, RadioDownloaderListener{/
 										eventReceived = false;
 										//acceptEvents = false;
 										SingleChannelByte8ImageData imageData = (SingleChannelByte8ImageData)(tempCurrent.getSubimageData());
-										Byte8ImageTransport bytetrs =  (Byte8ImageTransport) imageData.getImageTransport();
-										//byte[] data = bytetrs.getByte8PixelData();
-										//byte[] newData  = new byte[data.length];
-										data = bytetrs.getByte8PixelData();
-										Log.debug("Length of the data"+data.length);
-										int width = imageData.getWidth();
-										int height = imageData.getHeight();
-										Log.debug("width = "+ width);
-										Log.debug("height = " + height);
-										fireNewDataReceived(data, tempIm.getTimeInterval(),tempIm.getFreqInterval(), new Rectangle(rs.getWidth(),rs.getHeight()), id, drd.getPlotIdentifier(), tempIm.getRadioImageID());
+										if(imageData!=null){
+											Byte8ImageTransport bytetrs =  (Byte8ImageTransport) imageData.getImageTransport();
+											//byte[] data = bytetrs.getByte8PixelData();
+											//byte[] newData  = new byte[data.length];
+											data = bytetrs.getByte8PixelData();
+											Log.debug("Length of the data"+data.length);
+											int width = imageData.getWidth();
+											int height = imageData.getHeight();
+											Log.debug("width = "+ width);
+											Log.debug("height = " + height);
+											fireNewDataReceived(data, tempIm.getTimeInterval(),tempIm.getFreqInterval(), new Rectangle(rs.getWidth(),rs.getHeight()), id, drd.getPlotIdentifier(), tempIm.getRadioImageID());
+										}
 									}
 								}
 							}
