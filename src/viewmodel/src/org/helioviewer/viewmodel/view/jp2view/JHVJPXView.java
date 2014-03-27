@@ -374,15 +374,16 @@ public class JHVJPXView extends JHVJP2View implements TimedMovieView, CachedMovi
      * {@inheritDoc}
      */
     void setSubimageData(ImageData newImageData, SubImage roi, int compositionLayer) {
-
-        lastRenderedCompositionLayer = compositionLayer;
-
-        if (metaData instanceof ObserverMetaData) {
-            ObserverMetaData observerMetaData = (ObserverMetaData) metaData;
-            observerMetaData.updateDateTime(dateTimeCache.getDateTime(compositionLayer));
-            event.addReason(new TimestampChangedReason(this, observerMetaData.getDateTime()));
-        }
-        super.setSubimageData(newImageData, roi, 0);
+    	synchronized(this){
+	        lastRenderedCompositionLayer = compositionLayer;
+	
+	        if (metaData instanceof ObserverMetaData) {
+	            ObserverMetaData observerMetaData = (ObserverMetaData) metaData;
+	            observerMetaData.updateDateTime(dateTimeCache.getDateTime(compositionLayer));
+	            event.addReason(new TimestampChangedReason(this, observerMetaData.getDateTime()));
+	        }
+	        super.setSubimageData(newImageData, roi, 0);
+    	}
     }
 
     public LinkedMovieManager getLinkedMovieManager() {
