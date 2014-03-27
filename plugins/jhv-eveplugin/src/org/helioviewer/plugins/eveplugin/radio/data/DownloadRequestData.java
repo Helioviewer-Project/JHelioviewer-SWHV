@@ -13,7 +13,7 @@ public class DownloadRequestData implements LineDataSelectorElement{
 	private List<RadioImage> radioImages;
 	private Long ID;
 	private boolean isDownloading;
-	private String plotIdentifier;
+	private String plotIdentifier = "plot.identifier.master";
 	private boolean isVisible;
 	
 	private RadioDataManager radioDataManager;
