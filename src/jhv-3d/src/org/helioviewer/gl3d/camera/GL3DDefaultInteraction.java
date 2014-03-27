@@ -3,7 +3,6 @@ package org.helioviewer.gl3d.camera;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseWheelEvent;
 
-import org.helioviewer.gl3d.camera.GL3DBaseTrackballCamera;
 import org.helioviewer.gl3d.view.GL3DSceneGraphView;
 import org.helioviewer.viewmodel.region.Region;
 import org.helioviewer.viewmodel.view.MetaDataView;
@@ -13,7 +12,7 @@ import org.helioviewer.viewmodel.view.MetaDataView;
  * {@link GL3DSceneGraphView}. Default behavior includes camera reset on double
  * click.
  * 
- * @author Simon Spoerri (simon.spoerri@fhnw.ch)
+ * @author Simon Spšrri (simon.spoerri@fhnw.ch)
  * 
  */
 public abstract class GL3DDefaultInteraction extends GL3DInteraction {
@@ -50,7 +49,7 @@ public abstract class GL3DDefaultInteraction extends GL3DInteraction {
             camera.addCameraAnimation(new GL3DCameraZoomAnimation(distance, 500));
             camera.addCameraAnimation(new GL3DCameraPanAnimation(this.camera.getTranslation().copy().negate()));
         } else {
-            camera.setZTranslation(-GL3DBaseTrackballCamera.DEFAULT_CAMERA_DISTANCE);
+            camera.setZTranslation(-GL3DTrackballCamera.DEFAULT_CAMERA_DISTANCE);
             this.camera.getRotation().clear();
             this.camera.updateCameraTransformation();
         }

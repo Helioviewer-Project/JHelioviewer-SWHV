@@ -1,13 +1,9 @@
 package org.helioviewer.gl3d.camera;
 
-import java.util.Calendar;
 import java.util.Date;
-import java.util.GregorianCalendar;
 
 import org.helioviewer.base.logging.Log;
-import org.helioviewer.base.physics.Astronomy;
 import org.helioviewer.base.physics.DifferentialRotation;
-import org.helioviewer.gl3d.camera.GL3DBaseTrackballCamera;
 import org.helioviewer.gl3d.scenegraph.math.GL3DQuatd;
 import org.helioviewer.gl3d.scenegraph.math.GL3DVec3d;
 import org.helioviewer.gl3d.scenegraph.rt.GL3DRay;
@@ -27,35 +23,27 @@ import org.helioviewer.viewmodel.view.jp2view.datetime.ImmutableDateTime;
 
 /**
  * This camera is used when solar rotation tracking is enabled. It extends the
- * {@link GL3DBaseTrackballCamera} by automatically rotating the camera around the
+ * {@link GL3DTrackballCamera} by automatically rotating the camera around the
  * Y-Axis (pointing to solar north) by an amount calculated through
  * {@link DifferentialRotation}.
  * 
- * @author Simon Spoerri (simon.spoerri@fhnw.ch)
+ * @author Simon Spšrri (simon.spoerri@fhnw.ch)
  * 
  */
-public class GL3DSolarRotationTrackingTrackballCamera extends GL3DBaseTrackballCamera implements ViewListener {
-	
-	private final Date startDate;
+public class GL3DSolarRotationTrackingTrackballCamera extends GL3DTrackballCamera implements ViewListener {
+    private Date startDate = null;
 
     private CoordinateVector startPosition = null;
 
     private Date currentDate = null;
+    private double currentRotation = 0.0;
 
     private StonyhurstHeliographicCoordinateSystem stonyhurstCoordinateSystem = new StonyhurstHeliographicCoordinateSystem();
     private SolarSphereCoordinateSystem solarSphereCoordinateSystem = new SolarSphereCoordinateSystem();
     private SolarSphereToStonyhurstHeliographicConversion stonyhurstConversion = (SolarSphereToStonyhurstHeliographicConversion) solarSphereCoordinateSystem.getConversion(stonyhurstCoordinateSystem);
 
-	private GL3DQuatd baseRot;
-
-
-
-
     public GL3DSolarRotationTrackingTrackballCamera(GL3DSceneGraphView sceneGraphView) {
         super(sceneGraphView);
-        Calendar cal = new GregorianCalendar();
-        cal.set(2000, 1, 1, 0, 0, 0);
-        startDate = cal.getTime();
     }
 
     public void activate(GL3DCamera precedingCamera) {
@@ -66,40 +54,38 @@ public class GL3DSolarRotationTrackingTrackballCamera extends GL3DBaseTrackballC
     public void deactivate() {
         sceneGraphView.removeViewListener(this);
         this.startPosition = null;
+        this.startDate = null;
     };
 
     public String getName() {
         return "Solar Rotation Tracking Camera";
     }
-    
 
     public void viewChanged(View sender, ChangeEvent aEvent) {
         TimestampChangedReason timestampReason = aEvent.getLastChangedReasonByType(TimestampChangedReason.class);
         if ((timestampReason != null) && (timestampReason.getView() instanceof TimedMovieView) && LinkedMovieManager.getActiveInstance().isMaster((TimedMovieView) timestampReason.getView())) {
             currentDate = timestampReason.getNewDateTime().getTime();
-            
             if (startPosition != null) {
-                long timediff = -(currentDate.getTime()) / 1000;
-                Calendar cal = new GregorianCalendar();
-                cal.setTime(startDate);
-                double b02000 = Astronomy.getB0InRadians(cal);
-                cal.setTime(currentDate);
-                double b0 = Astronomy.getB0InRadians(cal); 
-                localrotation = DifferentialRotation.calculateRotationInRadians(0, timediff);
-                rotateAll();
+                long timediff = (currentDate.getTime() - startDate.getTime()) / 1000;
 
+                double theta = startPosition.getValue(StonyhurstHeliographicCoordinateSystem.THETA);
+                double rotation = DifferentialRotation.calculateRotationInRadians(theta, timediff);
+                // Log.debug("GL3DSolarRotationTracking: Rotating: "+rotation);
+
+                this.getRotation().rotate(GL3DQuatd.createRotation(currentRotation - rotation, new GL3DVec3d(0, 1, 0)));
+                this.updateCameraTransformation();
+                this.currentRotation = rotation;
             } else {
-                Calendar cal = new GregorianCalendar();
-                cal.setTime(startDate);
-                baseRot = this.getRotation().copy();
+                currentRotation = 0.0;
                 resetStartPosition();
             }
 
         }
 
     }
-    
+
     private void resetStartPosition() {
+        this.startDate = getStartDate();
 
         GL3DRayTracer positionTracer = new GL3DRayTracer(sceneGraphView.getHitReferenceShape(), this);
         GL3DRay positionRay = positionTracer.castCenter();
@@ -109,6 +95,7 @@ public class GL3DSolarRotationTrackingTrackballCamera extends GL3DBaseTrackballC
         if (position != null) {
             CoordinateVector solarSpherePosition = solarSphereCoordinateSystem.createCoordinateVector(position.x, position.y, position.z);
             CoordinateVector stonyhurstPosition = stonyhurstConversion.convert(solarSpherePosition);
+            // Log.debug("GL3DSolarRotationTrackingCam: StonyhurstPosition="+stonyhurstPosition);
             this.startPosition = stonyhurstPosition;
 
             Log.debug("GL3DSolarRotationTracking.Set Start hitpoint! " + positionRay.getDirection());
@@ -117,5 +104,20 @@ public class GL3DSolarRotationTrackingTrackballCamera extends GL3DBaseTrackballC
 
         }
 
+    }
+
+    private Date getStartDate() {
+        if (LinkedMovieManager.getActiveInstance() == null) {
+            return null;
+        }
+        TimedMovieView masterView = LinkedMovieManager.getActiveInstance().getMasterMovie();
+        if (masterView == null) {
+            return null;
+        }
+        ImmutableDateTime idt = masterView.getCurrentFrameDateTime();
+        if (idt == null) {
+            return null;
+        }
+        return idt.getTime();
     }
 }
