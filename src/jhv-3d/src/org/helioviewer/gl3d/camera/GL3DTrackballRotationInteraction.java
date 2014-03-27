@@ -9,6 +9,7 @@ import org.helioviewer.gl3d.scenegraph.math.GL3DVec3d;
 import org.helioviewer.gl3d.scenegraph.rt.GL3DRay;
 import org.helioviewer.gl3d.scenegraph.rt.GL3DRayTracer;
 import org.helioviewer.gl3d.view.GL3DSceneGraphView;
+import org.helioviewer.jhv.display.Displayer;
 
 /**
  * This interaction is used by the {@link GL3DTrackballCamera} as its rotation
@@ -41,6 +42,8 @@ public class GL3DTrackballRotationInteraction extends GL3DDefaultInteraction {
         }
 
         camera.fireCameraMoving();
+        Displayer.getSingletonInstance().display();
+
     }
 
     public void mouseReleased(MouseEvent e, GL3DCamera camera) {
@@ -48,6 +51,8 @@ public class GL3DTrackballRotationInteraction extends GL3DDefaultInteraction {
         this.currentRotationEndPoint = null;
 
         camera.fireCameraMoved();
+        Displayer.getSingletonInstance().display();
+
     }
 
     public void mousePressed(MouseEvent e, GL3DCamera camera) {

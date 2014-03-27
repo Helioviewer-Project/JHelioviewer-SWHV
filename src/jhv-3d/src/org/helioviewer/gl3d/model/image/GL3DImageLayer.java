@@ -258,7 +258,6 @@ public abstract class GL3DImageLayer extends GL3DOrientedGroup implements GL3DCa
     }
 
     public CoordinateVector getOrientation() {
-        // Log.debug("GL3DImageLayer: Orientation: "+this.coordinateSystemView.getOrientation());
     	HelioviewerMetaData h = (HelioviewerMetaData) this.metaDataView.getMetaData();
     	CoordinateVector c = this.coordinateSystemView.getOrientation();
     	return this.coordinateSystemView.getOrientation();
