@@ -42,34 +42,42 @@ public class LineDataSelectorModel {
 	}
 
 	public int getNumberOfAvailableLineData(String identifier){
-		List<LineDataSelectorElement> tempList = elementMap.get(identifier);
-		
-		return tempList == null?0:tempList.size();
+		synchronized(elementMap){
+			List<LineDataSelectorElement> tempList = elementMap.get(identifier);		
+			return tempList == null?0:tempList.size();
+		}
 	}
 	
 	public void addLineData(LineDataSelectorElement element){
-		if (this.elementMap.containsKey(element.getPlotIdentifier())){
-			this.elementMap.get(element.getPlotIdentifier()).add(element);
-		}else{
-			ArrayList<LineDataSelectorElement> tempList = new ArrayList<LineDataSelectorElement>();
-			tempList.add(element);
-			this.elementMap.put(element.getPlotIdentifier(), tempList);
-		}		
-		fireLineDataSelectorElementAdded(element);
+		synchronized(elementMap){
+			if (this.elementMap.containsKey(element.getPlotIdentifier())){
+				this.elementMap.get(element.getPlotIdentifier()).add(element);
+			}else{
+				ArrayList<LineDataSelectorElement> tempList = new ArrayList<LineDataSelectorElement>();
+				tempList.add(element);
+				this.elementMap.put(element.getPlotIdentifier(), tempList);
+			}		
+			fireLineDataSelectorElementAdded(element);
+		}
 	}
 	
 	public List<LineDataSelectorElement> getAllLineDataSelectorElements(String identifier){
-		return this.elementMap.get(identifier);
+		synchronized(elementMap){
+			return this.elementMap.get(identifier);
+		}
 	}
 
 	public void removeLineData(LineDataSelectorElement element){
-		//element.removeLineData();
-		this.elementMap.remove(element);
-		fireLineDataSelectorElementRemoved(element);
+		synchronized(elementMap){
+			this.elementMap.remove(element);
+			fireLineDataSelectorElementRemoved(element);
+		}
 	}
 	
 	public void lineDataElementUpdated(LineDataSelectorElement element){
-		fireLineDataSelectorElementUpdated(element);
+		synchronized(elementMap){
+			fireLineDataSelectorElementUpdated(element);
+		}
 	}
 
 	public void lineDataGroupChanged(){
@@ -77,12 +85,17 @@ public class LineDataSelectorModel {
 	}
 	
 	public boolean atLeastOneDownloading(String identifier){
-		for(LineDataSelectorElement el : elementMap.get(identifier)){
-			if(el.isDownloading()){
-				return true;
-			}
+		if(identifier==null){
+			identifier="plot1";
 		}
-		return false;
+		synchronized(elementMap){
+			for(LineDataSelectorElement el : elementMap.get(identifier)){
+				if(el.isDownloading()){
+					return true;
+				}
+			}
+			return false;
+		}
 	}
 	
 	private synchronized void fireLineDataSelectorElementRemoved(
