@@ -215,9 +215,18 @@ public class LayersModel implements ViewListener {
      *         information is available
      */
     public String getCurrentFrameTimestampString(View view) {
+    	 if (view == null) {
+             return null;
+         }
 
-    	ImmutableDateTime dt= getCurrentFrameTimestamp(view);
-    	return dt.toString();
+         MetaData md = view.getAdapter(MetaDataView.class).getMetaData();
+
+         if (md instanceof ObserverMetaData) {
+        	ImmutableDateTime dt= getCurrentFrameTimestamp(view);
+        	return dt.getCachedDate();
+         } else {
+            return "N/A";
+         }
     }
 
     /**
