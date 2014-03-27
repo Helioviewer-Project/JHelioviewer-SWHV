@@ -522,7 +522,7 @@ public class DownloadController {
                     type.getBaseUrl() + 
                     EVEAPI.API_URL_PARAMETER_STARTDATE + eveAPIDateFormat.format(interval.getStart()) + "&" + 
                     EVEAPI.API_URL_PARAMETER_ENDDATE + eveAPIDateFormat.format(interval.getEnd()) + "&" + 
-                    EVEAPI.API_URL_PARAMETER_TYPE + type.toString() + "&" +
+                    EVEAPI.API_URL_PARAMETER_TYPE + type.getName() + "&" +
                     EVEAPI.API_URL_PARAMETER_FORMAT + EVEAPI.API_URL_PARAMETER_FORMAT_VALUES.JSON);
         }
         private boolean test=true;

@@ -18,6 +18,7 @@ public class BandType {
 	private String baseUrl;
 	private BandGroup group;
 	private String label;
+	private String name;
 	private String unitLabel;
 	public HashMap<String, Double> warnLevels = new HashMap<String, Double>();
 	private double min;
@@ -33,7 +34,7 @@ public class BandType {
 			        this.baseUrl + 
 			        EVEAPI.API_URL_PARAMETER_STARTDATE + eveAPIDateFormat.format(interval.getStart()) + "&" + 
 			        EVEAPI.API_URL_PARAMETER_ENDDATE + eveAPIDateFormat.format(interval.getEnd()) + "&" + 
-			        EVEAPI.API_URL_PARAMETER_TYPE + this.getLabel() + "&" +
+			        EVEAPI.API_URL_PARAMETER_TYPE + this.getName() + "&" +
 			        EVEAPI.API_URL_PARAMETER_FORMAT + EVEAPI.API_URL_PARAMETER_FORMAT_VALUES.JSON);
 		} catch (MalformedURLException e) {
 			Log.error("Something is wrong with the EVEAPI url", e);
@@ -112,4 +113,10 @@ public class BandType {
 	public void setDataDownloader(DataDownloader dataDownloader) {
 		this.dataDownloader = dataDownloader;
 	}
+	public void setName(String name) {
+		this.name = name;
+	}
+	public String getName() {
+		return name;
+	}	
 }
