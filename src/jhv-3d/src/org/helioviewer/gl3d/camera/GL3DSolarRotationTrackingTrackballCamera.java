@@ -41,11 +41,15 @@ public class GL3DSolarRotationTrackingTrackballCamera extends GL3DBaseTrackballC
     private CoordinateVector startPosition = null;
 
     private Date currentDate = null;
-    private double currentRotation = 0.0;
 
     private StonyhurstHeliographicCoordinateSystem stonyhurstCoordinateSystem = new StonyhurstHeliographicCoordinateSystem();
     private SolarSphereCoordinateSystem solarSphereCoordinateSystem = new SolarSphereCoordinateSystem();
     private SolarSphereToStonyhurstHeliographicConversion stonyhurstConversion = (SolarSphereToStonyhurstHeliographicConversion) solarSphereCoordinateSystem.getConversion(stonyhurstCoordinateSystem);
+
+	private GL3DQuatd baseRot;
+
+
+
 
     public GL3DSolarRotationTrackingTrackballCamera(GL3DSceneGraphView sceneGraphView) {
         super(sceneGraphView);
@@ -67,34 +71,34 @@ public class GL3DSolarRotationTrackingTrackballCamera extends GL3DBaseTrackballC
     public String getName() {
         return "Solar Rotation Tracking Camera";
     }
-    public void rotateAll(double rotation){
-        this.setRotation(GL3DQuatd.createRotation(0.0, new GL3DVec3d(0, 1, 0)));
-        //this.getRotation().rotate(GL3DQuatd.createRotation(localrotation, new GL3DVec3d(0, 1, 0)));
-        if(this.currentDragRotation!=null){
-        	this.getRotation().rotate(this.currentDragRotation);
-        }
-        this.updateCameraTransformation();    	
-    }
+    
+
     public void viewChanged(View sender, ChangeEvent aEvent) {
         TimestampChangedReason timestampReason = aEvent.getLastChangedReasonByType(TimestampChangedReason.class);
         if ((timestampReason != null) && (timestampReason.getView() instanceof TimedMovieView) && LinkedMovieManager.getActiveInstance().isMaster((TimedMovieView) timestampReason.getView())) {
             currentDate = timestampReason.getNewDateTime().getTime();
+            
             if (startPosition != null) {
-                long timediff = (currentDate.getTime() - startDate.getTime()) / 1000;
-
-                double theta = startPosition.getValue(StonyhurstHeliographicCoordinateSystem.THETA);
-                double rotation = -DifferentialRotation.calculateRotationInRadians(0, timediff);
-                rotateAll(rotation);
+                long timediff = -(currentDate.getTime()) / 1000;
+                Calendar cal = new GregorianCalendar();
+                cal.setTime(startDate);
+                double b02000 = Astronomy.getB0InRadians(cal);
+                cal.setTime(currentDate);
+                double b0 = Astronomy.getB0InRadians(cal); 
+                localrotation = DifferentialRotation.calculateRotationInRadians(0, timediff);
+                rotateAll();
 
             } else {
-                currentRotation = 0.0;
+                Calendar cal = new GregorianCalendar();
+                cal.setTime(startDate);
+                baseRot = this.getRotation().copy();
                 resetStartPosition();
             }
 
         }
 
     }
-
+    
     private void resetStartPosition() {
 
         GL3DRayTracer positionTracer = new GL3DRayTracer(sceneGraphView.getHitReferenceShape(), this);
@@ -105,7 +109,6 @@ public class GL3DSolarRotationTrackingTrackballCamera extends GL3DBaseTrackballC
         if (position != null) {
             CoordinateVector solarSpherePosition = solarSphereCoordinateSystem.createCoordinateVector(position.x, position.y, position.z);
             CoordinateVector stonyhurstPosition = stonyhurstConversion.convert(solarSpherePosition);
-            // Log.debug("GL3DSolarRotationTrackingCam: StonyhurstPosition="+stonyhurstPosition);
             this.startPosition = stonyhurstPosition;
 
             Log.debug("GL3DSolarRotationTracking.Set Start hitpoint! " + positionRay.getDirection());
@@ -114,20 +117,5 @@ public class GL3DSolarRotationTrackingTrackballCamera extends GL3DBaseTrackballC
 
         }
 
-    }
-
-    private Date getStartDate() {
-        if (LinkedMovieManager.getActiveInstance() == null) {
-            return null;
-        }
-        TimedMovieView masterView = LinkedMovieManager.getActiveInstance().getMasterMovie();
-        if (masterView == null) {
-            return null;
-        }
-        ImmutableDateTime idt = masterView.getCurrentFrameDateTime();
-        if (idt == null) {
-            return null;
-        }
-        return idt.getTime();
     }
 }

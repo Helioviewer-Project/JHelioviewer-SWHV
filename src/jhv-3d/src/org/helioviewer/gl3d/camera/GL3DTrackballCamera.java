@@ -34,20 +34,17 @@ import org.helioviewer.viewmodel.view.jp2view.datetime.ImmutableDateTime;
  * @author Simon Spoerri (simon.spoerri@fhnw.ch)
  * 
  */
-public class GL3DTrackballCamera extends GL3DBaseTrackballCamera implements ViewListener {
+public class GL3DTrackballCamera extends GL3DBaseTrackballCamera {
 	
 	private final Date startDate;
 
     private CoordinateVector startPosition = null;
 
     private Date currentDate = null;
-    private double currentRotation = 0.0;
 
     private StonyhurstHeliographicCoordinateSystem stonyhurstCoordinateSystem = new StonyhurstHeliographicCoordinateSystem();
     private SolarSphereCoordinateSystem solarSphereCoordinateSystem = new SolarSphereCoordinateSystem();
     private SolarSphereToStonyhurstHeliographicConversion stonyhurstConversion = (SolarSphereToStonyhurstHeliographicConversion) solarSphereCoordinateSystem.getConversion(stonyhurstCoordinateSystem);
-
-	private Date previousDate;
 
 	private GL3DQuatd baseRot;
 
@@ -63,45 +60,16 @@ public class GL3DTrackballCamera extends GL3DBaseTrackballCamera implements View
 
     public void activate(GL3DCamera precedingCamera) {
         super.activate(precedingCamera);
-        sceneGraphView.addViewListener(this);
     }
 
     public void deactivate() {
-        sceneGraphView.removeViewListener(this);
         this.startPosition = null;
     };
 
     public String getName() {
         return "Solar Rotation Tracking Camera";
     }
-    
 
-    public void viewChanged(View sender, ChangeEvent aEvent) {
-        TimestampChangedReason timestampReason = aEvent.getLastChangedReasonByType(TimestampChangedReason.class);
-        if ((timestampReason != null) && (timestampReason.getView() instanceof TimedMovieView) && LinkedMovieManager.getActiveInstance().isMaster((TimedMovieView) timestampReason.getView())) {
-            currentDate = timestampReason.getNewDateTime().getTime();
-            
-            if (startPosition != null) {
-                long timediff = (currentDate.getTime() - startDate.getTime()) / 1000;
-                Calendar cal = new GregorianCalendar();
-                cal.setTime(startDate);
-                double b02000 = Astronomy.getB0InRadians(cal);
-                cal.setTime(currentDate);
-                double b0 = Astronomy.getB0InRadians(cal); 
-                localrotation = DifferentialRotation.calculateRotationInRadians(0, timediff);
-                rotateAll();
-
-            } else {
-                Calendar cal = new GregorianCalendar();
-                cal.setTime(startDate);
-                baseRot = this.getRotation().copy();
-                resetStartPosition();
-            }
-
-        }
-
-    }
-    
     private void resetStartPosition() {
 
         GL3DRayTracer positionTracer = new GL3DRayTracer(sceneGraphView.getHitReferenceShape(), this);

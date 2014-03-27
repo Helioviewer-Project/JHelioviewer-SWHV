@@ -204,10 +204,7 @@ public class GL3DCoordinateSystemView extends AbstractGL3DView implements GL3DVi
     }
 
     private static CoordinateSystem getDefaultCoordinateSystem(ImmutableDateTime datetime) {
-        //return new HeliocentricCartesian2000CoordinateSystem();
-
         return new TimedHeliocentricCartesianCoordinateSystem(datetime);
-        // return new HEECoordinateSystem();
     }
 
     private static CoordinateVector getDefaultOrientation(ImmutableDateTime datetime) {
