@@ -85,7 +85,6 @@ public class LineDataSelectorModel {
 	}
 	
 	public boolean atLeastOneDownloading(String identifier){
-		System.out.println(identifier);
 		synchronized(elementMap){
 			for(LineDataSelectorElement el : elementMap.get(identifier)){
 				if(el.isDownloading()){
