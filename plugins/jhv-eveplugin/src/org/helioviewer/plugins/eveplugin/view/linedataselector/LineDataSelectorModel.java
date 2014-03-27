@@ -85,9 +85,7 @@ public class LineDataSelectorModel {
 	}
 	
 	public boolean atLeastOneDownloading(String identifier){
-		if(identifier==null){
-			identifier="plot1";
-		}
+		System.out.println(identifier);
 		synchronized(elementMap){
 			for(LineDataSelectorElement el : elementMap.get(identifier)){
 				if(el.isDownloading()){

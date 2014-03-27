@@ -22,7 +22,7 @@ public class Band implements LineDataSelectorElement{
     private boolean isVisible = true;
     private Color graphColor = Color.BLACK;
     
-    private String plotIdentifier;
+    private String plotIdentifier = "plot.identifier.master";
     
     // //////////////////////////////////////////////////////////////////////////////
     // Methods
