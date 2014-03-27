@@ -80,29 +80,16 @@ public class GL3DComponentView extends AbstractComponentView implements GLEventL
         this.setCanvas(new GLCanvas(null, null, GLSharedContext.getSharedContext(), null));
         this.getCanvas().setMinimumSize(new java.awt.Dimension(100,100));
         Displayer.getSingletonInstance().addListener(this);
-
-        // Just for testing...
-        //animator = new FPSAnimator(canvas, 30);
-
         this.getCanvas().addGLEventListener(this);
-        //this.display(this.canvas);
     }
 
     public void deactivate() {
         if (this.animator != null) {
             this.animator.stop();
-            /*if (getAdapter(GL3DView.class) != null) {
-                getAdapter(GL3DView.class).deactivate(GL3DState.get());
-            }*/
         }
-        //animationLock.lock();
     }
 
     public void activate() {
-    	//this.display(this.canvas);
-        //this.animator.start();
-        /*if (this.animationLock.isLocked())
-            animationLock.unlock();*/
     }
 
     public GLCanvas getComponent() {
@@ -162,21 +149,11 @@ public class GL3DComponentView extends AbstractComponentView implements GLEventL
 
     public void reshape(GLAutoDrawable glAD, int x, int y, int width, int height) {
         viewportSize = new Vector2dInt(width, height);
-        // Log.debug("GL3DComponentView.Reshape");
         GL gl = glAD.getGL();
 
         gl.setSwapInterval(1);
 
         updateViewport();
-        //
-        // gl.glViewport(0, 0, width, height);
-        // gl.glMatrixMode(GL.GL_PROJECTION);
-        // gl.glLoadIdentity();
-        //
-        // gl.glOrtho(0, width, 0, height, -1, 10000);
-        //
-        // gl.glMatrixMode(GL.GL_MODELVIEW);
-        // gl.glLoadIdentity();
     }
 
     public synchronized void display(GLAutoDrawable glAD) {
