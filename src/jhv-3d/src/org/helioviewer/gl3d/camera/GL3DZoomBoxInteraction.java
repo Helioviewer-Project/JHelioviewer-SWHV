@@ -13,6 +13,7 @@ import org.helioviewer.gl3d.scenegraph.rt.GL3DRayTracer;
 import org.helioviewer.gl3d.view.GL3DSceneGraphView;
 import org.helioviewer.gl3d.wcs.CoordinateVector;
 import org.helioviewer.gl3d.wcs.impl.SolarImageCoordinateSystem;
+import org.helioviewer.jhv.display.Displayer;
 
 /**
  * The zoom box interaction allows the user to select a region of interest in
@@ -22,7 +23,7 @@ import org.helioviewer.gl3d.wcs.impl.SolarImageCoordinateSystem;
  * is applied. When the zoom box intersects with the corona the rotation is
  * reset and only a panning is applied.
  * 
- * @author Simon Spšrri (simon.spoerri@fhnw.ch)
+ * @author Simon Spï¿½rri (simon.spoerri@fhnw.ch)
  * 
  */
 public class GL3DZoomBoxInteraction extends GL3DDefaultInteraction {
@@ -88,6 +89,7 @@ public class GL3DZoomBoxInteraction extends GL3DDefaultInteraction {
 
     public void mouseDragged(MouseEvent e, GL3DCamera camera) {
         this.zoomBoxEndPoint = getHitPoint(e.getPoint());
+        Displayer.getSingletonInstance().display();
     }
 
     public void mouseReleased(MouseEvent e, GL3DCamera camera) {
@@ -117,6 +119,7 @@ public class GL3DZoomBoxInteraction extends GL3DDefaultInteraction {
         }
         this.zoomBoxEndPoint = null;
         this.zoomBoxStartPoint = null;
+        Displayer.getSingletonInstance().display();
     }
 
     private GL3DCameraRotationAnimation createRotationAnimation(GL3DVec3d startPoint) {
