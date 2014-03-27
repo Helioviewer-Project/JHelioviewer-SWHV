@@ -1,9 +1,16 @@
 package org.helioviewer.viewmodel.view.jp2view.datetime;
 
 import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.GregorianCalendar;
+import java.util.Locale;
 import java.util.TimeZone;
+
+import org.helioviewer.viewmodel.metadata.MetaData;
+import org.helioviewer.viewmodel.metadata.ObserverMetaData;
+import org.helioviewer.viewmodel.view.MetaDataView;
 
 /**
  * Class that holds Date and Time information. The data is stored in a Calendar
@@ -23,6 +30,7 @@ public class ImmutableDateTime implements Comparable<ImmutableDateTime> {
 
     /** Internal class that holds date/time information. */
     protected Calendar calendar;
+    protected String cachedDate;
 
     /**
      * The constructor that populates the fields of the internal Calendar
@@ -128,5 +136,15 @@ public class ImmutableDateTime implements Comparable<ImmutableDateTime> {
 
     public int hashCode() {
         return (int) (calendar.getTimeInMillis() ^ (calendar.getTimeInMillis() >>> 32));
+    }
+    
+    public String getCachedDate(){
+    	if(this.cachedDate==null){
+           SimpleDateFormat dateFormat;
+           dateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
+           this.cachedDate = dateFormat.format(calendar.getTime());
+      	}
+    	return this.cachedDate;
+   	
     }
 };
