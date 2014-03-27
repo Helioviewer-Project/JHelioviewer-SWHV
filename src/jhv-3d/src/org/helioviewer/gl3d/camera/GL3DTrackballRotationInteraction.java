@@ -79,8 +79,7 @@ public class GL3DTrackballRotationInteraction extends GL3DDefaultInteraction {
             // Log.debug("GL3DTrackballRotationInteraction: Ray is Outside!");
             double y = (camera.getHeight() / 2 - p.y) / camera.getHeight();
             double x = (p.x - camera.getWidth() / 2) / camera.getWidth();
-            // Transform the Point so it lies on the plane that is aligned to
-            // the viewspace (not the sphere)
+
             hitPoint = camera.getRotation().toMatrix().inverse().multiply(new GL3DVec3d(x, y, 0).normalize());
         }
         return hitPoint;
