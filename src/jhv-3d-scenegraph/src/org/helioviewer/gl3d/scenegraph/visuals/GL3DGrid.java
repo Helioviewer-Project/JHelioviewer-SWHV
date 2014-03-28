@@ -47,8 +47,15 @@ public class GL3DGrid extends GL3DGroup{
         	this.addNode(rect);
         }		
 	}
+	
+	private void reloadGrid(){
+		this.deleteAll(GL3DState.get());
+		this.loadGrid();
+	}
+	
     public void shapeDraw(GL3DState state) {
         super.shapeDraw(state);
+        
     }	
 
 }
