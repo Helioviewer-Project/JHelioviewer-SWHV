@@ -264,7 +264,7 @@ public abstract class GL3DImageLayer extends GL3DOrientedGroup implements GL3DCa
     }
 
 	private void updateROI(GL3DCamera activeCamera) {
-		/*
+		
     	MetaData metaData = metaDataView.getMetaData();
 
         if (metaData == null) {
@@ -381,7 +381,7 @@ public abstract class GL3DImageLayer extends GL3DOrientedGroup implements GL3DCa
         } else {
             Log.error("Illegal Region calculated! " + regionWidth + ":" + regionHeight + ". x = " + minPhysicalX + " - " + maxPhysicalX + ", y = " + minPhysicalY + " - " + maxPhysicalY);
         }
-        */
+        
     }
 
     public void setCoronaVisibility(boolean visible) {
