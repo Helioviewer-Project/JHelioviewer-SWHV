@@ -149,9 +149,6 @@ public class ImageViewerGui {
         mainFrame.setJMenuBar(menuBar);
         mainFrame.setFocusable(true);
 
-        // Set the default state and call prepareGui
-        // activateState(ViewStateEnum.View2D);
-
         prepareGui();
     }
 
