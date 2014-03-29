@@ -167,11 +167,14 @@ public class GL3DQuatd {
 
     public static GL3DQuatd calcRotation(GL3DVec3d startPoint, GL3DVec3d endPoint) throws IllegalArgumentException {
         GL3DVec3d rotationAxis = GL3DVec3d.cross(startPoint, endPoint);
-
         if (rotationAxis.length2() != 0) {
             rotationAxis.normalize();
+            
             double rotationAngle = Math.acos(GL3DVec3d.dot(startPoint, endPoint));
             GL3DQuatd rotation = GL3DQuatd.createRotation(rotationAngle, rotationAxis.copy());
+            if( Double.isNaN(rotation.a)|| Double.isNaN(rotation.u.x)|| Double.isNaN(rotation.u.y)|| Double.isNaN(rotation.u.z)){
+            	return GL3DQuatd.createRotation(0, new GL3DVec3d(0, 0, 1));
+            }
             return rotation;
         } else {
             // throw new
@@ -186,5 +189,10 @@ public class GL3DQuatd {
 
     public String toString() {
         return "[" + a + ", " + u.x + ", " + u.y + ", " + u.z + "]";
+    }
+    public static void main(String [] args){
+    	GL3DVec3d bp = new GL3DVec3d(0.08476370985803018, 0.025546149241522726, 0.9960735453519652+10e-15);
+    	GL3DVec3d ep = new GL3DVec3d(0.08476370985803018, 0.025546149241522726, 0.9960735453519652);
+    	System.out.println(calcRotation(bp,ep));
     }
 }
