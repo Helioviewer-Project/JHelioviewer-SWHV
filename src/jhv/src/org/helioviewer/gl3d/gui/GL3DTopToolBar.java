@@ -139,7 +139,6 @@ public class GL3DTopToolBar extends TopToolBar implements MouseListener {
         trackSolarRotationButton.setToolTipText("Enable Solar Rotation Tracking");
         addButton(trackSolarRotationButton);
 
-        // coronaVisibilityButton =
         coronaVisibilityButton = new JToggleButton(new GL3DToggleCoronaVisibilityAction());
         coronaVisibilityButton.setSelected(false);
         coronaVisibilityButton.setIcon(IconBank.getIcon(JHVIcon.LAYER_IMAGE));
@@ -153,9 +152,6 @@ public class GL3DTopToolBar extends TopToolBar implements MouseListener {
         gridVisibilityButton.setSelectedIcon(IconBank.getIcon(JHVIcon.LAYER_IMAGE_OFF));
         gridVisibilityButton.setToolTipText("Toggle Grid Visibility");
         addButton(gridVisibilityButton);
-        // VSO Export - DEACTIVATED FOR NOW
-        // addSeparator();
-        // addButton(new JButton(new NewQueryAction(true)));
 
         addSeparator();
 
