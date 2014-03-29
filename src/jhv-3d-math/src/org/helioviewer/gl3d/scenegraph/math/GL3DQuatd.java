@@ -167,20 +167,9 @@ public class GL3DQuatd {
 
     public static GL3DQuatd calcRotation(GL3DVec3d startPoint, GL3DVec3d endPoint) throws IllegalArgumentException {
         GL3DVec3d rotationAxis = GL3DVec3d.cross(startPoint, endPoint);
-        if (rotationAxis.length2() != 0) {
-            rotationAxis.normalize();
-            
-            double rotationAngle = Math.acos(GL3DVec3d.dot(startPoint, endPoint));
-            GL3DQuatd rotation = GL3DQuatd.createRotation(rotationAngle, rotationAxis.copy());
-            if( Double.isNaN(rotation.a)|| Double.isNaN(rotation.u.x)|| Double.isNaN(rotation.u.y)|| Double.isNaN(rotation.u.z)){
-            	return GL3DQuatd.createRotation(0, new GL3DVec3d(0, 0, 1));
-            }
-            return rotation;
-        } else {
-            // throw new
-            // IllegalArgumentException("Cannot Rotate about zero-length Axis");
-            return GL3DQuatd.createRotation(0, new GL3DVec3d(0, 0, 1));
-        }
+        double rotationAngle = Math.atan2(rotationAxis.length(), GL3DVec3d.dot(startPoint, endPoint));
+        GL3DQuatd rotation = GL3DQuatd.createRotation(rotationAngle, rotationAxis.copy());
+        return rotation;
     }
 
     public GL3DQuatd copy() {
