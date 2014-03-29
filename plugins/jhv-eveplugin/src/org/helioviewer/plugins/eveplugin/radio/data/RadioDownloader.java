@@ -11,7 +11,6 @@ import java.util.TimeZone;
 import org.helioviewer.base.logging.Log;
 import org.helioviewer.base.math.Interval;
 import org.helioviewer.base.message.Message;
-import org.helioviewer.jhv.gui.ImageViewerGui;
 import org.helioviewer.plugins.eveplugin.download.DataDownloader;
 import org.helioviewer.plugins.eveplugin.download.DownloadedData;
 import org.helioviewer.plugins.eveplugin.lines.data.Band;
