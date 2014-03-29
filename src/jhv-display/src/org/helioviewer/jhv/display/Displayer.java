@@ -6,8 +6,11 @@ public class Displayer{
 	
     private static Displayer instance = new Displayer();
     private final LinkedList<DisplayListener> listeners = new LinkedList<DisplayListener>();
-    
+    private GL3DComponentFakeInterface gl3dcomponent;
 
+    public void register(GL3DComponentFakeInterface gl3dcomponent){
+    	this.gl3dcomponent = gl3dcomponent;
+    }
 	public static Displayer getSingletonInstance() {
         if (instance == null) {
             throw new NullPointerException("Displayer not initialized");
@@ -27,5 +30,11 @@ public class Displayer{
             listener.display();
         }    	
     }
+    public void animate(){
+    	gl3dcomponent.activate();
+    }
+    public void stopAnimate(){
 
+    	gl3dcomponent.deactivate();
+    }
 }

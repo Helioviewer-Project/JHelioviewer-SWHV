@@ -119,7 +119,6 @@ public class GL3DZoomBoxInteraction extends GL3DDefaultInteraction {
         }
         this.zoomBoxEndPoint = null;
         this.zoomBoxStartPoint = null;
-        Displayer.getSingletonInstance().display();
     }
 
     private GL3DCameraRotationAnimation createRotationAnimation(GL3DVec3d startPoint) {
