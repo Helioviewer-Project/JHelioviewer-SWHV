@@ -22,6 +22,7 @@ import org.helioviewer.gl3d.camera.GL3DCameraListener;
 import org.helioviewer.gl3d.scenegraph.GL3DState;
 import org.helioviewer.jhv.display.DisplayListener;
 import org.helioviewer.jhv.display.Displayer;
+import org.helioviewer.jhv.display.GL3DComponentFakeInterface;
 import org.helioviewer.viewmodel.changeevent.ChangeEvent;
 import org.helioviewer.viewmodel.changeevent.LayerChangedReason;
 import org.helioviewer.viewmodel.changeevent.TimestampChangedReason;
@@ -57,7 +58,7 @@ import com.sun.opengl.util.FPSAnimator;
  * @author Simon Spoerri (simon.spoerri@fhnw.ch)
  * 
  */
-public class GL3DComponentView extends AbstractComponentView implements GLEventListener, ComponentView, DisplayListener {
+public class GL3DComponentView extends AbstractComponentView implements GLEventListener, ComponentView, DisplayListener, GL3DComponentFakeInterface {
     private GLCanvas canvas;
     private FPSAnimator animator;
 
@@ -79,6 +80,7 @@ public class GL3DComponentView extends AbstractComponentView implements GLEventL
     public GL3DComponentView() {
         this.setCanvas(new GLCanvas(null, null, GLSharedContext.getSharedContext(), null));
         this.getCanvas().setMinimumSize(new java.awt.Dimension(100,100));
+        Displayer.getSingletonInstance().register(this);        
         Displayer.getSingletonInstance().addListener(this);
         this.getCanvas().addGLEventListener(this);
     }
@@ -90,6 +92,16 @@ public class GL3DComponentView extends AbstractComponentView implements GLEventL
     }
 
     public void activate() {
+        if (this.animator == null) {
+        	this.animator = new FPSAnimator(this.getCanvas(), 30);
+            this.animator.start();
+        }
+        else{
+        	if(!this.animator.isAnimating()){
+                this.animator.start();
+        	}
+
+        }
     }
 
     public GLCanvas getComponent() {
