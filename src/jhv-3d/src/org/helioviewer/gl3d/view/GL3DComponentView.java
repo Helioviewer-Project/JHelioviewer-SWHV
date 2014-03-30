@@ -86,7 +86,7 @@ public class GL3DComponentView extends AbstractComponentView implements GLEventL
     }
 
     public void deactivate() {
-        if (this.animator != null) {
+        if (this.animator != null && this.animator.isAnimating()) {
             this.animator.stop();
         }
     }
