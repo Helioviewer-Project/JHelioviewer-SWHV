@@ -55,7 +55,7 @@ public class GL3DCameraRotationAnimation implements GL3DCameraAnimation {
         } else {
             double t = 1 - ((double) this.timeLeft) / this.duration;
             // Apply rotation interpolation
-            camera.getRotation().set(camera.getRotation().slerp(this.targetRotation, t));
+            camera.getRotation().set(camera.getRotation().nlerp(this.targetRotation, t));
         }
 
         camera.updateCameraTransformation();
@@ -64,7 +64,7 @@ public class GL3DCameraRotationAnimation implements GL3DCameraAnimation {
     }
 
     public void updateWithAnimation(GL3DCameraAnimation animation) {
-        // TODO: Simon Spšrri: implement Rotation Animation update
+        // TODO: Simon Spï¿½rri: implement Rotation Animation update
         // throw new UnsupportedOperationException();
         // if(animation instanceof GL3DCameraRotationAnimation) {
         // GL3DCameraRotationAnimation ani =
