@@ -64,7 +64,7 @@ public class GL3DCameraRotationAnimation implements GL3DCameraAnimation {
     }
 
     public void updateWithAnimation(GL3DCameraAnimation animation) {
-        // TODO: Simon Sp�rri: implement Rotation Animation update
+        // TODO: Simon Spoerri: implement Rotation Animation update
         // throw new UnsupportedOperationException();
         // if(animation instanceof GL3DCameraRotationAnimation) {
         // GL3DCameraRotationAnimation ani =
