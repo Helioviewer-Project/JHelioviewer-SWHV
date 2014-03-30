@@ -116,6 +116,12 @@ public class GL3DQuatd {
         this.u.z = ztemp;
         this.normalize();
     }
+    
+    public GL3DQuatd nlerp(GL3DQuatd r, double t) {
+        GL3DQuatd result = r.copy().add(this.copy().subtract(r).scale(t));
+        result.normalize();
+        return result;
+    }
 
     public GL3DQuatd slerp(GL3DQuatd r, double t) {
         double cosAngle = dot(r);
