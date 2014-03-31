@@ -22,7 +22,7 @@ public class EVEAPI {
     public final static String API_URL_PARAMETER_ENDDATE = "end_date=";
     
     /**  */
-    public final static String API_URL_PARAMETER_TYPE = "band_diode_or_line=";
+    public final static String API_URL_PARAMETER_TYPE = "timeline=";
     
     /**  */
     public final static String API_URL_PARAMETER_FORMAT = "data_format=";

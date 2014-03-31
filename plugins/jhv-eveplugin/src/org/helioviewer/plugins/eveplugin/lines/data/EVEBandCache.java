@@ -42,7 +42,7 @@ public class EVEBandCache {
             return new EVEValues();
         }
         
-        return cache.getValuesInInterval(interval, band.getBandType().getErrorLevels());
+        return cache.getValuesInInterval(interval, band.getBandType().getMultiplier());
     }
     
     public Range getMinMaxInInterval(final Band band, final Interval<Date> interval) {
