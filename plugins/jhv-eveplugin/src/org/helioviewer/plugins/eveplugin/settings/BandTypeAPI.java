@@ -132,14 +132,9 @@ public class BandTypeAPI extends APIAbstract{
 	        		group.add(this.bandtypes[i]);
 	        		this.bandtypes[i].setGroup(group);
 	        	}
-	        	if(job.has("errorLevels")){
-	        		JSONArray errorLevels = job.getJSONArray("errorLevels");
-	        		double [] errlevels = new double[errorLevels.length()];
-	                for(int j=0; j<errorLevels.length(); j++){	
-	                	
-	                	errlevels[j]= errorLevels.getDouble(j);
-	                }
-	                this.bandtypes[i].setErrorLevels(errlevels);
+	        	if(job.has("multiplier")){
+	        		double multiplier = job.getDouble("multiplier");
+	        		this.bandtypes[i].setMultiplier(multiplier);
 	        	}	        	
 	        }
 		} catch (JSONException e1) {

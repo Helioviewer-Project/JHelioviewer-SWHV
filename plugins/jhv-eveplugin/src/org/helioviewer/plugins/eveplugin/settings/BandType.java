@@ -23,8 +23,8 @@ public class BandType {
 	public HashMap<String, Double> warnLevels = new HashMap<String, Double>();
 	private double min;
 	private double max;
-	private double[] errorLevels;
 	private DataDownloader dataDownloader;
+	private double multiplier = 1;
 	
 	public URL buildUrl(Interval<Date> interval){
 		final SimpleDateFormat eveAPIDateFormat = new SimpleDateFormat(EVEAPI.API_DATE_FORMAT);
@@ -101,12 +101,6 @@ public class BandType {
 	public void setMax(double max) {
 		this.max = max;
 	}
-	public double[] getErrorLevels() {
-		return errorLevels;
-	}
-	public void setErrorLevels(double[] errorlevels) {
-		this.errorLevels = errorlevels;
-	}
 	public DataDownloader getDataDownloader() {
 		return dataDownloader;
 	}
@@ -118,5 +112,11 @@ public class BandType {
 	}
 	public String getName() {
 		return name;
+	}
+	public void setMultiplier(double multiplier) {
+		this.multiplier  = multiplier;
 	}	
+	public double getMultiplier(){
+		return this.multiplier;
+	}
 }

@@ -45,7 +45,7 @@ public class EVECache {
         }
     }
     
-    public EVEValues getValuesInInterval(final Interval<Date> interval, double[] errorlevels) {
+    public EVEValues getValuesInInterval(final Interval<Date> interval, double multiplier) {
         final EVEValues result = new EVEValues();
         
         final GregorianCalendar calendar = new GregorianCalendar();
@@ -63,23 +63,11 @@ public class EVECache {
             } 
             
             final EVEValue[] values = cache.getValuesInInterval(interval);
-            if(errorlevels!=null){
-	            for (int i = 0; i < values.length; i++) {
-	            	boolean isGood = true;
-	            	for(int j=0;j<errorlevels.length;j++){	            			            			
-	            		if( values[i]==null||values[i].value ==null || values[i].value == errorlevels[j])
-	            			isGood=false;
-	                	
-	            	}
-	            	if(isGood){
-	            		result.addValue(values[i]);
-	            	}
-	            }
-            }
-            else{
-	            for (int i = 0; i < values.length; i++) {
-	                	result.addValue(values[i]);
-	            }
+            for (int i = 0; i < values.length; i++) {
+            	if(values[i]!=null && values[i].value!=null){
+            		values[i].value = values[i].value*multiplier;
+                	result.addValue(values[i]);
+            	}
             }
             calendar.add(Calendar.DAY_OF_YEAR, 1);
             key = new Integer(calendar.get(Calendar.YEAR) * 1000 + calendar.get(Calendar.DAY_OF_YEAR));
