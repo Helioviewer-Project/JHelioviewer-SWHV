@@ -14,7 +14,7 @@ import org.helioviewer.viewmodel.view.ViewHelper;
  * Standard panning interaction, moves the camera proportionally to the mouse
  * movement when dragging
  * 
- * @author Simon Sp�rri (simon.spoerri@fhnw.ch)
+ * @author Simon Spoerri (simon.spoerri@fhnw.ch)
  * 
  */
 public class GL3DPanInteraction extends GL3DDefaultInteraction {
