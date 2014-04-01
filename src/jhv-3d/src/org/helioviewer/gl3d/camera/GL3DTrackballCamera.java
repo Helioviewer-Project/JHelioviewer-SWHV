@@ -15,7 +15,7 @@ import org.helioviewer.gl3d.wcs.TimedHeliocentricCartesianCoordinateSystem;
  * {@link GL3DTrackballRotationInteraction}) when in rotation mode. It is
  * currently the default camera.
  * 
- * @author Simon Sp�rri (simon.spoerri@fhnw.ch)
+ * @author Simon Spoerri (simon.spoerri@fhnw.ch)
  * 
  */
 public class GL3DTrackballCamera extends GL3DCamera {

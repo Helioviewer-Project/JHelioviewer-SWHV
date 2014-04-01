@@ -12,7 +12,7 @@ import org.helioviewer.viewmodel.view.MetaDataView;
  * {@link GL3DSceneGraphView}. Default behavior includes camera reset on double
  * click.
  * 
- * @author Simon Spšrri (simon.spoerri@fhnw.ch)
+ * @author Simon Spoerri (simon.spoerri@fhnw.ch)
  * 
  */
 public abstract class GL3DDefaultInteraction extends GL3DInteraction {
