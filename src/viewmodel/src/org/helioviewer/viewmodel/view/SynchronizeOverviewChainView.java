@@ -123,7 +123,7 @@ public class SynchronizeOverviewChainView extends AbstractSynchronizeChainView {
             if (overviewImageView != null) {
                 for (int i = 0; i < layeredView.getNumLayers(); ++i) {
                     View layer = layeredView.getLayer(i);
-                    if (layer.getAdapter(ImageInfoView.class) == overviewImageView) {
+                    if (layer != null && layer.getAdapter(ImageInfoView.class) == overviewImageView) {
                         layeredView.moveView(layer, aLayerChangedReason.getLayerIndex());
                         break;
                     }
