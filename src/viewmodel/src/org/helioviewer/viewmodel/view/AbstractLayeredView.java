@@ -200,7 +200,9 @@ public abstract class AbstractLayeredView extends AbstractView implements Layere
      * {@inheritDoc}
      */
     public View getLayer(int index) {
-        return layers.get(index);
+    	if (index < layers.size())
+    		return layers.get(index);
+    	return null;
     }
 
     /**
