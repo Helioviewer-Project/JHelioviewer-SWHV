@@ -34,8 +34,9 @@ public class GL3DMDIImageLayer extends GL3DImageLayer {
         double xOffset = (this.imageTextureView.metadata.getPhysicalUpperRight().getX()+this.imageTextureView.metadata.getPhysicalLowerLeft().getX())/(2.0*this.imageTextureView.metadata.getPhysicalImageWidth());
         double yOffset = (this.imageTextureView.metadata.getPhysicalUpperRight().getY()+this.imageTextureView.metadata.getPhysicalLowerLeft().getY())/(2.0*this.imageTextureView.metadata.getPhysicalImageHeight());
         vertex.setDefaultOffset(xOffset, yOffset);
-
-        this.fragmentShader.setCutOffRadius((Constants.SunRadius/this.imageTextureView.metadata.getPhysicalImageWidth()));
+        
+        if (this.fragmentShader != null)
+        	this.fragmentShader.setCutOffRadius((Constants.SunRadius/this.imageTextureView.metadata.getPhysicalImageWidth()));
 
 
         this.addNode(imageMesh);
@@ -48,8 +49,6 @@ public class GL3DMDIImageLayer extends GL3DImageLayer {
     protected GL3DImageMesh getImageSphere() {
         return imageMesh;
     }
-    
-
 
 
 }
