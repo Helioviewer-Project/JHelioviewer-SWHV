@@ -24,7 +24,6 @@ import org.helioviewer.viewmodel.view.LayeredView;
 import org.helioviewer.viewmodel.view.MetaDataView;
 import org.helioviewer.viewmodel.view.ModifiableInnerViewView;
 import org.helioviewer.viewmodel.view.MovieView;
-import org.helioviewer.viewmodel.view.OverlayView;
 import org.helioviewer.viewmodel.view.StandardSolarRotationTrackingView;
 import org.helioviewer.viewmodel.view.SubimageDataView;
 import org.helioviewer.viewmodel.view.SynchronizeView;
@@ -568,8 +567,8 @@ public class ViewchainFactory {
 		} else if (sourceView instanceof LayeredView) {
 			LayeredView layeredView = (LayeredView) sourceView;
 			for (int i = 0; i < layeredView.getNumLayers(); i++) {
-				createViewchainFromExistingViewchain(layeredView.getLayer(i),
-						newView, mainImagePanelView, keepSource);
+					createViewchainFromExistingViewchain(layeredView.getLayer(i),
+							newView, mainImagePanelView, keepSource);
 			}
 		}
 	}
