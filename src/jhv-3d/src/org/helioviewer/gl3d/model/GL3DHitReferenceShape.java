@@ -21,7 +21,7 @@ import org.helioviewer.gl3d.scenegraph.rt.GL3DRay;
  * detection when used for determining the region of interest on the image
  * meshes.
  * 
- * @author Simon Spoerri (simon.spoerri@fhnw.ch)
+ * @author Simon Sp�rri (simon.spoerri@fhnw.ch)
  * 
  */
 public class GL3DHitReferenceShape extends GL3DMesh {
@@ -85,20 +85,15 @@ public class GL3DHitReferenceShape extends GL3DMesh {
     
     public boolean hit(GL3DRay ray) {
         // if its hidden, it can't be hit
-    	if (isDrawBitOn(Bit.Hidden)) {
+    	if (isDrawBitOn(Bit.Hidden) || this.wmI == null) {
             return false;
             
         }
        	
         // Transform ray to object space for non-groups
-    	if(ray !=null && this.wmI!=null){
-            ray.setOriginOS(this.wmI.multiply(ray.getOrigin()));
-           ray.setDirOS(this.wmI.multiply(ray.getDirection()).normalize());
-           return this.shapeHit(ray);
-    	}
-    	
-    	return false;
-    	
+        ray.setOriginOS(this.wmI.multiply(ray.getOrigin()));
+        ray.setDirOS(this.wmI.multiply(ray.getDirection()).normalize());
+        return this.shapeHit(ray);
     }
 
     public boolean shapeHit(GL3DRay ray) {
