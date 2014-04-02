@@ -10,7 +10,6 @@ import org.helioviewer.base.math.Vector2dDouble;
 import org.helioviewer.base.math.Vector3dDouble;
 import org.helioviewer.gl3d.scenegraph.math.GL3DMat4d;
 import org.helioviewer.gl3d.scenegraph.math.GL3DVec3d;
-import org.helioviewer.gl3d.scenegraph.math.GL3DVec4d;
 import org.helioviewer.viewmodel.renderer.GLCommonRenderGraphics;
 import org.helioviewer.viewmodel.view.View;
 
@@ -369,9 +368,13 @@ public class GLPhysicalRenderGraphics extends AbstractPhysicalRenderGraphics {
 			Double width, Double height) {
 		y = -y;
 
+        gl.glEnable(GL.GL_VERTEX_PROGRAM_ARB);
+        gl.glEnable(GL.GL_FRAGMENT_PROGRAM_ARB);
+
 		commonRenderGraphics.bindImage(image);
         gl.glTexParameteri(GL.GL_TEXTURE_2D, GL.GL_TEXTURE_MAG_FILTER, GL.GL_LINEAR);
 
+        
 		gl.glColor3f(1.0f, 1.0f, 1.0f);
 		double width2 = width / 2.0;
 		double height2 = height / 2.0;
@@ -384,12 +387,14 @@ public class GLPhysicalRenderGraphics extends AbstractPhysicalRenderGraphics {
 		GL3DMat4d r = GL3DMat4d.rotation(angle, axis.normalize());
 		r.setTranslation(x, y, z);
 		
+		
 		gl.glDisable(GL.GL_LIGHTING);
 		gl.glEnable(GL.GL_BLEND);
 		gl.glBlendFunc(GL.GL_SRC_ALPHA, GL.GL_ONE_MINUS_SRC_ALPHA);
 		gl.glDisable(GL.GL_DEPTH_TEST);
 		gl.glEnable(GL.GL_CULL_FACE);
-
+		gl.glEnable(GL.GL_TEXTURE_2D);
+        
 		GL3DVec3d p0 = new GL3DVec3d(-width2, -height2, 0);
 		GL3DVec3d p1 = new GL3DVec3d(-width2, height2, 0);
 		GL3DVec3d p2 = new GL3DVec3d(width2, height2, 0);
@@ -412,10 +417,15 @@ public class GLPhysicalRenderGraphics extends AbstractPhysicalRenderGraphics {
 
 		gl.glEnd();
 
+		gl.glDisable(GL.GL_TEXTURE_2D);
+		gl.glEnable(GL.GL_LIGHTING);
 		gl.glDisable(GL.GL_BLEND);
-	    gl.glEnable(GL.GL_DEPTH_TEST);
-		gl.glDisable(GL.GL_CULL_FACE);		
-		
+		gl.glEnable(GL.GL_DEPTH_TEST);
+		gl.glDisable(GL.GL_CULL_FACE);
+		gl.glEnable(GL.GL_BLEND);
+        gl.glDisable(GL.GL_VERTEX_PROGRAM_ARB);
+        gl.glDisable(GL.GL_FRAGMENT_PROGRAM_ARB);
+
 		commonRenderGraphics.unbindScalingShader();
 		
 	}
@@ -442,7 +452,8 @@ public class GLPhysicalRenderGraphics extends AbstractPhysicalRenderGraphics {
         gl.glDisable(GL.GL_BLEND);
         gl.glEnable(GL.GL_DEPTH_TEST);
         gl.glDisable(GL.GL_CULL_FACE);		
-    	
+        gl.glDisable(GL.GL_LIGHTING);
+
 	}
 
 	@Override
@@ -461,9 +472,10 @@ public class GLPhysicalRenderGraphics extends AbstractPhysicalRenderGraphics {
 
         gl.glDisable(GL.GL_LINE_SMOOTH);
         gl.glDisable(GL.GL_BLEND);        
-        gl.glEnable(GL.GL_TEXTURE_2D);
+        gl.glDisable(GL.GL_TEXTURE_2D);
 
-		
+        gl.glDisable(GL.GL_LINE_SMOOTH);
+        
 	}
 
 	@Override
@@ -471,5 +483,32 @@ public class GLPhysicalRenderGraphics extends AbstractPhysicalRenderGraphics {
 		drawLine3d(p0.getX(), p0.getY(), p0.getZ(), p1.getX(), p1.getY(), p1.getZ());
 		// TODO Auto-generated method stub
 		
+	}
+
+	@Override
+	public void startDrawLines() {
+		gl.glDisable(GL.GL_TEXTURE_2D);
+        gl.glEnable(GL.GL_LINE_SMOOTH);
+        //gl.glBlendFunc(GL.GL_SRC_ALPHA, GL.GL_ONE_MINUS_SRC_ALPHA);
+        gl.glBegin(GL.GL_LINES);
+	}
+
+	@Override
+	public void stopDrawLines() {
+        gl.glEnd();
+        gl.glDisable(GL.GL_LINE_SMOOTH);
+		
+	}
+
+	@Override
+	public void drawLines3d(Double x0, Double y0, Double z0, Double x1,
+			Double y1, Double z1) {
+        gl.glVertex3d(x0, y0, z0);
+        gl.glVertex3d(x1, y1, z1);
+		
+	}
+	
+	public GL getGL(){
+		return gl;
 	}
 }
