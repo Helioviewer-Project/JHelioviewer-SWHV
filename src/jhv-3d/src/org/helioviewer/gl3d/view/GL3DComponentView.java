@@ -55,10 +55,10 @@ import com.sun.opengl.util.FPSAnimator;
  * {@link GLCanvas}.
  * 
  * 
- * @author Simon Sp�rri (simon.spoerri@fhnw.ch)
+ * @author Simon Spoerri (simon.spoerri@fhnw.ch)
  * 
  */
-public class GL3DComponentView extends AbstractComponentView implements GLEventListener, ComponentView {
+public class GL3DComponentView extends AbstractComponentView implements GLEventListener, ComponentView, DisplayListener, GL3DComponentFakeInterface {
     private GLCanvas canvas;
     private FPSAnimator animator;
 
@@ -78,29 +78,34 @@ public class GL3DComponentView extends AbstractComponentView implements GLEventL
     private Vector2dInt viewportSize;
 
     public GL3DComponentView() {
-        this.canvas = new GLCanvas(null, null, GLSharedContext.getSharedContext(), null);
-
-        // Just for testing...
-        animator = new FPSAnimator(canvas, 30);
-
-        this.canvas.addGLEventListener(this);
+        this.setCanvas(new GLCanvas(null, null, GLSharedContext.getSharedContext(), null));
+        this.getCanvas().setMinimumSize(new java.awt.Dimension(100,100));
+        Displayer.getSingletonInstance().register(this);        
+        Displayer.getSingletonInstance().addListener(this);
+        this.getCanvas().addGLEventListener(this);
     }
 
     public void deactivate() {
-        if (this.animator != null) {
+        if (this.animator != null && this.animator.isAnimating()) {
             this.animator.stop();
         }
-        animationLock.lock();
     }
 
     public void activate() {
-        this.animator.start();
-        if (this.animationLock.isLocked())
-            animationLock.unlock();
+        if (this.animator == null) {
+        	this.animator = new FPSAnimator(this.getCanvas(), 30);
+            this.animator.start();
+        }
+        else{
+        	if(!this.animator.isAnimating()){
+                this.animator.start();
+        	}
+
+        }
     }
 
     public GLCanvas getComponent() {
-        return this.canvas;
+        return this.getCanvas();
     }
 
     public void displayChanged(GLAutoDrawable arg0, boolean arg1, boolean arg2) {
@@ -113,7 +118,7 @@ public class GL3DComponentView extends AbstractComponentView implements GLEventL
 
         GL gl = glAD.getGL();
         GL3DState.create(gl);
-
+        
         // GLTextureCoordinate.init(gl);
         textureHelper.delAllTextures(gl);
         GLTextureHelper.initHelper(gl);
@@ -125,8 +130,6 @@ public class GL3DComponentView extends AbstractComponentView implements GLEventL
         gl.glShadeModel(GL.GL_SMOOTH);
         gl.glClear(GL.GL_COLOR_BUFFER_BIT | GL.GL_DEPTH_BUFFER_BIT);
         gl.glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
-        gl.glEnable(GL.GL_TEXTURE_1D);
-        gl.glEnable(GL.GL_TEXTURE_2D);
         gl.glTexEnvi(GL.GL_TEXTURE_ENV, GL.GL_TEXTURE_ENV_MODE, GL.GL_BLEND);
         // gl.glTexEnvi(GL.GL_TEXTURE_ENV, GL.GL_TEXTURE_ENV_MODE,
         // GL.GL_REPLACE);
@@ -143,10 +146,6 @@ public class GL3DComponentView extends AbstractComponentView implements GLEventL
         //gl.glDepthFunc(GL.GL_LESS);
         gl.glDepthFunc(GL.GL_LEQUAL);
 
-        gl.glLightfv(GL.GL_LIGHT0, GL.GL_AMBIENT, new float[] { 0.2f, 0.2f, 0.2f }, 0);
-        gl.glLightfv(GL.GL_LIGHT0, GL.GL_DIFFUSE, new float[] { 0.6f, 0.6f, 0.6f }, 0);
-        gl.glLightfv(GL.GL_LIGHT0, GL.GL_SPECULAR, new float[] { 0.2f, 0.2f, 0.2f }, 0);
-        gl.glLightfv(GL.GL_LIGHT0, GL.GL_POSITION, new float[] { 0, 0, (float) Constants.SunMeanDistanceToEarth }, 0);
         gl.glEnable(GL.GL_LIGHT0);
 
         viewportSize = new Vector2dInt(0, 0);
@@ -156,21 +155,11 @@ public class GL3DComponentView extends AbstractComponentView implements GLEventL
 
     public void reshape(GLAutoDrawable glAD, int x, int y, int width, int height) {
         viewportSize = new Vector2dInt(width, height);
-        // Log.debug("GL3DComponentView.Reshape");
         GL gl = glAD.getGL();
 
         gl.setSwapInterval(1);
 
         updateViewport();
-        //
-        // gl.glViewport(0, 0, width, height);
-        // gl.glMatrixMode(GL.GL_PROJECTION);
-        // gl.glLoadIdentity();
-        //
-        // gl.glOrtho(0, width, 0, height, -1, 10000);
-        //
-        // gl.glMatrixMode(GL.GL_MODELVIEW);
-        // gl.glLoadIdentity();
     }
 
     public synchronized void display(GLAutoDrawable glAD) {
@@ -215,9 +204,6 @@ public class GL3DComponentView extends AbstractComponentView implements GLEventL
         gl.glPushMatrix();
         if (!this.postRenderers.isEmpty()) {
 
-            // gl.glViewport((int)(width*0.55), (int)(height*0.55),
-            // (int)(width*0.45), (int)(height*0.45));
-
             gl.glMatrixMode(GL.GL_PROJECTION);
             gl.glLoadIdentity();
 
@@ -228,9 +214,9 @@ public class GL3DComponentView extends AbstractComponentView implements GLEventL
             gl.glTranslatef(0.0f, height, 0.0f);
             gl.glScalef(1.0f, -1.0f, 1.0f);
             gl.glDisable(GL.GL_LIGHTING);
-            gl.glEnable(GL.GL_TEXTURE_2D);
             gl.glColor4f(1, 1, 1, 0);
             gl.glDisable(GL.GL_DEPTH_TEST);
+            gl.glEnable(GL.GL_TEXTURE_2D);
 
             GLScreenRenderGraphics glRenderer = new GLScreenRenderGraphics(gl);
             synchronized (postRenderers) {
@@ -282,6 +268,14 @@ public class GL3DComponentView extends AbstractComponentView implements GLEventL
         // this.orthoView.updateMainImagePanelSize(mainImagePanelSize);
     }
 
+    public void display(){
+    	try{
+    	    this.canvas.display();
+    	}
+    	catch( Exception e){
+            Log.warn("GL3DTrackballCamera.mouseDragged: Illegal Rotation ignored!", e);    		
+    	}
+    }
     public void viewChanged(View sender, ChangeEvent aEvent) {
         if (this.animationLock.isLocked()) {
             return;
@@ -295,6 +289,15 @@ public class GL3DComponentView extends AbstractComponentView implements GLEventL
             this.viewportView = getAdapter(ViewportView.class);
             this.updateViewport();
         }
+        TimestampChangedReason timestampReason = aEvent.getLastChangedReasonByType(TimestampChangedReason.class);
+        if ((timestampReason != null) && (timestampReason.getView() instanceof TimedMovieView) && LinkedMovieManager.getActiveInstance().isMaster((TimedMovieView) timestampReason.getView())) {
+        	try{
+        	    this.getCanvas().display();
+        	}
+        	catch( Exception e){
+        		
+        	}
+        }        
         // inform all listener of the latest change reason
         // frameUpdated++;
         notifyViewListeners(aEvent);
@@ -330,4 +333,13 @@ public class GL3DComponentView extends AbstractComponentView implements GLEventL
             vertexView.buildVertexShader(newShaderBuilder).compile();
         }
     }
+
+	public GLCanvas getCanvas() {
+		return canvas;
+	}
+
+	public void setCanvas(GLCanvas canvas) {
+		this.canvas = canvas;
+	}
+     
 }
