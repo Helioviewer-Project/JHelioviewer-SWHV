@@ -7,6 +7,12 @@
 	<classpathentry combineaccessrules="false" kind="src" path="/jhv-3d-scenegraph"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/jhv-3d-wcs"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/base"/>
+	<classpathentry kind="src" path="resources"/>
+	<classpathentry kind="lib" path="/Users/freekv/swhv/SWHV_repos/trunk/client/jhv-3d-wcs/lib/fits.jar"/>
+	<classpathentry kind="lib" path="/Users/freekv/swhv/SWHV_repos/trunk/client/jhv-3d-wcs/lib/gluegen-rt.jar"/>
+	<classpathentry kind="lib" path="/Users/freekv/swhv/SWHV_repos/trunk/client/jhv-3d-wcs/lib/jogl.jar"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/jhv"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/viewmodel"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/viewmodelplugin"/>
 	<classpathentry kind="output" path="bin"/>
-    <classpathentry kind="src" path="resources" />
 </classpath>

@@ -77,6 +77,12 @@ public class HelioviewerMetaData extends AbstractMetaData implements SunMetaData
             observatory = m.get("TELESCOP");
             fullName = "SWAP " + measurement;
         }
+        else if (instrument.contains("VSM")) {
+            instrument = "VSM";
+            measurement = m.get("WAVELNTH");
+            observatory = m.get("TELESCOP");
+            fullName = "NSO-SOLIS " + measurement;
+        }        
         else if (instrument.contains("GONG")) {
             instrument = "GONG";
             measurement = m.get("WAVELNTH");
@@ -153,7 +159,7 @@ public class HelioviewerMetaData extends AbstractMetaData implements SunMetaData
         double allowedRelativeDifference = 0.01;
 
 
-        if (instrument.contains("AIA") || instrument.contains("SWAP")|| instrument.contains("GONG")|| instrument.contains("H-alpha")||instrument.contains("CALLISTO")) {
+        if (instrument.contains("AIA") || instrument.contains("SWAP")||instrument.contains("VSM")|| instrument.contains("GONG")|| instrument.contains("H-alpha")||instrument.contains("CALLISTO")) {
             double arcsecPerPixelX = metaDataContainer.tryGetDouble("CDELT1");
             double arcsecPerPixelY = metaDataContainer.tryGetDouble("CDELT2");
             if (Double.isNaN(arcsecPerPixelX)) {
@@ -263,7 +269,7 @@ public class HelioviewerMetaData extends AbstractMetaData implements SunMetaData
      */
     public void updateDateTime() {
         String observedDate;
-        if (instrument.contains("SWAP")||instrument.contains("GONG")||instrument.contains("CALLISTO")) {
+        if (instrument.contains("SWAP")||instrument.contains("GONG")||instrument.contains("VSM")||instrument.contains("CALLISTO")) {
             observedDate = metaDataContainer.get("DATE-OBS");
         } else {
             observedDate = metaDataContainer.get("DATE_OBS");

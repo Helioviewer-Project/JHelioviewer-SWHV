@@ -485,7 +485,7 @@ public class GLPhysicalRenderGraphics extends AbstractPhysicalRenderGraphics {
 		
 	}
 
-	@Override
+	
 	public void startDrawLines() {
 		gl.glDisable(GL.GL_TEXTURE_2D);
         gl.glEnable(GL.GL_LINE_SMOOTH);
@@ -493,14 +493,14 @@ public class GLPhysicalRenderGraphics extends AbstractPhysicalRenderGraphics {
         gl.glBegin(GL.GL_LINES);
 	}
 
-	@Override
+	
 	public void stopDrawLines() {
         gl.glEnd();
         gl.glDisable(GL.GL_LINE_SMOOTH);
 		
 	}
 
-	@Override
+	
 	public void drawLines3d(Double x0, Double y0, Double z0, Double x1,
 			Double y1, Double z1) {
         gl.glVertex3d(x0, y0, z0);
