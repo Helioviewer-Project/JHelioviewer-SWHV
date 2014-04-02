@@ -16,12 +16,12 @@ import org.helioviewer.gl3d.scenegraph.rt.GL3DRay;
 
 /**
  * The {@link GL3DHitReferenceShape} unifies all possible Image Layers (
- * {@link GL3DImageMesh} nodes in the Scene Graph)�in a single mesh node. This
+ * {@link GL3DImageMesh} nodes in the Scene Graph) in a single mesh node. This
  * node offers a mathematically simpler representation for faster hit point
  * detection when used for determining the region of interest on the image
  * meshes.
  * 
- * @author Simon Sp�rri (simon.spoerri@fhnw.ch)
+ * @author Simon Spoerri (simon.spoerri@fhnw.ch)
  * 
  */
 public class GL3DHitReferenceShape extends GL3DMesh {
