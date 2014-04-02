@@ -18,8 +18,6 @@ import java.util.jar.JarFile;
 import java.util.jar.Manifest;
 
 import org.helioviewer.base.logging.Log;
-import org.helioviewer.gl3d.plugin.GL3DModelPlugin;
-import org.helioviewer.gl3d.plugin.GL3DPluginController;
 import org.helioviewer.viewmodelplugin.filter.FilterContainer;
 import org.helioviewer.viewmodelplugin.interfaces.Plugin;
 import org.helioviewer.viewmodelplugin.overlay.OverlayContainer;
@@ -146,7 +144,6 @@ public class PluginManager {
                 if (!loadPlugin(f.toURI())) {
                     result.add(f.getPath());
                 }
-
             }
         }
 
@@ -286,7 +283,7 @@ public class PluginManager {
      *            Overlay container to add to the list.
      */
     public void addOverlayContainer(OverlayContainer container) {
-
+    	
         pluginOverlays.add(container);
     }
 
@@ -402,11 +399,6 @@ public class PluginManager {
             URLClassLoader classLoader = new URLClassLoader(urls, Thread.currentThread().getContextClassLoader());
             Log.info("PluginManager: Load plugin class :" + className);
             Object o = classLoader.loadClass(className).newInstance();
-
-            if(o instanceof GL3DModelPlugin){
-            	GL3DPluginController.getInstance().loadPlugin((GL3DModelPlugin) o);
-            	return true;
-            }
             
             if (o instanceof Plugin) {
                 addPlugin(classLoader, (Plugin) o, pluginLocation);
@@ -460,7 +452,6 @@ public class PluginManager {
     public void addPlugin(ClassLoader classLoader, Plugin plugin, URI pluginLocation) {
         PluginContainer pluginContainer = new PluginContainer(classLoader, plugin, pluginLocation, pluginSettings.isPluginActivated(pluginLocation));
         plugins.put(plugin, pluginContainer);
-
         if (pluginContainer.isActive()) {
             plugin.installPlugin();
         }
