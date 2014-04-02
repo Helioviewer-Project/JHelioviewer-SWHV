@@ -9,6 +9,8 @@ import java.awt.Graphics2D;
 import java.awt.RenderingHints;
 import java.awt.image.BufferedImage;
 
+import javax.media.opengl.GL;
+
 import org.helioviewer.base.math.Vector2dDouble;
 import org.helioviewer.base.math.Vector2dInt;
 import org.helioviewer.base.math.Vector3dDouble;
@@ -261,5 +263,11 @@ public class BufferedImagePhysicalRenderGraphics extends AbstractPhysicalRenderG
 			Double z1) {
 		// TODO Auto-generated method stub
 		
+	}
+
+	
+	public GL getGL() {
+		// TODO Auto-generated method stub
+		return null;
 	}
 }
