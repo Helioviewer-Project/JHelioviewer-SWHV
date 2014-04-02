@@ -3,8 +3,6 @@ package org.helioviewer.gl3d.view;
 import java.awt.event.KeyEvent;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.ConcurrentSkipListSet;
-
 import javax.media.opengl.GL;
 
 import org.helioviewer.base.logging.Log;
@@ -20,10 +18,6 @@ import org.helioviewer.gl3d.model.image.GL3DImageLayer;
 import org.helioviewer.gl3d.model.image.GL3DImageLayerFactory;
 import org.helioviewer.gl3d.model.image.GL3DImageLayers;
 import org.helioviewer.gl3d.model.image.GL3DImageMesh;
-import org.helioviewer.gl3d.plugin.GL3DModelListener;
-import org.helioviewer.gl3d.plugin.GL3DModelPlugin;
-import org.helioviewer.gl3d.plugin.GL3DPluginController;
-import org.helioviewer.gl3d.plugin.GL3DPluginListener;
 import org.helioviewer.gl3d.scenegraph.GL3DDrawBits.Bit;
 import org.helioviewer.gl3d.scenegraph.GL3DGroup;
 import org.helioviewer.gl3d.scenegraph.GL3DModel;
@@ -34,11 +28,9 @@ import org.helioviewer.gl3d.scenegraph.math.GL3DVec3d;
 import org.helioviewer.gl3d.scenegraph.math.GL3DVec4f;
 import org.helioviewer.gl3d.scenegraph.rt.GL3DRayTracer;
 import org.helioviewer.gl3d.scenegraph.visuals.GL3DArrow;
-import org.helioviewer.gl3d.scenegraph.visuals.GL3DSphere;
 import org.helioviewer.viewmodel.changeevent.ChangeEvent;
 import org.helioviewer.viewmodel.changeevent.LayerChangedReason;
 import org.helioviewer.viewmodel.region.Region;
-import org.helioviewer.viewmodel.renderer.physical.GLPhysicalRenderGraphics;
 import org.helioviewer.viewmodel.view.LayeredView;
 import org.helioviewer.viewmodel.view.MetaDataView;
 import org.helioviewer.viewmodel.view.RegionView;
@@ -47,7 +39,6 @@ import org.helioviewer.viewmodel.view.View;
 import org.helioviewer.viewmodel.view.ViewListener;
 import org.helioviewer.viewmodel.view.opengl.GLOverlayView;
 import org.helioviewer.viewmodel.view.opengl.GLView;
-import org.helioviewer.viewmodel.view.opengl.OverlayPluginContainer;
 
 /**
  * This is the most important view in the 3D viewchain. It assembles all 3D
@@ -58,418 +49,389 @@ import org.helioviewer.viewmodel.view.opengl.OverlayPluginContainer;
  * {@link GL3DRayTracer} to find the maximally spanning image region within the
  * displayed scene.
  * 
- * @author Simon Spoerri (simon.spoerri@fhnw.ch)
+ * @author Simon Sp�rri (simon.spoerri@fhnw.ch)
  * 
  */
 public class GL3DSceneGraphView extends AbstractGL3DView implements GL3DView {
-    private GL3DGroup root;
+	private GL3DGroup root;
 
-    // private GL3DImageGroup imageMeshes;
-    private GL3DShape sun;
-    private GLOverlayView overlayView = null;
-    private GL3DImageLayers imageLayers;
-    private GL3DHitReferenceShape hitReferenceShape;
-    private GL3DFramebufferImage framebuffer;
-    private GL3DGroup artificialObjects;
+	// private GL3DImageGroup imageMeshes;
+	private GLOverlayView overlayView = null;
+	private GL3DImageLayers imageLayers;
+	private GL3DHitReferenceShape hitReferenceShape;
+	private GL3DFramebufferImage framebuffer;
+	private GL3DGroup artificialObjects;
 
-    private List<GL3DImageTextureView> layersToAdd = new ArrayList<GL3DImageTextureView>();
-    private List<GL3DImageTextureView> layersToRemove = new ArrayList<GL3DImageTextureView>();
+	private List<GL3DImageTextureView> layersToAdd = new ArrayList<GL3DImageTextureView>();
+	private List<GL3DImageTextureView> layersToRemove = new ArrayList<GL3DImageTextureView>();
 
-    private List<GL3DNode> nodesToDelete = new ArrayList<GL3DNode>();
+	private List<GL3DNode> nodesToDelete = new ArrayList<GL3DNode>();
 
-    public GL3DSceneGraphView() {
-        this.root = createRoot();
-        // this.root = createTestRoot();
+	public GL3DSceneGraphView() {
+		this.root = createRoot();
+		// this.root = createTestRoot();
 
-        printScenegraph();
+		printScenegraph();
 
-        GL3DKeyController.getInstance().addListener(new GL3DKeyListener() {
-            public void keyHit(KeyEvent e) {
-                root.getDrawBits().toggle(Bit.BoundingBox);
-                Log.debug("Toggling BoundingBox");
-            }
-        }, KeyEvent.VK_B);
-        GL3DKeyController.getInstance().addListener(new GL3DKeyListener() {
-            public void keyHit(KeyEvent e) {
-                root.getDrawBits().toggle(Bit.Wireframe);
-                Log.debug("Toggling Wireframe");
-            }
-        }, KeyEvent.VK_W);
-        GL3DKeyController.getInstance().addListener(new GL3DKeyListener() {
-            public void keyHit(KeyEvent e) {
-                root.getDrawBits().toggle(Bit.Normals);
-                Log.debug("Toggling Normals");
-            }
-        }, KeyEvent.VK_N);
-        GL3DKeyController.getInstance().addListener(new GL3DKeyListener() {
-            public void keyHit(KeyEvent e) {
-                framebuffer.getDrawBits().toggle(Bit.Hidden);
-                Log.debug("Toggling Framebuffer");
-            }
-        }, KeyEvent.VK_F);
-        GL3DKeyController.getInstance().addListener(new GL3DKeyListener() {
-            public void keyHit(KeyEvent e) {
-                imageLayers.getDrawBits().toggle(Bit.Hidden);
-                Log.debug("Toggling Images");
-            }
-        }, KeyEvent.VK_I);
-        GL3DKeyController.getInstance().addListener(new GL3DKeyListener() {
-            public void keyHit(KeyEvent e) {
+		GL3DKeyController.getInstance().addListener(new GL3DKeyListener() {
+			public void keyHit(KeyEvent e) {
+				root.getDrawBits().toggle(Bit.BoundingBox);
+				Log.debug("Toggling BoundingBox");
+			}
+		}, KeyEvent.VK_B);
+		GL3DKeyController.getInstance().addListener(new GL3DKeyListener() {
+			public void keyHit(KeyEvent e) {
+				root.getDrawBits().toggle(Bit.Wireframe);
+				Log.debug("Toggling Wireframe");
+			}
+		}, KeyEvent.VK_W);
+		GL3DKeyController.getInstance().addListener(new GL3DKeyListener() {
+			public void keyHit(KeyEvent e) {
+				root.getDrawBits().toggle(Bit.Normals);
+				Log.debug("Toggling Normals");
+			}
+		}, KeyEvent.VK_N);
+		GL3DKeyController.getInstance().addListener(new GL3DKeyListener() {
+			public void keyHit(KeyEvent e) {
+				framebuffer.getDrawBits().toggle(Bit.Hidden);
+				Log.debug("Toggling Framebuffer");
+			}
+		}, KeyEvent.VK_F);
+		GL3DKeyController.getInstance().addListener(new GL3DKeyListener() {
+			public void keyHit(KeyEvent e) {
+				imageLayers.getDrawBits().toggle(Bit.Hidden);
+				Log.debug("Toggling Images");
+			}
+		}, KeyEvent.VK_I);
+		GL3DKeyController.getInstance().addListener(new GL3DKeyListener() {
+			public void keyHit(KeyEvent e) {
 				toggleCoronaVisibility();
-                Log.debug("Toggling Corona Visibility");
-            }
-        }, KeyEvent.VK_C);
+				Log.debug("Toggling Corona Visibility");
+			}
+		}, KeyEvent.VK_C);
+	}
 
-        GL3DPluginListener pluginListener = new GL3DPluginListener() {
+	public void render3D(GL3DState state) {
 
-            public void pluginLoaded(GL3DModelPlugin plugin) {
-                Log.debug("Plugin " + plugin.getPluginName() + " loaded. SceneGraph registering...");
-                getRoot().addNode(plugin.getPluginRootNode());
-                plugin.addModelListener(new GL3DModelListener() {
+		GL gl = state.gl;
 
-                    public void modelLoaded(GL3DNode modelRoot, GL3DModelPlugin plugin) {
-                        plugin.getPluginRootNode().addNode(modelRoot);
-                        Log.debug("Added new " + plugin.getPluginName() + " Model to SceneGraph.");
-                    }
+		gl.glBlendFunc(GL.GL_SRC_ALPHA, GL.GL_ONE_MINUS_SRC_ALPHA);
 
-                    public void modelUnloaded(GL3DNode modelRoot, GL3DModelPlugin plugin) {
-                        nodesToDelete.add(modelRoot);
-                        plugin.getPluginRootNode().removeNode(modelRoot);
-                        Log.debug("Removed " + plugin.getPluginName() + " Model from SceneGraph.");
-                    }
-                });
-            }
+		gl.glBlendEquation(GL.GL_FUNC_ADD);
+		deleteNodes(state);
 
-            public void pluginUnloaded(GL3DModelPlugin plugin) {
-                nodesToDelete.add(plugin.getPluginRootNode());
-                Log.debug("Unloaded Plugin " + plugin.getPluginName() + " from Scene Graph...");
-            }
-        };
+		if (this.getView() != null) {
+			state.pushMV();
+			this.renderChild(gl);
+			this.addLayersToSceneGraph(state);
+			this.removeLayersFromSceneGraph(state);
 
-        GL3DPluginController.getInstance().addPluginListener(pluginListener);
-    }
+			state.popMV();
+		}
 
-    public void render3D(GL3DState state) {
-        
-        GL gl = state.gl;
-        
-        gl.glBlendFunc(GL.GL_SRC_ALPHA, GL.GL_ONE_MINUS_SRC_ALPHA);
+		if (state.getActiveCamera() == null) {
+			Log.warn("GL3DSceneGraph: Camera not ready, aborting renderpass");
+			return;
+		}
+		// gl.glBlendFunc(GL.GL_ONE, GL.GL_DST_ALPHA);
+		gl.glDisable(GL.GL_BLEND);
+		gl.glEnable(GL.GL_DEPTH_TEST);
 
-        gl.glBlendEquation(GL.GL_FUNC_ADD);
-        deleteNodes(state);
+		state.pushMV();
+		state.loadIdentity();
+		this.root.update(state);
+		state.popMV();
 
-        if (this.getView() != null) {
-            state.pushMV();
-            this.renderChild(gl);
-            this.addLayersToSceneGraph(state);
-            this.removeLayersFromSceneGraph(state);
+		state.pushMV();
+		state.getActiveCamera().applyPerspective(state);
+		state.getActiveCamera().applyCamera(state);
 
-            state.popMV();
-        }
+		if (overlayView != null)
+			overlayView.preRender3D(state.gl);
 
-        if (state.getActiveCamera() == null) {
-            Log.warn("GL3DSceneGraph: Camera not ready, aborting renderpass");
-            return;
-        }
-        // gl.glBlendFunc(GL.GL_ONE, GL.GL_DST_ALPHA);
-        gl.glDisable(GL.GL_BLEND);
-        gl.glEnable(GL.GL_DEPTH_TEST);
-        gl.glEnable(GL.GL_TEXTURE_2D);
+		this.root.draw(state);
 
-        state.pushMV();
-        state.loadIdentity();
-        this.root.update(state);
-        state.popMV();
+		if (overlayView != null)
+			overlayView.postRender3D(state.gl);
 
-        state.pushMV();
-        state.getActiveCamera().applyPerspective(state);
-        state.getActiveCamera().applyCamera(state);
+		// Draw the camera or its interaction feedbacks
+		state.getActiveCamera().drawCamera(state);
 
-        //this.renderChild(gl);
-        
-        ConcurrentSkipListSet<OverlayPluginContainer> overlays = overlayView.getOverlays();
-        GLPhysicalRenderGraphics glRenderGraphics = new GLPhysicalRenderGraphics(gl, view);
-		
-        if (overlayView != null) overlayView.preRender3D(state.gl);
+		// Resume Previous Projection
+		state.getActiveCamera().resumePerspective(state);
 
-        /*
-        for (OverlayPluginContainer overlay : overlayView.getOverlays()){
-        	if (overlay.getRenderer3d() != null && !overlay.getPostRender()){
-    	        GLPhysicalRenderGraphics glRenderGraphics = new GLPhysicalRenderGraphics(gl, overlayView.getView());
-    	        overlay.getRenderer3d().render(glRenderGraphics);
-        	}
-        }
-		*/
-        
-        this.root.draw(state);
-        
-        if (overlayView != null) overlayView.postRender3D(state.gl);
+		state.popMV();
 
-        /*
-        for (OverlayPluginContainer overlay : overlayView.getOverlays()){
-        	if (overlay.getRenderer3d() != null && overlay.getPostRender()){
-    	        GLPhysicalRenderGraphics glRenderGraphics = new GLPhysicalRenderGraphics(gl, overlayView.getView());
-    	        overlay.getRenderer3d().render(glRenderGraphics);
-        	}
-        }
-        */
-        
-        // Draw the camera or its interaction feedbacks
-        state.getActiveCamera().drawCamera(state);
+		gl.glEnable(GL.GL_BLEND);
+	}
 
-        // Resume Previous Projection
-        state.getActiveCamera().resumePerspective(state);
+	private void deleteNodes(GL3DState state) {
+		for (GL3DNode node : this.nodesToDelete) {
+			node.delete(state);
+		}
+		this.nodesToDelete.clear();
+	}
 
-        state.popMV();
+	protected void setViewSpecificImplementation(View newView,
+			ChangeEvent changeEvent) {
+		Log.debug("GL3DSceneGraphView.ViewChanged: Sender=" + newView
+				+ " Event=" + changeEvent);
 
-        gl.glEnable(GL.GL_BLEND);
-    }
+		// Add Handler of Layer Events. Automatically add new Meshes for each
+		// Layer
+		if (newView.getAdapter(LayeredView.class) != null) {
+			LayeredView layeredView = ((LayeredView) newView
+					.getAdapter(LayeredView.class));
+			layeredView.addViewListener(new ViewListener() {
 
-    private void deleteNodes(GL3DState state) {
-        for (GL3DNode node : this.nodesToDelete) {
-            node.delete(state);
-        }
-        this.nodesToDelete.clear();
-    }
+				public void viewChanged(View sender, ChangeEvent aEvent) {
+					// Log.debug("viewChange: sender : " + sender);
+					if (aEvent.reasonOccurred(LayerChangedReason.class)) {
+						LayerChangedReason reason = aEvent
+								.getLastChangedReasonByType(LayerChangedReason.class);
+						handleLayerChange(reason);
+					}
+				}
+			});
 
-    protected void setViewSpecificImplementation(View newView, ChangeEvent changeEvent) {
-        Log.debug("GL3DSceneGraphView.ViewChanged: Sender=" + newView + " Event=" + changeEvent);
+			for (int i = 0; i < layeredView.getNumLayers(); i++) {
+				View layer = layeredView.getLayer(i);
+				if (layer != null)
+					this.addNewLayer(layer
+							.getAdapter(GL3DImageTextureView.class));
+				Log.debug("GL3DSceneGraphView: Adding Layer to Scene form LayeredView "
+						+ layer);
+			}
+		}
+	}
 
-        // Add Handler of Layer Events. Automatically add new Meshes for each
-        // Layer
-        if (newView.getAdapter(LayeredView.class) != null) {
-            LayeredView layeredView = ((LayeredView) newView.getAdapter(LayeredView.class));
-            layeredView.addViewListener(new ViewListener() {
+	private void handleLayerChange(LayerChangedReason reason) {
+		GL3DImageTextureView imageTextureView = reason.getSubView().getAdapter(
+				GL3DImageTextureView.class);
+		if (imageTextureView != null) {
 
-                public void viewChanged(View sender, ChangeEvent aEvent) {
-                	//Log.debug("viewChange: sender : " + sender);
-                    if (aEvent.reasonOccurred(LayerChangedReason.class)) {
-                        LayerChangedReason reason = aEvent.getLastChangedReasonByType(LayerChangedReason.class);
-                        handleLayerChange(reason);
-                    }
-                }
-            });
+			switch (reason.getLayerChangeType()) {
+			case LAYER_ADDED:
+				addNewLayer(imageTextureView);
+				break;
+			case LAYER_REMOVED:
+				removeLayer(imageTextureView);
+				break;
+			case LAYER_VISIBILITY:
+				toggleLayerVisibility(imageTextureView);
+				break;
+			case LAYER_MOVED:
+				moveLayerToIndex(imageTextureView, reason.getLayerIndex());
+				break;
+			}
+		} else {
+			Log.warn("GL3DSceneGraphView: Cannot handle Layer Change for Layers without a GL3DImageTextureView!");
+		}
+	}
 
-            for (int i = 0; i < layeredView.getNumLayers(); i++) {
-                View layer = layeredView.getLayer(i);
-                this.addNewLayer(layer.getAdapter(GL3DImageTextureView.class));
-                //Log.debug("GL3DSceneGraphView: Adding Layer to Scene form LayeredView " + layer);
-            }
-        }
-    }
+	private void moveLayerToIndex(GL3DImageTextureView view, int layerIndex) {
+		Log.debug("GL3DSceneGraphView.moveLayerToIndex " + layerIndex);
+		this.imageLayers.moveImages(view, layerIndex);
+	}
 
-    private void handleLayerChange(LayerChangedReason reason) {
-        GL3DImageTextureView imageTextureView = reason.getSubView().getAdapter(GL3DImageTextureView.class);
-        if (imageTextureView != null) {
+	private void toggleLayerVisibility(GL3DImageTextureView view) {
+		GL3DNode node = this.imageLayers.getImageLayerForView(view);
+		node.getDrawBits().toggle(Bit.Hidden);
+	}
 
-            switch (reason.getLayerChangeType()) {
-            case LAYER_ADDED:
-            	addNewLayer(imageTextureView);
-                break;
-            case LAYER_REMOVED:
-                removeLayer(imageTextureView);
-                break;
-            case LAYER_VISIBILITY:
-                toggleLayerVisibility(imageTextureView);
-                break;
-            case LAYER_MOVED:
-                moveLayerToIndex(imageTextureView, reason.getLayerIndex());
-                break;
-            }
-        } else {
-            Log.warn("GL3DSceneGraphView: Cannot handle Layer Change for Layers without a GL3DImageTextureView!");
-        }
-    }
+	private void removeLayersFromSceneGraph(GL3DState state) {
+		synchronized (this.layersToRemove) {
+			for (GL3DImageTextureView imageTextureView : this.layersToRemove) {
+				((GL3DCameraView) getAdapter(GL3DCameraView.class))
+						.removeCameraListener(this.imageLayers
+								.getImageLayerForView(imageTextureView));
+				this.imageLayers.removeLayer(state, imageTextureView);
+			}
+			this.layersToRemove.clear();
+		}
+	}
 
-    private void moveLayerToIndex(GL3DImageTextureView view, int layerIndex) {
-        Log.debug("GL3DSceneGraphView.moveLayerToIndex " + layerIndex);
-        this.imageLayers.moveImages(view, layerIndex);
-    }
+	private void addLayersToSceneGraph(GL3DState state) {
+		GL3DCamera camera = state.getActiveCamera();
 
-    private void toggleLayerVisibility(GL3DImageTextureView view) {
-        GL3DNode node = this.imageLayers.getImageLayerForView(view);
-        node.getDrawBits().toggle(Bit.Hidden);
-    }
+		synchronized (this.layersToAdd) {
+			for (GL3DImageTextureView imageTextureView : this.layersToAdd) {
+				GL3DImageLayer imageLayer = GL3DImageLayerFactory
+						.createImageLayer(state, imageTextureView);
 
-    private void removeLayersFromSceneGraph(GL3DState state) {
-        synchronized (this.layersToRemove) {
-            for (GL3DImageTextureView imageTextureView : this.layersToRemove) {
-                ((GL3DCameraView) getAdapter(GL3DCameraView.class)).removeCameraListener(this.imageLayers.getImageLayerForView(imageTextureView));
-                this.imageLayers.removeLayer(state, imageTextureView);
-            }
-            this.layersToRemove.clear();
-        }
-    }
+				((GL3DCameraView) getAdapter(GL3DCameraView.class))
+						.addCameraListener(imageLayer);
 
-    private void addLayersToSceneGraph(GL3DState state) {
-        GL3DCamera camera = state.getActiveCamera();
+				this.imageLayers.insertLayer(imageLayer);
 
-        synchronized (this.layersToAdd) {
-            LayeredView layeredView = getAdapter(LayeredView.class);
-            for (GL3DImageTextureView imageTextureView : this.layersToAdd) {
-                GL3DImageLayer imageLayer = GL3DImageLayerFactory.createImageLayer(state, imageTextureView);
-            	//GL3DImageLayer imageLayer = new GL3DAIAImageLayer(imageTextureView);
-            	
-                ((GL3DCameraView) getAdapter(GL3DCameraView.class)).addCameraListener(imageLayer);
+				imageTextureView.addViewListener(framebuffer);
 
-                this.imageLayers.insertLayer(imageLayer);
+			}
+			if (!this.layersToAdd.isEmpty()) {
+				// If there is data, zoom to fit
+				MetaDataView metaDataView = getAdapter(MetaDataView.class);
+				if (metaDataView != null && metaDataView.getMetaData() != null) {
+					Region region = metaDataView.getMetaData()
+							.getPhysicalRegion();
+					double halfWidth = region.getWidth() / 2;
+					double halfFOVRad = Math.toRadians(camera.getFOV() / 2);
+					double distance = halfWidth
+							* Math.sin(Math.PI / 2 - halfFOVRad)
+							/ Math.sin(halfFOVRad);
+					distance = -distance - camera.getZTranslation();
+					// Log.debug("GL3DZoomFitAction: Distance = "+distance+" Existing Distance: "+camera.getZTranslation());
+					camera.addCameraAnimation(new GL3DCameraZoomAnimation(
+							distance, 500));
+				}
+			}
+			this.layersToAdd.clear();
+		}
+	}
 
-                
-                imageTextureView.addViewListener(framebuffer);
-                //int layerNumber = layeredView.getLayerLevel(imageTextureView);
+	private void addNewLayer(GL3DImageTextureView imageTextureView) {
+		synchronized (this.layersToAdd) {
+			this.layersToAdd.add(imageTextureView);
+		}
+	}
 
-                //Log.debug("GL3DSceneGraphView: Add new ImageMesh for " + imageTextureView + " at position " + layerNumber);
+	private void removeLayer(GL3DImageTextureView imageTextureView) {
+		synchronized (this.layersToRemove) {
+			if (!this.layersToRemove.contains(imageTextureView)
+					&& this.imageLayers.getImageLayerForView(imageTextureView) != null) {
+				this.layersToRemove.add(imageTextureView);
+			}
+		}
+	}
 
-            }
-            if (!this.layersToAdd.isEmpty()) {
-                // If there is data, zoom to fit
-                MetaDataView metaDataView = getAdapter(MetaDataView.class);
-                if (metaDataView != null && metaDataView.getMetaData() != null) {
-                    Region region = metaDataView.getMetaData().getPhysicalRegion();
-                    double halfWidth = region.getWidth() / 2;
-                    double halfFOVRad = Math.toRadians(camera.getFOV() / 2);
-                    double distance = halfWidth * Math.sin(Math.PI / 2 - halfFOVRad) / Math.sin(halfFOVRad);
-                    distance = -distance - camera.getZTranslation();
-                    // Log.debug("GL3DZoomFitAction: Distance = "+distance+" Existing Distance: "+camera.getZTranslation());
-                    camera.addCameraAnimation(new GL3DCameraZoomAnimation(distance, 500));
-                }
-            }
-            this.layersToAdd.clear();
-        }
-    }
+	public int getNumberOfModels() {
+		if (this.root == null) {
+			return 0;
+		}
+		return this.root.getNumberOfChilds(GL3DModel.class);
+	}
 
-    private void addNewLayer(GL3DImageTextureView imageTextureView) {
-        synchronized (this.layersToAdd) {
-            this.layersToAdd.add(imageTextureView);
-        }
-    }
+	public GL3DModel getModelAt(int index) {
+		if (this.root == null) {
+			return null;
+		}
+		return this.root.getModelAt(index);
+	}
 
-    private void removeLayer(GL3DImageTextureView imageTextureView) {
-        synchronized (this.layersToRemove) {
-            if (!this.layersToRemove.contains(imageTextureView) && this.imageLayers.getImageLayerForView(imageTextureView) != null) {
-                this.layersToRemove.add(imageTextureView);
-            }
-        }
-    }
+	public GL3DGroup getRoot() {
+		return this.root;
+	}
 
-    public int getNumberOfModels() {
-        if (this.root == null) {
-            return 0;
-        }
-        return this.root.getNumberOfChilds(GL3DModel.class);
-    }
+	public void deactivate(GL3DState state) {
+		super.deactivate(state);
+		this.getRoot().delete(state);
+	}
 
-    public GL3DModel getModelAt(int index) {
-        if (this.root == null) {
-            return null;
-        }
-        return this.root.getModelAt(index);
-    }
+	private GL3DGroup createRoot() {
+		GL3DGroup root = new GL3DGroup("Scene Root");
 
-    public GL3DGroup getRoot() {
-        return this.root;
-    }
+		artificialObjects = new GL3DArtificialObjects();
+		root.addNode(artificialObjects);
 
-    public void deactivate(GL3DState state) {
-        super.deactivate(state);
-        this.getRoot().delete(state);
-    }
+		this.imageLayers = new GL3DImageLayers();
+		root.addNode(this.imageLayers);
 
-    private GL3DGroup createRoot() {
-        GL3DGroup root = new GL3DGroup("Scene Root");
-        
-        artificialObjects = new GL3DArtificialObjects();
-        root.addNode(artificialObjects);
-        
-        this.imageLayers = new GL3DImageLayers();
-        root.addNode(this.imageLayers);
-        
-        //this.overlayPlugins = new GL3DOverlayPlugins();
-        //root.addNode(this.overlayPlugins);
-        
-        this.hitReferenceShape = new GL3DHitReferenceShape(true);
-        root.addNode(this.hitReferenceShape);
+		// this.overlayPlugins = new GL3DOverlayPlugins();
+		// root.addNode(this.overlayPlugins);
 
-        GL3DGroup indicatorArrows = new GL3DModel("Arrows", "Arrows indicating the viewspace axes");
-        artificialObjects.addNode(indicatorArrows);
+		this.hitReferenceShape = new GL3DHitReferenceShape(true);
+		root.addNode(this.hitReferenceShape);
 
-        
-        GL3DShape north = new GL3DArrow("Northpole", Constants.SunRadius/16, Constants.SunRadius, Constants.SunRadius/2, 32, new GL3DVec4f(1.0f, 0.2f, 0.1f, 1.0f));
-        north.modelView().rotate(-Math.PI/2, GL3DVec3d.XAxis);
-        indicatorArrows.addNode(north);
-        
-        GL3DShape south = new GL3DArrow("Southpole", Constants.SunRadius/16, Constants.SunRadius, Constants.SunRadius/2, 32, new GL3DVec4f(0.1f, 0.2f, 1.0f, 1.0f));
-        south.modelView().rotate(Math.PI/2, GL3DVec3d.XAxis);
-        indicatorArrows.addNode(south);
-        
-               
-        GL3DModel sunModel = new GL3DModel("Sun", "Spherical Grid depicting the Sun");
-        artificialObjects.addNode(sunModel);
-        // Create the sungrid
-        this.sun = new GL3DSphere("Sun-grid", Constants.SunRadius, 200, 200, new GL3DVec4f(1.0f, 1.0f, 1.0f, 0.0f));
-        //this.sun = new GL3DSunGrid(Constants.SunRadius,200,200, new GL3DVec4f(0.8f, 0.8f, 0, 0.2f));
+		GL3DGroup indicatorArrows = new GL3DModel("Arrows",
+				"Arrows indicating the viewspace axes");
+		artificialObjects.addNode(indicatorArrows);
 
-        //sunModel.addNode(this.sun);  
-        framebuffer = new GL3DFramebufferImage();
-        artificialObjects.addNode(framebuffer);
-        framebuffer.getDrawBits().on(Bit.Hidden);
+		GL3DShape north = new GL3DArrow("Northpole", Constants.SunRadius / 16,
+				Constants.SunRadius, Constants.SunRadius / 2, 32,
+				new GL3DVec4f(1.0f, 0.2f, 0.1f, 1.0f));
+		north.modelView().rotate(-Math.PI / 2, GL3DVec3d.XAxis);
+		indicatorArrows.addNode(north);
 
-        return root;
-    }
+		GL3DShape south = new GL3DArrow("Southpole", Constants.SunRadius / 16,
+				Constants.SunRadius, Constants.SunRadius / 2, 32,
+				new GL3DVec4f(0.1f, 0.2f, 1.0f, 1.0f));
+		south.modelView().rotate(Math.PI / 2, GL3DVec3d.XAxis);
+		indicatorArrows.addNode(south);
 
-    public GL3DHitReferenceShape getHitReferenceShape() {
-        return hitReferenceShape;
-    }
+		GL3DModel sunModel = new GL3DModel("Sun",
+				"Spherical Grid depicting the Sun");
+		artificialObjects.addNode(sunModel);
+		// Create the sungrid
+		// this.sun = new GL3DSphere("Sun-grid", Constants.SunRadius, 200, 200,
+		// new GL3DVec4f(1.0f, 0.0f, 0.0f, 0.0f));
+		// this.sun = new GL3DSunGrid(Constants.SunRadius,200,200, new
+		// GL3DVec4f(0.8f, 0.8f, 0, 0.0f));
 
-    public void toggleCoronaVisibility() {
-        this.imageLayers.setCoronaVisibility(!this.imageLayers.getCoronaVisibility());
-    }
+		// sunModel.addNode(this.sun);
 
-    public void printScenegraph() {
-        System.out.println("PRINTING SCENEGRAPH =======================>");
+		framebuffer = new GL3DFramebufferImage();
+		artificialObjects.addNode(framebuffer);
+		framebuffer.getDrawBits().on(Bit.Hidden);
 
-        printNode(root, 0);
+		return root;
+	}
 
-    }
-    
-    public void setGLOverlayView(GLOverlayView overlayView){
-    	this.overlayView = overlayView;
-    }
+	public GL3DHitReferenceShape getHitReferenceShape() {
+		return hitReferenceShape;
+	}
 
-    private void printNode(GL3DNode node, int level) {
-        for (int i = 0; i < level; ++i)
-            System.out.print("   ");
+	public void toggleCoronaVisibility() {
+		this.imageLayers.setCoronaVisibility(!this.imageLayers
+				.getCoronaVisibility());
+	}
 
-        if (node == null) {
-            System.out.println("NULL");
-            return;
-        }
+	public void printScenegraph() {
+		System.out.println("PRINTING SCENEGRAPH =======================>");
 
-        System.out.println(node.getClass().getName() + " (" + node.getName() + ")");
+		printNode(root, 0);
 
-        /*
-         * GL3DNode sibling = node; while((sibling = sibling.getNext()) != null)
-         * { for(int i=0; i<level; ++i) System.out.print("   ");
-         * 
-         * System.out.println("Sibling: " + sibling.getClass().getName() + " ("
-         * + node.getName() + ")"); }
-         */
+	}
 
-        if (node instanceof GL3DGroup) {
-            GL3DGroup grp = (GL3DGroup) node;
-            for (int i = 0; i < grp.numChildNodes(); ++i) {
-                printNode(grp.getChild(i), level + 1);
-            }
-        }
-    }
+	public void setGLOverlayView(GLOverlayView overlayView) {
+		this.overlayView = overlayView;
+	}
 
-    protected void renderChild(GL gl) {
-    	if (view instanceof GLView) {
-            ((GLView) view).renderGL(gl, true);
-        } else {
-            textureHelper.renderImageDataToScreen(gl, view.getAdapter(RegionView.class).getRegion(), view.getAdapter(SubimageDataView.class).getSubimageData());
-        }
-    }
+	private void printNode(GL3DNode node, int level) {
+		for (int i = 0; i < level; ++i)
+			System.out.print("   ");
 
+		if (node == null) {
+			System.out.println("NULL");
+			return;
+		}
+
+		System.out.println(node.getClass().getName() + " (" + node.getName()
+				+ ")");
+
+		/*
+		 * GL3DNode sibling = node; while((sibling = sibling.getNext()) != null)
+		 * { for(int i=0; i<level; ++i) System.out.print("   ");
+		 * 
+		 * System.out.println("Sibling: " + sibling.getClass().getName() + " ("
+		 * + node.getName() + ")"); }
+		 */
+
+		if (node instanceof GL3DGroup) {
+			GL3DGroup grp = (GL3DGroup) node;
+			for (int i = 0; i < grp.numChildNodes(); ++i) {
+				printNode(grp.getChild(i), level + 1);
+			}
+		}
+	}
+
+	protected void renderChild(GL gl) {
+		if (view instanceof GLView) {
+			((GLView) view).renderGL(gl, true);
+		} else {
+			textureHelper.renderImageDataToScreen(gl,
+					view.getAdapter(RegionView.class).getRegion(), view
+							.getAdapter(SubimageDataView.class)
+							.getSubimageData());
+		}
+	}
 
 }
