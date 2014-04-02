@@ -119,7 +119,7 @@ import org.helioviewer.viewmodel.viewport.Viewport;
  * <p>
  * This class includes everything needed to export movies to an external format.
  * Therefore, it copies the existing view chain and performs all its operations
- * on this copy. To encode the final result, the command line tool from FFmpeg
+ * on this copy. To encode the final result, the command line toll from FFmpeg
  * is used.
  * 
  * @author Markus Langenberg
@@ -830,10 +830,10 @@ public class ExportMovieDialog extends JDialog implements ChangeListener, Action
             if (embedHardSubtitle.isSelected()) {
                 txtImageHeight.setValue(txtImageHeight.getValue());
             }
-        } else if (e.getSource() == zoom1to1) {
+        } else if (e.getSource() == zoom1to1 && topmostView.getAdapter(LayeredView.class).getLayer(layerSelection.getSelectedIndex()) != null) {
             zoomController.zoom1to1(topmostView, topmostView.getAdapter(LayeredView.class).getLayer(layerSelection.getSelectedIndex()), StaticViewport.createAdaptedViewport((Integer) txtImageWidth.getValue(), (Integer) txtImageHeight.getValue()));
             zoomSpinner.setValue(1.0);
-        } else if (e.getSource() == zoomFit) {
+        } else if (e.getSource() == zoomFit  && topmostView.getAdapter(LayeredView.class).getLayer(layerSelection.getSelectedIndex()) != null) {
             zoomController.zoomFit(topmostView.getAdapter(LayeredView.class).getLayer(layerSelection.getSelectedIndex()).getAdapter(MetaDataView.class), topmostView.getAdapter(RegionView.class));
             zoomSpinner.setValue(getCurrentZoom());
         } else if (e.getSource() == layerSelection) {
