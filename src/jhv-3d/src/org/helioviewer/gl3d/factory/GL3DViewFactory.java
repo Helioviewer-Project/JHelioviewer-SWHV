@@ -21,7 +21,7 @@ import org.helioviewer.viewmodel.view.opengl.GLOverlayView;
  * Factory is required. The {@link ViewFactory} is provided by the
  * {@link ViewchainFactory}
  * 
- * @author Simon Spoerri (simon.spoerri@fhnw.ch)
+ * @author Simon Sp�rri (simon.spoerri@fhnw.ch)
  * 
  */
 public class GL3DViewFactory extends GLViewFactory {
@@ -92,6 +92,7 @@ public class GL3DViewFactory extends GLViewFactory {
         GL3DLayeredView gl3dLayeredView = new GL3DLayeredView();
 
         for (int i = 0; i < layeredView.getNumLayers(); i++) {
+        	if (layeredView.getLayer(i) != null)
             gl3dLayeredView.addLayer(layeredView.getLayer(i));
         }
         return gl3dLayeredView;
