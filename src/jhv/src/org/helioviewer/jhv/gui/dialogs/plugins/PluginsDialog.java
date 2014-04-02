@@ -339,6 +339,7 @@ public class PluginsDialog extends JDialog implements ShowableDialog, ActionList
                     }
 
                     updatePluginList();
+                    pluginList.fireItemChanged();
                 }
             }
         });
