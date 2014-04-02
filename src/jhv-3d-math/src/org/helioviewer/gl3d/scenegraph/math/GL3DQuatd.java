@@ -1,7 +1,5 @@
 package org.helioviewer.gl3d.scenegraph.math;
 
-import org.helioviewer.base.logging.Log;
-
 public class GL3DQuatd {
     public static final double EPSILON = 0.000001;
 
@@ -105,22 +103,14 @@ public class GL3DQuatd {
     }
 
     public void rotate(GL3DQuatd q2) {
-        GL3DQuatd q1 = this;
-        double atemp = q1.a * q2.a - q1.u.x * q2.u.x - q1.u.y * q2.u.y - q1.u.z * q2.u.z;
-        double xtemp = q1.a * q2.u.x + q1.u.x * q2.a + q1.u.y * q2.u.z - q1.u.z * q2.u.y;
-        double ytemp = q1.a * q2.u.y + q1.u.y * q2.a + q1.u.z * q2.u.x - q1.u.x * q2.u.z;
-        double ztemp = q1.a * q2.u.z + q1.u.z * q2.a + q1.u.x * q2.u.y - q1.u.y * q2.u.x;
-        this.a = atemp;
-        this.u.x = xtemp;
-        this.u.y = ytemp;
-        this.u.z = ztemp;
+        GL3DQuatd q1 = this.copy();
+
+        this.a = q1.a * q2.a - q1.u.x * q2.u.x - q1.u.y * q2.u.y - q1.u.z * q2.u.z;
+        this.u.x = q1.a * q2.u.x + q1.u.x * q2.a + q1.u.y * q2.u.z - q1.u.z * q2.u.y;
+        this.u.y = q1.a * q2.u.y + q1.u.y * q2.a + q1.u.z * q2.u.x - q1.u.x * q2.u.z;
+        this.u.z = q1.a * q2.u.z + q1.u.z * q2.a + q1.u.x * q2.u.y - q1.u.y * q2.u.x;
+
         this.normalize();
-    }
-    
-    public GL3DQuatd nlerp(GL3DQuatd r, double t) {
-        GL3DQuatd result = r.copy().add(this.copy().subtract(r).scale(t));
-        result.normalize();
-        return result;
     }
 
     public GL3DQuatd slerp(GL3DQuatd r, double t) {
@@ -146,7 +136,13 @@ public class GL3DQuatd {
         q.normalize();
         return q;
     }
-
+    
+    public GL3DQuatd nlerp(GL3DQuatd r, double t) {
+        GL3DQuatd result = r.copy().add(this.copy().subtract(r).scale(t));
+        result.normalize();
+        return result;
+    }
+    
     public void set(GL3DQuatd q) {
         this.a = q.a;
         this.u = q.u;
@@ -172,10 +168,10 @@ public class GL3DQuatd {
     }
 
     public static GL3DQuatd calcRotation(GL3DVec3d startPoint, GL3DVec3d endPoint){
-        GL3DVec3d rotationAxis = GL3DVec3d.cross(startPoint, endPoint);
-        double rotationAngle = Math.atan2(rotationAxis.length(), GL3DVec3d.dot(startPoint, endPoint));
+    	 GL3DVec3d rotationAxis = GL3DVec3d.cross(startPoint, endPoint);
+         double rotationAngle = Math.atan2(rotationAxis.length(), GL3DVec3d.dot(startPoint, endPoint));
 
-        return GL3DQuatd.createRotation(rotationAngle, rotationAxis.copy());
+         return GL3DQuatd.createRotation(rotationAngle, rotationAxis.copy());        
     }
 
     public GL3DQuatd copy() {
@@ -184,10 +180,5 @@ public class GL3DQuatd {
 
     public String toString() {
         return "[" + a + ", " + u.x + ", " + u.y + ", " + u.z + "]";
-    }
-    public static void main(String [] args){
-    	GL3DVec3d bp = new GL3DVec3d(0.08476370985803018, 0.025546149241522726, 0.9960735453519652+10e-15);
-    	GL3DVec3d ep = new GL3DVec3d(0.08476370985803018, 0.025546149241522726, 0.9960735453519652);
-    	System.out.println(calcRotation(bp,ep));
     }
 }
