@@ -26,11 +26,10 @@ public abstract class GLFragmentShaderProgram {
 
     protected static final int target = GL.GL_FRAGMENT_PROGRAM_ARB;
 
-    private static Stack<Integer> shaderStack = new Stack<Integer>();
-    private static int shaderCurrentlyUsed = -1;
-    private int shaderID;
-    protected double alpha = 1.0f;
-    protected double cutOffRadius = 0.0f;
+    protected static Stack<Integer> shaderStack = new Stack<Integer>();
+    protected static int shaderCurrentlyUsed = -1;
+    protected int shaderID;
+
     
     /**
      * Build the shader.
@@ -69,8 +68,8 @@ public abstract class GLFragmentShaderProgram {
      * @param gl
      *            Valid reference to the current gl object
      */
-    public final void bind(GL gl) {
-    	bind(gl, shaderID, alpha, cutOffRadius);
+    public void bind(GL gl) {
+    	bind(gl, shaderID);
     }
 
     /**
@@ -104,7 +103,7 @@ public abstract class GLFragmentShaderProgram {
         Integer restoreShaderObject = shaderStack.pop();
         int restoreShader = restoreShaderObject == null ? 0 : restoreShaderObject.intValue();
         if (restoreShader >= 0) {
-            bind(gl, restoreShader, 0.0f, 0.0f);
+            bind(gl, restoreShader);
         }
     }
 
@@ -114,13 +113,10 @@ public abstract class GLFragmentShaderProgram {
      * @param gl
      *            Valid reference to the current gl object
      */
-    private static void bind(GL gl, int shader, double alpha, double cutOffRadius) {
+    private static void bind(GL gl, int shader) {
         if (shader != shaderCurrentlyUsed) {
             shaderCurrentlyUsed = shader;
             gl.glBindProgramARB(target, shader);
-            gl.glProgramLocalParameter4dARB(target, 1, alpha, 0.0f, 0.0f, 0.0f);
-            gl.glProgramLocalParameter4dARB(target, 0, cutOffRadius, 0.0f, 0.0f, 0.0f);
-            
         }
     }
 
