@@ -217,7 +217,6 @@ public class GL3DVec3d {
 
     public GL3DVec3d normalize(){
     	double len = length();
-		System.out.println(this);
     	if(len != 0.0){
     		this.divide(len);
     		if(this.length2()>1.0){
