@@ -217,25 +217,27 @@ public class GL3DVec3d {
     public GL3DVec3d normalize() {
     	double len = length();
 
-    	if (len != 0.0) {
-    		this.divide(len);
+        if (len == 0.0)
+            return this;
 
-            len = length();
-    		if (len > 1.0) {
-        		this.divide(Math.nextAfter(len, len + 1.0));
+   		this.divide(len);
 
-                len = length();
-        		if (len > 1.0){
-        			System.out.println(len);
-    	    		System.out.println(this);
-    		    	Log.error("The length of the vector is bigger than 1");
-    			    System.exit(1);
-    		    }
-    		}
-    		return this;
-    	}
-    	else
-    		return this;
+        len = length();
+        if (len <= 1.0)
+            return this;
+
+        this.divide(Math.nextAfter(len, len + 1.0));
+
+        len = length();
+        if (len <= 1.0)
+            return this;
+
+        System.out.println(len);
+        System.out.println(this);
+        Log.error("The length of the vector is bigger than 1");
+        System.exit(1);
+
+        return ZERO;
     }
 
     public double[] toArray() {
