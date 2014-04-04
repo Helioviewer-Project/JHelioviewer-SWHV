@@ -120,7 +120,7 @@ public class GL3DVec3d {
     }
 
     public GL3DVec3d divide(GL3DVec3d vec) {
-        if (vec.x == 0f || vec.y == 0f || vec.z == 0f)
+        if (vec.x == 0.0 || vec.y == 0.0 || vec.z == 0.0)
             throw new IllegalArgumentException("Division by 0 not allowed!");
         this.x /= vec.x;
         this.y /= vec.y;
@@ -138,13 +138,13 @@ public class GL3DVec3d {
     }
 
     public static GL3DVec3d divide(GL3DVec3d vec1, GL3DVec3d vec2) {
-        if (vec2.x == 0f || vec2.y == 0f || vec2.z == 0f)
+        if (vec2.x == 0.0 || vec2.y == 0.0 || vec2.z == 0.0)
             throw new IllegalArgumentException("Division by 0 not allowed!");
         return new GL3DVec3d(vec1.x / vec2.x, vec1.y / vec2.y, vec1.z / vec2.z);
     }
 
     public static GL3DVec3d divide(GL3DVec3d vec1, double s) {
-        if (s == 0f)
+        if (s == 0.0)
             throw new IllegalArgumentException("Division by 0 not allowed!");
         return new GL3DVec3d(vec1.x / s, vec1.y / s, vec1.z / s);
     }
@@ -188,7 +188,7 @@ public class GL3DVec3d {
     }
 
     public GL3DVec3d negate() {
-        return this.multiply(-1f);
+        return this.multiply(-1.0);
     }
 
     public static GL3DVec3d negate(GL3DVec3d vec) {
@@ -205,36 +205,37 @@ public class GL3DVec3d {
 
     public double length2() {
     	double absmax = Math.max(Math.max(Math.abs(this.x), Math.abs(this.y)), Math.abs(this.z));
-    	if(absmax == 0.0){
+    	if (absmax == 0.0)
     		return 0.0;
-    	}
-    	double tmpx = this.x/absmax;
-    	double tmpy = this.y/absmax;
-    	double tmpz = this.z/absmax;
-    	System.out.println(absmax);
-        return (tmpx * tmpx + tmpy * tmpy + tmpz * tmpz)*absmax*absmax;
+
+    	double tmpx = this.x / absmax;
+    	double tmpy = this.y / absmax;
+    	double tmpz = this.z / absmax;
+        return (tmpx * tmpx + tmpy * tmpy + tmpz * tmpz) * absmax * absmax;
     }
 
-    public GL3DVec3d normalize(){
+    public GL3DVec3d normalize() {
     	double len = length();
-    	if(len != 0.0){
+
+    	if (len != 0.0) {
     		this.divide(len);
-    		if(this.length2()>1.0){
-    			len = this.length();
-        		this.divide(Math.nextAfter(len, len +1.0));     		
-    		}
-    		if(this.length2()>1.0){
-    			System.out.println(this.length2());
-    			System.out.println(this);
-    			Log.error("The length of the vector is bigger than 1");
-    			System.exit(1);
+
+            len = length();
+    		if (len > 1.0) {
+        		this.divide(Math.nextAfter(len, len + 1.0));
+
+                len = length();
+        		if (len > 1.0){
+        			System.out.println(len);
+    	    		System.out.println(this);
+    		    	Log.error("The length of the vector is bigger than 1");
+    			    System.exit(1);
+    		    }
     		}
     		return this;
-    			
     	}
-    	else{
+    	else
     		return this;
-    	}
     }
 
     public double[] toArray() {
@@ -247,7 +248,7 @@ public class GL3DVec3d {
 
     public boolean equals(Object o) {
         if (o instanceof GL3DVec3d)
-            return isApproxEqual((GL3DVec3d) o, 0.0f);
+            return isApproxEqual((GL3DVec3d) o, 0.0);
         return false;
     }
 
