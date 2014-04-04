@@ -207,7 +207,7 @@ public class GL3DVec3d {
     	double tmpx = this.x / absmax;
     	double tmpy = this.y / absmax;
     	double tmpz = this.z / absmax;
-        return absmax * Math.sqrt((tmpx * tmpx + tmpy * tmpy + tmpz * tmpz));
+        return absmax * Math.sqrt(tmpx * tmpx + tmpy * tmpy + tmpz * tmpz);
     }
 
     public double length2() {
@@ -222,16 +222,21 @@ public class GL3DVec3d {
 
    		this.divide(len);
 
-        len = length();
+        // take shortcut, reasonably close to 1
+        len = Math.sqrt(this.x * this.x + this.y * this.y + this.z * this.z);
         if (len <= 1.0)
             return this;
 
-        this.divide(Math.nextAfter(len, len + 1.0));
+        // this.divide(Math.nextAfter(len, len + 1.0));
+        // instead assume error is 1 ulp
+        this.divide(0x1.0000000000001p+0);
 
-        len = length();
+        // take shortcut, reasonably close to 1
+        len = Math.sqrt(this.x * this.x + this.y * this.y + this.z * this.z);
         if (len <= 1.0)
             return this;
 
+        // can't happen / something is really messed up
         System.out.println(len);
         System.out.println(this);
         Log.error("The length of the vector is bigger than 1");
