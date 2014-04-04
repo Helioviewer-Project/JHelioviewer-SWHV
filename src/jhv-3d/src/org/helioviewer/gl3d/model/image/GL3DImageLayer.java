@@ -76,10 +76,6 @@ public abstract class GL3DImageLayer extends GL3DOrientedGroup implements GL3DCa
     protected GL3DNode accellerationShape;
 
     protected boolean doUpdateROI = true;
-    private JFrame frame = new JFrame("Hitpoints original");
-    private JFrame frame1 = new JFrame("Hitpoints");
-    private JPanel contentPane = new JPanel();
-    private JPanel contentPane1 = new JPanel();
 
     private ArrayList<Point> points = new ArrayList<Point>();
     private DynamicOpacityFilter opacityFilter;
@@ -92,10 +88,6 @@ public abstract class GL3DImageLayer extends GL3DOrientedGroup implements GL3DCa
     
     public GL3DImageLayer(String name, GL3DView mainLayerView) {
         super(name);
-        frame.setContentPane(contentPane);
-        frame.setBounds(50, 50, 640, 480);
-        frame1.setContentPane(contentPane1);
-        frame1.setBounds(50, 50, 640, 480);
         layerId = nextLayerId++;
 
         this.mainLayerView = mainLayerView;
@@ -282,10 +274,6 @@ public abstract class GL3DImageLayer extends GL3DOrientedGroup implements GL3DCa
         int width = (int) activeCamera.getWidth();
         int height = (int) activeCamera.getHeight();
         List<GL3DRay> regionTestRays = new ArrayList<GL3DRay>();
-        contentPane.removeAll();
-        contentPane.setLayout(null);
-        contentPane1.removeAll();
-        contentPane1.setLayout(null);
 		
         //frame.setVisible(true);
         //frame1.setVisible(true);
@@ -312,7 +300,7 @@ public abstract class GL3DImageLayer extends GL3DOrientedGroup implements GL3DCa
         
         if (!(orientation.equals(new GL3DVec3d(0, 1, 0)))) {
             GL3DVec3d orientationXZ = new GL3DVec3d(orientation.x, 0, orientation.z);
-            double phi = Math.acos(orientationXZ.z);
+            double phi = Math.acos(Math.max(-1, Math.min(1, orientationXZ.z)));
             if (orientationXZ.x < 0) {
             	phi = 0 - phi;
             }                
@@ -327,10 +315,6 @@ public abstract class GL3DImageLayer extends GL3DOrientedGroup implements GL3DCa
             	double coordx = (hitPoint.x - metaData.getPhysicalLowerLeft().getX())/metaData.getPhysicalImageWidth();
             	double coordy = ((1-hitPoint.y) - metaData.getPhysicalLowerLeft().getY())/metaData.getPhysicalImageHeight();
             	
-            	JPanel panel = new JPanel();
-            	panel.setBackground(Color.BLACK);
-            	panel.setBounds((int)(coordx * contentPane.getWidth())-3,(int)(coordy * contentPane.getHeight())-3, 5 , 5);
-            	contentPane.add(panel);
             	double x = phiRotation.m[0]*hitPoint.x + phiRotation.m[4]*hitPoint.y + phiRotation.m[8]*hitPoint.z + phiRotation.m[12];
                 double y = phiRotation.m[1]*hitPoint.x + phiRotation.m[5]*hitPoint.y + phiRotation.m[9]*hitPoint.z + phiRotation.m[13];
                 double z = phiRotation.m[2]*hitPoint.x + phiRotation.m[6]*hitPoint.y + phiRotation.m[10]*hitPoint.z + phiRotation.m[14];
@@ -338,11 +322,7 @@ public abstract class GL3DImageLayer extends GL3DOrientedGroup implements GL3DCa
                 coordx = (x - metaData.getPhysicalLowerLeft().getX())/metaData.getPhysicalImageWidth();
             	coordy = ((1-y) - metaData.getPhysicalLowerLeft().getY())/metaData.getPhysicalImageHeight();
 
-                JPanel panel1 = new JPanel();
-            	panel1.setBackground(Color.BLACK);
-            	panel1.setBounds((int)(coordx * contentPane.getWidth())-3,(int)(coordy * contentPane.getHeight())-3, 5 , 5);
-            	contentPane1.add(panel1);
-            	
+
                 minPhysicalX = Math.min(minPhysicalX, x);
                 minPhysicalY = Math.min(minPhysicalY, y);
                 minPhysicalZ = Math.min(minPhysicalZ, z);
