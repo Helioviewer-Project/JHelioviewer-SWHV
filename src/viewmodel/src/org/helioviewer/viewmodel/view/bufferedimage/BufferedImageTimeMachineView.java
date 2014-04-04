@@ -70,9 +70,7 @@ public class BufferedImageTimeMachineView extends AbstractBasicView implements S
      */
     private ViewListener slaveChainListener = new ViewListener() {
         public void viewChanged(View sender, ChangeEvent aEvent) {
-            System.out.println("Slave chain update: " + aEvent + " from thread " + Thread.currentThread().getId() + " with frame " + slaveMovieView.getCurrentFrameNumber());
             synchronized (slaveWait) {
-                System.out.println("Slave chain notify");
                 slaveWait.notify();
             }
         }
