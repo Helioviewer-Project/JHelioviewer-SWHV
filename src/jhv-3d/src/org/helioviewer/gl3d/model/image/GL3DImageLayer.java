@@ -300,7 +300,7 @@ public abstract class GL3DImageLayer extends GL3DOrientedGroup implements GL3DCa
         
         if (!(orientation.equals(new GL3DVec3d(0, 1, 0)))) {
             GL3DVec3d orientationXZ = new GL3DVec3d(orientation.x, 0, orientation.z);
-            double phi = Math.acos(Math.max(-1, Math.min(1, orientationXZ.z)));
+            double phi = Math.acos(orientationXZ.z);
             if (orientationXZ.x < 0) {
             	phi = 0 - phi;
             }                
