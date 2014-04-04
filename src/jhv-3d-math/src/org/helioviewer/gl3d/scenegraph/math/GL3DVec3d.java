@@ -1,5 +1,7 @@
 package org.helioviewer.gl3d.scenegraph.math;
 
+import org.helioviewer.base.logging.Log;
+
 public class GL3DVec3d {
     /**
      * Predefined Vectors
@@ -127,7 +129,7 @@ public class GL3DVec3d {
     }
 
     public GL3DVec3d divide(double s) {
-        if (s == 0f)
+        if (s == 0.0)
             throw new IllegalArgumentException("Division by 0 not allowed!");
         this.x /= s;
         this.y /= s;
@@ -190,7 +192,7 @@ public class GL3DVec3d {
     }
 
     public static GL3DVec3d negate(GL3DVec3d vec) {
-        return vec.multiply(-1f);
+        return vec.multiply(-1.0);
     }
 
     public boolean isApproxEqual(GL3DVec3d vec, double tolerance) {
@@ -198,19 +200,42 @@ public class GL3DVec3d {
     }
 
     public double length() {
-        return (double) Math.sqrt(length2());
+        return Math.sqrt(length2());
     }
 
     public double length2() {
-        return (this.x * this.x + this.y * this.y + this.z * this.z);
+    	double absmax = Math.max(Math.max(Math.abs(this.x), Math.abs(this.y)), Math.abs(this.z));
+    	if(absmax == 0.0){
+    		return 0.0;
+    	}
+    	double tmpx = this.x/absmax;
+    	double tmpy = this.y/absmax;
+    	double tmpz = this.z/absmax;
+    	System.out.println(absmax);
+        return (tmpx * tmpx + tmpy * tmpy + tmpz * tmpz)*absmax*absmax;
     }
 
-    public GL3DVec3d normalize() {
+    public GL3DVec3d normalize(){
     	double len = length();
-    	if(len != 0.0)
-    		return this.divide(length());
-    	else
+		System.out.println(this);
+    	if(len != 0.0){
+    		this.divide(len);
+    		if(this.length2()>1.0){
+    			len = this.length();
+        		this.divide(Math.nextAfter(len, len +1.0));     		
+    		}
+    		if(this.length2()>1.0){
+    			System.out.println(this.length2());
+    			System.out.println(this);
+    			Log.error("The length of the vector is bigger than 1");
+    			System.exit(1);
+    		}
     		return this;
+    			
+    	}
+    	else{
+    		return this;
+    	}
     }
 
     public double[] toArray() {
