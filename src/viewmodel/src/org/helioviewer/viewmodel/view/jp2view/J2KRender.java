@@ -244,6 +244,7 @@ class J2KRender implements Runnable {
 
     private void renderLayer(int numLayer) {
         parentImageRef.getLock().lock();
+        
 
         try {
             if (JP2Image.numJP2ImagesInUse() == 1) {
@@ -272,7 +273,6 @@ class J2KRender implements Runnable {
 
                         parentViewRef.updateParameter();
                         currParams = parentViewRef.getImageViewParams();
-
                         parentViewRef.addChangedReason(new NonConstantMetaDataChangedReason(parentViewRef, metaData));
                     }
                 
@@ -421,10 +421,7 @@ class J2KRender implements Runnable {
                         Log.warn("J2KRender: Params out of sync, skip frame");
                     }
                 }
-                //Log.debug("Data creation");
-                //Log.debug(parentImageRef.getNumComponents() < 3);
-                //Log.debug(parentViewRef);
-                //Log.debug("ByteBuffer : " + Arrays.toString(byteBuffer[currentByteBuffer]));
+
                 if (!movieMode)
                     break;
                 else {
