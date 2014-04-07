@@ -287,5 +287,9 @@ public abstract class GL3DCamera {
         	this.getRotation().rotate(this.currentDragRotation);
         }
         this.updateCameraTransformation();    	
-    }	
+    }
+
+	public boolean isAnimating() {
+		return !this.cameraAnimations.isEmpty();
+	}	
 }

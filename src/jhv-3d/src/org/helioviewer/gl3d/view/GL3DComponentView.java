@@ -86,22 +86,10 @@ public class GL3DComponentView extends AbstractComponentView implements GLEventL
     }
 
     public void deactivate() {
-        if (this.animator != null && this.animator.isAnimating()) {
-            this.animator.stop();
-        }
+
     }
 
     public void activate() {
-        if (this.animator == null) {
-        	this.animator = new FPSAnimator(this.getCanvas(), 30);
-            this.animator.start();
-        }
-        else{
-        	if(!this.animator.isAnimating()){
-                this.animator.start();
-        	}
-
-        }
     }
 
     public GLCanvas getComponent() {

@@ -12,6 +12,7 @@ import java.util.Timer;
 import java.util.TimerTask;
 
 import org.helioviewer.base.math.Vector2dInt;
+import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.gui.IconBank;
 import org.helioviewer.jhv.gui.IconBank.JHVIcon;
 import org.helioviewer.jhv.gui.ImageViewerGui;
@@ -103,6 +104,7 @@ public class MainImagePanel extends BasicImagePanel {
                     noImagePostRendererSet = true;
                 }
             }
+            Displayer.getSingletonInstance().render();
         }
         repaint();
     }

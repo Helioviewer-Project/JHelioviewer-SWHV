@@ -4,6 +4,7 @@ import javax.swing.JCheckBox;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
+import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.viewmodel.filter.Filter;
 import org.helioviewer.viewmodelplugin.filter.FilterPanel;
 import org.helioviewer.viewmodelplugin.filter.FilterTabPanelManager.Area;
@@ -38,6 +39,7 @@ public class RunningDifferencePanel extends FilterPanel {
             public void stateChanged(ChangeEvent e) {
                 if (filter != null) {
                     filter.setActive(activeBox.isSelected());
+                    Displayer.getSingletonInstance().render();
                 }
             }
         });

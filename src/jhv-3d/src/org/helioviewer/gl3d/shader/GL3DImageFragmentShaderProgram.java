@@ -9,6 +9,8 @@ import org.helioviewer.viewmodel.view.opengl.shader.GLShaderBuilder.GLBuildShade
 public class GL3DImageFragmentShaderProgram extends GLFragmentShaderProgram {
 
     private double cutOffRadius= 0.0f;
+	private double xTextureScale;
+	private double yTextureScale;
 
 	public GL3DImageFragmentShaderProgram() {
     }
@@ -19,7 +21,7 @@ public class GL3DImageFragmentShaderProgram extends GLFragmentShaderProgram {
      *            Valid reference to the current gl object
      */
     public final void bind(GL gl) {
-    	bind(gl, shaderID, cutOffRadius);
+    	bind(gl, shaderID, cutOffRadius, xTextureScale, yTextureScale);
     }
 
     /**
@@ -53,7 +55,7 @@ public class GL3DImageFragmentShaderProgram extends GLFragmentShaderProgram {
         Integer restoreShaderObject = shaderStack.pop();
         int restoreShader = restoreShaderObject == null ? 0 : restoreShaderObject.intValue();
         if (restoreShader >= 0) {
-            bind(gl, restoreShader, 0.0f);
+            bind(gl, restoreShader, 0.0f,0.0,0.0);
         }
     }
 
@@ -63,22 +65,26 @@ public class GL3DImageFragmentShaderProgram extends GLFragmentShaderProgram {
      * @param gl
      *            Valid reference to the current gl object
      */
-    private static void bind(GL gl, int shader, double cutOffRadius) {
+    private static void bind(GL gl, int shader, double cutOffRadius, double xTextureScale, double yTextureScale) {
         if (shader != shaderCurrentlyUsed) {
             shaderCurrentlyUsed = shader;
             gl.glBindProgramARB(target, shader);
             gl.glProgramLocalParameter4dARB(target, 0, cutOffRadius, 0.0f, 0.0f, 0.0f);
-            
+            gl.glProgramLocalParameter4dARB(target, 1,xTextureScale, yTextureScale, 0, 0);
         }
     }
     protected void buildImpl(GLShaderBuilder shaderBuilder) {
         try {
-        	String program = "\tfloat2 texture;" + GLShaderBuilder.LINE_SEP;
+        	//String program = "float2 vv = float2(clamp(texcoord0.x,0.0,textureScale.x), clamp(texcoord0.y,0.0,textureScale.y));";
+        	//program += "OUT.color = tex2D(texunit0, vv);";
+        	String program = "if(texcoord0.x<0.0||texcoord0.y<0.0||texcoord0.x>textureScale.x||texcoord0.y>textureScale.y){OUT.color = float4(1.0,0.0,0.0,1.0);}";
+        	program += "\tfloat2 texture;" + GLShaderBuilder.LINE_SEP;
             program += "\ttexture.x = textureCoordinate.z - 0.5;" + GLShaderBuilder.LINE_SEP;
             program += "\ttexture.y = textureCoordinate.w - 0.5;" + GLShaderBuilder.LINE_SEP;
             program += "\toutput.a *= step(length(texture),cutOffRadius);" + GLShaderBuilder.LINE_SEP;
             shaderBuilder.addEnvParameter("float cutOffRadius");
-            
+            shaderBuilder.addEnvParameter("float4 textureScale");            
+
             program = program.replace("output", shaderBuilder.useOutputValue("float4", "COLOR"));
             program = program.replace("textureCoordinate", shaderBuilder.useStandardParameter("float4", "TEXCOORD0"));
 
@@ -90,6 +96,11 @@ public class GL3DImageFragmentShaderProgram extends GLFragmentShaderProgram {
 
     }
     
+	public void changeTextureScale(double xTextureScale, double yTextureScale) {
+		this.xTextureScale = xTextureScale;
+		this.yTextureScale = yTextureScale;
+	}
+	
     public void setCutOffRadius(double cutOffRadius){
     	this.cutOffRadius = cutOffRadius;
     }
