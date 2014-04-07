@@ -26,8 +26,8 @@ public class GL3DEITImageLayer extends GL3DImageLayer {
     protected void createImageMeshNodes(GL gl) {
     	this.sphereFragmentShader = new GL3DImageFragmentShaderProgram();
     	GLFragmentShaderProgram sphereFragmentShader = GL3DShaderFactory.createFragmentShaderProgram(gl, this.sphereFragmentShader);
-        this.fragmentShader = new GL3DImageCoronaFragmentShaderProgram();        
-        GLFragmentShaderProgram coronaFragmentShader = GL3DShaderFactory.createFragmentShaderProgram(gl, fragmentShader);
+        this.coronaFragmentShader = new GL3DImageCoronaFragmentShaderProgram();        
+        GLFragmentShaderProgram coronaFragmentShader = GL3DShaderFactory.createFragmentShaderProgram(gl, this.coronaFragmentShader);
         
         GL3DImageVertexShaderProgram vertex = new GL3DImageVertexShaderProgram();
         GLVertexShaderProgram   vertexShader   = GL3DShaderFactory.createVertexShaderProgram(gl, vertex);
@@ -44,7 +44,7 @@ public class GL3DEITImageLayer extends GL3DImageLayer {
         vertex.setDefaultOffset(xOffset, yOffset);
 
         this.sphereFragmentShader.setCutOffRadius((float)(Constants.SunRadius/this.imageTextureView.metadata.getPhysicalImageWidth()));
-        this.fragmentShader.setCutOffRadius((Constants.SunRadius/this.imageTextureView.metadata.getPhysicalImageWidth()));
+        this.coronaFragmentShader.setCutOffRadius((Constants.SunRadius/this.imageTextureView.metadata.getPhysicalImageWidth()));
 
         
         

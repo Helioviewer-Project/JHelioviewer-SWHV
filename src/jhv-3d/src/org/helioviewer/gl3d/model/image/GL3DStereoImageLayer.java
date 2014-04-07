@@ -26,15 +26,14 @@ public class GL3DStereoImageLayer extends GL3DImageLayer {
     protected void createImageMeshNodes(GL gl) {
     	this.gl = gl;
 		HelioviewerMetaData hvMetaData = (HelioviewerMetaData) metaDataView.getMetaData();
-		//System.out.println("METADATA INSTANCE OF " + hvMetaData.getClass().getName() + " <======================================================= INSTRUMENT: " + hvMetaData.getInstrument() + " / Detector: " + hvMetaData.getDetector());
 		
 		GL3DImageVertexShaderProgram vertex = new GL3DImageVertexShaderProgram();
         GLVertexShaderProgram   vertexShader   = GL3DShaderFactory.createVertexShaderProgram(gl, vertex);
         this.imageTextureView.setVertexShader(vertex);
         //this.accellerationShape = new GL3DHitReferenceShape();
 		// Always display corona
-		this.fragmentShader = new GL3DImageCoronaFragmentShaderProgram();        
-        GLFragmentShaderProgram coronaFragmentShader = GL3DShaderFactory.createFragmentShaderProgram(gl, fragmentShader);
+		this.coronaFragmentShader = new GL3DImageCoronaFragmentShaderProgram();        
+        GLFragmentShaderProgram coronaFragmentShader = GL3DShaderFactory.createFragmentShaderProgram(gl, this.coronaFragmentShader);
         
         corona = new GL3DImageCorona(imageTextureView, vertexShader, coronaFragmentShader, this);
         this.imageTextureView.metadata = this.metaDataView.getMetaData();
@@ -59,7 +58,7 @@ public class GL3DStereoImageLayer extends GL3DImageLayer {
 		}
         vertex.setDefaultOffset(xOffset, yOffset);
         
-        this.fragmentShader.setCutOffRadius(0.99*(Constants.SunRadius/this.imageTextureView.metadata.getPhysicalImageWidth()));
+        this.coronaFragmentShader.setCutOffRadius(0.99*(Constants.SunRadius/this.imageTextureView.metadata.getPhysicalImageWidth()));
         
         
     }

@@ -24,9 +24,9 @@ public class GL3DLascoImageLayer extends GL3DImageLayer {
 
     protected void createImageMeshNodes(GL gl) {
         HelioviewerOcculterMetaData hvMetaData = (HelioviewerOcculterMetaData) metaDataView.getMetaData();
-        this.fragmentShader = new GL3DImageCoronaFragmentShaderProgram();        
+        this.coronaFragmentShader = new GL3DImageCoronaFragmentShaderProgram();        
         
-        GLFragmentShaderProgram fragmentShader = GL3DShaderFactory.createFragmentShaderProgram(gl, this.fragmentShader);
+        GLFragmentShaderProgram fragmentShader = GL3DShaderFactory.createFragmentShaderProgram(gl, this.coronaFragmentShader);
         GL3DImageVertexShaderProgram vertex = new GL3DImageVertexShaderProgram();
         GLVertexShaderProgram   vertexShader   = GL3DShaderFactory.createVertexShaderProgram(gl, vertex);
         this.imageTextureView.setVertexShader(vertex);
@@ -40,7 +40,7 @@ public class GL3DLascoImageLayer extends GL3DImageLayer {
         double yOffset = (this.imageTextureView.metadata.getPhysicalUpperRight().getY()+this.imageTextureView.metadata.getPhysicalLowerLeft().getY())/(2.0*this.imageTextureView.metadata.getPhysicalImageHeight());
         vertex.setDefaultOffset(xOffset, yOffset);
 
-        this.fragmentShader.setCutOffRadius((Constants.SunRadius*hvMetaData.getOuterPhysicalOcculterRadius()/this.imageTextureView.metadata.getPhysicalImageWidth()));
+        this.coronaFragmentShader.setCutOffRadius((Constants.SunRadius*hvMetaData.getOuterPhysicalOcculterRadius()/this.imageTextureView.metadata.getPhysicalImageWidth()));
 
         this.addNode(lascoImageMesh);
     }

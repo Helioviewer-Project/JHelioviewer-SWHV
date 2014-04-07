@@ -14,7 +14,9 @@ public class GL3DImageCoronaFragmentShaderProgram extends GLFragmentShaderProgra
 	private int h;
     protected double alpha = 1.0f;
     protected double cutOffRadius = 0.0f;
-
+	private double xTextureScale;
+	private double yTextureScale;
+	
     /**
      * Binds (= activates it) the shader, if it is not active so far.
      * 
@@ -22,7 +24,7 @@ public class GL3DImageCoronaFragmentShaderProgram extends GLFragmentShaderProgra
      *            Valid reference to the current gl object
      */
     public final void bind(GL gl) {
-    	bind(gl, shaderID, alpha, cutOffRadius);
+    	bind(gl, shaderID, alpha, cutOffRadius,  this.xTextureScale,  this.yTextureScale);
     }
 
     /**
@@ -56,7 +58,7 @@ public class GL3DImageCoronaFragmentShaderProgram extends GLFragmentShaderProgra
         Integer restoreShaderObject = shaderStack.pop();
         int restoreShader = restoreShaderObject == null ? 0 : restoreShaderObject.intValue();
         if (restoreShader >= 0) {
-            bind(gl, restoreShader, 0.0f, 0.0f);
+            bind(gl, restoreShader,0.0, 0.0, 0.0, 0.0);
         }
     }
 
@@ -66,13 +68,13 @@ public class GL3DImageCoronaFragmentShaderProgram extends GLFragmentShaderProgra
      * @param gl
      *            Valid reference to the current gl object
      */
-    private static void bind(GL gl, int shader, double alpha, double cutOffRadius) {
+    private static void bind(GL gl, int shader, double alpha, double cutOffRadius, double xTextureScale, double yTextureScale) {
         if (shader != shaderCurrentlyUsed) {
             shaderCurrentlyUsed = shader;
             gl.glBindProgramARB(target, shader);
             gl.glProgramLocalParameter4dARB(target, 1, alpha, 0.0f, 0.0f, 0.0f);
             gl.glProgramLocalParameter4dARB(target, 0, cutOffRadius, 0.0f, 0.0f, 0.0f);
-            
+            gl.glProgramLocalParameter4dARB(target, 2, xTextureScale, yTextureScale, 0, 0);
         }
     }
 
@@ -81,18 +83,22 @@ public class GL3DImageCoronaFragmentShaderProgram extends GLFragmentShaderProgra
      */
     protected void buildImpl(GLShaderBuilder shaderBuilder) {
         try {
-            String program = "\toutput.a *= alpha;" + GLShaderBuilder.LINE_SEP;
-            
+        	String program = "\tif(texcoord0.x<0.0||texcoord0.y<0.0||texcoord0.x>textureScale.x||texcoord0.y>textureScale.y){"+ GLShaderBuilder.LINE_SEP 
+        			+ "\t\tOUT.color = float4(0.0,1.0,0.0,1.0);" + GLShaderBuilder.LINE_SEP
+        			+ "\t}";        	
+        	program += "\toutput.a *= alpha;" + GLShaderBuilder.LINE_SEP;            
             program += "\tfloat2 texture;" + GLShaderBuilder.LINE_SEP;
             program += "\ttexture.x = textureCoordinate.z - 0.5;" + GLShaderBuilder.LINE_SEP;
             program += "\ttexture.y = textureCoordinate.w - 0.5;" + GLShaderBuilder.LINE_SEP;
             program += "\toutput.a *= step(cutOffRadius, length(texture));" + GLShaderBuilder.LINE_SEP;
             shaderBuilder.addEnvParameter("float cutOffRadius");
             shaderBuilder.addEnvParameter("float alpha");
+            shaderBuilder.addEnvParameter("float4 textureScale");            
             
             program = program.replace("output", shaderBuilder.useOutputValue("float4", "COLOR"));
             program = program.replace("textureCoordinate", shaderBuilder.useStandardParameter("float4", "TEXCOORD0"));
             shaderBuilder.addMainFragment(program);
+            System.out.println("CORONA Fragment Shader:\n" + shaderBuilder.getCode());
             
         } catch (GLBuildShaderException e) {
             e.printStackTrace();
@@ -107,4 +113,9 @@ public class GL3DImageCoronaFragmentShaderProgram extends GLFragmentShaderProgra
     public void setCutOffRadius(double cutOffRadius){
     	this.cutOffRadius = cutOffRadius;
     }
+    
+	public void changeTextureScale(double xTextureScale, double yTextureScale) {
+		this.xTextureScale = xTextureScale;
+		this.yTextureScale = yTextureScale;
+	}    
 }
