@@ -10,6 +10,7 @@ import org.helioviewer.base.physics.Constants;
 import org.helioviewer.gl3d.changeevent.ImageTextureRecapturedReason;
 import org.helioviewer.gl3d.model.image.GL3DImageMesh;
 import org.helioviewer.gl3d.scenegraph.GL3DState;
+import org.helioviewer.gl3d.shader.GL3DImageCoronaFragmentShaderProgram;
 import org.helioviewer.gl3d.shader.GL3DImageFragmentShaderProgram;
 import org.helioviewer.gl3d.shader.GL3DImageVertexShaderProgram;
 import org.helioviewer.gl3d.shader.GL3DShaderFactory;
@@ -62,7 +63,9 @@ public class GL3DImageTextureView extends AbstractGL3DView implements GL3DView {
 	public double maxZ = Constants.SunRadius;
 	// private Vector2dInt renderOffset;
 
-	private GLFragmentShaderProgram fragmentShader;
+	private GL3DImageFragmentShaderProgram fragmentShader;
+
+	private GL3DImageCoronaFragmentShaderProgram coronaFragmentShader;
 
 	public void render3D(GL3DState state) {
 		GL gl = state.gl;
@@ -142,8 +145,8 @@ public class GL3DImageTextureView extends AbstractGL3DView implements GL3DView {
 			if (vertexShader != null) {
 				this.vertexShader.changeRect(xOffset, yOffset, Math.abs(xScale), Math.abs(yScale));
 				this.vertexShader.changeTextureScale(this.textureScale.getX(), this.textureScale.getY());
-				GL3DImageFragmentShaderProgram fr = (GL3DImageFragmentShaderProgram)(this.fragmentShader);
-				fr.changeTextureScale(this.textureScale.getX(), this.textureScale.getY());
+				this.fragmentShader.changeTextureScale(this.textureScale.getX(), this.textureScale.getY());
+				this.coronaFragmentShader.changeTextureScale(this.textureScale.getX(), this.textureScale.getY());				
 			}
 		}
 
@@ -197,7 +200,8 @@ public class GL3DImageTextureView extends AbstractGL3DView implements GL3DView {
 		this.vertexShader = vertexShader;
 	}
 
-	public void setFragmentShader(GLFragmentShaderProgram fragmentShader) {
-		this.fragmentShader = fragmentShader;	
+	public void setFragmentShader(GL3DImageFragmentShaderProgram fragmentShader, GL3DImageCoronaFragmentShaderProgram coronaFragmentShader) {
+		this.fragmentShader = fragmentShader;
+		this.coronaFragmentShader = coronaFragmentShader;	
 	}
 }

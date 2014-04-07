@@ -24,13 +24,15 @@ public class GL3DAIAImageLayer extends GL3DImageLayer {
     protected void createImageMeshNodes(GL gl) {
     	this.sphereFragmentShader = new GL3DImageFragmentShaderProgram();
     	GLFragmentShaderProgram sphereFragmentShader = GL3DShaderFactory.createFragmentShaderProgram(gl, this.sphereFragmentShader);
+    	this.sphereFragmentShader = (GL3DImageFragmentShaderProgram)sphereFragmentShader;
         
-        this.fragmentShader = new GL3DImageCoronaFragmentShaderProgram();        
-        GLFragmentShaderProgram coronaFragmentShader = GL3DShaderFactory.createFragmentShaderProgram(gl, fragmentShader);
+        this.coronaFragmentShader = new GL3DImageCoronaFragmentShaderProgram();        
+        GLFragmentShaderProgram coronaFragmentShader = GL3DShaderFactory.createFragmentShaderProgram(gl, this.coronaFragmentShader);
+        this.coronaFragmentShader = (GL3DImageCoronaFragmentShaderProgram)coronaFragmentShader;
         GL3DImageVertexShaderProgram vertex = new GL3DImageVertexShaderProgram();
-        GLVertexShaderProgram   vertexShader   = GL3DShaderFactory.createVertexShaderProgram(gl, vertex);
+        GLVertexShaderProgram  vertexShader   = GL3DShaderFactory.createVertexShaderProgram(gl, vertex);
         this.imageTextureView.setVertexShader(vertex);
-        this.imageTextureView.setFragmentShader(sphereFragmentShader);
+        this.imageTextureView.setFragmentShader(this.sphereFragmentShader, this.coronaFragmentShader);
 
         this.imageTextureView.metadata = this.metaDataView.getMetaData();
         sphere = new GL3DImageSphere(imageTextureView, vertexShader, sphereFragmentShader, this);
@@ -40,7 +42,7 @@ public class GL3DAIAImageLayer extends GL3DImageLayer {
         double yOffset = (this.imageTextureView.metadata.getPhysicalUpperRight().getY()+this.imageTextureView.metadata.getPhysicalLowerLeft().getY())/(2.0*this.imageTextureView.metadata.getPhysicalImageHeight());
         vertex.setDefaultOffset((float)xOffset, (float)yOffset);
         this.sphereFragmentShader.setCutOffRadius((float)(Constants.SunRadius/this.imageTextureView.metadata.getPhysicalImageWidth()));
-        this.fragmentShader.setCutOffRadius((float)(Constants.SunRadius/this.imageTextureView.metadata.getPhysicalImageWidth()));
+        this.coronaFragmentShader.setCutOffRadius((float)(Constants.SunRadius/this.imageTextureView.metadata.getPhysicalImageWidth()));
         
 
         this.addNode(corona);
