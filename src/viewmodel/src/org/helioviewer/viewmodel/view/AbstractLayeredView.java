@@ -7,6 +7,7 @@ import java.util.concurrent.locks.ReentrantLock;
 
 import org.helioviewer.base.math.RectangleDouble;
 import org.helioviewer.base.math.Vector2dInt;
+import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.viewmodel.changeevent.ChangeEvent;
 import org.helioviewer.viewmodel.changeevent.LayerChangedReason;
 import org.helioviewer.viewmodel.changeevent.LayerChangedReason.LayerChangeType;
@@ -22,6 +23,7 @@ import org.helioviewer.viewmodel.region.Region;
 import org.helioviewer.viewmodel.region.RegionAdapter;
 import org.helioviewer.viewmodel.region.StaticRegion;
 import org.helioviewer.viewmodel.view.jp2view.JHVJP2View;
+import org.helioviewer.viewmodel.view.jp2view.JHVJPXView;
 import org.helioviewer.viewmodel.viewport.Viewport;
 import org.helioviewer.viewmodel.viewportimagesize.ViewportImageSize;
 
@@ -244,7 +246,9 @@ public abstract class AbstractLayeredView extends AbstractView implements Layere
         if (view.getAdapter(JHVJP2View.class) != null) {
             view.getAdapter(JHVJP2View.class).abolish();
         }
-
+        if (view.getAdapter(JHVJPXView.class) != null) {
+            view.getAdapter(JHVJPXView.class).removeRenderListener();
+        }
         ChangeEvent event = new ChangeEvent(new LayerChangedReason(this, LayerChangeType.LAYER_REMOVED, view, index));
 
         recalculateMetaData(false);
@@ -268,6 +272,7 @@ public abstract class AbstractLayeredView extends AbstractView implements Layere
             recalculateRegionsAndViewports(event);
         }
         redrawBuffer(event);
+        Displayer.getSingletonInstance().display();
     }
 
     /**

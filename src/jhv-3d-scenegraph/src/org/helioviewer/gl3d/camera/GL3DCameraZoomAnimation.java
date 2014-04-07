@@ -1,6 +1,7 @@
 package org.helioviewer.gl3d.camera;
 
 import org.helioviewer.jhv.display.Displayer;
+import org.helioviewer.viewmodel.view.jp2view.JHVJPXView;
 
 /**
  * This animation zooms the camera by a given amount. Zooming only affects the
@@ -11,6 +12,7 @@ import org.helioviewer.jhv.display.Displayer;
  */
 public class GL3DCameraZoomAnimation implements GL3DCameraAnimation {
     private boolean isFinished = false;
+    private static int count = 0;
 
     private long startTime = -1;
     private long lastAnimationTime = -1;
@@ -23,13 +25,14 @@ public class GL3DCameraZoomAnimation implements GL3DCameraAnimation {
 
     public GL3DCameraZoomAnimation(double distanceToTravel) {
         this(distanceToTravel, GL3DCameraAnimation.DEFAULT_ANIMATION_TIME);
+        Displayer.getSingletonInstance().render();
     }
 
     public GL3DCameraZoomAnimation(double distanceToTravel, long duration) {
         this.distanceToTravel = distanceToTravel;
         this.timeLeft = duration;
         this.distanceDelta = distanceToTravel / this.timeLeft;
-        Displayer.getSingletonInstance().animate();
+        //Displayer.getSingletonInstance().animate();
     }
 
     public void animate(GL3DCamera camera) {
@@ -56,12 +59,22 @@ public class GL3DCameraZoomAnimation implements GL3DCameraAnimation {
         if (camera.getZTranslation() == this.targetDistance) {
             this.isFinished = true;
             camera.updateCameraTransformation(true);
-            Displayer.getSingletonInstance().stopAnimate();
+            count = count + 1;
+            if(count%25==0){
+                camera.updateCameraTransformation(true);
+                Displayer.getSingletonInstance().display();        
+            }
+            else{
+                camera.updateCameraTransformation(false);
+                Displayer.getSingletonInstance().display();        
+            }
         } else {
-            camera.updateCameraTransformation(false);
+            camera.updateCameraTransformation(true);
+            Displayer.getSingletonInstance().render();        
         }
 
         this.lastAnimationTime = System.currentTimeMillis();
+
     }
 
     public void updateWithAnimation(GL3DCameraAnimation animation) {

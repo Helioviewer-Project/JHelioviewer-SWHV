@@ -10,6 +10,7 @@ import org.helioviewer.base.physics.Constants;
 import org.helioviewer.gl3d.changeevent.ImageTextureRecapturedReason;
 import org.helioviewer.gl3d.model.image.GL3DImageMesh;
 import org.helioviewer.gl3d.scenegraph.GL3DState;
+import org.helioviewer.gl3d.shader.GL3DImageFragmentShaderProgram;
 import org.helioviewer.gl3d.shader.GL3DImageVertexShaderProgram;
 import org.helioviewer.gl3d.shader.GL3DShaderFactory;
 import org.helioviewer.viewmodel.changeevent.CacheStatusChangedReason;
@@ -25,6 +26,7 @@ import org.helioviewer.viewmodel.view.View;
 import org.helioviewer.viewmodel.view.ViewListener;
 import org.helioviewer.viewmodel.view.ViewportView;
 import org.helioviewer.viewmodel.view.opengl.GLTextureHelper;
+import org.helioviewer.viewmodel.view.opengl.shader.GLFragmentShaderProgram;
 import org.helioviewer.viewmodel.viewport.Viewport;
 
 import sun.reflect.generics.visitor.Reifier;
@@ -59,6 +61,8 @@ public class GL3DImageTextureView extends AbstractGL3DView implements GL3DView {
 	public double minZ = 0.0;
 	public double maxZ = Constants.SunRadius;
 	// private Vector2dInt renderOffset;
+
+	private GLFragmentShaderProgram fragmentShader;
 
 	public void render3D(GL3DState state) {
 		GL gl = state.gl;
@@ -138,6 +142,8 @@ public class GL3DImageTextureView extends AbstractGL3DView implements GL3DView {
 			if (vertexShader != null) {
 				this.vertexShader.changeRect(xOffset, yOffset, Math.abs(xScale), Math.abs(yScale));
 				this.vertexShader.changeTextureScale(this.textureScale.getX(), this.textureScale.getY());
+				GL3DImageFragmentShaderProgram fr = (GL3DImageFragmentShaderProgram)(this.fragmentShader);
+				fr.changeTextureScale(this.textureScale.getX(), this.textureScale.getY());
 			}
 		}
 
@@ -189,5 +195,9 @@ public class GL3DImageTextureView extends AbstractGL3DView implements GL3DView {
 
 	public void setVertexShader(GL3DImageVertexShaderProgram vertexShader) {
 		this.vertexShader = vertexShader;
+	}
+
+	public void setFragmentShader(GLFragmentShaderProgram fragmentShader) {
+		this.fragmentShader = fragmentShader;	
 	}
 }

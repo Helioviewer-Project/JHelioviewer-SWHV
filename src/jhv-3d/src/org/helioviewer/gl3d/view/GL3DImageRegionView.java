@@ -5,6 +5,7 @@ import javax.media.opengl.GL;
 import org.helioviewer.base.logging.Log;
 import org.helioviewer.base.math.Vector2dInt;
 import org.helioviewer.gl3d.scenegraph.GL3DState;
+import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.viewmodel.changeevent.ChangeEvent;
 import org.helioviewer.viewmodel.changeevent.RegionChangedReason;
 import org.helioviewer.viewmodel.changeevent.RegionUpdatedReason;
@@ -16,6 +17,7 @@ import org.helioviewer.viewmodel.view.RegionView;
 import org.helioviewer.viewmodel.view.View;
 import org.helioviewer.viewmodel.view.ViewHelper;
 import org.helioviewer.viewmodel.view.ViewportView;
+import org.helioviewer.viewmodel.view.jp2view.JHVJPXView;
 import org.helioviewer.viewmodel.viewport.StaticViewport;
 import org.helioviewer.viewmodel.viewport.Viewport;
 import org.helioviewer.viewmodel.viewportimagesize.ViewportImageSize;
@@ -101,7 +103,6 @@ public class GL3DImageRegionView extends AbstractGL3DView implements GL3DView, R
         } else {
             event.addReason(new RegionUpdatedReason(this, r));
         }
-        System.out.println("Region changed");
 
         this.detectedRegion = r;
         boolean hasChanged = this.updateRegionAndViewport(event);
@@ -109,9 +110,6 @@ public class GL3DImageRegionView extends AbstractGL3DView implements GL3DView, R
         // Log.debug("GL3DImageRegionView: set Region!: "+this.actualImageRegion.getSize());
         hasChanged |= this.viewportView.setViewport(innerViewport, event);
         hasChanged |= this.underlyingRegionView.setRegion(this.actualImageRegion, event);
-
-        event.addReason(new RegionChangedReason(this, r));
-
         return hasChanged;
     }
 
@@ -126,7 +124,6 @@ public class GL3DImageRegionView extends AbstractGL3DView implements GL3DView, R
         this.renderOffset = new Vector2dInt(0, 0);
         // Log.debug("GL3DImageRegionView: Offset: "+renderOffset);
         this.actualImageRegion = region;
-
         return true;
     }
 

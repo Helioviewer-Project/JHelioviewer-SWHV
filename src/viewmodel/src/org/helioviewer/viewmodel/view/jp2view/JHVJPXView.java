@@ -2,6 +2,8 @@ package org.helioviewer.viewmodel.view.jp2view;
 import java.util.Date;
 
 import org.helioviewer.base.math.Interval;
+import org.helioviewer.jhv.display.Displayer;
+import org.helioviewer.jhv.display.RenderListener;
 import org.helioviewer.viewmodel.changeevent.ChangeEvent;
 import org.helioviewer.viewmodel.changeevent.PlayStateChangedReason;
 import org.helioviewer.viewmodel.changeevent.TimestampChangedReason;
@@ -10,6 +12,7 @@ import org.helioviewer.viewmodel.metadata.ObserverMetaData;
 import org.helioviewer.viewmodel.view.CachedMovieView;
 import org.helioviewer.viewmodel.view.LinkedMovieManager;
 import org.helioviewer.viewmodel.view.TimedMovieView;
+import org.helioviewer.viewmodel.view.bufferedimage.BufferedImageTimeMachineView;
 import org.helioviewer.viewmodel.view.cache.DateTimeCache;
 import org.helioviewer.viewmodel.view.cache.HelioviewerDateTimeCache;
 import org.helioviewer.viewmodel.view.cache.ImageCacheStatus;
@@ -34,7 +37,7 @@ import org.helioviewer.viewmodel.view.jp2view.image.SubImage;
  * 
  * @author Markus Langenberg
  */
-public class JHVJPXView extends JHVJP2View implements TimedMovieView, CachedMovieView {
+public class JHVJPXView extends JHVJP2View implements TimedMovieView, CachedMovieView, RenderListener {
 
     // Caching
     protected ImageCacheStatus imageCacheStatus;
@@ -61,6 +64,9 @@ public class JHVJPXView extends JHVJP2View implements TimedMovieView, CachedMovi
      */
     public JHVJPXView(boolean isMainView, Interval<Date> range) {
         super(isMainView, range);
+        if(isMainView){
+        	Displayer.getSingletonInstance().addRenderListener(this);
+        }
     }
 
     /**
@@ -455,4 +461,13 @@ public class JHVJPXView extends JHVJP2View implements TimedMovieView, CachedMovi
     public boolean isReuseBuffer() {
         return render.isReuseBuffer();
     }
+
+	@Override
+	public void render() {
+        renderRequestedSignal.signal(RenderReasons.NEW_DATA);
+	}
+	
+	public void removeRenderListener(){
+        Displayer.getSingletonInstance().removeRenderListener(this);
+	}
 }

@@ -4,6 +4,7 @@ import java.awt.event.ActionEvent;
 
 import org.helioviewer.gl3d.camera.GL3DCamera;
 import org.helioviewer.gl3d.camera.GL3DCameraZoomAnimation;
+import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.gui.actions.ZoomOutAction;
 
 /**
@@ -26,6 +27,8 @@ public class GL3DZoomOutAction extends ZoomOutAction {
 
         double distance = -camera.getDistanceToSunSurface() / 2;
         GL3DCameraSelectorModel.getInstance().getCurrentCamera().addCameraAnimation(new GL3DCameraZoomAnimation(distance, 500));
+        Displayer.getSingletonInstance().render();
+
     }
 
 }

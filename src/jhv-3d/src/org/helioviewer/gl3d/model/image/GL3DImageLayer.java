@@ -175,7 +175,6 @@ public abstract class GL3DImageLayer extends GL3DOrientedGroup implements GL3DCa
     public void shapeUpdate(GL3DState state) {
         super.shapeUpdate(state);
         if (doUpdateROI) {
-            // Log.debug("GL3DImageLayer: '"+getName()+" is updating its ROI");
             this.updateROI(state.getActiveCamera());
             doUpdateROI = false;
             this.accellerationShape.setUnchanged();
@@ -332,10 +331,7 @@ public abstract class GL3DImageLayer extends GL3DOrientedGroup implements GL3DCa
                 // Log.debug("GL3DImageLayer: Hitpoint: "+hitPoint+" - "+ray.isOnSun);
             }
         }
-        //frame.repaint();
-        //frame1.repaint();
 
-        // Restrict maximal region to physically available region
         minPhysicalX = Math.max(minPhysicalX, metaData.getPhysicalLowerLeft().getX());
         minPhysicalY = Math.max(minPhysicalY, metaData.getPhysicalLowerLeft().getY());
         maxPhysicalX = Math.min(maxPhysicalX, metaData.getPhysicalUpperRight().getX());

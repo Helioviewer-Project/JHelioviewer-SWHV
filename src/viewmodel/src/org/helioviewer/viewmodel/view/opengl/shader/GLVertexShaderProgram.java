@@ -29,10 +29,10 @@ public abstract class GLVertexShaderProgram {
     private static Stack<Integer> shaderStack = new Stack<Integer>();
     private static int shaderCurrentlyUsed = -1;
     private int shaderID;
-    protected double xOffset = 0.0f;
-    protected double yOffset = 0.0f;
-    protected double xScale = 1.0f;
-    protected double yScale = 1.0f;
+    protected double xOffset = 0.0;
+    protected double yOffset = 0.0;
+    protected double xScale = 1.0;
+    protected double yScale = 1.0;
     protected double xTextureScale = 1;
     protected double yTextureScale = 1;
     protected double defaultXOffset = 0;
