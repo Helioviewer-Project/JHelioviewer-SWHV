@@ -290,7 +290,7 @@ public class GL3DComponentView extends AbstractComponentView implements GLEventL
         TimestampChangedReason timestampReason = aEvent.getLastChangedReasonByType(TimestampChangedReason.class);
         if ((timestampReason != null) && (timestampReason.getView() instanceof TimedMovieView) && LinkedMovieManager.getActiveInstance().isMaster((TimedMovieView) timestampReason.getView())) {
         	try{
-        	    this.getCanvas().display();
+        	    this.display();
         	}
         	catch( Exception e){
         		
