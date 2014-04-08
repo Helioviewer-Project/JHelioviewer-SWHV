@@ -73,8 +73,8 @@ public class GL3DComponentView extends AbstractComponentView implements GLEventL
     // private GL3DOrthoView orthoView;
     private ViewportView viewportView;
 
-    private ReentrantLock animationLock = new ReentrantLock();
-
+    private int queue=0;
+    private Object lock = new Object();
     private Vector2dInt viewportSize;
 
     public GL3DComponentView() {
@@ -257,18 +257,27 @@ public class GL3DComponentView extends AbstractComponentView implements GLEventL
     }
 
     public void display(){
-    	try{
-    	    this.canvas.display();
+    	int queuecopy;
+    	synchronized(lock){
+    		queue++;
+    		queuecopy=queue;
     	}
-    	catch( Exception e){
-            Log.warn("GL3DTrackballCamera.mouseDragged: Illegal Rotation ignored!", e);    		
+    	if(queuecopy==1){
+    		while(queue>0){
+		    	try{
+		    	    this.canvas.display();
+		    	}
+		    	catch( Exception e){
+		            Log.warn("Display of GL3DComponentView canvas failed", e);    		
+		    	}
+		    	finally{
+		    		queue--;
+		    	}
+	    	}
     	}
     }
+    
     public void viewChanged(View sender, ChangeEvent aEvent) {
-        if (this.animationLock.isLocked()) {
-            return;
-        }
-        // Log.debug("GL3DComponentView.viewChanged! Sender: "+sender);
 
         // rebuild shaders, if necessary
         if (aEvent.reasonOccurred(ViewChainChangedReason.class) || (aEvent.reasonOccurred(LayerChangedReason.class) && aEvent.getLastChangedReasonByType(LayerChangedReason.class).getLayerChangeType() == LayerChangeType.LAYER_ADDED)) {
@@ -277,6 +286,7 @@ public class GL3DComponentView extends AbstractComponentView implements GLEventL
             this.viewportView = getAdapter(ViewportView.class);
             this.updateViewport();
         }
+        
         TimestampChangedReason timestampReason = aEvent.getLastChangedReasonByType(TimestampChangedReason.class);
         if ((timestampReason != null) && (timestampReason.getView() instanceof TimedMovieView) && LinkedMovieManager.getActiveInstance().isMaster((TimedMovieView) timestampReason.getView())) {
         	try{
@@ -286,8 +296,7 @@ public class GL3DComponentView extends AbstractComponentView implements GLEventL
         		
         	}
         }        
-        // inform all listener of the latest change reason
-        // frameUpdated++;
+
         notifyViewListeners(aEvent);
     }
 
