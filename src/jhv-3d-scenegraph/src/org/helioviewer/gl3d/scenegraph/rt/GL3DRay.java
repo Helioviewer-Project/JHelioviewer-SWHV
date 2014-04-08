@@ -66,7 +66,6 @@ public class GL3DRay {
     public void setDir(GL3DVec3d dir) {
         this.direction = dir;
         invDirection = new GL3DVec3d(dir.x == 0 ? 0 : 1 / dir.x, dir.y == 0 ? 0 : 1 / dir.y, dir.z == 0 ? 0 : 1 / dir.z);
-        invDirection = new GL3DVec3d(1 / dir.x, 1 / dir.y, 1 / dir.z);
         sign[0] = invDirection.x < 0 ? 1 : 0;
         sign[1] = invDirection.y < 0 ? 1 : 0;
         sign[2] = invDirection.z < 0 ? 1 : 0;
