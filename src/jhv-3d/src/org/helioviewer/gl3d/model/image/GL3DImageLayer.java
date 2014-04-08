@@ -306,20 +306,20 @@ public abstract class GL3DImageLayer extends GL3DOrientedGroup implements GL3DCa
             phi = 2 * Math.PI - phi;
             phiRotation = GL3DMat4d.rotation(phi, new GL3DVec3d(0, 1, 0));
         }
-        
+
         for (GL3DRay ray : regionTestRays) {
             GL3DVec3d hitPoint = ray.getHitPoint();
             if (hitPoint != null) {
-            	hitPoint = this.wmI.multiply(hitPoint);
-            	double coordx = (hitPoint.x - metaData.getPhysicalLowerLeft().getX())/metaData.getPhysicalImageWidth();
-            	double coordy = ((1-hitPoint.y) - metaData.getPhysicalLowerLeft().getY())/metaData.getPhysicalImageHeight();
-            	
-            	double x = phiRotation.m[0]*hitPoint.x + phiRotation.m[4]*hitPoint.y + phiRotation.m[8]*hitPoint.z + phiRotation.m[12];
+                hitPoint = this.wmI.multiply(hitPoint);
+                //double coordx = (hitPoint.x - metaData.getPhysicalLowerLeft().getX())/metaData.getPhysicalImageWidth();
+                //double coordy = ((1-hitPoint.y) - metaData.getPhysicalLowerLeft().getY())/metaData.getPhysicalImageHeight();
+
+                double x = phiRotation.m[0]*hitPoint.x + phiRotation.m[4]*hitPoint.y + phiRotation.m[8]*hitPoint.z + phiRotation.m[12];
                 double y = phiRotation.m[1]*hitPoint.x + phiRotation.m[5]*hitPoint.y + phiRotation.m[9]*hitPoint.z + phiRotation.m[13];
                 double z = phiRotation.m[2]*hitPoint.x + phiRotation.m[6]*hitPoint.y + phiRotation.m[10]*hitPoint.z + phiRotation.m[14];
-                
-                coordx = (x - metaData.getPhysicalLowerLeft().getX())/metaData.getPhysicalImageWidth();
-            	coordy = ((1-y) - metaData.getPhysicalLowerLeft().getY())/metaData.getPhysicalImageHeight();
+
+                //coordx = (x - metaData.getPhysicalLowerLeft().getX())/metaData.getPhysicalImageWidth();
+                //coordy = ((1-y) - metaData.getPhysicalLowerLeft().getY())/metaData.getPhysicalImageHeight();
 
 
                 minPhysicalX = Math.min(minPhysicalX, x);
