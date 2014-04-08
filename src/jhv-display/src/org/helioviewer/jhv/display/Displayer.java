@@ -8,6 +8,8 @@ public class Displayer{
     private final LinkedList<DisplayListener> listeners = new LinkedList<DisplayListener>();
     private final LinkedList<RenderListener> renderListeners = new LinkedList<RenderListener>();
     private GL3DComponentFakeInterface gl3dcomponent;
+	private Object lock = new Object();
+	private int queue = 0;
 
     public void register(GL3DComponentFakeInterface gl3dcomponent){
     	this.gl3dcomponent = gl3dcomponent;
@@ -46,9 +48,19 @@ public class Displayer{
     }
 
     public void display(){
-        for(final DisplayListener listener : listeners) {
-            listener.display();
-        }
+    	int queuecopy;
+    	synchronized(lock ){
+    		queue ++;
+    		queuecopy=queue;
+    	}
+    	if(queuecopy==1){
+    		while(queue>0){
+		        for(final DisplayListener listener : listeners) {
+		            listener.display();
+		        }
+		    	queue--;		    	
+	    	}
+    	}
     }
     public void animate(){
     	gl3dcomponent.activate();
