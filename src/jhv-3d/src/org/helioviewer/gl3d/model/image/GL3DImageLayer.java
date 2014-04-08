@@ -139,7 +139,10 @@ public abstract class GL3DImageLayer extends GL3DOrientedGroup implements GL3DCa
 
         CoordinateVector orientationVector = this.getOrientation();
         CoordinateConversion toViewSpace = this.getCoordinateSystem().getConversion(state.getActiveCamera().getViewSpaceCoordinateSystem());
-        GL3DVec3d orientation = GL3DHelper.toVec(toViewSpace.convert(orientationVector)).normalize();
+
+        GL3DVec3d orientation = GL3DHelper.toVec(toViewSpace.convert(orientationVector)); //.normalize(); - not needed for atan2
+        double phi = Math.atan2(orientation.x, orientation.z);
+        /*
         double phi = 0.0;
         if (!(orientation.equals(new GL3DVec3d(0, 1, 0)))) {
             GL3DVec3d orientationXZ = new GL3DVec3d(orientation.x, 0, orientation.z);
@@ -149,6 +152,7 @@ public abstract class GL3DImageLayer extends GL3DOrientedGroup implements GL3DCa
             }
             phi = 0.0;
         }
+        */
         this.accellerationShape = new GL3DHitReferenceShape(true, phi);
         this.addNode(this.accellerationShape);
 
@@ -158,7 +162,7 @@ public abstract class GL3DImageLayer extends GL3DOrientedGroup implements GL3DCa
         this.markAsChanged();
         updateROI(state.getActiveCamera());
 
-        GL3DQuatd phiRotation = GL3DQuatd.createRotation(2*Math.PI - phi, new GL3DVec3d(0,1,0));
+        GL3DQuatd phiRotation = GL3DQuatd.createRotation(phi, new GL3DVec3d(0,1,0));
         state.getActiveCamera().getRotation().set(phiRotation);
         state.getActiveCamera().updateCameraTransformation();
     }
@@ -180,9 +184,8 @@ public abstract class GL3DImageLayer extends GL3DOrientedGroup implements GL3DCa
 
     public void cameraMoved(GL3DCamera camera) {
         doUpdateROI = true;
-        if(this.accellerationShape!=null)
-        	this.accellerationShape.markAsChanged();
-        
+        if (this.accellerationShape!=null)
+            this.accellerationShape.markAsChanged();
         cameraMoving(camera);
     }
 
