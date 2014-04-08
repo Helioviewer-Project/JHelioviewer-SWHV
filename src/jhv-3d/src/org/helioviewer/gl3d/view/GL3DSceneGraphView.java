@@ -3,6 +3,7 @@ package org.helioviewer.gl3d.view;
 import java.awt.event.KeyEvent;
 import java.util.ArrayList;
 import java.util.List;
+
 import javax.media.opengl.GL;
 
 import org.helioviewer.base.logging.Log;
@@ -28,6 +29,7 @@ import org.helioviewer.gl3d.scenegraph.math.GL3DVec3d;
 import org.helioviewer.gl3d.scenegraph.math.GL3DVec4f;
 import org.helioviewer.gl3d.scenegraph.rt.GL3DRayTracer;
 import org.helioviewer.gl3d.scenegraph.visuals.GL3DArrow;
+import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.viewmodel.changeevent.ChangeEvent;
 import org.helioviewer.viewmodel.changeevent.LayerChangedReason;
 import org.helioviewer.viewmodel.region.Region;
@@ -76,36 +78,42 @@ public class GL3DSceneGraphView extends AbstractGL3DView implements GL3DView {
 		GL3DKeyController.getInstance().addListener(new GL3DKeyListener() {
 			public void keyHit(KeyEvent e) {
 				root.getDrawBits().toggle(Bit.BoundingBox);
+				Displayer.getSingletonInstance().display();
 				Log.debug("Toggling BoundingBox");
 			}
 		}, KeyEvent.VK_B);
 		GL3DKeyController.getInstance().addListener(new GL3DKeyListener() {
 			public void keyHit(KeyEvent e) {
 				root.getDrawBits().toggle(Bit.Wireframe);
+				Displayer.getSingletonInstance().display();
 				Log.debug("Toggling Wireframe");
 			}
 		}, KeyEvent.VK_W);
 		GL3DKeyController.getInstance().addListener(new GL3DKeyListener() {
 			public void keyHit(KeyEvent e) {
 				root.getDrawBits().toggle(Bit.Normals);
+				Displayer.getSingletonInstance().display();				
 				Log.debug("Toggling Normals");
 			}
 		}, KeyEvent.VK_N);
 		GL3DKeyController.getInstance().addListener(new GL3DKeyListener() {
 			public void keyHit(KeyEvent e) {
 				framebuffer.getDrawBits().toggle(Bit.Hidden);
+				Displayer.getSingletonInstance().display();				
 				Log.debug("Toggling Framebuffer");
 			}
 		}, KeyEvent.VK_F);
 		GL3DKeyController.getInstance().addListener(new GL3DKeyListener() {
 			public void keyHit(KeyEvent e) {
 				imageLayers.getDrawBits().toggle(Bit.Hidden);
+				Displayer.getSingletonInstance().display();				
 				Log.debug("Toggling Images");
 			}
 		}, KeyEvent.VK_I);
 		GL3DKeyController.getInstance().addListener(new GL3DKeyListener() {
 			public void keyHit(KeyEvent e) {
 				toggleCoronaVisibility();
+				Displayer.getSingletonInstance().display();				
 				Log.debug("Toggling Corona Visibility");
 			}
 		}, KeyEvent.VK_C);
