@@ -58,7 +58,10 @@ public class Displayer{
 		        for(final DisplayListener listener : listeners) {
 		            listener.display();
 		        }
-		    	queue--;		    	
+		    	queue--;
+		    	if(queue>1){
+		    		queue = 1;
+		    	}
 	    	}
     	}
     }
