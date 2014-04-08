@@ -289,12 +289,11 @@ public abstract class GL3DImageLayer extends GL3DOrientedGroup implements GL3DCa
         double maxPhysicalX = -Double.MAX_VALUE;
         double maxPhysicalY = -Double.MAX_VALUE;
         double maxPhysicalZ = -Double.MAX_VALUE;
-        
+
         CoordinateVector orientationVector = this.getOrientation();
         CoordinateConversion toViewSpace = this.getCoordinateSystem().getConversion(activeCamera.getViewSpaceCoordinateSystem());
 
-        GL3DVec3d orientation = GL3DHelper.toVec(toViewSpace.convert(orientationVector)).normalize();
-
+        GL3DVec3d orientation = GL3DHelper.toVec(toViewSpace.convert(orientationVector)); //.normalize(); - not needed for atan2
         GL3DMat4d phiRotation = GL3DMat4d.rotation(Math.atan2(orientation.x, orientation.z), new GL3DVec3d(0, 1, 0));
 
         /*
