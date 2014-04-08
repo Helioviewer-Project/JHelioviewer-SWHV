@@ -73,8 +73,6 @@ public class GL3DComponentView extends AbstractComponentView implements GLEventL
     // private GL3DOrthoView orthoView;
     private ViewportView viewportView;
 
-    private int queue=0;
-    private Object lock = new Object();
     private Vector2dInt viewportSize;
 
     public GL3DComponentView() {
@@ -257,23 +255,11 @@ public class GL3DComponentView extends AbstractComponentView implements GLEventL
     }
 
     public void display(){
-    	int queuecopy;
-    	synchronized(lock){
-    		queue++;
-    		queuecopy=queue;
+    	try{
+    	    this.canvas.display();
     	}
-    	if(queuecopy==1){
-    		while(queue>0){
-		    	try{
-		    	    this.canvas.display();
-		    	}
-		    	catch( Exception e){
-		            Log.warn("Display of GL3DComponentView canvas failed", e);    		
-		    	}
-		    	finally{
-		    		queue--;
-		    	}
-	    	}
+    	catch( Exception e){
+            Log.warn("Display of GL3DComponentView canvas failed", e);    		
     	}
     }
     
@@ -290,7 +276,8 @@ public class GL3DComponentView extends AbstractComponentView implements GLEventL
         TimestampChangedReason timestampReason = aEvent.getLastChangedReasonByType(TimestampChangedReason.class);
         if ((timestampReason != null) && (timestampReason.getView() instanceof TimedMovieView) && LinkedMovieManager.getActiveInstance().isMaster((TimedMovieView) timestampReason.getView())) {
         	try{
-        	    this.display();
+        	    //this.display();
+        	    Displayer.getSingletonInstance().display();
         	}
         	catch( Exception e){
         		
