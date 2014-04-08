@@ -146,7 +146,7 @@ public class GL3DImageTextureView extends AbstractGL3DView implements GL3DView {
 				this.vertexShader.changeRect(xOffset, yOffset, Math.abs(xScale), Math.abs(yScale));
 				this.vertexShader.changeTextureScale(this.textureScale.getX(), this.textureScale.getY());
 				this.fragmentShader.changeTextureScale(this.textureScale.getX(), this.textureScale.getY());
-				this.coronaFragmentShader.changeTextureScale(this.textureScale.getX(), this.textureScale.getY());				
+				this.coronaFragmentShader.changeTextureScale(this.textureScale.getX()*0.999, this.textureScale.getY()*0.999);				
 			}
 		}
 
