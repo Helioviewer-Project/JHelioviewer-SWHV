@@ -200,13 +200,13 @@ public class GL3DVec3d {
     }
 
     public double length() {
-    	double absmax = Math.max(Math.max(Math.abs(this.x), Math.abs(this.y)), Math.abs(this.z));
-    	if (absmax == 0.0)
-    		return 0.0;
+        double absmax = Math.max(Math.max(Math.abs(this.x), Math.abs(this.y)), Math.abs(this.z));
+        if (absmax == 0.0)
+            return 0.0;
 
-    	double tmpx = this.x / absmax;
-    	double tmpy = this.y / absmax;
-    	double tmpz = this.z / absmax;
+        double tmpx = this.x / absmax;
+        double tmpy = this.y / absmax;
+        double tmpz = this.z / absmax;
         return absmax * Math.sqrt(tmpx * tmpx + tmpy * tmpy + tmpz * tmpz);
     }
 
@@ -216,11 +216,11 @@ public class GL3DVec3d {
     }
 
     public GL3DVec3d normalize() {
-    	double len = length();
+        double len = length();
         if (len == 0.0)
             return this;
 
-   		this.divide(len);
+        this.divide(len);
 
         // take shortcut, reasonably close to 1
         len = Math.sqrt(this.x * this.x + this.y * this.y + this.z * this.z);
