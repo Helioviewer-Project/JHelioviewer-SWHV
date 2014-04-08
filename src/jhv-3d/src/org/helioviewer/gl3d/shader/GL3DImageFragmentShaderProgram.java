@@ -75,8 +75,6 @@ public class GL3DImageFragmentShaderProgram extends GLFragmentShaderProgram {
     }
     protected void buildImpl(GLShaderBuilder shaderBuilder) {
         try {
-        	//String program = "float2 vv = float2(clamp(texcoord0.x,0.0,textureScale.x), clamp(texcoord0.y,0.0,textureScale.y));";
-        	//program += "OUT.color = tex2D(texunit0, vv);";
         	String program = "\tif(texcoord0.x<0.0||texcoord0.y<0.0||texcoord0.x>textureScale.x||texcoord0.y>textureScale.y){"
         			+ "\t\tOUT.color = float4(1.0,0.0,0.0,1.0);" + GLShaderBuilder.LINE_SEP
         			+ "\t}";
