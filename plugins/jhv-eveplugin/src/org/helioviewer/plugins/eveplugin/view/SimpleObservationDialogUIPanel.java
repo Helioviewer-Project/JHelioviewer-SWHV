@@ -29,6 +29,7 @@ import org.helioviewer.jhv.gui.dialogs.observation.ObservationDialogPanel;
 import org.helioviewer.plugins.eveplugin.controller.ZoomController;
 import org.helioviewer.plugins.eveplugin.lines.data.BandController;
 import org.helioviewer.plugins.eveplugin.lines.data.EVECacheController;
+//import org.helioviewer.plugins.eveplugin.model.PlotTimeSpace;
 import org.helioviewer.plugins.eveplugin.radio.data.RadioBandType;
 import org.helioviewer.plugins.eveplugin.radio.data.RadioDownloader;
 import org.helioviewer.plugins.eveplugin.settings.BandGroup;
@@ -203,6 +204,7 @@ public class SimpleObservationDialogUIPanel extends ObservationDialogPanel imple
     
     private void updateZoomController() {
         ZoomController.getSingletonInstance().setAvailableInterval(new Interval<Date>(getStartDate(), getEndDate()));
+    	//PlotTimeSpace.getInstance().setMinAndMaxTime(getStartDate(), getEndDate());
     }
     
     private void updateBandController() {

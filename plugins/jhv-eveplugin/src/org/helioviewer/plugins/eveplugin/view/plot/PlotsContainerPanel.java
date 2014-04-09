@@ -29,6 +29,7 @@ public class PlotsContainerPanel extends JPanel implements BandControllerListene
     private final PlotPanel plotTwo = new PlotPanel(PLOT_IDENTIFIER_SLAVE, "Plot 2: ");
     
     private boolean isSecondPlotVisible = true;
+    private boolean isFirstPlotVisible = true;
     
     // //////////////////////////////////////////////////////////////////////////////
     // Methods
@@ -52,7 +53,7 @@ public class PlotsContainerPanel extends JPanel implements BandControllerListene
         
         setPlot2Visible(false);
     }
-    
+       
     public void setPlot2Visible(final boolean visible) {
         if (isSecondPlotVisible == visible) {
             return;
@@ -82,6 +83,7 @@ public class PlotsContainerPanel extends JPanel implements BandControllerListene
         }
         
         ImageViewerGui.getSingletonInstance().getContentPane().revalidate();
+        ImageViewerGui.getSingletonInstance().getContentPane().repaint();
     }
     
     public boolean isPlot2Visible() {

@@ -33,7 +33,26 @@ public class ZoomDataConfig implements ZoomManagerListener{
 		listeners.add(l);
 		double xRatio = 1.0 * (maxX.getTime()-minX.getTime())/displaySize.getWidth();
 		double yRatio = 1.0 * (maxY-minY)/displaySize.getHeight();
-		l.requestData(minX, maxX, minY, maxY, xRatio, yRatio, ID);
+		Thread t = new Thread((new Runnable(){
+			ZoomDataConfigListener l;
+			double xRatio;
+			double yRatio;
+			
+			@Override
+			public void run() {
+				l.requestData(minX, maxX, minY, maxY, xRatio, yRatio, ID);				
+			}
+			
+			public Runnable init(ZoomDataConfigListener l,double xRatio, double yRatio ){
+				this.l = l;
+				this.xRatio = xRatio;
+				this.yRatio = yRatio;
+				return this;
+			}
+			
+		}).init(l, xRatio, yRatio));
+		t.start();
+		
 		
 	}
 	
@@ -88,7 +107,7 @@ public class ZoomDataConfig implements ZoomManagerListener{
 	}
 
 	public void update(){
-		this.requestData();
+		requestData();		
 	}
 	
 	public void setDisplaySize(Rectangle displaySize) {

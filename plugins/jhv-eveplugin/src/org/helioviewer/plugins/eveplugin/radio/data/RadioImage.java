@@ -2,6 +2,7 @@ package org.helioviewer.plugins.eveplugin.radio.data;
 
 
 import java.awt.Color;
+import java.awt.Rectangle;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -10,9 +11,10 @@ import org.helioviewer.base.math.Interval;
 import org.helioviewer.base.math.Vector2dInt;
 import org.helioviewer.viewmodel.view.jp2view.image.ResolutionSet;
 import org.helioviewer.plugins.eveplugin.radio.model.ResolutionSetting;
+import org.helioviewer.plugins.eveplugin.radio.model.ZoomManagerListener;
 import org.helioviewer.plugins.eveplugin.view.linedataselector.LineDataSelectorElement;
 
-public class RadioImage {
+public class RadioImage{
 	private Interval<Date> timeInterval;
 	private FrequencyInterval freqInterval;
 	private int frameInJPX;
@@ -21,14 +23,16 @@ public class RadioImage {
 	private String plotIdentifier;
 	private boolean isVisible;
 	private RadioDataManager radioDataManager;
-	private long ID;
+	private long downloadID;
 	private ResolutionSetting lastUsedResolutionSetting;
 	private long radioImageID;
+	private DownloadedJPXData jpxData;
+	private boolean isDownloading;
 	
-	public RadioImage(long ID,Interval<Date> timeInterval,
-			FrequencyInterval freqInterval, int frameInJPX, ResolutionSet rs, List<ResolutionSetting> resolutionSettings, String plotIdentifier) {
+	public RadioImage(DownloadedJPXData jpxData, long downloadID,Long radioImageID,Interval<Date> timeInterval,
+			FrequencyInterval freqInterval, int frameInJPX, ResolutionSet rs, List<ResolutionSetting> resolutionSettings, String plotIdentifier, boolean isDownloading) {
 		super();
-		this.ID = ID;
+		this.downloadID = downloadID;
 		this.timeInterval = timeInterval;
 		this.freqInterval = freqInterval;
 		this.frameInJPX = frameInJPX;
@@ -37,29 +41,37 @@ public class RadioImage {
 		this.plotIdentifier = plotIdentifier;
 		this.isVisible = true;
 		this.radioDataManager = RadioDataManager.getSingletonInstance();
-		this.radioImageID = Math.round(Math.random()*1000000);
+		this.radioImageID = radioImageID;
+		this.jpxData = jpxData;
+		this.isDownloading = isDownloading;
 	}	
 	
+	public boolean isDownloading() {
+		return isDownloading;
+	}
+
+	public void setDownloading(boolean isDownloading) {
+		this.isDownloading = isDownloading;
+	}
+
 	public long getRadioImageID() {
 		return radioImageID;
 	}
 
-	public long getID() {
-		return ID;
+	public long getDownloadID() {
+		return downloadID;
 	}
 
-	public void setID(long iD) {
-		ID = iD;
+	public void setDownloadID(long iD) {
+		downloadID = iD;
 	}
-
-	
 
 	public ResolutionSetting getLastUsedResolutionSetting() {
 		return lastUsedResolutionSetting;
 	}
 
-	public void setLastUsedResolutionSetting(ResolutionSetting resolutionSetting) {
-		this.lastUsedResolutionSetting = resolutionSetting;
+	public void setLastUsedResolutionSetting(ResolutionSetting resolutionSetting) {		
+		this.lastUsedResolutionSetting = resolutionSetting;		
 	}
 
 	public Interval<Date> getTimeInterval() {

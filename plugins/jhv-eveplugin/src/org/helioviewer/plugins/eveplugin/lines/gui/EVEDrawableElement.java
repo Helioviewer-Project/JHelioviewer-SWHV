@@ -57,14 +57,15 @@ public class EVEDrawableElement implements DrawableElement{
 
 	@Override
 	public void draw(Graphics g, Rectangle graphArea) {
-		// TODO Auto-generated method stub
 		updateGraphsData(interval, graphArea);
 		drawGraphs(g, graphArea);
 	}
 
 	private void updateGraphsData(Interval <Date> interval,Rectangle graphArea) {
-		double logMinValue = Math.log10(yAxisElement.getSelectedRange().min);
-        double logMaxValue = Math.log10(yAxisElement.getSelectedRange().max);
+		//double logMinValue = Math.log10(yAxisElement.getSelectedRange().min);
+        //double logMaxValue = Math.log10(yAxisElement.getSelectedRange().max);
+		double logMinValue = yAxisElement.getMinValue();
+		double logMaxValue = yAxisElement.getMaxValue();
 		
 		double ratioX = !intervalAvailable ? 0 : (double)graphArea.width / (double)(interval.getEnd().getTime() - interval.getStart().getTime());
         double ratioY = logMaxValue < logMinValue ? 0 : graphArea.height / (logMaxValue - logMinValue);
@@ -108,10 +109,10 @@ public class EVEDrawableElement implements DrawableElement{
 	                final int y = computeY(eveValues[j].getValue().doubleValue(),interval, graphArea,ratioY, logMinValue);
 	                final Point point = new Point(x, y);
 	                
-	                if (graphArea.contains(point)) {
+	                //if (graphArea.contains(point)) {
 	                    pointList.add(point);
 	                    counter++;
-	                }
+	                //}
 	            }
 	
 	            

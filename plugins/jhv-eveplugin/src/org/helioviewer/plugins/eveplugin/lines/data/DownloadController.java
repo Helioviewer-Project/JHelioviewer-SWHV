@@ -482,7 +482,7 @@ public class DownloadController {
             
             if (url == null) return;
             
-            Log.debug("Requesting EVE Data: " + url);
+            //Log.debug("Requesting EVE Data: " + url);
             
             // this might take a while
             try {
@@ -528,7 +528,11 @@ public class DownloadController {
         private boolean test=true;
         private void addDataToCache(final JSONObject json, final Band band) {
             try {
-                final JSONArray data = json.getJSONArray("data");    
+            	double multiplier = 1.0;
+            	if(json.has("multiplier")){
+	        		multiplier = json.getDouble("multiplier");
+            	}
+	        	final JSONArray data = json.getJSONArray("data");    
                 //Log.warn(data.toString());
                 final EVEValue[] values = new EVEValue[data.length()];
                 
@@ -538,7 +542,7 @@ public class DownloadController {
                     // used time system in data is TAI -> compute to UTC
                     final long millis = ((long) entry.getDouble(0)) * 1000;// - 378691234000L;
                     //final long millis = ((long) entry.getDouble(0)*1000);
-                    values[i] = new EVEValue(new Date(millis), entry.getDouble(1));
+                    values[i] = new EVEValue(new Date(millis), entry.getDouble(1)*multiplier);
                     if(test){
                     	test=false;
                     	System.out.println(new Date(millis));

@@ -70,4 +70,8 @@ public class Range {
     public boolean contains(final Range range) {
         return range.min >= this.min && range.max <= this.max;
     }
+    
+    public String toString(){
+    	return "Range: ["+min+","+max+"]"; 
+    }
 }

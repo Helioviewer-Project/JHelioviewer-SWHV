@@ -48,7 +48,7 @@ public class LineDataSelectorModel {
 		}
 	}
 	
-	public void addLineData(LineDataSelectorElement element){
+	public synchronized void addLineData(LineDataSelectorElement element){
 		synchronized(elementMap){
 			if (this.elementMap.containsKey(element.getPlotIdentifier())){
 				this.elementMap.get(element.getPlotIdentifier()).add(element);

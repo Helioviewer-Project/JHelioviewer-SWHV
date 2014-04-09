@@ -13,4 +13,5 @@ public interface LineDataSelectorElement {
 	public abstract String getPlotIdentifier();
 	public abstract void setPlotIndentifier(String plotIdentifier);
 	public abstract boolean isAvailable();
+	public abstract String getUnitLabel();
 }

@@ -1,6 +1,7 @@
 package org.helioviewer.plugins.eveplugin.controller;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -23,7 +24,7 @@ public class DrawControllerData {
 	
 	public DrawControllerData() {
 		this.nrOfDrawableElements = 0;
-		this.drawableElements = new HashMap<DrawableType, List<DrawableElement>>();
+		this.drawableElements = new HashMap<DrawableType,List<DrawableElement>>();
 		this.listeners = new ArrayList<DrawControllerListener>();
 		this.yAxisSet = new HashSet<YAxisElement>();
 	}
@@ -37,7 +38,9 @@ public class DrawControllerData {
 	}
 
 	public Set<YAxisElement> getyAxisSet() {
-		return yAxisSet;
+		synchronized (yAxisSet) {
+			return yAxisSet;
+		}
 	}
 
 	public void setyAxisSet(Set<YAxisElement> yAxisSet) {
@@ -73,23 +76,31 @@ public class DrawControllerData {
 	public void addDrawableElement(DrawableElement element) {
 		List<DrawableElement> elements = drawableElements.get(element.getDrawableElementType().getLevel());
 		if (elements == null){
-			elements = new ArrayList<DrawableElement>();
+			elements = Collections.synchronizedList(new ArrayList<DrawableElement>());
 			drawableElements.put(element.getDrawableElementType().getLevel(), elements);
 		}
-		elements.add(element);
-		yAxisSet.add(element.getYAxisElement());
-		nrOfDrawableElements++;
-		Log.debug("*********************** yAxisSet element count: " + yAxisSet.size());
+		synchronized (elements) {
+			elements.add(element);
+			synchronized (yAxisSet) {
+				yAxisSet.add(element.getYAxisElement());
+			}
+			nrOfDrawableElements++;
+			//Log.debug("*********************** yAxisSet element count: " + yAxisSet.size());
+		}
 	}
 
 	public void removeDrawableElement(DrawableElement element) {
 		List<DrawableElement> elements = drawableElements.get(element.getDrawableElementType().getLevel());
 		if (elements != null){
-			elements.remove(element);
-			nrOfDrawableElements--;
-			if (elements.isEmpty()){
-				yAxisSet.remove(element.getYAxisElement());
+			synchronized(elements){
+				elements.remove(element);
+				nrOfDrawableElements--;
+				if (elements.isEmpty()){
+					synchronized (yAxisSet) {
+						yAxisSet.remove(element.getYAxisElement());
+					}
+				}
 			}
-		}		
+		}
 	}	
 }

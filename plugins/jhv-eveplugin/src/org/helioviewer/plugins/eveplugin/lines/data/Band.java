@@ -118,5 +118,10 @@ public class Band implements LineDataSelectorElement{
 	@Override
 	public boolean isAvailable() {
 		return BandController.getSingletonInstance().isBandAvailable(plotIdentifier,this);
+	}
+
+	@Override
+	public String getUnitLabel() {
+		return bandType.getUnitLabel();
 	}	
 }

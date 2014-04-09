@@ -132,10 +132,10 @@ public class BandTypeAPI extends APIAbstract{
 	        		group.add(this.bandtypes[i]);
 	        		this.bandtypes[i].setGroup(group);
 	        	}
-	        	if(job.has("multiplier")){
+	        	/*if(job.has("multiplier")){
 	        		double multiplier = job.getDouble("multiplier");
 	        		this.bandtypes[i].setMultiplier(multiplier);
-	        	}	        	
+	        	}*/	 	        	
 	        }
 		} catch (JSONException e1) {
         	Log.error("JSON parsing error", e1);

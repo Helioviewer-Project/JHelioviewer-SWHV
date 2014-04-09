@@ -38,14 +38,14 @@ public class PlotPanel extends JPanel {
         drawController = new EVEDrawController(identifier);
         
         graphPane = new ChartDrawGraphPane(identifier);
-        valueRangePane = new ChartDrawValueRangePane(drawController);
+        valueRangePane = new ChartDrawValueRangePane(drawController,identifier);
         
         initVisualComponents();
     }
     
     private void initVisualComponents() {
         setLayout(new BorderLayout());
-        setMinimumSize(new Dimension(200, 300));
+        //setMinimumSize(new Dimension(200, 300));
         
         
         plotPane.setLayout(new BorderLayout());

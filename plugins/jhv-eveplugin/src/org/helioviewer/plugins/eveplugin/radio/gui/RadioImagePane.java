@@ -278,7 +278,7 @@ public class RadioImagePane implements ImageObserver, RadioPlotModelListener, Dr
 	@Override
 	public boolean imageUpdate(Image img, int infoflags, int x, int y,
 			int width, int height) {
-		Log.debug("Image was updated "+ img);
+		//Log.debug("Image was updated "+ img);
 		return false;
 	}
 
@@ -300,7 +300,8 @@ public class RadioImagePane implements ImageObserver, RadioPlotModelListener, Dr
 	public void draw(Graphics g, Rectangle graphArea) {
 		Collection<PlotConfig> configs = RadioPlotModel.getSingletonInstance().getPlotConfigurations();
 		for(PlotConfig pc : configs){
-			Log.debug("Width when drawn is requested : " + pc.getDrawWidth());
+			//Log.debug("Width when drawn is requested : " + pc.getDrawWidth());
+			//Log.debug("Image id : "+ pc.getImageId());
 			pc.draw(g);
 		}		
 	}
