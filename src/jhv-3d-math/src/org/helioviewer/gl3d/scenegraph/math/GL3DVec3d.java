@@ -227,9 +227,8 @@ public class GL3DVec3d {
         if (len <= 1.0)
             return this;
 
-        // this.divide(Math.nextAfter(len, len + 1.0));
-        // instead assume error is 1 ulp
-        this.divide(0x1.0000000000001p+0);
+        // errors up to 2ulp found in testing
+        this.divide(Math.nextAfter(len, len + 1.0));
 
         // take shortcut, reasonably close to 1
         len = Math.sqrt(this.x * this.x + this.y * this.y + this.z * this.z);
@@ -242,7 +241,7 @@ public class GL3DVec3d {
         Log.error("The length of the vector is bigger than 1");
         System.exit(1);
 
-        return ZERO;
+        return null;
     }
 
     public double[] toArray() {
