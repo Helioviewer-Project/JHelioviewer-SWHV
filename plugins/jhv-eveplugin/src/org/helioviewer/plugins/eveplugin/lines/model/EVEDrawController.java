@@ -354,7 +354,7 @@ public class EVEDrawController implements BandControllerListener, ZoomController
 		double selectedStart = Math.pow(10,Math.log10(availableRange.min) + diffSelectedStart / diffScaledAvailable * diffAvaliable);
 		double selectedEnd = Math.pow(10,Math.log10(availableRange.min) + diffSelectedEnd / diffScaledAvailable * diffAvaliable);
 		if(selectedStart != selectedRange.min || selectedEnd != selectedRange.max){
-			Log.error("Set selected range");
+			//Log.error("Set selected range");
 			setSelectedRange(new Range(selectedStart, selectedEnd));
 		}else{
 			Log.error("Just do a fire redraw request");
