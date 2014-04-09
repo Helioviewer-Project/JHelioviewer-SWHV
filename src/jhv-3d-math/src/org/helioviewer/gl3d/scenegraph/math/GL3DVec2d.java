@@ -173,9 +173,8 @@ public class GL3DVec2d {
         if (len <= 1.0)
             return this;
 
-        // this.divide(Math.nextAfter(len, len + 1.0));
-        // instead assume error is 1 ulp
-        this.divide(0x1.0000000000001p+0);
+        // errors up to 2ulp found in testing
+        this.divide(Math.nextAfter(len, len + 1.0));
 
         // take shortcut, reasonably close to 1
         len = Math.sqrt(this.x * this.x + this.y * this.y);
@@ -188,15 +187,11 @@ public class GL3DVec2d {
         Log.error("The length of the vector is bigger than 1");
         System.exit(1);
 
-        return ZERO;
+        return null;
     }
 
     public double[] toArray() {
         return new double[] { x, y };
-    }
-
-    public String toString() {
-        return "(" + x + ", " + y + ")";
     }
 
     public boolean equals(Object o) {
@@ -217,5 +212,9 @@ public class GL3DVec2d {
             arr[i * 2 + 1] = v.y;
         }
         return arr;
+    }
+
+    public String toString() {
+        return "(" + x + ", " + y + ")";
     }
 }
