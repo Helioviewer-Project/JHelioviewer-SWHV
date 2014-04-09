@@ -2,7 +2,9 @@ package org.helioviewer.plugins.eveplugin.radio.data;
 
 import java.awt.Color;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.helioviewer.plugins.eveplugin.radio.model.ResolutionSetting;
 import org.helioviewer.plugins.eveplugin.view.linedataselector.LineDataSelectorElement;
@@ -10,8 +12,8 @@ import org.helioviewer.viewmodel.view.jp2view.image.ResolutionSet;
 
 public class DownloadRequestData implements LineDataSelectorElement{
 
-	private List<RadioImage> radioImages;
-	private Long ID;
+	private Map<Long,RadioImage> radioImages;
+	private Long downloadID;
 	private boolean isDownloading;
 	private String plotIdentifier = "plot.identifier.master";
 	private boolean isVisible;
@@ -20,37 +22,37 @@ public class DownloadRequestData implements LineDataSelectorElement{
 	
 	public DownloadRequestData(long ID, String plotIdentifier) {
 		this.radioDataManager = RadioDataManager.getSingletonInstance();
-		this.ID = ID;
-		this.radioImages = new ArrayList<RadioImage>();
+		this.downloadID = ID;
+		this.radioImages = new HashMap<Long,RadioImage>();
 		this.plotIdentifier = plotIdentifier;
 		this.isVisible = true;
 	}
 
-	public DownloadRequestData(long ID, List<RadioImage> radioImages, String plotIdentifier) {
-		this.ID = ID;
+	public DownloadRequestData(long ID, Map<Long,RadioImage> radioImages, String plotIdentifier) {
+		this.downloadID = ID;
 		this.radioImages = radioImages;
 		this.plotIdentifier = plotIdentifier;
 		this.isVisible = true;
 	}
 	
 	public void addRadioImage(RadioImage radioImage){
-		this.radioImages.add(radioImage);
+		this.radioImages.put(radioImage.getRadioImageID(), radioImage);
 	}
 
-	public List<RadioImage> getRadioImages() {
+	public Map<Long,RadioImage> getRadioImages() {
 		return radioImages;
 	}
 
-	public void setRadioImages(List<RadioImage> radioImages) {
+	public void setRadioImages(Map<Long,RadioImage> radioImages) {
 		this.radioImages = radioImages;
 	}
 
-	public Long getID() {
-		return ID;
+	public Long getDownloadID() {
+		return downloadID;
 	}
 
-	public void setID(Long iD) {
-		ID = iD;
+	public void setDownloadID(Long iD) {
+		downloadID = iD;
 	}
 
 	@Override
@@ -108,5 +110,11 @@ public class DownloadRequestData implements LineDataSelectorElement{
 	
 	public void setDownloading(boolean isDownloading){
 		this.isDownloading = isDownloading;
+	}
+
+	@Override
+	public String getUnitLabel() {
+		// TODO Auto-generated method stub
+		return "Don't know yet";
 	}
 }

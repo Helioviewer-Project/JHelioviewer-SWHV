@@ -7,6 +7,7 @@ import javax.swing.JPanel;
 
 import org.helioviewer.base.math.Interval;
 import org.helioviewer.plugins.eveplugin.controller.ZoomController;
+//import org.helioviewer.plugins.eveplugin.model.PlotTimeSpace;
 import org.helioviewer.plugins.eveplugin.view.plot.PlotsControlPanel;
 import org.helioviewer.plugins.eveplugin.view.plot.PlotsContainerPanel;
 
@@ -29,6 +30,7 @@ public class MainPanel extends JPanel {
         initVisualComponents();
         
         ZoomController.getSingletonInstance().setAvailableInterval(new Interval<Date>(new Date(), new Date()));
+        //PlotTimeSpace.getInstance().setMinAndMaxTime(new Date(), new Date());
     }
     
     private void initVisualComponents() {

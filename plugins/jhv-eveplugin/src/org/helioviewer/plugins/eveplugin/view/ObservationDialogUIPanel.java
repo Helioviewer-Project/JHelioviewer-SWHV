@@ -27,6 +27,7 @@ import org.helioviewer.jhv.gui.dialogs.observation.ObservationDialogPanel;
 import org.helioviewer.plugins.eveplugin.controller.ZoomController;
 import org.helioviewer.plugins.eveplugin.lines.data.BandController;
 import org.helioviewer.plugins.eveplugin.lines.data.EVECacheController;
+//import org.helioviewer.plugins.eveplugin.model.PlotTimeSpace;
 import org.helioviewer.plugins.eveplugin.settings.EVEAPI.API_URL_PARAMETER_TYPE_VALUES;
 import org.helioviewer.plugins.eveplugin.settings.BandType;
 import org.helioviewer.plugins.eveplugin.settings.BandGroup;
@@ -46,7 +47,7 @@ public class ObservationDialogUIPanel extends SimpleObservationDialogUIPanel{//O
     
     //private static final long serialVersionUID = 1L;
     
-    private static final String[] DATA_LABEL_TEXTS = new String[] {"Band", "Band", "Diodes", "Lines"};
+    //private static final String[] DATA_LABEL_TEXTS = new String[] {"Band", "Band", "Diodes", "Lines"};
     
     /*private final PlotsContainerPanel plotsContainerPanel;
     
@@ -138,8 +139,7 @@ public class ObservationDialogUIPanel extends SimpleObservationDialogUIPanel{//O
     
     private void updateGroupValues() {
         // change text of data label
-        labelData.setText(DATA_LABEL_TEXTS[comboBoxGroup.getSelectedIndex()]);
-        
+        labelData.setText("Dataset");
         // update values in data combobox
         final BandController bandController = BandController.getSingletonInstance();
         final DefaultComboBoxModel model = (DefaultComboBoxModel) comboBoxData.getModel(); 
@@ -205,6 +205,7 @@ public class ObservationDialogUIPanel extends SimpleObservationDialogUIPanel{//O
     
     private void updateZoomController() {
         ZoomController.getSingletonInstance().setAvailableInterval(new Interval<Date>(getStartDate(), getEndDate()));
+    	//PlotTimeSpace.getInstance().setMinAndMaxTime(getStartDate(), getEndDate());
     }
     
     private void updateBandController() {

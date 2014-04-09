@@ -11,6 +11,8 @@ import org.helioviewer.jhv.gui.ImageViewerGui;
 import org.helioviewer.jhv.gui.dialogs.observation.ObservationDialog;
 import org.helioviewer.jhv.gui.interfaces.MainContentPanelPlugin;
 import org.helioviewer.plugins.eveplugin.lines.data.DatabaseController;
+import org.helioviewer.plugins.eveplugin.model.PlotAreaSpace;
+//import org.helioviewer.plugins.eveplugin.model.PlotTimeSpace;
 import org.helioviewer.plugins.eveplugin.radio.data.RadioDataManager;
 import org.helioviewer.plugins.eveplugin.radio.model.RadioPlotModel;
 import org.helioviewer.plugins.eveplugin.settings.EVESettings;
@@ -45,6 +47,8 @@ public class EVEPlugin implements Plugin, MainContentPanelPlugin {
         // initialize database connection
         DatabaseController.getSingletonInstance();
         RadioPlotModel.getSingletonInstance();
+        //PlotAreaSpace.getInstance();
+        //PlotTimeSpace.getInstance();
     }
 
     public void uninstallPlugin() {
@@ -87,7 +91,7 @@ public class EVEPlugin implements Plugin, MainContentPanelPlugin {
     }
 
     public String getTabName() {
-        return "EVE";
+        return "1-D and 2-D Time Series";
     }
 
     public void setState(String state) {

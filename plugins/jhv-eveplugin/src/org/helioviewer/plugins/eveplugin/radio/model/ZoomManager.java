@@ -51,7 +51,7 @@ public class ZoomManager implements ZoomControllerListener{
 		if(!idenSize.equals(displaySize)){
 			//if(!(displaySize.width <=0 || displaySize.height <= 0)){
 			zmd.setDisplaySize(displaySize);
-			Log.debug("Display size for identifier " + identifier + "  is now: "+ displaySize.toString());
+			//Log.debug("Display size for identifier " + identifier + "  is now: "+ displaySize.toString());
 			fireDisplaySizeChanged(identifier);
 		}	
 	}
@@ -103,9 +103,9 @@ public class ZoomManager implements ZoomControllerListener{
 		}		
 	}
 	
-	public DrawableAreaMap getDrawableAreaMap(Date startDate, Date endDate,int startFrequency, int endFrequency, Rectangle area, long ID, String identifier){
-		ZoomManagerData zmd = getZoomManagerData(identifier);
-		ZoomDataConfig zdc = zmd.getZoomDataConfigMap().get(ID);
+	public DrawableAreaMap getDrawableAreaMap(Date startDate, Date endDate,int startFrequency, int endFrequency, Rectangle area, long downloadID, String plotIdentifier){
+		ZoomManagerData zmd = getZoomManagerData(plotIdentifier);
+		ZoomDataConfig zdc = zmd.getZoomDataConfigMap().get(downloadID);
 		int sourceX0 = defineXInSourceArea(startDate,startDate,endDate, area);
 		int sourceY0 = defineYInSourceArea(startFrequency, startFrequency, endFrequency, area,zdc);
 		int sourceX1 = defineXInSourceArea(endDate, startDate, endDate, area);
@@ -114,7 +114,7 @@ public class ZoomManager implements ZoomControllerListener{
 		int destY0 = defineYInDestinationArea(startFrequency,zdc);
 		int destX1 = defineXInDestinationArea(endDate,zdc);
 		int destY1 = defineYInDestinationArea(endFrequency,zdc);
-		return new DrawableAreaMap(sourceX0, sourceY0, sourceX1, sourceY1, destX0, destY0, destX1, destY1, ID);
+		return new DrawableAreaMap(sourceX0, sourceY0, sourceX1, sourceY1, destX0, destY0, destX1, destY1, downloadID);
 	}
 
 	private int defineYInDestinationArea(int frequencyToFind,ZoomDataConfig zdc) {

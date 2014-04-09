@@ -5,6 +5,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.GregorianCalendar;
 import java.util.List;
 import java.util.TimeZone;
 
@@ -23,9 +24,13 @@ public class RadioDownloader implements DataDownloader{
 	//give the data for a certain zoomlevel and timerange
 	private static RadioDownloader instance;
 	private List<RadioDownloaderListener> listeners;
+	private RadioImageCache cache;
+	
+	private final long MAXIMUM_DAYS = 172800000;
 	
 	private RadioDownloader(){
 		this.listeners = new ArrayList<RadioDownloaderListener>();
+		this.cache = RadioImageCache.getInstance();
 	}
 	
 	public static RadioDownloader getSingletonInstance(){
@@ -35,15 +40,15 @@ public class RadioDownloader implements DataDownloader{
 		return instance;
 	}
 	
-	public void requestAndOpenRemoteFile(String startTime, String endTime, String identifier){
+	public void requestAndOpenRemoteFile(String startDateString, String endDateString, String identifier){
 		Thread thread = new Thread(new Runnable() {
-			private String startTime;
-			private String endTime;
+			private String startDataString;
+			private String endDateString;
 			private String identifier;
 			
 			public Runnable init(String startTime, String endTime, String identifier){
-				this.startTime = startTime;
-				this.endTime = endTime;
+				this.startDataString = startTime;
+				this.endDateString = endTime;
 				this.identifier = identifier;
 				Log.debug("Starttime : "+ startTime);
 				Log.debug("Endtime : "+ endTime);
@@ -53,19 +58,131 @@ public class RadioDownloader implements DataDownloader{
             public void run() {
 
                 try {
-                    ImageInfoView v = APIRequestManager.requestAndOpenRemoteFile(false, null, startTime, endTime, "ROB-Humain", "CALLISTO","CALLISTO", "RADIOGRAM");
-                    //dataManager.addNewView(v);
-                    fireNewImageViewDownloaded(v, startTime, endTime, Math.round(1000000*Math.random()), identifier);
+                	Log.debug("Request for date "+ startDataString + " - " + endDateString);
+                	long duration = calculateFrequencyDuration(startDataString, endDateString);
+                	long downloadID = Math.round(1000000*Math.random());
+                	if(duration >= 0 && duration<= MAXIMUM_DAYS){
+                		Date startDate = parseDate(startDataString);
+                		Date requestedStartDate = new Date(startDate.getTime());
+                		Date endDate = parseDate(endDateString);
+                		if(endDate != null && startDate != null){
+                			//GregorianCalendar startGreg = new GregorianCalendar();
+                			//startGreg.setTime(startDate);
+                			endDate.setTime(endDate.getTime());
+                			//case there were not more than three days
+                			List<DownloadedJPXData> jpxList = new ArrayList<DownloadedJPXData>();
+                			while(startDate.before(endDate)||startDate.equals(endDate)){
+                				//String startDatePlusOne = calculateOneDayFurtherAsString(startDate);
+                				ImageInfoView v = APIRequestManager.requestAndOpenRemoteFile(false, null, createDateString(startDate), createDateString(startDate), "ROB-Humain", "CALLISTO","CALLISTO", "RADIOGRAM");
+                		//dataManager.addNewView(v);
+                				if(v != null){
+                					Long imageID = Math.round(1000000*Math.random());
+                					Log.debug("bbbbbbbbbbbbbb Image ID "+ imageID + " bbbbbbbbbbbbbbbbbbbbbbbbbbbb");
+                					DownloadedJPXData newJPXData = new DownloadedJPXData(v, imageID, startDate, endDate, identifier,downloadID);
+                					jpxList.add(newJPXData);
+                					cache.add(newJPXData);
+                				}else{
+                					Log.error("Received null view for date "+ startDate+ " and " + endDate);
+                				}
+                				startDate = calculateOneDayFurtherAsDate(startDate);
+                			}
+                			fireNewJPXDataAvailable(jpxList, identifier,requestedStartDate, endDate,downloadID);
+                		}else{
+                			
+                		}
+                	}else{
+                		
+                		//ImageInfoView v = APIRequestManager.requestAndOpenRemoteFile(false, null, startTime, endTime, "ROB-Humain", "CALLISTO","CALLISTO", "RADIOGRAM");
+                		
+                	}
                 } catch (IOException e) {
                     Log.error("An error occured while opening the remote file!", e);
                     Message.err("An error occured while opening the remote file!", e.getMessage(), false);
                 } 
-            }
-            
-            
-        }.init(startTime, endTime, identifier), "LoadNewImage");
+            }           
+        }.init(startDateString, endDateString, identifier), "LoadNewImage");
 
         thread.start();
+	}
+	
+	public void requestAndOpenIntervals(List<Interval<Date>> intervals, Long downloadId, String plotIdentifier, double ratioX, double ratioY){
+		for (Interval<Date> interval : intervals){
+			Log.debug("Request for data for interval "+ interval.getStart() + " - " + interval.getEnd());
+			Thread thread = new Thread(new Runnable() {
+				private String startDataString;
+				private String endDateString;
+				private String identifier;
+				private Long downloadID;
+				private double ratioX;
+				private double ratioY;
+				
+				public Runnable init(String startTime, String endTime, String identifier, Long downloadID, double ratioX, double ratioY){
+					this.startDataString = startTime;
+					this.endDateString = endTime;
+					this.identifier = identifier;
+					this.downloadID = downloadID;
+					this.ratioX = ratioX;
+					this.ratioY = ratioY;
+					//Log.debug("Starttime : "+ startTime);
+					//Log.debug("Endtime : "+ endTime);
+					return this;				
+				}
+				
+	            public void run() {	
+	                try {
+	                	
+	                	Date startDate = parseDate(startDataString);
+	                	Date requestedStartDate = new Date(startDate.getTime());
+	                	Date endDate = parseDate(endDateString);
+                		if(endDate != null && startDate != null){
+                			//GregorianCalendar startGreg = new GregorianCalendar();
+                			//startGreg.setTime(startDate);
+                			endDate.setTime(endDate.getTime());
+                			//case there were not more than three days
+                			List<DownloadedJPXData> jpxList = new ArrayList<DownloadedJPXData>();
+                			while(startDate.before(endDate)||startDate.equals(endDate)){
+                				//String startDatePlusOne = calculateOneDayFurtherAsString(startDate);
+                				ImageInfoView v = APIRequestManager.requestAndOpenRemoteFile(false, null, createDateString(startDate), createDateString(startDate), "ROB-Humain", "CALLISTO","CALLISTO", "RADIOGRAM");
+                		//dataManager.addNewView(v);
+                				if(v != null){
+                					Long imageID = Math.round(1000000*Math.random());
+                					//Log.debug("cccccccccccc Image ID "+ imageID + " cccccccccccccccccccccccccccccc");
+                					DownloadedJPXData newJPXData = new DownloadedJPXData(v,imageID , startDate, endDate, identifier,downloadID);
+                					jpxList.add(newJPXData);
+                					cache.add(newJPXData);
+                				}else {
+                					//Log.error("Received null view for date "+ startDate+ " and " + endDate);
+                				}
+                				startDate = calculateOneDayFurtherAsDate(startDate);
+                			}
+                			fireAdditionalJPXDataAvailable(jpxList, identifier,requestedStartDate, endDate,downloadID, ratioX, ratioY);
+                		}else{
+                			
+                		}	                	
+	                } catch (IOException e) {
+	                    Log.error("An error occured while opening the remote file!", e);
+	                    Message.err("An error occured while opening the remote file!", e.getMessage(), false);
+	                } 
+	            }
+				          
+	        }.init(createDateString(interval.getStart()), createDateString(interval.getEnd()), plotIdentifier, downloadId, ratioX, ratioY), "LoadNewImage");
+	
+	        thread.start();
+		}
+	}
+	
+	private void fireAdditionalJPXDataAvailable(
+			List<DownloadedJPXData> jpxList, String plotIdentifier,
+			Date startDate, Date endDate, Long downloadID, double ratioX, double ratioY) {
+		for(RadioDownloaderListener l : listeners){
+			l.newAdditionalDataDownloaded(jpxList, downloadID, plotIdentifier, ratioX, ratioY);
+		}
+	} 
+	
+	private void fireNewJPXDataAvailable(List<DownloadedJPXData> jpxList, String plotIdentifier, Date startDate, Date endDate,Long downloadID) {
+		for(RadioDownloaderListener l : listeners){
+			l.newJPXFilesDownloaded(jpxList, startDate,endDate,downloadID, plotIdentifier);
+		}
 	}
 	
 	public void addRadioDownloaderListener(RadioDownloaderListener l){
@@ -76,6 +193,53 @@ public class RadioDownloader implements DataDownloader{
 		listeners.remove(l);
 	}
 
+	private long calculateFrequencyDuration(String startTime,String endTime) {
+		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
+		sdf.setTimeZone(TimeZone.getTimeZone("UTC"));
+		Date start;
+		try {
+			start = sdf.parse(startTime);
+			Date end = sdf.parse(endTime);
+			return end.getTime()-start.getTime();
+		} catch (ParseException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			return -1;
+		}
+		
+	}
+	
+	private String calculateOneDayFurtherAsString(String date){
+		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
+		try {
+			return sdf.format(new Date(sdf.parse(date).getTime()+86400000));
+		} catch (ParseException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			return null;
+		}
+	}
+	
+	private Date calculateOneDayFurtherAsDate(String date){
+		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
+		try {
+			return new Date(sdf.parse(date).getTime()+86400000);
+		} catch (ParseException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			return null;
+		}
+	}
+	
+	private String calculateOneDayFurtherAsString(Date date){
+		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
+		return sdf.format(new Date(date.getTime()+86400000));
+	}
+	
+	private Date calculateOneDayFurtherAsDate(Date date){
+		return new Date(date.getTime()+86400000);
+	}
+	
 	/*private void fireNewDownloadRequested(String startTime, String endTime) {
 		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
 		sdf.setTimeZone(TimeZone.getTimeZone("UTC"));
@@ -110,5 +274,22 @@ public class RadioDownloader implements DataDownloader{
 		return null;
 	}
 	
+	private Date parseDate(String date){
+		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
+		sdf.setTimeZone(TimeZone.getTimeZone("UTC"));
+		try {
+			return sdf.parse(date);
+		} catch (ParseException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			return null;
+		}
+	}
+	
+	private String createDateString(Date date){
+		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
+		sdf.setTimeZone(TimeZone.getTimeZone("UTC"));
+		return sdf.format(date);
+	}
 	
 }

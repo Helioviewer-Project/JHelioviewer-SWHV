@@ -1,0 +1,15 @@
+*.class
+*.snap
+*.index
+.location
+jhv-3d-wcs/.metadata
+jhv-3d-wcs/src/jhv/bin
+jhv-3d-wcs/src/jhv-3d-plugin-vectors/bin
+jhv-3d-wcs/src/jhv-3d-plugin-pfss/bin
+jhv-3d-wcs/src/JHVVectors/bin
+jhv-3d-wcs/plugins/hek-plugin3d/.bzr
+*.new
+jhv-3d-wcs/temp
+jhv-3d-wcs/build
+jhv-3d-wcs/JHelioviewer.jar
+jhv-3d-wcs/plugins/jhv-eveplugin/derby.log

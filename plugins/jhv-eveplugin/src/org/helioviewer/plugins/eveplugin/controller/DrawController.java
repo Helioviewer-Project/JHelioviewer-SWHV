@@ -11,6 +11,8 @@ import java.util.Set;
 
 import org.helioviewer.base.logging.Log;
 import org.helioviewer.base.math.Interval;
+import org.helioviewer.jhv.layers.LayersListener;
+import org.helioviewer.jhv.layers.LayersModel;
 import org.helioviewer.plugins.eveplugin.base.Range;
 import org.helioviewer.plugins.eveplugin.draw.DrawableElement;
 import org.helioviewer.plugins.eveplugin.draw.DrawableType;
@@ -19,8 +21,10 @@ import org.helioviewer.plugins.eveplugin.settings.EVEAPI.API_RESOLUTION_AVERAGES
 import org.helioviewer.plugins.eveplugin.view.linedataselector.LineDataSelectorElement;
 import org.helioviewer.plugins.eveplugin.view.linedataselector.LineDataSelectorModel;
 import org.helioviewer.plugins.eveplugin.view.linedataselector.LineDataSelectorModelListener;
+import org.helioviewer.viewmodel.view.View;
+import org.helioviewer.viewmodel.view.jp2view.datetime.ImmutableDateTime;
 
-public class DrawController implements ZoomControllerListener, LineDataSelectorModelListener{
+public class DrawController implements ZoomControllerListener, LineDataSelectorModelListener, LayersListener{
 	
 	private static DrawController instance;
 	private Map<String,DrawControllerData> drawControllerData;
@@ -40,6 +44,7 @@ public class DrawController implements ZoomControllerListener, LineDataSelectorM
 		//this.yAxisSet = new HashMap<String,Set<YAxisElement>>();
 		ZoomController.getSingletonInstance().addZoomControllerListener(this);
 		LineDataSelectorModel.getSingletonInstance().addLineDataSelectorModelListener(this);
+		LayersModel.getSingletonInstance().addLayersListener(this);
 	}
 
 	public static DrawController getSingletonInstance(){
@@ -71,22 +76,35 @@ public class DrawController implements ZoomControllerListener, LineDataSelectorM
 	}
 	
 	public void addDrawableElement(DrawableElement element,String identifier){
-		DrawControllerData dcd = getDrawControllerData(identifier);
-		dcd.addDrawableElement(element);
-		
-		this.fireRedrawRequest(identifier);
+		addDrawableElement(element,identifier, true);
 	}
 	
 	public void updateDrawableElement(DrawableElement drawableElement, String identifier){
-		this.removeDrawableElement(drawableElement, identifier);
-		this.addDrawableElement(drawableElement, identifier);
+		synchronized(this){
+			removeDrawableElement(drawableElement,identifier,false);
+			this.addDrawableElement(drawableElement, identifier, false);
+		}
 		this.fireRedrawRequest(identifier);
 	}
 	
-	public void removeDrawableElement(DrawableElement element,String identifier){
+	private void addDrawableElement(DrawableElement element,String identifier, boolean redraw){
+		DrawControllerData dcd = getDrawControllerData(identifier);
+		dcd.addDrawableElement(element);
+		if(redraw){
+			this.fireRedrawRequest(identifier);
+		}
+	}
+	
+	private void removeDrawableElement(DrawableElement element, String identifier, boolean redraw){
 		DrawControllerData dcd = getDrawControllerData(identifier);
 		dcd.removeDrawableElement(element);
-		this.fireRedrawRequest(identifier);
+		if(redraw){
+			this.fireRedrawRequest(identifier);
+		}
+	}
+	
+	public void removeDrawableElement(DrawableElement element,String identifier){
+		removeDrawableElement(element,identifier,true);
 	}
 	
 	public int getNumberOfYAxis(String identifier){
@@ -105,23 +123,27 @@ public class DrawController implements ZoomControllerListener, LineDataSelectorM
 	}
 	
 	public List<DrawableElement> getAllDrawableElements(String identifier){
-		Collection<List<DrawableElement>> allValues = getDrawableElements(identifier).values();
-		ArrayList<DrawableElement> deList = new ArrayList<DrawableElement>();
-		for(List<DrawableElement> tempList: allValues){
-			deList.addAll(tempList);
+		synchronized(this){
+			Collection<List<DrawableElement>> allValues = getDrawableElements(identifier).values();
+			ArrayList<DrawableElement> deList = new ArrayList<DrawableElement>();
+			for(List<DrawableElement> tempList: allValues){
+				deList.addAll(tempList);
+			}
+			return deList;
 		}
-		return deList;
 	}
 	
 	public boolean hasElementsToBeDrawn(String identifier){
-		List<DrawableElement> allElements = this.getAllDrawableElements(identifier);
-		for (DrawableElement de : allElements){
-			if (de.hasElementsToDraw()){
-				return true;
+		synchronized(this){
+			List<DrawableElement> allElements = this.getAllDrawableElements(identifier);
+			for (DrawableElement de : allElements){
+				if (de.hasElementsToDraw()){
+					return true;
+				}
 			}
+			return false;
+			//return nrOfDrawableElement > 0;
 		}
-		return false;
-		//return nrOfDrawableElement > 0;
 	}
 	
 	public boolean getIntervalAvailable(){
@@ -210,10 +232,68 @@ public class DrawController implements ZoomControllerListener, LineDataSelectorM
 
 	@Override
 	public void lineDataUpdated(LineDataSelectorElement element) {
-		fireRedrawRequest(element.getPlotIdentifier());
+		fireRedrawRequest(element.getPlotIdentifier());		
+	}
+
+	@Override
+	public void layerAdded(int idx) {
+		// TODO Auto-generated method stub
 		
 	}
 
+	@Override
+	public void layerRemoved(View oldView, int oldIdx) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void layerChanged(int idx) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void activeLayerChanged(int idx) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void viewportGeometryChanged() {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void timestampChanged(int idx) {
+		final ImmutableDateTime timestamp = LayersModel.getSingletonInstance().getCurrentFrameTimestamp(idx);
+        fireRedrawRequestMovieFrameChanged(timestamp.getTime());
+		
+	}
+
+	private void fireRedrawRequestMovieFrameChanged(Date time) {
+		for (DrawControllerData dcd : drawControllerData.values()){
+			for(DrawControllerListener l : dcd.getListeners()){
+				l.drawMovieLineRequest(time);
+			}
+		}
+		
+	}
+
+	@Override
+	public void subImageDataChanged() {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void layerDownloaded(int idx) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	
 
 	/*public double getLogMinValue(){
 		if (selectedRange == null){

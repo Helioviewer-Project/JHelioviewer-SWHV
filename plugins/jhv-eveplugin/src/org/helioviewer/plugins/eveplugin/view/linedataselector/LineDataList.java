@@ -89,6 +89,7 @@ public class LineDataList extends JPanel implements LineDataSelectorModelListene
                 selectItem(i);
             }
         }
+        repaint();
     }
     
     private void addEntry(final LineDataSelectorElement element) {
@@ -221,7 +222,7 @@ public class LineDataList extends JPanel implements LineDataSelectorModelListene
         }
 		if(toRemove != null){
 			entryList.remove(toRemove);
-			Log.debug("Remove entry from compnent.");
+			//Log.debug("Remove entry from compnent.");
 			remove(toRemove);
 			repaint();
 		}

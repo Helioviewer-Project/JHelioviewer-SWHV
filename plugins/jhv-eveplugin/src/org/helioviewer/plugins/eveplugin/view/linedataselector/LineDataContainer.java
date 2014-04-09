@@ -85,6 +85,8 @@ public class LineDataContainer extends JPanel implements LineDataSelectorModelLi
     private void update() {
         if (lineDataModel.getNumberOfAvailableLineData(identifier)>0) {
             layout.show(this, "list");
+            listScrollPane.revalidate();
+            listScrollPane.repaint();
         } else {
             layout.show(this, "empty");
         }

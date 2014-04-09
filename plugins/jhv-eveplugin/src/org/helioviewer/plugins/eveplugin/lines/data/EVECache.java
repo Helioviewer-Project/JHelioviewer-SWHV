@@ -45,7 +45,8 @@ public class EVECache {
         }
     }
     
-    public EVEValues getValuesInInterval(final Interval<Date> interval, double multiplier) {
+    //public EVEValues getValuesInInterval(final Interval<Date> interval, double multiplier) {
+    public EVEValues getValuesInInterval(final Interval<Date> interval) {
         final EVEValues result = new EVEValues();
         
         final GregorianCalendar calendar = new GregorianCalendar();
@@ -65,7 +66,7 @@ public class EVECache {
             final EVEValue[] values = cache.getValuesInInterval(interval);
             for (int i = 0; i < values.length; i++) {
             	if(values[i]!=null && values[i].value!=null){
-            		values[i].value = values[i].value*multiplier;
+            		values[i].value = values[i].value;//*multiplier;
                 	result.addValue(values[i]);
             	}
             }

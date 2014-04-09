@@ -16,6 +16,7 @@ import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 
+import org.helioviewer.base.logging.Log;
 import org.helioviewer.base.math.Interval;
 import org.helioviewer.jhv.gui.IconBank;
 import org.helioviewer.jhv.gui.IconBank.JHVIcon;
@@ -25,6 +26,7 @@ import org.helioviewer.jhv.layers.LayersModel;
 import org.helioviewer.plugins.eveplugin.controller.ZoomController;
 import org.helioviewer.plugins.eveplugin.controller.ZoomController.ZOOM;
 import org.helioviewer.plugins.eveplugin.controller.ZoomControllerListener;
+//import org.helioviewer.plugins.eveplugin.model.PlotTimeSpace;
 import org.helioviewer.plugins.eveplugin.settings.EVEAPI.API_RESOLUTION_AVERAGES;
 import org.helioviewer.plugins.eveplugin.settings.EVESettings;
 import org.helioviewer.plugins.eveplugin.view.periodpicker.PeriodPicker;
@@ -176,9 +178,9 @@ public class PlotsControlPanel extends JPanel implements ZoomControllerListener,
     public void layerAdded(int idx) {
         if (setDefaultPeriod) {
             setDefaultPeriod = false;
-            
             final Interval<Date> interval = new Interval<Date>(LayersModel.getSingletonInstance().getFirstDate(), LayersModel.getSingletonInstance().getLastDate());
             ZoomController.getSingletonInstance().setAvailableInterval(interval);
+            //PlotTimeSpace.getInstance().setSelectedMinAndMaxTime(interval.getStart(), interval.getEnd());
         }
         
         setEnabledStateOfPeriodMovieButton();
@@ -211,6 +213,9 @@ public class PlotsControlPanel extends JPanel implements ZoomControllerListener,
         
         zoomController.setAvailableInterval(interval);
         zoomController.setSelectedInterval(zoomController.getAvailableInterval());
+        //PlotTimeSpace plotTimeSpace = PlotTimeSpace.getInstance();
+        //plotTimeSpace.setMinAndMaxTime(interval.getStart(), interval.getEnd());
+        //plotTimeSpace.setSelectedMinAndMaxTime(plotTimeSpace.getMinTime(), plotTimeSpace.getMaxTime());
     }
     
     // //////////////////////////////////////////////////////////////////////////////
@@ -228,6 +233,7 @@ public class PlotsControlPanel extends JPanel implements ZoomControllerListener,
         } else if (e.getSource() == periodFromLayersButton) {
             final Interval<Date> interval = new Interval<Date>(LayersModel.getSingletonInstance().getFirstDate(), LayersModel.getSingletonInstance().getLastDate());
             ZoomController.getSingletonInstance().setAvailableInterval(interval);
+            //PlotTimeSpace.getInstance().setSelectedMinAndMaxTime(interval.getStart(), interval.getEnd());
         } else if (e.getSource().equals(addLayerButton)) {
             ObservationDialog.getSingletonInstance().showDialog(EVESettings.OBSERVATION_UI_NAME);
         }

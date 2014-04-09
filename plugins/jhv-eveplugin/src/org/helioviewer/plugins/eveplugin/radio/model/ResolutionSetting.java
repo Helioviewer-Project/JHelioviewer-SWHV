@@ -1,5 +1,7 @@
 package org.helioviewer.plugins.eveplugin.radio.model;
 
+import java.awt.Rectangle;
+
 import org.helioviewer.base.math.Vector2dInt;
 
 public class ResolutionSetting {
@@ -75,8 +77,12 @@ public class ResolutionSetting {
 		this.resolutionLevel = resolutionLevel;
 	}
 
-	public Vector2dInt getVec2dIntRepresenation(){
+	public Vector2dInt getVec2dIntRepresentation(){
 		return new Vector2dInt(width,height);
+	}
+	
+	public Rectangle getRectangleRepresentation(){
+		return new Rectangle(width, height);
 	}
 	
 	public boolean equals(Object other){
@@ -88,6 +94,15 @@ public class ResolutionSetting {
 					temprs.getyRatio() == yRatio;
 		}
 		return false;
+	}
+	
+	public String toString(){
+		return 	"x Ratio : " + xRatio + " " + 
+				"y Ratio : " + yRatio + " " +
+				"nb : " + resolutionNb + " " +
+				"level : " + resolutionLevel + " " +
+				"height : " + height + " " + 
+				"width : " + width;
 	}
 	
 }
