@@ -195,6 +195,10 @@ public class GL3DVec2d {
         return new double[] { x, y };
     }
 
+    public String toString() {
+        return "(" + x + ", " + y + ")";
+    }
+
     public boolean equals(Object o) {
         if (o instanceof GL3DVec2d)
             return isApproxEqual((GL3DVec2d) o, 0.0);
