@@ -5,9 +5,14 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-public class ZoomDataConfig implements ZoomManagerListener{
+import org.helioviewer.base.logging.Log;
+import org.helioviewer.plugins.eveplugin.model.PlotAreaSpaceListener;
+
+public class ZoomDataConfig implements ZoomManagerListener,PlotAreaSpaceListener{
 	private double minY;
 	private double maxY;
+	private double selectedMinY;
+	private double selectedMaxY;
 	private Date minX;
 	private Date maxX;
 	private Rectangle displaySize;
@@ -22,6 +27,9 @@ public class ZoomDataConfig implements ZoomManagerListener{
 		this.minX = minX;
 		this.maxY = maxY;
 		this.minY = minY;
+		this.selectedMinY = minY;
+		this.selectedMaxY = maxY;
+		
 		this.displaySize = displaySize;
 		if (displaySize != null){
 			requestData();
@@ -32,7 +40,8 @@ public class ZoomDataConfig implements ZoomManagerListener{
 	public void addListener(ZoomDataConfigListener l){
 		listeners.add(l);
 		double xRatio = 1.0 * (maxX.getTime()-minX.getTime())/displaySize.getWidth();
-		double yRatio = 1.0 * (maxY-minY)/displaySize.getHeight();
+		//double yRatio = 1.0 * (maxY-minY)/displaySize.getHeight();
+		double yRatio = 1.0 * (selectedMaxY-selectedMinY)/displaySize.getHeight();
 		Thread t = new Thread((new Runnable(){
 			ZoomDataConfigListener l;
 			double xRatio;
@@ -40,7 +49,8 @@ public class ZoomDataConfig implements ZoomManagerListener{
 			
 			@Override
 			public void run() {
-				l.requestData(minX, maxX, minY, maxY, xRatio, yRatio, ID);				
+				//l.requestData(minX, maxX, minY, maxY, xRatio, yRatio, ID);
+				l.requestData(minX, maxX, selectedMinY,selectedMaxY, xRatio, yRatio, ID);
 			}
 			
 			public Runnable init(ZoomDataConfigListener l,double xRatio, double yRatio ){
@@ -123,9 +133,9 @@ public class ZoomDataConfig implements ZoomManagerListener{
 	
 	private void requestData(){
 		double xRatio = 1.0 * (maxX.getTime()-minX.getTime())/displaySize.getWidth();
-		double yRatio = 1.0 * (maxY-minY)/displaySize.getHeight();
+		double yRatio = 1.0 * (selectedMaxY-selectedMinY)/displaySize.getHeight();
 		for (ZoomDataConfigListener l : listeners){
-			l.requestData(minX, maxX, minY, maxY, xRatio, yRatio, ID);
+			l.requestData(minX, maxX, selectedMinY,selectedMaxY, xRatio, yRatio, ID);
 		}
 	}
 
@@ -135,4 +145,37 @@ public class ZoomDataConfig implements ZoomManagerListener{
 		this.maxX = maxX;
 		requestData();		
 	}
+
+	@Override
+	public void plotAreaSpaceChanged(double scaledMinValue,
+			double scaledMaxValue, double scaledMinTime, double scaledMaxTime,
+			double scaledSelectedMinValue, double scaledSelectedMaxValue,
+			double scaledSelectedMinTime, double scaledSelectedMaxTime) {
+		synchronized(this){
+			Log.debug("Plot area space changed");
+			double ratioAvailable = (this.maxY - this.minY) / (scaledMaxValue - scaledMinValue);
+			this.selectedMinY = this.minY + (scaledSelectedMinValue - scaledMinValue)*ratioAvailable;
+			this.selectedMaxY = this.minY + (scaledSelectedMaxValue - scaledMinValue)*ratioAvailable;
+			requestData();
+		}
+		
+	}
+
+	public double getSelectedMinY() {
+		return selectedMinY;
+	}
+
+	public void setSelectedMinY(double selectedMinY) {
+		this.selectedMinY = selectedMinY;
+	}
+
+	public double getSelectedMaxY() {
+		return selectedMaxY;
+	}
+
+	public void setSelectedMaxY(double selectedMaxY) {
+		this.selectedMaxY = selectedMaxY;
+	}
+	
+	
 }

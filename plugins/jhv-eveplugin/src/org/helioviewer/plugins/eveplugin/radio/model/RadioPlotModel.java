@@ -25,6 +25,8 @@ import org.helioviewer.plugins.eveplugin.lines.data.EVEValues;
 import org.helioviewer.plugins.eveplugin.lines.model.EVEDrawController;
 import org.helioviewer.plugins.eveplugin.lines.model.EVEDrawControllerListener;
 import org.helioviewer.plugins.eveplugin.model.ChartModel;
+import org.helioviewer.plugins.eveplugin.model.PlotAreaSpace;
+import org.helioviewer.plugins.eveplugin.model.PlotAreaSpaceManager;
 import org.helioviewer.plugins.eveplugin.radio.data.DownloadRequestData;
 import org.helioviewer.plugins.eveplugin.radio.data.FrequencyInterval;
 import org.helioviewer.plugins.eveplugin.radio.data.RadioDataManager;
@@ -65,7 +67,7 @@ public class RadioPlotModel implements RadioDataManagerListener,ZoomControllerLi
 		this.downloadRequestData = new HashMap<Long, DownloadRequestData>();
 		yAxisElement = new YAxisElement();
 		yAxisElement.setColor(Color.BLACK);
-		yAxisElement.setLabel("radio");
+		yAxisElement.setLabel("Mhz");
 		radioImagePane = new RadioImagePane();
 		drawController = DrawController.getSingletonInstance();
 		bufferedImages = new HashMap<Long, BufferedImage>();
@@ -152,10 +154,11 @@ public class RadioPlotModel implements RadioDataManagerListener,ZoomControllerLi
 				Log.debug("destin y1 : " + dam.getDestinationY1());
 				Log.debug("*****************************************************************");*/
 				//warn listeners a new image should be drawn.
-				yAxisElement.setMinValue(freqInterval.getStart());
-				yAxisElement.setMaxValue(freqInterval.getEnd());
+				Range selectedRange = defineSelectedRange(freqInterval.getStart(),freqInterval.getEnd(), identifier);
+				yAxisElement.setMinValue(selectedRange.min);
+				yAxisElement.setMaxValue(selectedRange.max);
 				yAxisElement.setAvailableRange(new Range(freqInterval.getStart(),freqInterval.getEnd()));
-				yAxisElement.setSelectedRange(new Range(freqInterval.getStart(),freqInterval.getEnd()));
+				yAxisElement.setSelectedRange(selectedRange);
 				PlotConfig pc = new PlotConfig(newImage, dam, downloadRequestData.get(ID).isVisible(),ID, radioImageID);
 				if(plotConfigList.containsKey(ID)){
 					plotConfigList.get(ID).put(radioImageID, pc);
@@ -197,6 +200,15 @@ public class RadioPlotModel implements RadioDataManagerListener,ZoomControllerLi
 	}*/
 
 	
+	private Range defineSelectedRange(int start, int end, String identifier) {
+		PlotAreaSpaceManager manager = PlotAreaSpaceManager.getInstance();
+		PlotAreaSpace plotAreaSpace = manager.getPlotAreaSpace(identifier);
+		double ratioAvailable = 1.0*(end - start) / (plotAreaSpace.getScaledMaxValue() - plotAreaSpace.getScaledMinValue());
+		double selectedMinY = 1.0*start + (plotAreaSpace.getScaledSelectedMinValue() - plotAreaSpace.getScaledMinValue())*ratioAvailable;
+		double selectedMaxY = 1.0*start + (plotAreaSpace.getScaledSelectedMaxValue() - plotAreaSpace.getScaledMinValue())*ratioAvailable;
+		return new Range(selectedMinY, selectedMaxY);
+	}
+
 	@Override
 	public void newGlobalFrequencyInterval(FrequencyInterval interval) {
 		this.freqInterval = interval;
@@ -413,10 +425,11 @@ public class RadioPlotModel implements RadioDataManagerListener,ZoomControllerLi
 			Log.debug("destin y1 : " + dam.getDestinationY1());
 			Log.debug("*****************************************************************");*/
 			//warn listeners a new image should be drawn.
-			yAxisElement.setMinValue(freqInterval.getStart());
-			yAxisElement.setMaxValue(freqInterval.getEnd());
+			Range selectedRange = defineSelectedRange(freqInterval.getStart(),freqInterval.getEnd(), identifier);
+			yAxisElement.setMinValue(selectedRange.min);
+			yAxisElement.setMaxValue(selectedRange.max);
 			yAxisElement.setAvailableRange(new Range(freqInterval.getStart(),freqInterval.getEnd()));
-			yAxisElement.setSelectedRange(new Range(freqInterval.getStart(),freqInterval.getEnd()));
+			yAxisElement.setSelectedRange(selectedRange);
 			PlotConfig pc = new PlotConfig(newImage, dam, downloadRequestData.get(downloadID).isVisible(),downloadID, radioImageID );
 			if(plotConfigList.containsKey(downloadID)){
 				plotConfigList.get(downloadID).put(radioImageID,pc);
