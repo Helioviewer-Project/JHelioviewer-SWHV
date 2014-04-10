@@ -468,13 +468,21 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
         
         //final long start = interval.getStart().getTime() + (long)((Math.min(x0, x1) - graphArea.x) / ratioX);
         //final long end = interval.getStart().getTime() + (long)((Math.max(x0, x1) - graphArea.x) / ratioX);
+        List<PlotAreaSpace> pass = new ArrayList<PlotAreaSpace>();
+        Map<PlotAreaSpace,Double> minTime = new HashMap<PlotAreaSpace, Double>();
+        Map<PlotAreaSpace,Double> maxTime = new HashMap<PlotAreaSpace, Double>();
         for(PlotAreaSpace pas : plotAreaSpaceManager.getAllPlotAreaSpaces()){
+        	pass.add(pas);
         	double ratioTime = graphArea.width/(pas.getScaledSelectedMaxTime() - pas.getScaledSelectedMinTime());
         
         	double startTime = pas.getScaledSelectedMinTime()+(Math.min(x0, x1) - graphArea.x)/ratioTime;
         	double endTime = pas.getScaledSelectedMinTime()+(Math.max(x0, x1) - graphArea.x)/ratioTime;
-        
-        	pas.setScaledSelectedTime(startTime, endTime);
+        	
+        	minTime.put(pas, startTime);
+        	maxTime.put(pas, endTime);
+        }
+        for(PlotAreaSpace pas : pass){
+        	pas.setScaledSelectedTime(minTime.get(pas), maxTime.get(pas));
         }
         
         PlotAreaSpace myPlotAreaSpace = plotAreaSpaceManager.getPlotAreaSpace(identifier);
