@@ -191,8 +191,8 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
     	int width = getWidth();
     	int height = getHeight();
         if (width > 0 && height > 0 
-        		&& ChartConstants.GRAPH_TOP_SPACE + ChartConstants.GRAPH_TOP_SPACE + ChartConstants.GRAPH_BOTTOM_SPACE < height
-        		&& ChartConstants.GRAPH_LEFT_SPACE + ChartConstants.GRAPH_LEFT_SPACE + ChartConstants.GRAPH_RIGHT_SPACE < width) {
+        		&& ChartConstants.GRAPH_TOP_SPACE + ChartConstants.GRAPH_BOTTOM_SPACE + 1 < height
+        		&& ChartConstants.GRAPH_LEFT_SPACE + ChartConstants.GRAPH_RIGHT_SPACE + 1 < width) {
             screenImage = new BufferedImage(width, height, BufferedImage.OPAQUE);
             //Log.debug("--------------------Screen image : " + screenImage+"--------------------");
             //Log.debug("----------------------------this : " + System.identityHashCode(this));
