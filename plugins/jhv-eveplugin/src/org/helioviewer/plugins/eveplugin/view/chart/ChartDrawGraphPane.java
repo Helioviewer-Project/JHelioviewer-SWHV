@@ -188,14 +188,18 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}*/
-        if (getWidth() > 0 && getHeight() > 0) {
-            screenImage = new BufferedImage(getWidth(), getHeight(), BufferedImage.OPAQUE);
+    	int width = getWidth();
+    	int height = getHeight();
+        if (width > 0 && height > 0 
+        		&& ChartConstants.GRAPH_TOP_SPACE + ChartConstants.GRAPH_TOP_SPACE + ChartConstants.GRAPH_BOTTOM_SPACE < height
+        		&& ChartConstants.GRAPH_LEFT_SPACE + ChartConstants.GRAPH_LEFT_SPACE + ChartConstants.GRAPH_RIGHT_SPACE < width) {
+            screenImage = new BufferedImage(width, height, BufferedImage.OPAQUE);
             //Log.debug("--------------------Screen image : " + screenImage+"--------------------");
             //Log.debug("----------------------------this : " + System.identityHashCode(this));
             final Graphics2D g = screenImage.createGraphics();
             drawBackground(g);
             //drawRadio(g);
-            BufferedImage plotPart = screenImage.getSubimage(ChartConstants.GRAPH_LEFT_SPACE, ChartConstants.GRAPH_TOP_SPACE, getWidth()-ChartConstants.GRAPH_LEFT_SPACE-ChartConstants.GRAPH_RIGHT_SPACE, getHeight()-ChartConstants.GRAPH_TOP_SPACE-ChartConstants.GRAPH_BOTTOM_SPACE);
+            BufferedImage plotPart = screenImage.getSubimage(ChartConstants.GRAPH_LEFT_SPACE, ChartConstants.GRAPH_TOP_SPACE, width-ChartConstants.GRAPH_LEFT_SPACE-ChartConstants.GRAPH_RIGHT_SPACE, height-ChartConstants.GRAPH_TOP_SPACE-ChartConstants.GRAPH_BOTTOM_SPACE);
             
             //drawGraphs(g); 
             //drawEvents(g);
