@@ -11,10 +11,12 @@ import org.helioviewer.base.logging.Log;
 import org.helioviewer.base.math.Interval;
 import org.helioviewer.plugins.eveplugin.controller.ZoomController;
 import org.helioviewer.plugins.eveplugin.controller.ZoomControllerListener;
+import org.helioviewer.plugins.eveplugin.model.PlotAreaSpaceListener;
+import org.helioviewer.plugins.eveplugin.model.PlotAreaSpaceManager;
 import org.helioviewer.plugins.eveplugin.radio.data.FrequencyInterval;
 import org.helioviewer.plugins.eveplugin.settings.EVEAPI.API_RESOLUTION_AVERAGES;
 
-public class ZoomManager implements ZoomControllerListener{
+public class ZoomManager implements ZoomControllerListener,PlotAreaSpaceListener{
 	private static ZoomManager instance; 
 	private Map <String, ZoomManagerData> zoomManagerData;
 	//private Map<String,Map<Long,ZoomDataConfig>> zoomDataConfigMap;
@@ -22,6 +24,7 @@ public class ZoomManager implements ZoomControllerListener{
 	//private boolean isAreaInitialized;
 	private ZoomController zoomController;
 	private Interval<Date> currentInterval;
+	private PlotAreaSpaceManager plotAreaSpaceManager; 
 	
 	//private Map<String, Rectangle> displaySizeMap;
 	
@@ -31,6 +34,7 @@ public class ZoomManager implements ZoomControllerListener{
 		zoomController.addZoomControllerListener(this);
 		//displaySizeMap = new HashMap<String, Rectangle>();
 		zoomManagerData = new HashMap<String, ZoomManagerData>();
+		plotAreaSpaceManager = PlotAreaSpaceManager.getInstance();
 	}
 	
 	public static ZoomManager getSingletonInstance(){
@@ -80,6 +84,8 @@ public class ZoomManager implements ZoomControllerListener{
 			}else{
 				config = new ZoomDataConfig(freqInterval.getStart(), freqInterval.getEnd(), currentInterval.getStart(), currentInterval.getStart(), null, ID);
 			}
+			plotAreaSpaceManager.getPlotAreaSpace(identifier).addPlotAreaSpaceListener(config);
+			Log.debug("PlotAreaSpaceListener added");
 			zmd.addToZoomDataConfigMap(ID, config);
 			config.addListener(zoomDataConfigListener);
 		}
@@ -107,12 +113,14 @@ public class ZoomManager implements ZoomControllerListener{
 		ZoomManagerData zmd = getZoomManagerData(plotIdentifier);
 		ZoomDataConfig zdc = zmd.getZoomDataConfigMap().get(downloadID);
 		int sourceX0 = defineXInSourceArea(startDate,startDate,endDate, area);
-		int sourceY0 = defineYInSourceArea(startFrequency, startFrequency, endFrequency, area,zdc);
+		int sourceY0 = defineYInSourceArea((int)zdc.getSelectedMaxY(), startFrequency, endFrequency, area,zdc);
 		int sourceX1 = defineXInSourceArea(endDate, startDate, endDate, area);
-		int sourceY1 = defineYInSourceArea(endFrequency, startFrequency, endFrequency, area,zdc);
+		int sourceY1 = defineYInSourceArea((int)zdc.getSelectedMinY(), startFrequency, endFrequency, area,zdc);
 		int destX0 = defineXInDestinationArea(startDate,zdc);
 		int destY0 = defineYInDestinationArea(startFrequency,zdc);
+		//int destY0 = defineYInDestinationArea((int)Math.floor(zdc.getSelectedMinY()),zdc);
 		int destX1 = defineXInDestinationArea(endDate,zdc);
+		//int destY1 = defineYInDestinationArea((int)Math.floor(zdc.getSelectedMaxY()),zdc);
 		int destY1 = defineYInDestinationArea(endFrequency,zdc);
 		return new DrawableAreaMap(sourceX0, sourceY0, sourceX1, sourceY1, destX0, destY0, destX1, destY1, downloadID);
 	}
@@ -173,5 +181,14 @@ public class ZoomManager implements ZoomControllerListener{
 			zoomManagerData.put(identifier, zwd);
 		}
 		return zwd;
+	}
+
+	@Override
+	public void plotAreaSpaceChanged(double scaledMinValue,
+			double scaledMaxValue, double scaledMinTime, double scaledMaxTime,
+			double scaledSelectedMinValue, double scaledSelectedMaxValue,
+			double scaledSelectedMinTime, double scaledSelectedMaxTime) {
+		// TODO Auto-generated method stub
+		
 	}
 }
