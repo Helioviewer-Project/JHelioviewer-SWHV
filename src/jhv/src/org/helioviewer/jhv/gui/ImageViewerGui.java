@@ -502,6 +502,7 @@ public class ImageViewerGui {
             public void run() {
                 TopToolBar toolBar = newState.getTopToolBar();
                 toolBar.updateStateButtons();
+                toolBar.setDisplayMode(null);
                 contentPanel.add(toolBar, BorderLayout.PAGE_START);
             }
         });
