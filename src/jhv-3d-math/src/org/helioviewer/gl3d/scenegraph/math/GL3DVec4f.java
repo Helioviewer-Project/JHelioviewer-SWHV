@@ -43,20 +43,18 @@ public class GL3DVec4f {
         this.w = coordinates[3];
     }
 
-    public GL3DVec4f add(GL3DVec4f vec) {
+    public void add(GL3DVec4f vec) {
         this.x += vec.x;
         this.y += vec.y;
         this.z += vec.z;
         this.w += vec.w;
-        return this;
     }
 
-    public GL3DVec4f add(float s) {
+    public void add(float s) {
         this.x += s;
         this.y += s;
         this.z += s;
         this.w += w;
-        return this;
     }
 
     public static GL3DVec4f add(GL3DVec4f vec1, GL3DVec4f vec2) {
@@ -67,20 +65,18 @@ public class GL3DVec4f {
         return new GL3DVec4f(vec1.x + s, vec1.y + s, vec1.z + s, vec1.w + s);
     }
 
-    public GL3DVec4f subtract(GL3DVec4f vec) {
+    public void subtract(GL3DVec4f vec) {
         this.x -= vec.x;
         this.y -= vec.y;
         this.z -= vec.z;
         this.w -= vec.w;
-        return this;
     }
 
-    public GL3DVec4f subtract(float s) {
+    public void subtract(float s) {
         this.x -= s;
         this.y -= s;
         this.z -= s;
         this.w -= s;
-        return this;
     }
 
     public static GL3DVec4f subtract(GL3DVec4f vec1, GL3DVec4f vec2) {
@@ -101,14 +97,13 @@ public class GL3DVec4f {
         return this;
     }
 
-    public GL3DVec4f divide(float s) {
+    public void divide(float s) {
         if (s == 0f)
             throw new IllegalArgumentException("Division by 0 not allowed!");
         this.x /= s;
         this.y /= s;
         this.z /= s;
         this.w /= s;
-        return this;
     }
 
     public static GL3DVec4f divide(GL3DVec4f vec1, GL3DVec4f vec2) {
@@ -123,20 +118,18 @@ public class GL3DVec4f {
         return new GL3DVec4f(vec1.x / s, vec1.y / s, vec1.z / s, vec1.w / s);
     }
 
-    public GL3DVec4f multiply(GL3DVec4f vec) {
+    public void multiply(GL3DVec4f vec) {
         this.x *= vec.x;
         this.y *= vec.y;
         this.z *= vec.z;
         this.w *= vec.w;
-        return this;
     }
 
-    public GL3DVec4f multiply(float s) {
+    public void multiply(float s) {
         this.x *= s;
         this.y *= s;
         this.z *= s;
         this.w *= s;
-        return this;
     }
 
     public static GL3DVec4f multiply(GL3DVec4f vec1, GL3DVec4f vec2) {
@@ -162,15 +155,21 @@ public class GL3DVec4f {
     public static GL3DVec4f cross(GL3DVec4f u, GL3DVec4f v) {
         return new GL3DVec4f(u.y * v.z - u.z * v.y, u.z * v.x - u.x * v.z, u.x * v.y - u.y * v.x, 1f);
     }
-
-    public GL3DVec4f negate() {
-        return this.multiply(-1f);
+    public void negate() {
+    	this.x = -this.x;
+    	this.y = -this.y;
+    	this.z = -this.z;
+    	this.w = -this.w;
     }
-
     public static GL3DVec4f negate(GL3DVec4f vec) {
-        return vec.multiply(-1f);
+    	GL3DVec4f newVec = vec.copy();
+    	newVec.negate();
+    	return newVec;
     }
 
+    private GL3DVec4f copy() {
+    	return new GL3DVec4f(this.x, this.y, this.z, this.w);
+	}
     public boolean isApproxEqual(GL3DVec4f vec, float tolerance) {
         return Math.abs(this.x - vec.x) <= tolerance && Math.abs(this.y - vec.y) <= tolerance && Math.abs(this.z - vec.z) <= tolerance && Math.abs(this.w - vec.w) <= tolerance;
     }
@@ -183,8 +182,8 @@ public class GL3DVec4f {
         return (this.x * this.x + this.y * this.y + this.z * this.z + this.w * this.w);
     }
 
-    public GL3DVec4f normalize() {
-        return this.divide(length());
+    public void normalize() {
+        this.divide(length());
     }
 
     public float[] toArray() {
@@ -195,10 +194,6 @@ public class GL3DVec4f {
         if (o instanceof GL3DVec4f)
             return isApproxEqual((GL3DVec4f) o, 0.0f);
         return false;
-    }
-
-    public Object clone() {
-        return new GL3DVec4f(this);
     }
 
     public static float[] toArray(GL3DVec4f[] vecs) {
