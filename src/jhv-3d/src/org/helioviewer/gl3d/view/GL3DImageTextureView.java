@@ -42,47 +42,29 @@ import org.helioviewer.viewmodel.viewport.Viewport;
 public class GL3DImageTextureView extends AbstractGL3DView implements GL3DView {
 
 	private int textureId = -1;
-
 	private Vector2dDouble textureScale = null;
-
 	private Region capturedRegion = null;
-
 	private boolean recaptureRequested = true;
 	private boolean regionChanged = true;
 	private boolean forceUpdate = false;
-	
 	private GL3DImageVertexShaderProgram vertexShader = null;
 	private GL3DImageCoronaVertexShaderProgram coronaVertexShader;
-
-	public MetaData metadata = null;
-	
+	public MetaData metadata = null;	
 	public double minZ = 0.0;
 	public double maxZ = Constants.SunRadius;
-	// private Vector2dInt renderOffset;
-
 	private GL3DImageFragmentShaderProgram fragmentShader;
-
 	private GL3DImageCoronaFragmentShaderProgram coronaFragmentShader;
-
 
 	public void render3D(GL3DState state) {
 		GL gl = state.gl;
 		if (this.getView() != null) {
-			// Log.debug("GL3DImageTextureView.render3D: Rendering for view "+this.getView());
-
 			// Only copy Framebuffer if necessary
 			GLTextureHelper th = new GLTextureHelper();
 			if (forceUpdate || recaptureRequested || regionChanged) {
-				// state.checkGLErrors("GL3DImageTextureView.beforeRenderChild");
-				// gl.glDisable(GL.GL_BLEND);
 				this.renderChild(gl);
-
-				// state.checkGLErrors("GL3DImageTextureView.beforeCopyToTexture");
 				this.capturedRegion = copyScreenToTexture(state, th);
 				gl.glClear(GL.GL_COLOR_BUFFER_BIT | GL.GL_DEPTH_BUFFER_BIT);
-
 				if (forceUpdate) {
-					// state.checkGLErrors("GL3DImageTextureView.beforeNotify");
 					this.notifyViewListeners(new ChangeEvent(
 							new ImageTextureRecapturedReason(
 									this,
@@ -113,7 +95,6 @@ public class GL3DImageTextureView extends AbstractGL3DView implements GL3DView {
 		if (this.textureId < 0) {
 			this.textureId = th.genTextureID(gl);
 		}
-		// gl.glBindTexture(GL.GL_TEXTURE_2D, this.textureId);
 
 		Region region = getAdapter(RegionView.class).getRegion();
 		Viewport viewport = getAdapter(ViewportView.class).getViewport();
@@ -127,7 +108,6 @@ public class GL3DImageTextureView extends AbstractGL3DView implements GL3DView {
 		int offsetY = (renderOffset == null ? 0 : renderOffset.getY());
 		Rectangle captureRectangle = new Rectangle(offsetX, offsetY,
 				viewport.getWidth(), viewport.getHeight());
-		// Log.debug("GL3DImageTextureView: Capturing "+captureRectangle);
 		
 		if (region != null) capturedRegion = region;
 
@@ -157,25 +137,19 @@ public class GL3DImageTextureView extends AbstractGL3DView implements GL3DView {
 		newView.addViewListener(new ViewListener() {
 
 			public void viewChanged(View sender, ChangeEvent aEvent) {
-				// Log.debug("GL3DImageTextureView.viewChanged RegionChanged "+aEvent);
 				if (aEvent.reasonOccurred(RegionChangedReason.class)) {
 					recaptureRequested = true;
 					regionChanged = true;
 				} else if (aEvent.reasonOccurred(RegionUpdatedReason.class)) {
 					// regionChanged = true;
 					recaptureRequested = true;
-					// Log.debug("GL3DImageTextureView.viewChanged RegionUpdated "+aEvent);
 				} else if (aEvent
 						.reasonOccurred(SubImageDataChangedReason.class)) {
 					// regionChanged = true;
 					recaptureRequested = true;
-					// Log.debug("GL3DImageTextureView.viewChanged SubImageDataChanged"+aEvent);
 				} else if (aEvent
 						.reasonOccurred(CacheStatusChangedReason.class)) {
 					recaptureRequested = true;
-					// Log.debug("GL3DImageTextureView.viewChanged CacheStatus "+aEvent);
-				} else {
-					// Log.debug("GL3DImageTextureView.viewChanged Not Handling Event "+aEvent);
 				}
 			}
 		});
