@@ -74,20 +74,18 @@ public class GL3DVec2d {
         return new GL3DVec2d(vec1.x - s, vec1.y - s);
     }
 
-    public GL3DVec2d divide(GL3DVec2d vec) {
+    public void divide(GL3DVec2d vec) {
         if (vec.x == 0.0 || vec.y == 0.0)
             throw new IllegalArgumentException("Division by 0 not allowed!");
         this.x /= vec.x;
         this.y /= vec.y;
-        return this;
     }
 
-    public GL3DVec2d divide(double s) {
+    public void divide(double s) {
         if (s == 0.0)
             throw new IllegalArgumentException("Division by 0 not allowed!");
         this.x /= s;
         this.y /= s;
-        return this;
     }
 
     public static GL3DVec2d divide(GL3DVec2d vec1, GL3DVec2d vec2) {
