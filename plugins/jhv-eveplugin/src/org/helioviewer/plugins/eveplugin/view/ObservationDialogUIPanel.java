@@ -1,6 +1,7 @@
 package org.helioviewer.plugins.eveplugin.view;
 
 import java.awt.BorderLayout;
+import java.awt.EventQueue;
 import java.awt.FlowLayout;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
@@ -60,14 +61,14 @@ public class ObservationDialogUIPanel extends SimpleObservationDialogUIPanel{//O
     
     private final JComboBox plotComboBox = new JComboBox(new String[] {"Plot 1", "Plot 2"});*/
     
-    private final JLabel labelGroup = new JLabel("Group");
-    private final JLabel labelData = new JLabel();
-    private final JComboBox comboBoxGroup = new JComboBox(new DefaultComboBoxModel());
-    private final JComboBox comboBoxData = new JComboBox(new DefaultComboBoxModel());
+    private JLabel labelGroup;
+    private JLabel labelData;
+    private JComboBox comboBoxGroup;
+    private JComboBox comboBoxData;
     
-    private final JPanel timePane = new JPanel();
-    private final JPanel plotPane = new JPanel();
-    private final JPanel dataPane = new JPanel();
+    private JPanel timePane;
+    private JPanel plotPane;
+    private JPanel dataPane;
 
     // //////////////////////////////////////////////////////////////////////////////
     // Methods
@@ -75,9 +76,22 @@ public class ObservationDialogUIPanel extends SimpleObservationDialogUIPanel{//O
     
     public ObservationDialogUIPanel(final PlotsContainerPanel plotsContainerPanel) {
         super(plotsContainerPanel);
+        EventQueue.invokeLater(new Runnable() {
+            public void run() {
+		        labelGroup = new JLabel("Group");
+		        labelData = new JLabel();
+		        comboBoxGroup = new JComboBox(new DefaultComboBoxModel());
+		        comboBoxData = new JComboBox(new DefaultComboBoxModel());
+		        
+		        timePane = new JPanel();
+		        plotPane = new JPanel();
+		        dataPane = new JPanel();
+		        initVisualComponents();
+		        initGroups();
+            }
+        });
         
-        initVisualComponents();
-        initGroups();
+        
     }
     
     private void initVisualComponents() {
