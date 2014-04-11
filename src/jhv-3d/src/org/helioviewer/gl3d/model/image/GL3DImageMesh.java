@@ -92,8 +92,8 @@ public abstract class GL3DImageMesh extends GL3DMesh {
 
     public void shapeDraw(GL3DState state) {
         th.bindTexture(state.gl, this.imageTextureView.getTextureId());
-        state.gl.glTexParameteri(GL.GL_TEXTURE_2D, GL.GL_TEXTURE_MIN_FILTER, GL.GL_LINEAR);
-        state.gl.glTexParameteri(GL.GL_TEXTURE_2D, GL.GL_TEXTURE_MAG_FILTER, GL.GL_NEAREST);
+        state.gl.glTexParameteri(GL.GL_TEXTURE_2D, GL.GL_TEXTURE_MIN_FILTER, GL.GL_NEAREST);
+        state.gl.glTexParameteri(GL.GL_TEXTURE_2D, GL.GL_TEXTURE_MAG_FILTER, GL.GL_LINEAR);
         
         GLVertexShaderProgram.pushShader(state.gl);
         GLFragmentShaderProgram.pushShader(state.gl);

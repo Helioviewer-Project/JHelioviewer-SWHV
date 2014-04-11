@@ -26,6 +26,7 @@ public class GLMinimalVertexShaderProgram extends GLVertexShaderProgram {
             String init = "mul(mvp, position)";
             init = init.replaceAll("position", shaderBuilder.useStandardParameter("float4", "POSITION"));
             init = init.replaceAll("mvp", shaderBuilder.useStandardParameter("uniform float4x4", "state.matrix.mvp"));
+            //shaderBuilder.useStandardParameter("uniform float4x4", "state.matrix.inverse.modelview[0]");            
             shaderBuilder.useOutputValue("float4", "POSITION", init);
 
         } catch (GLBuildShaderException e) {
