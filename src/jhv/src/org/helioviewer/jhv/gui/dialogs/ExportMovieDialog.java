@@ -1649,7 +1649,6 @@ public class ExportMovieDialog extends JDialog implements ChangeListener,
 		J2KRenderGlobalOptions
 				.setDoubleBufferingOption(savedDoubleBufferinOption);
 		ComponentView f = ImageViewerGui.getSingletonInstance().getMainView();
-		System.out.println(f.getView());
 		if (ImageViewerGui.getSingletonInstance().getMainView() instanceof GLComponentView) {
 			((GLComponentView) ImageViewerGui.getSingletonInstance()
 					.getMainView()).startAnimation();
