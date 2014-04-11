@@ -1,6 +1,8 @@
 package org.helioviewer.plugins.eveplugin.view;
 
 import java.awt.BorderLayout;
+
+import java.awt.EventQueue;
 import java.awt.FlowLayout;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
@@ -37,6 +39,7 @@ import org.helioviewer.plugins.eveplugin.settings.BandType;
 import org.helioviewer.plugins.eveplugin.settings.BandTypeAPI;
 import org.helioviewer.plugins.eveplugin.view.plot.PlotsContainerPanel;
 
+
 public class SimpleObservationDialogUIPanel extends ObservationDialogPanel implements JHVCalendarListener, ActionListener {
 	
 	// //////////////////////////////////////////////////////////////////////////////
@@ -47,34 +50,54 @@ public class SimpleObservationDialogUIPanel extends ObservationDialogPanel imple
     
     private static final String[] DATA_LABEL_TEXTS = new String[] {"Band", "Band", "Diodes", "Lines"};
     
-    protected final PlotsContainerPanel plotsContainerPanel;
+    protected PlotsContainerPanel plotsContainerPanel;
     
     protected boolean enableLoadButton = true;
     
-    private final JLabel labelStartDate = new JLabel("Start Date");
-    private final JLabel labelEndDate = new JLabel("End Date");
-    private final JHVCalendarDatePicker calendarStartDate = new JHVCalendarDatePicker();
-    private final JHVCalendarDatePicker calendarEndDate = new JHVCalendarDatePicker();
+    private JLabel labelStartDate ;
+    private JLabel labelEndDate;
+    private JHVCalendarDatePicker calendarStartDate;
+    private JHVCalendarDatePicker calendarEndDate;
     
-    protected final JComboBox plotComboBox = new JComboBox(new String[] {"Plot 1", "Plot 2"});
+    protected JComboBox plotComboBox;
     
-    private final JLabel labelGroup = new JLabel("Group");
-    private final JLabel labelData = new JLabel();
-    protected final JComboBox comboBoxGroup = new JComboBox(new DefaultComboBoxModel());
-    protected final JComboBox comboBoxData = new JComboBox(new DefaultComboBoxModel());
+    private JLabel labelGroup;
+    private JLabel labelData;
+    protected JComboBox comboBoxGroup;
+    protected JComboBox comboBoxData;
     
-    private final JPanel timePane = new JPanel();
-    private final JPanel plotPane = new JPanel();
-    private final JPanel dataPane = new JPanel();
+    private JPanel timePane;
+    private JPanel plotPane;
+    private JPanel dataPane;
 
     // //////////////////////////////////////////////////////////////////////////////
     // Methods
     // //////////////////////////////////////////////////////////////////////////////
     
     public SimpleObservationDialogUIPanel(final PlotsContainerPanel plotsContainerPanel) {
-        this.plotsContainerPanel = plotsContainerPanel;
+    	this.plotsContainerPanel = plotsContainerPanel;
+    	EventQueue.invokeLater(new Runnable() {
+            public void run() {
+            	
+            	labelStartDate = new JLabel("Start Date");
+            	labelEndDate = new JLabel("End Date");
+            	calendarStartDate = new JHVCalendarDatePicker();
+            	calendarEndDate = new JHVCalendarDatePicker();
         
-        initVisualComponents();
+            	plotComboBox = new JComboBox(new String[] {"Plot 1", "Plot 2"});
+        
+		        labelGroup = new JLabel("Group");
+		        labelData = new JLabel();
+		        comboBoxGroup = new JComboBox(new DefaultComboBoxModel());
+		        comboBoxData = new JComboBox(new DefaultComboBoxModel());
+		        timePane = new JPanel();
+		        plotPane = new JPanel();
+		        dataPane = new JPanel();
+		        initVisualComponents();
+            }
+        });
+    	
+        
         //initGroups();
     }
     
