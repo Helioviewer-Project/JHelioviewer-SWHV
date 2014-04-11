@@ -102,11 +102,10 @@ public class GL3DVec3d {
         return this;
     }
 
-    public GL3DVec3d subtract(double s) {
+    public void subtract(double s) {
         this.x -= s;
         this.y -= s;
         this.z -= s;
-        return this;
     }
 
     public static GL3DVec3d subtract(GL3DVec3d vec1, GL3DVec3d vec2) {
