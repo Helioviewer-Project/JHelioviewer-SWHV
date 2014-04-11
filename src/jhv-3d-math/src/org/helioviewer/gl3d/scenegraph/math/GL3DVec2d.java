@@ -38,16 +38,14 @@ public class GL3DVec2d {
         this.y = coordinates[1];
     }
 
-    public GL3DVec2d add(GL3DVec2d vec) {
+    public void add(GL3DVec2d vec) {
         this.x += vec.x;
         this.y += vec.y;
-        return this;
     }
 
-    public GL3DVec2d add(double s) {
+    public void add(double s) {
         this.x += s;
         this.y += s;
-        return this;
     }
 
     public static GL3DVec2d add(GL3DVec2d vec1, GL3DVec2d vec2) {
