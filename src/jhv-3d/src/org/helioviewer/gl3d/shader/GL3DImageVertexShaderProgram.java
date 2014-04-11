@@ -9,15 +9,30 @@ public class GL3DImageVertexShaderProgram extends GLVertexShaderProgram {
     /**
      * {@inheritDoc}
      */
-    protected void buildImpl(GLShaderBuilder shaderBuilder) {
+    protected void buildImpl(GLShaderBuilder shaderBuilder) {  	
         try {
-            String program = "\tphysicalPosition = physicalPosition;" + GLShaderBuilder.LINE_SEP;
-            program += "\toutput.z = output.x-offset.x;" + GLShaderBuilder.LINE_SEP;
-            program += "\toutput.w = output.y-offset.y;" + GLShaderBuilder.LINE_SEP;
+            String program = "";//" OUT.position = mul(mat, position);" + GLShaderBuilder.LINE_SEP;
+            program +=  "\tphysicalPosition = physicalPosition;" + GLShaderBuilder.LINE_SEP;
+            program += "float xrot = position.x*cos(0.8) - position.z*sin(0.8);" + GLShaderBuilder.LINE_SEP;
+            program += "float yrot = position.y;" + GLShaderBuilder.LINE_SEP;
+            program += "float zrot = position.x*sin(0.8) + position.z*cos(0.8);" + GLShaderBuilder.LINE_SEP;
             
-            program += "\toutput.x -= rect.x;" + GLShaderBuilder.LINE_SEP;
-            program += "\toutput.y -= rect.y;" + GLShaderBuilder.LINE_SEP;
+            program += "float zaxisxrot = 0.0*cos(0.8) - 1.0*sin(0.8);" + GLShaderBuilder.LINE_SEP;
+            program += "float zaxisyrot = 0.0;" + GLShaderBuilder.LINE_SEP;
+            program += "float zaxiszrot = 0.0*sin(0.8) + 1.0*cos(0.8);" + GLShaderBuilder.LINE_SEP;    
             
+            program += "\tfloat4 v1 = float4(position.x, position.y, position.z, 0.0);" + GLShaderBuilder.LINE_SEP;
+            program += "\tfloat4 v2 = float4(xrot, yrot, zrot, 0.0);" + GLShaderBuilder.LINE_SEP;
+            program += "\tfloat4 v3 = float4(zaxisxrot, zaxisyrot, zaxiszrot, 0.0);" + GLShaderBuilder.LINE_SEP;
+            program += "float projectionn = dot(v2,v3);" + GLShaderBuilder.LINE_SEP;
+
+            
+            program += "\toutput.z = xrot - offset.x;" + GLShaderBuilder.LINE_SEP;
+            program += "\toutput.w = yrot - offset.y;" + GLShaderBuilder.LINE_SEP;
+            program += "\toutput.x = xrot - rect.x;" + GLShaderBuilder.LINE_SEP;
+            program += "\toutput.y = yrot - rect.y;" + GLShaderBuilder.LINE_SEP;
+            program += "\tif( zrot<-7000000 ){output.z=0.0;}else{output.z=1.0;}" + GLShaderBuilder.LINE_SEP;
+
             program += "\toutput.x *= rect.z;" + GLShaderBuilder.LINE_SEP;
             program += "\toutput.y *= rect.w;" + GLShaderBuilder.LINE_SEP;
 
@@ -26,7 +41,7 @@ public class GL3DImageVertexShaderProgram extends GLVertexShaderProgram {
 			
             program += "\tscaledTexture.x -= offset.x;" + GLShaderBuilder.LINE_SEP;
             program += "\tscaledTexture.y -= offset.y;" + GLShaderBuilder.LINE_SEP;
-            program += "\talpha = color.a;";
+            //program +="\tOUT.position = position;";
             
             shaderBuilder.addEnvParameter("float4 rect");            
             shaderBuilder.addEnvParameter("float4 textureScale");            

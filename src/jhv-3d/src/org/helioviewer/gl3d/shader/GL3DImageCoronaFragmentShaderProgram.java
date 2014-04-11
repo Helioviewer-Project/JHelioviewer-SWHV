@@ -86,11 +86,13 @@ public class GL3DImageCoronaFragmentShaderProgram extends GLFragmentShaderProgra
         	String program = "\tif(texcoord0.x<0.0||texcoord0.y<0.0||texcoord0.x>textureScale.x||texcoord0.y>textureScale.y){"+ GLShaderBuilder.LINE_SEP 
         			+ "\t\tOUT.color = float4(0.0,1.0,0.0,1.0);" + GLShaderBuilder.LINE_SEP
         			+ "\t}";        	
-        	program += "\toutput.a *= alpha;" + GLShaderBuilder.LINE_SEP;            
+        	program += "\toutput.a *= alpha;" + GLShaderBuilder.LINE_SEP; 
+        	program += "\toutput.a = 1.0;" + GLShaderBuilder.LINE_SEP;            
             program += "\tfloat2 texture;" + GLShaderBuilder.LINE_SEP;
-            program += "\ttexture.x = textureCoordinate.z - 0.5;" + GLShaderBuilder.LINE_SEP;
-            program += "\ttexture.y = textureCoordinate.w - 0.5;" + GLShaderBuilder.LINE_SEP;
-            program += "\toutput.a *= step(cutOffRadius, length(texture));" + GLShaderBuilder.LINE_SEP;
+            //program += "\ttexture.x = textureCoordinate.z - 0.5;" + GLShaderBuilder.LINE_SEP;
+            //program += "\ttexture.y = textureCoordinate.w - 0.5;" + GLShaderBuilder.LINE_SEP;
+            //program += "\toutput.a *= 1.0;" + GLShaderBuilder.LINE_SEP;
+            //program += "\toutput.a *= step(cutOffRadius, length(texture));" + GLShaderBuilder.LINE_SEP;
             shaderBuilder.addEnvParameter("float cutOffRadius");
             shaderBuilder.addEnvParameter("float alpha");
             shaderBuilder.addEnvParameter("float4 textureScale");            

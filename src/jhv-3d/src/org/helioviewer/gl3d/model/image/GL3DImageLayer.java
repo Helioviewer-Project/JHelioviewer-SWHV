@@ -1,14 +1,11 @@
 package org.helioviewer.gl3d.model.image;
 
-import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Point;
 import java.util.ArrayList;
 import java.util.List;
 
 import javax.media.opengl.GL;
-import javax.swing.JFrame;
-import javax.swing.JPanel;
 
 import org.helioviewer.base.logging.Log;
 import org.helioviewer.base.physics.Constants;
@@ -34,7 +31,6 @@ import org.helioviewer.gl3d.view.GL3DView;
 import org.helioviewer.gl3d.wcs.CoordinateConversion;
 import org.helioviewer.gl3d.wcs.CoordinateSystem;
 import org.helioviewer.gl3d.wcs.CoordinateVector;
-import org.helioviewer.gl3d.wcs.HeliocentricCartesian2000CoordinateSystem;
 import org.helioviewer.jhv.internal_plugins.filter.opacity.DynamicOpacityFilter;
 import org.helioviewer.viewmodel.changeevent.ChangeEvent;
 import org.helioviewer.viewmodel.filter.Filter;
@@ -88,6 +84,7 @@ public abstract class GL3DImageLayer extends GL3DOrientedGroup implements GL3DCa
 
     public GL3DImageLayer(String name, GL3DView mainLayerView) {
         super(name);
+        
         layerId = nextLayerId++;
 
         this.mainLayerView = mainLayerView;

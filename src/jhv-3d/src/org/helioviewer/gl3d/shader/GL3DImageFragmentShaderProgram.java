@@ -78,10 +78,11 @@ public class GL3DImageFragmentShaderProgram extends GLFragmentShaderProgram {
         	String program = "\tif(texcoord0.x<0.0||texcoord0.y<0.0||texcoord0.x>textureScale.x||texcoord0.y>textureScale.y){"
         			+ "\t\tOUT.color = float4(1.0,0.0,0.0,1.0);" + GLShaderBuilder.LINE_SEP
         			+ "\t}";
-        	program += "\tfloat2 texture;" + GLShaderBuilder.LINE_SEP;
-            program += "\ttexture.x = textureCoordinate.z - 0.5;" + GLShaderBuilder.LINE_SEP;
-            program += "\ttexture.y = textureCoordinate.w - 0.5;" + GLShaderBuilder.LINE_SEP;
-            program += "\toutput.a *= step(length(texture),cutOffRadius);" + GLShaderBuilder.LINE_SEP;
+            program += "OUT.color.a=texcoord0.z;" + GLShaderBuilder.LINE_SEP;        	
+        	//program += "\tfloat2 texture;" + GLShaderBuilder.LINE_SEP;
+            //program += "\ttexture.x = textureCoordinate.z - 0.5;" + GLShaderBuilder.LINE_SEP;
+            //program += "\ttexture.y = textureCoordinate.w - 0.5;" + GLShaderBuilder.LINE_SEP;
+            //program += "\toutput.a *= step(length(texture),cutOffRadius);" + GLShaderBuilder.LINE_SEP;
             shaderBuilder.addEnvParameter("float cutOffRadius");
             shaderBuilder.addEnvParameter("float4 textureScale");            
 
