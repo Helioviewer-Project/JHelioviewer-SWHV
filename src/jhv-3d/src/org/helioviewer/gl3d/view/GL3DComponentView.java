@@ -1,13 +1,8 @@
 package org.helioviewer.gl3d.view;
 
 import java.awt.Color;
-import java.awt.event.ComponentAdapter;
-import java.awt.event.ComponentEvent;
 import java.io.File;
 import java.io.IOException;
-import java.util.Calendar;
-import java.util.GregorianCalendar;
-import java.util.concurrent.locks.ReentrantLock;
 
 import javax.media.opengl.GL;
 import javax.media.opengl.GLAutoDrawable;
@@ -16,9 +11,6 @@ import javax.media.opengl.GLEventListener;
 
 import org.helioviewer.base.logging.Log;
 import org.helioviewer.base.math.Vector2dInt;
-import org.helioviewer.base.physics.Constants;
-import org.helioviewer.gl3d.camera.GL3DCamera;
-import org.helioviewer.gl3d.camera.GL3DCameraListener;
 import org.helioviewer.gl3d.scenegraph.GL3DState;
 import org.helioviewer.jhv.display.DisplayListener;
 import org.helioviewer.jhv.display.Displayer;

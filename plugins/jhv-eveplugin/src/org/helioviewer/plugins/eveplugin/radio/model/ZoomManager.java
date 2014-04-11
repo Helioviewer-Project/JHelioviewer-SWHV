@@ -1,7 +1,6 @@
 package org.helioviewer.plugins.eveplugin.radio.model;
 
 import java.awt.Rectangle;
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;

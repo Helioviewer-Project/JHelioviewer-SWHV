@@ -1,17 +1,10 @@
 package org.jhv.dataset.tree.views;
-/**
- * @author Freek Verstringe
- */
-
-import java.awt.Color;
 import java.awt.Dimension;
-import java.awt.Font;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 
 import javax.swing.BorderFactory;
 import javax.swing.JLabel;
-import javax.swing.JPanel;
 
 import org.helioviewer.jhv.layers.LayersModel;
 import org.helioviewer.viewmodel.view.View;

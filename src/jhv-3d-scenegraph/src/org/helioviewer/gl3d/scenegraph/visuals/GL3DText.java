@@ -1,41 +1,15 @@
 package org.helioviewer.gl3d.scenegraph.visuals;
 
-import java.awt.Color;
-import java.awt.Font;
-import java.awt.FontMetrics;
-import java.awt.Graphics;
-import java.awt.Graphics2D;
-import java.awt.font.FontRenderContext;
-import java.awt.geom.Rectangle2D;
-import java.awt.image.BufferedImage;
-import java.awt.image.DataBuffer;
-import java.awt.image.DataBufferByte;
-import java.awt.image.DataBufferInt;
-import java.awt.image.DataBufferShort;
-import java.awt.image.DataBufferUShort;
-import java.io.File;
-import java.io.IOException;
-import java.net.MalformedURLException;
-import java.net.URI;
-import java.net.URL;
-import java.nio.Buffer;
-import java.nio.ByteBuffer;
-import java.nio.IntBuffer;
-import java.nio.ShortBuffer;
+
 import java.util.List;
 
-import javax.imageio.ImageIO;
 import javax.media.opengl.GL;
-
-import org.helioviewer.base.logging.Log;
-import org.helioviewer.base.physics.Constants;
 import org.helioviewer.gl3d.scenegraph.GL3DDrawBits.Bit;
 import org.helioviewer.gl3d.scenegraph.GL3DMesh;
 import org.helioviewer.gl3d.scenegraph.GL3DState;
 import org.helioviewer.gl3d.scenegraph.math.GL3DVec2d;
 import org.helioviewer.gl3d.scenegraph.math.GL3DVec3d;
 import org.helioviewer.gl3d.scenegraph.math.GL3DVec4d;
-import org.helioviewer.gl3d.scenegraph.math.GL3DVec4f;
 import org.helioviewer.viewmodel.view.opengl.GLTextureHelper;
 
 

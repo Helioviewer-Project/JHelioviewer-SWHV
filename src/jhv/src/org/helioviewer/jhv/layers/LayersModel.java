@@ -1308,7 +1308,6 @@ public class LayersModel implements ViewListener {
 		String intervalString;
 
     	if(imageInfoView!=null){
-    		Calendar cal = Calendar.getInstance();
     		SimpleDateFormat format = new SimpleDateFormat("yyyy/MM/dd HH:mm");
     		Interval<Date> interval = imageInfoView.getDateRange();
     		if(interval!=null){
@@ -1320,9 +1319,7 @@ public class LayersModel implements ViewListener {
     		else{
     			intervalString = layersModel.getCurrentFrameTimestampString(view);
     			typeString = "Single image";
-    		}
-
-    		
+    		}    		
     	}
     	else{
     		intervalString = layersModel.getCurrentFrameTimestampString(view);
@@ -1330,22 +1327,14 @@ public class LayersModel implements ViewListener {
     	}
 		LayerDescriptor ld = new LayerDescriptor(intervalString, typeString);
 
-        if (view == null) {
-            return ld;
-        }
-
         ld.isMovie = layersModel.isMovie(view);
         ld.isMaster = layersModel.isMaster(view);
         ld.isVisible = layersModel.isVisible(view);
         ld.isTimed = layersModel.isTimed(view);
         ld.title = layersModel.getName(view);
         ld.timestamp = layersModel.getCurrentFrameTimestampString(view);
-        
-
-        
+    
         return ld;
-        
-
     }
 
     private void fireLayerDownloaded(final int index) {

@@ -1,62 +1,24 @@
 package org.helioviewer.plugins.eveplugin.radio.gui;
 
 
-import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Image;
-import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.image.BufferedImage;
-import java.awt.image.ColorModel;
-import java.awt.image.DataBufferByte;
 import java.awt.image.ImageObserver;
-import java.awt.image.Raster;
-import java.awt.image.WritableRaster;
-import java.io.IOException;
-import java.net.URI;
-import java.net.URISyntaxException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
-import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
-import org.apache.derby.impl.store.access.PC_XenaVersion;
-import org.helioviewer.base.logging.Log;
-import org.helioviewer.base.math.Vector2dDouble;
-import org.helioviewer.base.math.Vector2dInt;
 import org.helioviewer.plugins.eveplugin.draw.DrawableElement;
 import org.helioviewer.plugins.eveplugin.draw.DrawableElementType;
 import org.helioviewer.plugins.eveplugin.draw.YAxisElement;
-import org.helioviewer.jhv.io.APIRequestManager;
 import org.helioviewer.plugins.eveplugin.radio.model.DrawableAreaMap;
 import org.helioviewer.plugins.eveplugin.radio.model.PlotConfig;
 import org.helioviewer.plugins.eveplugin.radio.model.RadioPlotModel;
 import org.helioviewer.plugins.eveplugin.radio.model.RadioPlotModelListener;
 import org.helioviewer.plugins.eveplugin.view.chart.Axis;
-
-import org.helioviewer.viewmodel.region.RegionAdapter;
-import org.helioviewer.viewmodel.region.StaticRegion;
-import org.helioviewer.viewmodel.view.View;
-import org.helioviewer.viewmodel.view.ViewListener;
-import org.helioviewer.viewmodel.view.jp2view.JHVJP2View.ReaderMode;
 import org.helioviewer.viewmodel.view.jp2view.JHVJPXView;
 import org.helioviewer.viewmodel.view.jp2view.JP2Image;
-import org.helioviewer.viewmodel.view.jp2view.JHVJP2View;
-import org.helioviewer.viewmodel.view.jp2view.image.ResolutionSet;
-import org.helioviewer.viewmodel.view.jp2view.kakadu.JHV_KduException;
-import org.helioviewer.viewmodel.viewport.StaticViewport;
-import org.helioviewer.viewmodel.viewport.ViewportAdapter;
-import org.helioviewer.viewmodel.changeevent.ChangeEvent;
-import org.helioviewer.viewmodel.changeevent.SubImageDataChangedReason;
-import org.helioviewer.viewmodel.changeevent.TimestampChangedReason;
-import org.helioviewer.viewmodel.imagedata.ImageData;
-import org.helioviewer.viewmodel.imagedata.SingleChannelByte8ImageData;
-import org.helioviewer.viewmodel.imagetransport.Byte8ImageTransport;
-
-
-
 
 
 public class RadioImagePane implements ImageObserver, RadioPlotModelListener, DrawableElement{

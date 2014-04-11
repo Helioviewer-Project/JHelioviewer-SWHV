@@ -116,8 +116,8 @@ public class GL3DImageTextureView extends AbstractGL3DView implements GL3DView {
 	
 		double xOffset = (region.getLowerLeftCorner().getX());
 		double yOffset = (region.getLowerLeftCorner().getY());
-		double xScale = (1/region.getWidth());
-		double yScale = (1/region.getHeight());
+		double xScale = (1/region.getWidth())*2;
+		double yScale = (1/region.getHeight())*2;
 		
 		if (vertexShader != null) {
 			this.vertexShader.changeRect(xOffset, yOffset, Math.abs(xScale), Math.abs(yScale));
@@ -132,8 +132,7 @@ public class GL3DImageTextureView extends AbstractGL3DView implements GL3DView {
 		return region;
 	}
 
-	protected void setViewSpecificImplementation(View newView,
-			ChangeEvent changeEvent) {
+	protected void setViewSpecificImplementation(View newView, ChangeEvent changeEvent) {
 		newView.addViewListener(new ViewListener() {
 
 			public void viewChanged(View sender, ChangeEvent aEvent) {
