@@ -29,6 +29,7 @@ import javax.media.opengl.GL;
 
 import org.helioviewer.base.logging.Log;
 import org.helioviewer.base.physics.Constants;
+import org.helioviewer.gl3d.scenegraph.GL3DDrawBits.Bit;
 import org.helioviewer.gl3d.scenegraph.GL3DMesh;
 import org.helioviewer.gl3d.scenegraph.GL3DState;
 import org.helioviewer.gl3d.scenegraph.math.GL3DVec2d;
@@ -71,6 +72,12 @@ public class GL3DText extends GL3DMesh {
         this.textColor = textColor;
     }
 
+	public GL3DText(double width, double height, int resX, int resY) {
+        super("Rectangle");
+        this.width = width;
+        this.height = height;
+		this.drawBits.set(Bit.Wireframe, false);
+    }
     
     public void shapeDraw( GL3DState state) {
     	GL gl = state.gl;
@@ -83,11 +90,6 @@ public class GL3DText extends GL3DMesh {
     	super.shapeDraw(state);
 	}
 
-	public GL3DText(double width, double height, int resX, int resY) {
-        super("Rectangle");
-        this.width = width;
-        this.height = height;
-    }
 
     public GL3DMeshPrimitive createMesh(GL3DState state, List<GL3DVec3d> positions, List<GL3DVec3d> normals, List<GL3DVec2d> textCoords, List<Integer> indices, List<GL3DVec4d> colors) {
         double xStart = -this.width*this.text.length() / 2.0;

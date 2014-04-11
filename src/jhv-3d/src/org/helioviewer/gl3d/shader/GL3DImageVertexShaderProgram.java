@@ -13,7 +13,7 @@ public class GL3DImageVertexShaderProgram extends GLVertexShaderProgram {
         try {
             String program = "\tphysicalPosition = physicalPosition;" + GLShaderBuilder.LINE_SEP;
             
-            program += "\tfloat phi = 0.8;" + GLShaderBuilder.LINE_SEP;
+            program += "\tfloat phi = -3.14159254/4.0;" + GLShaderBuilder.LINE_SEP;
             program += "\tfloat theta = 0.1;" + GLShaderBuilder.LINE_SEP;
             
             program += "\tfloat xrot = position.x*cos(phi) - position.z*sin(phi);" + GLShaderBuilder.LINE_SEP;
