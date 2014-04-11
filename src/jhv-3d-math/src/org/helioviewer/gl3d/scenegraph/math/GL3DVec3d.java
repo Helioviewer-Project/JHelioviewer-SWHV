@@ -116,13 +116,12 @@ public class GL3DVec3d {
         return new GL3DVec3d(vec1.x - s, vec1.y - s, vec1.z - s);
     }
 
-    public GL3DVec3d divide(GL3DVec3d vec) {
+    public void divide(GL3DVec3d vec) {
         if (vec.x == 0.0 || vec.y == 0.0 || vec.z == 0.0)
             throw new IllegalArgumentException("Division by 0 not allowed!");
         this.x /= vec.x;
         this.y /= vec.y;
         this.z /= vec.z;
-        return this;
     }
 
     public GL3DVec3d divide(double s) {
