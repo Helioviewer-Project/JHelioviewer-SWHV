@@ -4,6 +4,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 import javax.swing.AbstractButton;
 import javax.swing.ButtonGroup;
@@ -61,7 +62,7 @@ public class TopToolBar extends JToolBar implements MouseListener {
 
     protected JToggleButton view2d;
     protected JToggleButton view3d;
-
+    protected CopyOnWriteArrayList<JToggleButton> pluginList = new CopyOnWriteArrayList<JToggleButton>();
     /**
      * Default constructor.
      */
@@ -200,7 +201,18 @@ public class TopToolBar extends JToolBar implements MouseListener {
 
         addButton(view2d);
         addButton(view3d);
-
+        addSeparator();
+        
+        for (JToggleButton button : this.pluginList){
+        	if (displayMode == DisplayMode.ICONANDTEXT)
+        		this.add(button);
+        	else if(displayMode == DisplayMode.TEXTONLY)
+        		this.add(new JToggleButton(button.getText()));
+        	else
+        		this.add(new JToggleButton(button.getIcon()));
+        		
+        }
+        
         updateStateButtons();
     }
 
@@ -258,12 +270,13 @@ public class TopToolBar extends JToolBar implements MouseListener {
      * @param mode
      *            Display mode, can be either ICONANDTEXT, ICONONLY or TEXTONLY
      */
-    protected void setDisplayMode(DisplayMode mode) {
+    public void setDisplayMode(DisplayMode mode) {
         DisplayMode oldDisplayMode = displayMode;
-        displayMode = mode;
-        Settings.getSingletonInstance().setProperty("display.toolbar", mode.toString().toLowerCase());
-        Settings.getSingletonInstance().save();
-
+        if (mode != null){
+        	displayMode = mode;
+        	Settings.getSingletonInstance().setProperty("display.toolbar", mode.toString().toLowerCase());
+        	Settings.getSingletonInstance().save();
+        }
         SelectionMode selectionMode = SelectionMode.PAN;
 
         if (zoomBoxButton.isSelected()) {
@@ -276,6 +289,15 @@ public class TopToolBar extends JToolBar implements MouseListener {
 
         revalidate();
     }
+    
+    public void addToolbarPlugin(JToggleButton button){
+    	this.pluginList.add(button);
+    }
+    
+    public void removeToolbarPlugin(AbstractButton button){
+    	this.pluginList.remove(button);
+    }
+
 
     /**
      * Shows the popup if the correct mouse button was pressed.
@@ -319,4 +341,5 @@ public class TopToolBar extends JToolBar implements MouseListener {
             popUpMenu.show(e.getComponent(), e.getX(), e.getY());
         }
     }
+    
 }
