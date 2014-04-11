@@ -5,6 +5,7 @@ import javax.media.opengl.GL;
 import org.helioviewer.base.physics.Constants;
 import org.helioviewer.gl3d.scenegraph.GL3DMesh;
 import org.helioviewer.gl3d.scenegraph.math.GL3DVec4f;
+import org.helioviewer.gl3d.shader.GL3DImageCoronaVertexShaderProgram;
 import org.helioviewer.gl3d.shader.GL3DImageFragmentShaderProgram;
 import org.helioviewer.gl3d.shader.GL3DImageVertexShaderProgram;
 import org.helioviewer.gl3d.shader.GL3DShaderFactory;
@@ -24,7 +25,10 @@ public class GL3DHMIImageLayer extends GL3DImageLayer {
     	GLFragmentShaderProgram fragmentShader = GL3DShaderFactory.createFragmentShaderProgram(gl, this.sphereFragmentShader);
         GL3DImageVertexShaderProgram vertex = new GL3DImageVertexShaderProgram();
         GLVertexShaderProgram   vertexShader   = GL3DShaderFactory.createVertexShaderProgram(gl, vertex);
-        this.imageTextureView.setVertexShader(vertex);
+        GL3DImageCoronaVertexShaderProgram vertexCorona = new GL3DImageCoronaVertexShaderProgram();
+        GLVertexShaderProgram  vertexCoronaShader   = GL3DShaderFactory.createVertexShaderProgram(gl, vertexCorona);        
+        this.imageTextureView.setVertexShader(vertex, vertexCorona);        
+ 
         
         imageMesh = new GL3DImageSphere(imageTextureView, vertexShader, fragmentShader, this);
         this.imageTextureView.metadata = this.metaDataView.getMetaData();

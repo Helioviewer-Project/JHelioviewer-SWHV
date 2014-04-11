@@ -7,6 +7,7 @@ import org.helioviewer.gl3d.model.GL3DHitReferenceShape;
 import org.helioviewer.gl3d.scenegraph.GL3DMesh;
 import org.helioviewer.gl3d.scenegraph.math.GL3DVec4f;
 import org.helioviewer.gl3d.shader.GL3DImageCoronaFragmentShaderProgram;
+import org.helioviewer.gl3d.shader.GL3DImageCoronaVertexShaderProgram;
 import org.helioviewer.gl3d.shader.GL3DImageVertexShaderProgram;
 import org.helioviewer.gl3d.shader.GL3DLASCOImageFragmentShaderProgram;
 import org.helioviewer.gl3d.shader.GL3DShaderFactory;
@@ -29,7 +30,10 @@ public class GL3DLascoImageLayer extends GL3DImageLayer {
         GLFragmentShaderProgram fragmentShader = GL3DShaderFactory.createFragmentShaderProgram(gl, this.coronaFragmentShader);
         GL3DImageVertexShaderProgram vertex = new GL3DImageVertexShaderProgram();
         GLVertexShaderProgram   vertexShader   = GL3DShaderFactory.createVertexShaderProgram(gl, vertex);
-        this.imageTextureView.setVertexShader(vertex);
+        GL3DImageCoronaVertexShaderProgram vertexCorona = new GL3DImageCoronaVertexShaderProgram();
+        GLVertexShaderProgram  vertexCoronaShader   = GL3DShaderFactory.createVertexShaderProgram(gl, vertexCorona);        
+        this.imageTextureView.setVertexShader(vertex, vertexCorona);        
+ 
         
         lascoImageMesh = new GL3DImageCorona("LASCO", imageTextureView, vertexShader, fragmentShader, this);
         this.imageTextureView.metadata = this.metaDataView.getMetaData();

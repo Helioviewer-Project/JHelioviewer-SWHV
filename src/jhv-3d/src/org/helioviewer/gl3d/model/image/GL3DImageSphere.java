@@ -80,18 +80,6 @@ public class GL3DImageSphere extends GL3DImageMesh {
             GL3DVec3d orientation = GL3DHelper.toVec(toViewSpace.convert(orientationVector)); //.normalize(); - not needed for atan2
 
             phiRotation = GL3DMat4d.rotation(Math.atan2(orientation.x, orientation.z), new GL3DVec3d(0, 1, 0));
-            /*
-            if (!(orientation.equals(new GL3DVec3d(0, 1, 0)))) {
-                GL3DVec3d orientationXZ = new GL3DVec3d(orientation.x, 0, orientation.z);
-                double phi = 0-Math.acos(orientationXZ.z);
-
-                if (orientationXZ.x < 0) {
-
-                	phi = 0 - phi;
-                }                
-                phiRotation = GL3DMat4d.rotation(phi, new GL3DVec3d(0, 1, 0));
-             }
-             */
     		 int resolutionX = 50;
     		 int resolutionY = 100;
 

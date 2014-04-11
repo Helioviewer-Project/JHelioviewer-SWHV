@@ -7,6 +7,7 @@ import org.helioviewer.gl3d.model.GL3DHitReferenceShape;
 import org.helioviewer.gl3d.scenegraph.GL3DMesh;
 import org.helioviewer.gl3d.scenegraph.math.GL3DVec4f;
 import org.helioviewer.gl3d.shader.GL3DImageCoronaFragmentShaderProgram;
+import org.helioviewer.gl3d.shader.GL3DImageCoronaVertexShaderProgram;
 import org.helioviewer.gl3d.shader.GL3DImageFragmentShaderProgram;
 import org.helioviewer.gl3d.shader.GL3DImageVertexShaderProgram;
 import org.helioviewer.gl3d.shader.GL3DShaderFactory;
@@ -29,9 +30,10 @@ public class GL3DStereoImageLayer extends GL3DImageLayer {
 		
 		GL3DImageVertexShaderProgram vertex = new GL3DImageVertexShaderProgram();
         GLVertexShaderProgram   vertexShader   = GL3DShaderFactory.createVertexShaderProgram(gl, vertex);
-        this.imageTextureView.setVertexShader(vertex);
-        //this.accellerationShape = new GL3DHitReferenceShape();
-		// Always display corona
+        GL3DImageCoronaVertexShaderProgram vertexCorona = new GL3DImageCoronaVertexShaderProgram();
+        GLVertexShaderProgram  vertexCoronaShader   = GL3DShaderFactory.createVertexShaderProgram(gl, vertexCorona);        
+        this.imageTextureView.setVertexShader(vertex, vertexCorona);        
+ 
 		this.coronaFragmentShader = new GL3DImageCoronaFragmentShaderProgram();        
         GLFragmentShaderProgram coronaFragmentShader = GL3DShaderFactory.createFragmentShaderProgram(gl, this.coronaFragmentShader);
         

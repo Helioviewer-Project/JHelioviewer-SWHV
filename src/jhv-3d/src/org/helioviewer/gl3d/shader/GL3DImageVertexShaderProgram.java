@@ -24,8 +24,8 @@ public class GL3DImageVertexShaderProgram extends GLVertexShaderProgram {
             program += "\tOUT.position.y = yrot*cos(theta) - zrot*sin(theta);" + GLShaderBuilder.LINE_SEP;
             program += "\tOUT.position.z = yrot*sin(theta) + zrot*cos(theta);" + GLShaderBuilder.LINE_SEP;    
 */            
-            program += "\toutput.z = output.x-offset.x;" + GLShaderBuilder.LINE_SEP;
-            program += "\toutput.w = output.y-offset.y;" + GLShaderBuilder.LINE_SEP;
+            //program += "\toutput.z = output.x-offset.x;" + GLShaderBuilder.LINE_SEP;
+            //program += "\toutput.w = output.y-offset.y;" + GLShaderBuilder.LINE_SEP;
             program += "\toutput.x = xrot - rect.x;" + GLShaderBuilder.LINE_SEP;
             program += "\toutput.y = yrot - rect.y;" + GLShaderBuilder.LINE_SEP;            
 
