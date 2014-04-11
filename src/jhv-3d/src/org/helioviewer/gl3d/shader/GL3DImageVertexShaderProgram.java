@@ -76,6 +76,6 @@ public class GL3DImageVertexShaderProgram extends GLVertexShaderProgram {
 
 	public void changeTextureScale(Vector2dDouble textureScale) {
 		this.xTextureScale = textureScale.getX();
-		this.yTextureScale = textureScale.getX();
+		this.yTextureScale = textureScale.getY();
 	}
 }
