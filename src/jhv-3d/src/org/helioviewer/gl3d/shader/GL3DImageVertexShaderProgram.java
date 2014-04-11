@@ -15,20 +15,20 @@ public class GL3DImageVertexShaderProgram extends GLVertexShaderProgram {
             
             program += "\tfloat phi = 0.8;" + GLShaderBuilder.LINE_SEP;
             program += "\tfloat theta = 0.1;" + GLShaderBuilder.LINE_SEP;
-/*            
-            program += "\tfloat xrot = OUT.position.x*cos(phi) - OUT.position.z*sin(phi);" + GLShaderBuilder.LINE_SEP;
-            program += "\tfloat yrot = OUT.position.y;" + GLShaderBuilder.LINE_SEP;
-            program += "\tfloat zrot = OUT.position.x*sin(phi) + OUT.position.z*cos(phi);" + GLShaderBuilder.LINE_SEP;
             
+            program += "\tfloat xrot = position.x*cos(phi) - position.z*sin(phi);" + GLShaderBuilder.LINE_SEP;
+            program += "\tfloat yrot = position.y;" + GLShaderBuilder.LINE_SEP;
+            program += "\tfloat zrot = position.x*sin(phi) + position.z*cos(phi);" + GLShaderBuilder.LINE_SEP;
+/*            
             program += "\tOUT.position.x = xrot;" + GLShaderBuilder.LINE_SEP;
             program += "\tOUT.position.y = yrot*cos(theta) - zrot*sin(theta);" + GLShaderBuilder.LINE_SEP;
             program += "\tOUT.position.z = yrot*sin(theta) + zrot*cos(theta);" + GLShaderBuilder.LINE_SEP;    
 */            
             program += "\toutput.z = output.x-offset.x;" + GLShaderBuilder.LINE_SEP;
             program += "\toutput.w = output.y-offset.y;" + GLShaderBuilder.LINE_SEP;
-            
-            program += "\toutput.x -= rect.x;" + GLShaderBuilder.LINE_SEP;
-            program += "\toutput.y -= rect.y;" + GLShaderBuilder.LINE_SEP;
+            program += "\toutput.x = xrot - rect.x;" + GLShaderBuilder.LINE_SEP;
+            program += "\toutput.y = yrot - rect.y;" + GLShaderBuilder.LINE_SEP;            
+
             
             program += "\toutput.x *= rect.z;" + GLShaderBuilder.LINE_SEP;
             program += "\toutput.y *= rect.w;" + GLShaderBuilder.LINE_SEP;
