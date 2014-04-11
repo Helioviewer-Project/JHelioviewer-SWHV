@@ -10,6 +10,7 @@ import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.text.SimpleDateFormat;
 import java.util.TimeZone;
@@ -32,6 +33,7 @@ import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 
+import org.helioviewer.base.logging.Log;
 import org.helioviewer.jhv.JHVDirectory;
 import org.helioviewer.jhv.gui.ImageViewerGui;
 import org.helioviewer.jhv.gui.interfaces.ShowableDialog;
@@ -366,6 +368,13 @@ public class MetaDataDialog extends JDialog implements ActionListener, ShowableD
         } catch (TransformerException e) {
             e.printStackTrace();
         }
+        
+    	try {
+			fos.close();
+		} catch (IOException e) {
+			Log.error("Fail at closing file." + e);
+		};
+		
         return true;
     }
 }
