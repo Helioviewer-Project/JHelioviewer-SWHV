@@ -238,9 +238,9 @@ public class GL3DVec3d {
         Log.error("The length of the vector is bigger than 1");
         System.exit(1);
 
-        this.x = 0.0;
-        this.y = 0.0;
-        this.z = 0.0;
+        this.x = Double.NaN;
+        this.y = Double.NaN;
+        this.z = Double.NaN;
     }
 
     public double[] toArray() {
