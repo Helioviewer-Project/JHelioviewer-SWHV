@@ -520,8 +520,8 @@ public class ViewchainFactory {
 			newView = sourceView;
 			// otherwise create new view - if null, skip it
 		} else if (sourceView instanceof GLOverlayView) {
-			newView = sourceView;
-		}
+			newView = new GLOverlayView();
+			((GLOverlayView) sourceView).setOverlays(((GLOverlayView) sourceView).getOverlays());		}
 		else {
 			newView = viewFactory.createViewFromSource(sourceView, keepSource);
 

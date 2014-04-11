@@ -82,8 +82,10 @@ public class GL3DViewchainFactory extends ViewchainFactory {
             // viewFactory.createNewView(GL3DOrthoView.class);
             // orthoView.setView(gl3dLayeredView);
 
-            GLOverlayView overlayView = sourceView.getAdapter(GLOverlayView.class);
-        	overlayView.setView(gl3dLayeredView);
+            GLOverlayView oldOverlayView = sourceView.getAdapter(GLOverlayView.class);
+            GLOverlayView overlayView = new GLOverlayView();
+            overlayView.setOverlays(oldOverlayView.getOverlays());        	
+            overlayView.setView(gl3dLayeredView);
 
             
             GL3DCameraView cameraView = viewFactory.createNewView(GL3DCameraView.class);
