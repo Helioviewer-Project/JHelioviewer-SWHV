@@ -107,7 +107,12 @@ public class GL3DSphere extends GL3DMesh {
             t = s + q;
         }
         ray.setLength(t);
-        ray.setHitPoint(ray.getOrigin().copy().add(ray.getDirection().copy().normalize().multiply(t)));
+        GL3DVec3d rayCopy2 = ray.getDirection().copy();
+        rayCopy2.normalize();
+        rayCopy2.multiply(t);                
+        GL3DVec3d rayCopy = ray.getOrigin().copy();
+        rayCopy.add(rayCopy2);         
+        ray.setHitPoint(rayCopy);
         // ray.setHitPoint(this.wmI.multiply(ray.getHitPoint()));
         ray.isOutside = false;
         ray.setOriginShape(this);

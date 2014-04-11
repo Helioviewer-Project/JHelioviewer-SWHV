@@ -33,8 +33,6 @@ public class GL3DRayTracer {
 
     public synchronized GL3DRay castCenter() {
         GL3DRay ray = createCenterRay(this.camera);
-
-        // isOutside flag set to true if the ray hit no object in the scene
         ray.isOutside = !this.sceneRoot.hit(ray);
         return ray;
     }
@@ -74,17 +72,31 @@ public class GL3DRayTracer {
         LA.normalize();
         LU.normalize();
         LR.normalize();
-        GL3DVec3d C = LA.multiply(camera.getClipNear());
+        
+        /*GL3DVec3d C = LA.multiply(camera.getClipNear());
         GL3DVec3d TL = C.subtract(LR.copy().multiply(hw)).add(LU.copy().multiply(hh));
 
         GL3DVec3d dir = TL.copy().add(LR.copy().multiply(x).subtract(LU.copy().multiply(y)).multiply(pixelSize));
-        // dir = VM.copy().mat3().inverse().multiply(dir);
-        // EYE = VM.copy().inverse().multiply(EYE);
-
-        // GL3DMat4d VM_Inv = VM.inverse();
-        // dir = VM_Inv.mat3().multiply(dir);
-        // EYE = VM_Inv.multiply(EYE);
-
+        */
+        
+        GL3DVec3d dir = LA.copy();    
+        dir.multiply(camera.getClipNear());
+        GL3DVec3d LRcopy = LR.copy();
+        LRcopy.multiply(hw);
+        dir.subtract(LRcopy);
+        GL3DVec3d LUcopy = LU.copy();
+        LUcopy.multiply(hh);
+        dir.add(LUcopy);
+        
+        GL3DVec3d LUcopy2 = LU.copy();
+        LUcopy2.multiply(y);
+        
+        
+        GL3DVec3d LRcopy2 = LR.copy();
+        LRcopy2.multiply(x);
+        LRcopy2.subtract(LUcopy2);
+        LRcopy2.multiply(pixelSize);
+        dir.add(LRcopy2);
         GL3DRay ray = GL3DRay.createPrimaryRay(EYE, dir);
         return ray;
     }

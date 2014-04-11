@@ -75,11 +75,10 @@ public class GL3DVec3d {
         this.z = this.z < vector.z ? this.z : vector.z;
     }
 
-    public GL3DVec3d add(GL3DVec3d vec) {
+    public void add(GL3DVec3d vec) {
         this.x += vec.x;
         this.y += vec.y;
         this.z += vec.z;
-        return this;
     }
 
     public GL3DVec3d add(double s) {

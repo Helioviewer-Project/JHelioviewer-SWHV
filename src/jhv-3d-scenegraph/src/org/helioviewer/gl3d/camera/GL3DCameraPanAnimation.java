@@ -34,7 +34,8 @@ public class GL3DCameraPanAnimation implements GL3DCameraAnimation {
         if (this.startTime < 0) {
             this.startTime = System.currentTimeMillis();
             this.lastAnimationTime = System.currentTimeMillis();
-            this.targetTranslation = camera.getTranslation().copy().add(distanceToMove);
+            this.targetTranslation = camera.getTranslation().copy();
+            this.targetTranslation.add(distanceToMove);
         }
 
         long timeDelta = System.currentTimeMillis() - lastAnimationTime;
