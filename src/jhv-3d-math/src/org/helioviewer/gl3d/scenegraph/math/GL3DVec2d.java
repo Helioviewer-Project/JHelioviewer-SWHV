@@ -56,16 +56,14 @@ public class GL3DVec2d {
         return new GL3DVec2d(vec1.x + s, vec1.y + s);
     }
 
-    public GL3DVec2d subtract(GL3DVec2d vec) {
+    public void subtract(GL3DVec2d vec) {
         this.x -= vec.x;
         this.y -= vec.y;
-        return this;
     }
 
-    public GL3DVec2d subtract(double s) {
+    public void subtract(double s) {
         this.x -= s;
         this.y -= s;
-        return this;
     }
 
     public static GL3DVec2d subtract(GL3DVec2d vec1, GL3DVec2d vec2) {
