@@ -92,7 +92,9 @@ public class GL3DHitReferenceShape extends GL3DMesh {
        	
         // Transform ray to object space for non-groups
         ray.setOriginOS(this.wmI.multiply(ray.getOrigin()));
-        ray.setDirOS(this.wmI.multiply(ray.getDirection()).normalize());
+        GL3DVec3d helpingDir = this.wmI.multiply(ray.getDirection());
+        helpingDir.normalize();
+        ray.setDirOS(helpingDir);
         return this.shapeHit(ray);
     }
 
@@ -106,7 +108,8 @@ public class GL3DHitReferenceShape extends GL3DMesh {
             GL3DVec3d projectionPlaneNormal = new GL3DVec3d(0, 0, 1);
             GL3DVec3d pointOnSphere = this.wmI.multiply(ray.getHitPoint());
             ray.setHitPointOS(pointOnSphere);
-            double cos = pointOnSphere.normalize().dot(projectionPlaneNormal);
+            pointOnSphere.normalize();
+            double cos = pointOnSphere.dot(projectionPlaneNormal);
 
             boolean pointOnSphereBackside = cos < 0;
             // boolean pointOnSphereBackside = pointOnSphere.z<0;
@@ -135,7 +138,9 @@ public class GL3DHitReferenceShape extends GL3DMesh {
 
     private boolean isSphereHit(GL3DRay ray) {
     	GL3DVec3d l = new GL3DVec3d(0, 0, 0).subtract(ray.getOrigin());
-        double s = l.dot(ray.getDirection().copy().normalize());
+    	GL3DVec3d rayDirCopy = ray.getDirection().copy();
+    	rayDirCopy.normalize();
+        double s = l.dot(rayDirCopy);
         double l2 = l.length2();
         double r2 = Constants.SunRadius2;
         if (s < 0 && l2 > r2) {

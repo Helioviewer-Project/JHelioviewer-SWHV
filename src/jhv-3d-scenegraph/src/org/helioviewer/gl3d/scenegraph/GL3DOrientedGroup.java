@@ -27,17 +27,12 @@ public abstract class GL3DOrientedGroup extends GL3DCoordinateSystemGroup {
     }
 
     private void updateOrientation(GL3DState state) {
-    	// Transform Orientation to Viewspace
         CoordinateVector orientationVector = getOrientation();
         CoordinateConversion toViewSpace = getCoordinateSystem().getConversion(state.getActiveCamera().getViewSpaceCoordinateSystem());
         
-        GL3DVec3d orientation = GL3DHelper.toVec(toViewSpace.convert(orientationVector)).normalize();
-        
-        // Log.debug("GL3DOrientedGroup '"+getName()+"': Transformed Orientation from "+orientationVector
-        // +" to "+orientation+" {"+getCoordinateSystem().getClass().getSimpleName()+" -> "+state.getActiveCamera().getViewSpaceCoordinateSystem().getClass().getSimpleName()+"}");
+        GL3DVec3d orientation = GL3DHelper.toVec(toViewSpace.convert(orientationVector));
+        orientation.normalize();
 
-        // Only rotate x and y axis, because images already cater for solar
-        // north being at the top.
         this.m.set(GL3DMat4d.identity());
         
         

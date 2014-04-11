@@ -86,7 +86,9 @@ public class GL3DSphere extends GL3DMesh {
         // return false;
         // Log.debug("GL3DSphere.shapeHit: Dir="+ray.getDirection()+" Origin="+ray.getOrigin()+" Center="+this.center);
         GL3DVec3d l = this.center.copy().subtract(ray.getOrigin());
-        double s = l.dot(ray.getDirection().copy().normalize());
+        GL3DVec3d rayDirCopy = ray.getDirection().copy();
+        rayDirCopy.normalize();
+        double s = l.dot(rayDirCopy);
         double l2 = l.length2();
         double r2 = this.radius * this.radius;
         if (s < 0 && l2 > r2) {

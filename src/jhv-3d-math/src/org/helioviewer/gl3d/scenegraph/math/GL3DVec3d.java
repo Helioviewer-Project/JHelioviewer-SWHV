@@ -212,17 +212,17 @@ public class GL3DVec3d {
         return len * len;
     }
 
-    public GL3DVec3d normalize() {
+    public void normalize() {
         double len = length();
         if (len == 0.0)
-            return this;
+            return;
 
         this.divide(len);
 
         // take shortcut, reasonably close to 1
         len = Math.sqrt(this.x * this.x + this.y * this.y + this.z * this.z);
         if (len <= 1.0)
-            return this;
+            return;
 
         // errors up to 2ulp found in testing
         this.divide(Math.nextAfter(len, len + 1.0));
@@ -230,7 +230,7 @@ public class GL3DVec3d {
         // take shortcut, reasonably close to 1
         len = Math.sqrt(this.x * this.x + this.y * this.y + this.z * this.z);
         if (len <= 1.0)
-            return this;
+            return;
 
         // can't happen / something is really messed up
         System.out.println(len);
@@ -238,7 +238,9 @@ public class GL3DVec3d {
         Log.error("The length of the vector is bigger than 1");
         System.exit(1);
 
-        return null;
+        this.x = 0.0;
+        this.y = 0.0;
+        this.z = 0.0;
     }
 
     public double[] toArray() {

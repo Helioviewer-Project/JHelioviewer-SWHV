@@ -95,7 +95,6 @@ public class GL3DZoomBoxInteraction extends GL3DDefaultInteraction {
     public void mouseReleased(MouseEvent e, GL3DCamera camera) {
         if (this.isValidZoomBox()) {
             camera.addCameraAnimation(createZoomAnimation());
-
             if (isCompletelyOnSphere()) {
                 if (camera.getTranslation().x != 0 || camera.getTranslation().y != 0) {
                     // Reset Panning
@@ -105,8 +104,8 @@ public class GL3DZoomBoxInteraction extends GL3DDefaultInteraction {
                 } else {
                     GL3DVec3d hitPoint = getHitPoint(new Point((int) this.camera.getWidth() / 2, (int) this.camera.getHeight() / 2));
                     if (hitPoint != null) {
-                        GL3DVec3d startPoint = hitPoint.normalize();
-                        camera.addCameraAnimation(createRotationAnimation(startPoint));
+                        hitPoint.normalize();
+                        camera.addCameraAnimation(createRotationAnimation(hitPoint));
                     } else {
                         Log.error("GL3DZoomBoxInteraction: No Hitpoint returned on Sphere!");
                     }
