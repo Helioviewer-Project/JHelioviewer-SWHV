@@ -3,6 +3,7 @@ package org.helioviewer.viewmodel.view;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.LinkedList;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.locks.ReentrantLock;
 
 import org.helioviewer.base.math.RectangleDouble;
@@ -50,8 +51,8 @@ public abstract class AbstractLayeredView extends AbstractView implements Layere
     // Definitions
     // /////////////////////////////////////////////////////////////////////////
 
-    protected LinkedList<View> layers = new LinkedList<View>();
-    protected ReentrantLock layerLock = new ReentrantLock();
+	protected CopyOnWriteArrayList<View> layers = new CopyOnWriteArrayList<View>();
+	protected ReentrantLock layerLock = new ReentrantLock();
     protected HashMap<View, Layer> viewLookup = new HashMap<View, Layer>();
     protected Viewport viewport;
     protected Region region;
@@ -168,8 +169,7 @@ public abstract class AbstractLayeredView extends AbstractView implements Layere
 
         ChangeEvent changeEvent = new ChangeEvent(new LayerChangedReason(this, LayerChangeType.LAYER_ADDED, newLayer));
 
-        layerLock.lock();
-        try {
+
             layers.add(newIndex, newLayer);
             newLayer.addViewListener(this);
 
@@ -192,9 +192,7 @@ public abstract class AbstractLayeredView extends AbstractView implements Layere
             if (region != null)
                 region = new RegionAdapter(new StaticRegion(-0.5 * region.getWidth(), -0.5 * region.getHeight(), region.getSize()));
             recalculateRegionsAndViewports(new ChangeEvent());
-        } finally {
-            layerLock.unlock();
-        }
+
         redrawBuffer(changeEvent);
     }
 
