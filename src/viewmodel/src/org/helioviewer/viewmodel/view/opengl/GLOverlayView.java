@@ -1,7 +1,6 @@
 package org.helioviewer.viewmodel.view.opengl;
 
 import java.util.Iterator;
-import java.util.concurrent.ConcurrentSkipListSet;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 import javax.media.opengl.GL;
@@ -120,12 +119,6 @@ public class GLOverlayView extends AbstractGLView implements OverlayView{
 	}
 
 	@Override
-	public ConcurrentSkipListSet<OverlayPluginContainer> getOverlays() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
 	public void removeOverlay(int index) {
 		// TODO Auto-generated method stub
 		
@@ -142,6 +135,16 @@ public class GLOverlayView extends AbstractGLView implements OverlayView{
 	
 	public View getView(){
 		return view;
+	}
+
+	@Override
+	public void setOverlays(CopyOnWriteArrayList<OverlayPluginContainer> overlays) {
+        this.overlays = overlays;		
+	}
+
+	@Override
+	public CopyOnWriteArrayList<OverlayPluginContainer> getOverlays() {
+		return overlays;
 	}
 	
 }

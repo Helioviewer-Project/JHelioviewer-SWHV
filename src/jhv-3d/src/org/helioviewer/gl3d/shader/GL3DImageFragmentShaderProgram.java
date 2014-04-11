@@ -79,16 +79,9 @@ public class GL3DImageFragmentShaderProgram extends GLFragmentShaderProgram {
         			//+ "\t\tOUT.color = float4(1.0,0.0,0.0,1.0);" + GLShaderBuilder.LINE_SEP
         			+ "\t}";
             program += "\tfloat phi = 3.14159254/4.0;" + GLShaderBuilder.LINE_SEP;        	
-            program += "\tfloat theta = 0.0;" + GLShaderBuilder.LINE_SEP;
+            program += "\tfloat theta = 0.5;" + GLShaderBuilder.LINE_SEP;
             program += "\tOUT.color.a=1.0;" + GLShaderBuilder.LINE_SEP;
-            /*program += "\tfloat xrot = position.x*cos(phi) - position.z*sin(phi);" + GLShaderBuilder.LINE_SEP;
-            program += "\tfloat yrot = position.y;" + GLShaderBuilder.LINE_SEP;
-            program += "\tfloat zrot = position.x*sin(phi) + position.z*cos(phi);" + GLShaderBuilder.LINE_SEP;
             
-            program += "\tfloat xrott = xrot;" + GLShaderBuilder.LINE_SEP;
-            program += "\tfloat yrott = yrot*cos(theta) - zrot*sin(theta);" + GLShaderBuilder.LINE_SEP;
-            program += "\tfloat zrott = yrot*sin(theta) + zrot*cos(theta);" + GLShaderBuilder.LINE_SEP;            
-            */
             program += "\tfloat zaxisxrot = 0.0*cos(phi) - 1.0*sin(phi);" + GLShaderBuilder.LINE_SEP;
             program += "\tfloat zaxisyrot = 0.0;" + GLShaderBuilder.LINE_SEP;
             program += "\tfloat zaxiszrot = 0.0*sin(phi) + 1.0*cos(phi);" + GLShaderBuilder.LINE_SEP;  
@@ -98,9 +91,8 @@ public class GL3DImageFragmentShaderProgram extends GLFragmentShaderProgram {
             program += "\tfloat zaxiszrott = zaxisyrot*sin(theta) + zaxisxrot*cos(theta);" + GLShaderBuilder.LINE_SEP;             
             
             program += "\tfloat4 v1 = float4(position.x, position.y, position.z, 0.0);" + GLShaderBuilder.LINE_SEP;
-            //program += "\tfloat4 v2 = float4(xrot, yrot, zrot, 0.0);" + GLShaderBuilder.LINE_SEP;
-            program += "\tfloat4 v3 = float4(zaxisxrot, zaxisyrot, zaxiszrot, 0.0);" + GLShaderBuilder.LINE_SEP;
-            program += "\tfloat projectionn = dot(v1,v3);" + GLShaderBuilder.LINE_SEP;
+            program += "\tfloat4 v2 = float4(zaxisxrot, zaxisyrot, zaxiszrot, 0.0);" + GLShaderBuilder.LINE_SEP;
+            program += "\tfloat projectionn = dot(v1,v2);" + GLShaderBuilder.LINE_SEP;
            
         	program += "\tif(projectionn<0.0){"
         			+ "\t\tdiscard;" + GLShaderBuilder.LINE_SEP

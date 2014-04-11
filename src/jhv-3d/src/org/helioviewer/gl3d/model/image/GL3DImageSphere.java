@@ -35,7 +35,6 @@ import org.helioviewer.viewmodel.view.opengl.shader.GLVertexShaderProgram;
  * 
  */
 public class GL3DImageSphere extends GL3DImageMesh {
-	protected Vector2dInt mappingResolution = new Vector2dInt((int)Math.pow(2, 6), (int)Math.pow(2, 6));
 
     private TextureCoordinateSystem textureCoordinateSystem;
     private SolarImageToSolarSphereConversion solarImageToSolarSphereConversion;
@@ -96,14 +95,9 @@ public class GL3DImageSphere extends GL3DImageMesh {
 
     	                double x = cosPhi * sinTheta;
     	                double y = cosTheta;
-    	                double z = sinPhi * sinTheta;
-    	                
-    	                
-    	                positions.add(new GL3DVec3d(Constants.SunRadius * x, Constants.SunRadius * y, Constants.SunRadius * z));
-    	                
-    	                
-    	                createVertex(solarSphereCS.createCoordinateVector(Constants.SunRadius * x, Constants.SunRadius * y, Constants.SunRadius * z), normals, textCoords, colors);
-    	                
+    	                double z = sinPhi * sinTheta;   	                    	                
+    	                positions.add(new GL3DVec3d(Constants.SunRadius * x, Constants.SunRadius * y, Constants.SunRadius * z));  	             
+    	                createVertex(solarSphereCS.createCoordinateVector(Constants.SunRadius * x, Constants.SunRadius * y, Constants.SunRadius * z), normals, textCoords, colors);    	                
     	                
     	            }
     	        }

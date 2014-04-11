@@ -3,6 +3,7 @@ package org.helioviewer.viewmodel.view.bufferedimage;
 import java.awt.Graphics;
 import java.awt.image.BufferedImage;
 import java.util.concurrent.ConcurrentSkipListSet;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 import org.helioviewer.viewmodel.changeevent.ChangeEvent;
 import org.helioviewer.viewmodel.changeevent.RegionChangedReason;
@@ -156,8 +157,7 @@ public class BufferedImageOverlayView extends AbstractBasicView implements Overl
 	}
 
 	@Override
-	public ConcurrentSkipListSet<OverlayPluginContainer> getOverlays() {
-		// TODO Auto-generated method stub
+	public CopyOnWriteArrayList<OverlayPluginContainer> getOverlays() {		
 		return null;
 	}
 
@@ -166,4 +166,7 @@ public class BufferedImageOverlayView extends AbstractBasicView implements Overl
 		// TODO Auto-generated method stub
 		
 	}
+    @Override
+    public void setOverlays(CopyOnWriteArrayList<OverlayPluginContainer> overlays) {
+    }	
 }

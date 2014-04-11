@@ -1,6 +1,7 @@
 package org.helioviewer.viewmodel.view;
 
 import java.util.concurrent.ConcurrentSkipListSet;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 import org.helioviewer.viewmodel.renderer.physical.PhysicalRenderer;
 import org.helioviewer.viewmodel.view.opengl.OverlayPluginContainer;
@@ -26,7 +27,8 @@ import org.helioviewer.viewmodel.view.opengl.OverlayPluginContainer;
 public interface OverlayView extends ModifiableInnerViewView, ViewListener{
 
 	public void addOverlay(OverlayPluginContainer overlayPluginContainer);
-	public ConcurrentSkipListSet<OverlayPluginContainer> getOverlays();
+	public CopyOnWriteArrayList<OverlayPluginContainer> getOverlays();
+	public void setOverlays(CopyOnWriteArrayList<OverlayPluginContainer> overlays);	
 	public void removeOverlay(int index);
 	/**
 	 * Sets the renderer to draw overlays.
