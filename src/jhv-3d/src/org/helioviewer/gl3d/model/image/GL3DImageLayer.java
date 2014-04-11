@@ -139,17 +139,7 @@ public abstract class GL3DImageLayer extends GL3DOrientedGroup implements GL3DCa
 
         GL3DVec3d orientation = GL3DHelper.toVec(toViewSpace.convert(orientationVector)); //.normalize(); - not needed for atan2
         double phi = Math.atan2(orientation.x, orientation.z);
-        /*
-        double phi = 0.0;
-        if (!(orientation.equals(new GL3DVec3d(0, 1, 0)))) {
-            GL3DVec3d orientationXZ = new GL3DVec3d(orientation.x, 0, orientation.z);
-            phi = Math.acos(orientationXZ.z);
-            if (orientationXZ.x < 0) {
-                phi = 0 - phi;
-            }
-            phi = 0.0;
-        }
-        */
+
         this.accellerationShape = new GL3DHitReferenceShape(true, phi);
         this.addNode(this.accellerationShape);
 
