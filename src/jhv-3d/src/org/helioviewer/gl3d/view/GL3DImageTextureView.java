@@ -28,14 +28,7 @@ import org.helioviewer.viewmodel.view.View;
 import org.helioviewer.viewmodel.view.ViewListener;
 import org.helioviewer.viewmodel.view.ViewportView;
 import org.helioviewer.viewmodel.view.opengl.GLTextureHelper;
-import org.helioviewer.viewmodel.view.opengl.shader.GLFragmentShaderProgram;
-import org.helioviewer.viewmodel.view.opengl.shader.GLVertexShaderProgram;
 import org.helioviewer.viewmodel.viewport.Viewport;
-
-import sun.reflect.generics.visitor.Reifier;
-
-//import com.sun.xml.internal.ws.api.addressing.WSEndpointReference.Metadata;
-
 /**
  * Connects the 3D viewchain to the 2D viewchain. The underlying 2D viewchain
  * renders it's image to the framebuffer. This view then copies that framebuffer
@@ -148,7 +141,7 @@ public class GL3DImageTextureView extends AbstractGL3DView implements GL3DView {
 		
 		if (vertexShader != null) {
 			this.vertexShader.changeRect(xOffset, yOffset, Math.abs(xScale), Math.abs(yScale));
-			this.vertexShader.changeTextureScale(this.textureScale.getX(), this.textureScale.getY());
+			this.vertexShader.changeTextureScale(this.textureScale);
 			this.coronaVertexShader.changeRect(xOffset, yOffset, Math.abs(xScale), Math.abs(yScale));
 			this.coronaVertexShader.changeTextureScale(this.textureScale.getX(), this.textureScale.getY());				
 			this.fragmentShader.changeTextureScale(this.textureScale.getX(), this.textureScale.getY());

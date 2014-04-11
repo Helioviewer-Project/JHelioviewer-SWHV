@@ -1,5 +1,6 @@
 package org.helioviewer.gl3d.shader;
 
+import org.helioviewer.base.math.Vector2dDouble;
 import org.helioviewer.viewmodel.view.opengl.shader.GLShaderBuilder;
 import org.helioviewer.viewmodel.view.opengl.shader.GLShaderBuilder.GLBuildShaderException;
 import org.helioviewer.viewmodel.view.opengl.shader.GLVertexShaderProgram;
@@ -68,13 +69,13 @@ public class GL3DImageVertexShaderProgram extends GLVertexShaderProgram {
     	this.yScale = yScale;
     }
 
-	public void changeTextureScale(double xTextureScale, double yTextureScale) {
-		this.xTextureScale = xTextureScale;
-		this.yTextureScale = yTextureScale;
-	}
-
 	public void setDefaultOffset(double x, double y){
 		this.defaultXOffset = x;
 		this.defaultYOffset = y;
+	}
+
+	public void changeTextureScale(Vector2dDouble textureScale) {
+		this.xTextureScale = textureScale.getX();
+		this.yTextureScale = textureScale.getX();
 	}
 }
