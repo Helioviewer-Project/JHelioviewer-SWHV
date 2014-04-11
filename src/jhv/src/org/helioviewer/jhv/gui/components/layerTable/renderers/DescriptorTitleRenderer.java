@@ -9,7 +9,6 @@ import javax.swing.border.Border;
 import javax.swing.table.DefaultTableCellRenderer;
 
 import org.helioviewer.jhv.layers.LayerDescriptor;
-import org.helioviewer.jhv.layers.LayersModel;
 
 /**
  * TableCellRenderer rendering the name of a LayerDescriptor

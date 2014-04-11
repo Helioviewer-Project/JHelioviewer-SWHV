@@ -20,10 +20,6 @@ import org.helioviewer.plugins.eveplugin.controller.DrawController;
 import org.helioviewer.plugins.eveplugin.controller.ZoomController;
 import org.helioviewer.plugins.eveplugin.controller.ZoomControllerListener;
 import org.helioviewer.plugins.eveplugin.draw.YAxisElement;
-import org.helioviewer.plugins.eveplugin.lines.data.Band;
-import org.helioviewer.plugins.eveplugin.lines.data.EVEValues;
-import org.helioviewer.plugins.eveplugin.lines.model.EVEDrawController;
-import org.helioviewer.plugins.eveplugin.lines.model.EVEDrawControllerListener;
 import org.helioviewer.plugins.eveplugin.model.ChartModel;
 import org.helioviewer.plugins.eveplugin.model.PlotAreaSpace;
 import org.helioviewer.plugins.eveplugin.model.PlotAreaSpaceManager;
@@ -31,11 +27,8 @@ import org.helioviewer.plugins.eveplugin.radio.data.DownloadRequestData;
 import org.helioviewer.plugins.eveplugin.radio.data.FrequencyInterval;
 import org.helioviewer.plugins.eveplugin.radio.data.RadioDataManager;
 import org.helioviewer.plugins.eveplugin.radio.data.RadioDataManagerListener;
-import org.helioviewer.plugins.eveplugin.radio.data.RadioDownloaderListener;
-import org.helioviewer.plugins.eveplugin.radio.data.RadioImage;
 import org.helioviewer.plugins.eveplugin.radio.gui.RadioImagePane;
 import org.helioviewer.plugins.eveplugin.settings.EVEAPI.API_RESOLUTION_AVERAGES;
-import org.helioviewer.viewmodel.view.ImageInfoView;
 
 public class RadioPlotModel implements RadioDataManagerListener,ZoomControllerListener,//EVEDrawControllerListener, 
 			ZoomDataConfigListener{

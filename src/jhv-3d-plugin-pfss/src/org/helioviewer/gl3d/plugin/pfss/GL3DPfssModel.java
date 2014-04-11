@@ -4,7 +4,6 @@ import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
 
-import org.helioviewer.base.logging.Log;
 import org.helioviewer.base.physics.Constants;
 import org.helioviewer.gl3d.GL3DHelper;
 import org.helioviewer.gl3d.plugin.pfss.data.PfssCurve;

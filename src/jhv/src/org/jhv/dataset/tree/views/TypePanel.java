@@ -9,15 +9,11 @@ import org.helioviewer.viewmodel.view.View;
 import org.jhv.dataset.tree.models.DatasetLayer;
 import org.jhv.dataset.tree.models.DatasetType;
 import org.jhv.dataset.tree.models.LayersToDatasetLayers;
-import org.jhv.dataset.tree.views.FixedHeightButton;
-
 import javax.swing.JLabel;
-import javax.swing.JPanel;
 import javax.swing.tree.TreePath;
 
 
 import java.awt.BorderLayout;
-import java.awt.FlowLayout;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 

@@ -13,8 +13,6 @@ import javax.swing.JProgressBar;
 
 import org.helioviewer.jhv.gui.IconBank;
 import org.helioviewer.jhv.gui.IconBank.JHVIcon;
-import org.helioviewer.plugins.eveplugin.lines.data.Band;
-import org.helioviewer.plugins.eveplugin.lines.data.BandController;
 
 /**
  * @author Stephan Pagel

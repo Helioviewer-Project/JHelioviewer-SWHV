@@ -5,9 +5,6 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
-import java.util.TreeSet;
-
 import org.helioviewer.base.logging.Log;
 import org.helioviewer.base.math.Interval;
 

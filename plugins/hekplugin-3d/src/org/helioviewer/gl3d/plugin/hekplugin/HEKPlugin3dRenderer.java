@@ -2,7 +2,6 @@ package org.helioviewer.gl3d.plugin.hekplugin;
 
 import java.awt.Color;
 import java.awt.image.BufferedImage;
-import java.io.Console;
 import java.util.Date;
 import java.util.Vector;
 

@@ -5,7 +5,6 @@ import org.helioviewer.jhv.gui.ImageViewerGui;
 import org.helioviewer.viewmodel.filter.Filter;
 import org.helioviewer.viewmodel.metadata.HelioviewerMetaData;
 import org.helioviewer.viewmodel.metadata.HelioviewerOcculterMetaData;
-import org.helioviewer.viewmodel.metadata.MetaData;
 import org.helioviewer.viewmodel.view.FilterView;
 import org.helioviewer.viewmodel.view.LayeredView;
 import org.helioviewer.viewmodel.view.MetaDataView;

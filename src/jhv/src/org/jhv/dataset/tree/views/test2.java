@@ -1,11 +1,8 @@
 package org.jhv.dataset.tree.views;
 
-import static org.junit.Assert.assertTrue;
-
 import java.util.ArrayList;
 
 import javax.swing.JFrame;
-import javax.swing.JPanel;
 import javax.swing.JTree;
 import javax.swing.SwingUtilities;
 import javax.swing.tree.DefaultTreeCellRenderer;
@@ -13,7 +10,6 @@ import javax.swing.tree.DefaultTreeCellRenderer;
 import org.helioviewer.jhv.layers.LayerDescriptor;
 import org.helioviewer.jhv.layers.LayersModel;
 import org.jhv.dataset.tree.models.DatasetIntervals;
-import org.jhv.dataset.tree.models.DatasetLayerTreeModel;
 import org.jhv.dataset.tree.models.DatasetNodeRenderer;
 import org.jhv.dataset.tree.models.DatasetTreeCellEditor;
 

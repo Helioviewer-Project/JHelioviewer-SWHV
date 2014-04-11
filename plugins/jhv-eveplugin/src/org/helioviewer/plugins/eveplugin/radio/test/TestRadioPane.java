@@ -2,12 +2,9 @@ package org.helioviewer.plugins.eveplugin.radio.test;
 
 import java.awt.Dimension;
 import java.awt.Graphics;
-import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
 
 import javax.swing.JPanel;
-
-import org.helioviewer.base.logging.Log;
 
 public class TestRadioPane extends JPanel {
 

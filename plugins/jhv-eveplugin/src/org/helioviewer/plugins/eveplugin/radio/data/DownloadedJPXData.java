@@ -6,11 +6,7 @@ package org.helioviewer.plugins.eveplugin.radio.data;
 import java.util.Arrays;
 import java.util.Date;
 
-import org.helioviewer.base.logging.Log;
-import org.helioviewer.viewmodel.changeevent.CacheStatusChangedReason;
-import org.helioviewer.viewmodel.changeevent.CacheStatusChangedReason.CacheType;
 import org.helioviewer.viewmodel.changeevent.ChangeEvent;
-import org.helioviewer.viewmodel.changeevent.ChangedReason;
 import org.helioviewer.viewmodel.changeevent.ViewportChangedReason;
 import org.helioviewer.viewmodel.imagedata.SingleChannelByte8ImageData;
 import org.helioviewer.viewmodel.imagetransport.Byte8ImageTransport;

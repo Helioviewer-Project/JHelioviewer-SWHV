@@ -3,9 +3,6 @@ package org.helioviewer.gl3d.model.image;
 import javax.media.opengl.GL;
 
 import org.helioviewer.base.physics.Constants;
-import org.helioviewer.gl3d.model.GL3DHitReferenceShape;
-import org.helioviewer.gl3d.scenegraph.GL3DMesh;
-import org.helioviewer.gl3d.scenegraph.math.GL3DVec4f;
 import org.helioviewer.gl3d.shader.GL3DImageCoronaFragmentShaderProgram;
 import org.helioviewer.gl3d.shader.GL3DImageCoronaVertexShaderProgram;
 import org.helioviewer.gl3d.shader.GL3DImageFragmentShaderProgram;

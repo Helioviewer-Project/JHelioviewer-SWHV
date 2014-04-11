@@ -12,7 +12,6 @@ import org.helioviewer.viewmodel.metadata.ObserverMetaData;
 import org.helioviewer.viewmodel.view.CachedMovieView;
 import org.helioviewer.viewmodel.view.LinkedMovieManager;
 import org.helioviewer.viewmodel.view.TimedMovieView;
-import org.helioviewer.viewmodel.view.bufferedimage.BufferedImageTimeMachineView;
 import org.helioviewer.viewmodel.view.cache.DateTimeCache;
 import org.helioviewer.viewmodel.view.cache.HelioviewerDateTimeCache;
 import org.helioviewer.viewmodel.view.cache.ImageCacheStatus;

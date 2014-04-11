@@ -4,13 +4,7 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
-import java.util.GregorianCalendar;
-import java.util.Locale;
 import java.util.TimeZone;
-
-import org.helioviewer.viewmodel.metadata.MetaData;
-import org.helioviewer.viewmodel.metadata.ObserverMetaData;
-import org.helioviewer.viewmodel.view.MetaDataView;
 
 /**
  * Class that holds Date and Time information. The data is stored in a Calendar

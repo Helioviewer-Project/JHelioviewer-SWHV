@@ -22,7 +22,6 @@ import org.helioviewer.plugins.eveplugin.settings.EVEAPI;
 import org.helioviewer.plugins.eveplugin.settings.BandType;
 
 import org.helioviewer.plugins.eveplugin.settings.EVESettings;
-import org.helioviewer.plugins.eveplugin.settings.EVEAPI.API_URL_PARAMETER_TYPE_VALUES;
 import org.helioviewer.plugins.eveplugin.view.linedataselector.LineDataSelectorModel;
 import org.json.JSONArray;
 import org.json.JSONException;

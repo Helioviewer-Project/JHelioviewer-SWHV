@@ -16,16 +16,13 @@ import javax.swing.JPanel;
 import javax.swing.JWindow;
 import javax.swing.event.MouseInputListener;
 
-import org.helioviewer.base.logging.Log;
 import org.helioviewer.base.math.Interval;
 import org.helioviewer.plugins.eveplugin.base.Range;
 import org.helioviewer.plugins.eveplugin.lines.data.Band;
 import org.helioviewer.plugins.eveplugin.lines.data.EVEValues;
 import org.helioviewer.plugins.eveplugin.lines.model.EVEDrawController;
-import org.helioviewer.plugins.eveplugin.lines.model.EVEDrawControllerListener;
 import org.helioviewer.plugins.eveplugin.lines.model.EVEValueRangeModel;
 import org.helioviewer.plugins.eveplugin.lines.model.EVEValueRangeModelListener;
-import org.helioviewer.plugins.eveplugin.model.PlotAreaSpace;
 import org.helioviewer.plugins.eveplugin.model.PlotAreaSpaceListener;
 import org.helioviewer.plugins.eveplugin.model.PlotAreaSpaceManager;
 

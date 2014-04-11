@@ -3,7 +3,6 @@ package org.helioviewer.gl3d.camera;
 import java.awt.Point;
 import java.awt.event.MouseEvent;
 
-import org.helioviewer.base.logging.Log;
 import org.helioviewer.gl3d.scenegraph.math.GL3DQuatd;
 import org.helioviewer.gl3d.scenegraph.math.GL3DVec3d;
 import org.helioviewer.gl3d.scenegraph.rt.GL3DRay;

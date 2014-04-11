@@ -30,7 +30,6 @@ import org.helioviewer.viewmodel.view.ComponentView;
 import org.helioviewer.viewmodel.view.ImageInfoView;
 import org.helioviewer.viewmodel.view.LayeredView;
 import org.helioviewer.viewmodel.view.ModifiableInnerViewView;
-import org.helioviewer.viewmodel.view.OverlayView;
 import org.helioviewer.viewmodel.view.SynchronizeView;
 import org.helioviewer.viewmodel.view.View;
 import org.helioviewer.viewmodel.view.opengl.GLOverlayView;

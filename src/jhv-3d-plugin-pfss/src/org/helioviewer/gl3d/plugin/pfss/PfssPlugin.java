@@ -3,7 +3,6 @@ package org.helioviewer.gl3d.plugin.pfss;
 import javax.swing.JComponent;
 
 import org.helioviewer.gl3d.plugin.GL3DAbstractModelPlugin;
-import org.helioviewer.gl3d.plugin.GL3DModelPlugin;
 
 /**
  * The PFSS Plugin provides a means to load file based PFSS Model, that is

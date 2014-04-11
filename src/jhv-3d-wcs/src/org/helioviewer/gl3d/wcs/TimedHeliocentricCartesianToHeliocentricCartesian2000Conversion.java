@@ -3,7 +3,6 @@ package org.helioviewer.gl3d.wcs;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
 
-import org.helioviewer.base.logging.Log;
 import org.helioviewer.base.physics.Astronomy;
 import org.helioviewer.base.physics.DifferentialRotation;
 import org.helioviewer.viewmodel.view.jp2view.datetime.ImmutableDateTime;

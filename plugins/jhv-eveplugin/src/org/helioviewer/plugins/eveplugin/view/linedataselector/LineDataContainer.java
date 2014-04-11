@@ -9,10 +9,6 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 
-import org.helioviewer.plugins.eveplugin.lines.data.Band;
-import org.helioviewer.plugins.eveplugin.lines.data.BandController;
-import org.helioviewer.plugins.eveplugin.lines.data.BandControllerListener;
-
 /**
  * @author Stephan Pagel
  * */

@@ -4,7 +4,6 @@ import java.util.LinkedList;
 
 import org.helioviewer.base.logging.Log;
 import org.helioviewer.viewmodel.filter.Filter;
-import org.helioviewer.viewmodel.renderer.physical.PhysicalRenderer;
 import org.helioviewer.viewmodel.renderer.screen.ScreenRenderer;
 import org.helioviewer.viewmodel.view.ComponentView;
 import org.helioviewer.viewmodel.view.FilterView;
