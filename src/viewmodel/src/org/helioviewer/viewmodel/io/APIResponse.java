@@ -6,8 +6,6 @@ import java.io.Reader;
 import java.io.StringReader;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.nio.ByteBuffer;
-
 import org.helioviewer.base.logging.Log;
 import org.json.JSONException;
 import org.json.JSONObject;

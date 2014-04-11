@@ -7,8 +7,6 @@ import org.helioviewer.gl3d.scenegraph.rt.GL3DRay;
 import org.helioviewer.gl3d.view.GL3DSceneGraphView;
 import org.helioviewer.gl3d.wcs.CoordinateSystem;
 import org.helioviewer.gl3d.wcs.HeliocentricCartesian2000CoordinateSystem;
-import org.helioviewer.gl3d.wcs.HeliocentricCartesianCoordinateSystem;
-import org.helioviewer.gl3d.wcs.TimedHeliocentricCartesianCoordinateSystem;
 
 /**
  * The trackball camera provides a trackball rotation behavior (

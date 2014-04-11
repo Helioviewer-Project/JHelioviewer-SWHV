@@ -4,7 +4,6 @@ import java.awt.event.ActionEvent;
 import javax.swing.AbstractAction;
 import org.helioviewer.jhv.gui.IconBank;
 import org.helioviewer.jhv.gui.IconBank.JHVIcon;
-import org.helioviewer.jhv.layers.LayersModel;
 import org.helioviewer.viewmodel.view.View;
 import org.jhv.dataset.tree.models.LayersToDatasetLayers;
 

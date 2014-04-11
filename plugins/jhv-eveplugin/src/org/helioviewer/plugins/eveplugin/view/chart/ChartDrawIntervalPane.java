@@ -19,7 +19,6 @@ import java.util.Map;
 import javax.swing.JComponent;
 import javax.swing.event.MouseInputListener;
 
-import org.helioviewer.base.logging.Log;
 import org.helioviewer.base.math.Interval;
 import org.helioviewer.jhv.layers.LayersListener;
 import org.helioviewer.jhv.layers.LayersModel;

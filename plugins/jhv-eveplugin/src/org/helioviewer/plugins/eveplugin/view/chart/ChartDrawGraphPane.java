@@ -2,7 +2,6 @@ package org.helioviewer.plugins.eveplugin.view.chart;
 
 import java.awt.Color;
 import java.awt.Cursor;
-import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Point;
@@ -21,7 +20,6 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 

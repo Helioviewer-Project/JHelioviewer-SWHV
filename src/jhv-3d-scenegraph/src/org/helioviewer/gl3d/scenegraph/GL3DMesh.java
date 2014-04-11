@@ -6,7 +6,6 @@ import java.util.concurrent.locks.ReentrantLock;
 
 import javax.media.opengl.GL;
 
-import org.helioviewer.base.logging.Log;
 import org.helioviewer.base.physics.Constants;
 import org.helioviewer.gl3d.scenegraph.GL3DDrawBits.Bit;
 import org.helioviewer.gl3d.scenegraph.math.GL3DVec2d;

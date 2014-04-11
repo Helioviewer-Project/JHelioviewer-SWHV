@@ -9,7 +9,6 @@ import javax.swing.table.DefaultTableCellRenderer;
 
 import org.helioviewer.jhv.gui.IconBank;
 import org.helioviewer.jhv.gui.IconBank.JHVIcon;
-import org.helioviewer.jhv.layers.LayersModel;
 import org.helioviewer.jhv.layers.LayerDescriptor;
 
 /**

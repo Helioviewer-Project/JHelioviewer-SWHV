@@ -21,13 +21,8 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
 import javax.swing.JTabbedPane;
-import javax.swing.JTree;
 import javax.swing.SwingUtilities;
-import javax.swing.tree.DefaultTreeCellRenderer;
-
-import org.helioviewer.base.logging.Log;
 import org.helioviewer.base.message.Message;
-import org.helioviewer.gl3d.view.GL3DSceneGraphView;
 import org.helioviewer.jhv.JHVSplashScreen;
 import org.helioviewer.jhv.gui.actions.ExitProgramAction;
 import org.helioviewer.jhv.gui.components.ControlPanelContainer;
@@ -64,7 +59,6 @@ import org.helioviewer.jhv.io.APIRequestManager;
 import org.helioviewer.jhv.io.CommandLineProcessor;
 import org.helioviewer.jhv.io.FileDownloader;
 import org.helioviewer.jhv.io.JHVRequest;
-import org.helioviewer.jhv.layers.LayersModel;
 import org.helioviewer.viewmodel.metadata.ImageSizeMetaData;
 import org.helioviewer.viewmodel.view.ComponentView;
 import org.helioviewer.viewmodel.view.FilterView;
@@ -74,10 +68,6 @@ import org.helioviewer.viewmodel.view.MetaDataView;
 import org.helioviewer.viewmodel.view.MovieView;
 import org.helioviewer.viewmodel.view.View;
 import org.helioviewer.viewmodelplugin.filter.FilterTabPanelManager;
-import org.jhv.dataset.tree.models.DatasetIntervals;
-import org.jhv.dataset.tree.models.DatasetTreeModel;
-import org.jhv.dataset.tree.models.LayersToDatasetLayers;
-import org.jhv.dataset.tree.views.DatasetTree;
 
 
 

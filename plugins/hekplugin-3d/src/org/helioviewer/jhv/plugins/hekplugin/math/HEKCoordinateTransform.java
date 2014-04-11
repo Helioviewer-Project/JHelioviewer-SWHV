@@ -8,7 +8,6 @@ import org.helioviewer.base.math.SphericalCoord;
 import org.helioviewer.base.math.Vector2dDouble;
 import org.helioviewer.base.math.Vector3dDouble;
 import org.helioviewer.base.physics.Constants;
-import org.helioviewer.base.physics.SolarCoordinates;
 
 /**
  * This class copes all coordinate transformations needed in JHV.

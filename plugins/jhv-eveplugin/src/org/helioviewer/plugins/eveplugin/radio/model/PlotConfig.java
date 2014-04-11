@@ -3,8 +3,6 @@ package org.helioviewer.plugins.eveplugin.radio.model;
 import java.awt.Graphics;
 import java.awt.image.BufferedImage;
 
-import org.helioviewer.base.logging.Log;
-
 public class PlotConfig {
 	private BufferedImage image;
 	private DrawableAreaMap map;

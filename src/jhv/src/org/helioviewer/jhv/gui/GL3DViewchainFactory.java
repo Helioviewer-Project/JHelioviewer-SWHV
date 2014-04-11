@@ -9,7 +9,6 @@ import org.helioviewer.viewmodel.factory.ViewFactory;
 import org.helioviewer.viewmodel.view.ComponentView;
 import org.helioviewer.viewmodel.view.LayeredView;
 import org.helioviewer.viewmodel.view.ModifiableInnerViewView;
-import org.helioviewer.viewmodel.view.OverlayView;
 import org.helioviewer.viewmodel.view.View;
 import org.helioviewer.viewmodel.view.opengl.GLOverlayView;
 

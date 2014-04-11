@@ -8,7 +8,6 @@ import org.helioviewer.gl3d.GL3DHelper;
 import org.helioviewer.gl3d.scenegraph.GL3DState;
 import org.helioviewer.gl3d.scenegraph.math.GL3DMat4d;
 import org.helioviewer.gl3d.scenegraph.math.GL3DVec2d;
-import org.helioviewer.gl3d.scenegraph.math.GL3DVec2f;
 import org.helioviewer.gl3d.scenegraph.math.GL3DVec3d;
 import org.helioviewer.gl3d.scenegraph.math.GL3DVec4d;
 import org.helioviewer.gl3d.view.GL3DImageTextureView;
@@ -19,7 +18,6 @@ import org.helioviewer.gl3d.wcs.impl.SolarImageCoordinateSystem;
 import org.helioviewer.gl3d.wcs.impl.TextureCoordinateSystem;
 import org.helioviewer.viewmodel.metadata.MetaData;
 import org.helioviewer.viewmodel.region.Region;
-import org.helioviewer.viewmodel.view.MetaDataView;
 import org.helioviewer.viewmodel.view.opengl.shader.GLFragmentShaderProgram;
 import org.helioviewer.viewmodel.view.opengl.shader.GLVertexShaderProgram;
 

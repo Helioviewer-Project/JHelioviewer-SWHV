@@ -11,15 +11,11 @@ import org.helioviewer.jhv.gui.ImageViewerGui;
 import org.helioviewer.jhv.gui.dialogs.observation.ObservationDialog;
 import org.helioviewer.jhv.gui.interfaces.MainContentPanelPlugin;
 import org.helioviewer.plugins.eveplugin.lines.data.DatabaseController;
-import org.helioviewer.plugins.eveplugin.model.PlotAreaSpace;
-//import org.helioviewer.plugins.eveplugin.model.PlotTimeSpace;
-import org.helioviewer.plugins.eveplugin.radio.data.RadioDataManager;
 import org.helioviewer.plugins.eveplugin.radio.model.RadioPlotModel;
 import org.helioviewer.plugins.eveplugin.settings.EVESettings;
 import org.helioviewer.plugins.eveplugin.view.MainPanel;
 import org.helioviewer.plugins.eveplugin.view.ObservationDialogUIPanel;
 import org.helioviewer.plugins.eveplugin.view.SimpleObservationDialogUIPanel;
-import org.helioviewer.plugins.eveplugin.view.plot.PlotManagerDialog;
 import org.helioviewer.viewmodelplugin.interfaces.Plugin;
 
 /**

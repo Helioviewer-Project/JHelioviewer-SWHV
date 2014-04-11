@@ -2,7 +2,6 @@ package org.helioviewer.plugins.eveplugin.lines.data;
 
 import java.awt.Color;
 
-import org.helioviewer.plugins.eveplugin.download.DataDownloader;
 import org.helioviewer.plugins.eveplugin.settings.BandType;
 import org.helioviewer.plugins.eveplugin.view.linedataselector.LineDataSelectorElement;
 

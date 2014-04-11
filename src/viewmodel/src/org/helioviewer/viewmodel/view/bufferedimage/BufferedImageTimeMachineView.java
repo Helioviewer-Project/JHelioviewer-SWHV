@@ -8,7 +8,6 @@ import org.helioviewer.viewmodel.changeevent.ViewChainChangedReason;
 import org.helioviewer.viewmodel.factory.BufferedImageViewFactory;
 import org.helioviewer.viewmodel.factory.ViewFactory;
 import org.helioviewer.viewmodel.imagedata.ImageData;
-import org.helioviewer.viewmodel.imagetransport.Byte8ImageTransport;
 import org.helioviewer.viewmodel.region.Region;
 import org.helioviewer.viewmodel.view.AbstractBasicView;
 import org.helioviewer.viewmodel.view.ModifiableInnerViewView;

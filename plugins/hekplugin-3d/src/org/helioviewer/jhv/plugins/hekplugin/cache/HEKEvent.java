@@ -1,7 +1,6 @@
 package org.helioviewer.jhv.plugins.hekplugin.cache;
 
 import java.awt.image.BufferedImage;
-import java.beans.VetoableChangeListener;
 import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.List;

@@ -11,7 +11,6 @@ import org.helioviewer.gl3d.scenegraph.GL3DState;
 import org.helioviewer.gl3d.wcs.CoordinateSystem;
 import org.helioviewer.gl3d.wcs.CoordinateVector;
 import org.helioviewer.gl3d.wcs.HEEQCoordinateSystem;
-import org.helioviewer.gl3d.wcs.HeliocentricCartesian2000CoordinateSystem;
 import org.helioviewer.gl3d.wcs.StonyhurstCoordinateSystem;
 import org.helioviewer.gl3d.wcs.TimedHeliocentricCartesianCoordinateSystem;
 import org.helioviewer.viewmodel.changeevent.ChangeEvent;

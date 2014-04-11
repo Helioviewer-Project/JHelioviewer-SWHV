@@ -1,7 +1,6 @@
 package org.helioviewer.gl3d.camera;
 
 import org.helioviewer.jhv.display.Displayer;
-import org.helioviewer.viewmodel.view.jp2view.JHVJPXView;
 
 /**
  * This animation zooms the camera by a given amount. Zooming only affects the

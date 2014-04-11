@@ -1,19 +1,11 @@
 package org.helioviewer.gl3d.model;
 
-import org.helioviewer.base.physics.Constants;
 import org.helioviewer.gl3d.scenegraph.GL3DGroup;
 import org.helioviewer.gl3d.scenegraph.GL3DModel;
-import org.helioviewer.gl3d.scenegraph.GL3DShape;
 import org.helioviewer.gl3d.scenegraph.GL3DState;
-import org.helioviewer.gl3d.scenegraph.GL3DDrawBits.Bit;
-import org.helioviewer.gl3d.scenegraph.math.GL3DVec3d;
 import org.helioviewer.gl3d.scenegraph.math.GL3DVec4d;
 import org.helioviewer.gl3d.scenegraph.math.GL3DVec4f;
-import org.helioviewer.gl3d.scenegraph.visuals.GL3DArrow;
 import org.helioviewer.gl3d.scenegraph.visuals.GL3DGrid;
-import org.helioviewer.gl3d.scenegraph.visuals.GL3DText;
-import org.helioviewer.gl3d.scenegraph.visuals.GL3DSphere;
-import org.helioviewer.gl3d.scenegraph.visuals.GL3DSunGrid;
 
 /**
  * Grouping Object for all artificial objects, that is visual assistance objects

@@ -1,9 +1,6 @@
 package org.helioviewer.viewmodel.view;
 
 import java.util.AbstractList;
-import java.util.Date;
-
-import org.helioviewer.base.math.Interval;
 
 /**
  * Basic interface for every view.

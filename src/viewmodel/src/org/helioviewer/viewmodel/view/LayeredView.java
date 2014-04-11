@@ -1,9 +1,5 @@
 package org.helioviewer.viewmodel.view;
 
-import java.util.Date;
-
-import org.helioviewer.base.math.Interval;
-
 /**
  * View to merged multiple Views.
  * 
