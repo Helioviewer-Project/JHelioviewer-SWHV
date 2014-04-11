@@ -81,11 +81,10 @@ public class GL3DVec3d {
         this.z += vec.z;
     }
 
-    public GL3DVec3d add(double s) {
+    public void add(double s) {
         this.x += s;
         this.y += s;
         this.z += s;
-        return this;
     }
 
     public static GL3DVec3d add(GL3DVec3d vec1, GL3DVec3d vec2) {
