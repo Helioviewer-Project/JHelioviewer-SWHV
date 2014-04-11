@@ -95,7 +95,7 @@ public class GL3DImageTextureView extends AbstractGL3DView implements GL3DView {
 		if (this.textureId < 0) {
 			this.textureId = th.genTextureID(gl);
 		}
-
+		
 		Region region = getAdapter(RegionView.class).getRegion();
 		Viewport viewport = getAdapter(ViewportView.class).getViewport();
 		Vector2dInt renderOffset = getAdapter(GL3DImageRegionView.class)
@@ -106,8 +106,7 @@ public class GL3DImageTextureView extends AbstractGL3DView implements GL3DView {
 		}
 		int offsetX = renderOffset == null ? 0 : renderOffset.getX();
 		int offsetY = (renderOffset == null ? 0 : renderOffset.getY());
-		Rectangle captureRectangle = new Rectangle(offsetX, offsetY,
-				viewport.getWidth(), viewport.getHeight());
+		Rectangle captureRectangle = new Rectangle(offsetX, offsetY, viewport.getWidth(), viewport.getHeight());
 		
 		if (region != null) capturedRegion = region;
 
