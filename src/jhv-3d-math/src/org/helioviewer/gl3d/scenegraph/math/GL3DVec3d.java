@@ -144,11 +144,10 @@ public class GL3DVec3d {
         return new GL3DVec3d(vec1.x / s, vec1.y / s, vec1.z / s);
     }
 
-    public GL3DVec3d multiply(GL3DVec3d vec) {
+    public void multiply(GL3DVec3d vec) {
         this.x *= vec.x;
         this.y *= vec.y;
         this.z *= vec.z;
-        return this;
     }
 
     public GL3DVec3d multiply(double s) {
