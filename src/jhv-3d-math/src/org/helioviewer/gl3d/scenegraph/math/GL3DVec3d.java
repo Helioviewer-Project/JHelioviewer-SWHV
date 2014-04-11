@@ -124,13 +124,12 @@ public class GL3DVec3d {
         this.z /= vec.z;
     }
 
-    public GL3DVec3d divide(double s) {
+    public void divide(double s) {
         if (s == 0.0)
             throw new IllegalArgumentException("Division by 0 not allowed!");
         this.x /= s;
         this.y /= s;
         this.z /= s;
-        return this;
     }
 
     public static GL3DVec3d divide(GL3DVec3d vec1, GL3DVec3d vec2) {
