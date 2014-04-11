@@ -270,14 +270,15 @@ public abstract class GL3DMesh extends GL3DShape {
         for (GL3DTriangle t : this.triangles) {
             if (t.intersects(ray)) {
             	ray.setOriginShape(this);
-                ray.setHitPoint(ray.getOrigin().copy().add(ray.getDirection().copy().multiply(ray.getLength())));
-                // Log.debug("GL3DMesh.shapeHit: Ray intersects with Mesh " +
-                // this);
+            	
+                GL3DVec3d rayCopy2 = ray.getDirection().copy();
+                rayCopy2.multiply(ray.getLength());                
+                GL3DVec3d rayCopy = ray.getOrigin().copy();
+                rayCopy.add(rayCopy2);            	
+                ray.setHitPoint(rayCopy);
                 return true;
             }
         }
-        // Log.debug("GL3DMesh.shapeHit: Ray does not intersect with Mesh " +
-        // this);
         return false;
     }
 

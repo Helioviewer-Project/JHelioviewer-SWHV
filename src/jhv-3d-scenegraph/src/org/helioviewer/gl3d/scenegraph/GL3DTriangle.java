@@ -26,8 +26,11 @@ public class GL3DTriangle {
         this.a = a;
         this.b = b;
         this.c = c;
-
-        this.center = this.a.copy().add(c).add(b).divide(3);
+        
+        this.center = this.a.copy();
+        this.center.add(c);
+        this.center.add(b);
+        this.center.divide(3);
     }
 
     private final static double EPSILON = 0.0001;
