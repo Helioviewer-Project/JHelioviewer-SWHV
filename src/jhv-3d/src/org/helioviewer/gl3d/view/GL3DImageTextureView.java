@@ -138,27 +138,24 @@ public class GL3DImageTextureView extends AbstractGL3DView implements GL3DView {
 		
 		if (region != null) capturedRegion = region;
 
-		if (this.metadata != null){
-			th.copyFrameBufferToTexture(gl, textureId, captureRectangle);
-			this.textureScale = th.getTextureScale(textureId);
+		th.copyFrameBufferToTexture(gl, textureId, captureRectangle);
+		this.textureScale = th.getTextureScale(textureId);
+	
+		double xOffset = (region.getLowerLeftCorner().getX());
+		double yOffset = (region.getLowerLeftCorner().getY());
+		double xScale = (1/region.getWidth());
+		double yScale = (1/region.getHeight());
 		
-			double xOffset = (region.getLowerLeftCorner().getX());
-			double yOffset = (region.getLowerLeftCorner().getY());
-			double xScale = (1/region.getWidth());
-			double yScale = (1/region.getHeight());
-			
-			if (vertexShader != null) {
-				this.vertexShader.changeRect(xOffset, yOffset, Math.abs(xScale), Math.abs(yScale));
-				this.vertexShader.changeTextureScale(this.textureScale.getX(), this.textureScale.getY());
-				this.coronaVertexShader.changeRect(xOffset, yOffset, Math.abs(xScale), Math.abs(yScale));
-				this.coronaVertexShader.changeTextureScale(this.textureScale.getX(), this.textureScale.getY());				
-				this.fragmentShader.changeTextureScale(this.textureScale.getX(), this.textureScale.getY());
-				this.coronaFragmentShader.changeTextureScale(this.textureScale.getX()*0.999, this.textureScale.getY()*0.999);				
-			}
+		if (vertexShader != null) {
+			this.vertexShader.changeRect(xOffset, yOffset, Math.abs(xScale), Math.abs(yScale));
+			this.vertexShader.changeTextureScale(this.textureScale.getX(), this.textureScale.getY());
+			this.coronaVertexShader.changeRect(xOffset, yOffset, Math.abs(xScale), Math.abs(yScale));
+			this.coronaVertexShader.changeTextureScale(this.textureScale.getX(), this.textureScale.getY());				
+			this.fragmentShader.changeTextureScale(this.textureScale.getX(), this.textureScale.getY());
+			this.coronaFragmentShader.changeTextureScale(this.textureScale.getX()*0.999, this.textureScale.getY()*0.999);				
 		}
-
+		
 		this.recaptureRequested = false;
-
 		return region;
 	}
 
