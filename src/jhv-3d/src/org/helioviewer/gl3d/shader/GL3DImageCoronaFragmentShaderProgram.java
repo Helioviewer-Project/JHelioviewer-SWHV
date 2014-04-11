@@ -1,10 +1,7 @@
     package org.helioviewer.gl3d.shader;
 
-import java.nio.FloatBuffer;
 
 import javax.media.opengl.GL;
-
-import org.helioviewer.base.physics.Constants;
 import org.helioviewer.viewmodel.view.opengl.shader.GLFragmentShaderProgram;
 import org.helioviewer.viewmodel.view.opengl.shader.GLShaderBuilder;
 import org.helioviewer.viewmodel.view.opengl.shader.GLShaderBuilder.GLBuildShaderException;

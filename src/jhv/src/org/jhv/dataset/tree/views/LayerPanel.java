@@ -1,9 +1,6 @@
 package org.jhv.dataset.tree.views;
 
-import java.awt.BorderLayout;
-import java.awt.Color;
 import java.awt.Dimension;
-import java.awt.FlowLayout;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 
@@ -14,16 +11,12 @@ import org.helioviewer.jhv.layers.LayersModel;
 import org.helioviewer.viewmodel.view.View;
 import org.jhv.dataset.tree.models.DatasetLayer;
 import org.jhv.dataset.tree.models.LayersToDatasetLayers;
-import org.jhv.dataset.tree.views.FixedHeightButton;
 
 import javax.swing.BorderFactory;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
-import javax.swing.Icon;
 import javax.swing.ImageIcon;
-import javax.swing.JButton;
 import javax.swing.JLabel;
-import javax.swing.JPanel;
 
 public class LayerPanel extends DatasetPanel{
 

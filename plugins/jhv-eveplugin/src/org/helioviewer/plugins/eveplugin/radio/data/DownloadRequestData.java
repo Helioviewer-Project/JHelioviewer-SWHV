@@ -1,14 +1,10 @@
 package org.helioviewer.plugins.eveplugin.radio.data;
 
 import java.awt.Color;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
-import org.helioviewer.plugins.eveplugin.radio.model.ResolutionSetting;
 import org.helioviewer.plugins.eveplugin.view.linedataselector.LineDataSelectorElement;
-import org.helioviewer.viewmodel.view.jp2view.image.ResolutionSet;
 
 public class DownloadRequestData implements LineDataSelectorElement{
 

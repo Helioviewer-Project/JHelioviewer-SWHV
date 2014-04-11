@@ -1,12 +1,9 @@
 package org.helioviewer.plugins.eveplugin.view.plot;
 
 import java.awt.BorderLayout;
-import java.awt.Dimension;
-
 import javax.swing.JPanel;
 
 import org.helioviewer.plugins.eveplugin.lines.model.EVEDrawController;
-import org.helioviewer.plugins.eveplugin.view.bandselector.BandSelectorPanel;
 import org.helioviewer.plugins.eveplugin.view.chart.ChartDrawGraphPane;
 import org.helioviewer.plugins.eveplugin.view.chart.ChartDrawIntervalPane;
 import org.helioviewer.plugins.eveplugin.view.chart.ChartDrawValueRangePane;

@@ -1,17 +1,13 @@
 package org.helioviewer.plugins.eveplugin.view;
 
-import java.awt.BorderLayout;
 import java.awt.EventQueue;
-import java.awt.FlowLayout;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
 
 import javax.swing.BorderFactory;
-import javax.swing.BoxLayout;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
@@ -19,17 +15,10 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 
 import org.helioviewer.base.math.Interval;
-import org.helioviewer.jhv.Settings;
-import org.helioviewer.jhv.gui.components.calendar.JHVCalendarDatePicker;
-import org.helioviewer.jhv.gui.components.calendar.JHVCalendarEvent;
-import org.helioviewer.jhv.gui.components.calendar.JHVCalendarListener;
 import org.helioviewer.jhv.gui.dialogs.observation.ObservationDialog;
-import org.helioviewer.jhv.gui.dialogs.observation.ObservationDialogPanel;
 import org.helioviewer.plugins.eveplugin.controller.ZoomController;
 import org.helioviewer.plugins.eveplugin.lines.data.BandController;
 import org.helioviewer.plugins.eveplugin.lines.data.EVECacheController;
-//import org.helioviewer.plugins.eveplugin.model.PlotTimeSpace;
-import org.helioviewer.plugins.eveplugin.settings.EVEAPI.API_URL_PARAMETER_TYPE_VALUES;
 import org.helioviewer.plugins.eveplugin.settings.BandType;
 import org.helioviewer.plugins.eveplugin.settings.BandGroup;
 import org.helioviewer.plugins.eveplugin.settings.BandTypeAPI;
