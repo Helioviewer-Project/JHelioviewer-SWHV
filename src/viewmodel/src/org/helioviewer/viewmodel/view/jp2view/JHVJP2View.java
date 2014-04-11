@@ -4,12 +4,9 @@ import java.awt.Dimension;
 import java.net.URI;
 import java.util.Date;
 
-import javax.swing.text.html.HTMLDocument.HTMLReader.IsindexAction;
-
 import kdu_jni.Jp2_palette;
 import kdu_jni.KduException;
 
-import org.helioviewer.base.logging.Log;
 import org.helioviewer.base.math.Interval;
 import org.helioviewer.base.math.Vector2dInt;
 import org.helioviewer.viewmodel.changeevent.ChangeEvent;

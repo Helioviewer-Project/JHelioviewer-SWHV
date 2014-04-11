@@ -8,12 +8,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.helioviewer.base.logging.Log;
 import org.helioviewer.plugins.eveplugin.draw.DrawableElement;
 import org.helioviewer.plugins.eveplugin.draw.DrawableType;
 import org.helioviewer.plugins.eveplugin.draw.YAxisElement;
 
-import com.sun.corba.se.spi.ior.Identifiable;
 
 public class DrawControllerData {
 
