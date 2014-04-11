@@ -257,10 +257,6 @@ public class GL3DVec3d {
         return false;
     }
 
-    public Object clone() {
-        return this.copy();
-    }
-
     public GL3DVec3d copy() {
         return new GL3DVec3d(this);
     }
