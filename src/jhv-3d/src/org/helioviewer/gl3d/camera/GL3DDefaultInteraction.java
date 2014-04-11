@@ -3,6 +3,7 @@ package org.helioviewer.gl3d.camera;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseWheelEvent;
 
+import org.helioviewer.gl3d.scenegraph.math.GL3DVec3d;
 import org.helioviewer.gl3d.view.GL3DSceneGraphView;
 import org.helioviewer.viewmodel.region.Region;
 import org.helioviewer.viewmodel.view.MetaDataView;
@@ -47,7 +48,9 @@ public abstract class GL3DDefaultInteraction extends GL3DInteraction {
             // Log.debug("GL3DZoomFitAction: Distance = "+distance+" Existing Distance: "+camera.getZTranslation());
             this.camera.getRotation().clear();
             camera.addCameraAnimation(new GL3DCameraZoomAnimation(distance, 500));
-            camera.addCameraAnimation(new GL3DCameraPanAnimation(this.camera.getTranslation().copy().negate()));
+            GL3DVec3d cameraTranslation = this.camera.getTranslation().copy();
+            cameraTranslation.negate();
+            camera.addCameraAnimation(new GL3DCameraPanAnimation(cameraTranslation));
         } else {
             camera.setZTranslation(-GL3DTrackballCamera.DEFAULT_CAMERA_DISTANCE);
             this.camera.getRotation().clear();

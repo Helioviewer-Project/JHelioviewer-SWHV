@@ -287,7 +287,9 @@ public class GL3DMat4d {
         GL3DMat4d invRot = new GL3DMat4d(this);
         invRot.setTranslation(0, 0, 0); // remove the translation
         invRot.transpose(); // transpose it to get inverse rot.
-        eye.set(invRot.multiply(this.translation().negate())); // setMatrix eye
+        GL3DVec3d translation = this.translation();
+        translation.negate();
+        eye.set(invRot.multiply(translation)); // setMatrix eye
         right.set(m[0], m[4], m[8]); // normalized look right vector
         up.set(m[1], m[5], m[9]); // normalized look up vector
         at.set(-m[2], -m[6], -m[10]); // normalized look at vector

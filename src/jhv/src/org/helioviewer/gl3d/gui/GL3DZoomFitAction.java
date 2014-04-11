@@ -6,6 +6,7 @@ import org.helioviewer.base.logging.Log;
 import org.helioviewer.gl3d.camera.GL3DCamera;
 import org.helioviewer.gl3d.camera.GL3DCameraPanAnimation;
 import org.helioviewer.gl3d.camera.GL3DCameraZoomAnimation;
+import org.helioviewer.gl3d.scenegraph.math.GL3DVec3d;
 import org.helioviewer.jhv.gui.actions.ZoomFitAction;
 import org.helioviewer.jhv.layers.LayersModel;
 import org.helioviewer.viewmodel.region.Region;
@@ -40,7 +41,9 @@ public class GL3DZoomFitAction extends ZoomFitAction {
                 distance = -distance - camera.getZTranslation();
                 Log.debug("GL3DZoomFitAction: Distance = " + distance + " Existing Distance: " + camera.getZTranslation());
                 camera.addCameraAnimation(new GL3DCameraZoomAnimation(distance, 500));
-                camera.addCameraAnimation(new GL3DCameraPanAnimation(camera.getTranslation().copy().negate()));
+                GL3DVec3d cameraTranslation = camera.getTranslation().copy();
+                cameraTranslation.negate();
+                camera.addCameraAnimation(new GL3DCameraPanAnimation(cameraTranslation));
             }
         }
     }

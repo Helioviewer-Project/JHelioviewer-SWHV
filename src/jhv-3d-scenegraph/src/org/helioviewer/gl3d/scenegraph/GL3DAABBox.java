@@ -93,11 +93,13 @@ public class GL3DAABBox {
     }
 
     public void setCenterAndRadius() {
-        this.centerWS = GL3DVec3d.add(this.minWS, this.maxWS).multiply(0.5);
+        this.centerWS = GL3DVec3d.add(this.minWS, this.maxWS);
+        this.centerWS.multiply(0.5);
         GL3DVec3d ext = GL3DVec3d.subtract(this.maxWS, this.centerWS);
         this.radiusWS = ext.length();
 
-        this.centerOS = GL3DVec3d.add(this.minOS, this.maxOS).multiply(0.5);
+        this.centerOS = GL3DVec3d.add(this.minOS, this.maxOS);
+        this.centerOS.multiply(0.5);
         ext = GL3DVec3d.subtract(this.maxOS, this.centerOS);
         this.radiusOS = ext.length();
     }
