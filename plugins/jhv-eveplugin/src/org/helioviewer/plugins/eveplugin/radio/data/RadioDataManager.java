@@ -11,28 +11,16 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import javax.swing.SwingWorker;
-
-import org.apache.derby.iapi.jdbc.DRDAServerStarter;
 import org.helioviewer.base.logging.Log;
 import org.helioviewer.base.math.Interval;
 import org.helioviewer.plugins.eveplugin.controller.ZoomController;
 import org.helioviewer.plugins.eveplugin.radio.model.ResolutionSetting;
 import org.helioviewer.plugins.eveplugin.radio.test.DataChecker;
-import org.helioviewer.plugins.eveplugin.radio.test.RadioImageTestFrame;
-import org.helioviewer.plugins.eveplugin.radio.test.SendDataTestFrame;
 import org.helioviewer.plugins.eveplugin.settings.EVESettings;
 import org.helioviewer.plugins.eveplugin.view.linedataselector.LineDataSelectorModel;
-import org.helioviewer.viewmodel.changeevent.CacheStatusChangedReason;
-import org.helioviewer.viewmodel.changeevent.CacheStatusChangedReason.CacheType;
 import org.helioviewer.viewmodel.changeevent.ChangeEvent;
-import org.helioviewer.viewmodel.changeevent.SubImageDataChangedReason;
-import org.helioviewer.viewmodel.changeevent.TimestampChangedReason;
-import org.helioviewer.viewmodel.imagedata.SingleChannelByte8ImageData;
-import org.helioviewer.viewmodel.imagetransport.Byte8ImageTransport;
 import org.helioviewer.viewmodel.view.ImageInfoView;
 import org.helioviewer.viewmodel.view.View;
-import org.helioviewer.viewmodel.view.ViewListener;
 import org.helioviewer.viewmodel.view.jp2view.JHVJP2View;
 import org.helioviewer.viewmodel.view.jp2view.JHVJP2View.ReaderMode;
 import org.helioviewer.viewmodel.view.jp2view.JHVJPXView;

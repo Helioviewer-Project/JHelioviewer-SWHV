@@ -14,7 +14,6 @@ import org.helioviewer.gl3d.scenegraph.GL3DState;
 import org.helioviewer.gl3d.scenegraph.visuals.GL3DRectangle;
 
 import com.sun.opengl.util.BufferUtil;
-import com.sun.opengl.util.FPSAnimator;
 
 public class GL3DCanvas extends GLCanvas implements GLEventListener {
 

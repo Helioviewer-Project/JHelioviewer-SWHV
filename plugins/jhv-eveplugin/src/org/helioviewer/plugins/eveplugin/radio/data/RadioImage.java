@@ -1,18 +1,12 @@
 package org.helioviewer.plugins.eveplugin.radio.data;
 
 
-import java.awt.Color;
-import java.awt.Rectangle;
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
 import org.helioviewer.base.math.Interval;
-import org.helioviewer.base.math.Vector2dInt;
 import org.helioviewer.viewmodel.view.jp2view.image.ResolutionSet;
 import org.helioviewer.plugins.eveplugin.radio.model.ResolutionSetting;
-import org.helioviewer.plugins.eveplugin.radio.model.ZoomManagerListener;
-import org.helioviewer.plugins.eveplugin.view.linedataselector.LineDataSelectorElement;
 
 public class RadioImage{
 	private Interval<Date> timeInterval;

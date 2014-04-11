@@ -1,7 +1,6 @@
 package org.helioviewer.plugins.eveplugin.view.linedataselector;
 
 import java.awt.Color;
-import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -9,13 +8,9 @@ import javax.swing.BoxLayout;
 import javax.swing.JList;
 import javax.swing.JPanel;
 
-import org.helioviewer.base.logging.Log;
-import org.helioviewer.base.math.Interval;
+
 import org.helioviewer.plugins.eveplugin.lines.data.Band;
-import org.helioviewer.plugins.eveplugin.lines.data.BandController;
-import org.helioviewer.plugins.eveplugin.lines.data.BandControllerListener;
-import org.helioviewer.plugins.eveplugin.lines.data.DownloadController;
-import org.helioviewer.plugins.eveplugin.lines.data.DownloadControllerListener;
+
 
 /**
  * @author Stephan Pagel
