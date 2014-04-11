@@ -100,16 +100,14 @@ public class GL3DVec2d {
         return new GL3DVec2d(vec1.x / s, vec1.y / s);
     }
 
-    public GL3DVec2d multiply(GL3DVec2d vec) {
+    public void multiply(GL3DVec2d vec) {
         this.x *= vec.x;
         this.y *= vec.y;
-        return this;
     }
 
-    public GL3DVec2d multiply(double s) {
+    public void multiply(double s) {
         this.x *= s;
         this.y *= s;
-        return this;
     }
 
     public static GL3DVec2d multiply(GL3DVec2d vec1, GL3DVec2d vec2) {
@@ -128,15 +126,22 @@ public class GL3DVec2d {
         return (u.x * v.x) + (u.y * v.y);
     }
 
-    public GL3DVec2d negate() {
-        return this.multiply(-1.0);
+    public void negate() {
+    	this.x = -this.x;
+    	this.y = -this.y;
     }
 
     public static GL3DVec2d negate(GL3DVec2d vec) {
-        return vec.multiply(-1.0);
+    	GL3DVec2d newVec = vec.copy();
+    	newVec.negate();
+    	return newVec;
     }
 
-    public boolean isApproxEqual(GL3DVec2d vec, double tolerance) {
+    private GL3DVec2d copy() {
+    	return new GL3DVec2d(this.x, this.y);
+	}
+
+	public boolean isApproxEqual(GL3DVec2d vec, double tolerance) {
         return Math.abs(this.x - vec.x) <= tolerance && Math.abs(this.y - vec.y) <= tolerance;
     }
 
