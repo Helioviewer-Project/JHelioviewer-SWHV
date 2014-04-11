@@ -9,7 +9,10 @@ public class GL3DQuatd {
 
     public static GL3DQuatd createRotation(double angle, GL3DVec3d axis) {
         double halfAngle = angle / 2.0;
-        return new GL3DQuatd(Math.cos(halfAngle), axis.normalize().multiply(Math.sin(halfAngle)));
+        GL3DVec3d axisCopy = axis.copy();
+        axisCopy.normalize();
+        axisCopy.multiply(Math.sin(halfAngle));
+        return new GL3DQuatd(Math.cos(halfAngle), axisCopy);
     }
 
     private GL3DQuatd(double a, double x, double y, double z) {

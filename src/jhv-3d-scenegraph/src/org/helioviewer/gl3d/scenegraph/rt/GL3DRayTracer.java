@@ -53,11 +53,13 @@ public class GL3DRayTracer {
         GL3DVec3d EYE = new GL3DVec3d();
 
         VM.readLookAt(EYE, LA, LU, LR);
-        LA.normalize();
+        
+        GL3DVec3d dir = LA.copy();
+        dir.normalize();
 
-        GL3DVec3d C = LA.multiply(camera.getClipNear());
+        dir.multiply(camera.getClipNear());
 
-        GL3DRay ray = GL3DRay.createPrimaryRay(EYE, C);
+        GL3DRay ray = GL3DRay.createPrimaryRay(EYE, dir);
         return ray;
     }
 

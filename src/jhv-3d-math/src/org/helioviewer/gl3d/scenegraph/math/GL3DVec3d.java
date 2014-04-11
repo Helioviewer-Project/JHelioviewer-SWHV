@@ -150,11 +150,10 @@ public class GL3DVec3d {
         this.z *= vec.z;
     }
 
-    public GL3DVec3d multiply(double s) {
+    public void multiply(double s) {
         this.x *= s;
         this.y *= s;
         this.z *= s;
-        return this;
     }
 
     public static GL3DVec3d multiply(GL3DVec3d vec1, GL3DVec3d vec2) {
@@ -181,12 +180,16 @@ public class GL3DVec3d {
         return new GL3DVec3d(u.y * v.z - u.z * v.y, u.z * v.x - u.x * v.z, u.x * v.y - u.y * v.x);
     }
 
-    public GL3DVec3d negate() {
-        return this.multiply(-1.0);
+    public void negate() {
+        this.x = -this.x;
+        this.y = -this.y;
+        this.z = -this.z;
     }
 
     public static GL3DVec3d negate(GL3DVec3d vec) {
-        return vec.multiply(-1.0);
+        GL3DVec3d vecCopy = vec.copy();
+        vecCopy.negate();
+        return vecCopy;
     }
 
     public boolean isApproxEqual(GL3DVec3d vec, double tolerance) {

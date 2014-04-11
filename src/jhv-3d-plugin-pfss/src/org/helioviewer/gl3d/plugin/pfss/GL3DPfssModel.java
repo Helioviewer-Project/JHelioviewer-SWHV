@@ -52,8 +52,9 @@ public class GL3DPfssModel extends GL3DOrientedGroup {
 
                     CoordinateVector pfssCoordinate = curve.points.get(i);
                     CoordinateVector convertedCoordinate = conversion.convert(pfssCoordinate);
-
-                    points.add(GL3DHelper.toVec(convertedCoordinate).multiply(Constants.SunRadius));
+                    GL3DVec3d helpVec = GL3DHelper.toVec(convertedCoordinate);
+                    helpVec.multiply(Constants.SunRadius);
+                    points.add(helpVec);
                 }
             }
             this.addNode(new GL3DPolyLine(points, new GL3DVec4f(curve.color.x, curve.color.y, curve.color.z, 1.0f), GL3DMeshPrimitive.LINE_STRIP));
