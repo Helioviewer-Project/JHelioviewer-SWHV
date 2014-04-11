@@ -1,12 +1,12 @@
 package org.helioviewer.jhv.display;
 
-import java.util.LinkedList;
+import java.util.ArrayList;
 
 public class Displayer{
 	
     private static Displayer instance = new Displayer();
-    private final LinkedList<DisplayListener> listeners = new LinkedList<DisplayListener>();
-    private final LinkedList<RenderListener> renderListeners = new LinkedList<RenderListener>();
+    private final ArrayList<DisplayListener> listeners = new ArrayList<DisplayListener>();
+    private final ArrayList<RenderListener> renderListeners = new ArrayList<RenderListener>();
     private GL3DComponentFakeInterface gl3dcomponent;
 	private Object lock = new Object();
 	private int queue = 0;
@@ -55,12 +55,13 @@ public class Displayer{
     	}
     	if(queuecopy==1){
     		while(queue>0){
-		        for(final DisplayListener listener : listeners) {
-		            listener.display();
-		        }
-		    	synchronized(lock ){
-		    		queue--;
-		    	}
+
+    	    	synchronized(listeners){
+			        for(final DisplayListener listener : listeners) {
+			            listener.display();
+			        }
+    	    	}
+		    	queue--;
 	    	}
     	}
     }
