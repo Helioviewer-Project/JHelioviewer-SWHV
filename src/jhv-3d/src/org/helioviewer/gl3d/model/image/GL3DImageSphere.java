@@ -94,6 +94,7 @@ public class GL3DImageSphere extends GL3DImageMesh {
              */
     		 int resolutionX = 50;
     		 int resolutionY = 100;
+
              
     		 for (int latNumber = 0; latNumber <= resolutionX; latNumber++) {
     	            double theta = latNumber * Math.PI / resolutionX;
@@ -128,6 +129,7 @@ public class GL3DImageSphere extends GL3DImageMesh {
     	                
     	                
     	                tmpSolarSphereVec = positions.get(first);
+    	                /*
     	                double z0 = tmpSolarSphereVec.z;
     	                if (phiRotation != null){
     	                	z0 = tmpSolarSphereVec.x * phiRotation.m[2] + tmpSolarSphereVec.y * phiRotation.m[6] + tmpSolarSphereVec.z * phiRotation.m[10] + phiRotation.m[14];
@@ -150,8 +152,8 @@ public class GL3DImageSphere extends GL3DImageMesh {
     	                if (phiRotation != null){
     	                	z3 = tmpSolarSphereVec.x * phiRotation.m[2] + tmpSolarSphereVec.y * phiRotation.m[6] + tmpSolarSphereVec.z * phiRotation.m[10] + phiRotation.m[14];
     	                }
-    	                
-    	                if (z0 >= 0 && z1 >= 0 && z2 >= 0 && z3 >= 0) {
+    	                */
+    	                //if (z0 >= 0 && z1 >= 0 && z2 >= 0 && z3 >= 0) {
     	                	
         	                indices.add(first);
         	                indices.add(first + 1);
@@ -161,7 +163,8 @@ public class GL3DImageSphere extends GL3DImageMesh {
         	                indices.add(second);
         	                indices.add(second + 1);
         	                
-    	                }
+    	                //}
+    	                
     	            }
     	        }
     	 }

@@ -388,8 +388,7 @@ public class GL3DSceneGraphView extends AbstractGL3DView implements GL3DView {
 	}
 
 	public void toggleCoronaVisibility() {
-		this.imageLayers.setCoronaVisibility(!this.imageLayers
-				.getCoronaVisibility());
+		this.imageLayers.setCoronaVisibility(!this.imageLayers.getCoronaVisibility());
 	}
 
 	public void printScenegraph() {
