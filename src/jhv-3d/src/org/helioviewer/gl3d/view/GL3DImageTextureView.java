@@ -127,12 +127,6 @@ public class GL3DImageTextureView extends AbstractGL3DView implements GL3DView {
 			double deltat = metadata.getDateTime().getMillis()/1000.0;
 			double theta = 0.0;
 			double phi = DifferentialRotation.calculateRotationInRadians(0.0, deltat);
-			/*double theta = 3.14/8;
-			double phi = 3.14/2;
-			phi = phi + counter * 0.1;
-	    	counter++;			
-	    	System.out.println(phi);
-	    	*/
 			this.vertexShader.changeRect(xOffset, yOffset, Math.abs(xScale), Math.abs(yScale));
 			this.vertexShader.changeTextureScale(this.textureScale);
 	        this.vertexShader.changeAngles(theta, phi);
