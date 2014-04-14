@@ -147,12 +147,14 @@ public class BufferedImageTimeMachineView extends AbstractBasicView implements S
          * @see org.helioviewer.viewmodel.view.TimeMachineData#getPreviousFrame(int)
          */
         public ImageData getPreviousFrame(int pos) {
-            try {
+            /*try {
                 System.out.println("Previous frame " + pos + " with current master frame " + movieView.getCurrentFrameNumber());
                 return previousCache.get(pos);
-            } catch (IndexOutOfBoundsException e) {
-                return renderThroughSlave(movieView.getCurrentFrameNumber() - pos);
-            }
+            } catch (IndexOutOfBoundsException e) {*/
+                //return renderThroughSlave(movieView.getCurrentFrameNumber() - pos);
+                return renderThroughSlave(0);
+
+            /*}*/
         }
 
         /**

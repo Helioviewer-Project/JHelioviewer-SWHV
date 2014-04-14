@@ -95,7 +95,6 @@ public class DownloadedJPXData implements ViewListener{
 				//Log.debug("image data was null");
 			}
 		}else{
-			//Log.debug("Event received");
 			JHVJP2View jp2View = sender.getAdapter(JHVJP2View.class);
 			byte[] data = new byte[0];
 			SingleChannelByte8ImageData imageData = (SingleChannelByte8ImageData)(jp2View.getSubimageData());
@@ -104,7 +103,6 @@ public class DownloadedJPXData implements ViewListener{
 				data = bytetrs.getByte8PixelData();
 				byte[] copyData = Arrays.copyOf(data, data.length);
 				data = new byte[0];
-				//Log.debug("size of data "+ copyData.length);
 				radioDataManager.dataForIDReceived(copyData, imageID,downloadID);
 			}else{
 				//Log.debug("Imagedata was null");
