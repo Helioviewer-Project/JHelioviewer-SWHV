@@ -559,6 +559,8 @@ class J2KReader implements Runnable {
                                 case ALLFRAMESEQUALLY:
                                     current_step++;
                                     break;
+								default:
+									break;
                                 }
 
                                 // let others do their work, too

@@ -2,7 +2,6 @@ package org.helioviewer.viewmodel.view.bufferedimage;
 
 import java.awt.Graphics;
 import java.awt.image.BufferedImage;
-import java.util.concurrent.ConcurrentSkipListSet;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 import org.helioviewer.viewmodel.changeevent.ChangeEvent;

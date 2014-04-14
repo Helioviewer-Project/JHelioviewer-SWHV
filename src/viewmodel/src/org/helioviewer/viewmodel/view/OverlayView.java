@@ -1,6 +1,5 @@
 package org.helioviewer.viewmodel.view;
 
-import java.util.concurrent.ConcurrentSkipListSet;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 import org.helioviewer.viewmodel.renderer.physical.PhysicalRenderer;
