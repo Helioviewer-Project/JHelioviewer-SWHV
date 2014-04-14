@@ -256,7 +256,7 @@ public class HelioviewerMetaData extends AbstractMetaData implements SunMetaData
 
         if (changed) {
             solarPixelRadius = newSolarPixelRadius;
-            meterPerPixel = Constants.SunRadius / solarPixelRadius;
+            meterPerPixel = Constants.SunRadius / solarPixelRadius/Constants.SunRadiusInMeter;
             setPhysicalLowerLeftCorner(sunPixelPosition.scale(-meterPerPixel));
             setPhysicalImageSize(new Vector2dDouble(pixelImageSize.getX() * meterPerPixel, pixelImageSize.getY() * meterPerPixel));
         }

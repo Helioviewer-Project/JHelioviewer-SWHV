@@ -1,8 +1,11 @@
 package org.helioviewer.base.physics;
 
 public class Constants {
-
-    public static final double SunRadius = 6.96e8;
+	
+	//global units in solar radii
+    public static final double SunRadius = 1;
+    
+    public static final double SunRadiusInMeter = 6.96e8;
 
     public static final double SunDiameter = 2 * SunRadius;
 
