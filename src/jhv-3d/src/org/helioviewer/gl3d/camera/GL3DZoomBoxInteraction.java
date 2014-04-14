@@ -33,7 +33,7 @@ public class GL3DZoomBoxInteraction extends GL3DDefaultInteraction {
 
     private SolarImageCoordinateSystem solarDiskCS;
 
-    public GL3DZoomBoxInteraction(GL3DTrackballCamera camera, GL3DSceneGraphView sceneGraph) {
+    public GL3DZoomBoxInteraction(GL3DSolarRotationTrackingTrackballCamera camera, GL3DSceneGraphView sceneGraph) {
         super(camera, sceneGraph);
         this.solarDiskCS = new SolarImageCoordinateSystem();
     }
