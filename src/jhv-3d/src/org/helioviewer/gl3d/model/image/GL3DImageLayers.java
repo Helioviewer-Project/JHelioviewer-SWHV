@@ -116,7 +116,6 @@ public class GL3DImageLayers extends GL3DGroup {
         }
         
         state.gl.glDepthMask(true);
-        state.gl.glBlendFunc(GL.GL_SRC_ALPHA, GL.GL_ONE);        
         state.gl.glDisable(GL.GL_BLEND);
         
     }
