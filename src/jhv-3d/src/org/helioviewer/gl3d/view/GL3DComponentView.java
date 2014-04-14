@@ -52,7 +52,6 @@ import com.sun.opengl.util.FPSAnimator;
  */
 public class GL3DComponentView extends AbstractComponentView implements GLEventListener, ComponentView, DisplayListener, GL3DComponentFakeInterface {
     private GLCanvas canvas;
-    private FPSAnimator animator;
 
     private Color backgroundColor = Color.BLACK;
     private boolean backGroundColorHasChanged = false;
