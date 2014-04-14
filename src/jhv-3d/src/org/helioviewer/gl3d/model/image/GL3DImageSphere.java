@@ -4,7 +4,6 @@ import java.util.List;
 
 import javax.media.opengl.GL;
 
-import org.helioviewer.base.math.Vector2dInt;
 import org.helioviewer.base.physics.Constants;
 import org.helioviewer.gl3d.GL3DHelper;
 import org.helioviewer.gl3d.scenegraph.GL3DState;

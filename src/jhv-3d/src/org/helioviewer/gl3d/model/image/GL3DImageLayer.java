@@ -9,7 +9,6 @@ import javax.media.opengl.GL;
 
 import org.helioviewer.base.logging.Log;
 import org.helioviewer.base.physics.Constants;
-import org.helioviewer.base.physics.DifferentialRotation;
 import org.helioviewer.gl3d.GL3DHelper;
 import org.helioviewer.gl3d.camera.GL3DCamera;
 import org.helioviewer.gl3d.camera.GL3DCameraListener;

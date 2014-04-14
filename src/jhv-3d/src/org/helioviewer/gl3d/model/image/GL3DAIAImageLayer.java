@@ -15,7 +15,6 @@ import org.helioviewer.viewmodel.view.opengl.shader.GLVertexShaderProgram;
 public class GL3DAIAImageLayer extends GL3DImageLayer {
     private GL3DImageSphere sphere;
     private GL3DImageCorona corona;
-    private GL3DCircle circle;
     public GL3DAIAImageLayer(GL3DView mainView) {
         super("AIA Image Layer", mainView);
     }

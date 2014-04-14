@@ -111,7 +111,6 @@ import org.helioviewer.viewmodel.view.jp2view.JHVJP2View.ReaderMode;
 import org.helioviewer.viewmodel.view.jp2view.JP2Image;
 import org.helioviewer.viewmodel.view.jp2view.datetime.ImmutableDateTime;
 import org.helioviewer.viewmodel.view.opengl.GLComponentView;
-import org.helioviewer.viewmodel.view.opengl.GLLayeredView;
 import org.helioviewer.viewmodel.viewport.StaticViewport;
 import org.helioviewer.viewmodel.viewport.Viewport;
 

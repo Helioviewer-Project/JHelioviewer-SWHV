@@ -400,6 +400,8 @@ public final class ViewHelper {
             return RenderingHints.VALUE_INTERPOLATION_BILINEAR;
         case BICUBIC:
             return RenderingHints.VALUE_INTERPOLATION_BICUBIC;
+		default:
+			break;
         }
         return null;
     }

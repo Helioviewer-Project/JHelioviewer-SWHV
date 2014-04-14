@@ -312,6 +312,8 @@ public class PlotsControlPanel extends JPanel implements ZoomControllerListener,
                 return Integer.toString(number) + " Month" + plural;
             case Year:
                 return Integer.toString(number) + " Year" + plural;
+			default:
+				break;
             }
             
             return "Custom";

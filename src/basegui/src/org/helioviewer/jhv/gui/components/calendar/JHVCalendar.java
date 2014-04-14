@@ -411,6 +411,8 @@ public class JHVCalendar extends JPanel implements ComponentListener {
                     changeDisplayMode(DisplayMode.YEARS);
                     updateDateDisplay();
                     break;
+				default:
+					break;
                 }
 
             } else if (e.getSource() == quickForwardButton) {
