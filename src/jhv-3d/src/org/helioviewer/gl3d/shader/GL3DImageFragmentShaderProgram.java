@@ -11,6 +11,8 @@ public class GL3DImageFragmentShaderProgram extends GLFragmentShaderProgram {
     private double cutOffRadius= 0.0f;
 	private double xTextureScale;
 	private double yTextureScale;
+	private double theta;
+	private double phi;	
 
 	public GL3DImageFragmentShaderProgram() {
     }
@@ -21,9 +23,16 @@ public class GL3DImageFragmentShaderProgram extends GLFragmentShaderProgram {
      *            Valid reference to the current gl object
      */
     public final void bind(GL gl) {
-    	bind(gl, shaderID, cutOffRadius, xTextureScale, yTextureScale);
+    	bind(gl, shaderID, cutOffRadius, xTextureScale, yTextureScale, theta, phi);
     }
-
+    private static void bind(GL gl, int shader, double cutOffRadius, double xTextureScale, double yTextureScale, double theta, double phi) {
+        //if (shader != shaderCurrentlyUsed) {
+            shaderCurrentlyUsed = shader;
+            gl.glBindProgramARB(target, shader);
+            gl.glProgramLocalParameter4dARB(target, 0, cutOffRadius, 0.0f, 0.0f, 0.0f);
+            gl.glProgramLocalParameter4dARB(target, 1,xTextureScale, yTextureScale, theta, phi);
+        //}
+    }
     /**
      * Pushes the shader currently in use onto a stack.
      * 
@@ -55,32 +64,18 @@ public class GL3DImageFragmentShaderProgram extends GLFragmentShaderProgram {
         Integer restoreShaderObject = shaderStack.pop();
         int restoreShader = restoreShaderObject == null ? 0 : restoreShaderObject.intValue();
         if (restoreShader >= 0) {
-            bind(gl, restoreShader, 0.0f,0.0,0.0);
+            bind(gl, restoreShader, 0.0f,0.0,0.0, 0.0,0.0);
         }
     }
 
-    /**
-     * Binds (= activates it) the given shader, if it is not active so far.
-     * 
-     * @param gl
-     *            Valid reference to the current gl object
-     */
-    private static void bind(GL gl, int shader, double cutOffRadius, double xTextureScale, double yTextureScale) {
-        if (shader != shaderCurrentlyUsed) {
-            shaderCurrentlyUsed = shader;
-            gl.glBindProgramARB(target, shader);
-            gl.glProgramLocalParameter4dARB(target, 0, cutOffRadius, 0.0f, 0.0f, 0.0f);
-            gl.glProgramLocalParameter4dARB(target, 1,xTextureScale, yTextureScale, 0, 0);
-        }
-    }
     protected void buildImpl(GLShaderBuilder shaderBuilder) {
         try {
-        	String program = "\tif(texcoord0.x<0.0||texcoord0.y<0.0||texcoord0.x>textureScale.x||texcoord0.y>textureScale.y){"
+        	String program = "\tif(texcoord0.x<0.0||texcoord0.y<0.0||texcoord0.x>textureScaleThetaPhi.x||texcoord0.y>textureScaleThetaPhi.y){"
         			//+ "\t\tOUT.color = float4(1.0,0.0,0.0,1.0);" + GLShaderBuilder.LINE_SEP
-        			+ "\t}";
-            program += "\tfloat phi = 3.14159254/4;" + GLShaderBuilder.LINE_SEP;        	
-            program += "\tfloat theta = -3.14/4;" + GLShaderBuilder.LINE_SEP;
+        			+ "\t}"+ GLShaderBuilder.LINE_SEP;
             program += "\tOUT.color.a=1.0;" + GLShaderBuilder.LINE_SEP;
+            program += "\tfloat theta = textureScaleThetaPhi.z;" + GLShaderBuilder.LINE_SEP;
+            program += "\tfloat phi = textureScaleThetaPhi.w;" + GLShaderBuilder.LINE_SEP;        	
             
             program += "\tfloat zaxisxrott = 0.0;" + GLShaderBuilder.LINE_SEP;
             program += "\tfloat zaxisyrott = 0.0*cos(theta) - 1.0*sin(theta);" + GLShaderBuilder.LINE_SEP;
@@ -92,7 +87,7 @@ public class GL3DImageFragmentShaderProgram extends GLFragmentShaderProgram {
             
             
             program += "\tfloat4 v1 = float4(position.x, position.y, position.z, 0.0);" + GLShaderBuilder.LINE_SEP;
-            program += "\tfloat4 v2 = float4(zaxisxrott, zaxisyrott, zaxiszrott, 0.0);" + GLShaderBuilder.LINE_SEP;
+            program += "\tfloat4 v2 = float4(zaxisxrot, zaxisyrot, zaxiszrot, 0.0);" + GLShaderBuilder.LINE_SEP;
             program += "\tfloat projectionn = dot(v1,v2);" + GLShaderBuilder.LINE_SEP;
            
         	program += "\tif(projectionn<0.0){"
@@ -105,7 +100,8 @@ public class GL3DImageFragmentShaderProgram extends GLFragmentShaderProgram {
         	
         	
             shaderBuilder.addEnvParameter("float cutOffRadius");
-            shaderBuilder.addEnvParameter("float4 textureScale");            
+            shaderBuilder.addEnvParameter("float4 textureScaleThetaPhi");     
+
             program = program.replace("position",shaderBuilder.useStandardParameter("float4", "TEXCOORD3"));            
 
             program = program.replace("output", shaderBuilder.useOutputValue("float4", "COLOR"));
@@ -127,5 +123,9 @@ public class GL3DImageFragmentShaderProgram extends GLFragmentShaderProgram {
     public void setCutOffRadius(double cutOffRadius){
     	this.cutOffRadius = cutOffRadius;
     }
+	public void changeAngles(double theta, double phi) {
+		this.theta = theta;
+		this.phi = phi;
+	}
 
 }

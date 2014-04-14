@@ -27,8 +27,8 @@ public abstract class GLVertexShaderProgram {
     protected static final int target = GL.GL_VERTEX_PROGRAM_ARB;
 
     private static Stack<Integer> shaderStack = new Stack<Integer>();
-    private static int shaderCurrentlyUsed = -1;
-    private int shaderID;
+    protected static int shaderCurrentlyUsed = -1;
+    protected int shaderID;
     protected double xOffset = 0.0;
     protected double yOffset = 0.0;
     protected double xScale = 1.0;
@@ -75,7 +75,7 @@ public abstract class GLVertexShaderProgram {
      * @param gl
      *            Valid reference to the current gl object
      */
-    public final void bind(GL gl) {
+    public void bind(GL gl) {
     	bind(gl, shaderID, xOffset, yOffset, xScale, yScale, xTextureScale, yTextureScale, defaultXOffset, defaultYOffset);
     }
 
