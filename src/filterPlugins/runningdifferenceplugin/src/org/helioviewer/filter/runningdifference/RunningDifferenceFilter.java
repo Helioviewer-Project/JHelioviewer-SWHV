@@ -6,6 +6,10 @@ import java.util.List;
 import org.helioviewer.base.logging.Log;
 import org.helioviewer.viewmodel.filter.FilterListener;
 import org.helioviewer.viewmodel.filter.FrameFilter;
+
+import javax.media.opengl.GL;
+
+import org.helioviewer.viewmodel.filter.GLFragmentShaderFilter;
 import org.helioviewer.viewmodel.filter.ObservableFilter;
 import org.helioviewer.viewmodel.filter.StandardFilter;
 import org.helioviewer.viewmodel.imagedata.ColorMask;
@@ -13,13 +17,18 @@ import org.helioviewer.viewmodel.imagedata.ImageData;
 import org.helioviewer.viewmodel.imagedata.SingleChannelByte8ImageData;
 import org.helioviewer.viewmodel.imagetransport.Byte8ImageTransport;
 import org.helioviewer.viewmodel.view.TimeMachineData;
+import org.helioviewer.viewmodel.view.opengl.GLTextureHelper;
+import org.helioviewer.viewmodel.view.opengl.shader.GLFragmentShaderProgram;
+import org.helioviewer.viewmodel.view.opengl.shader.GLShaderBuilder;
+import org.helioviewer.viewmodel.view.opengl.shader.GLTextureCoordinate;
+import org.helioviewer.viewmodel.view.opengl.shader.GLShaderBuilder.GLBuildShaderException;
 
 /**
  * Filter applying running difference to some movie
  * 
  * @author Helge Dietert
  */
-public class RunningDifferenceFilter implements FrameFilter, StandardFilter, ObservableFilter {
+public class RunningDifferenceFilter implements FrameFilter, StandardFilter, ObservableFilter, GLFragmentShaderFilter {
     /**
      * Flag to indicate whether this filter should be considered active
      */
@@ -32,6 +41,10 @@ public class RunningDifferenceFilter implements FrameFilter, StandardFilter, Obs
      * Given time machine to access the previous frame
      */
     private TimeMachineData timeMachineData;
+    private DifferenceShader shader = new DifferenceShader();
+	private float differenceContrast = 0;
+	private int lookupDiff;
+	
 
     /**
      * @see org.helioviewer.viewmodel.filter.ObservableFilter#addFilterListener(org.helioviewer.viewmodel.filter.FilterListener)
@@ -53,7 +66,9 @@ public class RunningDifferenceFilter implements FrameFilter, StandardFilter, Obs
 
         if (timeMachineData == null)
             return data;
-
+        for (StackTraceElement ste : Thread.currentThread().getStackTrace()) {
+            System.out.println(ste);
+        } 
         ImageData previousFrame = timeMachineData.getPreviousFrame(1);
         // If this is the first frame and therefore 0 we take the frame before
         // to get some similar picture
@@ -156,12 +171,44 @@ public class RunningDifferenceFilter implements FrameFilter, StandardFilter, Obs
     }
 
 	public void setState(String state) {
-		// TODO Auto-generated method stub
-		
+        //setContrast(Float.parseFloat(state));
+        //panel.setValue(contrast);		
 	}
 
 	public String getState() {
-		// TODO Auto-generated method stub
-		return null;
+        return Boolean.toString(this.isActive);
 	}
+
+	public void applyGL(GL gl) {
+		System.out.println("APPLYFILTER");
+		shader.bind(gl);
+        ImageData previousFrame = timeMachineData.getPreviousFrame(1);
+        // If this is the first frame and therefore 0 we take the frame before
+        // to get some similar picture
+        if (previousFrame == null) {
+            Log.debug("No previous frame available, take ahead");
+            previousFrame = timeMachineData.getPreviousFrame(-1);
+        }
+        if(previousFrame!=null){
+            gl.glActiveTexture(shader.mode);		
+	        shader.activateDifferenceTexture(gl);
+	        gl.glBindTexture(GL.GL_TEXTURE_2D, lookupDiff); 
+	        GLTextureHelper th = new GLTextureHelper();
+	        th.moveImageDataToGLTexture(gl, previousFrame, 0, 0, previousFrame.getWidth(), previousFrame.getHeight(), lookupDiff);
+            //gl.glActiveTexture(GL.GL_TEXTURE0);		
+	    }
+        for (StackTraceElement ste : Thread.currentThread().getStackTrace()) {
+            System.out.println(ste);
+        }        
+	}
+
+    public GLShaderBuilder buildFragmentShader(GLShaderBuilder shaderBuilder) {
+        shader.build(shaderBuilder);
+
+        GLTextureHelper textureHelper = new GLTextureHelper();
+        textureHelper.delTextureID(shaderBuilder.getGL(), lookupDiff);
+        lookupDiff = textureHelper.genTextureID(shaderBuilder.getGL());
+        
+        return shaderBuilder;
+    }
 }
