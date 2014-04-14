@@ -379,7 +379,6 @@ public class JHVJPXView extends JHVJP2View implements TimedMovieView, CachedMovi
      * {@inheritDoc}
      */
     void setSubimageData(ImageData newImageData, SubImage roi, int compositionLayer) {
-    	synchronized(this){
 	        lastRenderedCompositionLayer = compositionLayer;
 	
 	        if (metaData instanceof ObserverMetaData) {
@@ -388,7 +387,6 @@ public class JHVJPXView extends JHVJP2View implements TimedMovieView, CachedMovi
 	            event.addReason(new TimestampChangedReason(this, observerMetaData.getDateTime()));
 	        }
 	        super.setSubimageData(newImageData, roi, 0);
-    	}
     }
 
     public LinkedMovieManager getLinkedMovieManager() {
