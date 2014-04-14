@@ -186,7 +186,7 @@ public class GL3DCanvas extends GLCanvas implements GLEventListener {
         gl.glMatrixMode(GL.GL_PROJECTION);
         gl.glPushMatrix();
         gl.glLoadIdentity();
-        glu.gluPerspective(10, ((double) width) / height, 0.1, 120);
+        glu.gluPerspective(10, ((double) width) / height, 0.01, 120);
         gl.glMatrixMode(GL.GL_MODELVIEW);
         gl.glLoadIdentity();
     };

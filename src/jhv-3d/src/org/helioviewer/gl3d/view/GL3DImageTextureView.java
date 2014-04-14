@@ -7,6 +7,7 @@ import javax.media.opengl.GL;
 import org.helioviewer.base.math.Vector2dDouble;
 import org.helioviewer.base.math.Vector2dInt;
 import org.helioviewer.base.physics.Constants;
+import org.helioviewer.base.physics.DifferentialRotation;
 import org.helioviewer.gl3d.changeevent.ImageTextureRecapturedReason;
 import org.helioviewer.gl3d.model.image.GL3DImageMesh;
 import org.helioviewer.gl3d.scenegraph.GL3DState;
@@ -20,9 +21,11 @@ import org.helioviewer.viewmodel.changeevent.ChangeEvent;
 import org.helioviewer.viewmodel.changeevent.RegionChangedReason;
 import org.helioviewer.viewmodel.changeevent.RegionUpdatedReason;
 import org.helioviewer.viewmodel.changeevent.SubImageDataChangedReason;
+import org.helioviewer.viewmodel.metadata.HelioviewerMetaData;
 import org.helioviewer.viewmodel.metadata.MetaData;
 import org.helioviewer.viewmodel.region.Region;
 import org.helioviewer.viewmodel.region.StaticRegion;
+import org.helioviewer.viewmodel.view.MetaDataView;
 import org.helioviewer.viewmodel.view.RegionView;
 import org.helioviewer.viewmodel.view.View;
 import org.helioviewer.viewmodel.view.ViewListener;
@@ -89,6 +92,7 @@ public class GL3DImageTextureView extends AbstractGL3DView implements GL3DView {
 		return this.textureId;
 	}
 	static int counter = 0;
+
 	private Region copyScreenToTexture(GL3DState state, GLTextureHelper th) {
 		GL gl = state.gl;
 
@@ -119,18 +123,24 @@ public class GL3DImageTextureView extends AbstractGL3DView implements GL3DView {
 		double yScale = 1/region.getHeight();
 		
 		if (vertexShader != null) {
-			double theta = 3.14/8;
+			HelioviewerMetaData metadata = (HelioviewerMetaData)getAdapter(MetaDataView.class).getMetaData();
+			double deltat = metadata.getDateTime().getMillis()/1000.0;
+			double theta = 0.0;
+			double phi = DifferentialRotation.calculateRotationInRadians(0.0, deltat);
+			/*double theta = 3.14/8;
 			double phi = 3.14/2;
 			phi = phi + counter * 0.1;
-	    	counter++;
+	    	counter++;			
 	    	System.out.println(phi);
+	    	*/
 			this.vertexShader.changeRect(xOffset, yOffset, Math.abs(xScale), Math.abs(yScale));
 			this.vertexShader.changeTextureScale(this.textureScale);
 	        this.vertexShader.changeAngles(theta, phi);
 			this.fragmentShader.changeTextureScale(this.textureScale.getX(), this.textureScale.getY());
 			this.fragmentShader.changeAngles(theta, phi);
 			this.coronaVertexShader.changeRect(xOffset, yOffset, Math.abs(xScale), Math.abs(yScale));
-			this.coronaVertexShader.changeTextureScale(this.textureScale.getX(), this.textureScale.getY());				
+			this.coronaVertexShader.changeTextureScale(this.textureScale.getX(), this.textureScale.getY());
+			this.coronaVertexShader.changeAngles(theta, phi);
 			this.coronaFragmentShader.changeTextureScale(this.textureScale.getX()*0.999, this.textureScale.getY()*0.999);
 		}
 		

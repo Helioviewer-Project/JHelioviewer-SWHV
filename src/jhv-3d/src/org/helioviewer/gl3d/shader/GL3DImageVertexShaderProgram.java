@@ -39,13 +39,15 @@ public class GL3DImageVertexShaderProgram extends GLVertexShaderProgram {
             program += "\tfloat theta = -textureScaleThetaPhi.z;" + GLShaderBuilder.LINE_SEP;
             program += "\tfloat phi = -textureScaleThetaPhi.w;" + GLShaderBuilder.LINE_SEP;
 
-            program += "\tfloat xrott = position.x;" + GLShaderBuilder.LINE_SEP;
-            program += "\tfloat yrott = position.y*cos(theta) - position.z*sin(theta);" + GLShaderBuilder.LINE_SEP;
-            program += "\tfloat zrott = position.y*sin(theta) + position.z*cos(theta);" + GLShaderBuilder.LINE_SEP;
+            program += "\tfloat xrot = position.x*cos(phi) - position.z*sin(phi);" + GLShaderBuilder.LINE_SEP;
+            program += "\tfloat yrot = position.y;" + GLShaderBuilder.LINE_SEP;
+            program += "\tfloat zrot = position.x*sin(phi) + position.z*cos(phi);" + GLShaderBuilder.LINE_SEP;
             
-            program += "\tfloat xrot = xrott*cos(phi) - zrott*sin(phi);" + GLShaderBuilder.LINE_SEP;
-            program += "\tfloat yrot = yrott;" + GLShaderBuilder.LINE_SEP;
-            program += "\tfloat zrot = xrott*sin(phi) + zrott*cos(phi);" + GLShaderBuilder.LINE_SEP;
+            program += "\tfloat xrott = xrot;" + GLShaderBuilder.LINE_SEP;
+            program += "\tfloat yrott = yrot*cos(theta) - zrot*sin(theta);" + GLShaderBuilder.LINE_SEP;
+            program += "\tfloat zrott = yrot*sin(theta) + zrot*cos(theta);" + GLShaderBuilder.LINE_SEP;
+            
+
             
             program += "\toutput.x = xrott - rect.x;" + GLShaderBuilder.LINE_SEP;
             program += "\toutput.y = yrott - rect.y;" + GLShaderBuilder.LINE_SEP;            
