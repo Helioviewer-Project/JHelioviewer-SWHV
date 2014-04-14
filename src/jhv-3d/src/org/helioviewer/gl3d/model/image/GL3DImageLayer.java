@@ -9,6 +9,7 @@ import javax.media.opengl.GL;
 
 import org.helioviewer.base.logging.Log;
 import org.helioviewer.base.physics.Constants;
+import org.helioviewer.base.physics.DifferentialRotation;
 import org.helioviewer.gl3d.GL3DHelper;
 import org.helioviewer.gl3d.camera.GL3DCamera;
 import org.helioviewer.gl3d.camera.GL3DCameraListener;
@@ -116,7 +117,18 @@ public abstract class GL3DImageLayer extends GL3DOrientedGroup implements GL3DCa
         this.doUpdateROI = true;
         this.markAsChanged();
     }
-
+    @Override
+    public void shapeDraw(GL3DState state) {
+        super.shapeDraw(state);
+    }
+/*    
+    public void updateMatrix(GL3DState state) {
+		HelioviewerMetaData metadata = (HelioviewerMetaData)this.metaDataView.getMetaData();
+		double deltat = metadata.getDateTime().getMillis()/1000.0;
+		double phi = DifferentialRotation.calculateRotationInRadians(0.0, deltat);
+    	this.modelView().rotate(phi, new GL3DVec3d(0,1,0));
+    }
+*/    
     private void initOpacityFilter(View mainLayerView) {
         // Get opacity filter from view chain
         View filterView = mainLayerView;
