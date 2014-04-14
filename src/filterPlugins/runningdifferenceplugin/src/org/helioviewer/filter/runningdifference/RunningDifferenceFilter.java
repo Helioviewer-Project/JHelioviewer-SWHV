@@ -65,10 +65,7 @@ public class RunningDifferenceFilter implements FrameFilter, StandardFilter, Obs
             return null;
 
         if (timeMachineData == null)
-            return data;
-        for (StackTraceElement ste : Thread.currentThread().getStackTrace()) {
-            System.out.println(ste);
-        } 
+            return data; 
         ImageData previousFrame = timeMachineData.getPreviousFrame(1);
         // If this is the first frame and therefore 0 we take the frame before
         // to get some similar picture
@@ -180,26 +177,28 @@ public class RunningDifferenceFilter implements FrameFilter, StandardFilter, Obs
 	}
 
 	public void applyGL(GL gl) {
-		System.out.println("APPLYFILTER");
-		shader.bind(gl);
-        ImageData previousFrame = timeMachineData.getPreviousFrame(1);
-        // If this is the first frame and therefore 0 we take the frame before
-        // to get some similar picture
-        if (previousFrame == null) {
-            Log.debug("No previous frame available, take ahead");
-            previousFrame = timeMachineData.getPreviousFrame(-1);
+		if(isActive){
+	        shader.setIsDifference(gl,1.0f);	        
+			shader.bind(gl);
+	        ImageData previousFrame = timeMachineData.getPreviousFrame(1);
+	        // If this is the first frame and therefore 0 we take the frame before
+	        // to get some similar picture
+	        if (previousFrame == null) {
+	            Log.debug("No previous frame available, take ahead");
+	            previousFrame = timeMachineData.getPreviousFrame(-1);
+	        }
+	        if(previousFrame!=null){
+	            gl.glActiveTexture(shader.mode);		
+		        shader.activateDifferenceTexture(gl);
+		        gl.glBindTexture(GL.GL_TEXTURE_2D, lookupDiff); 
+		        GLTextureHelper th = new GLTextureHelper();
+		        th.moveImageDataToGLTexture(gl, previousFrame, 0, 0, previousFrame.getWidth(), previousFrame.getHeight(), lookupDiff);
+	            //gl.glActiveTexture(GL.GL_TEXTURE0);		
+		    }
         }
-        if(previousFrame!=null){
-            gl.glActiveTexture(shader.mode);		
-	        shader.activateDifferenceTexture(gl);
-	        gl.glBindTexture(GL.GL_TEXTURE_2D, lookupDiff); 
-	        GLTextureHelper th = new GLTextureHelper();
-	        th.moveImageDataToGLTexture(gl, previousFrame, 0, 0, previousFrame.getWidth(), previousFrame.getHeight(), lookupDiff);
-            //gl.glActiveTexture(GL.GL_TEXTURE0);		
-	    }
-        for (StackTraceElement ste : Thread.currentThread().getStackTrace()) {
-            System.out.println(ste);
-        }        
+		else{
+	        shader.setIsDifference(gl,0.0f);	        
+		}	
 	}
 
     public GLShaderBuilder buildFragmentShader(GLShaderBuilder shaderBuilder) {
