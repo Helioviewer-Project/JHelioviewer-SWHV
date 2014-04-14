@@ -34,12 +34,9 @@ public class GL3DImageLayers extends GL3DGroup {
 
     private boolean coronaVisibility = true;
     
-    private GL3DCircle circle = null;
-
     public GL3DImageLayers() {
         super("Images");
         this.imageLayerMap = new HashMap<GL3DImageTextureView, GL3DImageLayer>();
-        circle = new GL3DCircle(Constants.SunRadius*1.5, new GL3DVec4f(0.8f, 0.8f, 0, 0.2f), "Platte");
     }
     
     
