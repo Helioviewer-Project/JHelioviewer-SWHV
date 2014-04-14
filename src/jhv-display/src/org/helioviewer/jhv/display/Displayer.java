@@ -1,15 +1,16 @@
 package org.helioviewer.jhv.display;
 
 import java.util.ArrayList;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 public class Displayer{
 	
-    private static Displayer instance = new Displayer();
+	private static Displayer instance = new Displayer();
     private final ArrayList<DisplayListener> listeners = new ArrayList<DisplayListener>();
     private final ArrayList<RenderListener> renderListeners = new ArrayList<RenderListener>();
     private GL3DComponentFakeInterface gl3dcomponent;
-	private Object lock = new Object();
-	private int queue = 0;
+    private ExecutorService displayPool = Executors.newSingleThreadExecutor();
 
     public void register(GL3DComponentFakeInterface gl3dcomponent){
     	this.gl3dcomponent = gl3dcomponent;
@@ -46,25 +47,23 @@ public class Displayer{
 	        }
     	}
     }
-
-    public void display(){
-    	int queuecopy;
-    	synchronized(lock ){
-    		queue ++;
-    		queuecopy=queue;
-    	}
-    	if(queuecopy==1){
-    		while(queue>0){
-
-    	    	synchronized(listeners){
-			        for(final DisplayListener listener : listeners) {
-			            listener.display();
-			        }
-    	    	}
-		    	queue--;
-	    	}
+    private void tdisplay(){
+    	synchronized(listeners){
+	        for(final DisplayListener listener : listeners) {
+	            listener.display();
+	        }
     	}
     }
+    private final class DisplayTask implements Runnable{
+		@Override
+		public void run() {
+			tdisplay();
+		}
+    }
+    public void display(){
+    	displayPool.submit(new DisplayTask());
+    }
+   
     public void animate(){
     	gl3dcomponent.activate();
     }
