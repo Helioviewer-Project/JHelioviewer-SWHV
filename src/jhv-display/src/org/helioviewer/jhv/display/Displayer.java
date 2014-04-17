@@ -63,12 +63,5 @@ public class Displayer{
     public void display(){
     	displayPool.submit(new DisplayTask());
     }
-   
-    public void animate(){
-    	gl3dcomponent.activate();
-    }
-    public void stopAnimate(){
 
-    	gl3dcomponent.deactivate();
-    }
 }
