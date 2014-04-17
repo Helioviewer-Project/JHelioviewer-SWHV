@@ -56,4 +56,6 @@ public interface TimeMachineData {
      *            frame and 1 the frame before
      */
     public void setPreviousCache(int n);
+    
+    public long getCurrentDateMillis();
 }
