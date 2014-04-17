@@ -21,6 +21,8 @@ public class GL3DImageVertexShaderProgram extends GLVertexShaderProgram {
         if (shader != shaderCurrentlyUsed) {
             shaderCurrentlyUsed = shader;
             // Log.debug("GLVertexShaderProgram.bind shader="+shader);
+            //gl.glActiveTexture(GL.GL_TEXTURE0);
+            //gl.glBindTexture(GL.GL_TEXTURE_2D, 1);
             gl.glBindProgramARB(target, shader);
             gl.glProgramLocalParameter4dARB(target, 0, xOffset, yOffset, xScale, yScale);
             gl.glProgramLocalParameter4dARB(target, 1,xTextureScale, yTextureScale,theta, phi);
@@ -38,6 +40,7 @@ public class GL3DImageVertexShaderProgram extends GLVertexShaderProgram {
             
             program += "\tfloat theta = -textureScaleThetaPhi.z;" + GLShaderBuilder.LINE_SEP;
             program += "\tfloat phi = -textureScaleThetaPhi.w;" + GLShaderBuilder.LINE_SEP;
+            program += "\tpositionPass = position;" + GLShaderBuilder.LINE_SEP;
 
             program += "\tfloat xrot = position.x*cos(phi) - position.z*sin(phi);" + GLShaderBuilder.LINE_SEP;
             program += "\tfloat yrot = position.y;" + GLShaderBuilder.LINE_SEP;
@@ -57,12 +60,7 @@ public class GL3DImageVertexShaderProgram extends GLVertexShaderProgram {
 
             program += "\toutput.x *= textureScaleThetaPhi.x;" + GLShaderBuilder.LINE_SEP;
             program += "\toutput.y *= textureScaleThetaPhi.y;" + GLShaderBuilder.LINE_SEP;
-			
-            program += "\tscaledTexture.x -= offset.x;" + GLShaderBuilder.LINE_SEP;
-            program += "\tscaledTexture.y -= offset.y;" + GLShaderBuilder.LINE_SEP;
-            
-            program += "\tpositionPass = position;" + GLShaderBuilder.LINE_SEP;
-
+			            
             program += "\talpha = color.a;";
             
             shaderBuilder.addEnvParameter("float4 rect");            
@@ -72,7 +70,6 @@ public class GL3DImageVertexShaderProgram extends GLVertexShaderProgram {
             program = program.replace("output", shaderBuilder.useOutputValue("float4", "TEXCOORD0"));
             program = program.replace("physicalPosition", shaderBuilder.useStandardParameter("float4", "POSITION"));
             program = program.replace("alpha", shaderBuilder.useOutputValue("float", "TEXCOORD1"));
-            program = program.replace("scaledTexture", shaderBuilder.useOutputValue("float4", "TEXCOORD2"));
             program = program.replace("positionPass", shaderBuilder.useOutputValue("float4", "TEXCOORD3"));
             program = program.replace("color", shaderBuilder.useStandardParameter("float4", "COLOR"));
             shaderBuilder.addMainFragment(program);
