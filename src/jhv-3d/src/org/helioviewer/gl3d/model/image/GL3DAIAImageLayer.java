@@ -20,9 +20,9 @@ public class GL3DAIAImageLayer extends GL3DImageLayer {
     }
 
     protected void createImageMeshNodes(GL gl) {
-    	this.sphereFragmentShader = new GL3DImageFragmentShaderProgram();
-    	GLFragmentShaderProgram sphereFragmentShader = GL3DShaderFactory.createFragmentShaderProgram(gl, this.sphereFragmentShader);
-    	this.sphereFragmentShader = (GL3DImageFragmentShaderProgram)sphereFragmentShader;
+    	this.sphereFragmentShader = imageTextureView.getFragmentShader();
+    	//GLFragmentShaderProgram sphereFragmentShader = GL3DShaderFactory.createFragmentShaderProgram(gl, this.sphereFragmentShader);
+    	//this.sphereFragmentShader = (GL3DImageFragmentShaderProgram)sphereFragmentShader;
         
         this.coronaFragmentShader = new GL3DImageCoronaFragmentShaderProgram();        
         GLFragmentShaderProgram coronaFragmentShader = GL3DShaderFactory.createFragmentShaderProgram(gl, this.coronaFragmentShader);
