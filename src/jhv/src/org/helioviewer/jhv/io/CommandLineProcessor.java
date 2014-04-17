@@ -54,16 +54,16 @@ public class CommandLineProcessor {
      * 
      * @return list of values of the -jpx option as URLs
      */
-    public static AbstractList<URL> getJPXOptionValues() {
+    public static AbstractList<URI> getJPXOptionValues() {
 
         // get associated value string for "jpip" option
         AbstractList<String> jpxURLs = getOptionValues("jpx");
-        LinkedList<URL> result = new LinkedList<URL>();
+        LinkedList<URI> result = new LinkedList<URI>();
         for (String jpxURL : jpxURLs) {
             if (!jpxURL.equals("")) {
                 try {
-                    result.add(new URL(jpxURL));
-                } catch (MalformedURLException e) {
+                    result.add(new URI(jpxURL));
+                } catch (URISyntaxException e) {
                     e.printStackTrace();
                 }
             }
