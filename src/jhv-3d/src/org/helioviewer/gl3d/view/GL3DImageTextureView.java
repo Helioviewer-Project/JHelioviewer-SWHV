@@ -30,6 +30,7 @@ import org.helioviewer.viewmodel.view.RegionView;
 import org.helioviewer.viewmodel.view.View;
 import org.helioviewer.viewmodel.view.ViewListener;
 import org.helioviewer.viewmodel.view.ViewportView;
+import org.helioviewer.viewmodel.view.jp2view.JHVJPXView;
 import org.helioviewer.viewmodel.view.opengl.GLTextureHelper;
 import org.helioviewer.viewmodel.viewport.Viewport;
 /**
@@ -95,10 +96,6 @@ public class GL3DImageTextureView extends AbstractGL3DView implements GL3DView {
 
 	private Region copyScreenToTexture(GL3DState state, GLTextureHelper th) {
 		GL gl = state.gl;
-
-		if (this.textureId < 0) {
-			this.textureId = th.genTextureID(gl);
-		}
 		
 		Region region = getAdapter(RegionView.class).getRegion();
 		Viewport viewport = getAdapter(ViewportView.class).getViewport();
@@ -113,9 +110,9 @@ public class GL3DImageTextureView extends AbstractGL3DView implements GL3DView {
 		Rectangle captureRectangle = new Rectangle(offsetX, offsetY, viewport.getWidth(), viewport.getHeight());
 		
 		if (region != null) capturedRegion = region;
-
-		th.copyFrameBufferToTexture(gl, textureId, captureRectangle);
-		this.textureScale = th.getTextureScale(textureId);
+		this.textureId = getAdapter(JHVJPXView.class).texID;
+		//th.copyFrameBufferToTexture(gl, textureId, captureRectangle);
+		//this.textureScale = th.getTextureScale(textureId);
 	
 		double xOffset = region.getLowerLeftCorner().getX();
 		double yOffset = region.getLowerLeftCorner().getY();
