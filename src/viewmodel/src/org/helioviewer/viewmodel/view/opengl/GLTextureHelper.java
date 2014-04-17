@@ -29,6 +29,7 @@ import org.helioviewer.viewmodel.imagetransport.Int32ImageTransport;
 import org.helioviewer.viewmodel.imagetransport.Short16ImageTransport;
 import org.helioviewer.viewmodel.region.Region;
 import org.helioviewer.viewmodel.renderer.GLCommonRenderGraphics;
+import org.helioviewer.viewmodel.view.jp2view.JHVJPXView;
 import org.helioviewer.viewmodel.view.opengl.shader.GLTextureCoordinate;
 
 /**
@@ -41,9 +42,9 @@ import org.helioviewer.viewmodel.view.opengl.shader.GLTextureCoordinate;
  * @author Markus Langenberg
  */
 public class GLTextureHelper {
-
+	public static boolean is2DState = false;
     private static TextureImplementation textureImplementation = null;
-    private static int texID = 0;
+    public static int texID = 0;
     private static boolean textureNonPowerOfTwo = false;
     private static int maxTextureSize = 2048;
     
@@ -372,17 +373,18 @@ public class GLTextureHelper {
      *            , y0 , x1 , y1 - Position and size to draw the texture
      */
     public void renderTextureToScreen(GL gl, float x0, float y0, float x1, float y1) {
-        gl.glBegin(GL.GL_QUADS);
-        mainTexCoord.setValue(gl, 0.0f, 1.0f);
-        gl.glVertex2f(x0, y0);
-        mainTexCoord.setValue(gl, 1.0f, 1.0f);
-        gl.glVertex2f(x1, y0);
-        mainTexCoord.setValue(gl, 1.0f, 0.0f);
-        gl.glVertex2f(x1, y1);
-        mainTexCoord.setValue(gl, 0.0f, 0.0f);
-        gl.glVertex2f(x0, y1);
-
-        gl.glEnd();
+    	if(is2DState){
+	        gl.glBegin(GL.GL_QUADS);
+	        mainTexCoord.setValue(gl, 0.0f, 1.0f);
+	        gl.glVertex2f(x0, y0);
+	        mainTexCoord.setValue(gl, 1.0f, 1.0f);
+	        gl.glVertex2f(x1, y0);
+	        mainTexCoord.setValue(gl, 1.0f, 0.0f);
+	        gl.glVertex2f(x1, y1);
+	        mainTexCoord.setValue(gl, 0.0f, 0.0f);
+	        gl.glVertex2f(x0, y1);
+	        gl.glEnd();
+    	}
     }
 
     /**
@@ -403,15 +405,26 @@ public class GLTextureHelper {
      * @param source
      *            Image data to draw to the screen
      */
-    public void renderImageDataToScreen(GL gl, Region region, ImageData source) {
-    	
+    public void renderImageDataToScreen(GL gl, Region region, ImageData source, JHVJPXView jpxView) {
         gl.glActiveTexture(GL.GL_TEXTURE0);
 
         if (source == null)
             return;
         if (source.getWidth() <= maxTextureSize && source.getHeight() <= maxTextureSize) {
-        	moveImageDataToGLTexture(gl, source, texID);
+            if(jpxView!=null){
+            	if(jpxView.texID==-1){
+            		jpxView.texID = genTextureID(gl);
+            	}
+                moveImageDataToGLTexture(gl, source,  jpxView.texID);
+            }
+            else{
+            	moveImageDataToGLTexture(gl, source,texID);
+
+            }            
             renderTextureToScreen(gl, region);
+
+            
+
         } else {
             ColorMask colorMask = source.getColorMask();
             if (colorMask.getMask() != 0xFFFFFFFF) {
@@ -426,8 +439,16 @@ public class GLTextureHelper {
 
                     int width = Math.min(source.getWidth() - x, maxTextureSize);
                     int height = Math.min(source.getHeight() - y, maxTextureSize);
-                    moveImageDataToGLTexture(gl, source, x, y, width, height, texID);
+                    if(jpxView!=null){
+                    	if(jpxView.texID==-1){
+                    		jpxView.texID = genTextureID(gl);
+                    	}
+                        moveImageDataToGLTexture(gl, source, x, y, width, height, jpxView.texID);
 
+                    }
+                    else{
+                    	moveImageDataToGLTexture(gl, source, x, y, width, height, texID);
+                    }
                     float x0 = (float) lowerleftCorner.getX() + (float) size.getX() * x / source.getWidth();
                     float y1 = (float) lowerleftCorner.getY() + (float) size.getY() * (source.getHeight() - y) / source.getHeight();
                     renderTextureToScreen(gl, x0, y1 - ((float) size.getY()) * (height + 1.5f) / source.getHeight(), x0 + ((float) size.getX()) * (width + 1.5f) / source.getWidth(), y1);

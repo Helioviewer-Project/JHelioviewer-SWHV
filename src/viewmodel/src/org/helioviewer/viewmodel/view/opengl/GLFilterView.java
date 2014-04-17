@@ -1,7 +1,9 @@
 package org.helioviewer.viewmodel.view.opengl;
 
 import javax.media.opengl.GL;
+import javax.media.opengl.glu.GLU;
 
+import org.helioviewer.base.logging.Log;
 import org.helioviewer.viewmodel.changeevent.ChangeEvent;
 import org.helioviewer.viewmodel.changeevent.FilterChangedReason;
 import org.helioviewer.viewmodel.changeevent.RegionChangedReason;
@@ -82,21 +84,20 @@ public class GLFilterView extends StandardFilterView implements GLFragmentShader
             }
 
             ((GLFilter) filter).applyGL(gl);
-
+            if (view instanceof GLView) {
+                ((GLView) view).renderGL(gl, true);
+            } else {
+                if (subimageDataView != null) {
+                    textureHelper.renderImageDataToScreen(gl, regionView.getRegion(), subimageDataView.getSubimageData(), view.getAdapter(JHVJPXView.class));               
+                }
+            }
 
             if (filter instanceof GLPostFilter) {
                 ((GLPostFilter) filter).postApplyGL(gl);
             }
 
-            gl.glDisable(GL.GL_FRAGMENT_PROGRAM_ARB);
+            //gl.glDisable(GL.GL_FRAGMENT_PROGRAM_ARB);
 
-        }
-        if (view instanceof GLView) {
-            ((GLView) view).renderGL(gl, true);
-        } else {
-            if (subimageDataView != null) {
-                textureHelper.renderImageDataToScreen(gl, regionView.getRegion(), subimageDataView.getSubimageData(), view.getAdapter(JHVJPXView.class));
-            }
         }
     }
 

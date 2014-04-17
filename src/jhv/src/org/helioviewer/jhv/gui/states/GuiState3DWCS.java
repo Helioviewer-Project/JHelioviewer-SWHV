@@ -11,6 +11,7 @@ import org.helioviewer.jhv.gui.GL3DViewchainFactory;
 import org.helioviewer.jhv.gui.components.SideContentPane;
 import org.helioviewer.jhv.gui.components.TopToolBar;
 import org.helioviewer.jhv.gui.interfaces.ImagePanelInputController;
+import org.helioviewer.viewmodel.view.opengl.GLTextureHelper;
 
 public class GuiState3DWCS extends GuiState2D {
 
@@ -25,9 +26,14 @@ public class GuiState3DWCS extends GuiState2D {
 
     public void activate() {
         super.activate();
+    	GLTextureHelper.is2DState = false;
         GL3DCameraSelectorModel.getInstance().activate(this.mainComponentView.getAdapter(GL3DSceneGraphView.class));
         GL3DPluginController.getInstance().setPluginConfiguration(new GL3DInternalPluginConfiguration());
         GL3DPluginController.getInstance().loadPlugins();
+    }
+    public void deactivate(){
+    	super.deactivate();
+    	GLTextureHelper.is2DState = true;
     }
 
     /*
