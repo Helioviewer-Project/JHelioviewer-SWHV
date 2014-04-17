@@ -15,6 +15,7 @@ public abstract class AbstractImageData implements JavaBufferedImageData {
     protected int width, height;
     protected BufferedImage image = null;
     protected ColorMask colorMask;
+    private long dateMillis;
 
     /**
      * Default constructor.
@@ -87,4 +88,12 @@ public abstract class AbstractImageData implements JavaBufferedImageData {
      * @return the created BufferedImage
      */
     protected abstract BufferedImage createBufferedImageFromImageTransport();
+    
+    public long getDateMillis(){
+    	return dateMillis;
+    }
+    
+    public void setDateMillis( long dateMillis){
+    	this.dateMillis = dateMillis;
+    }    
 }
