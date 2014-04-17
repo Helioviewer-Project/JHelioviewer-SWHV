@@ -554,7 +554,7 @@ public class ImageViewerGui {
         AbstractList<JHVRequest> jhvRequests = CommandLineProcessor.getJHVOptionValues();
         AbstractList<URI> jpipUris = CommandLineProcessor.getJPIPOptionValues();
         AbstractList<URI> downloadAddresses = CommandLineProcessor.getDownloadOptionValues();
-        AbstractList<URL> jpxUrls = CommandLineProcessor.getJPXOptionValues();
+        AbstractList<URI> jpxUrls = CommandLineProcessor.getJPXOptionValues();
 
         // Do nothing if no resource is specified
         if (jhvRequests.isEmpty() && jpipUris.isEmpty() && downloadAddresses.isEmpty() && jpxUrls.isEmpty()) {
@@ -644,10 +644,10 @@ public class ImageViewerGui {
         // -jpx
         // //////////////////////
 
-        for (URL jpxUrl : jpxUrls) {
+        for (URI jpxUrl : jpxUrls) {
             if (jpxUrl != null) {
                 try {
-                    ImageInfoView imageInfoView = APIRequestManager.requestData(true, jpxUrl, null, null);
+                    ImageInfoView imageInfoView = APIRequestManager.newLoad(jpxUrl, true, null);
                     if (imageInfoView != null && getMainView() != null) {
                         // get the layered view
                         LayeredView layeredView = getMainView().getAdapter(LayeredView.class);
