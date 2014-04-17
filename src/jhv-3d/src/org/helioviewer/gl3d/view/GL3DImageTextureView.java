@@ -32,6 +32,8 @@ import org.helioviewer.viewmodel.view.ViewListener;
 import org.helioviewer.viewmodel.view.ViewportView;
 import org.helioviewer.viewmodel.view.jp2view.JHVJPXView;
 import org.helioviewer.viewmodel.view.opengl.GLTextureHelper;
+import org.helioviewer.viewmodel.view.opengl.shader.GLFragmentShaderView;
+import org.helioviewer.viewmodel.view.opengl.shader.GLShaderBuilder;
 import org.helioviewer.viewmodel.viewport.Viewport;
 /**
  * Connects the 3D viewchain to the 2D viewchain. The underlying 2D viewchain
@@ -43,7 +45,7 @@ import org.helioviewer.viewmodel.viewport.Viewport;
  * @author Simon Spoerri (simon.spoerri@fhnw.ch)
  * 
  */
-public class GL3DImageTextureView extends AbstractGL3DView implements GL3DView {
+public class GL3DImageTextureView extends AbstractGL3DView implements GL3DView, GLFragmentShaderView {
 
 	private int textureId = -1;
 	private Vector2dDouble textureScale = null;
@@ -56,18 +58,21 @@ public class GL3DImageTextureView extends AbstractGL3DView implements GL3DView {
 	public MetaData metadata = null;	
 	public double minZ = 0.0;
 	public double maxZ = Constants.SunRadius;
-	private GL3DImageFragmentShaderProgram fragmentShader;
+	private GL3DImageFragmentShaderProgram fragmentShader = new GL3DImageFragmentShaderProgram();
 	private GL3DImageCoronaFragmentShaderProgram coronaFragmentShader;
-
+	
+    public void renderGL(GL gl, boolean nextView) {        
+        render3D(GL3DState.get());
+    }
+   
 	public void render3D(GL3DState state) {
 		GL gl = state.gl;
 		if (this.getView() != null) {
 			// Only copy Framebuffer if necessary
 			GLTextureHelper th = new GLTextureHelper();
-			if (forceUpdate || recaptureRequested || regionChanged) {
-				this.renderChild(gl);
+			if (true) {
 				this.capturedRegion = copyScreenToTexture(state, th);
-				gl.glClear(GL.GL_COLOR_BUFFER_BIT | GL.GL_DEPTH_BUFFER_BIT);
+				//gl.glClear(GL.GL_COLOR_BUFFER_BIT | GL.GL_DEPTH_BUFFER_BIT);
 				if (forceUpdate) {
 					this.notifyViewListeners(new ChangeEvent(
 							new ImageTextureRecapturedReason(
@@ -118,21 +123,22 @@ public class GL3DImageTextureView extends AbstractGL3DView implements GL3DView {
 		double yOffset = region.getLowerLeftCorner().getY();
 		double xScale = 1/region.getWidth();
 		double yScale = 1/region.getHeight();
-		
+
 		if (vertexShader != null) {
 			HelioviewerMetaData metadata = (HelioviewerMetaData)getAdapter(MetaDataView.class).getMetaData();
 			double deltat = metadata.getDateTime().getMillis()/1000.0;
 			double theta = 0.0;
 			double phi = DifferentialRotation.calculateRotationInRadians(0.0, deltat);
+
 			this.vertexShader.changeRect(xOffset, yOffset, Math.abs(xScale), Math.abs(yScale));
-			this.vertexShader.changeTextureScale(this.textureScale);
+			this.vertexShader.changeTextureScale(new Vector2dDouble(1.,1.));
 	        this.vertexShader.changeAngles(theta, phi);
-			this.fragmentShader.changeTextureScale(this.textureScale.getX(), this.textureScale.getY());
+			this.fragmentShader.changeTextureScale(1.,1.);
 			this.fragmentShader.changeAngles(theta, phi);
 			this.coronaVertexShader.changeRect(xOffset, yOffset, Math.abs(xScale), Math.abs(yScale));
-			this.coronaVertexShader.changeTextureScale(this.textureScale.getX(), this.textureScale.getY());
+			this.coronaVertexShader.changeTextureScale(1.,1.);
 			this.coronaVertexShader.changeAngles(theta, phi);
-			this.coronaFragmentShader.changeTextureScale(this.textureScale.getX()*0.999, this.textureScale.getY()*0.999);
+			this.coronaFragmentShader.changeTextureScale(1.*0.999, 1.*0.999);
 		}
 		
 		this.recaptureRequested = false;
@@ -179,7 +185,23 @@ public class GL3DImageTextureView extends AbstractGL3DView implements GL3DView {
 	}
 
 	public void setFragmentShader(GL3DImageFragmentShaderProgram fragmentShader, GL3DImageCoronaFragmentShaderProgram coronaFragmentShader) {
-		this.fragmentShader = fragmentShader;
+		//this.fragmentShader = fragmentShader;
 		this.coronaFragmentShader = coronaFragmentShader;	
+	}
+
+	@Override
+	public GLShaderBuilder buildFragmentShader(GLShaderBuilder shaderBuilder) {
+        GLFragmentShaderView nextView = view.getAdapter(GLFragmentShaderView.class);
+        if (nextView != null) {
+            shaderBuilder = nextView.buildFragmentShader(shaderBuilder);
+        }
+
+        fragmentShader.build(shaderBuilder);
+        System.out.println("GLTEXTURE: " + shaderBuilder.getCode());
+        return shaderBuilder;
+	}
+
+	public GL3DImageFragmentShaderProgram getFragmentShader() {
+		return this.fragmentShader;
 	}
 }
