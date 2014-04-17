@@ -73,7 +73,7 @@ public class GL3DImageFragmentShaderProgram extends GLFragmentShaderProgram {
         	String program = "\tif(texcoord0.x<0.0||texcoord0.y<0.0||texcoord0.x>textureScaleThetaPhi.x||texcoord0.y>textureScaleThetaPhi.y){"
         			//+ "\t\tOUT.color = float4(1.0,0.0,0.0,1.0);" + GLShaderBuilder.LINE_SEP
         			+ "\t}"+ GLShaderBuilder.LINE_SEP;
-            program += "\tOUT.color.a=1.0;" + GLShaderBuilder.LINE_SEP;
+            //program += "\tOUT.color.a=0.7;" + GLShaderBuilder.LINE_SEP;
             program += "\tfloat theta = textureScaleThetaPhi.z;" + GLShaderBuilder.LINE_SEP;
             program += "\tfloat phi = textureScaleThetaPhi.w;" + GLShaderBuilder.LINE_SEP;        	
             
@@ -105,7 +105,7 @@ public class GL3DImageFragmentShaderProgram extends GLFragmentShaderProgram {
             program = program.replace("position",shaderBuilder.useStandardParameter("float4", "TEXCOORD3"));            
 
             program = program.replace("output", shaderBuilder.useOutputValue("float4", "COLOR"));
-            program = program.replace("textureCoordinate", shaderBuilder.useStandardParameter("float4", "TEXCOORD0"));
+            program = program.replace("textureCoordinate", shaderBuilder.useStandardParameter("float4", "TEXCOORD5"));
             shaderBuilder.useOutputValue("float4", "DEPTH");
             shaderBuilder.addMainFragment(program);
             System.out.println("GL3D Image Fragment Shader:\n" + shaderBuilder.getCode());
