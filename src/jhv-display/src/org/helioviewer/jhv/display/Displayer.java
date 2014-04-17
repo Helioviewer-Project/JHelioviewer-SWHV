@@ -5,7 +5,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 public class Displayer{
-	
+	public static Object displaylock = new Object();
 	private static Displayer instance = new Displayer();
     private final ArrayList<DisplayListener> listeners = new ArrayList<DisplayListener>();
     private final ArrayList<RenderListener> renderListeners = new ArrayList<RenderListener>();
@@ -48,7 +48,7 @@ public class Displayer{
     	}
     }
     private void tdisplay(){
-    	synchronized(listeners){
+		synchronized(displaylock){
 	        for(final DisplayListener listener : listeners) {
 	            listener.display();
 	        }
