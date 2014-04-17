@@ -34,6 +34,7 @@ import org.helioviewer.viewmodel.view.View;
 import org.helioviewer.viewmodel.view.ViewHelper;
 import org.helioviewer.viewmodel.view.ViewListener;
 import org.helioviewer.viewmodel.view.ViewportView;
+import org.helioviewer.viewmodel.view.jp2view.JHVJPXView;
 import org.helioviewer.viewmodel.view.opengl.shader.GLFragmentShaderView;
 import org.helioviewer.viewmodel.view.opengl.shader.GLMinimalFragmentShaderProgram;
 import org.helioviewer.viewmodel.view.opengl.shader.GLMinimalVertexShaderProgram;
@@ -341,7 +342,7 @@ public class GLComponentView extends AbstractComponentView implements ViewListen
             if (view instanceof GLView) {
                 ((GLView) view).renderGL(gl, true);
             } else {
-                textureHelper.renderImageDataToScreen(gl, view.getAdapter(RegionView.class).getRegion(), view.getAdapter(SubimageDataView.class).getSubimageData());
+                textureHelper.renderImageDataToScreen(gl, view.getAdapter(RegionView.class).getRegion(), view.getAdapter(SubimageDataView.class).getSubimageData(), view.getAdapter(JHVJPXView.class));
             }
             gl.glPopMatrix();
         }

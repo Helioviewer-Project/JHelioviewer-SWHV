@@ -9,6 +9,7 @@ import org.helioviewer.viewmodel.view.RegionView;
 import org.helioviewer.viewmodel.view.SubimageDataView;
 import org.helioviewer.viewmodel.view.View;
 import org.helioviewer.viewmodel.view.ViewListener;
+import org.helioviewer.viewmodel.view.jp2view.JHVJPXView;
 
 /**
  * Abstract base class implementing GLView, providing some common OpenGL
@@ -48,7 +49,7 @@ public abstract class AbstractGLView extends AbstractBasicView implements GLView
         if (view instanceof GLView) {
         	((GLView) view).renderGL(gl, true);
         } else {
-            textureHelper.renderImageDataToScreen(gl, view.getAdapter(RegionView.class).getRegion(), view.getAdapter(SubimageDataView.class).getSubimageData());
+            textureHelper.renderImageDataToScreen(gl, view.getAdapter(RegionView.class).getRegion(), view.getAdapter(SubimageDataView.class).getSubimageData(), view.getAdapter(JHVJPXView.class));
         }
     }
 
