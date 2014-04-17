@@ -233,10 +233,10 @@ public class GL3DVec3d {
             return;
 
         // can't happen / something is really messed up
-        System.out.println(len);
+        /*System.out.println(len);
         System.out.println(this);
-        Log.error("The length of the vector is bigger than 1");
-        System.exit(1);
+        Log.error("The length of the vector is bigger than 1");*/
+        //System.exit(1);
 
         this.x = Double.NaN;
         this.y = Double.NaN;
