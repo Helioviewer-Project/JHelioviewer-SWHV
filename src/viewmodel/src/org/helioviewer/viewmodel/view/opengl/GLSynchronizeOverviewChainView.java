@@ -5,6 +5,7 @@ import javax.media.opengl.GL;
 import org.helioviewer.viewmodel.view.RegionView;
 import org.helioviewer.viewmodel.view.SubimageDataView;
 import org.helioviewer.viewmodel.view.SynchronizeOverviewChainView;
+import org.helioviewer.viewmodel.view.jp2view.JHVJPXView;
 
 /**
  * Implementation of SynchronizeView for rendering in OpenGL.
@@ -28,7 +29,7 @@ public class GLSynchronizeOverviewChainView extends SynchronizeOverviewChainView
         if (view instanceof GLView) {
             ((GLView) view).renderGL(gl, true);
         } else {
-            textureHelper.renderImageDataToScreen(gl, view.getAdapter(RegionView.class).getRegion(), view.getAdapter(SubimageDataView.class).getSubimageData());
+            textureHelper.renderImageDataToScreen(gl, view.getAdapter(RegionView.class).getRegion(), view.getAdapter(SubimageDataView.class).getSubimageData(), view.getAdapter(JHVJPXView.class));
         }
     }
 

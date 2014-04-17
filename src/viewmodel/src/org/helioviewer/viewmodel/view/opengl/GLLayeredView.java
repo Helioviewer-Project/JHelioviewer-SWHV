@@ -10,6 +10,7 @@ import org.helioviewer.viewmodel.view.AbstractLayeredView;
 import org.helioviewer.viewmodel.view.SubimageDataView;
 import org.helioviewer.viewmodel.view.View;
 import org.helioviewer.viewmodel.view.ViewHelper;
+import org.helioviewer.viewmodel.view.jp2view.JHVJPXView;
 import org.helioviewer.viewmodel.view.opengl.shader.GLFragmentShaderView;
 import org.helioviewer.viewmodel.view.opengl.shader.GLMinimalFragmentShaderProgram;
 import org.helioviewer.viewmodel.view.opengl.shader.GLMinimalVertexShaderProgram;
@@ -112,7 +113,7 @@ public class GLLayeredView extends AbstractLayeredView implements GLFragmentShad
                 if (v instanceof GLView) {
                     ((GLView) v).renderGL(gl, true);
                 } else {
-                    textureHelper.renderImageDataToScreen(gl, layer.regionView.getRegion(), v.getAdapter(SubimageDataView.class).getSubimageData());
+                    textureHelper.renderImageDataToScreen(gl, layer.regionView.getRegion(), v.getAdapter(SubimageDataView.class).getSubimageData(), v.getAdapter(JHVJPXView.class));
                 }
             }
 
