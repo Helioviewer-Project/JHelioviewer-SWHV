@@ -52,4 +52,8 @@ public interface ImageData {
      * @return the color mask which should be used when drawing the image.
      */
     public ColorMask getColorMask();
+    
+    public long getDateMillis();
+    public void setDateMillis(long dateMillis);
+
 }
