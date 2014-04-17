@@ -12,6 +12,7 @@ import org.helioviewer.viewmodel.changeevent.ChangeEvent;
 import org.helioviewer.viewmodel.region.Region;
 import org.helioviewer.viewmodel.view.View;
 import org.helioviewer.viewmodel.view.ViewListener;
+import org.helioviewer.viewmodel.view.opengl.GLFilterView;
 import org.helioviewer.viewmodel.view.opengl.GLTextureHelper;
 import org.helioviewer.viewmodel.view.opengl.shader.GLFragmentShaderProgram;
 import org.helioviewer.viewmodel.view.opengl.shader.GLVertexShaderProgram;
@@ -91,6 +92,11 @@ public abstract class GL3DImageMesh extends GL3DMesh {
     }
 
     public void shapeDraw(GL3DState state) {
+		GLFilterView glfilter = this.imageTextureView.getAdapter(GLFilterView.class);
+		while(glfilter!=null){
+			glfilter.renderGL(state.gl, true);
+			glfilter = glfilter.getView().getAdapter(GLFilterView.class);
+		}
         th.bindTexture(state.gl, this.imageTextureView.getTextureId());
         state.gl.glTexParameteri(GL.GL_TEXTURE_2D, GL.GL_TEXTURE_MIN_FILTER, GL.GL_NEAREST);
         state.gl.glTexParameteri(GL.GL_TEXTURE_2D, GL.GL_TEXTURE_MAG_FILTER, GL.GL_LINEAR);
@@ -105,7 +111,7 @@ public abstract class GL3DImageMesh extends GL3DMesh {
         GLVertexShaderProgram.popShader(state.gl);
         GLFragmentShaderProgram.popShader(state.gl);
 
-        th.bindTexture(state.gl, 0);
+        //th.bindTexture(state.gl, 0);
     }
 
     public GL3DImageTextureView getImageTextureView() {
