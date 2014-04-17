@@ -21,7 +21,7 @@ public class GL3DImageCoronaVertexShaderProgram extends GLVertexShaderProgram {
             shaderCurrentlyUsed = shader;
             gl.glBindProgramARB(target, shader);
             gl.glProgramLocalParameter4dARB(target, 0, xOffset, yOffset, xScale, yScale);
-            gl.glProgramLocalParameter4dARB(target, 1, xTextureScale, yTextureScale,theta, phi);
+            gl.glProgramLocalParameter4dARB(target, 1, xTextureScale, yTextureScale,theta, phi%(2*Math.PI));
             gl.glProgramLocalParameter4dARB(target, 2, defaultXOffset, defaultYOffset, 0,0);
         }
     }
