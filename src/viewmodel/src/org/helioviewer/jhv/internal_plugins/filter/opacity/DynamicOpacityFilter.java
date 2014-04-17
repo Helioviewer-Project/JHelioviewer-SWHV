@@ -7,6 +7,7 @@ import java.awt.image.BufferedImage;
 import javax.media.opengl.GL;
 
 import org.helioviewer.viewmodel.filter.AbstractFilter;
+import org.helioviewer.viewmodel.filter.GLFilter;
 import org.helioviewer.viewmodel.filter.GLFragmentShaderFilter;
 import org.helioviewer.viewmodel.filter.StandardFilter;
 import org.helioviewer.viewmodel.imagedata.ARGBInt32ImageData;
@@ -31,7 +32,7 @@ import org.helioviewer.viewmodel.view.opengl.shader.GLShaderBuilder.GLBuildShade
  * @author Markus Langenberg
  * 
  */
-public class DynamicOpacityFilter extends AbstractFilter implements StandardFilter, GLFragmentShaderFilter {
+public class DynamicOpacityFilter extends AbstractFilter implements StandardFilter, GLFragmentShaderFilter, GLFilter {
 
     // ////////////////////////////////////////////////////////////////
     // Definitions
