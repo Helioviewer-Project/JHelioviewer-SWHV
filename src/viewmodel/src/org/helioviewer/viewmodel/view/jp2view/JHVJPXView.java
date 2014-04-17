@@ -8,6 +8,7 @@ import org.helioviewer.viewmodel.changeevent.ChangeEvent;
 import org.helioviewer.viewmodel.changeevent.PlayStateChangedReason;
 import org.helioviewer.viewmodel.changeevent.TimestampChangedReason;
 import org.helioviewer.viewmodel.imagedata.ImageData;
+import org.helioviewer.viewmodel.metadata.HelioviewerMetaData;
 import org.helioviewer.viewmodel.metadata.ObserverMetaData;
 import org.helioviewer.viewmodel.view.CachedMovieView;
 import org.helioviewer.viewmodel.view.LinkedMovieManager;
@@ -21,6 +22,7 @@ import org.helioviewer.viewmodel.view.jp2view.J2KRender.RenderReasons;
 import org.helioviewer.viewmodel.view.jp2view.datetime.ImmutableDateTime;
 import org.helioviewer.viewmodel.view.jp2view.image.JP2ImageParameter;
 import org.helioviewer.viewmodel.view.jp2view.image.SubImage;
+import org.helioviewer.viewmodel.view.opengl.GLTextureHelper;
 
 /**
  * Implementation of TimedMovieView for JPX files.
@@ -42,7 +44,7 @@ public class JHVJPXView extends JHVJP2View implements TimedMovieView, CachedMovi
     protected ImageCacheStatus imageCacheStatus;
     protected DateTimeCache dateTimeCache;
     protected int lastRenderedCompositionLayer = -1;
-
+    public int texID = -1;
     /**
      * Linking movies, if the movie is not linked, this has to be null
      */
@@ -63,6 +65,7 @@ public class JHVJPXView extends JHVJP2View implements TimedMovieView, CachedMovi
      */
     public JHVJPXView(boolean isMainView, Interval<Date> range) {
         super(isMainView, range);
+
         if(isMainView){
         	Displayer.getSingletonInstance().addRenderListener(this);
         }
@@ -466,5 +469,11 @@ public class JHVJPXView extends JHVJP2View implements TimedMovieView, CachedMovi
 	
 	public void removeRenderListener(){
         Displayer.getSingletonInstance().removeRenderListener(this);
+	}
+
+	@Override
+	public long getCurrentDateMillis() {
+		HelioviewerMetaData metadata = (HelioviewerMetaData)this.getMetadata();
+    	return metadata.getDateTime().getMillis();
 	}
 }
