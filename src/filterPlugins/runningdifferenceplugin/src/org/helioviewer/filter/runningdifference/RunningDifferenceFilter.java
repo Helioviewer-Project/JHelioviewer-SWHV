@@ -4,6 +4,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 import org.helioviewer.base.logging.Log;
+import org.helioviewer.base.physics.DifferentialRotation;
 import org.helioviewer.viewmodel.filter.FilterListener;
 import org.helioviewer.viewmodel.filter.FrameFilter;
 
@@ -187,6 +188,8 @@ public class RunningDifferenceFilter implements FrameFilter, StandardFilter, Obs
 	            Log.debug("No previous frame available, take ahead");
 	            previousFrame = timeMachineData.getPreviousFrame(-1);
 	        }
+	        double timeDiff = (timeMachineData.getCurrentDateMillis()-previousFrame.getDateMillis())/1000;
+	        shader.setDifferenceAngle(gl, (float)(DifferentialRotation.calculateRotationInRadians(0.,timeDiff)));
 	        if(previousFrame!=null){
 	            gl.glActiveTexture(shader.mode);		
 		        shader.activateDifferenceTexture(gl);
