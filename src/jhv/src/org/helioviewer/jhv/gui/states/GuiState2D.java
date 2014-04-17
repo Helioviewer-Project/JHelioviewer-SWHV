@@ -10,6 +10,7 @@ import org.helioviewer.jhv.gui.controller.MainImagePanelMousePanController;
 import org.helioviewer.jhv.gui.interfaces.ImagePanelInputController;
 import org.helioviewer.viewmodel.view.ComponentView;
 import org.helioviewer.viewmodel.view.SynchronizeView;
+import org.helioviewer.viewmodel.view.opengl.GLTextureHelper;
 
 public class GuiState2D implements State {
 
