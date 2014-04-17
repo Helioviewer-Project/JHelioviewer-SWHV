@@ -12,6 +12,7 @@ import org.helioviewer.viewmodel.view.RegionView;
 import org.helioviewer.viewmodel.view.SubimageDataView;
 import org.helioviewer.viewmodel.view.View;
 import org.helioviewer.viewmodel.view.ViewHelper;
+import org.helioviewer.viewmodel.view.jp2view.JHVJPXView;
 import org.helioviewer.viewmodel.view.opengl.GLView;
 import org.helioviewer.viewmodel.viewportimagesize.ViewportImageSize;
 
@@ -89,7 +90,7 @@ public class GL3DOrthoView extends AbstractGL3DView implements GL3DView {
             if (view instanceof GLView) {
                 ((GLView) view).renderGL(gl, true);
             } else {
-                textureHelper.renderImageDataToScreen(gl, view.getAdapter(RegionView.class).getRegion(), view.getAdapter(SubimageDataView.class).getSubimageData());
+                textureHelper.renderImageDataToScreen(gl, view.getAdapter(RegionView.class).getRegion(), view.getAdapter(SubimageDataView.class).getSubimageData(), view.getAdapter(JHVJPXView.class));
             }
             gl.glPopMatrix();
         }

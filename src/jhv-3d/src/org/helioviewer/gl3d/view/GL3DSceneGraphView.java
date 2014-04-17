@@ -39,6 +39,7 @@ import org.helioviewer.viewmodel.view.RegionView;
 import org.helioviewer.viewmodel.view.SubimageDataView;
 import org.helioviewer.viewmodel.view.View;
 import org.helioviewer.viewmodel.view.ViewListener;
+import org.helioviewer.viewmodel.view.jp2view.JHVJPXView;
 import org.helioviewer.viewmodel.view.opengl.GLOverlayView;
 import org.helioviewer.viewmodel.view.opengl.GLView;
 
@@ -439,7 +440,7 @@ public class GL3DSceneGraphView extends AbstractGL3DView implements GL3DView {
 			textureHelper.renderImageDataToScreen(gl,
 					view.getAdapter(RegionView.class).getRegion(), view
 							.getAdapter(SubimageDataView.class)
-							.getSubimageData());
+							.getSubimageData(), view.getAdapter(JHVJPXView.class));
 		}
 	}
 
