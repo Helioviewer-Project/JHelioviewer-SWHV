@@ -165,9 +165,9 @@ public class JPIPStatusPanel extends ViewStatusPanelPlugin {
             boolean isRemote = LayersModel.getSingletonInstance().isRemote(view);
 
             if (isRemote) {
-                updateStatus(connected ? ConnectionStatus.CONNECTED : ConnectionStatus.DISCONNECTED);
+                //updateStatus(connected ? ConnectionStatus.CONNECTED : ConnectionStatus.DISCONNECTED);
             } else {
-                updateStatus(ConnectionStatus.LOCAL);
+                //updateStatus(ConnectionStatus.LOCAL);
             }
         }
     }
