@@ -12,7 +12,6 @@ import org.helioviewer.viewmodel.view.opengl.shader.GLFragmentShaderProgram;
 import org.helioviewer.viewmodel.view.opengl.shader.GLVertexShaderProgram;
 
 public class GL3DLascoImageLayer extends GL3DImageLayer {
-    private GL3DImageCorona lascoImageMesh;
 
     public GL3DLascoImageLayer(GL3DView mainView) {
         super("LASCO Image Layer", mainView);
@@ -27,7 +26,6 @@ public class GL3DLascoImageLayer extends GL3DImageLayer {
         this.imageTextureView.setVertexShader(vertex);        
  
         
-        lascoImageMesh = new GL3DImageCorona("LASCO", imageTextureView, vertexShader, fragmentShader, this);
         this.imageTextureView.metadata = this.metaDataView.getMetaData();
         
         this.accellerationShape = new GL3DHitReferenceShape();
@@ -36,13 +34,7 @@ public class GL3DLascoImageLayer extends GL3DImageLayer {
         double yOffset = (this.imageTextureView.metadata.getPhysicalUpperRight().getY()+this.imageTextureView.metadata.getPhysicalLowerLeft().getY())/(2.0*this.imageTextureView.metadata.getPhysicalImageHeight());
         vertex.setDefaultOffset(xOffset, yOffset);
 
-        this.coronaFragmentShader.setCutOffRadius((Constants.SunRadius*hvMetaData.getOuterPhysicalOcculterRadius()/this.imageTextureView.metadata.getPhysicalImageWidth()));
 
-        this.addNode(lascoImageMesh);
-    }
-
-    protected GL3DImageMesh getImageCorona() {
-        return lascoImageMesh;
     }
 
     protected GL3DImageMesh getImageSphere() {

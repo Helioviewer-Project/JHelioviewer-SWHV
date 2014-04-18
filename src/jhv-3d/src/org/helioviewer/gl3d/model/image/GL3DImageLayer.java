@@ -166,8 +166,6 @@ public abstract class GL3DImageLayer extends GL3DOrientedGroup implements GL3DCa
 
     protected abstract void createImageMeshNodes(GL gl);
 
-    protected abstract GL3DImageMesh getImageCorona();
-
     protected abstract GL3DImageMesh getImageSphere();
 
     public void shapeUpdate(GL3DState state) {
@@ -352,13 +350,7 @@ public abstract class GL3DImageLayer extends GL3DOrientedGroup implements GL3DCa
     }
 
     public void setCoronaVisibility(boolean visible) {
-        GL3DNode node = this.first;
-        while (node != null) {
-            if (node instanceof GL3DImageCorona) {
-                node.getDrawBits().set(Bit.Hidden, !visible);
-            }
-            node = node.getNext();
-        }
+
     }
 
     protected GL3DImageTextureView getImageTextureView() {

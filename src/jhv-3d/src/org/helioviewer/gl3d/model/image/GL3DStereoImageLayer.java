@@ -13,7 +13,6 @@ import org.helioviewer.viewmodel.view.opengl.shader.GLVertexShaderProgram;
 
 public class GL3DStereoImageLayer extends GL3DImageLayer {
     private GL3DImageSphere sphere = null;
-    private GL3DImageCorona corona = null;
     
     public GL3DStereoImageLayer(GL3DView mainView) {
         super("Stereo Image Layer", mainView);
@@ -29,10 +28,8 @@ public class GL3DStereoImageLayer extends GL3DImageLayer {
  
         GLFragmentShaderProgram coronaFragmentShader = GL3DShaderFactory.createFragmentShaderProgram(gl, this.coronaFragmentShader);
         
-        corona = new GL3DImageCorona(imageTextureView, vertexShader, coronaFragmentShader, this);
         this.imageTextureView.metadata = this.metaDataView.getMetaData();
                 
-		this.addNode(corona);
 		
 		
         
@@ -53,10 +50,6 @@ public class GL3DStereoImageLayer extends GL3DImageLayer {
         this.coronaFragmentShader.setCutOffRadius(0.99*(Constants.SunRadius/this.imageTextureView.metadata.getPhysicalImageWidth()));
         
         
-    }
-
-    protected GL3DImageMesh getImageCorona() {
-        return this.corona;
     }
 
     protected GL3DImageMesh getImageSphere() {
