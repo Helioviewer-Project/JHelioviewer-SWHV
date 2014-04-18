@@ -29,13 +29,11 @@ import org.helioviewer.viewmodel.view.opengl.shader.GLVertexShaderProgram;
  */
 public class GL3DImageCorona extends GL3DImageMesh {
     protected Vector2dInt mappingResolution = new Vector2dInt(2, 2);
-
     private TextureCoordinateSystem textureCoordinateSystem;
-    private SolarImageToTextureConversion solarDisk2TextureConversion;
 
     Region lastRegion = null;
     private GL3DImageLayer layer = null;
-    GL3DMat4d phiRotation = null;
+
 
     public GL3DImageCorona(String name, GL3DImageTextureView imageTextureView, GLVertexShaderProgram vertexShaderProgram, GLFragmentShaderProgram fragmentShaderProgram, GL3DImageLayer imageLayer) {
         super(name, imageTextureView, vertexShaderProgram, fragmentShaderProgram);
@@ -53,7 +51,6 @@ public class GL3DImageCorona extends GL3DImageMesh {
 
             SolarImageCoordinateSystem solarDiskCS = new SolarImageCoordinateSystem();
             textureCoordinateSystem = new TextureCoordinateSystem(this.imageTextureView.getTextureScale(), region);
-            solarDisk2TextureConversion = (SolarImageToTextureConversion) solarDiskCS.getConversion(textureCoordinateSystem);
             // Read Boundaries on Solar Disk
             CoordinateVector orientationVector = this.layer.getOrientation();
             CoordinateConversion toViewSpace = this.layer.getCoordinateSystem().getConversion(state.getActiveCamera().getViewSpaceCoordinateSystem());
@@ -61,24 +58,6 @@ public class GL3DImageCorona extends GL3DImageMesh {
             GL3DVec3d orientation = GL3DHelper.toVec(toViewSpace.convert(orientationVector));
             orientation.normalize();
 
-            /*
-            if (!(orientation.equals(new GL3DVec3d(0, 1, 0)))) {
-                GL3DVec3d orientationXZ = new GL3DVec3d(orientation.x, 0, orientation.z);
-                double phi = Math.acos(orientationXZ.z);
-                if (orientationXZ.x < 0) {
-                    phi = 0 - phi;
-                }
-                phiRotation = GL3DMat4d.rotation(phi, new GL3DVec3d(0, 1, 0));
-                GL3DVec4d direction = new GL3DVec4d(phiRotation.m[8]*1, phiRotation.m[9]*1, phiRotation.m[10]*1, 0);
-                this.layer.setLayerDirection(direction);
-            }
-            */
-
-            phiRotation = GL3DMat4d.rotation(Math.atan2(orientation.x, orientation.z), new GL3DVec3d(0, 1, 0));
-            GL3DVec4d direction = new GL3DVec4d(phiRotation.m[8]*1, phiRotation.m[9]*1, phiRotation.m[10]*1, 0);
-            this.layer.setLayerDirection(direction);
-
-            // if (phiRotation != null) { cannot be null
             {
                 int vertexCounter = 0;
 
@@ -97,11 +76,7 @@ public class GL3DImageCorona extends GL3DImageMesh {
     }
 
     private void pushVertex(Vector2dDouble position, List<GL3DVec3d> positions, List<GL3DVec3d> normals, List<GL3DVec2d> texCoords, List<GL3DVec4d> colors, double tx, double ty) {
-        double cx = position.getX() * phiRotation.m[0] + position.getY() * phiRotation.m[4] + phiRotation.m[12];
-        double cy = position.getX() * phiRotation.m[1] + position.getY() * phiRotation.m[5] + phiRotation.m[13];
-        double cz = position.getX() * phiRotation.m[2] + position.getY() * phiRotation.m[6] + phiRotation.m[14];
-
-        positions.add(new GL3DVec3d(cx, cy, cz));
+        positions.add(new GL3DVec3d(position.getX(), position.getY(), 0));
         colors.add(new GL3DVec4d(0, 0, 0, 1));
         texCoords.add(new GL3DVec2d(tx, ty));
     }
