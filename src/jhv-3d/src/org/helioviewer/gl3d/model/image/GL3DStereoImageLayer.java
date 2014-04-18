@@ -31,7 +31,6 @@ public class GL3DStereoImageLayer extends GL3DImageLayer {
         GLVertexShaderProgram  vertexCoronaShader   = GL3DShaderFactory.createVertexShaderProgram(gl, vertexCorona);        
         this.imageTextureView.setVertexShader(vertex, vertexCorona);        
  
-		this.coronaFragmentShader = new GL3DImageCoronaFragmentShaderProgram();        
         GLFragmentShaderProgram coronaFragmentShader = GL3DShaderFactory.createFragmentShaderProgram(gl, this.coronaFragmentShader);
         
         corona = new GL3DImageCorona(imageTextureView, vertexShader, coronaFragmentShader, this);

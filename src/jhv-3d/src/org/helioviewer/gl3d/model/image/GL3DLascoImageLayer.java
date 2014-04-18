@@ -22,7 +22,6 @@ public class GL3DLascoImageLayer extends GL3DImageLayer {
 
     protected void createImageMeshNodes(GL gl) {
         HelioviewerOcculterMetaData hvMetaData = (HelioviewerOcculterMetaData) metaDataView.getMetaData();
-        this.coronaFragmentShader = new GL3DImageCoronaFragmentShaderProgram();        
         
         GLFragmentShaderProgram fragmentShader = GL3DShaderFactory.createFragmentShaderProgram(gl, this.coronaFragmentShader);
         GL3DImageVertexShaderProgram vertex = new GL3DImageVertexShaderProgram();
