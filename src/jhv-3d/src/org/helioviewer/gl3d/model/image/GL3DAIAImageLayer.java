@@ -22,7 +22,6 @@ public class GL3DAIAImageLayer extends GL3DImageLayer {
         GL3DImageVertexShaderProgram vertex = new GL3DImageVertexShaderProgram();
         GLVertexShaderProgram  vertexShader   = GL3DShaderFactory.createVertexShaderProgram(gl, vertex);
         this.imageTextureView.setVertexShader(vertex);
-        this.imageTextureView.setFragmentShader(this.sphereFragmentShader, this.sphereFragmentShader);
         this.imageTextureView.metadata = this.metaDataView.getMetaData();
 
         sphere = new GL3DImageSphere(imageTextureView, vertexShader, sphereFragmentShader, this);

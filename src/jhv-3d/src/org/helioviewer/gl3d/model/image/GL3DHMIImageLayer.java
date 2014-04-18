@@ -33,16 +33,11 @@ public class GL3DHMIImageLayer extends GL3DImageLayer {
         vertex.setDefaultOffset(xOffset, yOffset);
 
         this.sphereFragmentShader.setCutOffRadius((float)(Constants.SunRadius/this.imageTextureView.metadata.getPhysicalImageWidth()));
-        this.coronaFragmentShader.setCutOffRadius((Constants.SunRadius/this.imageTextureView.metadata.getPhysicalImageWidth()));
-
 
 
         this.addNode(imageMesh);
     }
 
-    protected GL3DImageMesh getImageCorona() {
-        return null;
-    }
 
     protected GL3DImageMesh getImageSphere() {
         return imageMesh;

@@ -175,11 +175,6 @@ public class GL3DImageTextureView extends AbstractGL3DView implements GL3DView, 
 		this.vertexShader = vertexShader;
 	}
 
-	public void setFragmentShader(GL3DImageFragmentShaderProgram fragmentShader, GL3DImageFragmentShaderProgram coronaFragmentShader) {
-		//this.fragmentShader = fragmentShader;
-		//this.coronaFragmentShader = coronaFragmentShader;	
-	}
-
 	@Override
 	public GLShaderBuilder buildFragmentShader(GLShaderBuilder shaderBuilder) {
         GLFragmentShaderView nextView = view.getAdapter(GLFragmentShaderView.class);

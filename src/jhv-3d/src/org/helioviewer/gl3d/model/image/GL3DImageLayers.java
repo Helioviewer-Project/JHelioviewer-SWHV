@@ -42,7 +42,6 @@ public class GL3DImageLayers extends GL3DGroup {
     
     @Override
     public void shapeInit(GL3DState state) {
-    	//addNode(GL3DCoronaSort.getInstance());
     	super.shapeInit(state);
     }
 
