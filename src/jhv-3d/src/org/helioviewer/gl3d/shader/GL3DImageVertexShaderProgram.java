@@ -61,7 +61,6 @@ public class GL3DImageVertexShaderProgram extends GLVertexShaderProgram {
             program += "\toutput.x *= textureScaleThetaPhi.x;" + GLShaderBuilder.LINE_SEP;
             program += "\toutput.y *= textureScaleThetaPhi.y;" + GLShaderBuilder.LINE_SEP;
 			            
-            program += "\talpha = color.a;";
             
             shaderBuilder.addEnvParameter("float4 rect");            
             shaderBuilder.addEnvParameter("float4 textureScaleThetaPhi");            
@@ -69,7 +68,6 @@ public class GL3DImageVertexShaderProgram extends GLVertexShaderProgram {
             
             program = program.replace("output", shaderBuilder.useOutputValue("float4", "TEXCOORD0"));
             program = program.replace("physicalPosition", shaderBuilder.useStandardParameter("float4", "POSITION"));
-            program = program.replace("alpha", shaderBuilder.useOutputValue("float", "TEXCOORD1"));
             program = program.replace("positionPass", shaderBuilder.useOutputValue("float4", "TEXCOORD3"));
             program = program.replace("color", shaderBuilder.useStandardParameter("float4", "COLOR"));
             shaderBuilder.addMainFragment(program);

@@ -60,7 +60,7 @@ public class GL3DImageTextureView extends AbstractGL3DView implements GL3DView, 
 	public double minZ = 0.0;
 	public double maxZ = Constants.SunRadius;
 	private GL3DImageFragmentShaderProgram fragmentShader = new GL3DImageFragmentShaderProgram();
-	private GL3DImageCoronaFragmentShaderProgram coronaFragmentShader;
+	private GL3DImageFragmentShaderProgram coronaFragmentShader;
 	
     public void renderGL(GL gl, boolean nextView) {        
         render3D(GL3DState.get());
@@ -184,7 +184,7 @@ public class GL3DImageTextureView extends AbstractGL3DView implements GL3DView, 
 		this.coronaVertexShader = coronaVertexShader;
 	}
 
-	public void setFragmentShader(GL3DImageFragmentShaderProgram fragmentShader, GL3DImageCoronaFragmentShaderProgram coronaFragmentShader) {
+	public void setFragmentShader(GL3DImageFragmentShaderProgram fragmentShader, GL3DImageFragmentShaderProgram coronaFragmentShader) {
 		//this.fragmentShader = fragmentShader;
 		this.coronaFragmentShader = coronaFragmentShader;	
 	}
