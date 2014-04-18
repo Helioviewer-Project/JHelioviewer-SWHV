@@ -179,7 +179,6 @@ public class RunningDifferenceFilter implements FrameFilter, StandardFilter, Obs
 	}
 
 	public void applyGL(GL gl) {
-		System.out.println("RDAPPLYGL");
 		if(isActive){
 	        shader.setIsDifference(gl,1.0f);	        
 			shader.bind(gl);
