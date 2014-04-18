@@ -79,7 +79,7 @@ public abstract class GL3DImageLayer extends GL3DOrientedGroup implements GL3DCa
     private double lastViewAngle = 0.0;
 
     protected GL gl;
-    protected GL3DImageCoronaFragmentShaderProgram coronaFragmentShader = null;
+    protected GL3DImageFragmentShaderProgram coronaFragmentShader = null;
     protected GL3DImageFragmentShaderProgram sphereFragmentShader = null;
 
     public GL3DImageLayer(String name, GL3DView mainLayerView) {
@@ -210,7 +210,6 @@ public abstract class GL3DImageLayer extends GL3DOrientedGroup implements GL3DCa
         if (angle != lastViewAngle) {
             lastViewAngle = angle;
             float alpha = (float) ((Math.abs(90-lastViewAngle)-minAngle)/(maxAngle-minAngle));
-            if (this.coronaFragmentShader != null) this.coronaFragmentShader.changeAlpha(alpha);
         }
     }
 

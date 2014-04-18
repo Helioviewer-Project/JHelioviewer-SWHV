@@ -24,8 +24,6 @@ public class GL3DEITImageLayer extends GL3DImageLayer {
     protected void createImageMeshNodes(GL gl) {
     	this.sphereFragmentShader = new GL3DImageFragmentShaderProgram();
     	GLFragmentShaderProgram sphereFragmentShader = GL3DShaderFactory.createFragmentShaderProgram(gl, this.sphereFragmentShader);
-        this.coronaFragmentShader = new GL3DImageCoronaFragmentShaderProgram();        
-        GLFragmentShaderProgram coronaFragmentShader = GL3DShaderFactory.createFragmentShaderProgram(gl, this.coronaFragmentShader);
         
         GL3DImageVertexShaderProgram vertex = new GL3DImageVertexShaderProgram();
         GLVertexShaderProgram   vertexShader   = GL3DShaderFactory.createVertexShaderProgram(gl, vertex);
