@@ -12,8 +12,6 @@ import org.helioviewer.base.physics.DifferentialRotation;
 import org.helioviewer.gl3d.changeevent.ImageTextureRecapturedReason;
 import org.helioviewer.gl3d.model.image.GL3DImageMesh;
 import org.helioviewer.gl3d.scenegraph.GL3DState;
-import org.helioviewer.gl3d.shader.GL3DImageCoronaFragmentShaderProgram;
-import org.helioviewer.gl3d.shader.GL3DImageCoronaVertexShaderProgram;
 import org.helioviewer.gl3d.shader.GL3DImageFragmentShaderProgram;
 import org.helioviewer.gl3d.shader.GL3DImageVertexShaderProgram;
 import org.helioviewer.gl3d.shader.GL3DShaderFactory;
@@ -55,12 +53,10 @@ public class GL3DImageTextureView extends AbstractGL3DView implements GL3DView, 
 	private boolean regionChanged = true;
 	private boolean forceUpdate = false;
 	private GL3DImageVertexShaderProgram vertexShader = null;
-	private GL3DImageCoronaVertexShaderProgram coronaVertexShader;
 	public MetaData metadata = null;	
 	public double minZ = 0.0;
 	public double maxZ = Constants.SunRadius;
 	private GL3DImageFragmentShaderProgram fragmentShader = new GL3DImageFragmentShaderProgram();
-	private GL3DImageFragmentShaderProgram coronaFragmentShader;
 	
     public void renderGL(GL gl, boolean nextView) {        
         render3D(GL3DState.get());
@@ -134,10 +130,6 @@ public class GL3DImageTextureView extends AbstractGL3DView implements GL3DView, 
             this.vertexShader.changeAngles(theta, phi);
             this.fragmentShader.changeTextureScale(this.textureScale.getX(), this.textureScale.getY());
             this.fragmentShader.changeAngles(theta, phi);
-            this.coronaVertexShader.changeRect(xOffset, yOffset, Math.abs(xScale), Math.abs(yScale));
-            this.coronaVertexShader.changeTextureScale(this.textureScale.getX(), this.textureScale.getY());
-            this.coronaVertexShader.changeAngles(theta, phi);
-            this.coronaFragmentShader.changeTextureScale(this.textureScale.getX()*0.999, this.textureScale.getY()*0.999);
 		}
 		
 		this.recaptureRequested = false;
@@ -179,14 +171,13 @@ public class GL3DImageTextureView extends AbstractGL3DView implements GL3DView, 
 		this.forceUpdate = true;
 	}
 
-	public void setVertexShader(GL3DImageVertexShaderProgram vertexShader, GL3DImageCoronaVertexShaderProgram coronaVertexShader) {
+	public void setVertexShader(GL3DImageVertexShaderProgram vertexShader) {
 		this.vertexShader = vertexShader;
-		this.coronaVertexShader = coronaVertexShader;
 	}
 
 	public void setFragmentShader(GL3DImageFragmentShaderProgram fragmentShader, GL3DImageFragmentShaderProgram coronaFragmentShader) {
 		//this.fragmentShader = fragmentShader;
-		this.coronaFragmentShader = coronaFragmentShader;	
+		//this.coronaFragmentShader = coronaFragmentShader;	
 	}
 
 	@Override

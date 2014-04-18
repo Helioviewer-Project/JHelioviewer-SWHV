@@ -111,10 +111,6 @@ public class GL3DImageLayers extends GL3DGroup {
         state.gl.glDepthFunc(GL.GL_LEQUAL);
         state.gl.glDepthMask(false);
         
-        for (GL3DImageLayer layer : layers) {
-            layer.getImageCorona().draw(state);    
-        }
-        
         state.gl.glDepthMask(true);
         state.gl.glDisable(GL.GL_BLEND);
         
