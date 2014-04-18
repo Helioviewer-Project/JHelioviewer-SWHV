@@ -46,10 +46,7 @@ public class GL3DStereoImageLayer extends GL3DImageLayer {
 	    	this.sphereFragmentShader.setCutOffRadius(Constants.SunRadius/this.imageTextureView.metadata.getPhysicalImageWidth());
 		}
         vertex.setDefaultOffset(xOffset, yOffset);
-        
-        this.coronaFragmentShader.setCutOffRadius(0.99*(Constants.SunRadius/this.imageTextureView.metadata.getPhysicalImageWidth()));
-        
-        
+                        
     }
 
     protected GL3DImageMesh getImageSphere() {

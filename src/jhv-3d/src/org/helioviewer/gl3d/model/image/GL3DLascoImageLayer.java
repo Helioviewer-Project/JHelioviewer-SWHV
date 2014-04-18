@@ -34,7 +34,6 @@ public class GL3DLascoImageLayer extends GL3DImageLayer {
         double yOffset = (this.imageTextureView.metadata.getPhysicalUpperRight().getY()+this.imageTextureView.metadata.getPhysicalLowerLeft().getY())/(2.0*this.imageTextureView.metadata.getPhysicalImageHeight());
         vertex.setDefaultOffset(xOffset, yOffset);
 
-
     }
 
     protected GL3DImageMesh getImageSphere() {
