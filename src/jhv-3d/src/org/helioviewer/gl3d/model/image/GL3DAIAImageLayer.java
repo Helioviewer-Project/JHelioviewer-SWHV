@@ -24,16 +24,16 @@ public class GL3DAIAImageLayer extends GL3DImageLayer {
     	//GLFragmentShaderProgram sphereFragmentShader = GL3DShaderFactory.createFragmentShaderProgram(gl, this.sphereFragmentShader);
     	//this.sphereFragmentShader = (GL3DImageFragmentShaderProgram)sphereFragmentShader;
         
-        this.coronaFragmentShader = new GL3DImageCoronaFragmentShaderProgram();        
+        this.coronaFragmentShader = new GL3DImageFragmentShaderProgram();        
         GLFragmentShaderProgram coronaFragmentShader = GL3DShaderFactory.createFragmentShaderProgram(gl, this.coronaFragmentShader);
-        this.coronaFragmentShader = (GL3DImageCoronaFragmentShaderProgram)coronaFragmentShader;
+        this.coronaFragmentShader =imageTextureView.getFragmentShader();
         
         GL3DImageVertexShaderProgram vertex = new GL3DImageVertexShaderProgram();
         GLVertexShaderProgram  vertexShader   = GL3DShaderFactory.createVertexShaderProgram(gl, vertex);
         GL3DImageCoronaVertexShaderProgram vertexCorona = new GL3DImageCoronaVertexShaderProgram();
         GLVertexShaderProgram  vertexCoronaShader   = GL3DShaderFactory.createVertexShaderProgram(gl, vertexCorona);        
         this.imageTextureView.setVertexShader(vertex, vertexCorona);
-        this.imageTextureView.setFragmentShader(this.sphereFragmentShader, this.coronaFragmentShader);
+        this.imageTextureView.setFragmentShader(this.sphereFragmentShader, this.sphereFragmentShader);
         this.imageTextureView.metadata = this.metaDataView.getMetaData();
 
         sphere = new GL3DImageSphere(imageTextureView, vertexShader, sphereFragmentShader, this);

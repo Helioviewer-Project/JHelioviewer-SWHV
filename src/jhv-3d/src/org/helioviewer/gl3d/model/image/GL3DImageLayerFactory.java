@@ -29,10 +29,7 @@ public class GL3DImageLayerFactory {
         } else if (metaData instanceof HelioviewerMetaData) {
         	
             HelioviewerMetaData hvMetaData = (HelioviewerMetaData) metaData;
-            if (hvMetaData.getInstrument().equalsIgnoreCase("MDI")) {
-                // MDI
-                return new GL3DMDIImageLayer(mainView);
-            } else if (hvMetaData.getInstrument().equalsIgnoreCase("HMI")) {
+            if (hvMetaData.getInstrument().equalsIgnoreCase("HMI")) {
                 // HMI
                 Log.debug("GL3DImageLayerFactory: Creating HMI Image Layer!");
                 return new GL3DHMIImageLayer(mainView);
