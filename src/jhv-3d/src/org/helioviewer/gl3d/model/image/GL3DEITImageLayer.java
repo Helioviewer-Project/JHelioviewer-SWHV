@@ -4,8 +4,6 @@ import javax.media.opengl.GL;
 
 import org.helioviewer.base.physics.Constants;
 import org.helioviewer.gl3d.model.GL3DHitReferenceShape;
-import org.helioviewer.gl3d.shader.GL3DImageCoronaFragmentShaderProgram;
-import org.helioviewer.gl3d.shader.GL3DImageCoronaVertexShaderProgram;
 import org.helioviewer.gl3d.shader.GL3DImageFragmentShaderProgram;
 import org.helioviewer.gl3d.shader.GL3DImageVertexShaderProgram;
 import org.helioviewer.gl3d.shader.GL3DShaderFactory;
@@ -27,9 +25,7 @@ public class GL3DEITImageLayer extends GL3DImageLayer {
         
         GL3DImageVertexShaderProgram vertex = new GL3DImageVertexShaderProgram();
         GLVertexShaderProgram   vertexShader   = GL3DShaderFactory.createVertexShaderProgram(gl, vertex);
-        GL3DImageCoronaVertexShaderProgram vertexCorona = new GL3DImageCoronaVertexShaderProgram();
-        GLVertexShaderProgram  vertexCoronaShader   = GL3DShaderFactory.createVertexShaderProgram(gl, vertexCorona);        
-        this.imageTextureView.setVertexShader(vertex, vertexCorona);        
+        this.imageTextureView.setVertexShader(vertex);        
         
         sphere = new GL3DImageSphere(imageTextureView, vertexShader, sphereFragmentShader, this);
         corona = new GL3DImageCorona(imageTextureView, vertexShader, coronaFragmentShader, this);
