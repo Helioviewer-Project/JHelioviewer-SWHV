@@ -20,6 +20,7 @@ import org.helioviewer.viewmodel.view.View;
 import org.helioviewer.viewmodel.view.ViewHelper;
 import org.helioviewer.viewmodel.view.ViewListener;
 import org.helioviewer.viewmodel.view.ViewportView;
+import org.helioviewer.viewmodel.view.jp2view.JHVJPXView;
 import org.helioviewer.viewmodel.viewport.Viewport;
 
 /**
@@ -318,6 +319,7 @@ public class BufferedImageTimeMachineView extends AbstractBasicView implements S
         // this also trigger the rendering
 
         slaveView.addViewListener(slaveChainListener);
+        slaveMovieView.getAdapter(JHVJPXView.class).setBlocking(false);
     }
 
     /**
