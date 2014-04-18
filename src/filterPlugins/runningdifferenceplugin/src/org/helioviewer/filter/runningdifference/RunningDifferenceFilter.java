@@ -58,6 +58,7 @@ public class RunningDifferenceFilter implements FrameFilter, StandardFilter, Obs
      * @see org.helioviewer.viewmodel.filter.StandardFilter#apply(org.helioviewer.viewmodel.imagedata.ImageData)
      */
     public ImageData apply(ImageData data) {
+    	System.out.print("applyRD");
         // If its not active we don't filter at all
         if (!isActive)
             return data;
@@ -178,6 +179,7 @@ public class RunningDifferenceFilter implements FrameFilter, StandardFilter, Obs
 	}
 
 	public void applyGL(GL gl) {
+		System.out.println("RDAPPLYGL");
 		if(isActive){
 	        shader.setIsDifference(gl,1.0f);	        
 			shader.bind(gl);
@@ -190,14 +192,13 @@ public class RunningDifferenceFilter implements FrameFilter, StandardFilter, Obs
 	        }
 	        double timeDiff = (timeMachineData.getCurrentDateMillis()-previousFrame.getDateMillis())/1000;
 	        shader.setDifferenceAngle(gl, (float)(DifferentialRotation.calculateRotationInRadians(0.,timeDiff)));
-	        if(previousFrame!=null){
+	        //if(previousFrame!=null){
 	            gl.glActiveTexture(shader.mode);		
 		        shader.activateDifferenceTexture(gl);
 		        gl.glBindTexture(GL.GL_TEXTURE_2D, lookupDiff); 
 		        GLTextureHelper th = new GLTextureHelper();
 		        th.moveImageDataToGLTexture(gl, previousFrame, 0, 0, previousFrame.getWidth(), previousFrame.getHeight(), lookupDiff);
-	            //gl.glActiveTexture(GL.GL_TEXTURE0);		
-		    }
+		    //}
         }
 		else{
 	        shader.setIsDifference(gl,0.0f);	        
@@ -206,7 +207,6 @@ public class RunningDifferenceFilter implements FrameFilter, StandardFilter, Obs
 
     public GLShaderBuilder buildFragmentShader(GLShaderBuilder shaderBuilder) {
         shader.build(shaderBuilder);
-
         GLTextureHelper textureHelper = new GLTextureHelper();
         textureHelper.delTextureID(shaderBuilder.getGL(), lookupDiff);
         lookupDiff = textureHelper.genTextureID(shaderBuilder.getGL());
