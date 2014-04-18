@@ -95,10 +95,6 @@ public class GL3DImageSphere extends GL3DImageMesh {
 			Vector2dDouble ur = metaData.getPhysicalUpperRight();
 			Vector2dDouble lr = metaData.getPhysicalLowerRight();
 			Vector2dDouble ll = metaData.getPhysicalLowerLeft();
-			System.out.println("UL:" +ul);
-			System.out.println("UR:" +ur);
-			System.out.println("LR:" +lr);
-			System.out.println("LL: "+ll);
 
 			int beginPositionNumberCorona = numberOfPositions; 
 			positions.add(new GL3DVec3d(ul.getX(), ul.getY(), 0.));
