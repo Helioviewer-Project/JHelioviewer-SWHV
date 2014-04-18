@@ -45,6 +45,10 @@ public class JHVJPXView extends JHVJP2View implements TimedMovieView, CachedMovi
     protected DateTimeCache dateTimeCache;
     protected int lastRenderedCompositionLayer = -1;
     public int texID = -1;
+    /*
+     * Set to true if you want to use the displaylock.
+     */
+    private boolean blockingMode;
     /**
      * Linking movies, if the movie is not linked, this has to be null
      */
@@ -63,14 +67,20 @@ public class JHVJPXView extends JHVJP2View implements TimedMovieView, CachedMovi
      * @param isMainView
      *            Whether the view is a main view or not
      */
-    public JHVJPXView(boolean isMainView, Interval<Date> range) {
+    public JHVJPXView(boolean isMainView, Interval<Date> range, boolean blockingMode) {
         super(isMainView, range);
-
+        this.blockingMode = blockingMode;
         if(isMainView){
         	Displayer.getSingletonInstance().addRenderListener(this);
         }
     }
-
+    public JHVJPXView(boolean isMainView, Interval<Date> range) {
+        super(isMainView, range);
+        this.blockingMode = false;
+        if(isMainView){
+        	Displayer.getSingletonInstance().addRenderListener(this);
+        }
+    }
     /**
      * {@inheritDoc}
      */
@@ -382,18 +392,27 @@ public class JHVJPXView extends JHVJP2View implements TimedMovieView, CachedMovi
      * {@inheritDoc}
      */
     void setSubimageData(ImageData newImageData, SubImage roi, int compositionLayer) {
-    	synchronized(Displayer.displaylock){
-	        lastRenderedCompositionLayer = compositionLayer;
-	
-	        if (metaData instanceof ObserverMetaData) {
-	            ObserverMetaData observerMetaData = (ObserverMetaData) metaData;
-	            observerMetaData.updateDateTime(dateTimeCache.getDateTime(compositionLayer));
-	            event.addReason(new TimestampChangedReason(this, observerMetaData.getDateTime()));
-	        }
-	        super.setSubimageData(newImageData, roi, 0);
+    	if(blockingMode){
+	    	synchronized(Displayer.displaylock){
+	    		setSubimageDataHelper(newImageData, roi, compositionLayer); 
+	    	}
+    	}
+    	else{
+    		setSubimageDataHelper(newImageData, roi, compositionLayer); 
     	}
     }
 
+
+    private void setSubimageDataHelper(ImageData newImageData, SubImage roi, int compositionLayer) {
+        lastRenderedCompositionLayer = compositionLayer;
+    	
+        if (metaData instanceof ObserverMetaData) {
+            ObserverMetaData observerMetaData = (ObserverMetaData) metaData;
+            observerMetaData.updateDateTime(dateTimeCache.getDateTime(compositionLayer));
+            event.addReason(new TimestampChangedReason(this, observerMetaData.getDateTime()));
+        }
+        super.setSubimageData(newImageData, roi, 0);
+    }
     public LinkedMovieManager getLinkedMovieManager() {
         return linkedMovieManager;
     }
@@ -477,5 +496,8 @@ public class JHVJPXView extends JHVJP2View implements TimedMovieView, CachedMovi
 	public long getCurrentDateMillis() {
 		HelioviewerMetaData metadata = (HelioviewerMetaData)this.getMetadata();
     	return metadata.getDateTime().getMillis();
+	}
+	public void setBlocking(boolean blockingMode) {
+		this.blockingMode = blockingMode;
 	}
 }

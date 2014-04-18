@@ -117,7 +117,7 @@ public abstract class StandardViewFactory implements ViewFactory {
         } else if (source instanceof ImageInfoView) {
             if (source instanceof JHVJPXView) {
                 JHVJPXView sourceJPX = (JHVJPXView) source;
-                JHVJPXView newJPX = new JHVJPXView(false, sourceJPX.getDateRange());
+                JHVJPXView newJPX = new JHVJPXView(false, sourceJPX.getDateRange(), true);
 
                 newJPX.setJP2Image(sourceJPX.getJP2Image());
 
