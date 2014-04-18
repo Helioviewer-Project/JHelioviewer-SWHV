@@ -38,20 +38,41 @@ public class GL3DImageVertexShaderProgram extends GLVertexShaderProgram {
         try {
             String program = "\tphysicalPosition = physicalPosition;" + GLShaderBuilder.LINE_SEP;
             
+            program += "\tif(abs(position.x)>1.1){"+ GLShaderBuilder.LINE_SEP;
             program += "\tfloat theta = -textureScaleThetaPhi.z;" + GLShaderBuilder.LINE_SEP;
-            program += "\tfloat phi = -textureScaleThetaPhi.w;" + GLShaderBuilder.LINE_SEP;
+            program += "\tfloat phi = textureScaleThetaPhi.w;" + GLShaderBuilder.LINE_SEP;
+            
+            program += "\toutput.x = position.x - rect.x;" + GLShaderBuilder.LINE_SEP;
+            program += "\toutput.y = position.y - rect.y;" + GLShaderBuilder.LINE_SEP;            
+
+            
+            program += "\toutput.x *= rect.z;" + GLShaderBuilder.LINE_SEP;
+            program += "\toutput.y *= rect.w;" + GLShaderBuilder.LINE_SEP;
+
+            program += "\toutput.x *= textureScaleThetaPhi.x;" + GLShaderBuilder.LINE_SEP;
+            program += "\toutput.y *= textureScaleThetaPhi.y;" + GLShaderBuilder.LINE_SEP;			
             program += "\tpositionPass = position;" + GLShaderBuilder.LINE_SEP;
 
-            program += "\tfloat xrot = position.x*cos(phi) - position.z*sin(phi);" + GLShaderBuilder.LINE_SEP;
-            program += "\tfloat yrot = position.y;" + GLShaderBuilder.LINE_SEP;
-            program += "\tfloat zrot = position.x*sin(phi) + position.z*cos(phi);" + GLShaderBuilder.LINE_SEP;
+            program += "\tfloat xrott = physicalPosition.x;" + GLShaderBuilder.LINE_SEP;
+            program += "\tfloat yrott = physicalPosition.y*cos(theta) - physicalPosition.z*sin(theta);" + GLShaderBuilder.LINE_SEP;
+            program += "\tfloat zrott = physicalPosition.y*sin(theta) + physicalPosition.z*cos(theta);" + GLShaderBuilder.LINE_SEP;
+            
+            program += "\t physicalPosition.x = xrott*cos(phi) - zrott*sin(phi);" + GLShaderBuilder.LINE_SEP;
+            program += "\t physicalPosition.y = yrott;" + GLShaderBuilder.LINE_SEP;
+            program += "\t physicalPosition.z = xrott*sin(phi) + zrott*cos(phi);" + GLShaderBuilder.LINE_SEP;
+            program += "\t OUT.position = mul(state_matrix_mvp, physicalPosition);" + GLShaderBuilder.LINE_SEP;          
+            program += "\t}"+ GLShaderBuilder.LINE_SEP;
+            program += "\telse{"+ GLShaderBuilder.LINE_SEP;
+            program += "\tfloat theta = -textureScaleThetaPhi.z;" + GLShaderBuilder.LINE_SEP;
+            program += "\tfloat phi = -textureScaleThetaPhi.w;" + GLShaderBuilder.LINE_SEP;
+            program += "\tpositionPass = physicalPosition;" + GLShaderBuilder.LINE_SEP;
+            program += "\tfloat xrot = physicalPosition.x*cos(phi) - physicalPosition.z*sin(phi);" + GLShaderBuilder.LINE_SEP;
+            program += "\tfloat yrot = physicalPosition.y;" + GLShaderBuilder.LINE_SEP;
+            program += "\tfloat zrot = physicalPosition.x*sin(phi) + physicalPosition.z*cos(phi);" + GLShaderBuilder.LINE_SEP;
             
             program += "\tfloat xrott = xrot;" + GLShaderBuilder.LINE_SEP;
             program += "\tfloat yrott = yrot*cos(theta) - zrot*sin(theta);" + GLShaderBuilder.LINE_SEP;
-            program += "\tfloat zrott = yrot*sin(theta) + zrot*cos(theta);" + GLShaderBuilder.LINE_SEP;
-            
-
-            
+            program += "\tfloat zrott = yrot*sin(theta) + zrot*cos(theta);" + GLShaderBuilder.LINE_SEP;       
             program += "\toutput.x = xrott - rect.x;" + GLShaderBuilder.LINE_SEP;
             program += "\toutput.y = yrott - rect.y;" + GLShaderBuilder.LINE_SEP;            
 
@@ -59,7 +80,9 @@ public class GL3DImageVertexShaderProgram extends GLVertexShaderProgram {
             program += "\toutput.y *= rect.w;" + GLShaderBuilder.LINE_SEP;
 
             program += "\toutput.x *= textureScaleThetaPhi.x;" + GLShaderBuilder.LINE_SEP;
-            program += "\toutput.y *= textureScaleThetaPhi.y;" + GLShaderBuilder.LINE_SEP;
+            program += "\toutput.y *= textureScaleThetaPhi.y;" + GLShaderBuilder.LINE_SEP;            
+            program += "}"+ GLShaderBuilder.LINE_SEP;
+
 			            
             
             shaderBuilder.addEnvParameter("float4 rect");            

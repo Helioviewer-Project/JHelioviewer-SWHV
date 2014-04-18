@@ -26,12 +26,10 @@ public class GL3DImageFragmentShaderProgram extends GLFragmentShaderProgram {
     	bind(gl, shaderID, cutOffRadius, xTextureScale, yTextureScale, theta, phi);
     }
     private static void bind(GL gl, int shader, double cutOffRadius, double xTextureScale, double yTextureScale, double theta, double phi) {
-        //if (shader != shaderCurrentlyUsed) {
-            shaderCurrentlyUsed = shader;
-            gl.glBindProgramARB(target, shader);
-            gl.glProgramLocalParameter4dARB(target, 0, cutOffRadius, 0.0f, 0.0f, 0.0f);
-            gl.glProgramLocalParameter4dARB(target, 1,xTextureScale, yTextureScale, theta, phi);
-        //}
+        shaderCurrentlyUsed = shader;
+        gl.glBindProgramARB(target, shader);
+        gl.glProgramLocalParameter4dARB(target, 0, cutOffRadius, 0.0f, 0.0f, 0.0f);
+        gl.glProgramLocalParameter4dARB(target, 1,xTextureScale, yTextureScale, theta, phi);
     }
     /**
      * Pushes the shader currently in use onto a stack.
@@ -71,7 +69,7 @@ public class GL3DImageFragmentShaderProgram extends GLFragmentShaderProgram {
     protected void buildImpl(GLShaderBuilder shaderBuilder) {
         try {
         	String program = "\tif(texcoord0.x<0.0||texcoord0.y<0.0||texcoord0.x>textureScaleThetaPhi.x||texcoord0.y>textureScaleThetaPhi.y){"
-        			//+ "\t\tOUT.color = float4(1.0,0.0,0.0,1.0);" + GLShaderBuilder.LINE_SEP
+        			+ "\t\tOUT.color = float4(1.0,0.0,0.0,1.0);" + GLShaderBuilder.LINE_SEP
         			+ "\t}"+ GLShaderBuilder.LINE_SEP;
             program += "\tOUT.color.a=0.7;" + GLShaderBuilder.LINE_SEP;
             program += "\tfloat theta = textureScaleThetaPhi.z;" + GLShaderBuilder.LINE_SEP;
@@ -90,14 +88,9 @@ public class GL3DImageFragmentShaderProgram extends GLFragmentShaderProgram {
             program += "\tfloat4 v2 = float4(zaxisxrot, zaxisyrot, zaxiszrot, 0.0);" + GLShaderBuilder.LINE_SEP;
             program += "\tfloat projectionn = dot(v1,v2);" + GLShaderBuilder.LINE_SEP;
            
-        	program += "\tif(projectionn<0.0){"
+        	program += "\tif(position.z!=0.0 && projectionn<-0.001 || position.z==0.0 && position.x*position.x +position.y*position.y<0.999){"
         			+ "\t\tdiscard;" + GLShaderBuilder.LINE_SEP
-        			+ "\t}";    	
-        	//program += "\tfloat2 texture;" + GLShaderBuilder.LINE_SEP;
-            //program += "\ttexture.x = textureCoordinate.z - 0.5;" + GLShaderBuilder.LINE_SEP;
-            //program += "\ttexture.y = textureCoordinate.w - 0.5;" + GLShaderBuilder.LINE_SEP;
-            //program += "\toutput.a *= step(length(texture),cutOffRadius);" + GLShaderBuilder.LINE_SEP;        	
-        	
+        			+ "\t}";        	
         	
             shaderBuilder.addEnvParameter("float cutOffRadius");
             shaderBuilder.addEnvParameter("float4 textureScaleThetaPhi");     
