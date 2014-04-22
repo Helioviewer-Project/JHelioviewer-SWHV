@@ -17,10 +17,12 @@ public class ZoomDataConfig implements ZoomManagerListener,PlotAreaSpaceListener
 	private Date maxX;
 	private Rectangle displaySize;
 	private long ID;
+	private String plotIdentifier;
+	
 	
 	private List<ZoomDataConfigListener> listeners;
 
-	public ZoomDataConfig(double minY, double maxY, Date minX, Date maxX, Rectangle displaySize, long ID){
+	public ZoomDataConfig(double minY, double maxY, Date minX, Date maxX, Rectangle displaySize, long ID, String plotIdentifier ){
 		listeners = new ArrayList<ZoomDataConfigListener>();
 		
 		this.maxX = maxX;
@@ -29,6 +31,7 @@ public class ZoomDataConfig implements ZoomManagerListener,PlotAreaSpaceListener
 		this.minY = minY;
 		this.selectedMinY = minY;
 		this.selectedMaxY = maxY;
+		this.plotIdentifier = plotIdentifier;
 		
 		this.displaySize = displaySize;
 		if (displaySize != null){
@@ -50,7 +53,7 @@ public class ZoomDataConfig implements ZoomManagerListener,PlotAreaSpaceListener
 			@Override
 			public void run() {
 				//l.requestData(minX, maxX, minY, maxY, xRatio, yRatio, ID);
-				l.requestData(minX, maxX, selectedMinY,selectedMaxY, xRatio, yRatio, ID);
+				l.requestData(minX, maxX, selectedMinY,selectedMaxY, xRatio, yRatio, ID, plotIdentifier);
 			}
 			
 			public Runnable init(ZoomDataConfigListener l,double xRatio, double yRatio ){
@@ -135,7 +138,7 @@ public class ZoomDataConfig implements ZoomManagerListener,PlotAreaSpaceListener
 		double xRatio = 1.0 * (maxX.getTime()-minX.getTime())/displaySize.getWidth();
 		double yRatio = 1.0 * (selectedMaxY-selectedMinY)/displaySize.getHeight();
 		for (ZoomDataConfigListener l : listeners){
-			l.requestData(minX, maxX, selectedMinY,selectedMaxY, xRatio, yRatio, ID);
+			l.requestData(minX, maxX, selectedMinY,selectedMaxY, xRatio, yRatio, ID, plotIdentifier);
 		}
 	}
 

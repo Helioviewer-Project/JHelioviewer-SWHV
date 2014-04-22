@@ -253,7 +253,7 @@ public class SendDataTestFrame extends JFrame implements RadioDataManagerListene
 	}
 
 	@Override
-	public void clearAllSavedImages() {
+	public void clearAllSavedImages(String plotIdntifier) {
 		// TODO Auto-generated method stub
 		
 	}
@@ -286,7 +286,13 @@ public class SendDataTestFrame extends JFrame implements RadioDataManagerListene
 	}
 
 	@Override
-	public void clearAllSavedImagesForID(Long downloadID, Long imageID) {
+	public void clearAllSavedImagesForID(Long downloadID, Long imageID, String plotIdentifier) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void intervalTooBig(long iD, String identifier) {
 		// TODO Auto-generated method stub
 		
 	}

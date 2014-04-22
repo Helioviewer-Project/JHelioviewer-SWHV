@@ -49,8 +49,8 @@ public class RadioDownloader implements DataDownloader{
 				this.startDataString = startTime;
 				this.endDateString = endTime;
 				this.identifier = identifier;
-				Log.debug("Starttime : "+ startTime);
-				Log.debug("Endtime : "+ endTime);
+				//Log.debug("Starttime : "+ startTime);
+				//Log.debug("Endtime : "+ endTime);
 				return this;				
 			}
 			
@@ -60,10 +60,12 @@ public class RadioDownloader implements DataDownloader{
                 	Log.debug("Request for date "+ startDataString + " - " + endDateString);
                 	long duration = calculateFrequencyDuration(startDataString, endDateString);
                 	long downloadID = Math.round(1000000*Math.random());
-                	if(duration >= 0 && duration<= MAXIMUM_DAYS){
-                		Date startDate = parseDate(startDataString);
-                		Date requestedStartDate = new Date(startDate.getTime());
-                		Date endDate = parseDate(endDateString);
+                	Log.debug("DownloadID: "+ downloadID);
+                	Log.debug("plotidentifier: "+ identifier);
+                	Date startDate = parseDate(startDataString);
+                	Date endDate = parseDate(endDateString);
+                	if(duration >= 0 && duration<= MAXIMUM_DAYS){                		
+                		Date requestedStartDate = new Date(startDate.getTime());                		
                 		if(endDate != null && startDate != null){
                 			//GregorianCalendar startGreg = new GregorianCalendar();
                 			//startGreg.setTime(startDate);
@@ -76,7 +78,7 @@ public class RadioDownloader implements DataDownloader{
                 		//dataManager.addNewView(v);
                 				if(v != null){
                 					Long imageID = Math.round(1000000*Math.random());
-                					Log.debug("bbbbbbbbbbbbbb Image ID "+ imageID + " bbbbbbbbbbbbbbbbbbbbbbbbbbbb");
+                					//Log.debug("bbbbbbbbbbbbbb Image ID "+ imageID + " bbbbbbbbbbbbbbbbbbbbbbbbbbbb");
                 					DownloadedJPXData newJPXData = new DownloadedJPXData(v, imageID, startDate, endDate, identifier,downloadID);
                 					jpxList.add(newJPXData);
                 					cache.add(newJPXData);
@@ -90,7 +92,7 @@ public class RadioDownloader implements DataDownloader{
                 			
                 		}
                 	}else{
-                		
+                		fireIntervalTooBig(startDate,endDate,downloadID,identifier);
                 		//ImageInfoView v = APIRequestManager.requestAndOpenRemoteFile(false, null, startTime, endTime, "ROB-Humain", "CALLISTO","CALLISTO", "RADIOGRAM");
                 		
                 	}
@@ -98,7 +100,15 @@ public class RadioDownloader implements DataDownloader{
                     Log.error("An error occured while opening the remote file!", e);
                     Message.err("An error occured while opening the remote file!", e.getMessage(), false);
                 } 
-            }           
+            }
+
+			private void fireIntervalTooBig(Date startDate, Date endDate,
+					long downloadID, String plotIdentifier) {
+				for(RadioDownloaderListener l: listeners){
+					l.intervalTooBig(startDate, endDate, downloadID, identifier);
+				}
+				
+			}           
         }.init(startDateString, endDateString, identifier), "LoadNewImage");
 
         thread.start();

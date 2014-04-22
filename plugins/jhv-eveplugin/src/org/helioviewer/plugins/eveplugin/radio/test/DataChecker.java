@@ -88,7 +88,7 @@ public class DataChecker implements RadioDataManagerListener{
 	}
 	
 	@Override
-	public void clearAllSavedImages() {
+	public void clearAllSavedImages(String plotIDentifier) {
 		// TODO Auto-generated method stub
 		
 	}
@@ -121,7 +121,13 @@ public class DataChecker implements RadioDataManagerListener{
 	}
 
 	@Override
-	public void clearAllSavedImagesForID(Long downloadID, Long imageID) {
+	public void clearAllSavedImagesForID(Long downloadID, Long imageID, String plotIDentifier) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void intervalTooBig(long iD, String identifier) {
 		// TODO Auto-generated method stub
 		
 	}
