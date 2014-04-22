@@ -9,6 +9,7 @@ import java.awt.image.ImageObserver;
 import java.util.ArrayList;
 import java.util.Collection;
 
+import org.helioviewer.base.logging.Log;
 import org.helioviewer.plugins.eveplugin.draw.DrawableElement;
 import org.helioviewer.plugins.eveplugin.draw.DrawableElementType;
 import org.helioviewer.plugins.eveplugin.draw.YAxisElement;
@@ -22,9 +23,9 @@ import org.helioviewer.viewmodel.view.jp2view.JP2Image;
 
 
 public class RadioImagePane implements ImageObserver, RadioPlotModelListener, DrawableElement{
-	public static void main(String []args){
+	/*public static void main(String []args){
 		RadioImagePane pane = new RadioImagePane();
-	}
+	}*/
 
 	private int [][] radioImage;
 	private int width;
@@ -41,8 +42,12 @@ public class RadioImagePane implements ImageObserver, RadioPlotModelListener, Dr
 	ArrayList<BufferedImage> views = new ArrayList<BufferedImage>();
 	//private RadioPlotModel plotModel;
 	private YAxisElement yAxitElement;
+	private boolean intervalTooBig;
+	private String plotIdentifier;
 	
-	public RadioImagePane(){
+	public RadioImagePane(String plotIdentifier){
+		intervalTooBig = false;
+		this.plotIdentifier = plotIdentifier;
 		//this.plotModel = RadioPlotModel.getSingletonInstance();
 	/*	try {
 			throw new Exception();
@@ -159,7 +164,7 @@ public class RadioImagePane implements ImageObserver, RadioPlotModelListener, Dr
 			g.drawRect(0, i*96, 1000, 96);
 			//System.out.println(g.drawImage(views.get(0),0,0,200,200,0,0,12,2700, null));
 		}*/
-		Collection<PlotConfig> configs = RadioPlotModel.getSingletonInstance().getPlotConfigurations();
+		Collection<PlotConfig> configs = RadioPlotModel.getSingletonInstance().getPlotConfigurations(plotIdentifier);
 		for(PlotConfig pc : configs){
 			
 			pc.draw(g);
@@ -260,12 +265,29 @@ public class RadioImagePane implements ImageObserver, RadioPlotModelListener, Dr
 
 	@Override
 	public void draw(Graphics g, Rectangle graphArea) {
-		Collection<PlotConfig> configs = RadioPlotModel.getSingletonInstance().getPlotConfigurations();
-		for(PlotConfig pc : configs){
-			//Log.debug("Width when drawn is requested : " + pc.getDrawWidth());
-			//Log.debug("Image id : "+ pc.getImageId());
-			pc.draw(g);
-		}		
+		Log.debug("redraw radio image pane for plot : " + plotIdentifier);
+		if(!this.intervalTooBig){
+			Collection<PlotConfig> configs = RadioPlotModel.getSingletonInstance().getPlotConfigurations(plotIdentifier);
+			Log.debug("Number of plotconfigs: " + configs.size());
+			for(PlotConfig pc : configs){
+				//Log.debug("Width when drawn is requested : " + pc.getDrawWidth());
+				//Log.debug("Image id : "+ pc.getImageId());
+				pc.draw(g);
+			}
+		}else{
+			String text1 = "The selected interval is to big.";
+			String text2 = "Reduce the interval to see the radio images";
+			final int text1Width = (int) g.getFontMetrics().getStringBounds(text1, g).getWidth();
+			final int text2Width = (int) g.getFontMetrics().getStringBounds(text2, g).getWidth();
+			final int text1height = (int) g.getFontMetrics().getStringBounds(text2, g).getHeight();
+			final int text2height = (int) g.getFontMetrics().getStringBounds(text2, g).getHeight();
+    		final int x1 = graphArea.x + (graphArea.width / 2) - (text1Width / 2);
+    		final int y1 = (int) (graphArea.y + (graphArea.height / 2) - 1.5 * text1height);
+    		final int x2 = graphArea.x + (graphArea.width / 2) - (text2Width / 2);
+    		final int y2 = (int) (graphArea.y + graphArea.height / 2 +0.5 * text2height);
+			g.drawString(text1, x1, y1);
+			g.drawString(text2, x2, y2);
+		}
 	}
 
 	@Override
@@ -281,6 +303,14 @@ public class RadioImagePane implements ImageObserver, RadioPlotModelListener, Dr
 
 	@Override
 	public boolean hasElementsToDraw() {
-		return !(RadioPlotModel.getSingletonInstance().getPlotConfigurations() == null || RadioPlotModel.getSingletonInstance().getPlotConfigurations().isEmpty()); 
+		return !(RadioPlotModel.getSingletonInstance().getPlotConfigurations(plotIdentifier) == null || RadioPlotModel.getSingletonInstance().getPlotConfigurations(plotIdentifier).isEmpty()); 
+	}
+
+	public void setIntervalTooBig(boolean b) {
+		this.intervalTooBig = b;
+	}
+	
+	public boolean getIntervalTooBig(){
+		return this.intervalTooBig;
 	}
 }

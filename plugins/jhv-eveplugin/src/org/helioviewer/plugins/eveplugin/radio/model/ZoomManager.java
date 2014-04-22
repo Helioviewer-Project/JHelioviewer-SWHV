@@ -79,9 +79,9 @@ public class ZoomManager implements ZoomControllerListener,PlotAreaSpaceListener
 		if(freqInterval != null && interval !=null ){
 			ZoomDataConfig config;
 			if(zmd.isAreaInitialized()){
-				config = new ZoomDataConfig(freqInterval.getStart(), freqInterval.getEnd(), currentInterval.getStart(), currentInterval.getEnd(), zmd.getDisplaySize(), ID);	
+				config = new ZoomDataConfig(freqInterval.getStart(), freqInterval.getEnd(), currentInterval.getStart(), currentInterval.getEnd(), zmd.getDisplaySize(), ID, identifier);	
 			}else{
-				config = new ZoomDataConfig(freqInterval.getStart(), freqInterval.getEnd(), currentInterval.getStart(), currentInterval.getStart(), null, ID);
+				config = new ZoomDataConfig(freqInterval.getStart(), freqInterval.getEnd(), currentInterval.getStart(), currentInterval.getStart(), null, ID, identifier);
 			}
 			plotAreaSpaceManager.getPlotAreaSpace(identifier).addPlotAreaSpaceListener(config);
 			Log.debug("PlotAreaSpaceListener added");

@@ -86,7 +86,7 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
     
     private int lastKnownWidth = -1;
     private int lastKnownHeight = -1;
-	public RadioImagePane pane;
+	//public RadioImagePane pane;
 
     private BufferedImage screenImage = null;
        
@@ -116,7 +116,7 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
         addMouseListener(this);
         addMouseMotionListener(this);
         addComponentListener(this);
-		pane = new RadioImagePane();
+		//pane = new RadioImagePane();
         
         //radioPlotModel = RadioPlotModel.getSingletonInstance();
         //radioPlotModel.addRadioPlotModelListener(this);
@@ -408,7 +408,7 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
     }*/
     
     private void drawRadio(final Graphics g){
-    	pane.display(g);   
+    	//pane.display(g);   
     	this.repaint();
     }
     
