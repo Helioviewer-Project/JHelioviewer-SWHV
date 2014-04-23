@@ -830,8 +830,8 @@ public class ImageDataPanel extends ObservationDialogPanel {
          * @param container
          *            combobox where to add the items.
          */
-        private void setComboBox(JComboBox<Item> container, Item[] items) {
-            container.setModel(new DefaultComboBoxModel<Item>(items));
+        private void setComboBox(JComboBox container, Item[] items) {
+            container.setModel(new DefaultComboBoxModel(items));
             container.setEnabled(true);
             for (int i = 0; i < items.length; i++) {
                 if (items[i].isDefaultItem()) {
