@@ -1,6 +1,7 @@
 package org.helioviewer.plugins.eveplugin.view.plot;
 
 import java.awt.BorderLayout;
+import java.util.List;
 
 import javax.swing.JPanel;
 import javax.swing.JSplitPane;
@@ -10,8 +11,11 @@ import org.helioviewer.plugins.eveplugin.lines.data.Band;
 import org.helioviewer.plugins.eveplugin.lines.data.BandController;
 import org.helioviewer.plugins.eveplugin.lines.data.BandControllerListener;
 import org.helioviewer.plugins.eveplugin.view.chart.ChartDrawIntervalPane;
+import org.helioviewer.plugins.eveplugin.view.linedataselector.LineDataSelectorElement;
+import org.helioviewer.plugins.eveplugin.view.linedataselector.LineDataSelectorModel;
+import org.helioviewer.plugins.eveplugin.view.linedataselector.LineDataSelectorModelListener;
 
-public class PlotsContainerPanel extends JPanel implements BandControllerListener {
+public class PlotsContainerPanel extends JPanel implements LineDataSelectorModelListener{//BandControllerListener, {
 
     // //////////////////////////////////////////////////////////////////////////////
     // Definitions
@@ -41,7 +45,8 @@ public class PlotsContainerPanel extends JPanel implements BandControllerListene
         
         initVisualComponents();
         
-        BandController.getSingletonInstance().addBandControllerListener(this);
+        //BandController.getSingletonInstance().addBandControllerListener(this);
+        LineDataSelectorModel.getSingletonInstance().addLineDataSelectorModelListener(this);
     }
     
     private void initVisualComponents() {
@@ -106,4 +111,42 @@ public class PlotsContainerPanel extends JPanel implements BandControllerListene
     public void bandUpdated(final Band band, final String identifer) {}
 
     public void bandGroupChanged(final String identifer) {}
+
+	@Override
+	public void downloadStartded(LineDataSelectorElement element) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void downloadFinished(LineDataSelectorElement element) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void lineDataAdded(LineDataSelectorElement element) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void lineDataRemoved(LineDataSelectorElement element) {
+		if (element.getPlotIdentifier().equals(PLOT_IDENTIFIER_SLAVE)) {
+			List<LineDataSelectorElement> allElements = LineDataSelectorModel.getSingletonInstance().getAllLineDataSelectorElements(element.getPlotIdentifier());
+            if (allElements != null){
+            	int numberOfLines = LineDataSelectorModel.getSingletonInstance().getAllLineDataSelectorElements(element.getPlotIdentifier()).size();
+            	setPlot2Visible(numberOfLines > 0);
+            }else{
+            	setPlot2Visible(false);
+            }
+        }
+		
+	}
+
+	@Override
+	public void lineDataUpdated(LineDataSelectorElement element) {
+		// TODO Auto-generated method stub
+		
+	}
 }

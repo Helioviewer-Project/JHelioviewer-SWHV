@@ -6,6 +6,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.helioviewer.plugins.eveplugin.view.plot.PlotsContainerPanel;
+
 public class LineDataSelectorModel {
 	private List<LineDataSelectorModelListener> listeners;
 	private Map<String, List<LineDataSelectorElement>> elementMap;
@@ -69,7 +71,15 @@ public class LineDataSelectorModel {
 
 	public void removeLineData(LineDataSelectorElement element){
 		synchronized(elementMap){
-			this.elementMap.remove(element);
+			List<LineDataSelectorElement> elements = elementMap.get(element.getPlotIdentifier());
+			if(elements != null){
+				elements.remove(element);
+				if(elements.size()== 0){
+					elementMap.remove(element.getPlotIdentifier());
+				}
+			}
+			
+			
 			fireLineDataSelectorElementRemoved(element);
 		}
 	}
