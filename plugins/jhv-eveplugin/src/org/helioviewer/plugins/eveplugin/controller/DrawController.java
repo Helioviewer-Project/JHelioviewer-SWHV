@@ -224,6 +224,7 @@ public class DrawController implements ZoomControllerListener, LineDataSelectorM
 
 	@Override
 	public void lineDataRemoved(LineDataSelectorElement element) {
+		
 		fireRedrawRequest(element.getPlotIdentifier());
 		
 	}

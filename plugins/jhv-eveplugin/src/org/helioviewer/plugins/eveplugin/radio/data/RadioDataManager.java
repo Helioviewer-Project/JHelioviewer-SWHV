@@ -519,6 +519,7 @@ public class RadioDataManager implements RadioDownloaderListener{//,ViewListener
 	public void removeDownloadRequestData(DownloadRequestData drd){
 		this.downloadRequestData.remove(drd.getDownloadID());
 		lineDataSelectorModel.removeLineData(drd);
+		
 		fireDownloadRequestDataRemoved(drd);
 	}
 	
