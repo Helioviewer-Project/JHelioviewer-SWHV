@@ -9,10 +9,6 @@ import org.helioviewer.base.logging.Log;
 import org.helioviewer.base.math.Interval;
 
 public class RadioImageCache {
-	//private Map<Long,DownloadedJPXData> dataCache;
-	//private Map<Long,Long> useCache;
-	//private Map<Date, DownloadedJPXData> startDates;
-	
 	private Map<String, RadioImageCacheData> radioImageCacheData;
 	
 	private List<RadioImageCacheListener> listeners;  
@@ -20,12 +16,8 @@ public class RadioImageCache {
 	private static RadioImageCache instance;
 	
 	private RadioImageCache(){
-		//this.dataCache = new HashMap<Long, DownloadedJPXData>();
-		//this.useCache = new HashMap<Long,Long>();
-		//this.startDates = new HashMap<Date, DownloadedJPXData>();
 		this.listeners = new ArrayList<RadioImageCacheListener>();
-		radioImageCacheData = new HashMap<String, RadioImageCacheData>();
-		
+		radioImageCacheData = new HashMap<String, RadioImageCacheData>();		
 	}
 	
 	public void addRadioImageCacheListener(RadioImageCacheListener listener){
@@ -44,9 +36,12 @@ public class RadioImageCache {
 	}
 	
 	public void add(DownloadedJPXData jpxData){
-		//Log.debug("Try to add data in cache");
+		Log.debug("Try to add data in cache");
 		synchronized (instance) {
-			//Log.debug("Could add data to cache");
+			Log.debug("Could add data to cache");
+			Log.debug("ImageID : " + jpxData.getImageID());
+			Log.debug("plot identifier : "+ jpxData.getPlotIdentifier());
+			Log.debug("start time : " + jpxData.getStartDate());
 			RadioImageCacheData data = new RadioImageCacheData();
 			if(radioImageCacheData.containsKey(jpxData.getPlotIdentifier())){
 				data = radioImageCacheData.get(jpxData.getPlotIdentifier());
@@ -125,7 +120,25 @@ public class RadioImageCache {
 			}*/
 			return new RadioImageCacheResult(dataList, intervalList, new ArrayList<Long>(toRemove));
 		}else{
-			return new RadioImageCacheResult();
+			Date localStart = findStartDate(start, stepsize);
+			List<Interval<Date>> intervalList = new ArrayList<Interval<Date>>();
+			List<DownloadedJPXData> dataList = new ArrayList<DownloadedJPXData>();
+			List<Long> toRemove = new ArrayList<Long>();
+			while (localStart.before(end) || localStart.equals(end)){
+				//Log.debug("Execute loop");
+				intervalList.add(new Interval<Date>(localStart, new Date(localStart.getTime()+stepsize)));
+				localStart = new Date(localStart.getTime()+stepsize);
+			}
+			return new RadioImageCacheResult(dataList, intervalList, new ArrayList<Long>(toRemove));
+		}
+	}
+
+	public boolean containsDate(Date date, String plotIdentifier) {
+		if (radioImageCacheData.containsKey(plotIdentifier)){
+			RadioImageCacheData cacheData = radioImageCacheData.get(plotIdentifier);
+			return cacheData.getStartDates().containsKey(date);
+		}else {
+			return false;
 		}
 	}
 }
