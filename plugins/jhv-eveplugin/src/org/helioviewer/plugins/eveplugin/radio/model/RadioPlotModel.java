@@ -432,6 +432,7 @@ public class RadioPlotModel implements RadioDataManagerListener,ZoomControllerLi
 			Map<Long,Map<Long,PlotConfig>> plotConfigList = rpmd.getPlotConfigList();
 			BufferedImage newImage = createBufferedImage(area.width, area.height, data);
 			bufferedImages.put(radioImageID, newImage);
+			rpmd.getRadioImagePane().setIntervalTooBig(false);
 			Log.debug("buffered images size : "+ bufferedImages.size());
 			DrawableAreaMap dam = zoomManager.getDrawableAreaMap(timeInterval.getStart(), timeInterval.getEnd(),
 					freqInterval.getStart(), freqInterval.getEnd(), area, downloadID, identifier);
@@ -501,7 +502,7 @@ public class RadioPlotModel implements RadioDataManagerListener,ZoomControllerLi
 
 	@Override
 	public void intervalTooBig(long iD, String identifier) {
-		RadioImagePane radioImagePane = radioPlotModelData.get(identifier).getRadioImagePane();
+		RadioImagePane radioImagePane = getRadioPlotModelData(identifier).getRadioImagePane();
 		radioImagePane.setIntervalTooBig(true);	
 	}
 

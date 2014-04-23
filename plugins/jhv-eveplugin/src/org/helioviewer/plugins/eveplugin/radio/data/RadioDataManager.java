@@ -572,6 +572,9 @@ public class RadioDataManager implements RadioDownloaderListener{//,ViewListener
 					if(requestConfig.getxEnd().getTime() - requestConfig.getxStart().getTime() > EVESettings.MAXIMUM_INTERVAL_RANGE_MILLI_SEC_REQ){
 						// TODO handle to big interval
 						Log.debug("Interval too big");
+						for(Long id : requestConfig.getIDs()){
+							fireIntervalTooBig(id, plotIdentifier);
+						}
 					}else{
 						RadioImageCacheResult result = cache.getRadioImageCacheResultForInterval(requestConfig.getxStart(), requestConfig.getxEnd(), 24L*60*60*1000, plotIdentifier);
 						for(Long id : requestConfig.getIDs()){

@@ -5,7 +5,9 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.TimeZone;
 
 import org.helioviewer.base.logging.Log;
@@ -24,12 +26,14 @@ public class RadioDownloader implements DataDownloader{
 	private static RadioDownloader instance;
 	private List<RadioDownloaderListener> listeners;
 	private RadioImageCache cache;
+	private Set<Date> requestDateCache;
 	
 	private final long MAXIMUM_DAYS = 172800000;
 	
 	private RadioDownloader(){
 		this.listeners = new ArrayList<RadioDownloaderListener>();
 		this.cache = RadioImageCache.getInstance();
+		this.requestDateCache = new HashSet<Date>();
 	}
 	
 	public static RadioDownloader getSingletonInstance(){
@@ -138,33 +142,43 @@ public class RadioDownloader implements DataDownloader{
 				}
 				
 	            public void run() {	
-	                try {
-	                	
+	                try {	                	
 	                	Date startDate = parseDate(startDataString);
 	                	Date requestedStartDate = new Date(startDate.getTime());
 	                	Date endDate = parseDate(endDateString);
                 		if(endDate != null && startDate != null){
-                			//GregorianCalendar startGreg = new GregorianCalendar();
-                			//startGreg.setTime(startDate);
                 			endDate.setTime(endDate.getTime());
                 			//case there were not more than three days
                 			List<DownloadedJPXData> jpxList = new ArrayList<DownloadedJPXData>();
                 			while(startDate.before(endDate)||startDate.equals(endDate)){
-                				//String startDatePlusOne = calculateOneDayFurtherAsString(startDate);
-                				ImageInfoView v = APIRequestManager.requestAndOpenRemoteFile(false, null, createDateString(startDate), createDateString(startDate), "ROB-Humain", "CALLISTO","CALLISTO", "RADIOGRAM");
-                		//dataManager.addNewView(v);
-                				if(v != null){
-                					Long imageID = Math.round(1000000*Math.random());
-                					//Log.debug("cccccccccccc Image ID "+ imageID + " cccccccccccccccccccccccccccccc");
-                					DownloadedJPXData newJPXData = new DownloadedJPXData(v,imageID , startDate, endDate, identifier,downloadID);
-                					jpxList.add(newJPXData);
-                					cache.add(newJPXData);
-                				}else {
+                				boolean inRequestCache = true;
+                				synchronized (requestDateCache) {
+									if(!requestDateCache.contains(startDate)){
+										inRequestCache = false;
+										requestDateCache.add(startDate);
+									}
+								}
+                				if(!(inRequestCache || cache.containsDate(startDate, identifier))){
+                					ImageInfoView v = APIRequestManager.requestAndOpenRemoteFile(false, null, createDateString(startDate), createDateString(startDate), "ROB-Humain", "CALLISTO","CALLISTO", "RADIOGRAM");
+                					if(v != null){
+                						Long imageID = Math.round(1000000*Math.random());
+                						DownloadedJPXData newJPXData = new DownloadedJPXData(v,imageID , startDate, endDate, identifier,downloadID);
+                					    jpxList.add(newJPXData);
+                						cache.add(newJPXData); 
+                						synchronized (requestDateCache) {
+											requestDateCache.remove(startDate);
+										}
+                					}else {
                 					//Log.error("Received null view for date "+ startDate+ " and " + endDate);
-                				}
+                					}
+                				}else{
+            						Log.debug("Date was already in the cache. Do nothing.");
+            					}
                 				startDate = calculateOneDayFurtherAsDate(startDate);
                 			}
-                			fireAdditionalJPXDataAvailable(jpxList, identifier,requestedStartDate, endDate,downloadID, ratioX, ratioY);
+                			if(!jpxList.isEmpty()){
+                				fireAdditionalJPXDataAvailable(jpxList, identifier,requestedStartDate, endDate,downloadID, ratioX, ratioY);
+                			}
                 		}else{
                 			
                 		}	                	
