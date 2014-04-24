@@ -53,11 +53,13 @@ public class APIRequestManager {
      *            detector of the requested image.
      * @param measurement
      *            measurement of the requested image.
+     * @param message
+     * 			  display error message
      * @return time stamp of the latest available image on the server
      * @throws IOException
      * @throws MalformedURLException
      */
-    public static Date getLatestImageDate(String observatory, String instrument, String detector, String measurement) {
+    public static Date getLatestImageDate(String observatory, String instrument, String detector, String measurement, boolean message) {
 
         SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
         Date date = new Date();
@@ -65,7 +67,7 @@ public class APIRequestManager {
         ImageInfoView view = null;
         
         try {
-            view = loadImage(false, observatory, instrument, detector, measurement, formatter.format(date));
+            view = loadImage(false, observatory, instrument, detector, measurement, formatter.format(date), message);
             if (view != null) {
                 MetaData metaData = view.getAdapter(MetaDataView.class).getMetaData();
                 if (metaData instanceof HelioviewerMetaData) {
@@ -111,17 +113,19 @@ public class APIRequestManager {
      *            measurement of the requested image.
      * @param startTime
      *            time if the requested image.
+     * @param message
+     * 			  display error message.
      * @return image info view of the nearest image file on the server.
      * @throws MalformedURLException
      * @throws IOException
      */
-    public static ImageInfoView loadImage(boolean addToViewChain, String observatory, String instrument, String detector, String measurement, String startTime) throws MalformedURLException, IOException {
+    public static ImageInfoView loadImage(boolean addToViewChain, String observatory, String instrument, String detector, String measurement, String startTime, boolean message) throws MalformedURLException, IOException {
         String fileRequest = Settings.getSingletonInstance().getProperty("API.jp2images.path") + "?action=getJP2Image&observatory=" + observatory + "&instrument=" + instrument + "&detector=" + detector + "&measurement=" + measurement + "&date=" + startTime + "&json=true";
         String jpipRequest = fileRequest + "&jpip=true";
 
         // get URL from server where file with image series is located
         try {
-            return requestData(addToViewChain, new URL(jpipRequest), new URI(fileRequest), null);
+            return requestData(addToViewChain, new URL(jpipRequest), new URI(fileRequest), null, message);
         } catch (IOException e) {
             if (e instanceof UnknownHostException) {
                 Log.debug(">> APIRequestManager.loadImageSeries(boolean,String,String,String,String,String,String,String)  > Error will be throw", e);
@@ -157,12 +161,14 @@ public class APIRequestManager {
      *            end time of the requested image series.
      * @param cadence
      *            cadence between to images of the image series.
+     * @param message
+     * 			  display error message.	
      * @return image info view of the file which represents the image series on
      *         the server.
      * @throws MalformedURLException
      * @throws IOException
      */
-    private static ImageInfoView loadImageSeries(boolean addToViewChain, String observatory, String instrument, String detector, String measurement, String startTime, String endTime, String cadence) throws MalformedURLException, IOException {
+    private static ImageInfoView loadImageSeries(boolean addToViewChain, String observatory, String instrument, String detector, String measurement, String startTime, String endTime, String cadence, boolean message) throws MalformedURLException, IOException {
         String fileRequest = Settings.getSingletonInstance().getProperty("API.jp2series.path") + "?action=getJPX&observatory=" + observatory + "&instrument=" + instrument + "&detector=" + detector + "&measurement=" + measurement + "&startTime=" + startTime + "&endTime=" + endTime;
         Calendar cal = Calendar.getInstance();
         cal.set(Calendar.YEAR, Integer.parseInt(startTime.substring(0,4)));
@@ -193,7 +199,7 @@ public class APIRequestManager {
 
         // get URL from server where file with image series is located
         try {
-            return requestData(addToViewChain, new URL(jpipRequest), new URI(fileRequest), range);
+            return requestData(addToViewChain, new URL(jpipRequest), new URI(fileRequest), range, message);
         } catch (IOException e) {
             if (e instanceof UnknownHostException) {
                 Log.debug(">> APIRequestManager.loadImageSeries(boolean,String,String,String,String,String,String,String)  > Error will be throw", e);
@@ -228,10 +234,12 @@ public class APIRequestManager {
      *            The http request url which is sent to the server
      * @param downloadUri
      *            the http uri from which the whole file can be downloaded
+     * @param errorMessage
+     * 			  display error message
      * @return The ImageInfoView corresponding to the file whose location was
      *         returned by the server
      */
-    public static ImageInfoView requestData(boolean addToViewChain, URL jpipRequest, URI downloadUri, Interval<Date> range) throws IOException {
+    public static ImageInfoView requestData(boolean addToViewChain, URL jpipRequest, URI downloadUri, Interval<Date> range, boolean errorMessage) throws IOException {
         try {
             DownloadStream ds = new DownloadStream(jpipRequest, JHVGlobals.getStdConnectTimeout(), JHVGlobals.getStdReadTimeout());
             APIResponse response = new APIResponse(new BufferedReader(new InputStreamReader(ds.getInput())));
@@ -239,14 +247,18 @@ public class APIRequestManager {
             // Could we handle the answer from the server
             if (!response.hasData()) {
                 Log.error("Could not understand server answer from " + jpipRequest);
-                Message.err("Invalid Server reply", "The server data could not be parsed.", false);
+                if(errorMessage){
+                	Message.err("Invalid Server reply", "The server data could not be parsed.", false);
+                }
                 return null;
             }
             // Just some error from the server
             String error = response.getString("error");
             if (error != null) {
                 Log.error("Data query returned error: " + error);
-                Message.err("Error getting the data", Message.formatMessageString(error), false);
+                if(errorMessage){
+                	Message.err("Error getting the data", Message.formatMessageString(error), false);
+                }
                 return null;
             }
 
@@ -254,7 +266,7 @@ public class APIRequestManager {
             if (response.getURI() != null) {
                 // The server wants to load us the data
                 String message = response.getString("message");
-                if (message != null && !message.equalsIgnoreCase("null")) {
+                if (message != null && !message.equalsIgnoreCase("null") && errorMessage) {
                     Message.warn("Warning", Message.formatMessageString(message));
                 }
                 APIResponseDump.getSingletonInstance().putResponse(response);
@@ -265,10 +277,14 @@ public class APIRequestManager {
                 if (message != null && !message.equalsIgnoreCase("null")) {
                     Log.error("No data to load returned from " + jpipRequest);
                     Log.error("Server message: " + message);
-                    Message.err("Server could not return data", Message.formatMessageString(message), false);
+                    if(errorMessage){
+                    	Message.err("Server could not return data", Message.formatMessageString(message), false);
+                    }
                 } else {
                     Log.error("Did not find uri in reponse to " + jpipRequest);
-                    Message.err("No data source response", "While quering the data source, the server did not provide an answer.", false);
+                    if(errorMessage){
+                    	Message.err("No data source response", "While quering the data source, the server did not provide an answer.", false);
+                    }
                 }
             }
         } catch (SocketTimeoutException e) {
@@ -361,14 +377,16 @@ public class APIRequestManager {
      *            detector of the requested image.
      * @param measurement
      *            measurement of the requested image.
+     * @param message
+     * 			  display error message
      * @return new view
      * @throws IOException
      */
-    public static ImageInfoView requestAndOpenRemoteFile(boolean addToViewChain, String cadence, String startTime, String endTime, String observatory, String instrument, String detector, String measurement) throws IOException {
+    public static ImageInfoView requestAndOpenRemoteFile(boolean addToViewChain, String cadence, String startTime, String endTime, String observatory, String instrument, String detector, String measurement, boolean message) throws IOException {
         if (endTime.equals("")) {
-            return loadImage(addToViewChain, observatory, instrument, detector, measurement, startTime);
+            return loadImage(addToViewChain, observatory, instrument, detector, measurement, startTime, message);
         } else {
-            return loadImageSeries(addToViewChain, observatory, instrument, detector, measurement, startTime, endTime, cadence);
+            return loadImageSeries(addToViewChain, observatory, instrument, detector, measurement, startTime, endTime, cadence, message);
         }
     }
 }

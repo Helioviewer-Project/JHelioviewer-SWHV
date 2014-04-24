@@ -1918,7 +1918,7 @@ public class LayersModel implements ViewListener {
                         Log.info(">> LayersModel.StateParser.setupLayer() > \"" + layerSetting.directURI + "\" does not exist any more.");
                         Log.info(">> LayersModel.StateParser.setupLayer() > Requesting \"" + jpipRequest + "\" instead.");
 
-                        newView = APIRequestManager.requestData(true, new URL(jpipRequest), new URI(layerSetting.downloadURI), range);
+                        newView = APIRequestManager.requestData(true, new URL(jpipRequest), new URI(layerSetting.downloadURI), range, true);
 
                     } else { // If file exists -> Open file
                         Log.info(">> LayersModel.StateParser.setupLayer() > \"" + layerSetting.directURI + "\" still exists, load it.");
