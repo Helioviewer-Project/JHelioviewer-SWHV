@@ -375,16 +375,21 @@ public class RadioPlotModel implements RadioDataManagerListener,ZoomControllerLi
 			plotConfigList.remove(ID);
 			downloadRequestData.remove(ID);
 			drawController.removeDrawableElement(radioImagePane, drd.getPlotIdentifier());
+			for(Long imageID : drd.getRadioImages().keySet()){
+				bufferedImages.remove(imageID);
+			}
 			fireRemoveRadioImage(ID, drd.getPlotIdentifier());
 		}
 	}
 
 	private void fireRemoveRadioImage(long ID, String plotIdentifier) {
-		Set<RadioPlotModelListener> listeners = getRadioPlotModelData(plotIdentifier).getListeners();
-		for (RadioPlotModelListener l : listeners){
-			l.removeDownloadRequestData(ID);			
+		synchronized (this) {
+			Set<RadioPlotModelListener> listeners = getRadioPlotModelData(plotIdentifier).getListeners();
+			for (RadioPlotModelListener l : listeners){
+				l.removeDownloadRequestData(ID);			
+			}
+			chartModel.chartRedrawRequest();
 		}
-		chartModel.chartRedrawRequest();
 	}
 
 	

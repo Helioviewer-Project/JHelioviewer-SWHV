@@ -155,6 +155,7 @@ public class RadioDownloader implements DataDownloader{
                 				synchronized (requestDateCache) {
 									if(!requestDateCache.contains(startDate)){
 										inRequestCache = false;
+										Log.debug("Add date "+ startDate + " to request cache");
 										requestDateCache.add(startDate);
 									}
 								}
@@ -165,15 +166,21 @@ public class RadioDownloader implements DataDownloader{
                 						DownloadedJPXData newJPXData = new DownloadedJPXData(v,imageID , startDate, endDate, identifier,downloadID);
                 					    jpxList.add(newJPXData);
                 						cache.add(newJPXData); 
-                						synchronized (requestDateCache) {
-											requestDateCache.remove(startDate);
-										}
+                						
                 					}else {
                 					//Log.error("Received null view for date "+ startDate+ " and " + endDate);
-                					}
+                					}                					
                 				}else{
-            						Log.debug("Date was already in the cache. Do nothing.");
+            						if (inRequestCache){
+            							Log.debug("Date was already in the request cache. Do nothing.");
+            						}else{
+            							Log.debug("Date was already in the radio image cache. Do nothing.");
+            						}
             					}
+                				synchronized (requestDateCache) {
+									requestDateCache.remove(startDate);
+									Log.debug("remove "+ startDate + " from request cache");
+								}
                 				startDate = calculateOneDayFurtherAsDate(startDate);
                 			}
                 			if(!jpxList.isEmpty()){
