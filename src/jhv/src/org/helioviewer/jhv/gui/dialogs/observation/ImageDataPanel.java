@@ -252,7 +252,7 @@ public class ImageDataPanel extends ObservationDialogPanel {
             public void run() {
 
                 try {
-                    APIRequestManager.requestAndOpenRemoteFile(true,null, getStartTime(), "", getObservation(), getInstrument(), getDetector(), getMeasurement());
+                    APIRequestManager.requestAndOpenRemoteFile(true,null, getStartTime(), "", getObservation(), getInstrument(), getDetector(), getMeasurement(), true);
                 } catch (IOException e) {
                     Log.error("An error occured while opening the remote file!", e);
                     Message.err("An error occured while opening the remote file!", e.getMessage(), false);
@@ -280,7 +280,7 @@ public class ImageDataPanel extends ObservationDialogPanel {
 
             public void run() {
                 try {
-                    APIRequestManager.requestAndOpenRemoteFile(true,getCadence(), getStartTime(), getEndTime(), getObservation(), getInstrument(), getDetector(), getMeasurement());
+                    APIRequestManager.requestAndOpenRemoteFile(true,getCadence(), getStartTime(), getEndTime(), getObservation(), getInstrument(), getDetector(), getMeasurement(), true);
                 } catch (IOException e) {
                     Log.error("An error occured while opening the remote file!", e);
                     Message.err("An error occured while opening the remote file!", e.getMessage(), false);
@@ -462,7 +462,7 @@ public class ImageDataPanel extends ObservationDialogPanel {
          *             From inserting into the AWT Queue
          */
         public void setupTime() throws InterruptedException, InvocationTargetException {
-            final Date endDate = APIRequestManager.getLatestImageDate(instrumentsPanel.getObservatory(), instrumentsPanel.getInstrument(), instrumentsPanel.getDetector(), instrumentsPanel.getMeasurement());
+            final Date endDate = APIRequestManager.getLatestImageDate(instrumentsPanel.getObservatory(), instrumentsPanel.getInstrument(), instrumentsPanel.getDetector(), instrumentsPanel.getMeasurement(), true);
             final GregorianCalendar gregorianCalendar = new GregorianCalendar();
             gregorianCalendar.setTime(endDate);
             gregorianCalendar.add(GregorianCalendar.SECOND, cadencePanel.getCadence());

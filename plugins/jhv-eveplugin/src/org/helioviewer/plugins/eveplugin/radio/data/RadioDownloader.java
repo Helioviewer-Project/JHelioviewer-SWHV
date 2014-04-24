@@ -78,7 +78,7 @@ public class RadioDownloader implements DataDownloader{
                 			List<DownloadedJPXData> jpxList = new ArrayList<DownloadedJPXData>();
                 			while(startDate.before(endDate)||startDate.equals(endDate)){
                 				//String startDatePlusOne = calculateOneDayFurtherAsString(startDate);
-                				ImageInfoView v = APIRequestManager.requestAndOpenRemoteFile(false, null, createDateString(startDate), createDateString(startDate), "ROB-Humain", "CALLISTO","CALLISTO", "RADIOGRAM");
+                				ImageInfoView v = APIRequestManager.requestAndOpenRemoteFile(false, null, createDateString(startDate), createDateString(startDate), "ROB-Humain", "CALLISTO","CALLISTO", "RADIOGRAM", false);
                 		//dataManager.addNewView(v);
                 				if(v != null){
                 					Long imageID = Math.round(1000000*Math.random());
@@ -159,7 +159,7 @@ public class RadioDownloader implements DataDownloader{
 									}
 								}
                 				if(!(inRequestCache || cache.containsDate(startDate, identifier))){
-                					ImageInfoView v = APIRequestManager.requestAndOpenRemoteFile(false, null, createDateString(startDate), createDateString(startDate), "ROB-Humain", "CALLISTO","CALLISTO", "RADIOGRAM");
+                					ImageInfoView v = APIRequestManager.requestAndOpenRemoteFile(false, null, createDateString(startDate), createDateString(startDate), "ROB-Humain", "CALLISTO","CALLISTO", "RADIOGRAM", false);
                 					if(v != null){
                 						Long imageID = Math.round(1000000*Math.random());
                 						DownloadedJPXData newJPXData = new DownloadedJPXData(v,imageID , startDate, endDate, identifier,downloadID);

@@ -570,7 +570,7 @@ public class ImageViewerGui {
             try {
                 for (int layer = 0; layer < jhvRequest.imageLayers.length; ++layer) {
                     // load image and memorize corresponding view
-                    ImageInfoView imageInfoView = APIRequestManager.requestAndOpenRemoteFile(true,jhvRequest.cadence, jhvRequest.startTime, jhvRequest.endTime, jhvRequest.imageLayers[layer].observatory, jhvRequest.imageLayers[layer].instrument, jhvRequest.imageLayers[layer].detector, jhvRequest.imageLayers[layer].measurement);
+                    ImageInfoView imageInfoView = APIRequestManager.requestAndOpenRemoteFile(true,jhvRequest.cadence, jhvRequest.startTime, jhvRequest.endTime, jhvRequest.imageLayers[layer].observatory, jhvRequest.imageLayers[layer].instrument, jhvRequest.imageLayers[layer].detector, jhvRequest.imageLayers[layer].measurement, true);
                     if (imageInfoView != null && getMainView() != null) {
                         // get the layered view
                         LayeredView layeredView = getMainView().getAdapter(LayeredView.class);
