@@ -519,7 +519,9 @@ public class RadioDataManager implements RadioDownloaderListener{//,ViewListener
 	public void removeDownloadRequestData(DownloadRequestData drd){
 		this.downloadRequestData.remove(drd.getDownloadID());
 		lineDataSelectorModel.removeLineData(drd);
-		
+		for(Long imageID : drd.getRadioImages().keySet()){
+			cache.remove(imageID,drd.getPlotIdentifier());
+		}
 		fireDownloadRequestDataRemoved(drd);
 	}
 	
