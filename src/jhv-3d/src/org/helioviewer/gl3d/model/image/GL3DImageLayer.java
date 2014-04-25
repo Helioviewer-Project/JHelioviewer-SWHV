@@ -286,17 +286,6 @@ public abstract class GL3DImageLayer extends GL3DOrientedGroup implements GL3DCa
         GL3DVec3d orientation = GL3DHelper.toVec(toViewSpace.convert(orientationVector)); //.normalize(); - not needed for atan2
         GL3DMat4d phiRotation = GL3DMat4d.rotation(Math.atan2(orientation.x, orientation.z), new GL3DVec3d(0, 1, 0));
 
-        /*
-        if (!(orientation.equals(new GL3DVec3d(0, 1, 0)))) {
-            GL3DVec3d orientationXZ = new GL3DVec3d(orientation.x, 0, orientation.z);
-            double phi = Math.acos(orientationXZ.z);
-            if (orientationXZ.x < 0) {
-                phi = 0 - phi;
-            }
-            phi = 2 * Math.PI - phi;
-            phiRotation = GL3DMat4d.rotation(phi, new GL3DVec3d(0, 1, 0));
-        }
-        */
 
         for (GL3DRay ray : regionTestRays) {
             GL3DVec3d hitPoint = ray.getHitPoint();
@@ -342,7 +331,6 @@ public abstract class GL3DImageLayer extends GL3DOrientedGroup implements GL3DCa
 
         if (regionWidth > 0 && regionHeight > 0) {
             Region newRegion = StaticRegion.createAdaptedRegion(minPhysicalX, minPhysicalY, regionWidth, regionHeight);
-            // Log.debug("GL3DImageLayer: '"+getName()+" set its region");
             this.regionView.setRegion(newRegion, new ChangeEvent());
         } else {
             Log.error("Illegal Region calculated! " + regionWidth + ":" + regionHeight + ". x = " + minPhysicalX + " - " + maxPhysicalX + ", y = " + minPhysicalY + " - " + maxPhysicalY);
