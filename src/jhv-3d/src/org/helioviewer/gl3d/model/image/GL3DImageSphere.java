@@ -31,8 +31,7 @@ public class GL3DImageSphere extends GL3DImageMesh {
             GLVertexShaderProgram vertexShaderProgram,
             GLFragmentShaderProgram fragmentShaderProgram,
             GL3DImageLayer imageLayer) {
-        super("Sphere", imageTextureView, vertexShaderProgram,
-                fragmentShaderProgram);
+        super("Sphere", imageTextureView, vertexShaderProgram, fragmentShaderProgram);
         layer = imageLayer;
 
     }
@@ -51,7 +50,7 @@ public class GL3DImageSphere extends GL3DImageMesh {
             List<GL3DVec4d> colors) {
         if (this.capturedRegion != null) {
             int resolutionX = 20;
-            int resolutionY = 70;
+            int resolutionY = 20;
             int numberOfPositions = 0;
             for (int latNumber = 0; latNumber <= resolutionX; latNumber++) {
                 double theta = latNumber * Math.PI / resolutionX;

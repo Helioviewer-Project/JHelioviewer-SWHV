@@ -57,6 +57,8 @@ public class GL3DImageTextureView extends AbstractGL3DView implements GL3DView, 
 	public double minZ = 0.0;
 	public double maxZ = Constants.SunRadius;
 	private GL3DImageFragmentShaderProgram fragmentShader = new GL3DImageFragmentShaderProgram();
+	private double xScale;
+	private double yScale;
 	
     public void renderGL(GL gl, boolean nextView) {        
         render3D(GL3DState.get());
@@ -67,7 +69,7 @@ public class GL3DImageTextureView extends AbstractGL3DView implements GL3DView, 
 		if (this.getView() != null) {
 			// Only copy Framebuffer if necessary
 			GLTextureHelper th = new GLTextureHelper();
-			if (true) {
+			if (regionChanged) {
 				this.capturedRegion = copyScreenToTexture(state, th);
 				//gl.glClear(GL.GL_COLOR_BUFFER_BIT | GL.GL_DEPTH_BUFFER_BIT);
 				if (forceUpdate) {
@@ -82,6 +84,7 @@ public class GL3DImageTextureView extends AbstractGL3DView implements GL3DView, 
 				}
 				regionChanged = false;
 				forceUpdate = false;
+				recaptureRequested = false;
 			}
 		}
 	}
@@ -99,35 +102,37 @@ public class GL3DImageTextureView extends AbstractGL3DView implements GL3DView, 
 		
 		Region region = getAdapter(RegionView.class).getRegion();
 		Viewport viewport = getAdapter(ViewportView.class).getViewport();
-		Vector2dInt renderOffset = getAdapter(GL3DImageRegionView.class)
-				.getRenderOffset();
+
 		if (viewport == null || region == null) {
 			regionChanged = false;
 			return null;
 		}
-		int offsetX = renderOffset == null ? 0 : renderOffset.getX();
-		int offsetY = (renderOffset == null ? 0 : renderOffset.getY());
 		
-		if (region != null) capturedRegion = region;
 		this.textureId = getAdapter(JHVJPXView.class).texID;
 		//th.copyFrameBufferToTexture(gl, textureId, captureRectangle);
-		this.textureScale = th.getTextureScale(textureId);
-	
-		double xOffset = region.getLowerLeftCorner().getX();
-		double yOffset = region.getLowerLeftCorner().getY();
-		double xScale = 1/region.getWidth();
-		double yScale = 1/region.getHeight();
+		this.textureScale = th.getTextureScale(textureId);		
+		if (vertexShader != null ) {
+			double xOffset = (region.getUpperLeftCorner().getX());
+			double yOffset = -(region.getUpperLeftCorner().getY());
+			xScale = (1./region.getWidth());
+			yScale = (1./region.getHeight());
+	        //System.out.println("RECT " + xOffset + " " +yOffset + " " +1/xScale +" " +1/yScale );
+	        //System.out.println("REGIONRECT " + region );
+	        //System.out.println("METADATARECT " + metadata.getPhysicalRectangle() );
 
-		if (vertexShader != null) {
 			HelioviewerMetaData metadata = (HelioviewerMetaData)getAdapter(MetaDataView.class).getMetaData();
 			double deltat = metadata.getDateTime().getMillis()/1000.0 - Constants.referenceDate;
 			double theta = 0.0;
 			phi = DifferentialRotation.calculateRotationInRadians(0.0, deltat)%(Math.PI*2.0);
 
-			this.textureScale = new Vector2dDouble(1.0,1.0);
-            this.vertexShader.changeRect(xOffset, yOffset, Math.abs(xScale), Math.abs(yScale));
+            this.vertexShader.changeRect(xOffset, yOffset, xScale, yScale);
             this.vertexShader.changeTextureScale(this.textureScale);
             this.vertexShader.changeAngles(theta, phi);
+            //System.out.println("XTEXSCALE" + this.textureScale.getX());
+            //System.out.println("YTEXSCALE" + this.textureScale.getY());
+        	System.out.println("CHANGE SHADER VARS" + theta + " " +phi);
+        	System.out.println("CHANGE SHADER VARS" + region);
+        	System.out.println("CHANGE SHADER VARS" + this.textureScale);
             this.fragmentShader.changeTextureScale(this.textureScale.getX(), this.textureScale.getY());
             this.fragmentShader.changeAngles(theta, phi);
 		}
@@ -135,7 +140,7 @@ public class GL3DImageTextureView extends AbstractGL3DView implements GL3DView, 
 		this.recaptureRequested = false;
 		return region;
 	}
-    public static double phi = 0.0;
+    public double phi = 0.0;
 
 	protected void setViewSpecificImplementation(View newView, ChangeEvent changeEvent) {
 		newView.addViewListener(new ViewListener() {
@@ -144,16 +149,23 @@ public class GL3DImageTextureView extends AbstractGL3DView implements GL3DView, 
 				if (aEvent.reasonOccurred(RegionChangedReason.class)) {
 					recaptureRequested = true;
 					regionChanged = true;
+					//System.out.println("REAS1");
 				} else if (aEvent.reasonOccurred(RegionUpdatedReason.class)) {
 					// regionChanged = true;
-					recaptureRequested = true;
+					regionChanged = true;
+					System.out.println("REAS2");
+
 				} else if (aEvent
 						.reasonOccurred(SubImageDataChangedReason.class)) {
 					// regionChanged = true;
 					recaptureRequested = true;
+					System.out.println("REAS3");
+
 				} else if (aEvent
 						.reasonOccurred(CacheStatusChangedReason.class)) {
-					recaptureRequested = true;
+					recaptureRequested = true;					
+					System.out.println("REAS4");
+
 				}
 			}
 		});

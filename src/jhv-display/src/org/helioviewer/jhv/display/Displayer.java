@@ -49,6 +49,7 @@ public class Displayer{
     }
     private void tdisplay(){
         synchronized(displaylock){
+        	System.out.println("DISPLAYING");
             for(final DisplayListener listener : listeners) {
                 listener.display();
             }
