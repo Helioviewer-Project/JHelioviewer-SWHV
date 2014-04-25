@@ -28,21 +28,11 @@ import org.helioviewer.viewmodel.view.opengl.GLView;
  * 
  */
 public class GL3DLayeredView extends GLLayeredView implements GL3DView, LayeredView, RegionView, ViewportView {
-    // public class GL3DLayeredView extends AbstractLayeredView implements
-    // GL3DView, LayeredView {
-
-    private Lock renderLock = new ReentrantLock();
-
-    public GL3DLayeredView() {
-    }
 
     public void addLayer(View newLayer, int newIndex) {
         if (newLayer == null)
             return;
 
-        // This code snippet is copied from the superclass, because the
-        // imageTextureView should be the first
-        // view in the layer sub-chain
         if (!GLTextureHelper.textureNonPowerOfTwoAvailable() && newLayer.getAdapter(GLScalePowerOfTwoView.class) == null) {
             GLScalePowerOfTwoView scaleView = new GLScalePowerOfTwoView();
             scaleView.setView(newLayer);
@@ -87,7 +77,6 @@ public class GL3DLayeredView extends GLLayeredView implements GL3DView, LayeredV
     }
 
     public void render3D(GL3DState state) {
-        renderLock.lock();
         for (int i = 0; i < this.getNumLayers(); i++) {
             View layerView = this.getLayer(i);
             if (layerView instanceof GL3DView) {
@@ -96,7 +85,6 @@ public class GL3DLayeredView extends GLLayeredView implements GL3DView, LayeredV
                 ((GLView) layerView).renderGL(state.gl, true);
             }
         }
-        renderLock.unlock();
     }
 
     public void deactivate(GL3DState state) {
@@ -113,8 +101,6 @@ public class GL3DLayeredView extends GLLayeredView implements GL3DView, LayeredV
 
     protected boolean recalculateRegionsAndViewports(ChangeEvent event) {
         
-        renderLock.lock();
-
         Log.debug("GL3DLayeredView: recalculateRegionsAndViewports: " + this.region + " " + this.viewport);
         boolean changed = false;
 
@@ -126,8 +112,6 @@ public class GL3DLayeredView extends GLLayeredView implements GL3DView, LayeredV
         if (changed) {
             notifyViewListeners(event);
         }
-        renderLock.unlock();
-
         return changed;
     }
 
