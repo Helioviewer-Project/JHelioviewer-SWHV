@@ -95,7 +95,6 @@ public class GLOverlayView extends AbstractGLView implements OverlayView{
 				
 			GLLayeredView layeredView = sender.getAdapter(GLLayeredView.class);
 			Iterator<OverlayPluginContainer> iterator = this.overlays.iterator();
-			Log.debug("sender : " + sender);
 			//Region region = sender.getAdapter(RegionView.class);
 			while(iterator.hasNext()){
 				OverlayPluginContainer overlay = iterator.next();
