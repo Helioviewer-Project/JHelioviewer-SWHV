@@ -122,8 +122,6 @@ public class GL3DCameraView extends AbstractGL3DView implements GL3DView, GL3DCa
     protected void renderChild(GL gl) {
         if (view instanceof GLView) {
         	((GLView) view).renderGL(gl, false);
-        } else {
-            textureHelper.renderImageDataToScreen(gl, view.getAdapter(RegionView.class).getRegion(), view.getAdapter(SubimageDataView.class).getSubimageData(), view.getAdapter(JHVJPXView.class));
         }
     }
 }

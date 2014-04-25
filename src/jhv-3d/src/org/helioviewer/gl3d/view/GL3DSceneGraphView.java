@@ -436,11 +436,6 @@ public class GL3DSceneGraphView extends AbstractGL3DView implements GL3DView {
 	protected void renderChild(GL gl) {
 		if (view instanceof GLView) {
 			((GLView) view).renderGL(gl, true);
-		} else {
-			textureHelper.renderImageDataToScreen(gl,
-					view.getAdapter(RegionView.class).getRegion(), view
-							.getAdapter(SubimageDataView.class)
-							.getSubimageData(), view.getAdapter(JHVJPXView.class));
 		}
 	}
 
