@@ -11,7 +11,6 @@ import org.helioviewer.jhv.display.Displayer;
  */
 public class GL3DCameraZoomAnimation implements GL3DCameraAnimation {
     private boolean isFinished = false;
-    private static int count = 0;
 
     private long startTime = -1;
     private long lastAnimationTime = -1;
@@ -58,15 +57,7 @@ public class GL3DCameraZoomAnimation implements GL3DCameraAnimation {
         if (camera.getZTranslation() == this.targetDistance) {
             this.isFinished = true;
             camera.updateCameraTransformation(true);
-            count = count + 1;
-            if(count%25==0){
-                camera.updateCameraTransformation(true);
-                Displayer.getSingletonInstance().display();        
-            }
-            else{
-                camera.updateCameraTransformation(false);
-                Displayer.getSingletonInstance().display();        
-            }
+            Displayer.getSingletonInstance().render();        
         } else {
             camera.updateCameraTransformation(true);
             Displayer.getSingletonInstance().render();        

@@ -121,42 +121,42 @@ public abstract class AbstractMetaData implements MetaData {
     /**
      * {@inheritDoc}
      */
-    public synchronized Vector2dDouble getPhysicalLowerLeft() {
+    public Vector2dDouble getPhysicalLowerLeft() {
         return lowerLeftCorner;
     }
 
     /**
      * {@inheritDoc}
      */
-    public synchronized double getPhysicalImageHeight() {
+    public double getPhysicalImageHeight() {
         return sizeVector.getY();
     }
 
     /**
      * {@inheritDoc}
      */
-    public synchronized double getPhysicalImageWidth() {
+    public double getPhysicalImageWidth() {
         return sizeVector.getX();
     }
 
     /**
      * {@inheritDoc}
      */
-    public synchronized Vector2dDouble getPhysicalLowerRight() {
+    public Vector2dDouble getPhysicalLowerRight() {
         return lowerLeftCorner.add(sizeVector.getXVector());
     }
 
     /**
      * {@inheritDoc}
      */
-    public synchronized Vector2dDouble getPhysicalUpperLeft() {
+    public Vector2dDouble getPhysicalUpperLeft() {
         return lowerLeftCorner.add(sizeVector.getYVector());
     }
 
     /**
      * {@inheritDoc}
      */
-    public synchronized Vector2dDouble getPhysicalUpperRight() {
+    public Vector2dDouble getPhysicalUpperRight() {
         return lowerLeftCorner.add(sizeVector);
     }
 
@@ -170,7 +170,7 @@ public abstract class AbstractMetaData implements MetaData {
     /**
      * {@inheritDoc}
      */
-    public synchronized Region getPhysicalRegion() {
+    public Region getPhysicalRegion() {
         return StaticRegion.createAdaptedRegion(lowerLeftCorner, sizeVector);
     }
 
@@ -180,7 +180,7 @@ public abstract class AbstractMetaData implements MetaData {
      * @param newImageSize
      *            Physical size of the corresponding image
      */
-    protected synchronized void setPhysicalImageSize(Vector2dDouble newImageSize) {
+    protected void setPhysicalImageSize(Vector2dDouble newImageSize) {
         sizeVector = newImageSize;
     }
 
@@ -190,7 +190,7 @@ public abstract class AbstractMetaData implements MetaData {
      * @param newlLowerLeftCorner
      *            Physical lower left corner the corresponding image
      */
-    protected synchronized void setPhysicalLowerLeftCorner(Vector2dDouble newlLowerLeftCorner) {
+    protected void setPhysicalLowerLeftCorner(Vector2dDouble newlLowerLeftCorner) {
         lowerLeftCorner = newlLowerLeftCorner;
     }
 

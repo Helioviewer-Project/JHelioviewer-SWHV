@@ -10,12 +10,18 @@ import org.helioviewer.viewmodel.view.opengl.shader.GLVertexShaderProgram;
 public class GL3DImageVertexShaderProgram extends GLVertexShaderProgram {
 	private double theta;
 	private double phi;
+	private double xxOffset;
+	private double yyOffset;
+	private double xxScale;
+	private double yyScale;
+	private double xxTextureScale;
+	private double yyTextureScale;
 	
     /**
      * {@inheritDoc}
      */
     public final void bind(GL gl) {
-    	bind(gl, shaderID, xOffset, yOffset, xScale, yScale, xTextureScale, yTextureScale, defaultXOffset, defaultYOffset, theta, phi);
+    	bind(gl, shaderID, xxOffset, yyOffset, xxScale, yyScale, xxTextureScale, yyTextureScale, defaultXOffset, defaultYOffset, theta, phi);
     }	
     private static void bind(GL gl, int shader, double xOffset, double yOffset, double xScale, double yScale, double xTextureScale, double yTextureScale, double defaultXOffset, double defaultYOffset, double theta, double phi) {
         if (shader != shaderCurrentlyUsed) {
@@ -102,10 +108,10 @@ public class GL3DImageVertexShaderProgram extends GLVertexShaderProgram {
     }
     
     public void changeRect(double xOffset, double yOffset, double xScale, double yScale){
-    	this.xOffset = xOffset;
-    	this.yOffset = yOffset;
-    	this.xScale = xScale;
-    	this.yScale = yScale;
+    	this.xxOffset = xOffset;
+    	this.yyOffset = yOffset;
+    	this.xxScale = xScale;
+    	this.yyScale = yScale;
     }
 
 	public void setDefaultOffset(double x, double y){
@@ -115,8 +121,8 @@ public class GL3DImageVertexShaderProgram extends GLVertexShaderProgram {
 
 	public void changeTextureScale(Vector2dDouble textureScale) {
 		if(textureScale!=null){
-		this.xTextureScale = textureScale.getX();
-		this.yTextureScale = textureScale.getY();
+		this.xxTextureScale = textureScale.getX();
+		this.yyTextureScale = textureScale.getY();
 		}
 	}
 

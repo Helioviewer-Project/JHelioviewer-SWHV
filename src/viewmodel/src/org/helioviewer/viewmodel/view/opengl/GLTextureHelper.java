@@ -954,9 +954,10 @@ public class GLTextureHelper {
             gl.glTexParameteri(GL.GL_TEXTURE_2D, GL.GL_TEXTURE_WRAP_S, GL.GL_CLAMP_TO_BORDER);
             gl.glTexParameteri(GL.GL_TEXTURE_2D, GL.GL_TEXTURE_WRAP_T, GL.GL_CLAMP_TO_BORDER);
             
-            float scaleX = (float) width / width2;
-            float scaleY = (float) height / height2;
+            float scaleX = (float) 1.0*width / width2;
+            float scaleY = (float) 1.0*height / height2;
             scaleTexCoord.setValue(gl, scaleX, scaleY);
+            System.out.println("SCALESET " +scaleX + " " +scaleY);
             allTextures.put(texID, new Vector2dDouble(scaleX, scaleY));
         }
 

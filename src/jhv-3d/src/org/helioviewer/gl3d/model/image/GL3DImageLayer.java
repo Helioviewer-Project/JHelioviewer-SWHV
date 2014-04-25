@@ -30,6 +30,7 @@ import org.helioviewer.gl3d.view.GL3DView;
 import org.helioviewer.gl3d.wcs.CoordinateConversion;
 import org.helioviewer.gl3d.wcs.CoordinateSystem;
 import org.helioviewer.gl3d.wcs.CoordinateVector;
+import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.internal_plugins.filter.opacity.DynamicOpacityFilter;
 import org.helioviewer.viewmodel.changeevent.ChangeEvent;
 import org.helioviewer.viewmodel.filter.Filter;
@@ -239,24 +240,12 @@ public abstract class GL3DImageLayer extends GL3DOrientedGroup implements GL3DCa
     }
 
     public CoordinateVector getOrientation() {
-        HelioviewerMetaData h = (HelioviewerMetaData) this.metaDataView.getMetaData();
-        CoordinateVector c = this.coordinateSystemView.getOrientation();
         return this.coordinateSystemView.getOrientation();
     }
 
     private void updateROI(GL3DCamera activeCamera) {
 
         MetaData metaData = metaDataView.getMetaData();
-
-        if (metaData == null) {
-            // No Image Data found
-            return;
-        }
-        /*
-        double hh = Math.tan(Math.toRadians(activeCamera.getFOV() / 2)) * activeCamera.getClipNear();
-        double hw = hh * activeCamera.getAspect();
-        double pixelSize = hw / activeCamera.getWidth() * 2;
-        */
 
         GL3DRayTracer rayTracer = new GL3DRayTracer(this.accellerationShape, activeCamera);
 
@@ -280,11 +269,7 @@ public abstract class GL3DImageLayer extends GL3DOrientedGroup implements GL3DCa
         double maxPhysicalY = -Double.MAX_VALUE;
         double maxPhysicalZ = -Double.MAX_VALUE;
 
-        CoordinateVector orientationVector = this.getOrientation();
-        CoordinateConversion toViewSpace = this.getCoordinateSystem().getConversion(activeCamera.getViewSpaceCoordinateSystem());
-
-        GL3DVec3d orientation = GL3DHelper.toVec(toViewSpace.convert(orientationVector)); //.normalize(); - not needed for atan2
-        GL3DMat4d phiRotation = GL3DMat4d.rotation(Math.atan2(orientation.x, orientation.z), new GL3DVec3d(0, 1, 0));
+        GL3DMat4d phiRotation = GL3DMat4d.rotation(this.imageTextureView.phi, new GL3DVec3d(0, 1, 0));
 
 
         for (GL3DRay ray : regionTestRays) {
@@ -317,10 +302,10 @@ public abstract class GL3DImageLayer extends GL3DOrientedGroup implements GL3DCa
         maxPhysicalX = Math.min(maxPhysicalX, metaData.getPhysicalUpperRight().getX());
         maxPhysicalY = Math.min(maxPhysicalY, metaData.getPhysicalUpperRight().getY());
 
-        minPhysicalX -= Math.abs(minPhysicalX)*0.1;
-        minPhysicalY -= Math.abs(minPhysicalY)*0.1;
-        maxPhysicalX += Math.abs(maxPhysicalX)*0.1;
-        maxPhysicalY += Math.abs(maxPhysicalY)*0.1;
+        minPhysicalX -= Math.abs(minPhysicalX)*0.5;
+        minPhysicalY -= Math.abs(minPhysicalY)*0.5;
+        maxPhysicalX += Math.abs(maxPhysicalX)*0.5;
+        maxPhysicalY += Math.abs(maxPhysicalY)*0.5;
         if (minPhysicalX < metaData.getPhysicalLowerLeft().getX()) minPhysicalX = metaData.getPhysicalLowerLeft().getX();
         if (minPhysicalY < metaData.getPhysicalLowerLeft().getY()) minPhysicalY = metaData.getPhysicalLowerLeft().getX();
         if (maxPhysicalX > metaData.getPhysicalUpperRight().getX()) maxPhysicalX = metaData.getPhysicalUpperRight().getX();

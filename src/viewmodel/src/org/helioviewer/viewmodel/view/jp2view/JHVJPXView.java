@@ -305,7 +305,7 @@ public class JHVJPXView extends JHVJP2View implements TimedMovieView, CachedMovi
         if (linkedMovieManager != null) {
             linkedMovieManager.pauseLinkedMovies();
         }
-
+        System.out.println("RRS3");
         readerSignal.signal();
         if (render != null) {
             render.setMovieMode(false);
@@ -333,8 +333,10 @@ public class JHVJPXView extends JHVJP2View implements TimedMovieView, CachedMovi
                     if (render != null) {
                         render.setMovieMode(true);
                     }
+                    System.out.println("RRS4");
                     readerSignal.signal();
                     if (readerMode != ReaderMode.ONLYFIREONCOMPLETE) {
+                        System.out.println("RR7");
                         renderRequestedSignal.signal(RenderReasons.MOVIE_PLAY);
                     }
                 } else {
@@ -400,6 +402,7 @@ public class JHVJPXView extends JHVJP2View implements TimedMovieView, CachedMovi
     	else{
     		setSubimageDataHelper(newImageData, roi, compositionLayer); 
     	}
+    	System.out.println("Render finished");
     }
 
 
@@ -441,9 +444,10 @@ public class JHVJPXView extends JHVJP2View implements TimedMovieView, CachedMovi
             }
 
             this.event.copyFrom(event);
-
+            System.out.println("RRS5");
             readerSignal.signal();
             if (readerMode != ReaderMode.ONLYFIREONCOMPLETE) {
+                System.out.println("RR9");
                 renderRequestedSignal.signal(RenderReasons.MOVIE_PLAY);
             }
 
@@ -485,6 +489,7 @@ public class JHVJPXView extends JHVJP2View implements TimedMovieView, CachedMovi
 
 	@Override
 	public void render() {
+        System.out.println("RR8");
         renderRequestedSignal.signal(RenderReasons.NEW_DATA);
 	}
 	
