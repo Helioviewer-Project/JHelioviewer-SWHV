@@ -2,7 +2,6 @@ package org.helioviewer.gl3d.view;
 
 import javax.media.opengl.GL;
 
-import org.helioviewer.base.logging.Log;
 import org.helioviewer.base.math.Vector2dInt;
 import org.helioviewer.gl3d.scenegraph.GL3DState;
 import org.helioviewer.viewmodel.changeevent.ChangeEvent;
@@ -76,14 +75,11 @@ public class GL3DImageRegionView extends AbstractGL3DView implements GL3DView, R
 
     protected void setViewSpecificImplementation(View newView, ChangeEvent changeEvent) {
         RegionView regionView = newView.getAdapter(RegionView.class);
-        if (regionView != null) {
-            this.underlyingRegionView = regionView;
-        }
+        this.underlyingRegionView = regionView;
+
 
         ViewportView viewportView = newView.getAdapter(ViewportView.class);
-        if (viewportView != null) {
-            this.viewportView = viewportView;
-        }
+        this.viewportView = viewportView;
 
         MetaDataView metaDataView = newView.getAdapter(MetaDataView.class);
         if (metaDataView != null) {
@@ -104,7 +100,6 @@ public class GL3DImageRegionView extends AbstractGL3DView implements GL3DView, R
         this.detectedRegion = r;
         boolean hasChanged = this.updateRegionAndViewport(event);
 
-        // Log.debug("GL3DImageRegionView: set Region!: "+this.actualImageRegion.getSize());
         hasChanged |= this.viewportView.setViewport(innerViewport, event);
         hasChanged |= this.underlyingRegionView.setRegion(this.actualImageRegion, event);
         return hasChanged;
@@ -114,13 +109,10 @@ public class GL3DImageRegionView extends AbstractGL3DView implements GL3DView, R
         MetaData metaData = this.metaDataView.getMetaData();
         Region region = ViewHelper.cropRegionToImage(detectedRegion, metaData);
         ViewportImageSize requiredViewportSize = ViewHelper.calculateViewportImageSize(this.maximalViewport, region);
-        // Log.debug("GL3DImageRegionView: requiredViewportSize: "+requiredViewportSize.getSizeVector());
         this.innerViewport = StaticViewport.createAdaptedViewport(requiredViewportSize.getSizeVector());
-        // Log.debug("GL3DImageRegionView: Inner Viewport: "+innerViewport);
-
-        this.renderOffset = new Vector2dInt(0, 0);
-        // Log.debug("GL3DImageRegionView: Offset: "+renderOffset);
+        
         this.actualImageRegion = region;
+
         return true;
     }
 
@@ -129,7 +121,6 @@ public class GL3DImageRegionView extends AbstractGL3DView implements GL3DView, R
     }
     
     public boolean setViewport(Viewport v, ChangeEvent event) {
-        Log.debug("GL3DImageRegionView:setViewport() Viewport = " + v);
         this.maximalViewport = v;
 
         this.updateRegionAndViewport(event);
