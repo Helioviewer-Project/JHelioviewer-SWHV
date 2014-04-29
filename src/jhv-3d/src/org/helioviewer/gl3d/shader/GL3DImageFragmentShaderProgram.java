@@ -92,7 +92,7 @@ public class GL3DImageFragmentShaderProgram extends GLFragmentShaderProgram {
             program += "\tfloat4 v2 = float4(zaxisxrot, zaxisyrot, zaxiszrot, 0.0);" + GLShaderBuilder.LINE_SEP;
             program += "\tfloat projectionn = dot(v1,v2);" + GLShaderBuilder.LINE_SEP;
 
-            program += "\tif(position.z!=0.0 && projectionn<-0.001){"// || position.z==0.0 && position.x*position.x +position.y*position.y<0.999){"
+            program += "\tif((position.z!=0.0 && projectionn<-0.001) || (position.z==0.0 && position.x*position.x +position.y*position.y<0.9)){"
                     + "\t\tdiscard;" + GLShaderBuilder.LINE_SEP
                     + "\t}";
 
