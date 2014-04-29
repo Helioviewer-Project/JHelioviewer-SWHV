@@ -23,24 +23,8 @@ import org.helioviewer.viewmodel.view.jp2view.JP2Image;
 
 
 public class RadioImagePane implements ImageObserver, RadioPlotModelListener, DrawableElement{
-	/*public static void main(String []args){
-		RadioImagePane pane = new RadioImagePane();
-	}*/
-
-	private int [][] radioImage;
-	private int width;
-	private int height;
-	private int x0;
-	private int y0;
-	private Axis frequencyAxis;
-	private Axis dateTimeAxis;
-	private JHVJPXView view;
-	private JP2Image image;
-	private boolean eventReceived = false;
-	private boolean acceptEvents = false;
-	private boolean first = true;
+	
 	ArrayList<BufferedImage> views = new ArrayList<BufferedImage>();
-	//private RadioPlotModel plotModel;
 	private YAxisElement yAxitElement;
 	private boolean intervalTooBig;
 	private String plotIdentifier;
@@ -275,6 +259,7 @@ public class RadioImagePane implements ImageObserver, RadioPlotModelListener, Dr
 				pc.draw(g);
 			}
 		}else{
+			Log.debug("Putting text on the screen");
 			String text1 = "The selected interval is to big.";
 			String text2 = "Reduce the interval to see the radio images";
 			final int text1Width = (int) g.getFontMetrics().getStringBounds(text1, g).getWidth();

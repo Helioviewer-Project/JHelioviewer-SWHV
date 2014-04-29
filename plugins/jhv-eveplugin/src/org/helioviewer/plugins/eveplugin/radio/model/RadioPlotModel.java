@@ -508,7 +508,8 @@ public class RadioPlotModel implements RadioDataManagerListener,ZoomControllerLi
 	@Override
 	public void intervalTooBig(long iD, String identifier) {
 		RadioImagePane radioImagePane = getRadioPlotModelData(identifier).getRadioImagePane();
-		radioImagePane.setIntervalTooBig(true);	
+		radioImagePane.setIntervalTooBig(true);
+		drawController.updateDrawableElement(radioImagePane, identifier);
 	}
 
 	
