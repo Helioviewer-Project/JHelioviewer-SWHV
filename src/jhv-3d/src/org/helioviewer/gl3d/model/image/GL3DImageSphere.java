@@ -19,13 +19,13 @@ import org.helioviewer.viewmodel.view.opengl.shader.GLVertexShaderProgram;
  * Maps the solar disc part of an image layer onto an adaptive mesh that either
  * covers the entire solar disc or the just the part that is visible in the view
  * frustum.
- * 
+ *
  * @author Simon Spoerri (simon.spoerri@fhnw.ch)
- * 
+ *
  */
 public class GL3DImageSphere extends GL3DImageMesh {
 
-    private GL3DImageLayer layer;
+    private final GL3DImageLayer layer;
 
     public GL3DImageSphere(GL3DImageTextureView imageTextureView,
             GLVertexShaderProgram vertexShaderProgram,
@@ -36,15 +36,17 @@ public class GL3DImageSphere extends GL3DImageMesh {
 
     }
 
-    public void shapeDraw(GL3DState state) {
-        state.gl.glDisable(GL.GL_CULL_FACE);
+    @Override
+	public void shapeDraw(GL3DState state) {
+        state.gl.glEnable(GL.GL_CULL_FACE);
         state.gl.glEnable(GL.GL_DEPTH_TEST);
         state.gl.glEnable(GL.GL_BLEND);
 
         super.shapeDraw(state);
     }
 
-    public GL3DMeshPrimitive createMesh(GL3DState state,
+    @Override
+	public GL3DMeshPrimitive createMesh(GL3DState state,
             List<GL3DVec3d> positions, List<GL3DVec3d> normals,
             List<GL3DVec2d> textCoords, List<Integer> indices,
             List<GL3DVec4d> colors) {
@@ -78,8 +80,8 @@ public class GL3DImageSphere extends GL3DImageMesh {
                     indices.add(first + 1);
                     indices.add(second + 1);
                     indices.add(first);
-                    indices.add(second);
                     indices.add(second + 1);
+                    indices.add(second);
                 }
             }
             MetaData metaData = this.layer.metaDataView.getMetaData();
@@ -99,11 +101,12 @@ public class GL3DImageSphere extends GL3DImageMesh {
             numberOfPositions++;
 
             indices.add(beginPositionNumberCorona + 0);
+            indices.add(beginPositionNumberCorona + 2);
             indices.add(beginPositionNumberCorona + 1);
+
             indices.add(beginPositionNumberCorona + 2);
-            indices.add(beginPositionNumberCorona + 2);
-            indices.add(beginPositionNumberCorona + 3);
             indices.add(beginPositionNumberCorona + 0);
+            indices.add(beginPositionNumberCorona + 3);
 
         }
         return GL3DMeshPrimitive.TRIANGLES;
