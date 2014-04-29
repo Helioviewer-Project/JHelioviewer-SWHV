@@ -14,17 +14,18 @@ public class GL3DImageFragmentShaderProgram extends GLFragmentShaderProgram {
     private double theta;
     private double phi;
 	private double xxTextureScale = 1.0;
-	private double yyTextureScale = 1.0;    
+	private double yyTextureScale = 1.0;
 
     public GL3DImageFragmentShaderProgram() {
     }
     /**
      * Binds (= activates it) the shader, if it is not active so far.
-     * 
+     *
      * @param gl
      *            Valid reference to the current gl object
      */
-    public final void bind(GL gl) {
+    @Override
+	public final void bind(GL gl) {
         bind(gl, shaderID, cutOffRadius, xxTextureScale, yyTextureScale, theta, phi);
     }
     private static void bind(GL gl, int shader, double cutOffRadius, double xTextureScale, double yTextureScale, double theta, double phi) {
@@ -35,10 +36,10 @@ public class GL3DImageFragmentShaderProgram extends GLFragmentShaderProgram {
     }
     /**
      * Pushes the shader currently in use onto a stack.
-     * 
+     *
      * This is useful to load another shader but still being able to restore the
      * old one, similar to the very common pushMatrix() in OpenGL.
-     * 
+     *
      * @param gl
      *            Valid reference to the current gl object
      * @see #popShader(GL)
@@ -51,10 +52,10 @@ public class GL3DImageFragmentShaderProgram extends GLFragmentShaderProgram {
 
     /**
      * Takes the top of from the shader stack and binds it.
-     * 
+     *
      * This restores a shader pushed onto the stack earlier, similar to the very
      * common popMatrix() in OpenGL.
-     * 
+     *
      * @param gl
      *            Valid reference to the current gl object
      * @see #pushShader(GL)
@@ -68,35 +69,36 @@ public class GL3DImageFragmentShaderProgram extends GLFragmentShaderProgram {
         }
     }
 
-    protected void buildImpl(GLShaderBuilder shaderBuilder) {
+    @Override
+	protected void buildImpl(GLShaderBuilder shaderBuilder) {
         try {
             String program = "\tif(texcoord0.x<0.0||texcoord0.y<0.0||texcoord0.x>textureScaleThetaPhi.x||texcoord0.y>textureScaleThetaPhi.y){"
                     + "\t\tOUT.color = float4(1.0,0.0,0.0,1.0);" + GLShaderBuilder.LINE_SEP
                     + "\t}"+ GLShaderBuilder.LINE_SEP;
             program += "\tOUT.color.a=0.7;" + GLShaderBuilder.LINE_SEP;
             program += "\tfloat theta = textureScaleThetaPhi.z;" + GLShaderBuilder.LINE_SEP;
-            program += "\tfloat phi = textureScaleThetaPhi.w;" + GLShaderBuilder.LINE_SEP;            
-            
+            program += "\tfloat phi = textureScaleThetaPhi.w;" + GLShaderBuilder.LINE_SEP;
+
             program += "\tfloat zaxisxrott = 0.0;" + GLShaderBuilder.LINE_SEP;
             program += "\tfloat zaxisyrott = 0.0*cos(theta) - 1.0*sin(theta);" + GLShaderBuilder.LINE_SEP;
-            program += "\tfloat zaxiszrott = 0.0*sin(theta) + 1.0*cos(theta);" + GLShaderBuilder.LINE_SEP;             
+            program += "\tfloat zaxiszrott = 0.0*sin(theta) + 1.0*cos(theta);" + GLShaderBuilder.LINE_SEP;
 
             program += "\tfloat zaxisxrot = zaxisxrott*cos(phi) - zaxiszrott*sin(phi);" + GLShaderBuilder.LINE_SEP;
             program += "\tfloat zaxisyrot = zaxisyrott;" + GLShaderBuilder.LINE_SEP;
-            program += "\tfloat zaxiszrot = zaxisxrott*sin(phi) + zaxiszrott*cos(phi);" + GLShaderBuilder.LINE_SEP;  
-            
-            
+            program += "\tfloat zaxiszrot = zaxisxrott*sin(phi) + zaxiszrott*cos(phi);" + GLShaderBuilder.LINE_SEP;
+
+
             program += "\tfloat4 v1 = float4(position.x, position.y, position.z, 0.0);" + GLShaderBuilder.LINE_SEP;
             program += "\tfloat4 v2 = float4(zaxisxrot, zaxisyrot, zaxiszrot, 0.0);" + GLShaderBuilder.LINE_SEP;
             program += "\tfloat projectionn = dot(v1,v2);" + GLShaderBuilder.LINE_SEP;
-           
+
             program += "\tif(position.z!=0.0 && projectionn<-0.001){"// || position.z==0.0 && position.x*position.x +position.y*position.y<0.999){"
                     + "\t\tdiscard;" + GLShaderBuilder.LINE_SEP
-                    + "\t}";            
-            
+                    + "\t}";
+
             shaderBuilder.addEnvParameter("float cutOffRadius");
             shaderBuilder.addEnvParameter("float4 textureScaleThetaPhi");
-            program = program.replace("position",shaderBuilder.useStandardParameter("float4", "TEXCOORD3"));            
+            program = program.replace("position",shaderBuilder.useStandardParameter("float4", "TEXCOORD3"));
 
             program = program.replace("output", shaderBuilder.useOutputValue("float4", "COLOR"));
             program = program.replace("textureCoordinate", shaderBuilder.useStandardParameter("float4", "TEXCOORD5"));
@@ -108,12 +110,12 @@ public class GL3DImageFragmentShaderProgram extends GLFragmentShaderProgram {
         }
 
     }
-    
+
     public void changeTextureScale(double xTextureScale, double yTextureScale) {
         this.xxTextureScale = xTextureScale;
         this.yyTextureScale = yTextureScale;
     }
-    
+
     public void setCutOffRadius(double cutOffRadius){
         this.cutOffRadius = cutOffRadius;
     }
