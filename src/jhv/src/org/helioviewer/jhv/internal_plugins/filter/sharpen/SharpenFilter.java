@@ -1,5 +1,6 @@
 package org.helioviewer.jhv.internal_plugins.filter.sharpen;
 
+import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.viewmodel.filter.AbstractFilter;
 import org.helioviewer.viewmodel.filter.StandardFilter;
 import org.helioviewer.viewmodel.imagedata.ARGBInt32ImageData;
@@ -12,35 +13,35 @@ import org.helioviewer.viewmodel.imagetransport.Short16ImageTransport;
 
 /**
  * Filter for sharpen an image.
- * 
+ *
  * <p>
  * This filter sharpens the image by applying the unsharp mask algorithm. It
  * uses the following formula:
- * 
+ *
  * <p>
  * p_res(x,y) = (1 + a) * p_in(x,y) - a * p_low(x,y)
- * 
+ *
  * <p>
  * Here, p_res means the resulting pixel, p_in means the original input pixel
  * and p_low the pixel of the lowpassed filtered original. As applying the
  * lowpass, the image is convoluted with the 3x3 Gauss-kernel:
- * 
+ *
  * <p>
  * 1/16 * {{1, 2, 1}, {2, 4, 2}, {1, 2, 1}}
- * 
+ *
  * <p>
  * If the weighting is zero, the input data stays untouched.
- * 
+ *
  * <p>
  * The output of the filter always has the same image format as the input.
- * 
+ *
  * <p>
  * This filter supports only software rendering, but there is an OpenGL
  * implementation in {@link SharpenGLFilter}. This is because the OpenGL
  * implementation may be invalid due to graphics card restrictions.
- * 
+ *
  * @author Markus Langenberg
- * 
+ *
  */
 public class SharpenFilter extends AbstractFilter implements StandardFilter {
 
@@ -63,7 +64,7 @@ public class SharpenFilter extends AbstractFilter implements StandardFilter {
 
     /**
      * Sets the corresponding sharpen panel.
-     * 
+     *
      * @param panel
      *            Corresponding panel.
      */
@@ -74,21 +75,23 @@ public class SharpenFilter extends AbstractFilter implements StandardFilter {
 
     /**
      * Sets the weighting of the sharpening.
-     * 
+     *
      * @param newWeighting
      *            Weighting of the sharpening
      */
     void setWeighting(float newWeighting) {
         weighting = newWeighting;
         notifyAllListeners();
+        Displayer.getSingletonInstance().display();
     }
 
     /**
      * {@inheritDoc}
-     * 
+     *
      * <p>
      * This filter is not a major filter.
      */
+    @Override
     public boolean isMajorFilter() {
         return false;
     }
@@ -99,14 +102,14 @@ public class SharpenFilter extends AbstractFilter implements StandardFilter {
 
     /**
      * Blurs a single channel image by applying a 3x3 Gauss lowpass filter.
-     * 
+     *
      * Since a convolution with a Gauss kernel is separable, this function is
      * optimized by doing so.
-     * 
+     *
      * <p>
      * If the image has more than one channel, this function has to be called
      * multiple times.
-     * 
+     *
      * @param width
      *            Width of the image
      * @param height
@@ -128,14 +131,14 @@ public class SharpenFilter extends AbstractFilter implements StandardFilter {
 
     /**
      * Blurs a single channel image by applying a 3x3 Gauss lowpass filter.
-     * 
+     *
      * Since a convolution with a Gauss kernel is separable, this function is
      * optimized by doing so.
-     * 
+     *
      * <p>
      * If the image has more than one channel, this function has to be called
      * multiple times.
-     * 
+     *
      * @param width
      *            Width of the image
      * @param height
@@ -159,14 +162,14 @@ public class SharpenFilter extends AbstractFilter implements StandardFilter {
 
     /**
      * Blurs a single channel image by applying a 3x3 Gauss lowpass filter.
-     * 
+     *
      * Since a convolution with a Gauss kernel is separable, this function is
      * optimized by doing so.
-     * 
+     *
      * <p>
      * If the image has more than one channel, this function has to be called
      * multiple times.
-     * 
+     *
      * @param width
      *            Width of the image
      * @param height
@@ -233,6 +236,7 @@ public class SharpenFilter extends AbstractFilter implements StandardFilter {
     /**
      * {@inheritDoc}
      */
+    @Override
     public ImageData apply(ImageData data) {
         if (data == null) {
             return null;
@@ -327,6 +331,7 @@ public class SharpenFilter extends AbstractFilter implements StandardFilter {
     /**
      * {@inheritDoc}
      */
+    @Override
     public void forceRefilter() {
         forceRefilter = true;
 
@@ -335,6 +340,7 @@ public class SharpenFilter extends AbstractFilter implements StandardFilter {
     /**
      * {@inheritDoc}
      */
+    @Override
     public void setState(String state) {
         setWeighting(Float.parseFloat(state));
         panel.setValue(weighting);
@@ -343,6 +349,7 @@ public class SharpenFilter extends AbstractFilter implements StandardFilter {
     /**
      * {@inheritDoc}
      */
+    @Override
     public String getState() {
         return Float.toString(weighting);
     }

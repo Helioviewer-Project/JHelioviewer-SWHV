@@ -19,22 +19,22 @@ import org.helioviewer.viewmodelplugin.filter.FilterTabPanelManager.Area;
 
 /**
  * Panel containing three check boxes to modify the color mask of an image.
- * 
+ *
  * @author Markus Langenberg
  */
 public class ChannelMixerPanel extends FilterPanel implements ItemListener, FilterAlignmentDetails {
 
     private static final long serialVersionUID = 1L;
 
-    private JCheckBox redCheckBox;
-    private JCheckBox greenCheckBox;
-    private JCheckBox blueCheckBox;
-    private JLabel title;
+    private final JCheckBox redCheckBox;
+    private final JCheckBox greenCheckBox;
+    private final JCheckBox blueCheckBox;
+    private final JLabel title;
     private ChannelMixerFilter filter;
 
     /**
      * Default constructor.
-     * 
+     *
      */
     public ChannelMixerPanel() {
         setLayout(new BoxLayout(this, BoxLayout.LINE_AXIS));
@@ -72,6 +72,7 @@ public class ChannelMixerPanel extends FilterPanel implements ItemListener, Filt
      * {@inheritDoc}
      */
 
+    @Override
     public void setFilter(Filter filter) {
         if (filter instanceof ChannelMixerFilter) {
             this.filter = (ChannelMixerFilter) filter;
@@ -86,6 +87,7 @@ public class ChannelMixerPanel extends FilterPanel implements ItemListener, Filt
      * {@inheritDoc}
      */
 
+    @Override
     public Area getArea() {
         return Area.TOP;
     }
@@ -93,10 +95,12 @@ public class ChannelMixerPanel extends FilterPanel implements ItemListener, Filt
     /**
      * Changes the channel selection of the image.
      */
+    @Override
     public void itemStateChanged(ItemEvent e) {
         filter.setColorMask(redCheckBox.isSelected(), greenCheckBox.isSelected(), blueCheckBox.isSelected());
     }
 
+    @Override
     public int getDetails() {
         return FilterAlignmentDetails.POSITION_CHANNELMIXER;
     }
@@ -106,6 +110,7 @@ public class ChannelMixerPanel extends FilterPanel implements ItemListener, Filt
      * components' enabledState synced with the enabledState of this component.
      */
 
+    @Override
     public void setEnabled(boolean enabled) {
         super.setEnabled(enabled);
         redCheckBox.setEnabled(enabled);
@@ -116,10 +121,10 @@ public class ChannelMixerPanel extends FilterPanel implements ItemListener, Filt
 
     /**
      * Sets the panel values.
-     * 
+     *
      * This may be useful, if the values are changed from another source than
      * the panel itself.
-     * 
+     *
      * @param colorMask
      *            Mask representing the new values
      */

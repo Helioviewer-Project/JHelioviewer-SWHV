@@ -16,21 +16,21 @@ import org.helioviewer.viewmodelplugin.filter.FilterTabPanelManager.Area;
 
 /**
  * Panel containing a slider for changing the weighting of the sharpening.
- * 
+ *
  * @author Markus Langenberg
  */
 public class SharpenPanel extends FilterPanel implements ChangeListener, FilterAlignmentDetails {
 
     private static final long serialVersionUID = 1L;
 
-    private JSlider sharpeningSlider;
-    private JLabel sharpeningLabel;
-    private JLabel title;
+    private final JSlider sharpeningSlider;
+    private final JLabel sharpeningLabel;
+    private final JLabel title;
     private SharpenFilter filter;
 
     /**
      * Default constructor.
-     * 
+     *
      */
     public SharpenPanel() {
         setLayout(new BoxLayout(this, BoxLayout.LINE_AXIS));
@@ -59,6 +59,7 @@ public class SharpenPanel extends FilterPanel implements ChangeListener, FilterA
      * {@inheritDoc}
      */
 
+    @Override
     public void setFilter(Filter filter) {
         if (filter instanceof SharpenFilter) {
             this.filter = (SharpenFilter) filter;
@@ -73,6 +74,7 @@ public class SharpenPanel extends FilterPanel implements ChangeListener, FilterA
      * {@inheritDoc}
      */
 
+    @Override
     public Area getArea() {
         return Area.TOP;
     }
@@ -80,11 +82,13 @@ public class SharpenPanel extends FilterPanel implements ChangeListener, FilterA
     /**
      * Sets the weighting of the sharpening.
      */
+    @Override
     public void stateChanged(ChangeEvent e) {
-        filter.setWeighting((float) sharpeningSlider.getValue() / 10.0f);
+        filter.setWeighting(sharpeningSlider.getValue() / 10.0f);
         sharpeningLabel.setText(sharpeningSlider.getValue() + "%");
     }
 
+    @Override
     public int getDetails() {
         return FilterAlignmentDetails.POSITION_SHARPEN;
     }
@@ -94,6 +98,7 @@ public class SharpenPanel extends FilterPanel implements ChangeListener, FilterA
      * components' enabledState synced with the enabledState of this component.
      */
 
+    @Override
     public void setEnabled(boolean enabled) {
         super.setEnabled(enabled);
         sharpeningSlider.setEnabled(enabled);
@@ -103,10 +108,10 @@ public class SharpenPanel extends FilterPanel implements ChangeListener, FilterA
 
     /**
      * Sets the sharpen value.
-     * 
+     *
      * This may be useful, if the opacity is changed from another source than
      * the slider itself.
-     * 
+     *
      * @param sharpen
      *            New opacity value. Must be within [0, 10]
      */

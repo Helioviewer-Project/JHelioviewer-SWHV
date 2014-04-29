@@ -18,11 +18,11 @@ import org.helioviewer.viewmodelplugin.filter.FilterTabPanelManager.Area;
 
 /**
  * Panel containing a slider for changing the gamma value of the image.
- * 
+ *
  * <p>
  * To be able to reset the gamma value to 1.0, the slider snaps to 1.0 if it
  * close to it.
- * 
+ *
  * @author Markus Langenberg
  */
 public class GammaCorrectionPanel extends FilterPanel implements ChangeListener, MouseListener, FilterAlignmentDetails {
@@ -30,14 +30,14 @@ public class GammaCorrectionPanel extends FilterPanel implements ChangeListener,
     private static final long serialVersionUID = 1L;
     private static double factor = 0.01 * Math.log(10);
 
-    private JSlider gammaSlider;
-    private JLabel title;
-    private JLabel gammaLabel;
+    private final JSlider gammaSlider;
+    private final JLabel title;
+    private final JLabel gammaLabel;
     private GammaCorrectionFilter filter;
 
     /**
      * Default constructor.
-     * 
+     *
      */
     public GammaCorrectionPanel() {
         setLayout(new BoxLayout(this, BoxLayout.LINE_AXIS));
@@ -67,6 +67,7 @@ public class GammaCorrectionPanel extends FilterPanel implements ChangeListener,
      * {@inheritDoc}
      */
 
+    @Override
     public void setFilter(Filter filter) {
         if (filter instanceof GammaCorrectionFilter) {
             this.filter = (GammaCorrectionFilter) filter;
@@ -81,6 +82,7 @@ public class GammaCorrectionPanel extends FilterPanel implements ChangeListener,
      * {@inheritDoc}
      */
 
+    @Override
     public Area getArea() {
         return Area.TOP;
     }
@@ -88,6 +90,7 @@ public class GammaCorrectionPanel extends FilterPanel implements ChangeListener,
     /**
      * Sets the gamma value of the image.
      */
+    @Override
     public void stateChanged(ChangeEvent e) {
         int sliderValue = gammaSlider.getValue();
 
@@ -106,30 +109,35 @@ public class GammaCorrectionPanel extends FilterPanel implements ChangeListener,
     /**
      * {@inheritDoc} In this case, does nothing.
      */
+    @Override
     public void mouseClicked(MouseEvent e) {
     }
 
     /**
      * {@inheritDoc} In this case, does nothing.
      */
+    @Override
     public void mouseEntered(MouseEvent e) {
     }
 
     /**
      * {@inheritDoc} In this case, does nothing.
      */
+    @Override
     public void mouseExited(MouseEvent e) {
     }
 
     /**
      * {@inheritDoc} In this case, does nothing.
      */
+    @Override
     public void mousePressed(MouseEvent e) {
     }
 
     /**
      * {@inheritDoc} In this case, snaps the slider to 1.0 if it is close to it.
      */
+    @Override
     public void mouseReleased(MouseEvent e) {
         int sliderValue = gammaSlider.getValue();
 
@@ -138,6 +146,7 @@ public class GammaCorrectionPanel extends FilterPanel implements ChangeListener,
         }
     }
 
+    @Override
     public int getDetails() {
         return FilterAlignmentDetails.POSITION_GAMMA;
     }
@@ -147,6 +156,7 @@ public class GammaCorrectionPanel extends FilterPanel implements ChangeListener,
      * components' enabledState synced with the enabledState of this component.
      */
 
+    @Override
     public void setEnabled(boolean enabled) {
         super.setEnabled(enabled);
         gammaSlider.setEnabled(enabled);
@@ -156,10 +166,10 @@ public class GammaCorrectionPanel extends FilterPanel implements ChangeListener,
 
     /**
      * Sets the panel values.
-     * 
+     *
      * This may be useful, if the values are changed from another source than
      * the panel itself.
-     * 
+     *
      * @param gamma
      *            New gamma value, must be within [0.1, 10]
      */

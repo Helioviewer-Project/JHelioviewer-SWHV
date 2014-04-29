@@ -4,6 +4,7 @@ import java.nio.IntBuffer;
 
 import javax.media.opengl.GL;
 
+import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.viewmodel.filter.AbstractFilter;
 import org.helioviewer.viewmodel.filter.GLFragmentShaderFilter;
 import org.helioviewer.viewmodel.filter.StandardFilter;
@@ -18,16 +19,16 @@ import org.helioviewer.viewmodel.view.opengl.shader.GLSingleChannelLookupFragmen
 
 /**
  * Filter for applying a color table to a single channel image.
- * 
+ *
  * <p>
  * If the input image is not a single channel image, the filter does nothing and
  * returns the input data.
- * 
+ *
  * <p>
  * This filter supports software rendering as well as rendering in OpenGL.
- * 
+ *
  * mostly rewritten
- * 
+ *
  * @author Helge Dietert
  */
 public class SOHOLUTFilter extends AbstractFilter implements StandardFilter, GLFragmentShaderFilter {
@@ -46,10 +47,11 @@ public class SOHOLUTFilter extends AbstractFilter implements StandardFilter, GLF
 
     /**
      * {@inheritDoc}
-     * 
+     *
      * <p>
      * This filter is a major filter.
      */
+    @Override
     public boolean isMajorFilter() {
         return true;
     }
@@ -63,7 +65,7 @@ public class SOHOLUTFilter extends AbstractFilter implements StandardFilter, GLF
 
     /**
      * Constructor setting the color table.
-     * 
+     *
      * @param startWithLut
      *            Color table to apply to the image
      */
@@ -73,7 +75,7 @@ public class SOHOLUTFilter extends AbstractFilter implements StandardFilter, GLF
 
     /**
      * Sets the corresponding SOHOLUT panel.
-     * 
+     *
      * @param panel
      *            Corresponding panel.
      */
@@ -84,7 +86,7 @@ public class SOHOLUTFilter extends AbstractFilter implements StandardFilter, GLF
 
     /**
      * Sets a new color table to use from now on.
-     * 
+     *
      * @param newLUT
      *            New color table
      */
@@ -95,6 +97,7 @@ public class SOHOLUTFilter extends AbstractFilter implements StandardFilter, GLF
         lut = newLUT;
         invertLUT = invert;
         notifyAllListeners();
+        Displayer.getSingletonInstance().display();
     }
 
     // /////////////////////////
@@ -104,6 +107,7 @@ public class SOHOLUTFilter extends AbstractFilter implements StandardFilter, GLF
     /**
      * {@inheritDoc}
      */
+    @Override
     public ImageData apply(ImageData data) {
         // Ship over gray for performance as before
         if (data == null || !(data.getImageFormat() instanceof SingleChannelImageFormat) || (lut.getName() == "Gray" && !invertLUT)) {
@@ -129,7 +133,7 @@ public class SOHOLUTFilter extends AbstractFilter implements StandardFilter, GLF
     // /////////////////////////
     // OPENGL //
     // /////////////////////////
-    private GLSingleChannelLookupFragmentShaderProgram shader = new GLSingleChannelLookupFragmentShaderProgram();
+    private final GLSingleChannelLookupFragmentShaderProgram shader = new GLSingleChannelLookupFragmentShaderProgram();
     private int lookupTex = 0;
     private LUT lastLut = null;
     private boolean lastInverted = false;
@@ -137,6 +141,7 @@ public class SOHOLUTFilter extends AbstractFilter implements StandardFilter, GLF
     /**
      * {@inheritDoc}
      */
+    @Override
     public GLShaderBuilder buildFragmentShader(GLShaderBuilder shaderBuilder) {
         shader.build(shaderBuilder);
 
@@ -152,9 +157,10 @@ public class SOHOLUTFilter extends AbstractFilter implements StandardFilter, GLF
 
     /**
      * {@inheritDoc}
-     * 
+     *
      * In this case, also updates the color table, if necessary.
      */
+    @Override
     public void applyGL(GL gl) {
         shader.bind(gl);
         shader.activateLutTexture(gl);
@@ -195,6 +201,7 @@ public class SOHOLUTFilter extends AbstractFilter implements StandardFilter, GLF
         gl.glTexParameteri(GL.GL_TEXTURE_1D, GL.GL_TEXTURE_WRAP_S, GL.GL_CLAMP);
     }
 
+    @Override
     protected void finalize() {
         if (lookupTex != 0) {
             GLTextureHelper textureHelper = new GLTextureHelper();
@@ -205,6 +212,7 @@ public class SOHOLUTFilter extends AbstractFilter implements StandardFilter, GLF
     /**
      * {@inheritDoc}
      */
+    @Override
     public void forceRefilter() {
         lastLut = null;
     }
@@ -212,6 +220,7 @@ public class SOHOLUTFilter extends AbstractFilter implements StandardFilter, GLF
     /**
      * {@inheritDoc}
      */
+    @Override
     public void setState(String state) {
         String[] values = state.trim().split(" ");
         String tableString = values[0];
@@ -226,6 +235,7 @@ public class SOHOLUTFilter extends AbstractFilter implements StandardFilter, GLF
     /**
      * {@inheritDoc}
      */
+    @Override
     public String getState() {
         return lut.getName().replaceAll(Character.toString(LUT.angstrom), "ANGSTROM") + " " + invertLUT;
     }

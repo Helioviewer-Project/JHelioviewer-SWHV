@@ -28,7 +28,7 @@ import org.helioviewer.viewmodelplugin.filter.FilterTabPanelManager.Area;
 /**
  * Panel containing a combobox for choosing the color table and button to add
  * further tables adapted
- * 
+ *
  * @author Helge Dietert (extended)
  */
 public class SOHOLUTPanel extends FilterPanel implements ActionListener, FilterAlignmentDetails {
@@ -38,21 +38,21 @@ public class SOHOLUTPanel extends FilterPanel implements ActionListener, FilterA
     private static final Icon invertIcon = IconBank.getIcon(JHVIcon.INVERT);
 
     private SOHOLUTFilter filter;
-    private Map<String, LUT> lutMap;
+    private final Map<String, LUT> lutMap;
     private int lastSelectedIndex;
 
     /**
      * Shown combobox to choose
      */
-    private JComboBox combobox;
+    private final JComboBox combobox;
     /**
      * Shown invert button
      */
-    private JToggleButton invertButton = new JToggleButton(invertIcon);
+    private final JToggleButton invertButton = new JToggleButton(invertIcon);
     /**
      * Shown label
      */
-    private JLabel title;
+    private final JLabel title;
 
     /**
      * Creates a filter panel with the standard list of filters
@@ -90,6 +90,7 @@ public class SOHOLUTPanel extends FilterPanel implements ActionListener, FilterA
      * {@inheritDoc}
      */
 
+    @Override
     public void setFilter(Filter filter) {
         if (filter instanceof SOHOLUTFilter) {
             this.filter = (SOHOLUTFilter) filter;
@@ -104,6 +105,7 @@ public class SOHOLUTPanel extends FilterPanel implements ActionListener, FilterA
      * {@inheritDoc}
      */
 
+    @Override
     public Area getArea() {
         return Area.BOTTOM;
     }
@@ -111,6 +113,7 @@ public class SOHOLUTPanel extends FilterPanel implements ActionListener, FilterA
     /**
      * Sets the color table
      */
+    @Override
     public void actionPerformed(ActionEvent e) {
         if (e.getSource() == invertButton) {
             if (invertButton.isSelected()) {
@@ -151,7 +154,7 @@ public class SOHOLUTPanel extends FilterPanel implements ActionListener, FilterA
     /**
      * Set the filter to the filter with the given name if the filter exists for
      * this panel
-     * 
+     *
      * @param name
      *            Name of the filter
      */
@@ -161,7 +164,7 @@ public class SOHOLUTPanel extends FilterPanel implements ActionListener, FilterA
 
     /**
      * Adds a color table to the available list and set it active
-     * 
+     *
      * @param lut
      *            Color table to add
      */
@@ -172,6 +175,7 @@ public class SOHOLUTPanel extends FilterPanel implements ActionListener, FilterA
         filter.setLUT(lut, invertButton.isSelected());
     }
 
+    @Override
     public int getDetails() {
         return FilterAlignmentDetails.POSITION_COLORTABLES;
     }
@@ -180,6 +184,7 @@ public class SOHOLUTPanel extends FilterPanel implements ActionListener, FilterA
      * Override the setEnabled method in order to keep the containing
      * components' enabledState synced with the enabledState of this component.
      */
+    @Override
     public void setEnabled(boolean enabled) {
         super.setEnabled(enabled);
         title.setEnabled(enabled);
@@ -189,10 +194,10 @@ public class SOHOLUTPanel extends FilterPanel implements ActionListener, FilterA
 
     /**
      * Sets the sharpen value.
-     * 
+     *
      * This may be useful, if the opacity is changed from another source than
      * the slider itself.
-     * 
+     *
      * @param lut
      *            New look up table
      * @param invertLUT
