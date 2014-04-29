@@ -1,12 +1,8 @@
 package org.helioviewer.gl3d.view;
 
-import java.awt.Rectangle;
-
 import javax.media.opengl.GL;
 
-import org.helioviewer.base.logging.Log;
 import org.helioviewer.base.math.Vector2dDouble;
-import org.helioviewer.base.math.Vector2dInt;
 import org.helioviewer.base.physics.Constants;
 import org.helioviewer.base.physics.DifferentialRotation;
 import org.helioviewer.gl3d.changeevent.ImageTextureRecapturedReason;
@@ -25,7 +21,6 @@ import org.helioviewer.viewmodel.metadata.MetaData;
 import org.helioviewer.viewmodel.region.Region;
 import org.helioviewer.viewmodel.region.StaticRegion;
 import org.helioviewer.viewmodel.view.MetaDataView;
-import org.helioviewer.viewmodel.view.RegionView;
 import org.helioviewer.viewmodel.view.View;
 import org.helioviewer.viewmodel.view.ViewListener;
 import org.helioviewer.viewmodel.view.ViewportView;
@@ -41,9 +36,9 @@ import org.helioviewer.viewmodel.viewport.Viewport;
  * to a texture object which can then be used to be mapped onto a 3D mesh. Use a
  * {@link GL3DImageMesh} to connect the resulting texture to a mesh, or directly
  * use the {@link GL3DShaderFactory} to create standard Image Meshes.
- * 
+ *
  * @author Simon Spoerri (simon.spoerri@fhnw.ch)
- * 
+ *
  */
 public class GL3DImageTextureView extends AbstractGL3DView implements GL3DView, GLFragmentShaderView {
 
@@ -57,14 +52,16 @@ public class GL3DImageTextureView extends AbstractGL3DView implements GL3DView, 
     public MetaData metadata = null;
     public double minZ = 0.0;
     public double maxZ = Constants.SunRadius;
-    private GL3DImageFragmentShaderProgram fragmentShader = new GL3DImageFragmentShaderProgram();
+    private final GL3DImageFragmentShaderProgram fragmentShader = new GL3DImageFragmentShaderProgram();
     private double xScale;
     private double yScale;
 
+    @Override
     public void renderGL(GL gl, boolean nextView) {
         render3D(GL3DState.get());
     }
 
+    @Override
     public void render3D(GL3DState state) {
         GL gl = state.gl;
         if (this.getView() != null) {
@@ -83,6 +80,7 @@ public class GL3DImageTextureView extends AbstractGL3DView implements GL3DView, 
         }
     }
 
+    @Override
     public void deactivate(GL3DState state) {
         textureHelper.delTextureID(state.gl, this.textureId);
         this.textureId = -1;
@@ -141,28 +139,21 @@ public class GL3DImageTextureView extends AbstractGL3DView implements GL3DView, 
 
     public double phi = 0.0;
 
+    @Override
     protected void setViewSpecificImplementation(View newView, ChangeEvent changeEvent) {
         newView.addViewListener(new ViewListener() {
 
+            @Override
             public void viewChanged(View sender, ChangeEvent aEvent) {
                 if (aEvent.reasonOccurred(RegionChangedReason.class)) {
                     recaptureRequested = true;
                     regionChanged = true;
-                    // System.out.println("REAS1");
                 } else if (aEvent.reasonOccurred(RegionUpdatedReason.class)) {
-                    // regionChanged = true;
                     regionChanged = true;
-                    System.out.println("REAS2");
-
                 } else if (aEvent.reasonOccurred(SubImageDataChangedReason.class)) {
-                    // regionChanged = true;
                     recaptureRequested = true;
-                    System.out.println("REAS3");
-
                 } else if (aEvent.reasonOccurred(CacheStatusChangedReason.class)) {
                     recaptureRequested = true;
-                    System.out.println("REAS4");
-
                 }
             }
         });
