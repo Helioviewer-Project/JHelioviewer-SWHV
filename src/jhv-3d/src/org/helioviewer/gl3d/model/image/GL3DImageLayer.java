@@ -13,7 +13,6 @@ import org.helioviewer.gl3d.GL3DHelper;
 import org.helioviewer.gl3d.camera.GL3DCamera;
 import org.helioviewer.gl3d.camera.GL3DCameraListener;
 import org.helioviewer.gl3d.model.GL3DHitReferenceShape;
-import org.helioviewer.gl3d.scenegraph.GL3DDrawBits.Bit;
 import org.helioviewer.gl3d.scenegraph.GL3DNode;
 import org.helioviewer.gl3d.scenegraph.GL3DOrientedGroup;
 import org.helioviewer.gl3d.scenegraph.GL3DState;
@@ -30,26 +29,20 @@ import org.helioviewer.gl3d.view.GL3DView;
 import org.helioviewer.gl3d.wcs.CoordinateConversion;
 import org.helioviewer.gl3d.wcs.CoordinateSystem;
 import org.helioviewer.gl3d.wcs.CoordinateVector;
-import org.helioviewer.jhv.display.Displayer;
-import org.helioviewer.jhv.internal_plugins.filter.opacity.DynamicOpacityFilter;
 import org.helioviewer.viewmodel.changeevent.ChangeEvent;
-import org.helioviewer.viewmodel.filter.Filter;
-import org.helioviewer.viewmodel.metadata.HelioviewerMetaData;
 import org.helioviewer.viewmodel.metadata.MetaData;
 import org.helioviewer.viewmodel.region.Region;
 import org.helioviewer.viewmodel.region.StaticRegion;
 import org.helioviewer.viewmodel.view.MetaDataView;
 import org.helioviewer.viewmodel.view.RegionView;
-import org.helioviewer.viewmodel.view.View;
-import org.helioviewer.viewmodel.view.opengl.GLFilterView;
 
 /**
  * This is the scene graph equivalent of an image layer sub view chain attached
  * to the GL3DLayeredView. It represents exactly one image layer in the view
  * chain
- * 
+ *
  * @author Simon Spoerri (simon.spoerri@fhnw.ch)
- * 
+ *
  */
 public abstract class GL3DImageLayer extends GL3DOrientedGroup implements GL3DCameraListener {
     private static int nextLayerId = 0;
@@ -73,8 +66,7 @@ public abstract class GL3DImageLayer extends GL3DOrientedGroup implements GL3DCa
 
     protected boolean doUpdateROI = true;
 
-    private ArrayList<Point> points = new ArrayList<Point>();
-    private DynamicOpacityFilter opacityFilter;
+    private final ArrayList<Point> points = new ArrayList<Point>();
 
     private double lastViewAngle = 0.0;
 
@@ -84,7 +76,7 @@ public abstract class GL3DImageLayer extends GL3DOrientedGroup implements GL3DCa
 
     public GL3DImageLayer(String name, GL3DView mainLayerView) {
         super(name);
-        
+
         layerId = nextLayerId++;
 
         this.mainLayerView = mainLayerView;
@@ -111,7 +103,6 @@ public abstract class GL3DImageLayer extends GL3DOrientedGroup implements GL3DCa
             throw new IllegalStateException("Cannot create GL3DImageLayer when no RegionView is present in Layer");
         }
 
-        initOpacityFilter(mainLayerView);
         getCoordinateSystem().addListener(this);
         this.doUpdateROI = true;
         this.markAsChanged();
@@ -120,29 +111,10 @@ public abstract class GL3DImageLayer extends GL3DOrientedGroup implements GL3DCa
     public void shapeDraw(GL3DState state) {
         super.shapeDraw(state);
     }
-/*    
-    public void updateMatrix(GL3DState state) {
-		HelioviewerMetaData metadata = (HelioviewerMetaData)this.metaDataView.getMetaData();
-		double deltat = metadata.getDateTime().getMillis()/1000.0;
-		double phi = DifferentialRotation.calculateRotationInRadians(0.0, deltat);
-    	this.modelView().rotate(phi, new GL3DVec3d(0,1,0));
-    }
-*/    
-    private void initOpacityFilter(View mainLayerView) {
-        // Get opacity filter from view chain
-        View filterView = mainLayerView;
-        while ((filterView = filterView.getAdapter(GLFilterView.class)) != null && opacityFilter == null) {
-            Filter filter = ((GLFilterView) filterView).getFilter();
-            if (DynamicOpacityFilter.class.isInstance(filter)){
-                opacityFilter = (DynamicOpacityFilter) filter;
-            }
-        }
 
-        if (opacityFilter == null)
-            throw new IllegalStateException("Cannot create GL3DImageLayer when no DynamicOpacityFilter is present in ViewChain");
-    }
 
-    public void shapeInit(GL3DState state) {
+    @Override
+	public void shapeInit(GL3DState state) {
         this.createImageMeshNodes(state.gl);
 
         CoordinateVector orientationVector = this.getOrientation();
@@ -169,7 +141,8 @@ public abstract class GL3DImageLayer extends GL3DOrientedGroup implements GL3DCa
 
     protected abstract GL3DImageMesh getImageSphere();
 
-    public void shapeUpdate(GL3DState state) {
+    @Override
+	public void shapeUpdate(GL3DState state) {
         super.shapeUpdate(state);
         if (doUpdateROI) {
             this.updateROI(state.getActiveCamera());
@@ -178,7 +151,8 @@ public abstract class GL3DImageLayer extends GL3DOrientedGroup implements GL3DCa
         }
     }
 
-    public void cameraMoved(GL3DCamera camera) {
+    @Override
+	public void cameraMoved(GL3DCamera camera) {
         doUpdateROI = true;
         if (this.accellerationShape!=null)
             this.accellerationShape.markAsChanged();
@@ -195,7 +169,8 @@ public abstract class GL3DImageLayer extends GL3DOrientedGroup implements GL3DCa
         }
     }
 
-    public void cameraMoving(GL3DCamera camera) {
+    @Override
+	public void cameraMoving(GL3DCamera camera) {
         GL3DMat4d camTrans = camera.getRotation().toMatrix().inverse();
         GL3DVec4d camDirection = new GL3DVec4d(0, 0, 1, 1);
         camDirection = camTrans.multiply(camDirection);
@@ -235,11 +210,13 @@ public abstract class GL3DImageLayer extends GL3DOrientedGroup implements GL3DCa
         this.direction = direction;
     }
 
-    public CoordinateSystem getCoordinateSystem() {
+    @Override
+	public CoordinateSystem getCoordinateSystem() {
         return this.coordinateSystemView.getCoordinateSystem();
     }
 
-    public CoordinateVector getOrientation() {
+    @Override
+	public CoordinateVector getOrientation() {
         return this.coordinateSystemView.getOrientation();
     }
 
