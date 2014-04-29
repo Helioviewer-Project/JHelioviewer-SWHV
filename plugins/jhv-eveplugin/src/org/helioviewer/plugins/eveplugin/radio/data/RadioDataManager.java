@@ -899,106 +899,108 @@ public class RadioDataManager implements RadioDownloaderListener{//,ViewListener
 			SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
 			DownloadRequestData drd = new DownloadRequestData(downloadID,plotIdentifier);
 			drd.setDownloading(true);
-			lineDataSelectorModel.addLineData(drd); 
-			for (DownloadedJPXData djd : jpxFiles){
-				//Log.debug("Handling jpx file with ID "+ djd.getImageID()); 
-				//JHVJPXView jpxView = djd.getView().getAdapter(JHVJPXView.class);
-				JHVJP2View jpxView = djd.getView().getAdapter(JHVJP2View.class);
-				if (jpxView != null){
-					//Log.debug("Setting the Reader mode");
-					jpxView.setReaderMode(ReaderMode.ONLYFIREONCOMPLETE);
-					//jpxView.addViewListener(this);
-					//jpxView.addViewListener(testFrame);
-					JP2Image image = jpxView.getJP2Image();
-					//currentJP2View = jpxView;
-					//isCurrentJPX = true;
-					//currentJP2Image = currentJP2View.getJP2Image();
-					ResolutionSet rs = image.getResolutionSet();
-					//Log.debug("the resolution set : " +rs.toString());
-					for (int i = 0; i <= rs.getMaxResolutionLevels();i++){
-						//Log.debug("resolution level " + i + " : " + rs.getResolutionLevel(i));
-					}
-					//Log.debug("++++++++++++++++++++++++++++++++++++++");
-					Interval<Integer> interval = image.getCompositionLayerRange();
-					//Log.debug("the interval is : " + interval);
-					//Log.debug("the start of the interval : " + interval.getStart());
-					//Log.debug("the end of the interval : "+ interval.getEnd());
-					LineDataSelectorModel.getSingletonInstance().downloadStarted(drd);
-					for(int i=interval.getStart(); i<= interval.getEnd(); i++){
-						try{
-							/*Log.debug("BITPIX : " + image.get("BITPIX",i));
-							Log.debug("NAXIS1 : " + image.get("NAXIS1",i));
-							Log.debug("NAXIS2 : " + image.get("NAXIS2",i));
-							Log.debug("DATE-OBS : " + image.get("DATE-OBS",i));
-							Log.debug("TELESCOP : " + image.get("TELESCOP",i));
-							Log.debug("INSTRUME : " + image.get("INSTRUME",i));
-							Log.debug("DETECTOR : " + image.get("DETECTOR",i));
-							Log.debug("WAVELNTH : " + image.get("WAVELNTH",i));
-							Log.debug("DATE-END : " + image.get("DATE-END",i));
-							Log.debug("TIMEDELT : " + image.get("TIMEDELT",i));
-							Log.debug("STARTFREQ : " + image.get("STARTFRQ",i));
-							Log.debug("END-FREQ : " + image.get("END-FREQ",i));
-							Log.debug("FREQDELT : " + image.get("FREQDELT",i));
-							Log.debug("CDELT1 : " + image.get("CDELT1",i));
-							Log.debug("CDELT2 : " + image.get("CDELT2",i));
-							Log.debug("CRPIX1 : " + image.get("CRPIX1",i));
-							Log.debug("CRPIX2 : " + image.get("CRPIX2",i));*/
-							SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
-							FrequencyInterval fi = new FrequencyInterval(
-									Integer.parseInt(image.get("STARTFRQ",i)),
-									Integer.parseInt(image.get("END-FREQ",i)));
-							//Log.debug("Ratios : ");
-							Date start = null;
-							Date end = null;
-							try {
-								start = sdf.parse(image.get("DATE-OBS",i));
-								end = sdf.parse(image.get("DATE-END",i));
-							} catch (ParseException e) {
-								// TODO Auto-generated catch block
-								e.printStackTrace();
-								Log.error("Could not parse  "+ image.get("DATE-OBS",i) +" or "+ image.get("DATE-END",i));
-							}
-							List<ResolutionSetting> resolutionSettings = new ArrayList<ResolutionSetting>();
-							if(start !=null && end != null){
-								Double freqStart = Double.parseDouble(image.get("STARTFRQ",i));
-								Double freqEnd = Double.parseDouble(image.get("END-FREQ",i));
-								Interval<Date> dateInterval = new Interval<Date>(start,end);
-								for (int j = 0; j <= rs.getMaxResolutionLevels();j++){
-									ResolutionSetting tempResSet = new ResolutionSetting(
-											(1.0*(end.getTime()-start.getTime())/rs.getResolutionLevel(j).getResolutionBounds().width), 
-											((freqEnd-freqStart)/rs.getResolutionLevel(j).getResolutionBounds().height), 
-											j, 
-											rs.getResolutionLevel(j).getResolutionBounds().width,
-											rs.getResolutionLevel(j).getResolutionBounds().height, 
-											rs.getResolutionLevel(j).getZoomLevel());
-									resolutionSettings.add(tempResSet);
-									/*Log.debug("resolution level " + j + " : " +rs.getResolutionLevel(j));
-									Log.debug("Frequency Ratio : " + ((freqEnd-freqStart)/rs.getResolutionLevel(j).getResolutionBounds().height));
-									Log.debug("Date ratio: " + (1.0*(end.getTime()-start.getTime())/rs.getResolutionLevel(j).getResolutionBounds().width));
-									Log.debug("************************************");*/
-								}
-								int highestLevel = -1;
-								ResolutionSetting lastUsedResolutionSetting = null;
-								for(ResolutionSetting rst : resolutionSettings){
-									if(rst.getResolutionLevel()>highestLevel){
-										highestLevel = rst.getResolutionLevel();
-										lastUsedResolutionSetting = rst;
-									}
-								}
-								jpxView.setViewport(new ViewportAdapter(new StaticViewport(lastUsedResolutionSetting.getVec2dIntRepresentation())), new ChangeEvent());
-								RadioImage tempRs = new RadioImage(djd, downloadID, djd.getImageID(),dateInterval,fi,i,rs,resolutionSettings,plotIdentifier, true);
-								tempRs.setLastUsedResolutionSetting(lastUsedResolutionSetting);
-								drd.addRadioImage(tempRs);
-							}else{
-								//Log.debug("Start and/or stop is null");
-							}
-						}catch( IOException e){
-							Log.error("Some of the metadata could not be read aborting...");
-							return;
+			lineDataSelectorModel.addLineData(drd);
+			if(!jpxFiles.isEmpty()){
+				for (DownloadedJPXData djd : jpxFiles){
+					//Log.debug("Handling jpx file with ID "+ djd.getImageID()); 
+					//JHVJPXView jpxView = djd.getView().getAdapter(JHVJPXView.class);
+					JHVJP2View jpxView = djd.getView().getAdapter(JHVJP2View.class);
+					if (jpxView != null){
+						//Log.debug("Setting the Reader mode");
+						jpxView.setReaderMode(ReaderMode.ONLYFIREONCOMPLETE);
+						//jpxView.addViewListener(this);
+						//jpxView.addViewListener(testFrame);
+						JP2Image image = jpxView.getJP2Image();
+						//currentJP2View = jpxView;
+						//isCurrentJPX = true;
+						//currentJP2Image = currentJP2View.getJP2Image();
+						ResolutionSet rs = image.getResolutionSet();
+						//Log.debug("the resolution set : " +rs.toString());
+						for (int i = 0; i <= rs.getMaxResolutionLevels();i++){
+							//Log.debug("resolution level " + i + " : " + rs.getResolutionLevel(i));
 						}
-						//Log.debug("++++++++++++++++++++++++++++++++++++++++++++++++++++++++");
+						//Log.debug("++++++++++++++++++++++++++++++++++++++");
+						Interval<Integer> interval = image.getCompositionLayerRange();
+						//Log.debug("the interval is : " + interval);
+						//Log.debug("the start of the interval : " + interval.getStart());
+						//Log.debug("the end of the interval : "+ interval.getEnd());
+						LineDataSelectorModel.getSingletonInstance().downloadStarted(drd);
+						for(int i=interval.getStart(); i<= interval.getEnd(); i++){
+							try{
+								/*Log.debug("BITPIX : " + image.get("BITPIX",i));
+								Log.debug("NAXIS1 : " + image.get("NAXIS1",i));
+								Log.debug("NAXIS2 : " + image.get("NAXIS2",i));
+								Log.debug("DATE-OBS : " + image.get("DATE-OBS",i));
+								Log.debug("TELESCOP : " + image.get("TELESCOP",i));
+								Log.debug("INSTRUME : " + image.get("INSTRUME",i));
+								Log.debug("DETECTOR : " + image.get("DETECTOR",i));
+								Log.debug("WAVELNTH : " + image.get("WAVELNTH",i));
+								Log.debug("DATE-END : " + image.get("DATE-END",i));
+								Log.debug("TIMEDELT : " + image.get("TIMEDELT",i));
+								Log.debug("STARTFREQ : " + image.get("STARTFRQ",i));
+								Log.debug("END-FREQ : " + image.get("END-FREQ",i));
+								Log.debug("FREQDELT : " + image.get("FREQDELT",i));
+								Log.debug("CDELT1 : " + image.get("CDELT1",i));
+								Log.debug("CDELT2 : " + image.get("CDELT2",i));
+								Log.debug("CRPIX1 : " + image.get("CRPIX1",i));
+								Log.debug("CRPIX2 : " + image.get("CRPIX2",i));*/
+								SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
+								FrequencyInterval fi = new FrequencyInterval(
+										Integer.parseInt(image.get("STARTFRQ",i)),
+										Integer.parseInt(image.get("END-FREQ",i)));
+								//Log.debug("Ratios : ");
+								Date start = null;
+								Date end = null;
+								try {
+									start = sdf.parse(image.get("DATE-OBS",i));
+									end = sdf.parse(image.get("DATE-END",i));
+								} catch (ParseException e) {
+									// TODO Auto-generated catch block
+									e.printStackTrace();
+									Log.error("Could not parse  "+ image.get("DATE-OBS",i) +" or "+ image.get("DATE-END",i));
+								}
+								List<ResolutionSetting> resolutionSettings = new ArrayList<ResolutionSetting>();
+								if(start !=null && end != null){
+									Double freqStart = Double.parseDouble(image.get("STARTFRQ",i));
+									Double freqEnd = Double.parseDouble(image.get("END-FREQ",i));
+									Interval<Date> dateInterval = new Interval<Date>(start,end);
+									for (int j = 0; j <= rs.getMaxResolutionLevels();j++){
+										ResolutionSetting tempResSet = new ResolutionSetting(
+												(1.0*(end.getTime()-start.getTime())/rs.getResolutionLevel(j).getResolutionBounds().width), 
+												((freqEnd-freqStart)/rs.getResolutionLevel(j).getResolutionBounds().height), 
+												j, 
+												rs.getResolutionLevel(j).getResolutionBounds().width,
+												rs.getResolutionLevel(j).getResolutionBounds().height, 
+												rs.getResolutionLevel(j).getZoomLevel());
+										resolutionSettings.add(tempResSet);
+										/*Log.debug("resolution level " + j + " : " +rs.getResolutionLevel(j));
+										Log.debug("Frequency Ratio : " + ((freqEnd-freqStart)/rs.getResolutionLevel(j).getResolutionBounds().height));
+										Log.debug("Date ratio: " + (1.0*(end.getTime()-start.getTime())/rs.getResolutionLevel(j).getResolutionBounds().width));
+										Log.debug("************************************");*/
+									}
+									int highestLevel = -1;
+									ResolutionSetting lastUsedResolutionSetting = null;
+									for(ResolutionSetting rst : resolutionSettings){
+										if(rst.getResolutionLevel()>highestLevel){
+											highestLevel = rst.getResolutionLevel();
+											lastUsedResolutionSetting = rst;
+										}
+									}
+									jpxView.setViewport(new ViewportAdapter(new StaticViewport(lastUsedResolutionSetting.getVec2dIntRepresentation())), new ChangeEvent());
+									RadioImage tempRs = new RadioImage(djd, downloadID, djd.getImageID(),dateInterval,fi,i,rs,resolutionSettings,plotIdentifier, true);
+									tempRs.setLastUsedResolutionSetting(lastUsedResolutionSetting);
+									drd.addRadioImage(tempRs);
+								}else{
+									//Log.debug("Start and/or stop is null");
+								}
+							}catch( IOException e){
+								Log.error("Some of the metadata could not be read aborting...");
+								return;
+							}
+							//Log.debug("++++++++++++++++++++++++++++++++++++++++++++++++++++++++");
+						}
+						//Log.debug("Finished processing image with ID "+ djd.getImageID());
 					}
-					//Log.debug("Finished processing image with ID "+ djd.getImageID());
 				}
 			}
 			this.downloadRequestData.put(downloadID, drd);

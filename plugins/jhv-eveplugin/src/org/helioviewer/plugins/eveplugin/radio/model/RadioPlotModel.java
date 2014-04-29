@@ -93,7 +93,9 @@ public class RadioPlotModel implements RadioDataManagerListener,ZoomControllerLi
 	@Override
 	public void newDataAvailable(DownloadRequestData data, long ID) {
 		synchronized (this) {
-			getRadioPlotModelData(data.getPlotIdentifier()).getDownloadRequestData().put(ID,data);
+			getRadioPlotModelData(data.getPlotIdentifier()).getDownloadRequestData().put(ID,data);			
+			Map<Long,PlotConfig> plotConfigList = new HashMap<Long,PlotConfig>();
+			getRadioPlotModelData(data.getPlotIdentifier()).getPlotConfigList().put(ID, plotConfigList);
 		}			
 	}
 
@@ -508,6 +510,8 @@ public class RadioPlotModel implements RadioDataManagerListener,ZoomControllerLi
 	@Override
 	public void intervalTooBig(long iD, String identifier) {
 		RadioImagePane radioImagePane = getRadioPlotModelData(identifier).getRadioImagePane();
+		Map<Long,PlotConfig> plotConfigList = new HashMap<Long,PlotConfig>();
+		getRadioPlotModelData(identifier).getPlotConfigList().put(iD, plotConfigList);
 		radioImagePane.setIntervalTooBig(true);
 		drawController.updateDrawableElement(radioImagePane, identifier);
 	}
