@@ -12,7 +12,9 @@ public class GL3DImageFragmentShaderProgram extends GLFragmentShaderProgram {
     private double xTextureScale;
     private double yTextureScale;
     private double theta;
-    private double phi;    
+    private double phi;
+	private double xxTextureScale = 1.0;
+	private double yyTextureScale = 1.0;    
 
     public GL3DImageFragmentShaderProgram() {
     }
@@ -23,7 +25,7 @@ public class GL3DImageFragmentShaderProgram extends GLFragmentShaderProgram {
      *            Valid reference to the current gl object
      */
     public final void bind(GL gl) {
-        bind(gl, shaderID, cutOffRadius, xTextureScale, yTextureScale, theta, phi);
+        bind(gl, shaderID, cutOffRadius, xxTextureScale, yyTextureScale, theta, phi);
     }
     private static void bind(GL gl, int shader, double cutOffRadius, double xTextureScale, double yTextureScale, double theta, double phi) {
         shaderCurrentlyUsed = shader;
@@ -68,7 +70,7 @@ public class GL3DImageFragmentShaderProgram extends GLFragmentShaderProgram {
 
     protected void buildImpl(GLShaderBuilder shaderBuilder) {
         try {
-            String program = "\tif(texcoord0.x<0.0||texcoord0.y<0.0){"
+            String program = "\tif(texcoord0.x<0.0||texcoord0.y<0.0||texcoord0.x>textureScaleThetaPhi.x||texcoord0.y>textureScaleThetaPhi.y){"
                     + "\t\tOUT.color = float4(1.0,0.0,0.0,1.0);" + GLShaderBuilder.LINE_SEP
                     + "\t}"+ GLShaderBuilder.LINE_SEP;
             program += "\tOUT.color.a=0.7;" + GLShaderBuilder.LINE_SEP;
@@ -108,8 +110,8 @@ public class GL3DImageFragmentShaderProgram extends GLFragmentShaderProgram {
     }
     
     public void changeTextureScale(double xTextureScale, double yTextureScale) {
-        this.xTextureScale = xTextureScale;
-        this.yTextureScale = yTextureScale;
+        this.xxTextureScale = xTextureScale;
+        this.yyTextureScale = yTextureScale;
     }
     
     public void setCutOffRadius(double cutOffRadius){

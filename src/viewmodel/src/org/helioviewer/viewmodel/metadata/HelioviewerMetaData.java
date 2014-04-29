@@ -275,11 +275,19 @@ public class HelioviewerMetaData extends AbstractMetaData implements SunMetaData
 
         Region region = StaticRegion.createAdaptedRegion((roi.x/zoompercent-sunPixelPosition.getX())*meterPerPixel, 
     			(roi.y/zoompercent-sunPixelPosition.getY())*meterPerPixel, 
-    			roi.width*meterPerPixel/zoompercent/roi.width*nextPowerOfTwo(roi.width), 
-    			roi.height*meterPerPixel/zoompercent/roi.height*nextPowerOfTwo(roi.height));
+    			roi.width*meterPerPixel/zoompercent, 
+    			roi.height*meterPerPixel/zoompercent);
         System.out.println("REGION" + region);
         return region;
     }
+
+	public double getScaleX(SubImage roi) {
+		return 1.*roi.width/nextPowerOfTwo(roi.width);
+	}
+	public double getScaleY(SubImage roi) {
+		return 1.*roi.height/nextPowerOfTwo(roi.height);
+	}
+    
     private int nextPowerOfTwo(int input) {
         int output = 1;
         while (output < input) {
@@ -386,5 +394,6 @@ public class HelioviewerMetaData extends AbstractMetaData implements SunMetaData
     public boolean checkForModifications() {
         return updatePixelParameters();
     }
+
 
 }
