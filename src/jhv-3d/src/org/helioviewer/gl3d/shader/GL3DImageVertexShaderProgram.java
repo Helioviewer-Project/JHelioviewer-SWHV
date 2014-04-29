@@ -3,6 +3,7 @@ package org.helioviewer.gl3d.shader;
 import javax.media.opengl.GL;
 
 import org.helioviewer.base.math.Vector2dDouble;
+import org.helioviewer.viewmodel.view.opengl.GLTextureHelper;
 import org.helioviewer.viewmodel.view.opengl.shader.GLShaderBuilder;
 import org.helioviewer.viewmodel.view.opengl.shader.GLShaderBuilder.GLBuildShaderException;
 import org.helioviewer.viewmodel.view.opengl.shader.GLVertexShaderProgram;
@@ -10,18 +11,14 @@ import org.helioviewer.viewmodel.view.opengl.shader.GLVertexShaderProgram;
 public class GL3DImageVertexShaderProgram extends GLVertexShaderProgram {
 	private double theta;
 	private double phi;
-	private double xxOffset;
-	private double yyOffset;
-	private double xxScale;
-	private double yyScale;
-	private double xxTextureScale;
-	private double yyTextureScale;
+
 	
     /**
      * {@inheritDoc}
      */
     public final void bind(GL gl) {
-    	bind(gl, shaderID, xxOffset, yyOffset, xxScale, yyScale, xxTextureScale, yyTextureScale, defaultXOffset, defaultYOffset, theta, phi);
+    	GLTextureHelper th =  new GLTextureHelper();
+    	bind(gl, shaderID, xOffset, yOffset, xScale, yScale, th.scaleX, th.scaleY, defaultXOffset, defaultYOffset, theta, phi);
     }	
     private static void bind(GL gl, int shader, double xOffset, double yOffset, double xScale, double yScale, double xTextureScale, double yTextureScale, double defaultXOffset, double defaultYOffset, double theta, double phi) {
         if (shader != shaderCurrentlyUsed) {
@@ -55,8 +52,10 @@ public class GL3DImageVertexShaderProgram extends GLVertexShaderProgram {
             program += "\toutput.x *= rect.z;" + GLShaderBuilder.LINE_SEP;
             program += "\toutput.y *= rect.w;" + GLShaderBuilder.LINE_SEP;
 
-            program += "\toutput.x *= textureScaleThetaPhi.x;" + GLShaderBuilder.LINE_SEP;
-            program += "\toutput.y *= textureScaleThetaPhi.y;" + GLShaderBuilder.LINE_SEP;			
+            //program += "\toutput.x *= textureScaleThetaPhi.x;" + GLShaderBuilder.LINE_SEP;
+            //program += "\toutput.y *= textureScaleThetaPhi.y;" + GLShaderBuilder.LINE_SEP;
+            //program += "\toutput.y = 1.-output.y;" + GLShaderBuilder.LINE_SEP;
+
             program += "\tpositionPass = position;" + GLShaderBuilder.LINE_SEP;
 
             program += "\tfloat xrott = physicalPosition.x;" + GLShaderBuilder.LINE_SEP;
@@ -66,7 +65,9 @@ public class GL3DImageVertexShaderProgram extends GLVertexShaderProgram {
             program += "\t physicalPosition.x = xrott*cos(phi) - zrott*sin(phi);" + GLShaderBuilder.LINE_SEP;
             program += "\t physicalPosition.y = yrott;" + GLShaderBuilder.LINE_SEP;
             program += "\t physicalPosition.z = xrott*sin(phi) + zrott*cos(phi);" + GLShaderBuilder.LINE_SEP;
-            program += "\t OUT.position = mul(state_matrix_mvp, physicalPosition);" + GLShaderBuilder.LINE_SEP;          
+            program += "\t OUT.position = mul(state_matrix_mvp, physicalPosition);" + GLShaderBuilder.LINE_SEP;
+            program += "\t OUT.position.y = OUT.position.y;" + GLShaderBuilder.LINE_SEP;          
+
             program += "\t}"+ GLShaderBuilder.LINE_SEP;
             program += "\telse{"+ GLShaderBuilder.LINE_SEP;
             program += "\tfloat theta = -textureScaleThetaPhi.z;" + GLShaderBuilder.LINE_SEP;
@@ -84,9 +85,12 @@ public class GL3DImageVertexShaderProgram extends GLVertexShaderProgram {
 
             program += "\toutput.x *= rect.z;" + GLShaderBuilder.LINE_SEP;
             program += "\toutput.y *= rect.w;" + GLShaderBuilder.LINE_SEP;
+            //program += "\toutput.y = 1.-output.y;" + GLShaderBuilder.LINE_SEP;
 
-            program += "\toutput.x *= textureScaleThetaPhi.x;" + GLShaderBuilder.LINE_SEP;
-            program += "\toutput.y *= textureScaleThetaPhi.y;" + GLShaderBuilder.LINE_SEP;            
+            //program += "\toutput.x *= textureScaleThetaPhi.x;" + GLShaderBuilder.LINE_SEP;
+            //program += "\toutput.y *= textureScaleThetaPhi.y;" + GLShaderBuilder.LINE_SEP;    
+            program += "\t OUT.position.y = OUT.position.y;" + GLShaderBuilder.LINE_SEP;          
+
             program += "}"+ GLShaderBuilder.LINE_SEP;
 
 			            
@@ -108,10 +112,10 @@ public class GL3DImageVertexShaderProgram extends GLVertexShaderProgram {
     }
     
     public void changeRect(double xOffset, double yOffset, double xScale, double yScale){
-    	this.xxOffset = xOffset;
-    	this.yyOffset = yOffset;
-    	this.xxScale = xScale;
-    	this.yyScale = yScale;
+    	this.xOffset = xOffset;
+    	this.yOffset = yOffset;
+    	this.xScale = xScale;
+    	this.yScale = yScale;
     }
 
 	public void setDefaultOffset(double x, double y){
@@ -121,8 +125,8 @@ public class GL3DImageVertexShaderProgram extends GLVertexShaderProgram {
 
 	public void changeTextureScale(Vector2dDouble textureScale) {
 		if(textureScale!=null){
-		this.xxTextureScale = textureScale.getX();
-		this.yyTextureScale = textureScale.getY();
+		this.xTextureScale = textureScale.getX();
+		this.yTextureScale = textureScale.getY();
 		}
 	}
 

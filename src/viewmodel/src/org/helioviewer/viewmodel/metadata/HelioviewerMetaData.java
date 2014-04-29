@@ -5,8 +5,12 @@ import org.helioviewer.base.math.MathUtils;
 import org.helioviewer.base.math.Vector2dDouble;
 import org.helioviewer.base.math.Vector2dInt;
 import org.helioviewer.base.physics.Constants;
+import org.helioviewer.viewmodel.region.Region;
+import org.helioviewer.viewmodel.region.StaticRegion;
 import org.helioviewer.viewmodel.view.cache.HelioviewerDateTimeCache;
 import org.helioviewer.viewmodel.view.jp2view.datetime.ImmutableDateTime;
+import org.helioviewer.viewmodel.view.jp2view.image.ResolutionSet.ResolutionLevel;
+import org.helioviewer.viewmodel.view.jp2view.image.SubImage;
 
 /**
  * Implementation of MetaData representing solar images.
@@ -263,7 +267,26 @@ public class HelioviewerMetaData extends AbstractMetaData implements SunMetaData
 
         return changed;
     }
+    
+    public Region roiToRegion(SubImage roi, double zoompercent){
+    	System.out.println("ROIWHAT " + roi.width + " " + sunPixelPosition.getX() + " " + roi.x + " "+ " " + pixelImageSize.getX());
+    	System.out.println("ROIWHAT " + roi.height + " " + sunPixelPosition.getY() + " " + roi.y+ " " + pixelImageSize.getX());
+        System.out.println("RESOLUTION" + zoompercent);
 
+        Region region = StaticRegion.createAdaptedRegion((roi.x/zoompercent-sunPixelPosition.getX())*meterPerPixel, 
+    			(roi.y/zoompercent-sunPixelPosition.getY())*meterPerPixel, 
+    			roi.width*meterPerPixel/zoompercent/roi.width*nextPowerOfTwo(roi.width), 
+    			roi.height*meterPerPixel/zoompercent/roi.height*nextPowerOfTwo(roi.height));
+        System.out.println("REGION" + region);
+        return region;
+    }
+    private int nextPowerOfTwo(int input) {
+        int output = 1;
+        while (output < input) {
+            output <<= 1;
+        }
+        return output;
+    }    
     /**
      * {@inheritDoc}
      */
@@ -364,15 +387,4 @@ public class HelioviewerMetaData extends AbstractMetaData implements SunMetaData
         return updatePixelParameters();
     }
 
-    /**
-     * Get sun radius in arcsec
-     * 
-     * @author Carlos Martin
-     * 
-     * @return sun radius (in arcsec)
-     */
-    public double getRadiusSuninArcsec() {
-        double distanceToSun = metaDataContainer.tryGetDouble("DSUN_OBS");
-        return Math.atan(Constants.SunRadius / distanceToSun) * MathUtils.radeg * 3600;
-    }
 }

@@ -255,12 +255,10 @@ public class BufferedImageTimeMachineView extends AbstractBasicView implements S
         if (frameNumber < 0 || frameNumber > movieView.getMaximumFrameNumber())
             return null;
         // Ask slave if set
-        System.out.println("Thread " + Thread.currentThread().getId() + " tries to render through secondary slave on object " + slaveWait);
         if (slaveView == null) {
             return null;
         }
         synchronized (slaveLock) {
-            System.out.println("Start rendering through slave");
             synchronized (slaveWait) {
                 slaveMovieView.setCurrentFrame(frameNumber, new ChangeEvent(), true);
                 try {

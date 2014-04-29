@@ -50,6 +50,10 @@ public class GLTextureHelper {
     
     private static GLTextureCoordinate mainTexCoord = new GLMainTextureCoordinate();
     private static GLTextureCoordinate scaleTexCoord = new GLScaleTextureCoordinate();
+    public static double scaleX;
+    public static double scaleY;    
+
+    
 
     private static HashMap<Integer, Vector2dDouble> allTextures = new HashMap<Integer, Vector2dDouble>();
 
@@ -946,6 +950,7 @@ public class GLTextureHelper {
             
             // Log.debug("GLTextureHelper.genTexture2D: Width="+width+", Height="+height+" Width2="+width2+", Height2="+height2);
             if (buffer != null) {
+            	//System.out.println("TEXSUBIM" + width + " " + height);
             	gl.glTexSubImage2D(GL.GL_TEXTURE_2D, 0, 0, 0, width, height, inputFormat, inputType, buffer);
             }
             
@@ -954,10 +959,10 @@ public class GLTextureHelper {
             gl.glTexParameteri(GL.GL_TEXTURE_2D, GL.GL_TEXTURE_WRAP_S, GL.GL_CLAMP_TO_BORDER);
             gl.glTexParameteri(GL.GL_TEXTURE_2D, GL.GL_TEXTURE_WRAP_T, GL.GL_CLAMP_TO_BORDER);
             
-            float scaleX = (float) 1.0*width / width2;
-            float scaleY = (float) 1.0*height / height2;
-            scaleTexCoord.setValue(gl, scaleX, scaleY);
-            System.out.println("SCALESET " +scaleX + " " +scaleY);
+            scaleX = (float) 1.0*width / width2;
+            scaleY = (float) 1.0*height / height2;
+            scaleTexCoord.setValue(gl, (float)scaleX, (float)scaleY);
+            //System.out.println("SCALESET " +scaleX + " " +scaleY);
             allTextures.put(texID, new Vector2dDouble(scaleX, scaleY));
         }
 

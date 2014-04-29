@@ -17,6 +17,7 @@ import org.helioviewer.viewmodel.changeevent.SubImageDataChangedReason;
 import org.helioviewer.viewmodel.changeevent.TimestampChangedReason;
 import org.helioviewer.viewmodel.changeevent.ViewportChangedReason;
 import org.helioviewer.viewmodel.imagedata.ImageData;
+import org.helioviewer.viewmodel.metadata.HelioviewerMetaData;
 import org.helioviewer.viewmodel.metadata.MetaData;
 import org.helioviewer.viewmodel.metadata.MetaDataConstructor;
 import org.helioviewer.viewmodel.metadata.ObserverMetaData;
@@ -89,9 +90,12 @@ public class JHVJP2View extends AbstractView implements JP2View, ViewportView, R
     protected J2KRender render;
     final ReasonSignal<RenderReasons> renderRequestedSignal = new ReasonSignal<RenderReasons>();
 
+	private SubImage roi;
+
     // Renderer-ThreadGroup - This group is necessary to identify all renderer
     // threads
     public static final ThreadGroup renderGroup = new ThreadGroup("J2KRenderGroup");
+	protected Region displayedRegion;
 
     /**
      * Default constructor.
@@ -606,7 +610,7 @@ public class JHVJP2View extends AbstractView implements JP2View, ViewportView, R
             if (imageData == null) {
                 return false;
             }
-            setSubimageData(null, null, 0);
+            setSubimageData(null, null, 0, 1.);
             return true;
         }
         imageViewParams = newParams;
@@ -657,8 +661,13 @@ public class JHVJP2View extends AbstractView implements JP2View, ViewportView, R
      *            Composition Layer rendered, to update meta data
      *            {@link org.helioviewer.viewmodel.region.Region}
      */
-    void setSubimageData(ImageData newImageData, SubImage roi, int compositionLayer) {
+    void setSubimageData(ImageData newImageData, SubImage roi, int compositionLayer, double zoompercent) {
     	imageData = newImageData;
+    	HelioviewerMetaData hvmd = (HelioviewerMetaData) metaData;
+        this.roi = roi;
+        
+        this.displayedRegion = hvmd.roiToRegion(this.roi, zoompercent);
+        
         Region lastRegionSaved = lastRegion;
         subImageBuffer.setLastRegion(roi);
         this.event.addReason(new RegionUpdatedReason(this, lastRegion));
@@ -666,8 +675,7 @@ public class JHVJP2View extends AbstractView implements JP2View, ViewportView, R
         if (!lastRegion.equals(lastRegionSaved)) {
             this.event.addReason(new RegionChangedReason(this, lastRegion));
         }
-
-        event.addReason(new SubImageDataChangedReason(this));
+//        event.addReason(new SubImageDataChangedReason(this));
 
         ChangeEvent fireEvent = null;
         synchronized (event) {

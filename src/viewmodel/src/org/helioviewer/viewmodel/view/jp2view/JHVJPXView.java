@@ -10,6 +10,7 @@ import org.helioviewer.viewmodel.changeevent.TimestampChangedReason;
 import org.helioviewer.viewmodel.imagedata.ImageData;
 import org.helioviewer.viewmodel.metadata.HelioviewerMetaData;
 import org.helioviewer.viewmodel.metadata.ObserverMetaData;
+import org.helioviewer.viewmodel.region.Region;
 import org.helioviewer.viewmodel.view.CachedMovieView;
 import org.helioviewer.viewmodel.view.LinkedMovieManager;
 import org.helioviewer.viewmodel.view.TimedMovieView;
@@ -393,20 +394,22 @@ public class JHVJPXView extends JHVJP2View implements TimedMovieView, CachedMovi
     /**
      * {@inheritDoc}
      */
-    void setSubimageData(ImageData newImageData, SubImage roi, int compositionLayer) {
+    void setSubimageData(ImageData newImageData, SubImage roi, int compositionLayer, double zoompercent) {
     	if(blockingMode){
 	    	synchronized(Displayer.displaylock){
-	    		setSubimageDataHelper(newImageData, roi, compositionLayer); 
+	    		
+	        	System.out.println("AfterRender started");
+	    		setSubimageDataHelper(newImageData, roi, compositionLayer, zoompercent); 
+		    	System.out.println("AfterRender finished");
 	    	}
     	}
     	else{
-    		setSubimageDataHelper(newImageData, roi, compositionLayer); 
+    		setSubimageDataHelper(newImageData, roi, compositionLayer, zoompercent); 
     	}
-    	System.out.println("Render finished");
     }
 
 
-    private void setSubimageDataHelper(ImageData newImageData, SubImage roi, int compositionLayer) {
+    private void setSubimageDataHelper(ImageData newImageData, SubImage roi, int compositionLayer, double zoompercent) {
         lastRenderedCompositionLayer = compositionLayer;
     	
         if (metaData instanceof ObserverMetaData) {
@@ -414,7 +417,7 @@ public class JHVJPXView extends JHVJP2View implements TimedMovieView, CachedMovi
             observerMetaData.updateDateTime(dateTimeCache.getDateTime(compositionLayer));
             event.addReason(new TimestampChangedReason(this, observerMetaData.getDateTime()));
         }
-        super.setSubimageData(newImageData, roi, 0);
+        super.setSubimageData(newImageData, roi,compositionLayer, zoompercent);
     }
     public LinkedMovieManager getLinkedMovieManager() {
         return linkedMovieManager;
@@ -489,7 +492,6 @@ public class JHVJPXView extends JHVJP2View implements TimedMovieView, CachedMovi
 
 	@Override
 	public void render() {
-        System.out.println("RR8");
         renderRequestedSignal.signal(RenderReasons.NEW_DATA);
 	}
 	
@@ -504,5 +506,11 @@ public class JHVJPXView extends JHVJP2View implements TimedMovieView, CachedMovi
 	}
 	public void setBlocking(boolean blockingMode) {
 		this.blockingMode = blockingMode;
+	}
+	public void setDisplayedRegion(Region region) {
+		this.displayedRegion = region;
+	}
+	public Region getDisplayedRegion() {
+		return this.displayedRegion;
 	}
 }
