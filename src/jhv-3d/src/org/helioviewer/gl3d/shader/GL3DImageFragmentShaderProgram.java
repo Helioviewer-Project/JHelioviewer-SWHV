@@ -21,7 +21,7 @@ public class GL3DImageFragmentShaderProgram extends GLFragmentShaderProgram {
 
     /**
      * Binds (= activates it) the shader, if it is not active so far.
-     * 
+     *
      * @param gl
      *            Valid reference to the current gl object
      */
@@ -39,10 +39,10 @@ public class GL3DImageFragmentShaderProgram extends GLFragmentShaderProgram {
 
     /**
      * Pushes the shader currently in use onto a stack.
-     * 
+     *
      * This is useful to load another shader but still being able to restore the
      * old one, similar to the very common pushMatrix() in OpenGL.
-     * 
+     *
      * @param gl
      *            Valid reference to the current gl object
      * @see #popShader(GL)
@@ -55,10 +55,10 @@ public class GL3DImageFragmentShaderProgram extends GLFragmentShaderProgram {
 
     /**
      * Takes the top of from the shader stack and binds it.
-     * 
+     *
      * This restores a shader pushed onto the stack earlier, similar to the very
      * common popMatrix() in OpenGL.
-     * 
+     *
      * @param gl
      *            Valid reference to the current gl object
      * @see #pushShader(GL)
