@@ -12,46 +12,48 @@ import org.helioviewer.viewmodel.view.View;
  * @author Stefan Meier (stefan.meier@fhnw.ch)
  * */
 public class PfssPlugin3dRenderer extends PhysicalRenderer3d {
-	private PfssCache pfssCache = null;
-	private GL lastGl = null;
-	/**
-	 * Default constructor.
-	 */
-	public PfssPlugin3dRenderer(PfssCache pfssCache) {
-		this.pfssCache = pfssCache;
-	}
+    private PfssCache pfssCache = null;
+    private GL lastGl = null;
 
-	/**
-	 * {@inheritDoc}
-	 * 
-	 * Draws all available and visible solar events with there associated icon.
-	 */
-	public void render(PhysicalRenderGraphics g) {
-		if (pfssCache.isVisible()) {
-			GL gl = g.getGL();
-			PfssFitsFile fitsToClear = pfssCache.getFitsToDelete();
-			if (fitsToClear != null)
-				fitsToClear.clear(gl);
-			PfssData pfssData = pfssCache.getData();
+    /**
+     * Default constructor.
+     */
+    public PfssPlugin3dRenderer(PfssCache pfssCache) {
+        this.pfssCache = pfssCache;
+    }
 
-			if (pfssData != null) {
-				if (lastGl != gl) pfssData.setInit(false);
-				pfssData.init(gl);
-				lastGl = gl;
-				if (pfssData.isInit()) {
-					pfssData.display(gl);
-				}
-			}
+    /**
+     * {@inheritDoc}
+     * 
+     * Draws all available and visible solar events with there associated icon.
+     */
+    public void render(PhysicalRenderGraphics g) {
+        if (pfssCache.isVisible()) {
+            GL gl = g.getGL();
+            PfssFitsFile fitsToClear = pfssCache.getFitsToDelete();
+            if (fitsToClear != null)
+                fitsToClear.clear(gl);
+            PfssData pfssData = pfssCache.getData();
 
-		}
-	}
+            if (pfssData != null) {
+                if (lastGl != gl)
+                    pfssData.setInit(false);
+                pfssData.init(gl);
+                lastGl = gl;
+                if (pfssData.isInit()) {
+                    pfssData.display(gl);
+                }
+            }
 
-	public void setVisible() {
+        }
+    }
 
-	}
+    public void setVisible() {
 
-	public void viewChanged(View view) {
+    }
 
-	}
+    public void viewChanged(View view) {
+
+    }
 
 }

@@ -59,12 +59,12 @@ public class GL3DSphere extends GL3DMesh {
                 indices.add(first + 1);
                 indices.add(second + 1);
                 indices.add(second);
-                
+
                 // indices.add(second);
                 // indices.add(first + 1);
             }
         }
-        
+
         return GL3DMeshPrimitive.QUADS;
     }
 
@@ -111,9 +111,9 @@ public class GL3DSphere extends GL3DMesh {
         ray.setLength(t);
         GL3DVec3d rayCopy2 = ray.getDirection().copy();
         rayCopy2.normalize();
-        rayCopy2.multiply(t);                
+        rayCopy2.multiply(t);
         GL3DVec3d rayCopy = ray.getOrigin().copy();
-        rayCopy.add(rayCopy2);         
+        rayCopy.add(rayCopy2);
         ray.setHitPoint(rayCopy);
         // ray.setHitPoint(this.wmI.multiply(ray.getHitPoint()));
         ray.isOutside = false;

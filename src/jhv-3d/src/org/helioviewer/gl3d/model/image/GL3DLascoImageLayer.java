@@ -19,19 +19,18 @@ public class GL3DLascoImageLayer extends GL3DImageLayer {
 
     protected void createImageMeshNodes(GL gl) {
         HelioviewerOcculterMetaData hvMetaData = (HelioviewerOcculterMetaData) metaDataView.getMetaData();
-        
+
         GLFragmentShaderProgram fragmentShader = GL3DShaderFactory.createFragmentShaderProgram(gl, this.coronaFragmentShader);
         GL3DImageVertexShaderProgram vertex = new GL3DImageVertexShaderProgram();
-        GLVertexShaderProgram   vertexShader   = GL3DShaderFactory.createVertexShaderProgram(gl, vertex);
-        this.imageTextureView.setVertexShader(vertex);        
- 
-        
+        GLVertexShaderProgram vertexShader = GL3DShaderFactory.createVertexShaderProgram(gl, vertex);
+        this.imageTextureView.setVertexShader(vertex);
+
         this.imageTextureView.metadata = this.metaDataView.getMetaData();
-        
+
         this.accellerationShape = new GL3DHitReferenceShape();
-        
-        double xOffset = (this.imageTextureView.metadata.getPhysicalUpperRight().getX()+this.imageTextureView.metadata.getPhysicalLowerLeft().getX())/(2.0*this.imageTextureView.metadata.getPhysicalImageWidth());
-        double yOffset = (this.imageTextureView.metadata.getPhysicalUpperRight().getY()+this.imageTextureView.metadata.getPhysicalLowerLeft().getY())/(2.0*this.imageTextureView.metadata.getPhysicalImageHeight());
+
+        double xOffset = (this.imageTextureView.metadata.getPhysicalUpperRight().getX() + this.imageTextureView.metadata.getPhysicalLowerLeft().getX()) / (2.0 * this.imageTextureView.metadata.getPhysicalImageWidth());
+        double yOffset = (this.imageTextureView.metadata.getPhysicalUpperRight().getY() + this.imageTextureView.metadata.getPhysicalLowerLeft().getY()) / (2.0 * this.imageTextureView.metadata.getPhysicalImageHeight());
         vertex.setDefaultOffset(xOffset, yOffset);
 
     }
@@ -39,8 +38,5 @@ public class GL3DLascoImageLayer extends GL3DImageLayer {
     protected GL3DImageMesh getImageSphere() {
         return null;
     }
-    
-
-
 
 }

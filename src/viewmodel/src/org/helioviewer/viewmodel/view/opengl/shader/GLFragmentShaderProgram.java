@@ -30,7 +30,6 @@ public abstract class GLFragmentShaderProgram {
     protected static int shaderCurrentlyUsed = -1;
     protected int shaderID;
 
-    
     /**
      * Build the shader.
      * 
@@ -69,7 +68,7 @@ public abstract class GLFragmentShaderProgram {
      *            Valid reference to the current gl object
      */
     public void bind(GL gl) {
-    	bind(gl, shaderID);
+        bind(gl, shaderID);
     }
 
     /**

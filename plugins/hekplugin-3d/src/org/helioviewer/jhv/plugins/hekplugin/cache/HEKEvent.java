@@ -53,15 +53,16 @@ public class HEKEvent implements IntervalComparison<Date> {
     }
 
     /**
-     * Flag to indicate if the event is currently being displayed in any event popup
+     * Flag to indicate if the event is currently being displayed in any event
+     * popup
      */
     private boolean showEventInfo = false;
-    
+
     /**
      * Flag to indicate if the cached triangled have already been calculated
      */
     private boolean cacheValid = false;
-    
+
     /**
      * Cache boundary triangulation
      */
@@ -575,21 +576,22 @@ public class HEKEvent implements IntervalComparison<Date> {
     public HEKPath getPath() {
         return path;
     }
-    
+
     /**
-     * @return true if the current event is currently being displayed in a popup window
+     * @return true if the current event is currently being displayed in a popup
+     *         window
      */
     public boolean getShowEventInfo() {
         return showEventInfo;
     }
-    
+
     /**
-     * update status: true if the current event is currently being displayed in a popup window
+     * update status: true if the current event is currently being displayed in
+     * a popup window
      */
     public void setShowEventInfo(boolean show) {
         this.showEventInfo = show;
     }
-    
 
     private Vector<SphericalCoord> toStonyPolyon(String poly, Date now) {
 
@@ -667,11 +669,11 @@ public class HEKEvent implements IntervalComparison<Date> {
             Vector<GenericTriangle<Vector3dDouble>> result = new Vector<GenericTriangle<Vector3dDouble>>();
 
             for (GenericTriangle<SphericalCoord> triangle : cachedTriangles) {
-            	
-            	Vector3dDouble A = HEKEvent.convertToSceneCoordinates(triangle.A, now);
-            	Vector3dDouble B = HEKEvent.convertToSceneCoordinates(triangle.B, now);
-            	Vector3dDouble C = HEKEvent.convertToSceneCoordinates(triangle.C, now);
-				
+
+                Vector3dDouble A = HEKEvent.convertToSceneCoordinates(triangle.A, now);
+                Vector3dDouble B = HEKEvent.convertToSceneCoordinates(triangle.B, now);
+                Vector3dDouble C = HEKEvent.convertToSceneCoordinates(triangle.C, now);
+
                 result.add(new GenericTriangle<Vector3dDouble>(A, B, C));
             }
             return result;
@@ -697,7 +699,7 @@ public class HEKEvent implements IntervalComparison<Date> {
                 SphericalCoord rotatedA = HEKCoordinateTransform.StonyhurstRotateStonyhurst(triangle.A, timeDifferenceInSeconds);
                 SphericalCoord rotatedB = HEKCoordinateTransform.StonyhurstRotateStonyhurst(triangle.B, timeDifferenceInSeconds);
                 SphericalCoord rotatedC = HEKCoordinateTransform.StonyhurstRotateStonyhurst(triangle.C, timeDifferenceInSeconds);
-                
+
                 // ignore triangles where any of the points is on the backside
                 // of the Sun
                 // if (Math.abs(rotatedA.phi) > 90 || Math.abs(rotatedB.phi) >
@@ -715,7 +717,7 @@ public class HEKEvent implements IntervalComparison<Date> {
             return null;
         }
     }
-    
+
     private boolean inTriangles(Vector2dDouble point, List<DelaunayTriangle> triangles) {
         for (DelaunayTriangle triangle : triangles) {
             TriangulationPoint A = triangle.points[0];

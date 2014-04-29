@@ -64,14 +64,14 @@ public class GL3DCoordinateSystemView extends AbstractGL3DView implements GL3DVi
         if (metaData instanceof HelioviewerOcculterMetaData) {
             // LASCO
             HelioviewerMetaData hvMetaData = (HelioviewerOcculterMetaData) metaData;
-        	ImmutableDateTime datetime = hvMetaData.getDateTime();
+            ImmutableDateTime datetime = hvMetaData.getDateTime();
 
             Log.debug("GL3DCoordinateSystemView: Creating LASCO Image Layer");
             this.coordinateSystem = getDefaultCoordinateSystem(datetime);
             this.orientation = getDefaultOrientation(datetime);
         } else if (metaData instanceof HelioviewerMetaData) {
             HelioviewerMetaData hvMetaData = (HelioviewerMetaData) metaData;
-        	ImmutableDateTime datetime = hvMetaData.getDateTime();
+            ImmutableDateTime datetime = hvMetaData.getDateTime();
 
             if (hvMetaData.getInstrument().equalsIgnoreCase("MDI")) {
                 // MDI
@@ -90,11 +90,11 @@ public class GL3DCoordinateSystemView extends AbstractGL3DView implements GL3DVi
                 this.orientation = getDefaultOrientation(datetime);
             } else if (hvMetaData.getInstrument().equalsIgnoreCase("AIA")) {
                 // AIA
-                //Log.debug("GL3DCoordinateSystemView: Creating AIA Image Layer!");
-                //Log.warn(datetime.getFormattedTime()+hvMetaData.getMeasurement());
-            
+                // Log.debug("GL3DCoordinateSystemView: Creating AIA Image Layer!");
+                // Log.warn(datetime.getFormattedTime()+hvMetaData.getMeasurement());
+
                 this.coordinateSystem = getDefaultCoordinateSystem(datetime);
-                this.orientation = getDefaultOrientation(datetime);                
+                this.orientation = getDefaultOrientation(datetime);
             } else if (hvMetaData.getInstrument().equalsIgnoreCase("SECCHI")) {
                 // STEREO
                 Log.debug("GL3DCoordinateSystemView: Creating STEREO Image Layer!");
@@ -119,16 +119,16 @@ public class GL3DCoordinateSystemView extends AbstractGL3DView implements GL3DVi
                         this.orientation = getDefaultOrientation(datetime);
                     }
                 }
-            } else{
+            } else {
                 // Generic Layer
                 Log.debug("GL3DCoordinateSystemView: Creating Generic Image Layer!");
                 this.coordinateSystem = getDefaultCoordinateSystem(datetime);
-                this.orientation = getDefaultOrientation(datetime);                
+                this.orientation = getDefaultOrientation(datetime);
             }
         } else {
-        	
+
             Log.warn("GL3DCoordinateSystemView: Unknown Image Layer!");
-            ImmutableDateTime datetime = new ImmutableDateTime(2000,1,1,0,0,0);
+            ImmutableDateTime datetime = new ImmutableDateTime(2000, 1, 1, 0, 0, 0);
             this.coordinateSystem = getDefaultCoordinateSystem(datetime);
             this.orientation = getDefaultOrientation(datetime);
         }
@@ -199,7 +199,8 @@ public class GL3DCoordinateSystemView extends AbstractGL3DView implements GL3DVi
          * ); }
          */
 
-        //Log.debug("GL3DCoordinateSystem: CoordinateSystemView produced a " + this.coordinateSystem.getClass());
+        // Log.debug("GL3DCoordinateSystem: CoordinateSystemView produced a " +
+        // this.coordinateSystem.getClass());
     }
 
     private static CoordinateSystem getDefaultCoordinateSystem(ImmutableDateTime datetime) {

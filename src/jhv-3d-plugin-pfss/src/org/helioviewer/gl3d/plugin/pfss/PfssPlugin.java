@@ -37,8 +37,8 @@ public class PfssPlugin extends GL3DAbstractModelPlugin {
     public JComponent getConfigurationComponent() {
         return this.configPanel;
     }
-    
+
     public static void main(String[] args) {
-		// nothing
-	}
+        // nothing
+    }
 }

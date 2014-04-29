@@ -27,37 +27,36 @@ public class EVEPlugin implements Plugin, MainContentPanelPlugin {
 
     private final LinkedList<JComponent> pluginPanes = new LinkedList<JComponent>();
     private MainPanel mainPanel;
-    
+
     public void installPlugin() {
-    	Log.debug("EvePlugin : " + this);
-    	if (mainPanel == null){
-    		mainPanel = new MainPanel();
-    	}
-        
-        
+        Log.debug("EvePlugin : " + this);
+        if (mainPanel == null) {
+            mainPanel = new MainPanel();
+        }
+
         pluginPanes.add(mainPanel);
-        
-        ImageViewerGui.getSingletonInstance().getMainContentPanel().addPlugin(this);        
+
+        ImageViewerGui.getSingletonInstance().getMainContentPanel().addPlugin(this);
         ObservationDialog.getSingletonInstance().addUserInterface(EVESettings.OBSERVATION_UI_NAME, new ObservationDialogUIPanel(mainPanel.getPlotContainerPanel()));
         ObservationDialog.getSingletonInstance().addUserInterface(EVESettings.RADIO_OBSERVATION_UI_NAME, new SimpleObservationDialogUIPanel(mainPanel.getPlotContainerPanel()));
         // initialize database connection
         DatabaseController.getSingletonInstance();
         RadioPlotModel.getSingletonInstance();
-        //PlotAreaSpace.getInstance();
-        //PlotTimeSpace.getInstance();
+        // PlotAreaSpace.getInstance();
+        // PlotTimeSpace.getInstance();
     }
 
     public void uninstallPlugin() {
-    	ObservationDialog.getSingletonInstance().removeUserInterface(EVESettings.OBSERVATION_UI_NAME, new ObservationDialogUIPanel(mainPanel.getPlotContainerPanel()));
+        ObservationDialog.getSingletonInstance().removeUserInterface(EVESettings.OBSERVATION_UI_NAME, new ObservationDialogUIPanel(mainPanel.getPlotContainerPanel()));
         ObservationDialog.getSingletonInstance().removeUserInterface(EVESettings.RADIO_OBSERVATION_UI_NAME, new SimpleObservationDialogUIPanel(mainPanel.getPlotContainerPanel()));
         ImageViewerGui.getSingletonInstance().getMainContentPanel().removePlugin(this);
-        
+
     }
-    
+
     public static URL getResourceUrl(String name) {
         return EVEPlugin.class.getResource(name);
     }
-    
+
     public String getName() {
         return "EVEPlugin";
     }
@@ -68,11 +67,11 @@ public class EVEPlugin implements Plugin, MainContentPanelPlugin {
 
     public String getAboutLicenseText() {
         String description = "";
-        
+
         description += "<p>The plugin uses the <a href=\"http://www.json.org/java/\">JSON in Java</a> Library, licensed under a <a href=\"http://www.json.org/license.html\">custom License</a>.";
-        description += "<p>The plugin uses <a href=\"http://db.apache.org/derby/\">Apache Derby, an Apache DB subproject</a>,<br>" + '\u00A9' + " 2011, Apache Software Foundation, <a href=\"http://www.apache.org/licenses/\">Apache License, Version 2.0</a><br>"; 
-        
-        return description;        
+        description += "<p>The plugin uses <a href=\"http://db.apache.org/derby/\">Apache Derby, an Apache DB subproject</a>,<br>" + '\u00A9' + " 2011, Apache Software Foundation, <a href=\"http://www.apache.org/licenses/\">Apache License, Version 2.0</a><br>";
+
+        return description;
     }
 
     /**
@@ -94,11 +93,11 @@ public class EVEPlugin implements Plugin, MainContentPanelPlugin {
     }
 
     public void setState(String state) {
-        //TODO SP: Implement setState for EVEPlugin
+        // TODO SP: Implement setState for EVEPlugin
     }
 
     public String getState() {
-        //TODO SP: Implement getState for EVEPlugin
+        // TODO SP: Implement getState for EVEPlugin
         return "";
     }
 }

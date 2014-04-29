@@ -22,7 +22,7 @@ public class HEKConstants {
     private static final HEKConstants singletonInstance = new HEKConstants();
 
     public static final String ACRONYM_FALLBACK = "OT"; // other
-    
+
     public static final String HEK_SUMMARY_URL = "http://www.lmsal.com/hek/her?cmd=view-voevent&ivorn=";
 
     private SimpleDateFormat hekDateFormat;

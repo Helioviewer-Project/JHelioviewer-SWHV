@@ -27,7 +27,7 @@ public class GL3DImageLayerFactory {
             Log.debug("GL3DImageLayerFactory: Creating LASCO Image Layer");
             return new GL3DLascoImageLayer(mainView);
         } else if (metaData instanceof HelioviewerMetaData) {
-        	
+
             HelioviewerMetaData hvMetaData = (HelioviewerMetaData) metaData;
             if (hvMetaData.getInstrument().equalsIgnoreCase("HMI")) {
                 // HMI
@@ -37,13 +37,13 @@ public class GL3DImageLayerFactory {
                 // EIT
                 return new GL3DEITImageLayer(mainView);
             } else if (hvMetaData.getInstrument().equalsIgnoreCase("AIA")) {
-            	// AIA
-            	return new GL3DAIAImageLayer(mainView);
-            } else if(hvMetaData.getInstrument().equalsIgnoreCase("STEREO")){
+                // AIA
+                return new GL3DAIAImageLayer(mainView);
+            } else if (hvMetaData.getInstrument().equalsIgnoreCase("STEREO")) {
                 // STEREO
                 return new GL3DStereoImageLayer(mainView);
-            } else{
-            	//GENERIC
+            } else {
+                // GENERIC
                 return new GL3DAIAImageLayer(mainView);
             }
         } else {

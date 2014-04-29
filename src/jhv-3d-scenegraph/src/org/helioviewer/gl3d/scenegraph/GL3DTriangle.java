@@ -26,7 +26,7 @@ public class GL3DTriangle {
         this.a = a;
         this.b = b;
         this.c = c;
-        
+
         this.center = this.a.copy();
         this.center.add(c);
         this.center.add(b);

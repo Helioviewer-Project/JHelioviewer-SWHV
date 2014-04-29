@@ -54,13 +54,13 @@ public class SoftwareModeFilter implements StandardFilter {
         this.isLogging = isLogging;
     }
 
-	public void setState(String state) {
-		// TODO Auto-generated method stub
-		
-	}
+    public void setState(String state) {
+        // TODO Auto-generated method stub
 
-	public String getState() {
-		// TODO Auto-generated method stub
-		return null;
-	}
+    }
+
+    public String getState() {
+        // TODO Auto-generated method stub
+        return null;
+    }
 }

@@ -13,5 +13,6 @@ import org.helioviewer.plugins.eveplugin.lines.data.EVEValues;
 public interface EVEDrawControllerListener {
 
     public void drawRequest(final Interval<Date> interval, final Band[] bands, final EVEValues[] values, final Range availableRange, final Range selectedRange);
+
     public void drawRequest(final Date movieTimestamp);
 }

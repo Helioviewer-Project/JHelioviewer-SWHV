@@ -49,7 +49,7 @@ public class DescriptorIconRenderer extends DefaultTableCellRenderer {
      */
     public void setFixedWidth(JTable table, int column) {
         // Get a dummy label and measure the preferred width
-        Component dummy = getTableCellRendererComponent(table, new LayerDescriptor( null, null), false, false, 0, column);
+        Component dummy = getTableCellRendererComponent(table, new LayerDescriptor(null, null), false, false, 0, column);
         int width = dummy.getPreferredSize().width;
 
         table.getColumnModel().getColumn(column).setPreferredWidth(width);

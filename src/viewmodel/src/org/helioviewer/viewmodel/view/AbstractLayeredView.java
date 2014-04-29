@@ -50,8 +50,8 @@ public abstract class AbstractLayeredView extends AbstractView implements Layere
     // Definitions
     // /////////////////////////////////////////////////////////////////////////
 
-	protected CopyOnWriteArrayList<View> layers = new CopyOnWriteArrayList<View>();
-	protected ReentrantLock layerLock = new ReentrantLock();
+    protected CopyOnWriteArrayList<View> layers = new CopyOnWriteArrayList<View>();
+    protected ReentrantLock layerLock = new ReentrantLock();
     protected HashMap<View, Layer> viewLookup = new HashMap<View, Layer>();
     protected Viewport viewport;
     protected Region region;
@@ -168,29 +168,28 @@ public abstract class AbstractLayeredView extends AbstractView implements Layere
 
         ChangeEvent changeEvent = new ChangeEvent(new LayerChangedReason(this, LayerChangeType.LAYER_ADDED, newLayer));
 
+        layers.add(newIndex, newLayer);
+        newLayer.addViewListener(this);
 
-            layers.add(newIndex, newLayer);
-            newLayer.addViewListener(this);
+        viewLookup.put(newLayer, new Layer(newLayer));
 
-            viewLookup.put(newLayer, new Layer(newLayer));
-
-            if (layers.size() > 1) {
-                recalculateMetaData(false);
-                for (Layer layer : viewLookup.values()) {
-                    MetaData m = layer.metaDataView.getMetaData();
-                    if (m instanceof PixelBasedMetaData) {
-                        PixelBasedMetaData p = (PixelBasedMetaData) m;
-                        p.updatePhysicalRegion(metaData.getPhysicalRegion());
-                    }
+        if (layers.size() > 1) {
+            recalculateMetaData(false);
+            for (Layer layer : viewLookup.values()) {
+                MetaData m = layer.metaDataView.getMetaData();
+                if (m instanceof PixelBasedMetaData) {
+                    PixelBasedMetaData p = (PixelBasedMetaData) m;
+                    p.updatePhysicalRegion(metaData.getPhysicalRegion());
                 }
             }
-            recalculateMetaData();
-            region = metaData.getPhysicalRegion();
-            if (viewport != null)
-                region = ViewHelper.expandRegionToViewportAspectRatio(viewport, region, metaData);
-            if (region != null)
-                region = new RegionAdapter(new StaticRegion(-0.5 * region.getWidth(), -0.5 * region.getHeight(), region.getSize()));
-            recalculateRegionsAndViewports(new ChangeEvent());
+        }
+        recalculateMetaData();
+        region = metaData.getPhysicalRegion();
+        if (viewport != null)
+            region = ViewHelper.expandRegionToViewportAspectRatio(viewport, region, metaData);
+        if (region != null)
+            region = new RegionAdapter(new StaticRegion(-0.5 * region.getWidth(), -0.5 * region.getHeight(), region.getSize()));
+        recalculateRegionsAndViewports(new ChangeEvent());
 
         redrawBuffer(changeEvent);
     }
@@ -199,9 +198,9 @@ public abstract class AbstractLayeredView extends AbstractView implements Layere
      * {@inheritDoc}
      */
     public View getLayer(int index) {
-    	if (index < layers.size())
-    		return layers.get(index);
-    	return null;
+        if (index < layers.size())
+            return layers.get(index);
+        return null;
     }
 
     /**

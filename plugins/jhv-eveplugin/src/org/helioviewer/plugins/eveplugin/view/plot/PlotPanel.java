@@ -14,52 +14,51 @@ public class PlotPanel extends JPanel {
     // //////////////////////////////////////////////////////////////////////////////
     // Definitions
     // //////////////////////////////////////////////////////////////////////////////
-    
+
     private static final long serialVersionUID = 1L;
-    
+
     private final EVEDrawController drawController;
-    
+
     private final JPanel plotPane = new JPanel();
     private final LineDataSelectorPanel lineDataSelectorPane;
     private final ChartDrawGraphPane graphPane;
     private final ChartDrawValueRangePane valueRangePane;
     private ChartDrawIntervalPane intervalPane = null;
-    
+
     // //////////////////////////////////////////////////////////////////////////////
     // Methods
     // //////////////////////////////////////////////////////////////////////////////
-    
+
     public PlotPanel(final String identifier, final String plotName) {
         lineDataSelectorPane = new LineDataSelectorPanel(identifier, plotName);
-        
+
         drawController = new EVEDrawController(identifier);
-        
+
         graphPane = new ChartDrawGraphPane(identifier);
-        valueRangePane = new ChartDrawValueRangePane(drawController,identifier);
-        
+        valueRangePane = new ChartDrawValueRangePane(drawController, identifier);
+
         initVisualComponents();
     }
-    
+
     private void initVisualComponents() {
         setLayout(new BorderLayout());
-        //setMinimumSize(new Dimension(200, 300));
-        
-        
+        // setMinimumSize(new Dimension(200, 300));
+
         plotPane.setLayout(new BorderLayout());
         plotPane.add(graphPane, BorderLayout.CENTER);
         plotPane.add(valueRangePane, BorderLayout.LINE_END);
-        
+
         add(plotPane, BorderLayout.CENTER);
         add(lineDataSelectorPane, BorderLayout.LINE_END);
     }
-    
+
     public void setIntervalSlider(final ChartDrawIntervalPane intervalPane) {
         if (this.intervalPane != null) {
-            plotPane.remove(this.intervalPane);    
+            plotPane.remove(this.intervalPane);
         }
-        
+
         this.intervalPane = intervalPane;
-        
+
         if (intervalPane != null) {
             plotPane.add(intervalPane, BorderLayout.PAGE_END);
         }

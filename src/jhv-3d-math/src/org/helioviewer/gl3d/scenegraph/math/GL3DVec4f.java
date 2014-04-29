@@ -155,21 +155,24 @@ public class GL3DVec4f {
     public static GL3DVec4f cross(GL3DVec4f u, GL3DVec4f v) {
         return new GL3DVec4f(u.y * v.z - u.z * v.y, u.z * v.x - u.x * v.z, u.x * v.y - u.y * v.x, 1f);
     }
+
     public void negate() {
-    	this.x = -this.x;
-    	this.y = -this.y;
-    	this.z = -this.z;
-    	this.w = -this.w;
+        this.x = -this.x;
+        this.y = -this.y;
+        this.z = -this.z;
+        this.w = -this.w;
     }
+
     public static GL3DVec4f negate(GL3DVec4f vec) {
-    	GL3DVec4f newVec = vec.copy();
-    	newVec.negate();
-    	return newVec;
+        GL3DVec4f newVec = vec.copy();
+        newVec.negate();
+        return newVec;
     }
 
     private GL3DVec4f copy() {
-    	return new GL3DVec4f(this.x, this.y, this.z, this.w);
-	}
+        return new GL3DVec4f(this.x, this.y, this.z, this.w);
+    }
+
     public boolean isApproxEqual(GL3DVec4f vec, float tolerance) {
         return Math.abs(this.x - vec.x) <= tolerance && Math.abs(this.y - vec.y) <= tolerance && Math.abs(this.z - vec.z) <= tolerance && Math.abs(this.w - vec.w) <= tolerance;
     }

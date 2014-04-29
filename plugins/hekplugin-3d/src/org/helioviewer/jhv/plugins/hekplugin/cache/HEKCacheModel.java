@@ -38,7 +38,7 @@ public class HEKCacheModel {
     private Interval<Date> curInterval;
 
     private Vector<HEKCacheListener> cacheModelListeners = new Vector<HEKCacheListener>();
-    
+
     public HEKCacheModel(HEKCache cache) {
         this.cache = cache;
 
@@ -595,8 +595,8 @@ public class HEKCacheModel {
         // cache.lockWrite();
         try {
             cacheModelListeners.add(listener);
-        } finally { 
-        //    cache.unlockWrite();
+        } finally {
+            // cache.unlockWrite();
         }
     }
 
@@ -604,19 +604,19 @@ public class HEKCacheModel {
         // cache.lockWrite();
         try {
             cacheModelListeners.remove(listener);
-        } finally { 
-        //    cache.unlockWrite();
+        } finally {
+            // cache.unlockWrite();
         }
     }
 
     protected synchronized void fireCacheStateChanged() {
-        //cache.lockRead();
+        // cache.lockRead();
         try {
             for (HEKCacheListener h : cacheModelListeners) {
                 h.cacheStateChanged();
             }
         } finally {
-        //    cache.unlockRead();
+            // cache.unlockRead();
         }
     }
 
@@ -627,7 +627,7 @@ public class HEKCacheModel {
                 h.structureChanged(path);
             }
         } finally {
-        //    cache.unlockRead();
+            // cache.unlockRead();
         }
     }
 
@@ -638,7 +638,7 @@ public class HEKCacheModel {
                 h.eventsChanged(path);
             }
         } finally {
-        //    cache.unlockRead();
+            // cache.unlockRead();
         }
     }
 

@@ -19,11 +19,11 @@ public class EVEPluginLauncher {
      * @param args
      */
     public static void main(String[] args) {
-        String args2[] = JavaCompatibility.copyArray(args, args.length+2);
+        String args2[] = JavaCompatibility.copyArray(args, args.length + 2);
 
-        args2[args2.length-2] = "--deactivate-plugin";
-        args2[args2.length-1] = "EVEPlugin.jar";
-        
+        args2[args2.length - 2] = "--deactivate-plugin";
+        args2[args2.length - 1] = "EVEPlugin.jar";
+
         JavaHelioViewer.main(args2);
         PluginManager.getSingeltonInstance().addPlugin(EVEPluginLauncher.class.getClassLoader(), new EVEPlugin(), null);
     }

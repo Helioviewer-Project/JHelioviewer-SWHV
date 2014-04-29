@@ -83,7 +83,7 @@ class J2KRender implements Runnable {
 
     /** Maximum rendering iterations per layer allowed */
     // Is now calculated automatically as num_pix / MAX_RENDER_SAMPLES
-     private final int MAX_RENDER_ITERATIONS = 150;
+    private final int MAX_RENDER_ITERATIONS = 150;
 
     /** It says if the render is going to play a movie instead of a single image */
     private boolean movieMode = false;
@@ -245,7 +245,6 @@ class J2KRender implements Runnable {
 
     private void renderLayer(int numLayer) {
         parentImageRef.getLock().lock();
-        
 
         try {
             if (JP2Image.numJP2ImagesInUse() == 1) {
@@ -268,15 +267,15 @@ class J2KRender implements Runnable {
 
                 parentImageRef.updateResolutionSet(numLayer);
 
-                    MetaData metaData = parentViewRef.getMetaData();
+                MetaData metaData = parentViewRef.getMetaData();
 
-                    if (metaData instanceof NonConstantMetaData && ((NonConstantMetaData) metaData).checkForModifications()) {
+                if (metaData instanceof NonConstantMetaData && ((NonConstantMetaData) metaData).checkForModifications()) {
 
-                        parentViewRef.updateParameter();
-                        currParams = parentViewRef.getImageViewParams();
-                        parentViewRef.addChangedReason(new NonConstantMetaDataChangedReason(parentViewRef, metaData));
-                    }
-                
+                    parentViewRef.updateParameter();
+                    currParams = parentViewRef.getImageViewParams();
+                    parentViewRef.addChangedReason(new NonConstantMetaDataChangedReason(parentViewRef, metaData));
+                }
+
             }
 
             compositorRef.Set_max_quality_layers(currParams.qualityLayers);
@@ -293,7 +292,7 @@ class J2KRender implements Runnable {
             actualOffset.Assign(actualBufferedRegion.Access_pos());
 
             Kdu_dims newRegion = new Kdu_dims();
-            
+
             if (parentImageRef.getNumComponents() < 3) {
                 currentByteBuffer = (currentByteBuffer + 1) % NUM_BUFFERS;
                 if (currParams.subImage.getNumPixels() != byteBuffer[currentByteBuffer].length || (!movieMode && !linkedMovieMode && !J2KRenderGlobalOptions.getDoubleBufferingOption())) {
@@ -310,7 +309,7 @@ class J2KRender implements Runnable {
                 }
             }
             while (!compositorRef.Is_processing_complete()) {
-            	compositorRef.Process(MAX_RENDER_SAMPLES, newRegion);            
+                compositorRef.Process(MAX_RENDER_SAMPLES, newRegion);
                 Kdu_coords newOffset = newRegion.Access_pos();
                 Kdu_coords newSize = newRegion.Access_size();
 
@@ -321,9 +320,10 @@ class J2KRender implements Runnable {
                     continue;
 
                 localIntBuffer = newPixels > localIntBuffer.length ? new int[newPixels << 1] : localIntBuffer;
-                
+
                 compositorBuf.Get_region(newRegion, localIntBuffer);
-                //Log.debug("Local Int Buffer : " + Arrays.toString(localIntBuffer));
+                // Log.debug("Local Int Buffer : " +
+                // Arrays.toString(localIntBuffer));
 
                 int srcIdx = 0;
                 int destIdx = newOffset.Get_x() + newOffset.Get_y() * currParams.subImage.width;
@@ -332,16 +332,17 @@ class J2KRender implements Runnable {
                 int newHeight = newSize.Get_y();
 
                 if (parentImageRef.getNumComponents() < 3) {
-	                for (int row = 0; row < newHeight; row++, destIdx += currParams.subImage.width, srcIdx += newWidth) {
-	                    for (int col = 0; col < newWidth; ++col) {
-	                        byteBuffer[currentByteBuffer][destIdx + col] = (byte) ((localIntBuffer[srcIdx + col] >> 8) & 0xFF);
-	                    }
-	                }
+                    for (int row = 0; row < newHeight; row++, destIdx += currParams.subImage.width, srcIdx += newWidth) {
+                        for (int col = 0; col < newWidth; ++col) {
+                            byteBuffer[currentByteBuffer][destIdx + col] = (byte) ((localIntBuffer[srcIdx + col] >> 8) & 0xFF);
+                        }
+                    }
                 } else {
-                	for (int row = 0; row < newHeight; row++, destIdx += currParams.subImage.width, srcIdx += newWidth)
-                		System.arraycopy(localIntBuffer, srcIdx, intBuffer[currentIntBuffer], destIdx, newWidth);
+                    for (int row = 0; row < newHeight; row++, destIdx += currParams.subImage.width, srcIdx += newWidth)
+                        System.arraycopy(localIntBuffer, srcIdx, intBuffer[currentIntBuffer], destIdx, newWidth);
                 }
-                //Log.debug("byteBuffer : " + Arrays.toString(byteBuffer[currentByteBuffer]));
+                // Log.debug("byteBuffer : " +
+                // Arrays.toString(byteBuffer[currentByteBuffer]));
             }
 
             if (compositorBuf != null)
@@ -410,12 +411,12 @@ class J2KRender implements Runnable {
                 if (parentImageRef.getNumComponents() < 3) {
 
                     if (currParams.subImage.getNumPixels() == byteBuffer[currentByteBuffer].length) {
-                    	SingleChannelByte8ImageData imdata = new SingleChannelByte8ImageData(width, height, byteBuffer[currentByteBuffer], new ColorMask());
-                    	SubImage roi = currParams.subImage;
-                    	System.out.println("ROITTHAT " + roi);
-                        //System.out.println("TTRESOLUTION" + resolution);
+                        SingleChannelByte8ImageData imdata = new SingleChannelByte8ImageData(width, height, byteBuffer[currentByteBuffer], new ColorMask());
+                        SubImage roi = currParams.subImage;
+                        System.out.println("ROITTHAT " + roi);
+                        // System.out.println("TTRESOLUTION" + resolution);
                         parentViewRef.setSubimageData(imdata, currParams.subImage, curLayer, currParams.resolution.getZoomPercent());
-             
+
                     } else {
                         Log.warn("J2KRender: Params out of sync, skip frame");
                     }

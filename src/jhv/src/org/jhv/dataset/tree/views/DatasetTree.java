@@ -12,46 +12,39 @@ import javax.swing.tree.TreePath;
 import org.jhv.dataset.tree.models.DatasetNodeRenderer;
 import org.jhv.dataset.tree.models.DatasetTreeCellEditor;
 
+public class DatasetTree extends JTree {
 
+    private static final long serialVersionUID = 3552416133364895287L;
+    DefaultTreeModel model;
 
-public class DatasetTree extends JTree{
-	
-	private static final long serialVersionUID = 3552416133364895287L;
-	DefaultTreeModel model;
-	
-	public DatasetTree(DefaultTreeModel model){
-		super(model);
-		this.model = model;
-		this.setCellRenderer( new DatasetNodeRenderer());
-		this.setCellEditor(new DatasetTreeCellEditor(this, (DefaultTreeCellRenderer) this.getCellRenderer()));
-		this.getModel().addTreeModelListener(new DatasetTreeModelListener(this));
-		ToolTipManager.sharedInstance().registerComponent(this);
-        this.addMouseMotionListener(new TreeScanner());  
+    public DatasetTree(DefaultTreeModel model) {
+        super(model);
+        this.model = model;
+        this.setCellRenderer(new DatasetNodeRenderer());
+        this.setCellEditor(new DatasetTreeCellEditor(this, (DefaultTreeCellRenderer) this.getCellRenderer()));
+        this.getModel().addTreeModelListener(new DatasetTreeModelListener(this));
+        ToolTipManager.sharedInstance().registerComponent(this);
+        this.addMouseMotionListener(new TreeScanner());
         this.setRootVisible(false);
-		this.setEditable(true);
-	}
-	
-	class TreeScanner extends MouseMotionAdapter
-	{
-	    int lastSelected;
-	 
-	    public void mouseMoved(MouseEvent e)
-	    {
-	        JTree tree = (JTree)e.getSource();
-	        int selRow = tree.getRowForLocation(e.getX(), e.getY());
-	        TreePath path = getPathForLocation(e.getX(), e.getY());
-	        if(selRow == -1)
-	        {
-	            tree.clearSelection();
-	          
-	            lastSelected = -1;
-	        }
-	        else if(selRow != lastSelected)
-	        {
-		        startEditingAtPath(path);
-	            lastSelected = selRow;
-	        }
-	    }
-	}
-	
+        this.setEditable(true);
+    }
+
+    class TreeScanner extends MouseMotionAdapter {
+        int lastSelected;
+
+        public void mouseMoved(MouseEvent e) {
+            JTree tree = (JTree) e.getSource();
+            int selRow = tree.getRowForLocation(e.getX(), e.getY());
+            TreePath path = getPathForLocation(e.getX(), e.getY());
+            if (selRow == -1) {
+                tree.clearSelection();
+
+                lastSelected = -1;
+            } else if (selRow != lastSelected) {
+                startEditingAtPath(path);
+                lastSelected = selRow;
+            }
+        }
+    }
+
 }

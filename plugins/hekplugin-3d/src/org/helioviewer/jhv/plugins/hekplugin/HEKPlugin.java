@@ -31,7 +31,7 @@ public class HEKPlugin extends OverlayPlugin implements Plugin {
      * Default constructor.
      */
     public HEKPlugin() {
-       this(false);
+        this(false);
     }
 
     /**

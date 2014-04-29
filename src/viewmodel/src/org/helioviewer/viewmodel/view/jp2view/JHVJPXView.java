@@ -1,4 +1,5 @@
 package org.helioviewer.viewmodel.view.jp2view;
+
 import java.util.Date;
 
 import org.helioviewer.base.math.Interval;
@@ -71,17 +72,19 @@ public class JHVJPXView extends JHVJP2View implements TimedMovieView, CachedMovi
     public JHVJPXView(boolean isMainView, Interval<Date> range, boolean blockingMode) {
         super(isMainView, range);
         this.blockingMode = blockingMode;
-        if(isMainView){
-        	Displayer.getSingletonInstance().addRenderListener(this);
+        if (isMainView) {
+            Displayer.getSingletonInstance().addRenderListener(this);
         }
     }
+
     public JHVJPXView(boolean isMainView, Interval<Date> range) {
         super(isMainView, range);
         this.blockingMode = false;
-        if(isMainView){
-        	Displayer.getSingletonInstance().addRenderListener(this);
+        if (isMainView) {
+            Displayer.getSingletonInstance().addRenderListener(this);
         }
     }
+
     /**
      * {@inheritDoc}
      */
@@ -395,30 +398,29 @@ public class JHVJPXView extends JHVJP2View implements TimedMovieView, CachedMovi
      * {@inheritDoc}
      */
     void setSubimageData(ImageData newImageData, SubImage roi, int compositionLayer, double zoompercent) {
-    	if(blockingMode){
-	    	synchronized(Displayer.displaylock){
-	    		
-	        	System.out.println("AfterRender started");
-	    		setSubimageDataHelper(newImageData, roi, compositionLayer, zoompercent); 
-		    	System.out.println("AfterRender finished");
-	    	}
-    	}
-    	else{
-    		setSubimageDataHelper(newImageData, roi, compositionLayer, zoompercent); 
-    	}
-    }
+        if (blockingMode) {
+            synchronized (Displayer.displaylock) {
 
+                System.out.println("AfterRender started");
+                setSubimageDataHelper(newImageData, roi, compositionLayer, zoompercent);
+                System.out.println("AfterRender finished");
+            }
+        } else {
+            setSubimageDataHelper(newImageData, roi, compositionLayer, zoompercent);
+        }
+    }
 
     private void setSubimageDataHelper(ImageData newImageData, SubImage roi, int compositionLayer, double zoompercent) {
         lastRenderedCompositionLayer = compositionLayer;
-    	
+
         if (metaData instanceof ObserverMetaData) {
             ObserverMetaData observerMetaData = (ObserverMetaData) metaData;
             observerMetaData.updateDateTime(dateTimeCache.getDateTime(compositionLayer));
             event.addReason(new TimestampChangedReason(this, observerMetaData.getDateTime()));
         }
-        super.setSubimageData(newImageData, roi,compositionLayer, zoompercent);
+        super.setSubimageData(newImageData, roi, compositionLayer, zoompercent);
     }
+
     public LinkedMovieManager getLinkedMovieManager() {
         return linkedMovieManager;
     }
@@ -490,27 +492,30 @@ public class JHVJPXView extends JHVJP2View implements TimedMovieView, CachedMovi
         return render.isReuseBuffer();
     }
 
-	@Override
-	public void render() {
+    @Override
+    public void render() {
         renderRequestedSignal.signal(RenderReasons.NEW_DATA);
-	}
-	
-	public void removeRenderListener(){
-        Displayer.getSingletonInstance().removeRenderListener(this);
-	}
+    }
 
-	@Override
-	public long getCurrentDateMillis() {
-		HelioviewerMetaData metadata = (HelioviewerMetaData)this.getMetadata();
-    	return metadata.getDateTime().getMillis();
-	}
-	public void setBlocking(boolean blockingMode) {
-		this.blockingMode = blockingMode;
-	}
-	public void setDisplayedRegion(Region region) {
-		this.displayedRegion = region;
-	}
-	public Region getDisplayedRegion() {
-		return this.displayedRegion;
-	}
+    public void removeRenderListener() {
+        Displayer.getSingletonInstance().removeRenderListener(this);
+    }
+
+    @Override
+    public long getCurrentDateMillis() {
+        HelioviewerMetaData metadata = (HelioviewerMetaData) this.getMetadata();
+        return metadata.getDateTime().getMillis();
+    }
+
+    public void setBlocking(boolean blockingMode) {
+        this.blockingMode = blockingMode;
+    }
+
+    public void setDisplayedRegion(Region region) {
+        this.displayedRegion = region;
+    }
+
+    public Region getDisplayedRegion() {
+        return this.displayedRegion;
+    }
 }

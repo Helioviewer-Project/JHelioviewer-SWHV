@@ -28,6 +28,6 @@ public class HEKPluginLauncher {
         args2[args2.length - 2] = "--deactivate-plugin";
         args2[args2.length - 1] = "HEKPlugin.jar";
         JavaHelioViewer.main(args2, new HEKPlugin(true));
-        //JavaHelioViewer.main(args2);
+        // JavaHelioViewer.main(args2);
     }
 }

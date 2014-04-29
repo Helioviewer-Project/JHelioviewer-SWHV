@@ -424,7 +424,7 @@ class J2KReader implements Runnable {
                                 stepQuerys[current_step].setField(JPIPRequestField.LEN.toString(), String.valueOf(JpipRequestLen));
 
                                 req.setQuery(stepQuerys[current_step].toString());
-                                //Log.debug(stepQuerys[current_step].toString());
+                                // Log.debug(stepQuerys[current_step].toString());
                                 socket.send(req);
                                 if (Boolean.parseBoolean(System.getProperty("export.movie.debug.on"))) {
                                     try {
@@ -559,8 +559,8 @@ class J2KReader implements Runnable {
                                 case ALLFRAMESEQUALLY:
                                     current_step++;
                                     break;
-								default:
-									break;
+                                default:
+                                    break;
                                 }
 
                                 // let others do their work, too

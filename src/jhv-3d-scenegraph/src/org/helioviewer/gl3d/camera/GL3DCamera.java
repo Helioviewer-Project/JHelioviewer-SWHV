@@ -54,9 +54,9 @@ public abstract class GL3DCamera {
 
     private Stack<GL3DCameraAnimation> cameraAnimations = new Stack<GL3DCameraAnimation>();
 
-	protected GL3DQuatd currentDragRotation;
+    protected GL3DQuatd currentDragRotation;
 
-	protected double localrotation;
+    protected double localrotation;
 
     public GL3DCamera(double clipNear, double clipFar) {
         this();
@@ -128,9 +128,11 @@ public abstract class GL3DCamera {
     public GL3DQuatd getRotation() {
         return this.rotation;
     }
+
     public void setRotation(GL3DQuatd rotation) {
-    	this.rotation = rotation;
+        this.rotation = rotation;
     }
+
     public void deactivate() {
         this.cameraAnimations.clear();
     }
@@ -164,11 +166,10 @@ public abstract class GL3DCamera {
     }
 
     public void updateCameraTransformation(GL3DMat4d transformation) {
-    	this.cameraTransformation = transformation;
-    	//fireCameraMoved();
+        this.cameraTransformation = transformation;
+        // fireCameraMoved();
     }
 
-    
     /**
      * Updates the camera transformation by applying the rotation and
      * translation information.
@@ -276,20 +277,21 @@ public abstract class GL3DCamera {
     }
 
     public abstract CoordinateSystem getViewSpaceCoordinateSystem();
-	public void setDragRotation(GL3DQuatd currentDragRotation) {
-		this.currentDragRotation = currentDragRotation;		
-	}
-	
-    public void rotateAll(){
-        this.setRotation(GL3DQuatd.createRotation(0.0, new GL3DVec3d(0, 1, 0)));
-        this.getRotation().rotate(GL3DQuatd.createRotation(localrotation, new GL3DVec3d(0, 1, 0)));
-        if(this.currentDragRotation!=null){
-        	this.getRotation().rotate(this.currentDragRotation);
-        }
-        this.updateCameraTransformation();    	
+
+    public void setDragRotation(GL3DQuatd currentDragRotation) {
+        this.currentDragRotation = currentDragRotation;
     }
 
-	public boolean isAnimating() {
-		return !this.cameraAnimations.isEmpty();
-	}	
+    public void rotateAll() {
+        this.setRotation(GL3DQuatd.createRotation(0.0, new GL3DVec3d(0, 1, 0)));
+        this.getRotation().rotate(GL3DQuatd.createRotation(localrotation, new GL3DVec3d(0, 1, 0)));
+        if (this.currentDragRotation != null) {
+            this.getRotation().rotate(this.currentDragRotation);
+        }
+        this.updateCameraTransformation();
+    }
+
+    public boolean isAnimating() {
+        return !this.cameraAnimations.isEmpty();
+    }
 }

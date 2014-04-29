@@ -39,7 +39,6 @@ public class GL3DTopToolBar extends TopToolBar implements MouseListener {
     private JToggleButton trackSolarRotationButton;
     private JToggleButton coronaVisibilityButton;
     private JToggleButton gridVisibilityButton;
-    
 
     /**
      * Default constructor.
@@ -145,7 +144,7 @@ public class GL3DTopToolBar extends TopToolBar implements MouseListener {
         coronaVisibilityButton.setSelectedIcon(IconBank.getIcon(JHVIcon.LAYER_IMAGE_OFF));
         coronaVisibilityButton.setToolTipText("Toggle Corona Visibility");
         addButton(coronaVisibilityButton);
-        
+
         gridVisibilityButton = new JToggleButton(new GL3DToggleGridVisibilityAction());
         gridVisibilityButton.setSelected(false);
         gridVisibilityButton.setIcon(IconBank.getIcon(JHVIcon.LAYER_IMAGE));

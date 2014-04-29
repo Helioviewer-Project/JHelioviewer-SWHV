@@ -131,14 +131,14 @@ public class ImmutableDateTime implements Comparable<ImmutableDateTime> {
     public int hashCode() {
         return (int) (calendar.getTimeInMillis() ^ (calendar.getTimeInMillis() >>> 32));
     }
-    
-    public String getCachedDate(){
-    	if(this.cachedDate==null){
-           SimpleDateFormat dateFormat;
-           dateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
-           this.cachedDate = dateFormat.format(calendar.getTime());
-      	}
-    	return this.cachedDate;
-   	
+
+    public String getCachedDate() {
+        if (this.cachedDate == null) {
+            SimpleDateFormat dateFormat;
+            dateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
+            this.cachedDate = dateFormat.format(calendar.getTime());
+        }
+        return this.cachedDate;
+
     }
 };

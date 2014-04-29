@@ -80,10 +80,9 @@ public class SolarImageToSolarSphereConversion implements CoordinateConversion {
         return z;
     }
 
-    public CoordinateVector convertSolarToImage(CoordinateVector vector){
-    	double x = vector.getValue(SolarSphereCoordinateSystem.X_COORDINATE) * this.solarImageCoordinateSystem.getSolarRadius();
-    	double y = vector.getValue(SolarSphereCoordinateSystem.Y_COORDINATE) * this.solarImageCoordinateSystem.getSolarRadius();
-    	return this.solarImageCoordinateSystem.createCoordinateVector(x,y);
+    public CoordinateVector convertSolarToImage(CoordinateVector vector) {
+        double x = vector.getValue(SolarSphereCoordinateSystem.X_COORDINATE) * this.solarImageCoordinateSystem.getSolarRadius();
+        double y = vector.getValue(SolarSphereCoordinateSystem.Y_COORDINATE) * this.solarImageCoordinateSystem.getSolarRadius();
+        return this.solarImageCoordinateSystem.createCoordinateVector(x, y);
     }
 }
-

@@ -69,7 +69,7 @@ public class GL3DTrackballCamera extends GL3DSolarRotationTrackingTrackballCamer
             if (startPosition != null) {
                 long timediff = (currentDate.getTime()) / 1000 - Constants.referenceDate;
 
-                double rotation = -DifferentialRotation.calculateRotationInRadians(0., timediff)%(Math.PI*2.0);
+                double rotation = -DifferentialRotation.calculateRotationInRadians(0., timediff) % (Math.PI * 2.0);
 
                 this.getRotation().rotate(GL3DQuatd.createRotation(currentRotation - rotation, new GL3DVec3d(0, 1, 0)));
                 this.updateCameraTransformation();

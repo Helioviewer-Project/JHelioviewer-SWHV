@@ -26,8 +26,8 @@ public class GL3DCanvas extends GLCanvas implements GLEventListener {
 
     public GL3DCanvas() {
 
-        //FPSAnimator animator = new FPSAnimator(this, 10);
-        //animator.start();
+        // FPSAnimator animator = new FPSAnimator(this, 10);
+        // animator.start();
 
         this.addGLEventListener(this);
     }

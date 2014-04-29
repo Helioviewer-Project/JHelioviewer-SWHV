@@ -147,25 +147,24 @@ public class BufferedImageOverlayView extends AbstractBasicView implements Overl
         imageData = new ARGBInt32ImageData(sourceData, target);
     }
 
+    @Override
+    public void addOverlay(OverlayPluginContainer overlayPluginContainer) {
+        // TODO Auto-generated method stub
 
+    }
 
-	@Override
-	public void addOverlay(OverlayPluginContainer overlayPluginContainer) {
-		// TODO Auto-generated method stub
-		
-	}
+    @Override
+    public CopyOnWriteArrayList<OverlayPluginContainer> getOverlays() {
+        return null;
+    }
 
-	@Override
-	public CopyOnWriteArrayList<OverlayPluginContainer> getOverlays() {		
-		return null;
-	}
+    @Override
+    public void removeOverlay(int index) {
+        // TODO Auto-generated method stub
 
-	@Override
-	public void removeOverlay(int index) {
-		// TODO Auto-generated method stub
-		
-	}
+    }
+
     @Override
     public void setOverlays(CopyOnWriteArrayList<OverlayPluginContainer> overlays) {
-    }	
+    }
 }

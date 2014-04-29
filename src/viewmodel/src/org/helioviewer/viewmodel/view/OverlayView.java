@@ -23,29 +23,32 @@ import org.helioviewer.viewmodel.view.opengl.OverlayPluginContainer;
  * @author Markus Langenberg
  * 
  */
-public interface OverlayView extends ModifiableInnerViewView, ViewListener{
+public interface OverlayView extends ModifiableInnerViewView, ViewListener {
 
-	public void addOverlay(OverlayPluginContainer overlayPluginContainer);
-	public CopyOnWriteArrayList<OverlayPluginContainer> getOverlays();
-	public void setOverlays(CopyOnWriteArrayList<OverlayPluginContainer> overlays);	
-	public void removeOverlay(int index);
-	/**
-	 * Sets the renderer to draw overlays.
-	 * 
-	 * @param renderer
-	 *            New renderer to draw overlays.
-	 * @see #getRenderer
-	 */
-	public void setRenderer(PhysicalRenderer renderer);
+    public void addOverlay(OverlayPluginContainer overlayPluginContainer);
 
-	/**
-	 * Returns the currently used renderer.
-	 * 
-	 * If there is currently no renderer present, return null.
-	 * 
-	 * @return renderer currently in use, null if there is none.
-	 * @see #setRenderer
-	 */
+    public CopyOnWriteArrayList<OverlayPluginContainer> getOverlays();
 
+    public void setOverlays(CopyOnWriteArrayList<OverlayPluginContainer> overlays);
+
+    public void removeOverlay(int index);
+
+    /**
+     * Sets the renderer to draw overlays.
+     * 
+     * @param renderer
+     *            New renderer to draw overlays.
+     * @see #getRenderer
+     */
+    public void setRenderer(PhysicalRenderer renderer);
+
+    /**
+     * Returns the currently used renderer.
+     * 
+     * If there is currently no renderer present, return null.
+     * 
+     * @return renderer currently in use, null if there is none.
+     * @see #setRenderer
+     */
 
 }

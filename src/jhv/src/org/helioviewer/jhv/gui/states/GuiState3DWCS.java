@@ -26,14 +26,15 @@ public class GuiState3DWCS extends GuiState2D {
 
     public void activate() {
         super.activate();
-    	GLTextureHelper.is2DState = false;
+        GLTextureHelper.is2DState = false;
         GL3DCameraSelectorModel.getInstance().activate(this.mainComponentView.getAdapter(GL3DSceneGraphView.class));
         GL3DPluginController.getInstance().setPluginConfiguration(new GL3DInternalPluginConfiguration());
         GL3DPluginController.getInstance().loadPlugins();
     }
-    public void deactivate(){
-    	super.deactivate();
-    	GLTextureHelper.is2DState = true;
+
+    public void deactivate() {
+        super.deactivate();
+        GLTextureHelper.is2DState = true;
     }
 
     /*

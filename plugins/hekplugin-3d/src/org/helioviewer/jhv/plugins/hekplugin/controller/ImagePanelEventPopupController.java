@@ -69,6 +69,7 @@ public class ImagePanelEventPopupController implements ImagePanelPlugin, MouseLi
     private HEKEventInformationDialog hekPopUp = new HEKEventInformationDialog();
 
     private boolean state3D = false;
+
     // ///////////////////////////////////////////////////////////////////////////
     // Methods
     // ///////////////////////////////////////////////////////////////////////////
@@ -135,11 +136,11 @@ public class ImagePanelEventPopupController implements ImagePanelPlugin, MouseLi
             yCoord = p.y + imagePanel.getLocationOnScreen().y - hekPopUp.getSize().height - yOffset;
             if (yCoord < imagePanel.getLocationOnScreen().y) {
                 yCoord = imagePanel.getLocationOnScreen().y + imagePanel.getSize().height - hekPopUp.getSize().height;
-                
-                if(yCoord < imagePanel.getLocationOnScreen().y) {
+
+                if (yCoord < imagePanel.getLocationOnScreen().y) {
                     yCoord = imagePanel.getLocationOnScreen().y;
                 }
-                
+
                 yCoordInMiddle = true;
             }
         }
@@ -226,50 +227,50 @@ public class ImagePanelEventPopupController implements ImagePanelPlugin, MouseLi
         GL3DVec3d hitpoint = null;
         mouseOverHEKEvent = null;
         mouseOverPosition = null;
-        if (view instanceof GL3DComponentView && GL3DState.get().getActiveCamera() != null){
-        	state3D = true;
-        	
-        	GL3DComponentView gl3dview = (GL3DComponentView)view;
-        	GL3DSceneGraphView scenegraphview = (GL3DSceneGraphView)gl3dview.getView();
-        	GL3DRayTracer rayTracer = new GL3DRayTracer(scenegraphview.getHitReferenceShape(), GL3DState.get().getActiveCamera());
-        	GL3DRay ray = null;
-        	
-        	ray = rayTracer.cast(e.getX(), e.getY());
-			
-        	if (ray != null){
-        	if (ray.getHitPoint() != null){
-        		
-        		hitpoint = ray.getHitPoint();
-        	}}
+        if (view instanceof GL3DComponentView && GL3DState.get().getActiveCamera() != null) {
+            state3D = true;
+
+            GL3DComponentView gl3dview = (GL3DComponentView) view;
+            GL3DSceneGraphView scenegraphview = (GL3DSceneGraphView) gl3dview.getView();
+            GL3DRayTracer rayTracer = new GL3DRayTracer(scenegraphview.getHitReferenceShape(), GL3DState.get().getActiveCamera());
+            GL3DRay ray = null;
+
+            ray = rayTracer.cast(e.getX(), e.getY());
+
+            if (ray != null) {
+                if (ray.getHitPoint() != null) {
+
+                    hitpoint = ray.getHitPoint();
+                }
+            }
         }
-        
+
         if (currentDate != null) {
             Vector<HEKEvent> toDraw = HEKCache.getSingletonInstance().getModel().getActiveEvents(currentDate);
 
             for (HEKEvent evt : toDraw) {
-            	if (state3D){
-            		SphericalCoord stony = evt.getStony(currentDate);
-    				Vector3dDouble coords = HEKEvent.convertToSceneCoordinates(stony, currentDate);
-    				
-            		if (hitpoint != null){
-            			double deltaX = Math.abs(hitpoint.x-coords.getX());
-            			double deltaY = Math.abs(hitpoint.y+coords.getY());
-            			double deltaZ = Math.abs(hitpoint.z-coords.getZ());
-            			if (deltaX < 10000000 && deltaZ < 10000000 && deltaY < 10000000){
-            				mouseOverHEKEvent = evt;
-            				mouseOverPosition = new Point(e.getX(), e.getY());
-            			}
-            		}
-            	}
-            	else{
-                Vector2dDouble eventPos = evt.getScreenCoordinates(currentDate);
-                Vector2dInt screenPos = convertPhysicalToScreen(eventPos.getX(), eventPos.getY());
+                if (state3D) {
+                    SphericalCoord stony = evt.getStony(currentDate);
+                    Vector3dDouble coords = HEKEvent.convertToSceneCoordinates(stony, currentDate);
 
-                if (e.getPoint().getX() >= screenPos.getX() - 8 && e.getPoint().getX() <= screenPos.getX() + 8 && e.getPoint().getY() >= screenPos.getY() - 8 && e.getPoint().getY() <= screenPos.getY() + 8) {
-                    mouseOverHEKEvent = evt;
-                    mouseOverPosition = new Point(screenPos.getX(), screenPos.getY());
+                    if (hitpoint != null) {
+                        double deltaX = Math.abs(hitpoint.x - coords.getX());
+                        double deltaY = Math.abs(hitpoint.y + coords.getY());
+                        double deltaZ = Math.abs(hitpoint.z - coords.getZ());
+                        if (deltaX < 10000000 && deltaZ < 10000000 && deltaY < 10000000) {
+                            mouseOverHEKEvent = evt;
+                            mouseOverPosition = new Point(e.getX(), e.getY());
+                        }
+                    }
+                } else {
+                    Vector2dDouble eventPos = evt.getScreenCoordinates(currentDate);
+                    Vector2dInt screenPos = convertPhysicalToScreen(eventPos.getX(), eventPos.getY());
+
+                    if (e.getPoint().getX() >= screenPos.getX() - 8 && e.getPoint().getX() <= screenPos.getX() + 8 && e.getPoint().getY() >= screenPos.getY() - 8 && e.getPoint().getY() <= screenPos.getY() + 8) {
+                        mouseOverHEKEvent = evt;
+                        mouseOverPosition = new Point(screenPos.getX(), screenPos.getY());
+                    }
                 }
-            	}
             }
 
             if (lastHEKEvent == null && mouseOverHEKEvent != null) {

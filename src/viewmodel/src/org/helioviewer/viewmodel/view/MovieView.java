@@ -179,6 +179,6 @@ public interface MovieView extends View {
      * @see #setReuseBuffer(boolean)
      */
     public boolean isReuseBuffer();
-    
+
     public long getCurrentDateMillis();
 }

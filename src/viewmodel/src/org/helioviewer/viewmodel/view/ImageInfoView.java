@@ -56,8 +56,10 @@ public interface ImageInfoView extends View {
      * @return download uri
      */
     public URI getDownloadURI();
+
     public Interval<Date> getDateRange();
-    public void setDateRange(Interval<Date> range);  
+
+    public void setDateRange(Interval<Date> range);
 
     public MetaData getMetadata();
 }

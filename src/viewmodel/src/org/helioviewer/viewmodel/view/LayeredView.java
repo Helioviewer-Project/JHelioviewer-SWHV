@@ -160,5 +160,4 @@ public interface LayeredView extends View {
      */
     public void moveView(View view, int newLevel);
 
-  
 }

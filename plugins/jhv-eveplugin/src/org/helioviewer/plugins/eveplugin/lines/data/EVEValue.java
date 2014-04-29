@@ -13,21 +13,21 @@ public class EVEValue {
     // //////////////////////////////////////////////////////////////////////////////
     // Definitions
     // //////////////////////////////////////////////////////////////////////////////
-    
+
     public Date date;
     public Double value;
-    
+
     // //////////////////////////////////////////////////////////////////////////////
     // Methods
     // //////////////////////////////////////////////////////////////////////////////
-    
+
     /**
      * Default constructor.
      * */
     public EVEValue() {
         this(null, null);
     }
-    
+
     /**
      * Parameterized constructor which initializes the object with the given
      * time stamp and value.
@@ -41,7 +41,7 @@ public class EVEValue {
         this.date = date;
         this.value = value;
     }
-    
+
     /**
      * Returns the time stamp.
      * 
@@ -50,7 +50,7 @@ public class EVEValue {
     public Date getDate() {
         return date;
     }
-    
+
     /**
      * Returns the value.
      * 
@@ -59,7 +59,7 @@ public class EVEValue {
     public Double getValue() {
         return value;
     }
-    
+
     /**
      * Sets the time stamp.
      * 
@@ -69,7 +69,7 @@ public class EVEValue {
     public void setDate(final Date date) {
         this.date = date;
     }
-    
+
     /**
      * Sets the value.
      * 

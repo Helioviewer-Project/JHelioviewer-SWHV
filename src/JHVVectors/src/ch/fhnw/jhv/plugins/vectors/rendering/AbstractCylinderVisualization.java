@@ -326,7 +326,8 @@ public abstract class AbstractCylinderVisualization extends AbstractVectorVisual
         // draw all the shells
         gl.glBindBuffer(GL.GL_ELEMENT_ARRAY_BUFFER, vboShell[1]);
         for (int i = 0; i < vectorcount; i++) {
-            //gl.glDrawElements(GL.GL_TRIANGLE_STRIP, indicesCyl, GL.GL_UNSIGNED_INT, i * indicesCyl * BufferUtil.SIZEOF_INT);
+            // gl.glDrawElements(GL.GL_TRIANGLE_STRIP, indicesCyl,
+            // GL.GL_UNSIGNED_INT, i * indicesCyl * BufferUtil.SIZEOF_INT);
         }
 
         gl.glDisableClientState(GL.GL_VERTEX_ARRAY);

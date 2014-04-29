@@ -12,8 +12,8 @@ import org.helioviewer.plugins.eveplugin.settings.EVEAPI.API_RESOLUTION_AVERAGES
 public interface ZoomControllerListener {
 
     public void availableIntervalChanged(final Interval<Date> newInterval);
-    
+
     public void selectedIntervalChanged(final Interval<Date> newInterval);
-    
+
     public void selectedResolutionChanged(final API_RESOLUTION_AVERAGES newResolution);
 }

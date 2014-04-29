@@ -374,8 +374,9 @@ public class BasicImagePanel extends JPanel implements ComponentListener, ViewLi
             return;
         }
 
-        //if (aEvent.reasonOccurred(SubImageDataChangedReason.class) || aEvent.reasonOccurred(RegionChangedReason.class))
-            //repaint();
+        // if (aEvent.reasonOccurred(SubImageDataChangedReason.class) ||
+        // aEvent.reasonOccurred(RegionChangedReason.class))
+        // repaint();
     }
 
     // ////////////////////////////////////////////////////////////////

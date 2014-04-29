@@ -244,7 +244,7 @@ public class GLShaderBuilder {
                 if (!param.toLowerCase().contains(type.toLowerCase())) {
                     throw new GLBuildShaderException("Conflict between parameter types for " + parameter + ": " + type + " vs. " + param.substring(0, param.indexOf(' ')));
                 }
-                
+
                 return param.substring(param.indexOf(' '), param.indexOf(' ', param.indexOf(' ') + 1));
             }
         }
@@ -354,7 +354,8 @@ public class GLShaderBuilder {
     public int addEnvParameter(String declaration) throws GLBuildShaderException {
         if (nextConstantRegister < maxConstantRegisters) {
             parameterList.add("uniform " + declaration.trim() + " : C" + nextConstantRegister);
-            //parameterList.add("uniform " + declaration.trim() + nextConstantRegister);
+            // parameterList.add("uniform " + declaration.trim() +
+            // nextConstantRegister);
             return nextConstantRegister++;
         } else {
             throw new GLBuildShaderException("Number of available enviroment parameters exceeded (Max: " + maxConstantRegisters + ")");
@@ -545,12 +546,9 @@ public class GLShaderBuilder {
             super(target, offset, length, identifier);
         }
     }
-    
-    
-    
-    public String getCode()
-    {
-    	String finalCode = "struct outputStruct {" + LINE_SEP;
+
+    public String getCode() {
+        String finalCode = "struct outputStruct {" + LINE_SEP;
 
         for (String output : outputStruct) {
             finalCode += '\t' + outputTypes.get(output) + ' ' + output.toLowerCase() + " : " + output + ';' + LINE_SEP;
@@ -588,9 +586,8 @@ public class GLShaderBuilder {
 
         // main function body
         finalCode += LINE_SEP + mainBody + "\treturn OUT;" + LINE_SEP + '}';
-        
+
         return finalCode;
     }
-    
-    
+
 }

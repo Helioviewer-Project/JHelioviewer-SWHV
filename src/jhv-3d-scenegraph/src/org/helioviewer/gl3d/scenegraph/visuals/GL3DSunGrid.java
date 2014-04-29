@@ -11,7 +11,7 @@ public class GL3DSunGrid extends GL3DGroup {
 
     public GL3DSunGrid(double radius, int resolutionX, int resolutionY, GL3DVec4f color) {
         super("Sun Grid");
-        
+
         // Create a Sphere
         GL3DShape sphere = new GL3DSphere(radius, resolutionX, resolutionY, color);
         GL3DShape yAxis = new GL3DCircle(radius * 0.98, color, "yAxis");
@@ -22,14 +22,14 @@ public class GL3DSunGrid extends GL3DGroup {
         GL3DShape zAxis = new GL3DCircle(radius * 0.98, color, "zAxis");
         zAxis.modelView().rotate(Math.PI / 2, new GL3DVec3d(1, 0, 0));
         xAxis.getDrawBits().on(Bit.Wireframe);
-        //addNode(xAxis);
+        // addNode(xAxis);
         yAxis.getDrawBits().on(Bit.Wireframe);
-        //addNode(yAxis);
+        // addNode(yAxis);
         zAxis.getDrawBits().on(Bit.Wireframe);
-        //addNode(zAxis);
+        // addNode(zAxis);
         // Add the sphere as Node
         sphere.getDrawBits().on(Bit.Wireframe);
-        //sphere.getDrawBits().on(Bit.Hidden);
+        // sphere.getDrawBits().on(Bit.Hidden);
         addNode(sphere);
     }
 

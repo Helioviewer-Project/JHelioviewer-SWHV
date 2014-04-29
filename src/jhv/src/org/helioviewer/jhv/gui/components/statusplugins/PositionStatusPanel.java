@@ -108,7 +108,7 @@ public class PositionStatusPanel extends ViewStatusPanelPlugin implements MouseM
             String xStr = fmt.format(" %5d", (int) Math.round(pos.getX())).toString();
             String yStr = fmt.format(" %5d", (int) Math.round(pos.getY())).toString();
             fmt.close();
-            
+
             setText("(x, y) = " + "(" + xStr + PRIME + PRIME + "," + yStr + PRIME + PRIME + ")");
         } else {
 

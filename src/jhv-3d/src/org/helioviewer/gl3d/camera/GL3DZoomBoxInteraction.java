@@ -121,7 +121,7 @@ public class GL3DZoomBoxInteraction extends GL3DDefaultInteraction {
     }
 
     private GL3DCameraRotationAnimation createRotationAnimation(GL3DVec3d startPoint) {
-    	
+
         GL3DVec3d endPoint = GL3DVec3d.add(this.zoomBoxEndPoint, this.zoomBoxStartPoint);
         endPoint.divide(2);
         endPoint.normalize();

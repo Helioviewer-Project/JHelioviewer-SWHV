@@ -22,7 +22,7 @@ import org.helioviewer.viewmodel.view.View;
  * @author Markus Langenberg
  * 
  */
-public abstract class PhysicalRenderer3d implements PhysicalRenderer{
+public abstract class PhysicalRenderer3d implements PhysicalRenderer {
 
     /**
      * Callback function that will be called during rendering the image.
@@ -34,12 +34,12 @@ public abstract class PhysicalRenderer3d implements PhysicalRenderer{
      * @param g
      *            render object provided by caller
      */
-    public void render(PhysicalRenderGraphics g){
-    	
+    public void render(PhysicalRenderGraphics g) {
+
     }
-    
-    public void viewChanged(View view){
-    	
+
+    public void viewChanged(View view) {
+
     }
 
 }

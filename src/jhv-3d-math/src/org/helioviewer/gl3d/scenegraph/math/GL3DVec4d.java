@@ -28,13 +28,13 @@ public class GL3DVec4d {
         this.z = vector.z;
         this.w = vector.w;
     }
-    
-	public GL3DVec4d(GL3DVec3d vector) {
-		this.x = vector.x;
-		this.y = vector.y;
-		this.z = vector.z;
-		this.w = 0.0;
-	}
+
+    public GL3DVec4d(GL3DVec3d vector) {
+        this.x = vector.x;
+        this.y = vector.y;
+        this.z = vector.z;
+        this.w = 0.0;
+    }
 
     public GL3DVec4d() {
         this(0f, 0f, 0f, 0f);
@@ -163,23 +163,23 @@ public class GL3DVec4d {
     }
 
     public void negate() {
-    	this.x = -this.x;
-    	this.y = -this.y;
-    	this.z = -this.z;
-    	this.w = -this.w;
+        this.x = -this.x;
+        this.y = -this.y;
+        this.z = -this.z;
+        this.w = -this.w;
     }
 
     public static GL3DVec4d negate(GL3DVec4d vec) {
-    	GL3DVec4d newVec = vec.copy();
-    	newVec.negate();
-    	return newVec;
+        GL3DVec4d newVec = vec.copy();
+        newVec.negate();
+        return newVec;
     }
 
     private GL3DVec4d copy() {
-    	return new GL3DVec4d(this.x, this.y, this.z, this.w);
-	}
+        return new GL3DVec4d(this.x, this.y, this.z, this.w);
+    }
 
-	public boolean isApproxEqual(GL3DVec4d vec, double tolerance) {
+    public boolean isApproxEqual(GL3DVec4d vec, double tolerance) {
         return Math.abs(this.x - vec.x) <= tolerance && Math.abs(this.y - vec.y) <= tolerance && Math.abs(this.z - vec.z) <= tolerance && Math.abs(this.w - vec.w) <= tolerance;
     }
 

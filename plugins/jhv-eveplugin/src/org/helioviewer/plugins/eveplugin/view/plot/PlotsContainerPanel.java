@@ -15,91 +15,93 @@ import org.helioviewer.plugins.eveplugin.view.linedataselector.LineDataSelectorE
 import org.helioviewer.plugins.eveplugin.view.linedataselector.LineDataSelectorModel;
 import org.helioviewer.plugins.eveplugin.view.linedataselector.LineDataSelectorModelListener;
 
-public class PlotsContainerPanel extends JPanel implements LineDataSelectorModelListener{//BandControllerListener, {
+public class PlotsContainerPanel extends JPanel implements LineDataSelectorModelListener {// BandControllerListener,
+                                                                                          // {
 
     // //////////////////////////////////////////////////////////////////////////////
     // Definitions
     // //////////////////////////////////////////////////////////////////////////////
-    
+
     private static final long serialVersionUID = 1L;
-    
+
     public static final String PLOT_IDENTIFIER_MASTER = "plot.identifier.master";
     public static final String PLOT_IDENTIFIER_SLAVE = "plot.identifier.slave";
-    
+
     private final JSplitPane splitPane = new JSplitPane();
     private final ChartDrawIntervalPane intervalPane = new ChartDrawIntervalPane();
-    
+
     private final PlotPanel plotOne = new PlotPanel(PLOT_IDENTIFIER_MASTER, "Plot 1: ");
     private final PlotPanel plotTwo = new PlotPanel(PLOT_IDENTIFIER_SLAVE, "Plot 2: ");
-    
+
     private boolean isSecondPlotVisible = true;
     private boolean isFirstPlotVisible = true;
-    
+
     // //////////////////////////////////////////////////////////////////////////////
     // Methods
     // //////////////////////////////////////////////////////////////////////////////
-    
+
     public PlotsContainerPanel() {
         BandController.getSingletonInstance().registerBandManager(PLOT_IDENTIFIER_MASTER);
         BandController.getSingletonInstance().registerBandManager(PLOT_IDENTIFIER_SLAVE);
-        
+
         initVisualComponents();
-        
-        //BandController.getSingletonInstance().addBandControllerListener(this);
+
+        // BandController.getSingletonInstance().addBandControllerListener(this);
         LineDataSelectorModel.getSingletonInstance().addLineDataSelectorModelListener(this);
     }
-    
+
     private void initVisualComponents() {
         setLayout(new BorderLayout());
-        
+
         splitPane.setOrientation(JSplitPane.VERTICAL_SPLIT);
         splitPane.setTopComponent(plotOne);
         splitPane.setBottomComponent(plotTwo);
-        
+
         setPlot2Visible(false);
     }
-       
+
     public void setPlot2Visible(final boolean visible) {
         if (isSecondPlotVisible == visible) {
             return;
         }
-        
+
         if (isSecondPlotVisible) {
             splitPane.remove(plotOne);
             remove(splitPane);
-            
+
             plotTwo.setIntervalSlider(null);
         } else {
             remove(plotOne);
             plotOne.setIntervalSlider(null);
         }
-        
+
         isSecondPlotVisible = visible;
-        
+
         if (isSecondPlotVisible) {
             plotTwo.setIntervalSlider(intervalPane);
-            
+
             splitPane.setTopComponent(plotOne);
             add(splitPane, BorderLayout.CENTER);
         } else {
             plotOne.setIntervalSlider(intervalPane);
-            
+
             add(plotOne, BorderLayout.CENTER);
         }
-        
+
         ImageViewerGui.getSingletonInstance().getContentPane().revalidate();
         ImageViewerGui.getSingletonInstance().getContentPane().repaint();
     }
-    
+
     public boolean isPlot2Visible() {
         return isSecondPlotVisible;
     }
-    
+
     // //////////////////////////////////////////////////////////////////////////////
     // Band Controller Listener
     // //////////////////////////////////////////////////////////////////////////////
 
-    public void bandAdded(final Band band, final String identifier) {}
+    public void bandAdded(final Band band, final String identifier) {
+    }
 
     public void bandRemoved(final Band band, final String identifier) {
         if (identifier.equals(PLOT_IDENTIFIER_SLAVE)) {
@@ -108,45 +110,47 @@ public class PlotsContainerPanel extends JPanel implements LineDataSelectorModel
         }
     }
 
-    public void bandUpdated(final Band band, final String identifer) {}
+    public void bandUpdated(final Band band, final String identifer) {
+    }
 
-    public void bandGroupChanged(final String identifer) {}
+    public void bandGroupChanged(final String identifer) {
+    }
 
-	@Override
-	public void downloadStartded(LineDataSelectorElement element) {
-		// TODO Auto-generated method stub
-		
-	}
+    @Override
+    public void downloadStartded(LineDataSelectorElement element) {
+        // TODO Auto-generated method stub
 
-	@Override
-	public void downloadFinished(LineDataSelectorElement element) {
-		// TODO Auto-generated method stub
-		
-	}
+    }
 
-	@Override
-	public void lineDataAdded(LineDataSelectorElement element) {
-		// TODO Auto-generated method stub
-		
-	}
+    @Override
+    public void downloadFinished(LineDataSelectorElement element) {
+        // TODO Auto-generated method stub
 
-	@Override
-	public void lineDataRemoved(LineDataSelectorElement element) {
-		if (element.getPlotIdentifier().equals(PLOT_IDENTIFIER_SLAVE)) {
-			List<LineDataSelectorElement> allElements = LineDataSelectorModel.getSingletonInstance().getAllLineDataSelectorElements(element.getPlotIdentifier());
-            if (allElements != null){
-            	int numberOfLines = LineDataSelectorModel.getSingletonInstance().getAllLineDataSelectorElements(element.getPlotIdentifier()).size();
-            	setPlot2Visible(numberOfLines > 0);
-            }else{
-            	setPlot2Visible(false);
+    }
+
+    @Override
+    public void lineDataAdded(LineDataSelectorElement element) {
+        // TODO Auto-generated method stub
+
+    }
+
+    @Override
+    public void lineDataRemoved(LineDataSelectorElement element) {
+        if (element.getPlotIdentifier().equals(PLOT_IDENTIFIER_SLAVE)) {
+            List<LineDataSelectorElement> allElements = LineDataSelectorModel.getSingletonInstance().getAllLineDataSelectorElements(element.getPlotIdentifier());
+            if (allElements != null) {
+                int numberOfLines = LineDataSelectorModel.getSingletonInstance().getAllLineDataSelectorElements(element.getPlotIdentifier()).size();
+                setPlot2Visible(numberOfLines > 0);
+            } else {
+                setPlot2Visible(false);
             }
         }
-		
-	}
 
-	@Override
-	public void lineDataUpdated(LineDataSelectorElement element) {
-		// TODO Auto-generated method stub
-		
-	}
+    }
+
+    @Override
+    public void lineDataUpdated(LineDataSelectorElement element) {
+        // TODO Auto-generated method stub
+
+    }
 }

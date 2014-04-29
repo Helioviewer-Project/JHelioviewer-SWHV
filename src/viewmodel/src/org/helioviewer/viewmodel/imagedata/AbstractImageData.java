@@ -88,12 +88,12 @@ public abstract class AbstractImageData implements JavaBufferedImageData {
      * @return the created BufferedImage
      */
     protected abstract BufferedImage createBufferedImageFromImageTransport();
-    
-    public long getDateMillis(){
-    	return dateMillis;
+
+    public long getDateMillis() {
+        return dateMillis;
     }
-    
-    public void setDateMillis( long dateMillis){
-    	this.dateMillis = dateMillis;
-    }    
+
+    public void setDateMillis(long dateMillis) {
+        this.dateMillis = dateMillis;
+    }
 }

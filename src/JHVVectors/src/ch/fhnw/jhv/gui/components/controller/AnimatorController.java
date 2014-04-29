@@ -331,8 +331,8 @@ public class AnimatorController {
                     notifyListeners(AnimationAction.STOP);
                     updateMoviePanel();
                     break;
-				default:
-					break;
+                default:
+                    break;
                 }
             } else {
                 currentTimestamp += deltaTimePerTick;

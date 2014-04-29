@@ -19,33 +19,29 @@ public class GL3DEITImageLayer extends GL3DImageLayer {
     }
 
     protected void createImageMeshNodes(GL gl) {
-    	this.sphereFragmentShader = new GL3DImageFragmentShaderProgram();
-    	GLFragmentShaderProgram sphereFragmentShader = GL3DShaderFactory.createFragmentShaderProgram(gl, this.sphereFragmentShader);
-        
+        this.sphereFragmentShader = new GL3DImageFragmentShaderProgram();
+        GLFragmentShaderProgram sphereFragmentShader = GL3DShaderFactory.createFragmentShaderProgram(gl, this.sphereFragmentShader);
+
         GL3DImageVertexShaderProgram vertex = new GL3DImageVertexShaderProgram();
-        GLVertexShaderProgram   vertexShader   = GL3DShaderFactory.createVertexShaderProgram(gl, vertex);
-        this.imageTextureView.setVertexShader(vertex);        
-        
+        GLVertexShaderProgram vertexShader = GL3DShaderFactory.createVertexShaderProgram(gl, vertex);
+        this.imageTextureView.setVertexShader(vertex);
+
         sphere = new GL3DImageSphere(imageTextureView, vertexShader, sphereFragmentShader, this);
         this.imageTextureView.metadata = this.metaDataView.getMetaData();
-        
+
         this.accellerationShape = new GL3DHitReferenceShape();
-        
-        double xOffset = (this.imageTextureView.metadata.getPhysicalUpperRight().getX()+this.imageTextureView.metadata.getPhysicalLowerLeft().getX())/(2.0*this.imageTextureView.metadata.getPhysicalImageWidth());
-        double yOffset = (this.imageTextureView.metadata.getPhysicalUpperRight().getY()+this.imageTextureView.metadata.getPhysicalLowerLeft().getY())/(2.0*this.imageTextureView.metadata.getPhysicalImageHeight());
+
+        double xOffset = (this.imageTextureView.metadata.getPhysicalUpperRight().getX() + this.imageTextureView.metadata.getPhysicalLowerLeft().getX()) / (2.0 * this.imageTextureView.metadata.getPhysicalImageWidth());
+        double yOffset = (this.imageTextureView.metadata.getPhysicalUpperRight().getY() + this.imageTextureView.metadata.getPhysicalLowerLeft().getY()) / (2.0 * this.imageTextureView.metadata.getPhysicalImageHeight());
         vertex.setDefaultOffset(xOffset, yOffset);
 
-        this.sphereFragmentShader.setCutOffRadius((float)(Constants.SunRadius/this.imageTextureView.metadata.getPhysicalImageWidth()));
+        this.sphereFragmentShader.setCutOffRadius((float) (Constants.SunRadius / this.imageTextureView.metadata.getPhysicalImageWidth()));
 
         this.addNode(sphere);
     }
 
-
     protected GL3DImageMesh getImageSphere() {
         return this.sphere;
     }
-    
-
-
 
 }

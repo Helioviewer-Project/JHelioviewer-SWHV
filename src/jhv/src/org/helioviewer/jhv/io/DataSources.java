@@ -186,18 +186,18 @@ public class DataSources {
      * Use singleton
      */
     private DataSources() {
-    	Settings settingsInstance = Settings.getSingletonInstance();
-    	String prop = settingsInstance.getProperty("supported.data.sources");
-    	
-    	if(prop != null) {
-	        String supportedObservatories[] = prop.split(" ");
-	        for (String s : supportedObservatories) {
-	            if (!s.isEmpty()) {
-	                SUPPORTED_OBSERVATORIES.add(s);
-	            }
-	        }
-    	}
-        
+        Settings settingsInstance = Settings.getSingletonInstance();
+        String prop = settingsInstance.getProperty("supported.data.sources");
+
+        if (prop != null) {
+            String supportedObservatories[] = prop.split(" ");
+            for (String s : supportedObservatories) {
+                if (!s.isEmpty()) {
+                    SUPPORTED_OBSERVATORIES.add(s);
+                }
+            }
+        }
+
         while (true) {
             try {
                 String queryString = Settings.getSingletonInstance().getProperty("API.dataSources.path");

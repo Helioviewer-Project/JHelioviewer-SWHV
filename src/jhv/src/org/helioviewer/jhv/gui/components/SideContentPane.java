@@ -57,6 +57,7 @@ public class SideContentPane extends JComponent {
     public void add(String title, Component component, boolean startExpanded) {
         add(title, component, -1, startExpanded);
     }
+
     /**
      * Add new component into a new {@link CollapsiblePane} at the end.
      * 
@@ -68,8 +69,9 @@ public class SideContentPane extends JComponent {
      *            if true, the component will be visible right from the start
      */
     public void addWithButton(String title, Component component, boolean startExpanded) {
-    	addWithButton(title, component, -1, startExpanded);
+        addWithButton(title, component, -1, startExpanded);
     }
+
     /**
      * Add new component into a new {@link CollapsiblePane}.
      * 
@@ -93,6 +95,7 @@ public class SideContentPane extends JComponent {
             add(newPane, index);
         }
     }
+
     /**
      * Add new component into a new {@link CollapsiblePane}.
      * 
@@ -116,6 +119,7 @@ public class SideContentPane extends JComponent {
             add(newPane, index);
         }
     }
+
     /**
      * Expands the given component.
      * 

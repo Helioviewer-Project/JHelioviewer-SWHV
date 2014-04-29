@@ -57,19 +57,19 @@ public class HEKPluginContainer extends OverlayContainer {
      */
     @Override
     protected void installOverlayImpl(OverlayView overlayView, OverlayControlComponentManager controlList) {
-        
-    	hekPanel = new HEKPluginPanel(HEKCache.getSingletonInstance());
+
+        hekPanel = new HEKPluginPanel(HEKCache.getSingletonInstance());
         OverlayPluginContainer overlayPluginContainer = new OverlayPluginContainer();
         overlayPluginContainer.setRenderer(new HEKPluginRenderer());
         overlayPluginContainer.setRenderer3d(new HEKPlugin3dRenderer());
         overlayView.addOverlay(overlayPluginContainer);
         controlList.add(new OverlayControlComponent(hekPanel, getName()));
-        
+
         /*
-        hekPanel = new HEKPluginPanel(HEKCache.getSingletonInstance());
-        overlayView.setRenderer(new HEKPluginRenderer());
-        controlList.add(new OverlayControlComponent(hekPanel, getName()));
-		*/
+         * hekPanel = new HEKPluginPanel(HEKCache.getSingletonInstance());
+         * overlayView.setRenderer(new HEKPluginRenderer()); controlList.add(new
+         * OverlayControlComponent(hekPanel, getName()));
+         */
     }
 
     /**

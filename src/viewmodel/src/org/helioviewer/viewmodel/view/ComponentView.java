@@ -114,7 +114,7 @@ public interface ComponentView extends ModifiableInnerViewView, ViewListener {
      * @see #removePostRenderer(ScreenRenderer)
      * @see #getAllPostRenderer()
      */
-	public void addPostRenderer(ScreenRenderer postRenderer);
+    public void addPostRenderer(ScreenRenderer postRenderer);
 
     /**
      * Removes a post renderer.

@@ -270,7 +270,7 @@ public class PluginsDialog extends JDialog implements ShowableDialog, ActionList
 
         // Update all OverlayViews which are included in the view chain above
         // the layered view
-        GLOverlayView overlayView = ImageViewerGui.getSingletonInstance().getMainView().getAdapter(GLOverlayView.class);        
+        GLOverlayView overlayView = ImageViewerGui.getSingletonInstance().getMainView().getAdapter(GLOverlayView.class);
         chainFactory.updateOverlayViewsInViewchainMain(overlayView);
     }
 

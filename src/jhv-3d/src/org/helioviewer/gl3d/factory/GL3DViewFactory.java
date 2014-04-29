@@ -75,7 +75,7 @@ public class GL3DViewFactory extends GLViewFactory {
                 throw new IllegalArgumentException("Cannot create View from Source " + source);
             }
         } else if (source instanceof ComponentView) {
-			return (T) new GL3DComponentView();
+            return (T) new GL3DComponentView();
         } else {
             return super.createViewFromSourceImpl(source);
         }
@@ -92,8 +92,8 @@ public class GL3DViewFactory extends GLViewFactory {
         GL3DLayeredView gl3dLayeredView = new GL3DLayeredView();
 
         for (int i = 0; i < layeredView.getNumLayers(); i++) {
-        	if (layeredView.getLayer(i) != null)
-            gl3dLayeredView.addLayer(layeredView.getLayer(i));
+            if (layeredView.getLayer(i) != null)
+                gl3dLayeredView.addLayer(layeredView.getLayer(i));
         }
         return gl3dLayeredView;
     }

@@ -195,7 +195,7 @@ public class ImageSelectorPanel extends JPanel implements LayersListener {
          */
         public void actionPerformed(ActionEvent arg0) {
             if (LayersModel.getSingletonInstance().getActiveView() != null) {
-            	LayersToDatasetLayers.getSingletonInstance().moveLayerDown(LayersModel.getSingletonInstance().getActiveView());
+                LayersToDatasetLayers.getSingletonInstance().moveLayerDown(LayersModel.getSingletonInstance().getActiveView());
             }
         }
     };
@@ -224,7 +224,7 @@ public class ImageSelectorPanel extends JPanel implements LayersListener {
          */
         public void actionPerformed(ActionEvent arg0) {
             if (LayersModel.getSingletonInstance().getActiveView() != null) {
-            	LayersToDatasetLayers.getSingletonInstance().moveLayerUp(LayersModel.getSingletonInstance().getActiveView());
+                LayersToDatasetLayers.getSingletonInstance().moveLayerUp(LayersModel.getSingletonInstance().getActiveView());
 
             }
         }
@@ -379,7 +379,7 @@ public class ImageSelectorPanel extends JPanel implements LayersListener {
     public void layerDownloaded(int idx) {
     }
 
-	public ImageDataPanel getObservationImagePane() {
-		return observationImagePane;
-	}
+    public ImageDataPanel getObservationImagePane() {
+        return observationImagePane;
+    }
 }

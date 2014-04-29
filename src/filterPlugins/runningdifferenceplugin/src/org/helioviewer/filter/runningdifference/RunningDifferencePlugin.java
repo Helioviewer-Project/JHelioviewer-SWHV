@@ -1,4 +1,5 @@
 package org.helioviewer.filter.runningdifference;
+
 import org.helioviewer.viewmodelplugin.filter.FilterPlugin;
 
 /**
@@ -31,9 +32,9 @@ public class RunningDifferencePlugin extends FilterPlugin {
         return "Running Difference";
     }
 
-	public String getAboutLicenseText() {
-		// TODO Auto-generated method stub
-		return "about ...";
-	}
+    public String getAboutLicenseText() {
+        // TODO Auto-generated method stub
+        return "about ...";
+    }
 
 }

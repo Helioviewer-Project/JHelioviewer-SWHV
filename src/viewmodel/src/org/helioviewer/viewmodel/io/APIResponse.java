@@ -38,22 +38,22 @@ public class APIResponse {
      */
     public APIResponse(Reader source) {
         try {
-        	StringBuilder sb = new StringBuilder();
-        	try {
-        		BufferedReader br = new BufferedReader(source);
-        		
-        		String b;
-				while((b = br.readLine())!=null){
-					sb.append(b);
-					Log.debug("answer : " + b);
-				}
-				
-			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-        	//data = new JSONObject(new JSONTokener(source));
-        	data = new JSONObject(new JSONTokener(new StringReader(sb.toString())));
+            StringBuilder sb = new StringBuilder();
+            try {
+                BufferedReader br = new BufferedReader(source);
+
+                String b;
+                while ((b = br.readLine()) != null) {
+                    sb.append(b);
+                    Log.debug("answer : " + b);
+                }
+
+            } catch (IOException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            }
+            // data = new JSONObject(new JSONTokener(source));
+            data = new JSONObject(new JSONTokener(new StringReader(sb.toString())));
             uri = new URI(data.getString("uri"));
         } catch (JSONException e) {
             Log.error("Invalid JSON response " + data, e);
