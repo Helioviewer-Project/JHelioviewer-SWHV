@@ -48,6 +48,7 @@ public class JHVSimpleImageView extends AbstractView implements ViewportView, Re
     protected BufferedImage bufferedImage;
     protected PixelBasedMetaData pixelBasedMetaData;
     private Interval<Date> range;
+
     /**
      * Constructor which loads the corresponding image from given URI.
      * 
@@ -59,7 +60,7 @@ public class JHVSimpleImageView extends AbstractView implements ViewportView, Re
      *             thrown, if the image is not readable
      */
     public JHVSimpleImageView(URI _uri, Interval<Date> range) throws MalformedURLException, IOException {
-    	this.range = range;
+        this.range = range;
         uri = _uri;
         bufferedImage = ImageIO.read(uri.toURL());
 
@@ -75,7 +76,7 @@ public class JHVSimpleImageView extends AbstractView implements ViewportView, Re
      *            Specifies the location of the simple image file.
      */
     public JHVSimpleImageView(BufferedImage image, URI uri, Interval<Date> range) {
-    	this.range = range;
+        this.range = range;
         this.uri = uri;
         bufferedImage = image;
 
@@ -240,19 +241,20 @@ public class JHVSimpleImageView extends AbstractView implements ViewportView, Re
         return uri;
     }
 
-	@Override
-	public Interval<Date> getDateRange() {
-		return this.range;
-	}
-	@Override
-	public MetaData getMetadata() {
-		// TODO Auto-generated method stub
-		return pixelBasedMetaData;
-	}
+    @Override
+    public Interval<Date> getDateRange() {
+        return this.range;
+    }
 
-	@Override
-	public void setDateRange(Interval<Date> range) {
-		// TODO Auto-generated method stub
-		
-	}
+    @Override
+    public MetaData getMetadata() {
+        // TODO Auto-generated method stub
+        return pixelBasedMetaData;
+    }
+
+    @Override
+    public void setDateRange(Interval<Date> range) {
+        // TODO Auto-generated method stub
+
+    }
 }

@@ -69,8 +69,6 @@ import org.helioviewer.viewmodel.view.MovieView;
 import org.helioviewer.viewmodel.view.View;
 import org.helioviewer.viewmodelplugin.filter.FilterTabPanelManager;
 
-
-
 /**
  * A class that sets up the graphical user interface.
  * 
@@ -295,26 +293,16 @@ public class ImageViewerGui {
             }
         });
         /*
-        frame.addWindowFocusListener(new WindowAdapter() {
-        	int count=0;
-            public void windowGainedFocus(WindowEvent e) {
-            	if(count==0){
-            		count=count+1;
-            	}
-            	else{
-            	ComponentView cv = ImageViewerGui.getSingletonInstance().getMainView();
-            	cv.activate();       
-            	Log.error("WindowListener method called: windowActivated.");
-            	}
-            }
-
-            public void windowLostFocus(WindowEvent e) {
-            	ComponentView cv = ImageViewerGui.getSingletonInstance().getMainView();
-            	cv.deactivate();
-            	Log.error("WindowListener method called: windowDeactivated.");
-            }
-        });
-        */
+         * frame.addWindowFocusListener(new WindowAdapter() { int count=0;
+         * public void windowGainedFocus(WindowEvent e) { if(count==0){
+         * count=count+1; } else{ ComponentView cv =
+         * ImageViewerGui.getSingletonInstance().getMainView(); cv.activate();
+         * Log.error("WindowListener method called: windowActivated."); } }
+         * 
+         * public void windowLostFocus(WindowEvent e) { ComponentView cv =
+         * ImageViewerGui.getSingletonInstance().getMainView(); cv.deactivate();
+         * Log.error("WindowListener method called: windowDeactivated."); } });
+         */
         Dimension maxSize = Toolkit.getDefaultToolkit().getScreenSize();
         Dimension minSize = new Dimension(800, 600);
 
@@ -416,16 +404,16 @@ public class ImageViewerGui {
             filterPanelContainer = new ControlPanelContainer();
             filterPanelContainer.setDefaultPanel(tab);
             leftPane.add("Adjustments", filterPanelContainer, false);
-    	    /*
-            DatasetIntervals intervals = new DatasetIntervals();
-    	    DatasetTreeModel model = new DatasetTreeModel(intervals);
-    	    LayersToDatasetLayers converter = new LayersToDatasetLayers(model);
-    	    LayersModel.getSingletonInstance().addLayersListener(converter);
-    	    JTree tree = new DatasetTree(model);
-    	    model.setTree(tree);
-    		
-            leftPane.add("Tree", tree);
-			*/
+            /*
+             * DatasetIntervals intervals = new DatasetIntervals();
+             * DatasetTreeModel model = new DatasetTreeModel(intervals);
+             * LayersToDatasetLayers converter = new
+             * LayersToDatasetLayers(model);
+             * LayersModel.getSingletonInstance().addLayersListener(converter);
+             * JTree tree = new DatasetTree(model); model.setTree(tree);
+             * 
+             * leftPane.add("Tree", tree);
+             */
             return leftPane;
         }
     }
@@ -502,7 +490,7 @@ public class ImageViewerGui {
             public void run() {
                 TopToolBar toolBar = newState.getTopToolBar();
                 toolBar.updateStateButtons();
-                //toolBar.setDisplayMode(null);
+                // toolBar.setDisplayMode(null);
                 contentPanel.add(toolBar, BorderLayout.PAGE_START);
             }
         });
@@ -570,7 +558,7 @@ public class ImageViewerGui {
             try {
                 for (int layer = 0; layer < jhvRequest.imageLayers.length; ++layer) {
                     // load image and memorize corresponding view
-                    ImageInfoView imageInfoView = APIRequestManager.requestAndOpenRemoteFile(true,jhvRequest.cadence, jhvRequest.startTime, jhvRequest.endTime, jhvRequest.imageLayers[layer].observatory, jhvRequest.imageLayers[layer].instrument, jhvRequest.imageLayers[layer].detector, jhvRequest.imageLayers[layer].measurement, true);
+                    ImageInfoView imageInfoView = APIRequestManager.requestAndOpenRemoteFile(true, jhvRequest.cadence, jhvRequest.startTime, jhvRequest.endTime, jhvRequest.imageLayers[layer].observatory, jhvRequest.imageLayers[layer].instrument, jhvRequest.imageLayers[layer].detector, jhvRequest.imageLayers[layer].measurement, true);
                     if (imageInfoView != null && getMainView() != null) {
                         // get the layered view
                         LayeredView layeredView = getMainView().getAdapter(LayeredView.class);

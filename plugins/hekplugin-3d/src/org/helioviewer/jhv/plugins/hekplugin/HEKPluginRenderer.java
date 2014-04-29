@@ -26,119 +26,109 @@ import org.helioviewer.viewmodel.view.TimedMovieView;
  */
 public class HEKPluginRenderer implements PhysicalRenderer {
 
-	/**
-	 * Default constructor.
-	 */
-	public HEKPluginRenderer() {
-	}
+    /**
+     * Default constructor.
+     */
+    public HEKPluginRenderer() {
+    }
 
-	/**
-	 * The actual rendering routine
-	 * 
-	 * @param g
-	 *            - PhysicalRenderGraphics to render to
-	 * @param evt
-	 *            - Event to draw
-	 * @param now
-	 *            - Current point in time
-	 */
-	public void drawPolygon(PhysicalRenderGraphics g, HEKEvent evt, Date now) {
-		if (evt != null && evt.isVisible(now)) {
+    /**
+     * The actual rendering routine
+     * 
+     * @param g
+     *            - PhysicalRenderGraphics to render to
+     * @param evt
+     *            - Event to draw
+     * @param now
+     *            - Current point in time
+     */
+    public void drawPolygon(PhysicalRenderGraphics g, HEKEvent evt, Date now) {
+        if (evt != null && evt.isVisible(now)) {
 
-			String type = evt.getString("event_type");
-			Color eventColor = HEKConstants.getSingletonInstance()
-					.acronymToColor(type, 128);
+            String type = evt.getString("event_type");
+            Color eventColor = HEKConstants.getSingletonInstance().acronymToColor(type, 128);
 
-			Vector<HEKEvent.GenericTriangle<Vector2dDouble>> triangles = evt
-					.getTriangulation(now);
+            Vector<HEKEvent.GenericTriangle<Vector2dDouble>> triangles = evt.getTriangulation(now);
 
-			if (triangles != null) {
-				g.setColor(eventColor);
-				for (GenericTriangle<Vector2dDouble> triangle : triangles) {
-					Vector2dDouble tri[] = { triangle.A, triangle.B, triangle.C };
-					g.fillPolygon(tri);
-				}
-			}
+            if (triangles != null) {
+                g.setColor(eventColor);
+                for (GenericTriangle<Vector2dDouble> triangle : triangles) {
+                    Vector2dDouble tri[] = { triangle.A, triangle.B, triangle.C };
+                    g.fillPolygon(tri);
+                }
+            }
 
-			// draw bounds
-			g.setColor(new Color(255, 255, 255, 68));
-			int timeDifferenceInSeconds = (int) ((now.getTime() - evt
-					.getStart().getTime()) / 1000);
+            // draw bounds
+            g.setColor(new Color(255, 255, 255, 68));
+            int timeDifferenceInSeconds = (int) ((now.getTime() - evt.getStart().getTime()) / 1000);
 
-			Vector<SphericalCoord> outerBound = evt.getStonyBound(now);
-			Vector2dDouble oldBoundaryPoint2d = null;
-			double oldPhi = 0;
+            Vector<SphericalCoord> outerBound = evt.getStonyBound(now);
+            Vector2dDouble oldBoundaryPoint2d = null;
+            double oldPhi = 0;
 
-			if (outerBound != null) {
-				for (SphericalCoord boundaryPoint : outerBound) {
-					SphericalCoord rotatedBoundaryPoint = HEKCoordinateTransform
-							.StonyhurstRotateStonyhurst(boundaryPoint,
-									timeDifferenceInSeconds);
-					Vector2dDouble boundaryPoint2d = HEKEvent
-							.convertToScreenCoordinates(rotatedBoundaryPoint,
-									now);
+            if (outerBound != null) {
+                for (SphericalCoord boundaryPoint : outerBound) {
+                    SphericalCoord rotatedBoundaryPoint = HEKCoordinateTransform.StonyhurstRotateStonyhurst(boundaryPoint, timeDifferenceInSeconds);
+                    Vector2dDouble boundaryPoint2d = HEKEvent.convertToScreenCoordinates(rotatedBoundaryPoint, now);
 
-					if (oldBoundaryPoint2d != null) {
-						if (Math.abs(rotatedBoundaryPoint.phi) < 90
-								&& Math.abs(oldPhi) < 90) {
-							g.drawLine(oldBoundaryPoint2d, boundaryPoint2d);
-						}
-					}
+                    if (oldBoundaryPoint2d != null) {
+                        if (Math.abs(rotatedBoundaryPoint.phi) < 90 && Math.abs(oldPhi) < 90) {
+                            g.drawLine(oldBoundaryPoint2d, boundaryPoint2d);
+                        }
+                    }
 
-					oldBoundaryPoint2d = boundaryPoint2d;
-					oldPhi = rotatedBoundaryPoint.phi;
-				}
-			}
+                    oldBoundaryPoint2d = boundaryPoint2d;
+                    oldPhi = rotatedBoundaryPoint.phi;
+                }
+            }
 
-		}
+        }
 
-	}
+    }
 
-	/**
-	 * The actual rendering routine
-	 * 
-	 * @param g
-	 *            - PhysicalRenderGraphics to render to
-	 * @param evt
-	 *            - Event to draw
-	 * @param now
-	 *            - Current point in time
-	 */
-	public void drawIcon(PhysicalRenderGraphics g, HEKEvent evt, Date now) {
-		if (evt != null && evt.isVisible(now)) {
-			boolean large = evt.getShowEventInfo();
-			BufferedImage icon = evt.getIcon(large);
-			if (icon != null) {
-				Vector2dDouble coord = evt.getScreenCoordinates(now);
-				g.drawImage(icon, coord.getX(), coord.getY());
-			}
-		}
-	}
+    /**
+     * The actual rendering routine
+     * 
+     * @param g
+     *            - PhysicalRenderGraphics to render to
+     * @param evt
+     *            - Event to draw
+     * @param now
+     *            - Current point in time
+     */
+    public void drawIcon(PhysicalRenderGraphics g, HEKEvent evt, Date now) {
+        if (evt != null && evt.isVisible(now)) {
+            boolean large = evt.getShowEventInfo();
+            BufferedImage icon = evt.getIcon(large);
+            if (icon != null) {
+                Vector2dDouble coord = evt.getScreenCoordinates(now);
+                g.drawImage(icon, coord.getX(), coord.getY());
+            }
+        }
+    }
 
-	/**
-	 * {@inheritDoc}
-	 * 
-	 * Draws all available and visible solar events with there associated icon.
-	 */
-	public void render(PhysicalRenderGraphics g) {
-		TimedMovieView masterView = LinkedMovieManager.getActiveInstance()
-				.getMasterMovie();
-		if (masterView != null && masterView.getCurrentFrameDateTime() != null) {
-			Date currentDate = masterView.getCurrentFrameDateTime().getTime();
+    /**
+     * {@inheritDoc}
+     * 
+     * Draws all available and visible solar events with there associated icon.
+     */
+    public void render(PhysicalRenderGraphics g) {
+        TimedMovieView masterView = LinkedMovieManager.getActiveInstance().getMasterMovie();
+        if (masterView != null && masterView.getCurrentFrameDateTime() != null) {
+            Date currentDate = masterView.getCurrentFrameDateTime().getTime();
 
-			if (currentDate != null) {
-				Vector<HEKEvent> toDraw = HEKCache.getSingletonInstance()
-						.getModel().getActiveEvents(currentDate);
-				Log.info(toDraw);
-				for (HEKEvent evt : toDraw) {
-					drawPolygon(g, evt, currentDate);
-				}
+            if (currentDate != null) {
+                Vector<HEKEvent> toDraw = HEKCache.getSingletonInstance().getModel().getActiveEvents(currentDate);
+                Log.info(toDraw);
+                for (HEKEvent evt : toDraw) {
+                    drawPolygon(g, evt, currentDate);
+                }
 
-				for (HEKEvent evt : toDraw) {
-					drawIcon(g, evt, currentDate);
-				}
-			}
-		}
-	}
+                for (HEKEvent evt : toDraw) {
+                    drawIcon(g, evt, currentDate);
+                }
+            }
+        }
+    }
 
 }

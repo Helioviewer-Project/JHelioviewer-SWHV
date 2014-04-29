@@ -55,7 +55,7 @@ public class GLHelioviewerGeometryView extends AbstractGLView implements Heliovi
     /**
      * {@inheritDoc}
      */
-    public void renderGL(GL gl, boolean nextView) {	
+    public void renderGL(GL gl, boolean nextView) {
         gl.glEnable(GL.GL_FRAGMENT_PROGRAM_ARB);
         gl.glEnable(GL.GL_VERTEX_PROGRAM_ARB);
 
@@ -72,6 +72,7 @@ public class GLHelioviewerGeometryView extends AbstractGLView implements Heliovi
         gl.glDisable(GL.GL_FRAGMENT_PROGRAM_ARB);
         gl.glDisable(GL.GL_VERTEX_PROGRAM_ARB);
     }
+
     /**
      * {@inheritDoc}
      */
@@ -81,7 +82,7 @@ public class GLHelioviewerGeometryView extends AbstractGLView implements Heliovi
             shaderBuilder = nextView.buildFragmentShader(shaderBuilder);
         }
 
-        //fragmentShader.build(shaderBuilder);
+        // fragmentShader.build(shaderBuilder);
         return shaderBuilder;
     }
 
@@ -132,7 +133,7 @@ public class GLHelioviewerGeometryView extends AbstractGLView implements Heliovi
          * {@inheritDoc}
          */
         protected void buildImpl(GLShaderBuilder shaderBuilder) {
-        	
+
             MetaData metaData = view.getAdapter(MetaDataView.class).getMetaData();
 
             if (metaData instanceof HelioviewerOcculterMetaData) {
@@ -154,7 +155,7 @@ public class GLHelioviewerGeometryView extends AbstractGLView implements Heliovi
                     program = program.replace("outerRadius", Double.toString(hvMetaData.getOuterPhysicalOcculterRadius() * roccOuterFactor).replace(',', '.'));
                     program = program.replace("flatDist", Double.toString(hvMetaData.getPhysicalFlatOcculterSize()).replace(',', '.'));
 
-                    //shaderBuilder.addMainFragment(program);
+                    // shaderBuilder.addMainFragment(program);
                 } catch (GLBuildShaderException e) {
                     e.printStackTrace();
                 }
@@ -173,7 +174,7 @@ public class GLHelioviewerGeometryView extends AbstractGLView implements Heliovi
                         program = program.replace("physicalPosition", shaderBuilder.useStandardParameter("float4", "TEXCOORD0"));
                         program = program.replace("sunRadius", Double.toString(Constants.SunRadius * discFactor).replace(',', '.'));
 
-                        //shaderBuilder.addMainFragment(program);
+                        // shaderBuilder.addMainFragment(program);
                     } catch (GLBuildShaderException e) {
                         e.printStackTrace();
                     }

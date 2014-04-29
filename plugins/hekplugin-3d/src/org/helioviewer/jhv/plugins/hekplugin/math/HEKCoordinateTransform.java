@@ -150,17 +150,17 @@ public class HEKCoordinateTransform {
         return result;
     }
 
-    public static CartesianCoord StonyhurstToCartesian(SphericalCoord stony){
-		CartesianCoord result = new CartesianCoord();
-    	double cosTheta = Math.cos(stony.theta);
-		
+    public static CartesianCoord StonyhurstToCartesian(SphericalCoord stony) {
+        CartesianCoord result = new CartesianCoord();
+        double cosTheta = Math.cos(stony.theta);
+
         result.x = stony.r * cosTheta * Math.cos(stony.phi);
         result.y = stony.r * cosTheta * Math.sin(stony.phi);
         result.z = stony.r * Math.sin(stony.theta);
-        
+
         return result;
     }
-    
+
     /**
      * @param helioCentricFromSat
      * @return

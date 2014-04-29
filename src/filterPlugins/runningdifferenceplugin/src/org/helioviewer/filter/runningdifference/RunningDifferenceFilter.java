@@ -43,9 +43,8 @@ public class RunningDifferenceFilter implements FrameFilter, StandardFilter, Obs
      */
     private TimeMachineData timeMachineData;
     private DifferenceShader shader = new DifferenceShader();
-	private float differenceContrast = 0;
-	private int lookupDiff;
-	
+    private float differenceContrast = 0;
+    private int lookupDiff;
 
     /**
      * @see org.helioviewer.viewmodel.filter.ObservableFilter#addFilterListener(org.helioviewer.viewmodel.filter.FilterListener)
@@ -58,7 +57,7 @@ public class RunningDifferenceFilter implements FrameFilter, StandardFilter, Obs
      * @see org.helioviewer.viewmodel.filter.StandardFilter#apply(org.helioviewer.viewmodel.imagedata.ImageData)
      */
     public ImageData apply(ImageData data) {
-    	System.out.print("applyRD");
+        System.out.print("applyRD");
         // If its not active we don't filter at all
         if (!isActive)
             return data;
@@ -67,7 +66,7 @@ public class RunningDifferenceFilter implements FrameFilter, StandardFilter, Obs
             return null;
 
         if (timeMachineData == null)
-            return data; 
+            return data;
         ImageData previousFrame = timeMachineData.getPreviousFrame(1);
         // If this is the first frame and therefore 0 we take the frame before
         // to get some similar picture
@@ -86,21 +85,22 @@ public class RunningDifferenceFilter implements FrameFilter, StandardFilter, Obs
                     return null;
                 }
                 byte[] pixelData = new byte[newPixelData.length];
-                double tr=16;
+                double tr = 16;
                 for (int i = 0; i < newPixelData.length; i++) {
 
-                    //pixelData[i] = (byte) ((((newPixelData[i] << 4>>>1) - (prevPixelData[i] << 4>>>1))) + 0x80);
-                	int h1 = (int)newPixelData[i];
-                	int h2 = (int) prevPixelData[i];
-                	int diff = h1-h2;
-                	if(diff<-tr){ 
-                		diff=(int)(-tr);
-                	}
-                	else if(diff>tr){diff=(int)tr;}
-                	
-                	pixelData[i] = (byte)((int)((((diff)/tr+1)*(255./2.))));
-                	
-                	
+                    // pixelData[i] = (byte) ((((newPixelData[i] << 4>>>1) -
+                    // (prevPixelData[i] << 4>>>1))) + 0x80);
+                    int h1 = (int) newPixelData[i];
+                    int h2 = (int) prevPixelData[i];
+                    int diff = h1 - h2;
+                    if (diff < -tr) {
+                        diff = (int) (-tr);
+                    } else if (diff > tr) {
+                        diff = (int) tr;
+                    }
+
+                    pixelData[i] = (byte) ((int) ((((diff) / tr + 1) * (255. / 2.))));
+
                 }
                 final ColorMask colorMask = new ColorMask();
 
@@ -161,7 +161,7 @@ public class RunningDifferenceFilter implements FrameFilter, StandardFilter, Obs
      * @see org.helioviewer.viewmodel.filter.FrameFilter#setTimeMachineData(org.helioviewer.viewmodel.view.TimeMachineData)
      */
     public void setTimeMachineData(TimeMachineData data) {
-        //System.out.println("Time machine data is set");
+        // System.out.println("Time machine data is set");
         timeMachineData = data;
         if (timeMachineData != null)
             timeMachineData.setPreviousCache(1);
@@ -169,47 +169,47 @@ public class RunningDifferenceFilter implements FrameFilter, StandardFilter, Obs
             System.out.println("Empty time machine");
     }
 
-	public void setState(String state) {
-        //setContrast(Float.parseFloat(state));
-        //panel.setValue(contrast);		
-	}
+    public void setState(String state) {
+        // setContrast(Float.parseFloat(state));
+        // panel.setValue(contrast);
+    }
 
-	public String getState() {
+    public String getState() {
         return Boolean.toString(this.isActive);
-	}
+    }
 
-	public void applyGL(GL gl) {
-		if(isActive){
-	        shader.setIsDifference(gl,1.0f);	        
-			shader.bind(gl);
-	        ImageData previousFrame = timeMachineData.getPreviousFrame(1);
-	        // If this is the first frame and therefore 0 we take the frame before
-	        // to get some similar picture
-	        if (previousFrame == null) {
-	            Log.debug("No previous frame available, take ahead");
-	            previousFrame = timeMachineData.getPreviousFrame(-1);
-	        }
-	        double timeDiff = (timeMachineData.getCurrentDateMillis()-previousFrame.getDateMillis())/1000;
-	        shader.setDifferenceAngle(gl, (float)(DifferentialRotation.calculateRotationInRadians(0.,timeDiff)));
-	        //if(previousFrame!=null){
-	            gl.glActiveTexture(shader.mode);		
-		        shader.activateDifferenceTexture(gl);
-		        gl.glBindTexture(GL.GL_TEXTURE_2D, lookupDiff); 
-		        GLTextureHelper th = new GLTextureHelper();
-		        th.moveImageDataToGLTexture(gl, previousFrame, 0, 0, previousFrame.getWidth(), previousFrame.getHeight(), lookupDiff);
-		    //}
+    public void applyGL(GL gl) {
+        if (isActive) {
+            shader.setIsDifference(gl, 1.0f);
+            shader.bind(gl);
+            ImageData previousFrame = timeMachineData.getPreviousFrame(1);
+            // If this is the first frame and therefore 0 we take the frame
+            // before
+            // to get some similar picture
+            if (previousFrame == null) {
+                Log.debug("No previous frame available, take ahead");
+                previousFrame = timeMachineData.getPreviousFrame(-1);
+            }
+            double timeDiff = (timeMachineData.getCurrentDateMillis() - previousFrame.getDateMillis()) / 1000;
+            shader.setDifferenceAngle(gl, (float) (DifferentialRotation.calculateRotationInRadians(0., timeDiff)));
+            // if(previousFrame!=null){
+            gl.glActiveTexture(shader.mode);
+            shader.activateDifferenceTexture(gl);
+            gl.glBindTexture(GL.GL_TEXTURE_2D, lookupDiff);
+            GLTextureHelper th = new GLTextureHelper();
+            th.moveImageDataToGLTexture(gl, previousFrame, 0, 0, previousFrame.getWidth(), previousFrame.getHeight(), lookupDiff);
+            // }
+        } else {
+            shader.setIsDifference(gl, 0.0f);
         }
-		else{
-	        shader.setIsDifference(gl,0.0f);	        
-		}	
-	}
+    }
 
     public GLShaderBuilder buildFragmentShader(GLShaderBuilder shaderBuilder) {
         shader.build(shaderBuilder);
         GLTextureHelper textureHelper = new GLTextureHelper();
         textureHelper.delTextureID(shaderBuilder.getGL(), lookupDiff);
         lookupDiff = textureHelper.genTextureID(shaderBuilder.getGL());
-        
+
         return shaderBuilder;
     }
 }

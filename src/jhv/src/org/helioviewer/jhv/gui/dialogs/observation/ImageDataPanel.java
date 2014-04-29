@@ -252,7 +252,7 @@ public class ImageDataPanel extends ObservationDialogPanel {
             public void run() {
 
                 try {
-                    APIRequestManager.requestAndOpenRemoteFile(true,null, getStartTime(), "", getObservation(), getInstrument(), getDetector(), getMeasurement(), true);
+                    APIRequestManager.requestAndOpenRemoteFile(true, null, getStartTime(), "", getObservation(), getInstrument(), getDetector(), getMeasurement(), true);
                 } catch (IOException e) {
                     Log.error("An error occured while opening the remote file!", e);
                     Message.err("An error occured while opening the remote file!", e.getMessage(), false);
@@ -280,7 +280,7 @@ public class ImageDataPanel extends ObservationDialogPanel {
 
             public void run() {
                 try {
-                    APIRequestManager.requestAndOpenRemoteFile(true,getCadence(), getStartTime(), getEndTime(), getObservation(), getInstrument(), getDetector(), getMeasurement(), true);
+                    APIRequestManager.requestAndOpenRemoteFile(true, getCadence(), getStartTime(), getEndTime(), getObservation(), getInstrument(), getDetector(), getMeasurement(), true);
                 } catch (IOException e) {
                     Log.error("An error occured while opening the remote file!", e);
                     Message.err("An error occured while opening the remote file!", e.getMessage(), false);
@@ -812,10 +812,10 @@ public class ImageDataPanel extends ObservationDialogPanel {
          *             From inserting into the AWT Queue
          */
         public void setupSources() throws InterruptedException, InvocationTargetException {
-    		final DataSources source = DataSources.getSingletonInstance();
+            final DataSources source = DataSources.getSingletonInstance();
             EventQueue.invokeAndWait(new Runnable() {
                 public void run() {
-                	InstrumentsPanel.this.setComboBox(comboObservatory, source.getObservatories());
+                    InstrumentsPanel.this.setComboBox(comboObservatory, source.getObservatories());
                 }
             });
         }

@@ -35,7 +35,6 @@ import org.helioviewer.viewmodel.viewport.Viewport;
 import org.helioviewer.viewmodel.viewportimagesize.StaticViewportImageSize;
 import org.helioviewer.viewmodel.viewportimagesize.ViewportImageSizeAdapter;
 
-
 /**
  * Implementation of ImageInfoView for FITS images.
  * 
@@ -279,19 +278,20 @@ public class JHVFITSView extends AbstractView implements ViewportView, RegionVie
         return uri;
     }
 
-	@Override
-	public Interval<Date> getDateRange() {
-		return this.range;
-	}
-    
-	@Override
-	public void setDateRange(Interval<Date> range) {
-		// TODO Auto-generated method stub
-		this.range = range;
+    @Override
+    public Interval<Date> getDateRange() {
+        return this.range;
     }
-	@Override
-	public MetaData getMetadata() {
-		// TODO Auto-generated method stub
-		return m;
-	}
+
+    @Override
+    public void setDateRange(Interval<Date> range) {
+        // TODO Auto-generated method stub
+        this.range = range;
+    }
+
+    @Override
+    public MetaData getMetadata() {
+        // TODO Auto-generated method stub
+        return m;
+    }
 }

@@ -22,7 +22,7 @@ public class GLScalePowerOfTwoVertexShaderProgram extends GLVertexShaderProgram 
      */
     protected void buildImpl(GLShaderBuilder shaderBuilder) {
         try {
-        	String program = "\ttexCoord.xy = texCoord.xy * texScaling.zw;";
+            String program = "\ttexCoord.xy = texCoord.xy * texScaling.zw;";
             program = program.replaceAll("texScaling", shaderBuilder.useStandardParameter("float4", "TEXCOORD0"));
             program = program.replaceAll("texCoord", shaderBuilder.useOutputValue("float4", "TEXCOORD0"));
             shaderBuilder.addMainFragment(program);

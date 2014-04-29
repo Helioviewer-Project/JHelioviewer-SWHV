@@ -368,13 +368,14 @@ public class MetaDataDialog extends JDialog implements ActionListener, ShowableD
         } catch (TransformerException e) {
             e.printStackTrace();
         }
-        
-    	try {
-			fos.close();
-		} catch (IOException e) {
-			Log.error("Fail at closing file." + e);
-		};
-		
+
+        try {
+            fos.close();
+        } catch (IOException e) {
+            Log.error("Fail at closing file." + e);
+        }
+        ;
+
         return true;
     }
 }

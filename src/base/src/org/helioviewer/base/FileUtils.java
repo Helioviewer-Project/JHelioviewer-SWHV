@@ -249,7 +249,7 @@ public class FileUtils {
         in.close();
         out.close();
     }
-    
+
     /**
      * Method saving a stream to dst.
      * 
@@ -259,21 +259,21 @@ public class FileUtils {
      *            Destination file
      * @throws IOException
      */
-    public static String  read(File dst) throws IOException {
+    public static String read(File dst) throws IOException {
         Log.debug("Reading file " + dst.getAbsolutePath());
         BufferedReader in = new BufferedReader(new FileReader(dst));
         StringBuilder sb = new StringBuilder();
 
         // Transfer bytes from in to out
-        String str;    
-        while ((str = in.readLine()) != null) {            
+        String str;
+        while ((str = in.readLine()) != null) {
             sb.append(str);
         }
 
         in.close();
         return sb.toString();
     }
-    
+
     /**
      * Returns an input stream to a resource. This function can be used even if
      * the whole program and resources are within a JAR file.\n The path must

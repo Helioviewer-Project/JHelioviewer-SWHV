@@ -38,16 +38,16 @@ public abstract class GL3DImageMesh extends GL3DMesh {
     protected Vector2dDouble textureScale;
 
     private boolean reshapeRequested = false;
-    
+
     public GL3DImageMesh(String name, GL3DImageTextureView _imageTextureView, GLVertexShaderProgram vertexShaderProgram, GLFragmentShaderProgram fragmentShaderProgram) {
         super(name, new GL3DVec4f(0, 1, 0, 0.5f), new GL3DVec4f(0, 0, 0, 0));
         this.imageTextureView = _imageTextureView;
 
         this.vertexShaderProgram = vertexShaderProgram;
         this.fragmentShaderProgram = fragmentShaderProgram;
-        
+
         imageTextureView.addViewListener(new ViewListener() {
-        	
+
             public void viewChanged(View sender, ChangeEvent aEvent) {
                 ImageTextureRecapturedReason reason = aEvent.getLastChangedReasonByType(ImageTextureRecapturedReason.class);
                 if (reason != null) {
@@ -62,8 +62,7 @@ public abstract class GL3DImageMesh extends GL3DMesh {
         this.reshapeRequested = true;
         this.markAsChanged();
     }
-    
-    
+
     public GL3DImageMesh(String name, GL3DImageTextureView _imageTextureView, GLVertexShaderProgram vertexShaderProgram, GLFragmentShaderProgram fragmentShaderProgram, boolean viewListener) {
         super(name, new GL3DVec4f(0, 1, 0, 0.5f), new GL3DVec4f(0, 0, 0, 0));
         this.imageTextureView = _imageTextureView;
@@ -74,7 +73,6 @@ public abstract class GL3DImageMesh extends GL3DMesh {
         this.reshapeRequested = true;
         this.markAsChanged();
     }
-    
 
     public void shapeInit(GL3DState state) {
         super.shapeInit(state);
@@ -92,10 +90,10 @@ public abstract class GL3DImageMesh extends GL3DMesh {
     }
 
     public void shapeDraw(GL3DState state) {
-		GLFilterView glfilter = this.imageTextureView.getAdapter(GLFilterView.class);
-		if(glfilter!=null){
-			glfilter.renderGL(state.gl, true);
-		}            
+        GLFilterView glfilter = this.imageTextureView.getAdapter(GLFilterView.class);
+        if (glfilter != null) {
+            glfilter.renderGL(state.gl, true);
+        }
 
         th.bindTexture(state.gl, this.imageTextureView.getTextureId());
         state.gl.glTexParameteri(GL.GL_TEXTURE_2D, GL.GL_TEXTURE_MIN_FILTER, GL.GL_NEAREST);
@@ -111,15 +109,18 @@ public abstract class GL3DImageMesh extends GL3DMesh {
         GLVertexShaderProgram.popShader(state.gl);
         GLFragmentShaderProgram.popShader(state.gl);
 
-        //th.bindTexture(state.gl, 0);
+        // th.bindTexture(state.gl, 0);
     }
 
     public GL3DImageTextureView getImageTextureView() {
         return imageTextureView;
     }
-    
-    
-    protected GLVertexShaderProgram getVertexShader() { return vertexShaderProgram; }
-    
-    protected GLFragmentShaderProgram getFragmentShader() { return fragmentShaderProgram; }
+
+    protected GLVertexShaderProgram getVertexShader() {
+        return vertexShaderProgram;
+    }
+
+    protected GLFragmentShaderProgram getFragmentShader() {
+        return fragmentShaderProgram;
+    }
 }

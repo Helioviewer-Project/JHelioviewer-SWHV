@@ -15,50 +15,46 @@ import org.helioviewer.viewmodelplugin.overlay.OverlayControlComponentManager;
  */
 public class PfssPluginContainer extends OverlayContainer {
 
-	private PfssCache pfssCache;
-	private PfssPluginPanel pfssPluginPanel;
-	private boolean builtin_mode = false;
+    private PfssCache pfssCache;
+    private PfssPluginPanel pfssPluginPanel;
+    private boolean builtin_mode = false;
 
-	public PfssPluginContainer(boolean builtin_mode) {
-		this.builtin_mode = builtin_mode;
-	}
+    public PfssPluginContainer(boolean builtin_mode) {
+        this.builtin_mode = builtin_mode;
+    }
 
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	protected void installOverlayImpl(OverlayView overlayView,
-			OverlayControlComponentManager controlList) {
-		pfssCache = new PfssCache();
-		pfssPluginPanel = new PfssPluginPanel(pfssCache);
-		OverlayPluginContainer overlayPluginContainer = new OverlayPluginContainer();
-		overlayPluginContainer
-				.setRenderer3d(new PfssPlugin3dRenderer(pfssCache));
-		overlayView.addOverlay(overlayPluginContainer);
-		controlList
-				.add(new OverlayControlComponent(pfssPluginPanel, getName()));
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected void installOverlayImpl(OverlayView overlayView, OverlayControlComponentManager controlList) {
+        pfssCache = new PfssCache();
+        pfssPluginPanel = new PfssPluginPanel(pfssCache);
+        OverlayPluginContainer overlayPluginContainer = new OverlayPluginContainer();
+        overlayPluginContainer.setRenderer3d(new PfssPlugin3dRenderer(pfssCache));
+        overlayView.addOverlay(overlayPluginContainer);
+        controlList.add(new OverlayControlComponent(pfssPluginPanel, getName()));
 
-	}
+    }
 
-	/**
-	 * {@inheritDoc}
-	 */
-	public String getDescription() {
-		return null;
-	}
+    /**
+     * {@inheritDoc}
+     */
+    public String getDescription() {
+        return null;
+    }
 
-	/**
-	 * {@inheritDoc}
-	 */
-	public String getName() {
-		return "Pfss " + (builtin_mode ? "Built-In Version" : "");
-	}
+    /**
+     * {@inheritDoc}
+     */
+    public String getName() {
+        return "Pfss " + (builtin_mode ? "Built-In Version" : "");
+    }
 
-
-	@Override
-	public Class<? extends PhysicalRenderer> getOverlayClass() {
-		// TODO Auto-generated method stub
-		return PfssPlugin3dRenderer.class;
-	}
+    @Override
+    public Class<? extends PhysicalRenderer> getOverlayClass() {
+        // TODO Auto-generated method stub
+        return PfssPlugin3dRenderer.class;
+    }
 
 }

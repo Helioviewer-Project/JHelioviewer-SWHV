@@ -364,7 +364,7 @@ public interface RenderGraphics<BaseType extends Number, VectorType> {
      *            height of the rectangle the image is drawn to
      */
     public void drawImage3d(BufferedImage image, BaseType x, BaseType y, BaseType z, BaseType width, BaseType height);
-    
+
     /**
      * Draws a text.
      * 
@@ -386,10 +386,11 @@ public interface RenderGraphics<BaseType extends Number, VectorType> {
      *            coordinate of the reference point
      */
     public void drawText(String text, VectorType position);
-    
+
     public void fillPolygon(Vector3dDouble[] points);
 
     public void drawLine3d(BaseType x0, BaseType y0, BaseType z0, BaseType x1, BaseType y1, BaseType z1);
+
     public void drawLine3d(Vector3dDouble p0, Vector3dDouble p1);
- 
+
 }

@@ -70,36 +70,31 @@ public class HelioviewerMetaData extends AbstractMetaData implements SunMetaData
         setPhysicalImageSize(new Vector2dDouble(pixelImageSize.getX() * meterPerPixel, pixelImageSize.getY() * meterPerPixel));
 
         if (instrument.contains("AIA")) {
-        	instrument = "AIA";
+            instrument = "AIA";
             measurement = m.get("WAVELNTH");
             observatory = m.get("TELESCOP");
             fullName = "AIA " + measurement;
-        }
-        else if (instrument.contains("SWAP")) {
+        } else if (instrument.contains("SWAP")) {
             instrument = "SWAP";
             measurement = m.get("WAVELNTH");
             observatory = m.get("TELESCOP");
             fullName = "SWAP " + measurement;
-        }
-        else if (instrument.contains("VSM")) {
+        } else if (instrument.contains("VSM")) {
             instrument = "VSM";
             measurement = m.get("WAVELNTH");
             observatory = m.get("TELESCOP");
             fullName = "NSO-SOLIS " + measurement;
-        }        
-        else if (instrument.contains("GONG")) {
+        } else if (instrument.contains("GONG")) {
             instrument = "GONG";
             measurement = m.get("WAVELNTH");
             observatory = m.get("TELESCOP");
             fullName = "GONG " + measurement;
-        }
-        else if (instrument.contains("H-alpha")) {
+        } else if (instrument.contains("H-alpha")) {
             instrument = "H-alpha";
             measurement = m.get("WAVELNTH");
             observatory = m.get("TELESCOP");
             fullName = "H-alpha " + measurement;
-        }        
-        else if (instrument.contains("HMI")) {
+        } else if (instrument.contains("HMI")) {
             instrument = "HMI";
             measurement = m.get("CONTENT");
             observatory = m.get("TELESCOP");
@@ -162,8 +157,7 @@ public class HelioviewerMetaData extends AbstractMetaData implements SunMetaData
         double newSolarPixelRadius = -1.0;
         double allowedRelativeDifference = 0.01;
 
-
-        if (instrument.contains("AIA") || instrument.contains("SWAP")||instrument.contains("VSM")|| instrument.contains("GONG")|| instrument.contains("H-alpha")||instrument.contains("CALLISTO")) {
+        if (instrument.contains("AIA") || instrument.contains("SWAP") || instrument.contains("VSM") || instrument.contains("GONG") || instrument.contains("H-alpha") || instrument.contains("CALLISTO")) {
             double arcsecPerPixelX = metaDataContainer.tryGetDouble("CDELT1");
             double arcsecPerPixelY = metaDataContainer.tryGetDouble("CDELT2");
             if (Double.isNaN(arcsecPerPixelX)) {
@@ -260,47 +254,46 @@ public class HelioviewerMetaData extends AbstractMetaData implements SunMetaData
 
         if (changed) {
             solarPixelRadius = newSolarPixelRadius;
-            meterPerPixel = Constants.SunRadius / solarPixelRadius/Constants.SunRadiusInMeter;
+            meterPerPixel = Constants.SunRadius / solarPixelRadius / Constants.SunRadiusInMeter;
             setPhysicalLowerLeftCorner(sunPixelPosition.scale(-meterPerPixel));
             setPhysicalImageSize(new Vector2dDouble(pixelImageSize.getX() * meterPerPixel, pixelImageSize.getY() * meterPerPixel));
         }
 
         return changed;
     }
-    
-    public Region roiToRegion(SubImage roi, double zoompercent){
-    	System.out.println("ROIWHAT " + roi.width + " " + sunPixelPosition.getX() + " " + roi.x + " "+ " " + pixelImageSize.getX());
-    	System.out.println("ROIWHAT " + roi.height + " " + sunPixelPosition.getY() + " " + roi.y+ " " + pixelImageSize.getX());
+
+    public Region roiToRegion(SubImage roi, double zoompercent) {
+        System.out.println("ROIWHAT " + roi.width + " " + sunPixelPosition.getX() + " " + roi.x + " " + " " + pixelImageSize.getX());
+        System.out.println("ROIWHAT " + roi.height + " " + sunPixelPosition.getY() + " " + roi.y + " " + pixelImageSize.getX());
         System.out.println("RESOLUTION" + zoompercent);
 
-        Region region = StaticRegion.createAdaptedRegion((roi.x/zoompercent-sunPixelPosition.getX())*meterPerPixel, 
-    			(roi.y/zoompercent-sunPixelPosition.getY())*meterPerPixel, 
-    			roi.width*meterPerPixel/zoompercent, 
-    			roi.height*meterPerPixel/zoompercent);
+        Region region = StaticRegion.createAdaptedRegion((roi.x / zoompercent - sunPixelPosition.getX()) * meterPerPixel, (roi.y / zoompercent - sunPixelPosition.getY()) * meterPerPixel, roi.width * meterPerPixel / zoompercent, roi.height * meterPerPixel / zoompercent);
         System.out.println("REGION" + region);
         return region;
     }
 
-	public double getScaleX(SubImage roi) {
-		return 1.*roi.width/nextPowerOfTwo(roi.width);
-	}
-	public double getScaleY(SubImage roi) {
-		return 1.*roi.height/nextPowerOfTwo(roi.height);
-	}
-    
+    public double getScaleX(SubImage roi) {
+        return 1. * roi.width / nextPowerOfTwo(roi.width);
+    }
+
+    public double getScaleY(SubImage roi) {
+        return 1. * roi.height / nextPowerOfTwo(roi.height);
+    }
+
     private int nextPowerOfTwo(int input) {
         int output = 1;
         while (output < input) {
             output <<= 1;
         }
         return output;
-    }    
+    }
+
     /**
      * {@inheritDoc}
      */
     public void updateDateTime() {
         String observedDate;
-        if (instrument.contains("SWAP")||instrument.contains("GONG")||instrument.contains("VSM")||instrument.contains("CALLISTO")) {
+        if (instrument.contains("SWAP") || instrument.contains("GONG") || instrument.contains("VSM") || instrument.contains("CALLISTO")) {
             observedDate = metaDataContainer.get("DATE-OBS");
         } else {
             observedDate = metaDataContainer.get("DATE_OBS");
@@ -394,6 +387,5 @@ public class HelioviewerMetaData extends AbstractMetaData implements SunMetaData
     public boolean checkForModifications() {
         return updatePixelParameters();
     }
-
 
 }

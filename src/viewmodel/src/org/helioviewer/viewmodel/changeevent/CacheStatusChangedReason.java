@@ -63,27 +63,27 @@ public class CacheStatusChangedReason implements ChangedReason {
     public int getValue() {
         return value;
     }
-    
+
     /**
      * Creates a string representation of the object.
      * 
      */
-    public String toString(){
-    	StringBuilder sb = new StringBuilder();
-    	sb.append("[ View : ").append(view).append(" ; type : ");
-    	switch (type){
-    	case COMPLETE:
-    		sb.append("COMPLETE ; value : ");
-    		break;
-    	case PARTIAL:
-    		sb.append("PARTIAL ; value : ");
-    		break;
-    	default:
-    		sb.append("UNKNOWN ; value : ");
-    	}
-    	sb.append(value);
-    	sb.append("]");
-    	return sb.toString();
+    public String toString() {
+        StringBuilder sb = new StringBuilder();
+        sb.append("[ View : ").append(view).append(" ; type : ");
+        switch (type) {
+        case COMPLETE:
+            sb.append("COMPLETE ; value : ");
+            break;
+        case PARTIAL:
+            sb.append("PARTIAL ; value : ");
+            break;
+        default:
+            sb.append("UNKNOWN ; value : ");
+        }
+        sb.append(value);
+        sb.append("]");
+        return sb.toString();
     }
 
 }

@@ -18,98 +18,91 @@ import javax.swing.BoxLayout;
 import javax.swing.ImageIcon;
 import javax.swing.JLabel;
 
-public class LayerPanel extends DatasetPanel{
+public class LayerPanel extends DatasetPanel {
 
-	private static final long serialVersionUID = 7214631588320087038L;
-	
-	private DatasetLayer model;
-	private JLabel iconLabel;
-	private JLabel timestampLabel;
-	private JLabel titleLabel;
-	private JLabel deleteIconLabel;
-	private MouseAdapter adapter;
-		
-	public LayerPanel( DatasetLayer model ) {
-		super();
-		this.model = model;
-		this.updateChange();
-	}
-	public void updateChangeFast(){
-		ImageIcon icon = IconBank.getIcon( this.getIcon( this.model.getDescriptor()) );
-		iconLabel.setIcon( icon );
-		titleLabel.setText( this.model.getDescriptor().title);
-		timestampLabel.setText( this.model.getDescriptor().timestamp );
-		ImageIcon deleteIcon = IconBank.getIcon(JHVIcon.REMOVE_LAYER );
-		deleteIconLabel = new JLabel( deleteIcon );
-		deleteIconLabel.setToolTipText("Remove this layer");
-		adapter = new MouseAdapter()  
-		{  
-		    public void mouseReleased(MouseEvent e)  
-		    {  
-		        LayersModel.getSingletonInstance().removeLayer(LayersToDatasetLayers.getSingletonInstance().getView(model.getDescriptor()));
-		    }  
-		};
-		deleteIconLabel.addMouseListener(adapter); 		
-	}
-	
-	public void updateChange(){
-		this.removeAll();
-		this.setPreferredSize(new Dimension(250, 25));
-		this.setBorder(BorderFactory.createEmptyBorder(2,5,2,5)) ;
+    private static final long serialVersionUID = 7214631588320087038L;
 
-		this.setLayout(new BoxLayout( this, BoxLayout.LINE_AXIS));
-		
-		//Icon
-		ImageIcon icon = IconBank.getIcon( this.getIcon( this.model.getDescriptor()) );
-		iconLabel = new JLabel( icon );
-		iconLabel.setToolTipText(this.getTooltipText( this.model.getDescriptor() ));
-		adapter = new MouseAdapter()  
-		{  
-		    public void mouseReleased(MouseEvent e)  
-		    {  
-		    	LayersToDatasetLayers layersModel = LayersToDatasetLayers.getSingletonInstance();
-		        View view = layersModel.getView(model.getDescriptor());
-		        int index = layersModel.getIndex(model.getDescriptor());
+    private DatasetLayer model;
+    private JLabel iconLabel;
+    private JLabel timestampLabel;
+    private JLabel titleLabel;
+    private JLabel deleteIconLabel;
+    private MouseAdapter adapter;
 
-		        LayersModel.getSingletonInstance().setVisible(view,!LayersModel.getSingletonInstance().isVisible(index));
-		    }  
-		}; 
-		iconLabel.addMouseListener(adapter);
+    public LayerPanel(DatasetLayer model) {
+        super();
+        this.model = model;
+        this.updateChange();
+    }
 
-		
-		
-		this.add(iconLabel);
-		//whitespace
-		this.add(Box.createRigidArea(new Dimension(5,5)));
-		//Title
-		titleLabel = new JLabel( model.getDescriptor().title);
-		titleLabel.setToolTipText("Name of the Layer");
-		this.add(titleLabel);
-		//whitespace
-		this.add(Box.createRigidArea(new Dimension(5,5)));
-		//timestamp
-		timestampLabel = new JLabel( this.model.getDescriptor().timestamp );
-		timestampLabel.setToolTipText("Shown observation time (UTC) of this layer.");
-		this.add(timestampLabel);
+    public void updateChangeFast() {
+        ImageIcon icon = IconBank.getIcon(this.getIcon(this.model.getDescriptor()));
+        iconLabel.setIcon(icon);
+        titleLabel.setText(this.model.getDescriptor().title);
+        timestampLabel.setText(this.model.getDescriptor().timestamp);
+        ImageIcon deleteIcon = IconBank.getIcon(JHVIcon.REMOVE_LAYER);
+        deleteIconLabel = new JLabel(deleteIcon);
+        deleteIconLabel.setToolTipText("Remove this layer");
+        adapter = new MouseAdapter() {
+            public void mouseReleased(MouseEvent e) {
+                LayersModel.getSingletonInstance().removeLayer(LayersToDatasetLayers.getSingletonInstance().getView(model.getDescriptor()));
+            }
+        };
+        deleteIconLabel.addMouseListener(adapter);
+    }
 
-		//Icon
-		ImageIcon deleteIcon = IconBank.getIcon(JHVIcon.REMOVE_LAYER );
-		deleteIconLabel = new JLabel( deleteIcon );
-		deleteIconLabel.setToolTipText("Remove this layer");
-		deleteIconLabel.addMouseListener(new MouseAdapter()  
-		{  
-		    public void mouseReleased(MouseEvent e)  
-		    {  
-		        LayersModel.getSingletonInstance().removeLayer(LayersToDatasetLayers.getSingletonInstance().getView(model.getDescriptor()));
-		    }  
-		});  
-		this.add(deleteIconLabel);
-		//whitespace
-		this.add(Box.createRigidArea(new Dimension(5,5)));		
-		this.invalidate();
-		this.repaint();
-	}
-	
+    public void updateChange() {
+        this.removeAll();
+        this.setPreferredSize(new Dimension(250, 25));
+        this.setBorder(BorderFactory.createEmptyBorder(2, 5, 2, 5));
+
+        this.setLayout(new BoxLayout(this, BoxLayout.LINE_AXIS));
+
+        // Icon
+        ImageIcon icon = IconBank.getIcon(this.getIcon(this.model.getDescriptor()));
+        iconLabel = new JLabel(icon);
+        iconLabel.setToolTipText(this.getTooltipText(this.model.getDescriptor()));
+        adapter = new MouseAdapter() {
+            public void mouseReleased(MouseEvent e) {
+                LayersToDatasetLayers layersModel = LayersToDatasetLayers.getSingletonInstance();
+                View view = layersModel.getView(model.getDescriptor());
+                int index = layersModel.getIndex(model.getDescriptor());
+
+                LayersModel.getSingletonInstance().setVisible(view, !LayersModel.getSingletonInstance().isVisible(index));
+            }
+        };
+        iconLabel.addMouseListener(adapter);
+
+        this.add(iconLabel);
+        // whitespace
+        this.add(Box.createRigidArea(new Dimension(5, 5)));
+        // Title
+        titleLabel = new JLabel(model.getDescriptor().title);
+        titleLabel.setToolTipText("Name of the Layer");
+        this.add(titleLabel);
+        // whitespace
+        this.add(Box.createRigidArea(new Dimension(5, 5)));
+        // timestamp
+        timestampLabel = new JLabel(this.model.getDescriptor().timestamp);
+        timestampLabel.setToolTipText("Shown observation time (UTC) of this layer.");
+        this.add(timestampLabel);
+
+        // Icon
+        ImageIcon deleteIcon = IconBank.getIcon(JHVIcon.REMOVE_LAYER);
+        deleteIconLabel = new JLabel(deleteIcon);
+        deleteIconLabel.setToolTipText("Remove this layer");
+        deleteIconLabel.addMouseListener(new MouseAdapter() {
+            public void mouseReleased(MouseEvent e) {
+                LayersModel.getSingletonInstance().removeLayer(LayersToDatasetLayers.getSingletonInstance().getView(model.getDescriptor()));
+            }
+        });
+        this.add(deleteIconLabel);
+        // whitespace
+        this.add(Box.createRigidArea(new Dimension(5, 5)));
+        this.invalidate();
+        this.repaint();
+    }
+
     private String getTooltipText(LayerDescriptor descriptor) {
         boolean isMovie = descriptor.isMovie;
         boolean isMaster = descriptor.isMaster;
@@ -187,6 +180,6 @@ public class LayerPanel extends DatasetPanel{
             icon = JHVIcon.LAYER_IMAGE_OFF;
 
         return icon;
-    }	
-	
+    }
+
 }

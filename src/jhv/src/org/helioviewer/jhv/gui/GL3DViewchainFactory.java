@@ -35,21 +35,20 @@ public class GL3DViewchainFactory extends ViewchainFactory {
         // orthoView.setView(layeredView);
         GLOverlayView overlayView = viewFactory.createNewView(GLOverlayView.class);
         overlayView.setView(layeredView);
-        
+
         GL3DCameraView cameraView = viewFactory.createNewView(GL3DCameraView.class);
         cameraView.setView(overlayView);
-        
+
         GL3DViewportView viewportView = viewFactory.createNewView(GL3DViewportView.class);
         viewportView.setView(cameraView);
 
         GL3DSceneGraphView sceneGraph = new GL3DSceneGraphView();
         sceneGraph.setView(viewportView);
         sceneGraph.setGLOverlayView(overlayView);
-        
+
         GL3DComponentView componentView = viewFactory.createNewView(GL3DComponentView.class);
         componentView.setView(sceneGraph);
-        
-        
+
         // add Overlays (OvwelayView added before LayeredView and after
         // GL3DCameraView)
         updateOverlayViewsInViewchainMain(overlayView);
@@ -71,10 +70,9 @@ public class GL3DViewchainFactory extends ViewchainFactory {
     protected void createViewchainFromExistingViewchain(View sourceView, View targetView, ComponentView mainImagePanelView, boolean keepSource) {
 
         if (targetView != null && targetView.getClass().isAssignableFrom(GL3DComponentView.class)) {
-        	//View overlayView = sourceView.getAdapter(OverlayView.class);
+            // View overlayView = sourceView.getAdapter(OverlayView.class);
             View layeredView = sourceView.getAdapter(LayeredView.class);
 
-            
             ViewFactory viewFactory = getUsedViewFactory();
             View gl3dLayeredView = viewFactory.createViewFromSource(layeredView, false);
 
@@ -84,24 +82,21 @@ public class GL3DViewchainFactory extends ViewchainFactory {
 
             GLOverlayView oldOverlayView = sourceView.getAdapter(GLOverlayView.class);
             GLOverlayView overlayView = new GLOverlayView();
-            overlayView.setOverlays(oldOverlayView.getOverlays());        	
+            overlayView.setOverlays(oldOverlayView.getOverlays());
             overlayView.setView(gl3dLayeredView);
 
-            
             GL3DCameraView cameraView = viewFactory.createNewView(GL3DCameraView.class);
             cameraView.setView(overlayView);
 
-            
             GL3DViewportView viewportView = viewFactory.createNewView(GL3DViewportView.class);
             viewportView.setView(cameraView);
 
             GL3DSceneGraphView sceneGraph = new GL3DSceneGraphView();
             sceneGraph.setView(viewportView);
             sceneGraph.setGLOverlayView(overlayView);
-            
+
             ((GL3DComponentView) targetView).setView(sceneGraph);
-            
-            
+
             // do this recursively and proper (call for every view in the 3d
             // view chain, maybee...)
         } else {

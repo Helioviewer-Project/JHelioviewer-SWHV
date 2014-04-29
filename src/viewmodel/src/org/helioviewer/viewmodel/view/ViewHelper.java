@@ -400,8 +400,8 @@ public final class ViewHelper {
             return RenderingHints.VALUE_INTERPOLATION_BILINEAR;
         case BICUBIC:
             return RenderingHints.VALUE_INTERPOLATION_BICUBIC;
-		default:
-			break;
+        default:
+            break;
         }
         return null;
     }
@@ -424,7 +424,7 @@ public final class ViewHelper {
      *             if anything went wrong (e.g. type not supported, image not
      *             found, etc.)
      */
-    public static ImageInfoView loadView(URI uri,  Interval<Date> range) throws IOException {
+    public static ImageInfoView loadView(URI uri, Interval<Date> range) throws IOException {
         return loadView(uri, true, range);
     }
 

@@ -8,22 +8,23 @@ import javax.swing.JPanel;
 
 public class TestRadioPane extends JPanel {
 
-	/**
+    /**
 	 * 
 	 */
-	private static final long serialVersionUID = 1L;
-	private BufferedImage image;
-	/**
-	 * Create the panel.
-	 */
-	public TestRadioPane(BufferedImage im) {
-		this.image = im;
-		this.setPreferredSize(new Dimension (im.getWidth(), im.getHeight()));
-	}
+    private static final long serialVersionUID = 1L;
+    private BufferedImage image;
 
-	public void paintComponent(Graphics g){
-		if(image != null){
-			g.drawImage(image, 0, 0, image.getWidth(), image.getHeight(),0, 0,image.getTileWidth(),image.getHeight(), null);
-		}
-	}
+    /**
+     * Create the panel.
+     */
+    public TestRadioPane(BufferedImage im) {
+        this.image = im;
+        this.setPreferredSize(new Dimension(im.getWidth(), im.getHeight()));
+    }
+
+    public void paintComponent(Graphics g) {
+        if (image != null) {
+            g.drawImage(image, 0, 0, image.getWidth(), image.getHeight(), 0, 0, image.getTileWidth(), image.getHeight(), null);
+        }
+    }
 }

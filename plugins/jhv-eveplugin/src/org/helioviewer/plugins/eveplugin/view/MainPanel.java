@@ -16,30 +16,30 @@ public class MainPanel extends JPanel {
     // //////////////////////////////////////////////////////////////////////////////
     // Definitions
     // //////////////////////////////////////////////////////////////////////////////
-    
+
     private static final long serialVersionUID = 1L;
-    
+
     private final PlotsContainerPanel plotsPane = new PlotsContainerPanel();
     private final PlotsControlPanel controlPane = new PlotsControlPanel();
-        
+
     // //////////////////////////////////////////////////////////////////////////////
     // Methods
     // //////////////////////////////////////////////////////////////////////////////
-    
+
     public MainPanel() {
         initVisualComponents();
-        
+
         ZoomController.getSingletonInstance().setAvailableInterval(new Interval<Date>(new Date(), new Date()));
-        //PlotTimeSpace.getInstance().setMinAndMaxTime(new Date(), new Date());
+        // PlotTimeSpace.getInstance().setMinAndMaxTime(new Date(), new Date());
     }
-    
+
     private void initVisualComponents() {
         setLayout(new BorderLayout());
-        
+
         add(plotsPane, BorderLayout.CENTER);
         add(controlPane, BorderLayout.PAGE_END);
     }
-    
+
     public PlotsContainerPanel getPlotContainerPanel() {
         return plotsPane;
     }

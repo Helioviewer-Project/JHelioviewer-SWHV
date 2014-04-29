@@ -48,7 +48,7 @@ public abstract class GL3DShape extends GL3DNode {
         state.buildInverseAndNormalMatrix();
         this.wmI = new GL3DMat4d(state.getMVInverse());
         this.wmN = new GL3DMat3d(state.normalMatrix);
-        
+
         this.shapeInit(state);
         this.buildAABB();
         this.isInitialised = true;
@@ -59,9 +59,9 @@ public abstract class GL3DShape extends GL3DNode {
         if (!this.isInitialised) {
             this.init(state);
         }
-		if (this.hasChanged()) {
+        if (this.hasChanged()) {
             state.pushMV();
-            //this.updateMatrix(state);
+            // this.updateMatrix(state);
             this.wm = state.multiplyMV(this.m);
             state.buildInverseAndNormalMatrix();
             this.wmI = new GL3DMat4d(state.getMVInverse());
@@ -74,11 +74,11 @@ public abstract class GL3DShape extends GL3DNode {
     }
 
     public void updateMatrix(GL3DState state) {
-    	
+
     }
 
     public void draw(GL3DState state) {
-    	if (!isDrawBitOn(Bit.Hidden)) {
+        if (!isDrawBitOn(Bit.Hidden)) {
             // Log.debug("GL3DShape: Drawing '"+getName()+"'");
             state.pushMV();
             state.multiplyMV(this.m);

@@ -12,82 +12,79 @@ import org.helioviewer.plugins.eveplugin.draw.YAxisElement;
 import org.helioviewer.plugins.eveplugin.radio.data.DownloadRequestData;
 import org.helioviewer.plugins.eveplugin.radio.gui.RadioImagePane;
 
-
 public class RadioPlotModelData {
-	private YAxisElement yAxisElement;
-	private RadioImagePane radioImagePane;
-	//private Map<Long, BufferedImage> bufferedImages;
-	private Set<RadioPlotModelListener> listeners;
-	private Map<Long,DownloadRequestData> downloadRequestData;
-	private Map<Long,Map<Long,PlotConfig>> plotConfigList;
-	
-	public RadioPlotModelData(String plotIdentifier) {
-		yAxisElement = new YAxisElement();
-		yAxisElement.setColor(Color.BLACK);
-		yAxisElement.setLabel("Mhz");
-		radioImagePane = new RadioImagePane(plotIdentifier);
-		this.downloadRequestData = new HashMap<Long, DownloadRequestData>();
-		plotConfigList = new HashMap<Long,Map<Long,PlotConfig>>();
-		listeners = new HashSet<RadioPlotModelListener>();
-		//bufferedImages = new HashMap<Long, BufferedImage>();
-	}
+    private YAxisElement yAxisElement;
+    private RadioImagePane radioImagePane;
+    // private Map<Long, BufferedImage> bufferedImages;
+    private Set<RadioPlotModelListener> listeners;
+    private Map<Long, DownloadRequestData> downloadRequestData;
+    private Map<Long, Map<Long, PlotConfig>> plotConfigList;
 
-	public void addRadioPlotModelListener(RadioPlotModelListener listener){
-		this.listeners.add(listener);
-	}
-	
-	public void removeRadioPlotModelListener(RadioPlotModelListener listener){
-		this.listeners.remove(listener);
-	}
+    public RadioPlotModelData(String plotIdentifier) {
+        yAxisElement = new YAxisElement();
+        yAxisElement.setColor(Color.BLACK);
+        yAxisElement.setLabel("Mhz");
+        radioImagePane = new RadioImagePane(plotIdentifier);
+        this.downloadRequestData = new HashMap<Long, DownloadRequestData>();
+        plotConfigList = new HashMap<Long, Map<Long, PlotConfig>>();
+        listeners = new HashSet<RadioPlotModelListener>();
+        // bufferedImages = new HashMap<Long, BufferedImage>();
+    }
 
-	public YAxisElement getyAxisElement() {
-		return yAxisElement;
-	}
+    public void addRadioPlotModelListener(RadioPlotModelListener listener) {
+        this.listeners.add(listener);
+    }
 
-	public void setyAxisElement(YAxisElement yAxisElement) {
-		this.yAxisElement = yAxisElement;
-	}
+    public void removeRadioPlotModelListener(RadioPlotModelListener listener) {
+        this.listeners.remove(listener);
+    }
 
-	public RadioImagePane getRadioImagePane() {
-		return radioImagePane;
-	}
+    public YAxisElement getyAxisElement() {
+        return yAxisElement;
+    }
 
-	public void setRadioImagePane(RadioImagePane radioImagePane) {
-		this.radioImagePane = radioImagePane;
-	}
+    public void setyAxisElement(YAxisElement yAxisElement) {
+        this.yAxisElement = yAxisElement;
+    }
 
-	/*public Map<Long, BufferedImage> getBufferedImages() {
-		return bufferedImages;
-	}
+    public RadioImagePane getRadioImagePane() {
+        return radioImagePane;
+    }
 
-	public void setBufferedImages(Map<Long, BufferedImage> bufferedImages) {
-		this.bufferedImages = bufferedImages;
-	}*/
+    public void setRadioImagePane(RadioImagePane radioImagePane) {
+        this.radioImagePane = radioImagePane;
+    }
 
-	public Map<Long, DownloadRequestData> getDownloadRequestData() {
-		return downloadRequestData;
-	}
+    /*
+     * public Map<Long, BufferedImage> getBufferedImages() { return
+     * bufferedImages; }
+     * 
+     * public void setBufferedImages(Map<Long, BufferedImage> bufferedImages) {
+     * this.bufferedImages = bufferedImages; }
+     */
 
-	public void setDownloadRequestData(
-			Map<Long, DownloadRequestData> downloadRequestData) {
-		this.downloadRequestData = downloadRequestData;
-	}
+    public Map<Long, DownloadRequestData> getDownloadRequestData() {
+        return downloadRequestData;
+    }
 
-	public Map<Long, Map<Long, PlotConfig>> getPlotConfigList() {
-		return plotConfigList;
-	}
+    public void setDownloadRequestData(Map<Long, DownloadRequestData> downloadRequestData) {
+        this.downloadRequestData = downloadRequestData;
+    }
 
-	public void setPlotConfigList(Map<Long, Map<Long, PlotConfig>> plotConfigList) {
-		this.plotConfigList = plotConfigList;
-	}
+    public Map<Long, Map<Long, PlotConfig>> getPlotConfigList() {
+        return plotConfigList;
+    }
 
-	public Set<RadioPlotModelListener> getListeners() {
-		return listeners;
-	}
+    public void setPlotConfigList(Map<Long, Map<Long, PlotConfig>> plotConfigList) {
+        this.plotConfigList = plotConfigList;
+    }
 
-	public void setListeners(Set<RadioPlotModelListener> listeners) {
-		this.listeners = listeners;
-	}
-	
-	
+    public Set<RadioPlotModelListener> getListeners() {
+        return listeners;
+    }
+
+    public void setListeners(Set<RadioPlotModelListener> listeners) {
+        this.listeners = listeners;
+    }
+
 }

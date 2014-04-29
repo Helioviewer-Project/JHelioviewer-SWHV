@@ -13,7 +13,6 @@ import org.helioviewer.gl3d.scenegraph.math.GL3DVec3d;
 import org.helioviewer.viewmodel.renderer.GLCommonRenderGraphics;
 import org.helioviewer.viewmodel.view.View;
 
-
 /**
  * Implementation of PhyscialRenderGraphics, using OpenGL for drawing.
  * 
@@ -46,8 +45,8 @@ public class GLPhysicalRenderGraphics extends AbstractPhysicalRenderGraphics {
      *            system.
      */
     public GLPhysicalRenderGraphics(GL _gl, View view) {
-    	super(view);
-    	gl = _gl;
+        super(view);
+        gl = _gl;
         commonRenderGraphics = new GLCommonRenderGraphics(_gl);
 
         if (sinOval == null) {
@@ -288,33 +287,32 @@ public class GLPhysicalRenderGraphics extends AbstractPhysicalRenderGraphics {
      */
     public void drawImage(BufferedImage image, Double x, Double y, Double width, Double height) {
         y = -y;
-        
-        //commonRenderGraphics.bindScalingShader();
+
+        // commonRenderGraphics.bindScalingShader();
         commonRenderGraphics.bindImage(image);
 
         gl.glColor3f(1.0f, 1.0f, 1.0f);
         double width2 = width * 0.5;
         double height2 = height * 0.5;
-        
+
         gl.glBegin(GL.GL_QUADS);
-        
-        //commonRenderGraphics.setTexCoord(0.0f, 0.0f);
+
+        // commonRenderGraphics.setTexCoord(0.0f, 0.0f);
         gl.glTexCoord2d(0, 0);
         gl.glVertex2d(x - width2, y - height2);
-        //commonRenderGraphics.setTexCoord(0.0f, 1.0f);
+        // commonRenderGraphics.setTexCoord(0.0f, 1.0f);
         gl.glTexCoord2d(0, 1);
         gl.glVertex2d(x - width2, y + height2);
-        //commonRenderGraphics.setTexCoord(1.0f, 1.0f);
+        // commonRenderGraphics.setTexCoord(1.0f, 1.0f);
         gl.glTexCoord2d(1, 1);
         gl.glVertex2d(x + width2, y + height2);
-        //commonRenderGraphics.setTexCoord(1.0f, 0.0f);
+        // commonRenderGraphics.setTexCoord(1.0f, 0.0f);
         gl.glTexCoord2d(1, 0);
         gl.glVertex2d(x + width2, y - height2);
-        
-        gl.glEnd();
-        
 
-        //commonRenderGraphics.unbindScalingShader();
+        gl.glEnd();
+
+        // commonRenderGraphics.unbindScalingShader();
     }
 
     /**
@@ -330,7 +328,7 @@ public class GLPhysicalRenderGraphics extends AbstractPhysicalRenderGraphics {
 
         double width2 = size.getX() * 0.5;
         double height2 = size.getY() * 0.5;
-		
+
         gl.glBegin(GL.GL_QUADS);
 
         commonRenderGraphics.setTexCoord(0.0f, 0.0f);
@@ -343,105 +341,98 @@ public class GLPhysicalRenderGraphics extends AbstractPhysicalRenderGraphics {
         gl.glVertex2d(x + width2, y - height2);
 
         gl.glEnd();
-        
-        
 
         commonRenderGraphics.unbindScalingShader();
     }
 
-	@Override
-	public void drawImage3d(BufferedImage image, Double x, Double y, Double z) {
-		// TODO Auto-generated method stub
-		drawImage3d(image, x, y, z, 1.0f);
-	}
+    @Override
+    public void drawImage3d(BufferedImage image, Double x, Double y, Double z) {
+        // TODO Auto-generated method stub
+        drawImage3d(image, x, y, z, 1.0f);
+    }
 
-	@Override
-	public void drawImage3d(BufferedImage image, Double x, Double y, Double z,
-			float scale) {
-		Vector2dDouble imageSize = convertScreenToPhysical(image.getWidth(), image.getHeight());
-		drawImage3d(image, x, y,z, imageSize.getX() * scale, imageSize.getY() * scale);
+    @Override
+    public void drawImage3d(BufferedImage image, Double x, Double y, Double z, float scale) {
+        Vector2dDouble imageSize = convertScreenToPhysical(image.getWidth(), image.getHeight());
+        drawImage3d(image, x, y, z, imageSize.getX() * scale, imageSize.getY() * scale);
 
-	}
+    }
 
-	@Override
-	public void drawImage3d(BufferedImage image, Double x, Double y, Double z,
-			Double width, Double height) {
-		y = -y;
+    @Override
+    public void drawImage3d(BufferedImage image, Double x, Double y, Double z, Double width, Double height) {
+        y = -y;
 
         gl.glEnable(GL.GL_VERTEX_PROGRAM_ARB);
         gl.glEnable(GL.GL_FRAGMENT_PROGRAM_ARB);
 
-		commonRenderGraphics.bindImage(image);
+        commonRenderGraphics.bindImage(image);
         gl.glTexParameteri(GL.GL_TEXTURE_2D, GL.GL_TEXTURE_MAG_FILTER, GL.GL_LINEAR);
 
-        
-		gl.glColor3f(1.0f, 1.0f, 1.0f);
-		double width2 = width / 2.0;
-		double height2 = height / 2.0;
+        gl.glColor3f(1.0f, 1.0f, 1.0f);
+        double width2 = width / 2.0;
+        double height2 = height / 2.0;
 
-		GL3DVec3d sourceDir = new GL3DVec3d(0,0,1);
-		GL3DVec3d targetDir = new GL3DVec3d(x,y,z);
-		
-		double angle = Math.acos(sourceDir.dot(targetDir)/(sourceDir.length() * targetDir.length()));
-		GL3DVec3d axis = sourceDir.cross(targetDir);
-		axis.normalize();
-		GL3DMat4d r = GL3DMat4d.rotation(angle, axis);
-		r.setTranslation(x, y, z);
-		
-		
-		gl.glDisable(GL.GL_LIGHTING);
-		gl.glEnable(GL.GL_BLEND);
-		gl.glBlendFunc(GL.GL_SRC_ALPHA, GL.GL_ONE_MINUS_SRC_ALPHA);
-		gl.glDisable(GL.GL_DEPTH_TEST);
-		gl.glEnable(GL.GL_CULL_FACE);
-		gl.glEnable(GL.GL_TEXTURE_2D);
-        
-		GL3DVec3d p0 = new GL3DVec3d(-width2, -height2, 0);
-		GL3DVec3d p1 = new GL3DVec3d(-width2, height2, 0);
-		GL3DVec3d p2 = new GL3DVec3d(width2, height2, 0);
-		GL3DVec3d p3 = new GL3DVec3d(width2, -height2, 0);
-		p0 = r.multiply(p0);
-		p1 = r.multiply(p1);
-		p2 = r.multiply(p2);
-		p3 = r.multiply(p3);
+        GL3DVec3d sourceDir = new GL3DVec3d(0, 0, 1);
+        GL3DVec3d targetDir = new GL3DVec3d(x, y, z);
 
-		gl.glBegin(GL.GL_QUADS);
+        double angle = Math.acos(sourceDir.dot(targetDir) / (sourceDir.length() * targetDir.length()));
+        GL3DVec3d axis = sourceDir.cross(targetDir);
+        axis.normalize();
+        GL3DMat4d r = GL3DMat4d.rotation(angle, axis);
+        r.setTranslation(x, y, z);
 
-		commonRenderGraphics.setTexCoord(0.0f, 0.0f);
-		gl.glVertex3d(p0.x, p0.y, p0.z);
-		commonRenderGraphics.setTexCoord(0.0f, 1.0f);
-		gl.glVertex3d(p1.x, p1.y, p1.z);
-		commonRenderGraphics.setTexCoord(1.0f, 1.0f);
-		gl.glVertex3d(p2.x, p2.y, p2.z);
-		commonRenderGraphics.setTexCoord(1.0f, 0.0f);
-		gl.glVertex3d(p3.x, p3.y, p3.z);
+        gl.glDisable(GL.GL_LIGHTING);
+        gl.glEnable(GL.GL_BLEND);
+        gl.glBlendFunc(GL.GL_SRC_ALPHA, GL.GL_ONE_MINUS_SRC_ALPHA);
+        gl.glDisable(GL.GL_DEPTH_TEST);
+        gl.glEnable(GL.GL_CULL_FACE);
+        gl.glEnable(GL.GL_TEXTURE_2D);
 
-		gl.glEnd();
+        GL3DVec3d p0 = new GL3DVec3d(-width2, -height2, 0);
+        GL3DVec3d p1 = new GL3DVec3d(-width2, height2, 0);
+        GL3DVec3d p2 = new GL3DVec3d(width2, height2, 0);
+        GL3DVec3d p3 = new GL3DVec3d(width2, -height2, 0);
+        p0 = r.multiply(p0);
+        p1 = r.multiply(p1);
+        p2 = r.multiply(p2);
+        p3 = r.multiply(p3);
 
-		gl.glDisable(GL.GL_TEXTURE_2D);
-		gl.glEnable(GL.GL_LIGHTING);
-		gl.glDisable(GL.GL_BLEND);
-		gl.glEnable(GL.GL_DEPTH_TEST);
-		gl.glDisable(GL.GL_CULL_FACE);
-		gl.glEnable(GL.GL_BLEND);
+        gl.glBegin(GL.GL_QUADS);
+
+        commonRenderGraphics.setTexCoord(0.0f, 0.0f);
+        gl.glVertex3d(p0.x, p0.y, p0.z);
+        commonRenderGraphics.setTexCoord(0.0f, 1.0f);
+        gl.glVertex3d(p1.x, p1.y, p1.z);
+        commonRenderGraphics.setTexCoord(1.0f, 1.0f);
+        gl.glVertex3d(p2.x, p2.y, p2.z);
+        commonRenderGraphics.setTexCoord(1.0f, 0.0f);
+        gl.glVertex3d(p3.x, p3.y, p3.z);
+
+        gl.glEnd();
+
+        gl.glDisable(GL.GL_TEXTURE_2D);
+        gl.glEnable(GL.GL_LIGHTING);
+        gl.glDisable(GL.GL_BLEND);
+        gl.glEnable(GL.GL_DEPTH_TEST);
+        gl.glDisable(GL.GL_CULL_FACE);
+        gl.glEnable(GL.GL_BLEND);
         gl.glDisable(GL.GL_VERTEX_PROGRAM_ARB);
         gl.glDisable(GL.GL_FRAGMENT_PROGRAM_ARB);
 
-		commonRenderGraphics.unbindScalingShader();
-		
-	}
+        commonRenderGraphics.unbindScalingShader();
 
-	@Override
-	public void fillPolygon(Vector3dDouble[] points) {
+    }
+
+    @Override
+    public void fillPolygon(Vector3dDouble[] points) {
         gl.glBindTexture(GL.GL_TEXTURE_2D, 0);
 
-        
         gl.glDisable(GL.GL_DEPTH_TEST);
         gl.glEnable(GL.GL_LIGHTING);
-		gl.glEnable(GL.GL_BLEND);
-		gl.glBlendFunc(GL.GL_SRC_ALPHA, GL.GL_ONE_MINUS_SRC_ALPHA);
-		gl.glEnable(GL.GL_CULL_FACE);		
-	
+        gl.glEnable(GL.GL_BLEND);
+        gl.glBlendFunc(GL.GL_SRC_ALPHA, GL.GL_ONE_MINUS_SRC_ALPHA);
+        gl.glEnable(GL.GL_CULL_FACE);
+
         gl.glBegin(GL.GL_POLYGON);
 
         for (int i = 0; i < points.length; i++) {
@@ -452,64 +443,60 @@ public class GLPhysicalRenderGraphics extends AbstractPhysicalRenderGraphics {
 
         gl.glDisable(GL.GL_BLEND);
         gl.glEnable(GL.GL_DEPTH_TEST);
-        gl.glDisable(GL.GL_CULL_FACE);		
+        gl.glDisable(GL.GL_CULL_FACE);
         gl.glDisable(GL.GL_LIGHTING);
 
-	}
+    }
 
-	@Override
-	public void drawLine3d(Double x0, Double y0, Double z0, Double x1, Double y1, Double z1) {
-		// TODO Auto-generated method stub
+    @Override
+    public void drawLine3d(Double x0, Double y0, Double z0, Double x1, Double y1, Double z1) {
+        // TODO Auto-generated method stub
         gl.glDisable(GL.GL_TEXTURE_2D);
         gl.glEnable(GL.GL_LINE_SMOOTH);
         gl.glBlendFunc(GL.GL_SRC_ALPHA, GL.GL_ONE_MINUS_SRC_ALPHA);
-        
+
         gl.glBegin(GL.GL_LINES);
-        
+
         gl.glVertex3d(x0, -y0, z0);
         gl.glVertex3d(x1, -y1, z1);
 
         gl.glEnd();
 
         gl.glDisable(GL.GL_LINE_SMOOTH);
-        gl.glDisable(GL.GL_BLEND);        
+        gl.glDisable(GL.GL_BLEND);
         gl.glDisable(GL.GL_TEXTURE_2D);
 
         gl.glDisable(GL.GL_LINE_SMOOTH);
-        
-	}
 
-	@Override
-	public void drawLine3d(Vector3dDouble p0, Vector3dDouble p1) {
-		drawLine3d(p0.getX(), p0.getY(), p0.getZ(), p1.getX(), p1.getY(), p1.getZ());
-		// TODO Auto-generated method stub
-		
-	}
+    }
 
-	
-	public void startDrawLines() {
-		gl.glDisable(GL.GL_TEXTURE_2D);
+    @Override
+    public void drawLine3d(Vector3dDouble p0, Vector3dDouble p1) {
+        drawLine3d(p0.getX(), p0.getY(), p0.getZ(), p1.getX(), p1.getY(), p1.getZ());
+        // TODO Auto-generated method stub
+
+    }
+
+    public void startDrawLines() {
+        gl.glDisable(GL.GL_TEXTURE_2D);
         gl.glEnable(GL.GL_LINE_SMOOTH);
-        //gl.glBlendFunc(GL.GL_SRC_ALPHA, GL.GL_ONE_MINUS_SRC_ALPHA);
+        // gl.glBlendFunc(GL.GL_SRC_ALPHA, GL.GL_ONE_MINUS_SRC_ALPHA);
         gl.glBegin(GL.GL_LINES);
-	}
+    }
 
-	
-	public void stopDrawLines() {
+    public void stopDrawLines() {
         gl.glEnd();
         gl.glDisable(GL.GL_LINE_SMOOTH);
-		
-	}
 
-	
-	public void drawLines3d(Double x0, Double y0, Double z0, Double x1,
-			Double y1, Double z1) {
+    }
+
+    public void drawLines3d(Double x0, Double y0, Double z0, Double x1, Double y1, Double z1) {
         gl.glVertex3d(x0, y0, z0);
         gl.glVertex3d(x1, y1, z1);
-		
-	}
-	
-	public GL getGL(){
-		return gl;
-	}
+
+    }
+
+    public GL getGL() {
+        return gl;
+    }
 }

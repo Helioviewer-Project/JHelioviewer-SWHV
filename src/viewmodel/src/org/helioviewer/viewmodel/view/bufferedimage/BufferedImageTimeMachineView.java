@@ -158,10 +158,10 @@ public class BufferedImageTimeMachineView extends AbstractBasicView implements S
             cacheSize = n + 1;
         }
 
-		@Override
-		public long getCurrentDateMillis() {
-			return movieView.getCurrentDateMillis();
-		}
+        @Override
+        public long getCurrentDateMillis() {
+            return movieView.getCurrentDateMillis();
+        }
     };
 
     /**
@@ -209,7 +209,8 @@ public class BufferedImageTimeMachineView extends AbstractBasicView implements S
      * @see org.helioviewer.viewmodel.imagedata.ImageData.SubimataDataView#getSubimageData()
      */
     public ImageData getSubimageData() {
-        //Log.info("TimeMachine::getSubimageData() -> pass through frame " + movieView.getCurrentFrameNumber());
+        // Log.info("TimeMachine::getSubimageData() -> pass through frame " +
+        // movieView.getCurrentFrameNumber());
         // Update and check the frame number
         int newFrameNumber = movieView.getCurrentFrameNumber();
         if (newFrameNumber - frameNumber != 1) {
@@ -223,8 +224,9 @@ public class BufferedImageTimeMachineView extends AbstractBasicView implements S
         previousCache.addFirst(newFrame);
         while (previousCache.size() > cacheSize)
             previousCache.removeLast();
-        //System.out.println("New cache: ");
-        //Log.info("TimeMachine::getSubimageData() -> new cache size " + previousCache.size());
+        // System.out.println("New cache: ");
+        // Log.info("TimeMachine::getSubimageData() -> new cache size " +
+        // previousCache.size());
         return newFrame;
     }
 
@@ -289,7 +291,7 @@ public class BufferedImageTimeMachineView extends AbstractBasicView implements S
     public boolean setRegion(Region r, ChangeEvent event) {
         Region oldRegion = regionView.getRegion();
         // Just a shift?
-        if (oldRegion!=null &&r.getHeight() == oldRegion.getHeight() && r.getWidth() == oldRegion.getWidth()) {
+        if (oldRegion != null && r.getHeight() == oldRegion.getHeight() && r.getWidth() == oldRegion.getWidth()) {
             // TODO Rounding, shifting, (recalculate sides?)
             previousCache.clear();
         } else {
@@ -368,7 +370,7 @@ public class BufferedImageTimeMachineView extends AbstractBasicView implements S
      * @see org.helioviewer.viewmodel.view.ViewListener#viewChanged(org.helioviewer.viewmodel.view.View,org.helioviewer.viewmodel.changeevent.ChangeEvent)
      */
     public void viewChanged(View sender, ChangeEvent aEvent) {
-        //System.out.println("Master view changed " + aEvent);
+        // System.out.println("Master view changed " + aEvent);
         // The region and viewport changes are already redirected to the slave
         // view chain
         if (aEvent.reasonOccurred(ViewChainChangedReason.class)) {

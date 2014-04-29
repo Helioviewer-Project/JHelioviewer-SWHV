@@ -77,6 +77,6 @@ public interface View {
      *            The desired interface
      * @return View implementing the interface, if available, null otherwise
      */
-    public <T extends View> T getAdapter(Class<T> c);    
+    public <T extends View> T getAdapter(Class<T> c);
 
 }

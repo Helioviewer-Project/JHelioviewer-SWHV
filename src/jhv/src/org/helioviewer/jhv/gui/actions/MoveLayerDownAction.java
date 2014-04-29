@@ -35,7 +35,7 @@ public class MoveLayerDownAction extends AbstractAction {
      * {@inheritDoc}
      */
     public void actionPerformed(ActionEvent e) {
-    	LayersToDatasetLayers.getSingletonInstance().moveLayerDown(view);
+        LayersToDatasetLayers.getSingletonInstance().moveLayerDown(view);
     }
 
 }

@@ -33,7 +33,7 @@ public class GL3DPfssModel extends GL3DOrientedGroup {
     private int pointReductionModulo = 1;
     Date date;
     long interval;
-    
+
     public GL3DPfssModel(PfssDimension pfss) {
         super("PFSS Model");
 
@@ -57,20 +57,18 @@ public class GL3DPfssModel extends GL3DOrientedGroup {
                 }
             }
             this.addNode(new GL3DPolyLine(points, new GL3DVec4f(curve.color.x, curve.color.y, curve.color.z, 1.0f), GL3DMeshPrimitive.LINE_STRIP));
-        }    	
+        }
         this.date = new Date();
-        this.interval = 1000*60*60*12;
+        this.interval = 1000 * 60 * 60 * 12;
     }
 
     public void shapeDraw(GL3DState state) {
-    	if(Math.abs(state.getCurrentObservationDate().getTime()-this.date.getTime())<this.interval){
-    		super.shapeDraw(state);
-    	}
-    	else{
-    		super.setUnchanged();
-    	}
-    	
-        
+        if (Math.abs(state.getCurrentObservationDate().getTime() - this.date.getTime()) < this.interval) {
+            super.shapeDraw(state);
+        } else {
+            super.setUnchanged();
+        }
+
     }
 
     public CoordinateSystem getCoordinateSystem() {

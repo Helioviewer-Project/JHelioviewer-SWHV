@@ -22,112 +22,104 @@ import org.helioviewer.gl3d.plugin.GL3DPluginConfiguration;
  */
 public class GL3DInternalPluginConfiguration implements GL3DPluginConfiguration {
 
-	private static class PluginEntry {
-		public String path;
-		public String clazz;
+    private static class PluginEntry {
+        public String path;
+        public String clazz;
 
-		public PluginEntry(String path, String clazz) {
-			this.path = path;
-			this.clazz = clazz;
-		}
-	}
+        public PluginEntry(String path, String clazz) {
+            this.path = path;
+            this.clazz = clazz;
+        }
+    }
 
-	@Override
-	public List<GL3DModelPlugin> findPlugins() {
-		List<GL3DModelPlugin> plugins = new ArrayList<GL3DModelPlugin>();
+    @Override
+    public List<GL3DModelPlugin> findPlugins() {
+        List<GL3DModelPlugin> plugins = new ArrayList<GL3DModelPlugin>();
 
-		/*
-		 * ArrayList<PluginEntry> entries = new ArrayList<PluginEntry>();
-		 * entries.add(new
-		 * PluginEntry("C:\\Projects\\JHelioViewer\\hek3d_plugin.jar",
-		 * "org.helioviewer.gl3d.plugin.hekplugin.HEKPlugin")); entries.add(new
-		 * PluginEntry("C:\\Projects\\JHelioViewer\\pfss_plugin.jar",
-		 * "org.helioviewer.gl3d.plugin.pfss.PfssPlugin"));
-		 * 
-		 * for(PluginEntry entry : entries) { GL3DModelPlugin p =
-		 * loadPlugin(entry.path, entry.clazz); if(p != null && p instanceof
-		 * GL3DModelPlugin) plugins.add((GL3DModelPlugin) p); }
-		 */
+        /*
+         * ArrayList<PluginEntry> entries = new ArrayList<PluginEntry>();
+         * entries.add(new
+         * PluginEntry("C:\\Projects\\JHelioViewer\\hek3d_plugin.jar",
+         * "org.helioviewer.gl3d.plugin.hekplugin.HEKPlugin")); entries.add(new
+         * PluginEntry("C:\\Projects\\JHelioViewer\\pfss_plugin.jar",
+         * "org.helioviewer.gl3d.plugin.pfss.PfssPlugin"));
+         * 
+         * for(PluginEntry entry : entries) { GL3DModelPlugin p =
+         * loadPlugin(entry.path, entry.clazz); if(p != null && p instanceof
+         * GL3DModelPlugin) plugins.add((GL3DModelPlugin) p); }
+         */
 
-		return plugins;
-	}
+        return plugins;
+    }
 
-	private GL3DModelPlugin loadPlugin(String path, String clazz) {
-		File f = new File(path);
+    private GL3DModelPlugin loadPlugin(String path, String clazz) {
+        File f = new File(path);
 
-		// Load plugins with a URLClassLoader
-		try {
-			URL[] urls = new URL[1];
-			urls[0] = f.toURL();
+        // Load plugins with a URLClassLoader
+        try {
+            URL[] urls = new URL[1];
+            urls[0] = f.toURL();
 
-			URLClassLoader classLoader = new URLClassLoader(urls);
-			return (GL3DModelPlugin) classLoader.loadClass(clazz).newInstance();
-		} catch (Exception e) {
-			Log.error(">> Couldn't load plugin from: " + path + ": "
-					+ e.getMessage());
-		}
+            URLClassLoader classLoader = new URLClassLoader(urls);
+            return (GL3DModelPlugin) classLoader.loadClass(clazz).newInstance();
+        } catch (Exception e) {
+            Log.error(">> Couldn't load plugin from: " + path + ": " + e.getMessage());
+        }
 
-		return null;
-	}
+        return null;
+    }
 
-	// @Override
-	public List<GL3DModelPlugin> findPlugins2() {
-		File pfss = new File("C:\\Users\\jf\\Desktop\\PfssPlugin.jar");
-		// File vectors = new File("C:\\Users\\jf\\Desktop\\VectorsPlugin.jar");
-		// File hek = new File("C:\\Users\\jf\\Desktop\\HEKPlugin.jar");
-		// File hek = new
-		// File("C:\\Users\\jf\\Documents\\FHNW\\projects\\hekplugin-3d\\trunk\\bin\\");
-		File hek = new File(
-				"C:\\Projects\\JHelioViewer\\hekplugin-3d\\hek3d.jar");
+    // @Override
+    public List<GL3DModelPlugin> findPlugins2() {
+        File pfss = new File("C:\\Users\\jf\\Desktop\\PfssPlugin.jar");
+        // File vectors = new File("C:\\Users\\jf\\Desktop\\VectorsPlugin.jar");
+        // File hek = new File("C:\\Users\\jf\\Desktop\\HEKPlugin.jar");
+        // File hek = new
+        // File("C:\\Users\\jf\\Documents\\FHNW\\projects\\hekplugin-3d\\trunk\\bin\\");
+        File hek = new File("C:\\Projects\\JHelioViewer\\hekplugin-3d\\hek3d.jar");
 
-		if (hek.exists())
-			System.out
-					.println("EXISTS ========================================================================================");
-		else
-			System.out
-					.println("NOT EXISTS ========================================================================================");
+        if (hek.exists())
+            System.out.println("EXISTS ========================================================================================");
+        else
+            System.out.println("NOT EXISTS ========================================================================================");
 
-		/*
-		 * try { //urls[0] = pfss.toURL(); //urls[1] = vectors.toURL();
-		 * //urls[2] = hek.toURL(); urls[0] = hek.toURL(); } catch
-		 * (MalformedURLException e) { e.printStackTrace(); }
-		 */
+        /*
+         * try { //urls[0] = pfss.toURL(); //urls[1] = vectors.toURL();
+         * //urls[2] = hek.toURL(); urls[0] = hek.toURL(); } catch
+         * (MalformedURLException e) { e.printStackTrace(); }
+         */
 
-		List<GL3DModelPlugin> plugins = new ArrayList<GL3DModelPlugin>();
+        List<GL3DModelPlugin> plugins = new ArrayList<GL3DModelPlugin>();
 
-		// Load plugins with a URLClassLoader
-		try {
-			URL[] urls = new URL[1];
+        // Load plugins with a URLClassLoader
+        try {
+            URL[] urls = new URL[1];
 
-			urls[0] = hek.toURL();
+            urls[0] = hek.toURL();
 
-			URLClassLoader classLoader = new URLClassLoader(urls);
+            URLClassLoader classLoader = new URLClassLoader(urls);
 
-			// /// classLoader.loadClass(name)
+            // /// classLoader.loadClass(name)
 
-			Object pfssPlugin = null;
-			// Object vectorsPlugin = null;
-			Object hekPlugin = null;
+            Object pfssPlugin = null;
+            // Object vectorsPlugin = null;
+            Object hekPlugin = null;
 
-			pfssPlugin = classLoader.loadClass(
-					"org.helioviewer.gl3d.plugin.pfss.PfssPlugin")
-					.newInstance();
-			// vectorsPlugin =
-			// classLoader.loadClass("org.helioviewer.gl3d.plugin.vectors.VectorsPlugin").newInstance();
-			hekPlugin = classLoader.loadClass(
-					"org.helioviewer.gl3d.plugin.hekplugin.HEKPlugin")
-					.newInstance();
+            pfssPlugin = classLoader.loadClass("org.helioviewer.gl3d.plugin.pfss.PfssPlugin").newInstance();
+            // vectorsPlugin =
+            // classLoader.loadClass("org.helioviewer.gl3d.plugin.vectors.VectorsPlugin").newInstance();
+            hekPlugin = classLoader.loadClass("org.helioviewer.gl3d.plugin.hekplugin.HEKPlugin").newInstance();
 
-			plugins.add((GL3DModelPlugin) pfssPlugin);
-			// plugins.add((GL3DModelPlugin) vectorsPlugin);
-			plugins.add((GL3DModelPlugin) hekPlugin);
-			// plugins.add(new VectorsPlugin());
-			// plugins.add(new HEKPlugin());
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
+            plugins.add((GL3DModelPlugin) pfssPlugin);
+            // plugins.add((GL3DModelPlugin) vectorsPlugin);
+            plugins.add((GL3DModelPlugin) hekPlugin);
+            // plugins.add(new VectorsPlugin());
+            // plugins.add(new HEKPlugin());
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
 
-		return plugins;
-	}
+        return plugins;
+    }
 
 }

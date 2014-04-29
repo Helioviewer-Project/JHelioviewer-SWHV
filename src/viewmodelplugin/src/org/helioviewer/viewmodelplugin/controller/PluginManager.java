@@ -283,7 +283,7 @@ public class PluginManager {
      *            Overlay container to add to the list.
      */
     public void addOverlayContainer(OverlayContainer container) {
-    	
+
         pluginOverlays.add(container);
     }
 
@@ -399,7 +399,7 @@ public class PluginManager {
             URLClassLoader classLoader = new URLClassLoader(urls, Thread.currentThread().getContextClassLoader());
             Log.info("PluginManager: Load plugin class :" + className);
             Object o = classLoader.loadClass(className).newInstance();
-            
+
             if (o instanceof Plugin) {
                 addPlugin(classLoader, (Plugin) o, pluginLocation);
                 return true;

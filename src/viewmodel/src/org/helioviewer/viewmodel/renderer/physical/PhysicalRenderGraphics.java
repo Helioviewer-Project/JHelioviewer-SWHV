@@ -20,5 +20,5 @@ import org.helioviewer.viewmodel.renderer.RenderGraphics;
  * @author Markus Langenberg
  * */
 public interface PhysicalRenderGraphics extends RenderGraphics<Double, Vector2dDouble> {
-	public GL getGL();
+    public GL getGL();
 }

@@ -31,9 +31,9 @@ public class SoftwareModePlugin extends FilterPlugin {
         return "Dummy software plugin";
     }
 
-	public String getAboutLicenseText() {
-		// TODO Auto-generated method stub
-		return "about software plugin";
-	}
+    public String getAboutLicenseText() {
+        // TODO Auto-generated method stub
+        return "about software plugin";
+    }
 
 }

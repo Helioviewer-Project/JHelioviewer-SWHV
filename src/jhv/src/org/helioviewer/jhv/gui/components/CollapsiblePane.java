@@ -61,19 +61,20 @@ public class CollapsiblePane extends JComponent implements ActionListener {
         }
         toggleButton.setPreferredSize(new Dimension(ImageViewerGui.SIDE_PANEL_WIDTH, (int) toggleButton.getPreferredSize().getHeight()));
         toggleButton.addActionListener(this);
-        
+
         this.component = component;
         component.setVisible(startExpanded);
         add(component, BorderLayout.CENTER);
         setButtons();
         setMaximumSize(new Dimension(Short.MAX_VALUE, getPreferredSize().height));
     }
-	public void setButtons(){
+
+    public void setButtons() {
         topButtonsPanel = new JPanel();
         topButtonsPanel.setLayout(new BorderLayout());
         topButtonsPanel.add(toggleButton, BorderLayout.NORTH);
         add(topButtonsPanel, BorderLayout.PAGE_START);
-	}    
+    }
 
     /**
      * Sets the text on the toggle button

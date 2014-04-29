@@ -139,13 +139,13 @@ public class GL3DQuatd {
         q.normalize();
         return q;
     }
-    
+
     public GL3DQuatd nlerp(GL3DQuatd r, double t) {
         GL3DQuatd result = r.copy().add(this.copy().subtract(r).scale(t));
         result.normalize();
         return result;
     }
-    
+
     public void set(GL3DQuatd q) {
         this.a = q.a;
         this.u = q.u;
@@ -170,11 +170,11 @@ public class GL3DQuatd {
         return this.a * q.a + this.u.x * q.u.x + this.u.y * q.u.y + this.u.z * q.u.z;
     }
 
-    public static GL3DQuatd calcRotation(GL3DVec3d startPoint, GL3DVec3d endPoint){
-    	 GL3DVec3d rotationAxis = GL3DVec3d.cross(startPoint, endPoint);
-         double rotationAngle = Math.atan2(rotationAxis.length(), GL3DVec3d.dot(startPoint, endPoint));
+    public static GL3DQuatd calcRotation(GL3DVec3d startPoint, GL3DVec3d endPoint) {
+        GL3DVec3d rotationAxis = GL3DVec3d.cross(startPoint, endPoint);
+        double rotationAngle = Math.atan2(rotationAxis.length(), GL3DVec3d.dot(startPoint, endPoint));
 
-         return GL3DQuatd.createRotation(rotationAngle, rotationAxis.copy());        
+        return GL3DQuatd.createRotation(rotationAngle, rotationAxis.copy());
     }
 
     public GL3DQuatd copy() {

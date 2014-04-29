@@ -154,22 +154,22 @@ public class GL3DVec3f {
     }
 
     public void negate() {
-    	this.x = -this.x;
-    	this.y = -this.y;
-    	this.z = -this.z;
+        this.x = -this.x;
+        this.y = -this.y;
+        this.z = -this.z;
     }
 
     public static GL3DVec3f negate(GL3DVec3f vec) {
-    	GL3DVec3f newVec = vec.copy();
+        GL3DVec3f newVec = vec.copy();
         newVec.negate();
         return newVec;
     }
-    
-    private GL3DVec3f copy() {
-		return new GL3DVec3f(this.x, this.y, this.z);
-	}
 
-	public boolean isApproxEqual(GL3DVec3f vec, float tolerance) {
+    private GL3DVec3f copy() {
+        return new GL3DVec3f(this.x, this.y, this.z);
+    }
+
+    public boolean isApproxEqual(GL3DVec3f vec, float tolerance) {
         return Math.abs(this.x - vec.x) <= tolerance && Math.abs(this.y - vec.y) <= tolerance && Math.abs(this.z - vec.z) <= tolerance;
     }
 

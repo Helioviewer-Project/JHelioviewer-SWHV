@@ -30,26 +30,26 @@ public class PeriodPicker extends JPanel implements ActionListener, MouseListene
     // ////////////////////////////////////////////////////////////////
 
     private static final long serialVersionUID = 1L;
-    
+
     private SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd");
-    
+
     private final LinkedList<PeriodPickerListener> listeners = new LinkedList<PeriodPickerListener>();
     private Interval<Date> interval = new Interval<Date>(null, null);
-    
-    private final ImageIcon icon = IconBank.getIcon(JHVIcon.DATE);    
+
+    private final ImageIcon icon = IconBank.getIcon(JHVIcon.DATE);
     private final JTextField textField = new JTextField();
     private final JButton popupButton = new JButton(icon);
-    
+
     // ////////////////////////////////////////////////////////////////
     // Methods
     // ////////////////////////////////////////////////////////////////
-    
+
     public PeriodPicker() {
         initVisualComponents();
     }
-    
+
     private void initVisualComponents() {
-     // set basic layout
+        // set basic layout
         setLayout(new BorderLayout(0, 0));
 
         // set up text field
@@ -66,28 +66,28 @@ public class PeriodPicker extends JPanel implements ActionListener, MouseListene
         add(popupButton, BorderLayout.EAST);
         add(textField, BorderLayout.CENTER);
     }
-    
+
     private void updateTextField() {
         final Date startDate = interval.getStart() == null ? new Date() : interval.getStart();
         final Date endDate = interval.getEnd() == null ? new Date() : interval.getEnd();
-        
+
         textField.setText(dateFormat.format(startDate) + " - " + dateFormat.format(endDate));
     }
-    
+
     public void addPeriodPickerListener(final PeriodPickerListener listener) {
         listeners.add(listener);
     }
-    
+
     public void removePeriodPickerListener(final PeriodPickerListener listener) {
         listeners.remove(listener);
     }
-    
+
     private void fireIntervalChanged(final Interval<Date> interval) {
         for (final PeriodPickerListener listener : listeners) {
             listener.intervalChanged(interval);
         }
     }
-    
+
     /**
      * Sets the date format pattern. The date will be displayed in defined
      * format.
@@ -99,32 +99,32 @@ public class PeriodPicker extends JPanel implements ActionListener, MouseListene
         if (newFormat != null)
             dateFormat = newFormat;
     }
-    
+
     public void setInterval(final Interval<Date> interval) {
         this.interval = interval;
         updateTextField();
     }
-    
+
     public Interval<Date> getInterval() {
         return interval;
     }
-    
+
     private void showPeriodSelectionDialog() {
         final PeriodPickerDialog dialog = new PeriodPickerDialog();
         dialog.setInterval(interval);
-        
+
         if (dialog.showDialog() == PeriodPickerDialogResult.NEWPERIOD) {
             setInterval(dialog.getInterval());
             fireIntervalChanged(interval);
         }
     }
-    
+
     // ////////////////////////////////////////////////////////////////
     // Action Listener
     // ////////////////////////////////////////////////////////////////
 
     public void actionPerformed(ActionEvent e) {
-        if (e.getSource() == popupButton) {            
+        if (e.getSource() == popupButton) {
             showPeriodSelectionDialog();
         }
     }
@@ -132,18 +132,22 @@ public class PeriodPicker extends JPanel implements ActionListener, MouseListene
     // ////////////////////////////////////////////////////////////////
     // Mouse Listener
     // ////////////////////////////////////////////////////////////////
-    
+
     public void mouseClicked(MouseEvent e) {
         if (e.getSource() == textField) {
-            showPeriodSelectionDialog();    
+            showPeriodSelectionDialog();
         }
     }
 
-    public void mouseEntered(MouseEvent e) {}
+    public void mouseEntered(MouseEvent e) {
+    }
 
-    public void mouseExited(MouseEvent e) {}
+    public void mouseExited(MouseEvent e) {
+    }
 
-    public void mousePressed(MouseEvent e) {}
+    public void mousePressed(MouseEvent e) {
+    }
 
-    public void mouseReleased(MouseEvent e) {}
+    public void mouseReleased(MouseEvent e) {
+    }
 }

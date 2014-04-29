@@ -30,6 +30,7 @@ public class GL3DHitReferenceShape extends GL3DMesh {
     private boolean allowBacksideHits;
     private double angle = 0.0;
     private GL3DMat4d phiRotation;
+
     public GL3DHitReferenceShape() {
         this(false);
     }
@@ -44,13 +45,13 @@ public class GL3DHitReferenceShape extends GL3DMesh {
         this.allowBacksideHits = allowBacksideHits;
         this.angle = angle;
     }
-    
+
     public void shapeDraw(GL3DState state) {
         return;
     }
 
     public GL3DMeshPrimitive createMesh(GL3DState state, List<GL3DVec3d> positions, List<GL3DVec3d> normals, List<GL3DVec2d> textCoords, List<Integer> indices, List<GL3DVec4d> colors) {
-    	this.phiRotation = GL3DMat4d.rotation(angle, new GL3DVec3d(0, 1, 0));
+        this.phiRotation = GL3DMat4d.rotation(angle, new GL3DVec3d(0, 1, 0));
         GL3DVec3d ll = createVertex(-extremeValue, -extremeValue, 0);
         GL3DVec3d lr = createVertex(extremeValue, -extremeValue, 0);
         GL3DVec3d tr = createVertex(extremeValue, extremeValue, 0);
@@ -76,20 +77,20 @@ public class GL3DHitReferenceShape extends GL3DMesh {
         return GL3DMeshPrimitive.TRIANGLES;
     }
 
-    private GL3DVec3d createVertex(double x, double y, double z){
-    	double cx = x * phiRotation.m[0] + y * phiRotation.m[4] + z * phiRotation.m[8] + phiRotation.m[12];
+    private GL3DVec3d createVertex(double x, double y, double z) {
+        double cx = x * phiRotation.m[0] + y * phiRotation.m[4] + z * phiRotation.m[8] + phiRotation.m[12];
         double cy = x * phiRotation.m[1] + y * phiRotation.m[5] + z * phiRotation.m[9] + phiRotation.m[13];
         double cz = x * phiRotation.m[2] + y * phiRotation.m[6] + z * phiRotation.m[10] + phiRotation.m[14];
-       return new GL3DVec3d(cx, cy, cz);
+        return new GL3DVec3d(cx, cy, cz);
     }
-    
+
     public boolean hit(GL3DRay ray) {
         // if its hidden, it can't be hit
-    	if (isDrawBitOn(Bit.Hidden) || this.wmI == null) {
+        if (isDrawBitOn(Bit.Hidden) || this.wmI == null) {
             return false;
-            
+
         }
-       	
+
         // Transform ray to object space for non-groups
         ray.setOriginOS(this.wmI.multiply(ray.getOrigin()));
         GL3DVec3d helpingDir = this.wmI.multiply(ray.getDirection());
@@ -137,9 +138,9 @@ public class GL3DHitReferenceShape extends GL3DMesh {
     }
 
     private boolean isSphereHit(GL3DRay ray) {
-    	GL3DVec3d l = new GL3DVec3d(0, 0, 0).subtract(ray.getOrigin());
-    	GL3DVec3d rayDirCopy = ray.getDirection().copy();
-    	rayDirCopy.normalize();
+        GL3DVec3d l = new GL3DVec3d(0, 0, 0).subtract(ray.getOrigin());
+        GL3DVec3d rayDirCopy = ray.getDirection().copy();
+        rayDirCopy.normalize();
         double s = l.dot(rayDirCopy);
         double l2 = l.length2();
         double r2 = Constants.SunRadius2;
@@ -150,7 +151,7 @@ public class GL3DHitReferenceShape extends GL3DMesh {
         double s2 = s * s;
         double m2 = l2 - s2;
         if (m2 > r2) {
-        	return false;
+            return false;
         }
 
         double q = Math.sqrt(r2 - m2);
@@ -164,7 +165,7 @@ public class GL3DHitReferenceShape extends GL3DMesh {
         GL3DVec3d rayCopy2 = ray.getDirection().copy();
         rayCopy2.normalize();
         rayCopy2.multiply(t);
-        
+
         GL3DVec3d rayCopy = ray.getOrigin().copy();
         rayCopy.add(rayCopy2);
         ray.setHitPoint(rayCopy);

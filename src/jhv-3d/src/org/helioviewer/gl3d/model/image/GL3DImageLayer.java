@@ -40,14 +40,14 @@ import org.helioviewer.viewmodel.view.RegionView;
  * This is the scene graph equivalent of an image layer sub view chain attached
  * to the GL3DLayeredView. It represents exactly one image layer in the view
  * chain
- *
+ * 
  * @author Simon Spoerri (simon.spoerri@fhnw.ch)
- *
+ * 
  */
 public abstract class GL3DImageLayer extends GL3DOrientedGroup implements GL3DCameraListener {
     private static int nextLayerId = 0;
     private final int layerId;
-    private GL3DVec4d direction = new GL3DVec4d(0,0,1,0);
+    private GL3DVec4d direction = new GL3DVec4d(0, 0, 1, 0);
 
     public int getLayerId() {
         return layerId;
@@ -107,20 +107,25 @@ public abstract class GL3DImageLayer extends GL3DOrientedGroup implements GL3DCa
         this.doUpdateROI = true;
         this.markAsChanged();
     }
+
     @Override
     public void shapeDraw(GL3DState state) {
         super.shapeDraw(state);
     }
 
-
     @Override
-	public void shapeInit(GL3DState state) {
+    public void shapeInit(GL3DState state) {
         this.createImageMeshNodes(state.gl);
 
         CoordinateVector orientationVector = this.getOrientation();
         CoordinateConversion toViewSpace = this.getCoordinateSystem().getConversion(state.getActiveCamera().getViewSpaceCoordinateSystem());
 
-        GL3DVec3d orientation = GL3DHelper.toVec(toViewSpace.convert(orientationVector)); //.normalize(); - not needed for atan2
+        GL3DVec3d orientation = GL3DHelper.toVec(toViewSpace.convert(orientationVector)); // .normalize();
+                                                                                          // -
+                                                                                          // not
+                                                                                          // needed
+                                                                                          // for
+                                                                                          // atan2
         double phi = Math.atan2(orientation.x, orientation.z);
 
         this.accellerationShape = new GL3DHitReferenceShape(true, phi);
@@ -132,7 +137,7 @@ public abstract class GL3DImageLayer extends GL3DOrientedGroup implements GL3DCa
         this.markAsChanged();
         updateROI(state.getActiveCamera());
 
-        GL3DQuatd phiRotation = GL3DQuatd.createRotation(phi, new GL3DVec3d(0,1,0));
+        GL3DQuatd phiRotation = GL3DQuatd.createRotation(phi, new GL3DVec3d(0, 1, 0));
         state.getActiveCamera().getRotation().set(phiRotation);
         state.getActiveCamera().updateCameraTransformation();
     }
@@ -142,7 +147,7 @@ public abstract class GL3DImageLayer extends GL3DOrientedGroup implements GL3DCa
     protected abstract GL3DImageMesh getImageSphere();
 
     @Override
-	public void shapeUpdate(GL3DState state) {
+    public void shapeUpdate(GL3DState state) {
         super.shapeUpdate(state);
         if (doUpdateROI) {
             this.updateROI(state.getActiveCamera());
@@ -152,9 +157,9 @@ public abstract class GL3DImageLayer extends GL3DOrientedGroup implements GL3DCa
     }
 
     @Override
-	public void cameraMoved(GL3DCamera camera) {
+    public void cameraMoved(GL3DCamera camera) {
         doUpdateROI = true;
-        if (this.accellerationShape!=null)
+        if (this.accellerationShape != null)
             this.accellerationShape.markAsChanged();
         cameraMoving(camera);
     }
@@ -163,14 +168,14 @@ public abstract class GL3DImageLayer extends GL3DOrientedGroup implements GL3DCa
         return lastViewAngle;
     }
 
-    public void paint(Graphics g){
-        for (Point p : points){
-            g.fillRect(p.x-1, p.y-1, 2, 2);
+    public void paint(Graphics g) {
+        for (Point p : points) {
+            g.fillRect(p.x - 1, p.y - 1, 2, 2);
         }
     }
 
     @Override
-	public void cameraMoving(GL3DCamera camera) {
+    public void cameraMoving(GL3DCamera camera) {
         GL3DMat4d camTrans = camera.getRotation().toMatrix().inverse();
         GL3DVec4d camDirection = new GL3DVec4d(0, 0, 1, 1);
         camDirection = camTrans.multiply(camDirection);
@@ -182,41 +187,44 @@ public abstract class GL3DImageLayer extends GL3DOrientedGroup implements GL3DCa
         double minAngle = 30;
         if (angle != lastViewAngle) {
             lastViewAngle = angle;
-            float alpha = (float) ((Math.abs(90-lastViewAngle)-minAngle)/(maxAngle-minAngle));
+            float alpha = (float) ((Math.abs(90 - lastViewAngle) - minAngle) / (maxAngle - minAngle));
         }
     }
 
-    public GL3DVec4d getLayerDirection()
-    {
+    public GL3DVec4d getLayerDirection() {
         // Convert layer orientation to heliocentric coordinate system
-        /*CoordinateVector orientation = coordinateSystemView.getOrientation();
-        CoordinateSystem targetSystem = new HeliocentricCartesianCoordinateSystem();
-        CoordinateConversion converter = orientation.getCoordinateSystem().getConversion(targetSystem);
-        orientation = converter.convert(orientation);
+        /*
+         * CoordinateVector orientation = coordinateSystemView.getOrientation();
+         * CoordinateSystem targetSystem = new
+         * HeliocentricCartesianCoordinateSystem(); CoordinateConversion
+         * converter =
+         * orientation.getCoordinateSystem().getConversion(targetSystem);
+         * orientation = converter.convert(orientation);
+         * 
+         * GL3DVec3d layerDirection = new GL3DVec3d(orientation.getValue(0),
+         * orientation.getValue(1), orientation.getValue(2));
+         */
 
-        GL3DVec3d layerDirection = new GL3DVec3d(orientation.getValue(0), orientation.getValue(1), orientation.getValue(2));*/
+        // GL3DVec4d n = new GL3DVec4d(0, 0, 1, 1);
+        // n = modelView().multiply(n);
 
-        //GL3DVec4d n = new GL3DVec4d(0, 0, 1, 1);
-        //n = modelView().multiply(n);
+        // GL3DVec3d layerDirection = new GL3DVec3d(n.x, n.y, n.z);
 
-        //GL3DVec3d layerDirection = new GL3DVec3d(n.x, n.y, n.z);
-
-        //layerDirection.normalize();
+        // layerDirection.normalize();
         return direction;
     }
 
-
-    public void setLayerDirection(GL3DVec4d direction){
+    public void setLayerDirection(GL3DVec4d direction) {
         this.direction = direction;
     }
 
     @Override
-	public CoordinateSystem getCoordinateSystem() {
+    public CoordinateSystem getCoordinateSystem() {
         return this.coordinateSystemView.getCoordinateSystem();
     }
 
     @Override
-	public CoordinateVector getOrientation() {
+    public CoordinateVector getOrientation() {
         return this.coordinateSystemView.getOrientation();
     }
 
@@ -231,11 +239,11 @@ public abstract class GL3DImageLayer extends GL3DOrientedGroup implements GL3DCa
         int height = (int) activeCamera.getHeight();
         List<GL3DRay> regionTestRays = new ArrayList<GL3DRay>();
 
-        //frame.setVisible(true);
-        //frame1.setVisible(true);
-        for (int i = 0; i <= 10; i++){
-            for (int j = 0; j <= 10; j++){
-                regionTestRays.add(rayTracer.cast(i*(width/10), j*(height/10)));
+        // frame.setVisible(true);
+        // frame1.setVisible(true);
+        for (int i = 0; i <= 10; i++) {
+            for (int j = 0; j <= 10; j++) {
+                regionTestRays.add(rayTracer.cast(i * (width / 10), j * (height / 10)));
             }
         }
 
@@ -248,21 +256,23 @@ public abstract class GL3DImageLayer extends GL3DOrientedGroup implements GL3DCa
 
         GL3DMat4d phiRotation = GL3DMat4d.rotation(this.imageTextureView.phi, new GL3DVec3d(0, 1, 0));
 
-
         for (GL3DRay ray : regionTestRays) {
             GL3DVec3d hitPoint = ray.getHitPoint();
             if (hitPoint != null) {
                 hitPoint = this.wmI.multiply(hitPoint);
-                //double coordx = (hitPoint.x - metaData.getPhysicalLowerLeft().getX())/metaData.getPhysicalImageWidth();
-                //double coordy = ((1-hitPoint.y) - metaData.getPhysicalLowerLeft().getY())/metaData.getPhysicalImageHeight();
+                // double coordx = (hitPoint.x -
+                // metaData.getPhysicalLowerLeft().getX())/metaData.getPhysicalImageWidth();
+                // double coordy = ((1-hitPoint.y) -
+                // metaData.getPhysicalLowerLeft().getY())/metaData.getPhysicalImageHeight();
 
-                double x = phiRotation.m[0]*hitPoint.x + phiRotation.m[4]*hitPoint.y + phiRotation.m[8]*hitPoint.z + phiRotation.m[12];
-                double y = phiRotation.m[1]*hitPoint.x + phiRotation.m[5]*hitPoint.y + phiRotation.m[9]*hitPoint.z + phiRotation.m[13];
-                double z = phiRotation.m[2]*hitPoint.x + phiRotation.m[6]*hitPoint.y + phiRotation.m[10]*hitPoint.z + phiRotation.m[14];
+                double x = phiRotation.m[0] * hitPoint.x + phiRotation.m[4] * hitPoint.y + phiRotation.m[8] * hitPoint.z + phiRotation.m[12];
+                double y = phiRotation.m[1] * hitPoint.x + phiRotation.m[5] * hitPoint.y + phiRotation.m[9] * hitPoint.z + phiRotation.m[13];
+                double z = phiRotation.m[2] * hitPoint.x + phiRotation.m[6] * hitPoint.y + phiRotation.m[10] * hitPoint.z + phiRotation.m[14];
 
-                //coordx = (x - metaData.getPhysicalLowerLeft().getX())/metaData.getPhysicalImageWidth();
-                //coordy = ((1-y) - metaData.getPhysicalLowerLeft().getY())/metaData.getPhysicalImageHeight();
-
+                // coordx = (x -
+                // metaData.getPhysicalLowerLeft().getX())/metaData.getPhysicalImageWidth();
+                // coordy = ((1-y) -
+                // metaData.getPhysicalLowerLeft().getY())/metaData.getPhysicalImageHeight();
 
                 minPhysicalX = Math.min(minPhysicalX, x);
                 minPhysicalY = Math.min(minPhysicalY, y);
@@ -279,14 +289,18 @@ public abstract class GL3DImageLayer extends GL3DOrientedGroup implements GL3DCa
         maxPhysicalX = Math.min(maxPhysicalX, metaData.getPhysicalUpperRight().getX());
         maxPhysicalY = Math.min(maxPhysicalY, metaData.getPhysicalUpperRight().getY());
 
-        minPhysicalX -= Math.abs(minPhysicalX)*0.5;
-        minPhysicalY -= Math.abs(minPhysicalY)*0.5;
-        maxPhysicalX += Math.abs(maxPhysicalX)*0.5;
-        maxPhysicalY += Math.abs(maxPhysicalY)*0.5;
-        if (minPhysicalX < metaData.getPhysicalLowerLeft().getX()) minPhysicalX = metaData.getPhysicalLowerLeft().getX();
-        if (minPhysicalY < metaData.getPhysicalLowerLeft().getY()) minPhysicalY = metaData.getPhysicalLowerLeft().getX();
-        if (maxPhysicalX > metaData.getPhysicalUpperRight().getX()) maxPhysicalX = metaData.getPhysicalUpperRight().getX();
-        if (maxPhysicalY > metaData.getPhysicalUpperRight().getY()) maxPhysicalY = metaData.getPhysicalUpperRight().getY();
+        minPhysicalX -= Math.abs(minPhysicalX) * 0.5;
+        minPhysicalY -= Math.abs(minPhysicalY) * 0.5;
+        maxPhysicalX += Math.abs(maxPhysicalX) * 0.5;
+        maxPhysicalY += Math.abs(maxPhysicalY) * 0.5;
+        if (minPhysicalX < metaData.getPhysicalLowerLeft().getX())
+            minPhysicalX = metaData.getPhysicalLowerLeft().getX();
+        if (minPhysicalY < metaData.getPhysicalLowerLeft().getY())
+            minPhysicalY = metaData.getPhysicalLowerLeft().getX();
+        if (maxPhysicalX > metaData.getPhysicalUpperRight().getX())
+            maxPhysicalX = metaData.getPhysicalUpperRight().getX();
+        if (maxPhysicalY > metaData.getPhysicalUpperRight().getY())
+            maxPhysicalY = metaData.getPhysicalUpperRight().getY();
 
         double regionWidth = maxPhysicalX - minPhysicalX;
         double regionHeight = maxPhysicalY - minPhysicalY;

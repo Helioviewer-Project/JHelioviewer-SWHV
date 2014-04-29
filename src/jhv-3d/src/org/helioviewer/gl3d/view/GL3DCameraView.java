@@ -65,7 +65,7 @@ public class GL3DCameraView extends AbstractGL3DView implements GL3DView, GL3DCa
                 }
             }
         }, KeyEvent.VK_C);
-        
+
     }
 
     public void render3D(GL3DState state) {
@@ -118,10 +118,10 @@ public class GL3DCameraView extends AbstractGL3DView implements GL3DView, GL3DCa
     public void removeCameraListener(GL3DCameraListener listener) {
         this.listeners.remove(listener);
     }
- 
+
     protected void renderChild(GL gl) {
         if (view instanceof GLView) {
-        	((GLView) view).renderGL(gl, false);
+            ((GLView) view).renderGL(gl, false);
         }
     }
 }

@@ -54,7 +54,7 @@ public class APIRequestManager {
      * @param measurement
      *            measurement of the requested image.
      * @param message
-     * 			  display error message
+     *            display error message
      * @return time stamp of the latest available image on the server
      * @throws IOException
      * @throws MalformedURLException
@@ -65,7 +65,7 @@ public class APIRequestManager {
         Date date = new Date();
         boolean readDate = false;
         ImageInfoView view = null;
-        
+
         try {
             view = loadImage(false, observatory, instrument, detector, measurement, formatter.format(date), message);
             if (view != null) {
@@ -114,7 +114,7 @@ public class APIRequestManager {
      * @param startTime
      *            time if the requested image.
      * @param message
-     * 			  display error message.
+     *            display error message.
      * @return image info view of the nearest image file on the server.
      * @throws MalformedURLException
      * @throws IOException
@@ -162,7 +162,7 @@ public class APIRequestManager {
      * @param cadence
      *            cadence between to images of the image series.
      * @param message
-     * 			  display error message.	
+     *            display error message.
      * @return image info view of the file which represents the image series on
      *         the server.
      * @throws MalformedURLException
@@ -171,22 +171,22 @@ public class APIRequestManager {
     private static ImageInfoView loadImageSeries(boolean addToViewChain, String observatory, String instrument, String detector, String measurement, String startTime, String endTime, String cadence, boolean message) throws MalformedURLException, IOException {
         String fileRequest = Settings.getSingletonInstance().getProperty("API.jp2series.path") + "?action=getJPX&observatory=" + observatory + "&instrument=" + instrument + "&detector=" + detector + "&measurement=" + measurement + "&startTime=" + startTime + "&endTime=" + endTime;
         Calendar cal = Calendar.getInstance();
-        cal.set(Calendar.YEAR, Integer.parseInt(startTime.substring(0,4)));
-        cal.set(Calendar.MONTH, -1+Integer.parseInt(startTime.substring(5,7)));
-        cal.set(Calendar.DATE, Integer.parseInt(startTime.substring(8,10)));
-        cal.set(Calendar.HOUR_OF_DAY, Integer.parseInt(startTime.substring(11,13)));
-        cal.set(Calendar.MINUTE, Integer.parseInt(startTime.substring(14,16)));
-        cal.set(Calendar.SECOND, Integer.parseInt(startTime.substring(17,19)));
+        cal.set(Calendar.YEAR, Integer.parseInt(startTime.substring(0, 4)));
+        cal.set(Calendar.MONTH, -1 + Integer.parseInt(startTime.substring(5, 7)));
+        cal.set(Calendar.DATE, Integer.parseInt(startTime.substring(8, 10)));
+        cal.set(Calendar.HOUR_OF_DAY, Integer.parseInt(startTime.substring(11, 13)));
+        cal.set(Calendar.MINUTE, Integer.parseInt(startTime.substring(14, 16)));
+        cal.set(Calendar.SECOND, Integer.parseInt(startTime.substring(17, 19)));
         Date beginDate = cal.getTime();
 
-        cal.set(Calendar.YEAR, Integer.parseInt(endTime.substring(0,4)));
-        cal.set(Calendar.MONTH, -1+Integer.parseInt(endTime.substring(5,7)));
-        cal.set(Calendar.DATE, Integer.parseInt(endTime.substring(8,10)));
-        cal.set(Calendar.HOUR_OF_DAY, Integer.parseInt(endTime.substring(11,13)));
-        cal.set(Calendar.MINUTE, Integer.parseInt(endTime.substring(14,16)));
-        cal.set(Calendar.SECOND, Integer.parseInt(endTime.substring(17,19)));
+        cal.set(Calendar.YEAR, Integer.parseInt(endTime.substring(0, 4)));
+        cal.set(Calendar.MONTH, -1 + Integer.parseInt(endTime.substring(5, 7)));
+        cal.set(Calendar.DATE, Integer.parseInt(endTime.substring(8, 10)));
+        cal.set(Calendar.HOUR_OF_DAY, Integer.parseInt(endTime.substring(11, 13)));
+        cal.set(Calendar.MINUTE, Integer.parseInt(endTime.substring(14, 16)));
+        cal.set(Calendar.SECOND, Integer.parseInt(endTime.substring(17, 19)));
         Date endDate = cal.getTime();
-        
+
         Interval<Date> range = new Interval<Date>(beginDate, endDate);
         if (cadence != null) {
             fileRequest += "&cadence=" + cadence;
@@ -235,7 +235,7 @@ public class APIRequestManager {
      * @param downloadUri
      *            the http uri from which the whole file can be downloaded
      * @param errorMessage
-     * 			  display error message
+     *            display error message
      * @return The ImageInfoView corresponding to the file whose location was
      *         returned by the server
      */
@@ -247,8 +247,8 @@ public class APIRequestManager {
             // Could we handle the answer from the server
             if (!response.hasData()) {
                 Log.error("Could not understand server answer from " + jpipRequest);
-                if(errorMessage){
-                	Message.err("Invalid Server reply", "The server data could not be parsed.", false);
+                if (errorMessage) {
+                    Message.err("Invalid Server reply", "The server data could not be parsed.", false);
                 }
                 return null;
             }
@@ -256,8 +256,8 @@ public class APIRequestManager {
             String error = response.getString("error");
             if (error != null) {
                 Log.error("Data query returned error: " + error);
-                if(errorMessage){
-                	Message.err("Error getting the data", Message.formatMessageString(error), false);
+                if (errorMessage) {
+                    Message.err("Error getting the data", Message.formatMessageString(error), false);
                 }
                 return null;
             }
@@ -277,13 +277,13 @@ public class APIRequestManager {
                 if (message != null && !message.equalsIgnoreCase("null")) {
                     Log.error("No data to load returned from " + jpipRequest);
                     Log.error("Server message: " + message);
-                    if(errorMessage){
-                    	Message.err("Server could not return data", Message.formatMessageString(message), false);
+                    if (errorMessage) {
+                        Message.err("Server could not return data", Message.formatMessageString(message), false);
                     }
                 } else {
                     Log.error("Did not find uri in reponse to " + jpipRequest);
-                    if(errorMessage){
-                    	Message.err("No data source response", "While quering the data source, the server did not provide an answer.", false);
+                    if (errorMessage) {
+                        Message.err("No data source response", "While quering the data source, the server did not provide an answer.", false);
                     }
                 }
             }
@@ -317,8 +317,8 @@ public class APIRequestManager {
         ImageInfoView view = ViewHelper.loadView(uri, range);
 
         if (addToViewChain) {
-	    	ViewchainFactory factory = StateController.getInstance().getCurrentState().getViewchainFactory();
-	        factory.addLayerToViewchainMain(view, ImageViewerGui.getSingletonInstance().getMainView());
+            ViewchainFactory factory = StateController.getInstance().getCurrentState().getViewchainFactory();
+            factory.addLayerToViewchainMain(view, ImageViewerGui.getSingletonInstance().getMainView());
         }
         return view;
     }
@@ -378,7 +378,7 @@ public class APIRequestManager {
      * @param measurement
      *            measurement of the requested image.
      * @param message
-     * 			  display error message
+     *            display error message
      * @return new view
      * @throws IOException
      */

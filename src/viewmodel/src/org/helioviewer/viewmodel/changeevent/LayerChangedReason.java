@@ -107,10 +107,11 @@ public class LayerChangedReason implements ChangedReason {
         return layerIndex;
     }
 
-	public boolean getProcessed() {
-		return processed;
-	}
-	public void setProcessed(boolean processed) {
-		this.processed = processed;
-	}
+    public boolean getProcessed() {
+        return processed;
+    }
+
+    public void setProcessed(boolean processed) {
+        this.processed = processed;
+    }
 }

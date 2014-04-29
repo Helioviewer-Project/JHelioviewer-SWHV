@@ -42,7 +42,7 @@ public class GLLayeredView extends AbstractLayeredView implements GLFragmentShad
         if (newLayer == null) {
             return;
         }
-        
+
         if (!GLTextureHelper.textureNonPowerOfTwoAvailable() && newLayer.getAdapter(GLScalePowerOfTwoView.class) == null) {
             GLScalePowerOfTwoView scaleView = new GLScalePowerOfTwoView();
             scaleView.setView(newLayer);

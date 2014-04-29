@@ -109,7 +109,7 @@ public abstract class GL3DMesh extends GL3DShape {
         colors.clear();
         textCoords.clear();
         indices.clear();
-        
+
         this.primitive = this.createMesh(state, positions, normals, textCoords, indices, colors);
 
         this.positionVBO = GL3DBuffer.createPositionBuffer(state, positions);
@@ -193,7 +193,7 @@ public abstract class GL3DMesh extends GL3DShape {
 
             for (int i = 0; i < this.indices.size(); i++) {
                 if (i % 4 == 0)
-                	
+
                     gl.glBegin(GL.GL_LINE_LOOP);
                 int index = this.indices.get(i);
                 GL3DVec3d position = this.positions.get(index);
@@ -268,12 +268,12 @@ public abstract class GL3DMesh extends GL3DShape {
     public boolean shapeHit(GL3DRay ray) {
         for (GL3DTriangle t : this.triangles) {
             if (t.intersects(ray)) {
-            	ray.setOriginShape(this);
-            	
+                ray.setOriginShape(this);
+
                 GL3DVec3d rayCopy2 = ray.getDirection().copy();
-                rayCopy2.multiply(ray.getLength());                
+                rayCopy2.multiply(ray.getLength());
                 GL3DVec3d rayCopy = ray.getOrigin().copy();
-                rayCopy.add(rayCopy2);            	
+                rayCopy.add(rayCopy2);
                 ray.setHitPoint(rayCopy);
                 return true;
             }

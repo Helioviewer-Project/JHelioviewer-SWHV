@@ -21,61 +21,60 @@ public class BandContainer extends JPanel implements BandControllerListener {
     // //////////////////////////////////////////////////////////////////////////////
     // Definitions
     // //////////////////////////////////////////////////////////////////////////////
-    
+
     private static final long serialVersionUID = 1L;
 
     private final String identifier;
-    
+
     private final CardLayout layout = new CardLayout();
-    
+
     private final BandList list;
     private final JLabel emptyLabel = new JLabel("No Bands Added yet", JLabel.CENTER);
-    
+
     private final JScrollPane listScrollPane;
     private final JScrollPane emptyScrollPane = new JScrollPane(emptyLabel, JScrollPane.VERTICAL_SCROLLBAR_ALWAYS, JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
-    
+
     // //////////////////////////////////////////////////////////////////////////////
     // Methods
     // //////////////////////////////////////////////////////////////////////////////
-    
+
     /**
      * Default constructor.
      * */
-    public BandContainer(final String identifier) {   
+    public BandContainer(final String identifier) {
         this.identifier = identifier;
-        
+
         list = new BandList(identifier);
         listScrollPane = new JScrollPane(list, JScrollPane.VERTICAL_SCROLLBAR_ALWAYS, JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
-        
+
         BandController.getSingletonInstance().addBandControllerListener(this);
-        
+
         initVisualComponent();
     }
-    
+
     /**
      * Sets up the visual sub components and the component itself.
      * */
     private void initVisualComponent() {
         // setup tableScrollPane
         listScrollPane.setBorder(BorderFactory.createEmptyBorder(0, 0, 0, 0));
-  
+
         // setup emptyScrollPane
         emptyLabel.setFont(emptyLabel.getFont().deriveFont(Font.ITALIC));
         emptyLabel.setHorizontalTextPosition(JLabel.CENTER);
         emptyLabel.setOpaque(false);
         emptyLabel.setBackground(Color.WHITE);
-        
 
         emptyScrollPane.setBorder(BorderFactory.createEmptyBorder(0, 0, 0, 0));
-        
+
         // setup container panel
-        this.setLayout(layout);        
+        this.setLayout(layout);
         this.add(emptyScrollPane, "empty");
         this.add(listScrollPane, "list");
-        
+
         update();
     }
-    
+
     /**
      * 
      * */
@@ -86,28 +85,29 @@ public class BandContainer extends JPanel implements BandControllerListener {
             layout.show(this, "empty");
         }
     }
-    
+
     // //////////////////////////////////////////////////////////////////////////////
     // Band Controller Listener
     // //////////////////////////////////////////////////////////////////////////////
-    
+
     public void bandAdded(Band band, final String identifier) {
         if (this.identifier.equals(identifier)) {
-            update();    
+            update();
         }
     }
 
     public void bandRemoved(Band band, final String identifier) {
         if (this.identifier.equals(identifier)) {
-            update();    
+            update();
         }
     }
 
-    public void bandUpdated(Band band, final String identifier) {}
+    public void bandUpdated(Band band, final String identifier) {
+    }
 
     public void bandGroupChanged(final String identifier) {
         if (this.identifier.equals(identifier)) {
-            update();    
+            update();
         }
     }
 }

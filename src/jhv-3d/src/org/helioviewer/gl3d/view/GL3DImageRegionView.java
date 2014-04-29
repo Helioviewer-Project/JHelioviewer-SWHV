@@ -51,12 +51,12 @@ public class GL3DImageRegionView extends AbstractGL3DView implements GL3DView, R
         double regionHeight = this.actualImageRegion.getHeight();
         double regionWidthOfViewport = regionWidth / this.innerViewport.getWidth() * maximalViewport.getWidth();
         double regionHeightOfViewport = regionHeight / this.innerViewport.getHeight() * maximalViewport.getHeight();
-        
+
         double left = this.actualImageRegion.getCornerX();
         double right = left + regionWidthOfViewport;
         double bottom = this.actualImageRegion.getCornerY();
         double top = bottom + regionHeightOfViewport;
-        
+
         gl.glMatrixMode(GL.GL_PROJECTION);
         gl.glPushMatrix();
         gl.glLoadIdentity();
@@ -76,7 +76,6 @@ public class GL3DImageRegionView extends AbstractGL3DView implements GL3DView, R
     protected void setViewSpecificImplementation(View newView, ChangeEvent changeEvent) {
         RegionView regionView = newView.getAdapter(RegionView.class);
         this.underlyingRegionView = regionView;
-
 
         ViewportView viewportView = newView.getAdapter(ViewportView.class);
         this.viewportView = viewportView;
@@ -101,8 +100,8 @@ public class GL3DImageRegionView extends AbstractGL3DView implements GL3DView, R
         boolean hasChanged = this.updateRegionAndViewport(event);
 
         hasChanged |= this.viewportView.setViewport(innerViewport, event);
-        //System.out.println(underlyingRegionView);
-        //System.out.println("VPP" + this.innerViewport);
+        // System.out.println(underlyingRegionView);
+        // System.out.println("VPP" + this.innerViewport);
         hasChanged |= this.underlyingRegionView.setRegion(this.actualImageRegion, event);
 
         return hasChanged;
@@ -113,7 +112,7 @@ public class GL3DImageRegionView extends AbstractGL3DView implements GL3DView, R
         Region region = ViewHelper.cropRegionToImage(detectedRegion, metaData);
         ViewportImageSize requiredViewportSize = ViewHelper.calculateViewportImageSize(this.maximalViewport, region);
         this.innerViewport = StaticViewport.createAdaptedViewport(requiredViewportSize.getSizeVector());
-        
+
         this.actualImageRegion = region;
 
         return true;
@@ -122,7 +121,7 @@ public class GL3DImageRegionView extends AbstractGL3DView implements GL3DView, R
     public Region getRegion() {
         return this.actualImageRegion;
     }
-    
+
     public boolean setViewport(Viewport v, ChangeEvent event) {
         this.maximalViewport = v;
 

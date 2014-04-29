@@ -1,6 +1,5 @@
 package org.helioviewer.plugins.eveplugin.radio.data;
 
-
 import java.util.Date;
 import java.util.List;
 
@@ -8,165 +7,142 @@ import org.helioviewer.base.math.Interval;
 import org.helioviewer.viewmodel.view.jp2view.image.ResolutionSet;
 import org.helioviewer.plugins.eveplugin.radio.model.ResolutionSetting;
 
-public class RadioImage{
-	private Interval<Date> timeInterval;
-	private FrequencyInterval freqInterval;
-	private int frameInJPX;
-	private ResolutionSet resolutioSet;
-	private List<ResolutionSetting> resolutionSettings;
-	private String plotIdentifier;
-	private boolean isVisible;
-	private RadioDataManager radioDataManager;
-	private long downloadID;
-	private ResolutionSetting lastUsedResolutionSetting;
-	private long radioImageID;
-	private DownloadedJPXData jpxData;
-	private boolean isDownloading;
-	
-	public RadioImage(DownloadedJPXData jpxData, long downloadID,Long radioImageID,Interval<Date> timeInterval,
-			FrequencyInterval freqInterval, int frameInJPX, ResolutionSet rs, List<ResolutionSetting> resolutionSettings, String plotIdentifier, boolean isDownloading) {
-		super();
-		this.downloadID = downloadID;
-		this.timeInterval = timeInterval;
-		this.freqInterval = freqInterval;
-		this.frameInJPX = frameInJPX;
-		this.resolutioSet = rs;
-		this.resolutionSettings = resolutionSettings;
-		this.plotIdentifier = plotIdentifier;
-		this.isVisible = true;
-		this.radioDataManager = RadioDataManager.getSingletonInstance();
-		this.radioImageID = radioImageID;
-		this.jpxData = jpxData;
-		this.isDownloading = isDownloading;
-	}	
-	
-	public boolean isDownloading() {
-		return isDownloading;
-	}
+public class RadioImage {
+    private Interval<Date> timeInterval;
+    private FrequencyInterval freqInterval;
+    private int frameInJPX;
+    private ResolutionSet resolutioSet;
+    private List<ResolutionSetting> resolutionSettings;
+    private String plotIdentifier;
+    private boolean isVisible;
+    private RadioDataManager radioDataManager;
+    private long downloadID;
+    private ResolutionSetting lastUsedResolutionSetting;
+    private long radioImageID;
+    private DownloadedJPXData jpxData;
+    private boolean isDownloading;
 
-	public void setDownloading(boolean isDownloading) {
-		this.isDownloading = isDownloading;
-	}
+    public RadioImage(DownloadedJPXData jpxData, long downloadID, Long radioImageID, Interval<Date> timeInterval, FrequencyInterval freqInterval, int frameInJPX, ResolutionSet rs, List<ResolutionSetting> resolutionSettings, String plotIdentifier, boolean isDownloading) {
+        super();
+        this.downloadID = downloadID;
+        this.timeInterval = timeInterval;
+        this.freqInterval = freqInterval;
+        this.frameInJPX = frameInJPX;
+        this.resolutioSet = rs;
+        this.resolutionSettings = resolutionSettings;
+        this.plotIdentifier = plotIdentifier;
+        this.isVisible = true;
+        this.radioDataManager = RadioDataManager.getSingletonInstance();
+        this.radioImageID = radioImageID;
+        this.jpxData = jpxData;
+        this.isDownloading = isDownloading;
+    }
 
-	public long getRadioImageID() {
-		return radioImageID;
-	}
+    public boolean isDownloading() {
+        return isDownloading;
+    }
 
-	public long getDownloadID() {
-		return downloadID;
-	}
+    public void setDownloading(boolean isDownloading) {
+        this.isDownloading = isDownloading;
+    }
 
-	public void setDownloadID(long iD) {
-		downloadID = iD;
-	}
+    public long getRadioImageID() {
+        return radioImageID;
+    }
 
-	public ResolutionSetting getLastUsedResolutionSetting() {
-		return lastUsedResolutionSetting;
-	}
+    public long getDownloadID() {
+        return downloadID;
+    }
 
-	public void setLastUsedResolutionSetting(ResolutionSetting resolutionSetting) {		
-		this.lastUsedResolutionSetting = resolutionSetting;		
-	}
+    public void setDownloadID(long iD) {
+        downloadID = iD;
+    }
 
-	public Interval<Date> getTimeInterval() {
-		return timeInterval;
-	}
-	
-	public void setTimeInterval(Interval<Date> timeInterval) {
-		this.timeInterval = timeInterval;
-	}
-	
-	public FrequencyInterval getFreqInterval() {
-		return freqInterval;
-	}
-	
-	public void setFreqInterval(FrequencyInterval freqInterval) {
-		this.freqInterval = freqInterval;
-	}
-	
-	public int getFrameInJPX() {
-		return frameInJPX;
-	}
-	
-	public void setFrameInJPX(int frameInJPX) {
-		this.frameInJPX = frameInJPX;
-	}
+    public ResolutionSetting getLastUsedResolutionSetting() {
+        return lastUsedResolutionSetting;
+    }
 
-	public ResolutionSet getResolutioSet() {
-		return resolutioSet;
-	}
+    public void setLastUsedResolutionSetting(ResolutionSetting resolutionSetting) {
+        this.lastUsedResolutionSetting = resolutionSetting;
+    }
 
-	public void setResolutioSet(ResolutionSet resolutioSet) {
-		this.resolutioSet = resolutioSet;
-	}
-	
-	public ResolutionSetting defineBestResolutionSetting(double ratioX, double ratioY){
-		ResolutionSetting currentBest = null;
-		int highestLevel = 0;
-		for (ResolutionSetting rs : resolutionSettings){
-			if(rs.getxRatio() < ratioX || rs.getyRatio() < ratioY){
-				if(rs.getResolutionLevel() > highestLevel){
-					highestLevel = rs.getResolutionLevel();
-					currentBest = rs;
-				}
-			}
-			if(rs.getResolutionLevel()==0 && currentBest == null){
-				currentBest = rs;
-			}
-		}
-		return currentBest;
-	}
-	
-	public boolean withinInterval(Interval<Date> intervalToBeIn, FrequencyInterval freqIntervalToBeIn){
-		return intervalToBeIn.overlapsInclusive(timeInterval) && freqIntervalToBeIn.overlaps(freqInterval); 
-	}
+    public Interval<Date> getTimeInterval() {
+        return timeInterval;
+    }
 
-	/*@Override
-	public void removeLineData() {
-		radioDataManager.removeRadioData(this);		
-	}
+    public void setTimeInterval(Interval<Date> timeInterval) {
+        this.timeInterval = timeInterval;
+    }
 
-	@Override
-	public void setVisibility(boolean visible) {
-		this.isVisible = visible;
-	}
+    public FrequencyInterval getFreqInterval() {
+        return freqInterval;
+    }
 
-	@Override
-	public boolean isVisible() {
-		return this.isVisible;
-	}
+    public void setFreqInterval(FrequencyInterval freqInterval) {
+        this.freqInterval = freqInterval;
+    }
 
-	@Override
-	public String getName() {
-		return "Callisto radiogram";
-	}
+    public int getFrameInJPX() {
+        return frameInJPX;
+    }
 
-	@Override
-	public Color getDataColor() {
-		return Color.BLACK;
-	}
+    public void setFrameInJPX(int frameInJPX) {
+        this.frameInJPX = frameInJPX;
+    }
 
-	@Override
-	public void setDataColor(Color c) {}
+    public ResolutionSet getResolutioSet() {
+        return resolutioSet;
+    }
 
-	@Override
-	public boolean isDownloading() {
-		// TODO Auto-generated method stub
-		return false;
-	}
+    public void setResolutioSet(ResolutionSet resolutioSet) {
+        this.resolutioSet = resolutioSet;
+    }
 
-	@Override
-	public String getPlotIdentifier() {
-		return this.plotIdentifier;
-	}
+    public ResolutionSetting defineBestResolutionSetting(double ratioX, double ratioY) {
+        ResolutionSetting currentBest = null;
+        int highestLevel = 0;
+        for (ResolutionSetting rs : resolutionSettings) {
+            if (rs.getxRatio() < ratioX || rs.getyRatio() < ratioY) {
+                if (rs.getResolutionLevel() > highestLevel) {
+                    highestLevel = rs.getResolutionLevel();
+                    currentBest = rs;
+                }
+            }
+            if (rs.getResolutionLevel() == 0 && currentBest == null) {
+                currentBest = rs;
+            }
+        }
+        return currentBest;
+    }
 
-	@Override
-	public void setPlotIndentifier(String identifier) {
-		this.plotIdentifier = identifier;
-	}
+    public boolean withinInterval(Interval<Date> intervalToBeIn, FrequencyInterval freqIntervalToBeIn) {
+        return intervalToBeIn.overlapsInclusive(timeInterval) && freqIntervalToBeIn.overlaps(freqInterval);
+    }
 
-	@Override
-	public boolean isAvailable() {
-		return true;
-	}*/
+    /*
+     * @Override public void removeLineData() {
+     * radioDataManager.removeRadioData(this); }
+     * 
+     * @Override public void setVisibility(boolean visible) { this.isVisible =
+     * visible; }
+     * 
+     * @Override public boolean isVisible() { return this.isVisible; }
+     * 
+     * @Override public String getName() { return "Callisto radiogram"; }
+     * 
+     * @Override public Color getDataColor() { return Color.BLACK; }
+     * 
+     * @Override public void setDataColor(Color c) {}
+     * 
+     * @Override public boolean isDownloading() { // TODO Auto-generated method
+     * stub return false; }
+     * 
+     * @Override public String getPlotIdentifier() { return this.plotIdentifier;
+     * }
+     * 
+     * @Override public void setPlotIndentifier(String identifier) {
+     * this.plotIdentifier = identifier; }
+     * 
+     * @Override public boolean isAvailable() { return true; }
+     */
 }

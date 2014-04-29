@@ -37,7 +37,7 @@ public abstract class GLVertexShaderProgram {
     protected double yTextureScale = 1;
     protected double defaultXOffset = 0;
     protected double defaultYOffset = 0;
-    
+
     /**
      * Build the shader.
      * 
@@ -76,7 +76,7 @@ public abstract class GLVertexShaderProgram {
      *            Valid reference to the current gl object
      */
     public void bind(GL gl) {
-    	bind(gl, shaderID, xOffset, yOffset, xScale, yScale, xTextureScale, yTextureScale, defaultXOffset, defaultYOffset);
+        bind(gl, shaderID, xOffset, yOffset, xScale, yScale, xTextureScale, yTextureScale, defaultXOffset, defaultYOffset);
     }
 
     /**
@@ -123,8 +123,8 @@ public abstract class GLVertexShaderProgram {
             // Log.debug("GLVertexShaderProgram.bind shader="+shader);
             gl.glBindProgramARB(target, shader);
             gl.glProgramLocalParameter4dARB(target, 0, xOffset, yOffset, xScale, yScale);
-            gl.glProgramLocalParameter4dARB(target, 1,xTextureScale, yTextureScale, 0, 0);
-            gl.glProgramLocalParameter4dARB(target, 2,defaultXOffset, defaultYOffset, 0, 0);
+            gl.glProgramLocalParameter4dARB(target, 1, xTextureScale, yTextureScale, 0, 0);
+            gl.glProgramLocalParameter4dARB(target, 2, defaultXOffset, defaultYOffset, 0, 0);
 
         }
     }

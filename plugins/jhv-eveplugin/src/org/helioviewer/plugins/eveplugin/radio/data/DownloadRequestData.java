@@ -6,111 +6,112 @@ import java.util.Map;
 
 import org.helioviewer.plugins.eveplugin.view.linedataselector.LineDataSelectorElement;
 
-public class DownloadRequestData implements LineDataSelectorElement{
+public class DownloadRequestData implements LineDataSelectorElement {
 
-	private Map<Long,RadioImage> radioImages;
-	private Long downloadID;
-	private boolean isDownloading;
-	private String plotIdentifier = "plot.identifier.master";
-	private boolean isVisible;
-	
-	private RadioDataManager radioDataManager;
-	
-	public DownloadRequestData(long ID, String plotIdentifier) {
-		this.radioDataManager = RadioDataManager.getSingletonInstance();
-		this.downloadID = ID;
-		this.radioImages = new HashMap<Long,RadioImage>();
-		this.plotIdentifier = plotIdentifier;
-		this.isVisible = true;
-	}
+    private Map<Long, RadioImage> radioImages;
+    private Long downloadID;
+    private boolean isDownloading;
+    private String plotIdentifier = "plot.identifier.master";
+    private boolean isVisible;
 
-	public DownloadRequestData(long ID, Map<Long,RadioImage> radioImages, String plotIdentifier) {
-		this.downloadID = ID;
-		this.radioImages = radioImages;
-		this.plotIdentifier = plotIdentifier;
-		this.isVisible = true;
-	}
-	
-	public void addRadioImage(RadioImage radioImage){
-		this.radioImages.put(radioImage.getRadioImageID(), radioImage);
-	}
+    private RadioDataManager radioDataManager;
 
-	public Map<Long,RadioImage> getRadioImages() {
-		return radioImages;
-	}
+    public DownloadRequestData(long ID, String plotIdentifier) {
+        this.radioDataManager = RadioDataManager.getSingletonInstance();
+        this.downloadID = ID;
+        this.radioImages = new HashMap<Long, RadioImage>();
+        this.plotIdentifier = plotIdentifier;
+        this.isVisible = true;
+    }
 
-	public void setRadioImages(Map<Long,RadioImage> radioImages) {
-		this.radioImages = radioImages;
-	}
+    public DownloadRequestData(long ID, Map<Long, RadioImage> radioImages, String plotIdentifier) {
+        this.downloadID = ID;
+        this.radioImages = radioImages;
+        this.plotIdentifier = plotIdentifier;
+        this.isVisible = true;
+    }
 
-	public Long getDownloadID() {
-		return downloadID;
-	}
+    public void addRadioImage(RadioImage radioImage) {
+        this.radioImages.put(radioImage.getRadioImageID(), radioImage);
+    }
 
-	public void setDownloadID(Long iD) {
-		downloadID = iD;
-	}
+    public Map<Long, RadioImage> getRadioImages() {
+        return radioImages;
+    }
 
-	@Override
-	public void removeLineData() {
-		radioDataManager.removeDownloadRequestData(this);
-		
-	}
+    public void setRadioImages(Map<Long, RadioImage> radioImages) {
+        this.radioImages = radioImages;
+    }
 
-	@Override
-	public void setVisibility(boolean visible) {
-		this.isVisible = visible;
-		radioDataManager.downloadRequestDataVisibilityChanged(this);
-		
-	}
+    public Long getDownloadID() {
+        return downloadID;
+    }
 
-	@Override
-	public boolean isVisible() {
-		return this.isVisible;
-	}
+    public void setDownloadID(Long iD) {
+        downloadID = iD;
+    }
 
-	@Override
-	public String getName() {
-		return "Callisto radiogram";
-	}
+    @Override
+    public void removeLineData() {
+        radioDataManager.removeDownloadRequestData(this);
 
-	@Override
-	public Color getDataColor() {
-		return Color.black;
-	}
+    }
 
-	@Override
-	public void setDataColor(Color c) {}
+    @Override
+    public void setVisibility(boolean visible) {
+        this.isVisible = visible;
+        radioDataManager.downloadRequestDataVisibilityChanged(this);
 
-	@Override
-	public boolean isDownloading() {
-		return isDownloading;
-	}
+    }
 
-	@Override
-	public String getPlotIdentifier() {
-		return plotIdentifier;
-	}
+    @Override
+    public boolean isVisible() {
+        return this.isVisible;
+    }
 
-	@Override
-	public void setPlotIndentifier(String plotIdentifier) {
-		// TODO Auto-generated method stub
-		
-	}
+    @Override
+    public String getName() {
+        return "Callisto radiogram";
+    }
 
-	@Override
-	public boolean isAvailable() {
-		// TODO Auto-generated method stub
-		return true;
-	}
-	
-	public void setDownloading(boolean isDownloading){
-		this.isDownloading = isDownloading;
-	}
+    @Override
+    public Color getDataColor() {
+        return Color.black;
+    }
 
-	@Override
-	public String getUnitLabel() {
-		// TODO Auto-generated method stub
-		return "Don't know yet";
-	}
+    @Override
+    public void setDataColor(Color c) {
+    }
+
+    @Override
+    public boolean isDownloading() {
+        return isDownloading;
+    }
+
+    @Override
+    public String getPlotIdentifier() {
+        return plotIdentifier;
+    }
+
+    @Override
+    public void setPlotIndentifier(String plotIdentifier) {
+        // TODO Auto-generated method stub
+
+    }
+
+    @Override
+    public boolean isAvailable() {
+        // TODO Auto-generated method stub
+        return true;
+    }
+
+    public void setDownloading(boolean isDownloading) {
+        this.isDownloading = isDownloading;
+    }
+
+    @Override
+    public String getUnitLabel() {
+        // TODO Auto-generated method stub
+        return "Don't know yet";
+    }
 }

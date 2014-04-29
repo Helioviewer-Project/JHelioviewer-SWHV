@@ -16,16 +16,18 @@ public class LayerDescriptor {
     public String timestamp = "";
     public String interval;
     public String type;
-    
-    public LayerDescriptor( String interval, String type){
-    	this.interval = interval;
-    	this.type = type;
+
+    public LayerDescriptor(String interval, String type) {
+        this.interval = interval;
+        this.type = type;
     }
-	public String getInterval() {
-		return this.interval;
-	}
-	public String getType() {
-		return this.type;
-	}
+
+    public String getInterval() {
+        return this.interval;
+    }
+
+    public String getType() {
+        return this.type;
+    }
 
 }

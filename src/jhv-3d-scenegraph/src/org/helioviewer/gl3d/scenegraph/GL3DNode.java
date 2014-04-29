@@ -39,7 +39,7 @@ public abstract class GL3DNode {
     public abstract boolean hit(GL3DRay ray);
 
     public abstract void update(GL3DState state);
-    
+
     public abstract void delete(GL3DState state);
 
     public String toString() {

@@ -125,21 +125,21 @@ public class GL3DVec2f {
     }
 
     public void negate() {
-    	this.x = -this.x;
-    	this.y = -this.y;
+        this.x = -this.x;
+        this.y = -this.y;
     }
 
     public static GL3DVec2f negate(GL3DVec2f vec) {
-    	GL3DVec2f newVec = vec.copy();
-    	newVec.negate();
-    	return newVec;
+        GL3DVec2f newVec = vec.copy();
+        newVec.negate();
+        return newVec;
     }
 
     private GL3DVec2f copy() {
-		return new GL3DVec2f(this.x, this.y);
-	}
+        return new GL3DVec2f(this.x, this.y);
+    }
 
-	public boolean isApproxEqual(GL3DVec2f vec, float tolerance) {
+    public boolean isApproxEqual(GL3DVec2f vec, float tolerance) {
         return Math.abs(this.x - vec.x) <= tolerance && Math.abs(this.y - vec.y) <= tolerance;
     }
 

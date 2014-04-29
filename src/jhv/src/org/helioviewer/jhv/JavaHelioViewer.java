@@ -33,7 +33,6 @@ import org.helioviewer.viewmodel.view.jp2view.kakadu.JHV_KduException;
 import org.helioviewer.viewmodelplugin.controller.PluginManager;
 import org.helioviewer.viewmodelplugin.interfaces.Plugin;
 
-
 /**
  * This class starts the applications.
  * 
@@ -153,7 +152,7 @@ public class JavaHelioViewer {
         URI libsBackup = JHVDirectory.LIBS_LAST_CONFIG.getFile().toURI();
         URI libsRemote = null;
         try {
-        	Log.warn(Settings.getSingletonInstance().getProperty("default.remote.lib.path"));
+            Log.warn(Settings.getSingletonInstance().getProperty("default.remote.lib.path"));
             libsRemote = new URI(Settings.getSingletonInstance().getProperty("default.remote.lib.path"));
         } catch (URISyntaxException e1) {
             Log.error("Invalid uri for remote library server");
@@ -341,10 +340,9 @@ public class JavaHelioViewer {
         Plugin internalPlugin = new InternalFilterPlugin();
         PluginManager.getSingeltonInstance().addInternalPlugin(internalPlugin.getClass().getClassLoader(), internalPlugin);
 
-        
         if (builtinPlugins != null) {
             for (int i = 0; i < builtinPlugins.length; ++i) {
-            	PluginManager.getSingeltonInstance().addPlugin(builtinPlugins[i].getClass().getClassLoader(), builtinPlugins[i], null);
+                PluginManager.getSingeltonInstance().addPlugin(builtinPlugins[i].getClass().getClassLoader(), builtinPlugins[i], null);
             }
         }
 

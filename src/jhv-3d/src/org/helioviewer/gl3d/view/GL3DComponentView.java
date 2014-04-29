@@ -68,8 +68,8 @@ public class GL3DComponentView extends AbstractComponentView implements GLEventL
 
     public GL3DComponentView() {
         this.setCanvas(new GLCanvas(null, null, GLSharedContext.getSharedContext(), null));
-        this.getCanvas().setMinimumSize(new java.awt.Dimension(100,100));
-        Displayer.getSingletonInstance().register(this);        
+        this.getCanvas().setMinimumSize(new java.awt.Dimension(100, 100));
+        Displayer.getSingletonInstance().register(this);
         Displayer.getSingletonInstance().addListener(this);
         this.getCanvas().addGLEventListener(this);
     }
@@ -95,13 +95,13 @@ public class GL3DComponentView extends AbstractComponentView implements GLEventL
 
         GL gl = glAD.getGL();
         GL3DState.create(gl);
-        
+
         // GLTextureCoordinate.init(gl);
         textureHelper.delAllTextures(gl);
         GLTextureHelper.initHelper(gl);
 
         shaderHelper.delAllShaderIDs(gl);
-        //gl.glEnable(GL.GL_LINE_SMOOTH);
+        // gl.glEnable(GL.GL_LINE_SMOOTH);
         gl.glHint(GL.GL_LINE_SMOOTH_HINT, GL.GL_NICEST);
         // gl.glShadeModel(GL.GL_FLAT);
         gl.glShadeModel(GL.GL_SMOOTH);
@@ -120,7 +120,7 @@ public class GL3DComponentView extends AbstractComponentView implements GLEventL
         gl.glCullFace(GL.GL_BACK);
         gl.glFrontFace(GL.GL_CCW);
         gl.glEnable(GL.GL_DEPTH_TEST);
-        //gl.glDepthFunc(GL.GL_LESS);
+        // gl.glDepthFunc(GL.GL_LESS);
         gl.glDepthFunc(GL.GL_LEQUAL);
 
         gl.glEnable(GL.GL_LIGHT0);
@@ -140,8 +140,7 @@ public class GL3DComponentView extends AbstractComponentView implements GLEventL
     }
 
     public synchronized void display(GLAutoDrawable glAD) {
-    	
-    		
+
         GL gl = glAD.getGL();
 
         int width = this.viewportSize.getX();
@@ -202,7 +201,7 @@ public class GL3DComponentView extends AbstractComponentView implements GLEventL
                 }
             }
             gl.glDisable(GL.GL_TEXTURE_2D);
-            
+
         }
         gl.glPopMatrix();
         GL3DState.get().checkGLErrors();
@@ -245,15 +244,14 @@ public class GL3DComponentView extends AbstractComponentView implements GLEventL
         // this.orthoView.updateMainImagePanelSize(mainImagePanelSize);
     }
 
-    public void display(){
-    	try{
-    	    this.canvas.display();
-    	}
-    	catch( Exception e){
-            Log.warn("Display of GL3DComponentView canvas failed", e);    		
-    	}
+    public void display() {
+        try {
+            this.canvas.display();
+        } catch (Exception e) {
+            Log.warn("Display of GL3DComponentView canvas failed", e);
+        }
     }
-    
+
     public void viewChanged(View sender, ChangeEvent aEvent) {
 
         // rebuild shaders, if necessary
@@ -263,17 +261,16 @@ public class GL3DComponentView extends AbstractComponentView implements GLEventL
             this.viewportView = getAdapter(ViewportView.class);
             this.updateViewport();
         }
-        
+
         TimestampChangedReason timestampReason = aEvent.getLastChangedReasonByType(TimestampChangedReason.class);
         if ((timestampReason != null) && (timestampReason.getView() instanceof TimedMovieView) && LinkedMovieManager.getActiveInstance().isMaster((TimedMovieView) timestampReason.getView())) {
-        	try{
-        	    //this.display();
-        	    Displayer.getSingletonInstance().display();
-        	}
-        	catch( Exception e){
-        		
-        	}
-        }        
+            try {
+                // this.display();
+                Displayer.getSingletonInstance().display();
+            } catch (Exception e) {
+
+            }
+        }
 
         notifyViewListeners(aEvent);
     }
@@ -309,12 +306,12 @@ public class GL3DComponentView extends AbstractComponentView implements GLEventL
         }
     }
 
-	public GLCanvas getCanvas() {
-		return canvas;
-	}
+    public GLCanvas getCanvas() {
+        return canvas;
+    }
 
-	public void setCanvas(GLCanvas canvas) {
-		this.canvas = canvas;
-	}
-     
+    public void setCanvas(GLCanvas canvas) {
+        this.canvas = canvas;
+    }
+
 }

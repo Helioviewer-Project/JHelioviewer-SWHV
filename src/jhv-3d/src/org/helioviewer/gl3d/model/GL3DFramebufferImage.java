@@ -76,7 +76,7 @@ public class GL3DFramebufferImage extends GL3DMesh implements ViewListener {
     public GL3DMeshPrimitive createMesh(GL3DState state, List<GL3DVec3d> positions, List<GL3DVec3d> normals, List<GL3DVec2d> textCoords, List<Integer> indices, List<GL3DVec4d> colors) {
         // Log.debug("GL3DFramebufferImage: Create Mesh!");
         if (region != null) {
-        	double blx = region.getCornerX();
+            double blx = region.getCornerX();
             double bly = region.getCornerY();
             double tr_x = region.getUpperRightCorner().getX();
             double tr_y = region.getUpperRightCorner().getY();
@@ -112,7 +112,7 @@ public class GL3DFramebufferImage extends GL3DMesh implements ViewListener {
             indices.add(1);
             indices.add(2);
             indices.add(3);
-            
+
         }
 
         return GL3DMeshPrimitive.QUADS;

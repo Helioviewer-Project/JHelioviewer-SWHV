@@ -121,9 +121,9 @@ public class HEKPluginPanel extends OverlayPanel implements ActionListener, HEKC
     }
 
     /**
-	* Sets up the visual sub components and the visual part of the component
-	* itself.
-	* */
+     * Sets up the visual sub components and the visual part of the component
+     * itself.
+     * */
     private void initVisualComponents() {
 
         // set general appearance
@@ -220,7 +220,7 @@ public class HEKPluginPanel extends OverlayPanel implements ActionListener, HEKC
     }
 
     public void activeLayerChanged(int idx) {
-         View view = LayersModel.getSingletonInstance().getActiveView();
+        View view = LayersModel.getSingletonInstance().getActiveView();
     }
 
     public void layerAdded(int idx) {
