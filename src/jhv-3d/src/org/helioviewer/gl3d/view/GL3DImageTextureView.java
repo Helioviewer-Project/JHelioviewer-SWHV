@@ -99,12 +99,8 @@ public class GL3DImageTextureView extends AbstractGL3DView implements GL3DView, 
 	}
 
 	private Region copyScreenToTexture(GL3DState state, GLTextureHelper th) {
-		
-		Region region = getAdapter(JHVJPXView.class).getDisplayedRegion();
-		/*if(region!=region2){
-			System.out.println("REGION" + region);
-			System.out.println("REGION2" + region2);
-		};*/
+		JHVJPXView jhvjpx = getAdapter(JHVJPXView.class);
+		Region region = jhvjpx.getDisplayedRegion();
 		Viewport viewport = getAdapter(ViewportView.class).getViewport();
 
 		if (viewport == null || region == null) {
@@ -130,14 +126,14 @@ public class GL3DImageTextureView extends AbstractGL3DView implements GL3DView, 
 			phi = DifferentialRotation.calculateRotationInRadians(0.0, deltat)%(Math.PI*2.0);
 
             this.vertexShader.changeRect(xOffset, yOffset, xScale, yScale);
-            this.vertexShader.changeTextureScale(this.textureScale);
+            this.vertexShader.changeTextureScale(jhvjpx.getScaleX(), jhvjpx.getScaleY());
             this.vertexShader.changeAngles(theta, phi);
             //System.out.println("XTEXSCALE" + this.textureScale.getX());
             //System.out.println("YTEXSCALE" + this.textureScale.getY());
         	/*System.out.println("CHANGE SHADER VARS" + theta + " " +phi);
         	System.out.println("CHANGE SHADER VARS" + region);
         	System.out.println("CHANGE SHADER VARS" + this.textureScale);*/
-            this.fragmentShader.changeTextureScale(this.textureScale.getX(), this.textureScale.getY());
+            this.fragmentShader.changeTextureScale(jhvjpx.getScaleX(), jhvjpx.getScaleY());
             this.fragmentShader.changeAngles(theta, phi);
 		}
 		

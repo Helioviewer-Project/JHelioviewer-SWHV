@@ -97,6 +97,10 @@ public class JHVJP2View extends AbstractView implements JP2View, ViewportView, R
     public static final ThreadGroup renderGroup = new ThreadGroup("J2KRenderGroup");
 	protected Region displayedRegion;
 
+	private double scaleX;
+
+	private double scaleY;
+
     /**
      * Default constructor.
      * 
@@ -667,7 +671,12 @@ public class JHVJP2View extends AbstractView implements JP2View, ViewportView, R
         this.roi = roi;
         
         this.displayedRegion = hvmd.roiToRegion(this.roi, zoompercent);
-        
+        this.setScaleX(hvmd.getScaleX(this.roi));
+        System.out.println("SCALEXX" + this.scaleX);
+        this.setScaleY(hvmd.getScaleY(this.roi));
+        System.out.println("SCALEYY" + this.scaleY);
+
+
         Region lastRegionSaved = lastRegion;
         subImageBuffer.setLastRegion(roi);
         this.event.addReason(new RegionUpdatedReason(this, lastRegion));
@@ -675,7 +684,6 @@ public class JHVJP2View extends AbstractView implements JP2View, ViewportView, R
         if (!lastRegion.equals(lastRegionSaved)) {
             this.event.addReason(new RegionChangedReason(this, lastRegion));
         }
-//        event.addReason(new SubImageDataChangedReason(this));
 
         ChangeEvent fireEvent = null;
         synchronized (event) {
@@ -797,5 +805,21 @@ public class JHVJP2View extends AbstractView implements JP2View, ViewportView, R
 	public MetaData getMetadata() {
 		// TODO Auto-generated method stub
 		return metaData;
+	}
+
+	public double getScaleX() {
+		return scaleX;
+	}
+
+	public void setScaleX(double scaleX) {
+		this.scaleX = scaleX;
+	}
+
+	public double getScaleY() {
+		return scaleY;
+	}
+
+	public void setScaleY(double scaleY) {
+		this.scaleY = scaleY;
 	}
 }

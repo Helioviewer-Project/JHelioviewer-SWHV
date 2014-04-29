@@ -11,6 +11,8 @@ import org.helioviewer.viewmodel.view.opengl.shader.GLVertexShaderProgram;
 public class GL3DImageVertexShaderProgram extends GLVertexShaderProgram {
 	private double theta;
 	private double phi;
+	private double xxTextureScale;
+	private double yyTextureScale;
 
 	
     /**
@@ -18,7 +20,7 @@ public class GL3DImageVertexShaderProgram extends GLVertexShaderProgram {
      */
     public final void bind(GL gl) {
     	GLTextureHelper th =  new GLTextureHelper();
-    	bind(gl, shaderID, xOffset, yOffset, xScale, yScale, th.scaleX, th.scaleY, defaultXOffset, defaultYOffset, theta, phi);
+    	bind(gl, shaderID, xOffset, yOffset, xScale, yScale, xxTextureScale, yyTextureScale, defaultXOffset, defaultYOffset, theta, phi);
     }	
     private static void bind(GL gl, int shader, double xOffset, double yOffset, double xScale, double yScale, double xTextureScale, double yTextureScale, double defaultXOffset, double defaultYOffset, double theta, double phi) {
         if (shader != shaderCurrentlyUsed) {
@@ -46,14 +48,14 @@ public class GL3DImageVertexShaderProgram extends GLVertexShaderProgram {
             program += "\tfloat phi = textureScaleThetaPhi.w;" + GLShaderBuilder.LINE_SEP;
             
             program += "\toutput.x = position.x - rect.x;" + GLShaderBuilder.LINE_SEP;
-            program += "\toutput.y = position.y - rect.y;" + GLShaderBuilder.LINE_SEP;            
+            program += "\toutput.y = -position.y - rect.y;" + GLShaderBuilder.LINE_SEP;            
 
             
             program += "\toutput.x *= rect.z;" + GLShaderBuilder.LINE_SEP;
             program += "\toutput.y *= rect.w;" + GLShaderBuilder.LINE_SEP;
 
-            //program += "\toutput.x *= textureScaleThetaPhi.x;" + GLShaderBuilder.LINE_SEP;
-            //program += "\toutput.y *= textureScaleThetaPhi.y;" + GLShaderBuilder.LINE_SEP;
+            program += "\toutput.x *= textureScaleThetaPhi.x;" + GLShaderBuilder.LINE_SEP;
+            program += "\toutput.y *= textureScaleThetaPhi.y;" + GLShaderBuilder.LINE_SEP;
             //program += "\toutput.y = 1.-output.y;" + GLShaderBuilder.LINE_SEP;
 
             program += "\tpositionPass = position;" + GLShaderBuilder.LINE_SEP;
@@ -81,14 +83,14 @@ public class GL3DImageVertexShaderProgram extends GLVertexShaderProgram {
             program += "\tfloat yrott = yrot*cos(theta) - zrot*sin(theta);" + GLShaderBuilder.LINE_SEP;
             program += "\tfloat zrott = yrot*sin(theta) + zrot*cos(theta);" + GLShaderBuilder.LINE_SEP;       
             program += "\toutput.x = xrott - rect.x;" + GLShaderBuilder.LINE_SEP;
-            program += "\toutput.y = yrott - rect.y;" + GLShaderBuilder.LINE_SEP;            
+            program += "\toutput.y = -yrott - rect.y;" + GLShaderBuilder.LINE_SEP;            
 
             program += "\toutput.x *= rect.z;" + GLShaderBuilder.LINE_SEP;
             program += "\toutput.y *= rect.w;" + GLShaderBuilder.LINE_SEP;
             //program += "\toutput.y = 1.-output.y;" + GLShaderBuilder.LINE_SEP;
 
-            //program += "\toutput.x *= textureScaleThetaPhi.x;" + GLShaderBuilder.LINE_SEP;
-            //program += "\toutput.y *= textureScaleThetaPhi.y;" + GLShaderBuilder.LINE_SEP;    
+            program += "\toutput.x *= textureScaleThetaPhi.x;" + GLShaderBuilder.LINE_SEP;
+            program += "\toutput.y *= textureScaleThetaPhi.y;" + GLShaderBuilder.LINE_SEP;    
             program += "\t OUT.position.y = OUT.position.y;" + GLShaderBuilder.LINE_SEP;          
 
             program += "}"+ GLShaderBuilder.LINE_SEP;
@@ -123,15 +125,12 @@ public class GL3DImageVertexShaderProgram extends GLVertexShaderProgram {
 		this.defaultYOffset = y;
 	}
 
-	public void changeTextureScale(Vector2dDouble textureScale) {
-		if(textureScale!=null){
-		this.xTextureScale = textureScale.getX();
-		this.yTextureScale = textureScale.getY();
-		}
-	}
-
 	public void changeAngles(double theta, double phi) {
 		this.theta = theta;
 		this.phi = phi;
+	}
+	public void changeTextureScale(double scaleX, double scaleY) {
+		this.xxTextureScale = scaleX;
+		this.yyTextureScale = scaleY;
 	}
 }
