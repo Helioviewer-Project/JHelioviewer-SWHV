@@ -26,7 +26,6 @@ public class GL3DImageFragmentShaderProgram extends GLFragmentShaderProgram {
         bind(gl, shaderID, cutOffRadius, xTextureScale, yTextureScale, theta, phi);
     }
     private static void bind(GL gl, int shader, double cutOffRadius, double xTextureScale, double yTextureScale, double theta, double phi) {
-    	System.out.println("BINDSHADER");
         shaderCurrentlyUsed = shader;
         gl.glBindProgramARB(target, shader);
         gl.glProgramLocalParameter4dARB(target, 0, cutOffRadius, 0.0f, 0.0f, 0.0f);
@@ -69,7 +68,7 @@ public class GL3DImageFragmentShaderProgram extends GLFragmentShaderProgram {
 
     protected void buildImpl(GLShaderBuilder shaderBuilder) {
         try {
-            String program = "\tif(texcoord0.x<0.0||texcoord0.y<0.0||texcoord0.x>textureScaleThetaPhi.x||texcoord0.y>textureScaleThetaPhi.y){"
+            String program = "\tif(texcoord0.x<0.0||texcoord0.y<0.0){"
                     + "\t\tOUT.color = float4(1.0,0.0,0.0,1.0);" + GLShaderBuilder.LINE_SEP
                     + "\t}"+ GLShaderBuilder.LINE_SEP;
             program += "\tOUT.color.a=0.7;" + GLShaderBuilder.LINE_SEP;

@@ -101,8 +101,10 @@ public class GL3DImageRegionView extends AbstractGL3DView implements GL3DView, R
         boolean hasChanged = this.updateRegionAndViewport(event);
 
         hasChanged |= this.viewportView.setViewport(innerViewport, event);
+        //System.out.println(underlyingRegionView);
+        //System.out.println("VPP" + this.innerViewport);
         hasChanged |= this.underlyingRegionView.setRegion(this.actualImageRegion, event);
-        System.out.println(underlyingRegionView);
+
         return hasChanged;
     }
 

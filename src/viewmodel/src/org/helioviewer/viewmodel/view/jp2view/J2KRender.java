@@ -23,6 +23,7 @@ import org.helioviewer.viewmodel.view.MovieView;
 import org.helioviewer.viewmodel.view.MovieView.AnimationMode;
 import org.helioviewer.viewmodel.view.cache.DateTimeCache;
 import org.helioviewer.viewmodel.view.jp2view.image.JP2ImageParameter;
+import org.helioviewer.viewmodel.view.jp2view.image.SubImage;
 import org.helioviewer.viewmodel.view.jp2view.kakadu.JHV_Kdu_thread_env;
 import org.helioviewer.viewmodel.view.jp2view.kakadu.KakaduUtils;
 
@@ -409,14 +410,19 @@ class J2KRender implements Runnable {
                 if (parentImageRef.getNumComponents() < 3) {
 
                     if (currParams.subImage.getNumPixels() == byteBuffer[currentByteBuffer].length) {
-                        parentViewRef.setSubimageData(new SingleChannelByte8ImageData(width, height, byteBuffer[currentByteBuffer], new ColorMask()), currParams.subImage, curLayer);
+                    	SingleChannelByte8ImageData imdata = new SingleChannelByte8ImageData(width, height, byteBuffer[currentByteBuffer], new ColorMask());
+                    	SubImage roi = currParams.subImage;
+                    	System.out.println("ROITTHAT " + roi);
+                        //System.out.println("TTRESOLUTION" + resolution);
+                        parentViewRef.setSubimageData(imdata, currParams.subImage, curLayer, currParams.resolution.getZoomPercent());
+             
                     } else {
                         Log.warn("J2KRender: Params out of sync, skip frame");
                     }
 
                 } else {
                     if (currParams.subImage.getNumPixels() == intBuffer[currentIntBuffer].length) {
-                        parentViewRef.setSubimageData(new ARGBInt32ImageData(width, height, intBuffer[currentIntBuffer], new ColorMask()), currParams.subImage, curLayer);
+                        parentViewRef.setSubimageData(new ARGBInt32ImageData(width, height, intBuffer[currentIntBuffer], new ColorMask()), currParams.subImage, curLayer, currParams.resolution.getZoomPercent());
                     } else {
                         Log.warn("J2KRender: Params out of sync, skip frame");
                     }

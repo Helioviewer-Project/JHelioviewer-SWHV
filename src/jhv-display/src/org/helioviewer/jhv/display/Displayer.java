@@ -49,10 +49,11 @@ public class Displayer{
     }
     private void tdisplay(){
         synchronized(displaylock){
-        	System.out.println("DISPLAYING");
+        	System.out.println("DISPLAYING started");
             for(final DisplayListener listener : listeners) {
                 listener.display();
             }
+        	System.out.println("DISPLAYING finished");
         }
     }
     private final class DisplayTask implements Runnable{

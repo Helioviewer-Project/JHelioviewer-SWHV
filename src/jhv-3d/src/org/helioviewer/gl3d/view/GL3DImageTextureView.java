@@ -69,7 +69,7 @@ public class GL3DImageTextureView extends AbstractGL3DView implements GL3DView, 
 		if (this.getView() != null) {
 			// Only copy Framebuffer if necessary
 			GLTextureHelper th = new GLTextureHelper();
-			if (regionChanged) {
+			if (true) {
 				this.capturedRegion = copyScreenToTexture(state, th);
 				//gl.glClear(GL.GL_COLOR_BUFFER_BIT | GL.GL_DEPTH_BUFFER_BIT);
 				if (forceUpdate) {
@@ -100,7 +100,11 @@ public class GL3DImageTextureView extends AbstractGL3DView implements GL3DView, 
 
 	private Region copyScreenToTexture(GL3DState state, GLTextureHelper th) {
 		
-		Region region = getAdapter(RegionView.class).getRegion();
+		Region region = getAdapter(JHVJPXView.class).getDisplayedRegion();
+		/*if(region!=region2){
+			System.out.println("REGION" + region);
+			System.out.println("REGION2" + region2);
+		};*/
 		Viewport viewport = getAdapter(ViewportView.class).getViewport();
 
 		if (viewport == null || region == null) {
@@ -112,8 +116,8 @@ public class GL3DImageTextureView extends AbstractGL3DView implements GL3DView, 
 		//th.copyFrameBufferToTexture(gl, textureId, captureRectangle);
 		this.textureScale = th.getTextureScale(textureId);		
 		if (vertexShader != null ) {
-			double xOffset = (region.getUpperLeftCorner().getX());
-			double yOffset = -(region.getUpperLeftCorner().getY());
+			double xOffset = (region.getLowerLeftCorner().getX());
+			double yOffset = (region.getLowerLeftCorner().getY());
 			xScale = (1./region.getWidth());
 			yScale = (1./region.getHeight());
 	        //System.out.println("RECT " + xOffset + " " +yOffset + " " +1/xScale +" " +1/yScale );
@@ -130,9 +134,9 @@ public class GL3DImageTextureView extends AbstractGL3DView implements GL3DView, 
             this.vertexShader.changeAngles(theta, phi);
             //System.out.println("XTEXSCALE" + this.textureScale.getX());
             //System.out.println("YTEXSCALE" + this.textureScale.getY());
-        	System.out.println("CHANGE SHADER VARS" + theta + " " +phi);
+        	/*System.out.println("CHANGE SHADER VARS" + theta + " " +phi);
         	System.out.println("CHANGE SHADER VARS" + region);
-        	System.out.println("CHANGE SHADER VARS" + this.textureScale);
+        	System.out.println("CHANGE SHADER VARS" + this.textureScale);*/
             this.fragmentShader.changeTextureScale(this.textureScale.getX(), this.textureScale.getY());
             this.fragmentShader.changeAngles(theta, phi);
 		}
