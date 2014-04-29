@@ -57,7 +57,7 @@ public class PlotsControlPanel extends JPanel implements ZoomControllerListener,
     private final JLabel zoomLabel = new JLabel("Clip:");
     private final JComboBox zoomComboBox = new JComboBox(new DefaultComboBoxModel());
     
-    private final JButton addLayerButton = new JButton("Add layer", addIcon);
+    private final JButton addLayerButton = new JButton("Add Layer", addIcon);
     
     // //////////////////////////////////////////////////////////////////////////////
     // Methods
