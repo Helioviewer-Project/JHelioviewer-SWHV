@@ -12,7 +12,6 @@ import org.helioviewer.plugins.eveplugin.draw.YAxisElement;
 import org.helioviewer.plugins.eveplugin.radio.data.DownloadRequestData;
 import org.helioviewer.plugins.eveplugin.radio.gui.RadioImagePane;
 
-import com.sun.xml.internal.bind.v2.runtime.reflect.Lister;
 
 public class RadioPlotModelData {
 	private YAxisElement yAxisElement;
