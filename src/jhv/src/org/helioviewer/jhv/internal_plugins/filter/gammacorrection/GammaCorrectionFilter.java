@@ -2,6 +2,7 @@ package org.helioviewer.jhv.internal_plugins.filter.gammacorrection;
 
 import javax.media.opengl.GL;
 
+import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.viewmodel.filter.AbstractFilter;
 import org.helioviewer.viewmodel.filter.GLFragmentShaderFilter;
 import org.helioviewer.viewmodel.filter.StandardFilter;
@@ -14,33 +15,33 @@ import org.helioviewer.viewmodel.imagetransport.Int32ImageTransport;
 import org.helioviewer.viewmodel.imagetransport.Short16ImageTransport;
 import org.helioviewer.viewmodel.view.opengl.shader.GLFragmentShaderProgram;
 import org.helioviewer.viewmodel.view.opengl.shader.GLShaderBuilder;
-import org.helioviewer.viewmodel.view.opengl.shader.GLTextureCoordinate;
 import org.helioviewer.viewmodel.view.opengl.shader.GLShaderBuilder.GLBuildShaderException;
+import org.helioviewer.viewmodel.view.opengl.shader.GLTextureCoordinate;
 
 /**
  * Filter for applying gamma correction.
- * 
+ *
  * <p>
  * It uses the following formula:
- * 
+ *
  * <p>
  * p_res(x,y) = 255 * power( p_in(x,y) / 255, gamma)
- * 
+ *
  * <p>
  * Here, p_res means the resulting pixel, p_in means the original input pixel
  * and gamma the gamma value used.
- * 
+ *
  * <p>
  * Since this is a point operation, it is optimized using a lookup table filled
  * by precomputing the output value for every possible input value. The actual
  * filtering is performed by using that lookup table.
- * 
+ *
  * <p>
  * The output of the filter always has the same image format as the input.
- * 
+ *
  * <p>
  * This filter supports software rendering as well as rendering in OpenGL.
- * 
+ *
  * @author Markus Langenberg
  */
 public class GammaCorrectionFilter extends AbstractFilter implements StandardFilter, GLFragmentShaderFilter {
@@ -49,7 +50,7 @@ public class GammaCorrectionFilter extends AbstractFilter implements StandardFil
 
     private float gamma = 1.0f;
     private boolean rebuildTable = true;
-    private GammaCorrectionShader shader = new GammaCorrectionShader();
+    private final GammaCorrectionShader shader = new GammaCorrectionShader();
 
     private byte[] gammaTable8 = null;
     private short[] gammaTable16 = null;
@@ -58,7 +59,7 @@ public class GammaCorrectionFilter extends AbstractFilter implements StandardFil
 
     /**
      * Sets the corresponding gamma correction panel.
-     * 
+     *
      * @param panel
      *            Corresponding panel.
      */
@@ -69,7 +70,7 @@ public class GammaCorrectionFilter extends AbstractFilter implements StandardFil
 
     /**
      * Sets the gamma value.
-     * 
+     *
      * @param newGamma
      *            New gamma value.
      */
@@ -77,6 +78,7 @@ public class GammaCorrectionFilter extends AbstractFilter implements StandardFil
         gamma = newGamma;
         rebuildTable = true;
         notifyAllListeners();
+        Displayer.getSingletonInstance().display();
     }
 
     /**
@@ -120,6 +122,7 @@ public class GammaCorrectionFilter extends AbstractFilter implements StandardFil
     /**
      * {@inheritDoc}
      */
+    @Override
     public ImageData apply(ImageData data) {
         if (data == null) {
             return null;
@@ -193,7 +196,7 @@ public class GammaCorrectionFilter extends AbstractFilter implements StandardFil
 
         /**
          * Sets the gamma value
-         * 
+         *
          * @param gl
          *            Valid reference to the current gl object
          * @param gamma
@@ -208,6 +211,7 @@ public class GammaCorrectionFilter extends AbstractFilter implements StandardFil
         /**
          * {@inheritDoc}
          */
+        @Override
         protected void buildImpl(GLShaderBuilder shaderBuilder) {
             try {
                 gammaParam = shaderBuilder.addTexCoordParameter(1);
@@ -224,6 +228,7 @@ public class GammaCorrectionFilter extends AbstractFilter implements StandardFil
     /**
      * {@inheritDoc}
      */
+    @Override
     public GLShaderBuilder buildFragmentShader(GLShaderBuilder shaderBuilder) {
         shader.build(shaderBuilder);
         return shaderBuilder;
@@ -232,6 +237,7 @@ public class GammaCorrectionFilter extends AbstractFilter implements StandardFil
     /**
      * {@inheritDoc}
      */
+    @Override
     public void applyGL(GL gl) {
         shader.bind(gl);
         shader.setGamma(gl, gamma);
@@ -239,10 +245,11 @@ public class GammaCorrectionFilter extends AbstractFilter implements StandardFil
 
     /**
      * {@inheritDoc}
-     * 
+     *
      * <p>
      * This filter is a major filter.
      */
+    @Override
     public boolean isMajorFilter() {
         return true;
     }
@@ -250,6 +257,7 @@ public class GammaCorrectionFilter extends AbstractFilter implements StandardFil
     /**
      * {@inheritDoc}
      */
+    @Override
     public void forceRefilter() {
         forceRefilter = true;
     }
@@ -257,6 +265,7 @@ public class GammaCorrectionFilter extends AbstractFilter implements StandardFil
     /**
      * {@inheritDoc}
      */
+    @Override
     public void setState(String state) {
         setGamma(Float.parseFloat(state));
         panel.setValue(gamma);
@@ -265,6 +274,7 @@ public class GammaCorrectionFilter extends AbstractFilter implements StandardFil
     /**
      * {@inheritDoc}
      */
+    @Override
     public String getState() {
         return Float.toString(gamma);
     }

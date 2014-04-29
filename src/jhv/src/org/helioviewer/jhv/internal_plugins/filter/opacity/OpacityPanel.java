@@ -15,19 +15,19 @@ import org.helioviewer.viewmodelplugin.filter.FilterTabPanelManager.Area;
 
 /**
  * Panel containing a spinner for changing the opacity of the image.
- * 
+ *
  * @author Markus Langenberg
  * @author Malte Nuhn
  */
 public class OpacityPanel extends FilterPanel implements ChangeListener, FilterAlignmentDetails {
 
     private static final long serialVersionUID = 1L;
-    private JSpinner opacitySpinner;
+    private final JSpinner opacitySpinner;
     private OpacityFilter filter;
 
     /**
      * Default constructor.
-     * 
+     *
      */
     public OpacityPanel() {
         setLayout(new BoxLayout(this, BoxLayout.LINE_AXIS));
@@ -55,6 +55,7 @@ public class OpacityPanel extends FilterPanel implements ChangeListener, FilterA
      * Override the setEnabled method in order to keep the containing
      * components' enabledState synced with the enabledState of this component.
      */
+    @Override
     public void setEnabled(boolean enabled) {
         super.setEnabled(enabled);
         opacitySpinner.setEnabled(enabled);
@@ -64,6 +65,7 @@ public class OpacityPanel extends FilterPanel implements ChangeListener, FilterA
      * {@inheritDoc}
      */
 
+    @Override
     public void setFilter(Filter filter) {
         if (filter instanceof OpacityFilter) {
             this.filter = (OpacityFilter) filter;
@@ -78,6 +80,7 @@ public class OpacityPanel extends FilterPanel implements ChangeListener, FilterA
      * {@inheritDoc}
      */
 
+    @Override
     public Area getArea() {
         return Area.TOP;
     }
@@ -85,6 +88,7 @@ public class OpacityPanel extends FilterPanel implements ChangeListener, FilterA
     /**
      * Sets the opacity of the image.
      */
+    @Override
     public void stateChanged(ChangeEvent e) {
         if (filter != null) {
             float value = ((SpinnerNumberModel) opacitySpinner.getModel()).getNumber().floatValue();
@@ -94,10 +98,10 @@ public class OpacityPanel extends FilterPanel implements ChangeListener, FilterA
 
     /**
      * Sets the opacity value.
-     * 
+     *
      * This may be useful, if the opacity is changed from another source than
      * the slider itself.
-     * 
+     *
      * @param opacity
      *            New opacity value. Must be within [0, 100]
      */
@@ -108,6 +112,7 @@ public class OpacityPanel extends FilterPanel implements ChangeListener, FilterA
     /**
      * {@inheritDoc}
      */
+    @Override
     public int getDetails() {
         return FilterAlignmentDetails.POSITION_OPACITY;
     }

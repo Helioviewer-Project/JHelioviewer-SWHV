@@ -18,7 +18,7 @@ import org.helioviewer.viewmodelplugin.filter.FilterTabPanelManager.Area;
 
 /**
  * Panel containing a slider for changing the contrast of the image.
- * 
+ *
  * @author Markus Langenberg
  */
 public class ContrastPanel extends FilterPanel implements ChangeListener, MouseListener, FilterAlignmentDetails {
@@ -26,9 +26,9 @@ public class ContrastPanel extends FilterPanel implements ChangeListener, MouseL
     private static final long serialVersionUID = 1L;
     private static final float sliderToContrastScale = 25.0f;
 
-    private JSlider contrastSlider;
-    private JLabel title;
-    private JLabel contrastLabel;
+    private final JSlider contrastSlider;
+    private final JLabel title;
+    private final JLabel contrastLabel;
     private ContrastFilter filter;
 
     /**
@@ -62,6 +62,7 @@ public class ContrastPanel extends FilterPanel implements ChangeListener, MouseL
      * {@inheritDoc}
      */
 
+    @Override
     public void setFilter(Filter filter) {
         if (filter instanceof ContrastFilter) {
             this.filter = (ContrastFilter) filter;
@@ -76,6 +77,7 @@ public class ContrastPanel extends FilterPanel implements ChangeListener, MouseL
      * {@inheritDoc}
      */
 
+    @Override
     public Area getArea() {
         return Area.TOP;
     }
@@ -83,38 +85,44 @@ public class ContrastPanel extends FilterPanel implements ChangeListener, MouseL
     /**
      * Sets the gamma value of the image.
      */
+    @Override
     public void stateChanged(ChangeEvent e) {
-        filter.setContrast((float) contrastSlider.getValue() / sliderToContrastScale);
+        filter.setContrast(contrastSlider.getValue() / sliderToContrastScale);
         contrastLabel.setText(Integer.toString(contrastSlider.getValue()));
     }
 
     /**
      * {@inheritDoc} In this case, does nothing.
      */
+    @Override
     public void mouseClicked(MouseEvent e) {
     }
 
     /**
      * {@inheritDoc} In this case, does nothing.
      */
+    @Override
     public void mouseEntered(MouseEvent e) {
     }
 
     /**
      * {@inheritDoc} In this case, does nothing.
      */
+    @Override
     public void mouseExited(MouseEvent e) {
     }
 
     /**
      * {@inheritDoc} In this case, does nothing.
      */
+    @Override
     public void mousePressed(MouseEvent e) {
     }
 
     /**
      * {@inheritDoc} In this case, snaps the slider to 0 if it is close to it.
      */
+    @Override
     public void mouseReleased(MouseEvent e) {
         int sliderValue = contrastSlider.getValue();
 
@@ -126,6 +134,7 @@ public class ContrastPanel extends FilterPanel implements ChangeListener, MouseL
     /**
      * {@inheritDoc}
      */
+    @Override
     public int getDetails() {
         return FilterAlignmentDetails.POSITION_CONTRAST;
     }
@@ -135,6 +144,7 @@ public class ContrastPanel extends FilterPanel implements ChangeListener, MouseL
      * components' enabledState synced with the enabledState of this component.
      */
 
+    @Override
     public void setEnabled(boolean enabled) {
         super.setEnabled(enabled);
         contrastSlider.setEnabled(enabled);
@@ -144,10 +154,10 @@ public class ContrastPanel extends FilterPanel implements ChangeListener, MouseL
 
     /**
      * Sets the panel values.
-     * 
+     *
      * This may be useful, if the values are changed from another source than
      * the panel itself.
-     * 
+     *
      * @param gamma
      *            New gamma value, must be within [0.1, 10]
      */

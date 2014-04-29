@@ -2,6 +2,7 @@ package org.helioviewer.jhv.internal_plugins.filter.contrast;
 
 import javax.media.opengl.GL;
 
+import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.viewmodel.filter.AbstractFilter;
 import org.helioviewer.viewmodel.filter.GLFragmentShaderFilter;
 import org.helioviewer.viewmodel.filter.StandardFilter;
@@ -14,33 +15,33 @@ import org.helioviewer.viewmodel.imagetransport.Int32ImageTransport;
 import org.helioviewer.viewmodel.imagetransport.Short16ImageTransport;
 import org.helioviewer.viewmodel.view.opengl.shader.GLFragmentShaderProgram;
 import org.helioviewer.viewmodel.view.opengl.shader.GLShaderBuilder;
-import org.helioviewer.viewmodel.view.opengl.shader.GLTextureCoordinate;
 import org.helioviewer.viewmodel.view.opengl.shader.GLShaderBuilder.GLBuildShaderException;
+import org.helioviewer.viewmodel.view.opengl.shader.GLTextureCoordinate;
 
 /**
  * Filter for enhancing the contrast of the image.
- * 
+ *
  * <p>
  * It uses the following formula:
- * 
+ *
  * <p>
  * p_res(x,y) = 255 * (0.5 * sign(2x/255 - 1) * abs(2x/255 - 1)^(1.5^c) + 0.5)
- * 
+ *
  * <p>
  * Here, p_res means the resulting pixel, p_in means the original input pixel
  * and contrast the parameter used.
- * 
+ *
  * <p>
  * Since this is a point operation, it is optimized using a lookup table filled
  * by precomputing the output value for every possible input value. The actual
  * filtering is performed by using that lookup table.
- * 
+ *
  * <p>
  * The output of the filter always has the same image format as the input.
- * 
+ *
  * <p>
  * This filter supports software rendering as well as rendering in OpenGL.
- * 
+ *
  * @author Markus Langenberg
  */
 public class ContrastFilter extends AbstractFilter implements StandardFilter, GLFragmentShaderFilter {
@@ -49,7 +50,7 @@ public class ContrastFilter extends AbstractFilter implements StandardFilter, GL
 
     private float contrast = 0.0f;
     private boolean rebuildTable = true;
-    private ContrastShader shader = new ContrastShader();
+    private final ContrastShader shader = new ContrastShader();
 
     private byte[] contrastTable8 = null;
     private short[] contrastTable16 = null;
@@ -58,7 +59,7 @@ public class ContrastFilter extends AbstractFilter implements StandardFilter, GL
 
     /**
      * Sets the corresponding contrast panel.
-     * 
+     *
      * @param panel
      *            Corresponding panel.
      */
@@ -69,7 +70,7 @@ public class ContrastFilter extends AbstractFilter implements StandardFilter, GL
 
     /**
      * Sets the contrast parameter.
-     * 
+     *
      * @param newContrast
      *            New contrast parameter.
      */
@@ -77,6 +78,7 @@ public class ContrastFilter extends AbstractFilter implements StandardFilter, GL
         contrast = newContrast;
         rebuildTable = true;
         notifyAllListeners();
+        Displayer.getSingletonInstance().display();
     }
 
     /**
@@ -120,6 +122,7 @@ public class ContrastFilter extends AbstractFilter implements StandardFilter, GL
     /**
      * {@inheritDoc}
      */
+    @Override
     public ImageData apply(ImageData data) {
         if (data == null) {
             return null;
@@ -193,7 +196,7 @@ public class ContrastFilter extends AbstractFilter implements StandardFilter, GL
 
         /**
          * Sets the contrast parameter
-         * 
+         *
          * @param gl
          *            Valid reference to the current gl object
          * @param contrast
@@ -208,6 +211,7 @@ public class ContrastFilter extends AbstractFilter implements StandardFilter, GL
         /**
          * {@inheritDoc}
          */
+        @Override
         protected void buildImpl(GLShaderBuilder shaderBuilder) {
             try {
                 contrastParam = shaderBuilder.addTexCoordParameter(1);
@@ -224,6 +228,7 @@ public class ContrastFilter extends AbstractFilter implements StandardFilter, GL
     /**
      * {@inheritDoc}
      */
+    @Override
     public GLShaderBuilder buildFragmentShader(GLShaderBuilder shaderBuilder) {
         shader.build(shaderBuilder);
         return shaderBuilder;
@@ -232,6 +237,7 @@ public class ContrastFilter extends AbstractFilter implements StandardFilter, GL
     /**
      * {@inheritDoc}
      */
+    @Override
     public void applyGL(GL gl) {
         shader.bind(gl);
         shader.setContrast(gl, contrast);
@@ -239,10 +245,11 @@ public class ContrastFilter extends AbstractFilter implements StandardFilter, GL
 
     /**
      * {@inheritDoc}
-     * 
+     *
      * <p>
      * This filter is a major filter.
      */
+    @Override
     public boolean isMajorFilter() {
         return true;
     }
@@ -250,6 +257,7 @@ public class ContrastFilter extends AbstractFilter implements StandardFilter, GL
     /**
      * {@inheritDoc}
      */
+    @Override
     public void forceRefilter() {
         forceRefilter = true;
     }
@@ -257,6 +265,7 @@ public class ContrastFilter extends AbstractFilter implements StandardFilter, GL
     /**
      * {@inheritDoc}
      */
+    @Override
     public void setState(String state) {
         setContrast(Float.parseFloat(state));
         panel.setValue(contrast);
@@ -265,6 +274,7 @@ public class ContrastFilter extends AbstractFilter implements StandardFilter, GL
     /**
      * {@inheritDoc}
      */
+    @Override
     public String getState() {
         return Float.toString(contrast);
     }

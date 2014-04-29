@@ -2,6 +2,7 @@ package org.helioviewer.jhv.internal_plugins.filter.channelMixer;
 
 import javax.media.opengl.GL;
 
+import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.viewmodel.filter.AbstractFilter;
 import org.helioviewer.viewmodel.filter.GLPostFilter;
 import org.helioviewer.viewmodel.filter.StandardFilter;
@@ -18,17 +19,17 @@ import org.helioviewer.viewmodel.imagetransport.Short16ImageTransport;
 
 /**
  * Filter for modifying the color mask of an image.
- * 
+ *
  * <p>
  * The output of the filter always has the same image format as the input.
- * 
+ *
  * <p>
  * This filter supports software rendering as well as rendering in OpenGL.
- * 
+ *
  * <p>
  * To learn more about color masks, see
  * {@link org.helioviewer.viewmodel.imagedata.ColorMask}
- * 
+ *
  * @author Markus Langenberg
  */
 public class ChannelMixerFilter extends AbstractFilter implements StandardFilter, GLPostFilter {
@@ -39,7 +40,7 @@ public class ChannelMixerFilter extends AbstractFilter implements StandardFilter
 
     /**
      * Sets the corresponding channel mixer panel.
-     * 
+     *
      * @param panel
      *            Corresponding panel.
      */
@@ -50,7 +51,7 @@ public class ChannelMixerFilter extends AbstractFilter implements StandardFilter
 
     /**
      * Sets the color mask.
-     * 
+     *
      * @param showRed
      *            if true, the red channel will be shown
      * @param showGreen
@@ -67,11 +68,13 @@ public class ChannelMixerFilter extends AbstractFilter implements StandardFilter
 
         colorMask = newColorMask;
         notifyAllListeners();
+        Displayer.getSingletonInstance().display();
     }
 
     /**
      * {@inheritDoc}
      */
+    @Override
     public ImageData apply(ImageData data) {
 
         if (data == null) {
@@ -96,31 +99,34 @@ public class ChannelMixerFilter extends AbstractFilter implements StandardFilter
 
     /**
      * {@inheritDoc}
-     * 
+     *
      * <p>
      * In this case, sets the color mask by calling the corresponding
      * OpenGL-function.
      */
+    @Override
     public void applyGL(GL gl) {
         gl.glColorMask(colorMask.showRed(), colorMask.showGreen(), colorMask.showBlue(), true);
     }
 
     /**
      * {@inheritDoc}
-     * 
+     *
      * <p>
      * In this case, the color mask is set back to the default value.
      */
+    @Override
     public void postApplyGL(GL gl) {
         gl.glColorMask(true, true, true, true);
     }
 
     /**
      * {@inheritDoc}
-     * 
+     *
      * <p>
      * This filter is a major filter.
      */
+    @Override
     public boolean isMajorFilter() {
         return true;
     }
@@ -128,6 +134,7 @@ public class ChannelMixerFilter extends AbstractFilter implements StandardFilter
     /**
      * {@inheritDoc}
      */
+    @Override
     public void forceRefilter() {
         forceRefilter = true;
     }
@@ -135,6 +142,7 @@ public class ChannelMixerFilter extends AbstractFilter implements StandardFilter
     /**
      * {@inheritDoc}
      */
+    @Override
     public void setState(String state) {
         String[] values = state.trim().split(" ");
         if (values.length != 3) {
@@ -148,6 +156,7 @@ public class ChannelMixerFilter extends AbstractFilter implements StandardFilter
     /**
      * {@inheritDoc}
      */
+    @Override
     public String getState() {
         return colorMask.showRed() + " " + colorMask.showGreen() + " " + colorMask.showBlue();
     }

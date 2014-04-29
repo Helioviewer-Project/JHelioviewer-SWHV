@@ -6,6 +6,7 @@ import java.awt.image.BufferedImage;
 
 import javax.media.opengl.GL;
 
+import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.viewmodel.filter.AbstractFilter;
 import org.helioviewer.viewmodel.filter.GLFragmentShaderFilter;
 import org.helioviewer.viewmodel.filter.StandardFilter;
@@ -14,22 +15,22 @@ import org.helioviewer.viewmodel.imagedata.ImageData;
 import org.helioviewer.viewmodel.imagedata.JavaBufferedImageData;
 import org.helioviewer.viewmodel.view.opengl.shader.GLFragmentShaderProgram;
 import org.helioviewer.viewmodel.view.opengl.shader.GLShaderBuilder;
-import org.helioviewer.viewmodel.view.opengl.shader.GLTextureCoordinate;
 import org.helioviewer.viewmodel.view.opengl.shader.GLShaderBuilder.GLBuildShaderException;
+import org.helioviewer.viewmodel.view.opengl.shader.GLTextureCoordinate;
 
 /**
  * Filter for changing the opacity of an image.
- * 
+ *
  * <p>
  * The output of the filter always is an ARGB image, since that is currently the
  * only format supporting an alpha channel. Thus, this filter should be applied
  * as late as possible.
- * 
+ *
  * <p>
  * This filter supports software rendering as well as rendering in OpenGL.
- * 
+ *
  * @author Markus Langenberg
- * 
+ *
  */
 public class OpacityFilter extends AbstractFilter implements StandardFilter, GLFragmentShaderFilter {
 
@@ -38,7 +39,7 @@ public class OpacityFilter extends AbstractFilter implements StandardFilter, GLF
     // ////////////////////////////////////////////////////////////////
 
     private float opacity;
-    private OpacityShader shader = new OpacityShader();
+    private final OpacityShader shader = new OpacityShader();
     private OpacityPanel panel;
 
     // ////////////////////////////////////////////////////////////////
@@ -51,17 +52,18 @@ public class OpacityFilter extends AbstractFilter implements StandardFilter, GLF
 
     /**
      * {@inheritDoc}
-     * 
+     *
      * <p>
      * This filter is a major filter.
      */
+    @Override
     public boolean isMajorFilter() {
         return true;
     }
 
     /**
      * Sets the corresponding opacity panel.
-     * 
+     *
      * @param panel
      *            Corresponding panel.
      */
@@ -72,10 +74,10 @@ public class OpacityFilter extends AbstractFilter implements StandardFilter, GLF
 
     /**
      * Sets the opacity.
-     * 
+     *
      * This function does not the slider, thus should only be called by the
      * slider itself. Otherwise, use {@link #setOpacityExternal(float)}.
-     * 
+     *
      * @param newOpacity
      *            New opacity, value has to be within [0, 1]
      */
@@ -86,8 +88,10 @@ public class OpacityFilter extends AbstractFilter implements StandardFilter, GLF
 
         opacity = newOpacity;
         Thread t = new Thread(new Runnable() {
+            @Override
             public void run() {
                 notifyAllListeners();
+                Displayer.getSingletonInstance().display();
             }
         }, "NotifyFilterListenersThread");
         t.start();
@@ -96,6 +100,7 @@ public class OpacityFilter extends AbstractFilter implements StandardFilter, GLF
     /**
      * {@inheritDoc}
      */
+    @Override
     public ImageData apply(ImageData data) {
         if (data == null) {
             return null;
@@ -128,7 +133,7 @@ public class OpacityFilter extends AbstractFilter implements StandardFilter, GLF
 
         /**
          * Sets the new alpha value.
-         * 
+         *
          * @param gl
          *            Valid reference to the current gl object
          * @param alpha
@@ -143,6 +148,7 @@ public class OpacityFilter extends AbstractFilter implements StandardFilter, GLF
         /**
          * {@inheritDoc}
          */
+        @Override
         protected void buildImpl(GLShaderBuilder shaderBuilder) {
             try {
                 alphaParam = shaderBuilder.addTexCoordParameter(1);
@@ -159,6 +165,7 @@ public class OpacityFilter extends AbstractFilter implements StandardFilter, GLF
     /**
      * {@inheritDoc}
      */
+    @Override
     public GLShaderBuilder buildFragmentShader(GLShaderBuilder shaderBuilder) {
         shader.build(shaderBuilder);
         return shaderBuilder;
@@ -167,6 +174,7 @@ public class OpacityFilter extends AbstractFilter implements StandardFilter, GLF
     /**
      * {@inheritDoc}
      */
+    @Override
     public void applyGL(GL gl) {
         shader.bind(gl);
         shader.setAlpha(gl, opacity);
@@ -175,6 +183,7 @@ public class OpacityFilter extends AbstractFilter implements StandardFilter, GLF
     /**
      * {@inheritDoc}
      */
+    @Override
     public void forceRefilter() {
 
     }
@@ -182,6 +191,7 @@ public class OpacityFilter extends AbstractFilter implements StandardFilter, GLF
     /**
      * {@inheritDoc}
      */
+    @Override
     public void setState(String state) {
         setOpacity(Float.parseFloat(state));
         panel.setValue(opacity);
@@ -190,6 +200,7 @@ public class OpacityFilter extends AbstractFilter implements StandardFilter, GLF
     /**
      * {@inheritDoc}
      */
+    @Override
     public String getState() {
         return Float.toString(opacity);
     }
