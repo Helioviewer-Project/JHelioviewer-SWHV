@@ -9,8 +9,8 @@ import javax.swing.border.TitledBorder;
 
 public class TextImageTestPanel extends JPanel {
     /**
-	 * 
-	 */
+     * 
+     */
     private static final long serialVersionUID = 1L;
 
     /**

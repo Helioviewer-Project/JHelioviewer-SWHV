@@ -25,8 +25,8 @@ public class TrackBallCamera extends AbstractZoomCamera {
     private Matrix4f vm;
 
     /**
-	 * 
-	 */
+     * 
+     */
     private Vector3f oldMouseVec = new Vector3f();
 
     /**
