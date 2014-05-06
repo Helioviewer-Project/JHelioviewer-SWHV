@@ -136,12 +136,15 @@ public class DrawController implements ZoomControllerListener, LineDataSelectorM
     public boolean hasElementsToBeDrawn(String identifier) {
         synchronized (this) {
             List<DrawableElement> allElements = this.getAllDrawableElements(identifier);
-            for (DrawableElement de : allElements) {
+            return !allElements.isEmpty();
+            
+            /*for (DrawableElement de : allElements) {
                 if (de.hasElementsToDraw()) {
                     return true;
                 }
-            }
-            return false;
+            }*/
+            
+            //return false;
             // return nrOfDrawableElement > 0;
         }
     }
