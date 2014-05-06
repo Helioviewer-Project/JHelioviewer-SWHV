@@ -773,7 +773,7 @@ public class RadioDataManager implements RadioDownloaderListener {// ,ViewListen
         lineDataSelectorModel.addLineData(drd);
         fireIntervalTooBig(ID, identifier);
         fireNewDataAvailable(drd, ID);
-        fireDownloadRequestAnswered(new FrequencyInterval(0, 400), new Interval<Date>(requestedStartTime, requestedEndTime), ID, identifier);
+        fireDownloadRequestAnswered(new FrequencyInterval(20, 400), new Interval<Date>(requestedStartTime, requestedEndTime), ID, identifier);
 
     }
 
