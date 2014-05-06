@@ -1,5 +1,6 @@
 package org.helioviewer.plugins.eveplugin.radio.gui;
 
+import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Image;
 import java.awt.Rectangle;
@@ -213,8 +214,8 @@ public class RadioImagePane implements ImageObserver, RadioPlotModelListener, Dr
             }
         } else {
             Log.debug("Putting text on the screen");
-            String text1 = "The selected interval is to big.";
-            String text2 = "Reduce the interval to see the radio images";
+            String text1 = "The selected interval is too big.";
+            String text2 = "Reduce the interval to see the radio images.";
             final int text1Width = (int) g.getFontMetrics().getStringBounds(text1, g).getWidth();
             final int text2Width = (int) g.getFontMetrics().getStringBounds(text2, g).getWidth();
             final int text1height = (int) g.getFontMetrics().getStringBounds(text2, g).getHeight();
@@ -223,8 +224,10 @@ public class RadioImagePane implements ImageObserver, RadioPlotModelListener, Dr
             final int y1 = (int) (graphArea.y + (graphArea.height / 2) - 1.5 * text1height);
             final int x2 = graphArea.x + (graphArea.width / 2) - (text2Width / 2);
             final int y2 = (int) (graphArea.y + graphArea.height / 2 + 0.5 * text2height);
+            g.setColor(Color.black);
             g.drawString(text1, x1, y1);
             g.drawString(text2, x2, y2);
+            
         }
     }
 

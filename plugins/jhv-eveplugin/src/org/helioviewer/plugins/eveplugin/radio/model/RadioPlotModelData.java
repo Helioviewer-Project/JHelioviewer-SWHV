@@ -25,6 +25,7 @@ public class RadioPlotModelData {
         yAxisElement.setColor(Color.BLACK);
         yAxisElement.setLabel("Mhz");
         radioImagePane = new RadioImagePane(plotIdentifier);
+        radioImagePane.setYAxisElement(yAxisElement);
         this.downloadRequestData = new HashMap<Long, DownloadRequestData>();
         plotConfigList = new HashMap<Long, Map<Long, PlotConfig>>();
         listeners = new HashSet<RadioPlotModelListener>();
