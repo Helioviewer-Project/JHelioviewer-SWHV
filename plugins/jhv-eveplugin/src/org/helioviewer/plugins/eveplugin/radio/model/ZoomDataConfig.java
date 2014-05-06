@@ -173,4 +173,16 @@ public class ZoomDataConfig implements ZoomManagerListener, PlotAreaSpaceListene
         this.selectedMaxY = selectedMaxY;
     }
 
+    public String toString(){
+    	StringBuilder sb = new StringBuilder();
+    	sb.append("MinY = ").append(minY).append("\n")
+    	.append("MaxY = ").append(maxY).append("\n")
+    	.append("MinX = ").append(minX).append("\n")
+    	.append("MaxX = ").append(maxX).append("\n")
+    	.append("SelectedMinY = ").append(selectedMinY).append("\n")
+    	.append("SelectedMaxY = ").append(selectedMaxY).append("\n")
+    	.append("DisplaySize = ").append(displaySize).append("\n");
+    	return sb.toString();
+    }
+    
 }
