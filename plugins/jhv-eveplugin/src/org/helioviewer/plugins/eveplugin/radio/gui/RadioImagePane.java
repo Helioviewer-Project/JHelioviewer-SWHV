@@ -215,7 +215,7 @@ public class RadioImagePane implements ImageObserver, RadioPlotModelListener, Dr
         } else {
             Log.debug("Putting text on the screen");
             String text1 = "The selected interval is too big.";
-            String text2 = "Reduce the interval to see the radio images.";
+            String text2 = "Reduce the interval to see the radio spectrograms.";
             final int text1Width = (int) g.getFontMetrics().getStringBounds(text1, g).getWidth();
             final int text2Width = (int) g.getFontMetrics().getStringBounds(text2, g).getWidth();
             final int text1height = (int) g.getFontMetrics().getStringBounds(text2, g).getHeight();
