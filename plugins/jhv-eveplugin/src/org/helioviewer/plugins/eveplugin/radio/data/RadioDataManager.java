@@ -34,24 +34,24 @@ public class RadioDataManager implements RadioDownloaderListener {// ,ViewListen
     private static RadioDataManager instance;
     private List<RadioDataManagerListener> listeners;
     private Map<Long, DownloadRequestData> downloadRequestData;
-    private RadioImage previousRadioImage;
-    private Interval<Date> maxTimeRange;
+    //private RadioImage previousRadioImage;
+    //private Interval<Date> maxTimeRange;
     private FrequencyInterval maxFrequencyInterval;
     private JHVJP2View currentJP2View;
-    private boolean isCurrentJPX;
-    private JP2Image currentJP2Image;
+    //private boolean isCurrentJPX;
+    //private JP2Image currentJP2Image;
 
     private RadioDownloader downloader;
-    private boolean eventReceived;
+    //private boolean eventReceived;
     // private boolean acceptEvents;
-    private boolean expectEvent;
-    private int latestComplete;
-    private int waitingForFrame;
-    private DataChecker dataChecker;
+    //private boolean expectEvent;
+    //private int latestComplete;
+    //private int waitingForFrame;
+    //private DataChecker dataChecker;
 
     private RequestForDataBuffer requestBuffer;
 
-    private ZoomController zoomController;
+    //private ZoomController zoomController;
 
     private LineDataSelectorModel lineDataSelectorModel;
 
@@ -68,17 +68,17 @@ public class RadioDataManager implements RadioDownloaderListener {// ,ViewListen
         downloader = RadioDownloader.getSingletonInstance();
         downloader.addRadioDownloaderListener(this);
         currentJP2View = null;
-        isCurrentJPX = false;
-        currentJP2Image = null;
+        //isCurrentJPX = false;
+        //currentJP2Image = null;
         // this.acceptEvents = false;
-        this.eventReceived = false;
-        zoomController = ZoomController.getSingletonInstance();
+        //this.eventReceived = false;
+        //zoomController = ZoomController.getSingletonInstance();
         // zoomController.addZoomControllerListener(this);
         lineDataSelectorModel = LineDataSelectorModel.getSingletonInstance();
-        latestComplete = -1;
-        waitingForFrame = -1;
-        expectEvent = false;
-        dataChecker = new DataChecker();
+        //latestComplete = -1;
+        //waitingForFrame = -1;
+        //expectEvent = false;
+        //dataChecker = new DataChecker();
         // addRadioManagerListener(dataChecker);
         // addRadioManagerListener(sendDataTestFrame);
         cache = RadioImageCache.getInstance();
@@ -130,7 +130,7 @@ public class RadioDataManager implements RadioDownloaderListener {// ,ViewListen
                         }
                     }
                     this.maxFrequencyInterval = new FrequencyInterval(localMinFrequency, localMaxFrequency);
-                    this.maxTimeRange = new Interval<Date>(localMinDate, localMaxDate);
+                    //this.maxTimeRange = new Interval<Date>(localMinDate, localMaxDate);
                     // }
                 }
             }
@@ -287,8 +287,8 @@ public class RadioDataManager implements RadioDownloaderListener {// ,ViewListen
                     // jpxView.addViewListener(testFrame);
                     JP2Image image = jpxView.getJP2Image();
                     currentJP2View = jpxView;
-                    isCurrentJPX = true;
-                    currentJP2Image = currentJP2View.getJP2Image();
+                    //isCurrentJPX = true;
+                    //currentJP2Image = currentJP2View.getJP2Image();
                     ResolutionSet rs = image.getResolutionSet();
                     Log.debug("the resolution set : " + rs.toString());
                     for (int i = 0; i < rs.getMaxResolutionLevels(); i++) {
@@ -368,7 +368,7 @@ public class RadioDataManager implements RadioDownloaderListener {// ,ViewListen
                     // jp2View.addViewListener(testFrame);
                     JP2Image image = jp2View.getJP2Image();
                     currentJP2View = jp2View;
-                    currentJP2Image = currentJP2View.getJP2Image();
+                    //currentJP2Image = currentJP2View.getJP2Image();
                     ResolutionSet rs = image.getResolutionSet();
                     Log.debug("the resolution set : " + rs.toString());
                     for (int i = 0; i < rs.getMaxResolutionLevels(); i++) {
