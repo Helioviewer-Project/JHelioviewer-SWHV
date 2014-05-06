@@ -465,7 +465,7 @@ public class ChartDrawIntervalPane extends JComponent implements ZoomControllerL
                 maxList.put(pas, end);
             }
             for (PlotAreaSpace pas : pasList) {
-                if (pas.minMaxTimeIntervalContainsTime(minList.get(pas))) {
+                if (pas.minMaxTimeIntervalContainsTime(maxList.get(pas))) {
                     // ZoomController.getSingletonInstance().setSelectedInterval(new
                     // Interval<Date>(start, end));
                     pas.setScaledSelectedTime(minList.get(pas), maxList.get(pas));
