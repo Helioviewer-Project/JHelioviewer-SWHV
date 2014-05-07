@@ -34,6 +34,7 @@ public class ObservationDialogUIPanel extends SimpleObservationDialogUIPanel {
     // Definitions
     // //////////////////////////////////////////////////////////////////////////////
 
+    private static final long serialVersionUID = 8932098719271808631L;
     private JLabel labelGroup;
     private JLabel labelData;
     private JComboBox comboBoxGroup;
