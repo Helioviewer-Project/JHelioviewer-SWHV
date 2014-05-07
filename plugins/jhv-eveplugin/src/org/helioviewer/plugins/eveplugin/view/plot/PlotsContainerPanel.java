@@ -9,7 +9,6 @@ import javax.swing.JSplitPane;
 import org.helioviewer.jhv.gui.ImageViewerGui;
 import org.helioviewer.plugins.eveplugin.lines.data.Band;
 import org.helioviewer.plugins.eveplugin.lines.data.BandController;
-import org.helioviewer.plugins.eveplugin.lines.data.BandControllerListener;
 import org.helioviewer.plugins.eveplugin.view.chart.ChartDrawIntervalPane;
 import org.helioviewer.plugins.eveplugin.view.linedataselector.LineDataSelectorElement;
 import org.helioviewer.plugins.eveplugin.view.linedataselector.LineDataSelectorModel;
@@ -34,7 +33,6 @@ public class PlotsContainerPanel extends JPanel implements LineDataSelectorModel
     private final PlotPanel plotTwo = new PlotPanel(PLOT_IDENTIFIER_SLAVE, "Plot 2: ");
 
     private boolean isSecondPlotVisible = true;
-    private boolean isFirstPlotVisible = true;
 
     // //////////////////////////////////////////////////////////////////////////////
     // Methods
@@ -117,22 +115,13 @@ public class PlotsContainerPanel extends JPanel implements LineDataSelectorModel
     }
 
     @Override
-    public void downloadStartded(LineDataSelectorElement element) {
-        // TODO Auto-generated method stub
-
-    }
+    public void downloadStartded(LineDataSelectorElement element) {}
 
     @Override
-    public void downloadFinished(LineDataSelectorElement element) {
-        // TODO Auto-generated method stub
-
-    }
+    public void downloadFinished(LineDataSelectorElement element) {}
 
     @Override
-    public void lineDataAdded(LineDataSelectorElement element) {
-        // TODO Auto-generated method stub
-
-    }
+    public void lineDataAdded(LineDataSelectorElement element) {}
 
     @Override
     public void lineDataRemoved(LineDataSelectorElement element) {
@@ -149,8 +138,5 @@ public class PlotsContainerPanel extends JPanel implements LineDataSelectorModel
     }
 
     @Override
-    public void lineDataUpdated(LineDataSelectorElement element) {
-        // TODO Auto-generated method stub
-
-    }
+    public void lineDataUpdated(LineDataSelectorElement element) {}
 }

@@ -38,10 +38,6 @@ public class RadioImageCache {
     public void add(DownloadedJPXData jpxData) {
         Log.debug("Try to add data in cache");
         synchronized (instance) {
-            Log.debug("Could add data to cache");
-            Log.debug("ImageID : " + jpxData.getImageID());
-            Log.debug("plot identifier : " + jpxData.getPlotIdentifier());
-            Log.debug("start time : " + jpxData.getStartDate());
             RadioImageCacheData data = new RadioImageCacheData();
             if (radioImageCacheData.containsKey(jpxData.getPlotIdentifier())) {
                 data = radioImageCacheData.get(jpxData.getPlotIdentifier());
@@ -92,14 +88,7 @@ public class RadioImageCache {
             List<Interval<Date>> intervalList = new ArrayList<Interval<Date>>();
             List<DownloadedJPXData> dataList = new ArrayList<DownloadedJPXData>();
             List<Long> toRemove = new ArrayList<Long>(cacheData.getDataCache().keySet());
-            /*
-             * Log.debug("IDs in cache: "); for (Long temp :
-             * dataCache.keySet()){ Log.debug(temp); }
-             * Log.debug("Values to remove before"); for (Long temp : toRemove){
-             * Log.debug(temp); }
-             */
             while (localStart.before(end) || localStart.equals(end)) {
-                // Log.debug("Execute loop");
                 if (!cacheData.getStartDates().containsKey(localStart)) {
                     intervalList.add(new Interval<Date>(localStart, new Date(localStart.getTime() + stepsize)));
                 } else {
@@ -108,11 +97,6 @@ public class RadioImageCache {
                 }
                 localStart = new Date(localStart.getTime() + stepsize);
             }
-            /*
-             * Log.debug("Values to remove after"); for (Long temp : toRemove){
-             * Log.debug(temp); } Log.debug("IDs in cache: "); for (Long temp :
-             * dataCache.keySet()){ Log.debug(temp); }
-             */
             return new RadioImageCacheResult(dataList, intervalList, new ArrayList<Long>(toRemove));
         } else {
             Date localStart = findStartDate(start, stepsize);
@@ -120,7 +104,6 @@ public class RadioImageCache {
             List<DownloadedJPXData> dataList = new ArrayList<DownloadedJPXData>();
             List<Long> toRemove = new ArrayList<Long>();
             while (localStart.before(end) || localStart.equals(end)) {
-                // Log.debug("Execute loop");
                 intervalList.add(new Interval<Date>(localStart, new Date(localStart.getTime() + stepsize)));
                 localStart = new Date(localStart.getTime() + stepsize);
             }

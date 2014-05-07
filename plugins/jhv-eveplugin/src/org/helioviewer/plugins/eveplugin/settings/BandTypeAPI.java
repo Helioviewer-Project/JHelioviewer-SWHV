@@ -1,36 +1,23 @@
 package org.helioviewer.plugins.eveplugin.settings;
 
-import java.io.BufferedReader;
 
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.io.File;
 import java.io.InputStream;
-
 import java.net.URI;
 import java.net.URISyntaxException;
-
 import org.helioviewer.base.DownloadStream;
 import org.helioviewer.base.FileUtils;
 import org.helioviewer.base.logging.Log;
 import org.helioviewer.base.logging.LogSettings;
 import org.helioviewer.jhv.JHVDirectory;
 import org.helioviewer.jhv.JHVGlobals;
-//import org.helioviewer.jhv.Settings;
 import org.helioviewer.plugins.eveplugin.settings.APIAbstract;
-//import org.helioviewer.base.logging.LogSettings;
-//import org.helioviewer.jhv.io.FileDownloader;
 import org.json.JSONException;
 import org.json.JSONObject;
-//import org.helioviewer.plugins.eveplugin.view.chart.RadioImagePane;
 import org.json.JSONArray;
-//import org.json.JSONException;
-//import org.json.JSONObject;
 import org.helioviewer.plugins.eveplugin.EVEPlugin;
-
-//import java.util.Collection;
 import java.util.HashMap;
-//import java.util.Iterator;
 import java.util.Properties;
 
 public class BandTypeAPI extends APIAbstract {
@@ -40,11 +27,7 @@ public class BandTypeAPI extends APIAbstract {
     public HashMap<String, BandGroup> groups = new HashMap<String, BandGroup>();
 
     private Properties defaultProperties = new Properties();
-
-    public static void main(String[] args) {
-        // BandTypeAPI bt = new BandTypeAPI();
-    }
-
+    
     public static BandTypeAPI getSingletonInstance() {
         return singletonInstance;
     }
@@ -86,8 +69,6 @@ public class BandTypeAPI extends APIAbstract {
         final File dstFile = new File(JHVDirectory.PLUGINS.getPath() + "/EVEPlugin/datasets.json");
         try {
             DownloadStream ds = new DownloadStream(url, JHVGlobals.getStdConnectTimeout(), JHVGlobals.getStdReadTimeout());
-            BufferedReader in = new BufferedReader(new InputStreamReader(ds.getInput()));
-            StringBuilder sb = new StringBuilder();
             FileUtils.save(ds.getInput(), dstFile);
         } catch (final IOException e1) {
             Log.error("Error downloading the bandtypes.", e1);
@@ -132,12 +113,7 @@ public class BandTypeAPI extends APIAbstract {
                     BandGroup group = this.groups.get(job.getString("group"));
                     group.add(this.bandtypes[i]);
                     this.bandtypes[i].setGroup(group);
-                }
-                /*
-                 * if(job.has("multiplier")){ double multiplier =
-                 * job.getDouble("multiplier");
-                 * this.bandtypes[i].setMultiplier(multiplier); }
-                 */
+                }                
             }
         } catch (JSONException e1) {
             Log.error("JSON parsing error", e1);

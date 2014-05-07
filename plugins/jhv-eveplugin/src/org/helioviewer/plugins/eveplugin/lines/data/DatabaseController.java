@@ -35,8 +35,7 @@ public class DatabaseController {
 
     private final Object addQueueLock = new Object();
     private final LinkedList<DatabaseController.QueueItem> addQueue = new LinkedList<DatabaseController.QueueItem>();
-    private boolean startNewThread = true;
-
+    
     // //////////////////////////////////////////////////////////////////////////////
     // Methods
     // //////////////////////////////////////////////////////////////////////////////
@@ -204,7 +203,6 @@ public class DatabaseController {
                     if (addQueue.size() > 0) {
                         queueItem = addQueue.pop();
                     } else {
-                        startNewThread = true;
                         break;
                     }
                 }

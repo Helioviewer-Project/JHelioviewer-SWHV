@@ -7,9 +7,7 @@ import org.helioviewer.plugins.eveplugin.settings.BandType;
 
 public class RadioBandType extends BandType {
 
-    public RadioBandType() {
-        // TODO Auto-generated constructor stub
-    }
+    public RadioBandType() {}
 
     public URL buildUrl(Interval<Date> interval) {
         return null;

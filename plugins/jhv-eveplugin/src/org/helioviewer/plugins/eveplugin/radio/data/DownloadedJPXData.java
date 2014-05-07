@@ -76,13 +76,7 @@ public class DownloadedJPXData implements ViewListener {
 
     @Override
     public void viewChanged(View sender, ChangeEvent aEvent) {
-        // Log.debug("Event received for image ID "+ imageID);
-        // Log.debug("Sender object = " + sender);
-        // Log.debug("Event number : "+ aEvent.hashCode());
-        // Log.debug("What event" + aEvent);
         for (ViewportChangedReason cr : aEvent.getAllChangedReasonsByType(ViewportChangedReason.class)) {
-            // Log.debug("CacheStatusChangedReasons : ");
-            // Log.debug(cr.toString());
             radioDataManager.finishedDownloadingID(imageID, downloadID);
         }
         JHVJPXView jpxView = sender.getAdapter(JHVJPXView.class);
@@ -94,10 +88,7 @@ public class DownloadedJPXData implements ViewListener {
                 data = bytetrs.getByte8PixelData();
                 byte[] copyData = Arrays.copyOf(data, data.length);
                 data = new byte[0];
-                // Log.debug("size of data "+ copyData.length);
                 radioDataManager.dataForIDReceived(copyData, imageID, downloadID);
-            } else {
-                // Log.debug("image data was null");
             }
         } else {
             JHVJP2View jp2View = sender.getAdapter(JHVJP2View.class);
@@ -109,11 +100,7 @@ public class DownloadedJPXData implements ViewListener {
                 byte[] copyData = Arrays.copyOf(data, data.length);
                 data = new byte[0];
                 radioDataManager.dataForIDReceived(copyData, imageID, downloadID);
-            } else {
-                // Log.debug("Imagedata was null");
             }
         }
-
     }
-
 }

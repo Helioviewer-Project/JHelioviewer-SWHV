@@ -1,10 +1,8 @@
 package org.helioviewer.plugins.eveplugin.radio.model;
 
 import java.awt.Color;
-import java.awt.image.BufferedImage;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -15,7 +13,6 @@ import org.helioviewer.plugins.eveplugin.radio.gui.RadioImagePane;
 public class RadioPlotModelData {
     private YAxisElement yAxisElement;
     private RadioImagePane radioImagePane;
-    // private Map<Long, BufferedImage> bufferedImages;
     private Set<RadioPlotModelListener> listeners;
     private Map<Long, DownloadRequestData> downloadRequestData;
     private Map<Long, Map<Long, PlotConfig>> plotConfigList;
@@ -29,7 +26,6 @@ public class RadioPlotModelData {
         this.downloadRequestData = new HashMap<Long, DownloadRequestData>();
         plotConfigList = new HashMap<Long, Map<Long, PlotConfig>>();
         listeners = new HashSet<RadioPlotModelListener>();
-        // bufferedImages = new HashMap<Long, BufferedImage>();
     }
 
     public void addRadioPlotModelListener(RadioPlotModelListener listener) {
@@ -55,14 +51,6 @@ public class RadioPlotModelData {
     public void setRadioImagePane(RadioImagePane radioImagePane) {
         this.radioImagePane = radioImagePane;
     }
-
-    /*
-     * public Map<Long, BufferedImage> getBufferedImages() { return
-     * bufferedImages; }
-     * 
-     * public void setBufferedImages(Map<Long, BufferedImage> bufferedImages) {
-     * this.bufferedImages = bufferedImages; }
-     */
 
     public Map<Long, DownloadRequestData> getDownloadRequestData() {
         return downloadRequestData;

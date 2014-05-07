@@ -42,15 +42,12 @@ public class EVEPlugin implements Plugin, MainContentPanelPlugin {
         // initialize database connection
         DatabaseController.getSingletonInstance();
         RadioPlotModel.getSingletonInstance();
-        // PlotAreaSpace.getInstance();
-        // PlotTimeSpace.getInstance();
     }
 
     public void uninstallPlugin() {
         ObservationDialog.getSingletonInstance().removeUserInterface(EVESettings.OBSERVATION_UI_NAME, new ObservationDialogUIPanel(mainPanel.getPlotContainerPanel()));
         ObservationDialog.getSingletonInstance().removeUserInterface(EVESettings.RADIO_OBSERVATION_UI_NAME, new SimpleObservationDialogUIPanel(mainPanel.getPlotContainerPanel()));
         ImageViewerGui.getSingletonInstance().getMainContentPanel().removePlugin(this);
-
     }
 
     public static URL getResourceUrl(String name) {

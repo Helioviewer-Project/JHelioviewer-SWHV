@@ -419,18 +419,10 @@ public class ChartDrawIntervalPane extends JComponent implements ZoomControllerL
 
     private void moveSelectedInterval(final Point newMousePosition) {
         final int diffPixel = mousePressed.x > newMousePosition.x ? mousePressed.x - newMousePosition.x : newMousePosition.x - mousePressed.x;
-        // final double diffMinutes = (availableInterval.getEnd().getTime() -
-        // availableInterval.getStart().getTime()) / 60000.0;
         final double availableIntervalSpace = getWidth() - (ChartConstants.GRAPH_LEFT_SPACE + ChartConstants.GRAPH_RIGHT_SPACE + ChartConstants.RANGE_SELECTION_WIDTH) - 1.0;
-        // final long movedMinutes = (long)((diffPixel / availableIntervalSpace)
-        // * diffMinutes * 60000.0);
         final double movedUnits = diffPixel / availableIntervalSpace;
 
         if (mousePressed.x > newMousePosition.x) {
-            // final Date start = new Date(selectedInterval.getStart().getTime()
-            // - movedMinutes);
-            // final Date end = new Date(selectedInterval.getEnd().getTime() -
-            // movedMinutes);
             List<PlotAreaSpace> pasList = new ArrayList<PlotAreaSpace>();
             Map<PlotAreaSpace, Double> minList = new HashMap<PlotAreaSpace, Double>();
             Map<PlotAreaSpace, Double> maxList = new HashMap<PlotAreaSpace, Double>();
@@ -443,17 +435,11 @@ public class ChartDrawIntervalPane extends JComponent implements ZoomControllerL
             }
             for (PlotAreaSpace pas : pasList) {
                 if (pas.minMaxTimeIntervalContainsTime(minList.get(pas))) {
-                    // ZoomController.getSingletonInstance().setSelectedInterval(new
-                    // Interval<Date>(start, end));
                     pas.setScaledSelectedTime(minList.get(pas), maxList.get(pas));
                 }
             }
             mousePressed = newMousePosition;
         } else {
-            // final Date start = new Date(selectedInterval.getStart().getTime()
-            // + movedMinutes);
-            // final Date end = new Date(selectedInterval.getEnd().getTime() +
-            // movedMinutes);
             List<PlotAreaSpace> pasList = new ArrayList<PlotAreaSpace>();
             Map<PlotAreaSpace, Double> minList = new HashMap<PlotAreaSpace, Double>();
             Map<PlotAreaSpace, Double> maxList = new HashMap<PlotAreaSpace, Double>();
@@ -466,10 +452,7 @@ public class ChartDrawIntervalPane extends JComponent implements ZoomControllerL
             }
             for (PlotAreaSpace pas : pasList) {
                 if (pas.minMaxTimeIntervalContainsTime(maxList.get(pas))) {
-                    // ZoomController.getSingletonInstance().setSelectedInterval(new
-                    // Interval<Date>(start, end));
                     pas.setScaledSelectedTime(minList.get(pas), maxList.get(pas));
-
                 }
             }
             mousePressed = newMousePosition;
@@ -482,39 +465,23 @@ public class ChartDrawIntervalPane extends JComponent implements ZoomControllerL
                 return;
 
             final double availableIntervalSpace = getWidth() - (ChartConstants.GRAPH_LEFT_SPACE + ChartConstants.GRAPH_RIGHT_SPACE + ChartConstants.RANGE_SELECTION_WIDTH) - 1.0;
-            // final double diffMin = (availableInterval.getEnd().getTime() -
-            // availableInterval.getStart().getTime()) / 60000.0;
-            // final long timestamp = availableInterval.getStart().getTime() +
-            // (long)(((newMousePosition.x - ChartConstants.GRAPH_LEFT_SPACE) /
-            // availableIntervalSpace) * diffMin * 60000.0);
             for (PlotAreaSpace pas : plotAreaSpaceManager.getAllPlotAreaSpaces()) {
                 final double diffUnits = pas.getScaledMaxTime() - pas.getScaledMinTime();
                 final double timestamp = pas.getScaledMinTime() + ((newMousePosition.x - ChartConstants.GRAPH_LEFT_SPACE) / availableIntervalSpace) * diffUnits;
 
                 pas.setScaledSelectedTime(timestamp, pas.getScaledSelectedMaxTime());
             }
-            // ZoomController.getSingletonInstance().setSelectedInterval(new
-            // Interval<Date>(new Date(timestamp), selectedInterval.getEnd()));
-
         } else if (mouseOverRightGraspPoint) {
             if (newMousePosition.x <= leftIntervalBorderPosition)
                 return;
 
             final double availableIntervalSpace = getWidth() - (ChartConstants.GRAPH_LEFT_SPACE + ChartConstants.GRAPH_RIGHT_SPACE + ChartConstants.RANGE_SELECTION_WIDTH) - 1.0;
-            // final double diffMin = (availableInterval.getEnd().getTime() -
-            // availableInterval.getStart().getTime()) / 60000.0;
-            // final long timestamp = availableInterval.getStart().getTime() +
-            // (long)(((newMousePosition.x - ChartConstants.GRAPH_LEFT_SPACE) /
-            // availableIntervalSpace) * diffMin * 60000.0);
             for (PlotAreaSpace pas : plotAreaSpaceManager.getAllPlotAreaSpaces()) {
                 final double diffUnits = pas.getScaledMaxTime() - pas.getScaledMinTime();
                 final double timestamp = pas.getScaledMinTime() + (1.0 * (newMousePosition.x - ChartConstants.GRAPH_LEFT_SPACE) / availableIntervalSpace) * diffUnits;
 
                 pas.setScaledSelectedTime(pas.getScaledSelectedMinTime(), timestamp);
             }
-            // ZoomController.getSingletonInstance().setSelectedInterval(new
-            // Interval<Date>(selectedInterval.getStart(), new
-            // Date(timestamp)));
         }
     }
 

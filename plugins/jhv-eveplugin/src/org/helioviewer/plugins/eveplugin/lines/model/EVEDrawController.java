@@ -41,8 +41,6 @@ public class EVEDrawController implements BandControllerListener, ZoomController
     private final String identifier;
 
     private final LinkedList<EVEDrawControllerListener> listeners = new LinkedList<EVEDrawControllerListener>();
-    // private final HashMap<Band, EVEValues> dataMap = new HashMap<Band,
-    // EVEValues>();
     private final HashMap<Band, DownloadedData> dataMap = new HashMap<Band, DownloadedData>();
 
     private Interval<Date> interval = new Interval<Date>(null, null);
@@ -105,15 +103,6 @@ public class EVEDrawController implements BandControllerListener, ZoomController
             if (v != null) {
                 availableRange.setMin(v.getMinimumValue());
                 availableRange.setMax(v.getMaximumValue());
-                // Log.error("updateBand : Available range : "+
-                // availableRange.toString());
-                // Log.error("updateBand : Selected range : "+
-                // selectedRange.toString());
-                // adjustAvailableRangeBorders(availableRange);
-                // Log.error("updateBand : Available range after adjustment: "+
-                // availableRange.toString());
-                // Log.error("updateBand : Selected range after adjustment: "+
-                // selectedRange.toString());
             }
         }
         if (oldAvailableRange.min != availableRange.min || oldAvailableRange.max != availableRange.max) {
@@ -129,8 +118,6 @@ public class EVEDrawController implements BandControllerListener, ZoomController
     private void updateBands() {
         for (final Band band : dataMap.keySet())
             updateBand(band);
-
-        // fireRedrawRequest(true);
     }
 
     public void setSelectedRange(final Range newSelectedRange) {
@@ -147,17 +134,12 @@ public class EVEDrawController implements BandControllerListener, ZoomController
         final Band[] bands = dataMap.keySet().toArray(new Band[0]);
         final LinkedList<DownloadedData> values = new LinkedList<DownloadedData>();
         Range oldAvailableRange = new Range(availableRange);
-        // availableRange = new Range();
-
+        
         for (DownloadedData v : dataMap.values()) {
             if (v != null) {
 
                 availableRange.setMin(v.getMinimumValue());
                 availableRange.setMax(v.getMaximumValue());
-                // Log.error("fireRedrawRequest : Available range : "+
-                // availableRange.toString());
-                // Log.error("fireRedrawRequest : selected range : "+
-                // selectedRange.toString());
                 values.add(v);
             }
         }
@@ -173,9 +155,7 @@ public class EVEDrawController implements BandControllerListener, ZoomController
             updatePlotAreaSpace(availableRange, selectedRange);
 
         }
-
-        // adjustAvailableRangeBorders(availableRange);
-
+        
         for (EVEDrawControllerListener listener : listeners) {
             listener.drawRequest(interval, bands, values.toArray(new EVEValues[0]), availableRange, selectedRange);
         }
@@ -193,24 +173,12 @@ public class EVEDrawController implements BandControllerListener, ZoomController
     }
 
     private void updatePlotAreaSpace(Range availableRange, Range selectedRange) {
-        // Log.error("Available Range in updatePlotAreaSpace: " +
-        // availableRange.toString());
-        // Log.error("Selected Range in updatePlotAreaSpace: " +
-        // selectedRange.toString());
         double diffAvailable = Math.log10(availableRange.max) - Math.log10(availableRange.min);
-        // Log.error("Diff available in updatePlotAreaSpace: " + diffAvailable);
         double diffStart = Math.log10(selectedRange.min) - Math.log10(availableRange.min);
-        // Log.error("Diff start in updatePlotAreaSpace: " + diffStart);
         double diffEnd = Math.log10(selectedRange.max) - Math.log10(availableRange.min);
-        // Log.error("Diff end in updatePlotAreaSpace:" + diffEnd);
         double startValue = plotAreaSpace.getScaledMinValue() + diffStart / diffAvailable;
-        // Log.error("Start value in updatePlotAreaSpace:" + startValue);
         double endValue = plotAreaSpace.getScaledMinValue() + diffEnd / diffAvailable;
         plotAreaSpace.setScaledSelectedValue(startValue, endValue);
-        // Log.error("End Value in updatePlotAreaSpace:" + endValue);
-        // Log.error("Plot Area Space in updatePlotAreaSpace : \n" +
-        // plotAreaSpace.toString());
-
     }
 
     private void adjustAvailableRangeBorders(final Range availableRange) {
@@ -254,9 +222,6 @@ public class EVEDrawController implements BandControllerListener, ZoomController
     }
 
     private final DownloadedData retrieveData(final Band band, final Interval<Date> interval) {
-        // return
-        // EVECacheController.getSingletonInstance().getDataInInterval(band,
-        // interval);
         return band.getBandType().getDataDownloader().downloadData(band, interval);
     }
 
@@ -357,14 +322,6 @@ public class EVEDrawController implements BandControllerListener, ZoomController
 
     @Override
     public void plotAreaSpaceChanged(double scaledMinValue, double scaledMaxValue, double scaledMinTime, double scaledMaxTime, double scaledSelectedMinValue, double scaledSelectedMaxValue, double scaledSelectedMinTime, double scaledSelectedMaxTime) {
-        try {
-            throw new Exception();
-        } catch (Exception e) {
-            // TODO Auto-generated catch block
-            // e.printStackTrace();
-        }
-        // Log.error("Plot Area Space in plotAreaSpaceChanged : \n" +
-        // plotAreaSpace.toString());
         double diffScaledAvailable = scaledMaxValue - scaledMinValue;
         double diffAvaliable = Math.log10(availableRange.max) - Math.log10(availableRange.min);
         double diffSelectedStart = scaledSelectedMinValue - scaledMinValue;
@@ -372,10 +329,8 @@ public class EVEDrawController implements BandControllerListener, ZoomController
         double selectedStart = Math.pow(10, Math.log10(availableRange.min) + diffSelectedStart / diffScaledAvailable * diffAvaliable);
         double selectedEnd = Math.pow(10, Math.log10(availableRange.min) + diffSelectedEnd / diffScaledAvailable * diffAvaliable);
         if (selectedStart != selectedRange.min || selectedEnd != selectedRange.max) {
-            // Log.error("Set selected range");
             setSelectedRange(new Range(selectedStart, selectedEnd));
         } else {
-            Log.error("Just do a fire redraw request");
             fireRedrawRequest(false);
         }
     }

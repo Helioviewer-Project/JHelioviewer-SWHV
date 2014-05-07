@@ -13,13 +13,9 @@ public class RadioImage {
     private int frameInJPX;
     private ResolutionSet resolutioSet;
     private List<ResolutionSetting> resolutionSettings;
-    private String plotIdentifier;
-    private boolean isVisible;
-    private RadioDataManager radioDataManager;
     private long downloadID;
     private ResolutionSetting lastUsedResolutionSetting;
     private long radioImageID;
-    private DownloadedJPXData jpxData;
     private boolean isDownloading;
 
     public RadioImage(DownloadedJPXData jpxData, long downloadID, Long radioImageID, Interval<Date> timeInterval, FrequencyInterval freqInterval, int frameInJPX, ResolutionSet rs, List<ResolutionSetting> resolutionSettings, String plotIdentifier, boolean isDownloading) {
@@ -30,11 +26,7 @@ public class RadioImage {
         this.frameInJPX = frameInJPX;
         this.resolutioSet = rs;
         this.resolutionSettings = resolutionSettings;
-        this.plotIdentifier = plotIdentifier;
-        this.isVisible = true;
-        this.radioDataManager = RadioDataManager.getSingletonInstance();
         this.radioImageID = radioImageID;
-        this.jpxData = jpxData;
         this.isDownloading = isDownloading;
     }
 
@@ -118,31 +110,4 @@ public class RadioImage {
     public boolean withinInterval(Interval<Date> intervalToBeIn, FrequencyInterval freqIntervalToBeIn) {
         return intervalToBeIn.overlapsInclusive(timeInterval) && freqIntervalToBeIn.overlaps(freqInterval);
     }
-
-    /*
-     * @Override public void removeLineData() {
-     * radioDataManager.removeRadioData(this); }
-     * 
-     * @Override public void setVisibility(boolean visible) { this.isVisible =
-     * visible; }
-     * 
-     * @Override public boolean isVisible() { return this.isVisible; }
-     * 
-     * @Override public String getName() { return "Callisto radiogram"; }
-     * 
-     * @Override public Color getDataColor() { return Color.BLACK; }
-     * 
-     * @Override public void setDataColor(Color c) {}
-     * 
-     * @Override public boolean isDownloading() { // TODO Auto-generated method
-     * stub return false; }
-     * 
-     * @Override public String getPlotIdentifier() { return this.plotIdentifier;
-     * }
-     * 
-     * @Override public void setPlotIndentifier(String identifier) {
-     * this.plotIdentifier = identifier; }
-     * 
-     * @Override public boolean isAvailable() { return true; }
-     */
 }

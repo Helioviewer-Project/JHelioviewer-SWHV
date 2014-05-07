@@ -41,9 +41,7 @@ public class SimpleObservationDialogUIPanel extends ObservationDialogPanel imple
     // //////////////////////////////////////////////////////////////////////////////
 
     private static final long serialVersionUID = 1L;
-
-    private static final String[] DATA_LABEL_TEXTS = new String[] { "Band", "Band", "Diodes", "Lines" };
-
+    
     protected PlotsContainerPanel plotsContainerPanel;
 
     protected boolean enableLoadButton = true;
@@ -55,15 +53,12 @@ public class SimpleObservationDialogUIPanel extends ObservationDialogPanel imple
 
     protected JComboBox plotComboBox;
 
-    private JLabel labelGroup;
-    private JLabel labelData;
     protected JComboBox comboBoxGroup;
     protected JComboBox comboBoxData;
 
     private JPanel timePane;
     private JPanel plotPane;
-    private JPanel dataPane;
-
+    
     // //////////////////////////////////////////////////////////////////////////////
     // Methods
     // //////////////////////////////////////////////////////////////////////////////
@@ -80,13 +75,10 @@ public class SimpleObservationDialogUIPanel extends ObservationDialogPanel imple
 
                 plotComboBox = new JComboBox(new String[] { "Plot 1", "Plot 2" });
 
-                labelGroup = new JLabel("Group");
-                labelData = new JLabel();
                 comboBoxGroup = new JComboBox(new DefaultComboBoxModel());
                 comboBoxData = new JComboBox(new DefaultComboBoxModel());
                 timePane = new JPanel();
                 plotPane = new JPanel();
-                dataPane = new JPanel();
                 initVisualComponents();
             }
         });
@@ -124,58 +116,11 @@ public class SimpleObservationDialogUIPanel extends ObservationDialogPanel imple
 
         plotComboBox.addActionListener(this);
 
-        // set up data selection
-        /*
-         * comboBoxGroup.addActionListener(this);
-         * 
-         * dataPane.setLayout(new GridLayout(2, 2, GRIDLAYOUT_HGAP,
-         * GRIDLAYOUT_VGAP));
-         * dataPane.setBorder(BorderFactory.createTitledBorder
-         * (" Choose experiment specific data source "));
-         * dataPane.add(labelGroup); dataPane.add(comboBoxGroup);
-         * dataPane.add(labelData); dataPane.add(comboBoxData);
-         */
         // set basic layout
         this.setLayout(new BoxLayout(this, BoxLayout.PAGE_AXIS));
         this.add(timePane);
         this.add(plotPane);
-        // this.add(dataPane);
     }
-
-    /*
-     * private void initGroups() { final BandGroup[] groups =
-     * BandTypeAPI.getSingletonInstance().getGroups(); final
-     * DefaultComboBoxModel model = (DefaultComboBoxModel)
-     * comboBoxGroup.getModel(); model.removeAllElements();
-     * 
-     * for (final BandGroup group : groups) { model.addElement(group); } }
-     */
-
-    /*
-     * private void updateGroupValues() { // change text of data label
-     * labelData.setText(DATA_LABEL_TEXTS[comboBoxGroup.getSelectedIndex()]);
-     * 
-     * // update values in data combobox final BandController bandController =
-     * BandController.getSingletonInstance(); final DefaultComboBoxModel model =
-     * (DefaultComboBoxModel) comboBoxData.getModel(); final BandGroup
-     * selectedGroup = (BandGroup) comboBoxGroup.getSelectedItem(); final String
-     * identifier = plotComboBox.getSelectedIndex() == 0 ?
-     * PlotsContainerPanel.PLOT_IDENTIFIER_MASTER :
-     * PlotsContainerPanel.PLOT_IDENTIFIER_SLAVE; final BandType[] values =
-     * BandTypeAPI.getSingletonInstance().getBandTypes(selectedGroup);
-     * 
-     * model.removeAllElements();
-     * 
-     * for (final BandType value : values) { if
-     * (bandController.getBand(identifier, value) == null) {
-     * model.addElement(value); } }
-     * 
-     * if (model.getSize() > 0) { comboBoxData.setSelectedIndex(0); }
-     * 
-     * enableLoadButton = model.getSize() > 0;
-     * ObservationDialog.getSingletonInstance
-     * ().setLoadButtonEnabled(enableLoadButton); }
-     */
 
     public void setStartDate(final Date start) {
         calendarStartDate.setDate(start);
@@ -218,27 +163,12 @@ public class SimpleObservationDialogUIPanel extends ObservationDialogPanel imple
     }
 
     private void updateZoomController() {
-        ZoomController.getSingletonInstance().setAvailableInterval(new Interval<Date>(getStartDate(), getEndDate()));
-        // PlotTimeSpace.getInstance().setMinAndMaxTime(getStartDate(),
-        // getEndDate());
+        ZoomController.getSingletonInstance().setAvailableInterval(new Interval<Date>(getStartDate(), getEndDate()));        
     }
 
     private void updateBandController() {
-        // final BandController bandController =
-        // BandController.getSingletonInstance();
-
+        
         final String identifier = plotComboBox.getSelectedIndex() == 0 ? PlotsContainerPanel.PLOT_IDENTIFIER_MASTER : PlotsContainerPanel.PLOT_IDENTIFIER_SLAVE;
-        // final BandGroup group = (BandGroup) comboBoxGroup.getSelectedItem();
-        // final BandType bandType = (BandType) comboBoxData.getSelectedItem();
-        // bandType.setDataDownloader(EVECacheController.getSingletonInstance());
-
-        /*
-         * if (!bandController.getSelectedGroup(identifier).equals(group)) {
-         * bandController.removeAllBands(identifier); }
-         * 
-         * bandController.selectBandGroup(identifier, group);
-         * bandController.addBand(identifier, bandType);
-         */
         if (identifier.equals(PlotsContainerPanel.PLOT_IDENTIFIER_SLAVE)) {
             plotsContainerPanel.setPlot2Visible(true);
         }
@@ -246,8 +176,6 @@ public class SimpleObservationDialogUIPanel extends ObservationDialogPanel imple
 
     private void startRadioDownload() {
         final String identifier = plotComboBox.getSelectedIndex() == 0 ? PlotsContainerPanel.PLOT_IDENTIFIER_MASTER : PlotsContainerPanel.PLOT_IDENTIFIER_SLAVE;
-        // BandController bandController =
-        // BandController.getSingletonInstance();
         DateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
         String isoStart = df.format(getStartDate());
         Calendar end = Calendar.getInstance();
@@ -256,17 +184,7 @@ public class SimpleObservationDialogUIPanel extends ObservationDialogPanel imple
         end.set(Calendar.MINUTE, 59);
         end.set(Calendar.SECOND, 59);
         String isoEnd = df.format(getEndDate());
-
-        /*
-         * BandType type = new RadioBandType();
-         * type.setDataDownloader(RadioDownloader.getSingletonInstance());
-         * type.setLabel("Callisto Spectrogram"); type.setGroup(new
-         * BandGroup()); type.getGroup().setGroupLabel("Radio Spectrogram");
-         * type.getGroup().setKey("Radio"); type.getGroup().add(type);
-         */
-
         RadioDownloader.getSingletonInstance().requestAndOpenRemoteFile(isoStart, isoEnd, identifier);
-        // bandController.addBand(identifier, type);
     }
 
     @Override
@@ -330,10 +248,7 @@ public class SimpleObservationDialogUIPanel extends ObservationDialogPanel imple
     // //////////////////////////////////////////////////////////////////////////////
 
     public void actionPerformed(final ActionEvent e) {
-        /*
-         * if (e.getSource().equals(comboBoxGroup)) { updateGroupValues(); }
-         * else
-         */if (e.getSource().equals(plotComboBox)) {
+        if (e.getSource().equals(plotComboBox)) {
             final String identifier = plotComboBox.getSelectedIndex() == 0 ? PlotsContainerPanel.PLOT_IDENTIFIER_MASTER : PlotsContainerPanel.PLOT_IDENTIFIER_SLAVE;
             final BandGroup group = BandController.getSingletonInstance().getSelectedGroup(identifier);
 
