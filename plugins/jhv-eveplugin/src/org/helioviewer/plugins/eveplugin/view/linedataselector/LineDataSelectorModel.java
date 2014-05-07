@@ -6,7 +6,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.helioviewer.plugins.eveplugin.view.plot.PlotsContainerPanel;
 
 public class LineDataSelectorModel {
     private List<LineDataSelectorModelListener> listeners;

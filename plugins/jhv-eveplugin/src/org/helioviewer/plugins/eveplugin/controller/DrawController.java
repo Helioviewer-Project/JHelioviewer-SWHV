@@ -26,22 +26,11 @@ public class DrawController implements ZoomControllerListener, LineDataSelectorM
 
     private static DrawController instance;
     private Map<String, DrawControllerData> drawControllerData;
-    // private Map<String,DrawControllerData> drawableElements;
-    // private Map<String,List<DrawControllerListener>> listeners;
-    // private Map<String,Integer> nrOfDrawableElement;
     private Interval<Date> interval;
-    private Range selectedRange;
-    private Range availableRange;
-
-    // private Map<String,Set<YAxisElement>> yAxisSet;
-
+    
+    
     private DrawController() {
         this.drawControllerData = new HashMap<String, DrawControllerData>();
-        // this.nrOfDrawableElement = new HashMap<String, Integer>();
-        // this.drawableElements = new HashMap<String,Map<DrawableType,
-        // List<DrawableElement>>>();
-        // this.listeners = new HashMap<String,List<DrawControllerListener>>();
-        // this.yAxisSet = new HashMap<String,Set<YAxisElement>>();
         ZoomController.getSingletonInstance().addZoomControllerListener(this);
         LineDataSelectorModel.getSingletonInstance().addLineDataSelectorModelListener(this);
         LayersModel.getSingletonInstance().addLayersListener(this);
@@ -137,15 +126,6 @@ public class DrawController implements ZoomControllerListener, LineDataSelectorM
         synchronized (this) {
             List<DrawableElement> allElements = this.getAllDrawableElements(identifier);
             return !allElements.isEmpty();
-            
-            /*for (DrawableElement de : allElements) {
-                if (de.hasElementsToDraw()) {
-                    return true;
-                }
-            }*/
-            
-            //return false;
-            // return nrOfDrawableElement > 0;
         }
     }
 
@@ -162,12 +142,10 @@ public class DrawController implements ZoomControllerListener, LineDataSelectorM
     }
 
     public void setAvailableRange(Range availableRange) {
-        this.availableRange = availableRange;
         fireRedrawRequest();
     }
 
     public void setSelectedRange(Range selectedRange) {
-        this.selectedRange = selectedRange;
         fireRedrawRequest();
     }
 
@@ -296,15 +274,4 @@ public class DrawController implements ZoomControllerListener, LineDataSelectorM
         // TODO Auto-generated method stub
 
     }
-
-    /*
-     * public double getLogMinValue(){ if (selectedRange == null){ return -1.0;
-     * }else { return Math.log10(selectedRange.min); } }
-     * 
-     * public double getLogMaxValue(){ if (selectedRange == null){ return -1.0;
-     * }else { return Math.log10(selectedRange.max); } }
-     * 
-     * public String getVerticalLabel(){ //TODO implement the method return "";
-     * }
-     */
 }

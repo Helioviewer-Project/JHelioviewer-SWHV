@@ -46,9 +46,6 @@ public class LineDataContainer extends JPanel implements LineDataSelectorModelLi
         lineDataModel.addLineDataSelectorModelListener(this);
         list = new LineDataList(identifier);
         listScrollPane = new JScrollPane(list, JScrollPane.VERTICAL_SCROLLBAR_ALWAYS, JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
-
-        // BandController.getSingletonInstance().addBandControllerListener(this);
-
         initVisualComponent();
     }
 

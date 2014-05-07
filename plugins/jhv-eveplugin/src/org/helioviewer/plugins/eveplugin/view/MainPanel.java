@@ -28,9 +28,7 @@ public class MainPanel extends JPanel {
 
     public MainPanel() {
         initVisualComponents();
-
-        ZoomController.getSingletonInstance().setAvailableInterval(new Interval<Date>(new Date(), new Date()));
-        // PlotTimeSpace.getInstance().setMinAndMaxTime(new Date(), new Date());
+        ZoomController.getSingletonInstance().setAvailableInterval(new Interval<Date>(new Date(), new Date()));        
     }
 
     private void initVisualComponents() {

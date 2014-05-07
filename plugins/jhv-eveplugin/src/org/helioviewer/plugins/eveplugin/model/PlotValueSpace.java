@@ -19,7 +19,6 @@ public class PlotValueSpace implements PlotAreaSpaceListener {
         this.selectedMinValue = -1.0;
         this.selectedMaxValue = -1.0;
         this.listeners = new ArrayList<PlotValueSpaceListener>();
-        // this.plotAreaSpace = PlotAreaSpace.getInstance();
         plotAreaSpace.addPlotAreaSpaceListener(this);
     }
 
@@ -34,7 +33,6 @@ public class PlotValueSpace implements PlotAreaSpaceListener {
     @Override
     public void plotAreaSpaceChanged(double scaledMinValue, double scaledMaxValue, double scaledMinTime, double scaledMaxTime, double scaledSelectedMinValue, double scaledSelectedMaxValue, double scaledSelectedMinTime, double scaledSelectedMaxTime) {
         if (this.minValue != -1.0 && this.maxValue != -1.0 && this.selectedMinValue != -1.0 && this.selectedMaxValue != -1.0) {
-            // TODO calculate the new selected min and max value
             double diffValue = maxValue - minValue;
             double scaleDiff = scaledMaxValue - scaledMinValue;
             double selectedMin = (scaledSelectedMinValue - scaledMinValue) / scaleDiff;

@@ -59,8 +59,6 @@ public class EVEDrawableElement implements DrawableElement {
     }
 
     private void updateGraphsData(Interval<Date> interval, Rectangle graphArea) {
-        // double logMinValue = Math.log10(yAxisElement.getSelectedRange().min);
-        // double logMaxValue = Math.log10(yAxisElement.getSelectedRange().max);
         double logMinValue = yAxisElement.getMinValue();
         double logMaxValue = yAxisElement.getMaxValue();
 
@@ -68,9 +66,7 @@ public class EVEDrawableElement implements DrawableElement {
         double ratioY = logMaxValue < logMinValue ? 0 : graphArea.height / (logMaxValue - logMinValue);
 
         graphPolylines.clear();
-        // if (!intervalAvailable)
-        // return;
-
+        
         for (int i = 0; i < bands.length; ++i) {
             if (bands[i].isVisible()) {
                 final EVEValue[] eveValues = values[i].getValues();
@@ -105,10 +101,8 @@ public class EVEDrawableElement implements DrawableElement {
                     final int y = computeY(eveValues[j].getValue().doubleValue(), interval, graphArea, ratioY, logMinValue);
                     final Point point = new Point(x, y);
 
-                    // if (graphArea.contains(point)) {
                     pointList.add(point);
                     counter++;
-                    // }
                 }
 
                 if (counter > 0) {
@@ -119,8 +113,6 @@ public class EVEDrawableElement implements DrawableElement {
     }
 
     private void drawGraphs(final Graphics g, Rectangle graphArea) {
-        // if (!intervalAvailable)
-        // return;
         synchronized (graphPolylines) {
             Iterator<GraphPolyline> i = graphPolylines.iterator();
             while (i.hasNext()) {

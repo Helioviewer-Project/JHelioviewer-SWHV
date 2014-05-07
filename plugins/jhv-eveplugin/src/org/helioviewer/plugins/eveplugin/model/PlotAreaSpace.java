@@ -4,8 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class PlotAreaSpace {
-    // private static PlotAreaSpace instance;
-
+    
     private double scaledMinValue;
     private double scaledMaxValue;
     private double scaledMinTime;
@@ -29,12 +28,7 @@ public class PlotAreaSpace {
         this.scaledSelectedMinTime = 0.0;
         this.scaledSelectedMaxTime = 1.0;
     }
-
-    /*
-     * public static PlotAreaSpace getInstance(){ if(instance == null){ instance
-     * = new PlotAreaSpace(); } return instance; }
-     */
-
+   
     public void addPlotAreaSpaceListener(PlotAreaSpaceListener listener) {
         listeners.add(listener);
     }

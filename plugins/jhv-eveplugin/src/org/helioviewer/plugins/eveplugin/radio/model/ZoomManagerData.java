@@ -6,9 +6,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.helioviewer.plugins.eveplugin.model.PlotAreaSpaceListener;
 
-public class ZoomManagerData implements PlotAreaSpaceListener {
+public class ZoomManagerData{
 
     private Map<Long, ZoomDataConfig> zoomDataConfigMap;
     private boolean isAreaInitialized;
@@ -68,12 +67,5 @@ public class ZoomManagerData implements PlotAreaSpaceListener {
 
     public void addToZoomDataConfigMap(long iD, ZoomDataConfig config) {
         zoomDataConfigMap.put(iD, config);
-    }
-
-    @Override
-    public void plotAreaSpaceChanged(double scaledMinValue, double scaledMaxValue, double scaledMinTime, double scaledMaxTime, double scaledSelectedMinValue, double scaledSelectedMaxValue, double scaledSelectedMinTime, double scaledSelectedMaxTime) {
-        // TODO Auto-generated method stub
-
-    }
-
+    }   
 }

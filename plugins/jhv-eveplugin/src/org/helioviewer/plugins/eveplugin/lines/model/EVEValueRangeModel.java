@@ -17,7 +17,6 @@ public class EVEValueRangeModel implements PlotAreaSpaceListener {
     private PlotAreaSpace plotAreaSpace;
 
     private EVEValueRangeModel() {
-        // plotAreaSpace = PlotAreaSpace.getInstance();
         plotAreaSpace.addPlotAreaSpaceListener(this);
     }
 

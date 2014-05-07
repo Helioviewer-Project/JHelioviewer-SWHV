@@ -25,8 +25,6 @@ public class LineDataListEntry extends JPanel implements MouseListener {
 
     private static final long serialVersionUID = 1L;
 
-    private final String identifier;
-
     private final LineDataSelectorElement element;
     private final LineDataList list;
 
@@ -37,7 +35,6 @@ public class LineDataListEntry extends JPanel implements MouseListener {
     private final JLabel titleLabel = new JLabel();
     private final JLabel removeLabel = new JLabel();
 
-    private LineDataSelectorModel model;
 
     // //////////////////////////////////////////////////////////////////////////////
     // Methods
@@ -46,8 +43,6 @@ public class LineDataListEntry extends JPanel implements MouseListener {
     public LineDataListEntry(final LineDataList list, final LineDataSelectorElement element, final String identifier) {
         this.element = element;
         this.list = list;
-        this.identifier = identifier;
-        this.model = LineDataSelectorModel.getSingletonInstance();
         initVisualComponents();
         updateVisualComponentValues();
     }

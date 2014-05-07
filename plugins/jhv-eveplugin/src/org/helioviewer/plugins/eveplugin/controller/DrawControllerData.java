@@ -81,8 +81,6 @@ public class DrawControllerData {
                 yAxisSet.add(element.getYAxisElement());
             }
             nrOfDrawableElements++;
-            // Log.debug("*********************** yAxisSet element count: " +
-            // yAxisSet.size());
         }
     }
 
