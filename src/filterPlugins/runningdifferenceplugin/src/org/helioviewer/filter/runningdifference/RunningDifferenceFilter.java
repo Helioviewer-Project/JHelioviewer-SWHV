@@ -156,6 +156,7 @@ public class RunningDifferenceFilter implements FrameFilter, StandardFilter, Obs
      */
     public void setActive(boolean isActive) {
         this.isActive = isActive;
+        timeMachineData.setActive(isActive);
         notifyAllListeners();
     }
 
