@@ -8,7 +8,7 @@ import org.helioviewer.viewmodel.imagedata.ImageData;
  * <p>
  * It is crucial to set the cache properly and only these data should be
  * accessed regularly.
- * 
+ *
  * @see TimeMachineView
  * @author Helge Dietert
  */
@@ -19,7 +19,7 @@ public interface TimeMachineData {
      * This can trigger a different encoding and therefore should only be used
      * rarely to support a difference movie against a constant frame. There is
      * no guarantee that this results are cached even though the rest is.
-     * 
+     *
      * @param pos
      *            Frame number
      * @return ImageData of the frame. Null if this frame if not available
@@ -37,7 +37,7 @@ public interface TimeMachineData {
      * the normal ImageData and then acquire additional frames. Failing in this
      * may give wrong results! If using a normal filter, the StandardFilterView
      * already did this.
-     * 
+     *
      * @param pos
      *            Number of frames to go back
      * @return ImageData of the frame pos times before. Null if this frame if
@@ -50,7 +50,7 @@ public interface TimeMachineData {
      * <p>
      * Since the cache may need to be updated when the region changes etc.
      * having a big size also can cost CPU time.
-     * 
+     *
      * @param n
      *            Number of previous frames interested. 0 means the current
      *            frame and 1 the frame before
@@ -58,4 +58,6 @@ public interface TimeMachineData {
     public void setPreviousCache(int n);
 
     public long getCurrentDateMillis();
+
+    public void setActive(boolean isActive);
 }
