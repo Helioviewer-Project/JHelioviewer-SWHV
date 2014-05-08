@@ -2,8 +2,7 @@ package org.helioviewer.viewmodel.imagedata;
 
 import java.awt.image.BufferedImage;
 
-import javax.swing.plaf.synth.Region;
-
+import org.helioviewer.viewmodel.region.Region;
 import org.helioviewer.viewmodel.view.jp2view.image.SubImage;
 
 /**
