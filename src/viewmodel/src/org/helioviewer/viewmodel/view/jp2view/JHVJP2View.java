@@ -94,9 +94,6 @@ public class JHVJP2View extends AbstractView implements JP2View, ViewportView, R
     // Renderer-ThreadGroup - This group is necessary to identify all renderer
     // threads
     public static final ThreadGroup renderGroup = new ThreadGroup("J2KRenderGroup");
-    protected Region displayedRegion;
-
-    private int displayedLayer;
 
     private ImageData previousImageData;
 
@@ -685,10 +682,11 @@ public class JHVJP2View extends AbstractView implements JP2View, ViewportView, R
         this.imageData.setFrameNumber(compositionLayer);
         HelioviewerMetaData hvmd = (HelioviewerMetaData) metaData;
 
-        this.displayedRegion = hvmd.roiToRegion(roi, zoompercent);
+        this.imageData.setRegion(hvmd.roiToRegion(roi, zoompercent));
         this.imageData.setScaleX(hvmd.getScaleX(roi));
         System.out.println("SCALEXX" + this.imageData.getScaleX());
         this.imageData.setScaleY(hvmd.getScaleY(roi));
+        this.imageData.setDateMillis(hvmd.getDateTime().getMillis());
         System.out.println("SCALEYY" + this.imageData.getScaleY());
         Region lastRegionSaved = lastRegion;
         subImageBuffer.setLastRegion(roi);
@@ -830,5 +828,9 @@ public class JHVJP2View extends AbstractView implements JP2View, ViewportView, R
 
     public ImageData getPreviousImageData() {
         return this.previousImageData;
+    }
+
+    public void setPreviousImageData(ImageData previousImageData) {
+        this.previousImageData = previousImageData;
     }
 }
