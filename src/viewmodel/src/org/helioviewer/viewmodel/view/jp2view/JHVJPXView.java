@@ -11,7 +11,6 @@ import org.helioviewer.viewmodel.changeevent.TimestampChangedReason;
 import org.helioviewer.viewmodel.imagedata.ImageData;
 import org.helioviewer.viewmodel.metadata.HelioviewerMetaData;
 import org.helioviewer.viewmodel.metadata.ObserverMetaData;
-import org.helioviewer.viewmodel.region.Region;
 import org.helioviewer.viewmodel.view.CachedMovieView;
 import org.helioviewer.viewmodel.view.LinkedMovieManager;
 import org.helioviewer.viewmodel.view.TimedMovieView;
@@ -56,6 +55,7 @@ public class JHVJPXView extends JHVJP2View implements TimedMovieView, CachedMovi
      */
     protected LinkedMovieManager linkedMovieManager;
     private boolean fullyLoadedMode;
+    private boolean differenceMode;
 
     /**
      * Default constructor.
@@ -538,18 +538,14 @@ public class JHVJPXView extends JHVJP2View implements TimedMovieView, CachedMovi
         this.blockingMode = blockingMode;
     }
 
-    public void setDisplayedRegion(Region region) {
-        this.displayedRegion = region;
-    }
-
-    public Region getDisplayedRegion() {
-        return this.displayedRegion;
-    }
-
     public void setDifferenceMode(boolean differenceMode) {
+        this.differenceMode = differenceMode;
         this.render.setDifferenceMode(differenceMode);
     }
     public void setFullyLoadedMode(boolean fullyLoadedMode) {
         this.fullyLoadedMode = fullyLoadedMode;
+    }
+    public boolean getDifferenceMode(){
+        return this.differenceMode;
     }
 }
