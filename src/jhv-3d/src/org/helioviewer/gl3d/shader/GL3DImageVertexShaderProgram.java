@@ -2,7 +2,6 @@ package org.helioviewer.gl3d.shader;
 
 import javax.media.opengl.GL;
 
-import org.helioviewer.viewmodel.view.opengl.GLTextureHelper;
 import org.helioviewer.viewmodel.view.opengl.shader.GLShaderBuilder;
 import org.helioviewer.viewmodel.view.opengl.shader.GLShaderBuilder.GLBuildShaderException;
 import org.helioviewer.viewmodel.view.opengl.shader.GLVertexShaderProgram;
@@ -12,26 +11,30 @@ public class GL3DImageVertexShaderProgram extends GLVertexShaderProgram {
     private double phi;
     private double xxTextureScale;
     private double yyTextureScale;
+    private double differenceXTextureScale;
+    private double differenceYTextureScale;
+    private double differenceXOffset;
+    private double differenceYOffset;
+    private double differenceTheta;
+    private double differencePhi;
 
     /**
      * {@inheritDoc}
      */
     @Override
     public final void bind(GL gl) {
-        GLTextureHelper th = new GLTextureHelper();
         bind(gl, shaderID, xOffset, yOffset, xScale, yScale, xxTextureScale, yyTextureScale, defaultXOffset, defaultYOffset, theta, phi);
     }
 
-    private static void bind(GL gl, int shader, double xOffset, double yOffset, double xScale, double yScale, double xTextureScale, double yTextureScale, double defaultXOffset, double defaultYOffset, double theta, double phi) {
+    private void bind(GL gl, int shader, double xOffset, double yOffset, double xScale, double yScale, double xTextureScale, double yTextureScale, double defaultXOffset, double defaultYOffset, double theta, double phi) {
         if (shader != shaderCurrentlyUsed) {
             shaderCurrentlyUsed = shader;
-            // Log.debug("GLVertexShaderProgram.bind shader="+shader);
-            // gl.glActiveTexture(GL.GL_TEXTURE0);
-            // gl.glBindTexture(GL.GL_TEXTURE_2D, 1);
             gl.glBindProgramARB(target, shader);
             gl.glProgramLocalParameter4dARB(target, 0, xOffset, yOffset, xScale, yScale);
             gl.glProgramLocalParameter4dARB(target, 1, xTextureScale, yTextureScale, theta, phi);
             gl.glProgramLocalParameter4dARB(target, 2, defaultXOffset, defaultYOffset, 0, 0);
+            gl.glProgramLocalParameter4dARB(target, 3, differenceXOffset, differenceYOffset, 0, 0);
+            gl.glProgramLocalParameter4dARB(target, 2, differenceXTextureScale, differenceYTextureScale, differenceTheta, differencePhi);
 
         }
     }
@@ -88,8 +91,6 @@ public class GL3DImageVertexShaderProgram extends GLVertexShaderProgram {
 
             program += "\toutput.x *= rect.z;" + GLShaderBuilder.LINE_SEP;
             program += "\toutput.y *= rect.w;" + GLShaderBuilder.LINE_SEP;
-            // program += "\toutput.y = 1.-output.y;" +
-            // GLShaderBuilder.LINE_SEP;
 
             program += "\toutput.x *= textureScaleThetaPhi.x;" + GLShaderBuilder.LINE_SEP;
             program += "\toutput.y *= textureScaleThetaPhi.y;" + GLShaderBuilder.LINE_SEP;
@@ -133,5 +134,18 @@ public class GL3DImageVertexShaderProgram extends GLVertexShaderProgram {
     public void changeTextureScale(double scaleX, double scaleY) {
         this.xxTextureScale = scaleX;
         this.yyTextureScale = scaleY;
+    }
+
+    public void setDifferenceOffset(double x, double y) {
+        this.differenceXOffset = x;
+        this.differenceYOffset = y;
+    }
+    public void changeDifferenceTextureScale(double scaleX, double scaleY) {
+        this.differenceXTextureScale = scaleX;
+        this.differenceYTextureScale = scaleY;
+    }
+    public void changeDifferenceAngles(double theta, double phi) {
+        this.differenceTheta = theta;
+        this.differencePhi = phi;
     }
 }
