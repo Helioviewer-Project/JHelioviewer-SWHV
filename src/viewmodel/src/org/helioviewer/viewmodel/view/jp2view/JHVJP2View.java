@@ -627,7 +627,7 @@ public class JHVJP2View extends AbstractView implements JP2View, ViewportView, R
             if (imageData == null) {
                 return false;
             }
-            setSubimageData(null, null, 0, 1., false);
+            setSubimageData(null, null, 0, 1.);
             return true;
         }
         imageViewParams = newParams;
@@ -678,7 +678,7 @@ public class JHVJP2View extends AbstractView implements JP2View, ViewportView, R
      *            Composition Layer rendered, to update meta data
      *            {@link org.helioviewer.viewmodel.region.Region}
      */
-    void setSubimageData(ImageData newImageData, SubImage roi, int compositionLayer, double zoompercent, boolean differenceMode) {
+    void setSubimageData(ImageData newImageData, SubImage roi, int compositionLayer, double zoompercent) {
         if(this.imageData!=null && compositionLayer == this.imageData.getFrameNumber()+1)
             this.previousImageData = this.imageData;
         this.imageData = newImageData;
