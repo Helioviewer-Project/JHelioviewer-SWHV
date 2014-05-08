@@ -27,9 +27,9 @@ import org.helioviewer.viewmodel.view.jp2view.datetime.ImmutableDateTime;
  * the image layer. The orientation vector should give the image plane normal
  * and the coordinate system should define in which coordinate system this
  * normal is defined in.
- * 
+ *
  * @author Simon Spoerri (simon.spoerri@fhnw.ch)
- * 
+ *
  */
 public class GL3DCoordinateSystemView extends AbstractGL3DView implements GL3DView {
     private CoordinateSystem coordinateSystem;
@@ -38,10 +38,12 @@ public class GL3DCoordinateSystemView extends AbstractGL3DView implements GL3DVi
 
     private CoordinateVector orientation;
 
+    @Override
     public void render3D(GL3DState state) {
         metaDataView = getAdapter(MetaDataView.class);
         MetaData metaData = metaDataView.getMetaData();
         initialiseCoordinateSystem(metaData);
+        System.out.println("COORDINATESYSTEM CHANGED");
         GL gl = state.gl;
 
         this.renderChild(gl);
@@ -51,6 +53,7 @@ public class GL3DCoordinateSystemView extends AbstractGL3DView implements GL3DVi
         return this.coordinateSystem;
     }
 
+    @Override
     protected void setViewSpecificImplementation(View newView, ChangeEvent changeEvent) {
         if (this.metaDataView == null) {
             metaDataView = getAdapter(MetaDataView.class);
@@ -133,7 +136,7 @@ public class GL3DCoordinateSystemView extends AbstractGL3DView implements GL3DVi
             this.orientation = getDefaultOrientation(datetime);
         }
         /*
-         * 
+         *
          * if(metaData instanceof HelioviewerPositionedMetaData) {
          * HelioviewerPositionedMetaData hpmd = ((HelioviewerPositionedMetaData)
          * metaData); if(hpmd.isStonyhurstProvided()) { Calendar c = new
@@ -173,9 +176,9 @@ public class GL3DCoordinateSystemView extends AbstractGL3DView implements GL3DVi
          * this.orientation = getDefaultOrientation(); // Log.warn(
          * "GL3DCoordinateSystemView: No usable coordinates given for orientation"
          * ); }
-         * 
+         *
          * metaDataView.addViewListener(new ViewListener() {
-         * 
+         *
          * public void viewChanged(View sender, ChangeEvent aEvent) {
          * coordinateSystem.fireCoordinateSystemChanged(); } }); } else
          * if(metaData instanceof HelioviewerMetaData) { HelioviewerMetaData hmd
@@ -187,7 +190,7 @@ public class GL3DCoordinateSystemView extends AbstractGL3DView implements GL3DVi
          * Astronomy.getB0InRadians(c); // this.orientation =
          * this.coordinateSystem.createCoordinateVector(longitude, latitude,
          * radius);
-         * 
+         *
          * // //Default CoordinateSystem this.coordinateSystem = new
          * HEEQCoordinateSystem(b0); // //DefaultOrientation this.orientation =
          * this.coordinateSystem.createCoordinateVector(1, 0, 0); Log.debug(

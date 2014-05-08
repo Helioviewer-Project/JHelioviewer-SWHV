@@ -1,7 +1,6 @@
 package org.helioviewer.gl3d.model;
 
 import org.helioviewer.gl3d.scenegraph.GL3DGroup;
-import org.helioviewer.gl3d.scenegraph.GL3DModel;
 import org.helioviewer.gl3d.scenegraph.GL3DState;
 import org.helioviewer.gl3d.scenegraph.math.GL3DVec4d;
 import org.helioviewer.gl3d.scenegraph.math.GL3DVec4f;
@@ -10,9 +9,9 @@ import org.helioviewer.gl3d.scenegraph.visuals.GL3DGrid;
 /**
  * Grouping Object for all artificial objects, that is visual assistance objects
  * that do not represent any real data.
- * 
+ *
  * @author Simon Spoerri (simon.spoerri@fhnw.ch)
- * 
+ *
  */
 public class GL3DArtificialObjects extends GL3DGroup {
 
@@ -21,9 +20,9 @@ public class GL3DArtificialObjects extends GL3DGroup {
         // GL3DGroup indicatorArrows = new GL3DModel("Arrows",
         // "Arrows indicating the viewspace axes");
         // this.addNode(indicatorArrows);
-        // GL3DGrid grid = new GL3DGrid("grid", 20, 20, new
-        // GL3DVec4f(1.0f,0.0f,0.0f,1.0f), new GL3DVec4d(0.0,1.0,0.0,1.0));
-        // this.addNode(grid);
+        GL3DGrid grid = new GL3DGrid("grid", 20, 20, new
+        GL3DVec4f(1.0f,0.0f,0.0f,1.0f), new GL3DVec4d(0.0,1.0,0.0,1.0));
+        this.addNode(grid);
         // GL3DSphere blackSphere = new GL3DSphere(0.990*Constants.SunRadius,
         // 20,20, new GL3DVec4f(0.0f, 0.0f, 0.0f, 1.0f) );
         // this.addNode(blackSphere);
@@ -41,6 +40,7 @@ public class GL3DArtificialObjects extends GL3DGroup {
          */
     }
 
+    @Override
     public void shapeDraw(GL3DState state) {
         // state.gl.glDisable(GL.GL_LIGHTING);
         // state.gl.glEnable(GL.GL_BLEND);

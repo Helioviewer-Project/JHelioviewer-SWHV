@@ -1,8 +1,6 @@
 package org.helioviewer.gl3d.camera;
 
-import java.util.Calendar;
 import java.util.Date;
-import java.util.GregorianCalendar;
 
 import org.helioviewer.base.logging.Log;
 import org.helioviewer.base.physics.Constants;
@@ -16,7 +14,6 @@ import org.helioviewer.gl3d.wcs.CoordinateVector;
 import org.helioviewer.gl3d.wcs.conversion.SolarSphereToStonyhurstHeliographicConversion;
 import org.helioviewer.gl3d.wcs.impl.SolarSphereCoordinateSystem;
 import org.helioviewer.gl3d.wcs.impl.StonyhurstHeliographicCoordinateSystem;
-import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.viewmodel.changeevent.ChangeEvent;
 import org.helioviewer.viewmodel.changeevent.TimestampChangedReason;
 import org.helioviewer.viewmodel.view.LinkedMovieManager;
@@ -30,9 +27,9 @@ import org.helioviewer.viewmodel.view.jp2view.datetime.ImmutableDateTime;
  * {@link GL3DTrackballCamera} by automatically rotating the camera around the
  * Y-Axis (pointing to solar north) by an amount calculated through
  * {@link DifferentialRotation}.
- * 
+ *
  * @author Simon Spoerri (simon.spoerri@fhnw.ch)
- * 
+ *
  */
 public class GL3DTrackballCamera extends GL3DSolarRotationTrackingTrackballCamera implements ViewListener {
 
@@ -41,27 +38,32 @@ public class GL3DTrackballCamera extends GL3DSolarRotationTrackingTrackballCamer
     private Date currentDate = null;
     private double currentRotation = 0.0;
 
-    private StonyhurstHeliographicCoordinateSystem stonyhurstCoordinateSystem = new StonyhurstHeliographicCoordinateSystem();
-    private SolarSphereCoordinateSystem solarSphereCoordinateSystem = new SolarSphereCoordinateSystem();
-    private SolarSphereToStonyhurstHeliographicConversion stonyhurstConversion = (SolarSphereToStonyhurstHeliographicConversion) solarSphereCoordinateSystem.getConversion(stonyhurstCoordinateSystem);
+    private final StonyhurstHeliographicCoordinateSystem stonyhurstCoordinateSystem = new StonyhurstHeliographicCoordinateSystem();
+    private final SolarSphereCoordinateSystem solarSphereCoordinateSystem = new SolarSphereCoordinateSystem();
+    private final SolarSphereToStonyhurstHeliographicConversion stonyhurstConversion = (SolarSphereToStonyhurstHeliographicConversion) solarSphereCoordinateSystem.getConversion(stonyhurstCoordinateSystem);
+
 
     public GL3DTrackballCamera(GL3DSceneGraphView sceneGraphView) {
         super(sceneGraphView);
     }
 
+    @Override
     public void activate(GL3DCamera precedingCamera) {
         super.activate(precedingCamera);
         sceneGraphView.addViewListener(this);
     }
 
+    @Override
     public void deactivate() {
         sceneGraphView.removeViewListener(this);
     };
 
+    @Override
     public String getName() {
         return "Solar Rotation Tracking Camera";
     }
 
+    @Override
     public void viewChanged(View sender, ChangeEvent aEvent) {
         TimestampChangedReason timestampReason = aEvent.getLastChangedReasonByType(TimestampChangedReason.class);
         if ((timestampReason != null) && (timestampReason.getView() instanceof TimedMovieView) && LinkedMovieManager.getActiveInstance().isMaster((TimedMovieView) timestampReason.getView())) {
@@ -69,11 +71,11 @@ public class GL3DTrackballCamera extends GL3DSolarRotationTrackingTrackballCamer
             if (startPosition != null) {
                 long timediff = (currentDate.getTime()) / 1000 - Constants.referenceDate;
 
-                double rotation = -DifferentialRotation.calculateRotationInRadians(0., timediff) % (Math.PI * 2.0);
+                setDifferentialRotation(-DifferentialRotation.calculateRotationInRadians(0., timediff) % (Math.PI * 2.0));
 
-                this.getRotation().rotate(GL3DQuatd.createRotation(currentRotation - rotation, new GL3DVec3d(0, 1, 0)));
+                this.getRotation().rotate(GL3DQuatd.createRotation(currentRotation - getDifferentialRotation(), new GL3DVec3d(0, 1, 0)));
                 this.updateCameraTransformation();
-                this.currentRotation = rotation;
+                this.currentRotation = getDifferentialRotation();
             } else {
                 currentRotation = 0.0;
                 resetStartPosition();
