@@ -91,16 +91,14 @@ public class JHVJP2View extends AbstractView implements JP2View, ViewportView, R
     protected J2KRender render;
     final ReasonSignal<RenderReasons> renderRequestedSignal = new ReasonSignal<RenderReasons>();
 
-    private SubImage roi;
-
     // Renderer-ThreadGroup - This group is necessary to identify all renderer
     // threads
     public static final ThreadGroup renderGroup = new ThreadGroup("J2KRenderGroup");
     protected Region displayedRegion;
 
-    private double scaleX;
+    private int displayedLayer;
 
-    private double scaleY;
+    private ImageData previousImageData;
 
     /**
      * Default constructor.
@@ -681,15 +679,17 @@ public class JHVJP2View extends AbstractView implements JP2View, ViewportView, R
      *            {@link org.helioviewer.viewmodel.region.Region}
      */
     void setSubimageData(ImageData newImageData, SubImage roi, int compositionLayer, double zoompercent) {
-        imageData = newImageData;
+        if(this.imageData!=null && compositionLayer == this.imageData.getFrameNumber()+1)
+            this.previousImageData = this.imageData;
+        this.imageData = newImageData;
+        this.imageData.setFrameNumber(compositionLayer);
         HelioviewerMetaData hvmd = (HelioviewerMetaData) metaData;
-        this.roi = roi;
 
-        this.displayedRegion = hvmd.roiToRegion(this.roi, zoompercent);
-        this.setScaleX(hvmd.getScaleX(this.roi));
-        System.out.println("SCALEXX" + this.scaleX);
-        this.setScaleY(hvmd.getScaleY(this.roi));
-        System.out.println("SCALEYY" + this.scaleY);
+        this.displayedRegion = hvmd.roiToRegion(roi, zoompercent);
+        this.imageData.setScaleX(hvmd.getScaleX(roi));
+        System.out.println("SCALEXX" + this.imageData.getScaleX());
+        this.imageData.setScaleY(hvmd.getScaleY(roi));
+        System.out.println("SCALEYY" + this.imageData.getScaleY());
         Region lastRegionSaved = lastRegion;
         subImageBuffer.setLastRegion(roi);
         event.addReason(new SubImageDataChangedReason(this));
@@ -824,19 +824,11 @@ public class JHVJP2View extends AbstractView implements JP2View, ViewportView, R
         return metaData;
     }
 
-    public double getScaleX() {
-        return scaleX;
+    public ImageData getImageData() {
+        return this.imageData;
     }
 
-    public void setScaleX(double scaleX) {
-        this.scaleX = scaleX;
-    }
-
-    public double getScaleY() {
-        return scaleY;
-    }
-
-    public void setScaleY(double scaleY) {
-        this.scaleY = scaleY;
+    public ImageData getPreviousImageData() {
+        return this.previousImageData;
     }
 }

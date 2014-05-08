@@ -120,16 +120,17 @@ public class GL3DImageTextureView extends AbstractGL3DView implements GL3DView, 
             phi = DifferentialRotation.calculateRotationInRadians(0.0, deltat) % (Math.PI * 2.0);
 
             this.vertexShader.changeRect(xOffset, yOffset, xScale, yScale);
-            this.vertexShader.changeTextureScale(jhvjpx.getScaleX(), jhvjpx.getScaleY());
+            this.vertexShader.changeTextureScale(jhvjpx.getImageData().getScaleX(), jhvjpx.getImageData().getScaleY());
             this.vertexShader.changeAngles(theta, phi);
             // System.out.println("XTEXSCALE" + this.textureScale.getX());
             // System.out.println("YTEXSCALE" + this.textureScale.getY());
             /*
              * System.out.println("CHANGE SHADER VARS" + theta + " " +phi);
              * System.out.println("CHANGE SHADER VARS" + region);
-             * System.out.println("CHANGE SHADER VARS" + this.textureScale);
              */
-            this.fragmentShader.changeTextureScale(jhvjpx.getScaleX(), jhvjpx.getScaleY());
+            System.out.println("CHANGE SHADER VARS" + jhvjpx.getImageData().getFrameNumber());
+
+            this.fragmentShader.changeTextureScale(jhvjpx.getImageData().getScaleX(), jhvjpx.getImageData().getScaleY());
             this.fragmentShader.changeAngles(theta, phi);
         }
 
