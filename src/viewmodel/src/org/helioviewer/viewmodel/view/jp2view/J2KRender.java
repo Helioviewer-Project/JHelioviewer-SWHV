@@ -418,7 +418,7 @@ class J2KRender implements Runnable {
                         SubImage roi = currParams.subImage;
                         System.out.println("ROITTHAT " + roi);
                         // System.out.println("TTRESOLUTION" + resolution);
-                        parentViewRef.setSubimageData(imdata, currParams.subImage, curLayer, currParams.resolution.getZoomPercent(), differenceMode);
+                        parentViewRef.setSubimageData(imdata, currParams.subImage, curLayer, currParams.resolution.getZoomPercent());
 
                     } else {
                         Log.warn("J2KRender: Params out of sync, skip frame");
@@ -426,7 +426,7 @@ class J2KRender implements Runnable {
 
                 } else {
                     if (currParams.subImage.getNumPixels() == intBuffer[currentIntBuffer].length) {
-                        parentViewRef.setSubimageData(new ARGBInt32ImageData(width, height, intBuffer[currentIntBuffer], new ColorMask()), currParams.subImage, curLayer, currParams.resolution.getZoomPercent(), differenceMode);
+                        parentViewRef.setSubimageData(new ARGBInt32ImageData(width, height, intBuffer[currentIntBuffer], new ColorMask()), currParams.subImage, curLayer, currParams.resolution.getZoomPercent());
                     } else {
                         Log.warn("J2KRender: Params out of sync, skip frame");
                     }

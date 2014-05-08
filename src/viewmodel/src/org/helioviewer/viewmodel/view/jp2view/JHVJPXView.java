@@ -55,6 +55,7 @@ public class JHVJPXView extends JHVJP2View implements TimedMovieView, CachedMovi
      * Linking movies, if the movie is not linked, this has to be null
      */
     protected LinkedMovieManager linkedMovieManager;
+    private boolean fullyLoadedMode;
 
     /**
      * Default constructor.
@@ -417,24 +418,24 @@ public class JHVJPXView extends JHVJP2View implements TimedMovieView, CachedMovi
      * {@inheritDoc}
      */
     @Override
-    void setSubimageData(ImageData newImageData, SubImage roi, int compositionLayer, double zoompercent, boolean differenceMode) {
-        if(!differenceMode ||(differenceMode && this.imageCacheStatus.getImageStatus(compositionLayer) == CacheStatus.COMPLETE)){
+    void setSubimageData(ImageData newImageData, SubImage roi, int compositionLayer, double zoompercent) {
+        if(!fullyLoadedMode ||(fullyLoadedMode && this.imageCacheStatus.getImageStatus(compositionLayer) == CacheStatus.COMPLETE)){
             if (blockingMode) {
                 synchronized (Displayer.displaylock) {
-                    setSubimageDataHelper(newImageData, roi, compositionLayer, zoompercent,  differenceMode);
+                    setSubimageDataHelper(newImageData, roi, compositionLayer, zoompercent);
                 }
             }
             else{
-                setSubimageDataHelper(newImageData, roi, compositionLayer, zoompercent, differenceMode);
+                setSubimageDataHelper(newImageData, roi, compositionLayer, zoompercent);
             }
         }
-        else if(differenceMode && this.imageCacheStatus.getImageStatus(compositionLayer) == CacheStatus.COMPLETE){
+        else if(fullyLoadedMode && this.imageCacheStatus.getImageStatus(compositionLayer) == CacheStatus.COMPLETE){
             this.readerSignal.signal();
             Displayer.getSingletonInstance().render();
         }
     }
 
-    private void setSubimageDataHelper(ImageData newImageData, SubImage roi, int compositionLayer, double zoompercent, boolean differenceMode) {
+    private void setSubimageDataHelper(ImageData newImageData, SubImage roi, int compositionLayer, double zoompercent) {
         lastRenderedCompositionLayer = compositionLayer;
 
         if (metaData instanceof ObserverMetaData) {
@@ -442,7 +443,7 @@ public class JHVJPXView extends JHVJP2View implements TimedMovieView, CachedMovi
             observerMetaData.updateDateTime(dateTimeCache.getDateTime(compositionLayer));
             event.addReason(new TimestampChangedReason(this, observerMetaData.getDateTime()));
         }
-        super.setSubimageData(newImageData, roi, compositionLayer, zoompercent, differenceMode);
+        super.setSubimageData(newImageData, roi, compositionLayer, zoompercent);
     }
 
     @Override
@@ -547,5 +548,8 @@ public class JHVJPXView extends JHVJP2View implements TimedMovieView, CachedMovi
 
     public void setDifferenceMode(boolean differenceMode) {
         this.render.setDifferenceMode(differenceMode);
+    }
+    public void setFullyLoadedMode(boolean fullyLoadedMode) {
+        this.fullyLoadedMode = fullyLoadedMode;
     }
 }
