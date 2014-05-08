@@ -30,7 +30,7 @@ import org.helioviewer.viewmodel.viewportimagesize.ViewportImageSize;
 /**
  * Abstract base class implementing LayeredView, providing some common
  * functions.
- * 
+ *
  * <p>
  * This class provides most of the functionality of a LayeredView, since most of
  * its behavior is independent from the render mode. Because of that, the whole
@@ -39,10 +39,10 @@ import org.helioviewer.viewmodel.viewportimagesize.ViewportImageSize;
  * To improve performance, many intermediate results are cached.
  * <p>
  * For further informations about how to use layers, see {@link LayeredView}.
- * 
+ *
  * @author Ludwig Schmidt
  * @author Markus Langenberg
- * 
+ *
  */
 public abstract class AbstractLayeredView extends AbstractView implements LayeredView, RegionView, ViewportView, MetaDataView, ViewListener {
 
@@ -65,11 +65,11 @@ public abstract class AbstractLayeredView extends AbstractView implements Layere
 
     /**
      * Buffer for precomputed values for each layer.
-     * 
+     *
      * <p>
      * This container saves some values per layer, such as its visibility and
      * precomputed view adapters.
-     * 
+     *
      */
     public class Layer {
         public View view;
@@ -83,9 +83,9 @@ public abstract class AbstractLayeredView extends AbstractView implements Layere
 
         /**
          * Default constructor.
-         * 
+         *
          * Computes view adapters for this layer.
-         * 
+         *
          * @param base
          *            layer to save
          */
@@ -109,6 +109,7 @@ public abstract class AbstractLayeredView extends AbstractView implements Layere
     /**
      * {@inheritDoc}
      */
+    @Override
     public boolean isVisible(View _view) {
         if (viewLookup.get(_view) != null)
             return viewLookup.get(_view).visibility;
@@ -119,6 +120,7 @@ public abstract class AbstractLayeredView extends AbstractView implements Layere
     /**
      * {@inheritDoc}
      */
+    @Override
     public int getNumberOfVisibleLayer() {
         int result = 0;
         layerLock.lock();
@@ -138,6 +140,7 @@ public abstract class AbstractLayeredView extends AbstractView implements Layere
     /**
      * {@inheritDoc}
      */
+    @Override
     public void toggleVisibility(View view) {
         LinkedMovieManager.getActiveInstance().pauseLinkedMovies();
 
@@ -148,11 +151,13 @@ public abstract class AbstractLayeredView extends AbstractView implements Layere
 
             redrawBuffer(new ChangeEvent(new LayerChangedReason(this, LayerChangeType.LAYER_VISIBILITY, view)));
         }
+        Displayer.getSingletonInstance().display();
     }
 
     /**
      * {@inheritDoc}
      */
+    @Override
     public void addLayer(View newLayer) {
         addLayer(newLayer, layers.size());
     }
@@ -160,6 +165,7 @@ public abstract class AbstractLayeredView extends AbstractView implements Layere
     /**
      * {@inheritDoc}
      */
+    @Override
     public void addLayer(View newLayer, int newIndex) {
         if (newLayer == null) {
             return;
@@ -197,6 +203,7 @@ public abstract class AbstractLayeredView extends AbstractView implements Layere
     /**
      * {@inheritDoc}
      */
+    @Override
     public View getLayer(int index) {
         if (index < layers.size())
             return layers.get(index);
@@ -206,6 +213,7 @@ public abstract class AbstractLayeredView extends AbstractView implements Layere
     /**
      * {@inheritDoc}
      */
+    @Override
     public int getNumLayers() {
         return layers.size();
     }
@@ -213,6 +221,7 @@ public abstract class AbstractLayeredView extends AbstractView implements Layere
     /**
      * {@inheritDoc}
      */
+    @Override
     public int getLayerLevel(View view) {
         return layers.indexOf(view);
     }
@@ -220,6 +229,7 @@ public abstract class AbstractLayeredView extends AbstractView implements Layere
     /**
      * {@inheritDoc}
      */
+    @Override
     public void removeLayer(View view) {
 
         if (view == null) {
@@ -274,6 +284,7 @@ public abstract class AbstractLayeredView extends AbstractView implements Layere
     /**
      * {@inheritDoc}
      */
+    @Override
     public void removeLayer(int index) {
         removeLayer(layers.get(index));
     }
@@ -281,6 +292,7 @@ public abstract class AbstractLayeredView extends AbstractView implements Layere
     /**
      * {@inheritDoc}
      */
+    @Override
     public void removeAllLayers() {
 
         ChangeEvent event = new ChangeEvent();
@@ -308,6 +320,7 @@ public abstract class AbstractLayeredView extends AbstractView implements Layere
     /**
      * {@inheritDoc}
      */
+    @Override
     @SuppressWarnings(value = { "unchecked" })
     public <T extends View> T getAdapter(Class<T> c) {
         if (c.isInstance(this)) {
@@ -320,6 +333,7 @@ public abstract class AbstractLayeredView extends AbstractView implements Layere
     /**
      * {@inheritDoc}
      */
+    @Override
     public Region getRegion() {
         return region;
     }
@@ -327,6 +341,7 @@ public abstract class AbstractLayeredView extends AbstractView implements Layere
     /**
      * {@inheritDoc}
      */
+    @Override
     public boolean setRegion(Region r, ChangeEvent event) {
 
         if (event == null) {
@@ -360,6 +375,7 @@ public abstract class AbstractLayeredView extends AbstractView implements Layere
     /**
      * {@inheritDoc}
      */
+    @Override
     public Viewport getViewport() {
         return viewport;
     }
@@ -367,6 +383,7 @@ public abstract class AbstractLayeredView extends AbstractView implements Layere
     /**
      * {@inheritDoc}
      */
+    @Override
     public boolean setViewport(Viewport v, ChangeEvent event) {
 
         // check if viewport has changed
@@ -385,18 +402,19 @@ public abstract class AbstractLayeredView extends AbstractView implements Layere
     /**
      * {@inheritDoc}
      */
+    @Override
     public MetaData getMetaData() {
         return metaData;
     }
 
     /**
      * Recalculates the regions and viewports of all layers.
-     * 
+     *
      * <p>
      * Sets the regions and viewports of all layers according to the region and
      * viewport of the LayeredView. Also, calculates the offset of the layers to
      * each other.
-     * 
+     *
      * @param event
      *            ChangeEvent to collect history of all following changes
      * @return true, if at least one region or viewport changed
@@ -407,12 +425,12 @@ public abstract class AbstractLayeredView extends AbstractView implements Layere
 
     /**
      * Recalculates the regions and viewports of all layers.
-     * 
+     *
      * <p>
      * Sets the regions and viewports of all layers according to the region and
      * viewport of the LayeredView. Also, calculates the offset of the layers to
      * each other.
-     * 
+     *
      * @param event
      *            ChangeEvent to collect history of all following changes
      * @return true, if at least one region or viewport changed
@@ -456,6 +474,7 @@ public abstract class AbstractLayeredView extends AbstractView implements Layere
     /**
      * {@inheritDoc}
      */
+    @Override
     public void viewChanged(View sender, ChangeEvent aEvent) {
         if (aEvent.reasonOccurred(ViewChainChangedReason.class)) {
             for (Layer layer : viewLookup.values()) {
@@ -476,7 +495,7 @@ public abstract class AbstractLayeredView extends AbstractView implements Layere
 
     /**
      * Recalculates the meta data of the LayeredView.
-     * 
+     *
      * The region of the LayeredView is set to the bounding box of all layers.
      */
     protected void recalculateMetaData() {
@@ -485,7 +504,7 @@ public abstract class AbstractLayeredView extends AbstractView implements Layere
 
     /**
      * Recalculates the meta data of the LayeredView.
-     * 
+     *
      * The region of the LayeredView is set to the bounding box of all layers.
      */
     protected void recalculateMetaData(boolean includePixelBasedImages) {
@@ -526,10 +545,10 @@ public abstract class AbstractLayeredView extends AbstractView implements Layere
 
     /**
      * Redraws the scene.
-     * 
+     *
      * Calls the implementation specific function redrawBufferImpl(). A
      * SubImageDataChangedReason will be appended to the given ChangeEvent.
-     * 
+     *
      * @param aEvent
      *            ChangeEvent to collect history
      */
@@ -547,7 +566,7 @@ public abstract class AbstractLayeredView extends AbstractView implements Layere
 
     /**
      * Implementation specific part of redrawing the scene.
-     * 
+     *
      * Will be called from redrawBuffer.
      */
     protected abstract void redrawBufferImpl();
@@ -555,6 +574,7 @@ public abstract class AbstractLayeredView extends AbstractView implements Layere
     /**
      * {@inheritDoc}
      */
+    @Override
     public void moveView(View view, int newLevel) {
         ChangeEvent changeEvent = new ChangeEvent(new LayerChangedReason(this, LayerChangeType.LAYER_MOVED, view, newLevel));
         layerLock.lock();
