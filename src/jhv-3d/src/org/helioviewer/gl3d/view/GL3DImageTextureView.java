@@ -16,11 +16,9 @@ import org.helioviewer.viewmodel.changeevent.ChangeEvent;
 import org.helioviewer.viewmodel.changeevent.RegionChangedReason;
 import org.helioviewer.viewmodel.changeevent.RegionUpdatedReason;
 import org.helioviewer.viewmodel.changeevent.SubImageDataChangedReason;
-import org.helioviewer.viewmodel.metadata.HelioviewerMetaData;
 import org.helioviewer.viewmodel.metadata.MetaData;
 import org.helioviewer.viewmodel.region.Region;
 import org.helioviewer.viewmodel.region.StaticRegion;
-import org.helioviewer.viewmodel.view.MetaDataView;
 import org.helioviewer.viewmodel.view.View;
 import org.helioviewer.viewmodel.view.ViewListener;
 import org.helioviewer.viewmodel.view.ViewportView;
@@ -92,7 +90,7 @@ public class GL3DImageTextureView extends AbstractGL3DView implements GL3DView, 
 
     private Region copyScreenToTexture(GL3DState state, GLTextureHelper th) {
         JHVJPXView jhvjpx = getAdapter(JHVJPXView.class);
-        Region region = jhvjpx.getDisplayedRegion();
+        Region region = jhvjpx.getImageData().getRegion();
         Viewport viewport = getAdapter(ViewportView.class).getViewport();
 
         if (viewport == null || region == null) {
@@ -108,26 +106,28 @@ public class GL3DImageTextureView extends AbstractGL3DView implements GL3DView, 
             double yOffset = (region.getLowerLeftCorner().getY());
             xScale = (1. / region.getWidth());
             yScale = (1. / region.getHeight());
-            // System.out.println("RECT " + xOffset + " " +yOffset + " "
-            // +1/xScale +" " +1/yScale );
-            // System.out.println("REGIONRECT " + region );
-            // System.out.println("METADATARECT " +
-            // metadata.getPhysicalRectangle() );
 
-            HelioviewerMetaData metadata = (HelioviewerMetaData) getAdapter(MetaDataView.class).getMetaData();
-            double deltat = metadata.getDateTime().getMillis() / 1000.0 - Constants.referenceDate;
+            double deltat = jhvjpx.getImageData().getDateMillis() / 1000.0 - Constants.referenceDate;
             double theta = 0.0;
             phi = DifferentialRotation.calculateRotationInRadians(0.0, deltat) % (Math.PI * 2.0);
-
             this.vertexShader.changeRect(xOffset, yOffset, xScale, yScale);
             this.vertexShader.changeTextureScale(jhvjpx.getImageData().getScaleX(), jhvjpx.getImageData().getScaleY());
             this.vertexShader.changeAngles(theta, phi);
-            // System.out.println("XTEXSCALE" + this.textureScale.getX());
-            // System.out.println("YTEXSCALE" + this.textureScale.getY());
-            /*
-             * System.out.println("CHANGE SHADER VARS" + theta + " " +phi);
-             * System.out.println("CHANGE SHADER VARS" + region);
-             */
+
+            if(jhvjpx.getDifferenceMode()){
+                Region differenceRegion = jhvjpx.getPreviousImageData().getRegion();
+                double differenceXOffset = (differenceRegion.getLowerLeftCorner().getX());
+                double differenceYOffset = (differenceRegion.getLowerLeftCorner().getY());
+
+                double differenceDeltat = jhvjpx.getImageData().getDateMillis() / 1000.0 - Constants.referenceDate;
+                double differenceTheta = 0.0;
+                double differencePhi = DifferentialRotation.calculateRotationInRadians(0.0, differenceDeltat) % (Math.PI * 2.0);
+
+                this.vertexShader.changeDifferenceTextureScale(jhvjpx.getPreviousImageData().getScaleX(), jhvjpx.getPreviousImageData().getScaleY());
+                this.vertexShader.setDifferenceOffset(differenceXOffset, differenceYOffset);
+                this.vertexShader.changeDifferenceAngles(differenceTheta, differencePhi);
+            }
+
             System.out.println("CHANGE SHADER VARS" + jhvjpx.getImageData().getFrameNumber());
 
             this.fragmentShader.changeTextureScale(jhvjpx.getImageData().getScaleX(), jhvjpx.getImageData().getScaleY());
