@@ -2,12 +2,16 @@ package org.helioviewer.viewmodel.imagedata;
 
 import java.awt.image.BufferedImage;
 
+import javax.swing.plaf.synth.Region;
+
+import org.helioviewer.viewmodel.view.jp2view.image.SubImage;
+
 /**
  * Abstract ImageData object to provide some common functionalities.
- * 
+ *
  * The object manages all format-independent informations, such as the image
  * dimensions and the color mask.
- * 
+ *
  * @author Markus Langenberg
  */
 public abstract class AbstractImageData implements JavaBufferedImageData {
@@ -16,10 +20,16 @@ public abstract class AbstractImageData implements JavaBufferedImageData {
     protected BufferedImage image = null;
     protected ColorMask colorMask;
     private long dateMillis;
+    private Region region;
+    private double scaleY;
+    private double scaleX;
+    private SubImage subImage;
+    private int frameNumber;
+    private double zoomPercent;
 
     /**
      * Default constructor.
-     * 
+     *
      * @param newWidth
      *            width of the image
      * @param newHeight
@@ -35,7 +45,7 @@ public abstract class AbstractImageData implements JavaBufferedImageData {
 
     /**
      * Copy constructor.
-     * 
+     *
      * @param copyFrom
      *            object to copy
      */
@@ -50,6 +60,7 @@ public abstract class AbstractImageData implements JavaBufferedImageData {
     /**
      * {@inheritDoc}
      */
+    @Override
     public int getHeight() {
         return height;
     }
@@ -57,6 +68,7 @@ public abstract class AbstractImageData implements JavaBufferedImageData {
     /**
      * {@inheritDoc}
      */
+    @Override
     public int getWidth() {
         return width;
     }
@@ -64,6 +76,7 @@ public abstract class AbstractImageData implements JavaBufferedImageData {
     /**
      * {@inheritDoc}
      */
+    @Override
     public ColorMask getColorMask() {
         return colorMask;
     }
@@ -71,6 +84,7 @@ public abstract class AbstractImageData implements JavaBufferedImageData {
     /**
      * {@inheritDoc}
      */
+    @Override
     public BufferedImage getBufferedImage() {
         if (image == null) {
             image = createBufferedImageFromImageTransport();
@@ -81,19 +95,81 @@ public abstract class AbstractImageData implements JavaBufferedImageData {
     /**
      * Internal function to create a BufferedImage from the image transport
      * object.
-     * 
+     *
      * This function will be called from {@link #getBufferedImage()} when
      * necessary.
-     * 
+     *
      * @return the created BufferedImage
      */
     protected abstract BufferedImage createBufferedImageFromImageTransport();
 
+    @Override
     public long getDateMillis() {
         return dateMillis;
     }
 
+    @Override
     public void setDateMillis(long dateMillis) {
         this.dateMillis = dateMillis;
+    }
+
+    @Override
+    public void setFrameNumber(int frameNumber) {
+        this.frameNumber = frameNumber;
+    }
+
+    @Override
+    public int getFrameNumber() {
+        return this.frameNumber;
+    }
+
+    @Override
+    public void setZoomPercent(double percent) {
+        this.zoomPercent = percent;
+    }
+
+    @Override
+    public double getZoomPercent() {
+        return this.zoomPercent;
+    }
+
+    @Override
+    public void setSubImage(SubImage subImage) {
+        this.subImage = subImage;
+    }
+
+    @Override
+    public SubImage getSubImage() {
+        return this.subImage;
+    }
+
+    @Override
+    public double getScaleX() {
+        return this.scaleX;
+    }
+
+    @Override
+    public void setScaleX(double scaleX) {
+        this.scaleX = scaleX;
+    }
+
+    @Override
+    public double getScaleY() {
+        return this.scaleY;
+    }
+
+    @Override
+    public void setScaleY(double scaleY) {
+        this.scaleY = scaleY;
+    }
+
+    @Override
+    public Region getRegion() {
+        return this.region;
+    }
+
+    @Override
+    public void setRegion(Region r) {
+        this.region = r;
     }
 }
