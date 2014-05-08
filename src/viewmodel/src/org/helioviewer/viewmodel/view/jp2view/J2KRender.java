@@ -31,7 +31,7 @@ import org.helioviewer.viewmodel.view.jp2view.kakadu.KakaduUtils;
  * The J2KRender class handles all of the decompression, buffering, and
  * filtering of the image data. It essentially just waits for the shared object
  * in the JP2ImageView to signal it.
- * 
+ *
  * @author caplins
  * @author Benjamin Wamsler
  * @author Desmond Amadigwe
@@ -54,13 +54,13 @@ class J2KRender implements Runnable {
     private volatile boolean stop;
 
     /** A reference to the JP2Image this object is owned by. */
-    private JP2Image parentImageRef;
+    private final JP2Image parentImageRef;
 
     /** A reference to the JP2ImageView this object is owned by. */
-    private JHVJP2View parentViewRef;
+    private final JHVJP2View parentViewRef;
 
     /** A reference to the compositor used by this JP2Image. */
-    private Kdu_region_compositor compositorRef;
+    private final Kdu_region_compositor compositorRef;
 
     /** Used in run method to keep track of the current ImageViewParams */
     private JP2ImageParameter currParams = null;
@@ -101,7 +101,7 @@ class J2KRender implements Runnable {
 
     /**
      * Gets whether to reuse the buffer
-     * 
+     *
      * @return the reuseBuffer
      */
     public boolean isReuseBuffer() {
@@ -110,7 +110,7 @@ class J2KRender implements Runnable {
 
     /**
      * Sets whether to reuse the buffer
-     * 
+     *
      * @param reuseBuffer
      *            the reuseBuffer to set
      */
@@ -126,9 +126,11 @@ class J2KRender implements Runnable {
     private NextFrameCandidateChooser nextFrameCandidateChooser = new NextFrameCandidateLoopChooser();
     private FrameChooser frameChooser = new RelativeFrameChooser();
 
+    private boolean differenceMode = false;
+
     /**
      * The constructor.
-     * 
+     *
      * @param _parentViewRef
      */
     J2KRender(JHVJP2View _parentViewRef) {
@@ -295,14 +297,14 @@ class J2KRender implements Runnable {
 
             if (parentImageRef.getNumComponents() < 3) {
                 currentByteBuffer = (currentByteBuffer + 1) % NUM_BUFFERS;
-                if (currParams.subImage.getNumPixels() != byteBuffer[currentByteBuffer].length || (!movieMode && !linkedMovieMode && !J2KRenderGlobalOptions.getDoubleBufferingOption())) {
+                if (differenceMode || currParams.subImage.getNumPixels() != byteBuffer[currentByteBuffer].length || (!movieMode && !linkedMovieMode && !J2KRenderGlobalOptions.getDoubleBufferingOption())) {
                     byteBuffer[currentByteBuffer] = new byte[currParams.subImage.getNumPixels()];
                 } else if (J2KRenderGlobalOptions.getDoubleBufferingOption()) {
                     Arrays.fill(byteBuffer[currentByteBuffer], (byte) 0);
                 }
             } else {
                 currentIntBuffer = (currentIntBuffer + 1) % NUM_BUFFERS;
-                if (currParams.subImage.getNumPixels() != intBuffer[currentIntBuffer].length || (!movieMode && !linkedMovieMode && !J2KRenderGlobalOptions.getDoubleBufferingOption())) {
+                if (differenceMode || currParams.subImage.getNumPixels() != intBuffer[currentIntBuffer].length || (!movieMode && !linkedMovieMode && !J2KRenderGlobalOptions.getDoubleBufferingOption())) {
                     intBuffer[currentIntBuffer] = new int[currParams.subImage.getNumPixels()];
                 } else if (J2KRenderGlobalOptions.getDoubleBufferingOption()) {
                     Arrays.fill(intBuffer[currentIntBuffer], 0);
@@ -360,6 +362,7 @@ class J2KRender implements Runnable {
      * The method that decompresses and renders the image. It pushes it to the
      * ViewObserver.
      */
+    @Override
     public void run() {
         int numFrames = 0;
         lastFrame = -1;
@@ -415,7 +418,7 @@ class J2KRender implements Runnable {
                         SubImage roi = currParams.subImage;
                         System.out.println("ROITTHAT " + roi);
                         // System.out.println("TTRESOLUTION" + resolution);
-                        parentViewRef.setSubimageData(imdata, currParams.subImage, curLayer, currParams.resolution.getZoomPercent());
+                        parentViewRef.setSubimageData(imdata, currParams.subImage, curLayer, currParams.resolution.getZoomPercent(), differenceMode);
 
                     } else {
                         Log.warn("J2KRender: Params out of sync, skip frame");
@@ -423,7 +426,7 @@ class J2KRender implements Runnable {
 
                 } else {
                     if (currParams.subImage.getNumPixels() == intBuffer[currentIntBuffer].length) {
-                        parentViewRef.setSubimageData(new ARGBInt32ImageData(width, height, intBuffer[currentIntBuffer], new ColorMask()), currParams.subImage, curLayer, currParams.resolution.getZoomPercent());
+                        parentViewRef.setSubimageData(new ARGBInt32ImageData(width, height, intBuffer[currentIntBuffer], new ColorMask()), currParams.subImage, curLayer, currParams.resolution.getZoomPercent(), differenceMode);
                     } else {
                         Log.warn("J2KRender: Params out of sync, skip frame");
                     }
@@ -502,6 +505,7 @@ class J2KRender implements Runnable {
 
     private class NextFrameCandidateLoopChooser extends NextFrameCandidateChooser {
 
+        @Override
         public int getNextCandidate(int lastCandidate) {
             if (++lastCandidate > layers.getEnd()) {
                 System.gc();
@@ -514,6 +518,7 @@ class J2KRender implements Runnable {
 
     private class NextFrameCandidateStopChooser extends NextFrameCandidateChooser {
 
+        @Override
         public int getNextCandidate(int lastCandidate) {
             if (++lastCandidate > layers.getEnd()) {
                 movieMode = false;
@@ -528,6 +533,7 @@ class J2KRender implements Runnable {
 
         private int currentDirection = 1;
 
+        @Override
         public int getNextCandidate(int lastCandidate) {
             lastCandidate += currentDirection;
             if (lastCandidate < layers.getStart() && currentDirection == -1) {
@@ -549,6 +555,7 @@ class J2KRender implements Runnable {
     }
 
     private class RelativeFrameChooser implements FrameChooser {
+        @Override
         public long moveToNextFrame() {
             currParams.compositionLayer = nextFrameCandidateChooser.getNextCandidate(currParams.compositionLayer);
             return 1000 / movieSpeed;
@@ -557,7 +564,7 @@ class J2KRender implements Runnable {
 
     private class AbsoluteFrameChooser implements FrameChooser {
 
-        private DateTimeCache dateTimeCache = ((CachedMovieView) parentViewRef).getDateTimeCache();
+        private final DateTimeCache dateTimeCache = ((CachedMovieView) parentViewRef).getDateTimeCache();
 
         private long absoluteStartTime = dateTimeCache.getDateTime(currParams.compositionLayer).getMillis();
         private long systemStartTime = System.currentTimeMillis();
@@ -567,6 +574,7 @@ class J2KRender implements Runnable {
             systemStartTime = System.currentTimeMillis();
         }
 
+        @Override
         public long moveToNextFrame() {
             int lastCandidate, nextCandidate = currParams.compositionLayer;
             long lastDiff, nextDiff = -Long.MAX_VALUE;
@@ -587,5 +595,9 @@ class J2KRender implements Runnable {
                 return nextDiff / movieSpeed;
             }
         }
+    }
+
+    public void setDifferenceMode(boolean differenceMode) {
+        this.differenceMode  = differenceMode;
     }
 }
