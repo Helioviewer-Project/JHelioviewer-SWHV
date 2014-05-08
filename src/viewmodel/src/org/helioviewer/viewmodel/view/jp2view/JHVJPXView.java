@@ -24,20 +24,19 @@ import org.helioviewer.viewmodel.view.jp2view.J2KRender.RenderReasons;
 import org.helioviewer.viewmodel.view.jp2view.datetime.ImmutableDateTime;
 import org.helioviewer.viewmodel.view.jp2view.image.JP2ImageParameter;
 import org.helioviewer.viewmodel.view.jp2view.image.SubImage;
-import org.helioviewer.viewmodel.view.opengl.GLTextureHelper;
 
 /**
  * Implementation of TimedMovieView for JPX files.
- * 
+ *
  * <p>
  * This class is an extensions of {@link JHVJP2View} for JPX-Files, providing
  * additional movie commands.
- * 
+ *
  * <p>
  * For information about image series, see
  * {@link org.helioviewer.viewmodel.view.MovieView} and
  * {@link org.helioviewer.viewmodel.view.TimedMovieView}.
- * 
+ *
  * @author Markus Langenberg
  */
 public class JHVJPXView extends JHVJP2View implements TimedMovieView, CachedMovieView, RenderListener {
@@ -58,14 +57,14 @@ public class JHVJPXView extends JHVJP2View implements TimedMovieView, CachedMovi
 
     /**
      * Default constructor.
-     * 
+     *
      * <p>
      * When the view is not marked as a main view, it is assumed, that the view
      * will only serve one single image and will not have to perform any kind of
      * update any more. The effect of this assumption is, that the view will not
      * try to reconnect to the JPIP server when the connection breaks and that
      * there will be no other timestamps used than the first one.
-     * 
+     *
      * @param isMainView
      *            Whether the view is a main view or not
      */
@@ -88,6 +87,7 @@ public class JHVJPXView extends JHVJP2View implements TimedMovieView, CachedMovi
     /**
      * {@inheritDoc}
      */
+    @Override
     public void setJP2Image(JP2Image newJP2Image) {
         if (!isMainView) {
             super.setJP2Image(newJP2Image);
@@ -119,6 +119,7 @@ public class JHVJPXView extends JHVJP2View implements TimedMovieView, CachedMovi
     /**
      * {@inheritDoc}
      */
+    @Override
     public DateTimeCache getDateTimeCache() {
         return dateTimeCache;
     }
@@ -126,6 +127,7 @@ public class JHVJPXView extends JHVJP2View implements TimedMovieView, CachedMovi
     /**
      * {@inheritDoc}
      */
+    @Override
     public ImageCacheStatus getImageCacheStatus() {
         return imageCacheStatus;
     }
@@ -133,6 +135,7 @@ public class JHVJPXView extends JHVJP2View implements TimedMovieView, CachedMovi
     /**
      * {@inheritDoc}
      */
+    @Override
     public void setCurrentFrame(int frameNumber, ChangeEvent event) {
         setCurrentFrame(frameNumber, event, false);
     }
@@ -140,6 +143,7 @@ public class JHVJPXView extends JHVJP2View implements TimedMovieView, CachedMovi
     /**
      * {@inheritDoc}
      */
+    @Override
     public void setCurrentFrame(int frameNumber, ChangeEvent event, boolean forceSignal) {
 
         frameNumber = Math.max(0, Math.min(getMaximumFrameNumber(), frameNumber));
@@ -166,6 +170,7 @@ public class JHVJPXView extends JHVJP2View implements TimedMovieView, CachedMovi
     /**
      * {@inheritDoc}
      */
+    @Override
     public void setCurrentFrame(ImmutableDateTime time, ChangeEvent event) {
         setCurrentFrame(time, event, false);
     }
@@ -173,6 +178,7 @@ public class JHVJPXView extends JHVJP2View implements TimedMovieView, CachedMovi
     /**
      * {@inheritDoc}
      */
+    @Override
     public void setCurrentFrame(ImmutableDateTime time, ChangeEvent event, boolean forceSignal) {
 
         if (time == null)
@@ -206,6 +212,7 @@ public class JHVJPXView extends JHVJP2View implements TimedMovieView, CachedMovi
     /**
      * {@inheritDoc}
      */
+    @Override
     public int getCurrentFrameNumber() {
         return imageViewParams.compositionLayer;
     }
@@ -213,6 +220,7 @@ public class JHVJPXView extends JHVJP2View implements TimedMovieView, CachedMovi
     /**
      * {@inheritDoc}
      */
+    @Override
     public int getMaximumFrameNumber() {
         return jp2Image.getCompositionLayerRange().getEnd();
     }
@@ -220,6 +228,7 @@ public class JHVJPXView extends JHVJP2View implements TimedMovieView, CachedMovi
     /**
      * {@inheritDoc}
      */
+    @Override
     public int getMaximumAccessibleFrameNumber() {
         if (dateTimeCache == null || imageCacheStatus == null) {
             return -1;
@@ -230,6 +239,7 @@ public class JHVJPXView extends JHVJP2View implements TimedMovieView, CachedMovi
     /**
      * {@inheritDoc}
      */
+    @Override
     public ImmutableDateTime getCurrentFrameDateTime() {
         return dateTimeCache.getDateTime(getCurrentFrameNumber());
     }
@@ -237,6 +247,7 @@ public class JHVJPXView extends JHVJP2View implements TimedMovieView, CachedMovi
     /**
      * {@inheritDoc}
      */
+    @Override
     public ImmutableDateTime getFrameDateTime(int frameNumber) {
         return dateTimeCache.getDateTime(frameNumber);
     }
@@ -244,6 +255,7 @@ public class JHVJPXView extends JHVJP2View implements TimedMovieView, CachedMovi
     /**
      * {@inheritDoc}
      */
+    @Override
     public void setAnimationMode(AnimationMode mode) {
         if (render != null) {
             render.setAnimationMode(mode);
@@ -253,6 +265,7 @@ public class JHVJPXView extends JHVJP2View implements TimedMovieView, CachedMovi
     /**
      * {@inheritDoc}
      */
+    @Override
     public void setDesiredRelativeSpeed(int framesPerSecond) {
         if (render != null) {
             render.setMovieRelativeSpeed(framesPerSecond);
@@ -262,6 +275,7 @@ public class JHVJPXView extends JHVJP2View implements TimedMovieView, CachedMovi
     /**
      * {@inheritDoc}
      */
+    @Override
     public void setDesiredAbsoluteSpeed(int observationSecondsPerSecond) {
         if (render != null) {
             render.setMovieAbsoluteSpeed(observationSecondsPerSecond);
@@ -271,6 +285,7 @@ public class JHVJPXView extends JHVJP2View implements TimedMovieView, CachedMovi
     /**
      * {@inheritDoc}
      */
+    @Override
     public void linkMovie() {
         linkedMovieManager = LinkedMovieManager.getActiveInstance();
         linkedMovieManager.linkMovie(this);
@@ -279,6 +294,7 @@ public class JHVJPXView extends JHVJP2View implements TimedMovieView, CachedMovi
     /**
      * {@inheritDoc}
      */
+    @Override
     public void unlinkMovie() {
         if (linkedMovieManager != null) {
             LinkedMovieManager temp = linkedMovieManager;
@@ -290,6 +306,7 @@ public class JHVJPXView extends JHVJP2View implements TimedMovieView, CachedMovi
     /**
      * {@inheritDoc}
      */
+    @Override
     public float getActualFramerate() {
 
         if (render != null)
@@ -301,6 +318,7 @@ public class JHVJPXView extends JHVJP2View implements TimedMovieView, CachedMovi
     /**
      * {@inheritDoc}
      */
+    @Override
     public void pauseMovie() {
         if (!isMoviePlaying()) {
             return;
@@ -309,7 +327,6 @@ public class JHVJPXView extends JHVJP2View implements TimedMovieView, CachedMovi
         if (linkedMovieManager != null) {
             linkedMovieManager.pauseLinkedMovies();
         }
-        System.out.println("RRS3");
         readerSignal.signal();
         if (render != null) {
             render.setMovieMode(false);
@@ -330,6 +347,7 @@ public class JHVJPXView extends JHVJP2View implements TimedMovieView, CachedMovi
     /**
      * {@inheritDoc}
      */
+    @Override
     public void playMovie() {
         if (getMaximumFrameNumber() > 0) {
             if (linkedMovieManager == null || !linkedMovieManager.playLinkedMovies()) {
@@ -337,10 +355,8 @@ public class JHVJPXView extends JHVJP2View implements TimedMovieView, CachedMovi
                     if (render != null) {
                         render.setMovieMode(true);
                     }
-                    System.out.println("RRS4");
                     readerSignal.signal();
                     if (readerMode != ReaderMode.ONLYFIREONCOMPLETE) {
-                        System.out.println("RR7");
                         renderRequestedSignal.signal(RenderReasons.MOVIE_PLAY);
                     }
                 } else {
@@ -364,6 +380,7 @@ public class JHVJPXView extends JHVJP2View implements TimedMovieView, CachedMovi
     /**
      * {@inheritDoc}
      */
+    @Override
     public boolean isMoviePlaying() {
         if (render != null) {
             return render.isMovieMode() || (linkedMovieManager != null && linkedMovieManager.isPlaying());
@@ -375,13 +392,14 @@ public class JHVJPXView extends JHVJP2View implements TimedMovieView, CachedMovi
     /**
      * {@inheritDoc}
      */
+    @Override
     public void abolish() {
         abolish(true);
     }
 
     /**
      * Abolishes the jpx view
-     * 
+     *
      * @param unlinkMovie
      *            true, if the movie should be unlinked before abolishing it
      */
@@ -397,6 +415,7 @@ public class JHVJPXView extends JHVJP2View implements TimedMovieView, CachedMovi
     /**
      * {@inheritDoc}
      */
+    @Override
     void setSubimageData(ImageData newImageData, SubImage roi, int compositionLayer, double zoompercent) {
         if (blockingMode) {
             synchronized (Displayer.displaylock) {
@@ -421,17 +440,18 @@ public class JHVJPXView extends JHVJP2View implements TimedMovieView, CachedMovi
         super.setSubimageData(newImageData, roi, compositionLayer, zoompercent);
     }
 
+    @Override
     public LinkedMovieManager getLinkedMovieManager() {
         return linkedMovieManager;
     }
 
     /**
      * Internal function for setting the current frame number.
-     * 
+     *
      * Before actually setting the new frame number, checks whether that is
      * necessary. If the frame number has changed, also triggers an update of
      * the image.
-     * 
+     *
      * @param frameNumber
      * @return true, if the frame number has changed
      */
@@ -449,10 +469,8 @@ public class JHVJPXView extends JHVJP2View implements TimedMovieView, CachedMovi
             }
 
             this.event.copyFrom(event);
-            System.out.println("RRS5");
             readerSignal.signal();
             if (readerMode != ReaderMode.ONLYFIREONCOMPLETE) {
-                System.out.println("RR9");
                 renderRequestedSignal.signal(RenderReasons.MOVIE_PLAY);
             }
 
@@ -463,17 +481,18 @@ public class JHVJPXView extends JHVJP2View implements TimedMovieView, CachedMovi
 
     /**
      * Recalculates the image parameters.
-     * 
+     *
      * <p>
      * This function maps between the set of parameters used within the view
      * chain and the set of parameters used within the jp2-package.
-     * 
+     *
      * <p>
      * To achieve this, calls {@link #calculateParameter(int, int)} with the
      * currently used number of quality layers and the current frame number.
-     * 
+     *
      * @return Set of parameters used within the jp2-package
      */
+    @Override
     protected JP2ImageParameter calculateParameter() {
         return calculateParameter(getCurrentNumQualityLayers(), getCurrentFrameNumber());
     }
@@ -481,6 +500,7 @@ public class JHVJPXView extends JHVJP2View implements TimedMovieView, CachedMovi
     /**
      * @see org.helioviewer.viewmodel.view.MovieView#setReuseBuffer(boolean)
      */
+    @Override
     public void setReuseBuffer(boolean reuseBuffer) {
         render.setReuseBuffer(reuseBuffer);
     }
@@ -488,6 +508,7 @@ public class JHVJPXView extends JHVJP2View implements TimedMovieView, CachedMovi
     /**
      * @see org.helioviewer.viewmodel.view.MovieView#isReuseBuffer()
      */
+    @Override
     public boolean isReuseBuffer() {
         return render.isReuseBuffer();
     }
