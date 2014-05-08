@@ -1,17 +1,20 @@
 package org.helioviewer.gl3d.scenegraph.visuals;
 
 import org.helioviewer.base.physics.Constants;
+import org.helioviewer.gl3d.scenegraph.GL3DDrawBits.Bit;
 import org.helioviewer.gl3d.scenegraph.GL3DGroup;
 import org.helioviewer.gl3d.scenegraph.GL3DState;
-import org.helioviewer.gl3d.scenegraph.GL3DDrawBits.Bit;
+import org.helioviewer.gl3d.scenegraph.math.GL3DMat4d;
+import org.helioviewer.gl3d.scenegraph.math.GL3DQuatd;
+import org.helioviewer.gl3d.scenegraph.math.GL3DVec3d;
 import org.helioviewer.gl3d.scenegraph.math.GL3DVec4d;
 import org.helioviewer.gl3d.scenegraph.math.GL3DVec4f;
 
 public class GL3DGrid extends GL3DGroup {
-    private int xticks;
-    private int yticks;
-    private GL3DVec4f color;
-    private GL3DVec4d textColor;
+    private final int xticks;
+    private final int yticks;
+    private final GL3DVec4f color;
+    private final GL3DVec4d textColor;
     private String font;
 
     public GL3DGrid(String name, int xticks, int yticks, GL3DVec4f color, GL3DVec4d textColor) {
@@ -54,9 +57,14 @@ public class GL3DGrid extends GL3DGroup {
         this.loadGrid();
     }
 
+    @Override
     public void shapeDraw(GL3DState state) {
+        double differentialRotation = state.getActiveCamera().getDifferentialRotation();
+        this.m = GL3DMat4d.identity();
+        this.m.multiply(GL3DQuatd.createRotation(differentialRotation, new GL3DVec3d(0, 1, 0)).toMatrix());
+        //System.out.println(rotation);
         super.shapeDraw(state);
+        //this.m.multiply(GL3DQuatd.createRotation(differentialRotation, new GL3DVec3d(0, 1, 0)).toMatrix().inverse());
 
     }
-
 }

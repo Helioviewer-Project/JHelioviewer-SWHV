@@ -16,17 +16,17 @@ import org.helioviewer.gl3d.scenegraph.math.GL3DMat4d;
  * {@link GL3DComponentView}. It provides the reference to the {@link GL} object
  * and stores some globally relevant information such as width and height of the
  * viewport, etc. Also it allows for the stacking of the view transformations.
- * 
+ *
  * @author Simon Spoerri (simon.spoerri@fhnw.ch)
- * 
+ *
  */
 public class GL3DState {
     private static GL3DState instance;
 
     public GL gl;
 
-    protected GL3DMat4d mv;
-    private Stack<GL3DMat4d> matrixStack;
+    public GL3DMat4d mv;
+    private final Stack<GL3DMat4d> matrixStack;
 
     protected GL3DMat4d mvInverse;
 
