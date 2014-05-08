@@ -152,11 +152,11 @@ public class BufferedImageTimeMachineView extends AbstractBasicView implements S
         @Override
         public ImageData getPreviousFrame(int pos) {
             if(jpxView.getPreviousImageData()!=null &&jpxView.getPreviousImageData().getFrameNumber()+1 == jpxView.getImageData().getFrameNumber()){
-                System.out.println("PFFNMR" + jpxView.getImageData().getFrameNumber() + "-" +jpxView.getPreviousImageData().getFrameNumber());
                 return jpxView.getPreviousImageData();
             };
-            System.out.println("FFNMR" + jpxView.getImageData().getFrameNumber());
-            return renderThroughSlave(Math.abs(jpxView.getImageData().getFrameNumber()-1));
+            ImageData previousImageData = renderThroughSlave(Math.abs(jpxView.getImageData().getFrameNumber()-1));
+            jpxView.setPreviousImageData(previousImageData);
+            return previousImageData;
         }
 
         /**
