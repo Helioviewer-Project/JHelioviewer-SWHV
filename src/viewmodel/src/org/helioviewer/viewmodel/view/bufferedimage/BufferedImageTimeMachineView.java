@@ -36,7 +36,7 @@ import org.helioviewer.viewmodel.viewport.Viewport;
  * distinction between timed movies and non-timed movies. Instead when passing
  * though the data and caching the data as necessary it will query the frame
  * number and adopt a proper behaviour.
- * 
+ *
  * @author Helge Dietert
  */
 public class BufferedImageTimeMachineView extends AbstractBasicView implements SubimageDataView, TimeMachineView, RegionView, ViewportView {
@@ -50,7 +50,7 @@ public class BufferedImageTimeMachineView extends AbstractBasicView implements S
     protected int frameNumber = 0;
     /**
      * Cached underlying TimedMovieView to avoid overhead
-     * 
+     *
      * @see #updatePrecomputedViews()
      */
     protected MovieView movieView;
@@ -60,7 +60,7 @@ public class BufferedImageTimeMachineView extends AbstractBasicView implements S
     protected LinkedList<ImageData> previousCache = new LinkedList<ImageData>();
     /**
      * Cached underlying region view to avoid overhead
-     * 
+     *
      * @see #updatePrecomputedViews()
      */
     protected RegionView regionView;
@@ -68,7 +68,8 @@ public class BufferedImageTimeMachineView extends AbstractBasicView implements S
      * Slave view chain listener to trigger the return after a rendering through
      * that chain has been initiated
      */
-    private ViewListener slaveChainListener = new ViewListener() {
+    private final ViewListener slaveChainListener = new ViewListener() {
+        @Override
         public void viewChanged(View sender, ChangeEvent aEvent) {
             synchronized (slaveWait) {
                 slaveWait.notify();
@@ -77,28 +78,28 @@ public class BufferedImageTimeMachineView extends AbstractBasicView implements S
     };
     /**
      * Synchronization object to lock access to the slave view chain
-     * 
+     *
      * @see #slaveView
      */
     protected Object slaveLock = new Object();
     /**
      * Cached underlying TimedMovieView in the slave view chain
-     * 
+     *
      * @see #setViewSpecificImplementation(View, ChangeEvent)
      */
     protected MovieView slaveMovieView;
     /**
      * Cached underlying region view in the slave view chain
-     * 
+     *
      * @see #setViewSpecificImplementation(View, ChangeEvent)
      */
     protected RegionView slaveRegionView;
     /**
      * Cached underlying subimageDataView in the slave view chain
-     * 
+     *
      * @see #setViewSpecificImplementation(View, ChangeEvent)
      */
-    protected SubimageDataView slaveSubimageDataView;
+    protected JHVJPXView slaveSubimageDataView;
     /**
      * Slave view chain to create non-cached image data
      * <p>
@@ -110,23 +111,23 @@ public class BufferedImageTimeMachineView extends AbstractBasicView implements S
     protected View slaveView;
     /**
      * Cached underlying ViewportView of the slave view chain
-     * 
+     *
      * @see #setViewSpecificImplementation(View, ChangeEvent)
      */
     protected ViewportView slaveViewportView;
     /**
      * Synchronization object to wait until the slave chain finished rendering.
-     * 
+     *
      * @see #slaveView
      */
     protected Object slaveWait = new Object();
 
     /**
      * Cached underlying subimageDataView to avoid overhead
-     * 
+     *
      * @see #updatePrecomputedViews()
      */
-    protected SubimageDataView subimageDataView;
+    protected JHVJPXView jpxView;
 
     /**
      * Data object to pass to the filter to access the extra information
@@ -134,9 +135,10 @@ public class BufferedImageTimeMachineView extends AbstractBasicView implements S
     protected TimeMachineData timeMachineData = new TimeMachineData() {
         /**
          * Call the slave view chain to obtain the requested data
-         * 
+         *
          * @see org.helioviewer.viewmodel.view.TimeMachineData#getAbsoluteFrame(int)
          */
+        @Override
         public ImageData getAbsoluteFrame(int pos) {
             return renderThroughSlave(movieView.getCurrentFrameNumber() - pos);
         }
@@ -144,16 +146,23 @@ public class BufferedImageTimeMachineView extends AbstractBasicView implements S
         /**
          * Try to answer the query from the cache. Otherwise use the slave view
          * chain.
-         * 
+         *
          * @see org.helioviewer.viewmodel.view.TimeMachineData#getPreviousFrame(int)
          */
+        @Override
         public ImageData getPreviousFrame(int pos) {
-            return renderThroughSlave(movieView.getCurrentFrameNumber() - pos);
+            if(jpxView.getPreviousImageData()!=null &&jpxView.getPreviousImageData().getFrameNumber()+1 == jpxView.getImageData().getFrameNumber()){
+                System.out.println("PFFNMR" + jpxView.getImageData().getFrameNumber() + "-" +jpxView.getPreviousImageData().getFrameNumber());
+                return jpxView.getPreviousImageData();
+            };
+            System.out.println("FFNMR" + jpxView.getImageData().getFrameNumber());
+            return renderThroughSlave(Math.abs(jpxView.getImageData().getFrameNumber()-1));
         }
 
         /**
          * @see org.helioviewer.viewmodel.view.TimeMachineData#setPreviousCache(int)
          */
+        @Override
         public void setPreviousCache(int n) {
             cacheSize = n + 1;
         }
@@ -162,11 +171,17 @@ public class BufferedImageTimeMachineView extends AbstractBasicView implements S
         public long getCurrentDateMillis() {
             return movieView.getCurrentDateMillis();
         }
+
+        @Override
+        public void setActive(boolean isActive) {
+            jpxView.setDifferenceMode(isActive);
+            slaveSubimageDataView.setDifferenceMode(isActive);
+        }
     };
 
     /**
      * Cached underlying ViewportView to avoid overhead
-     * 
+     *
      * @see #updatePrecomputedViews()
      */
     protected ViewportView viewportView;
@@ -176,7 +191,7 @@ public class BufferedImageTimeMachineView extends AbstractBasicView implements S
      * <p>
      * This assumes that the view chain only consists of simple
      * ModifiableInnerViewView and one final view.
-     * 
+     *
      * @param factory
      *            Factory to create the copies
      */
@@ -198,16 +213,18 @@ public class BufferedImageTimeMachineView extends AbstractBasicView implements S
     /**
      * @see org.helioviewer.viewmodel.view.RegionView#getRegion()
      */
+    @Override
     public Region getRegion() {
         return regionView.getRegion();
     }
 
     /**
      * Passes through the image data and caches as necessary.
-     * 
+     *
      * @return image data of the current movie frame
      * @see org.helioviewer.viewmodel.imagedata.ImageData.SubimataDataView#getSubimageData()
      */
+    @Override
     public ImageData getSubimageData() {
         // Log.info("TimeMachine::getSubimageData() -> pass through frame " +
         // movieView.getCurrentFrameNumber());
@@ -220,7 +237,7 @@ public class BufferedImageTimeMachineView extends AbstractBasicView implements S
         }
         frameNumber = newFrameNumber;
         // Cache the data and return
-        ImageData newFrame = subimageDataView.getSubimageData();
+        ImageData newFrame = jpxView.getSubimageData();
         previousCache.addFirst(newFrame);
         while (previousCache.size() > cacheSize)
             previousCache.removeLast();
@@ -233,6 +250,7 @@ public class BufferedImageTimeMachineView extends AbstractBasicView implements S
     /**
      * @see org.helioviewer.viewmodel.view.TimeMachineView#getTimeMachineData()
      */
+    @Override
     public TimeMachineData getTimeMachineData() {
         return timeMachineData;
     }
@@ -240,13 +258,14 @@ public class BufferedImageTimeMachineView extends AbstractBasicView implements S
     /**
      * @see org.helioviewer.viewmodel.view.ViewportView#getViewport()
      */
+    @Override
     public Viewport getViewport() {
         return viewportView.getViewport();
     }
 
     /**
      * Renders the given frame through the slave view chain.
-     * 
+     *
      * @param frameNumber
      *            Absolute frame number to render
      * @return image data if its a valid frame number, otherwise null or it
@@ -284,10 +303,11 @@ public class BufferedImageTimeMachineView extends AbstractBasicView implements S
      * <p>
      * TODO Implement this, maybe rounding shifts to the next integer value. We
      * could try just recalculating these missing bars on the side.
-     * 
+     *
      * @see org.helioviewer.viewmodel.view.RegionView#setRegion(org.helioviewer.viewmodel.region.Region,
      *      org.helioviewer.viewmodel.changeevent.ChangeEvent)
      */
+    @Override
     public boolean setRegion(Region r, ChangeEvent event) {
         Region oldRegion = regionView.getRegion();
         // Just a shift?
@@ -313,7 +333,7 @@ public class BufferedImageTimeMachineView extends AbstractBasicView implements S
 
         slaveMovieView = ViewHelper.getViewAdapter(slaveView, MovieView.class);
         slaveRegionView = ViewHelper.getViewAdapter(slaveView, RegionView.class);
-        slaveSubimageDataView = ViewHelper.getViewAdapter(slaveView, SubimageDataView.class);
+        slaveSubimageDataView = ViewHelper.getViewAdapter(slaveView, JHVJPXView.class);
         slaveViewportView = ViewHelper.getViewAdapter(slaveView, ViewportView.class);
         // TODO Anything needed to save CPU time? If I set the region etc. does
         // this also trigger the rendering
@@ -329,9 +349,10 @@ public class BufferedImageTimeMachineView extends AbstractBasicView implements S
      * Furthermore a viewport change does not happen often while playing a
      * movie. Hence the cache will be invalidated, i.e. its an expensive
      * operation.
-     * 
+     *
      * @see org.helioviewer.viewmodel.view.ViewportView#setViewport(org.helioviewer.viewmodel.viewport.Viewport,org.helioviewer.viewmodel.changeevent.ChangeEvent)
      */
+    @Override
     public boolean setViewport(Viewport v, ChangeEvent event) {
         previousCache.clear();
         slaveViewportView.setViewport(v, new ChangeEvent());
@@ -340,35 +361,37 @@ public class BufferedImageTimeMachineView extends AbstractBasicView implements S
 
     /**
      * Setup the caches and the slave view chain
-     * 
+     *
      * @see org.helioviewer.viewmodel.view.AbstractBasicView#setViewSpecificImplementation(org.helioviewer.viewmodel.view.View,org.helioviewer.viewmodel.changeevent.ChangeEvent)
      */
     @Override
     protected void setViewSpecificImplementation(View newView, ChangeEvent changeEvent) {
         updatePrecomputedViews();
         setupSlaveViewChain();
-        movieView.setReuseBuffer(false);
+        movieView.setReuseBuffer(true);
     }
 
     /**
      * Updates the precomputed results for different view adapters.
-     * 
+     *
      * This adapters are precomputed to avoid unnecessary overhead appearing
      * when doing this every frame.
      */
     protected void updatePrecomputedViews() {
         movieView = ViewHelper.getViewAdapter(view, MovieView.class);
         regionView = ViewHelper.getViewAdapter(view, RegionView.class);
-        subimageDataView = ViewHelper.getViewAdapter(view, SubimageDataView.class);
+        jpxView = ViewHelper.getViewAdapter(view, JHVJPXView.class);
+        //jpxView.
         viewportView = ViewHelper.getViewAdapter(view, ViewportView.class);
     }
 
     /**
      * Inform the listener about the events, update the cache and slave chain as
      * necessary.
-     * 
+     *
      * @see org.helioviewer.viewmodel.view.ViewListener#viewChanged(org.helioviewer.viewmodel.view.View,org.helioviewer.viewmodel.changeevent.ChangeEvent)
      */
+    @Override
     public void viewChanged(View sender, ChangeEvent aEvent) {
         // System.out.println("Master view changed " + aEvent);
         // The region and viewport changes are already redirected to the slave
