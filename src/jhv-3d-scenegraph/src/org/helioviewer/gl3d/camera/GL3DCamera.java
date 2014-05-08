@@ -24,9 +24,9 @@ import org.helioviewer.gl3d.wcs.CoordinateSystem;
  * in {@link GL3DInteraction} objects that can be selected in the main toolbar.
  * The interactions then change the rotation and translation fields out of which
  * the resulting cameraTransformation is generated.
- * 
+ *
  * @author Simon Spoerri (simon.spoerri@fhnw.ch)
- * 
+ *
  */
 public abstract class GL3DCamera {
     protected GLU glu = new GLU();
@@ -36,14 +36,14 @@ public abstract class GL3DCamera {
 
     private double clipNear = Constants.SunRadius / 10;
     private double clipFar = Constants.SunRadius * 1000;
-    private double fov = 10;
+    private final double fov = 10;
     private double aspect = 0.0;
     private double width = 0.0;
     private double height = 0.0;
     public int currentMouseX = 0;
     public int currentMouseY = 0;
 
-    private List<GL3DCameraListener> listeners = new ArrayList<GL3DCameraListener>();
+    private final List<GL3DCameraListener> listeners = new ArrayList<GL3DCameraListener>();
 
     // This is the resulting cameraTransformation. All interactions should
     // modify this matrix
@@ -52,11 +52,13 @@ public abstract class GL3DCamera {
     protected GL3DQuatd rotation;
     protected GL3DVec3d translation;
 
-    private Stack<GL3DCameraAnimation> cameraAnimations = new Stack<GL3DCameraAnimation>();
+    private final Stack<GL3DCameraAnimation> cameraAnimations = new Stack<GL3DCameraAnimation>();
 
     protected GL3DQuatd currentDragRotation;
 
     protected double localrotation;
+
+    private double differentialRotation;
 
     public GL3DCamera(double clipNear, double clipFar) {
         this();
@@ -75,7 +77,7 @@ public abstract class GL3DCamera {
     /**
      * This method is called when the camera changes and should copy the
      * required settings of the preceding camera objects.
-     * 
+     *
      * @param precedingCamera
      */
     public void activate(GL3DCamera precedingCamera) {
@@ -117,7 +119,7 @@ public abstract class GL3DCamera {
         return this.translation;
     }
 
-    protected GL3DMat4d getCameraTransformation() {
+    public GL3DMat4d getCameraTransformation() {
         return this.cameraTransformation;
     }
 
@@ -141,8 +143,8 @@ public abstract class GL3DCamera {
         GL gl = state.gl;
         int viewport[] = new int[4];
         gl.glGetIntegerv(GL.GL_VIEWPORT, viewport, 0);
-        this.width = (double) viewport[2];
-        this.height = (double) viewport[3];
+        this.width = viewport[2];
+        this.height = viewport[3];
         this.aspect = width / height;
 
         gl.glMatrixMode(GL.GL_PROJECTION);
@@ -252,6 +254,7 @@ public abstract class GL3DCamera {
         return height;
     }
 
+    @Override
     public String toString() {
         return getName();
     }
@@ -293,5 +296,13 @@ public abstract class GL3DCamera {
 
     public boolean isAnimating() {
         return !this.cameraAnimations.isEmpty();
+    }
+
+    public double getDifferentialRotation() {
+        return differentialRotation;
+    }
+
+    public void setDifferentialRotation(double differentialRotation) {
+        this.differentialRotation = differentialRotation;
     }
 }
