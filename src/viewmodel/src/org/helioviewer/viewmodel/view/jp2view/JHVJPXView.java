@@ -18,6 +18,7 @@ import org.helioviewer.viewmodel.view.TimedMovieView;
 import org.helioviewer.viewmodel.view.cache.DateTimeCache;
 import org.helioviewer.viewmodel.view.cache.HelioviewerDateTimeCache;
 import org.helioviewer.viewmodel.view.cache.ImageCacheStatus;
+import org.helioviewer.viewmodel.view.cache.ImageCacheStatus.CacheStatus;
 import org.helioviewer.viewmodel.view.cache.LocalImageCacheStatus;
 import org.helioviewer.viewmodel.view.cache.RemoteImageCacheStatus;
 import org.helioviewer.viewmodel.view.jp2view.J2KRender.RenderReasons;
@@ -416,20 +417,24 @@ public class JHVJPXView extends JHVJP2View implements TimedMovieView, CachedMovi
      * {@inheritDoc}
      */
     @Override
-    void setSubimageData(ImageData newImageData, SubImage roi, int compositionLayer, double zoompercent) {
-        if (blockingMode) {
-            synchronized (Displayer.displaylock) {
-
-                System.out.println("AfterRender started");
-                setSubimageDataHelper(newImageData, roi, compositionLayer, zoompercent);
-                System.out.println("AfterRender finished");
+    void setSubimageData(ImageData newImageData, SubImage roi, int compositionLayer, double zoompercent, boolean differenceMode) {
+        if(!differenceMode ||(differenceMode && this.imageCacheStatus.getImageStatus(compositionLayer) == CacheStatus.COMPLETE)){
+            if (blockingMode) {
+                synchronized (Displayer.displaylock) {
+                    setSubimageDataHelper(newImageData, roi, compositionLayer, zoompercent,  differenceMode);
+                }
             }
-        } else {
-            setSubimageDataHelper(newImageData, roi, compositionLayer, zoompercent);
+            else{
+                setSubimageDataHelper(newImageData, roi, compositionLayer, zoompercent, differenceMode);
+            }
+        }
+        else if(differenceMode && this.imageCacheStatus.getImageStatus(compositionLayer) == CacheStatus.COMPLETE){
+            this.readerSignal.signal();
+            Displayer.getSingletonInstance().render();
         }
     }
 
-    private void setSubimageDataHelper(ImageData newImageData, SubImage roi, int compositionLayer, double zoompercent) {
+    private void setSubimageDataHelper(ImageData newImageData, SubImage roi, int compositionLayer, double zoompercent, boolean differenceMode) {
         lastRenderedCompositionLayer = compositionLayer;
 
         if (metaData instanceof ObserverMetaData) {
@@ -437,7 +442,7 @@ public class JHVJPXView extends JHVJP2View implements TimedMovieView, CachedMovi
             observerMetaData.updateDateTime(dateTimeCache.getDateTime(compositionLayer));
             event.addReason(new TimestampChangedReason(this, observerMetaData.getDateTime()));
         }
-        super.setSubimageData(newImageData, roi, compositionLayer, zoompercent);
+        super.setSubimageData(newImageData, roi, compositionLayer, zoompercent, differenceMode);
     }
 
     @Override
@@ -538,5 +543,9 @@ public class JHVJPXView extends JHVJP2View implements TimedMovieView, CachedMovi
 
     public Region getDisplayedRegion() {
         return this.displayedRegion;
+    }
+
+    public void setDifferenceMode(boolean differenceMode) {
+        this.render.setDifferenceMode(differenceMode);
     }
 }
