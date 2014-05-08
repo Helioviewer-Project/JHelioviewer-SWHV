@@ -11,9 +11,9 @@ import org.helioviewer.base.math.Interval;
  * is actually kept in two separate formats... int's and range/domain
  * Interval's. The intervals are probably the better choice, but I have gone
  * through and eliminated the direct calls to the member variables yet.
- * 
+ *
  * @author caplins
- * 
+ *
  */
 public class SubImage {
 
@@ -24,11 +24,17 @@ public class SubImage {
     public final Interval<Integer> range;
 
     /** The same data as in the range and domain */
-    public final int x, y, width, height;
+    public int x;
+
+    public int y;
+
+    public int width;
+
+    public int height;
 
     /**
      * Constructor taking primitive ints.
-     * 
+     *
      * @param _x
      * @param _y
      * @param _width
@@ -46,7 +52,7 @@ public class SubImage {
 
     /**
      * Constructor taking Intervals.
-     * 
+     *
      * @param _domain
      * @param _range
      */
@@ -61,7 +67,7 @@ public class SubImage {
 
     /**
      * Constructor taking a Rectangle
-     * 
+     *
      * @param _rect
      */
     public SubImage(Rectangle _rect) {
@@ -69,6 +75,7 @@ public class SubImage {
     }
 
     /** Overridden equals method. */
+    @Override
     public boolean equals(Object _obj) {
         if (_obj == null)
             return false;
@@ -86,6 +93,7 @@ public class SubImage {
     }
 
     /** Overridden toString method */
+    @Override
     public String toString() {
         String ret = "";
         ret += "x=" + domain.getStart() + "   ";
