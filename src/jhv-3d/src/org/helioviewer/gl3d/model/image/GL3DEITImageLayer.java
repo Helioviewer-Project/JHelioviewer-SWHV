@@ -18,6 +18,7 @@ public class GL3DEITImageLayer extends GL3DImageLayer {
         super("AIA Image Layer", mainView);
     }
 
+    @Override
     protected void createImageMeshNodes(GL gl) {
         this.sphereFragmentShader = new GL3DImageFragmentShaderProgram();
         GLFragmentShaderProgram sphereFragmentShader = GL3DShaderFactory.createFragmentShaderProgram(gl, this.sphereFragmentShader);
@@ -31,15 +32,12 @@ public class GL3DEITImageLayer extends GL3DImageLayer {
 
         this.accellerationShape = new GL3DHitReferenceShape();
 
-        double xOffset = (this.imageTextureView.metadata.getPhysicalUpperRight().getX() + this.imageTextureView.metadata.getPhysicalLowerLeft().getX()) / (2.0 * this.imageTextureView.metadata.getPhysicalImageWidth());
-        double yOffset = (this.imageTextureView.metadata.getPhysicalUpperRight().getY() + this.imageTextureView.metadata.getPhysicalLowerLeft().getY()) / (2.0 * this.imageTextureView.metadata.getPhysicalImageHeight());
-        vertex.setDefaultOffset(xOffset, yOffset);
-
         this.sphereFragmentShader.setCutOffRadius((float) (Constants.SunRadius / this.imageTextureView.metadata.getPhysicalImageWidth()));
 
         this.addNode(sphere);
     }
 
+    @Override
     protected GL3DImageMesh getImageSphere() {
         return this.sphere;
     }

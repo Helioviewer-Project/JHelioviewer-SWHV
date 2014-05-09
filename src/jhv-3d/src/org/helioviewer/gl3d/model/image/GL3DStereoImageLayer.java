@@ -18,6 +18,7 @@ public class GL3DStereoImageLayer extends GL3DImageLayer {
         super("Stereo Image Layer", mainView);
     }
 
+    @Override
     protected void createImageMeshNodes(GL gl) {
         this.gl = gl;
         HelioviewerMetaData hvMetaData = (HelioviewerMetaData) metaDataView.getMetaData();
@@ -30,9 +31,6 @@ public class GL3DStereoImageLayer extends GL3DImageLayer {
 
         this.imageTextureView.metadata = this.metaDataView.getMetaData();
 
-        double xOffset = (this.imageTextureView.metadata.getPhysicalUpperRight().getX() + this.imageTextureView.metadata.getPhysicalLowerLeft().getX()) / (2.0 * this.imageTextureView.metadata.getPhysicalImageWidth());
-        double yOffset = -(this.imageTextureView.metadata.getPhysicalUpperLeft().getY() + this.imageTextureView.metadata.getPhysicalLowerLeft().getY()) / (2.0 * this.imageTextureView.metadata.getPhysicalImageHeight());
-
         // Don't display sphere for corona images
         if (!hvMetaData.getDetector().startsWith("COR")) {
             this.sphereFragmentShader = new GL3DImageFragmentShaderProgram();
@@ -41,10 +39,10 @@ public class GL3DStereoImageLayer extends GL3DImageLayer {
             this.addNode(sphere);
             this.sphereFragmentShader.setCutOffRadius(Constants.SunRadius / this.imageTextureView.metadata.getPhysicalImageWidth());
         }
-        vertex.setDefaultOffset(xOffset, yOffset);
 
     }
 
+    @Override
     protected GL3DImageMesh getImageSphere() {
         return this.sphere;
     }
