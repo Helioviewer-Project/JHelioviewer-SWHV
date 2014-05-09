@@ -17,6 +17,8 @@ public class GL3DImageVertexShaderProgram extends GLVertexShaderProgram {
     private double differenceYOffset;
     private double differenceTheta;
     private double differencePhi;
+    private double differenceXScale;
+    private double differenceYScale;
 
     /**
      * {@inheritDoc}
@@ -33,8 +35,8 @@ public class GL3DImageVertexShaderProgram extends GLVertexShaderProgram {
             gl.glProgramLocalParameter4dARB(target, 0, xOffset, yOffset, xScale, yScale);
             gl.glProgramLocalParameter4dARB(target, 1, xTextureScale, yTextureScale, theta, phi);
             gl.glProgramLocalParameter4dARB(target, 2, defaultXOffset, defaultYOffset, 0, 0);
-            gl.glProgramLocalParameter4dARB(target, 3, differenceXOffset, differenceYOffset, 0, 0);
-            gl.glProgramLocalParameter4dARB(target, 2, differenceXTextureScale, differenceYTextureScale, differenceTheta, differencePhi);
+            gl.glProgramLocalParameter4dARB(target, 3, differenceXOffset, differenceYOffset, differenceXScale, differenceXScale);
+            gl.glProgramLocalParameter4dARB(target, 4, differenceXTextureScale, differenceYTextureScale, differenceTheta, differencePhi);
 
         }
     }
@@ -48,6 +50,8 @@ public class GL3DImageVertexShaderProgram extends GLVertexShaderProgram {
             String program = "\tphysicalPosition = physicalPosition;" + GLShaderBuilder.LINE_SEP;
 
             program += "\tif(abs(position.x)>1.1){" + GLShaderBuilder.LINE_SEP;
+            //Corona
+            //Image
             program += "\tfloat theta = -textureScaleThetaPhi.z;" + GLShaderBuilder.LINE_SEP;
             program += "\tfloat phi = textureScaleThetaPhi.w;" + GLShaderBuilder.LINE_SEP;
 
@@ -59,8 +63,6 @@ public class GL3DImageVertexShaderProgram extends GLVertexShaderProgram {
 
             program += "\toutput.x *= textureScaleThetaPhi.x;" + GLShaderBuilder.LINE_SEP;
             program += "\toutput.y *= textureScaleThetaPhi.y;" + GLShaderBuilder.LINE_SEP;
-            // program += "\toutput.y = 1.-output.y;" +
-            // GLShaderBuilder.LINE_SEP;
 
             program += "\tpositionPass = position;" + GLShaderBuilder.LINE_SEP;
 
@@ -73,9 +75,12 @@ public class GL3DImageVertexShaderProgram extends GLVertexShaderProgram {
             program += "\t physicalPosition.z = xrott*sin(phi) + zrott*cos(phi);" + GLShaderBuilder.LINE_SEP;
             program += "\t OUT.position = mul(state_matrix_mvp, physicalPosition);" + GLShaderBuilder.LINE_SEP;
             program += "\t OUT.position.y = OUT.position.y;" + GLShaderBuilder.LINE_SEP;
+            //Difference Image
 
             program += "\t}" + GLShaderBuilder.LINE_SEP;
             program += "\telse{" + GLShaderBuilder.LINE_SEP;
+            //Solar disk
+            //Image
             program += "\tfloat theta = -textureScaleThetaPhi.z;" + GLShaderBuilder.LINE_SEP;
             program += "\tfloat phi = -textureScaleThetaPhi.w;" + GLShaderBuilder.LINE_SEP;
             program += "\tpositionPass = physicalPosition;" + GLShaderBuilder.LINE_SEP;
@@ -94,16 +99,38 @@ public class GL3DImageVertexShaderProgram extends GLVertexShaderProgram {
 
             program += "\toutput.x *= textureScaleThetaPhi.x;" + GLShaderBuilder.LINE_SEP;
             program += "\toutput.y *= textureScaleThetaPhi.y;" + GLShaderBuilder.LINE_SEP;
-            program += "\t OUT.position.y = OUT.position.y;" + GLShaderBuilder.LINE_SEP;
+            //Difference Image
 
+            program += "\tfloat differencetheta = -diffTextureScaleThetaPhi.z;" + GLShaderBuilder.LINE_SEP;
+            program += "\tfloat differencephi = -diffTextureScaleThetaPhi.w;" + GLShaderBuilder.LINE_SEP;
+            program += "\txrot = physicalPosition.x*cos(differencephi) - physicalPosition.z*sin(differencephi);" + GLShaderBuilder.LINE_SEP;
+            program += "\tyrot = physicalPosition.y;" + GLShaderBuilder.LINE_SEP;
+            program += "\tzrot = physicalPosition.x*sin(differencephi) + physicalPosition.z*cos(differencephi);" + GLShaderBuilder.LINE_SEP;
+
+            program += "\txrott = xrot;" + GLShaderBuilder.LINE_SEP;
+            program += "\tyrott = yrot*cos(differencetheta) - zrot*sin(differencetheta);" + GLShaderBuilder.LINE_SEP;
+            program += "\tzrott = yrot*sin(differencetheta) + zrot*cos(differencetheta);" + GLShaderBuilder.LINE_SEP;
+
+            program += "\tdifferenceOutput.x = xrott - differenceRect.x;" + GLShaderBuilder.LINE_SEP;
+            program += "\tdifferenceOutput.y = -yrott - differenceRect.y;" + GLShaderBuilder.LINE_SEP;
+
+            program += "\tdifferenceOutput.x *= differenceRect.z;" + GLShaderBuilder.LINE_SEP;
+            program += "\tdifferenceOutput.y *= differenceRect.w;" + GLShaderBuilder.LINE_SEP;
+
+            program += "\tdifferenceOutput.x *= diffTextureScaleThetaPhi.x;" + GLShaderBuilder.LINE_SEP;
+            program += "\tdifferenceOutput.y *= diffTextureScaleThetaPhi.y;" + GLShaderBuilder.LINE_SEP;
             program += "}" + GLShaderBuilder.LINE_SEP;
 
             shaderBuilder.addEnvParameter("float4 rect");
             shaderBuilder.addEnvParameter("float4 textureScaleThetaPhi");
             shaderBuilder.addEnvParameter("float4 offset");
+            shaderBuilder.addEnvParameter("float4 differenceRect");
+            shaderBuilder.addEnvParameter("float4 diffTextureScaleThetaPhi");
 
             program = program.replace("output", shaderBuilder.useOutputValue("float4", "TEXCOORD0"));
             program = program.replace("physicalPosition", shaderBuilder.useStandardParameter("float4", "POSITION"));
+            program = program.replace("differenceOutput", shaderBuilder.useOutputValue("float4", "TEXCOORD4"));
+
             program = program.replace("positionPass", shaderBuilder.useOutputValue("float4", "TEXCOORD3"));
             program = program.replace("color", shaderBuilder.useStandardParameter("float4", "COLOR"));
             shaderBuilder.addMainFragment(program);
@@ -121,10 +148,6 @@ public class GL3DImageVertexShaderProgram extends GLVertexShaderProgram {
         this.yScale = yScale;
     }
 
-    public void setDefaultOffset(double x, double y) {
-        this.defaultXOffset = x;
-        this.defaultYOffset = y;
-    }
 
     public void changeAngles(double theta, double phi) {
         this.theta = theta;
@@ -136,10 +159,6 @@ public class GL3DImageVertexShaderProgram extends GLVertexShaderProgram {
         this.yyTextureScale = scaleY;
     }
 
-    public void setDifferenceOffset(double x, double y) {
-        this.differenceXOffset = x;
-        this.differenceYOffset = y;
-    }
     public void changeDifferenceTextureScale(double scaleX, double scaleY) {
         this.differenceXTextureScale = scaleX;
         this.differenceYTextureScale = scaleY;
@@ -147,5 +166,12 @@ public class GL3DImageVertexShaderProgram extends GLVertexShaderProgram {
     public void changeDifferenceAngles(double theta, double phi) {
         this.differenceTheta = theta;
         this.differencePhi = phi;
+    }
+
+    public void setDifferenceRect(double differenceXOffset, double differenceYOffset, double differenceXScale, double differenceYScale) {
+        this.differenceXOffset = differenceXOffset;
+        this.differenceYOffset = differenceYOffset;
+        this.differenceXScale = differenceXScale;
+        this.differenceYScale = differenceYScale;
     }
 }
