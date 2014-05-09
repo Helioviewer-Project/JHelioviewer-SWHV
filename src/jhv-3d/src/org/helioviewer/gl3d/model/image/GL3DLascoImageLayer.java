@@ -2,7 +2,6 @@ package org.helioviewer.gl3d.model.image;
 
 import javax.media.opengl.GL;
 
-import org.helioviewer.base.physics.Constants;
 import org.helioviewer.gl3d.model.GL3DHitReferenceShape;
 import org.helioviewer.gl3d.shader.GL3DImageVertexShaderProgram;
 import org.helioviewer.gl3d.shader.GL3DShaderFactory;
@@ -17,6 +16,7 @@ public class GL3DLascoImageLayer extends GL3DImageLayer {
         super("LASCO Image Layer", mainView);
     }
 
+    @Override
     protected void createImageMeshNodes(GL gl) {
         HelioviewerOcculterMetaData hvMetaData = (HelioviewerOcculterMetaData) metaDataView.getMetaData();
 
@@ -29,12 +29,9 @@ public class GL3DLascoImageLayer extends GL3DImageLayer {
 
         this.accellerationShape = new GL3DHitReferenceShape();
 
-        double xOffset = (this.imageTextureView.metadata.getPhysicalUpperRight().getX() + this.imageTextureView.metadata.getPhysicalLowerLeft().getX()) / (2.0 * this.imageTextureView.metadata.getPhysicalImageWidth());
-        double yOffset = (this.imageTextureView.metadata.getPhysicalUpperRight().getY() + this.imageTextureView.metadata.getPhysicalLowerLeft().getY()) / (2.0 * this.imageTextureView.metadata.getPhysicalImageHeight());
-        vertex.setDefaultOffset(xOffset, yOffset);
-
     }
 
+    @Override
     protected GL3DImageMesh getImageSphere() {
         return null;
     }
