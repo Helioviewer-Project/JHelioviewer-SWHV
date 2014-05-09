@@ -2,11 +2,10 @@ package org.helioviewer.filter.runningdifference;
 
 import javax.media.opengl.GL;
 
-import org.helioviewer.base.physics.Constants;
 import org.helioviewer.viewmodel.view.opengl.shader.GLFragmentShaderProgram;
 import org.helioviewer.viewmodel.view.opengl.shader.GLShaderBuilder;
-import org.helioviewer.viewmodel.view.opengl.shader.GLTextureCoordinate;
 import org.helioviewer.viewmodel.view.opengl.shader.GLShaderBuilder.GLBuildShaderException;
+import org.helioviewer.viewmodel.view.opengl.shader.GLTextureCoordinate;
 
 public class DifferenceShader extends GLFragmentShaderProgram {
     private GLTextureCoordinate isDifference;
@@ -26,11 +25,14 @@ public class DifferenceShader extends GLFragmentShaderProgram {
     /**
      * {@inheritDoc}
      */
+    @Override
     protected void buildImpl(GLShaderBuilder shaderBuilder) {
 
         try {
             isDifference = shaderBuilder.addTexCoordParameter(1);
             differenceAngle = shaderBuilder.addTexCoordParameter(1);
+            shaderBuilder.addTexCoordParameter(1);
+            shaderBuilder.addTexCoordParameter(1);
             String program = "";
             program = "if(isdifference>0.5){\toutput.r = ( output.r - tex2D(differenceImage, texcoord0.xy).r)/(output.r);";
             program += "\tvec4 tr = vec4(0.05f,0.05f,0.05f,0.05f);";
