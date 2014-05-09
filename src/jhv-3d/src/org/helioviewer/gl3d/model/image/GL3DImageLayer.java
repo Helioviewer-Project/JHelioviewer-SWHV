@@ -9,7 +9,6 @@ import javax.media.opengl.GL;
 
 import org.helioviewer.base.logging.Log;
 import org.helioviewer.base.physics.Constants;
-import org.helioviewer.gl3d.GL3DHelper;
 import org.helioviewer.gl3d.camera.GL3DCamera;
 import org.helioviewer.gl3d.camera.GL3DCameraListener;
 import org.helioviewer.gl3d.model.GL3DHitReferenceShape;
@@ -17,7 +16,6 @@ import org.helioviewer.gl3d.scenegraph.GL3DNode;
 import org.helioviewer.gl3d.scenegraph.GL3DOrientedGroup;
 import org.helioviewer.gl3d.scenegraph.GL3DState;
 import org.helioviewer.gl3d.scenegraph.math.GL3DMat4d;
-import org.helioviewer.gl3d.scenegraph.math.GL3DQuatd;
 import org.helioviewer.gl3d.scenegraph.math.GL3DVec3d;
 import org.helioviewer.gl3d.scenegraph.math.GL3DVec4d;
 import org.helioviewer.gl3d.scenegraph.rt.GL3DRay;
@@ -26,7 +24,6 @@ import org.helioviewer.gl3d.shader.GL3DImageFragmentShaderProgram;
 import org.helioviewer.gl3d.view.GL3DCoordinateSystemView;
 import org.helioviewer.gl3d.view.GL3DImageTextureView;
 import org.helioviewer.gl3d.view.GL3DView;
-import org.helioviewer.gl3d.wcs.CoordinateConversion;
 import org.helioviewer.gl3d.wcs.CoordinateSystem;
 import org.helioviewer.gl3d.wcs.CoordinateVector;
 import org.helioviewer.viewmodel.changeevent.ChangeEvent;
@@ -40,9 +37,9 @@ import org.helioviewer.viewmodel.view.RegionView;
  * This is the scene graph equivalent of an image layer sub view chain attached
  * to the GL3DLayeredView. It represents exactly one image layer in the view
  * chain
- * 
+ *
  * @author Simon Spoerri (simon.spoerri@fhnw.ch)
- * 
+ *
  */
 public abstract class GL3DImageLayer extends GL3DOrientedGroup implements GL3DCameraListener {
     private static int nextLayerId = 0;
@@ -117,29 +114,14 @@ public abstract class GL3DImageLayer extends GL3DOrientedGroup implements GL3DCa
     public void shapeInit(GL3DState state) {
         this.createImageMeshNodes(state.gl);
 
-        CoordinateVector orientationVector = this.getOrientation();
-        CoordinateConversion toViewSpace = this.getCoordinateSystem().getConversion(state.getActiveCamera().getViewSpaceCoordinateSystem());
-
-        GL3DVec3d orientation = GL3DHelper.toVec(toViewSpace.convert(orientationVector)); // .normalize();
-                                                                                          // -
-                                                                                          // not
-                                                                                          // needed
-                                                                                          // for
-                                                                                          // atan2
-        double phi = Math.atan2(orientation.x, orientation.z);
-
-        this.accellerationShape = new GL3DHitReferenceShape(true, phi);
+        this.accellerationShape = new GL3DHitReferenceShape(true, 0.);
         this.addNode(this.accellerationShape);
 
         super.shapeInit(state);
-
         this.doUpdateROI = true;
         this.markAsChanged();
         updateROI(state.getActiveCamera());
 
-        GL3DQuatd phiRotation = GL3DQuatd.createRotation(phi, new GL3DVec3d(0, 1, 0));
-        state.getActiveCamera().getRotation().set(phiRotation);
-        state.getActiveCamera().updateCameraTransformation();
     }
 
     protected abstract void createImageMeshNodes(GL gl);
@@ -200,7 +182,7 @@ public abstract class GL3DImageLayer extends GL3DOrientedGroup implements GL3DCa
          * converter =
          * orientation.getCoordinateSystem().getConversion(targetSystem);
          * orientation = converter.convert(orientation);
-         * 
+         *
          * GL3DVec3d layerDirection = new GL3DVec3d(orientation.getValue(0),
          * orientation.getValue(1), orientation.getValue(2));
          */
