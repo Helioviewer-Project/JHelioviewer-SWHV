@@ -4,7 +4,6 @@ import org.helioviewer.base.physics.Constants;
 import org.helioviewer.gl3d.scenegraph.GL3DDrawBits.Bit;
 import org.helioviewer.gl3d.scenegraph.GL3DGroup;
 import org.helioviewer.gl3d.scenegraph.GL3DState;
-import org.helioviewer.gl3d.scenegraph.math.GL3DMat3d;
 import org.helioviewer.gl3d.scenegraph.math.GL3DMat4d;
 import org.helioviewer.gl3d.scenegraph.math.GL3DQuatd;
 import org.helioviewer.gl3d.scenegraph.math.GL3DVec3d;
@@ -69,7 +68,7 @@ public class GL3DGrid extends GL3DGroup {
         this.wm = (this.m);
         state.buildInverseAndNormalMatrix();
         this.wmI = new GL3DMat4d(state.getMVInverse());
-        this.wmN = new GL3DMat3d(state.normalMatrix);
+        //this.wmN = new GL3DMat3d(state.normalMatrix);
         this.shapeUpdate(state);
         this.buildAABB();
         state.popMV();
@@ -78,6 +77,7 @@ public class GL3DGrid extends GL3DGroup {
 
     @Override
     public void shapeDraw(GL3DState state) {
+        this.markAsChanged();
         super.shapeDraw(state);
     }
 }
