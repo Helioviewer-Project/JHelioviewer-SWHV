@@ -21,18 +21,18 @@ import org.helioviewer.viewmodel.view.opengl.shader.GLVertexShaderProgram;
  * A {@link GL3DImageMesh} is used to map a image that was rendered in the 2D
  * sub-chain onto a mesh. The image is provided as a texture that was created by
  * a {@link GL3DImageTextureView}.
- * 
+ *
  * @author Simon Spoerri (simon.spoerri@fhnw.ch)
- * 
+ *
  */
 public abstract class GL3DImageMesh extends GL3DMesh {
 
     protected GL3DImageTextureView imageTextureView;
 
-    private GLTextureHelper th = new GLTextureHelper();
+    private final GLTextureHelper th = new GLTextureHelper();
 
-    private GLVertexShaderProgram vertexShaderProgram;
-    private GLFragmentShaderProgram fragmentShaderProgram;
+    private final GLVertexShaderProgram vertexShaderProgram;
+    private final GLFragmentShaderProgram fragmentShaderProgram;
 
     protected Region capturedRegion;
     protected Vector2dDouble textureScale;
@@ -48,6 +48,7 @@ public abstract class GL3DImageMesh extends GL3DMesh {
 
         imageTextureView.addViewListener(new ViewListener() {
 
+            @Override
             public void viewChanged(View sender, ChangeEvent aEvent) {
                 ImageTextureRecapturedReason reason = aEvent.getLastChangedReasonByType(ImageTextureRecapturedReason.class);
                 if (reason != null) {
@@ -74,12 +75,14 @@ public abstract class GL3DImageMesh extends GL3DMesh {
         this.markAsChanged();
     }
 
+    @Override
     public void shapeInit(GL3DState state) {
         super.shapeInit(state);
         this.imageTextureView.forceUpdate();
         // Log.debug("GL3DImageMesh.shapeInit: "+getName()+" Forcing image texture to update!");
     }
 
+    @Override
     public void shapeUpdate(GL3DState state) {
         if (this.reshapeRequested) {
             // Reshape Mesh
@@ -89,6 +92,7 @@ public abstract class GL3DImageMesh extends GL3DMesh {
         }
     }
 
+    @Override
     public void shapeDraw(GL3DState state) {
         GLFilterView glfilter = this.imageTextureView.getAdapter(GLFilterView.class);
         if (glfilter != null) {
@@ -96,6 +100,7 @@ public abstract class GL3DImageMesh extends GL3DMesh {
         }
 
         th.bindTexture(state.gl, this.imageTextureView.getTextureId());
+        //this.imageTextureView.copyScreenToTexture(state,th);
         state.gl.glTexParameteri(GL.GL_TEXTURE_2D, GL.GL_TEXTURE_MIN_FILTER, GL.GL_NEAREST);
         state.gl.glTexParameteri(GL.GL_TEXTURE_2D, GL.GL_TEXTURE_MAG_FILTER, GL.GL_LINEAR);
 
