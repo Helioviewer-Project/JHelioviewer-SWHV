@@ -20,9 +20,9 @@ import org.helioviewer.gl3d.scenegraph.rt.GL3DRay;
  * coordinates, and indices, that connect vertices to faces. An implementation
  * must provide these attributes and indices which will be converted to
  * {@link GL3DBuffer}.
- * 
+ *
  * @author Simon Spoerri (simon.spoerri@fhnw.ch)
- * 
+ *
  */
 public abstract class GL3DMesh extends GL3DShape {
     protected GL3DBuffer positionVBO;
@@ -41,11 +41,11 @@ public abstract class GL3DMesh extends GL3DShape {
 
     private List<GL3DTriangle> triangles;
 
-    private float[] diffuseMaterial;
+    private final float[] diffuseMaterial;
 
-    private float[] specularMaterial;
+    private final float[] specularMaterial;
 
-    private ReentrantLock meshLock = new ReentrantLock();
+    private final ReentrantLock meshLock = new ReentrantLock();
 
     public GL3DMesh(String name) {
         this(name, new GL3DVec4f(1, 1, 1, 1));
@@ -68,6 +68,7 @@ public abstract class GL3DMesh extends GL3DShape {
         this.specularMaterial[3] = alpha;
     }
 
+    @Override
     public void shapeInit(GL3DState state) {
         meshLock.lock();
 
@@ -123,6 +124,7 @@ public abstract class GL3DMesh extends GL3DShape {
         meshLock.unlock();
     }
 
+    @Override
     public void shapeDraw(GL3DState state) {
         meshLock.lock();
 
@@ -265,6 +267,7 @@ public abstract class GL3DMesh extends GL3DShape {
      * Implementations of this method for default shapes, such as a Sphere!
      */
 
+    @Override
     public boolean shapeHit(GL3DRay ray) {
         for (GL3DTriangle t : this.triangles) {
             if (t.intersects(ray)) {
@@ -281,9 +284,11 @@ public abstract class GL3DMesh extends GL3DShape {
         return false;
     }
 
+    @Override
     public void shapeUpdate(GL3DState state) {
     }
 
+    @Override
     public void shapeDelete(GL3DState state) {
         this.positionVBO.disable(state);
         this.colorVBO.disable(state);
@@ -349,6 +354,7 @@ public abstract class GL3DMesh extends GL3DShape {
         return triangles;
     }
 
+    @Override
     public GL3DAABBox buildAABB() {
         GL3DVec3d minOS = new GL3DVec3d();
         GL3DVec3d maxOS = new GL3DVec3d();
