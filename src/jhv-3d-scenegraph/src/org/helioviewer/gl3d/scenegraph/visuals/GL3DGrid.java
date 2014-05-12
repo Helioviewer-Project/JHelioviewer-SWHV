@@ -4,6 +4,7 @@ import org.helioviewer.base.physics.Constants;
 import org.helioviewer.gl3d.scenegraph.GL3DDrawBits.Bit;
 import org.helioviewer.gl3d.scenegraph.GL3DGroup;
 import org.helioviewer.gl3d.scenegraph.GL3DState;
+import org.helioviewer.gl3d.scenegraph.math.GL3DMat3d;
 import org.helioviewer.gl3d.scenegraph.math.GL3DMat4d;
 import org.helioviewer.gl3d.scenegraph.math.GL3DQuatd;
 import org.helioviewer.gl3d.scenegraph.math.GL3DVec3d;
@@ -56,15 +57,27 @@ public class GL3DGrid extends GL3DGroup {
         this.deleteAll(GL3DState.get());
         this.loadGrid();
     }
-
     @Override
-    public void shapeDraw(GL3DState state) {
+    public void update(GL3DState state) {
+        if (!this.isInitialised) {
+            this.init(state);
+        }
+        state.pushMV();
         double differentialRotation = state.getActiveCamera().getDifferentialRotation();
         this.m = GL3DMat4d.identity();
         this.m.multiply(GL3DQuatd.createRotation(differentialRotation, new GL3DVec3d(0, 1, 0)).toMatrix());
-        //System.out.println(rotation);
-        super.shapeDraw(state);
-        //this.m.multiply(GL3DQuatd.createRotation(differentialRotation, new GL3DVec3d(0, 1, 0)).toMatrix().inverse());
+        this.wm = (this.m);
+        state.buildInverseAndNormalMatrix();
+        this.wmI = new GL3DMat4d(state.getMVInverse());
+        this.wmN = new GL3DMat3d(state.normalMatrix);
+        this.shapeUpdate(state);
+        this.buildAABB();
+        state.popMV();
 
+    }
+
+    @Override
+    public void shapeDraw(GL3DState state) {
+        super.shapeDraw(state);
     }
 }
