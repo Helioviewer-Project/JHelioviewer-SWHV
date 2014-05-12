@@ -31,10 +31,9 @@ public class DifferenceShader extends GLFragmentShaderProgram {
         try {
             isDifference = shaderBuilder.addTexCoordParameter(1);
             differenceAngle = shaderBuilder.addTexCoordParameter(1);
-            shaderBuilder.addTexCoordParameter(1);
-            shaderBuilder.addTexCoordParameter(1);
+            shaderBuilder.getParameterList().add("float4 " + "texcoord4" + " : TEXCOORD4");
             String program = "";
-            program = "if(isdifference>0.5){\toutput.r = ( output.r - tex2D(differenceImage, texcoord0.xy).r)/(output.r);";
+            program = "if(isdifference>0.5){\toutput.r = ( output.r - tex2D(differenceImage, texcoord4.xy).r)/(output.r);";
             program += "\tvec4 tr = vec4(0.05f,0.05f,0.05f,0.05f);";
             program += "output.r = (output.r + 1.0f)/2.0f;}";
             // program =
