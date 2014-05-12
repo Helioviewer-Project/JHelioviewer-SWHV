@@ -429,7 +429,7 @@ public class JHVJPXView extends JHVJP2View implements TimedMovieView, CachedMovi
                 setSubimageDataHelper(newImageData, roi, compositionLayer, zoompercent);
             }
         }
-        else if(fullyLoadedMode && this.imageCacheStatus.getImageStatus(compositionLayer) == CacheStatus.COMPLETE){
+        else if(fullyLoadedMode && this.imageCacheStatus.getImageStatus(compositionLayer) != CacheStatus.COMPLETE){
             this.readerSignal.signal();
             Displayer.getSingletonInstance().render();
         }
