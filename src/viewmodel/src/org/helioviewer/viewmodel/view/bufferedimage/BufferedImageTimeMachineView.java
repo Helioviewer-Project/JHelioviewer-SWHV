@@ -151,12 +151,19 @@ public class BufferedImageTimeMachineView extends AbstractBasicView implements S
          */
         @Override
         public ImageData getPreviousFrame(int pos) {
+            /*
+            ImageData previousImageData = renderThroughSlave(0);
+            jpxView.setPreviousImageData(previousImageData);
+
+            return previousImageData;
+            */
             if(jpxView.getPreviousImageData()!=null &&jpxView.getPreviousImageData().getFrameNumber()+1 == jpxView.getImageData().getFrameNumber()){
                 return jpxView.getPreviousImageData();
             };
             ImageData previousImageData = renderThroughSlave(Math.abs(jpxView.getImageData().getFrameNumber()-1));
             jpxView.setPreviousImageData(previousImageData);
             return previousImageData;
+
         }
 
         /**
