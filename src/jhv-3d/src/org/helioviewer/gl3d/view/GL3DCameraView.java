@@ -14,10 +14,7 @@ import org.helioviewer.gl3d.camera.GL3DCameraListener;
 import org.helioviewer.gl3d.changeevent.CameraChangeChangedReason;
 import org.helioviewer.gl3d.scenegraph.GL3DState;
 import org.helioviewer.viewmodel.changeevent.ChangeEvent;
-import org.helioviewer.viewmodel.view.RegionView;
-import org.helioviewer.viewmodel.view.SubimageDataView;
 import org.helioviewer.viewmodel.view.View;
-import org.helioviewer.viewmodel.view.jp2view.JHVJPXView;
 import org.helioviewer.viewmodel.view.opengl.GLView;
 
 /**
@@ -25,31 +22,34 @@ import org.helioviewer.viewmodel.view.opengl.GLView;
  * {@link GL3DCamera}. Since applying the view space transformation is the first
  * transformation to be applied in a scene, this view must be executed before
  * the {@link GL3DSceneGraphView}.
- * 
+ *
  * @author Simon Spoerri (simon.spoerri@fhnw.ch)
- * 
+ *
  */
 public class GL3DCameraView extends AbstractGL3DView implements GL3DView, GL3DCameraListener {
     private GL3DCamera camera;
 
-    private List<GL3DCameraListener> listeners = new ArrayList<GL3DCameraListener>();
+    private final List<GL3DCameraListener> listeners = new ArrayList<GL3DCameraListener>();
 
     public GL3DCameraView() {
         // Register short keys for changing the interaction
         GL3DKeyController.getInstance().addListener(new GL3DKeyListener() {
 
+            @Override
             public void keyHit(KeyEvent e) {
                 camera.setCurrentInteraction(camera.getPanInteraction());
             }
         }, KeyEvent.VK_P);
         GL3DKeyController.getInstance().addListener(new GL3DKeyListener() {
 
+            @Override
             public void keyHit(KeyEvent e) {
                 camera.setCurrentInteraction(camera.getRotateInteraction());
             }
         }, KeyEvent.VK_R);
         GL3DKeyController.getInstance().addListener(new GL3DKeyListener() {
 
+            @Override
             public void keyHit(KeyEvent e) {
                 camera.setCurrentInteraction(camera.getZoomInteraction());
             }
@@ -58,6 +58,7 @@ public class GL3DCameraView extends AbstractGL3DView implements GL3DView, GL3DCa
         // Center Image when pressing alt+c
         GL3DKeyController.getInstance().addListener(new GL3DKeyListener() {
 
+            @Override
             public void keyHit(KeyEvent e) {
                 if (e.isAltDown()) {
                     camera.setPanning(0, 0);
@@ -68,6 +69,7 @@ public class GL3DCameraView extends AbstractGL3DView implements GL3DView, GL3DCa
 
     }
 
+    @Override
     public void render3D(GL3DState state) {
         GL gl = state.gl;
 
@@ -80,6 +82,7 @@ public class GL3DCameraView extends AbstractGL3DView implements GL3DView, GL3DCa
         }
     }
 
+    @Override
     protected void setViewSpecificImplementation(View newView, ChangeEvent changeEvent) {
     }
 
@@ -99,12 +102,14 @@ public class GL3DCameraView extends AbstractGL3DView implements GL3DView, GL3DCa
         notifyViewListeners(new ChangeEvent(new CameraChangeChangedReason(this, this.camera)));
     }
 
+    @Override
     public void cameraMoved(GL3DCamera camera) {
         for (GL3DCameraListener l : this.listeners) {
             l.cameraMoved(camera);
         }
     }
 
+    @Override
     public void cameraMoving(GL3DCamera camera) {
         for (GL3DCameraListener l : this.listeners) {
             l.cameraMoving(camera);
@@ -119,6 +124,7 @@ public class GL3DCameraView extends AbstractGL3DView implements GL3DView, GL3DCa
         this.listeners.remove(listener);
     }
 
+    @Override
     protected void renderChild(GL gl) {
         if (view instanceof GLView) {
             ((GLView) view).renderGL(gl, false);
