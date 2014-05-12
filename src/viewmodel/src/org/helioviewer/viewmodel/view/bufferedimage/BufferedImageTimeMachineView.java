@@ -4,6 +4,7 @@ import java.util.LinkedList;
 
 import org.helioviewer.base.logging.Log;
 import org.helioviewer.viewmodel.changeevent.ChangeEvent;
+import org.helioviewer.viewmodel.changeevent.RegionChangedReason;
 import org.helioviewer.viewmodel.changeevent.ViewChainChangedReason;
 import org.helioviewer.viewmodel.factory.BufferedImageViewFactory;
 import org.helioviewer.viewmodel.factory.ViewFactory;
@@ -149,21 +150,34 @@ public class BufferedImageTimeMachineView extends AbstractBasicView implements S
          *
          * @see org.helioviewer.viewmodel.view.TimeMachineData#getPreviousFrame(int)
          */
-        @Override
-        public ImageData getPreviousFrame(int pos) {
-            /*
+        //@Override
+        public ImageData getPreviousFramea(int pos) {
+
             ImageData previousImageData = renderThroughSlave(0);
             jpxView.setPreviousImageData(previousImageData);
 
             return previousImageData;
-            */
-            if(jpxView.getPreviousImageData()!=null &&jpxView.getPreviousImageData().getFrameNumber()+1 == jpxView.getImageData().getFrameNumber()){
+        }
+        @Override
+        public ImageData getPreviousFrame(int pos) {
+            ImageData prev = jpxView.getPreviousImageData();
+            ImageData curr = jpxView.getImageData();
+
+            if(jpxView.getPreviousImageData()!=null && prev.getFrameNumber()+1 == curr.getFrameNumber()){
                 return jpxView.getPreviousImageData();
             };
-            ImageData previousImageData = renderThroughSlave(Math.abs(jpxView.getImageData().getFrameNumber()-1));
-            jpxView.setPreviousImageData(previousImageData);
-            return previousImageData;
+            ChangeEvent event = new ChangeEvent();
+            ImageData previousImageData =null;
+            if(slaveRegionView!=null&&prev!=null){
+            event.addReason( new RegionChangedReason(slaveRegionView, prev.getRegion()) );
+                slaveRegionView.setRegion(curr.getRegion(),event);
+                previousImageData = renderThroughSlave(Math.abs(jpxView.getImageData().getFrameNumber()-1));
 
+                jpxView.setPreviousImageData(previousImageData);
+            }
+            if(jpxView.getPreviousImageData()!=null){
+            }
+            return previousImageData;
         }
 
         /**
@@ -182,7 +196,9 @@ public class BufferedImageTimeMachineView extends AbstractBasicView implements S
         @Override
         public void setActive(boolean isActive) {
             jpxView.setDifferenceMode(isActive);
+            jpxView.setFullyLoadedMode(isActive);
             slaveSubimageDataView.setDifferenceMode(isActive);
+            slaveSubimageDataView.setFullyLoadedMode(isActive);
         }
     };
 
@@ -325,7 +341,7 @@ public class BufferedImageTimeMachineView extends AbstractBasicView implements S
             // okay we need to invalidate the cache
             previousCache.clear();
         }
-        slaveRegionView.setRegion(r, new ChangeEvent());
+        //slaveRegionView.setRegion(r, new ChangeEvent());
         return regionView.setRegion(r, event);
     }
 
