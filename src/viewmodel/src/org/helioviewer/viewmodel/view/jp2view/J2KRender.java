@@ -416,8 +416,6 @@ class J2KRender implements Runnable {
                     if (currParams.subImage.getNumPixels() == byteBuffer[currentByteBuffer].length) {
                         SingleChannelByte8ImageData imdata = new SingleChannelByte8ImageData(width, height, byteBuffer[currentByteBuffer], new ColorMask());
                         SubImage roi = currParams.subImage;
-                        System.out.println("ROITTHAT " + roi);
-                        // System.out.println("TTRESOLUTION" + resolution);
                         parentViewRef.setSubimageData(imdata, currParams.subImage, curLayer, currParams.resolution.getZoomPercent());
 
                     } else {
