@@ -15,6 +15,7 @@ import org.helioviewer.gl3d.wcs.conversion.SolarSphereToStonyhurstHeliographicCo
 import org.helioviewer.gl3d.wcs.impl.SolarSphereCoordinateSystem;
 import org.helioviewer.gl3d.wcs.impl.StonyhurstHeliographicCoordinateSystem;
 import org.helioviewer.viewmodel.changeevent.ChangeEvent;
+import org.helioviewer.viewmodel.changeevent.TimestampChangedReason;
 import org.helioviewer.viewmodel.view.LinkedMovieManager;
 import org.helioviewer.viewmodel.view.TimedMovieView;
 import org.helioviewer.viewmodel.view.View;
@@ -34,7 +35,7 @@ public class GL3DTrackballCamera extends GL3DSolarRotationTrackingTrackballCamer
 
     private CoordinateVector startPosition = null;
 
-    private final Date currentDate = null;
+    private Date currentDate = null;
     private double currentRotation = 0.0;
 
     private final StonyhurstHeliographicCoordinateSystem stonyhurstCoordinateSystem = new StonyhurstHeliographicCoordinateSystem();
@@ -64,7 +65,7 @@ public class GL3DTrackballCamera extends GL3DSolarRotationTrackingTrackballCamer
 
     @Override
     public void viewChanged(View sender, ChangeEvent aEvent) {
-/*        TimestampChangedReason timestampReason = aEvent.getLastChangedReasonByType(TimestampChangedReason.class);
+        TimestampChangedReason timestampReason = aEvent.getLastChangedReasonByType(TimestampChangedReason.class);
         if ((timestampReason != null) && (timestampReason.getView() instanceof TimedMovieView) && LinkedMovieManager.getActiveInstance().isMaster((TimedMovieView) timestampReason.getView())) {
             currentDate = timestampReason.getNewDateTime().getTime();
             if (startPosition != null) {
@@ -80,22 +81,6 @@ public class GL3DTrackballCamera extends GL3DSolarRotationTrackingTrackballCamer
                 resetStartPosition();
             }
 
-        }*/
-    }
-
-    @Override
-    public void updateRotation(long currentTime){
-        if (startPosition != null) {
-            long timediff = currentTime/1000 - Constants.referenceDate;
-
-            setDifferentialRotation(-DifferentialRotation.calculateRotationInRadians(0., timediff) % (Math.PI * 2.0));
-
-            this.getRotation().rotate(GL3DQuatd.createRotation(currentRotation - getDifferentialRotation(), new GL3DVec3d(0, 1, 0)));
-            this.updateCameraTransformation();
-            this.currentRotation = getDifferentialRotation();
-        } else {
-            currentRotation = 0.0;
-            resetStartPosition();
         }
     }
 
