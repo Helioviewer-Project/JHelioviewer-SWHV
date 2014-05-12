@@ -35,7 +35,7 @@ public class GL3DImageVertexShaderProgram extends GLVertexShaderProgram {
             gl.glProgramLocalParameter4dARB(target, 0, xOffset, yOffset, xScale, yScale);
             gl.glProgramLocalParameter4dARB(target, 1, xTextureScale, yTextureScale, theta, phi);
             gl.glProgramLocalParameter4dARB(target, 2, defaultXOffset, defaultYOffset, 0, 0);
-            gl.glProgramLocalParameter4dARB(target, 3, differenceXOffset, differenceYOffset, differenceXScale, differenceXScale);
+            gl.glProgramLocalParameter4dARB(target, 3, differenceXOffset, differenceYOffset, differenceXScale, differenceYScale);
             gl.glProgramLocalParameter4dARB(target, 4, differenceXTextureScale, differenceYTextureScale, differenceTheta, differencePhi);
 
         }
