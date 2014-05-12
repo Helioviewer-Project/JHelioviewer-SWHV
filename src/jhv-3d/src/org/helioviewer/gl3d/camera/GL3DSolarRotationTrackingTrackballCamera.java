@@ -12,9 +12,9 @@ import org.helioviewer.gl3d.wcs.HeliocentricCartesian2000CoordinateSystem;
  * The trackball camera provides a trackball rotation behavior (
  * {@link GL3DTrackballRotationInteraction}) when in rotation mode. It is
  * currently the default camera.
- * 
+ *
  * @author Simon Spoerri (simon.spoerri@fhnw.ch)
- * 
+ *
  */
 public class GL3DSolarRotationTrackingTrackballCamera extends GL3DCamera {
     public static final double DEFAULT_CAMERA_DISTANCE = 12 * Constants.SunRadius;
@@ -23,9 +23,9 @@ public class GL3DSolarRotationTrackingTrackballCamera extends GL3DCamera {
 
     protected CoordinateSystem viewSpaceCoordinateSystem = new HeliocentricCartesian2000CoordinateSystem();
 
-    private GL3DTrackballRotationInteraction rotationInteraction;
-    private GL3DPanInteraction panInteraction;
-    private GL3DZoomBoxInteraction zoomBoxInteraction;
+    private final GL3DTrackballRotationInteraction rotationInteraction;
+    private final GL3DPanInteraction panInteraction;
+    private final GL3DZoomBoxInteraction zoomBoxInteraction;
 
     protected GL3DSceneGraphView sceneGraphView;
 
@@ -40,6 +40,7 @@ public class GL3DSolarRotationTrackingTrackballCamera extends GL3DCamera {
         this.currentInteraction = this.rotationInteraction;
     }
 
+    @Override
     public void applyCamera(GL3DState state) {
         // ((HEEQCoordinateSystem)this.viewSpaceCoordinateSystem).setObservationDate(state.getCurrentObservationDate());
         super.applyCamera(state);
@@ -49,30 +50,37 @@ public class GL3DSolarRotationTrackingTrackballCamera extends GL3DCamera {
         this.sceneGraphView = sceneGraphView;
     }
 
+    @Override
     public void reset() {
         this.currentInteraction.reset(this);
     }
 
+    @Override
     public double getDistanceToSunSurface() {
         return -this.getCameraTransformation().translation().z;
     }
 
+    @Override
     public GL3DInteraction getPanInteraction() {
         return this.panInteraction;
     }
 
+    @Override
     public GL3DInteraction getRotateInteraction() {
         return this.rotationInteraction;
     }
 
+    @Override
     public GL3DInteraction getCurrentInteraction() {
         return this.currentInteraction;
     }
 
+    @Override
     public void setCurrentInteraction(GL3DInteraction currentInteraction) {
         this.currentInteraction = currentInteraction;
     }
 
+    @Override
     public GL3DInteraction getZoomInteraction() {
         return this.zoomBoxInteraction;
     }
@@ -81,15 +89,18 @@ public class GL3DSolarRotationTrackingTrackballCamera extends GL3DCamera {
         return lastMouseRay;
     }
 
+    @Override
     public CoordinateSystem getViewSpaceCoordinateSystem() {
         return this.viewSpaceCoordinateSystem;
     }
 
+    @Override
     public GL3DMat4d getVM() {
         GL3DMat4d c = this.getCameraTransformation().copy();
         return c;
     }
 
+    @Override
     public String getName() {
         return "Trackball";
     }
