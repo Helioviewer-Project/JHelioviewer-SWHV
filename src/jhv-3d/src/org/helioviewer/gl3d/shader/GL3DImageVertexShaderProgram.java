@@ -32,6 +32,7 @@ public class GL3DImageVertexShaderProgram extends GLVertexShaderProgram {
         if (shader != shaderCurrentlyUsed) {
             shaderCurrentlyUsed = shader;
             gl.glBindProgramARB(target, shader);
+            System.out.println("SHADERANGLE" + phi);
             gl.glProgramLocalParameter4dARB(target, 0, xOffset, yOffset, xScale, yScale);
             gl.glProgramLocalParameter4dARB(target, 1, xTextureScale, yTextureScale, theta, phi);
             gl.glProgramLocalParameter4dARB(target, 2, defaultXOffset, defaultYOffset, 0, 0);
@@ -50,8 +51,6 @@ public class GL3DImageVertexShaderProgram extends GLVertexShaderProgram {
             String program = "\tphysicalPosition = physicalPosition;" + GLShaderBuilder.LINE_SEP;
 
             program += "\tif(abs(position.x)>1.1){" + GLShaderBuilder.LINE_SEP;
-            //Corona
-            //Image
             program += "\tfloat theta = -textureScaleThetaPhi.z;" + GLShaderBuilder.LINE_SEP;
             program += "\tfloat phi = textureScaleThetaPhi.w;" + GLShaderBuilder.LINE_SEP;
 
@@ -63,6 +62,15 @@ public class GL3DImageVertexShaderProgram extends GLVertexShaderProgram {
 
             program += "\toutput.x *= textureScaleThetaPhi.x;" + GLShaderBuilder.LINE_SEP;
             program += "\toutput.y *= textureScaleThetaPhi.y;" + GLShaderBuilder.LINE_SEP;
+
+            program += "\tdifferenceOutput.x = position.x - rect.x;" + GLShaderBuilder.LINE_SEP;
+            program += "\tdifferenceOutput.y = -position.y - rect.y;" + GLShaderBuilder.LINE_SEP;
+
+            program += "\tdifferenceOutput.x *= rect.z;" + GLShaderBuilder.LINE_SEP;
+            program += "\tdifferenceOutput.y *= rect.w;" + GLShaderBuilder.LINE_SEP;
+
+            program += "\tdifferenceOutput.x *= textureScaleThetaPhi.x;" + GLShaderBuilder.LINE_SEP;
+            program += "\tdifferenceOutput.y *= textureScaleThetaPhi.y;" + GLShaderBuilder.LINE_SEP;
 
             program += "\tpositionPass = position;" + GLShaderBuilder.LINE_SEP;
 
