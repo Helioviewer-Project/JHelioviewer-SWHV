@@ -44,7 +44,7 @@ import org.helioviewer.viewmodel.view.RegionView;
 public abstract class GL3DImageLayer extends GL3DOrientedGroup implements GL3DCameraListener {
     private static int nextLayerId = 0;
     private final int layerId;
-    private GL3DVec4d direction = new GL3DVec4d(0, 0, 1, 0);
+    private final GL3DVec4d direction = new GL3DVec4d(0, 0, 1, 0);
 
     public int getLayerId() {
         return layerId;
@@ -65,7 +65,7 @@ public abstract class GL3DImageLayer extends GL3DOrientedGroup implements GL3DCa
 
     private final ArrayList<Point> points = new ArrayList<Point>();
 
-    private double lastViewAngle = 0.0;
+    private final double lastViewAngle = 0.0;
 
     protected GL gl;
     protected GL3DImageFragmentShaderProgram coronaFragmentShader = null;
@@ -143,11 +143,6 @@ public abstract class GL3DImageLayer extends GL3DOrientedGroup implements GL3DCa
         doUpdateROI = true;
         if (this.accellerationShape != null)
             this.accellerationShape.markAsChanged();
-        cameraMoving(camera);
-    }
-
-    public double getLastViewAngle() {
-        return lastViewAngle;
     }
 
     public void paint(Graphics g) {
@@ -158,46 +153,6 @@ public abstract class GL3DImageLayer extends GL3DOrientedGroup implements GL3DCa
 
     @Override
     public void cameraMoving(GL3DCamera camera) {
-        GL3DMat4d camTrans = camera.getRotation().toMatrix().inverse();
-        GL3DVec4d camDirection = new GL3DVec4d(0, 0, 1, 1);
-        camDirection = camTrans.multiply(camDirection);
-        camDirection.w = 0;
-        camDirection.normalize();
-
-        double angle = Math.acos(camDirection.dot(direction)) / Math.PI * 180.0;
-        double maxAngle = 60;
-        double minAngle = 30;
-        if (angle != lastViewAngle) {
-            lastViewAngle = angle;
-            float alpha = (float) ((Math.abs(90 - lastViewAngle) - minAngle) / (maxAngle - minAngle));
-        }
-    }
-
-    public GL3DVec4d getLayerDirection() {
-        // Convert layer orientation to heliocentric coordinate system
-        /*
-         * CoordinateVector orientation = coordinateSystemView.getOrientation();
-         * CoordinateSystem targetSystem = new
-         * HeliocentricCartesianCoordinateSystem(); CoordinateConversion
-         * converter =
-         * orientation.getCoordinateSystem().getConversion(targetSystem);
-         * orientation = converter.convert(orientation);
-         *
-         * GL3DVec3d layerDirection = new GL3DVec3d(orientation.getValue(0),
-         * orientation.getValue(1), orientation.getValue(2));
-         */
-
-        // GL3DVec4d n = new GL3DVec4d(0, 0, 1, 1);
-        // n = modelView().multiply(n);
-
-        // GL3DVec3d layerDirection = new GL3DVec3d(n.x, n.y, n.z);
-
-        // layerDirection.normalize();
-        return direction;
-    }
-
-    public void setLayerDirection(GL3DVec4d direction) {
-        this.direction = direction;
     }
 
     @Override
