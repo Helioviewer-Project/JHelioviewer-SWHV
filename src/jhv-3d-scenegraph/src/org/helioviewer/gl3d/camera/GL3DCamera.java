@@ -305,4 +305,8 @@ public abstract class GL3DCamera {
     public void setDifferentialRotation(double differentialRotation) {
         this.differentialRotation = differentialRotation;
     }
+
+    public void updateRotation(long dateMillis) {
+
+    }
 }
