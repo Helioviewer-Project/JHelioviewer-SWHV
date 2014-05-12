@@ -33,11 +33,11 @@ public class DifferenceShader extends GLFragmentShaderProgram {
             differenceAngle = shaderBuilder.addTexCoordParameter(1);
             shaderBuilder.getParameterList().add("float4 " + "texcoord4" + " : TEXCOORD4");
             String program = "";
-            program = "if(isdifference>0.5){\toutput.r = ( output.r - tex2D(differenceImage, texcoord4.xy).r)/(output.r);";
-            program += "\tvec4 tr = vec4(0.05f,0.05f,0.05f,0.05f);";
-            program += "output.r = (output.r + 1.0f)/2.0f;}";
-            // program =
-            // "\toutput.rgb = tex2D(differenceImage, texcoord0.xy).rgb;";
+            program = "if(isdifference>0.5){\toutput.r = output.r - tex2D(differenceImage, texcoord4.xy).r;";
+            program += "\tfloat tr = 0.05f;";
+            program +="\toutput.r = clamp(output.r,-tr,tr)/tr;";
+            program +="\toutput.r = (output.r + 1.0f)/2.0f;";
+            program += "}";
 
             program = program.replaceAll("output", shaderBuilder.useOutputValue("float4", "COLOR"));
 
