@@ -59,7 +59,6 @@ public class RunningDifferenceFilter implements FrameFilter, StandardFilter, Obs
      */
     @Override
     public ImageData apply(ImageData data) {
-        System.out.print("applyRD");
         // If its not active we don't filter at all
         if (!isActive)
             return data;
