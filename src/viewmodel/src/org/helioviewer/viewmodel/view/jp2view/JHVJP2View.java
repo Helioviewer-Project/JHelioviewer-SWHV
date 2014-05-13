@@ -684,10 +684,8 @@ public class JHVJP2View extends AbstractView implements JP2View, ViewportView, R
 
         this.imageData.setRegion(hvmd.roiToRegion(roi, zoompercent));
         this.imageData.setScaleX(hvmd.getScaleX(roi));
-        System.out.println("SCALEXX" + this.imageData.getScaleX());
         this.imageData.setScaleY(hvmd.getScaleY(roi));
         this.imageData.setDateMillis(hvmd.getDateTime().getMillis());
-        System.out.println("SCALEYY" + this.imageData.getScaleY());
         Region lastRegionSaved = lastRegion;
         subImageBuffer.setLastRegion(roi);
         event.addReason(new SubImageDataChangedReason(this));
