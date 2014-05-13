@@ -2,7 +2,6 @@ package org.helioviewer.gl3d.view;
 
 import javax.media.opengl.GL;
 
-import org.helioviewer.base.logging.Log;
 import org.helioviewer.gl3d.scenegraph.GL3DState;
 import org.helioviewer.viewmodel.changeevent.ChangeEvent;
 import org.helioviewer.viewmodel.view.LayeredView;
@@ -17,9 +16,9 @@ import org.helioviewer.viewmodel.view.opengl.GLView;
 
 /**
  * The GL3DLayeredView makes sure to add all required sub-views to a new layer.
- * 
+ *
  * @author Simon Spoerri (simon.spoerri@fhnw.ch)
- * 
+ *
  */
 public class GL3DLayeredView extends GLLayeredView implements GL3DView, LayeredView, RegionView, ViewportView {
 
@@ -84,7 +83,6 @@ public class GL3DLayeredView extends GLLayeredView implements GL3DView, LayeredV
     @Override
     protected boolean recalculateRegionsAndViewports(ChangeEvent event) {
 
-        Log.debug("GL3DLayeredView: recalculateRegionsAndViewports: " + this.region + " " + this.viewport);
         boolean changed = false;
 
         if (viewport != null) {
