@@ -408,7 +408,6 @@ public class GLTextureHelper {
      *            Image data to draw to the screen
      */
     public void renderImageDataToScreen(GL gl, Region region, ImageData source, JHVJPXView jpxView) {
-        System.out.println("TTTHELP" + source.getFrameNumber() + " " +jpxView.getImageData().getFrameNumber());
         gl.glActiveTexture(GL.GL_TEXTURE0);
 
         if (source == null)
