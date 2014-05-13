@@ -4,7 +4,6 @@ import java.util.LinkedList;
 
 import org.helioviewer.base.logging.Log;
 import org.helioviewer.viewmodel.changeevent.ChangeEvent;
-import org.helioviewer.viewmodel.changeevent.RegionChangedReason;
 import org.helioviewer.viewmodel.changeevent.ViewChainChangedReason;
 import org.helioviewer.viewmodel.factory.BufferedImageViewFactory;
 import org.helioviewer.viewmodel.factory.ViewFactory;
@@ -172,7 +171,7 @@ public class BufferedImageTimeMachineView extends AbstractBasicView implements S
             };
             ChangeEvent event = new ChangeEvent();
             ImageData previousImageData =null;
-            if(slaveRegionView!=null&&prev!=null){
+            /*if(slaveRegionView!=null&&prev!=null){
             event.addReason( new RegionChangedReason(slaveRegionView, prev.getRegion()) );
                 slaveRegionView.setRegion(curr.getRegion(),event);
                 previousImageData = renderThroughSlave(Math.abs(jpxView.getImageData().getFrameNumber()-1));
@@ -180,7 +179,7 @@ public class BufferedImageTimeMachineView extends AbstractBasicView implements S
                 jpxView.setPreviousImageData(previousImageData);
             }
             if(jpxView.getPreviousImageData()!=null){
-            }
+            }*/
             return previousImageData;
         }
 
