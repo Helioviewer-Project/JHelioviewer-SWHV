@@ -6,7 +6,6 @@ import java.util.List;
 import javax.media.opengl.GL;
 
 import org.helioviewer.base.logging.Log;
-import org.helioviewer.base.physics.DifferentialRotation;
 import org.helioviewer.viewmodel.filter.FilterListener;
 import org.helioviewer.viewmodel.filter.FrameFilter;
 import org.helioviewer.viewmodel.filter.GLFragmentShaderFilter;
@@ -29,7 +28,9 @@ public class RunningDifferenceFilter implements FrameFilter, StandardFilter, Obs
     /**
      * Flag to indicate whether this filter should be considered active
      */
-    private boolean isActive = true;
+    private volatile boolean isActive = true;
+    private volatile boolean baseDifference = false;
+
     /**
      * Observer listener
      */
@@ -39,9 +40,9 @@ public class RunningDifferenceFilter implements FrameFilter, StandardFilter, Obs
      */
     private TimeMachineData timeMachineData;
     private final DifferenceShader shader = new DifferenceShader();
-    private final float differenceContrast = 0;
     private int lookupDiff;
     private ImageData currentFrame;
+    private float truncationValue = 0.05f;
 
     /**
      * @see org.helioviewer.viewmodel.filter.ObservableFilter#addFilterListener(org.helioviewer.viewmodel.filter.FilterListener)
@@ -66,12 +67,18 @@ public class RunningDifferenceFilter implements FrameFilter, StandardFilter, Obs
 
         if (timeMachineData == null)
             return data;
-        ImageData previousFrame = timeMachineData.getPreviousFrame(1);
-        // If this is the first frame and therefore 0 we take the frame before
-        // to get some similar picture
-        if (previousFrame == null) {
-            Log.debug("No previous frame available, take ahead");
-            previousFrame = timeMachineData.getPreviousFrame(-1);
+        ImageData previousFrame;
+        if(!baseDifference){
+            previousFrame = timeMachineData.getPreviousFrame(1);
+            // If this is the first frame and therefore 0 we take the frame before
+            // to get some similar picture
+            if (previousFrame == null) {
+                Log.debug("No previous frame available, take ahead");
+                previousFrame = timeMachineData.getPreviousFrame(-1);
+            }
+        }
+        else{
+            previousFrame =timeMachineData.getBaseDifferenceFrame();
         }
         if (previousFrame != null) {
             // Filter according to the data type
@@ -189,11 +196,18 @@ public class RunningDifferenceFilter implements FrameFilter, StandardFilter, Obs
         if (isActive) {
             shader.setIsDifference(gl, 1.0f);
             shader.bind(gl);
-            ImageData previousFrame = timeMachineData.getPreviousFrame(1);
+            ImageData previousFrame;
+            if(!baseDifference){
+                previousFrame = timeMachineData.getPreviousFrame(1);
+            }
+            else{
+                System.out.println("APPLY BASEDIFF");
+                previousFrame =timeMachineData.getBaseDifferenceFrame();
+            }
             if(this.currentFrame != previousFrame){
-                double timeDiff = (timeMachineData.getCurrentDateMillis() - previousFrame.getDateMillis()) / 1000;
-                shader.setDifferenceAngle(gl, (float) (DifferentialRotation.calculateRotationInRadians(0., timeDiff)));
+                shader.setTruncationValue(gl, this.truncationValue);
                 gl.glActiveTexture(shader.mode);
+
                 shader.activateDifferenceTexture(gl);
                 gl.glBindTexture(GL.GL_TEXTURE_2D, lookupDiff);
                 GLTextureHelper th = new GLTextureHelper();
@@ -212,5 +226,14 @@ public class RunningDifferenceFilter implements FrameFilter, StandardFilter, Obs
         lookupDiff = textureHelper.genTextureID(shaderBuilder.getGL());
 
         return shaderBuilder;
+    }
+
+    public void setTruncationvalue(float truncationValue) {
+        this.truncationValue = truncationValue;
+    }
+
+    public void setBaseDifference(boolean selected) {
+        this.baseDifference = selected;
+        System.out.println("BASEDIFF" + this.baseDifference);
     }
 }
