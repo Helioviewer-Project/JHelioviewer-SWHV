@@ -55,11 +55,9 @@ public class Displayer {
 
     private void tdisplay() {
         synchronized (displaylock) {
-            System.out.println("DISPLAYING started");
             for (final DisplayListener listener : listeners) {
                 listener.display();
             }
-            System.out.println("DISPLAYING finished");
         }
     }
 
