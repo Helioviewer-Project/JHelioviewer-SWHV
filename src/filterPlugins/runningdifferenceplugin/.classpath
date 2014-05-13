@@ -11,5 +11,6 @@
 			<attribute name="org.eclipse.jdt.launching.CLASSPATH_ATTR_LIBRARY_PATH_ENTRY" value="JHVVectors/lib/native/windows64bit/native"/>
 		</attributes>
 	</classpathentry>
+	<classpathentry kind="src" path="/basegui"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
