@@ -18,8 +18,6 @@ public class DifferenceShader extends GLFragmentShaderProgram {
         this.isDifference.setValue(gl, isDifference);
     }
 
-    public void setDifferenceAngle(GL gl, float differenceAngle) {
-        this.differenceAngle.setValue(gl, differenceAngle);
     }
 
     /**
@@ -30,7 +28,6 @@ public class DifferenceShader extends GLFragmentShaderProgram {
 
         try {
             isDifference = shaderBuilder.addTexCoordParameter(1);
-            differenceAngle = shaderBuilder.addTexCoordParameter(1);
             shaderBuilder.getParameterList().add("float4 " + "texcoord4" + " : TEXCOORD4");
             String program = "";
             program = "if(isdifference>0.5){\toutput.r = output.r - tex2D(differenceImage, texcoord4.xy).r;";
@@ -44,7 +41,6 @@ public class DifferenceShader extends GLFragmentShaderProgram {
             mode = shaderBuilder.addTextureParameter("sampler2D differenceImage");
             ID = (ID + 1) & 15;
             program = program.replace("isdifference", isDifference.getIdentifier(1));
-            program = program.replace("differenceAngle", differenceAngle.getIdentifier(1));
 
             shaderBuilder.addMainFragment(program);
             System.out.println("SHADERDIFF: " + shaderBuilder.getCode());
