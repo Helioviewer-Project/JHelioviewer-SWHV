@@ -2,11 +2,15 @@ package org.helioviewer.jhv.internal_plugins.filter.difference;
 
 import java.awt.Component;
 import java.awt.FlowLayout;
+import java.awt.GridLayout;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
 
 import javax.swing.BoxLayout;
-import javax.swing.JCheckBox;
+import javax.swing.ButtonGroup;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.JRadioButton;
 import javax.swing.JSpinner;
 import javax.swing.JTextField;
 import javax.swing.SpinnerNumberModel;
@@ -31,15 +35,10 @@ public class RunningDifferencePanel extends FilterPanel implements ChangeListene
      */
     private static final long serialVersionUID = -7744622478498519850L;
     /**
-     * Box if the running difference filter should be active
-     */
-    private final JCheckBox activeBox;
-    /**
      * Controlled filter by this panel
      */
     private RunningDifferenceFilter filter;
     private final JSpinner truncateSpinner;
-    private final JCheckBox baseDifferenceBox;
 
     /**
      * Creates a new panel to control the running difference. Not active until a
@@ -47,31 +46,7 @@ public class RunningDifferencePanel extends FilterPanel implements ChangeListene
      */
     public RunningDifferencePanel() {
         this.setLayout(new BoxLayout(this, BoxLayout.PAGE_AXIS));
-        activeBox = new JCheckBox("Enable difference");
-        activeBox.addChangeListener(new ChangeListener() {
-            @Override
-            public void stateChanged(ChangeEvent e) {
-                if (filter != null) {
-                    filter.setActive(activeBox.isSelected());
-                    Displayer.getSingletonInstance().render();
-                    Displayer.getSingletonInstance().display();
-                }
-            }
-        });
-        add(activeBox);
-        activeBox.setAlignmentX( Component.LEFT_ALIGNMENT );
-        baseDifferenceBox = new JCheckBox("Base difference");
-        baseDifferenceBox.addChangeListener(new ChangeListener() {
-            @Override
-            public void stateChanged(ChangeEvent e) {
-                if (filter != null) {
-                    filter.setBaseDifference(baseDifferenceBox.isSelected());
-                    Displayer.getSingletonInstance().display();
-                }
-            }
-        });
-        baseDifferenceBox.setAlignmentX( Component.LEFT_ALIGNMENT );
-        add(baseDifferenceBox);
+        addRadioButtons();
         truncateSpinner = new JSpinner();
         truncateSpinner.setModel(new SpinnerNumberModel(new Float(1), new Float(0), new Float(1), new Float(0.01f)));
         truncateSpinner.addChangeListener(this);
@@ -93,6 +68,66 @@ public class RunningDifferencePanel extends FilterPanel implements ChangeListene
         add(truncationLine);
         add(new JPanel());
     }
+
+
+    private void addRadioButtons(){
+        final JRadioButton radNone = new JRadioButton("No differences", true);
+        final JRadioButton radRunDiff = new JRadioButton("Running difference");
+        final JRadioButton radBaseDiff = new JRadioButton("Base difference");
+
+
+        radNone.addItemListener(new ItemListener() {
+            @Override
+            public void itemStateChanged(ItemEvent e) {
+                   if(e.getStateChange()==1){
+                       filter.setActive(false);
+                       radRunDiff.setSelected(false);
+                       radBaseDiff.setSelected(false);
+                   }
+            }
+        });
+
+        radRunDiff.addItemListener(new ItemListener() {
+            @Override
+            public void itemStateChanged(ItemEvent e) {
+                   if(e.getStateChange()==1){
+                       filter.setActive(true);
+                       filter.setBaseDifference(false);
+                       radNone.setSelected(false);
+                       radBaseDiff.setSelected(false);
+                   }
+               }
+        });
+
+        radBaseDiff.addItemListener(new ItemListener() {
+            @Override
+            public void itemStateChanged(ItemEvent e) {
+                if(e.getStateChange()==1){
+                    filter.setActive(true);
+                    filter.setBaseDifference(true);
+                    radNone.setSelected(false);
+                    radRunDiff.setSelected(false);
+                }
+            }
+        });
+
+        //Group the radio buttons.
+        ButtonGroup group = new ButtonGroup();
+        group.add(radNone);
+        group.add(radRunDiff);
+        group.add(radBaseDiff);
+
+        JPanel radPanel = new JPanel();
+        radPanel.setLayout(new GridLayout(0,1));
+        radNone.setAlignmentX( Component.LEFT_ALIGNMENT );
+        radPanel.add(radNone);
+        radRunDiff.setAlignmentX( Component.LEFT_ALIGNMENT );
+        radPanel.add(radRunDiff);
+        radBaseDiff.setAlignmentX( Component.LEFT_ALIGNMENT );
+        radPanel.add(radBaseDiff);
+        add(radPanel);
+     }
+
     @Override
     public void stateChanged(ChangeEvent e) {
         if (filter != null) {
@@ -116,7 +151,6 @@ public class RunningDifferencePanel extends FilterPanel implements ChangeListene
     @Override
     public void setEnabled(boolean enabled) {
         super.setEnabled(enabled);
-        activeBox.setEnabled(enabled);
     }
 
     /**
@@ -126,6 +160,7 @@ public class RunningDifferencePanel extends FilterPanel implements ChangeListene
     public void setFilter(Filter filter) {
         if (filter instanceof RunningDifferenceFilter) {
             this.filter = (RunningDifferenceFilter) filter;
+            this.filter.setActive(false);
             setEnabled(true);
         } else {
             setEnabled(false);
