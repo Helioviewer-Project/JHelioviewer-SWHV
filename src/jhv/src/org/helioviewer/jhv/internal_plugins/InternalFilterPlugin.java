@@ -3,10 +3,10 @@ package org.helioviewer.jhv.internal_plugins;
 import java.net.URI;
 import java.net.URISyntaxException;
 
-import org.helioviewer.filter.runningdifference.RunningDifferenceContainer;
 import org.helioviewer.jhv.internal_plugins.filter.SOHOLUTFilterPlugin.SOHOLUTFilterPlugin;
 import org.helioviewer.jhv.internal_plugins.filter.channelMixer.ChannelMixerPlugin;
 import org.helioviewer.jhv.internal_plugins.filter.contrast.ContrastPlugin;
+import org.helioviewer.jhv.internal_plugins.filter.difference.RunningDifferenceContainer;
 import org.helioviewer.jhv.internal_plugins.filter.gammacorrection.GammaCorrectionPlugin;
 import org.helioviewer.jhv.internal_plugins.filter.opacity.OpacityPlugin;
 import org.helioviewer.jhv.internal_plugins.filter.sharpen.SharpenPlugin;

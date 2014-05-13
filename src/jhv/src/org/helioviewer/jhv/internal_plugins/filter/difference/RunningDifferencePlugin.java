@@ -1,4 +1,4 @@
-package org.helioviewer.filter.runningdifference;
+package org.helioviewer.jhv.internal_plugins.filter.difference;
 
 import org.helioviewer.viewmodelplugin.filter.FilterPlugin;
 

@@ -1,6 +1,12 @@
-package org.helioviewer.filter.runningdifference;
+package org.helioviewer.jhv.internal_plugins.filter.difference;
 
+import java.awt.Component;
+import java.awt.FlowLayout;
+
+import javax.swing.BoxLayout;
 import javax.swing.JCheckBox;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
 import javax.swing.JSpinner;
 import javax.swing.JTextField;
 import javax.swing.SpinnerNumberModel;
@@ -40,7 +46,8 @@ public class RunningDifferencePanel extends FilterPanel implements ChangeListene
      * valid filter has been set.
      */
     public RunningDifferencePanel() {
-        activeBox = new JCheckBox("Enable running difference");
+        this.setLayout(new BoxLayout(this, BoxLayout.PAGE_AXIS));
+        activeBox = new JCheckBox("Enable difference");
         activeBox.addChangeListener(new ChangeListener() {
             @Override
             public void stateChanged(ChangeEvent e) {
@@ -52,6 +59,7 @@ public class RunningDifferencePanel extends FilterPanel implements ChangeListene
             }
         });
         add(activeBox);
+        activeBox.setAlignmentX( Component.LEFT_ALIGNMENT );
         baseDifferenceBox = new JCheckBox("Base difference");
         baseDifferenceBox.addChangeListener(new ChangeListener() {
             @Override
@@ -62,25 +70,35 @@ public class RunningDifferencePanel extends FilterPanel implements ChangeListene
                 }
             }
         });
+        baseDifferenceBox.setAlignmentX( Component.LEFT_ALIGNMENT );
         add(baseDifferenceBox);
         truncateSpinner = new JSpinner();
         truncateSpinner.setModel(new SpinnerNumberModel(new Float(1), new Float(0), new Float(1), new Float(0.01f)));
         truncateSpinner.addChangeListener(this);
 
+        JPanel truncationLine = new JPanel();
+        truncationLine.setLayout(new FlowLayout());
+        JLabel truncationLabel = new JLabel("Truncation point:");
+        truncationLine.add(truncationLabel);
         JSpinner.NumberEditor editor = new JSpinner.NumberEditor(truncateSpinner, "0%");
         truncateSpinner.setEditor(editor);
         editor.getTextField().setColumns(3);
         editor.getTextField().setHorizontalAlignment(JTextField.CENTER);
         editor.getTextField().setValue(0.05);
         WheelSupport.installMouseWheelSupport(truncateSpinner);
-        add(truncateSpinner);
+        truncationLine.add(truncateSpinner);
         setEnabled(false);
+        truncationLine.setAlignmentX( Component.LEFT_ALIGNMENT );
+        add(truncationLine);
+        add(new JPanel());
     }
     @Override
     public void stateChanged(ChangeEvent e) {
         if (filter != null) {
             float value = ((SpinnerNumberModel) truncateSpinner.getModel()).getNumber().floatValue();
             filter.setTruncationvalue(value);
+            Displayer.getSingletonInstance().display();
+
         }
     }
     /**
