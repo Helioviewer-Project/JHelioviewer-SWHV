@@ -77,7 +77,8 @@ public class RunningDifferencePanel extends FilterPanel implements ChangeListene
         truncateSpinner.addChangeListener(this);
 
         JPanel truncationLine = new JPanel();
-        truncationLine.setLayout(new FlowLayout());
+        truncationLine.setLayout(new FlowLayout(FlowLayout.LEFT));
+
         JLabel truncationLabel = new JLabel("Truncation point:");
         truncationLine.add(truncationLabel);
         JSpinner.NumberEditor editor = new JSpinner.NumberEditor(truncateSpinner, "0%");
