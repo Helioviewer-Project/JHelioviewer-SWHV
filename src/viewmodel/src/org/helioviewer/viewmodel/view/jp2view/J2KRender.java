@@ -67,7 +67,7 @@ class J2KRender implements Runnable {
 
     private int lastFrame = -1;
 
-    private final static int NUM_BUFFERS = 2;
+    private final static int NUM_BUFFERS = 8;
 
     /** An integer buffer used in the run method. */
     private int[] localIntBuffer = new int[0];
