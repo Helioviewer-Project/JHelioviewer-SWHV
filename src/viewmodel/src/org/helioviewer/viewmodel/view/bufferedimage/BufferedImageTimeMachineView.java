@@ -134,6 +134,8 @@ public class BufferedImageTimeMachineView extends AbstractBasicView implements S
      * Data object to pass to the filter to access the extra information
      */
     protected TimeMachineData timeMachineData = new TimeMachineData() {
+        private ImageData baseDifferenceImageData;
+
         /**
          * Call the slave view chain to obtain the requested data
          *
@@ -151,12 +153,14 @@ public class BufferedImageTimeMachineView extends AbstractBasicView implements S
          * @see org.helioviewer.viewmodel.view.TimeMachineData#getPreviousFrame(int)
          */
         //@Override
-        public ImageData getPreviousFramea(int pos) {
+        @Override
+        public ImageData getBaseDifferenceFrame() {
+            if(baseDifferenceImageData ==null){
+                baseDifferenceImageData = renderThroughSlave(0);
+            }
+            jpxView.setPreviousImageData(baseDifferenceImageData);
 
-            ImageData previousImageData = renderThroughSlave(0);
-            jpxView.setPreviousImageData(previousImageData);
-
-            return previousImageData;
+            return baseDifferenceImageData;
         }
         @Override
         public ImageData getPreviousFrame(int pos) {
@@ -200,6 +204,7 @@ public class BufferedImageTimeMachineView extends AbstractBasicView implements S
             slaveSubimageDataView.setDifferenceMode(isActive);
             slaveSubimageDataView.setFullyLoadedMode(isActive);
         }
+
     };
 
     /**
