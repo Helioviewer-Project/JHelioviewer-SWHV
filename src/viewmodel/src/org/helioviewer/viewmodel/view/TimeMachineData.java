@@ -60,4 +60,6 @@ public interface TimeMachineData {
     public long getCurrentDateMillis();
 
     public void setActive(boolean isActive);
+
+    public ImageData getBaseDifferenceFrame();
 }
