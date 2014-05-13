@@ -1,4 +1,4 @@
-package org.helioviewer.filter.runningdifference;
+package org.helioviewer.jhv.internal_plugins.filter.difference;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -6,6 +6,8 @@ import java.util.List;
 import javax.media.opengl.GL;
 
 import org.helioviewer.base.logging.Log;
+import org.helioviewer.jhv.gui.states.StateController;
+import org.helioviewer.jhv.gui.states.ViewStateEnum;
 import org.helioviewer.viewmodel.filter.FilterListener;
 import org.helioviewer.viewmodel.filter.FrameFilter;
 import org.helioviewer.viewmodel.filter.GLFragmentShaderFilter;
@@ -194,14 +196,18 @@ public class RunningDifferenceFilter implements FrameFilter, StandardFilter, Obs
     @Override
     public void applyGL(GL gl) {
         if (isActive) {
-            shader.setIsDifference(gl, 1.0f);
+            if(StateController.getInstance().getCurrentState().getType() == ViewStateEnum.View3D){
+                shader.setIsDifference(gl, 1.0f);
+            }
+            else{
+                shader.setIsDifference(gl, 0.25f);
+            }
             shader.bind(gl);
             ImageData previousFrame;
             if(!baseDifference){
                 previousFrame = timeMachineData.getPreviousFrame(1);
             }
             else{
-                System.out.println("APPLY BASEDIFF");
                 previousFrame =timeMachineData.getBaseDifferenceFrame();
             }
             if(this.currentFrame != previousFrame){
