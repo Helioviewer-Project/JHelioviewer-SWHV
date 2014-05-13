@@ -9,6 +9,7 @@ import org.helioviewer.viewmodel.view.opengl.shader.GLTextureCoordinate;
 
 public class DifferenceShader extends GLFragmentShaderProgram {
     private GLTextureCoordinate isDifference;
+    private GLTextureCoordinate truncationValue;
 
     private static int ID = 0;
     int mode = -1;
@@ -17,8 +18,9 @@ public class DifferenceShader extends GLFragmentShaderProgram {
         this.isDifference.setValue(gl, isDifference);
     }
 
+    public void setTruncationValue(GL gl, float truncationValue) {
+        this.truncationValue.setValue(gl, truncationValue);
     }
-
     /**
      * {@inheritDoc}
      */
@@ -27,11 +29,13 @@ public class DifferenceShader extends GLFragmentShaderProgram {
 
         try {
             isDifference = shaderBuilder.addTexCoordParameter(1);
+            truncationValue = shaderBuilder.addTexCoordParameter(1);
+
+
             shaderBuilder.getParameterList().add("float4 " + "texcoord4" + " : TEXCOORD4");
             String program = "";
             program = "if(isdifference>0.5){\toutput.r = output.r - tex2D(differenceImage, texcoord4.xy).r;";
-            program += "\tfloat tr = 0.05f;";
-            program +="\toutput.r = clamp(output.r,-tr,tr)/tr;";
+            program +="\toutput.r = clamp(output.r,-truncationValue,truncationValue)/truncationValue;";
             program +="\toutput.r = (output.r + 1.0f)/2.0f;";
             program += "}";
 
@@ -40,6 +44,8 @@ public class DifferenceShader extends GLFragmentShaderProgram {
             mode = shaderBuilder.addTextureParameter("sampler2D differenceImage");
             ID = (ID + 1) & 15;
             program = program.replace("isdifference", isDifference.getIdentifier(1));
+            program = program.replace("truncationValue", truncationValue.getIdentifier(1));
+
 
             shaderBuilder.addMainFragment(program);
             System.out.println("SHADERDIFF: " + shaderBuilder.getCode());
