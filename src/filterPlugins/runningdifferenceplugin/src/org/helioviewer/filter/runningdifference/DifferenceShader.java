@@ -9,7 +9,6 @@ import org.helioviewer.viewmodel.view.opengl.shader.GLTextureCoordinate;
 
 public class DifferenceShader extends GLFragmentShaderProgram {
     private GLTextureCoordinate isDifference;
-    private GLTextureCoordinate differenceAngle;
 
     private static int ID = 0;
     int mode = -1;
