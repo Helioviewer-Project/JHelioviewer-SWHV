@@ -1,4 +1,4 @@
-package org.helioviewer.jhv.gui.components;
+package org.helioviewer.basegui.components;
 
 /*
  * @(#)SpinnerWheelSupport.java 7/28/2006
