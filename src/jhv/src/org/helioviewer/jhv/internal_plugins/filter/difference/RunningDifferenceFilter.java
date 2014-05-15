@@ -17,7 +17,7 @@ import org.helioviewer.viewmodel.imagedata.ColorMask;
 import org.helioviewer.viewmodel.imagedata.ImageData;
 import org.helioviewer.viewmodel.imagedata.SingleChannelByte8ImageData;
 import org.helioviewer.viewmodel.imagetransport.Byte8ImageTransport;
-import org.helioviewer.viewmodel.view.TimeMachineData;
+import org.helioviewer.viewmodel.view.jp2view.JHVJPXView;
 import org.helioviewer.viewmodel.view.opengl.GLTextureHelper;
 import org.helioviewer.viewmodel.view.opengl.shader.GLShaderBuilder;
 
@@ -40,11 +40,12 @@ public class RunningDifferenceFilter implements FrameFilter, StandardFilter, Obs
     /**
      * Given time machine to access the previous frame
      */
-    private TimeMachineData timeMachineData;
+   // private TimeMachineData timeMachineData;
     private final DifferenceShader shader = new DifferenceShader();
     private int lookupDiff;
     private ImageData currentFrame;
     private float truncationValue = 0.05f;
+    private JHVJPXView jpxView;
 
     /**
      * @see org.helioviewer.viewmodel.filter.ObservableFilter#addFilterListener(org.helioviewer.viewmodel.filter.FilterListener)
@@ -66,14 +67,14 @@ public class RunningDifferenceFilter implements FrameFilter, StandardFilter, Obs
         if (data == null)
             return null;
 
-        if (timeMachineData == null)
+        if (jpxView == null)
             return data;
         ImageData previousFrame;
         if(!baseDifference){
-            previousFrame = timeMachineData.getPreviousFrame();
+            previousFrame = jpxView.getPreviousImageData();
         }
         else{
-            previousFrame =timeMachineData.getBaseDifferenceFrame();
+            previousFrame = jpxView.getPreviousImageData();
         }
         if (previousFrame != null) {
             // Filter according to the data type
@@ -158,7 +159,6 @@ public class RunningDifferenceFilter implements FrameFilter, StandardFilter, Obs
      */
     public void setActive(boolean isActive) {
         this.isActive = isActive;
-        timeMachineData.setActive(isActive);
         notifyAllListeners();
     }
 
@@ -166,19 +166,12 @@ public class RunningDifferenceFilter implements FrameFilter, StandardFilter, Obs
      * @see org.helioviewer.viewmodel.filter.FrameFilter#setTimeMachineData(org.helioviewer.viewmodel.view.TimeMachineData)
      */
     @Override
-    public void setTimeMachineData(TimeMachineData data) {
-        // System.out.println("Time machine data is set");
-        timeMachineData = data;
-        if (timeMachineData != null)
-            timeMachineData.setPreviousCache(1);
-        else
-            System.out.println("Empty time machine");
+    public void setTimeMachineData(JHVJPXView jpxView) {
+        this.jpxView = jpxView;
     }
 
     @Override
     public void setState(String state) {
-        // setContrast(Float.parseFloat(state));
-        // panel.setValue(contrast);
     }
 
     @Override
@@ -198,10 +191,10 @@ public class RunningDifferenceFilter implements FrameFilter, StandardFilter, Obs
             shader.bind(gl);
             ImageData previousFrame;
             if(!baseDifference){
-                previousFrame = timeMachineData.getPreviousFrame();
+                previousFrame = jpxView.getPreviousImageData();
             }
             else{
-                previousFrame =timeMachineData.getBaseDifferenceFrame();
+                previousFrame = jpxView.getPreviousImageData();
             }
             if(this.currentFrame != previousFrame){
                 shader.setTruncationValue(gl, this.truncationValue);

@@ -14,24 +14,25 @@ import org.helioviewer.viewmodel.filter.RegionFilter;
 import org.helioviewer.viewmodel.filter.StandardFilter;
 import org.helioviewer.viewmodel.imagedata.ImageData;
 import org.helioviewer.viewmodel.view.bufferedimage.BufferedImageTimeMachineView;
+import org.helioviewer.viewmodel.view.jp2view.JHVJPXView;
 
 /**
  * Implementation of FilterView, providing the capability to apply filters on
  * the image.
- * 
+ *
  * <p>
  * This view allows to filter the image data by using varies filters. Every time
  * the image data changes, the view calls the filter to calculate the new image
  * data. Apart from that, it feeds the filter with all other informations to do
  * its job, such as the current region, meta data or the full image.
- * 
+ *
  * <p>
  * For further information on how to use filters, see
  * {@link org.helioviewer.viewmodel.filter}
- * 
+ *
  * @author Ludwig Schmidt
  * @author Markus Langenberg
- * 
+ *
  */
 public class StandardFilterView extends AbstractBasicView implements FilterView, SubimageDataView, ViewListener, FilterListener {
 
@@ -46,9 +47,12 @@ public class StandardFilterView extends AbstractBasicView implements FilterView,
      */
     protected TimeMachineView timeMachineView = null;
 
+    private JHVJPXView jpxView;
+
     /**
      * {@inheritDoc}
      */
+    @Override
     public Filter getFilter() {
         return filter;
     }
@@ -56,6 +60,7 @@ public class StandardFilterView extends AbstractBasicView implements FilterView,
     /**
      * {@inheritDoc}
      */
+    @Override
     public void setFilter(Filter f) {
         if (filter != null && (filter instanceof ObservableFilter)) {
             ((ObservableFilter) filter).removeFilterListener(this);
@@ -81,6 +86,7 @@ public class StandardFilterView extends AbstractBasicView implements FilterView,
     /**
      * {@inheritDoc}
      */
+    @Override
     public ImageData getSubimageData() {
         if (filter instanceof StandardFilter && filteredData != null) {
             return filteredData;
@@ -92,7 +98,7 @@ public class StandardFilterView extends AbstractBasicView implements FilterView,
 
     /**
      * Prepares the actual filter process.
-     * 
+     *
      * This function feeds the filter with all the additional informations it
      * needs to do its job, such as the region, meta data and the full image.
      */
@@ -107,18 +113,16 @@ public class StandardFilterView extends AbstractBasicView implements FilterView,
             if (timeMachineView == null) {
                 // TODO This is only software mode
                 timeMachineView = new BufferedImageTimeMachineView();
-                timeMachineView.setView(view);
-                super.setView(timeMachineView);
                 updatePrecomputedViews();
             }
-            ((FrameFilter) filter).setTimeMachineData(timeMachineView.getTimeMachineData());
+            ((FrameFilter) filter).setTimeMachineData(jpxView);
         }
     }
 
     /**
      * If we have a time machine below we want to force it staying below the
      * filter view
-     * 
+     *
      * @see org.helioviewer.viewmodel.view.AbstractBasicView#setView(org.helioviewer.viewmodel.view.View)
      */
     @Override
@@ -131,7 +135,7 @@ public class StandardFilterView extends AbstractBasicView implements FilterView,
 
     /**
      * Refilters the image.
-     * 
+     *
      * Calls the filter and fires a ChangeEvent afterwards.
      */
     protected void refilter() {
@@ -154,9 +158,10 @@ public class StandardFilterView extends AbstractBasicView implements FilterView,
 
     /**
      * {@inheritDoc}
-     * 
+     *
      * In this case, refilters the image, if there is one.
      */
+    @Override
     protected void setViewSpecificImplementation(View newView, ChangeEvent changeEvent) {
         updatePrecomputedViews();
 
@@ -168,9 +173,10 @@ public class StandardFilterView extends AbstractBasicView implements FilterView,
 
     /**
      * {@inheritDoc}
-     * 
+     *
      * In case the image data has changed, applies the filter.
      */
+    @Override
     public void viewChanged(View sender, ChangeEvent aEvent) {
 
         if (aEvent.reasonOccurred(ViewChainChangedReason.class)) {
@@ -186,6 +192,7 @@ public class StandardFilterView extends AbstractBasicView implements FilterView,
     /**
      * {@inheritDoc}
      */
+    @Override
     public void filterChanged(Filter f) {
         refilter();
 
@@ -199,7 +206,7 @@ public class StandardFilterView extends AbstractBasicView implements FilterView,
 
     /**
      * Updates the precomputed results for different view adapters.
-     * 
+     *
      * This adapters are precomputed to avoid unnecessary overhead appearing
      * when doing this every frame.
      */
@@ -207,5 +214,7 @@ public class StandardFilterView extends AbstractBasicView implements FilterView,
         regionView = ViewHelper.getViewAdapter(view, RegionView.class);
         metaDataView = ViewHelper.getViewAdapter(view, MetaDataView.class);
         subimageDataView = ViewHelper.getViewAdapter(view, SubimageDataView.class);
+        jpxView =  ViewHelper.getViewAdapter(view, JHVJPXView.class);
+
     }
 }
