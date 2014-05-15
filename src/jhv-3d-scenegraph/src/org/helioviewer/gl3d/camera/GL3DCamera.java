@@ -281,19 +281,6 @@ public abstract class GL3DCamera {
 
     public abstract CoordinateSystem getViewSpaceCoordinateSystem();
 
-    public void setDragRotation(GL3DQuatd currentDragRotation) {
-        this.currentDragRotation = currentDragRotation;
-    }
-
-    public void rotateAll() {
-        this.setRotation(GL3DQuatd.createRotation(0.0, new GL3DVec3d(0, 1, 0)));
-        this.getRotation().rotate(GL3DQuatd.createRotation(localrotation, new GL3DVec3d(0, 1, 0)));
-        if (this.currentDragRotation != null) {
-            this.getRotation().rotate(this.currentDragRotation);
-        }
-        this.updateCameraTransformation();
-    }
-
     public boolean isAnimating() {
         return !this.cameraAnimations.isEmpty();
     }
