@@ -19,11 +19,12 @@ public class GL3DViewchainFactory extends ViewchainFactory {
 
     /**
      * Creates a new main view chain with the minimal needed views.
-     * 
+     *
      * @return a instance of a ComponentView which is the topmost view of the
      *         new chain.
      */
 
+    @Override
     protected ComponentView createNewViewchainMain() {
         ViewFactory viewFactory = getUsedViewFactory();
         // Layered View
@@ -59,6 +60,7 @@ public class GL3DViewchainFactory extends ViewchainFactory {
     /**
      * {@inheritDoc}
      */
+    @Override
     public ComponentView createViewchainFromExistingViewchain(ComponentView sourceImagePanelView, ComponentView mainImagePanelView, boolean keepSource) {
         ViewFactory viewFactory = getUsedViewFactory();
         ComponentView newView = viewFactory.createViewFromSource(sourceImagePanelView, keepSource);
@@ -67,8 +69,8 @@ public class GL3DViewchainFactory extends ViewchainFactory {
         return newView;
     }
 
+    @Override
     protected void createViewchainFromExistingViewchain(View sourceView, View targetView, ComponentView mainImagePanelView, boolean keepSource) {
-
         if (targetView != null && targetView.getClass().isAssignableFrom(GL3DComponentView.class)) {
             // View overlayView = sourceView.getAdapter(OverlayView.class);
             View layeredView = sourceView.getAdapter(LayeredView.class);
@@ -104,10 +106,12 @@ public class GL3DViewchainFactory extends ViewchainFactory {
         }
     }
 
+    @Override
     protected View getViewNextToOverlayView(ComponentView componentView) {
         return componentView.getAdapter(LayeredView.class);
     }
 
+    @Override
     protected ModifiableInnerViewView getViewBeforeToOverlayView(ComponentView componentView) {
         return componentView.getAdapter(GL3DCameraView.class);
         // return componentView;
