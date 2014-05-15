@@ -38,12 +38,10 @@ public interface TimeMachineData {
      * may give wrong results! If using a normal filter, the StandardFilterView
      * already did this.
      *
-     * @param pos
-     *            Number of frames to go back
      * @return ImageData of the frame pos times before. Null if this frame if
      *         not available
      */
-    public ImageData getPreviousFrame(int pos);
+    public ImageData getPreviousFrame();
 
     /**
      * Sets the number of previous frames we are interested in.

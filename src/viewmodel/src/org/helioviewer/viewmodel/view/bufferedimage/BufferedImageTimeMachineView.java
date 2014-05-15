@@ -162,7 +162,7 @@ public class BufferedImageTimeMachineView extends AbstractBasicView implements S
             return baseDifferenceImageData;
         }
         @Override
-        public ImageData getPreviousFrame(int pos) {
+        public ImageData getPreviousFrame() {
             ImageData prev = jpxView.getPreviousImageData();
             ImageData curr = jpxView.getImageData();
 
