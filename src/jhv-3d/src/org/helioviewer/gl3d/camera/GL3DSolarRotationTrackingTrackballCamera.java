@@ -101,6 +101,6 @@ public class GL3DSolarRotationTrackingTrackballCamera extends GL3DCamera {
 
     @Override
     public String getName() {
-        return "Trackball";
+        return "Solar Rotation Tracking Camera";
     }
 }
