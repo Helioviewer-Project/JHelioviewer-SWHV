@@ -17,8 +17,8 @@ import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.display.GL3DComponentFakeInterface;
 import org.helioviewer.viewmodel.changeevent.ChangeEvent;
 import org.helioviewer.viewmodel.changeevent.LayerChangedReason;
-import org.helioviewer.viewmodel.changeevent.TimestampChangedReason;
 import org.helioviewer.viewmodel.changeevent.LayerChangedReason.LayerChangeType;
+import org.helioviewer.viewmodel.changeevent.TimestampChangedReason;
 import org.helioviewer.viewmodel.changeevent.ViewChainChangedReason;
 import org.helioviewer.viewmodel.renderer.screen.GLScreenRenderGraphics;
 import org.helioviewer.viewmodel.renderer.screen.ScreenRenderer;
@@ -40,15 +40,13 @@ import org.helioviewer.viewmodel.view.opengl.shader.GLVertexShaderView;
 import org.helioviewer.viewmodel.viewport.StaticViewport;
 import org.helioviewer.viewmodel.viewport.Viewport;
 
-import com.sun.opengl.util.FPSAnimator;
-
 /**
  * The top-most View in the 3D View Chain. Let's the viewchain render to its
  * {@link GLCanvas}.
- * 
- * 
+ *
+ *
  * @author Simon Spoerri (simon.spoerri@fhnw.ch)
- * 
+ *
  */
 public class GL3DComponentView extends AbstractComponentView implements GLEventListener, ComponentView, DisplayListener, GL3DComponentFakeInterface {
     private GLCanvas canvas;
@@ -58,8 +56,8 @@ public class GL3DComponentView extends AbstractComponentView implements GLEventL
 
     private boolean rebuildShadersRequest = false;
 
-    private GLTextureHelper textureHelper = new GLTextureHelper();
-    private GLShaderHelper shaderHelper = new GLShaderHelper();
+    private final GLTextureHelper textureHelper = new GLTextureHelper();
+    private final GLShaderHelper shaderHelper = new GLShaderHelper();
 
     // private GL3DOrthoView orthoView;
     private ViewportView viewportView;
@@ -72,23 +70,28 @@ public class GL3DComponentView extends AbstractComponentView implements GLEventL
         Displayer.getSingletonInstance().register(this);
         Displayer.getSingletonInstance().addListener(this);
         this.getCanvas().addGLEventListener(this);
-    }
 
+    }
+    @Override
     public void deactivate() {
 
     }
 
+    @Override
     public void activate() {
     }
 
+    @Override
     public GLCanvas getComponent() {
         return this.getCanvas();
     }
 
+    @Override
     public void displayChanged(GLAutoDrawable arg0, boolean arg1, boolean arg2) {
         Log.debug("GL3DComponentView.DisplayChanged");
     }
 
+    @Override
     public void init(GLAutoDrawable glAD) {
         Log.debug("GL3DComponentView.Init");
         GLSharedContext.setSharedContext(glAD.getContext());
@@ -130,6 +133,7 @@ public class GL3DComponentView extends AbstractComponentView implements GLEventL
         // gl.glColor3f(1.0f, 1.0f, 0.0f);
     }
 
+    @Override
     public void reshape(GLAutoDrawable glAD, int x, int y, int width, int height) {
         viewportSize = new Vector2dInt(width, height);
         GL gl = glAD.getGL();
@@ -139,6 +143,7 @@ public class GL3DComponentView extends AbstractComponentView implements GLEventL
         updateViewport();
     }
 
+    @Override
     public synchronized void display(GLAutoDrawable glAD) {
 
         GL gl = glAD.getGL();
@@ -207,21 +212,25 @@ public class GL3DComponentView extends AbstractComponentView implements GLEventL
         GL3DState.get().checkGLErrors();
     }
 
+    @Override
     public void saveScreenshot(String imageFormat, File outputFile) throws IOException {
         throw new UnsupportedOperationException("Cannot Save screenshots in 3D mode yet!");
     }
 
+    @Override
     public void setBackgroundColor(Color background) {
         backgroundColor = background;
         backGroundColorHasChanged = true;
     }
 
+    @Override
     public void setOffset(Vector2dInt offset) {
         // if(this.orthoView!=null) {
         // orthoView.setOffset(offset);
         // }
     }
 
+    @Override
     public void updateMainImagePanelSize(Vector2dInt size) {
         super.updateMainImagePanelSize(size);
         this.viewportSize = size;
@@ -235,6 +244,7 @@ public class GL3DComponentView extends AbstractComponentView implements GLEventL
         }
     }
 
+    @Override
     protected void setViewSpecificImplementation(View newView, ChangeEvent changeEvent) {
         // this.orthoView = getAdapter(GL3DOrthoView.class);
         this.viewportView = getAdapter(ViewportView.class);
@@ -244,6 +254,7 @@ public class GL3DComponentView extends AbstractComponentView implements GLEventL
         // this.orthoView.updateMainImagePanelSize(mainImagePanelSize);
     }
 
+    @Override
     public void display() {
         try {
             this.canvas.display();
@@ -252,6 +263,7 @@ public class GL3DComponentView extends AbstractComponentView implements GLEventL
         }
     }
 
+    @Override
     public void viewChanged(View sender, ChangeEvent aEvent) {
 
         // rebuild shaders, if necessary
