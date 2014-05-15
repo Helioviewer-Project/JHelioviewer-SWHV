@@ -682,19 +682,37 @@ public class JHVJP2View extends AbstractView implements JP2View, ViewportView, R
      *            {@link org.helioviewer.viewmodel.region.Region}
      */
     void setSubimageData(ImageData newImageData, SubImage roi, int compositionLayer, double zoompercent, boolean fullyLoaded) {
-        if(this.imageData!=null && compositionLayer == 0)
-            this.baseDifferenceImageData = this.imageData;
-        if(this.imageData!=null && compositionLayer == this.imageData.getFrameNumber()+1)
-            this.previousImageData = this.imageData;
-        this.imageData = newImageData;
-        this.imageData.setFrameNumber(compositionLayer);
+        if(compositionLayer == 0){
+            this.baseDifferenceImageData = newImageData;
+        }
+        if(this.previousImageData!=null)
+            System.out.println("sdf" + compositionLayer + " " + this.imageData.getFrameNumber());
+
+        newImageData.setFrameNumber(compositionLayer);
         HelioviewerMetaData hvmd = (HelioviewerMetaData) metaData;
 
-        this.imageData.setRegion(hvmd.roiToRegion(roi, zoompercent));
-        this.imageData.setScaleX(hvmd.getScaleX(roi));
-        this.imageData.setScaleY(hvmd.getScaleY(roi));
-        this.imageData.setDateMillis(hvmd.getDateTime().getMillis());
-        this.imageData.setFullyLoaded(fullyLoaded);
+        newImageData.setRegion(hvmd.roiToRegion(roi, zoompercent));
+        newImageData.setScaleX(hvmd.getScaleX(roi));
+        newImageData.setScaleY(hvmd.getScaleY(roi));
+        newImageData.setDateMillis(hvmd.getDateTime().getMillis());
+        newImageData.setFullyLoaded(fullyLoaded);
+        if(this.imageData!=null && compositionLayer == this.imageData.getFrameNumber()+1){
+            this.previousImageData = this.imageData;
+            this.imageData = newImageData;
+        }
+        else if(this.previousImageData!=null&& this.previousImageData.getFrameNumber()-compositionLayer>2){
+            this.previousImageData = newImageData;
+            this.imageData = newImageData;
+        }
+        else if(this.imageData!=null && compositionLayer == this.imageData.getFrameNumber()-1){
+            this.previousImageData = this.imageData;
+            this.imageData = newImageData;
+        }
+        else{
+            this.imageData = newImageData;
+        }
+
+
         Region lastRegionSaved = lastRegion;
         subImageBuffer.setLastRegion(roi);
         event.addReason(new SubImageDataChangedReason(this));
