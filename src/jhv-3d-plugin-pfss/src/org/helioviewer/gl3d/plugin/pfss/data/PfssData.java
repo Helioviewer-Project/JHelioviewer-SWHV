@@ -6,7 +6,13 @@ import java.io.InputStream;
 import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
 import java.util.Arrays;
-import javax.media.opengl.*;
+
+import javax.media.opengl.GL;
+
+import nom.tam.fits.BasicHDU;
+import nom.tam.fits.BinaryTableHDU;
+import nom.tam.fits.Fits;
+import nom.tam.fits.FitsException;
 
 import org.helioviewer.base.physics.Constants;
 import org.helioviewer.gl3d.plugin.pfss.settings.PfssSettings;
@@ -14,14 +20,9 @@ import org.helioviewer.gl3d.scenegraph.math.GL3DVec3f;
 
 import com.sun.opengl.util.BufferUtil;
 
-import nom.tam.fits.BasicHDU;
-import nom.tam.fits.BinaryTableHDU;
-import nom.tam.fits.Fits;
-import nom.tam.fits.FitsException;
-
 /**
  * Loader of fitsfile & VBO generation & OpenGL visualization
- * 
+ *
  * @author Stefan Meier (stefan.meier@fhnw.ch)
  * */
 public class PfssData {
@@ -107,7 +108,7 @@ public class PfssData {
 
     }
 
-    private double calculateAngleBetween2Vecotrs(double x1, double y1, double z1, double x2, double y2, double z2) {
+    private double calculateAngleBetween2Vectors(double x1, double y1, double z1, double x2, double y2, double z2) {
         return (x1 * x2 + y1 * y2 + z1 * z2) / (Math.sqrt(x1 * x1 + y1 * y1 + z1 * z1) * Math.sqrt(x2 * x2 + y2 * y2 + z2 * z2));
     }
 
@@ -174,7 +175,7 @@ public class PfssData {
                     double zEnd = r1 * Math.sin(theta1) * Math.cos(phi1);
                     double xEnd = r1 * Math.sin(theta1) * Math.sin(phi1);
                     double yEnd = r1 * Math.cos(theta1);
-                    double angle = this.calculateAngleBetween2Vecotrs(xEnd - x, yEnd - y, zEnd - z, x - xStart, y - yStart, z - zStart);
+                    double angle = this.calculateAngleBetween2Vectors(xEnd - x, yEnd - y, zEnd - z, x - xStart, y - yStart, z - zStart);
                     colinear = angle > PfssSettings.ANGLE_OF_LOD && i != lineEnd;
                 }
             }

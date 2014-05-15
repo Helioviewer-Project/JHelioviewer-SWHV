@@ -9,6 +9,7 @@ import kdu_jni.KduException;
 
 import org.helioviewer.base.math.Interval;
 import org.helioviewer.base.math.Vector2dInt;
+import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.viewmodel.changeevent.ChangeEvent;
 import org.helioviewer.viewmodel.changeevent.ChangedReason;
 import org.helioviewer.viewmodel.changeevent.RegionChangedReason;
@@ -137,40 +138,43 @@ public class JHVJP2View extends AbstractView implements JP2View, ViewportView, R
      * @param newJP2Image
      */
     public void setJP2Image(JP2Image newJP2Image) {
-        if (jp2Image != null && reader != null) {
-            abolish();
-        }
-
-        metaData = MetaDataConstructor.getMetaData(newJP2Image);
-        if (region == null) {
-            if (!(metaData instanceof PixelBasedMetaData)) {
-                region = StaticRegion.createAdaptedRegion(getMetaData().getPhysicalLowerLeft(), getMetaData().getPhysicalImageSize());
+        synchronized(Displayer.displaylock){
+            if (jp2Image != null && reader != null) {
+                abolish();
             }
 
-            if (viewport == null) {
-                viewport = StaticViewport.createAdaptedViewport(100, 100);
-            }
+            metaData = MetaDataConstructor.getMetaData(newJP2Image);
+            if (region == null) {
+                if (!(metaData instanceof PixelBasedMetaData)) {
+                    region = StaticRegion.createAdaptedRegion(getMetaData().getPhysicalLowerLeft(), getMetaData().getPhysicalImageSize());
+                }
 
-            if (metaData instanceof ObserverMetaData) {
-                event.addReason(new TimestampChangedReason(this, ((ObserverMetaData) metaData).getDateTime()));
-            }
+                if (viewport == null) {
+                    viewport = StaticViewport.createAdaptedViewport(100, 100);
+                }
 
-            jp2Image = newJP2Image;
+                if (metaData instanceof ObserverMetaData) {
+                    event.addReason(new TimestampChangedReason(this, ((ObserverMetaData) metaData).getDateTime()));
+                }
 
-            imageViewParams = calculateParameter(newJP2Image.getQualityLayerRange().getEnd(), 0);
+                jp2Image = newJP2Image;
 
-            if (isMainView) {
-                jp2Image.setParentView(this);
-            }
+                imageViewParams = calculateParameter(newJP2Image.getQualityLayerRange().getEnd(), 0);
 
-            jp2Image.addReference();
+                if (isMainView) {
+                    jp2Image.setParentView(this);
 
-            try {
-                reader = new J2KReader(this);
-                render = new J2KRender(this);
-                startDecoding();
-            } catch (Exception e) {
-                e.printStackTrace();
+                }
+
+                jp2Image.addReference();
+
+                try {
+                    reader = new J2KReader(this);
+                    render = new J2KRender(this);
+                    startDecoding();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
             }
         }
     }
@@ -624,7 +628,7 @@ public class JHVJP2View extends AbstractView implements JP2View, ViewportView, R
             if (imageData == null) {
                 return false;
             }
-            setSubimageData(null, null, 0, 1.);
+            setSubimageData(null, null, 0, 1., false);
             return true;
         }
         imageViewParams = newParams;
@@ -675,7 +679,7 @@ public class JHVJP2View extends AbstractView implements JP2View, ViewportView, R
      *            Composition Layer rendered, to update meta data
      *            {@link org.helioviewer.viewmodel.region.Region}
      */
-    void setSubimageData(ImageData newImageData, SubImage roi, int compositionLayer, double zoompercent) {
+    void setSubimageData(ImageData newImageData, SubImage roi, int compositionLayer, double zoompercent, boolean fullyLoaded) {
         if(this.imageData!=null && compositionLayer == this.imageData.getFrameNumber()+1)
             this.previousImageData = this.imageData;
         this.imageData = newImageData;
@@ -686,6 +690,7 @@ public class JHVJP2View extends AbstractView implements JP2View, ViewportView, R
         this.imageData.setScaleX(hvmd.getScaleX(roi));
         this.imageData.setScaleY(hvmd.getScaleY(roi));
         this.imageData.setDateMillis(hvmd.getDateTime().getMillis());
+        this.imageData.setFullyLoaded(fullyLoaded);
         Region lastRegionSaved = lastRegion;
         subImageBuffer.setLastRegion(roi);
         event.addReason(new SubImageDataChangedReason(this));

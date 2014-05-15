@@ -25,6 +25,7 @@ public abstract class AbstractImageData implements JavaBufferedImageData {
     private SubImage subImage;
     private int frameNumber;
     private double zoomPercent;
+    private boolean fullyLoaded;
 
     /**
      * Default constructor.
@@ -170,5 +171,15 @@ public abstract class AbstractImageData implements JavaBufferedImageData {
     @Override
     public void setRegion(Region r) {
         this.region = r;
+    }
+
+    @Override
+    public void setFullyLoaded(boolean fullyLoaded) {
+        this.fullyLoaded = fullyLoaded;
+    }
+
+    @Override
+    public boolean getFullyLoaded() {
+        return fullyLoaded;
     }
 }
