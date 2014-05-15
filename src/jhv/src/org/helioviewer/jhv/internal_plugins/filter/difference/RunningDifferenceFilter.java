@@ -70,13 +70,7 @@ public class RunningDifferenceFilter implements FrameFilter, StandardFilter, Obs
             return data;
         ImageData previousFrame;
         if(!baseDifference){
-            previousFrame = timeMachineData.getPreviousFrame(1);
-            // If this is the first frame and therefore 0 we take the frame before
-            // to get some similar picture
-            if (previousFrame == null) {
-                Log.debug("No previous frame available, take ahead");
-                previousFrame = timeMachineData.getPreviousFrame(-1);
-            }
+            previousFrame = timeMachineData.getPreviousFrame();
         }
         else{
             previousFrame =timeMachineData.getBaseDifferenceFrame();
@@ -204,7 +198,7 @@ public class RunningDifferenceFilter implements FrameFilter, StandardFilter, Obs
             shader.bind(gl);
             ImageData previousFrame;
             if(!baseDifference){
-                previousFrame = timeMachineData.getPreviousFrame(1);
+                previousFrame = timeMachineData.getPreviousFrame();
             }
             else{
                 previousFrame =timeMachineData.getBaseDifferenceFrame();
