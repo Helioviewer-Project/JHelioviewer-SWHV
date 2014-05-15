@@ -159,6 +159,8 @@ public class RunningDifferenceFilter implements FrameFilter, StandardFilter, Obs
      */
     public void setActive(boolean isActive) {
         this.isActive = isActive;
+        jpxView.setDifferenceMode(isActive);
+        jpxView.setFullyLoadedMode(isActive);
         notifyAllListeners();
     }
 
@@ -226,6 +228,6 @@ public class RunningDifferenceFilter implements FrameFilter, StandardFilter, Obs
 
     public void setBaseDifference(boolean selected) {
         this.baseDifference = selected;
-        System.out.println("BASEDIFF" + this.baseDifference);
+        jpxView.setBaseDifferenceMode(selected);
     }
 }
