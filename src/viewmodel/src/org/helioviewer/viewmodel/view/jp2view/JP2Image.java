@@ -48,7 +48,7 @@ import org.w3c.dom.NodeList;
 /**
  * This class can open JPEG2000 images, yeah baby! Modified to improve the JPIP
  * communication.
- * 
+ *
  * @author caplins
  * @author Benjamin Wamsler
  * @author Juan Pablo
@@ -61,10 +61,10 @@ public class JP2Image implements MultiFrameMetaDataContainer {
     private static int numJP2Images = 0;
 
     /** This is the URI that uniquely identifies the image. */
-    private URI uri;
+    private final URI uri;
 
     /** This is the URI from whch the whole file can be downloaded via http */
-    private URI downloadURI;
+    private final URI downloadURI;
 
     /**
      * This is the object in which all transmitted data is stored. It has the
@@ -109,10 +109,10 @@ public class JP2Image implements MultiFrameMetaDataContainer {
     /** cache path */
     private static File cachePath;
 
-    private NodeList[] xmlCache;
+    private final NodeList[] xmlCache;
 
     private JHVJP2View parentView;
-    private ReentrantLock lock = new ReentrantLock();
+    private final ReentrantLock lock = new ReentrantLock();
     private int referenceCounter = 0;
     private JPIPSocket socket;
 
@@ -125,13 +125,13 @@ public class JP2Image implements MultiFrameMetaDataContainer {
 
     /**
      * Constructor
-     * 
+     *
      * <p>
      * To open an image an URI must be given and this should be made unique. All
      * initialization for this object is done in the constructor or in methods
      * called by the constructor. Either the constructor throws an exception or
      * the image was opened successfully.
-     * 
+     *
      * @param newUri
      *            URI representing the location of the image
      * @throws IOException
@@ -143,13 +143,13 @@ public class JP2Image implements MultiFrameMetaDataContainer {
 
     /**
      * Constructor
-     * 
+     *
      * <p>
      * To open an image an URI must be given and this should be made unique. All
      * initialization for this object is done in the constructor or in methods
      * called by the constructor. Either the constructor throws an exception or
      * the image was opened successfully.
-     * 
+     *
      * @param newUri
      *            URI representing the location of the image
      * @param downloadURI
@@ -189,7 +189,7 @@ public class JP2Image implements MultiFrameMetaDataContainer {
     /**
      * Initializes the Jp2_threadsafe_family_src for a remote file. (JPIP comms
      * happen here).
-     * 
+     *
      * @throws JHV_KduException
      * @throws IOException
      */
@@ -252,6 +252,7 @@ public class JP2Image implements MultiFrameMetaDataContainer {
             Timer timer = new Timer("WaitForCloseSocket");
             timer.schedule(new TimerTask() {
 
+                @Override
                 public synchronized void run() {
                     if (socket != null) {
                         try {
@@ -268,7 +269,7 @@ public class JP2Image implements MultiFrameMetaDataContainer {
 
     /**
      * Initializes the Jp2_threadsafe_family_src for a local file.
-     * 
+     *
      * @throws JHV_KduException
      * @throws IOException
      */
@@ -287,7 +288,7 @@ public class JP2Image implements MultiFrameMetaDataContainer {
 
     /**
      * Creates the Kakadu objects and sets all the data-members in this object.
-     * 
+     *
      * @throws JHV_KduException
      */
     private void createKakaduMachinery() throws JHV_KduException {
@@ -375,10 +376,10 @@ public class JP2Image implements MultiFrameMetaDataContainer {
 
     /**
      * Sets the parent view of this image.
-     * 
+     *
      * The parent view is used to determine the current frame when accessing
      * meta data.
-     * 
+     *
      * @param _parentView
      *            The new parent view
      * @see #getParentView()
@@ -390,10 +391,10 @@ public class JP2Image implements MultiFrameMetaDataContainer {
 
     /**
      * Returns the parent view of this image.
-     * 
+     *
      * The parent view is used to determine the current frame when accessing
      * meta data.
-     * 
+     *
      * @return The current parent view
      * @see #setParentView(JHVJP2View)
      * @see #getValueFromXML(String, String)
@@ -404,7 +405,7 @@ public class JP2Image implements MultiFrameMetaDataContainer {
 
     /**
      * Returns true if the image is remote or if image is note open.
-     * 
+     *
      * @return True if the image is remote image, false otherwise
      */
     public boolean isRemote() {
@@ -413,9 +414,9 @@ public class JP2Image implements MultiFrameMetaDataContainer {
 
     /**
      * Returns whether the image contains multiple frames.
-     * 
+     *
      * A image consisting of multiple frames is also called a 'movie'.
-     * 
+     *
      * @return True, if the image contains multiple frames, false otherwise
      */
     public boolean isMultiFrame() {
@@ -433,7 +434,7 @@ public class JP2Image implements MultiFrameMetaDataContainer {
     /**
      * Method that executes getValueFromXML(_keyword, _box, <currentBoxNumber>).
      * This will get the xml box from the currently shown frame
-     * 
+     *
      * @param _keyword
      * @param _box
      * @throws JHV_KduException
@@ -448,7 +449,7 @@ public class JP2Image implements MultiFrameMetaDataContainer {
 
     /**
      * Method that returns value of specified _keyword from specified _box.
-     * 
+     *
      * @param _keyword
      * @param _box
      * @param _boxNumber
@@ -514,7 +515,7 @@ public class JP2Image implements MultiFrameMetaDataContainer {
 
     /**
      * Returns the URI representing the location of the image.
-     * 
+     *
      * @return URI representing the location of the image.
      */
     public URI getURI() {
@@ -523,10 +524,10 @@ public class JP2Image implements MultiFrameMetaDataContainer {
 
     /**
      * Returns the download uri the image.
-     * 
+     *
      * This is the uri from which the whole file can be downloaded and stored
      * locally
-     * 
+     *
      * @return download uri
      */
     public URI getDownloadURI() {
@@ -535,10 +536,10 @@ public class JP2Image implements MultiFrameMetaDataContainer {
 
     /**
      * Returns the socket, if in remote mode.
-     * 
+     *
      * The socket is returned only one time. After calling this function for the
      * first time, it will always return null.
-     * 
+     *
      * @return Socket connected to the server
      */
     public JPIPSocket getSocket() {
@@ -576,6 +577,7 @@ public class JP2Image implements MultiFrameMetaDataContainer {
     /**
      * {@inheritDoc}
      */
+    @Override
     public String get(String key) {
         try {
             String value = getValueFromXML(key, "fits");
@@ -598,6 +600,7 @@ public class JP2Image implements MultiFrameMetaDataContainer {
     /**
      * {@inheritDoc}
      */
+    @Override
     public String get(String key, int frameNumber) throws IOException {
         try {
             String value = getValueFromXML(key, "fits", frameNumber + 1);
@@ -610,6 +613,7 @@ public class JP2Image implements MultiFrameMetaDataContainer {
     /**
      * {@inheritDoc}
      */
+    @Override
     public double tryGetDouble(String key) {
 
         String string = get(key);
@@ -618,7 +622,7 @@ public class JP2Image implements MultiFrameMetaDataContainer {
                 return Double.parseDouble(string);
             } catch (NumberFormatException e) {
                 Log.warn("NumberFormatException while trying to parse value \"" + string + "\" of key " + key + " from meta data of\n" + getURI());
-                return Double.NaN;
+                return 0.0;//Double.NaN;
             }
         }
         return 0.0;
@@ -627,6 +631,7 @@ public class JP2Image implements MultiFrameMetaDataContainer {
     /**
      * {@inheritDoc}
      */
+    @Override
     public int tryGetInt(String key) {
 
         String string = get(key);
@@ -644,6 +649,7 @@ public class JP2Image implements MultiFrameMetaDataContainer {
     /**
      * {@inheritDoc}
      */
+    @Override
     public int getPixelHeight() {
         return getResolutionSet().getResolutionLevel(0).getResolutionBounds().height;
     }
@@ -651,6 +657,7 @@ public class JP2Image implements MultiFrameMetaDataContainer {
     /**
      * {@inheritDoc}
      */
+    @Override
     public int getPixelWidth() {
 
         return getResolutionSet().getResolutionLevel(0).getResolutionBounds().width;
@@ -666,7 +673,7 @@ public class JP2Image implements MultiFrameMetaDataContainer {
 
     /**
      * Increases the reference counter.
-     * 
+     *
      * This counter is used to count all views, which are using this JP2Image as
      * their data source. The counter is decreased when calling
      * {@link #abolish()}.
@@ -766,10 +773,10 @@ public class JP2Image implements MultiFrameMetaDataContainer {
     /**
      * Deactivates the internal color lookup table for the given composition
      * layer.
-     * 
+     *
      * It is not allowed to call this function for a layer, which is not loaded
      * yet.
-     * 
+     *
      * @param numLayer
      *            composition layer to deactivate internal color lookup for
      */
@@ -818,7 +825,7 @@ public class JP2Image implements MultiFrameMetaDataContainer {
 
     /**
      * Returns the number of JP2Image instances currently in use.
-     * 
+     *
      * @return Number of JP2Image instances currently in use
      */
     static int numJP2ImagesInUse() {

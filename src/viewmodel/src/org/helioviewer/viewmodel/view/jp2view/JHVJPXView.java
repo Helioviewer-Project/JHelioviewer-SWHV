@@ -417,25 +417,29 @@ public class JHVJPXView extends JHVJP2View implements TimedMovieView, CachedMovi
     /**
      * {@inheritDoc}
      */
+
     @Override
-    void setSubimageData(ImageData newImageData, SubImage roi, int compositionLayer, double zoompercent) {
-        if(!fullyLoadedMode ||(fullyLoadedMode && this.imageCacheStatus.getImageStatus(compositionLayer) == CacheStatus.COMPLETE)){
-            if (blockingMode) {
-                synchronized (Displayer.displaylock) {
-                    setSubimageDataHelper(newImageData, roi, compositionLayer, zoompercent);
-                }
-            }
-            else{
-                setSubimageDataHelper(newImageData, roi, compositionLayer, zoompercent);
+    void setSubimageData(ImageData newImageData, SubImage roi, int compositionLayer, double zoompercent, boolean fullyLoaded) {
+        fullyLoaded = fullyLoadedMode && this.imageCacheStatus.getImageStatus(compositionLayer) == CacheStatus.COMPLETE;
+
+        if (blockingMode) {
+            synchronized (Displayer.displaylock) {
+                setSubimageDataHelper(newImageData, roi, compositionLayer, zoompercent, fullyLoaded);
+                System.out.println("FULLZP" + zoompercent);
+                System.out.println("CL" + compositionLayer);
+                System.out.println("ROI" + roi);
+                System.out.println("LOADED" + fullyLoaded);
             }
         }
-        else if(fullyLoadedMode && this.imageCacheStatus.getImageStatus(compositionLayer) != CacheStatus.COMPLETE){
+        else{
+            setSubimageDataHelper(newImageData, roi, compositionLayer, zoompercent, fullyLoaded);
+        }
+        if(!fullyLoaded){
             this.readerSignal.signal();
-            Displayer.getSingletonInstance().render();
         }
     }
 
-    private void setSubimageDataHelper(ImageData newImageData, SubImage roi, int compositionLayer, double zoompercent) {
+    private void setSubimageDataHelper(ImageData newImageData, SubImage roi, int compositionLayer, double zoompercent, boolean fullyLoaded) {
         lastRenderedCompositionLayer = compositionLayer;
 
         if (metaData instanceof ObserverMetaData) {
@@ -443,7 +447,7 @@ public class JHVJPXView extends JHVJP2View implements TimedMovieView, CachedMovi
             observerMetaData.updateDateTime(dateTimeCache.getDateTime(compositionLayer));
             event.addReason(new TimestampChangedReason(this, observerMetaData.getDateTime()));
         }
-        super.setSubimageData(newImageData, roi, compositionLayer, zoompercent);
+        super.setSubimageData(newImageData, roi, compositionLayer, zoompercent, fullyLoaded);
     }
 
     @Override

@@ -23,6 +23,7 @@ import org.helioviewer.viewmodel.view.View;
 import org.helioviewer.viewmodel.view.ViewListener;
 import org.helioviewer.viewmodel.view.ViewportView;
 import org.helioviewer.viewmodel.view.jp2view.JHVJPXView;
+import org.helioviewer.viewmodel.view.opengl.GLFilterView;
 import org.helioviewer.viewmodel.view.opengl.GLTextureHelper;
 import org.helioviewer.viewmodel.view.opengl.shader.GLFragmentShaderView;
 import org.helioviewer.viewmodel.view.opengl.shader.GLShaderBuilder;
@@ -101,6 +102,10 @@ public class GL3DImageTextureView extends AbstractGL3DView implements GL3DView, 
         // th.copyFrameBufferToTexture(gl, textureId, captureRectangle);
         this.textureScale = th.getTextureScale(textureId);
         if (vertexShader != null) {
+            GLFilterView glfilter = this.getAdapter(GLFilterView.class);
+            if (glfilter != null) {
+                glfilter.renderGL(state.gl, true);
+            }
             double xOffset = (region.getLowerLeftCorner().getX());
             double yOffset = (region.getLowerLeftCorner().getY());
             double xScale = (1. / region.getWidth());

@@ -72,5 +72,8 @@ public interface ImageData {
     public Region getRegion();
     public void setRegion(Region r);
 
+    boolean getFullyLoaded();
+    void setFullyLoaded(boolean fullyLoaded);
+
 
 }
