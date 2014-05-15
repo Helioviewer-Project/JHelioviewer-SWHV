@@ -23,7 +23,6 @@ import org.helioviewer.viewmodel.view.View;
 import org.helioviewer.viewmodel.view.ViewListener;
 import org.helioviewer.viewmodel.view.ViewportView;
 import org.helioviewer.viewmodel.view.jp2view.JHVJPXView;
-import org.helioviewer.viewmodel.view.opengl.GLFilterView;
 import org.helioviewer.viewmodel.view.opengl.GLTextureHelper;
 import org.helioviewer.viewmodel.view.opengl.shader.GLFragmentShaderView;
 import org.helioviewer.viewmodel.view.opengl.shader.GLShaderBuilder;
@@ -40,6 +39,10 @@ import org.helioviewer.viewmodel.viewport.Viewport;
  *
  */
 public class GL3DImageTextureView extends AbstractGL3DView implements GL3DView, GLFragmentShaderView {
+
+    public GL3DImageTextureView() {
+        super();
+    }
 
     private int textureId = -1;
     private Vector2dDouble textureScale = null;
@@ -102,10 +105,7 @@ public class GL3DImageTextureView extends AbstractGL3DView implements GL3DView, 
         // th.copyFrameBufferToTexture(gl, textureId, captureRectangle);
         this.textureScale = th.getTextureScale(textureId);
         if (vertexShader != null) {
-            GLFilterView glfilter = this.getAdapter(GLFilterView.class);
-            if (glfilter != null) {
-                glfilter.renderGL(state.gl, true);
-            }
+
             double xOffset = (region.getLowerLeftCorner().getX());
             double yOffset = (region.getLowerLeftCorner().getY());
             double xScale = (1. / region.getWidth());
@@ -118,7 +118,7 @@ public class GL3DImageTextureView extends AbstractGL3DView implements GL3DView, 
             this.vertexShader.changeTextureScale(jhvjpx.getImageData().getScaleX(), jhvjpx.getImageData().getScaleY());
             this.vertexShader.changeAngles(theta, phi);
 
-            if(jhvjpx.getPreviousImageData()!=null){
+            if(!jhvjpx.getBaseDifferenceMode() && jhvjpx.getPreviousImageData()!=null){
                 Region differenceRegion = jhvjpx.getPreviousImageData().getRegion();
                 double differenceXOffset = (differenceRegion.getLowerLeftCorner().getX());
                 double differenceYOffset = (differenceRegion.getLowerLeftCorner().getY());
@@ -127,19 +127,23 @@ public class GL3DImageTextureView extends AbstractGL3DView implements GL3DView, 
                 double differenceDeltat = jhvjpx.getPreviousImageData().getDateMillis() / 1000.0 - Constants.referenceDate;
                 double differenceTheta = 0.0;
                 double differencePhi = DifferentialRotation.calculateRotationInRadians(0.0, differenceDeltat) % (Math.PI * 2.0);
-                /*System.out.println("PPHI" +differencePhi + " " +phi);
-                System.out.println("PScaleX" +jhvjpx.getPreviousImageData().getScaleX() + " " +jhvjpx.getImageData().getScaleX());
-                System.out.println("PScaleY" +jhvjpx.getPreviousImageData().getScaleY() + " " +jhvjpx.getImageData().getScaleY());
-                System.out.println("PRECT" +differenceXOffset+ " " + differenceYOffset+ " " + differenceXScale+ " " + differenceYScale);
-                System.out.println("RECT" +xOffset+ " " + yOffset+ " " + xScale+ " " + yScale);
-                */
                 this.vertexShader.changeDifferenceTextureScale(jhvjpx.getPreviousImageData().getScaleX(), jhvjpx.getPreviousImageData().getScaleY());
                 this.vertexShader.setDifferenceRect(differenceXOffset, differenceYOffset, differenceXScale, differenceYScale);
                 this.vertexShader.changeDifferenceAngles(differenceTheta, differencePhi);
-                //System.out.println("FFFFF" + jhvjpx.getImageData().getFrameNumber() + " " +jhvjpx.getPreviousImageData().getFrameNumber());
-
             }
-
+            if(jhvjpx.getBaseDifferenceMode() && jhvjpx.getBaseDifferenceImageData()!=null){
+                Region differenceRegion = jhvjpx.getBaseDifferenceImageData().getRegion();
+                double differenceXOffset = (differenceRegion.getLowerLeftCorner().getX());
+                double differenceYOffset = (differenceRegion.getLowerLeftCorner().getY());
+                double differenceXScale = (1./differenceRegion.getWidth());
+                double differenceYScale = (1./differenceRegion.getHeight());
+                double differenceDeltat = jhvjpx.getBaseDifferenceImageData().getDateMillis() / 1000.0 - Constants.referenceDate;
+                double differenceTheta = 0.0;
+                double differencePhi = DifferentialRotation.calculateRotationInRadians(0.0, differenceDeltat) % (Math.PI * 2.0);
+                this.vertexShader.changeDifferenceTextureScale(jhvjpx.getBaseDifferenceImageData().getScaleX(), jhvjpx.getBaseDifferenceImageData().getScaleY());
+                this.vertexShader.setDifferenceRect(differenceXOffset, differenceYOffset, differenceXScale, differenceYScale);
+                this.vertexShader.changeDifferenceAngles(differenceTheta, differencePhi);
+            }
             this.fragmentShader.changeTextureScale(jhvjpx.getImageData().getScaleX(), jhvjpx.getImageData().getScaleY());
             this.fragmentShader.changeAngles(theta, phi);
         }
@@ -194,7 +198,7 @@ public class GL3DImageTextureView extends AbstractGL3DView implements GL3DView, 
         }
 
         fragmentShader.build(shaderBuilder);
-        System.out.println("GLTEXTURE: " + shaderBuilder.getCode());
+        //System.out.println("GLTEXTURE: " + shaderBuilder.getCode());
         return shaderBuilder;
     }
 
