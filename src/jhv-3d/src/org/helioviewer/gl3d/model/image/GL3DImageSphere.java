@@ -19,9 +19,9 @@ import org.helioviewer.viewmodel.view.opengl.shader.GLVertexShaderProgram;
  * Maps the solar disc part of an image layer onto an adaptive mesh that either
  * covers the entire solar disc or the just the part that is visible in the view
  * frustum.
- * 
+ *
  * @author Simon Spoerri (simon.spoerri@fhnw.ch)
- * 
+ *
  */
 public class GL3DImageSphere extends GL3DImageMesh {
 
