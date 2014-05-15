@@ -9,8 +9,6 @@ import org.helioviewer.viewmodel.view.opengl.shader.GLShaderBuilder.GLBuildShade
 public class GL3DImageFragmentShaderProgram extends GLFragmentShaderProgram {
 
     private double cutOffRadius = 0.0f;
-    private double xTextureScale;
-    private double yTextureScale;
     private double theta;
     private double phi;
     private double xxTextureScale = 1.0;
