@@ -67,7 +67,7 @@ class J2KRender implements Runnable {
 
     private int lastFrame = -1;
 
-    private final static int NUM_BUFFERS = 4;
+    private final static int NUM_BUFFERS = 1;
 
     /** An integer buffer used in the run method. */
     private int[] localIntBuffer = new int[0];
@@ -297,11 +297,7 @@ class J2KRender implements Runnable {
 
             if (parentImageRef.getNumComponents() < 3) {
                 currentByteBuffer = (currentByteBuffer + 1) % NUM_BUFFERS;
-                if (differenceMode || currParams.subImage.getNumPixels() != byteBuffer[currentByteBuffer].length || (!movieMode && !linkedMovieMode && !J2KRenderGlobalOptions.getDoubleBufferingOption())) {
-                    byteBuffer[currentByteBuffer] = new byte[currParams.subImage.getNumPixels()];
-                } else if (J2KRenderGlobalOptions.getDoubleBufferingOption()) {
-                    Arrays.fill(byteBuffer[currentByteBuffer], (byte) 0);
-                }
+                byteBuffer[currentByteBuffer] = new byte[currParams.subImage.getNumPixels()];
             } else {
                 currentIntBuffer = (currentIntBuffer + 1) % NUM_BUFFERS;
                 if (differenceMode || currParams.subImage.getNumPixels() != intBuffer[currentIntBuffer].length || (!movieMode && !linkedMovieMode && !J2KRenderGlobalOptions.getDoubleBufferingOption())) {
