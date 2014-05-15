@@ -23,5 +23,6 @@ public interface FrameFilter extends Filter {
      * @param data
      *            Reference to access previous frames
      */
-    public void setTimeMachineData(JHVJPXView data);
+    public void setJPXView(JHVJPXView data);
+
 }

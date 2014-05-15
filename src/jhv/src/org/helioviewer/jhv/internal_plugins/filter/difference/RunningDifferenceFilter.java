@@ -166,7 +166,7 @@ public class RunningDifferenceFilter implements FrameFilter, StandardFilter, Obs
      * @see org.helioviewer.viewmodel.filter.FrameFilter#setTimeMachineData(org.helioviewer.viewmodel.view.TimeMachineData)
      */
     @Override
-    public void setTimeMachineData(JHVJPXView jpxView) {
+    public void setJPXView(JHVJPXView jpxView) {
         this.jpxView = jpxView;
     }
 
