@@ -425,10 +425,6 @@ public class JHVJPXView extends JHVJP2View implements TimedMovieView, CachedMovi
         if (blockingMode) {
             synchronized (Displayer.displaylock) {
                 setSubimageDataHelper(newImageData, roi, compositionLayer, zoompercent, fullyLoaded);
-                System.out.println("FULLZP" + zoompercent);
-                System.out.println("CL" + compositionLayer);
-                System.out.println("ROI" + roi);
-                System.out.println("LOADED" + fullyLoaded);
             }
         }
         else{
