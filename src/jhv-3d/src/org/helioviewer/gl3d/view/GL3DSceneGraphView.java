@@ -35,11 +35,8 @@ import org.helioviewer.viewmodel.changeevent.LayerChangedReason;
 import org.helioviewer.viewmodel.region.Region;
 import org.helioviewer.viewmodel.view.LayeredView;
 import org.helioviewer.viewmodel.view.MetaDataView;
-import org.helioviewer.viewmodel.view.RegionView;
-import org.helioviewer.viewmodel.view.SubimageDataView;
 import org.helioviewer.viewmodel.view.View;
 import org.helioviewer.viewmodel.view.ViewListener;
-import org.helioviewer.viewmodel.view.jp2view.JHVJPXView;
 import org.helioviewer.viewmodel.view.opengl.GLOverlayView;
 import org.helioviewer.viewmodel.view.opengl.GLView;
 
@@ -51,12 +48,12 @@ import org.helioviewer.viewmodel.view.opengl.GLView;
  * active image region by performing a ray casting using the
  * {@link GL3DRayTracer} to find the maximally spanning image region within the
  * displayed scene.
- * 
+ *
  * @author Simon Spoerri (simon.spoerri@fhnw.ch)
- * 
+ *
  */
 public class GL3DSceneGraphView extends AbstractGL3DView implements GL3DView {
-    private GL3DGroup root;
+    private final GL3DGroup root;
 
     // private GL3DImageGroup imageMeshes;
     private GLOverlayView overlayView = null;
@@ -65,10 +62,10 @@ public class GL3DSceneGraphView extends AbstractGL3DView implements GL3DView {
     private GL3DFramebufferImage framebuffer;
     private GL3DGroup artificialObjects;
 
-    private List<GL3DImageTextureView> layersToAdd = new ArrayList<GL3DImageTextureView>();
-    private List<GL3DImageTextureView> layersToRemove = new ArrayList<GL3DImageTextureView>();
+    private final List<GL3DImageTextureView> layersToAdd = new ArrayList<GL3DImageTextureView>();
+    private final List<GL3DImageTextureView> layersToRemove = new ArrayList<GL3DImageTextureView>();
 
-    private List<GL3DNode> nodesToDelete = new ArrayList<GL3DNode>();
+    private final List<GL3DNode> nodesToDelete = new ArrayList<GL3DNode>();
 
     public GL3DSceneGraphView() {
         this.root = createRoot();
@@ -77,6 +74,7 @@ public class GL3DSceneGraphView extends AbstractGL3DView implements GL3DView {
         printScenegraph();
 
         GL3DKeyController.getInstance().addListener(new GL3DKeyListener() {
+            @Override
             public void keyHit(KeyEvent e) {
                 root.getDrawBits().toggle(Bit.BoundingBox);
                 Displayer.getSingletonInstance().display();
@@ -84,6 +82,7 @@ public class GL3DSceneGraphView extends AbstractGL3DView implements GL3DView {
             }
         }, KeyEvent.VK_B);
         GL3DKeyController.getInstance().addListener(new GL3DKeyListener() {
+            @Override
             public void keyHit(KeyEvent e) {
                 root.getDrawBits().toggle(Bit.Wireframe);
                 Displayer.getSingletonInstance().display();
@@ -91,6 +90,7 @@ public class GL3DSceneGraphView extends AbstractGL3DView implements GL3DView {
             }
         }, KeyEvent.VK_W);
         GL3DKeyController.getInstance().addListener(new GL3DKeyListener() {
+            @Override
             public void keyHit(KeyEvent e) {
                 root.getDrawBits().toggle(Bit.Normals);
                 Displayer.getSingletonInstance().display();
@@ -98,6 +98,7 @@ public class GL3DSceneGraphView extends AbstractGL3DView implements GL3DView {
             }
         }, KeyEvent.VK_N);
         GL3DKeyController.getInstance().addListener(new GL3DKeyListener() {
+            @Override
             public void keyHit(KeyEvent e) {
                 framebuffer.getDrawBits().toggle(Bit.Hidden);
                 Displayer.getSingletonInstance().display();
@@ -105,6 +106,7 @@ public class GL3DSceneGraphView extends AbstractGL3DView implements GL3DView {
             }
         }, KeyEvent.VK_F);
         GL3DKeyController.getInstance().addListener(new GL3DKeyListener() {
+            @Override
             public void keyHit(KeyEvent e) {
                 imageLayers.getDrawBits().toggle(Bit.Hidden);
                 Displayer.getSingletonInstance().display();
@@ -112,6 +114,7 @@ public class GL3DSceneGraphView extends AbstractGL3DView implements GL3DView {
             }
         }, KeyEvent.VK_I);
         GL3DKeyController.getInstance().addListener(new GL3DKeyListener() {
+            @Override
             public void keyHit(KeyEvent e) {
                 toggleCoronaVisibility();
                 Displayer.getSingletonInstance().display();
@@ -120,6 +123,7 @@ public class GL3DSceneGraphView extends AbstractGL3DView implements GL3DView {
         }, KeyEvent.VK_C);
     }
 
+    @Override
     public void render3D(GL3DState state) {
 
         GL gl = state.gl;
@@ -181,15 +185,17 @@ public class GL3DSceneGraphView extends AbstractGL3DView implements GL3DView {
         this.nodesToDelete.clear();
     }
 
+    @Override
     protected void setViewSpecificImplementation(View newView, ChangeEvent changeEvent) {
         Log.debug("GL3DSceneGraphView.ViewChanged: Sender=" + newView + " Event=" + changeEvent);
 
         // Add Handler of Layer Events. Automatically add new Meshes for each
         // Layer
         if (newView.getAdapter(LayeredView.class) != null) {
-            LayeredView layeredView = ((LayeredView) newView.getAdapter(LayeredView.class));
+            LayeredView layeredView = (newView.getAdapter(LayeredView.class));
             layeredView.addViewListener(new ViewListener() {
 
+                @Override
                 public void viewChanged(View sender, ChangeEvent aEvent) {
                     // Log.debug("viewChange: sender : " + sender);
                     if (aEvent.reasonOccurred(LayerChangedReason.class)) {
@@ -246,7 +252,7 @@ public class GL3DSceneGraphView extends AbstractGL3DView implements GL3DView {
     private void removeLayersFromSceneGraph(GL3DState state) {
         synchronized (this.layersToRemove) {
             for (GL3DImageTextureView imageTextureView : this.layersToRemove) {
-                ((GL3DCameraView) getAdapter(GL3DCameraView.class)).removeCameraListener(this.imageLayers.getImageLayerForView(imageTextureView));
+                getAdapter(GL3DCameraView.class).removeCameraListener(this.imageLayers.getImageLayerForView(imageTextureView));
                 this.imageLayers.removeLayer(state, imageTextureView);
             }
             this.layersToRemove.clear();
@@ -260,7 +266,7 @@ public class GL3DSceneGraphView extends AbstractGL3DView implements GL3DView {
             for (GL3DImageTextureView imageTextureView : this.layersToAdd) {
                 GL3DImageLayer imageLayer = GL3DImageLayerFactory.createImageLayer(state, imageTextureView);
 
-                ((GL3DCameraView) getAdapter(GL3DCameraView.class)).addCameraListener(imageLayer);
+                getAdapter(GL3DCameraView.class).addCameraListener(imageLayer);
 
                 this.imageLayers.insertLayer(imageLayer);
 
@@ -316,6 +322,7 @@ public class GL3DSceneGraphView extends AbstractGL3DView implements GL3DView {
         return this.root;
     }
 
+    @Override
     public void deactivate(GL3DState state) {
         super.deactivate(state);
         this.getRoot().delete(state);
@@ -375,7 +382,7 @@ public class GL3DSceneGraphView extends AbstractGL3DView implements GL3DView {
     public void printScenegraph() {
         System.out.println("PRINTING SCENEGRAPH =======================>");
 
-        printNode(root, 0);
+        //printNode(root, 0);
 
     }
 
@@ -397,7 +404,7 @@ public class GL3DSceneGraphView extends AbstractGL3DView implements GL3DView {
         /*
          * GL3DNode sibling = node; while((sibling = sibling.getNext()) != null)
          * { for(int i=0; i<level; ++i) System.out.print("   ");
-         * 
+         *
          * System.out.println("Sibling: " + sibling.getClass().getName() + " ("
          * + node.getName() + ")"); }
          */
@@ -410,6 +417,7 @@ public class GL3DSceneGraphView extends AbstractGL3DView implements GL3DView {
         }
     }
 
+    @Override
     protected void renderChild(GL gl) {
         if (view instanceof GLView) {
             ((GLView) view).renderGL(gl, true);
