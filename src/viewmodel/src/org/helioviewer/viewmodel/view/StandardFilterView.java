@@ -7,13 +7,11 @@ import org.helioviewer.viewmodel.changeevent.SubImageDataChangedReason;
 import org.helioviewer.viewmodel.changeevent.ViewChainChangedReason;
 import org.helioviewer.viewmodel.filter.Filter;
 import org.helioviewer.viewmodel.filter.FilterListener;
-import org.helioviewer.viewmodel.filter.FrameFilter;
 import org.helioviewer.viewmodel.filter.MetaDataFilter;
 import org.helioviewer.viewmodel.filter.ObservableFilter;
 import org.helioviewer.viewmodel.filter.RegionFilter;
 import org.helioviewer.viewmodel.filter.StandardFilter;
 import org.helioviewer.viewmodel.imagedata.ImageData;
-import org.helioviewer.viewmodel.view.jp2view.JHVJPXView;
 
 /**
  * Implementation of FilterView, providing the capability to apply filters on
@@ -41,8 +39,6 @@ public class StandardFilterView extends AbstractBasicView implements FilterView,
     protected RegionView regionView;
     protected MetaDataView metaDataView;
     protected SubimageDataView subimageDataView;
-
-    private JHVJPXView jpxView;
 
     /**
      * {@inheritDoc}
@@ -104,10 +100,6 @@ public class StandardFilterView extends AbstractBasicView implements FilterView,
         if (filter instanceof MetaDataFilter && metaDataView != null) {
             ((MetaDataFilter) filter).setMetaData(metaDataView.getMetaData());
         }
-        if (filter instanceof FrameFilter && ViewHelper.getViewAdapter(view, MovieView.class) != null) {
-                updatePrecomputedViews();
-            ((FrameFilter) filter).setJPXView(jpxView);
-        }
     }
 
     /**
@@ -127,6 +119,7 @@ public class StandardFilterView extends AbstractBasicView implements FilterView,
      * Calls the filter and fires a ChangeEvent afterwards.
      */
     protected void refilter() {
+        updatePrecomputedViews();
         if (filter != null && view != null) {
             synchronized (filter) {
                 refilterPrepare();
@@ -202,7 +195,5 @@ public class StandardFilterView extends AbstractBasicView implements FilterView,
         regionView = ViewHelper.getViewAdapter(view, RegionView.class);
         metaDataView = ViewHelper.getViewAdapter(view, MetaDataView.class);
         subimageDataView = ViewHelper.getViewAdapter(view, SubimageDataView.class);
-        jpxView =  ViewHelper.getViewAdapter(view, JHVJPXView.class);
-
     }
 }
