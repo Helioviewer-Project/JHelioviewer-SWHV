@@ -74,7 +74,7 @@ public class RunningDifferenceFilter implements FrameFilter, StandardFilter, Obs
             previousFrame = jpxView.getPreviousImageData();
         }
         else{
-            previousFrame = jpxView.getPreviousImageData();
+            previousFrame = jpxView.getBaseDifferenceImageData();
         }
         if (previousFrame != null) {
             // Filter according to the data type
@@ -194,7 +194,7 @@ public class RunningDifferenceFilter implements FrameFilter, StandardFilter, Obs
                 previousFrame = jpxView.getPreviousImageData();
             }
             else{
-                previousFrame = jpxView.getPreviousImageData();
+                previousFrame = jpxView.getBaseDifferenceImageData();
             }
             if(this.currentFrame != previousFrame){
                 shader.setTruncationValue(gl, this.truncationValue);
