@@ -48,7 +48,6 @@ public class DifferenceShader extends GLFragmentShaderProgram {
 
 
             shaderBuilder.addMainFragment(program);
-            System.out.println("SHADERDIFF: " + shaderBuilder.getCode());
         } catch (GLBuildShaderException e) {
             e.printStackTrace();
         }
