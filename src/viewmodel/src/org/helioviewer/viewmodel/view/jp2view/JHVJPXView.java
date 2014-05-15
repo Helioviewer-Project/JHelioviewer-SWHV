@@ -54,8 +54,9 @@ public class JHVJPXView extends JHVJP2View implements TimedMovieView, CachedMovi
      * Linking movies, if the movie is not linked, this has to be null
      */
     protected LinkedMovieManager linkedMovieManager;
-    private boolean fullyLoadedMode;
-    private boolean differenceMode;
+    private boolean fullyLoadedMode = false;
+    private boolean differenceMode = false;
+    private boolean baseDifferenceMode = false;
 
     /**
      * Default constructor.
@@ -420,7 +421,7 @@ public class JHVJPXView extends JHVJP2View implements TimedMovieView, CachedMovi
 
     @Override
     void setSubimageData(ImageData newImageData, SubImage roi, int compositionLayer, double zoompercent, boolean fullyLoaded) {
-        fullyLoaded = fullyLoadedMode && this.imageCacheStatus.getImageStatus(compositionLayer) == CacheStatus.COMPLETE;
+        fullyLoaded = this.imageCacheStatus.getImageStatus(compositionLayer) == CacheStatus.COMPLETE;
 
         if (blockingMode) {
             synchronized (Displayer.displaylock) {
@@ -430,8 +431,8 @@ public class JHVJPXView extends JHVJP2View implements TimedMovieView, CachedMovi
         else{
             setSubimageDataHelper(newImageData, roi, compositionLayer, zoompercent, fullyLoaded);
         }
-        if(!fullyLoaded){
-            this.readerSignal.signal();
+        if(fullyLoadedMode && !fullyLoaded){
+            //this.readerSignal.signal();
         }
     }
 
@@ -547,5 +548,13 @@ public class JHVJPXView extends JHVJP2View implements TimedMovieView, CachedMovi
     }
     public boolean getDifferenceMode(){
         return this.differenceMode;
+    }
+
+    public void setBaseDifferenceMode(boolean selected) {
+        this.baseDifferenceMode = selected;
+    }
+
+    public boolean getBaseDifferenceMode() {
+        return baseDifferenceMode;
     }
 }
