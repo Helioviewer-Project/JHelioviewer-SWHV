@@ -13,7 +13,6 @@ import org.helioviewer.viewmodel.filter.ObservableFilter;
 import org.helioviewer.viewmodel.filter.RegionFilter;
 import org.helioviewer.viewmodel.filter.StandardFilter;
 import org.helioviewer.viewmodel.imagedata.ImageData;
-import org.helioviewer.viewmodel.view.bufferedimage.BufferedImageTimeMachineView;
 import org.helioviewer.viewmodel.view.jp2view.JHVJPXView;
 
 /**
@@ -110,12 +109,8 @@ public class StandardFilterView extends AbstractBasicView implements FilterView,
             ((MetaDataFilter) filter).setMetaData(metaDataView.getMetaData());
         }
         if (filter instanceof FrameFilter && ViewHelper.getViewAdapter(view, MovieView.class) != null) {
-            if (timeMachineView == null) {
-                // TODO This is only software mode
-                timeMachineView = new BufferedImageTimeMachineView();
                 updatePrecomputedViews();
-            }
-            ((FrameFilter) filter).setTimeMachineData(jpxView);
+            ((FrameFilter) filter).setJPXView(jpxView);
         }
     }
 
