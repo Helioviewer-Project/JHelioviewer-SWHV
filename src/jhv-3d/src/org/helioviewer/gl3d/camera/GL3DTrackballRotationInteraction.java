@@ -15,9 +15,9 @@ import org.helioviewer.jhv.display.Displayer;
  * interaction. The calculation of the rotation done by creating a rotation
  * Quaternion between two points on a sphere. These points are retrieved by
  * using the raycasting mechanism provided by {@link GL3DRayTracer}.
- * 
+ *
  * @author Simon Spoerri (simon.spoerri@fhnw.ch)
- * 
+ *
  */
 public class GL3DTrackballRotationInteraction extends GL3DDefaultInteraction {
     private GL3DVec3d currentRotationStartPoint;
@@ -28,6 +28,7 @@ public class GL3DTrackballRotationInteraction extends GL3DDefaultInteraction {
         super(camera, sceneGraph);
     }
 
+    @Override
     public void mouseDragged(MouseEvent e, GL3DCamera camera) {
         this.currentRotationEndPoint = getVectorFromSphere(e.getPoint(), camera);
 
@@ -40,6 +41,7 @@ public class GL3DTrackballRotationInteraction extends GL3DDefaultInteraction {
 
     }
 
+    @Override
     public void mouseReleased(MouseEvent e, GL3DCamera camera) {
         this.currentRotationStartPoint = null;
         this.currentRotationEndPoint = null;
@@ -48,7 +50,14 @@ public class GL3DTrackballRotationInteraction extends GL3DDefaultInteraction {
         Displayer.getSingletonInstance().display();
 
     }
-
+    @Override
+    public void reset(){
+        if(this.currentDragRotation!=null){
+        this.currentDragRotation.clear();
+        }
+        super.reset();
+    }
+    @Override
     public void mousePressed(MouseEvent e, GL3DCamera camera) {
         // The start point of the rotation remains the same during a drag,
         // because the
