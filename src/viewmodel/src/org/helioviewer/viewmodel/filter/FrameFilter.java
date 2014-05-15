@@ -1,6 +1,6 @@
 package org.helioviewer.viewmodel.filter;
 
-import org.helioviewer.viewmodel.view.TimeMachineData;
+import org.helioviewer.viewmodel.view.jp2view.JHVJPXView;
 
 /**
  * Filter which works over several frames.
@@ -12,16 +12,16 @@ import org.helioviewer.viewmodel.view.TimeMachineData;
  * be established. It is also possible to query other frames, but this will
  * freeze the view chain and should therefore only be done very rarely (i.e.
  * ones a movie or when the user change a setting)
- * 
+ *
  * @author Helge Dietert
- * 
+ *
  */
 public interface FrameFilter extends Filter {
     /**
      * Sets the time machine data for this filter.
-     * 
+     *
      * @param data
      *            Reference to access previous frames
      */
-    public void setTimeMachineData(TimeMachineData data);
+    public void setTimeMachineData(JHVJPXView data);
 }
