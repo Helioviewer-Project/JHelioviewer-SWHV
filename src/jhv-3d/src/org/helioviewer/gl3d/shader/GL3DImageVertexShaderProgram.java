@@ -50,7 +50,7 @@ public class GL3DImageVertexShaderProgram extends GLVertexShaderProgram {
             String program = "\tphysicalPosition = physicalPosition;" + GLShaderBuilder.LINE_SEP;
 
             program += "\tif(abs(position.x)>1.1){" + GLShaderBuilder.LINE_SEP;
-            program += "\tfloat theta = -textureScaleThetaPhi.z;" + GLShaderBuilder.LINE_SEP;
+            program += "\tfloat theta = textureScaleThetaPhi.z;" + GLShaderBuilder.LINE_SEP;
             program += "\tfloat phi = textureScaleThetaPhi.w;" + GLShaderBuilder.LINE_SEP;
 
             program += "\toutput.x = position.x - rect.x;" + GLShaderBuilder.LINE_SEP;
@@ -61,6 +61,7 @@ public class GL3DImageVertexShaderProgram extends GLVertexShaderProgram {
 
             program += "\toutput.x *= textureScaleThetaPhi.x;" + GLShaderBuilder.LINE_SEP;
             program += "\toutput.y *= textureScaleThetaPhi.y;" + GLShaderBuilder.LINE_SEP;
+            //Difference Image
 
             program += "\tdifferenceOutput.x = position.x - rect.x;" + GLShaderBuilder.LINE_SEP;
             program += "\tdifferenceOutput.y = -position.y - rect.y;" + GLShaderBuilder.LINE_SEP;
@@ -82,7 +83,6 @@ public class GL3DImageVertexShaderProgram extends GLVertexShaderProgram {
             program += "\t physicalPosition.z = xrott*sin(phi) + zrott*cos(phi);" + GLShaderBuilder.LINE_SEP;
             program += "\t OUT.position = mul(state_matrix_mvp, physicalPosition);" + GLShaderBuilder.LINE_SEP;
             program += "\t OUT.position.y = OUT.position.y;" + GLShaderBuilder.LINE_SEP;
-            //Difference Image
 
             program += "\t}" + GLShaderBuilder.LINE_SEP;
             program += "\telse{" + GLShaderBuilder.LINE_SEP;
