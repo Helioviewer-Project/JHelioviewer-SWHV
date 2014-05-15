@@ -42,7 +42,6 @@ public class GL3DSolarRotationTrackingTrackballCamera extends GL3DCamera {
 
     @Override
     public void applyCamera(GL3DState state) {
-        // ((HEEQCoordinateSystem)this.viewSpaceCoordinateSystem).setObservationDate(state.getCurrentObservationDate());
         super.applyCamera(state);
     }
 
