@@ -20,7 +20,6 @@ import org.helioviewer.viewmodel.view.LinkedMovieManager;
 import org.helioviewer.viewmodel.view.TimedMovieView;
 import org.helioviewer.viewmodel.view.View;
 import org.helioviewer.viewmodel.view.ViewListener;
-import org.helioviewer.viewmodel.view.jp2view.datetime.ImmutableDateTime;
 
 /**
  * This camera is used when solar rotation tracking is enabled. It extends the
@@ -42,11 +41,20 @@ public class GL3DTrackballCamera extends GL3DSolarRotationTrackingTrackballCamer
     private final SolarSphereCoordinateSystem solarSphereCoordinateSystem = new SolarSphereCoordinateSystem();
     private final SolarSphereToStonyhurstHeliographicConversion stonyhurstConversion = (SolarSphereToStonyhurstHeliographicConversion) solarSphereCoordinateSystem.getConversion(stonyhurstCoordinateSystem);
 
+    private long timediff;
+
 
     public GL3DTrackballCamera(GL3DSceneGraphView sceneGraphView) {
         super(sceneGraphView);
     }
 
+    @Override
+    public void reset(){
+        this.getRotation().clear();
+        setDifferentialRotation(DifferentialRotation.calculateRotationInRadians(0., this.timediff) % (Math.PI * 2.0));
+        this.getRotation().rotate(GL3DQuatd.createRotation(  getDifferentialRotation(), new GL3DVec3d(0, 1, 0)));
+        super.reset();
+    }
     @Override
     public void activate(GL3DCamera precedingCamera) {
         super.activate(precedingCamera);
@@ -60,7 +68,7 @@ public class GL3DTrackballCamera extends GL3DSolarRotationTrackingTrackballCamer
 
     @Override
     public String getName() {
-        return "Solar Rotation Tracking Camera";
+        return "TrackBall";
     }
 
     @Override
@@ -68,19 +76,20 @@ public class GL3DTrackballCamera extends GL3DSolarRotationTrackingTrackballCamer
         TimestampChangedReason timestampReason = aEvent.getLastChangedReasonByType(TimestampChangedReason.class);
         if ((timestampReason != null) && (timestampReason.getView() instanceof TimedMovieView) && LinkedMovieManager.getActiveInstance().isMaster((TimedMovieView) timestampReason.getView())) {
             currentDate = timestampReason.getNewDateTime().getTime();
-            if (startPosition != null) {
-                long timediff = (currentDate.getTime()) / 1000 - Constants.referenceDate;
+            updateRotation();
+        }
+    }
 
-                setDifferentialRotation(-DifferentialRotation.calculateRotationInRadians(0., timediff) % (Math.PI * 2.0));
-
-                this.getRotation().rotate(GL3DQuatd.createRotation(currentRotation - getDifferentialRotation(), new GL3DVec3d(0, 1, 0)));
-                this.updateCameraTransformation();
-                this.currentRotation = getDifferentialRotation();
-            } else {
-                currentRotation = 0.0;
-                resetStartPosition();
-            }
-
+    public void updateRotation(){
+        if (startPosition != null) {
+            this.timediff = (currentDate.getTime()) / 1000 - Constants.referenceDate;
+            setDifferentialRotation(-DifferentialRotation.calculateRotationInRadians(0., timediff) % (Math.PI * 2.0));
+            this.getRotation().rotate(GL3DQuatd.createRotation(currentRotation - getDifferentialRotation(), new GL3DVec3d(0, 1, 0)));
+            this.updateCameraTransformation();
+            this.currentRotation = getDifferentialRotation();
+        } else {
+            currentRotation = 0.0;
+            resetStartPosition();
         }
     }
 
@@ -102,20 +111,5 @@ public class GL3DTrackballCamera extends GL3DSolarRotationTrackingTrackballCamer
 
         }
 
-    }
-
-    private Date getStartDate() {
-        if (LinkedMovieManager.getActiveInstance() == null) {
-            return null;
-        }
-        TimedMovieView masterView = LinkedMovieManager.getActiveInstance().getMasterMovie();
-        if (masterView == null) {
-            return null;
-        }
-        ImmutableDateTime idt = masterView.getCurrentFrameDateTime();
-        if (idt == null) {
-            return null;
-        }
-        return idt.getTime();
     }
 }
