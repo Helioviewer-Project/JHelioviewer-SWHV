@@ -98,6 +98,8 @@ public class JHVJP2View extends AbstractView implements JP2View, ViewportView, R
 
     private ImageData previousImageData;
 
+    private ImageData baseDifferenceImageData;
+
     /**
      * Default constructor.
      *
@@ -680,6 +682,8 @@ public class JHVJP2View extends AbstractView implements JP2View, ViewportView, R
      *            {@link org.helioviewer.viewmodel.region.Region}
      */
     void setSubimageData(ImageData newImageData, SubImage roi, int compositionLayer, double zoompercent, boolean fullyLoaded) {
+        if(this.imageData!=null && compositionLayer == 0)
+            this.baseDifferenceImageData = this.imageData;
         if(this.imageData!=null && compositionLayer == this.imageData.getFrameNumber()+1)
             this.previousImageData = this.imageData;
         this.imageData = newImageData;
@@ -831,6 +835,10 @@ public class JHVJP2View extends AbstractView implements JP2View, ViewportView, R
 
     public ImageData getPreviousImageData() {
         return this.previousImageData;
+    }
+
+    public ImageData getBaseDifferenceImageData() {
+        return this.baseDifferenceImageData;
     }
 
     public void setPreviousImageData(ImageData previousImageData) {
