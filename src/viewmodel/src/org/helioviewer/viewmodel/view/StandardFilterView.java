@@ -41,10 +41,6 @@ public class StandardFilterView extends AbstractBasicView implements FilterView,
     protected RegionView regionView;
     protected MetaDataView metaDataView;
     protected SubimageDataView subimageDataView;
-    /**
-     * Underlying TimeMachineView for this layer.
-     */
-    protected TimeMachineView timeMachineView = null;
 
     private JHVJPXView jpxView;
 
@@ -122,10 +118,7 @@ public class StandardFilterView extends AbstractBasicView implements FilterView,
      */
     @Override
     public void setView(View newView) {
-        if (timeMachineView == null)
-            super.setView(newView);
-        else
-            timeMachineView.setView(newView);
+        super.setView(newView);
     }
 
     /**
