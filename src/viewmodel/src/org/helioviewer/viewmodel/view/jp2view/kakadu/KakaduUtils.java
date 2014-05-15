@@ -23,7 +23,7 @@ import org.helioviewer.viewmodel.view.jp2view.io.jpip.JPIPSocket;
 
 /**
  * A collection of useful static methods.
- * 
+ *
  * @author caplins
  * @author Benjamin Wamsler
  * @author Juan Pablo
@@ -31,7 +31,7 @@ import org.helioviewer.viewmodel.view.jp2view.io.jpip.JPIPSocket;
 public class KakaduUtils {
     /**
      * Converts a Kdu_dims object to its Java equivalent (Rectangle).
-     * 
+     *
      * @param _dims
      *            Kdu_dims to convert
      * @return Rectangle equivalent to the given Kdu_dims
@@ -50,7 +50,7 @@ public class KakaduUtils {
 
     /**
      * Converts a Rectangle object to a Kdu_dims object
-     * 
+     *
      * @param _rect
      *            Rectangle to convert
      * @return Kdu_dims equivalent to the given Rectangle
@@ -73,7 +73,7 @@ public class KakaduUtils {
 
     /**
      * Converts a SubImage object to a Kdu_dims object
-     * 
+     *
      * @param _roi
      *            SubImage to convert
      * @return Kdu_dims equivalent to the given SubImage
@@ -98,7 +98,7 @@ public class KakaduUtils {
      * Downloads all the necessary initial data of an image. In the case of this
      * application, it includes the main header as well as the metadata.
      * JPIPSocket object should already be connected.
-     * 
+     *
      * @param _socket
      * @param _cache
      * @throws IOException
@@ -139,7 +139,7 @@ public class KakaduUtils {
      * specified matching box found and its superbox (if any) or null if none
      * were found. The superbox is returned so it can be closed properly after
      * the matching box has been closed.
-     * 
+     *
      * @param _familySrc
      * @param _boxType
      * @param _boxNumber
@@ -228,7 +228,7 @@ public class KakaduUtils {
      * Searches for a box of type _boxType, but within a superbox, instead of a
      * Jp2_threadsafe_family_src like the previous method. And in this case the
      * searching process is quite simpler.
-     * 
+     *
      * @param _supBox
      * @param _boxType
      * @param _boxNumber
@@ -269,7 +269,7 @@ public class KakaduUtils {
 
     /**
      * Returns the in _boxNumber specified XML box for an image.
-     * 
+     *
      * @throws JHV_KduException
      */
     public static String getXml(Jp2_threadsafe_family_src _familySrc, int _boxNumber) throws JHV_KduException {
@@ -355,7 +355,7 @@ public class KakaduUtils {
     /**
      * This method updates the server cache model. The JPIPSocket object should
      * be connected already.
-     * 
+     *
      * @param _socket
      * @param _cache
      * @throws IOException
