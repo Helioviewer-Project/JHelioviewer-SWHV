@@ -60,7 +60,7 @@ public class RunningDifferencePanel extends FilterPanel implements ChangeListene
         truncateSpinner.setEditor(editor);
         editor.getTextField().setColumns(3);
         editor.getTextField().setHorizontalAlignment(JTextField.CENTER);
-        editor.getTextField().setValue(1.);
+        editor.getTextField().setValue(0.2);
         WheelSupport.installMouseWheelSupport(truncateSpinner);
         truncationLine.add(truncateSpinner);
         setEnabled(false);
