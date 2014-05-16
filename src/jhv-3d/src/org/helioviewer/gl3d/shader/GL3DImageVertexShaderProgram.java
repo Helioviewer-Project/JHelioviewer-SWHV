@@ -63,14 +63,14 @@ public class GL3DImageVertexShaderProgram extends GLVertexShaderProgram {
             program += "\toutput.y *= textureScaleThetaPhi.y;" + GLShaderBuilder.LINE_SEP;
             //Difference Image
 
-            program += "\tdifferenceOutput.x = position.x - rect.x;" + GLShaderBuilder.LINE_SEP;
-            program += "\tdifferenceOutput.y = -position.y - rect.y;" + GLShaderBuilder.LINE_SEP;
+            program += "\tdifferenceOutput.x = position.x - differenceRect.x;" + GLShaderBuilder.LINE_SEP;
+            program += "\tdifferenceOutput.y = -position.y - differenceRect.y;" + GLShaderBuilder.LINE_SEP;
 
-            program += "\tdifferenceOutput.x *= rect.z;" + GLShaderBuilder.LINE_SEP;
-            program += "\tdifferenceOutput.y *= rect.w;" + GLShaderBuilder.LINE_SEP;
+            program += "\tdifferenceOutput.x *= differenceRect.z;" + GLShaderBuilder.LINE_SEP;
+            program += "\tdifferenceOutput.y *= differenceRect.w;" + GLShaderBuilder.LINE_SEP;
 
-            program += "\tdifferenceOutput.x *= textureScaleThetaPhi.x;" + GLShaderBuilder.LINE_SEP;
-            program += "\tdifferenceOutput.y *= textureScaleThetaPhi.y;" + GLShaderBuilder.LINE_SEP;
+            program += "\tdifferenceOutput.x *= diffTextureScaleThetaPhi.x;" + GLShaderBuilder.LINE_SEP;
+            program += "\tdifferenceOutput.y *= diffTextureScaleThetaPhi.y;" + GLShaderBuilder.LINE_SEP;
 
             program += "\tpositionPass = position;" + GLShaderBuilder.LINE_SEP;
 
@@ -110,6 +110,7 @@ public class GL3DImageVertexShaderProgram extends GLVertexShaderProgram {
 
             program += "\tfloat differencetheta = -diffTextureScaleThetaPhi.z;" + GLShaderBuilder.LINE_SEP;
             program += "\tfloat differencephi = -diffTextureScaleThetaPhi.w;" + GLShaderBuilder.LINE_SEP;
+
             program += "\txrot = physicalPosition.x*cos(differencephi) - physicalPosition.z*sin(differencephi);" + GLShaderBuilder.LINE_SEP;
             program += "\tyrot = physicalPosition.y;" + GLShaderBuilder.LINE_SEP;
             program += "\tzrot = physicalPosition.x*sin(differencephi) + physicalPosition.z*cos(differencephi);" + GLShaderBuilder.LINE_SEP;
