@@ -84,6 +84,7 @@ public class RunningDifferencePanel extends FilterPanel implements ChangeListene
                        radRunDiff.setSelected(false);
                        radBaseDiff.setSelected(false);
                    }
+                   Displayer.getSingletonInstance().display();
             }
         });
 
@@ -96,6 +97,7 @@ public class RunningDifferencePanel extends FilterPanel implements ChangeListene
                        radNone.setSelected(false);
                        radBaseDiff.setSelected(false);
                    }
+                   Displayer.getSingletonInstance().display();
                }
         });
 
@@ -108,10 +110,10 @@ public class RunningDifferencePanel extends FilterPanel implements ChangeListene
                     radNone.setSelected(false);
                     radRunDiff.setSelected(false);
                 }
+                Displayer.getSingletonInstance().display();
             }
         });
 
-        //Group the radio buttons.
         ButtonGroup group = new ButtonGroup();
         group.add(radNone);
         group.add(radRunDiff);
