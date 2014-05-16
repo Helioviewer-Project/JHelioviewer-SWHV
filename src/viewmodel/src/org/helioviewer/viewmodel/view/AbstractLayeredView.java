@@ -231,6 +231,10 @@ public abstract class AbstractLayeredView extends AbstractView implements Layere
      */
     @Override
     public void removeLayer(View view) {
+        removeLayer(view, true);
+    }
+
+    public void removeLayer(View view, boolean needAbolish) {
 
         if (view == null) {
             return;
@@ -249,7 +253,7 @@ public abstract class AbstractLayeredView extends AbstractView implements Layere
         } finally {
             layerLock.unlock();
         }
-        if (view.getAdapter(JHVJP2View.class) != null) {
+        if (view.getAdapter(JHVJP2View.class) != null && needAbolish) {
             view.getAdapter(JHVJP2View.class).abolish();
         }
         if (view.getAdapter(JHVJPXView.class) != null) {
