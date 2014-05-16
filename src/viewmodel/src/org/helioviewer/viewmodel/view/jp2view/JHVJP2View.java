@@ -685,8 +685,6 @@ public class JHVJP2View extends AbstractView implements JP2View, ViewportView, R
         if(compositionLayer == 0){
             this.baseDifferenceImageData = newImageData;
         }
-        if(this.previousImageData!=null)
-            System.out.println("sdf" + compositionLayer + " " + this.imageData.getFrameNumber());
 
         newImageData.setFrameNumber(compositionLayer);
         HelioviewerMetaData hvmd = (HelioviewerMetaData) metaData;
