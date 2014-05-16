@@ -64,7 +64,6 @@ public class GL3DImageTextureView extends AbstractGL3DView implements GL3DView, 
 
     @Override
     public void render3D(GL3DState state) {
-        GL gl = state.gl;
         if (this.getView() != null) {
             // Only copy Framebuffer if necessary
             GLTextureHelper th = new GLTextureHelper();
@@ -143,6 +142,9 @@ public class GL3DImageTextureView extends AbstractGL3DView implements GL3DView, 
                 this.vertexShader.changeDifferenceTextureScale(jhvjpx.getBaseDifferenceImageData().getScaleX(), jhvjpx.getBaseDifferenceImageData().getScaleY());
                 this.vertexShader.setDifferenceRect(differenceXOffset, differenceYOffset, differenceXScale, differenceYScale);
                 this.vertexShader.changeDifferenceAngles(differenceTheta, differencePhi);
+                this.fragmentShader.changeDifferenceTextureScale(jhvjpx.getBaseDifferenceImageData().getScaleX(), jhvjpx.getBaseDifferenceImageData().getScaleY());
+                this.fragmentShader.setDifferenceRect(differenceXOffset, differenceYOffset, differenceXScale, differenceYScale);
+                this.fragmentShader.changeDifferenceAngles(differenceTheta, differencePhi);
             }
             this.fragmentShader.changeTextureScale(jhvjpx.getImageData().getScaleX(), jhvjpx.getImageData().getScaleY());
             this.fragmentShader.changeAngles(theta, phi);
