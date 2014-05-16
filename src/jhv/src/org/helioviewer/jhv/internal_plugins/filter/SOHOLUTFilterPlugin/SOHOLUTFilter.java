@@ -6,6 +6,7 @@ import javax.media.opengl.GL;
 
 import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.viewmodel.filter.AbstractFilter;
+import org.helioviewer.viewmodel.filter.FrameFilter;
 import org.helioviewer.viewmodel.filter.GLFragmentShaderFilter;
 import org.helioviewer.viewmodel.filter.StandardFilter;
 import org.helioviewer.viewmodel.imagedata.ARGBInt32ImageData;
@@ -13,6 +14,7 @@ import org.helioviewer.viewmodel.imagedata.ImageData;
 import org.helioviewer.viewmodel.imageformat.SingleChannelImageFormat;
 import org.helioviewer.viewmodel.imagetransport.Byte8ImageTransport;
 import org.helioviewer.viewmodel.imagetransport.Short16ImageTransport;
+import org.helioviewer.viewmodel.view.jp2view.JHVJPXView;
 import org.helioviewer.viewmodel.view.opengl.GLTextureHelper;
 import org.helioviewer.viewmodel.view.opengl.shader.GLShaderBuilder;
 import org.helioviewer.viewmodel.view.opengl.shader.GLSingleChannelLookupFragmentShaderProgram;
@@ -31,7 +33,7 @@ import org.helioviewer.viewmodel.view.opengl.shader.GLSingleChannelLookupFragmen
  *
  * @author Helge Dietert
  */
-public class SOHOLUTFilter extends AbstractFilter implements StandardFilter, GLFragmentShaderFilter {
+public class SOHOLUTFilter extends AbstractFilter implements FrameFilter,StandardFilter, GLFragmentShaderFilter {
     // /////////////////////////
     // GENERAL //
     // /////////////////////////
@@ -137,6 +139,7 @@ public class SOHOLUTFilter extends AbstractFilter implements StandardFilter, GLF
     private int lookupTex = 0;
     private LUT lastLut = null;
     private boolean lastInverted = false;
+    private JHVJPXView jpxView;
 
     /**
      * {@inheritDoc}
@@ -164,17 +167,22 @@ public class SOHOLUTFilter extends AbstractFilter implements StandardFilter, GLF
     public void applyGL(GL gl) {
         shader.bind(gl);
         shader.activateLutTexture(gl);
-
+        LUT currlut;
         // Note: The lookup table will always be power of two,
         // so we won't get any problems here.
-
+        if (jpxView.getDifferenceMode()) {
+            currlut = LUT.getStandardList().get("Gray");
+        }
+        else {
+            currlut = lut;
+        }
         gl.glBindTexture(GL.GL_TEXTURE_1D, lookupTex);
 
-        if (lastLut != lut || invertLUT != lastInverted) {
+        if (lastLut != currlut || invertLUT != lastInverted) {
             int[] intLUT;
 
             if (invertLUT) {
-                int[] sourceLUT = lut.getLut8();
+                int[] sourceLUT = currlut.getLut8();
                 intLUT = new int[sourceLUT.length];
 
                 int offset = sourceLUT.length - 1;
@@ -183,11 +191,11 @@ public class SOHOLUTFilter extends AbstractFilter implements StandardFilter, GLF
                     intLUT[offset - i] = sourceLUT[i];
                 }
             } else {
-                intLUT = lut.getLut8();
+                intLUT = currlut.getLut8();
             }
 
             buffer = IntBuffer.wrap(intLUT);
-            lastLut = lut;
+            lastLut = currlut;
             lastInverted = invertLUT;
         }
         gl.glPixelStorei(GL.GL_UNPACK_SKIP_PIXELS, 0);
@@ -238,5 +246,10 @@ public class SOHOLUTFilter extends AbstractFilter implements StandardFilter, GLF
     @Override
     public String getState() {
         return lut.getName().replaceAll(Character.toString(LUT.angstrom), "ANGSTROM") + " " + invertLUT;
+    }
+
+    @Override
+    public void setJPXView(JHVJPXView jpxView) {
+        this.jpxView = jpxView;
     }
 }
