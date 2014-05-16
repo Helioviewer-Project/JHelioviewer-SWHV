@@ -153,10 +153,6 @@ public class RunningDifferenceFilter implements FrameFilter, StandardFilter, Obs
         listeners.remove(l);
     }
 
-    /**
-     * @param isActive
-     *            the isActive to set
-     */
     public void setActive(boolean isActive) {
         this.isActive = isActive;
         jpxView.setDifferenceMode(isActive);
@@ -164,9 +160,6 @@ public class RunningDifferenceFilter implements FrameFilter, StandardFilter, Obs
         notifyAllListeners();
     }
 
-    /**
-     * @see org.helioviewer.viewmodel.filter.FrameFilter#setTimeMachineData(org.helioviewer.viewmodel.view.TimeMachineData)
-     */
     @Override
     public void setJPXView(JHVJPXView jpxView) {
         this.jpxView = jpxView;
@@ -185,10 +178,20 @@ public class RunningDifferenceFilter implements FrameFilter, StandardFilter, Obs
     public void applyGL(GL gl) {
         if (isActive) {
             if(StateController.getInstance().getCurrentState().getType() == ViewStateEnum.View3D){
-                shader.setIsDifference(gl, 1.0f);
+                if(jpxView.getBaseDifferenceMode()){
+                    shader.setIsDifference(gl, 0.99f);
+                }
+                else{
+                    shader.setIsDifference(gl, 1.0f);
+                }
             }
             else{
-                shader.setIsDifference(gl, 0.25f);
+                if(jpxView.getBaseDifferenceMode()){
+                    shader.setIsDifference(gl, 0.26f);
+                }
+                else{
+                    shader.setIsDifference(gl, 0.25f);
+                }
             }
             shader.bind(gl);
             ImageData previousFrame;
