@@ -44,7 +44,7 @@ public class RunningDifferenceFilter implements FrameFilter, StandardFilter, Obs
     private final DifferenceShader shader = new DifferenceShader();
     private int lookupDiff;
     private ImageData currentFrame;
-    private float truncationValue = 1.0f;
+    private float truncationValue = 0.2f;
     private JHVJPXView jpxView;
 
     /**
