@@ -32,6 +32,10 @@ public class RunningDifferenceFilter implements FrameFilter, StandardFilter, Obs
      */
     private volatile boolean isActive = true;
     private volatile boolean baseDifference = false;
+    private volatile boolean baseDifferenceNoRot = false;
+    private volatile boolean runDiffNoRot = false;
+
+
 
     /**
      * Observer listener
@@ -179,10 +183,20 @@ public class RunningDifferenceFilter implements FrameFilter, StandardFilter, Obs
         if (isActive) {
             if(StateController.getInstance().getCurrentState().getType() == ViewStateEnum.View3D){
                 if(jpxView.getBaseDifferenceMode()){
-                    shader.setIsDifference(gl, 0.99f);
+                    if (this.baseDifferenceNoRot) {
+                        shader.setIsDifference(gl, 0.26f);
+                    }
+                    else {
+                        shader.setIsDifference(gl, 0.99f);
+                    }
                 }
                 else{
-                    shader.setIsDifference(gl, 1.0f);
+                    if(this.runDiffNoRot){
+                        shader.setIsDifference(gl, 0.25f);
+                    }
+                    else{
+                        shader.setIsDifference(gl, 1.0f);
+                    }
                 }
             }
             else{
@@ -232,5 +246,13 @@ public class RunningDifferenceFilter implements FrameFilter, StandardFilter, Obs
     public void setBaseDifference(boolean selected) {
         this.baseDifference = selected;
         jpxView.setBaseDifferenceMode(selected);
+    }
+
+    public void setBaseDifferenceRot(boolean baseDifferenceRot) {
+        this.baseDifferenceNoRot = baseDifferenceRot;
+    }
+
+    public void setRunDiffNoRot(boolean runDiffNoRot) {
+        this.runDiffNoRot = runDiffNoRot;
     }
 }
