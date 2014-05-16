@@ -54,7 +54,7 @@ public class RunningDifferencePanel extends FilterPanel implements ChangeListene
         JPanel truncationLine = new JPanel();
         truncationLine.setLayout(new FlowLayout(FlowLayout.LEFT));
 
-        JLabel truncationLabel = new JLabel("Truncation point:");
+        JLabel truncationLabel = new JLabel("Clipping threshold:");
         truncationLine.add(truncationLabel);
         JSpinner.NumberEditor editor = new JSpinner.NumberEditor(truncateSpinner, "0%");
         truncateSpinner.setEditor(editor);
@@ -73,7 +73,9 @@ public class RunningDifferencePanel extends FilterPanel implements ChangeListene
     private void addRadioButtons(){
         final JRadioButton radNone = new JRadioButton("No differences", true);
         final JRadioButton radRunDiff = new JRadioButton("Running difference");
+        final JRadioButton radRunDiffNoRot = new JRadioButton("Running difference(no correction)");
         final JRadioButton radBaseDiff = new JRadioButton("Base difference");
+        final JRadioButton radBaseDiffNoRot = new JRadioButton("Base difference(no correction)");
 
 
         radNone.addItemListener(new ItemListener() {
@@ -83,6 +85,8 @@ public class RunningDifferencePanel extends FilterPanel implements ChangeListene
                        filter.setActive(false);
                        radRunDiff.setSelected(false);
                        radBaseDiff.setSelected(false);
+                       radBaseDiffNoRot.setSelected(false);
+                       radRunDiffNoRot.setSelected(false);
                    }
                    Displayer.getSingletonInstance().display();
             }
@@ -94,8 +98,27 @@ public class RunningDifferencePanel extends FilterPanel implements ChangeListene
                    if(e.getStateChange()==1){
                        filter.setActive(true);
                        filter.setBaseDifference(false);
+                       filter.setRunDiffNoRot(false);
+
                        radNone.setSelected(false);
                        radBaseDiff.setSelected(false);
+                       radBaseDiffNoRot.setSelected(false);
+                       radRunDiffNoRot.setSelected(false);
+                   }
+                   Displayer.getSingletonInstance().display();
+               }
+        });
+
+        radRunDiffNoRot.addItemListener(new ItemListener() {
+            @Override
+            public void itemStateChanged(ItemEvent e) {
+                   if(e.getStateChange()==1){
+                       filter.setActive(true);
+                       filter.setBaseDifference(false);
+                       filter.setRunDiffNoRot(true);
+                       radNone.setSelected(false);
+                       radBaseDiff.setSelected(false);
+                       radBaseDiffNoRot.setSelected(false);
                    }
                    Displayer.getSingletonInstance().display();
                }
@@ -107,8 +130,27 @@ public class RunningDifferencePanel extends FilterPanel implements ChangeListene
                 if(e.getStateChange()==1){
                     filter.setActive(true);
                     filter.setBaseDifference(true);
+                    filter.setBaseDifferenceRot(false);
                     radNone.setSelected(false);
                     radRunDiff.setSelected(false);
+                    radBaseDiffNoRot.setSelected(false);
+                    radRunDiffNoRot.setSelected(false);
+                }
+                Displayer.getSingletonInstance().display();
+            }
+        });
+
+        radBaseDiffNoRot.addItemListener(new ItemListener() {
+            @Override
+            public void itemStateChanged(ItemEvent e) {
+                if(e.getStateChange()==1){
+                    filter.setActive(true);
+                    filter.setBaseDifference(true);
+                    filter.setBaseDifferenceRot(true);
+                    radNone.setSelected(false);
+                    radRunDiff.setSelected(false);
+                    radBaseDiff.setSelected(false);
+                    radRunDiffNoRot.setSelected(false);
                 }
                 Displayer.getSingletonInstance().display();
             }
@@ -117,7 +159,9 @@ public class RunningDifferencePanel extends FilterPanel implements ChangeListene
         ButtonGroup group = new ButtonGroup();
         group.add(radNone);
         group.add(radRunDiff);
+        group.add(radRunDiffNoRot);
         group.add(radBaseDiff);
+        group.add(radBaseDiffNoRot);
 
         JPanel radPanel = new JPanel();
         radPanel.setLayout(new GridLayout(0,1));
@@ -125,8 +169,13 @@ public class RunningDifferencePanel extends FilterPanel implements ChangeListene
         radPanel.add(radNone);
         radRunDiff.setAlignmentX( Component.LEFT_ALIGNMENT );
         radPanel.add(radRunDiff);
+        radRunDiffNoRot.setAlignmentX( Component.LEFT_ALIGNMENT );
+        radPanel.add(radRunDiffNoRot);
         radBaseDiff.setAlignmentX( Component.LEFT_ALIGNMENT );
         radPanel.add(radBaseDiff);
+        radBaseDiffNoRot.setAlignmentX( Component.LEFT_ALIGNMENT );
+        radPanel.add(radBaseDiffNoRot);
+
         add(radPanel);
      }
 
