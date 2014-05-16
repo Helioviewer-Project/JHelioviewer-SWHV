@@ -34,10 +34,18 @@ public class DifferenceShader extends GLFragmentShaderProgram {
 
             shaderBuilder.getParameterList().add("float4 " + "texcoord4" + " : TEXCOORD4");
             String program = "";
-            program = "if(isdifference>0.5){\toutput.r = output.r - tex2D(differenceImage, texcoord4.xy).r;";
-            program +="\toutput.r = clamp(output.r,-truncationValue,truncationValue)/truncationValue;";
-            program +="\toutput.r = (output.r + 1.0f)/2.0f;";
-            program += "}";
+
+            program = "if(isdifference>0.24 && isdifference<0.26){" + shaderBuilder.LINE_SEP
+                    + "\toutput.r = output.r - tex2D(differenceImage, texcoord0.xy).r;" + shaderBuilder.LINE_SEP;
+            program +="\toutput.r = clamp(output.r,-truncationValue,truncationValue)/truncationValue;" + shaderBuilder.LINE_SEP;
+            program +="\toutput.r = (output.r + 1.0f)/2.0f;" + shaderBuilder.LINE_SEP;
+            program += "}" + shaderBuilder.LINE_SEP;
+
+            program += "if(isdifference>0.98 && isdifference<1.01){" + shaderBuilder.LINE_SEP
+                    + "\toutput.r = output.r - tex2D(differenceImage, texcoord4.xy).r;" + shaderBuilder.LINE_SEP;
+            program +="\toutput.r = clamp(output.r,-truncationValue,truncationValue)/truncationValue;" + shaderBuilder.LINE_SEP;
+            program +="\toutput.r = (output.r + 1.0f)/2.0f;" + shaderBuilder.LINE_SEP;
+            program += "}" + shaderBuilder.LINE_SEP;
 
             program = program.replaceAll("output", shaderBuilder.useOutputValue("float4", "COLOR"));
 
