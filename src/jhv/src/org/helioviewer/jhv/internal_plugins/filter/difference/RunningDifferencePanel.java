@@ -54,7 +54,7 @@ public class RunningDifferencePanel extends FilterPanel implements ChangeListene
         JPanel truncationLine = new JPanel();
         truncationLine.setLayout(new FlowLayout(FlowLayout.LEFT));
 
-        JLabel truncationLabel = new JLabel("Clipping threshold:");
+        JLabel truncationLabel = new JLabel("Contrast threshold:");
         truncationLine.add(truncationLabel);
         JSpinner.NumberEditor editor = new JSpinner.NumberEditor(truncateSpinner, "0%");
         truncateSpinner.setEditor(editor);
