@@ -48,7 +48,7 @@ public class RunningDifferencePanel extends FilterPanel implements ChangeListene
         this.setLayout(new BoxLayout(this, BoxLayout.PAGE_AXIS));
         addRadioButtons();
         truncateSpinner = new JSpinner();
-        truncateSpinner.setModel(new SpinnerNumberModel(new Float(1), new Float(0), new Float(1), new Float(0.01f)));
+        truncateSpinner.setModel(new SpinnerNumberModel(new Float(0.2f), new Float(0), new Float(1), new Float(0.01f)));
         truncateSpinner.addChangeListener(this);
 
         JPanel truncationLine = new JPanel();
