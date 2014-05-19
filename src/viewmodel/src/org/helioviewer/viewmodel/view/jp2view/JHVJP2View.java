@@ -69,6 +69,7 @@ public class JHVJP2View extends AbstractView implements JP2View, ViewportView, R
     };
 
     private Interval<Date> range;
+    public int texID = -1;
 
     // Member related to the view chain
     protected Viewport viewport;

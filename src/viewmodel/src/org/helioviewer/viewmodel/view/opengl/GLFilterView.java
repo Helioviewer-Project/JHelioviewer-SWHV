@@ -66,7 +66,7 @@ public class GLFilterView extends StandardFilterView implements GLFragmentShader
     protected void refilterPrepare() {
         if (filter instanceof FrameFilter) {
             updatePrecomputedViews();
-            ((FrameFilter) filter).setJPXView(jpxView);
+            ((FrameFilter) filter).setJP2View(jpxView);
         }
         super.refilterPrepare();
         if (filter instanceof GLImageSizeFilter && viewportView != null) {

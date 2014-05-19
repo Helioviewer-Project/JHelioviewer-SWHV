@@ -14,6 +14,7 @@ import org.helioviewer.viewmodel.imagedata.ImageData;
 import org.helioviewer.viewmodel.imageformat.SingleChannelImageFormat;
 import org.helioviewer.viewmodel.imagetransport.Byte8ImageTransport;
 import org.helioviewer.viewmodel.imagetransport.Short16ImageTransport;
+import org.helioviewer.viewmodel.view.jp2view.JHVJP2View;
 import org.helioviewer.viewmodel.view.jp2view.JHVJPXView;
 import org.helioviewer.viewmodel.view.opengl.GLTextureHelper;
 import org.helioviewer.viewmodel.view.opengl.shader.GLShaderBuilder;
@@ -139,7 +140,7 @@ public class SOHOLUTFilter extends AbstractFilter implements FrameFilter,Standar
     private int lookupTex = 0;
     private LUT lastLut = null;
     private boolean lastInverted = false;
-    private JHVJPXView jpxView;
+    private JHVJP2View jp2View;
 
     /**
      * {@inheritDoc}
@@ -170,7 +171,9 @@ public class SOHOLUTFilter extends AbstractFilter implements FrameFilter,Standar
         LUT currlut;
         // Note: The lookup table will always be power of two,
         // so we won't get any problems here.
-        if (jpxView.getDifferenceMode()) {
+        boolean b =(jp2View instanceof JHVJPXView);
+        JHVJPXView jpxView = (JHVJPXView)jp2View;
+        if ( b && jpxView.getDifferenceMode()) {
             currlut = LUT.getStandardList().get("Gray");
         }
         else {
@@ -249,7 +252,7 @@ public class SOHOLUTFilter extends AbstractFilter implements FrameFilter,Standar
     }
 
     @Override
-    public void setJPXView(JHVJPXView jpxView) {
-        this.jpxView = jpxView;
+    public void setJP2View(JHVJP2View jp2View) {
+        this.jp2View = jp2View;
     }
 }

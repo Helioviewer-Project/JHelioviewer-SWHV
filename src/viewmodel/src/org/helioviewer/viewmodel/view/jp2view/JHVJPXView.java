@@ -45,7 +45,6 @@ public class JHVJPXView extends JHVJP2View implements TimedMovieView, CachedMovi
     protected ImageCacheStatus imageCacheStatus;
     protected DateTimeCache dateTimeCache;
     protected int lastRenderedCompositionLayer = -1;
-    public int texID = -1;
     /*
      * Set to true if you want to use the displaylock.
      */

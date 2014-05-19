@@ -17,6 +17,7 @@ import org.helioviewer.viewmodel.imagedata.ColorMask;
 import org.helioviewer.viewmodel.imagedata.ImageData;
 import org.helioviewer.viewmodel.imagedata.SingleChannelByte8ImageData;
 import org.helioviewer.viewmodel.imagetransport.Byte8ImageTransport;
+import org.helioviewer.viewmodel.view.jp2view.JHVJP2View;
 import org.helioviewer.viewmodel.view.jp2view.JHVJPXView;
 import org.helioviewer.viewmodel.view.opengl.GLTextureHelper;
 import org.helioviewer.viewmodel.view.opengl.shader.GLShaderBuilder;
@@ -50,6 +51,7 @@ public class RunningDifferenceFilter implements FrameFilter, StandardFilter, Obs
     private ImageData currentFrame;
     private float truncationValue = 0.2f;
     private JHVJPXView jpxView;
+    private JHVJP2View jp2View;
 
     /**
      * @see org.helioviewer.viewmodel.filter.ObservableFilter#addFilterListener(org.helioviewer.viewmodel.filter.FilterListener)
@@ -165,8 +167,11 @@ public class RunningDifferenceFilter implements FrameFilter, StandardFilter, Obs
     }
 
     @Override
-    public void setJPXView(JHVJPXView jpxView) {
-        this.jpxView = jpxView;
+    public void setJP2View(JHVJP2View jp2View) {
+        this.jp2View = jp2View;
+        if(jp2View instanceof JHVJPXView){
+            this.jpxView = (JHVJPXView)jp2View;
+        }
     }
 
     @Override
