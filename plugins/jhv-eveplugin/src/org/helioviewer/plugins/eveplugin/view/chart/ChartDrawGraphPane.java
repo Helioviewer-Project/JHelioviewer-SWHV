@@ -137,15 +137,15 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
         for (DrawableType dt : drawTypeList) {
             List<DrawableElement> del = drawableElements.get(dt);
             if (del != null) {
-                //Log.debug("Drawable element list is not null. Size is " + del.size());
+                Log.info("Drawable element list is not null. Size is " + del.size());
                 synchronized (del) {
                     for (DrawableElement de : del) {
                         de.draw(g, plotArea);
                     }
                 }
-            } /*else {
-                Log.debug("Drawable element list is null");
-            }*/
+            } else {
+                Log.info("Drawable element list is null");
+            }
         }
     }
 
@@ -174,7 +174,8 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
         final int width = Math.abs(mouseDragPosition.x - mousePressedPosition.x);
         final int height = Math.abs(mouseDragPosition.y - mousePressedPosition.y);
 
-        g.setColor(ChartConstants.SELECTED_INTERVAL_BACKGROUND_COLOR);
+        //g.setColor(ChartConstants.SELECTED_INTERVAL_BACKGROUND_COLOR);
+        g.setColor(Color.BLUE);
         g.drawRect(x, y, width, height);
     }
 
@@ -348,7 +349,7 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
         double startValue = (graphArea.y + graphArea.height - Math.max(y0, y1)) / ratioValue + myPlotAreaSpace.getScaledSelectedMinValue();
         double endValue = (graphArea.y + graphArea.height - Math.min(y0, y1)) / ratioValue + myPlotAreaSpace.getScaledSelectedMinValue();
 
-        myPlotAreaSpace.setScaledSelectedValue(startValue, endValue);
+        myPlotAreaSpace.setScaledSelectedValue(startValue, endValue,false);
     }
 
     private void updateGraphArea() {
@@ -432,7 +433,8 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
         final Rectangle movieFrame = new Rectangle(movieLinePosition - 1, graphArea.y, 3, graphArea.height);
 
         mousePressedOnMovieFrame = movieFrame.contains(e.getPoint());
-        mousePressedPosition = graphArea.contains(e.getPoint()) ? e.getPoint() : null;
+        //mousePressedPosition = graphArea.contains(e.getPoint()) ? e.getPoint() : null;
+        mousePressedPosition = plotArea.contains(e.getPoint()) ? e.getPoint() : null;
     }
 
     public void mouseReleased(final MouseEvent e) {
