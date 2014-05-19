@@ -21,14 +21,17 @@ public class ZoomManager implements ZoomControllerListener, PlotAreaSpaceListene
     private ZoomController zoomController;
     private Interval<Date> currentInterval;
     private PlotAreaSpaceManager plotAreaSpaceManager;
+    private Object intervalLock;
 
     
     private ZoomManager() {
-
+        //currentInterval = new Interval<Date>(new Date(), new Date()); 
         zoomController = ZoomController.getSingletonInstance();
         zoomController.addZoomControllerListener(this);
         zoomManagerData = new HashMap<String, ZoomManagerData>();
         plotAreaSpaceManager = PlotAreaSpaceManager.getInstance();
+        intervalLock = new Object();
+                
     }
 
     public static ZoomManager getSingletonInstance() {
@@ -66,20 +69,23 @@ public class ZoomManager implements ZoomControllerListener, PlotAreaSpaceListene
 
     public void addZoomDataConfig(FrequencyInterval freqInterval, Interval<Date> interval, ZoomDataConfigListener zoomDataConfigListener, long ID, String identifier) {
         ZoomManagerData zmd = getZoomManagerData(identifier);
-        if (currentInterval == null) {
-            this.currentInterval = interval;
-        }
-        if (freqInterval != null && interval != null) {
-            ZoomDataConfig config;
-            if (zmd.isAreaInitialized()) {
-                config = new ZoomDataConfig(freqInterval.getStart(), freqInterval.getEnd(), currentInterval.getStart(), currentInterval.getEnd(), zmd.getDisplaySize(), ID, identifier);
-            } else {
-                config = new ZoomDataConfig(freqInterval.getStart(), freqInterval.getEnd(), currentInterval.getStart(), currentInterval.getStart(), null, ID, identifier);
+        synchronized (intervalLock) {
+            if (currentInterval == null) {
+                this.currentInterval = interval;
             }
-            plotAreaSpaceManager.getPlotAreaSpace(identifier).addPlotAreaSpaceListener(config);
-            Log.debug("PlotAreaSpaceListener added");
-            zmd.addToZoomDataConfigMap(ID, config);
-            config.addListener(zoomDataConfigListener);
+            if (freqInterval != null && interval != null) {
+                ZoomDataConfig config;
+                if (zmd.isAreaInitialized()) {
+                    config = new ZoomDataConfig(freqInterval.getStart(), freqInterval.getEnd(), currentInterval.getStart(), currentInterval.getEnd(), zmd.getDisplaySize(), ID, identifier);
+                } else {
+                    config = new ZoomDataConfig(freqInterval.getStart(), freqInterval.getEnd(), currentInterval.getStart(), currentInterval.getStart(), null, ID, identifier);
+                }
+                plotAreaSpaceManager.getPlotAreaSpace(identifier).addPlotAreaSpaceListener(config);
+                Log.debug("PlotAreaSpaceListener added");
+                zmd.addToZoomDataConfigMap(ID, config);
+                config.addListener(zoomDataConfigListener);
+            }
+
         }
     }
 
@@ -115,6 +121,48 @@ public class ZoomManager implements ZoomControllerListener, PlotAreaSpaceListene
         return new DrawableAreaMap(sourceX0, sourceY0, sourceX1, sourceY1, destX0, destY0, destX1, destY1, downloadID);
     }
 
+    /**
+     * Calculates the available space in the screen size for the requested time interval and frequency interval. The frequency 
+     * gets the complete height, the time gets the portion of the width of the screen corresponding with the portion of the 
+     * complete time interval it takes. 
+     * 
+     * 
+     * @param startDate         The start date of the requested time interval
+     * @param endDate           The end date of the requested time interval
+     * @param startFreq         The start frequency of the requested frequency interval
+     * @param endFreq           The end frequency of the requested frequency interval
+     * @param downloadId        The download id that requests the space
+     * @param plotIdentifier    The plot for which the space is requested
+     * @return  A rectangle with the dimensions of the available space for the requested intervals
+     * @throws IllegalArgumentException     If the given start date or end date fall outside the current interval or the given start
+     *                                      frequency or end frequency fall outside the minimum and maximum frequency.
+     */
+    public Rectangle getAvailableSpaceForInterval(Date startDate, Date endDate, int startFreq, int endFreq, long downloadId, String plotIdentifier){
+        ZoomManagerData zmd = getZoomManagerData(plotIdentifier);
+        ZoomDataConfig zdc = zmd.getZoomDataConfigMap().get(downloadId);
+        synchronized (intervalLock) {       
+            if(currentInterval.containsPointInclusive(startDate) && currentInterval.containsPointInclusive(endDate) && 
+                    (startFreq >= zdc.getMinY() && startFreq <= zdc.getMaxY()) && 
+                    (endFreq >= zdc.getMinY() && endFreq <= zdc.getMaxY())){
+               int height = zmd.getDisplaySize().height;
+               double ratio = 1.0 * zmd.getDisplaySize().getWidth()/(currentInterval.getEnd().getTime()-currentInterval.getStart().getTime());
+               int width = (int)Math.round((endDate.getTime() - startDate.getTime())*ratio);
+               return new Rectangle(width,height);
+            }else{
+                throw new IllegalArgumentException("The requested start date, end date fall outside the current interval, " +
+                		"or the start frequency or end frequency fall outside the minimum or maximum frequency.\n " +
+                		"Start date : " + startDate + " in milliseconds : "+ startDate.getTime() +"\n" +
+                		"End date : "+endDate + " in milliseconds : "+ endDate.getTime() +"\n" + 
+                		"Start frequency : "+ startFreq + "\n" +
+                		"End frequency : "+endFreq+"\n"+
+                        "Current time interval : " + currentInterval + " in milliseconds : ["+ currentInterval.getStart().getTime() +", "+ currentInterval.getEnd().getTime() +"]\n"+
+                		"Current frequency interval : [" + zdc.getMinY()+","+zdc.getMaxY()+"]\n" +
+                		"current interval contains start : " + currentInterval.containsPointInclusive(startDate) + "\n" +
+                		"current interval contains end : " + currentInterval.containsPointInclusive(endDate));
+            }
+        }
+    }
+    
     private int defineYInDestinationArea(int frequencyToFind, ZoomDataConfig zdc) {
         return zdc.getDisplaySize().y + (int) Math.floor((frequencyToFind - zdc.getMinY()) / (1.0 * (zdc.getMaxY() - zdc.getMinY()) / zdc.getDisplaySize().height));
     }
@@ -138,12 +186,14 @@ public class ZoomManager implements ZoomControllerListener, PlotAreaSpaceListene
 
     @Override
     public void selectedIntervalChanged(Interval<Date> newInterval) {
-        currentInterval = newInterval;
-        for (ZoomManagerData zmd : zoomManagerData.values()) {
-            for (ZoomDataConfig zdc : zmd.getZoomDataConfigMap().values()) {
-                zdc.setMinX(newInterval.getStart());
-                zdc.setMaxX(newInterval.getEnd());
-                zdc.update();
+        synchronized (intervalLock) {
+            currentInterval = newInterval;
+            for (ZoomManagerData zmd : zoomManagerData.values()) {
+                for (ZoomDataConfig zdc : zmd.getZoomDataConfigMap().values()) {
+                    zdc.setMinX(newInterval.getStart());
+                    zdc.setMaxX(newInterval.getEnd());
+                    zdc.update();
+                }
             }
         }
     }

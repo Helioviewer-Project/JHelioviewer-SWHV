@@ -7,6 +7,7 @@ import java.util.Date;
 import kdu_jni.Jp2_palette;
 import kdu_jni.KduException;
 
+import org.helioviewer.base.logging.Log;
 import org.helioviewer.base.math.Interval;
 import org.helioviewer.base.math.Vector2dInt;
 import org.helioviewer.jhv.display.Displayer;
@@ -549,6 +550,7 @@ public class JHVJP2View extends AbstractView implements JP2View, ViewportView, R
 
         Vector2dInt imagePostion = ViewHelper.calculateInnerViewportOffset(r, metaData.getPhysicalRegion(), new ViewportImageSizeAdapter(new StaticViewportImageSize(res.getResolutionBounds().width, res.getResolutionBounds().height)));
 
+        Log.debug("subimage : " + imagePostion.getX()+ " , "+ imagePostion.getY() + "," + imageWidth + ","  + imageHeight);
         SubImage subImage = new SubImage(imagePostion.getX(), imagePostion.getY(), imageWidth, imageHeight);
 
         subImageBuffer.putSubImage(subImage, r);
@@ -630,7 +632,11 @@ public class JHVJP2View extends AbstractView implements JP2View, ViewportView, R
             if (imageData == null) {
                 return false;
             }
+<<<<<<< HEAD
             setSubimageData(null, null, 0, 1., false);
+=======
+            //setSubimageData(null, null, 0, 1.);
+>>>>>>> temp commit
             return true;
         }
         imageViewParams = newParams;

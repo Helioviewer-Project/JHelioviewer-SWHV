@@ -62,8 +62,8 @@ public class RequestForDataBuffer {
     }
 
     public boolean hasData() {
-        synchronized (this) {
+        //synchronized (this) {
             return newData;
-        }
+        //}
     }
 }

@@ -43,4 +43,21 @@ public class FrequencyInterval {
     public boolean overlaps(FrequencyInterval otherInterval) {
         return !(this.getStart() > otherInterval.getEnd() || this.getEnd() < otherInterval.getStart());
     }
+    
+    
+    public int squeeze(int element){
+         if (element >= start && element <= end){
+             return element;
+         }else{
+             if(element < start){
+                 return start;
+             }else{
+                 return end;
+             }
+         }
+    }
+    
+    public boolean containsInclusive(int value){
+        return value >= start || value <= end;
+    }
 }
