@@ -1,5 +1,7 @@
 package org.helioviewer.gl3d.shader;
 
+import java.util.ArrayList;
+
 import javax.media.opengl.GL;
 
 import org.helioviewer.viewmodel.view.opengl.shader.GLFragmentShaderProgram;
@@ -21,6 +23,10 @@ public class GL3DImageFragmentShaderProgram extends GLFragmentShaderProgram {
     private double differencePhi;
     private double differenceXScale;
     private double differenceYScale;
+    private int cutOffRadiusRef;
+    private int textureScaleThetaPhiRef;
+    private int diffTextureScaleThetaPhiRef;
+    private GLShaderBuilder builder;
     public GL3DImageFragmentShaderProgram() {
     }
 
@@ -37,10 +43,32 @@ public class GL3DImageFragmentShaderProgram extends GLFragmentShaderProgram {
 
     private void bind(GL gl, int shader, double cutOffRadius, double xTextureScale, double yTextureScale, double theta, double phi) {
         shaderCurrentlyUsed = shader;
+        double [] cutOffRadiusFloat = this.builder.getEnvParameter(this.cutOffRadiusRef);
+        cutOffRadiusFloat[0] = (float)cutOffRadius;
+        cutOffRadiusFloat[1] = 0f;
+        cutOffRadiusFloat[2] = 0f;
+        cutOffRadiusFloat[3] = 0f;
+
+
+        double [] textureScaleThetaPhiFloat = this.builder.getEnvParameter(this.textureScaleThetaPhiRef);
+        textureScaleThetaPhiFloat[0] = xTextureScale;
+        textureScaleThetaPhiFloat[1] = yTextureScale;
+        textureScaleThetaPhiFloat[2] = theta;
+        textureScaleThetaPhiFloat[3] = phi;
+
+
+        double [] diffTextureScaleThetaPhiFloat = this.builder.getEnvParameter(this.diffTextureScaleThetaPhiRef);
+        diffTextureScaleThetaPhiFloat[0] = differenceXTextureScale;
+        diffTextureScaleThetaPhiFloat[1] = differenceYTextureScale;
+        diffTextureScaleThetaPhiFloat[2] = differenceTheta;
+        diffTextureScaleThetaPhiFloat[3] = differencePhi;
+
         gl.glBindProgramARB(target, shader);
-        gl.glProgramLocalParameter4dARB(target, 0, cutOffRadius, 0.0f, 0.0f, 0.0f);
-        gl.glProgramLocalParameter4dARB(target, 1, xTextureScale, yTextureScale, theta, phi);
-        gl.glProgramLocalParameter4dARB(target, 2, differenceXTextureScale, differenceYTextureScale, differenceTheta, differencePhi);
+        ArrayList<double[]> params = this.builder.getEnvParameters();
+        int i = 0;
+        for(double[] param: params){
+            gl.glProgramLocalParameter4dARB(target, i++, param[0], param[1], param[2], param[3]);
+        }
     }
 
     /**
@@ -80,9 +108,9 @@ public class GL3DImageFragmentShaderProgram extends GLFragmentShaderProgram {
 
     @Override
     protected void buildImpl(GLShaderBuilder shaderBuilder) {
+        this.builder = shaderBuilder;
         try {
             String program = "\tif(texcoord0.x<0.0||texcoord0.y<0.0||texcoord0.x>textureScaleThetaPhi.x||texcoord0.y>textureScaleThetaPhi.y){" + "\t\tOUT.color = float4(1.0,0.0,0.0,1.0);" + GLShaderBuilder.LINE_SEP + "\t}" + GLShaderBuilder.LINE_SEP;
-            program = "\tif((texcoord4.x<0.0||texcoord4.y<0.0||texcoord4.x>diffTextureScaleThetaPhi.x||texcoord4.y>diffTextureScaleThetaPhi.y)){" + "\t\tOUT.color = float4(0.0,1.0,0.0,1.0);" + GLShaderBuilder.LINE_SEP + "\t}" + GLShaderBuilder.LINE_SEP;
 
             //program += "\tOUT.color.a=1.;" + GLShaderBuilder.LINE_SEP;
             program += "\tfloat theta = textureScaleThetaPhi.z;" + GLShaderBuilder.LINE_SEP;
@@ -102,9 +130,9 @@ public class GL3DImageFragmentShaderProgram extends GLFragmentShaderProgram {
 
             program += "\tif((position.z!=0.0 && projectionn<-0.001) || (position.z==0.0 && position.x*position.x +position.y*position.y<0.9)){" + "\t\tdiscard;" + GLShaderBuilder.LINE_SEP + "\t}";
 
-            shaderBuilder.addEnvParameter("float cutOffRadius");
-            shaderBuilder.addEnvParameter("float4 textureScaleThetaPhi");
-            shaderBuilder.addEnvParameter("float4 diffTextureScaleThetaPhi");
+            this.cutOffRadiusRef = shaderBuilder.addEnvParameter("float cutOffRadius");
+            this.textureScaleThetaPhiRef =shaderBuilder.addEnvParameter("float4 textureScaleThetaPhi");
+            this.diffTextureScaleThetaPhiRef = shaderBuilder.addEnvParameter("float4 diffTextureScaleThetaPhi");
 
             program = program.replace("position", shaderBuilder.useStandardParameter("float4", "TEXCOORD3"));
 

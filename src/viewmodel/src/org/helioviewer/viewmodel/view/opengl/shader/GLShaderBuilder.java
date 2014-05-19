@@ -1,5 +1,6 @@
 package org.helioviewer.viewmodel.view.opengl.shader;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedList;
 
@@ -51,6 +52,7 @@ public class GLShaderBuilder {
     private final HashMap<String, String> outputTypes = new HashMap<String, String>();
     private final HashMap<String, String> outputInit = new HashMap<String, String>();
     private final HashMap<String, String> standardParameterTypes = new HashMap<String, String>();
+    private final ArrayList<double[]> glEnvParameters = new ArrayList<double[]>();
 
     private final int[] componentsAvailableInTexCoord;
 
@@ -354,14 +356,19 @@ public class GLShaderBuilder {
     public int addEnvParameter(String declaration) throws GLBuildShaderException {
         if (nextConstantRegister < maxConstantRegisters) {
             getParameterList().add("uniform " + declaration.trim() + " : C" + nextConstantRegister);
-            // parameterList.add("uniform " + declaration.trim() +
-            // nextConstantRegister);
+            this.glEnvParameters.add(nextConstantRegister, new double[4]);
             return nextConstantRegister++;
         } else {
             throw new GLBuildShaderException("Number of available enviroment parameters exceeded (Max: " + maxConstantRegisters + ")");
         }
     }
 
+    public double[] getEnvParameter(int pos){
+        return this.glEnvParameters.get(pos);
+    }
+    public ArrayList<double[]> getEnvParameters(){
+        return this.glEnvParameters;
+    }
     /**
      * Adds a new generic vertex attribute to the parameter list. It returns the
      * index, which has to be used by glVertexAttrib*ARB to access this
