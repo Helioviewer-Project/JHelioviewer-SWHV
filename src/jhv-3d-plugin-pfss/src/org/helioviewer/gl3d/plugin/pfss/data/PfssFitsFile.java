@@ -11,7 +11,7 @@ import javax.media.opengl.GL;
 
 /**
  * Class to load the fitsfile with a http-request and store them in a byte[]
- * 
+ *
  * @author Stefan Meier (stefan.meier@fhnw.ch)
  * */
 public class PfssFitsFile {
@@ -21,13 +21,13 @@ public class PfssFitsFile {
 
     /**
      * Function to load the data and write them into a byte[]
-     * 
+     *
      * @param url
      */
     public synchronized void loadFile(String url) {
         InputStream in = null;
         try {
-            URL u = new URL("http://soleil.i4ds.ch/sol-win/4-2013-09-01_12-04-00.000_pfss_field_data.fits");
+            URL u = new URL("http://soleil.i4ds.ch/sol-win/2013-09-01_12-04-00.000_pfss_field_data.fits");
             // URL u = new URL(url);
             URLConnection uc = u.openConnection();
             int contentLength = uc.getContentLength();
@@ -59,7 +59,7 @@ public class PfssFitsFile {
     }
 
     /**
-     * 
+     *
      * @return PfssData -> prepared data for the visualization
      */
     public PfssData getData() {
@@ -71,11 +71,10 @@ public class PfssFitsFile {
 
     /**
      * Function to clear the VBO and the object data
-     * 
+     *
      * @param gl
      */
     public void clear(GL gl) {
-        System.out.println("clear");
         if (data != null) {
             this.data.clear(gl);
             this.data = null;
