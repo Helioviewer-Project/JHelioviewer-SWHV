@@ -1,5 +1,7 @@
 package org.helioviewer.viewmodel.view.opengl.shader;
 
+import java.util.ArrayList;
+
 import javax.media.opengl.GL;
 
 import org.helioviewer.viewmodel.view.opengl.shader.GLShaderBuilder.GLBuildShaderException;
@@ -7,38 +9,48 @@ import org.helioviewer.viewmodel.view.opengl.shader.GLShaderBuilder.GLBuildShade
 /**
  * Specialized implementation of GLFragmentShaderProgram for filters based on
  * lookup tables.
- * 
+ *
  * <p>
  * To use this program, it is not necessary to derive another class from this
  * one. A one-dimensional texture is used as the lookup table. To set the lookup
  * table, call {@link #activateLutTexture(GL)}. This binds the texture id used
  * for the lookup table. After that, the texture can be filled with the lookup
  * data. The rest is done by the class itself.
- * 
+ *
  * @author Markus Langenberg
  */
 public class GLSingleChannelLookupFragmentShaderProgram extends GLFragmentShaderProgram {
 
     private static int lutID = 0;
     int lutMode = -1;
+    private GLShaderBuilder builder;
 
     /**
      * Binds the texture used for the lookup table.
-     * 
+     *
      * As a result, copying the lookup data to the texture can take place.
-     * 
+     *
      * @param gl
      *            Valid reference to the current gl object
      */
     public void activateLutTexture(GL gl) {
         gl.glActiveTexture(lutMode);
     }
-
+    @Override
+    public void bind(GL gl){
+        ArrayList<double[]> params = this.builder.getEnvParameters();
+        int i = 0;
+        gl.glBindProgramARB(target, shaderID);
+        for(double[] param: params){
+            gl.glProgramLocalParameter4dARB(target, i++, param[0], param[1], param[2], param[3]);
+        }
+    }
     /**
      * {@inheritDoc}
      */
+    @Override
     protected void buildImpl(GLShaderBuilder shaderBuilder) {
-
+        this.builder = shaderBuilder;
         try {
             String program = "\toutput.rgb = tex1D(lut, output.r).rgb;";
 
