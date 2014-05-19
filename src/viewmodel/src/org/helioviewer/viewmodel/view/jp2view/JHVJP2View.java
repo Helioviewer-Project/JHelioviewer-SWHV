@@ -632,11 +632,7 @@ public class JHVJP2View extends AbstractView implements JP2View, ViewportView, R
             if (imageData == null) {
                 return false;
             }
-<<<<<<< HEAD
-            setSubimageData(null, null, 0, 1., false);
-=======
             //setSubimageData(null, null, 0, 1.);
->>>>>>> temp commit
             return true;
         }
         imageViewParams = newParams;
