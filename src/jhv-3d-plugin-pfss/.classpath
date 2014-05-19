@@ -14,5 +14,6 @@
 	<classpathentry combineaccessrules="false" kind="src" path="/jhv"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/viewmodel"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/viewmodelplugin"/>
+	<classpathentry kind="lib" path="/Users/freekv/swhv/SWHV_repos/trunk/client/jhv-3d-wcs/lib/bzip2.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
