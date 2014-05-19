@@ -346,11 +346,11 @@ public class GL3DSceneGraphView extends AbstractGL3DView implements GL3DView {
         GL3DGroup indicatorArrows = new GL3DModel("Arrows", "Arrows indicating the viewspace axes");
         artificialObjects.addNode(indicatorArrows);
 
-        GL3DShape north = new GL3DArrow("Northpole", Constants.SunRadius / 16, Constants.SunRadius, Constants.SunRadius / 2, 32, new GL3DVec4f(1.0f, 0.2f, 0.1f, 1.0f));
+        GL3DShape north = new GL3DArrow("Northpole", Constants.SunRadius / 128, Constants.SunRadius, Constants.SunRadius / 4, 128, new GL3DVec4f(1.0f, 0.2f, 0.1f, 1.0f));
         north.modelView().rotate(-Math.PI / 2, GL3DVec3d.XAxis);
         indicatorArrows.addNode(north);
 
-        GL3DShape south = new GL3DArrow("Southpole", Constants.SunRadius / 16, Constants.SunRadius, Constants.SunRadius / 2, 32, new GL3DVec4f(0.1f, 0.2f, 1.0f, 1.0f));
+        GL3DShape south = new GL3DArrow("Southpole", Constants.SunRadius / 128, Constants.SunRadius, Constants.SunRadius / 4, 128, new GL3DVec4f(0.1f, 0.2f, 1.0f, 1.0f));
         south.modelView().rotate(Math.PI / 2, GL3DVec3d.XAxis);
         indicatorArrows.addNode(south);
 
