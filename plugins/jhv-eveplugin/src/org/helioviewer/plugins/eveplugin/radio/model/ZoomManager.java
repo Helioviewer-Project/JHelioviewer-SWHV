@@ -81,7 +81,7 @@ public class ZoomManager implements ZoomControllerListener, PlotAreaSpaceListene
                     config = new ZoomDataConfig(freqInterval.getStart(), freqInterval.getEnd(), currentInterval.getStart(), currentInterval.getStart(), null, ID, identifier);
                 }
                 plotAreaSpaceManager.getPlotAreaSpace(identifier).addPlotAreaSpaceListener(config);
-                Log.debug("PlotAreaSpaceListener added");
+                Log.info("PlotAreaSpaceListener added");
                 zmd.addToZoomDataConfigMap(ID, config);
                 config.addListener(zoomDataConfigListener);
             }
@@ -149,7 +149,7 @@ public class ZoomManager implements ZoomControllerListener, PlotAreaSpaceListene
                int width = (int)Math.round((endDate.getTime() - startDate.getTime())*ratio);
                return new Rectangle(width,height);
             }else{
-                Log.debug("The requested start date, end date fall outside the current interval, " +
+                Log.info("The requested start date, end date fall outside the current interval, " +
                         "or the start frequency or end frequency fall outside the minimum or maximum frequency.\n " +
                         "Start date : " + startDate + " in milliseconds : "+ startDate.getTime() +"\n" +
                         "End date : "+endDate + " in milliseconds : "+ endDate.getTime() +"\n" + 
@@ -177,7 +177,8 @@ public class ZoomManager implements ZoomControllerListener, PlotAreaSpaceListene
     }
     
     private int defineYInDestinationArea(int frequencyToFind, ZoomDataConfig zdc) {
-        return zdc.getDisplaySize().y + (int) Math.floor((frequencyToFind - zdc.getMinY()) / (1.0 * (zdc.getMaxY() - zdc.getMinY()) / zdc.getDisplaySize().height));
+        //return zdc.getDisplaySize().y + (int) Math.floor((frequencyToFind - zdc.getMinY()) / (1.0 * (zdc.getMaxY() - zdc.getMinY()) / zdc.getDisplaySize().height));
+        return zdc.getDisplaySize().y + (int) Math.floor((frequencyToFind - zdc.getSelectedMinY()) / (1.0 * (zdc.getSelectedMaxY() - zdc.getSelectedMinY()) / zdc.getDisplaySize().height));
     }
 
     private int defineXInDestinationArea(Date dateToFind, ZoomDataConfig zdc) {
