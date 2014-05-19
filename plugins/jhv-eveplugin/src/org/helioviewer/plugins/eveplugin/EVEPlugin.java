@@ -29,7 +29,6 @@ public class EVEPlugin implements Plugin, MainContentPanelPlugin {
     private MainPanel mainPanel;
 
     public void installPlugin() {
-        Log.debug("EvePlugin : " + this);
         if (mainPanel == null) {
             mainPanel = new MainPanel();
         }
