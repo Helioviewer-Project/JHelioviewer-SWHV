@@ -10,7 +10,7 @@ import org.helioviewer.viewmodel.view.AbstractLayeredView;
 import org.helioviewer.viewmodel.view.SubimageDataView;
 import org.helioviewer.viewmodel.view.View;
 import org.helioviewer.viewmodel.view.ViewHelper;
-import org.helioviewer.viewmodel.view.jp2view.JHVJPXView;
+import org.helioviewer.viewmodel.view.jp2view.JHVJP2View;
 import org.helioviewer.viewmodel.view.opengl.shader.GLFragmentShaderView;
 import org.helioviewer.viewmodel.view.opengl.shader.GLMinimalFragmentShaderProgram;
 import org.helioviewer.viewmodel.view.opengl.shader.GLMinimalVertexShaderProgram;
@@ -19,25 +19,26 @@ import org.helioviewer.viewmodel.view.opengl.shader.GLVertexShaderView;
 
 /**
  * Implementation of LayeredView for rendering in OpenGL mode.
- * 
+ *
  * <p>
  * This class manages different layers in OpenGL by branching the renderGL calls
  * as well as the calls for building shaders.
- * 
+ *
  * <p>
  * For further information about the role of the LayeredView within the view
  * chain, see {@link org.helioviewer.viewmodel.view.LayeredView}
- * 
+ *
  * @author Markus Langenberg
- * 
+ *
  */
 public class GLLayeredView extends AbstractLayeredView implements GLFragmentShaderView, GLVertexShaderView {
 
-    private GLTextureHelper textureHelper = new GLTextureHelper();
+    private final GLTextureHelper textureHelper = new GLTextureHelper();
 
     /**
      * {@inheritDoc}
      */
+    @Override
     public void addLayer(View newLayer, int newIndex) {
         if (newLayer == null) {
             return;
@@ -53,7 +54,7 @@ public class GLLayeredView extends AbstractLayeredView implements GLFragmentShad
         /*
          * GLFilterView filterView = new GLFilterView(); OpacityFilter filter =
          * new OpacityFilter(0.5f); filterView.setFilter(filter);
-         * 
+         *
          * GLHelioviewerGeometryView geomView =
          * newLayer.getAdapter(GLHelioviewerGeometryView.class); if(geomView !=
          * null) { View firstFilter = geomView.getView();
@@ -66,6 +67,7 @@ public class GLLayeredView extends AbstractLayeredView implements GLFragmentShad
     /**
      * {@inheritDoc}
      */
+    @Override
     protected boolean recalculateRegionsAndViewports(ChangeEvent event) {
 
         boolean changed = false;
@@ -92,6 +94,7 @@ public class GLLayeredView extends AbstractLayeredView implements GLFragmentShad
     /**
      * {@inheritDoc}
      */
+    @Override
     public void renderGL(GL gl, boolean nextView) {
 
         layerLock.lock();
@@ -113,7 +116,7 @@ public class GLLayeredView extends AbstractLayeredView implements GLFragmentShad
                 if (v instanceof GLView) {
                     ((GLView) v).renderGL(gl, true);
                 } else {
-                    textureHelper.renderImageDataToScreen(gl, layer.regionView.getRegion(), v.getAdapter(SubimageDataView.class).getSubimageData(), v.getAdapter(JHVJPXView.class));
+                    textureHelper.renderImageDataToScreen(gl, layer.regionView.getRegion(), v.getAdapter(SubimageDataView.class).getSubimageData(), v.getAdapter(JHVJP2View.class));
                 }
             }
 
@@ -126,21 +129,23 @@ public class GLLayeredView extends AbstractLayeredView implements GLFragmentShad
 
     /**
      * {@inheritDoc}
-     * 
+     *
      * In this case, it does nothing, since for OpenGL views, the rendering
      * takes place in {@link #renderGL(GL)}.
      */
 
+    @Override
     protected void redrawBufferImpl() {
     }
 
     /**
      * {@inheritDoc}
-     * 
+     *
      * <p>
      * In this case, creates a new shader for every layer and initializes it
      * with the least necessary commands.
      */
+    @Override
     public GLShaderBuilder buildFragmentShader(GLShaderBuilder shaderBuilder) {
 
         layerLock.lock();
@@ -170,11 +175,12 @@ public class GLLayeredView extends AbstractLayeredView implements GLFragmentShad
 
     /**
      * {@inheritDoc}
-     * 
+     *
      * <p>
      * In this case, creates a new shader for every layer and initializes it
      * with the least necessary commands.
      */
+    @Override
     public GLShaderBuilder buildVertexShader(GLShaderBuilder shaderBuilder) {
 
         layerLock.lock();
