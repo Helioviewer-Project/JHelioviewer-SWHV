@@ -193,6 +193,8 @@ public class GammaCorrectionFilter extends AbstractFilter implements StandardFil
      */
     private class GammaCorrectionShader extends GLFragmentShaderProgram {
         private GLTextureCoordinate gammaParam;
+        private int gammaParamRef;
+        private double[] gammaParamFloat;
 
         /**
          * Sets the gamma value
@@ -203,9 +205,7 @@ public class GammaCorrectionFilter extends AbstractFilter implements StandardFil
          *            Gamma value
          */
         private void setGamma(GL gl, float gamma) {
-            if (gammaParam != null) {
-                gammaParam.setValue(gl, gamma);
-            }
+            gammaParamFloat[0] = gamma;
         }
 
         /**
@@ -214,10 +214,10 @@ public class GammaCorrectionFilter extends AbstractFilter implements StandardFil
         @Override
         protected void buildImpl(GLShaderBuilder shaderBuilder) {
             try {
-                gammaParam = shaderBuilder.addTexCoordParameter(1);
+                gammaParamRef = shaderBuilder.addEnvParameter("float gamma");
+                gammaParamFloat = shaderBuilder.getEnvParameter(gammaParamRef);
                 String program = "\toutput.rgb = pow(output.rgb, gamma);";
                 program = program.replace("output", shaderBuilder.useOutputValue("float4", "COLOR"));
-                program = program.replace("gamma", gammaParam.getIdentifier(3));
                 shaderBuilder.addMainFragment(program);
             } catch (GLBuildShaderException e) {
                 e.printStackTrace();

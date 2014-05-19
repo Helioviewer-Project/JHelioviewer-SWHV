@@ -16,7 +16,6 @@ import org.helioviewer.viewmodel.imagetransport.Short16ImageTransport;
 import org.helioviewer.viewmodel.view.opengl.shader.GLFragmentShaderProgram;
 import org.helioviewer.viewmodel.view.opengl.shader.GLShaderBuilder;
 import org.helioviewer.viewmodel.view.opengl.shader.GLShaderBuilder.GLBuildShaderException;
-import org.helioviewer.viewmodel.view.opengl.shader.GLTextureCoordinate;
 
 /**
  * Filter for enhancing the contrast of the image.
@@ -192,7 +191,9 @@ public class ContrastFilter extends AbstractFilter implements StandardFilter, GL
      * Fragment shader for enhancing the contrast.
      */
     private class ContrastShader extends GLFragmentShaderProgram {
-        private GLTextureCoordinate contrastParam;
+
+        private int contrastParamRef;
+        private double[] contrastParamFloat;
 
         /**
          * Sets the contrast parameter
@@ -203,8 +204,8 @@ public class ContrastFilter extends AbstractFilter implements StandardFilter, GL
          *            Contrast parameter
          */
         private void setContrast(GL gl, float contrast) {
-            if (contrastParam != null) {
-                contrastParam.setValue(gl, contrast);
+            if (contrastParamFloat != null) {
+                contrastParamFloat[0] = contrast;
             }
         }
 
@@ -214,10 +215,10 @@ public class ContrastFilter extends AbstractFilter implements StandardFilter, GL
         @Override
         protected void buildImpl(GLShaderBuilder shaderBuilder) {
             try {
-                contrastParam = shaderBuilder.addTexCoordParameter(1);
+                contrastParamRef = shaderBuilder.addEnvParameter("float contrast");
+                contrastParamFloat = shaderBuilder.getEnvParameter(contrastParamRef);
                 String program = "\toutput.rgb = 0.5f * sign(2.0f * output.rgb - 1.0f) * pow(abs(2.0f * output.rgb - 1.0f), pow(1.5f, -contrast)) + 0.5f;";
                 program = program.replace("output", shaderBuilder.useOutputValue("float4", "COLOR"));
-                program = program.replace("contrast", contrastParam.getIdentifier(1));
                 shaderBuilder.addMainFragment(program);
             } catch (GLBuildShaderException e) {
                 e.printStackTrace();
