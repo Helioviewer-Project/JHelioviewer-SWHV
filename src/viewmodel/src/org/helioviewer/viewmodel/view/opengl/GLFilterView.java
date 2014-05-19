@@ -18,6 +18,7 @@ import org.helioviewer.viewmodel.view.StandardFilterView;
 import org.helioviewer.viewmodel.view.View;
 import org.helioviewer.viewmodel.view.ViewHelper;
 import org.helioviewer.viewmodel.view.ViewportView;
+import org.helioviewer.viewmodel.view.jp2view.JHVJP2View;
 import org.helioviewer.viewmodel.view.jp2view.JHVJPXView;
 import org.helioviewer.viewmodel.view.opengl.shader.GLFragmentShaderView;
 import org.helioviewer.viewmodel.view.opengl.shader.GLShaderBuilder;
@@ -95,7 +96,7 @@ public class GLFilterView extends StandardFilterView implements GLFragmentShader
                 ((GLView) view).renderGL(gl, true);
             } else {
                 if (subimageDataView != null) {
-                    textureHelper.renderImageDataToScreen(gl, regionView.getRegion(), subimageDataView.getSubimageData(), view.getAdapter(JHVJPXView.class));
+                    textureHelper.renderImageDataToScreen(gl, regionView.getRegion(), subimageDataView.getSubimageData(), view.getAdapter(JHVJP2View.class));
                 }
             }
 

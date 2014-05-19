@@ -29,7 +29,7 @@ import org.helioviewer.viewmodel.imagetransport.Int32ImageTransport;
 import org.helioviewer.viewmodel.imagetransport.Short16ImageTransport;
 import org.helioviewer.viewmodel.region.Region;
 import org.helioviewer.viewmodel.renderer.GLCommonRenderGraphics;
-import org.helioviewer.viewmodel.view.jp2view.JHVJPXView;
+import org.helioviewer.viewmodel.view.jp2view.JHVJP2View;
 import org.helioviewer.viewmodel.view.opengl.shader.GLTextureCoordinate;
 
 /**
@@ -407,7 +407,7 @@ public class GLTextureHelper {
      * @param source
      *            Image data to draw to the screen
      */
-    public void renderImageDataToScreen(GL gl, Region region, ImageData source, JHVJPXView jpxView) {
+    public void renderImageDataToScreen(GL gl, Region region, ImageData source, JHVJP2View jpxView) {
         gl.glActiveTexture(GL.GL_TEXTURE0);
 
         if (source == null)
