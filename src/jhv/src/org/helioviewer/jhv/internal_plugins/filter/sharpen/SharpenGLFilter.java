@@ -48,7 +48,11 @@ public class SharpenGLFilter extends SharpenFilter implements GLFragmentShaderFi
             sharpenParamFloat[1] = pixelHeight * span;
             sharpenParamFloat[2]  = weighting;
         }
-
+        @Override
+        public void bind(GL gl){
+            super.bind(gl);
+            this.bindEnvVars(gl, this.sharpenParamRef, sharpenParamFloat);
+        }
         /**
          * {@inheritDoc}
          */

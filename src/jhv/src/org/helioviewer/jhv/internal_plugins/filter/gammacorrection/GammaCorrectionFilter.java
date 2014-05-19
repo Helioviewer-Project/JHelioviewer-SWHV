@@ -207,7 +207,11 @@ public class GammaCorrectionFilter extends AbstractFilter implements StandardFil
         private void setGamma(GL gl, float gamma) {
             gammaParamFloat[0] = gamma;
         }
-
+        @Override
+        public void bind(GL gl){
+            super.bind(gl);
+            this.bindEnvVars(gl, this.gammaParamRef, gammaParamFloat);
+        }
         /**
          * {@inheritDoc}
          */

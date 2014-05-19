@@ -1,7 +1,5 @@
 package org.helioviewer.viewmodel.view.opengl.shader;
 
-import java.util.ArrayList;
-
 import javax.media.opengl.GL;
 
 import org.helioviewer.viewmodel.view.opengl.shader.GLShaderBuilder.GLBuildShaderException;
@@ -38,12 +36,8 @@ public class GLSingleChannelLookupFragmentShaderProgram extends GLFragmentShader
     }
     @Override
     public void bind(GL gl){
-        ArrayList<double[]> params = this.builder.getEnvParameters();
-        int i = 0;
+        super.bind(gl);
         gl.glBindProgramARB(target, shaderID);
-        for(double[] param: params){
-            gl.glProgramLocalParameter4dARB(target, i++, param[0], param[1], param[2], param[3]);
-        }
     }
     /**
      * {@inheritDoc}

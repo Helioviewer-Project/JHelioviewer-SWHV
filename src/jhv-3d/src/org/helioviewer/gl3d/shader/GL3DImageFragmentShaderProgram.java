@@ -1,7 +1,5 @@
 package org.helioviewer.gl3d.shader;
 
-import java.util.ArrayList;
-
 import javax.media.opengl.GL;
 
 import org.helioviewer.viewmodel.view.opengl.shader.GLFragmentShaderProgram;
@@ -42,19 +40,21 @@ public class GL3DImageFragmentShaderProgram extends GLFragmentShaderProgram {
     }
 
     private void bind(GL gl, int shader, double cutOffRadius, double xTextureScale, double yTextureScale, double theta, double phi) {
-        shaderCurrentlyUsed = shader;
+        super.bind(gl);
+
         double [] cutOffRadiusFloat = this.builder.getEnvParameter(this.cutOffRadiusRef);
         cutOffRadiusFloat[0] = (float)cutOffRadius;
         cutOffRadiusFloat[1] = 0f;
         cutOffRadiusFloat[2] = 0f;
         cutOffRadiusFloat[3] = 0f;
-
+        this.bindEnvVars(gl, this.cutOffRadiusRef, cutOffRadiusFloat);
 
         double [] textureScaleThetaPhiFloat = this.builder.getEnvParameter(this.textureScaleThetaPhiRef);
         textureScaleThetaPhiFloat[0] = xTextureScale;
         textureScaleThetaPhiFloat[1] = yTextureScale;
         textureScaleThetaPhiFloat[2] = theta;
         textureScaleThetaPhiFloat[3] = phi;
+        this.bindEnvVars(gl, this.textureScaleThetaPhiRef, textureScaleThetaPhiFloat);
 
 
         double [] diffTextureScaleThetaPhiFloat = this.builder.getEnvParameter(this.diffTextureScaleThetaPhiRef);
@@ -62,13 +62,7 @@ public class GL3DImageFragmentShaderProgram extends GLFragmentShaderProgram {
         diffTextureScaleThetaPhiFloat[1] = differenceYTextureScale;
         diffTextureScaleThetaPhiFloat[2] = differenceTheta;
         diffTextureScaleThetaPhiFloat[3] = differencePhi;
-
-        gl.glBindProgramARB(target, shader);
-        ArrayList<double[]> params = this.builder.getEnvParameters();
-        int i = 0;
-        for(double[] param: params){
-            gl.glProgramLocalParameter4dARB(target, i++, param[0], param[1], param[2], param[3]);
-        }
+        this.bindEnvVars(gl, this.diffTextureScaleThetaPhiRef, diffTextureScaleThetaPhiFloat);
     }
 
     /**

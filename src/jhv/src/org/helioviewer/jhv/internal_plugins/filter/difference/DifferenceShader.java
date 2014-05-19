@@ -13,21 +13,22 @@ public class DifferenceShader extends GLFragmentShaderProgram {
     private static int ID = 0;
     int mode = -1;
     private int truncationValueRef;
-
-    private float truncationValue;
-
     private GLShaderBuilder builder;
+
+    private double[] truncationValueFloat;
 
     public void setIsDifference(GL gl, float isDifference) {
         this.isDifference.setValue(gl, isDifference);
     }
 
     public void setTruncationValue(GL gl, float truncationValue) {
-        this.truncationValue = truncationValue;
-        double[] trunc = this.builder.getEnvParameter(this.truncationValueRef);
-        trunc[0] = this.truncationValue;
+        this.truncationValueFloat[0] = truncationValue;
     }
-
+    @Override
+    public void bind(GL gl){
+        super.bind(gl);
+        this.bindEnvVars(gl, this.truncationValueRef, truncationValueFloat);
+    }
     /**
      * {@inheritDoc}
      */
@@ -37,6 +38,7 @@ public class DifferenceShader extends GLFragmentShaderProgram {
         try {
             isDifference = shaderBuilder.addTexCoordParameter(1);
             this.truncationValueRef = shaderBuilder.addEnvParameter("float truncationValue");
+            this.truncationValueFloat = this.builder.getEnvParameter(this.truncationValueRef);
 
 
             shaderBuilder.getParameterList().add("float4 " + "texcoord4" + " : TEXCOORD4");

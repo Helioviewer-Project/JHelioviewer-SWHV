@@ -144,7 +144,11 @@ public class OpacityFilter extends AbstractFilter implements StandardFilter, GLF
         private void setAlpha(GL gl, float alpha) {
             alphaParamFloat[0] = alpha;
         }
-
+        @Override
+        public void bind(GL gl){
+            super.bind(gl);
+            this.bindEnvVars(gl, this.alphaParamRef, alphaParamFloat);
+        }
         /**
          * {@inheritDoc}
          */
