@@ -46,7 +46,7 @@ public class SharpenGLFilter extends SharpenFilter implements GLFragmentShaderFi
         public void setFactors(GL gl, float weighting, float pixelWidth, float pixelHeight) {
             sharpenParamFloat[0] = pixelWidth * span;
             sharpenParamFloat[1] = pixelHeight * span;
-            sharpenParamFloat[1]  = weighting;
+            sharpenParamFloat[2]  = weighting;
         }
 
         /**
