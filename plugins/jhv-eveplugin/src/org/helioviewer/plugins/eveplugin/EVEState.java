@@ -13,14 +13,18 @@ public class EVEState {
 
     /** The singleton instance.*/
     private static EVEState instance;
-    /** Indicates if the mouse was dragged.*/ 
-    private boolean mouseDragging;
+    /** Indicates if the mouse was dragged in the time interval selector.*/ 
+    private boolean mouseTimeIntervalDragging;
+    /** Indicates if the mouse was dragged in the value interval selector.*/
+    private boolean mouseValueIntervalDragging;
+    
     
     /**
      * Private constructor, can only be used internally.
      */
     private EVEState(){
-        mouseDragging = false;
+        mouseTimeIntervalDragging = false;
+        mouseValueIntervalDragging = false;
     }
     
     /**
@@ -36,23 +40,40 @@ public class EVEState {
     }
 
     /**
-     * Is the mouse dragged?
+     * Returns true if the mouse was dragged in the time interval pane.
      * 
      * @return  True is the mouse was dragged, false if the mouse was not dragged.
      */
-    public boolean isMouseDragging() {
-        return mouseDragging;
+    public boolean isMouseTimeIntervalDragging() {
+        return mouseTimeIntervalDragging;
     }
 
     /**
-     * Sets whether the mouse is dragged at the moment.
+     * Sets whether the mouse is dragged in the time interval pane at the moment.
      * 
      * @param mouseDragging True is the mouse is dragged, false if the mouse is not dragged.
      */
-    public void setMouseDragging(boolean mouseDragging) {
-        Log.debug("State set on "+mouseDragging+" by: ");
-        Thread.dumpStack();
-        this.mouseDragging = mouseDragging;
+    public void setMouseTimeIntervalDragging(boolean mouseDragging) {
+        Log.info("State set on "+mouseDragging+" by: ");
+        this.mouseTimeIntervalDragging = mouseDragging;
+    }
+
+    /**
+     * Returns true if the mouse was dragged in the value range pane.
+     * 
+     * @return  True is the mouse was dragged, false if the mouse was not dragged.
+     */
+    public boolean isMouseValueIntervalDragging() {
+        return mouseValueIntervalDragging;
+    }
+
+    /**
+     * Sets whether the mouse is dragged in the time interval pane at the moment.
+     * 
+     * @param mouseValueIntervalDragging    True is the mouse is dragged, false if the mouse is not dragged.
+     */
+    public void setMouseValueIntervalDragging(boolean mouseValueIntervalDragging) {
+        this.mouseValueIntervalDragging = mouseValueIntervalDragging;
     }
     
     
