@@ -149,7 +149,19 @@ public class ZoomManager implements ZoomControllerListener, PlotAreaSpaceListene
                int width = (int)Math.round((endDate.getTime() - startDate.getTime())*ratio);
                return new Rectangle(width,height);
             }else{
-                throw new IllegalArgumentException("The requested start date, end date fall outside the current interval, " +
+                Log.debug("The requested start date, end date fall outside the current interval, " +
+                        "or the start frequency or end frequency fall outside the minimum or maximum frequency.\n " +
+                        "Start date : " + startDate + " in milliseconds : "+ startDate.getTime() +"\n" +
+                        "End date : "+endDate + " in milliseconds : "+ endDate.getTime() +"\n" + 
+                        "Start frequency : "+ startFreq + "\n" +
+                        "End frequency : "+endFreq+"\n"+
+                        "Current time interval : " + currentInterval + " in milliseconds : ["+ currentInterval.getStart().getTime() +", "+ currentInterval.getEnd().getTime() +"]\n"+
+                        "Current frequency interval : [" + zdc.getMinY()+","+zdc.getMaxY()+"]\n" +
+                        "current interval contains start : " + currentInterval.containsPointInclusive(startDate) + "\n" +
+                        "current interval contains end : " + currentInterval.containsPointInclusive(endDate));
+                //System.exit(1);
+                return new Rectangle(0,0);
+                /*throw new IllegalArgumentException("The requested start date, end date fall outside the current interval, " +
                 		"or the start frequency or end frequency fall outside the minimum or maximum frequency.\n " +
                 		"Start date : " + startDate + " in milliseconds : "+ startDate.getTime() +"\n" +
                 		"End date : "+endDate + " in milliseconds : "+ endDate.getTime() +"\n" + 
@@ -158,7 +170,8 @@ public class ZoomManager implements ZoomControllerListener, PlotAreaSpaceListene
                         "Current time interval : " + currentInterval + " in milliseconds : ["+ currentInterval.getStart().getTime() +", "+ currentInterval.getEnd().getTime() +"]\n"+
                 		"Current frequency interval : [" + zdc.getMinY()+","+zdc.getMaxY()+"]\n" +
                 		"current interval contains start : " + currentInterval.containsPointInclusive(startDate) + "\n" +
-                		"current interval contains end : " + currentInterval.containsPointInclusive(endDate));
+                		"current interval contains end : " + currentInterval.containsPointInclusive(endDate));*/
+                
             }
         }
     }
