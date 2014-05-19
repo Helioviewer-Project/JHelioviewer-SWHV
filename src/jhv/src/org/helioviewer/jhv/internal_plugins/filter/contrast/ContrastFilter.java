@@ -209,6 +209,11 @@ public class ContrastFilter extends AbstractFilter implements StandardFilter, GL
             }
         }
 
+        @Override
+        public void bind(GL gl){
+            super.bind(gl);
+            this.bindEnvVars(gl, this.contrastParamRef, contrastParamFloat);
+        }
         /**
          * {@inheritDoc}
          */
