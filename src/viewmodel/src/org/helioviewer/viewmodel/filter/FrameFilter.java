@@ -1,6 +1,6 @@
 package org.helioviewer.viewmodel.filter;
 
-import org.helioviewer.viewmodel.view.jp2view.JHVJPXView;
+import org.helioviewer.viewmodel.view.jp2view.JHVJP2View;
 
 /**
  * Filter which works over several frames.
@@ -23,6 +23,6 @@ public interface FrameFilter extends Filter {
      * @param data
      *            Reference to access previous frames
      */
-    public void setJPXView(JHVJPXView data);
+    public void setJP2View(JHVJP2View data);
 
 }
