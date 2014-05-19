@@ -297,6 +297,13 @@ public class RadioPlotModel implements RadioDataManagerListener, ZoomControllerL
             bufferedImages.put(radioImageID, newImage);
             rpmd.getRadioImagePane().setIntervalTooBig(false);
             Log.debug("buffered images size : " + bufferedImages.size());
+            Log.debug("timeinterval start : " + timeInterval.getStart());
+            Log.debug("timeinterval end : " + timeInterval.getEnd());
+            Log.debug("freqinterval start : " + freqInterval.getStart());
+            Log.debug("freqinterval end : " + freqInterval.getEnd());
+            Log.debug("Area : " + area);
+            Log.debug("DownloadID : "+ downloadID);
+            Log.debug("Identifier : " + identifier);
             DrawableAreaMap dam = zoomManager.getDrawableAreaMap(timeInterval.getStart(), timeInterval.getEnd(), freqInterval.getStart(), freqInterval.getEnd(), area, downloadID, identifier);
             Range selectedRange = defineSelectedRange(freqInterval.getStart(), freqInterval.getEnd(), identifier);
             yAxisElement.setMinValue(selectedRange.min);

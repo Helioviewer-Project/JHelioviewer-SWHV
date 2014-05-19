@@ -34,10 +34,10 @@ import org.helioviewer.viewmodel.view.jp2view.kakadu.KakaduUtils;
  * retrieve image data from a JPIP server (if the image is remote). The second
  * is that all view-changed signals are routed through this thread... so it must
  * forward them to the J2KRender thread through that threads signal.
- * 
+ *
  * TODO The server may change the parameters of the request, and we should take
  * it into account...
- * 
+ *
  * @author caplins
  * @author Juan Pablo
  * @author Markus Langenberg
@@ -57,16 +57,16 @@ class J2KReader implements Runnable {
     private volatile boolean stop;
 
     /** A reference to the JP2Image this object is owned by. */
-    private JP2Image parentImageRef;
+    private final JP2Image parentImageRef;
 
     /** A reference to the JP2ImageView this object is owned by. */
-    private JHVJP2View parentViewRef;
+    private final JHVJP2View parentViewRef;
 
     /** The JPIPSocket used to connect to the server. */
     private JPIPSocket socket;
 
     /** The a reference to the cache object used by the run method. */
-    private JHV_Kdu_cache cacheRef;
+    private final JHV_Kdu_cache cacheRef;
 
     /**
      * The time when the last response was received. It is used for performing
@@ -80,7 +80,7 @@ class J2KReader implements Runnable {
 
     /**
      * The constructor. Creates and connects the socket if image is remote.
-     * 
+     *
      * @param _imageViewRef
      * @throws IOException
      * @throws JHV_KduException
@@ -187,7 +187,7 @@ class J2KReader implements Runnable {
                     adjust = +1;
                 else {
                     double gapRatio = ((double) tgap) / ((double) (tgap + tdat));
-                    double targetRatio = ((double) (tdat + tgap)) / 10000.0;
+                    double targetRatio = (tdat + tgap) / 10000.0;
 
                     if (gapRatio > targetRatio)
                         adjust = +1;
@@ -227,6 +227,7 @@ class J2KReader implements Runnable {
         return (socket != null && socket.isConnected());
     }
 
+    @Override
     public void run() {
         JPIPRequest req = null;
 
@@ -244,6 +245,7 @@ class J2KReader implements Runnable {
             // Wait for signal
             try {
                 parentViewRef.readerSignal.waitForSignal();
+                Log.debug("Received signal.");
 
             } catch (InterruptedException e) {
                 continue;

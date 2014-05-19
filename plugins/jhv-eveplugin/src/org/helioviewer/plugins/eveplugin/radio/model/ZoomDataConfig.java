@@ -43,15 +43,15 @@ public class ZoomDataConfig implements ZoomManagerListener, PlotAreaSpaceListene
         listeners.add(l);
         double xRatio = 1.0 * (maxX.getTime() - minX.getTime()) / displaySize.getWidth();
         double yRatio = 1.0 * (selectedMaxY - selectedMinY) / displaySize.getHeight();
-        Thread t = new Thread((new Runnable() {
+        /*Thread t = new Thread((new Runnable() {
             ZoomDataConfigListener l;
             double xRatio;
             double yRatio;
 
             @Override
-            public void run() {
+            public void run() {*/
                 l.requestData(minX, maxX, selectedMinY, selectedMaxY, xRatio, yRatio, ID, plotIdentifier);
-            }
+            /*}
 
             public Runnable init(ZoomDataConfigListener l, double xRatio, double yRatio) {
                 this.l = l;
@@ -61,7 +61,7 @@ public class ZoomDataConfig implements ZoomManagerListener, PlotAreaSpaceListene
             }
 
         }).init(l, xRatio, yRatio));
-        t.start();
+        t.start();*/
 
     }
 

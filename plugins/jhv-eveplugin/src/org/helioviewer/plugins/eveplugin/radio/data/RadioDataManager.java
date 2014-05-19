@@ -12,10 +12,16 @@ import java.util.Map;
 
 import org.helioviewer.base.logging.Log;
 import org.helioviewer.base.math.Interval;
+import org.helioviewer.base.math.Vector2dDouble;
+import org.helioviewer.base.math.Vector2dInt;
 import org.helioviewer.plugins.eveplugin.radio.model.ResolutionSetting;
+import org.helioviewer.plugins.eveplugin.radio.model.ZoomManager;
 import org.helioviewer.plugins.eveplugin.settings.EVESettings;
 import org.helioviewer.plugins.eveplugin.view.linedataselector.LineDataSelectorModel;
 import org.helioviewer.viewmodel.changeevent.ChangeEvent;
+import org.helioviewer.viewmodel.metadata.HelioviewerMetaData;
+import org.helioviewer.viewmodel.region.RegionAdapter;
+import org.helioviewer.viewmodel.region.StaticRegion;
 import org.helioviewer.viewmodel.view.ImageInfoView;
 import org.helioviewer.viewmodel.view.View;
 import org.helioviewer.viewmodel.view.jp2view.JHVJP2View;
@@ -35,6 +41,7 @@ public class RadioDataManager implements RadioDownloaderListener {
     private RequestForDataBuffer requestBuffer;
     private LineDataSelectorModel lineDataSelectorModel;
     private RadioImageCache cache;
+    private ZoomManager zoomManager;
 
     private RadioDataManager() {
         listeners = new ArrayList<RadioDataManagerListener>();
@@ -44,6 +51,7 @@ public class RadioDataManager implements RadioDownloaderListener {
         lineDataSelectorModel = LineDataSelectorModel.getSingletonInstance();
         cache = RadioImageCache.getInstance();
         requestBuffer = new RequestForDataBuffer();
+        zoomManager = ZoomManager.getSingletonInstance();
     }
 
     public static RadioDataManager getSingletonInstance() {
@@ -100,24 +108,48 @@ public class RadioDataManager implements RadioDownloaderListener {
         listeners.remove(l);
     }
 
-    public synchronized void dataForIDReceived(byte[] data, Long imageID, Long downloadID) {
-        fireDataforIDReceived(data, imageID, downloadID);
+    /**
+     * Inform the RadioDataManager about the new data that was received. The RadioDataManagerListeners will be informed about 
+     * the new received data.
+     * 
+     * 
+     * @param data          The data received
+     * @param imageID       The ID of the image for which data was received
+     * @param downloadID    The ID of the download batch the image is part of
+     * @param dataSize      The height and width of the data
+     */
+    public synchronized void dataForIDReceived(byte[] data, Long imageID, Long downloadID, Rectangle dataSize) {
+        fireDataforIDReceived(data, imageID, downloadID, dataSize);
     }
     
-    private void fireDataforIDReceived(byte[] data, Long imageID, Long downloadID) {
+    /**
+     * Informs all RadioDataManagerListener of new received data.
+     * 
+     * @param data          The data received
+     * @param imageID       The ID of the image for which data was received
+     * @param downloadID    The ID of the download batch the image is part of
+     * @param dataSize      The height and width of the data
+     */
+    private void fireDataforIDReceived(byte[] data, Long imageID, Long downloadID, Rectangle dataSize) {
         synchronized (downloadRequestData) {
             DownloadRequestData drd = downloadRequestData.get(downloadID);
             if (drd != null) {
-                RadioImage image = drd.getRadioImages().get(imageID);
+                RadioImage image = drd.getRadioImages().get(imageID);                
                 if (image != null) {
-                    for (RadioDataManagerListener l : listeners) {
-                        l.newDataForIDReceived(data, image.getTimeInterval(), image.getFreqInterval(), image.getLastUsedResolutionSetting().getRectangleRepresentation(), downloadID, drd.getPlotIdentifier(), imageID);
+                    synchronized (image) {
+                        image.setLastDataSize(dataSize);
+                        if (image.getVisibleImageFreqInterval() != null && image.getVisibleImageTimeInterval() != null){
+                            for (RadioDataManagerListener l : listeners) {
+                                //l.newDataForIDReceived(data, image.getTimeInterval(), image.getFreqInterval(), image.getLastUsedResolutionSetting().getRectangleRepresentation(), downloadID, drd.getPlotIdentifier(), imageID);
+                                l.newDataForIDReceived(data, image.getVisibleImageTimeInterval(), image.getVisibleImageFreqInterval(), dataSize, downloadID, drd.getPlotIdentifier(), imageID);
+                            }
+                        }
                     }
                 } else {
-                    Log.debug("The image was null");
-                }
+                    //Log.debug("The image was null");
+                }                               
             } else {
-                Log.debug("Download request data was null");
+                //Log.debug("Download request data was null");
             }
         }
     }
@@ -270,7 +302,7 @@ public class RadioDataManager implements RadioDownloaderListener {
                             if (drd != null) {
                                 downloader.requestAndOpenIntervals(result.getMissingInterval(), id, drd.getPlotIdentifier(), requestConfig.getxRatio(), requestConfig.getyRatio());
                             } else {
-                                Log.debug("drd is null");
+                                //Log.debug("drd is null");
                             }
                         }
                         for (Long id : requestConfig.getIDs()) {
@@ -280,7 +312,51 @@ public class RadioDataManager implements RadioDownloaderListener {
                                 for (DownloadedJPXData jpxData : result.getAvailableData()) {
                                     RadioImage ri = drd.getRadioImages().get(jpxData.getImageID());
                                     if (ri != null) {
-                                        ResolutionSetting rs = ri.defineBestResolutionSetting(xRatio, yRatio);
+                                        synchronized (ri) {                                       
+                                            ri.setVisibleIntervals(xStart, xEnd, (int)Math.round(yStart),(int)Math.round(yEnd));
+                                            if(ri.getVisibleImageFreqInterval() != null && ri.getVisibleImageTimeInterval() != null){
+                                                Interval<Date> visibleDateInterval = ri.getVisibleImageTimeInterval();
+                                                FrequencyInterval visibleFrequencyInterval = ri.getVisibleImageFreqInterval();
+                                                if(!visibleDateInterval.getStart().equals(visibleDateInterval.getEnd())){
+                                                    //Log.debug("Visible start time : "+ visibleDateInterval.getStart().getTime() + " Date : "+ visibleDateInterval.getStart());
+                                                    //Log.debug("Visible end time : " + visibleDateInterval.getEnd().getTime() + " Date : "+ visibleDateInterval.getEnd());
+                                                    Rectangle viewport = zoomManager.getAvailableSpaceForInterval(
+                                                            visibleDateInterval.getStart(),
+                                                            visibleDateInterval.getEnd(), 
+                                                            visibleFrequencyInterval.getStart(), 
+                                                            visibleFrequencyInterval.getEnd(), id, plotIdentifier);
+                                                    View v = jpxData.getView();
+                                                    JHVJP2View jp2View = v.getAdapter(JHVJP2View.class);
+                                                    if (jp2View != null) {
+                                                        jp2View.setViewport(new ViewportAdapter(new StaticViewport(new Vector2dInt(viewport.width, viewport.height))), new ChangeEvent());
+                                                        Rectangle roi = ri.getROI();
+                                                        //Log.debug("*********************************************");
+                                                        //Log.debug("requested interval : " + xStart + " - " + xEnd + " , " + yStart + " - " + yEnd);
+                                                        //Log.debug("image id : "+ ri.getRadioImageID());
+                                                        //Log.debug("image interval : " + ri.getTimeInterval().getStart() + " - " + ri.getTimeInterval().getEnd() + " , " + ri.getFreqInterval().getStart() + " - " + ri.getFreqInterval().getEnd());
+                                                        //Log.debug("visible interval : " + ri.getVisibleImageTimeInterval().getStart() + " - " + ri.getVisibleImageTimeInterval().getEnd() + " , " + ri.getVisibleImageFreqInterval().getStart() + " - " + ri.getVisibleImageFreqInterval().getEnd());
+                                                        //Log.debug("viewport[width-height] : " + viewport.width + " - " + viewport.height);
+                                                        //Log.debug("ROI [x0,y0,width,height] : " + roi.x + "," + roi.y + "," + roi.width + "," + roi.height);
+                                                        HelioviewerMetaData md = (HelioviewerMetaData)jp2View.getMetadata();
+                                                        Double mpp = md.getUnitsPerPixel();
+                                                        if(!jp2View.setRegion(new RegionAdapter(new StaticRegion(roi.getX()*mpp, roi.getY()*mpp,
+                                                                new Vector2dDouble(roi.getWidth()*mpp, roi.getHeight()*mpp))), new ChangeEvent())){                                                            
+                                                        }else{
+                                                            Log.debug("The region has not changed send a data not changed for image id : " + ri.getRadioImageID());
+                                                            if(ri.getLastDataSize() != null){//can be null if a previous thread didn't finish yet
+                                                                fireDataNotChanged(ri.getVisibleImageTimeInterval(), ri.getVisibleImageFreqInterval(), ri.getLastDataSize(), id, drd.getPlotIdentifier(), ri.getRadioImageID());
+                                                            }else{
+                                                                Log.debug("Last data size was null for radio image id : " + ri.getRadioImageID());
+                                                            }
+                                                        }
+        
+                                                    }
+                                                }else{
+                                                    Log.debug("Start and end date of the visible interval were the same. No data requested");
+                                                }
+                                            }
+                                        }
+                                        /*ResolutionSetting rs = ri.defineBestResolutionSetting(xRatio, yRatio);
                                         if (rs != ri.getLastUsedResolutionSetting()) {
                                             Log.debug("Other resolution setting: update the viewport for " + jpxData.getImageID());
                                             Log.debug("radio image last resolutionsetting : " + ri.getLastUsedResolutionSetting());
@@ -291,10 +367,12 @@ public class RadioDataManager implements RadioDownloaderListener {
                                                 jp2View.setViewport(new ViewportAdapter(new StaticViewport(rs.getVec2dIntRepresentation())), new ChangeEvent());
                                                 ri.setLastUsedResolutionSetting(rs);
                                             }
+                                            
                                         } else {
                                             Log.debug("Same resolution setting don't update viewport");
                                             fireDataNotChanged(ri.getTimeInterval(), ri.getFreqInterval(), new Rectangle(rs.getWidth(), rs.getHeight()), id, drd.getPlotIdentifier(), ri.getRadioImageID());
                                         }
+                                        */
                                     }
                                 }
                             }
