@@ -536,6 +536,13 @@ public class ChartDrawIntervalPane extends JComponent implements ZoomControllerL
 
     public void mouseExited(MouseEvent e) {
         eveState.setMouseTimeIntervalDragging(false);
+        if (mousePressed != null) {
+            if (mouseOverLeftGraspPoint || mouseOverRightGraspPoint)
+                resizeSelectedInterval(e.getPoint(), true);
+            else if (mouseOverInterval)
+                moveSelectedInterval(e.getPoint(),true);
+        }
+        mousePressed = null;
         mouseOverComponent = false;
         mouseOverInterval = false;
         mouseOverLeftGraspPoint = false;
