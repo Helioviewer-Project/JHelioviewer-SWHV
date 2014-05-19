@@ -137,7 +137,7 @@ public class RadioDownloader{
                                 synchronized (requestDateCache) {
                                     if (!requestDateCache.contains(startDate)) {
                                         inRequestCache = false;
-                                        Log.debug("Add date " + startDate + " to request cache");
+                                        Log.info("Add date " + startDate + " to request cache");
                                         requestDateCache.add(startDate);
                                     }
                                 }
@@ -152,14 +152,14 @@ public class RadioDownloader{
                                     }
                                 } else {
                                     if (inRequestCache) {
-                                        Log.debug("Date was already in the request cache. Do nothing.");
+                                        Log.info("Date was already in the request cache. Do nothing.");
                                     } else {
-                                        Log.debug("Date was already in the radio image cache. Do nothing.");
+                                        Log.info("Date was already in the radio image cache. Do nothing.");
                                     }
                                 }
                                 synchronized (requestDateCache) {
                                     requestDateCache.remove(startDate);
-                                    Log.debug("remove " + startDate + " from request cache");
+                                    Log.info("remove " + startDate + " from request cache");
                                 }
                                 startDate = calculateOneDayFurtherAsDate(startDate);
                             }
