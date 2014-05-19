@@ -236,6 +236,12 @@ public class ChartDrawValueRangePane extends JComponent implements EVEValueRange
 
     public void mouseExited(MouseEvent arg0) {
         eveState.setMouseValueIntervalDragging(false);
+        if(mousePressed != null){
+            if (mouseOverTopGraspPoint || mouseOverBottomGraspPoint)
+                resizeSelectedRange(arg0.getPoint(),true);
+            else if (mouseOverRange)
+                moveSelectedRange(arg0.getPoint(),true);
+        }
         mouseOverComponent = false;
         mouseOverRange = false;
         mouseOverTopGraspPoint = false;
