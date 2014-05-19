@@ -7,7 +7,6 @@ import java.util.HashMap;
 import javax.media.opengl.GL;
 
 import org.helioviewer.base.logging.Log;
-import org.helioviewer.base.physics.Constants;
 import org.helioviewer.gl3d.camera.GL3DCamera;
 import org.helioviewer.gl3d.scenegraph.GL3DDrawBits.Bit;
 import org.helioviewer.gl3d.scenegraph.GL3DGroup;
@@ -15,21 +14,19 @@ import org.helioviewer.gl3d.scenegraph.GL3DNode;
 import org.helioviewer.gl3d.scenegraph.GL3DState;
 import org.helioviewer.gl3d.scenegraph.math.GL3DMat4d;
 import org.helioviewer.gl3d.scenegraph.math.GL3DVec3d;
-import org.helioviewer.gl3d.scenegraph.math.GL3DVec4f;
-import org.helioviewer.gl3d.scenegraph.visuals.GL3DCircle;
 import org.helioviewer.gl3d.view.GL3DImageTextureView;
 
 /**
  * The {@link GL3DImageLayers} node offers special capabilities for grouping
  * {@link GL3DImageLayer} nodes, because image nodes require special ordering
  * for the blending of different image layers.
- * 
+ *
  * @author Simon Spoerri (simon.spoerri@fhnw.ch)
- * 
+ *
  */
 public class GL3DImageLayers extends GL3DGroup {
 
-    private HashMap<GL3DImageTextureView, GL3DImageLayer> imageLayerMap;
+    private final HashMap<GL3DImageTextureView, GL3DImageLayer> imageLayerMap;
 
     private boolean coronaVisibility = true;
 
@@ -43,6 +40,7 @@ public class GL3DImageLayers extends GL3DGroup {
         super.shapeInit(state);
     }
 
+    @Override
     public void shapeDraw(GL3DState state) {
         if (!this.isDrawBitOn(Bit.Wireframe)) {
             GL3DState.get().checkGLErrors("GL3DImageLayers.beforeEnable");
@@ -75,7 +73,6 @@ public class GL3DImageLayers extends GL3DGroup {
                 layers.add((GL3DImageLayer) node);
             node = node.getNext();
         }
-
         state.gl.glDisable(GL.GL_FRAGMENT_PROGRAM_ARB);
         state.gl.glDisable(GL.GL_VERTEX_PROGRAM_ARB);
 
@@ -95,7 +92,7 @@ public class GL3DImageLayers extends GL3DGroup {
         }
 
         state.gl.glEnable(GL.GL_BLEND);
-        state.gl.glBlendFunc(GL.GL_SRC_ALPHA, GL.GL_ONE);
+        state.gl.glBlendFunc(GL.GL_SRC_ALPHA, GL.GL_ONE_MINUS_SRC_ALPHA);
         state.gl.glDepthFunc(GL.GL_LEQUAL);
         state.gl.glDepthMask(false);
 
@@ -104,6 +101,7 @@ public class GL3DImageLayers extends GL3DGroup {
 
     }
 
+    @Override
     public void shapeUpdate(GL3DState state) {
         super.shapeUpdate(state);
         updateImageLayerPriorities(state);
