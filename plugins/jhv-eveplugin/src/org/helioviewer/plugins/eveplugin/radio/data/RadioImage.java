@@ -176,11 +176,14 @@ public class RadioImage {
             Date tempEndX = new Date(imageTimeInterval.squeeze(visibleXEnd).getTime());
             this.visibleImageTimeInterval = new Interval<Date>(tempStartX,tempEndX);
             Log.debug("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@");
+            Log.debug("Image interval : ");
+            Log.debug("Start x : " + imageTimeInterval.getStart() + " in milliseconds : " +  imageTimeInterval.getStart().getTime());
+            Log.debug("End x : " + imageTimeInterval.getEnd() + " in milliseconds : " +  imageTimeInterval.getEnd().getTime());
             Log.debug("Requested interval : ");
             Log.debug("Start x : " + visibleXStart + " in milliseconds : " + visibleXStart.getTime());
             Log.debug("End x : " + visibleXEnd + " in milliseconds : " + visibleXEnd.getTime());
             Log.debug("Resulting visible time interval start : "+ visibleImageTimeInterval.getStart() + " in milliseconds : " + visibleImageTimeInterval.getStart().getTime());
-            Log.debug("Resulting visible time interval end : "+ visibleImageTimeInterval.getStart() + " in milliseconds : " + visibleImageTimeInterval.getEnd().getTime());
+            Log.debug("Resulting visible time interval end : "+ visibleImageTimeInterval.getEnd() + " in milliseconds : " + visibleImageTimeInterval.getEnd().getTime());
             Log.debug("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@");
         }else{
             this.visibleImageTimeInterval = null;
