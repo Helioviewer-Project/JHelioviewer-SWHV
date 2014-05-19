@@ -36,7 +36,7 @@ public class RadioImageCache {
     }
 
     public void add(DownloadedJPXData jpxData) {
-        Log.debug("Try to add data in cache");
+        Log.info("Try to add data in cache");
         synchronized (instance) {
             RadioImageCacheData data = new RadioImageCacheData();
             if (radioImageCacheData.containsKey(jpxData.getPlotIdentifier())) {

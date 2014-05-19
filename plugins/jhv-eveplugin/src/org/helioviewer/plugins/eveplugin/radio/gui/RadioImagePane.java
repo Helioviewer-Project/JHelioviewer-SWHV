@@ -59,10 +59,10 @@ public class RadioImagePane implements ImageObserver, RadioPlotModelListener, Dr
 
     @Override
     public void draw(Graphics g, Rectangle graphArea) {
-        Log.debug("redraw radio image pane for plot : " + plotIdentifier);
+        Log.info("redraw radio image pane for plot : " + plotIdentifier);
         if (!this.intervalTooBig) {
             Collection<PlotConfig> configs = RadioPlotModel.getSingletonInstance().getPlotConfigurations(plotIdentifier);
-            Log.debug("Number of plotconfigs: " + configs.size());
+            Log.info("Number of plotconfigs: " + configs.size());
             for (PlotConfig pc : configs) {
                 pc.draw(g);
             }
