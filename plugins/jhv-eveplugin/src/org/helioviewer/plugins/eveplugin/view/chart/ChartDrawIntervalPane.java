@@ -22,6 +22,7 @@ import javax.swing.event.MouseInputListener;
 import org.helioviewer.base.math.Interval;
 import org.helioviewer.jhv.layers.LayersListener;
 import org.helioviewer.jhv.layers.LayersModel;
+import org.helioviewer.plugins.eveplugin.EVEState;
 import org.helioviewer.plugins.eveplugin.controller.ZoomController;
 import org.helioviewer.plugins.eveplugin.controller.ZoomControllerListener;
 import org.helioviewer.plugins.eveplugin.model.PlotAreaSpace;
@@ -44,6 +45,7 @@ public class ChartDrawIntervalPane extends JComponent implements ZoomControllerL
     private Interval<Date> availableInterval = null;
     private Interval<Date> selectedInterval = null;
     private Interval<Date> movieInterval = new Interval<Date>(null, null);
+    
 
     private boolean mouseOverComponent = false;
     private boolean mouseOverInterval = false;
@@ -55,6 +57,7 @@ public class ChartDrawIntervalPane extends JComponent implements ZoomControllerL
     private int rightIntervalBorderPosition = -10;
 
     private PlotAreaSpaceManager plotAreaSpaceManager;
+    private EVEState eveState;
 
     // //////////////////////////////////////////////////////////////////////////////
     // Methods
@@ -68,6 +71,7 @@ public class ChartDrawIntervalPane extends JComponent implements ZoomControllerL
         ZoomController.getSingletonInstance().addZoomControllerListener(this);
         LayersModel.getSingletonInstance().addLayersListener(this);
         plotAreaSpaceManager = PlotAreaSpaceManager.getInstance();
+        eveState = EVEState.getSingletonInstance();
     }
 
     private void initVisualComponents() {
@@ -417,7 +421,7 @@ public class ChartDrawIntervalPane extends JComponent implements ZoomControllerL
         }
     }
 
-    private void moveSelectedInterval(final Point newMousePosition) {
+    private void moveSelectedInterval(final Point newMousePosition, boolean forced) {
         final int diffPixel = mousePressed.x > newMousePosition.x ? mousePressed.x - newMousePosition.x : newMousePosition.x - mousePressed.x;
         final double availableIntervalSpace = getWidth() - (ChartConstants.GRAPH_LEFT_SPACE + ChartConstants.GRAPH_RIGHT_SPACE + ChartConstants.RANGE_SELECTION_WIDTH) - 1.0;
         final double movedUnits = diffPixel / availableIntervalSpace;
@@ -435,7 +439,7 @@ public class ChartDrawIntervalPane extends JComponent implements ZoomControllerL
             }
             for (PlotAreaSpace pas : pasList) {
                 if (pas.minMaxTimeIntervalContainsTime(minList.get(pas))) {
-                    pas.setScaledSelectedTime(minList.get(pas), maxList.get(pas));
+                    pas.setScaledSelectedTime(minList.get(pas), maxList.get(pas), forced);
                 }
             }
             mousePressed = newMousePosition;
@@ -452,14 +456,14 @@ public class ChartDrawIntervalPane extends JComponent implements ZoomControllerL
             }
             for (PlotAreaSpace pas : pasList) {
                 if (pas.minMaxTimeIntervalContainsTime(maxList.get(pas))) {
-                    pas.setScaledSelectedTime(minList.get(pas), maxList.get(pas));
+                    pas.setScaledSelectedTime(minList.get(pas), maxList.get(pas), forced);
                 }
             }
             mousePressed = newMousePosition;
         }
     }
 
-    private void resizeSelectedInterval(final Point newMousePosition) {
+    private void resizeSelectedInterval(final Point newMousePosition, boolean forced) {
         if (mouseOverLeftGraspPoint) {
             if (newMousePosition.x >= rightIntervalBorderPosition)
                 return;
@@ -468,8 +472,7 @@ public class ChartDrawIntervalPane extends JComponent implements ZoomControllerL
             for (PlotAreaSpace pas : plotAreaSpaceManager.getAllPlotAreaSpaces()) {
                 final double diffUnits = pas.getScaledMaxTime() - pas.getScaledMinTime();
                 final double timestamp = pas.getScaledMinTime() + ((newMousePosition.x - ChartConstants.GRAPH_LEFT_SPACE) / availableIntervalSpace) * diffUnits;
-
-                pas.setScaledSelectedTime(timestamp, pas.getScaledSelectedMaxTime());
+                pas.setScaledSelectedTime(timestamp, pas.getScaledSelectedMaxTime(), forced);
             }
         } else if (mouseOverRightGraspPoint) {
             if (newMousePosition.x <= leftIntervalBorderPosition)
@@ -480,7 +483,7 @@ public class ChartDrawIntervalPane extends JComponent implements ZoomControllerL
                 final double diffUnits = pas.getScaledMaxTime() - pas.getScaledMinTime();
                 final double timestamp = pas.getScaledMinTime() + (1.0 * (newMousePosition.x - ChartConstants.GRAPH_LEFT_SPACE) / availableIntervalSpace) * diffUnits;
 
-                pas.setScaledSelectedTime(pas.getScaledSelectedMinTime(), timestamp);
+                pas.setScaledSelectedTime(pas.getScaledSelectedMinTime(), timestamp, forced);
             }
         }
     }
@@ -535,6 +538,11 @@ public class ChartDrawIntervalPane extends JComponent implements ZoomControllerL
     }
 
     public void mouseReleased(MouseEvent e) {
+        eveState.setMouseDragging(false);
+        if (mouseOverLeftGraspPoint || mouseOverRightGraspPoint)
+            resizeSelectedInterval(e.getPoint(), true);
+        else if (mouseOverInterval)
+            moveSelectedInterval(e.getPoint(),true);
         mousePressed = null;
 
         repaint();
@@ -545,10 +553,11 @@ public class ChartDrawIntervalPane extends JComponent implements ZoomControllerL
     // //////////////////////////////////////////////////////////////////////////////
 
     public void mouseDragged(MouseEvent e) {
+        eveState.setMouseDragging(true);
         if (mouseOverLeftGraspPoint || mouseOverRightGraspPoint)
-            resizeSelectedInterval(e.getPoint());
+            resizeSelectedInterval(e.getPoint(),false);
         else if (mouseOverInterval)
-            moveSelectedInterval(e.getPoint());
+            moveSelectedInterval(e.getPoint(),false);
     }
 
     public void mouseMoved(MouseEvent e) {

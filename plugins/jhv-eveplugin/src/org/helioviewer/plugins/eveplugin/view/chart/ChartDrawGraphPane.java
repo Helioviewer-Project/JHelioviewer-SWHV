@@ -340,7 +340,7 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
             maxTime.put(pas, endTime);
         }
         for (PlotAreaSpace pas : pass) {
-            pas.setScaledSelectedTime(minTime.get(pas), maxTime.get(pas));
+            pas.setScaledSelectedTime(minTime.get(pas), maxTime.get(pas), false);
         }
 
         PlotAreaSpace myPlotAreaSpace = plotAreaSpaceManager.getPlotAreaSpace(identifier);

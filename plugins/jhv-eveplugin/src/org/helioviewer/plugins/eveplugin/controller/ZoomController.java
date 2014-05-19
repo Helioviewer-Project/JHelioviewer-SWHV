@@ -279,7 +279,7 @@ public class ZoomController implements PlotAreaSpaceListener {
                 double diffPlotAreaTime = pas.getScaledMaxTime() - pas.getScaledMinTime();
                 double scaledSelectedStart = pas.getScaledMinTime() + (1.0 * (selectedInterval.getStart().getTime() - availableInterval.getStart().getTime()) * diffPlotAreaTime / diffAvailable);
                 double scaledSelectedEnd = pas.getScaledMinTime() + (1.0 * (selectedInterval.getEnd().getTime() - availableInterval.getStart().getTime()) * diffPlotAreaTime / diffAvailable);
-                pas.setScaledSelectedTime(scaledSelectedStart, scaledSelectedEnd);
+                pas.setScaledSelectedTime(scaledSelectedStart, scaledSelectedEnd,false);
             }
         }
     }

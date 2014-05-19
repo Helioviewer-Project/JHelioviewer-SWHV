@@ -14,6 +14,7 @@ import org.helioviewer.base.logging.Log;
 import org.helioviewer.base.math.Interval;
 import org.helioviewer.base.math.Vector2dDouble;
 import org.helioviewer.base.math.Vector2dInt;
+import org.helioviewer.plugins.eveplugin.EVEState;
 import org.helioviewer.plugins.eveplugin.radio.model.ResolutionSetting;
 import org.helioviewer.plugins.eveplugin.radio.model.ZoomManager;
 import org.helioviewer.plugins.eveplugin.settings.EVESettings;
@@ -42,6 +43,8 @@ public class RadioDataManager implements RadioDownloaderListener {
     private LineDataSelectorModel lineDataSelectorModel;
     private RadioImageCache cache;
     private ZoomManager zoomManager;
+    private long id = 0;
+    private EVEState eveState;
 
     private RadioDataManager() {
         listeners = new ArrayList<RadioDataManagerListener>();
@@ -52,6 +55,7 @@ public class RadioDataManager implements RadioDownloaderListener {
         cache = RadioImageCache.getInstance();
         requestBuffer = new RequestForDataBuffer();
         zoomManager = ZoomManager.getSingletonInstance();
+        eveState = EVEState.getSingletonInstance(); 
     }
 
     public static RadioDataManager getSingletonInstance() {
@@ -284,107 +288,117 @@ public class RadioDataManager implements RadioDownloaderListener {
     }
 
     public void requestForData(Date xStart, Date xEnd, double yStart, double yEnd, double xRatio, double yRatio, List<Long> iDs, String plotIdentifier) {
-        if (!requestBuffer.hasData()) {
-            requestBuffer.addRequestConfig(new RequestConfig(xStart, xEnd, yStart, yEnd, xRatio, yRatio, iDs));
-            while (requestBuffer.hasData()) {
-                RequestConfig requestConfig = requestBuffer.getData();
-                synchronized (downloadRequestData) {
-                    Log.debug("Request for data in interval " + requestConfig.getxStart() + " - " + requestConfig.getxEnd());
-                    if (requestConfig.getxEnd().getTime() - requestConfig.getxStart().getTime() > EVESettings.MAXIMUM_INTERVAL_RANGE_MILLI_SEC_REQ) {
-                        Log.debug("Interval too big");
-                        for (Long id : requestConfig.getIDs()) {
-                            fireIntervalTooBig(id, plotIdentifier);
-                        }
-                    } else {
-                        RadioImageCacheResult result = cache.getRadioImageCacheResultForInterval(requestConfig.getxStart(), requestConfig.getxEnd(), 24L * 60 * 60 * 1000, plotIdentifier);
-                        for (Long id : requestConfig.getIDs()) {
-                            DownloadRequestData drd = downloadRequestData.get(id);
-                            if (drd != null) {
-                                downloader.requestAndOpenIntervals(result.getMissingInterval(), id, drd.getPlotIdentifier(), requestConfig.getxRatio(), requestConfig.getyRatio());
-                            } else {
-                                //Log.debug("drd is null");
+        Long start = System.currentTimeMillis();
+        Log.debug("Request for data : " + id + " time " + start);
+        if (!eveState.isMouseDragging()){
+            Log.debug("mouse is not dragged");
+            if (!requestBuffer.hasData()) {
+                requestBuffer.addRequestConfig(new RequestConfig(xStart, xEnd, yStart, yEnd, xRatio, yRatio, iDs));
+                while (requestBuffer.hasData()) {
+                    RequestConfig requestConfig = requestBuffer.getData();
+                    synchronized (downloadRequestData) {
+                        Log.debug("Request for data in interval " + requestConfig.getxStart() + " - " + requestConfig.getxEnd());
+                        if (requestConfig.getxEnd().getTime() - requestConfig.getxStart().getTime() > EVESettings.MAXIMUM_INTERVAL_RANGE_MILLI_SEC_REQ) {
+                            Log.debug("Interval too big");
+                            for (Long id : requestConfig.getIDs()) {
+                                fireIntervalTooBig(id, plotIdentifier);
                             }
-                        }
-                        for (Long id : requestConfig.getIDs()) {
-                            DownloadRequestData drd = downloadRequestData.get(id);
-                            if (drd != null) {
-                                fireClearSavedImages(id, result.getToRemove(), drd.getPlotIdentifier());
-                                for (DownloadedJPXData jpxData : result.getAvailableData()) {
-                                    RadioImage ri = drd.getRadioImages().get(jpxData.getImageID());
-                                    if (ri != null) {
-                                        synchronized (ri) {                                       
-                                            ri.setVisibleIntervals(xStart, xEnd, (int)Math.round(yStart),(int)Math.round(yEnd));
-                                            if(ri.getVisibleImageFreqInterval() != null && ri.getVisibleImageTimeInterval() != null){
-                                                Interval<Date> visibleDateInterval = ri.getVisibleImageTimeInterval();
-                                                FrequencyInterval visibleFrequencyInterval = ri.getVisibleImageFreqInterval();
-                                                if(!visibleDateInterval.getStart().equals(visibleDateInterval.getEnd())){
-                                                    //Log.debug("Visible start time : "+ visibleDateInterval.getStart().getTime() + " Date : "+ visibleDateInterval.getStart());
-                                                    //Log.debug("Visible end time : " + visibleDateInterval.getEnd().getTime() + " Date : "+ visibleDateInterval.getEnd());
-                                                    Rectangle viewport = zoomManager.getAvailableSpaceForInterval(
-                                                            visibleDateInterval.getStart(),
-                                                            visibleDateInterval.getEnd(), 
-                                                            visibleFrequencyInterval.getStart(), 
-                                                            visibleFrequencyInterval.getEnd(), id, plotIdentifier);
-                                                    View v = jpxData.getView();
-                                                    JHVJP2View jp2View = v.getAdapter(JHVJP2View.class);
-                                                    if (jp2View != null) {
-                                                        jp2View.setViewport(new ViewportAdapter(new StaticViewport(new Vector2dInt(viewport.width, viewport.height))), new ChangeEvent());
-                                                        Rectangle roi = ri.getROI();
-                                                        //Log.debug("*********************************************");
-                                                        //Log.debug("requested interval : " + xStart + " - " + xEnd + " , " + yStart + " - " + yEnd);
-                                                        //Log.debug("image id : "+ ri.getRadioImageID());
-                                                        //Log.debug("image interval : " + ri.getTimeInterval().getStart() + " - " + ri.getTimeInterval().getEnd() + " , " + ri.getFreqInterval().getStart() + " - " + ri.getFreqInterval().getEnd());
-                                                        //Log.debug("visible interval : " + ri.getVisibleImageTimeInterval().getStart() + " - " + ri.getVisibleImageTimeInterval().getEnd() + " , " + ri.getVisibleImageFreqInterval().getStart() + " - " + ri.getVisibleImageFreqInterval().getEnd());
-                                                        //Log.debug("viewport[width-height] : " + viewport.width + " - " + viewport.height);
-                                                        //Log.debug("ROI [x0,y0,width,height] : " + roi.x + "," + roi.y + "," + roi.width + "," + roi.height);
-                                                        HelioviewerMetaData md = (HelioviewerMetaData)jp2View.getMetadata();
-                                                        Double mpp = md.getUnitsPerPixel();
-                                                        if(!jp2View.setRegion(new RegionAdapter(new StaticRegion(roi.getX()*mpp, roi.getY()*mpp,
-                                                                new Vector2dDouble(roi.getWidth()*mpp, roi.getHeight()*mpp))), new ChangeEvent())){                                                            
-                                                        }else{
-                                                            Log.debug("The region has not changed send a data not changed for image id : " + ri.getRadioImageID());
-                                                            if(ri.getLastDataSize() != null){//can be null if a previous thread didn't finish yet
-                                                                fireDataNotChanged(ri.getVisibleImageTimeInterval(), ri.getVisibleImageFreqInterval(), ri.getLastDataSize(), id, drd.getPlotIdentifier(), ri.getRadioImageID());
+                        } else {
+                            RadioImageCacheResult result = cache.getRadioImageCacheResultForInterval(requestConfig.getxStart(), requestConfig.getxEnd(), 24L * 60 * 60 * 1000, plotIdentifier);
+                            for (Long id : requestConfig.getIDs()) {
+                                DownloadRequestData drd = downloadRequestData.get(id);
+                                if (drd != null) {
+                                    downloader.requestAndOpenIntervals(result.getMissingInterval(), id, drd.getPlotIdentifier(), requestConfig.getxRatio(), requestConfig.getyRatio());
+                                } else {
+                                    //Log.debug("drd is null");
+                                }
+                            }
+                            for (Long id : requestConfig.getIDs()) {
+                                DownloadRequestData drd = downloadRequestData.get(id);
+                                if (drd != null) {
+                                    fireClearSavedImages(id, result.getToRemove(), drd.getPlotIdentifier());
+                                    Log.debug("Size of available images : "+ result.getAvailableData().size());
+                                    for (DownloadedJPXData jpxData : result.getAvailableData()) {
+                                        RadioImage ri = drd.getRadioImages().get(jpxData.getImageID());
+                                        if (ri != null) {
+                                            synchronized (ri) {                                       
+                                                ri.setVisibleIntervals(xStart, xEnd, (int)Math.round(yStart),(int)Math.round(yEnd));
+                                                if(ri.getVisibleImageFreqInterval() != null && ri.getVisibleImageTimeInterval() != null){
+                                                    Interval<Date> visibleDateInterval = ri.getVisibleImageTimeInterval();
+                                                    FrequencyInterval visibleFrequencyInterval = ri.getVisibleImageFreqInterval();
+                                                    if(!visibleDateInterval.getStart().equals(visibleDateInterval.getEnd())){
+                                                        //Log.debug("Visible start time : "+ visibleDateInterval.getStart().getTime() + " Date : "+ visibleDateInterval.getStart());
+                                                        //Log.debug("Visible end time : " + visibleDateInterval.getEnd().getTime() + " Date : "+ visibleDateInterval.getEnd());
+                                                        Rectangle viewport = zoomManager.getAvailableSpaceForInterval(
+                                                                visibleDateInterval.getStart(),
+                                                                visibleDateInterval.getEnd(), 
+                                                                visibleFrequencyInterval.getStart(), 
+                                                                visibleFrequencyInterval.getEnd(), id, plotIdentifier);
+                                                        View v = jpxData.getView();
+                                                        JHVJP2View jp2View = v.getAdapter(JHVJP2View.class);
+                                                        if (jp2View != null) {
+                                                            jp2View.setViewport(new ViewportAdapter(new StaticViewport(new Vector2dInt(viewport.width, viewport.height))), new ChangeEvent());
+                                                            Rectangle roi = ri.getROI();
+                                                            //Log.debug("*********************************************");
+                                                            //Log.debug("requested interval : " + xStart + " - " + xEnd + " , " + yStart + " - " + yEnd);
+                                                            //Log.debug("image id : "+ ri.getRadioImageID());
+                                                            //Log.debug("image interval : " + ri.getTimeInterval().getStart() + " - " + ri.getTimeInterval().getEnd() + " , " + ri.getFreqInterval().getStart() + " - " + ri.getFreqInterval().getEnd());
+                                                            //Log.debug("visible interval : " + ri.getVisibleImageTimeInterval().getStart() + " - " + ri.getVisibleImageTimeInterval().getEnd() + " , " + ri.getVisibleImageFreqInterval().getStart() + " - " + ri.getVisibleImageFreqInterval().getEnd());
+                                                            //Log.debug("viewport[width-height] : " + viewport.width + " - " + viewport.height);
+                                                            //Log.debug("ROI [x0,y0,width,height] : " + roi.x + "," + roi.y + "," + roi.width + "," + roi.height);
+                                                            HelioviewerMetaData md = (HelioviewerMetaData)jp2View.getMetadata();
+                                                            Double mpp = md.getUnitsPerPixel();
+                                                            if(!jp2View.setRegion(new RegionAdapter(new StaticRegion(roi.getX()*mpp, roi.getY()*mpp,
+                                                                    new Vector2dDouble(roi.getWidth()*mpp, roi.getHeight()*mpp))), new ChangeEvent())){                                                            
                                                             }else{
-                                                                Log.debug("Last data size was null for radio image id : " + ri.getRadioImageID());
+                                                                Log.debug("The region has not changed send a data not changed for image id : " + ri.getRadioImageID());
+                                                                if(ri.getLastDataSize() != null){//can be null if a previous thread didn't finish yet
+                                                                    fireDataNotChanged(ri.getVisibleImageTimeInterval(), ri.getVisibleImageFreqInterval(), ri.getLastDataSize(), id, drd.getPlotIdentifier(), ri.getRadioImageID());
+                                                                }else{
+                                                                    Log.debug("Last data size was null for radio image id : " + ri.getRadioImageID());
+                                                                }
                                                             }
+            
                                                         }
-        
+                                                    }else{
+                                                        Log.debug("Start and end date of the visible interval were the same. No data requested");
                                                     }
-                                                }else{
-                                                    Log.debug("Start and end date of the visible interval were the same. No data requested");
                                                 }
                                             }
-                                        }
-                                        /*ResolutionSetting rs = ri.defineBestResolutionSetting(xRatio, yRatio);
-                                        if (rs != ri.getLastUsedResolutionSetting()) {
-                                            Log.debug("Other resolution setting: update the viewport for " + jpxData.getImageID());
-                                            Log.debug("radio image last resolutionsetting : " + ri.getLastUsedResolutionSetting());
-                                            Log.debug("new resolution setting : " + rs);
-                                            View v = jpxData.getView();
-                                            JHVJP2View jp2View = v.getAdapter(JHVJP2View.class);
-                                            if (jp2View != null) {
-                                                jp2View.setViewport(new ViewportAdapter(new StaticViewport(rs.getVec2dIntRepresentation())), new ChangeEvent());
-                                                ri.setLastUsedResolutionSetting(rs);
+                                            /*ResolutionSetting rs = ri.defineBestResolutionSetting(xRatio, yRatio);
+                                            if (rs != ri.getLastUsedResolutionSetting()) {
+                                                Log.debug("Other resolution setting: update the viewport for " + jpxData.getImageID());
+                                                Log.debug("radio image last resolutionsetting : " + ri.getLastUsedResolutionSetting());
+                                                Log.debug("new resolution setting : " + rs);
+                                                View v = jpxData.getView();
+                                                JHVJP2View jp2View = v.getAdapter(JHVJP2View.class);
+                                                if (jp2View != null) {
+                                                    jp2View.setViewport(new ViewportAdapter(new StaticViewport(rs.getVec2dIntRepresentation())), new ChangeEvent());
+                                                    ri.setLastUsedResolutionSetting(rs);
+                                                }
+                                                
+                                            } else {
+                                                Log.debug("Same resolution setting don't update viewport");
+                                                fireDataNotChanged(ri.getTimeInterval(), ri.getFreqInterval(), new Rectangle(rs.getWidth(), rs.getHeight()), id, drd.getPlotIdentifier(), ri.getRadioImageID());
                                             }
-                                            
-                                        } else {
-                                            Log.debug("Same resolution setting don't update viewport");
-                                            fireDataNotChanged(ri.getTimeInterval(), ri.getFreqInterval(), new Rectangle(rs.getWidth(), rs.getHeight()), id, drd.getPlotIdentifier(), ri.getRadioImageID());
+                                            */
                                         }
-                                        */
                                     }
                                 }
                             }
                         }
                     }
                 }
+            } else {
+                Log.debug("Add request to buffer");
+                requestBuffer.addRequestConfig(new RequestConfig(xStart, xEnd, yStart, yEnd, xRatio, yRatio, iDs));
             }
-        } else {
-            Log.debug("Add request to buffer");
-            requestBuffer.addRequestConfig(new RequestConfig(xStart, xEnd, yStart, yEnd, xRatio, yRatio, iDs));
+        }else{
+            Log.debug("Mouse is dragged");
         }
-
+        long end  = System.currentTimeMillis();
+        Log.debug("Finished request for data id: " + id + " time : " + end +  " in " + (end-start) + " milliseconds");
+        id++;
     }
 
     private void fireClearSavedImages(Long downloadID, List<Long> toRemove, String plotIdentifier) {
