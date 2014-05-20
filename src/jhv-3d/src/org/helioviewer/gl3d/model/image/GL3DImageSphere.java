@@ -30,7 +30,6 @@ public class GL3DImageSphere extends GL3DImageMesh {
     public GL3DImageSphere(GL3DImageTextureView imageTextureView, GLVertexShaderProgram vertexShaderProgram, GLFragmentShaderProgram fragmentShaderProgram, GL3DImageLayer imageLayer) {
         super("Sphere", imageTextureView, vertexShaderProgram, fragmentShaderProgram);
         layer = imageLayer;
-
     }
 
     @Override
@@ -84,13 +83,13 @@ public class GL3DImageSphere extends GL3DImageMesh {
             Vector2dDouble ll = metaData.getPhysicalLowerLeft();
 
             int beginPositionNumberCorona = numberOfPositions;
-            positions.add(new GL3DVec3d(ul.getX(), ul.getY(), 0.));
+            positions.add(new GL3DVec3d(-4., 4., 0.));
             numberOfPositions++;
-            positions.add(new GL3DVec3d(ur.getX(), ur.getY(), 0.));
+            positions.add(new GL3DVec3d(4., 4., 0.));
             numberOfPositions++;
-            positions.add(new GL3DVec3d(lr.getX(), lr.getY(), 0.));
+            positions.add(new GL3DVec3d(4., -4., 0.));
             numberOfPositions++;
-            positions.add(new GL3DVec3d(ll.getX(), ll.getY(), 0.));
+            positions.add(new GL3DVec3d(-4., -4., 0.));
             numberOfPositions++;
 
             indices.add(beginPositionNumberCorona + 0);
