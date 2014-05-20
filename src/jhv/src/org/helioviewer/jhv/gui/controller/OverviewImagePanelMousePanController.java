@@ -22,18 +22,18 @@ import org.helioviewer.viewmodel.viewportimagesize.ViewportImageSize;
 
 /**
  * Implementation of ImagePanelInputController for the overview image panel.
- * 
+ *
  * <p>
  * By using this controller, the user can move the region of interest of the
  * main image panel. This can happen on two ways: Either by dragging the current
  * region or by clicking into the area outside the current region, which will
  * center the region on that point.
- * 
+ *
  * <p>
  * Also, see {@link org.helioviewer.jhv.gui.components.OverviewImagePanel}.
- * 
+ *
  * @author Stephan Pagel
- * 
+ *
  * */
 public class OverviewImagePanelMousePanController extends AbstractImagePanelMouseController {
 
@@ -71,7 +71,7 @@ public class OverviewImagePanelMousePanController extends AbstractImagePanelMous
 
     /**
      * Sets the area where image data is available. (ViewportImageSize + Offset)
-     * 
+     *
      * @param imageArea
      *            Position and size of the area where image data is available.
      * */
@@ -81,7 +81,7 @@ public class OverviewImagePanelMousePanController extends AbstractImagePanelMous
 
     /**
      * Sets the area where the ROI in main image currently is.
-     * 
+     *
      * @param roiArea
      *            Position and size of the ROI of the main image adopted to the
      *            overview.
@@ -89,10 +89,11 @@ public class OverviewImagePanelMousePanController extends AbstractImagePanelMous
     public void setROIArea(Rectangle roiArea) {
         this.roiArea = roiArea;
         if (!insideROIDragged) {
-            setCursorDependingOnRegion(lastMouseLocation);
+            //setCursorDependingOnRegion(lastMouseLocation);
         }
     }
 
+    @Override
     public void setView(View newView) {
         super.setView(newView);
         SynchronizeView sview = ViewHelper.getViewAdapter(newView, SynchronizeView.class);
@@ -105,7 +106,7 @@ public class OverviewImagePanelMousePanController extends AbstractImagePanelMous
 
     /**
      * Checks if mouse cursor is placed over area where image data is available.
-     * 
+     *
      * @param point
      *            Coordinates of the mouse cursor.
      * @return true if mouse cursor is located over this area.
@@ -116,7 +117,7 @@ public class OverviewImagePanelMousePanController extends AbstractImagePanelMous
 
     /**
      * Checks if mouse cursor is placed over ROI.
-     * 
+     *
      * @param point
      *            Coordinates of the mouse cursor.
      * @return true if mouse cursor is located over this area.
@@ -127,7 +128,7 @@ public class OverviewImagePanelMousePanController extends AbstractImagePanelMous
 
     /**
      * Sets the image of the mouse cursor depending on its position.
-     * 
+     *
      * @param point
      *            Coordinates of the mouse cursor.
      * */
@@ -157,7 +158,7 @@ public class OverviewImagePanelMousePanController extends AbstractImagePanelMous
     /**
      * Sets the region in main image depending on the mouse position in overview
      * image.
-     * 
+     *
      * @param coordinate
      *            Coordinate of cursor in overview image.
      * */
@@ -199,7 +200,7 @@ public class OverviewImagePanelMousePanController extends AbstractImagePanelMous
 
     /**
      * Updates the view of the zoom controller.
-     * 
+     *
      * It is always set to the observed view of the synchronize view
      */
     private void updateZoomController() {
@@ -217,6 +218,7 @@ public class OverviewImagePanelMousePanController extends AbstractImagePanelMous
     /**
      * {@inheritDoc}
      */
+    @Override
     public void mouseClicked(MouseEvent e) {
         if (e.getClickCount() > 1) {
             updateZoomController();
@@ -237,18 +239,21 @@ public class OverviewImagePanelMousePanController extends AbstractImagePanelMous
     /**
      * {@inheritDoc}
      */
+    @Override
     public void mouseEntered(MouseEvent e) {
     }
 
     /**
      * {@inheritDoc}
      */
+    @Override
     public void mouseExited(MouseEvent e) {
     }
 
     /**
      * {@inheritDoc}
      */
+    @Override
     public void mousePressed(MouseEvent e) {
         if (insideROI) {
             // update cursor
@@ -259,6 +264,7 @@ public class OverviewImagePanelMousePanController extends AbstractImagePanelMous
     /**
      * {@inheritDoc}
      */
+    @Override
     public void mouseReleased(MouseEvent e) {
         // update region
         if (this.interactionEnabled) {
@@ -275,6 +281,7 @@ public class OverviewImagePanelMousePanController extends AbstractImagePanelMous
     /**
      * {@inheritDoc}
      */
+    @Override
     public void mouseDragged(MouseEvent e) {
         lastMouseLocation = e.getPoint();
 
@@ -292,15 +299,17 @@ public class OverviewImagePanelMousePanController extends AbstractImagePanelMous
     /**
      * {@inheritDoc}
      */
+    @Override
     public void mouseMoved(MouseEvent e) {
         lastMouseLocation = e.getPoint();
         // update cursor
-        setCursorDependingOnRegion(e.getPoint());
+        //setCursorDependingOnRegion(e.getPoint());
     }
 
     /**
      * {@inheritDoc}
      */
+    @Override
     public void mouseWheelMoved(MouseWheelEvent e) {
         if (zoomController != null) {
             updateZoomController();
