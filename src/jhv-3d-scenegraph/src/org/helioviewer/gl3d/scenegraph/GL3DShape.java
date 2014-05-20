@@ -11,9 +11,9 @@ import org.helioviewer.gl3d.wcs.CoordinateSystem;
  * A {@link GL3DShape} is a {@link GL3DNode} that does have a position and a
  * bounding box within the scene graph. In practice, almost every
  * {@link GL3DNode} is also a {@link GL3DShape}.
- * 
+ *
  * @author Simon Spoerri (simon.spoerri@fhnw.ch)
- * 
+ *
  */
 public abstract class GL3DShape extends GL3DNode {
     // Model Matrix
@@ -42,6 +42,7 @@ public abstract class GL3DShape extends GL3DNode {
         this.aabb = new GL3DAABBox();
     }
 
+    @Override
     public void init(GL3DState state) {
         state.pushMV();
         this.wm = state.multiplyMV(this.m);
@@ -55,6 +56,7 @@ public abstract class GL3DShape extends GL3DNode {
         state.popMV();
     }
 
+    @Override
     public void update(GL3DState state) {
         if (!this.isInitialised) {
             this.init(state);
@@ -68,7 +70,7 @@ public abstract class GL3DShape extends GL3DNode {
             this.wmN = new GL3DMat3d(state.normalMatrix);
             this.shapeUpdate(state);
             this.setUnchanged();
-            this.buildAABB();
+            //this.buildAABB();
             state.popMV();
         }
     }
@@ -77,6 +79,7 @@ public abstract class GL3DShape extends GL3DNode {
 
     }
 
+    @Override
     public void draw(GL3DState state) {
         if (!isDrawBitOn(Bit.Hidden)) {
             // Log.debug("GL3DShape: Drawing '"+getName()+"'");
@@ -110,6 +113,7 @@ public abstract class GL3DShape extends GL3DNode {
         }
     }
 
+    @Override
     public boolean hit(GL3DRay ray) {
         // if its hidden, it can't be hit
         if (isDrawBitOn(Bit.Hidden)) {
@@ -130,9 +134,10 @@ public abstract class GL3DShape extends GL3DNode {
         return this.shapeHit(ray);
     }
 
+    @Override
     public void delete(GL3DState state) {
         if (parent != null && (parent instanceof GL3DGroup)) {
-            ((GL3DGroup) parent).removeNode(this);
+            parent.removeNode(this);
         }
         parent = null;
         shapeDelete(state);
