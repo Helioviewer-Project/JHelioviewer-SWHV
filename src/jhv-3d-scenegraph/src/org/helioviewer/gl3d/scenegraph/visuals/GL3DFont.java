@@ -52,12 +52,13 @@ public class GL3DFont {
     }
 
     private BufferedImage getFontBufferedImage(String font) {
-        BufferedImage img = new BufferedImage(256, 512, BufferedImage.TYPE_4BYTE_ABGR);
+        BufferedImage img = new BufferedImage(256, 512, BufferedImage.TYPE_4BYTE_ABGR_PRE);
         Graphics2D g2d = img.createGraphics();
         g2d.setPaint(Color.blue);
+        //g2d.clearRect(0, 0, 256, 512);
         g2d.setRenderingHint(
                 RenderingHints.KEY_TEXT_ANTIALIASING,
-                RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
+                RenderingHints.VALUE_TEXT_ANTIALIAS_GASP);
         g2d.setFont(new Font(font, Font.PLAIN, fontSize));
         RectangleDouble[] rects= new RectangleDouble[256];
         FontMetrics fm = g2d.getFontMetrics();
