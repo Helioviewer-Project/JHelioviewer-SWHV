@@ -91,18 +91,33 @@ public class GLLayeredView extends AbstractLayeredView implements GLFragmentShad
         return changed;
     }
 
+    protected void changeAngles() {
+        Layer[] viewArray = viewLookup.values().toArray(new Layer[ viewLookup.values().size()]);
+        if(viewArray.length>0){
+            for (int i=0; i<1; i++) {
+                long d1 = viewArray[0].regionView.getAdapter(JHVJP2View.class).getImageData().getDateMillis();
+                for (int j=viewArray.length-1; j>=0; j--) {
+                    long d2 = viewArray[j].regionView.getAdapter(JHVJP2View.class).getImageData().getDateMillis();
+                    if(d1-d2<45*60*1000){
+                        viewArray[j].regionView.getAdapter(JHVJP2View.class).getImageData().setDateMillis(d1);
+                    }
+                }
+            }
+        }
+    }
     /**
      * {@inheritDoc}
      */
     @Override
     public void renderGL(GL gl, boolean nextView) {
-
+        changeAngles();
         layerLock.lock();
 
         try {
             gl.glPushMatrix();
 
             for (View v : layers) {
+
                 Layer layer = viewLookup.get(v);
 
                 // If invisible, skip layer
