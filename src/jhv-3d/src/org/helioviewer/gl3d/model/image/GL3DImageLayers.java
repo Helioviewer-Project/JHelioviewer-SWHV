@@ -42,19 +42,15 @@ public class GL3DImageLayers extends GL3DGroup {
 
     @Override
     public void shapeDraw(GL3DState state) {
+
         if (!this.isDrawBitOn(Bit.Wireframe)) {
             GL3DState.get().checkGLErrors("GL3DImageLayers.beforeEnable");
             state.gl.glEnable(GL.GL_FRAGMENT_PROGRAM_ARB);
             state.gl.glEnable(GL.GL_VERTEX_PROGRAM_ARB);
 
         }
-        // state.gl.glDisable(GL.GL_LIGHTING);
 
-        // state.gl.glEnable(GL.GL_BLEND);
-        // drawBlendedImageGroup(state, this, false, false);
-        // drawBlendedImageGroup(state, sphereGroup, false, true);
         this.drawImageLayers(state);
-        // state.gl.glUniform1f(arg0, arg1)
         state.gl.glDisable(GL.GL_FRAGMENT_PROGRAM_ARB);
         state.gl.glDisable(GL.GL_VERTEX_PROGRAM_ARB);
         GL3DState.get().checkGLErrors("GL3DImageLayers.afterDisable");
@@ -66,7 +62,6 @@ public class GL3DImageLayers extends GL3DGroup {
     private void drawImageLayers(GL3DState state) {
         GL3DNode node = this.getFirst();
 
-        // Create sorted list of image layers
         ArrayList<GL3DImageLayer> layers = new ArrayList<GL3DImageLayer>();
         while (node != null) {
             if (!node.isDrawBitOn(Bit.Hidden) && node instanceof GL3DImageLayer)
@@ -76,8 +71,6 @@ public class GL3DImageLayers extends GL3DGroup {
         state.gl.glDisable(GL.GL_FRAGMENT_PROGRAM_ARB);
         state.gl.glDisable(GL.GL_VERTEX_PROGRAM_ARB);
 
-        // state.gl.glDisable(GL.GL_CULL_FACE);
-        // state.gl.glEnable(GL.GL_DEPTH_TEST);
         state.gl.glEnable(GL.GL_BLEND);
         state.gl.glBlendFunc(GL.GL_SRC_ALPHA, GL.GL_ONE_MINUS_SRC_ALPHA);
 
@@ -105,6 +98,7 @@ public class GL3DImageLayers extends GL3DGroup {
     public void shapeUpdate(GL3DState state) {
         super.shapeUpdate(state);
         updateImageLayerPriorities(state);
+        this.markAsChanged();
     }
 
     private void updateImageLayerPriorities(GL3DState state) {
@@ -168,7 +162,6 @@ public class GL3DImageLayers extends GL3DGroup {
             if (node instanceof GL3DImageLayer)
                 layers.add((GL3DImageLayer) node);
         }
-
         return layers;
     }
 }
