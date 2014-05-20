@@ -7,7 +7,6 @@ import java.net.HttpURLConnection;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
-import java.text.SimpleDateFormat;
 import java.util.AbstractList;
 import java.util.Collections;
 import java.util.Date;
@@ -32,13 +31,13 @@ import org.helioviewer.jhv.io.FileDownloader;
 import org.helioviewer.viewmodel.changeevent.ChangeEvent;
 import org.helioviewer.viewmodel.changeevent.ChangedReason;
 import org.helioviewer.viewmodel.changeevent.LayerChangedReason;
+import org.helioviewer.viewmodel.changeevent.LayerChangedReason.LayerChangeType;
 import org.helioviewer.viewmodel.changeevent.NonConstantMetaDataChangedReason;
 import org.helioviewer.viewmodel.changeevent.RegionChangedReason;
 import org.helioviewer.viewmodel.changeevent.SubImageDataChangedReason;
 import org.helioviewer.viewmodel.changeevent.TimestampChangedReason;
 import org.helioviewer.viewmodel.changeevent.ViewChainChangedReason;
 import org.helioviewer.viewmodel.changeevent.ViewportChangedReason;
-import org.helioviewer.viewmodel.changeevent.LayerChangedReason.LayerChangeType;
 import org.helioviewer.viewmodel.io.APIResponse;
 import org.helioviewer.viewmodel.io.APIResponseDump;
 import org.helioviewer.viewmodel.metadata.MetaData;
@@ -73,14 +72,14 @@ import org.xml.sax.helpers.XMLReaderFactory;
  * This class is a (redundant) representation of the LayeredView + ViewChain
  * state, and, in addition to this, introduces the concept of an "activeLayer",
  * which is the Layer that is currently operated on by the user/GUI.
- * 
+ *
  * This class is mainly used by the LayerTable(Model) as an abstraction to the
  * ViewChain.
- * 
+ *
  * Future development plans still have to show if it is worth to keep this
  * class, or if the abstraction should be avoided and direct access to the
  * viewChain/layeredView should be used in all GUI classes.
- * 
+ *
  * @author Malte Nuhn
  */
 public class LayersModel implements ViewListener {
@@ -89,16 +88,16 @@ public class LayersModel implements ViewListener {
 
     /** The sole instance of this class. */
     private static final LayersModel layersModel = new LayersModel();
-    private ReentrantReadWriteLock rwl = new ReentrantReadWriteLock();
+    private final ReentrantReadWriteLock rwl = new ReentrantReadWriteLock();
 
-    private AbstractList<LayersListener> layerListeners = new LinkedList<LayersListener>();
+    private final AbstractList<LayersListener> layerListeners = new LinkedList<LayersListener>();
 
     // store the last updated timestamp
     private Date lastTimestamp;
 
     /**
      * Method returns the sole instance of this class.
-     * 
+     *
      * @return the only instance of this class.
      * */
     public static LayersModel getSingletonInstance() {
@@ -112,7 +111,7 @@ public class LayersModel implements ViewListener {
     /**
      * Get the layeredView object. Returns null if the ImageViewerGui, the
      * mainView or the layeredView are not yet initialized.
-     * 
+     *
      * @return reference to the LayeredView object, null if an error occurs
      */
     public LayeredView getLayeredView() {
@@ -128,7 +127,7 @@ public class LayersModel implements ViewListener {
 
     /**
      * Return the view associated with the active Layer
-     * 
+     *
      * @return View associated with the active Layer
      */
     public View getActiveView() {
@@ -162,7 +161,7 @@ public class LayersModel implements ViewListener {
     /**
      * Set the activeLayer to the Layer that can be associated to the given
      * view, do nothing if the view cannot be associated with any layer
-     * 
+     *
      * @param view
      */
     public void setActiveLayer(View view) {
@@ -172,7 +171,7 @@ public class LayersModel implements ViewListener {
 
     /**
      * Set the activeLayer to the Layer associated with the given index
-     * 
+     *
      * @param idx
      *            - index of the layer to be set as active Layer
      */
@@ -192,7 +191,7 @@ public class LayersModel implements ViewListener {
     /**
      * Return a String containing the current timestamp of the given layer,
      * return an empty string if no timing information is available
-     * 
+     *
      * @param idx
      *            - Index of the layer in question
      * @return String representation of the timestamp, empty String if no timing
@@ -206,7 +205,7 @@ public class LayersModel implements ViewListener {
     /**
      * Return a String containing the current timestamp of the given layer,
      * return an empty string if no timing information is available
-     * 
+     *
      * @param view
      *            - View that can be associated with the layer in question
      * @return String representation of the timestamp, empty String if no timing
@@ -230,7 +229,7 @@ public class LayersModel implements ViewListener {
     /**
      * Return the current timestamp of the given layer, return an empty string
      * if no timing information is available
-     * 
+     *
      * @param idx
      *            - Index of the layer in question
      * @return timestamp, null if no timing information is available
@@ -243,7 +242,7 @@ public class LayersModel implements ViewListener {
     /**
      * Return the current timestamp of the given layer, return an empty string
      * if no timing information is available
-     * 
+     *
      * @param view
      *            - View that can be associated with the layer in question
      * @return timestamp, null if no timing information is available
@@ -268,7 +267,7 @@ public class LayersModel implements ViewListener {
     /**
      * Return the timestamp of the first available image data of the layer in
      * question
-     * 
+     *
      * @param view
      *            - View that can be associated with the layer in question
      * @return timestamp of the first available image data, null if no
@@ -295,7 +294,7 @@ public class LayersModel implements ViewListener {
 
     /**
      * Retrieve the timestamp from an imageView which contains metaData
-     * 
+     *
      * @param view
      * @return timestamp associated with the image data currently presented
      */
@@ -328,7 +327,7 @@ public class LayersModel implements ViewListener {
     /**
      * Return the timestamp of the first available image data of the layer in
      * question
-     * 
+     *
      * @param idx
      *            - index of the layer in question
      * @return timestamp of the first available image data, null if no
@@ -345,7 +344,7 @@ public class LayersModel implements ViewListener {
 
     /**
      * Return the timestamp of the first available image data
-     * 
+     *
      * @return timestamp of the first available image data, null if no
      *         information available
      */
@@ -369,7 +368,7 @@ public class LayersModel implements ViewListener {
     /**
      * Return the timestamp of the last available image data of the layer in
      * question
-     * 
+     *
      * @param view
      *            - View that can be associated with the layer in question
      * @return timestamp of the last available image data, null if no
@@ -400,7 +399,7 @@ public class LayersModel implements ViewListener {
 
     /**
      * Return the timestamp of the last available image data
-     * 
+     *
      * @return timestamp of the last available image data, null if no
      *         information available
      */
@@ -424,7 +423,7 @@ public class LayersModel implements ViewListener {
     /**
      * Return the timestamp of the last available image data of the layer in
      * question
-     * 
+     *
      * @param idx
      *            - index of the layer in question
      * @return timestamp of the last available image data, null if no
@@ -437,7 +436,7 @@ public class LayersModel implements ViewListener {
 
     /**
      * Find the index of the layer that can be associated with the given view
-     * 
+     *
      * @param view
      *            - View that can be associated with the layer in question
      * @return index of the layer that can be associated with the given view
@@ -454,15 +453,15 @@ public class LayersModel implements ViewListener {
      * Important internal method to convert between LayersModel indexing and
      * LayeredView indexing. Calling it twice should form the identity
      * operation.
-     * 
+     *
      * LayersModel indices go from 0 .. (LayerCount - 1), with 0 being the
      * uppermost layer
-     * 
+     *
      * whereas
-     * 
+     *
      * LayeredView indies go from (LayerCount - 1) .. 0, with 0 being the layer
      * at the bottom.
-     * 
+     *
      * @param idx
      *            to be converted from LayersModel to LayeredView or the other
      *            direction.
@@ -480,11 +479,11 @@ public class LayersModel implements ViewListener {
     /**
      * Important internal method to convert between LayersModel indexing and
      * LayeredView indexing.
-     * 
+     *
      * Since this index transformation involves the number of layers, this
      * transformation has to pay respect to situation where the number of layers
      * has changed.
-     * 
+     *
      * @param idx
      *            to be converted from LayersModel to LayeredView or the other
      *            direction after a layer has been deleted
@@ -501,7 +500,7 @@ public class LayersModel implements ViewListener {
 
     /**
      * Return the number of layers currently available
-     * 
+     *
      * @return number of layers
      */
     public int getNumLayers() {
@@ -517,7 +516,7 @@ public class LayersModel implements ViewListener {
     /**
      * Change the visibility of the layer in question, and automatically
      * (un)link + play/pause the layer
-     * 
+     *
      * @param view
      *            - View that can be associated with the layer in question
      * @param visible
@@ -536,7 +535,7 @@ public class LayersModel implements ViewListener {
     /**
      * Change the visibility of the layer in question, and automatically
      * (un)link + play/pause the layer
-     * 
+     *
      * @param idx
      *            - index of the layer in question
      * @param visible
@@ -549,7 +548,7 @@ public class LayersModel implements ViewListener {
 
     /**
      * Change the visibility of the layer in question
-     * 
+     *
      * @param view
      *            - View that can be associated with the layer in question
      * @param visible
@@ -566,7 +565,7 @@ public class LayersModel implements ViewListener {
 
     /**
      * Change the visibility of the layer in question
-     * 
+     *
      * @param idx
      *            - index of the layer in question
      * @param visible
@@ -583,10 +582,10 @@ public class LayersModel implements ViewListener {
 
     /**
      * Get the visibility of the layer in question
-     * 
+     *
      * @param view
      *            - View that can be associated with the layer in question
-     * 
+     *
      * @return true if the layer is visible
      */
     public boolean isVisible(View view) {
@@ -600,7 +599,7 @@ public class LayersModel implements ViewListener {
 
     /**
      * Get the visibility of the layer in question
-     * 
+     *
      * @param idx
      *            - index of the layer in question
      * @return true if the layer is visible
@@ -616,7 +615,7 @@ public class LayersModel implements ViewListener {
 
     /**
      * Get the name of the layer in question
-     * 
+     *
      * @param view
      *            - View that can be associated with the layer in question
      * @return name of the layer, the views default String representation if no
@@ -636,7 +635,7 @@ public class LayersModel implements ViewListener {
 
     /**
      * Get the name of the layer in question
-     * 
+     *
      * @param idx
      *            - index of the layer in question
      * @return name of the layer, the views default String representation if no
@@ -736,10 +735,11 @@ public class LayersModel implements ViewListener {
 
     /**
      * View changed handler.
-     * 
+     *
      * Internally forwards (an abstraction) of the events to the LayersListener
-     * 
+     *
      */
+    @Override
     public void viewChanged(View sender, ChangeEvent aEvent) {
 
         handleSubImageDataChanges(sender, aEvent);
@@ -752,7 +752,7 @@ public class LayersModel implements ViewListener {
     /**
      * Check if the given index is valid, given the current state of the
      * LayeredView/ViewChain
-     * 
+     *
      * @param idx
      *            - index of the layer in question
      * @return true if the index is valid
@@ -767,7 +767,7 @@ public class LayersModel implements ViewListener {
 
     /**
      * Calulate a new activeLayer after the old Layer has been deleted
-     * 
+     *
      * @param oldActiveLayerIdx
      *            - index of old active, but deleted, layer
      * @return the index of the new active layer to choose, or -1 if no suitable
@@ -787,7 +787,7 @@ public class LayersModel implements ViewListener {
 
     /**
      * Trigger downloading the layer in question
-     * 
+     *
      * @param idx
      *            - index of the layer in question
      */
@@ -798,7 +798,7 @@ public class LayersModel implements ViewListener {
 
     /**
      * Trigger downloading the layer in question
-     * 
+     *
      * @param view
      *            - View that can be associated with the layer in question
      */
@@ -809,6 +809,7 @@ public class LayersModel implements ViewListener {
         final ImageInfoView infoView = view.getAdapter(ImageInfoView.class);
 
         Thread downloadThread = new Thread(new Runnable() {
+            @Override
             public void run() {
                 downloadFromJPIP(infoView);
                 LayersModel.getSingletonInstance().viewChanged(infoView, new ChangeEvent(new LayerChangedReason(infoView, LayerChangeType.LAYER_DOWNLOADED, view)));
@@ -819,7 +820,7 @@ public class LayersModel implements ViewListener {
 
     /**
      * Downloads the complete image from the JPIP server.
-     * 
+     *
      * Changes the source of the ImageInfoView afterwards, since a local file is
      * always faster.
      */
@@ -880,7 +881,7 @@ public class LayersModel implements ViewListener {
     /**
      * Trigger showing a dialog displaying the meta data of the layer in
      * question.
-     * 
+     *
      * @param idx
      *            - index of the layer in question
      */
@@ -892,10 +893,10 @@ public class LayersModel implements ViewListener {
     /**
      * Trigger showing a dialog displaying the meta data of the layer in
      * question.
-     * 
+     *
      * @param view
      *            - View that can be associated with the layer in question
-     * 
+     *
      * @see org.helioviewer.jhv.gui.dialogs.MetaDataDialog
      */
     public void showMetaInfo(View view) {
@@ -909,7 +910,7 @@ public class LayersModel implements ViewListener {
 
     /**
      * Remove the layer in question
-     * 
+     *
      * @param idx
      *            - index of the layer in question
      */
@@ -922,7 +923,7 @@ public class LayersModel implements ViewListener {
 
     /**
      * Remove the layer in question
-     * 
+     *
      * @param view
      *            - View that can be associated with the layer in question
      */
@@ -933,7 +934,7 @@ public class LayersModel implements ViewListener {
 
     /**
      * Set the link-state of the layer in question
-     * 
+     *
      * @param view
      *            - View that can be associated with the layer in question
      * @param link
@@ -962,7 +963,7 @@ public class LayersModel implements ViewListener {
 
     /**
      * Set the link-state of the layer in question
-     * 
+     *
      * @param idx
      *            - index of the layer in question
      * @param link
@@ -975,7 +976,7 @@ public class LayersModel implements ViewListener {
 
     /**
      * Set the play-state of the layer in question
-     * 
+     *
      * @param idx
      *            - index of the layer in question
      * @param play
@@ -988,7 +989,7 @@ public class LayersModel implements ViewListener {
 
     /**
      * Set the play-state of the layer in question
-     * 
+     *
      * @param view
      *            - View that can be associated with the layer in question
      * @param play
@@ -1012,7 +1013,7 @@ public class LayersModel implements ViewListener {
 
     /**
      * Check whether the layer in question is a movie
-     * 
+     *
      * @param idx
      *            - index of the layer in question
      * @return true if the layer in question is a movie
@@ -1025,7 +1026,7 @@ public class LayersModel implements ViewListener {
 
     /**
      * Check whether the layer in question is a movie
-     * 
+     *
      * @param view
      *            - View that can be associated with the layer in question
      * @return true if the layer in question is a movie
@@ -1040,7 +1041,7 @@ public class LayersModel implements ViewListener {
 
     /**
      * Check whether the layer in question has timing information
-     * 
+     *
      * @param idx
      *            - index of the layer in question
      * @return true if the layer in question has timing information
@@ -1051,7 +1052,7 @@ public class LayersModel implements ViewListener {
 
     /**
      * Check whether the layer in question has timing information
-     * 
+     *
      * @param view
      *            - View that can be associated with the layer in question
      * @return true if the layer in question has timing information
@@ -1072,7 +1073,7 @@ public class LayersModel implements ViewListener {
 
     /**
      * Move the layer in question up
-     * 
+     *
      * @param view
      *            - View that can be associated with the layer in question
      */
@@ -1096,7 +1097,7 @@ public class LayersModel implements ViewListener {
 
     /**
      * Move the layer in question down
-     * 
+     *
      * @param view
      *            - View that can be associated with the layer in question
      */
@@ -1119,7 +1120,7 @@ public class LayersModel implements ViewListener {
 
     /**
      * Check whether the layer in question is currently playing
-     * 
+     *
      * @param idx
      *            - index of the layer in question
      * @return true if the layer in question is currently playing
@@ -1131,7 +1132,7 @@ public class LayersModel implements ViewListener {
 
     /**
      * Check whether the layer in question is currently playing
-     * 
+     *
      * @param view
      *            - View that can be associated with the layer in question
      * @return true if the layer in question is currently playing
@@ -1150,7 +1151,7 @@ public class LayersModel implements ViewListener {
 
     /**
      * Return the current framerate for the layer in question
-     * 
+     *
      * @param idx
      *            - index of the layer in question
      * @return the current framerate or 0.0 if the movie is not playing, or if
@@ -1163,7 +1164,7 @@ public class LayersModel implements ViewListener {
 
     /**
      * Return the current framerate for the layer in question
-     * 
+     *
      * @param view
      *            - View that can be associated with the layer in question
      * @return the current framerate or 0.0 if the movie is not playing, or if
@@ -1190,7 +1191,7 @@ public class LayersModel implements ViewListener {
     /**
      * Check whether the layer in question is a Master in the list of linked
      * movies
-     * 
+     *
      * @param idx
      *            - index of the layer in question
      * @return true if the layer in question is a master
@@ -1203,7 +1204,7 @@ public class LayersModel implements ViewListener {
     /**
      * Check whether the layer in question is a Master in the list of linked
      * movies
-     * 
+     *
      * @param view
      *            - View that can be associated with the layer in question
      * @return true if the layer in question is a master
@@ -1219,7 +1220,7 @@ public class LayersModel implements ViewListener {
 
     /**
      * Check whether the layer in question is a Remote View
-     * 
+     *
      * @param view
      *            - View that can be associated with the layer in question
      * @return true if the layer in question is a remote view
@@ -1239,7 +1240,7 @@ public class LayersModel implements ViewListener {
 
     /**
      * Check whether the layer in question is a Remote View
-     * 
+     *
      * @param idx
      *            - index of the layer in question
      * @return true if the layer in question is a remote view
@@ -1251,7 +1252,7 @@ public class LayersModel implements ViewListener {
 
     /**
      * Check whether the layer in question is connected to a JPIP server
-     * 
+     *
      * @param idx
      *            - index of the layer in question
      * @return true if the layer is connected to a JPIP server
@@ -1263,7 +1264,7 @@ public class LayersModel implements ViewListener {
 
     /**
      * Check whether the layer in question is connected to a JPIP server
-     * 
+     *
      * @param view
      *            - View that can be associated with the layer in question
      * @return true if the layer is connected to a JPIP server
@@ -1283,7 +1284,7 @@ public class LayersModel implements ViewListener {
 
     /**
      * Return a representation of the layer in question
-     * 
+     *
      * @param idx
      *            - index of the layer in question
      * @return LayerDescriptor of the current state of the layer in question
@@ -1295,13 +1296,13 @@ public class LayersModel implements ViewListener {
 
     /**
      * Return a representation of the layer in question
-     * 
+     *
      * @param view
      *            - View that can be associated with the layer in question
      * @return LayerDescriptor of the current state of the layer in question
      */
     public LayerDescriptor getDescriptor(View view) {
-        ImageInfoView imageInfoView = view.getAdapter(ImageInfoView.class);
+/*        ImageInfoView imageInfoView = view.getAdapter(ImageInfoView.class);
         String typeString;
         String intervalString;
 
@@ -1320,8 +1321,8 @@ public class LayersModel implements ViewListener {
         } else {
             intervalString = layersModel.getCurrentFrameTimestampString(view);
             typeString = "JPEG200-movie";
-        }
-        LayerDescriptor ld = new LayerDescriptor(intervalString, typeString);
+        }*/
+        LayerDescriptor ld = new LayerDescriptor("sd", "sdf");
 
         ld.isMovie = layersModel.isMovie(view);
         ld.isMaster = layersModel.isMaster(view);
@@ -1336,6 +1337,7 @@ public class LayersModel implements ViewListener {
     private void fireLayerDownloaded(final int index) {
         Thread thread = new Thread(new Runnable() {
 
+            @Override
             public void run() {
                 rwl.readLock().lock();
                 try {
@@ -1357,6 +1359,7 @@ public class LayersModel implements ViewListener {
     private void fireLayerRemoved(final View oldView, final int oldIndex) {
         Thread thread = new Thread(new Runnable() {
 
+            @Override
             public void run() {
                 rwl.readLock().lock();
                 try {
@@ -1380,6 +1383,7 @@ public class LayersModel implements ViewListener {
 
         Thread thread = new Thread(new Runnable() {
 
+            @Override
             public void run() {
                 rwl.readLock().lock();
                 try {
@@ -1402,6 +1406,7 @@ public class LayersModel implements ViewListener {
 
         Thread thread = new Thread(new Runnable() {
 
+            @Override
             public void run() {
                 rwl.readLock().lock();
                 try {
@@ -1425,6 +1430,7 @@ public class LayersModel implements ViewListener {
 
         Thread thread = new Thread(new Runnable() {
 
+            @Override
             public void run() {
                 rwl.readLock().lock();
                 try {
@@ -1449,6 +1455,7 @@ public class LayersModel implements ViewListener {
     private void fireActiveLayerChanged(final int index) {
         Thread thread = new Thread(new Runnable() {
 
+            @Override
             public void run() {
                 rwl.readLock().lock();
                 try {
@@ -1470,6 +1477,7 @@ public class LayersModel implements ViewListener {
     private void fireViewportGeometryChanged() {
         Thread thread = new Thread(new Runnable() {
 
+            @Override
             public void run() {
                 rwl.readLock().lock();
                 try {
@@ -1492,6 +1500,7 @@ public class LayersModel implements ViewListener {
     private void fireTimestampChanged(final int idx) {
         Thread thread = new Thread(new Runnable() {
 
+            @Override
             public void run() {
                 rwl.readLock().lock();
                 try {
@@ -1514,6 +1523,7 @@ public class LayersModel implements ViewListener {
     private void fireSubImageDataChanged() {
         Thread thread = new Thread(new Runnable() {
 
+            @Override
             public void run() {
                 rwl.readLock().lock();
                 try {
@@ -1543,7 +1553,7 @@ public class LayersModel implements ViewListener {
 
     /**
      * Remove LayersListener
-     * 
+     *
      * * @author Carlos Martin
      */
     public void removeLayersListener(LayersListener layerListener) {
@@ -1557,7 +1567,7 @@ public class LayersModel implements ViewListener {
 
     /**
      * Get last Frame
-     * 
+     *
      * @return
      */
     public Date getLastUpdatedTimestamp() {
@@ -1576,7 +1586,7 @@ public class LayersModel implements ViewListener {
     /**
      * Return a XML representation of the current layers. This also includes the
      * filter state for each layer.
-     * 
+     *
      * @see org.helioviewer.viewmodel.filter.Filter#getState
      * @param tab
      *            - String to be prepended to each line of the xml
@@ -1664,7 +1674,7 @@ public class LayersModel implements ViewListener {
     /**
      * Restore the JHV state from the given file. This will overwrite the
      * current JHV state without further notice!
-     * 
+     *
      * @param stateURL
      *            - URL to read the JHV state from
      */
@@ -1706,7 +1716,7 @@ public class LayersModel implements ViewListener {
          * Variable storing all information about the state currently being
          * parsed
          */
-        private FullState fullSetting = new FullState();
+        private final FullState fullSetting = new FullState();
 
         /**
          * Flag showing, if the parser should "copy" the raw XML data currently
@@ -1716,7 +1726,7 @@ public class LayersModel implements ViewListener {
 
         /**
          * Default Constructor
-         * 
+         *
          * @param xmlSource
          */
         public StateParser(InputSource xmlSource) {
@@ -1735,6 +1745,7 @@ public class LayersModel implements ViewListener {
         /**
          * {@inheritDoc}
          */
+        @Override
         public void characters(char ch[], int start, int length) throws SAXException {
             stringBuffer.append(new String(ch, start, length));
         }
@@ -1742,6 +1753,7 @@ public class LayersModel implements ViewListener {
         /**
          * {@inheritDoc}
          */
+        @Override
         public void startElement(String namespaceURI, String localName, String qualifiedName, Attributes atts) throws SAXException {
             String tagName = localName.toLowerCase();
 
@@ -1801,6 +1813,7 @@ public class LayersModel implements ViewListener {
         /**
          * {@inheritDoc}
          */
+        @Override
         public void endElement(String namespaceURI, String localName, String qualifiedName) throws SAXException {
             String tagName = localName.toLowerCase();
 
@@ -1844,7 +1857,7 @@ public class LayersModel implements ViewListener {
         /**
          * Find and Setup the Filter with the given name that is associated with
          * the given view and set it's state according to the given StateString
-         * 
+         *
          * @param view
          *            - View to which the filter in question can be associated
          *            with
@@ -1876,7 +1889,7 @@ public class LayersModel implements ViewListener {
         /**
          * Add a new Layer and initialize it according to the given LayerSetting
          * object, including filters
-         * 
+         *
          * @param layerSetting
          *            - LayerSetting describing the new layer to be set-up
          * @see LayerState
@@ -1971,7 +1984,7 @@ public class LayersModel implements ViewListener {
         /**
          * Finally setup the viewchain, filters, ... according to the internal
          * FullSetting representation
-         * 
+         *
          * @see FullState
          */
         public void setupLayers() {
@@ -2066,6 +2079,7 @@ public class LayersModel implements ViewListener {
             /**
              * {@inheritDoc}
              */
+            @Override
             public String toString() {
                 return "FilterSetting{ name: " + name + " state: " + stateString + "}";
             }
@@ -2104,6 +2118,7 @@ public class LayersModel implements ViewListener {
             /**
              * {@inheritDoc}
              */
+            @Override
             public String toString() {
                 return "LayerSetting{ id: " + id + ", URI: " + directURI + ", downloadURI: " + downloadURI + " FilterSettings: " + filterSettings + "}";
             }
@@ -2113,9 +2128,10 @@ public class LayersModel implements ViewListener {
              * <p>
              * {@inheritDoc}
              */
+            @Override
             public int compareTo(LayerState other) {
                 if (other != null) {
-                    LayerState otherLayerSetting = (LayerState) other;
+                    LayerState otherLayerSetting = other;
                     return new Integer(id).compareTo(otherLayerSetting.id);
                 } else {
                     return 0;
