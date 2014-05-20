@@ -1,8 +1,12 @@
 package org.helioviewer.gl3d.view;
 
+import java.util.Calendar;
+import java.util.GregorianCalendar;
+
 import javax.media.opengl.GL;
 
 import org.helioviewer.base.math.Vector2dDouble;
+import org.helioviewer.base.physics.Astronomy;
 import org.helioviewer.base.physics.Constants;
 import org.helioviewer.base.physics.DifferentialRotation;
 import org.helioviewer.gl3d.changeevent.ImageTextureRecapturedReason;
@@ -111,7 +115,9 @@ public class GL3DImageTextureView extends AbstractGL3DView implements GL3DView, 
             double yScale = (1. / region.getHeight());
 
             double deltat = jhvjpx.getImageData().getDateMillis() / 1000.0 - Constants.referenceDate;
-            double theta = 0.0;
+            Calendar cal = new GregorianCalendar();
+            cal.setTimeInMillis((long)deltat*1000);
+            double theta = Astronomy.getB0InRadians(cal);
             phi = DifferentialRotation.calculateRotationInRadians(0.0, deltat) % (Math.PI * 2.0);
             this.vertexShader.changeRect(xOffset, yOffset, xScale, yScale);
             this.vertexShader.changeTextureScale(jhvjpx.getImageData().getScaleX(), jhvjpx.getImageData().getScaleY());
