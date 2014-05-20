@@ -104,7 +104,7 @@ public class GL3DImageFragmentShaderProgram extends GLFragmentShaderProgram {
     protected void buildImpl(GLShaderBuilder shaderBuilder) {
         this.builder = shaderBuilder;
         try {
-            String program = "\tif(texcoord0.x<0.0||texcoord0.y<0.0||texcoord0.x>textureScaleThetaPhi.x||texcoord0.y>textureScaleThetaPhi.y){" + "\t\tOUT.color = float4(1.0,0.0,0.0,1.0);" + GLShaderBuilder.LINE_SEP + "\t}" + GLShaderBuilder.LINE_SEP;
+            String program = "\tif(texcoord0.x<0.0||texcoord0.y<0.0||texcoord0.x>textureScaleThetaPhi.x||texcoord0.y>textureScaleThetaPhi.y){" + "discard;" + GLShaderBuilder.LINE_SEP + "\t}" + GLShaderBuilder.LINE_SEP;
 
             //program += "\tOUT.color.a=1.;" + GLShaderBuilder.LINE_SEP;
             program += "\tfloat theta = textureScaleThetaPhi.z;" + GLShaderBuilder.LINE_SEP;
