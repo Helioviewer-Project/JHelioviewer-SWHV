@@ -117,7 +117,7 @@ public class GL3DImageTextureView extends AbstractGL3DView implements GL3DView, 
             double deltat = jhvjpx.getImageData().getDateMillis() / 1000.0 - Constants.referenceDate;
             Calendar cal = new GregorianCalendar();
             cal.setTimeInMillis((long)deltat*1000);
-            double theta = Astronomy.getB0InRadians(cal);
+            theta = Astronomy.getB0InRadians(cal);
             phi = DifferentialRotation.calculateRotationInRadians(0.0, deltat) % (Math.PI * 2.0);
             this.vertexShader.changeRect(xOffset, yOffset, xScale, yScale);
             this.vertexShader.changeTextureScale(jhvjpx.getImageData().getScaleX(), jhvjpx.getImageData().getScaleY());
@@ -169,6 +169,7 @@ public class GL3DImageTextureView extends AbstractGL3DView implements GL3DView, 
     }
 
     public double phi = 0.0;
+    public double theta = 0.0;
 
     @Override
     protected void setViewSpecificImplementation(View newView, ChangeEvent changeEvent) {

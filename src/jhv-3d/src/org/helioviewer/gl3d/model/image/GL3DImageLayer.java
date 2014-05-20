@@ -1,6 +1,5 @@
 package org.helioviewer.gl3d.model.image;
 
-import java.awt.Point;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -16,7 +15,6 @@ import org.helioviewer.gl3d.scenegraph.GL3DOrientedGroup;
 import org.helioviewer.gl3d.scenegraph.GL3DState;
 import org.helioviewer.gl3d.scenegraph.math.GL3DMat4d;
 import org.helioviewer.gl3d.scenegraph.math.GL3DVec3d;
-import org.helioviewer.gl3d.scenegraph.math.GL3DVec4d;
 import org.helioviewer.gl3d.scenegraph.rt.GL3DRay;
 import org.helioviewer.gl3d.scenegraph.rt.GL3DRayTracer;
 import org.helioviewer.gl3d.shader.GL3DImageFragmentShaderProgram;
@@ -43,7 +41,6 @@ import org.helioviewer.viewmodel.view.RegionView;
 public abstract class GL3DImageLayer extends GL3DOrientedGroup implements GL3DCameraListener {
     private static int nextLayerId = 0;
     private final int layerId;
-    private final GL3DVec4d direction = new GL3DVec4d(0, 0, 1, 0);
 
     public int getLayerId() {
         return layerId;
@@ -61,10 +58,6 @@ public abstract class GL3DImageLayer extends GL3DOrientedGroup implements GL3DCa
     protected GL3DNode accellerationShape;
 
     protected boolean doUpdateROI = true;
-
-    private final ArrayList<Point> points = new ArrayList<Point>();
-
-    private final double lastViewAngle = 0.0;
 
     protected GL gl;
     protected GL3DImageFragmentShaderProgram coronaFragmentShader = null;
@@ -186,32 +179,21 @@ public abstract class GL3DImageLayer extends GL3DOrientedGroup implements GL3DCa
         double maxPhysicalZ = -Double.MAX_VALUE;
 
         GL3DMat4d phiRotation = GL3DMat4d.rotation(this.imageTextureView.phi, new GL3DVec3d(0, 1, 0));
+        phiRotation.rotate(-this.imageTextureView.theta, new GL3DVec3d(0, 0, 1));
 
         for (GL3DRay ray : regionTestRays) {
             GL3DVec3d hitPoint = ray.getHitPoint();
             if (hitPoint != null) {
                 hitPoint = this.wmI.multiply(hitPoint);
-                // double coordx = (hitPoint.x -
-                // metaData.getPhysicalLowerLeft().getX())/metaData.getPhysicalImageWidth();
-                // double coordy = ((1-hitPoint.y) -
-                // metaData.getPhysicalLowerLeft().getY())/metaData.getPhysicalImageHeight();
-
                 double x = phiRotation.m[0] * hitPoint.x + phiRotation.m[4] * hitPoint.y + phiRotation.m[8] * hitPoint.z + phiRotation.m[12];
                 double y = phiRotation.m[1] * hitPoint.x + phiRotation.m[5] * hitPoint.y + phiRotation.m[9] * hitPoint.z + phiRotation.m[13];
                 double z = phiRotation.m[2] * hitPoint.x + phiRotation.m[6] * hitPoint.y + phiRotation.m[10] * hitPoint.z + phiRotation.m[14];
-
-                // coordx = (x -
-                // metaData.getPhysicalLowerLeft().getX())/metaData.getPhysicalImageWidth();
-                // coordy = ((1-y) -
-                // metaData.getPhysicalLowerLeft().getY())/metaData.getPhysicalImageHeight();
-
                 minPhysicalX = Math.min(minPhysicalX, x);
                 minPhysicalY = Math.min(minPhysicalY, y);
                 minPhysicalZ = Math.min(minPhysicalZ, z);
                 maxPhysicalX = Math.max(maxPhysicalX, x);
                 maxPhysicalY = Math.max(maxPhysicalY, y);
                 maxPhysicalZ = Math.max(maxPhysicalZ, z);
-                // Log.debug("GL3DImageLayer: Hitpoint: "+hitPoint+" - "+ray.isOnSun);
             }
         }
 
