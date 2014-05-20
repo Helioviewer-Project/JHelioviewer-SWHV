@@ -68,11 +68,8 @@ public class GL3DGrid extends GL3DGroup {
         this.wm = (this.m);
         state.buildInverseAndNormalMatrix();
         this.wmI = new GL3DMat4d(state.getMVInverse());
-        //this.wmN = new GL3DMat3d(state.normalMatrix);
         this.shapeUpdate(state);
-        //this.buildAABB();
         state.popMV();
-
     }
 
     @Override
