@@ -11,6 +11,7 @@ public class Displayer {
     private final ArrayList<RenderListener> renderListeners = new ArrayList<RenderListener>();
     private GL3DComponentFakeInterface gl3dcomponent;
     private final ExecutorService displayPool = Executors.newSingleThreadExecutor();
+    private boolean displaying=false;
 
     public void register(GL3DComponentFakeInterface gl3dcomponent) {
         this.gl3dcomponent = gl3dcomponent;
@@ -46,11 +47,16 @@ public class Displayer {
     }
 
     public void render() {
+        if(!displaying){
+        displaying=true;
         synchronized (renderListeners) {
             for (final RenderListener renderListener : renderListeners) {
                 renderListener.render();
             }
         }
+        displaying=false;
+        }
+
     }
 
     private void tdisplay() {
