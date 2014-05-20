@@ -6,12 +6,12 @@ import org.helioviewer.gl3d.scenegraph.rt.GL3DRay;
 /**
  * A {@link GL3DNode} is the base class for all nodes within the scene graph. It
  * defines the structure and basic attributes of every node.
- * 
+ *
  * @author Simon Spoerri (simon.spoerri@fhnw.ch)
- * 
+ *
  */
 public abstract class GL3DNode {
-    private String name;
+    private final String name;
 
     protected GL3DNode next;
     protected GL3DNode previous;
@@ -42,6 +42,7 @@ public abstract class GL3DNode {
 
     public abstract void delete(GL3DState state);
 
+    @Override
     public String toString() {
         return this.name;
     }
@@ -80,7 +81,7 @@ public abstract class GL3DNode {
     }
 
     public boolean isDrawBitOn(Bit bit) {
-        return this.drawBits.get(bit) || (this.parent != null && this.parent instanceof GL3DShape && ((GL3DShape) this.parent).isDrawBitOn(bit));
+        return this.drawBits.get(bit);// || (this.parent != null && this.parent instanceof GL3DShape && ((GL3DShape) this.parent).isDrawBitOn(bit));
     }
 
     public void clearDrawBit(Bit bit) {
