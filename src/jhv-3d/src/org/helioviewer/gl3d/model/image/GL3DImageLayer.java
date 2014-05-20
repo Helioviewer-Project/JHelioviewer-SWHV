@@ -1,6 +1,5 @@
 package org.helioviewer.gl3d.model.image;
 
-import java.awt.Graphics;
 import java.awt.Point;
 import java.util.ArrayList;
 import java.util.List;
@@ -145,11 +144,6 @@ public abstract class GL3DImageLayer extends GL3DOrientedGroup implements GL3DCa
             this.accellerationShape.markAsChanged();
     }
 
-    public void paint(Graphics g) {
-        for (Point p : points) {
-            g.fillRect(p.x - 1, p.y - 1, 2, 2);
-        }
-    }
 
     @Override
     public void cameraMoving(GL3DCamera camera) {
