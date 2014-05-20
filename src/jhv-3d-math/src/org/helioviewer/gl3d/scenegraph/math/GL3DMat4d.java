@@ -273,7 +273,26 @@ public class GL3DMat4d {
     }
 
     public GL3DMat4d transpose() {
-        return swap(1, 4).swap(2, 8).swap(6, 9).swap(3, 12).swap(7, 13).swap(11, 14);
+        double temp;
+        temp = m[1];
+        m[1] = m[4];
+        m[4] = temp;
+        temp = m[2];
+        m[2] = m[8];
+        m[8] = temp;
+        temp = m[6];
+        m[6] = m[9];
+        m[9] = temp;
+        temp = m[3];
+        m[3] = m[12];
+        m[12] = temp;
+        temp = m[7];
+        m[7] = m[13];
+        m[13] = temp;
+        temp = m[11];
+        m[11] = m[14];
+        m[14] = temp;
+        return this;
     }
 
     public GL3DMat4d swap(int i1, int i2) {
@@ -355,9 +374,9 @@ public class GL3DMat4d {
         // Quaterniond quat = new Quaterniond(degAng, axisx, axisy, axisz);
         // return buildRotationMatrix(quat);
         GL3DMat4d r = GL3DMat4d.identity();
-        double RadAng = (double) angle;
-        double ca = (double) Math.cos(RadAng);
-        double sa = (double) Math.sin(RadAng);
+        double RadAng = angle;
+        double ca = Math.cos(RadAng);
+        double sa = Math.sin(RadAng);
 
         if (axisx == 1 && axisy == 0 && axisz == 0) // about x-axis
         {
@@ -401,7 +420,7 @@ public class GL3DMat4d {
             y = axisy;
             z = axisz;
             if (len > 1.0001 || len < 0.9999 && len != 0) {
-                len = 1 / (double) Math.sqrt(len);
+                len = 1 / Math.sqrt(len);
                 x *= len;
                 y *= len;
                 z *= len;
@@ -428,7 +447,7 @@ public class GL3DMat4d {
     }
 
     public static GL3DMat4d perspective(double fov, double aspect, double n, double f) {
-        double t = (double) (Math.tan(Math.toRadians(fov * 0.5)) * n);
+        double t = Math.tan(Math.toRadians(fov * 0.5)) * n;
         double b = -t;
         double r = t * aspect;
         double l = -r;
@@ -451,6 +470,7 @@ public class GL3DMat4d {
         return new GL3DMat4d(this);
     }
 
+    @Override
     public String toString() {
         StringBuffer sb = new StringBuffer();
         String format = "%01.02f";
