@@ -170,51 +170,49 @@ public class SOHOLUTFilter extends AbstractFilter implements FrameFilter,Standar
     public void applyGL(GL gl) {
         shader.bind(gl);
         shader.activateLutTexture(gl);
-        if(this.changed){
-            LUT currlut;
-            // Note: The lookup table will always be power of two,
-            // so we won't get any problems here.
-            boolean b =(jp2View instanceof JHVJPXView);
-            JHVJPXView jpxView = (JHVJPXView)jp2View;
-            if ( b && jpxView.getDifferenceMode()) {
-                currlut = LUT.getStandardList().get("Gray");
-            }
-            else {
-                currlut = lut;
-            }
-            gl.glBindTexture(GL.GL_TEXTURE_1D, lookupTex);
-
-            if (lastLut != currlut || invertLUT != lastInverted) {
-                int[] intLUT;
-
-                if (invertLUT) {
-                    int[] sourceLUT = currlut.getLut8();
-                    intLUT = new int[sourceLUT.length];
-
-                    int offset = sourceLUT.length - 1;
-                    for (int i = 0; i < sourceLUT.length / 2; i++) {
-                        intLUT[i] = sourceLUT[offset - i];
-                        intLUT[offset - i] = sourceLUT[i];
-                    }
-                } else {
-                    intLUT = currlut.getLut8();
-                }
-
-                buffer = IntBuffer.wrap(intLUT);
-                lastLut = currlut;
-                lastInverted = invertLUT;
-            }
-            gl.glPixelStorei(GL.GL_UNPACK_SKIP_PIXELS, 0);
-            gl.glPixelStorei(GL.GL_UNPACK_SKIP_ROWS, 0);
-            gl.glPixelStorei(GL.GL_UNPACK_ROW_LENGTH, 0);
-            gl.glPixelStorei(GL.GL_UNPACK_ALIGNMENT, 4);
-
-            gl.glTexImage1D(GL.GL_TEXTURE_1D, 0, GL.GL_RGBA, buffer.limit(), 0, GL.GL_BGRA, GL.GL_UNSIGNED_INT_8_8_8_8_REV, buffer);
-            gl.glTexParameteri(GL.GL_TEXTURE_1D, GL.GL_TEXTURE_MIN_FILTER, GL.GL_NEAREST);
-            gl.glTexParameteri(GL.GL_TEXTURE_1D, GL.GL_TEXTURE_MAG_FILTER, GL.GL_NEAREST);
-            gl.glTexParameteri(GL.GL_TEXTURE_1D, GL.GL_TEXTURE_WRAP_S, GL.GL_CLAMP);
+        LUT currlut;
+        // Note: The lookup table will always be power of two,
+        // so we won't get any problems here.
+        boolean b =(jp2View instanceof JHVJPXView);
+        JHVJPXView jpxView = (JHVJPXView)jp2View;
+        if ( b && jpxView.getDifferenceMode()) {
+            currlut = LUT.getStandardList().get("Gray");
         }
-        this.changed = false;
+        else {
+            currlut = lut;
+        }
+        gl.glBindTexture(GL.GL_TEXTURE_1D, lookupTex);
+
+        if (lastLut != currlut || invertLUT != lastInverted) {
+            int[] intLUT;
+
+            if (invertLUT) {
+                int[] sourceLUT = currlut.getLut8();
+                intLUT = new int[sourceLUT.length];
+
+                int offset = sourceLUT.length - 1;
+                for (int i = 0; i < sourceLUT.length / 2; i++) {
+                    intLUT[i] = sourceLUT[offset - i];
+                    intLUT[offset - i] = sourceLUT[i];
+                }
+            } else {
+                intLUT = currlut.getLut8();
+            }
+
+            buffer = IntBuffer.wrap(intLUT);
+            lastLut = currlut;
+            lastInverted = invertLUT;
+        }
+        gl.glPixelStorei(GL.GL_UNPACK_SKIP_PIXELS, 0);
+        gl.glPixelStorei(GL.GL_UNPACK_SKIP_ROWS, 0);
+        gl.glPixelStorei(GL.GL_UNPACK_ROW_LENGTH, 0);
+        gl.glPixelStorei(GL.GL_UNPACK_ALIGNMENT, 4);
+
+        gl.glTexImage1D(GL.GL_TEXTURE_1D, 0, GL.GL_RGBA, buffer.limit(), 0, GL.GL_BGRA, GL.GL_UNSIGNED_INT_8_8_8_8_REV, buffer);
+        gl.glTexParameteri(GL.GL_TEXTURE_1D, GL.GL_TEXTURE_MIN_FILTER, GL.GL_NEAREST);
+        gl.glTexParameteri(GL.GL_TEXTURE_1D, GL.GL_TEXTURE_MAG_FILTER, GL.GL_NEAREST);
+        gl.glTexParameteri(GL.GL_TEXTURE_1D, GL.GL_TEXTURE_WRAP_S, GL.GL_CLAMP);
+
     }
 
     @Override
