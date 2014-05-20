@@ -1,10 +1,12 @@
 package org.helioviewer.jhv.gui.components;
 
+import java.awt.BasicStroke;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Graphics;
+import java.awt.Graphics2D;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
@@ -34,49 +36,49 @@ import javax.swing.plaf.basic.BasicSliderUI;
 
 import org.helioviewer.jhv.gui.ButtonCreator;
 import org.helioviewer.jhv.gui.IconBank;
+import org.helioviewer.jhv.gui.IconBank.JHVIcon;
 import org.helioviewer.jhv.gui.ImageViewerGui;
 import org.helioviewer.jhv.gui.ViewListenerDistributor;
-import org.helioviewer.jhv.gui.IconBank.JHVIcon;
 import org.helioviewer.jhv.layers.LayersListener;
 import org.helioviewer.jhv.layers.LayersModel;
 import org.helioviewer.viewmodel.changeevent.CacheStatusChangedReason;
 import org.helioviewer.viewmodel.changeevent.ChangeEvent;
 import org.helioviewer.viewmodel.changeevent.LayerChangedReason;
+import org.helioviewer.viewmodel.changeevent.LayerChangedReason.LayerChangeType;
 import org.helioviewer.viewmodel.changeevent.PlayStateChangedReason;
 import org.helioviewer.viewmodel.changeevent.SubImageDataChangedReason;
-import org.helioviewer.viewmodel.changeevent.LayerChangedReason.LayerChangeType;
 import org.helioviewer.viewmodel.metadata.ObserverMetaData;
 import org.helioviewer.viewmodel.view.CachedMovieView;
 import org.helioviewer.viewmodel.view.MetaDataView;
 import org.helioviewer.viewmodel.view.MovieView;
+import org.helioviewer.viewmodel.view.MovieView.AnimationMode;
 import org.helioviewer.viewmodel.view.TimedMovieView;
 import org.helioviewer.viewmodel.view.View;
 import org.helioviewer.viewmodel.view.ViewListener;
-import org.helioviewer.viewmodel.view.MovieView.AnimationMode;
 import org.helioviewer.viewmodel.view.jp2view.datetime.ImmutableDateTime;
 
 /**
  * Panel containing the movie controls.
- * 
+ *
  * <p>
  * This panel provides the capability to start and stop an movie, step to
  * certain frames and switch the movie speed as well as the movie mode.
- * 
+ *
  * <p>
  * Apart from that, this component is responsible for playing multiple movie
  * simultaneous. This is done by actual playing only one movie, the one with the
  * most frames per time. All other image series just jump to the frame being
  * closest to the current frame of the series currently playing. That way, it is
  * impossible that different series get asynchronous.
- * 
+ *
  * <p>
  * For further information about image series, see
  * {@link org.helioviewer.viewmodel.view.MovieView} and
  * {@link org.helioviewer.viewmodel.view.TimedMovieView}.
- * 
+ *
  * @author Markus Langenberg
  * @author Malte Nuhn
- * 
+ *
  */
 public class MoviePanel extends JPanel implements ActionListener, ChangeListener, MouseListener, MouseWheelListener, ViewListener {
 
@@ -85,37 +87,45 @@ public class MoviePanel extends JPanel implements ActionListener, ChangeListener
     // different animation speeds
     private enum SpeedUnit {
         FRAMESPERSECOND {
+            @Override
             public String toString() {
                 return "Frames/sec";
             }
 
+            @Override
             public int getSecondsPerSecond() {
                 return 0;
             }
         },
         MINUTESPERSECOND {
+            @Override
             public String toString() {
                 return "Solar minutes/sec";
             }
 
+            @Override
             public int getSecondsPerSecond() {
                 return 60;
             }
         },
         HOURSPERSECOND {
+            @Override
             public String toString() {
                 return "Solar hours/sec";
             }
 
+            @Override
             public int getSecondsPerSecond() {
                 return 3600;
             }
         },
         DAYSPERSECOND {
+            @Override
             public String toString() {
                 return "Solar days/sec";
             }
 
+            @Override
             public int getSecondsPerSecond() {
                 return 86400;
             }
@@ -131,21 +141,21 @@ public class MoviePanel extends JPanel implements ActionListener, ChangeListener
     // Status
     private static boolean isAdvanced = false;
     private boolean isPlaying = false;
-    private boolean isDragging = false;
+    private final boolean isDragging = false;
 
     // Gui elements
-    private TimeSlider timeSlider;
-    private JLabel frameNumberLabel;
-    private JButton previousFrameButton;
-    private JButton playPauseButton;
-    private JButton nextFrameButton;
-    private JButton advancedButton;
-    private JSpinner speedSpinner;
-    private JComboBox speedUnitComboBox;
-    private JComboBox animationModeComboBox;
+    private final TimeSlider timeSlider;
+    private final JLabel frameNumberLabel;
+    private final JButton previousFrameButton;
+    private final JButton playPauseButton;
+    private final JButton nextFrameButton;
+    private final JButton advancedButton;
+    private final JSpinner speedSpinner;
+    private final JComboBox speedUnitComboBox;
+    private final JComboBox animationModeComboBox;
 
-    private JPanel modePanel;
-    private JPanel speedPanel;
+    private final JPanel modePanel;
+    private final JPanel speedPanel;
 
     // References
     private MovieView view;
@@ -159,7 +169,7 @@ public class MoviePanel extends JPanel implements ActionListener, ChangeListener
 
     /**
      * Default constructor.
-     * 
+     *
      * @param movieView
      *            Associated movie view
      */
@@ -302,6 +312,7 @@ public class MoviePanel extends JPanel implements ActionListener, ChangeListener
      * Override the setEnabled method in order to keep the containing
      * components' enabledState synced with the enabledState of this component.
      */
+    @Override
     public void setEnabled(boolean enabled) {
         if (timedView == null)
             enabled = false;
@@ -327,7 +338,7 @@ public class MoviePanel extends JPanel implements ActionListener, ChangeListener
 
     /**
      * Returns the movie panel for the given view
-     * 
+     *
      * @return movie panel if available, else null
      */
     public static MoviePanel getMoviePanel(MovieView view) {
@@ -348,7 +359,7 @@ public class MoviePanel extends JPanel implements ActionListener, ChangeListener
 
     /**
      * Jumps to the specified frame
-     * 
+     *
      * @param frame
      *            the number of the frame
      */
@@ -362,7 +373,7 @@ public class MoviePanel extends JPanel implements ActionListener, ChangeListener
 
     /**
      * Returns the current frame number
-     * 
+     *
      * @return the current frame number
      */
     public int getCurrentFrameNumber() {
@@ -412,11 +423,11 @@ public class MoviePanel extends JPanel implements ActionListener, ChangeListener
 
     /**
      * Locks or unlocks the movie, Should only be called by LayersModel
-     * 
+     *
      * In future developments, the concept of linked movies might either be
      * dropped (when introducing a global timestamp/timeline) or be moved to
      * LayersModel
-     * 
+     *
      * @param link
      *            true, if it should be locked, else false
      */
@@ -431,6 +442,7 @@ public class MoviePanel extends JPanel implements ActionListener, ChangeListener
     /**
      * {@inheritDoc}
      */
+    @Override
     public void actionPerformed(ActionEvent e) {
 
         if (e.getSource() == advancedButton) {
@@ -485,6 +497,7 @@ public class MoviePanel extends JPanel implements ActionListener, ChangeListener
     }
 
     // This is needed for the CardLayout
+    @Override
     @SuppressWarnings("deprecation")
     public void show(boolean visible) {
         super.show(visible);
@@ -495,6 +508,7 @@ public class MoviePanel extends JPanel implements ActionListener, ChangeListener
     /**
      * {@inheritDoc}
      */
+    @Override
     public void stateChanged(javax.swing.event.ChangeEvent e) {
 
         // Jump to different frame
@@ -514,24 +528,28 @@ public class MoviePanel extends JPanel implements ActionListener, ChangeListener
     /**
      * {@inheritDoc}
      */
+    @Override
     public void mouseClicked(MouseEvent e) {
     }
 
     /**
      * {@inheritDoc}
      */
+    @Override
     public void mouseEntered(MouseEvent e) {
     }
 
     /**
      * {@inheritDoc}
      */
+    @Override
     public void mouseExited(MouseEvent e) {
     }
 
     /**
      * {@inheritDoc}
      */
+    @Override
     public void mousePressed(MouseEvent e) {
         linkedMovieManager.someoneIsDragging = true;
 
@@ -543,6 +561,7 @@ public class MoviePanel extends JPanel implements ActionListener, ChangeListener
     /**
      * {@inheritDoc}
      */
+    @Override
     public void mouseWheelMoved(MouseWheelEvent e) {
         if (isEnabled()) {
             if (e.getWheelRotation() < 0) {
@@ -556,6 +575,7 @@ public class MoviePanel extends JPanel implements ActionListener, ChangeListener
     /**
      * {@inheritDoc}
      */
+    @Override
     public void mouseReleased(MouseEvent e) {
         if (isPlaying) {
             view.playMovie();
@@ -564,6 +584,7 @@ public class MoviePanel extends JPanel implements ActionListener, ChangeListener
         linkedMovieManager.someoneIsDragging = false;
     }
 
+    @Override
     public void viewChanged(View sender, ChangeEvent aEvent) {
 
         // Stop movie, when the layer was removed.
@@ -628,7 +649,7 @@ public class MoviePanel extends JPanel implements ActionListener, ChangeListener
 
     /**
      * Abstract base class for all static movie actions.
-     * 
+     *
      * Static movie actions are supposed be integrated into {@link MenuBar},
      * also to provide shortcuts. They always refer to the active layer.
      */
@@ -638,7 +659,7 @@ public class MoviePanel extends JPanel implements ActionListener, ChangeListener
 
         /**
          * Default constructor.
-         * 
+         *
          * @param name
          *            name of the action that shall be displayed on a button
          * @param icon
@@ -653,24 +674,28 @@ public class MoviePanel extends JPanel implements ActionListener, ChangeListener
         /**
          * {@inheritDoc}
          */
+        @Override
         public void layerAdded(int idx) {
         }
 
         /**
          * {@inheritDoc}
          */
+        @Override
         public void layerRemoved(View oldView, int oldIdx) {
         }
 
         /**
          * {@inheritDoc}
          */
+        @Override
         public void layerChanged(int idx) {
         }
 
         /**
          * {@inheritDoc}
          */
+        @Override
         public void activeLayerChanged(int idx) {
             this.searchCorrespondingMoviePanel(LayersModel.getSingletonInstance().getLayer(idx));
         }
@@ -678,33 +703,37 @@ public class MoviePanel extends JPanel implements ActionListener, ChangeListener
         /**
          * {@inheritDoc}
          */
+        @Override
         public void viewportGeometryChanged() {
         }
 
         /**
          * {@inheritDoc}
          */
+        @Override
         public void subImageDataChanged() {
         }
 
         /**
          * {@inheritDoc}
          */
+        @Override
         public void timestampChanged(int idx) {
         }
 
         /**
          * {@inheritDoc}
          */
+        @Override
         public void layerDownloaded(int idx) {
         }
 
         /**
          * Searches the movie panel corresponding to the given view.
-         * 
+         *
          * All static movie actions are performed by accessing the movie panel
          * of the active and basically clicking on the corresponding button.
-         * 
+         *
          * @param view
          *            View to search panel for
          */
@@ -729,7 +758,7 @@ public class MoviePanel extends JPanel implements ActionListener, ChangeListener
 
     /**
      * Action to play or pause the active layer, if it is an image series.
-     * 
+     *
      * Static movie actions are supposed be integrated into {@link MenuBar},
      * also to provide shortcuts. They always refer to the active layer.
      */
@@ -748,6 +777,7 @@ public class MoviePanel extends JPanel implements ActionListener, ChangeListener
         /**
          * {@inheritDoc}
          */
+        @Override
         public void actionPerformed(ActionEvent e) {
             if (activePanel != null) {
                 activePanel.actionPerformed(new ActionEvent(activePanel.playPauseButton, 0, ""));
@@ -759,6 +789,7 @@ public class MoviePanel extends JPanel implements ActionListener, ChangeListener
         /**
          * {@inheritDoc}
          */
+        @Override
         public void activeLayerChanged(int idx) {
             super.activeLayerChanged(idx);
             if (activePanel != null && getValue(SMALL_ICON) != activePanel.playPauseButton.getIcon()) {
@@ -771,7 +802,7 @@ public class MoviePanel extends JPanel implements ActionListener, ChangeListener
     /**
      * Action to step to the previous frame for the active layer, if it is an
      * image series.
-     * 
+     *
      * Static movie actions are supposed be integrated into {@link MenuBar},
      * also to provide shortcuts. They always refer to the active layer.
      */
@@ -790,6 +821,7 @@ public class MoviePanel extends JPanel implements ActionListener, ChangeListener
         /**
          * {@inheritDoc}
          */
+        @Override
         public void actionPerformed(ActionEvent e) {
             if (activePanel != null) {
                 activePanel.actionPerformed(new ActionEvent(activePanel.previousFrameButton, 0, ""));
@@ -800,7 +832,7 @@ public class MoviePanel extends JPanel implements ActionListener, ChangeListener
     /**
      * Action to step to the next frame for the active layer, if it is an image
      * series.
-     * 
+     *
      * Static movie actions are supposed be integrated into {@link MenuBar},
      * also to provide shortcuts. They always refer to the active layer.
      */
@@ -819,6 +851,7 @@ public class MoviePanel extends JPanel implements ActionListener, ChangeListener
         /**
          * {@inheritDoc}
          */
+        @Override
         public void actionPerformed(ActionEvent e) {
             if (activePanel != null) {
                 activePanel.actionPerformed(new ActionEvent(activePanel.nextFrameButton, 0, ""));
@@ -828,20 +861,20 @@ public class MoviePanel extends JPanel implements ActionListener, ChangeListener
 
     /**
      * Class to synchronize linked image series.
-     * 
+     *
      * Synchronize the GUI elements as well as the actual movie.
      */
     private static class LinkedMovieManager {
 
-        private LinkedList<MoviePanel> linkedMovies = new LinkedList<MoviePanel>();
+        private final LinkedList<MoviePanel> linkedMovies = new LinkedList<MoviePanel>();
         public boolean someoneIsDragging = false;
 
         /**
          * Adds an image series to the set of series playing simultaneous.
-         * 
+         *
          * <p>
          * The master movie panel may change.
-         * 
+         *
          * @param newPanel
          *            Panel to add
          */
@@ -878,10 +911,10 @@ public class MoviePanel extends JPanel implements ActionListener, ChangeListener
 
         /**
          * Removes an image series from the set of series playing simultaneous.
-         * 
+         *
          * <p>
          * The master movie panel may change.
-         * 
+         *
          * @param panel
          *            Panel to remove
          */
@@ -893,7 +926,7 @@ public class MoviePanel extends JPanel implements ActionListener, ChangeListener
         /**
          * Copies the value from the speed spinner of the given panel to all
          * other linked panels.
-         * 
+         *
          * @param copyFrom
          *            Panel dominating the other ones right now
          */
@@ -906,7 +939,7 @@ public class MoviePanel extends JPanel implements ActionListener, ChangeListener
         /**
          * Copies the value from the speed unit combobox of the given panel to
          * all other linked panels.
-         * 
+         *
          * @param copyFrom
          *            Panel dominating the other ones right now
          */
@@ -919,7 +952,7 @@ public class MoviePanel extends JPanel implements ActionListener, ChangeListener
         /**
          * Copies the value from the animation mode combobox of the given panel
          * to all other linked panels.
-         * 
+         *
          * @param copyFrom
          *            Panel dominating the other ones right now
          */
@@ -933,7 +966,7 @@ public class MoviePanel extends JPanel implements ActionListener, ChangeListener
 
     /**
      * Extension of JSlider displaying the caching status on the track.
-     * 
+     *
      * This element provides its own look and feel. Therefore, it is independent
      * from the global look and feel.
      */
@@ -950,7 +983,7 @@ public class MoviePanel extends JPanel implements ActionListener, ChangeListener
 
         /**
          * Default constructor
-         * 
+         *
          * @param orientation
          *            specified orientation
          * @param min
@@ -968,15 +1001,16 @@ public class MoviePanel extends JPanel implements ActionListener, ChangeListener
         /**
          * Overrides updateUI, to keep own SliderUI.
          */
+        @Override
         public void updateUI() {
         }
 
         /**
          * Sets the frame number, to which partial information is loaded.
-         * 
+         *
          * Partial information means, that the image already can be shown, but
          * not yet in full quality.
-         * 
+         *
          * @param cachedUntil
          *            Frame number, to which partial information is loaded.
          */
@@ -987,10 +1021,10 @@ public class MoviePanel extends JPanel implements ActionListener, ChangeListener
 
         /**
          * Sets the frame number, to which complete information is loaded.
-         * 
+         *
          * Complete information means, that the image can be shown in full
          * quality.
-         * 
+         *
          * @param cachedUntil
          *            Frame number, to which complete information is loaded.
          */
@@ -1005,14 +1039,14 @@ public class MoviePanel extends JPanel implements ActionListener, ChangeListener
 
         /**
          * Extension of BasicSliderUI overriding some drawing functions.
-         * 
+         *
          * All functions for size calculations stay the same.
          */
         private class TimeSliderUI extends BasicSliderUI {
 
             /**
              * Default constructor.
-             * 
+             *
              * @param component
              *            the component where this UI delegate is being
              *            installed
@@ -1024,6 +1058,7 @@ public class MoviePanel extends JPanel implements ActionListener, ChangeListener
             /**
              * {@inheritDoc}
              */
+            @Override
             protected TrackListener createTrackListener(JSlider slider) {
                 return new TimeTrackListener();
             }
@@ -1031,6 +1066,7 @@ public class MoviePanel extends JPanel implements ActionListener, ChangeListener
             /**
              * {@inheritDoc}
              */
+            @Override
             protected void scrollDueToClickInTrack(int dir) {
                 setValue(this.valueForXPosition(((TimeTrackListener) trackListener).getCurrentX()));
             }
@@ -1038,6 +1074,7 @@ public class MoviePanel extends JPanel implements ActionListener, ChangeListener
             /**
              * {@inheritDoc}
              */
+            @Override
             public void paintThumb(Graphics g) {
                 g.setColor(Color.BLACK);
                 g.drawRect(thumbRect.x, thumbRect.y, thumbRect.width - 1, thumbRect.height - 1);
@@ -1048,10 +1085,11 @@ public class MoviePanel extends JPanel implements ActionListener, ChangeListener
 
             /**
              * {@inheritDoc}
-             * 
+             *
              * Draws the different region (no/partial/complete information
              * loaded) in different colors.
              */
+            @Override
             public void paintTrack(Graphics g) {
 
                 int height = getSize().height / 4;
@@ -1060,15 +1098,30 @@ public class MoviePanel extends JPanel implements ActionListener, ChangeListener
                 int partialCachedOffset = (int) ((float) (partialCachedUntil) / (getMaximum() - getMinimum()) * trackRect.width);
 
                 int completeCachedOffset = (int) ((float) (completeCachedUntil) / (getMaximum() - getMinimum()) * trackRect.width);
+                Graphics2D g2d = (Graphics2D)g;
+                g2d.setStroke(new BasicStroke(4));
 
-                g.setColor(notCachedColor);
-                g.fillRect(trackRect.x + partialCachedOffset, offset, trackRect.width - partialCachedOffset, height);
+                g2d.setColor(notCachedColor);
+                g2d.drawLine(trackRect.x + partialCachedOffset,
+                        offset+ getSize().height / 8,
+                        trackRect.x + trackRect.width - 0,
+                        offset+ getSize().height / 8);
 
-                g.setColor(partialCachedColor);
-                g.fillRect(trackRect.x + completeCachedOffset, offset, partialCachedOffset - completeCachedOffset, height);
+                //g.fillRect(trackRect.x + partialCachedOffset, offset , trackRect.x + partialCachedO, offset + getSize().height / 8);
 
-                g.setColor(completeCachedColor);
-                g.fillRect(trackRect.x, offset, completeCachedOffset, height);
+                g2d.setColor(partialCachedColor);
+                g2d.drawLine(trackRect.x + completeCachedOffset,
+                        offset+ getSize().height / 8,
+                        trackRect.x + partialCachedOffset,
+                        offset+ getSize().height / 8);
+                //g.fillRect(trackRect.x + completeCachedOffset, offset, partialCachedOffset - completeCachedOffset, height);
+
+                g2d.setColor(completeCachedColor);
+                g2d.drawLine(trackRect.x,
+                        offset+ getSize().height / 8,
+                        trackRect.x + completeCachedOffset,
+                        offset+ getSize().height / 8);
+                g2d.setStroke(new BasicStroke(1));
             }
 
             /**
