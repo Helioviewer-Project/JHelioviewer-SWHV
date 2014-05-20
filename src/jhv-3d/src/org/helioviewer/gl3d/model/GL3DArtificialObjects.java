@@ -42,14 +42,6 @@ public class GL3DArtificialObjects extends GL3DGroup {
 
     @Override
     public void shapeDraw(GL3DState state) {
-        // state.gl.glDisable(GL.GL_LIGHTING);
-        // state.gl.glEnable(GL.GL_BLEND);
-        // state.gl.glDisable(GL.GL_DEPTH_TEST);
-        // state.gl.glDepthMask(false);
         super.shapeDraw(state);
-        // state.gl.glDepthMask(true);
-        // state.gl.glEnable(GL.GL_LIGHTING);
-        // state.gl.glDisable(GL.GL_BLEND);
-        // state.gl.glEnable(GL.GL_DEPTH_TEST);
     }
 }
