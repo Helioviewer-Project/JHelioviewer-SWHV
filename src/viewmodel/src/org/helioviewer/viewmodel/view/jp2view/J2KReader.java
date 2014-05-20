@@ -245,8 +245,6 @@ class J2KReader implements Runnable {
             // Wait for signal
             try {
                 parentViewRef.readerSignal.waitForSignal();
-                Log.debug("Received signal.");
-
             } catch (InterruptedException e) {
                 continue;
             }
