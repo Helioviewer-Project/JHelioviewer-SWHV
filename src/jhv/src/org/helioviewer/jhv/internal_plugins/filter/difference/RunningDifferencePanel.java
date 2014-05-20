@@ -64,7 +64,7 @@ public class RunningDifferencePanel extends FilterPanel implements ChangeListene
         WheelSupport.installMouseWheelSupport(truncateSpinner);
         truncationLine.add(truncateSpinner);
         setEnabled(false);
-        truncationLine.setAlignmentX( Component.LEFT_ALIGNMENT );
+        truncationLine.setAlignmentY( Component.LEFT_ALIGNMENT );
         add(truncationLine);
         add(new JPanel());
     }
