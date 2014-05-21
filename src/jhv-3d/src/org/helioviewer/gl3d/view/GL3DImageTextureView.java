@@ -146,7 +146,8 @@ public class GL3DImageTextureView extends AbstractGL3DView implements GL3DView, 
                 double differenceXScale = (1./differenceRegion.getWidth());
                 double differenceYScale = (1./differenceRegion.getHeight());
                 double differenceDeltat = jhvjpx.getBaseDifferenceImageData().getDateMillis() / 1000.0 - Constants.referenceDate;
-                double differenceTheta = 0.0;
+                cal.setTimeInMillis((long)differenceDeltat*1000);
+                double differenceTheta = Astronomy.getB0InRadians(cal);
                 double differencePhi = DifferentialRotation.calculateRotationInRadians(0.0, differenceDeltat) % (Math.PI * 2.0);
                 this.vertexShader.changeDifferenceTextureScale(jhvjpx.getBaseDifferenceImageData().getScaleX(), jhvjpx.getBaseDifferenceImageData().getScaleY());
                 this.vertexShader.setDifferenceRect(differenceXOffset, differenceYOffset, differenceXScale, differenceYScale);
