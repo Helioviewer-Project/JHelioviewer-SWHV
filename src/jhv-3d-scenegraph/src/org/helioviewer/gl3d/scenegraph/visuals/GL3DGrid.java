@@ -1,5 +1,7 @@
 package org.helioviewer.gl3d.scenegraph.visuals;
 
+import java.awt.Color;
+
 import org.helioviewer.base.physics.Constants;
 import org.helioviewer.gl3d.scenegraph.GL3DDrawBits.Bit;
 import org.helioviewer.gl3d.scenegraph.GL3DGroup;
@@ -30,26 +32,41 @@ public class GL3DGrid extends GL3DGroup {
         GL3DSphere sphere = new GL3DSphere(Constants.SunRadius * 1.02, this.xticks, this.yticks, this.color);
         sphere.getDrawBits().on(Bit.Wireframe);
         this.addNode(sphere);
-        GL3DText rect;
         double letterSize = 0.05 * Constants.SunRadius;
         double size = Constants.SunRadius * 1.1;
         double zdist = Constants.SunRadius * 0.001;
 
+        int len = 2*(this.xticks-1) + this.yticks - 1;
+        double xPos [] = new double[len];
+        double yPos [] = new double[len];
+        double zPos [] = new double[len];
+        String str [] = new String[len];
+        int counter = 0;
         for (int i = 1; i < this.xticks; i++) {
             double angle = i * Math.PI / this.xticks;
-            String angleStringx = "" + (int) (90 - 1.0 * i / this.xticks * 180);
-            rect = new GL3DText(letterSize, letterSize, Math.sin(angle) * size, Math.cos(angle) * size, zdist, angleStringx, this.textColor);
-            this.addNode(rect);
-            String angleStringy = "" + (int) (90 - 1.0 * i / this.xticks * 180);
-            rect = new GL3DText(letterSize, letterSize, -Math.sin(angle) * size, Math.cos(angle) * size, zdist, angleStringy, this.textColor);
-            this.addNode(rect);
+            str[counter] =  "" + (int) (90 - 1.0 * i / this.xticks * 180);
+            xPos[counter] = Math.sin(angle) * size;
+            yPos[counter] = Math.cos(angle) * size;
+            zPos[counter] = zdist;
+            counter ++;
+
+            str[counter] =  "" + (int) (90 - 1.0 * i / this.xticks * 180);
+            xPos[counter] = -Math.sin(angle) * size;
+            yPos[counter] = Math.cos(angle) * size;
+            zPos[counter] = zdist;
+            counter ++;
         }
         for (int i = 1; i < this.yticks; i++) {
+            str[counter] =  "" + (int) (90 - 1.0 * i / (this.yticks / 2.0) * 180);
             double angle = i * Math.PI / (this.yticks / 2.0);
-            String angleString = "" + (int) (90 - 1.0 * i / (this.yticks / 2.0) * 180);
-            rect = new GL3DText(letterSize, letterSize, Math.cos(angle) * size, 0.0, Math.sin(angle) * size, angleString, this.textColor);
-            this.addNode(rect);
+            xPos[counter] = Math.cos(angle) * size;
+            yPos[counter] = 0.;
+            zPos[counter] = Math.sin(angle) * size;
+            counter ++;
         }
+        GL3DText txt = new GL3DText(letterSize, xPos, yPos, zPos, str, "Serif", new Color(1.f, 0.f, 0.f, 1.f));
+        this.addNode(txt);
+
     }
 
     private void reloadGrid() {
