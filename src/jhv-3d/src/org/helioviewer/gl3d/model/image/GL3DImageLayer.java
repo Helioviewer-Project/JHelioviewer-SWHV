@@ -165,9 +165,9 @@ public abstract class GL3DImageLayer extends GL3DOrientedGroup implements GL3DCa
 
         // frame.setVisible(true);
         // frame1.setVisible(true);
-        for (int i = 0; i <= 10; i++) {
-            for (int j = 0; j <= 10; j++) {
-                regionTestRays.add(rayTracer.cast(i * (width / 10), j * (height / 10)));
+        for (int i = 0; i <= 1; i++) {
+            for (int j = 0; j <= 1; j++) {
+                regionTestRays.add(rayTracer.cast(i * (width / 1), j * (height / 1)));
             }
         }
 
