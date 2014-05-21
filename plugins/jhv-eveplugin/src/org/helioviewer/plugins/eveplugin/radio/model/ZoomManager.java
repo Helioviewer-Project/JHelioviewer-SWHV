@@ -122,6 +122,26 @@ public class ZoomManager implements ZoomControllerListener, PlotAreaSpaceListene
     }
 
     /**
+     * Creates a drawable area map based on start and end date. The source will have the coordinates (0,0,0,0) and are meaningless,
+     * the destination coordinates are corresponding with the time interval and the taking the complete height of the plot area.
+     * 
+     * @param startDate         The start date of the interval
+     * @param endDate           The end date of the interval
+     * @param downloadID        The download id of the request
+     * @param plotIdentifier    The plot identifier of the request
+     * @return  Drawable area map with the correct coordinates
+     */
+    public DrawableAreaMap getDrawableAreaMap(Date startDate, Date endDate, long downloadID, String plotIdentifier) {
+        ZoomManagerData zmd = getZoomManagerData(plotIdentifier);
+        ZoomDataConfig zdc = zmd.getZoomDataConfigMap().get(downloadID);
+        int destX0 = defineXInDestinationArea(startDate, zdc);
+        int destY0 = 0;
+        int destX1 = defineXInDestinationArea(endDate, zdc);
+        int destY1 = zmd.getDisplaySize().height;
+        return new DrawableAreaMap(0, 0, 0, 0, destX0, destY0, destX1, destY1, downloadID);
+    }
+    
+    /**
      * Calculates the available space in the screen size for the requested time interval and frequency interval. The frequency 
      * gets the complete height, the time gets the portion of the width of the screen corresponding with the portion of the 
      * complete time interval it takes. 

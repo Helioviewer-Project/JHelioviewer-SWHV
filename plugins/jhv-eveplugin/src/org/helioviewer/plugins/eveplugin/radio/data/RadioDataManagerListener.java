@@ -7,6 +7,7 @@ import java.util.List;
 import org.helioviewer.base.math.Interval;
 
 public interface RadioDataManagerListener {
+    
     public abstract void downloadRequestAnswered(FrequencyInterval freqInterval, Interval<Date> timeInterval, long ID, String identifier);
 
     public abstract void additionDownloadRequestAnswered(Long downloadID);
@@ -32,4 +33,6 @@ public interface RadioDataManagerListener {
     public abstract void clearAllSavedImagesForID(Long downloadID, Long imageID, String plotIdentifier);
 
     public abstract void intervalTooBig(long iD, String identifier);
+    
+    public abstract void noDataInterval(List<Interval<Date>> noDataList, Long downloadID, String plotIdentifier);
 }

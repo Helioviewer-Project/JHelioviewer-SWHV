@@ -123,4 +123,10 @@ public class DataChecker implements RadioDataManagerListener {
 
     }
 
+    @Override
+    public void noDataInterval(List<Interval<Date>> noDataList, Long downloadID, String plotIdentifier) {
+        // TODO Auto-generated method stub
+        
+    }
+
 }

@@ -287,4 +287,10 @@ public class SendDataTestFrame extends JFrame implements RadioDataManagerListene
         // TODO Auto-generated method stub
 
     }
+
+    @Override
+    public void noDataInterval(List<Interval<Date>> noDataList, Long downloadID, String plotIdentifier) {
+        // TODO Auto-generated method stub
+        
+    }
 }
