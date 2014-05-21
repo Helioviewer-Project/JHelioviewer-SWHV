@@ -10,8 +10,8 @@ import java.awt.RenderingHints;
 import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
 import java.awt.image.DataBuffer;
-import java.awt.image.DataBufferByte;
-import java.nio.ByteBuffer;
+import java.awt.image.DataBufferInt;
+import java.nio.IntBuffer;
 import java.util.HashMap;
 
 import javax.media.opengl.GL;
@@ -21,6 +21,7 @@ import javax.swing.JLabel;
 
 import org.helioviewer.base.math.RectangleDouble;
 import org.helioviewer.viewmodel.view.opengl.GLTextureHelper;
+
 
 public class GL3DFont {
 
@@ -43,13 +44,18 @@ public class GL3DFont {
             GLTextureHelper th = new GLTextureHelper();
             texture_id = th.genTextureID(gl);
             DataBuffer rawBuffer = img.getRaster().getDataBuffer();
-            //IntBuffer buffer = IntBuffer.wrap(((DataBufferInt) rawBuffer).getData());
-            ByteBuffer buffer = ByteBuffer.wrap(((DataBufferByte) rawBuffer).getData());
+            IntBuffer buffer = IntBuffer.wrap(((DataBufferInt) rawBuffer).getData());
+            //ByteBuffer bbuffer = BufferUtil.copyIntBufferAsByteBuffer(buffer);
+            int [] bbuffer = buffer.array();
+            for(int i=0;i<bbuffer.length ; i++){
+                bbuffer[i] = Integer.MAX_VALUE - bbuffer[i];
+            }
+
             gl.glPixelStorei(GL.GL_UNPACK_SKIP_ROWS, 0);
             gl.glPixelStorei(GL.GL_UNPACK_ROW_LENGTH, 0);
             gl.glPixelStorei(GL.GL_UNPACK_ALIGNMENT, 4);
             gl.glBindTexture(GL.GL_TEXTURE_2D, texture_id);
-            gl.glTexImage2D(GL.GL_TEXTURE_2D, 0, GL.GL_RGBA, 256, 512, 0, GL.GL_ABGR_EXT, GL.GL_UNSIGNED_BYTE, buffer);
+            gl.glTexImage2D(GL.GL_TEXTURE_2D, 0, GL.GL_RGBA, 256, 512, 0, GL.GL_BGRA, GL.GL_UNSIGNED_INT_8_8_8_8_REV, buffer);
             gl.glTexParameteri(GL.GL_TEXTURE_2D, GL.GL_TEXTURE_MIN_FILTER, GL.GL_LINEAR);
             gl.glTexParameteri(GL.GL_TEXTURE_2D, GL.GL_TEXTURE_MAG_FILTER, GL.GL_NEAREST);
             gl.glTexParameteri(GL.GL_TEXTURE_2D, GL.GL_TEXTURE_WRAP_S, GL.GL_CLAMP);
@@ -57,8 +63,8 @@ public class GL3DFont {
             loadedFontsTextureId.put(font, texture_id);
         }
         texture_id = loadedFontsTextureId.get(font);
-        gl.glDisable(GL.GL_COLOR_MATERIAL);
-        //gl.glEnable(GL.GL_BLEND);
+        //gl.glDisable(GL.GL_COLOR_MATERIAL);
+        gl.glEnable(GL.GL_BLEND);
         gl.glBindTexture(GL.GL_TEXTURE_2D, texture_id);
         gl.glTexParameteri(GL.GL_TEXTURE_2D, GL.GL_TEXTURE_MAG_FILTER, GL.GL_LINEAR);
         gl.glTexParameteri(GL.GL_TEXTURE_2D, GL.GL_TEXTURE_MIN_FILTER, GL.GL_NEAREST);
@@ -75,12 +81,12 @@ public class GL3DFont {
     }
 
     private BufferedImage getFontBufferedImage(String font) {
-        BufferedImage img = new BufferedImage(256, 512, BufferedImage.TYPE_4BYTE_ABGR_PRE);
+        BufferedImage img = new BufferedImage(256, 512, BufferedImage.TYPE_INT_ARGB);
         Graphics2D g2d = (Graphics2D) img.getGraphics();
         //g2d.setPaintMode();
-        g2d.setColor(new Color(0.f,0.f,0.f,1.f));
+        g2d.setColor(new Color(0.f, 0.f, 0.f, 1.0f));
         g2d.fillRect(0, 0, 256, 512);
-        g2d.setColor(new Color(0.f,1.f,1.f,1.f));
+        g2d.setColor(new Color(1.f, 0.f, 0.f, 1.f));
 
         g2d.setRenderingHint(
                 RenderingHints.KEY_TEXT_ANTIALIASING,
