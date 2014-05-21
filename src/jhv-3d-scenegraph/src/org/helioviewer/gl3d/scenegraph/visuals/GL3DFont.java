@@ -62,7 +62,7 @@ public class GL3DFont {
         gl.glBindTexture(GL.GL_TEXTURE_2D, texture_id);
         gl.glTexParameteri(GL.GL_TEXTURE_2D, GL.GL_TEXTURE_MAG_FILTER, GL.GL_LINEAR);
         gl.glTexParameteri(GL.GL_TEXTURE_2D, GL.GL_TEXTURE_MIN_FILTER, GL.GL_NEAREST);
-        //gl.glEnable(GL.GL_COLOR_MATERIAL);
+        gl.glEnable(GL.GL_COLOR_MATERIAL);
 
     }
 
