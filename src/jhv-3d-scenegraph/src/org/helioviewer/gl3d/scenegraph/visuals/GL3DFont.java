@@ -57,16 +57,7 @@ public class GL3DFont {
             loadedFontsTextureId.put(font, texture_id);
         }
         texture_id = loadedFontsTextureId.get(font);
-<<<<<<< HEAD
 
-=======
-        //gl.glDisable(GL.GL_COLOR_MATERIAL);
-        gl.glEnable(GL.GL_BLEND);
-        gl.glPixelStorei(GL.GL_UNPACK_SKIP_PIXELS, 0);
-        gl.glPixelStorei(GL.GL_UNPACK_SKIP_ROWS, 0);
-        gl.glPixelStorei(GL.GL_UNPACK_ROW_LENGTH, 256);
-        gl.glPixelStorei(GL.GL_UNPACK_ALIGNMENT, 32 >> 3);
->>>>>>> Change interpolation for text, enable blending
         gl.glBindTexture(GL.GL_TEXTURE_2D, texture_id);
         gl.glTexParameteri(GL.GL_TEXTURE_2D, GL.GL_TEXTURE_WRAP_S, GL.GL_CLAMP);
         gl.glTexParameteri(GL.GL_TEXTURE_2D, GL.GL_TEXTURE_WRAP_T, GL.GL_CLAMP);
