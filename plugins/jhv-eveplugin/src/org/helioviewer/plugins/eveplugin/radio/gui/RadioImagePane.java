@@ -14,6 +14,7 @@ import org.helioviewer.plugins.eveplugin.draw.DrawableElement;
 import org.helioviewer.plugins.eveplugin.draw.DrawableElementType;
 import org.helioviewer.plugins.eveplugin.draw.YAxisElement;
 import org.helioviewer.plugins.eveplugin.radio.model.DrawableAreaMap;
+import org.helioviewer.plugins.eveplugin.radio.model.NoDataConfig;
 import org.helioviewer.plugins.eveplugin.radio.model.PlotConfig;
 import org.helioviewer.plugins.eveplugin.radio.model.RadioPlotModel;
 import org.helioviewer.plugins.eveplugin.radio.model.RadioPlotModelListener;
@@ -23,34 +24,27 @@ public class RadioImagePane implements ImageObserver, RadioPlotModelListener, Dr
     private YAxisElement yAxitElement;
     private boolean intervalTooBig;
     private String plotIdentifier;
+    private RadioPlotModel radioPlotModel;
 
     public RadioImagePane(String plotIdentifier) {
-        intervalTooBig = false;
+        this.intervalTooBig = false;
         this.plotIdentifier = plotIdentifier;
+        this.radioPlotModel = RadioPlotModel.getSingletonInstance();
     }
-
-    public void display(Graphics g) {
-        Collection<PlotConfig> configs = RadioPlotModel.getSingletonInstance().getPlotConfigurations(plotIdentifier);
-        for (PlotConfig pc : configs) {
-            pc.draw(g);
-        }
-    }
+    
     @Override
     public boolean imageUpdate(Image img, int infoflags, int x, int y, int width, int height) {
         return false;
     }
 
     @Override
-    public void drawBufferedImage(BufferedImage image, DrawableAreaMap map) {
-    }
+    public void drawBufferedImage(BufferedImage image, DrawableAreaMap map) {}
 
     @Override
-    public void changeVisibility(long iD) {
-    }
+    public void changeVisibility(long iD) {}
 
     @Override
-    public void removeDownloadRequestData(long iD) {
-    }
+    public void removeDownloadRequestData(long iD) {}
 
     @Override
     public DrawableElementType getDrawableElementType() {
@@ -61,7 +55,12 @@ public class RadioImagePane implements ImageObserver, RadioPlotModelListener, Dr
     public void draw(Graphics g, Rectangle graphArea) {
         Log.trace("redraw radio image pane for plot : " + plotIdentifier);
         if (!this.intervalTooBig) {
-            Collection<PlotConfig> configs = RadioPlotModel.getSingletonInstance().getPlotConfigurations(plotIdentifier);
+            Collection<NoDataConfig> noDataConfigs = radioPlotModel.getNoDataConfigurations(plotIdentifier);
+            Log.debug("Draw no data configs. Size: "+ noDataConfigs.size());
+            for(NoDataConfig ndc : noDataConfigs){
+                ndc.draw(g);
+            }
+            Collection<PlotConfig> configs = radioPlotModel.getPlotConfigurations(plotIdentifier);
             Log.trace("Number of plotconfigs: " + configs.size());
             for (PlotConfig pc : configs) {
                 pc.draw(g);

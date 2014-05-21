@@ -15,6 +15,7 @@ import org.helioviewer.base.math.Interval;
 import org.helioviewer.base.math.Vector2dDouble;
 import org.helioviewer.base.math.Vector2dInt;
 import org.helioviewer.plugins.eveplugin.EVEState;
+import org.helioviewer.plugins.eveplugin.radio.model.NoDataConfig;
 import org.helioviewer.plugins.eveplugin.radio.model.ResolutionSetting;
 import org.helioviewer.plugins.eveplugin.radio.model.ZoomManager;
 import org.helioviewer.plugins.eveplugin.settings.EVESettings;
@@ -99,6 +100,8 @@ public class RadioDataManager implements RadioDownloaderListener {
                         }
                     }
                     this.maxFrequencyInterval = new FrequencyInterval(localMinFrequency, localMaxFrequency);
+                } else {
+                    this.maxFrequencyInterval = new FrequencyInterval(0,0);
                 }
             }
         }
@@ -289,7 +292,7 @@ public class RadioDataManager implements RadioDownloaderListener {
 
     public void requestForData(Date xStart, Date xEnd, double yStart, double yEnd, double xRatio, double yRatio, List<Long> iDs, String plotIdentifier) {
         Long start = System.currentTimeMillis();
-        Log.trace("Request for data : " + id + " time " + start);
+        Log.debug("Request for data : " + id + " time " + start);
         if (!eveState.isMouseTimeIntervalDragging() && !eveState.isMouseValueIntervalDragging()) {
             Log.trace("mouse is not dragged");
             if (!requestBuffer.hasData()) {
@@ -442,7 +445,7 @@ public class RadioDataManager implements RadioDownloaderListener {
     }
 
     @Override
-    public void newJPXFilesDownloaded(List<DownloadedJPXData> jpxFiles, List<Interval<Date>> noDataList, Date requestedStartTime, Date requestedEndTime, Long downloadID, String plotIdentifier) {
+    public void newJPXFilesDownloaded(List<DownloadedJPXData> jpxFiles, Date requestedStartTime, Date requestedEndTime, Long downloadID, String plotIdentifier) {
         Log.trace("Init the download request data in radio data manager");
         synchronized (downloadRequestData) {
             SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
@@ -505,7 +508,6 @@ public class RadioDataManager implements RadioDownloaderListener {
             this.downloadRequestData.put(downloadID, drd);
             defineMaxBounds(downloadID);
             fireNewDataAvailable(drd, downloadID);
-            fireNoDataIntervalsReceived(noDataList, downloadID, plotIdentifier);
             fireDownloadRequestAnswered(maxFrequencyInterval, new Interval<Date>(requestedStartTime, requestedEndTime), downloadID, plotIdentifier);
         }
     }
@@ -601,6 +603,9 @@ public class RadioDataManager implements RadioDownloaderListener {
             l.noDataInterval(noDataList, downloadID, plotIdentifier);
         }
     }
-
-
+    
+    @Override
+    public void newNoData(List<Interval<Date>> noDataList, String identifier, long downloadID) {
+        fireNoDataIntervalsReceived(noDataList, downloadID, identifier);
+    }
 }
