@@ -76,16 +76,18 @@ public class RadioDownloader{
                                     cache.add(newJPXData);
                                 } else {
                                     Log.error("Received null view in request and open for date " + startDate + " and " + endDate);
-                                    noDataList.add(new Interval<Date>(startDate, calculateOneDayFurtherAsDate(startDate)));
+                                    if(cache.addNoDataInterval(new Interval<Date>(startDate, calculateOneDayFurtherAsDate(startDate)), identifier)) {
+                                        noDataList.add(new Interval<Date>(startDate, calculateOneDayFurtherAsDate(startDate)));
+                                    }                                    
                                 }
                                 startDate = calculateOneDayFurtherAsDate(startDate);
                             }
                             fireNewJPXDataAvailable(jpxList, identifier, requestedStartDate, endDate, downloadID);
                             if (!noDataList.isEmpty()){
-                                Log.debug("Data in no data in request and open : " + noDataList.size());
+                                Log.trace("Data in no data in request and open : " + noDataList.size());
                                 fireNoData(noDataList, identifier, downloadID);
                             }else{
-                                Log.debug("no data list is empty in request and open");
+                                Log.trace("no data list is empty in request and open");
                             }
                         } else {
 
@@ -103,7 +105,6 @@ public class RadioDownloader{
                 for (RadioDownloaderListener l : listeners) {
                     l.intervalTooBig(startDate, endDate, downloadID, identifier);
                 }
-
             }
         }.init(startDateString, endDateString, identifier), "LoadNewImage");
 
@@ -112,7 +113,6 @@ public class RadioDownloader{
     
     
     public void requestAndOpenIntervals(List<Interval<Date>> intervals, Long downloadId, String plotIdentifier, double ratioX, double ratioY) {
-        List<Interval<Date>> noDataList = new ArrayList<Interval<Date>>();
         for (Interval<Date> interval : intervals) {
             Log.debug("Request for data for interval " + interval.getStart() + " - " + interval.getEnd());
             Thread thread = new Thread(new Runnable() {
@@ -124,14 +124,14 @@ public class RadioDownloader{
                 private double ratioY;
                 private List<Interval<Date>> noDataList;
 
-                public Runnable init(String startTime, String endTime, String identifier, Long downloadID, double ratioX, double ratioY, List<Interval<Date>> noDataList) {
+                public Runnable init(String startTime, String endTime, String identifier, Long downloadID, double ratioX, double ratioY) {
                     this.startDataString = startTime;
                     this.endDateString = endTime;
                     this.identifier = identifier;
                     this.downloadID = downloadID;
                     this.ratioX = ratioX;
                     this.ratioY = ratioY;
-                    this.noDataList = noDataList;
+                    this.noDataList = new ArrayList<Interval<Date>>();
                     return this;
                 }
 
@@ -144,7 +144,6 @@ public class RadioDownloader{
                             endDate.setTime(endDate.getTime());
                             // case there were not more than three days
                             List<DownloadedJPXData> jpxList = new ArrayList<DownloadedJPXData>();
-                            List<Interval<Date>> noDataList = new ArrayList<Interval<Date>>();
                             while (startDate.before(endDate) || startDate.equals(endDate)) {
                                 boolean inRequestCache = true;
                                 synchronized (requestDateCache) {
@@ -163,7 +162,9 @@ public class RadioDownloader{
                                         cache.add(newJPXData);
                                     } else { 
                                         Log.error("Received null view in request intervals for date " + startDate + " and " + endDate);                                    
-                                        noDataList.add(new Interval<Date>(startDate, calculateOneDayFurtherAsDate(startDate)));
+                                        if(cache.addNoDataInterval(new Interval<Date>(startDate, calculateOneDayFurtherAsDate(startDate)), identifier)) {
+                                            noDataList.add(new Interval<Date>(startDate, calculateOneDayFurtherAsDate(startDate)));                
+                                        }
                                     }
                                 } else {
                                     if (inRequestCache) {
@@ -178,27 +179,34 @@ public class RadioDownloader{
                                 }
                                 startDate = calculateOneDayFurtherAsDate(startDate);
                             }
-                            if (!jpxList.isEmpty() || !noDataList.isEmpty()) {
+                            if (!jpxList.isEmpty()) {
                                 fireAdditionalJPXDataAvailable(jpxList, identifier, requestedStartDate, endDate, downloadID, ratioX, ratioY);
+                            }
+                            if (!noDataList.isEmpty()) {
+                                Log.trace("Size of noDataList in request intervals: "+ noDataList.size());
+                                fireNoData(noDataList, identifier, downloadID);
+                            } else {
+                                Log.trace("noDataList was empty");
                             }
                         } else {
 
-                        }
-                        if (!noDataList.isEmpty()) {
-                            Log.debug("Size of noDataList : "+ noDataList.size());
-                            fireNoData(noDataList, identifier, downloadID);
-                        } else {
-                            Log.debug("noDataList was empty");
-                        }
+                        }                        
                     } catch (IOException e) {
                         Log.error("An error occured while opening the remote file!", e);
                         Message.err("An error occured while opening the remote file!", e.getMessage(), false);
                     }
                 }
 
-            }.init(createDateString(interval.getStart()), createDateString(interval.getEnd()), plotIdentifier, downloadId, ratioX, ratioY, noDataList), "LoadNewImage");
+            }.init(createDateString(interval.getStart()), createDateString(interval.getEnd()), plotIdentifier, downloadId, ratioX, ratioY), "LoadNewImage"+(Math.round(Math.random()*10000)));
 
-            thread.start();            
+            thread.start();
+            /*try {
+                thread.join();
+            } catch (InterruptedException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            }*/
+            
             
         }
     }

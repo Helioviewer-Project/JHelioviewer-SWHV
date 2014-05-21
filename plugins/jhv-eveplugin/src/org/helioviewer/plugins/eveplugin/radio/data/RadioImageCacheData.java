@@ -4,16 +4,20 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.helioviewer.base.math.Interval;
+
 public class RadioImageCacheData {
 
     private Map<Long, DownloadedJPXData> dataCache;
     private Map<Long, Long> useCache;
     private Map<Date, DownloadedJPXData> startDates;
+    private Map<Date, Interval<Date>> noDataCache;
 
     public RadioImageCacheData() {
         this.dataCache = new HashMap<Long, DownloadedJPXData>();
         this.useCache = new HashMap<Long, Long>();
         this.startDates = new HashMap<Date, DownloadedJPXData>();
+        this.noDataCache = new HashMap<Date, Interval<Date>>();
     }
 
     public Map<Long, DownloadedJPXData> getDataCache() {
@@ -40,4 +44,11 @@ public class RadioImageCacheData {
         this.startDates = startDates;
     }
 
+    public Map<Date, Interval<Date>> getNoDataCache() {
+        return noDataCache;
+    }
+
+    public void setNoDataCache(Map<Date, Interval<Date>> noDataCache) {
+        this.noDataCache = noDataCache;
+    }    
 }

@@ -5,6 +5,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
 import org.helioviewer.base.logging.Log;
 import org.helioviewer.base.math.Interval;
 
@@ -38,15 +39,11 @@ public class RadioImageCache {
     public void add(DownloadedJPXData jpxData) {
         Log.trace("Try to add data in cache");
         synchronized (instance) {
-            RadioImageCacheData data = new RadioImageCacheData();
-            if (radioImageCacheData.containsKey(jpxData.getPlotIdentifier())) {
-                data = radioImageCacheData.get(jpxData.getPlotIdentifier());
-            } else {
-                radioImageCacheData.put(jpxData.getPlotIdentifier(), data);
-            }
+            RadioImageCacheData data = getRadioImageCache(jpxData.getPlotIdentifier());
             data.getDataCache().put(jpxData.getImageID(), jpxData);
             data.getUseCache().put(jpxData.getImageID(), 0L);
             data.getStartDates().put(jpxData.getStartDate(), jpxData);
+            data.getNoDataCache().remove(jpxData.getStartDate());
         }
     }
 
@@ -58,7 +55,6 @@ public class RadioImageCache {
         synchronized (instance) {
             if (radioImageCacheData.containsKey(plotIdentifier)) {
                 RadioImageCacheData cacheData = radioImageCacheData.get(plotIdentifier);
-
                 DownloadedJPXData data = cacheData.getDataCache().get(ID);
                 cacheData.getDataCache().remove(ID);
                 cacheData.getUseCache().remove(ID);
@@ -88,6 +84,7 @@ public class RadioImageCache {
             List<Interval<Date>> intervalList = new ArrayList<Interval<Date>>();
             List<DownloadedJPXData> dataList = new ArrayList<DownloadedJPXData>();
             List<Long> toRemove = new ArrayList<Long>(cacheData.getDataCache().keySet());
+            List<Interval<Date>> noDataInterval = new ArrayList<Interval<Date>>();
             while (localStart.before(end) || localStart.equals(end)) {
                 if (!cacheData.getStartDates().containsKey(localStart)) {
                     intervalList.add(new Interval<Date>(localStart, new Date(localStart.getTime() + stepsize)));
@@ -95,9 +92,12 @@ public class RadioImageCache {
                     dataList.add(cacheData.getStartDates().get(localStart));
                     toRemove.remove(cacheData.getStartDates().get(localStart).getImageID());
                 }
+                if(cacheData.getNoDataCache().containsKey(localStart)){
+                    noDataInterval.add(cacheData.getNoDataCache().get(localStart));
+                }
                 localStart = new Date(localStart.getTime() + stepsize);
             }
-            return new RadioImageCacheResult(dataList, intervalList, new ArrayList<Long>(toRemove));
+            return new RadioImageCacheResult(dataList, intervalList, new ArrayList<Long>(toRemove),noDataInterval);
         } else {
             Date localStart = findStartDate(start, stepsize);
             List<Interval<Date>> intervalList = new ArrayList<Interval<Date>>();
@@ -107,7 +107,7 @@ public class RadioImageCache {
                 intervalList.add(new Interval<Date>(localStart, new Date(localStart.getTime() + stepsize)));
                 localStart = new Date(localStart.getTime() + stepsize);
             }
-            return new RadioImageCacheResult(dataList, intervalList, new ArrayList<Long>(toRemove));
+            return new RadioImageCacheResult(dataList, intervalList, new ArrayList<Long>(toRemove), new ArrayList<Interval<Date>>());
         }
     }
 
@@ -119,4 +119,28 @@ public class RadioImageCache {
             return false;
         }
     }
+    
+    public boolean addNoDataInterval(Interval<Date> interval, String plotIdentifier){
+        synchronized (instance) {       
+            RadioImageCacheData data = getRadioImageCache(plotIdentifier);
+            boolean added = data.getNoDataCache().containsKey(interval.getStart());
+            data.getNoDataCache().put(interval.getStart(), interval);
+            Log.trace("Added : " + !added + ". Size of noDataCache : "+ data.getNoDataCache().size());
+            return !added;
+        }
+    }
+    
+    
+    
+    private RadioImageCacheData getRadioImageCache(String plotIdentifier){
+        RadioImageCacheData data = new RadioImageCacheData();
+        if (radioImageCacheData.containsKey(plotIdentifier)) {
+            data = radioImageCacheData.get(plotIdentifier);
+        } else {
+            radioImageCacheData.put(plotIdentifier, data);
+        }
+        return data;
+    }
+    
+    
 }
