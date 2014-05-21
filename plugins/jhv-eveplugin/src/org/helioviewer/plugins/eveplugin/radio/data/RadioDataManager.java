@@ -442,7 +442,7 @@ public class RadioDataManager implements RadioDownloaderListener {
     }
 
     @Override
-    public void newJPXFilesDownloaded(List<DownloadedJPXData> jpxFiles, Date requestedStartTime, Date requestedEndTime, Long downloadID, String plotIdentifier) {
+    public void newJPXFilesDownloaded(List<DownloadedJPXData> jpxFiles, List<Interval<Date>> noDataList, Date requestedStartTime, Date requestedEndTime, Long downloadID, String plotIdentifier) {
         Log.trace("Init the download request data in radio data manager");
         synchronized (downloadRequestData) {
             SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
@@ -505,6 +505,7 @@ public class RadioDataManager implements RadioDownloaderListener {
             this.downloadRequestData.put(downloadID, drd);
             defineMaxBounds(downloadID);
             fireNewDataAvailable(drd, downloadID);
+            fireNoDataIntervalsReceived(noDataList, downloadID, plotIdentifier);
             fireDownloadRequestAnswered(maxFrequencyInterval, new Interval<Date>(requestedStartTime, requestedEndTime), downloadID, plotIdentifier);
         }
     }
@@ -594,4 +595,12 @@ public class RadioDataManager implements RadioDownloaderListener {
             l.additionDownloadRequestAnswered(downloadID);
         }
     }
+    
+    private void fireNoDataIntervalsReceived(List<Interval<Date>> noDataList, Long downloadID, String plotIdentifier) {
+        for(RadioDataManagerListener l : listeners){
+            l.noDataInterval(noDataList, downloadID, plotIdentifier);
+        }
+    }
+
+
 }
