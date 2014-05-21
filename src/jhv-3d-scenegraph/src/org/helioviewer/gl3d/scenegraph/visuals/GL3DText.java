@@ -56,7 +56,7 @@ public class GL3DText extends GL3DMesh {
     @Override
     public void shapeDraw(GL3DState state) {
         GL gl = state.gl;
-        gl.glLightfv(GL.GL_LIGHT0, GL.GL_AMBIENT, new float[] { 1.f, 1.f, 1.f }, 0);
+        gl.glLightfv(GL.GL_LIGHT0, GL.GL_AMBIENT, new float[] { 1.f, 1.f, 1.f, 1.f }, 0);
 
         if (!initiated) {
             GLTextureHelper th = new GLTextureHelper();
