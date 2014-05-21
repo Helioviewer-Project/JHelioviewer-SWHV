@@ -57,12 +57,21 @@ public class GL3DFont {
             loadedFontsTextureId.put(font, texture_id);
         }
         texture_id = loadedFontsTextureId.get(font);
+<<<<<<< HEAD
 
+=======
+        //gl.glDisable(GL.GL_COLOR_MATERIAL);
+        gl.glEnable(GL.GL_BLEND);
+        gl.glPixelStorei(GL.GL_UNPACK_SKIP_PIXELS, 0);
+        gl.glPixelStorei(GL.GL_UNPACK_SKIP_ROWS, 0);
+        gl.glPixelStorei(GL.GL_UNPACK_ROW_LENGTH, 256);
+        gl.glPixelStorei(GL.GL_UNPACK_ALIGNMENT, 32 >> 3);
+>>>>>>> Change interpolation for text, enable blending
         gl.glBindTexture(GL.GL_TEXTURE_2D, texture_id);
         gl.glTexParameteri(GL.GL_TEXTURE_2D, GL.GL_TEXTURE_WRAP_S, GL.GL_CLAMP);
         gl.glTexParameteri(GL.GL_TEXTURE_2D, GL.GL_TEXTURE_WRAP_T, GL.GL_CLAMP);
         gl.glTexParameteri(GL.GL_TEXTURE_2D, GL.GL_TEXTURE_MAG_FILTER, GL.GL_LINEAR);
-        gl.glTexParameteri(GL.GL_TEXTURE_2D, GL.GL_TEXTURE_MIN_FILTER, GL.GL_NEAREST);
+        gl.glTexParameteri(GL.GL_TEXTURE_2D, GL.GL_TEXTURE_MIN_FILTER, GL.GL_LINEAR);
         //gl.glEnable(GL.GL_COLOR_MATERIAL);
 
     }
@@ -79,13 +88,13 @@ public class GL3DFont {
         BufferedImage img = new BufferedImage(256, 512, BufferedImage.TYPE_INT_ARGB);
         Graphics2D g2d = (Graphics2D) img.getGraphics();
         //g2d.setPaintMode();
-        g2d.setColor(new Color(0.f, 0.f, 0.f, 1.0f));
+        g2d.setColor(new Color(0.f, 0.f, 0.f, 0.0f));
         g2d.fillRect(0, 0, 256, 512);
-        g2d.setColor(new Color(1.f, 0.f, 0.f, 1.f));
+        g2d.setColor(new Color(1.f, 1.f, 1.f, 0.5f));
 
         g2d.setRenderingHint(
                 RenderingHints.KEY_TEXT_ANTIALIASING,
-                RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
+                RenderingHints.VALUE_TEXT_ANTIALIAS_LCD_HRGB);
         g2d.setFont(new Font(font, Font.PLAIN, fontSize));
         RectangleDouble[] rects= new RectangleDouble[256];
         FontMetrics fm = g2d.getFontMetrics();
