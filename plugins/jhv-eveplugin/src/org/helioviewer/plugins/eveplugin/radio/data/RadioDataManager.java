@@ -15,7 +15,6 @@ import org.helioviewer.base.math.Interval;
 import org.helioviewer.base.math.Vector2dDouble;
 import org.helioviewer.base.math.Vector2dInt;
 import org.helioviewer.plugins.eveplugin.EVEState;
-import org.helioviewer.plugins.eveplugin.radio.model.NoDataConfig;
 import org.helioviewer.plugins.eveplugin.radio.model.ResolutionSetting;
 import org.helioviewer.plugins.eveplugin.radio.model.ZoomManager;
 import org.helioviewer.plugins.eveplugin.settings.EVESettings;
@@ -292,7 +291,7 @@ public class RadioDataManager implements RadioDownloaderListener {
 
     public void requestForData(Date xStart, Date xEnd, double yStart, double yEnd, double xRatio, double yRatio, List<Long> iDs, String plotIdentifier) {
         Long start = System.currentTimeMillis();
-        Log.debug("Request for data : " + id + " time " + start);
+        Log.trace("Request for data : " + id + " time " + start);
         if (!eveState.isMouseTimeIntervalDragging() && !eveState.isMouseValueIntervalDragging()) {
             Log.trace("mouse is not dragged");
             if (!requestBuffer.hasData()) {
@@ -606,6 +605,8 @@ public class RadioDataManager implements RadioDownloaderListener {
     
     @Override
     public void newNoData(List<Interval<Date>> noDataList, String identifier, long downloadID) {
-        fireNoDataIntervalsReceived(noDataList, downloadID, identifier);
+        if(!eveState.isMouseTimeIntervalDragging() && !eveState.isMouseValueIntervalDragging()){
+            fireNoDataIntervalsReceived(noDataList, downloadID, identifier);
+        }
     }
 }

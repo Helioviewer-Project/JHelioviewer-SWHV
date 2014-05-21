@@ -10,12 +10,14 @@ public class RadioImageCacheResult {
     private List<DownloadedJPXData> availableData;
     private List<Interval<Date>> missingInterval;
     private List<Long> toRemove;
+    private List<Interval<Date>> noDataInterval;
 
-    public RadioImageCacheResult(List<DownloadedJPXData> availableData, List<Interval<Date>> missingInterval, List<Long> toRemove) {
+    public RadioImageCacheResult(List<DownloadedJPXData> availableData, List<Interval<Date>> missingInterval, List<Long> toRemove, List<Interval<Date>> noDataInterval) {
         super();
         this.availableData = availableData;
         this.missingInterval = missingInterval;
         this.toRemove = toRemove;
+        this.noDataInterval = noDataInterval;
     }
 
     public RadioImageCacheResult() {
@@ -47,4 +49,12 @@ public class RadioImageCacheResult {
     public void setToRemove(List<Long> toRemove) {
         this.toRemove = toRemove;
     }
+
+    public List<Interval<Date>> getNoDataInterval() {
+        return noDataInterval;
+    }
+
+    public void setNoDataInterval(List<Interval<Date>> noDataInterval) {
+        this.noDataInterval = noDataInterval;
+    }   
 }

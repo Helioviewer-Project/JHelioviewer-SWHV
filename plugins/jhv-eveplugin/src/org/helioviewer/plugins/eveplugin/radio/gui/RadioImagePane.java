@@ -56,7 +56,7 @@ public class RadioImagePane implements ImageObserver, RadioPlotModelListener, Dr
         Log.trace("redraw radio image pane for plot : " + plotIdentifier);
         if (!this.intervalTooBig) {
             Collection<NoDataConfig> noDataConfigs = radioPlotModel.getNoDataConfigurations(plotIdentifier);
-            Log.debug("Draw no data configs. Size: "+ noDataConfigs.size());
+            Log.trace("Draw no data configs. Size: "+ noDataConfigs.size());
             for(NoDataConfig ndc : noDataConfigs){
                 ndc.draw(g);
             }

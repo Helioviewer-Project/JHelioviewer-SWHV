@@ -123,7 +123,7 @@ public class NoDataConfig {
      */
     public void draw(Graphics g){
         if(visible) {
-            Log.debug("Visible and drawable area map : " + drawableAreaMap.toString());
+            Log.trace("Visible and drawable area map : " + drawableAreaMap.toString());
             int spaceWidth = drawableAreaMap.getDestinationX1()-drawableAreaMap.getDestinationX0();
             int spaceHeight = drawableAreaMap.getDestinationY1()-drawableAreaMap.getDestinationY0();
             g.setColor(new Color(247,62,62));
