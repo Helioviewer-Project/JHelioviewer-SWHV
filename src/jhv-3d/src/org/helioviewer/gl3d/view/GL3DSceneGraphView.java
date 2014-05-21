@@ -332,10 +332,10 @@ public class GL3DSceneGraphView extends AbstractGL3DView implements GL3DView {
         GL3DGroup root = new GL3DGroup("Scene Root");
 
         artificialObjects = new GL3DArtificialObjects();
-        root.addNode(artificialObjects);
 
         this.imageLayers = new GL3DImageLayers();
         root.addNode(this.imageLayers);
+        root.addNode(artificialObjects);
 
         // this.overlayPlugins = new GL3DOverlayPlugins();
         // root.addNode(this.overlayPlugins);
