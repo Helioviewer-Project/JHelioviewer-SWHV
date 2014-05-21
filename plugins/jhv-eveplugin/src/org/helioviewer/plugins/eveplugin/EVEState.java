@@ -54,7 +54,7 @@ public class EVEState {
      * @param mouseDragging True is the mouse is dragged, false if the mouse is not dragged.
      */
     public void setMouseTimeIntervalDragging(boolean mouseDragging) {
-        Log.info("State set on "+mouseDragging+" by: ");
+        Log.trace("State set on "+mouseDragging+" by: ");
         this.mouseTimeIntervalDragging = mouseDragging;
     }
 

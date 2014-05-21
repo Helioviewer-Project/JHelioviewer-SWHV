@@ -146,7 +146,7 @@ public class ZoomDataConfig implements ZoomManagerListener, PlotAreaSpaceListene
     @Override
     public void plotAreaSpaceChanged(double scaledMinValue, double scaledMaxValue, double scaledMinTime, double scaledMaxTime, double scaledSelectedMinValue, double scaledSelectedMaxValue, double scaledSelectedMinTime, double scaledSelectedMaxTime) {
         synchronized (this) {
-            Log.info("Plot area space changed");
+            Log.trace("Plot area space changed");
             double ratioAvailable = (this.maxY - this.minY) / (scaledMaxValue - scaledMinValue);
             this.selectedMinY = this.minY + (scaledSelectedMinValue - scaledMinValue) * ratioAvailable;
             this.selectedMaxY = this.minY + (scaledSelectedMaxValue - scaledMinValue) * ratioAvailable;
