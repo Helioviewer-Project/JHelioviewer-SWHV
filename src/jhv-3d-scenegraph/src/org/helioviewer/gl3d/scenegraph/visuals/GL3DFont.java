@@ -1,6 +1,7 @@
 package org.helioviewer.gl3d.scenegraph.visuals;
 
 import java.awt.Color;
+import java.awt.FlowLayout;
 import java.awt.Font;
 import java.awt.FontMetrics;
 import java.awt.Graphics2D;
@@ -8,9 +9,15 @@ import java.awt.GraphicsEnvironment;
 import java.awt.RenderingHints;
 import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
+import java.awt.image.DataBuffer;
+import java.awt.image.DataBufferByte;
+import java.nio.ByteBuffer;
 import java.util.HashMap;
 
 import javax.media.opengl.GL;
+import javax.swing.ImageIcon;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
 
 import org.helioviewer.base.math.RectangleDouble;
 import org.helioviewer.viewmodel.view.opengl.GLTextureHelper;
@@ -32,15 +39,31 @@ public class GL3DFont {
         int texture_id;
         if (!loadedFontsTextureId.containsKey(font)) {
             BufferedImage img = getFontBufferedImage(font);
+
             GLTextureHelper th = new GLTextureHelper();
             texture_id = th.genTextureID(gl);
-            th.moveBufferedImageToGLTexture(gl, img, texture_id);
+            DataBuffer rawBuffer = img.getRaster().getDataBuffer();
+            //IntBuffer buffer = IntBuffer.wrap(((DataBufferInt) rawBuffer).getData());
+            ByteBuffer buffer = ByteBuffer.wrap(((DataBufferByte) rawBuffer).getData());
+            gl.glPixelStorei(GL.GL_UNPACK_SKIP_ROWS, 0);
+            gl.glPixelStorei(GL.GL_UNPACK_ROW_LENGTH, 0);
+            gl.glPixelStorei(GL.GL_UNPACK_ALIGNMENT, 4);
+            gl.glBindTexture(GL.GL_TEXTURE_2D, texture_id);
+            gl.glTexImage2D(GL.GL_TEXTURE_2D, 0, GL.GL_RGBA, 256, 512, 0, GL.GL_ABGR_EXT, GL.GL_UNSIGNED_BYTE, buffer);
+            gl.glTexParameteri(GL.GL_TEXTURE_2D, GL.GL_TEXTURE_MIN_FILTER, GL.GL_LINEAR);
+            gl.glTexParameteri(GL.GL_TEXTURE_2D, GL.GL_TEXTURE_MAG_FILTER, GL.GL_NEAREST);
+            gl.glTexParameteri(GL.GL_TEXTURE_2D, GL.GL_TEXTURE_WRAP_S, GL.GL_CLAMP);
+            gl.glTexParameteri(GL.GL_TEXTURE_2D, GL.GL_TEXTURE_WRAP_T, GL.GL_CLAMP);
             loadedFontsTextureId.put(font, texture_id);
         }
         texture_id = loadedFontsTextureId.get(font);
+        gl.glDisable(GL.GL_COLOR_MATERIAL);
+        //gl.glEnable(GL.GL_BLEND);
         gl.glBindTexture(GL.GL_TEXTURE_2D, texture_id);
         gl.glTexParameteri(GL.GL_TEXTURE_2D, GL.GL_TEXTURE_MAG_FILTER, GL.GL_LINEAR);
         gl.glTexParameteri(GL.GL_TEXTURE_2D, GL.GL_TEXTURE_MIN_FILTER, GL.GL_NEAREST);
+        //gl.glEnable(GL.GL_COLOR_MATERIAL);
+
     }
 
     public RectangleDouble[] getCharacters(String fontName){
@@ -53,12 +76,15 @@ public class GL3DFont {
 
     private BufferedImage getFontBufferedImage(String font) {
         BufferedImage img = new BufferedImage(256, 512, BufferedImage.TYPE_4BYTE_ABGR_PRE);
-        Graphics2D g2d = img.createGraphics();
-        g2d.setPaint(Color.blue);
-        //g2d.clearRect(0, 0, 256, 512);
+        Graphics2D g2d = (Graphics2D) img.getGraphics();
+        //g2d.setPaintMode();
+        g2d.setColor(new Color(0.f,0.f,0.f,1.f));
+        g2d.fillRect(0, 0, 256, 512);
+        g2d.setColor(new Color(0.f,1.f,1.f,1.f));
+
         g2d.setRenderingHint(
                 RenderingHints.KEY_TEXT_ANTIALIASING,
-                RenderingHints.VALUE_TEXT_ANTIALIAS_GASP);
+                RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
         g2d.setFont(new Font(font, Font.PLAIN, fontSize));
         RectangleDouble[] rects= new RectangleDouble[256];
         FontMetrics fm = g2d.getFontMetrics();
@@ -120,6 +146,13 @@ public class GL3DFont {
         {
           System.out.println(fonts[i]);
         }
+        JFrame frame = new JFrame();
+        frame.getContentPane().setLayout(new FlowLayout());
+
+        BufferedImage img = GL3DFont.getSingletonInstance().getFontBufferedImage("Monospace");
+        frame.getContentPane().add(new JLabel(new ImageIcon(img)));
+        frame.pack();
+        frame.setVisible(true);
       }
 
 
