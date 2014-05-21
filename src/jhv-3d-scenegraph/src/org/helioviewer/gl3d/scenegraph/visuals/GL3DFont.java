@@ -43,33 +43,24 @@ public class GL3DFont {
 
             GLTextureHelper th = new GLTextureHelper();
             texture_id = th.genTextureID(gl);
+
             DataBuffer rawBuffer = img.getRaster().getDataBuffer();
             IntBuffer buffer = IntBuffer.wrap(((DataBufferInt) rawBuffer).getData());
-            //ByteBuffer bbuffer = BufferUtil.copyIntBufferAsByteBuffer(buffer);
-            int [] bbuffer = buffer.array();
-            for(int i=0;i<bbuffer.length ; i++){
-                bbuffer[i] = Integer.MAX_VALUE - bbuffer[i];
-            }
 
-            gl.glPixelStorei(GL.GL_UNPACK_SKIP_ROWS, 0);
-            gl.glPixelStorei(GL.GL_UNPACK_ROW_LENGTH, 0);
-            gl.glPixelStorei(GL.GL_UNPACK_ALIGNMENT, 4);
+            gl.glTexEnvi(GL.GL_TEXTURE_ENV, GL.GL_TEXTURE_ENV_MODE, GL.GL_REPLACE);
+
             gl.glBindTexture(GL.GL_TEXTURE_2D, texture_id);
             gl.glTexImage2D(GL.GL_TEXTURE_2D, 0, GL.GL_RGBA, 256, 512, 0, GL.GL_BGRA, GL.GL_UNSIGNED_INT_8_8_8_8_REV, buffer);
-            gl.glTexParameteri(GL.GL_TEXTURE_2D, GL.GL_TEXTURE_MIN_FILTER, GL.GL_LINEAR);
-            gl.glTexParameteri(GL.GL_TEXTURE_2D, GL.GL_TEXTURE_MAG_FILTER, GL.GL_NEAREST);
-            gl.glTexParameteri(GL.GL_TEXTURE_2D, GL.GL_TEXTURE_WRAP_S, GL.GL_CLAMP);
-            gl.glTexParameteri(GL.GL_TEXTURE_2D, GL.GL_TEXTURE_WRAP_T, GL.GL_CLAMP);
+
             loadedFontsTextureId.put(font, texture_id);
         }
         texture_id = loadedFontsTextureId.get(font);
-        //gl.glDisable(GL.GL_COLOR_MATERIAL);
-        gl.glEnable(GL.GL_BLEND);
+
         gl.glBindTexture(GL.GL_TEXTURE_2D, texture_id);
+        gl.glTexParameteri(GL.GL_TEXTURE_2D, GL.GL_TEXTURE_WRAP_S, GL.GL_CLAMP);
+        gl.glTexParameteri(GL.GL_TEXTURE_2D, GL.GL_TEXTURE_WRAP_T, GL.GL_CLAMP);
         gl.glTexParameteri(GL.GL_TEXTURE_2D, GL.GL_TEXTURE_MAG_FILTER, GL.GL_LINEAR);
         gl.glTexParameteri(GL.GL_TEXTURE_2D, GL.GL_TEXTURE_MIN_FILTER, GL.GL_NEAREST);
-        gl.glEnable(GL.GL_COLOR_MATERIAL);
-
     }
 
     public RectangleDouble[] getCharacters(String fontName){
