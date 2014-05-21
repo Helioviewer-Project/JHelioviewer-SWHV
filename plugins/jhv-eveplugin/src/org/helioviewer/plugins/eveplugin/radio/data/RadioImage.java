@@ -45,7 +45,7 @@ public class RadioImage {
      * @return  Rectangle with the size of the latest received data for this RadioImage
      */
     public Rectangle getLastDataSize() {
-        Log.info("get last data size for image id : " + radioImageID);
+        Log.trace("get last data size for image id : " + radioImageID);
         return lastDataSize;
     }
 
@@ -55,7 +55,7 @@ public class RadioImage {
      * @param lastDataSize The size of the last data download
      */
     public void setLastDataSize(Rectangle lastDataSize) {
-        Log.info("Set last data size for image id : " + radioImageID);
+        Log.trace("Set last data size for image id : " + radioImageID);
         this.lastDataSize = lastDataSize;
     }
 
@@ -171,21 +171,21 @@ public class RadioImage {
      * @param visibleYEnd       The end frequency of the visible interval
      */
     public void setVisibleIntervals(Date visibleXStart, Date visibleXEnd, int visibleYStart, int visibleYEnd){
-        Log.info("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@");
-        Log.info("Image interval : ");
-        Log.info("Start x : " + imageTimeInterval.getStart() + " in milliseconds : " +  imageTimeInterval.getStart().getTime());
-        Log.info("End x : " + imageTimeInterval.getEnd() + " in milliseconds : " +  imageTimeInterval.getEnd().getTime());
-        Log.info("Requested interval : ");
-        Log.info("Start x : " + visibleXStart + " in milliseconds : " + visibleXStart.getTime());
-        Log.info("End x : " + visibleXEnd + " in milliseconds : " + visibleXEnd.getTime());
+        Log.trace("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@");
+        Log.trace("Image interval : ");
+        Log.trace("Start x : " + imageTimeInterval.getStart() + " in milliseconds : " +  imageTimeInterval.getStart().getTime());
+        Log.trace("End x : " + imageTimeInterval.getEnd() + " in milliseconds : " +  imageTimeInterval.getEnd().getTime());
+        Log.trace("Requested interval : ");
+        Log.trace("Start x : " + visibleXStart + " in milliseconds : " + visibleXStart.getTime());
+        Log.trace("End x : " + visibleXEnd + " in milliseconds : " + visibleXEnd.getTime());
         if(imageTimeInterval.containsPointInclusive(visibleXStart) || imageTimeInterval.containsPointInclusive(visibleXEnd)){
             //the case the requested interval lies completely or partially in the image interval 
             Date tempStartX = new Date(imageTimeInterval.squeeze(visibleXStart).getTime());
             Date tempEndX = new Date(imageTimeInterval.squeeze(visibleXEnd).getTime());
             this.visibleImageTimeInterval = new Interval<Date>(tempStartX,tempEndX);
-            Log.info("Resulting visible time interval start : "+ visibleImageTimeInterval.getStart() + " in milliseconds : " + visibleImageTimeInterval.getStart().getTime());
-            Log.info("Resulting visible time interval end : "+ visibleImageTimeInterval.getEnd() + " in milliseconds : " + visibleImageTimeInterval.getEnd().getTime());
-            Log.info("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@");
+            Log.trace("Resulting visible time interval start : "+ visibleImageTimeInterval.getStart() + " in milliseconds : " + visibleImageTimeInterval.getStart().getTime());
+            Log.trace("Resulting visible time interval end : "+ visibleImageTimeInterval.getEnd() + " in milliseconds : " + visibleImageTimeInterval.getEnd().getTime());
+            Log.trace("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@");
         }else{
             Interval<Date> tempInterval = new Interval<Date>(visibleXStart, visibleXEnd);
             if(tempInterval.containsPointInclusive(imageTimeInterval.getStart()) || tempInterval.containsPointInclusive(imageTimeInterval.getEnd())){
@@ -193,14 +193,14 @@ public class RadioImage {
                 Date tempStartX = new Date(tempInterval.squeeze(imageTimeInterval.getStart()).getTime());
                 Date tempEndX = new Date(tempInterval.squeeze(imageTimeInterval.getEnd()).getTime());
                 this.visibleImageTimeInterval = new Interval<Date>(tempStartX,tempEndX);
-                Log.info("Resulting visible time interval start : "+ visibleImageTimeInterval.getStart() + " in milliseconds : " + visibleImageTimeInterval.getStart().getTime());
-                Log.info("Resulting visible time interval end : "+ visibleImageTimeInterval.getEnd() + " in milliseconds : " + visibleImageTimeInterval.getEnd().getTime());
-                Log.info("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@");
+                Log.trace("Resulting visible time interval start : "+ visibleImageTimeInterval.getStart() + " in milliseconds : " + visibleImageTimeInterval.getStart().getTime());
+                Log.trace("Resulting visible time interval end : "+ visibleImageTimeInterval.getEnd() + " in milliseconds : " + visibleImageTimeInterval.getEnd().getTime());
+                Log.trace("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@");
             }else{
                 //Other cases: image completely outside the requested interval
                 this.visibleImageTimeInterval = null;
-                Log.info("No resulting visible.");
-                Log.info("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@");
+                Log.trace("No resulting visible.");
+                Log.trace("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@");
             }
             
         }

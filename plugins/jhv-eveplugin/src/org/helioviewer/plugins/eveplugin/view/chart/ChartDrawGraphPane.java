@@ -137,14 +137,14 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
         for (DrawableType dt : drawTypeList) {
             List<DrawableElement> del = drawableElements.get(dt);
             if (del != null) {
-                Log.info("Drawable element list is not null. Size is " + del.size());
+                Log.trace("Drawable element list is not null. Size is " + del.size());
                 synchronized (del) {
                     for (DrawableElement de : del) {
                         de.draw(g, plotArea);
                     }
                 }
             } else {
-                Log.info("Drawable element list is null");
+                Log.trace("Drawable element list is null");
             }
         }
     }

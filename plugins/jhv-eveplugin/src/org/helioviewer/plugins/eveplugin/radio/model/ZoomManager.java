@@ -81,7 +81,7 @@ public class ZoomManager implements ZoomControllerListener, PlotAreaSpaceListene
                     config = new ZoomDataConfig(freqInterval.getStart(), freqInterval.getEnd(), currentInterval.getStart(), currentInterval.getStart(), null, ID, identifier);
                 }
                 plotAreaSpaceManager.getPlotAreaSpace(identifier).addPlotAreaSpaceListener(config);
-                Log.info("PlotAreaSpaceListener added");
+                Log.trace("PlotAreaSpaceListener added");
                 zmd.addToZoomDataConfigMap(ID, config);
                 config.addListener(zoomDataConfigListener);
             }
@@ -149,7 +149,7 @@ public class ZoomManager implements ZoomControllerListener, PlotAreaSpaceListene
                int width = (int)Math.round((endDate.getTime() - startDate.getTime())*ratio);
                return new Rectangle(width,height);
             }else{
-                Log.info("The requested start date, end date fall outside the current interval, " +
+                Log.trace("The requested start date, end date fall outside the current interval, " +
                         "or the start frequency or end frequency fall outside the minimum or maximum frequency.\n " +
                         "Start date : " + startDate + " in milliseconds : "+ startDate.getTime() +"\n" +
                         "End date : "+endDate + " in milliseconds : "+ endDate.getTime() +"\n" + 
