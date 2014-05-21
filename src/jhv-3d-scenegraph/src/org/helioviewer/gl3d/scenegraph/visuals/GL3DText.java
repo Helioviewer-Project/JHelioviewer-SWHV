@@ -42,7 +42,7 @@ public class GL3DText extends GL3DMesh {
         this.y0 = y0;
         this.z0 = z0;
         this.text = text;
-        this.font = "Monospaced";
+        this.font = "Serif";
         this.textColor = textColor;
     }
 
@@ -56,8 +56,12 @@ public class GL3DText extends GL3DMesh {
     @Override
     public void shapeDraw(GL3DState state) {
         GL gl = state.gl;
-        gl.glLightfv(GL.GL_LIGHT0, GL.GL_AMBIENT, new float[] { 1.f, 1.f, 1.f, 1.f }, 0);
+        gl.glDisable ( GL.GL_COLOR_MATERIAL ) ;
+        gl.glDisable(GL.GL_LIGHT0);
 
+        //gl.glLightfv(GL.GL_LIGHT0, GL.GL_AMBIENT, new float[] { 1.f, 1.f, 1.f, 1.f }, 0);
+        gl.glDisable(GL.GL_LIGHTING);
+        gl.glDisable(GL.GL_BLEND);
         if (!initiated) {
             GLTextureHelper th = new GLTextureHelper();
             this.texture_id = th.genTextureID(gl);
@@ -66,20 +70,35 @@ public class GL3DText extends GL3DMesh {
         GL3DFont.getSingletonInstance().loadFont(this.font, gl);
 
         super.shapeDraw(state);
+        gl.glEnable(GL.GL_LIGHT0);
+
     }
 
     @Override
     public GL3DMeshPrimitive createMesh(GL3DState state, List<GL3DVec3d> positions, List<GL3DVec3d> normals, List<GL3DVec2d> textCoords, List<Integer> indices, List<GL3DVec4d> colors) {
         RectangleDouble[] characters = GL3DFont.getSingletonInstance().getCharacters(this.font);
-        double xStart = -this.width * this.text.length() / 2.0;
+        double fontHeight = characters[0].getHeight();
+        double totalWidth = 0;
+        for(int i=0; i<this.text.length();i++){
+            int ch = (this.text.charAt(i));
+            RectangleDouble rect =characters[ch];
+            double width = rect.getWidth();
+            totalWidth += width;
+        }
+        double scaledTotalWidth = totalWidth * this.height/fontHeight;
+        double xStart = -scaledTotalWidth / 2.0;
         double yStart = -this.height / 2.0;
+
+        double adaptedScaledTotalWidth =0;
         for (int i = 0; i < this.text.length(); i++) {
             int ch = (this.text.charAt(i));
             RectangleDouble rect =characters[ch];
-            positions.add(new GL3DVec3d( x0 + xStart +  this.width * i    , y0 - yStart , z0));
-            positions.add(new GL3DVec3d( x0 + xStart +  this.width * i    , y0 + yStart , z0));
-            positions.add(new GL3DVec3d( x0 + xStart +  this.width * (i+1), y0 + yStart , z0));
-            positions.add(new GL3DVec3d( x0 + xStart +  this.width * (i+1), y0 - yStart , z0));
+            positions.add(new GL3DVec3d( x0 + xStart +  adaptedScaledTotalWidth, y0 - yStart , z0));
+            positions.add(new GL3DVec3d( x0 + xStart +  adaptedScaledTotalWidth, y0 + yStart , z0));
+            adaptedScaledTotalWidth += 1.* characters[ch].getWidth() * this.height / characters[ch].getHeight();
+            System.out.println(ch +" " +adaptedScaledTotalWidth);
+            positions.add(new GL3DVec3d( x0 + xStart +  adaptedScaledTotalWidth, y0 + yStart , z0));
+            positions.add(new GL3DVec3d( x0 + xStart +  adaptedScaledTotalWidth, y0 - yStart , z0));
 
             textCoords.add(new GL3DVec2d(rect.getX(), rect.getY() - rect.getHeight()));
             textCoords.add(new GL3DVec2d(rect.getX(), rect.getY()));
@@ -98,6 +117,7 @@ public class GL3DText extends GL3DMesh {
             indices.add(startIndexThisRow + 3);
             indices.add(startIndexThisRow);
         }
+        System.out.println("END");
         return GL3DMeshPrimitive.TRIANGLES;
 
     }

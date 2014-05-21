@@ -46,8 +46,10 @@ public class GL3DFont {
 
             DataBuffer rawBuffer = img.getRaster().getDataBuffer();
             IntBuffer buffer = IntBuffer.wrap(((DataBufferInt) rawBuffer).getData());
-
-            gl.glTexEnvi(GL.GL_TEXTURE_ENV, GL.GL_TEXTURE_ENV_MODE, GL.GL_REPLACE);
+            gl.glPixelStorei(GL.GL_UNPACK_SKIP_PIXELS, 0);
+            gl.glPixelStorei(GL.GL_UNPACK_SKIP_ROWS, 0);
+            gl.glPixelStorei(GL.GL_UNPACK_ROW_LENGTH, 256);
+            gl.glPixelStorei(GL.GL_UNPACK_ALIGNMENT, 32 >> 3);
 
             gl.glBindTexture(GL.GL_TEXTURE_2D, texture_id);
             gl.glTexImage2D(GL.GL_TEXTURE_2D, 0, GL.GL_RGBA, 256, 512, 0, GL.GL_BGRA, GL.GL_UNSIGNED_INT_8_8_8_8_REV, buffer);
@@ -61,6 +63,8 @@ public class GL3DFont {
         gl.glTexParameteri(GL.GL_TEXTURE_2D, GL.GL_TEXTURE_WRAP_T, GL.GL_CLAMP);
         gl.glTexParameteri(GL.GL_TEXTURE_2D, GL.GL_TEXTURE_MAG_FILTER, GL.GL_LINEAR);
         gl.glTexParameteri(GL.GL_TEXTURE_2D, GL.GL_TEXTURE_MIN_FILTER, GL.GL_NEAREST);
+        //gl.glEnable(GL.GL_COLOR_MATERIAL);
+
     }
 
     public RectangleDouble[] getCharacters(String fontName){
