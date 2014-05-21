@@ -108,7 +108,7 @@ public class GL3DImageVertexShaderProgram extends GLVertexShaderProgram {
             program += "\toutput.y *= textureScaleThetaPhi.y;" + GLShaderBuilder.LINE_SEP;
             //Difference Image
 
-            program += "\tfloat differencetheta = -diffTextureScaleThetaPhi.z;" + GLShaderBuilder.LINE_SEP;
+            program += "\tfloat differencetheta = -textureScaleThetaPhi.z;" + GLShaderBuilder.LINE_SEP;
             program += "\tfloat differencephi = -diffTextureScaleThetaPhi.w;" + GLShaderBuilder.LINE_SEP;
 
             program += "\txrot = physicalPosition.x*cos(differencephi) - physicalPosition.z*sin(differencephi);" + GLShaderBuilder.LINE_SEP;
