@@ -37,34 +37,26 @@ public class GL3DGrid extends GL3DGroup {
         double zdist = Constants.SunRadius * 0.001;
 
         int len = 2*(this.xticks-1) + this.yticks - 1;
-        double xPos [] = new double[len];
-        double yPos [] = new double[len];
-        double zPos [] = new double[len];
+        GL3DVec3d [] positions3D = new GL3DVec3d [len];
         String str [] = new String[len];
         int counter = 0;
         for (int i = 1; i < this.xticks; i++) {
             double angle = i * Math.PI / this.xticks;
             str[counter] =  "" + (int) (90 - 1.0 * i / this.xticks * 180);
-            xPos[counter] = Math.sin(angle) * size;
-            yPos[counter] = Math.cos(angle) * size;
-            zPos[counter] = zdist;
+            positions3D[counter] = new GL3DVec3d(Math.sin(angle) * size, Math.cos(angle) * size, zdist);
             counter ++;
 
             str[counter] =  "" + (int) (90 - 1.0 * i / this.xticks * 180);
-            xPos[counter] = -Math.sin(angle) * size;
-            yPos[counter] = Math.cos(angle) * size;
-            zPos[counter] = zdist;
+            positions3D[counter] = new GL3DVec3d(-Math.sin(angle) * size, Math.cos(angle) * size, zdist);
             counter ++;
         }
         for (int i = 1; i < this.yticks; i++) {
             str[counter] =  "" + (int) (90 - 1.0 * i / (this.yticks / 2.0) * 180);
             double angle = i * Math.PI / (this.yticks / 2.0);
-            xPos[counter] = Math.cos(angle) * size;
-            yPos[counter] = 0.;
-            zPos[counter] = Math.sin(angle) * size;
+            positions3D[counter] = new GL3DVec3d(Math.cos(angle) * size, 0., Math.sin(angle) * size);
             counter ++;
         }
-        GL3DText txt = new GL3DText(letterSize, xPos, yPos, zPos, str, "Serif", new Color(1.f, 0.f, 0.f, 1.f), new Color(0.f, 0.f, 0.f, 0.f));
+        GL3DText txt = new GL3DText(letterSize, positions3D, str, "Serif", new Color(1.f, 0.f, 0.f, 1.f), new Color(0.f, 0.f, 0.f, 0.f));
         this.addNode(txt);
 
     }
