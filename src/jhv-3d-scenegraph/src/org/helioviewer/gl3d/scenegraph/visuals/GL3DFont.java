@@ -33,40 +33,42 @@ public class GL3DFont {
         return instance;
     }
 
-    public void loadFont(String font, GL gl) {
+    public void updateFont(String font, GL gl, Color textColor, Color backGroundColor) {
         int texture_id;
+        GLTextureHelper th = new GLTextureHelper();
         if (!loadedFontsTextureId.containsKey(font)) {
-            BufferedImage img = getFontBufferedImage(font);
-
-            GLTextureHelper th = new GLTextureHelper();
             texture_id = th.genTextureID(gl);
-            th.moveBufferedImageToGLTexture(gl, img, texture_id);
-            loadedFontsTextureId.put(font, texture_id);
         }
-        texture_id = loadedFontsTextureId.get(font);
+        else{
+            texture_id = loadedFontsTextureId.get(font);
+        }
+        BufferedImage img = getFontBufferedImage(font, textColor, backGroundColor);
+        th.moveBufferedImageToGLTexture(gl, img, texture_id);
+        loadedFontsTextureId.put(font, texture_id);
+    }
 
+    public void bindFont(String font, GL gl) {
+        int texture_id = loadedFontsTextureId.get(font);
         gl.glBindTexture(GL.GL_TEXTURE_2D, texture_id);
         gl.glTexParameteri(GL.GL_TEXTURE_2D, GL.GL_TEXTURE_WRAP_S, GL.GL_CLAMP);
         gl.glTexParameteri(GL.GL_TEXTURE_2D, GL.GL_TEXTURE_WRAP_T, GL.GL_CLAMP);
         gl.glTexParameteri(GL.GL_TEXTURE_2D, GL.GL_TEXTURE_MAG_FILTER, GL.GL_LINEAR);
         gl.glTexParameteri(GL.GL_TEXTURE_2D, GL.GL_TEXTURE_MIN_FILTER, GL.GL_LINEAR);
-
     }
 
-    public RectangleDouble[] getCharacters(String fontName){
+    public RectangleDouble[] getCharacters(String fontName, Color textColor, Color backgroundColor){
         if (!this.loadedFontsCharacterPosition.containsKey(fontName)) {
-            this.getFontBufferedImage(fontName);
+            this.getFontBufferedImage(fontName, textColor, backgroundColor);
         }
         return this.loadedFontsCharacterPosition.get(fontName);
-
     }
 
-    private BufferedImage getFontBufferedImage(String font) {
+    private BufferedImage getFontBufferedImage(String font, Color textColor, Color backGroundColor) {
         BufferedImage img = new BufferedImage(256, 512, BufferedImage.TYPE_INT_ARGB);
         Graphics2D g2d = (Graphics2D) img.getGraphics();
-        g2d.setColor(new Color(0.f, 0.f, 0.f, 0.0f));
+        g2d.setColor(backGroundColor);
         g2d.fillRect(0, 0, 256, 512);
-        g2d.setColor(new Color(1.f, 1.f, 1.f, 0.5f));
+        g2d.setColor(textColor);
 
         g2d.setRenderingHint(
                 RenderingHints.KEY_TEXT_ANTIALIASING,
@@ -135,7 +137,7 @@ public class GL3DFont {
         JFrame frame = new JFrame();
         frame.getContentPane().setLayout(new FlowLayout());
 
-        BufferedImage img = GL3DFont.getSingletonInstance().getFontBufferedImage("Monospace");
+        BufferedImage img = GL3DFont.getSingletonInstance().getFontBufferedImage("Monospace", new Color(1.f, 1.f, 1.f, 1.f), new Color(0.f, 0.f, 0.f, 0.f));
         frame.getContentPane().add(new JLabel(new ImageIcon(img)));
         frame.pack();
         frame.setVisible(true);

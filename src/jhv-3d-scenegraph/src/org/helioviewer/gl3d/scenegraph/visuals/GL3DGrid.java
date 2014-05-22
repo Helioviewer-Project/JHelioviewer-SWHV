@@ -64,7 +64,7 @@ public class GL3DGrid extends GL3DGroup {
             zPos[counter] = Math.sin(angle) * size;
             counter ++;
         }
-        GL3DText txt = new GL3DText(letterSize, xPos, yPos, zPos, str, "Serif", new Color(1.f, 0.f, 0.f, 1.f));
+        GL3DText txt = new GL3DText(letterSize, xPos, yPos, zPos, str, "Serif", new Color(1.f, 0.f, 0.f, 1.f), new Color(0.f, 0.f, 0.f, 0.f));
         this.addNode(txt);
 
     }
