@@ -19,19 +19,15 @@ public class GL3DText extends GL3DMesh {
     private boolean initiated = false;
     private int texture_id;
     private final String[] text;
-    private final double[] x0;
-    private final double[] y0;
-    private final double[] z0;
+    private final GL3DVec3d [] position3D;
     private final String font;
     private Color textColor;
     private Color backgroundColor;
 
-    public GL3DText(double height, double []x0, double []y0, double []z0, String[] text, String font, Color textColor, Color backgroundColor) {
+    public GL3DText(double height, GL3DVec3d [] position3D, String[] text, String font, Color textColor, Color backgroundColor) {
         super("GL3DText");
         this.height = height;
-        this.x0 = x0;
-        this.y0 = y0;
-        this.z0 = z0;
+        this.position3D = position3D;
         this.text = text;
         this.font = font;
         this.textColor = textColor;
@@ -78,7 +74,7 @@ public class GL3DText extends GL3DMesh {
         double fontHeight = characters[0].getHeight();
         int counter = 0;
 
-        for (int k=0; k<this.x0.length; k++) {
+        for (int k=0; k<this.position3D.length; k++) {
             double totalWidth = 0;
             for(int i=0; i<this.text[k].length();i++){
                 int ch = (this.text[k].charAt(i));
@@ -94,11 +90,11 @@ public class GL3DText extends GL3DMesh {
             for (int i = 0; i < this.text[k].length(); i++) {
                 int ch = (this.text[k].charAt(i));
                 RectangleDouble rect =characters[ch];
-                positions.add(new GL3DVec3d( x0[k] + xStart +  adaptedScaledTotalWidth, y0[k] - yStart , z0[k]));
-                positions.add(new GL3DVec3d( x0[k] + xStart +  adaptedScaledTotalWidth, y0[k] + yStart , z0[k]));
+                positions.add(new GL3DVec3d( position3D[k].x + xStart +  adaptedScaledTotalWidth, position3D[k].y - yStart , position3D[k].z));
+                positions.add(new GL3DVec3d( position3D[k].x + xStart +  adaptedScaledTotalWidth, position3D[k].y + yStart , position3D[k].z));
                 adaptedScaledTotalWidth += 1.* characters[ch].getWidth() * this.height / characters[ch].getHeight();
-                positions.add(new GL3DVec3d( x0[k] + xStart +  adaptedScaledTotalWidth, y0[k] + yStart , z0[k]));
-                positions.add(new GL3DVec3d( x0[k] + xStart +  adaptedScaledTotalWidth, y0[k] - yStart , z0[k]));
+                positions.add(new GL3DVec3d( position3D[k].x + xStart +  adaptedScaledTotalWidth, position3D[k].y + yStart , position3D[k].z));
+                positions.add(new GL3DVec3d( position3D[k].x + xStart +  adaptedScaledTotalWidth, position3D[k].y - yStart , position3D[k].z));
 
                 textCoords.add(new GL3DVec2d(rect.getX(), rect.getY() - rect.getHeight()));
                 textCoords.add(new GL3DVec2d(rect.getX(), rect.getY()));
