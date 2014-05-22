@@ -19,12 +19,12 @@ public class GL3DText extends GL3DMesh {
     private boolean initiated = false;
     private int texture_id;
     private final String[] text;
-    private final GL3DVec3d [] position3D;
+    private final GL3DVec3d[] position3D;
     private final String font;
     private Color textColor;
     private Color backgroundColor;
 
-    public GL3DText(double height, GL3DVec3d [] position3D, String[] text, String font, Color textColor, Color backgroundColor) {
+    public GL3DText(double height, GL3DVec3d[] position3D, String[] text, String font, Color textColor, Color backgroundColor) {
         super("GL3DText");
         this.height = height;
         this.position3D = position3D;
@@ -48,10 +48,11 @@ public class GL3DText extends GL3DMesh {
         this.setUnchanged();
         this.markAsChanged();
     }
+
     @Override
     public void shapeDraw(GL3DState state) {
         GL gl = state.gl;
-        gl.glDisable ( GL.GL_COLOR_MATERIAL ) ;
+        gl.glDisable(GL.GL_COLOR_MATERIAL);
         gl.glDisable(GL.GL_LIGHT0);
 
         gl.glDisable(GL.GL_LIGHTING);
@@ -66,41 +67,38 @@ public class GL3DText extends GL3DMesh {
         gl.glEnable(GL.GL_LIGHT0);
     }
 
-
-
     @Override
     public GL3DMeshPrimitive createMesh(GL3DState state, List<GL3DVec3d> positions, List<GL3DVec3d> normals, List<GL3DVec2d> textCoords, List<Integer> indices, List<GL3DVec4d> colors) {
         RectangleDouble[] characters = GL3DFont.getSingletonInstance().getCharacters(this.font, this.textColor, this.backgroundColor);
         double fontHeight = characters[0].getHeight();
         int counter = 0;
 
-        for (int k=0; k<this.position3D.length; k++) {
+        for (int k = 0; k < this.position3D.length; k++) {
             double totalWidth = 0;
-            for(int i=0; i<this.text[k].length();i++){
+            for (int i = 0; i < this.text[k].length(); i++) {
                 int ch = (this.text[k].charAt(i));
-                RectangleDouble rect =characters[ch];
+                RectangleDouble rect = characters[ch];
                 double width = rect.getWidth();
                 totalWidth += width;
             }
-            double scaledTotalWidth = totalWidth * this.height/fontHeight;
+            double scaledTotalWidth = totalWidth * this.height / fontHeight;
             double xStart = -scaledTotalWidth / 2.0;
             double yStart = -this.height / 2.0;
 
-            double adaptedScaledTotalWidth =0;
+            double adaptedScaledTotalWidth = 0;
             for (int i = 0; i < this.text[k].length(); i++) {
                 int ch = (this.text[k].charAt(i));
-                RectangleDouble rect =characters[ch];
-                positions.add(new GL3DVec3d( position3D[k].x + xStart +  adaptedScaledTotalWidth, position3D[k].y - yStart , position3D[k].z));
-                positions.add(new GL3DVec3d( position3D[k].x + xStart +  adaptedScaledTotalWidth, position3D[k].y + yStart , position3D[k].z));
-                adaptedScaledTotalWidth += 1.* characters[ch].getWidth() * this.height / characters[ch].getHeight();
-                positions.add(new GL3DVec3d( position3D[k].x + xStart +  adaptedScaledTotalWidth, position3D[k].y + yStart , position3D[k].z));
-                positions.add(new GL3DVec3d( position3D[k].x + xStart +  adaptedScaledTotalWidth, position3D[k].y - yStart , position3D[k].z));
+                RectangleDouble rect = characters[ch];
+                positions.add(new GL3DVec3d(position3D[k].x + xStart + adaptedScaledTotalWidth, position3D[k].y - yStart, position3D[k].z));
+                positions.add(new GL3DVec3d(position3D[k].x + xStart + adaptedScaledTotalWidth, position3D[k].y + yStart, position3D[k].z));
+                adaptedScaledTotalWidth += 1. * characters[ch].getWidth() * this.height / characters[ch].getHeight();
+                positions.add(new GL3DVec3d(position3D[k].x + xStart + adaptedScaledTotalWidth, position3D[k].y + yStart, position3D[k].z));
+                positions.add(new GL3DVec3d(position3D[k].x + xStart + adaptedScaledTotalWidth, position3D[k].y - yStart, position3D[k].z));
 
                 textCoords.add(new GL3DVec2d(rect.getX(), rect.getY() - rect.getHeight()));
                 textCoords.add(new GL3DVec2d(rect.getX(), rect.getY()));
                 textCoords.add(new GL3DVec2d(rect.getX() + rect.getWidth(), rect.getY()));
                 textCoords.add(new GL3DVec2d(rect.getX() + rect.getWidth(), rect.getY() - rect.getHeight()));
-
 
                 int startIndexThisRow = 4 * counter;
                 indices.add(startIndexThisRow);
@@ -110,7 +108,7 @@ public class GL3DText extends GL3DMesh {
                 indices.add(startIndexThisRow + 2);
                 indices.add(startIndexThisRow + 3);
                 indices.add(startIndexThisRow);
-                counter ++;
+                counter++;
             }
         }
         System.out.println("END");
@@ -118,11 +116,11 @@ public class GL3DText extends GL3DMesh {
 
     }
 
-    public void setTextColor(Color textColor){
+    public void setTextColor(Color textColor) {
         this.textColor = textColor;
     }
 
-    public void setBackgroundColor(Color backgroundColor){
+    public void setBackgroundColor(Color backgroundColor) {
         this.backgroundColor = backgroundColor;
     }
 }
