@@ -9,9 +9,6 @@ import java.awt.GraphicsEnvironment;
 import java.awt.RenderingHints;
 import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
-import java.awt.image.DataBuffer;
-import java.awt.image.DataBufferInt;
-import java.nio.IntBuffer;
 import java.util.HashMap;
 
 import javax.media.opengl.GL;
@@ -43,7 +40,8 @@ public class GL3DFont {
 
             GLTextureHelper th = new GLTextureHelper();
             texture_id = th.genTextureID(gl);
-
+            th.moveBufferedImageToGLTexture(gl, img, texture_id);
+/*
             DataBuffer rawBuffer = img.getRaster().getDataBuffer();
             IntBuffer buffer = IntBuffer.wrap(((DataBufferInt) rawBuffer).getData());
             gl.glPixelStorei(GL.GL_UNPACK_SKIP_PIXELS, 0);
@@ -53,7 +51,7 @@ public class GL3DFont {
 
             gl.glBindTexture(GL.GL_TEXTURE_2D, texture_id);
             gl.glTexImage2D(GL.GL_TEXTURE_2D, 0, GL.GL_RGBA, 256, 512, 0, GL.GL_BGRA, GL.GL_UNSIGNED_INT_8_8_8_8_REV, buffer);
-
+*/
             loadedFontsTextureId.put(font, texture_id);
         }
         texture_id = loadedFontsTextureId.get(font);
