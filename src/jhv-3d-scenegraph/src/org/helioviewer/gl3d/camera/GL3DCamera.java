@@ -24,9 +24,9 @@ import org.helioviewer.gl3d.wcs.CoordinateSystem;
  * in {@link GL3DInteraction} objects that can be selected in the main toolbar.
  * The interactions then change the rotation and translation fields out of which
  * the resulting cameraTransformation is generated.
- *
+ * 
  * @author Simon Spoerri (simon.spoerri@fhnw.ch)
- *
+ * 
  */
 public abstract class GL3DCamera {
     protected GLU glu = new GLU();
@@ -34,7 +34,7 @@ public abstract class GL3DCamera {
     public static final double MAX_DISTANCE = -Constants.SunMeanDistanceToEarth * 1.5;
     public static final double MIN_DISTANCE = -Constants.SunRadius * 1.2;
 
-    private double clipNear = Constants.SunRadius / 10.;
+    private double clipNear = Constants.SunRadius / 100.;
     private double clipFar = Constants.SunRadius * 100.;
     private final double fov = 10;
     private double aspect = 0.0;
@@ -77,7 +77,7 @@ public abstract class GL3DCamera {
     /**
      * This method is called when the camera changes and should copy the
      * required settings of the preceding camera objects.
-     *
+     * 
      * @param precedingCamera
      */
     public void activate(GL3DCamera precedingCamera) {
