@@ -55,7 +55,7 @@ public class GL3DText extends GL3DMesh {
 
         //gl.glLightfv(GL.GL_LIGHT0, GL.GL_AMBIENT, new float[] { 1.f, 1.f, 1.f, 1.f }, 0);
         gl.glDisable(GL.GL_LIGHTING);
-        state.gl.glDisable(GL.GL_BLEND);
+        state.gl.glEnable(GL.GL_BLEND);
         //state.gl.glBlendFunc(GL.GL_ONE_MINUS_DST_COLOR, GL.GL_ONE_MINUS_SRC_COLOR);
         if (!initiated) {
             GLTextureHelper th = new GLTextureHelper();
