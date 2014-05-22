@@ -156,6 +156,11 @@ public abstract class GL3DImageLayer extends GL3DOrientedGroup implements GL3DCa
 
         MetaData metaData = metaDataView.getMetaData();
 
+        double llx = metaData.getPhysicalLowerLeft().getX();
+        double lly = metaData.getPhysicalLowerLeft().getY();
+        double urx = metaData.getPhysicalUpperRight().getX();
+        double ury = metaData.getPhysicalUpperRight().getY();
+
         GL3DRayTracer rayTracer = new GL3DRayTracer(this.accellerationShape, activeCamera);
 
         // Shoot Rays in the corners of the viewport
@@ -197,25 +202,20 @@ public abstract class GL3DImageLayer extends GL3DOrientedGroup implements GL3DCa
             }
         }
 
-        minPhysicalX = Math.max(minPhysicalX, metaData.getPhysicalLowerLeft().getX());
-        minPhysicalY = Math.max(minPhysicalY, metaData.getPhysicalLowerLeft().getY());
-        maxPhysicalX = Math.min(maxPhysicalX, metaData.getPhysicalUpperRight().getX());
-        maxPhysicalY = Math.min(maxPhysicalY, metaData.getPhysicalUpperRight().getY());
+        minPhysicalX = Math.max(minPhysicalX, llx);
+        minPhysicalY = Math.max(minPhysicalY, lly);
+        maxPhysicalX = Math.min(maxPhysicalX, urx);
+        maxPhysicalY = Math.min(maxPhysicalY, ury);
 
         minPhysicalX -= Math.abs(minPhysicalX) * 0.5;
         minPhysicalY -= Math.abs(minPhysicalY) * 0.5;
         maxPhysicalX += Math.abs(maxPhysicalX) * 0.5;
         maxPhysicalY += Math.abs(maxPhysicalY) * 0.5;
 
-        if (minPhysicalX < metaData.getPhysicalLowerLeft().getX())
-            minPhysicalX = metaData.getPhysicalLowerLeft().getX();
-        if (minPhysicalY < metaData.getPhysicalLowerLeft().getY())
-            minPhysicalY = metaData.getPhysicalLowerLeft().getY();
-
-        if (maxPhysicalX > metaData.getPhysicalUpperRight().getX())
-            maxPhysicalX = metaData.getPhysicalUpperRight().getX();
-        if (maxPhysicalY > metaData.getPhysicalUpperRight().getY())
-            maxPhysicalY = metaData.getPhysicalUpperRight().getY();
+        minPhysicalX = Math.max(minPhysicalX, llx);
+        minPhysicalY = Math.max(minPhysicalY, lly);
+        maxPhysicalX = Math.min(maxPhysicalX, urx);
+        maxPhysicalY = Math.min(maxPhysicalY, ury);
 
         double regionWidth = maxPhysicalX - minPhysicalX;
         double regionHeight = maxPhysicalY - minPhysicalY;
