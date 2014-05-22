@@ -33,7 +33,6 @@ import org.helioviewer.viewmodel.view.MovieView;
 import org.helioviewer.viewmodel.view.TimedMovieView;
 import org.helioviewer.viewmodel.view.View;
 import org.helioviewer.viewmodel.view.jp2view.datetime.ImmutableDateTime;
-import org.jhv.dataset.tree.models.LayersToDatasetLayers;
 
 /**
  * Panel for displaying all layers including the layer specific controls.
@@ -43,20 +42,20 @@ import org.jhv.dataset.tree.models.LayersToDatasetLayers;
  * Except the LayersListener this is a GUI class expecting to be run in the
  * EventQueue.
  * <p>
- * 
+ *
  * TODO: Low-Importance - Fix the issue that everything runs in the EventQueue
- * 
+ *
  * At the moment, a lot of GUI calls are not fired on the EventDispatchThread
  * According to the Java specifications, this IS NOT ALLOWED and could cause
  * problems!
- * 
+ *
  * In order to fix this use SwingUtilities.invokeLater or
  * Swingutilities.invokeAndWait to make GUI interactions
- * 
+ *
  * Ludwig already tried to fix all of this "with one line of code" by adding
  * invokeLater to the ViewListenerDistributor However, this calls TOO MUCH stuff
  * on the event queue - and the GUI becomes unresponsive
- * 
+ *
  * @author Markus Langenberg
  * @author Malte Nuhn
  */
@@ -75,9 +74,9 @@ public class ImageSelectorPanel extends JPanel implements LayersListener {
      * Action to add a new layer. If there is a current active layer which much
      * different time, the dates will be updated.
      */
-    private Action addLayerAction = new AbstractAction("Add Layer", IconBank.getIcon(JHVIcon.ADD)) {
+    private final Action addLayerAction = new AbstractAction("Add Layer", IconBank.getIcon(JHVIcon.ADD)) {
         /**
-         * 
+         *
          */
         private static final long serialVersionUID = 1L;
         {
@@ -87,6 +86,7 @@ public class ImageSelectorPanel extends JPanel implements LayersListener {
         /**
          * {@inheritDoc}
          */
+        @Override
         public void actionPerformed(ActionEvent arg0) {
             // Check the dates if possible
             final View activeView = LayersModel.getSingletonInstance().getActiveView();
@@ -94,17 +94,17 @@ public class ImageSelectorPanel extends JPanel implements LayersListener {
             /*
              * TODO: Code Simplification - Cleanup Date selection when clicking
              * on "add images", e.g. use LayersModel.getLatestDate(...), ...
-             * 
+             *
              * Here are some more comments by Helge:
-             * 
+             *
              * If it is a local file, the timestamps are read from the parsed
              * JPX movie, i.e. a call will pause until the whole movie has
              * finished loading.
-             * 
+             *
              * If it has been reading through the API the frame time stamps
              * already have been returned and it is not bad. For the time being
              * it will only update if its already loaded.
-             * 
+             *
              * I think there should be a better solution? Maybe a wait dialog?
              * etc.?
              */
@@ -141,7 +141,7 @@ public class ImageSelectorPanel extends JPanel implements LayersListener {
     /**
      * Button to add new layers
      */
-    private JButton addLayerButton = new JButton(addLayerAction);
+    private final JButton addLayerButton = new JButton(addLayerAction);
 
     /**
      * Action to download the current layer. If there is no active layer, the
@@ -149,9 +149,9 @@ public class ImageSelectorPanel extends JPanel implements LayersListener {
      * <p>
      * Should be activated accordingly in the class
      */
-    private Action downloadLayerAction = new AbstractAction() {
+    private final Action downloadLayerAction = new AbstractAction() {
         /**
-         * 
+         *
          */
         private static final long serialVersionUID = 1L;
         {
@@ -162,6 +162,7 @@ public class ImageSelectorPanel extends JPanel implements LayersListener {
         /**
          * {@inheritDoc}
          */
+        @Override
         public void actionPerformed(ActionEvent arg0) {
             if (LayersModel.getSingletonInstance().getActiveView() != null) {
                 LayersModel.getSingletonInstance().downloadLayer(LayersModel.getSingletonInstance().getActiveView());
@@ -171,18 +172,18 @@ public class ImageSelectorPanel extends JPanel implements LayersListener {
     /**
      * Button to show {@link #downloadLayerAction}
      */
-    private JButton downloadLayerButton = new JButton(downloadLayerAction);
+    private final JButton downloadLayerButton = new JButton(downloadLayerAction);
 
-    private LayerTable layerTable;
+    private final LayerTable layerTable;
     /**
      * Action to move the current layer down. If there is no active layer, the
      * action will do nothing.
      * <p>
      * Should be activated accordingly in the class
      */
-    private Action moveLayerDownAction = new AbstractAction() {
+    private final Action moveLayerDownAction = new AbstractAction() {
         /**
-         * 
+         *
          */
         private static final long serialVersionUID = 1L;
         {
@@ -193,25 +194,26 @@ public class ImageSelectorPanel extends JPanel implements LayersListener {
         /**
          * {@inheritDoc}
          */
+        @Override
         public void actionPerformed(ActionEvent arg0) {
             if (LayersModel.getSingletonInstance().getActiveView() != null) {
-                LayersToDatasetLayers.getSingletonInstance().moveLayerDown(LayersModel.getSingletonInstance().getActiveView());
+                LayersModel.getSingletonInstance().moveLayerDown(LayersModel.getSingletonInstance().getActiveView());
             }
         }
     };
     /**
      * Button to show {@link #moveLayerDownAction}
      */
-    private JButton moveLayerDownButton = new JButton(moveLayerDownAction);
+    private final JButton moveLayerDownButton = new JButton(moveLayerDownAction);
     /**
      * Action to move the current layer up. If there is no active layer, the
      * action will do nothing.
      * <p>
      * Should be activated accordingly in the class
      */
-    private Action moveLayerUpAction = new AbstractAction() {
+    private final Action moveLayerUpAction = new AbstractAction() {
         /**
-         * 
+         *
          */
         private static final long serialVersionUID = 1L;
         {
@@ -222,9 +224,10 @@ public class ImageSelectorPanel extends JPanel implements LayersListener {
         /**
          * {@inheritDoc}
          */
+        @Override
         public void actionPerformed(ActionEvent arg0) {
             if (LayersModel.getSingletonInstance().getActiveView() != null) {
-                LayersToDatasetLayers.getSingletonInstance().moveLayerUp(LayersModel.getSingletonInstance().getActiveView());
+                LayersModel.getSingletonInstance().moveLayerUp(LayersModel.getSingletonInstance().getActiveView());
 
             }
         }
@@ -232,16 +235,16 @@ public class ImageSelectorPanel extends JPanel implements LayersListener {
     /**
      * Button to show {@link #moveLayerUpAction}
      */
-    private JButton moveLayerUpButton = new JButton(moveLayerUpAction);
+    private final JButton moveLayerUpButton = new JButton(moveLayerUpAction);
     /**
      * Action to show the meta data. If there is no active layer, the action
      * will do nothing.
      * <p>
      * Should be activated accordingly in the class
      */
-    private Action showMetaAction = new AbstractAction() {
+    private final Action showMetaAction = new AbstractAction() {
         /**
-         * 
+         *
          */
         private static final long serialVersionUID = 1L;
         {
@@ -252,6 +255,7 @@ public class ImageSelectorPanel extends JPanel implements LayersListener {
         /**
          * {@inheritDoc}
          */
+        @Override
         public void actionPerformed(ActionEvent arg0) {
             if (LayersModel.getSingletonInstance().getActiveView() != null) {
                 LayersModel.getSingletonInstance().showMetaInfo(LayersModel.getSingletonInstance().getActiveView());
@@ -261,7 +265,7 @@ public class ImageSelectorPanel extends JPanel implements LayersListener {
     /**
      * Button to show {@link #showMetaAction}
      */
-    private JButton showMetaButton = new JButton(showMetaAction);
+    private final JButton showMetaButton = new JButton(showMetaAction);
 
     /**
      * Default constructor.
@@ -319,6 +323,7 @@ public class ImageSelectorPanel extends JPanel implements LayersListener {
      */
     private void activateActions() {
         EventQueue.invokeLater(new Runnable() {
+            @Override
             public void run() {
                 boolean e = LayersModel.getSingletonInstance().getActiveView() != null;
                 downloadLayerAction.setEnabled(e);
@@ -332,12 +337,14 @@ public class ImageSelectorPanel extends JPanel implements LayersListener {
     /**
      * {@inheritDoc}
      */
+    @Override
     public void activeLayerChanged(int index) {
     }
 
     /**
      * {@inheritDoc}
      */
+    @Override
     public void layerAdded(int newIndex) {
         activateActions();
     }
@@ -345,12 +352,14 @@ public class ImageSelectorPanel extends JPanel implements LayersListener {
     /**
      * {@inheritDoc}
      */
+    @Override
     public void layerChanged(int index) {
     }
 
     /**
      * {@inheritDoc}
      */
+    @Override
     public void layerRemoved(View oldView, int oldIndex) {
         activateActions();
     }
@@ -358,24 +367,28 @@ public class ImageSelectorPanel extends JPanel implements LayersListener {
     /**
      * {@inheritDoc}
      */
+    @Override
     public void subImageDataChanged() {
     }
 
     /**
      * {@inheritDoc}
      */
+    @Override
     public void timestampChanged(int idx) {
     }
 
     /**
      * {@inheritDoc}
      */
+    @Override
     public void viewportGeometryChanged() {
     }
 
     /**
      * {@inheritDoc}
      */
+    @Override
     public void layerDownloaded(int idx) {
     }
 
