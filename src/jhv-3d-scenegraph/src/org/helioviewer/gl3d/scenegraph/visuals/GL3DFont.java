@@ -41,17 +41,6 @@ public class GL3DFont {
             GLTextureHelper th = new GLTextureHelper();
             texture_id = th.genTextureID(gl);
             th.moveBufferedImageToGLTexture(gl, img, texture_id);
-/*
-            DataBuffer rawBuffer = img.getRaster().getDataBuffer();
-            IntBuffer buffer = IntBuffer.wrap(((DataBufferInt) rawBuffer).getData());
-            gl.glPixelStorei(GL.GL_UNPACK_SKIP_PIXELS, 0);
-            gl.glPixelStorei(GL.GL_UNPACK_SKIP_ROWS, 0);
-            gl.glPixelStorei(GL.GL_UNPACK_ROW_LENGTH, 256);
-            gl.glPixelStorei(GL.GL_UNPACK_ALIGNMENT, 32 >> 3);
-
-            gl.glBindTexture(GL.GL_TEXTURE_2D, texture_id);
-            gl.glTexImage2D(GL.GL_TEXTURE_2D, 0, GL.GL_RGBA, 256, 512, 0, GL.GL_BGRA, GL.GL_UNSIGNED_INT_8_8_8_8_REV, buffer);
-*/
             loadedFontsTextureId.put(font, texture_id);
         }
         texture_id = loadedFontsTextureId.get(font);
@@ -75,7 +64,6 @@ public class GL3DFont {
     private BufferedImage getFontBufferedImage(String font) {
         BufferedImage img = new BufferedImage(256, 512, BufferedImage.TYPE_INT_ARGB);
         Graphics2D g2d = (Graphics2D) img.getGraphics();
-        //g2d.setPaintMode();
         g2d.setColor(new Color(0.f, 0.f, 0.f, 0.0f));
         g2d.fillRect(0, 0, 256, 512);
         g2d.setColor(new Color(1.f, 1.f, 1.f, 0.5f));
