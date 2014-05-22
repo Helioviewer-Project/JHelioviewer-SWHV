@@ -23,9 +23,10 @@ public class GL3DText extends GL3DMesh {
     private final double[] y0;
     private final double[] z0;
     private final String font;
-    private final Color textColor;
+    private Color textColor;
+    private Color backgroundColor;
 
-    public GL3DText(double height, double []x0, double []y0, double []z0, String[] text, String font, Color textColor) {
+    public GL3DText(double height, double []x0, double []y0, double []z0, String[] text, String font, Color textColor, Color backgroundColor) {
         super("GL3DText");
         this.height = height;
         this.x0 = x0;
@@ -34,46 +35,46 @@ public class GL3DText extends GL3DMesh {
         this.text = text;
         this.font = font;
         this.textColor = textColor;
+        this.backgroundColor = backgroundColor;
     }
 
-    public GL3DText(double height, double [] x0, double [] y0, double [] z0, String[] text, Color textColor) {
-        super("GL3DText");
-        this.height = height;
-        this.x0 = x0;
-        this.y0 = y0;
-        this.z0 = z0;
-        this.text = text;
-        this.font = "Serif";
-        this.textColor = textColor;
+    @Override
+    public void shapeUpdate(GL3DState state) {
+        super.shapeUpdate(state);
+        GL3DFont.getSingletonInstance().updateFont(this.font, state.gl, this.textColor, this.backgroundColor);
+        this.setUnchanged();
     }
 
+    @Override
+    public void shapeInit(GL3DState state) {
+        super.shapeInit(state);
+        GL3DFont.getSingletonInstance().updateFont(this.font, state.gl, this.textColor, this.backgroundColor);
+        this.setUnchanged();
+        this.markAsChanged();
+    }
     @Override
     public void shapeDraw(GL3DState state) {
         GL gl = state.gl;
         gl.glDisable ( GL.GL_COLOR_MATERIAL ) ;
         gl.glDisable(GL.GL_LIGHT0);
 
-        //gl.glLightfv(GL.GL_LIGHT0, GL.GL_AMBIENT, new float[] { 1.f, 1.f, 1.f, 1.f }, 0);
         gl.glDisable(GL.GL_LIGHTING);
         state.gl.glEnable(GL.GL_BLEND);
-        //state.gl.glBlendFunc(GL.GL_ONE_MINUS_DST_COLOR, GL.GL_ONE_MINUS_SRC_COLOR);
         if (!initiated) {
             GLTextureHelper th = new GLTextureHelper();
             this.texture_id = th.genTextureID(gl);
             initiated = true;
         }
-        GL3DFont.getSingletonInstance().loadFont(this.font, gl);
-
+        GL3DFont.getSingletonInstance().bindFont(this.font, gl);
         super.shapeDraw(state);
         gl.glEnable(GL.GL_LIGHT0);
-
     }
 
 
 
     @Override
     public GL3DMeshPrimitive createMesh(GL3DState state, List<GL3DVec3d> positions, List<GL3DVec3d> normals, List<GL3DVec2d> textCoords, List<Integer> indices, List<GL3DVec4d> colors) {
-        RectangleDouble[] characters = GL3DFont.getSingletonInstance().getCharacters(this.font);
+        RectangleDouble[] characters = GL3DFont.getSingletonInstance().getCharacters(this.font, this.textColor, this.backgroundColor);
         double fontHeight = characters[0].getHeight();
         int counter = 0;
 
@@ -119,5 +120,13 @@ public class GL3DText extends GL3DMesh {
         System.out.println("END");
         return GL3DMeshPrimitive.TRIANGLES;
 
+    }
+
+    public void setTextColor(Color textColor){
+        this.textColor = textColor;
+    }
+
+    public void setBackgroundColor(Color backgroundColor){
+        this.backgroundColor = backgroundColor;
     }
 }
