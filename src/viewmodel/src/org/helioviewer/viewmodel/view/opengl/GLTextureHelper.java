@@ -642,7 +642,7 @@ public class GLTextureHelper {
     private int mapTypeToInputGLFormat(int type) {
         if (type == BufferedImage.TYPE_BYTE_GRAY || type == BufferedImage.TYPE_BYTE_INDEXED)
             return GL.GL_LUMINANCE;
-        else if (type == BufferedImage.TYPE_4BYTE_ABGR || type == BufferedImage.TYPE_INT_BGR)
+        else if (type == BufferedImage.TYPE_4BYTE_ABGR || type == BufferedImage.TYPE_INT_BGR ||type == BufferedImage.TYPE_INT_ARGB)
             return GL.GL_BGRA;
         else
             return GL.GL_RGBA;
