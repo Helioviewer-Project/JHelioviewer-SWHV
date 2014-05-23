@@ -2,7 +2,6 @@ package org.helioviewer.gl3d.model.image;
 
 import javax.media.opengl.GL;
 
-import org.helioviewer.gl3d.model.GL3DHitReferenceShape;
 import org.helioviewer.gl3d.shader.GL3DImageVertexShaderProgram;
 import org.helioviewer.gl3d.shader.GL3DShaderFactory;
 import org.helioviewer.gl3d.view.GL3DView;
@@ -26,8 +25,6 @@ public class GL3DLascoImageLayer extends GL3DImageLayer {
         this.imageTextureView.setVertexShader(vertex);
 
         this.imageTextureView.metadata = this.metaDataView.getMetaData();
-
-        this.accellerationShape = new GL3DHitReferenceShape();
 
     }
 

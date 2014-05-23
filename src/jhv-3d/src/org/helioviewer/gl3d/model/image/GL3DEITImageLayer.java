@@ -3,7 +3,6 @@ package org.helioviewer.gl3d.model.image;
 import javax.media.opengl.GL;
 
 import org.helioviewer.base.physics.Constants;
-import org.helioviewer.gl3d.model.GL3DHitReferenceShape;
 import org.helioviewer.gl3d.shader.GL3DImageFragmentShaderProgram;
 import org.helioviewer.gl3d.shader.GL3DImageVertexShaderProgram;
 import org.helioviewer.gl3d.shader.GL3DShaderFactory;
@@ -29,8 +28,6 @@ public class GL3DEITImageLayer extends GL3DImageLayer {
 
         sphere = new GL3DImageSphere(imageTextureView, vertexShader, sphereFragmentShader, this);
         this.imageTextureView.metadata = this.metaDataView.getMetaData();
-
-        this.accellerationShape = new GL3DHitReferenceShape();
 
         this.sphereFragmentShader.setCutOffRadius((float) (Constants.SunRadius / this.imageTextureView.metadata.getPhysicalImageWidth()));
 
