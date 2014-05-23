@@ -86,7 +86,7 @@ public class RadioPlotModel implements RadioDataManagerListener,
      * @param identifier    The plot identifier
      * @return  A collection containing all the no data configurations. 
      */
-    public Collection<NoDataConfig> getNoDataConfigurations(String identifier){
+    public Collection<NoDataConfig> getNoDataConfigurations(String identifier) {
         Map<Long, List<NoDataConfig>> noDataConfigList = getRadioPlotModelData(identifier).getNoDataConfigList();
         List<NoDataConfig> allNoDataConfigs = new ArrayList<NoDataConfig>();
         for (List<NoDataConfig> ndcl : noDataConfigList.values()) {
@@ -265,16 +265,16 @@ public class RadioPlotModel implements RadioDataManagerListener,
 
     @Override
     public void noDataInterval(List<Interval<Date>> noDataList, Long downloadID, String plotIdentifier) {
-        if(!noDataList.isEmpty()) {
+        if (!noDataList.isEmpty()) {
             RadioPlotModelData rpmd = getRadioPlotModelData(plotIdentifier);
             Map<Long, List<NoDataConfig>> noDataConfigList = rpmd.getNoDataConfigList();
             Map<Long, DownloadRequestData> downloadRequestData = rpmd.getDownloadRequestData();
-            if(!noDataConfigList.containsKey(downloadID)){
+            if (!noDataConfigList.containsKey(downloadID)) {
                 noDataConfigList.put(downloadID, new ArrayList<NoDataConfig>());
             }else{
                 //noDataConfigList.get(downloadID).clear();
             }
-            for (Interval<Date> noData : noDataList){
+            for (Interval<Date> noData : noDataList) {
                 DrawableAreaMap dam = zoomManager.getDrawableAreaMap(noData.getStart(), noData.getEnd(), downloadID, plotIdentifier);
                 noDataConfigList.get(downloadID).add(new NoDataConfig(noData, dam, downloadID, downloadRequestData.get(downloadID).isVisible()));
             }
@@ -383,15 +383,15 @@ public class RadioPlotModel implements RadioDataManagerListener,
         return radioPlotModelData.get(identifier);
     }
     
-    private void updateNoDataConfig(Long downloadID, String plotIdentifier){
+    private void updateNoDataConfig(Long downloadID, String plotIdentifier) {
         RadioPlotModelData rpmd = getRadioPlotModelData(plotIdentifier);
         Map<Long, List<NoDataConfig>> noDataConfigList = rpmd.getNoDataConfigList();
-        if(!noDataConfigList.containsKey(downloadID)){
+        if (!noDataConfigList.containsKey(downloadID)) {
             noDataConfigList.put(downloadID, new ArrayList<NoDataConfig>());
         }else{
             //noDataConfigList.get(downloadID).clear();
         }
-        for (NoDataConfig ndc : noDataConfigList.get(downloadID)){
+        for (NoDataConfig ndc : noDataConfigList.get(downloadID)) {
             DrawableAreaMap dam = zoomManager.getDrawableAreaMap(ndc.getDateInterval().getStart(), ndc.getDateInterval().getEnd(), downloadID, plotIdentifier);
             ndc.setDrawableAreaMap(dam);
         }

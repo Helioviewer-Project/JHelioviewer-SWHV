@@ -76,14 +76,14 @@ public class RadioDownloader{
                                     cache.add(newJPXData);
                                 } else {
                                     Log.error("Received null view in request and open for date " + startDate + " and " + endDate);
-                                    if(cache.addNoDataInterval(new Interval<Date>(startDate, calculateOneDayFurtherAsDate(startDate)), identifier)) {
+                                    if (cache.addNoDataInterval(new Interval<Date>(startDate, calculateOneDayFurtherAsDate(startDate)), identifier)) {
                                         noDataList.add(new Interval<Date>(startDate, calculateOneDayFurtherAsDate(startDate)));
                                     }                                    
                                 }
                                 startDate = calculateOneDayFurtherAsDate(startDate);
                             }
                             fireNewJPXDataAvailable(jpxList, identifier, requestedStartDate, endDate, downloadID);
-                            if (!noDataList.isEmpty()){
+                            if (!noDataList.isEmpty()) {
                                 Log.trace("Data in no data in request and open : " + noDataList.size());
                                 fireNoData(noDataList, identifier, downloadID);
                             }else{
@@ -162,7 +162,7 @@ public class RadioDownloader{
                                         cache.add(newJPXData);
                                     } else { 
                                         Log.error("Received null view in request intervals for date " + startDate + " and " + endDate);                                    
-                                        if(cache.addNoDataInterval(new Interval<Date>(startDate, calculateOneDayFurtherAsDate(startDate)), identifier)) {
+                                        if (cache.addNoDataInterval(new Interval<Date>(startDate, calculateOneDayFurtherAsDate(startDate)), identifier)) {
                                             noDataList.add(new Interval<Date>(startDate, calculateOneDayFurtherAsDate(startDate)));                
                                         }
                                     }
@@ -269,7 +269,7 @@ public class RadioDownloader{
     }
     
     private void fireNoData(List<Interval<Date>> noDataList, String identifier, long downloadID) {
-        for (RadioDownloaderListener l : listeners){
+        for (RadioDownloaderListener l : listeners) {
             l.newNoData(noDataList, identifier,downloadID);
         }
     }

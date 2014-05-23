@@ -170,7 +170,7 @@ public class RadioImage {
      * @param visibleYStart     The start frequency of the visible interval 
      * @param visibleYEnd       The end frequency of the visible interval
      */
-    public void setVisibleIntervals(Date visibleXStart, Date visibleXEnd, int visibleYStart, int visibleYEnd){
+    public void setVisibleIntervals(Date visibleXStart, Date visibleXEnd, int visibleYStart, int visibleYEnd) {
         Log.trace("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@");
         Log.trace("Image interval : ");
         Log.trace("Start x : " + imageTimeInterval.getStart() + " in milliseconds : " +  imageTimeInterval.getStart().getTime());
@@ -178,7 +178,7 @@ public class RadioImage {
         Log.trace("Requested interval : ");
         Log.trace("Start x : " + visibleXStart + " in milliseconds : " + visibleXStart.getTime());
         Log.trace("End x : " + visibleXEnd + " in milliseconds : " + visibleXEnd.getTime());
-        if(imageTimeInterval.containsPointInclusive(visibleXStart) || imageTimeInterval.containsPointInclusive(visibleXEnd)){
+        if (imageTimeInterval.containsPointInclusive(visibleXStart) || imageTimeInterval.containsPointInclusive(visibleXEnd)) {
             //the case the requested interval lies completely or partially in the image interval 
             Date tempStartX = new Date(imageTimeInterval.squeeze(visibleXStart).getTime());
             Date tempEndX = new Date(imageTimeInterval.squeeze(visibleXEnd).getTime());
@@ -188,7 +188,7 @@ public class RadioImage {
             Log.trace("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@");
         }else{
             Interval<Date> tempInterval = new Interval<Date>(visibleXStart, visibleXEnd);
-            if(tempInterval.containsPointInclusive(imageTimeInterval.getStart()) || tempInterval.containsPointInclusive(imageTimeInterval.getEnd())){
+            if (tempInterval.containsPointInclusive(imageTimeInterval.getStart()) || tempInterval.containsPointInclusive(imageTimeInterval.getEnd())) {
                 //case image interval completely in requested interval
                 Date tempStartX = new Date(tempInterval.squeeze(imageTimeInterval.getStart()).getTime());
                 Date tempEndX = new Date(tempInterval.squeeze(imageTimeInterval.getEnd()).getTime());
@@ -204,7 +204,7 @@ public class RadioImage {
             }
             
         }
-        if(imageFreqInterval.containsInclusive(visibleYStart) || imageFreqInterval.containsInclusive(visibleYEnd)){
+        if (imageFreqInterval.containsInclusive(visibleYStart) || imageFreqInterval.containsInclusive(visibleYEnd)) {
             int tempStartY = imageFreqInterval.squeeze(visibleYStart);
             int tempEndY = imageFreqInterval.squeeze(visibleYEnd);
             this.visibleImageFreqInterval = new FrequencyInterval(tempStartY, tempEndY);
@@ -220,8 +220,8 @@ public class RadioImage {
      * 
      * @return  A Rectangle containing the region of interest of the visible time and frequency interface.
      */
-    public Rectangle getROI(){
-        if(visibleImageFreqInterval != null && visibleImageTimeInterval != null){
+    public Rectangle getROI() {
+        if (visibleImageFreqInterval != null && visibleImageTimeInterval != null) {
             int maxImageWidth = resolutioSet.getResolutionLevel(0).getResolutionBounds().width;
             int maxImageHeight = resolutioSet.getResolutionLevel(0).getResolutionBounds().height;
             long imageTimesize = imageTimeInterval.getEnd().getTime() - imageTimeInterval.getStart().getTime();

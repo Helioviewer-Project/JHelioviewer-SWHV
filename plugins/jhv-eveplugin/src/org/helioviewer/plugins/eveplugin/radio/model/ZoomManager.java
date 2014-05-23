@@ -157,13 +157,13 @@ public class ZoomManager implements ZoomControllerListener, PlotAreaSpaceListene
      * @throws IllegalArgumentException     If the given start date or end date fall outside the current interval or the given start
      *                                      frequency or end frequency fall outside the minimum and maximum frequency.
      */
-    public Rectangle getAvailableSpaceForInterval(Date startDate, Date endDate, int startFreq, int endFreq, long downloadId, String plotIdentifier){
+    public Rectangle getAvailableSpaceForInterval(Date startDate, Date endDate, int startFreq, int endFreq, long downloadId, String plotIdentifier) {
         ZoomManagerData zmd = getZoomManagerData(plotIdentifier);
         ZoomDataConfig zdc = zmd.getZoomDataConfigMap().get(downloadId);
         synchronized (intervalLock) {       
-            if(currentInterval.containsPointInclusive(startDate) && currentInterval.containsPointInclusive(endDate) && 
+            if (currentInterval.containsPointInclusive(startDate) && currentInterval.containsPointInclusive(endDate) && 
                     (startFreq >= zdc.getMinY() && startFreq <= zdc.getMaxY()) && 
-                    (endFreq >= zdc.getMinY() && endFreq <= zdc.getMaxY())){
+                    (endFreq >= zdc.getMinY() && endFreq <= zdc.getMaxY())) {
                int height = zmd.getDisplaySize().height;
                double ratio = 1.0 * zmd.getDisplaySize().getWidth()/(currentInterval.getEnd().getTime()-currentInterval.getStart().getTime());
                int width = (int)Math.round((endDate.getTime() - startDate.getTime())*ratio);

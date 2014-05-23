@@ -22,7 +22,7 @@ public class EVEState {
     /**
      * Private constructor, can only be used internally.
      */
-    private EVEState(){
+    private EVEState() {
         mouseTimeIntervalDragging = false;
         mouseValueIntervalDragging = false;
     }
@@ -32,8 +32,8 @@ public class EVEState {
      * 
      * @return  The EVEState singleton object
      */
-    public static EVEState getSingletonInstance(){
-        if (instance == null){
+    public static EVEState getSingletonInstance() {
+        if (instance == null) {
             instance = new EVEState();
         }
         return instance;
