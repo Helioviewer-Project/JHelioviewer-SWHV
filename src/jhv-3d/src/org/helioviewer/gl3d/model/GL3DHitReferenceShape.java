@@ -25,11 +25,11 @@ import org.helioviewer.gl3d.scenegraph.rt.GL3DRay;
  * 
  */
 public class GL3DHitReferenceShape extends GL3DMesh {
-    private static final double extremeValue = Constants.SunMeanDistanceToEarth * 10;
+    private static final double extremeValue = 4.;// Constants.SunMeanDistanceToEarth
+                                                  // * 10;
 
-    private boolean allowBacksideHits;
-    private double angle = 0.0;
-    private GL3DMat4d phiRotation;
+    private final boolean allowBacksideHits;
+    private final GL3DMat4d phiRotation;
 
     public GL3DHitReferenceShape() {
         this(false);
@@ -38,34 +38,40 @@ public class GL3DHitReferenceShape extends GL3DMesh {
     public GL3DHitReferenceShape(boolean allowBacksideHits) {
         super("Hit Reference Shape");
         this.allowBacksideHits = allowBacksideHits;
+        this.phiRotation = new GL3DMat4d();
+        this.phiRotation.setIdentity();
     }
 
-    public GL3DHitReferenceShape(boolean allowBacksideHits, double angle) {
+    public GL3DHitReferenceShape(boolean allowBacksideHits, GL3DMat4d phiRotation) {
         super("Hit Reference Shape");
         this.allowBacksideHits = allowBacksideHits;
-        this.angle = angle;
+        this.phiRotation = phiRotation;
     }
 
+    @Override
     public void shapeDraw(GL3DState state) {
         return;
     }
 
+    @Override
     public GL3DMeshPrimitive createMesh(GL3DState state, List<GL3DVec3d> positions, List<GL3DVec3d> normals, List<GL3DVec2d> textCoords, List<Integer> indices, List<GL3DVec4d> colors) {
-        this.phiRotation = GL3DMat4d.rotation(angle, new GL3DVec3d(0, 1, 0));
         GL3DVec3d ll = createVertex(-extremeValue, -extremeValue, 0);
         GL3DVec3d lr = createVertex(extremeValue, -extremeValue, 0);
         GL3DVec3d tr = createVertex(extremeValue, extremeValue, 0);
         GL3DVec3d tl = createVertex(-extremeValue, extremeValue, 0);
 
-        positions.add(ll);// normals.add(new GL3DVec3d(0,0,1));//colors.add(new
-                          // GL3DVec4d(0, 0, 1, 0.0));
-        positions.add(lr);// normals.add(new GL3DVec3d(0,0,1));//colors.add(new
-                          // GL3DVec4d(0, 0, 1, 0.0));
-        positions.add(tr);// normals.add(new GL3DVec3d(0,0,1));//colors.add(new
-                          // GL3DVec4d(0, 0, 1, 0.0));
-        positions.add(tl);// normals.add(new GL3DVec3d(0,0,1));//colors.add(new
-                          // GL3DVec4d(0, 0, 1, 0.0));
-
+        positions.add(ll);
+        normals.add(new GL3DVec3d(0, 0, 1));
+        colors.add(new GL3DVec4d(0, 0, 1, 1.0));
+        positions.add(lr);
+        normals.add(new GL3DVec3d(0, 0, 1));
+        colors.add(new GL3DVec4d(0, 0, 1, 1.0));
+        positions.add(tr);
+        normals.add(new GL3DVec3d(0, 0, 1));
+        colors.add(new GL3DVec4d(0, 0, 1, 1.0));
+        positions.add(tl);
+        normals.add(new GL3DVec3d(0, 0, 1));
+        colors.add(new GL3DVec4d(0, 0, 1, 1.0));
         indices.add(0);
         indices.add(1);
         indices.add(2);
@@ -81,9 +87,11 @@ public class GL3DHitReferenceShape extends GL3DMesh {
         double cx = x * phiRotation.m[0] + y * phiRotation.m[4] + z * phiRotation.m[8] + phiRotation.m[12];
         double cy = x * phiRotation.m[1] + y * phiRotation.m[5] + z * phiRotation.m[9] + phiRotation.m[13];
         double cz = x * phiRotation.m[2] + y * phiRotation.m[6] + z * phiRotation.m[10] + phiRotation.m[14];
+        System.out.println(new GL3DVec3d(cx, cy, cz));
         return new GL3DVec3d(cx, cy, cz);
     }
 
+    @Override
     public boolean hit(GL3DRay ray) {
         // if its hidden, it can't be hit
         if (isDrawBitOn(Bit.Hidden) || this.wmI == null) {
@@ -99,6 +107,7 @@ public class GL3DHitReferenceShape extends GL3DMesh {
         return this.shapeHit(ray);
     }
 
+    @Override
     public boolean shapeHit(GL3DRay ray) {
         // Hit detection happens in Object-Space
         boolean isSphereHit = isSphereHit(ray);
@@ -175,9 +184,11 @@ public class GL3DHitReferenceShape extends GL3DMesh {
         return true;
     }
 
+    @Override
     public GL3DAABBox buildAABB() {
         this.aabb.fromOStoWS(new GL3DVec3d(-extremeValue, -extremeValue, -extremeValue), new GL3DVec3d(extremeValue, extremeValue, extremeValue), this.wm);
 
         return this.aabb;
     }
+
 }
