@@ -20,9 +20,9 @@ import org.helioviewer.gl3d.view.GL3DImageTextureView;
  * The {@link GL3DImageLayers} node offers special capabilities for grouping
  * {@link GL3DImageLayer} nodes, because image nodes require special ordering
  * for the blending of different image layers.
- *
+ * 
  * @author Simon Spoerri (simon.spoerri@fhnw.ch)
- *
+ * 
  */
 public class GL3DImageLayers extends GL3DGroup {
 
@@ -68,8 +68,6 @@ public class GL3DImageLayers extends GL3DGroup {
                 layers.add((GL3DImageLayer) node);
             node = node.getNext();
         }
-        state.gl.glDisable(GL.GL_FRAGMENT_PROGRAM_ARB);
-        state.gl.glDisable(GL.GL_VERTEX_PROGRAM_ARB);
 
         state.gl.glEnable(GL.GL_BLEND);
         state.gl.glBlendFunc(GL.GL_SRC_ALPHA, GL.GL_ONE_MINUS_SRC_ALPHA);
@@ -77,19 +75,13 @@ public class GL3DImageLayers extends GL3DGroup {
         state.gl.glEnable(GL.GL_FRAGMENT_PROGRAM_ARB);
         state.gl.glEnable(GL.GL_VERTEX_PROGRAM_ARB);
         state.gl.glEnable(GL.GL_DEPTH_TEST);
-        state.gl.glEnable(GL.GL_BLEND);
 
         for (GL3DImageLayer layer : layers) {
             if (layer.getImageSphere() != null)
                 layer.getImageSphere().draw(state);
         }
 
-        state.gl.glEnable(GL.GL_BLEND);
-        state.gl.glBlendFunc(GL.GL_SRC_ALPHA, GL.GL_ONE_MINUS_SRC_ALPHA);
-        state.gl.glDepthFunc(GL.GL_LEQUAL);
-        state.gl.glDepthMask(false);
-
-        state.gl.glDepthMask(true);
+        // state.gl.glDepthMask(true);
         state.gl.glDisable(GL.GL_BLEND);
 
     }

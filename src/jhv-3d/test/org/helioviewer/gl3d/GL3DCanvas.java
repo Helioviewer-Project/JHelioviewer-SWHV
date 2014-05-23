@@ -86,6 +86,7 @@ public class GL3DCanvas extends GLCanvas implements GLEventListener {
      * gl.glBindBufferARB(GL.GL_ELEMENT_ARRAY_BUFFER_ARB, 0); }
      */
 
+    @Override
     public void display(GLAutoDrawable autoDrawable) {
         GL gl = autoDrawable.getGL();
         gl.glClear(GL.GL_COLOR_BUFFER_BIT | GL.GL_DEPTH_BUFFER_BIT);
@@ -112,15 +113,17 @@ public class GL3DCanvas extends GLCanvas implements GLEventListener {
         state.checkGLErrors();
     }
 
+    @Override
     public void displayChanged(GLAutoDrawable arg0, boolean arg1, boolean arg2) {
         System.out.println("DisplayChange");
     }
 
+    @Override
     public void init(GLAutoDrawable autoDrawable) {
         System.out.println("Init");
 
         GL gl = autoDrawable.getGL();
-        gl.glShadeModel(GL.GL_FLAT);
+        // gl.glShadeModel(GL.GL_FLAT);
         gl.glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
         gl.glDisable(GL.GL_TEXTURE_1D);
         gl.glDisable(GL.GL_TEXTURE_2D);
@@ -135,10 +138,12 @@ public class GL3DCanvas extends GLCanvas implements GLEventListener {
         // VBOHelper.checkVBOSupport(gl);
 
         // enable textures
-        gl.glTexParameteri(GL.GL_TEXTURE_2D, GL.GL_TEXTURE_MIN_FILTER, GL.GL_LINEAR);
-        gl.glTexParameteri(GL.GL_TEXTURE_2D, GL.GL_TEXTURE_MAG_FILTER, GL.GL_LINEAR);
+        // gl.glTexParameteri(GL.GL_TEXTURE_2D, GL.GL_TEXTURE_MIN_FILTER,
+        // GL.GL_LINEAR);
+        // gl.glTexParameteri(GL.GL_TEXTURE_2D, GL.GL_TEXTURE_MAG_FILTER,
+        // GL.GL_LINEAR);
 
-        gl.glShadeModel(GL.GL_SMOOTH);
+        // gl.glShadeModel(GL.GL_SMOOTH);
 
         // activate lightning
         gl.glEnable(GL.GL_LIGHTING);
@@ -177,6 +182,7 @@ public class GL3DCanvas extends GLCanvas implements GLEventListener {
         createVBO(state);
     }
 
+    @Override
     public void reshape(GLAutoDrawable autoDrawable, int x, int y, int width, int height) {
         System.out.println("Reshape");
         GL gl = autoDrawable.getGL();
