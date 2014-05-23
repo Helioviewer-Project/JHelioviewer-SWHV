@@ -61,17 +61,18 @@ public class GL3DHitReferenceShape extends GL3DMesh {
         GL3DVec3d tl = createVertex(-extremeValue, extremeValue, 0);
 
         positions.add(ll);
-        normals.add(new GL3DVec3d(0, 0, 1));
-        colors.add(new GL3DVec4d(0, 0, 1, 1.0));
+        //normals.add(new GL3DVec3d(0, 0, 1));
+        //colors.add(new GL3DVec4d(0, 0, 1, 1.0));
         positions.add(lr);
-        normals.add(new GL3DVec3d(0, 0, 1));
-        colors.add(new GL3DVec4d(0, 0, 1, 1.0));
+        //normals.add(new GL3DVec3d(0, 0, 1));
+        //colors.add(new GL3DVec4d(0, 0, 1, 1.0));
         positions.add(tr);
-        normals.add(new GL3DVec3d(0, 0, 1));
-        colors.add(new GL3DVec4d(0, 0, 1, 1.0));
+        //normals.add(new GL3DVec3d(0, 0, 1));
+        //colors.add(new GL3DVec4d(0, 0, 1, 1.0));
         positions.add(tl);
-        normals.add(new GL3DVec3d(0, 0, 1));
-        colors.add(new GL3DVec4d(0, 0, 1, 1.0));
+        //normals.add(new GL3DVec3d(0, 0, 1));
+        //colors.add(new GL3DVec4d(0, 0, 1, 1.0));
+
         indices.add(0);
         indices.add(1);
         indices.add(2);
@@ -87,7 +88,7 @@ public class GL3DHitReferenceShape extends GL3DMesh {
         double cx = x * phiRotation.m[0] + y * phiRotation.m[4] + z * phiRotation.m[8] + phiRotation.m[12];
         double cy = x * phiRotation.m[1] + y * phiRotation.m[5] + z * phiRotation.m[9] + phiRotation.m[13];
         double cz = x * phiRotation.m[2] + y * phiRotation.m[6] + z * phiRotation.m[10] + phiRotation.m[14];
-        System.out.println(new GL3DVec3d(cx, cy, cz));
+        // System.out.println(new GL3DVec3d(cx, cy, cz));
         return new GL3DVec3d(cx, cy, cz);
     }
 
