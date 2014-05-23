@@ -27,7 +27,7 @@ public class RadioPlotModelData {
     private Map<Long, List<NoDataConfig>> noDataConfigList;
 
     public RadioPlotModelData(String plotIdentifier) {
-        yAxisElement = new YAxisElement();
+        yAxisElement = new RadioYAxisElement(plotIdentifier);
         yAxisElement.setColor(Color.BLACK);
         yAxisElement.setLabel("Mhz");
         radioImagePane = new RadioImagePane(plotIdentifier);

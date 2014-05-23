@@ -16,6 +16,8 @@ import org.helioviewer.base.math.Vector2dDouble;
 import org.helioviewer.base.math.Vector2dInt;
 import org.helioviewer.plugins.eveplugin.EVEState;
 import org.helioviewer.plugins.eveplugin.radio.model.ResolutionSetting;
+import org.helioviewer.plugins.eveplugin.radio.model.YValueModel;
+import org.helioviewer.plugins.eveplugin.radio.model.YValueModelManager;
 import org.helioviewer.plugins.eveplugin.radio.model.ZoomManager;
 import org.helioviewer.plugins.eveplugin.settings.EVESettings;
 import org.helioviewer.plugins.eveplugin.view.linedataselector.LineDataSelectorModel;
@@ -45,6 +47,7 @@ public class RadioDataManager implements RadioDownloaderListener {
     private ZoomManager zoomManager;
     private long id = 0;
     private EVEState eveState;
+    private YValueModelManager yValueModelManager;
 
     private RadioDataManager() {
         listeners = new ArrayList<RadioDataManagerListener>();
@@ -55,7 +58,8 @@ public class RadioDataManager implements RadioDownloaderListener {
         cache = RadioImageCache.getInstance();
         requestBuffer = new RequestForDataBuffer();
         zoomManager = ZoomManager.getSingletonInstance();
-        eveState = EVEState.getSingletonInstance(); 
+        eveState = EVEState.getSingletonInstance();
+        yValueModelManager = YValueModelManager.getInstance();
     }
 
     public static RadioDataManager getSingletonInstance() {
@@ -65,7 +69,7 @@ public class RadioDataManager implements RadioDownloaderListener {
         return instance;
     }
 
-    private void defineMaxBounds(Long ID) {
+    private void defineMaxBounds(Long ID, String plotIdentifier) {
         synchronized (downloadRequestData) {
             DownloadRequestData drd = this.downloadRequestData.get(ID);
             if (drd != null) {
@@ -103,6 +107,9 @@ public class RadioDataManager implements RadioDownloaderListener {
                     this.maxFrequencyInterval = new FrequencyInterval(0,0);
                 }
             }
+            YValueModel yValueModel = yValueModelManager.getYValueModel(plotIdentifier);
+            yValueModel.setAvailableYMin(maxFrequencyInterval.getStart());
+            yValueModel.setAvailableYMax(maxFrequencyInterval.getEnd());
         }
     }
 
@@ -202,7 +209,7 @@ public class RadioDataManager implements RadioDownloaderListener {
                             Log.error("Start and/or stop is null");
                         }                    }
                     this.downloadRequestData.put(ID, drd);
-                    defineMaxBounds(ID);
+                    defineMaxBounds(ID, identifier);
                     fireNewDataAvailable(drd, ID);
                     fireDownloadRequestAnswered(maxFrequencyInterval, new Interval<Date>(requestedStartTime, requestedEndTime), ID, identifier);
                 } else {
@@ -241,7 +248,7 @@ public class RadioDataManager implements RadioDownloaderListener {
                         }
                     }
                     this.downloadRequestData.put(ID, drd);
-                    defineMaxBounds(ID);
+                    defineMaxBounds(ID,identifier);
                     fireNewDataAvailable(drd, ID);
                     fireDownloadRequestAnswered(maxFrequencyInterval, new Interval<Date>(requestedStartTime, requestedEndTime), ID, identifier);
                 }
@@ -505,7 +512,7 @@ public class RadioDataManager implements RadioDownloaderListener {
                 }
             }
             this.downloadRequestData.put(downloadID, drd);
-            defineMaxBounds(downloadID);
+            defineMaxBounds(downloadID,plotIdentifier);
             fireNewDataAvailable(drd, downloadID);
             fireDownloadRequestAnswered(maxFrequencyInterval, new Interval<Date>(requestedStartTime, requestedEndTime), downloadID, plotIdentifier);
         }
@@ -585,10 +592,21 @@ public class RadioDataManager implements RadioDownloaderListener {
                 }
             }
             this.downloadRequestData.put(downloadID, drd);
-            defineMaxBounds(downloadID);
+            defineMaxBounds(downloadID,plotIdentifier);
+            fireFrequencyIntervalUpdated(plotIdentifier, this.maxFrequencyInterval);
             fireNewDataAvailable(drd, downloadID);
             fireAdditionalDownloadRequestAnswered(downloadID);
         }
+    }
+
+    /**
+     * @param plotIdentifier
+     * @param maxFrequencyInterval2
+     */
+    private void fireFrequencyIntervalUpdated(String plotIdentifier, FrequencyInterval maxFrequencyInterval) {
+        for (RadioDataManagerListener l : listeners) {
+            l.frequencyIntervalUpdated(plotIdentifier, maxFrequencyInterval);
+        }        
     }
 
     private void fireAdditionalDownloadRequestAnswered(Long downloadID) {
