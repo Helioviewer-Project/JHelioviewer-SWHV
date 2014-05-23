@@ -10,7 +10,6 @@ import org.helioviewer.base.physics.Constants;
 import org.helioviewer.gl3d.camera.GL3DCamera;
 import org.helioviewer.gl3d.camera.GL3DCameraListener;
 import org.helioviewer.gl3d.model.GL3DHitReferenceShape;
-import org.helioviewer.gl3d.scenegraph.GL3DNode;
 import org.helioviewer.gl3d.scenegraph.GL3DOrientedGroup;
 import org.helioviewer.gl3d.scenegraph.GL3DState;
 import org.helioviewer.gl3d.scenegraph.math.GL3DMat4d;
@@ -34,9 +33,9 @@ import org.helioviewer.viewmodel.view.RegionView;
  * This is the scene graph equivalent of an image layer sub view chain attached
  * to the GL3DLayeredView. It represents exactly one image layer in the view
  * chain
- *
+ * 
  * @author Simon Spoerri (simon.spoerri@fhnw.ch)
- *
+ * 
  */
 public abstract class GL3DImageLayer extends GL3DOrientedGroup implements GL3DCameraListener {
     private static int nextLayerId = 0;
@@ -55,7 +54,7 @@ public abstract class GL3DImageLayer extends GL3DOrientedGroup implements GL3DCa
     public double minZ = -Constants.SunRadius;
     public double maxZ = Constants.SunRadius;
 
-    protected GL3DNode accellerationShape;
+    protected GL3DHitReferenceShape accellerationShape;
 
     protected boolean doUpdateROI = true;
 
@@ -105,8 +104,9 @@ public abstract class GL3DImageLayer extends GL3DOrientedGroup implements GL3DCa
     @Override
     public void shapeInit(GL3DState state) {
         this.createImageMeshNodes(state.gl);
-
-        this.accellerationShape = new GL3DHitReferenceShape(true, 0.);
+        GL3DMat4d mm = new GL3DMat4d();
+        mm.setIdentity();
+        this.accellerationShape = new GL3DHitReferenceShape(true, mm);
         this.addNode(this.accellerationShape);
 
         super.shapeInit(state);
@@ -137,7 +137,6 @@ public abstract class GL3DImageLayer extends GL3DOrientedGroup implements GL3DCa
             this.accellerationShape.markAsChanged();
     }
 
-
     @Override
     public void cameraMoving(GL3DCamera camera) {
     }
@@ -160,9 +159,11 @@ public abstract class GL3DImageLayer extends GL3DOrientedGroup implements GL3DCa
         double lly = metaData.getPhysicalLowerLeft().getY();
         double urx = metaData.getPhysicalUpperRight().getX();
         double ury = metaData.getPhysicalUpperRight().getY();
+        GL3DMat4d phiRotation = GL3DMat4d.rotation(this.imageTextureView.phi, new GL3DVec3d(0, 1, 0));
+        phiRotation.rotate(-this.imageTextureView.theta, new GL3DVec3d(0, 0, 1));
 
+        this.accellerationShape = new GL3DHitReferenceShape(true, phiRotation);
         GL3DRayTracer rayTracer = new GL3DRayTracer(this.accellerationShape, activeCamera);
-
         // Shoot Rays in the corners of the viewport
         int width = (int) activeCamera.getWidth();
         int height = (int) activeCamera.getHeight();
@@ -170,8 +171,8 @@ public abstract class GL3DImageLayer extends GL3DOrientedGroup implements GL3DCa
 
         // frame.setVisible(true);
         // frame1.setVisible(true);
-        for (int i = 0; i <= 1; i++) {
-            for (int j = 0; j <= 1; j++) {
+        for (int i = 0; i <= 10; i++) {
+            for (int j = 0; j <= 10; j++) {
                 regionTestRays.add(rayTracer.cast(i * (width / 1), j * (height / 1)));
             }
         }
@@ -183,22 +184,25 @@ public abstract class GL3DImageLayer extends GL3DOrientedGroup implements GL3DCa
         double maxPhysicalY = -Double.MAX_VALUE;
         double maxPhysicalZ = -Double.MAX_VALUE;
 
-        GL3DMat4d phiRotation = GL3DMat4d.rotation(this.imageTextureView.phi, new GL3DVec3d(0, 1, 0));
-        phiRotation.rotate(-this.imageTextureView.theta, new GL3DVec3d(0, 0, 1));
-
         for (GL3DRay ray : regionTestRays) {
             GL3DVec3d hitPoint = ray.getHitPoint();
             if (hitPoint != null) {
                 hitPoint = this.wmI.multiply(hitPoint);
-                double x = phiRotation.m[0] * hitPoint.x + phiRotation.m[4] * hitPoint.y + phiRotation.m[8] * hitPoint.z + phiRotation.m[12];
-                double y = phiRotation.m[1] * hitPoint.x + phiRotation.m[5] * hitPoint.y + phiRotation.m[9] * hitPoint.z + phiRotation.m[13];
-                double z = phiRotation.m[2] * hitPoint.x + phiRotation.m[6] * hitPoint.y + phiRotation.m[10] * hitPoint.z + phiRotation.m[14];
-                minPhysicalX = Math.min(minPhysicalX, x);
-                minPhysicalY = Math.min(minPhysicalY, y);
-                minPhysicalZ = Math.min(minPhysicalZ, z);
-                maxPhysicalX = Math.max(maxPhysicalX, x);
-                maxPhysicalY = Math.max(maxPhysicalY, y);
-                maxPhysicalZ = Math.max(maxPhysicalZ, z);
+                // double x = phiRotation.m[0] * hitPoint.x + phiRotation.m[4] *
+                // hitPoint.y + phiRotation.m[8] * hitPoint.z +
+                // phiRotation.m[12];
+                // double y = phiRotation.m[1] * hitPoint.x + phiRotation.m[5] *
+                // hitPoint.y + phiRotation.m[9] * hitPoint.z +
+                // phiRotation.m[13];
+                // double z = phiRotation.m[2] * hitPoint.x + phiRotation.m[6] *
+                // hitPoint.y + phiRotation.m[10] * hitPoint.z +
+                // phiRotation.m[14];
+                minPhysicalX = Math.min(minPhysicalX, hitPoint.x);
+                minPhysicalY = Math.min(minPhysicalY, hitPoint.y);
+                minPhysicalZ = Math.min(minPhysicalZ, hitPoint.z);
+                maxPhysicalX = Math.max(maxPhysicalX, hitPoint.x);
+                maxPhysicalY = Math.max(maxPhysicalY, hitPoint.y);
+                maxPhysicalZ = Math.max(maxPhysicalZ, hitPoint.z);
             }
         }
 
