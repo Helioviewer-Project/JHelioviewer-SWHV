@@ -180,7 +180,7 @@ public class ChartDrawValueRangePane extends JComponent implements EVEValueRange
         } else {
             newRange.min = selectedRange.min - movedValues;
             newRange.max = selectedRange.max - movedValues;
-            if (newRange.min < availableRange.min){
+            if (newRange.min < availableRange.min) {
                 newRange.max += (availableRange.min - newRange.min);
                 newRange.min = availableRange.min;
             }
@@ -236,7 +236,7 @@ public class ChartDrawValueRangePane extends JComponent implements EVEValueRange
 
     public void mouseExited(MouseEvent arg0) {
         eveState.setMouseValueIntervalDragging(false);
-        if(mousePressed != null){
+        if (mousePressed != null) {
             if (mouseOverTopGraspPoint || mouseOverBottomGraspPoint)
                 resizeSelectedRange(arg0.getPoint(),true);
             else if (mouseOverRange)

@@ -45,11 +45,11 @@ public class FrequencyInterval {
     }
     
     
-    public int squeeze(int element){
-         if (element >= start && element <= end){
+    public int squeeze(int element) {
+         if (element >= start && element <= end) {
              return element;
          }else{
-             if(element < start){
+             if (element < start) {
                  return start;
              }else{
                  return end;
@@ -57,7 +57,7 @@ public class FrequencyInterval {
          }
     }
     
-    public boolean containsInclusive(int value){
+    public boolean containsInclusive(int value) {
         return value >= start || value <= end;
     }
 }

@@ -144,7 +144,7 @@ public class RadioDataManager implements RadioDownloaderListener {
                 if (image != null) {
                     synchronized (image) {
                         image.setLastDataSize(dataSize);
-                        if (image.getVisibleImageFreqInterval() != null && image.getVisibleImageTimeInterval() != null){
+                        if (image.getVisibleImageFreqInterval() != null && image.getVisibleImageTimeInterval() != null) {
                             for (RadioDataManagerListener l : listeners) {
                                 //l.newDataForIDReceived(data, image.getTimeInterval(), image.getFreqInterval(), image.getLastUsedResolutionSetting().getRectangleRepresentation(), downloadID, drd.getPlotIdentifier(), imageID);
                                 l.newDataForIDReceived(data, image.getVisibleImageTimeInterval(), image.getVisibleImageFreqInterval(), dataSize, downloadID, drd.getPlotIdentifier(), imageID);
@@ -352,12 +352,12 @@ public class RadioDataManager implements RadioDownloaderListener {
                                                             Log.trace("*********************************************");
                                                             HelioviewerMetaData md = (HelioviewerMetaData)jp2View.getMetadata();
                                                             Double mpp = md.getUnitsPerPixel();
-                                                            if(jp2View.setRegion(new RegionAdapter(new StaticRegion(roi.getX()*mpp, roi.getY()*mpp,
-                                                                    new Vector2dDouble(roi.getWidth()*mpp, roi.getHeight()*mpp))), new ChangeEvent())){
+                                                            if (jp2View.setRegion(new RegionAdapter(new StaticRegion(roi.getX()*mpp, roi.getY()*mpp,
+                                                                    new Vector2dDouble(roi.getWidth()*mpp, roi.getHeight()*mpp))), new ChangeEvent())) {
                                                                 Log.trace("The region is changed");
                                                             }else{
                                                                 Log.trace("The region has not changed send a data not changed for image id : " + ri.getRadioImageID());
-                                                                if(ri.getLastDataSize() != null){//can be null if a previous thread didn't finish yet
+                                                                if (ri.getLastDataSize() != null) {//can be null if a previous thread didn't finish yet
                                                                     fireDataNotChanged(ri.getVisibleImageTimeInterval(), ri.getVisibleImageFreqInterval(), ri.getLastDataSize(), id, drd.getPlotIdentifier(), ri.getRadioImageID());
                                                                 }else{
                                                                     Log.trace("Last data size was null for radio image id : " + ri.getRadioImageID());
@@ -598,14 +598,14 @@ public class RadioDataManager implements RadioDownloaderListener {
     }
     
     private void fireNoDataIntervalsReceived(List<Interval<Date>> noDataList, Long downloadID, String plotIdentifier) {
-        for(RadioDataManagerListener l : listeners){
+        for (RadioDataManagerListener l : listeners) {
             l.noDataInterval(noDataList, downloadID, plotIdentifier);
         }
     }
     
     @Override
     public void newNoData(List<Interval<Date>> noDataList, String identifier, long downloadID) {
-        if(!eveState.isMouseTimeIntervalDragging() && !eveState.isMouseValueIntervalDragging()){
+        if (!eveState.isMouseTimeIntervalDragging() && !eveState.isMouseValueIntervalDragging()) {
             fireNoDataIntervalsReceived(noDataList, downloadID, identifier);
         }
     }

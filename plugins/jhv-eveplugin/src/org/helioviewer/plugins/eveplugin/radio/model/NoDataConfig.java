@@ -121,8 +121,8 @@ public class NoDataConfig {
      * 
      * @param g The Graphics on which the no data configuration should be drawn
      */
-    public void draw(Graphics g){
-        if(visible) {
+    public void draw(Graphics g) {
+        if (visible) {
             Log.trace("Visible and drawable area map : " + drawableAreaMap.toString());
             int spaceWidth = drawableAreaMap.getDestinationX1()-drawableAreaMap.getDestinationX0();
             int spaceHeight = drawableAreaMap.getDestinationY1()-drawableAreaMap.getDestinationY0();

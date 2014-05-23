@@ -435,7 +435,7 @@ public class ChartDrawIntervalPane extends JComponent implements ZoomControllerL
                 double start = pas.getScaledSelectedMinTime() - movedUnits*diffUnits;
                 double end = pas.getScaledSelectedMaxTime() - movedUnits*diffUnits;
                 pasList.add(pas);
-                if(start < pas.getScaledMinTime()){
+                if (start < pas.getScaledMinTime()) {
                     end += (pas.getScaledMinTime() - start);
                     start = pas.getScaledMinTime();
                 }
@@ -456,7 +456,7 @@ public class ChartDrawIntervalPane extends JComponent implements ZoomControllerL
                 double diffUnits = pas.getScaledMaxTime() - pas.getScaledMinTime();
                 double start = pas.getScaledSelectedMinTime() + movedUnits*diffUnits;
                 double end = pas.getScaledSelectedMaxTime() + movedUnits*diffUnits;
-                if(end > pas.getScaledMaxTime()){
+                if (end > pas.getScaledMaxTime()) {
                     start -= (end - pas.getScaledMaxTime());
                     end = pas.getScaledMaxTime();
                 }

@@ -92,7 +92,7 @@ public class RadioImageCache {
                     dataList.add(cacheData.getStartDates().get(localStart));
                     toRemove.remove(cacheData.getStartDates().get(localStart).getImageID());
                 }
-                if(cacheData.getNoDataCache().containsKey(localStart)){
+                if (cacheData.getNoDataCache().containsKey(localStart)) {
                     noDataInterval.add(cacheData.getNoDataCache().get(localStart));
                 }
                 localStart = new Date(localStart.getTime() + stepsize);
@@ -120,7 +120,7 @@ public class RadioImageCache {
         }
     }
     
-    public boolean addNoDataInterval(Interval<Date> interval, String plotIdentifier){
+    public boolean addNoDataInterval(Interval<Date> interval, String plotIdentifier) {
         synchronized (instance) {       
             RadioImageCacheData data = getRadioImageCache(plotIdentifier);
             boolean added = data.getNoDataCache().containsKey(interval.getStart());
@@ -132,7 +132,7 @@ public class RadioImageCache {
     
     
     
-    private RadioImageCacheData getRadioImageCache(String plotIdentifier){
+    private RadioImageCacheData getRadioImageCache(String plotIdentifier) {
         RadioImageCacheData data = new RadioImageCacheData();
         if (radioImageCacheData.containsKey(plotIdentifier)) {
             data = radioImageCacheData.get(plotIdentifier);
