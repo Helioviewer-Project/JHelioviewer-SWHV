@@ -38,6 +38,8 @@ public class RadioPlotModel implements RadioDataManagerListener,
     private DrawController drawController;
     private Map<Long, BufferedImage> bufferedImages;
     private ChartModel chartModel;
+    private YValueModelManager yValueModelManager;
+    
 
     private Map<String, RadioPlotModelData> radioPlotModelData;
 
@@ -49,6 +51,7 @@ public class RadioPlotModel implements RadioDataManagerListener,
         bufferedImages = new HashMap<Long, BufferedImage>();
         chartModel = ChartModel.getSingletonInstance();
         radioPlotModelData = new HashMap<String, RadioPlotModelData>();
+        this.yValueModelManager = YValueModelManager.getInstance();
 
     }
 
@@ -97,11 +100,13 @@ public class RadioPlotModel implements RadioDataManagerListener,
     
     /*
      * RadioDataManagerListener
-     */
-    
+     */    
     @Override
     public void downloadRequestAnswered(FrequencyInterval freqInterval, Interval<Date> timeInterval, long ID, String identifier) {
         zoomManager.addZoomDataConfig(freqInterval, timeInterval, this, ID, identifier);
+        YValueModel yValueModel = this.yValueModelManager.getYValueModel(identifier);
+        yValueModel.setAvailableYMax(freqInterval.getStart());
+        yValueModel.setAvailableYMax(freqInterval.getEnd());
     }
     
     @Override
@@ -122,18 +127,12 @@ public class RadioPlotModel implements RadioDataManagerListener,
     @Override
     public void dataNotChanged(Interval<Date> timeInterval, FrequencyInterval freqInterval, Rectangle area, List<Long> downloadIDList, String identifier, long radioImageID) {
         RadioPlotModelData rpmd = getRadioPlotModelData(identifier);
-        YAxisElement yAxisElement = rpmd.getyAxisElement();
         Map<Long, Map<Long, PlotConfig>> plotConfigList = rpmd.getPlotConfigList();
         Map<Long, DownloadRequestData> downloadRequestData = rpmd.getDownloadRequestData();
         for (long ID : downloadIDList) {
             synchronized (this) {
                 BufferedImage newImage = bufferedImages.get(radioImageID);
                 DrawableAreaMap dam = zoomManager.getDrawableAreaMap(timeInterval.getStart(), timeInterval.getEnd(), freqInterval.getStart(), freqInterval.getEnd(), area, ID, identifier);
-                Range selectedRange = defineSelectedRange(freqInterval.getStart(), freqInterval.getEnd(), identifier);
-                yAxisElement.setMinValue(selectedRange.min);
-                yAxisElement.setMaxValue(selectedRange.max);
-                yAxisElement.setAvailableRange(new Range(freqInterval.getStart(), freqInterval.getEnd()));
-                yAxisElement.setSelectedRange(selectedRange);
                 PlotConfig pc = new PlotConfig(newImage, dam, downloadRequestData.get(ID).isVisible(), ID, radioImageID);
                 if (plotConfigList.containsKey(ID)) {
                     plotConfigList.get(ID).put(radioImageID, pc);
@@ -207,7 +206,6 @@ public class RadioPlotModel implements RadioDataManagerListener,
     public void newDataForIDReceived(byte[] data, Interval<Date> timeInterval, FrequencyInterval freqInterval, Rectangle area, Long downloadID, String identifier, Long radioImageID) {
         synchronized (this) {
             RadioPlotModelData rpmd = getRadioPlotModelData(identifier);
-            YAxisElement yAxisElement = rpmd.getyAxisElement();
             Map<Long, DownloadRequestData> downloadRequestData = rpmd.getDownloadRequestData();
             Map<Long, Map<Long, PlotConfig>> plotConfigList = rpmd.getPlotConfigList();
             BufferedImage newImage = createBufferedImage(area.width, area.height, data);
@@ -226,11 +224,6 @@ public class RadioPlotModel implements RadioDataManagerListener,
             DrawableAreaMap dam = zoomManager.getDrawableAreaMap(timeInterval.getStart(), timeInterval.getEnd(), freqInterval.getStart(), freqInterval.getEnd(), area, downloadID, identifier);
             Log.trace("Drawable Area Map : " + dam);
             Log.trace("-===============================================================-");
-            //Range selectedRange = defineSelectedRange(freqInterval.getStart(), freqInterval.getEnd(), identifier);
-            yAxisElement.setMinValue(freqInterval.getStart());
-            yAxisElement.setMaxValue(freqInterval.getEnd());
-            //yAxisElement.setAvailableRange(new Range(freqInterval.getStart(), freqInterval.getEnd()));
-            //yAxisElement.setSelectedRange(selectedRange);
             PlotConfig pc = new PlotConfig(newImage, dam, downloadRequestData.get(downloadID).isVisible(), downloadID, radioImageID);
             if (plotConfigList.containsKey(downloadID)) {
                 plotConfigList.get(downloadID).put(radioImageID, pc);
@@ -282,6 +275,13 @@ public class RadioPlotModel implements RadioDataManagerListener,
         }
     }
     
+    @Override
+    public void frequencyIntervalUpdated(String plotIdentifier, FrequencyInterval maxFrequencyInterval) {
+        YValueModel yValueModel = yValueModelManager.getYValueModel(plotIdentifier);
+        yValueModel.setAvailableYMin(maxFrequencyInterval.getStart());
+        yValueModel.setAvailableYMax(maxFrequencyInterval.getEnd());
+    }
+    
     /*
      * ZoomDataConfigListener
      */
@@ -323,15 +323,6 @@ public class RadioPlotModel implements RadioDataManagerListener,
         t.start();
         updateNoDataConfig(ID, plotIdentifier);
     }
-    
-    private Range defineSelectedRange(int start, int end, String identifier) {
-        PlotAreaSpaceManager manager = PlotAreaSpaceManager.getInstance();
-        PlotAreaSpace plotAreaSpace = manager.getPlotAreaSpace(identifier);
-        double ratioAvailable = 1.0 * (end - start) / (plotAreaSpace.getScaledMaxValue() - plotAreaSpace.getScaledMinValue());
-        double selectedMinY = 1.0 * start + (plotAreaSpace.getScaledSelectedMinValue() - plotAreaSpace.getScaledMinValue()) * ratioAvailable;
-        double selectedMaxY = 1.0 * start + (plotAreaSpace.getScaledSelectedMaxValue() - plotAreaSpace.getScaledMinValue()) * ratioAvailable;
-        return new Range(selectedMinY, selectedMaxY);
-    }    
 
     private void fireDrawNewBufferedImage(String identifier) {// BufferedImage
         RadioPlotModelData rpmd = getRadioPlotModelData(identifier);
@@ -397,5 +388,7 @@ public class RadioPlotModel implements RadioDataManagerListener,
         }
         fireDrawNewBufferedImage(plotIdentifier);
     }
+
+    
 
 }

@@ -35,4 +35,12 @@ public interface RadioDataManagerListener {
     public abstract void intervalTooBig(long iD, String identifier);
     
     public abstract void noDataInterval(List<Interval<Date>> noDataList, Long downloadID, String plotIdentifier);
+
+    /**
+     * The maximum frequency interval for the plot with the given plot identifier was changed.
+     * 
+     * @param plotIdentifier        The plot identifier for which the frequency interval was changed
+     * @param maxFrequencyInterval  The new maximum frequency interval
+     */
+    public abstract void frequencyIntervalUpdated(String plotIdentifier, FrequencyInterval maxFrequencyInterval);
 }

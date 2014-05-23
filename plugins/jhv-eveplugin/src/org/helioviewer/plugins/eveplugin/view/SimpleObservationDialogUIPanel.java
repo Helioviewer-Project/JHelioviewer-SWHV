@@ -177,9 +177,10 @@ public class SimpleObservationDialogUIPanel extends ObservationDialogPanel imple
     private void startRadioDownload() {
         final String identifier = plotComboBox.getSelectedIndex() == 0 ? PlotsContainerPanel.PLOT_IDENTIFIER_MASTER : PlotsContainerPanel.PLOT_IDENTIFIER_SLAVE;
         DateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
-        String isoStart = df.format(getStartDate());
+        Interval<Date> selectedInterval = ZoomController.getSingletonInstance().getSelectedInterval();
+        String isoStart = df.format(selectedInterval.getStart());
         Calendar end = Calendar.getInstance();
-        end.setTime(getEndDate());
+        end.setTime(selectedInterval.getEnd());
         end.set(Calendar.HOUR_OF_DAY, 23);
         end.set(Calendar.MINUTE, 59);
         end.set(Calendar.SECOND, 59);

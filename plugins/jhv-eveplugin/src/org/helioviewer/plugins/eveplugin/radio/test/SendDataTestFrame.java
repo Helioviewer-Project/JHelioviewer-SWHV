@@ -293,4 +293,13 @@ public class SendDataTestFrame extends JFrame implements RadioDataManagerListene
         // TODO Auto-generated method stub
         
     }
+
+    /* (non-Javadoc)
+     * @see org.helioviewer.plugins.eveplugin.radio.data.RadioDataManagerListener#frequencyIntervalUpdated(java.lang.String, org.helioviewer.plugins.eveplugin.radio.data.FrequencyInterval)
+     */
+    @Override
+    public void frequencyIntervalUpdated(String plotIdentifier, FrequencyInterval maxFrequencyInterval) {
+        // TODO Auto-generated method stub
+        
+    }
 }
