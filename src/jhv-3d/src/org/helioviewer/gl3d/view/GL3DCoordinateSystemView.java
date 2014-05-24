@@ -10,7 +10,6 @@ import org.helioviewer.base.physics.Astronomy;
 import org.helioviewer.gl3d.scenegraph.GL3DState;
 import org.helioviewer.gl3d.wcs.CoordinateSystem;
 import org.helioviewer.gl3d.wcs.CoordinateVector;
-import org.helioviewer.gl3d.wcs.HEEQCoordinateSystem;
 import org.helioviewer.gl3d.wcs.StonyhurstCoordinateSystem;
 import org.helioviewer.gl3d.wcs.TimedHeliocentricCartesianCoordinateSystem;
 import org.helioviewer.viewmodel.changeevent.ChangeEvent;
@@ -27,9 +26,9 @@ import org.helioviewer.viewmodel.view.jp2view.datetime.ImmutableDateTime;
  * the image layer. The orientation vector should give the image plane normal
  * and the coordinate system should define in which coordinate system this
  * normal is defined in.
- *
+ * 
  * @author Simon Spoerri (simon.spoerri@fhnw.ch)
- *
+ * 
  */
 public class GL3DCoordinateSystemView extends AbstractGL3DView implements GL3DView {
     private CoordinateSystem coordinateSystem;
@@ -103,20 +102,24 @@ public class GL3DCoordinateSystemView extends AbstractGL3DView implements GL3DVi
                 Log.debug("GL3DCoordinateSystemView: Creating STEREO Image Layer!");
                 if (metaData instanceof HelioviewerPositionedMetaData) {
                     HelioviewerPositionedMetaData hpmd = ((HelioviewerPositionedMetaData) metaData);
-                    if (hpmd.isStonyhurstProvided()) {
+                    if (hpmd.isHEEQProvided()) {
                         Calendar c = new GregorianCalendar();
                         c.setTime(hpmd.getDateTime().getTime());
                         double b0 = Astronomy.getB0InRadians(c);
+                        // this.coordinateSystem = new
+                        // TimedHEEQCoordinateSystem(hpmd.getDateTime(),
+                        // hpmd.getStonyhurstLatitude(),
+                        // hpmd.getStonyhurstLongitude());
+                        Log.debug("GL3DCoordinateSystemView: Providing HEEQ Coordinate System and orientation");
+
+                    } else if (hpmd.isStonyhurstProvided()) {
+                        Calendar c = new GregorianCalendar();
+                        c.setTime(hpmd.getDateTime().getTime());
+                        double b0 = Astronomy.getB0InRadians(c);
+
                         this.coordinateSystem = new StonyhurstCoordinateSystem(b0);
                         this.orientation = this.coordinateSystem.createCoordinateVector(Math.toRadians(hpmd.getStonyhurstLongitude()), Math.toRadians(hpmd.getStonyhurstLatitude()), hpmd.getDobs());
                         Log.debug("GL3DCoordinateSystemView: Providing Stonyhurst Coordinate System and orientation");
-                    } else if (hpmd.isHEEQProvided()) {
-                        Calendar c = new GregorianCalendar();
-                        c.setTime(hpmd.getDateTime().getTime());
-                        double b0 = Astronomy.getB0InRadians(c);
-                        this.coordinateSystem = new HEEQCoordinateSystem(b0);
-                        this.orientation = this.coordinateSystem.createCoordinateVector(hpmd.getHEEQX(), hpmd.getHEEQY(), hpmd.getHEEQZ());
-                        Log.debug("GL3DCoordinateSystemView: Providing HEEQ Coordinate System and orientation");
                     } else {
                         this.coordinateSystem = getDefaultCoordinateSystem(datetime);
                         this.orientation = getDefaultOrientation(datetime);
@@ -136,7 +139,7 @@ public class GL3DCoordinateSystemView extends AbstractGL3DView implements GL3DVi
             this.orientation = getDefaultOrientation(datetime);
         }
         /*
-         *
+         * 
          * if(metaData instanceof HelioviewerPositionedMetaData) {
          * HelioviewerPositionedMetaData hpmd = ((HelioviewerPositionedMetaData)
          * metaData); if(hpmd.isStonyhurstProvided()) { Calendar c = new
@@ -176,9 +179,9 @@ public class GL3DCoordinateSystemView extends AbstractGL3DView implements GL3DVi
          * this.orientation = getDefaultOrientation(); // Log.warn(
          * "GL3DCoordinateSystemView: No usable coordinates given for orientation"
          * ); }
-         *
+         * 
          * metaDataView.addViewListener(new ViewListener() {
-         *
+         * 
          * public void viewChanged(View sender, ChangeEvent aEvent) {
          * coordinateSystem.fireCoordinateSystemChanged(); } }); } else
          * if(metaData instanceof HelioviewerMetaData) { HelioviewerMetaData hmd
@@ -190,7 +193,7 @@ public class GL3DCoordinateSystemView extends AbstractGL3DView implements GL3DVi
          * Astronomy.getB0InRadians(c); // this.orientation =
          * this.coordinateSystem.createCoordinateVector(longitude, latitude,
          * radius);
-         *
+         * 
          * // //Default CoordinateSystem this.coordinateSystem = new
          * HEEQCoordinateSystem(b0); // //DefaultOrientation this.orientation =
          * this.coordinateSystem.createCoordinateVector(1, 0, 0); Log.debug(
