@@ -44,13 +44,13 @@ public class MainImagePanel extends BasicImagePanel {
     // default serialVersionUID
     private static final long serialVersionUID = 1L;
 
-    private NoImagePostRenderer noImagePostRenderer = new NoImagePostRenderer();
+    private final NoImagePostRenderer noImagePostRenderer = new NoImagePostRenderer();
     private boolean noImagePostRendererSet = false;
 
-    private LoadingPostRendererSwitch loadingPostRenderer = new LoadingPostRendererSwitch();
+    private final LoadingPostRendererSwitch loadingPostRenderer = new LoadingPostRendererSwitch();
     private int loadingTasks = 0;
 
-    private AbstractList<MouseMotionListener> mouseMotionListeners = new LinkedList<MouseMotionListener>();
+    private final AbstractList<MouseMotionListener> mouseMotionListeners = new LinkedList<MouseMotionListener>();
 
     // ///////////////////////////////////////////////////////////////////////////
     // Methods
@@ -113,6 +113,7 @@ public class MainImagePanel extends BasicImagePanel {
      * {@inheritDoc}
      */
 
+    @Override
     public synchronized void setView(ComponentView newView) {
 
         if (renderedImageComponent != null)
@@ -150,6 +151,7 @@ public class MainImagePanel extends BasicImagePanel {
      * {@inheritDoc}
      */
 
+    @Override
     public synchronized void addMouseMotionListener(MouseMotionListener l) {
         if (l != null)
             mouseMotionListeners.add(l);
@@ -159,6 +161,7 @@ public class MainImagePanel extends BasicImagePanel {
      * {@inheritDoc}
      */
 
+    @Override
     public synchronized void removeMouseMotionListener(MouseMotionListener l) {
         if (l != null)
             mouseMotionListeners.remove(l);
@@ -171,6 +174,7 @@ public class MainImagePanel extends BasicImagePanel {
      * when there is no image available.
      */
 
+    @Override
     public void viewChanged(View sender, ChangeEvent aEvent) {
         // checks if at least one layer is available - if not the post renderer
         // for displaying that no image was selected will be added
@@ -204,6 +208,7 @@ public class MainImagePanel extends BasicImagePanel {
      * Centers the no image loaded image when component was resized.
      */
 
+    @Override
     public void componentResized(ComponentEvent e) {
 
         noImagePostRenderer.setContainerSize(getWidth(), getHeight());
@@ -256,6 +261,7 @@ public class MainImagePanel extends BasicImagePanel {
          * 
          * Draws the no image loaded image.
          */
+        @Override
         public void render(ScreenRenderGraphics g) {
             if (image != null) {
                 g.drawImage(image, (size.width - image.getWidth()) / 2, (size.height - image.getHeight()) / 2);
@@ -363,15 +369,18 @@ public class MainImagePanel extends BasicImagePanel {
         /**
          * {@inheritDoc}
          */
+        @Override
         public void startAnimation() {
             currentPearlPos = numPearlPositions / 2;
 
             if (timer == null) {
                 timer = new Timer("Loading Animation", true);
                 timer.schedule(new TimerTask() {
+                    @Override
                     public void run() {
                         currentPearlPos++;
                         repaint();
+                        Displayer.getSingletonInstance().display();
                     }
                 }, 0, 100);
             }
@@ -380,6 +389,7 @@ public class MainImagePanel extends BasicImagePanel {
         /**
          * {@inheritDoc}
          */
+        @Override
         public void stopAnimation() {
             if (timer != null) {
                 timer.cancel();
@@ -390,6 +400,7 @@ public class MainImagePanel extends BasicImagePanel {
         /**
          * {@inheritDoc}
          */
+        @Override
         public boolean isAnimating() {
             return timer != null;
         }
@@ -399,6 +410,7 @@ public class MainImagePanel extends BasicImagePanel {
          * 
          * Draws the loading image and its animation.
          */
+        @Override
         public void render(ScreenRenderGraphics g) {
             if (image != null) {
                 g.drawImage(image, position.x, position.y);
@@ -432,6 +444,7 @@ public class MainImagePanel extends BasicImagePanel {
         /**
          * {@inheritDoc}
          */
+        @Override
         public void setContainerSize(int width, int height) {
             position = new Point((width - image.getWidth()) / 2, (height - image.getHeight()) / 2);
         }
@@ -455,6 +468,7 @@ public class MainImagePanel extends BasicImagePanel {
         /**
          * {@inheritDoc}
          */
+        @Override
         public void setContainerSize(int width, int height) {
             // position = new Point(width - 185, 12);
             position = new Point(width - 231, 12);
@@ -474,13 +488,14 @@ public class MainImagePanel extends BasicImagePanel {
      */
     private class LoadingPostRendererSwitch implements LoadingPostRenderer {
 
-        private LoadingPostRenderer centerRenderer = new CenterLoadingPostRenderer();
-        private LoadingPostRenderer cornerRenderer = new CornerLoadingPostRenderer();
+        private final LoadingPostRenderer centerRenderer = new CenterLoadingPostRenderer();
+        private final LoadingPostRenderer cornerRenderer = new CornerLoadingPostRenderer();
         private LoadingPostRenderer currentRenderer = centerRenderer;
 
         /**
          * {@inheritDoc}
          */
+        @Override
         public void render(ScreenRenderGraphics g) {
             currentRenderer.render(g);
         }
@@ -488,6 +503,7 @@ public class MainImagePanel extends BasicImagePanel {
         /**
          * {@inheritDoc}
          */
+        @Override
         public void setContainerSize(int width, int height) {
             centerRenderer.setContainerSize(width, height);
             cornerRenderer.setContainerSize(width, height);
@@ -496,6 +512,7 @@ public class MainImagePanel extends BasicImagePanel {
         /**
          * {@inheritDoc}
          */
+        @Override
         public void startAnimation() {
             currentRenderer.startAnimation();
         }
@@ -503,13 +520,16 @@ public class MainImagePanel extends BasicImagePanel {
         /**
          * {@inheritDoc}
          */
+        @Override
         public void stopAnimation() {
             currentRenderer.stopAnimation();
+            Displayer.getSingletonInstance().display();
         }
 
         /**
          * {@inheritDoc}
          */
+        @Override
         public boolean isAnimating() {
             return currentRenderer.isAnimating();
         }
