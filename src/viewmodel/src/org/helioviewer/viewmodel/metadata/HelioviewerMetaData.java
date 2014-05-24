@@ -13,15 +13,15 @@ import org.helioviewer.viewmodel.view.jp2view.image.SubImage;
 
 /**
  * Implementation of MetaData representing solar images.
- *
+ * 
  * <p>
  * This class is supposed to be for solar images. Currently, it supports the
  * observatory SOHO with its instruments EIT, LASCO and MDI, as well as some
  * instruments on board of the observatory STEREO.
- *
+ * 
  * @author Ludwig Schmidt
  * @author Andre Dau
- *
+ * 
  */
 public class HelioviewerMetaData extends AbstractMetaData implements SunMetaData, ObserverMetaData, ImageSizeMetaData, NonConstantMetaData {
 
@@ -40,9 +40,9 @@ public class HelioviewerMetaData extends AbstractMetaData implements SunMetaData
 
     /**
      * Default constructor.
-     *
+     * 
      * Tries to read all informations required.
-     *
+     * 
      * @param m
      *            Meta data container serving as a base for the construction
      */
@@ -137,14 +137,14 @@ public class HelioviewerMetaData extends AbstractMetaData implements SunMetaData
 
     /**
      * Reads the non-constant pixel parameters of the meta data.
-     *
+     * 
      * This includes the resolution as well as position and size of the sun. The
      * function also checks, whether these values have changed and returns true
      * if so.
-     *
+     * 
      * @return true, if the pixel parameters have changed, false otherwise
      */
-    private boolean updatePixelParameters() {
+    protected boolean updatePixelParameters() {
 
         boolean changed = false;
 
@@ -173,7 +173,7 @@ public class HelioviewerMetaData extends AbstractMetaData implements SunMetaData
             }
             // distance to sun in meters
             double distanceToSun = metaDataContainer.tryGetDouble("DSUN_OBS");
-            double radiusSunInArcsec = Math.atan(Constants.SunRadius / distanceToSun) * MathUtils.radeg * 3600;
+            double radiusSunInArcsec = Math.atan(Constants.SunRadiusInMeter / distanceToSun) * MathUtils.radeg * 3600;
             newSolarPixelRadius = radiusSunInArcsec / arcsecPerPixelX;
 
         } else if (instrument.contains("HMI")) {
@@ -243,8 +243,12 @@ public class HelioviewerMetaData extends AbstractMetaData implements SunMetaData
             }
 
             double sunX = metaDataContainer.tryGetDouble("CRPIX1");
-            double sunY = metaDataContainer.tryGetDouble("CRPIX2");
-
+            double sunY;
+            if (detector.equals("EUVI")) {
+                sunY = 2048 - metaDataContainer.tryGetDouble("CRPIX2");
+            } else {
+                sunY = metaDataContainer.tryGetDouble("CRPIX2");
+            }
             if (changed || Math.abs(sunPixelPosition.getX() - sunX) > allowedAbsoluteDifference || Math.abs(sunPixelPosition.getY() - sunY) > allowedAbsoluteDifference) {
                 sunPixelPosition = new Vector2dDouble(sunX, sunY);
                 changed = true;
@@ -253,7 +257,7 @@ public class HelioviewerMetaData extends AbstractMetaData implements SunMetaData
 
         if (changed) {
             solarPixelRadius = newSolarPixelRadius;
-            meterPerPixel = Constants.SunRadius / solarPixelRadius / Constants.SunRadiusInMeter;
+            meterPerPixel = Constants.SunRadius / solarPixelRadius;
             setPhysicalLowerLeftCorner(sunPixelPosition.scale(-meterPerPixel));
             setPhysicalImageSize(new Vector2dDouble(pixelImageSize.getX() * meterPerPixel, pixelImageSize.getY() * meterPerPixel));
         }
@@ -262,12 +266,15 @@ public class HelioviewerMetaData extends AbstractMetaData implements SunMetaData
     }
 
     public Region roiToRegion(SubImage roi, double zoompercent) {
-        //System.out.println("ROIWHAT " + roi.width + " " + sunPixelPosition.getX() + " " + roi.x + " " + " " + pixelImageSize.getX());
-        //System.out.println("ROIWHAT " + roi.height + " " + sunPixelPosition.getY() + " " + roi.y + " " + pixelImageSize.getX());
-        //System.out.println("RESOLUTION" + zoompercent);
+        // System.out.println("ROIWHAT " + roi.width + " " +
+        // sunPixelPosition.getX() + " " + roi.x + " " + " " +
+        // pixelImageSize.getX());
+        // System.out.println("ROIWHAT " + roi.height + " " +
+        // sunPixelPosition.getY() + " " + roi.y + " " + pixelImageSize.getX());
+        // System.out.println("RESOLUTION" + zoompercent);
 
         Region region = StaticRegion.createAdaptedRegion((roi.x / zoompercent - sunPixelPosition.getX()) * meterPerPixel, (roi.y / zoompercent - sunPixelPosition.getY()) * meterPerPixel, roi.width * meterPerPixel / zoompercent, roi.height * meterPerPixel / zoompercent);
-        //System.out.println("REGION" + region);
+        // System.out.println("REGION" + region);
         return region;
     }
 
@@ -392,7 +399,7 @@ public class HelioviewerMetaData extends AbstractMetaData implements SunMetaData
 
     /**
      * {@inheritDoc}
-     *
+     * 
      * In this case, the resolution and the solar pixel position are checked.
      */
     @Override
