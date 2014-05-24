@@ -35,7 +35,7 @@ public abstract class GL3DCamera {
     public static final double MIN_DISTANCE = -Constants.SunRadius * 1.2;
 
     private double clipNear = Constants.SunRadius / 100.;
-    private double clipFar = Constants.SunRadius * 100.;
+    private double clipFar = Constants.SunRadius * 1000.;
     private final double fov = 10;
     private double aspect = 0.0;
     private double width = 0.0;
