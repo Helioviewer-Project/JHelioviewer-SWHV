@@ -159,10 +159,10 @@ public abstract class GL3DImageLayer extends GL3DOrientedGroup implements GL3DCa
         double lly = metaData.getPhysicalLowerLeft().getY();
         double urx = metaData.getPhysicalUpperRight().getX();
         double ury = metaData.getPhysicalUpperRight().getY();
-        GL3DMat4d phiRotation = GL3DMat4d.rotation(this.imageTextureView.phi, new GL3DVec3d(0, 1, 0));
-        phiRotation.rotate(-this.imageTextureView.theta, new GL3DVec3d(0, 0, 1));
+        GL3DMat4d hitRotation = GL3DMat4d.rotation(this.imageTextureView.phi, new GL3DVec3d(0, 1, 0));
+        hitRotation.rotate(-this.imageTextureView.theta, new GL3DVec3d(0, 0, 1));
 
-        this.accellerationShape = new GL3DHitReferenceShape(true, phiRotation);
+        this.accellerationShape = new GL3DHitReferenceShape(true, hitRotation);
         GL3DRayTracer rayTracer = new GL3DRayTracer(this.accellerationShape, activeCamera);
         // Shoot Rays in the corners of the viewport
         int width = (int) activeCamera.getWidth();
@@ -211,10 +211,10 @@ public abstract class GL3DImageLayer extends GL3DOrientedGroup implements GL3DCa
         maxPhysicalX = Math.min(maxPhysicalX, urx);
         maxPhysicalY = Math.min(maxPhysicalY, ury);
 
-        minPhysicalX -= Math.abs(minPhysicalX) * 0.5;
-        minPhysicalY -= Math.abs(minPhysicalY) * 0.5;
-        maxPhysicalX += Math.abs(maxPhysicalX) * 0.5;
-        maxPhysicalY += Math.abs(maxPhysicalY) * 0.5;
+        minPhysicalX -= Math.abs(minPhysicalX) * 0.1;
+        minPhysicalY -= Math.abs(minPhysicalY) * 0.1;
+        maxPhysicalX += Math.abs(maxPhysicalX) * 0.1;
+        maxPhysicalY += Math.abs(maxPhysicalY) * 0.1;
 
         minPhysicalX = Math.max(minPhysicalX, llx);
         minPhysicalY = Math.max(minPhysicalY, lly);

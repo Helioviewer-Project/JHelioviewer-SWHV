@@ -29,7 +29,7 @@ public class GL3DHitReferenceShape extends GL3DMesh {
                                                   // * 10;
 
     private final boolean allowBacksideHits;
-    private final GL3DMat4d phiRotation;
+    private final GL3DMat4d hitRotation;
 
     public GL3DHitReferenceShape() {
         this(false);
@@ -38,14 +38,14 @@ public class GL3DHitReferenceShape extends GL3DMesh {
     public GL3DHitReferenceShape(boolean allowBacksideHits) {
         super("Hit Reference Shape");
         this.allowBacksideHits = allowBacksideHits;
-        this.phiRotation = new GL3DMat4d();
-        this.phiRotation.setIdentity();
+        this.hitRotation = new GL3DMat4d();
+        this.hitRotation.setIdentity();
     }
 
     public GL3DHitReferenceShape(boolean allowBacksideHits, GL3DMat4d phiRotation) {
         super("Hit Reference Shape");
         this.allowBacksideHits = allowBacksideHits;
-        this.phiRotation = phiRotation;
+        this.hitRotation = phiRotation;
     }
 
     @Override
@@ -61,17 +61,17 @@ public class GL3DHitReferenceShape extends GL3DMesh {
         GL3DVec3d tl = createVertex(-extremeValue, extremeValue, 0);
 
         positions.add(ll);
-        //normals.add(new GL3DVec3d(0, 0, 1));
-        //colors.add(new GL3DVec4d(0, 0, 1, 1.0));
+        // normals.add(new GL3DVec3d(0, 0, 1));
+        // colors.add(new GL3DVec4d(0, 0, 1, 1.0));
         positions.add(lr);
-        //normals.add(new GL3DVec3d(0, 0, 1));
-        //colors.add(new GL3DVec4d(0, 0, 1, 1.0));
+        // normals.add(new GL3DVec3d(0, 0, 1));
+        // colors.add(new GL3DVec4d(0, 0, 1, 1.0));
         positions.add(tr);
-        //normals.add(new GL3DVec3d(0, 0, 1));
-        //colors.add(new GL3DVec4d(0, 0, 1, 1.0));
+        // normals.add(new GL3DVec3d(0, 0, 1));
+        // colors.add(new GL3DVec4d(0, 0, 1, 1.0));
         positions.add(tl);
-        //normals.add(new GL3DVec3d(0, 0, 1));
-        //colors.add(new GL3DVec4d(0, 0, 1, 1.0));
+        // normals.add(new GL3DVec3d(0, 0, 1));
+        // colors.add(new GL3DVec4d(0, 0, 1, 1.0));
 
         indices.add(0);
         indices.add(1);
@@ -85,10 +85,11 @@ public class GL3DHitReferenceShape extends GL3DMesh {
     }
 
     private GL3DVec3d createVertex(double x, double y, double z) {
-        double cx = x * phiRotation.m[0] + y * phiRotation.m[4] + z * phiRotation.m[8] + phiRotation.m[12];
-        double cy = x * phiRotation.m[1] + y * phiRotation.m[5] + z * phiRotation.m[9] + phiRotation.m[13];
-        double cz = x * phiRotation.m[2] + y * phiRotation.m[6] + z * phiRotation.m[10] + phiRotation.m[14];
-        // System.out.println(new GL3DVec3d(cx, cy, cz));
+
+        double cx = x * hitRotation.m[0] + y * hitRotation.m[4] + z * hitRotation.m[8] + hitRotation.m[12];
+        double cy = x * hitRotation.m[1] + y * hitRotation.m[5] + z * hitRotation.m[9] + hitRotation.m[13];
+        double cz = x * hitRotation.m[2] + y * hitRotation.m[6] + z * hitRotation.m[10] + hitRotation.m[14];
+
         return new GL3DVec3d(cx, cy, cz);
     }
 
