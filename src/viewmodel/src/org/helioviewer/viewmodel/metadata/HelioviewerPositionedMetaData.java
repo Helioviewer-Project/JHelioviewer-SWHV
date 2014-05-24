@@ -22,24 +22,33 @@ public class HelioviewerPositionedMetaData extends HelioviewerMetaData implement
 
     public HelioviewerPositionedMetaData(MetaDataContainer mdc) {
         super(mdc);
+        updatePosition();
+    }
 
-        this.heeqX = mdc.tryGetDouble("HEQX_OBS");
-        this.heeqY = mdc.tryGetDouble("HEQY_OBS");
-        this.heeqZ = mdc.tryGetDouble("HEQZ_OBS");
+    @Override
+    protected boolean updatePixelParameters() {
+        updatePosition();
+        return super.updatePixelParameters();
+    }
+
+    private void updatePosition() {
+        this.heeqX = metaDataContainer.tryGetDouble("HEQX_OBS");
+        this.heeqY = metaDataContainer.tryGetDouble("HEQY_OBS");
+        this.heeqZ = metaDataContainer.tryGetDouble("HEQZ_OBS");
         this.heeqAvailable = this.heeqX != 0.0 || this.heeqY != 0.0 || this.heeqZ != 0.0;
 
-        this.heeX = mdc.tryGetDouble("HEEX_OBS");
-        this.heeY = mdc.tryGetDouble("HEEY_OBS");
-        this.heeZ = mdc.tryGetDouble("HEEZ_OBS");
+        this.heeX = metaDataContainer.tryGetDouble("HEEX_OBS");
+        this.heeY = metaDataContainer.tryGetDouble("HEEY_OBS");
+        this.heeZ = metaDataContainer.tryGetDouble("HEEZ_OBS");
         this.heeAvailable = this.heeX != 0.0 || this.heeY != 0.0 || this.heeZ != 0.0;
 
-        this.crlt = mdc.tryGetDouble("CRLT_OBS");
-        this.crln = mdc.tryGetDouble("CRLN_OBS");
-        this.dobs = mdc.tryGetDouble("DSUN_OBS");
+        this.crlt = metaDataContainer.tryGetDouble("CRLT_OBS");
+        this.crln = metaDataContainer.tryGetDouble("CRLN_OBS");
+        this.dobs = metaDataContainer.tryGetDouble("DSUN_OBS");
         this.carringtonAvailable = this.crlt != 0.0 || this.crln != 0.0;
 
-        this.stonyhurstLatitude = mdc.tryGetDouble("HGLT_OBS");
-        this.stonyhurstLongitude = mdc.tryGetDouble("HGLN_OBS");
+        this.stonyhurstLatitude = metaDataContainer.tryGetDouble("HGLT_OBS");
+        this.stonyhurstLongitude = metaDataContainer.tryGetDouble("HGLN_OBS");
         this.stonyhurstAvailable = this.stonyhurstLatitude != 0.0 || this.stonyhurstLongitude != 0.0;
     }
 
@@ -59,18 +68,22 @@ public class HelioviewerPositionedMetaData extends HelioviewerMetaData implement
         return heeAvailable;
     }
 
+    @Override
     public double getHEEQX() {
         return this.heeqX;
     }
 
+    @Override
     public double getHEEQY() {
         return this.heeqY;
     }
 
+    @Override
     public double getHEEQZ() {
         return this.heeqZ;
     }
 
+    @Override
     public boolean isHEEQProvided() {
         return this.heeqAvailable;
     }
