@@ -10,18 +10,15 @@ import org.helioviewer.base.physics.Constants;
 import org.helioviewer.gl3d.camera.GL3DCamera;
 import org.helioviewer.gl3d.camera.GL3DCameraListener;
 import org.helioviewer.gl3d.model.GL3DHitReferenceShape;
-import org.helioviewer.gl3d.scenegraph.GL3DOrientedGroup;
+import org.helioviewer.gl3d.scenegraph.GL3DGroup;
 import org.helioviewer.gl3d.scenegraph.GL3DState;
 import org.helioviewer.gl3d.scenegraph.math.GL3DMat4d;
 import org.helioviewer.gl3d.scenegraph.math.GL3DVec3d;
 import org.helioviewer.gl3d.scenegraph.rt.GL3DRay;
 import org.helioviewer.gl3d.scenegraph.rt.GL3DRayTracer;
 import org.helioviewer.gl3d.shader.GL3DImageFragmentShaderProgram;
-import org.helioviewer.gl3d.view.GL3DCoordinateSystemView;
 import org.helioviewer.gl3d.view.GL3DImageTextureView;
 import org.helioviewer.gl3d.view.GL3DView;
-import org.helioviewer.gl3d.wcs.CoordinateSystem;
-import org.helioviewer.gl3d.wcs.CoordinateVector;
 import org.helioviewer.viewmodel.changeevent.ChangeEvent;
 import org.helioviewer.viewmodel.metadata.MetaData;
 import org.helioviewer.viewmodel.region.Region;
@@ -37,7 +34,7 @@ import org.helioviewer.viewmodel.view.RegionView;
  * @author Simon Spoerri (simon.spoerri@fhnw.ch)
  * 
  */
-public abstract class GL3DImageLayer extends GL3DOrientedGroup implements GL3DCameraListener {
+public abstract class GL3DImageLayer extends GL3DGroup implements GL3DCameraListener {
     private static int nextLayerId = 0;
     private final int layerId;
 
@@ -47,7 +44,7 @@ public abstract class GL3DImageLayer extends GL3DOrientedGroup implements GL3DCa
 
     protected GL3DView mainLayerView;
     protected GL3DImageTextureView imageTextureView;
-    protected GL3DCoordinateSystemView coordinateSystemView;
+    // protected GL3DCoordinateSystemView coordinateSystemView;
     protected MetaDataView metaDataView;
     protected RegionView regionView;
     protected GL3DImageLayers layerGroup;
@@ -77,11 +74,14 @@ public abstract class GL3DImageLayer extends GL3DOrientedGroup implements GL3DCa
             throw new IllegalStateException("Cannot create GL3DImageLayer when no GL3DImageTextureView is present in Layer");
         }
 
-        this.coordinateSystemView = this.mainLayerView.getAdapter(GL3DCoordinateSystemView.class);
-        if (this.coordinateSystemView == null) {
-            throw new IllegalStateException("Cannot create GL3DImageLayer when no GL3DCoordinateSystemView is present in Layer");
-        }
-
+        /*
+         * this.coordinateSystemView =
+         * this.mainLayerView.getAdapter(GL3DCoordinateSystemView.class); if
+         * (this.coordinateSystemView == null) { throw new
+         * IllegalStateException(
+         * "Cannot create GL3DImageLayer when no GL3DCoordinateSystemView is present in Layer"
+         * ); }
+         */
         this.metaDataView = this.mainLayerView.getAdapter(MetaDataView.class);
         if (this.metaDataView == null) {
             throw new IllegalStateException("Cannot create GL3DImageLayer when no MetaDataView is present in Layer");
@@ -91,7 +91,7 @@ public abstract class GL3DImageLayer extends GL3DOrientedGroup implements GL3DCa
             throw new IllegalStateException("Cannot create GL3DImageLayer when no RegionView is present in Layer");
         }
 
-        getCoordinateSystem().addListener(this);
+        // getCoordinateSystem().addListener(this);
         this.doUpdateROI = true;
         this.markAsChanged();
     }
@@ -141,16 +141,13 @@ public abstract class GL3DImageLayer extends GL3DOrientedGroup implements GL3DCa
     public void cameraMoving(GL3DCamera camera) {
     }
 
-    @Override
-    public CoordinateSystem getCoordinateSystem() {
-        return this.coordinateSystemView.getCoordinateSystem();
-    }
-
-    @Override
-    public CoordinateVector getOrientation() {
-        return this.coordinateSystemView.getOrientation();
-    }
-
+    /*
+     * @Override public CoordinateSystem getCoordinateSystem() { return
+     * this.coordinateSystemView.getCoordinateSystem(); }
+     * 
+     * @Override public CoordinateVector getOrientation() { return
+     * this.coordinateSystemView.getOrientation(); }
+     */
     private void updateROI(GL3DCamera activeCamera) {
 
         MetaData metaData = metaDataView.getMetaData();
