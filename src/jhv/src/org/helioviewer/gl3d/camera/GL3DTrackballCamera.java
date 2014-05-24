@@ -14,9 +14,12 @@ import org.helioviewer.gl3d.wcs.CoordinateVector;
 import org.helioviewer.gl3d.wcs.conversion.SolarSphereToStonyhurstHeliographicConversion;
 import org.helioviewer.gl3d.wcs.impl.SolarSphereCoordinateSystem;
 import org.helioviewer.gl3d.wcs.impl.StonyhurstHeliographicCoordinateSystem;
+import org.helioviewer.jhv.layers.LayersModel;
 import org.helioviewer.viewmodel.changeevent.ChangeEvent;
 import org.helioviewer.viewmodel.changeevent.TimestampChangedReason;
+import org.helioviewer.viewmodel.view.ImageInfoView;
 import org.helioviewer.viewmodel.view.LinkedMovieManager;
+import org.helioviewer.viewmodel.view.SubimageDataView;
 import org.helioviewer.viewmodel.view.TimedMovieView;
 import org.helioviewer.viewmodel.view.View;
 import org.helioviewer.viewmodel.view.ViewListener;
@@ -26,9 +29,9 @@ import org.helioviewer.viewmodel.view.ViewListener;
  * {@link GL3DTrackballCamera} by automatically rotating the camera around the
  * Y-Axis (pointing to solar north) by an amount calculated through
  * {@link DifferentialRotation}.
- *
+ * 
  * @author Simon Spoerri (simon.spoerri@fhnw.ch)
- *
+ * 
  */
 public class GL3DTrackballCamera extends GL3DSolarRotationTrackingTrackballCamera implements ViewListener {
 
@@ -43,18 +46,18 @@ public class GL3DTrackballCamera extends GL3DSolarRotationTrackingTrackballCamer
 
     private long timediff;
 
-
     public GL3DTrackballCamera(GL3DSceneGraphView sceneGraphView) {
         super(sceneGraphView);
     }
 
     @Override
-    public void reset(){
+    public void reset() {
         this.getRotation().clear();
         setDifferentialRotation(DifferentialRotation.calculateRotationInRadians(0., this.timediff) % (Math.PI * 2.0));
-        this.getRotation().rotate(GL3DQuatd.createRotation(  getDifferentialRotation(), new GL3DVec3d(0, 1, 0)));
+        this.getRotation().rotate(GL3DQuatd.createRotation(getDifferentialRotation(), new GL3DVec3d(0, 1, 0)));
         super.reset();
     }
+
     @Override
     public void activate(GL3DCamera precedingCamera) {
         super.activate(precedingCamera);
@@ -80,10 +83,14 @@ public class GL3DTrackballCamera extends GL3DSolarRotationTrackingTrackballCamer
         }
     }
 
-    public void updateRotation(){
+    public void updateRotation() {
         if (startPosition != null) {
             this.timediff = (currentDate.getTime()) / 1000 - Constants.referenceDate;
-            setDifferentialRotation(-DifferentialRotation.calculateRotationInRadians(0., timediff) % (Math.PI * 2.0));
+            View activeView = LayersModel.getSingletonInstance().getActiveView();
+            SubimageDataView sim = activeView.getAdapter(ImageInfoView.class).getAdapter(SubimageDataView.class);
+            long time = sim.getSubimageData().getDateMillis();
+            double deltat = time / 1000.0 - Constants.referenceDate;
+            setDifferentialRotation(-DifferentialRotation.calculateRotationInRadians(0., deltat) % (Math.PI * 2.0));
             this.getRotation().rotate(GL3DQuatd.createRotation(currentRotation - getDifferentialRotation(), new GL3DVec3d(0, 1, 0)));
             this.updateCameraTransformation();
             this.currentRotation = getDifferentialRotation();
