@@ -8,8 +8,8 @@ import org.helioviewer.base.physics.DifferentialRotation;
 import org.helioviewer.viewmodel.view.jp2view.datetime.ImmutableDateTime;
 
 public class TimedHeliocentricCartesianToHeliocentricCartesian2000Conversion implements CoordinateConversion {
-    private TimedHeliocentricCartesianCoordinateSystem source;
-    private HeliocentricCartesian2000CoordinateSystem h2000;
+    private final TimedHeliocentricCartesianCoordinateSystem source;
+    private final HeliocentricCartesian2000CoordinateSystem h2000;
 
     public TimedHeliocentricCartesianToHeliocentricCartesian2000Conversion(TimedHeliocentricCartesianCoordinateSystem source, HeliocentricCartesian2000CoordinateSystem h2000) {
         this.h2000 = h2000;
@@ -23,7 +23,7 @@ public class TimedHeliocentricCartesianToHeliocentricCartesian2000Conversion imp
 
     @Override
     public CoordinateSystem getTargetCoordinateSystem() {
-        return (CoordinateSystem) (this.h2000);
+        return (this.h2000);
     }
 
     @Override
@@ -50,7 +50,7 @@ public class TimedHeliocentricCartesianToHeliocentricCartesian2000Conversion imp
 
         double timediff = (dt.getMillis() - cal.getTime().getTime()) / 1000.0;
         double rot = -DifferentialRotation.calculateRotationInRadians(0, timediff);
-        rot = 0.0;
+        // rot = 0.0;
         double xp = xheeq * Math.cos(rot) - yheeq * Math.sin(rot);
         double yp = xheeq * Math.sin(rot) + yheeq * Math.cos(rot);
         double zp = zheeq;
