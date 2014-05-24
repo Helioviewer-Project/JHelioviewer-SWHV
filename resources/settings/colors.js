@@ -1,4 +1,7 @@
-[{"instrument":"EIT",
+[{"instrument":"SECCHI",
+  "measurement":"171",
+  "color":"STEREO EUVI 171 Å"},
+{"instrument":"EIT",
   "measurement":"171",
   "color":"SOHO EIT 171 Å"},
  {"instrument":"EIT",

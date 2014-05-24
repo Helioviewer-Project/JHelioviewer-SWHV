@@ -11,9 +11,9 @@ import org.helioviewer.viewmodel.view.SubimageDataView;
 import org.helioviewer.viewmodel.view.jp2view.JHVJP2View;
 import org.helioviewer.viewmodelplugin.filter.FilterContainer;
 import org.helioviewer.viewmodelplugin.filter.FilterTab;
+import org.helioviewer.viewmodelplugin.filter.FilterTabDescriptor.Type;
 import org.helioviewer.viewmodelplugin.filter.FilterTabList;
 import org.helioviewer.viewmodelplugin.filter.FilterTabPanelManager;
-import org.helioviewer.viewmodelplugin.filter.FilterTabDescriptor.Type;
 import org.helioviewer.viewmodelplugin.filter.FilterTabPanelManager.Area;
 
 /**
@@ -33,6 +33,7 @@ public class SOHOLUTFilterPlugin extends FilterContainer {
     /**
      * {@inheritDoc}
      */
+    @Override
     public String getDescription() {
         return null;
     }
@@ -40,6 +41,7 @@ public class SOHOLUTFilterPlugin extends FilterContainer {
     /**
      * {@inheritDoc}
      */
+    @Override
     public String getName() {
         return "Color Tables";
     }
@@ -50,6 +52,7 @@ public class SOHOLUTFilterPlugin extends FilterContainer {
      * set to gray by default, which does not change the color at all.
      */
 
+    @Override
     protected void installFilterImpl(FilterView filterView, FilterTabList tabList) {
         // Only applicable for SingeChannelFormat
         if (!(filterView.getAdapter(SubimageDataView.class).getSubimageData().getImageFormat() instanceof SingleChannelImageFormat))
@@ -86,9 +89,11 @@ public class SOHOLUTFilterPlugin extends FilterContainer {
         MetaDataView metaDataView = filterView.getAdapter(MetaDataView.class);
         if (metaDataView != null) {
             MetaData metaData = metaDataView.getMetaData();
+
             if (metaData != null && metaData instanceof HelioviewerMetaData) {
                 HelioviewerMetaData hvMetaData = (HelioviewerMetaData) metaData;
                 String colorKey = DefaultTable.getSingletonInstance().getColorTable(hvMetaData);
+
                 if (colorKey != null) {
                     Log.debug("Try to apply color table " + colorKey);
                     pane.setLutByName(colorKey);
@@ -105,6 +110,7 @@ public class SOHOLUTFilterPlugin extends FilterContainer {
      * {@inheritDoc}
      */
 
+    @Override
     public Class<? extends Filter> getFilterClass() {
         return SOHOLUTFilter.class;
     }
