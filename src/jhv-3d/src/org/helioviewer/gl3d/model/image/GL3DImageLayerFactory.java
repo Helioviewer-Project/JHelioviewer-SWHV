@@ -39,7 +39,7 @@ public class GL3DImageLayerFactory {
             } else if (hvMetaData.getInstrument().equalsIgnoreCase("AIA")) {
                 // AIA
                 return new GL3DAIAImageLayer(mainView);
-            } else if (hvMetaData.getInstrument().equalsIgnoreCase("STEREO")) {
+            } else if (hvMetaData.getInstrument().equalsIgnoreCase("SECCHI")) {
                 // STEREO
                 return new GL3DStereoImageLayer(mainView);
             } else {
