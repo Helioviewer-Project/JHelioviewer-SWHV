@@ -5,6 +5,7 @@ import java.util.GregorianCalendar;
 
 import javax.media.opengl.GL;
 
+import org.helioviewer.base.math.MathUtils;
 import org.helioviewer.base.math.Vector2dDouble;
 import org.helioviewer.base.physics.Astronomy;
 import org.helioviewer.base.physics.Constants;
@@ -20,12 +21,17 @@ import org.helioviewer.viewmodel.changeevent.ChangeEvent;
 import org.helioviewer.viewmodel.changeevent.RegionChangedReason;
 import org.helioviewer.viewmodel.changeevent.RegionUpdatedReason;
 import org.helioviewer.viewmodel.changeevent.SubImageDataChangedReason;
+import org.helioviewer.viewmodel.metadata.HelioviewerPositionedMetaData;
 import org.helioviewer.viewmodel.metadata.MetaData;
 import org.helioviewer.viewmodel.region.Region;
 import org.helioviewer.viewmodel.region.StaticRegion;
+import org.helioviewer.viewmodel.view.ImageInfoView;
+import org.helioviewer.viewmodel.view.MetaDataView;
+import org.helioviewer.viewmodel.view.SubimageDataView;
 import org.helioviewer.viewmodel.view.View;
 import org.helioviewer.viewmodel.view.ViewListener;
 import org.helioviewer.viewmodel.view.ViewportView;
+import org.helioviewer.viewmodel.view.jp2view.JHVJP2View;
 import org.helioviewer.viewmodel.view.jp2view.JHVJPXView;
 import org.helioviewer.viewmodel.view.opengl.GLTextureHelper;
 import org.helioviewer.viewmodel.view.opengl.shader.GLFragmentShaderView;
@@ -38,9 +44,9 @@ import org.helioviewer.viewmodel.viewport.Viewport;
  * to a texture object which can then be used to be mapped onto a 3D mesh. Use a
  * {@link GL3DImageMesh} to connect the resulting texture to a mesh, or directly
  * use the {@link GL3DShaderFactory} to create standard Image Meshes.
- *
+ * 
  * @author Simon Spoerri (simon.spoerri@fhnw.ch)
- *
+ * 
  */
 public class GL3DImageTextureView extends AbstractGL3DView implements GL3DView, GLFragmentShaderView {
 
@@ -59,7 +65,6 @@ public class GL3DImageTextureView extends AbstractGL3DView implements GL3DView, 
     public double minZ = 0.0;
     public double maxZ = Constants.SunRadius;
     private final GL3DImageFragmentShaderProgram fragmentShader = new GL3DImageFragmentShaderProgram();
-
 
     @Override
     public void renderGL(GL gl, boolean nextView) {
@@ -95,8 +100,11 @@ public class GL3DImageTextureView extends AbstractGL3DView implements GL3DView, 
     }
 
     public Region copyScreenToTexture(GL3DState state, GLTextureHelper th) {
-        JHVJPXView jhvjpx = getAdapter(JHVJPXView.class);
-        Region region = jhvjpx.getImageData().getRegion();
+        SubimageDataView sim = this.getAdapter(ImageInfoView.class).getAdapter(SubimageDataView.class);
+        MetaDataView metadataView = this.getAdapter(MetaDataView.class);
+
+        Region region = sim.getSubimageData().getRegion();
+
         Viewport viewport = getAdapter(ViewportView.class).getViewport();
 
         if (viewport == null || region == null) {
@@ -104,7 +112,7 @@ public class GL3DImageTextureView extends AbstractGL3DView implements GL3DView, 
             return null;
         }
 
-        this.textureId = getAdapter(JHVJPXView.class).texID;
+        this.textureId = getAdapter(JHVJP2View.class).texID;
         // th.copyFrameBufferToTexture(gl, textureId, captureRectangle);
         this.textureScale = th.getTextureScale(textureId);
         if (vertexShader != null) {
@@ -114,54 +122,58 @@ public class GL3DImageTextureView extends AbstractGL3DView implements GL3DView, 
             double xScale = (1. / region.getWidth());
             double yScale = (1. / region.getHeight());
 
-            double deltat = jhvjpx.getImageData().getDateMillis() / 1000.0 - Constants.referenceDate;
+            double deltat = sim.getSubimageData().getDateMillis() / 1000.0 - Constants.referenceDate;
             Calendar cal = new GregorianCalendar();
-            cal.setTimeInMillis((long)deltat*1000);
+            cal.setTimeInMillis(sim.getSubimageData().getDateMillis());
             theta = Astronomy.getB0InRadians(cal);
             phi = DifferentialRotation.calculateRotationInRadians(0.0, deltat) % (Math.PI * 2.0);
+            if (((HelioviewerPositionedMetaData) (metadataView.getMetaData())).getInstrument().equalsIgnoreCase("SECCHI")) {
+                phi -= ((HelioviewerPositionedMetaData) (metadataView.getMetaData())).getStonyhurstLongitude() / MathUtils.radeg;
+                theta = ((HelioviewerPositionedMetaData) (metadataView.getMetaData())).getStonyhurstLatitude() / MathUtils.radeg;
+            }
             this.vertexShader.changeRect(xOffset, yOffset, xScale, yScale);
-            this.vertexShader.changeTextureScale(jhvjpx.getImageData().getScaleX(), jhvjpx.getImageData().getScaleY());
+            this.vertexShader.changeTextureScale(sim.getSubimageData().getScaleX(), sim.getSubimageData().getScaleY());
             this.vertexShader.changeAngles(theta, phi);
-
-            if(!jhvjpx.getBaseDifferenceMode() && jhvjpx.getPreviousImageData()!=null){
-                Region differenceRegion = jhvjpx.getPreviousImageData().getRegion();
-                double differenceXOffset = (differenceRegion.getLowerLeftCorner().getX());
-                double differenceYOffset = (differenceRegion.getLowerLeftCorner().getY());
-                double differenceXScale = (1./differenceRegion.getWidth());
-                double differenceYScale = (1./differenceRegion.getHeight());
-                double differenceDeltat = jhvjpx.getPreviousImageData().getDateMillis() / 1000.0 - Constants.referenceDate;
-                double differenceTheta = 0.0;
-                double differencePhi = DifferentialRotation.calculateRotationInRadians(0.0, differenceDeltat) % (Math.PI * 2.0);
-                this.vertexShader.changeDifferenceTextureScale(jhvjpx.getPreviousImageData().getScaleX(), jhvjpx.getPreviousImageData().getScaleY());
-                this.vertexShader.setDifferenceRect(differenceXOffset, differenceYOffset, differenceXScale, differenceYScale);
-                this.vertexShader.changeDifferenceAngles(differenceTheta, differencePhi);
-                this.fragmentShader.changeDifferenceTextureScale(jhvjpx.getPreviousImageData().getScaleX(), jhvjpx.getPreviousImageData().getScaleY());
-                this.fragmentShader.setDifferenceRect(differenceXOffset, differenceYOffset, differenceXScale, differenceYScale);
-                this.fragmentShader.changeDifferenceAngles(differenceTheta, differencePhi);
+            JHVJPXView jhvjpx = this.getAdapter(JHVJPXView.class);
+            if (jhvjpx != null) {
+                if (!jhvjpx.getBaseDifferenceMode() && jhvjpx.getPreviousImageData() != null) {
+                    Region differenceRegion = jhvjpx.getPreviousImageData().getRegion();
+                    double differenceXOffset = (differenceRegion.getLowerLeftCorner().getX());
+                    double differenceYOffset = (differenceRegion.getLowerLeftCorner().getY());
+                    double differenceXScale = (1. / differenceRegion.getWidth());
+                    double differenceYScale = (1. / differenceRegion.getHeight());
+                    double differenceDeltat = jhvjpx.getPreviousImageData().getDateMillis() / 1000.0 - Constants.referenceDate;
+                    double differenceTheta = 0.0;
+                    double differencePhi = DifferentialRotation.calculateRotationInRadians(0.0, differenceDeltat) % (Math.PI * 2.0);
+                    this.vertexShader.changeDifferenceTextureScale(jhvjpx.getPreviousImageData().getScaleX(), jhvjpx.getPreviousImageData().getScaleY());
+                    this.vertexShader.setDifferenceRect(differenceXOffset, differenceYOffset, differenceXScale, differenceYScale);
+                    this.vertexShader.changeDifferenceAngles(differenceTheta, differencePhi);
+                    this.fragmentShader.changeDifferenceTextureScale(jhvjpx.getPreviousImageData().getScaleX(), jhvjpx.getPreviousImageData().getScaleY());
+                    this.fragmentShader.setDifferenceRect(differenceXOffset, differenceYOffset, differenceXScale, differenceYScale);
+                    this.fragmentShader.changeDifferenceAngles(differenceTheta, differencePhi);
+                } else if (jhvjpx.getBaseDifferenceMode() && jhvjpx.getBaseDifferenceImageData() != null) {
+                    Region differenceRegion = jhvjpx.getBaseDifferenceImageData().getRegion();
+                    double differenceXOffset = (differenceRegion.getLowerLeftCorner().getX());
+                    double differenceYOffset = (differenceRegion.getLowerLeftCorner().getY());
+                    double differenceXScale = (1. / differenceRegion.getWidth());
+                    double differenceYScale = (1. / differenceRegion.getHeight());
+                    double differenceDeltat = jhvjpx.getBaseDifferenceImageData().getDateMillis() / 1000.0 - Constants.referenceDate;
+                    cal.setTimeInMillis((long) differenceDeltat * 1000);
+                    double differenceTheta = Astronomy.getB0InRadians(cal);
+                    double differencePhi = DifferentialRotation.calculateRotationInRadians(0.0, differenceDeltat) % (Math.PI * 2.0);
+                    this.vertexShader.changeDifferenceTextureScale(jhvjpx.getBaseDifferenceImageData().getScaleX(), jhvjpx.getBaseDifferenceImageData().getScaleY());
+                    this.vertexShader.setDifferenceRect(differenceXOffset, differenceYOffset, differenceXScale, differenceYScale);
+                    this.vertexShader.changeDifferenceAngles(differenceTheta, differencePhi);
+                    this.fragmentShader.changeDifferenceTextureScale(jhvjpx.getBaseDifferenceImageData().getScaleX(), jhvjpx.getBaseDifferenceImageData().getScaleY());
+                    this.fragmentShader.setDifferenceRect(differenceXOffset, differenceYOffset, differenceXScale, differenceYScale);
+                    this.fragmentShader.changeDifferenceAngles(differenceTheta, differencePhi);
+                } else {
+                    this.fragmentShader.changeDifferenceTextureScale(jhvjpx.getImageData().getScaleX(), jhvjpx.getImageData().getScaleY());
+                    this.fragmentShader.setDifferenceRect(xOffset, yOffset, xScale, yScale);
+                    this.fragmentShader.changeDifferenceAngles(theta, phi);
+                }
             }
-            else if(jhvjpx.getBaseDifferenceMode() && jhvjpx.getBaseDifferenceImageData()!=null){
-                Region differenceRegion = jhvjpx.getBaseDifferenceImageData().getRegion();
-                double differenceXOffset = (differenceRegion.getLowerLeftCorner().getX());
-                double differenceYOffset = (differenceRegion.getLowerLeftCorner().getY());
-                double differenceXScale = (1./differenceRegion.getWidth());
-                double differenceYScale = (1./differenceRegion.getHeight());
-                double differenceDeltat = jhvjpx.getBaseDifferenceImageData().getDateMillis() / 1000.0 - Constants.referenceDate;
-                cal.setTimeInMillis((long)differenceDeltat*1000);
-                double differenceTheta = Astronomy.getB0InRadians(cal);
-                double differencePhi = DifferentialRotation.calculateRotationInRadians(0.0, differenceDeltat) % (Math.PI * 2.0);
-                this.vertexShader.changeDifferenceTextureScale(jhvjpx.getBaseDifferenceImageData().getScaleX(), jhvjpx.getBaseDifferenceImageData().getScaleY());
-                this.vertexShader.setDifferenceRect(differenceXOffset, differenceYOffset, differenceXScale, differenceYScale);
-                this.vertexShader.changeDifferenceAngles(differenceTheta, differencePhi);
-                this.fragmentShader.changeDifferenceTextureScale(jhvjpx.getBaseDifferenceImageData().getScaleX(), jhvjpx.getBaseDifferenceImageData().getScaleY());
-                this.fragmentShader.setDifferenceRect(differenceXOffset, differenceYOffset, differenceXScale, differenceYScale);
-                this.fragmentShader.changeDifferenceAngles(differenceTheta, differencePhi);
-            }
-            else{
-                this.fragmentShader.changeDifferenceTextureScale(jhvjpx.getImageData().getScaleX(), jhvjpx.getImageData().getScaleY());
-                this.fragmentShader.setDifferenceRect(xOffset, yOffset, xScale, yScale);
-                this.fragmentShader.changeDifferenceAngles(theta, phi);
-            }
-            this.fragmentShader.changeTextureScale(jhvjpx.getImageData().getScaleX(), jhvjpx.getImageData().getScaleY());
+            this.fragmentShader.changeTextureScale(sim.getSubimageData().getScaleX(), sim.getSubimageData().getScaleY());
             this.fragmentShader.changeAngles(theta, phi);
         }
 
