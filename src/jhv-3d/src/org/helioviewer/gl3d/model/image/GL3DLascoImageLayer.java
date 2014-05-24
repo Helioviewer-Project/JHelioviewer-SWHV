@@ -5,11 +5,10 @@ import javax.media.opengl.GL;
 import org.helioviewer.gl3d.shader.GL3DImageVertexShaderProgram;
 import org.helioviewer.gl3d.shader.GL3DShaderFactory;
 import org.helioviewer.gl3d.view.GL3DView;
-import org.helioviewer.viewmodel.metadata.HelioviewerOcculterMetaData;
-import org.helioviewer.viewmodel.view.opengl.shader.GLFragmentShaderProgram;
 import org.helioviewer.viewmodel.view.opengl.shader.GLVertexShaderProgram;
 
 public class GL3DLascoImageLayer extends GL3DImageLayer {
+    private GL3DImageSphere sphere;
 
     public GL3DLascoImageLayer(GL3DView mainView) {
         super("LASCO Image Layer", mainView);
@@ -17,20 +16,19 @@ public class GL3DLascoImageLayer extends GL3DImageLayer {
 
     @Override
     protected void createImageMeshNodes(GL gl) {
-        HelioviewerOcculterMetaData hvMetaData = (HelioviewerOcculterMetaData) metaDataView.getMetaData();
-
-        GLFragmentShaderProgram fragmentShader = GL3DShaderFactory.createFragmentShaderProgram(gl, this.coronaFragmentShader);
-        GL3DImageVertexShaderProgram vertex = new GL3DImageVertexShaderProgram();
-        GLVertexShaderProgram vertexShader = GL3DShaderFactory.createVertexShaderProgram(gl, vertex);
-        this.imageTextureView.setVertexShader(vertex);
-
+        this.sphereFragmentShader = imageTextureView.getFragmentShader();
+        GL3DImageVertexShaderProgram vertexShaderProgram = new GL3DImageVertexShaderProgram();
+        GLVertexShaderProgram vertexShader = GL3DShaderFactory.createVertexShaderProgram(gl, vertexShaderProgram);
+        this.imageTextureView.setVertexShader(vertexShaderProgram);
         this.imageTextureView.metadata = this.metaDataView.getMetaData();
+        sphere = new GL3DImageSphere(imageTextureView, vertexShader, sphereFragmentShader, this);
+        this.addNode(sphere);
 
     }
 
     @Override
     protected GL3DImageMesh getImageSphere() {
-        return null;
+        return sphere;
     }
 
 }
