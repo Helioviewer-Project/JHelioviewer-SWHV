@@ -34,10 +34,10 @@ import org.helioviewer.viewmodel.view.jp2view.kakadu.KakaduUtils;
  * retrieve image data from a JPIP server (if the image is remote). The second
  * is that all view-changed signals are routed through this thread... so it must
  * forward them to the J2KRender thread through that threads signal.
- *
+ * 
  * TODO The server may change the parameters of the request, and we should take
  * it into account...
- *
+ * 
  * @author caplins
  * @author Juan Pablo
  * @author Markus Langenberg
@@ -80,7 +80,7 @@ class J2KReader implements Runnable {
 
     /**
      * The constructor. Creates and connects the socket if image is remote.
-     *
+     * 
      * @param _imageViewRef
      * @throws IOException
      * @throws JHV_KduException
@@ -122,7 +122,7 @@ class J2KReader implements Runnable {
     void start() {
         if (myThread != null)
             stop();
-        myThread = new Thread(this, "J2KReader");
+        myThread = new Thread(this, "J2KReader" + this.parentViewRef.getName());
         stop = false;
         myThread.start();
     }
