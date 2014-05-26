@@ -180,27 +180,27 @@ public class ExportMovieDialog extends JDialog implements ChangeListener, Action
     private LinkedList<JP2ImageOriginalParent> jp2ImageOriginalParents;
     private View topmostView;
     private GLComponentView glComponentView;
-    private HashMap<TimedMovieView, StatusStruct> currentViewStatus = new HashMap<TimedMovieView, StatusStruct>();
+    private final HashMap<TimedMovieView, StatusStruct> currentViewStatus = new HashMap<TimedMovieView, StatusStruct>();
     private Thread exportThread;
     private Thread initThread;
     private int currentFrame = 0;
     private boolean exportFinished = false;
     private boolean initializationDone;
     private MovieFileFilter selectedOutputFormat = new MP4Filter();
-    private int hardSubtitleFontSizeFactor = 20;
+    private final int hardSubtitleFontSizeFactor = 20;
 
     private HashMap<JComponent, Boolean> enableState;
-    private List<JComponent> guiElements;
+    private final List<JComponent> guiElements;
 
-    private Semaphore viewChangedSemaphore = new Semaphore(1);
+    private final Semaphore viewChangedSemaphore = new Semaphore(1);
 
     private BufferedImage output;
 
-    private ZoomController zoomController = new ZoomController();
+    private final ZoomController zoomController = new ZoomController();
 
     private boolean savedDoubleBufferinOption = J2KRenderGlobalOptions.getDoubleBufferingOption();
 
-    private HashMap<JHVJP2View, Integer> readerErrorCounter = new HashMap<JHVJP2View, Integer>();
+    private final HashMap<JHVJP2View, Integer> readerErrorCounter = new HashMap<JHVJP2View, Integer>();
 
     private class StatusStruct {
         public ImmutableDateTime currentDateTime = new ImmutableDateTime(0);
@@ -234,6 +234,7 @@ public class ExportMovieDialog extends JDialog implements ChangeListener, Action
         if (layeredView.getNumberOfVisibleLayer() == 0) {
             Message.err("No visible layers!", "There are no visible layers loaded which can be exported", false);
             SwingUtilities.invokeLater(new Runnable() {
+                @Override
                 public void run() {
                     dispose();
                 }
@@ -249,6 +250,7 @@ public class ExportMovieDialog extends JDialog implements ChangeListener, Action
 
             Log.debug(">> ExportMovieDialog() > Start initializing GUI");
             addWindowListener(new WindowAdapter() {
+                @Override
                 public void windowClosing(WindowEvent e) {
                     exportFinished = true;
                     finish();
@@ -286,7 +288,7 @@ public class ExportMovieDialog extends JDialog implements ChangeListener, Action
             ComponentView componentView;
             GLComponentView mainComponentView = (GLComponentView) ImageViewerGui.getSingletonInstance().getMainView();
             if (mainComponentView instanceof GLComponentView) {
-                ((GLComponentView) mainComponentView).stopAnimation();
+                mainComponentView.stopAnimation();
             }
             if (!Boolean.parseBoolean(Settings.getSingletonInstance().getProperty(SOFTWARE_MODUS_SETTING)) && GLInfo.glIsUsable()) {
                 Log.info("Export movie rendering modus: OpenGL");
@@ -550,6 +552,7 @@ public class ExportMovieDialog extends JDialog implements ChangeListener, Action
             Log.debug(">> ExportMovieDialog() > Disable GUI until init is finished");
             disableGUI();
             initThread = new Thread(new Runnable() {
+                @Override
                 public void run() {
                     initViewchain();
                     Log.debug(">> ExportMovieDialog() > Viewchain initialization is finished");
@@ -726,6 +729,7 @@ public class ExportMovieDialog extends JDialog implements ChangeListener, Action
     /**
      * {@inheritDoc}
      */
+    @Override
     public void actionPerformed(ActionEvent e) {
         if (e.getSource() == txtImageHeight || e.getSource() == txtImageWidth || e.getSource() == txtTotalHeight) {
             updateViewport(((JFormattedTextField) e.getSource()).getDocument());
@@ -799,6 +803,7 @@ public class ExportMovieDialog extends JDialog implements ChangeListener, Action
                 saveExportSettings();
 
                 exportThread = new Thread(new Runnable() {
+                    @Override
                     public void run() {
                         exportMovie();
                     }
@@ -813,11 +818,14 @@ public class ExportMovieDialog extends JDialog implements ChangeListener, Action
             // Cancel export if running, close dialog in any case
         } else if (e.getSource() == cmdCancel) {
             exportFinished = true;
-            new Thread() {
+            Thread t = new Thread(new Runnable() {
+
+                @Override
                 public void run() {
                     finish();
                 }
-            }.start();
+            }, "exportFinished thread");
+            t.start();
         } else if (e.getSource() == aspectRatioSelection) {
             AspectRatio aspectRatio = (AspectRatio) aspectRatioSelection.getSelectedItem();
             if (aspectRatio.getWidth() != 0) {
@@ -845,6 +853,7 @@ public class ExportMovieDialog extends JDialog implements ChangeListener, Action
     /**
      * Updates the zoom after the zoom spinner has changed.
      */
+    @Override
     public void stateChanged(javax.swing.event.ChangeEvent e) {
         if (e.getSource() == zoomSpinner) {
             double zoomSpinnerValue = (Double) zoomSpinner.getValue();
@@ -856,6 +865,7 @@ public class ExportMovieDialog extends JDialog implements ChangeListener, Action
      * Update viewport after text fields (width, height, total height) have
      * changed
      */
+    @Override
     public void insertUpdate(DocumentEvent e) {
         updateViewport(e.getDocument());
     }
@@ -864,10 +874,12 @@ public class ExportMovieDialog extends JDialog implements ChangeListener, Action
      * Update viewport after text fields (width, height, total height) have
      * changed
      */
+    @Override
     public void removeUpdate(DocumentEvent e) {
         updateViewport(e.getDocument());
     }
 
+    @Override
     public void changedUpdate(DocumentEvent evt) {
 
     }
@@ -925,7 +937,7 @@ public class ExportMovieDialog extends JDialog implements ChangeListener, Action
             if (aspectRatio.getWidth() != 0) {
                 if (embedHardSubtitle.isSelected() && embedHardSubtitleAspectRatio.isSelected()) {
                     if (!updatingTotalHeight) {
-                        double factor = 1.0 / (1.0 - (double) aspectRatio.getWidth() * Math.log(1 + topmostView.getAdapter(LayeredView.class).getNumberOfVisibleLayer()) / aspectRatio.getHeight() / hardSubtitleFontSizeFactor);
+                        double factor = 1.0 / (1.0 - aspectRatio.getWidth() * Math.log(1 + topmostView.getAdapter(LayeredView.class).getNumberOfVisibleLayer()) / aspectRatio.getHeight() / hardSubtitleFontSizeFactor);
                         txtTotalHeight.setValue((int) Math.floor(factor * height));
                     }
                 } else {
@@ -955,18 +967,18 @@ public class ExportMovieDialog extends JDialog implements ChangeListener, Action
                         txtImageWidth.setValue(width);
                     }
                     if (!updatingImageHeight) {
-                        int height = (int) Math.ceil(((Integer) txtTotalHeight.getValue()) - (Integer) txtImageWidth.getValue() * Math.log(1 + topmostView.getAdapter(LayeredView.class).getNumberOfVisibleLayer()) / (double) hardSubtitleFontSizeFactor);
+                        int height = (int) Math.ceil(((Integer) txtTotalHeight.getValue()) - (Integer) txtImageWidth.getValue() * Math.log(1 + topmostView.getAdapter(LayeredView.class).getNumberOfVisibleLayer()) / hardSubtitleFontSizeFactor);
                         txtImageHeight.setValue(height);
                     }
                 } else {
                     if (aspectRatio.getWidth() == 0) {
                         if (!updatingImageHeight) {
-                            int height = (int) Math.ceil(((Integer) txtTotalHeight.getValue()) - (Integer) txtImageWidth.getValue() * Math.log(1 + topmostView.getAdapter(LayeredView.class).getNumberOfVisibleLayer()) / (double) hardSubtitleFontSizeFactor);
+                            int height = (int) Math.ceil(((Integer) txtTotalHeight.getValue()) - (Integer) txtImageWidth.getValue() * Math.log(1 + topmostView.getAdapter(LayeredView.class).getNumberOfVisibleLayer()) / hardSubtitleFontSizeFactor);
                             txtImageHeight.setValue(height);
                         }
                     } else {
                         if (!updatingImageHeight) {
-                            double factor = 1.0 / (1.0 + (double) aspectRatio.getWidth() * Math.log(1 + topmostView.getAdapter(LayeredView.class).getNumberOfVisibleLayer()) / aspectRatio.getHeight() / hardSubtitleFontSizeFactor);
+                            double factor = 1.0 / (1.0 + aspectRatio.getWidth() * Math.log(1 + topmostView.getAdapter(LayeredView.class).getNumberOfVisibleLayer()) / aspectRatio.getHeight() / hardSubtitleFontSizeFactor);
                             txtImageHeight.setValue((int) Math.ceil(factor * (Integer) txtTotalHeight.getValue()));
                         }
                     }
@@ -979,6 +991,7 @@ public class ExportMovieDialog extends JDialog implements ChangeListener, Action
     /**
      * {@inheritDoc}
      */
+    @Override
     public synchronized void viewChanged(View sender, ChangeEvent aEvent) {
         if (viewChangedSemaphore.tryAcquire()) {
             try {
@@ -1158,6 +1171,7 @@ public class ExportMovieDialog extends JDialog implements ChangeListener, Action
                                 byte data[] = new byte[bufferSize];
 
                                 File[] inputFiles = JHVDirectory.TEMP.getFile().listFiles(new FilenameFilter() {
+                                    @Override
                                     public boolean accept(File dir, String name) {
                                         return (name.contains("frame") && name.toLowerCase().endsWith(selectedOutputFormat.getIntermediateExtension()));
                                     }
@@ -1250,6 +1264,7 @@ public class ExportMovieDialog extends JDialog implements ChangeListener, Action
                     // exception.
                     Timer timer = new Timer("CloseMovieExport");
                     timer.schedule(new TimerTask() {
+                        @Override
                         public void run() {
                             finish();
                         }
@@ -1300,6 +1315,7 @@ public class ExportMovieDialog extends JDialog implements ChangeListener, Action
             } else if (chosenOption == 2) {
                 exportFinished = true;
                 new Thread() {
+                    @Override
                     public void run() {
                         finish();
                     }
@@ -1309,6 +1325,7 @@ public class ExportMovieDialog extends JDialog implements ChangeListener, Action
             if (chosenOption == 0) {
                 exportFinished = true;
                 new Thread() {
+                    @Override
                     public void run() {
                         finish();
                     }
@@ -1322,6 +1339,7 @@ public class ExportMovieDialog extends JDialog implements ChangeListener, Action
     }
 
     private class ViewChangedUpdateGUIRunnable implements Runnable {
+        @Override
         public void run() {
             viewChangedUpdateGUI();
         }
@@ -1330,6 +1348,7 @@ public class ExportMovieDialog extends JDialog implements ChangeListener, Action
     /**
      * {@inheritDoc}
      */
+    @Override
     public void showDialog() {
 
         if (!FileUtils.isExecutableRegistered("ffmpeg")) {
@@ -1395,6 +1414,7 @@ public class ExportMovieDialog extends JDialog implements ChangeListener, Action
         System.gc();
         // hide dialog
         SwingUtilities.invokeLater(new Runnable() {
+            @Override
             public void run() {
                 if (glRenderingDialog != null) {
                     glRenderingDialog.dispose();
@@ -1610,6 +1630,7 @@ public class ExportMovieDialog extends JDialog implements ChangeListener, Action
         Log.info(">> ExportMovieDialog.exportMovie() > Delete files in temp folder");
         // Delete all files in JHV/temp
         File[] tempFiles = JHVDirectory.TEMP.getFile().listFiles(new FilenameFilter() {
+            @Override
             public boolean accept(File dir, String name) {
                 return (name.contains("frame") && (name.toLowerCase().endsWith(".bmp") || name.toLowerCase().endsWith(".jpg") || name.toLowerCase().endsWith(".png"))) || (name.startsWith("export_") && (name.endsWith(".sub") || name.endsWith(".ttxt")));
             }
@@ -1769,6 +1790,7 @@ public class ExportMovieDialog extends JDialog implements ChangeListener, Action
      */
     private abstract class MovieFileFilter extends FileFilter {
 
+        @Override
         public boolean accept(File file) {
             return file.isDirectory() || acceptFile(file);
         }
@@ -1801,6 +1823,7 @@ public class ExportMovieDialog extends JDialog implements ChangeListener, Action
         /**
          * {@inheritDoc}
          */
+        @Override
         public String toString() {
             return getExtension();
         }
@@ -1816,6 +1839,7 @@ public class ExportMovieDialog extends JDialog implements ChangeListener, Action
         /**
          * {@inheritDoc}
          */
+        @Override
         public boolean acceptFile(File f) {
             return f.getName().toLowerCase().endsWith(".mov");
         }
@@ -1823,6 +1847,7 @@ public class ExportMovieDialog extends JDialog implements ChangeListener, Action
         /**
          * {@inheritDoc}
          */
+        @Override
         public String getDescription() {
             return "Quicktime (.mov)";
         }
@@ -1830,6 +1855,7 @@ public class ExportMovieDialog extends JDialog implements ChangeListener, Action
         /**
          * {@inheritDoc}
          */
+        @Override
         public String getExtension() {
             return ".mov";
         }
@@ -1837,6 +1863,7 @@ public class ExportMovieDialog extends JDialog implements ChangeListener, Action
         /**
          * {@inheritDoc}
          */
+        @Override
         public String getIntermediateExtension() {
             return ".bmp";
         }
@@ -1844,6 +1871,7 @@ public class ExportMovieDialog extends JDialog implements ChangeListener, Action
         /**
          * {@inheritDoc}
          */
+        @Override
         public boolean useTempDirectoryForIntermediateImages() {
             return true;
         }
@@ -1859,6 +1887,7 @@ public class ExportMovieDialog extends JDialog implements ChangeListener, Action
         /**
          * {@inheritDoc}
          */
+        @Override
         public boolean acceptFile(File f) {
             return f.getName().toLowerCase().endsWith(".mp4");
         }
@@ -1866,6 +1895,7 @@ public class ExportMovieDialog extends JDialog implements ChangeListener, Action
         /**
          * {@inheritDoc}
          */
+        @Override
         public String getDescription() {
             return "MPEG-4 (.mp4)";
         }
@@ -1873,6 +1903,7 @@ public class ExportMovieDialog extends JDialog implements ChangeListener, Action
         /**
          * {@inheritDoc}
          */
+        @Override
         public String getExtension() {
             return ".mp4";
         }
@@ -1880,6 +1911,7 @@ public class ExportMovieDialog extends JDialog implements ChangeListener, Action
         /**
          * {@inheritDoc}
          */
+        @Override
         public String getIntermediateExtension() {
             return ".bmp";
         }
@@ -1887,6 +1919,7 @@ public class ExportMovieDialog extends JDialog implements ChangeListener, Action
         /**
          * {@inheritDoc}
          */
+        @Override
         public boolean useTempDirectoryForIntermediateImages() {
             return true;
         }
@@ -1902,6 +1935,7 @@ public class ExportMovieDialog extends JDialog implements ChangeListener, Action
         /**
          * {@inheritDoc}
          */
+        @Override
         public boolean acceptFile(File f) {
             return f.getName().toLowerCase().endsWith(".jpg") || f.getName().toLowerCase().endsWith(".jpeg");
         }
@@ -1909,6 +1943,7 @@ public class ExportMovieDialog extends JDialog implements ChangeListener, Action
         /**
          * {@inheritDoc}
          */
+        @Override
         public String getDescription() {
             return "Set of JPG images (.jpg)";
         }
@@ -1916,6 +1951,7 @@ public class ExportMovieDialog extends JDialog implements ChangeListener, Action
         /**
          * {@inheritDoc}
          */
+        @Override
         public String getExtension() {
             return ".jpg";
         }
@@ -1923,6 +1959,7 @@ public class ExportMovieDialog extends JDialog implements ChangeListener, Action
         /**
          * {@inheritDoc}
          */
+        @Override
         public String getIntermediateExtension() {
             return ".jpg";
         }
@@ -1930,6 +1967,7 @@ public class ExportMovieDialog extends JDialog implements ChangeListener, Action
         /**
          * {@inheritDoc}
          */
+        @Override
         public boolean useTempDirectoryForIntermediateImages() {
             return false;
         }
@@ -1945,6 +1983,7 @@ public class ExportMovieDialog extends JDialog implements ChangeListener, Action
         /**
          * {@inheritDoc}
          */
+        @Override
         public boolean acceptFile(File f) {
             return f.getName().toLowerCase().endsWith(".png");
         }
@@ -1952,6 +1991,7 @@ public class ExportMovieDialog extends JDialog implements ChangeListener, Action
         /**
          * {@inheritDoc}
          */
+        @Override
         public String getDescription() {
             return "Set of PNG images (.png)";
         }
@@ -1959,6 +1999,7 @@ public class ExportMovieDialog extends JDialog implements ChangeListener, Action
         /**
          * {@inheritDoc}
          */
+        @Override
         public String getExtension() {
             return ".png";
         }
@@ -1966,6 +2007,7 @@ public class ExportMovieDialog extends JDialog implements ChangeListener, Action
         /**
          * {@inheritDoc}
          */
+        @Override
         public String getIntermediateExtension() {
             return ".png";
         }
@@ -1973,6 +2015,7 @@ public class ExportMovieDialog extends JDialog implements ChangeListener, Action
         /**
          * {@inheritDoc}
          */
+        @Override
         public boolean useTempDirectoryForIntermediateImages() {
             return false;
         }
@@ -1988,6 +2031,7 @@ public class ExportMovieDialog extends JDialog implements ChangeListener, Action
         /**
          * {@inheritDoc}
          */
+        @Override
         public boolean acceptFile(File f) {
             return f.getName().toLowerCase().endsWith(".zip");
         }
@@ -1995,6 +2039,7 @@ public class ExportMovieDialog extends JDialog implements ChangeListener, Action
         /**
          * {@inheritDoc}
          */
+        @Override
         public String getDescription() {
             return "ZIP archive of JPG images (.zip)";
         }
@@ -2002,6 +2047,7 @@ public class ExportMovieDialog extends JDialog implements ChangeListener, Action
         /**
          * {@inheritDoc}
          */
+        @Override
         public String getExtension() {
             return ".zip";
         }
@@ -2009,6 +2055,7 @@ public class ExportMovieDialog extends JDialog implements ChangeListener, Action
         /**
          * {@inheritDoc}
          */
+        @Override
         public String getIntermediateExtension() {
             return ".jpg";
         }
@@ -2016,6 +2063,7 @@ public class ExportMovieDialog extends JDialog implements ChangeListener, Action
         /**
          * {@inheritDoc}
          */
+        @Override
         public boolean useTempDirectoryForIntermediateImages() {
             return true;
         }
@@ -2031,6 +2079,7 @@ public class ExportMovieDialog extends JDialog implements ChangeListener, Action
         /**
          * {@inheritDoc}
          */
+        @Override
         public boolean acceptFile(File f) {
             return f.getName().toLowerCase().endsWith(".zip");
         }
@@ -2038,6 +2087,7 @@ public class ExportMovieDialog extends JDialog implements ChangeListener, Action
         /**
          * {@inheritDoc}
          */
+        @Override
         public String getDescription() {
             return "ZIP archive of PNG images (.zip)";
         }
@@ -2045,6 +2095,7 @@ public class ExportMovieDialog extends JDialog implements ChangeListener, Action
         /**
          * {@inheritDoc}
          */
+        @Override
         public String getExtension() {
             return ".zip";
         }
@@ -2052,6 +2103,7 @@ public class ExportMovieDialog extends JDialog implements ChangeListener, Action
         /**
          * {@inheritDoc}
          */
+        @Override
         public String getIntermediateExtension() {
             return ".png";
         }
@@ -2059,6 +2111,7 @@ public class ExportMovieDialog extends JDialog implements ChangeListener, Action
         /**
          * {@inheritDoc}
          */
+        @Override
         public boolean useTempDirectoryForIntermediateImages() {
             return true;
         }
@@ -2068,6 +2121,7 @@ public class ExportMovieDialog extends JDialog implements ChangeListener, Action
     /**
      * Updates either the speed spinner or the zoom level
      */
+    @Override
     public void mouseWheelMoved(MouseWheelEvent e) {
         if (e.getSource() == speedSpinner) {
             int minVal = (Integer) ((SpinnerNumberModel) speedSpinner.getModel()).getMinimum();
@@ -2094,14 +2148,15 @@ public class ExportMovieDialog extends JDialog implements ChangeListener, Action
      * 
      */
     static class AspectRatio {
-        private int width;
-        private int height;
+        private final int width;
+        private final int height;
 
         public AspectRatio(int width, int height) {
             this.width = width;
             this.height = height;
         }
 
+        @Override
         public String toString() {
             if (width == 0 || height == 0) {
                 return "Custom";
