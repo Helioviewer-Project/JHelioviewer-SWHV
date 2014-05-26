@@ -181,6 +181,7 @@ public class JavaHelioViewerLauncher {
                 }
                 final Process p = Runtime.getRuntime().exec(commandArray);
                 Runtime.getRuntime().addShutdownHook(new Thread(new Runnable() {
+                    @Override
                     public void run() {
                         p.destroy();
                     }
@@ -207,6 +208,7 @@ public class JavaHelioViewerLauncher {
         final BufferedReader stdout = new BufferedReader(new InputStreamReader(process.getInputStream()));
         final BufferedReader stderr = new BufferedReader(new InputStreamReader(process.getErrorStream()));
         Thread threadStdout = new Thread(new Runnable() {
+            @Override
             public void run() {
                 try {
                     String line;
@@ -225,8 +227,9 @@ public class JavaHelioViewerLauncher {
                     }
                 }
             }
-        });
+        }, "JavaHelioviewerstdout");
         Thread threadStderr = new Thread(new Runnable() {
+            @Override
             public void run() {
                 try {
                     String line;
@@ -245,7 +248,7 @@ public class JavaHelioViewerLauncher {
                     }
                 }
             }
-        });
+        }, "JavaHelioviewerstderr");
 
         threadStderr.start();
         threadStdout.start();
@@ -267,7 +270,7 @@ public class JavaHelioViewerLauncher {
 // be removed before compilation in the built script -- Helge Dietert
 @SuppressWarnings("all")
 class ListenerImpl implements HyperlinkListener, PropertyChangeListener {
-    private JOptionPane errorPane;
+    private final JOptionPane errorPane;
 
     /**
      * Constructor
@@ -283,6 +286,7 @@ class ListenerImpl implements HyperlinkListener, PropertyChangeListener {
     /**
      * {@inheritDoc}
      */
+    @Override
     public void hyperlinkUpdate(HyperlinkEvent event) {
         if (event.getEventType() == HyperlinkEvent.EventType.ACTIVATED) {
             String url = event.getURL().toString();
@@ -324,6 +328,7 @@ class ListenerImpl implements HyperlinkListener, PropertyChangeListener {
     /**
      * {@inheritDoc}
      */
+    @Override
     public void propertyChange(PropertyChangeEvent evt) {
         if (evt.getSource() == errorPane) {
             Integer value = ((Integer) errorPane.getValue());
