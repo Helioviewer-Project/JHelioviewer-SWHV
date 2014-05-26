@@ -44,20 +44,20 @@ public class HEKPluginPanel extends OverlayPanel implements ActionListener, HEKC
     private static final long serialVersionUID = 1L;
 
     // UI Components
-    private JPanel buttonPanel = new JPanel(new BorderLayout());
-    private JProgressBar progressBar = new JProgressBar();
-    private HEKCacheTreeView tree = new HEKCacheTreeView(HEKCache.getSingletonInstance());
-    private JScrollPane treeView = new JScrollPane(tree);
-    private JButton cancelButton = new JButton(new ImageIcon(HEKPlugin.getResourceUrl("/images/hekCancel.png")));
-    private JButton reloadButton = new JButton(new ImageIcon(HEKPlugin.getResourceUrl("/images/hekReload.png")));
-    private HEKCacheTreeViewContainer container = new HEKCacheTreeViewContainer();
+    private final JPanel buttonPanel = new JPanel(new BorderLayout());
+    private final JProgressBar progressBar = new JProgressBar();
+    private final HEKCacheTreeView tree = new HEKCacheTreeView(HEKCache.getSingletonInstance());
+    private final JScrollPane treeView = new JScrollPane(tree);
+    private final JButton cancelButton = new JButton(new ImageIcon(HEKPlugin.getResourceUrl("/images/hekCancel.png")));
+    private final JButton reloadButton = new JButton(new ImageIcon(HEKPlugin.getResourceUrl("/images/hekReload.png")));
+    private final HEKCacheTreeViewContainer container = new HEKCacheTreeViewContainer();
 
-    private HEKCacheModel cacheModel;
-    private HEKCache cache;
-    private HEKCacheSelectionModel selectionModel;
+    private final HEKCacheModel cacheModel;
+    private final HEKCache cache;
+    private final HEKCacheSelectionModel selectionModel;
     @SuppressWarnings("unused")
-    private HEKCacheTreeModel treeModel;
-    private HEKCacheLoadingModel loadingModel;
+    private final HEKCacheTreeModel treeModel;
+    private final HEKCacheLoadingModel loadingModel;
 
     /**
      * Default constructor
@@ -210,6 +210,7 @@ public class HEKPluginPanel extends OverlayPanel implements ActionListener, HEKC
 
     }
 
+    @Override
     public void setEnabled(boolean b) {
         // super.setEnabled(b);
         if (b == false) {
@@ -235,7 +236,7 @@ public class HEKPluginPanel extends OverlayPanel implements ActionListener, HEKC
                     getStructure();
                 }
             }
-        });
+        }, "layerAddedHEK");
         threadUpdate.start();
     }
 
