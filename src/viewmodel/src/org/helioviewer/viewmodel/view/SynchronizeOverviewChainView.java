@@ -14,12 +14,12 @@ import org.helioviewer.viewmodel.factory.BufferedImageViewFactory;
 
 /**
  * Implementation of SynchronizeView for use in an overview view chain.
- *
+ * 
  * <p>
  * This class implements a SynchronizeView to use it in an overview view chain.
  * An overview view chain copies the behavior of the main view chain, but it is
  * allowed to opt out unnecessary views.
- *
+ * 
  * @author Stephan Pagel
  */
 public class SynchronizeOverviewChainView extends AbstractSynchronizeChainView {
@@ -88,11 +88,11 @@ public class SynchronizeOverviewChainView extends AbstractSynchronizeChainView {
 
     /**
      * Handles the synchronization of layer related things.
-     *
+     * 
      * <p>
      * In particular, this function handles adding, removing and changing the
      * visibility of layers in the main view chain.
-     *
+     * 
      * @param aLayerChangedReason
      *            observed ChangedReason
      */
@@ -104,7 +104,7 @@ public class SynchronizeOverviewChainView extends AbstractSynchronizeChainView {
             addLayer(aLayerChangedReason.getSubView(), null);
 
         } else if (aLayerChangedReason.getLayerChangeType() == LayerChangeType.LAYER_REMOVED) {
-            // remove a layer
+
             ImageInfoView imageInfoView = ViewHelper.getViewAdapter(aLayerChangedReason.getSubView(), ImageInfoView.class);
             View overviewImageView = viewRelations.get(imageInfoView);
             if (overviewImageView != null) {
@@ -139,11 +139,11 @@ public class SynchronizeOverviewChainView extends AbstractSynchronizeChainView {
     /**
      * Handles the synchronization of region changes related to ROI (e.g. for
      * rectangle)
-     *
+     * 
      * <p>
      * In particular, this function fires a ChangeEvent to notify other views,
      * that the region of the main view chain has changed.
-     *
+     * 
      * @param sender
      *            Origin of the change in the main view chain
      */
@@ -160,9 +160,9 @@ public class SynchronizeOverviewChainView extends AbstractSynchronizeChainView {
     /**
      * Adds a sub view chain for a new layer in the main view chain to the
      * overview view chain.
-     *
+     * 
      * All corresponding filter views and the image view will be created.
-     *
+     * 
      * @param view
      *            First view in sub view chain of the corresponding layer from
      *            observed view chain.
@@ -238,20 +238,20 @@ public class SynchronizeOverviewChainView extends AbstractSynchronizeChainView {
 
     /**
      * Removes a image view from the overview with all associated views.
-     *
+     * 
      * @param aView
      *            ImageInfoView of the main view chain which is removed
      * */
     @Override
     public void removeLayer(ImageInfoView imageInfoView, View subView) {
-        getAdapter(LayeredView.class).removeLayer(subView, false);
+        getAdapter(LayeredView.class).removeLayer(subView, true);
         viewRelations.remove(imageInfoView);
     }
 
     /**
      * Changes the visibility of a layer view chain observed in the main view
      * chain.
-     *
+     * 
      * @param aView
      *            View of the sub image view chain. The visibility of the
      *            related image will be toggled.
@@ -265,7 +265,7 @@ public class SynchronizeOverviewChainView extends AbstractSynchronizeChainView {
      * Searches for the layered view in a sub tree chain by checking the
      * listening views. The method returns the first sub view of the layered
      * view which belongs to the passed view.
-     *
+     * 
      * @param aView
      *            View from where to search for a layered view.
      * @return The first sub view of the layered view which belongs to the
