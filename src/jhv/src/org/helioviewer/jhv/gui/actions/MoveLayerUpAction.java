@@ -1,11 +1,13 @@
 package org.helioviewer.jhv.gui.actions;
 
 import java.awt.event.ActionEvent;
+
 import javax.swing.AbstractAction;
+
 import org.helioviewer.jhv.gui.IconBank;
 import org.helioviewer.jhv.gui.IconBank.JHVIcon;
+import org.helioviewer.jhv.layers.LayersModel;
 import org.helioviewer.viewmodel.view.View;
-import org.jhv.dataset.tree.models.LayersToDatasetLayers;
 
 /**
  * Action for a specific layer to move up a given layer.
@@ -18,7 +20,7 @@ public class MoveLayerUpAction extends AbstractAction {
     /**
      * Controlled layer by this action.
      */
-    private View view;
+    private final View view;
 
     /**
      * Creates a action to move a layer up
@@ -34,8 +36,9 @@ public class MoveLayerUpAction extends AbstractAction {
     /**
      * {@inheritDoc}
      */
+    @Override
     public void actionPerformed(ActionEvent e) {
-        LayersToDatasetLayers.getSingletonInstance().moveLayerUp(view);
+        LayersModel.getSingletonInstance().moveLayerUp(view);
     }
 
 }
