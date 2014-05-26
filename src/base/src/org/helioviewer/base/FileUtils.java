@@ -4,9 +4,8 @@ import java.io.BufferedInputStream;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileReader;
-
 import java.io.FileOutputStream;
+import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -92,6 +91,7 @@ public class FileUtils {
         final BufferedReader stdout = new BufferedReader(new InputStreamReader(process.getInputStream()));
         final BufferedReader stderr = new BufferedReader(new InputStreamReader(process.getErrorStream()));
         Thread threadStdout = new Thread(new Runnable() {
+            @Override
             public void run() {
                 try {
                     String line;
@@ -108,8 +108,9 @@ public class FileUtils {
                     }
                 }
             }
-        });
+        }, "FILEUTILS1");
         Thread threadStderr = new Thread(new Runnable() {
+            @Override
             public void run() {
                 try {
                     String line;
@@ -126,7 +127,7 @@ public class FileUtils {
                     }
                 }
             }
-        });
+        }, "FILEUTILS2");
 
         threadStderr.start();
         threadStdout.start();

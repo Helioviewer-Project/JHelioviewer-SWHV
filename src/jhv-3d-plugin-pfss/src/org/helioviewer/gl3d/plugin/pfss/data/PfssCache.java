@@ -14,8 +14,8 @@ import org.helioviewer.gl3d.plugin.pfss.settings.PfssSettings;
  * */
 public class PfssCache {
 
-    private LinkedHashMap<String, PfssFitsFile> pfssDatas = new LinkedHashMap<String, PfssFitsFile>();
-    private HashMap<Integer, PfssYear> years;
+    private final LinkedHashMap<String, PfssFitsFile> pfssDatas = new LinkedHashMap<String, PfssFitsFile>();
+    private final HashMap<Integer, PfssYear> years;
     private PfssDayAndTime lastEntry = null;
     private boolean visible = false;
     private boolean load = false;
@@ -61,7 +61,7 @@ public class PfssCache {
                 if (tmp != null) {
                     PfssFitsFile tmpFits = new PfssFitsFile();
                     pfssDatas.put(tmp.getUrl(), tmpFits);
-                    Thread t = new Thread(new PfssDataLoader(tmp, tmpFits));
+                    Thread t = new Thread(new PfssDataLoader(tmp, tmpFits), "PFFSLoader");
                     t.start();
                     tmp = tmp.getNext();
                 }
@@ -101,7 +101,7 @@ public class PfssCache {
     }
 
     private void loadFile(PfssDayAndTime dayAndTime, PfssFitsFile fits) {
-        Thread t = new Thread(new PfssDataLoader(dayAndTime, fits));
+        Thread t = new Thread(new PfssDataLoader(dayAndTime, fits), "PFSSLOADER2");
         t.start();
     }
 
