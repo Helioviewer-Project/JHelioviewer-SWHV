@@ -52,15 +52,15 @@ public class OpenRemoteFileDialog extends JDialog implements ShowableDialog, Act
     private static final long serialVersionUID = 1L;
     private static JTextField inputAddress = new JTextField();
     private static JTextField imageAddress = new JTextField();
-    private JLabel secondLabel = new JLabel("Remote Image Path: ");
-    private JButton buttonOpen = new JButton(" Open ");
-    private JButton buttonCancel = new JButton(" Cancel ");
-    private JButton refresh = new JButton(" Connect ");
-    private JButton buttonShow = new JButton(" Advanced Options ");
+    private final JLabel secondLabel = new JLabel("Remote Image Path: ");
+    private final JButton buttonOpen = new JButton(" Open ");
+    private final JButton buttonCancel = new JButton(" Cancel ");
+    private final JButton refresh = new JButton(" Connect ");
+    private final JButton buttonShow = new JButton(" Advanced Options ");
     private static DynamicModel treeModel;
     private static JTree tree;
     private static String chosenFile = "/";
-    private JPanel connectPanel = new JPanel(new BorderLayout());
+    private final JPanel connectPanel = new JPanel(new BorderLayout());
     private JScrollPane scrollPane = new JScrollPane();
     private static JCheckBox fromJPIP = new JCheckBox("Download From HTTP");
 
@@ -110,6 +110,7 @@ public class OpenRemoteFileDialog extends JDialog implements ShowableDialog, Act
         try {
 
             mouseListener = new MouseAdapter() {
+                @Override
                 public void mouseClicked(MouseEvent e) {
                     int selRow = tree.getRowForLocation(e.getX(), e.getY());
                     TreePath treePath = tree.getPathForLocation(e.getX(), e.getY());
@@ -186,6 +187,7 @@ public class OpenRemoteFileDialog extends JDialog implements ShowableDialog, Act
      *            the ActionEvent that occured what happens when the ActionEvent
      *            e is fired
      */
+    @Override
     public void actionPerformed(ActionEvent arg) {
         /*
          * when the user wants to have more options the JTree is expanded and
@@ -384,6 +386,7 @@ public class OpenRemoteFileDialog extends JDialog implements ShowableDialog, Act
         try {
             final URI uri = new URI(srv + img);
             Thread thread = new Thread(new Runnable() {
+                @Override
                 public void run() {
                     ImageViewerGui.getSingletonInstance().getMainImagePanel().setLoading(true);
                     FileDownloader filedownloader = new FileDownloader();
@@ -401,7 +404,7 @@ public class OpenRemoteFileDialog extends JDialog implements ShowableDialog, Act
 
                 }
 
-            });
+            }, "OpenRemoteFile1");
 
             thread.start();
 
@@ -463,6 +466,7 @@ public class OpenRemoteFileDialog extends JDialog implements ShowableDialog, Act
             final OpenRemoteFileDialog parent = this;
             Thread thread = new Thread(new Runnable() {
 
+                @Override
                 public void run() {
                     try {
                         APIRequestManager.newLoad(uri, new URI(httpPath), true, null);
@@ -482,7 +486,7 @@ public class OpenRemoteFileDialog extends JDialog implements ShowableDialog, Act
                         parent.dispose();
                     }
                 }
-            });
+            }, "OpenRemoteFile2");
 
             thread.start();
         } catch (URISyntaxException e) {
@@ -495,6 +499,7 @@ public class OpenRemoteFileDialog extends JDialog implements ShowableDialog, Act
     /**
      * {@inheritDoc}
      */
+    @Override
     public void showDialog() {
         pack();
         setSize(getPreferredSize());
