@@ -174,7 +174,7 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
         final int width = Math.abs(mouseDragPosition.x - mousePressedPosition.x);
         final int height = Math.abs(mouseDragPosition.y - mousePressedPosition.y);
 
-        //g.setColor(ChartConstants.SELECTED_INTERVAL_BACKGROUND_COLOR);
+        // g.setColor(ChartConstants.SELECTED_INTERVAL_BACKGROUND_COLOR);
         g.setColor(Color.BLUE);
         g.drawRect(x, y, width, height);
     }
@@ -349,12 +349,14 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
         double startValue = (graphArea.y + graphArea.height - Math.max(y0, y1)) / ratioValue + myPlotAreaSpace.getScaledSelectedMinValue();
         double endValue = (graphArea.y + graphArea.height - Math.min(y0, y1)) / ratioValue + myPlotAreaSpace.getScaledSelectedMinValue();
 
-        myPlotAreaSpace.setScaledSelectedValue(startValue, endValue,false);
+        myPlotAreaSpace.setScaledSelectedValue(startValue, endValue, false);
     }
 
     private void updateGraphArea() {
         if (drawController.getYAxisElements(identifier).size() >= 2) {
             twoYAxis = 1;
+        } else {
+            twoYAxis = 0;
         }
         final int graphWidth = getWidth() - (ChartConstants.GRAPH_LEFT_SPACE + ChartConstants.GRAPH_RIGHT_SPACE + twoYAxis * ChartConstants.TWO_AXIS_GRAPH_RIGHT);
         final int graphHeight = getHeight() - (ChartConstants.GRAPH_TOP_SPACE + ChartConstants.GRAPH_BOTTOM_SPACE);
@@ -433,7 +435,8 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
         final Rectangle movieFrame = new Rectangle(movieLinePosition - 1, graphArea.y, 3, graphArea.height);
 
         mousePressedOnMovieFrame = movieFrame.contains(e.getPoint());
-        //mousePressedPosition = graphArea.contains(e.getPoint()) ? e.getPoint() : null;
+        // mousePressedPosition = graphArea.contains(e.getPoint()) ?
+        // e.getPoint() : null;
         mousePressedPosition = plotArea.contains(e.getPoint()) ? e.getPoint() : null;
     }
 
