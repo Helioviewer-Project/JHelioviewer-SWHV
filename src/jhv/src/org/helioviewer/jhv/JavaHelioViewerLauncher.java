@@ -181,7 +181,7 @@ public class JavaHelioViewerLauncher {
                 }
                 final Process p = Runtime.getRuntime().exec(commandArray);
                 Runtime.getRuntime().addShutdownHook(new Thread(new Runnable() {
-                    @Override
+                    // @Override
                     public void run() {
                         p.destroy();
                     }
@@ -208,7 +208,7 @@ public class JavaHelioViewerLauncher {
         final BufferedReader stdout = new BufferedReader(new InputStreamReader(process.getInputStream()));
         final BufferedReader stderr = new BufferedReader(new InputStreamReader(process.getErrorStream()));
         Thread threadStdout = new Thread(new Runnable() {
-            @Override
+            // @Override
             public void run() {
                 try {
                     String line;
@@ -229,7 +229,7 @@ public class JavaHelioViewerLauncher {
             }
         }, "JavaHelioviewerstdout");
         Thread threadStderr = new Thread(new Runnable() {
-            @Override
+            // @Override
             public void run() {
                 try {
                     String line;
@@ -286,7 +286,7 @@ class ListenerImpl implements HyperlinkListener, PropertyChangeListener {
     /**
      * {@inheritDoc}
      */
-    @Override
+    // @Override
     public void hyperlinkUpdate(HyperlinkEvent event) {
         if (event.getEventType() == HyperlinkEvent.EventType.ACTIVATED) {
             String url = event.getURL().toString();
@@ -328,7 +328,7 @@ class ListenerImpl implements HyperlinkListener, PropertyChangeListener {
     /**
      * {@inheritDoc}
      */
-    @Override
+    // @Override
     public void propertyChange(PropertyChangeEvent evt) {
         if (evt.getSource() == errorPane) {
             Integer value = ((Integer) errorPane.getValue());
