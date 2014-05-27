@@ -60,7 +60,7 @@
 
     <target name="init" depends="mkdir">
        	<echo message="Trying to determine revision" />
-        <!-- <exec 
+        <exec 
             executable="${bzrpath}" 
             outputproperty="jhv.revision.tmp" 
             resolveexecutable="true" 
@@ -68,7 +68,7 @@
             resultproperty="jhv.revision.retcode"
             failifexecutionfails="false">
                 <arg value="revno"/>
-        </exec> -->
+        </exec>
         <loadfile property="jhv.version" srcFile="VERSION" />
         <property name="jhv.version" value="2.0.0" />
         <if>
