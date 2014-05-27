@@ -19,7 +19,7 @@ public class DataChecker implements RadioDataManagerListener {
     }
 
     @Override
-    public void downloadRequestAnswered(FrequencyInterval freqInterval, Interval<Date> timeInterval, long ID, String identifier) {
+    public void downloadRequestAnswered(Interval<Date> timeInterval, long ID, String identifier) {
         // TODO Auto-generated method stub
 
     }
@@ -102,13 +102,6 @@ public class DataChecker implements RadioDataManagerListener {
     @Override
     public void newDataForIDReceived(byte[] data, Interval<Date> timeInterval, FrequencyInterval freqInterval, Rectangle area, Long ID, String identifier, Long imageID) {
         // TODO Auto-generated method stub
-
-    }
-
-    @Override
-    public void additionDownloadRequestAnswered(Long downloadID) {
-        // TODO Auto-generated method stub
-
     }
 
     @Override
@@ -126,16 +119,21 @@ public class DataChecker implements RadioDataManagerListener {
     @Override
     public void noDataInterval(List<Interval<Date>> noDataList, Long downloadID, String plotIdentifier) {
         // TODO Auto-generated method stub
-        
+
     }
 
-    /* (non-Javadoc)
-     * @see org.helioviewer.plugins.eveplugin.radio.data.RadioDataManagerListener#frequencyIntervalUpdated(java.lang.String, org.helioviewer.plugins.eveplugin.radio.data.FrequencyInterval)
+    /*
+     * (non-Javadoc)
+     * 
+     * @see
+     * org.helioviewer.plugins.eveplugin.radio.data.RadioDataManagerListener
+     * #frequencyIntervalUpdated(java.lang.String,
+     * org.helioviewer.plugins.eveplugin.radio.data.FrequencyInterval)
      */
     @Override
     public void frequencyIntervalUpdated(String plotIdentifier, FrequencyInterval maxFrequencyInterval) {
         // TODO Auto-generated method stub
-        
+
     }
 
 }
