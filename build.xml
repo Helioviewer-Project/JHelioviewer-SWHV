@@ -102,7 +102,7 @@
             tofile="${temp}/src/org/helioviewer/jhv/JavaHelioViewerLauncher.java"
         />
 		<replace file="${temp}/src/org/helioviewer/jhv/JavaHelioViewerLauncher.java" token='@SuppressWarnings("all")'/>
-		<javac destdir="${bin.jhv}" target="1.2" source="1.2" debug="true" debuglevel="source,lines,vars" includeantruntime="false">
+		<javac destdir="${bin.jhv}" target="1.5" source="1.5" debug="true" debuglevel="source,lines,vars" includeantruntime="false">
 			<src path="${temp}/src/org/helioviewer/jhv/" />
             <include name="JavaHelioViewerLauncher.java"/>
 		</javac>
