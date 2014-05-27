@@ -24,7 +24,7 @@ import org.helioviewer.viewmodel.view.opengl.shader.GLShaderBuilder;
 
 /**
  * Filter applying running difference to some movie
- *
+ * 
  * @author Helge Dietert
  */
 public class RunningDifferenceFilter implements FrameFilter, StandardFilter, ObservableFilter, GLFragmentShaderFilter {
@@ -36,8 +36,6 @@ public class RunningDifferenceFilter implements FrameFilter, StandardFilter, Obs
     private volatile boolean baseDifferenceNoRot = false;
     private volatile boolean runDiffNoRot = false;
 
-
-
     /**
      * Observer listener
      */
@@ -45,7 +43,7 @@ public class RunningDifferenceFilter implements FrameFilter, StandardFilter, Obs
     /**
      * Given time machine to access the previous frame
      */
-   // private TimeMachineData timeMachineData;
+    // private TimeMachineData timeMachineData;
     private final DifferenceShader shader = new DifferenceShader();
     private int lookupDiff;
     private ImageData currentFrame;
@@ -76,10 +74,9 @@ public class RunningDifferenceFilter implements FrameFilter, StandardFilter, Obs
         if (jpxView == null)
             return data;
         ImageData previousFrame;
-        if(!baseDifference){
+        if (!baseDifference) {
             previousFrame = jpxView.getPreviousImageData();
-        }
-        else{
+        } else {
             previousFrame = jpxView.getBaseDifferenceImageData();
         }
         if (previousFrame != null) {
@@ -169,8 +166,8 @@ public class RunningDifferenceFilter implements FrameFilter, StandardFilter, Obs
     @Override
     public void setJP2View(JHVJP2View jp2View) {
         this.jp2View = jp2View;
-        if(jp2View instanceof JHVJPXView){
-            this.jpxView = (JHVJPXView)jp2View;
+        if (jp2View instanceof JHVJPXView) {
+            this.jpxView = (JHVJPXView) jp2View;
         }
     }
 
@@ -186,45 +183,40 @@ public class RunningDifferenceFilter implements FrameFilter, StandardFilter, Obs
     @Override
     public void applyGL(GL gl) {
         if (isActive) {
-            if(StateController.getInstance().getCurrentState().getType() == ViewStateEnum.View3D){
-                if(jpxView.getBaseDifferenceMode()){
+            if (StateController.getInstance().getCurrentState().getType() == ViewStateEnum.View3D) {
+                if (jpxView.getBaseDifferenceMode()) {
                     if (this.baseDifferenceNoRot) {
                         shader.setIsDifference(gl, 0.26f);
-                    }
-                    else {
+                    } else {
                         shader.setIsDifference(gl, 0.99f);
                     }
-                }
-                else{
-                    if(this.runDiffNoRot){
+                } else {
+                    if (this.runDiffNoRot) {
                         shader.setIsDifference(gl, 0.25f);
-                    }
-                    else{
+                    } else {
                         shader.setIsDifference(gl, 1.0f);
                     }
                 }
-            }
-            else{
-                if(jpxView.getBaseDifferenceMode()){
+            } else {
+                if (jpxView.getBaseDifferenceMode()) {
                     shader.setIsDifference(gl, 0.26f);
-                }
-                else{
+                } else {
                     shader.setIsDifference(gl, 0.25f);
                 }
             }
             shader.bind(gl);
             ImageData previousFrame;
-            if(!baseDifference){
+            if (!baseDifference) {
                 previousFrame = jpxView.getPreviousImageData();
-            }
-            else{
+            } else {
                 previousFrame = jpxView.getBaseDifferenceImageData();
             }
-            if(this.currentFrame != previousFrame){
+            if (this.currentFrame != previousFrame) {
                 shader.setTruncationValue(gl, this.truncationValue);
                 gl.glActiveTexture(shader.mode);
 
                 shader.activateDifferenceTexture(gl);
+
                 gl.glBindTexture(GL.GL_TEXTURE_2D, lookupDiff);
                 GLTextureHelper th = new GLTextureHelper();
                 th.moveImageDataToGLTexture(gl, previousFrame, 0, 0, previousFrame.getWidth(), previousFrame.getHeight(), lookupDiff);
