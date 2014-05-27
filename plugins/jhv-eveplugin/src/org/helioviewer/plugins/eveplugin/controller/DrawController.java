@@ -27,8 +27,7 @@ public class DrawController implements ZoomControllerListener, LineDataSelectorM
     private static DrawController instance;
     private Map<String, DrawControllerData> drawControllerData;
     private Interval<Date> interval;
-    
-    
+
     private DrawController() {
         this.drawControllerData = new HashMap<String, DrawControllerData>();
         ZoomController.getSingletonInstance().addZoomControllerListener(this);
@@ -207,9 +206,7 @@ public class DrawController implements ZoomControllerListener, LineDataSelectorM
 
     @Override
     public void lineDataRemoved(LineDataSelectorElement element) {
-
         fireRedrawRequest(element.getPlotIdentifier());
-
     }
 
     @Override
