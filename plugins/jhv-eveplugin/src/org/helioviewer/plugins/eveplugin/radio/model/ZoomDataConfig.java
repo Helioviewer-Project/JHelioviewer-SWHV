@@ -17,7 +17,7 @@ public class ZoomDataConfig implements ZoomManagerListener, PlotAreaSpaceListene
 
     private List<ZoomDataConfigListener> listeners;
 
-    public ZoomDataConfig(double minY, double maxY, Date minX, Date maxX, Rectangle displaySize, long ID, String plotIdentifier) {
+    public ZoomDataConfig(Date minX, Date maxX, Rectangle displaySize, long ID, String plotIdentifier) {
         listeners = new ArrayList<ZoomDataConfigListener>();
 
         this.maxX = maxX;
@@ -35,7 +35,7 @@ public class ZoomDataConfig implements ZoomManagerListener, PlotAreaSpaceListene
         listeners.add(l);
         double xRatio = 1.0 * (maxX.getTime() - minX.getTime()) / displaySize.getWidth();
         double yRatio = 1.0 * (yValueModel.getSelectedYMax() - yValueModel.getSelectedYMin()) / displaySize.getHeight();
-        l.requestData(minX, maxX, yValueModel.getSelectedYMin(), yValueModel.getSelectedYMax(), xRatio, yRatio, ID, plotIdentifier);        
+        l.requestData(minX, maxX, yValueModel.getSelectedYMin(), yValueModel.getSelectedYMax(), xRatio, yRatio, ID, plotIdentifier);
     }
 
     public long getID() {
@@ -99,15 +99,13 @@ public class ZoomDataConfig implements ZoomManagerListener, PlotAreaSpaceListene
         this.maxX = maxX;
         requestData();
     }
-    
+
     public String toString() {
-    	StringBuilder sb = new StringBuilder();
-    	sb.append("MinX = ").append(minX).append("\n")
-    	.append("MaxX = ").append(maxX).append("\n")
-    	.append("DisplaySize = ").append(displaySize).append("\n");
-    	return sb.toString();
+        StringBuilder sb = new StringBuilder();
+        sb.append("MinX = ").append(minX).append("\n").append("MaxX = ").append(maxX).append("\n").append("DisplaySize = ").append(displaySize).append("\n");
+        return sb.toString();
     }
-    
+
     @Override
     public void plotAreaSpaceChanged(double scaledMinValue, double scaledMaxValue, double scaledMinTime, double scaledMaxTime, double scaledSelectedMinValue, double scaledSelectedMaxValue, double scaledSelectedMinTime, double scaledSelectedMaxTime) {
         synchronized (this) {
