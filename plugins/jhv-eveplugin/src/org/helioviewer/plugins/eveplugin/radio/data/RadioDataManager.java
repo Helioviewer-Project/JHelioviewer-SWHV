@@ -555,7 +555,7 @@ public class RadioDataManager implements RadioDownloaderListener {
                             } else {
                                 Log.trace("The region has not changed send a data not changed for image id : " + ri.getRadioImageID());
                                 if (ri.getLastDataSize() != null) {
-                                    fireDataNotChanged(ri.getVisibleImageTimeInterval(), ri.getVisibleImageFreqInterval(), ri.getLastDataSize(), id, drd.getPlotIdentifier(), ri.getRadioImageID());
+                                    fireDataNotChanged(ri.getVisibleImageTimeInterval(), ri.getVisibleImageFreqInterval(), ri.getLastDataSize(), drd.getDownloadID(), drd.getPlotIdentifier(), ri.getRadioImageID());
                                 } else {
                                     Log.trace("Last data size was null for radio image id : " + ri.getRadioImageID());
                                 }
