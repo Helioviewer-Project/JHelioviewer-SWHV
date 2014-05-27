@@ -56,7 +56,7 @@ public abstract class GL3DCamera {
 
     protected GL3DQuatd currentDragRotation;
 
-    protected double localrotation;
+    protected GL3DQuatd localRotation;
 
     private double differentialRotation;
 
@@ -69,6 +69,9 @@ public abstract class GL3DCamera {
     public GL3DCamera() {
         this.cameraTransformation = GL3DMat4d.identity();
         this.rotation = GL3DQuatd.createRotation(0.0, new GL3DVec3d(0, 1, 0));
+        this.currentDragRotation = GL3DQuatd.createRotation(0.0, new GL3DVec3d(0, 1, 0));
+        this.localRotation = GL3DQuatd.createRotation(0.0, new GL3DVec3d(0, 1, 0));
+
         this.translation = new GL3DVec3d();
     }
 
@@ -127,12 +130,37 @@ public abstract class GL3DCamera {
         return getTranslation().z;
     }
 
+    public GL3DQuatd getLocalRotation() {
+        return this.localRotation;
+    }
+
     public GL3DQuatd getRotation() {
         return this.rotation;
     }
 
-    public void setRotation(GL3DQuatd rotation) {
-        this.rotation = rotation;
+    public void resetCurrentDragRotation() {
+        this.currentDragRotation.clear();
+    }
+
+    public void setLocalRotation(GL3DQuatd localRotation) {
+        this.localRotation = localRotation;
+        this.rotation.clear();
+        this.rotation.rotate(this.localRotation);
+        this.rotation.rotate(this.currentDragRotation);
+    }
+
+    public void setCurrentDragRotation(GL3DQuatd currentDragRotation) {
+        this.currentDragRotation = currentDragRotation;
+        this.rotation.clear();
+        this.rotation.rotate(this.localRotation);
+        this.rotation.rotate(this.currentDragRotation);
+    }
+
+    public void rotateCurrentDragRotation(GL3DQuatd currentDragRotation) {
+        this.currentDragRotation.rotate(currentDragRotation);
+        this.rotation.clear();
+        this.rotation.rotate(this.localRotation);
+        this.rotation.rotate(this.currentDragRotation);
     }
 
     public void deactivate() {
@@ -283,14 +311,6 @@ public abstract class GL3DCamera {
 
     public boolean isAnimating() {
         return !this.cameraAnimations.isEmpty();
-    }
-
-    public double getDifferentialRotation() {
-        return differentialRotation;
-    }
-
-    public void setDifferentialRotation(double differentialRotation) {
-        this.differentialRotation = differentialRotation;
     }
 
     public void updateRotation(long dateMillis) {

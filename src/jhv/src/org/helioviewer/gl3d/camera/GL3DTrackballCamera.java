@@ -2,24 +2,18 @@ package org.helioviewer.gl3d.camera;
 
 import java.util.Date;
 
-import org.helioviewer.base.logging.Log;
 import org.helioviewer.base.physics.Constants;
 import org.helioviewer.base.physics.DifferentialRotation;
 import org.helioviewer.gl3d.scenegraph.math.GL3DQuatd;
 import org.helioviewer.gl3d.scenegraph.math.GL3DVec3d;
-import org.helioviewer.gl3d.scenegraph.rt.GL3DRay;
-import org.helioviewer.gl3d.scenegraph.rt.GL3DRayTracer;
 import org.helioviewer.gl3d.view.GL3DSceneGraphView;
 import org.helioviewer.gl3d.wcs.CoordinateVector;
 import org.helioviewer.gl3d.wcs.conversion.SolarSphereToStonyhurstHeliographicConversion;
 import org.helioviewer.gl3d.wcs.impl.SolarSphereCoordinateSystem;
 import org.helioviewer.gl3d.wcs.impl.StonyhurstHeliographicCoordinateSystem;
-import org.helioviewer.jhv.layers.LayersModel;
 import org.helioviewer.viewmodel.changeevent.ChangeEvent;
 import org.helioviewer.viewmodel.changeevent.TimestampChangedReason;
-import org.helioviewer.viewmodel.view.ImageInfoView;
 import org.helioviewer.viewmodel.view.LinkedMovieManager;
-import org.helioviewer.viewmodel.view.SubimageDataView;
 import org.helioviewer.viewmodel.view.TimedMovieView;
 import org.helioviewer.viewmodel.view.View;
 import org.helioviewer.viewmodel.view.ViewListener;
@@ -35,7 +29,7 @@ import org.helioviewer.viewmodel.view.ViewListener;
  */
 public class GL3DTrackballCamera extends GL3DSolarRotationTrackingTrackballCamera implements ViewListener {
 
-    private CoordinateVector startPosition = null;
+    private final CoordinateVector startPosition = null;
 
     private Date currentDate = null;
     private double currentRotation = 0.0;
@@ -52,9 +46,7 @@ public class GL3DTrackballCamera extends GL3DSolarRotationTrackingTrackballCamer
 
     @Override
     public void reset() {
-        this.getRotation().clear();
-        setDifferentialRotation(DifferentialRotation.calculateRotationInRadians(0., this.timediff) % (Math.PI * 2.0));
-        this.getRotation().rotate(GL3DQuatd.createRotation(getDifferentialRotation(), new GL3DVec3d(0, 1, 0)));
+        this.resetCurrentDragRotation();
         super.reset();
     }
 
@@ -84,39 +76,12 @@ public class GL3DTrackballCamera extends GL3DSolarRotationTrackingTrackballCamer
     }
 
     public void updateRotation() {
-        if (startPosition != null) {
-            this.timediff = (currentDate.getTime()) / 1000 - Constants.referenceDate;
-            View activeView = LayersModel.getSingletonInstance().getActiveView();
-            SubimageDataView sim = activeView.getAdapter(ImageInfoView.class).getAdapter(SubimageDataView.class);
-            long time = sim.getSubimageData().getDateMillis();
-            double deltat = time / 1000.0 - Constants.referenceDate;
-            setDifferentialRotation(-DifferentialRotation.calculateRotationInRadians(0., deltat) % (Math.PI * 2.0));
-            this.getRotation().rotate(GL3DQuatd.createRotation(currentRotation - getDifferentialRotation(), new GL3DVec3d(0, 1, 0)));
-            this.updateCameraTransformation();
-            this.currentRotation = getDifferentialRotation();
-        } else {
-            currentRotation = 0.0;
-            resetStartPosition();
-        }
+        this.timediff = (currentDate.getTime()) / 1000 - Constants.referenceDate;
+        this.currentRotation = DifferentialRotation.calculateRotationInRadians(0., this.timediff) % (Math.PI * 2.0);
+        this.setLocalRotation(GL3DQuatd.createRotation(this.currentRotation, new GL3DVec3d(0, 1, 0)));
+        this.updateCameraTransformation();
     }
 
     private void resetStartPosition() {
-        GL3DRayTracer positionTracer = new GL3DRayTracer(sceneGraphView.getHitReferenceShape(), this);
-        GL3DRay positionRay = positionTracer.castCenter();
-
-        GL3DVec3d position = positionRay.getHitPoint();
-
-        if (position != null) {
-            CoordinateVector solarSpherePosition = solarSphereCoordinateSystem.createCoordinateVector(position.x, position.y, position.z);
-            CoordinateVector stonyhurstPosition = stonyhurstConversion.convert(solarSpherePosition);
-            // Log.debug("GL3DSolarRotationTrackingCam: StonyhurstPosition="+stonyhurstPosition);
-            this.startPosition = stonyhurstPosition;
-
-            Log.debug("GL3DSolarRotationTracking.Set Start hitpoint! " + positionRay.getDirection());
-        } else {
-            Log.debug("GL3DSolarRotationTracking.cannot reset hitpoint! " + positionRay.getDirection());
-
-        }
-
     }
 }
