@@ -27,8 +27,8 @@ public class GLPhysicalRenderGraphics extends AbstractPhysicalRenderGraphics {
     private static final int edgesPerOval = 32; // has to be power of two
     private static double[] sinOval;
 
-    private GL gl;
-    private GLCommonRenderGraphics commonRenderGraphics;
+    private final GL gl;
+    private final GLCommonRenderGraphics commonRenderGraphics;
     private Font font;
 
     /**
@@ -60,6 +60,7 @@ public class GLPhysicalRenderGraphics extends AbstractPhysicalRenderGraphics {
     /**
      * {@inheritDoc}
      */
+    @Override
     public void setColor(Color color) {
         gl.glColor4ub((byte) color.getRed(), (byte) color.getGreen(), (byte) color.getBlue(), (byte) color.getAlpha());
     }
@@ -67,6 +68,7 @@ public class GLPhysicalRenderGraphics extends AbstractPhysicalRenderGraphics {
     /**
      * {@inheritDoc}
      */
+    @Override
     public void setFont(Font font) {
         this.font = font;
     }
@@ -74,6 +76,7 @@ public class GLPhysicalRenderGraphics extends AbstractPhysicalRenderGraphics {
     /**
      * {@inheritDoc}
      */
+    @Override
     public void setLineWidth(float lineWidth) {
         gl.glLineWidth(lineWidth);
     }
@@ -81,6 +84,7 @@ public class GLPhysicalRenderGraphics extends AbstractPhysicalRenderGraphics {
     /**
      * {@inheritDoc}
      */
+    @Override
     public void drawLine(Double x0, Double y0, Double x1, Double y1) {
         gl.glDisable(GL.GL_TEXTURE_2D);
 
@@ -97,6 +101,7 @@ public class GLPhysicalRenderGraphics extends AbstractPhysicalRenderGraphics {
     /**
      * {@inheritDoc}
      */
+    @Override
     public void drawRectangle(Double x, Double y, Double width, Double height) {
         y = -y;
         gl.glDisable(GL.GL_TEXTURE_2D);
@@ -119,8 +124,10 @@ public class GLPhysicalRenderGraphics extends AbstractPhysicalRenderGraphics {
     /**
      * {@inheritDoc}
      */
+    @Override
     public void fillRectangle(Double x, Double y, Double width, Double height) {
         y = -y;
+
         gl.glBindTexture(GL.GL_TEXTURE_2D, 0);
 
         double width2 = width * 0.5;
@@ -139,6 +146,7 @@ public class GLPhysicalRenderGraphics extends AbstractPhysicalRenderGraphics {
     /**
      * {@inheritDoc}
      */
+    @Override
     public void drawOval(Double x, Double y, Double width, Double height) {
         y = -y;
         gl.glDisable(GL.GL_TEXTURE_2D);
@@ -160,6 +168,7 @@ public class GLPhysicalRenderGraphics extends AbstractPhysicalRenderGraphics {
     /**
      * {@inheritDoc}
      */
+    @Override
     public void fillOval(Double x, Double y, Double width, Double height) {
         y = -y;
         gl.glBindTexture(GL.GL_TEXTURE_2D, 0);
@@ -191,6 +200,7 @@ public class GLPhysicalRenderGraphics extends AbstractPhysicalRenderGraphics {
     /**
      * {@inheritDoc}
      */
+    @Override
     public void drawPolygon(Double[] xCoords, Double[] yCoords) {
         gl.glDisable(GL.GL_TEXTURE_2D);
 
@@ -208,6 +218,7 @@ public class GLPhysicalRenderGraphics extends AbstractPhysicalRenderGraphics {
     /**
      * {@inheritDoc}
      */
+    @Override
     public void drawPolygon(Vector2dDouble[] points) {
         gl.glDisable(GL.GL_TEXTURE_2D);
 
@@ -225,6 +236,7 @@ public class GLPhysicalRenderGraphics extends AbstractPhysicalRenderGraphics {
     /**
      * {@inheritDoc}
      */
+    @Override
     public void fillPolygon(Double[] xCoords, Double[] yCoords) {
         gl.glBindTexture(GL.GL_TEXTURE_2D, 0);
 
@@ -240,6 +252,7 @@ public class GLPhysicalRenderGraphics extends AbstractPhysicalRenderGraphics {
     /**
      * {@inheritDoc}
      */
+    @Override
     public void fillPolygon(Vector2dDouble[] points) {
         gl.glBindTexture(GL.GL_TEXTURE_2D, 0);
 
@@ -260,6 +273,7 @@ public class GLPhysicalRenderGraphics extends AbstractPhysicalRenderGraphics {
      * to use the same image object every call, if the image data does not
      * change.
      */
+    @Override
     public void drawImage(BufferedImage image, Double x, Double y) {
         drawImage(image, x, y, 1.0f);
     }
@@ -272,6 +286,7 @@ public class GLPhysicalRenderGraphics extends AbstractPhysicalRenderGraphics {
      * to use the same image object every call, if the image data does not
      * change.
      */
+    @Override
     public void drawImage(BufferedImage image, Double x, Double y, float scale) {
         Vector2dDouble imageSize = convertScreenToPhysical(image.getWidth(), image.getHeight());
         drawImage(image, x, y, imageSize.getX() * scale, imageSize.getY() * scale);
@@ -285,6 +300,7 @@ public class GLPhysicalRenderGraphics extends AbstractPhysicalRenderGraphics {
      * to use the same image object every call, if the image data does not
      * change.
      */
+    @Override
     public void drawImage(BufferedImage image, Double x, Double y, Double width, Double height) {
         y = -y;
 
@@ -318,6 +334,7 @@ public class GLPhysicalRenderGraphics extends AbstractPhysicalRenderGraphics {
     /**
      * {@inheritDoc}
      */
+    @Override
     public void drawText(String text, Double x, Double y) {
         y = -y;
 
@@ -362,8 +379,9 @@ public class GLPhysicalRenderGraphics extends AbstractPhysicalRenderGraphics {
     public void drawImage3d(BufferedImage image, Double x, Double y, Double z, Double width, Double height) {
         y = -y;
 
-        gl.glEnable(GL.GL_VERTEX_PROGRAM_ARB);
-        gl.glEnable(GL.GL_FRAGMENT_PROGRAM_ARB);
+        // gl.glEnable(GL.GL_VERTEX_PROGRAM_ARB);
+        // gl.glEnable(GL.GL_FRAGMENT_PROGRAM_ARB);
+        commonRenderGraphics.bindScalingShader();
 
         commonRenderGraphics.bindImage(image);
         gl.glTexParameteri(GL.GL_TEXTURE_2D, GL.GL_TEXTURE_MAG_FILTER, GL.GL_LINEAR);
@@ -419,12 +437,13 @@ public class GLPhysicalRenderGraphics extends AbstractPhysicalRenderGraphics {
         gl.glDisable(GL.GL_VERTEX_PROGRAM_ARB);
         gl.glDisable(GL.GL_FRAGMENT_PROGRAM_ARB);
 
-        commonRenderGraphics.unbindScalingShader();
+        // commonRenderGraphics.unbindScalingShader();
 
     }
 
     @Override
     public void fillPolygon(Vector3dDouble[] points) {
+
         gl.glBindTexture(GL.GL_TEXTURE_2D, 0);
 
         gl.glDisable(GL.GL_DEPTH_TEST);
@@ -450,7 +469,7 @@ public class GLPhysicalRenderGraphics extends AbstractPhysicalRenderGraphics {
 
     @Override
     public void drawLine3d(Double x0, Double y0, Double z0, Double x1, Double y1, Double z1) {
-        // TODO Auto-generated method stub
+
         gl.glDisable(GL.GL_TEXTURE_2D);
         gl.glEnable(GL.GL_LINE_SMOOTH);
         gl.glBlendFunc(GL.GL_SRC_ALPHA, GL.GL_ONE_MINUS_SRC_ALPHA);
@@ -496,6 +515,7 @@ public class GLPhysicalRenderGraphics extends AbstractPhysicalRenderGraphics {
 
     }
 
+    @Override
     public GL getGL() {
         return gl;
     }
