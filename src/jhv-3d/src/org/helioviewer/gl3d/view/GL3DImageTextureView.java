@@ -96,6 +96,9 @@ public class GL3DImageTextureView extends AbstractGL3DView implements GL3DView, 
     }
 
     public int getTextureId() {
+        if (this.textureId == 0 || this.textureId == -1) {
+            this.textureId = getAdapter(JHVJP2View.class).texID;
+        }
         return this.textureId;
     }
 
