@@ -78,19 +78,13 @@ public class RadioDownloader{
                                     Log.error("Received null view in request and open for date " + startDate + " and " + endDate);
                                     if (cache.addNoDataInterval(new Interval<Date>(startDate, calculateOneDayFurtherAsDate(startDate)), identifier)) {
                                         noDataList.add(new Interval<Date>(startDate, calculateOneDayFurtherAsDate(startDate)));
-                                    }                                    
+                                    }
                                 }
                                 startDate = calculateOneDayFurtherAsDate(startDate);
                             }
                             fireNewJPXDataAvailable(jpxList, identifier, requestedStartDate, endDate, downloadID);
-                            if (!noDataList.isEmpty()) {
-                                Log.trace("Data in no data in request and open : " + noDataList.size());
-                                fireNoData(noDataList, identifier, downloadID);
-                            }else{
-                                Log.trace("no data list is empty in request and open");
-                            }
-                        } else {
-
+                            Log.trace("Data in no data in request and open : " + noDataList.size());
+                            fireNoData(noDataList, identifier, downloadID);
                         }
                     } else {
                         fireIntervalTooBig(startDate, endDate, downloadID, identifier);
@@ -110,8 +104,8 @@ public class RadioDownloader{
 
         thread.start();
     }
-    
-    
+
+
     public void requestAndOpenIntervals(List<Interval<Date>> intervals, Long downloadId, String plotIdentifier, double ratioX, double ratioY) {
         for (Interval<Date> interval : intervals) {
             Log.debug("Request for data for interval " + interval.getStart() + " - " + interval.getEnd());
@@ -182,15 +176,9 @@ public class RadioDownloader{
                             if (!jpxList.isEmpty()) {
                                 fireAdditionalJPXDataAvailable(jpxList, identifier, requestedStartDate, endDate, downloadID, ratioX, ratioY);
                             }
-                            if (!noDataList.isEmpty()) {
-                                Log.trace("Size of noDataList in request intervals: "+ noDataList.size());
-                                fireNoData(noDataList, identifier, downloadID);
-                            } else {
-                                Log.trace("noDataList was empty");
-                            }
-                        } else {
-
-                        }                        
+                            Log.trace("Size of noDataList in request intervals: "+ noDataList.size());
+                            fireNoData(noDataList, identifier, downloadID);                            
+                        }
                     } catch (IOException e) {
                         Log.error("An error occured while opening the remote file!", e);
                         Message.err("An error occured while opening the remote file!", e.getMessage(), false);

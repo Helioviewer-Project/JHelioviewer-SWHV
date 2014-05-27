@@ -258,23 +258,23 @@ public class RadioPlotModel implements RadioDataManagerListener,
 
     @Override
     public void noDataInterval(List<Interval<Date>> noDataList, Long downloadID, String plotIdentifier) {
-        if (!noDataList.isEmpty()) {
-            RadioPlotModelData rpmd = getRadioPlotModelData(plotIdentifier);
-            Map<Long, List<NoDataConfig>> noDataConfigList = rpmd.getNoDataConfigList();
-            Map<Long, DownloadRequestData> downloadRequestData = rpmd.getDownloadRequestData();
-            if (!noDataConfigList.containsKey(downloadID)) {
-                noDataConfigList.put(downloadID, new ArrayList<NoDataConfig>());
-            }else{
-                //noDataConfigList.get(downloadID).clear();
-            }
-            for (Interval<Date> noData : noDataList) {
-                DrawableAreaMap dam = zoomManager.getDrawableAreaMap(noData.getStart(), noData.getEnd(), downloadID, plotIdentifier);
-                noDataConfigList.get(downloadID).add(new NoDataConfig(noData, dam, downloadID, downloadRequestData.get(downloadID).isVisible()));
-            }
-            fireDrawNewBufferedImage(plotIdentifier);
+        RadioPlotModelData rpmd = getRadioPlotModelData(plotIdentifier);
+        RadioImagePane radioImagePane = rpmd.getRadioImagePane();
+        radioImagePane.setIntervalTooBig(false);
+        Map<Long, List<NoDataConfig>> noDataConfigList = rpmd.getNoDataConfigList();
+        Map<Long, DownloadRequestData> downloadRequestData = rpmd.getDownloadRequestData();
+        if (!noDataConfigList.containsKey(downloadID)) {
+            noDataConfigList.put(downloadID, new ArrayList<NoDataConfig>());
+        }else{
+            //noDataConfigList.get(downloadID).clear();
         }
+        for (Interval<Date> noData : noDataList) {
+            DrawableAreaMap dam = zoomManager.getDrawableAreaMap(noData.getStart(), noData.getEnd(), downloadID, plotIdentifier);
+            noDataConfigList.get(downloadID).add(new NoDataConfig(noData, dam, downloadID, downloadRequestData.get(downloadID).isVisible()));
+        }
+        fireDrawNewBufferedImage(plotIdentifier);
     }
-    
+
     @Override
     public void frequencyIntervalUpdated(String plotIdentifier, FrequencyInterval maxFrequencyInterval) {
         YValueModel yValueModel = yValueModelManager.getYValueModel(plotIdentifier);
