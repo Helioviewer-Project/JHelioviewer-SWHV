@@ -272,33 +272,18 @@ public class ZoomManager implements ZoomControllerListener, PlotAreaSpaceListene
     }
 
     /**
+     * Remove the zoom manager data from the zoom manager.
+     * 
+     * @param downloadID
+     *            The download identifier to remove from the zoom manager
      * @param plotIdentifier
-     * @param maxFrequencyInterval
-     * 
-     *            public void updateFrequencyIntervals(String plotIdentifier,
-     *            FrequencyInterval maxFrequencyInterval) { synchronized
-     *            (intervalLock) {
-     * 
-     *            ZoomManagerData zmd = zoomManagerData.get(plotIdentifier);
-     *            PlotAreaSpace pas =
-     *            plotAreaSpaceManager.getPlotAreaSpace(plotIdentifier); double
-     *            scaledDiff = pas.getScaledMaxValue()-pas.getScaledMinValue();
-     * 
-     *            for (ZoomDataConfig zdc : zmd.getZoomDataConfigMap().values())
-     *            { zdc.setMinY(1.0*maxFrequencyInterval.getStart());
-     *            zdc.setMaxY(1.0*maxFrequencyInterval.getEnd()); double absDiff
-     *            = maxFrequencyInterval.getEnd()-maxFrequencyInterval.getStart(
-     *            ); double freqPerScaled = absDiff/scaledDiff;
-     *            zdc.setSelectedMinY(1.0*maxFrequencyInterval.getStart()+(pas.
-     *            getScaledSelectedMinValue
-     *            ()-pas.getScaledMinValue())*freqPerScaled);
-     *            zdc.setSelectedMaxY(1.0*maxFrequencyInterval.getStart()+(pas.
-     *            getScaledSelectedMaxValue
-     *            ()-pas.getScaledMinValue())*freqPerScaled);
-     *            Log.debug("Selected interval is : ["+ zdc.getSelectedMinY() +
-     *            ", " +zdc.getSelectedMaxY()+ "]"); zdc.update(); }
-     *            Log.debug("Frequency intervals updated");
-     * 
-     *            } }
+     *            The plot identifier for which the download identifier should
+     *            be removed
      */
+    public void removeZoomManagerDataConfig(long downloadID, String plotIdentifier) {
+        ZoomManagerData zmd = zoomManagerData.get(plotIdentifier);
+        if (zmd != null) {
+            zmd.getZoomDataConfigMap().remove(downloadID);
+        }
+    }
 }

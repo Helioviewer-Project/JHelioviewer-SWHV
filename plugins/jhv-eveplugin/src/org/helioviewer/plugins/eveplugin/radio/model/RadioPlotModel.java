@@ -176,6 +176,7 @@ public class RadioPlotModel implements RadioDataManagerListener, ZoomDataConfigL
             noDataList.remove(ID);
             plotConfigList.remove(ID);
             downloadRequestData.remove(ID);
+            zoomManager.removeZoomManagerDataConfig(ID, drd.getPlotIdentifier());
             drawController.removeDrawableElement(radioImagePane, drd.getPlotIdentifier());
             for (Long imageID : drd.getRadioImages().keySet()) {
                 bufferedImages.remove(imageID);
