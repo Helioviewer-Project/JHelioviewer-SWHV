@@ -285,7 +285,7 @@ class J2KRender implements Runnable {
 
             Kdu_dims requestedBufferedRegion = KakaduUtils.roiToKdu_dims(currParams.subImage);
 
-            compositorRef.Set_buffer_surface(requestedBufferedRegion);
+            compositorRef.Set_buffer_surface(requestedBufferedRegion, 0);
 
             Kdu_dims actualBufferedRegion = new Kdu_dims();
             Kdu_compositor_buf compositorBuf = compositorRef.Get_composition_buffer(actualBufferedRegion);
@@ -332,7 +332,7 @@ class J2KRender implements Runnable {
                 if (parentImageRef.getNumComponents() < 3) {
                     for (int row = 0; row < newHeight; row++, destIdx += currParams.subImage.width, srcIdx += newWidth) {
                         for (int col = 0; col < newWidth; ++col) {
-                            byteBuffer[currentByteBuffer][destIdx + col] = (byte) ((localIntBuffer[srcIdx + col] >> 8) & 0xFF);
+                            byteBuffer[currentByteBuffer][destIdx + col] = (byte) ((localIntBuffer[srcIdx + col]) & 0xFF);
                         }
                     }
                 } else {
