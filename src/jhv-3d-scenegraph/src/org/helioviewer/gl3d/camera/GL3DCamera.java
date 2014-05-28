@@ -199,9 +199,10 @@ public abstract class GL3DCamera {
      */
     public void updateCameraTransformation(boolean fireEvent) {
         this.rotation.clear();
+        this.rotation.rotate(this.currentDragRotation);
+
         this.rotation.rotate(this.localRotation);
 
-        this.rotation.rotate(this.currentDragRotation);
         cameraTransformation = GL3DMat4d.identity();
         cameraTransformation.translate(this.translation);
         cameraTransformation.multiply(this.rotation.toMatrix());
@@ -320,5 +321,9 @@ public abstract class GL3DCamera {
 
     public long getTimeDelay() {
         return this.timeDelay;
+    }
+
+    public GL3DQuatd getCurrentDragRotation() {
+        return this.currentDragRotation;
     }
 }
