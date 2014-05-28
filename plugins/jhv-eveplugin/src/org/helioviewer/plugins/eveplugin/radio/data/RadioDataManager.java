@@ -25,6 +25,7 @@ import org.helioviewer.viewmodel.changeevent.ChangeEvent;
 import org.helioviewer.viewmodel.metadata.HelioviewerMetaData;
 import org.helioviewer.viewmodel.region.RegionAdapter;
 import org.helioviewer.viewmodel.region.StaticRegion;
+import org.helioviewer.viewmodel.view.MetaDataView;
 import org.helioviewer.viewmodel.view.View;
 import org.helioviewer.viewmodel.view.jp2view.JHVJP2View;
 import org.helioviewer.viewmodel.view.jp2view.JHVJP2View.ReaderMode;
@@ -537,6 +538,7 @@ public class RadioDataManager implements RadioDownloaderListener {
                         Rectangle viewport = zoomManager.getAvailableSpaceForInterval(visibleDateInterval.getStart(), visibleDateInterval.getEnd(), visibleFrequencyInterval.getStart(), visibleFrequencyInterval.getEnd(), id, plotIdentifier);
                         View v = jpxData.getView();
                         JHVJP2View jp2View = v.getAdapter(JHVJP2View.class);
+                        MetaDataView metaDataView = v.getAdapter(MetaDataView.class);
                         if (jp2View != null) {
                             jp2View.setViewport(new ViewportAdapter(new StaticViewport(new Vector2dInt(viewport.width, viewport.height))), new ChangeEvent());
                             Rectangle roi = ri.getROI();
@@ -548,7 +550,7 @@ public class RadioDataManager implements RadioDownloaderListener {
                             Log.trace("viewport[width-height] : " + viewport.width + " - " + viewport.height);
                             Log.trace("ROI [x0,y0,width,height] : " + roi.x + "," + roi.y + "," + roi.width + "," + roi.height);
                             Log.trace("*********************************************");
-                            HelioviewerMetaData md = (HelioviewerMetaData) jp2View.getMetadata();
+                            HelioviewerMetaData md = (HelioviewerMetaData) metaDataView.getMetaData();
                             Double mpp = md.getUnitsPerPixel();
                             if (jp2View.setRegion(new RegionAdapter(new StaticRegion(roi.getX() * mpp, roi.getY() * mpp, new Vector2dDouble(roi.getWidth() * mpp, roi.getHeight() * mpp))), new ChangeEvent())) {
                                 Log.trace("The region is changed");
