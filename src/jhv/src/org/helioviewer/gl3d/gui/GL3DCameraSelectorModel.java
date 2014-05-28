@@ -12,6 +12,7 @@ import org.helioviewer.gl3d.camera.GL3DCamera;
 import org.helioviewer.gl3d.camera.GL3DFixedTimeCamera;
 import org.helioviewer.gl3d.camera.GL3DSolarRotationTrackingTrackballCamera;
 import org.helioviewer.gl3d.camera.GL3DTrackballCamera;
+import org.helioviewer.gl3d.camera.GL3DTrackballStonyhurstCamera;
 import org.helioviewer.gl3d.view.GL3DCameraView;
 import org.helioviewer.gl3d.view.GL3DSceneGraphView;
 import org.helioviewer.jhv.gui.ImageViewerGui;
@@ -41,6 +42,8 @@ public class GL3DCameraSelectorModel extends AbstractListModel implements ComboB
     private GL3DSolarRotationTrackingTrackballCamera solarRotationCamera;
 
     private GL3DFixedTimeCamera fixedTimeCamera;
+
+    private GL3DTrackballStonyhurstCamera stonyHurstCamera;
 
     public static GL3DCameraSelectorModel getInstance() {
         if (instance == null) {
@@ -73,7 +76,7 @@ public class GL3DCameraSelectorModel extends AbstractListModel implements ComboB
         if (sceneGraphView != null) {
             trackballCamera = new GL3DTrackballCamera(sceneGraphView);
             fixedTimeCamera = new GL3DFixedTimeCamera(sceneGraphView);
-
+            stonyHurstCamera = new GL3DTrackballStonyhurstCamera(sceneGraphView);
             solarRotationCamera = new GL3DSolarRotationTrackingTrackballCamera(sceneGraphView);
             defaultCamera = trackballCamera;
             lastCamera = defaultCamera;
@@ -150,6 +153,10 @@ public class GL3DCameraSelectorModel extends AbstractListModel implements ComboB
 
     public GL3DFixedTimeCamera getFixedTimeCamera() {
         return fixedTimeCamera;
+    }
+
+    public GL3DTrackballStonyhurstCamera getStonyHurstCamera() {
+        return stonyHurstCamera;
     }
 
 }
