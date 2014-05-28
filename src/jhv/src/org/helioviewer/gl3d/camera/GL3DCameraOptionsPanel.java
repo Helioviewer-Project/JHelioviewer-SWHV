@@ -54,7 +54,7 @@ public class GL3DCameraOptionsPanel extends JPanel {
                 GL3DCameraSelectorModel selector = GL3DCameraSelectorModel.getInstance();
                 selector.setCurrentCamera(selector.getTrackballCamera());
                 hideTimedelayComponents();
-                Displayer.getSingletonInstance().display();
+                Displayer.getSingletonInstance().render();
             }
         });
 
@@ -63,9 +63,9 @@ public class GL3DCameraOptionsPanel extends JPanel {
             @Override
             public void actionPerformed(ActionEvent e) {
                 GL3DCameraSelectorModel selector = GL3DCameraSelectorModel.getInstance();
-                selector.setCurrentCamera(selector.getSolarRotationCamera());
+                selector.setCurrentCamera(selector.getStonyHurstCamera());
                 hideTimedelayComponents();
-                Displayer.getSingletonInstance().display();
+                Displayer.getSingletonInstance().render();
             }
         });
 
@@ -76,7 +76,7 @@ public class GL3DCameraOptionsPanel extends JPanel {
                 GL3DCameraSelectorModel selector = GL3DCameraSelectorModel.getInstance();
                 selector.setCurrentCamera(selector.getFixedTimeCamera());
                 showTimedelayComponents();
-                Displayer.getSingletonInstance().display();
+                Displayer.getSingletonInstance().render();
             }
         });
 
