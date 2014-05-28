@@ -4,7 +4,6 @@ import java.util.List;
 
 import javax.media.opengl.GL;
 
-import org.helioviewer.base.math.Vector2dDouble;
 import org.helioviewer.base.physics.Constants;
 import org.helioviewer.gl3d.scenegraph.GL3DState;
 import org.helioviewer.gl3d.scenegraph.math.GL3DVec2d;
@@ -77,10 +76,6 @@ public class GL3DImageSphere extends GL3DImageMesh {
                 }
             }
             MetaData metaData = this.layer.metaDataView.getMetaData();
-            Vector2dDouble ul = metaData.getPhysicalUpperLeft();
-            Vector2dDouble ur = metaData.getPhysicalUpperRight();
-            Vector2dDouble lr = metaData.getPhysicalLowerRight();
-            Vector2dDouble ll = metaData.getPhysicalLowerLeft();
 
             int beginPositionNumberCorona = numberOfPositions;
             positions.add(new GL3DVec3d(-40., 40., 0.));
