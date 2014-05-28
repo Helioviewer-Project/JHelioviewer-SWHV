@@ -77,7 +77,10 @@ public class GL3DTrackballRotationInteraction extends GL3DDefaultInteraction {
         if (ray.isOnSun) {
             // Log.debug("GL3DTrackballRotationInteraction: Ray is Inside!");
             hitPoint = ray.getHitPoint();
+            // System.out.println(hitPoint);
             hitPoint.normalize();
+            hitPoint = camera.getLocalRotation().toMatrix().multiply(hitPoint);
+
         } else {
             // Log.debug("GL3DTrackballRotationInteraction: Ray is Outside!");
             double y = (camera.getHeight() / 2 - p.y) / camera.getHeight();
@@ -86,7 +89,9 @@ public class GL3DTrackballRotationInteraction extends GL3DDefaultInteraction {
             // the viewspace (not the sphere)
             GL3DVec3d normalizedHelpVec = new GL3DVec3d(x, y, 0);
             normalizedHelpVec.normalize();
-            hitPoint = camera.getRotation().toMatrix().inverse().multiply(normalizedHelpVec);
+            hitPoint = normalizedHelpVec;
+            // hitPoint =
+            // camera.getRotation().toMatrix().multiply(normalizedHelpVec);
         }
         return hitPoint;
     }
