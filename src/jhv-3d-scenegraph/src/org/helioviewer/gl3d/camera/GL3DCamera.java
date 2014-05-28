@@ -58,8 +58,6 @@ public abstract class GL3DCamera {
 
     protected GL3DQuatd localRotation;
 
-    private double differentialRotation;
-
     private long timeDelay;
 
     public GL3DCamera(double clipNear, double clipFar) {
