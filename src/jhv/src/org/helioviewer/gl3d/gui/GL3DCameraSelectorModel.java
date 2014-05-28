@@ -9,6 +9,7 @@ import javax.swing.ListModel;
 
 import org.helioviewer.base.logging.Log;
 import org.helioviewer.gl3d.camera.GL3DCamera;
+import org.helioviewer.gl3d.camera.GL3DFixedTimeCamera;
 import org.helioviewer.gl3d.camera.GL3DSolarRotationTrackingTrackballCamera;
 import org.helioviewer.gl3d.camera.GL3DTrackballCamera;
 import org.helioviewer.gl3d.view.GL3DCameraView;
@@ -38,6 +39,8 @@ public class GL3DCameraSelectorModel extends AbstractListModel implements ComboB
     private GL3DTrackballCamera trackballCamera;
 
     private GL3DSolarRotationTrackingTrackballCamera solarRotationCamera;
+
+    private GL3DFixedTimeCamera fixedTimeCamera;
 
     public static GL3DCameraSelectorModel getInstance() {
         if (instance == null) {
@@ -69,6 +72,8 @@ public class GL3DCameraSelectorModel extends AbstractListModel implements ComboB
 
         if (sceneGraphView != null) {
             trackballCamera = new GL3DTrackballCamera(sceneGraphView);
+            fixedTimeCamera = new GL3DFixedTimeCamera(sceneGraphView);
+
             solarRotationCamera = new GL3DSolarRotationTrackingTrackballCamera(sceneGraphView);
             defaultCamera = trackballCamera;
             lastCamera = defaultCamera;
