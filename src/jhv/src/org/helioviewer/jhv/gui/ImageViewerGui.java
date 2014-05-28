@@ -11,7 +11,6 @@ import java.io.File;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URI;
-import java.net.URL;
 import java.util.AbstractList;
 
 import javax.swing.BoxLayout;
@@ -22,7 +21,9 @@ import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
 import javax.swing.JTabbedPane;
 import javax.swing.SwingUtilities;
+
 import org.helioviewer.base.message.Message;
+import org.helioviewer.gl3d.camera.GL3DCameraOptionsPanel;
 import org.helioviewer.jhv.JHVSplashScreen;
 import org.helioviewer.jhv.gui.actions.ExitProgramAction;
 import org.helioviewer.jhv.gui.components.ControlPanelContainer;
@@ -111,7 +112,7 @@ public class ImageViewerGui {
     private MoviePanel moviePanel;
     private ControlPanelContainer moviePanelContainer;
     private ControlPanelContainer filterPanelContainer;
-    private JMenuBar menuBar;
+    private final JMenuBar menuBar;
 
     // private SolarEventCatalogsPanel solarEventCatalogsPanel;
 
@@ -124,6 +125,7 @@ public class ImageViewerGui {
      */
     private ImageViewerGui() {
         StateController.getInstance().addStateChangeListener(new StateChangeListener() {
+            @Override
             public void stateChanged(State newState, State oldState, StateController stateController) {
                 activateState(newState, oldState);
             }
@@ -242,6 +244,7 @@ public class ImageViewerGui {
 
         Thread thread = new Thread(new Runnable() {
 
+            @Override
             public void run() {
 
                 loadImagesAtStartup();
@@ -287,6 +290,7 @@ public class ImageViewerGui {
         frame.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
         frame.addWindowListener(new WindowAdapter() {
 
+            @Override
             public void windowClosing(WindowEvent arg0) {
                 ExitProgramAction exitAction = new ExitProgramAction();
                 exitAction.actionPerformed(new ActionEvent(this, 0, ""));
@@ -404,16 +408,12 @@ public class ImageViewerGui {
             filterPanelContainer = new ControlPanelContainer();
             filterPanelContainer.setDefaultPanel(tab);
             leftPane.add("Adjustments", filterPanelContainer, false);
-            /*
-             * DatasetIntervals intervals = new DatasetIntervals();
-             * DatasetTreeModel model = new DatasetTreeModel(intervals);
-             * LayersToDatasetLayers converter = new
-             * LayersToDatasetLayers(model);
-             * LayersModel.getSingletonInstance().addLayersListener(converter);
-             * JTree tree = new DatasetTree(model); model.setTree(tree);
-             * 
-             * leftPane.add("Tree", tree);
-             */
+
+            JTabbedPane cameraTab = new JTabbedPane();
+            GL3DCameraOptionsPanel cameraOptionsPanel = new GL3DCameraOptionsPanel();
+            cameraTab.addTab("Internal Plugins", cameraOptionsPanel);
+            cameraTab.setEnabled(false);
+            leftPane.add("Camera options", cameraOptionsPanel, false);
             return leftPane;
         }
     }
@@ -487,6 +487,7 @@ public class ImageViewerGui {
         newState.recreateViewChains(oldState);
 
         SwingUtilities.invokeLater(new Runnable() {
+            @Override
             public void run() {
                 TopToolBar toolBar = newState.getTopToolBar();
                 toolBar.updateStateButtons();
