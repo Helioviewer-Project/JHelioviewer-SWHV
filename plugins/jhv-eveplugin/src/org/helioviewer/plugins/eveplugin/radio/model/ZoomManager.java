@@ -120,7 +120,7 @@ public class ZoomManager implements ZoomControllerListener, PlotAreaSpaceListene
         int destY0 = defineYInDestinationArea(startFrequency, yValueModel, zdc);
         int destX1 = defineXInDestinationArea(endDate, zdc);
         int destY1 = defineYInDestinationArea(endFrequency, yValueModel, zdc);
-        Log.debug("Selected interval in getDrawableAreaMap : [" + yValueModel.getSelectedYMin() + ", " + yValueModel.getSelectedYMax() + "]");
+        Log.trace("Selected interval in getDrawableAreaMap : [" + yValueModel.getSelectedYMin() + ", " + yValueModel.getSelectedYMax() + "]");
         return new DrawableAreaMap(sourceX0, sourceY0, sourceX1, sourceY1, destX0, destY0, destX1, destY1, downloadID);
     }
 

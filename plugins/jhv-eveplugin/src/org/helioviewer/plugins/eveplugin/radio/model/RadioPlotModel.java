@@ -77,7 +77,7 @@ public class RadioPlotModel implements RadioDataManagerListener, ZoomDataConfigL
                     tempAllConfig.add(pc);
                 }
             }
-            Log.debug("Number of plot configs returned : " + tempAllConfig.size());
+            Log.trace("Number of plot configs returned : " + tempAllConfig.size());
             return tempAllConfig;
         }
     }
