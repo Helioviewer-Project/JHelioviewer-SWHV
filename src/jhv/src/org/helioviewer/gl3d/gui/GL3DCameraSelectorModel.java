@@ -148,4 +148,8 @@ public class GL3DCameraSelectorModel extends AbstractListModel implements ComboB
         return solarRotationCamera;
     }
 
+    public GL3DFixedTimeCamera getFixedTimeCamera() {
+        return fixedTimeCamera;
+    }
+
 }
