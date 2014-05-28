@@ -73,7 +73,7 @@ public class GL3DGrid extends GL3DGroup {
         }
         state.pushMV();
         GL3DQuatd differentialRotation = state.getActiveCamera().getLocalRotation();
-        this.m = differentialRotation.toMatrix();
+        this.m = differentialRotation.toMatrix().inverse();
         this.wm = (this.m);
         state.buildInverseAndNormalMatrix();
         this.wmI = new GL3DMat4d(state.getMVInverse());
