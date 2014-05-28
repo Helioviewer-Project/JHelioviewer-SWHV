@@ -1,13 +1,11 @@
 package org.helioviewer.jhv.internal_plugins.filter.difference;
 
-import java.awt.Color;
 import java.awt.Component;
 import java.awt.FlowLayout;
 import java.awt.GridLayout;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 
-import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
 import javax.swing.ButtonGroup;
 import javax.swing.JLabel;
@@ -27,9 +25,9 @@ import org.helioviewer.viewmodelplugin.filter.FilterTabPanelManager.Area;
 
 /**
  * Panel to control running differences
- *
+ * 
  * @author Helge Dietert
- *
+ * 
  */
 public class RunningDifferencePanel extends FilterPanel implements ChangeListener {
     /**
@@ -50,86 +48,84 @@ public class RunningDifferencePanel extends FilterPanel implements ChangeListene
         this.setLayout(new BoxLayout(this, BoxLayout.PAGE_AXIS));
         addRadioButtons();
         truncateSpinner = new JSpinner();
-        truncateSpinner.setModel(new SpinnerNumberModel(new Float(0.2f), new Float(0), new Float(1), new Float(0.01f)));
+        truncateSpinner.setModel(new SpinnerNumberModel(new Float(0.8f), new Float(0), new Float(1), new Float(0.01f)));
         truncateSpinner.addChangeListener(this);
 
         JPanel truncationLine = new JPanel();
         truncationLine.setLayout(new FlowLayout(FlowLayout.LEFT));
 
-        JLabel truncationLabel = new JLabel("Contrast threshold:");
+        JLabel truncationLabel = new JLabel("Contrast boost:");
         truncationLine.add(truncationLabel);
         JSpinner.NumberEditor editor = new JSpinner.NumberEditor(truncateSpinner, "0%");
         truncateSpinner.setEditor(editor);
         editor.getTextField().setColumns(3);
         editor.getTextField().setHorizontalAlignment(JTextField.CENTER);
-        editor.getTextField().setValue(0.2);
+        // editor.getTextField().setValue(0.8);
         WheelSupport.installMouseWheelSupport(truncateSpinner);
         truncationLine.add(truncateSpinner);
         setEnabled(false);
-        truncationLine.setAlignmentY( Component.LEFT_ALIGNMENT );
+        truncationLine.setAlignmentY(Component.LEFT_ALIGNMENT);
         add(truncationLine);
         add(new JPanel());
     }
 
-
-    private void addRadioButtons(){
+    private void addRadioButtons() {
         final JRadioButton radNone = new JRadioButton("No differences", true);
         final JRadioButton radRunDiff = new JRadioButton("Running difference");
         final JRadioButton radRunDiffNoRot = new JRadioButton("Running difference(no correction)");
         final JRadioButton radBaseDiff = new JRadioButton("Base difference");
         final JRadioButton radBaseDiffNoRot = new JRadioButton("Base difference(no correction)");
 
-
         radNone.addItemListener(new ItemListener() {
             @Override
             public void itemStateChanged(ItemEvent e) {
-                   if(e.getStateChange()==1){
-                       filter.setActive(false);
-                       radRunDiff.setSelected(false);
-                       radBaseDiff.setSelected(false);
-                       radBaseDiffNoRot.setSelected(false);
-                       radRunDiffNoRot.setSelected(false);
-                   }
-                   Displayer.getSingletonInstance().display();
+                if (e.getStateChange() == 1) {
+                    filter.setActive(false);
+                    radRunDiff.setSelected(false);
+                    radBaseDiff.setSelected(false);
+                    radBaseDiffNoRot.setSelected(false);
+                    radRunDiffNoRot.setSelected(false);
+                }
+                Displayer.getSingletonInstance().display();
             }
         });
 
         radRunDiff.addItemListener(new ItemListener() {
             @Override
             public void itemStateChanged(ItemEvent e) {
-                   if(e.getStateChange()==1){
-                       filter.setActive(true);
-                       filter.setBaseDifference(false);
-                       filter.setRunDiffNoRot(false);
+                if (e.getStateChange() == 1) {
+                    filter.setActive(true);
+                    filter.setBaseDifference(false);
+                    filter.setRunDiffNoRot(false);
 
-                       radNone.setSelected(false);
-                       radBaseDiff.setSelected(false);
-                       radBaseDiffNoRot.setSelected(false);
-                       radRunDiffNoRot.setSelected(false);
-                   }
-                   Displayer.getSingletonInstance().display();
-               }
+                    radNone.setSelected(false);
+                    radBaseDiff.setSelected(false);
+                    radBaseDiffNoRot.setSelected(false);
+                    radRunDiffNoRot.setSelected(false);
+                }
+                Displayer.getSingletonInstance().display();
+            }
         });
 
         radRunDiffNoRot.addItemListener(new ItemListener() {
             @Override
             public void itemStateChanged(ItemEvent e) {
-                   if(e.getStateChange()==1){
-                       filter.setActive(true);
-                       filter.setBaseDifference(false);
-                       filter.setRunDiffNoRot(true);
-                       radNone.setSelected(false);
-                       radBaseDiff.setSelected(false);
-                       radBaseDiffNoRot.setSelected(false);
-                   }
-                   Displayer.getSingletonInstance().display();
-               }
+                if (e.getStateChange() == 1) {
+                    filter.setActive(true);
+                    filter.setBaseDifference(false);
+                    filter.setRunDiffNoRot(true);
+                    radNone.setSelected(false);
+                    radBaseDiff.setSelected(false);
+                    radBaseDiffNoRot.setSelected(false);
+                }
+                Displayer.getSingletonInstance().display();
+            }
         });
 
         radBaseDiff.addItemListener(new ItemListener() {
             @Override
             public void itemStateChanged(ItemEvent e) {
-                if(e.getStateChange()==1){
+                if (e.getStateChange() == 1) {
                     filter.setActive(true);
                     filter.setBaseDifference(true);
                     filter.setBaseDifferenceRot(false);
@@ -145,7 +141,7 @@ public class RunningDifferencePanel extends FilterPanel implements ChangeListene
         radBaseDiffNoRot.addItemListener(new ItemListener() {
             @Override
             public void itemStateChanged(ItemEvent e) {
-                if(e.getStateChange()==1){
+                if (e.getStateChange() == 1) {
                     filter.setActive(true);
                     filter.setBaseDifference(true);
                     filter.setBaseDifferenceRot(true);
@@ -166,30 +162,31 @@ public class RunningDifferencePanel extends FilterPanel implements ChangeListene
         group.add(radBaseDiffNoRot);
 
         JPanel radPanel = new JPanel();
-        radPanel.setLayout(new GridLayout(0,1));
-        radNone.setAlignmentX( Component.LEFT_ALIGNMENT );
+        radPanel.setLayout(new GridLayout(0, 1));
+        radNone.setAlignmentX(Component.LEFT_ALIGNMENT);
         radPanel.add(radNone);
-        radRunDiff.setAlignmentX( Component.LEFT_ALIGNMENT );
+        radRunDiff.setAlignmentX(Component.LEFT_ALIGNMENT);
         radPanel.add(radRunDiff);
-        radRunDiffNoRot.setAlignmentX( Component.LEFT_ALIGNMENT );
+        radRunDiffNoRot.setAlignmentX(Component.LEFT_ALIGNMENT);
         radPanel.add(radRunDiffNoRot);
-        radBaseDiff.setAlignmentX( Component.LEFT_ALIGNMENT );
+        radBaseDiff.setAlignmentX(Component.LEFT_ALIGNMENT);
         radPanel.add(radBaseDiff);
-        radBaseDiffNoRot.setAlignmentX( Component.LEFT_ALIGNMENT );
+        radBaseDiffNoRot.setAlignmentX(Component.LEFT_ALIGNMENT);
         radPanel.add(radBaseDiffNoRot);
 
         add(radPanel);
-     }
+    }
 
     @Override
     public void stateChanged(ChangeEvent e) {
         if (filter != null) {
             float value = ((SpinnerNumberModel) truncateSpinner.getModel()).getNumber().floatValue();
-            filter.setTruncationvalue(value);
+            filter.setTruncationvalue(1 - value);
             Displayer.getSingletonInstance().display();
 
         }
     }
+
     /**
      * @see org.helioviewer.viewmodelplugin.filter.FilterPanel#getArea()
      */
