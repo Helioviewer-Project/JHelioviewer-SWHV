@@ -137,6 +137,7 @@ public abstract class GL3DCamera {
     }
 
     public GL3DQuatd getRotation() {
+
         return this.rotation;
     }
 
@@ -146,13 +147,6 @@ public abstract class GL3DCamera {
 
     public void setLocalRotation(GL3DQuatd localRotation) {
         this.localRotation = localRotation;
-        this.rotation.clear();
-        this.rotation.rotate(this.localRotation);
-        this.rotation.rotate(this.currentDragRotation);
-    }
-
-    public void setCurrentDragRotation(GL3DQuatd currentDragRotation) {
-        this.currentDragRotation = currentDragRotation;
         this.rotation.clear();
         this.rotation.rotate(this.localRotation);
         this.rotation.rotate(this.currentDragRotation);
@@ -207,6 +201,9 @@ public abstract class GL3DCamera {
      * translation information.
      */
     public void updateCameraTransformation(boolean fireEvent) {
+        this.rotation.clear();
+        this.rotation.rotate(this.localRotation);
+        this.rotation.rotate(this.currentDragRotation);
         cameraTransformation = GL3DMat4d.identity();
         cameraTransformation.translate(this.translation);
         cameraTransformation.multiply(this.rotation.toMatrix());
