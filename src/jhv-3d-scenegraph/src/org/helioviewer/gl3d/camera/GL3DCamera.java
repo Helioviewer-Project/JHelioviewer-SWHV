@@ -60,6 +60,8 @@ public abstract class GL3DCamera {
 
     private double differentialRotation;
 
+    private long timeDelay;
+
     public GL3DCamera(double clipNear, double clipFar) {
         this();
         this.clipNear = clipNear;
@@ -315,5 +317,13 @@ public abstract class GL3DCamera {
 
     public void updateRotation(long dateMillis) {
 
+    }
+
+    public void setTimeDelay(long timeDelay) {
+        this.timeDelay = timeDelay;
+    }
+
+    public long getTimeDelay() {
+        return this.timeDelay;
     }
 }
