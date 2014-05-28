@@ -23,7 +23,7 @@ public class PlotConfig {
 
     public void draw(Graphics g) {
         if (visible) {
-            Log.debug("Draw image on : " + map);
+            Log.trace("Draw image on : " + map);
             g.drawImage(image, map.getDestinationX0(), map.getDestinationY0(), map.getDestinationX1(), map.getDestinationY1(), map.getSourceX0(), map.getSourceY0(), map.getSourceX1(), map.getSourceY1(), null);
         }
     }
