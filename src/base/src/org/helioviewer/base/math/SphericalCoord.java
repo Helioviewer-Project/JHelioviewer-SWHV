@@ -21,10 +21,12 @@ public class SphericalCoord {
         this(stony.theta, stony.phi, stony.r);
     }
 
+    @Override
     public String toString() {
-        return String.format(Locale.ENGLISH, "Theta=%.2f¡, Phi=%.2f¡, r=%.2f", theta, phi, r);
+        return String.format(Locale.ENGLISH, "Theta=%.2f degrees, Phi=%.2f degrees, r=%.2f", theta, phi, r);
     }
 
+    @Override
     public boolean equals(Object otherObject) {
         if (otherObject instanceof SphericalCoord) {
             SphericalCoord otherCoord = (SphericalCoord) otherObject;
