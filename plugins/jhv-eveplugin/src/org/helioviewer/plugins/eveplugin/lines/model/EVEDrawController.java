@@ -134,7 +134,7 @@ public class EVEDrawController implements BandControllerListener, ZoomController
         final Band[] bands = dataMap.keySet().toArray(new Band[0]);
         final LinkedList<DownloadedData> values = new LinkedList<DownloadedData>();
         Range oldAvailableRange = new Range(availableRange);
-        
+
         for (DownloadedData v : dataMap.values()) {
             if (v != null) {
 
@@ -155,7 +155,7 @@ public class EVEDrawController implements BandControllerListener, ZoomController
             updatePlotAreaSpace(availableRange, selectedRange);
 
         }
-        
+
         for (EVEDrawControllerListener listener : listeners) {
             listener.drawRequest(interval, bands, values.toArray(new EVEValues[0]), availableRange, selectedRange);
         }
@@ -235,6 +235,7 @@ public class EVEDrawController implements BandControllerListener, ZoomController
         interval = newInterval;
 
         updateBands();
+        fireRedrawRequest(false);
     }
 
     public void selectedResolutionChanged(final API_RESOLUTION_AVERAGES newResolution) {
