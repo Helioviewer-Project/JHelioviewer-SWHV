@@ -76,7 +76,7 @@ public class GL3DFixedTimeCamera extends GL3DSolarRotationTrackingTrackballCamer
     }
 
     public void updateRotation() {
-        this.timediff = (System.currentTimeMillis() + this.getTimeDelay()) / 1000 - Constants.referenceDate;
+        this.timediff = this.getTimeDelay() / 1000 - Constants.referenceDate;
         this.currentRotation = DifferentialRotation.calculateRotationInRadians(0., this.timediff) % (Math.PI * 2.0);
         this.setLocalRotation(GL3DQuatd.createRotation(this.currentRotation, new GL3DVec3d(0, 1, 0)));
         this.updateCameraTransformation();
