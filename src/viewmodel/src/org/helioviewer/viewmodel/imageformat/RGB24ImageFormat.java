@@ -16,4 +16,9 @@ package org.helioviewer.viewmodel.imageformat;
  */
 public class RGB24ImageFormat implements RGBImageFormat {
 
+    @Override
+    public boolean isSingleChannel() {
+        return false;
+    }
+
 }
