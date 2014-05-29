@@ -262,9 +262,9 @@ class J2KRender implements Runnable {
             // not needed: the raw component is extracted from codestream
             // parentImageRef.deactivateColorLookupTable(numLayer);
 
-            Kdu_dims dimsRef1 = new Kdu_dims(), dimsRef2 = new Kdu_dims();
-
-            compositorRef.Add_compositing_layer(numLayer, dimsRef1, dimsRef2);
+            // TODO: figure out for getNumComponents() > 2
+            // Kdu_dims dimsRef1 = new Kdu_dims(), dimsRef2 = new Kdu_dims();
+            // compositorRef.Add_compositing_layer(numLayer, dimsRef1, dimsRef2);
 
             if (lastCompositionLayerRendered != numLayer) {
                 lastCompositionLayerRendered = numLayer;
