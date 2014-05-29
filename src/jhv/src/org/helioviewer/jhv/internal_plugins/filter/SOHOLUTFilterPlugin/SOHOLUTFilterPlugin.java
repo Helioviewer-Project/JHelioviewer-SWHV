@@ -2,7 +2,6 @@ package org.helioviewer.jhv.internal_plugins.filter.SOHOLUTFilterPlugin;
 
 import org.helioviewer.base.logging.Log;
 import org.helioviewer.viewmodel.filter.Filter;
-import org.helioviewer.viewmodel.imageformat.SingleChannelImageFormat;
 import org.helioviewer.viewmodel.metadata.HelioviewerMetaData;
 import org.helioviewer.viewmodel.metadata.MetaData;
 import org.helioviewer.viewmodel.view.FilterView;
@@ -55,7 +54,7 @@ public class SOHOLUTFilterPlugin extends FilterContainer {
     @Override
     protected void installFilterImpl(FilterView filterView, FilterTabList tabList) {
         // Only applicable for SingeChannelFormat
-        if (!(filterView.getAdapter(SubimageDataView.class).getSubimageData().getImageFormat() instanceof SingleChannelImageFormat))
+        if (!(filterView.getAdapter(SubimageDataView.class).getSubimageData().getImageFormat().isSingleChannel()))
             return;
 
         SOHOLUTFilter filter = new SOHOLUTFilter();
