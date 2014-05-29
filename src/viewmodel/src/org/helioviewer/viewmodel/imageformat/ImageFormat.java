@@ -13,5 +13,6 @@ package org.helioviewer.viewmodel.imageformat;
  * 
  */
 public interface ImageFormat {
+    public boolean isSingleChannel();
 
 }

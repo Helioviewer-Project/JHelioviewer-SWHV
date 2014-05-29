@@ -6,7 +6,6 @@ import nom.tam.fits.BasicHDU;
 import nom.tam.fits.Fits;
 import nom.tam.fits.Header;
 import nom.tam.fits.HeaderCard;
-import nom.tam.fits.ImageHDU;
 import nom.tam.util.Cursor;
 
 import org.helioviewer.viewmodel.imagedata.ARGBInt32ImageData;
@@ -53,7 +52,7 @@ public class FITSImage implements MetaDataContainer {
         Fits fits = new Fits(url);
 
         // get basic information from file
-        BasicHDU hdu = (ImageHDU) fits.readHDU();
+        BasicHDU hdu = fits.readHDU();
         int bitsPerPixel = hdu.getBitPix();
         header = hdu.getHeader();
 
@@ -146,7 +145,7 @@ public class FITSImage implements MetaDataContainer {
             }
 
             // create buffered image from row data
-            JavaBufferedImageData imageData = new ARGBInt32ImageData(width, height, data, new ColorMask());
+            JavaBufferedImageData imageData = new ARGBInt32ImageData(false, width, height, data, new ColorMask());
             image = imageData.getBufferedImage();
 
         } else if (bitsPerPixel == BasicHDU.BITPIX_FLOAT) {
@@ -271,6 +270,7 @@ public class FITSImage implements MetaDataContainer {
     /**
      * {@inheritDoc}
      */
+    @Override
     public String get(String key) {
 
         return header.getStringValue(key);
@@ -279,6 +279,7 @@ public class FITSImage implements MetaDataContainer {
     /**
      * {@inheritDoc}
      */
+    @Override
     public double tryGetDouble(String key) {
 
         return header.getDoubleValue(key);
@@ -287,6 +288,7 @@ public class FITSImage implements MetaDataContainer {
     /**
      * {@inheritDoc}
      */
+    @Override
     public int tryGetInt(String key) {
 
         return header.getIntValue(key);
@@ -295,6 +297,7 @@ public class FITSImage implements MetaDataContainer {
     /**
      * {@inheritDoc}
      */
+    @Override
     public int getPixelHeight() {
 
         if (image == null)
@@ -306,6 +309,7 @@ public class FITSImage implements MetaDataContainer {
     /**
      * {@inheritDoc}
      */
+    @Override
     public int getPixelWidth() {
 
         if (image == null)

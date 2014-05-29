@@ -37,4 +37,9 @@ public class SingleChannelImageFormat implements ImageFormat {
         return bitDepth;
     }
 
+    @Override
+    public boolean isSingleChannel() {
+        return true;
+    }
+
 }

@@ -6,8 +6,8 @@ import java.awt.image.DataBufferByte;
 import java.awt.image.DataBufferInt;
 
 import org.helioviewer.base.logging.Log;
-import org.helioviewer.viewmodel.imageformat.ImageFormat;
 import org.helioviewer.viewmodel.imageformat.ARGB32ImageFormat;
+import org.helioviewer.viewmodel.imageformat.ImageFormat;
 import org.helioviewer.viewmodel.imagetransport.ImageTransport;
 import org.helioviewer.viewmodel.imagetransport.Int32ImageTransport;
 
@@ -24,7 +24,7 @@ import org.helioviewer.viewmodel.imagetransport.Int32ImageTransport;
  */
 public class ARGBInt32ImageData extends AbstractImageData {
 
-    private static final ImageFormat format = new ARGB32ImageFormat();
+    private final ARGB32ImageFormat format = new ARGB32ImageFormat();
     private Int32ImageTransport imageTransport;
 
     /**
@@ -37,6 +37,8 @@ public class ARGBInt32ImageData extends AbstractImageData {
      * The pixel data has to be given as a one-dimensional array containing the
      * pixel data line by line. Each array element represents one pixel.
      * 
+     * @param singleChannel
+     * 
      * @param newWidth
      *            width of the image
      * @param newHeight
@@ -46,8 +48,9 @@ public class ARGBInt32ImageData extends AbstractImageData {
      * @param newColorMask
      *            color mask of the image
      */
-    public ARGBInt32ImageData(int newWidth, int newHeight, int[] newPixelData, ColorMask newColorMask) {
+    public ARGBInt32ImageData(boolean singleChannel, int newWidth, int newHeight, int[] newPixelData, ColorMask newColorMask) {
         super(newWidth, newHeight, newColorMask);
+        format.setSingleChannel(true);
         imageTransport = new Int32ImageTransport(newPixelData);
     }
 
@@ -151,6 +154,7 @@ public class ARGBInt32ImageData extends AbstractImageData {
     /**
      * {@inheritDoc}
      */
+    @Override
     public ImageFormat getImageFormat() {
         return format;
     }
@@ -158,6 +162,7 @@ public class ARGBInt32ImageData extends AbstractImageData {
     /**
      * {@inheritDoc}
      */
+    @Override
     public ImageTransport getImageTransport() {
         return imageTransport;
     }
@@ -165,6 +170,7 @@ public class ARGBInt32ImageData extends AbstractImageData {
     /**
      * {@inheritDoc}
      */
+    @Override
     protected BufferedImage createBufferedImageFromImageTransport() {
         BufferedImage newImage = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
         newImage.setRGB(0, 0, width, height, imageTransport.getInt32PixelData(), 0, width);
