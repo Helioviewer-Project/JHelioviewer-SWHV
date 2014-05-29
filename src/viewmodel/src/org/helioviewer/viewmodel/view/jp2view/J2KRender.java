@@ -275,25 +275,22 @@ class J2KRender implements Runnable {
                 MetaData metaData = parentViewRef.getMetaData();
 
                 if (metaData instanceof NonConstantMetaData && ((NonConstantMetaData) metaData).checkForModifications()) {
-
                     parentViewRef.updateParameter();
                     currParams = parentViewRef.getImageViewParams();
                     parentViewRef.addChangedReason(new NonConstantMetaDataChangedReason(parentViewRef, metaData));
                 }
-
             }
 
+            compositorRef.Set_surface_initialization_mode(false);
             compositorRef.Set_max_quality_layers(currParams.qualityLayers);
             compositorRef.Set_scale(false, false, false, currParams.resolution.getZoomPercent());
-
-            Kdu_dims requestedBufferedRegion = KakaduUtils.roiToKdu_dims(currParams.subImage);
-
-            compositorRef.Set_surface_initialization_mode(false);
-            compositorRef.Set_buffer_surface(requestedBufferedRegion, 0);
-
             if (parentImageRef.getNumComponents() <= 2) {
                 compositorRef.Set_single_component(numLayer, 0, KakaduConstants.KDU_WANT_CODESTREAM_COMPONENTS);
             }
+
+            SubImage roi = currParams.subImage;
+            Kdu_dims requestedBufferedRegion = KakaduUtils.roiToKdu_dims(roi);
+            compositorRef.Set_buffer_surface(requestedBufferedRegion, 0);
 
             Kdu_dims actualBufferedRegion = new Kdu_dims();
             Kdu_compositor_buf compositorBuf = compositorRef.Get_composition_buffer(actualBufferedRegion);
@@ -305,15 +302,17 @@ class J2KRender implements Runnable {
 
             if (parentImageRef.getNumComponents() < 2) {
                 currentByteBuffer = (currentByteBuffer + 1) % NUM_BUFFERS;
-                byteBuffer[currentByteBuffer] = new byte[currParams.subImage.getNumPixels()];
+                byteBuffer[currentByteBuffer] = new byte[roi.getNumPixels()];
             } else {
                 currentIntBuffer = (currentIntBuffer + 1) % NUM_BUFFERS;
-                if (differenceMode || currParams.subImage.getNumPixels() != intBuffer[currentIntBuffer].length || (!movieMode && !linkedMovieMode && !J2KRenderGlobalOptions.getDoubleBufferingOption())) {
-                    intBuffer[currentIntBuffer] = new int[currParams.subImage.getNumPixels()];
+                if (differenceMode || roi.getNumPixels() != intBuffer[currentIntBuffer].length || 
+                    (!movieMode && !linkedMovieMode && !J2KRenderGlobalOptions.getDoubleBufferingOption())) {
+                    intBuffer[currentIntBuffer] = new int[roi.getNumPixels()];
                 } else if (J2KRenderGlobalOptions.getDoubleBufferingOption()) {
                     Arrays.fill(intBuffer[currentIntBuffer], 0);
                 }
             }
+
             while (!compositorRef.Is_processing_complete()) {
                 compositorRef.Process(MAX_RENDER_SAMPLES, newRegion);
                 Kdu_coords newOffset = newRegion.Access_pos();
@@ -321,7 +320,10 @@ class J2KRender implements Runnable {
 
                 newOffset.Subtract(actualOffset);
 
-                int newPixels = newSize.Get_x() * newSize.Get_y();
+                int newWidth = newSize.Get_x();
+                int newHeight = newSize.Get_y();
+                int newPixels = newWidth * newHeight;
+
                 if (newPixels == 0)
                     continue;
 
@@ -332,19 +334,16 @@ class J2KRender implements Runnable {
                 // Arrays.toString(localIntBuffer));
 
                 int srcIdx = 0;
-                int destIdx = newOffset.Get_x() + newOffset.Get_y() * currParams.subImage.width;
-
-                int newWidth = newSize.Get_x();
-                int newHeight = newSize.Get_y();
+                int destIdx = newOffset.Get_x() + newOffset.Get_y() * roi.width;
 
                 if (parentImageRef.getNumComponents() < 2) {
-                    for (int row = 0; row < newHeight; row++, destIdx += currParams.subImage.width, srcIdx += newWidth) {
+                    for (int row = 0; row < newHeight; row++, destIdx += roi.width, srcIdx += newWidth) {
                         for (int col = 0; col < newWidth; ++col) {
                             byteBuffer[currentByteBuffer][destIdx + col] = (byte) (localIntBuffer[srcIdx + col] & 0xFF);
                         }
                     }
                 } else {
-                    for (int row = 0; row < newHeight; row++, destIdx += currParams.subImage.width, srcIdx += newWidth)
+                    for (int row = 0; row < newHeight; row++, destIdx += roi.width, srcIdx += newWidth)
                         System.arraycopy(localIntBuffer, srcIdx, intBuffer[currentIntBuffer], destIdx, newWidth);
                 }
                 // Log.debug("byteBuffer : " +
@@ -361,9 +360,13 @@ class J2KRender implements Runnable {
 
                     newOffset.Subtract(actualOffset);
 
-                    int newPixels = newSize.Get_x() * newSize.Get_y();
+                    int newWidth = newSize.Get_x();
+                    int newHeight = newSize.Get_y();
+                    int newPixels = newWidth * newHeight;
+
                     if (newPixels == 0)
                         continue;
+
                     localIntBuffer = newPixels > localIntBuffer.length ? new int[newPixels << 1] : localIntBuffer;
 
                     compositorBuf.Get_region(newRegion, localIntBuffer);
@@ -371,20 +374,17 @@ class J2KRender implements Runnable {
                     // Arrays.toString(localIntBuffer));
 
                     int srcIdx = 0;
-                    int destIdx = newOffset.Get_x() + newOffset.Get_y() * currParams.subImage.width;
+                    int destIdx = newOffset.Get_x() + newOffset.Get_y() * roi.width;
 
-                    int newWidth = newSize.Get_x();
-                    int newHeight = newSize.Get_y();
-
-                    for (int row = 0; row < newHeight; row++, destIdx += currParams.subImage.width, srcIdx += newWidth) {
+                    for (int row = 0; row < newHeight; row++, destIdx += roi.width, srcIdx += newWidth) {
                         for (int col = 0; col < newWidth; ++col) {
                             // long unsignedValue =
                             // (intBuffer[currentByteBuffer][destIdx + col] &
                             // 0xffffffffl) >> 24;
-                            intBuffer[currentByteBuffer][destIdx + col] = (intBuffer[currentByteBuffer][destIdx + col] & 0x00FF0000) | ((localIntBuffer[srcIdx + col] & 0x00FF0000) << 8);
+                            intBuffer[currentByteBuffer][destIdx + col] = (intBuffer[currentByteBuffer][destIdx + col] & 0x00FFFFFF) |
+                                                                          ((localIntBuffer[srcIdx + col] & 0x00FF0000) << 8);
                         }
                     }
-
                     // Log.debug("byteBuffer : " +
                     // Arrays.toString(byteBuffer[currentByteBuffer]));
                 }
