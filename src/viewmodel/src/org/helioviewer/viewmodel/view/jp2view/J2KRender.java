@@ -259,7 +259,8 @@ class J2KRender implements Runnable {
             compositorRef.Refresh();
             compositorRef.Remove_compositing_layer(-1, true);
 
-            parentImageRef.deactivateColorLookupTable(numLayer);
+            // not needed: the raw component is extracted from codestream
+            // parentImageRef.deactivateColorLookupTable(numLayer);
 
             Kdu_dims dimsRef1 = new Kdu_dims(), dimsRef2 = new Kdu_dims();
 
@@ -288,11 +289,13 @@ class J2KRender implements Runnable {
 
             compositorRef.Set_buffer_surface(requestedBufferedRegion, 0);
 
-            Kdu_dims actualBufferedRegion = new Kdu_dims();
-            Kdu_compositor_buf compositorBuf = compositorRef.Get_composition_buffer(actualBufferedRegion);
-            if (parentImageRef.getNumComponents() == 2) {
+            if (parentImageRef.getNumComponents() <= 2) {
                 compositorRef.Set_single_component(numLayer, 0, KakaduConstants.KDU_WANT_CODESTREAM_COMPONENTS);
             }
+
+            Kdu_dims actualBufferedRegion = new Kdu_dims();
+            Kdu_compositor_buf compositorBuf = compositorRef.Get_composition_buffer(actualBufferedRegion);
+
             Kdu_coords actualOffset = new Kdu_coords();
             actualOffset.Assign(actualBufferedRegion.Access_pos());
 
@@ -335,7 +338,7 @@ class J2KRender implements Runnable {
                 if (parentImageRef.getNumComponents() < 2) {
                     for (int row = 0; row < newHeight; row++, destIdx += currParams.subImage.width, srcIdx += newWidth) {
                         for (int col = 0; col < newWidth; ++col) {
-                            byteBuffer[currentByteBuffer][destIdx + col] = (byte) ((localIntBuffer[srcIdx + col]) & 0xFF);
+                            byteBuffer[currentByteBuffer][destIdx + col] = (byte) (localIntBuffer[srcIdx + col] & 0xFF);
                         }
                     }
                 } else {
