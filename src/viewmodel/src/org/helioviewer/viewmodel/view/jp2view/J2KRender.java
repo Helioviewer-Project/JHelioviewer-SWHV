@@ -256,8 +256,9 @@ class J2KRender implements Runnable {
                 compositorRef.Set_thread_env(null, 0);
             }
 
-            compositorRef.Refresh();
-            compositorRef.Remove_compositing_layer(-1, true);
+            // see TODO below
+            // compositorRef.Refresh();
+            // compositorRef.Remove_compositing_layer(-1, true);
 
             // not needed: the raw component is extracted from codestream
             // parentImageRef.deactivateColorLookupTable(numLayer);
@@ -287,6 +288,7 @@ class J2KRender implements Runnable {
 
             Kdu_dims requestedBufferedRegion = KakaduUtils.roiToKdu_dims(currParams.subImage);
 
+            compositorRef.Set_surface_initialization_mode(false);
             compositorRef.Set_buffer_surface(requestedBufferedRegion, 0);
 
             if (parentImageRef.getNumComponents() <= 2) {
