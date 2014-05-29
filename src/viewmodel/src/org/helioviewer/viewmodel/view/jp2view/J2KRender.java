@@ -26,6 +26,7 @@ import org.helioviewer.viewmodel.view.jp2view.image.JP2ImageParameter;
 import org.helioviewer.viewmodel.view.jp2view.image.SubImage;
 import org.helioviewer.viewmodel.view.jp2view.kakadu.JHV_Kdu_thread_env;
 import org.helioviewer.viewmodel.view.jp2view.kakadu.KakaduUtils;
+import org.helioviewer.viewmodel.view.jp2view.kakadu.KakaduConstants;
 
 /**
  * The J2KRender class handles all of the decompression, buffering, and
@@ -290,7 +291,7 @@ class J2KRender implements Runnable {
             Kdu_dims actualBufferedRegion = new Kdu_dims();
             Kdu_compositor_buf compositorBuf = compositorRef.Get_composition_buffer(actualBufferedRegion);
             if (parentImageRef.getNumComponents() == 2) {
-                compositorRef.Set_single_component(numLayer, 0, 1);
+                compositorRef.Set_single_component(numLayer, 0, KakaduConstants.KDU_WANT_CODESTREAM_COMPONENTS);
             }
             Kdu_coords actualOffset = new Kdu_coords();
             actualOffset.Assign(actualBufferedRegion.Access_pos());
@@ -344,8 +345,10 @@ class J2KRender implements Runnable {
                 // Log.debug("byteBuffer : " +
                 // Arrays.toString(byteBuffer[currentByteBuffer]));
             }
+
             if (parentImageRef.getNumComponents() == 2) {
-                compositorRef.Set_single_component(numLayer, 1, 1);
+                // extract alpha component
+                compositorRef.Set_single_component(numLayer, 1, KakaduConstants.KDU_WANT_CODESTREAM_COMPONENTS);
                 while (!compositorRef.Is_processing_complete()) {
                     compositorRef.Process(MAX_RENDER_SAMPLES, newRegion);
                     Kdu_coords newOffset = newRegion.Access_pos();
