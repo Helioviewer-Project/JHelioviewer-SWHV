@@ -443,28 +443,26 @@ class J2KRender implements Runnable {
 
                 renderLayer(curLayer);
 
-                int width = currParams.subImage.width;
-                int height = currParams.subImage.height;
+                SubImage roi = currParams.subImage;
+                int width = roi.width;
+                int height = roi.height;
 
                 if (parentImageRef.getNumComponents() < 2) {
-
-                    if (currParams.subImage.getNumPixels() == byteBuffer[currentByteBuffer].length) {
+                    if (roi.getNumPixels() == byteBuffer[currentByteBuffer].length) {
                         SingleChannelByte8ImageData imdata = new SingleChannelByte8ImageData(width, height, byteBuffer[currentByteBuffer], new ColorMask());
-                        SubImage roi = currParams.subImage;
-
-                        parentViewRef.setSubimageData(imdata, currParams.subImage, curLayer, currParams.resolution.getZoomPercent(), false);
-
+                        parentViewRef.setSubimageData(imdata, roi, curLayer, currParams.resolution.getZoomPercent(), false);
                     } else {
                         Log.warn("J2KRender: Params out of sync, skip frame");
                     }
-
                 } else {
-                    if (currParams.subImage.getNumPixels() == intBuffer[currentIntBuffer].length) {
+                    if (roi.getNumPixels() == intBuffer[currentIntBuffer].length) {
                         boolean singleChannel = false;
                         if (parentImageRef.getNumComponents() == 2) {
                             singleChannel = true;
                         }
-                        parentViewRef.setSubimageData(new ARGBInt32ImageData(singleChannel, width, height, intBuffer[currentIntBuffer], new ColorMask()), currParams.subImage, curLayer, currParams.resolution.getZoomPercent(), false);
+
+                        ARGBInt32ImageData imdata = new ARGBInt32ImageData(singleChannel, width, height, intBuffer[currentIntBuffer], new ColorMask());
+                        parentViewRef.setSubimageData(imdata, roi, curLayer, currParams.resolution.getZoomPercent(), false);
                     } else {
                         Log.warn("J2KRender: Params out of sync, skip frame");
                     }
