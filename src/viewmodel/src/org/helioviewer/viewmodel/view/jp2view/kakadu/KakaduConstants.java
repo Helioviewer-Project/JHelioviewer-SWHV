@@ -14,5 +14,9 @@ public final class KakaduConstants {
     public static final int KDU_META_DATABIN = 4;
     /** Kakadu constant */
     public static final int KDU_UNDEFINED_DATABIN = 5;
+    /** Kakadu constant */
+    public static final int KDU_WANT_OUTPUT_COMPONENTS = 0;
+    /** Kakadu constant */
+    public static final int KDU_WANT_CODESTREAM_COMPONENTS = 1;
 
 };
