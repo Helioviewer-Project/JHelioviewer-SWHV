@@ -290,7 +290,7 @@ class J2KRender implements Runnable {
             Kdu_dims actualBufferedRegion = new Kdu_dims();
             Kdu_compositor_buf compositorBuf = compositorRef.Get_composition_buffer(actualBufferedRegion);
             if (parentImageRef.getNumComponents() == 2) {
-                compositorRef.Set_single_component(0, 0, 1);
+                compositorRef.Set_single_component(numLayer, 0, 1);
             }
             Kdu_coords actualOffset = new Kdu_coords();
             actualOffset.Assign(actualBufferedRegion.Access_pos());
@@ -345,7 +345,7 @@ class J2KRender implements Runnable {
                 // Arrays.toString(byteBuffer[currentByteBuffer]));
             }
             if (parentImageRef.getNumComponents() == 2) {
-                compositorRef.Set_single_component(0, 1, 1);
+                compositorRef.Set_single_component(numLayer, 1, 1);
                 while (!compositorRef.Is_processing_complete()) {
                     compositorRef.Process(MAX_RENDER_SAMPLES, newRegion);
                     Kdu_coords newOffset = newRegion.Access_pos();
