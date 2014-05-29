@@ -31,7 +31,7 @@ import org.helioviewer.viewmodel.view.jp2view.kakadu.KakaduUtils;
  * The J2KRender class handles all of the decompression, buffering, and
  * filtering of the image data. It essentially just waits for the shared object
  * in the JP2ImageView to signal it.
- *
+ * 
  * @author caplins
  * @author Benjamin Wamsler
  * @author Desmond Amadigwe
@@ -101,7 +101,7 @@ class J2KRender implements Runnable {
 
     /**
      * Gets whether to reuse the buffer
-     *
+     * 
      * @return the reuseBuffer
      */
     public boolean isReuseBuffer() {
@@ -110,7 +110,7 @@ class J2KRender implements Runnable {
 
     /**
      * Sets whether to reuse the buffer
-     *
+     * 
      * @param reuseBuffer
      *            the reuseBuffer to set
      */
@@ -130,7 +130,7 @@ class J2KRender implements Runnable {
 
     /**
      * The constructor.
-     *
+     * 
      * @param _parentViewRef
      */
     J2KRender(JHVJP2View _parentViewRef) {
@@ -289,13 +289,15 @@ class J2KRender implements Runnable {
 
             Kdu_dims actualBufferedRegion = new Kdu_dims();
             Kdu_compositor_buf compositorBuf = compositorRef.Get_composition_buffer(actualBufferedRegion);
-
+            if (parentImageRef.getNumComponents() == 2) {
+                compositorRef.Set_single_component(0, 0, 1);
+            }
             Kdu_coords actualOffset = new Kdu_coords();
             actualOffset.Assign(actualBufferedRegion.Access_pos());
 
             Kdu_dims newRegion = new Kdu_dims();
 
-            if (parentImageRef.getNumComponents() < 3) {
+            if (parentImageRef.getNumComponents() < 2) {
                 currentByteBuffer = (currentByteBuffer + 1) % NUM_BUFFERS;
                 byteBuffer[currentByteBuffer] = new byte[currParams.subImage.getNumPixels()];
             } else {
@@ -329,7 +331,7 @@ class J2KRender implements Runnable {
                 int newWidth = newSize.Get_x();
                 int newHeight = newSize.Get_y();
 
-                if (parentImageRef.getNumComponents() < 3) {
+                if (parentImageRef.getNumComponents() < 2) {
                     for (int row = 0; row < newHeight; row++, destIdx += currParams.subImage.width, srcIdx += newWidth) {
                         for (int col = 0; col < newWidth; ++col) {
                             byteBuffer[currentByteBuffer][destIdx + col] = (byte) ((localIntBuffer[srcIdx + col]) & 0xFF);
@@ -341,6 +343,43 @@ class J2KRender implements Runnable {
                 }
                 // Log.debug("byteBuffer : " +
                 // Arrays.toString(byteBuffer[currentByteBuffer]));
+            }
+            if (parentImageRef.getNumComponents() == 2) {
+                compositorRef.Set_single_component(0, 1, 1);
+                while (!compositorRef.Is_processing_complete()) {
+                    compositorRef.Process(MAX_RENDER_SAMPLES, newRegion);
+                    Kdu_coords newOffset = newRegion.Access_pos();
+                    Kdu_coords newSize = newRegion.Access_size();
+
+                    newOffset.Subtract(actualOffset);
+
+                    int newPixels = newSize.Get_x() * newSize.Get_y();
+                    if (newPixels == 0)
+                        continue;
+                    localIntBuffer = newPixels > localIntBuffer.length ? new int[newPixels << 1] : localIntBuffer;
+
+                    compositorBuf.Get_region(newRegion, localIntBuffer);
+                    // Log.debug("Local Int Buffer : " +
+                    // Arrays.toString(localIntBuffer));
+
+                    int srcIdx = 0;
+                    int destIdx = newOffset.Get_x() + newOffset.Get_y() * currParams.subImage.width;
+
+                    int newWidth = newSize.Get_x();
+                    int newHeight = newSize.Get_y();
+
+                    for (int row = 0; row < newHeight; row++, destIdx += currParams.subImage.width, srcIdx += newWidth) {
+                        for (int col = 0; col < newWidth; ++col) {
+                            // long unsignedValue =
+                            // (intBuffer[currentByteBuffer][destIdx + col] &
+                            // 0xffffffffl) >> 24;
+                            intBuffer[currentByteBuffer][destIdx + col] = (intBuffer[currentByteBuffer][destIdx + col] & 0x00FF0000) | ((localIntBuffer[srcIdx + col] & 0x00FF0000) << 8);
+                        }
+                    }
+
+                    // Log.debug("byteBuffer : " +
+                    // Arrays.toString(byteBuffer[currentByteBuffer]));
+                }
             }
 
             if (compositorBuf != null)
@@ -407,7 +446,7 @@ class J2KRender implements Runnable {
                 int width = currParams.subImage.width;
                 int height = currParams.subImage.height;
 
-                if (parentImageRef.getNumComponents() < 3) {
+                if (parentImageRef.getNumComponents() < 2) {
 
                     if (currParams.subImage.getNumPixels() == byteBuffer[currentByteBuffer].length) {
                         SingleChannelByte8ImageData imdata = new SingleChannelByte8ImageData(width, height, byteBuffer[currentByteBuffer], new ColorMask());
@@ -421,7 +460,11 @@ class J2KRender implements Runnable {
 
                 } else {
                     if (currParams.subImage.getNumPixels() == intBuffer[currentIntBuffer].length) {
-                        parentViewRef.setSubimageData(new ARGBInt32ImageData(width, height, intBuffer[currentIntBuffer], new ColorMask()), currParams.subImage, curLayer, currParams.resolution.getZoomPercent(), false);
+                        boolean singleChannel = false;
+                        if (parentImageRef.getNumComponents() == 2) {
+                            singleChannel = true;
+                        }
+                        parentViewRef.setSubimageData(new ARGBInt32ImageData(singleChannel, width, height, intBuffer[currentIntBuffer], new ColorMask()), currParams.subImage, curLayer, currParams.resolution.getZoomPercent(), false);
                     } else {
                         Log.warn("J2KRender: Params out of sync, skip frame");
                     }
@@ -593,6 +636,6 @@ class J2KRender implements Runnable {
     }
 
     public void setDifferenceMode(boolean differenceMode) {
-        this.differenceMode  = differenceMode;
+        this.differenceMode = differenceMode;
     }
 }
