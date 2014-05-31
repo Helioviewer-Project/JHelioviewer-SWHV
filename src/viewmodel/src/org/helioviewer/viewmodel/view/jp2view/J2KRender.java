@@ -25,8 +25,8 @@ import org.helioviewer.viewmodel.view.cache.DateTimeCache;
 import org.helioviewer.viewmodel.view.jp2view.image.JP2ImageParameter;
 import org.helioviewer.viewmodel.view.jp2view.image.SubImage;
 import org.helioviewer.viewmodel.view.jp2view.kakadu.JHV_Kdu_thread_env;
-import org.helioviewer.viewmodel.view.jp2view.kakadu.KakaduUtils;
 import org.helioviewer.viewmodel.view.jp2view.kakadu.KakaduConstants;
+import org.helioviewer.viewmodel.view.jp2view.kakadu.KakaduUtils;
 
 /**
  * The J2KRender class handles all of the decompression, buffering, and
@@ -265,7 +265,8 @@ class J2KRender implements Runnable {
 
             // TODO: figure out for getNumComponents() > 2
             // Kdu_dims dimsRef1 = new Kdu_dims(), dimsRef2 = new Kdu_dims();
-            // compositorRef.Add_compositing_layer(numLayer, dimsRef1, dimsRef2);
+            // compositorRef.Add_compositing_layer(numLayer, dimsRef1,
+            // dimsRef2);
 
             if (lastCompositionLayerRendered != numLayer) {
                 lastCompositionLayerRendered = numLayer;
@@ -305,8 +306,7 @@ class J2KRender implements Runnable {
                 byteBuffer[currentByteBuffer] = new byte[roi.getNumPixels()];
             } else {
                 currentIntBuffer = (currentIntBuffer + 1) % NUM_BUFFERS;
-                if (differenceMode || roi.getNumPixels() != intBuffer[currentIntBuffer].length || 
-                    (!movieMode && !linkedMovieMode && !J2KRenderGlobalOptions.getDoubleBufferingOption())) {
+                if (differenceMode || roi.getNumPixels() != intBuffer[currentIntBuffer].length || (!movieMode && !linkedMovieMode && !J2KRenderGlobalOptions.getDoubleBufferingOption())) {
                     intBuffer[currentIntBuffer] = new int[roi.getNumPixels()];
                 } else if (J2KRenderGlobalOptions.getDoubleBufferingOption()) {
                     Arrays.fill(intBuffer[currentIntBuffer], 0);
@@ -349,6 +349,7 @@ class J2KRender implements Runnable {
                 // Log.debug("byteBuffer : " +
                 // Arrays.toString(byteBuffer[currentByteBuffer]));
             }
+            boolean changed = false;
 
             if (parentImageRef.getNumComponents() == 2) {
                 // extract alpha component
@@ -370,26 +371,21 @@ class J2KRender implements Runnable {
                     localIntBuffer = newPixels > localIntBuffer.length ? new int[newPixels << 1] : localIntBuffer;
 
                     compositorBuf.Get_region(newRegion, localIntBuffer);
-                    // Log.debug("Local Int Buffer : " +
-                    // Arrays.toString(localIntBuffer));
 
                     int srcIdx = 0;
                     int destIdx = newOffset.Get_x() + newOffset.Get_y() * roi.width;
 
                     for (int row = 0; row < newHeight; row++, destIdx += roi.width, srcIdx += newWidth) {
                         for (int col = 0; col < newWidth; ++col) {
-                            // long unsignedValue =
-                            // (intBuffer[currentByteBuffer][destIdx + col] &
-                            // 0xffffffffl) >> 24;
-                            intBuffer[currentByteBuffer][destIdx + col] = (intBuffer[currentByteBuffer][destIdx + col] & 0x00FFFFFF) |
-                                                                          ((localIntBuffer[srcIdx + col] & 0x00FF0000) << 8);
+                            intBuffer[currentByteBuffer][destIdx + col] = (intBuffer[currentByteBuffer][destIdx + col] & 0x00FFFFFF) | ((localIntBuffer[srcIdx + col] & 0x00FF0000) << 8);
                         }
                     }
-                    // Log.debug("byteBuffer : " +
-                    // Arrays.toString(byteBuffer[currentByteBuffer]));
-                }
-            }
 
+                }
+                System.out.println("sdfsdf" + changed);
+
+            }
+            System.out.println("next");
             if (compositorBuf != null)
                 compositorBuf.Native_destroy();
 
