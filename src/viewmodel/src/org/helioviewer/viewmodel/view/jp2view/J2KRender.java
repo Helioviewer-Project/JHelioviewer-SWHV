@@ -349,7 +349,6 @@ class J2KRender implements Runnable {
                 // Log.debug("byteBuffer : " +
                 // Arrays.toString(byteBuffer[currentByteBuffer]));
             }
-            boolean changed = false;
 
             if (parentImageRef.getNumComponents() == 2) {
                 // extract alpha component
@@ -371,21 +370,25 @@ class J2KRender implements Runnable {
                     localIntBuffer = newPixels > localIntBuffer.length ? new int[newPixels << 1] : localIntBuffer;
 
                     compositorBuf.Get_region(newRegion, localIntBuffer);
+                    // Log.debug("Local Int Buffer : " +
+                    // Arrays.toString(localIntBuffer));
 
                     int srcIdx = 0;
                     int destIdx = newOffset.Get_x() + newOffset.Get_y() * roi.width;
 
                     for (int row = 0; row < newHeight; row++, destIdx += roi.width, srcIdx += newWidth) {
                         for (int col = 0; col < newWidth; ++col) {
+                            // long unsignedValue =
+                            // (intBuffer[currentByteBuffer][destIdx + col] &
+                            // 0xffffffffl) >> 24;
                             intBuffer[currentByteBuffer][destIdx + col] = (intBuffer[currentByteBuffer][destIdx + col] & 0x00FFFFFF) | ((localIntBuffer[srcIdx + col] & 0x00FF0000) << 8);
                         }
                     }
-
+                    // Log.debug("byteBuffer : " +
+                    // Arrays.toString(byteBuffer[currentByteBuffer]));
                 }
-                System.out.println("sdfsdf" + changed);
-
             }
-            System.out.println("next");
+
             if (compositorBuf != null)
                 compositorBuf.Native_destroy();
 
