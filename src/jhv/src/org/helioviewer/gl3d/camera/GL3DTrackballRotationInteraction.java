@@ -75,23 +75,30 @@ public class GL3DTrackballRotationInteraction extends GL3DDefaultInteraction {
         GL3DVec3d hitPoint;
 
         if (ray.isOnSun) {
-            // Log.debug("GL3DTrackballRotationInteraction: Ray is Inside!");
             hitPoint = ray.getHitPoint();
-            // System.out.println(hitPoint);
             hitPoint.normalize();
+
             hitPoint = camera.getLocalRotation().toMatrix().multiply(hitPoint);
+            double radeg = 180. / Math.PI;
 
         } else {
-            // Log.debug("GL3DTrackballRotationInteraction: Ray is Outside!");
             double y = (camera.getHeight() / 2 - p.y) / camera.getHeight();
             double x = (p.x - camera.getWidth() / 2) / camera.getWidth();
-            // Transform the Point so it lies on the plane that is aligned to
-            // the viewspace (not the sphere)
-            GL3DVec3d normalizedHelpVec = new GL3DVec3d(x, y, 0);
-            normalizedHelpVec.normalize();
-            hitPoint = normalizedHelpVec;
-            // hitPoint =
-            // camera.getRotation().toMatrix().multiply(normalizedHelpVec);
+
+            GL3DVec3d nv = new GL3DVec3d(x, y, 0);
+            nv.normalize();
+            hitPoint = camera.getRotation().toMatrix().inverse().multiply(nv);
+            hitPoint = camera.getLocalRotation().toMatrix().multiply(hitPoint);
+            /*
+             * //
+             * Log.debug("GL3DTrackballRotationInteraction: Ray is Outside!");
+             * System.out.println(ray.getOrigin() + " " + ray.getDirection());
+             * GL3DVec3d vec = ray.getDirection().copy();
+             * vec.multiply(ray.getOrigin().length()); vec.add(ray.getOrigin());
+             * vec.multiply(-1.); // vec.z = -Math.abs(vec.z) * vec.z; hitPoint
+             * = camera.getLocalRotation().toMatrix().multiply(vec);
+             * System.out.println(vec + "HP " + hitPoint);
+             */
         }
         return hitPoint;
     }
