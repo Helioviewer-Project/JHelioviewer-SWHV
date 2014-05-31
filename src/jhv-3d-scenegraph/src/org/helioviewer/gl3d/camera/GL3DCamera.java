@@ -135,7 +135,7 @@ public abstract class GL3DCamera {
     }
 
     public GL3DQuatd getRotation() {
-
+        this.updateCameraTransformation();
         return this.rotation;
     }
 
