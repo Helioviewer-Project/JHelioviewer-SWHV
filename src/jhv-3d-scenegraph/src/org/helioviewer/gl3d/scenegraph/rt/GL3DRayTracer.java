@@ -16,8 +16,8 @@ import org.helioviewer.gl3d.scenegraph.math.GL3DVec3d;
  */
 public class GL3DRayTracer {
 
-    private GL3DNode sceneRoot;
-    private GL3DCamera camera;
+    private final GL3DNode sceneRoot;
+    private final GL3DCamera camera;
 
     double hh;
     double hw;
@@ -74,15 +74,6 @@ public class GL3DRayTracer {
         LA.normalize();
         LU.normalize();
         LR.normalize();
-
-        /*
-         * GL3DVec3d C = LA.multiply(camera.getClipNear()); GL3DVec3d TL =
-         * C.subtract(LR.copy().multiply(hw)).add(LU.copy().multiply(hh));
-         * 
-         * GL3DVec3d dir =
-         * TL.copy().add(LR.copy().multiply(x).subtract(LU.copy()
-         * .multiply(y)).multiply(pixelSize));
-         */
 
         GL3DVec3d dir = LA.copy();
         dir.multiply(camera.getClipNear());
