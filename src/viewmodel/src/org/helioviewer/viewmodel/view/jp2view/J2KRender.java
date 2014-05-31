@@ -1,7 +1,5 @@
 package org.helioviewer.viewmodel.view.jp2view;
 
-import java.util.Arrays;
-
 import kdu_jni.KduException;
 import kdu_jni.Kdu_compositor_buf;
 import kdu_jni.Kdu_coords;
@@ -306,11 +304,15 @@ class J2KRender implements Runnable {
                 byteBuffer[currentByteBuffer] = new byte[roi.getNumPixels()];
             } else {
                 currentIntBuffer = (currentIntBuffer + 1) % NUM_BUFFERS;
-                if (differenceMode || roi.getNumPixels() != intBuffer[currentIntBuffer].length || (!movieMode && !linkedMovieMode && !J2KRenderGlobalOptions.getDoubleBufferingOption())) {
-                    intBuffer[currentIntBuffer] = new int[roi.getNumPixels()];
-                } else if (J2KRenderGlobalOptions.getDoubleBufferingOption()) {
-                    Arrays.fill(intBuffer[currentIntBuffer], 0);
-                }
+                // if (differenceMode || roi.getNumPixels() !=
+                // intBuffer[currentIntBuffer].length || (!movieMode &&
+                // !linkedMovieMode &&
+                // !J2KRenderGlobalOptions.getDoubleBufferingOption())) {
+                intBuffer[currentIntBuffer] = new int[roi.getNumPixels()];
+                // } else if (J2KRenderGlobalOptions.getDoubleBufferingOption())
+                // {
+                // Arrays.fill(intBuffer[currentIntBuffer], 0);
+                // }
             }
 
             while (!compositorRef.Is_processing_complete()) {
