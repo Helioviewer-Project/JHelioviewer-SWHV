@@ -96,15 +96,15 @@ public class FileUtils {
                 try {
                     String line;
                     while ((line = stdout.readLine()) != null) {
-                        Log.log(logLevel, ">> FileUtiles.logProcessOutput(Process, " + processName + ", " + logLevel + ") > std out: " + line);
+                        Log.log(logLevel, ">> FileUtils.logProcessOutput(Process, " + processName + ", " + logLevel + ") > std out: " + line);
                     }
                 } catch (IOException e) {
-                    Log.error(">> FileUtiles.logProcessOutput(Process, " + processName + ", " + logLevel + ") > Error while reading standard output", e);
+                    Log.error(">> FileUtils.logProcessOutput(Process, " + processName + ", " + logLevel + ") > Error while reading standard output", e);
                 } finally {
                     try {
                         stdout.close();
                     } catch (IOException e) {
-                        Log.error(">> FileUtiles.logProcessOutput(Process, " + processName + ", " + logLevel + ") > Error while closing standard output stream", e);
+                        Log.error(">> FileUtils.logProcessOutput(Process, " + processName + ", " + logLevel + ") > Error while closing standard output stream", e);
                     }
                 }
             }
@@ -115,15 +115,15 @@ public class FileUtils {
                 try {
                     String line;
                     while ((line = stderr.readLine()) != null) {
-                        Log.log(logLevel, ">> FileUtiles.logProcessOutput(Process, " + processName + ", " + logLevel + ") > std err: " + line);
+                        Log.log(logLevel, ">> FileUtils.logProcessOutput(Process, " + processName + ", " + logLevel + ") > std err: " + line);
                     }
                 } catch (IOException e) {
-                    Log.error(">> FileUtiles.logProcessOutput(Process, " + processName + ", " + logLevel + ") > Error while reading standard error", e);
+                    Log.error(">> FileUtils.logProcessOutput(Process, " + processName + ", " + logLevel + ") > Error while reading standard error", e);
                 } finally {
                     try {
                         stderr.close();
                     } catch (IOException e) {
-                        Log.error(">> FileUtiles.logProcessOutput(Process, " + processName + ", " + logLevel + ") > Error while closing standard error stream", e);
+                        Log.error(">> FileUtils.logProcessOutput(Process, " + processName + ", " + logLevel + ") > Error while closing standard error stream", e);
                     }
                 }
             }
@@ -136,7 +136,7 @@ public class FileUtils {
                 threadStderr.join();
                 threadStdout.join();
             } catch (InterruptedException e) {
-                Log.error(">> FileUtiles.logProcessOutput(Process, " + processName + ", " + logLevel + ") > Interrupted while reading process output.", e);
+                Log.error(">> FileUtils.logProcessOutput(Process, " + processName + ", " + logLevel + ") > Interrupted while reading process output.", e);
             }
         }
     }
