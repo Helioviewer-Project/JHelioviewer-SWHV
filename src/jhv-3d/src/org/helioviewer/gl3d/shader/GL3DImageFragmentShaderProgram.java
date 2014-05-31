@@ -25,12 +25,13 @@ public class GL3DImageFragmentShaderProgram extends GLFragmentShaderProgram {
     private int textureScaleThetaPhiRef;
     private int diffTextureScaleThetaPhiRef;
     private GLShaderBuilder builder;
+
     public GL3DImageFragmentShaderProgram() {
     }
 
     /**
      * Binds (= activates it) the shader, if it is not active so far.
-     *
+     * 
      * @param gl
      *            Valid reference to the current gl object
      */
@@ -42,22 +43,21 @@ public class GL3DImageFragmentShaderProgram extends GLFragmentShaderProgram {
     private void bind(GL gl, int shader, double cutOffRadius, double xTextureScale, double yTextureScale, double theta, double phi) {
         super.bind(gl);
 
-        double [] cutOffRadiusFloat = this.builder.getEnvParameter(this.cutOffRadiusRef);
-        cutOffRadiusFloat[0] = (float)cutOffRadius;
+        double[] cutOffRadiusFloat = this.builder.getEnvParameter(this.cutOffRadiusRef);
+        cutOffRadiusFloat[0] = (float) cutOffRadius;
         cutOffRadiusFloat[1] = 0f;
         cutOffRadiusFloat[2] = 0f;
         cutOffRadiusFloat[3] = 0f;
         this.bindEnvVars(gl, this.cutOffRadiusRef, cutOffRadiusFloat);
 
-        double [] textureScaleThetaPhiFloat = this.builder.getEnvParameter(this.textureScaleThetaPhiRef);
+        double[] textureScaleThetaPhiFloat = this.builder.getEnvParameter(this.textureScaleThetaPhiRef);
         textureScaleThetaPhiFloat[0] = xTextureScale;
         textureScaleThetaPhiFloat[1] = yTextureScale;
         textureScaleThetaPhiFloat[2] = theta;
         textureScaleThetaPhiFloat[3] = phi;
         this.bindEnvVars(gl, this.textureScaleThetaPhiRef, textureScaleThetaPhiFloat);
 
-
-        double [] diffTextureScaleThetaPhiFloat = this.builder.getEnvParameter(this.diffTextureScaleThetaPhiRef);
+        double[] diffTextureScaleThetaPhiFloat = this.builder.getEnvParameter(this.diffTextureScaleThetaPhiRef);
         diffTextureScaleThetaPhiFloat[0] = differenceXTextureScale;
         diffTextureScaleThetaPhiFloat[1] = differenceYTextureScale;
         diffTextureScaleThetaPhiFloat[2] = differenceTheta;
@@ -67,10 +67,10 @@ public class GL3DImageFragmentShaderProgram extends GLFragmentShaderProgram {
 
     /**
      * Pushes the shader currently in use onto a stack.
-     *
+     * 
      * This is useful to load another shader but still being able to restore the
      * old one, similar to the very common pushMatrix() in OpenGL.
-     *
+     * 
      * @param gl
      *            Valid reference to the current gl object
      * @see #popShader(GL)
@@ -83,10 +83,10 @@ public class GL3DImageFragmentShaderProgram extends GLFragmentShaderProgram {
 
     /**
      * Takes the top of from the shader stack and binds it.
-     *
+     * 
      * This restores a shader pushed onto the stack earlier, similar to the very
      * common popMatrix() in OpenGL.
-     *
+     * 
      * @param gl
      *            Valid reference to the current gl object
      * @see #pushShader(GL)
@@ -96,7 +96,7 @@ public class GL3DImageFragmentShaderProgram extends GLFragmentShaderProgram {
         Integer restoreShaderObject = shaderStack.pop();
         int restoreShader = restoreShaderObject == null ? 0 : restoreShaderObject.intValue();
         if (restoreShader >= 0) {
-            //bind(gl, restoreShader, 0.0f, 0.0, 0.0, 0.0, 0.0);
+            // bind(gl, restoreShader, 0.0f, 0.0, 0.0, 0.0, 0.0);
         }
     }
 
@@ -106,7 +106,7 @@ public class GL3DImageFragmentShaderProgram extends GLFragmentShaderProgram {
         try {
             String program = "\tif(texcoord0.x<0.0||texcoord0.y<0.0||texcoord0.x>textureScaleThetaPhi.x||texcoord0.y>textureScaleThetaPhi.y){" + "discard;" + GLShaderBuilder.LINE_SEP + "\t}" + GLShaderBuilder.LINE_SEP;
 
-            //program += "\tOUT.color.a=1.;" + GLShaderBuilder.LINE_SEP;
+            // program += "\tOUT.color.a=1.;" + GLShaderBuilder.LINE_SEP;
             program += "\tfloat theta = textureScaleThetaPhi.z;" + GLShaderBuilder.LINE_SEP;
             program += "\tfloat phi = textureScaleThetaPhi.w;" + GLShaderBuilder.LINE_SEP;
 
@@ -125,13 +125,12 @@ public class GL3DImageFragmentShaderProgram extends GLFragmentShaderProgram {
             program += "\tif((position.z!=0.0 && projectionn<-0.001) || (position.z==0.0 && position.x*position.x +position.y*position.y<0.9)){" + "\t\tdiscard;" + GLShaderBuilder.LINE_SEP + "\t}";
 
             this.cutOffRadiusRef = shaderBuilder.addEnvParameter("float cutOffRadius");
-            this.textureScaleThetaPhiRef =shaderBuilder.addEnvParameter("float4 textureScaleThetaPhi");
+            this.textureScaleThetaPhiRef = shaderBuilder.addEnvParameter("float4 textureScaleThetaPhi");
             this.diffTextureScaleThetaPhiRef = shaderBuilder.addEnvParameter("float4 diffTextureScaleThetaPhi");
 
             program = program.replace("position", shaderBuilder.useStandardParameter("float4", "TEXCOORD3"));
 
             program = program.replace("output", shaderBuilder.useOutputValue("float4", "COLOR"));
-            shaderBuilder.useOutputValue("float4", "DEPTH");
             shaderBuilder.addMainFragment(program);
             System.out.println("GL3D Image Fragment Shader:\n" + shaderBuilder.getCode());
         } catch (GLBuildShaderException e) {
@@ -158,6 +157,7 @@ public class GL3DImageFragmentShaderProgram extends GLFragmentShaderProgram {
         this.differenceXTextureScale = scaleX;
         this.differenceYTextureScale = scaleY;
     }
+
     public void changeDifferenceAngles(double theta, double phi) {
         this.differenceTheta = theta;
         this.differencePhi = phi;
