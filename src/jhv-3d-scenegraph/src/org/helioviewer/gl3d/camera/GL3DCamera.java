@@ -150,6 +150,12 @@ public abstract class GL3DCamera {
 
     }
 
+    public void setCurrentDragRotation(GL3DQuatd currentDragRotation) {
+        this.currentDragRotation = currentDragRotation;
+        this.rotation.clear();
+        this.updateCameraTransformation();
+    }
+
     public void rotateCurrentDragRotation(GL3DQuatd currentDragRotation) {
         this.currentDragRotation.rotate(currentDragRotation);
         this.rotation.clear();
