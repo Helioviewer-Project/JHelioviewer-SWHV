@@ -48,9 +48,9 @@ import org.helioviewer.viewmodel.view.opengl.GLView;
  * active image region by performing a ray casting using the
  * {@link GL3DRayTracer} to find the maximally spanning image region within the
  * displayed scene.
- *
+ * 
  * @author Simon Spoerri (simon.spoerri@fhnw.ch)
- *
+ * 
  */
 public class GL3DSceneGraphView extends AbstractGL3DView implements GL3DView {
     private final GL3DGroup root;
@@ -376,7 +376,7 @@ public class GL3DSceneGraphView extends AbstractGL3DView implements GL3DView {
     }
 
     public void toggleCoronaVisibility() {
-        this.imageLayers.setCoronaVisibility(!this.imageLayers.getCoronaVisibility());
+        //this.imageLayers.setCoronaVisibility(!this.imageLayers.getCoronaVisibility());
     }
 
     public void printScenegraph() {
@@ -404,7 +404,7 @@ public class GL3DSceneGraphView extends AbstractGL3DView implements GL3DView {
         /*
          * GL3DNode sibling = node; while((sibling = sibling.getNext()) != null)
          * { for(int i=0; i<level; ++i) System.out.print("   ");
-         *
+         * 
          * System.out.println("Sibling: " + sibling.getClass().getName() + " ("
          * + node.getName() + ")"); }
          */
