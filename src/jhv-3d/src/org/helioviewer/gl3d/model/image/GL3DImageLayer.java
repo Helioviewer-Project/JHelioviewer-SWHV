@@ -228,7 +228,6 @@ public abstract class GL3DImageLayer extends GL3DOrientedGroup implements GL3DCa
                     minPhysicalY = Math.min(minPhysicalY, hitPoint.y);
                     maxPhysicalX = Math.max(maxPhysicalX, hitPoint.x);
                     maxPhysicalY = Math.max(maxPhysicalY, hitPoint.y);
-                    System.out.println("Y1 " + hitPoint.y);
                 }
                 GL3DRay rayS = rayTracerS.cast((int) (i * width / res), (int) (j * height / 1.));
 
@@ -241,7 +240,6 @@ public abstract class GL3DImageLayer extends GL3DOrientedGroup implements GL3DCa
                     minPhysicalY = Math.min(minPhysicalY, hitPoint.y);
                     maxPhysicalX = Math.max(maxPhysicalX, hitPoint.x);
                     maxPhysicalY = Math.max(maxPhysicalY, hitPoint.y);
-                    System.out.println("Y2 " + hitPoint.y);
 
                 }
             }
@@ -258,7 +256,6 @@ public abstract class GL3DImageLayer extends GL3DOrientedGroup implements GL3DCa
                     minPhysicalY = Math.min(minPhysicalY, hitPoint.y);
                     maxPhysicalX = Math.max(maxPhysicalX, hitPoint.x);
                     maxPhysicalY = Math.max(maxPhysicalY, hitPoint.y);
-                    System.out.println("Y3 " + hitPoint.y);
 
                 }
                 GL3DRay rayS = rayTracerS.cast((int) (i * width / 1.), (int) (j * height / res));
@@ -271,12 +268,10 @@ public abstract class GL3DImageLayer extends GL3DOrientedGroup implements GL3DCa
                     minPhysicalY = Math.min(minPhysicalY, hitPoint.y);
                     maxPhysicalX = Math.max(maxPhysicalX, hitPoint.x);
                     maxPhysicalY = Math.max(maxPhysicalY, hitPoint.y);
-                    System.out.println("Y4 " + hitPoint.y);
 
                 }
             }
         }
-        System.out.println("xrange " + minPhysicalX + " " + maxPhysicalX + " " + minPhysicalY + " " + maxPhysicalY);
 
         if (minPhysicalX < metaData.getPhysicalLowerLeft().getX())
             minPhysicalX = metaData.getPhysicalLowerLeft().getX();
@@ -289,11 +284,8 @@ public abstract class GL3DImageLayer extends GL3DOrientedGroup implements GL3DCa
 
         double regionWidth = maxPhysicalX - minPhysicalX;
         double regionHeight = maxPhysicalY - minPhysicalY;
-        System.out.println("ll " + metaData.getPhysicalLowerLeft() + "ur " + metaData.getPhysicalUpperRight() + " lr" + metaData.getPhysicalLowerRight() + " ul" + metaData.getPhysicalUpperLeft());
-        System.out.println("xrange " + minPhysicalX + " " + maxPhysicalX + " " + minPhysicalY + " " + maxPhysicalY);
         if (regionWidth > 0 && regionHeight > 0) {
             Region newRegion = StaticRegion.createAdaptedRegion(minPhysicalX, minPhysicalY, regionWidth, regionHeight);
-            // Log.debug("GL3DImageLayer: '"+getName()+" set its region");
             this.regionView.setRegion(newRegion, new ChangeEvent());
         } else {
             Log.error("Illegal Region calculated! " + regionWidth + ":" + regionHeight + ". x = " + minPhysicalX + " - " + maxPhysicalX + ", y = " + minPhysicalY + " - " + maxPhysicalY);
