@@ -31,8 +31,9 @@ public class GL3DTrackballRotationInteraction extends GL3DDefaultInteraction {
     @Override
     public void mouseDragged(MouseEvent e, GL3DCamera camera) {
         this.currentRotationEndPoint = getVectorFromSphere(e.getPoint(), camera);
-
-        currentDragRotation = GL3DQuatd.calcRotation(currentRotationStartPoint, currentRotationEndPoint);
+        if (currentRotationStartPoint != null && currentRotationEndPoint != null) {
+            currentDragRotation = GL3DQuatd.calcRotation(currentRotationStartPoint, currentRotationEndPoint);
+        }
         camera.rotateCurrentDragRotation(currentDragRotation);
         this.camera.updateCameraTransformation(false);
 
@@ -79,7 +80,6 @@ public class GL3DTrackballRotationInteraction extends GL3DDefaultInteraction {
             hitPoint.normalize();
 
             hitPoint = camera.getLocalRotation().toMatrix().multiply(hitPoint);
-            double radeg = 180. / Math.PI;
 
         } else {
             double y = (camera.getHeight() / 2 - p.y) / camera.getHeight();
@@ -89,16 +89,6 @@ public class GL3DTrackballRotationInteraction extends GL3DDefaultInteraction {
             nv.normalize();
             hitPoint = camera.getRotation().toMatrix().inverse().multiply(nv);
             hitPoint = camera.getLocalRotation().toMatrix().multiply(hitPoint);
-            /*
-             * //
-             * Log.debug("GL3DTrackballRotationInteraction: Ray is Outside!");
-             * System.out.println(ray.getOrigin() + " " + ray.getDirection());
-             * GL3DVec3d vec = ray.getDirection().copy();
-             * vec.multiply(ray.getOrigin().length()); vec.add(ray.getOrigin());
-             * vec.multiply(-1.); // vec.z = -Math.abs(vec.z) * vec.z; hitPoint
-             * = camera.getLocalRotation().toMatrix().multiply(vec);
-             * System.out.println(vec + "HP " + hitPoint);
-             */
         }
         return hitPoint;
     }
