@@ -43,8 +43,8 @@ public class GL3DImageSphere extends GL3DImageMesh {
     @Override
     public GL3DMeshPrimitive createMesh(GL3DState state, List<GL3DVec3d> positions, List<GL3DVec3d> normals, List<GL3DVec2d> textCoords, List<Integer> indices, List<GL3DVec4d> colors) {
         if (this.capturedRegion != null) {
-            int resolutionX = 20;
-            int resolutionY = 20;
+            int resolutionX = 50;
+            int resolutionY = 50;
             int numberOfPositions = 0;
             for (int latNumber = 0; latNumber <= resolutionX; latNumber++) {
                 double theta = latNumber * Math.PI / resolutionX;
