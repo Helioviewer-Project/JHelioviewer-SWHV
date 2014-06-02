@@ -17,6 +17,15 @@ public class GL3DTriangle {
     protected GL3DVec3d c;
 
     protected GL3DVec3d center;
+    private boolean planarMode = true;
+
+    public boolean isPlanarMode() {
+        return planarMode;
+    }
+
+    public void setPlanarMode(boolean planarMode) {
+        this.planarMode = planarMode;
+    }
 
     public GL3DTriangle() {
 
@@ -61,16 +70,19 @@ public class GL3DTriangle {
 
         // Calculate barycentric coordinates: u>0 && v>0 && u+v<=1
         u = AO.dot(K) * inv_det;
-        if (u < 0.0f || u > 1.0)
-            return false;
-
+        if (!planarMode) {
+            if (u < 0.0f || u > 1.0)
+                return false;
+        }
         // prepare to test v parameter
         Q = GL3DVec3d.cross(AO, e1);
 
         // calculate v parameter and test bounds
-        v = Q.dot(ray.getDirectionOS()) * inv_det;
-        if (v < 0.0f || u + v > 1.0f)
-            return false;
+        if (!planarMode) {
+            v = Q.dot(ray.getDirectionOS()) * inv_det;
+            if (v < 0.0f || u + v > 1.0f)
+                return false;
+        }
 
         // calculate t, ray intersects triangle
         t = e2.dot(Q) * inv_det;
