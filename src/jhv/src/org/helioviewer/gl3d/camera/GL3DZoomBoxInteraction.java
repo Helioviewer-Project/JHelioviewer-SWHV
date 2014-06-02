@@ -31,13 +31,14 @@ public class GL3DZoomBoxInteraction extends GL3DDefaultInteraction {
     private GL3DVec3d zoomBoxStartPoint;
     private GL3DVec3d zoomBoxEndPoint;
 
-    private SolarImageCoordinateSystem solarDiskCS;
+    private final SolarImageCoordinateSystem solarDiskCS;
 
     public GL3DZoomBoxInteraction(GL3DSolarRotationTrackingTrackballCamera camera, GL3DSceneGraphView sceneGraph) {
         super(camera, sceneGraph);
         this.solarDiskCS = new SolarImageCoordinateSystem();
     }
 
+    @Override
     public void drawInteractionFeedback(GL3DState state, GL3DCamera camera) {
         if (this.isValidZoomBox()) {
             double x0, x1, y0, y1, z0, z1;
@@ -83,16 +84,20 @@ public class GL3DZoomBoxInteraction extends GL3DDefaultInteraction {
         }
     }
 
+    @Override
     public void mousePressed(MouseEvent e, GL3DCamera camera) {
         this.zoomBoxStartPoint = getHitPoint(e.getPoint());
     }
 
+    @Override
     public void mouseDragged(MouseEvent e, GL3DCamera camera) {
         this.zoomBoxEndPoint = getHitPoint(e.getPoint());
         Displayer.getSingletonInstance().display();
     }
 
+    @Override
     public void mouseReleased(MouseEvent e, GL3DCamera camera) {
+
         if (this.isValidZoomBox()) {
             camera.addCameraAnimation(createZoomAnimation());
             if (isCompletelyOnSphere()) {
@@ -118,15 +123,15 @@ public class GL3DZoomBoxInteraction extends GL3DDefaultInteraction {
         }
         this.zoomBoxEndPoint = null;
         this.zoomBoxStartPoint = null;
+        Displayer.getSingletonInstance().display();
     }
 
     private GL3DCameraRotationAnimation createRotationAnimation(GL3DVec3d startPoint) {
 
-        GL3DVec3d endPoint = GL3DVec3d.add(this.zoomBoxEndPoint, this.zoomBoxStartPoint);
+        GL3DVec3d endPoint = GL3DVec3d.add(camera.getLocalRotation().toMatrix().multiply(this.zoomBoxEndPoint), camera.getLocalRotation().toMatrix().multiply(this.zoomBoxStartPoint));
         endPoint.divide(2);
         endPoint.normalize();
-
-        return new GL3DCameraRotationAnimation(startPoint, endPoint, 700);
+        return new GL3DCameraRotationAnimation(new GL3DVec3d(0., 0., 1.), endPoint, 700);
     }
 
     private GL3DCameraPanAnimation createPanAnimation(long x, long y) {
@@ -136,6 +141,7 @@ public class GL3DZoomBoxInteraction extends GL3DDefaultInteraction {
     }
 
     private GL3DCameraZoomAnimation createZoomAnimation() {
+
         double halfWidth = Math.abs(this.zoomBoxEndPoint.x - this.zoomBoxStartPoint.x) / 2;
         double halfFOVRad = Math.toRadians(camera.getFOV() / 2);
         double distance = halfWidth * Math.sin(Math.PI / 2 - halfFOVRad) / Math.sin(halfFOVRad);
