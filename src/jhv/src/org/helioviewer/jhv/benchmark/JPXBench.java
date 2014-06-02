@@ -46,8 +46,8 @@ public class JPXBench implements ViewListener {
     private long previousTime;
     private int numberOfIterations = 0;
 
-    public JPXBench() {
-        URI file = (new File("/Users/freekv/JHelioviewer/Downloads/AIA171.jpx")).toURI();
+    public JPXBench(String inputFile) {
+        URI file = (new File(inputFile)).toURI();
         ImageInfoView view = null;
         try {
             view = APIRequestManager.newLoad(file, true, null);
@@ -103,7 +103,10 @@ public class JPXBench implements ViewListener {
 
     public static void main(String[] args) {
         jhvMain(args);
-        JPXBench jpxbench = new JPXBench();
+        String inputFile = args[0];
+
+        //inputFile ="/Users/freekv/JHelioviewer/Downloads/AIA171.jpx";
+        JPXBench jpxbench = new JPXBench(inputFile);
 
     }
 
