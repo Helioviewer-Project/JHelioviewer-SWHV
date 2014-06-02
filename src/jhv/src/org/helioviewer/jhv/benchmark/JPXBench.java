@@ -45,8 +45,10 @@ public class JPXBench implements ViewListener {
     private double avg;
     private long previousTime;
     private int numberOfIterations = 0;
+    private int resolution = 1;
 
-    public JPXBench(String inputFile) {
+    public JPXBench(String inputFile, int resolution) {
+        this.resolution = resolution;
         URI file = (new File(inputFile)).toURI();
         ImageInfoView view = null;
         try {
@@ -95,8 +97,10 @@ public class JPXBench implements ViewListener {
             if (jp2View != null) {
                 HelioviewerMetaData md = (HelioviewerMetaData) jp2View.getMetadata();
                 Double mpp = md.getUnitsPerPixel();
-                jp2View.setViewport(new ViewportAdapter(new StaticViewport(1024, 1024)), new ChangeEvent());
-                jp2View.setRegion(new RegionAdapter(new StaticRegion(0 * mpp, 0 * mpp, new Vector2dDouble(4096.0 * mpp, 4096.0 * mpp))), new ChangeEvent());
+                int height = jp2View.getJP2Image().getPixelHeight();
+                int width = jp2View.getJP2Image().getPixelWidth();
+                jp2View.setViewport(new ViewportAdapter(new StaticViewport(width / resolution, height / resolution)), new ChangeEvent());
+                jp2View.setRegion(new RegionAdapter(new StaticRegion(0 * mpp, 0 * mpp, new Vector2dDouble(width * mpp, height * mpp))), new ChangeEvent());
             }
         }
     }
@@ -104,9 +108,10 @@ public class JPXBench implements ViewListener {
     public static void main(String[] args) {
         jhvMain(args);
         String inputFile = args[0];
+        int resolution = Integer.parseInt(args[1]);
 
         //inputFile ="/Users/freekv/JHelioviewer/Downloads/AIA171.jpx";
-        JPXBench jpxbench = new JPXBench(inputFile);
+        JPXBench jpxbench = new JPXBench(inputFile, resolution);
 
     }
 
