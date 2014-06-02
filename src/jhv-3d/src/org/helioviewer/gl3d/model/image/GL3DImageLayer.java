@@ -1,14 +1,10 @@
 package org.helioviewer.gl3d.model.image;
 
-import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Point;
 import java.util.ArrayList;
-import java.util.List;
 
 import javax.media.opengl.GL;
-import javax.swing.JFrame;
-import javax.swing.JPanel;
 
 import org.helioviewer.base.logging.Log;
 import org.helioviewer.base.physics.Constants;
@@ -26,7 +22,6 @@ import org.helioviewer.gl3d.shader.GL3DImageFragmentShaderProgram;
 import org.helioviewer.gl3d.view.GL3DCoordinateSystemView;
 import org.helioviewer.gl3d.view.GL3DImageTextureView;
 import org.helioviewer.gl3d.view.GL3DView;
-import org.helioviewer.gl3d.wcs.CoordinateConversion;
 import org.helioviewer.gl3d.wcs.CoordinateSystem;
 import org.helioviewer.gl3d.wcs.CoordinateVector;
 import org.helioviewer.viewmodel.changeevent.ChangeEvent;
@@ -41,7 +36,7 @@ import org.helioviewer.viewmodel.view.RegionView;
  * to the GL3DLayeredView. It represents exactly one image layer in the view
  * chain
  * 
- * @author Simon Sp�rri (simon.spoerri@fhnw.ch)
+ * @author Simon Spoerri (simon.spoerri@fhnw.ch)
  * 
  */
 public abstract class GL3DImageLayer extends GL3DOrientedGroup implements GL3DCameraListener {
@@ -65,10 +60,6 @@ public abstract class GL3DImageLayer extends GL3DOrientedGroup implements GL3DCa
     protected GL3DNode accellerationShape;
 
     protected boolean doUpdateROI = true;
-    private final JFrame frame = new JFrame("Hitpoints original");
-    private final JFrame frame1 = new JFrame("Hitpoints");
-    private final JPanel contentPane = new JPanel();
-    private final JPanel contentPane1 = new JPanel();
 
     private final ArrayList<Point> points = new ArrayList<Point>();
 
@@ -76,13 +67,11 @@ public abstract class GL3DImageLayer extends GL3DOrientedGroup implements GL3DCa
 
     protected GL gl;
     protected GL3DImageFragmentShaderProgram sphereFragmentShader = null;
+    private GL3DHitReferenceShape accellerationShapeS;
 
     public GL3DImageLayer(String name, GL3DView mainLayerView) {
         super(name);
-        frame.setContentPane(contentPane);
-        frame.setBounds(50, 50, 640, 480);
-        frame1.setContentPane(contentPane1);
-        frame1.setBounds(50, 50, 640, 480);
+
         layerId = nextLayerId++;
 
         this.mainLayerView = mainLayerView;
@@ -118,7 +107,9 @@ public abstract class GL3DImageLayer extends GL3DOrientedGroup implements GL3DCa
     public void shapeInit(GL3DState state) {
         this.createImageMeshNodes(state.gl);
 
-        this.accellerationShape = new GL3DHitReferenceShape(true);
+        this.accellerationShape = new GL3DHitReferenceShape(false);
+        this.accellerationShapeS = new GL3DHitReferenceShape(true);
+
         this.addNode(this.accellerationShape);
 
         super.shapeInit(state);
@@ -214,92 +205,83 @@ public abstract class GL3DImageLayer extends GL3DOrientedGroup implements GL3DCa
         }
 
         GL3DRayTracer rayTracer = new GL3DRayTracer(this.accellerationShape, activeCamera);
+        GL3DRayTracer rayTracerS = new GL3DRayTracer(this.accellerationShapeS, activeCamera);
 
         // Shoot Rays in the corners of the viewport
         int width = (int) activeCamera.getWidth();
         int height = (int) activeCamera.getHeight();
-        List<GL3DRay> regionTestRays = new ArrayList<GL3DRay>();
-        contentPane.removeAll();
-        contentPane.setLayout(null);
-        contentPane1.removeAll();
-        contentPane1.setLayout(null);
-
-        //frame.setVisible(true);
-        //frame1.setVisible(true);
-        for (int i = 0; i <= 10; i++) {
-            for (int j = 0; j <= 10; j++) {
-
-                regionTestRays.add(rayTracer.cast(i * (width / 10), j * (height / 10)));
-            }
-        }
-
         double minPhysicalX = Double.MAX_VALUE;
         double minPhysicalY = Double.MAX_VALUE;
-        double minPhysicalZ = Double.MAX_VALUE;
         double maxPhysicalX = -Double.MAX_VALUE;
         double maxPhysicalY = -Double.MAX_VALUE;
-        double maxPhysicalZ = -Double.MAX_VALUE;
 
-        CoordinateVector orientationVector = this.getOrientation();
-        CoordinateConversion toViewSpace = this.getCoordinateSystem().getConversion(activeCamera.getViewSpaceCoordinateSystem());
+        double res = 100.;
+        for (int i = 0; i <= res; i++) {
+            for (int j = 0; j <= 1; j++) {
+                GL3DRay ray = rayTracer.cast((int) (i * width / res), (int) (j * height / 1.));
+                GL3DVec3d hitPoint = ray.getHitPoint();
+                if (hitPoint != null) {
+                    hitPoint = ray.getHitPoint();
+                    hitPoint = activeCamera.getLocalRotation().toMatrix().multiply(hitPoint);
 
-        for (GL3DRay ray : regionTestRays) {
-            GL3DVec3d hitPoint = ray.getHitPoint();
-            if (hitPoint != null) {
-                hitPoint = this.wmI.multiply(hitPoint);
-                hitPoint = activeCamera.getLocalRotation().toMatrix().multiply(hitPoint);
+                    minPhysicalX = Math.min(minPhysicalX, hitPoint.x);
+                    minPhysicalY = Math.min(minPhysicalY, hitPoint.y);
+                    maxPhysicalX = Math.max(maxPhysicalX, hitPoint.x);
+                    maxPhysicalY = Math.max(maxPhysicalY, hitPoint.y);
+                    System.out.println("Y1 " + hitPoint.y);
+                }
+                GL3DRay rayS = rayTracerS.cast((int) (i * width / res), (int) (j * height / 1.));
 
-                double coordx = (hitPoint.x - metaData.getPhysicalLowerLeft().getX()) / metaData.getPhysicalImageWidth();
-                double coordy = ((1 - hitPoint.y) - metaData.getPhysicalLowerLeft().getY()) / metaData.getPhysicalImageHeight();
+                hitPoint = rayS.getHitPoint();
+                if (hitPoint != null) {
+                    hitPoint = ray.getHitPoint();
 
-                JPanel panel = new JPanel();
-                panel.setBackground(Color.BLACK);
-                panel.setBounds((int) (coordx * contentPane.getWidth()) - 3, (int) (coordy * contentPane.getHeight()) - 3, 5, 5);
-                contentPane.add(panel);
-                double x = hitPoint.x;
-                double y = hitPoint.y;
-                double z = hitPoint.z;
+                    hitPoint = activeCamera.getLocalRotation().toMatrix().multiply(hitPoint);
+                    minPhysicalX = Math.min(minPhysicalX, hitPoint.x);
+                    minPhysicalY = Math.min(minPhysicalY, hitPoint.y);
+                    maxPhysicalX = Math.max(maxPhysicalX, hitPoint.x);
+                    maxPhysicalY = Math.max(maxPhysicalY, hitPoint.y);
+                    System.out.println("Y2 " + hitPoint.y);
 
-                coordx = (x - metaData.getPhysicalLowerLeft().getX()) / metaData.getPhysicalImageWidth();
-                coordy = ((1 - y) - metaData.getPhysicalLowerLeft().getY()) / metaData.getPhysicalImageHeight();
-
-                JPanel panel1 = new JPanel();
-                panel1.setBackground(Color.BLACK);
-                panel1.setBounds((int) (coordx * contentPane.getWidth()) - 3, (int) (coordy * contentPane.getHeight()) - 3, 5, 5);
-                contentPane1.add(panel1);
-
-                minPhysicalX = Math.min(minPhysicalX, x);
-                minPhysicalY = Math.min(minPhysicalY, y);
-                minPhysicalZ = Math.min(minPhysicalZ, z);
-                maxPhysicalX = Math.max(maxPhysicalX, x);
-                maxPhysicalY = Math.max(maxPhysicalY, y);
-                maxPhysicalZ = Math.max(maxPhysicalZ, z);
-                // Log.debug("GL3DImageLayer: Hitpoint: "+hitPoint+" - "+ray.isOnSun);
+                }
             }
         }
+        for (int i = 0; i <= 1; i++) {
+            for (int j = 0; j <= res; j++) {
+                GL3DRay ray = rayTracer.cast((int) (i * width / 1.), (int) (j * height / res));
+                GL3DVec3d hitPoint = ray.getHitPoint();
+                if (hitPoint != null) {
+                    hitPoint = ray.getHitPoint();
+                    hitPoint = activeCamera.getLocalRotation().toMatrix().multiply(hitPoint);
 
-        double llx = metaData.getPhysicalLowerLeft().getX();
-        double lly = metaData.getPhysicalLowerLeft().getY();
-        double urx = metaData.getPhysicalUpperRight().getX();
-        double ury = metaData.getPhysicalUpperRight().getY();
-        minPhysicalX = Math.max(minPhysicalX, llx);
-        minPhysicalY = Math.max(minPhysicalY, lly);
-        maxPhysicalX = Math.min(maxPhysicalX, urx);
-        maxPhysicalY = Math.min(maxPhysicalY, ury);
+                    minPhysicalX = Math.min(minPhysicalX, hitPoint.x);
+                    minPhysicalY = Math.min(minPhysicalY, hitPoint.y);
+                    maxPhysicalX = Math.max(maxPhysicalX, hitPoint.x);
+                    maxPhysicalY = Math.max(maxPhysicalY, hitPoint.y);
+                    System.out.println("Y3 " + hitPoint.y);
 
-        minPhysicalX = Math.max(minPhysicalX, metaData.getPhysicalLowerLeft().getX());
-        minPhysicalY = Math.max(minPhysicalY, metaData.getPhysicalLowerLeft().getY());
-        maxPhysicalX = Math.min(maxPhysicalX, metaData.getPhysicalUpperRight().getX());
-        maxPhysicalY = Math.min(maxPhysicalY, metaData.getPhysicalUpperRight().getY());
+                }
+                GL3DRay rayS = rayTracerS.cast((int) (i * width / 1.), (int) (j * height / res));
+                hitPoint = rayS.getHitPoint();
+                if (hitPoint != null) {
+                    hitPoint = ray.getHitPoint();
 
-        minPhysicalX -= Math.abs(minPhysicalX) * 0.1;
-        minPhysicalY -= Math.abs(minPhysicalY) * 0.1;
-        maxPhysicalX += Math.abs(maxPhysicalX) * 0.1;
-        maxPhysicalY += Math.abs(maxPhysicalY) * 0.1;
+                    hitPoint = activeCamera.getLocalRotation().toMatrix().multiply(hitPoint);
+                    minPhysicalX = Math.min(minPhysicalX, hitPoint.x);
+                    minPhysicalY = Math.min(minPhysicalY, hitPoint.y);
+                    maxPhysicalX = Math.max(maxPhysicalX, hitPoint.x);
+                    maxPhysicalY = Math.max(maxPhysicalY, hitPoint.y);
+                    System.out.println("Y4 " + hitPoint.y);
+
+                }
+            }
+        }
+        System.out.println("xrange " + minPhysicalX + " " + maxPhysicalX + " " + minPhysicalY + " " + maxPhysicalY);
+
         if (minPhysicalX < metaData.getPhysicalLowerLeft().getX())
             minPhysicalX = metaData.getPhysicalLowerLeft().getX();
         if (minPhysicalY < metaData.getPhysicalLowerLeft().getY())
-            minPhysicalY = metaData.getPhysicalLowerLeft().getX();
+            minPhysicalY = metaData.getPhysicalLowerLeft().getY();
         if (maxPhysicalX > metaData.getPhysicalUpperRight().getX())
             maxPhysicalX = metaData.getPhysicalUpperRight().getX();
         if (maxPhysicalY > metaData.getPhysicalUpperRight().getY())
@@ -307,7 +289,8 @@ public abstract class GL3DImageLayer extends GL3DOrientedGroup implements GL3DCa
 
         double regionWidth = maxPhysicalX - minPhysicalX;
         double regionHeight = maxPhysicalY - minPhysicalY;
-
+        System.out.println("ll " + metaData.getPhysicalLowerLeft() + "ur " + metaData.getPhysicalUpperRight() + " lr" + metaData.getPhysicalLowerRight() + " ul" + metaData.getPhysicalUpperLeft());
+        System.out.println("xrange " + minPhysicalX + " " + maxPhysicalX + " " + minPhysicalY + " " + maxPhysicalY);
         if (regionWidth > 0 && regionHeight > 0) {
             Region newRegion = StaticRegion.createAdaptedRegion(minPhysicalX, minPhysicalY, regionWidth, regionHeight);
             // Log.debug("GL3DImageLayer: '"+getName()+" set its region");
@@ -315,7 +298,7 @@ public abstract class GL3DImageLayer extends GL3DOrientedGroup implements GL3DCa
         } else {
             Log.error("Illegal Region calculated! " + regionWidth + ":" + regionHeight + ". x = " + minPhysicalX + " - " + maxPhysicalX + ", y = " + minPhysicalY + " - " + maxPhysicalY);
         }
-
+        this.markAsChanged();
     }
 
     protected GL3DImageTextureView getImageTextureView() {
