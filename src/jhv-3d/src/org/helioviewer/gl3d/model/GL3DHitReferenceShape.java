@@ -3,6 +3,7 @@ package org.helioviewer.gl3d.model;
 import java.util.List;
 
 import org.helioviewer.base.physics.Constants;
+import org.helioviewer.gl3d.camera.GL3DCamera;
 import org.helioviewer.gl3d.model.image.GL3DImageMesh;
 import org.helioviewer.gl3d.scenegraph.GL3DAABBox;
 import org.helioviewer.gl3d.scenegraph.GL3DDrawBits.Bit;
@@ -25,8 +26,7 @@ import org.helioviewer.gl3d.scenegraph.rt.GL3DRay;
  * 
  */
 public class GL3DHitReferenceShape extends GL3DMesh {
-    private static final double extremeValue = 4.;// Constants.SunMeanDistanceToEarth
-                                                  // * 10;
+    private static final double extremeValue = 4000000.;
 
     private final boolean allowBacksideHits;
     private final GL3DMat4d hitRotation;
@@ -102,8 +102,9 @@ public class GL3DHitReferenceShape extends GL3DMesh {
         }
 
         // Transform ray to object space for non-groups
-        ray.setOriginOS(this.wmI.multiply(ray.getOrigin()));
-        GL3DVec3d helpingDir = this.wmI.multiply(ray.getDirection());
+        GL3DCamera activeCamera = GL3DState.get().getActiveCamera();
+        ray.setOriginOS(this.wmI.multiply(activeCamera.getLocalRotation().toMatrix().multiply(ray.getOrigin())));
+        GL3DVec3d helpingDir = this.wmI.multiply(activeCamera.getLocalRotation().toMatrix().multiply(ray.getDirection()));
         helpingDir.normalize();
         ray.setDirOS(helpingDir);
         return this.shapeHit(ray);
@@ -114,7 +115,7 @@ public class GL3DHitReferenceShape extends GL3DMesh {
         // Hit detection happens in Object-Space
         boolean isSphereHit = isSphereHit(ray);
         // boolean isSphereHit = isSphereHitInOS(ray);
-        if (isSphereHit) {
+        if (isSphereHit & this.allowBacksideHits) {
             // GL3DVec3d hitPoint = this.wmI.multiply(ray.getHitPoint()).;
             GL3DVec3d hitPoint = ray.getHitPoint();
             GL3DVec3d projectionPlaneNormal = new GL3DVec3d(0, 0, 1);
@@ -135,7 +136,7 @@ public class GL3DHitReferenceShape extends GL3DMesh {
             }
         }
 
-        if (isSphereHit) {
+        if (isSphereHit & this.allowBacksideHits) {
             ray.isOnSun = true;
             // ray.setHitPoint(this.wmI.multiply(ray.getHitPoint()));
             return true;
