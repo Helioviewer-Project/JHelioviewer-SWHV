@@ -121,7 +121,9 @@ public class GL3DHitReferenceShape extends GL3DMesh implements ViewListener {
         boolean isSphereHit = false;
         if (!this.hitCoronaPlane) {
             isSphereHit = isSphereHit(ray);
-            ray.isOnSun = true;
+            if (isSphereHit) {
+                ray.isOnSun = true;
+            }
         } else if (this.hitCoronaPlane || !isSphereHit) {
             super.shapeHit(ray);
         }
