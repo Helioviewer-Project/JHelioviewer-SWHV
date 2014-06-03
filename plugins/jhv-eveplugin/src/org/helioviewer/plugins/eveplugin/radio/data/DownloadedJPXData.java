@@ -82,7 +82,7 @@ public class DownloadedJPXData implements ViewListener {
 
     @Override
     public void viewChanged(View sender, ChangeEvent aEvent) {
-        Log.debug("View changed for image ID : " + imageID);
+        Log.trace("View changed for image ID : " + imageID);
         for (ViewportChangedReason cr : aEvent.getAllChangedReasonsByType(ViewportChangedReason.class)) {
             radioDataManager.finishedDownloadingID(imageID, downloadID);
         }
