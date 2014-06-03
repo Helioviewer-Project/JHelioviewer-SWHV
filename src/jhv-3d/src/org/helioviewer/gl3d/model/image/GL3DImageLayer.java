@@ -67,7 +67,6 @@ public abstract class GL3DImageLayer extends GL3DOrientedGroup implements GL3DCa
 
     protected GL gl;
     protected GL3DImageFragmentShaderProgram sphereFragmentShader = null;
-    private final GL3DHitReferenceShape accellerationShapeS;
     private final JHVJPXView jpxView;
 
     public GL3DImageLayer(String name, GL3DView mainLayerView) {
@@ -100,13 +99,10 @@ public abstract class GL3DImageLayer extends GL3DOrientedGroup implements GL3DCa
         }
 
         this.accellerationShape = new GL3DHitReferenceShape(false);
-        this.accellerationShapeS = new GL3DHitReferenceShape(true);
         this.jpxView = this.mainLayerView.getAdapter(JHVJPXView.class);
         if (this.regionView != null) {
             this.jpxView.addViewListener(this.accellerationShape);
-            this.jpxView.addViewListener(this.accellerationShapeS);
             this.jpxView.addViewListener(this);
-
         }
 
         getCoordinateSystem().addListener(this);
@@ -178,16 +174,12 @@ public abstract class GL3DImageLayer extends GL3DOrientedGroup implements GL3DCa
 
     private void updateROI(GL3DCamera activeCamera) {
         MetaData metaData = metaDataView.getMetaData();
-
         if (metaData == null) {
-            // No Image Data found
             return;
         }
 
         GL3DRayTracer rayTracer = new GL3DRayTracer(this.accellerationShape, activeCamera);
-        GL3DRayTracer rayTracerS = new GL3DRayTracer(this.accellerationShapeS, activeCamera);
 
-        // Shoot Rays in the corners of the viewport
         int width = (int) activeCamera.getWidth();
         int height = (int) activeCamera.getHeight();
         double minPhysicalX = Double.MAX_VALUE;
@@ -195,57 +187,36 @@ public abstract class GL3DImageLayer extends GL3DOrientedGroup implements GL3DCa
         double maxPhysicalX = -Double.MAX_VALUE;
         double maxPhysicalY = -Double.MAX_VALUE;
 
-        double res = 100.;
+        double res = 10.;
         for (int i = 0; i <= res; i++) {
             for (int j = 0; j <= 1; j++) {
-                GL3DRay ray = rayTracer.cast((int) (i * width / res), (int) (j * height / 1.));
-                GL3DVec3d hitPoint = ray.getHitPoint();
-                if (hitPoint != null) {
-                    hitPoint = ray.getHitPoint();
-
-                    minPhysicalX = Math.min(minPhysicalX, hitPoint.x);
-                    minPhysicalY = Math.min(minPhysicalY, hitPoint.y);
-                    maxPhysicalX = Math.max(maxPhysicalX, hitPoint.x);
-                    maxPhysicalY = Math.max(maxPhysicalY, hitPoint.y);
-                }
-                GL3DRay rayS = rayTracerS.cast((int) (i * width / res), (int) (j * height / 1.));
-
-                hitPoint = rayS.getHitPoint();
-                if (hitPoint != null) {
-                    hitPoint = ray.getHitPoint();
-
-                    hitPoint = activeCamera.getLocalRotation().toMatrix().multiply(hitPoint);
-                    minPhysicalX = Math.min(minPhysicalX, hitPoint.x);
-                    minPhysicalY = Math.min(minPhysicalY, hitPoint.y);
-                    maxPhysicalX = Math.max(maxPhysicalX, hitPoint.x);
-                    maxPhysicalY = Math.max(maxPhysicalY, hitPoint.y);
-
+                for (final boolean on : new boolean[] { false, true }) {
+                    this.accellerationShape.setHitCoronaPlane(on);
+                    GL3DRay ray = rayTracer.cast((int) (i * width / res), (int) (j * height / 1.));
+                    GL3DVec3d hitPoint = ray.getHitPoint();
+                    if (hitPoint != null) {
+                        hitPoint = ray.getHitPoint();
+                        minPhysicalX = Math.min(minPhysicalX, hitPoint.x);
+                        minPhysicalY = Math.min(minPhysicalY, hitPoint.y);
+                        maxPhysicalX = Math.max(maxPhysicalX, hitPoint.x);
+                        maxPhysicalY = Math.max(maxPhysicalY, hitPoint.y);
+                    }
                 }
             }
         }
         for (int i = 0; i <= 1; i++) {
             for (int j = 0; j <= res; j++) {
-                GL3DRay ray = rayTracer.cast((int) (i * width / 1.), (int) (j * height / res));
-                GL3DVec3d hitPoint = ray.getHitPoint();
-                if (hitPoint != null) {
-                    hitPoint = ray.getHitPoint();
-
-                    minPhysicalX = Math.min(minPhysicalX, hitPoint.x);
-                    minPhysicalY = Math.min(minPhysicalY, hitPoint.y);
-                    maxPhysicalX = Math.max(maxPhysicalX, hitPoint.x);
-                    maxPhysicalY = Math.max(maxPhysicalY, hitPoint.y);
-
-                }
-                GL3DRay rayS = rayTracerS.cast((int) (i * width / 1.), (int) (j * height / res));
-                hitPoint = rayS.getHitPoint();
-                if (hitPoint != null) {
-                    hitPoint = ray.getHitPoint();
-
-                    minPhysicalX = Math.min(minPhysicalX, hitPoint.x);
-                    minPhysicalY = Math.min(minPhysicalY, hitPoint.y);
-                    maxPhysicalX = Math.max(maxPhysicalX, hitPoint.x);
-                    maxPhysicalY = Math.max(maxPhysicalY, hitPoint.y);
-
+                for (final boolean on : new boolean[] { false, true }) {
+                    this.accellerationShape.setHitCoronaPlane(on);
+                    GL3DRay ray = rayTracer.cast((int) (i * width / 1.), (int) (j * height / res));
+                    GL3DVec3d hitPoint = ray.getHitPoint();
+                    if (hitPoint != null) {
+                        hitPoint = ray.getHitPoint();
+                        minPhysicalX = Math.min(minPhysicalX, hitPoint.x);
+                        minPhysicalY = Math.min(minPhysicalY, hitPoint.y);
+                        maxPhysicalX = Math.max(maxPhysicalX, hitPoint.x);
+                        maxPhysicalY = Math.max(maxPhysicalY, hitPoint.y);
+                    }
                 }
             }
         }
