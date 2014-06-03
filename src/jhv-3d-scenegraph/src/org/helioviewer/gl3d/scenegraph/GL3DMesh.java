@@ -20,9 +20,9 @@ import org.helioviewer.gl3d.scenegraph.rt.GL3DRay;
  * coordinates, and indices, that connect vertices to faces. An implementation
  * must provide these attributes and indices which will be converted to
  * {@link GL3DBuffer}.
- *
+ * 
  * @author Simon Spoerri (simon.spoerri@fhnw.ch)
- *
+ * 
  */
 public abstract class GL3DMesh extends GL3DShape {
     protected GL3DBuffer positionVBO;
@@ -86,7 +86,7 @@ public abstract class GL3DMesh extends GL3DShape {
         this.texcoordVBO = GL3DBuffer.create2DTextureCoordinateBuffer(state, textCoords);
         this.indexVBO = GL3DBuffer.createIndexBuffer(state, indices);
 
-        this.triangles = buildTriangles();
+        this.setTriangles(buildTriangles());
         meshLock.unlock();
     }
 
@@ -119,7 +119,7 @@ public abstract class GL3DMesh extends GL3DShape {
         this.texcoordVBO = GL3DBuffer.create2DTextureCoordinateBuffer(state, textCoords);
         this.indexVBO = GL3DBuffer.createIndexBuffer(state, indices);
 
-        this.triangles = buildTriangles();
+        this.setTriangles(buildTriangles());
 
         meshLock.unlock();
     }
@@ -269,7 +269,7 @@ public abstract class GL3DMesh extends GL3DShape {
 
     @Override
     public boolean shapeHit(GL3DRay ray) {
-        for (GL3DTriangle t : this.triangles) {
+        for (GL3DTriangle t : this.getTriangles()) {
             if (t.intersects(ray)) {
                 ray.setOriginShape(this);
 
@@ -381,6 +381,14 @@ public abstract class GL3DMesh extends GL3DShape {
     }
 
     public abstract GL3DMeshPrimitive createMesh(GL3DState state, List<GL3DVec3d> positions, List<GL3DVec3d> normals, List<GL3DVec2d> textCoords, List<Integer> indices, List<GL3DVec4d> colors);
+
+    public List<GL3DTriangle> getTriangles() {
+        return triangles;
+    }
+
+    public void setTriangles(List<GL3DTriangle> triangles) {
+        this.triangles = triangles;
+    }
 
     public enum GL3DMeshPrimitive {
         TRIANGLES(GL.GL_TRIANGLES), TRIANGLE_STRIP(GL.GL_TRIANGLE_STRIP), TRIANGLE_FAN(GL.GL_TRIANGLE_FAN), POINTS(GL.GL_POINTS), QUADS(GL.GL_QUADS), LINES(GL.GL_LINES), LINE_LOOP(GL.GL_LINE_LOOP), LINE_STRIP(GL.GL_LINE_STRIP);
