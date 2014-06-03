@@ -31,20 +31,23 @@ public class RadioImagePane implements ImageObserver, RadioPlotModelListener, Dr
         this.plotIdentifier = plotIdentifier;
         this.radioPlotModel = RadioPlotModel.getSingletonInstance();
     }
-    
+
     @Override
     public boolean imageUpdate(Image img, int infoflags, int x, int y, int width, int height) {
         return false;
     }
 
     @Override
-    public void drawBufferedImage(BufferedImage image, DrawableAreaMap map) {}
+    public void drawBufferedImage(BufferedImage image, DrawableAreaMap map) {
+    }
 
     @Override
-    public void changeVisibility(long iD) {}
+    public void changeVisibility(long iD) {
+    }
 
     @Override
-    public void removeDownloadRequestData(long iD) {}
+    public void removeDownloadRequestData(long iD) {
+    }
 
     @Override
     public DrawableElementType getDrawableElementType() {
@@ -54,15 +57,17 @@ public class RadioImagePane implements ImageObserver, RadioPlotModelListener, Dr
     @Override
     public void draw(Graphics g, Rectangle graphArea) {
         Log.trace("redraw radio image pane for plot : " + plotIdentifier);
+        Thread.dumpStack();
         if (!this.intervalTooBig) {
             Collection<NoDataConfig> noDataConfigs = radioPlotModel.getNoDataConfigurations(plotIdentifier);
-            Log.trace("Draw no data configs. Size: "+ noDataConfigs.size());
+            Log.trace("Draw no data configs. Size: " + noDataConfigs.size());
             for (NoDataConfig ndc : noDataConfigs) {
                 ndc.draw(g);
             }
             Collection<PlotConfig> configs = radioPlotModel.getPlotConfigurations(plotIdentifier);
             Log.trace("Number of plotconfigs: " + configs.size());
             for (PlotConfig pc : configs) {
+                Log.trace("imageID" + pc.getImageId());
                 pc.draw(g);
             }
         } else {
@@ -79,7 +84,7 @@ public class RadioImagePane implements ImageObserver, RadioPlotModelListener, Dr
             g.setColor(Color.black);
             g.drawString(text1, x1, y1);
             g.drawString(text2, x2, y2);
-            
+
         }
     }
 
