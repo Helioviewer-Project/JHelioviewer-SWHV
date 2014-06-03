@@ -8,7 +8,6 @@ import java.util.List;
 import org.helioviewer.base.physics.Astronomy;
 import org.helioviewer.base.physics.Constants;
 import org.helioviewer.base.physics.DifferentialRotation;
-import org.helioviewer.gl3d.camera.GL3DCamera;
 import org.helioviewer.gl3d.model.image.GL3DImageMesh;
 import org.helioviewer.gl3d.scenegraph.GL3DAABBox;
 import org.helioviewer.gl3d.scenegraph.GL3DDrawBits.Bit;
@@ -41,7 +40,7 @@ import org.helioviewer.viewmodel.view.ViewListener;
 public class GL3DHitReferenceShape extends GL3DMesh implements ViewListener {
     private static final double extremeValue = 4000000.;
 
-    private final boolean allowBacksideHits;
+    private final boolean hitCoronaPlane;
     private final GL3DMat4d hitRotation;
 
     private Date currentDate;
@@ -56,9 +55,9 @@ public class GL3DHitReferenceShape extends GL3DMesh implements ViewListener {
         this(false);
     }
 
-    public GL3DHitReferenceShape(boolean allowBacksideHits) {
+    public GL3DHitReferenceShape(boolean hitCoronaPlane) {
         super("Hit Reference Shape");
-        this.allowBacksideHits = allowBacksideHits;
+        this.hitCoronaPlane = hitCoronaPlane;
         this.hitRotation = new GL3DMat4d();
         this.hitRotation.setIdentity();
         this.localRotation = GL3DQuatd.createRotation(0., new GL3DVec3d(0., 1., 0.));
@@ -98,14 +97,10 @@ public class GL3DHitReferenceShape extends GL3DMesh implements ViewListener {
 
     @Override
     public boolean hit(GL3DRay ray) {
-        // if its hidden, it can't be hit
         if (isDrawBitOn(Bit.Hidden) || this.wmI == null) {
             return false;
-
         }
 
-        // Transform ray to object space for non-groups
-        GL3DCamera activeCamera = GL3DState.get().getActiveCamera();
         ray.setOriginOS(this.wmI.multiply(this.localRotation.toMatrix().multiply(ray.getOrigin())));
         GL3DVec3d helpingDir = this.wmI.multiply(this.localRotation.toMatrix().multiply(ray.getDirection()));
         helpingDir.normalize();
@@ -118,7 +113,7 @@ public class GL3DHitReferenceShape extends GL3DMesh implements ViewListener {
         // Hit detection happens in Object-Space
         boolean isSphereHit = isSphereHit(ray);
         // boolean isSphereHit = isSphereHitInOS(ray);
-        if (isSphereHit & this.allowBacksideHits) {
+        if (isSphereHit & this.hitCoronaPlane) {
             // GL3DVec3d hitPoint = this.wmI.multiply(ray.getHitPoint()).;
             GL3DVec3d hitPoint = ray.getHitPoint();
             GL3DVec3d projectionPlaneNormal = new GL3DVec3d(0, 0, 1);
@@ -133,13 +128,13 @@ public class GL3DHitReferenceShape extends GL3DMesh implements ViewListener {
             if (pointOnSphereBackside) {
                 // Hit the backside of the sphere, ray must have hit the plane
                 // first
-                isSphereHit = this.allowBacksideHits;
+                isSphereHit = this.hitCoronaPlane;
                 // Log.debug("GL3DHitReferenceShape: Viewing Plane from Behind! "+pointOnSphere+
                 // " Projection Plane: "+ projectionPlaneNormal);
             }
         }
 
-        if (isSphereHit & this.allowBacksideHits) {
+        if (isSphereHit & this.hitCoronaPlane) {
             ray.isOnSun = true;
             ray.setHitPoint(this.localRotation.toMatrix().multiply(ray.getHitPoint()));
             // ray.setHitPoint(this.wmI.multiply(ray.getHitPoint()));
