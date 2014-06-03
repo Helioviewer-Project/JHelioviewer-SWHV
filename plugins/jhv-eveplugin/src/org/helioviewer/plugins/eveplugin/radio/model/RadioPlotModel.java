@@ -114,11 +114,19 @@ public class RadioPlotModel implements RadioDataManagerListener, ZoomDataConfigL
     }
 
     @Override
-    public void newDataAvailable(DownloadRequestData data, long ID) {
+    public void newDataAvailable(DownloadRequestData data, long downloadID) {
         synchronized (this) {
-            getRadioPlotModelData(data.getPlotIdentifier()).getDownloadRequestData().put(ID, data);
-            Map<Long, PlotConfig> plotConfigList = new HashMap<Long, PlotConfig>();
-            getRadioPlotModelData(data.getPlotIdentifier()).getPlotConfigList().put(ID, plotConfigList);
+            Map<Long, DownloadRequestData> drd = getRadioPlotModelData(data.getPlotIdentifier()).getDownloadRequestData();
+            if (drd.containsKey(downloadID)) {
+                drd.get(downloadID).mergeDownloadRequestData(data);
+            } else {
+                drd.put(downloadID, data);
+            }
+            Map<Long, Map<Long, PlotConfig>> plotConfigListMap = getRadioPlotModelData(data.getPlotIdentifier()).getPlotConfigList();
+            if (!plotConfigListMap.containsKey(downloadID)) {
+                Map<Long, PlotConfig> plotConfigList = new HashMap<Long, PlotConfig>();
+                getRadioPlotModelData(data.getPlotIdentifier()).getPlotConfigList().put(downloadID, plotConfigList);
+            }
         }
     }
 
@@ -290,6 +298,7 @@ public class RadioPlotModel implements RadioDataManagerListener, ZoomDataConfigL
 
     @Override
     public void requestData(Date xStart, Date xEnd, double yStart, double yEnd, double xRatio, double yRatio, long ID, String plotIdentifier) {
+        Log.trace("Request for data in : " + xStart + " - " + xEnd);
         Thread t = new Thread(new Runnable() {
 
             Date xStart;
@@ -332,7 +341,6 @@ public class RadioPlotModel implements RadioDataManagerListener, ZoomDataConfigL
         YAxisElement yAxisElement = rpmd.getyAxisElement();
         radioImagePane.setYAxisElement(yAxisElement);
         drawController.updateDrawableElement(radioImagePane, identifier);
-        chartModel.chartRedrawRequest();
     }
 
     private BufferedImage createBufferedImage(int width, int height, byte[] data) {
@@ -357,7 +365,6 @@ public class RadioPlotModel implements RadioDataManagerListener, ZoomDataConfigL
             for (RadioPlotModelListener l : listeners) {
                 l.removeDownloadRequestData(ID);
             }
-            chartModel.chartRedrawRequest();
         }
     }
 
@@ -366,7 +373,6 @@ public class RadioPlotModel implements RadioDataManagerListener, ZoomDataConfigL
         for (RadioPlotModelListener l : listeners) {
             l.changeVisibility(ID);
         }
-        chartModel.chartRedrawRequest();
     }
 
     private RadioPlotModelData getRadioPlotModelData(String identifier) {

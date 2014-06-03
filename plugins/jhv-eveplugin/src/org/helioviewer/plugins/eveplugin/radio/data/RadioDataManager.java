@@ -315,7 +315,8 @@ public class RadioDataManager implements RadioDownloaderListener {
 
     @Override
     public void newNoData(List<Interval<Date>> noDataList, String identifier, long downloadID) {
-        if (!eveState.isMouseTimeIntervalDragging() && !eveState.isMouseValueIntervalDragging()) {
+        Log.trace("noDataList size : " + noDataList.size());
+        if (!eveState.isMouseTimeIntervalDragging() && !eveState.isMouseValueIntervalDragging() && noDataList.size() > 0) {
             fireNoDataIntervalsReceived(noDataList, downloadID, identifier);
         }
     }
@@ -585,11 +586,11 @@ public class RadioDataManager implements RadioDownloaderListener {
     private void fireClearSavedImages(Long downloadID, List<Long> toRemove, String plotIdentifier) {
         Log.trace("Clear images for downloadID " + downloadID + " and plotIdentifier " + plotIdentifier + " nr of elements to remove: " + toRemove.size());
         for (Long imageID : toRemove) {
+            Log.trace("Remove image ID : " + imageID);
             for (RadioDataManagerListener l : listeners) {
                 l.clearAllSavedImagesForID(downloadID, imageID, plotIdentifier);
             }
         }
-
     }
 
     /**

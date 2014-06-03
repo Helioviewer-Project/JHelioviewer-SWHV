@@ -114,4 +114,20 @@ public class DownloadRequestData implements LineDataSelectorElement {
         // TODO Auto-generated method stub
         return "Don't know yet";
     }
+
+    /**
+     * Merges the download request data in this download request data. If the
+     * plot identifier and the download identifier are the same, the extra radio
+     * images are added to the radio images of this download request data. The
+     * downloading status and visibility status of this download request data is
+     * kept.
+     * 
+     * @param downloadRequestData
+     *            The download request data to be merged in this
+     */
+    public void mergeDownloadRequestData(DownloadRequestData downloadRequestData) {
+        if (downloadRequestData.getDownloadID() == downloadID && downloadRequestData.getPlotIdentifier() == plotIdentifier) {
+            radioImages.putAll(downloadRequestData.getRadioImages());
+        }
+    }
 }
