@@ -1,8 +1,13 @@
 package org.helioviewer.gl3d.model;
 
+import java.util.Calendar;
+import java.util.Date;
+import java.util.GregorianCalendar;
 import java.util.List;
 
+import org.helioviewer.base.physics.Astronomy;
 import org.helioviewer.base.physics.Constants;
+import org.helioviewer.base.physics.DifferentialRotation;
 import org.helioviewer.gl3d.camera.GL3DCamera;
 import org.helioviewer.gl3d.model.image.GL3DImageMesh;
 import org.helioviewer.gl3d.scenegraph.GL3DAABBox;
@@ -11,10 +16,17 @@ import org.helioviewer.gl3d.scenegraph.GL3DMesh;
 import org.helioviewer.gl3d.scenegraph.GL3DState;
 import org.helioviewer.gl3d.scenegraph.GL3DTriangle;
 import org.helioviewer.gl3d.scenegraph.math.GL3DMat4d;
+import org.helioviewer.gl3d.scenegraph.math.GL3DQuatd;
 import org.helioviewer.gl3d.scenegraph.math.GL3DVec2d;
 import org.helioviewer.gl3d.scenegraph.math.GL3DVec3d;
 import org.helioviewer.gl3d.scenegraph.math.GL3DVec4d;
 import org.helioviewer.gl3d.scenegraph.rt.GL3DRay;
+import org.helioviewer.viewmodel.changeevent.ChangeEvent;
+import org.helioviewer.viewmodel.changeevent.TimestampChangedReason;
+import org.helioviewer.viewmodel.view.LinkedMovieManager;
+import org.helioviewer.viewmodel.view.TimedMovieView;
+import org.helioviewer.viewmodel.view.View;
+import org.helioviewer.viewmodel.view.ViewListener;
 
 /**
  * The {@link GL3DHitReferenceShape} unifies all possible Image Layers (
@@ -26,11 +38,19 @@ import org.helioviewer.gl3d.scenegraph.rt.GL3DRay;
  * @author Simon Spoerri (simon.spoerri@fhnw.ch)
  * 
  */
-public class GL3DHitReferenceShape extends GL3DMesh {
+public class GL3DHitReferenceShape extends GL3DMesh implements ViewListener {
     private static final double extremeValue = 4000000.;
 
     private final boolean allowBacksideHits;
     private final GL3DMat4d hitRotation;
+
+    private Date currentDate;
+
+    private long timediff;
+
+    private double currentRotation;
+
+    private final GL3DQuatd localRotation;
 
     public GL3DHitReferenceShape() {
         this(false);
@@ -41,12 +61,7 @@ public class GL3DHitReferenceShape extends GL3DMesh {
         this.allowBacksideHits = allowBacksideHits;
         this.hitRotation = new GL3DMat4d();
         this.hitRotation.setIdentity();
-    }
-
-    public GL3DHitReferenceShape(boolean allowBacksideHits, GL3DMat4d phiRotation) {
-        super("Hit Reference Shape");
-        this.allowBacksideHits = allowBacksideHits;
-        this.hitRotation = phiRotation;
+        this.localRotation = GL3DQuatd.createRotation(0., new GL3DVec3d(0., 1., 0.));
     }
 
     @Override
@@ -62,17 +77,9 @@ public class GL3DHitReferenceShape extends GL3DMesh {
         GL3DVec3d tl = createVertex(-extremeValue, extremeValue, 0);
 
         positions.add(ll);
-        // normals.add(new GL3DVec3d(0, 0, 1));
-        // colors.add(new GL3DVec4d(0, 0, 1, 1.0));
         positions.add(lr);
-        // normals.add(new GL3DVec3d(0, 0, 1));
-        // colors.add(new GL3DVec4d(0, 0, 1, 1.0));
         positions.add(tr);
-        // normals.add(new GL3DVec3d(0, 0, 1));
-        // colors.add(new GL3DVec4d(0, 0, 1, 1.0));
         positions.add(tl);
-        // normals.add(new GL3DVec3d(0, 0, 1));
-        // colors.add(new GL3DVec4d(0, 0, 1, 1.0));
 
         indices.add(0);
         indices.add(1);
@@ -86,12 +93,7 @@ public class GL3DHitReferenceShape extends GL3DMesh {
     }
 
     private GL3DVec3d createVertex(double x, double y, double z) {
-
-        double cx = x * hitRotation.m[0] + y * hitRotation.m[4] + z * hitRotation.m[8] + hitRotation.m[12];
-        double cy = x * hitRotation.m[1] + y * hitRotation.m[5] + z * hitRotation.m[9] + hitRotation.m[13];
-        double cz = x * hitRotation.m[2] + y * hitRotation.m[6] + z * hitRotation.m[10] + hitRotation.m[14];
-
-        return new GL3DVec3d(cx, cy, cz);
+        return new GL3DVec3d(x, y, z);
     }
 
     @Override
@@ -104,8 +106,8 @@ public class GL3DHitReferenceShape extends GL3DMesh {
 
         // Transform ray to object space for non-groups
         GL3DCamera activeCamera = GL3DState.get().getActiveCamera();
-        ray.setOriginOS(this.wmI.multiply(activeCamera.getLocalRotation().toMatrix().multiply(ray.getOrigin())));
-        GL3DVec3d helpingDir = this.wmI.multiply(activeCamera.getLocalRotation().toMatrix().multiply(ray.getDirection()));
+        ray.setOriginOS(this.wmI.multiply(this.localRotation.toMatrix().multiply(ray.getOrigin())));
+        GL3DVec3d helpingDir = this.wmI.multiply(this.localRotation.toMatrix().multiply(ray.getDirection()));
         helpingDir.normalize();
         ray.setDirOS(helpingDir);
         return this.shapeHit(ray);
@@ -139,6 +141,7 @@ public class GL3DHitReferenceShape extends GL3DMesh {
 
         if (isSphereHit & this.allowBacksideHits) {
             ray.isOnSun = true;
+            ray.setHitPoint(this.localRotation.toMatrix().multiply(ray.getHitPoint()));
             // ray.setHitPoint(this.wmI.multiply(ray.getHitPoint()));
             return true;
         } else {
@@ -147,6 +150,7 @@ public class GL3DHitReferenceShape extends GL3DMesh {
                 ray.setHitPointOS(this.wmI.multiply(ray.getHitPoint()));
         }
 
+        ray.setHitPoint(this.localRotation.toMatrix().multiply(ray.getHitPoint()));
         return true;
     }
 
@@ -200,7 +204,6 @@ public class GL3DHitReferenceShape extends GL3DMesh {
         ray.setHitPoint(rayCopy);
         ray.isOutside = false;
         ray.setOriginShape(this);
-        // Log.debug("GL3DShape.shapeHit: Hit at Distance: "+t+" HitPoint: "+ray.getHitPoint());
         return true;
     }
 
@@ -211,4 +214,23 @@ public class GL3DHitReferenceShape extends GL3DMesh {
         return this.aabb;
     }
 
+    @Override
+    public void viewChanged(View sender, ChangeEvent aEvent) {
+        TimestampChangedReason timestampReason = aEvent.getLastChangedReasonByType(TimestampChangedReason.class);
+        if ((timestampReason != null) && (timestampReason.getView() instanceof TimedMovieView) && LinkedMovieManager.getActiveInstance().isMaster((TimedMovieView) timestampReason.getView())) {
+            currentDate = timestampReason.getNewDateTime().getTime();
+            updateRotation();
+        }
+    }
+
+    public void updateRotation() {
+        this.timediff = (currentDate.getTime()) / 1000 - Constants.referenceDate;
+        this.currentRotation = DifferentialRotation.calculateRotationInRadians(0., this.timediff) % (Math.PI * 2.0);
+        Calendar cal = new GregorianCalendar();
+        cal.setTime(new Date(currentDate.getTime()));
+        double b0 = Astronomy.getB0InRadians(cal);
+        this.localRotation.clear();
+        this.localRotation.rotate(GL3DQuatd.createRotation(-b0, new GL3DVec3d(1, 0, 0)));
+        this.localRotation.rotate(GL3DQuatd.createRotation(this.currentRotation, new GL3DVec3d(0, 1, 0)));
+    }
 }
