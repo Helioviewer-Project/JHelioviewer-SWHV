@@ -57,7 +57,6 @@ public class RadioImagePane implements ImageObserver, RadioPlotModelListener, Dr
     @Override
     public void draw(Graphics g, Rectangle graphArea) {
         Log.trace("redraw radio image pane for plot : " + plotIdentifier);
-        Thread.dumpStack();
         if (!this.intervalTooBig) {
             Collection<NoDataConfig> noDataConfigs = radioPlotModel.getNoDataConfigurations(plotIdentifier);
             Log.trace("Draw no data configs. Size: " + noDataConfigs.size());
