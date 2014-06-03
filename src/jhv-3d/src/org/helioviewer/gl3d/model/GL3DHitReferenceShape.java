@@ -110,43 +110,19 @@ public class GL3DHitReferenceShape extends GL3DMesh implements ViewListener {
 
     @Override
     public boolean shapeHit(GL3DRay ray) {
-        // Hit detection happens in Object-Space
-        boolean isSphereHit = isSphereHit(ray);
-        // boolean isSphereHit = isSphereHitInOS(ray);
-        if (isSphereHit & this.hitCoronaPlane) {
-            // GL3DVec3d hitPoint = this.wmI.multiply(ray.getHitPoint()).;
-            GL3DVec3d hitPoint = ray.getHitPoint();
-            GL3DVec3d projectionPlaneNormal = new GL3DVec3d(0, 0, 1);
-            GL3DVec3d pointOnSphere = this.wmI.multiply(ray.getHitPoint());
-            ray.setHitPointOS(pointOnSphere);
-            pointOnSphere.normalize();
-            double cos = pointOnSphere.dot(projectionPlaneNormal);
-
-            boolean pointOnSphereBackside = cos < 0;
-            // boolean pointOnSphereBackside = pointOnSphere.z<0;
-
-            if (pointOnSphereBackside) {
-                // Hit the backside of the sphere, ray must have hit the plane
-                // first
-                isSphereHit = this.hitCoronaPlane;
-                // Log.debug("GL3DHitReferenceShape: Viewing Plane from Behind! "+pointOnSphere+
-                // " Projection Plane: "+ projectionPlaneNormal);
-            }
-        }
-
-        if (isSphereHit & this.hitCoronaPlane) {
+        boolean isSphereHit = false;
+        if (!this.hitCoronaPlane) {
+            isSphereHit = isSphereHit(ray);
             ray.isOnSun = true;
-            ray.setHitPoint(this.localRotation.toMatrix().multiply(ray.getHitPoint()));
-            // ray.setHitPoint(this.wmI.multiply(ray.getHitPoint()));
-            return true;
-        } else {
+        } else if (this.hitCoronaPlane || !isSphereHit) {
             super.shapeHit(ray);
-            if (ray.getHitPoint() != null)
-                ray.setHitPointOS(this.wmI.multiply(ray.getHitPoint()));
         }
-
-        ray.setHitPoint(this.localRotation.toMatrix().multiply(ray.getHitPoint()));
-        return true;
+        if (ray.getHitPoint() != null) {
+            ray.setHitPointOS(this.wmI.multiply(this.localRotation.toMatrix().multiply(ray.getHitPoint())));
+            ray.setHitPoint(this.localRotation.toMatrix().multiply(ray.getHitPoint()));
+            return true;
+        }
+        return false;
     }
 
     public boolean shapeHitPlanar(GL3DRay ray) {
