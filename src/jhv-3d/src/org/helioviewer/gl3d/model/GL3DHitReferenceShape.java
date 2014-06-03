@@ -9,6 +9,7 @@ import org.helioviewer.gl3d.scenegraph.GL3DAABBox;
 import org.helioviewer.gl3d.scenegraph.GL3DDrawBits.Bit;
 import org.helioviewer.gl3d.scenegraph.GL3DMesh;
 import org.helioviewer.gl3d.scenegraph.GL3DState;
+import org.helioviewer.gl3d.scenegraph.GL3DTriangle;
 import org.helioviewer.gl3d.scenegraph.math.GL3DMat4d;
 import org.helioviewer.gl3d.scenegraph.math.GL3DVec2d;
 import org.helioviewer.gl3d.scenegraph.math.GL3DVec3d;
@@ -147,6 +148,22 @@ public class GL3DHitReferenceShape extends GL3DMesh {
         }
 
         return true;
+    }
+
+    public boolean shapeHitPlanar(GL3DRay ray) {
+        for (GL3DTriangle t : this.getTriangles()) {
+            if (t.intersectsPlanar(ray)) {
+                ray.setOriginShape(this);
+
+                GL3DVec3d rayCopy2 = ray.getDirection().copy();
+                rayCopy2.multiply(ray.getLength());
+                GL3DVec3d rayCopy = ray.getOrigin().copy();
+                rayCopy.add(rayCopy2);
+                ray.setHitPoint(rayCopy);
+                return true;
+            }
+        }
+        return false;
     }
 
     private boolean isSphereHit(GL3DRay ray) {
