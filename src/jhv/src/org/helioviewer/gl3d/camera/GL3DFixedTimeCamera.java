@@ -42,6 +42,7 @@ public class GL3DFixedTimeCamera extends GL3DSolarRotationTrackingTrackballCamer
 
     public GL3DFixedTimeCamera(GL3DSceneGraphView sceneGraphView) {
         super(sceneGraphView);
+        currentDate = new Date();
     }
 
     @Override
