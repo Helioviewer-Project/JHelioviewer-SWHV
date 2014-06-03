@@ -78,7 +78,6 @@ public class GL3DTrackballRotationInteraction extends GL3DDefaultInteraction {
         if (ray.isOnSun) {
             hitPoint = ray.getHitPoint();
             hitPoint.normalize();
-
             hitPoint = camera.getLocalRotation().toMatrix().multiply(hitPoint);
 
         } else {
