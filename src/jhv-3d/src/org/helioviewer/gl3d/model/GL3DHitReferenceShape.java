@@ -40,7 +40,7 @@ import org.helioviewer.viewmodel.view.ViewListener;
 public class GL3DHitReferenceShape extends GL3DMesh implements ViewListener {
     private static final double extremeValue = 4000000.;
 
-    private final boolean hitCoronaPlane;
+    private boolean hitCoronaPlane;
     private final GL3DMat4d hitRotation;
 
     private Date currentDate;
@@ -61,6 +61,14 @@ public class GL3DHitReferenceShape extends GL3DMesh implements ViewListener {
         this.hitRotation = new GL3DMat4d();
         this.hitRotation.setIdentity();
         this.localRotation = GL3DQuatd.createRotation(0., new GL3DVec3d(0., 1., 0.));
+    }
+
+    public boolean isHitCoronaPlane() {
+        return hitCoronaPlane;
+    }
+
+    public void setHitCoronaPlane(boolean hitCoronaPlane) {
+        this.hitCoronaPlane = hitCoronaPlane;
     }
 
     @Override
