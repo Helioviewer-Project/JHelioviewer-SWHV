@@ -16,7 +16,7 @@ import org.helioviewer.base.message.Message;
 import org.helioviewer.jhv.io.APIRequestManager;
 import org.helioviewer.viewmodel.view.ImageInfoView;
 
-public class RadioDownloader{
+public class RadioDownloader {
     // Make connection with server to request the jpx
     // Make structure indicating the start and stop for every jpx in the file
     // give the data for a certain zoomlevel and timerange
@@ -94,7 +94,7 @@ public class RadioDownloader{
                     Message.err("An error occured while opening the remote file!", e.getMessage(), false);
                 }
             }
-            
+
             private void fireIntervalTooBig(Date startDate, Date endDate, long downloadID, String plotIdentifier) {
                 for (RadioDownloaderListener l : listeners) {
                     l.intervalTooBig(startDate, endDate, downloadID, identifier);
@@ -104,7 +104,6 @@ public class RadioDownloader{
 
         thread.start();
     }
-
 
     public void requestAndOpenIntervals(List<Interval<Date>> intervals, Long downloadId, String plotIdentifier, double ratioX, double ratioY) {
         for (Interval<Date> interval : intervals) {
@@ -154,10 +153,10 @@ public class RadioDownloader{
                                         DownloadedJPXData newJPXData = new DownloadedJPXData(v, imageID, startDate, endDate, identifier, downloadID);
                                         jpxList.add(newJPXData);
                                         cache.add(newJPXData);
-                                    } else { 
-                                        Log.error("Received null view in request intervals for date " + startDate + " and " + endDate);                                    
+                                    } else {
+                                        Log.error("Received null view in request intervals for date " + startDate + " and " + endDate);
                                         if (cache.addNoDataInterval(new Interval<Date>(startDate, calculateOneDayFurtherAsDate(startDate)), identifier)) {
-                                            noDataList.add(new Interval<Date>(startDate, calculateOneDayFurtherAsDate(startDate)));                
+                                            noDataList.add(new Interval<Date>(startDate, calculateOneDayFurtherAsDate(startDate)));
                                         }
                                     }
                                 } else {
@@ -176,8 +175,8 @@ public class RadioDownloader{
                             if (!jpxList.isEmpty()) {
                                 fireAdditionalJPXDataAvailable(jpxList, identifier, requestedStartDate, endDate, downloadID, ratioX, ratioY);
                             }
-                            Log.trace("Size of noDataList in request intervals: "+ noDataList.size());
-                            fireNoData(noDataList, identifier, downloadID);                            
+                            Log.trace("Size of noDataList in request intervals: " + noDataList.size());
+                            fireNoData(noDataList, identifier, downloadID);
                         }
                     } catch (IOException e) {
                         Log.error("An error occured while opening the remote file!", e);
@@ -185,17 +184,9 @@ public class RadioDownloader{
                     }
                 }
 
-            }.init(createDateString(interval.getStart()), createDateString(interval.getEnd()), plotIdentifier, downloadId, ratioX, ratioY), "LoadNewImage"+(Math.round(Math.random()*10000)));
+            }.init(createDateString(interval.getStart()), createDateString(interval.getEnd()), plotIdentifier, downloadId, ratioX, ratioY), "LoadNewImage" + (Math.round(Math.random() * 10000)));
 
             thread.start();
-            /*try {
-                thread.join();
-            } catch (InterruptedException e) {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
-            }*/
-            
-            
         }
     }
 
@@ -238,7 +229,6 @@ public class RadioDownloader{
         return new Date(date.getTime() + 86400000);
     }
 
-
     private Date parseDate(String date) {
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
         sdf.setTimeZone(TimeZone.getTimeZone("UTC"));
@@ -255,10 +245,10 @@ public class RadioDownloader{
         sdf.setTimeZone(TimeZone.getTimeZone("UTC"));
         return sdf.format(date);
     }
-    
+
     private void fireNoData(List<Interval<Date>> noDataList, String identifier, long downloadID) {
         for (RadioDownloaderListener l : listeners) {
-            l.newNoData(noDataList, identifier,downloadID);
+            l.newNoData(noDataList, identifier, downloadID);
         }
     }
 
