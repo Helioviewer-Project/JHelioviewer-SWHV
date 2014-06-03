@@ -11,9 +11,8 @@ import org.helioviewer.plugins.eveplugin.draw.YAxisElement;
 import org.helioviewer.plugins.eveplugin.radio.data.DownloadRequestData;
 import org.helioviewer.plugins.eveplugin.radio.gui.RadioImagePane;
 
-
 /**
- * Collects per plot identifier some data needed by the radio plot model. 
+ * Collects per plot identifier some data needed by the radio plot model.
  * 
  * @author Bram.Bourgoignie@oma.be
  */
@@ -89,21 +88,20 @@ public class RadioPlotModelData {
     /**
      * Gives the no data configuration list.
      * 
-     * @return  Map containing per download id a list of no data configurations
+     * @return Map containing per download id a list of no data configurations
      */
     public Map<Long, List<NoDataConfig>> getNoDataConfigList() {
         return noDataConfigList;
     }
 
     /**
-     * Sets the no data configuration list. 
+     * Sets the no data configuration list.
      * 
-     * @param noDataConfigList  The no data configuration list
+     * @param noDataConfigList
+     *            The no data configuration list
      */
     public void setNoDataConfigList(Map<Long, List<NoDataConfig>> noDataConfigList) {
         this.noDataConfigList = noDataConfigList;
     }
-    
-    
 
 }
