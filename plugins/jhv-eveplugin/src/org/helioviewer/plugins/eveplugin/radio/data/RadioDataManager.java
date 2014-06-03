@@ -321,6 +321,19 @@ public class RadioDataManager implements RadioDownloaderListener {
         }
     }
 
+    @Override
+    public void removeSpectrograms(String identifier) {
+        List<DownloadRequestData> plotDRD = new ArrayList<DownloadRequestData>();
+        for (DownloadRequestData drd : downloadRequestData.values()) {
+            if (drd.getPlotIdentifier().equals(identifier)) {
+                plotDRD.add(drd);
+            }
+        }
+        for (DownloadRequestData drd : plotDRD) {
+            removeDownloadRequestData(drd);
+        }
+    }
+
     /**
      * Define the maximum bound of the frequency interval. The y-value model is
      * updated.
@@ -784,5 +797,4 @@ public class RadioDataManager implements RadioDownloaderListener {
             l.noDataInterval(noDataList, downloadID, plotIdentifier);
         }
     }
-
 }
