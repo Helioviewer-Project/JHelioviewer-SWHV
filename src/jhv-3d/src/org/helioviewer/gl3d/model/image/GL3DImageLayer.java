@@ -1,6 +1,5 @@
 package org.helioviewer.gl3d.model.image;
 
-import java.awt.Graphics;
 import java.awt.Point;
 import java.util.ArrayList;
 
@@ -10,7 +9,6 @@ import org.helioviewer.base.physics.Constants;
 import org.helioviewer.gl3d.camera.GL3DCamera;
 import org.helioviewer.gl3d.camera.GL3DCameraListener;
 import org.helioviewer.gl3d.model.GL3DHitReferenceShape;
-import org.helioviewer.gl3d.scenegraph.GL3DNode;
 import org.helioviewer.gl3d.scenegraph.GL3DOrientedGroup;
 import org.helioviewer.gl3d.scenegraph.GL3DState;
 import org.helioviewer.gl3d.scenegraph.math.GL3DVec3d;
@@ -29,6 +27,9 @@ import org.helioviewer.viewmodel.region.Region;
 import org.helioviewer.viewmodel.region.StaticRegion;
 import org.helioviewer.viewmodel.view.MetaDataView;
 import org.helioviewer.viewmodel.view.RegionView;
+import org.helioviewer.viewmodel.view.View;
+import org.helioviewer.viewmodel.view.ViewListener;
+import org.helioviewer.viewmodel.view.jp2view.JHVJPXView;
 
 /**
  * This is the scene graph equivalent of an image layer sub view chain attached
@@ -38,7 +39,7 @@ import org.helioviewer.viewmodel.view.RegionView;
  * @author Simon Spoerri (simon.spoerri@fhnw.ch)
  * 
  */
-public abstract class GL3DImageLayer extends GL3DOrientedGroup implements GL3DCameraListener {
+public abstract class GL3DImageLayer extends GL3DOrientedGroup implements GL3DCameraListener, ViewListener {
     private static int nextLayerId = 0;
     private final int layerId;
     private GL3DVec4d direction = new GL3DVec4d(0, 0, 1, 0);
@@ -56,7 +57,7 @@ public abstract class GL3DImageLayer extends GL3DOrientedGroup implements GL3DCa
     public double minZ = -Constants.SunRadius;
     public double maxZ = Constants.SunRadius;
 
-    protected GL3DNode accellerationShape;
+    protected GL3DHitReferenceShape accellerationShape;
 
     protected boolean doUpdateROI = true;
 
@@ -66,7 +67,8 @@ public abstract class GL3DImageLayer extends GL3DOrientedGroup implements GL3DCa
 
     protected GL gl;
     protected GL3DImageFragmentShaderProgram sphereFragmentShader = null;
-    private GL3DHitReferenceShape accellerationShapeS;
+    private final GL3DHitReferenceShape accellerationShapeS;
+    private final JHVJPXView jpxView;
 
     public GL3DImageLayer(String name, GL3DView mainLayerView) {
         super(name);
@@ -97,6 +99,16 @@ public abstract class GL3DImageLayer extends GL3DOrientedGroup implements GL3DCa
             throw new IllegalStateException("Cannot create GL3DImageLayer when no RegionView is present in Layer");
         }
 
+        this.accellerationShape = new GL3DHitReferenceShape(false);
+        this.accellerationShapeS = new GL3DHitReferenceShape(true);
+        this.jpxView = this.mainLayerView.getAdapter(JHVJPXView.class);
+        if (this.regionView != null) {
+            this.jpxView.addViewListener(this.accellerationShape);
+            this.jpxView.addViewListener(this.accellerationShapeS);
+            this.jpxView.addViewListener(this);
+
+        }
+
         getCoordinateSystem().addListener(this);
         this.doUpdateROI = true;
         this.markAsChanged();
@@ -105,9 +117,6 @@ public abstract class GL3DImageLayer extends GL3DOrientedGroup implements GL3DCa
     @Override
     public void shapeInit(GL3DState state) {
         this.createImageMeshNodes(state.gl);
-
-        this.accellerationShape = new GL3DHitReferenceShape(false);
-        this.accellerationShapeS = new GL3DHitReferenceShape(true);
 
         this.addNode(this.accellerationShape);
 
@@ -127,12 +136,10 @@ public abstract class GL3DImageLayer extends GL3DOrientedGroup implements GL3DCa
     @Override
     public void shapeUpdate(GL3DState state) {
         super.shapeUpdate(state);
-        if (doUpdateROI) {
-            // Log.debug("GL3DImageLayer: '"+getName()+" is updating its ROI");
-            this.updateROI(state.getActiveCamera());
-            doUpdateROI = false;
-            this.accellerationShape.setUnchanged();
-        }
+        // Log.debug("GL3DImageLayer: '"+getName()+" is updating its ROI");
+        this.updateROI(state.getActiveCamera());
+        doUpdateROI = false;
+        this.accellerationShape.setUnchanged();
     }
 
     @Override
@@ -145,38 +152,12 @@ public abstract class GL3DImageLayer extends GL3DOrientedGroup implements GL3DCa
         return lastViewAngle;
     }
 
-    public void paint(Graphics g) {
-
-        for (Point p : points) {
-            g.fillRect(p.x - 1, p.y - 1, 2, 2);
-        }
-    }
-
     @Override
     public void cameraMoving(GL3DCamera camera) {
 
     }
 
     public GL3DVec4d getLayerDirection() {
-        // Convert layer orientation to heliocentric coordinate system
-        /*
-         * CoordinateVector orientation = coordinateSystemView.getOrientation();
-         * CoordinateSystem targetSystem = new
-         * HeliocentricCartesianCoordinateSystem(); CoordinateConversion
-         * converter =
-         * orientation.getCoordinateSystem().getConversion(targetSystem);
-         * orientation = converter.convert(orientation);
-         * 
-         * GL3DVec3d layerDirection = new GL3DVec3d(orientation.getValue(0),
-         * orientation.getValue(1), orientation.getValue(2));
-         */
-
-        //GL3DVec4d n = new GL3DVec4d(0, 0, 1, 1);
-        //n = modelView().multiply(n);
-
-        //GL3DVec3d layerDirection = new GL3DVec3d(n.x, n.y, n.z);
-
-        //layerDirection.normalize();
         return direction;
     }
 
@@ -221,7 +202,6 @@ public abstract class GL3DImageLayer extends GL3DOrientedGroup implements GL3DCa
                 GL3DVec3d hitPoint = ray.getHitPoint();
                 if (hitPoint != null) {
                     hitPoint = ray.getHitPoint();
-                    hitPoint = activeCamera.getLocalRotation().toMatrix().multiply(hitPoint);
 
                     minPhysicalX = Math.min(minPhysicalX, hitPoint.x);
                     minPhysicalY = Math.min(minPhysicalY, hitPoint.y);
@@ -249,7 +229,6 @@ public abstract class GL3DImageLayer extends GL3DOrientedGroup implements GL3DCa
                 GL3DVec3d hitPoint = ray.getHitPoint();
                 if (hitPoint != null) {
                     hitPoint = ray.getHitPoint();
-                    hitPoint = activeCamera.getLocalRotation().toMatrix().multiply(hitPoint);
 
                     minPhysicalX = Math.min(minPhysicalX, hitPoint.x);
                     minPhysicalY = Math.min(minPhysicalY, hitPoint.y);
@@ -262,7 +241,6 @@ public abstract class GL3DImageLayer extends GL3DOrientedGroup implements GL3DCa
                 if (hitPoint != null) {
                     hitPoint = ray.getHitPoint();
 
-                    hitPoint = activeCamera.getLocalRotation().toMatrix().multiply(hitPoint);
                     minPhysicalX = Math.min(minPhysicalX, hitPoint.x);
                     minPhysicalY = Math.min(minPhysicalY, hitPoint.y);
                     maxPhysicalX = Math.max(maxPhysicalX, hitPoint.x);
@@ -289,7 +267,6 @@ public abstract class GL3DImageLayer extends GL3DOrientedGroup implements GL3DCa
         } else {
             Region newRegion = StaticRegion.createAdaptedRegion(metaData.getPhysicalLowerLeft().getX(), metaData.getPhysicalLowerLeft().getY(), metaData.getPhysicalUpperRight().getX() - metaData.getPhysicalLowerLeft().getX(), metaData.getPhysicalUpperRight().getY() - metaData.getPhysicalLowerLeft().getY());
             this.regionView.setRegion(newRegion, new ChangeEvent());
-            //Log.error("Illegal Region calculated! " + regionWidth + ":" + regionHeight + ". x = " + minPhysicalX + " - " + maxPhysicalX + ", y = " + minPhysicalY + " - " + maxPhysicalY);
         }
         this.markAsChanged();
     }
@@ -308,5 +285,10 @@ public abstract class GL3DImageLayer extends GL3DOrientedGroup implements GL3DCa
 
     public GL3DImageFragmentShaderProgram getSphereFragmentShader() {
         return sphereFragmentShader;
+    }
+
+    @Override
+    public void viewChanged(View sender, ChangeEvent aEvent) {
+        this.updateROI(GL3DState.get().getActiveCamera());
     }
 }
