@@ -106,11 +106,11 @@ public class EVEDrawController implements BandControllerListener, ZoomController
             }
         }
         if (oldAvailableRange.min != availableRange.min || oldAvailableRange.max != availableRange.max) {
-            Log.error("update band available range changed so we change the plotareaSpace");
+            Log.trace("update band available range changed so we change the plotareaSpace");
             checkSelectedRange(availableRange, selectedRange);
             updatePlotAreaSpace(availableRange, selectedRange);
         } else {
-            Log.error("Same available range");
+            Log.trace("Same available range");
         }
         dataMap.put(band, data);
     }
