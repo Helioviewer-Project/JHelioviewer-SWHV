@@ -295,7 +295,6 @@ public class JHVJP2View extends AbstractView implements JP2View, ViewportView, R
             this.event.copyFrom(event);
 
             this.event.addReason(new ViewportChangedReason(this, v));
-            System.out.println("RR6");
             renderRequestedSignal.signal(RenderReasons.OTHER);
 
             return true;
