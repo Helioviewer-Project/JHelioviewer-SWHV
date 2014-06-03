@@ -340,7 +340,7 @@ public class GL3DSceneGraphView extends AbstractGL3DView implements GL3DView {
         // this.overlayPlugins = new GL3DOverlayPlugins();
         // root.addNode(this.overlayPlugins);
 
-        this.hitReferenceShape = new GL3DHitReferenceShape(true);
+        this.hitReferenceShape = new GL3DHitReferenceShape(false);
         root.addNode(this.hitReferenceShape);
 
         GL3DGroup indicatorArrows = new GL3DModel("Arrows", "Arrows indicating the viewspace axes");
