@@ -10,10 +10,6 @@ import org.helioviewer.base.physics.DifferentialRotation;
 import org.helioviewer.gl3d.scenegraph.math.GL3DQuatd;
 import org.helioviewer.gl3d.scenegraph.math.GL3DVec3d;
 import org.helioviewer.gl3d.view.GL3DSceneGraphView;
-import org.helioviewer.gl3d.wcs.CoordinateVector;
-import org.helioviewer.gl3d.wcs.conversion.SolarSphereToStonyhurstHeliographicConversion;
-import org.helioviewer.gl3d.wcs.impl.SolarSphereCoordinateSystem;
-import org.helioviewer.gl3d.wcs.impl.StonyhurstHeliographicCoordinateSystem;
 import org.helioviewer.viewmodel.changeevent.ChangeEvent;
 import org.helioviewer.viewmodel.changeevent.TimestampChangedReason;
 import org.helioviewer.viewmodel.view.LinkedMovieManager;
@@ -32,14 +28,8 @@ import org.helioviewer.viewmodel.view.ViewListener;
  */
 public class GL3DTrackballCamera extends GL3DSolarRotationTrackingTrackballCamera implements ViewListener {
 
-    private final CoordinateVector startPosition = null;
-
     private Date currentDate = null;
     private double currentRotation = 0.0;
-
-    private final StonyhurstHeliographicCoordinateSystem stonyhurstCoordinateSystem = new StonyhurstHeliographicCoordinateSystem();
-    private final SolarSphereCoordinateSystem solarSphereCoordinateSystem = new SolarSphereCoordinateSystem();
-    private final SolarSphereToStonyhurstHeliographicConversion stonyhurstConversion = (SolarSphereToStonyhurstHeliographicConversion) solarSphereCoordinateSystem.getConversion(stonyhurstCoordinateSystem);
 
     private long timediff;
 
@@ -90,6 +80,4 @@ public class GL3DTrackballCamera extends GL3DSolarRotationTrackingTrackballCamer
         this.updateCameraTransformation();
     }
 
-    private void resetStartPosition() {
-    }
 }
