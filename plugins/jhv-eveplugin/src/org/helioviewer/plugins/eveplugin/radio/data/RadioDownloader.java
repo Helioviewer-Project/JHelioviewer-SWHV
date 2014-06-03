@@ -41,6 +41,7 @@ public class RadioDownloader {
     }
 
     public void requestAndOpenRemoteFile(String startDateString, String endDateString, String identifier) {
+        fireRemoveRadioSpectrogram(identifier);
         Thread thread = new Thread(new Runnable() {
             private String startDataString;
             private String endDateString;
@@ -103,6 +104,20 @@ public class RadioDownloader {
         }.init(startDateString, endDateString, identifier), "LoadNewImage");
 
         thread.start();
+    }
+
+    /**
+     * Instructs the radio downloader listeners to remove the spectrograms from
+     * the plot identified by the plot identifier
+     * 
+     * @param identifier
+     *            The identifier of the plot from which the radio spectrograms
+     *            should be removed.
+     */
+    private void fireRemoveRadioSpectrogram(String identifier) {
+        for (RadioDownloaderListener l : listeners) {
+            l.removeSpectrograms(identifier);
+        }
     }
 
     public void requestAndOpenIntervals(List<Interval<Date>> intervals, Long downloadId, String plotIdentifier, double ratioX, double ratioY) {

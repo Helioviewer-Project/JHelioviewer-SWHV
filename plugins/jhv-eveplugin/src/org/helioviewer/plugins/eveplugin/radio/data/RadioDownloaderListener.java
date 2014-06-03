@@ -15,4 +15,14 @@ public interface RadioDownloaderListener {
     public abstract void newAdditionalDataDownloaded(List<DownloadedJPXData> jpxFiles, Long downloadID, String plotIdentifier, double ratioX, double ratioY);
 
     public abstract void newNoData(List<Interval<Date>> noDataList, String identifier, long downloadID);
+
+    /**
+     * Instructs the radio downloader listener to remove all the spectrograms
+     * for the plot identifier by the identifier.
+     * 
+     * @param identifier
+     *            The identifier of the plot from which the spectrograms should
+     *            be removed
+     */
+    public abstract void removeSpectrograms(String identifier);
 }
