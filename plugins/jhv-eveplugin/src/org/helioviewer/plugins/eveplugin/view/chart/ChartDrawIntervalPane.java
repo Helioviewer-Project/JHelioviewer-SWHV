@@ -19,6 +19,7 @@ import java.util.Map;
 import javax.swing.JComponent;
 import javax.swing.event.MouseInputListener;
 
+import org.helioviewer.base.logging.Log;
 import org.helioviewer.base.math.Interval;
 import org.helioviewer.jhv.layers.LayersListener;
 import org.helioviewer.jhv.layers.LayersModel;
@@ -45,7 +46,6 @@ public class ChartDrawIntervalPane extends JComponent implements ZoomControllerL
     private Interval<Date> availableInterval = null;
     private Interval<Date> selectedInterval = null;
     private Interval<Date> movieInterval = new Interval<Date>(null, null);
-    
 
     private boolean mouseOverComponent = false;
     private boolean mouseOverInterval = false;
@@ -432,8 +432,8 @@ public class ChartDrawIntervalPane extends JComponent implements ZoomControllerL
             Map<PlotAreaSpace, Double> maxList = new HashMap<PlotAreaSpace, Double>();
             for (PlotAreaSpace pas : plotAreaSpaceManager.getAllPlotAreaSpaces()) {
                 double diffUnits = pas.getScaledMaxTime() - pas.getScaledMinTime();
-                double start = pas.getScaledSelectedMinTime() - movedUnits*diffUnits;
-                double end = pas.getScaledSelectedMaxTime() - movedUnits*diffUnits;
+                double start = pas.getScaledSelectedMinTime() - movedUnits * diffUnits;
+                double end = pas.getScaledSelectedMaxTime() - movedUnits * diffUnits;
                 pasList.add(pas);
                 if (start < pas.getScaledMinTime()) {
                     end += (pas.getScaledMinTime() - start);
@@ -454,8 +454,8 @@ public class ChartDrawIntervalPane extends JComponent implements ZoomControllerL
             Map<PlotAreaSpace, Double> maxList = new HashMap<PlotAreaSpace, Double>();
             for (PlotAreaSpace pas : plotAreaSpaceManager.getAllPlotAreaSpaces()) {
                 double diffUnits = pas.getScaledMaxTime() - pas.getScaledMinTime();
-                double start = pas.getScaledSelectedMinTime() + movedUnits*diffUnits;
-                double end = pas.getScaledSelectedMaxTime() + movedUnits*diffUnits;
+                double start = pas.getScaledSelectedMinTime() + movedUnits * diffUnits;
+                double end = pas.getScaledSelectedMaxTime() + movedUnits * diffUnits;
                 if (end > pas.getScaledMaxTime()) {
                     start -= (end - pas.getScaledMaxTime());
                     end = pas.getScaledMaxTime();
@@ -511,6 +511,8 @@ public class ChartDrawIntervalPane extends JComponent implements ZoomControllerL
     }
 
     public void selectedIntervalChanged(final Interval<Date> newInterval) {
+        // Log.debug("selected interval" + newInterval);
+        // Thread.dumpStack();
         if (newInterval.getStart() == null || newInterval.getEnd() == null)
             selectedInterval = null;
         else
@@ -540,7 +542,7 @@ public class ChartDrawIntervalPane extends JComponent implements ZoomControllerL
             if (mouseOverLeftGraspPoint || mouseOverRightGraspPoint)
                 resizeSelectedInterval(e.getPoint(), true);
             else if (mouseOverInterval)
-                moveSelectedInterval(e.getPoint(),true);
+                moveSelectedInterval(e.getPoint(), true);
         }
         mousePressed = null;
         mouseOverComponent = false;
@@ -561,7 +563,7 @@ public class ChartDrawIntervalPane extends JComponent implements ZoomControllerL
         if (mouseOverLeftGraspPoint || mouseOverRightGraspPoint)
             resizeSelectedInterval(e.getPoint(), true);
         else if (mouseOverInterval)
-            moveSelectedInterval(e.getPoint(),true);
+            moveSelectedInterval(e.getPoint(), true);
         mousePressed = null;
 
         repaint();
@@ -574,9 +576,9 @@ public class ChartDrawIntervalPane extends JComponent implements ZoomControllerL
     public void mouseDragged(MouseEvent e) {
         eveState.setMouseTimeIntervalDragging(true);
         if (mouseOverLeftGraspPoint || mouseOverRightGraspPoint)
-            resizeSelectedInterval(e.getPoint(),false);
+            resizeSelectedInterval(e.getPoint(), false);
         else if (mouseOverInterval)
-            moveSelectedInterval(e.getPoint(),false);
+            moveSelectedInterval(e.getPoint(), false);
     }
 
     public void mouseMoved(MouseEvent e) {
