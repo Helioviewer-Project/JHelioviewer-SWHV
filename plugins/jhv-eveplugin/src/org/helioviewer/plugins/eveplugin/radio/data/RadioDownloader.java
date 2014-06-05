@@ -56,7 +56,8 @@ public class RadioDownloader {
 
             public void run() {
                 try {
-                    Log.debug("Request for date " + startDataString + " - " + endDateString);
+                    // Log.debug("Request for date " + startDataString + " - " +
+                    // endDateString);
                     long duration = calculateFrequencyDuration(startDataString, endDateString);
                     long downloadID = Math.round(1000000 * Math.random());
                     Date startDate = parseDate(startDataString);
@@ -122,7 +123,8 @@ public class RadioDownloader {
 
     public void requestAndOpenIntervals(List<Interval<Date>> intervals, Long downloadId, String plotIdentifier, double ratioX, double ratioY) {
         for (Interval<Date> interval : intervals) {
-            Log.debug("Request for data for interval " + interval.getStart() + " - " + interval.getEnd());
+            // Log.debug("Request for data for interval " + interval.getStart()
+            // + " - " + interval.getEnd());
             Thread thread = new Thread(new Runnable() {
                 private String startDataString;
                 private String endDateString;
