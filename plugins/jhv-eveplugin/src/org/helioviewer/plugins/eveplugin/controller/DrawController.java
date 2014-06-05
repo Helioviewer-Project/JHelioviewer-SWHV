@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.helioviewer.base.logging.Log;
 import org.helioviewer.base.math.Interval;
 import org.helioviewer.jhv.gui.ViewListenerDistributor;
 import org.helioviewer.plugins.eveplugin.base.Range;
@@ -31,6 +32,7 @@ public class DrawController implements ZoomControllerListener, LineDataSelectorM
     private Map<String, DrawControllerData> drawControllerData;
     private Interval<Date> interval;
     private List<DrawControllerListener> forAllPlotIdentifiers;
+    private Thread viewChangedThread;
 
     private DrawController() {
         this.drawControllerData = new HashMap<String, DrawControllerData>();
@@ -258,7 +260,24 @@ public class DrawController implements ZoomControllerListener, LineDataSelectorM
     public void viewChanged(View sender, ChangeEvent aEvent) {
         TimestampChangedReason timestampReason = aEvent.getLastChangedReasonByType(TimestampChangedReason.class);
         if ((timestampReason != null) && (timestampReason.getView() instanceof TimedMovieView) && LinkedMovieManager.getActiveInstance().isMaster((TimedMovieView) timestampReason.getView())) {
-            fireRedrawRequestMovieFrameChanged(timestampReason.getNewDateTime().getTime());
+            if (this.viewChangedThread == null || viewChangedThread.getState() == Thread.State.TERMINATED) {
+                this.viewChangedThread = new Thread(new Runnable() {
+                    private Date date;
+
+                    @Override
+                    public void run() {
+                        fireRedrawRequestMovieFrameChanged(date);
+                    }
+
+                    public Runnable init(Date date) {
+                        this.date = date;
+                        return this;
+                    }
+                }.init(timestampReason.getNewDateTime().getTime()));
+                this.viewChangedThread.start();
+            } else {
+                Log.trace("Ignore timestamp thread still running");
+            }
         }
     }
 }
