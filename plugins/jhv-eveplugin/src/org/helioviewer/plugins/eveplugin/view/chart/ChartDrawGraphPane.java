@@ -34,6 +34,7 @@ import org.helioviewer.plugins.eveplugin.model.ChartModel;
 import org.helioviewer.plugins.eveplugin.model.ChartModelListener;
 import org.helioviewer.plugins.eveplugin.model.PlotAreaSpace;
 import org.helioviewer.plugins.eveplugin.model.PlotAreaSpaceManager;
+import org.helioviewer.plugins.eveplugin.model.TimeIntervalLockModel;
 import org.helioviewer.plugins.eveplugin.radio.model.ZoomManager;
 import org.helioviewer.viewmodel.changeevent.ChangeEvent;
 import org.helioviewer.viewmodel.view.LinkedMovieManager;
@@ -595,7 +596,9 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
 
             updateMovieLineInformation();
 
-            repaint();
+            if (!TimeIntervalLockModel.getInstance().isLocked()) {
+                repaint();
+            }
         }
     }
 }

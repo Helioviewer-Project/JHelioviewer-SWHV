@@ -12,6 +12,7 @@ import java.util.GregorianCalendar;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
+import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -25,6 +26,7 @@ import org.helioviewer.jhv.layers.LayersModel;
 import org.helioviewer.plugins.eveplugin.controller.ZoomController;
 import org.helioviewer.plugins.eveplugin.controller.ZoomController.ZOOM;
 import org.helioviewer.plugins.eveplugin.controller.ZoomControllerListener;
+import org.helioviewer.plugins.eveplugin.model.TimeIntervalLockModel;
 //import org.helioviewer.plugins.eveplugin.model.PlotTimeSpace;
 import org.helioviewer.plugins.eveplugin.settings.EVEAPI.API_RESOLUTION_AVERAGES;
 import org.helioviewer.plugins.eveplugin.settings.EVESettings;
@@ -57,7 +59,12 @@ public class PlotsControlPanel extends JPanel implements ZoomControllerListener,
     private final JLabel zoomLabel = new JLabel("Clip:");
     private final JComboBox zoomComboBox = new JComboBox(new DefaultComboBoxModel());
 
+    private final JLabel lockIntervalLabel = new JLabel("Lock Time Interval:");
+    private final JCheckBox lockIntervalCheckBox = new JCheckBox();
+
     private final JButton addLayerButton = new JButton("Add Layer", addIcon);
+
+    private boolean selectedIndexSetByProgram = false;
 
     // //////////////////////////////////////////////////////////////////////////////
     // Methods
@@ -73,6 +80,8 @@ public class PlotsControlPanel extends JPanel implements ZoomControllerListener,
     private void initVisualComponents() {
         setLayout(new BorderLayout());
 
+        initLockIntervalCheckBox();
+
         final JPanel periodPane = new JPanel();
         periodPane.setLayout(new FlowLayout(FlowLayout.LEFT));
         periodPane.add(periodLabel);
@@ -80,6 +89,8 @@ public class PlotsControlPanel extends JPanel implements ZoomControllerListener,
         periodPane.add(periodFromLayersButton);
 
         final JPanel zoomPane = new JPanel(new FlowLayout(FlowLayout.RIGHT));
+        zoomPane.add(lockIntervalLabel);
+        zoomPane.add(lockIntervalCheckBox);
         zoomPane.add(zoomLabel);
         zoomPane.add(zoomComboBox);
 
@@ -103,6 +114,22 @@ public class PlotsControlPanel extends JPanel implements ZoomControllerListener,
 
         addLayerButton.setToolTipText("Add a new layer");
         addLayerButton.addActionListener(this);
+    }
+
+    /**
+     * 
+     */
+    private void initLockIntervalCheckBox() {
+        lockIntervalCheckBox.setSelected(TimeIntervalLockModel.getInstance().isLocked());
+
+        lockIntervalCheckBox.addActionListener(new ActionListener() {
+
+            @Override
+            public void actionPerformed(ActionEvent arg0) {
+                TimeIntervalLockModel.getInstance().setLocked(lockIntervalCheckBox.isSelected());
+            }
+
+        });
     }
 
     private void setEnabledStateOfPeriodMovieButton() {
@@ -236,8 +263,12 @@ public class PlotsControlPanel extends JPanel implements ZoomControllerListener,
             final ZoomComboboxItem item = (ZoomComboboxItem) zoomComboBox.getSelectedItem();
             selectedIntervalByZoombox = null;
 
-            if (item != null) {
+            if (item != null && !selectedIndexSetByProgram) {
                 selectedIntervalByZoombox = ZoomController.getSingletonInstance().zoomTo(item.getZoom(), item.getNumber());
+            } else {
+                if (selectedIndexSetByProgram) {
+                    selectedIndexSetByProgram = false;
+                }
             }
         } else if (e.getSource() == periodFromLayersButton) {
             final Interval<Date> interval = new Interval<Date>(LayersModel.getSingletonInstance().getFirstDate(), LayersModel.getSingletonInstance().getLastDate());
@@ -270,6 +301,7 @@ public class PlotsControlPanel extends JPanel implements ZoomControllerListener,
         if (selectedIntervalByZoombox != null && newInterval != null) {
             if (!selectedIntervalByZoombox.equals(newInterval)) {
                 try {
+                    selectedIndexSetByProgram = true;
                     zoomComboBox.setSelectedIndex(0);
                 } catch (final IllegalArgumentException ex) {
                 }
