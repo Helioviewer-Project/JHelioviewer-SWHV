@@ -15,20 +15,14 @@ import java.util.Set;
 
 import org.helioviewer.base.logging.Log;
 import org.helioviewer.base.math.Interval;
-import org.helioviewer.plugins.eveplugin.base.Range;
 import org.helioviewer.plugins.eveplugin.controller.DrawController;
-import org.helioviewer.plugins.eveplugin.controller.ZoomController;
-import org.helioviewer.plugins.eveplugin.controller.ZoomControllerListener;
 import org.helioviewer.plugins.eveplugin.draw.YAxisElement;
 import org.helioviewer.plugins.eveplugin.model.ChartModel;
-import org.helioviewer.plugins.eveplugin.model.PlotAreaSpace;
-import org.helioviewer.plugins.eveplugin.model.PlotAreaSpaceManager;
 import org.helioviewer.plugins.eveplugin.radio.data.DownloadRequestData;
 import org.helioviewer.plugins.eveplugin.radio.data.FrequencyInterval;
 import org.helioviewer.plugins.eveplugin.radio.data.RadioDataManager;
 import org.helioviewer.plugins.eveplugin.radio.data.RadioDataManagerListener;
 import org.helioviewer.plugins.eveplugin.radio.gui.RadioImagePane;
-import org.helioviewer.plugins.eveplugin.settings.EVEAPI.API_RESOLUTION_AVERAGES;
 
 public class RadioPlotModel implements RadioDataManagerListener, ZoomDataConfigListener {
     private static RadioPlotModel instance;
@@ -36,8 +30,8 @@ public class RadioPlotModel implements RadioDataManagerListener, ZoomDataConfigL
     private ZoomManager zoomManager;
     private DrawController drawController;
     private Map<Long, BufferedImage> bufferedImages;
-    private ChartModel chartModel;
     private YValueModelManager yValueModelManager;
+    private long counter;
 
     private Map<String, RadioPlotModelData> radioPlotModelData;
 
@@ -47,7 +41,6 @@ public class RadioPlotModel implements RadioDataManagerListener, ZoomDataConfigL
         this.zoomManager = ZoomManager.getSingletonInstance();
         drawController = DrawController.getSingletonInstance();
         bufferedImages = new HashMap<Long, BufferedImage>();
-        chartModel = ChartModel.getSingletonInstance();
         radioPlotModelData = new HashMap<String, RadioPlotModelData>();
         this.yValueModelManager = YValueModelManager.getInstance();
 
@@ -298,7 +291,8 @@ public class RadioPlotModel implements RadioDataManagerListener, ZoomDataConfigL
 
     @Override
     public void requestData(Date xStart, Date xEnd, double yStart, double yEnd, double xRatio, double yRatio, long ID, String plotIdentifier) {
-        Log.trace("Request for data in : " + xStart + " - " + xEnd);
+        // Log.debug("Request for data in : " + xStart + " - " + xEnd);
+        // Thread.dumpStack();
         Thread t = new Thread(new Runnable() {
 
             Date xStart;
@@ -329,9 +323,9 @@ public class RadioPlotModel implements RadioDataManagerListener, ZoomDataConfigL
                 return this;
             }
 
-        }.init(xStart, xEnd, yStart, yEnd, xRatio, yRatio, ID, plotIdentifier));
-
+        }.init(xStart, xEnd, yStart, yEnd, xRatio, yRatio, ID, plotIdentifier), "Request data " + counter);
         t.start();
+        counter++;
         updateNoDataConfig(ID, plotIdentifier);
     }
 
