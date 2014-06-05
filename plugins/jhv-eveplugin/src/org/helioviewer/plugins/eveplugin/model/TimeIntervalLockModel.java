@@ -123,7 +123,7 @@ public class TimeIntervalLockModel implements ZoomControllerListener, DrawContro
     @Override
     public void drawMovieLineRequest(Date time) {
         if (isLocked && currentAvailableInterval.containsPointInclusive(time) && !previousMovieTime.equals(time)) {
-            Log.debug("previousTimeInterval : " + previousMovieTime + " currentMovieTime : " + time);
+            Log.trace("previousTimeInterval : " + previousMovieTime + " currentMovieTime : " + time);
             previousMovieTime = time;
             Map<PlotAreaSpace, Double> selectedStartTimes = new HashMap<PlotAreaSpace, Double>();
             Map<PlotAreaSpace, Double> selectedEndTimes = new HashMap<PlotAreaSpace, Double>();
