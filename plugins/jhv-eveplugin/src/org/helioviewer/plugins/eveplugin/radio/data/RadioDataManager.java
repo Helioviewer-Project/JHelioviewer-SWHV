@@ -76,8 +76,11 @@ public class RadioDataManager implements RadioDownloaderListener {
     /** Instance of eve state */
     private EVEState eveState;
 
-    /** INstance of the y-value model manager */
+    /** Instance of the y-value model manager */
     private YValueModelManager yValueModelManager;
+
+    /** Is there a request for data busy */
+    private boolean requestForDataBusy;
 
     /**
      * private constructor used when the instance is requested for the first
@@ -95,6 +98,7 @@ public class RadioDataManager implements RadioDownloaderListener {
         zoomManager = ZoomManager.getSingletonInstance();
         eveState = EVEState.getSingletonInstance();
         yValueModelManager = YValueModelManager.getInstance();
+        requestForDataBusy = false;
     }
 
     /**
@@ -207,27 +211,38 @@ public class RadioDataManager implements RadioDownloaderListener {
      */
     public void requestForData(Date xStart, Date xEnd, double yStart, double yEnd, double xRatio, double yRatio, List<Long> iDs, String plotIdentifier) {
         Long start = System.currentTimeMillis();
-        Log.trace("Request for data : " + id + " time " + start);
+        Long tempId = id;
+        id++;
+        // Log.debug("Request for data : " + tempId + " time " + start +
+        // " by thread " + Thread.currentThread().getName());
+        // Thread.dumpStack();
         if (!eveState.isMouseTimeIntervalDragging() && !eveState.isMouseValueIntervalDragging()) {
             Log.trace("mouse is not dragged");
-            if (!requestBuffer.hasData()) {
+            if (!requestBuffer.hasData() && !requestForDataBusy) {
+                requestForDataBusy = true;
                 requestBuffer.addRequestConfig(new RequestConfig(xStart, xEnd, yStart, yEnd, xRatio, yRatio, iDs));
+                // Log.debug("Nope it was : thread " +
+                // Thread.currentThread().getName());
                 while (requestBuffer.hasData()) {
+                    // Log.debug("Get data out of request buffer : thread " +
+                    // Thread.currentThread().getName());
                     RequestConfig requestConfig = requestBuffer.getData();
                     synchronized (downloadRequestData) {
                         handleRequestConfig(requestConfig, xStart, xEnd, yStart, yEnd, plotIdentifier);
                     }
                 }
+                requestForDataBusy = false;
             } else {
-                Log.trace("Add request to buffer");
+                // Log.debug("Add request to buffer");
                 requestBuffer.addRequestConfig(new RequestConfig(xStart, xEnd, yStart, yEnd, xRatio, yRatio, iDs));
             }
         } else {
             Log.trace("Mouse is dragged");
         }
         long end = System.currentTimeMillis();
-        Log.trace("Finished request for data id: " + id + " time : " + end + " in " + (end - start) + " milliseconds");
-        id++;
+        // Log.debug("Finished request for data id: " + tempId + " time : " +
+        // end + " in " + (end - start) + " milliseconds by thread " +
+        // Thread.currentThread().getName());
     }
 
     /**
