@@ -9,11 +9,11 @@ import javax.swing.ListModel;
 
 import org.helioviewer.base.logging.Log;
 import org.helioviewer.gl3d.camera.GL3DCamera;
+import org.helioviewer.gl3d.camera.GL3DEarthCamera;
 import org.helioviewer.gl3d.camera.GL3DFixedTimeCamera;
 import org.helioviewer.gl3d.camera.GL3DFollowObjectCamera;
+import org.helioviewer.gl3d.camera.GL3DObserverCamera;
 import org.helioviewer.gl3d.camera.GL3DSolarRotationTrackingTrackballCamera;
-import org.helioviewer.gl3d.camera.GL3DEarthCamera;
-import org.helioviewer.gl3d.camera.GL3DTrackballStonyhurstCamera;
 import org.helioviewer.gl3d.view.GL3DCameraView;
 import org.helioviewer.gl3d.view.GL3DSceneGraphView;
 import org.helioviewer.jhv.gui.ImageViewerGui;
@@ -44,7 +44,7 @@ public class GL3DCameraSelectorModel extends AbstractListModel implements ComboB
 
     private GL3DFixedTimeCamera fixedTimeCamera;
 
-    private GL3DTrackballStonyhurstCamera stonyHurstCamera;
+    private GL3DObserverCamera observerCamera;
 
     private GL3DFollowObjectCamera followObjectCamera;
 
@@ -79,7 +79,7 @@ public class GL3DCameraSelectorModel extends AbstractListModel implements ComboB
         if (sceneGraphView != null) {
             earthCamera = new GL3DEarthCamera(sceneGraphView);
             fixedTimeCamera = new GL3DFixedTimeCamera(sceneGraphView);
-            stonyHurstCamera = new GL3DTrackballStonyhurstCamera(sceneGraphView);
+            observerCamera = new GL3DObserverCamera(sceneGraphView);
             solarRotationCamera = new GL3DSolarRotationTrackingTrackballCamera(sceneGraphView);
             followObjectCamera = new GL3DFollowObjectCamera(sceneGraphView);
 
@@ -88,7 +88,7 @@ public class GL3DCameraSelectorModel extends AbstractListModel implements ComboB
             cameras.add(earthCamera);
             cameras.add(solarRotationCamera);
             cameras.add(fixedTimeCamera);
-            cameras.add(stonyHurstCamera);
+            cameras.add(observerCamera);
             cameras.add(followObjectCamera);
 
             defaultCamera = earthCamera;
@@ -166,8 +166,8 @@ public class GL3DCameraSelectorModel extends AbstractListModel implements ComboB
         return fixedTimeCamera;
     }
 
-    public GL3DTrackballStonyhurstCamera getStonyHurstCamera() {
-        return stonyHurstCamera;
+    public GL3DObserverCamera getStonyHurstCamera() {
+        return observerCamera;
     }
 
     public GL3DFollowObjectCamera getFollowObjectCamera() {
