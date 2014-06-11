@@ -26,25 +26,30 @@ import org.json.JSONObject;
 import org.json.JSONTokener;
 
 public class GL3DPositionLoading {
-    private boolean isLoaded;
+    private boolean isLoaded = false;
     private URL url;
     private JSONObject jsonResult;
     public GL3DPositionDateTime[] positionDateTime;
     private final SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
     private final GregorianCalendar calendar = new GregorianCalendar();
+    private final String beginDate = "2017-07-28T00:00:00";
+    private final String endDate = "2027-05-30T00:00:00";
+    private final String[] targetList = { "SOLAR%20ORBITER" };
+    private final int target = 0;
+    private final String observer = "SUN";
+    private final String baseUrl = "http://swhv:7789/multiposition?begin_utc=";
+    private final int steps = 935;
 
     public GL3DPositionLoading() {
         buildRequestURL();
         this.requestData();
-        this.parseData();
     }
 
     private void buildRequestURL() {
         try {
-            url = new URL("http://swhv:7789/multiposition?begin_utc=2017-07-28T00:00:00&end_utc=2027-05-30T00:00:00&steps=935&observer=SUN&target=SOLAR%20ORBITER&ref=HEEQ&kind=latitudinal");
+            url = new URL(baseUrl + "begin_utc=" + this.beginDate + "&end_utc=" + this.endDate + "&steps=" + steps + "&observer=" + observer + "&target=" + targetList[0] + "&ref=HEEQ&kind=latitudinal");
         } catch (MalformedURLException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
+            Log.error("A wrong url is given.", e);
         }
     }
 
@@ -56,11 +61,12 @@ public class GL3DPositionLoading {
                     DownloadStream ds = new DownloadStream(url, 30000, 30000);
                     Reader reader = new BufferedReader(new InputStreamReader(ds.getInput(), "UTF-8"));
                     jsonResult = new JSONObject(new JSONTokener(reader));
+                    parseData();
                     isLoaded = true;
                 } catch (final IOException e1) {
-                    Log.error("Error Parsing the EVE Response.", e1);
+                    Log.warn("Error Parsing the EVE Response.", e1);
                 } catch (JSONException e2) {
-                    Log.error("Error Parsing the JSON Response.", e2);
+                    Log.warn("Error Parsing the JSON Response.", e2);
                 }
 
             }
@@ -69,11 +75,10 @@ public class GL3DPositionLoading {
     }
 
     private void parseData() {
-
         calendar.clear();
         try {
-            JSONArray posArray = this.jsonResult.getJSONObject("multipositionResponse").getJSONObject("multipositionResult").getJSONArray("float");
-            this.positionDateTime = new GL3DPositionDateTime[posArray.length()];
+            JSONArray posArray = jsonResult.getJSONObject("multipositionResponse").getJSONObject("multipositionResult").getJSONArray("float");
+            positionDateTime = new GL3DPositionDateTime[posArray.length()];
             for (int i = 0; i < posArray.length(); i++) {
                 JSONArray ithArray = posArray.getJSONArray(i);
                 String dateString = ithArray.get(0).toString();
@@ -84,14 +89,12 @@ public class GL3DPositionLoading {
                 double y = positionArray.getDouble(1);
                 double z = positionArray.getDouble(2);
                 GL3DVec3d vec = new GL3DVec3d(x, y, z);
-                this.positionDateTime[i] = new GL3DPositionDateTime(calendar.getTimeInMillis(), vec);
+                positionDateTime[i] = new GL3DPositionDateTime(calendar.getTimeInMillis(), vec);
             }
         } catch (JSONException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
+            Log.warn("Problem Parsing the JSON Response.", e);
         } catch (ParseException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
+            Log.warn("Problem Parsing the date in JSON Response.", e);
         }
     }
 
