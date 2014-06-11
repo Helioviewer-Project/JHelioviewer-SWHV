@@ -3,6 +3,8 @@ package org.helioviewer.gl3d.camera;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
 import java.text.ParseException;
 import java.util.Date;
 
@@ -45,10 +47,22 @@ public class GL3DFollowObjectCameraOptionPanel extends GL3DCameraOptionPanel {
         objectCombobox = new JComboBox();
         objectCombobox.addItem("Solar Orbiter");
         objectCombobox.addItem("Venus");
+        objectCombobox.addItemListener(new ItemListener() {
+            @Override
+            public void itemStateChanged(ItemEvent event) {
+                if (event.getStateChange() == ItemEvent.SELECTED) {
+                    String object = (String) event.getItem();
+                    if (object != null) {
+                        camera.setObservingObject(object);
+                        revalidate();
+                    }
+                }
+            }
+        });
         add(objectCombobox);
     }
 
-    private void addDatePanel(JLabel dateLabel, JPanel datetimePanel, JHVCalendarDatePicker datePickerr, TimeTextField timePickerr, boolean begin) {
+    private void addDatePanel(JLabel dateLabel, JPanel datetimePanel, JHVCalendarDatePicker datePickerr, TimeTextField timePickerr, final boolean begin) {
         add(dateLabel);
         datetimePanel = new JPanel();
         datetimePanel.setLayout(new GridLayout(0, 2));
@@ -60,7 +74,11 @@ public class GL3DFollowObjectCameraOptionPanel extends GL3DCameraOptionPanel {
             public void actionPerformed(JHVCalendarEvent e) {
                 try {
                     Date dt = TimeTextField.formatter.parse(timePicker.getText());
-                    camera.setBeginDate(new Date(datePicker.getDate().getTime() + dt.getTime()));
+                    if (begin) {
+                        camera.setBeginDate(new Date(datePicker.getDate().getTime() + dt.getTime()));
+                    } else {
+                        camera.setEndDate(new Date(datePicker.getDate().getTime() + dt.getTime()));
+                    }
                 } catch (ParseException e1) {
                     Log.error("Date parsing failed", e1);
                 }
@@ -74,6 +92,9 @@ public class GL3DFollowObjectCameraOptionPanel extends GL3DCameraOptionPanel {
         } else {
             startDate = LayersModel.getSingletonInstance().getLastDate();
             datePicker.setDate(startDate);
+        }
+        if (startDate == null) {
+            startDate = new Date(System.currentTimeMillis());
         }
         timePickerr = timePicker;
         timePicker.setText(TimeTextField.formatter.format(startDate));
