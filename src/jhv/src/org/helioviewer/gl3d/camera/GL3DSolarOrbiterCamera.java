@@ -14,6 +14,7 @@ import org.helioviewer.viewmodel.view.LinkedMovieManager;
 import org.helioviewer.viewmodel.view.TimedMovieView;
 import org.helioviewer.viewmodel.view.View;
 import org.helioviewer.viewmodel.view.ViewListener;
+import org.helioviewer.viewmodel.view.jp2view.JHVJPXView;
 
 /**
  * This camera is used when solar rotation tracking is enabled. It extends the
@@ -73,10 +74,12 @@ public class GL3DSolarOrbiterCamera extends GL3DSolarRotationTrackingTrackballCa
     public void viewChanged(View sender, ChangeEvent aEvent) {
         TimestampChangedReason timestampReason = aEvent.getLastChangedReasonByType(TimestampChangedReason.class);
         if ((timestampReason != null) && (timestampReason.getView() instanceof TimedMovieView) && LinkedMovieManager.getActiveInstance().isMaster((TimedMovieView) timestampReason.getView())) {
+            JHVJPXView jpx = timestampReason.getView().getAdapter(JHVJPXView.class);
+            i = jpx.getCurrentFrameNumber() % 935;
             currentDate = new Date(this.positionLoading.positionDateTime[i].getTimestamp());
             currentL = this.positionLoading.positionDateTime[i].getPosition().y;
             currentB = this.positionLoading.positionDateTime[i].getPosition().z;
-            currentDistance = (1000 * this.positionLoading.positionDateTime[i].getPosition().x) / Constants.SunRadiusInMeter;
+            currentDistance = 1000 * (this.positionLoading.positionDateTime[i].getPosition().x) / Constants.SunRadiusInMeter / 7;
             i = (i + 1) % 48;
             updateRotation();
         }
@@ -89,7 +92,8 @@ public class GL3DSolarOrbiterCamera extends GL3DSolarRotationTrackingTrackballCa
         GL3DQuatd newRotation = GL3DQuatd.createRotation(this.currentRotation, new GL3DVec3d(0, 1, 0));
         newRotation.rotate(GL3DQuatd.createRotation(currentB, new GL3DVec3d(1, 0, 0)));
         this.setLocalRotation(newRotation);
-        this.setZTranslation(currentDistance);
+        this.setZTranslation(-currentDistance);
+        System.out.println(this.getZTranslation());
         this.updateCameraTransformation();
     }
 

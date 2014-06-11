@@ -46,6 +46,7 @@ public class GL3DCameraOptionsPanel extends JPanel {
         String earthCameraButtonString = "View from earth";
         String stonyhurstCameraButtonString = "Stonyhurst view";
         String fixedTimeCameraButtonString = "View from earth at fixed time";
+        String solarOrbiterCameraButtonString = "View from solar orbiter";
 
         JRadioButton earthCameraButton = new JRadioButton(earthCameraButtonString);
         earthCameraButton.addActionListener(new ActionListener() {
@@ -64,7 +65,6 @@ public class GL3DCameraOptionsPanel extends JPanel {
             public void actionPerformed(ActionEvent e) {
                 GL3DCameraSelectorModel selector = GL3DCameraSelectorModel.getInstance();
                 selector.setCurrentCamera(selector.getStonyHurstCamera());
-                hideTimedelayComponents();
                 Displayer.getSingletonInstance().render();
             }
         });
@@ -80,14 +80,28 @@ public class GL3DCameraOptionsPanel extends JPanel {
             }
         });
 
+        JRadioButton solarOrbiterCameraButton = new JRadioButton(solarOrbiterCameraButtonString);
+        solarOrbiterCameraButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                GL3DCameraSelectorModel selector = GL3DCameraSelectorModel.getInstance();
+                selector.setCurrentCamera(selector.getSolarOrbiterCamera());
+                hideTimedelayComponents();
+                Displayer.getSingletonInstance().render();
+            }
+        });
         ButtonGroup group = new ButtonGroup();
         group.add(earthCameraButton);
         group.add(stonyhurstCameraButton);
         group.add(fixedTimeCameraButton);
+        group.add(solarOrbiterCameraButton);
+
         JPanel radioPanel = new JPanel(new GridLayout(0, 1));
         radioPanel.add(earthCameraButton);
         radioPanel.add(stonyhurstCameraButton);
         radioPanel.add(fixedTimeCameraButton);
+        radioPanel.add(solarOrbiterCameraButton);
+
         this.add(radioPanel);
     }
 
