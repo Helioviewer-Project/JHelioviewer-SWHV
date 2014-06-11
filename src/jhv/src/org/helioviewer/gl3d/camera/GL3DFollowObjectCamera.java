@@ -98,4 +98,8 @@ public class GL3DFollowObjectCamera extends GL3DSolarRotationTrackingTrackballCa
     public void fireNewLoaded() {
 
     }
+
+    public void setBeginDate(Date date) {
+        this.positionLoading.setBeginDate(date);
+    }
 }
