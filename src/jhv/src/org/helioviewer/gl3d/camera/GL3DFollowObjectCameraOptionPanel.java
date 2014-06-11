@@ -6,6 +6,7 @@ import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 
 import javax.swing.JComboBox;
@@ -33,9 +34,12 @@ public class GL3DFollowObjectCameraOptionPanel extends GL3DCameraOptionPanel imp
     TimeTextField endTimePicker;
     JComboBox objectCombobox;
     private final GL3DFollowObjectCamera camera;
+    private final JLabel cameraTime;
+    private final SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
 
     public GL3DFollowObjectCameraOptionPanel(GL3DFollowObjectCamera camera) {
         this.camera = camera;
+        cameraTime = new JLabel("----");
         setLayout(new GridLayout(0, 1));
         this.loadedLabel = new JLabel("Not loaded");
         add(this.loadedLabel);
@@ -60,7 +64,7 @@ public class GL3DFollowObjectCameraOptionPanel extends GL3DCameraOptionPanel imp
 
     private void addObjectCombobox() {
         objectCombobox = new JComboBox();
-        objectCombobox.addItem("Solar Orbiter");
+        objectCombobox.addItem("Solar%20Orbiter");
         objectCombobox.addItem("Venus");
         objectCombobox.addItemListener(new ItemListener() {
             @Override
@@ -192,5 +196,10 @@ public class GL3DFollowObjectCameraOptionPanel extends GL3DCameraOptionPanel imp
         } else {
             this.loadedLabel.setText("Not Loaded");
         }
+    }
+
+    @Override
+    public void fireCameraTime(Date cameraDate) {
+        this.cameraTime.setText(format.format(cameraDate));
     }
 }
