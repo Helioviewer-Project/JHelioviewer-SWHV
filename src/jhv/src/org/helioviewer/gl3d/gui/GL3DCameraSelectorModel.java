@@ -81,12 +81,16 @@ public class GL3DCameraSelectorModel extends AbstractListModel implements ComboB
             fixedTimeCamera = new GL3DFixedTimeCamera(sceneGraphView);
             stonyHurstCamera = new GL3DTrackballStonyhurstCamera(sceneGraphView);
             solarRotationCamera = new GL3DSolarRotationTrackingTrackballCamera(sceneGraphView);
-            setSolarOrbiterCamera(new GL3DSolarOrbiterCamera(sceneGraphView));
+            solarOrbiterCamera = new GL3DSolarOrbiterCamera(sceneGraphView);
 
             defaultCamera = trackballCamera;
             lastCamera = defaultCamera;
             cameras.add(trackballCamera);
             cameras.add(solarRotationCamera);
+            cameras.add(fixedTimeCamera);
+            cameras.add(stonyHurstCamera);
+            cameras.add(solarOrbiterCamera);
+
             defaultCamera = trackballCamera;
 
             if (getCameraView() != null) {
@@ -114,7 +118,10 @@ public class GL3DCameraSelectorModel extends AbstractListModel implements ComboB
 
     @Override
     public GL3DCamera getSelectedItem() {
-        return getCameraView().getCurrentCamera();
+        if (getCameraView() != null) {
+            return getCameraView().getCurrentCamera();
+        }
+        return null;
     }
 
     public void setCurrentCamera(GL3DCamera camera) {
@@ -165,10 +172,6 @@ public class GL3DCameraSelectorModel extends AbstractListModel implements ComboB
 
     public GL3DSolarOrbiterCamera getSolarOrbiterCamera() {
         return solarOrbiterCamera;
-    }
-
-    public void setSolarOrbiterCamera(GL3DSolarOrbiterCamera solarOrbiterCamera) {
-        this.solarOrbiterCamera = solarOrbiterCamera;
     }
 
 }
