@@ -45,8 +45,8 @@ public class GL3DFollowObjectCameraOptionPanel extends GL3DCameraOptionPanel {
         endDatePicker = new JHVCalendarDatePicker();
         endTimePicker = new TimeTextField();
         addEndDatePanel();
-        this.setBeginTime();
-        this.setEndTime();
+        this.syncWithLayerBeginTime();
+        this.syncWithLayerEndTime();
 
     }
 
@@ -95,9 +95,9 @@ public class GL3DFollowObjectCameraOptionPanel extends GL3DCameraOptionPanel {
 
     private void setEndTime() {
         try {
-            Date dt = TimeTextField.formatter.parse(beginTimePicker.getText());
-            camera.setBeginDate(new Date(beginDatePicker.getDate().getTime() + dt.getTime()));
-            System.out.println(new Date(beginDatePicker.getDate().getTime() + dt.getTime()));
+            Date dt = TimeTextField.formatter.parse(endTimePicker.getText());
+            camera.setBeginDate(new Date(endDatePicker.getDate().getTime() + dt.getTime()));
+            System.out.println(new Date(endDatePicker.getDate().getTime() + dt.getTime()));
         } catch (ParseException e) {
             Log.error("Date parsing failed" + e);
         }
