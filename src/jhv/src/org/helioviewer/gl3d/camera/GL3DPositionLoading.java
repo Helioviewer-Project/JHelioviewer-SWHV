@@ -8,6 +8,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.Locale;
@@ -32,32 +33,31 @@ public class GL3DPositionLoading {
     public GL3DPositionDateTime[] positionDateTime;
     private final SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
     private final GregorianCalendar calendar = new GregorianCalendar();
-    private final String beginDate = "2017-07-28T00:00:00";
-    private final String endDate = "2027-05-30T00:00:00";
-    private final String[] targetList = { "SOLAR%20ORBITER" };
-    private final int target = 0;
+    private String beginDate = "2017-07-28T00:00:00";
+    private String endDate = "2027-05-30T00:00:00";
+    private String target = "SOLAR%20ORBITER";
     private final String observer = "SUN";
     private final String baseUrl = "http://swhv:7789/multiposition?";
     private final int steps = 935;
 
     public GL3DPositionLoading() {
-        buildRequestURL();
         this.requestData();
     }
 
     private void buildRequestURL() {
         try {
-            url = new URL(baseUrl + "begin_utc=" + this.beginDate + "&end_utc=" + this.endDate + "&steps=" + steps + "&observer=" + observer + "&target=" + targetList[0] + "&ref=HEEQ&kind=latitudinal");
+            url = new URL(baseUrl + "begin_utc=" + this.beginDate + "&end_utc=" + this.endDate + "&steps=" + steps + "&observer=" + observer + "&target=" + target + "&ref=HEEQ&kind=latitudinal");
         } catch (MalformedURLException e) {
             Log.error("A wrong url is given.", e);
         }
     }
 
-    private void requestData() {
+    public void requestData() {
         Thread loadData = new Thread(new Runnable() {
             @Override
             public void run() {
                 try {
+                    buildRequestURL();
                     DownloadStream ds = new DownloadStream(url, 30000, 30000);
                     Reader reader = new BufferedReader(new InputStreamReader(ds.getInput(), "UTF-8"));
                     jsonResult = new JSONObject(new JSONTokener(reader));
@@ -102,6 +102,34 @@ public class GL3DPositionLoading {
         return this.isLoaded;
     }
 
+    public void setBeginDate(String beginDate) {
+        this.beginDate = beginDate;
+    }
+
+    public void setBeginDate(Date beginDate) {
+        this.beginDate = this.format.format(beginDate);
+    }
+
+    public void setBeginDate(long beginDate) {
+        this.beginDate = this.format.format(new Date(beginDate));
+    }
+
+    public void setEndDate(String endDate) {
+        this.endDate = endDate;
+    }
+
+    public void setEndDate(Date endDate) {
+        this.endDate = this.format.format(endDate);
+    }
+
+    public void setEndDate(long endDate) {
+        this.endDate = this.format.format(new Date(endDate));
+    }
+
+    public void setTarget(String target) {
+        this.target = target;
+    }
+
     public static void main(String[] args) throws InterruptedException {
         // Uncaught runtime errors are displayed in a dialog box in addition
         JHVUncaughtExceptionHandler.setupHandlerForThread();
@@ -128,5 +156,21 @@ public class GL3DPositionLoading {
             System.out.println(positionDateTime);
         }
 
+    }
+
+    private final ArrayList<GL3DPositionLoadingListener> listeners = new ArrayList<GL3DPositionLoadingListener>();
+
+    public void addListener(GL3DPositionLoadingListener listener) {
+        synchronized (listeners) {
+            listeners.add(listener);
+        }
+    }
+
+    public void fireLoaded() {
+        synchronized (listeners) {
+            for (GL3DPositionLoadingListener listener : listeners) {
+                listener.fireNewLoaded();
+            }
+        }
     }
 }

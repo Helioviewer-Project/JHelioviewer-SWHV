@@ -13,14 +13,13 @@ public class GL3DCameraOptionsAttributeManager {
 
     public GL3DCameraOptionPanel getCameraOptionAttributePanel(GL3DCamera camera) {
         if (camera instanceof GL3DEarthCamera) {
-            return new GL3DTrackBallCameraOptionPanel((GL3DEarthCamera) camera);
+            return new GL3DEarthCameraOptionPanel((GL3DEarthCamera) camera);
         } else if (camera instanceof GL3DFixedTimeCamera) {
             return new GL3DFixedTimeCameraOptionPanel((GL3DFixedTimeCamera) camera);
-
         } else if (camera instanceof GL3DFollowObjectCamera) {
             return new GL3DFollowObjectCameraOptionPanel((GL3DFollowObjectCamera) camera);
-        } else if (camera instanceof GL3DSolarRotationTrackingTrackballCamera) {
-            return new GL3DSolarRotationTrackingTrackballCameraOptionPanel((GL3DSolarRotationTrackingTrackballCamera) camera);
+        } else if (camera instanceof GL3DObserverCamera) {
+            return new GL3DObserverCameraOptionPanel((GL3DObserverCamera) camera);
         }
         return new GL3DCameraOptionPanel();
     }

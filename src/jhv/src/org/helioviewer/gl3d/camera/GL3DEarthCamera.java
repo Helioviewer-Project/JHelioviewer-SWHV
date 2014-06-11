@@ -58,7 +58,7 @@ public class GL3DEarthCamera extends GL3DSolarRotationTrackingTrackballCamera im
 
     @Override
     public String getName() {
-        return "View from observer";
+        return "View from earth";
     }
 
     @Override
@@ -71,15 +71,13 @@ public class GL3DEarthCamera extends GL3DSolarRotationTrackingTrackballCamera im
     }
 
     public void updateRotation() {
-
         this.timediff = (currentDate.getTime()) / 1000 - Constants.referenceDate;
         this.currentRotation = DifferentialRotation.calculateRotationInRadians(0., this.timediff) % (Math.PI * 2.0);
         Calendar cal = new GregorianCalendar();
         cal.setTime(new Date(currentDate.getTime()));
         double b0 = Astronomy.getB0InRadians(cal);
         this.getLocalRotation().clear();
-        this.getLocalRotation().rotate(GL3DQuatd.createRotation(b0, new GL3DVec3d(1, 0, 0)));
-
+        this.getLocalRotation().rotate(GL3DQuatd.createRotation(-b0, new GL3DVec3d(1, 0, 0)));
         this.getLocalRotation().rotate(GL3DQuatd.createRotation(this.currentRotation, new GL3DVec3d(0, 1, 0)));
         this.updateCameraTransformation();
     }

@@ -16,7 +16,7 @@ import org.helioviewer.viewmodel.view.View;
 import org.helioviewer.viewmodel.view.ViewListener;
 import org.helioviewer.viewmodel.view.jp2view.JHVJPXView;
 
-public class GL3DFollowObjectCamera extends GL3DSolarRotationTrackingTrackballCamera implements ViewListener {
+public class GL3DFollowObjectCamera extends GL3DSolarRotationTrackingTrackballCamera implements ViewListener, GL3DPositionLoadingListener {
 
     private final CoordinateVector startPosition = null;
 
@@ -29,6 +29,7 @@ public class GL3DFollowObjectCamera extends GL3DSolarRotationTrackingTrackballCa
     public GL3DFollowObjectCamera(GL3DSceneGraphView sceneGraphView) {
         super(sceneGraphView);
         positionLoading = new GL3DPositionLoading();
+        positionLoading.addListener(this);
     }
 
     @Override
@@ -91,5 +92,10 @@ public class GL3DFollowObjectCamera extends GL3DSolarRotationTrackingTrackballCa
     }
 
     private void resetStartPosition() {
+    }
+
+    @Override
+    public void fireNewLoaded() {
+
     }
 }
