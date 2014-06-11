@@ -188,7 +188,6 @@ public abstract class GL3DMesh extends GL3DShape {
 
     private void renderWireframe(GL3DState state, GL3DMeshPrimitive primitive) {
         GL gl = state.gl;
-        gl.glColor3d(1, 1, 0);
         gl.glDisable(GL.GL_LIGHTING);
         gl.glDisable(GL.GL_TEXTURE_2D);
         if (primitive == GL3DMeshPrimitive.QUADS) {
