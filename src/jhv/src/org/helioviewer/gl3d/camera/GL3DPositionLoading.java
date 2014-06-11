@@ -31,8 +31,8 @@ public class GL3DPositionLoading {
     private String endDate = "2027-05-30T00:00:00";
     private String target = "SOLAR%20ORBITER";
     private final String observer = "SUN";
-    private final String baseUrl = "http://swhv:7789/multiposition?";
-    private final int steps = 935;
+    private final String baseUrl = "http://swhv:7789/position?";
+    private final int deltat = 60 * 60 * 6; //6 hours
 
     public GL3DPositionLoading() {
         this.requestData();
@@ -40,7 +40,7 @@ public class GL3DPositionLoading {
 
     private void buildRequestURL() {
         try {
-            url = new URL(baseUrl + "begin_utc=" + this.beginDate + "&end_utc=" + this.endDate + "&steps=" + steps + "&observer=" + observer + "&target=" + target + "&ref=HEEQ&kind=latitudinal");
+            url = new URL(baseUrl + "utc=" + this.beginDate + "&utc_end=" + this.endDate + "&deltat=" + deltat + "&observer=" + observer + "&target=" + target + "&ref=HEEQ&kind=latitudinal");
         } catch (MalformedURLException e) {
             Log.error("A wrong url is given.", e);
         }
@@ -98,14 +98,23 @@ public class GL3DPositionLoading {
 
     public void setBeginDate(String beginDate) {
         this.beginDate = beginDate;
+        applyChanges();
+
     }
 
     public void setBeginDate(Date beginDate) {
         this.beginDate = this.format.format(beginDate);
+        applyChanges();
+    }
+
+    public void applyChanges() {
+        this.isLoaded = false;
+        this.requestData();
     }
 
     public void setBeginDate(long beginDate) {
         this.beginDate = this.format.format(new Date(beginDate));
+        applyChanges();
     }
 
     public void setEndDate(String endDate) {
@@ -114,14 +123,17 @@ public class GL3DPositionLoading {
 
     public void setEndDate(Date endDate) {
         this.endDate = this.format.format(endDate);
+        applyChanges();
     }
 
     public void setEndDate(long endDate) {
         this.endDate = this.format.format(new Date(endDate));
+        applyChanges();
     }
 
     public void setTarget(String target) {
         this.target = target;
+        applyChanges();
     }
 
     private final ArrayList<GL3DPositionLoadingListener> listeners = new ArrayList<GL3DPositionLoadingListener>();
