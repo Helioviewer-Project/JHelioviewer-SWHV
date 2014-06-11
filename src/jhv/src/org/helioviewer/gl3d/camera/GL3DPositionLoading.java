@@ -39,7 +39,7 @@ public class GL3DPositionLoading {
 
     private void buildRequestURL() {
         try {
-            url = new URL("http://swhv:7789/multiposition?begin_utc=2017-07-28T00:00:00&end_utc=2019-05-30T00:00:00&steps=48&observer=SUN&target=SOLAR%20ORBITER&ref=HEEQ&kind=latitudinal");
+            url = new URL("http://swhv:7789/multiposition?begin_utc=2017-07-28T00:00:00&end_utc=2027-05-30T00:00:00&steps=935&observer=SUN&target=SOLAR%20ORBITER&ref=HEEQ&kind=latitudinal");
         } catch (MalformedURLException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();

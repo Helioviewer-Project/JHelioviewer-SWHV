@@ -88,8 +88,6 @@ public class GL3DCameraSelectorModel extends AbstractListModel implements ComboB
             cameras.add(trackballCamera);
             cameras.add(solarRotationCamera);
             defaultCamera = trackballCamera;
-            trackballCamera.setSceneGraphView(sceneGraphView);
-            solarRotationCamera.setSceneGraphView(sceneGraphView);
 
             if (getCameraView() != null) {
                 setCurrentCamera(lastCamera);
@@ -121,6 +119,7 @@ public class GL3DCameraSelectorModel extends AbstractListModel implements ComboB
 
     public void setCurrentCamera(GL3DCamera camera) {
         lastCamera = camera;
+        System.out.println(camera);
         getCameraView().setCurrentCamera(camera);
     }
 
