@@ -53,7 +53,7 @@ public abstract class GL3DDefaultInteraction extends GL3DInteraction {
             cameraTranslation.negate();
             camera.addCameraAnimation(new GL3DCameraPanAnimation(cameraTranslation));
         } else {
-            camera.setZTranslation(-GL3DTrackballCamera.DEFAULT_CAMERA_DISTANCE);
+            camera.setZTranslation(-GL3DEarthCamera.DEFAULT_CAMERA_DISTANCE);
             this.camera.updateCameraTransformation();
         }
     }
