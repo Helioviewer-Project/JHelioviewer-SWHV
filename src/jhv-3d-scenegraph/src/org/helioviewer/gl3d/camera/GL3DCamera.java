@@ -166,6 +166,9 @@ public abstract class GL3DCamera {
         this.cameraAnimations.clear();
     }
 
+    public void activate() {
+    }
+
     public void applyPerspective(GL3DState state) {
         GL gl = state.gl;
         int viewport[] = new int[4];
