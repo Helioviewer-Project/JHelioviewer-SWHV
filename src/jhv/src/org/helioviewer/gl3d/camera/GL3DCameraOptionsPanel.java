@@ -14,7 +14,7 @@ public class GL3DCameraOptionsPanel extends JPanel {
     private static final long serialVersionUID = 3942154069677445408L;
     private JComboBox cameraComboBox;
     private GL3DCameraSelectorModel cameraSelectorModel;
-    private JPanel optionsPanel;
+    private GL3DCameraOptionPanel optionsPanel;
     private final GL3DCameraOptionsAttributeManager cameraOptionsAttributeManager = GL3DCameraOptionsAttributeManager.getSingletonInstance();
 
     public GL3DCameraOptionsPanel() {
@@ -42,6 +42,7 @@ public class GL3DCameraOptionsPanel extends JPanel {
                         cameraSelectorModel.setCurrentCamera(selectedCamera);
                         cameraSelectorModel.getCurrentCamera().activate();
                         if (optionsPanel != null) {
+                            optionsPanel.deactivate();
                             remove(optionsPanel);
                         }
                         optionsPanel = cameraOptionsAttributeManager.getCameraOptionAttributePanel(selectedCamera);
@@ -52,4 +53,5 @@ public class GL3DCameraOptionsPanel extends JPanel {
             }
         });
     }
+
 }

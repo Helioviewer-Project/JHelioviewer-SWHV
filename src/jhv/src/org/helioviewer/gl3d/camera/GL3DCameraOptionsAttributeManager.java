@@ -21,6 +21,6 @@ public class GL3DCameraOptionsAttributeManager {
         } else if (camera instanceof GL3DObserverCamera) {
             return new GL3DObserverCameraOptionPanel((GL3DObserverCamera) camera);
         }
-        return new GL3DCameraOptionPanel();
+        return null;
     }
 }

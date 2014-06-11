@@ -6,4 +6,10 @@ public class GL3DEarthCameraOptionPanel extends GL3DCameraOptionPanel {
         // TODO Auto-generated constructor stub
     }
 
+    @Override
+    public void deactivate() {
+        // TODO Auto-generated method stub
+
+    }
+
 }

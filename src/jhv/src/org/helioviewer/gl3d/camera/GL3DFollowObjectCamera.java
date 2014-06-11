@@ -1,5 +1,6 @@
 package org.helioviewer.gl3d.camera;
 
+import java.util.ArrayList;
 import java.util.Date;
 
 import org.helioviewer.base.physics.Constants;
@@ -23,6 +24,7 @@ public class GL3DFollowObjectCamera extends GL3DSolarRotationTrackingTrackballCa
     private Date currentDate = null;
     private double currentRotation = 0.0;
     private long timediff;
+    private final ArrayList<GL3DFollowObjectCameraListener> followObjectCameraListeners = new ArrayList<GL3DFollowObjectCameraListener>();
 
     private final GL3DPositionLoading positionLoading;
 
@@ -115,9 +117,25 @@ public class GL3DFollowObjectCamera extends GL3DSolarRotationTrackingTrackballCa
         }
     }
 
-    @Override
-    public void fireNewLoaded() {
+    public void addFollowObjectCameraListener(GL3DFollowObjectCameraListener listener) {
+        synchronized (followObjectCameraListeners) {
+            this.followObjectCameraListeners.add(listener);
+        }
+    }
 
+    public void removeFollowObjectCameraListener(GL3DFollowObjectCameraListener listener) {
+        synchronized (followObjectCameraListeners) {
+            this.followObjectCameraListeners.remove(listener);
+        }
+    }
+
+    @Override
+    public void fireNewLoaded(boolean isLoaded) {
+        synchronized (followObjectCameraListeners) {
+            for (GL3DFollowObjectCameraListener listener : followObjectCameraListeners) {
+                listener.fireLoaded(isLoaded);
+            }
+        }
     }
 
     public void setBeginDate(Date date) {
@@ -131,4 +149,5 @@ public class GL3DFollowObjectCamera extends GL3DSolarRotationTrackingTrackballCa
     public void setObservingObject(String object) {
         this.positionLoading.setObservingObject(object);
     }
+
 }

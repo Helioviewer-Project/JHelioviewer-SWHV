@@ -32,7 +32,7 @@ public class GL3DPositionLoading {
     private String target = "SOLAR%20ORBITER";
     private final String observer = "SUN";
     private final String baseUrl = "http://localhost:7789/position?";
-    private final int deltat = 60 * 60 * 6; //6 hours
+    private final int deltat = 60 * 60 * 6; //6 hours by default
     private final ArrayList<GL3DPositionLoadingListener> listeners = new ArrayList<GL3DPositionLoadingListener>();
     private Date beginDatems;
     private Date endDatems;
@@ -65,7 +65,7 @@ public class GL3DPositionLoading {
                     jsonResult = new JSONArray(new JSONTokener(reader));
                     parseData();
                     if (positionDateTime.length > 0) {
-                        isLoaded = true;
+                        setLoaded(true);
                     }
                 } catch (final IOException e1) {
                     Log.warn("Error Parsing the EVE Response.", e1);
@@ -74,8 +74,14 @@ public class GL3DPositionLoading {
                 }
 
             }
+
         });
         loadData.run();
+    }
+
+    private void setLoaded(boolean isLoaded) {
+        this.isLoaded = isLoaded;
+        this.fireLoaded();
     }
 
     private void parseData() {
@@ -115,7 +121,7 @@ public class GL3DPositionLoading {
     }
 
     public void applyChanges() {
-        this.isLoaded = false;
+        this.setLoaded(false);
         this.requestData();
     }
 
@@ -146,7 +152,7 @@ public class GL3DPositionLoading {
     public void fireLoaded() {
         synchronized (listeners) {
             for (GL3DPositionLoadingListener listener : listeners) {
-                listener.fireNewLoaded();
+                listener.fireNewLoaded(this.isLoaded);
             }
         }
     }
