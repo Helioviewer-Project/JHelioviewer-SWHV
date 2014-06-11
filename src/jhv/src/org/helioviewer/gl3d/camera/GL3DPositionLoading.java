@@ -29,9 +29,9 @@ public class GL3DPositionLoading {
     private final GregorianCalendar calendar = new GregorianCalendar();
     private String beginDate = "2017-07-28T00:00:00";
     private String endDate = "2027-05-30T00:00:00";
-    private String target = "SOLAR%20ORBITER";
+    private final String target = "SOLAR%20ORBITER";
     private final String observer = "SUN";
-    private final String baseUrl = "http://swhv:7789/position?";
+    private final String baseUrl = "http://localhost:7789/position?";
     private final int deltat = 60 * 60 * 6; //6 hours
 
     public GL3DPositionLoading() {
@@ -96,14 +96,9 @@ public class GL3DPositionLoading {
         return this.isLoaded;
     }
 
-    public void setBeginDate(String beginDate) {
-        this.beginDate = beginDate;
-        applyChanges();
-
-    }
-
     public void setBeginDate(Date beginDate) {
         this.beginDate = this.format.format(beginDate);
+        this.beginDatems = beginDate;
         applyChanges();
     }
 
@@ -114,29 +109,25 @@ public class GL3DPositionLoading {
 
     public void setBeginDate(long beginDate) {
         this.beginDate = this.format.format(new Date(beginDate));
+        this.beginDatems = new Date(beginDate);
         applyChanges();
-    }
-
-    public void setEndDate(String endDate) {
-        this.endDate = endDate;
     }
 
     public void setEndDate(Date endDate) {
         this.endDate = this.format.format(endDate);
+        this.endDatems = endDate;
         applyChanges();
     }
 
     public void setEndDate(long endDate) {
         this.endDate = this.format.format(new Date(endDate));
-        applyChanges();
-    }
-
-    public void setTarget(String target) {
-        this.target = target;
+        this.endDatems = new Date(endDate);
         applyChanges();
     }
 
     private final ArrayList<GL3DPositionLoadingListener> listeners = new ArrayList<GL3DPositionLoadingListener>();
+    private Date beginDatems;
+    private Date endDatems;
 
     public void addListener(GL3DPositionLoadingListener listener) {
         synchronized (listeners) {
@@ -150,5 +141,13 @@ public class GL3DPositionLoading {
                 listener.fireNewLoaded();
             }
         }
+    }
+
+    public Date getBeginDate() {
+        return this.beginDatems;
+    }
+
+    public Date getEndDate() {
+        return this.endDatems;
     }
 }
