@@ -20,7 +20,8 @@ import org.helioviewer.jhv.gui.components.calendar.JHVCalendarEvent;
 import org.helioviewer.jhv.gui.components.calendar.JHVCalendarListener;
 import org.helioviewer.jhv.layers.LayersModel;
 
-public class GL3DFollowObjectCameraOptionPanel extends GL3DCameraOptionPanel {
+public class GL3DFollowObjectCameraOptionPanel extends GL3DCameraOptionPanel implements GL3DFollowObjectCameraListener {
+    private final JLabel loadedLabel;
     private final JLabel beginDateLabel;
     private JPanel beginDatetimePanel;
     JHVCalendarDatePicker beginDatePicker;
@@ -36,6 +37,8 @@ public class GL3DFollowObjectCameraOptionPanel extends GL3DCameraOptionPanel {
     public GL3DFollowObjectCameraOptionPanel(GL3DFollowObjectCamera camera) {
         this.camera = camera;
         setLayout(new GridLayout(0, 1));
+        this.loadedLabel = new JLabel("Not loaded");
+        add(this.loadedLabel);
         addObjectCombobox();
         beginDateLabel = new JLabel("Begin date");
         beginDatePicker = new JHVCalendarDatePicker();
@@ -47,7 +50,12 @@ public class GL3DFollowObjectCameraOptionPanel extends GL3DCameraOptionPanel {
         addEndDatePanel();
         this.syncWithLayerBeginTime();
         this.syncWithLayerEndTime();
+        this.camera.addFollowObjectCameraListener(this);
+    }
 
+    @Override
+    public void deactivate() {
+        this.camera.removeFollowObjectCameraListener(this);
     }
 
     private void addObjectCombobox() {
@@ -175,5 +183,14 @@ public class GL3DFollowObjectCameraOptionPanel extends GL3DCameraOptionPanel {
         endDatetimePanel.add(endDatePicker);
         endDatetimePanel.add(endTimePicker);
         add(endDatetimePanel);
+    }
+
+    @Override
+    public void fireLoaded(boolean isLoaded) {
+        if (isLoaded) {
+            this.loadedLabel.setText("Loaded");
+        } else {
+            this.loadedLabel.setText("Not Loaded");
+        }
     }
 }

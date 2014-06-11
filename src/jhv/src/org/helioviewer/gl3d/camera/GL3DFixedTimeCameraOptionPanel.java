@@ -72,4 +72,10 @@ public class GL3DFixedTimeCameraOptionPanel extends GL3DCameraOptionPanel {
         timeDelay += timedelayTime.getValue().getTime();
     }
 
+    @Override
+    public void deactivate() {
+        // TODO Auto-generated method stub
+
+    }
+
 }
