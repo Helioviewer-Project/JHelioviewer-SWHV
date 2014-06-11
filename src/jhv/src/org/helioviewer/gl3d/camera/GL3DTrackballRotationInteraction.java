@@ -11,7 +11,7 @@ import org.helioviewer.gl3d.view.GL3DSceneGraphView;
 import org.helioviewer.jhv.display.Displayer;
 
 /**
- * This interaction is used by the {@link GL3DTrackballCamera} as its rotation
+ * This interaction is used by the {@link GL3DEarthCamera} as its rotation
  * interaction. The calculation of the rotation done by creating a rotation
  * Quaternion between two points on a sphere. These points are retrieved by
  * using the raycasting mechanism provided by {@link GL3DRayTracer}.

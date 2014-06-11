@@ -12,7 +12,7 @@ import org.helioviewer.gl3d.camera.GL3DCamera;
 import org.helioviewer.gl3d.camera.GL3DFixedTimeCamera;
 import org.helioviewer.gl3d.camera.GL3DFollowObjectCamera;
 import org.helioviewer.gl3d.camera.GL3DSolarRotationTrackingTrackballCamera;
-import org.helioviewer.gl3d.camera.GL3DTrackballCamera;
+import org.helioviewer.gl3d.camera.GL3DEarthCamera;
 import org.helioviewer.gl3d.camera.GL3DTrackballStonyhurstCamera;
 import org.helioviewer.gl3d.view.GL3DCameraView;
 import org.helioviewer.gl3d.view.GL3DSceneGraphView;
@@ -38,7 +38,7 @@ public class GL3DCameraSelectorModel extends AbstractListModel implements ComboB
 
     private GL3DCamera lastCamera;
 
-    private GL3DTrackballCamera trackballCamera;
+    private GL3DEarthCamera earthCamera;
 
     private GL3DSolarRotationTrackingTrackballCamera solarRotationCamera;
 
@@ -77,21 +77,21 @@ public class GL3DCameraSelectorModel extends AbstractListModel implements ComboB
         // getMainView().getAdapter(GL3DSceneGraphView.class);
 
         if (sceneGraphView != null) {
-            trackballCamera = new GL3DTrackballCamera(sceneGraphView);
+            earthCamera = new GL3DEarthCamera(sceneGraphView);
             fixedTimeCamera = new GL3DFixedTimeCamera(sceneGraphView);
             stonyHurstCamera = new GL3DTrackballStonyhurstCamera(sceneGraphView);
             solarRotationCamera = new GL3DSolarRotationTrackingTrackballCamera(sceneGraphView);
             followObjectCamera = new GL3DFollowObjectCamera(sceneGraphView);
 
-            defaultCamera = trackballCamera;
+            defaultCamera = earthCamera;
             lastCamera = defaultCamera;
-            cameras.add(trackballCamera);
+            cameras.add(earthCamera);
             cameras.add(solarRotationCamera);
             cameras.add(fixedTimeCamera);
             cameras.add(stonyHurstCamera);
             cameras.add(followObjectCamera);
 
-            defaultCamera = trackballCamera;
+            defaultCamera = earthCamera;
 
             if (getCameraView() != null) {
                 setCurrentCamera(lastCamera);
@@ -154,8 +154,8 @@ public class GL3DCameraSelectorModel extends AbstractListModel implements ComboB
         return null;
     }
 
-    public GL3DTrackballCamera getTrackballCamera() {
-        return trackballCamera;
+    public GL3DEarthCamera getTrackballCamera() {
+        return earthCamera;
     }
 
     public GL3DSolarRotationTrackingTrackballCamera getSolarRotationCamera() {

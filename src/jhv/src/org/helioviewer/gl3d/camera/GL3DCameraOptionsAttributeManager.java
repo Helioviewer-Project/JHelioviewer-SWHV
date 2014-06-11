@@ -12,8 +12,8 @@ public class GL3DCameraOptionsAttributeManager {
     }
 
     public GL3DCameraOptionPanel getCameraOptionAttributePanel(GL3DCamera camera) {
-        if (camera instanceof GL3DTrackballCamera) {
-            return new GL3DTrackBallCameraOptionPanel((GL3DTrackballCamera) camera);
+        if (camera instanceof GL3DEarthCamera) {
+            return new GL3DTrackBallCameraOptionPanel((GL3DEarthCamera) camera);
         } else if (camera instanceof GL3DFixedTimeCamera) {
             return new GL3DFixedTimeCameraOptionPanel((GL3DFixedTimeCamera) camera);
 
