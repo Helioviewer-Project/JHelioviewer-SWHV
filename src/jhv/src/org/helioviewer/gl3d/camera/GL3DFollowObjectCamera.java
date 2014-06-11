@@ -8,6 +8,7 @@ import org.helioviewer.gl3d.scenegraph.math.GL3DQuatd;
 import org.helioviewer.gl3d.scenegraph.math.GL3DVec3d;
 import org.helioviewer.gl3d.view.GL3DSceneGraphView;
 import org.helioviewer.gl3d.wcs.CoordinateVector;
+import org.helioviewer.jhv.layers.LayersModel;
 import org.helioviewer.viewmodel.changeevent.ChangeEvent;
 import org.helioviewer.viewmodel.changeevent.TimestampChangedReason;
 import org.helioviewer.viewmodel.view.LinkedMovieManager;
@@ -80,15 +81,24 @@ public class GL3DFollowObjectCamera extends GL3DSolarRotationTrackingTrackballCa
     }
 
     public void updateRotation() {
-        this.timediff = currentDate.getTime() - Constants.referenceDate;
+        if (this.positionLoading.isLoaded()) {
+            long t1 = LayersModel.getSingletonInstance().getFirstDate().getTime();
+            long t2 = LayersModel.getSingletonInstance().getLastDate().getTime();
 
-        this.currentRotation = (currentL + DifferentialRotation.calculateRotationInRadians(0., this.timediff)) % (Math.PI * 2.0);
-        GL3DQuatd newRotation = GL3DQuatd.createRotation(this.currentRotation, new GL3DVec3d(0, 1, 0));
-        newRotation.rotate(GL3DQuatd.createRotation(currentB, new GL3DVec3d(1, 0, 0)));
-        this.setLocalRotation(newRotation);
-        this.setZTranslation(-currentDistance);
-        System.out.println(this.getZTranslation());
-        this.updateCameraTransformation();
+            long t3 = this.positionLoading.getBeginDate().getTime();
+            long t4 = this.positionLoading.getEndDate().getTime();
+
+            //Linear scaling between camera range and current time interval range
+            long currentCameraTime = (long) (t3 + 1. * (t4 - t3) * (currentDate.getTime() - t1) / (t2 - t1));
+
+            this.timediff = currentCameraTime - Constants.referenceDate;
+            this.currentRotation = (currentL + DifferentialRotation.calculateRotationInRadians(0., this.timediff)) % (Math.PI * 2.0);
+            GL3DQuatd newRotation = GL3DQuatd.createRotation(this.currentRotation, new GL3DVec3d(0, 1, 0));
+            newRotation.rotate(GL3DQuatd.createRotation(currentB, new GL3DVec3d(1, 0, 0)));
+            this.setLocalRotation(newRotation);
+            this.setZTranslation(-currentDistance);
+            this.updateCameraTransformation();
+        }
     }
 
     private void resetStartPosition() {
