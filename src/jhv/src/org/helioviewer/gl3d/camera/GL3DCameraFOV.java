@@ -2,8 +2,6 @@ package org.helioviewer.gl3d.camera;
 
 import java.util.List;
 
-import javax.media.opengl.GL;
-
 import org.helioviewer.gl3d.scenegraph.GL3DDrawBits.Bit;
 import org.helioviewer.gl3d.scenegraph.GL3DMesh;
 import org.helioviewer.gl3d.scenegraph.GL3DState;
@@ -25,10 +23,8 @@ public class GL3DCameraFOV extends GL3DMesh {
     @Override
     public void shapeDraw(GL3DState state) {
         this.markAsChanged();
-        state.gl.glEnable(GL.GL_COLOR);
         state.gl.glColor3d(1., 0., 0.);
         super.shapeDraw(state);
-        state.gl.glDisable(GL.GL_COLOR);
     }
 
     @Override
