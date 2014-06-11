@@ -413,7 +413,7 @@ public class ImageViewerGui {
             GL3DCameraOptionsPanel cameraOptionsPanel = new GL3DCameraOptionsPanel();
             cameraTab.addTab("Internal Plugins", cameraOptionsPanel);
             cameraTab.setEnabled(false);
-            leftPane.add("Camera options", cameraOptionsPanel, false);
+            leftPane.add("Camera Options", cameraOptionsPanel, false);
             return leftPane;
         }
     }
