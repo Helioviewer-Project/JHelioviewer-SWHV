@@ -9,7 +9,7 @@ import org.helioviewer.base.physics.Constants;
 import org.helioviewer.gl3d.camera.GL3DCamera;
 import org.helioviewer.gl3d.camera.GL3DCameraListener;
 import org.helioviewer.gl3d.model.GL3DHitReferenceShape;
-import org.helioviewer.gl3d.scenegraph.GL3DOrientedGroup;
+import org.helioviewer.gl3d.scenegraph.GL3DGroup;
 import org.helioviewer.gl3d.scenegraph.GL3DState;
 import org.helioviewer.gl3d.scenegraph.math.GL3DVec3d;
 import org.helioviewer.gl3d.scenegraph.math.GL3DVec4d;
@@ -19,8 +19,6 @@ import org.helioviewer.gl3d.shader.GL3DImageFragmentShaderProgram;
 import org.helioviewer.gl3d.view.GL3DCoordinateSystemView;
 import org.helioviewer.gl3d.view.GL3DImageTextureView;
 import org.helioviewer.gl3d.view.GL3DView;
-import org.helioviewer.gl3d.wcs.CoordinateSystem;
-import org.helioviewer.gl3d.wcs.CoordinateVector;
 import org.helioviewer.viewmodel.changeevent.ChangeEvent;
 import org.helioviewer.viewmodel.metadata.MetaData;
 import org.helioviewer.viewmodel.region.Region;
@@ -39,7 +37,7 @@ import org.helioviewer.viewmodel.view.jp2view.JHVJPXView;
  * @author Simon Spoerri (simon.spoerri@fhnw.ch)
  * 
  */
-public abstract class GL3DImageLayer extends GL3DOrientedGroup implements GL3DCameraListener, ViewListener {
+public abstract class GL3DImageLayer extends GL3DGroup implements GL3DCameraListener, ViewListener {
     private static int nextLayerId = 0;
     private final int layerId;
     private GL3DVec4d direction = new GL3DVec4d(0, 0, 1, 0);
@@ -105,7 +103,6 @@ public abstract class GL3DImageLayer extends GL3DOrientedGroup implements GL3DCa
             this.jpxView.addViewListener(this);
         }
 
-        getCoordinateSystem().addListener(this);
         this.doUpdateROI = true;
         this.markAsChanged();
     }
@@ -159,17 +156,6 @@ public abstract class GL3DImageLayer extends GL3DOrientedGroup implements GL3DCa
 
     public void setLayerDirection(GL3DVec4d direction) {
         this.direction = direction;
-    }
-
-    @Override
-    public CoordinateSystem getCoordinateSystem() {
-        return this.coordinateSystemView.getCoordinateSystem();
-    }
-
-    @Override
-    public CoordinateVector getOrientation() {
-        // Log.debug("GL3DImageLayer: Orientation: "+this.coordinateSystemView.getOrientation());
-        return this.coordinateSystemView.getOrientation();
     }
 
     private void updateROI(GL3DCamera activeCamera) {
