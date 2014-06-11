@@ -30,6 +30,8 @@ public class GL3DPositionLoading {
     private URL url;
     private JSONObject jsonResult;
     public GL3DPositionDateTime[] positionDateTime;
+    private final SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
+    private final GregorianCalendar calendar = new GregorianCalendar();
 
     public GL3DPositionLoading() {
         buildRequestURL();
@@ -67,8 +69,7 @@ public class GL3DPositionLoading {
     }
 
     private void parseData() {
-        SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
-        final GregorianCalendar calendar = new GregorianCalendar();
+
         calendar.clear();
         try {
             JSONArray posArray = this.jsonResult.getJSONObject("multipositionResponse").getJSONObject("multipositionResult").getJSONArray("float");
