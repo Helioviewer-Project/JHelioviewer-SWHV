@@ -4,14 +4,14 @@ import java.awt.EventQueue;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
 import java.util.Date;
 
 import javax.swing.BoxLayout;
-import javax.swing.ButtonGroup;
+import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
-import javax.swing.JRadioButton;
-import javax.swing.JSpinner;
 
 import org.helioviewer.basegui.components.TimeTextField;
 import org.helioviewer.gl3d.gui.GL3DCameraSelectorModel;
@@ -23,12 +23,14 @@ import org.helioviewer.jhv.gui.components.calendar.JHVCalendarListener;
 
 public class GL3DCameraOptionsPanel extends JPanel {
     private static final long serialVersionUID = 3942154069677445408L;
-    private JSpinner timedelaySpinner;
     private long timeDelay;
     private JPanel timedelayPanel;
     private JLabel timedelayLabel;
     private JHVCalendarDatePicker timedelayDate;
     private TimeTextField timedelayTime;
+    private JComboBox cameraComboBox;
+    private GL3DCamera currentCamera;
+    private GL3DCameraSelectorModel cameraSelectorModel;
 
     public GL3DCameraOptionsPanel() {
         setLayout(new BoxLayout(this, BoxLayout.PAGE_AXIS));
@@ -36,73 +38,28 @@ public class GL3DCameraOptionsPanel extends JPanel {
         EventQueue.invokeLater(new Runnable() {
             @Override
             public void run() {
-                addCameraChoiceRadioButtons();
-                addTimedelayPanel();
+                addCameraComboBox();
             }
         });
     }
 
-    private void addCameraChoiceRadioButtons() {
-        String earthCameraButtonString = "View from earth";
-        String stonyhurstCameraButtonString = "Stonyhurst view";
-        String fixedTimeCameraButtonString = "View from earth at fixed time";
-        String solarOrbiterCameraButtonString = "View from solar orbiter";
-
-        JRadioButton earthCameraButton = new JRadioButton(earthCameraButtonString);
-        earthCameraButton.addActionListener(new ActionListener() {
+    private void addCameraComboBox() {
+        cameraSelectorModel = GL3DCameraSelectorModel.getInstance();
+        this.cameraComboBox = new JComboBox(cameraSelectorModel);
+        add(this.cameraComboBox);
+        this.cameraComboBox.addItemListener(new ItemListener() {
             @Override
-            public void actionPerformed(ActionEvent e) {
-                GL3DCameraSelectorModel selector = GL3DCameraSelectorModel.getInstance();
-                selector.setCurrentCamera(selector.getTrackballCamera());
-                hideTimedelayComponents();
-                Displayer.getSingletonInstance().render();
+            public void itemStateChanged(ItemEvent event) {
+                if (event.getStateChange() == ItemEvent.SELECTED) {
+                    GL3DCamera selectedCamera = (GL3DCamera) event.getItem();
+                    if (selectedCamera != null) {
+                        cameraSelectorModel.getCurrentCamera().deactivate();
+                        cameraSelectorModel.setCurrentCamera(selectedCamera);
+                        cameraSelectorModel.getCurrentCamera().activate();
+                    }
+                }
             }
         });
-
-        JRadioButton stonyhurstCameraButton = new JRadioButton(stonyhurstCameraButtonString);
-        stonyhurstCameraButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                GL3DCameraSelectorModel selector = GL3DCameraSelectorModel.getInstance();
-                selector.setCurrentCamera(selector.getStonyHurstCamera());
-                Displayer.getSingletonInstance().render();
-            }
-        });
-
-        JRadioButton fixedTimeCameraButton = new JRadioButton(fixedTimeCameraButtonString);
-        fixedTimeCameraButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                GL3DCameraSelectorModel selector = GL3DCameraSelectorModel.getInstance();
-                selector.setCurrentCamera(selector.getFixedTimeCamera());
-                showTimedelayComponents();
-                Displayer.getSingletonInstance().render();
-            }
-        });
-
-        JRadioButton solarOrbiterCameraButton = new JRadioButton(solarOrbiterCameraButtonString);
-        solarOrbiterCameraButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                GL3DCameraSelectorModel selector = GL3DCameraSelectorModel.getInstance();
-                selector.setCurrentCamera(selector.getSolarOrbiterCamera());
-                hideTimedelayComponents();
-                Displayer.getSingletonInstance().render();
-            }
-        });
-        ButtonGroup group = new ButtonGroup();
-        group.add(earthCameraButton);
-        group.add(stonyhurstCameraButton);
-        group.add(fixedTimeCameraButton);
-        group.add(solarOrbiterCameraButton);
-
-        JPanel radioPanel = new JPanel(new GridLayout(0, 1));
-        radioPanel.add(earthCameraButton);
-        radioPanel.add(stonyhurstCameraButton);
-        radioPanel.add(fixedTimeCameraButton);
-        radioPanel.add(solarOrbiterCameraButton);
-
-        this.add(radioPanel);
     }
 
     private void addTimedelayPanel() {
@@ -136,21 +93,11 @@ public class GL3DCameraOptionsPanel extends JPanel {
         timedelayPanel.add(timedelayDate);
         timedelayPanel.add(timedelayTime);
         add(timedelayPanel);
-        hideTimedelayComponents();
-
     }
 
     public void computeTimedelayTime() {
         timeDelay = timedelayDate.getDate().getTime();
         timeDelay += timedelayTime.getValue().getTime();
-        System.out.println(timeDelay);
     }
 
-    private void showTimedelayComponents() {
-        timedelayPanel.setVisible(true);
-    }
-
-    private void hideTimedelayComponents() {
-        timedelayPanel.setVisible(false);
-    }
 }
