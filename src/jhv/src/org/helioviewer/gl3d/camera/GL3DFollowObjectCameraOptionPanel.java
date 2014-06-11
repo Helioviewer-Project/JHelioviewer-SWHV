@@ -96,7 +96,7 @@ public class GL3DFollowObjectCameraOptionPanel extends GL3DCameraOptionPanel {
     private void setEndTime() {
         try {
             Date dt = TimeTextField.formatter.parse(endTimePicker.getText());
-            camera.setBeginDate(new Date(endDatePicker.getDate().getTime() + dt.getTime()));
+            camera.setEndDate(new Date(endDatePicker.getDate().getTime() + dt.getTime()));
             System.out.println(new Date(endDatePicker.getDate().getTime() + dt.getTime()));
         } catch (ParseException e) {
             Log.error("Date parsing failed" + e);
