@@ -96,6 +96,7 @@ public class GL3DPositionLoading {
                     positionDateTime[i] = new GL3DPositionDateTime(calendar.getTimeInMillis(), vec);
                 }
             }
+            Displayer.getSingletonInstance().render();
         } catch (JSONException e) {
             Log.warn("Problem Parsing the JSON Response.", e);
         } catch (ParseException e) {
