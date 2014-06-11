@@ -16,16 +16,7 @@ import org.helioviewer.viewmodel.view.View;
 import org.helioviewer.viewmodel.view.ViewListener;
 import org.helioviewer.viewmodel.view.jp2view.JHVJPXView;
 
-/**
- * This camera is used when solar rotation tracking is enabled. It extends the
- * {@link GL3DSolarOrbiterCamera} by automatically rotating the camera around
- * the Y-Axis (pointing to solar north) by an amount calculated through
- * {@link DifferentialRotation}.
- * 
- * @author Simon Spoerri (simon.spoerri@fhnw.ch)
- * 
- */
-public class GL3DSolarOrbiterCamera extends GL3DSolarRotationTrackingTrackballCamera implements ViewListener {
+public class GL3DFollowObjectCamera extends GL3DSolarRotationTrackingTrackballCamera implements ViewListener {
 
     private final CoordinateVector startPosition = null;
 
@@ -35,7 +26,7 @@ public class GL3DSolarOrbiterCamera extends GL3DSolarRotationTrackingTrackballCa
 
     private final GL3DPositionLoading positionLoading;
 
-    public GL3DSolarOrbiterCamera(GL3DSceneGraphView sceneGraphView) {
+    public GL3DFollowObjectCamera(GL3DSceneGraphView sceneGraphView) {
         super(sceneGraphView);
         positionLoading = new GL3DPositionLoading();
     }
@@ -59,7 +50,7 @@ public class GL3DSolarOrbiterCamera extends GL3DSolarRotationTrackingTrackballCa
 
     @Override
     public String getName() {
-        return "Solar orbiter Camera";
+        return "Follow Object Camera";
     }
 
     int i = 0;
@@ -72,16 +63,18 @@ public class GL3DSolarOrbiterCamera extends GL3DSolarRotationTrackingTrackballCa
 
     @Override
     public void viewChanged(View sender, ChangeEvent aEvent) {
-        TimestampChangedReason timestampReason = aEvent.getLastChangedReasonByType(TimestampChangedReason.class);
-        if ((timestampReason != null) && (timestampReason.getView() instanceof TimedMovieView) && LinkedMovieManager.getActiveInstance().isMaster((TimedMovieView) timestampReason.getView())) {
-            JHVJPXView jpx = timestampReason.getView().getAdapter(JHVJPXView.class);
-            i = jpx.getCurrentFrameNumber() % 935;
-            currentDate = new Date(this.positionLoading.positionDateTime[i].getTimestamp());
-            currentL = this.positionLoading.positionDateTime[i].getPosition().y;
-            currentB = this.positionLoading.positionDateTime[i].getPosition().z;
-            currentDistance = 1000 * (this.positionLoading.positionDateTime[i].getPosition().x) / Constants.SunRadiusInMeter / 7;
-            i = (i + 1) % 48;
-            updateRotation();
+        if (this.positionLoading.isLoaded()) {
+            TimestampChangedReason timestampReason = aEvent.getLastChangedReasonByType(TimestampChangedReason.class);
+            if ((timestampReason != null) && (timestampReason.getView() instanceof TimedMovieView) && LinkedMovieManager.getActiveInstance().isMaster((TimedMovieView) timestampReason.getView())) {
+                JHVJPXView jpx = timestampReason.getView().getAdapter(JHVJPXView.class);
+                i = jpx.getCurrentFrameNumber() % 935;
+                currentDate = new Date(this.positionLoading.positionDateTime[i].getTimestamp());
+                currentL = this.positionLoading.positionDateTime[i].getPosition().y;
+                currentB = this.positionLoading.positionDateTime[i].getPosition().z;
+                currentDistance = 1000 * (this.positionLoading.positionDateTime[i].getPosition().x) / Constants.SunRadiusInMeter / 7;
+                i = (i + 1) % 48;
+                updateRotation();
+            }
         }
     }
 

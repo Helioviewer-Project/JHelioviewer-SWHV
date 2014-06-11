@@ -4,15 +4,20 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
 
+import org.helioviewer.base.math.MathUtils;
 import org.helioviewer.base.physics.Astronomy;
 import org.helioviewer.base.physics.Constants;
 import org.helioviewer.base.physics.DifferentialRotation;
 import org.helioviewer.gl3d.scenegraph.math.GL3DQuatd;
 import org.helioviewer.gl3d.scenegraph.math.GL3DVec3d;
 import org.helioviewer.gl3d.view.GL3DSceneGraphView;
+import org.helioviewer.jhv.layers.LayersModel;
 import org.helioviewer.viewmodel.changeevent.ChangeEvent;
 import org.helioviewer.viewmodel.changeevent.TimestampChangedReason;
+import org.helioviewer.viewmodel.metadata.HelioviewerPositionedMetaData;
+import org.helioviewer.viewmodel.metadata.MetaData;
 import org.helioviewer.viewmodel.view.LinkedMovieManager;
+import org.helioviewer.viewmodel.view.MetaDataView;
 import org.helioviewer.viewmodel.view.TimedMovieView;
 import org.helioviewer.viewmodel.view.View;
 import org.helioviewer.viewmodel.view.ViewListener;
@@ -58,7 +63,7 @@ public class GL3DTrackballCamera extends GL3DSolarRotationTrackingTrackballCamer
 
     @Override
     public String getName() {
-        return "TrackBall";
+        return "View from observer";
     }
 
     @Override
@@ -71,15 +76,29 @@ public class GL3DTrackballCamera extends GL3DSolarRotationTrackingTrackballCamer
     }
 
     public void updateRotation() {
+
+        double addl0 = 0.;
+        double addb0 = 0.;
+        MetaDataView mdv = LayersModel.getSingletonInstance().getActiveView().getAdapter(MetaDataView.class);
+
+        if (mdv != null) {
+            MetaData metadata = mdv.getMetaData();
+            if (metadata instanceof HelioviewerPositionedMetaData) {
+                HelioviewerPositionedMetaData hvMetadata = (HelioviewerPositionedMetaData) metadata;
+                addl0 = hvMetadata.getStonyhurstLongitude() / MathUtils.radeg;
+                addb0 = hvMetadata.getStonyhurstLatitude() / MathUtils.radeg;
+            }
+        }
+
         this.timediff = (currentDate.getTime()) / 1000 - Constants.referenceDate;
         this.currentRotation = DifferentialRotation.calculateRotationInRadians(0., this.timediff) % (Math.PI * 2.0);
         Calendar cal = new GregorianCalendar();
         cal.setTime(new Date(currentDate.getTime()));
         double b0 = Astronomy.getB0InRadians(cal);
         this.getLocalRotation().clear();
-        this.getLocalRotation().rotate(GL3DQuatd.createRotation(-b0, new GL3DVec3d(1, 0, 0)));
-        this.getLocalRotation().rotate(GL3DQuatd.createRotation(this.currentRotation, new GL3DVec3d(0, 1, 0)));
+        this.getLocalRotation().rotate(GL3DQuatd.createRotation(addb0, new GL3DVec3d(1, 0, 0)));
+
+        this.getLocalRotation().rotate(GL3DQuatd.createRotation(this.currentRotation - addl0, new GL3DVec3d(0, 1, 0)));
         this.updateCameraTransformation();
     }
-
 }

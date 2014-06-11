@@ -10,7 +10,7 @@ import javax.swing.ListModel;
 import org.helioviewer.base.logging.Log;
 import org.helioviewer.gl3d.camera.GL3DCamera;
 import org.helioviewer.gl3d.camera.GL3DFixedTimeCamera;
-import org.helioviewer.gl3d.camera.GL3DSolarOrbiterCamera;
+import org.helioviewer.gl3d.camera.GL3DFollowObjectCamera;
 import org.helioviewer.gl3d.camera.GL3DSolarRotationTrackingTrackballCamera;
 import org.helioviewer.gl3d.camera.GL3DTrackballCamera;
 import org.helioviewer.gl3d.camera.GL3DTrackballStonyhurstCamera;
@@ -46,7 +46,7 @@ public class GL3DCameraSelectorModel extends AbstractListModel implements ComboB
 
     private GL3DTrackballStonyhurstCamera stonyHurstCamera;
 
-    private GL3DSolarOrbiterCamera solarOrbiterCamera;
+    private GL3DFollowObjectCamera followObjectCamera;
 
     public static GL3DCameraSelectorModel getInstance() {
         if (instance == null) {
@@ -81,7 +81,7 @@ public class GL3DCameraSelectorModel extends AbstractListModel implements ComboB
             fixedTimeCamera = new GL3DFixedTimeCamera(sceneGraphView);
             stonyHurstCamera = new GL3DTrackballStonyhurstCamera(sceneGraphView);
             solarRotationCamera = new GL3DSolarRotationTrackingTrackballCamera(sceneGraphView);
-            solarOrbiterCamera = new GL3DSolarOrbiterCamera(sceneGraphView);
+            followObjectCamera = new GL3DFollowObjectCamera(sceneGraphView);
 
             defaultCamera = trackballCamera;
             lastCamera = defaultCamera;
@@ -89,7 +89,7 @@ public class GL3DCameraSelectorModel extends AbstractListModel implements ComboB
             cameras.add(solarRotationCamera);
             cameras.add(fixedTimeCamera);
             cameras.add(stonyHurstCamera);
-            cameras.add(solarOrbiterCamera);
+            cameras.add(followObjectCamera);
 
             defaultCamera = trackballCamera;
 
@@ -170,8 +170,8 @@ public class GL3DCameraSelectorModel extends AbstractListModel implements ComboB
         return stonyHurstCamera;
     }
 
-    public GL3DSolarOrbiterCamera getSolarOrbiterCamera() {
-        return solarOrbiterCamera;
+    public GL3DFollowObjectCamera getFollowObjectCamera() {
+        return followObjectCamera;
     }
 
 }
