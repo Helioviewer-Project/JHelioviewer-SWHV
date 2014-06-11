@@ -98,9 +98,12 @@ public class HelioviewerMetaData extends AbstractMetaData implements SunMetaData
             measurement = m.get("CONTENT");
             observatory = m.get("TELESCOP");
             fullName = "HMI " + measurement.substring(0, 1) + measurement.substring(1, 3).toLowerCase();
-        }
-
-        else if (instrument.equals("EIT")) {
+        } else if (instrument.contains("NRH")) {
+            instrument = "NRH";
+            measurement = m.get("WAVELNTH");
+            observatory = m.get("TELESCOP");
+            fullName = "NRH " + measurement;
+        } else if (instrument.equals("EIT")) {
             measurement = m.get("WAVELNTH");
             if (measurement == null) {
                 measurement = "" + m.tryGetInt("WAVELNTH");
@@ -156,7 +159,7 @@ public class HelioviewerMetaData extends AbstractMetaData implements SunMetaData
         double newSolarPixelRadius = -1.0;
         double allowedRelativeDifference = 0.01;
 
-        if (instrument.contains("AIA") || instrument.contains("SWAP") || instrument.contains("VSM") || instrument.contains("GONG") || instrument.contains("H-alpha") || instrument.contains("CALLISTO")) {
+        if (instrument.contains("AIA") || instrument.contains("SWAP") || instrument.contains("VSM") || instrument.contains("NRH") || instrument.contains("GONG") || instrument.contains("H-alpha") || instrument.contains("CALLISTO")) {
             double arcsecPerPixelX = metaDataContainer.tryGetDouble("CDELT1");
             double arcsecPerPixelY = metaDataContainer.tryGetDouble("CDELT2");
             if (Double.isNaN(arcsecPerPixelX)) {
@@ -300,7 +303,7 @@ public class HelioviewerMetaData extends AbstractMetaData implements SunMetaData
     @Override
     public void updateDateTime() {
         String observedDate;
-        if (instrument.contains("SWAP") || instrument.contains("GONG") || instrument.contains("VSM") || instrument.contains("CALLISTO")) {
+        if (instrument.contains("SWAP") || instrument.contains("NRH") || instrument.contains("GONG") || instrument.contains("VSM") || instrument.contains("CALLISTO")) {
             observedDate = metaDataContainer.get("DATE-OBS");
         } else {
             observedDate = metaDataContainer.get("DATE_OBS");
