@@ -98,6 +98,10 @@ public class GL3DPositionLoading {
         }
     }
 
+    public boolean isLoaded() {
+        return this.isLoaded;
+    }
+
     public static void main(String[] args) throws InterruptedException {
         // Uncaught runtime errors are displayed in a dialog box in addition
         JHVUncaughtExceptionHandler.setupHandlerForThread();

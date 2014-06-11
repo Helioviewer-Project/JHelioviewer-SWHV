@@ -4,60 +4,32 @@ import java.awt.EventQueue;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.ItemEvent;
-import java.awt.event.ItemListener;
 import java.util.Date;
 
-import javax.swing.BoxLayout;
-import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 
 import org.helioviewer.basegui.components.TimeTextField;
-import org.helioviewer.gl3d.gui.GL3DCameraSelectorModel;
 import org.helioviewer.gl3d.scenegraph.GL3DState;
 import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.gui.components.calendar.JHVCalendarDatePicker;
 import org.helioviewer.jhv.gui.components.calendar.JHVCalendarEvent;
 import org.helioviewer.jhv.gui.components.calendar.JHVCalendarListener;
 
-public class GL3DCameraOptionsPanel extends JPanel {
-    private static final long serialVersionUID = 3942154069677445408L;
-    private long timeDelay;
-    private JPanel timedelayPanel;
+public class GL3DFixedTimeCameraOptionPanel extends GL3DCameraOptionPanel {
+
+    private static final long serialVersionUID = 1L;
     private JLabel timedelayLabel;
+    private JPanel timedelayPanel;
     private JHVCalendarDatePicker timedelayDate;
     private TimeTextField timedelayTime;
-    private JComboBox cameraComboBox;
-    private GL3DCamera currentCamera;
-    private GL3DCameraSelectorModel cameraSelectorModel;
+    private long timeDelay;
 
-    public GL3DCameraOptionsPanel() {
-        setLayout(new BoxLayout(this, BoxLayout.PAGE_AXIS));
-
+    public GL3DFixedTimeCameraOptionPanel(GL3DFixedTimeCamera camera) {
         EventQueue.invokeLater(new Runnable() {
             @Override
             public void run() {
-                addCameraComboBox();
-            }
-        });
-    }
-
-    private void addCameraComboBox() {
-        cameraSelectorModel = GL3DCameraSelectorModel.getInstance();
-        this.cameraComboBox = new JComboBox(cameraSelectorModel);
-        add(this.cameraComboBox);
-        this.cameraComboBox.addItemListener(new ItemListener() {
-            @Override
-            public void itemStateChanged(ItemEvent event) {
-                if (event.getStateChange() == ItemEvent.SELECTED) {
-                    GL3DCamera selectedCamera = (GL3DCamera) event.getItem();
-                    if (selectedCamera != null) {
-                        cameraSelectorModel.getCurrentCamera().deactivate();
-                        cameraSelectorModel.setCurrentCamera(selectedCamera);
-                        cameraSelectorModel.getCurrentCamera().activate();
-                    }
-                }
+                addTimedelayPanel();
             }
         });
     }
