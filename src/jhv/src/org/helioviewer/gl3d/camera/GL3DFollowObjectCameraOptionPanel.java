@@ -38,9 +38,9 @@ public class GL3DFollowObjectCameraOptionPanel extends GL3DCameraOptionPanel {
         setLayout(new GridLayout(0, 1));
         addObjectCombobox();
         beginDateLabel = new JLabel("Begin date");
-        addDatePanel(beginDateLabel, beginDatetimePanel, beginDatePicker, beginTimePicker, true);
+        addBeginDatePanel(beginDateLabel, beginDatetimePanel, beginDatePicker, beginTimePicker);
         endDateLabel = new JLabel("End date");
-        addDatePanel(endDateLabel, endDatetimePanel, endDatePicker, endTimePicker, false);
+        addEndDatePanel(endDateLabel, endDatetimePanel, endDatePicker, endTimePicker);
     }
 
     private void addObjectCombobox() {
@@ -62,23 +62,17 @@ public class GL3DFollowObjectCameraOptionPanel extends GL3DCameraOptionPanel {
         add(objectCombobox);
     }
 
-    private void addDatePanel(JLabel dateLabel, JPanel datetimePanel, JHVCalendarDatePicker datePickerr, TimeTextField timePickerr, final boolean begin) {
+    private void addBeginDatePanel(JLabel dateLabel, JPanel datetimePanel, final JHVCalendarDatePicker datePicker, final TimeTextField timePicker) {
         add(dateLabel);
         datetimePanel = new JPanel();
         datetimePanel.setLayout(new GridLayout(0, 2));
-        final TimeTextField timePicker = new TimeTextField();
-        final JHVCalendarDatePicker datePicker = new JHVCalendarDatePicker();
-        datePickerr = datePicker;
         datePicker.addJHVCalendarListener(new JHVCalendarListener() {
             @Override
             public void actionPerformed(JHVCalendarEvent e) {
                 try {
                     Date dt = TimeTextField.formatter.parse(timePicker.getText());
-                    if (begin) {
-                        camera.setBeginDate(new Date(datePicker.getDate().getTime() + dt.getTime()));
-                    } else {
-                        camera.setEndDate(new Date(datePicker.getDate().getTime() + dt.getTime()));
-                    }
+                    camera.setBeginDate(new Date(datePicker.getDate().getTime() + dt.getTime()));
+
                 } catch (ParseException e1) {
                     Log.error("Date parsing failed", e1);
                 }
@@ -86,17 +80,53 @@ public class GL3DFollowObjectCameraOptionPanel extends GL3DCameraOptionPanel {
             }
         });
         Date startDate = null;
-        if (begin) {
-            startDate = LayersModel.getSingletonInstance().getFirstDate();
-            datePicker.setDate(startDate);
-        } else {
-            startDate = LayersModel.getSingletonInstance().getLastDate();
-            datePicker.setDate(startDate);
-        }
+        startDate = LayersModel.getSingletonInstance().getFirstDate();
+        datePicker.setDate(startDate);
+
         if (startDate == null) {
             startDate = new Date(System.currentTimeMillis());
         }
-        timePickerr = timePicker;
+        timePicker.setText(TimeTextField.formatter.format(startDate));
+        timePicker.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                try {
+                    Date dt = TimeTextField.formatter.parse(timePicker.getText());
+                    camera.setBeginDate(new Date(datePicker.getDate().getTime() + dt.getTime()));
+                } catch (ParseException e1) {
+                    Log.error("Date parsing failed", e1);
+                }
+                Displayer.getSingletonInstance().render();
+            }
+        });
+        datetimePanel.add(datePicker);
+        datetimePanel.add(timePicker);
+        add(datetimePanel);
+    }
+
+    private void addEndDatePanel(JLabel dateLabel, JPanel datetimePanel, final JHVCalendarDatePicker datePicker, final TimeTextField timePicker) {
+        add(dateLabel);
+        datetimePanel = new JPanel();
+        datetimePanel.setLayout(new GridLayout(0, 2));
+        datePicker.addJHVCalendarListener(new JHVCalendarListener() {
+            @Override
+            public void actionPerformed(JHVCalendarEvent e) {
+                try {
+                    Date dt = TimeTextField.formatter.parse(timePicker.getText());
+                    camera.setEndDate(new Date(datePicker.getDate().getTime() + dt.getTime()));
+
+                } catch (ParseException e1) {
+                    Log.error("Date parsing failed", e1);
+                }
+                Displayer.getSingletonInstance().render();
+            }
+        });
+        Date startDate = null;
+        startDate = LayersModel.getSingletonInstance().getLastDate();
+        datePicker.setDate(startDate);
+        if (startDate == null) {
+            startDate = new Date(System.currentTimeMillis());
+        }
         timePicker.setText(TimeTextField.formatter.format(startDate));
         timePicker.addActionListener(new ActionListener() {
             @Override
