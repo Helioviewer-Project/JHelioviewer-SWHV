@@ -37,7 +37,7 @@ public class GL3DPositionLoading {
     private final String[] targetList = { "SOLAR%20ORBITER" };
     private final int target = 0;
     private final String observer = "SUN";
-    private final String baseUrl = "http://swhv:7789/multiposition?begin_utc=";
+    private final String baseUrl = "http://swhv:7789/multiposition?";
     private final int steps = 935;
 
     public GL3DPositionLoading() {
