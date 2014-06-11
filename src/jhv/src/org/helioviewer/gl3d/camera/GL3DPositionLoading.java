@@ -11,16 +11,10 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.GregorianCalendar;
-import java.util.Locale;
-import java.util.TimeZone;
 
 import org.helioviewer.base.DownloadStream;
 import org.helioviewer.base.logging.Log;
-import org.helioviewer.base.logging.LogSettings;
 import org.helioviewer.gl3d.scenegraph.math.GL3DVec3d;
-import org.helioviewer.jhv.JHVDirectory;
-import org.helioviewer.jhv.JHVUncaughtExceptionHandler;
-import org.helioviewer.jhv.io.CommandLineProcessor;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -128,34 +122,6 @@ public class GL3DPositionLoading {
 
     public void setTarget(String target) {
         this.target = target;
-    }
-
-    public static void main(String[] args) throws InterruptedException {
-        // Uncaught runtime errors are displayed in a dialog box in addition
-        JHVUncaughtExceptionHandler.setupHandlerForThread();
-
-        // Save command line arguments
-        CommandLineProcessor.setArguments(args);
-
-        // Save current default system timezone in user.timezone
-        System.setProperty("user.timezone", TimeZone.getDefault().getID());
-
-        // Per default all times should be given in GMT
-        TimeZone.setDefault(TimeZone.getTimeZone("GMT"));
-
-        // Save current default locale to user.locale
-        System.setProperty("user.locale", Locale.getDefault().toString());
-
-        // Per default, the us locale should be used
-        Locale.setDefault(Locale.US);
-
-        // init log
-        LogSettings.init("/settings/log4j.initial.properties", JHVDirectory.SETTINGS.getPath() + "log4j.properties", JHVDirectory.LOGS.getPath(), CommandLineProcessor.isOptionSet("--use-existing-log-time-stamp"));
-        GL3DPositionLoading positionLoading = new GL3DPositionLoading();
-        for (GL3DPositionDateTime positionDateTime : positionLoading.positionDateTime) {
-            System.out.println(positionDateTime);
-        }
-
     }
 
     private final ArrayList<GL3DPositionLoadingListener> listeners = new ArrayList<GL3DPositionLoadingListener>();
