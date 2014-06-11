@@ -88,6 +88,7 @@ public class GL3DFollowObjectCamera extends GL3DSolarRotationTrackingTrackballCa
                     currentCameraTime = t4;
                     i = 0;
                 }
+                this.fireCameratTime(new Date(currentCameraTime));
                 i = Math.min(i, this.positionLoading.positionDateTime.length);
                 i = Math.max(i, 0);
                 try {
@@ -99,6 +100,14 @@ public class GL3DFollowObjectCamera extends GL3DSolarRotationTrackingTrackballCa
                 updateRotation();
             }
 
+        }
+    }
+
+    private void fireCameratTime(Date currentCameraTime) {
+        synchronized (followObjectCameraListeners) {
+            for (GL3DFollowObjectCameraListener listener : followObjectCameraListeners) {
+                listener.fireCameraTime(currentCameraTime);
+            }
         }
     }
 
