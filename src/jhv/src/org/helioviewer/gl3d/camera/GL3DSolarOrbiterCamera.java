@@ -59,7 +59,7 @@ public class GL3DSolarOrbiterCamera extends GL3DSolarRotationTrackingTrackballCa
 
     @Override
     public String getName() {
-        return "TrackBall";
+        return "Solar orbiter Camera";
     }
 
     int i = 0;
