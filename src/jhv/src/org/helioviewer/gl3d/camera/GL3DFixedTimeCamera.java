@@ -64,7 +64,7 @@ public class GL3DFixedTimeCamera extends GL3DSolarRotationTrackingTrackballCamer
 
     @Override
     public String getName() {
-        return "TrackBall";
+        return "FixedTimeCamera";
     }
 
     @Override

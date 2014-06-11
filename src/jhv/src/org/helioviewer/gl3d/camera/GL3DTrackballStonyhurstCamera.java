@@ -65,7 +65,7 @@ public class GL3DTrackballStonyhurstCamera extends GL3DSolarRotationTrackingTrac
 
     @Override
     public String getName() {
-        return "TrackBall";
+        return "Stonyhurst Camera";
     }
 
     @Override
