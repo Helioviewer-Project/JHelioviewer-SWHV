@@ -55,7 +55,6 @@ public class GL3DPositionLoading {
     private void buildRequestURL() {
         try {
             url = new URL(baseUrl + "utc=" + this.beginDate + "&utc_end=" + this.endDate + "&deltat=" + deltat + "&observer=" + observer + "&target=" + target + "&ref=HEEQ&kind=latitudinal");
-            System.out.println(url);
         } catch (MalformedURLException e) {
             Log.error("A wrong url is given.", e);
         }
