@@ -72,6 +72,7 @@ public class GL3DFollowObjectCamera extends GL3DSolarRotationTrackingTrackballCa
     private double currentDistance = Constants.SunRadius;
 
     private long currentCameraTime;
+    private double lratio;
 
     @Override
     public void viewChanged(View sender, ChangeEvent aEvent) {
@@ -97,7 +98,8 @@ public class GL3DFollowObjectCamera extends GL3DSolarRotationTrackingTrackballCa
                 currentL = position.y;
                 currentB = position.z;
                 currentDistance = position.x;
-
+                GL3DVec3d initPosition = this.positionLoading.getInterpolatedPosition(t3);
+                lratio = initPosition.x / position.x;
                 updateRotation();
                 setFOV(currentDistance * Math.tan(FOVangle));
             }
@@ -125,7 +127,7 @@ public class GL3DFollowObjectCamera extends GL3DSolarRotationTrackingTrackballCa
             newRotation.rotate(GL3DQuatd.createRotation(currentB, new GL3DVec3d(1, 0, 0)));
             newRotation.rotate(GL3DQuatd.createRotation(this.currentRotation, new GL3DVec3d(0, 1, 0)));
             this.setLocalRotation(newRotation);
-            this.setZTranslation(-currentDistance / 7.);
+            this.setRatio(lratio);
             this.updateCameraTransformation();
         }
     }
