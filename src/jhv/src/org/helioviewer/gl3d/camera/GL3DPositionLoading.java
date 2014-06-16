@@ -93,20 +93,18 @@ public class GL3DPositionLoading {
     private void parseData() {
         calendar.clear();
         try {
-            synchronized (Displayer.displaylock) {
-                positionDateTime = new GL3DPositionDateTime[jsonResult.length()];
-                for (int i = 0; i < jsonResult.length(); i++) {
-                    JSONArray ithArray = jsonResult.getJSONArray(i);
-                    String dateString = ithArray.get(0).toString();
-                    Date date = format.parse(dateString);
-                    calendar.setTime(date);
-                    JSONArray positionArray = ithArray.getJSONArray(1);
-                    double x = positionArray.getDouble(0);
-                    double y = positionArray.getDouble(1);
-                    double z = positionArray.getDouble(2);
-                    GL3DVec3d vec = new GL3DVec3d(x, y, z);
-                    positionDateTime[i] = new GL3DPositionDateTime(calendar.getTimeInMillis(), vec);
-                }
+            GL3DPositionDateTime[] positionDateTimehelper = new GL3DPositionDateTime[jsonResult.length()];
+            for (int i = 0; i < jsonResult.length(); i++) {
+                JSONArray ithArray = jsonResult.getJSONArray(i);
+                String dateString = ithArray.get(0).toString();
+                Date date = format.parse(dateString);
+                calendar.setTime(date);
+                JSONArray positionArray = ithArray.getJSONArray(1);
+                double x = positionArray.getDouble(0);
+                double y = positionArray.getDouble(1);
+                double z = positionArray.getDouble(2);
+                GL3DVec3d vec = new GL3DVec3d(x, y, z);
+                positionDateTimehelper[i] = new GL3DPositionDateTime(calendar.getTimeInMillis(), vec);
             }
             Displayer.getSingletonInstance().render();
         } catch (JSONException e) {
