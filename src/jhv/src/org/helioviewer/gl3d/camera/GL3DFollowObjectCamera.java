@@ -86,24 +86,14 @@ public class GL3DFollowObjectCamera extends GL3DSolarRotationTrackingTrackballCa
                 //Linear interpolation
                 if (t4 != t3) {
                     currentCameraTime = (long) ((t3 + 1. * (t4 - t3) * (timestampReason.getNewDateTime().getMillis() - t1) / (t2 - t1)));
-                    double interpolatedIndex = (1. * (currentCameraTime - t3) / (t4 - t3) * this.positionLoading.positionDateTime.length);
-                    i = (int) interpolatedIndex;
-                    i = Math.min(i, this.positionLoading.positionDateTime.length - 1);
-                    inext = Math.min(i + 1, this.positionLoading.positionDateTime.length - 1);
-                    alpha = 1. - interpolatedIndex % 1.;
-                    System.out.println("CCT" + i);
-                    System.out.println(alpha);
-
                 } else {
                     currentCameraTime = t4;
-                    i = 0;
-                    inext = 0;
                 }
                 this.fireCameratTime(new Date(currentCameraTime));
-                currentL = alpha * this.positionLoading.positionDateTime[i].getPosition().y + (1 - alpha) * this.positionLoading.positionDateTime[inext].getPosition().y;
-                currentB = alpha * this.positionLoading.positionDateTime[i].getPosition().z + (1 - alpha) * this.positionLoading.positionDateTime[inext].getPosition().z;
-                currentDistance = 1000 * (alpha * this.positionLoading.positionDateTime[i].getPosition().x + (1 - alpha) * this.positionLoading.positionDateTime[inext].getPosition().x);
-                currentDistance /= Constants.SunRadiusInMeter;
+                GL3DVec3d position = this.positionLoading.getInterpolatedPosition(currentCameraTime);
+                currentL = position.y;
+                currentB = position.z;
+                currentDistance = position.x;
 
                 updateRotation();
                 //double FSIangle = 0.284 * Math.PI / 180.;
