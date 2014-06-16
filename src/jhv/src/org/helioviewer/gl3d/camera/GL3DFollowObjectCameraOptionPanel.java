@@ -5,7 +5,6 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
-import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
@@ -13,7 +12,6 @@ import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 
-import org.helioviewer.base.logging.Log;
 import org.helioviewer.basegui.components.TimeTextField;
 import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.gui.components.calendar.JHVCalendarDatePicker;
@@ -102,7 +100,7 @@ public class GL3DFollowObjectCameraOptionPanel extends GL3DCameraOptionPanel imp
         beginTimePicker.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                setEndTime();
+                setBeginTime();
                 Displayer.getSingletonInstance().render();
             }
         });
@@ -112,21 +110,18 @@ public class GL3DFollowObjectCameraOptionPanel extends GL3DCameraOptionPanel imp
     }
 
     private void setEndTime() {
-        try {
-            Date dt = TimeTextField.formatter.parse(endTimePicker.getText());
-            camera.setEndDate(new Date(endDatePicker.getDate().getTime() + dt.getTime()));
-        } catch (ParseException e) {
-            Log.error("Date parsing failed" + e);
-        }
+        Date dt = endTimePicker.getValue();
+        Date end_date = new Date(endDatePicker.getDate().getTime() + dt.getTime());
+        camera.setEndDate(end_date);
+        System.out.println("EBT" + end_date);
+
     }
 
     private void setBeginTime() {
-        try {
-            Date dt = TimeTextField.formatter.parse(beginTimePicker.getText());
-            camera.setBeginDate(new Date(beginDatePicker.getDate().getTime() + dt.getTime()));
-        } catch (ParseException e) {
-            Log.error("Date parsing failed" + e);
-        }
+        Date dt = beginTimePicker.getValue();
+        Date begin_date = new Date(beginDatePicker.getDate().getTime() + dt.getTime());
+        camera.setBeginDate(begin_date);
+        System.out.println("SBT" + begin_date);
     }
 
     private void syncWithLayer() {
@@ -137,7 +132,7 @@ public class GL3DFollowObjectCameraOptionPanel extends GL3DCameraOptionPanel imp
     private void syncWithLayerBeginTime() {
         Date startDate = null;
         startDate = LayersModel.getSingletonInstance().getFirstDate();
-        beginDatePicker.setDate(startDate);
+        beginDatePicker.setDate(new Date(startDate.getTime() - startDate.getTime() % (60 * 60 * 24 * 1000)));
 
         if (startDate == null) {
             startDate = new Date(System.currentTimeMillis());
@@ -149,8 +144,8 @@ public class GL3DFollowObjectCameraOptionPanel extends GL3DCameraOptionPanel imp
     private void syncWithLayerEndTime() {
         Date endDate = null;
         endDate = LayersModel.getSingletonInstance().getLastDate();
-        endDatePicker.setDate(endDate);
-
+        System.out.println("LAYEREND" + endDate);
+        endDatePicker.setDate(new Date(endDate.getTime() - endDate.getTime() % (60 * 60 * 24 * 1000)));
         if (endDate == null) {
             endDate = new Date(System.currentTimeMillis());
         }
@@ -165,12 +160,7 @@ public class GL3DFollowObjectCameraOptionPanel extends GL3DCameraOptionPanel imp
         endDatePicker.addJHVCalendarListener(new JHVCalendarListener() {
             @Override
             public void actionPerformed(JHVCalendarEvent e) {
-                try {
-                    Date dt = TimeTextField.formatter.parse(endTimePicker.getText());
-                    camera.setEndDate(new Date(endDatePicker.getDate().getTime() + dt.getTime()));
-                } catch (ParseException e1) {
-                    Log.error("Date parsing failed", e1);
-                }
+                setEndTime();
                 Displayer.getSingletonInstance().render();
             }
         });
@@ -178,12 +168,7 @@ public class GL3DFollowObjectCameraOptionPanel extends GL3DCameraOptionPanel imp
         endTimePicker.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                try {
-                    Date dt = TimeTextField.formatter.parse(endTimePicker.getText());
-                    camera.setBeginDate(new Date(endDatePicker.getDate().getTime() + dt.getTime()));
-                } catch (ParseException e1) {
-                    Log.error("Date parsing failed", e1);
-                }
+                setEndTime();
                 Displayer.getSingletonInstance().render();
             }
         });
