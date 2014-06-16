@@ -22,6 +22,11 @@ import org.json.JSONException;
 import org.json.JSONTokener;
 
 public class GL3DPositionLoading {
+    private final String LOADEDSTATE = "Loaded";
+    private final String LOADINGSTATE = "Loading";
+    private final String FAILEDSTATE = "Failed";
+    private final String PARTIALSTATE = "Failed";
+
     private boolean isLoaded = false;
     private URL url;
     private JSONArray jsonResult;
@@ -39,11 +44,12 @@ public class GL3DPositionLoading {
     private Date endDatems;
 
     public GL3DPositionLoading() {
-        this.requestData();
-        beginDatems = new Date(System.currentTimeMillis());
-        endDatems = new Date(System.currentTimeMillis());
-        beginDate = this.format.format(beginDatems);
-        endDate = this.format.format(endDatems);
+        /*
+         * beginDatems = LayersModel.getSingletonInstance(); endDatems = new
+         * Date(System.currentTimeMillis()); beginDate =
+         * this.format.format(beginDatems); endDate =
+         * this.format.format(endDatems); this.requestData();
+         */
     }
 
     private void buildRequestURL() {
@@ -69,9 +75,9 @@ public class GL3DPositionLoading {
                         setLoaded(true);
                     }
                 } catch (final IOException e1) {
-                    //Log.warn("Error Parsing the EVE Response.", e1);
+                    fireLoaded(FAILEDSTATE);
                 } catch (JSONException e2) {
-                    //Log.warn("Error Parsing the JSON Response.", e2);
+                    fireLoaded(FAILEDSTATE);
                 }
 
             }
@@ -82,7 +88,7 @@ public class GL3DPositionLoading {
 
     private void setLoaded(boolean isLoaded) {
         this.isLoaded = isLoaded;
-        this.fireLoaded();
+        this.fireLoaded(this.LOADEDSTATE);
     }
 
     private void parseData() {
@@ -105,8 +111,10 @@ public class GL3DPositionLoading {
             }
             Displayer.getSingletonInstance().render();
         } catch (JSONException e) {
+            this.fireLoaded(this.PARTIALSTATE);
             Log.warn("Problem Parsing the JSON Response.", e);
         } catch (ParseException e) {
+            this.fireLoaded(this.PARTIALSTATE);
             Log.warn("Problem Parsing the date in JSON Response.", e);
         }
     }
@@ -150,10 +158,10 @@ public class GL3DPositionLoading {
         }
     }
 
-    public void fireLoaded() {
+    public void fireLoaded(String state) {
         synchronized (listeners) {
             for (GL3DPositionLoadingListener listener : listeners) {
-                listener.fireNewLoaded(this.isLoaded);
+                listener.fireNewLoaded(state);
             }
         }
     }

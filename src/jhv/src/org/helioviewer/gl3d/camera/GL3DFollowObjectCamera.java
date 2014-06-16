@@ -137,10 +137,10 @@ public class GL3DFollowObjectCamera extends GL3DSolarRotationTrackingTrackballCa
     }
 
     @Override
-    public void fireNewLoaded(boolean isLoaded) {
+    public void fireNewLoaded(String state) {
         synchronized (followObjectCameraListeners) {
             for (GL3DFollowObjectCameraListener listener : followObjectCameraListeners) {
-                listener.fireLoaded(isLoaded);
+                listener.fireLoaded(state);
             }
         }
     }
