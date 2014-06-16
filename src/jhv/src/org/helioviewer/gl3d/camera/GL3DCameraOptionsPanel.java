@@ -1,12 +1,13 @@
 package org.helioviewer.gl3d.camera;
 
 import java.awt.EventQueue;
-import java.awt.event.ItemEvent;
-import java.awt.event.ItemListener;
 
 import javax.swing.BoxLayout;
 import javax.swing.JComboBox;
 import javax.swing.JPanel;
+import javax.swing.JTabbedPane;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
 
 import org.helioviewer.gl3d.gui.GL3DCameraSelectorModel;
 
@@ -23,35 +24,47 @@ public class GL3DCameraOptionsPanel extends JPanel {
         EventQueue.invokeLater(new Runnable() {
             @Override
             public void run() {
-                addCameraComboBox();
+                addCameraTabs();
             }
         });
     }
 
-    private void addCameraComboBox() {
+    private void addCameraTabs() {
+        final JTabbedPane tab = new JTabbedPane();
+        tab.add("Observer", new JPanel());
+        tab.add("Earth", new JPanel());
+        tab.add("Expert", new JPanel());
+        add(tab);
         cameraSelectorModel = GL3DCameraSelectorModel.getInstance();
         this.cameraComboBox = new JComboBox(cameraSelectorModel);
         add(this.cameraComboBox);
-        this.cameraComboBox.addItemListener(new ItemListener() {
+        tab.addChangeListener(new ChangeListener() {
             @Override
-            public void itemStateChanged(ItemEvent event) {
-                if (event.getStateChange() == ItemEvent.SELECTED) {
-                    GL3DCamera selectedCamera = (GL3DCamera) event.getItem();
-                    if (selectedCamera != null) {
-                        cameraSelectorModel.getCurrentCamera().deactivate();
-                        cameraSelectorModel.setCurrentCamera(selectedCamera);
-                        cameraSelectorModel.getCurrentCamera().activate();
-                        if (optionsPanel != null) {
-                            optionsPanel.deactivate();
-                            remove(optionsPanel);
-                        }
-                        optionsPanel = cameraOptionsAttributeManager.getCameraOptionAttributePanel(selectedCamera);
-                        add(optionsPanel);
-                        revalidate();
-                    }
+            public void stateChanged(ChangeEvent e) {
+                int index = tab.getSelectedIndex();
+                System.out.println("selected" + index);
+                if (index == 0) {
+                    cameraSelectorModel.getCurrentCamera().deactivate();
+                    cameraSelectorModel.setCurrentCamera(cameraSelectorModel.getTrackballCamera());
+                    optionsPanel = cameraOptionsAttributeManager.getCameraOptionAttributePanel(cameraSelectorModel.getCurrentCamera());
                 }
+                if (index == 1) {
+                    cameraSelectorModel.getCurrentCamera().deactivate();
+                    cameraSelectorModel.setCurrentCamera(cameraSelectorModel.getEarthCamera());
+                    optionsPanel = cameraOptionsAttributeManager.getCameraOptionAttributePanel(cameraSelectorModel.getCurrentCamera());
+                }
+                if (index == 2) {
+                    cameraSelectorModel.getCurrentCamera().deactivate();
+                    cameraSelectorModel.setCurrentCamera(cameraSelectorModel.getFollowObjectCamera());
+                    optionsPanel = cameraOptionsAttributeManager.getCameraOptionAttributePanel(cameraSelectorModel.getCurrentCamera());
+                }
+                tab.setComponentAt(index, optionsPanel);
             }
         });
     }
 
+    public JPanel createFollowObjectCamera() {
+        JPanel panel1 = new JPanel();
+        return panel1;
+    }
 }
