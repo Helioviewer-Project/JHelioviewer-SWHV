@@ -9,16 +9,24 @@ import java.awt.event.ItemListener;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
+import javax.swing.BorderFactory;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
+import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JSeparator;
+import javax.swing.JSpinner;
+import javax.swing.SpinnerNumberModel;
 import javax.swing.SwingConstants;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
 
 import org.helioviewer.basegui.components.TimeTextField;
+import org.helioviewer.basegui.components.WheelSupport;
+import org.helioviewer.gl3d.scenegraph.GL3DDrawBits.Bit;
 import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.gui.components.calendar.JHVCalendarDatePicker;
 import org.helioviewer.jhv.gui.components.calendar.JHVCalendarEvent;
@@ -45,20 +53,62 @@ public class GL3DFollowObjectCameraOptionPanel extends GL3DCameraOptionPanel imp
     private JPanel addBeginDatePanel;
     private JPanel addEndDatePanel;
     private JButton synchronizeWithLayersButton;
-    private JButton synchronizeWithBeginButton;
-    private JButton synchronizeWithEndButton;
     private JButton synchronizeWithNowButton;
     private JButton synchronizeWithCurrentButton;
+    private final JPanel fovPanel;
+    private final JSpinner fovSpinner;
 
-    public GL3DFollowObjectCameraOptionPanel(GL3DFollowObjectCamera camera) {
+    public GL3DFollowObjectCameraOptionPanel(final GL3DFollowObjectCamera camera) {
         this.camera = camera;
         setLayout(new BoxLayout(this, BoxLayout.PAGE_AXIS));
+        this.setBorder(BorderFactory.createEmptyBorder(0, 4, 0, 4));
+
         JPanel infoPanel = new JPanel(new GridLayout(2, 0));
+
         cameraTime = new JLabel("Camera date: " + DISABLED_TEXT);
         infoPanel.add(this.cameraTime);
         this.loadedLabel = new JLabel("Status: Not loaded");
         infoPanel.add(this.loadedLabel);
         add(infoPanel);
+        add(new JSeparator(SwingConstants.HORIZONTAL));
+        this.fovPanel = new JPanel();
+        this.fovPanel.setLayout(new BoxLayout(fovPanel, BoxLayout.LINE_AXIS));
+        this.fovPanel.add(new JLabel("FOV angle (degree) "));
+        this.fovSpinner = new JSpinner();
+        this.fovSpinner.setModel(new SpinnerNumberModel(new Double(0.8), new Double(0.0), new Double(180.), new Double(0.01)));
+        camera.setFOVangleDegrees((Double) fovSpinner.getValue());
+
+        this.fovSpinner.addChangeListener(new ChangeListener() {
+            @Override
+            public void stateChanged(ChangeEvent e) {
+                camera.setFOVangleDegrees((Double) fovSpinner.getValue());
+                Displayer.getSingletonInstance().render();
+            }
+        });
+        WheelSupport.installMouseWheelSupport(this.fovSpinner);
+        this.fovPanel.add(this.fovSpinner);
+        this.fovSpinner.setMaximumSize(new Dimension(6, 22));
+        this.fovPanel.add(Box.createHorizontalGlue());
+        this.fovPanel.add(new JSeparator(SwingConstants.VERTICAL));
+        this.fovPanel.add(Box.createHorizontalGlue());
+        JCheckBox fovCheckbox = new JCheckBox("Visible");
+        fovCheckbox.setSelected(true);
+        fovCheckbox.addItemListener(new ItemListener() {
+
+            @Override
+            public void itemStateChanged(ItemEvent e) {
+                if (e.getStateChange() == ItemEvent.DESELECTED) {
+                    camera.cameraFOV.getDrawBits().on(Bit.Hidden);
+                } else {
+                    camera.cameraFOV.getDrawBits().off(Bit.Hidden);
+                }
+                Displayer.getSingletonInstance().display();
+
+            }
+        });
+        this.fovPanel.add(fovCheckbox);
+
+        add(this.fovPanel);
         add(new JSeparator(SwingConstants.HORIZONTAL));
         addObjectCombobox();
         beginDateLabel = new JLabel("Begin");
@@ -84,22 +134,6 @@ public class GL3DFollowObjectCameraOptionPanel extends GL3DCameraOptionPanel imp
                 syncWithLayer();
             }
         });
-        this.synchronizeWithBeginButton = new JButton("Begin");
-        this.synchronizeWithBeginButton.setToolTipText("Fill twice begin date of current active layer.");
-        this.synchronizeWithBeginButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                syncBothLayerBeginTime();
-            }
-        });
-        this.synchronizeWithEndButton = new JButton("End");
-        this.synchronizeWithEndButton.setToolTipText("Fill twice end date of current active layer.");
-        this.synchronizeWithEndButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                syncBothLayerEndTime();
-            }
-        });
         this.synchronizeWithNowButton = new JButton("Now");
         this.synchronizeWithNowButton.setToolTipText("Fill twice now.");
         this.synchronizeWithNowButton.addActionListener(new ActionListener() {
@@ -114,25 +148,17 @@ public class GL3DFollowObjectCameraOptionPanel extends GL3DCameraOptionPanel imp
             @Override
             public void actionPerformed(ActionEvent e) {
                 syncWithLayerCurrentTime();
+                Displayer.getSingletonInstance().display();
             }
         });
         JPanel buttonPanel = new JPanel();
-        buttonPanel.setLayout(new BoxLayout(buttonPanel, BoxLayout.LINE_AXIS));
+        buttonPanel.setLayout(new GridLayout(0, 3));
         this.synchronizeWithLayersButton.getMaximumSize().width = 15;
-        //this.synchronizeWithLayersButton.setBorder(null);
         buttonPanel.add(this.synchronizeWithLayersButton);
 
-        this.synchronizeWithBeginButton.getMaximumSize().width = 15;
-        //this.synchronizeWithBeginButton.setBorder(null);
-        //buttonPanel.add(this.synchronizeWithBeginButton);
-
         this.synchronizeWithCurrentButton.getMaximumSize().width = 15;
-        //this.synchronizeWithCurrentButton.setBorder(null);
         buttonPanel.add(this.synchronizeWithCurrentButton);
 
-        this.synchronizeWithEndButton.getMaximumSize().width = 15;
-        this.synchronizeWithEndButton.setBorder(null);
-        //buttonPanel.add(this.synchronizeWithEndButton);
         this.synchronizeWithNowButton.getMaximumSize().width = 15;
         buttonPanel.add(this.synchronizeWithNowButton);
 
