@@ -8,6 +8,7 @@ import java.awt.event.ItemListener;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
+import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -35,6 +36,7 @@ public class GL3DFollowObjectCameraOptionPanel extends GL3DCameraOptionPanel imp
     private final JLabel cameraTime;
     private final SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
     private final String DISABLED_TEXT = "----";
+    private final JButton synchronizeWithLayersButton;
 
     public GL3DFollowObjectCameraOptionPanel(GL3DFollowObjectCamera camera) {
         this.camera = camera;
@@ -43,6 +45,14 @@ public class GL3DFollowObjectCameraOptionPanel extends GL3DCameraOptionPanel imp
         add(this.cameraTime);
         this.loadedLabel = new JLabel("Not loaded");
         add(this.loadedLabel);
+        this.synchronizeWithLayersButton = new JButton("Synchronize");
+        this.synchronizeWithLayersButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                syncWithLayer();
+            }
+        });
+        add(this.synchronizeWithLayersButton);
         addObjectCombobox();
         beginDateLabel = new JLabel("Begin date");
         beginDatePicker = new JHVCalendarDatePicker();
@@ -113,15 +123,12 @@ public class GL3DFollowObjectCameraOptionPanel extends GL3DCameraOptionPanel imp
         Date dt = endTimePicker.getValue();
         Date end_date = new Date(endDatePicker.getDate().getTime() + dt.getTime());
         camera.setEndDate(end_date);
-        System.out.println("EBT" + end_date);
-
     }
 
     private void setBeginTime() {
         Date dt = beginTimePicker.getValue();
         Date begin_date = new Date(beginDatePicker.getDate().getTime() + dt.getTime());
         camera.setBeginDate(begin_date);
-        System.out.println("SBT" + begin_date);
     }
 
     private void syncWithLayer() {
@@ -132,11 +139,10 @@ public class GL3DFollowObjectCameraOptionPanel extends GL3DCameraOptionPanel imp
     private void syncWithLayerBeginTime() {
         Date startDate = null;
         startDate = LayersModel.getSingletonInstance().getFirstDate();
-        beginDatePicker.setDate(new Date(startDate.getTime() - startDate.getTime() % (60 * 60 * 24 * 1000)));
-
         if (startDate == null) {
             startDate = new Date(System.currentTimeMillis());
         }
+        beginDatePicker.setDate(new Date(startDate.getTime() - startDate.getTime() % (60 * 60 * 24 * 1000)));
         beginTimePicker.setText(TimeTextField.formatter.format(startDate));
         setBeginTime();
     }
@@ -144,11 +150,10 @@ public class GL3DFollowObjectCameraOptionPanel extends GL3DCameraOptionPanel imp
     private void syncWithLayerEndTime() {
         Date endDate = null;
         endDate = LayersModel.getSingletonInstance().getLastDate();
-        System.out.println("LAYEREND" + endDate);
-        endDatePicker.setDate(new Date(endDate.getTime() - endDate.getTime() % (60 * 60 * 24 * 1000)));
         if (endDate == null) {
             endDate = new Date(System.currentTimeMillis());
         }
+        endDatePicker.setDate(new Date(endDate.getTime() - endDate.getTime() % (60 * 60 * 24 * 1000)));
         endTimePicker.setText(TimeTextField.formatter.format(endDate));
         setEndTime();
     }
@@ -178,12 +183,8 @@ public class GL3DFollowObjectCameraOptionPanel extends GL3DCameraOptionPanel imp
     }
 
     @Override
-    public void fireLoaded(boolean isLoaded) {
-        if (isLoaded) {
-            this.loadedLabel.setText("Loaded");
-        } else {
-            this.loadedLabel.setText("Not Loaded");
-        }
+    public void fireLoaded(String state) {
+        this.loadedLabel.setText(state);
     }
 
     @Override
