@@ -8,7 +8,6 @@ import org.helioviewer.base.physics.DifferentialRotation;
 import org.helioviewer.gl3d.scenegraph.math.GL3DQuatd;
 import org.helioviewer.gl3d.scenegraph.math.GL3DVec3d;
 import org.helioviewer.gl3d.view.GL3DSceneGraphView;
-import org.helioviewer.gl3d.wcs.CoordinateVector;
 import org.helioviewer.jhv.layers.LayersModel;
 import org.helioviewer.viewmodel.changeevent.ChangeEvent;
 import org.helioviewer.viewmodel.changeevent.TimestampChangedReason;
@@ -18,8 +17,6 @@ import org.helioviewer.viewmodel.view.View;
 import org.helioviewer.viewmodel.view.ViewListener;
 
 public class GL3DFollowObjectCamera extends GL3DSolarRotationTrackingTrackballCamera implements ViewListener, GL3DPositionLoadingListener {
-
-    private final CoordinateVector startPosition = null;
 
     private Date currentDate = null;
     private double currentRotation = 0.0;
@@ -80,9 +77,7 @@ public class GL3DFollowObjectCamera extends GL3DSolarRotationTrackingTrackballCa
                 //Camera times
                 long t3 = this.positionLoading.getBeginDate().getTime();
                 long t4 = this.positionLoading.getEndDate().getTime();
-                int i;
-                int inext;
-                double alpha = 1.;
+
                 //Linear interpolation
                 if (t4 != t3) {
                     currentCameraTime = (long) ((t3 + 1. * (t4 - t3) * (timestampReason.getNewDateTime().getMillis() - t1) / (t2 - t1)));
