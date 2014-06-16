@@ -78,16 +78,12 @@ public class GL3DCameraSelectorModel extends AbstractListModel implements ComboB
 
         if (sceneGraphView != null) {
             earthCamera = new GL3DEarthCamera(sceneGraphView);
-            fixedTimeCamera = new GL3DFixedTimeCamera(sceneGraphView);
             observerCamera = new GL3DObserverCamera(sceneGraphView);
-            solarRotationCamera = new GL3DSolarRotationTrackingTrackballCamera(sceneGraphView);
             followObjectCamera = new GL3DFollowObjectCamera(sceneGraphView);
 
             defaultCamera = earthCamera;
             lastCamera = defaultCamera;
             cameras.add(earthCamera);
-            cameras.add(solarRotationCamera);
-            cameras.add(fixedTimeCamera);
             cameras.add(observerCamera);
             cameras.add(followObjectCamera);
 
