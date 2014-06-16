@@ -24,6 +24,7 @@ import org.helioviewer.jhv.gui.components.calendar.JHVCalendarDatePicker;
 import org.helioviewer.jhv.gui.components.calendar.JHVCalendarEvent;
 import org.helioviewer.jhv.gui.components.calendar.JHVCalendarListener;
 import org.helioviewer.jhv.layers.LayersModel;
+import org.helioviewer.viewmodel.view.jp2view.datetime.ImmutableDateTime;
 
 public class GL3DFollowObjectCameraOptionPanel extends GL3DCameraOptionPanel implements GL3DFollowObjectCameraListener {
     private final JLabel loadedLabel;
@@ -41,11 +42,13 @@ public class GL3DFollowObjectCameraOptionPanel extends GL3DCameraOptionPanel imp
     private final JLabel cameraTime;
     private final SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
     private final String DISABLED_TEXT = "----";
-    private final JButton synchronizeWithLayersButton;
     private JPanel addBeginDatePanel;
     private JPanel addEndDatePanel;
-    private final JButton synchronizeWithBeginButton;
-    private final JButton synchronizeWithEndButton;
+    private JButton synchronizeWithLayersButton;
+    private JButton synchronizeWithBeginButton;
+    private JButton synchronizeWithEndButton;
+    private JButton synchronizeWithNowButton;
+    private JButton synchronizeWithCurrentButton;
 
     public GL3DFollowObjectCameraOptionPanel(GL3DFollowObjectCamera camera) {
         this.camera = camera;
@@ -66,6 +69,13 @@ public class GL3DFollowObjectCameraOptionPanel extends GL3DCameraOptionPanel imp
         endDatePicker = new JHVCalendarDatePicker();
         endTimePicker = new TimeTextField();
         addEndDatePanel();
+        addSyncButtons();
+        this.syncWithLayerBeginTime();
+        this.syncWithLayerEndTime();
+        this.camera.addFollowObjectCameraListener(this);
+    }
+
+    public void addSyncButtons() {
         this.synchronizeWithLayersButton = new JButton("Sync");
         this.synchronizeWithLayersButton.setToolTipText("Fill the dates based on the current active layer.");
         this.synchronizeWithLayersButton.addActionListener(new ActionListener() {
@@ -90,15 +100,43 @@ public class GL3DFollowObjectCameraOptionPanel extends GL3DCameraOptionPanel imp
                 syncBothLayerEndTime();
             }
         });
-        JPanel buttonPanel = new JPanel(new GridLayout(0, 3));
+        this.synchronizeWithNowButton = new JButton("Now");
+        this.synchronizeWithNowButton.setToolTipText("Fill twice now.");
+        this.synchronizeWithNowButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                syncBothLayerNow();
+            }
+        });
+        this.synchronizeWithCurrentButton = new JButton("Current");
+        this.synchronizeWithCurrentButton.setToolTipText("Fill twice current layer time.");
+        this.synchronizeWithCurrentButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                syncWithLayerCurrentTime();
+            }
+        });
+        JPanel buttonPanel = new JPanel();
+        buttonPanel.setLayout(new BoxLayout(buttonPanel, BoxLayout.LINE_AXIS));
+        this.synchronizeWithLayersButton.getMaximumSize().width = 15;
+        //this.synchronizeWithLayersButton.setBorder(null);
         buttonPanel.add(this.synchronizeWithLayersButton);
-        buttonPanel.add(this.synchronizeWithBeginButton);
-        buttonPanel.add(this.synchronizeWithEndButton);
+
+        this.synchronizeWithBeginButton.getMaximumSize().width = 15;
+        //this.synchronizeWithBeginButton.setBorder(null);
+        //buttonPanel.add(this.synchronizeWithBeginButton);
+
+        this.synchronizeWithCurrentButton.getMaximumSize().width = 15;
+        //this.synchronizeWithCurrentButton.setBorder(null);
+        buttonPanel.add(this.synchronizeWithCurrentButton);
+
+        this.synchronizeWithEndButton.getMaximumSize().width = 15;
+        this.synchronizeWithEndButton.setBorder(null);
+        //buttonPanel.add(this.synchronizeWithEndButton);
+        this.synchronizeWithNowButton.getMaximumSize().width = 15;
+        buttonPanel.add(this.synchronizeWithNowButton);
+
         add(buttonPanel);
-        add(new JPanel());
-        this.syncWithLayerBeginTime();
-        this.syncWithLayerEndTime();
-        this.camera.addFollowObjectCameraListener(this);
     }
 
     @Override
@@ -211,6 +249,31 @@ public class GL3DFollowObjectCameraOptionPanel extends GL3DCameraOptionPanel imp
         beginTimePicker.setText(TimeTextField.formatter.format(endDate));
         endDatePicker.setDate(new Date(endDate.getTime() - endDate.getTime() % (60 * 60 * 24 * 1000)));
         endTimePicker.setText(TimeTextField.formatter.format(endDate));
+        setBeginTime();
+        setEndTime();
+    }
+
+    private void syncBothLayerNow() {
+        Date nowDate = new Date(System.currentTimeMillis());
+        beginDatePicker.setDate(new Date(nowDate.getTime() - nowDate.getTime() % (60 * 60 * 24 * 1000)));
+        beginTimePicker.setText(TimeTextField.formatter.format(nowDate));
+        endDatePicker.setDate(new Date(nowDate.getTime() - nowDate.getTime() % (60 * 60 * 24 * 1000)));
+        endTimePicker.setText(TimeTextField.formatter.format(nowDate));
+        setBeginTime();
+        setEndTime();
+    }
+
+    private void syncWithLayerCurrentTime() {
+        ImmutableDateTime helpDate = null;
+        helpDate = LayersModel.getSingletonInstance().getCurrentFrameTimestamp(LayersModel.getSingletonInstance().getActiveLayer());
+        Date currentDate = helpDate.getTime();
+        if (currentDate == null) {
+            currentDate = new Date(System.currentTimeMillis());
+        }
+        endDatePicker.setDate(new Date(currentDate.getTime() - currentDate.getTime() % (60 * 60 * 24 * 1000)));
+        endTimePicker.setText(TimeTextField.formatter.format(currentDate));
+        beginDatePicker.setDate(new Date(currentDate.getTime() - currentDate.getTime() % (60 * 60 * 24 * 1000)));
+        beginTimePicker.setText(TimeTextField.formatter.format(currentDate));
         setBeginTime();
         setEndTime();
     }
