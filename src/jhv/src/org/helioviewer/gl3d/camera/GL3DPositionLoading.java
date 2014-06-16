@@ -33,9 +33,9 @@ public class GL3DPositionLoading {
     public GL3DPositionDateTime[] positionDateTime;
     private final SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
     private final GregorianCalendar calendar = new GregorianCalendar();
-    private String beginDate = "2017-07-28T00:00:00";
-    private String endDate = "2027-05-30T00:00:00";
-    private String target = "SOLAR%20ORBITER";
+    private String beginDate = "2014-07-28T00:00:00";
+    private String endDate = "2014-05-30T00:00:00";
+    private String target = "EARTH";
     private final String observer = "SUN";
     private final String baseUrl = "http://localhost:7789/position?";
     private final int deltat = 60 * 60 * 6; //6 hours by default
