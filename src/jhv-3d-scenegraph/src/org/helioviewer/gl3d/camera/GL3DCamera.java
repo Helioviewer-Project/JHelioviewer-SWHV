@@ -60,6 +60,10 @@ public abstract class GL3DCamera {
 
     private long timeDelay;
 
+    private double translationz;
+
+    private double ratio = 1.0;
+
     public GL3DCamera(double clipNear, double clipFar) {
         this();
         this.clipNear = clipNear;
@@ -106,7 +110,8 @@ public abstract class GL3DCamera {
     }
 
     protected void setZTranslation(double z) {
-        this.translation.z = Math.min(MIN_DISTANCE, Math.max(MAX_DISTANCE, z));
+        this.translationz = Math.min(MIN_DISTANCE, Math.max(MAX_DISTANCE, z));
+        this.translation.z = this.ratio * this.translationz;
     }
 
     protected void addPanning(double x, double y) {
@@ -334,5 +339,10 @@ public abstract class GL3DCamera {
 
     public GL3DQuatd getCurrentDragRotation() {
         return this.currentDragRotation;
+    }
+
+    public void setRatio(double ratio) {
+        this.ratio = ratio;
+        this.translation.z = this.translationz * this.ratio;
     }
 }
