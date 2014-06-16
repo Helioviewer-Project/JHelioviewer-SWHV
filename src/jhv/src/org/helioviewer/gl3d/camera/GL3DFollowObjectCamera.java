@@ -5,6 +5,7 @@ import java.util.Date;
 
 import org.helioviewer.base.physics.Constants;
 import org.helioviewer.base.physics.DifferentialRotation;
+import org.helioviewer.gl3d.scenegraph.GL3DDrawBits.Bit;
 import org.helioviewer.gl3d.scenegraph.math.GL3DQuatd;
 import org.helioviewer.gl3d.scenegraph.math.GL3DVec3d;
 import org.helioviewer.gl3d.view.GL3DSceneGraphView;
@@ -24,6 +25,7 @@ public class GL3DFollowObjectCamera extends GL3DSolarRotationTrackingTrackballCa
     private final ArrayList<GL3DFollowObjectCameraListener> followObjectCameraListeners = new ArrayList<GL3DFollowObjectCameraListener>();
     GL3DCameraFOV cameraFOV;
     private final GL3DPositionLoading positionLoading;
+    private double FOVangle;
 
     public GL3DFollowObjectCamera(GL3DSceneGraphView sceneGraphView) {
         super(sceneGraphView);
@@ -46,8 +48,14 @@ public class GL3DFollowObjectCamera extends GL3DSolarRotationTrackingTrackballCa
     }
 
     @Override
+    public void activate() {
+        this.cameraFOV.getDrawBits().off(Bit.Hidden);
+    };
+
+    @Override
     public void deactivate() {
         sceneGraphView.removeViewListener(this);
+        this.cameraFOV.getDrawBits().on(Bit.Hidden);
     };
 
     @Override
@@ -91,9 +99,7 @@ public class GL3DFollowObjectCamera extends GL3DSolarRotationTrackingTrackballCa
                 currentDistance = position.x;
 
                 updateRotation();
-                //double FSIangle = 0.284 * Math.PI / 180.;
-                double FSIangle = 3.8 * Math.PI / 180.;
-                setFOV(currentDistance * Math.tan(FSIangle));
+                setFOV(currentDistance * Math.tan(FOVangle));
             }
 
         }
@@ -164,6 +170,11 @@ public class GL3DFollowObjectCamera extends GL3DSolarRotationTrackingTrackballCa
 
     public void setObservingObject(String object) {
         this.positionLoading.setObservingObject(object);
+    }
+
+    public void setFOVangleDegrees(double fovAngle) {
+        this.FOVangle = fovAngle * Math.PI / 180.0;
+
     }
 
 }
