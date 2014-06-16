@@ -106,9 +106,7 @@ public class GL3DPositionLoading {
                 GL3DVec3d vec = new GL3DVec3d(x, y, z);
                 positionDateTimehelper[i] = new GL3DPositionDateTime(calendar.getTimeInMillis(), vec);
             }
-            //synchronized (Displayer.displaylock) {
             this.positionDateTime = positionDateTimehelper;
-            //}
             Displayer.getSingletonInstance().render();
         } catch (JSONException e) {
             this.fireLoaded(this.PARTIALSTATE);
