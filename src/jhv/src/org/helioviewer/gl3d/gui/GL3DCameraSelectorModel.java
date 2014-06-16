@@ -170,4 +170,8 @@ public class GL3DCameraSelectorModel extends AbstractListModel implements ComboB
         return followObjectCamera;
     }
 
+    public GL3DEarthCamera getEarthCamera() {
+        return earthCamera;
+    }
+
 }
