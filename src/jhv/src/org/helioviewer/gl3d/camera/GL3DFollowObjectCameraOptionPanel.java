@@ -36,11 +36,13 @@ public class GL3DFollowObjectCameraOptionPanel extends GL3DCameraOptionPanel imp
     private final GL3DFollowObjectCamera camera;
     private final JLabel cameraTime;
     private final SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
+    private final String DISABLED_TEXT = "----";
 
     public GL3DFollowObjectCameraOptionPanel(GL3DFollowObjectCamera camera) {
         this.camera = camera;
-        cameraTime = new JLabel("----");
         setLayout(new GridLayout(0, 1));
+        cameraTime = new JLabel(DISABLED_TEXT);
+        add(this.cameraTime);
         this.loadedLabel = new JLabel("Not loaded");
         add(this.loadedLabel);
         addObjectCombobox();
@@ -60,19 +62,23 @@ public class GL3DFollowObjectCameraOptionPanel extends GL3DCameraOptionPanel imp
     @Override
     public void deactivate() {
         this.camera.removeFollowObjectCameraListener(this);
+
+        cameraTime.setText(DISABLED_TEXT);
     }
 
     private void addObjectCombobox() {
         objectCombobox = new JComboBox();
-        objectCombobox.addItem("Solar%20Orbiter");
-        objectCombobox.addItem("Venus");
+        GL3DSpaceObject[] objectList = GL3DSpaceObject.getObjectList();
+        for (int i = 0; i < objectList.length; i++) {
+            objectCombobox.addItem(objectList[i]);
+        }
         objectCombobox.addItemListener(new ItemListener() {
             @Override
             public void itemStateChanged(ItemEvent event) {
                 if (event.getStateChange() == ItemEvent.SELECTED) {
-                    String object = (String) event.getItem();
+                    GL3DSpaceObject object = (GL3DSpaceObject) event.getItem();
                     if (object != null) {
-                        camera.setObservingObject(object);
+                        camera.setObservingObject(object.getUrlName());
                         revalidate();
                     }
                 }
@@ -109,7 +115,6 @@ public class GL3DFollowObjectCameraOptionPanel extends GL3DCameraOptionPanel imp
         try {
             Date dt = TimeTextField.formatter.parse(endTimePicker.getText());
             camera.setEndDate(new Date(endDatePicker.getDate().getTime() + dt.getTime()));
-            System.out.println(new Date(endDatePicker.getDate().getTime() + dt.getTime()));
         } catch (ParseException e) {
             Log.error("Date parsing failed" + e);
         }
@@ -119,7 +124,6 @@ public class GL3DFollowObjectCameraOptionPanel extends GL3DCameraOptionPanel imp
         try {
             Date dt = TimeTextField.formatter.parse(beginTimePicker.getText());
             camera.setBeginDate(new Date(beginDatePicker.getDate().getTime() + dt.getTime()));
-            System.out.println(new Date(beginDatePicker.getDate().getTime() + dt.getTime()));
         } catch (ParseException e) {
             Log.error("Date parsing failed" + e);
         }
@@ -164,7 +168,6 @@ public class GL3DFollowObjectCameraOptionPanel extends GL3DCameraOptionPanel imp
                 try {
                     Date dt = TimeTextField.formatter.parse(endTimePicker.getText());
                     camera.setEndDate(new Date(endDatePicker.getDate().getTime() + dt.getTime()));
-
                 } catch (ParseException e1) {
                     Log.error("Date parsing failed", e1);
                 }
@@ -201,5 +204,10 @@ public class GL3DFollowObjectCameraOptionPanel extends GL3DCameraOptionPanel imp
     @Override
     public void fireCameraTime(Date cameraDate) {
         this.cameraTime.setText(format.format(cameraDate));
+    }
+
+    @Override
+    public void fireNewDate(Date date) {
+        this.cameraTime.setText(this.format.format(date));
     }
 }
