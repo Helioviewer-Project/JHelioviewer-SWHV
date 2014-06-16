@@ -17,10 +17,10 @@ import org.helioviewer.gl3d.scenegraph.math.GL3DVec3d;
 import org.helioviewer.gl3d.wcs.CoordinateSystem;
 
 /**
- * The GL3DCamera is resposible for the view space transformation. It sets up
+ * The GL3DCamera is responsible for the view space transformation. It sets up
  * the perspective and is generates the view space transformation. This
  * transformation is in turn influenced by the user interaction. Different
- * styles of user interaction are supported. These interactions are encapsuled
+ * styles of user interaction are supported. These interactions are encapsulated
  * in {@link GL3DInteraction} objects that can be selected in the main toolbar.
  * The interactions then change the rotation and translation fields out of which
  * the resulting cameraTransformation is generated.
