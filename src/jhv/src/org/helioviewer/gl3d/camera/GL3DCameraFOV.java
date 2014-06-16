@@ -12,12 +12,20 @@ import org.helioviewer.gl3d.scenegraph.math.GL3DVec3d;
 import org.helioviewer.gl3d.scenegraph.math.GL3DVec4d;
 
 public class GL3DCameraFOV extends GL3DMesh {
-    public GL3DCameraFOV() {
-        this("CameraFOV");
+    private final double width;
+    private final double height;
+
+    private final double epsilon = 0.01;
+    private double scale;
+
+    public GL3DCameraFOV(double width, double height) {
+        this("CameraFOV", width, height);
     }
 
-    public GL3DCameraFOV(String name) {
+    public GL3DCameraFOV(String name, double width, double height) {
         super(name);
+        this.width = width;
+        this.height = height;
     }
 
     @Override
@@ -25,6 +33,10 @@ public class GL3DCameraFOV extends GL3DMesh {
         this.markAsChanged();
         state.gl.glColor3d(1., 0., 0.);
         super.shapeDraw(state);
+    }
+
+    public void scale(double s) {
+        this.scale = s;
     }
 
     @Override
@@ -36,6 +48,7 @@ public class GL3DCameraFOV extends GL3DMesh {
         state.pushMV();
         GL3DQuatd differentialRotation = state.getActiveCamera().getLocalRotation();
         this.m = differentialRotation.toMatrix().inverse();
+        this.m.scale(scale, scale, scale);
         this.wm = (this.m);
         state.buildInverseAndNormalMatrix();
         this.wmI = new GL3DMat4d(state.getMVInverse());
@@ -46,30 +59,27 @@ public class GL3DCameraFOV extends GL3DMesh {
     @Override
     public GL3DMeshPrimitive createMesh(GL3DState state, List<GL3DVec3d> positions, List<GL3DVec3d> normals, List<GL3DVec2d> textCoords, List<Integer> indices, List<GL3DVec4d> colors) {
         int numberOfPositions = 0;
-        double helper = 1.28;
-        double epsilon = 0.01;
         int beginPositionNumber = numberOfPositions;
-        positions.add(new GL3DVec3d(-helper, helper, epsilon));
+        positions.add(new GL3DVec3d(-width / 2., height / 2., epsilon));
         colors.add(new GL3DVec4d(1., 0., 0., 1.));
         numberOfPositions++;
-        positions.add(new GL3DVec3d(helper, helper, epsilon));
+        positions.add(new GL3DVec3d(width / 2., height / 2., epsilon));
         colors.add(new GL3DVec4d(1., 0., 0., 1.));
         numberOfPositions++;
-        positions.add(new GL3DVec3d(helper, -helper, epsilon));
+        positions.add(new GL3DVec3d(width / 2., -height / 2., epsilon));
         colors.add(new GL3DVec4d(1., 0., 0., 1.));
         numberOfPositions++;
-        positions.add(new GL3DVec3d(-helper, -helper, epsilon));
+        positions.add(new GL3DVec3d(-width / 2., -height / 2., epsilon));
         colors.add(new GL3DVec4d(1., 0., 0., 1.));
         numberOfPositions++;
 
         indices.add(beginPositionNumber + 0);
-        indices.add(beginPositionNumber + 2);
         indices.add(beginPositionNumber + 1);
-
         indices.add(beginPositionNumber + 2);
-        indices.add(beginPositionNumber + 0);
         indices.add(beginPositionNumber + 3);
-        return GL3DMeshPrimitive.TRIANGLES;
+        //indices.add(beginPositionNumber + 0);
+        //indices.add(beginPositionNumber + 3);
+        return GL3DMeshPrimitive.QUADS;
 
     }
 }

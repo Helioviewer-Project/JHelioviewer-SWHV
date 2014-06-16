@@ -35,8 +35,6 @@ public class GL3DEarthCamera extends GL3DSolarRotationTrackingTrackballCamera im
 
     public GL3DEarthCamera(GL3DSceneGraphView sceneGraphView) {
         super(sceneGraphView);
-        GL3DCameraFOV cameraFOV = new GL3DCameraFOV();
-        sceneGraphView.getRoot().addNode(cameraFOV);
     }
 
     @Override
