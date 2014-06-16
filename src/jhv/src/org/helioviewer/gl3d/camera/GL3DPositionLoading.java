@@ -14,6 +14,7 @@ import java.util.GregorianCalendar;
 
 import org.helioviewer.base.DownloadStream;
 import org.helioviewer.base.logging.Log;
+import org.helioviewer.base.physics.Constants;
 import org.helioviewer.gl3d.scenegraph.math.GL3DVec3d;
 import org.helioviewer.jhv.display.Displayer;
 import org.json.JSONArray;
@@ -163,6 +164,22 @@ public class GL3DPositionLoading {
 
     public Date getEndDate() {
         return this.endDatems;
+    }
+
+    public GL3DVec3d getInterpolatedPosition(long currentCameraTime) {
+        long t3 = this.getBeginDate().getTime();
+        long t4 = this.getEndDate().getTime();
+        double interpolatedIndex = (1. * (currentCameraTime - t3) / (t4 - t3) * this.positionDateTime.length);
+        int i = (int) interpolatedIndex;
+        i = Math.min(i, this.positionDateTime.length - 1);
+        int inext = Math.min(i + 1, this.positionDateTime.length - 1);
+        double alpha = 1. - interpolatedIndex % 1.;
+        double hgln = alpha * this.positionDateTime[i].getPosition().y + (1 - alpha) * this.positionDateTime[inext].getPosition().y;
+        double hglt = alpha * this.positionDateTime[i].getPosition().z + (1 - alpha) * this.positionDateTime[inext].getPosition().z;
+        double dist = alpha * this.positionDateTime[i].getPosition().x + (1 - alpha) * this.positionDateTime[inext].getPosition().x;
+        dist = dist * 1000 / Constants.SunRadiusInMeter;
+        GL3DVec3d vec = new GL3DVec3d(dist, hgln, hglt);
+        return vec;
     }
 
     public void setObservingObject(String object) {
