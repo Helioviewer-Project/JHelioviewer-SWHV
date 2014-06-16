@@ -81,24 +81,30 @@ public class GL3DFollowObjectCamera extends GL3DSolarRotationTrackingTrackballCa
                 long t3 = this.positionLoading.getBeginDate().getTime();
                 long t4 = this.positionLoading.getEndDate().getTime();
                 int i;
+                int inext;
+                double alpha = 1.;
                 //Linear interpolation
                 if (t4 != t3) {
                     currentCameraTime = (long) ((t3 + 1. * (t4 - t3) * (timestampReason.getNewDateTime().getMillis() - t1) / (t2 - t1)));
-                    i = (int) (1. * (currentCameraTime - t3) / (t4 - t3) * this.positionLoading.positionDateTime.length);
+                    double interpolatedIndex = (1. * (currentCameraTime - t3) / (t4 - t3) * this.positionLoading.positionDateTime.length);
+                    i = (int) interpolatedIndex;
+                    i = Math.min(i, this.positionLoading.positionDateTime.length - 1);
+                    inext = Math.min(i + 1, this.positionLoading.positionDateTime.length - 1);
+                    alpha = 1. - interpolatedIndex % 1.;
+                    System.out.println("CCT" + i);
+                    System.out.println(alpha);
 
                 } else {
                     currentCameraTime = t4;
                     i = 0;
+                    inext = 0;
                 }
                 this.fireCameratTime(new Date(currentCameraTime));
-                i = Math.min(i, this.positionLoading.positionDateTime.length);
-                i = Math.max(i, 0);
-                try {
-                    currentL = this.positionLoading.positionDateTime[i].getPosition().y;
-                    currentB = this.positionLoading.positionDateTime[i].getPosition().z;
-                    currentDistance = 1000 * (this.positionLoading.positionDateTime[i].getPosition().x) / Constants.SunRadiusInMeter;
-                } catch (Exception e) {
-                }
+                currentL = alpha * this.positionLoading.positionDateTime[i].getPosition().y + (1 - alpha) * this.positionLoading.positionDateTime[inext].getPosition().y;
+                currentB = alpha * this.positionLoading.positionDateTime[i].getPosition().z + (1 - alpha) * this.positionLoading.positionDateTime[inext].getPosition().z;
+                currentDistance = 1000 * (alpha * this.positionLoading.positionDateTime[i].getPosition().x + (1 - alpha) * this.positionLoading.positionDateTime[inext].getPosition().x);
+                currentDistance /= Constants.SunRadiusInMeter;
+
                 updateRotation();
                 //double FSIangle = 0.284 * Math.PI / 180.;
                 double FSIangle = 3.8 * Math.PI / 180.;
@@ -122,7 +128,6 @@ public class GL3DFollowObjectCamera extends GL3DSolarRotationTrackingTrackballCa
 
     public void updateRotation() {
         if (this.positionLoading.isLoaded() && currentDate != null) {
-
             this.timediff = (currentCameraTime) / 1000 - Constants.referenceDate;
             this.currentRotation = (-currentL + DifferentialRotation.calculateRotationInRadians(0., this.timediff)) % (Math.PI * 2.0);
             GL3DQuatd newRotation = GL3DQuatd.createRotation(0., new GL3DVec3d(0, 1, 0));
@@ -151,6 +156,15 @@ public class GL3DFollowObjectCamera extends GL3DSolarRotationTrackingTrackballCa
         synchronized (followObjectCameraListeners) {
             for (GL3DFollowObjectCameraListener listener : followObjectCameraListeners) {
                 listener.fireLoaded(isLoaded);
+            }
+        }
+    }
+
+    @Override
+    public void fireNewDate() {
+        synchronized (followObjectCameraListeners) {
+            for (GL3DFollowObjectCameraListener listener : followObjectCameraListeners) {
+                listener.fireNewDate(new Date(this.currentCameraTime));
             }
         }
     }
