@@ -69,9 +69,9 @@ public class GL3DPositionLoading {
                         setLoaded(true);
                     }
                 } catch (final IOException e1) {
-                    Log.warn("Error Parsing the EVE Response.", e1);
+                    //Log.warn("Error Parsing the EVE Response.", e1);
                 } catch (JSONException e2) {
-                    Log.warn("Error Parsing the JSON Response.", e2);
+                    //Log.warn("Error Parsing the JSON Response.", e2);
                 }
 
             }
