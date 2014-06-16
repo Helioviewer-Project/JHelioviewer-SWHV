@@ -40,8 +40,6 @@ public class GL3DObserverCamera extends GL3DSolarRotationTrackingTrackballCamera
 
     public GL3DObserverCamera(GL3DSceneGraphView sceneGraphView) {
         super(sceneGraphView);
-        GL3DCameraFOV cameraFOV = new GL3DCameraFOV();
-        sceneGraphView.getRoot().addNode(cameraFOV);
     }
 
     @Override
