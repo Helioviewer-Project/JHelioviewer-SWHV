@@ -54,12 +54,12 @@ public class GL3DFixedTimeCamera extends GL3DSolarRotationTrackingTrackballCamer
     @Override
     public void activate(GL3DCamera precedingCamera) {
         super.activate(precedingCamera);
-        sceneGraphView.addViewListener(this);
+        getSceneGraphView().addViewListener(this);
     }
 
     @Override
     public void deactivate() {
-        sceneGraphView.removeViewListener(this);
+        getSceneGraphView().removeViewListener(this);
     };
 
     @Override

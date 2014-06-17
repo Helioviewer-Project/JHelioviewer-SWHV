@@ -44,7 +44,7 @@ public class GL3DFollowObjectCamera extends GL3DSolarRotationTrackingTrackballCa
     @Override
     public void activate(GL3DCamera precedingCamera) {
         super.activate(precedingCamera);
-        sceneGraphView.addViewListener(this);
+        getSceneGraphView().addViewListener(this);
     }
 
     @Override
@@ -54,7 +54,7 @@ public class GL3DFollowObjectCamera extends GL3DSolarRotationTrackingTrackballCa
 
     @Override
     public void deactivate() {
-        sceneGraphView.removeViewListener(this);
+        getSceneGraphView().removeViewListener(this);
         this.cameraFOV.getDrawBits().on(Bit.Hidden);
     };
 

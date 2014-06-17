@@ -3,7 +3,10 @@ package org.helioviewer.gl3d.camera;
 import org.helioviewer.base.physics.Constants;
 import org.helioviewer.gl3d.scenegraph.GL3DState;
 import org.helioviewer.gl3d.scenegraph.math.GL3DMat4d;
+import org.helioviewer.gl3d.scenegraph.math.GL3DVec4d;
+import org.helioviewer.gl3d.scenegraph.math.GL3DVec4f;
 import org.helioviewer.gl3d.scenegraph.rt.GL3DRay;
+import org.helioviewer.gl3d.scenegraph.visuals.GL3DGrid;
 import org.helioviewer.gl3d.view.GL3DSceneGraphView;
 import org.helioviewer.gl3d.wcs.CoordinateSystem;
 import org.helioviewer.gl3d.wcs.HeliocentricCartesian2000CoordinateSystem;
@@ -27,17 +30,18 @@ public class GL3DSolarRotationTrackingTrackballCamera extends GL3DCamera {
     private final GL3DPanInteraction panInteraction;
     private final GL3DZoomBoxInteraction zoomBoxInteraction;
 
-    protected GL3DSceneGraphView sceneGraphView;
+    private GL3DSceneGraphView sceneGraphView;
 
     protected GL3DInteraction currentInteraction;
 
     public GL3DSolarRotationTrackingTrackballCamera(GL3DSceneGraphView sceneGraphView) {
-        this.sceneGraphView = sceneGraphView;
+        super();
+        this.setSceneGraphView(sceneGraphView);
         this.rotationInteraction = new GL3DTrackballRotationInteraction(this, sceneGraphView);
         this.panInteraction = new GL3DPanInteraction(this, sceneGraphView);
         this.zoomBoxInteraction = new GL3DZoomBoxInteraction(this, sceneGraphView);
-
         this.currentInteraction = this.rotationInteraction;
+        this.setGrid(this.getGrid());
     }
 
     @Override
@@ -103,5 +107,23 @@ public class GL3DSolarRotationTrackingTrackballCamera extends GL3DCamera {
     @Override
     public String getName() {
         return "Solar Rotation Tracking Camera";
+    }
+
+    @Override
+    public void createNewGrid() {
+        {
+            getSceneGraphView().getRoot().removeNode(getGrid());
+            this.setGrid(new GL3DGrid("grid", getGridResolutionX(), getGridResolutionY(), new GL3DVec4f(1.0f, 0.0f, 0.0f, 1.0f), new GL3DVec4d(0.0, 1.0, 0.0, 1.0)));
+            getSceneGraphView().getRoot().addNode(getGrid());
+        }
+    }
+
+    @Override
+    public void setGrid(GL3DGrid grid) {
+        getSceneGraphView().getRoot().addNode(grid);
+    }
+
+    public GL3DSceneGraphView getSceneGraphView() {
+        return sceneGraphView;
     }
 }
