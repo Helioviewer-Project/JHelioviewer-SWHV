@@ -59,6 +59,7 @@ public class GL3DFollowObjectCameraOptionPanel extends GL3DCameraOptionPanel imp
     private final JSpinner fovSpinner;
 
     public GL3DFollowObjectCameraOptionPanel(final GL3DFollowObjectCamera camera) {
+        super(camera);
         this.camera = camera;
         setLayout(new BoxLayout(this, BoxLayout.PAGE_AXIS));
         this.setBorder(BorderFactory.createEmptyBorder(0, 4, 0, 4));

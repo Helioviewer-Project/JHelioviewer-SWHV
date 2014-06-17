@@ -26,6 +26,7 @@ public class GL3DFixedTimeCameraOptionPanel extends GL3DCameraOptionPanel {
     private long timeDelay;
 
     public GL3DFixedTimeCameraOptionPanel(GL3DFixedTimeCamera camera) {
+        super(camera);
         EventQueue.invokeLater(new Runnable() {
             @Override
             public void run() {
