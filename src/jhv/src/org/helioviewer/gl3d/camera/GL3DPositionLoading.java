@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.net.MalformedURLException;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -26,7 +27,7 @@ public class GL3DPositionLoading {
     private final String LOADEDSTATE = "Loaded";
     private final String LOADINGSTATE = "Loading";
     private final String FAILEDSTATE = "Failed";
-    private final String PARTIALSTATE = "Failed";
+    private final String PARTIALSTATE = "Partial";
 
     private boolean isLoaded = false;
     private URL url;
@@ -67,17 +68,29 @@ public class GL3DPositionLoading {
             public void run() {
                 try {
                     buildRequestURL();
-                    DownloadStream ds = new DownloadStream(url, 30000, 30000);
+                    DownloadStream ds = new DownloadStream(url.toURI(), 30000, 30000, true);
                     Reader reader = new BufferedReader(new InputStreamReader(ds.getInput(), "UTF-8"));
-                    jsonResult = new JSONArray(new JSONTokener(reader));
-                    parseData();
-                    if (positionDateTime.length > 0) {
-                        setLoaded(true);
+                    if (!ds.getResponse400()) {
+                        jsonResult = new JSONArray(new JSONTokener(reader));
+                        parseData();
+                        if (positionDateTime.length > 0) {
+                            setLoaded(true);
+                        }
+                    } else {
+                        JSONObject jsonObject = new JSONObject(new JSONTokener(reader));
+                        if (jsonObject.has("faultstring")) {
+                            String faultstring = jsonObject.getString("faultstring");
+                            fireLoaded(faultstring);
+                        }
                     }
                 } catch (final IOException e1) {
-                    fireLoaded(FAILEDSTATE);
+                    Log.warn(e1);
+                    e1.printStackTrace();
+                    fireLoaded(FAILEDSTATE + ": server problem");
                 } catch (JSONException e2) {
-                    fireLoaded(FAILEDSTATE);
+                    fireLoaded(FAILEDSTATE + ": json parse problem");
+                } catch (URISyntaxException e) {
+                    fireLoaded(FAILEDSTATE + ": wrong URI");
                 }
 
             }

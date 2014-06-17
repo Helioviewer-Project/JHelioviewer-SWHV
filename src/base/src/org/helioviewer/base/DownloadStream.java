@@ -60,6 +60,8 @@ public class DownloadStream {
      * Used url to connect
      */
     final private URL url;
+    private boolean ignore400;
+    private boolean response400;
 
     /**
      * Creates d download object for a given uri, assuming a file if not given a
@@ -79,6 +81,12 @@ public class DownloadStream {
         url = uri.toURL();
         this.readTimeout = readTimeout;
         this.connectTimeout = connectTimeout;
+        this.ignore400 = false;
+    }
+
+    public DownloadStream(URI uri, int connectTimeout, int readTimeout, boolean ignore400) throws URISyntaxException, MalformedURLException {
+        this(uri, connectTimeout, readTimeout);
+        this.ignore400 = ignore400;
     }
 
     /**
@@ -91,6 +99,10 @@ public class DownloadStream {
         this.url = url;
         this.readTimeout = readTimeout;
         this.connectTimeout = connectTimeout;
+    }
+
+    public boolean getResponse400() {
+        return this.response400;
     }
 
     /**
@@ -117,21 +129,43 @@ public class DownloadStream {
                 out.write(output);
                 out.close();
             }
-            httpC.connect();
+            try {
+                httpC.connect();
+            } catch (IOException e) {
+
+            }
             // Check the connection code
-            if (httpC.getResponseCode() >= 400) {
+            if (httpC.getResponseCode() > 400) {
+                Log.error(">> DownloadStream.connect() > Error opening http connection to " + url + " Response code: " + httpC.getResponseCode());
+                throw new IOException("Error opening http connection to " + url + " Response code: " + httpC.getResponseCode());
+            }
+
+            if (httpC.getResponseCode() == 400 && !(this.ignore400)) {
                 Log.error(">> DownloadStream.connect() > Error opening http connection to " + url + " Response code: " + httpC.getResponseCode());
                 throw new IOException("Error opening http connection to " + url + " Response code: " + httpC.getResponseCode());
             }
             // Now according to the encoding open the right input Stream
-            String encoding = httpC.getContentEncoding();
-            Log.debug("Created http connection with encoding " + encoding);
-            if (encoding != null && encoding.equalsIgnoreCase("gzip")) {
-                in = new GZIPInputStream(httpC.getInputStream());
-            } else if (encoding != null && encoding.equalsIgnoreCase("deflate")) {
-                in = new InflaterInputStream(httpC.getInputStream());
+            if (httpC.getResponseCode() == 400) {
+                this.response400 = true;
+                String encoding = httpC.getContentEncoding();
+                Log.debug("Created http connection with encoding " + encoding);
+                if (encoding != null && encoding.equalsIgnoreCase("gzip")) {
+                    in = new GZIPInputStream(httpC.getErrorStream());
+                } else if (encoding != null && encoding.equalsIgnoreCase("deflate")) {
+                    in = new InflaterInputStream(httpC.getErrorStream());
+                } else {
+                    in = httpC.getErrorStream();
+                }
             } else {
-                in = httpC.getInputStream();
+                String encoding = httpC.getContentEncoding();
+                Log.debug("Created http connection with encoding " + encoding);
+                if (encoding != null && encoding.equalsIgnoreCase("gzip")) {
+                    in = new GZIPInputStream(httpC.getInputStream());
+                } else if (encoding != null && encoding.equalsIgnoreCase("deflate")) {
+                    in = new InflaterInputStream(httpC.getInputStream());
+                } else {
+                    in = httpC.getInputStream();
+                }
             }
         } else {
             Log.debug("No http connection, try no compression");
