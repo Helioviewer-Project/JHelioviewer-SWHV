@@ -1,6 +1,7 @@
 package org.helioviewer.gl3d.camera;
 
 import org.helioviewer.base.physics.Constants;
+import org.helioviewer.gl3d.scenegraph.GL3DDrawBits.Bit;
 import org.helioviewer.gl3d.scenegraph.GL3DState;
 import org.helioviewer.gl3d.scenegraph.math.GL3DMat4d;
 import org.helioviewer.gl3d.scenegraph.math.GL3DVec4d;
@@ -111,15 +112,18 @@ public class GL3DSolarRotationTrackingTrackballCamera extends GL3DCamera {
 
     @Override
     public void createNewGrid() {
-        {
-            getSceneGraphView().getRoot().removeNode(getGrid());
-            this.setGrid(new GL3DGrid("grid", getGridResolutionX(), getGridResolutionY(), new GL3DVec4f(1.0f, 0.0f, 0.0f, 1.0f), new GL3DVec4d(0.0, 1.0, 0.0, 1.0)));
-            getSceneGraphView().getRoot().addNode(getGrid());
-        }
+        boolean hidden = getGrid().getDrawBits().get(Bit.Hidden);
+        getSceneGraphView().getRoot().removeNode(getGrid());
+        GL3DGrid newGrid = new GL3DGrid("grid", getGridResolutionX(), getGridResolutionY(), new GL3DVec4f(1.0f, 0.0f, 0.0f, 1.0f), new GL3DVec4d(0.0, 1.0, 0.0, 1.0));
+        newGrid.getDrawBits().set(Bit.Hidden, hidden);
+        this.setGrid(newGrid);
+
     }
 
     @Override
     public void setGrid(GL3DGrid grid) {
+        super.setGrid(grid);
+        grid.toString();
         getSceneGraphView().getRoot().addNode(grid);
     }
 

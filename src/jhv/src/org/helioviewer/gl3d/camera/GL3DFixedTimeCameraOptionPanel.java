@@ -75,8 +75,6 @@ public class GL3DFixedTimeCameraOptionPanel extends GL3DCameraOptionPanel {
 
     @Override
     public void deactivate() {
-        // TODO Auto-generated method stub
-
     }
 
 }

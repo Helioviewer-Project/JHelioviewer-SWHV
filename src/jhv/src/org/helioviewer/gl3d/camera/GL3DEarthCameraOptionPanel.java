@@ -1,6 +1,5 @@
 package org.helioviewer.gl3d.camera;
 
-
 public class GL3DEarthCameraOptionPanel extends GL3DCameraOptionPanel {
 
     private final GL3DEarthCamera camera;
@@ -13,7 +12,6 @@ public class GL3DEarthCameraOptionPanel extends GL3DCameraOptionPanel {
 
     @Override
     public void deactivate() {
-
     }
 
 }

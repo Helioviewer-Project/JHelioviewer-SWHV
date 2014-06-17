@@ -27,7 +27,24 @@ public abstract class GL3DCameraOptionPanel extends JPanel {
     private JPanel gridPanel;
     private JSpinner gridResolutionXSpinner;
     private JSpinner gridResolutionYSpinner;
-    private JCheckBox fovCheckbox;
+    private JCheckBox gridVisibleCheckbox;
+
+    public JCheckBox getGridVisibleCheckbox() {
+        return gridVisibleCheckbox;
+    }
+
+    public JSpinner getGridResolutionXSpinner() {
+        return gridResolutionXSpinner;
+    }
+
+    public JSpinner getGridResolutionYSpinner() {
+        return gridResolutionYSpinner;
+    }
+
+    public void setGridVisibleCheckbox(JCheckBox fovCheckbox) {
+        this.gridVisibleCheckbox = fovCheckbox;
+    }
+
     private final GL3DCamera camera;
 
     public GL3DCameraOptionPanel(GL3DCamera camera) {
@@ -53,15 +70,14 @@ public abstract class GL3DCameraOptionPanel extends JPanel {
         this.gridPanel.add(Box.createHorizontalGlue());
 
         createVisibleCheckBox();
-        this.gridPanel.add(fovCheckbox);
+        this.gridPanel.add(gridVisibleCheckbox);
 
         add(this.gridPanel);
     }
 
     private void createVisibleCheckBox() {
-        fovCheckbox = new JCheckBox("Visible");
-        fovCheckbox.setSelected(true);
-        fovCheckbox.addItemListener(new ItemListener() {
+        gridVisibleCheckbox = new JCheckBox("Visible");
+        gridVisibleCheckbox.addItemListener(new ItemListener() {
             @Override
             public void itemStateChanged(ItemEvent e) {
                 if (e.getStateChange() == ItemEvent.DESELECTED) {
@@ -73,6 +89,8 @@ public abstract class GL3DCameraOptionPanel extends JPanel {
 
             }
         });
+        gridVisibleCheckbox.setSelected(false);
+
     }
 
     public void createGridResolutionX() {

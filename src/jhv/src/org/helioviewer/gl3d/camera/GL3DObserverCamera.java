@@ -56,6 +56,7 @@ public class GL3DObserverCamera extends GL3DSolarRotationTrackingTrackballCamera
 
     @Override
     public void deactivate() {
+        super.deactivate();
         getSceneGraphView().removeViewListener(this);
     };
 
@@ -96,7 +97,7 @@ public class GL3DObserverCamera extends GL3DSolarRotationTrackingTrackballCamera
             }
         }
 
-        this.timediff = (currentDate.getTime()) / 1000 - Constants.referenceDate;
+        this.timediff = currentDate.getTime() / 1000 - Constants.referenceDate;
         this.currentRotation = DifferentialRotation.calculateRotationInRadians(0., this.timediff) % (Math.PI * 2.0);
 
         this.getLocalRotation().clear();
