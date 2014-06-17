@@ -10,6 +10,7 @@ import javax.media.opengl.glu.GLU;
 
 import org.helioviewer.base.logging.Log;
 import org.helioviewer.base.physics.Constants;
+import org.helioviewer.gl3d.scenegraph.GL3DDrawBits.Bit;
 import org.helioviewer.gl3d.scenegraph.GL3DState;
 import org.helioviewer.gl3d.scenegraph.math.GL3DMat4d;
 import org.helioviewer.gl3d.scenegraph.math.GL3DQuatd;
@@ -69,7 +70,7 @@ public abstract class GL3DCamera {
 
     private int gridResolutionX = 20;
     private int gridResolutionY = 20;
-    private final GL3DGrid grid;
+    private GL3DGrid grid;
 
     public GL3DCamera(double clipNear, double clipFar) {
         this();
@@ -84,10 +85,12 @@ public abstract class GL3DCamera {
         this.localRotation = GL3DQuatd.createRotation(0.0, new GL3DVec3d(0, 1, 0));
         this.translation = new GL3DVec3d();
         this.grid = new GL3DGrid("grid", getGridResolutionX(), getGridResolutionY(), new GL3DVec4f(1.0f, 0.0f, 0.0f, 1.0f), new GL3DVec4d(0.0, 1.0, 0.0, 1.0));
+        this.getGrid().getDrawBits().on(Bit.Hidden);
     }
 
     public GL3DGrid getGrid() {
         return this.grid;
+
     }
 
     public abstract void createNewGrid();
@@ -108,7 +111,10 @@ public abstract class GL3DCamera {
         createNewGrid();
     }
 
-    public abstract void setGrid(GL3DGrid grid);
+    public void setGrid(GL3DGrid grid) {
+
+        this.grid = grid;
+    };
 
     public abstract void reset();
 
@@ -200,9 +206,11 @@ public abstract class GL3DCamera {
 
     public void deactivate() {
         this.cameraAnimations.clear();
+        this.getGrid().getDrawBits().on(Bit.Hidden);
     }
 
     public void activate() {
+        //this.getGrid().getDrawBits().off(Bit.Hidden);
     }
 
     public void applyPerspective(GL3DState state) {

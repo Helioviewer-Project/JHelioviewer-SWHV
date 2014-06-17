@@ -72,6 +72,8 @@ public class GL3DFollowObjectCameraOptionPanel extends GL3DCameraOptionPanel imp
         infoPanel.add(this.loadedLabel);
         add(infoPanel);
         add(new JSeparator(SwingConstants.HORIZONTAL));
+        this.createGridOptions();
+        add(new JSeparator(SwingConstants.HORIZONTAL));
         this.fovPanel = new JPanel();
         this.fovPanel.setLayout(new BoxLayout(fovPanel, BoxLayout.LINE_AXIS));
         this.fovPanel.add(new JLabel("FOV angle (degree) "));
@@ -169,7 +171,6 @@ public class GL3DFollowObjectCameraOptionPanel extends GL3DCameraOptionPanel imp
     @Override
     public void deactivate() {
         this.camera.removeFollowObjectCameraListener(this);
-
         cameraTime.setText(DISABLED_TEXT);
     }
 

@@ -12,7 +12,7 @@ public class GL3DObserverCameraOptionPanel extends GL3DCameraOptionPanel {
 
     @Override
     public void deactivate() {
-
+        camera.deactivate();
     }
 
 }

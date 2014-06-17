@@ -150,8 +150,8 @@ public class GL3DCameraSelectorModel extends AbstractListModel implements ComboB
         return null;
     }
 
-    public GL3DEarthCamera getTrackballCamera() {
-        return earthCamera;
+    public GL3DObserverCamera getObserverCamera() {
+        return observerCamera;
     }
 
     public GL3DSolarRotationTrackingTrackballCamera getSolarRotationCamera() {
