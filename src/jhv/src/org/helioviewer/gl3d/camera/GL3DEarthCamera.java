@@ -36,10 +36,6 @@ public class GL3DEarthCamera extends GL3DSolarRotationTrackingTrackballCamera im
 
     public GL3DEarthCamera(GL3DSceneGraphView sceneGraphView) {
         super(sceneGraphView);
-        if (sceneGraphView == null) {
-            System.out.println("Problemssssss");
-            System.exit(1);
-        }
     }
 
     @Override
