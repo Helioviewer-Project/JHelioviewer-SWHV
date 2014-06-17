@@ -19,6 +19,7 @@ import org.helioviewer.gl3d.scenegraph.math.GL3DVec3d;
 import org.helioviewer.jhv.display.Displayer;
 import org.json.JSONArray;
 import org.json.JSONException;
+import org.json.JSONObject;
 import org.json.JSONTokener;
 
 public class GL3DPositionLoading {
@@ -37,7 +38,7 @@ public class GL3DPositionLoading {
     private String endDate = "2014-05-30T00:00:00";
     private String target = "Mercury";
     private final String observer = "SUN";
-    private final String baseUrl = "http://localhost:7789/position?";
+    private final String baseUrl = "http://127.0.0.1:7789/position?";
     private final int deltat = 60 * 60 * 6; //6 hours by default
     private final ArrayList<GL3DPositionLoadingListener> listeners = new ArrayList<GL3DPositionLoadingListener>();
     private Date beginDatems;
@@ -95,11 +96,11 @@ public class GL3DPositionLoading {
         try {
             GL3DPositionDateTime[] positionDateTimehelper = new GL3DPositionDateTime[jsonResult.length()];
             for (int i = 0; i < jsonResult.length(); i++) {
-                JSONArray ithArray = jsonResult.getJSONArray(i);
-                String dateString = ithArray.get(0).toString();
+                JSONObject ithObject = jsonResult.getJSONObject(i);
+                String dateString = ithObject.getString("utc").toString();
                 Date date = format.parse(dateString);
                 calendar.setTime(date);
-                JSONArray positionArray = ithArray.getJSONArray(1);
+                JSONArray positionArray = ithObject.getJSONArray("val");
                 double x = positionArray.getDouble(0);
                 double y = positionArray.getDouble(1);
                 double z = positionArray.getDouble(2);
