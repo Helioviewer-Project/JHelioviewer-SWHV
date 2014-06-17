@@ -55,12 +55,12 @@ public class GL3DTrackballStonyhurstCamera extends GL3DSolarRotationTrackingTrac
     @Override
     public void activate(GL3DCamera precedingCamera) {
         super.activate(precedingCamera);
-        sceneGraphView.addViewListener(this);
+        getSceneGraphView().addViewListener(this);
     }
 
     @Override
     public void deactivate() {
-        sceneGraphView.removeViewListener(this);
+        getSceneGraphView().removeViewListener(this);
     };
 
     @Override

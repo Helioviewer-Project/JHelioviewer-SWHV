@@ -20,9 +20,9 @@ public class GL3DArtificialObjects extends GL3DGroup {
         // GL3DGroup indicatorArrows = new GL3DModel("Arrows",
         // "Arrows indicating the viewspace axes");
         // this.addNode(indicatorArrows);
-        GL3DGrid grid = new GL3DGrid("grid", 20, 20, new
-        GL3DVec4f(1.0f,0.0f,0.0f,1.0f), new GL3DVec4d(0.0,1.0,0.0,1.0));
-        this.addNode(grid);
+        //GL3DGrid grid = new GL3DGrid("grid", 20, 20, new
+        //GL3DVec4f(1.0f,0.0f,0.0f,1.0f), new GL3DVec4d(0.0,1.0,0.0,1.0));
+        //this.addNode(grid);
         // GL3DSphere blackSphere = new GL3DSphere(0.990*Constants.SunRadius,
         // 20,20, new GL3DVec4f(0.0f, 0.0f, 0.0f, 1.0f) );
         // this.addNode(blackSphere);

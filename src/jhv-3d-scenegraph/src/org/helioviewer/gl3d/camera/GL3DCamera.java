@@ -14,6 +14,9 @@ import org.helioviewer.gl3d.scenegraph.GL3DState;
 import org.helioviewer.gl3d.scenegraph.math.GL3DMat4d;
 import org.helioviewer.gl3d.scenegraph.math.GL3DQuatd;
 import org.helioviewer.gl3d.scenegraph.math.GL3DVec3d;
+import org.helioviewer.gl3d.scenegraph.math.GL3DVec4d;
+import org.helioviewer.gl3d.scenegraph.math.GL3DVec4f;
+import org.helioviewer.gl3d.scenegraph.visuals.GL3DGrid;
 import org.helioviewer.gl3d.wcs.CoordinateSystem;
 
 /**
@@ -64,6 +67,10 @@ public abstract class GL3DCamera {
 
     private double ratio = 1.0;
 
+    private int gridResolutionX = 20;
+    private int gridResolutionY = 20;
+    private final GL3DGrid grid;
+
     public GL3DCamera(double clipNear, double clipFar) {
         this();
         this.clipNear = clipNear;
@@ -75,9 +82,33 @@ public abstract class GL3DCamera {
         this.rotation = GL3DQuatd.createRotation(0.0, new GL3DVec3d(0, 1, 0));
         this.currentDragRotation = GL3DQuatd.createRotation(0.0, new GL3DVec3d(0, 1, 0));
         this.localRotation = GL3DQuatd.createRotation(0.0, new GL3DVec3d(0, 1, 0));
-
         this.translation = new GL3DVec3d();
+        this.grid = new GL3DGrid("grid", getGridResolutionX(), getGridResolutionY(), new GL3DVec4f(1.0f, 0.0f, 0.0f, 1.0f), new GL3DVec4d(0.0, 1.0, 0.0, 1.0));
     }
+
+    public GL3DGrid getGrid() {
+        return this.grid;
+    }
+
+    public abstract void createNewGrid();
+
+    public void setGridResolution(int resolution) {
+        this.setGridResolutionX(resolution);
+        this.setGridResolutionY(resolution);
+        createNewGrid();
+    }
+
+    public void setGridResolutionX(int resolution) {
+        this.gridResolutionX = resolution;
+        createNewGrid();
+    }
+
+    public void setGridResolutionY(int resolution) {
+        this.gridResolutionY = resolution;
+        createNewGrid();
+    }
+
+    public abstract void setGrid(GL3DGrid grid);
 
     public abstract void reset();
 
@@ -344,5 +375,13 @@ public abstract class GL3DCamera {
     public void setRatio(double ratio) {
         this.ratio = ratio;
         this.translation.z = this.translationz * this.ratio;
+    }
+
+    public int getGridResolutionX() {
+        return gridResolutionX;
+    }
+
+    public int getGridResolutionY() {
+        return gridResolutionY;
     }
 }

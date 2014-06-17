@@ -9,6 +9,7 @@ import org.helioviewer.base.physics.Constants;
 import org.helioviewer.base.physics.DifferentialRotation;
 import org.helioviewer.gl3d.scenegraph.math.GL3DQuatd;
 import org.helioviewer.gl3d.scenegraph.math.GL3DVec3d;
+import org.helioviewer.gl3d.scenegraph.visuals.GL3DGrid;
 import org.helioviewer.gl3d.view.GL3DSceneGraphView;
 import org.helioviewer.viewmodel.changeevent.ChangeEvent;
 import org.helioviewer.viewmodel.changeevent.TimestampChangedReason;
@@ -35,6 +36,15 @@ public class GL3DEarthCamera extends GL3DSolarRotationTrackingTrackballCamera im
 
     public GL3DEarthCamera(GL3DSceneGraphView sceneGraphView) {
         super(sceneGraphView);
+        if (sceneGraphView == null) {
+            System.out.println("Problemssssss");
+            System.exit(1);
+        }
+    }
+
+    @Override
+    public void setGrid(GL3DGrid grid) {
+        getSceneGraphView().getRoot().addNode(grid);
     }
 
     @Override
@@ -46,12 +56,12 @@ public class GL3DEarthCamera extends GL3DSolarRotationTrackingTrackballCamera im
     @Override
     public void activate(GL3DCamera precedingCamera) {
         super.activate(precedingCamera);
-        sceneGraphView.addViewListener(this);
+        getSceneGraphView().addViewListener(this);
     }
 
     @Override
     public void deactivate() {
-        sceneGraphView.removeViewListener(this);
+        getSceneGraphView().removeViewListener(this);
     };
 
     @Override

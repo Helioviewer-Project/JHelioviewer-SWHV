@@ -11,12 +11,12 @@ import org.helioviewer.gl3d.scenegraph.math.GL3DVec4f;
 import org.helioviewer.gl3d.scenegraph.rt.GL3DRay;
 
 public class GL3DSphere extends GL3DMesh {
-    private int resolutionX;
-    private int resolutionY;
-    private double radius;
+    private final int resolutionX;
+    private final int resolutionY;
+    private final double radius;
 
     private GL3DVec3d center;
-    private GL3DVec3d centerOS = new GL3DVec3d(0, 0, 0);
+    private final GL3DVec3d centerOS = new GL3DVec3d(0, 0, 0);
 
     public GL3DSphere(double radius, int resolutionX, int resolutionY, GL3DVec4f color) {
         this("Sphere", radius, resolutionX, resolutionY, color);
@@ -29,6 +29,7 @@ public class GL3DSphere extends GL3DMesh {
         this.resolutionY = resolutionY;
     }
 
+    @Override
     public GL3DMeshPrimitive createMesh(GL3DState state, List<GL3DVec3d> positions, List<GL3DVec3d> normals, List<GL3DVec2d> textCoords, List<Integer> indices, List<GL3DVec4d> colors) {
 
         for (int latNumber = 0; latNumber <= this.resolutionX; latNumber++) {
@@ -60,23 +61,24 @@ public class GL3DSphere extends GL3DMesh {
                 indices.add(second + 1);
                 indices.add(second);
 
-                // indices.add(second);
-                // indices.add(first + 1);
             }
         }
 
         return GL3DMeshPrimitive.QUADS;
     }
 
+    @Override
     public void shapeInit(GL3DState state) {
         super.shapeInit(state);
         this.center = this.wm.multiply(this.centerOS);
     }
 
+    @Override
     public void shapeUpdate(GL3DState state) {
         this.center = this.wm.multiply(this.centerOS);
     }
 
+    @Override
     public boolean shapeHit(GL3DRay ray) {
         // if(super.shapeHit(ray)) {
         // this.lastHitPoint = this.wmI.multiply(ray.getHitPoint());
