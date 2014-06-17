@@ -111,7 +111,6 @@ public class GL3DText extends GL3DMesh {
                 counter++;
             }
         }
-        System.out.println("END");
         return GL3DMeshPrimitive.TRIANGLES;
 
     }
