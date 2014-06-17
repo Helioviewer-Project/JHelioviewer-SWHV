@@ -19,6 +19,7 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JSeparator;
 import javax.swing.JSpinner;
+import javax.swing.JTextArea;
 import javax.swing.SpinnerNumberModel;
 import javax.swing.SwingConstants;
 import javax.swing.event.ChangeEvent;
@@ -35,7 +36,7 @@ import org.helioviewer.jhv.layers.LayersModel;
 import org.helioviewer.viewmodel.view.jp2view.datetime.ImmutableDateTime;
 
 public class GL3DFollowObjectCameraOptionPanel extends GL3DCameraOptionPanel implements GL3DFollowObjectCameraListener {
-    private final JLabel loadedLabel;
+    private final JTextArea loadedLabel;
     private final JLabel beginDateLabel;
     private JPanel beginDatetimePanel;
     JHVCalendarDatePicker beginDatePicker;
@@ -63,14 +64,25 @@ public class GL3DFollowObjectCameraOptionPanel extends GL3DCameraOptionPanel imp
         this.camera = camera;
         setLayout(new BoxLayout(this, BoxLayout.PAGE_AXIS));
         this.setBorder(BorderFactory.createEmptyBorder(0, 4, 0, 4));
-
-        JPanel infoPanel = new JPanel(new GridLayout(2, 0));
-
+        add(new JSeparator(SwingConstants.HORIZONTAL));
+        JPanel cameraTimePanel = new JPanel();
+        cameraTimePanel.setLayout(new BoxLayout(cameraTimePanel, BoxLayout.LINE_AXIS));
         cameraTime = new JLabel("Camera date: " + DISABLED_TEXT);
-        infoPanel.add(this.cameraTime);
-        this.loadedLabel = new JLabel("Status: Not loaded");
-        infoPanel.add(this.loadedLabel);
-        add(infoPanel);
+        cameraTimePanel.add(cameraTime);
+        cameraTimePanel.add(Box.createHorizontalGlue());
+        add(cameraTimePanel);
+        JPanel loadedLabelPanel = new JPanel();
+        loadedLabelPanel.setMaximumSize(new Dimension(338, 40));
+
+        loadedLabelPanel.setLayout(new BoxLayout(loadedLabelPanel, BoxLayout.LINE_AXIS));
+        loadedLabel = new JTextArea("Status: Not loaded");
+        loadedLabel.setEditable(false);
+        loadedLabel.setLineWrap(true);
+        loadedLabel.setOpaque(false);
+        loadedLabelPanel.add(loadedLabel);
+        loadedLabelPanel.add(Box.createHorizontalGlue());
+        add(loadedLabelPanel);
+
         add(new JSeparator(SwingConstants.HORIZONTAL));
         this.createGridOptions();
         add(new JSeparator(SwingConstants.HORIZONTAL));
@@ -220,7 +232,6 @@ public class GL3DFollowObjectCameraOptionPanel extends GL3DCameraOptionPanel imp
         });
         addBeginDatePanel.add(beginDatePicker);
         addBeginDatePanel.add(beginTimePicker);
-        //addBeginDatePanel.add(beginDatetimePanel);
         addBeginDatePanel.add(Box.createRigidArea(new Dimension(40, 0)));
         add(addBeginDatePanel);
     }
@@ -251,34 +262,6 @@ public class GL3DFollowObjectCameraOptionPanel extends GL3DCameraOptionPanel imp
         beginDatePicker.setDate(new Date(startDate.getTime() - startDate.getTime() % (60 * 60 * 24 * 1000)));
         beginTimePicker.setText(TimeTextField.formatter.format(startDate));
         setBeginTime();
-    }
-
-    private void syncBothLayerBeginTime() {
-        Date startDate = null;
-        startDate = LayersModel.getSingletonInstance().getFirstDate();
-        if (startDate == null) {
-            startDate = new Date(System.currentTimeMillis());
-        }
-        beginDatePicker.setDate(new Date(startDate.getTime() - startDate.getTime() % (60 * 60 * 24 * 1000)));
-        beginTimePicker.setText(TimeTextField.formatter.format(startDate));
-        endDatePicker.setDate(new Date(startDate.getTime() - startDate.getTime() % (60 * 60 * 24 * 1000)));
-        endTimePicker.setText(TimeTextField.formatter.format(startDate));
-        setBeginTime();
-        setEndTime();
-    }
-
-    private void syncBothLayerEndTime() {
-        Date endDate = null;
-        endDate = LayersModel.getSingletonInstance().getLastDate();
-        if (endDate == null) {
-            endDate = new Date(System.currentTimeMillis());
-        }
-        beginDatePicker.setDate(new Date(endDate.getTime() - endDate.getTime() % (60 * 60 * 24 * 1000)));
-        beginTimePicker.setText(TimeTextField.formatter.format(endDate));
-        endDatePicker.setDate(new Date(endDate.getTime() - endDate.getTime() % (60 * 60 * 24 * 1000)));
-        endTimePicker.setText(TimeTextField.formatter.format(endDate));
-        setBeginTime();
-        setEndTime();
     }
 
     private void syncBothLayerNow() {

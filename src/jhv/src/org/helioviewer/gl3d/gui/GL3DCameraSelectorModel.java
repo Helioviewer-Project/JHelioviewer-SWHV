@@ -47,6 +47,7 @@ public class GL3DCameraSelectorModel extends AbstractListModel implements ComboB
     private GL3DObserverCamera observerCamera;
 
     private GL3DFollowObjectCamera followObjectCamera;
+    ArrayList<GL3DCameraSelectionModelListener> listeners = new ArrayList<GL3DCameraSelectionModelListener>();
 
     public static GL3DCameraSelectorModel getInstance() {
         if (instance == null) {
@@ -80,8 +81,7 @@ public class GL3DCameraSelectorModel extends AbstractListModel implements ComboB
             earthCamera = new GL3DEarthCamera(sceneGraphView);
             observerCamera = new GL3DObserverCamera(sceneGraphView);
             followObjectCamera = new GL3DFollowObjectCamera(sceneGraphView);
-
-            defaultCamera = earthCamera;
+            defaultCamera = observerCamera;
             lastCamera = defaultCamera;
             cameras.add(earthCamera);
             cameras.add(observerCamera);
@@ -96,6 +96,15 @@ public class GL3DCameraSelectorModel extends AbstractListModel implements ComboB
             }
         }
         getCameraView().setCurrentCamera(defaultCamera);
+        this.fireInit();
+    }
+
+    private void fireInit() {
+        synchronized (listeners) {
+            for (GL3DCameraSelectionModelListener listener : listeners) {
+                listener.fireInit();
+            }
+        }
     }
 
     public GL3DCamera getCurrentCamera() {
@@ -122,7 +131,6 @@ public class GL3DCameraSelectorModel extends AbstractListModel implements ComboB
 
     public void setCurrentCamera(GL3DCamera camera) {
         lastCamera = camera;
-        System.out.println(camera);
         getCameraView().setCurrentCamera(camera);
     }
 
@@ -172,6 +180,18 @@ public class GL3DCameraSelectorModel extends AbstractListModel implements ComboB
 
     public GL3DEarthCamera getEarthCamera() {
         return earthCamera;
+    }
+
+    public void addListener(GL3DCameraSelectionModelListener listener) {
+        synchronized (listeners) {
+            listeners.add(listener);
+        }
+    }
+
+    public void removeListener(GL3DCameraSelectionModelListener listener) {
+        synchronized (listeners) {
+            listeners.remove(listener);
+        }
     }
 
 }
