@@ -22,19 +22,19 @@ import org.helioviewer.viewmodel.view.opengl.shader.GLSingleChannelLookupFragmen
 
 /**
  * Filter for applying a color table to a single channel image.
- *
+ * 
  * <p>
  * If the input image is not a single channel image, the filter does nothing and
  * returns the input data.
- *
+ * 
  * <p>
  * This filter supports software rendering as well as rendering in OpenGL.
- *
+ * 
  * mostly rewritten
- *
+ * 
  * @author Helge Dietert
  */
-public class SOHOLUTFilter extends AbstractFilter implements FrameFilter,StandardFilter, GLFragmentShaderFilter {
+public class SOHOLUTFilter extends AbstractFilter implements FrameFilter, StandardFilter, GLFragmentShaderFilter {
     // /////////////////////////
     // GENERAL //
     // /////////////////////////
@@ -51,7 +51,7 @@ public class SOHOLUTFilter extends AbstractFilter implements FrameFilter,Standar
 
     /**
      * {@inheritDoc}
-     *
+     * 
      * <p>
      * This filter is a major filter.
      */
@@ -69,7 +69,7 @@ public class SOHOLUTFilter extends AbstractFilter implements FrameFilter,Standar
 
     /**
      * Constructor setting the color table.
-     *
+     * 
      * @param startWithLut
      *            Color table to apply to the image
      */
@@ -79,7 +79,7 @@ public class SOHOLUTFilter extends AbstractFilter implements FrameFilter,Standar
 
     /**
      * Sets the corresponding SOHOLUT panel.
-     *
+     * 
      * @param panel
      *            Corresponding panel.
      */
@@ -90,7 +90,7 @@ public class SOHOLUTFilter extends AbstractFilter implements FrameFilter,Standar
 
     /**
      * Sets a new color table to use from now on.
-     *
+     * 
      * @param newLUT
      *            New color table
      */
@@ -100,7 +100,7 @@ public class SOHOLUTFilter extends AbstractFilter implements FrameFilter,Standar
         }
         lut = newLUT;
         invertLUT = invert;
-        this.changed =  true;
+        this.changed = true;
         notifyAllListeners();
         Displayer.getSingletonInstance().display();
     }
@@ -163,7 +163,7 @@ public class SOHOLUTFilter extends AbstractFilter implements FrameFilter,Standar
 
     /**
      * {@inheritDoc}
-     *
+     * 
      * In this case, also updates the color table, if necessary.
      */
     @Override
@@ -173,16 +173,15 @@ public class SOHOLUTFilter extends AbstractFilter implements FrameFilter,Standar
         LUT currlut;
         // Note: The lookup table will always be power of two,
         // so we won't get any problems here.
-        boolean b =(jp2View instanceof JHVJPXView);
-        JHVJPXView jpxView = (JHVJPXView)jp2View;
-        if ( b && jpxView.getDifferenceMode()) {
+        boolean b = (jp2View instanceof JHVJPXView);
+        JHVJPXView jpxView = (JHVJPXView) jp2View;
+        if (b && jpxView.getDifferenceMode()) {
             currlut = LUT.getStandardList().get("Gray");
-        }
-        else {
+        } else {
             currlut = lut;
         }
-        gl.glBindTexture(GL.GL_TEXTURE_1D, lookupTex);
 
+        gl.glBindTexture(GL.GL_TEXTURE_1D, lookupTex);
         if (lastLut != currlut || invertLUT != lastInverted) {
             int[] intLUT;
 
@@ -202,16 +201,17 @@ public class SOHOLUTFilter extends AbstractFilter implements FrameFilter,Standar
             buffer = IntBuffer.wrap(intLUT);
             lastLut = currlut;
             lastInverted = invertLUT;
-        }
-        gl.glPixelStorei(GL.GL_UNPACK_SKIP_PIXELS, 0);
-        gl.glPixelStorei(GL.GL_UNPACK_SKIP_ROWS, 0);
-        gl.glPixelStorei(GL.GL_UNPACK_ROW_LENGTH, 0);
-        gl.glPixelStorei(GL.GL_UNPACK_ALIGNMENT, 4);
 
-        gl.glTexImage1D(GL.GL_TEXTURE_1D, 0, GL.GL_RGBA, buffer.limit(), 0, GL.GL_BGRA, GL.GL_UNSIGNED_INT_8_8_8_8_REV, buffer);
-        gl.glTexParameteri(GL.GL_TEXTURE_1D, GL.GL_TEXTURE_MIN_FILTER, GL.GL_NEAREST);
-        gl.glTexParameteri(GL.GL_TEXTURE_1D, GL.GL_TEXTURE_MAG_FILTER, GL.GL_NEAREST);
-        gl.glTexParameteri(GL.GL_TEXTURE_1D, GL.GL_TEXTURE_WRAP_S, GL.GL_CLAMP);
+            gl.glPixelStorei(GL.GL_UNPACK_SKIP_PIXELS, 0);
+            gl.glPixelStorei(GL.GL_UNPACK_SKIP_ROWS, 0);
+            gl.glPixelStorei(GL.GL_UNPACK_ROW_LENGTH, 0);
+            gl.glPixelStorei(GL.GL_UNPACK_ALIGNMENT, 4);
+
+            gl.glTexImage1D(GL.GL_TEXTURE_1D, 0, GL.GL_RGBA, buffer.limit(), 0, GL.GL_BGRA, GL.GL_UNSIGNED_INT_8_8_8_8_REV, buffer);
+            gl.glTexParameteri(GL.GL_TEXTURE_1D, GL.GL_TEXTURE_MIN_FILTER, GL.GL_NEAREST);
+            gl.glTexParameteri(GL.GL_TEXTURE_1D, GL.GL_TEXTURE_MAG_FILTER, GL.GL_NEAREST);
+            gl.glTexParameteri(GL.GL_TEXTURE_1D, GL.GL_TEXTURE_WRAP_S, GL.GL_CLAMP);
+        }
 
     }
 
