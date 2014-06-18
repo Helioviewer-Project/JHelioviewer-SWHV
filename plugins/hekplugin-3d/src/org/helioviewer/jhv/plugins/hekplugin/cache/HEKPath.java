@@ -7,15 +7,16 @@ import org.helioviewer.base.logging.Log;
 
 /**
  * Class used to categorize events
- * 
+ *
  * @author Malte Nuhn
- * 
+ *
  */
 
 // TODO JAVADOC
 public class HEKPath {
 
     public static final Comparator<HEKPath> LASTPARTCOMPARATOR = new Comparator<HEKPath>() {
+        @Override
         public int compare(HEKPath a, HEKPath b) {
             String partA = a.getLastPart();
             String partB = b.getLastPart();
@@ -30,12 +31,12 @@ public class HEKPath {
     /**
      * Reference to the cache object this path belongs to
      */
-    private HEKCache cache;
+    private final HEKCache cache;
 
     /**
      * List of Subdirectories
      */
-    private Vector<String> path = new Vector<String>();
+    private final Vector<String> path = new Vector<String>();
 
     /**
      * Flag if this path directly exists in the cache, or if it is an
@@ -53,7 +54,7 @@ public class HEKPath {
 
     /**
      * Constructor.
-     * 
+     *
      * @param root
      * @param obj
      * @param catalogue
@@ -71,7 +72,7 @@ public class HEKPath {
 
     /**
      * Constructor.
-     * 
+     *
      * @param hekCache
      */
     public HEKPath(HEKCache hekCache) {
@@ -81,7 +82,7 @@ public class HEKPath {
 
     /**
      * Constructor.
-     * 
+     *
      * @param other
      */
     public HEKPath(HEKPath other) {
@@ -92,7 +93,7 @@ public class HEKPath {
 
     /**
      * Constructor.
-     * 
+     *
      * @param other
      * @param additional
      * @param obj
@@ -105,7 +106,7 @@ public class HEKPath {
 
     /**
      * Constructor
-     * 
+     *
      * @param hekCache
      * @param path
      */
@@ -118,7 +119,7 @@ public class HEKPath {
 
     /**
      * Constructor.
-     * 
+     *
      * @param other
      * @param additional
      */
@@ -129,10 +130,11 @@ public class HEKPath {
 
     /**
      * Overwritten equals function.
-     * 
-     * Two HEKPathes are equal iff all parts of the containing "path" vector
+     *
+     * Two HEKPathes are equal if all parts of the containing "path" vector
      * equal.
      */
+    @Override
     public boolean equals(Object other) {
         if (other instanceof HEKPath) {
             HEKPath otherType = (HEKPath) other;
@@ -226,6 +228,7 @@ public class HEKPath {
         return result;
     }
 
+    @Override
     public String toString() {
         if (!path.isEmpty()) {
             return path.toString();
@@ -234,6 +237,7 @@ public class HEKPath {
         }
     }
 
+    @Override
     public int hashCode() {
         return this.toString().hashCode();
     }
