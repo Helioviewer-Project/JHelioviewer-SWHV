@@ -7,8 +7,6 @@ import java.io.File;
 import java.net.URI;
 import java.net.URISyntaxException;
 
-import org.helioviewer.jhv.JHVDirectory;
-import org.helioviewer.jhv.Settings;
 import org.helioviewer.jhv.plugins.swek.config.SWEKConfiguration;
 import org.helioviewer.jhv.plugins.swek.settings.SWEKSettings;
 import org.helioviewer.viewmodelplugin.controller.PluginManager;
@@ -104,4 +102,6 @@ public class SWEKPlugin extends OverlayPlugin implements Plugin {
         container.setPosition(PluginSettings.getSingeltonInstance().getOverlayPosition(pluginLocation, container.getOverlayClass()));
         PluginManager.getSingeltonInstance().addOverlayContainer(container);
     }
+
+
 }
