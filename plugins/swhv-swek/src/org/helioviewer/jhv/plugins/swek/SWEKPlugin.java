@@ -3,6 +3,16 @@
  */
 package org.helioviewer.jhv.plugins.swek;
 
+import java.io.File;
+import java.net.URI;
+import java.net.URISyntaxException;
+
+import org.helioviewer.jhv.JHVDirectory;
+import org.helioviewer.jhv.Settings;
+import org.helioviewer.jhv.plugins.swek.config.SWEKConfiguration;
+import org.helioviewer.jhv.plugins.swek.settings.SWEKSettings;
+import org.helioviewer.viewmodelplugin.controller.PluginManager;
+import org.helioviewer.viewmodelplugin.controller.PluginSettings;
 import org.helioviewer.viewmodelplugin.interfaces.Plugin;
 import org.helioviewer.viewmodelplugin.overlay.OverlayPlugin;
 
@@ -15,50 +25,86 @@ import org.helioviewer.viewmodelplugin.overlay.OverlayPlugin;
  *
  */
 public class SWEKPlugin extends OverlayPlugin implements Plugin {
+    /** Path to the SWEK home directory */
+    private final String SWEK_Home;
 
-    /* (non-Javadoc)
-     * @see org.helioviewer.viewmodelplugin.interfaces.Plugin#getName()
+    /** Instance of the SWEKConfiguration*/
+    private final SWEKConfiguration SWEKConfig;
+
+    public SWEKPlugin() {
+        SWEK_Home = JHVDirectory.PLUGINS.getPath() + "swek_plugin" + System.getProperty("file.seperator");
+        SWEKConfig = SWEKConfiguration.getSingletonInstance();
+        try {
+            this.pluginLocation = new URI(SWEKSettings.PLUGIN_NAME);
+        } catch (URISyntaxException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+    }
+
+    @Override
+    public void installPlugin(){
+        createPluginDirectoryStructure();
+        configurePlugin();
+        registerPlugin();
+    }
+
+    /*
+     * Plugin interface
      */
     @Override
     public String getName() {
-        // TODO Auto-generated method stub
-        return null;
+        return "Space Weather Event Knowledgbase";
     }
 
-    /* (non-Javadoc)
-     * @see org.helioviewer.viewmodelplugin.interfaces.Plugin#getDescription()
-     */
     @Override
     public String getDescription() {
-        // TODO Auto-generated method stub
-        return null;
+        return "A description";
     }
 
-    /* (non-Javadoc)
-     * @see org.helioviewer.viewmodelplugin.interfaces.Plugin#setState(java.lang.String)
-     */
     @Override
     public void setState(String state) {
         // TODO Auto-generated method stub
 
     }
 
-    /* (non-Javadoc)
-     * @see org.helioviewer.viewmodelplugin.interfaces.Plugin#getState()
-     */
     @Override
     public String getState() {
         // TODO Auto-generated method stub
         return null;
     }
 
-    /* (non-Javadoc)
-     * @see org.helioviewer.viewmodelplugin.interfaces.Plugin#getAboutLicenseText()
-     */
     @Override
     public String getAboutLicenseText() {
-        // TODO Auto-generated method stub
-        return null;
+        String description = "";
+        description += "<p>The plugin uses the <a href=\"http://www.json.org/java/\">JSON in Java</a> Library, licensed under a <a href=\"http://www.json.org/license.html\">custom License</a>.";
+        return description;
     }
 
+    /**
+     * Creates the directory structure in the home directory of the JHelioviewer
+     */
+    private void createPluginDirectoryStructure() {
+        File swekHomeFile = new File(SWEK_Home);
+        if(!swekHomeFile.isDirectory()){
+            swekHomeFile.mkdirs();
+        }
+    }
+
+    /**
+     * Configures the SWEK plugin.
+     */
+    private void configurePlugin() {
+        SWEKConfig.loadConfiguration();
+    }
+
+    /**
+     * Add the plugin to the JHV system.
+     */
+    private void registerPlugin() {
+        SWEKPluginContainer container = new SWEKPluginContainer();
+        container.setActive(PluginSettings.getSingeltonInstance().isOverlayInPluginActivated(pluginLocation, container.getOverlayClass(), true));
+        container.setPosition(PluginSettings.getSingeltonInstance().getOverlayPosition(pluginLocation, container.getOverlayClass()));
+        PluginManager.getSingeltonInstance().addOverlayContainer(container);
+    }
 }
