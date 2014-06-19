@@ -23,9 +23,8 @@ public class SWEKPluginLauncher {
         String[] args2 = JavaCompatibility.copyArrayString(args, args.length + 2);
 
         args2[args2.length - 2] = "--deactivate-plugin";
-        args2[args2.length - 1] = "HEKPlugin.jar";
+        args2[args2.length - 1] = "SWEKPlugin.jar";
         JavaHelioViewer.main(args2, new SWEKPlugin());
-
     }
 
 }
