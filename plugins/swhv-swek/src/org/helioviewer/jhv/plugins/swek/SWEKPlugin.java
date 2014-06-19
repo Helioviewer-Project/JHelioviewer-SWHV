@@ -25,14 +25,11 @@ import org.helioviewer.viewmodelplugin.overlay.OverlayPlugin;
  *
  */
 public class SWEKPlugin extends OverlayPlugin implements Plugin {
-    /** Path to the SWEK home directory */
-    private final String SWEK_Home;
 
     /** Instance of the SWEKConfiguration*/
     private final SWEKConfiguration SWEKConfig;
 
     public SWEKPlugin() {
-        SWEK_Home = JHVDirectory.PLUGINS.getPath() + "swek_plugin" + System.getProperty("file.seperator");
         SWEKConfig = SWEKConfiguration.getSingletonInstance();
         try {
             this.pluginLocation = new URI(SWEKSettings.PLUGIN_NAME);
@@ -85,7 +82,7 @@ public class SWEKPlugin extends OverlayPlugin implements Plugin {
      * Creates the directory structure in the home directory of the JHelioviewer
      */
     private void createPluginDirectoryStructure() {
-        File swekHomeFile = new File(SWEK_Home);
+        File swekHomeFile = new File(SWEKSettings.SWEK_HOME);
         if(!swekHomeFile.isDirectory()){
             swekHomeFile.mkdirs();
         }
