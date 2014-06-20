@@ -22,7 +22,7 @@ import com.sun.opengl.util.BufferUtil;
 
 /**
  * Loader of fitsfile & VBO generation & OpenGL visualization
- *
+ * 
  * @author Stefan Meier (stefan.meier@fhnw.ch)
  * */
 public class PfssData {
@@ -139,6 +139,7 @@ public class PfssData {
     }
 
     private void calculatePositions() {
+
         int lineEnd = this.ptr_nz_len[0] - 1;
         int lineCounter = 1;
         int counter = 0;
@@ -291,6 +292,10 @@ public class PfssData {
         gl.glDisable(GL.GL_FRAGMENT_PROGRAM_ARB);
         gl.glDisable(GL.GL_VERTEX_PROGRAM_ARB);
         gl.glDisable(GL.GL_LIGHTING);
+
+        gl.glDisable(GL.GL_TEXTURE_2D);
+        gl.glDisable(GL.GL_TEXTURE_1D);
+
         gl.glEnable(GL.GL_BLEND);
         gl.glBlendFunc(GL.GL_SRC_ALPHA, GL.GL_ONE);
         gl.glBlendEquation(GL.GL_FUNC_ADD);
@@ -301,7 +306,6 @@ public class PfssData {
         GL3DVec3f color;
 
         gl.glLineWidth(PfssSettings.LINE_WIDTH);
-        // gl.glPrimitiveRestartIndexNV(0);
 
         if (indicesSunToSun != null && indicesSunToSun.limit() > 0) {
             color = PfssSettings.SUN_SUN_LINE_COLOR;
