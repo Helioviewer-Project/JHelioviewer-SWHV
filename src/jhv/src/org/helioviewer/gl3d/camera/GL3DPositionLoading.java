@@ -39,7 +39,7 @@ public class GL3DPositionLoading {
     private String endDate = "2014-05-30T00:00:00";
     private String target = "Mercury";
     private final String observer = "SUN";
-    private final String baseUrl = "http://127.0.0.1:7789/position?";
+    private final String baseUrl = "http://swhv.oma.be:7789/position?";
     private final int deltat = 60 * 60 * 6; //6 hours by default
     private final ArrayList<GL3DPositionLoadingListener> listeners = new ArrayList<GL3DPositionLoadingListener>();
     private Date beginDatems;
