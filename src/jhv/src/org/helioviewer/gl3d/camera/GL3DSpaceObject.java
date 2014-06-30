@@ -17,14 +17,15 @@ public class GL3DSpaceObject {
 
         objectList[0] = new GL3DSpaceObject("Mercury", "Mercury");
         objectList[1] = new GL3DSpaceObject("Venus", "Venus");
+
         objectList[2] = new GL3DSpaceObject("Earth", "Earth");
         objectList[3] = new GL3DSpaceObject("Moon", "Moon");
 
         objectList[4] = new GL3DSpaceObject("Mars%20Barycenter", "Mars");
-        objectList[5] = new GL3DSpaceObject("Saturn%20Barycenter", "Saturn");
-        objectList[6] = new GL3DSpaceObject("Uranus%20Barycenter", "Uranus");
-        objectList[7] = new GL3DSpaceObject("Neptune%20Barycenter", "Neptune");
-        objectList[8] = new GL3DSpaceObject("Jupiter%20Barycenter", "Jupiter");
+        objectList[5] = new GL3DSpaceObject("Jupiter%20Barycenter", "Jupiter");
+        objectList[6] = new GL3DSpaceObject("Saturn%20Barycenter", "Saturn");
+        objectList[7] = new GL3DSpaceObject("Uranus%20Barycenter", "Uranus");
+        objectList[8] = new GL3DSpaceObject("Neptune%20Barycenter", "Neptune");
         objectList[9] = new GL3DSpaceObject("Pluto%20Barycenter", "Pluto");
 
         objectList[10] = new GL3DSpaceObject("STEREO%20Ahead", "STEREO Ahead");
