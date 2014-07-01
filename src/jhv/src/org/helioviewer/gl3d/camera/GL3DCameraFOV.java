@@ -47,7 +47,7 @@ public class GL3DCameraFOV extends GL3DMesh {
             if (x * x + y * y < 1) {
                 z += Math.sqrt(1 - x * x - y * y);
             }
-            gl.glVertex3d(x, y, z);
+            gl.glVertex3d(x, y, -z);
 
         }
         for (int i = 0; i <= subdivisions; i++) {
@@ -57,7 +57,7 @@ public class GL3DCameraFOV extends GL3DMesh {
             if (x * x + y * y < 1) {
                 z += Math.sqrt(1 - x * x - y * y);
             }
-            gl.glVertex3d(x, y, z);
+            gl.glVertex3d(x, y, -z);
         }
         for (int i = 0; i <= subdivisions; i++) {
             double x = bw - 2 * bw / subdivisions * i;
@@ -66,7 +66,7 @@ public class GL3DCameraFOV extends GL3DMesh {
             if (x * x + y * y < 1) {
                 z += Math.sqrt(1 - x * x - y * y);
             }
-            gl.glVertex3d(x, y, z);
+            gl.glVertex3d(x, y, -z);
         }
         for (int i = 0; i <= subdivisions; i++) {
             double x = -bw;
@@ -75,7 +75,7 @@ public class GL3DCameraFOV extends GL3DMesh {
             if (x * x + y * y < 1) {
                 z += Math.sqrt(1 - x * x - y * y);
             }
-            gl.glVertex3d(x, y, z);
+            gl.glVertex3d(x, y, -z);
         }
         gl.glEnd();
     }
