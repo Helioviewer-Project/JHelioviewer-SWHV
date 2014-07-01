@@ -176,8 +176,8 @@ public class PfssData {
                     double zEnd = r1 * Math.sin(theta1) * Math.cos(phi1);
                     double xEnd = r1 * Math.sin(theta1) * Math.sin(phi1);
                     double yEnd = r1 * Math.cos(theta1);
-                    double angle = this.calculateAngleBetween2Vectors(xEnd - x, yEnd - y, zEnd - z, x - xStart, y - yStart, z - zStart);
-                    colinear = angle > PfssSettings.ANGLE_OF_LOD && i != lineEnd;
+                    double cosAngle = this.calculateAngleBetween2Vectors(xEnd - x, yEnd - y, zEnd - z, x - xStart, y - yStart, z - zStart);
+                    colinear = cosAngle > PfssSettings.ANGLE_OF_LOD && i != lineEnd;
                 }
             }
 
