@@ -132,7 +132,7 @@ public class GL3DImageTextureView extends AbstractGL3DView implements GL3DView, 
             phi = DifferentialRotation.calculateRotationInRadians(0.0, deltat) % (Math.PI * 2.0);
             if (metadataView.getMetaData() instanceof HelioviewerPositionedMetaData && ((HelioviewerPositionedMetaData) (metadataView.getMetaData())).getInstrument().equalsIgnoreCase("SECCHI")) {
                 phi -= ((HelioviewerPositionedMetaData) (metadataView.getMetaData())).getStonyhurstLongitude() / MathUtils.radeg;
-                theta = -((HelioviewerPositionedMetaData) (metadataView.getMetaData())).getStonyhurstLatitude() / MathUtils.radeg;
+                theta = ((HelioviewerPositionedMetaData) (metadataView.getMetaData())).getStonyhurstLatitude() / MathUtils.radeg;
             }
             this.vertexShader.changeRect(xOffset, yOffset, xScale, yScale);
             this.vertexShader.changeTextureScale(sim.getSubimageData().getScaleX(), sim.getSubimageData().getScaleY());
