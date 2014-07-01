@@ -112,6 +112,7 @@ public class GL3DFollowObjectCamera extends GL3DSolarRotationTrackingTrackballCa
 
     private void setFOV(double scale) {
         this.cameraFOV.scale(scale);
+        this.cameraFOV.setAngles(this.currentB, this.currentRotation);
     }
 
     private void fireCameratTime(Date currentCameraTime) {
