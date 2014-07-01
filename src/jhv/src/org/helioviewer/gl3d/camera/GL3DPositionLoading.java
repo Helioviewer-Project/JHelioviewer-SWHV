@@ -25,7 +25,6 @@ import org.json.JSONTokener;
 
 public class GL3DPositionLoading {
     private final String LOADEDSTATE = "Loaded";
-    private final String LOADINGSTATE = "Loading";
     private final String FAILEDSTATE = "Failed";
     private final String PARTIALSTATE = "Partial";
 
@@ -46,12 +45,6 @@ public class GL3DPositionLoading {
     private Date endDatems;
 
     public GL3DPositionLoading() {
-        /*
-         * beginDatems = LayersModel.getSingletonInstance(); endDatems = new
-         * Date(System.currentTimeMillis()); beginDate =
-         * this.format.format(beginDatems); endDate =
-         * this.format.format(endDatems); this.requestData();
-         */
     }
 
     private void buildRequestURL() {

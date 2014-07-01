@@ -89,7 +89,7 @@ public class GL3DObserverCamera extends GL3DSolarRotationTrackingTrackballCamera
                     addb0 = Astronomy.getB0InRadians(cal);
                 } else {
                     addl0 = hvMetadata.getStonyhurstLongitude() / MathUtils.radeg;
-                    addb0 = -hvMetadata.getStonyhurstLatitude() / MathUtils.radeg;
+                    addb0 = hvMetadata.getStonyhurstLatitude() / MathUtils.radeg;
                 }
 
             } else {

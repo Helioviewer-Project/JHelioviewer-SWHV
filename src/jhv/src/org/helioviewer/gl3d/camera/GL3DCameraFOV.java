@@ -2,11 +2,10 @@ package org.helioviewer.gl3d.camera;
 
 import java.util.List;
 
-import org.helioviewer.gl3d.scenegraph.GL3DDrawBits.Bit;
+import javax.media.opengl.GL;
+
 import org.helioviewer.gl3d.scenegraph.GL3DMesh;
 import org.helioviewer.gl3d.scenegraph.GL3DState;
-import org.helioviewer.gl3d.scenegraph.math.GL3DMat4d;
-import org.helioviewer.gl3d.scenegraph.math.GL3DQuatd;
 import org.helioviewer.gl3d.scenegraph.math.GL3DVec2d;
 import org.helioviewer.gl3d.scenegraph.math.GL3DVec3d;
 import org.helioviewer.gl3d.scenegraph.math.GL3DVec4d;
@@ -31,8 +30,54 @@ public class GL3DCameraFOV extends GL3DMesh {
     @Override
     public void shapeDraw(GL3DState state) {
         this.markAsChanged();
+        state.gl.glDisable(GL.GL_DEPTH_TEST);
         state.gl.glColor3d(1., 0., 0.);
-        super.shapeDraw(state);
+        state.gl.glEnable(GL.GL_DEPTH_TEST);
+        GL gl = state.gl;
+        gl.glLineWidth(2.5f);
+        gl.glColor3d(0.0f, 1.0f, 0.0f);
+        gl.glBegin(GL.GL_LINE_LOOP);
+        double bw = width * scale / 2.;
+        double bh = height * scale / 2.;
+        int subdivisions = 10;
+        for (int i = 0; i <= subdivisions; i++) {
+            double x = -bw + 2 * bw / subdivisions * i;
+            double y = bh;
+            double z = epsilon;
+            if (x * x + y * y < 1) {
+                z += Math.sqrt(1 - x * x - y * y);
+            }
+            gl.glVertex3d(x, y, z);
+
+        }
+        for (int i = 0; i <= subdivisions; i++) {
+            double x = bw;
+            double y = bh - 2 * bh / subdivisions * i;
+            double z = epsilon;
+            if (x * x + y * y < 1) {
+                z += Math.sqrt(1 - x * x - y * y);
+            }
+            gl.glVertex3d(x, y, z);
+        }
+        for (int i = 0; i <= subdivisions; i++) {
+            double x = bw - 2 * bw / subdivisions * i;
+            double y = -bh;
+            double z = epsilon;
+            if (x * x + y * y < 1) {
+                z += Math.sqrt(1 - x * x - y * y);
+            }
+            gl.glVertex3d(x, y, z);
+        }
+        for (int i = 0; i <= subdivisions; i++) {
+            double x = -bw;
+            double y = -bh + 2 * bh / subdivisions * i;
+            double z = epsilon;
+            if (x * x + y * y < 1) {
+                z += Math.sqrt(1 - x * x - y * y);
+            }
+            gl.glVertex3d(x, y, z);
+        }
+        gl.glEnd();
     }
 
     public void scale(double s) {
@@ -40,46 +85,7 @@ public class GL3DCameraFOV extends GL3DMesh {
     }
 
     @Override
-    public void update(GL3DState state) {
-        if (!this.isInitialised) {
-            this.init(state);
-        }
-        this.getDrawBits().on(Bit.Wireframe);
-        state.pushMV();
-        GL3DQuatd differentialRotation = state.getActiveCamera().getLocalRotation();
-        this.m = differentialRotation.toMatrix().inverse();
-        this.m.scale(scale, scale, scale);
-        this.wm = (this.m);
-        state.buildInverseAndNormalMatrix();
-        this.wmI = new GL3DMat4d(state.getMVInverse());
-        this.shapeUpdate(state);
-        state.popMV();
-    }
-
-    @Override
     public GL3DMeshPrimitive createMesh(GL3DState state, List<GL3DVec3d> positions, List<GL3DVec3d> normals, List<GL3DVec2d> textCoords, List<Integer> indices, List<GL3DVec4d> colors) {
-        int numberOfPositions = 0;
-        int beginPositionNumber = numberOfPositions;
-        positions.add(new GL3DVec3d(-width / 2., height / 2., epsilon));
-        colors.add(new GL3DVec4d(1., 0., 0., 1.));
-        numberOfPositions++;
-        positions.add(new GL3DVec3d(width / 2., height / 2., epsilon));
-        colors.add(new GL3DVec4d(1., 0., 0., 1.));
-        numberOfPositions++;
-        positions.add(new GL3DVec3d(width / 2., -height / 2., epsilon));
-        colors.add(new GL3DVec4d(1., 0., 0., 1.));
-        numberOfPositions++;
-        positions.add(new GL3DVec3d(-width / 2., -height / 2., epsilon));
-        colors.add(new GL3DVec4d(1., 0., 0., 1.));
-        numberOfPositions++;
-
-        indices.add(beginPositionNumber + 0);
-        indices.add(beginPositionNumber + 1);
-        indices.add(beginPositionNumber + 2);
-        indices.add(beginPositionNumber + 3);
-        //indices.add(beginPositionNumber + 0);
-        //indices.add(beginPositionNumber + 3);
-        return GL3DMeshPrimitive.QUADS;
-
+        return GL3DMeshPrimitive.LINE_LOOP;
     }
 }

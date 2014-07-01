@@ -135,9 +135,9 @@ public class GL3DFollowObjectCameraOptionPanel extends GL3DCameraOptionPanel imp
         endTimePicker = new TimeTextField();
         addEndDatePanel();
         addSyncButtons();
+        this.camera.addFollowObjectCameraListener(this);
         this.syncWithLayerBeginTime();
         this.syncWithLayerEndTime();
-        this.camera.addFollowObjectCameraListener(this);
     }
 
     public void addSyncButtons() {

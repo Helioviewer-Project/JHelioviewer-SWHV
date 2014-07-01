@@ -102,6 +102,7 @@ public class GL3DFollowObjectCamera extends GL3DSolarRotationTrackingTrackballCa
                 currentDistance = position.x;
                 GL3DVec3d initPosition = this.positionLoading.getInterpolatedPosition(t3);
                 lratio = initPosition.x / position.x;
+
                 updateRotation();
                 setFOV(currentDistance * Math.tan(FOVangle));
             }
