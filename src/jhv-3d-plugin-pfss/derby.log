@@ -1,0 +1,10 @@
+----------------------------------------------------------------
+Tue Jul 01 08:29:50 GMT 2014:
+Booting Derby version The Apache Software Foundation - Apache Derby - 10.8.2.2 - (1181258): instance a816c00e-0146-f10b-5409-000003d8c2b0 
+on database directory /Users/bramb/JHelioviewer/Plugins/EVEPlugin/Data  with class loader java.net.URLClassLoader@520b1684 
+Loaded from file:/Users/bramb/JHelioviewer/Plugins/EVEPlugin.jar
+java.vendor=Apple Inc.
+java.runtime.version=1.6.0_65-b14-462-11M4609
+user.dir=/Users/bramb/Documents/OMA/jhelioviewer/git/client/jhv-3d-wcs/src/jhv-3d-plugin-pfss
+derby.system.home=null
+Database Class Loader started - derby.database.classpath=''
