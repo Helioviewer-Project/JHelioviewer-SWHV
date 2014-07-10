@@ -5,18 +5,18 @@ package org.helioviewer.jhv.plugins.swek;
 
 import org.helioviewer.jhv.plugins.swek.rendering.SWEKRenderer;
 import org.helioviewer.jhv.plugins.swek.view.SWEKPluginPanel;
+import org.helioviewer.viewmodel.renderer.physical.PhysicalRenderer;
+import org.helioviewer.viewmodel.view.OverlayView;
+import org.helioviewer.viewmodel.view.opengl.OverlayPluginContainer;
 import org.helioviewer.viewmodelplugin.overlay.OverlayContainer;
 import org.helioviewer.viewmodelplugin.overlay.OverlayControlComponent;
 import org.helioviewer.viewmodelplugin.overlay.OverlayControlComponentManager;
-import org.helioviewer.viewmodel.view.OverlayView;
-import org.helioviewer.viewmodel.view.opengl.OverlayPluginContainer;
-import org.helioviewer.viewmodel.renderer.physical.PhysicalRenderer;
 
 /**
  * @author Bram.Bourgoignie@oma.be
- *
+ * 
  */
-public class SWEKPluginContainer extends OverlayContainer{
+public class SWEKPluginContainer extends OverlayContainer {
 
     @Override
     public String getName() {
@@ -29,13 +29,14 @@ public class SWEKPluginContainer extends OverlayContainer{
     }
 
     @Override
-    protected void installOverlayImpl(OverlayView overlayView, OverlayControlComponentManager controlList) {
-        SWEKPluginPanel swekPanel = new SWEKPluginPanel();
+    protected void installOverlayImpl(OverlayView overlayView,
+            OverlayControlComponentManager controlList) {
+        SWEKPluginPanel swekPanel = SWEKPluginPanel
+                .getSWEKPluginPanelInstance();
         OverlayPluginContainer overlayPluginContainer = new OverlayPluginContainer();
         overlayPluginContainer.setRenderer(new SWEKRenderer());
         overlayView.addOverlay(overlayPluginContainer);
         controlList.add(new OverlayControlComponent(swekPanel, getName()));
-
 
     }
 
@@ -44,7 +45,5 @@ public class SWEKPluginContainer extends OverlayContainer{
         // TODO Auto-generated method stub
         return null;
     }
-
-
 
 }

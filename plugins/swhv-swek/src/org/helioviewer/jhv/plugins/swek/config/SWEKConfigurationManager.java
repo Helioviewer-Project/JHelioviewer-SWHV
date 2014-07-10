@@ -24,7 +24,6 @@ import java.util.Properties;
 import org.helioviewer.base.logging.Log;
 import org.helioviewer.jhv.Settings;
 import org.helioviewer.jhv.plugins.swek.SWEKPlugin;
-import org.helioviewer.jhv.plugins.swek.config.SWEKRelatedEvents;
 import org.helioviewer.jhv.plugins.swek.settings.SWEKSettings;
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -32,7 +31,7 @@ import org.json.JSONObject;
 
 /**
  * @author Bram.Bourgognie@oma.be
- *
+ * 
  */
 public class SWEKConfigurationManager {
 
@@ -63,7 +62,7 @@ public class SWEKConfigurationManager {
     /**
      * private constructor
      */
-    private SWEKConfigurationManager(){
+    private SWEKConfigurationManager() {
         this.configLoaded = false;
         this.swekProperties = new Properties();
         this.sources = new HashMap<String, SWEKSource>();
@@ -73,11 +72,11 @@ public class SWEKConfigurationManager {
 
     /**
      * Gives access to the singleton instance
-     *
-     * @return  the singleton instance
+     * 
+     * @return the singleton instance
      */
-    public static SWEKConfigurationManager getSingletonInstance(){
-        if(singletonInstance == null){
+    public static SWEKConfigurationManager getSingletonInstance() {
+        if (singletonInstance == null) {
             singletonInstance = new SWEKConfigurationManager();
         }
         return singletonInstance;
@@ -85,19 +84,19 @@ public class SWEKConfigurationManager {
 
     /**
      * Loads the configuration.
-     *
-     * If no configuration file is set by the user, the program downloads
-     * the configuration file online and saves it the JHelioviewer/Plugins/swek-plugin
-     * folder.
-     *
+     * 
+     * If no configuration file is set by the user, the program downloads the
+     * configuration file online and saves it the
+     * JHelioviewer/Plugins/swek-plugin folder.
+     * 
      */
     public void loadConfiguration() {
-        if(!configLoaded) {
+        if (!this.configLoaded) {
             Log.debug("Load the swek internal settings");
             this.loadPluginSettings();
             Log.debug("search and open the configuration file");
             boolean isConfigParsed;
-            if(checkAndOpenUserSetFile()) {
+            if (checkAndOpenUserSetFile()) {
                 isConfigParsed = parseConfigFile();
             } else if (checkAndOpenHomeDirectoryFile()) {
                 isConfigParsed = parseConfigFile();
@@ -108,78 +107,104 @@ public class SWEKConfigurationManager {
             }
             if (!isConfigParsed) {
                 // TODO set on the panel the config file could not be parsed.
-                configLoaded = false;
+                this.configLoaded = false;
             } else {
-                configLoaded = true;
+                this.configLoaded = true;
             }
         }
     }
 
-   /**
-    * Loads the overall plugin settings.
-    */
-   private void loadPluginSettings() {
-       InputStream defaultPropStream = SWEKPlugin.class.getResourceAsStream("/SWEK.properties");
-       try {
-           swekProperties.load(defaultPropStream);
-       } catch (IOException ex) {
-           Log.error("Could not load the swek settings : ", ex);
-       }
-   }
-
+    /**
+     * Gives a map with all the event types. The event type name is the key and
+     * the event type is the value.
+     * 
+     * @return map containing the event types found in the configuration file
+     */
+    public Map<String, SWEKEventType> getEventTypes() {
+        loadConfiguration();
+        return this.eventTypes;
+    }
 
     /**
-     * Downloads the SWEK configuration from the Internet and saves it in the plugin home directory.
-     *
-     * @return  true if the the file was found and copied to the home directory, false if the
-     *          file could not be found, copied or something else went wrong.
+     * Loads the overall plugin settings.
+     */
+    private void loadPluginSettings() {
+        InputStream defaultPropStream = SWEKPlugin.class
+                .getResourceAsStream("/SWEK.properties");
+        try {
+            this.swekProperties.load(defaultPropStream);
+        } catch (IOException ex) {
+            Log.error("Could not load the swek settings : ", ex);
+        }
+    }
+
+    /**
+     * Downloads the SWEK configuration from the Internet and saves it in the
+     * plugin home directory.
+     * 
+     * @return true if the the file was found and copied to the home directory,
+     *         false if the file could not be found, copied or something else
+     *         went wrong.
      */
     private boolean checkAndOpenOnlineFile() {
         Log.debug("Download the configuration file from the net and copy it to the plugin home directory");
         try {
-            URL url = new URL(swekProperties.getProperty("plugin.swek.onlineconfigfile"));
+            URL url = new URL(
+                    this.swekProperties
+                            .getProperty("plugin.swek.onlineconfigfile"));
             ReadableByteChannel rbc = Channels.newChannel(url.openStream());
-            String saveFile = SWEKSettings.SWEK_HOME + swekProperties.getProperty("plugin.swek.configfilename");
+            String saveFile = SWEKSettings.SWEK_HOME
+                    + this.swekProperties
+                            .getProperty("plugin.swek.configfilename");
             FileOutputStream fos = new FileOutputStream(saveFile);
             fos.getChannel().transferFrom(rbc, 0, Long.MAX_VALUE);
             fos.close();
-            configFileURL = new URL("file://" + saveFile);
+            this.configFileURL = new URL("file://" + saveFile);
             return true;
         } catch (MalformedURLException e) {
-            Log.debug("Could not create a URL from the value found in the properties file: "+
-                    swekProperties.getProperty("plugin.swek.onlineconfigfile") + " : " + e);
+            Log.debug("Could not create a URL from the value found in the properties file: "
+                    + this.swekProperties
+                            .getProperty("plugin.swek.onlineconfigfile")
+                    + " : " + e);
         } catch (IOException e) {
-            Log.debug("Something went wrong downloading the configuration file from the server or saving it to the local machine : "+ e);
+            Log.debug("Something went wrong downloading the configuration file from the server or saving it to the local machine : "
+                    + e);
         }
         return false;
     }
 
     /**
-     * Checks the home directory of the plugin (normally ~/JHelioviewer/Plugins/swek-plugin/
-     * for the existence of the SWEKSettings.json file.
-     *
-     * @return  true if the file was found and useful, false if the file was not found.
+     * Checks the home directory of the plugin (normally
+     * ~/JHelioviewer/Plugins/swek-plugin/ for the existence of the
+     * SWEKSettings.json file.
+     * 
+     * @return true if the file was found and useful, false if the file was not
+     *         found.
      */
     private boolean checkAndOpenHomeDirectoryFile() {
-        String configFile = SWEKSettings.SWEK_HOME + swekProperties.getProperty("plugin.swek.configfilename");
+        String configFile = SWEKSettings.SWEK_HOME
+                + this.swekProperties.getProperty("plugin.swek.configfilename");
         try {
             File f = new File(configFile);
-            if(f.exists()){
-                this.configFileURL = new URL("file://"+ configFile);
+            if (f.exists()) {
+                this.configFileURL = new URL("file://" + configFile);
                 return true;
             } else {
-                Log.debug("File created from the settings : " + configFile + " does not exists on this system.");
+                Log.debug("File created from the settings : " + configFile
+                        + " does not exists on this system.");
             }
         } catch (MalformedURLException e) {
-            Log.debug("File at possition " + configFile + " could not be parsed into an URL");
+            Log.debug("File at possition " + configFile
+                    + " could not be parsed into an URL");
         }
         return false;
     }
 
     /**
      * Checks the jhelioviewer settings file for a swek configuration file.
-     *
-     * @return true if the file as found and useful, false if the file was not found.
+     * 
+     * @return true if the file as found and useful, false if the file was not
+     *         found.
      */
     private boolean checkAndOpenUserSetFile() {
         Log.debug("Search for a user define configuration file in the JHelioviewer setting file.");
@@ -191,14 +216,16 @@ public class SWEKConfigurationManager {
         } else {
             try {
                 URI fileLocation = new URI(fileName);
-                configFileURL = fileLocation.toURL();
-                Log.debug("Config file : " + configFileURL.toString());
+                this.configFileURL = fileLocation.toURL();
+                Log.debug("Config file : " + this.configFileURL.toString());
                 return true;
             } catch (URISyntaxException e) {
-                Log.debug("Wrong URI syntax for the found file name : " + fileName);
+                Log.debug("Wrong URI syntax for the found file name : "
+                        + fileName);
                 return false;
             } catch (MalformedURLException e) {
-                Log.debug("Could not convert the URI in a correct URL. The found file name : " + fileName);
+                Log.debug("Could not convert the URI in a correct URL. The found file name : "
+                        + fileName);
                 return false;
             }
         }
@@ -209,17 +236,18 @@ public class SWEKConfigurationManager {
      */
     private boolean parseConfigFile() {
         try {
-            InputStream configIs = configFileURL.openStream();
+            InputStream configIs = this.configFileURL.openStream();
             StringBuilder sb = new StringBuilder();
-            BufferedReader br = new BufferedReader(new InputStreamReader(configIs));
+            BufferedReader br = new BufferedReader(new InputStreamReader(
+                    configIs));
             String line;
-            while((line = br.readLine()) != null) {
+            while ((line = br.readLine()) != null) {
                 sb.append(line);
             }
             JSONObject configJSON = new JSONObject(sb.toString());
             return parseJSONConfig(configJSON);
         } catch (IOException e) {
-            Log.debug("The configuration file could not be parsed : "+ e);
+            Log.debug("The configuration file could not be parsed : " + e);
             System.exit(1);
         } catch (JSONException e) {
             Log.debug("Could not parse the given JSON : " + e);
@@ -230,15 +258,18 @@ public class SWEKConfigurationManager {
 
     /**
      * Parses the JSON from start
-     *
-     * @param configJSON    The JSON to parse
+     * 
+     * @param configJSON
+     *            The JSON to parse
      * @return true if the JSON configuration could be parsed, false if not.
      */
     private boolean parseJSONConfig(JSONObject configJSON) {
         this.configuration = new SWEKConfiguration();
         try {
-            this.configuration.setManuallyChanged(parseManuallyChanged(configJSON));
-            this.configuration.setConfigurationVersion(parseVersion(configJSON));
+            this.configuration
+                    .setManuallyChanged(parseManuallyChanged(configJSON));
+            this.configuration
+                    .setConfigurationVersion(parseVersion(configJSON));
             this.configuration.setSources(parseSources(configJSON));
             this.configuration.setEventTypes(parseEventTypes(configJSON));
             this.configuration.setRelatedEvents(parseRelatedEvents(configJSON));
@@ -252,39 +283,48 @@ public class SWEKConfigurationManager {
 
     /**
      * Parses a if the configuration was manually changed from a json.
-     *
-     * @param jsonObject        the json from which to parse the manually changed indication
-     * @return                  the parsed manually changed indication
-     * @throws JSONException    if the manually changed indication could not be parsed
+     * 
+     * @param jsonObject
+     *            the json from which to parse the manually changed indication
+     * @return the parsed manually changed indication
+     * @throws JSONException
+     *             if the manually changed indication could not be parsed
      */
-    private boolean parseManuallyChanged(JSONObject configJSON) throws JSONException {
+    private boolean parseManuallyChanged(JSONObject configJSON)
+            throws JSONException {
         return configJSON.getBoolean("manually_changed");
     }
 
     /**
      * Parses the configuration version from the big json.
-     *
-     * @param configJSON        The JSON from which to parse
-     * @return                  The parsed configuration version
-     * @throws JSONException    If the configuration version could not be parsed.
+     * 
+     * @param configJSON
+     *            The JSON from which to parse
+     * @return The parsed configuration version
+     * @throws JSONException
+     *             If the configuration version could not be parsed.
      */
     private String parseVersion(JSONObject configJSON) throws JSONException {
         return configJSON.getString("config_version");
     }
 
     /**
-     * Parses the list of sources from a json and adds the sources to a map indexed on the name of the source.
-     *
-     * @param configJSON        the JSON from which to parse the sources
-     * @return                  a list of sources parsed from the JSON
-     * @throws JSONException    if the sources could not be parsed
+     * Parses the list of sources from a json and adds the sources to a map
+     * indexed on the name of the source.
+     * 
+     * @param configJSON
+     *            the JSON from which to parse the sources
+     * @return a list of sources parsed from the JSON
+     * @throws JSONException
+     *             if the sources could not be parsed
      */
-    private List<SWEKSource> parseSources(JSONObject configJSON) throws JSONException {
+    private List<SWEKSource> parseSources(JSONObject configJSON)
+            throws JSONException {
         ArrayList<SWEKSource> swekSources = new ArrayList<SWEKSource>();
         JSONArray sourcesArray = configJSON.getJSONArray("sources");
         for (int i = 0; i < sourcesArray.length(); i++) {
             SWEKSource source = parseSource(sourcesArray.getJSONObject(i));
-            sources.put(source.getSourceName(), source);
+            this.sources.put(source.getSourceName(), source);
             swekSources.add(source);
         }
         return swekSources;
@@ -292,13 +332,15 @@ public class SWEKConfigurationManager {
 
     /**
      * Parses a source from a json.
-     *
-     * @param jsonObject        the json from which to parse the source
-     * @return                  the parsed source
-     * @throws JSONException    if the source could not be parsed
+     * 
+     * @param jsonObject
+     *            the json from which to parse the source
+     * @return the parsed source
+     * @throws JSONException
+     *             if the source could not be parsed
      */
     private SWEKSource parseSource(JSONObject jsonObject) throws JSONException {
-        SWEKSource source  =  new SWEKSource();
+        SWEKSource source = new SWEKSource();
         source.setSourceName(parseSourceName(jsonObject));
         source.setProviderName(parseProviderName(jsonObject));
         source.setDownloader(parseDownloader(jsonObject));
@@ -310,10 +352,12 @@ public class SWEKConfigurationManager {
 
     /**
      * Parses the source from a json.
-     *
-     * @param jsonObject        the json from which to parse the source
-     * @return                  the parsed source
-     * @throws JSONException    if the source could not be parsed
+     * 
+     * @param jsonObject
+     *            the json from which to parse the source
+     * @return the parsed source
+     * @throws JSONException
+     *             if the source could not be parsed
      */
     private String parseSourceName(JSONObject jsonObject) throws JSONException {
         return jsonObject.getString("name");
@@ -321,53 +365,69 @@ public class SWEKConfigurationManager {
 
     /**
      * Parses the provider name from a json.
-     *
-     * @param jsonObject        the json from which to parse the provider name
-     * @return                  the parsed provider name
-     * @throws JSONException    if the provider name could not be parsed
+     * 
+     * @param jsonObject
+     *            the json from which to parse the provider name
+     * @return the parsed provider name
+     * @throws JSONException
+     *             if the provider name could not be parsed
      */
-    private String parseProviderName(JSONObject jsonObject) throws JSONException {
+    private String parseProviderName(JSONObject jsonObject)
+            throws JSONException {
         return jsonObject.getString("provider_name");
     }
 
     /**
      * Parses the downloader description from a json.
-     *
-     * @param jsonObject        the json from which to parse the downloader description
-     * @return                  the parsed downloader description
-     * @throws JSONException    if the downloader description could not be parsed
+     * 
+     * @param jsonObject
+     *            the json from which to parse the downloader description
+     * @return the parsed downloader description
+     * @throws JSONException
+     *             if the downloader description could not be parsed
      */
-    private SWEKDownloaderDescription parseDownloader(JSONObject jsonObject) throws JSONException {
+    private SWEKDownloaderDescription parseDownloader(JSONObject jsonObject)
+            throws JSONException {
         SWEKDownloaderDescription downloadDescription = new SWEKDownloaderDescription();
         JSONObject downloaderObject = jsonObject.getJSONObject("downloader");
-        downloadDescription.setDownloaderClass(parseDownloadClass(downloaderObject));
-        downloadDescription.setParameters(parseDownloadParameters(downloaderObject));
+        downloadDescription
+                .setDownloaderClass(parseDownloadClass(downloaderObject));
+        downloadDescription
+                .setParameters(parseDownloadParameters(downloaderObject));
         return downloadDescription;
     }
 
     /**
      * Parses the downloader class from a json.
-     *
-     * @param jsonObject        the json from which to parse the downloader class
-     * @return                  the parsed downloader class
-     * @throws JSONException    if the downloader class could not be parsed
+     * 
+     * @param jsonObject
+     *            the json from which to parse the downloader class
+     * @return the parsed downloader class
+     * @throws JSONException
+     *             if the downloader class could not be parsed
      */
-    private String parseDownloadClass(JSONObject downloaderObject) throws JSONException {
+    private String parseDownloadClass(JSONObject downloaderObject)
+            throws JSONException {
         return downloaderObject.getString("class");
     }
 
     /**
      * Parses the downloader parameters from a json.
-     *
-     * @param jsonObject        the json from which to parse the downloader parameters
-     * @return                  the parsed downloader parameters
-     * @throws JSONException    if the downloader parameters could not be parsed
+     * 
+     * @param jsonObject
+     *            the json from which to parse the downloader parameters
+     * @return the parsed downloader parameters
+     * @throws JSONException
+     *             if the downloader parameters could not be parsed
      */
-    private Map<String, String> parseDownloadParameters(JSONObject downloaderObject) throws JSONException {
+    private Map<String, String> parseDownloadParameters(
+            JSONObject downloaderObject) throws JSONException {
         Map<String, String> downloadParameterMap = new HashMap<String, String>();
-        JSONArray downloadParameterArray =  downloaderObject.getJSONArray("parameters");
-        for (int i = 0; i < downloadParameterArray.length(); i++){
-            JSONObject parameterObject = downloadParameterArray.getJSONObject(i);
+        JSONArray downloadParameterArray = downloaderObject
+                .getJSONArray("parameters");
+        for (int i = 0; i < downloadParameterArray.length(); i++) {
+            JSONObject parameterObject = downloadParameterArray
+                    .getJSONObject(i);
             downloadParameterMap.put(
                     parseDownloadParameterName(parameterObject),
                     parseDownloadParameterValue(parameterObject));
@@ -377,32 +437,40 @@ public class SWEKConfigurationManager {
 
     /**
      * Parses the downloader parameter name from a json.
-     *
-     * @param jsonObject        the json from which to parse the downloader parameter name
-     * @return                  the parsed downloader parameter name
-     * @throws JSONException    if the downloader parameter name could not be parsed
+     * 
+     * @param jsonObject
+     *            the json from which to parse the downloader parameter name
+     * @return the parsed downloader parameter name
+     * @throws JSONException
+     *             if the downloader parameter name could not be parsed
      */
-    private String parseDownloadParameterName(JSONObject parameterObject) throws JSONException {
+    private String parseDownloadParameterName(JSONObject parameterObject)
+            throws JSONException {
         return parameterObject.getString("download_parameter_name");
     }
 
     /**
      * Parses the downloader parameter value from a json.
-     *
-     * @param jsonObject        the json from which to parse the downloader parameter value
-     * @return                  the parsed downloader parameter value
-     * @throws JSONException    if the downloader parameter value could not be parsed
+     * 
+     * @param jsonObject
+     *            the json from which to parse the downloader parameter value
+     * @return the parsed downloader parameter value
+     * @throws JSONException
+     *             if the downloader parameter value could not be parsed
      */
-    private String parseDownloadParameterValue(JSONObject parameterObject) throws JSONException {
+    private String parseDownloadParameterValue(JSONObject parameterObject)
+            throws JSONException {
         return parameterObject.getString("download_parameter_value");
     }
 
     /**
      * Parses the event parser from a json.
-     *
-     * @param jsonObject        the json from which to parse the event parser
-     * @return                  the parsed event parser
-     * @throws JSONException    if the event parser could not be parsed
+     * 
+     * @param jsonObject
+     *            the json from which to parse the event parser
+     * @return the parsed event parser
+     * @throws JSONException
+     *             if the event parser could not be parsed
      */
     private String parseEventParser(JSONObject jsonObject) throws JSONException {
         return jsonObject.getString("event_parser");
@@ -410,10 +478,12 @@ public class SWEKConfigurationManager {
 
     /**
      * Parses the base url from a json.
-     *
-     * @param jsonObject        the json from which to parse the base url
-     * @return                  the parsed base url
-     * @throws JSONException    if the base url could not be parsed
+     * 
+     * @param jsonObject
+     *            the json from which to parse the base url
+     * @return the parsed base url
+     * @throws JSONException
+     *             if the base url could not be parsed
      */
     private String parseBaseURL(JSONObject jsonObject) throws JSONException {
         return jsonObject.getString("base_url");
@@ -421,64 +491,78 @@ public class SWEKConfigurationManager {
 
     /**
      * Parses the general parameters from a json.
-     *
-     * @param jsonObject        the json from which to parse the general parameters
-     * @return                  the parsed general parameters
-     * @throws JSONException    if the general parameters could not be parsed
+     * 
+     * @param jsonObject
+     *            the json from which to parse the general parameters
+     * @return the parsed general parameters
+     * @throws JSONException
+     *             if the general parameters could not be parsed
      */
-    private List<SWEKParameter> parseGeneralParameters(JSONObject jsonObject) throws JSONException {
-        List<SWEKParameter> parameterList =  new ArrayList<SWEKParameter>();
-        JSONArray parameterArray = jsonObject.getJSONArray("general_parameters");
-        for (int i=0; i < parameterArray.length(); i++){
-            SWEKParameter parameter = parseParameter(parameterArray.getJSONObject(i));
+    private List<SWEKParameter> parseGeneralParameters(JSONObject jsonObject)
+            throws JSONException {
+        List<SWEKParameter> parameterList = new ArrayList<SWEKParameter>();
+        JSONArray parameterArray = jsonObject
+                .getJSONArray("general_parameters");
+        for (int i = 0; i < parameterArray.length(); i++) {
+            SWEKParameter parameter = parseParameter(parameterArray
+                    .getJSONObject(i));
             parameterList.add(parameter);
-            parameters.put(parameter.getParameterName(), parameter);
+            this.parameters.put(parameter.getParameterName(), parameter);
         }
         return parameterList;
     }
 
     /**
      * Parses the list of event types from a json.
-     *
-     * @param configJSON        the JSON from which to parse the event types
-     * @return                  a list of event types parsed from the JSON
-     * @throws JSONException    if the event types could not be parsed
+     * 
+     * @param configJSON
+     *            the JSON from which to parse the event types
+     * @return a list of event types parsed from the JSON
+     * @throws JSONException
+     *             if the event types could not be parsed
      */
-    private List<SWEKEventType> parseEventTypes(JSONObject configJSON) throws JSONException {
+    private List<SWEKEventType> parseEventTypes(JSONObject configJSON)
+            throws JSONException {
         List<SWEKEventType> result = new ArrayList<SWEKEventType>();
         JSONArray eventJSONArray = configJSON.getJSONArray("events_types");
         for (int i = 0; i < eventJSONArray.length(); i++) {
-            SWEKEventType eventType = parseEventType(eventJSONArray.getJSONObject(i));
+            SWEKEventType eventType = parseEventType(eventJSONArray
+                    .getJSONObject(i));
             result.add(eventType);
-            eventTypes.put(eventType.getEventName(), eventType);
+            this.eventTypes.put(eventType.getEventName(), eventType);
         }
         return result;
     }
 
     /**
      * Parses an event type from a json.
-     *
-     * @param object    The event type to parse
-     * @return          The parsed event type
+     * 
+     * @param object
+     *            The event type to parse
+     * @return The parsed event type
      * @throws JSONException
      */
-    private SWEKEventType parseEventType(JSONObject object) throws JSONException {
+    private SWEKEventType parseEventType(JSONObject object)
+            throws JSONException {
         SWEKEventType eventType = new SWEKEventType();
         eventType.setEventName(parseEventName(object));
         eventType.setSuppliers(parseSuppliers(object));
         eventType.setParameterList(parseParameterList(object));
-        eventType.setRequestIntervalExtension(parseRequestIntervalExtension(object));
+        eventType
+                .setRequestIntervalExtension(parseRequestIntervalExtension(object));
         eventType.setStandardSelected(parseStandardSelected(object));
         eventType.setGroupOn(parseGroupOn(object));
         return eventType;
     }
 
     /**
-     *Parses the event name from a json.
-     *
-     * @param object            the json from which the event name is parsed
-     * @return                  the event name
-     * @throws JSONException    if the supplier name could not be parsed
+     * Parses the event name from a json.
+     * 
+     * @param object
+     *            the json from which the event name is parsed
+     * @return the event name
+     * @throws JSONException
+     *             if the supplier name could not be parsed
      */
     private String parseEventName(JSONObject object) throws JSONException {
         return object.getString("event_name");
@@ -486,15 +570,18 @@ public class SWEKConfigurationManager {
 
     /**
      * Parses the suppliers from a json.
-     *
-     * @param jsonObject        the json from which the suppliers are parsed
-     * @return                  the suppliers list
-     * @throws JSONException    if the suppliers could not be parsed
+     * 
+     * @param jsonObject
+     *            the json from which the suppliers are parsed
+     * @return the suppliers list
+     * @throws JSONException
+     *             if the suppliers could not be parsed
      */
-    private List<SWEKSupplier> parseSuppliers(JSONObject object) throws JSONException {
+    private List<SWEKSupplier> parseSuppliers(JSONObject object)
+            throws JSONException {
         List<SWEKSupplier> suppliers = new ArrayList<SWEKSupplier>();
         JSONArray suppliersArray = object.getJSONArray("suppliers");
-        for (int i = 0 ; i < suppliersArray.length() ; i++ ) {
+        for (int i = 0; i < suppliersArray.length(); i++) {
             suppliers.add(parseSupplier(suppliersArray.getJSONObject(i)));
         }
         return suppliers;
@@ -502,10 +589,12 @@ public class SWEKConfigurationManager {
 
     /**
      * Parses a supplier from a json.
-     *
-     * @param object            the json from which the supplier is parsed
-     * @return                  the supplier
-     * @throws JSONException    if the supplier could not be parsed
+     * 
+     * @param object
+     *            the json from which the supplier is parsed
+     * @return the supplier
+     * @throws JSONException
+     *             if the supplier could not be parsed
      */
     private SWEKSupplier parseSupplier(JSONObject object) throws JSONException {
         SWEKSupplier supplier = new SWEKSupplier();
@@ -516,10 +605,12 @@ public class SWEKConfigurationManager {
 
     /**
      * Parses the supplier name from a json.
-     *
-     * @param object            the json from which the supplier name is parsed
-     * @return                  the supplier name
-     * @throws JSONException    if the supplier name could not be parsed
+     * 
+     * @param object
+     *            the json from which the supplier name is parsed
+     * @return the supplier name
+     * @throws JSONException
+     *             if the supplier name could not be parsed
      */
     private String parseSupplierName(JSONObject object) throws JSONException {
         return object.getString("supplier_name");
@@ -527,46 +618,56 @@ public class SWEKConfigurationManager {
 
     /**
      * Parses a supplier source from a json.
-     *
-     * @param object            the json from which the supplier source is parsed
-     * @return                  the supplier source
-     * @throws JSONException    if the supplier source could not be parsed
+     * 
+     * @param object
+     *            the json from which the supplier source is parsed
+     * @return the supplier source
+     * @throws JSONException
+     *             if the supplier source could not be parsed
      */
-    private SWEKSource parseSupplierSource(JSONObject object) throws JSONException {
-        return sources.get(object.getString("source"));
+    private SWEKSource parseSupplierSource(JSONObject object)
+            throws JSONException {
+        return this.sources.get(object.getString("source"));
     }
-
 
     /**
      * Parses the parameter list from the given JSON.
-     *
-     * @param object            the json from which to parse the parameter list
-     * @return                  the parameter list
-     * @throws JSONException    if the parameter list could not be parsed.
+     * 
+     * @param object
+     *            the json from which to parse the parameter list
+     * @return the parameter list
+     * @throws JSONException
+     *             if the parameter list could not be parsed.
      */
-    private List<SWEKParameter> parseParameterList(JSONObject object) throws JSONException {
+    private List<SWEKParameter> parseParameterList(JSONObject object)
+            throws JSONException {
         List<SWEKParameter> parameterList = new ArrayList<SWEKParameter>();
         JSONArray parameterListArray = object.getJSONArray("parameter_list");
-        for (int i = 0; i < parameterListArray.length(); i++){
-            SWEKParameter parameter = parseParameter((JSONObject)parameterListArray.get(i));
+        for (int i = 0; i < parameterListArray.length(); i++) {
+            SWEKParameter parameter = parseParameter((JSONObject) parameterListArray
+                    .get(i));
             parameterList.add(parameter);
-            parameters.put(parameter.getParameterName(), parameter);
+            this.parameters.put(parameter.getParameterName(), parameter);
         }
         return parameterList;
     }
 
     /**
      * Parses a parameter from json.
-     *
-     * @param jsonObject        the json from which to parse
-     * @return                  the parsed parameter
-     * @throws JSONException    if the parameter could not be parsed
+     * 
+     * @param jsonObject
+     *            the json from which to parse
+     * @return the parsed parameter
+     * @throws JSONException
+     *             if the parameter could not be parsed
      */
-    private SWEKParameter parseParameter(JSONObject jsonObject) throws JSONException {
+    private SWEKParameter parseParameter(JSONObject jsonObject)
+            throws JSONException {
         SWEKParameter parameter = new SWEKParameter();
         parameter.setSource(parseSourceInParameter(jsonObject));
         parameter.setParameterName(parseParameterName(jsonObject));
-        parameter.setParameterDisplayName(parseParameterDisplayName(jsonObject));
+        parameter
+                .setParameterDisplayName(parseParameterDisplayName(jsonObject));
         parameter.setParameterFilter(parseParameterFilter(jsonObject));
         parameter.setDefaultVisible(parseDefaultVisible(jsonObject));
         return parameter;
@@ -574,48 +675,60 @@ public class SWEKConfigurationManager {
 
     /**
      * Parses the source from a json.
-     *
-     * @param jsonObject        the json from which the source is parsed
-     * @return                  the source
-     * @throws JSONException    if the source could not be parsed
+     * 
+     * @param jsonObject
+     *            the json from which the source is parsed
+     * @return the source
+     * @throws JSONException
+     *             if the source could not be parsed
      */
-    private String parseSourceInParameter(JSONObject jsonObject) throws JSONException {
+    private String parseSourceInParameter(JSONObject jsonObject)
+            throws JSONException {
         return jsonObject.getString("source");
     }
 
     /**
      * Parses the parameter name from a json.
-     *
-     * @param jsonObject        the json from which the parameter name is parsed
-     * @return                  the parameter name
-     * @throws JSONException    if the parameter name could not be parsed
+     * 
+     * @param jsonObject
+     *            the json from which the parameter name is parsed
+     * @return the parameter name
+     * @throws JSONException
+     *             if the parameter name could not be parsed
      */
-    private String parseParameterName(JSONObject jsonObject) throws JSONException {
+    private String parseParameterName(JSONObject jsonObject)
+            throws JSONException {
         return jsonObject.getString("parameter_name");
     }
 
     /**
      * Parses the parameter display name from a json.
-     *
-     * @param jsonObject        the json from which the parameter display name is parsed
-     * @return                  the parameter display name
-     * @throws JSONException    if the parameter display name could not be parsed
+     * 
+     * @param jsonObject
+     *            the json from which the parameter display name is parsed
+     * @return the parameter display name
+     * @throws JSONException
+     *             if the parameter display name could not be parsed
      */
-    private String parseParameterDisplayName(JSONObject jsonObject) throws JSONException {
+    private String parseParameterDisplayName(JSONObject jsonObject)
+            throws JSONException {
         return jsonObject.getString("parameter_display_name");
     }
 
     /**
      * Parses the parameter filter from a given json.
-     *
-     * @param jsonObject        the json to parse from
-     * @return                  the parsed filter
-     * @throws JSONException    if the filter could not be parsed
+     * 
+     * @param jsonObject
+     *            the json to parse from
+     * @return the parsed filter
+     * @throws JSONException
+     *             if the filter could not be parsed
      */
-    private SWEKParameterFilter parseParameterFilter(JSONObject jsonObject) throws JSONException {
+    private SWEKParameterFilter parseParameterFilter(JSONObject jsonObject)
+            throws JSONException {
         SWEKParameterFilter filter = new SWEKParameterFilter();
         JSONObject filterobject = jsonObject.optJSONObject("filter");
-        if(filterobject != null) {
+        if (filterobject != null) {
             filter.setFilterType(parseFilterType(filterobject));
             filter.setMin(parseMin(filterobject));
             filter.setMax(parseMax(filterobject));
@@ -627,10 +740,12 @@ public class SWEKConfigurationManager {
 
     /**
      * Parses the filter type from a json.
-     *
-     * @param object            the json from which the filter type is parsed
-     * @return                  the filter type
-     * @throws JSONException    if the filter type could not be parsed
+     * 
+     * @param object
+     *            the json from which the filter type is parsed
+     * @return the filter type
+     * @throws JSONException
+     *             if the filter type could not be parsed
      */
     private String parseFilterType(JSONObject object) throws JSONException {
         return object.getString("filter_type");
@@ -638,10 +753,12 @@ public class SWEKConfigurationManager {
 
     /**
      * parses the minimum filter value from a json.
-     *
-     * @param object            the json from which to filter the minimum value
-     * @return                  the minimum filter value
-     * @throws JSONException    if the minimum filter value could not be parsed
+     * 
+     * @param object
+     *            the json from which to filter the minimum value
+     * @return the minimum filter value
+     * @throws JSONException
+     *             if the minimum filter value could not be parsed
      */
     private double parseMin(JSONObject object) throws JSONException {
         return object.getDouble("min");
@@ -649,10 +766,12 @@ public class SWEKConfigurationManager {
 
     /**
      * Parses the maximum filter value from the json.
-     *
-     * @param object            the json from which to filter the maximum filter value
-     * @return                  the maximum filter value
-     * @throws JSONException    if the maximum filter value could not be parsed
+     * 
+     * @param object
+     *            the json from which to filter the maximum filter value
+     * @return the maximum filter value
+     * @throws JSONException
+     *             if the maximum filter value could not be parsed
      */
     private double parseMax(JSONObject object) throws JSONException {
         return object.getDouble("max");
@@ -660,72 +779,92 @@ public class SWEKConfigurationManager {
 
     /**
      * Parses the default visible from the given json.
-     *
-     * @param jsonObject        the json from which to parse
-     * @return                  the parsed default visible
-     * @throws JSONException    if the default visible could not be parsed
+     * 
+     * @param jsonObject
+     *            the json from which to parse
+     * @return the parsed default visible
+     * @throws JSONException
+     *             if the default visible could not be parsed
      */
-    private boolean parseDefaultVisible(JSONObject jsonObject) throws JSONException {
+    private boolean parseDefaultVisible(JSONObject jsonObject)
+            throws JSONException {
         return jsonObject.getBoolean("default_visible");
     }
 
     /**
      * Parses the request interval extension from the json.
-     *
-     * @param object            the json from which to parse the request interval extension
-     * @return                  the parsed request interval extension
-     * @throws JSONException    if the request interval extension could not be parsed
+     * 
+     * @param object
+     *            the json from which to parse the request interval extension
+     * @return the parsed request interval extension
+     * @throws JSONException
+     *             if the request interval extension could not be parsed
      */
-    private Long parseRequestIntervalExtension(JSONObject object) throws JSONException {
+    private Long parseRequestIntervalExtension(JSONObject object)
+            throws JSONException {
         return object.getLong("request_interval_extension");
     }
 
     /**
      * Parses the standard selected from the json.
-     *
-     * @param object            the json from which to parse the standard selected
-     * @return                  true if standard selected is true in json, false if standard selected is false in json
-     * @throws JSONException    if the standard selected could not be parsed from json.
+     * 
+     * @param object
+     *            the json from which to parse the standard selected
+     * @return true if standard selected is true in json, false if standard
+     *         selected is false in json
+     * @throws JSONException
+     *             if the standard selected could not be parsed from json.
      */
-    private boolean parseStandardSelected(JSONObject object) throws JSONException {
+    private boolean parseStandardSelected(JSONObject object)
+            throws JSONException {
         return object.getBoolean("standard_selected");
     }
 
     /**
      * Parses the "group on" from the json.
-     *
-     * @param object            the json from which to parse the "group on"
-     * @return                  the group on parameter
-     * @throws JSONException    if the "group on" could not be parsed from the json.
+     * 
+     * @param object
+     *            the json from which to parse the "group on"
+     * @return the group on parameter
+     * @throws JSONException
+     *             if the "group on" could not be parsed from the json.
      */
     private SWEKParameter parseGroupOn(JSONObject object) throws JSONException {
-        return parameters.get(object.getString("group_on"));
+        return this.parameters.get(object.getString("group_on"));
     }
 
     /**
      * Parses the list of related events from a json.
-     *
-     * @param jsonObject        the json from which to parse the list of related events
-     * @return                  the parsed list of related events
-     * @throws JSONException    if the list of related events could not be parsed
+     * 
+     * @param jsonObject
+     *            the json from which to parse the list of related events
+     * @return the parsed list of related events
+     * @throws JSONException
+     *             if the list of related events could not be parsed
      */
-    private List<SWEKRelatedEvents> parseRelatedEvents(JSONObject configJSON) throws JSONException {
+    private List<SWEKRelatedEvents> parseRelatedEvents(JSONObject configJSON)
+            throws JSONException {
         List<SWEKRelatedEvents> relatedEventsList = new ArrayList<SWEKRelatedEvents>();
-        JSONArray relatedEventsArray = configJSON.getJSONArray("related_events");
-        for (int i = 0 ; i < relatedEventsArray.length() ; i++) {
-            relatedEventsList.add(parseRelatedEvent(relatedEventsArray.getJSONObject(i)));
+        JSONArray relatedEventsArray = configJSON
+                .getJSONArray("related_events");
+        for (int i = 0; i < relatedEventsArray.length(); i++) {
+            relatedEventsList.add(parseRelatedEvent(relatedEventsArray
+                    .getJSONObject(i)));
         }
         return relatedEventsList;
     }
 
     /**
      * Parses related events from a json.
-     *
-     * @param jsonObject        the json from which to parse related events
-     * @return                  the parsed related events
-     * @throws JSONException    if the related events could not be parsed
+     * 
+     * @param jsonObject
+     *            the json from which to parse related events
+     * @return the parsed related events
+     * @throws JSONException
+     *             if the related events could not be parsed
      */
-    private SWEKRelatedEvents parseRelatedEvent(JSONObject jsonObject) throws JSONException {
+    private SWEKRelatedEvents parseRelatedEvent(JSONObject jsonObject)
+            throws JSONException {
         SWEKRelatedEvents relatedEvents = new SWEKRelatedEvents();
         relatedEvents.setEvent(parseRelatedEventName(jsonObject));
         relatedEvents.setRelatedWith(parseRelatedWith(jsonObject));
@@ -735,37 +874,46 @@ public class SWEKConfigurationManager {
 
     /**
      * Parses a related event name from a json.
-     *
-     * @param jsonObject        the json from which to parse the related event name
-     * @return                  the parsed related event type
-     * @throws JSONException    if the related event name could not be parsed
+     * 
+     * @param jsonObject
+     *            the json from which to parse the related event name
+     * @return the parsed related event type
+     * @throws JSONException
+     *             if the related event name could not be parsed
      */
-    private SWEKEventType parseRelatedEventName(JSONObject jsonObject) throws JSONException {
-        return eventTypes.get(jsonObject.getString("event_name"));
+    private SWEKEventType parseRelatedEventName(JSONObject jsonObject)
+            throws JSONException {
+        return this.eventTypes.get(jsonObject.getString("event_name"));
     }
 
     /**
      * Parses a "related with" from a json.
-     *
-     * @param jsonObject        the json from which to parse the "related with"
-     * @return                  the parsed "related with" event type
-     * @throws JSONException    if the "related with" could not be parsed
+     * 
+     * @param jsonObject
+     *            the json from which to parse the "related with"
+     * @return the parsed "related with" event type
+     * @throws JSONException
+     *             if the "related with" could not be parsed
      */
-    private SWEKEventType parseRelatedWith(JSONObject jsonObject) throws JSONException {
-        return eventTypes.get(jsonObject.getString("related_with"));
+    private SWEKEventType parseRelatedWith(JSONObject jsonObject)
+            throws JSONException {
+        return this.eventTypes.get(jsonObject.getString("related_with"));
     }
 
     /**
      * Parses a list of "related on" from a json.
-     *
-     * @param jsonObject        the json from which to parse the "related on" list
-     * @return                  the parsed "related on" list
-     * @throws JSONException    if the "related on" list could not be parsed
+     * 
+     * @param jsonObject
+     *            the json from which to parse the "related on" list
+     * @return the parsed "related on" list
+     * @throws JSONException
+     *             if the "related on" list could not be parsed
      */
-    private List<SWEKRelatedOn> parseRelatedOnList(JSONObject jsonObject) throws JSONException {
+    private List<SWEKRelatedOn> parseRelatedOnList(JSONObject jsonObject)
+            throws JSONException {
         List<SWEKRelatedOn> relatedOnList = new ArrayList<SWEKRelatedOn>();
         JSONArray relatedOnArray = jsonObject.getJSONArray("related_on");
-        for (int i = 0 ; i < relatedOnArray.length() ; i++) {
+        for (int i = 0; i < relatedOnArray.length(); i++) {
             relatedOnList.add(parseRelatedOn(relatedOnArray.getJSONObject(i)));
         }
         return relatedOnList;
@@ -773,12 +921,15 @@ public class SWEKConfigurationManager {
 
     /**
      * Parses a "related on" from a json.
-     *
-     * @param jsonObject        the json from which to parse the "related on"
-     * @return                  the parsed "related on"
-     * @throws JSONException    if the "related on" could not be parsed
+     * 
+     * @param jsonObject
+     *            the json from which to parse the "related on"
+     * @return the parsed "related on"
+     * @throws JSONException
+     *             if the "related on" could not be parsed
      */
-    private SWEKRelatedOn parseRelatedOn(JSONObject jsonObject) throws JSONException {
+    private SWEKRelatedOn parseRelatedOn(JSONObject jsonObject)
+            throws JSONException {
         SWEKRelatedOn relatedOn = new SWEKRelatedOn();
         relatedOn.setParameterFrom(parseParameterFrom(jsonObject));
         relatedOn.setParameterWith(parseParameterWith(jsonObject));
@@ -787,23 +938,29 @@ public class SWEKConfigurationManager {
 
     /**
      * Parses a "parameter from" from a json.
-     *
-     * @param jsonObject        the json from which to parse the "parameter from"
-     * @return                  the parsed "parameter from"
-     * @throws JSONException    if the "parameter from" could not be parsed
+     * 
+     * @param jsonObject
+     *            the json from which to parse the "parameter from"
+     * @return the parsed "parameter from"
+     * @throws JSONException
+     *             if the "parameter from" could not be parsed
      */
-    private SWEKParameter parseParameterFrom(JSONObject jsonObject) throws JSONException {
-        return parameters.get(jsonObject.getString("parameter_from"));
+    private SWEKParameter parseParameterFrom(JSONObject jsonObject)
+            throws JSONException {
+        return this.parameters.get(jsonObject.getString("parameter_from"));
     }
 
     /**
      * Parses a "parameter with" from a json.
-     *
-     * @param jsonObject        the json from which to parse the "parameter with"
-     * @return                  the parsed "parameter with"
-     * @throws JSONException    if the "parameter with" could not be parsed
+     * 
+     * @param jsonObject
+     *            the json from which to parse the "parameter with"
+     * @return the parsed "parameter with"
+     * @throws JSONException
+     *             if the "parameter with" could not be parsed
      */
-    private SWEKParameter parseParameterWith(JSONObject jsonObject) throws JSONException {
-        return parameters.get(jsonObject.getString("parameter_with"));
+    private SWEKParameter parseParameterWith(JSONObject jsonObject)
+            throws JSONException {
+        return this.parameters.get(jsonObject.getString("parameter_with"));
     }
 }
