@@ -17,8 +17,8 @@
 	<classpathentry combineaccessrules="false" kind="src" path="/jhv-3d-plugin"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/jhv"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/jhv-3d"/>
-	<classpathentry kind="var" path="JHV_SRCROOT/lib/jogl.jar"/>
-	<classpathentry kind="var" path="JHV_SRCROOT/lib/gluegen-rt.jar"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/jhv-display"/>
+	<classpathentry kind="lib" path="lib/gluegen-rt.jar"/>
+	<classpathentry kind="lib" path="lib/jogl.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
