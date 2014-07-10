@@ -40,7 +40,7 @@ public class SWEKConfigurationManager {
     private static SWEKConfigurationManager singletonInstance;
 
     /** Config loaded */
-    private final boolean configLoaded;
+    private boolean configLoaded;
 
     /** Config file URL */
     private URL configFileURL;
@@ -96,14 +96,21 @@ public class SWEKConfigurationManager {
             Log.debug("Load the swek internal settings");
             this.loadPluginSettings();
             Log.debug("search and open the configuration file");
+            boolean isConfigParsed;
             if(checkAndOpenUserSetFile()) {
-                parseConfigFile();
+                isConfigParsed = parseConfigFile();
             } else if (checkAndOpenHomeDirectoryFile()) {
-                parseConfigFile();
+                isConfigParsed = parseConfigFile();
             } else if (checkAndOpenOnlineFile()) {
-                parseConfigFile();
+                isConfigParsed = parseConfigFile();
             } else {
-                //TODO config file could not be loaded.
+                isConfigParsed = false;
+            }
+            if (!isConfigParsed) {
+                // TODO set on the panel the config file could not be parsed.
+                configLoaded = false;
+            } else {
+                configLoaded = true;
             }
         }
     }
@@ -210,8 +217,7 @@ public class SWEKConfigurationManager {
                 sb.append(line);
             }
             JSONObject configJSON = new JSONObject(sb.toString());
-            parseJSONConfig(configJSON);
-            return true;
+            return parseJSONConfig(configJSON);
         } catch (IOException e) {
             Log.debug("The configuration file could not be parsed : "+ e);
             System.exit(1);
@@ -226,8 +232,9 @@ public class SWEKConfigurationManager {
      * Parses the JSON from start
      *
      * @param configJSON    The JSON to parse
+     * @return true if the JSON configuration could be parsed, false if not.
      */
-    private void parseJSONConfig(JSONObject configJSON) {
+    private boolean parseJSONConfig(JSONObject configJSON) {
         this.configuration = new SWEKConfiguration();
         try {
             this.configuration.setManuallyChanged(parseManuallyChanged(configJSON));
@@ -235,9 +242,11 @@ public class SWEKConfigurationManager {
             this.configuration.setSources(parseSources(configJSON));
             this.configuration.setEventTypes(parseEventTypes(configJSON));
             this.configuration.setRelatedEvents(parseRelatedEvents(configJSON));
+            return true;
         } catch (JSONException e) {
-            // TODO Auto-generated catch block
+            Log.error("Could not parse config json");
             e.printStackTrace();
+            return false;
         }
     }
 
@@ -307,7 +316,7 @@ public class SWEKConfigurationManager {
      * @throws JSONException    if the source could not be parsed
      */
     private String parseSourceName(JSONObject jsonObject) throws JSONException {
-        return jsonObject.getString("source");
+        return jsonObject.getString("name");
     }
 
     /**
@@ -605,10 +614,15 @@ public class SWEKConfigurationManager {
      */
     private SWEKParameterFilter parseParameterFilter(JSONObject jsonObject) throws JSONException {
         SWEKParameterFilter filter = new SWEKParameterFilter();
-        filter.setFilterType(parseFilterType(jsonObject.getJSONObject("filter")));
-        filter.setMin(parseMin(jsonObject.getJSONObject("filter")));
-        filter.setMax(parseMax(jsonObject.getJSONObject("filter")));
-        return filter;
+        JSONObject filterobject = jsonObject.optJSONObject("filter");
+        if(filterobject != null) {
+            filter.setFilterType(parseFilterType(filterobject));
+            filter.setMin(parseMin(filterobject));
+            filter.setMax(parseMax(filterobject));
+            return filter;
+        } else {
+            return null;
+        }
     }
 
     /**
