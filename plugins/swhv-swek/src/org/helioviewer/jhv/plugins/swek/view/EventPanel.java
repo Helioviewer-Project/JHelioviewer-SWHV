@@ -7,6 +7,7 @@ import javax.swing.JTree;
 
 import org.helioviewer.jhv.plugins.swek.config.SWEKEventType;
 import org.helioviewer.jhv.plugins.swek.model.SWEKTreeModel;
+import org.helioviewer.jhv.plugins.swek.model.SWEKTreeModelEventType;
 
 /**
  * Panel display one event type
@@ -37,15 +38,7 @@ public class EventPanel extends JPanel {
      */
     private void initVisisualComponents() {
         setLayout(new BorderLayout());
-        /**
-         * DefaultMutableTreeNode eventNode = new
-         * DefaultMutableTreeNode(this.eventType.getEventName()); for
-         * (SWEKSupplier supplier : this.eventType.getSuppliers()) {
-         * DefaultMutableTreeNode supplierNode = new
-         * DefaultMutableTreeNode(supplier.getSupplierName());
-         * eventNode.add(supplierNode); }
-         */
-        this.eventTypeTree = new JTree(new SWEKTreeModel(this.eventType));
+        this.eventTypeTree = new JTree(new SWEKTreeModel(new SWEKTreeModelEventType(this.eventType)));
         this.eventTypeTree.setCellRenderer(new SWEKEventTreeRenderer());
         add(this.eventTypeTree, BorderLayout.CENTER);
     }
