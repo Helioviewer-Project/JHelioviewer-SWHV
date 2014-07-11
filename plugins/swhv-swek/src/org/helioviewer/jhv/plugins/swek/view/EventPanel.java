@@ -4,10 +4,9 @@ import java.awt.BorderLayout;
 
 import javax.swing.JPanel;
 import javax.swing.JTree;
-import javax.swing.tree.DefaultMutableTreeNode;
 
 import org.helioviewer.jhv.plugins.swek.config.SWEKEventType;
-import org.helioviewer.jhv.plugins.swek.config.SWEKSupplier;
+import org.helioviewer.jhv.plugins.swek.model.SWEKTreeModel;
 
 /**
  * Panel display one event type
@@ -16,7 +15,7 @@ import org.helioviewer.jhv.plugins.swek.config.SWEKSupplier;
  * 
  */
 public class EventPanel extends JPanel {
-    /**  */
+    /** seriolVersionUID */
     private static final long serialVersionUID = 1057300852220893978L;
 
     /** The event type for which the event panel is created */
@@ -38,14 +37,16 @@ public class EventPanel extends JPanel {
      */
     private void initVisisualComponents() {
         setLayout(new BorderLayout());
-        DefaultMutableTreeNode eventNode = new DefaultMutableTreeNode(
-                this.eventType.getEventName());
-        for (SWEKSupplier supplier : this.eventType.getSuppliers()) {
-            DefaultMutableTreeNode supplierNode = new DefaultMutableTreeNode(
-                    supplier.getSupplierName());
-            eventNode.add(supplierNode);
-        }
-        this.eventTypeTree = new JTree(eventNode);
+        /**
+         * DefaultMutableTreeNode eventNode = new
+         * DefaultMutableTreeNode(this.eventType.getEventName()); for
+         * (SWEKSupplier supplier : this.eventType.getSuppliers()) {
+         * DefaultMutableTreeNode supplierNode = new
+         * DefaultMutableTreeNode(supplier.getSupplierName());
+         * eventNode.add(supplierNode); }
+         */
+        this.eventTypeTree = new JTree(new SWEKTreeModel(this.eventType));
+        this.eventTypeTree.setCellRenderer(new SWEKEventTreeRenderer());
         add(this.eventTypeTree, BorderLayout.CENTER);
     }
 }
