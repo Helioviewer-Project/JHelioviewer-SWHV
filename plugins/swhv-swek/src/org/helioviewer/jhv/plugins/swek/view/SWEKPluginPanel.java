@@ -4,7 +4,6 @@
 package org.helioviewer.jhv.plugins.swek.view;
 
 import java.awt.BorderLayout;
-import java.awt.Color;
 import java.awt.Component;
 
 import javax.swing.BoxLayout;
@@ -46,20 +45,15 @@ public class SWEKPluginPanel extends OverlayPanel {
         JPanel eventTypePanel = new JPanel();
         BoxLayout boxLayout = new BoxLayout(eventTypePanel, BoxLayout.Y_AXIS);
         eventTypePanel.setLayout(boxLayout);
-        for (SWEKEventType eventType : this.configManager.getEventTypes()
-                .values()) {
+        for (SWEKEventType eventType : this.configManager.getEventTypes().values()) {
             EventPanel eventPanel = new EventPanel(eventType);
             eventPanel.setAlignmentX(Component.LEFT_ALIGNMENT);
-
             eventTypePanel.add(eventPanel);
         }
         JScrollPane sp = new JScrollPane(eventTypePanel);
         sp.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_ALWAYS);
         sp.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
         add(sp, BorderLayout.CENTER);
-        sp.setBackground(Color.CYAN);
-        eventTypePanel.setBackground(Color.RED);
-        setBackground(Color.BLUE);
     }
 
     /**
