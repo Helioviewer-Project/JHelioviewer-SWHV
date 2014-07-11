@@ -7,13 +7,10 @@ import javax.swing.event.TreeModelListener;
 import javax.swing.tree.TreeModel;
 import javax.swing.tree.TreePath;
 
-import org.helioviewer.jhv.plugins.swek.config.SWEKEventType;
-import org.helioviewer.jhv.plugins.swek.config.SWEKSupplier;
-
 public class SWEKTreeModel implements TreeModel {
 
     /** The event type for this model */
-    private final SWEKEventType eventType;
+    private final SWEKTreeModelEventType eventType;
 
     /** Holds the TreeModelListeners */
     private final List<TreeModelListener> listeners;
@@ -24,7 +21,7 @@ public class SWEKTreeModel implements TreeModel {
      * @param eventType
      *            The event type for which to create the tree model
      */
-    public SWEKTreeModel(SWEKEventType eventType) {
+    public SWEKTreeModel(SWEKTreeModelEventType eventType) {
         this.eventType = eventType;
         this.listeners = new ArrayList<TreeModelListener>();
     }
@@ -37,8 +34,8 @@ public class SWEKTreeModel implements TreeModel {
 
     @Override
     public Object getChild(Object parent, int index) {
-        if (parent instanceof SWEKEventType) {
-            return ((SWEKEventType) parent).getSuppliers().get(index);
+        if (parent instanceof SWEKTreeModelEventType) {
+            return ((SWEKTreeModelEventType) parent).getSwekTreeSuppliers().get(index);
         } else {
             return null;
         }
@@ -46,8 +43,8 @@ public class SWEKTreeModel implements TreeModel {
 
     @Override
     public int getChildCount(Object parent) {
-        if (parent instanceof SWEKEventType) {
-            return ((SWEKEventType) parent).getSuppliers().size();
+        if (parent instanceof SWEKTreeModelEventType) {
+            return ((SWEKTreeModelEventType) parent).getSwekEventType().getSuppliers().size();
         } else {
             return 0;
         }
@@ -55,9 +52,9 @@ public class SWEKTreeModel implements TreeModel {
 
     @Override
     public int getIndexOfChild(Object parent, Object child) {
-        if ((parent instanceof SWEKEventType) && (child instanceof SWEKSupplier)) {
+        if ((parent instanceof SWEKTreeModelEventType) && (child instanceof SWEKTreeModelSupplier)) {
             int count = 0;
-            for (SWEKSupplier supplier : ((SWEKEventType) parent).getSuppliers()) {
+            for (SWEKTreeModelSupplier supplier : ((SWEKTreeModelEventType) parent).getSwekTreeSuppliers()) {
                 if (supplier.equals(child)) {
                     return count;
                 } else {
@@ -75,7 +72,7 @@ public class SWEKTreeModel implements TreeModel {
 
     @Override
     public boolean isLeaf(Object node) {
-        if (node instanceof SWEKEventType) {
+        if (node instanceof SWEKTreeModelEventType) {
             return false;
         } else {
             return true;
