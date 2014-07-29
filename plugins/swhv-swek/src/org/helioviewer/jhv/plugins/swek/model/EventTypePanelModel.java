@@ -3,11 +3,20 @@ package org.helioviewer.jhv.plugins.swek.model;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.swing.event.TreeExpansionEvent;
+import javax.swing.event.TreeExpansionListener;
 import javax.swing.event.TreeModelListener;
 import javax.swing.tree.TreeModel;
 import javax.swing.tree.TreePath;
 
-public class EventPanelModel implements TreeModel, SWEKTreeModelListener {
+/**
+ * The model of the event type panel. This model is a TreeModel and is used by
+ * the tree on the event type panel.
+ * 
+ * @author Bram Bourgoignie (Bram.Bourgoignie@oma.be)
+ * 
+ */
+public class EventTypePanelModel implements TreeModel, TreeExpansionListener {
 
     /** The event type for this model */
     private final SWEKTreeModelEventType eventType;
@@ -27,11 +36,10 @@ public class EventPanelModel implements TreeModel, SWEKTreeModelListener {
      * @param eventType
      *            The event type for which to create the tree model
      */
-    public EventPanelModel(SWEKTreeModelEventType eventType) {
+    public EventTypePanelModel(SWEKTreeModelEventType eventType) {
         this.eventType = eventType;
         this.listeners = new ArrayList<TreeModelListener>();
         this.treeModelInstance = SWEKTreeModel.getSingletonInstance();
-        this.treeModelInstance.addSWEKTreeModelListener(this);
         this.panelModelListeners = new ArrayList<EventPanelModelListener>();
     }
 
@@ -185,5 +193,29 @@ public class EventPanelModel implements TreeModel, SWEKTreeModelListener {
      */
     @Override
     public void valueForPathChanged(TreePath path, Object newValue) {
+    }
+
+    /*
+     * (non-Javadoc)
+     * 
+     * @see
+     * javax.swing.event.TreeExpansionListener#treeCollapsed(javax.swing.event
+     * .TreeExpansionEvent)
+     */
+    @Override
+    public void treeCollapsed(TreeExpansionEvent event) {
+        this.treeModelInstance.subTreeCollapsed();
+    }
+
+    /*
+     * (non-Javadoc)
+     * 
+     * @see
+     * javax.swing.event.TreeExpansionListener#treeExpanded(javax.swing.event
+     * .TreeExpansionEvent)
+     */
+    @Override
+    public void treeExpanded(TreeExpansionEvent event) {
+        this.treeModelInstance.subTreeExpanded();
     }
 }

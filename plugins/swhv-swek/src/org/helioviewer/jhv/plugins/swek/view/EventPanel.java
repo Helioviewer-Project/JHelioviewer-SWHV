@@ -9,8 +9,8 @@ import javax.swing.JTree;
 
 import org.helioviewer.base.logging.Log;
 import org.helioviewer.jhv.plugins.swek.config.SWEKEventType;
-import org.helioviewer.jhv.plugins.swek.model.EventPanelModel;
 import org.helioviewer.jhv.plugins.swek.model.EventPanelModelListener;
+import org.helioviewer.jhv.plugins.swek.model.EventTypePanelModel;
 import org.helioviewer.jhv.plugins.swek.model.SWEKTreeModelEventType;
 
 /**
@@ -30,14 +30,14 @@ public class EventPanel extends JPanel implements EventPanelModelListener, Mouse
     private JTree eventTypeTree;
 
     /** The model for this panel */
-    private final EventPanelModel eventPanelModel;
+    private final EventTypePanelModel eventPanelModel;
 
     /**
      * Creates a event panel for a certain
      */
     public EventPanel(SWEKEventType eventType) {
         this.eventType = eventType;
-        this.eventPanelModel = new EventPanelModel(new SWEKTreeModelEventType(this.eventType));
+        this.eventPanelModel = new EventTypePanelModel(new SWEKTreeModelEventType(this.eventType));
         this.eventPanelModel.addEventPanelModelListener(this);
         initVisisualComponents();
     }
@@ -50,6 +50,7 @@ public class EventPanel extends JPanel implements EventPanelModelListener, Mouse
         this.eventTypeTree = new JTree(this.eventPanelModel);
         this.eventTypeTree.setSelectionModel(null);
         this.eventTypeTree.addMouseListener(this);
+        this.eventTypeTree.addTreeExpansionListener(this.eventPanelModel);
         this.eventTypeTree.setCellRenderer(new SWEKEventTreeRenderer());
         add(this.eventTypeTree, BorderLayout.CENTER);
     }
@@ -65,25 +66,21 @@ public class EventPanel extends JPanel implements EventPanelModelListener, Mouse
 
     @Override
     public void mouseEntered(MouseEvent e) {
-        // TODO Auto-generated method stub
 
     }
 
     @Override
     public void mouseExited(MouseEvent e) {
-        // TODO Auto-generated method stub
 
     }
 
     @Override
     public void mousePressed(MouseEvent e) {
-        // TODO Auto-generated method stub
 
     }
 
     @Override
     public void mouseReleased(MouseEvent e) {
-        // TODO Auto-generated method stub
 
     }
 

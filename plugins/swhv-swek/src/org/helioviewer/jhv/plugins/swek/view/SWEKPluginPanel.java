@@ -9,19 +9,21 @@ import java.awt.Component;
 import javax.swing.BoxLayout;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
-import javax.swing.ScrollPaneConstants;
 
+import org.helioviewer.base.logging.Log;
 import org.helioviewer.jhv.plugins.swek.config.SWEKConfigurationManager;
 import org.helioviewer.jhv.plugins.swek.config.SWEKEventType;
+import org.helioviewer.jhv.plugins.swek.model.SWEKTreeModel;
+import org.helioviewer.jhv.plugins.swek.model.SWEKTreeModelListener;
 import org.helioviewer.viewmodelplugin.overlay.OverlayPanel;
 
 /**
  * The main visual component of the SWEK-plugin.
  * 
- * @author Bram.Bourgoignie@oma.be
+ * @author Bram Bourgoignie (Bram.Bourgoignie@oma.be)
  * 
  */
-public class SWEKPluginPanel extends OverlayPanel {
+public class SWEKPluginPanel extends OverlayPanel implements SWEKTreeModelListener {
 
     /** Serial version UID */
     private static final long serialVersionUID = 212085486418646472L;
@@ -29,10 +31,16 @@ public class SWEKPluginPanel extends OverlayPanel {
     /** The singleton panel used */
     private static SWEKPluginPanel swekPluginPanel;
 
+    /** The SWEK configuration manager */
     private final SWEKConfigurationManager configManager;
+
+    /** Instance of the treeModel */
+    private final SWEKTreeModel treeModelInstance;
 
     private SWEKPluginPanel() {
         this.configManager = SWEKConfigurationManager.getSingletonInstance();
+        this.treeModelInstance = SWEKTreeModel.getSingletonInstance();
+        this.treeModelInstance.addSWEKTreeModelListener(this);
         initVisualComponents();
 
     }
@@ -51,8 +59,8 @@ public class SWEKPluginPanel extends OverlayPanel {
             eventTypePanel.add(eventPanel);
         }
         JScrollPane sp = new JScrollPane(eventTypePanel);
-        sp.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_ALWAYS);
-        sp.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
+        // sp.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_ALWAYS);
+        // sp.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
         add(sp, BorderLayout.CENTER);
     }
 
@@ -66,5 +74,12 @@ public class SWEKPluginPanel extends OverlayPanel {
             swekPluginPanel = new SWEKPluginPanel();
         }
         return swekPluginPanel;
+    }
+
+    @Override
+    public void expansionChanged() {
+        Log.debug("revalidate and repaint");
+        super.revalidate();
+        super.repaint();
     }
 }
