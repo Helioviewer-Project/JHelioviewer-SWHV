@@ -3,90 +3,50 @@ package org.helioviewer.jhv.plugins.swek.model;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.swing.event.TreeModelListener;
-import javax.swing.tree.TreeModel;
-import javax.swing.tree.TreePath;
+/**
+ * This model manages all the SWEKEventTypeTreeModels and delegate events. This
+ * was primarily created to handle the selection in the distributed event trees.
+ * 
+ * The SWEKTreeModel is the central point of acces.
+ * 
+ * @author Bram Bourgoignie (Bram.Bourgoignie@oma.be)
+ * 
+ */
+public class SWEKTreeModel {
+    /** The singleton instance of the SWEKTreeModel */
+    private static SWEKTreeModel singletonInstance;
 
-public class SWEKTreeModel implements TreeModel {
+    /** Holder for the SWEK event type tree models */
+    private final List<SWEKTreeModelListener> listeners;
 
-    /** The event type for this model */
-    private final SWEKTreeModelEventType eventType;
+    private SWEKTreeModel() {
+        this.listeners = new ArrayList<SWEKTreeModelListener>();
+    }
 
-    /** Holds the TreeModelListeners */
-    private final List<TreeModelListener> listeners;
+    public static SWEKTreeModel getSingletonInstance() {
+        if (singletonInstance == null) {
+            singletonInstance = new SWEKTreeModel();
+        }
+        return singletonInstance;
+    }
 
     /**
-     * Creates a SWEKTreeModel for the given SWEK event type.
+     * Adds a new SWEK tree model listener.
      * 
-     * @param eventType
-     *            The event type for which to create the tree model
+     * @param swekTreeModelListener
+     *            the listener to add
      */
-    public SWEKTreeModel(SWEKTreeModelEventType eventType) {
-        this.eventType = eventType;
-        this.listeners = new ArrayList<TreeModelListener>();
+    public void addSWEKTreeModelListener(SWEKTreeModelListener swekTreeModelListener) {
+        this.listeners.add(swekTreeModelListener);
     }
 
-    @Override
-    public void addTreeModelListener(TreeModelListener l) {
-        this.listeners.add(l);
-
+    /**
+     * removes a SWEK tree model listener.
+     * 
+     * @param swekTreeModelListener
+     *            the listener to remove
+     */
+    public void removeSWEKTreeModelListener(SWEKTreeModelListener swekTreeModelListener) {
+        this.listeners.remove(swekTreeModelListener);
     }
-
-    @Override
-    public Object getChild(Object parent, int index) {
-        if (parent instanceof SWEKTreeModelEventType) {
-            return ((SWEKTreeModelEventType) parent).getSwekTreeSuppliers().get(index);
-        } else {
-            return null;
-        }
-    }
-
-    @Override
-    public int getChildCount(Object parent) {
-        if (parent instanceof SWEKTreeModelEventType) {
-            return ((SWEKTreeModelEventType) parent).getSwekEventType().getSuppliers().size();
-        } else {
-            return 0;
-        }
-    }
-
-    @Override
-    public int getIndexOfChild(Object parent, Object child) {
-        if ((parent instanceof SWEKTreeModelEventType) && (child instanceof SWEKTreeModelSupplier)) {
-            int count = 0;
-            for (SWEKTreeModelSupplier supplier : ((SWEKTreeModelEventType) parent).getSwekTreeSuppliers()) {
-                if (supplier.equals(child)) {
-                    return count;
-                } else {
-                    count++;
-                }
-            }
-        }
-        return -1;
-    }
-
-    @Override
-    public Object getRoot() {
-        return this.eventType;
-    }
-
-    @Override
-    public boolean isLeaf(Object node) {
-        if (node instanceof SWEKTreeModelEventType) {
-            return false;
-        } else {
-            return true;
-        }
-    }
-
-    @Override
-    public void removeTreeModelListener(TreeModelListener l) {
-        this.listeners.remove(l);
-
-    }
-
-    @Override
-    public void valueForPathChanged(TreePath path, Object newValue) {
-    }
-
 }
