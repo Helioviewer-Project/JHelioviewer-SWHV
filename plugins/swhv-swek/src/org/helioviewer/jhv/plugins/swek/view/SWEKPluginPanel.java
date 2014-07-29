@@ -59,8 +59,6 @@ public class SWEKPluginPanel extends OverlayPanel implements SWEKTreeModelListen
             eventTypePanel.add(eventPanel);
         }
         JScrollPane sp = new JScrollPane(eventTypePanel);
-        // sp.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_ALWAYS);
-        // sp.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
         add(sp, BorderLayout.CENTER);
     }
 
