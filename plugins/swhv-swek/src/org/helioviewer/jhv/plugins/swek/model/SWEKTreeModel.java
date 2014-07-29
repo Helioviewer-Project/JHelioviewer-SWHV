@@ -49,4 +49,27 @@ public class SWEKTreeModel {
     public void removeSWEKTreeModelListener(SWEKTreeModelListener swekTreeModelListener) {
         this.listeners.remove(swekTreeModelListener);
     }
+
+    /**
+     * Inform the SWEK tree model about a subtree that was collapsed.
+     */
+    public void subTreeCollapsed() {
+        fireTreeExpansionChanged();
+    }
+
+    /**
+     * Inform the SWEK tree model about a subtree that was expanded.
+     */
+    public void subTreeExpanded() {
+        fireTreeExpansionChanged();
+    }
+
+    /**
+     * Inform the SWEK tree model listeners about a change of the tree.
+     */
+    private void fireTreeExpansionChanged() {
+        for (SWEKTreeModelListener l : this.listeners) {
+            l.expansionChanged();
+        }
+    }
 }
