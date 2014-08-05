@@ -233,10 +233,8 @@ public class SWEKConfigurationManager {
             return parseJSONConfig(configJSON);
         } catch (IOException e) {
             Log.debug("The configuration file could not be parsed : " + e);
-            System.exit(1);
         } catch (JSONException e) {
             Log.debug("Could not parse the given JSON : " + e);
-            System.exit(1);
         }
         return false;
     }
