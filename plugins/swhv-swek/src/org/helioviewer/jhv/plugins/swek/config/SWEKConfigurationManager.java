@@ -210,11 +210,10 @@ public class SWEKConfigurationManager {
                 return true;
             } catch (URISyntaxException e) {
                 Log.debug("Wrong URI syntax for the found file name : " + fileName);
-                return false;
             } catch (MalformedURLException e) {
                 Log.debug("Could not convert the URI in a correct URL. The found file name : " + fileName);
-                return false;
             }
+            return false;
         }
     }
 
