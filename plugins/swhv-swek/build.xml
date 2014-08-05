@@ -7,7 +7,7 @@
 
     <property name="jhv.root" value="${basedir}/../../" />
     <property name="jhv.bin" value="${jhv.root}/bin/jhv/" />
-    <property name="jhv.build.resources" value="${jhv.root}/build-resources/" />
+    <property name="jhv.build.resources" value="${jhv.root}build-resources/" />
     <property name="jhv.lib" value="${jhv.root}/lib/" />
     <property name="jhv.build" value="${jhv.root}/build/" />
     <property name="src" value="${basedir}/src/" />
@@ -43,7 +43,7 @@
     <!-- build classes of main jhv project -->
     <target name="jhv.compile">
         <echo message="basedir is ${basedir}"/>
-        <ant inheritAll="false" target="compile" antfile="${jhv.root}/build.xml" />
+        <ant inheritAll="false" target="compile" antfile="${jhv.root}/build.xml" dir="${jhv.root}"/>
     </target>
 
     <!-- Create directory structure -->
@@ -107,40 +107,38 @@
 
     <target name="compile" depends="jhv.compile, init">
         <javac srcdir="${src}" destdir="${bin}" target="1.5" source="1.5"  debug="on" debuglevel="source,lines,vars" includeantruntime="false">
-			<classpath>
-				<fileset dir="${lib}">
-					<include name="**/*.jar" />
-				</fileset>
-				<fileset dir="${jhv.lib}">
-					<include name="**/*.jar"/>
-				</fileset>
-				<pathelement location="${jhv.bin}" />
-			</classpath>
- 		</javac>
-	</target>
-	
-	<!-- Jar bundle -->
+            <classpath>
+                <fileset dir="${lib}">
+                    <include name="**/*.jar" />
+                </fileset>
+                <fileset dir="${jhv.lib}">
+                    <include name="**/*.jar"/>
+                </fileset>
+                <pathelement location="${jhv.bin}" />
+            </classpath>
+        </javac>
+    </target>
 
-	
-	<target name="jar-bundle" depends="compile">
-		<!-- JAR File -->
- 		<jar destfile="${build}/${plugin.name}.jar">
-			<manifest>
-				<attribute name="Main-Class" value="org.helioviewer.jhv.plugins.${plugin.package}.${plugin.name}" />
-				<attribute name="Class-Path" value="." />
+    <!-- Jar bundle -->
+    <target name="jar-bundle" depends="compile">
+        <!-- JAR File -->
+        <jar destfile="${build}/${plugin.name}.jar">
+            <manifest>
+                <attribute name="Main-Class" value="org.helioviewer.jhv.plugins.${plugin.package}.${plugin.name}" />
+                <attribute name="Class-Path" value="." />
                 <attribute name="Implementation-Version" value="v${version}r${revision}" />
                 <attribute name="version" value="${version}" />
                 <attribute name="revision" value="${revision}" />
-			</manifest>
+            </manifest>
             <fileset dir="${bin}" />
             <fileset dir="${resources}" />
             <fileset file="README" />
             <fileset file="COPYING" />
-	        <zipgroupfileset dir="${lib}" includes="**/*.jar"/>
- 		</jar>
-	</target>
-	
-	<!-- Source bundle -->
+            <zipgroupfileset dir="${lib}" includes="**/*.jar"/>
+        </jar>
+    </target>
+
+    <!-- Source bundle -->
 
     <target name="bundle-src" depends ="bundle-src-zip, bundle-src-tar" />
 
