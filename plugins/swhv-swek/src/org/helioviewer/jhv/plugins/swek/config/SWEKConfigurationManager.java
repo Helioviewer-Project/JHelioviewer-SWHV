@@ -167,7 +167,7 @@ public class SWEKConfigurationManager {
 
     /**
      * Checks the home directory of the plugin (normally
-     * ~/JHelioviewer/Plugins/swek-plugin/ for the existence of the
+     * ~/JHelioviewer/Plugins/swek-plugin/) for the existence of the
      * SWEKSettings.json file.
      * 
      * @return true if the file was found and useful, false if the file was not
