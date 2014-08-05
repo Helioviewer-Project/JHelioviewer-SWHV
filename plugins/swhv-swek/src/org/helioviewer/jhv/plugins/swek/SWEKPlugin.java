@@ -9,6 +9,7 @@ import java.net.URISyntaxException;
 
 import org.helioviewer.jhv.plugins.swek.config.SWEKConfigurationManager;
 import org.helioviewer.jhv.plugins.swek.settings.SWEKSettings;
+import org.helioviewer.jhv.plugins.swek.sources.SWEKSourceManager;
 import org.helioviewer.viewmodelplugin.controller.PluginManager;
 import org.helioviewer.viewmodelplugin.controller.PluginSettings;
 import org.helioviewer.viewmodelplugin.interfaces.Plugin;
@@ -18,17 +19,21 @@ import org.helioviewer.viewmodelplugin.overlay.OverlayPlugin;
  * Part of these developments are based on the work done in the HEKPlugin
  * (lp:~jhelioviewer-dev/jhelioviewer/hekplugin) and HEKPlugin 3d
  * (lp:~jhelioviewer-dev/jhelioviewer/hekplugin-3d).
- *
+ * 
  * @author Bram.Bourgoignie@oma.be
- *
+ * 
  */
 public class SWEKPlugin extends OverlayPlugin implements Plugin {
 
-    /** Instance of the SWEKConfiguration*/
+    /** Instance of the SWEKConfiguration */
     private final SWEKConfigurationManager SWEKConfig;
 
+    /** Instance of the SWEKDownloadManager */
+    private final SWEKSourceManager SWEKSources;
+
     public SWEKPlugin() {
-        SWEKConfig = SWEKConfigurationManager.getSingletonInstance();
+        this.SWEKConfig = SWEKConfigurationManager.getSingletonInstance();
+        this.SWEKSources = SWEKSourceManager.getSingletonInstance();
         try {
             this.pluginLocation = new URI(SWEKSettings.PLUGIN_NAME);
         } catch (URISyntaxException e) {
@@ -38,7 +43,7 @@ public class SWEKPlugin extends OverlayPlugin implements Plugin {
     }
 
     @Override
-    public void installPlugin(){
+    public void installPlugin() {
         createPluginDirectoryStructure();
         configurePlugin();
         registerPlugin();
@@ -81,7 +86,7 @@ public class SWEKPlugin extends OverlayPlugin implements Plugin {
      */
     private void createPluginDirectoryStructure() {
         File swekHomeFile = new File(SWEKSettings.SWEK_HOME);
-        if(!swekHomeFile.isDirectory()){
+        if (!swekHomeFile.isDirectory()) {
             swekHomeFile.mkdirs();
         }
     }
@@ -90,7 +95,8 @@ public class SWEKPlugin extends OverlayPlugin implements Plugin {
      * Configures the SWEK plugin.
      */
     private void configurePlugin() {
-        SWEKConfig.loadConfiguration();
+        this.SWEKConfig.loadConfiguration();
+        this.SWEKSources.loadSources();
     }
 
     /**
@@ -98,10 +104,10 @@ public class SWEKPlugin extends OverlayPlugin implements Plugin {
      */
     private void registerPlugin() {
         SWEKPluginContainer container = new SWEKPluginContainer();
-        container.setActive(PluginSettings.getSingeltonInstance().isOverlayInPluginActivated(pluginLocation, container.getOverlayClass(), true));
-        container.setPosition(PluginSettings.getSingeltonInstance().getOverlayPosition(pluginLocation, container.getOverlayClass()));
+        container.setActive(PluginSettings.getSingeltonInstance().isOverlayInPluginActivated(this.pluginLocation,
+                container.getOverlayClass(), true));
+        container.setPosition(PluginSettings.getSingeltonInstance().getOverlayPosition(this.pluginLocation, container.getOverlayClass()));
         PluginManager.getSingeltonInstance().addOverlayContainer(container);
     }
-
 
 }
