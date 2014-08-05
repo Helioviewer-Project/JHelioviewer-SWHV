@@ -1,12 +1,13 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
 
-<project name="build" default="all">
-	<property name="plugin.name" value="SWEKPlugin" />
-	<property name="plugin.package" value="swekplugin" />
 
-	<property name="jhv.root" value="${basedir}/../../" />
-	<property name="jhv.bin" value="${jhv.root}/bin/jhv/" />
-	<property name="jhv.build.resources" value="${jhv.root}/build-resources/" />
+<project name="build" default="all">
+    <property name="plugin.name" value="SWEKPlugin" />
+    <property name="plugin.package" value="swekplugin" />
+
+    <property name="jhv.root" value="${basedir}/../../" />
+    <property name="jhv.bin" value="${jhv.root}/bin/jhv/" />
+    <property name="jhv.build.resources" value="${jhv.root}/build-resources/" />
     <property name="jhv.lib" value="${jhv.root}/lib/" />
     <property name="jhv.build" value="${jhv.root}/build/" />
     <property name="src" value="${basedir}/src/" />
@@ -20,24 +21,33 @@
     <property name="temp" value="${basedir}/temp/" />
     <property name="bzrpath" value="bzr" />
     <property name="plugins.dir" value="${user.home}/JHelioviewer/Plugins/" />
+    <property name="sweksources" value="${basedir}/sources" />
+    <property name="sweksources.lib" value="${sweksources}/lib" />
 
-	<!-- Include ant-contrib -->
+    <!-- Include ant-contrib -->
+    <echo message="build resources : ${jhv.build.resources}"/>
     <taskdef resource="net/sf/antcontrib/antcontrib.properties">
       <classpath>
-        <pathelement location="${jhv.build.resources}/shared/ant-contrib-1.0b3.jar"/>
+        <pathelement location="${jhv.build.resources}shared/ant-contrib-1.0b3.jar"/>
       </classpath>
     </taskdef>
 
 
-	<target name="all" depends="jar-bundle, bundle-src" />
+    <target name="all" depends="jar-bundle, bundle-src, jar-copy" />
 
+    <!-- Copy the swek-jar to the sources lib directory -->
+    <target name="jar-copy">
+        <copy file="${build}/${plugin.name}.jar" todir="${sweksources.lib}/"/>
+    </target>
+    
     <!-- build classes of main jhv project -->
     <target name="jhv.compile">
-    	<ant inheritAll="false" target="compile" antfile="${jhv.root}/build.xml" />
+        <echo message="basedir is ${basedir}"/>
+        <ant inheritAll="false" target="compile" antfile="${jhv.root}/build.xml" />
     </target>
 
-	<!-- Create directory structure -->
-	<target name="mkdir">
+    <!-- Create directory structure -->
+    <target name="mkdir">
         <mkdir dir="${build}" /> 
         <mkdir dir="${build.resources}" /> 
         <mkdir dir="${bin}" /> 
@@ -45,29 +55,31 @@
         <mkdir dir="${resources}" /> 
         <mkdir dir="${lib}" /> 
         <mkdir dir="${src}" /> 
-        <mkdir dir="${doc}" /> 
-	</target>
-	
-	<!-- Delete generated files -->
-	<target name="clean">
+        <mkdir dir="${doc}" />
+        <mkdir dir="${sweksources.lib}" />
+    </target>
+
+    <!-- Delete generated files -->
+    <target name="clean">
         <delete includeemptydirs="true" verbose="true">
-        	<fileset dir="${bin}" followsymlinks="false" defaultexcludes="no"/>
+            <fileset dir="${bin}" followsymlinks="false" defaultexcludes="no"/>
         </delete> 
         <delete includeemptydirs="true" verbose="true">
-        	<fileset dir="${build}" followsymlinks="false" defaultexcludes="no"/>
+            <fileset dir="${build}" followsymlinks="false" defaultexcludes="no"/>
         </delete> 
         <delete includeemptydirs="true" verbose="true">
-        	<fileset dir="${doc}" followsymlinks="false" defaultexcludes="no"/>
+            <fileset dir="${doc}" followsymlinks="false" defaultexcludes="no"/>
         </delete> 
         <delete includeemptydirs="true" verbose="true">
-        	<fileset dir="${bin.eclipse}" followsymlinks="false" defaultexcludes="no"/>
+            <fileset dir="${bin.eclipse}" followsymlinks="false" defaultexcludes="no"/>
         </delete> 
         <antcall target="mkdir" />
-	</target>
-	
-	<!-- Determine revision and version -->
-	<target name="init" depends="mkdir">
-       	<echo message="Trying to determine revision" />
+    </target>
+
+
+    <!-- Determine revision and version -->
+    <target name="init" depends="mkdir">
+    <echo message="Trying to determine revision" />
         <exec 
             executable="${bzrpath}" 
             outputproperty="revision.tmp" 
@@ -90,11 +102,11 @@
         </if>
     </target>
 
-	
-	<!-- Compile sources -->
 
-	<target name="compile" depends="jhv.compile, init">
-		<javac srcdir="${src}" destdir="${bin}" target="1.5" source="1.5"  debug="on" debuglevel="source,lines,vars" includeantruntime="false">
+<!-- Compile sources -->
+
+    <target name="compile" depends="jhv.compile, init">
+        <javac srcdir="${src}" destdir="${bin}" target="1.5" source="1.5"  debug="on" debuglevel="source,lines,vars" includeantruntime="false">
 			<classpath>
 				<fileset dir="${lib}">
 					<include name="**/*.jar" />
@@ -139,21 +151,36 @@
 
     <target name="bundle-src-prepare" depends="build-init">
         <mkdir dir="${jhv.bin}/build" />
-        <javac destdir="${jhv.bin}/build/" srcdir="${jhv.build.resources}/shared/" includes="**/ManifestGenerator.java" />
+        <echo message="${java.runtime.version}" />
+        <javac destdir="${jhv.bin}/build/" debug="true" debuglevel="source,lines,vars" verbose="yes" srcdir="${jhv.build.resources}/shared/" includes="**/ManifestGenerator.java" target="1.5" source="1.7" includeantruntime="false" />
         <taskdef name="generateManifest" classname="ManifestGenerator">
             <classpath location="${jhv.bin}/build/"/>
         </taskdef>
         <mkdir dir="${temp}/build/src" />
         <delete file="${temp}/build/src/bzrstatus" />
-        <exec executable="${bzrpath}" output="${temp}/build/src/bzrstatus" resolveexecutable="true" searchpath="true">
+        <exec executable="${bzrpath}" 
+            output="${temp}/build/src/bzrstatus" 
+            resolveexecutable="true" 
+            searchpath="true" 
+            failifexecutionfails="false"
+            resultproperty="jhv.revision.retcode">
             <arg value="status"/>
             <arg value="-S"/>
             <arg value="-r"/>
             <arg value="0"/>
         </exec>
         <delete file="${temp}/build/src/bzrfiles" />
-        <generateManifest input="${temp}/build/src/bzrstatus" output="${temp}/build/src/bzrfiles" />
-        <loadfile property="files" srcFile="${temp}/build/src/bzrfiles" />
+        <if>
+        <equals arg1="${jhv.revision.retcode}" arg2="0"/>
+        <then>
+            <generateManifest input="${temp}/build/src/bzrstatus" output="${temp}/build/src/bzrfiles" />
+            <loadfile property="files" srcFile="${temp}/build/src/bzrfiles" />
+        </then>
+        <else>
+            <property name="files" value="no files found" />
+        </else>
+    </if>
+        
     </target>
     
     <target name="bundle-src-tar" depends="bundle-src-prepare">
