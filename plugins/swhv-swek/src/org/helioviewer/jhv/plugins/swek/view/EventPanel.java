@@ -48,6 +48,7 @@ public class EventPanel extends JPanel implements EventPanelModelListener, Mouse
     private void initVisisualComponents() {
         setLayout(new BorderLayout());
         this.eventTypeTree = new JTree(this.eventPanelModel);
+        this.eventTypeTree.setShowsRootHandles(true);
         this.eventTypeTree.setSelectionModel(null);
         this.eventTypeTree.addMouseListener(this);
         this.eventTypeTree.addTreeExpansionListener(this.eventPanelModel);

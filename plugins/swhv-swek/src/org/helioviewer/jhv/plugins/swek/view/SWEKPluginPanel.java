@@ -5,6 +5,7 @@ package org.helioviewer.jhv.plugins.swek.view;
 
 import java.awt.BorderLayout;
 import java.awt.Component;
+import java.awt.Dimension;
 
 import javax.swing.BoxLayout;
 import javax.swing.JPanel;
@@ -42,6 +43,8 @@ public class SWEKPluginPanel extends OverlayPanel implements SWEKTreeModelListen
         this.treeModelInstance = SWEKTreeModel.getSingletonInstance();
         this.treeModelInstance.addSWEKTreeModelListener(this);
         initVisualComponents();
+        this.revalidate();
+        this.repaint();
 
     }
 
@@ -50,6 +53,7 @@ public class SWEKPluginPanel extends OverlayPanel implements SWEKTreeModelListen
      */
     private void initVisualComponents() {
         this.setLayout(new BorderLayout());
+        this.setPreferredSize(new Dimension(150, 200));
         JPanel eventTypePanel = new JPanel();
         BoxLayout boxLayout = new BoxLayout(eventTypePanel, BoxLayout.Y_AXIS);
         eventTypePanel.setLayout(boxLayout);
