@@ -1,0 +1,163 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- WARNING: Eclipse auto-generated file.
+              Any modifications will be overwritten.
+              To include a user specific buildfile here, simply create one in the same
+              directory with the processing instruction <?eclipse.ant.import?>
+              as the first entry and export the buildfile again. --><project basedir="." default="build" name="HEKSource">
+    <property environment="env"/>
+    <property name="swhvproject.location" value="/Users/bramb/Documents/OMA/jhelioviewer/git/client/jhv-3d-wcs/" />
+    <property name="base.location" value="../../../src/base"/>
+    <property name="basegui.location" value="../../../src/basegui"/>
+    <property name="jhv-3d-math.location" value="../../../src/jhv-3d-math"/>
+    <property name="jhv-display.location" value="../../../src/jhv-display"/>
+    <property name="viewmodel.location" value="../../../src/viewmodel"/>
+    <property name="jhv-3d-wcs.location" value="../../../src/jhv-3d-wcs"/>
+    <property name="jhv-3d-scenegraph.location" value="../../../src/jhv-3d-scenegraph"/>
+    <property name="jhv-3d-plugin.location" value="../../../src/jhv-3d-plugin"/>
+    <property name="jhv-3d.location" value="../../../src/jhv-3d"/>
+    <property name="viewmodelplugin.location" value="../../../src/viewmodelplugin"/>
+    <property name="jhv.location" value="../../../src/jhv"/>
+    <property name="swhv-swek.location" value="../"/>
+    <property name="debuglevel" value="source,lines,vars"/>
+    <property name="target" value="1.6"/>
+    <property name="source" value="1.6"/>
+    <path id="JUnit 4.libraryclasspath">
+        <pathelement location="../../../../../../../../../Downloads/eclipse 2/plugins/org.junit_4.11.0.v201303080030/junit.jar"/>
+        <pathelement location="../../../../../../../../../Downloads/eclipse 2/plugins/org.hamcrest.core_1.3.0.v201303031735.jar"/>
+    </path>
+    <path id="base.classpath">
+        <pathelement location="${base.location}/bin"/>
+        <pathelement location="${base.location}/../lib/log4j-1.2.16.jar"/>
+        <path refid="JUnit 4.libraryclasspath"/>
+    </path>
+    <path id="jhv-3d-math.classpath">
+        <pathelement location="${jhv-3d-math.location}/bin"/>
+        <path refid="base.classpath"/>
+    </path>
+    <path id="jhv-display.classpath">
+        <pathelement location="${jhv-display.location}/bin"/>
+    </path>
+    <path id="viewmodel.classpath">
+        <pathelement location="${viewmodel.location}/bin"/>
+        <pathelement location="${viewmodel.location}/../lib/fits.jar"/>
+        <pathelement location="${viewmodel.location}/../lib/kdu_jni.jar"/>
+        <pathelement location="${viewmodel.location}/../lib/log4j-1.2.16.jar"/>
+        <path refid="base.classpath"/>
+        <pathelement location="${viewmodel.location}/../lib/gluegen-rt.jar"/>
+        <pathelement location="${viewmodel.location}/../lib/jogl.jar"/>
+        <pathelement location="${viewmodel.location}/../lib/json.jar"/>
+        <path refid="jhv-3d-math.classpath"/>
+        <path refid="jhv-display.classpath"/>
+        <pathelement location="${viewmodel.location}/../lib/bzip2.jar"/>
+    </path>
+    <path id="jhv-3d-wcs.classpath">
+        <pathelement location="${jhv-3d-wcs.location}/bin"/>
+        <path refid="jhv-3d-math.classpath"/>
+        <path refid="base.classpath"/>
+        <path refid="viewmodel.classpath"/>
+    </path>
+    <path id="jhv-3d-scenegraph.classpath">
+        <pathelement location="${jhv-3d-scenegraph.location}/bin"/>
+        <path refid="jhv-3d-math.classpath"/>
+        <pathelement location="${jhv-3d-scenegraph.location}/../lib/gluegen-rt.jar"/>
+        <pathelement location="${jhv-3d-scenegraph.location}/../lib/jogl.jar"/>
+        <path refid="jhv-3d-wcs.classpath"/>
+        <path refid="base.classpath"/>
+        <path refid="viewmodel.classpath"/>
+        <path refid="jhv-display.classpath"/>
+    </path>
+    <path id="jhv-3d-plugin.classpath">
+        <pathelement location="${jhv-3d-plugin.location}/bin"/>
+        <path refid="base.classpath"/>
+        <path refid="jhv-3d-math.classpath"/>
+        <path refid="jhv-3d-scenegraph.classpath"/>
+        <path refid="jhv-3d-wcs.classpath"/>
+    </path>
+    <path id="viewmodelplugin.classpath">
+        <pathelement location="${viewmodelplugin.location}/bin"/>
+        <path refid="viewmodel.classpath"/>
+        <path refid="base.classpath"/>
+        <path refid="jhv-3d-plugin.classpath"/>
+    </path>
+    <path id="basegui.classpath">
+        <pathelement location="${basegui.location}/bin"/>
+        <path refid="base.classpath"/>
+    </path>
+    <path id="jhv-3d.classpath">
+        <pathelement location="${jhv-3d.location}/bin"/>
+        <path refid="JUnit 4.libraryclasspath"/>
+        <pathelement location="${jhv-3d.location}/../lib/jogl.jar"/>
+        <pathelement location="${jhv-3d.location}/../lib/gluegen-rt.jar"/>
+        <pathelement location="${jhv-3d.location}/../lib/log4j-1.2.16.jar"/>
+        <pathelement location="${jhv-3d.location}/../resources"/>
+        <path refid="base.classpath"/>
+        <path refid="viewmodel.classpath"/>
+        <path refid="jhv-3d-math.classpath"/>
+        <path refid="jhv-3d-plugin.classpath"/>
+        <path refid="jhv-3d-scenegraph.classpath"/>
+        <path refid="jhv-3d-wcs.classpath"/>
+        <path refid="jhv-display.classpath"/>
+    </path>
+    <path id="jhv.classpath">
+        <pathelement location="${jhv.location}/bin"/>
+        <path refid="base.classpath"/>
+        <path refid="viewmodel.classpath"/>
+        <pathelement location="${jhv.location}/../lib/kdu_jni.jar"/>
+        <pathelement location="${jhv.location}/../lib/json.jar"/>
+        <pathelement location="${jhv.location}/../lib/log4j-1.2.16.jar"/>
+        <path refid="viewmodelplugin.classpath"/>
+        <path refid="basegui.classpath"/>
+        <pathelement location="${jhv.location}/../lib/gluegen-rt.jar"/>
+        <pathelement location="${jhv.location}/../lib/jogl.jar"/>
+        <path refid="jhv-3d.classpath"/>
+        <path refid="jhv-3d-scenegraph.classpath"/>
+        <path refid="jhv-3d-plugin.classpath"/>
+        <pathelement location="${jhv.location}/../resources"/>
+        <path refid="JUnit 4.libraryclasspath"/>
+        <path refid="jhv-3d-wcs.classpath"/>
+        <path refid="jhv-3d-math.classpath"/>
+        <path refid="jhv-display.classpath"/>
+    </path>
+    <path id="swhv-swek.classpath">
+        <pathelement location="${swhv-swek.location}/bin"/>
+        <path refid="viewmodelplugin.classpath"/>
+        <path refid="viewmodel.classpath"/>
+        <path refid="base.classpath"/>
+        <path refid="jhv.classpath"/>
+        <pathelement location="${swhv-swek.location}/../lib/json.jar"/>
+        <pathelement location="${swhv-swek.location}/resources"/>
+    </path>
+    <path id="HEKSource.classpath">
+        <pathelement location="bin"/>
+        <path refid="swhv-swek.classpath"/>
+    </path>
+    <target name="init">
+        <mkdir dir="bin"/>
+        <copy includeemptydirs="false" todir="bin">
+            <fileset dir="src">
+                <exclude name="**/*.launch"/>
+                <exclude name="**/*.java"/>
+            </fileset>
+        </copy>
+    </target>
+    <target name="clean">
+        <delete dir="bin"/>
+    </target>
+    <target depends="clean" name="cleanall">
+        <ant antfile="build.xml" dir="${basedir}" inheritAll="false" target="clean"/>
+        <ant antfile="build.xml" dir="${swhv-swek.location}" inheritAll="false" target="clean"/>
+    </target>
+    <target depends="build-subprojects,build-project" name="build"/>
+    <target name="build-subprojects">
+        <ant antfile="build.xml" dir="${jhvproject.location}" inheritAll="false" target="build-project"/>
+        <ant antfile="build.xml" dir="${swhv-swek.location}" inheritAll="false" target="build-project"/>
+    </target>
+    <target depends="init" name="build-project">
+        <echo message="${ant.project.name}: ${ant.file}"/>
+        <javac debug="true" debuglevel="${debuglevel}" destdir="bin" includeantruntime="false" source="${source}" target="${target}">
+            <src path="src"/>
+            <classpath refid="HEKSource.classpath"/>
+        </javac>
+    </target>
+    <target description="Build all projects which reference this project. Useful to propagate changes." name="build-refprojects"/>
+</project>
