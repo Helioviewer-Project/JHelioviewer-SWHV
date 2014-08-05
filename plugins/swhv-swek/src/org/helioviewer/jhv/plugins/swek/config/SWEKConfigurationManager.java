@@ -322,8 +322,9 @@ public class SWEKConfigurationManager {
         SWEKSource source = new SWEKSource();
         source.setSourceName(parseSourceName(jsonObject));
         source.setProviderName(parseProviderName(jsonObject));
-        source.setDownloader(parseDownloader(jsonObject));
-        source.setEventParser(parseEventParser(jsonObject));
+        source.setDownloaderClass(parseDownloader(jsonObject));
+        source.setEventParserClass(parseEventParser(jsonObject));
+        source.setJarLocation(parseJarLocation(jsonObject));
         source.setBaseURL(parseBaseURL(jsonObject));
         source.setGeneralParameters(parseGeneralParameters(jsonObject));
         return source;
@@ -364,70 +365,9 @@ public class SWEKConfigurationManager {
      * @throws JSONException
      *             if the downloader description could not be parsed
      */
-    private SWEKDownloaderDescription parseDownloader(JSONObject jsonObject) throws JSONException {
-        SWEKDownloaderDescription downloadDescription = new SWEKDownloaderDescription();
-        JSONObject downloaderObject = jsonObject.getJSONObject("downloader");
-        downloadDescription.setDownloaderClass(parseDownloadClass(downloaderObject));
-        downloadDescription.setParameters(parseDownloadParameters(downloaderObject));
-        return downloadDescription;
-    }
+    private String parseDownloader(JSONObject jsonObject) throws JSONException {
+        return jsonObject.getString("downloader");
 
-    /**
-     * Parses the downloader class from a json.
-     * 
-     * @param jsonObject
-     *            the json from which to parse the downloader class
-     * @return the parsed downloader class
-     * @throws JSONException
-     *             if the downloader class could not be parsed
-     */
-    private String parseDownloadClass(JSONObject downloaderObject) throws JSONException {
-        return downloaderObject.getString("class");
-    }
-
-    /**
-     * Parses the downloader parameters from a json.
-     * 
-     * @param jsonObject
-     *            the json from which to parse the downloader parameters
-     * @return the parsed downloader parameters
-     * @throws JSONException
-     *             if the downloader parameters could not be parsed
-     */
-    private Map<String, String> parseDownloadParameters(JSONObject downloaderObject) throws JSONException {
-        Map<String, String> downloadParameterMap = new HashMap<String, String>();
-        JSONArray downloadParameterArray = downloaderObject.getJSONArray("parameters");
-        for (int i = 0; i < downloadParameterArray.length(); i++) {
-            JSONObject parameterObject = downloadParameterArray.getJSONObject(i);
-            downloadParameterMap.put(parseDownloadParameterName(parameterObject), parseDownloadParameterValue(parameterObject));
-        }
-        return downloadParameterMap;
-    }
-
-    /**
-     * Parses the downloader parameter name from a json.
-     * 
-     * @param jsonObject
-     *            the json from which to parse the downloader parameter name
-     * @return the parsed downloader parameter name
-     * @throws JSONException
-     *             if the downloader parameter name could not be parsed
-     */
-    private String parseDownloadParameterName(JSONObject parameterObject) throws JSONException {
-        return parameterObject.getString("download_parameter_name");
-    }
-
-    /**
-     * Parses the downloader parameter value from a json.
-     * 
-     * @param jsonObject
-     *            the json from which to parse the downloader parameter value
-     * @return the parsed downloader parameter value
-     * @throws JSONException
-     *             if the downloader parameter value could not be parsed
-     */
-    private String parseDownloadParameterValue(JSONObject parameterObject) throws JSONException {
-        return parameterObject.getString("download_parameter_value");
     }
 
     /**
@@ -441,6 +381,20 @@ public class SWEKConfigurationManager {
      */
     private String parseEventParser(JSONObject jsonObject) throws JSONException {
         return jsonObject.getString("event_parser");
+    }
+
+    /**
+     * Parses the jar location from a json.
+     * 
+     * @param jsonObject
+     *            the json from which to parse the jar location
+     * @return the parsed jar location
+     * @throws JSONException
+     *             if the event parser could not be parsed
+     */
+
+    private String parseJarLocation(JSONObject jsonObject) throws JSONException {
+        return jsonObject.getString("jar_location");
     }
 
     /**
