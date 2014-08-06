@@ -126,6 +126,17 @@ public class SWEKConfigurationManager {
     }
 
     /**
+     * Gives a map with all the event sources. The source name is the key and
+     * the source is the value.
+     * 
+     * @return map containing the sources found in the configuration file
+     */
+    public Map<String, SWEKSource> getSources() {
+        loadConfiguration();
+        return this.sources;
+    }
+
+    /**
      * Loads the overall plugin settings.
      */
     private void loadPluginSettings() {
