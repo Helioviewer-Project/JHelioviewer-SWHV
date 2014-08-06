@@ -89,6 +89,10 @@ public class SWEKPlugin extends OverlayPlugin implements Plugin {
         if (!swekHomeFile.isDirectory()) {
             swekHomeFile.mkdirs();
         }
+        File swekSourceJarDirectory = new File(SWEKSettings.SWEK_SOURCES);
+        if (!swekSourceJarDirectory.isDirectory()) {
+            swekSourceJarDirectory.mkdirs();
+        }
     }
 
     /**
