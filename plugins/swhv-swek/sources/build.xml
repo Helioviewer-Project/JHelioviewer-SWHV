@@ -15,6 +15,8 @@
     <property name="heksource.lib" value="${basedir}/lib" />
     <property name="heksource.build.resources" value="${basedir}/build-resources/" />
     <property name="source.name" value="heksource"/>
+    <property name="server.lib.location" value="/Users/bramb/Documents/OMA/jhelioviewer/svn/SWHV_repos/trunk/data/server/swek_config/jars/" />
+              	
     <!-- These should be set automatically to something that makes sence... -->
     <property name="revision" value="0" />
     <property name="version" value="0"/>
@@ -37,6 +39,10 @@
                 <exclude name="**/*.java"/>
             </fileset>
         </copy>
+    </target>
+
+    <target name="omabuild" depends="build">
+        <copy todir="${server.lib.location}" file="${heksource.build}/${source.name}.jar"/>
     </target>
 
     <target name="clean">
