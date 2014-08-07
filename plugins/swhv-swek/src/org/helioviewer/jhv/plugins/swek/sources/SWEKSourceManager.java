@@ -33,7 +33,7 @@ public class SWEKSourceManager {
     private final SWEKConfigurationManager configManager;
 
     /** Are the sources loaded */
-    private final boolean sourcesLoaded;
+    private boolean sourcesLoaded;
 
     /** The swek properties */
     private final Properties swekProperties;
@@ -69,16 +69,21 @@ public class SWEKSourceManager {
      * Loads the SWEK sources. If the download source is remote, the jar are
      * downloaded to the home directory of the swekplugin and loaded from there.
      * Local plugins will be loaded from disc.
+     * 
+     * @return true if all the source were loaded, false if not.
      */
-    public void loadSources() {
+    public boolean loadSources() {
         if (!this.sourcesLoaded) {
             // Check the sweksettings file for the downloaders
             if (checkAndDownloadJars()) {
-                prepareDownloadersClassLoader();
+                if (prepareDownloadersClassLoader()) {
+                    this.sourcesLoaded = true;
+                }
             } else {
-
+                this.sourcesLoaded = false;
             }
         }
+        return this.sourcesLoaded;
     }
 
     /**
@@ -175,15 +180,39 @@ public class SWEKSourceManager {
     private boolean prepareDownloadersClassLoader() {
         URL[] urls = this.jarURLList.toArray(new URL[0]);
         this.urlClassLoader = URLClassLoader.newInstance(urls, Thread.currentThread().getContextClassLoader());
-        return false;
+        return true;
     }
 
     /**
-     * Gives the downloader object for the given swek source.
+     * Gives the downloader object for the given swek source. This function
+     * expects the loadSources is already called. A new call of loadSources is
+     * not done in order to avoid an infinite amount of calls to the loadSource
+     * function.
      * 
      * @param swekSource
+     *            The swek source for which the downloader was requested
+     * @return The downloader or null if the sources were not loaded correctly.
      */
-    public void getDownloader(SWEKSource swekSource) {
-
+    public SWEKDownloader getDownloader(SWEKSource swekSource) {
+        if (this.sourcesLoaded) {
+            try {
+                Object downloaderObject = this.urlClassLoader.loadClass(swekSource.getDownloaderClass()).newInstance();
+                if (downloaderObject instanceof SWEKDownloader) {
+                    return (SWEKDownloader) downloaderObject;
+                }
+            } catch (ClassNotFoundException e) {
+                Log.error("The class with name:" + swekSource.getDownloaderClass() + " could not be loaded. Resulting error: " + e
+                        + ". null returned");
+            } catch (InstantiationException e) {
+                Log.error("The class with name:" + swekSource.getDownloaderClass() + " could not be instantiated. Resulting error: " + e
+                        + ". null returned");
+            } catch (IllegalAccessException e) {
+                Log.error("The class with name:" + swekSource.getDownloaderClass() + " could not be accessed. Resulting error: " + e
+                        + ". null returned");
+            }
+        } else {
+            Log.error("The sources are not loaded. Check previous errors and fix the problem first. Null returned.");
+        }
+        return null;
     }
 }
