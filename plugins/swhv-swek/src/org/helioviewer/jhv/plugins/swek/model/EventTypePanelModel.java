@@ -84,9 +84,9 @@ public class EventTypePanelModel implements TreeModel, TreeExpansionListener {
                 supplier.setCheckboxSelected(this.eventType.isCheckboxSelected());
             }
             if (this.eventType.isCheckboxSelected()) {
-                this.downloadManager.downloadEventType(this.eventType.getSwekEventType());
+                this.downloadManager.startDownloadEventType(this.eventType.getSwekEventType());
             } else {
-                // TODO end the downloading.
+                this.downloadManager.stopDownloadingEventType(this.eventType.getSwekEventType());
             }
         } else if (row > 0 && row <= this.eventType.getSwekTreeSuppliers().size()) {
             SWEKTreeModelSupplier supplier = this.eventType.getSwekTreeSuppliers().get(row - 1);
@@ -95,9 +95,9 @@ public class EventTypePanelModel implements TreeModel, TreeExpansionListener {
                 this.eventType.setCheckboxSelected(true);
             }
             if (supplier.isCheckboxSelected()) {
-                this.downloadManager.downloadEventType(this.eventType.getSwekEventType(), supplier.getSwekSupplier().getSource());
+                this.downloadManager.startDownloadEventType(this.eventType.getSwekEventType(), supplier.getSwekSupplier().getSource());
             } else {
-                // TODO end the downloading.
+                this.downloadManager.stopDownloadingEventType(this.eventType.getSwekEventType(), supplier.getSwekSupplier().getSource());
             }
         }
     }
