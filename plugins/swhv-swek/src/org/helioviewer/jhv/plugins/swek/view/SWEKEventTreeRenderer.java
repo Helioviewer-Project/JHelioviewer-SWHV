@@ -1,5 +1,6 @@
 package org.helioviewer.jhv.plugins.swek.view;
 
+import java.awt.BorderLayout;
 import java.awt.Component;
 
 import javax.swing.JCheckBox;
@@ -43,8 +44,9 @@ public class SWEKEventTreeRenderer extends DefaultTreeCellRenderer {
         JCheckBox checkBox = new JCheckBox();
         checkBox.setSelected(((AbstractSWEKTreeModelElement) whatToDisplay).isCheckboxSelected());
         JPanel panel = new JPanel();
-        panel.add(checkBox);
-        panel.add(new JLabel(name));
+        panel.setLayout(new BorderLayout());
+        panel.add(checkBox, BorderLayout.LINE_START);
+        panel.add(new JLabel(name), BorderLayout.CENTER);
         // panel.setBackground(Color.WHITE);
         panel.setOpaque(false);
         return panel;
