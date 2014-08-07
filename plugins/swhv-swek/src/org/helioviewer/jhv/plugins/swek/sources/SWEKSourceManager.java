@@ -12,7 +12,6 @@ import java.nio.channels.Channels;
 import java.nio.channels.ReadableByteChannel;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Properties;
 
 import org.helioviewer.base.logging.Log;
 import org.helioviewer.jhv.plugins.swek.config.SWEKConfigurationManager;
@@ -35,9 +34,6 @@ public class SWEKSourceManager {
     /** Are the sources loaded */
     private boolean sourcesLoaded;
 
-    /** The swek properties */
-    private final Properties swekProperties;
-
     private final List<URL> jarURLList;
 
     /** The URL classloader */
@@ -48,7 +44,6 @@ public class SWEKSourceManager {
      */
     private SWEKSourceManager() {
         this.sourcesLoaded = false;
-        this.swekProperties = new Properties();
         this.configManager = SWEKConfigurationManager.getSingletonInstance();
         this.jarURLList = new ArrayList<URL>();
     }
@@ -148,6 +143,7 @@ public class SWEKSourceManager {
             File dest = new File(SWEKSettings.SWEK_SOURCES + filename);
             FileOutputStream fos = new FileOutputStream(dest);
             fos.getChannel().transferFrom(rbc, 0, Long.MAX_VALUE);
+            fos.close();
             this.jarURLList.add(dest.toURI().toURL());
             return true;
         } catch (MalformedURLException e) {
