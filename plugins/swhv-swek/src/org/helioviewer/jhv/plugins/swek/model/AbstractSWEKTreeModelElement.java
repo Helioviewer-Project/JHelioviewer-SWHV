@@ -11,6 +11,13 @@ public abstract class AbstractSWEKTreeModelElement {
     private boolean checkboxSelected;
 
     /**
+     * Default constructor
+     */
+    public AbstractSWEKTreeModelElement() {
+        this.checkboxSelected = false;
+    }
+
+    /**
      * Creates a Abstract SWEK Tree element.
      * 
      * @param isCheckBoxSelected
