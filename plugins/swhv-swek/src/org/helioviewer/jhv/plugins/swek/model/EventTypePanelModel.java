@@ -9,6 +9,8 @@ import javax.swing.event.TreeModelListener;
 import javax.swing.tree.TreeModel;
 import javax.swing.tree.TreePath;
 
+import org.helioviewer.jhv.plugins.swek.download.SWEKDownloadManager;
+
 /**
  * The model of the event type panel. This model is a TreeModel and is used by
  * the tree on the event type panel.
@@ -30,6 +32,9 @@ public class EventTypePanelModel implements TreeModel, TreeExpansionListener {
     /** Local instance of the tree model */
     private final SWEKTreeModel treeModelInstance;
 
+    /** Instance of the download manager */
+    private final SWEKDownloadManager downloadManager;
+
     /**
      * Creates a SWEKTreeModel for the given SWEK event type.
      * 
@@ -41,6 +46,7 @@ public class EventTypePanelModel implements TreeModel, TreeExpansionListener {
         this.listeners = new ArrayList<TreeModelListener>();
         this.treeModelInstance = SWEKTreeModel.getSingletonInstance();
         this.panelModelListeners = new ArrayList<EventPanelModelListener>();
+        this.downloadManager = SWEKDownloadManager.getSingletonInstance();
     }
 
     /**
@@ -77,11 +83,21 @@ public class EventTypePanelModel implements TreeModel, TreeExpansionListener {
             for (SWEKTreeModelSupplier supplier : this.eventType.getSwekTreeSuppliers()) {
                 supplier.setCheckboxSelected(this.eventType.isCheckboxSelected());
             }
+            if (this.eventType.isCheckboxSelected()) {
+                this.downloadManager.downloadEventType(this.eventType.getSwekEventType());
+            } else {
+                // TODO end the downloading.
+            }
         } else if (row > 0 && row <= this.eventType.getSwekTreeSuppliers().size()) {
             SWEKTreeModelSupplier supplier = this.eventType.getSwekTreeSuppliers().get(row - 1);
             supplier.setCheckboxSelected(!supplier.isCheckboxSelected());
             if (supplier.isCheckboxSelected()) {
                 this.eventType.setCheckboxSelected(true);
+            }
+            if (supplier.isCheckboxSelected()) {
+                this.downloadManager.downloadEventType(this.eventType.getSwekEventType(), supplier.getSwekSupplier().getSource());
+            } else {
+                // TODO end the downloading.
             }
         }
     }
