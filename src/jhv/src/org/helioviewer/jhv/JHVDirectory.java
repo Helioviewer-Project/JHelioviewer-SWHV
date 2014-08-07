@@ -180,6 +180,21 @@ public enum JHVDirectory {
         public File getFile() {
             return new File(getPath());
         }
+    },
+    /**
+     * Resources needed by plugins to operate. These can be jars and could not
+     * be added in the Plugins directory where they are considered as Plugins.
+     */
+    PLUGIN_RESOURCES {
+        @Override
+        public String getPath() {
+            return HOME.getPath() + "PluginResources" + File.separator;
+        }
+
+        @Override
+        public File getFile() {
+            return new File(getPath());
+        }
     };
 
     /** A String representation of the path of the directory. */
