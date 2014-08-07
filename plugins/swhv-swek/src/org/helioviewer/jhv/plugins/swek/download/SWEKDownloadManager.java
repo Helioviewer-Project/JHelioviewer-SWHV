@@ -33,29 +33,50 @@ public class SWEKDownloadManager {
     }
 
     /**
-     * Downloads for every source the requested event type. This will start a
-     * thread to download the events.
+     * Starts downloading for every source the requested event type. This will
+     * start a thread to download the events.
      * 
      * @param eventType
      *            The event type to download
      */
-    public void downloadEventType(SWEKEventType eventType) {
+    public void startDownloadEventType(SWEKEventType eventType) {
         for (SWEKSupplier s : eventType.getSuppliers()) {
-            downloadEventType(eventType, s.getSource());
+            startDownloadEventType(eventType, s.getSource());
         }
     }
 
     /**
-     * Downloads for one particular source the given event type.
+     * Starts downloading for one particular source the given event type.
      * 
      * @param eventType
      *            The event type to download
      * @param source
      *            The source from which to download the event type
      */
-    public void downloadEventType(SWEKEventType eventType, SWEKSource source) {
+    public void startDownloadEventType(SWEKEventType eventType, SWEKSource source) {
         SWEKDownloader downloader = this.sourceManager.getDownloader(source);
         System.out.println("downloader : " + downloader);
     }
 
+    /**
+     * Stops downloading the event type for every source of the event type.
+     * 
+     * @param eventType
+     *            the event type for which to stop downloads
+     */
+    public void stopDownloadingEventType(SWEKEventType eventType) {
+
+    }
+
+    /**
+     * Stops downloading the event type for the given source.
+     * 
+     * @param eventType
+     *            the event type for which to stop the downloads
+     * @param source
+     *            the source for which to stop the downloads
+     */
+    public void stopDownloadingEventType(SWEKEventType eventType, SWEKSource source) {
+
+    }
 }
