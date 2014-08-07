@@ -7,7 +7,6 @@ import java.awt.event.MouseListener;
 import javax.swing.JPanel;
 import javax.swing.JTree;
 
-import org.helioviewer.base.logging.Log;
 import org.helioviewer.jhv.plugins.swek.config.SWEKEventType;
 import org.helioviewer.jhv.plugins.swek.model.EventPanelModelListener;
 import org.helioviewer.jhv.plugins.swek.model.EventTypePanelModel;
@@ -60,7 +59,6 @@ public class EventPanel extends JPanel implements EventPanelModelListener, Mouse
     public void mouseClicked(MouseEvent e) {
         int clickedOnRow = this.eventTypeTree.getRowForLocation(e.getX(), e.getY());
         this.eventPanelModel.rowClicked(clickedOnRow);
-        Log.debug("Clicked on " + clickedOnRow);
         this.eventTypeTree.revalidate();
         this.eventTypeTree.repaint();
     }
