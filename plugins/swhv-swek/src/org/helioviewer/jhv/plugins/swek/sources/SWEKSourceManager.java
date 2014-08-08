@@ -82,6 +82,69 @@ public class SWEKSourceManager {
     }
 
     /**
+     * Gives the downloader object for the given swek source. This function
+     * expects the loadSources is already called. A new call of loadSources is
+     * not done in order to avoid an infinite amount of calls to the loadSource
+     * function.
+     * 
+     * @param swekSource
+     *            the swek source for which the downloader was requested
+     * @return the downloader or null if the sources were not loaded correctly
+     *         or an error occurred.
+     */
+    public SWEKDownloader getDownloader(SWEKSource swekSource) {
+        return loadClass(swekSource.getDownloaderClass(), SWEKDownloader.class);
+    }
+
+    /**
+     * Gives the parser object for the given swek source. This function expects
+     * the loadSources is already called. A new call of loadSources is not done
+     * in order to avoid an inifinite amount of calls to the loadSource
+     * function.
+     * 
+     * @param swekSource
+     *            the swek source for which the parser was requested
+     * @return the parser or null if the sources were not loaded correctly or an
+     *         error occurred.
+     */
+    public SWEKParser getParser(SWEKSource swekSource) {
+        return loadClass(swekSource.getEventParserClass(), SWEKParser.class);
+    }
+
+    /**
+     * Generic method that loads a class with the given name of the given
+     * classType.
+     * 
+     * @param className
+     *            The name of the class to load
+     * @param classType
+     *            The type of the class to load
+     * @return The class requested or null if an error occurred
+     */
+    private <T> T loadClass(String className, Class<T> classType) {
+        if (this.sourcesLoaded) {
+            try {
+                Object object = this.urlClassLoader.loadClass(className).newInstance();
+                if (classType.isInstance(object)) {
+                    return classType.cast(object);
+                } else {
+                    Log.error("The class with name:" + className + " does not return a class of type " + classType.getName()
+                            + ". null returned");
+                }
+            } catch (ClassNotFoundException e) {
+                Log.error("The class with name:" + className + " could not be loaded. Resulting error: " + e + ". null returned");
+            } catch (InstantiationException e) {
+                Log.error("The class with name:" + className + " could not be instantiated. Resulting error: " + e + ". null returned");
+            } catch (IllegalAccessException e) {
+                Log.error("The class with name:" + className + " could not be accessed. Resulting error: " + e + ". null returned");
+            }
+        } else {
+            Log.error("The sources are not loaded. Check previous errors and fix the problem first. Null returned.");
+        }
+        return null;
+    }
+
+    /**
      * Checks the swek configuration file for defined sources. It downloads the
      * jars to the home directory of the swek plugin if the location of the jar
      * is external. It builds up a list of URIs with the location of the jars.
@@ -179,36 +242,4 @@ public class SWEKSourceManager {
         return true;
     }
 
-    /**
-     * Gives the downloader object for the given swek source. This function
-     * expects the loadSources is already called. A new call of loadSources is
-     * not done in order to avoid an infinite amount of calls to the loadSource
-     * function.
-     * 
-     * @param swekSource
-     *            The swek source for which the downloader was requested
-     * @return The downloader or null if the sources were not loaded correctly.
-     */
-    public SWEKDownloader getDownloader(SWEKSource swekSource) {
-        if (this.sourcesLoaded) {
-            try {
-                Object downloaderObject = this.urlClassLoader.loadClass(swekSource.getDownloaderClass()).newInstance();
-                if (downloaderObject instanceof SWEKDownloader) {
-                    return (SWEKDownloader) downloaderObject;
-                }
-            } catch (ClassNotFoundException e) {
-                Log.error("The class with name:" + swekSource.getDownloaderClass() + " could not be loaded. Resulting error: " + e
-                        + ". null returned");
-            } catch (InstantiationException e) {
-                Log.error("The class with name:" + swekSource.getDownloaderClass() + " could not be instantiated. Resulting error: " + e
-                        + ". null returned");
-            } catch (IllegalAccessException e) {
-                Log.error("The class with name:" + swekSource.getDownloaderClass() + " could not be accessed. Resulting error: " + e
-                        + ". null returned");
-            }
-        } else {
-            Log.error("The sources are not loaded. Check previous errors and fix the problem first. Null returned.");
-        }
-        return null;
-    }
 }
