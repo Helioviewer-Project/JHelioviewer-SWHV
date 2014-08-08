@@ -23,7 +23,7 @@ import java.util.Properties;
 
 import org.helioviewer.base.logging.Log;
 import org.helioviewer.jhv.Settings;
-import org.helioviewer.jhv.plugins.swek.SWEKPlugin;
+import org.helioviewer.jhv.plugins.swek.settings.SWEKProperties;
 import org.helioviewer.jhv.plugins.swek.settings.SWEKSettings;
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -44,9 +44,6 @@ public class SWEKConfigurationManager {
     /** Config file URL */
     private URL configFileURL;
 
-    /** The swek properties */
-    private final Properties swekProperties;
-
     /** The loaded configuration */
     private SWEKConfiguration configuration;
 
@@ -59,15 +56,18 @@ public class SWEKConfigurationManager {
     /** Map containing the event types */
     private final Map<String, SWEKEventType> eventTypes;
 
+    /***/
+    private final Properties swekProperties;
+
     /**
      * private constructor
      */
     private SWEKConfigurationManager() {
         this.configLoaded = false;
-        this.swekProperties = new Properties();
         this.sources = new HashMap<String, SWEKSource>();
         this.parameters = new HashMap<String, SWEKParameter>();
         this.eventTypes = new HashMap<String, SWEKEventType>();
+        this.swekProperties = SWEKProperties.getSingletonInstance().getSWEKProperties();
     }
 
     /**
@@ -92,8 +92,6 @@ public class SWEKConfigurationManager {
      */
     public void loadConfiguration() {
         if (!this.configLoaded) {
-            Log.debug("Load the swek internal settings");
-            this.loadPluginSettings();
             Log.debug("search and open the configuration file");
             boolean isConfigParsed;
             if (checkAndOpenUserSetFile()) {
@@ -134,18 +132,6 @@ public class SWEKConfigurationManager {
     public Map<String, SWEKSource> getSources() {
         loadConfiguration();
         return this.sources;
-    }
-
-    /**
-     * Loads the overall plugin settings.
-     */
-    private void loadPluginSettings() {
-        InputStream defaultPropStream = SWEKPlugin.class.getResourceAsStream("/SWEK.properties");
-        try {
-            this.swekProperties.load(defaultPropStream);
-        } catch (IOException ex) {
-            Log.error("Could not load the swek settings : ", ex);
-        }
     }
 
     /**
