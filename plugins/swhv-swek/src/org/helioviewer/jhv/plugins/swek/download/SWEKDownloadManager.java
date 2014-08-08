@@ -1,8 +1,13 @@
 package org.helioviewer.jhv.plugins.swek.download;
 
+import java.util.Properties;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+
 import org.helioviewer.jhv.plugins.swek.config.SWEKEventType;
 import org.helioviewer.jhv.plugins.swek.config.SWEKSource;
 import org.helioviewer.jhv.plugins.swek.config.SWEKSupplier;
+import org.helioviewer.jhv.plugins.swek.settings.SWEKProperties;
 import org.helioviewer.jhv.plugins.swek.sources.SWEKDownloader;
 import org.helioviewer.jhv.plugins.swek.sources.SWEKSourceManager;
 
@@ -13,11 +18,20 @@ public class SWEKDownloadManager {
     /** Singleton instance of the SWE */
     private static SWEKDownloadManager instance;
 
+    /** Threadpool for downloading events */
+    private final ExecutorService downloadEventPool;
+
+    /** The properties specific to the swek plugin */
+    private final Properties swekProperties;
+
     /**
      * private constructor of the SWEKDownloadManager
      */
     private SWEKDownloadManager() {
         this.sourceManager = SWEKSourceManager.getSingletonInstance();
+        this.swekProperties = SWEKProperties.getSingletonInstance().getSWEKProperties();
+        this.downloadEventPool = Executors.newFixedThreadPool(Integer.parseInt(this.swekProperties
+                .getProperty("plugin.swek.numberofthreads")));
     }
 
     /**
