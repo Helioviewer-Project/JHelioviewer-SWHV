@@ -1,0 +1,32 @@
+/**
+ * 
+ */
+package org.helioviewer.jhv.data.container;
+
+import java.util.Date;
+
+/**
+ * A handler of JHV event requests should implement this interface and register
+ * with the JHVEventContainer.
+ * 
+ * @author Bram Bourgoignie (Bram.Bourgoignie@oma.be)
+ */
+public interface JHVEventContainerRequestHandler {
+    /**
+     * Handle new request for a date.
+     * 
+     * @param date
+     *            the date to handle the request for
+     */
+    public abstract void handleRequestForDate(Date date);
+
+    /**
+     * Handle request for an interval.
+     * 
+     * @param startDate
+     *            the start date of the interval
+     * @param endDate
+     *            the end date of the interval
+     */
+    public abstract void handleRequestForInterval(Date startDate, Date endDate);
+}
