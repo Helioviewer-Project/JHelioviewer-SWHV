@@ -8,7 +8,6 @@ import javax.swing.JPanel;
 import javax.swing.JTree;
 
 import org.helioviewer.jhv.plugins.swek.config.SWEKEventType;
-import org.helioviewer.jhv.plugins.swek.model.EventPanelModelListener;
 import org.helioviewer.jhv.plugins.swek.model.EventTypePanelModel;
 import org.helioviewer.jhv.plugins.swek.model.SWEKTreeModelEventType;
 
@@ -18,7 +17,7 @@ import org.helioviewer.jhv.plugins.swek.model.SWEKTreeModelEventType;
  * @author Bram Bourgoignie (Bram.Bourgoignie@oma.be)
  * 
  */
-public class EventPanel extends JPanel implements EventPanelModelListener, MouseListener {
+public class EventPanel extends JPanel implements MouseListener {
     /** seriolVersionUID */
     private static final long serialVersionUID = 1057300852220893978L;
 
@@ -37,7 +36,6 @@ public class EventPanel extends JPanel implements EventPanelModelListener, Mouse
     public EventPanel(SWEKEventType eventType) {
         this.eventType = eventType;
         this.eventPanelModel = new EventTypePanelModel(new SWEKTreeModelEventType(this.eventType));
-        this.eventPanelModel.addEventPanelModelListener(this);
         initVisisualComponents();
     }
 
