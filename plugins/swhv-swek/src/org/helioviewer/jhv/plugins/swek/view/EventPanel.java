@@ -8,6 +8,7 @@ import javax.swing.JPanel;
 import javax.swing.JTree;
 
 import org.helioviewer.jhv.plugins.swek.config.SWEKEventType;
+import org.helioviewer.jhv.plugins.swek.download.SWEKDownloadManager;
 import org.helioviewer.jhv.plugins.swek.model.EventTypePanelModel;
 import org.helioviewer.jhv.plugins.swek.model.SWEKTreeModelEventType;
 
@@ -30,12 +31,17 @@ public class EventPanel extends JPanel implements MouseListener {
     /** The model for this panel */
     private final EventTypePanelModel eventPanelModel;
 
+    /** Instance of the download manager */
+    private final SWEKDownloadManager downloadManager;
+
     /**
      * Creates a event panel for a certain
      */
     public EventPanel(SWEKEventType eventType) {
+        this.downloadManager = SWEKDownloadManager.getSingletonInstance();
         this.eventType = eventType;
         this.eventPanelModel = new EventTypePanelModel(new SWEKTreeModelEventType(this.eventType));
+        this.eventPanelModel.addEventPanelModelListener(this.downloadManager);
         initVisisualComponents();
     }
 
