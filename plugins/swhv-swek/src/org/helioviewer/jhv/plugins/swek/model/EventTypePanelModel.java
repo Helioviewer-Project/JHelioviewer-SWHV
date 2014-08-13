@@ -9,7 +9,9 @@ import javax.swing.event.TreeModelListener;
 import javax.swing.tree.TreeModel;
 import javax.swing.tree.TreePath;
 
-import org.helioviewer.jhv.plugins.swek.download.SWEKDownloadManager;
+import org.helioviewer.jhv.plugins.swek.config.SWEKEventType;
+import org.helioviewer.jhv.plugins.swek.config.SWEKSource;
+import org.helioviewer.jhv.plugins.swek.config.SWEKSupplier;
 
 /**
  * The model of the event type panel. This model is a TreeModel and is used by
@@ -27,13 +29,10 @@ public class EventTypePanelModel implements TreeModel, TreeExpansionListener {
     private final List<TreeModelListener> listeners;
 
     /** Holds the EventPanelModelListeners */
-    private final List<EventPanelModelListener> panelModelListeners;
+    private final List<EventTypePanelModelListener> panelModelListeners;
 
     /** Local instance of the tree model */
     private final SWEKTreeModel treeModelInstance;
-
-    /** Instance of the download manager */
-    private final SWEKDownloadManager downloadManager;
 
     /**
      * Creates a SWEKTreeModel for the given SWEK event type.
@@ -45,8 +44,7 @@ public class EventTypePanelModel implements TreeModel, TreeExpansionListener {
         this.eventType = eventType;
         this.listeners = new ArrayList<TreeModelListener>();
         this.treeModelInstance = SWEKTreeModel.getSingletonInstance();
-        this.panelModelListeners = new ArrayList<EventPanelModelListener>();
-        this.downloadManager = SWEKDownloadManager.getSingletonInstance();
+        this.panelModelListeners = new ArrayList<EventTypePanelModelListener>();
     }
 
     /**
@@ -55,7 +53,7 @@ public class EventTypePanelModel implements TreeModel, TreeExpansionListener {
      * @param listener
      *            the listener to add
      */
-    public void addEventPanelModelListener(EventPanelModelListener listener) {
+    public void addEventPanelModelListener(EventTypePanelModelListener listener) {
         this.panelModelListeners.add(listener);
     }
 
@@ -65,7 +63,7 @@ public class EventTypePanelModel implements TreeModel, TreeExpansionListener {
      * @param listener
      *            the listener to remove
      */
-    public void removeEventPanelModelListener(EventPanelModelListener listener) {
+    public void removeEventPanelModelListener(EventTypePanelModelListener listener) {
         this.panelModelListeners.remove(listener);
     }
 
@@ -84,9 +82,9 @@ public class EventTypePanelModel implements TreeModel, TreeExpansionListener {
                 supplier.setCheckboxSelected(this.eventType.isCheckboxSelected());
             }
             if (this.eventType.isCheckboxSelected()) {
-                this.downloadManager.startDownloadEventType(this.eventType.getSwekEventType());
+                fireNewEventTypeActive(this.eventType.getSwekEventType());
             } else {
-                this.downloadManager.stopDownloadingEventType(this.eventType.getSwekEventType());
+                fireNewEventTypeInActive(this.eventType.getSwekEventType());
             }
         } else if (row > 0 && row <= this.eventType.getSwekTreeSuppliers().size()) {
             SWEKTreeModelSupplier supplier = this.eventType.getSwekTreeSuppliers().get(row - 1);
@@ -95,9 +93,9 @@ public class EventTypePanelModel implements TreeModel, TreeExpansionListener {
                 this.eventType.setCheckboxSelected(true);
             }
             if (supplier.isCheckboxSelected()) {
-                this.downloadManager.startDownloadEventType(this.eventType.getSwekEventType(), supplier.getSwekSupplier().getSource());
+                fireNewEventTypeAndSourceActive(this.eventType.getSwekEventType(), supplier.getSwekSupplier().getSource());
             } else {
-                this.downloadManager.stopDownloadingEventType(this.eventType.getSwekEventType(), supplier.getSwekSupplier().getSource());
+                fireNewEventTypeAndSourceInActive(this.eventType.getSwekEventType(), supplier.getSwekSupplier().getSource());
             }
         }
     }
@@ -233,5 +231,58 @@ public class EventTypePanelModel implements TreeModel, TreeExpansionListener {
     @Override
     public void treeExpanded(TreeExpansionEvent event) {
         this.treeModelInstance.subTreeExpanded();
+    }
+
+    /**
+     * Informs the listeners about an event type and source that became active.
+     * 
+     * @param eventType
+     *            the event type that became active
+     * @param swekSource
+     *            the source that became active
+     */
+    private void fireNewEventTypeAndSourceActive(SWEKEventType eventType, SWEKSource swekSource) {
+        for (EventTypePanelModelListener l : this.panelModelListeners) {
+            l.newEventTypeAndSourceActive(eventType, swekSource);
+        }
+    }
+
+    /**
+     * Informs the listeners about an event type and source that became
+     * inactive.
+     * 
+     * @param eventType
+     *            the event type that became inactive
+     * @param swekSource
+     *            the source that became inactive
+     */
+    private void fireNewEventTypeAndSourceInActive(SWEKEventType eventType, SWEKSource swekSource) {
+        for (EventTypePanelModelListener l : this.panelModelListeners) {
+            l.newEventTypeAndSourceInActive(eventType, swekSource);
+        }
+    }
+
+    /**
+     * Informs the listeners about an event type that became active.
+     * 
+     * @param swekEventType
+     *            the event type that became active
+     */
+    private void fireNewEventTypeActive(SWEKEventType swekEventType) {
+        for (SWEKSupplier supplier : swekEventType.getSuppliers()) {
+            fireNewEventTypeAndSourceActive(swekEventType, supplier.getSource());
+        }
+    }
+
+    /**
+     * Informs the listeners about an event type that became inactive.
+     * 
+     * @param swekEventType
+     *            the event type that became inactive
+     */
+    private void fireNewEventTypeInActive(SWEKEventType swekEventType) {
+        for (SWEKSupplier supplier : swekEventType.getSuppliers()) {
+            fireNewEventTypeAndSourceInActive(swekEventType, supplier.getSource());
+        }
     }
 }
