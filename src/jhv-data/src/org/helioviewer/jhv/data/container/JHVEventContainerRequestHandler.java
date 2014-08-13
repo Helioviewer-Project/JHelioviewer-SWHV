@@ -4,6 +4,7 @@
 package org.helioviewer.jhv.data.container;
 
 import java.util.Date;
+import java.util.List;
 
 /**
  * A handler of JHV event requests should implement this interface and register
@@ -29,4 +30,12 @@ public interface JHVEventContainerRequestHandler {
      *            the end date of the interval
      */
     public abstract void handleRequestForInterval(Date startDate, Date endDate);
+
+    /**
+     * Handle request for a list of dates
+     * 
+     * @param dates
+     *            the list of dates
+     */
+    public abstract void handleRequestForDateList(List<Date> dates);
 }
