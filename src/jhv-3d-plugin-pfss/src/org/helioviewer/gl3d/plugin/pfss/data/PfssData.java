@@ -1,6 +1,5 @@
 package org.helioviewer.gl3d.plugin.pfss.data;
 
-import java.nio.ByteBuffer;
 import java.nio.FloatBuffer;
 
 import javax.media.opengl.GL;
@@ -40,7 +39,7 @@ public class PfssData {
 
     private void createBuffer(int len) {
         int numberOfLines = len / PfssSettings.POINTS_PER_LINE;
-        //vertices = BufferUtil.newFloatBuffer(len * (3 + 4) + 2 * numberOfLines * (3 + 4));
+        vertices = BufferUtil.newFloatBuffer(len * (3 + 4) + 2 * numberOfLines * (3 + 4));
     }
 
     private int addColor(float x, float y, float z, float opacity, int counter) {
@@ -106,28 +105,19 @@ public class PfssData {
 
     public void init(GL gl) {
         if (gzipFitsFile != null) {
-            if (!init && !read && gl != null) {
+            if (!read)
+                readFitsFile();
+            if (!init && read && gl != null) {
                 buffer = new int[1];
                 gl.glGenBuffers(1, buffer, 0);
 
                 VBOVertices = buffer[0];
                 gl.glBindBuffer(GL.GL_ARRAY_BUFFER, VBOVertices);
-                int nofloats = 0;
-                if (gzipFitsFile != null) {
-                    int len = this.gzipFitsFile.length / 8;
-                    int numberOfLines = len / PfssSettings.POINTS_PER_LINE;
-                    nofloats = len * (3 + 4) + 2 * numberOfLines * (3 + 4);
-                }
-                gl.glBufferData(GL.GL_ARRAY_BUFFER, nofloats * BufferUtil.SIZEOF_FLOAT, null, GL.GL_STREAM_DRAW);
-                ByteBuffer vertexBuffer = gl.glMapBuffer(GL.GL_ARRAY_BUFFER, GL.GL_WRITE_ONLY);
-                vertices = vertexBuffer.asFloatBuffer();
-                gl.glUnmapBuffer(GL.GL_ARRAY_BUFFER);
+                gl.glBufferData(GL.GL_ARRAY_BUFFER, vertices.limit() * BufferUtil.SIZEOF_FLOAT, vertices, GL.GL_STATIC_DRAW);
                 gl.glBindBuffer(GL.GL_ARRAY_BUFFER, 0);
 
                 init = true;
             }
-            if (init && !read)
-                readFitsFile();
         }
     }
 
@@ -159,7 +149,6 @@ public class PfssData {
         gl.glVertexPointer(3, GL.GL_FLOAT, 7 * 4, 0);
 
         gl.glLineWidth(PfssSettings.LINE_WIDTH);
-
         gl.glDrawArrays(GL.GL_LINE_STRIP, 0, vertices.limit() / 7);
 
         gl.glDisableClientState(GL.GL_VERTEX_ARRAY);
