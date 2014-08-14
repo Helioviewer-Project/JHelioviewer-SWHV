@@ -22,6 +22,7 @@ import javax.swing.JOptionPane;
 import org.helioviewer.base.logging.Log;
 import org.helioviewer.gl3d.plugin.pfss.data.PfssCache;
 import org.helioviewer.gl3d.plugin.pfss.settings.PfssSettings;
+import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.layers.LayersListener;
 import org.helioviewer.jhv.layers.LayersModel;
 import org.helioviewer.jhv.plugins.pfssplugin.PfssPlugin;
@@ -118,6 +119,7 @@ public class PfssPluginPanel extends OverlayPanel implements ActionListener, Lay
                 pfssCache.setVisible(true);
                 visibleButton.setIcon(new ImageIcon(PfssPlugin.getResourceUrl("/images/visible_dm.png")));
             }
+            Displayer.getSingletonInstance().display();
         }
 
         if (act.getSource().equals(reloadButton)) {
