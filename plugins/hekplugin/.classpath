@@ -1,9 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
 	<classpathentry kind="src" path="src"/>
-	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/J2SE-1.5"/>
-	<classpathentry kind="src" path="/base"/>
-	<classpathentry kind="lib" path="../lib/json.jar"/>
+	<classpathentry excluding="src/|resources/|resources/|downloaders/bin/org/helioviewer/jhv/plugins/swek/downloader/|downloaders/src/org/helioviewer/jhv/plugins/swek/downloader/" kind="src" path=""/>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.6"/>
 	<classpathentry kind="src" path="/viewmodelplugin"/>
 	<classpathentry kind="src" path="/viewmodel"/>
 	<classpathentry kind="src" path="/jhv"/>
