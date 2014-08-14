@@ -147,12 +147,12 @@ public class PfssPluginPanel extends OverlayPanel implements ActionListener, Lay
         if (start != null && end != null) {
             int startYear = startCal.get(Calendar.YEAR);
             int startMonth = startCal.get(Calendar.MONTH);
-            startYear = 1996;
-            startMonth = 6;
+            startYear = 2014;
+            startMonth = 7;
             int endYear = endCal.get(Calendar.YEAR);
             int endMonth = endCal.get(Calendar.MONTH);
-            endYear = 1996;
-            endMonth = 6;
+            endYear = 2014;
+            endMonth = 7;
             boolean run = true;
 
             while (run) {
@@ -160,7 +160,7 @@ public class PfssPluginPanel extends OverlayPanel implements ActionListener, Lay
                 URL data;
                 try {
                     String m = (startMonth) < 9 ? "0" + (startMonth + 1) : (startMonth + 1) + "";
-                    data = new URL("http://soleil.i4ds.ch/sol-win/" + startYear + "/" + m + "/list.txt");
+                    data = new URL("http://127.0.0.1/pfss/" + startYear + "/" + m + "/list.txt");
                     BufferedReader in = new BufferedReader(new InputStreamReader(data.openStream()));
 
                     String inputLine;
@@ -169,6 +169,7 @@ public class PfssPluginPanel extends OverlayPanel implements ActionListener, Lay
                     String[] date;
                     String[] time;
                     while ((inputLine = in.readLine()) != null) {
+
                         splitted = inputLine.split(" ");
                         url = splitted[1];
                         splitted = splitted[0].split("T");
@@ -237,8 +238,7 @@ public class PfssPluginPanel extends OverlayPanel implements ActionListener, Lay
             Date date = masterView.getCurrentFrameDateTime().getTime();
             Calendar cal = GregorianCalendar.getInstance();
             cal.setTime(date);
-
-            pfssCache.updateData(1996, 6, cal.get(Calendar.DAY_OF_MONTH) * 1000000 + cal.get(Calendar.HOUR_OF_DAY) * 10000 + cal.get(Calendar.MINUTE) * 100 + cal.get(Calendar.SECOND));
+            pfssCache.updateData(2014, 7, cal.get(Calendar.DAY_OF_MONTH) * 1000000 + cal.get(Calendar.HOUR_OF_DAY) * 10000 + cal.get(Calendar.MINUTE) * 100 + cal.get(Calendar.SECOND));
         }
     }
 

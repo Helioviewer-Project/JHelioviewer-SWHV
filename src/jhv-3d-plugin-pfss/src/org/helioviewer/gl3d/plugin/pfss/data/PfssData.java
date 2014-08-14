@@ -130,7 +130,6 @@ public class PfssData {
     public void display(GL gl) {
         gl.glEnableClientState(GL.GL_VERTEX_ARRAY);
         gl.glEnableClientState(GL.GL_COLOR_ARRAY);
-        gl.glDisableClientState(GL.GL_NORMAL_ARRAY);
 
         gl.glDisable(GL.GL_FRAGMENT_PROGRAM_ARB);
         gl.glDisable(GL.GL_VERTEX_PROGRAM_ARB);
@@ -142,7 +141,9 @@ public class PfssData {
         gl.glEnable(GL.GL_BLEND);
         gl.glBlendFunc(GL.GL_SRC_ALPHA, GL.GL_ONE);
         gl.glBlendEquation(GL.GL_FUNC_ADD);
-        gl.glEnable(GL.GL_LINE_SMOOTH);
+        //gl.glHint(GL.GL_LINE_SMOOTH_HINT, GL.GL_FASTEST);
+        //gl.glEnable(GL.GL_LINE_SMOOTH);
+
         gl.glDepthMask(false);
         gl.glBindBuffer(GL.GL_ARRAY_BUFFER, VBOVertices);
         gl.glColorPointer(4, GL.GL_FLOAT, 7 * 4, 3 * 4);
@@ -158,7 +159,6 @@ public class PfssData {
         gl.glDisable(GL.GL_BLEND);
         gl.glDepthMask(true);
         gl.glLineWidth(1f);
-
     }
 
     public boolean isInit() {
