@@ -23,7 +23,6 @@ public class PfssMonth {
     }
 
     public PfssDayAndTime findData(int dayAndTime) {
-        System.out.println(dayAndTime);
 
         PfssDayAndTime last = null;
         PfssDayAndTime entry = null;

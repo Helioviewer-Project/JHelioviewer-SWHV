@@ -40,6 +40,7 @@ public class PfssPluginContainer extends OverlayContainer {
     /**
      * {@inheritDoc}
      */
+    @Override
     public String getDescription() {
         return null;
     }
@@ -47,13 +48,13 @@ public class PfssPluginContainer extends OverlayContainer {
     /**
      * {@inheritDoc}
      */
+    @Override
     public String getName() {
         return "Pfss " + (builtin_mode ? "Built-In Version" : "");
     }
 
     @Override
     public Class<? extends PhysicalRenderer> getOverlayClass() {
-        // TODO Auto-generated method stub
         return PfssPlugin3dRenderer.class;
     }
 

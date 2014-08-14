@@ -83,6 +83,7 @@ public class PfssCache {
     public void updateData(int year, int month, int dayAndTime) {
         if (pfssDatas != null && !load) {
             PfssDayAndTime tmp = findData(year, month, dayAndTime);
+
             if (tmp != null) {
 
                 PfssFitsFile fits = pfssDatas.get(tmp.getUrl());
