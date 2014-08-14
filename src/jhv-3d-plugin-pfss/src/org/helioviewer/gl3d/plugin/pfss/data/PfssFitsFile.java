@@ -1,11 +1,13 @@
 package org.helioviewer.gl3d.plugin.pfss.data;
 
 import java.io.BufferedInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
+import java.util.zip.GZIPInputStream;
 
 import javax.media.opengl.GL;
 
@@ -27,29 +29,31 @@ public class PfssFitsFile {
     public synchronized void loadFile(String url) {
         InputStream in = null;
         try {
-            //URL u = new URL("http://soleil.i4ds.ch/sol-win/2013-09-01_12-04-00.000_pfss_field_data.fits");
             //System.exit(1);
             System.out.println(url);
             URL u = new URL(url);
             URLConnection uc = u.openConnection();
             int contentLength = uc.getContentLength();
-            InputStream raw = uc.getInputStream();
+            InputStream raw;
+            if (uc.getHeaderField("Content-Encoding") != null && uc.getHeaderField("Content-Encoding").equals("gzip")) {
+                raw = new GZIPInputStream(uc.getInputStream());
+            } else {
+                raw = uc.getInputStream();
+            }
             in = new BufferedInputStream(raw);
 
-            gzipFitsFile = new byte[contentLength];
+            ByteArrayOutputStream buffer = new ByteArrayOutputStream();
 
-            int bytesRead = 0;
-            int offset = 0;
-            while (offset < contentLength) {
-                bytesRead = in.read(gzipFitsFile, offset, gzipFitsFile.length - offset);
-                if (bytesRead == -1)
-                    break;
-                offset += bytesRead;
+            int nRead;
+            byte[] data = new byte[16384];
+
+            while ((nRead = in.read(data, 0, data.length)) != -1) {
+                buffer.write(data, 0, nRead);
             }
-            for (int i = 0; i < 100; i++) {
-                int s = (gzipFitsFile[i] & 0xFF);
-                System.err.println(s);
-            }
+
+            buffer.flush();
+
+            this.gzipFitsFile = buffer.toByteArray();
             loaded = true;
         } catch (MalformedURLException e) {
             e.printStackTrace();

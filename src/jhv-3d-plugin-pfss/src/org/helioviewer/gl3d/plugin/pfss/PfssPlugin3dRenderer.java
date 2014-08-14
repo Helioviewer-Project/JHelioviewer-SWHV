@@ -1,6 +1,7 @@
 package org.helioviewer.gl3d.plugin.pfss;
 
 import javax.media.opengl.GL;
+
 import org.helioviewer.gl3d.plugin.pfss.data.PfssCache;
 import org.helioviewer.gl3d.plugin.pfss.data.PfssData;
 import org.helioviewer.gl3d.plugin.pfss.data.PfssFitsFile;
@@ -27,6 +28,7 @@ public class PfssPlugin3dRenderer extends PhysicalRenderer3d {
      * 
      * Draws all available and visible solar events with there associated icon.
      */
+    @Override
     public void render(PhysicalRenderGraphics g) {
         if (pfssCache.isVisible()) {
             GL gl = g.getGL();
@@ -52,6 +54,7 @@ public class PfssPlugin3dRenderer extends PhysicalRenderer3d {
 
     }
 
+    @Override
     public void viewChanged(View view) {
 
     }

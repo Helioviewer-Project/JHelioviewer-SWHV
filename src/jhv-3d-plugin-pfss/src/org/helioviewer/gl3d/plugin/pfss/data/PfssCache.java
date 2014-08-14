@@ -55,18 +55,20 @@ public class PfssCache {
         load = true;
         pfssDatas.clear();
         PfssDayAndTime tmp = findData(year, month, dayAndTime);
-        if (tmp != null) {
-            lastURL = tmp.getUrl();
-            for (int i = 0; i < PfssSettings.PRELOAD; i++) {
-                if (tmp != null) {
-                    PfssFitsFile tmpFits = new PfssFitsFile();
-                    pfssDatas.put(tmp.getUrl(), tmpFits);
-                    Thread t = new Thread(new PfssDataLoader(tmp, tmpFits), "PFFSLoader");
-                    t.start();
-                    tmp = tmp.getNext();
-                }
-            }
+
+        //if (tmp != null) {
+        //lastURL = tmp.getUrl();
+        for (int i = 0; i < PfssSettings.PRELOAD; i++) {
+            //if (tmp != null) {
+            PfssFitsFile tmpFits = new PfssFitsFile();
+            pfssDatas.put("iets", tmpFits);
+            Thread t = new Thread(new PfssDataLoader(tmp, tmpFits), "PFFSLoader");
+
+            t.start();
+            //tmp = tmp.getNext();
+            //}
         }
+        //}
         load = false;
 
     }
@@ -78,10 +80,12 @@ public class PfssCache {
     }
 
     public void updateData(int year, int month, int dayAndTime) {
+
         if (pfssDatas != null && !load) {
             PfssDayAndTime tmp = findData(year, month, dayAndTime);
 
             if (tmp != null) {
+
                 PfssFitsFile fits = pfssDatas.get(tmp.getUrl());
 
                 if (lastURL != tmp.getUrl()) {
