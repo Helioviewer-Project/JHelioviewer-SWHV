@@ -5,8 +5,6 @@ import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
-import java.util.ArrayList;
-import java.util.List;
 
 import javax.swing.DefaultListModel;
 import javax.swing.JButton;
@@ -33,7 +31,7 @@ public class PfssConfigPanel extends JPanel {
      */
     private static final long serialVersionUID = 8535729209025947878L;
 
-    private PfssPlugin plugin;
+    private final PfssPlugin plugin;
 
     private PfssFileListModel fileModel;
 
@@ -58,6 +56,7 @@ public class PfssConfigPanel extends JPanel {
         addButton.addActionListener(new ActionListener() {
             File lastFile = null;
 
+            @Override
             public void actionPerformed(ActionEvent e) {
                 if (lastFile == null) {
                     // lastFile = new File(System.getProperty("user.dir"));
@@ -69,11 +68,7 @@ public class PfssConfigPanel extends JPanel {
                 if (chooser.showOpenDialog(that) == JFileChooser.APPROVE_OPTION) {
                     Log.debug("Loading PFSS Files...");
                     for (File f : chooser.getSelectedFiles()) {
-                        PfssFileModel model = new PfssFileModel(f);
-                        if (model.load()) {
-                            fileModel.addModel(model);
-                            plugin.fireModelLoaded(model.getRoot());
-                        }
+
                         lastFile = f;
                     }
                     that.revalidate();
@@ -83,16 +78,16 @@ public class PfssConfigPanel extends JPanel {
         });
         final JButton removeButton = new JButton("Remove");
         removeButton.addActionListener(new ActionListener() {
+            @Override
             public void actionPerformed(ActionEvent arg0) {
                 int modelIndex = fileList.getSelectedIndex();
-                PfssFileModel model = fileModel.models.get(modelIndex);
-                plugin.fireModelUnloaded(model.getRoot());
                 fileModel.removeModel(modelIndex);
             }
         });
 
         fileList.addListSelectionListener(new ListSelectionListener() {
 
+            @Override
             public void valueChanged(ListSelectionEvent e) {
                 if (fileList.isSelectionEmpty()) {
                     removeButton.setEnabled(false);
@@ -114,27 +109,13 @@ public class PfssConfigPanel extends JPanel {
          * 
          */
         private static final long serialVersionUID = -2994377168813184873L;
-        private List<PfssFileModel> models = new ArrayList<PfssFileModel>();
 
         public PfssFileListModel() {
         }
 
         public void removeModel(int index) {
-            models.remove(index);
             this.fireIntervalRemoved(this, index, index);
         }
 
-        public void addModel(PfssFileModel model) {
-            this.models.add(model);
-            this.fireIntervalAdded(this, this.models.size() - 1, this.models.size());
-        }
-
-        public Object getElementAt(int index) {
-            return models.get(index);
-        }
-
-        public int getSize() {
-            return models.size();
-        }
     }
 }
