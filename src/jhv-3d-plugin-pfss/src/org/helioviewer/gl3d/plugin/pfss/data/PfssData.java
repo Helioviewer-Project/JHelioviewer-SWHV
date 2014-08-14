@@ -1,20 +1,10 @@
 package org.helioviewer.gl3d.plugin.pfss.data;
 
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
-import java.io.InputStream;
 import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
-import java.util.Arrays;
 
 import javax.media.opengl.GL;
 
-import nom.tam.fits.BasicHDU;
-import nom.tam.fits.BinaryTableHDU;
-import nom.tam.fits.Fits;
-import nom.tam.fits.FitsException;
-
-import org.helioviewer.base.physics.Constants;
 import org.helioviewer.gl3d.plugin.pfss.settings.PfssSettings;
 import org.helioviewer.gl3d.scenegraph.math.GL3DVec3f;
 
@@ -27,12 +17,12 @@ import com.sun.opengl.util.BufferUtil;
  * */
 public class PfssData {
     private byte[] gzipFitsFile = null;
-    private String type = null;
-    private String date = null;
-    private short[] ptr = null;
-    private short[] ptr_nz_len = null;
-    private short[] ptph = null;
-    private short[] ptth = null;
+    private final String type = null;
+    private final String date = null;
+    private final short[] ptr = null;
+    private final short[] ptr_nz_len = null;
+    private final short[] ptph = null;
+    private final short[] ptth = null;
 
     private int[] buffer;
     private FloatBuffer vertices;
@@ -61,40 +51,15 @@ public class PfssData {
 
     private void readFitsFile() {
         if (gzipFitsFile != null) {
-            InputStream is = null;
-            try {
-                is = new ByteArrayInputStream(gzipFitsFile);
-                Fits fits = new Fits(is, true);
-                BasicHDU hdus[] = fits.read();
-                BinaryTableHDU bhdu = (BinaryTableHDU) hdus[1];
-                type = Arrays.toString((String[]) bhdu.getColumn("TYPE"));
-                date = Arrays.toString((String[]) bhdu.getColumn("DATE_TIME"));
-                ptr = ((short[][]) bhdu.getColumn("PTR"))[0];
-                ptr_nz_len = ((short[][]) bhdu.getColumn("PTR_NZ_LEN"))[0];
-                ptph = ((short[][]) bhdu.getColumn("PTPH"))[0];
-                ptth = ((short[][]) bhdu.getColumn("PTTH"))[0];
-
-                calculatePositions();
-
-            } catch (FitsException e) {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
-            } finally {
-                try {
-                    is.close();
-                } catch (IOException e) {
-                    // TODO Auto-generated catch block
-                    e.printStackTrace();
-                }
-            }
+            calculatePositions();
         }
     }
 
     private void createBuffer() {
-        vertices = BufferUtil.newFloatBuffer(this.ptr.length * 3 + 3);
-        indicesSunToOutside = BufferUtil.newIntBuffer(this.ptr.length * 2);
-        indicesOutsideToSun = BufferUtil.newIntBuffer(this.ptr.length * 2);
-        indicesSunToSun = BufferUtil.newIntBuffer(this.ptr.length * 2);
+        vertices = BufferUtil.newFloatBuffer(40 * 120 * 3 + 3);
+        indicesSunToOutside = BufferUtil.newIntBuffer(40 * 120 * 2);
+        indicesOutsideToSun = BufferUtil.newIntBuffer(40 * 120 * 2);
+        indicesSunToSun = BufferUtil.newIntBuffer(40 * 120 * 2);
 
     }
 
@@ -140,73 +105,49 @@ public class PfssData {
 
     private void calculatePositions() {
 
-        int lineEnd = this.ptr_nz_len[0] - 1;
+        int lineEnd = 19;
         int lineCounter = 1;
         int counter = 0;
         int lineStart = 0;
 
         this.createBuffer();
-        TYPE type = getType(lineStart, lineEnd);
+        TYPE type = TYPE.OUTSIDE_TO_SUN;
 
         double xStart = 0;
         double yStart = 0;
         double zStart = 0;
         boolean lineStarted = false;
-        for (int i = 0; i < this.ptr.length; i += PfssSettings.LOD_STEPS) {
+        double x = 0, y = 0, z = 0;
 
-            if (i > lineEnd && lineCounter < this.ptr_nz_len.length) {
-                i = lineEnd;
-            }
-            boolean colinear = false;
+        for (int i = 0; i < this.gzipFitsFile.length / 6; i++) {
+            int rx = ((this.gzipFitsFile[6 * i + 1] << 8) & 0x0000ff00) | (this.gzipFitsFile[6 * i + 0] & 0x000000ff);
+            int ry = ((this.gzipFitsFile[6 * i + 3] << 8) & 0x0000ff00) | (this.gzipFitsFile[6 * i + 2] & 0x000000ff);
+            int rz = ((this.gzipFitsFile[6 * i + 5] << 8) & 0x0000ff00) | (this.gzipFitsFile[6 * i + 4] & 0x000000ff);
 
-            double r0 = ptr[i] / 8192.0 * Constants.SunRadius;
-            double phi0 = ptph[i] / 32768.0 * 2 * Math.PI;
-            double theta0 = ptth[i] / 32768.0 * 2 * Math.PI;
+            x = 3. * (rx * 2. / 65535 - 1.);
+            y = 3. * (ry * 2. / 65535 - 1.);
+            z = 3. * (rz * 2. / 65535 - 1.);
+            System.out.println("(" + rx + "," + ry + "," + rz + ")");
 
-            double z = r0 * Math.sin(theta0) * Math.cos(phi0);
-            double x = r0 * Math.sin(theta0) * Math.sin(phi0);
-            double y = r0 * Math.cos(theta0);
-
-            if (lineStarted) {
-                if (i + 1 < ptr.length) {
-                    double r1 = ptr[i + 1] / 8192.0 * Constants.SunRadius;
-                    double phi1 = ptph[i + 1] / 32768.0 * 2 * Math.PI;
-                    double theta1 = ptth[i + 1] / 32768.0 * 2 * Math.PI;
-
-                    double zEnd = r1 * Math.sin(theta1) * Math.cos(phi1);
-                    double xEnd = r1 * Math.sin(theta1) * Math.sin(phi1);
-                    double yEnd = r1 * Math.cos(theta1);
-                    double cosAngle = this.calculateAngleBetween2Vectors(xEnd - x, yEnd - y, zEnd - z, x - xStart, y - yStart, z - zStart);
-                    colinear = cosAngle > PfssSettings.ANGLE_OF_LOD && i != lineEnd;
-                }
-            }
-
-            else {
+            if (!lineStarted) {
                 lineStarted = true;
                 xStart = x;
                 yStart = y;
                 zStart = z;
             }
 
-            if (!colinear) {
-                if (i != lineEnd) {
-                    xStart = x;
-                    yStart = y;
-                    zStart = z;
-                    this.addIndex(type, counter);
-                }
-                counter = this.addVertex((float) x, (float) y, (float) z, counter);
-
+            if (i % 20 != 19) {
+                xStart = x;
+                yStart = y;
+                zStart = z;
+                this.addIndex(type, counter);
             }
+            counter = this.addVertex((float) x, (float) y, (float) z, counter);
 
-            if (i == lineEnd) {
+            if (i % 20 == 19) {
                 lineStarted = false;
                 lineStart = lineEnd + 1;
-                if (lineCounter < this.ptr_nz_len.length) {
-                    lineEnd += this.ptr_nz_len[lineCounter++];
-                }
-
-                type = getType(lineStart, lineEnd);
+                type = TYPE.OUTSIDE_TO_SUN;
             }
 
         }
