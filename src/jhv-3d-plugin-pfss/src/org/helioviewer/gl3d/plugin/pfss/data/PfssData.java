@@ -26,18 +26,13 @@ public class PfssData {
 
     private int[] buffer;
     private FloatBuffer vertices;
-    private IntBuffer indicesSunToOutside = null;
-    private IntBuffer indicesSunToSun = null;
-    private IntBuffer indicesOutsideToSun = null;
+    private FloatBuffer colors;
 
-    private enum TYPE {
-        SUN_TO_OUTSIDE, SUN_TO_SUN, OUTSIDE_TO_SUN
-    };
+    private IntBuffer indices = null;
 
     private int VBOVertices;
-    private int VBOIndicesSunToOutside;
-    private int VBOIndicesSunToSun;
-    private int VBOIndicesOutsideToSun;
+    private int VBOColors;
+    private int VBOIndices;
 
     public boolean read = false;
     public boolean init = false;
@@ -55,45 +50,26 @@ public class PfssData {
         }
     }
 
-    private void createBuffer() {
-        vertices = BufferUtil.newFloatBuffer(40 * 120 * 3 + 3);
-        indicesSunToOutside = BufferUtil.newIntBuffer(40 * 120 * 2);
-        indicesOutsideToSun = BufferUtil.newIntBuffer(40 * 120 * 2);
-        indicesSunToSun = BufferUtil.newIntBuffer(40 * 120 * 2);
-
-    }
-
-    private TYPE getType(int startLine, int lineEnd) {
-        if (this.ptr[startLine] > 8192 * 1.05)
-            return TYPE.OUTSIDE_TO_SUN;
-        else if (this.ptr[lineEnd] > 8192 * 1.05)
-            return TYPE.SUN_TO_OUTSIDE;
-        else
-            return TYPE.SUN_TO_SUN;
-
+    private void createBuffer(int len) {
+        vertices = BufferUtil.newFloatBuffer(len * 4 + 4);
+        colors = BufferUtil.newFloatBuffer(len * 4 + 4);
+        indices = BufferUtil.newIntBuffer(42 * len);
     }
 
     private double calculateAngleBetween2Vectors(double x1, double y1, double z1, double x2, double y2, double z2) {
         return (x1 * x2 + y1 * y2 + z1 * z2) / (Math.sqrt(x1 * x1 + y1 * y1 + z1 * z1) * Math.sqrt(x2 * x2 + y2 * y2 + z2 * z2));
     }
 
-    private void addIndex(TYPE type, int counter) {
-        switch (type) {
-        case SUN_TO_OUTSIDE:
-            indicesSunToOutside.put(counter);
-            indicesSunToOutside.put(counter + 1);
-            break;
-        case SUN_TO_SUN:
-            indicesSunToSun.put(counter);
-            indicesSunToSun.put(counter + 1);
-            break;
-        case OUTSIDE_TO_SUN:
-            indicesOutsideToSun.put(counter);
-            indicesOutsideToSun.put(counter + 1);
-            break;
-        default:
-            break;
-        }
+    private void addIndex(int counter) {
+        indices.put(counter);
+        indices.put(counter + 1);
+    }
+
+    private int addColor(float x, float y, float z, int counter) {
+        colors.put(x);
+        colors.put(y);
+        colors.put(z);
+        return ++counter;
     }
 
     private int addVertex(float x, float y, float z, int counter) {
@@ -105,13 +81,14 @@ public class PfssData {
 
     private void calculatePositions() {
 
-        int lineEnd = 19;
+        int lineEnd = 39;
         int lineCounter = 1;
         int counter = 0;
+        int countercolor = 0;
+
         int lineStart = 0;
 
-        this.createBuffer();
-        TYPE type = TYPE.OUTSIDE_TO_SUN;
+        this.createBuffer(this.gzipFitsFile.length / 8);
 
         double xStart = 0;
         double yStart = 0;
@@ -119,15 +96,14 @@ public class PfssData {
         boolean lineStarted = false;
         double x = 0, y = 0, z = 0;
 
-        for (int i = 0; i < this.gzipFitsFile.length / 6; i++) {
-            int rx = ((this.gzipFitsFile[6 * i + 1] << 8) & 0x0000ff00) | (this.gzipFitsFile[6 * i + 0] & 0x000000ff);
-            int ry = ((this.gzipFitsFile[6 * i + 3] << 8) & 0x0000ff00) | (this.gzipFitsFile[6 * i + 2] & 0x000000ff);
-            int rz = ((this.gzipFitsFile[6 * i + 5] << 8) & 0x0000ff00) | (this.gzipFitsFile[6 * i + 4] & 0x000000ff);
+        for (int i = 0; i < this.gzipFitsFile.length / 8; i++) {
+            int rx = ((this.gzipFitsFile[8 * i + 1] << 8) & 0x0000ff00) | (this.gzipFitsFile[8 * i + 0] & 0x000000ff);
+            int ry = ((this.gzipFitsFile[8 * i + 3] << 8) & 0x0000ff00) | (this.gzipFitsFile[8 * i + 2] & 0x000000ff);
+            int rz = ((this.gzipFitsFile[8 * i + 5] << 8) & 0x0000ff00) | (this.gzipFitsFile[8 * i + 4] & 0x000000ff);
 
             x = 3. * (rx * 2. / 65535 - 1.);
             y = 3. * (ry * 2. / 65535 - 1.);
             z = 3. * (rz * 2. / 65535 - 1.);
-            System.out.println("(" + rx + "," + ry + "," + rz + ")");
 
             if (!lineStarted) {
                 lineStarted = true;
@@ -136,50 +112,32 @@ public class PfssData {
                 zStart = z;
             }
 
-            if (i % 20 != 19) {
+            if (i % 40 != 39) {
                 xStart = x;
                 yStart = y;
                 zStart = z;
-                this.addIndex(type, counter);
+                this.addIndex(counter);
             }
-            counter = this.addVertex((float) x, (float) y, (float) z, counter);
+            counter = this.addVertex((float) x, (float) z, (float) -y, counter);
 
-            if (i % 20 == 19) {
+            int col = ((this.gzipFitsFile[8 * i + 7] << 8) & 0x0000ff00) | (this.gzipFitsFile[8 * i + 6] & 0x000000ff);
+            double bright = (col * 2. / 65535.) - 1.;
+            if (bright > 0) {
+                countercolor = this.addColor(1.f, (float) (1. - bright), (float) (1. - bright), countercolor);
+            } else {
+                countercolor = this.addColor((float) (1. + bright), (float) (1. + bright), 1.f, countercolor);
+            }
+
+            if (i % 40 == 39) {
                 lineStarted = false;
                 lineStart = lineEnd + 1;
-                type = TYPE.OUTSIDE_TO_SUN;
             }
 
         }
         vertices.flip();
-        indicesSunToOutside.flip();
-        indicesOutsideToSun.flip();
-        indicesSunToSun.flip();
+        colors.flip();
+        indices.flip();
         read = true;
-    }
-
-    public String getType() {
-        return type;
-    }
-
-    public String getDate() {
-        return date;
-    }
-
-    public short[] getPtr() {
-        return ptr;
-    }
-
-    public short[] getPtr_nz_len() {
-        return ptr_nz_len;
-    }
-
-    public short[] getPtph() {
-        return ptph;
-    }
-
-    public short[] getPtth() {
-        return ptth;
     }
 
     public void init(GL gl) {
@@ -187,8 +145,8 @@ public class PfssData {
             if (!read)
                 readFitsFile();
             if (!init && read && gl != null) {
-                buffer = new int[4];
-                gl.glGenBuffers(4, buffer, 0);
+                buffer = new int[3];
+                gl.glGenBuffers(3, buffer, 0);
 
                 VBOVertices = buffer[0];
                 gl.glBindBufferARB(GL.GL_ARRAY_BUFFER, VBOVertices);
@@ -196,27 +154,16 @@ public class PfssData {
                 gl.glBindBuffer(GL.GL_ARRAY_BUFFER, 0);
 
                 // color
-                if (indicesSunToSun != null && indicesSunToSun.limit() > 0) {
-                    VBOIndicesSunToSun = buffer[1];
-                    gl.glBindBuffer(GL.GL_ELEMENT_ARRAY_BUFFER, VBOIndicesSunToSun);
-                    gl.glBufferData(GL.GL_ELEMENT_ARRAY_BUFFER, indicesSunToSun.limit() * BufferUtil.SIZEOF_INT, indicesSunToSun, GL.GL_STATIC_DRAW);
+                if (indices != null && indices.limit() > 0) {
+                    VBOIndices = buffer[1];
+                    gl.glBindBuffer(GL.GL_ELEMENT_ARRAY_BUFFER, VBOIndices);
+                    gl.glBufferData(GL.GL_ELEMENT_ARRAY_BUFFER, indices.limit() * BufferUtil.SIZEOF_INT, indices, GL.GL_STATIC_DRAW);
                     gl.glBindBuffer(GL.GL_ELEMENT_ARRAY_BUFFER, 0);
                 }
-
-                if (indicesSunToOutside != null && indicesSunToOutside.limit() > 0) {
-                    VBOIndicesSunToOutside = buffer[2];
-                    gl.glBindBuffer(GL.GL_ELEMENT_ARRAY_BUFFER, VBOIndicesSunToOutside);
-                    gl.glBufferData(GL.GL_ELEMENT_ARRAY_BUFFER, indicesSunToOutside.limit() * BufferUtil.SIZEOF_INT, indicesSunToOutside, GL.GL_STATIC_DRAW);
-                    gl.glBindBuffer(GL.GL_ELEMENT_ARRAY_BUFFER, 0);
-                }
-
-                if (indicesOutsideToSun != null && indicesOutsideToSun.limit() > 0) {
-                    VBOIndicesOutsideToSun = buffer[3];
-                    gl.glBindBuffer(GL.GL_ELEMENT_ARRAY_BUFFER, VBOIndicesOutsideToSun);
-                    gl.glBufferData(GL.GL_ELEMENT_ARRAY_BUFFER, indicesOutsideToSun.limit() * BufferUtil.SIZEOF_INT, indicesOutsideToSun, GL.GL_STATIC_DRAW);
-                    gl.glBindBuffer(GL.GL_ELEMENT_ARRAY_BUFFER, 0);
-                }
-
+                VBOColors = buffer[2];
+                gl.glBindBufferARB(GL.GL_ARRAY_BUFFER, VBOColors);
+                gl.glBufferDataARB(GL.GL_ARRAY_BUFFER, colors.limit() * BufferUtil.SIZEOF_FLOAT, colors, GL.GL_STATIC_DRAW);
+                gl.glBindBuffer(GL.GL_ARRAY_BUFFER, 0);
                 init = true;
             }
         }
@@ -224,12 +171,14 @@ public class PfssData {
 
     public void clear(GL gl) {
         if (init) {
-            gl.glDeleteBuffers(4, buffer, 0);
+            gl.glDeleteBuffers(3, buffer, 0);
         }
     }
 
     public void display(GL gl) {
         gl.glEnableClientState(GL.GL_VERTEX_ARRAY);
+        gl.glEnableClientState(GL.GL_COLOR_ARRAY);
+
         gl.glDisable(GL.GL_FRAGMENT_PROGRAM_ARB);
         gl.glDisable(GL.GL_VERTEX_PROGRAM_ARB);
         gl.glDisable(GL.GL_LIGHTING);
@@ -242,32 +191,24 @@ public class PfssData {
         gl.glBlendEquation(GL.GL_FUNC_ADD);
         gl.glEnable(GL.GL_LINE_SMOOTH);
         gl.glDepthMask(false);
+        gl.glBindBuffer(GL.GL_ARRAY_BUFFER, VBOColors);
+        gl.glColorPointer(3, GL.GL_FLOAT, 0, 0);
         gl.glBindBuffer(GL.GL_ARRAY_BUFFER, VBOVertices);
         gl.glVertexPointer(3, GL.GL_FLOAT, 0, 0);
         GL3DVec3f color;
 
-        gl.glLineWidth(PfssSettings.LINE_WIDTH);
+        //gl.glLineWidth(PfssSettings.LINE_WIDTH);
+        gl.glLineWidth(0.3f);
 
-        if (indicesSunToSun != null && indicesSunToSun.limit() > 0) {
+        if (indices != null && indices.limit() > 0) {
             color = PfssSettings.SUN_SUN_LINE_COLOR;
             gl.glColor4f(color.x, color.y, color.z, PfssSettings.LINE_ALPHA);
-            gl.glBindBuffer(GL.GL_ELEMENT_ARRAY_BUFFER, VBOIndicesSunToSun);
-            gl.glDrawElements(GL.GL_LINES, indicesSunToSun.limit(), GL.GL_UNSIGNED_INT, 0);
-        }
-        if (indicesSunToOutside != null && indicesSunToOutside.limit() > 0) {
-            color = PfssSettings.SUN_OUT_LINE_COLOR;
-            gl.glColor4f(color.x, color.y, color.z, PfssSettings.LINE_ALPHA);
-            gl.glBindBuffer(GL.GL_ELEMENT_ARRAY_BUFFER, VBOIndicesSunToOutside);
-            gl.glDrawElements(GL.GL_LINES, indicesSunToOutside.limit(), GL.GL_UNSIGNED_INT, 0);
-        }
-
-        if (indicesOutsideToSun != null && indicesOutsideToSun.limit() > 0) {
-            color = PfssSettings.OUT_SUN_LINE_COLOR;
-            gl.glColor4f(color.x, color.y, color.z, PfssSettings.LINE_ALPHA);
-            gl.glBindBuffer(GL.GL_ELEMENT_ARRAY_BUFFER, VBOIndicesOutsideToSun);
-            gl.glDrawElements(GL.GL_LINES, indicesOutsideToSun.limit(), GL.GL_UNSIGNED_INT, 0);
+            gl.glBindBuffer(GL.GL_ELEMENT_ARRAY_BUFFER, VBOIndices);
+            gl.glDrawElements(GL.GL_LINES, indices.limit(), GL.GL_UNSIGNED_INT, 0);
         }
         gl.glDisableClientState(GL.GL_VERTEX_ARRAY);
+        gl.glDisableClientState(GL.GL_COLOR_ARRAY);
+
         gl.glDisable(GL.GL_LINE_SMOOTH);
         gl.glDisable(GL.GL_BLEND);
         gl.glDepthMask(true);

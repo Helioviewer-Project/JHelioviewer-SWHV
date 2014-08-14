@@ -19,10 +19,8 @@ public class PfssDataLoader implements Runnable {
 
     @Override
     public void run() {
-        String m = (dayAndTime.getMonth()) < 9 ? "0" + (dayAndTime.getMonth() + 1) : (dayAndTime.getMonth() + 1) + "";
-        String url = "http://swhv.oma.be/magtest/fileraw_short.dat";//PfssSettings.INFOFILE_URL + dayAndTime.getYear() + "/" + m + "/" + dayAndTime.getUrl();
+        String url = "http://swhv.oma.be/magtest/webGL/streamdata.php?skip=2";
         fitsFile.loadFile(url);
-
     }
 
 }

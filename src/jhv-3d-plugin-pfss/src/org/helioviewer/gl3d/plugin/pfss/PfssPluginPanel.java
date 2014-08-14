@@ -44,8 +44,8 @@ public class PfssPluginPanel extends OverlayPanel implements ActionListener, Lay
     private boolean showAgain = true;
     private boolean retry = false;
     // UI Components
-    private JButton visibleButton = new JButton(new ImageIcon(PfssPlugin.getResourceUrl("/images/invisible_dm.png")));
-    private JButton reloadButton = new JButton(new ImageIcon(PfssPlugin.getResourceUrl("/images/reload.png")));
+    private final JButton visibleButton = new JButton(new ImageIcon(PfssPlugin.getResourceUrl("/images/invisible_dm.png")));
+    private final JButton reloadButton = new JButton(new ImageIcon(PfssPlugin.getResourceUrl("/images/reload.png")));
 
     /**
      * Default constructor
@@ -107,6 +107,7 @@ public class PfssPluginPanel extends OverlayPanel implements ActionListener, Lay
     public void updateComponents() {
     }
 
+    @Override
     public void actionPerformed(ActionEvent act) {
         if (act.getSource().equals(visibleButton)) {
             if (pfssCache.isVisible()) {
@@ -124,12 +125,15 @@ public class PfssPluginPanel extends OverlayPanel implements ActionListener, Lay
 
     }
 
+    @Override
     public void setEnabled(boolean b) {
     }
 
+    @Override
     public void activeLayerChanged(int idx) {
     }
 
+    @Override
     public void layerAdded(int idx) {
         Date start = LayersModel.getSingletonInstance().getFirstDate();
         Date end = LayersModel.getSingletonInstance().getLastDate();
@@ -213,15 +217,19 @@ public class PfssPluginPanel extends OverlayPanel implements ActionListener, Lay
         }
     }
 
+    @Override
     public void layerChanged(int idx) {
     }
 
+    @Override
     public void layerRemoved(View oldView, int oldIdx) {
     }
 
+    @Override
     public void subImageDataChanged() {
     }
 
+    @Override
     public void timestampChanged(int idx) {
         // Not used anymore
         TimedMovieView masterView = LinkedMovieManager.getActiveInstance().getMasterMovie();
@@ -234,6 +242,7 @@ public class PfssPluginPanel extends OverlayPanel implements ActionListener, Lay
         }
     }
 
+    @Override
     public void viewportGeometryChanged() {
     }
 
@@ -246,9 +255,11 @@ public class PfssPluginPanel extends OverlayPanel implements ActionListener, Lay
     /**
      * {@inheritDoc}
      */
+    @Override
     public void layerDownloaded(int idx) {
     }
 
+    @Override
     public void viewChanged(View sender, ChangeEvent aEvent) {
     }
 
