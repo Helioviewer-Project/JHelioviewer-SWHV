@@ -19,7 +19,9 @@ public class PfssDataLoader implements Runnable {
 
     @Override
     public void run() {
-        String url = "http://swhv.oma.be/magtest/webGL/streamdata.php?skip=0";
+        String baseUrl = "http://127.0.0.1/web/webGL/streamdata.php?skip=0&filename=";
+        String m = (dayAndTime.getMonth()) < 9 ? "0" + (dayAndTime.getMonth() + 1) : (dayAndTime.getMonth() + 1) + "";
+        String url = baseUrl + dayAndTime.getUrl();
         fitsFile.loadFile(url);
     }
 

@@ -17,9 +17,9 @@ import org.helioviewer.gl3d.scenegraph.GL3DNode;
  * 
  */
 public class PfssFileModel {
-    private String filename;
+    private final String filename;
 
-    private File modelFile;
+    private final File modelFile;
 
     private GL3DGroup root;
 
@@ -51,7 +51,7 @@ public class PfssFileModel {
 
             try {
                 PfssDimension dim = importer.readFile(this.filename);
-                this.root = new GL3DPfssModel(dim);
+                //this.root = new GL3DPfssModel(dim);
 
                 this.loaded = true;
                 Log.debug("Loaded Pfss Model from " + this.filename);

@@ -8,8 +8,8 @@ import java.util.ArrayList;
  * @author Stefan Meier (stefan.meier@fhnw.ch)
  * */
 public class PfssMonth {
-    private int month;
-    private ArrayList<PfssDayAndTime> dayAndTimes;
+    private final int month;
+    private final ArrayList<PfssDayAndTime> dayAndTimes;
 
     public PfssMonth(int month) {
         this.month = month;
@@ -23,6 +23,8 @@ public class PfssMonth {
     }
 
     public PfssDayAndTime findData(int dayAndTime) {
+        System.out.println(dayAndTime);
+
         PfssDayAndTime last = null;
         PfssDayAndTime entry = null;
         for (PfssDayAndTime data : dayAndTimes) {
