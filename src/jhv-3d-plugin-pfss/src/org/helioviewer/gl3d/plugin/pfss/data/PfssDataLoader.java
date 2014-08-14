@@ -19,7 +19,7 @@ public class PfssDataLoader implements Runnable {
 
     @Override
     public void run() {
-        String url = "http://swhv.oma.be/magtest/webGL/streamdata.php?skip=2";
+        String url = "http://swhv.oma.be/magtest/webGL/streamdata.php?skip=0";
         fitsFile.loadFile(url);
     }
 

@@ -63,5 +63,7 @@ public class PfssSettings {
     /**
      * Linewidth for the OpenGL visualization
      */
-    public final static float LINE_WIDTH = 1.5f;
+    public final static float LINE_WIDTH = 0.6f;
+
+    public final static int POINTS_PER_LINE = 40;
 }
