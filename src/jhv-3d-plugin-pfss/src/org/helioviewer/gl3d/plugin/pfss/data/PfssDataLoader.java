@@ -1,7 +1,6 @@
 package org.helioviewer.gl3d.plugin.pfss.data;
 
 import org.helioviewer.gl3d.plugin.pfss.data.dataStructure.PfssDayAndTime;
-import org.helioviewer.gl3d.plugin.pfss.settings.PfssSettings;
 
 /**
  * Runnable class to load the Pfss-data in a thread
@@ -9,8 +8,8 @@ import org.helioviewer.gl3d.plugin.pfss.settings.PfssSettings;
  * @author Stefan Meier (stefan.meier@fhnw.ch)
  * */
 public class PfssDataLoader implements Runnable {
-    private PfssDayAndTime dayAndTime;
-    private PfssFitsFile fitsFile;
+    private final PfssDayAndTime dayAndTime;
+    private final PfssFitsFile fitsFile;
 
     public PfssDataLoader(PfssDayAndTime dayAndTime, PfssFitsFile fitsFile) {
         this.dayAndTime = dayAndTime;
@@ -18,9 +17,10 @@ public class PfssDataLoader implements Runnable {
 
     }
 
+    @Override
     public void run() {
         String m = (dayAndTime.getMonth()) < 9 ? "0" + (dayAndTime.getMonth() + 1) : (dayAndTime.getMonth() + 1) + "";
-        String url = PfssSettings.INFOFILE_URL + dayAndTime.getYear() + "/" + m + "/" + dayAndTime.getUrl();
+        String url = "http://swhv.oma.be/magtest/fileraw_short.dat";//PfssSettings.INFOFILE_URL + dayAndTime.getYear() + "/" + m + "/" + dayAndTime.getUrl();
         fitsFile.loadFile(url);
 
     }

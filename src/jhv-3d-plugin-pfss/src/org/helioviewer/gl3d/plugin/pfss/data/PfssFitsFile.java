@@ -46,6 +46,10 @@ public class PfssFitsFile {
                     break;
                 offset += bytesRead;
             }
+            for (int i = 0; i < 100; i++) {
+                int s = (gzipFitsFile[i] & 0xFF);
+                System.err.println(s);
+            }
             loaded = true;
         } catch (MalformedURLException e) {
             e.printStackTrace();
