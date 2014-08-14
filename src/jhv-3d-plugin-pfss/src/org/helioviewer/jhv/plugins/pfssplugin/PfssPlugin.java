@@ -3,6 +3,7 @@ package org.helioviewer.jhv.plugins.pfssplugin;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
+
 import org.helioviewer.gl3d.plugin.pfss.PfssPluginContainer;
 import org.helioviewer.gl3d.plugin.pfss.settings.PfssSettings;
 import org.helioviewer.viewmodelplugin.controller.PluginManager;
@@ -21,7 +22,7 @@ public class PfssPlugin extends OverlayPlugin implements Plugin {
     /**
      * Reference to the eventPlugin
      */
-    private PfssPluginContainer eventPlugin;
+    private final PfssPluginContainer eventPlugin;
 
     /**
      * Default constructor.
@@ -56,6 +57,7 @@ public class PfssPlugin extends OverlayPlugin implements Plugin {
      * Overrides the default method because the internal provided filters are
      * activated by default.
      */
+    @Override
     public void installPlugin() {
         for (OverlayContainer overlay : overlayContainerList) {
             overlay.setActive(PluginSettings.getSingeltonInstance().isOverlayInPluginActivated(pluginLocation, overlay.getOverlayClass(), true));
@@ -70,6 +72,7 @@ public class PfssPlugin extends OverlayPlugin implements Plugin {
      * A description is not needed here because this plug-in is activated always
      * and will not be visible in the corresponding dialogs.
      */
+    @Override
     public String getDescription() {
         return null;
     }
@@ -77,6 +80,7 @@ public class PfssPlugin extends OverlayPlugin implements Plugin {
     /**
      * {@inheritDoc}
      */
+    @Override
     public String getName() {
         return "Pfss Overlay Plugin " + (builtin_mode ? "Built-In Version" : "");
     }
@@ -86,6 +90,7 @@ public class PfssPlugin extends OverlayPlugin implements Plugin {
      * 
      * null because this is an internal plugin
      */
+    @Override
     public String getAboutLicenseText() {
         String description = "";
         description += "<p>" + "The plugin uses the <a href=\"http://heasarc.gsfc.nasa.gov/docs/heasarc/fits/java/v1.0/\">Fits in Java</a> Library, licensed under a <a href=\"https://www.gnu.org/licenses/old-licenses/gpl-1.0-standalone.html\">GPL License</a>.";
@@ -101,15 +106,15 @@ public class PfssPlugin extends OverlayPlugin implements Plugin {
     /**
      * {@inheritDoc} In this case, does nothing.
      */
+    @Override
     public void setState(String state) {
-        // TODO Implement setState for PfssPlugin
     }
 
     /**
      * {@inheritDoc} In this case, does nothing.
      */
+    @Override
     public String getState() {
-        // TODO Implement getState for PfssPlugin
         return "";
     }
 }

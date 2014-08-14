@@ -17,7 +17,6 @@ public class PfssYear {
     }
 
     public PfssDayAndTime addMonth(int year, int month, int dayAndTime, String url) {
-        System.out.println("ADDAD" + month);
         if (!months.containsKey(month))
             months.put(month, new PfssMonth(month));
         return months.get(month).addDayAndTime(year, month, dayAndTime, url);

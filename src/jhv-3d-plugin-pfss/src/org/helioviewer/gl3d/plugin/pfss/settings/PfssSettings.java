@@ -66,4 +66,6 @@ public class PfssSettings {
     public final static float LINE_WIDTH = 0.6f;
 
     public final static int POINTS_PER_LINE = 40;
+
+    public static String baseUrl = "http://swhv.oma.be/magtest/";
 }
