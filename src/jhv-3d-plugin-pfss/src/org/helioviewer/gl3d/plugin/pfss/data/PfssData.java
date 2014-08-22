@@ -85,6 +85,13 @@ public class PfssData {
                 x = 3. * (rx * 2. / 65535 - 1.);
                 y = 3. * (ry * 2. / 65535 - 1.);
                 z = 3. * (rz * 2. / 65535 - 1.);
+                double angle = -Math.PI / 2.;
+                double helpx = Math.cos(angle) * x + Math.sin(angle) * z;
+                double helpz = -Math.sin(angle) * x + Math.cos(angle) * z;
+                x = helpx;
+                z = helpz;
+                x = -x;
+
                 int col = ((this.gzipFitsFile[8 * i + 7] << 8) & 0x0000ff00) | (this.gzipFitsFile[8 * i + 6] & 0x000000ff);
                 double bright = (col * 2. / 65535.) - 1.;
                 if (i % PfssSettings.POINTS_PER_LINE == 0) {
@@ -102,12 +109,11 @@ public class PfssData {
                         double zo = 3. * (roz * 2. / 65535 - 1.);
                         double ro = Math.sqrt(xo * xo + yo * yo + zo * zo);
                         double r = Math.sqrt(x * x + y * y + z * z);
-                        System.out.println("RR" + ro + " " + r);
 
                         if (r < 1.5 && ro < 1.5) {
                             type = 0;
                             counter = this.addColor(1.f, 0.f, 1.f, 1.0f, counter);
-                        } else if (r >= 1.5 && ro <= 1.5) {
+                        } else if (bright < 0) {
                             type = 1;
                             counter = this.addColor(0.f, 0.f, 1.f, 1.0f, counter);
                         } else {

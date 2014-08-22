@@ -1,0 +1,33 @@
+*************************************
+*  JHelioviewer Pfss Plugin INSTALL  *
+*************************************
+
+IMPORTANT
+---------
+Note that a non-developer version is automatically installed since JHelioviewer 2.1.
+These instructions are only needed if you want do develop on the Pfss Plugin.
+
+General Information
+-------------------
+
+General development information: See JHelioviewer Project + JHelioviewer Website.
+
+The source code of this plugin is hosted on Launchpad: https://launchpad.net/jhelioviewer
+
+This document serves only as a quick reference for building the source code. More detailed 
+instructions as well as development guidelines and information can be found on
+http://www.helioviewer.org/wiki/index.php?title=JHelioviewer_Development_Information
+and in JHelioviewer's INSTALL file.
+
+Build instructions
+------------------
+
+More general information about the build process can be found in JHelioviewer's INSTALL file - 
+this only represents one quick way to get the plugin running.
+
+run:
+
+    ant                   - build PfssPlugin.jar
+    ant install-plugin    - build and copy/install PfssPlugin.jar into ~/JHelioviewer/Plugins/
+    ant clean             - clean-up workspace
+

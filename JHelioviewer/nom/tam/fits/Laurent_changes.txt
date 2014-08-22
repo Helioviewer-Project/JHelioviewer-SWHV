@@ -1,0 +1,39 @@
+In BinaryTable:
+
+ -- For ComplexData has bSize *= 2, size*=2.
+    Not sure this is right.  Seems to be handled by adding dimension...
+
+ -- getTformType (and getTformLength) methods
+    Changed name to ...TFORM... and made accessible to
+    other classes by giving it package level access.
+
+
+In FitsFactory
+  -- Added setCheckAsciiStrings flag (which defaults to false).
+  If set then when a warning will be noted if invalid ASCII characters
+  are found, but the program will not fail.
+
+  -- Added ASCII charset variable.
+
+In HeaderCard, FitsUtil, nom.tam.util.ByteParser
+  -- Conversions of bytes to strings now use the FitsFactory.ASCII charset.
+
+
+In Header
+   -- Fixed bug with positioning of header card in positionAfterIndex
+
+Changes to changes
+
+In BinaryTable: didn't change getTFORMType to protected but to package
+level access, since that is actual what we are using.
+
+Did not make classes final. I can easily conceive of users wishing to extend
+classes like BinaryTable to customize to their own needs.
+
+Did not incorporate the small formatting changes.  Many of them (including
+the spacing in expressions would probably be a good idea), but I've become
+very wary of using the ++ and -- operators (see my contribution in the thread at
+http://groups.google.com/group/comp.lang.java.programmer/browse_frm/thread/357b4587c4b36352/dcb152343ace64f5?lnk=gst&q=mcglynn#dcb152343ace64f5
+for some of the motivation).
+
+Did not incorporate changes to packages (not that I expected to).
