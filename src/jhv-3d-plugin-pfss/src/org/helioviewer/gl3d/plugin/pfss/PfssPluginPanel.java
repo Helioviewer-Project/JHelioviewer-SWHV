@@ -5,6 +5,8 @@ import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -104,7 +106,7 @@ public class PfssPluginPanel extends OverlayPanel implements ActionListener, Lay
         this.qualitySpinner.addChangeListener(new ChangeListener() {
             @Override
             public void stateChanged(javax.swing.event.ChangeEvent e) {
-                PfssSettings.qualityReduction = ((Integer) qualitySpinner.getValue()).intValue();
+                PfssSettings.qualityReduction = 8 - ((Integer) qualitySpinner.getValue()).intValue();
                 Displayer.getSingletonInstance().display();
             }
 
@@ -115,6 +117,20 @@ public class PfssPluginPanel extends OverlayPanel implements ActionListener, Lay
         helpPanel.add(new JLabel("Quality:"));
         helpPanel.add(qualitySpinner);
         this.add(helpPanel, c0);
+
+        GridBagConstraints c1 = new GridBagConstraints();
+        c1.insets = new Insets(0, 0, 5, 0);
+        c1.gridx = 0;
+        c1.gridy = 2;
+        JCheckBox fixedColors = new JCheckBox("Fixed colors", false);
+        fixedColors.addItemListener(new ItemListener() {
+            @Override
+            public void itemStateChanged(ItemEvent e) {
+                PfssSettings.fixedColor = (e.getStateChange() == ItemEvent.SELECTED);
+                Displayer.getSingletonInstance().display();
+            }
+        });
+        this.add(fixedColors, c1);
 
         GridBagConstraints c2 = new GridBagConstraints();
         c2.insets = new Insets(0, 0, 5, 0);

@@ -70,4 +70,6 @@ public class PfssSettings {
     public static String baseUrl = "http://swhv.oma.be/magtest/";
 
     public static int qualityReduction = 8;
+
+    public static boolean fixedColor = false;
 }
