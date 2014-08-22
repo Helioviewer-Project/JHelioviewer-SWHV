@@ -4,7 +4,8 @@ import java.awt.event.KeyEvent;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.media.opengl.GL;
+import javax.media.opengl.GL2;
+import javax.media.opengl.GL2;
 
 import org.helioviewer.base.logging.Log;
 import org.helioviewer.base.physics.Constants;
@@ -126,11 +127,11 @@ public class GL3DSceneGraphView extends AbstractGL3DView implements GL3DView {
     @Override
     public void render3D(GL3DState state) {
 
-        GL gl = state.gl;
+        GL2 gl = state.gl;
 
-        gl.glBlendFunc(GL.GL_SRC_ALPHA, GL.GL_ONE_MINUS_SRC_ALPHA);
+        gl.glBlendFunc(GL2.GL_SRC_ALPHA, GL2.GL_ONE_MINUS_SRC_ALPHA);
 
-        gl.glBlendEquation(GL.GL_FUNC_ADD);
+        gl.glBlendEquation(GL2.GL_FUNC_ADD);
         deleteNodes(state);
 
         if (this.getView() != null) {
@@ -146,9 +147,9 @@ public class GL3DSceneGraphView extends AbstractGL3DView implements GL3DView {
             Log.warn("GL3DSceneGraph: Camera not ready, aborting renderpass");
             return;
         }
-        // gl.glBlendFunc(GL.GL_ONE, GL.GL_DST_ALPHA);
-        gl.glDisable(GL.GL_BLEND);
-        gl.glEnable(GL.GL_DEPTH_TEST);
+        // gl.glBlendFunc(GL2.GL_ONE, GL2.GL_DST_ALPHA);
+        gl.glDisable(GL2.GL_BLEND);
+        gl.glEnable(GL2.GL_DEPTH_TEST);
 
         state.pushMV();
         state.loadIdentity();
@@ -175,7 +176,7 @@ public class GL3DSceneGraphView extends AbstractGL3DView implements GL3DView {
 
         state.popMV();
 
-        gl.glEnable(GL.GL_BLEND);
+        gl.glEnable(GL2.GL_BLEND);
     }
 
     private void deleteNodes(GL3DState state) {
@@ -418,7 +419,7 @@ public class GL3DSceneGraphView extends AbstractGL3DView implements GL3DView {
     }
 
     @Override
-    protected void renderChild(GL gl) {
+    protected void renderChild(GL2 gl) {
         if (view instanceof GLView) {
             ((GLView) view).renderGL(gl, true);
         }

@@ -3,7 +3,7 @@ package org.helioviewer.gl3d.scenegraph.visuals;
 import java.awt.Color;
 import java.util.List;
 
-import javax.media.opengl.GL;
+import javax.media.opengl.GL2;
 
 import org.helioviewer.base.math.RectangleDouble;
 import org.helioviewer.gl3d.scenegraph.GL3DMesh;
@@ -51,12 +51,12 @@ public class GL3DText extends GL3DMesh {
 
     @Override
     public void shapeDraw(GL3DState state) {
-        GL gl = state.gl;
-        gl.glDisable(GL.GL_COLOR_MATERIAL);
-        gl.glDisable(GL.GL_LIGHT0);
+        GL2 gl = state.gl;
+        gl.glDisable(GL2.GL_COLOR_MATERIAL);
+        gl.glDisable(GL2.GL_LIGHT0);
 
-        gl.glDisable(GL.GL_LIGHTING);
-        state.gl.glEnable(GL.GL_BLEND);
+        gl.glDisable(GL2.GL_LIGHTING);
+        state.gl.glEnable(GL2.GL_BLEND);
         if (!initiated) {
             GLTextureHelper th = new GLTextureHelper();
             this.texture_id = th.genTextureID(gl);
@@ -64,7 +64,7 @@ public class GL3DText extends GL3DMesh {
         }
         GL3DFont.getSingletonInstance().bindFont(this.font, gl);
         super.shapeDraw(state);
-        gl.glEnable(GL.GL_LIGHT0);
+        gl.glEnable(GL2.GL_LIGHT0);
     }
 
     @Override

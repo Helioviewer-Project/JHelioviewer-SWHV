@@ -3,7 +3,7 @@ package org.helioviewer.gl3d.view;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
 
-import javax.media.opengl.GL;
+import javax.media.opengl.GL2;
 
 import org.helioviewer.base.logging.Log;
 import org.helioviewer.base.physics.Astronomy;
@@ -43,7 +43,7 @@ public class GL3DCoordinateSystemView extends AbstractGL3DView implements GL3DVi
         MetaData metaData = metaDataView.getMetaData();
         initialiseCoordinateSystem(metaData);
         System.out.println("COORDINATESYSTEM CHANGED");
-        GL gl = state.gl;
+        GL2 gl = state.gl;
 
         this.renderChild(gl);
     }

@@ -10,12 +10,12 @@
 	<classpathentry kind="src" path="resources"/>
 	<classpathentry kind="lib" path="../lib/fits.jar"/>
 	<classpathentry kind="lib" path="../lib/gluegen-rt.jar"/>
-	<classpathentry kind="lib" path="../lib/jogl.jar"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/jhv"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/viewmodel"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/viewmodelplugin"/>
 	<classpathentry kind="lib" path="../lib/bzip2.jar"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/jhv-display"/>
 	<classpathentry kind="src" path="/basegui"/>
+	<classpathentry kind="lib" path="/Users/freekv/swhv/git/client/jhv-3d-wcs/lib/jogl-all.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

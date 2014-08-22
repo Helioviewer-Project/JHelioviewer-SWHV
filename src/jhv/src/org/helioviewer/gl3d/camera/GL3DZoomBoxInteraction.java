@@ -3,7 +3,7 @@ package org.helioviewer.gl3d.camera;
 import java.awt.Point;
 import java.awt.event.MouseEvent;
 
-import javax.media.opengl.GL;
+import javax.media.opengl.GL2;
 
 import org.helioviewer.base.logging.Log;
 import org.helioviewer.gl3d.scenegraph.GL3DState;
@@ -61,14 +61,14 @@ public class GL3DZoomBoxInteraction extends GL3DDefaultInteraction {
                 y0 = this.zoomBoxEndPoint.y;
             }
 
-            GL gl = state.gl;
+            GL2 gl = state.gl;
             gl.glColor3d(1, 1, 0);
-            gl.glDisable(GL.GL_DEPTH_TEST);
-            gl.glDisable(GL.GL_LIGHTING);
-            gl.glDisable(GL.GL_TEXTURE_2D);
+            gl.glDisable(GL2.GL_DEPTH_TEST);
+            gl.glDisable(GL2.GL_LIGHTING);
+            gl.glDisable(GL2.GL_TEXTURE_2D);
 
             gl.glLineWidth(2.0f);
-            gl.glBegin(GL.GL_LINE_LOOP);
+            gl.glBegin(GL2.GL_LINE_LOOP);
 
             gl.glVertex3d(x0, y0, z0);
             gl.glVertex3d(x1, y0, z1);
@@ -78,9 +78,9 @@ public class GL3DZoomBoxInteraction extends GL3DDefaultInteraction {
             gl.glEnd();
 
             gl.glLineWidth(1.0f);
-            gl.glEnable(GL.GL_LIGHTING);
-            gl.glEnable(GL.GL_DEPTH_TEST);
-            gl.glEnable(GL.GL_TEXTURE_2D);
+            gl.glEnable(GL2.GL_LIGHTING);
+            gl.glEnable(GL2.GL_DEPTH_TEST);
+            gl.glEnable(GL2.GL_TEXTURE_2D);
         }
     }
 

@@ -3,7 +3,7 @@ package org.helioviewer.gl3d.scenegraph;
 import java.util.Date;
 import java.util.Stack;
 
-import javax.media.opengl.GL;
+import javax.media.opengl.GL2;
 import javax.media.opengl.glu.GLU;
 
 import org.helioviewer.base.logging.Log;
@@ -23,7 +23,7 @@ import org.helioviewer.gl3d.scenegraph.math.GL3DMat4d;
 public class GL3DState {
     private static GL3DState instance;
 
-    public GL gl;
+    public GL2 gl;
 
     public GL3DMat4d mv;
     private final Stack<GL3DMat4d> matrixStack;
@@ -39,7 +39,7 @@ public class GL3DState {
 
     private Date currentObservationDate;
 
-    public static GL3DState create(GL gl) {
+    public static GL3DState create(GL2 gl) {
         instance = new GL3DState(gl);
         return instance;
     }
@@ -48,14 +48,14 @@ public class GL3DState {
         return instance;
     }
 
-    public static GL3DState getUpdated(GL gl, int width, int height) {
+    public static GL3DState getUpdated(GL2 gl, int width, int height) {
         instance.gl = gl;
         instance.viewportWidth = width;
         instance.viewportHeight = height;
         return instance;
     }
 
-    private GL3DState(GL gl) {
+    private GL3DState(GL2 gl) {
         this.gl = gl;
         this.mv = GL3DMat4d.identity();
         this.matrixStack = new Stack<GL3DMat4d>();
@@ -114,15 +114,15 @@ public class GL3DState {
         }
         int glErrorCode = gl.glGetError();
 
-        if (glErrorCode != GL.GL_NO_ERROR) {
+        if (glErrorCode != GL2.GL_NO_ERROR) {
             GLU glu = new GLU();
             Log.error("GL Error (" + glErrorCode + "): " + glu.gluErrorString(glErrorCode) + " - @" + message);
-            if (glErrorCode == GL.GL_INVALID_OPERATION) {
+            if (glErrorCode == GL2.GL_INVALID_OPERATION) {
                 // Find the error position
                 int[] err = new int[1];
-                gl.glGetIntegerv(GL.GL_PROGRAM_ERROR_POSITION_ARB, err, 0);
+                gl.glGetIntegerv(GL2.GL_PROGRAM_ERROR_POSITION_ARB, err, 0);
                 if (err[0] >= 0) {
-                    String error = gl.glGetString(GL.GL_PROGRAM_ERROR_STRING_ARB);
+                    String error = gl.glGetString(GL2.GL_PROGRAM_ERROR_STRING_ARB);
                     Log.error("GL error at " + err[0] + ":\n" + error);
                 }
             }
@@ -136,22 +136,22 @@ public class GL3DState {
         return checkGLErrors(this.gl);
     }
 
-    public boolean checkGLErrors(GL gl) {
+    public boolean checkGLErrors(GL2 gl) {
         if (gl == null) {
             Log.warn("OpenGL not yet Initialised!");
             return true;
         }
         int glErrorCode = gl.glGetError();
 
-        if (glErrorCode != GL.GL_NO_ERROR) {
+        if (glErrorCode != GL2.GL_NO_ERROR) {
             GLU glu = new GLU();
             Log.error("GL Error (" + glErrorCode + "): " + glu.gluErrorString(glErrorCode));
-            if (glErrorCode == GL.GL_INVALID_OPERATION) {
+            if (glErrorCode == GL2.GL_INVALID_OPERATION) {
                 // Find the error position
                 int[] err = new int[1];
-                gl.glGetIntegerv(GL.GL_PROGRAM_ERROR_POSITION_ARB, err, 0);
+                gl.glGetIntegerv(GL2.GL_PROGRAM_ERROR_POSITION_ARB, err, 0);
                 if (err[0] >= 0) {
-                    String error = gl.glGetString(GL.GL_PROGRAM_ERROR_STRING_ARB);
+                    String error = gl.glGetString(GL2.GL_PROGRAM_ERROR_STRING_ARB);
                     Log.error("GL error at " + err[0] + ":\n" + error);
                 }
             }

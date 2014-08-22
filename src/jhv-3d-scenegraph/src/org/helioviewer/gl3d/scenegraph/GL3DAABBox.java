@@ -3,7 +3,7 @@ package org.helioviewer.gl3d.scenegraph;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.media.opengl.GL;
+import javax.media.opengl.GL2;
 
 import org.helioviewer.gl3d.scenegraph.GL3DMesh.GL3DMeshPrimitive;
 import org.helioviewer.gl3d.scenegraph.math.GL3DMat4d;
@@ -165,14 +165,14 @@ public class GL3DAABBox {
         this.indexBuffer.enable(state);
         this.colorBuffer.enable(state);
 
-        // state.gl.glMaterialfv(GL.GL_FRONT, GL.GL_DIFFUSE,
+        // state.gl.glMaterialfv(GL2.GL_FRONT, GL2.GL_DIFFUSE,
         // this.diffuseMaterial, 0);
 
         // state.gl.glColor4d(color.x, color.y, color.z, color.w);
         GL3DMeshPrimitive primitive = GL3DMeshPrimitive.LINES;
-        state.gl.glDisable(GL.GL_LIGHTING);
+        state.gl.glDisable(GL2.GL_LIGHTING);
         state.gl.glDrawElements(primitive.id, this.indexBuffer.numberOfElements, this.indexBuffer.dataType.id, 0);
-        state.gl.glEnable(GL.GL_LIGHTING);
+        state.gl.glEnable(GL2.GL_LIGHTING);
 
         this.vertexBuffer.disable(state);
         this.colorBuffer.disable(state);

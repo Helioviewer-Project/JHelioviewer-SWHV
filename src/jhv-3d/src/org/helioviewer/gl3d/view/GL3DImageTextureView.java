@@ -3,7 +3,7 @@ package org.helioviewer.gl3d.view;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
 
-import javax.media.opengl.GL;
+import javax.media.opengl.GL2;
 
 import org.helioviewer.base.math.MathUtils;
 import org.helioviewer.base.math.Vector2dDouble;
@@ -67,7 +67,7 @@ public class GL3DImageTextureView extends AbstractGL3DView implements GL3DView, 
     private final GL3DImageFragmentShaderProgram fragmentShader = new GL3DImageFragmentShaderProgram();
 
     @Override
-    public void renderGL(GL gl, boolean nextView) {
+    public void renderGL(GL2 gl, boolean nextView) {
         render3D(GL3DState.get());
     }
 
@@ -78,7 +78,7 @@ public class GL3DImageTextureView extends AbstractGL3DView implements GL3DView, 
             GLTextureHelper th = new GLTextureHelper();
             if (true) {
                 this.capturedRegion = copyScreenToTexture(state, th);
-                // gl.glClear(GL.GL_COLOR_BUFFER_BIT | GL.GL_DEPTH_BUFFER_BIT);
+                // gl.glClear(GL2.GL_COLOR_BUFFER_BIT | GL2.GL_DEPTH_BUFFER_BIT);
                 if (forceUpdate) {
                     this.notifyViewListeners(new ChangeEvent(new ImageTextureRecapturedReason(this, this.textureId, this.textureScale, StaticRegion.createAdaptedRegion(this.capturedRegion.getRectangle()))));
                 }

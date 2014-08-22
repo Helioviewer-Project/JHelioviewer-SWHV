@@ -9,7 +9,7 @@ import java.net.URL;
 import java.net.URLConnection;
 import java.util.zip.GZIPInputStream;
 
-import javax.media.opengl.GL;
+import javax.media.opengl.GL2;
 
 /**
  * Class to load the fitsfile with a http-request and store them in a byte[]
@@ -82,7 +82,7 @@ public class PfssFitsFile {
      * 
      * @param gl
      */
-    public void clear(GL gl) {
+    public void clear(GL2 gl) {
         if (data != null) {
             this.data.clear(gl);
             this.data = null;

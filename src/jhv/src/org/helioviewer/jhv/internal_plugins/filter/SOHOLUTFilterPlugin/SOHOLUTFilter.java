@@ -2,7 +2,7 @@ package org.helioviewer.jhv.internal_plugins.filter.SOHOLUTFilterPlugin;
 
 import java.nio.IntBuffer;
 
-import javax.media.opengl.GL;
+import javax.media.opengl.GL2;
 
 import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.viewmodel.filter.AbstractFilter;
@@ -28,7 +28,7 @@ import org.helioviewer.viewmodel.view.opengl.shader.GLSingleChannelLookupFragmen
  * returns the input data.
  * 
  * <p>
- * This filter supports software rendering as well as rendering in OpenGL.
+ * This filter supports software rendering as well as rendering in OpenGL2.
  * 
  * mostly rewritten
  * 
@@ -167,7 +167,7 @@ public class SOHOLUTFilter extends AbstractFilter implements FrameFilter, Standa
      * In this case, also updates the color table, if necessary.
      */
     @Override
-    public void applyGL(GL gl) {
+    public void applyGL(GL2 gl) {
         shader.bind(gl);
         shader.activateLutTexture(gl);
         LUT currlut;
@@ -181,7 +181,7 @@ public class SOHOLUTFilter extends AbstractFilter implements FrameFilter, Standa
             currlut = lut;
         }
 
-        gl.glBindTexture(GL.GL_TEXTURE_1D, lookupTex);
+        gl.glBindTexture(GL2.GL_TEXTURE_1D, lookupTex);
         if (lastLut != currlut || invertLUT != lastInverted) {
             int[] intLUT;
 
@@ -202,15 +202,15 @@ public class SOHOLUTFilter extends AbstractFilter implements FrameFilter, Standa
             lastLut = currlut;
             lastInverted = invertLUT;
 
-            gl.glPixelStorei(GL.GL_UNPACK_SKIP_PIXELS, 0);
-            gl.glPixelStorei(GL.GL_UNPACK_SKIP_ROWS, 0);
-            gl.glPixelStorei(GL.GL_UNPACK_ROW_LENGTH, 0);
-            gl.glPixelStorei(GL.GL_UNPACK_ALIGNMENT, 4);
+            gl.glPixelStorei(GL2.GL_UNPACK_SKIP_PIXELS, 0);
+            gl.glPixelStorei(GL2.GL_UNPACK_SKIP_ROWS, 0);
+            gl.glPixelStorei(GL2.GL_UNPACK_ROW_LENGTH, 0);
+            gl.glPixelStorei(GL2.GL_UNPACK_ALIGNMENT, 4);
 
-            gl.glTexImage1D(GL.GL_TEXTURE_1D, 0, GL.GL_RGBA, buffer.limit(), 0, GL.GL_BGRA, GL.GL_UNSIGNED_INT_8_8_8_8_REV, buffer);
-            gl.glTexParameteri(GL.GL_TEXTURE_1D, GL.GL_TEXTURE_MIN_FILTER, GL.GL_NEAREST);
-            gl.glTexParameteri(GL.GL_TEXTURE_1D, GL.GL_TEXTURE_MAG_FILTER, GL.GL_NEAREST);
-            gl.glTexParameteri(GL.GL_TEXTURE_1D, GL.GL_TEXTURE_WRAP_S, GL.GL_CLAMP);
+            gl.glTexImage1D(GL2.GL_TEXTURE_1D, 0, GL2.GL_RGBA, buffer.limit(), 0, GL2.GL_BGRA, GL2.GL_UNSIGNED_INT_8_8_8_8_REV, buffer);
+            gl.glTexParameteri(GL2.GL_TEXTURE_1D, GL2.GL_TEXTURE_MIN_FILTER, GL2.GL_NEAREST);
+            gl.glTexParameteri(GL2.GL_TEXTURE_1D, GL2.GL_TEXTURE_MAG_FILTER, GL2.GL_NEAREST);
+            gl.glTexParameteri(GL2.GL_TEXTURE_1D, GL2.GL_TEXTURE_WRAP_S, GL2.GL_CLAMP);
         }
 
     }

@@ -1,6 +1,7 @@
 package org.helioviewer.gl3d.shader;
 
-import javax.media.opengl.GL;
+import javax.media.opengl.GL2;
+import javax.media.opengl.GL2;
 
 import org.helioviewer.gl3d.model.image.GL3DImageMesh;
 import org.helioviewer.viewmodel.view.opengl.shader.GLFragmentShaderProgram;
@@ -19,9 +20,9 @@ import org.helioviewer.viewmodel.view.opengl.shader.GLVertexShaderProgram;
  * 
  */
 public class GL3DShaderFactory {
-    public static GLFragmentShaderProgram createFragmentShaderProgram(GL gl, GLFragmentShaderProgram fragmentShaderProgram) {
+    public static GLFragmentShaderProgram createFragmentShaderProgram(GL2 gl, GLFragmentShaderProgram fragmentShaderProgram) {
         // create new shader builder
-        GLShaderBuilder newShaderBuilder = new GLShaderBuilder(gl, GL.GL_FRAGMENT_PROGRAM_ARB, true);
+        GLShaderBuilder newShaderBuilder = new GLShaderBuilder(gl, GL2.GL_FRAGMENT_PROGRAM_ARB, true);
 
         // fill with standard values
         GLMinimalFragmentShaderProgram minimalProgram = new GLMinimalFragmentShaderProgram();
@@ -34,9 +35,9 @@ public class GL3DShaderFactory {
         return fragmentShaderProgram;
     }
 
-    public static GLVertexShaderProgram createVertexShaderProgram(GL gl, GLVertexShaderProgram vertexShaderProgram) {
+    public static GLVertexShaderProgram createVertexShaderProgram(GL2 gl, GLVertexShaderProgram vertexShaderProgram) {
         // create new shader builder
-        GLShaderBuilder newShaderBuilder = new GLShaderBuilder(gl, GL.GL_VERTEX_PROGRAM_ARB, true);
+        GLShaderBuilder newShaderBuilder = new GLShaderBuilder(gl, GL2.GL_VERTEX_PROGRAM_ARB, true);
 
         // fill with standard values
         GLMinimalVertexShaderProgram minimalProgram = new GLMinimalVertexShaderProgram();

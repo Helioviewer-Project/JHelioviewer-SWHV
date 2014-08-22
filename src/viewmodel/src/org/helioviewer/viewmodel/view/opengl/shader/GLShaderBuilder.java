@@ -4,35 +4,35 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedList;
 
-import javax.media.opengl.GL;
+import javax.media.opengl.GL2;
 
 import org.helioviewer.base.logging.Log;
 
 /**
  * Class to build new OpenGL shader build in Cg.
- *
+ * 
  * <p>
  * Since a graphics card only supports one active vertex shader and one active
  * fragment shader at a time, it is necessary to merge all operations that
  * should be applied to one image into one big, final shader.
- *
+ * 
  * <p>
  * Therefore, this class provides functions to add different input and output
  * parameter to the current shader as well as adding code pieces. After adding
  * all different parts of the shader, they can be compiled into one single
  * shader. For programming, Cg (C for Graphics, developed by NVIDIA) is used as
  * the shading language. To use this class, you have to be familiar with Cg.
- *
+ * 
  * <p>
  * When adding code pieces, it is highly recommended to use a specific prefix,
  * so that your names do not collide with names from other parts.
- *
+ * 
  * <p>
  * For further informations about programming shaders, refer to the Cg User
  * Manual.
- *
+ * 
  * @author Markus Langenberg
- *
+ * 
  */
 public class GLShaderBuilder {
 
@@ -61,7 +61,7 @@ public class GLShaderBuilder {
     private int nextVertexAttribute = 0;
     private static int highestTexCoordEverUsed = 0;
 
-    private final GL gl;
+    private final GL2 gl;
     private final int shaderID;
     private final int type;
 
@@ -71,31 +71,31 @@ public class GLShaderBuilder {
     /**
      * Initializes the static members of the shader builder. This has to happen
      * during runtime, since many of this values are driver dependent.
-     *
+     * 
      * @param gl
      *            current GL object
      */
-    public static void initShaderBuilder(GL gl) {
+    public static void initShaderBuilder(GL2 gl) {
         Log.debug(">> GLShaderBuilder.initShaderBuilder(GL) > Initialize shader builder");
         int tmp[] = new int[1];
 
         tmp[0] = 0;
-        gl.glGetIntegerv(GL.GL_MAX_TEXTURE_IMAGE_UNITS, tmp, 0);
+        gl.glGetIntegerv(GL2.GL_MAX_TEXTURE_IMAGE_UNITS, tmp, 0);
         maxTexUnits = tmp[0];
         Log.debug(">> GLShaderBuilder.initShaderBuilder(GL) > max texture image units: " + maxTexUnits);
 
         tmp[0] = 0;
-        gl.glGetIntegerv(GL.GL_MAX_TEXTURE_COORDS, tmp, 0);
+        gl.glGetIntegerv(GL2.GL_MAX_TEXTURE_COORDS, tmp, 0);
         maxTexCoords = tmp[0];
         Log.debug(">> GLShaderBuilder.initShaderBuilder(GL) > max texture coords: " + maxTexCoords);
 
         tmp[0] = 0;
-        gl.glGetIntegerv(GL.GL_MAX_FRAGMENT_UNIFORM_COMPONENTS_ARB, tmp, 0);
+        gl.glGetIntegerv(GL2.GL_MAX_FRAGMENT_UNIFORM_COMPONENTS, tmp, 0);
         maxConstantRegisters = tmp[0];
         Log.debug(">> GLShaderBuilder.initShaderBuilder(GL) > max fragment uniform components arb: " + maxConstantRegisters);
 
         tmp[0] = 0;
-        gl.glGetIntegerv(GL.GL_MAX_VERTEX_ATTRIBS_ARB, tmp, 0);
+        gl.glGetIntegerv(GL2.GL_MAX_VERTEX_ATTRIBS_ARB, tmp, 0);
         maxVertexAttributes = tmp[0];
         Log.debug(">> GLShaderBuilder.initShaderBuilder(GL) > max vertex attributes arb: " + maxVertexAttributes);
 
@@ -104,18 +104,18 @@ public class GLShaderBuilder {
 
     /**
      * Generates a new GLShaderBuilder.
-     *
+     * 
      * @param gl
      *            Valid reference to the current gl object
      * @param type
      *            the shader type, has to be GL_FRAGMENT_PROGRAM_ARB or
      *            GL_VERTEX_PROGRAM_ARB
      */
-    public GLShaderBuilder(GL gl, int type) {
+    public GLShaderBuilder(GL2 gl, int type) {
         this(gl, type, false);
     }
 
-    public GLShaderBuilder(GL gl, int type, boolean standalone) {
+    public GLShaderBuilder(GL2 gl, int type, boolean standalone) {
         this.gl = gl;
         this.type = type;
 
@@ -136,17 +136,17 @@ public class GLShaderBuilder {
      * Returns the GL object assigned to this ShaderBuilder. Warning: Only use
      * this function within a build*Shader-method, otherwise the object might
      * not be valid.
-     *
+     * 
      * @return Reference to the current gl object
      */
-    public GL getGL() {
+    public GL2 getGL() {
         return gl;
     }
 
     /**
      * Returns OpenGL shader id assigned to this shader. To use this shader,
      * bind shader id.
-     *
+     * 
      * @return assigned shader id
      */
     public int getShaderID() {
@@ -156,7 +156,7 @@ public class GLShaderBuilder {
     /**
      * Advises the GLShaderBuilder to provide this output value in its output.
      * Typical values are for example POSITION, COLOR or TEXCOORD0
-     *
+     * 
      * @param type
      *            the type of the output value to use (since this is not a
      *            1:1-binding to the value)
@@ -187,7 +187,7 @@ public class GLShaderBuilder {
      * Advises the GLShaderBuilder to provide this output value in its output,
      * initialing it the given value. Typical values are for example POSITION,
      * COLOR or TEXCOORD0
-     *
+     * 
      * @param type
      *            the type of the output value to use (since this is not a
      *            1:1-binding to the value)
@@ -222,7 +222,7 @@ public class GLShaderBuilder {
      * parameter list. This function should be used for all kind of parameters,
      * which do not have a special function and may be used by multiple code
      * fragments, such as COLOR, TEXUNIT0, TEXCOORD0 or all members of state.
-     *
+     * 
      * @param type
      *            the type of the standard parameter to use (since this is not a
      *            1:1-binding to the parameter)
@@ -272,7 +272,7 @@ public class GLShaderBuilder {
      * coordinate is added to the parameter list. It returns an abstract
      * representation of the texture coordinate, which has be used to access the
      * values. The object wrappes the call to the actual OpenGL functions
-     *
+     * 
      * @param numDimensions
      *            Number of values to add to texture coordinate
      * @return GLTextureCoordinate presenting the new values
@@ -283,7 +283,7 @@ public class GLShaderBuilder {
         int texCoord = 0;
         while (texCoord < maxTexCoords) {
             if (componentsAvailableInTexCoord[texCoord] >= numDimensions) {
-                if (type == GL.GL_FRAGMENT_PROGRAM_ARB && texCoord > highestTexCoordEverUsed) {
+                if (type == GL2.GL_FRAGMENT_PROGRAM_ARB && texCoord > highestTexCoordEverUsed) {
                     highestTexCoordEverUsed = texCoord;
                 }
 
@@ -308,7 +308,7 @@ public class GLShaderBuilder {
                     identifier += coordinateDimension[i];
                 }
 
-                GLTextureCoordinate output = new GLShaderTextureCoordinate(GL.GL_TEXTURE0 + texCoord, offset, numDimensions, identifier);
+                GLTextureCoordinate output = new GLShaderTextureCoordinate(GL2.GL_TEXTURE0 + texCoord, offset, numDimensions, identifier);
 
                 componentsAvailableInTexCoord[texCoord] -= numDimensions;
 
@@ -323,7 +323,7 @@ public class GLShaderBuilder {
      * Adds a new texture unit to the parameter list. It returns the OpenGL
      * constant, which has to be used by glActiveTexture to access this
      * parameter, for example GL_TEXTURE1 or GL_TEXTURE4.
-     *
+     * 
      * @param declaration
      *            declaration of the new parameter, including type and name. for
      *            example "sampler2D myTexture".
@@ -334,7 +334,7 @@ public class GLShaderBuilder {
     public int addTextureParameter(String declaration) throws GLBuildShaderException {
         if (nextTexUnit < maxTexUnits) {
             getParameterList().add("uniform " + declaration.trim() + " : TEXUNIT" + nextTexUnit);
-            return GL.GL_TEXTURE0 + nextTexUnit++;
+            return GL2.GL_TEXTURE0 + nextTexUnit++;
         } else {
             throw new GLBuildShaderException("Number of available texture units exceeded (Max: " + maxTexUnits + ")");
         }
@@ -344,7 +344,7 @@ public class GLShaderBuilder {
      * Adds a new environment parameter to the parameter list. It returns the
      * index, which has to be used by glProgramEnvParameter*ARB to access this
      * parameter.
-     *
+     * 
      * @param declaration
      *            declaration of the new parameter, including type and name. for
      *            example "float2 myParam".
@@ -363,17 +363,19 @@ public class GLShaderBuilder {
         }
     }
 
-    public double[] getEnvParameter(int pos){
+    public double[] getEnvParameter(int pos) {
         return this.glEnvParameters.get(pos);
     }
-    public ArrayList<double[]> getEnvParameters(){
+
+    public ArrayList<double[]> getEnvParameters() {
         return this.glEnvParameters;
     }
+
     /**
      * Adds a new generic vertex attribute to the parameter list. It returns the
      * index, which has to be used by glVertexAttrib*ARB to access this
      * parameter.
-     *
+     * 
      * @param declaration
      *            declaration of the new parameter, including type and name. for
      *            example "float2 myParam".
@@ -397,7 +399,7 @@ public class GLShaderBuilder {
      * parameters and body. Make sure to add a code fragment to the main
      * function by calling addMainFragment(), where the new function is called
      * in some way.
-     *
+     * 
      * @param code
      *            new code fragment
      */
@@ -409,7 +411,7 @@ public class GLShaderBuilder {
      * Adds a new code fragment to the program code. Use the names returned by
      * useOutputValue and useStandardParameter or the ones assigned by yourself
      * calling a add*-method.
-     *
+     * 
      * @param code
      *            new code fragment
      */
@@ -426,7 +428,7 @@ public class GLShaderBuilder {
             shaderHelper.delShaderID(gl, shaderID);
             return;
         }
-        if (type == GL.GL_VERTEX_PROGRAM_ARB) {
+        if (type == GL2.GL_VERTEX_PROGRAM_ARB) {
             for (int i = 0; i <= highestTexCoordEverUsed; i++) {
                 String searchFor = "TEXCOORD" + i;
                 boolean alreadyUsed = outputStruct.contains(searchFor);
@@ -491,23 +493,23 @@ public class GLShaderBuilder {
 
     /**
      * Compiles the given shaders and creates a new shader builder to continue.
-     *
+     * 
      * The new shader builder is initialized with a GLMinimalXShaderProgram.
      * This function might be useful, if multiple shaders should be used on path
      * path through the view chain.
-     *
+     * 
      * @param shaderBuilder
      * @return new shader builder
      */
     public static GLShaderBuilder compileAndCreateNew(GLShaderBuilder shaderBuilder) {
         shaderBuilder.compile();
 
-        if (shaderBuilder.type == GL.GL_FRAGMENT_PROGRAM_ARB) {
-            shaderBuilder = new GLShaderBuilder(shaderBuilder.getGL(), GL.GL_FRAGMENT_PROGRAM_ARB);
+        if (shaderBuilder.type == GL2.GL_FRAGMENT_PROGRAM_ARB) {
+            shaderBuilder = new GLShaderBuilder(shaderBuilder.getGL(), GL2.GL_FRAGMENT_PROGRAM_ARB);
             GLMinimalFragmentShaderProgram minimalFragmentShaderProgram = new GLMinimalFragmentShaderProgram();
             minimalFragmentShaderProgram.build(shaderBuilder);
         } else {
-            shaderBuilder = new GLShaderBuilder(shaderBuilder.getGL(), GL.GL_VERTEX_PROGRAM_ARB);
+            shaderBuilder = new GLShaderBuilder(shaderBuilder.getGL(), GL2.GL_VERTEX_PROGRAM_ARB);
             GLMinimalVertexShaderProgram minimalVertexShaderProgram = new GLMinimalVertexShaderProgram();
             minimalVertexShaderProgram.build(shaderBuilder);
         }
@@ -529,14 +531,14 @@ public class GLShaderBuilder {
     /**
      * GLTextureCoordinate implementation for the all texture coordinates
      * managed by GLShaderBuilder
-     *
+     * 
      * @see GLShaderBuilder#addTextureParameter(String)
      */
     private class GLShaderTextureCoordinate extends GLTextureCoordinate {
 
         /**
          * Default constructor.
-         *
+         * 
          * @param target
          *            OpenGL constant, representing the texture coordinate, such
          *            as GL_TEXTURE0 or GL_TEXTURE3

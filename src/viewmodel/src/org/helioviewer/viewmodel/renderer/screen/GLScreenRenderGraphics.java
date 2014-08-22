@@ -4,7 +4,7 @@ import java.awt.Color;
 import java.awt.Font;
 import java.awt.image.BufferedImage;
 
-import javax.media.opengl.GL;
+import javax.media.opengl.GL2;
 
 import org.helioviewer.base.math.Vector2dInt;
 import org.helioviewer.base.math.Vector3dDouble;
@@ -24,8 +24,8 @@ public class GLScreenRenderGraphics extends AbstractScreenRenderGraphics {
     private static final int edgesPerOval = 32; // has to be power of two
     private static float[] sinOval;
 
-    private GL gl;
-    private GLCommonRenderGraphics commonRenderGraphics;
+    private final GL2 gl;
+    private final GLCommonRenderGraphics commonRenderGraphics;
     private Font font;
 
     /**
@@ -38,7 +38,7 @@ public class GLScreenRenderGraphics extends AbstractScreenRenderGraphics {
      * @param _gl
      *            gl object, that should be used for drawing.
      */
-    public GLScreenRenderGraphics(GL _gl) {
+    public GLScreenRenderGraphics(GL2 _gl) {
         gl = _gl;
         commonRenderGraphics = new GLCommonRenderGraphics(_gl);
 
@@ -53,6 +53,7 @@ public class GLScreenRenderGraphics extends AbstractScreenRenderGraphics {
     /**
      * {@inheritDoc}
      */
+    @Override
     public void setColor(Color color) {
         gl.glColor4ub((byte) color.getRed(), (byte) color.getGreen(), (byte) color.getBlue(), (byte) color.getAlpha());
     }
@@ -60,6 +61,7 @@ public class GLScreenRenderGraphics extends AbstractScreenRenderGraphics {
     /**
      * {@inheritDoc}
      */
+    @Override
     public void setFont(Font font) {
         this.font = font;
     }
@@ -67,6 +69,7 @@ public class GLScreenRenderGraphics extends AbstractScreenRenderGraphics {
     /**
      * {@inheritDoc}
      */
+    @Override
     public void setLineWidth(float lineWidth) {
         gl.glLineWidth(lineWidth);
     }
@@ -74,26 +77,28 @@ public class GLScreenRenderGraphics extends AbstractScreenRenderGraphics {
     /**
      * {@inheritDoc}
      */
+    @Override
     public void drawLine(Integer x0, Integer y0, Integer x1, Integer y1) {
-        gl.glDisable(GL.GL_TEXTURE_2D);
+        gl.glDisable(GL2.GL_TEXTURE_2D);
 
-        gl.glBegin(GL.GL_LINES);
+        gl.glBegin(GL2.GL_LINES);
 
         gl.glVertex2i(x0, y0);
         gl.glVertex2i(x1, y1);
 
         gl.glEnd();
 
-        gl.glEnable(GL.GL_TEXTURE_2D);
+        gl.glEnable(GL2.GL_TEXTURE_2D);
     }
 
     /**
      * {@inheritDoc}
      */
+    @Override
     public void drawRectangle(Integer x, Integer y, Integer width, Integer height) {
-        gl.glDisable(GL.GL_TEXTURE_2D);
+        gl.glDisable(GL2.GL_TEXTURE_2D);
 
-        gl.glBegin(GL.GL_LINE_LOOP);
+        gl.glBegin(GL2.GL_LINE_LOOP);
 
         gl.glVertex2i(x, y);
         gl.glVertex2i(x, y + height);
@@ -102,16 +107,17 @@ public class GLScreenRenderGraphics extends AbstractScreenRenderGraphics {
 
         gl.glEnd();
 
-        gl.glEnable(GL.GL_TEXTURE_2D);
+        gl.glEnable(GL2.GL_TEXTURE_2D);
     }
 
     /**
      * {@inheritDoc}
      */
+    @Override
     public void fillRectangle(Integer x, Integer y, Integer width, Integer height) {
-        gl.glBindTexture(GL.GL_TEXTURE_2D, 0);
+        gl.glBindTexture(GL2.GL_TEXTURE_2D, 0);
 
-        gl.glBegin(GL.GL_QUADS);
+        gl.glBegin(GL2.GL_QUADS);
 
         gl.glVertex2i(x, y);
         gl.glVertex2i(x, y + height);
@@ -124,15 +130,16 @@ public class GLScreenRenderGraphics extends AbstractScreenRenderGraphics {
     /**
      * {@inheritDoc}
      */
+    @Override
     public void drawOval(Integer x, Integer y, Integer width, Integer height) {
-        gl.glDisable(GL.GL_TEXTURE_2D);
+        gl.glDisable(GL2.GL_TEXTURE_2D);
 
         int radiusX = width >> 1;
         int radiusY = height >> 1;
         int centerX = x + radiusX;
         int centerY = y + radiusY;
 
-        gl.glBegin(GL.GL_LINE_LOOP);
+        gl.glBegin(GL2.GL_LINE_LOOP);
 
         for (int i = 0; i < edgesPerOval; i++) {
             gl.glVertex2i(centerX + (int) (radiusX * sinOval[i]), centerY + (int) (radiusY * sinOval[(i + (edgesPerOval >> 2)) & (edgesPerOval - 1)]));
@@ -140,14 +147,15 @@ public class GLScreenRenderGraphics extends AbstractScreenRenderGraphics {
 
         gl.glEnd();
 
-        gl.glEnable(GL.GL_TEXTURE_2D);
+        gl.glEnable(GL2.GL_TEXTURE_2D);
     }
 
     /**
      * {@inheritDoc}
      */
+    @Override
     public void fillOval(Integer x, Integer y, Integer width, Integer height) {
-        gl.glBindTexture(GL.GL_TEXTURE_2D, 0);
+        gl.glBindTexture(GL2.GL_TEXTURE_2D, 0);
 
         int radiusX = width >> 1;
         int radiusY = height >> 1;
@@ -157,11 +165,11 @@ public class GLScreenRenderGraphics extends AbstractScreenRenderGraphics {
         if (width == height) {
             gl.glPointSize(width);
 
-            gl.glBegin(GL.GL_POINTS);
+            gl.glBegin(GL2.GL_POINTS);
             gl.glVertex2i(centerX, centerY);
             gl.glEnd();
         } else {
-            gl.glBegin(GL.GL_TRIANGLE_FAN);
+            gl.glBegin(GL2.GL_TRIANGLE_FAN);
 
             gl.glVertex2i(centerX, centerY);
 
@@ -178,10 +186,11 @@ public class GLScreenRenderGraphics extends AbstractScreenRenderGraphics {
     /**
      * {@inheritDoc}
      */
+    @Override
     public void drawPolygon(Integer[] xCoords, Integer[] yCoords) {
-        gl.glDisable(GL.GL_TEXTURE_2D);
+        gl.glDisable(GL2.GL_TEXTURE_2D);
 
-        gl.glBegin(GL.GL_LINE_LOOP);
+        gl.glBegin(GL2.GL_LINE_LOOP);
 
         for (int i = 0; i < xCoords.length; i++) {
             gl.glVertex2i(xCoords[i], yCoords[i]);
@@ -189,16 +198,17 @@ public class GLScreenRenderGraphics extends AbstractScreenRenderGraphics {
 
         gl.glEnd();
 
-        gl.glEnable(GL.GL_TEXTURE_2D);
+        gl.glEnable(GL2.GL_TEXTURE_2D);
     }
 
     /**
      * {@inheritDoc}
      */
+    @Override
     public void drawPolygon(Vector2dInt[] points) {
-        gl.glDisable(GL.GL_TEXTURE_2D);
+        gl.glDisable(GL2.GL_TEXTURE_2D);
 
-        gl.glBegin(GL.GL_LINE_LOOP);
+        gl.glBegin(GL2.GL_LINE_LOOP);
 
         for (int i = 0; i < points.length; i++) {
             gl.glVertex2i(points[i].getX(), points[i].getY());
@@ -206,16 +216,17 @@ public class GLScreenRenderGraphics extends AbstractScreenRenderGraphics {
 
         gl.glEnd();
 
-        gl.glEnable(GL.GL_TEXTURE_2D);
+        gl.glEnable(GL2.GL_TEXTURE_2D);
     }
 
     /**
      * {@inheritDoc}
      */
+    @Override
     public void fillPolygon(Integer[] xCoords, Integer[] yCoords) {
-        gl.glBindTexture(GL.GL_TEXTURE_2D, 0);
+        gl.glBindTexture(GL2.GL_TEXTURE_2D, 0);
 
-        gl.glBegin(GL.GL_POLYGON);
+        gl.glBegin(GL2.GL_POLYGON);
 
         for (int i = 0; i < xCoords.length; i++) {
             gl.glVertex2i(xCoords[i], yCoords[i]);
@@ -227,10 +238,11 @@ public class GLScreenRenderGraphics extends AbstractScreenRenderGraphics {
     /**
      * {@inheritDoc}
      */
+    @Override
     public void fillPolygon(Vector2dInt[] points) {
-        gl.glBindTexture(GL.GL_TEXTURE_2D, 0);
+        gl.glBindTexture(GL2.GL_TEXTURE_2D, 0);
 
-        gl.glBegin(GL.GL_POLYGON);
+        gl.glBegin(GL2.GL_POLYGON);
 
         for (int i = 0; i < points.length; i++) {
             gl.glVertex2i(points[i].getX(), points[i].getY());
@@ -247,6 +259,7 @@ public class GLScreenRenderGraphics extends AbstractScreenRenderGraphics {
      * to use the same image object every call, if the image data does not
      * change.
      */
+    @Override
     public void drawImage(BufferedImage image, Integer x, Integer y, Integer width, Integer height) {
 
         commonRenderGraphics.bindScalingShader();
@@ -254,7 +267,7 @@ public class GLScreenRenderGraphics extends AbstractScreenRenderGraphics {
 
         gl.glColor3f(1.0f, 1.0f, 1.0f);
 
-        gl.glBegin(GL.GL_QUADS);
+        gl.glBegin(GL2.GL_QUADS);
 
         commonRenderGraphics.setTexCoord(0.0f, 0.0f);
         gl.glVertex2i(x, y);
@@ -273,13 +286,14 @@ public class GLScreenRenderGraphics extends AbstractScreenRenderGraphics {
     /**
      * {@inheritDoc}
      */
+    @Override
     public void drawText(String text, Integer x, Integer y) {
         commonRenderGraphics.bindScalingShader();
         commonRenderGraphics.bindString(text, font);
 
         Vector2dInt size = commonRenderGraphics.getStringDisplaySize(text, font);
 
-        gl.glBegin(GL.GL_QUADS);
+        gl.glBegin(GL2.GL_QUADS);
 
         commonRenderGraphics.setTexCoord(0.0f, 0.0f);
         gl.glVertex2i(x, y);

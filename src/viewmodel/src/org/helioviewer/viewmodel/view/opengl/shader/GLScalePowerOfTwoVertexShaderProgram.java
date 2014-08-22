@@ -1,6 +1,6 @@
 package org.helioviewer.viewmodel.view.opengl.shader;
 
-import javax.media.opengl.GL;
+import javax.media.opengl.GL2;
 
 import org.helioviewer.viewmodel.view.opengl.shader.GLShaderBuilder.GLBuildShaderException;
 
@@ -37,9 +37,9 @@ public class GLScalePowerOfTwoVertexShaderProgram extends GLVertexShaderProgram 
      * @param gl
      *            Valid reference to the current gl object
      */
-    public void buildStandAlone(GL gl) {
+    public void buildStandAlone(GL2 gl) {
         // create new shader builder
-        GLShaderBuilder newShaderBuilder = new GLShaderBuilder(gl, GL.GL_VERTEX_PROGRAM_ARB);
+        GLShaderBuilder newShaderBuilder = new GLShaderBuilder(gl, GL2.GL_VERTEX_PROGRAM_ARB);
 
         // fill with standard values
         GLMinimalVertexShaderProgram minimalProgram = new GLMinimalVertexShaderProgram();

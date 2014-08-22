@@ -1,6 +1,6 @@
 package org.helioviewer.viewmodel.view.opengl.shader;
 
-import javax.media.opengl.GL;
+import javax.media.opengl.GL2;
 
 import org.helioviewer.base.logging.Log;
 
@@ -48,7 +48,7 @@ public abstract class GLTextureCoordinate {
      *            shader programs
      */
     protected GLTextureCoordinate(int target, int offset, int length, String identifier) {
-        this.target = target - GL.GL_TEXTURE0;
+        this.target = target - GL2.GL_TEXTURE0;
         this.offset = offset;
         this.length = length;
         this.identifier = identifier;
@@ -78,10 +78,10 @@ public abstract class GLTextureCoordinate {
      * @param gl
      *            Valid reference to the current gl object
      */
-    public static void init(GL gl) {
+    public static void init(GL2 gl) {
         Log.debug(">> GLTextureCoordinate.init(GL) > Initialize GLTextureCoordinate");
         int tmp[] = new int[1];
-        gl.glGetIntegerv(GL.GL_MAX_TEXTURE_COORDS, tmp, 0);
+        gl.glGetIntegerv(GL2.GL_MAX_TEXTURE_COORDS, tmp, 0);
 
         currentValues = new float[tmp[0]][4];
     }
@@ -96,13 +96,13 @@ public abstract class GLTextureCoordinate {
      * @param value1
      *            First component to set
      */
-    public void setValue(GL gl, float value1) {
+    public void setValue(GL2 gl, float value1) {
         if (length != 1) {
             throw new IllegalArgumentException("Calling this function is not valid for GLTextureCoordinate with lenght " + length + ".");
         }
 
         currentValues[target][offset] = value1;
-        gl.glMultiTexCoord4fv(target + GL.GL_TEXTURE0, currentValues[target], 0);
+        gl.glMultiTexCoord4fv(target + GL2.GL_TEXTURE0, currentValues[target], 0);
     }
 
     /**
@@ -117,14 +117,14 @@ public abstract class GLTextureCoordinate {
      * @param value2
      *            Second component to set
      */
-    public void setValue(GL gl, float value1, float value2) {
+    public void setValue(GL2 gl, float value1, float value2) {
         if (length != 2) {
             throw new IllegalArgumentException("Calling this function is not valid for GLTextureCoordinate with lenght " + length + ".");
         }
 
         currentValues[target][offset] = value1;
         currentValues[target][offset + 1] = value2;
-        gl.glMultiTexCoord4fv(target + GL.GL_TEXTURE0, currentValues[target], 0);
+        gl.glMultiTexCoord4fv(target + GL2.GL_TEXTURE0, currentValues[target], 0);
     }
 
     /**
@@ -141,7 +141,7 @@ public abstract class GLTextureCoordinate {
      * @param value3
      *            Third component to set
      */
-    public void setValue(GL gl, float value1, float value2, float value3) {
+    public void setValue(GL2 gl, float value1, float value2, float value3) {
         if (length != 3) {
             throw new IllegalArgumentException("Calling this function is not valid for GLTextureCoordinate with lenght " + length + ".");
         }
@@ -149,7 +149,7 @@ public abstract class GLTextureCoordinate {
         currentValues[target][offset] = value1;
         currentValues[target][offset + 1] = value2;
         currentValues[target][offset + 2] = value3;
-        gl.glMultiTexCoord4fv(target + GL.GL_TEXTURE0, currentValues[target], 0);
+        gl.glMultiTexCoord4fv(target + GL2.GL_TEXTURE0, currentValues[target], 0);
     }
 
     /**
@@ -168,7 +168,7 @@ public abstract class GLTextureCoordinate {
      * @param value4
      *            Forth component to set
      */
-    public void setValue(GL gl, float value1, float value2, float value3, float value4) {
+    public void setValue(GL2 gl, float value1, float value2, float value3, float value4) {
         if (length != 4) {
             throw new IllegalArgumentException("Calling this function is not valid for GLTextureCoordinate with lenght " + length + ".");
         }
@@ -177,7 +177,7 @@ public abstract class GLTextureCoordinate {
         currentValues[target][offset + 1] = value2;
         currentValues[target][offset + 2] = value3;
         currentValues[target][offset + 3] = value4;
-        gl.glMultiTexCoord4fv(target + GL.GL_TEXTURE0, currentValues[target], 0);
+        gl.glMultiTexCoord4fv(target + GL2.GL_TEXTURE0, currentValues[target], 0);
     }
 
     /**
@@ -191,7 +191,7 @@ public abstract class GLTextureCoordinate {
      * @param values
      *            Array containing all components to set
      */
-    public void setValue(GL gl, float[] values) {
+    public void setValue(GL2 gl, float[] values) {
         if (length != values.length) {
             throw new IllegalArgumentException("'values' is supposed to have a length of " + length + ".");
         }
@@ -199,7 +199,7 @@ public abstract class GLTextureCoordinate {
         for (int i = 0; i < length; i++) {
             currentValues[target][offset + i] = values[i];
         }
-        gl.glMultiTexCoord4fv(target + GL.GL_TEXTURE0, currentValues[target], 0);
+        gl.glMultiTexCoord4fv(target + GL2.GL_TEXTURE0, currentValues[target], 0);
     }
 
     /**

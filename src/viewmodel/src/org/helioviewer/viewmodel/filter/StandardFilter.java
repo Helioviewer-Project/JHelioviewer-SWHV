@@ -9,7 +9,7 @@ import org.helioviewer.viewmodel.imagedata.ImageData;
  * Although OpenGL accelerated are much faster, every filter should provide a
  * pure software implementation as a fallback solution. Even when using the
  * OpenGL rendering mode (which is not possible on all machines) it is not
- * guaranteed that a filter actually will be performed in OpenGL.
+ * guaranteed that a filter actually will be performed in OpenGL2.
  * 
  * <p>
  * In software rendering mode, the filter gets the current image data objects

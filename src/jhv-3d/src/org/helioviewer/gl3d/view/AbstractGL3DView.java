@@ -1,6 +1,6 @@
 package org.helioviewer.gl3d.view;
 
-import javax.media.opengl.GL;
+import javax.media.opengl.GL2;
 
 import org.helioviewer.gl3d.scenegraph.GL3DState;
 import org.helioviewer.viewmodel.view.opengl.AbstractGLView;
@@ -14,7 +14,7 @@ import org.helioviewer.viewmodel.view.opengl.AbstractGLView;
  */
 public abstract class AbstractGL3DView extends AbstractGLView implements GL3DView {
 
-    public void renderGL(GL gl, boolean nextView) {
+    public void renderGL(GL2 gl, boolean nextView) {
         render3D(GL3DState.get());
     }
 

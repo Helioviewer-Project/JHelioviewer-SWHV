@@ -1,6 +1,6 @@
 package org.helioviewer.jhv.internal_plugins.filter.difference;
 
-import javax.media.opengl.GL;
+import javax.media.opengl.GL2;
 
 import org.helioviewer.viewmodel.view.opengl.shader.GLFragmentShaderProgram;
 import org.helioviewer.viewmodel.view.opengl.shader.GLShaderBuilder;
@@ -17,16 +17,16 @@ public class DifferenceShader extends GLFragmentShaderProgram {
 
     private double[] truncationValueFloat;
 
-    public void setIsDifference(GL gl, float isDifference) {
+    public void setIsDifference(GL2 gl, float isDifference) {
         this.isDifference.setValue(gl, isDifference);
     }
 
-    public void setTruncationValue(GL gl, float truncationValue) {
+    public void setTruncationValue(GL2 gl, float truncationValue) {
         this.truncationValueFloat[0] = truncationValue;
     }
 
     @Override
-    public void bind(GL gl) {
+    public void bind(GL2 gl) {
         super.bind(gl);
         this.bindEnvVars(gl, this.truncationValueRef, truncationValueFloat);
     }
@@ -73,6 +73,6 @@ public class DifferenceShader extends GLFragmentShaderProgram {
         }
     }
 
-    public void activateDifferenceTexture(GL gl) {
+    public void activateDifferenceTexture(GL2 gl) {
     }
 }

@@ -11,7 +11,7 @@ import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
 import java.util.HashMap;
 
-import javax.media.opengl.GL;
+import javax.media.opengl.GL2;
 import javax.swing.ImageIcon;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -33,7 +33,7 @@ public class GL3DFont {
         return instance;
     }
 
-    public void updateFont(String font, GL gl, Color textColor, Color backGroundColor) {
+    public void updateFont(String font, GL2 gl, Color textColor, Color backGroundColor) {
         int texture_id;
         GLTextureHelper th = new GLTextureHelper();
         if (!loadedFontsTextureId.containsKey(font)) {
@@ -47,13 +47,13 @@ public class GL3DFont {
         loadedFontsTextureId.put(font, texture_id);
     }
 
-    public void bindFont(String font, GL gl) {
+    public void bindFont(String font, GL2 gl) {
         int texture_id = loadedFontsTextureId.get(font);
-        gl.glBindTexture(GL.GL_TEXTURE_2D, texture_id);
-        gl.glTexParameteri(GL.GL_TEXTURE_2D, GL.GL_TEXTURE_WRAP_S, GL.GL_CLAMP);
-        gl.glTexParameteri(GL.GL_TEXTURE_2D, GL.GL_TEXTURE_WRAP_T, GL.GL_CLAMP);
-        gl.glTexParameteri(GL.GL_TEXTURE_2D, GL.GL_TEXTURE_MAG_FILTER, GL.GL_LINEAR);
-        gl.glTexParameteri(GL.GL_TEXTURE_2D, GL.GL_TEXTURE_MIN_FILTER, GL.GL_LINEAR);
+        gl.glBindTexture(GL2.GL_TEXTURE_2D, texture_id);
+        gl.glTexParameteri(GL2.GL_TEXTURE_2D, GL2.GL_TEXTURE_WRAP_S, GL2.GL_CLAMP);
+        gl.glTexParameteri(GL2.GL_TEXTURE_2D, GL2.GL_TEXTURE_WRAP_T, GL2.GL_CLAMP);
+        gl.glTexParameteri(GL2.GL_TEXTURE_2D, GL2.GL_TEXTURE_MAG_FILTER, GL2.GL_LINEAR);
+        gl.glTexParameteri(GL2.GL_TEXTURE_2D, GL2.GL_TEXTURE_MIN_FILTER, GL2.GL_LINEAR);
     }
 
     public RectangleDouble[] getCharacters(String fontName, Color textColor, Color backgroundColor){

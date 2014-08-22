@@ -1,6 +1,6 @@
 package org.helioviewer.jhv.internal_plugins.filter.channelMixer;
 
-import javax.media.opengl.GL;
+import javax.media.opengl.GL2;
 
 import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.viewmodel.filter.AbstractFilter;
@@ -24,7 +24,7 @@ import org.helioviewer.viewmodel.imagetransport.Short16ImageTransport;
  * The output of the filter always has the same image format as the input.
  * 
  * <p>
- * This filter supports software rendering as well as rendering in OpenGL.
+ * This filter supports software rendering as well as rendering in OpenGL2.
  * 
  * <p>
  * To learn more about color masks, see
@@ -105,7 +105,7 @@ public class ChannelMixerFilter extends AbstractFilter implements StandardFilter
      * OpenGL-function.
      */
     @Override
-    public void applyGL(GL gl) {
+    public void applyGL(GL2 gl) {
         gl.glColorMask(colorMask.showRed(), colorMask.showGreen(), colorMask.showBlue(), true);
     }
 
@@ -116,7 +116,7 @@ public class ChannelMixerFilter extends AbstractFilter implements StandardFilter
      * In this case, the color mask is set back to the default value.
      */
     @Override
-    public void postApplyGL(GL gl) {
+    public void postApplyGL(GL2 gl) {
         gl.glColorMask(true, true, true, true);
     }
 

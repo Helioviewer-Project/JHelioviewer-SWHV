@@ -87,7 +87,7 @@
     </target>
 	
 	<target name="compile" depends="init" >
-		<javac srcdir="${src.path}" destdir="${bin.jhv}" target="1.5" source="1.5" debug="on" debuglevel="source,lines,vars" includeantruntime="false">
+		<javac srcdir="${src.path}" destdir="${bin.jhv}" target="1.7" source="1.7" debug="on" debuglevel="source,lines,vars" includeantruntime="false">
 			<classpath>
 				<fileset dir="${lib}">
 					<include name="**/*.jar" />

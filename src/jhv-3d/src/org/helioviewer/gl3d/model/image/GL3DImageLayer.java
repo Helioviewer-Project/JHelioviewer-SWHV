@@ -3,7 +3,7 @@ package org.helioviewer.gl3d.model.image;
 import java.awt.Point;
 import java.util.ArrayList;
 
-import javax.media.opengl.GL;
+import javax.media.opengl.GL2;
 
 import org.helioviewer.base.physics.Constants;
 import org.helioviewer.gl3d.camera.GL3DCamera;
@@ -63,7 +63,7 @@ public abstract class GL3DImageLayer extends GL3DGroup implements GL3DCameraList
 
     private final double lastViewAngle = 0.0;
 
-    protected GL gl;
+    protected GL2 gl;
     protected GL3DImageFragmentShaderProgram sphereFragmentShader = null;
     private final JHVJPXView jpxView;
 
@@ -122,7 +122,7 @@ public abstract class GL3DImageLayer extends GL3DGroup implements GL3DCameraList
         state.getActiveCamera().updateCameraTransformation();
     }
 
-    protected abstract void createImageMeshNodes(GL gl);
+    protected abstract void createImageMeshNodes(GL2 gl);
 
     protected abstract GL3DImageMesh getImageSphere();
 

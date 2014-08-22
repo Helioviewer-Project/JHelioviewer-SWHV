@@ -1,6 +1,6 @@
 package org.helioviewer.gl3d.view;
 
-import javax.media.opengl.GL;
+import javax.media.opengl.GL2;
 
 import org.helioviewer.gl3d.scenegraph.GL3DState;
 import org.helioviewer.viewmodel.changeevent.ChangeEvent;
@@ -105,7 +105,7 @@ public class GL3DLayeredView extends GLLayeredView implements GL3DView, LayeredV
     protected void redrawBufferImpl() {
     }
 
-    public void renderGL(GL gl) {
+    public void renderGL(GL2 gl) {
         for (int i = 0; i < this.getNumLayers(); i++) {
             View layerView = this.getLayer(i);
             if (layerView instanceof GL3DView) {

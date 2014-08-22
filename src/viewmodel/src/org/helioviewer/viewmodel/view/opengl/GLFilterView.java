@@ -1,6 +1,6 @@
 package org.helioviewer.viewmodel.view.opengl;
 
-import javax.media.opengl.GL;
+import javax.media.opengl.GL2;
 
 import org.helioviewer.viewmodel.changeevent.ChangeEvent;
 import org.helioviewer.viewmodel.changeevent.FilterChangedReason;
@@ -82,13 +82,13 @@ public class GLFilterView extends StandardFilterView implements GLFragmentShader
      * {@inheritDoc}
      */
     @Override
-    public void renderGL(GL gl, boolean nextView) {
+    public void renderGL(GL2 gl, boolean nextView) {
         updatePrecomputedViews();
         if (filter instanceof GLFilter) {
             refilterPrepare();
 
             if (filter instanceof GLFragmentShaderFilter) {
-                gl.glEnable(GL.GL_FRAGMENT_PROGRAM_ARB);
+                gl.glEnable(GL2.GL_FRAGMENT_PROGRAM_ARB);
             }
 
             ((GLFilter) filter).applyGL(gl);

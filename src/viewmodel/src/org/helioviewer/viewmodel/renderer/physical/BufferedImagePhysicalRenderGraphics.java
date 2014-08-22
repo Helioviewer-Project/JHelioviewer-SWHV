@@ -9,7 +9,7 @@ import java.awt.Graphics2D;
 import java.awt.RenderingHints;
 import java.awt.image.BufferedImage;
 
-import javax.media.opengl.GL;
+import javax.media.opengl.GL2;
 
 import org.helioviewer.base.math.Vector2dDouble;
 import org.helioviewer.base.math.Vector2dInt;
@@ -28,7 +28,7 @@ import org.helioviewer.viewmodel.view.View;
  */
 public class BufferedImagePhysicalRenderGraphics extends AbstractPhysicalRenderGraphics {
 
-    private Graphics2D graphics;
+    private final Graphics2D graphics;
 
     /**
      * Default constructor.
@@ -54,6 +54,7 @@ public class BufferedImagePhysicalRenderGraphics extends AbstractPhysicalRenderG
     /**
      * {@inheritDoc}
      */
+    @Override
     public void setColor(Color color) {
         graphics.setColor(color);
     }
@@ -61,6 +62,7 @@ public class BufferedImagePhysicalRenderGraphics extends AbstractPhysicalRenderG
     /**
      * {@inheritDoc}
      */
+    @Override
     public void setFont(Font font) {
         graphics.setFont(font);
     }
@@ -68,6 +70,7 @@ public class BufferedImagePhysicalRenderGraphics extends AbstractPhysicalRenderG
     /**
      * {@inheritDoc}
      */
+    @Override
     public void setLineWidth(float lineWidth) {
         graphics.setStroke(new BasicStroke(lineWidth));
     }
@@ -75,6 +78,7 @@ public class BufferedImagePhysicalRenderGraphics extends AbstractPhysicalRenderG
     /**
      * {@inheritDoc}
      */
+    @Override
     public void drawLine(Double x0, Double y0, Double x1, Double y1) {
         Vector2dInt p0 = convertPhysicalToScreen(x0, y0);
         Vector2dInt p1 = convertPhysicalToScreen(x1, y1);
@@ -84,6 +88,7 @@ public class BufferedImagePhysicalRenderGraphics extends AbstractPhysicalRenderG
     /**
      * {@inheritDoc}
      */
+    @Override
     public void drawRectangle(Double x, Double y, Double width, Double height) {
         Vector2dInt pos = convertPhysicalToScreen(x, y);
         Vector2dInt size = convertPhysicalToScreen(width, height);
@@ -93,6 +98,7 @@ public class BufferedImagePhysicalRenderGraphics extends AbstractPhysicalRenderG
     /**
      * {@inheritDoc}
      */
+    @Override
     public void fillRectangle(Double x, Double y, Double width, Double height) {
         Vector2dInt pos = convertPhysicalToScreen(x, y);
         Vector2dInt size = convertPhysicalToScreen(width, height);
@@ -102,6 +108,7 @@ public class BufferedImagePhysicalRenderGraphics extends AbstractPhysicalRenderG
     /**
      * {@inheritDoc}
      */
+    @Override
     public void drawOval(Double x, Double y, Double width, Double height) {
         Vector2dInt pos = convertPhysicalToScreen(x, y);
         Vector2dInt size = convertPhysicalToScreen(width, height);
@@ -111,6 +118,7 @@ public class BufferedImagePhysicalRenderGraphics extends AbstractPhysicalRenderG
     /**
      * {@inheritDoc}
      */
+    @Override
     public void fillOval(Double x, Double y, Double width, Double height) {
         Vector2dInt pos = convertPhysicalToScreen(x, y);
         Vector2dInt size = convertPhysicalToScreen(width, height);
@@ -120,6 +128,7 @@ public class BufferedImagePhysicalRenderGraphics extends AbstractPhysicalRenderG
     /**
      * {@inheritDoc}
      */
+    @Override
     public void drawPolygon(Double[] xCoords, Double[] yCoords) {
         Vector2dInt[] convertedPoints = new Vector2dInt[xCoords.length];
         for (int i = 0; i < xCoords.length; i++) {
@@ -131,6 +140,7 @@ public class BufferedImagePhysicalRenderGraphics extends AbstractPhysicalRenderG
     /**
      * {@inheritDoc}
      */
+    @Override
     public void drawPolygon(Vector2dDouble[] points) {
         Vector2dInt[] convertedPoints = new Vector2dInt[points.length];
         for (int i = 0; i < points.length; i++) {
@@ -160,6 +170,7 @@ public class BufferedImagePhysicalRenderGraphics extends AbstractPhysicalRenderG
     /**
      * {@inheritDoc}
      */
+    @Override
     public void fillPolygon(Double[] xCoords, Double[] yCoords) {
         Vector2dInt[] convertedPoints = new Vector2dInt[xCoords.length];
         for (int i = 0; i < xCoords.length; i++) {
@@ -171,6 +182,7 @@ public class BufferedImagePhysicalRenderGraphics extends AbstractPhysicalRenderG
     /**
      * {@inheritDoc}
      */
+    @Override
     public void fillPolygon(Vector2dDouble[] points) {
         Vector2dInt[] convertedPoints = new Vector2dInt[points.length];
         for (int i = 0; i < points.length; i++) {
@@ -200,6 +212,7 @@ public class BufferedImagePhysicalRenderGraphics extends AbstractPhysicalRenderG
     /**
      * {@inheritDoc}
      */
+    @Override
     public void drawImage(BufferedImage image, Double x, Double y) {
         Vector2dInt pos = convertPhysicalToScreen(x, y);
         graphics.drawImage(image, pos.getX() - image.getWidth() / 2, pos.getY() - image.getHeight() / 2, null);
@@ -208,6 +221,7 @@ public class BufferedImagePhysicalRenderGraphics extends AbstractPhysicalRenderG
     /**
      * {@inheritDoc}
      */
+    @Override
     public void drawImage(BufferedImage image, Double x, Double y, float scale) {
         Vector2dInt pos = convertPhysicalToScreen(x, y);
         int width = (int) (image.getWidth() * scale);
@@ -218,6 +232,7 @@ public class BufferedImagePhysicalRenderGraphics extends AbstractPhysicalRenderG
     /**
      * {@inheritDoc}
      */
+    @Override
     public void drawImage(BufferedImage image, Double x, Double y, Double width, Double height) {
         Vector2dInt pos = convertPhysicalToScreen(x, y);
         Vector2dInt size = convertPhysicalToScreen(width, height);
@@ -227,6 +242,7 @@ public class BufferedImagePhysicalRenderGraphics extends AbstractPhysicalRenderG
     /**
      * {@inheritDoc}
      */
+    @Override
     public void drawText(String text, Double x, Double y) {
         Vector2dInt pos = convertPhysicalToScreen(x, y);
         FontMetrics metrics = graphics.getFontMetrics();
@@ -262,7 +278,8 @@ public class BufferedImagePhysicalRenderGraphics extends AbstractPhysicalRenderG
 
     }
 
-    public GL getGL() {
+    @Override
+    public GL2 getGL() {
         // TODO Auto-generated method stub
         return null;
     }

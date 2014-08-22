@@ -1,6 +1,6 @@
 package org.helioviewer.gl3d.plugin.pfss;
 
-import javax.media.opengl.GL;
+import javax.media.opengl.GL2;
 
 import org.helioviewer.gl3d.plugin.pfss.data.PfssCache;
 import org.helioviewer.gl3d.plugin.pfss.data.PfssData;
@@ -14,7 +14,7 @@ import org.helioviewer.viewmodel.view.View;
  * */
 public class PfssPlugin3dRenderer extends PhysicalRenderer3d {
     private PfssCache pfssCache = null;
-    private GL lastGl = null;
+    private GL2 lastGl = null;
 
     /**
      * Default constructor.
@@ -31,7 +31,7 @@ public class PfssPlugin3dRenderer extends PhysicalRenderer3d {
     @Override
     public void render(PhysicalRenderGraphics g) {
         if (pfssCache.isVisible()) {
-            GL gl = g.getGL();
+            GL2 gl = g.getGL();
             PfssFitsFile fitsToClear = pfssCache.getFitsToDelete();
             if (fitsToClear != null)
                 fitsToClear.clear(gl);

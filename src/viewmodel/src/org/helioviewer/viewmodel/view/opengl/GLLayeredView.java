@@ -1,6 +1,6 @@
 package org.helioviewer.viewmodel.view.opengl;
 
-import javax.media.opengl.GL;
+import javax.media.opengl.GL2;
 
 import org.helioviewer.viewmodel.changeevent.ChangeEvent;
 import org.helioviewer.viewmodel.metadata.MetaData;
@@ -110,7 +110,7 @@ public class GLLayeredView extends AbstractLayeredView implements GLFragmentShad
      * {@inheritDoc}
      */
     @Override
-    public void renderGL(GL gl, boolean nextView) {
+    public void renderGL(GL2 gl, boolean nextView) {
         changeAngles();
         layerLock.lock();
 
@@ -172,7 +172,7 @@ public class GLLayeredView extends AbstractLayeredView implements GLFragmentShad
                 GLFragmentShaderView fragmentView = v.getAdapter(GLFragmentShaderView.class);
                 if (fragmentView != null) {
                     // create new shader builder
-                    GLShaderBuilder newShaderBuilder = new GLShaderBuilder(shaderBuilder.getGL(), GL.GL_FRAGMENT_PROGRAM_ARB);
+                    GLShaderBuilder newShaderBuilder = new GLShaderBuilder(shaderBuilder.getGL(), GL2.GL_FRAGMENT_PROGRAM_ARB);
 
                     // fill with standard values
                     GLMinimalFragmentShaderProgram minimalProgram = new GLMinimalFragmentShaderProgram();
@@ -206,7 +206,7 @@ public class GLLayeredView extends AbstractLayeredView implements GLFragmentShad
                 GLVertexShaderView vertexView = v.getAdapter(GLVertexShaderView.class);
                 if (vertexView != null) {
                     // create new shader builder
-                    GLShaderBuilder newShaderBuilder = new GLShaderBuilder(shaderBuilder.getGL(), GL.GL_VERTEX_PROGRAM_ARB);
+                    GLShaderBuilder newShaderBuilder = new GLShaderBuilder(shaderBuilder.getGL(), GL2.GL_VERTEX_PROGRAM_ARB);
 
                     // fill with standard values
                     GLMinimalVertexShaderProgram minimalProgram = new GLMinimalVertexShaderProgram();

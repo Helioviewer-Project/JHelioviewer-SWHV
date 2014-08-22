@@ -1,6 +1,6 @@
 package org.helioviewer.viewmodel.view.opengl;
 
-import javax.media.opengl.GL;
+import javax.media.opengl.GL2;
 
 import org.helioviewer.viewmodel.changeevent.ChangeEvent;
 import org.helioviewer.viewmodel.view.View;
@@ -43,13 +43,13 @@ public class GLScalePowerOfTwoView extends AbstractGLView implements GLVertexSha
     /**
      * {@inheritDoc}
      */
-    public void renderGL(GL gl, boolean nextView) {
-        gl.glEnable(GL.GL_VERTEX_PROGRAM_ARB);
+    public void renderGL(GL2 gl, boolean nextView) {
+        gl.glEnable(GL2.GL_VERTEX_PROGRAM_ARB);
         shader.bind(gl);
 
         renderChild(gl);
 
-        gl.glDisable(GL.GL_VERTEX_PROGRAM_ARB);
+        gl.glDisable(GL2.GL_VERTEX_PROGRAM_ARB);
     }
 
     /**

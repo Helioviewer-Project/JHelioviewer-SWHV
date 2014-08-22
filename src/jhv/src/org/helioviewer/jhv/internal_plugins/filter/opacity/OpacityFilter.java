@@ -4,7 +4,7 @@ import java.awt.AlphaComposite;
 import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
 
-import javax.media.opengl.GL;
+import javax.media.opengl.GL2;
 
 import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.viewmodel.filter.AbstractFilter;
@@ -27,7 +27,7 @@ import org.helioviewer.viewmodel.view.opengl.shader.GLTextureCoordinate;
  * as late as possible.
  *
  * <p>
- * This filter supports software rendering as well as rendering in OpenGL.
+ * This filter supports software rendering as well as rendering in OpenGL2.
  *
  * @author Markus Langenberg
  *
@@ -141,11 +141,11 @@ public class OpacityFilter extends AbstractFilter implements StandardFilter, GLF
          * @param alpha
          *            Alpha value
          */
-        private void setAlpha(GL gl, float alpha) {
+        private void setAlpha(GL2 gl, float alpha) {
             alphaParamFloat[0] = alpha;
         }
         @Override
-        public void bind(GL gl){
+        public void bind(GL2 gl){
             super.bind(gl);
             this.bindEnvVars(gl, this.alphaParamRef, alphaParamFloat);
         }
@@ -179,7 +179,7 @@ public class OpacityFilter extends AbstractFilter implements StandardFilter, GLF
      * {@inheritDoc}
      */
     @Override
-    public void applyGL(GL gl) {
+    public void applyGL(GL2 gl) {
         shader.bind(gl);
         shader.setAlpha(gl, opacity);
     }

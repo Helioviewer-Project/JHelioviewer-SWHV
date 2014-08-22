@@ -1,6 +1,6 @@
 package org.helioviewer.viewmodel.view.opengl.shader;
 
-import javax.media.opengl.GL;
+import javax.media.opengl.GL2;
 
 import org.helioviewer.viewmodel.view.opengl.shader.GLShaderBuilder.GLBuildShaderException;
 
@@ -31,11 +31,11 @@ public class GLSingleChannelLookupFragmentShaderProgram extends GLFragmentShader
      * @param gl
      *            Valid reference to the current gl object
      */
-    public void activateLutTexture(GL gl) {
+    public void activateLutTexture(GL2 gl) {
         gl.glActiveTexture(lutMode);
     }
     @Override
-    public void bind(GL gl){
+    public void bind(GL2 gl){
         super.bind(gl);
         gl.glBindProgramARB(target, shaderID);
     }

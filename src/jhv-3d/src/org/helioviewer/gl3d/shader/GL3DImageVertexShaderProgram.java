@@ -1,6 +1,6 @@
 package org.helioviewer.gl3d.shader;
 
-import javax.media.opengl.GL;
+import javax.media.opengl.GL2;
 
 import org.helioviewer.viewmodel.view.opengl.shader.GLShaderBuilder;
 import org.helioviewer.viewmodel.view.opengl.shader.GLShaderBuilder.GLBuildShaderException;
@@ -24,11 +24,11 @@ public class GL3DImageVertexShaderProgram extends GLVertexShaderProgram {
      * {@inheritDoc}
      */
     @Override
-    public final void bind(GL gl) {
+    public final void bind(GL2 gl) {
         bind(gl, shaderID, xOffset, yOffset, xScale, yScale, xxTextureScale, yyTextureScale, defaultXOffset, defaultYOffset, theta, phi);
     }
 
-    private void bind(GL gl, int shader, double xOffset, double yOffset, double xScale, double yScale, double xTextureScale, double yTextureScale, double defaultXOffset, double defaultYOffset, double theta, double phi) {
+    private void bind(GL2 gl, int shader, double xOffset, double yOffset, double xScale, double yScale, double xTextureScale, double yTextureScale, double defaultXOffset, double defaultYOffset, double theta, double phi) {
         if (shader != shaderCurrentlyUsed) {
             shaderCurrentlyUsed = shader;
             gl.glBindProgramARB(target, shader);

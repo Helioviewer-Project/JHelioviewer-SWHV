@@ -2,11 +2,11 @@ package org.helioviewer.gl3d.plugin.pfss.data;
 
 import java.nio.FloatBuffer;
 
-import javax.media.opengl.GL;
+import javax.media.opengl.GL2;
 
 import org.helioviewer.gl3d.plugin.pfss.settings.PfssSettings;
 
-import com.sun.opengl.util.BufferUtil;
+import com.jogamp.common.nio.Buffers;
 
 /**
  * Loader of fitsfile & VBO generation & OpenGL visualization
@@ -41,7 +41,7 @@ public class PfssData {
 
     private void createBuffer(int len) {
         int numberOfLines = len / PfssSettings.POINTS_PER_LINE;
-        vertices = BufferUtil.newFloatBuffer(len * (3 + 4) + 2 * numberOfLines * (3 + 4));
+        vertices = Buffers.newDirectFloatBuffer(len * (3 + 4) + 2 * numberOfLines * (3 + 4));
     }
 
     private int addColor(float x, float y, float z, float opacity, int counter) {
@@ -158,7 +158,7 @@ public class PfssData {
         read = true;
     }
 
-    public void init(GL gl) {
+    public void init(GL2 gl) {
         if (gzipFitsFile != null) {
             if (!read)
                 readFitsFile();
@@ -167,55 +167,55 @@ public class PfssData {
                 gl.glGenBuffers(1, buffer, 0);
 
                 VBOVertices = buffer[0];
-                gl.glBindBuffer(GL.GL_ARRAY_BUFFER, VBOVertices);
-                gl.glBufferData(GL.GL_ARRAY_BUFFER, vertices.limit() * BufferUtil.SIZEOF_FLOAT, vertices, GL.GL_STATIC_DRAW);
-                gl.glBindBuffer(GL.GL_ARRAY_BUFFER, 0);
+                gl.glBindBuffer(GL2.GL_ARRAY_BUFFER, VBOVertices);
+                gl.glBufferData(GL2.GL_ARRAY_BUFFER, vertices.limit() * Buffers.SIZEOF_FLOAT, vertices, GL2.GL_STATIC_DRAW);
+                gl.glBindBuffer(GL2.GL_ARRAY_BUFFER, 0);
 
                 init = true;
             }
         }
     }
 
-    public void clear(GL gl) {
+    public void clear(GL2 gl) {
         if (init) {
             gl.glDeleteBuffers(1, buffer, 0);
         }
     }
 
-    public void display(GL gl) {
+    public void display(GL2 gl) {
         if (PfssSettings.qualityReduction != this.lastQuality || PfssSettings.fixedColor != this.lastFixedColor) {
             this.clear(gl);
             this.init = false;
             this.read = false;
             this.init(gl);
         }
-        gl.glEnableClientState(GL.GL_VERTEX_ARRAY);
-        gl.glEnableClientState(GL.GL_COLOR_ARRAY);
+        gl.glEnableClientState(GL2.GL_VERTEX_ARRAY);
+        gl.glEnableClientState(GL2.GL_COLOR_ARRAY);
 
-        gl.glDisable(GL.GL_FRAGMENT_PROGRAM_ARB);
-        gl.glDisable(GL.GL_VERTEX_PROGRAM_ARB);
-        gl.glDisable(GL.GL_LIGHTING);
+        gl.glDisable(GL2.GL_FRAGMENT_PROGRAM_ARB);
+        gl.glDisable(GL2.GL_VERTEX_PROGRAM_ARB);
+        gl.glDisable(GL2.GL_LIGHTING);
 
-        gl.glDisable(GL.GL_TEXTURE_2D);
-        gl.glDisable(GL.GL_TEXTURE_1D);
+        gl.glDisable(GL2.GL_TEXTURE_2D);
+        gl.glDisable(GL2.GL_TEXTURE_1D);
 
-        gl.glEnable(GL.GL_BLEND);
-        gl.glBlendFunc(GL.GL_SRC_ALPHA, GL.GL_ONE);
-        gl.glBlendEquation(GL.GL_FUNC_ADD);
+        gl.glEnable(GL2.GL_BLEND);
+        gl.glBlendFunc(GL2.GL_SRC_ALPHA, GL2.GL_ONE);
+        gl.glBlendEquation(GL2.GL_FUNC_ADD);
 
         gl.glDepthMask(false);
-        gl.glBindBuffer(GL.GL_ARRAY_BUFFER, VBOVertices);
-        gl.glColorPointer(4, GL.GL_FLOAT, 7 * 4, 3 * 4);
-        gl.glVertexPointer(3, GL.GL_FLOAT, 7 * 4, 0);
+        gl.glBindBuffer(GL2.GL_ARRAY_BUFFER, VBOVertices);
+        gl.glColorPointer(4, GL2.GL_FLOAT, 7 * 4, 3 * 4);
+        gl.glVertexPointer(3, GL2.GL_FLOAT, 7 * 4, 0);
 
         gl.glLineWidth(PfssSettings.LINE_WIDTH);
-        gl.glDrawArrays(GL.GL_LINE_STRIP, 0, vertices.limit() / 7);
+        gl.glDrawArrays(GL2.GL_LINE_STRIP, 0, vertices.limit() / 7);
 
-        gl.glDisableClientState(GL.GL_VERTEX_ARRAY);
-        gl.glDisableClientState(GL.GL_COLOR_ARRAY);
+        gl.glDisableClientState(GL2.GL_VERTEX_ARRAY);
+        gl.glDisableClientState(GL2.GL_COLOR_ARRAY);
 
-        gl.glDisable(GL.GL_LINE_SMOOTH);
-        gl.glDisable(GL.GL_BLEND);
+        gl.glDisable(GL2.GL_LINE_SMOOTH);
+        gl.glDisable(GL2.GL_BLEND);
         gl.glDepthMask(true);
         gl.glLineWidth(1f);
     }

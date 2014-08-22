@@ -1,6 +1,6 @@
 package org.helioviewer.jhv.internal_plugins.filter.gammacorrection;
 
-import javax.media.opengl.GL;
+import javax.media.opengl.GL2;
 
 import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.viewmodel.filter.AbstractFilter;
@@ -40,7 +40,7 @@ import org.helioviewer.viewmodel.view.opengl.shader.GLTextureCoordinate;
  * The output of the filter always has the same image format as the input.
  *
  * <p>
- * This filter supports software rendering as well as rendering in OpenGL.
+ * This filter supports software rendering as well as rendering in OpenGL2.
  *
  * @author Markus Langenberg
  */
@@ -204,11 +204,11 @@ public class GammaCorrectionFilter extends AbstractFilter implements StandardFil
          * @param gamma
          *            Gamma value
          */
-        private void setGamma(GL gl, float gamma) {
+        private void setGamma(GL2 gl, float gamma) {
             gammaParamFloat[0] = gamma;
         }
         @Override
-        public void bind(GL gl){
+        public void bind(GL2 gl){
             super.bind(gl);
             this.bindEnvVars(gl, this.gammaParamRef, gammaParamFloat);
         }
@@ -242,7 +242,7 @@ public class GammaCorrectionFilter extends AbstractFilter implements StandardFil
      * {@inheritDoc}
      */
     @Override
-    public void applyGL(GL gl) {
+    public void applyGL(GL2 gl) {
         shader.bind(gl);
         shader.setGamma(gl, gamma);
     }

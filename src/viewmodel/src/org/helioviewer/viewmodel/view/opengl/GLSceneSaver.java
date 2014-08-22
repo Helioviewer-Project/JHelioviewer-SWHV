@@ -1,10 +1,11 @@
 package org.helioviewer.viewmodel.view.opengl;
 
-import java.nio.DoubleBuffer;
+import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
 import java.util.Stack;
 
 import javax.media.opengl.GL;
+import javax.media.opengl.GL2;
 import javax.media.opengl.glu.GLU;
 
 import org.helioviewer.base.math.Vector2dDouble;
@@ -47,14 +48,14 @@ public class GLSceneSaver {
      * @param gl
      *            Valid reference to the current gl object
      */
-    public static void pushScene(GL gl) {
+    public static void pushScene(GL2 gl) {
 
         GLFragmentShaderProgram.pushShader(gl);
         GLVertexShaderProgram.pushShader(gl);
 
         sceneTextureStack.push(textureHelper.copyFrameBufferToTexture(gl));
 
-        gl.glClear(GL.GL_COLOR_BUFFER_BIT);
+        gl.glClear(GL2.GL_COLOR_BUFFER_BIT);
     }
 
     /**
@@ -67,7 +68,7 @@ public class GLSceneSaver {
      * @param gl
      *            Valid reference to the current gl object
      */
-    public static void popScene(GL gl) {
+    public static void popScene(GL2 gl) {
 
         // Generate scaling shader, if necessary
         if (!GLTextureHelper.textureNonPowerOfTwoAvailable() && scalingShader == null) {
@@ -79,22 +80,22 @@ public class GLSceneSaver {
         int newTexture = textureHelper.copyFrameBufferToTexture(gl);
 
         // Clear screen
-        gl.glClear(GL.GL_COLOR_BUFFER_BIT);
+        gl.glClear(GL2.GL_COLOR_BUFFER_BIT);
 
         // calculate region
-        boolean isFragmentProgramEnabled = gl.glIsEnabled(GL.GL_FRAGMENT_PROGRAM_ARB);
-        boolean isVertexProgramEnabled = gl.glIsEnabled(GL.GL_VERTEX_PROGRAM_ARB);
+        boolean isFragmentProgramEnabled = gl.glIsEnabled(GL2.GL_FRAGMENT_PROGRAM_ARB);
+        boolean isVertexProgramEnabled = gl.glIsEnabled(GL2.GL_VERTEX_PROGRAM_ARB);
 
-        DoubleBuffer modelViewMatrix = DoubleBuffer.allocate(16);
-        DoubleBuffer projectionMatrix = DoubleBuffer.allocate(16);
+        FloatBuffer modelViewMatrix = FloatBuffer.allocate(16);
+        FloatBuffer projectionMatrix = FloatBuffer.allocate(16);
         IntBuffer viewport = IntBuffer.allocate(4);
 
-        gl.glGetDoublev(GL.GL_MODELVIEW_MATRIX, modelViewMatrix);
-        gl.glGetDoublev(GL.GL_PROJECTION_MATRIX, projectionMatrix);
-        gl.glGetIntegerv(GL.GL_VIEWPORT, viewport);
+        gl.glGetFloatv(GL2.GL_MODELVIEW_MATRIX, modelViewMatrix);
+        gl.glGetFloatv(GL2.GL_PROJECTION_MATRIX, projectionMatrix);
+        gl.glGetIntegerv(GL2.GL_VIEWPORT, viewport);
 
-        DoubleBuffer positionBuffer = DoubleBuffer.allocate(3);
-        DoubleBuffer sizeBuffer = DoubleBuffer.allocate(3);
+        FloatBuffer positionBuffer = FloatBuffer.allocate(3);
+        FloatBuffer sizeBuffer = FloatBuffer.allocate(3);
 
         GLU glu = new GLU();
         glu.gluUnProject(0, viewport.get(3), 0, modelViewMatrix, projectionMatrix, viewport, positionBuffer);
@@ -105,12 +106,12 @@ public class GLSceneSaver {
         Region region = StaticRegion.createAdaptedRegion(position, size);
 
         // Set shaders
-        gl.glDisable(GL.GL_FRAGMENT_PROGRAM_ARB);
+        gl.glDisable(GL2.GL_FRAGMENT_PROGRAM_ARB);
         if (!GLTextureHelper.textureNonPowerOfTwoAvailable()) {
-            gl.glEnable(GL.GL_VERTEX_PROGRAM_ARB);
+            gl.glEnable(GL2.GL_VERTEX_PROGRAM_ARB);
             scalingShader.bind(gl);
         } else {
-            gl.glDisable(GL.GL_VERTEX_PROGRAM_ARB);
+            gl.glDisable(GL2.GL_VERTEX_PROGRAM_ARB);
         }
 
         // Get saved scene from stack
@@ -125,13 +126,13 @@ public class GLSceneSaver {
 
         // Reset shaders
         if (!GLTextureHelper.textureNonPowerOfTwoAvailable() && !isVertexProgramEnabled) {
-            gl.glDisable(GL.GL_VERTEX_PROGRAM_ARB);
+            gl.glDisable(GL2.GL_VERTEX_PROGRAM_ARB);
         } else if (GLTextureHelper.textureNonPowerOfTwoAvailable() && isVertexProgramEnabled) {
-            gl.glEnable(GL.GL_VERTEX_PROGRAM_ARB);
+            gl.glEnable(GL2.GL_VERTEX_PROGRAM_ARB);
         }
 
         if (isFragmentProgramEnabled) {
-            gl.glEnable(GL.GL_FRAGMENT_PROGRAM_ARB);
+            gl.glEnable(GL2.GL_FRAGMENT_PROGRAM_ARB);
         }
 
         // Load current shaders again
