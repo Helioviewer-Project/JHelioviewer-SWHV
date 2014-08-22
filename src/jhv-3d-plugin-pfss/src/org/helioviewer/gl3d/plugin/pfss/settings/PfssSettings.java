@@ -68,4 +68,6 @@ public class PfssSettings {
     public final static int POINTS_PER_LINE = 40;
 
     public static String baseUrl = "http://swhv.oma.be/magtest/";
+
+    public static int qualityReduction = 8;
 }

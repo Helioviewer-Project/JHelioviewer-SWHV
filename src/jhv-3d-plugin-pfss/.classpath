@@ -16,5 +16,6 @@
 	<classpathentry combineaccessrules="false" kind="src" path="/viewmodelplugin"/>
 	<classpathentry kind="lib" path="../lib/bzip2.jar"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/jhv-display"/>
+	<classpathentry kind="src" path="/basegui"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
