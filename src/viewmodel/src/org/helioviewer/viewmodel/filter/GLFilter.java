@@ -1,6 +1,6 @@
 package org.helioviewer.viewmodel.filter;
 
-import javax.media.opengl.GL;
+import javax.media.opengl.GL2;
 
 /**
  * Filter which supports in OpenGL rendering mode.
@@ -41,5 +41,5 @@ public interface GLFilter extends Filter {
      * @param gl
      *            Valid reference to the current gl object
      */
-    public void applyGL(GL gl);
+    public void applyGL(GL2 gl);
 }

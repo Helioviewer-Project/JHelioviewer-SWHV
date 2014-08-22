@@ -77,7 +77,7 @@ public final class AboutDialog extends JDialog implements ActionListener, Showab
 
         "This software uses the <a href=http://www.kakadusoftware.com>Kakadu JPEG2000 Toolkit</a>,<br> " + '\u00A9' + " 2009, NewSouth Innovations Ltd (NSI), <a href=Kakadu.txt>(License)</a><br>" +
 
-        "<p>This software uses the <a href=http://kenai.com/projects/jogl>Java OpenGL Bindings (JOGL)</a>,<br>" + '\u00A9' + " 2003-2007 Sun Microsystems, Inc., <a href=JOGL.txt>(License)</a><br>" +
+        "<p>This software uses the <a href=http://kenai.com/projects/jogl>Java OpenGL Bindings (JOGL)</a>,<br>" + '\u00A9' + " 2003-2007 Sun Microsystems, Inc., <a href=JOGL2.txt>(License)</a><br>" +
 
         "<p>This software uses the <a href=https://gluegen.dev.java.net/>GlueGen Toolkit</a>,<br>" + '\u00A9' + " 2003-2005 Sun Microsystems, Inc., <a href=GlueGen.txt>(License)</a><br>" +
 

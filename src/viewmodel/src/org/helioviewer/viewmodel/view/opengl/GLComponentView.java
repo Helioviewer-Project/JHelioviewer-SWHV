@@ -12,9 +12,10 @@ import java.nio.ByteBuffer;
 
 import javax.imageio.ImageIO;
 import javax.media.opengl.GL;
+import javax.media.opengl.GL2;
 import javax.media.opengl.GLAutoDrawable;
-import javax.media.opengl.GLCanvas;
 import javax.media.opengl.GLEventListener;
+import javax.media.opengl.awt.GLCanvas;
 import javax.media.opengl.glu.GLU;
 
 import org.helioviewer.base.logging.Log;
@@ -44,26 +45,26 @@ import org.helioviewer.viewmodel.view.opengl.shader.GLVertexShaderView;
 import org.helioviewer.viewmodel.viewport.Viewport;
 import org.helioviewer.viewmodel.viewportimagesize.ViewportImageSize;
 
-import com.sun.opengl.util.FPSAnimator;
-import com.sun.opengl.util.ImageUtil;
-import com.sun.opengl.util.TileRenderer;
+import com.jogamp.opengl.util.FPSAnimator;
+import com.jogamp.opengl.util.TileRenderer;
+import com.jogamp.opengl.util.awt.ImageUtil;
 
 /**
  * Implementation of ComponentView for rendering in OpenGL mode.
- *
+ * 
  * <p>
  * This class starts the tree walk through all the GLViews to draw the final
  * scene. Therefore the class owns a GLCanvas. Note that GLCanvas is a
  * heavyweight component.
- *
+ * 
  * <p>
  * For further information about the use of OpenGL within this application, see
  * {@link GLView}.
- *
+ * 
  * <p>
  * For further information about the role of the ComponentView within the view
  * chain, see {@link org.helioviewer.viewmodel.view.ComponentView}
- *
+ * 
  * @author Markus Langenberg
  */
 public class GLComponentView extends AbstractComponentView implements ViewListener, GLEventListener {
@@ -99,7 +100,7 @@ public class GLComponentView extends AbstractComponentView implements ViewListen
 
     /**
      * Default constructor.
-     *
+     * 
      * Also initializes all OpenGL Helper classes.
      */
     public GLComponentView() {
@@ -146,14 +147,14 @@ public class GLComponentView extends AbstractComponentView implements ViewListen
 
     /**
      * Save the next rendered frame in a buffered image and return this image.
-     *
+     * 
      * WARNING: The returned image is a reference to the internal buffered image
      * of this class. A subsequent call to this function might change the data
      * of this returned buffered image. If this is not desired, one has to make
      * a copy of the returned image, before calling getBufferedImage() again.
      * This choice was made with the movie export application in mind in order
      * to save main memory.
-     *
+     * 
      * @return BufferedImage of the next rendered frame
      */
     public BufferedImage getBufferedImage() {
@@ -172,7 +173,7 @@ public class GLComponentView extends AbstractComponentView implements ViewListen
 
     /**
      * {@inheritDoc}
-     *
+     * 
      * Since the screenshot is saved after the next rendering cycle, the result
      * is not available directly after calling this function. It only places a
      * request to save the screenshot.
@@ -195,7 +196,7 @@ public class GLComponentView extends AbstractComponentView implements ViewListen
 
     /**
      * {@inheritDoc}
-     *
+     * 
      * In this case, the canvas is repainted.
      */
     @Override
@@ -236,23 +237,23 @@ public class GLComponentView extends AbstractComponentView implements ViewListen
     /**
      * {@inheritDoc}
      */
-    @Override
+
     public void displayChanged(GLAutoDrawable drawable, boolean modeChanged, boolean deviceChanged) {
     }
 
     /**
-     * Initializes OpenGL.
-     *
+     * Initializes OpenGL2.
+     * 
      * This function is called when the canvas is visible the first time. It
      * initializes OpenGL by setting some system properties, such as switching
      * on some OpenGL features. Apart from that, the function also calls
      * {@link GLTextureHelper#initHelper(GL)}.
-     *
+     * 
      * <p>
      * Note, that this function should not be called by any user defined
      * function. It is part of the GLEventListener and invoked by the OpenGL
      * thread.
-     *
+     * 
      * @param drawable
      *            GLAutoDrawable passed by the OpenGL thread
      */
@@ -260,35 +261,35 @@ public class GLComponentView extends AbstractComponentView implements ViewListen
     public void init(GLAutoDrawable drawable) {
         GLSharedContext.setSharedContext(drawable.getContext());
 
-        final GL gl = drawable.getGL();
+        final GL2 gl = (GL2) drawable.getGL();
 
         textureHelper.delAllTextures(gl);
         GLTextureHelper.initHelper(gl);
 
         shaderHelper.delAllShaderIDs(gl);
 
-        gl.glShadeModel(GL.GL_FLAT);
+        gl.glShadeModel(GL2.GL_FLAT);
         gl.glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
-        gl.glEnable(GL.GL_TEXTURE_1D);
-        gl.glEnable(GL.GL_TEXTURE_2D);
-        gl.glEnable(GL.GL_BLEND);
-        gl.glEnable(GL.GL_POINT_SMOOTH);
-        gl.glBlendFunc(GL.GL_SRC_ALPHA, GL.GL_ONE_MINUS_SRC_ALPHA);
+        gl.glEnable(GL2.GL_TEXTURE_1D);
+        gl.glEnable(GL2.GL_TEXTURE_2D);
+        gl.glEnable(GL2.GL_BLEND);
+        gl.glEnable(GL2.GL_POINT_SMOOTH);
+        gl.glBlendFunc(GL2.GL_SRC_ALPHA, GL2.GL_ONE_MINUS_SRC_ALPHA);
 
         gl.glColor3f(1.0f, 1.0f, 1.0f);
     }
 
     /**
      * Reshapes the viewport.
-     *
+     * 
      * This function is called, whenever the canvas is resized. It ensures, that
      * the perspective never gets corrupted.
-     *
+     * 
      * <p>
      * Note, that this function should not be called by any user defined
      * function. It is part of the GLEventListener and invoked by the OpenGL
      * thread.
-     *
+     * 
      * @param drawable
      *            GLAutoDrawable passed by the OpenGL thread
      * @param x
@@ -302,27 +303,27 @@ public class GLComponentView extends AbstractComponentView implements ViewListen
      */
     @Override
     public void reshape(GLAutoDrawable drawable, int x, int y, int width, int height) {
-        final GL gl = drawable.getGL();
+        final GL2 gl = (GL2) drawable.getGL();
 
         gl.setSwapInterval(1);
 
         gl.glViewport(0, 0, width, height);
-        gl.glMatrixMode(GL.GL_PROJECTION);
+        gl.glMatrixMode(GL2.GL_PROJECTION);
         gl.glLoadIdentity();
 
         gl.glOrtho(0, width, 0, height, -1, 10000);
 
-        gl.glMatrixMode(GL.GL_MODELVIEW);
+        gl.glMatrixMode(GL2.GL_MODELVIEW);
         gl.glLoadIdentity();
     }
 
     /**
      * This function does the actual rendering of the scene on the screen.
-     *
+     * 
      * This is the most important function of this class, it is responsible for
      * rendering the entire scene to the screen. Therefore, it starts the tree
      * walk. After that, all post renderes are called.
-     *
+     * 
      * @param gl
      *            current GL object
      * @param xOffsetFinal
@@ -330,11 +331,11 @@ public class GLComponentView extends AbstractComponentView implements ViewListen
      * @param yOffsetFinal
      *            y-offset in pixels
      */
-    protected void displayBody(GL gl, float xOffsetFinal, float yOffsetFinal) {
+    protected void displayBody(GL2 gl, float xOffsetFinal, float yOffsetFinal) {
         // Set up screen
 
         gl.glClearColor(backgroundColor.getRed() / 255.0f, backgroundColor.getGreen() / 255.0f, backgroundColor.getBlue() / 255.0f, backgroundColor.getAlpha() / 255.0f);
-        gl.glClear(GL.GL_COLOR_BUFFER_BIT);
+        gl.glClear(GL2.GL_COLOR_BUFFER_BIT);
         gl.glLoadIdentity();
 
         Viewport viewport = view.getAdapter(ViewportView.class).getViewport();
@@ -373,16 +374,16 @@ public class GLComponentView extends AbstractComponentView implements ViewListen
 
     /**
      * Displays the scene on the screen.
-     *
+     * 
      * This is the most important function of this class, it is responsible for
      * rendering the entire scene to the screen. Therefore, it starts the tree
      * walk. After that, all post renderes are called.
-     *
+     * 
      * <p>
      * Note, that this function should not be called by any user defined
      * function. It is part of the GLEventListener and invoked by the OpenGL
      * thread.
-     *
+     * 
      * @param drawable
      *            GLAutoDrawable passed by the OpenGL thread
      * @see ComponentView#addPostRenderer(ScreenRenderer)
@@ -393,7 +394,7 @@ public class GLComponentView extends AbstractComponentView implements ViewListen
         if (view == null || canvas.getSize().width <= 0 || canvas.getSize().height <= 0) {
             return;
         }
-        final GL gl = drawable.getGL();
+        final GL2 gl = (GL2) drawable.getGL();
 
         // Rebuild all shaders, if necessary
         if (rebuildShadersRequest) {
@@ -416,15 +417,16 @@ public class GLComponentView extends AbstractComponentView implements ViewListen
             }
             tileRenderer.setTileSize(canvas.getWidth(), canvas.getHeight(), 0);
             tileRenderer.setImageSize(v.getWidth(), v.getHeight());
-            tileRenderer.setImageBuffer(GL.GL_BGR, GL.GL_UNSIGNED_BYTE, screenshotBuffer);
-            tileRenderer.trOrtho(0, v.getWidth(), 0, v.getHeight(), -1, 1);
+            //tileRenderer.setImageBuffer(arg0);
+            //tileRenderer.setImageBuffer(GL2.GL_BGR, GL2.GL_UNSIGNED_BYTE, screenshotBuffer);
+            //tileRenderer.trOrtho(0, v.getWidth(), 0, v.getHeight(), -1, 1);
             int tileNum = 0;
-            do {
-                Log.trace(">> GLComponentView.display() > Start rendering tile number: " + (++tileNum));
-                tileRenderer.beginTile(gl);
-                displayBody(gl, 0, 0);
-            } while (tileRenderer.endTile(gl));
-
+            /*
+             * do { Log.trace(
+             * ">> GLComponentView.display() > Start rendering tile number: " +
+             * (++tileNum)); tileRenderer.beginTile(gl); displayBody(gl, 0, 0);
+             * } while (tileRenderer.endTile(gl.getGL2()));
+             */
             Log.trace(">> GLComponentView.display() > Flip image");
             ImageUtil.flipImageVertically(screenshot);
             if (saveScreenshotRequest) {
@@ -470,7 +472,7 @@ public class GLComponentView extends AbstractComponentView implements ViewListen
 
         // check for errors
         int errorCode = gl.glGetError();
-        if (errorCode != GL.GL_NO_ERROR) {
+        if (errorCode != GL2.GL_NO_ERROR) {
             GLU glu = new GLU();
             Log.error("OpenGL Error (" + errorCode + ") : " + glu.gluErrorString(errorCode));
         }
@@ -485,21 +487,21 @@ public class GLComponentView extends AbstractComponentView implements ViewListen
 
     /**
      * Start rebuilding all shaders.
-     *
+     * 
      * This function is called, whenever the shader structure of the whole view
      * chain may have changed, e.g. when new views are added.
-     *
+     * 
      * @param gl
      *            Valid reference to the current gl object
      */
-    private void rebuildShaders(GL gl) {
+    private void rebuildShaders(GL2 gl) {
         rebuildShadersRequest = false;
         shaderHelper.delAllShaderIDs(gl);
 
         GLFragmentShaderView fragmentView = view.getAdapter(GLFragmentShaderView.class);
         if (fragmentView != null) {
             // create new shader builder
-            GLShaderBuilder newShaderBuilder = new GLShaderBuilder(gl, GL.GL_FRAGMENT_PROGRAM_ARB);
+            GLShaderBuilder newShaderBuilder = new GLShaderBuilder(gl, GL2.GL_FRAGMENT_PROGRAM_ARB);
 
             // fill with standard values
             GLMinimalFragmentShaderProgram minimalProgram = new GLMinimalFragmentShaderProgram();
@@ -512,7 +514,7 @@ public class GLComponentView extends AbstractComponentView implements ViewListen
         GLVertexShaderView vertexView = view.getAdapter(GLVertexShaderView.class);
         if (vertexView != null) {
             // create new shader builder
-            GLShaderBuilder newShaderBuilder = new GLShaderBuilder(gl, GL.GL_VERTEX_PROGRAM_ARB);
+            GLShaderBuilder newShaderBuilder = new GLShaderBuilder(gl, GL2.GL_VERTEX_PROGRAM_ARB);
 
             // fill with standard values
             GLMinimalVertexShaderProgram minimalProgram = new GLMinimalVertexShaderProgram();
@@ -521,6 +523,12 @@ public class GLComponentView extends AbstractComponentView implements ViewListen
             // fill with other filters and compile
             vertexView.buildVertexShader(newShaderBuilder).compile();
         }
+    }
+
+    @Override
+    public void dispose(GLAutoDrawable arg0) {
+        // TODO Auto-generated method stub
+
     }
 
 }

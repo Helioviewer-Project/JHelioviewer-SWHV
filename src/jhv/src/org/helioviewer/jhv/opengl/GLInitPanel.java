@@ -4,10 +4,11 @@ import java.awt.Dimension;
 import java.lang.Thread.UncaughtExceptionHandler;
 
 import javax.media.opengl.GL;
+import javax.media.opengl.GL2;
 import javax.media.opengl.GLAutoDrawable;
-import javax.media.opengl.GLCanvas;
 import javax.media.opengl.GLEventListener;
 import javax.media.opengl.GLException;
+import javax.media.opengl.awt.GLCanvas;
 
 import org.helioviewer.base.logging.Log;
 import org.helioviewer.base.message.Message;
@@ -18,10 +19,10 @@ import org.helioviewer.viewmodel.view.opengl.GLTextureHelper;
 import org.helioviewer.viewmodel.view.opengl.shader.GLShaderBuilder;
 import org.helioviewer.viewmodel.view.opengl.shader.GLShaderHelper;
 
-import com.sun.opengl.util.Animator;
+import com.jogamp.opengl.util.Animator;
 
 /**
- * Component to initialize OpenGL.
+ * Component to initialize OpenGL2.
  * 
  * <p>
  * The only purpose of this component is to be visible for one moment during the
@@ -34,7 +35,7 @@ import com.sun.opengl.util.Animator;
 public class GLInitPanel extends GLCanvas {
 
     private static final long serialVersionUID = 1L;
-    private Animator animator;
+    private final Animator animator;
 
     /**
      * Default constructor
@@ -67,6 +68,7 @@ public class GLInitPanel extends GLCanvas {
      */
     public static void startViewChainThread() {
         Thread thread = new Thread(new Runnable() {
+            @Override
             public void run() {
                 ImageViewerGui.getSingletonInstance().createViewchains();
             }
@@ -75,41 +77,43 @@ public class GLInitPanel extends GLCanvas {
     }
 
     /**
-     * Implementation GLEventHandler to startup OpenGL. It implements all
+     * Implementation GLEventHandler to startup OpenGL2. It implements all
      * listener functions.
      */
     private class GLListener implements GLEventListener {
-        private GLInitPanel parent;
+        private final GLInitPanel parent;
 
         GLListener(GLInitPanel _parent) {
             super();
             parent = _parent;
         }
 
+        @Override
         public void display(GLAutoDrawable gLDrawable) {
-            final GL gl = gLDrawable.getGL();
+            final GL2 gl = (GL2) gLDrawable.getGL();
 
-            gl.glClear(GL.GL_COLOR_BUFFER_BIT);
+            gl.glClear(GL2.GL_COLOR_BUFFER_BIT);
         }
 
         public void displayChanged(GLAutoDrawable drawable, boolean modeChanged, boolean deviceChanged) {
         }
 
+        @Override
         public void init(GLAutoDrawable drawable) {
             Log.debug(">> GLInitPanel.init(GLAutoDrawable) > Dispose GLInitPanel: Stop the animator and make it invisible");
             parent.postInit();
 
             Log.debug(">> GLInitPanel.init(GLAutoDrawable) > Set GL properties");
-            final GL gl = drawable.getGL();
+            final GL2 gl = (GL2) drawable.getGL();
 
             Log.debug(">> GLInitPanel.init(GLAutoDrawable) > Shade model: flat");
-            gl.glShadeModel(GL.GL_FLAT);
+            gl.glShadeModel(GL2.GL_FLAT);
             Log.debug(">> GLInitPanel.init(GLAutoDrawable) > Clear color: black");
             gl.glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
             Log.debug(">> GLInitPanel.init(GLAutoDrawable) > Enable 1D texture");
-            // gl.glEnable(GL.GL_TEXTURE_1D);
+            // gl.glEnable(GL2.GL_TEXTURE_1D);
             Log.debug(">> GLInitPanel.init(GLAutoDrawable) > Enable 2D texture");
-            // gl.glEnable(GL.GL_TEXTURE_2D);
+            // gl.glEnable(GL2.GL_TEXTURE_2D);
 
             GLInfo.update(gl);
 
@@ -125,7 +129,14 @@ public class GLInitPanel extends GLCanvas {
             startViewChainThread();
         }
 
+        @Override
         public void reshape(GLAutoDrawable drawable, int x, int y, int width, int height) {
+        }
+
+        @Override
+        public void dispose(GLAutoDrawable arg0) {
+            // TODO Auto-generated method stub
+
         }
     }
 
@@ -160,6 +171,7 @@ public class GLInitPanel extends GLCanvas {
          * is disabled. Thus, the view chain has to be reseted. Also, this
          * decorator is removed.
          */
+        @Override
         public void uncaughtException(Thread t, Throwable e) {
             if (e instanceof GLException) {
                 Throwable cause = e.getCause();

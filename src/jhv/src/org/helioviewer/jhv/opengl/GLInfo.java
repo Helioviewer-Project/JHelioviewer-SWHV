@@ -3,7 +3,7 @@ package org.helioviewer.jhv.opengl;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import javax.media.opengl.GL;
+import javax.media.opengl.GL2;
 
 import org.helioviewer.base.logging.Log;
 import org.helioviewer.jhv.gui.ImageViewerGui;
@@ -36,8 +36,8 @@ public class GLInfo {
      *            Valid reference to the current gl object
      * @see #setGlEnabled(boolean)
      */
-    public static void update(GL gl) {
-        version = gl.glGetString(GL.GL_VERSION);
+    public static void update(GL2 gl) {
+        version = gl.glGetString(GL2.GL_VERSION);
         Log.debug(">> GLInfo.update(GL) > Version string: " + version);
         Matcher versionMatcher = Pattern.compile("\\d+(\\.(\\d+))*").matcher(version);
         if (!versionMatcher.find()) {
@@ -46,7 +46,7 @@ public class GLInfo {
             version = versionMatcher.group();
         }
 
-        String extensionStr = gl.glGetString(GL.GL_EXTENSIONS);
+        String extensionStr = gl.glGetString(GL2.GL_EXTENSIONS);
         Log.debug(">> GLInfo.update(GL) > Extensions: " + extensionStr);
 
         glUsable = true;
@@ -65,14 +65,14 @@ public class GLInfo {
             glUsable = false;
         } else {
             int[] out = new int[1];
-            gl.glGetProgramivARB(GL.GL_VERTEX_PROGRAM_ARB, GL.GL_MAX_PROGRAM_INSTRUCTIONS_ARB, out, 0);
+            gl.glGetProgramivARB(GL2.GL_VERTEX_PROGRAM_ARB, GL2.GL_MAX_PROGRAM_INSTRUCTIONS_ARB, out, 0);
             Log.debug(">> GLInfo.update(GL) > GL_MAX_PROGRAM_INSTRUCTIONS = " + out[0]);
-            gl.glGetProgramivARB(GL.GL_VERTEX_PROGRAM_ARB, GL.GL_MAX_PROGRAM_PARAMETERS_ARB, out, 0);
+            gl.glGetProgramivARB(GL2.GL_VERTEX_PROGRAM_ARB, GL2.GL_MAX_PROGRAM_PARAMETERS_ARB, out, 0);
             Log.debug(">> GLInfo.update(GL) > GL_MAX_PROGRAM_PARAMETERS   = " + out[0]);
-            gl.glGetProgramivARB(GL.GL_VERTEX_PROGRAM_ARB, GL.GL_MAX_PROGRAM_TEMPORARIES_ARB, out, 0);
+            gl.glGetProgramivARB(GL2.GL_VERTEX_PROGRAM_ARB, GL2.GL_MAX_PROGRAM_TEMPORARIES_ARB, out, 0);
             Log.debug(">> GLInfo.update(GL) > GL_MAX_PROGRAM_TEMPORARIES   = " + out[0]);
 
-            gl.glGetIntegerv(GL.GL_MAX_DRAW_BUFFERS_ARB, out, 0);
+            gl.glGetIntegerv(GL2.GL_MAX_DRAW_BUFFERS, out, 0);
             Log.debug(">> GLInfo.update(GL) > GL_MAX_DRAW_BUFFERS = " + out[0]);
 
         }

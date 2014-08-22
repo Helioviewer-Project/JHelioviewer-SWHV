@@ -3,7 +3,7 @@ package org.helioviewer.viewmodel.view.opengl;
 import java.util.Iterator;
 import java.util.concurrent.CopyOnWriteArrayList;
 
-import javax.media.opengl.GL;
+import javax.media.opengl.GL2;
 
 import org.helioviewer.base.logging.Log;
 import org.helioviewer.viewmodel.changeevent.ChangeEvent;
@@ -20,7 +20,7 @@ import org.helioviewer.viewmodel.view.ViewHelper;
  * Implementation of OverlayView for rendering in OpenGL mode.
  * 
  * <p>
- * This class provides the capability to draw overlays in OpenGL. Therefore it
+ * This class provides the capability to draw overlays in OpenGL2. Therefore it
  * manages a {@link PhysicalRenderer}, which is passed to the registered
  * renderer.
  * 
@@ -45,7 +45,7 @@ public class GLOverlayView extends AbstractGLView implements OverlayView {
     /**
      * {@inheritDoc}
      */
-    public void renderGL(GL gl, boolean nextView) {
+    public void renderGL(GL2 gl, boolean nextView) {
         // just for 2d
         renderChild(gl);
 
@@ -62,7 +62,7 @@ public class GLOverlayView extends AbstractGLView implements OverlayView {
         }
     }
 
-    public void postRender3D(GL gl) {
+    public void postRender3D(GL2 gl) {
         GLPhysicalRenderGraphics glRenderGraphics = new GLPhysicalRenderGraphics(gl, view);
         Iterator<OverlayPluginContainer> iterator = this.overlays.iterator();
 
@@ -74,7 +74,7 @@ public class GLOverlayView extends AbstractGLView implements OverlayView {
         }
     }
 
-    public void preRender3D(GL gl) {
+    public void preRender3D(GL2 gl) {
         GLPhysicalRenderGraphics glRenderGraphics = new GLPhysicalRenderGraphics(gl, view);
         Iterator<OverlayPluginContainer> iterator = this.overlays.iterator();
 

@@ -5,7 +5,8 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Stack;
 
-import javax.media.opengl.GL;
+import javax.media.opengl.GL2;
+import javax.media.opengl.GL2;
 import javax.media.opengl.glu.GLU;
 
 import org.helioviewer.base.logging.Log;
@@ -214,27 +215,27 @@ public abstract class GL3DCamera {
     }
 
     public void applyPerspective(GL3DState state) {
-        GL gl = state.gl;
+        GL2 gl = state.gl;
         int viewport[] = new int[4];
-        gl.glGetIntegerv(GL.GL_VIEWPORT, viewport, 0);
+        gl.glGetIntegerv(GL2.GL_VIEWPORT, viewport, 0);
         this.width = viewport[2];
         this.height = viewport[3];
         this.aspect = width / height;
 
-        gl.glMatrixMode(GL.GL_PROJECTION);
+        gl.glMatrixMode(GL2.GL_PROJECTION);
 
         gl.glPushMatrix();
         gl.glLoadIdentity();
         glu.gluPerspective(this.fov, this.aspect, this.clipNear, this.clipFar);
 
-        gl.glMatrixMode(GL.GL_MODELVIEW);
+        gl.glMatrixMode(GL2.GL_MODELVIEW);
     }
 
     public void resumePerspective(GL3DState state) {
-        GL gl = state.gl;
-        gl.glMatrixMode(GL.GL_PROJECTION);
+        GL2 gl = state.gl;
+        gl.glMatrixMode(GL2.GL_PROJECTION);
         gl.glPopMatrix();
-        gl.glMatrixMode(GL.GL_MODELVIEW);
+        gl.glMatrixMode(GL2.GL_MODELVIEW);
     }
 
     public void updateCameraTransformation() {

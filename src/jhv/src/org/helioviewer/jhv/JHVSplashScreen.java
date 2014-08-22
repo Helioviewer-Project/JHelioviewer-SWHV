@@ -111,7 +111,7 @@ public class JHVSplashScreen extends JFrame implements StatusTextListener {
      * version on the machine and creates the main view chain
      * */
     public void initializeViewchain() {
-        imagePanel.setText("Starting OpenGL...");
+        imagePanel.setText("Starting OpenGL2...");
         nextStep();
         StatusPanel.addStatusTextListener(this);
         if (GLInfo.glIsUsable()) {

@@ -12,7 +12,7 @@ import java.nio.CharBuffer;
 import java.util.LinkedList;
 import java.util.List;
 
-import javax.media.opengl.GL;
+import javax.media.opengl.GL2;
 import javax.media.opengl.glu.GLU;
 
 import org.apache.log4j.Level;
@@ -51,15 +51,15 @@ public class GLShaderHelper {
      * @param _tmpPath
      *            Location where to put temporary files.
      */
-    public static void initHelper(GL gl, String _tmpPath) {
-        Log.debug(">> GLShaderHelper.initHelper(GL gl, String _tmpPath) > Initialize helper functions");
+    public static void initHelper(GL2 gl, String _tmpPath) {
+        Log.debug(">> GLShaderHelper.initHelper(GL2 gl, String _tmpPath) > Initialize helper functions");
         tmpPath = _tmpPath;
 
-        Log.debug(">> GLShaderHelper.initHelper(GL gl, String _tmpPath) > temp path: " + tmpPath);
+        Log.debug(">> GLShaderHelper.initHelper(GL2 gl, String _tmpPath) > temp path: " + tmpPath);
         int tmp[] = new int[1];
-        gl.glGetProgramivARB(GL.GL_FRAGMENT_PROGRAM_ARB, GL.GL_MAX_PROGRAM_TEX_INDIRECTIONS_ARB, tmp, 0);
+        gl.glGetProgramivARB(GL2.GL_FRAGMENT_PROGRAM_ARB, GL2.GL_MAX_PROGRAM_TEX_INDIRECTIONS_ARB, tmp, 0);
         maxTextureIndirections = tmp[0];
-        Log.debug(">> GLShaderHelper.initHelper(GL gl, String _tmpPath) > max texture indirections: " + maxTextureIndirections);
+        Log.debug(">> GLShaderHelper.initHelper(GL2 gl, String _tmpPath) > max texture indirections: " + maxTextureIndirections);
     }
 
     /**
@@ -80,13 +80,13 @@ public class GLShaderHelper {
      *            Valid reference to the current gl object
      * @return new shader id
      */
-    public int genShaderID(GL gl) {
+    public int genShaderID(GL2 gl) {
         int id = genStandaloneShaderID(gl);
         allShaders.add(id);
         return id;
     }
 
-    public int genStandaloneShaderID(GL gl) {
+    public int genStandaloneShaderID(GL2 gl) {
         int[] tmp = new int[1];
         gl.glGenProgramsARB(1, tmp, 0);
         return tmp[0];
@@ -103,12 +103,12 @@ public class GLShaderHelper {
      * @param shaderID
      *            Shader id to delete
      */
-    public void delShaderID(GL gl, int shaderID) {
+    public void delShaderID(GL2 gl, int shaderID) {
         if (!allShaders.contains(shaderID))
             return;
 
         if (gl == null) {
-            gl = GLU.getCurrentGL();
+            gl = (GL2) GLU.getCurrentGL();
         }
 
         allShaders.remove(allShaders.indexOf(shaderID));
@@ -126,7 +126,7 @@ public class GLShaderHelper {
      * @param gl
      *            Valid reference to the current gl object
      */
-    public void delAllShaderIDs(GL gl) {
+    public void delAllShaderIDs(GL2 gl) {
         GLCommonRenderGraphics.clearShader();
         GLSceneSaver.clearShader();
         for (int i = allShaders.size() - 1; i >= 0; i--) {
@@ -145,7 +145,7 @@ public class GLShaderHelper {
      * @param shader
      *            Shader id
      */
-    public void bindShader(GL gl, int target, int shader) {
+    public void bindShader(GL2 gl, int target, int shader) {
         if (shader != shaderCurrentlyBound) {
             shaderCurrentlyBound = shader;
             gl.glBindProgramARB(target, shader);
@@ -172,7 +172,7 @@ public class GLShaderHelper {
      * @param target
      *            Shader id to put the compiled program
      */
-    public void compileProgram(GL gl, int programType, URL source, int target) {
+    public void compileProgram(GL2 gl, int programType, URL source, int target) {
         compileProgram(gl, programType, getContents(source), target);
     }
 
@@ -196,7 +196,7 @@ public class GLShaderHelper {
      * @param target
      *            Shader id to put the compiled program
      */
-    public void compileProgram(GL gl, int programType, String source, int target) {
+    public void compileProgram(GL2 gl, int programType, String source, int target) {
         File tmpOut = new File(tmpPath + "tmp.cg");
         File tmpIn = new File(tmpPath + "tmp.asm");
         if (tmpIn.exists()) {
@@ -207,7 +207,7 @@ public class GLShaderHelper {
 
         putContents(tmpOut, source);
 
-        String profile = programType == GL.GL_FRAGMENT_PROGRAM_ARB ? "arbfp1" : "arbvp1";
+        String profile = programType == GL2.GL_FRAGMENT_PROGRAM_ARB ? "arbfp1" : "arbvp1";
         List<String> args = new LinkedList<String>();
         args.add("-profile");
         args.add(profile);
@@ -238,7 +238,7 @@ public class GLShaderHelper {
         gl.glBindProgramARB(programType, target);
 
         CharBuffer programBuffer = CharBuffer.wrap(compiledProgram);
-        gl.glProgramStringARB(programType, GL.GL_PROGRAM_FORMAT_ASCII_ARB, compiledProgram.length(), programBuffer.toString());
+        gl.glProgramStringARB(programType, GL2.GL_PROGRAM_FORMAT_ASCII_ARB, compiledProgram.length(), programBuffer.toString());
 
     }
 

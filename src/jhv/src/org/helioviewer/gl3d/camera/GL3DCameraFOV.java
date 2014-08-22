@@ -2,7 +2,8 @@ package org.helioviewer.gl3d.camera;
 
 import java.util.List;
 
-import javax.media.opengl.GL;
+import javax.media.opengl.GL2;
+import javax.media.opengl.GL2;
 
 import org.helioviewer.gl3d.scenegraph.GL3DMesh;
 import org.helioviewer.gl3d.scenegraph.GL3DState;
@@ -31,13 +32,13 @@ public class GL3DCameraFOV extends GL3DMesh {
     @Override
     public void shapeDraw(GL3DState state) {
         this.markAsChanged();
-        state.gl.glDisable(GL.GL_DEPTH_TEST);
+        state.gl.glDisable(GL2.GL_DEPTH_TEST);
         state.gl.glColor3d(1., 0., 0.);
-        state.gl.glEnable(GL.GL_DEPTH_TEST);
-        GL gl = state.gl;
+        state.gl.glEnable(GL2.GL_DEPTH_TEST);
+        GL2 gl = state.gl;
         gl.glLineWidth(2.5f);
         gl.glColor3d(0.0f, 1.0f, 0.0f);
-        gl.glBegin(GL.GL_LINE_LOOP);
+        gl.glBegin(GL2.GL_LINE_LOOP);
         double bw = width * scale / 2.;
         double bh = height * scale / 2.;
         int subdivisions = 10;

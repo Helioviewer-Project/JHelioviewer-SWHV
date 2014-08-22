@@ -1,6 +1,6 @@
 package org.helioviewer.viewmodel.view.opengl;
 
-import javax.media.opengl.GL;
+import javax.media.opengl.GL2;
 
 import org.helioviewer.viewmodel.view.RegionView;
 import org.helioviewer.viewmodel.view.SubimageDataView;
@@ -8,7 +8,7 @@ import org.helioviewer.viewmodel.view.SynchronizeOverviewChainView;
 import org.helioviewer.viewmodel.view.jp2view.JHVJP2View;
 
 /**
- * Implementation of SynchronizeView for rendering in OpenGL.
+ * Implementation of SynchronizeView for rendering in OpenGL2.
  *
  * <p>
  * This class behaves exactly like
@@ -26,7 +26,7 @@ public class GLSynchronizeOverviewChainView extends SynchronizeOverviewChainView
      * {@inheritDoc}
      */
     @Override
-    public void renderGL(GL gl, boolean nextView) {
+    public void renderGL(GL2 gl, boolean nextView) {
         if (view instanceof GLView) {
             ((GLView) view).renderGL(gl, true);
         } else {

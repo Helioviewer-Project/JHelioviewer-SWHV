@@ -1,6 +1,6 @@
 package org.helioviewer.viewmodel.filter;
 
-import javax.media.opengl.GL;
+import javax.media.opengl.GL2;
 
 /**
  * Filter which has to perform some commands after rendering
@@ -22,5 +22,5 @@ public interface GLPostFilter extends GLFilter {
      * @param gl
      *            Valid reference to the current gl object
      */
-    public void postApplyGL(GL gl);
+    public void postApplyGL(GL2 gl);
 }

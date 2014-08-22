@@ -2,7 +2,7 @@ package org.helioviewer.gl3d.scenegraph.visuals;
 
 import java.util.List;
 
-import javax.media.opengl.GL;
+import javax.media.opengl.GL2;
 
 import org.helioviewer.gl3d.scenegraph.GL3DMesh;
 import org.helioviewer.gl3d.scenegraph.GL3DState;
@@ -75,9 +75,9 @@ public class GL3DTrianglesCone extends GL3DMesh {
     }
 
     public void shapeDraw(GL3DState state) {
-        state.gl.glDisable(GL.GL_LIGHTING);
+        state.gl.glDisable(GL2.GL_LIGHTING);
         super.shapeDraw(state);
-        state.gl.glEnable(GL.GL_LIGHTING);
+        state.gl.glEnable(GL2.GL_LIGHTING);
 
     }
 }

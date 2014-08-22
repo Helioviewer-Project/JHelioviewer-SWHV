@@ -1,6 +1,6 @@
 package org.helioviewer.gl3d.view;
 
-import javax.media.opengl.GL;
+import javax.media.opengl.GL2;
 
 import org.helioviewer.gl3d.scenegraph.GL3DState;
 import org.helioviewer.viewmodel.changeevent.ChangeEvent;
@@ -22,7 +22,7 @@ public class GL3DViewportView extends AbstractGL3DView implements GL3DView {
 
     public void render3D(GL3DState state) {
 
-        GL gl = state.gl;
+        GL2 gl = state.gl;
         if (viewportView != null) {
             gl.glViewport(0, 0, viewportView.getViewport().getWidth(), viewportView.getViewport().getHeight());
             // Log.debug("GL3DViewportView.viewport (width="+viewportView.getViewport().getWidth()+", height="+viewportView.getViewport().getHeight()+")");

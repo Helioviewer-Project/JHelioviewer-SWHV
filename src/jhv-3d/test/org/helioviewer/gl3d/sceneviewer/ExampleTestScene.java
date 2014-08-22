@@ -1,5 +1,7 @@
 package org.helioviewer.gl3d.sceneviewer;
 
+import javax.media.opengl.GLAutoDrawable;
+
 import org.helioviewer.gl3d.scenegraph.GL3DGroup;
 import org.helioviewer.gl3d.scenegraph.GL3DNode;
 import org.helioviewer.gl3d.scenegraph.math.GL3DVec4f;
@@ -11,6 +13,7 @@ public class ExampleTestScene extends GL3DTestScene {
         new ExampleTestScene();
     }
 
+    @Override
     public GL3DNode getSceneRoot() {
         GL3DGroup root = new GL3DGroup("Root");
 
@@ -19,5 +22,11 @@ public class ExampleTestScene extends GL3DTestScene {
         root.addNode(arrow);
 
         return root;
+    }
+
+    @Override
+    public void dispose(GLAutoDrawable arg0) {
+        // TODO Auto-generated method stub
+
     }
 }

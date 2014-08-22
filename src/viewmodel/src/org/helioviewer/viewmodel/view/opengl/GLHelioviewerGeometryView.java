@@ -1,6 +1,6 @@
 package org.helioviewer.viewmodel.view.opengl;
 
-import javax.media.opengl.GL;
+import javax.media.opengl.GL2;
 
 import org.helioviewer.base.physics.Constants;
 import org.helioviewer.viewmodel.changeevent.ChangeEvent;
@@ -55,9 +55,9 @@ public class GLHelioviewerGeometryView extends AbstractGLView implements Heliovi
     /**
      * {@inheritDoc}
      */
-    public void renderGL(GL gl, boolean nextView) {
-        gl.glEnable(GL.GL_FRAGMENT_PROGRAM_ARB);
-        gl.glEnable(GL.GL_VERTEX_PROGRAM_ARB);
+    public void renderGL(GL2 gl, boolean nextView) {
+        gl.glEnable(GL2.GL_FRAGMENT_PROGRAM_ARB);
+        gl.glEnable(GL2.GL_VERTEX_PROGRAM_ARB);
 
         vertexShader.bind(gl);
         fragmentShader.bind(gl);
@@ -69,8 +69,8 @@ public class GLHelioviewerGeometryView extends AbstractGLView implements Heliovi
 
         renderChild(gl);
 
-        gl.glDisable(GL.GL_FRAGMENT_PROGRAM_ARB);
-        gl.glDisable(GL.GL_VERTEX_PROGRAM_ARB);
+        gl.glDisable(GL2.GL_FRAGMENT_PROGRAM_ARB);
+        gl.glDisable(GL2.GL_VERTEX_PROGRAM_ARB);
     }
 
     /**
@@ -123,7 +123,7 @@ public class GLHelioviewerGeometryView extends AbstractGLView implements Heliovi
     private class GeometryFragmentShaderProgram extends GLFragmentShaderProgram {
         private GLTextureCoordinate rotationParam;
 
-        private void setMaskRotation(GL gl, float maskRotation) {
+        private void setMaskRotation(GL2 gl, float maskRotation) {
             if (rotationParam != null) {
                 rotationParam.setValue(gl, maskRotation);
             }

@@ -1,6 +1,6 @@
 package org.helioviewer.viewmodel.view.opengl;
 
-import javax.media.opengl.GL;
+import javax.media.opengl.GL2;
 
 import org.helioviewer.viewmodel.view.View;
 
@@ -8,7 +8,7 @@ import org.helioviewer.viewmodel.view.View;
  * View for displaying images in OpenGL render mode.
  * 
  * <p>
- * To accelerate the rendering process, this application supports open GL. Since
+ * To accelerate the rendering process, this application supports open GL2. Since
  * the structure of rendering an OpenGL image differs from the rendering of Java
  * BufferedImages, a new view is necessary.
  * 
@@ -48,5 +48,5 @@ public interface GLView extends View {
      * @param nextView
      *            Flag for recursive rendering
      */
-    public void renderGL(GL gl, boolean nextView);
+    public void renderGL(GL2 gl, boolean nextView);
 }

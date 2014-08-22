@@ -4,7 +4,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.locks.ReentrantLock;
 
-import javax.media.opengl.GL;
+import javax.media.opengl.GL2;
+import javax.media.opengl.GL2;
 
 import org.helioviewer.base.physics.Constants;
 import org.helioviewer.gl3d.scenegraph.GL3DDrawBits.Bit;
@@ -152,8 +153,8 @@ public abstract class GL3DMesh extends GL3DShape {
             } else {
                 // state.gl.glColor4d(1, 1, 1, 1);
                 // Log.debug("GL3DMesh: "+getName()+" Using VBO AND diffuseMaterial as Color");
-                state.gl.glMaterialfv(GL.GL_FRONT, GL.GL_AMBIENT_AND_DIFFUSE, this.diffuseMaterial, 0);
-                state.gl.glMaterialfv(GL.GL_FRONT, GL.GL_SPECULAR, this.specularMaterial, 0);
+                state.gl.glMaterialfv(GL2.GL_FRONT, GL2.GL_AMBIENT_AND_DIFFUSE, this.diffuseMaterial, 0);
+                state.gl.glMaterialfv(GL2.GL_FRONT, GL2.GL_SPECULAR, this.specularMaterial, 0);
                 this.colorVBO.enable(state);
             }
 
@@ -161,9 +162,9 @@ public abstract class GL3DMesh extends GL3DShape {
             if (textCoords.size() > 0) {
                 // state.gl.glColor4d(1, 1, 1, 1);
                 this.texcoordVBO.enable(state);
-                state.gl.glEnable(GL.GL_TEXTURE_2D);
+                state.gl.glEnable(GL2.GL_TEXTURE_2D);
             } else {
-                state.gl.glDisable(GL.GL_TEXTURE_2D);
+                state.gl.glDisable(GL2.GL_TEXTURE_2D);
             }
             // GL3DState.get().checkGLErrors("GL3DImageMesh.beforeDrawCall "+getName());
 
@@ -187,15 +188,15 @@ public abstract class GL3DMesh extends GL3DShape {
     }
 
     private void renderWireframe(GL3DState state, GL3DMeshPrimitive primitive) {
-        GL gl = state.gl;
-        gl.glDisable(GL.GL_LIGHTING);
-        gl.glDisable(GL.GL_TEXTURE_2D);
+        GL2 gl = state.gl;
+        gl.glDisable(GL2.GL_LIGHTING);
+        gl.glDisable(GL2.GL_TEXTURE_2D);
         if (primitive == GL3DMeshPrimitive.QUADS) {
 
             for (int i = 0; i < this.indices.size(); i++) {
                 if (i % 4 == 0)
 
-                    gl.glBegin(GL.GL_LINE_LOOP);
+                    gl.glBegin(GL2.GL_LINE_LOOP);
                 int index = this.indices.get(i);
                 GL3DVec3d position = this.positions.get(index);
                 gl.glVertex3d(position.x, position.y, position.z);
@@ -207,7 +208,7 @@ public abstract class GL3DMesh extends GL3DShape {
 
             for (int i = 0; i < this.indices.size(); i++) {
                 if (i % 3 == 0)
-                    gl.glBegin(GL.GL_LINE_LOOP);
+                    gl.glBegin(GL2.GL_LINE_LOOP);
                 int index = this.indices.get(i);
                 GL3DVec3d position = this.positions.get(index);
                 gl.glVertex3d(position.x, position.y, position.z);
@@ -215,7 +216,7 @@ public abstract class GL3DMesh extends GL3DShape {
                     gl.glEnd();
             }
         } else if (primitive == GL3DMeshPrimitive.LINES) {
-            gl.glBegin(GL.GL_LINES);
+            gl.glBegin(GL2.GL_LINES);
 
             GL3DVec3d lastPosition = null;
             for (int i = 0; i < this.indices.size(); i++) {
@@ -229,7 +230,7 @@ public abstract class GL3DMesh extends GL3DShape {
             }
             gl.glEnd();
         } else {
-            gl.glBegin(GL.GL_LINE_LOOP);
+            gl.glBegin(GL2.GL_LINE_LOOP);
 
             for (int i = 0; i < this.indices.size(); i++) {
                 int index = this.indices.get(i);
@@ -239,16 +240,16 @@ public abstract class GL3DMesh extends GL3DShape {
             gl.glEnd();
         }
 
-        gl.glEnable(GL.GL_LIGHTING);
-        gl.glEnable(GL.GL_TEXTURE_2D);
+        gl.glEnable(GL2.GL_LIGHTING);
+        gl.glEnable(GL2.GL_TEXTURE_2D);
     }
 
     private void renderNormals(GL3DState state) {
-        GL gl = state.gl;
+        GL2 gl = state.gl;
         gl.glColor3d(1, 0.5, 0);
-        gl.glDisable(GL.GL_LIGHTING);
-        gl.glDisable(GL.GL_TEXTURE_2D);
-        gl.glBegin(GL.GL_LINES);
+        gl.glDisable(GL2.GL_LIGHTING);
+        gl.glDisable(GL2.GL_TEXTURE_2D);
+        gl.glBegin(GL2.GL_LINES);
         for (int i = 0; i < this.normals.size(); i++) {
             GL3DVec3d position = this.positions.get(i);
             GL3DVec3d normal = this.normals.get(i);
@@ -257,8 +258,8 @@ public abstract class GL3DMesh extends GL3DShape {
             gl.glVertex3d(position.x + normal.x * Constants.SunRadius / 10, position.y + normal.y * Constants.SunRadius / 10, position.z + normal.z * Constants.SunRadius / 10);
         }
         gl.glEnd();
-        gl.glEnable(GL.GL_LIGHTING);
-        gl.glEnable(GL.GL_TEXTURE_2D);
+        gl.glEnable(GL2.GL_LIGHTING);
+        gl.glEnable(GL2.GL_TEXTURE_2D);
     }
 
     /**
@@ -390,7 +391,7 @@ public abstract class GL3DMesh extends GL3DShape {
     }
 
     public enum GL3DMeshPrimitive {
-        TRIANGLES(GL.GL_TRIANGLES), TRIANGLE_STRIP(GL.GL_TRIANGLE_STRIP), TRIANGLE_FAN(GL.GL_TRIANGLE_FAN), POINTS(GL.GL_POINTS), QUADS(GL.GL_QUADS), LINES(GL.GL_LINES), LINE_LOOP(GL.GL_LINE_LOOP), LINE_STRIP(GL.GL_LINE_STRIP);
+        TRIANGLES(GL2.GL_TRIANGLES), TRIANGLE_STRIP(GL2.GL_TRIANGLE_STRIP), TRIANGLE_FAN(GL2.GL_TRIANGLE_FAN), POINTS(GL2.GL_POINTS), QUADS(GL2.GL_QUADS), LINES(GL2.GL_LINES), LINE_LOOP(GL2.GL_LINE_LOOP), LINE_STRIP(GL2.GL_LINE_STRIP);
         protected int id;
 
         private GL3DMeshPrimitive(int id) {

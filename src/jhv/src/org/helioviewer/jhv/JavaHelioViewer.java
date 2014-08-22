@@ -228,6 +228,7 @@ public class JavaHelioViewer {
         try {
             EventQueue.invokeAndWait(new Runnable() {
 
+                @Override
                 public void run() {
                     Log.info("Try to load OpenGL libraries");
                     if (!System.getProperty("jhv.os").equals("mac")) {
@@ -238,8 +239,8 @@ public class JavaHelioViewer {
                         Message.err("Error loading OpenGL libraries", "The OpenGL libraries could not be loaded. JHelioviewer will run in software mode.", false);
                         GLInfo.glUnusable();
                     } else {
-                        com.sun.opengl.impl.NativeLibLoader.disableLoading();
-                        com.sun.gluegen.runtime.NativeLibLoader.disableLoading();
+                        //com.sun.opengl.impl.NativeLibLoader.disableLoading();
+                        //com.sun.gluegen.runtime.NativeLibLoader.disableLoading();
                         Log.info("Successfully loaded OpenGL libraries");
                     }
                 }

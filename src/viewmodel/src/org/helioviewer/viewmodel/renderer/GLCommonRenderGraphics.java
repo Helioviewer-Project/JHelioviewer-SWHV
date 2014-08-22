@@ -8,7 +8,7 @@ import java.awt.RenderingHints;
 import java.awt.image.BufferedImage;
 import java.util.HashMap;
 
-import javax.media.opengl.GL;
+import javax.media.opengl.GL2;
 
 import org.helioviewer.base.math.Vector2dInt;
 import org.helioviewer.viewmodel.view.opengl.GLTextureHelper;
@@ -30,7 +30,7 @@ public class GLCommonRenderGraphics {
     private static GLScalePowerOfTwoVertexShaderProgram scalingShader;
     private static GLTextureCoordinate texCoord = new GLTextureHelper.GLMainTextureCoordinate();
 
-    private GL gl;
+    private final GL2 gl;
     private static GLTextureHelper textureHelper = new GLTextureHelper();
     private static HashMap<BufferedImage, Integer> mapImageToTexture = new HashMap<BufferedImage, Integer>();
     private static HashMap<StringFontPair, Integer> mapStringToTexture = new HashMap<StringFontPair, Integer>();
@@ -48,7 +48,7 @@ public class GLCommonRenderGraphics {
      * @param _gl
      *            gl object, that should be used for drawing.
      */
-    public GLCommonRenderGraphics(GL _gl) {
+    public GLCommonRenderGraphics(GL2 _gl) {
         gl = _gl;
 
         if (!GLTextureHelper.textureNonPowerOfTwoAvailable() && scalingShader == null) {
@@ -167,7 +167,7 @@ public class GLCommonRenderGraphics {
         if (GLTextureHelper.textureNonPowerOfTwoAvailable())
             return;
 
-        gl.glEnable(GL.GL_VERTEX_PROGRAM_ARB);
+        gl.glEnable(GL2.GL_VERTEX_PROGRAM_ARB);
         scalingShader.bind(gl);
     }
 
@@ -177,7 +177,7 @@ public class GLCommonRenderGraphics {
      * This is the corresponding call to {@link #bindScalingShader()}.
      */
     public void unbindScalingShader() {
-        gl.glDisable(GL.GL_VERTEX_PROGRAM_ARB);
+        gl.glDisable(GL2.GL_VERTEX_PROGRAM_ARB);
     }
 
     /**
@@ -188,7 +188,7 @@ public class GLCommonRenderGraphics {
      * @param gl
      *            valid gl object to use.
      */
-    public static void clearImageTextureBuffer(GL gl) {
+    public static void clearImageTextureBuffer(GL2 gl) {
         for (Integer i : mapImageToTexture.values()) {
             textureHelper.delTextureID(gl, i);
         }
@@ -203,7 +203,7 @@ public class GLCommonRenderGraphics {
      * @param gl
      *            valid gl object to use.
      */
-    public static void clearStringTextureBuffer(GL gl) {
+    public static void clearStringTextureBuffer(GL2 gl) {
         for (Integer i : mapStringToTexture.values()) {
             textureHelper.delTextureID(gl, i);
         }
@@ -226,6 +226,7 @@ public class GLCommonRenderGraphics {
             font = _font;
         }
 
+        @Override
         public boolean equals(Object o) {
             if (o instanceof StringFontPair) {
                 StringFontPair other = (StringFontPair) o;
@@ -237,6 +238,7 @@ public class GLCommonRenderGraphics {
             return false;
         }
 
+        @Override
         public int hashCode() {
             if (font == null)
                 return string.hashCode();

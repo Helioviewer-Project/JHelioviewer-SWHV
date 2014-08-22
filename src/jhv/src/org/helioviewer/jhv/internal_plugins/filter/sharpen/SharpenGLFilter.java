@@ -1,6 +1,6 @@
 package org.helioviewer.jhv.internal_plugins.filter.sharpen;
 
-import javax.media.opengl.GL;
+import javax.media.opengl.GL2;
 
 import org.helioviewer.viewmodel.filter.GLFragmentShaderFilter;
 import org.helioviewer.viewmodel.filter.GLImageSizeFilter;
@@ -43,13 +43,13 @@ public class SharpenGLFilter extends SharpenFilter implements GLFragmentShaderFi
          * @param pixelHeight
          *            Height of a pixel = 1/imageHeight
          */
-        public void setFactors(GL gl, float weighting, float pixelWidth, float pixelHeight) {
+        public void setFactors(GL2 gl, float weighting, float pixelWidth, float pixelHeight) {
             sharpenParamFloat[0] = pixelWidth * span;
             sharpenParamFloat[1] = pixelHeight * span;
             sharpenParamFloat[2]  = weighting;
         }
         @Override
-        public void bind(GL gl){
+        public void bind(GL2 gl){
             super.bind(gl);
             this.bindEnvVars(gl, this.sharpenParamRef, sharpenParamFloat);
         }
@@ -108,7 +108,7 @@ public class SharpenGLFilter extends SharpenFilter implements GLFragmentShaderFi
      * {@inheritDoc}
      */
     @Override
-    public void applyGL(GL gl) {
+    public void applyGL(GL2 gl) {
         shader.bind(gl);
         shader.setFactors(gl, weighting, pixelWidth, pixelHeight);
     }

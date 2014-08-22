@@ -2,7 +2,7 @@ package org.helioviewer.gl3d.model.image;
 
 import java.util.List;
 
-import javax.media.opengl.GL;
+import javax.media.opengl.GL2;
 
 import org.helioviewer.base.physics.Constants;
 import org.helioviewer.gl3d.scenegraph.GL3DState;
@@ -33,9 +33,9 @@ public class GL3DImageSphere extends GL3DImageMesh {
 
     @Override
     public void shapeDraw(GL3DState state) {
-        state.gl.glEnable(GL.GL_CULL_FACE);
-        state.gl.glEnable(GL.GL_DEPTH_TEST);
-        state.gl.glEnable(GL.GL_BLEND);
+        state.gl.glEnable(GL2.GL_CULL_FACE);
+        state.gl.glEnable(GL2.GL_DEPTH_TEST);
+        state.gl.glEnable(GL2.GL_BLEND);
 
         super.shapeDraw(state);
     }

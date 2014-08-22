@@ -1,6 +1,6 @@
 package org.helioviewer.gl3d.view;
 
-import javax.media.opengl.GL;
+import javax.media.opengl.GL2;
 
 import org.helioviewer.base.logging.Log;
 import org.helioviewer.base.math.Vector2dInt;
@@ -45,17 +45,17 @@ public class GL3DOrthoView extends AbstractGL3DView implements GL3DView {
     }
 
     public void render3D(GL3DState state) {
-        GL gl = state.gl;
+        GL2 gl = state.gl;
 
         // Viewport viewport =
         // view.getAdapter(ViewportView.class).getViewport();
 
-        gl.glMatrixMode(GL.GL_PROJECTION);
+        gl.glMatrixMode(GL2.GL_PROJECTION);
         gl.glPushMatrix();
         gl.glLoadIdentity();
         gl.glOrtho(0, state.getViewportWidth(), 0, state.getViewportHeight(), -1, 10000);
         // Log.debug("GL3DOrthoView: Set Ortho Projection width="+state.getViewportWidth()+" height="+state.getViewportHeight());
-        gl.glMatrixMode(GL.GL_MODELVIEW);
+        gl.glMatrixMode(GL2.GL_MODELVIEW);
         gl.glPushMatrix();
         gl.glLoadIdentity();
 
@@ -94,9 +94,9 @@ public class GL3DOrthoView extends AbstractGL3DView implements GL3DView {
         }
 
         // Resume Previous Projection
-        gl.glMatrixMode(GL.GL_PROJECTION);
+        gl.glMatrixMode(GL2.GL_PROJECTION);
         gl.glPopMatrix();
-        gl.glMatrixMode(GL.GL_MODELVIEW);
+        gl.glMatrixMode(GL2.GL_MODELVIEW);
         gl.glPopMatrix();
     }
 

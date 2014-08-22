@@ -1,6 +1,6 @@
 package org.helioviewer.jhv.internal_plugins.filter.contrast;
 
-import javax.media.opengl.GL;
+import javax.media.opengl.GL2;
 
 import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.viewmodel.filter.AbstractFilter;
@@ -39,7 +39,7 @@ import org.helioviewer.viewmodel.view.opengl.shader.GLShaderBuilder.GLBuildShade
  * The output of the filter always has the same image format as the input.
  *
  * <p>
- * This filter supports software rendering as well as rendering in OpenGL.
+ * This filter supports software rendering as well as rendering in OpenGL2.
  *
  * @author Markus Langenberg
  */
@@ -203,14 +203,14 @@ public class ContrastFilter extends AbstractFilter implements StandardFilter, GL
          * @param contrast
          *            Contrast parameter
          */
-        private void setContrast(GL gl, float contrast) {
+        private void setContrast(GL2 gl, float contrast) {
             if (contrastParamFloat != null) {
                 contrastParamFloat[0] = contrast;
             }
         }
 
         @Override
-        public void bind(GL gl){
+        public void bind(GL2 gl){
             super.bind(gl);
             this.bindEnvVars(gl, this.contrastParamRef, contrastParamFloat);
         }
@@ -244,7 +244,7 @@ public class ContrastFilter extends AbstractFilter implements StandardFilter, GL
      * {@inheritDoc}
      */
     @Override
-    public void applyGL(GL gl) {
+    public void applyGL(GL2 gl) {
         shader.bind(gl);
         shader.setContrast(gl, contrast);
     }

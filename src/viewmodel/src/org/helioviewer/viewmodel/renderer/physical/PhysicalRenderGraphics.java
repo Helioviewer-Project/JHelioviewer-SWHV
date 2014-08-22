@@ -1,6 +1,6 @@
 package org.helioviewer.viewmodel.renderer.physical;
 
-import javax.media.opengl.GL;
+import javax.media.opengl.GL2;
 
 import org.helioviewer.base.math.Vector2dDouble;
 import org.helioviewer.viewmodel.renderer.RenderGraphics;
@@ -20,5 +20,5 @@ import org.helioviewer.viewmodel.renderer.RenderGraphics;
  * @author Markus Langenberg
  * */
 public interface PhysicalRenderGraphics extends RenderGraphics<Double, Vector2dDouble> {
-    public GL getGL();
+    public GL2 getGL();
 }

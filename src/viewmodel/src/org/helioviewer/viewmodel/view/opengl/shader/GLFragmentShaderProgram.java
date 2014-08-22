@@ -2,7 +2,7 @@ package org.helioviewer.viewmodel.view.opengl.shader;
 
 import java.util.Stack;
 
-import javax.media.opengl.GL;
+import javax.media.opengl.GL2;
 
 /**
  * Abstract class to build customized fragment shaders.
@@ -24,7 +24,7 @@ import javax.media.opengl.GL;
  */
 public abstract class GLFragmentShaderProgram {
 
-    protected static final int target = GL.GL_FRAGMENT_PROGRAM_ARB;
+    protected static final int target = GL2.GL_FRAGMENT_PROGRAM_ARB;
 
     protected static Stack<Integer> shaderStack = new Stack<Integer>();
     protected static int shaderCurrentlyUsed = -1;
@@ -67,25 +67,25 @@ public abstract class GLFragmentShaderProgram {
      * @param gl
      *            Valid reference to the current gl object
      */
-    public void bind(GL gl) {
+    public void bind(GL2 gl) {
         bind(gl, shaderID);
     }
-    public void bindEnvVars(GL gl,int id, double [] param) {
+    public void bindEnvVars(GL2 gl,int id, double [] param) {
         gl.glProgramLocalParameter4dARB(target, id, param[0], param[1], param[2], param[3]);
     }
     /**
      * Pushes the shader currently in use onto a stack.
      *
      * This is useful to load another shader but still being able to restore the
-     * old one, similar to the very common pushMatrix() in OpenGL.
+     * old one, similar to the very common pushMatrix() in OpenGL2.
      *
      * @param gl
      *            Valid reference to the current gl object
      * @see #popShader(GL)
      */
-    public static void pushShader(GL gl) {
+    public static void pushShader(GL2 gl) {
         shaderStack.push(shaderCurrentlyUsed);
-        gl.glPushAttrib(GL.GL_CURRENT_BIT);
+        gl.glPushAttrib(GL2.GL_CURRENT_BIT);
         // Log.debug("GL3DFragmentShaderProgram: pushShader, current="+shaderCurrentlyUsed);
     }
 
@@ -93,13 +93,13 @@ public abstract class GLFragmentShaderProgram {
      * Takes the top of from the shader stack and binds it.
      *
      * This restores a shader pushed onto the stack earlier, similar to the very
-     * common popMatrix() in OpenGL.
+     * common popMatrix() in OpenGL2.
      *
      * @param gl
      *            Valid reference to the current gl object
      * @see #pushShader(GL)
      */
-    public static void popShader(GL gl) {
+    public static void popShader(GL2 gl) {
         gl.glPopAttrib();
         Integer restoreShaderObject = shaderStack.pop();
         int restoreShader = restoreShaderObject == null ? 0 : restoreShaderObject.intValue();
@@ -114,7 +114,7 @@ public abstract class GLFragmentShaderProgram {
      * @param gl
      *            Valid reference to the current gl object
      */
-    private static void bind(GL gl, int shader) {
+    private static void bind(GL2 gl, int shader) {
         if (shader != shaderCurrentlyUsed) {
             shaderCurrentlyUsed = shader;
             gl.glBindProgramARB(target, shader);

@@ -1,6 +1,6 @@
 package org.helioviewer.viewmodel.view.opengl;
 
-import javax.media.opengl.GL;
+import javax.media.opengl.GL2;
 
 import org.helioviewer.viewmodel.view.RegionView;
 import org.helioviewer.viewmodel.view.StandardSolarRotationTrackingView;
@@ -20,7 +20,7 @@ public class GLSolarRotationTrackingView extends StandardSolarRotationTrackingVi
     /**
      * {@inheritDoc}
      */
-    public void renderGL(GL gl, boolean nextView) {
+    public void renderGL(GL2 gl, boolean nextView) {
         if (view instanceof GLView) {
             ((GLView) view).renderGL(gl, true);
         } else {

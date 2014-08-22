@@ -1,6 +1,6 @@
 package org.helioviewer.gl3d.view;
 
-import javax.media.opengl.GL;
+import javax.media.opengl.GL2;
 
 import org.helioviewer.base.math.Vector2dInt;
 import org.helioviewer.gl3d.scenegraph.GL3DState;
@@ -39,7 +39,7 @@ public class GL3DImageRegionView extends AbstractGL3DView implements GL3DView, R
     private Region actualImageRegion;
 
     public void render3D(GL3DState state) {
-        GL gl = state.gl;
+        GL2 gl = state.gl;
 
         if (this.actualImageRegion == null || this.innerViewport == null) {
             return;
@@ -57,19 +57,19 @@ public class GL3DImageRegionView extends AbstractGL3DView implements GL3DView, R
         double bottom = this.actualImageRegion.getCornerY();
         double top = bottom + regionHeightOfViewport;
 
-        gl.glMatrixMode(GL.GL_PROJECTION);
+        gl.glMatrixMode(GL2.GL_PROJECTION);
         gl.glPushMatrix();
         gl.glLoadIdentity();
         gl.glOrtho(left, right, bottom, top, -1, 10000);
-        gl.glMatrixMode(GL.GL_MODELVIEW);
+        gl.glMatrixMode(GL2.GL_MODELVIEW);
         gl.glPushMatrix();
         gl.glLoadIdentity();
         this.renderChild(gl);
 
         // Resume Previous Projection
-        gl.glMatrixMode(GL.GL_PROJECTION);
+        gl.glMatrixMode(GL2.GL_PROJECTION);
         gl.glPopMatrix();
-        gl.glMatrixMode(GL.GL_MODELVIEW);
+        gl.glMatrixMode(GL2.GL_MODELVIEW);
         gl.glPopMatrix();
     }
 

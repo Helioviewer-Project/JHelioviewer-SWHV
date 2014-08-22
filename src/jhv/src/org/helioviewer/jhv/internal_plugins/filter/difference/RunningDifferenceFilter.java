@@ -3,7 +3,7 @@ package org.helioviewer.jhv.internal_plugins.filter.difference;
 import java.util.LinkedList;
 import java.util.List;
 
-import javax.media.opengl.GL;
+import javax.media.opengl.GL2;
 
 import org.helioviewer.base.logging.Log;
 import org.helioviewer.jhv.gui.states.StateController;
@@ -181,7 +181,7 @@ public class RunningDifferenceFilter implements FrameFilter, StandardFilter, Obs
     }
 
     @Override
-    public void applyGL(GL gl) {
+    public void applyGL(GL2 gl) {
         if (isActive) {
             if (StateController.getInstance().getCurrentState().getType() == ViewStateEnum.View3D) {
                 if (jpxView.getBaseDifferenceMode()) {
@@ -217,7 +217,7 @@ public class RunningDifferenceFilter implements FrameFilter, StandardFilter, Obs
 
                 shader.activateDifferenceTexture(gl);
 
-                gl.glBindTexture(GL.GL_TEXTURE_2D, lookupDiff);
+                gl.glBindTexture(GL2.GL_TEXTURE_2D, lookupDiff);
                 GLTextureHelper th = new GLTextureHelper();
                 th.moveImageDataToGLTexture(gl, previousFrame, 0, 0, previousFrame.getWidth(), previousFrame.getHeight(), lookupDiff);
             }

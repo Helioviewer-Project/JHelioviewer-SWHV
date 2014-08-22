@@ -18,7 +18,7 @@ public class GL3DMergeMesh extends GL3DMesh {
     }
 
     public void shapeDraw(GL3DState state) {
-        // state.gl.glDisable(GL.GL_LIGHTING);
+        // state.gl.glDisable(GL2.GL_LIGHTING);
         super.shapeDraw(state);
     }
 

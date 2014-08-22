@@ -1,6 +1,6 @@
 package org.helioviewer.gl3d.scenegraph.rt;
 
-import javax.media.opengl.GL;
+import javax.media.opengl.GL2;
 
 import org.helioviewer.gl3d.scenegraph.GL3DShape;
 import org.helioviewer.gl3d.scenegraph.GL3DState;
@@ -82,16 +82,16 @@ public class GL3DRay {
      */
 
     public void draw(GL3DState state) {
-        GL gl = state.gl;
+        GL2 gl = state.gl;
 
         this.length = this.length < 1000 ? this.length : 100;
 
-        gl.glDisable(GL.GL_LIGHTING);
-        gl.glDisable(GL.GL_TEXTURE_2D);
+        gl.glDisable(GL2.GL_LIGHTING);
+        gl.glDisable(GL2.GL_TEXTURE_2D);
 
         state.pushMV();
         // state.loadIdentity();
-        gl.glBegin(GL.GL_LINES);
+        gl.glBegin(GL2.GL_LINES);
 
         gl.glColor3d(1, 1, 0);
         gl.glVertex3d(origin.x, origin.y, origin.z);
@@ -104,8 +104,8 @@ public class GL3DRay {
 
         // Log.debug("GL3DRay: DRAW IN WS: Origin: "+this.origin+" Destination: "+GL3DVec3d.add(this.origin,
         // this.direction.copy().multiply(length)));
-        gl.glEnable(GL.GL_LIGHTING);
-        gl.glEnable(GL.GL_TEXTURE_2D);
+        gl.glEnable(GL2.GL_LIGHTING);
+        gl.glEnable(GL2.GL_TEXTURE_2D);
     }
 
     public GL3DVec3d getOrigin() {

@@ -4,10 +4,10 @@ import java.awt.Color;
 import java.io.File;
 import java.io.IOException;
 
-import javax.media.opengl.GL;
+import javax.media.opengl.GL2;
 import javax.media.opengl.GLAutoDrawable;
-import javax.media.opengl.GLCanvas;
 import javax.media.opengl.GLEventListener;
+import javax.media.opengl.awt.GLCanvas;
 
 import org.helioviewer.base.logging.Log;
 import org.helioviewer.base.math.Vector2dInt;
@@ -43,10 +43,10 @@ import org.helioviewer.viewmodel.viewport.Viewport;
 /**
  * The top-most View in the 3D View Chain. Let's the viewchain render to its
  * {@link GLCanvas}.
- *
- *
+ * 
+ * 
  * @author Simon Spoerri (simon.spoerri@fhnw.ch)
- *
+ * 
  */
 public class GL3DComponentView extends AbstractComponentView implements GLEventListener, ComponentView, DisplayListener, GL3DComponentFakeInterface {
     private GLCanvas canvas;
@@ -72,6 +72,7 @@ public class GL3DComponentView extends AbstractComponentView implements GLEventL
         this.getCanvas().addGLEventListener(this);
 
     }
+
     @Override
     public void deactivate() {
 
@@ -86,7 +87,6 @@ public class GL3DComponentView extends AbstractComponentView implements GLEventL
         return this.getCanvas();
     }
 
-    @Override
     public void displayChanged(GLAutoDrawable arg0, boolean arg1, boolean arg2) {
         Log.debug("GL3DComponentView.DisplayChanged");
     }
@@ -96,7 +96,7 @@ public class GL3DComponentView extends AbstractComponentView implements GLEventL
         Log.debug("GL3DComponentView.Init");
         GLSharedContext.setSharedContext(glAD.getContext());
 
-        GL gl = glAD.getGL();
+        GL2 gl = (GL2) glAD.getGL();
         GL3DState.create(gl);
 
         // GLTextureCoordinate.init(gl);
@@ -104,29 +104,29 @@ public class GL3DComponentView extends AbstractComponentView implements GLEventL
         GLTextureHelper.initHelper(gl);
 
         shaderHelper.delAllShaderIDs(gl);
-        // gl.glEnable(GL.GL_LINE_SMOOTH);
-        gl.glHint(GL.GL_LINE_SMOOTH_HINT, GL.GL_NICEST);
-        // gl.glShadeModel(GL.GL_FLAT);
-        gl.glShadeModel(GL.GL_SMOOTH);
-        gl.glClear(GL.GL_COLOR_BUFFER_BIT | GL.GL_DEPTH_BUFFER_BIT);
+        // gl.glEnable(GL2.GL_LINE_SMOOTH);
+        gl.glHint(GL2.GL_LINE_SMOOTH_HINT, GL2.GL_NICEST);
+        // gl.glShadeModel(GL2.GL_FLAT);
+        gl.glShadeModel(GL2.GL_SMOOTH);
+        gl.glClear(GL2.GL_COLOR_BUFFER_BIT | GL2.GL_DEPTH_BUFFER_BIT);
         gl.glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
-        //gl.glTexEnvi(GL.GL_TEXTURE_ENV, GL.GL_TEXTURE_ENV_MODE, GL.GL_BLEND);
-        // gl.glTexEnvi(GL.GL_TEXTURE_ENV, GL.GL_TEXTURE_ENV_MODE,
-        // GL.GL_REPLACE);
-        gl.glEnable(GL.GL_BLEND);
-        gl.glEnable(GL.GL_POINT_SMOOTH);
-        gl.glEnable(GL.GL_COLOR_MATERIAL);
+        //gl.glTexEnvi(GL2.GL_TEXTURE_ENV, GL2.GL_TEXTURE_ENV_MODE, GL2.GL_BLEND);
+        // gl.glTexEnvi(GL2.GL_TEXTURE_ENV, GL2.GL_TEXTURE_ENV_MODE,
+        // GL2.GL_REPLACE);
+        gl.glEnable(GL2.GL_BLEND);
+        gl.glEnable(GL2.GL_POINT_SMOOTH);
+        gl.glEnable(GL2.GL_COLOR_MATERIAL);
 
-        gl.glEnable(GL.GL_LIGHTING);
-        gl.glEnable(GL.GL_NORMALIZE);
-        // gl.glEnable(GL.GL_CULL_FACE);
-        gl.glCullFace(GL.GL_BACK);
-        gl.glFrontFace(GL.GL_CCW);
-        gl.glEnable(GL.GL_DEPTH_TEST);
-        // gl.glDepthFunc(GL.GL_LESS);
-        gl.glDepthFunc(GL.GL_LEQUAL);
+        gl.glEnable(GL2.GL_LIGHTING);
+        gl.glEnable(GL2.GL_NORMALIZE);
+        // gl.glEnable(GL2.GL_CULL_FACE);
+        gl.glCullFace(GL2.GL_BACK);
+        gl.glFrontFace(GL2.GL_CCW);
+        gl.glEnable(GL2.GL_DEPTH_TEST);
+        // gl.glDepthFunc(GL2.GL_LESS);
+        gl.glDepthFunc(GL2.GL_LEQUAL);
 
-        gl.glEnable(GL.GL_LIGHT0);
+        gl.glEnable(GL2.GL_LIGHT0);
 
         viewportSize = new Vector2dInt(0, 0);
         this.rebuildShadersRequest = true;
@@ -136,7 +136,7 @@ public class GL3DComponentView extends AbstractComponentView implements GLEventL
     @Override
     public void reshape(GLAutoDrawable glAD, int x, int y, int width, int height) {
         viewportSize = new Vector2dInt(width, height);
-        GL gl = glAD.getGL();
+        GL2 gl = (GL2) glAD.getGL();
 
         gl.setSwapInterval(1);
 
@@ -146,7 +146,7 @@ public class GL3DComponentView extends AbstractComponentView implements GLEventL
     @Override
     public synchronized void display(GLAutoDrawable glAD) {
 
-        GL gl = glAD.getGL();
+        GL2 gl = (GL2) glAD.getGL();
 
         int width = this.viewportSize.getX();
         int height = this.viewportSize.getY();
@@ -168,10 +168,10 @@ public class GL3DComponentView extends AbstractComponentView implements GLEventL
         // int width = viewport.getWidth();
         // int height = viewport.getHeight();
 
-        gl.glClear(GL.GL_COLOR_BUFFER_BIT | GL.GL_DEPTH_BUFFER_BIT);
+        gl.glClear(GL2.GL_COLOR_BUFFER_BIT | GL2.GL_DEPTH_BUFFER_BIT);
         gl.glColor4f(1, 1, 1, 1);
-        gl.glEnable(GL.GL_LIGHTING);
-        gl.glEnable(GL.GL_DEPTH_TEST);
+        gl.glEnable(GL2.GL_LIGHTING);
+        gl.glEnable(GL2.GL_DEPTH_TEST);
 
         // gl.glLoadIdentity();
 
@@ -185,19 +185,19 @@ public class GL3DComponentView extends AbstractComponentView implements GLEventL
         gl.glPushMatrix();
         if (!this.postRenderers.isEmpty()) {
 
-            gl.glMatrixMode(GL.GL_PROJECTION);
+            gl.glMatrixMode(GL2.GL_PROJECTION);
             gl.glLoadIdentity();
 
             gl.glOrtho(0, width, 0, height, -1, 10000);
 
-            gl.glMatrixMode(GL.GL_MODELVIEW);
+            gl.glMatrixMode(GL2.GL_MODELVIEW);
             gl.glLoadIdentity();
             gl.glTranslatef(0.0f, height, 0.0f);
             gl.glScalef(1.0f, -1.0f, 1.0f);
-            gl.glDisable(GL.GL_LIGHTING);
+            gl.glDisable(GL2.GL_LIGHTING);
             gl.glColor4f(1, 1, 1, 0);
-            gl.glDisable(GL.GL_DEPTH_TEST);
-            gl.glEnable(GL.GL_TEXTURE_2D);
+            gl.glDisable(GL2.GL_DEPTH_TEST);
+            gl.glEnable(GL2.GL_TEXTURE_2D);
 
             GLScreenRenderGraphics glRenderer = new GLScreenRenderGraphics(gl);
             synchronized (postRenderers) {
@@ -205,7 +205,7 @@ public class GL3DComponentView extends AbstractComponentView implements GLEventL
                     r.render(glRenderer);
                 }
             }
-            gl.glDisable(GL.GL_TEXTURE_2D);
+            gl.glDisable(GL2.GL_TEXTURE_2D);
 
         }
         gl.glPopMatrix();
@@ -287,14 +287,14 @@ public class GL3DComponentView extends AbstractComponentView implements GLEventL
         notifyViewListeners(aEvent);
     }
 
-    private void rebuildShaders(GL gl) {
+    private void rebuildShaders(GL2 gl) {
         rebuildShadersRequest = false;
         shaderHelper.delAllShaderIDs(gl);
 
         GLFragmentShaderView fragmentView = view.getAdapter(GLFragmentShaderView.class);
         if (fragmentView != null) {
             // create new shader builder
-            GLShaderBuilder newShaderBuilder = new GLShaderBuilder(gl, GL.GL_FRAGMENT_PROGRAM_ARB);
+            GLShaderBuilder newShaderBuilder = new GLShaderBuilder(gl, GL2.GL_FRAGMENT_PROGRAM_ARB);
 
             // fill with standard values
             GLMinimalFragmentShaderProgram minimalProgram = new GLMinimalFragmentShaderProgram();
@@ -307,7 +307,7 @@ public class GL3DComponentView extends AbstractComponentView implements GLEventL
         GLVertexShaderView vertexView = view.getAdapter(GLVertexShaderView.class);
         if (vertexView != null) {
             // create new shader builder
-            GLShaderBuilder newShaderBuilder = new GLShaderBuilder(gl, GL.GL_VERTEX_PROGRAM_ARB);
+            GLShaderBuilder newShaderBuilder = new GLShaderBuilder(gl, GL2.GL_VERTEX_PROGRAM_ARB);
 
             // fill with standard values
             GLMinimalVertexShaderProgram minimalProgram = new GLMinimalVertexShaderProgram();
@@ -324,6 +324,11 @@ public class GL3DComponentView extends AbstractComponentView implements GLEventL
 
     public void setCanvas(GLCanvas canvas) {
         this.canvas = canvas;
+    }
+
+    @Override
+    public void dispose(GLAutoDrawable arg0) {
+
     }
 
 }

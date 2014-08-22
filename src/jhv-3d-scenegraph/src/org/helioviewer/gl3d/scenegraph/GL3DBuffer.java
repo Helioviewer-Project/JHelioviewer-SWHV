@@ -6,13 +6,13 @@ import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
 import java.util.List;
 
-import javax.media.opengl.GL;
+import javax.media.opengl.GL2;
 
 import org.helioviewer.gl3d.scenegraph.math.GL3DVec2d;
 import org.helioviewer.gl3d.scenegraph.math.GL3DVec3d;
 import org.helioviewer.gl3d.scenegraph.math.GL3DVec4d;
 
-import com.sun.opengl.util.BufferUtil;
+import com.jogamp.common.nio.Buffers;
 
 /**
  * A {@link GL3DBuffer} is a buffer object on the graphic card. Buffer objects
@@ -23,7 +23,7 @@ import com.sun.opengl.util.BufferUtil;
  * 
  */
 public class GL3DBuffer {
-    private final static int drawType = GL.GL_DYNAMIC_DRAW;
+    private final static int drawType = GL2.GL_DYNAMIC_DRAW;
 
     protected int id;
     protected GL3DBufferType type;
@@ -38,7 +38,7 @@ public class GL3DBuffer {
     // Offset between 2 elements within the array
     private int stride = 0;
 
-    private int offset = 0;
+    private final int offset = 0;
 
     private Buffer data;
 
@@ -300,7 +300,7 @@ public class GL3DBuffer {
     }
 
     public enum GL3DBufferDataType {
-        FLOAT(GL.GL_FLOAT, BufferUtil.SIZEOF_FLOAT), DOUBLE(GL.GL_DOUBLE, BufferUtil.SIZEOF_DOUBLE), INT(GL.GL_INT, BufferUtil.SIZEOF_INT), UNSIGNED_INT(GL.GL_UNSIGNED_INT, BufferUtil.SIZEOF_INT);
+        FLOAT(GL2.GL_FLOAT, Buffers.SIZEOF_FLOAT), DOUBLE(GL2.GL_DOUBLE, Buffers.SIZEOF_DOUBLE), INT(GL2.GL_INT, Buffers.SIZEOF_INT), UNSIGNED_INT(GL2.GL_UNSIGNED_INT, Buffers.SIZEOF_INT);
 
         public int size;
         public int id;
@@ -312,7 +312,7 @@ public class GL3DBuffer {
     }
 
     public enum GL3DBufferType {
-        ARRAY(GL.GL_ARRAY_BUFFER), ELEMENT(GL.GL_ELEMENT_ARRAY_BUFFER);
+        ARRAY(GL2.GL_ARRAY_BUFFER), ELEMENT(GL2.GL_ELEMENT_ARRAY_BUFFER);
 
         public int id;
 
@@ -322,7 +322,7 @@ public class GL3DBuffer {
     }
 
     public enum GL3DBufferAttribute {
-        VERTEX(GL.GL_VERTEX_ARRAY), COLOR(GL.GL_COLOR_ARRAY), NORMAL(GL.GL_NORMAL_ARRAY), TEXTURE(GL.GL_TEXTURE_COORD_ARRAY), NONE(-1);
+        VERTEX(GL2.GL_VERTEX_ARRAY), COLOR(GL2.GL_COLOR_ARRAY), NORMAL(GL2.GL_NORMAL_ARRAY), TEXTURE(GL2.GL_TEXTURE_COORD_ARRAY), NONE(-1);
 
         public int id;
 

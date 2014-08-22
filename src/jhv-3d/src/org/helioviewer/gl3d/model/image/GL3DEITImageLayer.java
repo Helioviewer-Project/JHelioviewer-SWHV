@@ -1,6 +1,6 @@
 package org.helioviewer.gl3d.model.image;
 
-import javax.media.opengl.GL;
+import javax.media.opengl.GL2;
 
 import org.helioviewer.base.physics.Constants;
 import org.helioviewer.gl3d.shader.GL3DImageFragmentShaderProgram;
@@ -18,7 +18,7 @@ public class GL3DEITImageLayer extends GL3DImageLayer {
     }
 
     @Override
-    protected void createImageMeshNodes(GL gl) {
+    protected void createImageMeshNodes(GL2 gl) {
         this.sphereFragmentShader = new GL3DImageFragmentShaderProgram();
         GLFragmentShaderProgram sphereFragmentShader = GL3DShaderFactory.createFragmentShaderProgram(gl, this.sphereFragmentShader);
 

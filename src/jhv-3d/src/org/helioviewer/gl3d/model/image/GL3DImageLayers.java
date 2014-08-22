@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 
-import javax.media.opengl.GL;
+import javax.media.opengl.GL2;
 
 import org.helioviewer.base.logging.Log;
 import org.helioviewer.gl3d.camera.GL3DCamera;
@@ -45,18 +45,18 @@ public class GL3DImageLayers extends GL3DGroup {
 
         if (!this.isDrawBitOn(Bit.Wireframe)) {
             GL3DState.get().checkGLErrors("GL3DImageLayers.beforeEnable");
-            state.gl.glEnable(GL.GL_FRAGMENT_PROGRAM_ARB);
-            state.gl.glEnable(GL.GL_VERTEX_PROGRAM_ARB);
+            state.gl.glEnable(GL2.GL_FRAGMENT_PROGRAM_ARB);
+            state.gl.glEnable(GL2.GL_VERTEX_PROGRAM_ARB);
 
         }
 
         this.drawImageLayers(state);
-        state.gl.glDisable(GL.GL_FRAGMENT_PROGRAM_ARB);
-        state.gl.glDisable(GL.GL_VERTEX_PROGRAM_ARB);
+        state.gl.glDisable(GL2.GL_FRAGMENT_PROGRAM_ARB);
+        state.gl.glDisable(GL2.GL_VERTEX_PROGRAM_ARB);
         GL3DState.get().checkGLErrors("GL3DImageLayers.afterDisable");
 
-        state.gl.glDisable(GL.GL_BLEND);
-        state.gl.glEnable(GL.GL_LIGHTING);
+        state.gl.glDisable(GL2.GL_BLEND);
+        state.gl.glEnable(GL2.GL_LIGHTING);
     }
 
     private void drawImageLayers(GL3DState state) {
@@ -69,12 +69,12 @@ public class GL3DImageLayers extends GL3DGroup {
             node = node.getNext();
         }
 
-        state.gl.glEnable(GL.GL_BLEND);
-        state.gl.glBlendFunc(GL.GL_SRC_ALPHA, GL.GL_ONE_MINUS_SRC_ALPHA);
+        state.gl.glEnable(GL2.GL_BLEND);
+        state.gl.glBlendFunc(GL2.GL_SRC_ALPHA, GL2.GL_ONE_MINUS_SRC_ALPHA);
 
-        state.gl.glEnable(GL.GL_FRAGMENT_PROGRAM_ARB);
-        state.gl.glEnable(GL.GL_VERTEX_PROGRAM_ARB);
-        state.gl.glEnable(GL.GL_DEPTH_TEST);
+        state.gl.glEnable(GL2.GL_FRAGMENT_PROGRAM_ARB);
+        state.gl.glEnable(GL2.GL_VERTEX_PROGRAM_ARB);
+        state.gl.glEnable(GL2.GL_DEPTH_TEST);
 
         for (GL3DImageLayer layer : layers) {
             if (layer.getImageSphere() != null)
@@ -82,7 +82,7 @@ public class GL3DImageLayers extends GL3DGroup {
         }
 
         // state.gl.glDepthMask(true);
-        state.gl.glDisable(GL.GL_BLEND);
+        state.gl.glDisable(GL2.GL_BLEND);
 
     }
 

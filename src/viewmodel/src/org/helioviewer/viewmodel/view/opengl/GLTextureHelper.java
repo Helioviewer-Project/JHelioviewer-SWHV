@@ -14,6 +14,7 @@ import java.nio.ShortBuffer;
 import java.util.HashMap;
 
 import javax.media.opengl.GL;
+import javax.media.opengl.GL2;
 import javax.media.opengl.glu.GLU;
 
 import org.helioviewer.base.logging.Log;
@@ -55,7 +56,7 @@ public class GLTextureHelper {
 
     private static HashMap<Integer, Vector2dDouble> allTextures = new HashMap<Integer, Vector2dDouble>();
 
-    private final static int[] formatMap = { GL.GL_LUMINANCE4, GL.GL_LUMINANCE4, GL.GL_LUMINANCE4, GL.GL_LUMINANCE4, GL.GL_LUMINANCE8, GL.GL_LUMINANCE8, GL.GL_LUMINANCE8, GL.GL_LUMINANCE8, GL.GL_LUMINANCE12, GL.GL_LUMINANCE12, GL.GL_LUMINANCE12, GL.GL_LUMINANCE12, GL.GL_LUMINANCE16, GL.GL_LUMINANCE16, GL.GL_LUMINANCE16, GL.GL_LUMINANCE16 };
+    private final static int[] formatMap = { GL2.GL_LUMINANCE4, GL2.GL_LUMINANCE4, GL2.GL_LUMINANCE4, GL2.GL_LUMINANCE4, GL2.GL_LUMINANCE8, GL2.GL_LUMINANCE8, GL2.GL_LUMINANCE8, GL2.GL_LUMINANCE8, GL2.GL_LUMINANCE12, GL2.GL_LUMINANCE12, GL2.GL_LUMINANCE12, GL2.GL_LUMINANCE12, GL2.GL_LUMINANCE16, GL2.GL_LUMINANCE16, GL2.GL_LUMINANCE16, GL2.GL_LUMINANCE16 };
 
     /**
      * Sets whether non power of two textures should be used.
@@ -105,7 +106,7 @@ public class GLTextureHelper {
      * @param gl
      *            Valid reference to the current gl object
      */
-    public static void initHelper(GL gl) {
+    public static void initHelper(GL2 gl) {
         Log.debug(">> GLTextureHelper.initHelper(GL) > Initialize helper functions");
 
         if (textureImplementation == null) {
@@ -118,7 +119,7 @@ public class GLTextureHelper {
         }
 
         int tmp[] = new int[1];
-        gl.glGetIntegerv(GL.GL_MAX_TEXTURE_SIZE, tmp, 0);
+        gl.glGetIntegerv(GL2.GL_MAX_TEXTURE_SIZE, tmp, 0);
         maxTextureSize = tmp[0];
         Log.debug(">> GLTextureHelper.initHelper(GL) > max texture size: " + maxTextureSize);
 
@@ -144,7 +145,7 @@ public class GLTextureHelper {
      *            Valid reference to the current gl object
      * @return new texture id
      */
-    public synchronized int genTextureID(GL gl) {
+    public synchronized int genTextureID(GL2 gl) {
         int[] tmp = new int[1];
         gl.glGenTextures(1, tmp, 0);
         allTextures.put(tmp[0], null);
@@ -166,7 +167,7 @@ public class GLTextureHelper {
      *            texture id to bind
      * @see #bindTexture(GL, int, int)
      */
-    public synchronized void bindTexture(GL gl, int texture) {
+    public synchronized void bindTexture(GL2 gl, int texture) {
         textureImplementation.bindTexture(gl, texture);
     }
 
@@ -187,7 +188,7 @@ public class GLTextureHelper {
      *            texture id to bind
      * @see #bindTexture(GL, int, int)
      */
-    public synchronized void bindTexture(GL gl, int target, int texture) {
+    public synchronized void bindTexture(GL2 gl, int target, int texture) {
         textureImplementation.bindTexture(gl, target, texture);
     }
 
@@ -202,12 +203,12 @@ public class GLTextureHelper {
      * @param texID
      *            Texture id to delete
      */
-    public synchronized void delTextureID(GL gl, int texID) {
+    public synchronized void delTextureID(GL2 gl, int texID) {
         if (!allTextures.containsKey(texID))
             return;
 
         if (gl == null) {
-            gl = GLU.getCurrentGL();
+            gl = (GL2) GLU.getCurrentGL();
         }
 
         allTextures.remove(texID);
@@ -225,7 +226,7 @@ public class GLTextureHelper {
      * @param gl
      *            Valid reference to the current gl object
      */
-    public synchronized void delAllTextures(GL gl) {
+    public synchronized void delAllTextures(GL2 gl) {
         GLCommonRenderGraphics.clearImageTextureBuffer(gl);
         GLCommonRenderGraphics.clearStringTextureBuffer(gl);
 
@@ -261,7 +262,7 @@ public class GLTextureHelper {
      *            Valid reference to the current gl object
      * @return texture the frame buffer was copied to
      */
-    public int copyFrameBufferToTexture(GL gl) {
+    public int copyFrameBufferToTexture(GL2 gl) {
         int texture = genTextureID(gl);
         return copyFrameBufferToTexture(gl, texture);
     }
@@ -278,9 +279,9 @@ public class GLTextureHelper {
      *            target texture
      * @return texture the frame buffer was copied to
      */
-    public int copyFrameBufferToTexture(GL gl, int texture) {
+    public int copyFrameBufferToTexture(GL2 gl, int texture) {
         int viewport[] = new int[4];
-        gl.glGetIntegerv(GL.GL_VIEWPORT, viewport, 0);
+        gl.glGetIntegerv(GL2.GL_VIEWPORT, viewport, 0);
         return copyFrameBufferToTexture(gl, texture, new Rectangle(viewport[0], viewport[1], viewport[2], viewport[3]));
     }
 
@@ -297,14 +298,14 @@ public class GLTextureHelper {
      *            area of the frame buffer to copy
      * @return texture the frame buffer was copied to
      */
-    public int copyFrameBufferToTexture(GL gl, Rectangle rect) {
+    public int copyFrameBufferToTexture(GL2 gl, Rectangle rect) {
         int texture = genTextureID(gl);
         return copyFrameBufferToTexture(gl, texture, rect);
     }
 
-    public int copyFrameBufferToSubTexture(GL gl, int texture, Rectangle rect) {
-        gl.glActiveTexture(GL.GL_TEXTURE0);
-        textureImplementation.genTexture2D(gl, texture, GL.GL_RGBA, rect.width, rect.height, GL.GL_RGBA, GL.GL_UNSIGNED_BYTE, null);
+    public int copyFrameBufferToSubTexture(GL2 gl, int texture, Rectangle rect) {
+        gl.glActiveTexture(GL2.GL_TEXTURE0);
+        textureImplementation.genTexture2D(gl, texture, GL2.GL_RGBA, rect.width, rect.height, GL2.GL_RGBA, GL2.GL_UNSIGNED_BYTE, null);
         textureImplementation.copyFrameBufferToTexture(gl, texture, rect);
         // Log.debug("GLTextureHelper.copyFrameBuffer: Viewport= "+rect.x+", "+rect.y+", "+rect.width+", "+rect.height);
         return texture;
@@ -325,9 +326,9 @@ public class GLTextureHelper {
      *            area of the frame buffer to copy
      * @return texture the frame buffer was copied to
      */
-    public int copyFrameBufferToTexture(GL gl, int texture, Rectangle rect) {
-        gl.glActiveTexture(GL.GL_TEXTURE0);
-        textureImplementation.genTexture2D(gl, texture, GL.GL_RGBA, rect.width, rect.height, GL.GL_RGBA, GL.GL_UNSIGNED_BYTE, null);
+    public int copyFrameBufferToTexture(GL2 gl, int texture, Rectangle rect) {
+        gl.glActiveTexture(GL2.GL_TEXTURE0);
+        textureImplementation.genTexture2D(gl, texture, GL2.GL_RGBA, rect.width, rect.height, GL2.GL_RGBA, GL2.GL_UNSIGNED_BYTE, null);
         textureImplementation.copyFrameBufferToTexture(gl, texture, rect);
         // Log.debug("GLTextureHelper.copyFrameBuffer: Viewport= "+rect.x+", "+rect.y+", "+rect.width+", "+rect.height);
         return texture;
@@ -349,7 +350,7 @@ public class GLTextureHelper {
      * @param region
      *            Position and size to draw the texture
      */
-    public void renderTextureToScreen(GL gl, Region region) {
+    public void renderTextureToScreen(GL2 gl, Region region) {
         Vector2dDouble lowerleftCorner = region.getLowerLeftCorner();
         Vector2dDouble size = region.getSize();
 
@@ -374,9 +375,9 @@ public class GLTextureHelper {
      * @param x0
      *            , y0 , x1 , y1 - Position and size to draw the texture
      */
-    public void renderTextureToScreen(GL gl, float x0, float y0, float x1, float y1) {
+    public void renderTextureToScreen(GL2 gl, float x0, float y0, float x1, float y1) {
         if (is2DState) {
-            gl.glBegin(GL.GL_QUADS);
+            gl.glBegin(GL2.GL_QUADS);
             mainTexCoord.setValue(gl, 0.0f, 1.0f);
             gl.glVertex2f(x0, y0);
             mainTexCoord.setValue(gl, 1.0f, 1.0f);
@@ -407,8 +408,8 @@ public class GLTextureHelper {
      * @param source
      *            Image data to draw to the screen
      */
-    public void renderImageDataToScreen(GL gl, Region region, ImageData source, JHVJP2View jpxView) {
-        gl.glActiveTexture(GL.GL_TEXTURE0);
+    public void renderImageDataToScreen(GL2 gl, Region region, ImageData source, JHVJP2View jpxView) {
+        gl.glActiveTexture(GL2.GL_TEXTURE0);
 
         if (source == null)
             return;
@@ -467,7 +468,7 @@ public class GLTextureHelper {
      * @param target
      *            Valid texture id
      */
-    public void moveImageDataToGLTexture(GL gl, ImageData source, int target) {
+    public void moveImageDataToGLTexture(GL2 gl, ImageData source, int target) {
         moveImageDataToGLTexture(gl, source, 0, 0, source.getWidth(), source.getHeight(), target);
     }
 
@@ -492,7 +493,7 @@ public class GLTextureHelper {
      * @param target
      *            Valid texture id
      */
-    public void moveImageDataToGLTexture(GL gl, ImageData source, int x, int y, int width, int height, int target) {
+    public void moveImageDataToGLTexture(GL2 gl, ImageData source, int x, int y, int width, int height, int target) {
 
         if (source == null)
             return;
@@ -514,10 +515,10 @@ public class GLTextureHelper {
             buffer = null;
         }
 
-        gl.glPixelStorei(GL.GL_UNPACK_SKIP_PIXELS, x);
-        gl.glPixelStorei(GL.GL_UNPACK_SKIP_ROWS, y);
-        gl.glPixelStorei(GL.GL_UNPACK_ROW_LENGTH, source.getWidth());
-        gl.glPixelStorei(GL.GL_UNPACK_ALIGNMENT, bitsPerPixel >> 3);
+        gl.glPixelStorei(GL2.GL_UNPACK_SKIP_PIXELS, x);
+        gl.glPixelStorei(GL2.GL_UNPACK_SKIP_ROWS, y);
+        gl.glPixelStorei(GL2.GL_UNPACK_ROW_LENGTH, source.getWidth());
+        gl.glPixelStorei(GL2.GL_UNPACK_ALIGNMENT, bitsPerPixel >> 3);
 
         ImageFormat imageFormat = source.getImageFormat();
 
@@ -543,7 +544,7 @@ public class GLTextureHelper {
      *            Valid texture id
      * @see #moveImageDataToGLTexture(GL, ImageData, int)
      */
-    public void moveBufferedImageToGLTexture(GL gl, BufferedImage source, int target) {
+    public void moveBufferedImageToGLTexture(GL2 gl, BufferedImage source, int target) {
 
         if (source == null)
             return;
@@ -568,10 +569,10 @@ public class GLTextureHelper {
             buffer = null;
         }
 
-        gl.glPixelStorei(GL.GL_UNPACK_SKIP_PIXELS, 0);
-        gl.glPixelStorei(GL.GL_UNPACK_SKIP_ROWS, 0);
-        gl.glPixelStorei(GL.GL_UNPACK_ROW_LENGTH, 0);
-        gl.glPixelStorei(GL.GL_UNPACK_ALIGNMENT, mapDataBufferTypeToGLAlign(rawBuffer.getDataType()));
+        gl.glPixelStorei(GL2.GL_UNPACK_SKIP_PIXELS, 0);
+        gl.glPixelStorei(GL2.GL_UNPACK_SKIP_ROWS, 0);
+        gl.glPixelStorei(GL2.GL_UNPACK_ROW_LENGTH, 0);
+        gl.glPixelStorei(GL2.GL_UNPACK_ALIGNMENT, mapDataBufferTypeToGLAlign(rawBuffer.getDataType()));
 
         if (source.getHeight() == 1) {
             textureImplementation.genTexture1D(gl, target, mapTypeToInternalGLFormat(source.getType()), source.getWidth(), mapTypeToInputGLFormat(source.getType()), mapDataBufferTypeToGLType(rawBuffer.getDataType()), buffer);
@@ -593,7 +594,7 @@ public class GLTextureHelper {
         if (imageFormat instanceof SingleChannelImageFormat)
             return formatMap[((SingleChannelImageFormat) imageFormat).getBitDepth() - 1];
         else if (imageFormat instanceof ARGB32ImageFormat || imageFormat instanceof RGB24ImageFormat)
-            return GL.GL_RGBA;
+            return GL2.GL_RGBA;
         else
             throw new IllegalArgumentException("Format is not supported");
     }
@@ -609,9 +610,9 @@ public class GLTextureHelper {
     private int mapImageFormatToInputGLFormat(ImageFormat imageFormat) {
 
         if (imageFormat instanceof SingleChannelImageFormat)
-            return GL.GL_LUMINANCE;
+            return GL2.GL_LUMINANCE;
         else if (imageFormat instanceof ARGB32ImageFormat || imageFormat instanceof RGB24ImageFormat)
-            return GL.GL_BGRA;
+            return GL2.GL_BGRA;
         else
             throw new IllegalArgumentException("Format is not supported");
     }
@@ -626,9 +627,9 @@ public class GLTextureHelper {
      */
     private int mapTypeToInternalGLFormat(int type) {
         if (type == BufferedImage.TYPE_BYTE_GRAY || type == BufferedImage.TYPE_BYTE_INDEXED)
-            return GL.GL_LUMINANCE;
+            return GL2.GL_LUMINANCE;
         else
-            return GL.GL_RGBA;
+            return GL2.GL_RGBA;
     }
 
     /**
@@ -641,11 +642,11 @@ public class GLTextureHelper {
      */
     private int mapTypeToInputGLFormat(int type) {
         if (type == BufferedImage.TYPE_BYTE_GRAY || type == BufferedImage.TYPE_BYTE_INDEXED)
-            return GL.GL_LUMINANCE;
+            return GL2.GL_LUMINANCE;
         else if (type == BufferedImage.TYPE_4BYTE_ABGR || type == BufferedImage.TYPE_INT_BGR || type == BufferedImage.TYPE_INT_ARGB)
-            return GL.GL_BGRA;
+            return GL2.GL_BGRA;
         else
-            return GL.GL_RGBA;
+            return GL2.GL_RGBA;
     }
 
     /**
@@ -659,11 +660,11 @@ public class GLTextureHelper {
     private int mapBitsPerPixelToGLType(int bitsPerPixel) {
         switch (bitsPerPixel) {
         case 8:
-            return GL.GL_UNSIGNED_BYTE;
+            return GL2.GL_UNSIGNED_BYTE;
         case 16:
-            return GL.GL_UNSIGNED_SHORT;
+            return GL2.GL_UNSIGNED_SHORT;
         case 32:
-            return GL.GL_UNSIGNED_INT_8_8_8_8_REV;
+            return GL2.GL_UNSIGNED_INT_8_8_8_8_REV;
         default:
             return 0;
         }
@@ -680,13 +681,13 @@ public class GLTextureHelper {
     private int mapDataBufferTypeToGLType(int dataBufferType) {
         switch (dataBufferType) {
         case DataBuffer.TYPE_BYTE:
-            return GL.GL_UNSIGNED_BYTE;
+            return GL2.GL_UNSIGNED_BYTE;
         case DataBuffer.TYPE_SHORT:
-            return GL.GL_SHORT;
+            return GL2.GL_SHORT;
         case DataBuffer.TYPE_USHORT:
-            return GL.GL_UNSIGNED_SHORT;
+            return GL2.GL_UNSIGNED_SHORT;
         case DataBuffer.TYPE_INT:
-            return GL.GL_UNSIGNED_INT_8_8_8_8_REV;
+            return GL2.GL_UNSIGNED_INT_8_8_8_8_REV;
         default:
             return 0;
         }
@@ -747,7 +748,7 @@ public class GLTextureHelper {
          * @param buffer
          *            Source data
          */
-        public void genTexture1D(GL gl, int texID, int internalFormat, int width, int inputFormat, int inputType, Buffer buffer);
+        public void genTexture1D(GL2 gl, int texID, int internalFormat, int width, int inputFormat, int inputType, Buffer buffer);
 
         /**
          * Copies image data to a two-dimensional texture to the graphics
@@ -770,7 +771,7 @@ public class GLTextureHelper {
          * @param buffer
          *            Source data
          */
-        public void genTexture2D(GL gl, int texID, int internalFormat, int width, int height, int inputFormat, int inputType, Buffer buffer);
+        public void genTexture2D(GL2 gl, int texID, int internalFormat, int width, int height, int inputFormat, int inputType, Buffer buffer);
 
         /**
          * Binds a 2D texture.
@@ -781,7 +782,7 @@ public class GLTextureHelper {
          *            texture id to bind
          * @see #bindTexture(GL, int, int)
          */
-        public void bindTexture(GL gl, int texture);
+        public void bindTexture(GL2 gl, int texture);
 
         /**
          * Binds a texture.
@@ -794,7 +795,7 @@ public class GLTextureHelper {
          *            texture id to bind
          * @see #bindTexture(GL, int, int)
          */
-        public void bindTexture(GL gl, int target, int texture);
+        public void bindTexture(GL2 gl, int target, int texture);
 
         /**
          * Copies the current frame buffer to a texture.
@@ -806,7 +807,7 @@ public class GLTextureHelper {
          * @param rect
          *            area of the frame buffer to copy
          */
-        public void copyFrameBufferToTexture(GL gl, int texture, Rectangle rect);
+        public void copyFrameBufferToTexture(GL2 gl, int texture, Rectangle rect);
     }
 
     /**
@@ -818,45 +819,45 @@ public class GLTextureHelper {
          * {@inheritDoc}
          */
         @Override
-        public void genTexture1D(GL gl, int texID, int internalFormat, int width, int inputFormat, int inputType, Buffer buffer) {
+        public void genTexture1D(GL2 gl, int texID, int internalFormat, int width, int inputFormat, int inputType, Buffer buffer) {
 
-            gl.glBindTexture(GL.GL_TEXTURE_1D, texID);
+            gl.glBindTexture(GL2.GL_TEXTURE_1D, texID);
 
-            gl.glTexImage1D(GL.GL_TEXTURE_1D, 0, internalFormat, width, 0, inputFormat, inputType, buffer);
+            gl.glTexImage1D(GL2.GL_TEXTURE_1D, 0, internalFormat, width, 0, inputFormat, inputType, buffer);
 
-            gl.glTexParameteri(GL.GL_TEXTURE_1D, GL.GL_TEXTURE_MIN_FILTER, GL.GL_LINEAR);
-            gl.glTexParameteri(GL.GL_TEXTURE_1D, GL.GL_TEXTURE_MAG_FILTER, GL.GL_NEAREST);
-            gl.glTexParameteri(GL.GL_TEXTURE_1D, GL.GL_TEXTURE_WRAP_S, GL.GL_CLAMP);
+            gl.glTexParameteri(GL2.GL_TEXTURE_1D, GL2.GL_TEXTURE_MIN_FILTER, GL2.GL_LINEAR);
+            gl.glTexParameteri(GL2.GL_TEXTURE_1D, GL2.GL_TEXTURE_MAG_FILTER, GL2.GL_NEAREST);
+            gl.glTexParameteri(GL2.GL_TEXTURE_1D, GL2.GL_TEXTURE_WRAP_S, GL2.GL_CLAMP);
         }
 
         /**
          * {@inheritDoc}
          */
         @Override
-        public void genTexture2D(GL gl, int texID, int internalFormat, int width, int height, int inputFormat, int inputType, Buffer buffer) {
+        public void genTexture2D(GL2 gl, int texID, int internalFormat, int width, int height, int inputFormat, int inputType, Buffer buffer) {
 
-            gl.glBindTexture(GL.GL_TEXTURE_2D, texID);
-            gl.glTexImage2D(GL.GL_TEXTURE_2D, 0, internalFormat, width, height, 0, inputFormat, inputType, buffer);
+            gl.glBindTexture(GL2.GL_TEXTURE_2D, texID);
+            gl.glTexImage2D(GL2.GL_TEXTURE_2D, 0, internalFormat, width, height, 0, inputFormat, inputType, buffer);
 
-            gl.glTexParameteri(GL.GL_TEXTURE_2D, GL.GL_TEXTURE_MIN_FILTER, GL.GL_LINEAR);
-            gl.glTexParameteri(GL.GL_TEXTURE_2D, GL.GL_TEXTURE_MAG_FILTER, GL.GL_LINEAR);
-            gl.glTexParameteri(GL.GL_TEXTURE_2D, GL.GL_TEXTURE_WRAP_S, GL.GL_CLAMP);
-            gl.glTexParameteri(GL.GL_TEXTURE_2D, GL.GL_TEXTURE_WRAP_T, GL.GL_CLAMP);
+            gl.glTexParameteri(GL2.GL_TEXTURE_2D, GL2.GL_TEXTURE_MIN_FILTER, GL2.GL_LINEAR);
+            gl.glTexParameteri(GL2.GL_TEXTURE_2D, GL2.GL_TEXTURE_MAG_FILTER, GL2.GL_LINEAR);
+            gl.glTexParameteri(GL2.GL_TEXTURE_2D, GL2.GL_TEXTURE_WRAP_S, GL2.GL_CLAMP);
+            gl.glTexParameteri(GL2.GL_TEXTURE_2D, GL2.GL_TEXTURE_WRAP_T, GL2.GL_CLAMP);
         }
 
         /**
          * {@inheritDoc}
          */
         @Override
-        public void bindTexture(GL gl, int texture) {
-            gl.glBindTexture(GL.GL_TEXTURE_2D, texture);
+        public void bindTexture(GL2 gl, int texture) {
+            gl.glBindTexture(GL2.GL_TEXTURE_2D, texture);
         }
 
         /**
          * {@inheritDoc}
          */
         @Override
-        public void bindTexture(GL gl, int target, int texture) {
+        public void bindTexture(GL2 gl, int target, int texture) {
             gl.glBindTexture(target, texture);
         }
 
@@ -864,8 +865,8 @@ public class GLTextureHelper {
          * {@inheritDoc}
          */
         @Override
-        public void copyFrameBufferToTexture(GL gl, int texture, Rectangle rect) {
-            gl.glCopyTexImage2D(GL.GL_TEXTURE_2D, 0, GL.GL_RGBA, rect.x, rect.y, rect.width, rect.height, 0);
+        public void copyFrameBufferToTexture(GL2 gl, int texture, Rectangle rect) {
+            gl.glCopyTexImage2D(GL2.GL_TEXTURE_2D, 0, GL2.GL_RGBA, rect.x, rect.y, rect.width, rect.height, 0);
         }
 
     }
@@ -885,21 +886,21 @@ public class GLTextureHelper {
         private int bytebufferlength;
 
         @Override
-        public void genTexture1D(GL gl, int texID, int internalFormat, int width, int inputFormat, int inputType, Buffer buffer) {
+        public void genTexture1D(GL2 gl, int texID, int internalFormat, int width, int inputFormat, int inputType, Buffer buffer) {
 
-            gl.glBindTexture(GL.GL_TEXTURE_1D, texID);
+            gl.glBindTexture(GL2.GL_TEXTURE_1D, texID);
 
             int width2 = nextPowerOfTwo(width);
 
-            gl.glTexImage1D(GL.GL_TEXTURE_1D, 0, internalFormat, width2, 0, inputFormat, inputType, null);
+            gl.glTexImage1D(GL2.GL_TEXTURE_1D, 0, internalFormat, width2, 0, inputFormat, inputType, null);
 
             if (buffer != null) {
-                gl.glTexSubImage1D(GL.GL_TEXTURE_1D, 0, 0, width, inputFormat, inputType, buffer);
+                gl.glTexSubImage1D(GL2.GL_TEXTURE_1D, 0, 0, width, inputFormat, inputType, buffer);
             }
 
-            gl.glTexParameteri(GL.GL_TEXTURE_1D, GL.GL_TEXTURE_MIN_FILTER, GL.GL_LINEAR);
-            gl.glTexParameteri(GL.GL_TEXTURE_1D, GL.GL_TEXTURE_MAG_FILTER, GL.GL_NEAREST);
-            gl.glTexParameteri(GL.GL_TEXTURE_1D, GL.GL_TEXTURE_WRAP_S, GL.GL_CLAMP);
+            gl.glTexParameteri(GL2.GL_TEXTURE_1D, GL2.GL_TEXTURE_MIN_FILTER, GL2.GL_LINEAR);
+            gl.glTexParameteri(GL2.GL_TEXTURE_1D, GL2.GL_TEXTURE_MAG_FILTER, GL2.GL_NEAREST);
+            gl.glTexParameteri(GL2.GL_TEXTURE_1D, GL2.GL_TEXTURE_WRAP_S, GL2.GL_CLAMP);
 
             float scaleX = (float) width / width2;
 
@@ -911,53 +912,53 @@ public class GLTextureHelper {
          * {@inheritDoc}
          */
         @Override
-        public void genTexture2D(GL gl, int texID, int internalFormat, int width, int height, int inputFormat, int inputType, Buffer buffer) {
+        public void genTexture2D(GL2 gl, int texID, int internalFormat, int width, int height, int inputFormat, int inputType, Buffer buffer) {
 
-            gl.glBindTexture(GL.GL_TEXTURE_2D, texID);
+            gl.glBindTexture(GL2.GL_TEXTURE_2D, texID);
             int width2 = nextPowerOfTwo(width);
             int height2 = nextPowerOfTwo(height);
 
             int bpp = 3;
             switch (inputFormat) {
-            case GL.GL_LUMINANCE:
-            case GL.GL_ALPHA:
+            case GL2.GL_LUMINANCE:
+            case GL2.GL_ALPHA:
                 bpp = 1;
                 break;
-            case GL.GL_LUMINANCE_ALPHA:
+            case GL2.GL_LUMINANCE_ALPHA:
                 bpp = 2;
                 break;
-            case GL.GL_RGB:
+            case GL2.GL_RGB:
                 bpp = 3;
                 break;
-            case GL.GL_RGBA:
+            case GL2.GL_RGBA:
                 bpp = 4;
                 break;
             }
             switch (inputType) {
-            case GL.GL_UNSIGNED_BYTE:
+            case GL2.GL_UNSIGNED_BYTE:
                 bpp *= 1;
                 break;
-            case GL.GL_UNSIGNED_SHORT:
-            case GL.GL_UNSIGNED_SHORT_5_6_5:
-            case GL.GL_UNSIGNED_SHORT_4_4_4_4:
-            case GL.GL_UNSIGNED_SHORT_5_5_5_1:
+            case GL2.GL_UNSIGNED_SHORT:
+            case GL2.GL_UNSIGNED_SHORT_5_6_5:
+            case GL2.GL_UNSIGNED_SHORT_4_4_4_4:
+            case GL2.GL_UNSIGNED_SHORT_5_5_5_1:
                 bpp *= 2;
                 break;
             }
 
-            gl.glTexImage2D(GL.GL_TEXTURE_2D, 0, internalFormat, width2, height2, 0, inputFormat, inputType, null);
+            gl.glTexImage2D(GL2.GL_TEXTURE_2D, 0, internalFormat, width2, height2, 0, inputFormat, inputType, null);
 
             // Log.debug("GLTextureHelper.genTexture2D: Width="+width+", Height="+height+" Width2="+width2+", Height2="+height2);
             if (buffer != null) {
                 // System.out.println("TEXSUBIM" + width + " " + height);
-                gl.glTexSubImage2D(GL.GL_TEXTURE_2D, 0, 0, 0, width, height, inputFormat, inputType, buffer);
+                gl.glTexSubImage2D(GL2.GL_TEXTURE_2D, 0, 0, 0, width, height, inputFormat, inputType, buffer);
             }
 
-            gl.glTexParameteri(GL.GL_TEXTURE_2D, GL.GL_TEXTURE_MIN_FILTER, GL.GL_LINEAR);
+            gl.glTexParameteri(GL2.GL_TEXTURE_2D, GL2.GL_TEXTURE_MIN_FILTER, GL2.GL_LINEAR);
             //Does the 2D mode need GL_NEAREST??
-            gl.glTexParameteri(GL.GL_TEXTURE_2D, GL.GL_TEXTURE_MAG_FILTER, GL.GL_LINEAR);
-            gl.glTexParameteri(GL.GL_TEXTURE_2D, GL.GL_TEXTURE_WRAP_S, GL.GL_CLAMP_TO_BORDER);
-            gl.glTexParameteri(GL.GL_TEXTURE_2D, GL.GL_TEXTURE_WRAP_T, GL.GL_CLAMP_TO_BORDER);
+            gl.glTexParameteri(GL2.GL_TEXTURE_2D, GL2.GL_TEXTURE_MAG_FILTER, GL2.GL_LINEAR);
+            gl.glTexParameteri(GL2.GL_TEXTURE_2D, GL2.GL_TEXTURE_WRAP_S, GL2.GL_CLAMP_TO_BORDER);
+            gl.glTexParameteri(GL2.GL_TEXTURE_2D, GL2.GL_TEXTURE_WRAP_T, GL2.GL_CLAMP_TO_BORDER);
 
             scaleX = (float) 1.0 * width / width2;
             scaleY = (float) 1.0 * height / height2;
@@ -974,8 +975,8 @@ public class GLTextureHelper {
          * {@link org.helioviewer.viewmodel.view.opengl.shader.GLScalePowerOfTwoVertexShaderProgram}
          */
         @Override
-        public void bindTexture(GL gl, int texture) {
-            bindTexture(gl, GL.GL_TEXTURE_2D, texture);
+        public void bindTexture(GL2 gl, int texture) {
+            bindTexture(gl, GL2.GL_TEXTURE_2D, texture);
         }
 
         /**
@@ -986,7 +987,7 @@ public class GLTextureHelper {
          * {@link org.helioviewer.viewmodel.view.opengl.shader.GLScalePowerOfTwoVertexShaderProgram}
          */
         @Override
-        public void bindTexture(GL gl, int target, int texture) {
+        public void bindTexture(GL2 gl, int target, int texture) {
             gl.glBindTexture(target, texture);
 
             Vector2dDouble scaleVector = allTextures.get(texture);
@@ -999,11 +1000,11 @@ public class GLTextureHelper {
          * {@inheritDoc}
          */
         @Override
-        public void copyFrameBufferToTexture(GL gl, int texture, Rectangle rect) {
+        public void copyFrameBufferToTexture(GL2 gl, int texture, Rectangle rect) {
             int width = nextPowerOfTwo(rect.width);
             int height = nextPowerOfTwo(rect.height);
             // Log.debug("GLTextureHelper.glCopyTexImage2D: Width="+width+", Height="+height+" x="+rect.x+", y="+rect.y);
-            gl.glCopyTexImage2D(GL.GL_TEXTURE_2D, 0, GL.GL_RGBA, rect.x, rect.y, width, height, 0);
+            gl.glCopyTexImage2D(GL2.GL_TEXTURE_2D, 0, GL2.GL_RGBA, rect.x, rect.y, width, height, 0);
         }
 
         /**
@@ -1036,7 +1037,7 @@ public class GLTextureHelper {
          * Default constructor
          */
         public GLMainTextureCoordinate() {
-            super(GL.GL_TEXTURE0, 0, 2, "texcoord0.xy");
+            super(GL2.GL_TEXTURE0, 0, 2, "texcoord0.xy");
         }
     }
 
@@ -1049,7 +1050,7 @@ public class GLTextureHelper {
          * Default constructor
          */
         protected GLScaleTextureCoordinate() {
-            super(GL.GL_TEXTURE0, 2, 2, "texcoord0.zw");
+            super(GL2.GL_TEXTURE0, 2, 2, "texcoord0.zw");
         }
     }
 }

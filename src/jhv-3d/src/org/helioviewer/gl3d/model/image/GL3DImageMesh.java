@@ -1,6 +1,6 @@
 package org.helioviewer.gl3d.model.image;
 
-import javax.media.opengl.GL;
+import javax.media.opengl.GL2;
 
 import org.helioviewer.base.math.Vector2dDouble;
 import org.helioviewer.gl3d.changeevent.ImageTextureRecapturedReason;
@@ -101,8 +101,8 @@ public abstract class GL3DImageMesh extends GL3DMesh {
 
         th.bindTexture(state.gl, this.imageTextureView.getTextureId());
         //this.imageTextureView.copyScreenToTexture(state,th);
-        state.gl.glTexParameteri(GL.GL_TEXTURE_2D, GL.GL_TEXTURE_MIN_FILTER, GL.GL_LINEAR);
-        state.gl.glTexParameteri(GL.GL_TEXTURE_2D, GL.GL_TEXTURE_MAG_FILTER, GL.GL_LINEAR);
+        state.gl.glTexParameteri(GL2.GL_TEXTURE_2D, GL2.GL_TEXTURE_MIN_FILTER, GL2.GL_LINEAR);
+        state.gl.glTexParameteri(GL2.GL_TEXTURE_2D, GL2.GL_TEXTURE_MAG_FILTER, GL2.GL_LINEAR);
 
         GLVertexShaderProgram.pushShader(state.gl);
         GLFragmentShaderProgram.pushShader(state.gl);

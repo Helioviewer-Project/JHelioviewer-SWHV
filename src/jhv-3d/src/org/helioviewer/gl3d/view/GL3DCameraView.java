@@ -4,7 +4,7 @@ import java.awt.event.KeyEvent;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.media.opengl.GL;
+import javax.media.opengl.GL2;
 
 import org.helioviewer.base.logging.Log;
 import org.helioviewer.gl3d.GL3DKeyController;
@@ -71,7 +71,7 @@ public class GL3DCameraView extends AbstractGL3DView implements GL3DView, GL3DCa
 
     @Override
     public void render3D(GL3DState state) {
-        GL gl = state.gl;
+        GL2 gl = state.gl;
 
         if (this.camera != null) {
             state.setActiveChamera(this.camera);
@@ -125,7 +125,7 @@ public class GL3DCameraView extends AbstractGL3DView implements GL3DView, GL3DCa
     }
 
     @Override
-    protected void renderChild(GL gl) {
+    protected void renderChild(GL2 gl) {
         if (view instanceof GLView) {
             ((GLView) view).renderGL(gl, false);
         }

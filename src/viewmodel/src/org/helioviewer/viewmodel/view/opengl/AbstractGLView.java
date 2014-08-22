@@ -1,6 +1,6 @@
 package org.helioviewer.viewmodel.view.opengl;
 
-import javax.media.opengl.GL;
+import javax.media.opengl.GL2;
 
 import org.helioviewer.viewmodel.changeevent.ChangeEvent;
 import org.helioviewer.viewmodel.view.AbstractBasicView;
@@ -46,7 +46,7 @@ public abstract class AbstractGLView extends AbstractBasicView implements GLView
      * @param gl
      *            Valid reference to the current gl object
      */
-    protected void renderChild(GL gl) {
+    protected void renderChild(GL2 gl) {
         if (view instanceof GLView) {
             ((GLView) view).renderGL(gl, true);
         } else {
