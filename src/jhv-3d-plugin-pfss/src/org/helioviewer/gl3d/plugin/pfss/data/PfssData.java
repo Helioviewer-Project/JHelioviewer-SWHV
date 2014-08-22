@@ -24,6 +24,8 @@ public class PfssData {
     public boolean read = false;
     public boolean init = false;
 
+    private boolean lastFixedColor;
+
     /**
      * Constructor
      */
@@ -70,7 +72,10 @@ public class PfssData {
 
         this.createBuffer(this.gzipFitsFile.length / 8 / (PfssSettings.qualityReduction + 1));
         this.lastQuality = PfssSettings.qualityReduction;
+        this.lastFixedColor = PfssSettings.fixedColor;
         double x = 0, y = 0, z = 0;
+        int type = 0;
+
         for (int i = 0; i < this.gzipFitsFile.length / 8; i++) {
             if (i / 8 / PfssSettings.POINTS_PER_LINE % (PfssSettings.qualityReduction + 1) == PfssSettings.qualityReduction) {
                 int rx = ((this.gzipFitsFile[8 * i + 1] << 8) & 0x0000ff00) | (this.gzipFitsFile[8 * i + 0] & 0x000000ff);
@@ -82,20 +87,64 @@ public class PfssData {
                 z = 3. * (rz * 2. / 65535 - 1.);
                 int col = ((this.gzipFitsFile[8 * i + 7] << 8) & 0x0000ff00) | (this.gzipFitsFile[8 * i + 6] & 0x000000ff);
                 double bright = (col * 2. / 65535.) - 1.;
-
                 if (i % PfssSettings.POINTS_PER_LINE == 0) {
                     counter = this.addVertex((float) x, (float) z, (float) -y, counter);
                     counter = this.addColor(bright, 0.f, counter);
                     counter = this.addVertex((float) x, (float) z, (float) -y, counter);
-                    counter = this.addColor(bright, 1.f, counter);
+                    if (!PfssSettings.fixedColor) {
+                        counter = this.addColor(bright, 1.f, counter);
+                    } else {
+                        int rox = ((this.gzipFitsFile[8 * (i + PfssSettings.POINTS_PER_LINE - 1) + 1] << 8) & 0x0000ff00) | (this.gzipFitsFile[8 * (i + PfssSettings.POINTS_PER_LINE - 1) + 0] & 0x000000ff);
+                        int roy = ((this.gzipFitsFile[8 * (i + PfssSettings.POINTS_PER_LINE - 1) + 3] << 8) & 0x0000ff00) | (this.gzipFitsFile[8 * (i + PfssSettings.POINTS_PER_LINE - 1) + 2] & 0x000000ff);
+                        int roz = ((this.gzipFitsFile[8 * (i + PfssSettings.POINTS_PER_LINE - 1) + 5] << 8) & 0x0000ff00) | (this.gzipFitsFile[8 * (i + PfssSettings.POINTS_PER_LINE - 1) + 4] & 0x000000ff);
+                        double xo = 3. * (rox * 2. / 65535 - 1.);
+                        double yo = 3. * (roy * 2. / 65535 - 1.);
+                        double zo = 3. * (roz * 2. / 65535 - 1.);
+                        double ro = Math.sqrt(xo * xo + yo * yo + zo * zo);
+                        double r = Math.sqrt(x * x + y * y + z * z);
+                        System.out.println("RR" + ro + " " + r);
+
+                        if (r < 1.5 && ro < 1.5) {
+                            type = 0;
+                            counter = this.addColor(1.f, 0.f, 1.f, 1.0f, counter);
+                        } else if (r >= 1.5 && ro <= 1.5) {
+                            type = 1;
+                            counter = this.addColor(0.f, 0.f, 1.f, 1.0f, counter);
+                        } else {
+                            type = 2;
+                            counter = this.addColor(1.f, 0.f, 0.f, 1.0f, counter);
+                        }
+
+                    }
                 } else if (i % PfssSettings.POINTS_PER_LINE == PfssSettings.POINTS_PER_LINE - 1) {
                     counter = this.addVertex((float) x, (float) z, (float) -y, counter);
-                    counter = this.addColor(bright, 1.f, counter);
+                    if (!PfssSettings.fixedColor) {
+                        counter = this.addColor(bright, 1.f, counter);
+                    } else {
+                        if (type == 0) {
+                            counter = this.addColor(1.f, 0.f, 1.f, 1.0f, counter);
+                        } else if (type == 1) {
+                            counter = this.addColor(0.f, 0.f, 1.f, 1.0f, counter);
+                        } else {
+                            counter = this.addColor(1.f, 0.f, 0.f, 1.0f, counter);
+                        }
+                    }
                     counter = this.addVertex((float) x, (float) z, (float) -y, counter);
+
                     counter = this.addColor(bright, 0.f, counter);
                 } else {
                     counter = this.addVertex((float) x, (float) z, (float) -y, counter);
-                    counter = this.addColor(bright, 1.f, counter);
+                    if (!PfssSettings.fixedColor) {
+                        counter = this.addColor(bright, 1.f, counter);
+                    } else {
+                        if (type == 0) {
+                            counter = this.addColor(1.f, 0.f, 1.f, 1.0f, counter);
+                        } else if (type == 1) {
+                            counter = this.addColor(0.f, 0.f, 1.f, 1.0f, counter);
+                        } else {
+                            counter = this.addColor(1.f, 0.f, 0.f, 1.0f, counter);
+                        }
+                    }
                 }
             }
         }
@@ -128,7 +177,7 @@ public class PfssData {
     }
 
     public void display(GL gl) {
-        if (PfssSettings.qualityReduction != this.lastQuality) {
+        if (PfssSettings.qualityReduction != this.lastQuality || PfssSettings.fixedColor != this.lastFixedColor) {
             this.clear(gl);
             this.init = false;
             this.read = false;
