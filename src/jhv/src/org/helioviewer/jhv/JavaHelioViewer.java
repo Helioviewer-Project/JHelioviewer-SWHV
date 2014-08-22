@@ -33,6 +33,8 @@ import org.helioviewer.viewmodel.view.jp2view.kakadu.JHV_KduException;
 import org.helioviewer.viewmodelplugin.controller.PluginManager;
 import org.helioviewer.viewmodelplugin.interfaces.Plugin;
 
+import com.jogamp.common.jvm.JNILibLoaderBase;
+
 /**
  * This class starts the applications.
  * 
@@ -45,6 +47,15 @@ import org.helioviewer.viewmodelplugin.interfaces.Plugin;
  * 
  */
 public class JavaHelioViewer {
+    static class JoglLoaderDummy implements JNILibLoaderBase.LoaderAction {
+
+        public boolean loadLibrary(String arg0, boolean arg1, ClassLoader arg2) {
+            return true;
+        }
+
+        public void loadLibrary(String arg0, String[] arg1, boolean arg2, ClassLoader arg3) {
+        }
+    }
 
     public static void main(String[] args) {
         main(args, (Plugin[]) null);
@@ -231,16 +242,14 @@ public class JavaHelioViewer {
                 @Override
                 public void run() {
                     Log.info("Try to load OpenGL libraries");
-                    if (!System.getProperty("jhv.os").equals("mac")) {
-                        System.loadLibrary("jawt");
-                    }
-                    if (null == ResourceLoader.getSingletonInstance().loadResource("jogl", finalLibsRemote, finalLibs, finalLibs, finalLibsBackup, System.getProperties())) {
+
+                    if (null == ResourceLoader.getSingletonInstance().loadResource("jogl2.2.0", finalLibsRemote, finalLibs, finalLibs, finalLibsBackup, System.getProperties())) {
                         Log.error("Could not load OpenGL libraries");
                         Message.err("Error loading OpenGL libraries", "The OpenGL libraries could not be loaded. JHelioviewer will run in software mode.", false);
                         GLInfo.glUnusable();
                     } else {
-                        //com.sun.opengl.impl.NativeLibLoader.disableLoading();
-                        //com.sun.gluegen.runtime.NativeLibLoader.disableLoading();
+                        System.setProperty("jogamp.gluegen.UseTempJarCache", "false");
+                        JNILibLoaderBase.setLoadingAction(new JoglLoaderDummy());
                         Log.info("Successfully loaded OpenGL libraries");
                     }
                 }
