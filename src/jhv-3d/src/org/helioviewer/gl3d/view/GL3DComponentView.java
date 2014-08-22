@@ -65,7 +65,7 @@ public class GL3DComponentView extends AbstractComponentView implements GLEventL
     private Vector2dInt viewportSize;
 
     public GL3DComponentView() {
-        this.setCanvas(new GLCanvas(null, null, GLSharedContext.getSharedContext(), null));
+        this.setCanvas(new GLCanvas());
         this.getCanvas().setMinimumSize(new java.awt.Dimension(100, 100));
         Displayer.getSingletonInstance().register(this);
         Displayer.getSingletonInstance().addListener(this);

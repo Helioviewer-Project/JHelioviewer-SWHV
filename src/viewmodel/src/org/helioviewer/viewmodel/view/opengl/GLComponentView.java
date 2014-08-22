@@ -104,7 +104,7 @@ public class GLComponentView extends AbstractComponentView implements ViewListen
      * Also initializes all OpenGL Helper classes.
      */
     public GLComponentView() {
-        canvas = new GLCanvas(null, null, GLSharedContext.getSharedContext(), null);
+        canvas = new GLCanvas();
         canvas.setMinimumSize(new Dimension());
 
         animator = new FPSAnimator(canvas, 30);
