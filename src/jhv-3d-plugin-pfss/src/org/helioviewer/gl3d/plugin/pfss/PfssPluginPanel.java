@@ -17,9 +17,15 @@ import java.util.GregorianCalendar;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
+import javax.swing.JLabel;
 import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JSpinner;
+import javax.swing.SpinnerNumberModel;
+import javax.swing.event.ChangeListener;
 
 import org.helioviewer.base.logging.Log;
+import org.helioviewer.basegui.components.WheelSupport;
 import org.helioviewer.gl3d.plugin.pfss.data.PfssCache;
 import org.helioviewer.gl3d.plugin.pfss.settings.PfssSettings;
 import org.helioviewer.jhv.display.Displayer;
@@ -48,6 +54,7 @@ public class PfssPluginPanel extends OverlayPanel implements ActionListener, Lay
     // UI Components
     private final JButton visibleButton = new JButton(new ImageIcon(PfssPlugin.getResourceUrl("/images/invisible_dm.png")));
     private final JButton reloadButton = new JButton(new ImageIcon(PfssPlugin.getResourceUrl("/images/reload.png")));
+    private JSpinner qualitySpinner;
 
     /**
      * Default constructor
@@ -78,7 +85,7 @@ public class PfssPluginPanel extends OverlayPanel implements ActionListener, Lay
         GridBagLayout gridBagLayout = new GridBagLayout();
         gridBagLayout.columnWidths = new int[] { 0, 0, 0 };
         gridBagLayout.rowHeights = new int[] { 0, 0, 0, 0, 0, 0 };
-        gridBagLayout.columnWeights = new double[] { 1.0, 0.0, Double.MIN_VALUE };
+        gridBagLayout.columnWeights = new double[] { 0.0, 1., 0.0, Double.MIN_VALUE };
         gridBagLayout.rowWeights = new double[] { 0.0, 0.0, 0.0, 0.0, 0.0, Double.MIN_VALUE };
         setLayout(gridBagLayout);
 
@@ -87,19 +94,41 @@ public class PfssPluginPanel extends OverlayPanel implements ActionListener, Lay
 
         setEnabled(true);
 
+        GridBagConstraints c0 = new GridBagConstraints();
+        c0.insets = new Insets(0, 0, 5, 0);
+        c0.gridx = 0;
+        c0.gridy = 1;
+        this.qualitySpinner = new JSpinner();
+        this.qualitySpinner.setModel(new SpinnerNumberModel(new Integer(0), new Integer(0), new Integer(8), new Integer(1)));
+
+        this.qualitySpinner.addChangeListener(new ChangeListener() {
+            @Override
+            public void stateChanged(javax.swing.event.ChangeEvent e) {
+                PfssSettings.qualityReduction = ((Integer) qualitySpinner.getValue()).intValue();
+                Displayer.getSingletonInstance().display();
+            }
+
+        });
+        WheelSupport.installMouseWheelSupport(qualitySpinner);
+
+        JPanel helpPanel = new JPanel();
+        helpPanel.add(new JLabel("Quality:"));
+        helpPanel.add(qualitySpinner);
+        this.add(helpPanel, c0);
+
+        GridBagConstraints c2 = new GridBagConstraints();
+        c2.insets = new Insets(0, 0, 5, 0);
+        c2.gridx = 2;
+        c2.gridy = 0;
+
+        this.add(visibleButton, c2);
+
         GridBagConstraints c3 = new GridBagConstraints();
         c3.insets = new Insets(0, 0, 5, 0);
-        c3.gridx = 1;
+        c3.gridx = 3;
         c3.gridy = 0;
 
-        this.add(visibleButton, c3);
-
-        GridBagConstraints c6 = new GridBagConstraints();
-        c6.insets = new Insets(0, 0, 5, 0);
-        c6.gridx = 2;
-        c6.gridy = 0;
-
-        this.add(reloadButton, c6);
+        this.add(reloadButton, c3);
 
     }
 

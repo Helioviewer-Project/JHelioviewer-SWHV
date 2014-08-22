@@ -13,6 +13,7 @@ import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
+import javax.swing.JSpinner;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
@@ -34,6 +35,8 @@ public class PfssConfigPanel extends JPanel {
     private final PfssPlugin plugin;
 
     private PfssFileListModel fileModel;
+
+    private JSpinner qualitySpinner;
 
     public PfssConfigPanel(PfssPlugin plugin) {
         this.plugin = plugin;
@@ -97,6 +100,7 @@ public class PfssConfigPanel extends JPanel {
             }
         });
 
+        controls.add(this.qualitySpinner);
         controls.add(addButton);
         controls.add(removeButton);
 

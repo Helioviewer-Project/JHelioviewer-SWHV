@@ -29,8 +29,6 @@ public class PfssFitsFile {
     public synchronized void loadFile(String url) {
         InputStream in = null;
         try {
-            //System.exit(1);
-            System.out.println(url);
             URL u = new URL(url);
             URLConnection uc = u.openConnection();
             int contentLength = uc.getContentLength();

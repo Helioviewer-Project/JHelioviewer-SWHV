@@ -20,7 +20,7 @@ public class PfssData {
     private FloatBuffer vertices;
 
     private int VBOVertices;
-
+    private int lastQuality;
     public boolean read = false;
     public boolean init = false;
 
@@ -68,36 +68,36 @@ public class PfssData {
     private void calculatePositions() {
         int counter = 0;
 
-        this.createBuffer(this.gzipFitsFile.length / 8);
-
+        this.createBuffer(this.gzipFitsFile.length / 8 / (PfssSettings.qualityReduction + 1));
+        this.lastQuality = PfssSettings.qualityReduction;
         double x = 0, y = 0, z = 0;
-
         for (int i = 0; i < this.gzipFitsFile.length / 8; i++) {
-            int rx = ((this.gzipFitsFile[8 * i + 1] << 8) & 0x0000ff00) | (this.gzipFitsFile[8 * i + 0] & 0x000000ff);
-            int ry = ((this.gzipFitsFile[8 * i + 3] << 8) & 0x0000ff00) | (this.gzipFitsFile[8 * i + 2] & 0x000000ff);
-            int rz = ((this.gzipFitsFile[8 * i + 5] << 8) & 0x0000ff00) | (this.gzipFitsFile[8 * i + 4] & 0x000000ff);
+            if (i / 8 / PfssSettings.POINTS_PER_LINE % (PfssSettings.qualityReduction + 1) == PfssSettings.qualityReduction) {
+                int rx = ((this.gzipFitsFile[8 * i + 1] << 8) & 0x0000ff00) | (this.gzipFitsFile[8 * i + 0] & 0x000000ff);
+                int ry = ((this.gzipFitsFile[8 * i + 3] << 8) & 0x0000ff00) | (this.gzipFitsFile[8 * i + 2] & 0x000000ff);
+                int rz = ((this.gzipFitsFile[8 * i + 5] << 8) & 0x0000ff00) | (this.gzipFitsFile[8 * i + 4] & 0x000000ff);
 
-            x = 3. * (rx * 2. / 65535 - 1.);
-            y = 3. * (ry * 2. / 65535 - 1.);
-            z = 3. * (rz * 2. / 65535 - 1.);
-            int col = ((this.gzipFitsFile[8 * i + 7] << 8) & 0x0000ff00) | (this.gzipFitsFile[8 * i + 6] & 0x000000ff);
-            double bright = (col * 2. / 65535.) - 1.;
+                x = 3. * (rx * 2. / 65535 - 1.);
+                y = 3. * (ry * 2. / 65535 - 1.);
+                z = 3. * (rz * 2. / 65535 - 1.);
+                int col = ((this.gzipFitsFile[8 * i + 7] << 8) & 0x0000ff00) | (this.gzipFitsFile[8 * i + 6] & 0x000000ff);
+                double bright = (col * 2. / 65535.) - 1.;
 
-            if (i % PfssSettings.POINTS_PER_LINE == 0) {
-                counter = this.addVertex((float) x, (float) z, (float) -y, counter);
-                counter = this.addColor(bright, 0.f, counter);
-                counter = this.addVertex((float) x, (float) z, (float) -y, counter);
-                counter = this.addColor(bright, 1.f, counter);
-            } else if (i % PfssSettings.POINTS_PER_LINE == PfssSettings.POINTS_PER_LINE - 1) {
-                counter = this.addVertex((float) x, (float) z, (float) -y, counter);
-                counter = this.addColor(bright, 1.f, counter);
-                counter = this.addVertex((float) x, (float) z, (float) -y, counter);
-                counter = this.addColor(bright, 0.f, counter);
-            } else {
-                counter = this.addVertex((float) x, (float) z, (float) -y, counter);
-                counter = this.addColor(bright, 1.f, counter);
+                if (i % PfssSettings.POINTS_PER_LINE == 0) {
+                    counter = this.addVertex((float) x, (float) z, (float) -y, counter);
+                    counter = this.addColor(bright, 0.f, counter);
+                    counter = this.addVertex((float) x, (float) z, (float) -y, counter);
+                    counter = this.addColor(bright, 1.f, counter);
+                } else if (i % PfssSettings.POINTS_PER_LINE == PfssSettings.POINTS_PER_LINE - 1) {
+                    counter = this.addVertex((float) x, (float) z, (float) -y, counter);
+                    counter = this.addColor(bright, 1.f, counter);
+                    counter = this.addVertex((float) x, (float) z, (float) -y, counter);
+                    counter = this.addColor(bright, 0.f, counter);
+                } else {
+                    counter = this.addVertex((float) x, (float) z, (float) -y, counter);
+                    counter = this.addColor(bright, 1.f, counter);
+                }
             }
-
         }
         vertices.flip();
         read = true;
@@ -128,6 +128,12 @@ public class PfssData {
     }
 
     public void display(GL gl) {
+        if (PfssSettings.qualityReduction != this.lastQuality) {
+            this.clear(gl);
+            this.init = false;
+            this.read = false;
+            this.init(gl);
+        }
         gl.glEnableClientState(GL.GL_VERTEX_ARRAY);
         gl.glEnableClientState(GL.GL_COLOR_ARRAY);
 
@@ -141,8 +147,6 @@ public class PfssData {
         gl.glEnable(GL.GL_BLEND);
         gl.glBlendFunc(GL.GL_SRC_ALPHA, GL.GL_ONE);
         gl.glBlendEquation(GL.GL_FUNC_ADD);
-        //gl.glHint(GL.GL_LINE_SMOOTH_HINT, GL.GL_FASTEST);
-        //gl.glEnable(GL.GL_LINE_SMOOTH);
 
         gl.glDepthMask(false);
         gl.glBindBuffer(GL.GL_ARRAY_BUFFER, VBOVertices);
