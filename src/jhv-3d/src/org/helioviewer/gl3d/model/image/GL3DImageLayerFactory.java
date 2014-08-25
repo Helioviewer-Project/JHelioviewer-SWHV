@@ -32,7 +32,7 @@ public class GL3DImageLayerFactory {
             if (hvMetaData.getInstrument().equalsIgnoreCase("HMI")) {
                 // HMI
                 Log.debug("GL3DImageLayerFactory: Creating HMI Image Layer!");
-                return new GL3DHMIImageLayer(mainView);
+                return new GL3DAIAImageLayer(mainView);
             } else if (hvMetaData.getInstrument().equalsIgnoreCase("EIT")) {
                 // EIT
                 return new GL3DEITImageLayer(mainView);

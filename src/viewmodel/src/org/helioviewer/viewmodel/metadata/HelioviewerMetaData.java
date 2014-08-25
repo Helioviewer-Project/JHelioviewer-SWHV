@@ -159,7 +159,7 @@ public class HelioviewerMetaData extends AbstractMetaData implements SunMetaData
         double newSolarPixelRadius = -1.0;
         double allowedRelativeDifference = 0.01;
 
-        if (instrument.contains("AIA") || instrument.contains("SWAP") || instrument.contains("VSM") || instrument.contains("NRH") || instrument.contains("GONG") || instrument.contains("H-alpha") || instrument.contains("CALLISTO")) {
+        if (instrument.contains("HMI") || instrument.contains("AIA") || instrument.contains("SWAP") || instrument.contains("VSM") || instrument.contains("NRH") || instrument.contains("GONG") || instrument.contains("H-alpha") || instrument.contains("CALLISTO")) {
             double arcsecPerPixelX = metaDataContainer.tryGetDouble("CDELT1");
             double arcsecPerPixelY = metaDataContainer.tryGetDouble("CDELT2");
             if (Double.isNaN(arcsecPerPixelX)) {
@@ -177,26 +177,6 @@ public class HelioviewerMetaData extends AbstractMetaData implements SunMetaData
             // distance to sun in meters
             double distanceToSun = metaDataContainer.tryGetDouble("DSUN_OBS");
             double radiusSunInArcsec = Math.atan(Constants.SunRadiusInMeter / distanceToSun) * MathUtils.radeg * 3600;
-            newSolarPixelRadius = radiusSunInArcsec / arcsecPerPixelX;
-
-        } else if (instrument.contains("HMI")) {
-            double arcsecPerPixelX = metaDataContainer.tryGetDouble("CDELT1");
-            double arcsecPerPixelY = metaDataContainer.tryGetDouble("CDELT2");
-            if (Double.isNaN(arcsecPerPixelX)) {
-                if (Double.isNaN(arcsecPerPixelY)) {
-                    Log.warn(">> HelioviewerMetaData.readPixelParamters() > Both CDELT1 and CDELT2 are NaN. Use 0.6 as default value.");
-                    arcsecPerPixelX = 0.6;
-                } else {
-                    Log.warn(">> HelioviewerMetaData.readPixelParamters() > CDELT1 is NaN. CDELT2 is used.");
-                    arcsecPerPixelX = arcsecPerPixelY;
-                }
-            }
-            if (Math.abs(arcsecPerPixelX - arcsecPerPixelY) > arcsecPerPixelX * 0.0001) {
-                Log.warn(">> HelioviewerMetaData.readPixelParamters() > CDELT1 and CDELT2 have different values. CDELT1 is used.");
-            }
-            // distance to sun in meters
-            double distanceToSun = metaDataContainer.tryGetDouble("DSUN_OBS");
-            double radiusSunInArcsec = Math.atan(Constants.SunRadius / distanceToSun) * MathUtils.radeg * 3600;
             newSolarPixelRadius = radiusSunInArcsec / arcsecPerPixelX;
 
         } else if (instrument.equals("EIT")) {
