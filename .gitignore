@@ -13,3 +13,4 @@ jhv-3d-wcs/temp
 jhv-3d-wcs/build
 jhv-3d-wcs/JHelioviewer.jar
 jhv-3d-wcs/plugins/jhv-eveplugin/derby.log
+jhv-3d-wcs/src/jhv-3d-plugin-pfss/bin
