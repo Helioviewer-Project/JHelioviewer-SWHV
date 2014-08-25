@@ -12,9 +12,9 @@
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 	<classpathentry kind="lib" path="/Users/freekv/swhv/git/client/jhv-3d-wcs/lib/kdu_jni.jar"/>
 	<classpathentry kind="src" path="/jhv-3d-math"/>
-	<classpathentry kind="lib" path="/Users/freekv/swhv/git/client/jhv-3d-wcs/lib/jogl.jar"/>
-	<classpathentry kind="lib" path="/Users/freekv/swhv/git/client/jhv-3d-wcs/lib/gluegen-rt.jar"/>
-	<classpathentry kind="lib" path="/Users/freekv/swhv/git/client/jhv-3d-wcs/lib/forms-1.3.0.jar"/>
-	<classpathentry kind="lib" path="/Users/freekv/swhv/git/client/jhv-3d-wcs/lib/miglayout15-swing.jar"/>
+        <classpathentry kind="lib" path="../lib/jogl.jar"/>
+        <classpathentry kind="lib" path="../lib/gluegen-rt.jar"/>
+	<classpathentry kind="lib" path="../lib/forms-1.3.0.jar"/>
+	<classpathentry kind="lib" path="../lib/miglayout15-swing.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
