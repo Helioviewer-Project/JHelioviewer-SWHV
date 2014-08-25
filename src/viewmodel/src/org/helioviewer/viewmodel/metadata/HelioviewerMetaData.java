@@ -216,7 +216,6 @@ public class HelioviewerMetaData extends AbstractMetaData implements SunMetaData
             }
             double solarRadiusPixel = solarRadiusArcSec / arcSecPerPixel;
             newSolarPixelRadius = solarRadiusPixel;
-            // newSolarPixelRadius = metaDataContainer.tryGetDouble("RSUN");
         }
 
         if (newSolarPixelRadius > 0) {
@@ -249,15 +248,7 @@ public class HelioviewerMetaData extends AbstractMetaData implements SunMetaData
     }
 
     public Region roiToRegion(SubImage roi, double zoompercent) {
-        // System.out.println("ROIWHAT " + roi.width + " " +
-        // sunPixelPosition.getX() + " " + roi.x + " " + " " +
-        // pixelImageSize.getX());
-        // System.out.println("ROIWHAT " + roi.height + " " +
-        // sunPixelPosition.getY() + " " + roi.y + " " + pixelImageSize.getX());
-        // System.out.println("RESOLUTION" + zoompercent);
-
         Region region = StaticRegion.createAdaptedRegion((roi.x / zoompercent - sunPixelPosition.getX()) * meterPerPixel, (roi.y / zoompercent - sunPixelPosition.getY()) * meterPerPixel, roi.width * meterPerPixel / zoompercent, roi.height * meterPerPixel / zoompercent);
-        // System.out.println("REGION" + region);
         return region;
     }
 
