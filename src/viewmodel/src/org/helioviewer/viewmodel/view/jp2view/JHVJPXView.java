@@ -460,7 +460,7 @@ public class JHVJPXView extends JHVJP2View implements TimedMovieView, CachedMovi
      * @param frameNumber
      * @return true, if the frame number has changed
      */
-    protected boolean setCurrentFrameNumber(int frameNumber, ChangeEvent event, boolean forceSignal) {
+    public boolean setCurrentFrameNumber(int frameNumber, ChangeEvent event, boolean forceSignal) {
         if (frameNumber != imageViewParams.compositionLayer || forceSignal) {
 
             imageViewParams.compositionLayer = frameNumber;

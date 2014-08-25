@@ -25,11 +25,34 @@ public class GL3DMat4f {
         m[15] = M15;
     }
 
+    public GL3DMat4f(float[] M) {
+        m[0] = M[0];
+        m[4] = M[4];
+        m[8] = M[8];
+        m[12] = M[12];
+        m[1] = M[1];
+        m[5] = M[5];
+        m[9] = M[9];
+        m[13] = M[13];
+        m[2] = M[2];
+        m[6] = M[6];
+        m[10] = M[10];
+        m[14] = M[14];
+        m[3] = M[3];
+        m[7] = M[7];
+        m[11] = M[11];
+        m[15] = M[15];
+    }
+
     public GL3DMat4f() {
     }
 
     public GL3DMat4f(GL3DMat4f mat) {
         set(mat);
+    }
+
+    public GL3DMat4f copy() {
+        return new GL3DMat4f(this);
     }
 
     public void setIdentity() {
@@ -372,6 +395,7 @@ public class GL3DMat4f {
         return mat3;
     }
 
+    @Override
     public String toString() {
         StringBuffer sb = new StringBuffer();
         String format = "%01.02f";
