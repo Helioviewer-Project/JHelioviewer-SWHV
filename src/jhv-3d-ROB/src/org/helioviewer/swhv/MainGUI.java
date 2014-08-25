@@ -4,6 +4,7 @@ import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
+import java.awt.EventQueue;
 import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -25,6 +26,7 @@ import org.helioviewer.globalstate.GlobalStateContainer;
 import org.helioviewer.jhv.JHVDirectory;
 import org.helioviewer.jhv.KakaduEngine;
 import org.helioviewer.jhv.Settings;
+import org.helioviewer.jhv.opengl.GLInfo;
 import org.helioviewer.jhv.resourceloader.ResourceLoader;
 import org.helioviewer.swhv.gui.GUISettings;
 import org.helioviewer.swhv.gui.ImageDataPanel;
@@ -39,10 +41,21 @@ import org.helioviewer.swhv.metadata.SWHVMetadataContainer;
 import org.helioviewer.swhv.time.GlobalTime;
 import org.helioviewer.viewmodel.view.jp2view.kakadu.JHV_KduException;
 
+import com.jogamp.common.jvm.JNILibLoaderBase;
+
 public class MainGUI extends JFrame {
-    /**
-     * 
-     */
+    static class JoglLoaderDummy implements JNILibLoaderBase.LoaderAction {
+
+        @Override
+        public boolean loadLibrary(String arg0, boolean arg1, ClassLoader arg2) {
+            return true;
+        }
+
+        @Override
+        public void loadLibrary(String arg0, String[] arg1, boolean arg2, ClassLoader arg3) {
+        }
+    }
+
     private static final long serialVersionUID = -1442153374916511471L;
     private JPanel leftPanel;
     private final Component rightPanel;
@@ -166,6 +179,34 @@ public class MainGUI extends JFrame {
         } catch (JHV_KduException e) {
             Log.fatal("Failed to setup Kakadu message handlers.", e);
             Message.err("Error starting Kakadu message handler", e.getMessage(), true);
+        }
+        /* ----------Setup OpenGL ----------- */
+
+        final URI finalLibs = libs;
+        final URI finalLibsRemote = libsRemote;
+        final URI finalLibsBackup = libsBackup;
+
+        // Has to run in EventQueue due to bug in NVidia Driver 260.99
+        try {
+            EventQueue.invokeAndWait(new Runnable() {
+
+                @Override
+                public void run() {
+                    Log.info("Try to load OpenGL libraries");
+
+                    if (null == ResourceLoader.getSingletonInstance().loadResource("jogl2.2.0ROB", finalLibsRemote, finalLibs, finalLibs, finalLibsBackup, System.getProperties())) {
+                        Log.error("Could not load OpenGL libraries");
+                        Message.err("Error loading OpenGL libraries", "The OpenGL libraries could not be loaded. JHelioviewer will run in software mode.", false);
+                        GLInfo.glUnusable();
+                    } else {
+                        System.setProperty("jogamp.gluegen.UseTempJarCache", "false");
+                        JNILibLoaderBase.setLoadingAction(new JoglLoaderDummy());
+                        Log.info("Successfully loaded OpenGL libraries");
+                    }
+                }
+            });
+        } catch (Exception e1) {
+            e1.printStackTrace();
         }
         new MainGUI();
     }
