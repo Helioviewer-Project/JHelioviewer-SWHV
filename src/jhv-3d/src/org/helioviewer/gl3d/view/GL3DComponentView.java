@@ -6,7 +6,9 @@ import java.io.IOException;
 
 import javax.media.opengl.GL2;
 import javax.media.opengl.GLAutoDrawable;
+import javax.media.opengl.GLCapabilities;
 import javax.media.opengl.GLEventListener;
+import javax.media.opengl.GLProfile;
 import javax.media.opengl.awt.GLCanvas;
 
 import org.helioviewer.base.logging.Log;
@@ -65,7 +67,9 @@ public class GL3DComponentView extends AbstractComponentView implements GLEventL
     private Vector2dInt viewportSize;
 
     public GL3DComponentView() {
-        this.setCanvas(new GLCanvas());
+        GLCapabilities caps = new GLCapabilities(GLProfile.getDefault());
+        GLCanvas glCanvas = new GLCanvas(caps);
+        this.setCanvas(glCanvas);
         this.getCanvas().setMinimumSize(new java.awt.Dimension(100, 100));
         Displayer.getSingletonInstance().register(this);
         Displayer.getSingletonInstance().addListener(this);

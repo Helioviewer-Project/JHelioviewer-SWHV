@@ -49,10 +49,12 @@ import com.jogamp.common.jvm.JNILibLoaderBase;
 public class JavaHelioViewer {
     static class JoglLoaderDummy implements JNILibLoaderBase.LoaderAction {
 
+        @Override
         public boolean loadLibrary(String arg0, boolean arg1, ClassLoader arg2) {
             return true;
         }
 
+        @Override
         public void loadLibrary(String arg0, String[] arg1, boolean arg2, ClassLoader arg3) {
         }
     }
@@ -243,7 +245,7 @@ public class JavaHelioViewer {
                 public void run() {
                     Log.info("Try to load OpenGL libraries");
 
-                    if (null == ResourceLoader.getSingletonInstance().loadResource("jogl2.2.0", finalLibsRemote, finalLibs, finalLibs, finalLibsBackup, System.getProperties())) {
+                    if (null == ResourceLoader.getSingletonInstance().loadResource("jogl2.2.0ROB", finalLibsRemote, finalLibs, finalLibs, finalLibsBackup, System.getProperties())) {
                         Log.error("Could not load OpenGL libraries");
                         Message.err("Error loading OpenGL libraries", "The OpenGL libraries could not be loaded. JHelioviewer will run in software mode.", false);
                         GLInfo.glUnusable();
