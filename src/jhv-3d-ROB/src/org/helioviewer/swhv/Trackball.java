@@ -30,7 +30,7 @@ public class Trackball extends MouseAdapter implements MouseMotionListener {
     public float[] trackballMatrix() {
         Quaternion q = new Quaternion(this.curquat);
         q.normalize();
-        return q.toMatrix();
+        return q.toMatrix(new float[16], 0);
     }
 
     public void trackballReshape(int width, int height) {
@@ -105,7 +105,7 @@ public class Trackball extends MouseAdapter implements MouseMotionListener {
         fl[0] = a.x;
         fl[1] = a.y;
         fl[2] = a.z;
-        q.fromAxis(fl, phi);
+        //q.fromAxis(fl, phi);
     }
 
     private static float trackball_project_to_sphere(float r, float x, float y) {
