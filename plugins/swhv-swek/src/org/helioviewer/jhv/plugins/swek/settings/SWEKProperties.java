@@ -41,9 +41,9 @@ public class SWEKProperties {
     }
 
     /**
-     * Gets the swek properties file
+     * Gets the swek properties.
      * 
-     * @return The swek properties file.
+     * @return The swek properties.
      */
     public Properties getSWEKProperties() {
         return this.swekProperties;
