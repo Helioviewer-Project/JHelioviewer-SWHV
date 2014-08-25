@@ -6,6 +6,7 @@ import java.lang.Thread.UncaughtExceptionHandler;
 import javax.media.opengl.GL;
 import javax.media.opengl.GL2;
 import javax.media.opengl.GLAutoDrawable;
+import javax.media.opengl.GLCapabilities;
 import javax.media.opengl.GLEventListener;
 import javax.media.opengl.GLException;
 import javax.media.opengl.awt.GLCanvas;
@@ -39,8 +40,8 @@ public class GLInitPanel extends GLCanvas {
     /**
      * Default constructor
      */
-    public GLInitPanel() {
-        super();
+    public GLInitPanel(GLCapabilities capabilities) {
+        super(capabilities);
 
         Thread.setDefaultUncaughtExceptionHandler(new GLUncaughtExceptionHandlerDecorator(Thread.getDefaultUncaughtExceptionHandler()));
 
