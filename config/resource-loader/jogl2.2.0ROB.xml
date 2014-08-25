@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<resourceDefinition>
+   <configuration name="mac">
+       <priority value="1" />
+       <requirements>
+           <requirement name="jhv.os" value="mac"/>
+       </requirements>
+       <files>
+           <file name="libnewt.jnilib" srcDir="jogl2.2.0/mac" destDir="." loadLibrary="true" md5="c28eb8fa0e5107c31199f34a5669438e"/>
+           <file name="libnativewindow_awt.jnilib" srcDir="jogl2.2.0/mac" destDir="." loadLibrary="true" md5="1424ac1290211b2e9ca63a59d077a1ca"/>
+           <file name="libgluegen-rt.jnilib" srcDir="jogl2.2.0/mac" destDir="." loadLibrary="true" md5="7a656b968cb4f5888fe07b69efaf48bc"/>
+           <file name="libnativewindow_macosx.jnilib" srcDir="jogl2.2.0/mac" destDir="." loadLibrary="true" md5="62fb6879c81e825bc3f21fdf43a4f093"/>
+           <file name="libjogl_desktop.jnilib" srcDir="jogl2.2.0/mac" destDir="." loadLibrary="true" md5="7f93c6d9196a444375f8fc3f1c12bf4b"/>
+        </files>
+    </configuration>
+    <configuration name="linux-x86-32">
+        <priority value="1" />
+        <requirements>
+            <requirement name="jhv.os" value="linux"/>
+            <requirement name="jhv.java.arch" value="32"/>
+        </requirements>
+        <files>
+            <file name="libnativewindow_awt.so" srcDir="jogl2.2.0/linux-32" destDir="." loadLibrary="true" md5="3cf6b76cba46e59a87bd82c80d4f4bcf"/>
+            <file name="libnewt.so" srcDir="jogl2.2.0/linux-32" destDir="." loadLibrary="true" md5="c7f72e3354f798114918fe5cb7c04a64"/>
+            <file name="libgluegen-rt.so" srcDir="jogl2.2.0/linux-32" destDir="." loadLibrary="true" md5="1e25e0543b0710211306638d127c1ad8"/>
+            <file name="libjogl_desktop.so" srcDir="jogl2.2.0/linux-32" destDir="." loadLibrary="true" md5="664af02bdc8789984d16fd25fef66391"/>
+            <file name="libnativewindow_x11.so" srcDir="jogl2.2.0/linux-32" destDir="." loadLibrary="true" md5="bc2364dc110069feabf506186c9c7c30"/>
+        </files>
+    </configuration>
+    <configuration name="linux-x86-64">
+        <priority value="1" />
+        <requirements>
+            <requirement name="jhv.os" value="linux"/>
+            <requirement name="jhv.java.arch" value="64"/>
+        </requirements>
+        <files>
+            <file name="libnativewindow_awt.so" srcDir="jogl2.2.0/linux-64" destDir="." loadLibrary="true" md5="71fb50ed9bcf8ef87346110f79ac7bf0"/>
+            <file name="libnewt.so" srcDir="jogl2.2.0/linux-64" destDir="." loadLibrary="true" md5="d549c0b52a7b3ff9ef287092ae8149d8"/>
+            <file name="libgluegen-rt.so" srcDir="jogl2.2.0/linux-64" destDir="." loadLibrary="true" md5="bf60abe80e9f155f19596051ce439d84"/>
+            <file name="libjogl_desktop.so" srcDir="jogl2.2.0/linux-64" destDir="." loadLibrary="true" md5="e19e79ee7968f4010e4e55e978823581"/>
+            <file name="libnativewindow_x11.so" srcDir="jogl2.2.0/linux-64" destDir="." loadLibrary="true" md5="742b16fa39b0e9c42307a4172044300b"/>
+        </files>
+    </configuration>
+    <configuration name="windows-x86-32">
+        <priority value="1" />
+        <requirements>
+            <requirement name="jhv.os" value="windows"/>
+            <requirement name="jhv.java.arch" value="32"/>
+        </requirements>
+        <files>
+            <file name="newt.dll" srcDir="jogl2.2.0/windows-32" destDir="." loadLibrary="true" md5="b9ee54b16ec6d206b88cc38c89cff468"/>
+            <file name="nativewindow_awt.dll" srcDir="jogl2.2.0/windows-32" destDir="." loadLibrary="true" md5="7a4ae7a990ece8f717240ebb406499bc"/>
+            <file name="jogl_desktop.dll" srcDir="jogl2.2.0/windows-32" destDir="." loadLibrary="true" md5="708f55e183d43f4ae4cdbbc0cc9b6b5a"/>
+            <file name="gluegen-rt.dll" srcDir="jogl2.2.0/windows-32" destDir="." loadLibrary="true" md5="2e17742843069f935b9bf8478102915b"/>
+            <file name="nativewindow_win32.dll" srcDir="jogl2.2.0/windows-32" destDir="." loadLibrary="true" md5="e0675c4eeddf49136e4ff75bf5987143"/>
+        </files>
+    </configuration>
+    <configuration name="windows-x86-64">
+        <priority value="1" />
+        <requirements>
+            <requirement name="jhv.os" value="windows"/>
+            <requirement name="jhv.java.arch" value="64"/>
+        </requirements>
+        <files>
+            <file name="newt.dll" srcDir="jogl2.2.0/windows-64" destDir="." loadLibrary="true" md5="cd60b12054c93323981a5d79e30173a0"/>
+            <file name="nativewindow_awt.dll" srcDir="jogl2.2.0/windows-64" destDir="." loadLibrary="true" md5="9325b8b93748f0ca1de729fb11c58d15"/>
+            <file name="jogl_desktop.dll" srcDir="jogl2.2.0/windows-64" destDir="." loadLibrary="true" md5="cb3b485940508e939875d5182fffb57c"/>
+            <file name="gluegen-rt.dll" srcDir="jogl2.2.0/windows-64" destDir="." loadLibrary="true" md5="7187f941d3f83309c38f5ae62b15f392"/>
+            <file name="nativewindow_win32.dll" srcDir="jogl2.2.0/windows-64" destDir="." loadLibrary="true" md5="f004ee565ed153c7a146490227d575af"/>
+        </files>
+    </configuration>
+</resourceDefinition>

@@ -86,7 +86,7 @@ public class GLComponentView extends AbstractComponentView implements ViewListen
     private GLAutoDrawable canvasDrawable;
     private RegionView regionView;
     private FPSAnimator animator;
-    private boolean useOffscreenRendering;
+    private boolean useOffscreenRendering = false;
 
     // render options
     private Color backgroundColor = Color.BLACK;
