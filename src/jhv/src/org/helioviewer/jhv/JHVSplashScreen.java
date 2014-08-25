@@ -6,6 +6,8 @@ import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.image.BufferedImage;
 
+import javax.media.opengl.GLCapabilities;
+import javax.media.opengl.GLProfile;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -47,8 +49,8 @@ public class JHVSplashScreen extends JFrame implements StatusTextListener {
 
     private static JHVSplashScreen instance = new JHVSplashScreen();
 
-    private SplashImagePanel imagePanel = new SplashImagePanel();
-    private JProgressBar progressBar = new JProgressBar(0, 100);
+    private final SplashImagePanel imagePanel = new SplashImagePanel();
+    private final JProgressBar progressBar = new JProgressBar(0, 100);
 
     private int steps = 1;
     private int currentStep = 1;
@@ -111,12 +113,15 @@ public class JHVSplashScreen extends JFrame implements StatusTextListener {
      * version on the machine and creates the main view chain
      * */
     public void initializeViewchain() {
-        imagePanel.setText("Starting OpenGL2...");
+        imagePanel.setText("Starting OpenGL...");
         nextStep();
         StatusPanel.addStatusTextListener(this);
         if (GLInfo.glIsUsable()) {
             try {
-                add(new GLInitPanel(), BorderLayout.NORTH);
+                GLProfile profile = GLProfile.getDefault();
+                System.out.println(profile.getImplName());
+                GLCapabilities capabilities = new GLCapabilities(profile);
+                add(new GLInitPanel(capabilities), BorderLayout.NORTH);
             } catch (Throwable t) {
                 Log.error("Could not load OpenGL", t);
                 GLInfo.glUnusable();
@@ -215,6 +220,7 @@ public class JHVSplashScreen extends JFrame implements StatusTextListener {
     /**
      * {@inheritDoc}
      */
+    @Override
     public void statusTextChanged(String newStatusText) {
         if (newStatusText.length() > 0) {
             setProgressText(newStatusText);
@@ -236,6 +242,7 @@ public class JHVSplashScreen extends JFrame implements StatusTextListener {
 
         progressBar.addChangeListener(new ChangeListener() {
 
+            @Override
             public void stateChanged(ChangeEvent e) {
                 int value = ((JProgressBar) e.getSource()).getValue();
                 int max = ((JProgressBar) e.getSource()).getMaximum();
@@ -270,8 +277,8 @@ public class JHVSplashScreen extends JFrame implements StatusTextListener {
 
         private static final long serialVersionUID = 1L;
 
-        private BufferedImage image = IconBank.getImage(JHVIcon.SPLASH);
-        private JLabel label = new JLabel("");
+        private final BufferedImage image = IconBank.getImage(JHVIcon.SPLASH);
+        private final JLabel label = new JLabel("");
 
         // ////////////////////////////////////////////////////////////
         // Methods
@@ -328,6 +335,7 @@ public class JHVSplashScreen extends JFrame implements StatusTextListener {
          * @param g
          *            Graphics object where image shall be drawn.
          */
+        @Override
         protected void paintComponent(Graphics g) {
 
             if (image != null)
