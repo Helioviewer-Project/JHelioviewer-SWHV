@@ -258,8 +258,8 @@ public class ImageViewerGui {
                 splash.setProgressValue(100);
 
                 // remove splash screen
-                //splash.dispose();
-                splash.setVisible(false);
+                splash.dispose();
+                //splash.setVisible(false);
 
             }
         }, "LoadImagesOnStartUp");
