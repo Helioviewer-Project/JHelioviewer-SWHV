@@ -4,7 +4,6 @@ import org.helioviewer.gl3d.view.GL3DCameraView;
 import org.helioviewer.gl3d.view.GL3DComponentView;
 import org.helioviewer.gl3d.view.GL3DImageTextureView;
 import org.helioviewer.gl3d.view.GL3DLayeredView;
-import org.helioviewer.gl3d.view.GL3DOrthoView;
 import org.helioviewer.gl3d.view.GL3DSceneGraphView;
 import org.helioviewer.gl3d.view.GL3DView;
 import org.helioviewer.gl3d.view.GL3DViewportView;
@@ -20,23 +19,22 @@ import org.helioviewer.viewmodel.view.opengl.GLOverlayView;
  * views in 3D differs from the views in 2D, which is why a special 3D View
  * Factory is required. The {@link ViewFactory} is provided by the
  * {@link ViewchainFactory}
- * 
+ *
  * @author Simon Spoerri (simon.spoerri@fhnw.ch)
- * 
+ *
  */
 public class GL3DViewFactory extends GLViewFactory {
 
     /**
      * {@inheritDoc}
      */
+    @Override
     @SuppressWarnings("unchecked")
     public <T extends View> T createNewView(Class<T> pattern) {
         if (pattern.isAssignableFrom(GL3DSceneGraphView.class)) {
             return (T) new GL3DSceneGraphView();
         } else if (pattern.isAssignableFrom(GL3DCameraView.class)) {
             return (T) new GL3DCameraView();
-        } else if (pattern.isAssignableFrom(GL3DOrthoView.class)) {
-            return (T) new GL3DOrthoView();
         } else if (pattern.isAssignableFrom(GL3DViewportView.class)) {
             return (T) new GL3DViewportView();
         } else if (pattern.isAssignableFrom(GL3DImageTextureView.class)) {
@@ -55,6 +53,7 @@ public class GL3DViewFactory extends GLViewFactory {
     /**
      * {@inheritDoc}
      */
+    @Override
     @SuppressWarnings("unchecked")
     protected <T extends View> T createViewFromSourceImpl(T source) {
         // Check if a GL3DView is requested
@@ -65,8 +64,6 @@ public class GL3DViewFactory extends GLViewFactory {
                 return (T) new GL3DSceneGraphView();
             } else if (source instanceof GL3DCameraView) {
                 return (T) new GL3DCameraView();
-            } else if (source instanceof GL3DOrthoView) {
-                return (T) new GL3DOrthoView();
             } else if (source instanceof GL3DViewportView) {
                 return (T) new GL3DViewportView();
             } else if (source instanceof GL3DImageTextureView) {
@@ -83,7 +80,7 @@ public class GL3DViewFactory extends GLViewFactory {
 
     /**
      * Creates a 3D layered view and copies the existing layers to the new view.
-     * 
+     *
      * @param layeredView
      *            old LayeredView
      * @return new GL3DLayeredView

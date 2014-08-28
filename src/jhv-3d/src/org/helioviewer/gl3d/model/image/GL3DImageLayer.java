@@ -16,7 +16,6 @@ import org.helioviewer.gl3d.scenegraph.math.GL3DVec4d;
 import org.helioviewer.gl3d.scenegraph.rt.GL3DRay;
 import org.helioviewer.gl3d.scenegraph.rt.GL3DRayTracer;
 import org.helioviewer.gl3d.shader.GL3DImageFragmentShaderProgram;
-import org.helioviewer.gl3d.view.GL3DCoordinateSystemView;
 import org.helioviewer.gl3d.view.GL3DImageTextureView;
 import org.helioviewer.gl3d.view.GL3DView;
 import org.helioviewer.viewmodel.changeevent.ChangeEvent;
@@ -33,9 +32,9 @@ import org.helioviewer.viewmodel.view.jp2view.JHVJPXView;
  * This is the scene graph equivalent of an image layer sub view chain attached
  * to the GL3DLayeredView. It represents exactly one image layer in the view
  * chain
- * 
+ *
  * @author Simon Spoerri (simon.spoerri@fhnw.ch)
- * 
+ *
  */
 public abstract class GL3DImageLayer extends GL3DGroup implements GL3DCameraListener, ViewListener {
     private static int nextLayerId = 0;
@@ -48,7 +47,6 @@ public abstract class GL3DImageLayer extends GL3DGroup implements GL3DCameraList
 
     protected GL3DView mainLayerView;
     protected GL3DImageTextureView imageTextureView;
-    protected GL3DCoordinateSystemView coordinateSystemView;
     protected MetaDataView metaDataView;
     protected RegionView regionView;
     protected GL3DImageLayers layerGroup;
@@ -80,11 +78,6 @@ public abstract class GL3DImageLayer extends GL3DGroup implements GL3DCameraList
         this.imageTextureView = this.mainLayerView.getAdapter(GL3DImageTextureView.class);
         if (this.imageTextureView == null) {
             throw new IllegalStateException("Cannot create GL3DImageLayer when no GL3DImageTextureView is present in Layer");
-        }
-
-        this.coordinateSystemView = this.mainLayerView.getAdapter(GL3DCoordinateSystemView.class);
-        if (this.coordinateSystemView == null) {
-            throw new IllegalStateException("Cannot create GL3DImageLayer when no GL3DCoordinateSystemView is present in Layer");
         }
 
         this.metaDataView = this.mainLayerView.getAdapter(MetaDataView.class);

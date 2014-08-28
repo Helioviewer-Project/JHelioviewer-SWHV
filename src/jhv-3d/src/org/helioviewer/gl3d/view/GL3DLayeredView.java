@@ -33,18 +33,6 @@ public class GL3DLayeredView extends GLLayeredView implements GL3DView, LayeredV
             newLayer = scaleView;
         }
 
-        if (newLayer.getAdapter(GL3DCoordinateSystemView.class) == null) {
-            GL3DCoordinateSystemView coordinateSystemView = new GL3DCoordinateSystemView();
-            coordinateSystemView.setView(newLayer);
-            newLayer = coordinateSystemView;
-        }
-
-        if (newLayer.getAdapter(GL3DImageRegionView.class) == null) {
-            GL3DImageRegionView imageRegionView = new GL3DImageRegionView();
-            imageRegionView.setView(newLayer);
-            newLayer = imageRegionView;
-        }
-
         if (newLayer.getAdapter(GL3DImageTextureView.class) == null) {
             GL3DImageTextureView imageToTextureView = new GL3DImageTextureView();
             imageToTextureView.setView(newLayer);
