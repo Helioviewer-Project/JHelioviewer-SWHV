@@ -5,7 +5,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import javax.media.opengl.GL2;
-import javax.media.opengl.GL2;
 
 import org.helioviewer.base.logging.Log;
 import org.helioviewer.base.physics.Constants;
@@ -14,7 +13,6 @@ import org.helioviewer.gl3d.GL3DKeyController.GL3DKeyListener;
 import org.helioviewer.gl3d.camera.GL3DCamera;
 import org.helioviewer.gl3d.camera.GL3DCameraZoomAnimation;
 import org.helioviewer.gl3d.model.GL3DArtificialObjects;
-import org.helioviewer.gl3d.model.GL3DFramebufferImage;
 import org.helioviewer.gl3d.model.GL3DHitReferenceShape;
 import org.helioviewer.gl3d.model.image.GL3DImageLayer;
 import org.helioviewer.gl3d.model.image.GL3DImageLayerFactory;
@@ -49,9 +47,9 @@ import org.helioviewer.viewmodel.view.opengl.GLView;
  * active image region by performing a ray casting using the
  * {@link GL3DRayTracer} to find the maximally spanning image region within the
  * displayed scene.
- * 
+ *
  * @author Simon Spoerri (simon.spoerri@fhnw.ch)
- * 
+ *
  */
 public class GL3DSceneGraphView extends AbstractGL3DView implements GL3DView {
     private final GL3DGroup root;
@@ -60,7 +58,6 @@ public class GL3DSceneGraphView extends AbstractGL3DView implements GL3DView {
     private GLOverlayView overlayView = null;
     private GL3DImageLayers imageLayers;
     private GL3DHitReferenceShape hitReferenceShape;
-    private GL3DFramebufferImage framebuffer;
     private GL3DGroup artificialObjects;
 
     private final List<GL3DImageTextureView> layersToAdd = new ArrayList<GL3DImageTextureView>();
@@ -101,7 +98,6 @@ public class GL3DSceneGraphView extends AbstractGL3DView implements GL3DView {
         GL3DKeyController.getInstance().addListener(new GL3DKeyListener() {
             @Override
             public void keyHit(KeyEvent e) {
-                framebuffer.getDrawBits().toggle(Bit.Hidden);
                 Displayer.getSingletonInstance().display();
                 Log.debug("Toggling Framebuffer");
             }
@@ -271,8 +267,6 @@ public class GL3DSceneGraphView extends AbstractGL3DView implements GL3DView {
 
                 this.imageLayers.insertLayer(imageLayer);
 
-                imageTextureView.addViewListener(framebuffer);
-
             }
             if (!this.layersToAdd.isEmpty()) {
                 // If there is data, zoom to fit
@@ -338,9 +332,6 @@ public class GL3DSceneGraphView extends AbstractGL3DView implements GL3DView {
         root.addNode(this.imageLayers);
         root.addNode(artificialObjects);
 
-        // this.overlayPlugins = new GL3DOverlayPlugins();
-        // root.addNode(this.overlayPlugins);
-
         this.hitReferenceShape = new GL3DHitReferenceShape(false);
         root.addNode(this.hitReferenceShape);
 
@@ -354,20 +345,6 @@ public class GL3DSceneGraphView extends AbstractGL3DView implements GL3DView {
         GL3DShape south = new GL3DArrow("Southpole", Constants.SunRadius / 128, Constants.SunRadius, Constants.SunRadius / 4, 128, new GL3DVec4f(0.1f, 0.2f, 1.0f, 1.0f));
         south.modelView().rotate(Math.PI / 2, GL3DVec3d.XAxis);
         indicatorArrows.addNode(south);
-
-        GL3DModel sunModel = new GL3DModel("Sun", "Spherical Grid depicting the Sun");
-        artificialObjects.addNode(sunModel);
-        // Create the sungrid
-        // this.sun = new GL3DSphere("Sun-grid", Constants.SunRadius, 200, 200,
-        // new GL3DVec4f(1.0f, 0.0f, 0.0f, 0.0f));
-        // this.sun = new GL3DSunGrid(Constants.SunRadius,200,200, new
-        // GL3DVec4f(0.8f, 0.8f, 0, 0.0f));
-
-        // sunModel.addNode(this.sun);
-
-        framebuffer = new GL3DFramebufferImage();
-        artificialObjects.addNode(framebuffer);
-        framebuffer.getDrawBits().on(Bit.Hidden);
 
         return root;
     }
@@ -405,7 +382,7 @@ public class GL3DSceneGraphView extends AbstractGL3DView implements GL3DView {
         /*
          * GL3DNode sibling = node; while((sibling = sibling.getNext()) != null)
          * { for(int i=0; i<level; ++i) System.out.print("   ");
-         * 
+         *
          * System.out.println("Sibling: " + sibling.getClass().getName() + " ("
          * + node.getName() + ")"); }
          */
