@@ -3,6 +3,7 @@
 *.index
 .location
 jhv-3d-wcs/.metadata
+.recommenders
 jhv-3d-wcs/src/jhv/bin
 jhv-3d-wcs/src/jhv-3d-plugin-vectors/bin
 jhv-3d-wcs/src/jhv-3d-plugin-pfss/bin
