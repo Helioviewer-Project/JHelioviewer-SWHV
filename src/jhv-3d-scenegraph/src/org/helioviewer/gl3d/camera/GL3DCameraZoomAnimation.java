@@ -33,6 +33,7 @@ public class GL3DCameraZoomAnimation implements GL3DCameraAnimation {
         // Displayer.getSingletonInstance().animate();
     }
 
+    @Override
     public void animate(GL3DCamera camera) {
         if (this.startTime < 0) {
             this.startTime = System.currentTimeMillis();
@@ -67,6 +68,7 @@ public class GL3DCameraZoomAnimation implements GL3DCameraAnimation {
 
     }
 
+    @Override
     public void updateWithAnimation(GL3DCameraAnimation animation) {
         if (animation instanceof GL3DCameraZoomAnimation) {
             GL3DCameraZoomAnimation ani = (GL3DCameraZoomAnimation) animation;
@@ -77,6 +79,7 @@ public class GL3DCameraZoomAnimation implements GL3DCameraAnimation {
         }
     }
 
+    @Override
     public boolean isFinished() {
         return isFinished;
     }
