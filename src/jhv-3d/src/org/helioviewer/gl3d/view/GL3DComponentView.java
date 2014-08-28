@@ -45,10 +45,10 @@ import org.helioviewer.viewmodel.viewport.Viewport;
 /**
  * The top-most View in the 3D View Chain. Let's the viewchain render to its
  * {@link GLCanvas}.
- * 
- * 
+ *
+ *
  * @author Simon Spoerri (simon.spoerri@fhnw.ch)
- * 
+ *
  */
 public class GL3DComponentView extends AbstractComponentView implements GLEventListener, ComponentView, DisplayListener, GL3DComponentFakeInterface {
     private GLCanvas canvas;
@@ -141,10 +141,7 @@ public class GL3DComponentView extends AbstractComponentView implements GLEventL
     public void reshape(GLAutoDrawable glAD, int x, int y, int width, int height) {
         viewportSize = new Vector2dInt(width, height);
         GL2 gl = (GL2) glAD.getGL();
-
         gl.setSwapInterval(1);
-
-        updateViewport();
     }
 
     @Override
@@ -254,10 +251,6 @@ public class GL3DComponentView extends AbstractComponentView implements GLEventL
         this.viewportView = getAdapter(ViewportView.class);
     }
 
-    private void updateViewport() {
-        // this.orthoView.updateMainImagePanelSize(mainImagePanelSize);
-    }
-
     @Override
     public void display() {
         try {
@@ -270,12 +263,9 @@ public class GL3DComponentView extends AbstractComponentView implements GLEventL
     @Override
     public void viewChanged(View sender, ChangeEvent aEvent) {
 
-        // rebuild shaders, if necessary
         if (aEvent.reasonOccurred(ViewChainChangedReason.class) || (aEvent.reasonOccurred(LayerChangedReason.class) && aEvent.getLastChangedReasonByType(LayerChangedReason.class).getLayerChangeType() == LayerChangeType.LAYER_ADDED)) {
             rebuildShadersRequest = true;
-            // this.orthoView = getAdapter(GL3DOrthoView.class);
             this.viewportView = getAdapter(ViewportView.class);
-            this.updateViewport();
         }
 
         TimestampChangedReason timestampReason = aEvent.getLastChangedReasonByType(TimestampChangedReason.class);

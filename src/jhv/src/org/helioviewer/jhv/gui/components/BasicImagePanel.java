@@ -30,15 +30,16 @@ import org.helioviewer.viewmodel.view.View;
 import org.helioviewer.viewmodel.view.ViewHelper;
 import org.helioviewer.viewmodel.view.ViewListener;
 import org.helioviewer.viewmodel.view.ViewportView;
+import org.helioviewer.viewmodel.view.opengl.GLTextureHelper;
 import org.helioviewer.viewmodel.viewport.StaticViewport;
 import org.helioviewer.viewmodel.viewport.Viewport;
 
 /**
  * This class represents a basic image component that is used to display the
  * image of all images.
- * 
+ *
  * @author Stephan Pagel
- * 
+ *
  * */
 public class BasicImagePanel extends JPanel implements ComponentListener, ViewListener {
 
@@ -94,6 +95,7 @@ public class BasicImagePanel extends JPanel implements ComponentListener, ViewLi
         backgroundImage = img;
     }
 
+    @Override
     public void paintComponent(Graphics g) {
         super.paintComponent(g);
         if (backgroundImage != null)
@@ -103,6 +105,7 @@ public class BasicImagePanel extends JPanel implements ComponentListener, ViewLi
     /**
      * Adds an mouse listener to the component.
      */
+    @Override
     public void addMouseListener(MouseListener l) {
         if (renderedImageComponent != null)
             renderedImageComponent.addMouseListener(l);
@@ -111,6 +114,7 @@ public class BasicImagePanel extends JPanel implements ComponentListener, ViewLi
     /**
      * Adds an mouse motion listener to the component.
      */
+    @Override
     public void addMouseMotionListener(MouseMotionListener l) {
         if (renderedImageComponent != null)
             renderedImageComponent.addMouseMotionListener(l);
@@ -119,6 +123,7 @@ public class BasicImagePanel extends JPanel implements ComponentListener, ViewLi
     /**
      * Adds an mouse wheel listener to the component.
      */
+    @Override
     public void addMouseWheelListener(MouseWheelListener l) {
         if (renderedImageComponent != null)
             renderedImageComponent.addMouseWheelListener(l);
@@ -127,6 +132,7 @@ public class BasicImagePanel extends JPanel implements ComponentListener, ViewLi
     /**
      * Removes an mouse listener from the component.
      */
+    @Override
     public void removeMouseListener(MouseListener l) {
         if (renderedImageComponent != null)
             renderedImageComponent.removeMouseListener(l);
@@ -135,6 +141,7 @@ public class BasicImagePanel extends JPanel implements ComponentListener, ViewLi
     /**
      * Removes an mouse listener from the component.
      */
+    @Override
     public void removeMouseMotionListener(MouseMotionListener l) {
         if (renderedImageComponent != null)
             renderedImageComponent.removeMouseMotionListener(l);
@@ -143,6 +150,7 @@ public class BasicImagePanel extends JPanel implements ComponentListener, ViewLi
     /**
      * Removes an mouse listener from the component.
      */
+    @Override
     public void removeMouseWheelListener(MouseWheelListener l) {
         if (renderedImageComponent != null)
             renderedImageComponent.removeMouseWheelListener(l);
@@ -151,7 +159,7 @@ public class BasicImagePanel extends JPanel implements ComponentListener, ViewLi
     /**
      * Returns the component view which acts as the last view in the associated
      * view chain and provides the data for this component.
-     * 
+     *
      * @return associated component view.
      */
     public ComponentView getView() {
@@ -161,7 +169,7 @@ public class BasicImagePanel extends JPanel implements ComponentListener, ViewLi
     /**
      * Sets the component view which acts as the last view in the associated
      * view chain and provides the data for this component.
-     * 
+     *
      * @param newView
      *            new component view.
      */
@@ -224,17 +232,17 @@ public class BasicImagePanel extends JPanel implements ComponentListener, ViewLi
 
     /**
      * Returns the provided viewport of this component
-     * 
+     *
      * @return provided viewport of this component.
      * */
     public Viewport getViewport() {
-        return StaticViewport.createAdaptedViewport(Math.max(1, getWidth() - 2), Math.max(1, getHeight() - 2));
+        return StaticViewport.createAdaptedViewport(Math.max(1, GLTextureHelper.getPixelHIFactorWidth() * getWidth() - 2), Math.max(1, GLTextureHelper.getPixelHIFactorHeight() * getHeight() - 2));
     }
 
     /**
      * Adds a new plug-in to the component. Plug-ins in this case are controller
      * which e.g. has to react on inputs made to this component.
-     * 
+     *
      * @param newPlugin
      *            new plug-in which has to to be added to this component
      */
@@ -252,10 +260,10 @@ public class BasicImagePanel extends JPanel implements ComponentListener, ViewLi
 
     /**
      * Removes a plug-in from the component.
-     * 
+     *
      * @param oldPlugin
      *            plug-in which has to to be removed from this component
-     * 
+     *
      * @see BasicImagePanel#addPlugin(ImagePanelPlugin)
      */
     public void removePlugin(ImagePanelPlugin oldPlugin) {
@@ -270,7 +278,7 @@ public class BasicImagePanel extends JPanel implements ComponentListener, ViewLi
 
     /**
      * Returns the associated input controller.
-     * 
+     *
      * @return input controller of this component.
      */
     public ImagePanelInputController getInputController() {
@@ -279,10 +287,10 @@ public class BasicImagePanel extends JPanel implements ComponentListener, ViewLi
 
     /**
      * Sets the passed input controller as active one and removes the existing.
-     * 
+     *
      * <p>
      * Note, that every input controller is also registered as a plugin.
-     * 
+     *
      * @param newInputController
      *            new input controller.
      * @see #addPlugin(ImagePanelPlugin)
@@ -320,7 +328,7 @@ public class BasicImagePanel extends JPanel implements ComponentListener, ViewLi
 
     /**
      * Adds the passed post renderer to the image component.
-     * 
+     *
      * @param postRenderer
      *            new post renderer for the image component.
      */
@@ -336,7 +344,7 @@ public class BasicImagePanel extends JPanel implements ComponentListener, ViewLi
 
     /**
      * Adds the passed post renderer from the image component.
-     * 
+     *
      * @param postRenderer
      *            post renderer which has to be removed from image component.
      */
@@ -352,6 +360,7 @@ public class BasicImagePanel extends JPanel implements ComponentListener, ViewLi
     /**
      * {@inheritDoc}
      */
+    @Override
     public void viewChanged(View sender, ChangeEvent aEvent) {
 
         if (aEvent.reasonOccurred(ViewChainChangedReason.class)) {
@@ -386,12 +395,14 @@ public class BasicImagePanel extends JPanel implements ComponentListener, ViewLi
     /**
      * Method will be called when component was hidden.
      */
+    @Override
     public void componentHidden(ComponentEvent e) {
     }
 
     /**
      * Method will be called when component was moved.
      */
+    @Override
     public void componentMoved(ComponentEvent e) {
     }
 
@@ -399,6 +410,7 @@ public class BasicImagePanel extends JPanel implements ComponentListener, ViewLi
      * Method will be called when component was resized. Resets the viewport and
      * region.
      */
+    @Override
     public void componentResized(ComponentEvent e) {
 
         if (viewportView != null && regionView != null && metaDataView != null) {
@@ -419,6 +431,7 @@ public class BasicImagePanel extends JPanel implements ComponentListener, ViewLi
     /**
      * Method will be called when component was shown.
      */
+    @Override
     public void componentShown(ComponentEvent e) {
     }
 }

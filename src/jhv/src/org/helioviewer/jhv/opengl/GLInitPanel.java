@@ -23,14 +23,14 @@ import com.jogamp.opengl.util.Animator;
 
 /**
  * Component to initialize OpenGL2.
- * 
+ *
  * <p>
  * The only purpose of this component is to be visible for one moment during the
  * startup sequence of JHV. It calls {@link GLInfo#update(GL)} to get the
  * application running and initializes some OpenGL classes.
- * 
+ *
  * @author Markus Langenberg
- * 
+ *
  */
 public class GLInitPanel extends GLCanvas {
 
@@ -105,7 +105,6 @@ public class GLInitPanel extends GLCanvas {
 
             Log.debug(">> GLInitPanel.init(GLAutoDrawable) > Set GL properties");
             final GL2 gl = (GL2) drawable.getGL();
-
             Log.debug(">> GLInitPanel.init(GLAutoDrawable) > Shade model: flat");
             gl.glShadeModel(GL2.GL_FLAT);
             Log.debug(">> GLInitPanel.init(GLAutoDrawable) > Clear color: black");
@@ -120,8 +119,13 @@ public class GLInitPanel extends GLCanvas {
             if (GLInfo.glIsUsable()) {
                 GLShaderHelper.initHelper(gl, JHVDirectory.TEMP.getPath());
                 GLShaderBuilder.initShaderBuilder(gl);
-                // GLTextureHelper.setTextureNonPowerOfTwo(gl.isExtensionAvailable("GL_ARB_texture_non_power_of_two"));
+
                 GLTextureHelper.setTextureNonPowerOfTwo(false);
+
+                //Fix for retina displays
+                GLTextureHelper.setPixelHIFactorWidth(parent.getCurrentSurfaceScale(new int[2])[0]);
+                GLTextureHelper.setPixelHIFactorHeight(parent.getCurrentSurfaceScale(new int[2])[1]);
+
             } else {
                 Message.err("Could not initialize OpenGL", "OpenGL could not be initialized properly during startup. JHelioviewer will start in software mode. OpenGL is not available on the system or incompatible.", false);
             }
@@ -142,13 +146,13 @@ public class GLInitPanel extends GLCanvas {
 
     /**
      * UncaughtExceptionHandler to detect OpenGL exceptions.
-     * 
+     *
      * All other exceptions are passed to the decorated handler. In case an
      * OpenGL exception is detected, it is assumed that OpenGL is in some way
      * broken. Thus, it is disabled as a precaution. When this happens, this
      * decorator is removed, since it is impossible that an OpenGL exception can
      * appear again.
-     * 
+     *
      * @author Markus Langenberg
      */
     private class GLUncaughtExceptionHandlerDecorator implements UncaughtExceptionHandler {
@@ -156,7 +160,7 @@ public class GLInitPanel extends GLCanvas {
 
         /**
          * Default constructor
-         * 
+         *
          * @param handler
          *            Decorated exception handler.
          */
@@ -166,7 +170,7 @@ public class GLInitPanel extends GLCanvas {
 
         /**
          * {@inheritDoc}
-         * 
+         *
          * In case an OpenGL exception is detected, a warning is logged, OpenGL
          * is disabled. Thus, the view chain has to be reseted. Also, this
          * decorator is removed.

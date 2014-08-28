@@ -18,14 +18,16 @@ import org.helioviewer.viewmodel.renderer.screen.ScreenRenderer;
 import org.helioviewer.viewmodel.view.LayeredView;
 import org.helioviewer.viewmodel.view.View;
 import org.helioviewer.viewmodel.view.ViewHelper;
+import org.helioviewer.viewmodel.viewport.StaticViewport;
+import org.helioviewer.viewmodel.viewport.Viewport;
 import org.helioviewer.viewmodel.viewportimagesize.ViewportImageSize;
 
 /**
  * This class represents an image component that is used to display the overview
  * of an image.
- * 
+ *
  * @author Stephan Pagel
- * 
+ *
  */
 public class OverviewImagePanel extends BasicImagePanel {
 
@@ -42,8 +44,8 @@ public class OverviewImagePanel extends BasicImagePanel {
     private ViewportImageSize viewportImageSize;
     private Vector2dInt offset;
 
-    private OverviewImagePanelPostRenderer postRenderer = new OverviewImagePanelPostRenderer();
-    private OverviewImagePanelMousePanController inputControllerPanning = new OverviewImagePanelMousePanController();
+    private final OverviewImagePanelPostRenderer postRenderer = new OverviewImagePanelPostRenderer();
+    private final OverviewImagePanelMousePanController inputControllerPanning = new OverviewImagePanelMousePanController();
 
     // ///////////////////////////////////////////////////////////////////////////
     // Methods
@@ -74,11 +76,12 @@ public class OverviewImagePanel extends BasicImagePanel {
 
     /**
      * {@inheritDoc}
-     * 
+     *
      * This method is overridden to protect the internal input controller. Input
      * controller for this class are handled by this class by its own.
      */
 
+    @Override
     public void setInputController(ImagePanelInputController newInputController) {
 
         if (newInputController == inputControllerPanning)
@@ -87,10 +90,11 @@ public class OverviewImagePanel extends BasicImagePanel {
 
     /**
      * {@inheritDoc}
-     * 
+     *
      * Computes the ROI rectangle for the overview image.
      * */
 
+    @Override
     public void viewChanged(View sender, ChangeEvent aEvent) {
         // Show rendered image centered
         if (renderedImageComponent != null) {
@@ -156,7 +160,7 @@ public class OverviewImagePanel extends BasicImagePanel {
 
     /**
      * Computes the offset that image will be displayed centered.
-     * 
+     *
      * @param viewportImageSize
      *            image size
      * @return offset that image will be displayed centered.
@@ -174,7 +178,7 @@ public class OverviewImagePanel extends BasicImagePanel {
     /**
      * Computes the size and position of the rectangle which indicates the
      * current ROI.
-     * 
+     *
      * @param viewportImageSize
      *            Size of the view port of the overview image
      * @param regionMainImage
@@ -199,6 +203,7 @@ public class OverviewImagePanel extends BasicImagePanel {
      * region.
      */
 
+    @Override
     public void componentResized(ComponentEvent e) {
 
         if (viewportView != null) {
@@ -216,9 +221,19 @@ public class OverviewImagePanel extends BasicImagePanel {
     }
 
     /**
+     * Returns the provided viewport of this component
+     *
+     * @return provided viewport of this component.
+     * */
+    @Override
+    public Viewport getViewport() {
+        return StaticViewport.createAdaptedViewport(Math.max(1, getWidth() - 2), Math.max(1, getHeight() - 2));
+    }
+
+    /**
      * Computes the the center of the main image region translated to overview
      * panel coordinates.
-     * 
+     *
      * @param viewportImageSize
      *            Size of the view port of the overview image
      * @param regionMainImage
@@ -239,7 +254,7 @@ public class OverviewImagePanel extends BasicImagePanel {
     /**
      * Class represents the post renderer for the overview image panel. Contains
      * the drawing management for the ROI rectangle.
-     * 
+     *
      * @author Stephan Pagel
      * */
     private class OverviewImagePanelPostRenderer implements ScreenRenderer {
@@ -250,9 +265,9 @@ public class OverviewImagePanel extends BasicImagePanel {
 
         private Rectangle rect;
         private Vector2dInt center;
-        private Color color = Color.YELLOW;
-        private Vector2dInt centerOvalRadius = new Vector2dInt(3, 3);
-        private Vector2dInt centerOvalDiameter = centerOvalRadius.scale(2).add(new Vector2dInt(1, 1));
+        private final Color color = Color.YELLOW;
+        private final Vector2dInt centerOvalRadius = new Vector2dInt(3, 3);
+        private final Vector2dInt centerOvalDiameter = centerOvalRadius.scale(2).add(new Vector2dInt(1, 1));
 
         // ///////////////////////////////////////////////////////////////////////
         // Methods
@@ -260,7 +275,7 @@ public class OverviewImagePanel extends BasicImagePanel {
 
         /**
          * Sets the last position and size of the rectangle.
-         * 
+         *
          * @param rect
          *            size and position of the rectangle.
          */
@@ -271,7 +286,7 @@ public class OverviewImagePanel extends BasicImagePanel {
         /**
          * Sets the center of the main image region in overview panel
          * coordinates
-         * 
+         *
          * @param center
          *            center of the main image region in overview panel
          *            coordinates
@@ -283,10 +298,11 @@ public class OverviewImagePanel extends BasicImagePanel {
 
         /**
          * Draws the rectangle.
-         * 
+         *
          * @param g
          *            Graphics object where to draw the rectangle.
          */
+        @Override
         public void render(ScreenRenderGraphics g) {
 
             if (rect != null) {

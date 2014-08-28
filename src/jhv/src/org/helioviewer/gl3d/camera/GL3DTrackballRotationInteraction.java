@@ -9,15 +9,16 @@ import org.helioviewer.gl3d.scenegraph.rt.GL3DRay;
 import org.helioviewer.gl3d.scenegraph.rt.GL3DRayTracer;
 import org.helioviewer.gl3d.view.GL3DSceneGraphView;
 import org.helioviewer.jhv.display.Displayer;
+import org.helioviewer.viewmodel.view.opengl.GLTextureHelper;
 
 /**
  * This interaction is used by the {@link GL3DEarthCamera} as its rotation
  * interaction. The calculation of the rotation done by creating a rotation
  * Quaternion between two points on a sphere. These points are retrieved by
  * using the raycasting mechanism provided by {@link GL3DRayTracer}.
- * 
+ *
  * @author Simon Spoerri (simon.spoerri@fhnw.ch)
- * 
+ *
  */
 public class GL3DTrackballRotationInteraction extends GL3DDefaultInteraction {
     private GL3DVec3d currentRotationStartPoint;
@@ -70,8 +71,9 @@ public class GL3DTrackballRotationInteraction extends GL3DDefaultInteraction {
     }
 
     protected GL3DVec3d getVectorFromSphere(Point p, GL3DCamera camera) {
+        Point pp = new Point(p.x * GLTextureHelper.getPixelHIFactorWidth(), p.y * GLTextureHelper.getPixelHIFactorHeight());
         GL3DRayTracer sunTracer = new GL3DRayTracer(sceneGraphView.getHitReferenceShape(), camera);
-        GL3DRay ray = sunTracer.cast(p.x, p.y);
+        GL3DRay ray = sunTracer.cast(pp.x, pp.y);
 
         GL3DVec3d hitPoint;
 
@@ -81,8 +83,8 @@ public class GL3DTrackballRotationInteraction extends GL3DDefaultInteraction {
             hitPoint = camera.getLocalRotation().toMatrix().multiply(hitPoint);
 
         } else {
-            double y = (camera.getHeight() / 2 - p.y) / camera.getHeight();
-            double x = (p.x - camera.getWidth() / 2) / camera.getWidth();
+            double y = (camera.getHeight() / 2 - pp.y) / camera.getHeight();
+            double x = (pp.x - camera.getWidth() / 2) / camera.getWidth();
 
             GL3DVec3d nv = new GL3DVec3d(x, y, 0);
             nv.normalize();
