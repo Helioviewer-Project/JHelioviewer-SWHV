@@ -44,7 +44,7 @@ import org.helioviewer.viewmodelplugin.overlay.OverlayPanel;
 
 /**
  * Panel of Pfss-Plugin
- * 
+ *
  * @author Stefan Meier (stefan.meier@fhnw.ch)
  * */
 public class PfssPluginPanel extends OverlayPanel implements ActionListener, LayersListener, ViewListener {
@@ -60,7 +60,7 @@ public class PfssPluginPanel extends OverlayPanel implements ActionListener, Lay
 
     /**
      * Default constructor
-     * 
+     *
      * */
     public PfssPluginPanel(PfssCache pfssCache) {
         this.pfssCache = pfssCache;
@@ -205,7 +205,7 @@ public class PfssPluginPanel extends OverlayPanel implements ActionListener, Lay
                 URL data;
                 try {
                     String m = (startMonth) < 9 ? "0" + (startMonth + 1) : (startMonth + 1) + "";
-                    data = new URL(PfssSettings.baseUrl + "pfss/" + startYear + "/" + m + "/list.txt");
+                    data = new URL(PfssSettings.baseUrl + startYear + "/" + m + "/list.txt");
                     BufferedReader in = new BufferedReader(new InputStreamReader(data.openStream()));
 
                     String inputLine;

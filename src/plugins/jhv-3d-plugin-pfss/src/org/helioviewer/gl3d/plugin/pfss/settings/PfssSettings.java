@@ -4,7 +4,7 @@ import org.helioviewer.gl3d.scenegraph.math.GL3DVec3f;
 
 /**
  * Important settings
- * 
+ *
  * @author Stefan Meier (stefan.meier@fhnw.ch)
  * */
 public class PfssSettings {
@@ -67,7 +67,7 @@ public class PfssSettings {
 
     public final static int POINTS_PER_LINE = 40;
 
-    public static String baseUrl = "http://swhv.oma.be/magtest/";
+    public static String baseUrl = "http://swhv.oma.be/magtest/pfss/";
 
     public static int qualityReduction = 8;
 
