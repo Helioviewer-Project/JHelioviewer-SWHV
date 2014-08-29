@@ -110,7 +110,6 @@ public class JPXBench implements ViewListener {
         String inputFile = args[0];
         int resolution = Integer.parseInt(args[1]);
 
-        //inputFile ="/Users/freekv/JHelioviewer/Downloads/AIA171.jpx";
         JPXBench jpxbench = new JPXBench(inputFile, resolution);
 
     }

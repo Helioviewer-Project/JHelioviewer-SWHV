@@ -15,6 +15,7 @@ import org.helioviewer.swhv.GLSLProgram;
 import com.jogamp.opengl.util.GLBuffers;
 
 public class SolarObject {
+
     private static int MAX_TEXTURES = 10;
     private final float[] vertexData;
     private final int[] vertexBufferObject = new int[1];
