@@ -4,9 +4,13 @@ import java.io.IOException;
 import java.util.HashMap;
 
 import org.clapper.util.misc.FileHashMap;
+import org.clapper.util.misc.ObjectExistsException;
+import org.clapper.util.misc.VersionMismatchException;
+import org.helioviewer.base.logging.Log;
 import org.helioviewer.gl3d.plugin.pfss.data.dataStructure.PfssDayAndTime;
 import org.helioviewer.gl3d.plugin.pfss.data.dataStructure.PfssYear;
 import org.helioviewer.gl3d.plugin.pfss.settings.PfssSettings;
+import org.helioviewer.jhv.JHVDirectory;
 
 /**
  * Datastructur to cache the Pfss-Data with preload function
@@ -27,9 +31,10 @@ public class PfssCache {
      * The private constructor to support the singleton pattern.
      * */
     public PfssCache() {
+        Log.info("Set up Pfss cache in " + JHVDirectory.PLUGINS.getFile().toURI() + "pfsscache");
         try {
-            pfssDatas = new FileHashMap<String, PfssFitsFile>("/Users/freekv/JHelioviewer/Plugins/pfsscache");
-        } catch (IOException e) {
+            pfssDatas = new FileHashMap<String, PfssFitsFile>(JHVDirectory.PLUGINS.getFile().toURI().getPath() + "/pfsscache", FileHashMap.RECLAIM_FILE_GAPS | FileHashMap.TRANSIENT | FileHashMap.FORCE_OVERWRITE);
+        } catch (IOException | ObjectExistsException | ClassNotFoundException | VersionMismatchException e) {
             e.printStackTrace();
         }
         years = new HashMap<Integer, PfssYear>();
@@ -60,7 +65,9 @@ public class PfssCache {
 
     public void preloadData(int year, int month, int dayAndTime) {
         load = true;
-        pfssDatas.clear();
+        if (pfssDatas != null) {
+            pfssDatas.clear();
+        }
         PfssDayAndTime tmp = findData(year, month, dayAndTime);
 
         if (tmp != null) {
@@ -68,8 +75,7 @@ public class PfssCache {
             for (int i = 0; i < PfssSettings.PRELOAD; i++) {
                 //if (tmp != null) {
                 PfssFitsFile tmpFits = new PfssFitsFile();
-                pfssDatas.put(tmp.getUrl(), tmpFits);
-                Thread t = new Thread(new PfssDataLoader(tmp, tmpFits), "PFFSLoader");
+                Thread t = new Thread(new PfssDataLoader(tmp, tmpFits, pfssDatas), "PFFSLoader");
 
                 t.start();
                 tmp = tmp.getNext();
@@ -111,7 +117,7 @@ public class PfssCache {
     }
 
     private void loadFile(PfssDayAndTime dayAndTime, PfssFitsFile fits) {
-        Thread t = new Thread(new PfssDataLoader(dayAndTime, fits), "PFSSLOADER2");
+        Thread t = new Thread(new PfssDataLoader(dayAndTime, fits, pfssDatas), "PFSSLOADER2");
         t.start();
     }
 

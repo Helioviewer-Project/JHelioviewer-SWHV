@@ -75,8 +75,6 @@ public class PfssFitsFile implements Serializable {
         if (data == null && loaded) {
             this.data = new PfssData(gzipFitsFile);
         }
-        if (null != gzipFitsFile)
-            System.out.println(gzipFitsFile.length);
         return new PfssData(gzipFitsFile);
     }
 
