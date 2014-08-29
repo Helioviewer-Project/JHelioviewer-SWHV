@@ -1,20 +1,21 @@
 package org.helioviewer.gl3d.plugin.pfss.data;
 
+import java.io.IOException;
 import java.util.HashMap;
-import java.util.LinkedHashMap;
 
+import org.clapper.util.misc.FileHashMap;
 import org.helioviewer.gl3d.plugin.pfss.data.dataStructure.PfssDayAndTime;
 import org.helioviewer.gl3d.plugin.pfss.data.dataStructure.PfssYear;
 import org.helioviewer.gl3d.plugin.pfss.settings.PfssSettings;
 
 /**
  * Datastructur to cache the Pfss-Data with preload function
- * 
+ *
  * @author Stefan Meier (stefan.meier@fhnw.ch)
  * */
 public class PfssCache {
 
-    private final LinkedHashMap<String, PfssFitsFile> pfssDatas = new LinkedHashMap<String, PfssFitsFile>();
+    private FileHashMap<String, PfssFitsFile> pfssDatas;
     private final HashMap<Integer, PfssYear> years;
     private PfssDayAndTime lastEntry = null;
     private boolean visible = false;
@@ -26,6 +27,11 @@ public class PfssCache {
      * The private constructor to support the singleton pattern.
      * */
     public PfssCache() {
+        try {
+            pfssDatas = new FileHashMap<String, PfssFitsFile>("/Users/freekv/JHelioviewer/Plugins/pfsscache");
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
         years = new HashMap<Integer, PfssYear>();
     }
 
@@ -137,7 +143,7 @@ public class PfssCache {
             String url = "";
             for (String s : pfssDatas.keySet())
                 url = s;
-            pfssDatas.remove(url);
+            //pfssDatas.remove(url);
         }
     }
 

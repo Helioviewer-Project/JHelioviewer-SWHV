@@ -4,6 +4,7 @@ import java.io.BufferedInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.Serializable;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
@@ -13,17 +14,17 @@ import javax.media.opengl.GL2;
 
 /**
  * Class to load the fitsfile with a http-request and store them in a byte[]
- * 
+ *
  * @author Stefan Meier (stefan.meier@fhnw.ch)
  * */
-public class PfssFitsFile {
+public class PfssFitsFile implements Serializable {
     private PfssData data = null;
     private byte[] gzipFitsFile;
     private boolean loaded = false;
 
     /**
      * Function to load the data and write them into a byte[]
-     * 
+     *
      * @param url
      */
     public synchronized void loadFile(String url) {
@@ -67,19 +68,21 @@ public class PfssFitsFile {
     }
 
     /**
-     * 
+     *
      * @return PfssData -> prepared data for the visualization
      */
     public PfssData getData() {
         if (data == null && loaded) {
             this.data = new PfssData(gzipFitsFile);
         }
-        return data;
+        if (null != gzipFitsFile)
+            System.out.println(gzipFitsFile.length);
+        return new PfssData(gzipFitsFile);
     }
 
     /**
      * Function to clear the VBO and the object data
-     * 
+     *
      * @param gl
      */
     public void clear(GL2 gl) {
