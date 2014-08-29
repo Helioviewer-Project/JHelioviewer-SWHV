@@ -84,25 +84,25 @@ public class SWHVMetadataContainer implements GlobalTimeListener {
                         } catch (Exception e) {
                         }
 
-                        double CRPIX1;
+                        double CRPIX1 = 0.;
                         try {
                             String crpixString = jpxView.getJP2Image().getValueFromXML("CRPIX1", "fits", i);
                             CRPIX1 = Double.parseDouble(crpixString);
                         } catch (Exception e) {
                         }
-                        double CRPIX2;
+                        double CRPIX2 = 0.;
                         try {
                             String crpixString = jpxView.getJP2Image().getValueFromXML("CRPIX2", "fits", i);
                             CRPIX2 = Double.parseDouble(crpixString);
                         } catch (Exception e) {
                         }
-                        double CDELT1;
+                        double CDELT1 = 1.;
                         try {
                             String cdeltString = jpxView.getJP2Image().getValueFromXML("CDELT1", "fits", i);
                             CDELT1 = Double.parseDouble(cdeltString);
                         } catch (Exception e) {
                         }
-                        double CDELT2;
+                        double CDELT2 = 1.;
                         try {
                             String cdeltString = jpxView.getJP2Image().getValueFromXML("CDELT2", "fits", i);
                             CDELT2 = Double.parseDouble(cdeltString);
@@ -110,7 +110,7 @@ public class SWHVMetadataContainer implements GlobalTimeListener {
                         }
 
                         SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
-                        SWHVMetadata md = new SWHVMetadata(dateFormat.parse(date), hgltobs, hglnobs, jpxView, i);
+                        SWHVMetadata md = new SWHVMetadata(dateFormat.parse(date), hgltobs, hglnobs, CRPIX1, CRPIX2, CDELT1, CDELT2, jpxView, i);
                         if (md.getDate().getTime() < beginTime) {
                             beginTime = md.getDate().getTime();
                             curTime = beginTime;

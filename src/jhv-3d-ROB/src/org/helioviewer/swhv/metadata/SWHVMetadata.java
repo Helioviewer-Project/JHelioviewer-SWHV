@@ -18,7 +18,7 @@ public class SWHVMetadata implements Comparable {
     private final double widthSolarUnits;
     private final double heightSolarUnits;
 
-    public SWHVMetadata(Date date, double hgltobs, double hglnobs, JHVJPXView view, int frameNumber) {
+    public SWHVMetadata(Date date, double hgltobs, double hglnobs, double crpix1, double crpix2, double cdelt1, double cdelt2, JHVJPXView view, int frameNumber) {
         super();
         this.date = date;
         this.hgltobs = hgltobs;
