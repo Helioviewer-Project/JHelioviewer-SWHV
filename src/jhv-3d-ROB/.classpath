@@ -10,7 +10,7 @@
 	<classpathentry kind="src" path="/basegui"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/jhv-display"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
-	<classpathentry kind="lib" path="/Users/freekv/swhv/git/client/jhv-3d-wcs/lib/kdu_jni.jar"/>
+	<classpathentry kind="lib" path="../lib/kdu_jni.jar"/>
 	<classpathentry kind="src" path="/jhv-3d-math"/>
 	<classpathentry kind="lib" path="../lib/jogl.jar"/>
 	<classpathentry kind="lib" path="../lib/gluegen-rt.jar"/>

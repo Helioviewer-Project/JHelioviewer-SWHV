@@ -17,6 +17,5 @@
 	<classpathentry combineaccessrules="false" kind="src" path="/jhv-display"/>
 	<classpathentry kind="src" path="/basegui"/>
 	<classpathentry kind="lib" path="../lib/jogl.jar"/>
-	<classpathentry kind="lib" path="/Users/freekv/swhv/git/client/jhv-3d-wcs/lib/javautil-3.1.1.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
