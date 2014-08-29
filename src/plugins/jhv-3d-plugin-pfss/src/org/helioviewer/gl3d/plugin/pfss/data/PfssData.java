@@ -3,6 +3,9 @@ package org.helioviewer.gl3d.plugin.pfss.data;
 import java.io.ByteArrayInputStream;
 import java.nio.FloatBuffer;
 import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.GregorianCalendar;
 import java.util.TimeZone;
 
 import javax.media.opengl.GL2;
@@ -12,6 +15,9 @@ import nom.tam.fits.BinaryTableHDU;
 import nom.tam.fits.Fits;
 import nom.tam.fits.Header;
 
+import org.helioviewer.base.physics.Astronomy;
+import org.helioviewer.base.physics.Constants;
+import org.helioviewer.base.physics.DifferentialRotation;
 import org.helioviewer.gl3d.plugin.pfss.settings.PfssSettings;
 
 import com.jogamp.common.nio.Buffers;
@@ -98,8 +104,13 @@ public class PfssData {
             String date = header.findKey("DATE-OBS");
             SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
             dateFormat.setTimeZone(TimeZone.getTimeZone("GMT"));
-
+            Date dd = dateFormat.parse(date.substring(11, 30));
             this.createBuffer(fieldlinex.length);
+            double deltat = dd.getTime() / 1000.0 - Constants.referenceDate;
+            Calendar cal = new GregorianCalendar();
+            cal.setTimeInMillis(dd.getTime());
+            double phi = DifferentialRotation.calculateRotationInRadians(0.0, deltat) % (Math.PI * 2.0) - Math.PI / 2.;
+            double theta = -2 * Astronomy.getB0InRadians(cal);
 
             for (int i = 0; i < fieldlinex.length; i++) {
                 if (i / PfssSettings.POINTS_PER_LINE % 8 <= 8 - PfssSettings.qualityReduction) {
@@ -110,13 +121,15 @@ public class PfssData {
                     x = 3. * (rx * 2. / 65535 - 1.);
                     y = 3. * (ry * 2. / 65535 - 1.);
                     z = 3. * (rz * 2. / 65535 - 1.);
-                    double angle = -Math.PI / 2.;
-                    double helpx = Math.cos(angle) * x + Math.sin(angle) * z;
-                    double helpz = -Math.sin(angle) * x + Math.cos(angle) * z;
+                    double helpx = Math.cos(phi) * x + Math.sin(phi) * y;
+                    double helpy = -Math.sin(phi) * x + Math.cos(phi) * y;
                     x = helpx;
-                    z = helpz;
-                    x = -x;
+                    y = helpy;
 
+                    double helpxx = Math.cos(theta) * x + Math.sin(theta) * z;
+                    double helpzz = -Math.sin(theta) * x + Math.cos(theta) * z;
+                    x = helpxx;
+                    z = helpzz;
                     int col = fieldlines[i] + 32768;
                     double bright = (col * 2. / 65535.) - 1.;
                     if (i % PfssSettings.POINTS_PER_LINE == 0) {
