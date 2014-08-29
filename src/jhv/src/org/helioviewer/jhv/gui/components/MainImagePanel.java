@@ -413,12 +413,15 @@ public class MainImagePanel extends BasicImagePanel {
          */
         @Override
         public void render(ScreenRenderGraphics g) {
+            int wf = GLTextureHelper.getPixelHIFactorWidth();
+            int hf = GLTextureHelper.getPixelHIFactorHeight();
+
             if (image != null) {
-                g.drawImage(image, position.x, position.y);
+                g.drawImage(image, wf * position.x - (radiusPearl - offsetX) * (wf - 1), hf * position.y - (radiusPearl - offsetY) * (hf - 1));
             }
 
-            int centerX = position.x - radiusPearl + offsetX;
-            int centerY = position.y - radiusPearl + offsetY;
+            int centerX = wf * (position.x - radiusPearl + offsetX);
+            int centerY = hf * (position.y - radiusPearl + offsetY);
 
             for (int i = 0; i < numPearls; i++) {
                 g.setColor(pearlColors[i]);
