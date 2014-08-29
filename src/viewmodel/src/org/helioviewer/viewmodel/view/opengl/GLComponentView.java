@@ -18,7 +18,6 @@ import javax.media.opengl.GLCapabilities;
 import javax.media.opengl.GLDrawableFactory;
 import javax.media.opengl.GLEventListener;
 import javax.media.opengl.GLProfile;
-import javax.media.opengl.GLSharedContextSetter;
 import javax.media.opengl.awt.GLCanvas;
 import javax.media.opengl.awt.GLJPanel;
 import javax.media.opengl.glu.GLU;
@@ -58,20 +57,20 @@ import com.jogamp.opengl.util.awt.ImageUtil;
 
 /**
  * Implementation of ComponentView for rendering in OpenGL mode.
- * 
+ *
  * <p>
  * This class starts the tree walk through all the GLViews to draw the final
  * scene. Therefore the class owns a GLCanvas. Note that GLCanvas is a
  * heavyweight component.
- * 
+ *
  * <p>
  * For further information about the use of OpenGL within this application, see
  * {@link GLView}.
- * 
+ *
  * <p>
  * For further information about the role of the ComponentView within the view
  * chain, see {@link org.helioviewer.viewmodel.view.ComponentView}
- * 
+ *
  * @author Markus Langenberg
  */
 public class GLComponentView extends AbstractComponentView implements ViewListener, GLEventListener {
@@ -122,7 +121,7 @@ public class GLComponentView extends AbstractComponentView implements ViewListen
 
     /**
      * Default constructor.
-     * 
+     *
      * Also initializes all OpenGL Helper classes.
      */
     public GLComponentView() {
@@ -139,9 +138,6 @@ public class GLComponentView extends AbstractComponentView implements ViewListen
         this.useOffscreenRendering = useOffscreenRendering;
         GLCapabilities caps = new GLCapabilities(GLProfile.getDefault());
         if (useOffscreenRendering) {
-            // Bad performance but better Swing compatibility. 
-            // For some reason GLCanvas in combination with offscreen framebuffers
-            // screws up the canvas positioning.
             caps.setOnscreen(false);
             GLJPanel glPanel = new GLJPanel(caps);
             canvas = glPanel;
@@ -152,10 +148,11 @@ public class GLComponentView extends AbstractComponentView implements ViewListen
             canvasDrawable = glCanvas;
         }
         canvas.setMinimumSize(new Dimension());
+        canvas.setVisible(true);
 
-        if (GLSharedContext.getSharedContext() != null) {
-            ((GLSharedContextSetter) canvas).setSharedContext(GLSharedContext.getSharedContext());
-        }
+        //if (GLSharedContext.getSharedContext() != null) {
+        //    ((GLSharedContextSetter) canvas).setSharedContext(GLSharedContext.getSharedContext());
+        //}
         canvasDrawable.addGLEventListener(this);
         animator = new FPSAnimator(canvasDrawable, 30);
         animator.start();
@@ -199,14 +196,14 @@ public class GLComponentView extends AbstractComponentView implements ViewListen
 
     /**
      * Save the next rendered frame in a buffered image and return this image.
-     * 
+     *
      * WARNING: The returned image is a reference to the internal buffered image
      * of this class. A subsequent call to this function might change the data
      * of this returned buffered image. If this is not desired, one has to make
      * a copy of the returned image, before calling getBufferedImage() again.
      * This choice was made with the movie export application in mind in order
      * to save main memory.
-     * 
+     *
      * @return BufferedImage of the next rendered frame
      */
     public BufferedImage getBufferedImage() {
@@ -230,7 +227,7 @@ public class GLComponentView extends AbstractComponentView implements ViewListen
 
     /**
      * {@inheritDoc}
-     * 
+     *
      * Since the screenshot is saved after the next rendering cycle, the result
      * is not available directly after calling this function. It only places a
      * request to save the screenshot.
@@ -293,7 +290,7 @@ public class GLComponentView extends AbstractComponentView implements ViewListen
 
     /**
      * {@inheritDoc}
-     * 
+     *
      * In this case, the canvas is repainted.
      */
     @Override
@@ -338,17 +335,17 @@ public class GLComponentView extends AbstractComponentView implements ViewListen
 
     /**
      * Initializes OpenGL2.
-     * 
+     *
      * This function is called when the canvas is visible the first time. It
      * initializes OpenGL by setting some system properties, such as switching
      * on some OpenGL features. Apart from that, the function also calls
      * {@link GLTextureHelper#initHelper(GL)}.
-     * 
+     *
      * <p>
      * Note, that this function should not be called by any user defined
      * function. It is part of the GLEventListener and invoked by the OpenGL
      * thread.
-     * 
+     *
      * @param drawable
      *            GLAutoDrawable passed by the OpenGL thread
      */
@@ -406,15 +403,15 @@ public class GLComponentView extends AbstractComponentView implements ViewListen
 
     /**
      * Reshapes the viewport.
-     * 
+     *
      * This function is called, whenever the canvas is resized. It ensures, that
      * the perspective never gets corrupted.
-     * 
+     *
      * <p>
      * Note, that this function should not be called by any user defined
      * function. It is part of the GLEventListener and invoked by the OpenGL
      * thread.
-     * 
+     *
      * @param drawable
      *            GLAutoDrawable passed by the OpenGL thread
      * @param x
@@ -444,11 +441,11 @@ public class GLComponentView extends AbstractComponentView implements ViewListen
 
     /**
      * This function does the actual rendering of the scene on the screen.
-     * 
+     *
      * This is the most important function of this class, it is responsible for
      * rendering the entire scene to the screen. Therefore, it starts the tree
      * walk. After that, all post renderes are called.
-     * 
+     *
      * @param gl
      *            current GL object
      * @param xOffsetFinal
@@ -504,16 +501,16 @@ public class GLComponentView extends AbstractComponentView implements ViewListen
 
     /**
      * Displays the scene on the screen.
-     * 
+     *
      * This is the most important function of this class, it is responsible for
      * rendering the entire scene to the screen. Therefore, it starts the tree
      * walk. After that, all post renderes are called.
-     * 
+     *
      * <p>
      * Note, that this function should not be called by any user defined
      * function. It is part of the GLEventListener and invoked by the OpenGL
      * thread.
-     * 
+     *
      * @param drawable
      *            GLAutoDrawable passed by the OpenGL thread
      * @see ComponentView#addPostRenderer(ScreenRenderer)
@@ -649,10 +646,10 @@ public class GLComponentView extends AbstractComponentView implements ViewListen
 
     /**
      * Start rebuilding all shaders.
-     * 
+     *
      * This function is called, whenever the shader structure of the whole view
      * chain may have changed, e.g. when new views are added.
-     * 
+     *
      * @param gl
      *            Valid reference to the current gl object
      */
