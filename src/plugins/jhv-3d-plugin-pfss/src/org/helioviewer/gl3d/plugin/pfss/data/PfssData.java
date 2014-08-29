@@ -1,8 +1,16 @@
 package org.helioviewer.gl3d.plugin.pfss.data;
 
+import java.io.ByteArrayInputStream;
 import java.nio.FloatBuffer;
+import java.text.SimpleDateFormat;
+import java.util.TimeZone;
 
 import javax.media.opengl.GL2;
+
+import nom.tam.fits.BasicHDU;
+import nom.tam.fits.BinaryTableHDU;
+import nom.tam.fits.Fits;
+import nom.tam.fits.Header;
 
 import org.helioviewer.gl3d.plugin.pfss.settings.PfssSettings;
 
@@ -10,7 +18,7 @@ import com.jogamp.common.nio.Buffers;
 
 /**
  * Loader of fitsfile & VBO generation & OpenGL visualization
- * 
+ *
  * @author Stefan Meier (stefan.meier@fhnw.ch)
  * */
 public class PfssData {
@@ -69,93 +77,114 @@ public class PfssData {
 
     private void calculatePositions() {
         int counter = 0;
-
-        this.createBuffer(this.gzipFitsFile.length / 8 / (PfssSettings.qualityReduction + 1));
         this.lastQuality = PfssSettings.qualityReduction;
         this.lastFixedColor = PfssSettings.fixedColor;
+
         double x = 0, y = 0, z = 0;
         int type = 0;
+        ByteArrayInputStream is = new ByteArrayInputStream(this.gzipFitsFile);
+        try {
+            Fits fits = new Fits(is, true);
+            BasicHDU hdus[] = fits.read();
+            BinaryTableHDU bhdu = (BinaryTableHDU) hdus[1];
 
-        for (int i = 0; i < this.gzipFitsFile.length / 8; i++) {
-            if (i / 8 / PfssSettings.POINTS_PER_LINE % (PfssSettings.qualityReduction + 1) == PfssSettings.qualityReduction) {
-                int rx = ((this.gzipFitsFile[8 * i + 1] << 8) & 0x0000ff00) | (this.gzipFitsFile[8 * i + 0] & 0x000000ff);
-                int ry = ((this.gzipFitsFile[8 * i + 3] << 8) & 0x0000ff00) | (this.gzipFitsFile[8 * i + 2] & 0x000000ff);
-                int rz = ((this.gzipFitsFile[8 * i + 5] << 8) & 0x0000ff00) | (this.gzipFitsFile[8 * i + 4] & 0x000000ff);
+            short[] fieldlinex = ((short[]) bhdu.getColumn("FIELDLINEx"));
+            short[] fieldliney = ((short[]) bhdu.getColumn("FIELDLINEy"));
+            short[] fieldlinez = ((short[]) bhdu.getColumn("FIELDLINEz"));
+            short[] fieldlines = ((short[]) bhdu.getColumn("FIELDLINEs"));
 
-                x = 3. * (rx * 2. / 65535 - 1.);
-                y = 3. * (ry * 2. / 65535 - 1.);
-                z = 3. * (rz * 2. / 65535 - 1.);
-                double angle = -Math.PI / 2.;
-                double helpx = Math.cos(angle) * x + Math.sin(angle) * z;
-                double helpz = -Math.sin(angle) * x + Math.cos(angle) * z;
-                x = helpx;
-                z = helpz;
-                x = -x;
+            Header header = bhdu.getHeader();
 
-                int col = ((this.gzipFitsFile[8 * i + 7] << 8) & 0x0000ff00) | (this.gzipFitsFile[8 * i + 6] & 0x000000ff);
-                double bright = (col * 2. / 65535.) - 1.;
-                if (i % PfssSettings.POINTS_PER_LINE == 0) {
-                    counter = this.addVertex((float) x, (float) z, (float) -y, counter);
-                    counter = this.addColor(bright, 0.f, counter);
-                    counter = this.addVertex((float) x, (float) z, (float) -y, counter);
-                    if (!PfssSettings.fixedColor) {
-                        counter = this.addColor(bright, 1.f, counter);
-                    } else {
-                        int rox = ((this.gzipFitsFile[8 * (i + PfssSettings.POINTS_PER_LINE - 1) + 1] << 8) & 0x0000ff00) | (this.gzipFitsFile[8 * (i + PfssSettings.POINTS_PER_LINE - 1) + 0] & 0x000000ff);
-                        int roy = ((this.gzipFitsFile[8 * (i + PfssSettings.POINTS_PER_LINE - 1) + 3] << 8) & 0x0000ff00) | (this.gzipFitsFile[8 * (i + PfssSettings.POINTS_PER_LINE - 1) + 2] & 0x000000ff);
-                        int roz = ((this.gzipFitsFile[8 * (i + PfssSettings.POINTS_PER_LINE - 1) + 5] << 8) & 0x0000ff00) | (this.gzipFitsFile[8 * (i + PfssSettings.POINTS_PER_LINE - 1) + 4] & 0x000000ff);
-                        double xo = 3. * (rox * 2. / 65535 - 1.);
-                        double yo = 3. * (roy * 2. / 65535 - 1.);
-                        double zo = 3. * (roz * 2. / 65535 - 1.);
-                        double ro = Math.sqrt(xo * xo + yo * yo + zo * zo);
-                        double r = Math.sqrt(x * x + y * y + z * z);
+            String date = header.findKey("DATE-OBS");
+            SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
+            dateFormat.setTimeZone(TimeZone.getTimeZone("GMT"));
 
-                        if (r < 1.5 && ro < 1.5) {
-                            type = 0;
-                            counter = this.addColor(1.f, 0.f, 1.f, 1.0f, counter);
-                        } else if (bright < 0) {
-                            type = 1;
-                            counter = this.addColor(0.f, 0.f, 1.f, 1.0f, counter);
+            this.createBuffer(fieldlinex.length);
+
+            for (int i = 0; i < fieldlinex.length; i++) {
+                if (i / PfssSettings.POINTS_PER_LINE % 8 <= 8 - PfssSettings.qualityReduction) {
+                    int rx = fieldlinex[i] + 32768;
+                    int ry = fieldliney[i] + 32768;
+                    int rz = fieldlinez[i] + 32768;
+
+                    x = 3. * (rx * 2. / 65535 - 1.);
+                    y = 3. * (ry * 2. / 65535 - 1.);
+                    z = 3. * (rz * 2. / 65535 - 1.);
+                    double angle = -Math.PI / 2.;
+                    double helpx = Math.cos(angle) * x + Math.sin(angle) * z;
+                    double helpz = -Math.sin(angle) * x + Math.cos(angle) * z;
+                    x = helpx;
+                    z = helpz;
+                    x = -x;
+
+                    int col = fieldlines[i] + 32768;
+                    double bright = (col * 2. / 65535.) - 1.;
+                    if (i % PfssSettings.POINTS_PER_LINE == 0) {
+                        counter = this.addVertex((float) x, (float) z, (float) -y, counter);
+                        counter = this.addColor(bright, 0.f, counter);
+                        counter = this.addVertex((float) x, (float) z, (float) -y, counter);
+                        if (!PfssSettings.fixedColor) {
+                            counter = this.addColor(bright, 1.f, counter);
                         } else {
-                            type = 2;
-                            counter = this.addColor(1.f, 0.f, 0.f, 1.0f, counter);
+                            int rox = fieldlinex[i];
+                            int roy = fieldliney[i];
+                            int roz = fieldlinez[i];
+                            double xo = 3. * (rox * 2. / 65535 - 1.);
+                            double yo = 3. * (roy * 2. / 65535 - 1.);
+                            double zo = 3. * (roz * 2. / 65535 - 1.);
+                            double ro = Math.sqrt(xo * xo + yo * yo + zo * zo);
+                            double r = Math.sqrt(x * x + y * y + z * z);
+
+                            if (r < 1.5 && ro < 1.5) {
+                                type = 0;
+                                counter = this.addColor(1.f, 0.f, 1.f, 1.0f, counter);
+                            } else if (bright < 0) {
+                                type = 1;
+                                counter = this.addColor(0.f, 0.f, 1.f, 1.0f, counter);
+                            } else {
+                                type = 2;
+                                counter = this.addColor(1.f, 0.f, 0.f, 1.0f, counter);
+                            }
+
                         }
-
-                    }
-                } else if (i % PfssSettings.POINTS_PER_LINE == PfssSettings.POINTS_PER_LINE - 1) {
-                    counter = this.addVertex((float) x, (float) z, (float) -y, counter);
-                    if (!PfssSettings.fixedColor) {
-                        counter = this.addColor(bright, 1.f, counter);
-                    } else {
-                        if (type == 0) {
-                            counter = this.addColor(1.f, 0.f, 1.f, 1.0f, counter);
-                        } else if (type == 1) {
-                            counter = this.addColor(0.f, 0.f, 1.f, 1.0f, counter);
+                    } else if (i % PfssSettings.POINTS_PER_LINE == PfssSettings.POINTS_PER_LINE - 1) {
+                        counter = this.addVertex((float) x, (float) z, (float) -y, counter);
+                        if (!PfssSettings.fixedColor) {
+                            counter = this.addColor(bright, 1.f, counter);
                         } else {
-                            counter = this.addColor(1.f, 0.f, 0.f, 1.0f, counter);
+                            if (type == 0) {
+                                counter = this.addColor(1.f, 0.f, 1.f, 1.0f, counter);
+                            } else if (type == 1) {
+                                counter = this.addColor(0.f, 0.f, 1.f, 1.0f, counter);
+                            } else {
+                                counter = this.addColor(1.f, 0.f, 0.f, 1.0f, counter);
+                            }
                         }
-                    }
-                    counter = this.addVertex((float) x, (float) z, (float) -y, counter);
+                        counter = this.addVertex((float) x, (float) z, (float) -y, counter);
 
-                    counter = this.addColor(bright, 0.f, counter);
-                } else {
-                    counter = this.addVertex((float) x, (float) z, (float) -y, counter);
-                    if (!PfssSettings.fixedColor) {
-                        counter = this.addColor(bright, 1.f, counter);
+                        counter = this.addColor(bright, 0.f, counter);
                     } else {
-                        if (type == 0) {
-                            counter = this.addColor(1.f, 0.f, 1.f, 1.0f, counter);
-                        } else if (type == 1) {
-                            counter = this.addColor(0.f, 0.f, 1.f, 1.0f, counter);
+                        counter = this.addVertex((float) x, (float) z, (float) -y, counter);
+                        if (!PfssSettings.fixedColor) {
+                            counter = this.addColor(bright, 1.f, counter);
                         } else {
-                            counter = this.addColor(1.f, 0.f, 0.f, 1.0f, counter);
+                            if (type == 0) {
+                                counter = this.addColor(1.f, 0.f, 1.f, 1.0f, counter);
+                            } else if (type == 1) {
+                                counter = this.addColor(0.f, 0.f, 1.f, 1.0f, counter);
+                            } else {
+                                counter = this.addColor(1.f, 0.f, 0.f, 1.0f, counter);
+                            }
                         }
                     }
                 }
             }
+            vertices.flip();
+            read = true;
+        } catch (Exception e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
         }
-        vertices.flip();
-        read = true;
     }
 
     public void init(GL2 gl) {
