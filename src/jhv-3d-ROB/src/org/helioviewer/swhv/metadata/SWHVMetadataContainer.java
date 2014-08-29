@@ -35,7 +35,6 @@ public class SWHVMetadataContainer implements GlobalTimeListener {
         String buildUid = null;
         try {
             buildUid = jpxView.getJP2Image().getValueFromXML("INSTRUME", "fits", 1);
-
             buildUid += jpxView.getJP2Image().getValueFromXML("TELESCOP", "fits", 1);
             buildUid += jpxView.getJP2Image().getValueFromXML("DETECTOR", "fits", 1);
             buildUid += jpxView.getJP2Image().getValueFromXML("WAVELNTH", "fits", 1);
@@ -50,8 +49,65 @@ public class SWHVMetadataContainer implements GlobalTimeListener {
                 try {
                     for (int i = 1; i <= jpxView.getMaximumFrameNumber(); i++) {
                         String date = jpxView.getJP2Image().getValueFromXML("DATE-OBS", "fits", i);
-                        double hgltobs = 0.;//Double.parseDouble(jpxView.getJP2Image().getValueFromXML("HGLT_OBS", "fits", i));
-                        double hglnobs = 0.;//Double.parseDouble(jpxView.getJP2Image().getValueFromXML("HGLN_OBS", "fits", i));
+
+                        double hgltobs = 0.;
+                        try {
+                            String hgltobsString = jpxView.getJP2Image().getValueFromXML("CRLT_OBS", "fits", i);
+                            if (hgltobsString == null) {
+                                hgltobsString = jpxView.getJP2Image().getValueFromXML("HGLT_OBS", "fits", i);
+                            }
+                            if (hgltobsString == null) {
+                                hgltobsString = jpxView.getJP2Image().getValueFromXML("HGLT-OBS", "fits", i);
+                            }
+                            hgltobs = Double.parseDouble(hgltobsString);
+                        } catch (Exception e) {
+                        }
+                        double hglnobs = 0.;
+                        try {
+                            String hglnobsString = jpxView.getJP2Image().getValueFromXML("CRLN_OBS", "fits", i);
+                            if (hglnobsString == null) {
+                                hglnobsString = jpxView.getJP2Image().getValueFromXML("HGLN_OBS", "fits", i);
+                            }
+                            if (hglnobsString == null) {
+                                hglnobsString = jpxView.getJP2Image().getValueFromXML("HGLN-OBS", "fits", i);
+                            }
+                            hgltobs = Double.parseDouble(hglnobsString);
+                        } catch (Exception e) {
+                        }
+                        double dsun;
+                        try {
+                            String dsunString = jpxView.getJP2Image().getValueFromXML("DSUN_OBS", "fits", i);
+                            if (dsunString == null) {
+                                dsunString = jpxView.getJP2Image().getValueFromXML("DSUN", "fits", i);
+                            }
+                            dsun = Double.parseDouble(dsunString);
+                        } catch (Exception e) {
+                        }
+
+                        double CRPIX1;
+                        try {
+                            String crpixString = jpxView.getJP2Image().getValueFromXML("CRPIX1", "fits", i);
+                            CRPIX1 = Double.parseDouble(crpixString);
+                        } catch (Exception e) {
+                        }
+                        double CRPIX2;
+                        try {
+                            String crpixString = jpxView.getJP2Image().getValueFromXML("CRPIX2", "fits", i);
+                            CRPIX2 = Double.parseDouble(crpixString);
+                        } catch (Exception e) {
+                        }
+                        double CDELT1;
+                        try {
+                            String cdeltString = jpxView.getJP2Image().getValueFromXML("CDELT1", "fits", i);
+                            CDELT1 = Double.parseDouble(cdeltString);
+                        } catch (Exception e) {
+                        }
+                        double CDELT2;
+                        try {
+                            String cdeltString = jpxView.getJP2Image().getValueFromXML("CDELT2", "fits", i);
+                            CDELT2 = Double.parseDouble(cdeltString);
+                        } catch (Exception e) {
+                        }
 
                         SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
                         SWHVMetadata md = new SWHVMetadata(dateFormat.parse(date), hgltobs, hglnobs, jpxView, i);

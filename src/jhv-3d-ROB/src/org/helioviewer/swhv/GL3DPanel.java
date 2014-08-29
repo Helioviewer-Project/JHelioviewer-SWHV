@@ -1,11 +1,7 @@
 package org.helioviewer.swhv;
 
 import java.awt.Component;
-import java.awt.image.BufferedImage;
-import java.io.File;
-import java.io.IOException;
 
-import javax.imageio.ImageIO;
 import javax.media.opengl.GL3;
 import javax.media.opengl.GLAutoDrawable;
 import javax.media.opengl.GLCapabilities;
@@ -16,11 +12,8 @@ import javax.media.opengl.awt.GLCanvas;
 import org.helioviewer.gl3d.scenegraph.math.GL3DMat4f;
 import org.helioviewer.gl3d.scenegraph.math.GL3DVec3f;
 import org.helioviewer.swhv.objects3d.Cube;
-import org.helioviewer.swhv.objects3d.Solar3DObject;
 import org.helioviewer.swhv.objects3d.SolarObject;
 import org.helioviewer.swhv.time.GlobalTimeListener;
-
-import com.jogamp.opengl.util.awt.AWTGLReadBufferUtil;
 
 public class GL3DPanel implements GLEventListener, GlobalTimeListener {
 
@@ -28,7 +21,6 @@ public class GL3DPanel implements GLEventListener, GlobalTimeListener {
     private GLCanvas canvas;
     private Trackball tb;
     private Cube cube;
-    private Solar3DObject s3d;
     public static final SolarObject sun = new SolarObject();
 
     public GL3DPanel() {
@@ -42,7 +34,7 @@ public class GL3DPanel implements GLEventListener, GlobalTimeListener {
         canvas = new GLCanvas(capabilities);
         canvas.addGLEventListener(this);
         tb = new Trackball();
-        tb.trackballReshape(canvas.getWidth(), canvas.getHeight());
+        tb.trackballReshape(canvas.getWidth() / 4, canvas.getHeight() / 4);
         tb.trackballInit(0);
 
         this.canvas.addMouseMotionListener(tb);
@@ -52,6 +44,7 @@ public class GL3DPanel implements GLEventListener, GlobalTimeListener {
     }
 
     static int count = 0;
+    GL3DMat4f localmat = GL3DMat4f.identity();
 
     @Override
     public void display(GLAutoDrawable glad) {
@@ -61,18 +54,13 @@ public class GL3DPanel implements GLEventListener, GlobalTimeListener {
         gl.glClear(GL3.GL_COLOR_BUFFER_BIT);
         GL3DMat4f vv = new GL3DMat4f(tb.trackballMatrix());
         GL3DMat4f mat = this.camera.getViewProjectionMatrix(gl);
+        GL3DMat4f localmatinverse = localmat.inverse();
+        mat.multiply(localmatinverse);
+        localmat = vv.multiply(localmat);
         mat.multiply(vv);
         this.cube.render(gl, mat.m);
         this.sun.render(gl, mat.m);
         glad.swapBuffers();
-        AWTGLReadBufferUtil glReadBufferUtil = new AWTGLReadBufferUtil(glad.getGLProfile(), false);
-        BufferedImage image = glReadBufferUtil.readPixelsToBufferedImage(glad.getGL(), true);
-        try {
-            ImageIO.write(image, "png", new File("/Users/freekv/pngs/test" + count + ".png"));
-            count++;
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
     }
 
     @Override
@@ -92,13 +80,12 @@ public class GL3DPanel implements GLEventListener, GlobalTimeListener {
         this.cube = new Cube();
         this.cube.initializeObject(gl);
         this.sun.initializeObject(gl);
-
     }
 
     @Override
     public void reshape(GLAutoDrawable drawable, int x, int y, int width, int height) {
         GL3 gl = drawable.getGL().getGL3();
-        tb.trackballReshape(width, height);
+        tb.trackballReshape(width / 4, height / 4);
         gl.glViewport(x, y, width, height);
         this.getCamera().reshape(width, height);
     }

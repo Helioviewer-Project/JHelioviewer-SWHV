@@ -12,8 +12,8 @@ public class Trackball extends MouseAdapter implements MouseMotionListener {
 
     public final static float TRACKBALLSIZE = 1f;
 
-    Quaternion curquat = new Quaternion();
-    Quaternion lastquat = new Quaternion();
+    QuaternionExtension curquat = new QuaternionExtension();
+    QuaternionExtension lastquat = new QuaternionExtension();
     int beginx, beginy;
 
     int trackball_width;
@@ -41,7 +41,7 @@ public class Trackball extends MouseAdapter implements MouseMotionListener {
     @Override
     public void mouseDragged(MouseEvent e) {
         if (trackball_tracking) {
-            trackball(lastquat, (2.0f * beginx - trackball_width) / trackball_width, (trackball_height - 2.0f * beginy) / trackball_height, (2.0f * e.getX() - trackball_width) / trackball_width, (trackball_height - 2.0f * e.getY()) / trackball_height);
+            trackball(lastquat, (2.0f * beginx - trackball_width) / trackball_width / 2, (trackball_height - 2.0f * beginy) / trackball_height / 2, (2.0f * e.getX() - trackball_width) / trackball_width/2, (trackball_height - 2.0f * e.getY()) / trackball_height/2);
             beginx = e.getX();
             beginy = e.getY();
             this.curquat.mult(this.lastquat);
@@ -64,17 +64,15 @@ public class Trackball extends MouseAdapter implements MouseMotionListener {
 
     @Override
     public void mousePressed(MouseEvent e) {
-        System.out.println("pressed");
         trackballStartMotion(e.getX(), e.getY());
     }
 
     @Override
     public void mouseReleased(MouseEvent e) {
-        System.out.println("released");
         trackballStopMotion();
     }
 
-    void trackball(Quaternion q, float p1x, float p1y, float p2x, float p2y) {
+    void trackball(QuaternionExtension q, float p1x, float p1y, float p2x, float p2y) {
         Vector3f a;
         float phi;
         Vector3f p1, p2, d;
@@ -105,7 +103,7 @@ public class Trackball extends MouseAdapter implements MouseMotionListener {
         fl[0] = a.x;
         fl[1] = a.y;
         fl[2] = a.z;
-        //q.fromAxis(fl, phi);
+        q.fromAxis(fl, phi);
     }
 
     private static float trackball_project_to_sphere(float r, float x, float y) {

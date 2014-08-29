@@ -68,8 +68,6 @@ public class JPXViewWatcher implements ViewListener {
     }
 
     public void setJPXView(File file) {
-        String startTime = "2014-02-25T00:00:00.000Z";
-        String endTime = "2014-02-25T12:00:00.000Z";
         ImageInfoView view;
         try {
             view = APIRequestManager.newLoad(file.toURI(), true, null);
