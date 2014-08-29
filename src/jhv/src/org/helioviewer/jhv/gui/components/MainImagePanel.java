@@ -24,11 +24,12 @@ import org.helioviewer.viewmodel.view.ComponentView;
 import org.helioviewer.viewmodel.view.LayeredView;
 import org.helioviewer.viewmodel.view.View;
 import org.helioviewer.viewmodel.view.ViewHelper;
+import org.helioviewer.viewmodel.view.opengl.GLTextureHelper;
 
 /**
  * This class represents an image component that is used to display the image of
  * all images.
- * 
+ *
  * @author caplins
  * @author Alen Agheksanterian
  * @author Benjamin Wamsler
@@ -74,10 +75,10 @@ public class MainImagePanel extends BasicImagePanel {
 
     /**
      * Shows the image loading animation.
-     * 
+     *
      * Manages a counter, so that the animation appears on the first loading
      * process and disappears on the last.
-     * 
+     *
      * @param isLoading
      *            true to start animation, false to stop
      */
@@ -169,7 +170,7 @@ public class MainImagePanel extends BasicImagePanel {
 
     /**
      * {@inheritDoc}
-     * 
+     *
      * Adds and removes a post renderer which displays the no image loaded sign
      * when there is no image available.
      */
@@ -204,7 +205,7 @@ public class MainImagePanel extends BasicImagePanel {
 
     /**
      * {@inheritDoc}
-     * 
+     *
      * Centers the no image loaded image when component was resized.
      */
 
@@ -225,7 +226,7 @@ public class MainImagePanel extends BasicImagePanel {
     /**
      * A post renderer which displays an image which shows that no image (layer)
      * is loaded.
-     * 
+     *
      * @author Stephan Pagel
      * */
     private class NoImagePostRenderer implements ScreenRenderer {
@@ -246,7 +247,7 @@ public class MainImagePanel extends BasicImagePanel {
 
         /**
          * Sets the size of the available image area (viewport).
-         * 
+         *
          * @param width
          *            width of the available space of the image.
          * @param height
@@ -258,27 +259,27 @@ public class MainImagePanel extends BasicImagePanel {
 
         /**
          * {@inheritDoc}
-         * 
+         *
          * Draws the no image loaded image.
          */
         @Override
         public void render(ScreenRenderGraphics g) {
             if (image != null) {
-                g.drawImage(image, (size.width - image.getWidth()) / 2, (size.height - image.getHeight()) / 2);
+                g.drawImage(image, (GLTextureHelper.getPixelHIFactorWidth() * size.width - image.getWidth()) / 2, (GLTextureHelper.getPixelHIFactorHeight() * size.height - image.getHeight()) / 2);
             }
         }
     }
 
     /**
      * A post renderer which indicates that something is being loaded right now.
-     * 
+     *
      * @author Markus Langenberg
      */
     private interface LoadingPostRenderer extends ScreenRenderer {
 
         /**
          * Sets the size of the available image area (viewport).
-         * 
+         *
          * @param width
          *            width of the available space of the image.
          * @param height
@@ -298,7 +299,7 @@ public class MainImagePanel extends BasicImagePanel {
 
         /**
          * Returns, whether the animation is running.
-         * 
+         *
          * @return True, if the animation is running, false otherwise
          */
         public boolean isAnimating();
@@ -306,10 +307,10 @@ public class MainImagePanel extends BasicImagePanel {
 
     /**
      * Base implementation of LoadingPostRenderer.
-     * 
+     *
      * This implementation is abstract and does not specify some specific
      * appearance parameters.
-     * 
+     *
      * @author Markus Langenberg
      */
     private abstract class BaseLoadingPostRenderer implements LoadingPostRenderer {
@@ -407,7 +408,7 @@ public class MainImagePanel extends BasicImagePanel {
 
         /**
          * {@inheritDoc}
-         * 
+         *
          * Draws the loading image and its animation.
          */
         @Override
@@ -429,7 +430,7 @@ public class MainImagePanel extends BasicImagePanel {
     /**
      * Extension of BaseLoadingPostRenderer for drawing a big animation in the
      * middle of the screen.
-     * 
+     *
      * @author Markus Langenberg
      */
     private class CenterLoadingPostRenderer extends BaseLoadingPostRenderer {
@@ -453,7 +454,7 @@ public class MainImagePanel extends BasicImagePanel {
     /**
      * Extension of BaseLoadingPostRenderer for drawing a small animation in the
      * top right corner of the screen.
-     * 
+     *
      * @author Markus Langenberg
      */
     private class CornerLoadingPostRenderer extends BaseLoadingPostRenderer {
@@ -478,12 +479,12 @@ public class MainImagePanel extends BasicImagePanel {
     /**
      * Implementation of LoadingPostRenderer for switching between multiple
      * other implementations.
-     * 
+     *
      * This class owns a CenterLoadingPostRenderer and a
      * CornerLoadingPostRenderer. All calls to this class a redirected to one of
      * them. When no image is loaded, the center version is used, otherwise the
      * corner version.
-     * 
+     *
      * @author Markus Langenberg
      */
     private class LoadingPostRendererSwitch implements LoadingPostRenderer {
@@ -537,7 +538,7 @@ public class MainImagePanel extends BasicImagePanel {
         /**
          * Switches between the use of the center renderer or the corner
          * renderer.
-         * 
+         *
          * @param use
          *            If true, the center renderer ist used, otherwise, the
          *            corner renderer is used
