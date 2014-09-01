@@ -463,6 +463,8 @@ public class SWEKConfigurationManager {
         eventType.setRequestIntervalExtension(parseRequestIntervalExtension(object));
         eventType.setStandardSelected(parseStandardSelected(object));
         eventType.setGroupOn(parseGroupOn(object));
+        eventType.setCoordinateSystem(parseCoordinateSystem(object));
+        eventType.setSpatialRegion(parseSpatialRegion(object));
         return eventType;
     }
 
@@ -729,6 +731,89 @@ public class SWEKConfigurationManager {
      */
     private SWEKParameter parseGroupOn(JSONObject object) throws JSONException {
         return this.parameters.get(object.getString("group_on"));
+    }
+
+    /**
+     * Parses the "coordinate_system" from the json.
+     * 
+     * @param object
+     *            the json from which to parse the "coordinate_system"
+     * @return the coordinate system
+     * @throws JSONException
+     *             if the "coordinate_system" could not be parsed from the json
+     */
+    private String parseCoordinateSystem(JSONObject object) throws JSONException {
+        return object.getString("coordinate_system");
+    }
+
+    /**
+     * Parses the "spacial_region" from the json.
+     * 
+     * @param object
+     *            the object from which to parse the "spatial_region"
+     * @return the spatial region
+     * @throws JSONException
+     *             if the "spatial_region" could not be parsed from the json
+     */
+    private SWEKSpatialRegion parseSpatialRegion(JSONObject object) throws JSONException {
+        SWEKSpatialRegion spacialRegion = new SWEKSpatialRegion();
+        spacialRegion.setX1(parseX1(object.getJSONObject("spatial_region")));
+        spacialRegion.setY1(parseY1(object.getJSONObject("spatial_region")));
+        spacialRegion.setX2(parseX2(object.getJSONObject("spatial_region")));
+        spacialRegion.setY2(parseY2(object.getJSONObject("spatial_region")));
+        return spacialRegion;
+    }
+
+    /**
+     * Parses the x1 coordinate of the spatial region from the json.
+     * 
+     * @param jsonObject
+     *            the object from which to parse the x1-coordinate
+     * @return the x1 coordinate
+     * @throws JSONException
+     *             if the x1 coordinate could not be parsed from the json
+     */
+    private int parseX1(JSONObject jsonObject) throws JSONException {
+        return jsonObject.getInt("x1");
+    }
+
+    /**
+     * Parses the y1 coordinate of the spatial region from the json.
+     * 
+     * @param jsonObject
+     *            the object from which to parse the y1-coordinate
+     * @return the y1 coordinate
+     * @throws JSONException
+     *             if the y1 coordinate could not be parsed from the json
+     */
+    private int parseY1(JSONObject jsonObject) throws JSONException {
+        return jsonObject.getInt("y1");
+    }
+
+    /**
+     * Parses the x2 coordinate of the spatial region from the json.
+     * 
+     * @param jsonObject
+     *            the object from which to parse the x2-coordinate
+     * @return the x2 coordinate
+     * @throws JSONException
+     *             if the x2 coordinate could not be parsed
+     */
+    private int parseX2(JSONObject jsonObject) throws JSONException {
+        return jsonObject.getInt("x2");
+    }
+
+    /**
+     * Parses the y2 coordinate of the spatial region from the json.
+     * 
+     * @param jsonObject
+     *            the object from which to parse the y2 coordinate
+     * @return the y2 coordinate
+     * @throws JSONException
+     *             if the y2 coordinate could not be parsed
+     */
+    private int parseY2(JSONObject jsonObject) throws JSONException {
+        return jsonObject.getInt("y2");
     }
 
     /**
