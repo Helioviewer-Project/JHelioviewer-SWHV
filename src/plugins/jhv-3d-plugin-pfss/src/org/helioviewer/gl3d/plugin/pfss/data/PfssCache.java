@@ -3,11 +3,6 @@ package org.helioviewer.gl3d.plugin.pfss.data;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 
-<<<<<<< HEAD
-=======
-import org.clapper.util.misc.FileHashMap;
-import org.helioviewer.base.logging.Log;
->>>>>>> remove multi catch
 import org.helioviewer.gl3d.plugin.pfss.data.dataStructure.PfssDayAndTime;
 import org.helioviewer.gl3d.plugin.pfss.data.dataStructure.PfssYear;
 import org.helioviewer.gl3d.plugin.pfss.settings.PfssSettings;
@@ -31,18 +26,7 @@ public class PfssCache {
      * The private constructor to support the singleton pattern.
      * */
     public PfssCache() {
-<<<<<<< HEAD
         years = new HashMap<Integer, PfssYear>();
-=======
-        Log.info("Set up Pfss cache in " + JHVDirectory.PLUGINS.getFile().toURI() + "pfsscache");
-        try {
-            this.pfssDatas = new FileHashMap<String, PfssFitsFile>(JHVDirectory.PLUGINS.getFile().toURI().getPath() + "/pfsscache",
-                    FileHashMap.RECLAIM_FILE_GAPS | FileHashMap.TRANSIENT | FileHashMap.FORCE_OVERWRITE);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        this.years = new HashMap<Integer, PfssYear>();
->>>>>>> remove multi catch
     }
 
     public void addData(int year, int month, int dayAndTime, String url) {
@@ -72,15 +56,8 @@ public class PfssCache {
     }
 
     public void preloadData(int year, int month, int dayAndTime) {
-<<<<<<< HEAD
         load = true;
         pfssDatas.clear();
-=======
-        this.load = true;
-        if (this.pfssDatas != null) {
-            this.pfssDatas.clear();
-        }
->>>>>>> remove multi catch
         PfssDayAndTime tmp = findData(year, month, dayAndTime);
 
         if (tmp != null) {
@@ -88,12 +65,9 @@ public class PfssCache {
             for (int i = 0; i < PfssSettings.PRELOAD; i++) {
                 // if (tmp != null) {
                 PfssFitsFile tmpFits = new PfssFitsFile();
-<<<<<<< HEAD
                 pfssDatas.put(tmp.getUrl(), tmpFits);
                 Thread t = new Thread(new PfssDataLoader(tmp, tmpFits), "PFFSLoader");
-=======
-                Thread t = new Thread(new PfssDataLoader(tmp, tmpFits, this.pfssDatas), "PFFSLoader");
->>>>>>> remove multi catch
+
 
                 t.start();
                 tmp = tmp.getNext();
@@ -135,11 +109,7 @@ public class PfssCache {
     }
 
     private void loadFile(PfssDayAndTime dayAndTime, PfssFitsFile fits) {
-<<<<<<< HEAD
         Thread t = new Thread(new PfssDataLoader(dayAndTime, fits), "PFSSLOADER2");
-=======
-        Thread t = new Thread(new PfssDataLoader(dayAndTime, fits, this.pfssDatas), "PFSSLOADER2");
->>>>>>> remove multi catch
         t.start();
     }
 
@@ -168,17 +138,11 @@ public class PfssCache {
     }
 
     private void checkList() {
-<<<<<<< HEAD
         if (pfssDatas.size() > PfssSettings.CACHE_SIZE) {
             String url = "";
             for (String s : pfssDatas.keySet())
                 url = s;
             pfssDatas.remove(url);
-=======
-        if (this.pfssDatas.size() > PfssSettings.CACHE_SIZE) {
-            for (String s : this.pfssDatas.keySet()) {
-            }
->>>>>>> remove multi catch
         }
     }
 
