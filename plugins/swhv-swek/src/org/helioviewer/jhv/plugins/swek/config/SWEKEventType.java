@@ -34,7 +34,8 @@ public class SWEKEventType {
     /** The coordinate system */
     private String coordinateSystem;
 
-    private SWEKSpatialRegion spacialRegion;
+    /** The spatial region over which the event can be found */
+    private SWEKSpatialRegion spatialRegion;
 
     /**
      * Create a SWEKEvenType with an empty name, suppliers list, parameter list,
@@ -49,6 +50,7 @@ public class SWEKEventType {
         this.standardSelected = false;
         this.groupOn = null;
         this.coordinateSystem = "";
+        this.spatialRegion = new SWEKSpatialRegion();
     }
 
     /**
@@ -216,6 +218,25 @@ public class SWEKEventType {
      */
     public void setCoordinateSystem(String coordinateSystem) {
         this.coordinateSystem = coordinateSystem;
+    }
+
+    /**
+     * Gets the spatial region for this event type.
+     * 
+     * @return The spatial region
+     */
+    public SWEKSpatialRegion getSpatialRegion() {
+        return this.spatialRegion;
+    }
+
+    /**
+     * Sets the spatial region for this event.
+     * 
+     * @param spatialRegion
+     *            The spatial region
+     */
+    public void setSpatialRegion(SWEKSpatialRegion spatialRegion) {
+        this.spatialRegion = spatialRegion;
     }
 
 }
