@@ -24,7 +24,7 @@ import org.helioviewer.viewmodel.view.opengl.shader.GLShaderBuilder;
 
 /**
  * Filter applying running difference to some movie
- * 
+ *
  * @author Helge Dietert
  */
 public class RunningDifferenceFilter implements FrameFilter, StandardFilter, ObservableFilter, GLFragmentShaderFilter {
@@ -112,7 +112,6 @@ public class RunningDifferenceFilter implements FrameFilter, StandardFilter, Obs
                 return new SingleChannelByte8ImageData(data.getWidth(), data.getHeight(), pixelData, colorMask);
             }
         }
-        System.out.println("No other frame available");
         return data;
     }
 
