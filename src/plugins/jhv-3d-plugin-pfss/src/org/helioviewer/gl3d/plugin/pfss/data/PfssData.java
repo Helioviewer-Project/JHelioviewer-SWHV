@@ -15,7 +15,6 @@ import nom.tam.fits.BinaryTableHDU;
 import nom.tam.fits.Fits;
 import nom.tam.fits.Header;
 
-import org.helioviewer.base.physics.Astronomy;
 import org.helioviewer.base.physics.Constants;
 import org.helioviewer.base.physics.DifferentialRotation;
 import org.helioviewer.gl3d.plugin.pfss.settings.PfssSettings;
@@ -103,14 +102,14 @@ public class PfssData {
 
             String date = header.findKey("DATE-OBS");
             SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
-            dateFormat.setTimeZone(TimeZone.getTimeZone("GMT"));
             Date dd = dateFormat.parse(date.substring(11, 30));
+            dateFormat.setTimeZone(TimeZone.getTimeZone("GMT-2:00"));
+
             this.createBuffer(fieldlinex.length);
             double deltat = dd.getTime() / 1000.0 - Constants.referenceDate;
             Calendar cal = new GregorianCalendar();
             cal.setTimeInMillis(dd.getTime());
             double phi = DifferentialRotation.calculateRotationInRadians(0.0, deltat) % (Math.PI * 2.0) - Math.PI / 2.;
-            double theta = -2 * Astronomy.getB0InRadians(cal);
 
             for (int i = 0; i < fieldlinex.length; i++) {
                 if (i / PfssSettings.POINTS_PER_LINE % 8 <= 8 - PfssSettings.qualityReduction) {
@@ -121,15 +120,12 @@ public class PfssData {
                     x = 3. * (rx * 2. / 65535 - 1.);
                     y = 3. * (ry * 2. / 65535 - 1.);
                     z = 3. * (rz * 2. / 65535 - 1.);
+
                     double helpx = Math.cos(phi) * x + Math.sin(phi) * y;
                     double helpy = -Math.sin(phi) * x + Math.cos(phi) * y;
                     x = helpx;
                     y = helpy;
 
-                    double helpxx = Math.cos(theta) * x + Math.sin(theta) * z;
-                    double helpzz = -Math.sin(theta) * x + Math.cos(theta) * z;
-                    x = helpxx;
-                    z = helpzz;
                     int col = fieldlines[i] + 32768;
                     double bright = (col * 2. / 65535.) - 1.;
                     if (i % PfssSettings.POINTS_PER_LINE == 0) {
@@ -139,9 +135,9 @@ public class PfssData {
                         if (!PfssSettings.fixedColor) {
                             counter = this.addColor(bright, 1.f, counter);
                         } else {
-                            int rox = fieldlinex[i];
-                            int roy = fieldliney[i];
-                            int roz = fieldlinez[i];
+                            int rox = fieldlinex[i] + 32768;
+                            int roy = fieldliney[i] + 32768;
+                            int roz = fieldlinez[i] + 32768;
                             double xo = 3. * (rox * 2. / 65535 - 1.);
                             double yo = 3. * (roy * 2. / 65535 - 1.);
                             double zo = 3. * (roz * 2. / 65535 - 1.);
@@ -150,13 +146,13 @@ public class PfssData {
 
                             if (r < 1.5 && ro < 1.5) {
                                 type = 0;
-                                counter = this.addColor(1.f, 0.f, 1.f, 1.0f, counter);
+                                counter = this.addColor(1.f, 1.f, 1.f, 1.0f, counter);
                             } else if (bright < 0) {
                                 type = 1;
-                                counter = this.addColor(0.f, 0.f, 1.f, 1.0f, counter);
+                                counter = this.addColor(1.f, 0.f, 0.f, 1.0f, counter);
                             } else {
                                 type = 2;
-                                counter = this.addColor(1.f, 0.f, 0.f, 1.0f, counter);
+                                counter = this.addColor(1.f, 0.f, 1.f, 1.0f, counter);
                             }
 
                         }
@@ -166,11 +162,11 @@ public class PfssData {
                             counter = this.addColor(bright, 1.f, counter);
                         } else {
                             if (type == 0) {
-                                counter = this.addColor(1.f, 0.f, 1.f, 1.0f, counter);
+                                counter = this.addColor(1.f, 1.f, 1.f, 1.0f, counter);
                             } else if (type == 1) {
-                                counter = this.addColor(0.f, 0.f, 1.f, 1.0f, counter);
-                            } else {
                                 counter = this.addColor(1.f, 0.f, 0.f, 1.0f, counter);
+                            } else {
+                                counter = this.addColor(1.f, 0.f, 1.f, 1.0f, counter);
                             }
                         }
                         counter = this.addVertex((float) x, (float) z, (float) -y, counter);
@@ -182,11 +178,11 @@ public class PfssData {
                             counter = this.addColor(bright, 1.f, counter);
                         } else {
                             if (type == 0) {
-                                counter = this.addColor(1.f, 0.f, 1.f, 1.0f, counter);
+                                counter = this.addColor(1.f, 1.f, 1.f, 1.0f, counter);
                             } else if (type == 1) {
-                                counter = this.addColor(0.f, 0.f, 1.f, 1.0f, counter);
-                            } else {
                                 counter = this.addColor(1.f, 0.f, 0.f, 1.0f, counter);
+                            } else {
+                                counter = this.addColor(1.f, 0.f, 1.f, 1.0f, counter);
                             }
                         }
                     }
@@ -195,7 +191,6 @@ public class PfssData {
             vertices.flip();
             read = true;
         } catch (Exception e) {
-            // TODO Auto-generated catch block
             e.printStackTrace();
         }
     }

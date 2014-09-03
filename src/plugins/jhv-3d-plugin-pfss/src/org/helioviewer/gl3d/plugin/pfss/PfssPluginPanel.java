@@ -114,7 +114,7 @@ public class PfssPluginPanel extends OverlayPanel implements ActionListener, Lay
         WheelSupport.installMouseWheelSupport(qualitySpinner);
 
         JPanel helpPanel = new JPanel();
-        helpPanel.add(new JLabel("Quality:"));
+        helpPanel.add(new JLabel("Level:"));
         helpPanel.add(qualitySpinner);
         this.add(helpPanel, c0);
 

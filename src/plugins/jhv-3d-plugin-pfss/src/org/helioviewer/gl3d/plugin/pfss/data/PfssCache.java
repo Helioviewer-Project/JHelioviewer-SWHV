@@ -9,7 +9,7 @@ import org.helioviewer.gl3d.plugin.pfss.settings.PfssSettings;
 
 /**
  * Datastructur to cache the Pfss-Data with preload function
- * 
+ *
  * @author Stefan Meier (stefan.meier@fhnw.ch)
  * */
 public class PfssCache {
@@ -63,14 +63,15 @@ public class PfssCache {
         if (tmp != null) {
             this.lastURL = tmp.getUrl();
             for (int i = 0; i < PfssSettings.PRELOAD; i++) {
-                // if (tmp != null) {
-                PfssFitsFile tmpFits = new PfssFitsFile();
-                pfssDatas.put(tmp.getUrl(), tmpFits);
-                Thread t = new Thread(new PfssDataLoader(tmp, tmpFits), "PFFSLoader");
+                if (tmp != null) {
+                    PfssFitsFile tmpFits = new PfssFitsFile();
 
+                    pfssDatas.put(tmp.getUrl(), tmpFits);
+                    Thread t = new Thread(new PfssDataLoader(tmp, tmpFits), "PFFSLoader");
 
-                t.start();
-                tmp = tmp.getNext();
+                    t.start();
+                    tmp = tmp.getNext();
+                }
             }
         }
 

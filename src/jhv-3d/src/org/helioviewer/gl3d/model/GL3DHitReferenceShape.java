@@ -33,9 +33,9 @@ import org.helioviewer.viewmodel.view.ViewListener;
  * node offers a mathematically simpler representation for faster hit point
  * detection when used for determining the region of interest on the image
  * meshes.
- * 
+ *
  * @author Simon Spoerri (simon.spoerri@fhnw.ch)
- * 
+ *
  */
 public class GL3DHitReferenceShape extends GL3DMesh implements ViewListener {
     private static final double extremeValue = 4000000.;
@@ -209,7 +209,7 @@ public class GL3DHitReferenceShape extends GL3DMesh implements ViewListener {
         this.currentRotation = DifferentialRotation.calculateRotationInRadians(0., this.timediff) % (Math.PI * 2.0);
         Calendar cal = new GregorianCalendar();
         cal.setTime(new Date(currentDate.getTime()));
-        double b0 = Astronomy.getB0InRadians(cal);
+        double b0 = -Astronomy.getB0InRadians(cal);
         this.localRotation.clear();
         this.localRotation.rotate(GL3DQuatd.createRotation(-b0, new GL3DVec3d(1, 0, 0)));
         this.localRotation.rotate(GL3DQuatd.createRotation(this.currentRotation, new GL3DVec3d(0, 1, 0)));
