@@ -44,9 +44,9 @@ import org.helioviewer.viewmodel.viewport.Viewport;
  * to a texture object which can then be used to be mapped onto a 3D mesh. Use a
  * {@link GL3DImageMesh} to connect the resulting texture to a mesh, or directly
  * use the {@link GL3DShaderFactory} to create standard Image Meshes.
- * 
+ *
  * @author Simon Spoerri (simon.spoerri@fhnw.ch)
- * 
+ *
  */
 public class GL3DImageTextureView extends AbstractGL3DView implements GL3DView, GLFragmentShaderView {
 
@@ -128,7 +128,7 @@ public class GL3DImageTextureView extends AbstractGL3DView implements GL3DView, 
             double deltat = sim.getSubimageData().getDateMillis() / 1000.0 - Constants.referenceDate;
             Calendar cal = new GregorianCalendar();
             cal.setTimeInMillis(sim.getSubimageData().getDateMillis());
-            theta = Astronomy.getB0InRadians(cal);
+            theta = -Astronomy.getB0InRadians(cal);
             phi = DifferentialRotation.calculateRotationInRadians(0.0, deltat) % (Math.PI * 2.0);
             if (metadataView.getMetaData() instanceof HelioviewerPositionedMetaData && ((HelioviewerPositionedMetaData) (metadataView.getMetaData())).getInstrument().equalsIgnoreCase("SECCHI")) {
                 phi -= ((HelioviewerPositionedMetaData) (metadataView.getMetaData())).getStonyhurstLongitude() / MathUtils.radeg;
