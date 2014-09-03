@@ -5,5 +5,8 @@
 	<classpathentry kind="lib" path="lib"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/swhv-swek"/>
 	<classpathentry kind="lib" path="resources"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/base"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/jhv"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/jhv-data"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
