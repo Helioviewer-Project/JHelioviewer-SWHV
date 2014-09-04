@@ -3,7 +3,7 @@
 <project name="build" default="all">
 
 	<property name="src.base" value="${basedir}/src/" />
-        <property name="src.path" value="${src.base}/jhv/src/:${src.base}/base/src/::${src.base}/basegui/src/:${src.base}/viewmodel/src/:${src.base}/viewmodelplugin/src/:${src.base}/jhv-3d/src/:${src.base}/jhv-3d-wcs/src/:${src.base}/jhv-3d-scenegraph/src/:${src.base}/jhv-3d-math/src/:${src.base}/jhv-3d-plugin/src/:${src.base}/jhv-3d-plugin-vectors/src/:${src.base}/jhv-display/src/:${src.base}/filterPlugins:${src.base}/jhv-3d-ROB" />
+    <property name="src.path" value="${src.base}/jhv/src/:${src.base}/base/src/::${src.base}/basegui/src/:${src.base}/viewmodel/src/:${src.base}/viewmodelplugin/src/:${src.base}/jhv-3d/src/:${src.base}/jhv-3d-wcs/src/:${src.base}/jhv-3d-scenegraph/src/:${src.base}/jhv-3d-math/src/:${src.base}/jhv-3d-plugin/src/:${src.base}/jhv-3d-plugin-vectors/src/:${src.base}/jhv-display/src/:${src.base}/filterPlugins:${src.base}/jhv-3d-ROB:${src.base}/jhv-data/src" />
         <property name="bin.eclipse" value="${src.base}/jhv/bin/ ${src.base}/base/bin/ ${src.base}/viewmodel/bin/ ${src.base}/viewmodelplugin/bin/ ${src.base}/JHVVectors/bin/ ${src.base}/jhv-3d/bin/ ${src.base}/jhv-3d-scenegraph/bin/ ${src.base}/jhv-3d-math/bin/ ${src.base}/jhv-3d-plugin/bin/ ${src.base}/jhv-3d-plugin-vectors/bin/ ${src.base}/jhv-3d-wcs/bin/ ${src.base}/jhv-display/bin/ ${src.base}/filterPlugins/bin ${src.base}/jhv-3d-ROB/bin" />
     <property name="doc" value="${basedir}/doc/" />
     <property name="bin" value="${basedir}/bin/" />
@@ -87,7 +87,7 @@
     </target>
 	
 	<target name="compile" depends="init" >
-		<javac srcdir="${src.path}" destdir="${bin.jhv}" target="1.6" source="1.6" debug="on" debuglevel="source,lines,vars" includeantruntime="false">
+		<javac srcdir="${src.path}" destdir="${bin.jhv}" target="1.6" source="1.6" debug="on" debuglevel="source,lines,vars" includeantruntime="false" encoding="utf-8">
 			<classpath>
 				<fileset dir="${lib}">
 					<include name="**/*.jar" />
