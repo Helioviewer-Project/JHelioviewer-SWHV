@@ -9,16 +9,16 @@ import org.helioviewer.jhv.data.container.JHVEventContainer;
 import org.helioviewer.jhv.data.container.JHVEventContainerRequestHandler;
 import org.helioviewer.jhv.plugins.swek.SWEKPluginLocks;
 
-public class RequestManager implements JHVEventContainerRequestHandler {
+public class IncomingRequestManager implements JHVEventContainerRequestHandler {
 
     /** The singleton instance */
-    private static RequestManager instance;
+    private static IncomingRequestManager instance;
 
     /** Local instance of the JHVEventContainer */
     private final JHVEventContainer eventContainer;
 
     /** The listeners */
-    private final List<RequestManagerListener> listeners;
+    private final List<IncomingRequestManagerListener> listeners;
 
     /** List of requested intervals */
     private final List<Interval<Date>> intervalList;
@@ -29,10 +29,10 @@ public class RequestManager implements JHVEventContainerRequestHandler {
     /**
      * Private constructor.
      */
-    private RequestManager() {
+    private IncomingRequestManager() {
         this.eventContainer = JHVEventContainer.getSingletonInstance();
         this.eventContainer.registerHandler(this);
-        this.listeners = new ArrayList<RequestManagerListener>();
+        this.listeners = new ArrayList<IncomingRequestManagerListener>();
         this.intervalList = new ArrayList<Interval<Date>>();
         this.dateList = new ArrayList<Date>();
     }
@@ -42,9 +42,9 @@ public class RequestManager implements JHVEventContainerRequestHandler {
      * 
      * @return the singleton instance
      */
-    public static RequestManager getSingletonInstance() {
+    public static IncomingRequestManager getSingletonInstance() {
         if (instance == null) {
-            instance = new RequestManager();
+            instance = new IncomingRequestManager();
         }
         return instance;
     }
@@ -55,7 +55,7 @@ public class RequestManager implements JHVEventContainerRequestHandler {
      * @param l
      *            the listener to add
      */
-    public void addRequestManagerListener(RequestManagerListener l) {
+    public void addRequestManagerListener(IncomingRequestManagerListener l) {
         this.listeners.add(l);
     }
 
@@ -65,7 +65,7 @@ public class RequestManager implements JHVEventContainerRequestHandler {
      * @param l
      *            the listener to remove
      */
-    public void removeRequestManagerListener(RequestManagerListener l) {
+    public void removeRequestManagerListener(IncomingRequestManagerListener l) {
         this.listeners.remove(l);
     }
 
@@ -126,7 +126,7 @@ public class RequestManager implements JHVEventContainerRequestHandler {
      *            the date that was requested
      */
     private void fireNewDateRequested(Date date) {
-        for (RequestManagerListener l : this.listeners) {
+        for (IncomingRequestManagerListener l : this.listeners) {
             l.newRequestForDate(date);
         }
     }
@@ -138,7 +138,7 @@ public class RequestManager implements JHVEventContainerRequestHandler {
      *            interval that was requested
      */
     private void fireNewIntervalRequested(Interval<Date> interval) {
-        for (RequestManagerListener l : this.listeners) {
+        for (IncomingRequestManagerListener l : this.listeners) {
             l.newRequestForInterval(interval);
         }
     }
@@ -150,7 +150,7 @@ public class RequestManager implements JHVEventContainerRequestHandler {
      *            list of dates that was requested
      */
     private void firedNewDateListRequested(List<Date> dates) {
-        for (RequestManagerListener l : this.listeners) {
+        for (IncomingRequestManagerListener l : this.listeners) {
             l.newRequestForDateList(dates);
         }
     }

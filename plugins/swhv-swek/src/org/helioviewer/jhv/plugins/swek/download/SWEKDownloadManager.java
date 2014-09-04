@@ -18,11 +18,11 @@ import org.helioviewer.jhv.plugins.swek.config.SWEKEventType;
 import org.helioviewer.jhv.plugins.swek.config.SWEKSource;
 import org.helioviewer.jhv.plugins.swek.config.SWEKSupplier;
 import org.helioviewer.jhv.plugins.swek.model.EventTypePanelModelListener;
-import org.helioviewer.jhv.plugins.swek.request.RequestManager;
-import org.helioviewer.jhv.plugins.swek.request.RequestManagerListener;
+import org.helioviewer.jhv.plugins.swek.request.IncomingRequestManager;
+import org.helioviewer.jhv.plugins.swek.request.IncomingRequestManagerListener;
 import org.helioviewer.jhv.plugins.swek.settings.SWEKProperties;
 
-public class SWEKDownloadManager implements DownloadWorkerListener, RequestManagerListener, EventTypePanelModelListener {
+public class SWEKDownloadManager implements DownloadWorkerListener, IncomingRequestManagerListener, EventTypePanelModelListener {
 
     /** Singleton instance of the SWE */
     private static SWEKDownloadManager instance;
@@ -42,7 +42,7 @@ public class SWEKDownloadManager implements DownloadWorkerListener, RequestManag
     private final Map<SWEKEventType, Set<SWEKSource>> activeEventTypes;
 
     /** Local instance of the request manager */
-    private final RequestManager requestManager;
+    private final IncomingRequestManager requestManager;
 
     /**
      * private constructor of the SWEKDownloadManager
@@ -53,7 +53,7 @@ public class SWEKDownloadManager implements DownloadWorkerListener, RequestManag
                 .getProperty("plugin.swek.numberofthreads")));
         this.dwMap = new HashMap<SWEKEventType, Map<Date, DownloadWorker>>();
         this.activeEventTypes = new HashMap<SWEKEventType, Set<SWEKSource>>();
-        this.requestManager = RequestManager.getSingletonInstance();
+        this.requestManager = IncomingRequestManager.getSingletonInstance();
         this.busyAndFinishedJobs = new HashMap<SWEKEventType, Map<SWEKSource, Set<Date>>>();
     }
 

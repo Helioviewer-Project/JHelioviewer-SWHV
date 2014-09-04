@@ -12,7 +12,7 @@ import org.helioviewer.base.math.Interval;
  * @author Bram Bourgoignie (Bram.Bourgoignie@oma.be)
  * 
  */
-public interface RequestManagerListener {
+public interface IncomingRequestManagerListener {
     /**
      * New request for a date was issued
      * 
