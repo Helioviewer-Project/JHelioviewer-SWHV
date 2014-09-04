@@ -1,10 +1,16 @@
 package org.helioviewer.jhv.plugins.swek.sources.hek;
 
+import java.io.IOException;
 import java.io.InputStream;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Properties;
 
+import org.helioviewer.base.DownloadStream;
+import org.helioviewer.base.logging.Log;
+import org.helioviewer.jhv.JHVGlobals;
 import org.helioviewer.jhv.plugins.swek.config.SWEKEventType;
 import org.helioviewer.jhv.plugins.swek.sources.SWEKDownloader;
 
@@ -29,9 +35,18 @@ public class HEKDownloader implements SWEKDownloader {
 
     @Override
     public InputStream downloadData(SWEKEventType eventType, Date startDate, Date endDate) {
-        createURL(eventType, startDate, endDate);
+        String urlString = createURL(eventType, startDate, endDate);
+        try {
+            DownloadStream ds = new DownloadStream(new URL(urlString), JHVGlobals.getStdConnectTimeout(), JHVGlobals.getStdReadTimeout());
+            return ds.getInput();
+        } catch (MalformedURLException e) {
+            Log.error("Could not create URL from given string: " + urlString);
+            return null;
+        } catch (IOException e) {
+            Log.error("Could not create input stream for given URL: " + urlString);
+            return null;
+        }
 
-        return null;
     }
 
     /**

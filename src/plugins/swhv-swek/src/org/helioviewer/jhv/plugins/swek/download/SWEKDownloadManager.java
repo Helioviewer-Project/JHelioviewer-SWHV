@@ -22,6 +22,12 @@ import org.helioviewer.jhv.plugins.swek.request.IncomingRequestManager;
 import org.helioviewer.jhv.plugins.swek.request.IncomingRequestManagerListener;
 import org.helioviewer.jhv.plugins.swek.settings.SWEKProperties;
 
+/**
+ * 
+ * 
+ * @author Bram Bourgoignie (Bram.Bourgoignie@oma.be)
+ * 
+ */
 public class SWEKDownloadManager implements DownloadWorkerListener, IncomingRequestManagerListener, EventTypePanelModelListener {
 
     /** Singleton instance of the SWE */
