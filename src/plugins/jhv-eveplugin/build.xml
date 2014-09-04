@@ -4,7 +4,7 @@
 	<property name="plugin.name" value="EVEPlugin" />
 	<property name="plugin.package" value="eveplugin" />
 
-	<property name="jhv.root" value="${basedir}/../../" />
+	<property name="jhv.root" value="${basedir}/../../.." />
 	<property name="jhv.bin" value="${jhv.root}/bin/jhv/" />
 	<property name="jhv.build.resources" value="${jhv.root}/build-resources/" />
     <property name="jhv.lib" value="${jhv.root}/lib/" />
@@ -199,6 +199,8 @@
 			<fileset dir="${build}" />
 		</copy>
 	</target>
+    
+    <!-- Install the plugins -->
 	<target name="install-plugin" depends="jar-bundle">
 		<copy file="${build}/${plugin.name}.jar" todir="${plugins.dir}" />
 	</target>
