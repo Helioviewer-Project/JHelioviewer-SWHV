@@ -7,7 +7,9 @@ import java.io.File;
 import java.net.URI;
 import java.net.URISyntaxException;
 
+import org.helioviewer.jhv.layers.LayersModel;
 import org.helioviewer.jhv.plugins.swek.config.SWEKConfigurationManager;
+import org.helioviewer.jhv.plugins.swek.request.OutgoingRequestManager;
 import org.helioviewer.jhv.plugins.swek.settings.SWEKSettings;
 import org.helioviewer.jhv.plugins.swek.sources.SWEKSourceManager;
 import org.helioviewer.viewmodelplugin.controller.PluginManager;
@@ -31,9 +33,13 @@ public class SWEKPlugin extends OverlayPlugin implements Plugin {
     /** Instance of the SWEKDownloadManager */
     private final SWEKSourceManager SWEKSources;
 
+    /** The outgoing request manager */
+    private final OutgoingRequestManager outgoingRequestManager;
+
     public SWEKPlugin() {
         this.SWEKConfig = SWEKConfigurationManager.getSingletonInstance();
         this.SWEKSources = SWEKSourceManager.getSingletonInstance();
+        this.outgoingRequestManager = new OutgoingRequestManager();
         try {
             this.pluginLocation = new URI(SWEKSettings.PLUGIN_NAME);
         } catch (URISyntaxException e) {
@@ -101,6 +107,7 @@ public class SWEKPlugin extends OverlayPlugin implements Plugin {
     private void configurePlugin() {
         this.SWEKConfig.loadConfiguration();
         this.SWEKSources.loadSources();
+        LayersModel.getSingletonInstance().addLayersListener(this.outgoingRequestManager);
     }
 
     /**

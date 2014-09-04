@@ -5,9 +5,9 @@
     <property name="plugin.name" value="SWEKPlugin" />
     <property name="plugin.package" value="swekplugin" />
 
-    <property name="jhv.root" value="${basedir}/../../" />
+    <property name="jhv.root" value="${basedir}/../../.." />
     <property name="jhv.bin" value="${jhv.root}/bin/jhv/" />
-    <property name="jhv.build.resources" value="${jhv.root}build-resources/" />
+    <property name="jhv.build.resources" value="${jhv.root}/build-resources/" />
     <property name="jhv.lib" value="${jhv.root}/lib/" />
     <property name="jhv.build" value="${jhv.root}/build/" />
     <property name="src" value="${basedir}/src/" />
@@ -22,7 +22,7 @@
     <property name="bzrpath" value="bzr" />
     <property name="plugins.dir" value="${user.home}/JHelioviewer/Plugins/" />
     <property name="sweksources" value="${basedir}/sources" />
-    <property name="sweksources.lib" value="${sweksources}/lib" />
+    <property name="sweksources.lib" value="${sweksources}/*/lib" />
 
     <!-- Include ant-contrib -->
     <echo message="build resources : ${jhv.build.resources}"/>
@@ -33,16 +33,12 @@
     </taskdef>
 
 
-    <target name="all" depends="jar-bundle, bundle-src, jar-copy" />
+    <target name="all" depends="copy-to-root-build" />
 
-    <!-- Copy the swek-jar to the sources lib directory -->
-    <target name="jar-copy">
-        <copy file="${build}/${plugin.name}.jar" todir="${sweksources.lib}/"/>
-    </target>
-    
     <!-- build classes of main jhv project -->
     <target name="jhv.compile">
         <echo message="basedir is ${basedir}"/>
+        <echo message="jhv build is ${jhv.build}" />
         <ant inheritAll="false" target="compile" antfile="${jhv.root}/build.xml" dir="${jhv.root}"/>
     </target>
 
@@ -74,6 +70,9 @@
             <fileset dir="${bin.eclipse}" followsymlinks="false" defaultexcludes="no"/>
         </delete> 
         <antcall target="mkdir" />
+        <subant target="clean">
+            <fileset dir="./sources/" includes="*/build.xml" />
+        </subant>
     </target>
 
 
@@ -103,8 +102,7 @@
     </target>
 
 
-<!-- Compile sources -->
-
+    <!-- Compile sources -->
     <target name="compile" depends="jhv.compile, init">
         <javac srcdir="${src}" destdir="${bin}" target="1.5" source="1.5"  debug="on" debuglevel="source,lines,vars" includeantruntime="false">
             <classpath>
@@ -136,11 +134,18 @@
             <fileset file="COPYING" />
             <zipgroupfileset dir="${lib}" includes="**/*.jar"/>
         </jar>
+        <subant target="jar-bundle">
+            <fileset dir="./sources/" includes="*/build.xml" />
+        </subant>
     </target>
 
     <!-- Source bundle -->
 
-    <target name="bundle-src" depends ="bundle-src-zip, bundle-src-tar" />
+    <target name="bundle-src" depends ="bundle-src-zip, bundle-src-tar" >
+        <subant target="bundle-src">
+            <fileset dir="./sources/" includes="*/build.xml" />
+        </subant>
+    </target>
 
     <target name="build-init" depends="init">
         <property name="pkg.name" value="${plugin.name}-${version}.${revision}" />
@@ -150,7 +155,7 @@
     <target name="bundle-src-prepare" depends="build-init">
         <mkdir dir="${jhv.bin}/build" />
         <echo message="${java.runtime.version}" />
-        <javac destdir="${jhv.bin}/build/" debug="true" debuglevel="source,lines,vars" verbose="yes" srcdir="${jhv.build.resources}/shared/" includes="**/ManifestGenerator.java" target="1.5" source="1.7" includeantruntime="false" />
+        <javac destdir="${jhv.bin}/build/" debug="true" debuglevel="source,lines,vars" verbose="yes" srcdir="${jhv.build.resources}/shared/" includes="**/ManifestGenerator.java" target="1.6" source="1.6" includeantruntime="false" />
         <taskdef name="generateManifest" classname="ManifestGenerator">
             <classpath location="${jhv.bin}/build/"/>
         </taskdef>
@@ -196,7 +201,7 @@
     <!-- documentation -->
     
     <target name="doc" depends="jhv.compile">
-        <javadoc 
+        <javadoc
             access="private"
             destdir="${doc}"
             author="true"
@@ -216,6 +221,9 @@
 				<pathelement location="${jhv.bin}" />
 			</classpath>
         </javadoc>
+        <subant target="doc">
+            <fileset dir="./sources/" includes="*/build.xml" />
+        </subant>
     </target>
     
     <!-- install/release plugin -->
@@ -223,9 +231,16 @@
 		<copy todir="${jhv.build}">
 			<fileset dir="${build}" />
 		</copy>
+        <subant target="copy-to-root-build">
+            <fileset dir="./sources/" includes="*/build.xml" />
+        </subant>
 	</target>
+    
 	<target name="install-plugin" depends="jar-bundle">
 		<copy file="${build}/${plugin.name}.jar" todir="${plugins.dir}" />
+        <subant target="install-source">
+            <fileset dir="./sources/" includes="*/build.xml" />
+        </subant>
 	</target>
 
 </project>

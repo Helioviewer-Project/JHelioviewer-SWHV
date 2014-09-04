@@ -13,7 +13,7 @@ public interface SWEKEventStream {
     /**
      * Gets the next available event if any.
      * 
-     * @return The next event or null if the stream has no events.
+     * @return The next event or null if the stream has no events.hasEvents
      */
     public abstract JHVEvent next();
 }

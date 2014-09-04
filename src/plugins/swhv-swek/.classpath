@@ -10,5 +10,6 @@
 	<classpathentry kind="lib" path="../lib/json.jar"/>
 	<classpathentry kind="lib" path="resources"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/jhv-data"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/jhv-display"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

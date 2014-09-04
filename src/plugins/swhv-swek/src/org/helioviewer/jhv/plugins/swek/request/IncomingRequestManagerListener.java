@@ -7,7 +7,8 @@ import org.helioviewer.base.math.Interval;
 
 /**
  * Interface needs to be implemented by every class interested in requests for
- * events for a certain date.
+ * events for a certain date. This class handles the request coming from the
+ * JHVEventContainer.
  * 
  * @author Bram Bourgoignie (Bram.Bourgoignie@oma.be)
  * 
