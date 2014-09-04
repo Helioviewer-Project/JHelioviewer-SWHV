@@ -353,6 +353,6 @@
     </target>
     
     <target name="install-plugins" >
-    	<ant antfile="plugins/build.xml" inheritAll="false" target="install-plugins"/>
+    	<ant antfile="src/plugins/build.xml" inheritAll="false" target="install-plugins"/>
     </target>
 </project>
