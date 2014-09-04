@@ -10,6 +10,7 @@ import org.helioviewer.gl3d.scenegraph.math.GL3DVec2d;
 import org.helioviewer.gl3d.scenegraph.math.GL3DVec3d;
 import org.helioviewer.gl3d.scenegraph.math.GL3DVec4d;
 import org.helioviewer.gl3d.view.GL3DImageTextureView;
+import org.helioviewer.viewmodel.metadata.HelioviewerPositionedMetaData;
 import org.helioviewer.viewmodel.metadata.MetaData;
 import org.helioviewer.viewmodel.view.opengl.shader.GLFragmentShaderProgram;
 import org.helioviewer.viewmodel.view.opengl.shader.GLVertexShaderProgram;
@@ -18,9 +19,9 @@ import org.helioviewer.viewmodel.view.opengl.shader.GLVertexShaderProgram;
  * Maps the solar disc part of an image layer onto an adaptive mesh that either
  * covers the entire solar disc or the just the part that is visible in the view
  * frustum.
- * 
+ *
  * @author Simon Spoerri (simon.spoerri@fhnw.ch)
- * 
+ *
  */
 public class GL3DImageSphere extends GL3DImageMesh {
 
@@ -76,25 +77,32 @@ public class GL3DImageSphere extends GL3DImageMesh {
                 }
             }
             MetaData metaData = this.layer.metaDataView.getMetaData();
+            boolean showCorona = true;
+            if (metaData instanceof HelioviewerPositionedMetaData) {
+                HelioviewerPositionedMetaData md = (HelioviewerPositionedMetaData) metaData;
+                if (md.getInstrument().contains("HMI")) {
+                    showCorona = false;
+                }
+            }
+            if (showCorona) {
+                int beginPositionNumberCorona = numberOfPositions;
+                positions.add(new GL3DVec3d(-40., 40., 0.));
+                numberOfPositions++;
+                positions.add(new GL3DVec3d(40., 40., 0.));
+                numberOfPositions++;
+                positions.add(new GL3DVec3d(40., -40., 0.));
+                numberOfPositions++;
+                positions.add(new GL3DVec3d(-40., -40., 0.));
+                numberOfPositions++;
 
-            int beginPositionNumberCorona = numberOfPositions;
-            positions.add(new GL3DVec3d(-40., 40., 0.));
-            numberOfPositions++;
-            positions.add(new GL3DVec3d(40., 40., 0.));
-            numberOfPositions++;
-            positions.add(new GL3DVec3d(40., -40., 0.));
-            numberOfPositions++;
-            positions.add(new GL3DVec3d(-40., -40., 0.));
-            numberOfPositions++;
+                indices.add(beginPositionNumberCorona + 0);
+                indices.add(beginPositionNumberCorona + 2);
+                indices.add(beginPositionNumberCorona + 1);
 
-            indices.add(beginPositionNumberCorona + 0);
-            indices.add(beginPositionNumberCorona + 2);
-            indices.add(beginPositionNumberCorona + 1);
-
-            indices.add(beginPositionNumberCorona + 2);
-            indices.add(beginPositionNumberCorona + 0);
-            indices.add(beginPositionNumberCorona + 3);
-
+                indices.add(beginPositionNumberCorona + 2);
+                indices.add(beginPositionNumberCorona + 0);
+                indices.add(beginPositionNumberCorona + 3);
+            }
         }
         return GL3DMeshPrimitive.TRIANGLES;
     }
