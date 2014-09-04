@@ -10,6 +10,8 @@ import org.helioviewer.viewmodel.view.opengl.shader.GLShaderBuilder.GLBuildShade
 public class GL3DImageFragmentShaderProgram extends GLFragmentShaderProgram {
 
     private double cutOffRadius = 0.0f;
+    private double outerCutOffRadius = 40.f;
+
     private double theta;
     private double phi;
     private double xxTextureScale = 1.0;
@@ -23,6 +25,8 @@ public class GL3DImageFragmentShaderProgram extends GLFragmentShaderProgram {
     private double differenceXScale;
     private double differenceYScale;
     private int cutOffRadiusRef;
+    private int outerCutOffRadiusRef;
+
     private int textureScaleThetaPhiRef;
     private int diffTextureScaleThetaPhiRef;
     private GLShaderBuilder builder;
@@ -32,24 +36,31 @@ public class GL3DImageFragmentShaderProgram extends GLFragmentShaderProgram {
 
     /**
      * Binds (= activates it) the shader, if it is not active so far.
-     * 
+     *
      * @param gl
      *            Valid reference to the current gl object
      */
     @Override
     public final void bind(GL2 gl) {
-        bind(gl, shaderID, cutOffRadius, xxTextureScale, yyTextureScale, theta, phi);
+        bind(gl, shaderID, outerCutOffRadius, cutOffRadius, xxTextureScale, yyTextureScale, theta, phi);
     }
 
-    private void bind(GL2 gl, int shader, double cutOffRadius, double xTextureScale, double yTextureScale, double theta, double phi) {
+    private void bind(GL2 gl, int shader, double outerCutOffRadius, double cutOffRadius, double xTextureScale, double yTextureScale, double theta, double phi) {
         super.bind(gl);
 
         double[] cutOffRadiusFloat = this.builder.getEnvParameter(this.cutOffRadiusRef);
+        double[] outerCutOffRadiusFloat = this.builder.getEnvParameter(this.outerCutOffRadiusRef);
+
         cutOffRadiusFloat[0] = (float) cutOffRadius;
         cutOffRadiusFloat[1] = 0f;
         cutOffRadiusFloat[2] = 0f;
         cutOffRadiusFloat[3] = 0f;
-        this.bindEnvVars(gl, this.cutOffRadiusRef, cutOffRadiusFloat);
+        outerCutOffRadiusFloat[0] = (float) outerCutOffRadius;
+        outerCutOffRadiusFloat[1] = 0f;
+        outerCutOffRadiusFloat[2] = 0f;
+        outerCutOffRadiusFloat[3] = 0f;
+        this.bindEnvVars(gl, this.outerCutOffRadiusRef, cutOffRadiusFloat);
+        this.bindEnvVars(gl, this.outerCutOffRadiusRef, outerCutOffRadiusFloat);
 
         double[] textureScaleThetaPhiFloat = this.builder.getEnvParameter(this.textureScaleThetaPhiRef);
         textureScaleThetaPhiFloat[0] = xTextureScale;
@@ -68,10 +79,10 @@ public class GL3DImageFragmentShaderProgram extends GLFragmentShaderProgram {
 
     /**
      * Pushes the shader currently in use onto a stack.
-     * 
+     *
      * This is useful to load another shader but still being able to restore the
      * old one, similar to the very common pushMatrix() in OpenGL2.
-     * 
+     *
      * @param gl
      *            Valid reference to the current gl object
      * @see #popShader(GL)
@@ -84,10 +95,10 @@ public class GL3DImageFragmentShaderProgram extends GLFragmentShaderProgram {
 
     /**
      * Takes the top of from the shader stack and binds it.
-     * 
+     *
      * This restores a shader pushed onto the stack earlier, similar to the very
      * common popMatrix() in OpenGL2.
-     * 
+     *
      * @param gl
      *            Valid reference to the current gl object
      * @see #pushShader(GL)
@@ -107,7 +118,9 @@ public class GL3DImageFragmentShaderProgram extends GLFragmentShaderProgram {
         try {
             String program = "\tif(texcoord0.x<0.0||texcoord0.y<0.0||texcoord0.x>textureScaleThetaPhi.x||texcoord0.y>textureScaleThetaPhi.y){" + "discard;" + GLShaderBuilder.LINE_SEP + "\t}" + GLShaderBuilder.LINE_SEP;
 
-            // program += "\tOUT.color.a=1.;" + GLShaderBuilder.LINE_SEP;
+            program += "\tif(position.x*position.x+position.y*position.y+position.z*position.z<cutOffRadius*cutOffRadius){OUT.color.a=0.;}" + GLShaderBuilder.LINE_SEP;
+            program += "\tif(position.x*position.x+position.y*position.y+position.z*position.z>outerCutOffRadius*outerCutOffRadius){OUT.color.a=0.;}" + GLShaderBuilder.LINE_SEP;
+
             program += "\tfloat theta = textureScaleThetaPhi.z;" + GLShaderBuilder.LINE_SEP;
             program += "\tfloat phi = textureScaleThetaPhi.w;" + GLShaderBuilder.LINE_SEP;
 
@@ -126,6 +139,8 @@ public class GL3DImageFragmentShaderProgram extends GLFragmentShaderProgram {
             program += "\tif((position.z!=0.0 && projectionn<-0.001) || (position.z==0.0 && position.x*position.x +position.y*position.y<0.9)){" + "\t\tdiscard;" + GLShaderBuilder.LINE_SEP + "\t}";
 
             this.cutOffRadiusRef = shaderBuilder.addEnvParameter("float cutOffRadius");
+            this.outerCutOffRadiusRef = shaderBuilder.addEnvParameter("float outerCutOffRadius");
+
             this.textureScaleThetaPhiRef = shaderBuilder.addEnvParameter("float4 textureScaleThetaPhi");
             this.diffTextureScaleThetaPhiRef = shaderBuilder.addEnvParameter("float4 diffTextureScaleThetaPhi");
 
@@ -147,6 +162,10 @@ public class GL3DImageFragmentShaderProgram extends GLFragmentShaderProgram {
 
     public void setCutOffRadius(double cutOffRadius) {
         this.cutOffRadius = cutOffRadius;
+    }
+
+    public void setOuterCutOffRadius(double outerCutOffRadius) {
+        this.outerCutOffRadius = outerCutOffRadius;
     }
 
     public void changeAngles(double theta, double phi) {

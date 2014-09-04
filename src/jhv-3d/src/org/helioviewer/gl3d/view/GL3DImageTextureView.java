@@ -21,6 +21,7 @@ import org.helioviewer.viewmodel.changeevent.ChangeEvent;
 import org.helioviewer.viewmodel.changeevent.RegionChangedReason;
 import org.helioviewer.viewmodel.changeevent.RegionUpdatedReason;
 import org.helioviewer.viewmodel.changeevent.SubImageDataChangedReason;
+import org.helioviewer.viewmodel.metadata.HelioviewerOcculterMetaData;
 import org.helioviewer.viewmodel.metadata.HelioviewerPositionedMetaData;
 import org.helioviewer.viewmodel.metadata.MetaData;
 import org.helioviewer.viewmodel.region.Region;
@@ -178,6 +179,11 @@ public class GL3DImageTextureView extends AbstractGL3DView implements GL3DView, 
             }
             this.fragmentShader.changeTextureScale(sim.getSubimageData().getScaleX(), sim.getSubimageData().getScaleY());
             this.fragmentShader.changeAngles(theta, phi);
+            if (metadata instanceof HelioviewerOcculterMetaData) {
+                HelioviewerOcculterMetaData md = (HelioviewerOcculterMetaData) metadata;
+                this.fragmentShader.setCutOffRadius(md.getInnerPhysicalOcculterRadius());
+                this.fragmentShader.setOuterCutOffRadius(md.getOuterPhysicalOcculterRadius());
+            }
         }
 
         this.recaptureRequested = false;

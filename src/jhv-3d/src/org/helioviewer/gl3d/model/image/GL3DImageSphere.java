@@ -10,6 +10,7 @@ import org.helioviewer.gl3d.scenegraph.math.GL3DVec2d;
 import org.helioviewer.gl3d.scenegraph.math.GL3DVec3d;
 import org.helioviewer.gl3d.scenegraph.math.GL3DVec4d;
 import org.helioviewer.gl3d.view.GL3DImageTextureView;
+import org.helioviewer.viewmodel.metadata.HelioviewerOcculterMetaData;
 import org.helioviewer.viewmodel.metadata.HelioviewerPositionedMetaData;
 import org.helioviewer.viewmodel.metadata.MetaData;
 import org.helioviewer.viewmodel.view.opengl.shader.GLFragmentShaderProgram;
@@ -47,36 +48,43 @@ public class GL3DImageSphere extends GL3DImageMesh {
             int resolutionX = 50;
             int resolutionY = 50;
             int numberOfPositions = 0;
-            for (int latNumber = 0; latNumber <= resolutionX; latNumber++) {
-                double theta = latNumber * Math.PI / resolutionX;
-                double sinTheta = Math.sin(theta);
-                double cosTheta = Math.cos(theta);
-                for (int longNumber = 0; longNumber <= resolutionY; longNumber++) {
-                    double phi = longNumber * 2 * Math.PI / resolutionY;
-                    double sinPhi = Math.sin(phi);
-                    double cosPhi = Math.cos(phi);
-
-                    double x = cosPhi * sinTheta;
-                    double y = cosTheta;
-                    double z = sinPhi * sinTheta;
-                    positions.add(new GL3DVec3d(Constants.SunRadius * x, Constants.SunRadius * y, Constants.SunRadius * z));
-                    numberOfPositions++;
-                }
-            }
-
-            for (int latNumber = 0; latNumber < resolutionX; latNumber++) {
-                for (int longNumber = 0; longNumber < resolutionY; longNumber++) {
-                    int first = (latNumber * (resolutionY + 1)) + longNumber;
-                    int second = first + resolutionY + 1;
-                    indices.add(first);
-                    indices.add(first + 1);
-                    indices.add(second + 1);
-                    indices.add(first);
-                    indices.add(second + 1);
-                    indices.add(second);
-                }
-            }
             MetaData metaData = this.layer.metaDataView.getMetaData();
+            boolean showSphere = true;
+            if (metaData instanceof HelioviewerOcculterMetaData) {
+                HelioviewerOcculterMetaData md = (HelioviewerOcculterMetaData) metaData;
+                showSphere = false;
+            }
+            if (showSphere) {
+                for (int latNumber = 0; latNumber <= resolutionX; latNumber++) {
+                    double theta = latNumber * Math.PI / resolutionX;
+                    double sinTheta = Math.sin(theta);
+                    double cosTheta = Math.cos(theta);
+                    for (int longNumber = 0; longNumber <= resolutionY; longNumber++) {
+                        double phi = longNumber * 2 * Math.PI / resolutionY;
+                        double sinPhi = Math.sin(phi);
+                        double cosPhi = Math.cos(phi);
+
+                        double x = cosPhi * sinTheta;
+                        double y = cosTheta;
+                        double z = sinPhi * sinTheta;
+                        positions.add(new GL3DVec3d(Constants.SunRadius * x, Constants.SunRadius * y, Constants.SunRadius * z));
+                        numberOfPositions++;
+                    }
+                }
+
+                for (int latNumber = 0; latNumber < resolutionX; latNumber++) {
+                    for (int longNumber = 0; longNumber < resolutionY; longNumber++) {
+                        int first = (latNumber * (resolutionY + 1)) + longNumber;
+                        int second = first + resolutionY + 1;
+                        indices.add(first);
+                        indices.add(first + 1);
+                        indices.add(second + 1);
+                        indices.add(first);
+                        indices.add(second + 1);
+                        indices.add(second);
+                    }
+                }
+            }
             boolean showCorona = true;
             if (metaData instanceof HelioviewerPositionedMetaData) {
                 HelioviewerPositionedMetaData md = (HelioviewerPositionedMetaData) metaData;
