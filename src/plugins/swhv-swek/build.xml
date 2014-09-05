@@ -3,7 +3,7 @@
 
 <project name="build" default="all">
     <property name="plugin.name" value="SWEKPlugin" />
-    <property name="plugin.package" value="swekplugin" />
+    <property name="plugin.package" value="swek" />
 
     <property name="jhv.root" value="${basedir}/../../.." />
     <property name="jhv.bin" value="${jhv.root}/bin/jhv/" />
