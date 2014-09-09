@@ -37,11 +37,11 @@ public class SWEKPlugin extends OverlayPlugin implements Plugin {
     private final OutgoingRequestManager outgoingRequestManager;
 
     public SWEKPlugin() {
-        this.SWEKConfig = SWEKConfigurationManager.getSingletonInstance();
-        this.SWEKSources = SWEKSourceManager.getSingletonInstance();
-        this.outgoingRequestManager = new OutgoingRequestManager();
+        SWEKConfig = SWEKConfigurationManager.getSingletonInstance();
+        SWEKSources = SWEKSourceManager.getSingletonInstance();
+        outgoingRequestManager = OutgoingRequestManager.getSingletonInstance();
         try {
-            this.pluginLocation = new URI(SWEKSettings.PLUGIN_NAME);
+            pluginLocation = new URI(SWEKSettings.PLUGIN_NAME);
         } catch (URISyntaxException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
@@ -105,9 +105,9 @@ public class SWEKPlugin extends OverlayPlugin implements Plugin {
      * Configures the SWEK plugin.
      */
     private void configurePlugin() {
-        this.SWEKConfig.loadConfiguration();
-        this.SWEKSources.loadSources();
-        LayersModel.getSingletonInstance().addLayersListener(this.outgoingRequestManager);
+        SWEKConfig.loadConfiguration();
+        SWEKSources.loadSources();
+        LayersModel.getSingletonInstance().addLayersListener(outgoingRequestManager);
     }
 
     /**
@@ -115,9 +115,9 @@ public class SWEKPlugin extends OverlayPlugin implements Plugin {
      */
     private void registerPlugin() {
         SWEKPluginContainer container = new SWEKPluginContainer();
-        container.setActive(PluginSettings.getSingeltonInstance().isOverlayInPluginActivated(this.pluginLocation,
-                container.getOverlayClass(), true));
-        container.setPosition(PluginSettings.getSingeltonInstance().getOverlayPosition(this.pluginLocation, container.getOverlayClass()));
+        container.setActive(PluginSettings.getSingeltonInstance().isOverlayInPluginActivated(pluginLocation, container.getOverlayClass(),
+                true));
+        container.setPosition(PluginSettings.getSingeltonInstance().getOverlayPosition(pluginLocation, container.getOverlayClass()));
         PluginManager.getSingeltonInstance().addOverlayContainer(container);
     }
 
