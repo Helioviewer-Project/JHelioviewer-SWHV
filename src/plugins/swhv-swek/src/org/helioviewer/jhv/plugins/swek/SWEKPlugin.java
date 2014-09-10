@@ -7,8 +7,10 @@ import java.io.File;
 import java.net.URI;
 import java.net.URISyntaxException;
 
+import org.helioviewer.jhv.data.container.JHVEventContainer;
 import org.helioviewer.jhv.layers.LayersModel;
 import org.helioviewer.jhv.plugins.swek.config.SWEKConfigurationManager;
+import org.helioviewer.jhv.plugins.swek.request.IncomingRequestManager;
 import org.helioviewer.jhv.plugins.swek.request.OutgoingRequestManager;
 import org.helioviewer.jhv.plugins.swek.settings.SWEKSettings;
 import org.helioviewer.jhv.plugins.swek.sources.SWEKSourceManager;
@@ -36,10 +38,18 @@ public class SWEKPlugin extends OverlayPlugin implements Plugin {
     /** The outgoing request manager */
     private final OutgoingRequestManager outgoingRequestManager;
 
+    /** the incoming request manager */
+    private final IncomingRequestManager incomingRequestManager;
+
+    /** instance of the event container */
+    private final JHVEventContainer eventContainer;
+
     public SWEKPlugin() {
         SWEKConfig = SWEKConfigurationManager.getSingletonInstance();
         SWEKSources = SWEKSourceManager.getSingletonInstance();
         outgoingRequestManager = OutgoingRequestManager.getSingletonInstance();
+        incomingRequestManager = IncomingRequestManager.getSingletonInstance();
+        eventContainer = JHVEventContainer.getSingletonInstance();
         try {
             pluginLocation = new URI(SWEKSettings.PLUGIN_NAME);
         } catch (URISyntaxException e) {
@@ -108,6 +118,7 @@ public class SWEKPlugin extends OverlayPlugin implements Plugin {
         SWEKConfig.loadConfiguration();
         SWEKSources.loadSources();
         LayersModel.getSingletonInstance().addLayersListener(outgoingRequestManager);
+        eventContainer.registerHandler(incomingRequestManager);
     }
 
     /**
