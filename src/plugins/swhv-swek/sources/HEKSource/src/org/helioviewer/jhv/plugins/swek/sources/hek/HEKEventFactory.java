@@ -14,19 +14,19 @@ public class HEKEventFactory {
      *            The string description of the event
      * @return The HEKEvent if known or the unknown hek event.
      */
-    public static HEKEvent getHEKEvent(String eventType) {
-        HEKEvent unknown = HEKEvent.UNKNOWN;
+    public static HEKEventEnum getHEKEvent(String eventType) {
+        HEKEventEnum unknown = HEKEventEnum.UNKNOWN;
         Object[] possibleEvents = unknown.getDeclaringClass().getEnumConstants();
         for (Object hekEvent : possibleEvents) {
-            if (hekEvent instanceof HEKEvent) {
-                HEKEvent event = (HEKEvent) hekEvent;
+            if (hekEvent instanceof HEKEventEnum) {
+                HEKEventEnum event = (HEKEventEnum) hekEvent;
                 if (event.getSWEKEventName().equals(eventType)) {
                     return event;
                 }
             }
         }
 
-        return HEKEvent.UNKNOWN;
+        return HEKEventEnum.UNKNOWN;
     }
 
 }
