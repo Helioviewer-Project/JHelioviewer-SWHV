@@ -39,7 +39,7 @@ public class DownloadWorker implements Runnable {
     private SWEKParser parser;
 
     /** The source manager */
-    private SWEKSourceManager sourceManager;
+    private final SWEKSourceManager sourceManager;
 
     /** The input stream from where the raw downloaded events are coming. */
     private InputStream downloadInputStream;
@@ -65,15 +65,15 @@ public class DownloadWorker implements Runnable {
      * Default constructor.
      */
     public DownloadWorker() {
-        this.isStopped = false;
-        this.eventType = null;
-        this.swekSource = null;
-        this.eventRequestDate = new Date();
-        this.downloadStartDate = new Date();
-        this.downloadEndDate = new Date();
-        this.sourceManager = SWEKSourceManager.getSingletonInstance();
-        this.listeners = new ArrayList<DownloadWorkerListener>();
-        this.isFireForceStoppedCalled = false;
+        isStopped = false;
+        eventType = null;
+        swekSource = null;
+        eventRequestDate = new Date();
+        downloadStartDate = new Date();
+        downloadEndDate = new Date();
+        sourceManager = SWEKSourceManager.getSingletonInstance();
+        listeners = new ArrayList<DownloadWorkerListener>();
+        isFireForceStoppedCalled = false;
     }
 
     /**
@@ -89,14 +89,15 @@ public class DownloadWorker implements Runnable {
      * 
      */
     public DownloadWorker(SWEKEventType eventType, SWEKSource swekSource, Date date) {
-        this.isStopped = false;
+        isStopped = false;
         this.swekSource = swekSource;
         this.eventType = eventType;
-        this.eventRequestDate = date;
-        this.downloadStartDate = new Date(getCurrentDate(this.eventRequestDate).getTime() - this.eventType.getRequestIntervalExtension());
-        this.downloadEndDate = new Date(getNextDate(this.eventRequestDate).getTime() + this.eventType.getRequestIntervalExtension());
-        this.listeners = new ArrayList<DownloadWorkerListener>();
-        this.isFireForceStoppedCalled = false;
+        eventRequestDate = date;
+        downloadStartDate = new Date(getCurrentDate(eventRequestDate).getTime() - this.eventType.getRequestIntervalExtension());
+        downloadEndDate = new Date(getNextDate(eventRequestDate).getTime() + this.eventType.getRequestIntervalExtension());
+        listeners = new ArrayList<DownloadWorkerListener>();
+        sourceManager = SWEKSourceManager.getSingletonInstance();
+        isFireForceStoppedCalled = false;
     }
 
     /**
@@ -106,7 +107,7 @@ public class DownloadWorker implements Runnable {
      *            The listener to add.
      */
     public void addDownloadWorkerListener(DownloadWorkerListener listener) {
-        this.listeners.add(listener);
+        listeners.add(listener);
     }
 
     /**
@@ -116,25 +117,25 @@ public class DownloadWorker implements Runnable {
      *            The listener to remove.
      */
     public void removeDownloadWorkerListener(DownloadWorkerListener listener) {
-        this.listeners.remove(listener);
+        listeners.remove(listener);
     }
 
     /**
      * Stops the worker thread
      */
     public void stopWorker() {
-        this.isStopped = true;
-        this.downloader.stopDownload();
-        this.parser.stopParser();
+        isStopped = true;
+        downloader.stopDownload();
+        parser.stopParser();
     }
 
     @Override
     public void run() {
         fireDownloadWorkerStarted();
         // create downloader
-        this.downloader = createDownloader();
+        downloader = createDownloader();
         // create parser
-        this.parser = createParser();
+        parser = createParser();
         // download the data
         downloadData();
         // parse the data
@@ -150,7 +151,7 @@ public class DownloadWorker implements Runnable {
      * @return the start date of the download
      */
     public Date getDownloadStartDate() {
-        return this.downloadStartDate;
+        return downloadStartDate;
     }
 
     /**
@@ -159,7 +160,7 @@ public class DownloadWorker implements Runnable {
      * @return the end date of the download
      */
     public Date getDownloadEndDate() {
-        return this.downloadEndDate;
+        return downloadEndDate;
     }
 
     /**
@@ -168,7 +169,7 @@ public class DownloadWorker implements Runnable {
      * @return The source
      */
     public SWEKSource getSource() {
-        return this.swekSource;
+        return swekSource;
     }
 
     /**
@@ -177,18 +178,18 @@ public class DownloadWorker implements Runnable {
      * @return The event type that is downloading
      */
     public SWEKEventType getEventType() {
-        return this.eventType;
+        return eventType;
     }
 
     /**
      * Sends the events to the event container.
      */
     private void distributeData() {
-        if (!this.isStopped) {
-            if (this.eventStream != null) {
-                while (this.eventStream.hasEvents()) {
+        if (!isStopped) {
+            if (eventStream != null) {
+                while (eventStream.hasEvents()) {
                     // TODO offer event to the JHVEventContainer
-                    this.eventStream.next();
+                    eventStream.next();
                 }
             }
         } else {
@@ -200,11 +201,11 @@ public class DownloadWorker implements Runnable {
      * Parses the source specific input stream to a jhv specific event type.
      */
     private void parseData() {
-        if (!this.isStopped) {
-            this.eventStream = this.parser.parseEventStream(this.downloadInputStream);
+        if (!isStopped) {
+            eventStream = parser.parseEventStream(downloadInputStream);
         } else {
-            if (this.parser != null) {
-                this.parser.stopParser();
+            if (parser != null) {
+                parser.stopParser();
             }
             fireDownloadWorkerForcedStopped();
         }
@@ -214,11 +215,11 @@ public class DownloadWorker implements Runnable {
      * Downloads the data from the source.
      */
     private void downloadData() {
-        if (!this.isStopped) {
-            this.downloadInputStream = this.downloader.downloadData(this.eventType, this.downloadStartDate, this.downloadEndDate);
+        if (!isStopped) {
+            downloadInputStream = downloader.downloadData(eventType, downloadStartDate, downloadEndDate);
         } else {
-            if (this.downloader != null) {
-                this.downloader.stopDownload();
+            if (downloader != null) {
+                downloader.stopDownload();
             }
             fireDownloadWorkerForcedStopped();
         }
@@ -230,8 +231,8 @@ public class DownloadWorker implements Runnable {
      * @return the parser for the source
      */
     private SWEKParser createParser() {
-        if (!this.isStopped) {
-            return this.sourceManager.getParser(this.swekSource);
+        if (!isStopped) {
+            return sourceManager.getParser(swekSource);
         } else {
             fireDownloadWorkerForcedStopped();
             return null;
@@ -244,8 +245,8 @@ public class DownloadWorker implements Runnable {
      * @return The downloader or null if the download was stopped.
      */
     private SWEKDownloader createDownloader() {
-        if (!this.isStopped) {
-            return this.sourceManager.getDownloader(this.swekSource);
+        if (!isStopped) {
+            return sourceManager.getDownloader(swekSource);
         } else {
             fireDownloadWorkerForcedStopped();
             return null;
@@ -294,11 +295,11 @@ public class DownloadWorker implements Runnable {
      * stop.
      */
     private void fireDownloadWorkerForcedStopped() {
-        if (!this.isFireForceStoppedCalled) {
-            for (DownloadWorkerListener l : this.listeners) {
+        if (!isFireForceStoppedCalled) {
+            for (DownloadWorkerListener l : listeners) {
                 l.workerForcedToStop(this);
             }
-            this.isFireForceStoppedCalled = true;
+            isFireForceStoppedCalled = true;
         }
     }
 
@@ -306,7 +307,7 @@ public class DownloadWorker implements Runnable {
      * Inform the download worker listeners the download worker has finished.
      */
     private void fireDownloadWorkerFinished() {
-        for (DownloadWorkerListener l : this.listeners) {
+        for (DownloadWorkerListener l : listeners) {
             l.workerFinished(this);
         }
     }
@@ -315,7 +316,7 @@ public class DownloadWorker implements Runnable {
      * Inform the download worker listener the download worker has started.
      */
     private void fireDownloadWorkerStarted() {
-        for (DownloadWorkerListener l : this.listeners) {
+        for (DownloadWorkerListener l : listeners) {
             l.workerStarted(this);
         }
     }
