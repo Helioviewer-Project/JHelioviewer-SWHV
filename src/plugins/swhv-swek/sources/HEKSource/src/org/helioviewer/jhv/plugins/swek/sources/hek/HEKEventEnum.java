@@ -1,6 +1,6 @@
 package org.helioviewer.jhv.plugins.swek.sources.hek;
 
-public enum HEKEvent {
+public enum HEKEventEnum {
 
     ACTIVE_REGION("ActiveRegion", "Active Region", "AR"), CORONAL_MASS_EJECTION("CME", "Coronal Mass Ejection", "CE"), CORONAL_DIMMING(
             "CoronalDimming", "Coronal Dimming", "CD"), CORONAL_HOLE("CoronalHole", "Coronal Hole", "CH"), CORONAL_WAVE("CoronalWave",
@@ -28,7 +28,7 @@ public enum HEKEvent {
      * @param eventAbbreviation
      *            The hek abbreviation of the hek event
      */
-    private HEKEvent(String hekEventName, String swekEventName, String eventAbbreviation) {
+    private HEKEventEnum(String hekEventName, String swekEventName, String eventAbbreviation) {
         this.eventAbbreviation = eventAbbreviation;
         this.swekEventName = swekEventName;
         this.hekEventName = hekEventName;
