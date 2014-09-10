@@ -60,6 +60,7 @@ public class SWEKDownloadManager implements DownloadWorkerListener, IncomingRequ
         activeEventTypes = new HashMap<SWEKEventType, Set<SWEKSource>>();
         requestManager = IncomingRequestManager.getSingletonInstance();
         busyAndFinishedJobs = new HashMap<SWEKEventType, Map<SWEKSource, Set<Date>>>();
+        requestManager.addRequestManagerListener(this);
     }
 
     /**
