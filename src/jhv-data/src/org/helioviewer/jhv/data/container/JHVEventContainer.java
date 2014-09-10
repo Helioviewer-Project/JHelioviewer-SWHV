@@ -15,7 +15,7 @@ public class JHVEventContainer {
     private static JHVEventContainer singletonInstance;
 
     /** The handlers of requests */
-    private final List<JHVEventContainerRequestHandler> handlers;
+    private final List<JHVEventContainerRequestHandler> requestHandlers;
 
     /** the event cache */
     private final JHVEventCache eventCache;
@@ -27,7 +27,7 @@ public class JHVEventContainer {
      * Private constructor.
      */
     private JHVEventContainer() {
-        handlers = new ArrayList<JHVEventContainerRequestHandler>();
+        requestHandlers = new ArrayList<JHVEventContainerRequestHandler>();
         eventHandlerCache = JHVEventHandlerCache.getSingletonInstance();
         eventCache = JHVEventCache.getSingletonInstance();
     }
@@ -47,11 +47,14 @@ public class JHVEventContainer {
     /**
      * Register a JHV event container request handler.
      * 
+     * 
      * @param handler
      *            the handler to register
      */
     public void registerHandler(JHVEventContainerRequestHandler handler) {
-        handlers.add(handler);
+        synchronized (JHVEventContainerLocks.requestHandlerLock) {
+            requestHandlers.add(handler);
+        }
     }
 
     /**
@@ -61,7 +64,9 @@ public class JHVEventContainer {
      *            the handler to remove
      */
     public void removeHandler(JHVEventContainerRequestHandler handler) {
-        handlers.remove(handler);
+        synchronized (JHVEventContainerLocks.requestHandlerLock) {
+            requestHandlers.remove(handler);
+        }
     }
 
     /**
@@ -80,6 +85,7 @@ public class JHVEventContainer {
             eventHandlerCache.add(handler, date);
             List<JHVEvent> events = eventCache.get(date);
             handler.newEventsReceived(events);
+            requestEvents(date);
         }
     }
 
@@ -120,6 +126,37 @@ public class JHVEventContainer {
             eventHandlerCache.add(handler, startDate, endDate);
             List<JHVEvent> events = eventCache.get(startDate, endDate);
             handler.newEventsReceived(events);
+            requestEvents(startDate, endDate);
+        }
+    }
+
+    /**
+     * Request data from the request handlers for a date.
+     * 
+     * @param date
+     *            the date for which to request the data
+     */
+    private void requestEvents(Date date) {
+        synchronized (JHVEventContainerLocks.requestHandlerLock) {
+            for (JHVEventContainerRequestHandler handler : requestHandlers) {
+                handler.handleRequestForDate(date);
+            }
+        }
+    }
+
+    /**
+     * Request data from the request handlers over an interval.
+     * 
+     * @param startDate
+     *            the start of the interval
+     * @param endDate
+     *            the end of the interval
+     */
+    private void requestEvents(Date startDate, Date endDate) {
+        synchronized (JHVEventContainerLocks.requestHandlerLock) {
+            for (JHVEventContainerRequestHandler handler : requestHandlers) {
+                handler.handleRequestForInterval(startDate, endDate);
+            }
         }
     }
 }
