@@ -28,6 +28,8 @@ public class SWEKSourceManager {
     /** Singleton instance of the swek download manager */
     private static SWEKSourceManager instance;
 
+    private boolean loadExternalJars;
+
     /** Instance of the SWEK configuration manager */
     private final SWEKConfigurationManager configManager;
 
@@ -43,9 +45,10 @@ public class SWEKSourceManager {
      * private constructor
      */
     private SWEKSourceManager() {
-        this.sourcesLoaded = false;
-        this.configManager = SWEKConfigurationManager.getSingletonInstance();
-        this.jarURLList = new ArrayList<URL>();
+        sourcesLoaded = false;
+        loadExternalJars = true;
+        configManager = SWEKConfigurationManager.getSingletonInstance();
+        jarURLList = new ArrayList<URL>();
     }
 
     /**
@@ -60,6 +63,10 @@ public class SWEKSourceManager {
         return instance;
     }
 
+    public void loadExternalJars(boolean loadExternalJars) {
+        this.loadExternalJars = loadExternalJars;
+    }
+
     /**
      * Loads the SWEK sources. If the download source is remote, the jar are
      * downloaded to the home directory of the swekplugin and loaded from there.
@@ -68,17 +75,17 @@ public class SWEKSourceManager {
      * @return true if all the source were loaded, false if not.
      */
     public boolean loadSources() {
-        if (!this.sourcesLoaded) {
+        if (!sourcesLoaded) {
             // Check the sweksettings file for the downloaders
             if (checkAndDownloadJars()) {
                 if (prepareDownloadersClassLoader()) {
-                    this.sourcesLoaded = true;
+                    sourcesLoaded = true;
                 }
             } else {
-                this.sourcesLoaded = false;
+                sourcesLoaded = false;
             }
         }
-        return this.sourcesLoaded;
+        return sourcesLoaded;
     }
 
     /**
@@ -122,26 +129,42 @@ public class SWEKSourceManager {
      * @return The class requested or null if an error occurred
      */
     private <T> T loadClass(String className, Class<T> classType) {
-        if (this.sourcesLoaded) {
+        if (loadExternalJars) {
+            if (sourcesLoaded) {
+                try {
+                    Object object = urlClassLoader.loadClass(className).newInstance();
+                    if (classType.isInstance(object)) {
+                        return classType.cast(object);
+                    } else {
+                        Log.error("The class with name:" + className + " does not return a class of type " + classType.getName()
+                                + ". null returned");
+                    }
+                } catch (ClassNotFoundException e) {
+                    Log.error("The class with name:" + className + " could not be loaded. Resulting error: " + e + ". null returned");
+                } catch (InstantiationException e) {
+                    Log.error("The class with name:" + className + " could not be instantiated. Resulting error: " + e + ". null returned");
+                } catch (IllegalAccessException e) {
+                    Log.error("The class with name:" + className + " could not be accessed. Resulting error: " + e + ". null returned");
+                }
+            } else {
+                Log.error("The sources are not loaded. Check previous errors and fix the problem first. Null returned.");
+            }
+            return null;
+        } else {
             try {
-                Object object = this.urlClassLoader.loadClass(className).newInstance();
+                Object object = Class.forName(className).newInstance();
                 if (classType.isInstance(object)) {
                     return classType.cast(object);
-                } else {
-                    Log.error("The class with name:" + className + " does not return a class of type " + classType.getName()
-                            + ". null returned");
                 }
-            } catch (ClassNotFoundException e) {
-                Log.error("The class with name:" + className + " could not be loaded. Resulting error: " + e + ". null returned");
             } catch (InstantiationException e) {
                 Log.error("The class with name:" + className + " could not be instantiated. Resulting error: " + e + ". null returned");
             } catch (IllegalAccessException e) {
                 Log.error("The class with name:" + className + " could not be accessed. Resulting error: " + e + ". null returned");
+            } catch (ClassNotFoundException e) {
+                Log.error("The class with name:" + className + " could not be loaded. Resulting error: " + e + ". null returned");
             }
-        } else {
-            Log.error("The sources are not loaded. Check previous errors and fix the problem first. Null returned.");
+            return null;
         }
-        return null;
     }
 
     /**
@@ -153,12 +176,12 @@ public class SWEKSourceManager {
      */
     private boolean checkAndDownloadJars() {
         boolean downloadJarOK = true;
-        for (SWEKSource source : this.configManager.getSources().values()) {
+        for (SWEKSource source : configManager.getSources().values()) {
             URI sourceURI;
             try {
                 sourceURI = new URI(source.getJarLocation());
                 if (sourceURI.getScheme().equals("file")) {
-                    this.jarURLList.add(sourceURI.toURL());
+                    jarURLList.add(sourceURI.toURL());
                 } else {
                     if (downloadJar(sourceURI)) {
                         downloadJarOK = downloadJarOK && true;
@@ -207,7 +230,7 @@ public class SWEKSourceManager {
             FileOutputStream fos = new FileOutputStream(dest);
             fos.getChannel().transferFrom(rbc, 0, Long.MAX_VALUE);
             fos.close();
-            this.jarURLList.add(dest.toURI().toURL());
+            jarURLList.add(dest.toURI().toURL());
             return true;
         } catch (MalformedURLException e) {
             Log.error("The URL was malformed for source " + sourceURI + ". Given error was " + e);
@@ -237,9 +260,8 @@ public class SWEKSourceManager {
      *         not created.
      */
     private boolean prepareDownloadersClassLoader() {
-        URL[] urls = this.jarURLList.toArray(new URL[0]);
-        this.urlClassLoader = URLClassLoader.newInstance(urls, Thread.currentThread().getContextClassLoader());
+        URL[] urls = jarURLList.toArray(new URL[0]);
+        urlClassLoader = URLClassLoader.newInstance(urls, Thread.currentThread().getContextClassLoader());
         return true;
     }
-
 }

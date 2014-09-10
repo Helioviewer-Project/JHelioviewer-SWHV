@@ -8,7 +8,7 @@ import org.helioviewer.jhv.JavaHelioViewer;
 
 /**
  * @author bramb
- *
+ * 
  */
 public class SWEKPluginLauncher {
 
@@ -26,7 +26,7 @@ public class SWEKPluginLauncher {
         args2[args2.length - 1] = "SWEKPlugin.jar";
         args2[args2.length - 4] = "--deactivate-plugin";
         args2[args2.length - 3] = "HEKPlugin.jar";
-        JavaHelioViewer.main(args2, new SWEKPlugin());
+        JavaHelioViewer.main(args2, new SWEKPlugin(false));
     }
 
 }
