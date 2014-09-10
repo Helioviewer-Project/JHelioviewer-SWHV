@@ -8,4 +8,6 @@ public class JHVEventContainerLocks {
     public static final Object cacheLock = new Object();
 
     public static final Object eventHandlerCacheLock = new Object();
+
+    public static final Object requestHandlerLock = new Object();
 }
