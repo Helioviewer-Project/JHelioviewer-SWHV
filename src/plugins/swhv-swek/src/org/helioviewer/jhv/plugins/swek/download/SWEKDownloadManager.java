@@ -54,13 +54,12 @@ public class SWEKDownloadManager implements DownloadWorkerListener, IncomingRequ
      * private constructor of the SWEKDownloadManager
      */
     private SWEKDownloadManager() {
-        this.swekProperties = SWEKProperties.getSingletonInstance().getSWEKProperties();
-        this.downloadEventPool = Executors.newFixedThreadPool(Integer.parseInt(this.swekProperties
-                .getProperty("plugin.swek.numberofthreads")));
-        this.dwMap = new HashMap<SWEKEventType, Map<Date, DownloadWorker>>();
-        this.activeEventTypes = new HashMap<SWEKEventType, Set<SWEKSource>>();
-        this.requestManager = IncomingRequestManager.getSingletonInstance();
-        this.busyAndFinishedJobs = new HashMap<SWEKEventType, Map<SWEKSource, Set<Date>>>();
+        swekProperties = SWEKProperties.getSingletonInstance().getSWEKProperties();
+        downloadEventPool = Executors.newFixedThreadPool(Integer.parseInt(swekProperties.getProperty("plugin.swek.numberofthreads")));
+        dwMap = new HashMap<SWEKEventType, Map<Date, DownloadWorker>>();
+        activeEventTypes = new HashMap<SWEKEventType, Set<SWEKSource>>();
+        requestManager = IncomingRequestManager.getSingletonInstance();
+        busyAndFinishedJobs = new HashMap<SWEKEventType, Map<SWEKSource, Set<Date>>>();
     }
 
     /**
@@ -83,7 +82,7 @@ public class SWEKDownloadManager implements DownloadWorkerListener, IncomingRequ
      */
     public void stopDownloadingEventType(SWEKEventType eventType) {
         synchronized (SWEKPluginLocks.downloadLock) {
-            Map<Date, DownloadWorker> dwMapOnDate = this.dwMap.get(eventType);
+            Map<Date, DownloadWorker> dwMapOnDate = dwMap.get(eventType);
             for (DownloadWorker dw : dwMapOnDate.values()) {
                 dw.stopWorker();
             }
@@ -100,12 +99,15 @@ public class SWEKDownloadManager implements DownloadWorkerListener, IncomingRequ
      */
     public void stopDownloadingEventType(SWEKEventType eventType, SWEKSource source) {
         synchronized (SWEKPluginLocks.downloadLock) {
-            Map<Date, DownloadWorker> dwMapOnDate = this.dwMap.get(eventType);
-            for (DownloadWorker dw : dwMapOnDate.values()) {
-                if (dw.getSource().equals(source)) {
-                    dw.stopWorker();
+            if (dwMap.containsKey(eventType)) {
+                Map<Date, DownloadWorker> dwMapOnDate = dwMap.get(eventType);
+                for (DownloadWorker dw : dwMapOnDate.values()) {
+                    if (dw.getSource().equals(source)) {
+                        dw.stopWorker();
+                    }
                 }
             }
+
         }
     }
 
@@ -168,7 +170,7 @@ public class SWEKDownloadManager implements DownloadWorkerListener, IncomingRequ
      */
     private void removeWorkerFromMap(DownloadWorker worker) {
         synchronized (SWEKPluginLocks.downloadLock) {
-            Map<Date, DownloadWorker> dwMapOnDate = this.dwMap.get(worker.getEventType());
+            Map<Date, DownloadWorker> dwMapOnDate = dwMap.get(worker.getEventType());
             if (dwMapOnDate != null) {
                 dwMapOnDate.remove(worker.getDownloadStartDate());
             }
@@ -187,16 +189,16 @@ public class SWEKDownloadManager implements DownloadWorkerListener, IncomingRequ
      */
     private void addToDownloaderMap(SWEKEventType eventType, Date date, DownloadWorker dw) {
         Map<Date, DownloadWorker> dwMapOnDate;
-        if (!this.dwMap.containsKey(eventType)) {
-            this.dwMap.put(eventType, new HashMap<Date, DownloadWorker>());
+        if (!dwMap.containsKey(eventType)) {
+            dwMap.put(eventType, new HashMap<Date, DownloadWorker>());
         }
-        dwMapOnDate = this.dwMap.get(eventType);
+        dwMapOnDate = dwMap.get(eventType);
         if (!dwMapOnDate.containsKey(date)) {
             dwMapOnDate.put(date, dw);
         } else {
             Log.debug("The event type : " + eventType + " is already downloaded for date : " + date + ". No extra download is done.");
         }
-        this.dwMap.put(eventType, dwMapOnDate);
+        dwMap.put(eventType, dwMapOnDate);
     }
 
     /**
@@ -209,12 +211,12 @@ public class SWEKDownloadManager implements DownloadWorkerListener, IncomingRequ
      *            the swek source to add
      */
     private void addEventTypeToActiveEventTypeMap(SWEKEventType eventType, SWEKSource swekSource) {
-        if (!this.activeEventTypes.containsKey(eventType)) {
-            this.activeEventTypes.put(eventType, new HashSet<SWEKSource>());
+        if (!activeEventTypes.containsKey(eventType)) {
+            activeEventTypes.put(eventType, new HashSet<SWEKSource>());
         }
-        Set<SWEKSource> sourceSet = this.activeEventTypes.get(eventType);
+        Set<SWEKSource> sourceSet = activeEventTypes.get(eventType);
         sourceSet.add(swekSource);
-        this.activeEventTypes.put(eventType, sourceSet);
+        activeEventTypes.put(eventType, sourceSet);
 
     }
 
@@ -228,10 +230,10 @@ public class SWEKDownloadManager implements DownloadWorkerListener, IncomingRequ
      *            the swek source to remove
      */
     private void removeEventTypeFromActiveEventTypeMap(SWEKEventType eventType, SWEKSource swekSource) {
-        Set<SWEKSource> sourceSet = this.activeEventTypes.get(eventType);
+        Set<SWEKSource> sourceSet = activeEventTypes.get(eventType);
         if (sourceSet != null) {
             sourceSet.remove(swekSource);
-            this.activeEventTypes.put(eventType, sourceSet);
+            activeEventTypes.put(eventType, sourceSet);
         }
     }
 
@@ -245,11 +247,11 @@ public class SWEKDownloadManager implements DownloadWorkerListener, IncomingRequ
      *            the source providing the event type
      */
     private void downloadForAllDates(SWEKEventType eventType, SWEKSource swekSource) {
-        List<Date> allDates = this.requestManager.getAllRequestedDates();
+        List<Date> allDates = requestManager.getAllRequestedDates();
         for (Date date : allDates) {
             startDownloadEventType(eventType, swekSource, date);
         }
-        List<Interval<Date>> allIntervals = this.requestManager.getAllRequestedIntervals();
+        List<Interval<Date>> allIntervals = requestManager.getAllRequestedIntervals();
         for (Interval<Date> interval : allIntervals) {
             startDownloadEventType(eventType, swekSource, interval);
         }
@@ -265,8 +267,8 @@ public class SWEKDownloadManager implements DownloadWorkerListener, IncomingRequ
      */
     private void downloadAllSelectedEventTypes(Date date) {
         synchronized (SWEKPluginLocks.treeSelectionLock) {
-            for (SWEKEventType eventType : this.activeEventTypes.keySet()) {
-                for (SWEKSource source : this.activeEventTypes.get(eventType)) {
+            for (SWEKEventType eventType : activeEventTypes.keySet()) {
+                for (SWEKSource source : activeEventTypes.get(eventType)) {
                     startDownloadEventType(eventType, source, date);
                 }
             }
@@ -283,8 +285,8 @@ public class SWEKDownloadManager implements DownloadWorkerListener, IncomingRequ
      */
     private void downloadAllSelectedEventTypes(Interval<Date> interval) {
         synchronized (SWEKPluginLocks.treeSelectionLock) {
-            for (SWEKEventType eventType : this.activeEventTypes.keySet()) {
-                for (SWEKSource source : this.activeEventTypes.get(eventType)) {
+            for (SWEKEventType eventType : activeEventTypes.keySet()) {
+                for (SWEKSource source : activeEventTypes.get(eventType)) {
                     startDownloadEventType(eventType, source, interval);
                 }
             }
@@ -303,7 +305,7 @@ public class SWEKDownloadManager implements DownloadWorkerListener, IncomingRequ
      * @return true if the combination was found, false if not
      */
     private boolean inBusyAndFinishedJobs(SWEKEventType eventType, SWEKSource source, Date date) {
-        Map<SWEKSource, Set<Date>> sourcesAndDatesForEvent = this.busyAndFinishedJobs.get(eventType);
+        Map<SWEKSource, Set<Date>> sourcesAndDatesForEvent = busyAndFinishedJobs.get(eventType);
         if (sourcesAndDatesForEvent != null) {
             Set<Date> datesForEventAndSource = sourcesAndDatesForEvent.get(source);
             if (datesForEventAndSource != null) {
@@ -325,7 +327,7 @@ public class SWEKDownloadManager implements DownloadWorkerListener, IncomingRequ
      *            the date to remove
      */
     private void removeFromBusyAndFinishedJobs(SWEKEventType eventType, SWEKSource source, Date date) {
-        Map<SWEKSource, Set<Date>> sourcesAndDatesForEvent = this.busyAndFinishedJobs.get(eventType);
+        Map<SWEKSource, Set<Date>> sourcesAndDatesForEvent = busyAndFinishedJobs.get(eventType);
         if (sourcesAndDatesForEvent != null) {
             Set<Date> datesForEventAndSource = sourcesAndDatesForEvent.get(source);
             if (datesForEventAndSource != null) {
@@ -363,7 +365,7 @@ public class SWEKDownloadManager implements DownloadWorkerListener, IncomingRequ
             if (!inBusyAndFinishedJobs(eventType, source, date)) {
                 dw.addDownloadWorkerListener(this);
                 addToDownloaderMap(eventType, dw.getDownloadStartDate(), dw);
-                this.downloadEventPool.execute(dw);
+                downloadEventPool.execute(dw);
             }
         }
     }
