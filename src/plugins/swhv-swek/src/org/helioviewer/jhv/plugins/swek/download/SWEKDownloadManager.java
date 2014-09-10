@@ -107,7 +107,6 @@ public class SWEKDownloadManager implements DownloadWorkerListener, IncomingRequ
                     }
                 }
             }
-
         }
     }
 
