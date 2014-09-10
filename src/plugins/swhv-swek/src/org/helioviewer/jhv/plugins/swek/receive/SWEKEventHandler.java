@@ -26,7 +26,7 @@ public class SWEKEventHandler implements JHVEventHandler {
      * @return the singleton instance
      */
     public static SWEKEventHandler getSingletonInstace() {
-        if (instance != null) {
+        if (instance == null) {
             instance = new SWEKEventHandler();
         }
         return instance;
