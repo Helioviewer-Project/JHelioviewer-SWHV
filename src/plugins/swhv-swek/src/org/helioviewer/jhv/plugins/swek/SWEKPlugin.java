@@ -44,9 +44,41 @@ public class SWEKPlugin extends OverlayPlugin implements Plugin {
     /** instance of the event container */
     private final JHVEventContainer eventContainer;
 
+    /**  */
+    private final boolean loadExternalJars;
+
+    /**
+     * Default constructor
+     * 
+     */
     public SWEKPlugin() {
         SWEKConfig = SWEKConfigurationManager.getSingletonInstance();
         SWEKSources = SWEKSourceManager.getSingletonInstance();
+        loadExternalJars = true;
+        SWEKSources.loadExternalJars(loadExternalJars);
+        outgoingRequestManager = OutgoingRequestManager.getSingletonInstance();
+        incomingRequestManager = IncomingRequestManager.getSingletonInstance();
+        eventContainer = JHVEventContainer.getSingletonInstance();
+        try {
+            pluginLocation = new URI(SWEKSettings.PLUGIN_NAME);
+        } catch (URISyntaxException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+    }
+
+    /**
+     * Creates a SWEKPlugin that loads or doesn't load the external jars
+     * 
+     * @param loadExternalJars
+     *            true is the source jar should be loaded, false if the source
+     *            jars should not be loaded.
+     */
+    public SWEKPlugin(boolean loadExternalJars) {
+        SWEKConfig = SWEKConfigurationManager.getSingletonInstance();
+        SWEKSources = SWEKSourceManager.getSingletonInstance();
+        this.loadExternalJars = loadExternalJars;
+        SWEKSources.loadExternalJars(loadExternalJars);
         outgoingRequestManager = OutgoingRequestManager.getSingletonInstance();
         incomingRequestManager = IncomingRequestManager.getSingletonInstance();
         eventContainer = JHVEventContainer.getSingletonInstance();
