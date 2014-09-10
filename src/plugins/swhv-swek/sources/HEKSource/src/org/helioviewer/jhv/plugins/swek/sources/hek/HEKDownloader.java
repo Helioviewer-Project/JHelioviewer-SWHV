@@ -24,7 +24,7 @@ public class HEKDownloader implements SWEKDownloader {
      */
     public HEKDownloader() {
         HEKSourceProperties hsp = HEKSourceProperties.getSingletonInstance();
-        this.hekSourceProperties = hsp.getHEKSourceProperties();
+        hekSourceProperties = hsp.getHEKSourceProperties();
     }
 
     @Override
@@ -62,7 +62,7 @@ public class HEKDownloader implements SWEKDownloader {
      * @return the url represented as string
      */
     private String createURL(SWEKEventType eventType, Date startDate, Date endDate) {
-        StringBuilder baseURL = new StringBuilder(this.hekSourceProperties.getProperty("heksource.baseurl")).append("?");
+        StringBuilder baseURL = new StringBuilder(hekSourceProperties.getProperty("heksource.baseurl")).append("?");
         baseURL = appendCmd(baseURL, eventType, startDate, endDate).append("&");
         baseURL = appendType(baseURL, eventType, startDate, endDate).append("&");
         baseURL = appendEventType(baseURL, eventType, startDate, endDate).append("&");
@@ -123,7 +123,7 @@ public class HEKDownloader implements SWEKDownloader {
      * @return the current URL extended with the event type
      */
     private StringBuilder appendEventType(StringBuilder baseURL, SWEKEventType eventType, Date startDate, Date endDate) {
-        return baseURL.append("event_type=").append(HEKEventFactory.getHEKEvent(eventType.getEventName()));
+        return baseURL.append("event_type=").append(HEKEventFactory.getHEKEvent(eventType.getEventName()).getAbbriviation());
     }
 
     /**
