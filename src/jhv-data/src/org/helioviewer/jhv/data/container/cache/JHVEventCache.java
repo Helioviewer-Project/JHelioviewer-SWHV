@@ -31,7 +31,7 @@ public class JHVEventCache {
      * @return singleton instance of the cache.
      */
     public static JHVEventCache getSingletonInstance() {
-        if (instance != null) {
+        if (instance == null) {
             instance = new JHVEventCache();
         }
         return instance;
