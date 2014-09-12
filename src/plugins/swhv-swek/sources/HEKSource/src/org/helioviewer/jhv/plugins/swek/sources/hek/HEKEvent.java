@@ -213,7 +213,7 @@ public class HEKEvent implements JHVEvent {
         allVisibleNullParameters = new ArrayList<JHVEventParameter>();
         allNonVisibleParameters = new ArrayList<JHVEventParameter>();
         allNonVisibleNotNullParameters = new ArrayList<JHVEventParameter>();
-        allVisibleNullParameters = new ArrayList<JHVEventParameter>();
+        allNonVisibleNullParameters = new ArrayList<JHVEventParameter>();
     }
 
     /**
