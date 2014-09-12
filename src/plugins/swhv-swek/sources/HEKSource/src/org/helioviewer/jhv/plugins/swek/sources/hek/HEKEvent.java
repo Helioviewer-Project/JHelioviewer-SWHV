@@ -179,22 +179,26 @@ public class HEKEvent implements JHVEvent {
      *            the parameter to add
      * @param visible
      *            is the parameter visible
+     * @param configured
+     *            was the event in the configuration file
      */
-    public void addParameter(JHVEventParameter parameter, boolean visible) {
+    public void addParameter(JHVEventParameter parameter, boolean visible, boolean configured) {
         allParameters.add(parameter);
-        if (visible) {
-            allVisibleParameters.add(parameter);
-            if (parameter.getParameterValue() == null) {
-                allVisibleNullParameters.add(parameter);
+        if (configured) {
+            if (visible) {
+                allVisibleParameters.add(parameter);
+                if (parameter.getParameterValue() == null) {
+                    allVisibleNullParameters.add(parameter);
+                } else {
+                    allVisibleNotNullParameters.add(parameter);
+                }
             } else {
-                allVisibleNotNullParameters.add(parameter);
-            }
-        } else {
-            allNonVisibleParameters.add(parameter);
-            if (parameter.getParameterValue() == null) {
-                allNonVisibleNullParameters.add(parameter);
-            } else {
-                allNonVisibleNotNullParameters.add(parameter);
+                allNonVisibleParameters.add(parameter);
+                if (parameter.getParameterValue() == null) {
+                    allNonVisibleNullParameters.add(parameter);
+                } else {
+                    allNonVisibleNotNullParameters.add(parameter);
+                }
             }
         }
     }
@@ -210,5 +214,26 @@ public class HEKEvent implements JHVEvent {
         allNonVisibleParameters = new ArrayList<JHVEventParameter>();
         allNonVisibleNotNullParameters = new ArrayList<JHVEventParameter>();
         allVisibleNullParameters = new ArrayList<JHVEventParameter>();
+    }
+
+    /**
+     * Sets the start date of the HEKEvent.
+     * 
+     * @param startDate
+     *            the start date
+     */
+    public void setStartTime(Date startDate) {
+        this.startDate = startDate;
+    }
+
+    /**
+     * Sets the end date of the HEKEvent.
+     * 
+     * @param endDate
+     *            the end date
+     */
+    public void setEndTime(Date endDate) {
+        this.endDate = endDate;
+
     }
 }
