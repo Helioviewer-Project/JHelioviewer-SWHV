@@ -11,5 +11,6 @@
 	<classpathentry combineaccessrules="false" kind="src" path="/viewmodelplugin"/>
 	<classpathentry kind="lib" path="lib/derby.jar"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/jhv-display"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/jhv-data"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
