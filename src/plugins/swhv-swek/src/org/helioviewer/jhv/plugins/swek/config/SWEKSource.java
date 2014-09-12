@@ -225,7 +225,7 @@ public class SWEKSource {
      */
     public boolean containsParameter(String name) {
         for (SWEKParameter parameter : generalParameters) {
-            if (parameter.getParameterName().equals(name)) {
+            if (parameter.getParameterName().toLowerCase().equals(name.toLowerCase())) {
                 return true;
             }
         }
@@ -242,7 +242,7 @@ public class SWEKSource {
      */
     public SWEKParameter getParameter(String name) {
         for (SWEKParameter parameter : generalParameters) {
-            if (parameter.getParameterName().equals(name)) {
+            if (parameter.getParameterName().toLowerCase().equals(name.toLowerCase())) {
                 return parameter;
             }
         }
