@@ -202,7 +202,7 @@ public class DownloadWorker implements Runnable {
      */
     private void parseData() {
         if (!isStopped) {
-            eventStream = parser.parseEventStream(downloadInputStream);
+            eventStream = parser.parseEventStream(downloadInputStream, eventType, swekSource);
         } else {
             if (parser != null) {
                 parser.stopParser();
