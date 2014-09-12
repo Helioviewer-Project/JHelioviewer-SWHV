@@ -13,7 +13,7 @@ public interface SWEKParser {
      * Parses the event stream.
      * 
      * @param downloadInputStream
-     *            The stream containing the events in specific source format
+     *            the stream containing the events in specific source format
      * @return the stream containing the events in standard jhelioviewer format
      */
     public abstract SWEKEventStream parseEventStream(InputStream downloadInputStream);
