@@ -18,4 +18,10 @@ public interface JHVEventHandler {
      *            the list of events that were received
      */
     public abstract void newEventsReceived(List<JHVEvent> eventList);
+
+    /**
+     * Informs the JHVEventHandler the cache was changed.
+     * 
+     */
+    public abstract void cacheUpdated();
 }
