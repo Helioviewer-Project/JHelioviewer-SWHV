@@ -3,6 +3,7 @@ package org.helioviewer.jhv.plugins.swek.receive;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.helioviewer.base.logging.Log;
 import org.helioviewer.jhv.data.container.JHVEventHandler;
 import org.helioviewer.jhv.data.datatype.JHVEvent;
 
@@ -54,7 +55,15 @@ public class SWEKEventHandler implements JHVEventHandler {
 
     @Override
     public void newEventsReceived(List<JHVEvent> eventList) {
+        Log.info("New events received.");
+        for (JHVEvent event : eventList) {
+            Log.info(event.getName() + " " + event.getDisplayName() + " " + event.getStartDate() + "-" + event.getEndDate());
+        }
+    }
 
+    @Override
+    public void cacheUpdated() {
+        Log.info("New Cache update received");
     }
 
 }
