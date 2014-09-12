@@ -43,14 +43,14 @@ public class SWEKEventType {
      */
     public SWEKEventType() {
         super();
-        this.eventName = "";
-        this.suppliers = new ArrayList<SWEKSupplier>();
-        this.parameterList = new ArrayList<SWEKParameter>();
-        this.requestIntervalExtension = 0L;
-        this.standardSelected = false;
-        this.groupOn = null;
-        this.coordinateSystem = "";
-        this.spatialRegion = new SWEKSpatialRegion();
+        eventName = "";
+        suppliers = new ArrayList<SWEKSupplier>();
+        parameterList = new ArrayList<SWEKParameter>();
+        requestIntervalExtension = 0L;
+        standardSelected = false;
+        groupOn = null;
+        coordinateSystem = "";
+        spatialRegion = new SWEKSpatialRegion();
     }
 
     /**
@@ -91,7 +91,7 @@ public class SWEKEventType {
      * @return the eventName
      */
     public String getEventName() {
-        return this.eventName;
+        return eventName;
     }
 
     /**
@@ -110,7 +110,7 @@ public class SWEKEventType {
      * @return the suppliers
      */
     public List<SWEKSupplier> getSuppliers() {
-        return this.suppliers;
+        return suppliers;
     }
 
     /**
@@ -129,7 +129,7 @@ public class SWEKEventType {
      * @return the parameterList
      */
     public List<SWEKParameter> getParameterList() {
-        return this.parameterList;
+        return parameterList;
     }
 
     /**
@@ -148,7 +148,7 @@ public class SWEKEventType {
      * @return the requestIntervalExtension
      */
     public Long getRequestIntervalExtension() {
-        return this.requestIntervalExtension;
+        return requestIntervalExtension;
     }
 
     /**
@@ -168,7 +168,7 @@ public class SWEKEventType {
      *         false if not
      */
     public boolean isStandardSelected() {
-        return this.standardSelected;
+        return standardSelected;
     }
 
     /**
@@ -188,7 +188,7 @@ public class SWEKEventType {
      * @return the groupOn
      */
     public SWEKParameter getGroupOn() {
-        return this.groupOn;
+        return groupOn;
     }
 
     /**
@@ -207,7 +207,7 @@ public class SWEKEventType {
      * @return the coordinate system
      */
     public String getCoordinateSystem() {
-        return this.coordinateSystem;
+        return coordinateSystem;
     }
 
     /**
@@ -226,7 +226,7 @@ public class SWEKEventType {
      * @return The spatial region
      */
     public SWEKSpatialRegion getSpatialRegion() {
-        return this.spatialRegion;
+        return spatialRegion;
     }
 
     /**
@@ -239,4 +239,37 @@ public class SWEKEventType {
         this.spatialRegion = spatialRegion;
     }
 
+    /**
+     * Contains this source the following parameter.
+     * 
+     * @param name
+     *            the name of the parameter
+     * @return true if the parameter is configured for this source, false if the
+     *         parameter is not configured for this source
+     */
+    public boolean containsParameter(String name) {
+        for (SWEKParameter parameter : parameterList) {
+            if (parameter.getParameterName().equals(name)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
+     * Gets a parameter from the event type.
+     * 
+     * @param name
+     *            the name of the parameter defined in the swek source
+     * @return the parameter if present in the event type, null if the parameter
+     *         was not found.
+     */
+    public SWEKParameter getParameter(String name) {
+        for (SWEKParameter parameter : parameterList) {
+            if (parameter.getParameterName().equals(name)) {
+                return parameter;
+            }
+        }
+        return null;
+    }
 }
