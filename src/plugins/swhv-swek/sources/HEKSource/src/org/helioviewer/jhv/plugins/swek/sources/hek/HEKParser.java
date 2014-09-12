@@ -134,7 +134,12 @@ public class HEKParser implements SWEKParser {
     private void parseParameter(JSONObject result, Object key, HEKEvent currentEvent) throws JSONException {
         if (key instanceof String) {
             String keyString = (String) key;
+            Log.info("key: " + keyString);
             String value = result.getString((String) key);
+            if (value.toLowerCase().equals("null")) {
+                value = null;
+            }
+
             if (keyString.toLowerCase().equals("event_starttime")) {
                 currentEvent.setStartTime(parseDate(value));
             } else if (keyString.toLowerCase().equals("event_endtime")) {
