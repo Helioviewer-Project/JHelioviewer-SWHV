@@ -41,13 +41,13 @@ public class SWEKSource {
      * downloader, parser, base URL and empty list of general parameters.
      */
     public SWEKSource() {
-        this.sourceName = "";
-        this.providerName = "";
-        this.downloaderClass = "";
-        this.eventParserClass = "";
-        this.jarLocation = "";
-        this.baseURL = "";
-        this.generalParameters = new ArrayList<SWEKParameter>();
+        sourceName = "";
+        providerName = "";
+        downloaderClass = "";
+        eventParserClass = "";
+        jarLocation = "";
+        baseURL = "";
+        generalParameters = new ArrayList<SWEKParameter>();
     }
 
     /**
@@ -88,7 +88,7 @@ public class SWEKSource {
      * @return the sourceName
      */
     public String getSourceName() {
-        return this.sourceName;
+        return sourceName;
     }
 
     /**
@@ -107,7 +107,7 @@ public class SWEKSource {
      * @return the providerName The name of the provider
      */
     public String getProviderName() {
-        return this.providerName;
+        return providerName;
     }
 
     /**
@@ -126,7 +126,7 @@ public class SWEKSource {
      * @return The downloader class for events from this source
      */
     public String getDownloaderClass() {
-        return this.downloaderClass;
+        return downloaderClass;
     }
 
     /**
@@ -145,7 +145,7 @@ public class SWEKSource {
      * @return the eventParser class
      */
     public String getEventParserClass() {
-        return this.eventParserClass;
+        return eventParserClass;
     }
 
     /**
@@ -164,7 +164,7 @@ public class SWEKSource {
      * @return the baseURL The URL for this source.
      */
     public String getBaseURL() {
-        return this.baseURL;
+        return baseURL;
     }
 
     /**
@@ -183,7 +183,7 @@ public class SWEKSource {
      * @return the generalParameters The general parameters of this source
      */
     public List<SWEKParameter> getGeneralParameters() {
-        return this.generalParameters;
+        return generalParameters;
     }
 
     /**
@@ -202,7 +202,7 @@ public class SWEKSource {
      * @return string containing the location of the jar
      */
     public String getJarLocation() {
-        return this.jarLocation;
+        return jarLocation;
     }
 
     /**
@@ -215,4 +215,37 @@ public class SWEKSource {
         this.jarLocation = jarLocation;
     }
 
+    /**
+     * Contains this source the following parameter.
+     * 
+     * @param name
+     *            the name of the parameter
+     * @return true if the parameter is configured for this source, false if the
+     *         parameter is not configured for this source
+     */
+    public boolean containsParameter(String name) {
+        for (SWEKParameter parameter : generalParameters) {
+            if (parameter.getParameterName().equals(name)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
+     * Gets the parameter if defined in the SWEK source.
+     * 
+     * @param name
+     *            the name of the parameter
+     * @return the parameter if the parameter is defined in the SWEKSource, null
+     *         if the parameter was not found
+     */
+    public SWEKParameter getParameter(String name) {
+        for (SWEKParameter parameter : generalParameters) {
+            if (parameter.getParameterName().equals(name)) {
+                return parameter;
+            }
+        }
+        return null;
+    }
 }
