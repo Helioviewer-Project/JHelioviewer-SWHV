@@ -36,6 +36,7 @@ public class HEKDownloader implements SWEKDownloader {
     @Override
     public InputStream downloadData(SWEKEventType eventType, Date startDate, Date endDate) {
         String urlString = createURL(eventType, startDate, endDate);
+        Log.info("Download events using following URL: " + urlString);
         try {
             DownloadStream ds = new DownloadStream(new URL(urlString), JHVGlobals.getStdConnectTimeout(), JHVGlobals.getStdReadTimeout());
             return ds.getInput();
