@@ -131,6 +131,17 @@ public class JHVEventContainer {
     }
 
     /**
+     * Add an event to the event cache.
+     * 
+     * @param event
+     *            the event to add to the event cache
+     */
+    public void addEvent(JHVEvent event) {
+        eventCache.add(event);
+        fireEventCacheChanged(event.getStartDate());
+    }
+
+    /**
      * Request data from the request handlers for a date.
      * 
      * @param date
@@ -157,6 +168,20 @@ public class JHVEventContainer {
             for (JHVEventContainerRequestHandler handler : requestHandlers) {
                 handler.handleRequestForInterval(startDate, endDate);
             }
+        }
+    }
+
+    /**
+     * Notify the interested JHVEventhandler of about the cache that was
+     * changed.
+     * 
+     * @param date
+     *            the date for which the cache was changed.
+     */
+    private void fireEventCacheChanged(Date date) {
+        List<JHVEventHandler> jhvEventHandlers = eventHandlerCache.getJHVEventHandlersForDate(date);
+        for (JHVEventHandler handler : jhvEventHandlers) {
+            handler.cacheUpdated();
         }
     }
 }
