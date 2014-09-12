@@ -6,6 +6,7 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
+import org.helioviewer.jhv.data.container.JHVEventContainer;
 import org.helioviewer.jhv.plugins.swek.config.SWEKEventType;
 import org.helioviewer.jhv.plugins.swek.config.SWEKSource;
 import org.helioviewer.jhv.plugins.swek.sources.SWEKDownloader;
@@ -53,6 +54,9 @@ public class DownloadWorker implements Runnable {
     /** Worker end download date */
     private final Date downloadEndDate;
 
+    /** instance of the JHV Event container */
+    private final JHVEventContainer eventContainer;
+
     /**
      * The list containing the download worker listeners of this download worker
      */
@@ -74,6 +78,7 @@ public class DownloadWorker implements Runnable {
         sourceManager = SWEKSourceManager.getSingletonInstance();
         listeners = new ArrayList<DownloadWorkerListener>();
         isFireForceStoppedCalled = false;
+        eventContainer = JHVEventContainer.getSingletonInstance();
     }
 
     /**
@@ -98,6 +103,7 @@ public class DownloadWorker implements Runnable {
         listeners = new ArrayList<DownloadWorkerListener>();
         sourceManager = SWEKSourceManager.getSingletonInstance();
         isFireForceStoppedCalled = false;
+        eventContainer = JHVEventContainer.getSingletonInstance();
     }
 
     /**
@@ -188,8 +194,7 @@ public class DownloadWorker implements Runnable {
         if (!isStopped) {
             if (eventStream != null) {
                 while (eventStream.hasEvents()) {
-                    // TODO offer event to the JHVEventContainer
-                    eventStream.next();
+                    eventContainer.addEvent(eventStream.next());
                 }
             }
         } else {
