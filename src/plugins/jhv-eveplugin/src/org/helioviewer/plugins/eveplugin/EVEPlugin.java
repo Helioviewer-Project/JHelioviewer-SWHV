@@ -9,6 +9,9 @@ import org.helioviewer.jhv.JavaHelioViewerLauncher;
 import org.helioviewer.jhv.gui.ImageViewerGui;
 import org.helioviewer.jhv.gui.dialogs.observation.ObservationDialog;
 import org.helioviewer.jhv.gui.interfaces.MainContentPanelPlugin;
+import org.helioviewer.plugins.eveplugin.controller.ZoomController;
+import org.helioviewer.plugins.eveplugin.events.data.EventRequester;
+import org.helioviewer.plugins.eveplugin.events.model.EventModel;
 import org.helioviewer.plugins.eveplugin.lines.data.DatabaseController;
 import org.helioviewer.plugins.eveplugin.radio.model.RadioPlotModel;
 import org.helioviewer.plugins.eveplugin.settings.EVESettings;
@@ -29,6 +32,10 @@ public class EVEPlugin implements Plugin, MainContentPanelPlugin {
 
     @Override
     public void installPlugin() {
+        EventRequester eventRequester = EventRequester.getSingletonInstance();
+        ZoomController.getSingletonInstance().addZoomControllerListener(eventRequester);
+        eventRequester.addListener(EventModel.getSingletonInstance());
+        ZoomController.getSingletonInstance().addZoomControllerListener(EventModel.getSingletonInstance());
         if (mainPanel == null) {
             mainPanel = new MainPanel();
         }
@@ -43,6 +50,7 @@ public class EVEPlugin implements Plugin, MainContentPanelPlugin {
         // initialize database connection
         DatabaseController.getSingletonInstance();
         RadioPlotModel.getSingletonInstance();
+
     }
 
     @Override
