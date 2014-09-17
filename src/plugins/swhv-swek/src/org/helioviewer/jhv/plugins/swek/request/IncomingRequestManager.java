@@ -30,11 +30,11 @@ public class IncomingRequestManager implements JHVEventContainerRequestHandler {
      * Private constructor.
      */
     private IncomingRequestManager() {
-        this.eventContainer = JHVEventContainer.getSingletonInstance();
-        this.eventContainer.registerHandler(this);
-        this.listeners = new ArrayList<IncomingRequestManagerListener>();
-        this.intervalList = new ArrayList<Interval<Date>>();
-        this.dateList = new ArrayList<Date>();
+        eventContainer = JHVEventContainer.getSingletonInstance();
+        eventContainer.registerHandler(this);
+        listeners = new ArrayList<IncomingRequestManagerListener>();
+        intervalList = new ArrayList<Interval<Date>>();
+        dateList = new ArrayList<Date>();
     }
 
     /**
@@ -56,7 +56,7 @@ public class IncomingRequestManager implements JHVEventContainerRequestHandler {
      *            the listener to add
      */
     public void addRequestManagerListener(IncomingRequestManagerListener l) {
-        this.listeners.add(l);
+        listeners.add(l);
     }
 
     /**
@@ -66,7 +66,7 @@ public class IncomingRequestManager implements JHVEventContainerRequestHandler {
      *            the listener to remove
      */
     public void removeRequestManagerListener(IncomingRequestManagerListener l) {
-        this.listeners.remove(l);
+        listeners.remove(l);
     }
 
     /**
@@ -76,7 +76,7 @@ public class IncomingRequestManager implements JHVEventContainerRequestHandler {
      */
     public List<Date> getAllRequestedDates() {
         synchronized (SWEKPluginLocks.requestLock) {
-            return this.dateList;
+            return dateList;
         }
     }
 
@@ -87,14 +87,16 @@ public class IncomingRequestManager implements JHVEventContainerRequestHandler {
      */
     public List<Interval<Date>> getAllRequestedIntervals() {
         synchronized (SWEKPluginLocks.requestLock) {
-            return this.intervalList;
+            List<Interval<Date>> tempIntervals = new ArrayList<Interval<Date>>();
+            tempIntervals.addAll(intervalList);
+            return tempIntervals;
         }
     }
 
     @Override
     public void handleRequestForDate(Date date) {
         synchronized (SWEKPluginLocks.requestLock) {
-            this.dateList.add(date);
+            dateList.add(date);
             fireNewDateRequested(date);
         }
     }
@@ -103,7 +105,7 @@ public class IncomingRequestManager implements JHVEventContainerRequestHandler {
     public void handleRequestForInterval(Date startDate, Date endDate) {
         synchronized (SWEKPluginLocks.requestLock) {
             Interval<Date> interval = new Interval<Date>(startDate, endDate);
-            this.intervalList.add(interval);
+            intervalList.add(interval);
             fireNewIntervalRequested(interval);
         }
     }
@@ -112,7 +114,7 @@ public class IncomingRequestManager implements JHVEventContainerRequestHandler {
     public void handleRequestForDateList(List<Date> dates) {
         synchronized (SWEKPluginLocks.requestLock) {
             for (Date date : dates) {
-                this.dateList.add(date);
+                dateList.add(date);
             }
             firedNewDateListRequested(dates);
         }
@@ -126,7 +128,7 @@ public class IncomingRequestManager implements JHVEventContainerRequestHandler {
      *            the date that was requested
      */
     private void fireNewDateRequested(Date date) {
-        for (IncomingRequestManagerListener l : this.listeners) {
+        for (IncomingRequestManagerListener l : listeners) {
             l.newRequestForDate(date);
         }
     }
@@ -138,7 +140,7 @@ public class IncomingRequestManager implements JHVEventContainerRequestHandler {
      *            interval that was requested
      */
     private void fireNewIntervalRequested(Interval<Date> interval) {
-        for (IncomingRequestManagerListener l : this.listeners) {
+        for (IncomingRequestManagerListener l : listeners) {
             l.newRequestForInterval(interval);
         }
     }
@@ -150,7 +152,7 @@ public class IncomingRequestManager implements JHVEventContainerRequestHandler {
      *            list of dates that was requested
      */
     private void firedNewDateListRequested(List<Date> dates) {
-        for (IncomingRequestManagerListener l : this.listeners) {
+        for (IncomingRequestManagerListener l : listeners) {
             l.newRequestForDateList(dates);
         }
     }
