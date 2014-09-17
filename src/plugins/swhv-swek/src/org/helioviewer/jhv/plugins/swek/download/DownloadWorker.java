@@ -6,6 +6,7 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
+import org.helioviewer.base.math.Interval;
 import org.helioviewer.jhv.data.container.JHVEventContainer;
 import org.helioviewer.jhv.plugins.swek.config.SWEKEventType;
 import org.helioviewer.jhv.plugins.swek.config.SWEKSource;
@@ -28,7 +29,7 @@ public class DownloadWorker implements Runnable {
     private final SWEKSource swekSource;
 
     /** The date for which the event was requested */
-    private final Date eventRequestDate;
+    private Date eventRequestDate;
 
     /** Should the download stop */
     private boolean isStopped;
@@ -56,6 +57,8 @@ public class DownloadWorker implements Runnable {
 
     /** instance of the JHV Event container */
     private final JHVEventContainer eventContainer;
+
+    private Interval<Date> interval;
 
     /**
      * The list containing the download worker listeners of this download worker
@@ -107,6 +110,29 @@ public class DownloadWorker implements Runnable {
     }
 
     /**
+     * Creates a worker thread to download the events of the given event type,
+     * from the given source for a given interval.
+     * 
+     * @param eventType
+     *            the type to download
+     * @param swekSource
+     *            the source from which to download
+     * @param interval
+     *            the interval for which to download
+     */
+    public DownloadWorker(SWEKEventType eventType, SWEKSource swekSource, Interval<Date> interval) {
+        isStopped = false;
+        this.swekSource = swekSource;
+        this.eventType = eventType;
+        downloadStartDate = new Date(interval.getStart().getTime() - this.eventType.getRequestIntervalExtension());
+        downloadEndDate = new Date(interval.getEnd().getTime() + this.eventType.getRequestIntervalExtension());
+        listeners = new ArrayList<DownloadWorkerListener>();
+        sourceManager = SWEKSourceManager.getSingletonInstance();
+        isFireForceStoppedCalled = false;
+        eventContainer = JHVEventContainer.getSingletonInstance();
+    }
+
+    /**
      * Adds a new listener to the download worker thread.
      * 
      * @param listener
@@ -148,6 +174,8 @@ public class DownloadWorker implements Runnable {
         parseData();
         // distribute the data
         distributeData();
+        // inform JHVEventContainer data finished downloading
+        eventContainer.finishedDownload();
         fireDownloadWorkerFinished();
     }
 
