@@ -11,7 +11,7 @@ import org.helioviewer.jhv.data.datatype.JHVEvent;
  * @author Bram Bourgoignie (Bram.Bourgoignie@oma.be)
  * 
  */
-public interface IncomingEventHandlerListener {
+public interface EventRequesterListener {
     /**
      * New Events where received.
      * 
