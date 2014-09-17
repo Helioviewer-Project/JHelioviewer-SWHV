@@ -29,16 +29,16 @@ import org.helioviewer.viewmodel.view.ViewListener;
 public class DrawController implements ZoomControllerListener, LineDataSelectorModelListener, ViewListener {
 
     private static DrawController instance;
-    private Map<String, DrawControllerData> drawControllerData;
+    private final Map<String, DrawControllerData> drawControllerData;
     private Interval<Date> interval;
-    private List<DrawControllerListener> forAllPlotIdentifiers;
+    private final List<DrawControllerListener> forAllPlotIdentifiers;
     private Thread viewChangedThread;
 
     private DrawController() {
-        this.drawControllerData = new HashMap<String, DrawControllerData>();
+        drawControllerData = new HashMap<String, DrawControllerData>();
         ZoomController.getSingletonInstance().addZoomControllerListener(this);
         LineDataSelectorModel.getSingletonInstance().addLineDataSelectorModelListener(this);
-        this.forAllPlotIdentifiers = new ArrayList<DrawControllerListener>();
+        forAllPlotIdentifiers = new ArrayList<DrawControllerListener>();
         ViewListenerDistributor.getSingletonInstance().addViewListener(this);
     }
 
@@ -63,7 +63,7 @@ public class DrawController implements ZoomControllerListener, LineDataSelectorM
     }
 
     public void addDrawControllerListenerForAllIdentifiers(DrawControllerListener listener) {
-        this.forAllPlotIdentifiers.add(listener);
+        forAllPlotIdentifiers.add(listener);
         for (String identifier : drawControllerData.keySet()) {
             DrawControllerData dcd = getDrawControllerData(identifier);
             dcd.addDrawControllerListener(listener);
@@ -71,7 +71,7 @@ public class DrawController implements ZoomControllerListener, LineDataSelectorM
     }
 
     public void removeDrawControllerListenerForAllIdentifiers(DrawControllerListener listener) {
-        this.forAllPlotIdentifiers.remove(listener);
+        forAllPlotIdentifiers.remove(listener);
         for (String identifier : drawControllerData.keySet()) {
             DrawControllerData dcd = getDrawControllerData(identifier);
             dcd.removeDrawControllerListener(listener);
@@ -131,16 +131,16 @@ public class DrawController implements ZoomControllerListener, LineDataSelectorM
         return dcd.getyAxisSet();
     }
 
-    public Map<DrawableType, List<DrawableElement>> getDrawableElements(String identifier) {
+    public Map<DrawableType, Set<DrawableElement>> getDrawableElements(String identifier) {
         DrawControllerData dcd = getDrawControllerData(identifier);
         return dcd.getDrawableElements();
     }
 
     public List<DrawableElement> getAllDrawableElements(String identifier) {
         synchronized (this) {
-            Collection<List<DrawableElement>> allValues = getDrawableElements(identifier).values();
+            Collection<Set<DrawableElement>> allValues = getDrawableElements(identifier).values();
             ArrayList<DrawableElement> deList = new ArrayList<DrawableElement>();
-            for (List<DrawableElement> tempList : allValues) {
+            for (Set<DrawableElement> tempList : allValues) {
                 deList.addAll(tempList);
             }
             return deList;
@@ -181,7 +181,9 @@ public class DrawController implements ZoomControllerListener, LineDataSelectorM
 
     private void fireRedrawRequest() {
         for (DrawControllerData dcd : drawControllerData.values()) {
+            Log.info("DrawController listeners size: " + dcd.getListeners().size());
             for (DrawControllerListener l : dcd.getListeners()) {
+                Log.info("Draw Controller listener : " + l);
                 l.drawRequest();
             }
         }
@@ -259,9 +261,10 @@ public class DrawController implements ZoomControllerListener, LineDataSelectorM
     @Override
     public void viewChanged(View sender, ChangeEvent aEvent) {
         TimestampChangedReason timestampReason = aEvent.getLastChangedReasonByType(TimestampChangedReason.class);
-        if ((timestampReason != null) && (timestampReason.getView() instanceof TimedMovieView) && LinkedMovieManager.getActiveInstance().isMaster((TimedMovieView) timestampReason.getView())) {
-            if (this.viewChangedThread == null || viewChangedThread.getState() == Thread.State.TERMINATED) {
-                this.viewChangedThread = new Thread(new Runnable() {
+        if ((timestampReason != null) && (timestampReason.getView() instanceof TimedMovieView)
+                && LinkedMovieManager.getActiveInstance().isMaster((TimedMovieView) timestampReason.getView())) {
+            if (viewChangedThread == null || viewChangedThread.getState() == Thread.State.TERMINATED) {
+                viewChangedThread = new Thread(new Runnable() {
                     private Date date;
 
                     @Override
@@ -274,7 +277,7 @@ public class DrawController implements ZoomControllerListener, LineDataSelectorM
                         return this;
                     }
                 }.init(timestampReason.getNewDateTime().getTime()));
-                this.viewChangedThread.start();
+                viewChangedThread.start();
             } else {
                 Log.trace("Ignore timestamp thread still running");
             }
