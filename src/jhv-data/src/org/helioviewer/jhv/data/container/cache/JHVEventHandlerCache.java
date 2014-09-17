@@ -29,12 +29,15 @@ public class JHVEventHandlerCache {
     /** Handlers that want events within an interval */
     private final Map<Date, Map<Date, Set<JHVEventHandler>>> interestInInterval;
 
+    private final Set<JHVEventHandler> allJHVeventHandlers;
+
     /**
      * private default constructor
      */
     private JHVEventHandlerCache() {
         interestInDate = new HashMap<Date, Set<JHVEventHandler>>();
         interestInInterval = new HashMap<Date, Map<Date, Set<JHVEventHandler>>>();
+        allJHVeventHandlers = new HashSet<JHVEventHandler>();
     }
 
     /**
@@ -66,6 +69,18 @@ public class JHVEventHandlerCache {
             }
             tempSet.add(handler);
             interestInDate.put(roundedDate, tempSet);
+            allJHVeventHandlers.add(handler);
+        }
+    }
+
+    /**
+     * Gets all the JHVEventHandlers.
+     * 
+     * @return a set with all event handlers
+     */
+    public Set<JHVEventHandler> getAllJHVEventHandlers() {
+        synchronized (JHVEventContainerLocks.eventHandlerCacheLock) {
+            return allJHVeventHandlers;
         }
     }
 
@@ -94,6 +109,7 @@ public class JHVEventHandlerCache {
             eventHandlers.add(handler);
             eventHandlerEnd.put(roundedEndDate, eventHandlers);
             interestInInterval.put(roundedStartDate, eventHandlerEnd);
+            allJHVeventHandlers.add(handler);
         }
     }
 
