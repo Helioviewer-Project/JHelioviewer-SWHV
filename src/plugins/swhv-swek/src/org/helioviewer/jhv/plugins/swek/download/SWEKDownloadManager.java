@@ -1,6 +1,5 @@
 package org.helioviewer.jhv.plugins.swek.download;
 
-import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -42,7 +41,11 @@ public class SWEKDownloadManager implements DownloadWorkerListener, IncomingRequ
     /** Map holding the download workers order by event type and date */
     private final Map<SWEKEventType, Map<Date, DownloadWorker>> dwMap;
 
+    /** Map with all the finished and busy downloads */
     private final Map<SWEKEventType, Map<SWEKSource, Set<Date>>> busyAndFinishedJobs;
+
+    /** Map with all the finished and busy interval downloads */
+    private final Map<SWEKEventType, Map<SWEKSource, Map<Date, Set<Date>>>> busyAndFinishedIntervalJobs;
 
     /** Map holding the active event types and its sources */
     private final Map<SWEKEventType, Set<SWEKSource>> activeEventTypes;
@@ -60,6 +63,7 @@ public class SWEKDownloadManager implements DownloadWorkerListener, IncomingRequ
         activeEventTypes = new HashMap<SWEKEventType, Set<SWEKSource>>();
         requestManager = IncomingRequestManager.getSingletonInstance();
         busyAndFinishedJobs = new HashMap<SWEKEventType, Map<SWEKSource, Set<Date>>>();
+        busyAndFinishedIntervalJobs = new HashMap<SWEKEventType, Map<SWEKSource, Map<Date, Set<Date>>>>();
         requestManager.addRequestManagerListener(this);
     }
 
@@ -316,6 +320,31 @@ public class SWEKDownloadManager implements DownloadWorkerListener, IncomingRequ
     }
 
     /**
+     * Checks if a job is already busy or finished.
+     * 
+     * @param eventType
+     *            the type that should be checked
+     * @param swekSource
+     *            the source that provides the event type
+     * @param interval
+     *            the interval that should be checked
+     * @return true if the cobination was found, false if not.
+     */
+    private boolean inBusyAndFinishedIntervalJobs(SWEKEventType eventType, SWEKSource swekSource, Interval<Date> interval) {
+        Map<SWEKSource, Map<Date, Set<Date>>> sourcesAndDatesForEvent = busyAndFinishedIntervalJobs.get(eventType);
+        if (sourcesAndDatesForEvent != null) {
+            Map<Date, Set<Date>> datesForEventTypeAndSource = sourcesAndDatesForEvent.get(swekSource);
+            if (datesForEventTypeAndSource != null) {
+                Set<Date> endDatesForStartDate = datesForEventTypeAndSource.get(interval.getStart());
+                if (endDatesForStartDate != null) {
+                    return endDatesForStartDate.contains(interval.getEnd());
+                }
+            }
+        }
+        return false;
+    }
+
+    /**
      * Removes the combination of event type, source and date from the busy and
      * finished jobs.
      * 
@@ -365,6 +394,7 @@ public class SWEKDownloadManager implements DownloadWorkerListener, IncomingRequ
             if (!inBusyAndFinishedJobs(eventType, source, date)) {
                 dw.addDownloadWorkerListener(this);
                 addToDownloaderMap(eventType, dw.getDownloadStartDate(), dw);
+                addToBusyAndFinishedJobs(eventType, source, date);
                 downloadEventPool.execute(dw);
             }
         }
@@ -382,15 +412,67 @@ public class SWEKDownloadManager implements DownloadWorkerListener, IncomingRequ
      */
     private void startDownloadEventType(SWEKEventType eventType, SWEKSource swekSource, Interval<Date> interval) {
         synchronized (SWEKPluginLocks.downloadLock) {
-            Calendar c = Calendar.getInstance();
-            c.setTime(interval.getStart());
-            Date loopDate = c.getTime();
-            do {
-                startDownloadEventType(eventType, swekSource, loopDate);
-                c.add(Calendar.DAY_OF_MONTH, 1);
-                loopDate = c.getTime();
-            } while (loopDate.before(interval.getEnd()));
+            DownloadWorker dw = new DownloadWorker(eventType, swekSource, interval);
+            if (!inBusyAndFinishedIntervalJobs(eventType, swekSource, interval)) {
+                dw.addDownloadWorkerListener(this);
+                addToDownloaderMap(eventType, dw.getDownloadStartDate(), dw);
+                addToBusyAndFinishedIntervalJobs(eventType, swekSource, interval);
+                downloadEventPool.execute(dw);
+            }
         }
+    }
+
+    /**
+     * Add event type, source, date to busy and finished jobs.
+     * 
+     * @param eventType
+     *            the event type to add
+     * @param source
+     *            the source to add
+     * @param date
+     *            the date to add
+     */
+    private void addToBusyAndFinishedJobs(SWEKEventType eventType, SWEKSource source, Date date) {
+        Map<SWEKSource, Set<Date>> sourcesForEventType = new HashMap<SWEKSource, Set<Date>>();
+        Set<Date> dates = new HashSet<Date>();
+        if (busyAndFinishedJobs.containsKey(eventType)) {
+            sourcesForEventType = busyAndFinishedJobs.get(eventType);
+            if (sourcesForEventType.containsKey(source)) {
+                dates = sourcesForEventType.get(source);
+                dates.add(date);
+            }
+            sourcesForEventType.put(source, dates);
+        }
+        busyAndFinishedJobs.put(eventType, sourcesForEventType);
+    }
+
+    /**
+     * Adds event type, source, interval to busy and finished jobs.
+     * 
+     * @param eventType
+     *            the event type to add
+     * @param swekSource
+     *            the source to add
+     * @param interval
+     *            the interval to add
+     */
+    private void addToBusyAndFinishedIntervalJobs(SWEKEventType eventType, SWEKSource swekSource, Interval<Date> interval) {
+        Map<SWEKSource, Map<Date, Set<Date>>> sourcesForEventType = new HashMap<SWEKSource, Map<Date, Set<Date>>>();
+        Map<Date, Set<Date>> datesPerSource = new HashMap<Date, Set<Date>>();
+        Set<Date> endDate = new HashSet<Date>();
+        if (busyAndFinishedIntervalJobs.containsKey(eventType)) {
+            sourcesForEventType = busyAndFinishedIntervalJobs.get(eventType);
+            if (sourcesForEventType.containsKey(swekSource)) {
+                datesPerSource = sourcesForEventType.get(swekSource);
+                if (datesPerSource.containsKey(interval.getStart())) {
+                    endDate = datesPerSource.get(interval.getStart());
+                    endDate.add(interval.getEnd());
+                }
+                datesPerSource.put(interval.getStart(), endDate);
+            }
+            sourcesForEventType.put(swekSource, datesPerSource);
+        }
+        busyAndFinishedIntervalJobs.put(eventType, sourcesForEventType);
     }
 
     /**
