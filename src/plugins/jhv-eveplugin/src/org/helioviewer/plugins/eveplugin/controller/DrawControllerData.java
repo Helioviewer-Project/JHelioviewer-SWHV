@@ -1,5 +1,6 @@
 package org.helioviewer.plugins.eveplugin.controller;
 
+import java.awt.EventQueue;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -16,14 +17,14 @@ public class DrawControllerData {
 
     private int nrOfDrawableElements;
     private Set<YAxisElement> yAxisSet;
-    private Map<DrawableType, List<DrawableElement>> drawableElements;
+    private Map<DrawableType, Set<DrawableElement>> drawableElements;
     private List<DrawControllerListener> listeners;
 
     public DrawControllerData() {
-        this.nrOfDrawableElements = 0;
-        this.drawableElements = new HashMap<DrawableType, List<DrawableElement>>();
-        this.listeners = new ArrayList<DrawControllerListener>();
-        this.yAxisSet = new HashSet<YAxisElement>();
+        nrOfDrawableElements = 0;
+        drawableElements = new HashMap<DrawableType, Set<DrawableElement>>();
+        listeners = new ArrayList<DrawControllerListener>();
+        yAxisSet = new HashSet<YAxisElement>();
     }
 
     public int getNrOfDrawableElements() {
@@ -44,11 +45,11 @@ public class DrawControllerData {
         this.yAxisSet = yAxisSet;
     }
 
-    public Map<DrawableType, List<DrawableElement>> getDrawableElements() {
+    public Map<DrawableType, Set<DrawableElement>> getDrawableElements() {
         return drawableElements;
     }
 
-    public void setDrawableElements(Map<DrawableType, List<DrawableElement>> drawableElements) {
+    public void setDrawableElements(Map<DrawableType, Set<DrawableElement>> drawableElements) {
         this.drawableElements = drawableElements;
     }
 
@@ -61,41 +62,54 @@ public class DrawControllerData {
     }
 
     public void addDrawControllerListener(DrawControllerListener listener) {
-        this.listeners.add(listener);
+        listeners.add(listener);
     }
 
     public void removeDrawControllerListener(DrawControllerListener listener) {
-        this.listeners.remove(listener);
+        listeners.remove(listener);
 
     }
 
-    public void addDrawableElement(DrawableElement element) {
-        List<DrawableElement> elements = drawableElements.get(element.getDrawableElementType().getLevel());
-        if (elements == null) {
-            elements = Collections.synchronizedList(new ArrayList<DrawableElement>());
-            drawableElements.put(element.getDrawableElementType().getLevel(), elements);
-        }
-        synchronized (elements) {
-            elements.add(element);
-            synchronized (yAxisSet) {
-                yAxisSet.add(element.getYAxisElement());
+    public void addDrawableElement(final DrawableElement element) {
+        EventQueue.invokeLater(new Runnable() {
+
+            @Override
+            public void run() {
+                Set<DrawableElement> elements = drawableElements.get(element.getDrawableElementType().getLevel());
+                if (elements == null) {
+                    elements = Collections.synchronizedSet(new HashSet<DrawableElement>());
+                    drawableElements.put(element.getDrawableElementType().getLevel(), elements);
+                }
+
+                elements.add(element);
+
+                Set<YAxisElement> tempSet = new HashSet<YAxisElement>(yAxisSet);
+                tempSet.add(element.getYAxisElement());
+                yAxisSet = tempSet;
             }
-            nrOfDrawableElements++;
-        }
+
+        });
+        nrOfDrawableElements++;
     }
 
-    public void removeDrawableElement(DrawableElement element) {
-        List<DrawableElement> elements = drawableElements.get(element.getDrawableElementType().getLevel());
-        if (elements != null) {
-            synchronized (elements) {
-                elements.remove(element);
-                nrOfDrawableElements--;
-                if (elements.isEmpty()) {
-                    synchronized (yAxisSet) {
-                        yAxisSet.remove(element.getYAxisElement());
+    public void removeDrawableElement(final DrawableElement element) {
+        EventQueue.invokeLater(new Runnable() {
+
+            @Override
+            public void run() {
+                Set<DrawableElement> elements = drawableElements.get(element.getDrawableElementType().getLevel());
+                if (elements != null) {
+                    synchronized (elements) {
+                        elements.remove(element);
+                        nrOfDrawableElements--;
+                        if (elements.isEmpty()) {
+                            synchronized (yAxisSet) {
+                                yAxisSet.remove(element.getYAxisElement());
+                            }
+                        }
                     }
                 }
             }
-        }
+        });
     }
 }
