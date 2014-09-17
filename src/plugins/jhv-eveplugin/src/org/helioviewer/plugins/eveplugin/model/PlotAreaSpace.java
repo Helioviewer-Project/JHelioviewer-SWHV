@@ -3,8 +3,10 @@ package org.helioviewer.plugins.eveplugin.model;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.helioviewer.base.logging.Log;
+
 public class PlotAreaSpace {
-    
+
     private double scaledMinValue;
     private double scaledMaxValue;
     private double scaledMinTime;
@@ -14,21 +16,21 @@ public class PlotAreaSpace {
     private double scaledSelectedMinTime;
     private double scaledSelectedMaxTime;
 
-    private List<PlotAreaSpaceListener> listeners;
+    private final List<PlotAreaSpaceListener> listeners;
 
     public PlotAreaSpace() {
         listeners = new ArrayList<PlotAreaSpaceListener>();
 
-        this.scaledMinValue = 0.0;
-        this.scaledMaxValue = 1.0;
-        this.scaledMinTime = 0.0;
-        this.scaledMaxTime = 1.0;
-        this.scaledSelectedMinValue = 0.0;
-        this.scaledSelectedMaxValue = 1.0;
-        this.scaledSelectedMinTime = 0.0;
-        this.scaledSelectedMaxTime = 1.0;
+        scaledMinValue = 0.0;
+        scaledMaxValue = 1.0;
+        scaledMinTime = 0.0;
+        scaledMaxTime = 1.0;
+        scaledSelectedMinValue = 0.0;
+        scaledSelectedMaxValue = 1.0;
+        scaledSelectedMinTime = 0.0;
+        scaledSelectedMaxTime = 1.0;
     }
-   
+
     public void addPlotAreaSpaceListener(PlotAreaSpaceListener listener) {
         listeners.add(listener);
     }
@@ -42,7 +44,7 @@ public class PlotAreaSpace {
     }
 
     public void setScaledMinValue(double scaledMinValue) {
-        if (this.scaledMinTime != scaledMinValue) {
+        if (scaledMinTime != scaledMinValue) {
             this.scaledMinValue = scaledMinValue;
             firePlotAreaSpaceChanged();
         }
@@ -143,8 +145,10 @@ public class PlotAreaSpace {
         }
     }
 
-    public void setScaledSelectedTimeAndValue(double scaledSelectedMinTime, double scaledSelectedMaxTime, double scaledSelectedMinValue, double scaledSelectedMaxValue) {
-        if (!(this.scaledSelectedMinTime == scaledSelectedMinTime && this.scaledSelectedMaxTime == scaledSelectedMaxTime && this.scaledSelectedMinValue == scaledSelectedMinValue && this.scaledSelectedMaxValue == scaledSelectedMaxValue)) {
+    public void setScaledSelectedTimeAndValue(double scaledSelectedMinTime, double scaledSelectedMaxTime, double scaledSelectedMinValue,
+            double scaledSelectedMaxValue) {
+        if (!(this.scaledSelectedMinTime == scaledSelectedMinTime && this.scaledSelectedMaxTime == scaledSelectedMaxTime
+                && this.scaledSelectedMinValue == scaledSelectedMinValue && this.scaledSelectedMaxValue == scaledSelectedMaxValue)) {
             this.scaledSelectedMinTime = scaledSelectedMinTime;
             this.scaledSelectedMaxTime = scaledSelectedMaxTime;
             this.scaledSelectedMinValue = scaledSelectedMinValue;
@@ -154,21 +158,29 @@ public class PlotAreaSpace {
     }
 
     public boolean minMaxTimeIntervalContainsTime(double value) {
-        return value >= this.scaledMinTime && value <= this.scaledMaxTime;
+        return value >= scaledMinTime && value <= scaledMaxTime;
     }
 
     public boolean minMaxValueIntervalContainsValue(double value) {
-        return value >= this.scaledMinValue && value <= this.scaledMaxValue;
+        return value >= scaledMinValue && value <= scaledMaxValue;
     }
 
+    @Override
     public String toString() {
-        return "Scaled min time  : " + scaledMinTime + "\n" + "Scaled max time  : " + scaledMaxTime + "\n" + "Scaled min value : " + scaledMinValue + "\n" + "Scaled max value : " + scaledMaxValue + "\n" + "Selected scaled min time  : " + scaledSelectedMinTime + "\n" + "Selected scaled max time  : " + scaledSelectedMaxTime + "\n" + "Selected scaled min value : " + scaledSelectedMinValue + "\n" + "Selected scaled max value : " + scaledSelectedMaxValue + "\n";
+        return "Scaled min time  : " + scaledMinTime + "\n" + "Scaled max time  : " + scaledMaxTime + "\n" + "Scaled min value : "
+                + scaledMinValue + "\n" + "Scaled max value : " + scaledMaxValue + "\n" + "Selected scaled min time  : "
+                + scaledSelectedMinTime + "\n" + "Selected scaled max time  : " + scaledSelectedMaxTime + "\n"
+                + "Selected scaled min value : " + scaledSelectedMinValue + "\n" + "Selected scaled max value : " + scaledSelectedMaxValue
+                + "\n";
 
     }
 
     private void firePlotAreaSpaceChanged() {
-        for (PlotAreaSpaceListener l : listeners) {            
-            l.plotAreaSpaceChanged(scaledMinValue, scaledMaxValue, scaledMinTime, scaledMaxTime, scaledSelectedMinValue, scaledSelectedMaxValue, scaledSelectedMinTime, scaledSelectedMaxTime);   
+        Log.info("Listeners size : " + listeners.size());
+        for (PlotAreaSpaceListener l : listeners) {
+            Log.info("listener : " + l);
+            l.plotAreaSpaceChanged(scaledMinValue, scaledMaxValue, scaledMinTime, scaledMaxTime, scaledSelectedMinValue,
+                    scaledSelectedMaxValue, scaledSelectedMinTime, scaledSelectedMaxTime);
         }
     }
 }
