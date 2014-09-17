@@ -1,8 +1,10 @@
 package org.helioviewer.jhv.data.container;
 
+import java.awt.EventQueue;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Set;
 
 import org.helioviewer.jhv.data.container.cache.JHVEventCache;
 import org.helioviewer.jhv.data.container.cache.JHVEventHandlerCache;
@@ -80,13 +82,17 @@ public class JHVEventContainer {
      * @param handler
      *            the handler to send events to
      */
-    public void requestForDate(Date date, JHVEventHandler handler) {
-        synchronized (JHVEventContainerLocks.dateLock) {
-            eventHandlerCache.add(handler, date);
-            List<JHVEvent> events = eventCache.get(date);
-            handler.newEventsReceived(events);
-            requestEvents(date);
-        }
+    public void requestForDate(final Date date, final JHVEventHandler handler) {
+        EventQueue.invokeLater(new Runnable() {
+
+            @Override
+            public void run() {
+                eventHandlerCache.add(handler, date);
+                List<JHVEvent> events = eventCache.get(date);
+                handler.newEventsReceived(events);
+                requestEvents(date);
+            }
+        });
     }
 
     /**
@@ -100,12 +106,16 @@ public class JHVEventContainer {
      * @param handler
      *            the handler to send events to
      */
-    public void requestForDateList(List<Date> dateList, JHVEventHandler handler) {
-        synchronized (JHVEventContainerLocks.dateLock) {
-            for (Date date : dateList) {
-                requestForDate(date, handler);
+    public void requestForDateList(final List<Date> dateList, final JHVEventHandler handler) {
+        EventQueue.invokeLater(new Runnable() {
+
+            @Override
+            public void run() {
+                for (Date date : dateList) {
+                    requestForDate(date, handler);
+                }
             }
-        }
+        });
     }
 
     /**
@@ -121,13 +131,17 @@ public class JHVEventContainer {
      * @param handler
      *            the handler
      */
-    public void requestForInterval(Date startDate, Date endDate, JHVEventHandler handler) {
-        synchronized (JHVEventContainerLocks.intervalLock) {
-            eventHandlerCache.add(handler, startDate, endDate);
-            List<JHVEvent> events = eventCache.get(startDate, endDate);
-            handler.newEventsReceived(events);
-            requestEvents(startDate, endDate);
-        }
+    public void requestForInterval(final Date startDate, final Date endDate, final JHVEventHandler handler) {
+        Thread.dumpStack();
+        EventQueue.invokeLater(new Runnable() {
+            @Override
+            public void run() {
+                eventHandlerCache.add(handler, startDate, endDate);
+                List<JHVEvent> events = eventCache.get(startDate, endDate);
+                handler.newEventsReceived(events);
+                requestEvents(startDate, endDate);
+            }
+        });
     }
 
     /**
@@ -138,7 +152,14 @@ public class JHVEventContainer {
      */
     public void addEvent(JHVEvent event) {
         eventCache.add(event);
-        fireEventCacheChanged(event.getStartDate());
+        // fireEventCacheChanged(event.getStartDate());
+    }
+
+    /**
+     * 
+     */
+    public void finishedDownload() {
+        fireEventCacheChanged();
     }
 
     /**
@@ -178,10 +199,17 @@ public class JHVEventContainer {
      * @param date
      *            the date for which the cache was changed.
      */
-    private void fireEventCacheChanged(Date date) {
-        List<JHVEventHandler> jhvEventHandlers = eventHandlerCache.getJHVEventHandlersForDate(date);
-        for (JHVEventHandler handler : jhvEventHandlers) {
+    private void fireEventCacheChanged() {
+        /**
+         * List<JHVEventHandler> jhvEventHandlers =
+         * eventHandlerCache.getJHVEventHandlersForDate(date); for
+         * (JHVEventHandler handler : jhvEventHandlers) {
+         * handler.cacheUpdated(); }
+         */
+        Set<JHVEventHandler> handlers = eventHandlerCache.getAllJHVEventHandlers();
+        for (JHVEventHandler handler : handlers) {
             handler.cacheUpdated();
         }
     }
+
 }
