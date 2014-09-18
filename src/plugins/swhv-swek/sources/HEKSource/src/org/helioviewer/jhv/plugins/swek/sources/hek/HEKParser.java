@@ -145,8 +145,9 @@ public class HEKParser implements SWEKParser {
                 currentEvent.setStartTime(parseDate(value));
             } else if (keyString.toLowerCase().equals("event_endtime")) {
                 currentEvent.setEndTime(parseDate(value));
+            } else if (keyString.toLowerCase().equals("kb_archivid")) {
+                currentEvent.setUniqueID(value);
             } else {
-
                 boolean visible = false;
                 boolean configured = false;
                 JHVEventParameter parameter = new JHVEventParameter(keyString, keyString, value);

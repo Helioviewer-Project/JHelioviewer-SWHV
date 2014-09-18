@@ -110,4 +110,18 @@ public interface JHVEvent {
      * @return the event type of the event
      */
     public abstract JHVEventType getJHVEventType();
+
+    /**
+     * Gets an unique identifier.
+     * 
+     */
+    public abstract String getUniqueID();
+
+    /**
+     * Gets the list of available position informations.
+     * 
+     * @return a list with positioning information
+     */
+    public abstract List<JHVPositionInformation> getPositioningInformation();
+
 }
