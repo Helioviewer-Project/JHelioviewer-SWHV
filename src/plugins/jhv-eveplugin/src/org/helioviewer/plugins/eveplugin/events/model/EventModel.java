@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import org.helioviewer.base.logging.Log;
 import org.helioviewer.base.math.Interval;
 import org.helioviewer.jhv.data.datatype.JHVEvent;
 import org.helioviewer.plugins.eveplugin.EVEState;
@@ -83,12 +84,13 @@ public class EventModel implements ZoomControllerListener, EventRequesterListene
 
     @Override
     public void selectedIntervalChanged(final Interval<Date> newInterval) {
+        selectedInterval = newInterval;
         if (!EVEState.getSingletonInstance().isMouseTimeIntervalDragging()) {
             EventQueue.invokeLater(new Runnable() {
 
                 @Override
                 public void run() {
-                    selectedInterval = newInterval;
+
                     createEventPlotConfiguration();
                 }
             });
@@ -107,13 +109,14 @@ public class EventModel implements ZoomControllerListener, EventRequesterListene
         synchronized (intervalLock) {
             eventPlotConfiguration = new ArrayList<EventPlotConfiguration>();
             this.events = events;
+            Log.info("New events received selected interval: " + selectedInterval + " availalble interval " + availableInterval);
             if (selectedInterval != null && availableInterval != null) {
                 createEventPlotConfiguration();
             }
         }
-        // if (selectedInterval != null && availableInterval != null) {
-        DrawController.getSingletonInstance().updateDrawableElement(eventPanel, plot);
-        // }
+        if (selectedInterval != null && availableInterval != null) {
+            DrawController.getSingletonInstance().updateDrawableElement(eventPanel, plot);
+        }
     }
 
     public List<EventPlotConfiguration> getEventPlotConfiguration() {
