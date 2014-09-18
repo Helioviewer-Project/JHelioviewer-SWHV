@@ -60,4 +60,10 @@ public class HEKEventType implements JHVEventType {
         return eventProvider;
     }
 
+    @Override
+    public boolean equals(JHVEventType otherEventType) {
+        return otherEventType.getEventType().equals(eventType) && otherEventType.getEventSource().equals(eventSource)
+                && otherEventType.getEvenProvider().equals(eventProvider);
+    }
+
 }
