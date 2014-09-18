@@ -8,6 +8,7 @@ import javax.swing.Icon;
 
 import org.helioviewer.jhv.data.datatype.JHVEvent;
 import org.helioviewer.jhv.data.datatype.JHVEventParameter;
+import org.helioviewer.jhv.data.datatype.JHVEventType;
 
 /**
  * Represents a JHVevent coming from the HEK source.
@@ -56,6 +57,9 @@ public class HEKEvent implements JHVEvent {
     /** all the non visible null parameters */
     private List<JHVEventParameter> allNonVisibleNullParameters;
 
+    /** The event type */
+    private final JHVEventType eventType;
+
     /**
      * Default constructor
      */
@@ -65,30 +69,34 @@ public class HEKEvent implements JHVEvent {
         eventDisplayName = "";
         description = "";
         icon = null;
+        eventType = null;
     }
 
     /**
-     * Creates a HEK event with an event name, event display name and short
-     * description.
+     * Creates a HEK event with an event name, event display name, short
+     * description and an .
      * 
      * @param eventName
      *            the event name
      * @param eventDisplayName
      *            the event display name
      * @param description
-     *            the short descriptionn
+     *            the short description
+     * @param eventType
+     *            the event type
      */
-    public HEKEvent(String eventName, String eventDisplayName, String description) {
+    public HEKEvent(String eventName, String eventDisplayName, String description, JHVEventType eventType) {
         initLists();
         this.eventName = eventName;
         this.eventDisplayName = eventDisplayName;
         this.description = description;
         icon = null;
+        this.eventType = eventType;
     }
 
     /**
      * Creates a HEK event with an event name, event display name, short
-     * description and an icon.
+     * description, event type and an icon.
      * 
      * @param eventName
      *            the event name
@@ -99,12 +107,13 @@ public class HEKEvent implements JHVEvent {
      * @param icon
      *            the icon
      */
-    public HEKEvent(String eventName, String eventDisplayName, String description, Icon icon) {
+    public HEKEvent(String eventName, String eventDisplayName, String description, JHVEventType eventType, Icon icon) {
         initLists();
         this.eventName = eventName;
         this.eventDisplayName = eventDisplayName;
         this.description = description;
         this.icon = icon;
+        this.eventType = eventType;
     }
 
     @Override
@@ -170,6 +179,11 @@ public class HEKEvent implements JHVEvent {
     @Override
     public String getShortDescription() {
         return description;
+    }
+
+    @Override
+    public JHVEventType getJHVEventType() {
+        return eventType;
     }
 
     /**

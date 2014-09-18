@@ -94,8 +94,9 @@ public class HEKParser implements SWEKParser {
      */
     private void parseEventJSON(JSONObject eventJSON) throws JSONException {
         JSONArray results = eventJSON.getJSONArray("result");
+        HEKEventType hekEventType = new HEKEventType(eventType.getEventName(), eventSource.getSourceName(), eventSource.getProviderName());
         for (int i = 0; i < results.length() && !parserStopped; i++) {
-            HEKEvent currentEvent = new HEKEvent(eventType.getEventName(), eventType.getEventName(), "");
+            HEKEvent currentEvent = new HEKEvent(eventType.getEventName(), eventType.getEventName(), "", hekEventType);
             JSONObject result = results.getJSONObject(i);
             parseResult(result, currentEvent);
             eventStream.addJHVEvent(currentEvent);
