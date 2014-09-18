@@ -127,17 +127,37 @@ public class EventRequester implements ZoomControllerListener, JHVEventHandler {
     }
 
     @Override
-    public void newEventsReceived(List<JHVEvent> eventList) {
-        synchronized (intervalLock) {
-            fireNewEventsReceived(eventList);
-        }
+    public void newEventsReceived(final List<JHVEvent> eventList) {
+        EventQueue.invokeLater(new Runnable() {
+
+            @Override
+            public void run() {
+                fireNewEventsReceived(eventList);
+            }
+
+        });
+
     }
 
     @Override
     public void cacheUpdated() {
-        synchronized (intervalLock) {
-            eventContainer.requestForInterval(selectedInterval.getStart(), selectedInterval.getEnd(), this);
-        }
+        EventQueue.invokeLater((new Runnable() {
+
+            private Interval<Date> selectedInterval;
+            private JHVEventHandler eventHandler;
+
+            public Runnable init(Interval<Date> selectedInterval, JHVEventHandler eventHandler) {
+                this.selectedInterval = selectedInterval;
+                this.eventHandler = eventHandler;
+                return this;
+            }
+
+            @Override
+            public void run() {
+                eventContainer.requestForInterval(selectedInterval.getStart(), selectedInterval.getEnd(), eventHandler);
+            }
+
+        }).init(selectedInterval, this));
 
     }
 
