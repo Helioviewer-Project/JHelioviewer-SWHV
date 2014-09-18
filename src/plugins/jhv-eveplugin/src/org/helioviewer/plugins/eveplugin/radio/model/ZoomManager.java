@@ -10,20 +10,18 @@ import org.helioviewer.base.logging.Log;
 import org.helioviewer.base.math.Interval;
 import org.helioviewer.plugins.eveplugin.controller.ZoomController;
 import org.helioviewer.plugins.eveplugin.controller.ZoomControllerListener;
-import org.helioviewer.plugins.eveplugin.model.PlotAreaSpace;
 import org.helioviewer.plugins.eveplugin.model.PlotAreaSpaceListener;
 import org.helioviewer.plugins.eveplugin.model.PlotAreaSpaceManager;
-import org.helioviewer.plugins.eveplugin.radio.data.FrequencyInterval;
 import org.helioviewer.plugins.eveplugin.settings.EVEAPI.API_RESOLUTION_AVERAGES;
 
 public class ZoomManager implements ZoomControllerListener, PlotAreaSpaceListener {
     private static ZoomManager instance;
-    private Map<String, ZoomManagerData> zoomManagerData;
-    private ZoomController zoomController;
+    private final Map<String, ZoomManagerData> zoomManagerData;
+    private final ZoomController zoomController;
     private Interval<Date> currentInterval;
-    private PlotAreaSpaceManager plotAreaSpaceManager;
-    private Object intervalLock;
-    private YValueModelManager yValueModelManager;
+    private final PlotAreaSpaceManager plotAreaSpaceManager;
+    private final Object intervalLock;
+    private final YValueModelManager yValueModelManager;
 
     private ZoomManager() {
         // currentInterval = new Interval<Date>(new Date(), new Date());
@@ -73,7 +71,7 @@ public class ZoomManager implements ZoomControllerListener, PlotAreaSpaceListene
         ZoomManagerData zmd = getZoomManagerData(identifier);
         synchronized (intervalLock) {
             if (currentInterval == null) {
-                this.currentInterval = interval;
+                currentInterval = interval;
             }
             if (interval != null) {
                 ZoomDataConfig config;
@@ -108,7 +106,8 @@ public class ZoomManager implements ZoomControllerListener, PlotAreaSpaceListene
         }
     }
 
-    public DrawableAreaMap getDrawableAreaMap(Date startDate, Date endDate, int startFrequency, int endFrequency, Rectangle area, long downloadID, String plotIdentifier) {
+    public DrawableAreaMap getDrawableAreaMap(Date startDate, Date endDate, int startFrequency, int endFrequency, Rectangle area,
+            long downloadID, String plotIdentifier) {
         ZoomManagerData zmd = getZoomManagerData(plotIdentifier);
         ZoomDataConfig zdc = zmd.getZoomDataConfigMap().get(downloadID);
         YValueModel yValueModel = yValueModelManager.getYValueModel(plotIdentifier);
@@ -120,7 +119,8 @@ public class ZoomManager implements ZoomControllerListener, PlotAreaSpaceListene
         int destY0 = defineYInDestinationArea(startFrequency, yValueModel, zdc);
         int destX1 = defineXInDestinationArea(endDate, zdc);
         int destY1 = defineYInDestinationArea(endFrequency, yValueModel, zdc);
-        Log.trace("Selected interval in getDrawableAreaMap : [" + yValueModel.getSelectedYMin() + ", " + yValueModel.getSelectedYMax() + "]");
+        Log.trace("Selected interval in getDrawableAreaMap : [" + yValueModel.getSelectedYMin() + ", " + yValueModel.getSelectedYMax()
+                + "]");
         return new DrawableAreaMap(sourceX0, sourceY0, sourceX1, sourceY1, destX0, destY0, destX1, destY1, downloadID);
     }
 
@@ -176,18 +176,54 @@ public class ZoomManager implements ZoomControllerListener, PlotAreaSpaceListene
      *             interval or the given start frequency or end frequency fall
      *             outside the minimum and maximum frequency.
      */
-    public Rectangle getAvailableSpaceForInterval(Date startDate, Date endDate, int startFreq, int endFreq, long downloadId, String plotIdentifier) {
+    public Rectangle getAvailableSpaceForInterval(Date startDate, Date endDate, int startFreq, int endFreq, long downloadId,
+            String plotIdentifier) {
         ZoomManagerData zmd = getZoomManagerData(plotIdentifier);
         ZoomDataConfig zdc = zmd.getZoomDataConfigMap().get(downloadId);
         YValueModel yValueModel = yValueModelManager.getYValueModel(plotIdentifier);
         synchronized (intervalLock) {
-            if (currentInterval.containsPointInclusive(startDate) && currentInterval.containsPointInclusive(endDate) && (startFreq >= yValueModel.getAvailableYMin() && startFreq <= yValueModel.getAvailableYMax()) && (endFreq >= yValueModel.getAvailableYMin() && endFreq <= yValueModel.getAvailableYMax())) {
+            if (currentInterval.containsPointInclusive(startDate) && currentInterval.containsPointInclusive(endDate)
+                    && (startFreq >= yValueModel.getAvailableYMin() && startFreq <= yValueModel.getAvailableYMax())
+                    && (endFreq >= yValueModel.getAvailableYMin() && endFreq <= yValueModel.getAvailableYMax())) {
                 int height = zmd.getDisplaySize().height;
-                double ratio = 1.0 * zmd.getDisplaySize().getWidth() / (currentInterval.getEnd().getTime() - currentInterval.getStart().getTime());
+                double ratio = 1.0 * zmd.getDisplaySize().getWidth()
+                        / (currentInterval.getEnd().getTime() - currentInterval.getStart().getTime());
                 int width = (int) Math.round((endDate.getTime() - startDate.getTime()) * ratio);
                 return new Rectangle(width, height);
             } else {
-                Log.trace("The requested start date, end date fall outside the current interval, " + "or the start frequency or end frequency fall outside the minimum or maximum frequency.\n " + "Start date : " + startDate + " in milliseconds : " + startDate.getTime() + "\n" + "End date : " + endDate + " in milliseconds : " + endDate.getTime() + "\n" + "Start frequency : " + startFreq + "\n" + "End frequency : " + endFreq + "\n" + "Current time interval : " + currentInterval + " in milliseconds : [" + currentInterval.getStart().getTime() + ", " + currentInterval.getEnd().getTime() + "]\n" + "Current frequency interval : [" + yValueModel.getAvailableYMin() + "," + yValueModel.getAvailableYMax() + "]\n" + "current interval contains start : " + currentInterval.containsPointInclusive(startDate) + "\n" + "current interval contains end : " + currentInterval.containsPointInclusive(endDate));
+                Log.trace("The requested start date, end date fall outside the current interval, "
+                        + "or the start frequency or end frequency fall outside the minimum or maximum frequency.\n " + "Start date : "
+                        + startDate
+                        + " in milliseconds : "
+                        + startDate.getTime()
+                        + "\n"
+                        + "End date : "
+                        + endDate
+                        + " in milliseconds : "
+                        + endDate.getTime()
+                        + "\n"
+                        + "Start frequency : "
+                        + startFreq
+                        + "\n"
+                        + "End frequency : "
+                        + endFreq
+                        + "\n"
+                        + "Current time interval : "
+                        + currentInterval
+                        + " in milliseconds : ["
+                        + currentInterval.getStart().getTime()
+                        + ", "
+                        + currentInterval.getEnd().getTime()
+                        + "]\n"
+                        + "Current frequency interval : ["
+                        + yValueModel.getAvailableYMin()
+                        + ","
+                        + yValueModel.getAvailableYMax()
+                        + "]\n"
+                        + "current interval contains start : "
+                        + currentInterval.containsPointInclusive(startDate)
+                        + "\n"
+                        + "current interval contains end : " + currentInterval.containsPointInclusive(endDate));
                 // System.exit(1);
                 return new Rectangle(0, 0);
                 /*
@@ -219,11 +255,15 @@ public class ZoomManager implements ZoomControllerListener, PlotAreaSpaceListene
         // return zdc.getDisplaySize().y + (int) Math.floor((frequencyToFind -
         // zdc.getMinY()) / (1.0 * (zdc.getMaxY() - zdc.getMinY()) /
         // zdc.getDisplaySize().height));
-        return zdc.getDisplaySize().y + (int) Math.floor((frequencyToFind - yValueModel.getSelectedYMin()) / (1.0 * (yValueModel.getSelectedYMax() - yValueModel.getSelectedYMin()) / zdc.getDisplaySize().height));
+        return zdc.getDisplaySize().y
+                + (int) Math.floor((frequencyToFind - yValueModel.getSelectedYMin())
+                        / (1.0 * (yValueModel.getSelectedYMax() - yValueModel.getSelectedYMin()) / zdc.getDisplaySize().height));
     }
 
     private int defineXInDestinationArea(Date dateToFind, ZoomDataConfig zdc) {
-        return zdc.getDisplaySize().x + (int) Math.floor((dateToFind.getTime() - zdc.getMinX().getTime()) / (1.0 * (zdc.getMaxX().getTime() - zdc.getMinX().getTime()) / zdc.getDisplaySize().width));
+        return zdc.getDisplaySize().x
+                + (int) Math.floor((dateToFind.getTime() - zdc.getMinX().getTime())
+                        / (1.0 * (zdc.getMaxX().getTime() - zdc.getMinX().getTime()) / zdc.getDisplaySize().width));
     }
 
     private int defineYInSourceArea(int frequencyToFind, int startFrequency, int endFrequency, Rectangle area, ZoomDataConfig zdc) {
@@ -268,7 +308,9 @@ public class ZoomManager implements ZoomControllerListener, PlotAreaSpaceListene
     }
 
     @Override
-    public void plotAreaSpaceChanged(double scaledMinValue, double scaledMaxValue, double scaledMinTime, double scaledMaxTime, double scaledSelectedMinValue, double scaledSelectedMaxValue, double scaledSelectedMinTime, double scaledSelectedMaxTime) {
+    public void plotAreaSpaceChanged(double scaledMinValue, double scaledMaxValue, double scaledMinTime, double scaledMaxTime,
+            double scaledSelectedMinValue, double scaledSelectedMaxValue, double scaledSelectedMinTime, double scaledSelectedMaxTime,
+            boolean forced) {
     }
 
     /**

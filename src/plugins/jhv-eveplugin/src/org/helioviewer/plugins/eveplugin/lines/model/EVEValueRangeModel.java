@@ -28,11 +28,11 @@ public class EVEValueRangeModel implements PlotAreaSpaceListener {
     }
 
     public void addValueRangeModelListener(EVEValueRangeModelListener listener) {
-        this.listeners.add(listener);
+        listeners.add(listener);
     }
 
     public void removeValueRangeListener(EVEValueRangeModelListener listener) {
-        this.listeners.remove(listener);
+        listeners.remove(listener);
     }
 
     public Range getSelectedInterval() {
@@ -54,38 +54,38 @@ public class EVEValueRangeModel implements PlotAreaSpaceListener {
     }
 
     public double getAvailableIntervalMin() {
-        return this.availableInterval.min;
+        return availableInterval.min;
     }
 
     public void setAvailableIntervalMin(double availableIntervalMin) {
-        this.availableInterval.min = availableIntervalMin;
+        availableInterval.min = availableIntervalMin;
         fireAvailbleIntervalRangeChanged();
     }
 
     public double getAvailableIntervalMax() {
-        return this.availableInterval.max;
+        return availableInterval.max;
     }
 
     public void setAvailableIntervalMax(double availableIntervalMax) {
-        this.availableInterval.max = availableIntervalMax;
+        availableInterval.max = availableIntervalMax;
         fireAvailbleIntervalRangeChanged();
     }
 
     public double getSelectedIntervalMin() {
-        return this.selectedInterval.min;
+        return selectedInterval.min;
     }
 
     public void setSelectedIntervalMin(double selectedIntervalMin) {
-        this.selectedInterval.min = selectedIntervalMin;
+        selectedInterval.min = selectedIntervalMin;
         fireSelectedIntervalRangeChanged();
     }
 
     public double getSelectedIntervalMax() {
-        return this.selectedInterval.max;
+        return selectedInterval.max;
     }
 
     public void setSelectedIntervalMax(double selectedIntervalMax) {
-        this.selectedInterval.max = selectedIntervalMax;
+        selectedInterval.max = selectedIntervalMax;
         fireSelectedIntervalRangeChanged();
     }
 
@@ -102,7 +102,9 @@ public class EVEValueRangeModel implements PlotAreaSpaceListener {
     }
 
     @Override
-    public void plotAreaSpaceChanged(double scaledMinValue, double scaledMaxValue, double scaledMinTime, double scaledMaxTime, double scaledSelectedMinValue, double scaledSelectedMaxValue, double scaledSelectedMinTime, double scaledSelectedMaxTime) {
+    public void plotAreaSpaceChanged(double scaledMinValue, double scaledMaxValue, double scaledMinTime, double scaledMaxTime,
+            double scaledSelectedMinValue, double scaledSelectedMaxValue, double scaledSelectedMinTime, double scaledSelectedMaxTime,
+            boolean forced) {
         // TODO Auto-generated method stub
 
     }
