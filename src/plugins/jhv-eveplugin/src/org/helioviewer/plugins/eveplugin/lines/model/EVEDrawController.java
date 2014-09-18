@@ -32,7 +32,8 @@ import org.helioviewer.viewmodel.view.jp2view.datetime.ImmutableDateTime;
 /**
  * @author Stephan Pagel
  * */
-public class EVEDrawController implements BandControllerListener, ZoomControllerListener, EVECacheControllerListener, LayersListener, PlotAreaSpaceListener {
+public class EVEDrawController implements BandControllerListener, ZoomControllerListener, EVECacheControllerListener, LayersListener,
+        PlotAreaSpaceListener {
 
     // //////////////////////////////////////////////////////////////////////////////
     // Definitions
@@ -45,13 +46,13 @@ public class EVEDrawController implements BandControllerListener, ZoomController
 
     private Interval<Date> interval = new Interval<Date>(null, null);
     private Range selectedRange = new Range();
-    private Range availableRange = new Range();
-    private DrawController drawController;
+    private final Range availableRange = new Range();
+    private final DrawController drawController;
 
-    private EVEDrawableElement eveDrawableElement;
-    private YAxisElement yAxisElement;
+    private final EVEDrawableElement eveDrawableElement;
+    private final YAxisElement yAxisElement;
 
-    private PlotAreaSpace plotAreaSpace;
+    private final PlotAreaSpace plotAreaSpace;
 
     // //////////////////////////////////////////////////////////////////////////////
     // Methods
@@ -64,9 +65,9 @@ public class EVEDrawController implements BandControllerListener, ZoomController
         ZoomController.getSingletonInstance().addZoomControllerListener(this);
         EVECacheController.getSingletonInstance().addControllerListener(this);
         LayersModel.getSingletonInstance().addLayersListener(this);
-        this.drawController = DrawController.getSingletonInstance();
-        this.eveDrawableElement = new EVEDrawableElement();
-        this.yAxisElement = new YAxisElement();
+        drawController = DrawController.getSingletonInstance();
+        eveDrawableElement = new EVEDrawableElement();
+        yAxisElement = new YAxisElement();
 
         plotAreaSpace = PlotAreaSpaceManager.getInstance().getPlotAreaSpace(identifier);
         plotAreaSpace.addPlotAreaSpaceListener(this);
@@ -116,8 +117,9 @@ public class EVEDrawController implements BandControllerListener, ZoomController
     }
 
     private void updateBands() {
-        for (final Band band : dataMap.keySet())
+        for (final Band band : dataMap.keySet()) {
             updateBand(band);
+        }
     }
 
     public void setSelectedRange(final Range newSelectedRange) {
@@ -163,7 +165,8 @@ public class EVEDrawController implements BandControllerListener, ZoomController
         if (bands.length > 0) {
             unitLabel = bands[0].getUnitLabel();
         }
-        yAxisElement.set(selectedRange, availableRange, unitLabel, Math.log10(selectedRange.min), Math.log10(selectedRange.max), Color.PINK);
+        yAxisElement
+                .set(selectedRange, availableRange, unitLabel, Math.log10(selectedRange.min), Math.log10(selectedRange.max), Color.PINK);
         eveDrawableElement.set(interval, bands, values.toArray(new EVEValues[0]), yAxisElement);
         if (bands.length > 0) {
             drawController.updateDrawableElement(eveDrawableElement, identifier);
@@ -228,9 +231,11 @@ public class EVEDrawController implements BandControllerListener, ZoomController
     // //////////////////////////////////////////////////////////////////////////////
     // Zoom Controller Listener
     // //////////////////////////////////////////////////////////////////////////////
+    @Override
     public void availableIntervalChanged(final Interval<Date> newInterval) {
     }
 
+    @Override
     public void selectedIntervalChanged(final Interval<Date> newInterval) {
         interval = newInterval;
 
@@ -238,6 +243,7 @@ public class EVEDrawController implements BandControllerListener, ZoomController
         fireRedrawRequest(false);
     }
 
+    @Override
     public void selectedResolutionChanged(final API_RESOLUTION_AVERAGES newResolution) {
     }
 
@@ -245,27 +251,32 @@ public class EVEDrawController implements BandControllerListener, ZoomController
     // Band Controller Listener
     // //////////////////////////////////////////////////////////////////////////////
 
+    @Override
     public void bandAdded(final Band band, final String identifier) {
         if (this.identifier.equals(identifier)) {
             addToMap(band);
         }
     }
 
+    @Override
     public void bandRemoved(final Band band, final String identifier) {
         if (this.identifier.equals(identifier)) {
             removeFromMap(band);
         }
     }
 
+    @Override
     public void bandUpdated(final Band band, final String identifier) {
         if (this.identifier.equals(identifier)) {
-            if (band.isVisible())
+            if (band.isVisible()) {
                 addToMap(band);
-            else
+            } else {
                 removeFromMap(band);
+            }
         }
     }
 
+    @Override
     public void bandGroupChanged(final String identifier) {
         if (this.identifier.equals(identifier)) {
             dataMap.clear();
@@ -284,6 +295,7 @@ public class EVEDrawController implements BandControllerListener, ZoomController
     // EVE Cache Controller Listener
     // //////////////////////////////////////////////////////////////////////////////
 
+    @Override
     public void dataAdded(final Band band) {
         if (dataMap.containsKey(band)) {
             updateBand(band);
@@ -295,34 +307,44 @@ public class EVEDrawController implements BandControllerListener, ZoomController
     // Layers Listener
     // //////////////////////////////////////////////////////////////////////////////
 
+    @Override
     public void layerAdded(int idx) {
     }
 
+    @Override
     public void layerRemoved(View oldView, int oldIdx) {
     }
 
+    @Override
     public void layerChanged(int idx) {
     }
 
+    @Override
     public void activeLayerChanged(int idx) {
     }
 
+    @Override
     public void viewportGeometryChanged() {
     }
 
+    @Override
     public void timestampChanged(int idx) {
         final ImmutableDateTime timestamp = LayersModel.getSingletonInstance().getCurrentFrameTimestamp(idx);
         fireRedrawRequestMovieFrameChanged(timestamp.getTime());
     }
 
+    @Override
     public void subImageDataChanged() {
     }
 
+    @Override
     public void layerDownloaded(int idx) {
     }
 
     @Override
-    public void plotAreaSpaceChanged(double scaledMinValue, double scaledMaxValue, double scaledMinTime, double scaledMaxTime, double scaledSelectedMinValue, double scaledSelectedMaxValue, double scaledSelectedMinTime, double scaledSelectedMaxTime) {
+    public void plotAreaSpaceChanged(double scaledMinValue, double scaledMaxValue, double scaledMinTime, double scaledMaxTime,
+            double scaledSelectedMinValue, double scaledSelectedMaxValue, double scaledSelectedMinTime, double scaledSelectedMaxTime,
+            boolean forced) {
         double diffScaledAvailable = scaledMaxValue - scaledMinValue;
         double diffAvaliable = Math.log10(availableRange.max) - Math.log10(availableRange.min);
         double diffSelectedStart = scaledSelectedMinValue - scaledMinValue;

@@ -47,9 +47,9 @@ public class ChartDrawValueRangePane extends JComponent implements EVEValueRange
     private int bottomRangeBorderPosition = -10;
     private final HintPopup minLabel = new HintPopup();
     private final HintPopup maxLabel = new HintPopup();
-    private PlotAreaSpaceManager plotAreaSpacemanager;
-    private String plotIdentifier;
-    private EVEState eveState;
+    private final PlotAreaSpaceManager plotAreaSpacemanager;
+    private final String plotIdentifier;
+    private final EVEState eveState;
 
     // //////////////////////////////////////////////////////////////////////////////
     // Methods
@@ -94,9 +94,10 @@ public class ChartDrawValueRangePane extends JComponent implements EVEValueRange
         final double min = selectedRange.min - availableRange.min;
         final double max = selectedRange.max - availableRange.min;
 
-
-        topRangeBorderPosition = (availableRangeSpace - (int) ((max / differenceAvailableValues) * availableRangeSpace)) + ChartConstants.GRAPH_TOP_SPACE;
-        bottomRangeBorderPosition = (availableRangeSpace - (int) ((min / differenceAvailableValues) * availableRangeSpace)) + ChartConstants.GRAPH_TOP_SPACE;
+        topRangeBorderPosition = (availableRangeSpace - (int) ((max / differenceAvailableValues) * availableRangeSpace))
+                + ChartConstants.GRAPH_TOP_SPACE;
+        bottomRangeBorderPosition = (availableRangeSpace - (int) ((min / differenceAvailableValues) * availableRangeSpace))
+                + ChartConstants.GRAPH_TOP_SPACE;
     }
 
     private void drawBackground(Graphics g) {
@@ -121,8 +122,9 @@ public class ChartDrawValueRangePane extends JComponent implements EVEValueRange
     }
 
     private void drawIntervalGraspPoints(Graphics g) {
-        if (!mouseOverComponent)
+        if (!mouseOverComponent) {
             return;
+        }
 
         Polygon p0 = new Polygon();
         p0.addPoint(getWidth() / 2 - 5, topRangeBorderPosition);
@@ -154,8 +156,10 @@ public class ChartDrawValueRangePane extends JComponent implements EVEValueRange
 
             final Point componentLocationOnScreen = getLocationOnScreen();
 
-            minLabel.setLocation(componentLocationOnScreen.x + getWidth(), componentLocationOnScreen.y + bottomRangeBorderPosition - maxLabel.getHeight() / 2);
-            maxLabel.setLocation(componentLocationOnScreen.x + getWidth(), componentLocationOnScreen.y + topRangeBorderPosition - minLabel.getHeight() / 2);
+            minLabel.setLocation(componentLocationOnScreen.x + getWidth(), componentLocationOnScreen.y + bottomRangeBorderPosition
+                    - maxLabel.getHeight() / 2);
+            maxLabel.setLocation(componentLocationOnScreen.x + getWidth(),
+                    componentLocationOnScreen.y + topRangeBorderPosition - minLabel.getHeight() / 2);
         } else {
             minLabel.setVisible(false);
             maxLabel.setVisible(false);
@@ -163,7 +167,8 @@ public class ChartDrawValueRangePane extends JComponent implements EVEValueRange
     }
 
     private void moveSelectedRange(final Point newMousePosition, boolean forced) {
-        final int diffPixel = mousePressed.y > newMousePosition.y ? mousePressed.y - newMousePosition.y : newMousePosition.y - mousePressed.y;
+        final int diffPixel = mousePressed.y > newMousePosition.y ? mousePressed.y - newMousePosition.y : newMousePosition.y
+                - mousePressed.y;
         final double diffRange = availableRange.max - availableRange.min;
         final int availableRangeSpace = getHeight() - 1 - (ChartConstants.GRAPH_TOP_SPACE + ChartConstants.GRAPH_BOTTOM_SPACE);
         final double movedValues = (diffPixel / (double) availableRangeSpace) * diffRange;
@@ -195,7 +200,7 @@ public class ChartDrawValueRangePane extends JComponent implements EVEValueRange
     private synchronized void resizeSelectedRange(final Point newMousePosition, boolean forced) {
         int useThisY = newMousePosition.y;
         if (mouseOverTopGraspPoint) {
-            if (newMousePosition.y >= bottomRangeBorderPosition ) {
+            if (newMousePosition.y >= bottomRangeBorderPosition) {
                 useThisY = bottomRangeBorderPosition;
             }
             if (newMousePosition.y < ChartConstants.GRAPH_TOP_SPACE) {
@@ -216,7 +221,8 @@ public class ChartDrawValueRangePane extends JComponent implements EVEValueRange
             }
             final int availableRangeSpace = getHeight() - 1 - (ChartConstants.GRAPH_TOP_SPACE + ChartConstants.GRAPH_BOTTOM_SPACE);
             final double diffRange = availableRange.max - availableRange.min;
-            final double min = availableRange.min + (((availableRangeSpace - (useThisY - ChartConstants.GRAPH_TOP_SPACE)) / (double) availableRangeSpace) * diffRange);
+            final double min = availableRange.min
+                    + (((availableRangeSpace - (useThisY - ChartConstants.GRAPH_TOP_SPACE)) / (double) availableRangeSpace) * diffRange);
 
             plotAreaSpacemanager.getPlotAreaSpace(plotIdentifier).setScaledSelectedValue(min, selectedRange.max, forced);
         }
@@ -226,21 +232,25 @@ public class ChartDrawValueRangePane extends JComponent implements EVEValueRange
     // Mouse Input Listener
     // //////////////////////////////////////////////////////////////////////////////
 
+    @Override
     public void mouseClicked(MouseEvent arg0) {
     }
 
+    @Override
     public void mouseEntered(MouseEvent arg0) {
         mouseOverComponent = true;
         repaint();
     }
 
+    @Override
     public void mouseExited(MouseEvent arg0) {
         eveState.setMouseValueIntervalDragging(false);
         if (mousePressed != null) {
-            if (mouseOverTopGraspPoint || mouseOverBottomGraspPoint)
-                resizeSelectedRange(arg0.getPoint(),true);
-            else if (mouseOverRange)
-                moveSelectedRange(arg0.getPoint(),true);
+            if (mouseOverTopGraspPoint || mouseOverBottomGraspPoint) {
+                resizeSelectedRange(arg0.getPoint(), true);
+            } else if (mouseOverRange) {
+                moveSelectedRange(arg0.getPoint(), true);
+            }
         }
         mouseOverComponent = false;
         mouseOverRange = false;
@@ -251,27 +261,33 @@ public class ChartDrawValueRangePane extends JComponent implements EVEValueRange
         repaint();
     }
 
+    @Override
     public void mousePressed(MouseEvent arg0) {
         mousePressed = arg0.getPoint();
     }
 
+    @Override
     public void mouseReleased(MouseEvent arg0) {
         eveState.setMouseValueIntervalDragging(false);
-        if (mouseOverTopGraspPoint || mouseOverBottomGraspPoint)
-            resizeSelectedRange(arg0.getPoint(),true);
-        else if (mouseOverRange)
-            moveSelectedRange(arg0.getPoint(),true);
+        if (mouseOverTopGraspPoint || mouseOverBottomGraspPoint) {
+            resizeSelectedRange(arg0.getPoint(), true);
+        } else if (mouseOverRange) {
+            moveSelectedRange(arg0.getPoint(), true);
+        }
         mousePressed = null;
     }
 
+    @Override
     public void mouseDragged(MouseEvent arg0) {
         eveState.setMouseValueIntervalDragging(true);
-        if (mouseOverTopGraspPoint || mouseOverBottomGraspPoint)
-            resizeSelectedRange(arg0.getPoint(),false);
-        else if (mouseOverRange)
-            moveSelectedRange(arg0.getPoint(),false);
+        if (mouseOverTopGraspPoint || mouseOverBottomGraspPoint) {
+            resizeSelectedRange(arg0.getPoint(), false);
+        } else if (mouseOverRange) {
+            moveSelectedRange(arg0.getPoint(), false);
+        }
     }
 
+    @Override
     public void mouseMoved(MouseEvent e) {
         mouseOverRange = false;
         mouseOverTopGraspPoint = false;
@@ -284,26 +300,30 @@ public class ChartDrawValueRangePane extends JComponent implements EVEValueRange
         }
 
         // is mouse cursor above of one of the grasp points?
-        if (e.getPoint().y >= topRangeBorderPosition - 5 && e.getPoint().y <= topRangeBorderPosition + 5 && e.getPoint().x >= (getWidth() / 2 - 5) && e.getPoint().x <= (getWidth() / 2 + 5)) {
+        if (e.getPoint().y >= topRangeBorderPosition - 5 && e.getPoint().y <= topRangeBorderPosition + 5
+                && e.getPoint().x >= (getWidth() / 2 - 5) && e.getPoint().x <= (getWidth() / 2 + 5)) {
             mouseOverTopGraspPoint = true;
             setCursor(new Cursor(Cursor.N_RESIZE_CURSOR));
         }
 
-        if (e.getPoint().y >= bottomRangeBorderPosition - 5 && e.getPoint().y <= bottomRangeBorderPosition + 5 && e.getPoint().x >= (getWidth() / 2 - 5) && e.getPoint().x <= (getWidth() / 2 + 5)) {
+        if (e.getPoint().y >= bottomRangeBorderPosition - 5 && e.getPoint().y <= bottomRangeBorderPosition + 5
+                && e.getPoint().x >= (getWidth() / 2 - 5) && e.getPoint().x <= (getWidth() / 2 + 5)) {
             mouseOverBottomGraspPoint = true;
             setCursor(new Cursor(Cursor.N_RESIZE_CURSOR));
         }
 
         // reset cursor if it does not point to the range area
-        if (!mouseOverRange)
+        if (!mouseOverRange) {
             setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
+        }
     }
 
     // //////////////////////////////////////////////////////////////////////////////
     // Draw Controller Listener
     // //////////////////////////////////////////////////////////////////////////////
 
-    public void drawRequest(final Interval<Date> interval, final Band[] bands, final EVEValues[] values, final Range availableRange, final Range selectedRange) {
+    public void drawRequest(final Interval<Date> interval, final Band[] bands, final EVEValues[] values, final Range availableRange,
+            final Range selectedRange) {
         this.availableRange = availableRange;
         this.selectedRange = selectedRange;
 
@@ -371,10 +391,12 @@ public class ChartDrawValueRangePane extends JComponent implements EVEValueRange
     }
 
     @Override
-    public void plotAreaSpaceChanged(double scaledMinValue, double scaledMaxValue, double scaledMinTime, double scaledMaxTime, double scaledSelectedMinValue, double scaledSelectedMaxValue, double scaledSelectedMinTime, double scaledSelectedMaxTime) {
+    public void plotAreaSpaceChanged(double scaledMinValue, double scaledMaxValue, double scaledMinTime, double scaledMaxTime,
+            double scaledSelectedMinValue, double scaledSelectedMaxValue, double scaledSelectedMinTime, double scaledSelectedMaxTime,
+            boolean forced) {
 
-        this.availableRange = new Range(scaledMinValue, scaledMaxValue);
-        this.selectedRange = new Range(scaledSelectedMinValue, scaledSelectedMaxValue);
+        availableRange = new Range(scaledMinValue, scaledMaxValue);
+        selectedRange = new Range(scaledSelectedMinValue, scaledSelectedMaxValue);
         repaint();
     }
 }

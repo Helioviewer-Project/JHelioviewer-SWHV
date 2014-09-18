@@ -9,16 +9,16 @@ public class PlotValueSpace implements PlotAreaSpaceListener {
     private double selectedMinValue;
     private double selectedMaxValue;
 
-    private List<PlotValueSpaceListener> listeners;
+    private final List<PlotValueSpaceListener> listeners;
 
     private PlotAreaSpace plotAreaSpace;
 
     public PlotValueSpace() {
-        this.minValue = -1.0;
-        this.maxValue = -1.0;
-        this.selectedMinValue = -1.0;
-        this.selectedMaxValue = -1.0;
-        this.listeners = new ArrayList<PlotValueSpaceListener>();
+        minValue = -1.0;
+        maxValue = -1.0;
+        selectedMinValue = -1.0;
+        selectedMaxValue = -1.0;
+        listeners = new ArrayList<PlotValueSpaceListener>();
         plotAreaSpace.addPlotAreaSpaceListener(this);
     }
 
@@ -31,14 +31,16 @@ public class PlotValueSpace implements PlotAreaSpaceListener {
     }
 
     @Override
-    public void plotAreaSpaceChanged(double scaledMinValue, double scaledMaxValue, double scaledMinTime, double scaledMaxTime, double scaledSelectedMinValue, double scaledSelectedMaxValue, double scaledSelectedMinTime, double scaledSelectedMaxTime) {
-        if (this.minValue != -1.0 && this.maxValue != -1.0 && this.selectedMinValue != -1.0 && this.selectedMaxValue != -1.0) {
+    public void plotAreaSpaceChanged(double scaledMinValue, double scaledMaxValue, double scaledMinTime, double scaledMaxTime,
+            double scaledSelectedMinValue, double scaledSelectedMaxValue, double scaledSelectedMinTime, double scaledSelectedMaxTime,
+            boolean forced) {
+        if (minValue != -1.0 && maxValue != -1.0 && selectedMinValue != -1.0 && selectedMaxValue != -1.0) {
             double diffValue = maxValue - minValue;
             double scaleDiff = scaledMaxValue - scaledMinValue;
             double selectedMin = (scaledSelectedMinValue - scaledMinValue) / scaleDiff;
             double selectedMax = (scaledSelectedMaxValue - scaledMinValue) / scaleDiff;
-            this.selectedMinValue = minValue + Math.round(diffValue * selectedMin);
-            this.selectedMaxValue = minValue + Math.round(diffValue * selectedMax);
+            selectedMinValue = minValue + Math.round(diffValue * selectedMin);
+            selectedMaxValue = minValue + Math.round(diffValue * selectedMax);
             fireSelectedIntervalChanged();
         }
     }
@@ -78,8 +80,8 @@ public class PlotValueSpace implements PlotAreaSpaceListener {
     public void setMinAndMaxValue(double minValue, double maxValue) {
         this.minValue = minValue;
         this.maxValue = maxValue;
-        this.selectedMinValue = minValue;
-        this.selectedMaxValue = maxValue;
+        selectedMinValue = minValue;
+        selectedMaxValue = maxValue;
         fireAvailableIntervalChanged();
     }
 
@@ -91,14 +93,14 @@ public class PlotValueSpace implements PlotAreaSpaceListener {
 
     private void fireSelectedIntervalChanged() {
         for (PlotValueSpaceListener l : listeners) {
-            l.selectedIntervalChanged(this.selectedMinValue, this.selectedMaxValue);
+            l.selectedIntervalChanged(selectedMinValue, selectedMaxValue);
         }
 
     }
 
     private void fireAvailableIntervalChanged() {
         for (PlotValueSpaceListener l : listeners) {
-            l.availableIntervalChanged(this.selectedMinValue, this.selectedMaxValue);
+            l.availableIntervalChanged(selectedMinValue, selectedMaxValue);
         }
     }
 

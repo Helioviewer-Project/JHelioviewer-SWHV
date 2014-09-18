@@ -12,10 +12,10 @@ public class ZoomDataConfig implements ZoomManagerListener, PlotAreaSpaceListene
     private Date maxX;
     private Rectangle displaySize;
     private long ID;
-    private String plotIdentifier;
-    private YValueModel yValueModel;
+    private final String plotIdentifier;
+    private final YValueModel yValueModel;
 
-    private List<ZoomDataConfigListener> listeners;
+    private final List<ZoomDataConfigListener> listeners;
 
     public ZoomDataConfig(Date minX, Date maxX, Rectangle displaySize, long ID, String plotIdentifier) {
         listeners = new ArrayList<ZoomDataConfigListener>();
@@ -23,7 +23,7 @@ public class ZoomDataConfig implements ZoomManagerListener, PlotAreaSpaceListene
         this.maxX = maxX;
         this.minX = minX;
         this.plotIdentifier = plotIdentifier;
-        this.yValueModel = YValueModelManager.getInstance().getYValueModel(plotIdentifier);
+        yValueModel = YValueModelManager.getInstance().getYValueModel(plotIdentifier);
         this.displaySize = displaySize;
         if (displaySize != null) {
             requestData();
@@ -81,7 +81,7 @@ public class ZoomDataConfig implements ZoomManagerListener, PlotAreaSpaceListene
 
     @Override
     public void displaySizeChanged(Rectangle area) {
-        this.displaySize = area;
+        displaySize = area;
         requestData();
     }
 
@@ -100,14 +100,18 @@ public class ZoomDataConfig implements ZoomManagerListener, PlotAreaSpaceListene
         requestData();
     }
 
+    @Override
     public String toString() {
         StringBuilder sb = new StringBuilder();
-        sb.append("MinX = ").append(minX).append("\n").append("MaxX = ").append(maxX).append("\n").append("DisplaySize = ").append(displaySize).append("\n");
+        sb.append("MinX = ").append(minX).append("\n").append("MaxX = ").append(maxX).append("\n").append("DisplaySize = ")
+                .append(displaySize).append("\n");
         return sb.toString();
     }
 
     @Override
-    public void plotAreaSpaceChanged(double scaledMinValue, double scaledMaxValue, double scaledMinTime, double scaledMaxTime, double scaledSelectedMinValue, double scaledSelectedMaxValue, double scaledSelectedMinTime, double scaledSelectedMaxTime) {
+    public void plotAreaSpaceChanged(double scaledMinValue, double scaledMaxValue, double scaledMinTime, double scaledMaxTime,
+            double scaledSelectedMinValue, double scaledSelectedMaxValue, double scaledSelectedMinTime, double scaledSelectedMaxTime,
+            boolean forced) {
         synchronized (this) {
             requestData();
         }
