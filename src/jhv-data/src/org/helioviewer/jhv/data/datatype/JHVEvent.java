@@ -103,4 +103,11 @@ public interface JHVEvent {
      * @return a list with all null non visible parameters
      */
     public abstract List<JHVEventParameter> getNonVisibleNullEventParameters();
+
+    /**
+     * Gets the event type of the event.
+     * 
+     * @return the event type of the event
+     */
+    public abstract JHVEventType getJHVEventType();
 }
