@@ -5,10 +5,12 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Set;
+import java.util.logging.Logger;
 
 import org.helioviewer.jhv.data.container.cache.JHVEventCache;
 import org.helioviewer.jhv.data.container.cache.JHVEventHandlerCache;
 import org.helioviewer.jhv.data.datatype.JHVEvent;
+import org.helioviewer.jhv.data.datatype.JHVEventType;
 import org.helioviewer.jhv.data.lock.JHVEventContainerLocks;
 
 public class JHVEventContainer {
@@ -87,6 +89,7 @@ public class JHVEventContainer {
 
             @Override
             public void run() {
+                Logger.getLogger(JHVEventContainer.class.getName()).info("Request for date : " + date);
                 eventHandlerCache.add(handler, date);
                 List<JHVEvent> events = eventCache.get(date);
                 handler.newEventsReceived(events);
@@ -111,6 +114,7 @@ public class JHVEventContainer {
 
             @Override
             public void run() {
+                Logger.getLogger(JHVEventContainer.class.getName()).info("Request for date list :");
                 for (Date date : dateList) {
                     requestForDate(date, handler);
                 }
@@ -136,6 +140,7 @@ public class JHVEventContainer {
         EventQueue.invokeLater(new Runnable() {
             @Override
             public void run() {
+                Logger.getLogger(JHVEventContainer.class.getName()).info("Request for interval : [" + startDate + "," + endDate + "]");
                 eventHandlerCache.add(handler, startDate, endDate);
                 List<JHVEvent> events = eventCache.get(startDate, endDate);
                 handler.newEventsReceived(events);
@@ -150,16 +155,48 @@ public class JHVEventContainer {
      * @param event
      *            the event to add to the event cache
      */
-    public void addEvent(JHVEvent event) {
-        eventCache.add(event);
-        // fireEventCacheChanged(event.getStartDate());
+    public void addEvent(final JHVEvent event) {
+        EventQueue.invokeLater(new Runnable() {
+
+            @Override
+            public void run() {
+                eventCache.add(event);
+            }
+
+        });
+
     }
 
     /**
-     * 
+     * Indicates to the JHVEventContainer that a download was finished. This
+     * must be called the event request handlers in order to propagate the
+     * downloaded events to the event handlers.
      */
     public void finishedDownload() {
-        fireEventCacheChanged();
+        EventQueue.invokeLater(new Runnable() {
+
+            @Override
+            public void run() {
+                fireEventCacheChanged();
+            }
+        });
+    }
+
+    /**
+     * Removes the events of the given eventType from the event cache.
+     * 
+     * @param eventType
+     *            the event type to remove from the cache.
+     */
+    public void removeEvents(final JHVEventType eventType) {
+        EventQueue.invokeLater(new Runnable() {
+
+            @Override
+            public void run() {
+                eventCache.removeEventType(eventType);
+                fireEventCacheChanged();
+            }
+        });
     }
 
     /**
