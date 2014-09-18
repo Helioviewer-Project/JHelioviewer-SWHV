@@ -4,8 +4,10 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.helioviewer.jhv.data.container.util.DateUtil;
 import org.helioviewer.jhv.data.datatype.JHVEvent;
@@ -19,11 +21,15 @@ public class JHVEventCache {
     /** The events received for a certain date */
     private final Map<Date, Map<Date, List<JHVEvent>>> events;
 
+    /**  */
+    private final Set<String> eventIDs;
+
     /**
      * private default constructor
      */
     private JHVEventCache() {
         events = new HashMap<Date, Map<Date, List<JHVEvent>>>();
+        eventIDs = new HashSet<String>();
     }
 
     /**
@@ -46,9 +52,12 @@ public class JHVEventCache {
      */
     public void add(JHVEvent event) {
         synchronized (JHVEventContainerLocks.cacheLock) {
-            Date startDate = DateUtil.getCurrentDate(event.getStartDate());
-            Date endDate = DateUtil.getNextDate(event.getEndDate());
-            addToList(startDate, endDate, event);
+            if (!eventIDs.contains(event.getUniqueID())) {
+                Date startDate = DateUtil.getCurrentDate(event.getStartDate());
+                Date endDate = DateUtil.getNextDate(event.getEndDate());
+                addToList(startDate, endDate, event);
+                eventIDs.add(event.getUniqueID());
+            }
         }
     }
 
@@ -142,6 +151,7 @@ public class JHVEventCache {
                     for (JHVEvent event : eventList) {
                         if (event.getJHVEventType().equals(eventType)) {
                             deleteList.add(event);
+                            eventIDs.remove(event.getUniqueID());
                         }
                     }
                     eventList.removeAll(deleteList);

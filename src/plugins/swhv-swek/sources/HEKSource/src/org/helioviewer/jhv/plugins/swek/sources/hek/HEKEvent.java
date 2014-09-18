@@ -9,6 +9,7 @@ import javax.swing.Icon;
 import org.helioviewer.jhv.data.datatype.JHVEvent;
 import org.helioviewer.jhv.data.datatype.JHVEventParameter;
 import org.helioviewer.jhv.data.datatype.JHVEventType;
+import org.helioviewer.jhv.data.datatype.JHVPositionInformation;
 
 /**
  * Represents a JHVevent coming from the HEK source.
@@ -60,6 +61,12 @@ public class HEKEvent implements JHVEvent {
     /** The event type */
     private final JHVEventType eventType;
 
+    /** The unique identifier */
+    private String uniqueID;
+
+    /** List with positioning information for this event */
+    private List<JHVPositionInformation> positionInformation;
+
     /**
      * Default constructor
      */
@@ -75,6 +82,7 @@ public class HEKEvent implements JHVEvent {
     /**
      * Creates a HEK event with an event name, event display name, short
      * description and an .
+     * 
      * 
      * @param eventName
      *            the event name
@@ -114,6 +122,7 @@ public class HEKEvent implements JHVEvent {
         this.description = description;
         this.icon = icon;
         this.eventType = eventType;
+        uniqueID = uniqueID;
     }
 
     @Override
@@ -218,19 +227,6 @@ public class HEKEvent implements JHVEvent {
     }
 
     /**
-     * Initialize all the lists.
-     */
-    private void initLists() {
-        allParameters = new ArrayList<JHVEventParameter>();
-        allVisibleParameters = new ArrayList<JHVEventParameter>();
-        allVisibleNotNullParameters = new ArrayList<JHVEventParameter>();
-        allVisibleNullParameters = new ArrayList<JHVEventParameter>();
-        allNonVisibleParameters = new ArrayList<JHVEventParameter>();
-        allNonVisibleNotNullParameters = new ArrayList<JHVEventParameter>();
-        allNonVisibleNullParameters = new ArrayList<JHVEventParameter>();
-    }
-
-    /**
      * Sets the start date of the HEKEvent.
      * 
      * @param startDate
@@ -250,4 +246,48 @@ public class HEKEvent implements JHVEvent {
         this.endDate = endDate;
 
     }
+
+    @Override
+    public String getUniqueID() {
+        return uniqueID;
+    }
+
+    /**
+     * Sets the unique ID for the HekEvent.
+     * 
+     * @param uniqueID
+     */
+    public void setUniqueID(String uniqueID) {
+        this.uniqueID = uniqueID;
+    }
+
+    @Override
+    public List<JHVPositionInformation> getPositioningInformation() {
+        return positionInformation;
+    }
+
+    /**
+     * Adds position information to the HEKEvent.
+     * 
+     * @param positionInformation
+     *            the position information to add
+     */
+    public void addJHVPositionInformation(JHVPositionInformation positionInformation) {
+        this.positionInformation.add(positionInformation);
+    }
+
+    /**
+     * Initialize all the lists.
+     */
+    private void initLists() {
+        allParameters = new ArrayList<JHVEventParameter>();
+        allVisibleParameters = new ArrayList<JHVEventParameter>();
+        allVisibleNotNullParameters = new ArrayList<JHVEventParameter>();
+        allVisibleNullParameters = new ArrayList<JHVEventParameter>();
+        allNonVisibleParameters = new ArrayList<JHVEventParameter>();
+        allNonVisibleNotNullParameters = new ArrayList<JHVEventParameter>();
+        allNonVisibleNullParameters = new ArrayList<JHVEventParameter>();
+        positionInformation = new ArrayList<JHVPositionInformation>();
+    }
+
 }
