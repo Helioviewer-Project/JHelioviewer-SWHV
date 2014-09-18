@@ -157,8 +157,12 @@ public class DownloadWorker implements Runnable {
      */
     public void stopWorker() {
         isStopped = true;
-        downloader.stopDownload();
-        parser.stopParser();
+        if (downloader != null) {
+            downloader.stopDownload();
+        }
+        if (parser != null) {
+            parser.stopParser();
+        }
     }
 
     @Override

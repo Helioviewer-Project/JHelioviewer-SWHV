@@ -9,10 +9,11 @@ import java.util.Map;
 
 import org.helioviewer.jhv.data.container.util.DateUtil;
 import org.helioviewer.jhv.data.datatype.JHVEvent;
+import org.helioviewer.jhv.data.datatype.JHVEventType;
 import org.helioviewer.jhv.data.lock.JHVEventContainerLocks;
 
 public class JHVEventCache {
-    /** signleton instance of JHVevent cache */
+    /** singleton instance of JHVevent cache */
     private static JHVEventCache instance;
 
     /** The events received for a certain date */
@@ -125,6 +126,29 @@ public class JHVEventCache {
             }
             return eventsResult;
         }
+    }
+
+    /**
+     * Removes all the events of the given event type from the event cache.
+     * 
+     * @param eventType
+     *            the event type to remove
+     */
+    public void removeEventType(JHVEventType eventType) {
+        synchronized (JHVEventContainerLocks.cacheLock) {
+            for (Map<Date, List<JHVEvent>> endDateEvents : events.values()) {
+                for (List<JHVEvent> eventList : endDateEvents.values()) {
+                    List<JHVEvent> deleteList = new ArrayList<JHVEvent>();
+                    for (JHVEvent event : eventList) {
+                        if (event.getJHVEventType().equals(eventType)) {
+                            deleteList.add(event);
+                        }
+                    }
+                    eventList.removeAll(deleteList);
+                }
+            }
+        }
+
     }
 
     /**
