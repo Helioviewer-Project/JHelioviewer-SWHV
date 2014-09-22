@@ -15,12 +15,12 @@ import org.helioviewer.viewmodel.view.View;
 
 /**
  * Implementation of PhyscialRenderGraphics, using OpenGL for drawing.
- * 
+ *
  * <p>
  * Maps all methods to corresponding OpenGL methods.
- * 
+ *
  * @author Markus Langenberg
- * 
+ *
  * */
 public class GLPhysicalRenderGraphics extends AbstractPhysicalRenderGraphics {
 
@@ -33,11 +33,11 @@ public class GLPhysicalRenderGraphics extends AbstractPhysicalRenderGraphics {
 
     /**
      * Default constructor.
-     * 
+     *
      * <p>
      * The caller has to provide a gl object, which can be used by this
      * renderer.
-     * 
+     *
      * @param _gl
      *            gl object, that should be used for drawing.
      * @param view
@@ -267,7 +267,7 @@ public class GLPhysicalRenderGraphics extends AbstractPhysicalRenderGraphics {
 
     /**
      * {@inheritDoc}
-     * 
+     *
      * <p>
      * Note, that the renderer buffers recently seen images, so it a good idea
      * to use the same image object every call, if the image data does not
@@ -280,7 +280,7 @@ public class GLPhysicalRenderGraphics extends AbstractPhysicalRenderGraphics {
 
     /**
      * {@inheritDoc}
-     * 
+     *
      * <p>
      * Note, that the renderer buffers recently seen images, so it a good idea
      * to use the same image object every call, if the image data does not
@@ -294,7 +294,7 @@ public class GLPhysicalRenderGraphics extends AbstractPhysicalRenderGraphics {
 
     /**
      * {@inheritDoc}
-     * 
+     *
      * <p>
      * Note, that the renderer buffers recently seen images, so it a good idea
      * to use the same image object every call, if the image data does not
@@ -379,8 +379,8 @@ public class GLPhysicalRenderGraphics extends AbstractPhysicalRenderGraphics {
     public void drawImage3d(BufferedImage image, Double x, Double y, Double z, Double width, Double height) {
         y = -y;
 
-        // gl.glEnable(GL2.GL_VERTEX_PROGRAM_ARB);
-        // gl.glEnable(GL2.GL_FRAGMENT_PROGRAM_ARB);
+        gl.glDisable(GL2.GL_VERTEX_PROGRAM_ARB);
+        gl.glDisable(GL2.GL_FRAGMENT_PROGRAM_ARB);
         commonRenderGraphics.bindScalingShader();
 
         commonRenderGraphics.bindImage(image);
