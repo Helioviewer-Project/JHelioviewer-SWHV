@@ -27,9 +27,9 @@ public class SWEKTreeModelEventType extends AbstractSWEKTreeModelElement {
      *            created
      */
     public SWEKTreeModelEventType(SWEKEventType swekEventType) {
-        super(false);
+        super(false, swekEventType.getEventIcon());
         this.swekEventType = swekEventType;
-        this.swekTreeSuppliers = new ArrayList<SWEKTreeModelSupplier>();
+        swekTreeSuppliers = new ArrayList<SWEKTreeModelSupplier>();
         fillSWEKTreeSuppliers();
     }
 
@@ -39,7 +39,7 @@ public class SWEKTreeModelEventType extends AbstractSWEKTreeModelElement {
      * @return the SWEK event type
      */
     public SWEKEventType getSwekEventType() {
-        return this.swekEventType;
+        return swekEventType;
     }
 
     /**
@@ -49,15 +49,15 @@ public class SWEKTreeModelEventType extends AbstractSWEKTreeModelElement {
      * @return a list of SWEK tree model suppliers
      */
     public List<SWEKTreeModelSupplier> getSwekTreeSuppliers() {
-        return this.swekTreeSuppliers;
+        return swekTreeSuppliers;
     }
 
     /**
      * Fills the list of SWEK tree model suppliers for this swek event type.
      */
     private void fillSWEKTreeSuppliers() {
-        for (SWEKSupplier swekSupplier : this.swekEventType.getSuppliers()) {
-            this.swekTreeSuppliers.add(new SWEKTreeModelSupplier(swekSupplier));
+        for (SWEKSupplier swekSupplier : swekEventType.getSuppliers()) {
+            swekTreeSuppliers.add(new SWEKTreeModelSupplier(swekSupplier));
         }
     }
 

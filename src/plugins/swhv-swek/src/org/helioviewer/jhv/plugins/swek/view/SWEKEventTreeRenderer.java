@@ -2,7 +2,11 @@ package org.helioviewer.jhv.plugins.swek.view;
 
 import java.awt.BorderLayout;
 import java.awt.Component;
+import java.awt.Graphics;
+import java.awt.Image;
+import java.awt.image.BufferedImage;
 
+import javax.swing.ImageIcon;
 import javax.swing.JCheckBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -44,11 +48,37 @@ public class SWEKEventTreeRenderer extends DefaultTreeCellRenderer {
         JCheckBox checkBox = new JCheckBox();
         checkBox.setSelected(((AbstractSWEKTreeModelElement) whatToDisplay).isCheckboxSelected());
         JPanel panel = new JPanel();
+        // panel.setPreferredSize(new Dimension(150, 30));
         panel.setLayout(new BorderLayout());
         panel.add(checkBox, BorderLayout.LINE_START);
-        panel.add(new JLabel(name), BorderLayout.CENTER);
+        ImageIcon icon = ((AbstractSWEKTreeModelElement) whatToDisplay).getIcon();
+        if (icon != null) {
+            JPanel tempPanel = new JPanel();
+            tempPanel.setLayout(new BorderLayout());
+            tempPanel.add(new JLabel(resizeIcon(icon)), BorderLayout.LINE_START);
+            tempPanel.add(new JLabel(name), BorderLayout.CENTER);
+            tempPanel.setOpaque(false);
+            panel.add(tempPanel);
+        } else {
+            panel.add(new JLabel(name), BorderLayout.CENTER);
+        }
         // panel.setBackground(Color.WHITE);
         panel.setOpaque(false);
         return panel;
+    }
+
+    /**
+     * Resizes an icon to the correct size.
+     * 
+     * @param icon
+     *            the icon to resize
+     * @return the resized icon
+     */
+    private ImageIcon resizeIcon(ImageIcon icon) {
+        Image im = icon.getImage();
+        BufferedImage bi = new BufferedImage(25, 25, BufferedImage.TYPE_INT_ARGB);
+        Graphics g = bi.createGraphics();
+        g.drawImage(im, 0, 0, 25, 25, null);
+        return new ImageIcon(bi);
     }
 }
