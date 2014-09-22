@@ -79,14 +79,14 @@ public class GL3DSceneGraphView extends AbstractGL3DView implements GL3DView {
                 Log.debug("Toggling BoundingBox");
             }
         }, KeyEvent.VK_B);
-        GL3DKeyController.getInstance().addListener(new GL3DKeyListener() {
-            @Override
-            public void keyHit(KeyEvent e) {
-                root.getDrawBits().toggle(Bit.Wireframe);
-                Displayer.getSingletonInstance().display();
-                Log.debug("Toggling Wireframe");
-            }
-        }, KeyEvent.VK_W);
+        /*
+         * GL3DKeyController.getInstance().addListener(new GL3DKeyListener() {
+         * 
+         * @Override public void keyHit(KeyEvent e) {
+         * root.getDrawBits().toggle(Bit.Wireframe);
+         * Displayer.getSingletonInstance().display();
+         * Log.debug("Toggling Wireframe"); } }, KeyEvent.VK_W);
+         */
         GL3DKeyController.getInstance().addListener(new GL3DKeyListener() {
             @Override
             public void keyHit(KeyEvent e) {
@@ -382,7 +382,7 @@ public class GL3DSceneGraphView extends AbstractGL3DView implements GL3DView {
         /*
          * GL3DNode sibling = node; while((sibling = sibling.getNext()) != null)
          * { for(int i=0; i<level; ++i) System.out.print("   ");
-         *
+         * 
          * System.out.println("Sibling: " + sibling.getClass().getName() + " ("
          * + node.getName() + ")"); }
          */
