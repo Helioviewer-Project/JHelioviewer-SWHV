@@ -27,9 +27,9 @@ import org.helioviewer.viewmodel.view.ViewListener;
  * {@link GL3DObserverCamera} by automatically rotating the camera around the
  * Y-Axis (pointing to solar north) by an amount calculated through
  * {@link DifferentialRotation}.
- * 
+ *
  * @author Simon Spoerri (simon.spoerri@fhnw.ch)
- * 
+ *
  */
 public class GL3DObserverCamera extends GL3DSolarRotationTrackingTrackballCamera implements ViewListener {
 
@@ -78,32 +78,34 @@ public class GL3DObserverCamera extends GL3DSolarRotationTrackingTrackballCamera
 
         double addl0 = 0.;
         double addb0 = 0.;
-        MetaDataView mdv = LayersModel.getSingletonInstance().getActiveView().getAdapter(MetaDataView.class);
-        Calendar cal = new GregorianCalendar();
-        cal.setTime(new Date(currentDate.getTime()));
-        if (mdv != null) {
-            MetaData metadata = mdv.getMetaData();
-            if (metadata instanceof HelioviewerPositionedMetaData) {
-                HelioviewerPositionedMetaData hvMetadata = (HelioviewerPositionedMetaData) metadata;
-                if (!hvMetadata.isStonyhurstProvided()) {
-                    addb0 = Astronomy.getB0InRadians(cal);
+        if (LayersModel.getSingletonInstance().getActiveView() != null) {
+            MetaDataView mdv = LayersModel.getSingletonInstance().getActiveView().getAdapter(MetaDataView.class);
+            Calendar cal = new GregorianCalendar();
+            cal.setTime(new Date(currentDate.getTime()));
+            if (mdv != null) {
+                MetaData metadata = mdv.getMetaData();
+                if (metadata instanceof HelioviewerPositionedMetaData) {
+                    HelioviewerPositionedMetaData hvMetadata = (HelioviewerPositionedMetaData) metadata;
+                    if (!hvMetadata.isStonyhurstProvided()) {
+                        addb0 = Astronomy.getB0InRadians(cal);
+                    } else {
+                        addl0 = hvMetadata.getStonyhurstLongitude() / MathUtils.radeg;
+                        addb0 = hvMetadata.getStonyhurstLatitude() / MathUtils.radeg;
+                    }
+
                 } else {
-                    addl0 = hvMetadata.getStonyhurstLongitude() / MathUtils.radeg;
-                    addb0 = hvMetadata.getStonyhurstLatitude() / MathUtils.radeg;
+                    addb0 = Astronomy.getB0InRadians(cal);
                 }
-
-            } else {
-                addb0 = Astronomy.getB0InRadians(cal);
             }
+
+            this.timediff = currentDate.getTime() / 1000 - Constants.referenceDate;
+            this.currentRotation = DifferentialRotation.calculateRotationInRadians(0., this.timediff) % (Math.PI * 2.0);
+
+            this.getLocalRotation().clear();
+            this.getLocalRotation().rotate(GL3DQuatd.createRotation(-addb0, new GL3DVec3d(1, 0, 0)));
+
+            this.getLocalRotation().rotate(GL3DQuatd.createRotation(this.currentRotation - addl0, new GL3DVec3d(0, 1, 0)));
+            this.updateCameraTransformation();
         }
-
-        this.timediff = currentDate.getTime() / 1000 - Constants.referenceDate;
-        this.currentRotation = DifferentialRotation.calculateRotationInRadians(0., this.timediff) % (Math.PI * 2.0);
-
-        this.getLocalRotation().clear();
-        this.getLocalRotation().rotate(GL3DQuatd.createRotation(-addb0, new GL3DVec3d(1, 0, 0)));
-
-        this.getLocalRotation().rotate(GL3DQuatd.createRotation(this.currentRotation - addl0, new GL3DVec3d(0, 1, 0)));
-        this.updateCameraTransformation();
     }
 }
