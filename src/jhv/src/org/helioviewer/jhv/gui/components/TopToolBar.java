@@ -18,6 +18,7 @@ import javax.swing.SwingConstants;
 import org.helioviewer.base.logging.Log;
 import org.helioviewer.gl3d.gui.GL3DResetCameraAction;
 import org.helioviewer.gl3d.gui.GL3DSetPanInteractionAction;
+import org.helioviewer.gl3d.gui.GL3DSetRotationInteractionAction;
 import org.helioviewer.gl3d.gui.GL3DSetZoomBoxInteractionAction;
 import org.helioviewer.gl3d.gui.GL3DToggleSolarRotationAction;
 import org.helioviewer.gl3d.gui.GL3DZoomFitAction;
@@ -53,7 +54,7 @@ public class TopToolBar extends JToolBar implements MouseListener {
     private static final long serialVersionUID = 1L;
 
     public enum SelectionMode {
-        PAN, ZOOMBOX
+        PAN, ZOOMBOX, ROTATE
     };
 
     private enum DisplayMode {
@@ -63,6 +64,7 @@ public class TopToolBar extends JToolBar implements MouseListener {
     private DisplayMode displayMode;
 
     private JToggleButton panButton;
+    private JToggleButton rotateButton;
     private JToggleButton zoomBoxButton;
 
     private JToggleButton trackSolarRotationButton;
@@ -209,6 +211,15 @@ public class TopToolBar extends JToolBar implements MouseListener {
             group.add(zoomBoxButton);
             addButton(zoomBoxButton);
         }
+
+        rotateButton = new JToggleButton(new GL3DSetRotationInteractionAction());
+        rotateButton.setSelected(selectionMode == SelectionMode.ROTATE);
+        rotateButton.setIcon(IconBank.getIcon(JHVIcon.ROTATE));
+        rotateButton.setSelectedIcon(IconBank.getIcon(JHVIcon.ROTATE_SELECTED));
+        rotateButton.setToolTipText("Select Rotating");
+        group.add(rotateButton);
+        addButton(rotateButton);
+
         addSeparator();
 
         if (StateController.getInstance().getCurrentState().getType() == ViewStateEnum.View2D) {
@@ -270,6 +281,7 @@ public class TopToolBar extends JToolBar implements MouseListener {
     public void updateStateButtons() {
         this.updateStateButtons(StateController.getInstance().getCurrentState());
         //trackSolarRotationButton.setEnabled(StateController.getInstance().getCurrentState() == ViewStateEnum.View2D.getState());
+        this.rotateButton.setEnabled(StateController.getInstance().getCurrentState() == ViewStateEnum.View3D.getState());
         resetCamera.setEnabled(StateController.getInstance().getCurrentState() == ViewStateEnum.View3D.getState());
         this.zoomBoxButton.setEnabled(StateController.getInstance().getCurrentState() == ViewStateEnum.View2D.getState());
     }
@@ -331,7 +343,7 @@ public class TopToolBar extends JToolBar implements MouseListener {
             Settings.getSingletonInstance().setProperty("display.toolbar", mode.toString().toLowerCase());
             Settings.getSingletonInstance().save();
         }
-        SelectionMode selectionMode = SelectionMode.PAN;
+        SelectionMode selectionMode = SelectionMode.ROTATE;
 
         if (zoomBoxButton.isSelected()) {
             selectionMode = SelectionMode.ZOOMBOX;
