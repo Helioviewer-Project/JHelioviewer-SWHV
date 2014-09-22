@@ -34,10 +34,10 @@ import org.helioviewer.jhv.gui.states.ViewStateEnum;
 
 /**
  * Toolbar containing the most common actions.
- * 
+ *
  * <p>
  * The toolbar provides a context menu to change its appearance.
- * 
+ *
  * @author Markus Langenberg
  * @author Andre Dau
  */
@@ -83,7 +83,7 @@ public class TopToolBar extends JToolBar implements MouseListener {
 
     /**
      * Sets the active selection mode.
-     * 
+     *
      * @param mode
      *            Selection mode, can be either PAN, ZOOMBOX or FOCUS.
      */
@@ -101,6 +101,7 @@ public class TopToolBar extends JToolBar implements MouseListener {
     /**
      * {@inheritDoc}
      */
+    @Override
     public void mouseClicked(MouseEvent e) {
         maybeShowPopup(e);
     }
@@ -108,18 +109,21 @@ public class TopToolBar extends JToolBar implements MouseListener {
     /**
      * {@inheritDoc}
      */
+    @Override
     public void mouseEntered(MouseEvent e) {
     }
 
     /**
      * {@inheritDoc}
      */
+    @Override
     public void mouseExited(MouseEvent e) {
     }
 
     /**
      * {@inheritDoc}
      */
+    @Override
     public void mousePressed(MouseEvent e) {
         maybeShowPopup(e);
     }
@@ -127,15 +131,16 @@ public class TopToolBar extends JToolBar implements MouseListener {
     /**
      * {@inheritDoc}
      */
+    @Override
     public void mouseReleased(MouseEvent e) {
     }
 
     /**
      * (Re)creates the toolbar.
-     * 
+     *
      * This function is called during the construction of this panel as well as
      * after the display mode has changed.
-     * 
+     *
      * @param selectionMode
      *            Current selection mode, to select the correct button.
      * @see #setDisplayMode(DisplayMode)
@@ -235,10 +240,10 @@ public class TopToolBar extends JToolBar implements MouseListener {
 
     /**
      * Adds a given button to the toolbar.
-     * 
+     *
      * This function sets some standard values of the button regarding the
      * appearance. The current display mode is taken into account.
-     * 
+     *
      * @param button
      *            Button to add
      */
@@ -267,9 +272,9 @@ public class TopToolBar extends JToolBar implements MouseListener {
 
     /**
      * Sets the current display mode.
-     * 
+     *
      * This changes the way the toolbar is display.
-     * 
+     *
      * @param mode
      *            Display mode, can be either ICONANDTEXT, ICONONLY or TEXTONLY
      */
@@ -303,7 +308,7 @@ public class TopToolBar extends JToolBar implements MouseListener {
 
     /**
      * Shows the popup if the correct mouse button was pressed.
-     * 
+     *
      * @param e
      *            MouseEvent that triggered the event
      */
@@ -315,6 +320,7 @@ public class TopToolBar extends JToolBar implements MouseListener {
 
             JRadioButtonMenuItem iconAndText = new JRadioButtonMenuItem("Icon and Text", displayMode == DisplayMode.ICONANDTEXT);
             iconAndText.addActionListener(new ActionListener() {
+                @Override
                 public void actionPerformed(ActionEvent e) {
                     setDisplayMode(DisplayMode.ICONANDTEXT);
                 }
@@ -324,6 +330,7 @@ public class TopToolBar extends JToolBar implements MouseListener {
 
             JRadioButtonMenuItem iconOnly = new JRadioButtonMenuItem("Icon Only", displayMode == DisplayMode.ICONONLY);
             iconOnly.addActionListener(new ActionListener() {
+                @Override
                 public void actionPerformed(ActionEvent e) {
                     setDisplayMode(DisplayMode.ICONONLY);
                 }
@@ -333,6 +340,7 @@ public class TopToolBar extends JToolBar implements MouseListener {
 
             JRadioButtonMenuItem textOnly = new JRadioButtonMenuItem("Text Only", displayMode == DisplayMode.TEXTONLY);
             textOnly.addActionListener(new ActionListener() {
+                @Override
                 public void actionPerformed(ActionEvent e) {
                     setDisplayMode(DisplayMode.TEXTONLY);
                 }
@@ -342,6 +350,16 @@ public class TopToolBar extends JToolBar implements MouseListener {
 
             popUpMenu.show(e.getComponent(), e.getX(), e.getY());
         }
+    }
+
+    public void disableStateButton() {
+        this.view2d.setEnabled(false);
+        this.view3d.setEnabled(false);
+    }
+
+    public void enableStateButton() {
+        this.view2d.setEnabled(true);
+        this.view3d.setEnabled(true);
     }
 
 }
