@@ -30,7 +30,6 @@ import org.helioviewer.viewmodel.view.LinkedMovieManager;
 import org.helioviewer.viewmodel.view.TimedMovieView;
 import org.helioviewer.viewmodel.view.View;
 import org.helioviewer.viewmodel.view.ViewportView;
-import org.helioviewer.viewmodel.view.opengl.GLSharedContext;
 import org.helioviewer.viewmodel.view.opengl.GLTextureHelper;
 import org.helioviewer.viewmodel.view.opengl.GLView;
 import org.helioviewer.viewmodel.view.opengl.shader.GLFragmentShaderView;
@@ -98,7 +97,7 @@ public class GL3DComponentView extends AbstractComponentView implements GLEventL
     @Override
     public void init(GLAutoDrawable glAD) {
         Log.debug("GL3DComponentView.Init");
-        GLSharedContext.setSharedContext(glAD.getContext());
+        //GLSharedContext.setSharedContext(glAD.getContext());
 
         GL2 gl = (GL2) glAD.getGL();
         GL3DState.create(gl);
