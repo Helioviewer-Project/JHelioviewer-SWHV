@@ -28,16 +28,16 @@ import org.helioviewer.viewmodel.view.ViewListener;
 
 /**
  * Implementation of ComponentView for rendering in software mode.
- * 
+ *
  * <p>
  * This class manages a JPanel, used to draw the screen.
- * 
+ *
  * <p>
  * For further information about the role of the ComponentView within the view
  * chain, see {@link org.helioviewer.viewmodel.view.ComponentView}
- * 
+ *
  * @author Stephan Pagel
- * 
+ *
  *         TODO: When drawing the image to the screen, this class does not take
  *         into account the value of the color mask. This has to be be done.
  */
@@ -47,7 +47,7 @@ public class BufferedImageComponentView extends AbstractComponentView {
     // Definitions
     // //////////////////////////////////////////////////////////////////
 
-    private JavaImagePanel javaImagePanel = new JavaImagePanel();
+    private final JavaImagePanel javaImagePanel = new JavaImagePanel();
 
     private JavaBufferedImageData imageData;
 
@@ -58,6 +58,7 @@ public class BufferedImageComponentView extends AbstractComponentView {
     /**
      * {@inheritDoc}
      */
+    @Override
     public Component getComponent() {
         return javaImagePanel;
     }
@@ -65,6 +66,7 @@ public class BufferedImageComponentView extends AbstractComponentView {
     /**
      * {@inheritDoc}
      */
+    @Override
     public void saveScreenshot(String imageFormat, File outputFile) throws IOException {
         BufferedImage original = imageData.getBufferedImage();
         BufferedImage output = new BufferedImage(original.getWidth(), original.getHeight(), BufferedImage.TYPE_3BYTE_BGR);
@@ -80,6 +82,7 @@ public class BufferedImageComponentView extends AbstractComponentView {
     /**
      * {@inheritDoc}
      */
+    @Override
     public void setBackgroundColor(Color background) {
         javaImagePanel.setBackgroundColor(background);
     }
@@ -87,6 +90,7 @@ public class BufferedImageComponentView extends AbstractComponentView {
     /**
      * {@inheritDoc}
      */
+    @Override
     public void setOffset(Vector2dInt offset) {
         javaImagePanel.setOffset(offset);
     }
@@ -94,6 +98,7 @@ public class BufferedImageComponentView extends AbstractComponentView {
     /**
      * {@inheritDoc}
      */
+    @Override
     protected void setViewSpecificImplementation(View newView, ChangeEvent changeEvent) {
         if (ViewHelper.getImageDataAdapter(view, JavaBufferedImageData.class) != null) {
             updatePanel();
@@ -103,6 +108,7 @@ public class BufferedImageComponentView extends AbstractComponentView {
     /**
      * {@inheritDoc}
      */
+    @Override
     public void addPostRenderer(ScreenRenderer postRenderer) {
         if (postRenderer != null) {
             javaImagePanel.addPostRenderer(postRenderer);
@@ -116,6 +122,7 @@ public class BufferedImageComponentView extends AbstractComponentView {
     /**
      * {@inheritDoc}
      */
+    @Override
     public void removePostRenderer(ScreenRenderer postRenderer) {
         if (postRenderer != null) {
             javaImagePanel.removePostRenderer(postRenderer);
@@ -129,6 +136,7 @@ public class BufferedImageComponentView extends AbstractComponentView {
     /**
      * {@inheritDoc}
      */
+    @Override
     public AbstractList<ScreenRenderer> getAllPostRenderer() {
         return javaImagePanel.getAllPostRenderer();
     }
@@ -136,6 +144,7 @@ public class BufferedImageComponentView extends AbstractComponentView {
     /**
      * {@inheritDoc}
      */
+    @Override
     public void viewChanged(View sender, ChangeEvent aEvent) {
 
         if (aEvent.reasonOccurred(RegionChangedReason.class) || aEvent.reasonOccurred(SubImageDataChangedReason.class) || aEvent.reasonOccurred(ViewChainChangedReason.class)) {
@@ -160,9 +169,11 @@ public class BufferedImageComponentView extends AbstractComponentView {
         }
     }
 
+    @Override
     public void deactivate() {
     };
 
+    @Override
     public void activate() {
     }
 
@@ -180,14 +191,14 @@ public class BufferedImageComponentView extends AbstractComponentView {
         private BufferedImage image;
         private Color backgroundColor = Color.BLACK;
         private Vector2dInt offset = new Vector2dInt();
-        private LinkedList<ScreenRenderer> postRenderers = new LinkedList<ScreenRenderer>();
+        private final LinkedList<ScreenRenderer> postRenderers = new LinkedList<ScreenRenderer>();
 
         // //////////////////////////////////////////////////////////////
         // Methods
         // //////////////////////////////////////////////////////////////
         /**
          * Set the latest image data to the panel.
-         * 
+         *
          * @param aImage
          *            Image to draw to the screen.
          */
@@ -198,10 +209,10 @@ public class BufferedImageComponentView extends AbstractComponentView {
 
         /**
          * Sets the background color.
-         * 
+         *
          * This color will be displayed in areas with no image, where images are
          * transparent or when there is no image present at all.
-         * 
+         *
          * @param color
          *            new background color
          */
@@ -212,9 +223,9 @@ public class BufferedImageComponentView extends AbstractComponentView {
         /**
          * Sets the displacement of the upper left corner of the image relative
          * to the component.
-         * 
+         *
          * For example, this function can be used to manually center the image.
-         * 
+         *
          * @param _offset
          *            new offset
          */
@@ -225,10 +236,10 @@ public class BufferedImageComponentView extends AbstractComponentView {
         /**
          * Adds a post renderer, which can draw simple geometric forms on a
          * drawn image and background.
-         * 
+         *
          * The post renderer will be called after every redraw of the actual
          * image.
-         * 
+         *
          * @param postRenderer
          *            new post renderer
          * @see #removePostRenderer(ScreenRenderer)
@@ -241,7 +252,7 @@ public class BufferedImageComponentView extends AbstractComponentView {
 
         /**
          * Removes a post renderer.
-         * 
+         *
          * @param postRenderer
          *            post renderer which should be removed
          * @see #addPostRenderer(ScreenRenderer)
@@ -257,10 +268,10 @@ public class BufferedImageComponentView extends AbstractComponentView {
 
         /**
          * Returns the list of all post renderer.
-         * 
+         *
          * This function can be used to move the set of post renderers from one
          * ComponentView to another.
-         * 
+         *
          * @return list of all post renderer
          * @see #addPostRenderer(ScreenRenderer)
          * @see #removePostRenderer(ScreenRenderer)
@@ -273,6 +284,7 @@ public class BufferedImageComponentView extends AbstractComponentView {
          * Draws the current image to the screen. Calls all registered post
          * renderer afterwards.
          */
+        @Override
         public void paintComponent(Graphics g) {
             // draw image to panel
             g.setColor(backgroundColor);
