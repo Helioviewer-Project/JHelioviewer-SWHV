@@ -2,7 +2,6 @@ package org.helioviewer.jhv.gui.states;
 
 import org.helioviewer.gl3d.gui.GL3DCameraMouseController;
 import org.helioviewer.gl3d.gui.GL3DCameraSelectorModel;
-import org.helioviewer.gl3d.gui.GL3DModelPanel;
 import org.helioviewer.gl3d.gui.GL3DTopToolBar;
 import org.helioviewer.gl3d.model.GL3DInternalPluginConfiguration;
 import org.helioviewer.gl3d.plugin.GL3DPluginController;
@@ -17,13 +16,12 @@ public class GuiState3DWCS extends GuiState2D {
 
     // private JPanel gl3dSettingsPanel;
 
-    private GL3DModelPanel modelPanel;
-
     public GuiState3DWCS() {
         // Override the viewchainFactory with a specific 3D implementation
         super(new GL3DViewchainFactory());
     }
 
+    @Override
     public void activate() {
         super.activate();
         GLTextureHelper.is2DState = false;
@@ -32,6 +30,7 @@ public class GuiState3DWCS extends GuiState2D {
         GL3DPluginController.getInstance().loadPlugins();
     }
 
+    @Override
     public void deactivate() {
         super.deactivate();
         GLTextureHelper.is2DState = true;
@@ -59,24 +58,22 @@ public class GuiState3DWCS extends GuiState2D {
      * gl3dSettingsPanel.add(tabs, c); }
      */
 
+    @Override
     public void addStateSpecificComponents(SideContentPane sideContentPane) {
         GL3DCameraSelectorModel.getInstance();
-        if (this.modelPanel == null) {
-            this.modelPanel = new GL3DModelPanel();
-        }
-        modelPanel.init();
-        sideContentPane.add("Model Plugins", this.modelPanel, false);
     }
 
+    @Override
     public void removeStateSpecificComponents(SideContentPane sideContentPane) {
-        sideContentPane.remove(this.modelPanel);
-        this.modelPanel.destroy();
+
     }
 
+    @Override
     public ViewStateEnum getType() {
         return ViewStateEnum.View3D;
     }
 
+    @Override
     public TopToolBar getTopToolBar() {
         if (topToolBar == null) {
             topToolBar = new GL3DTopToolBar();
@@ -84,10 +81,12 @@ public class GuiState3DWCS extends GuiState2D {
         return topToolBar;
     }
 
+    @Override
     public ImagePanelInputController getDefaultInputController() {
         return new GL3DCameraMouseController();
     }
 
+    @Override
     public boolean isOverviewPanelInteractionEnabled() {
         return false;
     }

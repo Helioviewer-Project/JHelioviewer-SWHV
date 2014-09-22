@@ -16,6 +16,7 @@ import javax.swing.JToolBar;
 import javax.swing.SwingConstants;
 
 import org.helioviewer.base.logging.Log;
+import org.helioviewer.gl3d.gui.GL3DResetCameraAction;
 import org.helioviewer.jhv.Settings;
 import org.helioviewer.jhv.gui.IconBank;
 import org.helioviewer.jhv.gui.IconBank.JHVIcon;
@@ -59,7 +60,7 @@ public class TopToolBar extends JToolBar implements MouseListener {
     private JToggleButton zoomBoxButton;
 
     private JToggleButton trackSolarRotationButton;
-
+    private JButton resetCamera;
     protected JToggleButton view2d;
     protected JToggleButton view3d;
     protected CopyOnWriteArrayList<JToggleButton> pluginList = new CopyOnWriteArrayList<JToggleButton>();
@@ -154,6 +155,9 @@ public class TopToolBar extends JToolBar implements MouseListener {
         addButton(new JButton(new ZoomFitAction(false)));
         addButton(new JButton(new Zoom1to1Action(false)));
 
+        resetCamera = new JButton(new GL3DResetCameraAction());
+        addButton(resetCamera);
+
         addSeparator();
 
         // Selection
@@ -174,16 +178,18 @@ public class TopToolBar extends JToolBar implements MouseListener {
         zoomBoxButton.setToolTipText("Select Zoom Box");
         group.add(zoomBoxButton);
         addButton(zoomBoxButton);
+        zoomBoxButton.setEnabled(false);
 
         addSeparator();
 
         boolean solarRotationWasEnabled = (trackSolarRotationButton != null && trackSolarRotationButton.isSelected());
         trackSolarRotationButton = new JToggleButton(new ToggleSolarRotationTrackingAction(solarRotationWasEnabled));
-        trackSolarRotationButton.setSelected(solarRotationWasEnabled);
+        trackSolarRotationButton.setSelected(false);
         trackSolarRotationButton.setIcon(IconBank.getIcon(JHVIcon.FOCUS));
         trackSolarRotationButton.setSelectedIcon(IconBank.getIcon(JHVIcon.FOCUS_SELECTED));
         trackSolarRotationButton.setToolTipText("Enable Solar Rotation Tracking");
         addButton(trackSolarRotationButton);
+        trackSolarRotationButton.setEnabled(true);
 
         // VSO Export - DEACTIVATED FOR NOW
         // addSeparator();
@@ -224,6 +230,9 @@ public class TopToolBar extends JToolBar implements MouseListener {
 
     public void updateStateButtons() {
         this.updateStateButtons(StateController.getInstance().getCurrentState());
+        trackSolarRotationButton.setEnabled(StateController.getInstance().getCurrentState() == ViewStateEnum.View2D.getState());
+        resetCamera.setEnabled(StateController.getInstance().getCurrentState() == ViewStateEnum.View3D.getState());
+        this.zoomBoxButton.setEnabled(StateController.getInstance().getCurrentState() == ViewStateEnum.View2D.getState());
     }
 
     public void updateStateButtons(State currentState) {
@@ -262,8 +271,6 @@ public class TopToolBar extends JToolBar implements MouseListener {
             break;
         case ICONONLY:
             button.setText("");
-            break;
-        default:
             break;
         }
 
@@ -304,6 +311,16 @@ public class TopToolBar extends JToolBar implements MouseListener {
 
     public void removeToolbarPlugin(AbstractButton button) {
         this.pluginList.remove(button);
+    }
+
+    public void disableStateButton() {
+        this.view2d.setEnabled(false);
+        this.view3d.setEnabled(false);
+    }
+
+    public void enableStateButton() {
+        this.view2d.setEnabled(true);
+        this.view3d.setEnabled(true);
     }
 
     /**
@@ -350,16 +367,6 @@ public class TopToolBar extends JToolBar implements MouseListener {
 
             popUpMenu.show(e.getComponent(), e.getX(), e.getY());
         }
-    }
-
-    public void disableStateButton() {
-        this.view2d.setEnabled(false);
-        this.view3d.setEnabled(false);
-    }
-
-    public void enableStateButton() {
-        this.view2d.setEnabled(true);
-        this.view3d.setEnabled(true);
     }
 
 }

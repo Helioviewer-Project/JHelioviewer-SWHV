@@ -2,7 +2,7 @@ package org.helioviewer.jhv.layers;
 
 /**
  * Class representing the current state of a layer
- * 
+ *
  * @author Malte Nuhn
  * @author Freek Verstringe
  */
@@ -13,6 +13,7 @@ public class LayerDescriptor {
     public boolean isTimed = false;
 
     public String title = "";
+    public String observatory = "";
     public String timestamp = "";
     public String interval;
     public String type;

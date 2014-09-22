@@ -40,6 +40,7 @@ import org.helioviewer.viewmodel.changeevent.ViewChainChangedReason;
 import org.helioviewer.viewmodel.changeevent.ViewportChangedReason;
 import org.helioviewer.viewmodel.io.APIResponse;
 import org.helioviewer.viewmodel.io.APIResponseDump;
+import org.helioviewer.viewmodel.metadata.HelioviewerPositionedMetaData;
 import org.helioviewer.viewmodel.metadata.MetaData;
 import org.helioviewer.viewmodel.metadata.ObserverMetaData;
 import org.helioviewer.viewmodel.region.Region;
@@ -322,6 +323,19 @@ public class LayersModel implements ViewListener {
 
         return result;
 
+    }
+
+    public String getObservatory(View view) {
+        if (view == null) {
+            return null;
+        }
+        ImageInfoView imageInfoView = view.getAdapter(ImageInfoView.class);
+        if (imageInfoView != null) {
+            HelioviewerPositionedMetaData metaData = (HelioviewerPositionedMetaData) imageInfoView.getMetadata();
+            return metaData.getObservatory();
+        } else {
+            return view.toString();
+        }
     }
 
     /**
@@ -1302,26 +1316,22 @@ public class LayersModel implements ViewListener {
      * @return LayerDescriptor of the current state of the layer in question
      */
     public LayerDescriptor getDescriptor(View view) {
-/*        ImageInfoView imageInfoView = view.getAdapter(ImageInfoView.class);
-        String typeString;
-        String intervalString;
-
-        if (imageInfoView != null) {
-            SimpleDateFormat format = new SimpleDateFormat("yyyy/MM/dd HH:mm");
-            Interval<Date> interval = imageInfoView.getDateRange();
-            if (interval != null) {
-                typeString = "JPEG2000-movie";
-                String beginDate = format.format(interval.getStart());
-                String endDate = format.format(interval.getEnd());
-                intervalString = beginDate + "-" + endDate;
-            } else {
-                intervalString = layersModel.getCurrentFrameTimestampString(view);
-                typeString = "Single image";
-            }
-        } else {
-            intervalString = layersModel.getCurrentFrameTimestampString(view);
-            typeString = "JPEG200-movie";
-        }*/
+        /*
+         * ImageInfoView imageInfoView = view.getAdapter(ImageInfoView.class);
+         * String typeString; String intervalString;
+         *
+         * if (imageInfoView != null) { SimpleDateFormat format = new
+         * SimpleDateFormat("yyyy/MM/dd HH:mm"); Interval<Date> interval =
+         * imageInfoView.getDateRange(); if (interval != null) { typeString =
+         * "JPEG2000-movie"; String beginDate =
+         * format.format(interval.getStart()); String endDate =
+         * format.format(interval.getEnd()); intervalString = beginDate + "-" +
+         * endDate; } else { intervalString =
+         * layersModel.getCurrentFrameTimestampString(view); typeString =
+         * "Single image"; } } else { intervalString =
+         * layersModel.getCurrentFrameTimestampString(view); typeString =
+         * "JPEG200-movie"; }
+         */
         LayerDescriptor ld = new LayerDescriptor("sd", "sdf");
 
         ld.isMovie = layersModel.isMovie(view);
@@ -1329,6 +1339,7 @@ public class LayersModel implements ViewListener {
         ld.isVisible = layersModel.isVisible(view);
         ld.isTimed = layersModel.isTimed(view);
         ld.title = layersModel.getName(view);
+        ld.observatory = layersModel.getObservatory(view);
         ld.timestamp = layersModel.getCurrentFrameTimestampString(view);
 
         return ld;
