@@ -5,6 +5,7 @@ import javax.media.opengl.GL2;
 import org.helioviewer.gl3d.plugin.pfss.data.PfssCache;
 import org.helioviewer.gl3d.plugin.pfss.data.PfssData;
 import org.helioviewer.gl3d.plugin.pfss.data.PfssFitsFile;
+import org.helioviewer.gl3d.scenegraph.GL3DState;
 import org.helioviewer.viewmodel.renderer.physical.PhysicalRenderGraphics;
 import org.helioviewer.viewmodel.renderer.physical.PhysicalRenderer3d;
 import org.helioviewer.viewmodel.view.View;
@@ -25,7 +26,7 @@ public class PfssPlugin3dRenderer extends PhysicalRenderer3d {
 
     /**
      * {@inheritDoc}
-     * 
+     *
      * Draws all available and visible solar events with there associated icon.
      */
     @Override
@@ -46,7 +47,7 @@ public class PfssPlugin3dRenderer extends PhysicalRenderer3d {
                     pfssData.display(gl);
                 }
             }
-
+            GL3DState.get().checkGLErrors("PfssPlugin3dRenderer.afterRender");
         }
     }
 
