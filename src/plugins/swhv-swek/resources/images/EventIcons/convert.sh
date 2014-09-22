@@ -1,0 +1,43 @@
+#!/usr/bin/env bash
+
+convert ar_icon.gif -type TrueColorMatte -depth 16 -interlace none -resize 32x32 ar_icon.png
+convert bp_icon.gif -type TrueColorMatte -depth 16 -interlace none -resize 32x32 bp_icon.png
+convert cd_icon.gif -type TrueColorMatte -depth 16 -interlace none -resize 32x32 cd_icon.png
+convert ce_icon.gif -type TrueColorMatte -depth 16 -interlace none -resize 32x32 ce_icon.png
+convert ch_icon.gif -type TrueColorMatte -depth 16 -interlace none -resize 32x32 ch_icon.png
+convert cj_icon.gif -type TrueColorMatte -depth 16 -interlace none -resize 32x32 cj_icon.png
+convert cw_icon.gif -type TrueColorMatte -depth 16 -interlace none -resize 32x32 cw_icon.png
+convert ef_icon.gif -type TrueColorMatte -depth 16 -interlace none -resize 32x32 ef_icon.png
+convert fa_icon.gif -type TrueColorMatte -depth 16 -interlace none -resize 32x32 fa_icon.png
+convert fe_icon.gif -type TrueColorMatte -depth 16 -interlace none -resize 32x32 fe_icon.png
+convert fi_icon.gif -type TrueColorMatte -depth 16 -interlace none -resize 32x32 fi_icon.png
+convert fl_icon.gif -type TrueColorMatte -depth 16 -interlace none -resize 32x32 fl_icon.png
+convert lp_icon.gif -type TrueColorMatte -depth 16 -interlace none -resize 32x32 lp_icon.png
+convert nr_icon.gif -type TrueColorMatte -depth 16 -interlace none -resize 32x32 nr_icon.png
+convert os_icon.gif -type TrueColorMatte -depth 16 -interlace none -resize 32x32 os_icon.png
+convert ot_icon.gif -type TrueColorMatte -depth 16 -interlace none -resize 32x32 ot_icon.png
+convert pg_icon.gif -type TrueColorMatte -depth 16 -interlace none -resize 32x32 pg_icon.png
+convert sg_icon.gif -type TrueColorMatte -depth 16 -interlace none -resize 32x32 sg_icon.png
+convert sp_icon.gif -type TrueColorMatte -depth 16 -interlace none -resize 32x32 sp_icon.png
+convert ss_icon.gif -type TrueColorMatte -depth 16 -interlace none -resize 32x32 ss_icon.png
+
+convert ar_icon.gif -type TrueColorMatte -depth 16 -interlace none -resize 16x16 ar_small.png
+convert bp_icon.gif -type TrueColorMatte -depth 16 -interlace none -resize 16x16 bp_small.png
+convert cd_icon.gif -type TrueColorMatte -depth 16 -interlace none -resize 16x16 cd_small.png
+convert ce_icon.gif -type TrueColorMatte -depth 16 -interlace none -resize 16x16 ce_small.png
+convert ch_icon.gif -type TrueColorMatte -depth 16 -interlace none -resize 16x16 ch_small.png
+convert cj_icon.gif -type TrueColorMatte -depth 16 -interlace none -resize 16x16 cj_small.png
+convert cw_icon.gif -type TrueColorMatte -depth 16 -interlace none -resize 16x16 cw_small.png
+convert ef_icon.gif -type TrueColorMatte -depth 16 -interlace none -resize 16x16 ef_small.png
+convert fa_icon.gif -type TrueColorMatte -depth 16 -interlace none -resize 16x16 fa_small.png
+convert fe_icon.gif -type TrueColorMatte -depth 16 -interlace none -resize 16x16 fe_small.png
+convert fi_icon.gif -type TrueColorMatte -depth 16 -interlace none -resize 16x16 fi_small.png
+convert fl_icon.gif -type TrueColorMatte -depth 16 -interlace none -resize 16x16 fl_small.png
+convert lp_icon.gif -type TrueColorMatte -depth 16 -interlace none -resize 16x16 lp_small.png
+convert nr_icon.gif -type TrueColorMatte -depth 16 -interlace none -resize 16x16 nr_small.png
+convert os_icon.gif -type TrueColorMatte -depth 16 -interlace none -resize 16x16 os_small.png
+convert ot_icon.gif -type TrueColorMatte -depth 16 -interlace none -resize 16x16 ot_small.png
+convert pg_icon.gif -type TrueColorMatte -depth 16 -interlace none -resize 16x16 pg_small.png
+convert sg_icon.gif -type TrueColorMatte -depth 16 -interlace none -resize 16x16 sg_small.png
+convert sp_icon.gif -type TrueColorMatte -depth 16 -interlace none -resize 16x16 sp_small.png
+convert ss_icon.gif -type TrueColorMatte -depth 16 -interlace none -resize 16x16 ss_small.png
