@@ -11,18 +11,18 @@ import org.helioviewer.viewmodel.view.View;
 /**
  * Abstract base class implementing ImagePanelInputController for the main image
  * panel.
- * 
+ *
  * <p>
  * This class implements the capability to zoom within the main image panel by
  * using the mouse wheel or by double-clicking. Since this functionality is
  * common to all ImagePanelInputControllers used for the main image panel, there
  * centralized here.
- * 
+ *
  * <p>
  * Also see {@link org.helioviewer.jhv.gui.components.MainImagePanel}
- * 
+ *
  * @author Markus Langenberg
- * 
+ *
  */
 public abstract class MainImagePanelMouseController extends AbstractImagePanelMouseController {
 
@@ -39,6 +39,7 @@ public abstract class MainImagePanelMouseController extends AbstractImagePanelMo
     /**
      * {@inheritDoc}
      */
+    @Override
     public void setView(View newView) {
 
         super.setView(newView);
@@ -49,6 +50,7 @@ public abstract class MainImagePanelMouseController extends AbstractImagePanelMo
     /**
      * {@inheritDoc}
      */
+    @Override
     public void mouseClicked(MouseEvent e) {
         if (e.getClickCount() > 1) {
             if (e.getButton() == MouseEvent.BUTTON1) {
@@ -62,6 +64,7 @@ public abstract class MainImagePanelMouseController extends AbstractImagePanelMo
     /**
      * {@inheritDoc}
      */
+    @Override
     public void mouseWheelMoved(MouseWheelEvent e) {
         if (zoomController != null) {
             zoomController.zoomSteps(getView(), (int) (-Math.max(1, e.getUnitsToScroll() / 3) * Math.signum(e.getUnitsToScroll())));
