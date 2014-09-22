@@ -30,6 +30,7 @@ import org.helioviewer.viewmodel.view.SynchronizeView;
 import org.helioviewer.viewmodel.view.View;
 import org.helioviewer.viewmodel.view.ViewListener;
 import org.helioviewer.viewmodel.view.jp2view.JP2View;
+import org.helioviewer.viewmodel.view.opengl.GLLayeredView;
 import org.helioviewer.viewmodel.view.opengl.GLOverlayView;
 import org.helioviewer.viewmodelplugin.controller.PluginManager;
 import org.helioviewer.viewmodelplugin.filter.FilterContainer;
@@ -337,7 +338,6 @@ public class ViewchainFactory {
         AbstractList<OverlayContainer> overlayContainerList = PluginManager.getSingeltonInstance().getOverlayContainers(true);
         OverlayControlComponentManager manager = new OverlayControlComponentManager();
 
-        // FIXME: Simon Spoerri, check if this can be done more nicely
         // View nextView = componentView.getView();
 
         for (int i = overlayContainerList.size() - 1; i >= 0; i--) {
@@ -430,6 +430,14 @@ public class ViewchainFactory {
         ComponentView newView = viewFactory.createViewFromSource(sourceImagePanelView, keepSource);
         createViewchainFromExistingViewchain(sourceImagePanelView.getView(), newView, mainImagePanelView, keepSource);
 
+        LayeredView layeredView = sourceImagePanelView.getAdapter(LayeredView.class);
+        GLLayeredView newLayeredView = (GLLayeredView) newView.getAdapter(LayeredView.class);
+        for (int i = 0; i < layeredView.getNumLayers(); i++) {
+            if (!layeredView.isVisible(layeredView.getLayer(i))) {
+                newLayeredView.toggleVisibility(newLayeredView.getLayer(i));
+            }
+        }
+
         return newView;
     }
 
@@ -516,7 +524,9 @@ public class ViewchainFactory {
         } else if (sourceView instanceof LayeredView) {
             LayeredView layeredView = (LayeredView) sourceView;
             for (int i = 0; i < layeredView.getNumLayers(); i++) {
-                createViewchainFromExistingViewchain(layeredView.getLayer(i), newView, mainImagePanelView, keepSource);
+                if (layeredView.getLayer(i) != null) {
+                    createViewchainFromExistingViewchain(layeredView.getLayer(i), newView, mainImagePanelView, keepSource);
+                }
             }
         }
     }
