@@ -166,7 +166,6 @@ public class TopToolBar extends JToolBar implements MouseListener {
             addButton(new JButton(new GL3DZoomInAction(false)));
             addButton(new JButton(new GL3DZoomOutAction(false)));
             addButton(new JButton(new GL3DZoomFitAction(false)));
-            addButton(new JButton(new GL3DResetCameraAction()));
         }
         resetCamera = new JButton(new GL3DResetCameraAction());
         addButton(resetCamera);

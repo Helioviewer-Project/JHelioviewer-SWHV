@@ -3,12 +3,14 @@ package org.helioviewer.jhv.gui;
 import org.helioviewer.gl3d.factory.GL3DViewFactory;
 import org.helioviewer.gl3d.view.GL3DCameraView;
 import org.helioviewer.gl3d.view.GL3DComponentView;
+import org.helioviewer.gl3d.view.GL3DLayeredView;
 import org.helioviewer.gl3d.view.GL3DSceneGraphView;
 import org.helioviewer.gl3d.view.GL3DViewportView;
 import org.helioviewer.viewmodel.factory.ViewFactory;
 import org.helioviewer.viewmodel.view.ComponentView;
 import org.helioviewer.viewmodel.view.LayeredView;
 import org.helioviewer.viewmodel.view.ModifiableInnerViewView;
+import org.helioviewer.viewmodel.view.StandardSolarRotationTrackingView;
 import org.helioviewer.viewmodel.view.View;
 import org.helioviewer.viewmodel.view.opengl.GLOverlayView;
 
@@ -63,6 +65,7 @@ public class GL3DViewchainFactory extends ViewchainFactory {
     @Override
     public ComponentView createViewchainFromExistingViewchain(ComponentView sourceImagePanelView, ComponentView mainImagePanelView, boolean keepSource) {
         ViewFactory viewFactory = getUsedViewFactory();
+        sourceImagePanelView.getAdapter(StandardSolarRotationTrackingView.class).setEnabled(false);
         ComponentView newView = viewFactory.createViewFromSource(sourceImagePanelView, keepSource);
         createViewchainFromExistingViewchain(sourceImagePanelView.getView(), newView, mainImagePanelView, keepSource);
 
@@ -71,12 +74,19 @@ public class GL3DViewchainFactory extends ViewchainFactory {
 
     @Override
     protected void createViewchainFromExistingViewchain(View sourceView, View targetView, ComponentView mainImagePanelView, boolean keepSource) {
+
         if (targetView != null && targetView.getClass().isAssignableFrom(GL3DComponentView.class)) {
-            // View overlayView = sourceView.getAdapter(OverlayView.class);
+            //View overlayView = sourceView.getAdapter(OverlayView.class);
             View layeredView = sourceView.getAdapter(LayeredView.class);
 
             ViewFactory viewFactory = getUsedViewFactory();
             View gl3dLayeredView = viewFactory.createViewFromSource(layeredView, false);
+
+            for (int i = 0; i < ((LayeredView) layeredView).getNumLayers(); i++) {
+                if (!((LayeredView) layeredView).isVisible(((LayeredView) layeredView).getLayer(i))) {
+                    ((GL3DLayeredView) gl3dLayeredView).toggleVisibility(((GL3DLayeredView) gl3dLayeredView).getLayer(i));
+                }
+            }
 
             // GL3DOrthoView orthoView =
             // viewFactory.createNewView(GL3DOrthoView.class);
