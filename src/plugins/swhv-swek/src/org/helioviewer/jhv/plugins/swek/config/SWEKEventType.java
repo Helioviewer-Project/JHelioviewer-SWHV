@@ -6,7 +6,7 @@ package org.helioviewer.jhv.plugins.swek.config;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.swing.Icon;
+import javax.swing.ImageIcon;
 
 /**
  * Describes a SWEK event type.
@@ -40,7 +40,7 @@ public class SWEKEventType {
     private SWEKSpatialRegion spatialRegion;
 
     /** The icon corresponding with the event type */
-    private Icon eventIcon;
+    private ImageIcon eventIcon;
 
     /**
      * Create a SWEKEvenType with an empty name, suppliers list, parameter list,
@@ -83,7 +83,7 @@ public class SWEKEventType {
      *            the icon of the event type
      */
     public SWEKEventType(String eventName, List<SWEKSupplier> suppliers, List<SWEKParameter> parameterList, Long requestIntervalExtension,
-            boolean standardSelected, SWEKParameter groupOn, String coordinateSystem, Icon eventIcon) {
+            boolean standardSelected, SWEKParameter groupOn, String coordinateSystem, ImageIcon eventIcon) {
         super();
         this.eventName = eventName;
         this.suppliers = suppliers;
@@ -288,7 +288,7 @@ public class SWEKEventType {
      * 
      * @return the icon of the event type
      */
-    public Icon getEventIcon() {
+    public ImageIcon getEventIcon() {
         return eventIcon;
     }
 
@@ -298,7 +298,7 @@ public class SWEKEventType {
      * @param eventIcon
      *            the icon of the event type
      */
-    public void setEventIcon(Icon eventIcon) {
+    public void setEventIcon(ImageIcon eventIcon) {
         this.eventIcon = eventIcon;
     }
 }
