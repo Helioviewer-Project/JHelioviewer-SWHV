@@ -20,6 +20,7 @@ import org.helioviewer.gl3d.gui.GL3DResetCameraAction;
 import org.helioviewer.gl3d.gui.GL3DSetPanInteractionAction;
 import org.helioviewer.gl3d.gui.GL3DSetRotationInteractionAction;
 import org.helioviewer.gl3d.gui.GL3DSetZoomBoxInteractionAction;
+import org.helioviewer.gl3d.gui.GL3DToggleCoronaVisibilityAction;
 import org.helioviewer.gl3d.gui.GL3DToggleSolarRotationAction;
 import org.helioviewer.gl3d.gui.GL3DZoomFitAction;
 import org.helioviewer.gl3d.gui.GL3DZoomInAction;
@@ -69,6 +70,7 @@ public class TopToolBar extends JToolBar implements MouseListener {
 
     private JToggleButton trackSolarRotationButton;
     private JToggleButton trackSolarRotationButton3D;
+    private JToggleButton coronaVisibilityButton;
     private ToggleSolarRotationTrackingAction toggleSolarRotationTrackingAction;
     private JButton resetCamera;
     protected JToggleButton view2d;
@@ -241,6 +243,14 @@ public class TopToolBar extends JToolBar implements MouseListener {
             addButton(trackSolarRotationButton3D);
         }
 
+        // coronaVisibilityButton =
+        coronaVisibilityButton = new JToggleButton(new GL3DToggleCoronaVisibilityAction());
+        coronaVisibilityButton.setSelected(false);
+        coronaVisibilityButton.setIcon(IconBank.getIcon(JHVIcon.LAYER_IMAGE));
+        coronaVisibilityButton.setSelectedIcon(IconBank.getIcon(JHVIcon.LAYER_IMAGE_OFF));
+        coronaVisibilityButton.setToolTipText("Toggle Corona Visibility");
+        addButton(coronaVisibilityButton);
+
         // VSO Export - DEACTIVATED FOR NOW
         // addSeparator();
         // addButton(new JButton(new NewQueryAction(true)));
@@ -280,7 +290,7 @@ public class TopToolBar extends JToolBar implements MouseListener {
 
     public void updateStateButtons() {
         this.updateStateButtons(StateController.getInstance().getCurrentState());
-        //trackSolarRotationButton.setEnabled(StateController.getInstance().getCurrentState() == ViewStateEnum.View2D.getState());
+        this.coronaVisibilityButton.setEnabled(StateController.getInstance().getCurrentState() == ViewStateEnum.View3D.getState());
         this.rotateButton.setEnabled(StateController.getInstance().getCurrentState() == ViewStateEnum.View3D.getState());
         resetCamera.setEnabled(StateController.getInstance().getCurrentState() == ViewStateEnum.View3D.getState());
         this.zoomBoxButton.setEnabled(StateController.getInstance().getCurrentState() == ViewStateEnum.View2D.getState());
