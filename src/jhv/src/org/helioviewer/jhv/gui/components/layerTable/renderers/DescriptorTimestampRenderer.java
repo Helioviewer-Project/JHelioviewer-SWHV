@@ -13,7 +13,7 @@ import org.helioviewer.jhv.layers.LayerDescriptor;
 
 /**
  * TableCellRenderer rendering the timestamp of a LayerDescriptor
- * 
+ *
  * @author Malte Nuhn
  * @author Helge Dietert
  */
@@ -30,7 +30,7 @@ public class DescriptorTimestampRenderer extends DefaultTableCellRenderer {
 
     /**
      * Renderer to show the descriptor
-     * 
+     *
      * @param drawLine
      *            if true it will add a gray line between layers
      */
@@ -42,6 +42,7 @@ public class DescriptorTimestampRenderer extends DefaultTableCellRenderer {
      * @see javax.swing.table.DefaultTableCellRenderer#getTableCellRendererComponent(javax.swing.JTable,
      *      java.lang.Object, boolean, boolean, int, int)
      */
+    @Override
     public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
         if (value instanceof LayerDescriptor) {
             LayerDescriptor descriptor = (LayerDescriptor) value;
