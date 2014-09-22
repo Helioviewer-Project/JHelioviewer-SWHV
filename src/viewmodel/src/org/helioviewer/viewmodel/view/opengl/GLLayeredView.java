@@ -55,7 +55,7 @@ public class GLLayeredView extends AbstractLayeredView implements GLFragmentShad
         /*
          * GLFilterView filterView = new GLFilterView(); OpacityFilter filter =
          * new OpacityFilter(0.5f); filterView.setFilter(filter);
-         *
+         * 
          * GLHelioviewerGeometryView geomView =
          * newLayer.getAdapter(GLHelioviewerGeometryView.class); if(geomView !=
          * null) { View firstFilter = geomView.getView();
@@ -99,14 +99,14 @@ public class GLLayeredView extends AbstractLayeredView implements GLFragmentShad
          * d1 = viewArray[viewArray.length -
          * 1].regionView.getAdapter(JHVJP2View.
          * class).getImageData().getDateMillis();
-         * 
+         *
          * for (int j = viewArray.length - 1; j >= 0; j--) { long d2 =
          * viewArray[
          * j].regionView.getAdapter(JHVJP2View.class).getImageData().getDateMillis
          * (); if (d1 - d2 < 45 * 60 * 1000) {
          * viewArray[j].regionView.getAdapter
          * (JHVJP2View.class).getImageData().setDateMillis(d1); } }
-         * 
+         *
          * }
          */
     }
@@ -125,19 +125,20 @@ public class GLLayeredView extends AbstractLayeredView implements GLFragmentShad
             for (View v : layers) {
 
                 Layer layer = viewLookup.get(v);
+                if (layer != null) {
+                    // If invisible, skip layer
+                    if (!layer.visibility) {
+                        continue;
+                    }
 
-                // If invisible, skip layer
-                if (!layer.visibility) {
-                    continue;
-                }
+                    gl.glColor3f(1.0f, 1.0f, 1.0f);
 
-                gl.glColor3f(1.0f, 1.0f, 1.0f);
-
-                // if layer is GLView, go on, otherwise render now
-                if (v instanceof GLView) {
-                    ((GLView) v).renderGL(gl, true);
-                } else {
-                    textureHelper.renderImageDataToScreen(gl, layer.regionView.getRegion(), v.getAdapter(SubimageDataView.class).getSubimageData(), v.getAdapter(JHVJP2View.class));
+                    // if layer is GLView, go on, otherwise render now
+                    if (v instanceof GLView) {
+                        ((GLView) v).renderGL(gl, true);
+                    } else {
+                        textureHelper.renderImageDataToScreen(gl, layer.regionView.getRegion(), v.getAdapter(SubimageDataView.class).getSubimageData(), v.getAdapter(JHVJP2View.class));
+                    }
                 }
             }
 
