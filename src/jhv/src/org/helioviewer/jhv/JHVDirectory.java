@@ -125,7 +125,7 @@ public enum JHVDirectory {
     PLUGINS {
         @Override
         public String getPath() {
-            return HOME.getPath() + "Plugins3D" + File.separator;
+            return HOME.getPath() + "Plugins" + File.separator;
         }
 
         @Override
