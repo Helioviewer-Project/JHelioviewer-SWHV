@@ -437,8 +437,6 @@ public class GLPhysicalRenderGraphics extends AbstractPhysicalRenderGraphics {
         gl.glDisable(GL2.GL_VERTEX_PROGRAM_ARB);
         gl.glDisable(GL2.GL_FRAGMENT_PROGRAM_ARB);
 
-        // commonRenderGraphics.unbindScalingShader();
-
     }
 
     @Override
