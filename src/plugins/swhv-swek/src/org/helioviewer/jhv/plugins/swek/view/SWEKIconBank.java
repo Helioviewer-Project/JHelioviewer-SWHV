@@ -54,6 +54,23 @@ public class SWEKIconBank {
     }
 
     /**
+     * Gets the Icon for the given icon name.
+     * 
+     * @param iconName
+     *            the name of the icon.
+     * @return the icon corresponding with the given name or the "other" icon if
+     *         the name was not known.
+     */
+    public Icon getIcon(String iconName) {
+        Icon tempIcon = iconBank.get(iconName);
+        if (tempIcon == null) {
+            return iconBank.get("Other");
+        } else {
+            return tempIcon;
+        }
+    }
+
+    /**
      * Initializes the icon bank. Adds all the standard icons to the iconbank.
      */
     private void initIconBank() {
@@ -63,6 +80,7 @@ public class SWEKIconBank {
         iconBank.put("CoronalHole", new ImageIcon(SWEKPlugin.class.getResource("/images/EventIcons/ch_icon.png")));
         iconBank.put("CoronalWave", new ImageIcon(SWEKPlugin.class.getResource("/images/EventIcons/cw_icon.png")));
         iconBank.put("EmergingFlux", new ImageIcon(SWEKPlugin.class.getResource("/images/EventIcons/ef_icon.png")));
+        iconBank.put("Eruption", new ImageIcon(SWEKPlugin.class.getResource("/images/EventIcons/er_small.gif")));
         iconBank.put("FilamentActivation", new ImageIcon(SWEKPlugin.class.getResource("/images/EventIcons/fa_icon.png")));
         iconBank.put("FilamentEruption", new ImageIcon(SWEKPlugin.class.getResource("/images/EventIcons/fe_icon.png")));
         iconBank.put("Filament", new ImageIcon(SWEKPlugin.class.getResource("/images/EventIcons/fi_icon.png")));
@@ -71,6 +89,7 @@ public class SWEKIconBank {
         iconBank.put("NothingReported", new ImageIcon(SWEKPlugin.class.getResource("/images/EventIcons/nr_icon.png")));
         iconBank.put("Oscillation", new ImageIcon(SWEKPlugin.class.getResource("/images/EventIcons/os_icon.png")));
         iconBank.put("Other", new ImageIcon(SWEKPlugin.class.getResource("/images/EventIcons/ot_icon.png")));
+        iconBank.put("Plage", new ImageIcon(SWEKPlugin.class.getResource("/images/EventIcons/pg_icon.png")));
         iconBank.put("Sigmoid", new ImageIcon(SWEKPlugin.class.getResource("/images/EventIcons/sg_icon.png")));
         iconBank.put("SpraySurge", new ImageIcon(SWEKPlugin.class.getResource("/images/EventIcons/sp_icon.png")));
         iconBank.put("SunSpot", new ImageIcon(SWEKPlugin.class.getResource("/images/EventIcons/ss_icon.png")));
