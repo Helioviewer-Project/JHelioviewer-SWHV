@@ -3,7 +3,6 @@ package org.helioviewer.jhv.plugins.swek.view;
 import java.util.HashMap;
 import java.util.Map;
 
-import javax.swing.Icon;
 import javax.swing.ImageIcon;
 
 import org.helioviewer.jhv.plugins.swek.SWEKPlugin;
@@ -19,13 +18,13 @@ public class SWEKIconBank {
     private static SWEKIconBank singletonInstance;
 
     /** the icon bank */
-    private final Map<String, Icon> iconBank;
+    private final Map<String, ImageIcon> iconBank;
 
     /**
      * Private default constructor.
      */
     private SWEKIconBank() {
-        iconBank = new HashMap<String, Icon>();
+        iconBank = new HashMap<String, ImageIcon>();
         initIconBank();
     }
 
@@ -61,8 +60,8 @@ public class SWEKIconBank {
      * @return the icon corresponding with the given name or the "other" icon if
      *         the name was not known.
      */
-    public Icon getIcon(String iconName) {
-        Icon tempIcon = iconBank.get(iconName);
+    public ImageIcon getIcon(String iconName) {
+        ImageIcon tempIcon = iconBank.get(iconName);
         if (tempIcon == null) {
             return iconBank.get("Other");
         } else {
