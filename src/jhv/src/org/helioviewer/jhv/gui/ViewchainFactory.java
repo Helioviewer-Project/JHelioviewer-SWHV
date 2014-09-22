@@ -45,14 +45,14 @@ import org.helioviewer.viewmodelplugin.overlay.OverlayPanel;
 
 /**
  * This class handles the buildup of a view chain.
- * 
+ *
  * The class follows the factory pattern. It is responsible to build up a view
  * chain in the right structure. It adds the corresponding views depending on
  * the chosen mode (software mode or OpenGL mode).
- * 
+ *
  * @author Markus Langenberg
  * @author Stephan Pagel
- * 
+ *
  */
 public class ViewchainFactory {
 
@@ -60,7 +60,7 @@ public class ViewchainFactory {
 
     /**
      * Default constructor.
-     * 
+     *
      * This constructor calls the constructor {@link #ViewchainFactory(boolean)}
      * with the argument false. This results in that a BufferedImage view chain
      * (Software Mode) will be created.
@@ -72,12 +72,12 @@ public class ViewchainFactory {
     /**
      * Constructor which creates the view chain factory depending on the chosen
      * and available mode.
-     * 
+     *
      * Depending on the passed parameter value the constructor creates the used
      * view factory as a OpenGL view factory (OpenGL mode) or a BufferedImage
      * view factory (Software mode). If OpenGL mode is not available the
      * parameter will be ignored and the software mode will be used.
-     * 
+     *
      * @param useBufferedImageViewChain
      *            indicates if the software mode has to be used.
      */
@@ -96,7 +96,7 @@ public class ViewchainFactory {
 
     /**
      * This method returns the internal used view factory.
-     * 
+     *
      * @return used view factory.
      */
     public ViewFactory getUsedViewFactory() {
@@ -105,7 +105,7 @@ public class ViewchainFactory {
 
     /**
      * This method creates the main view chain depending on the selected mode.
-     * 
+     *
      * The mode was defined when the instance of the class was created.
      * <p>
      * If the passed parameter value is null a new main view chain will be
@@ -113,7 +113,7 @@ public class ViewchainFactory {
      * {@link org.helioviewer.viewmodel.view.ComponentView} instance (the
      * topmost view of the view chain) the existing view chain will be
      * transfered with all its settings to a new view chain.
-     * 
+     *
      * @param currentMainImagePanelView
      *            instance of the ComponentView which is the topmost view of the
      *            view chain which has to be transfered to the new one.
@@ -133,7 +133,7 @@ public class ViewchainFactory {
     /**
      * This method creates the overview view chain always in software mode and
      * if a main view chain already exists.
-     * 
+     *
      * If there is no main view chain (represented by there topmost view, the
      * ComponentView) than the method did nothing and returns a null value. The
      * instance is needed to make synchronization available.
@@ -142,7 +142,7 @@ public class ViewchainFactory {
      * whole view chain will be transfered with all its settings to a new view
      * chain. If no ComponentView instance was passed the method creates a new
      * overview view chain.
-     * 
+     *
      * @param mainImagePanelView
      *            the ComponentView instance of the main view chain which acts
      *            as the observed view chain.
@@ -169,14 +169,14 @@ public class ViewchainFactory {
     /**
      * Adds a new ImageInfoView to the main view chain and creates the
      * corresponding user interface components.
-     * 
+     *
      * The ImageInfoViews are always the undermost views in the view chain so
      * they will be added as a new layer to the LayeredView. For this reason
      * this method creates also the complete sub view chain (including the
      * needed filter views) and add it to the LayeredView.
      * <p>
      * If one of the passed parameter values is null nothing will happen.
-     * 
+     *
      * @param newLayer
      *            new ImageInfoView for which to create the sub view chain as a
      *            new layer.
@@ -266,6 +266,7 @@ public class ViewchainFactory {
                  * containing components' enabledState synced with the
                  * enabledState of this component.
                  */
+                @Override
                 public void setEnabled(boolean enabled) {
                     for (int i = 0; i < this.getTabCount(); i++) {
                         this.getComponentAt(i).setEnabled(enabled);
@@ -313,7 +314,7 @@ public class ViewchainFactory {
      * Updates all enabled overlay views in a given view chain. The method
      * removes all existing from the view chain and after this it adds all
      * enabled overlays.
-     * 
+     *
      * @param componentView
      *            the ComponentView instance of the view chain where to update
      *            the overlay views.
@@ -361,7 +362,7 @@ public class ViewchainFactory {
 
     /**
      * Creates a new main view chain with the minimal needed views.
-     * 
+     *
      * @return a instance of a ComponentView which is the topmost view of the
      *         new chain.
      */
@@ -385,7 +386,7 @@ public class ViewchainFactory {
 
     /**
      * Creates a new overview view chain with the minimum needed views.
-     * 
+     *
      * @param mainImagePanelView
      *            the topmost view of the view chain which is the observed view
      *            chain.
@@ -414,9 +415,9 @@ public class ViewchainFactory {
     /**
      * Builds up a new view chain on the basis of an existing one depending on
      * the selected mode.
-     * 
+     *
      * The new view chain will have the the same structure as the original one.
-     * 
+     *
      * @param sourceImagePanelView
      *            The topmost view of the original view chain.
      * @param mainImagePanelView
@@ -452,7 +453,7 @@ public class ViewchainFactory {
     /**
      * Method goes recursively through a view chain and creates a new one with
      * the same structure.
-     * 
+     *
      * @param sourceView
      *            current view of the view chain which has to be transfered to
      *            the new view chain.
@@ -477,7 +478,7 @@ public class ViewchainFactory {
             // otherwise create new view - if null, skip it
         } else if (sourceView instanceof GLOverlayView) {
             newView = new GLOverlayView();
-            ((GLOverlayView) sourceView).setOverlays(((GLOverlayView) sourceView).getOverlays());
+            ((GLOverlayView) newView).setOverlays(((GLOverlayView) sourceView).getOverlays());
         } else {
             newView = viewFactory.createViewFromSource(sourceView, keepSource);
 
