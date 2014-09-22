@@ -17,6 +17,7 @@ import javax.swing.SwingConstants;
 
 import org.helioviewer.base.logging.Log;
 import org.helioviewer.gl3d.gui.GL3DResetCameraAction;
+import org.helioviewer.gl3d.gui.GL3DSetPanInteractionAction;
 import org.helioviewer.gl3d.gui.GL3DSetZoomBoxInteractionAction;
 import org.helioviewer.gl3d.gui.GL3DToggleSolarRotationAction;
 import org.helioviewer.gl3d.gui.GL3DZoomFitAction;
@@ -175,15 +176,15 @@ public class TopToolBar extends JToolBar implements MouseListener {
         // Selection
         ButtonGroup group = new ButtonGroup();
 
-        panButton = new JToggleButton(new SetPanSelectionAction());
-        panButton.setSelected(selectionMode == SelectionMode.PAN);
-        panButton.setIcon(IconBank.getIcon(JHVIcon.PAN));
-        panButton.setSelectedIcon(IconBank.getIcon(JHVIcon.PAN_SELECTED));
-        panButton.setToolTipText("Select Panning");
-        group.add(panButton);
-        addButton(panButton);
-
         if (StateController.getInstance().getCurrentState().getType() == ViewStateEnum.View2D) {
+            panButton = new JToggleButton(new SetPanSelectionAction());
+            panButton.setSelected(selectionMode == SelectionMode.PAN);
+            panButton.setIcon(IconBank.getIcon(JHVIcon.PAN));
+            panButton.setSelectedIcon(IconBank.getIcon(JHVIcon.PAN_SELECTED));
+            panButton.setToolTipText("Select Panning");
+            group.add(panButton);
+            addButton(panButton);
+
             zoomBoxButton = new JToggleButton(new SetZoomBoxSelectionAction());
             zoomBoxButton.setSelected(selectionMode == SelectionMode.ZOOMBOX);
             zoomBoxButton.setIcon(IconBank.getIcon(JHVIcon.SELECT));
@@ -192,6 +193,14 @@ public class TopToolBar extends JToolBar implements MouseListener {
             group.add(zoomBoxButton);
             addButton(zoomBoxButton);
         } else {
+            panButton = new JToggleButton(new GL3DSetPanInteractionAction());
+            panButton.setSelected(selectionMode == SelectionMode.PAN);
+            panButton.setIcon(IconBank.getIcon(JHVIcon.PAN));
+            panButton.setSelectedIcon(IconBank.getIcon(JHVIcon.PAN_SELECTED));
+            panButton.setToolTipText("Select Panning");
+            group.add(panButton);
+            addButton(panButton);
+
             zoomBoxButton = new JToggleButton(new GL3DSetZoomBoxInteractionAction());
             zoomBoxButton.setSelected(selectionMode == SelectionMode.ZOOMBOX);
             zoomBoxButton.setIcon(IconBank.getIcon(JHVIcon.SELECT));
