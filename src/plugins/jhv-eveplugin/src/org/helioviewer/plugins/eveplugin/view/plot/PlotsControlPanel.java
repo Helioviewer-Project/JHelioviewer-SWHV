@@ -66,7 +66,7 @@ public class PlotsControlPanel extends JPanel implements ZoomControllerListener,
     private final JLabel eventsLabel = new JLabel("Display events: ");
     private final JCheckBox eventsCheckBox = new JCheckBox();
     private final String[] plots = { "Plot 1", "Plot 2" };
-    private final JComboBox<String> eventsComboBox = new JComboBox<String>(plots);
+    private final JComboBox eventsComboBox = new JComboBox(plots);
 
     private final JButton addLayerButton = new JButton("Add Layer", addIcon);
 
@@ -116,8 +116,7 @@ public class PlotsControlPanel extends JPanel implements ZoomControllerListener,
         periodPicker.addPeriodPickerListener(this);
 
         periodFromLayersButton.setToolTipText("Request data of selected movie interval");
-        periodFromLayersButton.setPreferredSize(new Dimension(movietimeIcon.getIconWidth() + 14,
-                periodFromLayersButton.getPreferredSize().height));
+        periodFromLayersButton.setPreferredSize(new Dimension(movietimeIcon.getIconWidth() + 14, periodFromLayersButton.getPreferredSize().height));
         periodFromLayersButton.addActionListener(this);
         setEnabledStateOfPeriodMovieButton();
 
@@ -152,7 +151,7 @@ public class PlotsControlPanel extends JPanel implements ZoomControllerListener,
     }
 
     /**
-     * 
+     *
      */
     private void initLockIntervalCheckBox() {
         lockIntervalCheckBox.setSelected(TimeIntervalLockModel.getInstance().isLocked());
@@ -218,8 +217,7 @@ public class PlotsControlPanel extends JPanel implements ZoomControllerListener,
         }
     }
 
-    private boolean addElementToModel(final DefaultComboBoxModel model, final Date startDate, final Interval<Date> interval,
-            final int calendarField, final int calendarValue, final ZOOM zoom) {
+    private boolean addElementToModel(final DefaultComboBoxModel model, final Date startDate, final Interval<Date> interval, final int calendarField, final int calendarValue, final ZOOM zoom) {
         final Calendar calendar = new GregorianCalendar();
 
         calendar.clear();
@@ -242,8 +240,7 @@ public class PlotsControlPanel extends JPanel implements ZoomControllerListener,
     public void layerAdded(int idx) {
         if (setDefaultPeriod) {
             setDefaultPeriod = false;
-            final Interval<Date> interval = new Interval<Date>(LayersModel.getSingletonInstance().getFirstDate(), LayersModel
-                    .getSingletonInstance().getLastDate());
+            final Interval<Date> interval = new Interval<Date>(LayersModel.getSingletonInstance().getFirstDate(), LayersModel.getSingletonInstance().getLastDate());
             ZoomController.getSingletonInstance().setAvailableInterval(interval);
             // PlotTimeSpace.getInstance().setSelectedMinAndMaxTime(interval.getStart(),
             // interval.getEnd());
@@ -318,8 +315,7 @@ public class PlotsControlPanel extends JPanel implements ZoomControllerListener,
                 }
             }
         } else if (e.getSource() == periodFromLayersButton) {
-            final Interval<Date> interval = new Interval<Date>(LayersModel.getSingletonInstance().getFirstDate(), LayersModel
-                    .getSingletonInstance().getLastDate());
+            final Interval<Date> interval = new Interval<Date>(LayersModel.getSingletonInstance().getFirstDate(), LayersModel.getSingletonInstance().getLastDate());
             ZoomController.getSingletonInstance().setAvailableInterval(interval);
             // PlotTimeSpace.getInstance().setSelectedMinAndMaxTime(interval.getStart(),
             // interval.getEnd());
