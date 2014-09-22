@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-import javax.swing.Icon;
 import javax.swing.ImageIcon;
 
 import org.helioviewer.jhv.data.datatype.JHVEvent;
@@ -181,7 +180,7 @@ public class HEKEvent implements JHVEvent {
     }
 
     @Override
-    public Icon getIcon() {
+    public ImageIcon getIcon() {
         return icon;
     }
 
