@@ -5,6 +5,7 @@ import java.util.Date;
 import java.util.List;
 
 import javax.swing.Icon;
+import javax.swing.ImageIcon;
 
 import org.helioviewer.jhv.data.datatype.JHVEvent;
 import org.helioviewer.jhv.data.datatype.JHVEventParameter;
@@ -26,7 +27,7 @@ public class HEKEvent implements JHVEvent {
     private Date endDate;
 
     /** the icon */
-    private final Icon icon;
+    private final ImageIcon icon;
 
     /** the event name */
     private final String eventName;
@@ -115,14 +116,13 @@ public class HEKEvent implements JHVEvent {
      * @param icon
      *            the icon
      */
-    public HEKEvent(String eventName, String eventDisplayName, String description, JHVEventType eventType, Icon icon) {
+    public HEKEvent(String eventName, String eventDisplayName, String description, JHVEventType eventType, ImageIcon icon) {
         initLists();
         this.eventName = eventName;
         this.eventDisplayName = eventDisplayName;
         this.description = description;
         this.icon = icon;
         this.eventType = eventType;
-        uniqueID = uniqueID;
     }
 
     @Override

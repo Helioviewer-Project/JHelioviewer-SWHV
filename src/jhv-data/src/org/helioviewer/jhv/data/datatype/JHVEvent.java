@@ -3,7 +3,7 @@ package org.helioviewer.jhv.data.datatype;
 import java.util.Date;
 import java.util.List;
 
-import javax.swing.Icon;
+import javax.swing.ImageIcon;
 
 /**
  * 
@@ -43,7 +43,7 @@ public interface JHVEvent {
      * 
      * @return the icon
      */
-    public abstract Icon getIcon();
+    public abstract ImageIcon getIcon();
 
     /**
      * Gets the short description of the event.
