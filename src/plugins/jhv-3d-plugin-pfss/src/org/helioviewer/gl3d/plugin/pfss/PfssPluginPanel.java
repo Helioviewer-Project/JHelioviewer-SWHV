@@ -231,12 +231,12 @@ public class PfssPluginPanel extends OverlayPanel implements ActionListener, Lay
                     if (showAgain) {
 
                         Object[] options = { "Retry", "OK" };
-                        String message = "Pfss-Data for " + startYear + "-" + (startMonth + 1) + " isn't available";
+                        String message = "PFSS-Data for " + startYear + "-" + (startMonth + 1) + " isn't available";
                         Log.error(message);
                         JCheckBox checkBox = new JCheckBox("Don't show this message again.");
                         checkBox.setEnabled(showAgain);
                         Object[] params = { message, checkBox };
-                        int n = JOptionPane.showOptionDialog(this, params, "Pfss-Data", JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.WARNING_MESSAGE, null, options, options[1]);
+                        int n = JOptionPane.showOptionDialog(this, params, "PFSS-Data", JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.WARNING_MESSAGE, null, options, options[1]);
                         showAgain = !checkBox.isSelected();
                         if (n == 0) {
                             retry = true;

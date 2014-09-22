@@ -10,7 +10,7 @@ import org.helioviewer.viewmodelplugin.overlay.OverlayControlComponentManager;
 
 /**
  * Plugincontainer for Pfss
- * 
+ *
  * @author Stefan Meier
  */
 public class PfssPluginContainer extends OverlayContainer {
@@ -50,7 +50,7 @@ public class PfssPluginContainer extends OverlayContainer {
      */
     @Override
     public String getName() {
-        return "Pfss " + (builtin_mode ? "Built-In Version" : "");
+        return "PFSS " + (builtin_mode ? "Built-In Version" : "");
     }
 
     @Override
