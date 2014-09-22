@@ -21,10 +21,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 
+import javax.swing.ImageIcon;
+
 import org.helioviewer.base.logging.Log;
 import org.helioviewer.jhv.Settings;
 import org.helioviewer.jhv.plugins.swek.settings.SWEKProperties;
 import org.helioviewer.jhv.plugins.swek.settings.SWEKSettings;
+import org.helioviewer.jhv.plugins.swek.view.SWEKIconBank;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -465,7 +468,36 @@ public class SWEKConfigurationManager {
         eventType.setGroupOn(parseGroupOn(object));
         eventType.setCoordinateSystem(parseCoordinateSystem(object));
         eventType.setSpatialRegion(parseSpatialRegion(object));
+        eventType.setEventIcon(parseEventIcon(object));
         return eventType;
+    }
+
+    /**
+     * Parses the event icon settings.
+     * 
+     * @param object
+     *            the JSON object from where to parse the icon object.
+     * @return the icon defined in the configuration
+     * @throws JSONException
+     *             if the JSON object could not be parsed
+     */
+    private ImageIcon parseEventIcon(JSONObject object) throws JSONException {
+        String eventIconValue = object.getString("icon");
+        if (eventIconValue != null) {
+            try {
+                URI eventIconURI = new URI(eventIconValue);
+                if (eventIconURI.getScheme().toLowerCase().equals("iconbank")) {
+                    return SWEKIconBank.getSingletonInstance().getIcon(eventIconURI.getHost());
+                } else {
+                    return SWEKIconBank.getSingletonInstance().getIcon("Other");
+                }
+                // TODO Bram : Add other ways to add icons (file,url,...)
+            } catch (URISyntaxException e) {
+                Log.info("Could not parse the URI " + eventIconValue + " null icon is returned.");
+                return null;
+            }
+        }
+        return null;
     }
 
     /**
