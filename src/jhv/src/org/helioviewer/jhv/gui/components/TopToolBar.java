@@ -343,8 +343,12 @@ public class TopToolBar extends JToolBar implements MouseListener {
             Settings.getSingletonInstance().setProperty("display.toolbar", mode.toString().toLowerCase());
             Settings.getSingletonInstance().save();
         }
-        SelectionMode selectionMode = SelectionMode.ROTATE;
+        SelectionMode selectionMode;
+        if (StateController.getInstance().getCurrentState() == ViewStateEnum.View3D.getState())
+            selectionMode = SelectionMode.ROTATE;
 
+        else
+            selectionMode = SelectionMode.PAN;
         if (zoomBoxButton.isSelected()) {
             selectionMode = SelectionMode.ZOOMBOX;
         }
