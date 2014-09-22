@@ -1,5 +1,7 @@
 package org.helioviewer.jhv.plugins.swek.model;
 
+import javax.swing.ImageIcon;
+
 /**
  * Abstract class combining general functionality of the SWEK tree elements
  * 
@@ -10,21 +12,50 @@ public abstract class AbstractSWEKTreeModelElement {
     /** Is the check box selected */
     private boolean checkboxSelected;
 
+    /** The icon */
+    private ImageIcon icon;
+
     /**
      * Default constructor
      */
     public AbstractSWEKTreeModelElement() {
-        this.checkboxSelected = false;
+        checkboxSelected = false;
+        icon = null;
     }
 
     /**
-     * Creates a Abstract SWEK Tree element.
+     * Creates an Abstract SWEK Tree element with the checkbox selected or not.
      * 
      * @param isCheckBoxSelected
      *            Is the checkbox selected.
      */
     public AbstractSWEKTreeModelElement(boolean isCheckBoxSelected) {
-        this.checkboxSelected = isCheckBoxSelected;
+        checkboxSelected = isCheckBoxSelected;
+    }
+
+    /**
+     * Creates an Abstract SWEK tree element with a given icon.
+     * 
+     * @param icon
+     *            the icon for this SWEKTreeModel element
+     */
+    public AbstractSWEKTreeModelElement(ImageIcon icon) {
+        this.icon = icon;
+        checkboxSelected = false;
+    }
+
+    /**
+     * Creates an Abstract SWEK tree element with the checkbox selected or not
+     * and a given icon.
+     * 
+     * @param isCheckBoxSelected
+     *            is the checkbox selected
+     * @param icon
+     *            the icon for this SWEKTreeModel element
+     */
+    public AbstractSWEKTreeModelElement(boolean isCheckBoxSelected, ImageIcon icon) {
+        checkboxSelected = isCheckBoxSelected;
+        this.icon = icon;
     }
 
     /**
@@ -33,7 +64,7 @@ public abstract class AbstractSWEKTreeModelElement {
      * @return true if the checkbox is selected, false if not.
      */
     public boolean isCheckboxSelected() {
-        return this.checkboxSelected;
+        return checkboxSelected;
     }
 
     /**
@@ -44,5 +75,14 @@ public abstract class AbstractSWEKTreeModelElement {
      */
     public void setCheckboxSelected(boolean checkboxSelected) {
         this.checkboxSelected = checkboxSelected;
+    }
+
+    /**
+     * Gets the icon for this abstract SWEK tree event type.
+     * 
+     * @return the icon for this abstract SWEK tree event type
+     */
+    public ImageIcon getIcon() {
+        return icon;
     }
 }
