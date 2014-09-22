@@ -47,19 +47,19 @@ import org.helioviewer.viewmodel.viewportimagesize.ViewportImageSizeAdapter;
 
 /**
  * Implementation of ImageInfoView for JPG2000 images.
- * 
+ *
  * <p>
  * This class represents the gateway to the heart of the helioviewer project. It
  * is responsible for reading and decoding JPG2000 images. Therefore, it manages
  * two Threads: One Thread for communicating with the JPIP server, the other one
  * for decoding the images.
- * 
+ *
  * <p>
  * For decoding the images, the kakadu library is used. Unfortunately, kakaku is
  * not threadsafe, so be careful! Although kakadu is a and highly optimized
  * library, the decoding process is the bottleneck for speeding up the
  * application.
- * 
+ *
  */
 public class JHVJP2View extends AbstractView implements JP2View, ViewportView, RegionView, MetaDataView, SubimageDataView, ImageInfoView {
 
@@ -103,14 +103,14 @@ public class JHVJP2View extends AbstractView implements JP2View, ViewportView, R
 
     /**
      * Default constructor.
-     * 
+     *
      * <p>
      * When the view is not marked as a main view, it is assumed, that the view
      * will only serve one single image and will not have to perform any kind of
      * update any more. The effect of this assumption is, that the view will not
      * try to reconnect to the JPIP server when the connection breaks and that
      * there will be no other timestamps used than the first one.
-     * 
+     *
      * @param isMainView
      *            Whether the view is a main view or not
      */
@@ -122,7 +122,7 @@ public class JHVJP2View extends AbstractView implements JP2View, ViewportView, R
 
     /**
      * Returns the JPG2000 image managed by this class.
-     * 
+     *
      * @return JPG2000 image
      */
     public JP2Image getJP2Image() {
@@ -131,13 +131,13 @@ public class JHVJP2View extends AbstractView implements JP2View, ViewportView, R
 
     /**
      * Sets the JPG2000 image used by this class.
-     * 
+     *
      * This functions sets up the whole infrastructure needed for using the
      * image, including the two threads.
-     * 
+     *
      * <p>
      * Thus, this functions also works as a constructor.
-     * 
+     *
      * @param newJP2Image
      */
     public void setJP2Image(JP2Image newJP2Image) {
@@ -184,7 +184,7 @@ public class JHVJP2View extends AbstractView implements JP2View, ViewportView, R
 
     /**
      * Sets the reader mode.
-     * 
+     *
      * <p>
      * The options are:
      * <ul>
@@ -195,7 +195,7 @@ public class JHVJP2View extends AbstractView implements JP2View, ViewportView, R
      * <li>ALWAYSFIREONNEWDATA: Whenever new data is received, the reader fires
      * a ChangeEvent. This is the default value.</li>
      * </ul>
-     * 
+     *
      * @param readerMode
      * @see #getReaderMode()
      */
@@ -205,7 +205,7 @@ public class JHVJP2View extends AbstractView implements JP2View, ViewportView, R
 
     /**
      * Returns the reader mode.
-     * 
+     *
      * @return Current reader mode.
      * @see #setReaderMode(ReaderMode)
      */
@@ -215,11 +215,11 @@ public class JHVJP2View extends AbstractView implements JP2View, ViewportView, R
 
     /**
      * Sets, whether this view is persistent.
-     * 
+     *
      * This value only has effect, when the image is a remote image. A
      * persistent view will close its socket after receiving the first frame. By
      * default, main views are not persistent.
-     * 
+     *
      * @param isPersistent
      *            True, if this view is persistent
      * @see #isPersistent
@@ -230,7 +230,7 @@ public class JHVJP2View extends AbstractView implements JP2View, ViewportView, R
 
     /**
      * Returns the built-in color lookup table.
-     * 
+     *
      */
     public int[] getBuiltInLUT() {
         try {
@@ -427,7 +427,7 @@ public class JHVJP2View extends AbstractView implements JP2View, ViewportView, R
 
     /**
      * Returns whether the reader is connected to a JPIP server or not.
-     * 
+     *
      * @return True, if connected to a JPIP server, false otherwise
      */
     public boolean isConnectedToJPIP() {
@@ -439,7 +439,7 @@ public class JHVJP2View extends AbstractView implements JP2View, ViewportView, R
 
     /**
      * Fires a ChangeEvent into the view chain.
-     * 
+     *
      * @param aEvent
      *            ChangeEvent to fire
      */
@@ -473,15 +473,15 @@ public class JHVJP2View extends AbstractView implements JP2View, ViewportView, R
 
     /**
      * Recalculates the image parameters.
-     * 
+     *
      * <p>
      * This function maps between the set of parameters used within the view
      * chain and the set of parameters used within the jp2-package.
-     * 
+     *
      * <p>
      * To achieve this, calls {@link #calculateParameter(int, int)} with the
      * currently used number of quality layers and the first frame.
-     * 
+     *
      * @return Set of parameters used within the jp2-package
      */
     protected JP2ImageParameter calculateParameter() {
@@ -490,16 +490,16 @@ public class JHVJP2View extends AbstractView implements JP2View, ViewportView, R
 
     /**
      * Recalculates the image parameters.
-     * 
+     *
      * This function maps between the set of parameters used within the view
      * chain and the set of parameters used within the jp2-package.
-     * 
+     *
      * <p>
      * To achieve this, calls
      * {@link #calculateParameter(Viewport, Region, int, int)} with the current
      * region and viewport and the given number of quality layers and frame
      * number.
-     * 
+     *
      * @param numQualityLayers
      *            Number of quality layers to use
      * @param frameNumber
@@ -512,14 +512,14 @@ public class JHVJP2View extends AbstractView implements JP2View, ViewportView, R
 
     /**
      * Recalculates the image parameters.
-     * 
+     *
      * This function maps between the set of parameters used within the view
      * chain and the set of parameters used within the jp2-package.
-     * 
+     *
      * <p>
      * To achieve this, calculates the set of parameters used within the
      * jp2-package according to the given requirements from the view chain.
-     * 
+     *
      * @param v
      *            Viewport the image will be displayed in
      * @param r
@@ -560,7 +560,7 @@ public class JHVJP2View extends AbstractView implements JP2View, ViewportView, R
      * Sets the current ImageViewParams to the ones specified. Any parameter
      * that should remain unchanged should be specified null. (Isn't
      * auto-unboxing just convenient as hell sometimes?)
-     * 
+     *
      * @param _roi
      *            Pixel region to display
      * @param _resolution
@@ -580,7 +580,7 @@ public class JHVJP2View extends AbstractView implements JP2View, ViewportView, R
     /**
      * Method calls setImageViewParams(SubImage, ResolutionLevel, Integer,
      * Integer, boolean) with the boolean set to true.
-     * 
+     *
      * @param _roi
      *            Pixel region to display
      * @param _resolution
@@ -598,7 +598,7 @@ public class JHVJP2View extends AbstractView implements JP2View, ViewportView, R
     /**
      * Calls {@link #setImageViewParams(JP2ImageParameter, boolean)} with the
      * boolean set to true.
-     * 
+     *
      * @param newParams
      *            New set of parameters to use
      * @return true, if the parameters actually has changed, false otherwise
@@ -609,10 +609,10 @@ public class JHVJP2View extends AbstractView implements JP2View, ViewportView, R
 
     /**
      * Sets the image parameters, if the given ones are valid.
-     * 
+     *
      * Also, triggers an update of the image using the new set of parameters, if
      * desired.
-     * 
+     *
      * @param newParams
      *            New set of parameters to use
      * @param reload
@@ -649,7 +649,7 @@ public class JHVJP2View extends AbstractView implements JP2View, ViewportView, R
 
     /**
      * Returns the current set of parameters.
-     * 
+     *
      * @return Current set of parameters
      */
     JP2ImageParameter getImageViewParams() {
@@ -658,7 +658,7 @@ public class JHVJP2View extends AbstractView implements JP2View, ViewportView, R
 
     /**
      * Returns the current internal region (before decoding).
-     * 
+     *
      * @return current internal region
      */
     Region getRegionPrelook() {
@@ -667,11 +667,11 @@ public class JHVJP2View extends AbstractView implements JP2View, ViewportView, R
 
     /**
      * Sets the new image data for the given region.
-     * 
+     *
      * <p>
      * This function is used as a callback function which is called by
      * {@link J2KRender} when it has finished decoding an image.
-     * 
+     *
      * @param newImageData
      *            New image data
      * @param roi
@@ -727,7 +727,7 @@ public class JHVJP2View extends AbstractView implements JP2View, ViewportView, R
 
     /**
      * Returns whether this view is used as a main view.
-     * 
+     *
      * @return Whether this view is used as a main view
      */
     boolean isMainView() {
@@ -736,7 +736,7 @@ public class JHVJP2View extends AbstractView implements JP2View, ViewportView, R
 
     /**
      * Returns, whether this view is persistent.
-     * 
+     *
      * @return True, if this view is persistent, false otherwise.
      * @see #setPersistent(boolean)
      */
@@ -746,7 +746,7 @@ public class JHVJP2View extends AbstractView implements JP2View, ViewportView, R
 
     /**
      * Recalculate the image parameters.
-     * 
+     *
      * This might be useful, if some assumption have changed, such as the
      * resolution set.
      */
@@ -756,10 +756,10 @@ public class JHVJP2View extends AbstractView implements JP2View, ViewportView, R
 
     /**
      * Adds a ChangedReason to the current event.
-     * 
+     *
      * The event will be fired during the next call of
      * {@link #setSubimageData(ImageData, SubImage, int)}.
-     * 
+     *
      * @param reason
      *            The ChangedReason to add
      */
@@ -771,7 +771,7 @@ public class JHVJP2View extends AbstractView implements JP2View, ViewportView, R
      * Private class for remembering the
      * {@link org.helioviewer.viewmodel.region.Region} corresponding to
      * {@link org.helioviewer.viewmodel.view.jp2view.image.SubImage}.
-     * 
+     *
      * <p>
      * To ensure, that the size of the buffer does not grow into infinity, this
      * buffer is organized in circle.
@@ -784,7 +784,7 @@ public class JHVJP2View extends AbstractView implements JP2View, ViewportView, R
 
         /**
          * Puts a new pair of Region and SubImage into the buffer.
-         * 
+         *
          * @param subImage
          * @param subImageRegion
          */
@@ -798,7 +798,7 @@ public class JHVJP2View extends AbstractView implements JP2View, ViewportView, R
 
         /**
          * Sets the parents Region to the one corresponding to subImage.
-         * 
+         *
          * @param subImage
          *            Search Region for this SubImage
          */
@@ -855,5 +855,9 @@ public class JHVJP2View extends AbstractView implements JP2View, ViewportView, R
 
     public void setPreviousImageData(ImageData previousImageData) {
         this.previousImageData = previousImageData;
+    }
+
+    public void refresh() {
+        readerSignal.signal();
     }
 }

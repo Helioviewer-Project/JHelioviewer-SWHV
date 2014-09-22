@@ -1,5 +1,6 @@
 package org.helioviewer.viewmodel.view.opengl;
 
+import javax.media.opengl.GL;
 import javax.media.opengl.GL2;
 
 import org.helioviewer.viewmodel.changeevent.ChangeEvent;
@@ -19,17 +20,17 @@ import org.helioviewer.viewmodel.view.opengl.shader.GLVertexShaderView;
 
 /**
  * Implementation of LayeredView for rendering in OpenGL mode.
- * 
+ *
  * <p>
  * This class manages different layers in OpenGL by branching the renderGL calls
  * as well as the calls for building shaders.
- * 
+ *
  * <p>
  * For further information about the role of the LayeredView within the view
  * chain, see {@link org.helioviewer.viewmodel.view.LayeredView}
- * 
+ *
  * @author Markus Langenberg
- * 
+ *
  */
 public class GLLayeredView extends AbstractLayeredView implements GLFragmentShaderView, GLVertexShaderView {
 
@@ -54,7 +55,7 @@ public class GLLayeredView extends AbstractLayeredView implements GLFragmentShad
         /*
          * GLFilterView filterView = new GLFilterView(); OpacityFilter filter =
          * new OpacityFilter(0.5f); filterView.setFilter(filter);
-         * 
+         *
          * GLHelioviewerGeometryView geomView =
          * newLayer.getAdapter(GLHelioviewerGeometryView.class); if(geomView !=
          * null) { View firstFilter = geomView.getView();
@@ -92,18 +93,22 @@ public class GLLayeredView extends AbstractLayeredView implements GLFragmentShad
     }
 
     protected void changeAngles() {
-        Layer[] viewArray = viewLookup.values().toArray(new Layer[viewLookup.values().size()]);
-        if (viewArray.length > 0) {
-            long d1 = viewArray[viewArray.length - 1].regionView.getAdapter(JHVJP2View.class).getImageData().getDateMillis();
-
-            for (int j = viewArray.length - 1; j >= 0; j--) {
-                long d2 = viewArray[j].regionView.getAdapter(JHVJP2View.class).getImageData().getDateMillis();
-                if (d1 - d2 < 45 * 60 * 1000) {
-                    viewArray[j].regionView.getAdapter(JHVJP2View.class).getImageData().setDateMillis(d1);
-                }
-            }
-
-        }
+        /*
+         * Layer[] viewArray = viewLookup.values().toArray(new
+         * Layer[viewLookup.values().size()]); if (viewArray.length > 0) { long
+         * d1 = viewArray[viewArray.length -
+         * 1].regionView.getAdapter(JHVJP2View.
+         * class).getImageData().getDateMillis();
+         * 
+         * for (int j = viewArray.length - 1; j >= 0; j--) { long d2 =
+         * viewArray[
+         * j].regionView.getAdapter(JHVJP2View.class).getImageData().getDateMillis
+         * (); if (d1 - d2 < 45 * 60 * 1000) {
+         * viewArray[j].regionView.getAdapter
+         * (JHVJP2View.class).getImageData().setDateMillis(d1); } }
+         * 
+         * }
+         */
     }
 
     /**
@@ -145,7 +150,7 @@ public class GLLayeredView extends AbstractLayeredView implements GLFragmentShad
 
     /**
      * {@inheritDoc}
-     * 
+     *
      * In this case, it does nothing, since for OpenGL views, the rendering
      * takes place in {@link #renderGL(GL)}.
      */
@@ -156,7 +161,7 @@ public class GLLayeredView extends AbstractLayeredView implements GLFragmentShad
 
     /**
      * {@inheritDoc}
-     * 
+     *
      * <p>
      * In this case, creates a new shader for every layer and initializes it
      * with the least necessary commands.
@@ -191,7 +196,7 @@ public class GLLayeredView extends AbstractLayeredView implements GLFragmentShad
 
     /**
      * {@inheritDoc}
-     * 
+     *
      * <p>
      * In this case, creates a new shader for every layer and initializes it
      * with the least necessary commands.

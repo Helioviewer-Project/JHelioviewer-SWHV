@@ -14,7 +14,7 @@ import org.helioviewer.viewmodelplugin.filter.FilterContainer;
  * Available filter can be activated so they will be included to the view chains
  * and filter can be disabled. It is possible to rearrange the order of
  * activated filters.
- * 
+ *
  * @author Stephan Pagel
  */
 public class FilterPluginDialog extends AbstractPluginDialog {
@@ -25,8 +25,8 @@ public class FilterPluginDialog extends AbstractPluginDialog {
 
     private static final long serialVersionUID = 1L;
 
-    private JButton activatedPluginsUpButton = new JButton("Up");
-    private JButton activatedPluginsDownButton = new JButton("Down");
+    private final JButton activatedPluginsUpButton = new JButton("Up");
+    private final JButton activatedPluginsDownButton = new JButton("Down");
 
     // ////////////////////////////////////////////////////////////////
     // Methods
@@ -84,6 +84,7 @@ public class FilterPluginDialog extends AbstractPluginDialog {
      * {@inheritDoc}
      */
 
+    @Override
     public void actionPerformed(ActionEvent arg0) {
 
         super.actionPerformed(arg0);
@@ -106,7 +107,7 @@ public class FilterPluginDialog extends AbstractPluginDialog {
 
         if (selected != null && selected instanceof FilterContainer && index > 0) {
             activatedPluginsListModel.remove(index);
-            activatedPluginsListModel.add(index - 1, (FilterContainer) selected);
+            activatedPluginsListModel.add(index - 1, selected);
 
             activatedPluginsList.setSelectedIndex(index - 1);
         }
@@ -123,7 +124,7 @@ public class FilterPluginDialog extends AbstractPluginDialog {
 
         if (selected != null && selected instanceof FilterContainer && index < activatedPluginsListModel.size() - 1) {
             activatedPluginsListModel.remove(index);
-            activatedPluginsListModel.add(index + 1, (FilterContainer) selected);
+            activatedPluginsListModel.add(index + 1, selected);
 
             activatedPluginsList.setSelectedIndex(index + 1);
         }
@@ -135,6 +136,7 @@ public class FilterPluginDialog extends AbstractPluginDialog {
      * Resets the current rank position in the view chain for all filters.
      */
 
+    @Override
     protected void beforeSaveAndClose() {
 
         // put SOHOLUTFilter last (such that it is applied first); otherwise
@@ -162,5 +164,9 @@ public class FilterPluginDialog extends AbstractPluginDialog {
             ((FilterContainer) availablePluginsListModel.get(i)).setPosition(-1);
             ((FilterContainer) availablePluginsListModel.get(i)).changeSettings();
         }
+    }
+
+    @Override
+    public void init() {
     }
 }

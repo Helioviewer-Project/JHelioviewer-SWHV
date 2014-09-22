@@ -37,14 +37,14 @@ import com.jogamp.common.jvm.JNILibLoaderBase;
 
 /**
  * This class starts the applications.
- * 
+ *
  * @author caplins
  * @author Benjamin Wamsler
  * @author Markus Langenberg
  * @author Stephan Pagel
  * @author Andre Dau
  * @author Helge Dietert
- * 
+ *
  */
 public class JavaHelioViewer {
     static class JoglLoaderDummy implements JNILibLoaderBase.LoaderAction {
@@ -275,7 +275,7 @@ public class JavaHelioViewer {
         splash.setProgressText("Initialize FFmpeg...");
         // Load/download ffmpeg
         Log.info("Install FFmpeg");
-        if (null == ResourceLoader.getSingletonInstance().loadResource("ffmpeg", libsRemote, libs, libs, libsBackup, System.getProperties())) {
+        if (null == ResourceLoader.getSingletonInstance().loadResource("ffmpeg-2-1", libsRemote, libs, libs, libsBackup, System.getProperties())) {
             Log.error("Error installing FFmpeg");
             Message.err("Error installing FFmpeg", "Could not install FFmpeg tool. Movie export will not work.", false);
         } else {

@@ -6,6 +6,7 @@ import java.awt.FlowLayout;
 import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+
 import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
@@ -22,8 +23,8 @@ import javax.swing.event.HyperlinkListener;
 import org.helioviewer.base.logging.Log;
 import org.helioviewer.jhv.JHVGlobals;
 import org.helioviewer.jhv.gui.IconBank;
-import org.helioviewer.jhv.gui.ImageViewerGui;
 import org.helioviewer.jhv.gui.IconBank.JHVIcon;
+import org.helioviewer.jhv.gui.ImageViewerGui;
 import org.helioviewer.jhv.gui.interfaces.ShowableDialog;
 import org.helioviewer.jhv.internal_plugins.InternalPlugin;
 import org.helioviewer.viewmodelplugin.controller.PluginContainer;
@@ -32,10 +33,10 @@ import org.helioviewer.viewmodelplugin.interfaces.Plugin;
 
 /**
  * Dialog that is used to display information about the program.
- * 
+ *
  * <p>
  * This includes version and contact informations.
- * 
+ *
  * @author Markus Langenberg
  * @author Andre Dau
  */
@@ -44,7 +45,7 @@ public final class AboutDialog extends JDialog implements ActionListener, Showab
     private static final long serialVersionUID = 1L;
 
     private final JButton closeButton = new JButton("Close");
-    private JScrollPane scrollPane;
+    private final JScrollPane scrollPane;
 
     /**
      * Default constructor.
@@ -140,12 +141,14 @@ public final class AboutDialog extends JDialog implements ActionListener, Showab
     /**
      * {@inheritDoc}
      */
+    @Override
     public void showDialog() {
         pack();
         setSize(getPreferredSize());
         setLocationRelativeTo(ImageViewerGui.getMainFrame());
 
         SwingUtilities.invokeLater(new Runnable() {
+            @Override
             public void run() {
                 scrollPane.getVerticalScrollBar().setValue(0);
             }
@@ -157,6 +160,7 @@ public final class AboutDialog extends JDialog implements ActionListener, Showab
     /**
      * Closes the dialog.
      */
+    @Override
     public void actionPerformed(ActionEvent a) {
         if (a.getSource() == this.closeButton) {
             this.dispose();
@@ -166,6 +170,7 @@ public final class AboutDialog extends JDialog implements ActionListener, Showab
     /**
      * Opens a browser or email client after clicking on a hyperlink.
      */
+    @Override
     public void hyperlinkUpdate(HyperlinkEvent e) {
         if (e.getEventType() == HyperlinkEvent.EventType.ACTIVATED) {
             if (e.getURL() == null) {
@@ -179,7 +184,7 @@ public final class AboutDialog extends JDialog implements ActionListener, Showab
 
     /**
      * Formats the version and revision string
-     * 
+     *
      * @return the formatted version and revision string
      */
     private String getVersionString() {
@@ -197,5 +202,9 @@ public final class AboutDialog extends JDialog implements ActionListener, Showab
         }
         return "JHelioviewer " + versionString + " - Revision " + revisionString;
 
+    }
+
+    @Override
+    public void init() {
     }
 }

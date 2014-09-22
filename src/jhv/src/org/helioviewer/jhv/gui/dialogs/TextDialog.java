@@ -58,14 +58,20 @@ public class TextDialog extends JDialog implements ActionListener, ShowableDialo
         add(closeButton, BorderLayout.EAST);
     }
 
+    @Override
     public void actionPerformed(ActionEvent e) {
         this.dispose();
     }
 
+    @Override
     public void showDialog() {
         pack();
         setSize(getPreferredSize());
         setLocationRelativeTo(ImageViewerGui.getMainFrame());
         setVisible(true);
+    }
+
+    @Override
+    public void init() {
     }
 }

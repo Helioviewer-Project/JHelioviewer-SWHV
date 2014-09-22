@@ -9,14 +9,14 @@ import org.helioviewer.jhv.opengl.GLInfo;
  * Singleton that controls the current state, i.e. 2D or 3D.
  * {@link StateChangeListener}s can be added for notifications about the current
  * state. By default, the 3D state is enabled.
- * 
+ *
  * @author Simon Spoerri (simon.spoerri@fhnw.ch)
- * 
+ *
  */
 public class StateController {
     private static StateController instance = new StateController();
 
-    private List<StateChangeListener> stateChangeListeners = new ArrayList<StateChangeListener>();
+    private final List<StateChangeListener> stateChangeListeners = new ArrayList<StateChangeListener>();
 
     private State currentState;
 

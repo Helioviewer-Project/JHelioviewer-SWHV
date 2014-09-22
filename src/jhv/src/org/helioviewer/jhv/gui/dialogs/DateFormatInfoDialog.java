@@ -18,7 +18,7 @@ import org.helioviewer.jhv.gui.interfaces.ShowableDialog;
 /**
  * Dialog used to display all supported characters for a date pattern. It also
  * gives some examples how to create a pattern.
- * 
+ *
  * @author Stephan Pagel
  */
 public class DateFormatInfoDialog extends JDialog implements ActionListener, ShowableDialog {
@@ -29,7 +29,7 @@ public class DateFormatInfoDialog extends JDialog implements ActionListener, Sho
 
     private static final long serialVersionUID = 1L;
 
-    private JButton closeButton = new JButton("Close");
+    private final JButton closeButton = new JButton("Close");
 
     // ////////////////////////////////////////////////////////////////////////////////
     // Methods
@@ -69,6 +69,7 @@ public class DateFormatInfoDialog extends JDialog implements ActionListener, Sho
     /**
      * Closes the dialog.
      */
+    @Override
     public void actionPerformed(ActionEvent arg0) {
         dispose();
     }
@@ -76,6 +77,7 @@ public class DateFormatInfoDialog extends JDialog implements ActionListener, Sho
     /**
      * {@inheritDoc}
      */
+    @Override
     public void showDialog() {
         pack();
         setSize(getPreferredSize().width, getPreferredSize().height);
@@ -83,4 +85,7 @@ public class DateFormatInfoDialog extends JDialog implements ActionListener, Sho
         setVisible(true);
     }
 
+    @Override
+    public void init() {
+    }
 }

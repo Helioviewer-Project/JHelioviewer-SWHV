@@ -48,7 +48,7 @@ import org.helioviewer.viewmodel.view.jp2view.kakadu.JHV_Kdu_cache;
 
 /**
  * Dialog that allows the user to change default preferences and settings.
- * 
+ *
  * @author Desmond Amadigwe
  * @author Benjamin Wamsler
  * @author Juan Pablo
@@ -65,10 +65,10 @@ public class PreferencesDialog extends JDialog implements ShowableDialog {
     private JRadioButton doNothingOnStartUp;
     private JComboBox lafCombo;
     private JPanel paramsPanel;
-    private JCheckBox limitMaxSize = new JCheckBox("Limit size");
-    private JLabel occupiedSizeLabel = new JLabel();
-    private JTextField maxCacheBox = new JTextField("0.0");
-    private JLabel maxCacheBoxLabel = new JLabel(" Mbytes");
+    private final JCheckBox limitMaxSize = new JCheckBox("Limit size");
+    private final JLabel occupiedSizeLabel = new JLabel();
+    private final JTextField maxCacheBox = new JTextField("0.0");
+    private final JLabel maxCacheBoxLabel = new JLabel(" Mbytes");
     private JCheckBox useOpenGLIfAvailable;
     private JCheckBox useOpenGLIfAvailableExportMovie;
     private JComboBox debugFileCombo = null;
@@ -78,13 +78,13 @@ public class PreferencesDialog extends JDialog implements ShowableDialog {
     private JTextField dateFormatField;
     private JButton dateFormatInfo;
 
-    private Settings settings = Settings.getSingletonInstance();
+    private final Settings settings = Settings.getSingletonInstance();
 
     /*
      * This array will contain look and feels that are not allowed when using
      * JHV
      */
-    private String[] disallowedLafs = { "CDE/Motif" };
+    private final String[] disallowedLafs = { "CDE/Motif" };
 
     /**
      * The private constructor that sets the fields and the dialog.
@@ -125,6 +125,7 @@ public class PreferencesDialog extends JDialog implements ShowableDialog {
         JButton resetBtn = new JButton(" Reset ");
 
         acceptBtn.addActionListener(new ActionListener() {
+            @Override
             public void actionPerformed(ActionEvent e) {
                 if (!isDateFormatValid(dateFormatField.getText())) {
                     Message.err("Syntax error", "The entered date pattern contains illegal signs!\nAll suppported signs are listed in the associated information dialog.", false);
@@ -148,6 +149,7 @@ public class PreferencesDialog extends JDialog implements ShowableDialog {
         });
 
         cancelBtn.addActionListener(new ActionListener() {
+            @Override
             public void actionPerformed(ActionEvent e) {
                 setLookAndFeelCombo(settings.getProperty("display.laf"));
                 dispose();
@@ -155,6 +157,7 @@ public class PreferencesDialog extends JDialog implements ShowableDialog {
         });
 
         resetBtn.addActionListener(new ActionListener() {
+            @Override
             public void actionPerformed(ActionEvent e) {
 
                 if (JOptionPane.showConfirmDialog(null, "Do you really want to reset the setting values?", "Attention", JOptionPane.YES_NO_OPTION) == JOptionPane.YES_OPTION) {
@@ -201,7 +204,7 @@ public class PreferencesDialog extends JDialog implements ShowableDialog {
      * Checks the passed pattern if it is a supported date pattern. The pattern
      * could contain defined letters and special characters. The method checks
      * valid signs only!
-     * 
+     *
      * @param format
      *            pattern to check.
      * @return boolean value if pattern is supported.
@@ -211,7 +214,7 @@ public class PreferencesDialog extends JDialog implements ShowableDialog {
         // go through all signs of pattern
         for (int i = 0; i < format.length(); i++) {
             char sign = format.charAt(i);
-            int ascii = (int) sign;
+            int ascii = sign;
 
             // if it is a number or letter, check it if it is supported
             if ((ascii >= 48 && ascii <= 57) || (ascii >= 65 && ascii <= 90) || (ascii >= 97 && ascii <= 122)) {
@@ -228,6 +231,7 @@ public class PreferencesDialog extends JDialog implements ShowableDialog {
     /**
      * {@inheritDoc}
      */
+    @Override
     public void showDialog() {
 
         loadSettings();
@@ -240,7 +244,7 @@ public class PreferencesDialog extends JDialog implements ShowableDialog {
 
     /**
      * Method that returns allowed look and feels for JHV
-     * 
+     *
      * @return Array containing allowed look and feels
      */
     private UIManager.LookAndFeelInfo[] getAllowedLookAndFeels() {
@@ -262,7 +266,7 @@ public class PreferencesDialog extends JDialog implements ShowableDialog {
 
     /**
      * Updates the look and feel combobox.
-     * 
+     *
      * @param lafClassName
      *            Entry to select
      */
@@ -283,7 +287,7 @@ public class PreferencesDialog extends JDialog implements ShowableDialog {
 
     /**
      * Loads the settings.
-     * 
+     *
      * Reads the informations from {@link org.helioviewer.jhv.Settings} and sets
      * all gui elements according to them.
      */
@@ -345,7 +349,7 @@ public class PreferencesDialog extends JDialog implements ShowableDialog {
 
     /**
      * Saves the settings.
-     * 
+     *
      * Writes the informations to {@link org.helioviewer.jhv.Settings}.
      */
     private void saveSettings() {
@@ -395,7 +399,7 @@ public class PreferencesDialog extends JDialog implements ShowableDialog {
 
     /**
      * Builds the string showing the size of the cache currently used.
-     * 
+     *
      * @return String showing the size of the cache currently used
      */
     private String getCacheSizeText() {
@@ -409,14 +413,14 @@ public class PreferencesDialog extends JDialog implements ShowableDialog {
         if (len < 1024)
             return ("Occupied size: " + len + " bytes");
         else if (len < 1048576)
-            return ("Occupied size: " + ((double) Math.round(((double) len / 1024.0) * 100.0) / 100.0) + " Kbytes");
+            return ("Occupied size: " + (Math.round((len / 1024.0) * 100.0) / 100.0) + " Kbytes");
         else
-            return ("Occupied size: " + ((double) Math.round(((double) len / 1048576.0) * 100.0) / 100.0) + " Mbytes");
+            return ("Occupied size: " + (Math.round((len / 1048576.0) * 100.0) / 100.0) + " Mbytes");
     }
 
     /**
      * Creates the JPIP cache panel.
-     * 
+     *
      * @return JPIP cache panel
      */
     private JPanel createJPIPCachePanel() {
@@ -433,6 +437,7 @@ public class PreferencesDialog extends JDialog implements ShowableDialog {
 
         limitMaxSize.addActionListener(new ActionListener() {
 
+            @Override
             public void actionPerformed(ActionEvent e) {
                 maxCacheBox.setVisible(limitMaxSize.isSelected());
                 maxCacheBoxLabel.setVisible(limitMaxSize.isSelected());
@@ -458,7 +463,7 @@ public class PreferencesDialog extends JDialog implements ShowableDialog {
 
     /**
      * Creates the general parameters panel.
-     * 
+     *
      * @return General parameters panel
      */
     private JPanel createParametersPanel() {
@@ -491,6 +496,7 @@ public class PreferencesDialog extends JDialog implements ShowableDialog {
 
         final PreferencesDialog parent = this;
         lafCombo.addActionListener(new ActionListener() {
+            @Override
             public void actionPerformed(ActionEvent e) {
                 JComboBox source = (JComboBox) e.getSource();
                 // UIManager.LookAndFeelInfo[] lafs =
@@ -523,6 +529,7 @@ public class PreferencesDialog extends JDialog implements ShowableDialog {
         dateFormatInfo.setToolTipText("Show possible date format information");
         dateFormatInfo.addActionListener(new ActionListener() {
 
+            @Override
             public void actionPerformed(ActionEvent e) {
                 DateFormatInfoDialog dialog = new DateFormatInfoDialog();
                 dialog.showDialog();
@@ -586,7 +593,7 @@ public class PreferencesDialog extends JDialog implements ShowableDialog {
 
     /**
      * Creates the default save directories panel.
-     * 
+     *
      * @return Default save directories panel
      */
     private JPanel createDefaultSaveDirPanel() {
@@ -622,6 +629,7 @@ public class PreferencesDialog extends JDialog implements ShowableDialog {
             table = new JTable(new DefaultTableModel(tableData, new String[] { "Description", "Value" }) {
                 private static final long serialVersionUID = 1L;
 
+                @Override
                 public boolean isCellEditable(int row, int column) {
                     return ((row == 2) && (column == 1));
                 }
@@ -633,6 +641,7 @@ public class PreferencesDialog extends JDialog implements ShowableDialog {
             // table.setFillsViewportHeight(true);
 
             table.addMouseListener(new MouseAdapter() {
+                @Override
                 public void mouseClicked(MouseEvent e) {
                     if (e.getClickCount() != 2)
                         return;
@@ -686,5 +695,9 @@ public class PreferencesDialog extends JDialog implements ShowableDialog {
             model.setValueAt(JHVDirectory.HOME.getPath(), 1, 1);
             model.setValueAt("jpip://delphi.nascom.nasa.gov:8090", 2, 1);
         }
+    }
+
+    @Override
+    public void init() {
     }
 }

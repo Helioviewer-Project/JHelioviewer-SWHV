@@ -28,6 +28,7 @@ import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.FilenameFilter;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.io.Writer;
 import java.text.NumberFormat;
 import java.text.SimpleDateFormat;
@@ -73,14 +74,16 @@ import org.helioviewer.base.FileUtils;
 import org.helioviewer.base.logging.Log;
 import org.helioviewer.base.message.Message;
 import org.helioviewer.jhv.JHVDirectory;
+import org.helioviewer.jhv.JHVGlobals;
 import org.helioviewer.jhv.Settings;
+import org.helioviewer.jhv.gui.IconBank;
+import org.helioviewer.jhv.gui.IconBank.JHVIcon;
 import org.helioviewer.jhv.gui.ImageViewerGui;
 import org.helioviewer.jhv.gui.ViewchainFactory;
 import org.helioviewer.jhv.gui.components.MainImagePanel;
 import org.helioviewer.jhv.gui.controller.MainImagePanelMousePanController;
 import org.helioviewer.jhv.gui.controller.ZoomController;
 import org.helioviewer.jhv.gui.interfaces.ShowableDialog;
-import org.helioviewer.jhv.gui.states.StateController;
 import org.helioviewer.jhv.opengl.GLInfo;
 import org.helioviewer.viewmodel.changeevent.ChangeEvent;
 import org.helioviewer.viewmodel.changeevent.ReaderErrorReason;
@@ -116,13 +119,13 @@ import org.helioviewer.viewmodel.viewport.Viewport;
 
 /**
  * Dialog o export movies to standard video formats.
- * 
+ *
  * <p>
  * This class includes everything needed to export movies to an external format.
  * Therefore, it copies the existing view chain and performs all its operations
- * on this copy. To encode the final result, the command line toll from FFmpeg
- * is used.
- * 
+ * on this copy. The movie is produced by invoking the ffmpeg exectuable and
+ * piping bmp images to the ffmpeg process.
+ *
  * @author Markus Langenberg
  * @author Andre Dau
  */
@@ -134,8 +137,6 @@ public class ExportMovieDialog extends JDialog implements ChangeListener, Action
 
     private static final int PANEL_WIDTH = 200;
     private static final int PANEL_HEIGHT = 200;
-    private int tileWidth;
-    private int tileHeight;
 
     private static final String SETTING_RATIO = "export.aspect.ratio";
     private static final String SETTING_IMG_WIDTH = "export.image.width";
@@ -148,59 +149,73 @@ public class ExportMovieDialog extends JDialog implements ChangeListener, Action
     private static final String SETTING_HARD_SBTL = "export.hard.subtitle";
     private static final String SETTING_HARD_SBTL_RATIO = "export.subtitle.aspect.ratio";
     private static final String SOFTWARE_MODUS_SETTING = "export.software.rendering";
-    private static final String SETTING_TILE_WIDTH = "export.tile.width";
-    private static final String SETTING_TILE_HEIGHT = "export.tile.height";
 
     private static final int READER_ERROR_LIMIT = 3;
+    private static final int hardSubtitleFactor = 22;
+    private static final int hardSubtitleBorder = 10;
 
-    private JComboBox aspectRatioSelection;
+    // Members grouped by swing, collections, objects, primitive data types
+    // to make it easier to free members later
+
+    // Swing components
+    private final JComboBox aspectRatioSelection;
+    private final JFormattedTextField txtImageWidth, txtImageHeight, txtTotalHeight;
+    private final JSpinner speedSpinner;
+    private final JCheckBox loadFirstCheckBox;
+    private final JCheckBox useDifferentialRotationTracking;
+    private final JCheckBox embedSoftSubtitle;
+    private final JCheckBox embedHardSubtitle;
+    private final JCheckBox embedHardSubtitleAspectRatio;
+    private final JButton cmdExport, cmdCancel;
+    private final JProgressBar progressBar;
+    private final JComboBox layerSelection;
+    private final JButton zoom1to1;
+    private final JButton zoomFit;
+    private final JSpinner zoomSpinner;
+    private final JPanel imagePanelContainer;
+
+    // Collections
     private Map<View, File> subtitleFiles;
-    private File subtitleFileAll;
-    private Writer subtitleWriterAll;
     private Map<View, Writer> subtitleWriters;
-    private String txtTargetFile;
-    private JFormattedTextField txtImageWidth, txtImageHeight, txtTotalHeight;
-    private MainImagePanel imagePanel;
-    private JSpinner speedSpinner;
-    private JCheckBox loadFirstCheckBox;
-    private JCheckBox useDifferentialRotationTracking;
-    private JCheckBox embedSoftSubtitle;
-    private JCheckBox embedHardSubtitle;
-    private JCheckBox embedHardSubtitleAspectRatio;
-    private JButton cmdExport, cmdCancel;
-    private JProgressBar progressBar;
-    private JComboBox layerSelection;
-    private JButton zoom1to1;
-    private JButton zoomFit;
-    private JSpinner zoomSpinner;
-
-    private JDialog glRenderingDialog;
-    private MovieView masterMovieView;
-    private int linkedMovieManagerInstance = -1;
     private LinkedList<JP2ImageOriginalParent> jp2ImageOriginalParents;
-    private View topmostView;
-    private GLComponentView glComponentView;
-    private final HashMap<TimedMovieView, StatusStruct> currentViewStatus = new HashMap<TimedMovieView, StatusStruct>();
-    private Thread exportThread;
-    private Thread initThread;
-    private int currentFrame = 0;
-    private boolean exportFinished = false;
-    private boolean initializationDone;
-    private MovieFileFilter selectedOutputFormat = new MP4Filter();
-    private final int hardSubtitleFontSizeFactor = 20;
-
     private HashMap<JComponent, Boolean> enableState;
     private final List<JComponent> guiElements;
+    private HashMap<TimedMovieView, StatusStruct> currentViewStatus = new HashMap<TimedMovieView, StatusStruct>();
+    private HashMap<JHVJP2View, Integer> readerErrorCounter = new HashMap<JHVJP2View, Integer>();
 
-    private final Semaphore viewChangedSemaphore = new Semaphore(1);
-
+    // Other objects
+    private MainImagePanel imagePanel;
+    private File subtitleFileAll;
+    private Writer subtitleWriterAll;
+    private String txtTargetFile;
+    private MovieView masterMovieView;
+    private View topmostView;
+    private GLComponentView glComponentView;
+    private Thread exportThread;
+    private Thread initThread;
+    private MovieFileFilter selectedOutputFormat = new MOVFilter();
+    private Semaphore viewChangedSemaphore = new Semaphore(1);
     private BufferedImage output;
+    private ZoomController zoomController = new ZoomController();
+    private OutputStream ffmpegStdin;
+    private Process ffmpegProcess;
 
-    private final ZoomController zoomController = new ZoomController();
-
+    // Primitive data types
+    private boolean exportSuccessful = false;
     private boolean savedDoubleBufferinOption = J2KRenderGlobalOptions.getDoubleBufferingOption();
+    private int frameRate;
+    private int numLayers;
+    private boolean initializationDone;
+    private int linkedMovieManagerInstance = -1;
+    private int currentFrame = 0;
+    private boolean exportFinished = false;
 
-    private final HashMap<JHVJP2View, Integer> readerErrorCounter = new HashMap<JHVJP2View, Integer>();
+    // Little Hack in order to avoid cyclic updating in updateViewport()
+    // of the text fields.
+    // Otherwise one gets an illegal state exception
+    private boolean updatingImageHeight = false;
+    private boolean updatingImageWidth = false;
+    private boolean updatingTotalHeight = false;
 
     private class StatusStruct {
         public ImmutableDateTime currentDateTime = new ImmutableDateTime(0);
@@ -224,21 +239,294 @@ public class ExportMovieDialog extends JDialog implements ChangeListener, Action
      */
     public ExportMovieDialog() {
         super(ImageViewerGui.getMainFrame(), "Export Movie", true);
-        StateController.getInstance().set2DState();
-        Log.info("Initialize movie export dialog");
-        initializationDone = false;
-
         guiElements = new ArrayList<JComponent>();
+
+        Log.debug(">> ExportMovieDialog() > Start initializing GUI");
+        addWindowListener(new WindowAdapter() {
+            @Override
+            public void windowClosing(WindowEvent e) {
+                exportFinished = true;
+                release();
+            }
+        });
+
+        setLayout(new BorderLayout());
+        setResizable(false);
+
+        // Parameters
+
+        JPanel parameterPanel = new JPanel(new GridBagLayout());
+        parameterPanel.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
+        parameterPanel.setComponentOrientation(ComponentOrientation.RIGHT_TO_LEFT);
+        GridBagConstraints c = new GridBagConstraints();
+        c.fill = GridBagConstraints.HORIZONTAL;
+        c.insets = new Insets(2, 2, 2, 2);
+
+        JPanel zoomPanel = new JPanel();
+        layerSelection = new JComboBox();
+
+        zoom1to1 = new JButton("Zoom 1:1");
+        zoomFit = new JButton("Zoom to Fit");
+        zoomSpinner = new JSpinner(new SpinnerNumberModel(new Double(1), new Double(0.0005), null, new Double(0.01f)));
+        JSpinner.NumberEditor editor = new JSpinner.NumberEditor(zoomSpinner, "0.00%");
+        zoomSpinner.setEditor(editor);
+        zoom1to1.addActionListener(this);
+        zoomFit.addActionListener(this);
+        zoomSpinner.addChangeListener(this);
+        zoomSpinner.addMouseWheelListener(this);
+        layerSelection.addActionListener(this);
+        guiElements.add(zoomSpinner);
+        guiElements.add(layerSelection);
+        guiElements.add(zoom1to1);
+        guiElements.add(zoomFit);
+
+        c.gridy = 1;
+        c.gridwidth = 1;
+        c.weightx = 0;
+        parameterPanel.add(zoom1to1, c);
+        parameterPanel.add(zoomFit, c);
+        c.gridwidth = 2;
+        zoomPanel.setLayout(new BoxLayout(zoomPanel, BoxLayout.X_AXIS));
+        zoomPanel.add(new JLabel("Zoom:   "));
+        zoomPanel.add(zoomSpinner);
+        zoomPanel.add(new JLabel("  of Layer"));
+        parameterPanel.add(layerSelection, c);
+        c.gridwidth = 1;
+        c.weightx = 1;
+        parameterPanel.add(new JLabel(" "), c);
+        c.weightx = 0;
+        parameterPanel.add(zoomPanel, c);
+        // Image Panel
+        Log.debug(">> ExportMovieDialog() > Create preview image panel");
+        imagePanelContainer = new JPanel(new FlowLayout(FlowLayout.CENTER, 0, 0));
+
+        c.gridy++;
+        c.weightx = 0;
+        c.gridwidth = 2;
+        c.gridheight = 8;
+        parameterPanel.add(imagePanelContainer, c);
+
+        c.gridheight = 1;
+
+        // Image dimensions
+        c.gridwidth = 2;
+
+        aspectRatioSelection = new JComboBox(aspectRatioPresets);
+        aspectRatioSelection.addActionListener(this);
+        parameterPanel.add(aspectRatioSelection, c);
+        c.gridwidth = 1;
+        parameterPanel.add(new JLabel(), c);
+        parameterPanel.add(new JLabel("Aspect ratio:"), c);
+        guiElements.add(aspectRatioSelection);
+
+        // Image Width
+        c.gridy++;
+        c.gridwidth = 2;
+        txtImageWidth = new JFormattedTextField(new Integer(640));
+        txtImageWidth.getDocument().addDocumentListener(this);
+        txtImageWidth.addActionListener(this);
+        ((NumberFormat) ((NumberFormatter) txtImageWidth.getFormatter()).getFormat()).setGroupingUsed(false);
+        parameterPanel.add(txtImageWidth, c);
+        c.gridwidth = 1;
+        c.weightx = 1;
+        parameterPanel.add(new JLabel(), c);
+        c.weightx = 0;
+        parameterPanel.add(new JLabel("Image Width:"), c);
+        guiElements.add(txtImageWidth);
+
+        // Image Height
+        c.gridy++;
+        txtImageHeight = new JFormattedTextField(new Integer(640));
+        txtImageHeight.getDocument().addDocumentListener(this);
+        txtImageHeight.addActionListener(this);
+        ((NumberFormat) ((NumberFormatter) txtImageHeight.getFormatter()).getFormat()).setGroupingUsed(false);
+        c.gridwidth = 2;
+        parameterPanel.add(txtImageHeight, c);
+        c.gridwidth = 1;
+        c.weightx = 1;
+        parameterPanel.add(new JLabel(), c);
+        c.weightx = 0;
+        parameterPanel.add(new JLabel("Image Height:"), c);
+        guiElements.add(txtImageHeight);
+
+        // Total height
+        c.gridy++;
+        txtTotalHeight = new JFormattedTextField(new Integer(640));
+        txtTotalHeight.setEnabled(false);
+        txtTotalHeight.getDocument().addDocumentListener(this);
+        txtTotalHeight.addActionListener(this);
+        ((NumberFormat) ((NumberFormatter) txtTotalHeight.getFormatter()).getFormat()).setGroupingUsed(false);
+        c.gridwidth = 2;
+        parameterPanel.add(txtTotalHeight, c);
+        c.gridwidth = 1;
+        c.weightx = 1;
+        parameterPanel.add(new JLabel(), c);
+        c.weightx = 0;
+        parameterPanel.add(new JLabel("Total Height With Subtitles:"), c);
+        guiElements.add(txtTotalHeight);
+
+        // Speed
+        c.gridy++;
+        c.gridwidth = 2;
+        speedSpinner = new JSpinner(new SpinnerNumberModel(20, 1, 99, 1));
+        speedSpinner.addMouseWheelListener(this);
+        parameterPanel.add(speedSpinner, c);
+        c.gridwidth = 1;
+        c.weightx = 1;
+        parameterPanel.add(new JLabel(), c);
+        c.weightx = 0;
+        parameterPanel.add(new JLabel("Speed (fps):"), c);
+        guiElements.add(speedSpinner);
+
+        c.gridy++;
+        parameterPanel.add(new JLabel(" "), c);
+
+        // Load First = Load all data via JPIP before exporting
+        c.gridy++;
+        c.gridwidth = 4;
+        loadFirstCheckBox = new JCheckBox("Download full quality before export", false);
+        parameterPanel.add(loadFirstCheckBox, c);
+        guiElements.add(loadFirstCheckBox);
+
+        // Use differential rotation tracking
+        c.gridy++;
+        c.gridwidth = 6;
+        StandardSolarRotationTrackingView trackingView = ImageViewerGui.getSingletonInstance().getMainView().getAdapter(StandardSolarRotationTrackingView.class);
+        useDifferentialRotationTracking = new JCheckBox("Use differential rotation tracking", trackingView != null && trackingView.getEnabled());
+        parameterPanel.add(useDifferentialRotationTracking, c);
+        guiElements.add(useDifferentialRotationTracking);
+
+        // Soft subtitle
+        c.gridy++;
+        c.gridx = 0;
+        c.gridwidth = 6;
+        embedSoftSubtitle = new JCheckBox("Embed soft subtitle (can be turned on and off during playback)", true);
+        parameterPanel.add(embedSoftSubtitle, c);
+        guiElements.add(embedSoftSubtitle);
+
+        // Hard subtitle
+        c.gridy++;
+        c.gridx = 0;
+        c.gridwidth = 6;
+        embedHardSubtitle = new JCheckBox("Embed hard subtitle (can NOT be turned on and off during playback)", false);
+        embedHardSubtitle.addActionListener(this);
+        parameterPanel.add(embedHardSubtitle, c);
+        c.gridy++;
+        c.gridx = 0;
+        c.gridwidth = 6;
+        embedHardSubtitleAspectRatio = new JCheckBox("Use total movie height instead of image height for aspect ratio", false);
+        embedHardSubtitleAspectRatio.setEnabled(false);
+        embedHardSubtitleAspectRatio.addActionListener(this);
+        guiElements.add(embedHardSubtitle);
+        guiElements.add(embedHardSubtitleAspectRatio);
+
+        parameterPanel.add(embedHardSubtitleAspectRatio, c);
+
+        // Stretch
+        c.gridy++;
+        c.weighty = 1.0;
+        parameterPanel.add(Box.createVerticalGlue(), c);
+
+        // Buttons
+        JPanel buttonPane = new JPanel();
+        buttonPane.setLayout(new BoxLayout(buttonPane, BoxLayout.LINE_AXIS));
+
+        cmdExport = new JButton("Export");
+        cmdExport.addActionListener(this);
+        guiElements.add(cmdExport);
+
+        cmdCancel = new JButton("Cancel");
+        cmdCancel.addActionListener(this);
+        guiElements.add(cmdCancel);
+
+        buttonPane.add(Box.createHorizontalGlue());
+
+        // Order depends on operation system
+        if (System.getProperty("os.name").toUpperCase().contains("WIN")) {
+            buttonPane.add(cmdExport);
+            buttonPane.add(cmdCancel);
+        } else {
+            buttonPane.add(cmdCancel);
+            buttonPane.add(cmdExport);
+        }
+
+        c.gridy++;
+        parameterPanel.add(buttonPane, c);
+
+        add(parameterPanel);
+
+        // Progressbar
+        progressBar = new JProgressBar(JProgressBar.HORIZONTAL, 0, 100);
+        add(progressBar, BorderLayout.SOUTH);
+    }
+
+    private void setGuiDuringExport() {
+        // Disable all GUI elements
+        layerSelection.setEnabled(false);
+        zoom1to1.setEnabled(false);
+        zoomFit.setEnabled(false);
+        aspectRatioSelection.setEnabled(false);
+        txtImageHeight.setEnabled(false);
+        txtImageWidth.setEnabled(false);
+        loadFirstCheckBox.setEnabled(false);
+        useDifferentialRotationTracking.setEnabled(false);
+        speedSpinner.setEnabled(false);
+        cmdExport.setEnabled(false);
+        embedSoftSubtitle.setEnabled(false);
+        embedHardSubtitle.setEnabled(false);
+        embedHardSubtitleAspectRatio.setEnabled(false);
+        txtTotalHeight.setEnabled(false);
+        zoom1to1.setEnabled(false);
+        zoomFit.setEnabled(false);
+        zoomSpinner.setEnabled(false);
+    }
+
+    private void setGuiBeforeExport() {
+        // Disable all GUI elements
+        enableState.put(layerSelection, true);
+        enableState.put(zoom1to1, true);
+        enableState.put(zoomFit, true);
+        enableState.put(aspectRatioSelection, true);
+        enableState.put(txtImageHeight, true);
+        enableState.put(txtImageWidth, true);
+        enableState.put(loadFirstCheckBox, true);
+        enableState.put(useDifferentialRotationTracking, true);
+        enableState.put(speedSpinner, true);
+        enableState.put(cmdExport, true);
+        enableState.put(embedSoftSubtitle, true);
+        enableState.put(embedHardSubtitle, true);
+        enableState.put(embedHardSubtitleAspectRatio, true);
+        enableState.put(txtTotalHeight, true);
+        enableState.put(zoom1to1, true);
+        enableState.put(zoomSpinner, true);
+        enableState.put(zoomFit, true);
+    }
+
+    @Override
+    public void init() {
+        Log.info("Initialize movie export dialog");
+
+        initializationDone = false;
+        currentViewStatus = new HashMap<TimedMovieView, StatusStruct>();
+        readerErrorCounter = new HashMap<JHVJP2View, Integer>();
+        zoomController = new ZoomController();
+        selectedOutputFormat = new MOVFilter();
+        viewChangedSemaphore = new Semaphore(1);
+        exportSuccessful = false;
+        savedDoubleBufferinOption = J2KRenderGlobalOptions.getDoubleBufferingOption();
+        linkedMovieManagerInstance = -1;
+        currentFrame = 0;
+        exportFinished = false;
+        updatingImageHeight = false;
+        updatingImageWidth = false;
+        updatingTotalHeight = false;
+        enableState = new HashMap<JComponent, Boolean>();
 
         LayeredView layeredView = ImageViewerGui.getSingletonInstance().getMainView().getAdapter(LayeredView.class);
         if (layeredView.getNumberOfVisibleLayer() == 0) {
             Message.err("No visible layers!", "There are no visible layers loaded which can be exported", false);
-            SwingUtilities.invokeLater(new Runnable() {
-                @Override
-                public void run() {
-                    dispose();
-                }
-            });
+            release();
+            return;
         } else {
             Log.debug(">> ExportMovieDialog() > Pause movies");
             for (int i = 0; i < layeredView.getNumLayers(); i++) {
@@ -247,323 +535,142 @@ public class ExportMovieDialog extends JDialog implements ChangeListener, Action
                     movieView.pauseMovie();
                 }
             }
-
-            Log.debug(">> ExportMovieDialog() > Start initializing GUI");
-            addWindowListener(new WindowAdapter() {
-                @Override
-                public void windowClosing(WindowEvent e) {
-                    exportFinished = true;
-                    finish();
-                }
-            });
-
-            setLayout(new BorderLayout());
-            setResizable(false);
-
-            // Parameters
-
-            JPanel parameterPanel = new JPanel(new GridBagLayout());
-            parameterPanel.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
-            parameterPanel.setComponentOrientation(ComponentOrientation.RIGHT_TO_LEFT);
-            GridBagConstraints c = new GridBagConstraints();
-            c.fill = GridBagConstraints.HORIZONTAL;
-            c.insets = new Insets(2, 2, 2, 2);
-
-            // Target File
-            // c.weightx = 1.0;
-
-            txtTargetFile = new String(JHVDirectory.EXPORTS.getPath() + "JHV_movie_created_");
-
-            SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd_HH.mm.ss");
-            txtTargetFile += dateFormat.format(new Date());
-            txtTargetFile += selectedOutputFormat.getExtension();
-
-            // Viewchain
-
-            // Copy main view chain
-
-            Log.debug(">> ExportMovieDialog() > Create preview viewchain");
-
-            ViewchainFactory viewChainFactory;
-            ComponentView componentView;
-            GLComponentView mainComponentView = (GLComponentView) ImageViewerGui.getSingletonInstance().getMainView();
-            if (mainComponentView instanceof GLComponentView) {
-                mainComponentView.stopAnimation();
-            }
-            if (!Boolean.parseBoolean(Settings.getSingletonInstance().getProperty(SOFTWARE_MODUS_SETTING)) && GLInfo.glIsUsable()) {
-                Log.info("Export movie rendering modus: OpenGL");
-                // Create view chain factory
-                viewChainFactory = new ViewchainFactory(new GLViewFactory());
-                componentView = glComponentView = (GLComponentView) viewChainFactory.createViewchainMain(mainComponentView, true);
-            } else {
-                Log.info("Export movie rendering modus: Software");
-                viewChainFactory = new ViewchainFactory(true);
-                componentView = viewChainFactory.createViewchainMain(mainComponentView, true);
-            }
-
-            Log.debug(">> ExportMovieDialog() > Delete invisible layers from preview view chain");
-            // Delete invisible layers
-            LayeredView mainLayeredView = ImageViewerGui.getSingletonInstance().getMainView().getAdapter(LayeredView.class);
-            LayeredView exportLayeredView = componentView.getAdapter(LayeredView.class);
-
-            for (int i = mainLayeredView.getNumLayers() - 1; i >= 0; i--) {
-                if (!mainLayeredView.isVisible(mainLayeredView.getLayer(i))) {
-                    exportLayeredView.removeLayer(i);
-                }
-            }
-
-            // Remember and change parent views of all JP2Images
-            Log.debug(">> ExportMovieDialog() > Relink jp2 images to preview view chain");
-
-            jp2ImageOriginalParents = new LinkedList<JP2ImageOriginalParent>();
-
-            for (int i = 0; i < exportLayeredView.getNumLayers(); i++) {
-                JHVJP2View jp2View = exportLayeredView.getLayer(i).getAdapter(JHVJP2View.class);
-                if (jp2View != null) {
-                    JP2Image jp2Image = jp2View.getJP2Image();
-                    jp2ImageOriginalParents.add(new JP2ImageOriginalParent(jp2Image, jp2Image.getParentView()));
-                    jp2Image.setParentView(jp2View);
-                }
-            }
-            this.topmostView = componentView.getView();
-
-            // Layer selection and zoom 1:1 / zoom to fit
-
-            JPanel zoomPanel = new JPanel();
-
-            layerSelection = new JComboBox();
-            for (int i = 0; i < exportLayeredView.getNumLayers(); ++i) {
-                layerSelection.addItem(exportLayeredView.getLayer(i).getAdapter(JHVJP2View.class).getName());
-            }
-            zoom1to1 = new JButton("Zoom 1:1");
-            zoomFit = new JButton("Zoom to Fit");
-            zoomSpinner = new JSpinner(new SpinnerNumberModel(new Double(1), new Double(0.01), null, new Double(0.01f)));
-            JSpinner.NumberEditor editor = new JSpinner.NumberEditor(zoomSpinner, "0%");
-            zoomSpinner.setEditor(editor);
-            zoom1to1.addActionListener(this);
-            zoomFit.addActionListener(this);
-            zoomSpinner.addChangeListener(this);
-            zoomSpinner.addMouseWheelListener(this);
-            layerSelection.addActionListener(this);
-            guiElements.add(zoomSpinner);
-            guiElements.add(layerSelection);
-            guiElements.add(zoom1to1);
-            guiElements.add(zoomFit);
-
-            c.gridy = 1;
-            c.gridwidth = 1;
-            c.weightx = 0;
-            parameterPanel.add(zoom1to1, c);
-            parameterPanel.add(zoomFit, c);
-            c.gridwidth = 2;
-            zoomPanel.setLayout(new BoxLayout(zoomPanel, BoxLayout.X_AXIS));
-            zoomPanel.add(new JLabel("Zoom:   "));
-            zoomPanel.add(zoomSpinner);
-            zoomPanel.add(new JLabel("  of Layer"));
-            parameterPanel.add(layerSelection, c);
-            c.gridwidth = 1;
-            c.weightx = 1;
-            parameterPanel.add(new JLabel(" "), c);
-            c.weightx = 0;
-            parameterPanel.add(zoomPanel, c);
-            // Image Panel
-            Log.debug(">> ExportMovieDialog() > Create preview image panel");
-            JPanel imagePanelContainer = new JPanel(new FlowLayout(FlowLayout.CENTER, 0, 0));
             imagePanel = new MainImagePanel();
-            imagePanel.setUpdateViewportView(false);
+            imagePanel.setLoading(false);
             imagePanel.setAutoscrolls(true);
             imagePanel.setFocusable(false);
+            imagePanel.setUpdateViewportView(false);
             imagePanel.setPreferredSize(new Dimension(PANEL_WIDTH, PANEL_HEIGHT));
+            imagePanel.setSize(new Dimension(PANEL_WIDTH, PANEL_HEIGHT));
             MainImagePanelMousePanController mainImagePanelMousePanController = new MainImagePanelMousePanController();
             imagePanel.setInputController(mainImagePanelMousePanController);
-            imagePanel.setLoading(false);
-            imagePanelContainer.add(imagePanel);
-            imagePanel.setView(componentView);
             imagePanel.removeMouseWheelListener(mainImagePanelMousePanController);
-            imagePanel.addMouseWheelListener(this);
-            c.gridy++;
-            c.weightx = 0;
-            c.gridwidth = 2;
-            c.gridheight = 8;
-            parameterPanel.add(imagePanelContainer, c);
-
-            c.gridheight = 1;
-
-            // Image dimensions
-            c.gridwidth = 2;
-
-            aspectRatioSelection = new JComboBox(aspectRatioPresets);
-            aspectRatioSelection.addActionListener(this);
-            parameterPanel.add(aspectRatioSelection, c);
-            c.gridwidth = 1;
-            parameterPanel.add(new JLabel(), c);
-            parameterPanel.add(new JLabel("Aspect ratio:"), c);
-            guiElements.add(aspectRatioSelection);
-
-            // Image Width
-            c.gridy++;
-            c.gridwidth = 2;
-            txtImageWidth = new JFormattedTextField(new Integer(640));
-            txtImageWidth.getDocument().addDocumentListener(this);
-            txtImageWidth.addActionListener(this);
-            ((NumberFormat) ((NumberFormatter) txtImageWidth.getFormatter()).getFormat()).setGroupingUsed(false);
-            parameterPanel.add(txtImageWidth, c);
-            c.gridwidth = 1;
-            c.weightx = 1;
-            parameterPanel.add(new JLabel(), c);
-            c.weightx = 0;
-            parameterPanel.add(new JLabel("Image Width:"), c);
-            guiElements.add(txtImageWidth);
-
-            // Image Height
-            c.gridy++;
-            txtImageHeight = new JFormattedTextField(new Integer(640));
-            txtImageHeight.getDocument().addDocumentListener(this);
-            txtImageHeight.addActionListener(this);
-            ((NumberFormat) ((NumberFormatter) txtImageHeight.getFormatter()).getFormat()).setGroupingUsed(false);
-            c.gridwidth = 2;
-            parameterPanel.add(txtImageHeight, c);
-            c.gridwidth = 1;
-            c.weightx = 1;
-            parameterPanel.add(new JLabel(), c);
-            c.weightx = 0;
-            parameterPanel.add(new JLabel("Image Height:"), c);
-            guiElements.add(txtImageHeight);
-
-            // Total height
-            c.gridy++;
-            txtTotalHeight = new JFormattedTextField(new Integer(640));
-            txtTotalHeight.setEnabled(false);
-            txtTotalHeight.getDocument().addDocumentListener(this);
-            txtTotalHeight.addActionListener(this);
-            ((NumberFormat) ((NumberFormatter) txtTotalHeight.getFormatter()).getFormat()).setGroupingUsed(false);
-            c.gridwidth = 2;
-            parameterPanel.add(txtTotalHeight, c);
-            c.gridwidth = 1;
-            c.weightx = 1;
-            parameterPanel.add(new JLabel(), c);
-            c.weightx = 0;
-            parameterPanel.add(new JLabel("Total Height With Subtitles:"), c);
-            guiElements.add(txtTotalHeight);
-
-            // Speed
-            c.gridy++;
-            c.gridwidth = 2;
-            speedSpinner = new JSpinner(new SpinnerNumberModel(20, 1, 99, 1));
-            speedSpinner.addMouseWheelListener(this);
-            parameterPanel.add(speedSpinner, c);
-            c.gridwidth = 1;
-            c.weightx = 1;
-            parameterPanel.add(new JLabel(), c);
-            c.weightx = 0;
-            parameterPanel.add(new JLabel("Speed (fps):"), c);
-            guiElements.add(speedSpinner);
-
-            c.gridy++;
-            parameterPanel.add(new JLabel(" "), c);
-
-            Log.debug(">> ExportMovieDialog() > Set initial region and zoom of preview");
-
-            MetaData metaData = imagePanel.getView().getAdapter(MetaDataView.class).getMetaData();
-            Region initialRegion = ViewHelper.cropInnerRegionToOuterRegion(metaData.getPhysicalRegion(), ImageViewerGui.getSingletonInstance().getMainView().getAdapter(RegionView.class).getRegion());
-            initialRegion = ViewHelper.contractRegionToViewportAspectRatio(imagePanel.getViewport(), initialRegion, metaData);
-            imagePanel.getView().getAdapter(RegionView.class).setRegion(initialRegion, new ChangeEvent());
-
-            zoomController.setImagePanel(imagePanel);
-
-            // Load First = Load all data via JPIP before exporting
-            c.gridy++;
-            c.gridwidth = 4;
-            loadFirstCheckBox = new JCheckBox("Download full quality before export", false);
-            parameterPanel.add(loadFirstCheckBox, c);
-            guiElements.add(loadFirstCheckBox);
-
-            // Use differential rotation tracking
-            c.gridy++;
-            c.gridwidth = 6;
-            StandardSolarRotationTrackingView trackingView = ImageViewerGui.getSingletonInstance().getMainView().getAdapter(StandardSolarRotationTrackingView.class);
-            useDifferentialRotationTracking = new JCheckBox("Use differential rotation tracking", trackingView != null && trackingView.getEnabled());
-            parameterPanel.add(useDifferentialRotationTracking, c);
-            guiElements.add(useDifferentialRotationTracking);
-
-            // Soft subtitle
-            c.gridy++;
-            c.gridx = 0;
-            c.gridwidth = 6;
-            embedSoftSubtitle = new JCheckBox("Embed soft subtitle (can be turned on and off during playback)", true);
-            parameterPanel.add(embedSoftSubtitle, c);
-            guiElements.add(embedSoftSubtitle);
-
-            // Hard subtitle
-            c.gridy++;
-            c.gridx = 0;
-            c.gridwidth = 6;
-            embedHardSubtitle = new JCheckBox("Embed hard subtitle (can NOT be turned on and off during playback)", false);
-            embedHardSubtitle.addActionListener(this);
-            parameterPanel.add(embedHardSubtitle, c);
-            c.gridy++;
-            c.gridx = 0;
-            c.gridwidth = 6;
-            embedHardSubtitleAspectRatio = new JCheckBox("Use total movie height instead of image height for aspect ratio", false);
-            embedHardSubtitleAspectRatio.setEnabled(false);
-            embedHardSubtitleAspectRatio.addActionListener(this);
-            guiElements.add(embedHardSubtitle);
-            guiElements.add(embedHardSubtitleAspectRatio);
-
-            parameterPanel.add(embedHardSubtitleAspectRatio, c);
-
-            // Stretch
-            c.gridy++;
-            c.weighty = 1.0;
-            parameterPanel.add(Box.createVerticalGlue(), c);
-
-            // Buttons
-            JPanel buttonPane = new JPanel();
-            buttonPane.setLayout(new BoxLayout(buttonPane, BoxLayout.LINE_AXIS));
-
-            cmdExport = new JButton("Export");
-            cmdExport.addActionListener(this);
-            guiElements.add(cmdExport);
-
-            cmdCancel = new JButton("Cancel");
-            cmdCancel.addActionListener(this);
-            guiElements.add(cmdCancel);
-
-            buttonPane.add(Box.createHorizontalGlue());
-
-            // Order depends on operation system
-            if (System.getProperty("os.name").toUpperCase().contains("WIN")) {
-                buttonPane.add(cmdExport);
-                buttonPane.add(cmdCancel);
-            } else {
-                buttonPane.add(cmdCancel);
-                buttonPane.add(cmdExport);
-            }
-
-            c.gridy++;
-            parameterPanel.add(buttonPane, c);
-
-            add(parameterPanel);
-            enableState = new HashMap<JComponent, Boolean>();
-
-            // Progressbar
-            progressBar = new JProgressBar(JProgressBar.HORIZONTAL, 0, 100);
-            add(progressBar, BorderLayout.SOUTH);
+            imagePanel.setBackgroundImage(IconBank.getImage(JHVIcon.LOADING_BIG).getScaledInstance(PANEL_WIDTH, PANEL_HEIGHT, java.awt.Image.SCALE_SMOOTH));
+            imagePanel.setBackground(Color.BLACK);
+            imagePanelContainer.removeAll();
+            imagePanelContainer.add(imagePanel);
             Log.debug(">> ExportMovieDialog() > Disable GUI until init is finished");
+            progressBar.setValue(0);
             disableGUI();
             initThread = new Thread(new Runnable() {
                 @Override
                 public void run() {
+                    Region initialRegion = initAndGetInitialRegion();
                     initViewchain();
-                    Log.debug(">> ExportMovieDialog() > Viewchain initialization is finished");
-                    loadExportSettings();
-                    zoomSpinner.setValue(getCurrentZoom());
-                    Log.debug(">> ExportMovieDialog() > Settings loaded");
-                    enableGUI();
+                    Log.debug(">> ExportMovieDialog() > Viewchain initialization is finished. Loading settings");
+                    try {
+                        SwingUtilities.invokeAndWait(new Runnable() {
+                            @Override
+                            public void run() {
+                                setGuiBeforeExport();
+                                loadExportSettings();
+                            }
+                        });
+                    } catch (Throwable t) {
+                        Log.error(">> ExportMovieDialog() > Could not load settings!");
+                        Message.err("Movie export", "Error initializing movie export dialog.\nPlease consult the log files for more information.", false);
+                    }
+                    Log.debug(">> ExportMovieDialog() > Settings loaded. Set inital region.");
+                    imagePanel.getView().getAdapter(RegionView.class).setRegion(initialRegion, new ChangeEvent());
+                    try {
+                        SwingUtilities.invokeAndWait(new Runnable() {
+                            @Override
+                            public void run() {
+                                zoomSpinner.setValue(getCurrentZoom());
+                                Log.debug(">> ExportMovieDialog() > Region is set. Enable GUI.");
+                                enableGUI();
+                            }
+                        });
+                    } catch (Throwable e) {
+                        Log.error(">> ExportMovieDialog() > Error initializing dialog. ", e);
+                        release();
+                        return;
+                    }
                 }
             }, "InitMovieExport");
+
             initThread.start();
         }
+    }
+
+    private Region initAndGetInitialRegion() {
+        txtTargetFile = new String(JHVDirectory.EXPORTS.getPath() + "JHV_movie_created_");
+
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd_HH.mm.ss");
+        txtTargetFile += dateFormat.format(new Date());
+        txtTargetFile += selectedOutputFormat.getExtension();
+
+        // Viewchain
+
+        // Copy main view chain
+
+        Log.debug(">> ExportMovieDialog() > Create preview viewchain");
+
+        ViewchainFactory viewChainFactory;
+        ComponentView componentView;
+        ComponentView mainComponentView = ImageViewerGui.getSingletonInstance().getMainView();
+        if (mainComponentView instanceof GLComponentView) {
+            ((GLComponentView) mainComponentView).stopAnimation();
+        }
+        if (!Boolean.parseBoolean(Settings.getSingletonInstance().getProperty(SOFTWARE_MODUS_SETTING)) && GLInfo.glIsUsable()) {
+            Log.info("Export movie rendering modus: OpenGL");
+            // Create view chain factory
+            viewChainFactory = new ViewchainFactory(new GLViewFactory());
+            componentView = glComponentView = (GLComponentView) viewChainFactory.createViewchainMain(mainComponentView, true);
+            glComponentView.useOffscreenRendering();
+        } else {
+            Log.info("Export movie rendering modus: Software");
+            viewChainFactory = new ViewchainFactory(true);
+            componentView = viewChainFactory.createViewchainMain(mainComponentView, true);
+        }
+
+        Log.debug(">> ExportMovieDialog() > Delete invisible layers from preview view chain");
+        // Delete invisible layers
+        LayeredView mainLayeredView = ImageViewerGui.getSingletonInstance().getMainView().getAdapter(LayeredView.class);
+        LayeredView exportLayeredView = componentView.getAdapter(LayeredView.class);
+
+        for (int i = mainLayeredView.getNumLayers() - 1; i >= 0; i--) {
+            if (!mainLayeredView.isVisible(mainLayeredView.getLayer(i))) {
+                exportLayeredView.removeLayer(i);
+            }
+        }
+
+        // Remember and change parent views of all JP2Images
+        Log.debug(">> ExportMovieDialog() > Relink jp2 images to preview view chain");
+
+        jp2ImageOriginalParents = new LinkedList<JP2ImageOriginalParent>();
+
+        for (int i = 0; i < exportLayeredView.getNumLayers(); i++) {
+            JHVJP2View jp2View = exportLayeredView.getLayer(i).getAdapter(JHVJP2View.class);
+            if (jp2View != null) {
+                JP2Image jp2Image = jp2View.getJP2Image();
+                jp2ImageOriginalParents.add(new JP2ImageOriginalParent(jp2Image, jp2Image.getParentView()));
+                jp2Image.setParentView(jp2View);
+            }
+        }
+        this.topmostView = componentView.getView();
+        numLayers = topmostView.getAdapter(LayeredView.class).getNumberOfVisibleLayer();
+
+        // Layer selection and zoom 1:1 / zoom to fit
+
+        layerSelection.removeAllItems();
+        for (int i = 0; i < exportLayeredView.getNumLayers(); ++i) {
+            layerSelection.addItem(exportLayeredView.getLayer(i).getAdapter(JHVJP2View.class).getName());
+        }
+        imagePanel.setBackgroundImage(null);
+        imagePanel.setView(componentView);
+        imagePanel.addMouseWheelListener(this);
+        pack();
+
+        Log.debug(">> ExportMovieDialog() > Set initial region and zoom of preview");
+
+        MetaData metaData = imagePanel.getView().getAdapter(MetaDataView.class).getMetaData();
+        Region initialRegion_ = ViewHelper.cropInnerRegionToOuterRegion(metaData.getPhysicalRegion(), ImageViewerGui.getSingletonInstance().getMainView().getAdapter(RegionView.class).getRegion());
+        Region initialRegion = ViewHelper.contractRegionToViewportAspectRatio(imagePanel.getViewport(), initialRegion_, metaData);
+
+        zoomController.setImagePanel(imagePanel);
+
+        return initialRegion;
     }
 
     private void disableGUI() {
@@ -601,7 +708,7 @@ public class ExportMovieDialog extends JDialog implements ChangeListener, Action
 
         try {
             val = settings.getProperty(SETTING_RATIO);
-            if (val != null && !val.isEmpty()) {
+            if (val != null && !(val.length() == 0)) {
                 int width, height;
                 if (val.equals("Custom")) {
                     width = height = 0;
@@ -623,7 +730,7 @@ public class ExportMovieDialog extends JDialog implements ChangeListener, Action
 
         try {
             val = settings.getProperty(SETTING_SPEED);
-            if (val != null && !val.isEmpty()) {
+            if (val != null && !(val.length() == 0)) {
                 speedSpinner.setValue(Integer.parseInt(val));
             }
         } catch (Throwable t) {
@@ -632,7 +739,7 @@ public class ExportMovieDialog extends JDialog implements ChangeListener, Action
 
         try {
             val = settings.getProperty(SETTING_FULL_QUALITY);
-            if (val != null && !val.isEmpty()) {
+            if (val != null && !(val.length() == 0)) {
                 loadFirstCheckBox.setSelected(Boolean.parseBoolean(val));
             }
         } catch (Throwable t) {
@@ -641,7 +748,7 @@ public class ExportMovieDialog extends JDialog implements ChangeListener, Action
 
         try {
             val = settings.getProperty(SETTING_TRACKING);
-            if (val != null && !val.isEmpty()) {
+            if (val != null && !(val.length() == 0)) {
                 useDifferentialRotationTracking.setSelected(Boolean.parseBoolean(val));
             }
         } catch (Throwable t) {
@@ -650,7 +757,7 @@ public class ExportMovieDialog extends JDialog implements ChangeListener, Action
 
         try {
             val = settings.getProperty(SETTING_SOFT_SBTL);
-            if (val != null && !val.isEmpty()) {
+            if (val != null && !(val.length() == 0)) {
                 embedSoftSubtitle.setSelected(Boolean.parseBoolean(val));
             }
         } catch (Throwable t) {
@@ -659,11 +766,14 @@ public class ExportMovieDialog extends JDialog implements ChangeListener, Action
 
         try {
             val = settings.getProperty(SETTING_HARD_SBTL);
-            if (val != null && !val.isEmpty()) {
+            if (val != null && !(val.length() == 0)) {
                 embedHardSubtitle.setSelected(Boolean.parseBoolean(val));
                 if (embedHardSubtitle.isSelected()) {
-                    embedHardSubtitleAspectRatio.setEnabled(true);
-                    txtTotalHeight.setEnabled(true);
+                    enableState.put(embedHardSubtitleAspectRatio, true);
+                    enableState.put(txtTotalHeight, true);
+                } else {
+                    enableState.put(embedHardSubtitleAspectRatio, false);
+                    enableState.put(txtTotalHeight, false);
                 }
             }
         } catch (Throwable t) {
@@ -672,7 +782,7 @@ public class ExportMovieDialog extends JDialog implements ChangeListener, Action
 
         try {
             val = settings.getProperty(SETTING_HARD_SBTL_RATIO);
-            if (val != null && !val.isEmpty()) {
+            if (val != null && !(val.length() == 0)) {
                 embedHardSubtitleAspectRatio.setSelected(Boolean.parseBoolean(val));
             }
         } catch (Throwable t) {
@@ -681,7 +791,7 @@ public class ExportMovieDialog extends JDialog implements ChangeListener, Action
 
         try {
             val = settings.getProperty(SETTING_IMG_HEIGHT);
-            if (val != null && !val.isEmpty()) {
+            if (val != null && !(val.length() == 0)) {
                 txtImageHeight.setValue(Math.round(Float.parseFloat(val)));
             }
         } catch (Throwable t) {
@@ -690,7 +800,7 @@ public class ExportMovieDialog extends JDialog implements ChangeListener, Action
 
         try {
             val = settings.getProperty(SETTING_TOTAL_HEIGHT);
-            if (val != null && !val.isEmpty()) {
+            if (val != null && !(val.length() == 0)) {
                 txtTotalHeight.setValue(Math.round(Float.parseFloat(val)));
             }
         } catch (Throwable t) {
@@ -699,26 +809,8 @@ public class ExportMovieDialog extends JDialog implements ChangeListener, Action
 
         try {
             val = settings.getProperty(SETTING_IMG_WIDTH);
-            if (val != null && !val.isEmpty()) {
+            if (val != null && !(val.length() == 0)) {
                 txtImageWidth.setValue(Math.round(Float.parseFloat(val)));
-            }
-        } catch (Throwable t) {
-            Log.error(t);
-        }
-
-        try {
-            val = settings.getProperty(SETTING_TILE_WIDTH);
-            if (val != null && !val.isEmpty()) {
-                tileWidth = Math.round(Float.parseFloat(val));
-            }
-        } catch (Throwable t) {
-            Log.error(t);
-        }
-
-        try {
-            val = settings.getProperty(SETTING_TILE_HEIGHT);
-            if (val != null && !val.isEmpty()) {
-                tileHeight = Math.round(Float.parseFloat(val));
             }
         } catch (Throwable t) {
             Log.error(t);
@@ -818,14 +910,15 @@ public class ExportMovieDialog extends JDialog implements ChangeListener, Action
             // Cancel export if running, close dialog in any case
         } else if (e.getSource() == cmdCancel) {
             exportFinished = true;
-            Thread t = new Thread(new Runnable() {
-
+            if (topmostView != null) {
+                topmostView.removeViewListener(this);
+            }
+            new Thread() {
                 @Override
                 public void run() {
-                    finish();
+                    release();
                 }
-            }, "exportFinished thread");
-            t.start();
+            }.start();
         } else if (e.getSource() == aspectRatioSelection) {
             AspectRatio aspectRatio = (AspectRatio) aspectRatioSelection.getSelectedItem();
             if (aspectRatio.getWidth() != 0) {
@@ -839,10 +932,10 @@ public class ExportMovieDialog extends JDialog implements ChangeListener, Action
             if (embedHardSubtitle.isSelected()) {
                 txtImageHeight.setValue(txtImageHeight.getValue());
             }
-        } else if (e.getSource() == zoom1to1 && topmostView.getAdapter(LayeredView.class).getLayer(layerSelection.getSelectedIndex()) != null) {
+        } else if (e.getSource() == zoom1to1) {
             zoomController.zoom1to1(topmostView, topmostView.getAdapter(LayeredView.class).getLayer(layerSelection.getSelectedIndex()), StaticViewport.createAdaptedViewport((Integer) txtImageWidth.getValue(), (Integer) txtImageHeight.getValue()));
             zoomSpinner.setValue(1.0);
-        } else if (e.getSource() == zoomFit && topmostView.getAdapter(LayeredView.class).getLayer(layerSelection.getSelectedIndex()) != null) {
+        } else if (e.getSource() == zoomFit) {
             zoomController.zoomFit(topmostView.getAdapter(LayeredView.class).getLayer(layerSelection.getSelectedIndex()).getAdapter(MetaDataView.class), topmostView.getAdapter(RegionView.class));
             zoomSpinner.setValue(getCurrentZoom());
         } else if (e.getSource() == layerSelection) {
@@ -855,7 +948,7 @@ public class ExportMovieDialog extends JDialog implements ChangeListener, Action
      */
     @Override
     public void stateChanged(javax.swing.event.ChangeEvent e) {
-        if (e.getSource() == zoomSpinner) {
+        if (e.getSource() == zoomSpinner && zoomController != null && topmostView != null) {
             double zoomSpinnerValue = (Double) zoomSpinner.getValue();
             zoomController.zoom(topmostView, zoomSpinnerValue / getCurrentZoom());
         }
@@ -884,21 +977,17 @@ public class ExportMovieDialog extends JDialog implements ChangeListener, Action
 
     }
 
-    // Little Hack in order to avoid cyclic updating in updateViewport()
-    // of the text fields.
-    // Otherwise one gets an illegal state exception
-    private boolean updatingImageHeight = false;
-    private boolean updatingImageWidth = false;
-    private boolean updatingTotalHeight = false;
-
     /**
      * Update viewport after text fields (width, height, total height) have
      * changed
-     * 
+     *
      * @param document
      *            The Document object corresponding to the text field
      */
     private synchronized void updateViewport(Document document) {
+        if (topmostView == null || zoomController == null) {
+            return;
+        }
         calculateViewport(document);
         int width = (Integer) txtImageWidth.getValue();
         int height = (Integer) txtImageHeight.getValue();
@@ -907,7 +996,22 @@ public class ExportMovieDialog extends JDialog implements ChangeListener, Action
         } else {
             topmostView.getAdapter(ViewportView.class).setViewport(StaticViewport.createAdaptedViewport((int) Math.round((double) imagePanel.getView().getComponent().getWidth() * width / height), imagePanel.getView().getComponent().getHeight()), new ChangeEvent());
         }
-        zoomSpinner.setValue(getCurrentZoom());
+        double currentZoom = getCurrentZoom();
+        zoomSpinner.setValue(currentZoom);
+    }
+
+    private int calculateHardSubtitleHeight(int width, int height) {
+        return Math.min(width, height) / hardSubtitleFactor;
+    }
+
+    private int calculateHardSubtitleHeight2(int width, int totalHeight) {
+        totalHeight -= hardSubtitleBorder;
+        return Math.min(totalHeight / (hardSubtitleFactor + numLayers), width / hardSubtitleFactor);
+    }
+
+    private int calculateHardSubtitleHeight3(int totalHeight, AspectRatio aspectRatio) {
+        totalHeight -= hardSubtitleBorder;
+        return Math.min(totalHeight * aspectRatio.getWidth() / (hardSubtitleFactor * aspectRatio.getHeight() + numLayers * aspectRatio.getWidth()), totalHeight / (hardSubtitleFactor + numLayers));
     }
 
     private synchronized void calculateViewport(Document document) {
@@ -937,8 +1041,8 @@ public class ExportMovieDialog extends JDialog implements ChangeListener, Action
             if (aspectRatio.getWidth() != 0) {
                 if (embedHardSubtitle.isSelected() && embedHardSubtitleAspectRatio.isSelected()) {
                     if (!updatingTotalHeight) {
-                        double factor = 1.0 / (1.0 - aspectRatio.getWidth() * Math.log(1 + topmostView.getAdapter(LayeredView.class).getNumberOfVisibleLayer()) / aspectRatio.getHeight() / hardSubtitleFontSizeFactor);
-                        txtTotalHeight.setValue((int) Math.floor(factor * height));
+                        int subtitleHeight = numLayers * calculateHardSubtitleHeight(width, height);
+                        txtTotalHeight.setValue(height + subtitleHeight + hardSubtitleBorder);
                     }
                 } else {
                     width = (int) Math.floor((double) height / aspectRatio.height * aspectRatio.width);
@@ -946,40 +1050,45 @@ public class ExportMovieDialog extends JDialog implements ChangeListener, Action
                         txtImageWidth.setValue(width);
                     }
                     if (!updatingTotalHeight) {
-                        int totalHeight = (int) ((Integer) txtImageHeight.getValue() + (Integer) txtImageWidth.getValue() * Math.log(1 + topmostView.getAdapter(LayeredView.class).getNumberOfVisibleLayer()) / hardSubtitleFontSizeFactor);
+                        int subtitleHeight = numLayers * calculateHardSubtitleHeight(width, height);
+                        int totalHeight = (Integer) txtImageHeight.getValue() + subtitleHeight + hardSubtitleBorder;
                         txtTotalHeight.setValue(totalHeight);
                     }
                 }
             } else {
                 if (!updatingTotalHeight) {
-                    int totalHeight = (int) ((Integer) txtImageHeight.getValue() + (Integer) txtImageWidth.getValue() * Math.log(1 + topmostView.getAdapter(LayeredView.class).getNumberOfVisibleLayer()) / hardSubtitleFontSizeFactor);
+                    int subtitleHeight = numLayers * calculateHardSubtitleHeight(width, height);
+                    int totalHeight = (Integer) txtImageHeight.getValue() + subtitleHeight + hardSubtitleBorder;
                     txtTotalHeight.setValue(totalHeight);
                 }
             }
             updatingImageHeight = false;
         } else if (document == txtTotalHeight.getDocument()) {
             updatingTotalHeight = true;
+            int totalHeight = (Integer) txtTotalHeight.getValue();
             if (embedHardSubtitle.isSelected()) {
                 AspectRatio aspectRatio = (AspectRatio) aspectRatioSelection.getSelectedItem();
                 if (aspectRatio.getWidth() != 0 && embedHardSubtitleAspectRatio.isSelected()) {
-                    int width = (int) Math.floor((Integer) txtTotalHeight.getValue() / (double) aspectRatio.height * aspectRatio.width);
+                    int width = (int) Math.floor(totalHeight / (double) aspectRatio.height * aspectRatio.width);
                     if (!updatingImageWidth) {
                         txtImageWidth.setValue(width);
                     }
                     if (!updatingImageHeight) {
-                        int height = (int) Math.ceil(((Integer) txtTotalHeight.getValue()) - (Integer) txtImageWidth.getValue() * Math.log(1 + topmostView.getAdapter(LayeredView.class).getNumberOfVisibleLayer()) / hardSubtitleFontSizeFactor);
+                        int subtitleHeight = numLayers * calculateHardSubtitleHeight2(width, totalHeight);
+                        int height = totalHeight - subtitleHeight - hardSubtitleBorder;
                         txtImageHeight.setValue(height);
                     }
                 } else {
                     if (aspectRatio.getWidth() == 0) {
                         if (!updatingImageHeight) {
-                            int height = (int) Math.ceil(((Integer) txtTotalHeight.getValue()) - (Integer) txtImageWidth.getValue() * Math.log(1 + topmostView.getAdapter(LayeredView.class).getNumberOfVisibleLayer()) / hardSubtitleFontSizeFactor);
+                            int subtitleHeight = numLayers * calculateHardSubtitleHeight2((Integer) txtImageWidth.getValue(), totalHeight);
+                            int height = totalHeight - subtitleHeight - hardSubtitleBorder;
                             txtImageHeight.setValue(height);
                         }
                     } else {
                         if (!updatingImageHeight) {
-                            double factor = 1.0 / (1.0 + aspectRatio.getWidth() * Math.log(1 + topmostView.getAdapter(LayeredView.class).getNumberOfVisibleLayer()) / aspectRatio.getHeight() / hardSubtitleFontSizeFactor);
-                            txtImageHeight.setValue((int) Math.ceil(factor * (Integer) txtTotalHeight.getValue()));
+                            int height = totalHeight - numLayers * calculateHardSubtitleHeight3(totalHeight, aspectRatio) - hardSubtitleBorder;
+                            txtImageHeight.setValue(height);
                         }
                     }
                 }
@@ -1001,7 +1110,6 @@ public class ExportMovieDialog extends JDialog implements ChangeListener, Action
                 if (topmostView == null || exportFinished || !initializationDone) {
                     return;
                 }
-
                 if (aEvent.reasonOccurred(ReaderErrorReason.class)) {
                     ReaderErrorReason errorReason = aEvent.getLastChangedReasonByType(ReaderErrorReason.class);
                     if (readerErrorCounter.containsKey(errorReason.getJHVJP2View())) {
@@ -1076,24 +1184,25 @@ public class ExportMovieDialog extends JDialog implements ChangeListener, Action
                 }
 
                 // Convert to RGB image
-                int hardSubtitleOffsetY = input.getHeight();
-                int hardSubtitleOffsetX = 5;
 
                 int totalHeight = embedHardSubtitle.isSelected() ? (Integer) txtTotalHeight.getValue() : input.getHeight();
                 if (output == null || output.getWidth() != input.getWidth() || output.getHeight() != totalHeight) {
                     output = new BufferedImage(input.getWidth(), totalHeight, BufferedImage.TYPE_3BYTE_BGR);
                 }
 
-                // Fill background with black color (in case the frame has
-                // opaque areas)
-
                 Graphics2D g = output.createGraphics();
                 g.setColor(Color.BLACK);
                 g.fillRect(0, 0, output.getWidth(), output.getHeight());
                 g.drawImage(input, null, 0, 0);
-                int hardSubtitleFontSize = Math.max(1, (output.getHeight() - input.getHeight() - 5) / topmostView.getAdapter(LayeredView.class).getNumberOfVisibleLayer());
-                g.setFont(new Font("Arial", Font.BOLD, hardSubtitleFontSize));
+
+                int hardSubtitleOffsetY = input.getHeight();
+                int hardSubtitleOffsetX = hardSubtitleBorder / 2;
+                int hardSubtitleFontSize = calculateHardSubtitleHeight2(output.getWidth(), output.getHeight());
+                g.setFont(new Font("Arial", Font.PLAIN, hardSubtitleFontSize));
                 g.setColor(Color.WHITE);
+
+                input.flush();
+                input = null;
 
                 // Write subtitles
                 String frameNumberText = "{" + (currentFrame - 1) + "}{" + (currentFrame - 1) + "}";
@@ -1108,7 +1217,7 @@ public class ExportMovieDialog extends JDialog implements ChangeListener, Action
                     if (movieView != null) {
                         subText += " - " + subtitleFormatter.format(movieView.getCurrentFrameDateTime().getTime());
                     }
-                    if (embedSoftSubtitle.isSelected()) {
+                    if (doEmbedSoftSubtitles()) {
                         Writer writer = subtitleWriters.get(view);
                         try {
                             writer.append(frameNumberText + subText + System.getProperty("line.separator"));
@@ -1122,7 +1231,7 @@ public class ExportMovieDialog extends JDialog implements ChangeListener, Action
                         g.drawString(subText, hardSubtitleOffsetX, hardSubtitleOffsetY);
                     }
                 }
-                if (embedSoftSubtitle.isSelected()) {
+                if (doEmbedSoftSubtitles() && subtitleFiles.size() > 1) {
                     subtitleTextAll.replace(subtitleTextAll.length() - 1, subtitleTextAll.length(), System.getProperty("line.separator"));
                     try {
                         subtitleWriterAll.append(subtitleTextAll);
@@ -1130,27 +1239,42 @@ public class ExportMovieDialog extends JDialog implements ChangeListener, Action
                         Log.error("> ExportMovieDialog.viewChanged(View, ChangeEvent) >> Error writing to file: " + subtitleFileAll.getAbsolutePath(), e);
                     }
                 }
-                // Write the image to temporary file
-                try {
-                    File targetFile;
-                    if (selectedOutputFormat.useTempDirectoryForIntermediateImages()) {
-                        String frameNumber = Integer.toString(currentFrame);
-                        while (frameNumber.length() < 4) {
-                            frameNumber = "0" + frameNumber;
-                        }
-                        targetFile = new File(JHVDirectory.TEMP.getPath() + "frame" + frameNumber + selectedOutputFormat.getIntermediateExtension());
-                    } else {
-                        String frameNumber = Integer.toString(currentFrame);
-                        while (frameNumber.length() < 4) {
-                            frameNumber = "0" + frameNumber;
-                        }
-                        targetFile = new File(txtTargetFile.replace(selectedOutputFormat.getIntermediateExtension(), "_" + frameNumber + selectedOutputFormat.getIntermediateExtension()));
-                    }
-                    ImageIO.write(output, selectedOutputFormat.getIntermediateExtension().replace(".", ""), targetFile);
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
 
+                g.dispose();
+
+                // Write the image to temporary file
+                if (selectedOutputFormat.getIntermediateExtension().length() == 0) {
+                    try {
+                        ImageIO.write(output, "bmp", ffmpegStdin);
+                        ffmpegStdin.flush();
+                    } catch (IOException e) {
+                        Message.err("FFmpeg error", "Could not pass buffered image to ffmpeg. Movie export will be canceled.", false);
+                        Log.error(">> ExportMovieDialog > Could not pass buffered image to ffmpeg. Movie export will be canceled.", e);
+                        return;
+                    }
+                } else {
+                    try {
+                        File targetFile;
+                        if (selectedOutputFormat.useTempDirectoryForIntermediateImages()) {
+                            String frameNumber = Integer.toString(currentFrame);
+                            while (frameNumber.length() < 4) {
+                                frameNumber = "0" + frameNumber;
+                            }
+                            targetFile = new File(JHVDirectory.TEMP.getPath() + "frame" + frameNumber + selectedOutputFormat.getIntermediateExtension());
+                        } else {
+                            String frameNumber = Integer.toString(currentFrame);
+                            while (frameNumber.length() < 4) {
+                                frameNumber = "0" + frameNumber;
+                            }
+                            targetFile = new File(txtTargetFile.replace(selectedOutputFormat.getIntermediateExtension(), "_" + frameNumber + selectedOutputFormat.getIntermediateExtension()));
+                        }
+                        ImageIO.write(output, selectedOutputFormat.getIntermediateExtension().replace(".", ""), targetFile);
+                    } catch (IOException e) {
+                        Message.err("Export movie error", "Could not write buffered image to file. Movie export will be canceled.", false);
+                        Log.error(">> ExportMovieDialog > Could not write buffered image to file. Movie export will be canceled.", e);
+                        return;
+                    }
+                }
                 currentFrame++;
 
                 // If last frame is reached, merge temporary files to movie
@@ -1193,45 +1317,50 @@ public class ExportMovieDialog extends JDialog implements ChangeListener, Action
                                 e.printStackTrace();
                             }
 
-                            // MOVIE-File: Create Movie using FFmpeg
                         } else {
-
-                            // Build command for calling FFmpeg
-                            LinkedList<String> commandLineArgs = new LinkedList<String>();
-                            commandLineArgs.add("-s");
-                            commandLineArgs.add(txtImageWidth.getValue() + "x" + txtImageHeight.getValue());
-                            commandLineArgs.add("-sameq");
-                            commandLineArgs.add("-y");
-                            commandLineArgs.add("-r");
-                            commandLineArgs.add(speedSpinner.getValue().toString());
-                            commandLineArgs.add("-i");
-                            commandLineArgs.add(JHVDirectory.TEMP.getPath() + "frame%04d.bmp");
-                            commandLineArgs.add(txtTargetFile);
-
-                            // Run FFmpeg
+                            // MOVIE-File: Finish movie stream
+                            output.flush();
                             try {
-                                Process p = FileUtils.invokeExecutable("ffmpeg", commandLineArgs);
-                                FileUtils.logProcessOutput(p, "ffmpeg", Level.DEBUG, true);
-                                p.waitFor();
-                            } catch (IOException e) {
-                                e.printStackTrace();
-                            } catch (InterruptedException e) {
-                                e.printStackTrace();
+                                ffmpegStdin.flush();
+                                ffmpegStdin.close();
+                            } catch (IOException e1) {
+                                Log.error(">> ExportMovieDialog > Error closing FFmpeg stdin.", e1);
+                            } finally {
+                                ffmpegStdin = null;
                             }
+
+                            try {
+                                ffmpegProcess.waitFor();
+                            } catch (InterruptedException e1) {
+                                Log.error(">> ExportMovie > Interrupted while waiting for FFmpeg to finish.", e1);
+                                ffmpegProcess.destroy();
+                            }
+                            ffmpegProcess = null;
 
                             // Build command for MP4Box
 
+                            LinkedList<String> commandLineArgs = new LinkedList<String>();
                             if (FileUtils.isExecutableRegistered("mp4box")) {
-                                if (embedSoftSubtitle.isSelected()) {
+                                if (doEmbedSoftSubtitles()) {
                                     commandLineArgs.clear();
                                     commandLineArgs.add("-ipod");
                                     commandLineArgs.add("-tmp");
                                     commandLineArgs.add(new File(txtTargetFile).getParent());
                                     commandLineArgs.add("-fps");
                                     commandLineArgs.add(speedSpinner.getValue().toString());
-                                    commandLineArgs.add("-add");
-                                    commandLineArgs.add(subtitleFileAll.getAbsolutePath() + ":group=2:lang=en");
-                                    for (File ttxtFile : subtitleFiles.values()) {
+                                    File[] subFiles = new File[subtitleFiles.size()];
+                                    subFiles = subtitleFiles.values().toArray(subFiles);
+                                    int i = 0;
+                                    if (subFiles.length > 1) {
+                                        commandLineArgs.add("-add");
+                                        commandLineArgs.add(subtitleFileAll.getAbsolutePath() + ":group=2:lang=en");
+                                    } else if (i < subFiles.length) {
+                                        commandLineArgs.add("-add");
+                                        commandLineArgs.add(subFiles[i].getAbsolutePath() + ":group=2:lang=en");
+                                        ++i;
+                                    }
+                                    for (; i < subFiles.length; ++i) {
+                                        File ttxtFile = subFiles[i];
                                         if (ttxtFile != null && ttxtFile.exists()) {
                                             commandLineArgs.add("-add");
                                             commandLineArgs.add(ttxtFile.getAbsolutePath() + ":group=2:lang=en:disabled");
@@ -1257,6 +1386,7 @@ public class ExportMovieDialog extends JDialog implements ChangeListener, Action
                     }
 
                     exportFinished = true;
+                    exportSuccessful = true;
 
                     // Close dialog. This has to happen in a different thread,
                     // because
@@ -1266,7 +1396,7 @@ public class ExportMovieDialog extends JDialog implements ChangeListener, Action
                     timer.schedule(new TimerTask() {
                         @Override
                         public void run() {
-                            finish();
+                            release();
                         }
                     }, 200);
                     return;
@@ -1317,7 +1447,7 @@ public class ExportMovieDialog extends JDialog implements ChangeListener, Action
                 new Thread() {
                     @Override
                     public void run() {
-                        finish();
+                        release();
                     }
                 }.start();
             }
@@ -1327,7 +1457,7 @@ public class ExportMovieDialog extends JDialog implements ChangeListener, Action
                 new Thread() {
                     @Override
                     public void run() {
-                        finish();
+                        release();
                     }
                 }.start();
             }
@@ -1351,44 +1481,69 @@ public class ExportMovieDialog extends JDialog implements ChangeListener, Action
     @Override
     public void showDialog() {
 
-        if (!FileUtils.isExecutableRegistered("ffmpeg")) {
-            Message.err("Could not find FFmpeg tool", "The FFmpeg tool could not be found. Movie export will not be available", false);
-        } else {
-            if (!FileUtils.isExecutableRegistered("mp4box")) {
-                Message.err("Could not find MP4Box tool", "The MP4Box tool could not be found. Exported movie will not contain subtitles.", false);
-            }
-            pack();
-            setSize(getPreferredSize());
-            setLocationRelativeTo(ImageViewerGui.getMainFrame());
-            setVisible(true);
+        if (!FileUtils.isExecutableRegistered("mp4box")) {
+            Message.err("Could not find MP4Box tool", "The MP4Box tool could not be found. Exported movie will not contain subtitles.", false);
+            Log.error(">> ExportMovieDialog > The MP4Box tool could not be found. Exported movie will not contain subtitles.");
         }
+
+        if (!FileUtils.isExecutableRegistered("ffmpeg")) {
+            Message.err("Could not find FFmpeg executable", "Movie export will not work. However, you can try to export image series.", false);
+            Log.error(">> ExportMovieDialog > Could not find FFmpeg executable");
+        }
+
+        pack();
+        setSize(getPreferredSize());
+        setLocationRelativeTo(ImageViewerGui.getMainFrame());
+        setVisible(true);
     }
 
     /**
      * Deletes all resources and closes the dialog.
      */
-    synchronized public void finish() {
+    synchronized public void release() {
+
         System.setProperty("export.movie.debug.on", "false");
         closeSubtitleWriters(false);
+
+        if (ffmpegStdin != null) {
+            try {
+                ffmpegStdin.close();
+            } catch (IOException e) {
+                Log.error(">> ExportMovieDialog > Error closing FFmpeg stdin.", e);
+            } finally {
+                ffmpegStdin = null;
+            }
+        }
+
+        if (ffmpegProcess != null) {
+            ffmpegProcess.destroy();
+            ffmpegProcess = null;
+        }
+
         // Destroy all threads still running
         if (exportThread != null && !exportThread.equals(Thread.currentThread())) {
             exportThread.interrupt();
-            exportThread = null;
         }
+        exportThread = null;
         if (initThread != null && !initThread.equals(Thread.currentThread())) {
             initThread.interrupt();
-            initThread = null;
         }
+        initThread = null;
 
-        for (JP2ImageOriginalParent jp2ImageOriginalParent : jp2ImageOriginalParents) {
-            jp2ImageOriginalParent.jp2Image.setParentView(jp2ImageOriginalParent.originalParent);
+        if (jp2ImageOriginalParents != null) {
+            for (JP2ImageOriginalParent jp2ImageOriginalParent : jp2ImageOriginalParents) {
+                jp2ImageOriginalParent.jp2Image.setParentView(jp2ImageOriginalParent.originalParent);
+                jp2ImageOriginalParent.originalParent.refresh();
+            }
+            jp2ImageOriginalParents.clear();
+            jp2ImageOriginalParents = null;
         }
 
         // Delete linked movie manager to unlink all movies
         if (linkedMovieManagerInstance > 0) {
             LinkedMovieManager.deleteInstance(linkedMovieManagerInstance);
-            linkedMovieManagerInstance = -1;
         }
+        linkedMovieManagerInstance = -1;
 
         //
 
@@ -1407,26 +1562,84 @@ public class ExportMovieDialog extends JDialog implements ChangeListener, Action
 
         masterMovieView = null;
         J2KRenderGlobalOptions.setDoubleBufferingOption(savedDoubleBufferinOption);
-        ComponentView f = ImageViewerGui.getSingletonInstance().getMainView();
-        if (ImageViewerGui.getSingletonInstance().getMainView() instanceof GLComponentView) {
-            ((GLComponentView) ImageViewerGui.getSingletonInstance().getMainView()).startAnimation();
+        if (glComponentView != null) {
+            glComponentView.dispose();
+            glComponentView = null;
         }
-        System.gc();
+        imagePanel = null;
+        topmostView = null;
+        subtitleFileAll = null;
+        if (subtitleFiles != null) {
+            subtitleFiles.clear();
+            subtitleFiles = null;
+        }
+        subtitleWriterAll = null;
+        if (subtitleWriters != null) {
+            subtitleWriters.clear();
+            subtitleWriters = null;
+        }
+        if (currentViewStatus != null) {
+            currentViewStatus.clear();
+            currentViewStatus = null;
+        }
+        exportThread = null;
+        initThread = null;
+        selectedOutputFormat = null;
+        if (enableState != null) {
+            enableState.clear();
+            enableState = null;
+        }
+        viewChangedSemaphore = null;
+        if (output != null) {
+            output.flush();
+            output = null;
+        }
+        zoomController = null;
+        if (readerErrorCounter != null) {
+            readerErrorCounter.clear();
+            readerErrorCounter = null;
+        }
+
+        if (layerSelection != null) {
+            layerSelection.removeAllItems();
+        }
+        if (imagePanelContainer != null) {
+            imagePanelContainer.removeAll();
+        }
+
+        if (ImageViewerGui.getSingletonInstance().getMainView() instanceof GLComponentView) {
+            GLComponentView mainView = (GLComponentView) ImageViewerGui.getSingletonInstance().getMainView();
+            mainView.requestRebuildShaders();
+            mainView.startAnimation();
+        }
+
+        if (!exportSuccessful && txtTargetFile != null) {
+            File destFile = new File(txtTargetFile);
+            if (destFile.isFile() && destFile.exists()) {
+                destFile.delete();
+            }
+        }
+        txtTargetFile = null;
+
         // hide dialog
         SwingUtilities.invokeLater(new Runnable() {
             @Override
             public void run() {
-                if (glRenderingDialog != null) {
-                    glRenderingDialog.dispose();
-                }
                 dispose();
+                new Thread() {
+                    @Override
+                    public void run() {
+                        JHVGlobals.gc();
+                    }
+                }.start();
             }
         });
+
     }
 
     /**
      * Initializes the copy of the view chain.
-     * 
+     *
      * This code is put into a separate function to be able to run it in a new
      * thread. As a result, the application will not block the whole time.
      */
@@ -1467,9 +1680,9 @@ public class ExportMovieDialog extends JDialog implements ChangeListener, Action
 
     /**
      * Get the current zoom level of the currently selected layer
-     * 
+     *
      * @return zoom level of the currently selected layer
-     * 
+     *
      */
     private double getCurrentZoom() {
         if (topmostView != null && txtImageWidth != null && txtImageHeight != null) {
@@ -1484,7 +1697,7 @@ public class ExportMovieDialog extends JDialog implements ChangeListener, Action
 
     /**
      * Opens and prepares a subtitle file for writing
-     * 
+     *
      * @param subtitleFile
      *            the subtitle file
      * @return the corresponding writer object
@@ -1503,7 +1716,7 @@ public class ExportMovieDialog extends JDialog implements ChangeListener, Action
 
     /**
      * Closes all subtitle writes
-     * 
+     *
      * @param deleteFiles
      *            true, of the files should be deleted after closing
      */
@@ -1546,32 +1759,28 @@ public class ExportMovieDialog extends JDialog implements ChangeListener, Action
         if (System.getProperty("export.movie.debug") != null) {
             System.setProperty("export.movie.debug.on", "true");
         }
+
+        setGuiDuringExport();
+
         imagePanel.removeMouseWheelListener(this);
         imagePanel.setInputController(null);
         topmostView.removeViewListener(imagePanel.getView());
         if (glComponentView != null) {
             glComponentView.stopAnimation();
-
             // make copy of buffered image
-            BufferedImage background = glComponentView.getBufferedImage();
-            ColorModel cm = background.getColorModel();
+            BufferedImage screenshot = glComponentView.getBufferedImage();
+            ColorModel cm = screenshot.getColorModel();
             boolean isAlphaPremultiplied = cm.isAlphaPremultiplied();
-            WritableRaster raster = background.copyData(null);
-            background = new BufferedImage(cm, raster, isAlphaPremultiplied, null);
+            WritableRaster raster = screenshot.copyData(null);
+            screenshot = new BufferedImage(cm, raster, isAlphaPremultiplied, null);
 
-            imagePanel.setBackgroundImage(background);
-            imagePanel.setView(null);
+            imagePanel.setBackgroundImage(screenshot);
+            imagePanel.setBackground(Color.BLACK);
+            imagePanel.repaint();
+            glComponentView.getComponent().setSize(1, 1);
             glComponentView.requestRebuildShaders();
-            glComponentView.getComponent().setPreferredSize(new Dimension(tileWidth, tileHeight));
-            glRenderingDialog = new JDialog(ImageViewerGui.getMainFrame());
-            glRenderingDialog.setResizable(false);
-            glRenderingDialog.add(glComponentView.getComponent());
-            glRenderingDialog.pack();
-            // Dialog must be made visible at least once in order for the canvas
-            // to draw
-            glRenderingDialog.setVisible(true);
-            glRenderingDialog.setVisible(false);
         }
+
         savedDoubleBufferinOption = J2KRenderGlobalOptions.getDoubleBufferingOption();
         J2KRenderGlobalOptions.setDoubleBufferingOption(true);
         Viewport movieViewport = StaticViewport.createAdaptedViewport((Integer) txtImageWidth.getValue(), (Integer) txtImageHeight.getValue());
@@ -1579,28 +1788,12 @@ public class ExportMovieDialog extends JDialog implements ChangeListener, Action
 
         topmostView.getAdapter(ViewportView.class).setViewport(movieViewport, new ChangeEvent());
         topmostView.getAdapter(RegionView.class).setRegion(movieRegion, new ChangeEvent());
-        // Disable all GUI elements
-        layerSelection.setEnabled(false);
-        zoom1to1.setEnabled(false);
-        zoomFit.setEnabled(false);
-        aspectRatioSelection.setEnabled(false);
-        txtImageHeight.setEnabled(false);
-        txtImageWidth.setEnabled(false);
-        loadFirstCheckBox.setEnabled(false);
-        useDifferentialRotationTracking.setEnabled(false);
-        speedSpinner.setEnabled(false);
-        cmdExport.setEnabled(false);
-        embedSoftSubtitle.setEnabled(false);
-        embedHardSubtitle.setEnabled(false);
-        embedHardSubtitleAspectRatio.setEnabled(false);
-        txtTotalHeight.setEnabled(false);
-        zoom1to1.setEnabled(false);
-        zoomFit.setEnabled(false);
-        zoomSpinner.setEnabled(false);
 
         masterMovieView = null;
         subtitleFiles = new HashMap<View, File>();
         subtitleWriters = new HashMap<View, Writer>();
+
+        JHVGlobals.gc();
 
         // If selected file filter does not fit txtTargetFile, select a new one
         if (!txtTargetFile.toLowerCase().endsWith(selectedOutputFormat.getExtension())) {
@@ -1621,10 +1814,6 @@ public class ExportMovieDialog extends JDialog implements ChangeListener, Action
                     selectedOutputFormat = new PNGArchiveFilter();
                 }
             }
-        }
-        if ((selectedOutputFormat instanceof MP4Filter || selectedOutputFormat instanceof MOVFilter) && !FileUtils.isExecutableRegistered("ffmpeg")) {
-            Message.err("Could not find FFmpeg tool", "The FFmpeg tool could not be found. Movie export for mp4 and mov files will not be available", false);
-            return;
         }
 
         Log.info(">> ExportMovieDialog.exportMovie() > Delete files in temp folder");
@@ -1656,12 +1845,15 @@ public class ExportMovieDialog extends JDialog implements ChangeListener, Action
         LayeredView layeredView = topmostView.getAdapter(LayeredView.class);
 
         // Subtitle - all
-        subtitleFileAll = new File(JHVDirectory.TEMP.getPath() + "export_all.sub");
-        try {
-            subtitleWriterAll = openSubtitleWriter(subtitleFileAll);
-        } catch (IOException e) {
-            Log.error(">> ExportMovieDialog.exportMovie() > Could not create subtitle file: " + subtitleFileAll.getAbsolutePath(), e);
+        if (doEmbedSoftSubtitles() && layeredView.getNumLayers() > 1) {
+            subtitleFileAll = new File(JHVDirectory.TEMP.getPath() + "export_all.sub");
+            try {
+                subtitleWriterAll = openSubtitleWriter(subtitleFileAll);
+            } catch (IOException e) {
+                Log.error(">> ExportMovieDialog.exportMovie() > Could not create subtitle file: " + subtitleFileAll.getAbsolutePath(), e);
+            }
         }
+
         for (int i = 0; i < layeredView.getNumLayers(); i++) {
             View view = layeredView.getLayer(i);
 
@@ -1673,10 +1865,12 @@ public class ExportMovieDialog extends JDialog implements ChangeListener, Action
 
             // Subtitles
             File sub = new File(JHVDirectory.TEMP.getPath() + "export_" + i + ".sub");
+            subtitleFiles.put(view, sub);
             try {
-                Writer writer = openSubtitleWriter(sub);
-                subtitleFiles.put(view, sub);
-                subtitleWriters.put(view, writer);
+                if (doEmbedSoftSubtitles()) {
+                    Writer writer = openSubtitleWriter(sub);
+                    subtitleWriters.put(view, writer);
+                }
             } catch (IOException e) {
                 Log.error(">> ExportMovieDialog.exportMovie() > Could not create subtitle file: " + sub.getAbsolutePath(), e);
             }
@@ -1730,7 +1924,7 @@ public class ExportMovieDialog extends JDialog implements ChangeListener, Action
 
         if (masterMovieView == null) {
             Message.warn("Warning", "Nothing to export: No layer contains an image series.");
-            finish();
+            release();
             return;
         }
 
@@ -1766,6 +1960,49 @@ public class ExportMovieDialog extends JDialog implements ChangeListener, Action
             }
         }
 
+        Log.info(">> ExportMovieDialog.exportMovie() > Setup movie writer");
+        File targetFile = new File(txtTargetFile);
+        if (targetFile.exists() && targetFile.isFile()) {
+            targetFile.delete();
+        }
+        frameRate = (Integer) speedSpinner.getValue();
+        if (selectedOutputFormat.getIntermediateExtension().length() == 0) {
+            int totalHeight = embedHardSubtitle.isSelected() ? (Integer) txtTotalHeight.getValue() : (Integer) txtImageHeight.getValue();
+            List<String> args = new ArrayList<String>();
+            args.add("-f");
+            args.add("image2pipe");
+            args.add("-vcodec");
+            args.add("bmp");
+            args.add("-s");
+            args.add(txtImageWidth.getValue().toString() + "x" + totalHeight);
+            args.add("-r");
+            args.add(Integer.toString(frameRate));
+            args.add("-y");
+            args.add("-i");
+            args.add("-");
+            args.add("-vcodec");
+            args.add(selectedOutputFormat.getCodec());
+            args.addAll(selectedOutputFormat.getFFmpegOptions());
+            args.add("-an");
+            args.add(targetFile.getAbsolutePath());
+
+            try {
+                ffmpegProcess = FileUtils.invokeExecutable("ffmpeg", args);
+                ffmpegStdin = ffmpegProcess.getOutputStream();
+
+                try {
+                    FileUtils.logProcessOutput(ffmpegProcess, "FFmpeg", Level.DEBUG, false);
+                } catch (IOException e1) {
+                    Log.error(">> ExportMovieDialog > Error logging FFmpeg process.", e1);
+                    return;
+                }
+            } catch (IOException e) {
+                Message.err("FFmpeg error", "Error starting ffmpeg. Cannot export movie", false);
+                Log.error(">> ExportMovieDialog > Error starting ffmpeg. Cannot export movie", e);
+                return;
+            }
+        }
+
         Log.info(">> ExportMovieDialog.exportMovie() > Start movie export");
 
         // Start playing
@@ -1773,19 +2010,14 @@ public class ExportMovieDialog extends JDialog implements ChangeListener, Action
         masterMovieView.setCurrentFrame(0, new ChangeEvent(), true);
     }
 
-    /**
-     * A dummy to manage viewport, region and meta data during selection.
-     * 
-     * <p>
-     * This class is only used between initializing the view chain and starting
-     * the export.
-     * 
-     * @author Markus Langenberg
-     */
+    private boolean doEmbedSoftSubtitles() {
+        return (selectedOutputFormat.getIntermediateExtension().length() == 0) && embedSoftSubtitle.isSelected();
+    }
+
     /**
      * File filter for movies, also providing the extension of the selected
      * format.
-     * 
+     *
      * @author Markus Langenberg
      */
     private abstract class MovieFileFilter extends FileFilter {
@@ -1795,18 +2027,22 @@ public class ExportMovieDialog extends JDialog implements ChangeListener, Action
             return file.isDirectory() || acceptFile(file);
         }
 
+        protected abstract String getCodec();
+
+        protected abstract List<String> getFFmpegOptions();
+
         protected abstract boolean acceptFile(File f);
 
         /**
          * Returns the extension associated with this movie format.
-         * 
+         *
          * @return Extension associated with this movie format
          */
         public abstract String getExtension();
 
         /**
          * Returns the extension used for the intermediate images.
-         * 
+         *
          * @return Extension used for the intermediate images
          */
         public abstract String getIntermediateExtension();
@@ -1814,7 +2050,7 @@ public class ExportMovieDialog extends JDialog implements ChangeListener, Action
         /**
          * Returns, whether intermediate images should be written to the
          * temporary directory or to the final destination.
-         * 
+         *
          * @return If true, intermediate images are written to the temporary
          *         directoy
          */
@@ -1831,7 +2067,7 @@ public class ExportMovieDialog extends JDialog implements ChangeListener, Action
 
     /**
      * Implementation of MovieFileFiter for Quicktime movies.
-     * 
+     *
      * @author Markus Langenberg
      */
     private class MOVFilter extends MovieFileFilter {
@@ -1842,6 +2078,21 @@ public class ExportMovieDialog extends JDialog implements ChangeListener, Action
         @Override
         public boolean acceptFile(File f) {
             return f.getName().toLowerCase().endsWith(".mov");
+        }
+
+        @Override
+        public String getCodec() {
+            return "mpeg4";
+        }
+
+        @Override
+        public List<String> getFFmpegOptions() {
+            List<String> result = new ArrayList<String>();
+            result.add("-qscale:v");
+            result.add("1");
+            // result.add("-pix_fmt");
+            // result.add("yuv420p");
+            return result;
         }
 
         /**
@@ -1865,7 +2116,7 @@ public class ExportMovieDialog extends JDialog implements ChangeListener, Action
          */
         @Override
         public String getIntermediateExtension() {
-            return ".bmp";
+            return "";
         }
 
         /**
@@ -1873,13 +2124,13 @@ public class ExportMovieDialog extends JDialog implements ChangeListener, Action
          */
         @Override
         public boolean useTempDirectoryForIntermediateImages() {
-            return true;
+            return false;
         }
     }
 
     /**
      * Implementation of MovieFileFilter for MPEG-4 movies.
-     * 
+     *
      * @author Markus Langenberg
      */
     private class MP4Filter extends MovieFileFilter {
@@ -1890,6 +2141,21 @@ public class ExportMovieDialog extends JDialog implements ChangeListener, Action
         @Override
         public boolean acceptFile(File f) {
             return f.getName().toLowerCase().endsWith(".mp4");
+        }
+
+        @Override
+        public String getCodec() {
+            return "mpeg4";
+        }
+
+        @Override
+        public List<String> getFFmpegOptions() {
+            List<String> result = new ArrayList<String>();
+            result.add("-qscale:v");
+            result.add("1");
+            // result.add("-pix_fmt");
+            // result.add("yuv420p");
+            return result;
         }
 
         /**
@@ -1913,7 +2179,7 @@ public class ExportMovieDialog extends JDialog implements ChangeListener, Action
          */
         @Override
         public String getIntermediateExtension() {
-            return ".bmp";
+            return "";
         }
 
         /**
@@ -1921,13 +2187,13 @@ public class ExportMovieDialog extends JDialog implements ChangeListener, Action
          */
         @Override
         public boolean useTempDirectoryForIntermediateImages() {
-            return true;
+            return false;
         }
     }
 
     /**
      * Implementation of MovieFileFilter for a set of JPEG images.
-     * 
+     *
      * @author Markus Langenberg
      */
     private class JPEGSetFilter extends MovieFileFilter {
@@ -1938,6 +2204,16 @@ public class ExportMovieDialog extends JDialog implements ChangeListener, Action
         @Override
         public boolean acceptFile(File f) {
             return f.getName().toLowerCase().endsWith(".jpg") || f.getName().toLowerCase().endsWith(".jpeg");
+        }
+
+        @Override
+        public String getCodec() {
+            return null;
+        }
+
+        @Override
+        public List<String> getFFmpegOptions() {
+            return null;
         }
 
         /**
@@ -1975,7 +2251,7 @@ public class ExportMovieDialog extends JDialog implements ChangeListener, Action
 
     /**
      * Implementation of MovieFileFilter for a set of PNG images.
-     * 
+     *
      * @author Markus Langenberg
      */
     private class PNGSetFilter extends MovieFileFilter {
@@ -1986,6 +2262,16 @@ public class ExportMovieDialog extends JDialog implements ChangeListener, Action
         @Override
         public boolean acceptFile(File f) {
             return f.getName().toLowerCase().endsWith(".png");
+        }
+
+        @Override
+        public String getCodec() {
+            return null;
+        }
+
+        @Override
+        public List<String> getFFmpegOptions() {
+            return null;
         }
 
         /**
@@ -2023,7 +2309,7 @@ public class ExportMovieDialog extends JDialog implements ChangeListener, Action
 
     /**
      * Implementation of MovieFileFilter for ZIP archives of JPEG images.
-     * 
+     *
      * @author Markus Langenberg
      */
     private class JPEGArchiveFilter extends MovieFileFilter {
@@ -2034,6 +2320,16 @@ public class ExportMovieDialog extends JDialog implements ChangeListener, Action
         @Override
         public boolean acceptFile(File f) {
             return f.getName().toLowerCase().endsWith(".zip");
+        }
+
+        @Override
+        public String getCodec() {
+            return null;
+        }
+
+        @Override
+        public List<String> getFFmpegOptions() {
+            return null;
         }
 
         /**
@@ -2071,7 +2367,7 @@ public class ExportMovieDialog extends JDialog implements ChangeListener, Action
 
     /**
      * Implementation of MovieFileFilter for ZIP archives of PNG images.
-     * 
+     *
      * @author Markus Langenberg
      */
     private class PNGArchiveFilter extends MovieFileFilter {
@@ -2082,6 +2378,16 @@ public class ExportMovieDialog extends JDialog implements ChangeListener, Action
         @Override
         public boolean acceptFile(File f) {
             return f.getName().toLowerCase().endsWith(".zip");
+        }
+
+        @Override
+        public String getCodec() {
+            return null;
+        }
+
+        @Override
+        public List<String> getFFmpegOptions() {
+            return null;
         }
 
         /**
@@ -2143,9 +2449,9 @@ public class ExportMovieDialog extends JDialog implements ChangeListener, Action
 
     /**
      * Class which stores aspect ratio information
-     * 
+     *
      * @author Andre Dau
-     * 
+     *
      */
     static class AspectRatio {
         private final int width;

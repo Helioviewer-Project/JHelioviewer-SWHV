@@ -46,7 +46,7 @@ import org.helioviewer.viewmodelplugin.controller.PluginManager;
 /**
  * The Plug-in Dialog allows to manage all available plug-ins. Plug-ins can be
  * added, removed or enabled / disabled.
- * 
+ *
  * @author Stephan Pagel
  * */
 public class PluginsDialog extends JDialog implements ShowableDialog, ActionListener, WindowListener, ListEntryChangeListener {
@@ -109,9 +109,9 @@ public class PluginsDialog extends JDialog implements ShowableDialog, ActionList
         headerText.append("<p style=\"padding-left:10px\">");
         headerText.append("Manage available plug-ins of JHelioviewer.<br>");
         headerText.append("You can import enable or delete plug-ins.<br>"); // TODO
-                                                                            // SP:
-                                                                            // add
-                                                                            // "download"
+        // SP:
+        // add
+        // "download"
         headerText.append("Press the information buttons to get additional details.");
         headerText.append("</p></font></html>");
 
@@ -315,6 +315,7 @@ public class PluginsDialog extends JDialog implements ShowableDialog, ActionList
         fileChooser.setMultiSelectionEnabled(false);
 
         fileChooser.addActionListener(new ActionListener() {
+            @Override
             public void actionPerformed(final ActionEvent _e) {
                 if (_e.getActionCommand().equals(JFileChooser.APPROVE_SELECTION) && fileChooser.getSelectedFile().exists() && fileChooser.getSelectedFile().isFile()) {
                     fileChooser.setVisible(false);
@@ -348,7 +349,7 @@ public class PluginsDialog extends JDialog implements ShowableDialog, ActionList
     }
 
     /**
-     * 
+     *
      * */
     private void downloadPlugins() {
         // TODO SP: show download dialog
@@ -363,6 +364,7 @@ public class PluginsDialog extends JDialog implements ShowableDialog, ActionList
     /**
      * {@inheritDoc}
      * */
+    @Override
     public void showDialog() {
         changesMade = false;
 
@@ -382,6 +384,7 @@ public class PluginsDialog extends JDialog implements ShowableDialog, ActionList
     /**
      * {@inheritDoc}
      * */
+    @Override
     public void actionPerformed(final ActionEvent e) {
         if (e.getSource().equals(okButton)) {
             closeDialog();
@@ -405,18 +408,21 @@ public class PluginsDialog extends JDialog implements ShowableDialog, ActionList
     /**
      * {@inheritDoc}
      * */
+    @Override
     public void windowActivated(final WindowEvent e) {
     }
 
     /**
      * {@inheritDoc}
      * */
+    @Override
     public void windowClosed(final WindowEvent e) {
     }
 
     /**
      * {@inheritDoc}
      * */
+    @Override
     public void windowClosing(final WindowEvent e) {
         closeDialog();
     }
@@ -424,24 +430,28 @@ public class PluginsDialog extends JDialog implements ShowableDialog, ActionList
     /**
      * {@inheritDoc}
      * */
+    @Override
     public void windowDeactivated(final WindowEvent e) {
     }
 
     /**
      * {@inheritDoc}
      * */
+    @Override
     public void windowDeiconified(final WindowEvent e) {
     }
 
     /**
      * {@inheritDoc}
      * */
+    @Override
     public void windowIconified(final WindowEvent e) {
     }
 
     /**
      * {@inheritDoc}
      * */
+    @Override
     public void windowOpened(final WindowEvent e) {
     }
 
@@ -452,6 +462,7 @@ public class PluginsDialog extends JDialog implements ShowableDialog, ActionList
     /**
      * {@inheritDoc}
      */
+    @Override
     public void itemChanged() {
         changesMade = true;
 
@@ -461,6 +472,7 @@ public class PluginsDialog extends JDialog implements ShowableDialog, ActionList
     /**
      * {@inheritDoc}
      */
+    @Override
     public void listChanged() {
         updateVisualComponents();
     }
@@ -479,6 +491,7 @@ public class PluginsDialog extends JDialog implements ShowableDialog, ActionList
         /**
          * {@inheritDoc}
          */
+        @Override
         public boolean accept(File f) {
 
             if (f.isDirectory())
@@ -496,8 +509,13 @@ public class PluginsDialog extends JDialog implements ShowableDialog, ActionList
         /**
          * {@inheritDoc}
          */
+        @Override
         public String getDescription() {
             return "JAR files (\".jar\")";
         }
+    }
+
+    @Override
+    public void init() {
     }
 }
