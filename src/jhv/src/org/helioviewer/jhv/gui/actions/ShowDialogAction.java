@@ -11,18 +11,19 @@ import org.helioviewer.jhv.gui.interfaces.ShowableDialog;
 
 /**
  * Action to show any given dialog.
- * 
+ *
  * @author Markus Langenberg
  */
 
 public class ShowDialogAction extends AbstractAction {
 
     private static final long serialVersionUID = 1L;
-    private Class<ShowableDialog> dialogToShow;
+    private final Class<ShowableDialog> dialogToShow;
+    private ShowableDialog dialog;
 
     /**
      * Default constructor.
-     * 
+     *
      * @param name
      *            name of the action that shall be displayed on a button
      * @param dialog
@@ -42,9 +43,13 @@ public class ShowDialogAction extends AbstractAction {
     /**
      * {@inheritDoc}
      */
+    @Override
     public void actionPerformed(ActionEvent e) {
         try {
-            dialogToShow.newInstance().showDialog();
+            if (dialog == null)
+                dialog = dialogToShow.newInstance();
+            dialog.init();
+            dialog.showDialog();
         } catch (Exception e1) {
             e1.printStackTrace();
         }

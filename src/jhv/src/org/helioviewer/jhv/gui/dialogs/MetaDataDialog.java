@@ -52,7 +52,7 @@ import org.w3c.dom.NodeList;
 
 /**
  * Dialog that is used to display meta data for an image.
- * 
+ *
  * @author Alen Agheksanterian
  * @author Stephan Pagel
  */
@@ -63,8 +63,8 @@ public class MetaDataDialog extends JDialog implements ActionListener, ShowableD
     private final JButton closeButton = new JButton("Close");
     private final JButton exportFitsButton = new JButton("Export FITS Header as XML");
 
-    private Vector<String> infoList = new Vector<String>();
-    private JList listBox = new JList();
+    private final Vector<String> infoList = new Vector<String>();
+    private final JList listBox = new JList();
     private Document xmlDoc = null;
     private boolean metaDataOK;
     private String outFileName;
@@ -81,6 +81,7 @@ public class MetaDataDialog extends JDialog implements ActionListener, ShowableD
         listBox.setFont(new Font("Courier", Font.PLAIN, 12));
 
         listBox.setCellRenderer(new ListCellRenderer() {
+            @Override
             public Component getListCellRendererComponent(JList list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
                 JTextArea textArea = new JTextArea(value.toString().trim());
                 textArea.setLineWrap(true);
@@ -125,7 +126,7 @@ public class MetaDataDialog extends JDialog implements ActionListener, ShowableD
 
     /**
      * Adds a data item to the list
-     * 
+     *
      * @param _item
      *            New item to add
      * @see #setMetaData(MetaDataView)
@@ -140,6 +141,7 @@ public class MetaDataDialog extends JDialog implements ActionListener, ShowableD
     /**
      * {@inheritDoc}
      */
+    @Override
     public void showDialog() {
         pack();
         if (!metaDataOK)
@@ -154,6 +156,7 @@ public class MetaDataDialog extends JDialog implements ActionListener, ShowableD
     /**
      * {@inheritDoc}
      */
+    @Override
     public void actionPerformed(ActionEvent _a) {
         if (_a.getSource() == closeButton) {
             xmlDoc = null;
@@ -172,7 +175,7 @@ public class MetaDataDialog extends JDialog implements ActionListener, ShowableD
 
     /**
      * Sets the full document which can be found reading the given MetaDataView.
-     * 
+     *
      * @param metaDataView
      *            Source to read
      * @see #addDataItem(String)
@@ -264,7 +267,7 @@ public class MetaDataDialog extends JDialog implements ActionListener, ShowableD
     /**
      * A method that writes the xml box specified by its root node to the list
      * box in image info dialog box.
-     * 
+     *
      * @param node
      *            Node to write
      * @param indent
@@ -305,11 +308,11 @@ public class MetaDataDialog extends JDialog implements ActionListener, ShowableD
 
     /**
      * A method that gets the value of a node element.
-     * 
+     *
      * If the node itself has children and no text value, an empty string is
      * returned. This is maybe an overkill for our purposes now, but takes into
      * account the possibility of nested tags.
-     * 
+     *
      * @param elem
      *            Node to read
      * @return value of the node
@@ -330,7 +333,7 @@ public class MetaDataDialog extends JDialog implements ActionListener, ShowableD
 
     /**
      * This routine saves the fits data into an XML file.
-     * 
+     *
      * @param source
      *            XML document to save
      * @param filename
@@ -377,5 +380,9 @@ public class MetaDataDialog extends JDialog implements ActionListener, ShowableD
         ;
 
         return true;
+    }
+
+    @Override
+    public void init() {
     }
 }

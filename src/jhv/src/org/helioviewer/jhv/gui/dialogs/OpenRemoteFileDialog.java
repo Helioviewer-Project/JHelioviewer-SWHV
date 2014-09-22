@@ -36,8 +36,8 @@ import org.helioviewer.jhv.io.FileDownloader;
 
 /**
  * Dialog that is used to open user defined JPIP images.
- * 
- * 
+ *
+ *
  * @author Stephan Pagel
  * @author Andreas Hoelzl
  */
@@ -232,7 +232,7 @@ public class OpenRemoteFileDialog extends JDialog implements ShowableDialog, Act
 
     /**
      * changes the download source from http to jpip or vice versa
-     * 
+     *
      */
     public void changeSource() {
         if (fromJPIP.isSelected() == true) {
@@ -245,10 +245,10 @@ public class OpenRemoteFileDialog extends JDialog implements ShowableDialog, Act
     /**
      * when the user wants to have more options the JTree is expanded and the
      * user can choose the files fromt he server he put into the http-field
-     * 
+     *
      * @param arg
      *            the actionEvent that has occured
-     * 
+     *
      */
     public void show(ActionEvent arg) {
         this.setSize(this.getPreferredSize());
@@ -508,5 +508,9 @@ public class OpenRemoteFileDialog extends JDialog implements ShowableDialog, Act
 
         setLocationRelativeTo(ImageViewerGui.getMainFrame());
         setVisible(true);
+    }
+
+    @Override
+    public void init() {
     }
 }

@@ -18,10 +18,10 @@ import org.helioviewer.viewmodel.view.jp2view.kakadu.JHV_Kdu_cache;
 
 /**
  * A class that stores and reads default values in a settings file.
- * 
+ *
  * To check, whether the default settings have changed, a version string is
  * used. This string always should contain the date of the last change.
- * 
+ *
  * @author Benjamin Wamsler
  * @author Juan Pablo
  * @author Markus Langenberg
@@ -32,11 +32,11 @@ public class Settings {
     private static final Settings singletonInstance = new Settings();
 
     /** The properties object */
-    private Properties defaultProperties = new Properties();
-    private Properties userProperties = new Properties();
+    private final Properties defaultProperties = new Properties();
+    private final Properties userProperties = new Properties();
 
     /** The properties file */
-    private File propFile = new File(JHVDirectory.SETTINGS.getPath() + "user.properties");
+    private final File propFile = new File(JHVDirectory.SETTINGS.getPath() + "user.properties");
 
     /**
      * The private constructor of this class.
@@ -132,7 +132,7 @@ public class Settings {
     /**
      * Method sets the value of a specified property and saves it as a user
      * setting
-     * 
+     *
      * @param key
      *            Default field to be written to
      * @param val
@@ -147,7 +147,7 @@ public class Settings {
     /**
      * Method that returns the value of the specified property. User defined
      * properties are always preferred over the default settings.
-     * 
+     *
      * @param key
      *            Default field to read
      */
@@ -161,7 +161,7 @@ public class Settings {
 
     /**
      * Method returns the sole instance of this class.
-     * 
+     *
      * @return the only instance of this class.
      * */
     public static Settings getSingletonInstance() {
@@ -170,7 +170,7 @@ public class Settings {
 
     /**
      * Sets the look and feel to all windows of the application.
-     * 
+     *
      * @param lookAndFeel
      *            name of the lookandfeel.
      */
@@ -193,6 +193,7 @@ public class Settings {
     /**
      * The values are saved to disk only if there have been a modification.
      */
+    @Override
     protected void finalize() {
         save();
     }

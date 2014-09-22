@@ -17,7 +17,7 @@ import org.helioviewer.jhv.gui.interfaces.ShowableDialog;
 
 /**
  * Dialog used to display basic usage tips for the program.
- * 
+ *
  * <p>
  * Basically, the dialog contains all shortcuts.
  */
@@ -66,6 +66,7 @@ public class HelpDialog extends JDialog implements ActionListener, ShowableDialo
     /**
      * {@inheritDoc}
      */
+    @Override
     public void showDialog() {
         pack();
         setSize(getPreferredSize().width, getPreferredSize().height);
@@ -76,14 +77,19 @@ public class HelpDialog extends JDialog implements ActionListener, ShowableDialo
     /**
      * Closes the dialog.
      */
+    @Override
     public void actionPerformed(ActionEvent _a) {
         if (_a.getSource() == this.closeButton) {
             this.dispose();
         } /*
-           * else if (_a.getSource() == this.wikiButton) JHVGlobals.openURL(
-           * "http://www.helioviewer.org/wiki/index.php?title=JHelioviewer_User_Guide"
-           * ); else if (_a.getSource() == this.jhvButton)
-           * JHVGlobals.openURL("http://jhelioviewer.org");
-           */
+         * else if (_a.getSource() == this.wikiButton) JHVGlobals.openURL(
+         * "http://www.helioviewer.org/wiki/index.php?title=JHelioviewer_User_Guide"
+         * ); else if (_a.getSource() == this.jhvButton)
+         * JHVGlobals.openURL("http://jhelioviewer.org");
+         */
+    }
+
+    @Override
+    public void init() {
     }
 }

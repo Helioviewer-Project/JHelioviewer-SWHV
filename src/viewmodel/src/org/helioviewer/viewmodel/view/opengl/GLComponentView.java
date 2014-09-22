@@ -15,9 +15,9 @@ import javax.media.opengl.GL;
 import javax.media.opengl.GL2;
 import javax.media.opengl.GLAutoDrawable;
 import javax.media.opengl.GLCapabilities;
-import javax.media.opengl.GLDrawableFactory;
 import javax.media.opengl.GLEventListener;
 import javax.media.opengl.GLProfile;
+import javax.media.opengl.GLSharedContextSetter;
 import javax.media.opengl.awt.GLCanvas;
 import javax.media.opengl.awt.GLJPanel;
 import javax.media.opengl.glu.GLU;
@@ -85,7 +85,7 @@ public class GLComponentView extends AbstractComponentView implements ViewListen
     private GLAutoDrawable canvasDrawable;
     private RegionView regionView;
     private FPSAnimator animator;
-    private boolean useOffscreenRendering = false;
+    private boolean useOffscreenRendering;
 
     // render options
     private Color backgroundColor = Color.BLACK;
@@ -114,8 +114,8 @@ public class GLComponentView extends AbstractComponentView implements ViewListen
     private int[] renderBufferDepth;
     private int[] renderBufferColor;
 
-    private static int defaultTileWidth;
-    private static int defaultTileHeight;
+    private static int defaultTileWidth = 640;
+    private static int defaultTileHeight = 640;
     private int tileWidth;
     private int tileHeight;
 
@@ -138,6 +138,9 @@ public class GLComponentView extends AbstractComponentView implements ViewListen
         this.useOffscreenRendering = useOffscreenRendering;
         GLCapabilities caps = new GLCapabilities(GLProfile.getDefault());
         if (useOffscreenRendering) {
+            // Bad performance but better Swing compatibility.
+            // For some reason GLCanvas in combination with offscreen framebuffers
+            // screws up the canvas positioning.
             caps.setOnscreen(false);
             GLJPanel glPanel = new GLJPanel(caps);
             canvas = glPanel;
@@ -148,11 +151,10 @@ public class GLComponentView extends AbstractComponentView implements ViewListen
             canvasDrawable = glCanvas;
         }
         canvas.setMinimumSize(new Dimension());
-        canvas.setVisible(true);
 
-        //if (GLSharedContext.getSharedContext() != null) {
-        //    ((GLSharedContextSetter) canvas).setSharedContext(GLSharedContext.getSharedContext());
-        //}
+        if (GLSharedContext.getSharedContext() != null) {
+            ((GLSharedContextSetter) canvas).setSharedContext(GLSharedContext.getSharedContext());
+        }
         canvasDrawable.addGLEventListener(this);
         animator = new FPSAnimator(canvasDrawable, 30);
         animator.start();
@@ -352,7 +354,7 @@ public class GLComponentView extends AbstractComponentView implements ViewListen
     @Override
     public void init(GLAutoDrawable drawable) {
         GLSharedContext.setSharedContext(drawable.getContext());
-        GLDrawableFactory.getFactory(GLProfile.getDefault()).createExternalGLContext();
+        //GLDrawableFactory.getFactory(GLProfile.getDefault()).createExternalGLContext();
         final GL2 gl = drawable.getGL().getGL2();
 
         frameBufferObject = new int[1];
@@ -614,20 +616,6 @@ public class GLComponentView extends AbstractComponentView implements ViewListen
             }
             displayBody(gl, xOffsetFinal, yOffsetFinal);
         }
-
-        // // fps counter;
-        // frame++;
-        // long time = System.currentTimeMillis();
-        //
-        // if (time - timebase > 1000) {
-        // float factor = 1000.0f/(time-timebase);
-        // float fps = frame*factor;
-        // float fps2 = frameUpdated*factor;
-        // timebase = time;
-        // frame = 0;
-        // frameUpdated = 0;
-        // System.out.println(fps2 + ", " + fps);
-        // }
 
         // check for errors
         int errorCode = gl.glGetError();

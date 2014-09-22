@@ -25,7 +25,7 @@ import org.helioviewer.viewmodelplugin.controller.PluginManager;
  * This class provides a dialog which allows to manage the plug-ins. Available
  * plug-ins can be activated so there functionality is available in JHV and
  * plug-ins can be disabled.
- * 
+ *
  * @author Stephan Pagel
  */
 public class PluginDialog extends AbstractPluginDialog implements ListSelectionListener {
@@ -36,8 +36,8 @@ public class PluginDialog extends AbstractPluginDialog implements ListSelectionL
 
     private static final long serialVersionUID = 1L;
 
-    private JButton availablePluginsImportButton = new JButton("Import");
-    private JButton availablePluginsDeleteButton = new JButton("Delete");
+    private final JButton availablePluginsImportButton = new JButton("Import");
+    private final JButton availablePluginsDeleteButton = new JButton("Delete");
 
     // ////////////////////////////////////////////////////////////////
     // Methods
@@ -113,6 +113,7 @@ public class PluginDialog extends AbstractPluginDialog implements ListSelectionL
         fileChooser.setMultiSelectionEnabled(false);
 
         fileChooser.addActionListener(new ActionListener() {
+            @Override
             public void actionPerformed(ActionEvent _e) {
                 if (_e.getActionCommand().equals(JFileChooser.APPROVE_SELECTION) && fileChooser.getSelectedFile().exists() && fileChooser.getSelectedFile().isFile()) {
 
@@ -180,6 +181,7 @@ public class PluginDialog extends AbstractPluginDialog implements ListSelectionL
      * {@inheritDoc}
      */
 
+    @Override
     public void actionPerformed(ActionEvent arg0) {
         super.actionPerformed(arg0);
 
@@ -194,6 +196,7 @@ public class PluginDialog extends AbstractPluginDialog implements ListSelectionL
     // List Selection Listener
     // ////////////////////////////////////////////////////////////////
 
+    @Override
     public void valueChanged(final ListSelectionEvent event) {
         updateDeleteButton();
     }
@@ -212,6 +215,7 @@ public class PluginDialog extends AbstractPluginDialog implements ListSelectionL
         /**
          * {@inheritDoc}
          */
+        @Override
         public boolean accept(File f) {
 
             if (f.isDirectory())
@@ -229,8 +233,13 @@ public class PluginDialog extends AbstractPluginDialog implements ListSelectionL
         /**
          * {@inheritDoc}
          */
+        @Override
         public String getDescription() {
             return "JAR files (\".jar\")";
         }
+    }
+
+    @Override
+    public void init() {
     }
 }

@@ -19,7 +19,7 @@ import org.helioviewer.jhv.gui.interfaces.ShowableDialog;
 
 /**
  * Dialog to show that a new version is available
- * 
+ *
  * @author Helge Dietert
  */
 public class NewVersionDialog extends JDialog implements ActionListener, ShowableDialog, HyperlinkListener {
@@ -37,7 +37,7 @@ public class NewVersionDialog extends JDialog implements ActionListener, Showabl
 
     /**
      * Creates a dialog with the given parameters
-     * 
+     *
      * @param newVersion
      *            new version which is available
      * @param message
@@ -64,6 +64,7 @@ public class NewVersionDialog extends JDialog implements ActionListener, Showabl
         closeButtonContainer.add(downloadButton);
         downloadButton.addActionListener(this);
         downloadButton.addActionListener(new ActionListener() {
+            @Override
             public void actionPerformed(ActionEvent arg0) {
                 JHVGlobals.openURL("http://jhelioviewer.org");
             }
@@ -74,6 +75,7 @@ public class NewVersionDialog extends JDialog implements ActionListener, Showabl
             closeButtonContainer.add(laterButton);
             laterButton.addActionListener(this);
             laterButton.addActionListener(new ActionListener() {
+                @Override
                 public void actionPerformed(ActionEvent arg) {
                     nextCheck = suspendedStarts;
                 }
@@ -89,6 +91,7 @@ public class NewVersionDialog extends JDialog implements ActionListener, Showabl
     /**
      * {@inheritDoc}
      */
+    @Override
     public void showDialog() {
         pack();
         setSize(getPreferredSize());
@@ -99,6 +102,7 @@ public class NewVersionDialog extends JDialog implements ActionListener, Showabl
     /**
      * Closes the dialog.
      */
+    @Override
     public void actionPerformed(ActionEvent a) {
         this.dispose();
     }
@@ -106,6 +110,7 @@ public class NewVersionDialog extends JDialog implements ActionListener, Showabl
     /**
      * Opens a browser or email client after clicking on a hyperlink.
      */
+    @Override
     public void hyperlinkUpdate(HyperlinkEvent e) {
         if (e.getEventType() == HyperlinkEvent.EventType.ACTIVATED) {
             JHVGlobals.openURL(e.getURL().toString());
@@ -117,5 +122,9 @@ public class NewVersionDialog extends JDialog implements ActionListener, Showabl
      */
     public int getNextCheck() {
         return nextCheck;
+    }
+
+    @Override
+    public void init() {
     }
 }

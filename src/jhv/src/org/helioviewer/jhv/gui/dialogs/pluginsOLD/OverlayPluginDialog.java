@@ -13,7 +13,7 @@ import org.helioviewer.viewmodelplugin.overlay.OverlayContainer;
  * Available overlays can be activated so they will be included to the view
  * chains and overlays can be disabled. It is possible to rearrange the order of
  * activated overlays.
- * 
+ *
  * @author Stephan Pagel
  */
 public class OverlayPluginDialog extends AbstractPluginDialog {
@@ -24,8 +24,8 @@ public class OverlayPluginDialog extends AbstractPluginDialog {
 
     private static final long serialVersionUID = 1L;
 
-    private JButton activatedPluginsUpButton = new JButton("Up");
-    private JButton activatedPluginsDownButton = new JButton("Down");
+    private final JButton activatedPluginsUpButton = new JButton("Up");
+    private final JButton activatedPluginsDownButton = new JButton("Down");
 
     // ////////////////////////////////////////////////////////////////
     // Methods
@@ -80,6 +80,7 @@ public class OverlayPluginDialog extends AbstractPluginDialog {
      * {@inheritDoc}
      */
 
+    @Override
     public void actionPerformed(ActionEvent arg0) {
 
         super.actionPerformed(arg0);
@@ -102,7 +103,7 @@ public class OverlayPluginDialog extends AbstractPluginDialog {
 
         if (selected != null && selected instanceof OverlayContainer && index > 0) {
             activatedPluginsListModel.remove(index);
-            activatedPluginsListModel.add(index - 1, (OverlayContainer) selected);
+            activatedPluginsListModel.add(index - 1, selected);
 
             activatedPluginsList.setSelectedIndex(index - 1);
         }
@@ -120,7 +121,7 @@ public class OverlayPluginDialog extends AbstractPluginDialog {
 
         if (selected != null && selected instanceof OverlayContainer && index < activatedPluginsListModel.size() - 1) {
             activatedPluginsListModel.remove(index);
-            activatedPluginsListModel.add(index + 1, (OverlayContainer) selected);
+            activatedPluginsListModel.add(index + 1, selected);
 
             activatedPluginsList.setSelectedIndex(index + 1);
         }
@@ -132,6 +133,7 @@ public class OverlayPluginDialog extends AbstractPluginDialog {
      * Resets the current rank position in the view chain for all overlays.
      */
 
+    @Override
     protected void beforeSaveAndClose() {
 
         // set rank for all activated overlays
@@ -145,5 +147,9 @@ public class OverlayPluginDialog extends AbstractPluginDialog {
             ((OverlayContainer) availablePluginsListModel.get(i)).setPosition(-1);
             ((OverlayContainer) availablePluginsListModel.get(i)).changeSettings();
         }
+    }
+
+    @Override
+    public void init() {
     }
 }

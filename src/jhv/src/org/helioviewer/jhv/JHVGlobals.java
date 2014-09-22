@@ -10,6 +10,7 @@ import java.util.jar.JarFile;
 import java.util.jar.Manifest;
 
 import javax.swing.JOptionPane;
+
 import org.apache.log4j.Level;
 import org.helioviewer.base.FileUtils;
 import org.helioviewer.base.logging.Log;
@@ -17,7 +18,7 @@ import org.helioviewer.base.logging.Log;
 /**
  * Intended to be a class for static functions and fields relevant to the
  * application as a whole.
- * 
+ *
  * @author caplins
  */
 public class JHVGlobals {
@@ -31,6 +32,10 @@ public class JHVGlobals {
     public static final String GLibVersionTool = "glibc-version";
     public static final String ffmpeg = "ffmpeg";
     public static final String cgc = "cgc";
+
+    public static void gc() {
+        System.gc();
+    }
 
     private static final String[] browsers = { "firefox", "opera", "konqueror", "epiphany", "seamonkey", "galeon", "kazehakase", "mozilla", "netscape" };
 
@@ -102,7 +107,7 @@ public class JHVGlobals {
     /**
      * Returns the version of JHelioviewer as found in the manifest file of the
      * jar archive
-     * 
+     *
      * @return the version or null if the classes are not within a jar archive
      *         or the manifest does not contain the version
      */
@@ -113,7 +118,7 @@ public class JHVGlobals {
     /**
      * Returns the revision of JHelioviewer as found in the manifest file of the
      * jar archive
-     * 
+     *
      * @return the revision or null if the classes are not within a jar archive
      *         or the manifest does not contain the revision
      */
@@ -124,7 +129,7 @@ public class JHVGlobals {
     /**
      * Attempts to create the necessary directories if they do not exist. It
      * gets its list of directories to create from the JHVDirectory class.
-     * 
+     *
      * @throws SecurityException
      */
     public static void createDirs() throws SecurityException {
@@ -139,7 +144,7 @@ public class JHVGlobals {
 
     /**
      * Opens the specified web page in the default web browser
-     * 
+     *
      * @param url
      *            A web address (URL) of a web page (e.g
      *            "http://www.jhelioviewer.org/")

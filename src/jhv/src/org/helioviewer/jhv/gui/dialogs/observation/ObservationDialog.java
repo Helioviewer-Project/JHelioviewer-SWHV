@@ -16,17 +16,17 @@ import javax.swing.JPanel;
 
 import org.helioviewer.base.message.Message;
 import org.helioviewer.jhv.gui.IconBank;
-import org.helioviewer.jhv.gui.ImageViewerGui;
 import org.helioviewer.jhv.gui.IconBank.JHVIcon;
+import org.helioviewer.jhv.gui.ImageViewerGui;
 import org.helioviewer.jhv.gui.interfaces.ShowableDialog;
 
 /**
  * The Observation Dialog provides the main interface to get data from the
  * Helioviewer or other servers.
- * 
+ *
  * In order to select data a panel has to be added to the dialog. The Panel has
  * to be derived from ObservationDialogPanel.
- * 
+ *
  * @author Stephan Pagel
  * */
 public class ObservationDialog extends JDialog implements ActionListener, ShowableDialog {
@@ -224,6 +224,7 @@ public class ObservationDialog extends JDialog implements ActionListener, Showab
     /**
      * {@inheritDoc}
      */
+    @Override
     public void showDialog() {
         showDialog(null);
     }
@@ -235,6 +236,7 @@ public class ObservationDialog extends JDialog implements ActionListener, Showab
     /**
      * Reacts on user input.
      * */
+    @Override
     public void actionPerformed(final ActionEvent e) {
         if (e.getSource().equals(uiSelectionComboBox)) {
             setUIContainerPane((String) uiSelectionComboBox.getSelectedItem());
@@ -252,5 +254,9 @@ public class ObservationDialog extends JDialog implements ActionListener, Showab
             selectedPane.cancelButtonPressed();
             closeDialog();
         }
+    }
+
+    @Override
+    public void init() {
     }
 }
