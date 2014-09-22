@@ -13,6 +13,7 @@ import java.net.URL;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
@@ -44,6 +45,7 @@ public class PfssPluginPanel extends OverlayPanel implements ActionListener, Lay
     private PfssCache pfssCache = null;
     private boolean showAgain = true;
     private boolean retry = false;
+    private final CopyOnWriteArrayList<String> messages = new CopyOnWriteArrayList<String>();
     // UI Components
     private final JButton visibleButton = new JButton(new ImageIcon(PfssPlugin.getResourceUrl("/images/invisible_dm.png")));
     private final JButton reloadButton = new JButton(new ImageIcon(PfssPlugin.getResourceUrl("/images/reload.png")));
@@ -92,14 +94,14 @@ public class PfssPluginPanel extends OverlayPanel implements ActionListener, Lay
         c3.gridy = 0;
 
         this.add(visibleButton, c3);
-
+        visibleButton.setToolTipText("disable/enable PFSS");
         GridBagConstraints c6 = new GridBagConstraints();
         c6.insets = new Insets(0, 0, 5, 0);
         c6.gridx = 2;
         c6.gridy = 0;
 
         this.add(reloadButton, c6);
-
+        reloadButton.setToolTipText("reload PFSS data");
     }
 
     /**
@@ -115,6 +117,7 @@ public class PfssPluginPanel extends OverlayPanel implements ActionListener, Lay
                 pfssCache.setVisible(false);
                 visibleButton.setIcon(new ImageIcon(PfssPlugin.getResourceUrl("/images/invisible_dm.png")));
             } else {
+                this.showData();
                 pfssCache.setVisible(true);
                 visibleButton.setIcon(new ImageIcon(PfssPlugin.getResourceUrl("/images/visible_dm.png")));
             }
@@ -124,6 +127,25 @@ public class PfssPluginPanel extends OverlayPanel implements ActionListener, Lay
             layerAdded(0);
         }
 
+    }
+
+    private void showData() {
+        if (showAgain) {
+            for (String message : messages) {
+
+                Object[] options = { "Retry", "OK" };
+                Log.error(message);
+                messages.remove(message);
+                JCheckBox checkBox = new JCheckBox("Don't show this message again.");
+                checkBox.setEnabled(showAgain);
+                Object[] params = { message, checkBox };
+                int n = JOptionPane.showOptionDialog(this, params, "Pfss-Data", JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.WARNING_MESSAGE, null, options, options[1]);
+                showAgain = !checkBox.isSelected();
+                if (n == 0) {
+                    retry = true;
+                }
+            }
+        }
     }
 
     @Override
@@ -200,12 +222,16 @@ public class PfssPluginPanel extends OverlayPanel implements ActionListener, Lay
                         String message = "PFSS data for " + startYear + "-" + (startMonth + 1) + " is not available";
                         Log.error(message);
                         JCheckBox checkBox = new JCheckBox("Don't show this message again.");
-                        checkBox.setEnabled(showAgain);
-                        Object[] params = { message, checkBox };
-                        int n = JOptionPane.showOptionDialog(this, params, "PFSS-Data", JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.WARNING_MESSAGE, null, options, options[1]);
-                        showAgain = !checkBox.isSelected();
-                        if (n == 0) {
-                            retry = true;
+                        if (this.pfssCache.isVisible()) {
+                            checkBox.setEnabled(showAgain);
+                            Object[] params = { message, checkBox };
+                            int n = JOptionPane.showOptionDialog(this, params, "PFSS-Data", JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.WARNING_MESSAGE, null, options, options[1]);
+                            showAgain = !checkBox.isSelected();
+                            if (n == 0) {
+                                retry = true;
+                            }
+                        } else {
+                            messages.add(message);
                         }
                     }
                 }

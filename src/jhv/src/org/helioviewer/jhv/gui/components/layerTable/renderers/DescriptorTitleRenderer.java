@@ -2,6 +2,7 @@ package org.helioviewer.jhv.gui.components.layerTable.renderers;
 
 import java.awt.Color;
 import java.awt.Component;
+
 import javax.swing.BorderFactory;
 import javax.swing.JLabel;
 import javax.swing.JTable;
@@ -12,7 +13,7 @@ import org.helioviewer.jhv.layers.LayerDescriptor;
 
 /**
  * TableCellRenderer rendering the name of a LayerDescriptor
- * 
+ *
  * @author Malte Nuhn
  * @author Helge Dietert
  */
@@ -31,7 +32,7 @@ public class DescriptorTitleRenderer extends DefaultTableCellRenderer {
 
     /**
      * Renderer to show the descriptor
-     * 
+     *
      * @param drawLine
      *            if true it will add a gray line between layers
      */
@@ -41,14 +42,15 @@ public class DescriptorTitleRenderer extends DefaultTableCellRenderer {
 
     /**
      * Adopted to show the descriptor of the layer
-     * 
+     *
      * @see javax.swing.table.DefaultTableCellRenderer#getTableCellRendererComponent(javax.swing.JTable,
      *      java.lang.Object, boolean, boolean, int, int)
      */
+    @Override
     public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
         if (value instanceof LayerDescriptor) {
             LayerDescriptor descriptor = (LayerDescriptor) value;
-            JLabel label = (JLabel) super.getTableCellRendererComponent(table, descriptor.title, isSelected, hasFocus, row, column);
+            JLabel label = (JLabel) super.getTableCellRendererComponent(table, descriptor.observatory + " " + descriptor.title, isSelected, hasFocus, row, column);
             label.setToolTipText("Name of the Layer");
             if (drawLine && row > 0) {
                 label.setBorder(interBorder);
