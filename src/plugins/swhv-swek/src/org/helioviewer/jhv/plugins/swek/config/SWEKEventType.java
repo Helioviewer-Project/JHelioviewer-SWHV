@@ -6,6 +6,8 @@ package org.helioviewer.jhv.plugins.swek.config;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.swing.Icon;
+
 /**
  * Describes a SWEK event type.
  * 
@@ -37,9 +39,13 @@ public class SWEKEventType {
     /** The spatial region over which the event can be found */
     private SWEKSpatialRegion spatialRegion;
 
+    /** The icon corresponding with the event type */
+    private Icon eventIcon;
+
     /**
      * Create a SWEKEvenType with an empty name, suppliers list, parameter list,
-     * not standard selected and grouped on nothing.
+     * not standard selected, grouped on nothing, no coordinate system, no
+     * spatial region and event icon null.
      */
     public SWEKEventType() {
         super();
@@ -51,12 +57,13 @@ public class SWEKEventType {
         groupOn = null;
         coordinateSystem = "";
         spatialRegion = new SWEKSpatialRegion();
+        eventIcon = null;
     }
 
     /**
      * Creates an event type for the given event name, suppliers list, parameter
-     * list, request interval extension, standard selected indication and group
-     * on parameter.
+     * list, request interval extension, standard selected indication, group on
+     * parameter, coordinate system and icon.
      * 
      * @param eventName
      *            The name of the event
@@ -72,9 +79,11 @@ public class SWEKEventType {
      *            On what are corresponding events grouped
      * @param coordinateSystem
      *            The coordinate system
+     * @param eventIcon
+     *            the icon of the event type
      */
     public SWEKEventType(String eventName, List<SWEKSupplier> suppliers, List<SWEKParameter> parameterList, Long requestIntervalExtension,
-            boolean standardSelected, SWEKParameter groupOn, String coordinateSystem) {
+            boolean standardSelected, SWEKParameter groupOn, String coordinateSystem, Icon eventIcon) {
         super();
         this.eventName = eventName;
         this.suppliers = suppliers;
@@ -83,6 +92,7 @@ public class SWEKEventType {
         this.standardSelected = standardSelected;
         this.groupOn = groupOn;
         this.coordinateSystem = coordinateSystem;
+        this.eventIcon = eventIcon;
     }
 
     /**
@@ -271,5 +281,24 @@ public class SWEKEventType {
             }
         }
         return null;
+    }
+
+    /**
+     * Gets the event icon.
+     * 
+     * @return the icon of the event type
+     */
+    public Icon getEventIcon() {
+        return eventIcon;
+    }
+
+    /**
+     * Sets the event icon.
+     * 
+     * @param eventIcon
+     *            the icon of the event type
+     */
+    public void setEventIcon(Icon eventIcon) {
+        this.eventIcon = eventIcon;
     }
 }
