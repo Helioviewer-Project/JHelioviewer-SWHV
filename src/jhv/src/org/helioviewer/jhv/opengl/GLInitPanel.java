@@ -9,7 +9,7 @@ import javax.media.opengl.GLAutoDrawable;
 import javax.media.opengl.GLCapabilities;
 import javax.media.opengl.GLEventListener;
 import javax.media.opengl.GLException;
-import javax.media.opengl.awt.GLCanvas;
+import javax.media.opengl.awt.GLJPanel;
 
 import org.helioviewer.base.logging.Log;
 import org.helioviewer.base.message.Message;
@@ -18,8 +18,6 @@ import org.helioviewer.jhv.gui.ImageViewerGui;
 import org.helioviewer.viewmodel.view.opengl.GLTextureHelper;
 import org.helioviewer.viewmodel.view.opengl.shader.GLShaderBuilder;
 import org.helioviewer.viewmodel.view.opengl.shader.GLShaderHelper;
-
-import com.jogamp.opengl.util.Animator;
 
 /**
  * Component to initialize OpenGL2.
@@ -32,10 +30,11 @@ import com.jogamp.opengl.util.Animator;
  * @author Markus Langenberg
  *
  */
-public class GLInitPanel extends GLCanvas {
+public class GLInitPanel extends GLJPanel {
 
     private static final long serialVersionUID = 1L;
-    private final Animator animator;
+    public boolean isInit = false;
+    public boolean isDisposed = false;
 
     /**
      * Default constructor
@@ -44,14 +43,12 @@ public class GLInitPanel extends GLCanvas {
         super(capabilities);
 
         Thread.setDefaultUncaughtExceptionHandler(new GLUncaughtExceptionHandlerDecorator(Thread.getDefaultUncaughtExceptionHandler()));
-
         GLListener listener = new GLListener(this);
         addGLEventListener(listener);
 
-        animator = new Animator(this);
-        animator.start();
-
         setPreferredSize(new Dimension(1, 1));
+        setMinimumSize(new Dimension(1, 1));
+        setVisible(true);
     }
 
     /**
@@ -59,7 +56,6 @@ public class GLInitPanel extends GLCanvas {
      * since the component will not be used any more.
      */
     private void postInit() {
-        animator.stop();
         setVisible(false);
     }
 
@@ -86,6 +82,7 @@ public class GLInitPanel extends GLCanvas {
         GLListener(GLInitPanel _parent) {
             super();
             parent = _parent;
+
         }
 
         @Override
@@ -95,13 +92,11 @@ public class GLInitPanel extends GLCanvas {
             gl.glClear(GL2.GL_COLOR_BUFFER_BIT);
         }
 
-        public void displayChanged(GLAutoDrawable drawable, boolean modeChanged, boolean deviceChanged) {
-        }
-
         @Override
         public void init(GLAutoDrawable drawable) {
+            isInit = true;
+
             Log.debug(">> GLInitPanel.init(GLAutoDrawable) > Dispose GLInitPanel: Stop the animator and make it invisible");
-            parent.postInit();
 
             Log.debug(">> GLInitPanel.init(GLAutoDrawable) > Set GL properties");
             final GL2 gl = (GL2) drawable.getGL();
@@ -130,17 +125,21 @@ public class GLInitPanel extends GLCanvas {
                 Message.err("Could not initialize OpenGL", "OpenGL could not be initialized properly during startup. JHelioviewer will start in software mode. OpenGL is not available on the system or incompatible.", false);
             }
             Log.debug(">> GLInitPanel.init(GLAutoDrawable) > Start viewchain creation");
-            startViewChainThread();
+            isInit = true;
+            parent.postInit();
+
         }
 
         @Override
         public void reshape(GLAutoDrawable drawable, int x, int y, int width, int height) {
+            final GL2 gl = (GL2) drawable.getGL();
+
+            gl.glViewport(x, y, width, height);
         }
 
         @Override
         public void dispose(GLAutoDrawable arg0) {
-            // TODO Auto-generated method stub
-
+            isDisposed = true;
         }
     }
 
