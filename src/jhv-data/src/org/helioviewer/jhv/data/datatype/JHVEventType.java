@@ -26,7 +26,7 @@ public interface JHVEventType {
      * 
      * @return the provider
      */
-    public abstract String getEvenProvider();
+    public abstract String getEventProvider();
 
     /**
      * Check if the given event type is equal to this event type.
