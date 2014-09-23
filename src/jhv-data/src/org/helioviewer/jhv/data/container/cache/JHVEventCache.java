@@ -127,11 +127,23 @@ public class JHVEventCache {
             for (Date sDate : events.keySet()) {
                 Calendar tempS = Calendar.getInstance();
                 tempS.setTime(sDate);
+                // event starts after interval start but before interval end
                 if (intervalS.compareTo(tempS) <= 0 && intervalE.compareTo(tempS) >= 0) {
                     for (List<JHVEvent> tempEvent : events.get(sDate).values()) {
                         eventsResult.addAll(tempEvent);
                     }
                 }
+                // event start before interval start and end after interval
+                // start
+                Map<Date, List<JHVEvent>> endDatesEvents = events.get(sDate);
+                for (Date eDate : endDatesEvents.keySet()) {
+                    Calendar tempE = Calendar.getInstance();
+                    tempE.setTime(eDate);
+                    if (intervalS.compareTo(tempS) >= 0 && intervalS.compareTo(tempE) <= 0) {
+                        eventsResult.addAll(endDatesEvents.get(eDate));
+                    }
+                }
+
             }
             return eventsResult;
         }
