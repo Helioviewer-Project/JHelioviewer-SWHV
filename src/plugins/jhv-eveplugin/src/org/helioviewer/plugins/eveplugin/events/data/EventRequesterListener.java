@@ -1,6 +1,9 @@
 package org.helioviewer.plugins.eveplugin.events.data;
 
+import java.util.Date;
 import java.util.List;
+import java.util.Map;
+import java.util.NavigableMap;
 
 import org.helioviewer.jhv.data.datatype.JHVEvent;
 
@@ -18,5 +21,5 @@ public interface EventRequesterListener {
      * @param events
      *            the events received
      */
-    public abstract void newEventsReceived(List<JHVEvent> events);
+    public abstract void newEventsReceived(Map<String, NavigableMap<Date, NavigableMap<Date, List<JHVEvent>>>> events);
 }

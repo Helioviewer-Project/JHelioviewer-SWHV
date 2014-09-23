@@ -1,7 +1,10 @@
 package org.helioviewer.jhv.plugins.swek.receive;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
+import java.util.Map;
+import java.util.NavigableMap;
 
 import org.helioviewer.base.logging.Log;
 import org.helioviewer.jhv.data.container.JHVEventHandler;
@@ -54,10 +57,21 @@ public class SWEKEventHandler implements JHVEventHandler {
     }
 
     @Override
-    public void newEventsReceived(List<JHVEvent> eventList) {
+    public void newEventsReceived(Map<String, NavigableMap<Date, NavigableMap<Date, List<JHVEvent>>>> eventList) {
         Log.info("New events received.");
-        for (JHVEvent event : eventList) {
-            Log.info(event.getName() + " " + event.getDisplayName() + " " + event.getStartDate() + "-" + event.getEndDate());
+        /*
+         * for (JHVEvent event : eventList) { Log.info(event.getName() + " " +
+         * event.getDisplayName() + " " + event.getStartDate() + "-" +
+         * event.getEndDate()); }
+         */
+        for (String eventType : eventList.keySet()) {
+            for (Date sDate : eventList.get(eventType).keySet()) {
+                for (Date eDate : eventList.get(eventType).get(sDate).keySet()) {
+                    for (JHVEvent event : eventList.get(eventType).get(sDate).get(eDate)) {
+                        Log.info(event.getName() + " " + event.getDisplayName() + " " + event.getStartDate() + "-" + event.getEndDate());
+                    }
+                }
+            }
         }
     }
 

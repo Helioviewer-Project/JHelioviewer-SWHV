@@ -20,6 +20,9 @@ public class EventPlotConfiguration {
     private final double scaledX0;
     private final double scaledX1;
 
+    /** the Y position */
+    private final int yPosition;
+
     /**
      * Creates a EventPlotConfiguration for the given event with scaledX0 start
      * position and scaledX1 end position.
@@ -30,11 +33,15 @@ public class EventPlotConfiguration {
      *            the scaled start position
      * @param scaledX1
      *            the scaled end position
+     * @param yPosition
+     *            the y-position of this event in the band provided for this
+     *            event type.
      */
-    public EventPlotConfiguration(JHVEvent event, double scaledX0, double scaledX1) {
+    public EventPlotConfiguration(JHVEvent event, double scaledX0, double scaledX1, int yPosition) {
         this.event = event;
         this.scaledX0 = scaledX0;
         this.scaledX1 = scaledX1;
+        this.yPosition = yPosition;
     }
 
     /**
@@ -44,13 +51,28 @@ public class EventPlotConfiguration {
      *            the graphics on which to draw
      * @param graphArea
      *            the area available to draw
+     * @param nrOfEventTypes
+     *            the number of event types to be drawn
+     * @param eventTypeNR
+     *            the number of this event type
+     * @param linesForEventType
+     *            maximum of lines needed for this event type
+     * @param totalLines
+     *            the total number of lines for all events
+     * @param nrPreviousLines
+     *            the number of lines used already
      */
-    public void draw(Graphics g, Rectangle graphArea) {
+    public void draw(Graphics g, Rectangle graphArea, int nrOfEventTypes, int eventTypeNR, int linesForEventType, int totalLines,
+            int nrPreviousLines) {
+        int spacePerLine = (new Double(Math.floor(1.0 * graphArea.height / totalLines / 2))).intValue();
+        int startPosition = spacePerLine * 2 * (nrPreviousLines + yPosition);
         g.setColor(Color.CYAN);
-        g.fillRect((new Double(Math.floor(graphArea.width * scaledX0))).intValue(), 10,
-                (new Double(Math.floor(graphArea.width * (scaledX1 - scaledX0)))).intValue(), 2);
+        g.fillRect((new Double(Math.floor(graphArea.width * scaledX0))).intValue(), startPosition,
+                (new Double(Math.floor(graphArea.width * (scaledX1 - scaledX0)))).intValue(), spacePerLine);
         // g.drawString(event.getDisplayName(), (new
         // Double(Math.floor(graphArea.width * scaledX0))).intValue(), 60);
-        g.drawImage(event.getIcon().getImage(), (new Double(Math.floor(graphArea.width * scaledX0))).intValue(), 60, null);
+        // g.drawImage(event.getIcon().getImage(), (new
+        // Double(Math.floor(graphArea.width * scaledX0))).intValue(), 60,
+        // null);
     }
 }

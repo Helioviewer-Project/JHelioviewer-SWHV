@@ -4,6 +4,7 @@ import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Rectangle;
 import java.util.List;
+import java.util.Map;
 
 import org.helioviewer.base.logging.Log;
 import org.helioviewer.plugins.eveplugin.base.Range;
@@ -12,6 +13,7 @@ import org.helioviewer.plugins.eveplugin.draw.DrawableElementType;
 import org.helioviewer.plugins.eveplugin.draw.YAxisElement;
 import org.helioviewer.plugins.eveplugin.events.model.EventModel;
 import org.helioviewer.plugins.eveplugin.events.model.EventPlotConfiguration;
+import org.helioviewer.plugins.eveplugin.events.model.EventTypePlotConfiguration;
 
 public class EventPanel implements DrawableElement {
 
@@ -29,9 +31,17 @@ public class EventPanel implements DrawableElement {
         long start = System.currentTimeMillis();
         Thread.dumpStack();
         if (EventModel.getSingletonInstance().isEventsVisible()) {
-            List<EventPlotConfiguration> epcs = EventModel.getSingletonInstance().getEventPlotConfiguration();
-            for (EventPlotConfiguration epc : epcs) {
-                epc.draw(g, graphArea);
+            EventTypePlotConfiguration etpc = EventModel.getSingletonInstance().getEventTypePlotConfiguration();
+            Map<String, List<EventPlotConfiguration>> epcs = etpc.getEventPlotConfigurations();
+            int eventTypeNr = 0;
+            int previousLine = 0;
+            for (String eventType : epcs.keySet()) {
+                for (EventPlotConfiguration epc : epcs.get(eventType)) {
+                    epc.draw(g, graphArea, etpc.getNrOfEventTypes(), eventTypeNr, etpc.getMaxLinesPerEventType().get(eventType).intValue(),
+                            etpc.getTotalNrLines(), previousLine);
+                }
+                eventTypeNr++;
+                previousLine += etpc.getMaxLinesPerEventType().get(eventType).intValue();
             }
         }
         Log.info("Run draw time: " + (System.currentTimeMillis() - start));
@@ -50,6 +60,6 @@ public class EventPanel implements DrawableElement {
 
     @Override
     public boolean hasElementsToDraw() {
-        return !EventModel.getSingletonInstance().getEventPlotConfiguration().isEmpty();
+        return !EventModel.getSingletonInstance().getEventTypePlotConfiguration().getEventPlotConfigurations().isEmpty();
     }
 }

@@ -4,6 +4,8 @@ import java.awt.EventQueue;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
+import java.util.NavigableMap;
 import java.util.Set;
 import java.util.logging.Logger;
 
@@ -91,7 +93,7 @@ public class JHVEventContainer {
             public void run() {
                 Logger.getLogger(JHVEventContainer.class.getName()).info("Request for date : " + date);
                 eventHandlerCache.add(handler, date);
-                List<JHVEvent> events = eventCache.get(date);
+                Map<String, NavigableMap<Date, NavigableMap<Date, List<JHVEvent>>>> events = eventCache.get(date);
                 handler.newEventsReceived(events);
                 requestEvents(date);
             }
@@ -142,7 +144,7 @@ public class JHVEventContainer {
             public void run() {
                 Logger.getLogger(JHVEventContainer.class.getName()).info("Request for interval : [" + startDate + "," + endDate + "]");
                 eventHandlerCache.add(handler, startDate, endDate);
-                List<JHVEvent> events = eventCache.get(startDate, endDate);
+                Map<String, NavigableMap<Date, NavigableMap<Date, List<JHVEvent>>>> events = eventCache.get(startDate, endDate);
                 handler.newEventsReceived(events);
                 requestEvents(startDate, endDate);
             }
