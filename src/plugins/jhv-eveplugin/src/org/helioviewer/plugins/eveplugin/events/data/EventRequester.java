@@ -4,6 +4,8 @@ import java.awt.EventQueue;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
+import java.util.NavigableMap;
 
 import org.helioviewer.base.logging.Log;
 import org.helioviewer.base.math.Interval;
@@ -127,7 +129,7 @@ public class EventRequester implements ZoomControllerListener, JHVEventHandler {
     }
 
     @Override
-    public void newEventsReceived(final List<JHVEvent> eventList) {
+    public void newEventsReceived(final Map<String, NavigableMap<Date, NavigableMap<Date, List<JHVEvent>>>> eventList) {
         EventQueue.invokeLater(new Runnable() {
 
             @Override
@@ -161,7 +163,7 @@ public class EventRequester implements ZoomControllerListener, JHVEventHandler {
 
     }
 
-    private void fireNewEventsReceived(List<JHVEvent> events) {
+    private void fireNewEventsReceived(Map<String, NavigableMap<Date, NavigableMap<Date, List<JHVEvent>>>> events) {
         for (EventRequesterListener l : listeners) {
             l.newEventsReceived(events);
         }

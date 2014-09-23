@@ -1,6 +1,9 @@
 package org.helioviewer.jhv.data.container;
 
+import java.util.Date;
 import java.util.List;
+import java.util.Map;
+import java.util.NavigableMap;
 
 import org.helioviewer.jhv.data.datatype.JHVEvent;
 
@@ -17,7 +20,7 @@ public interface JHVEventHandler {
      * @param eventList
      *            the list of events that were received
      */
-    public abstract void newEventsReceived(List<JHVEvent> eventList);
+    public abstract void newEventsReceived(Map<String, NavigableMap<Date, NavigableMap<Date, List<JHVEvent>>>> eventList);
 
     /**
      * Informs the JHVEventHandler the cache was changed.
