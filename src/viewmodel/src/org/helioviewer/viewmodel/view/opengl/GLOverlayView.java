@@ -5,7 +5,6 @@ import java.util.concurrent.CopyOnWriteArrayList;
 
 import javax.media.opengl.GL2;
 
-import org.helioviewer.base.logging.Log;
 import org.helioviewer.viewmodel.changeevent.ChangeEvent;
 import org.helioviewer.viewmodel.changeevent.RegionChangedReason;
 import org.helioviewer.viewmodel.changeevent.ViewChainChangedReason;
@@ -18,16 +17,16 @@ import org.helioviewer.viewmodel.view.ViewHelper;
 
 /**
  * Implementation of OverlayView for rendering in OpenGL mode.
- * 
+ *
  * <p>
  * This class provides the capability to draw overlays in OpenGL2. Therefore it
  * manages a {@link PhysicalRenderer}, which is passed to the registered
  * renderer.
- * 
+ *
  * <p>
  * For further information about the role of the OverlayView within the view
  * chain, see {@link org.helioviewer.viewmodel.view.OverlayView}.
- * 
+ *
  * @author Markus Langenberg
  */
 public class GLOverlayView extends AbstractGLView implements OverlayView {
@@ -38,6 +37,7 @@ public class GLOverlayView extends AbstractGLView implements OverlayView {
     /**
      * {@inheritDoc}
      */
+    @Override
     protected void setViewSpecificImplementation(View newView, ChangeEvent changeEvent) {
         layeredView = ViewHelper.getViewAdapter(view, LayeredView.class);
     }
@@ -45,6 +45,7 @@ public class GLOverlayView extends AbstractGLView implements OverlayView {
     /**
      * {@inheritDoc}
      */
+    @Override
     public void renderGL(GL2 gl, boolean nextView) {
         // just for 2d
         renderChild(gl);
@@ -89,9 +90,10 @@ public class GLOverlayView extends AbstractGLView implements OverlayView {
     /**
      * {@inheritDoc}
      */
+    @Override
     public void viewChanged(View sender, ChangeEvent aEvent) {
         // Log.debug("viewChange: sender : " + sender);
-        if (aEvent.reasonOccurred(RegionChangedReason.class)) {
+        if (aEvent != null && aEvent.reasonOccurred(RegionChangedReason.class)) {
 
             GLLayeredView layeredView = sender.getAdapter(GLLayeredView.class);
             Iterator<OverlayPluginContainer> iterator = this.overlays.iterator();
@@ -131,6 +133,7 @@ public class GLOverlayView extends AbstractGLView implements OverlayView {
         this.overlays.add(overlayPluginContainer);
     }
 
+    @Override
     public View getView() {
         return view;
     }
