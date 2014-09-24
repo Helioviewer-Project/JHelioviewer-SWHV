@@ -25,7 +25,7 @@ import org.helioviewer.base.logging.Log;
 
 /**
  * A class which provides functions for accessing and working with files.
- * 
+ *
  * @author Benjamin Wamsler
  * @author Andre Dau
  */
@@ -36,7 +36,7 @@ public class FileUtils {
 
     /**
      * Return the current working directory
-     * 
+     *
      * @return the current working directory
      */
     public static File getWorkingDirectory() {
@@ -45,7 +45,7 @@ public class FileUtils {
 
     /**
      * Invokes an executable whose path was registered before.
-     * 
+     *
      * @param identifier
      *            Identifier under which the executable is registered
      * @param arguments
@@ -75,7 +75,7 @@ public class FileUtils {
      * Logs stdout and stderr of a process. It is necessary to read from the
      * input and the error stream of a process object. Otherwise the process
      * might block when the buffer is full.
-     * 
+     *
      * @param process
      *            The process object
      * @param processName
@@ -144,7 +144,7 @@ public class FileUtils {
     /**
      * Registers the path of an executable. The executable can be later invoked
      * using its identifier
-     * 
+     *
      * @param identifier
      *            Identifier under which the executable can be accessed
      * @param path
@@ -194,7 +194,7 @@ public class FileUtils {
 
     /**
      * Checks if an executable with the given identifier was registered.
-     * 
+     *
      * @param identifier
      *            Identifier of the executable
      * @return true, if executable is registered
@@ -205,7 +205,7 @@ public class FileUtils {
 
     /**
      * Method copies a file from src to dst.
-     * 
+     *
      * @param src
      *            Source file
      * @param dst
@@ -227,9 +227,21 @@ public class FileUtils {
         out.close();
     }
 
+    public static void copy(InputStream in, OutputStream out) throws IOException {
+
+        // Transfer bytes from in to out
+        byte[] buf = new byte[1024];
+        int len;
+        while ((len = in.read(buf)) > 0) {
+            out.write(buf, 0, len);
+        }
+        in.close();
+        out.close();
+    }
+
     /**
      * Method saving a stream to dst.
-     * 
+     *
      * @param in
      *            Input stream, will be closed if finished
      * @param dst
@@ -253,7 +265,7 @@ public class FileUtils {
 
     /**
      * Method saving a stream to dst.
-     * 
+     *
      * @param in
      *            Input stream, will be closed if finished
      * @param dst
@@ -281,7 +293,7 @@ public class FileUtils {
      * begin with a slash and contain all subfolders, e.g.:\n
      * /images/sample_image.png <br>
      * The class loader used is the same which was used to load FileUtils
-     * 
+     *
      * @param resourcePath
      *            The path to the resource
      * @return An InputStream to the resource
@@ -295,7 +307,7 @@ public class FileUtils {
      * program and resources are within a JAR file.\n The path must begin with a
      * slash and contain all subfolders, e.g.:\n /images/sample_image.png <br>
      * The class loader used is the same which was used to load FileUtils .
-     * 
+     *
      * @param resourcePath
      *            The path to the resource
      * @return An URL to the resource
@@ -306,7 +318,7 @@ public class FileUtils {
 
     /**
      * Calculates the MD5 hash of a file.
-     * 
+     *
      * @param fileUri
      *            The URI of the file from which the md5 hash should be
      *            calculated
@@ -344,7 +356,7 @@ public class FileUtils {
 
     /**
      * Converts a hex string into a byte array
-     * 
+     *
      * @param s
      *            The hex string
      * @return The byte array
@@ -360,7 +372,7 @@ public class FileUtils {
 
     /**
      * Converts a byte array into a hex string
-     * 
+     *
      * @param b
      *            The byte array
      * @return The hex string

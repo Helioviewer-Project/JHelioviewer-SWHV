@@ -1,6 +1,5 @@
 package org.helioviewer.jhv;
 
-import java.awt.EventQueue;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
@@ -229,37 +228,32 @@ public class JavaHelioViewer {
         Settings.getSingletonInstance().update();
 
         /* ----------Setup OpenGL ----------- */
-
-        splash.nextStep();
-        splash.setProgressText("Load OpenGL libraries...");
-
-        final URI finalLibs = libs;
-        final URI finalLibsRemote = libsRemote;
-        final URI finalLibsBackup = libsBackup;
-
-        // Has to run in EventQueue due to bug in NVidia Driver 260.99
-        try {
-            EventQueue.invokeAndWait(new Runnable() {
-
-                @Override
-                public void run() {
-                    Log.info("Try to load OpenGL libraries");
-
-                    if (null == ResourceLoader.getSingletonInstance().loadResource("jogl2.2.0", finalLibsRemote, finalLibs, finalLibs, finalLibsBackup, System.getProperties())) {
-                        Log.error("Could not load OpenGL libraries");
-                        Message.err("Error loading OpenGL libraries", "The OpenGL libraries could not be loaded. JHelioviewer will run in software mode.", false);
-                        GLInfo.glUnusable();
-                    } else {
-                        System.setProperty("jogamp.gluegen.UseTempJarCache", "false");
-                        JNILibLoaderBase.setLoadingAction(new JoglLoaderDummy());
-                        Log.info("Successfully loaded OpenGL libraries");
-                    }
-                }
-            });
-        } catch (Exception e1) {
-            e1.printStackTrace();
-        }
-
+        /*
+         * splash.nextStep();
+         * splash.setProgressText("Load OpenGL libraries...");
+         * 
+         * final URI finalLibs = libs; final URI finalLibsRemote = libsRemote;
+         * final URI finalLibsBackup = libsBackup;
+         * 
+         * // Has to run in EventQueue due to bug in NVidia Driver 260.99 try {
+         * EventQueue.invokeAndWait(new Runnable() {
+         * 
+         * @Override public void run() {
+         * Log.info("Try to load OpenGL libraries");
+         * 
+         * if (null ==
+         * ResourceLoader.getSingletonInstance().loadResource("jogl2.2.0",
+         * finalLibsRemote, finalLibs, finalLibs, finalLibsBackup,
+         * System.getProperties())) {
+         * Log.error("Could not load OpenGL libraries");
+         * Message.err("Error loading OpenGL libraries",
+         * "The OpenGL libraries could not be loaded. JHelioviewer will run in software mode."
+         * , false); GLInfo.glUnusable(); } else {
+         * System.setProperty("jogamp.gluegen.UseTempJarCache", "false");
+         * JNILibLoaderBase.setLoadingAction(new JoglLoaderDummy());
+         * Log.info("Successfully loaded OpenGL libraries"); } } }); } catch
+         * (Exception e1) { e1.printStackTrace(); }
+         */
         Log.info("Try to install CG Compiler");
         if (null == ResourceLoader.getSingletonInstance().loadResource("cgc", libsRemote, libs, libs, libsBackup, System.getProperties())) {
             Log.error("Could not install CG Compiler");
