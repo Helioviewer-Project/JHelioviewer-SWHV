@@ -165,6 +165,8 @@ public class GLComponentView extends AbstractComponentView implements ViewListen
             screenshot.flush();
             screenshot = null;
         }
+        GLSharedContext.setSharedContext(null);
+
         tileRenderer = null;
     }
 
