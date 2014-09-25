@@ -2,16 +2,20 @@ package org.helioviewer.jhv.plugins.swek.sources.hek;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.net.URLEncoder;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.List;
 import java.util.Properties;
 
 import org.helioviewer.base.DownloadStream;
 import org.helioviewer.base.logging.Log;
 import org.helioviewer.jhv.JHVGlobals;
 import org.helioviewer.jhv.plugins.swek.config.SWEKEventType;
+import org.helioviewer.jhv.plugins.swek.download.SWEKParam;
 import org.helioviewer.jhv.plugins.swek.sources.SWEKDownloader;
 
 public class HEKDownloader implements SWEKDownloader {
@@ -34,8 +38,8 @@ public class HEKDownloader implements SWEKDownloader {
     }
 
     @Override
-    public InputStream downloadData(SWEKEventType eventType, Date startDate, Date endDate) {
-        String urlString = createURL(eventType, startDate, endDate);
+    public InputStream downloadData(SWEKEventType eventType, Date startDate, Date endDate, List<SWEKParam> params) {
+        String urlString = createURL(eventType, startDate, endDate, params);
         Log.info("Download events using following URL: " + urlString);
         try {
             DownloadStream ds = new DownloadStream(new URL(urlString), JHVGlobals.getStdConnectTimeout(), JHVGlobals.getStdReadTimeout());
@@ -62,7 +66,7 @@ public class HEKDownloader implements SWEKDownloader {
      *            the end date of the interval over which to download the event
      * @return the url represented as string
      */
-    private String createURL(SWEKEventType eventType, Date startDate, Date endDate) {
+    private String createURL(SWEKEventType eventType, Date startDate, Date endDate, List<SWEKParam> params) {
         StringBuilder baseURL = new StringBuilder(hekSourceProperties.getProperty("heksource.baseurl")).append("?");
         baseURL = appendCmd(baseURL, eventType, startDate, endDate).append("&");
         baseURL = appendType(baseURL, eventType, startDate, endDate).append("&");
@@ -70,7 +74,7 @@ public class HEKDownloader implements SWEKDownloader {
         baseURL = appendEventCoorSys(baseURL, eventType, startDate, endDate).append("&");
         baseURL = appendX1X2Y1Y2(baseURL, eventType, startDate, endDate).append("&");
         baseURL = appendCosec(baseURL, eventType, startDate, endDate).append("&");
-        baseURL = appendParams(baseURL, eventType, startDate, endDate).append("&");
+        baseURL = appendParams(baseURL, eventType, startDate, endDate, params).append("&");
         baseURL = appendEventStartTime(baseURL, eventType, startDate).append("&");
         baseURL = appendEventEndTime(baseURL, eventType, endDate).append("&");
         return baseURL.toString();
@@ -193,9 +197,26 @@ public class HEKDownloader implements SWEKDownloader {
      *            the start date
      * @param endDate
      *            the end date
+     * @param params
      * @return the current URL extended with the params
      */
-    private StringBuilder appendParams(StringBuilder baseURL, SWEKEventType eventType, Date startDate, Date endDate) {
+    private StringBuilder appendParams(StringBuilder baseURL, SWEKEventType eventType, Date startDate, Date endDate, List<SWEKParam> params) {
+        int paramCount = 0;
+
+        for (SWEKParam param : params) {
+            String encodedValue;
+            try {
+                encodedValue = URLEncoder.encode(param.getValue(), "UTF-8");
+            } catch (UnsupportedEncodingException e) {
+                encodedValue = param.getValue();
+            }
+            if (param.getParam().toLowerCase().equals("provider")) {
+                baseURL.append("param").append(paramCount).append("=").append("frm_name").append("&").append("op").append(paramCount)
+                        .append("=").append(param.getOperand().URLEncodedRepresentation()).append("&").append("value").append(paramCount)
+                        .append("=").append(encodedValue);
+            }
+            paramCount++;
+        }
         return baseURL;
     }
 
