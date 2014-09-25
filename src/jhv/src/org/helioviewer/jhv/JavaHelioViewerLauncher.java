@@ -68,7 +68,7 @@ public class JavaHelioViewerLauncher {
         start(JavaHelioViewer.class, args);
     }
 
-    private static void loadLibs() {
+    public static void loadLibs() {
         SystemProperties.setPlatform();
         String libpath = JHVDirectory.LIBS.getPath().substring(0, JHVDirectory.LIBS.getPath().length() - 1) + File.separator;
         System.out.println(libpath);
