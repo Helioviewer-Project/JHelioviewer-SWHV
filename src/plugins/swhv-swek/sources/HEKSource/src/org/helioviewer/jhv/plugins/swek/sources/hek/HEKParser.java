@@ -132,7 +132,7 @@ public class HEKParser implements SWEKParser {
         HEKEventType hekEventType = new HEKEventType(eventType.getEventName(), eventSource.getSourceName(), eventSource.getProviderName());
         for (int i = 0; i < results.length() && !parserStopped; i++) {
             HEKEvent currentEvent = new HEKEvent(eventType.getEventName(), eventType.getEventName(), "", hekEventType,
-                    eventType.getEventIcon());
+                    eventType.getEventIcon(), eventType.getColor());
             JSONObject result = results.getJSONObject(i);
             parseResult(result, currentEvent);
             handleCoordinates(currentEvent);

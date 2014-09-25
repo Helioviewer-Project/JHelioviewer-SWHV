@@ -36,8 +36,8 @@ public class EventTypePlotConfiguration {
 
     /**
      * Creates the event type plot configuration from the given number of
-     * events, total number of lines, maximum lines per event type and the event
-     * plot configurations.
+     * events, total number of lines, maximum lines per event type, the event
+     * plot configurations and the color of the event type.
      * 
      * @param nrOfEventType
      *            the total number of event types to be drawn
@@ -91,5 +91,4 @@ public class EventTypePlotConfiguration {
     public Map<String, List<EventPlotConfiguration>> getEventPlotConfigurations() {
         return eventPlotConfigurations;
     }
-
 }

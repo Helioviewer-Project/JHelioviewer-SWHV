@@ -1,5 +1,6 @@
 package org.helioviewer.jhv.data.datatype;
 
+import java.awt.Color;
 import java.util.Date;
 import java.util.List;
 
@@ -123,5 +124,12 @@ public interface JHVEvent {
      * @return a list with positioning information
      */
     public abstract List<JHVPositionInformation> getPositioningInformation();
+
+    /**
+     * Gets the color in which the event should be drawn.
+     * 
+     * @return the color
+     */
+    public abstract Color getColor();
 
 }

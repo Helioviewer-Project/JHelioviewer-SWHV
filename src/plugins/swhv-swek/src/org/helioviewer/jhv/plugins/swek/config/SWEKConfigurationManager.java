@@ -3,12 +3,14 @@
  */
 package org.helioviewer.jhv.plugins.swek.config;
 
+import java.awt.Color;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.lang.reflect.Field;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -469,7 +471,73 @@ public class SWEKConfigurationManager {
         eventType.setCoordinateSystem(parseCoordinateSystem(object));
         eventType.setSpatialRegion(parseSpatialRegion(object));
         eventType.setEventIcon(parseEventIcon(object));
+        eventType.setColor(parseColor(object));
         return eventType;
+    }
+
+    /**
+     * Parses the color from the json.
+     * 
+     * @param object
+     *            the json to parse from
+     * @return the color of the event type or black if something went wrong.
+     * @throws JSONException
+     *             If the parsing went wrong
+     */
+    private Color parseColor(JSONObject object) throws JSONException {
+        String color = object.getString("color");
+        if (color != null) {
+            try {
+                URI colorURI = new URI(color);
+                if (colorURI.getScheme().toLowerCase().equals("colorname")) {
+                    return parseColorName(colorURI.getHost());
+                } else if (colorURI.getScheme().toLowerCase().equals("colorcode")) {
+                    return parseColorCode(colorURI.getHost());
+                } else {
+                    Log.info("Could not understand : " + color + " returned black color");
+                    return Color.black;
+                }
+            } catch (URISyntaxException e) {
+                Log.info("Could not parse the URI " + color + " black color is returned.");
+            }
+        }
+        return Color.black;
+    }
+
+    /**
+     * Parses a hexadecimal or octal string to a color.
+     * 
+     * @param colorCode
+     *            the code to parse into a color
+     * @return the color represented by the hex st ring or black if something
+     *         went wrong
+     */
+    private Color parseColorCode(String colorCode) {
+        try {
+            return Color.decode(colorCode);
+        } catch (NumberFormatException ex) {
+            Log.info("Could not parse the color code " + colorCode + " black color is returned.");
+            return Color.black;
+        }
+    }
+
+    /**
+     * Parses a color name into a color.
+     * 
+     * @param colorName
+     *            the name to parse into a color
+     * @return the color represented by the color name or black if something
+     *         went wrong
+     */
+    private Color parseColorName(String colorName) {
+        try {
+            Field field = Class.forName("java.awt.Color").getField(colorName);
+            return (Color) field.get(null);
+        } catch (Exception e) {
+            Log.info("Could not parse the color name " + colorName + " black color is returned.");
+            return Color.black; // Not defined
+        }
+
     }
 
     /**

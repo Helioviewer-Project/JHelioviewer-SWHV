@@ -3,6 +3,7 @@
  */
 package org.helioviewer.jhv.plugins.swek.config;
 
+import java.awt.Color;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -42,10 +43,13 @@ public class SWEKEventType {
     /** The icon corresponding with the event type */
     private ImageIcon eventIcon;
 
+    /** The color used for this event type */
+    private Color color;
+
     /**
      * Create a SWEKEvenType with an empty name, suppliers list, parameter list,
      * not standard selected, grouped on nothing, no coordinate system, no
-     * spatial region and event icon null.
+     * spatial region, event icon null and color black.
      */
     public SWEKEventType() {
         super();
@@ -58,12 +62,13 @@ public class SWEKEventType {
         coordinateSystem = "";
         spatialRegion = new SWEKSpatialRegion();
         eventIcon = null;
+        color = Color.BLACK;
     }
 
     /**
      * Creates an event type for the given event name, suppliers list, parameter
      * list, request interval extension, standard selected indication, group on
-     * parameter, coordinate system and icon.
+     * parameter, coordinate system, icon and color.
      * 
      * @param eventName
      *            The name of the event
@@ -81,9 +86,11 @@ public class SWEKEventType {
      *            The coordinate system
      * @param eventIcon
      *            the icon of the event type
+     * @param color
+     *            the color of the event type
      */
     public SWEKEventType(String eventName, List<SWEKSupplier> suppliers, List<SWEKParameter> parameterList, Long requestIntervalExtension,
-            boolean standardSelected, SWEKParameter groupOn, String coordinateSystem, ImageIcon eventIcon) {
+            boolean standardSelected, SWEKParameter groupOn, String coordinateSystem, ImageIcon eventIcon, Color color) {
         super();
         this.eventName = eventName;
         this.suppliers = suppliers;
@@ -93,6 +100,7 @@ public class SWEKEventType {
         this.groupOn = groupOn;
         this.coordinateSystem = coordinateSystem;
         this.eventIcon = eventIcon;
+        this.color = color;
     }
 
     /**
@@ -300,5 +308,24 @@ public class SWEKEventType {
      */
     public void setEventIcon(ImageIcon eventIcon) {
         this.eventIcon = eventIcon;
+    }
+
+    /**
+     * Gets the color of the event type.
+     * 
+     * @return the color of the event type
+     */
+    public Color getColor() {
+        return color;
+    }
+
+    /**
+     * Sets the color of the event type.
+     * 
+     * @param color
+     *            the color of the event type
+     */
+    public void setColor(Color color) {
+        this.color = color;
     }
 }
