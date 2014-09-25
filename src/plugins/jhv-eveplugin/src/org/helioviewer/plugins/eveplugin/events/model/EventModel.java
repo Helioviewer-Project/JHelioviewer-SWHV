@@ -58,7 +58,7 @@ public class EventModel implements ZoomControllerListener, EventRequesterListene
     private final EventPanel eventPanel;
 
     /** The swing worker creating the event type plot configurations */
-    private SwingWorker currentSwingWorker;
+    private SwingWorker<EventTypePlotConfiguration, Void> currentSwingWorker;
 
     /**
      * Private default constructor.
@@ -124,9 +124,6 @@ public class EventModel implements ZoomControllerListener, EventRequesterListene
                 createEventPlotConfiguration();
             }
         }
-        if (selectedInterval != null && availableInterval != null) {
-            DrawController.getSingletonInstance().updateDrawableElement(eventPanel, plot);
-        }
     }
 
     public EventTypePlotConfiguration getEventTypePlotConfiguration() {
@@ -159,6 +156,7 @@ public class EventModel implements ZoomControllerListener, EventRequesterListene
 
                 @Override
                 public EventTypePlotConfiguration doInBackground() {
+                    Log.info("Swingworker started");
                     int maxNrLines = 0;
                     Map<String, Integer> linesPerEventType = new HashMap<String, Integer>();
                     Map<String, List<EventPlotConfiguration>> eventPlotConfigPerEventType = new HashMap<String, List<EventPlotConfiguration>>();
@@ -218,13 +216,17 @@ public class EventModel implements ZoomControllerListener, EventRequesterListene
                         maxNrLines += maxEventLines;
                         eventPlotConfigPerEventType.put(eventType, plotConfig);
                     }
+                    Log.info("Swingworker finished");
                     return new EventTypePlotConfiguration(events.size(), maxNrLines, linesPerEventType, eventPlotConfigPerEventType);
                 }
 
                 @Override
                 public void done() {
                     try {
+                        Log.info("Swingworker done started");
                         eventPlotConfiguration = get();
+                        DrawController.getSingletonInstance().updateDrawableElement(eventPanel, plot);
+                        Log.info("Swingworker done finished");
                     } catch (InterruptedException e) {
                         Log.error("Could not create the event type plot configurations");
                     } catch (ExecutionException e) {
