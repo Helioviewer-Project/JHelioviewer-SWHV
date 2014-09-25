@@ -71,7 +71,7 @@ public class JavaHelioViewerLauncher {
     public static void loadLibs() {
         SystemProperties.setPlatform();
         String libpath = JHVDirectory.LIBS.getPath().substring(0, JHVDirectory.LIBS.getPath().length() - 1) + File.separator;
-        System.out.println(libpath);
+        //System.out.println(libpath);
         String libs[] = new String[4];// ["","",""];
         String pathlib = "";
         if (System.getProperty("jhv.os").equals("mac")) {
@@ -113,8 +113,8 @@ public class JavaHelioViewerLauncher {
                 InputStream in = JavaHelioViewerLauncher.class.getResourceAsStream("/jogl/lib/" + pathlib + libs[i]);
                 File fileOut = new File(libpath + libs[i]);
                 OutputStream out = new FileOutputStream(fileOut);
-                System.out.println(in);
-                System.out.println(out);
+                //System.out.println(in);
+                //System.out.println(out);
                 FileUtils.copy(in, out);
                 in.close();
                 out.close();
