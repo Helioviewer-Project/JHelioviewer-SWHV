@@ -36,9 +36,9 @@ import org.helioviewer.jhv.resourceloader.SystemProperties;
  * functions and it does not use type templates. For this reason the class
  * cannot use the apache logger. It is possible to pass command line arguments
  * to the launcher. The arguments are passed to the main JHelioviewer program.
- *
+ * 
  * @author Andre Dau
- *
+ * 
  */
 
 // The following also checks the installed java version, so it must run with
@@ -61,7 +61,7 @@ public class JavaHelioViewerLauncher {
     /**
      * Launches JavaHelioViewer.main(String[]) in a new vm with the parameters
      * specified in the config file
-     *
+     * 
      * @param args
      */
     public static void main(String[] args) {
@@ -70,9 +70,9 @@ public class JavaHelioViewerLauncher {
 
     private static void loadLibs() {
         SystemProperties.setPlatform();
-        String libpath = JHVDirectory.LIBS.getPath().substring(0, JHVDirectory.LIBS.getPath().length() - 1) + "/";
+        String libpath = JHVDirectory.LIBS.getPath().substring(0, JHVDirectory.LIBS.getPath().length() - 1) + File.separator;
         System.out.println(libpath);
-        String libs[] = new String[4];//["","",""];
+        String libs[] = new String[4];// ["","",""];
         String pathlib = "";
         if (System.getProperty("jhv.os").equals("mac")) {
             libs[0] = "libgluegen-rt.jnilib";
@@ -81,16 +81,16 @@ public class JavaHelioViewerLauncher {
             libs[3] = "libjogl_desktop.jnilib";
             pathlib = "macosx-universal/";
         } else if (System.getProperty("jhv.os").equals("windows") && System.getProperty("jhv.arch").equals("x86-64")) {
-            libs[0] = "libgluegen-rt.dll";
-            libs[1] = "libnativewindow_awt.dll";
-            libs[2] = "libnativewindow_win32.dll";
-            libs[3] = "libjogl_desktop.dll";
+            libs[0] = "gluegen-rt.dll";
+            libs[1] = "nativewindow_awt.dll";
+            libs[2] = "nativewindow_win32.dll";
+            libs[3] = "jogl_desktop.dll";
             pathlib = "windows-amd64/";
         } else if (System.getProperty("jhv.os").equals("windows") && System.getProperty("jhv.arch").equals("x86-32")) {
-            libs[0] = "libgluegen-rt.dll";
-            libs[1] = "libnativewindow_awt.dll";
-            libs[2] = "libnativewindow_win32.dll";
-            libs[3] = "libjogl_desktop.dll";
+            libs[0] = "gluegen-rt.dll";
+            libs[1] = "nativewindow_awt.dll";
+            libs[2] = "nativewindow_win32.dll";
+            libs[3] = "jogl_desktop.dll";
             pathlib = "windows-i586/";
         } else if (System.getProperty("jhv.os").equals("linux") && System.getProperty("jhv.arch").equals("x86-64")) {
             libs[0] = "libgluegen-rt.so";
@@ -99,7 +99,8 @@ public class JavaHelioViewerLauncher {
             libs[3] = "libjogl_desktop.so";
             pathlib = "linux-amd64/";
         }
-        //if (System.getProperty("jhv.os").equals("linux") && System.getProperty("jhv.arch").equals("x86-32")) {
+        // if (System.getProperty("jhv.os").equals("linux") &&
+        // System.getProperty("jhv.arch").equals("x86-32")) {
         else {
             libs[0] = "libgluegen-rt.so";
             libs[1] = "libnativewindow_awt.so";
@@ -109,9 +110,11 @@ public class JavaHelioViewerLauncher {
         }
         for (int i = 0; i < libs.length; i++) {
             try {
-                InputStream in = JavaHelioViewerLauncher.class.getResourceAsStream("/resources/jogl/lib/" + pathlib + libs[i]);
+                InputStream in = JavaHelioViewerLauncher.class.getResourceAsStream("/jogl/lib/" + pathlib + libs[i]);
                 File fileOut = new File(libpath + libs[i]);
                 OutputStream out = new FileOutputStream(fileOut);
+                System.out.println(in);
+                System.out.println(out);
                 FileUtils.copy(in, out);
                 in.close();
                 out.close();
@@ -124,7 +127,7 @@ public class JavaHelioViewerLauncher {
     /**
      * Launches the main method of the given class in a new vm with the
      * parameters specified in the config file
-     *
+     * 
      * @param mainClass
      *            the class which contains the main method to launch
      * @param args
@@ -148,7 +151,10 @@ public class JavaHelioViewerLauncher {
         // version too old
         if (versionNum1 < 1 || (versionNum1 == 1 && versionNum2 < 5)) {
             System.out.println("JavaHelioviewerLauncher > Java version too old to run JHelioviewer");
-            JEditorPane messagePane = new JEditorPane("text/html", "Your Java version needs to be updated in order to use JHelioviewer.<br>" + "You can get the latest version at <br>" + "<a href=\"http://www.java.com/download\"> http://www.java.com/download </a><br>" + "Your Java version: " + versionString + "<br>" + "Required version: 1.5 or greater");
+            JEditorPane messagePane = new JEditorPane("text/html",
+                    "Your Java version needs to be updated in order to use JHelioviewer.<br>" + "You can get the latest version at <br>"
+                            + "<a href=\"http://www.java.com/download\"> http://www.java.com/download </a><br>" + "Your Java version: "
+                            + versionString + "<br>" + "Required version: 1.5 or greater");
 
             messagePane.setEditable(false);
             messagePane.setOpaque(false);
@@ -173,7 +179,8 @@ public class JavaHelioViewerLauncher {
 
                 // Path to java binary (should use the same with wich the
                 // launcher was invoked)
-                commandLine.add(System.getProperty("java.home") + System.getProperty("file.separator") + "bin" + System.getProperty("file.separator") + "java");
+                commandLine.add(System.getProperty("java.home") + System.getProperty("file.separator") + "bin"
+                        + System.getProperty("file.separator") + "java");
 
                 // Initialize settings and variables
                 System.out.println("JavaHelioviewerLauncher > Initialize settings and read arguments for JVM");
@@ -194,7 +201,8 @@ public class JavaHelioViewerLauncher {
                 commandLine.add("-cp");
                 commandLine.add(jvmArgs);
                 jvmArgs = "-cp " + jvmArgs;
-                String libArg = "-Djava.library.path=" + JHVDirectory.LIBS.getPath().substring(0, JHVDirectory.LIBS.getPath().length() - 1) + System.getProperty("path.separator") + System.getProperty("java.library.path");
+                String libArg = "-Djava.library.path=" + JHVDirectory.LIBS.getPath().substring(0, JHVDirectory.LIBS.getPath().length() - 1)
+                        + System.getProperty("path.separator") + System.getProperty("java.library.path");
                 jvmArgs += " " + libArg;
                 commandLine.add(libArg);
                 String extArg = "-Djava.ext.dirs=\"\"";
@@ -223,7 +231,8 @@ public class JavaHelioViewerLauncher {
                 }
                 loadLibs();
 
-                System.out.println("JavaHelioviewerLauncher > Start JHelioviewer with the following java virtual machine parameters:" + jvmArgs);
+                System.out.println("JavaHelioviewerLauncher > Start JHelioviewer with the following java virtual machine parameters:"
+                        + jvmArgs);
                 // Pass arguments to process
                 commandLine.add(mainClass.getName());
 
@@ -257,7 +266,7 @@ public class JavaHelioViewerLauncher {
 
     /**
      * Logs the output of a process and redirects it to stdout
-     *
+     * 
      * @param process
      *            the process whose output should be logged
      * @param header
@@ -277,13 +286,15 @@ public class JavaHelioViewerLauncher {
                         System.out.println(header + line);
                     }
                 } catch (IOException e) {
-                    System.err.println(">> JavaHelioviewerLauncher.logProcessOutput(Process) >" + header + " Error while reading standard output");
+                    System.err.println(">> JavaHelioviewerLauncher.logProcessOutput(Process) >" + header
+                            + " Error while reading standard output");
                     e.printStackTrace();
                 } finally {
                     try {
                         stdout.close();
                     } catch (IOException e) {
-                        System.err.println(">> JavaHelioviewerLauncher.logProcessOutput(Process) >" + header + " Error while closing standard output stream");
+                        System.err.println(">> JavaHelioviewerLauncher.logProcessOutput(Process) >" + header
+                                + " Error while closing standard output stream");
                         e.printStackTrace();
                     }
                 }
@@ -299,13 +310,15 @@ public class JavaHelioViewerLauncher {
                         System.out.println(header + "ERROR: " + line);
                     }
                 } catch (IOException e) {
-                    System.err.println(">> JavaHelioviewerLauncher.logProcessOutput(Process) >" + header + "Error while reading standard error");
+                    System.err.println(">> JavaHelioviewerLauncher.logProcessOutput(Process) >" + header
+                            + "Error while reading standard error");
                     e.printStackTrace();
                 } finally {
                     try {
                         stderr.close();
                     } catch (IOException e) {
-                        System.err.println(">> JavaHelioviewerLauncher.logProcessOutput(Process) >" + header + " Error while closing standard error stream");
+                        System.err.println(">> JavaHelioviewerLauncher.logProcessOutput(Process) >" + header
+                                + " Error while closing standard error stream");
                         e.printStackTrace();
                     }
                 }
@@ -321,9 +334,9 @@ public class JavaHelioViewerLauncher {
 /**
  * Class to open hyperlinks and closing the version error dialog when the close
  * or ok button is pressed.
- *
+ * 
  * @author Andre Dau
- *
+ * 
  */
 // The following also checks the installed java version, so it must run with
 // java 1.2, ie. warnings will be generated.
@@ -336,7 +349,7 @@ class ListenerImpl implements HyperlinkListener, PropertyChangeListener {
 
     /**
      * Constructor
-     *
+     * 
      * @param errorPane
      *            The option pane which contains the version too old error
      *            message
@@ -353,7 +366,8 @@ class ListenerImpl implements HyperlinkListener, PropertyChangeListener {
     public void hyperlinkUpdate(HyperlinkEvent event) {
         if (event.getEventType() == HyperlinkEvent.EventType.ACTIVATED) {
             String url = event.getURL().toString();
-            final String[] browsers = { "firefox", "opera", "konqueror", "epiphany", "seamonkey", "galeon", "kazehakase", "mozilla", "netscape" };
+            final String[] browsers = { "firefox", "opera", "konqueror", "epiphany", "seamonkey", "galeon", "kazehakase", "mozilla",
+                    "netscape" };
             String osName = System.getProperty("os.name");
             try {
                 if (osName.startsWith("Mac OS")) {
@@ -369,11 +383,13 @@ class ListenerImpl implements HyperlinkListener, PropertyChangeListener {
                         String browser = browsers[i];
                         if (!found) {
                             Process p = Runtime.getRuntime().exec(new String[] { "which", browser });
-                            JavaHelioViewerLauncher.logProcessOutput(p, ">> JavaHeliovViewerLauncher.hyperlinkUpdate(HyperliinkEvent) > which: ");
+                            JavaHelioViewerLauncher.logProcessOutput(p,
+                                    ">> JavaHeliovViewerLauncher.hyperlinkUpdate(HyperliinkEvent) > which: ");
                             found = p.waitFor() == 0;
                             if (found) {
                                 p = Runtime.getRuntime().exec(new String[] { browser, url });
-                                JavaHelioViewerLauncher.logProcessOutput(p, ">> JavaHeliovViewerLauncher.hyperlinkUpdate(HyperliinkEvent) > browser: ");
+                                JavaHelioViewerLauncher.logProcessOutput(p,
+                                        ">> JavaHeliovViewerLauncher.hyperlinkUpdate(HyperliinkEvent) > browser: ");
                             }
                         }
                     }
