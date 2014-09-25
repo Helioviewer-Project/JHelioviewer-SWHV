@@ -42,9 +42,9 @@ public class EventTypePanelModel implements TreeModel, TreeExpansionListener {
      */
     public EventTypePanelModel(SWEKTreeModelEventType eventType) {
         this.eventType = eventType;
-        this.listeners = new ArrayList<TreeModelListener>();
-        this.treeModelInstance = SWEKTreeModel.getSingletonInstance();
-        this.panelModelListeners = new ArrayList<EventTypePanelModelListener>();
+        listeners = new ArrayList<TreeModelListener>();
+        treeModelInstance = SWEKTreeModel.getSingletonInstance();
+        panelModelListeners = new ArrayList<EventTypePanelModelListener>();
     }
 
     /**
@@ -54,7 +54,7 @@ public class EventTypePanelModel implements TreeModel, TreeExpansionListener {
      *            the listener to add
      */
     public void addEventPanelModelListener(EventTypePanelModelListener listener) {
-        this.panelModelListeners.add(listener);
+        panelModelListeners.add(listener);
     }
 
     /**
@@ -64,7 +64,7 @@ public class EventTypePanelModel implements TreeModel, TreeExpansionListener {
      *            the listener to remove
      */
     public void removeEventPanelModelListener(EventTypePanelModelListener listener) {
-        this.panelModelListeners.remove(listener);
+        panelModelListeners.remove(listener);
     }
 
     /**
@@ -77,25 +77,27 @@ public class EventTypePanelModel implements TreeModel, TreeExpansionListener {
      */
     public void rowClicked(int row) {
         if (row == 0) {
-            this.eventType.setCheckboxSelected(!this.eventType.isCheckboxSelected());
-            for (SWEKTreeModelSupplier supplier : this.eventType.getSwekTreeSuppliers()) {
-                supplier.setCheckboxSelected(this.eventType.isCheckboxSelected());
+            eventType.setCheckboxSelected(!eventType.isCheckboxSelected());
+            for (SWEKTreeModelSupplier supplier : eventType.getSwekTreeSuppliers()) {
+                supplier.setCheckboxSelected(eventType.isCheckboxSelected());
             }
-            if (this.eventType.isCheckboxSelected()) {
-                fireNewEventTypeActive(this.eventType.getSwekEventType());
+            if (eventType.isCheckboxSelected()) {
+                fireNewEventTypeActive(eventType.getSwekEventType());
             } else {
-                fireNewEventTypeInActive(this.eventType.getSwekEventType());
+                fireNewEventTypeInActive(eventType.getSwekEventType());
             }
-        } else if (row > 0 && row <= this.eventType.getSwekTreeSuppliers().size()) {
-            SWEKTreeModelSupplier supplier = this.eventType.getSwekTreeSuppliers().get(row - 1);
+        } else if (row > 0 && row <= eventType.getSwekTreeSuppliers().size()) {
+            SWEKTreeModelSupplier supplier = eventType.getSwekTreeSuppliers().get(row - 1);
             supplier.setCheckboxSelected(!supplier.isCheckboxSelected());
             if (supplier.isCheckboxSelected()) {
-                this.eventType.setCheckboxSelected(true);
+                eventType.setCheckboxSelected(true);
             }
             if (supplier.isCheckboxSelected()) {
-                fireNewEventTypeAndSourceActive(this.eventType.getSwekEventType(), supplier.getSwekSupplier().getSource());
+                fireNewEventTypeAndSourceActive(eventType.getSwekEventType(), supplier.getSwekSupplier().getSource(),
+                        supplier.getSwekSupplier());
             } else {
-                fireNewEventTypeAndSourceInActive(this.eventType.getSwekEventType(), supplier.getSwekSupplier().getSource());
+                fireNewEventTypeAndSourceInActive(eventType.getSwekEventType(), supplier.getSwekSupplier().getSource(),
+                        supplier.getSwekSupplier());
             }
         }
     }
@@ -108,7 +110,7 @@ public class EventTypePanelModel implements TreeModel, TreeExpansionListener {
      */
     @Override
     public void addTreeModelListener(TreeModelListener l) {
-        this.listeners.add(l);
+        listeners.add(l);
 
     }
 
@@ -168,7 +170,7 @@ public class EventTypePanelModel implements TreeModel, TreeExpansionListener {
      */
     @Override
     public Object getRoot() {
-        return this.eventType;
+        return eventType;
     }
 
     /*
@@ -194,7 +196,7 @@ public class EventTypePanelModel implements TreeModel, TreeExpansionListener {
      */
     @Override
     public void removeTreeModelListener(TreeModelListener l) {
-        this.listeners.remove(l);
+        listeners.remove(l);
 
     }
 
@@ -218,7 +220,7 @@ public class EventTypePanelModel implements TreeModel, TreeExpansionListener {
      */
     @Override
     public void treeCollapsed(TreeExpansionEvent event) {
-        this.treeModelInstance.subTreeCollapsed();
+        treeModelInstance.subTreeCollapsed();
     }
 
     /*
@@ -230,7 +232,7 @@ public class EventTypePanelModel implements TreeModel, TreeExpansionListener {
      */
     @Override
     public void treeExpanded(TreeExpansionEvent event) {
-        this.treeModelInstance.subTreeExpanded();
+        treeModelInstance.subTreeExpanded();
     }
 
     /**
@@ -240,10 +242,12 @@ public class EventTypePanelModel implements TreeModel, TreeExpansionListener {
      *            the event type that became active
      * @param swekSource
      *            the source that became active
+     * @param swekSupplier
+     *            the supplier that became active
      */
-    private void fireNewEventTypeAndSourceActive(SWEKEventType eventType, SWEKSource swekSource) {
-        for (EventTypePanelModelListener l : this.panelModelListeners) {
-            l.newEventTypeAndSourceActive(eventType, swekSource);
+    private void fireNewEventTypeAndSourceActive(SWEKEventType eventType, SWEKSource swekSource, SWEKSupplier swekSupplier) {
+        for (EventTypePanelModelListener l : panelModelListeners) {
+            l.newEventTypeAndSourceActive(eventType, swekSource, swekSupplier);
         }
     }
 
@@ -256,9 +260,9 @@ public class EventTypePanelModel implements TreeModel, TreeExpansionListener {
      * @param swekSource
      *            the source that became inactive
      */
-    private void fireNewEventTypeAndSourceInActive(SWEKEventType eventType, SWEKSource swekSource) {
-        for (EventTypePanelModelListener l : this.panelModelListeners) {
-            l.newEventTypeAndSourceInActive(eventType, swekSource);
+    private void fireNewEventTypeAndSourceInActive(SWEKEventType eventType, SWEKSource swekSource, SWEKSupplier supplier) {
+        for (EventTypePanelModelListener l : panelModelListeners) {
+            l.newEventTypeAndSourceInActive(eventType, swekSource, supplier);
         }
     }
 
@@ -270,7 +274,7 @@ public class EventTypePanelModel implements TreeModel, TreeExpansionListener {
      */
     private void fireNewEventTypeActive(SWEKEventType swekEventType) {
         for (SWEKSupplier supplier : swekEventType.getSuppliers()) {
-            fireNewEventTypeAndSourceActive(swekEventType, supplier.getSource());
+            fireNewEventTypeAndSourceActive(swekEventType, supplier.getSource(), supplier);
         }
     }
 
@@ -282,7 +286,7 @@ public class EventTypePanelModel implements TreeModel, TreeExpansionListener {
      */
     private void fireNewEventTypeInActive(SWEKEventType swekEventType) {
         for (SWEKSupplier supplier : swekEventType.getSuppliers()) {
-            fireNewEventTypeAndSourceInActive(swekEventType, supplier.getSource());
+            fireNewEventTypeAndSourceInActive(swekEventType, supplier.getSource(), supplier);
         }
     }
 }
