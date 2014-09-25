@@ -1,5 +1,6 @@
 package org.helioviewer.jhv.plugins.swek.sources.hek;
 
+import java.awt.Color;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -67,6 +68,9 @@ public class HEKEvent implements JHVEvent {
     /** List with positioning information for this event */
     private List<JHVPositionInformation> positionInformation;
 
+    /** The color in which the event should be drawn */
+    private final Color color;
+
     /**
      * Default constructor
      */
@@ -77,11 +81,12 @@ public class HEKEvent implements JHVEvent {
         description = "";
         icon = null;
         eventType = null;
+        color = Color.black;
     }
 
     /**
      * Creates a HEK event with an event name, event display name, short
-     * description and an .
+     * description, an event type and color.
      * 
      * 
      * @param eventName
@@ -92,19 +97,22 @@ public class HEKEvent implements JHVEvent {
      *            the short description
      * @param eventType
      *            the event type
+     * @param color
+     *            the color
      */
-    public HEKEvent(String eventName, String eventDisplayName, String description, JHVEventType eventType) {
+    public HEKEvent(String eventName, String eventDisplayName, String description, JHVEventType eventType, Color color) {
         initLists();
         this.eventName = eventName;
         this.eventDisplayName = eventDisplayName;
         this.description = description;
         icon = null;
         this.eventType = eventType;
+        this.color = color;
     }
 
     /**
      * Creates a HEK event with an event name, event display name, short
-     * description, event type and an icon.
+     * description, event type, an icon and color.
      * 
      * @param eventName
      *            the event name
@@ -114,14 +122,17 @@ public class HEKEvent implements JHVEvent {
      *            the description
      * @param icon
      *            the icon
+     * @param color
+     *            the color
      */
-    public HEKEvent(String eventName, String eventDisplayName, String description, JHVEventType eventType, ImageIcon icon) {
+    public HEKEvent(String eventName, String eventDisplayName, String description, JHVEventType eventType, ImageIcon icon, Color color) {
         initLists();
         this.eventName = eventName;
         this.eventDisplayName = eventDisplayName;
         this.description = description;
         this.icon = icon;
         this.eventType = eventType;
+        this.color = color;
     }
 
     @Override
@@ -194,6 +205,21 @@ public class HEKEvent implements JHVEvent {
         return eventType;
     }
 
+    @Override
+    public Color getColor() {
+        return color;
+    }
+
+    @Override
+    public List<JHVPositionInformation> getPositioningInformation() {
+        return positionInformation;
+    }
+
+    @Override
+    public String getUniqueID() {
+        return uniqueID;
+    }
+
     /**
      * Adds a parameter to the event.
      * 
@@ -246,11 +272,6 @@ public class HEKEvent implements JHVEvent {
 
     }
 
-    @Override
-    public String getUniqueID() {
-        return uniqueID;
-    }
-
     /**
      * Sets the unique ID for the HekEvent.
      * 
@@ -258,11 +279,6 @@ public class HEKEvent implements JHVEvent {
      */
     public void setUniqueID(String uniqueID) {
         this.uniqueID = uniqueID;
-    }
-
-    @Override
-    public List<JHVPositionInformation> getPositioningInformation() {
-        return positionInformation;
     }
 
     /**

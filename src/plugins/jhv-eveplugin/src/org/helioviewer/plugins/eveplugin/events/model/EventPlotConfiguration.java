@@ -1,6 +1,5 @@
 package org.helioviewer.plugins.eveplugin.events.model;
 
-import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Rectangle;
 
@@ -66,7 +65,7 @@ public class EventPlotConfiguration {
             int nrPreviousLines) {
         int spacePerLine = (new Double(Math.floor(1.0 * graphArea.height / totalLines / 2))).intValue();
         int startPosition = spacePerLine * 2 * (nrPreviousLines + yPosition);
-        g.setColor(Color.CYAN);
+        g.setColor(event.getColor());
         g.fillRect((new Double(Math.floor(graphArea.width * scaledX0))).intValue(), startPosition,
                 (new Double(Math.floor(graphArea.width * (scaledX1 - scaledX0)))).intValue(), spacePerLine);
         // g.drawString(event.getDisplayName(), (new
