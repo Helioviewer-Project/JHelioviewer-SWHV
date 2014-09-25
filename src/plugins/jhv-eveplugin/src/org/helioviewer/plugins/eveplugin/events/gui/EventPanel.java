@@ -17,8 +17,10 @@ import org.helioviewer.plugins.eveplugin.events.model.EventTypePlotConfiguration
 
 public class EventPanel implements DrawableElement {
 
-    public EventPanel() {
+    private final YAxisElement yAxisElement;
 
+    public EventPanel() {
+        yAxisElement = new YAxisElement(new Range(0, 0), new Range(0, 0), "", 0, 0, Color.BLACK);
     }
 
     @Override
@@ -55,7 +57,7 @@ public class EventPanel implements DrawableElement {
 
     @Override
     public YAxisElement getYAxisElement() {
-        return new YAxisElement(new Range(0, 0), new Range(0, 0), "", 0, 0, Color.BLACK);
+        return yAxisElement;
     }
 
     @Override
