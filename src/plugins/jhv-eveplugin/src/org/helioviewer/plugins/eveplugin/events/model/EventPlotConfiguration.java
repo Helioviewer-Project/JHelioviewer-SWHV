@@ -63,7 +63,7 @@ public class EventPlotConfiguration {
      */
     public void draw(Graphics g, Rectangle graphArea, int nrOfEventTypes, int eventTypeNR, int linesForEventType, int totalLines,
             int nrPreviousLines) {
-        int spacePerLine = (new Double(Math.floor(1.0 * graphArea.height / totalLines / 2))).intValue();
+        int spacePerLine = Math.min(4, (new Double(Math.floor(1.0 * graphArea.height / totalLines / 2))).intValue());
         int startPosition = spacePerLine * 2 * (nrPreviousLines + yPosition);
         g.setColor(event.getColor());
         g.fillRect((new Double(Math.floor(graphArea.width * scaledX0))).intValue(), startPosition,
