@@ -41,10 +41,10 @@ public class EVEDrawableElement implements DrawableElement {
     }
 
     public EVEDrawableElement() {
-        this.interval = new Interval<Date>(Calendar.getInstance().getTime(), Calendar.getInstance().getTime());
-        this.bands = new Band[0];
-        this.values = new EVEValues[0];
-        this.yAxisElement = new YAxisElement();
+        interval = new Interval<Date>(Calendar.getInstance().getTime(), Calendar.getInstance().getTime());
+        bands = new Band[0];
+        values = new EVEValues[0];
+        yAxisElement = new YAxisElement();
     }
 
     @Override
@@ -62,22 +62,25 @@ public class EVEDrawableElement implements DrawableElement {
         double logMinValue = yAxisElement.getMinValue();
         double logMaxValue = yAxisElement.getMaxValue();
 
-        double ratioX = !intervalAvailable ? 0 : (double) graphArea.width / (double) (interval.getEnd().getTime() - interval.getStart().getTime());
+        double ratioX = !intervalAvailable ? 0 : (double) graphArea.width
+                / (double) (interval.getEnd().getTime() - interval.getStart().getTime());
         double ratioY = logMaxValue < logMinValue ? 0 : graphArea.height / (logMaxValue - logMinValue);
 
         graphPolylines.clear();
-        
+
         for (int i = 0; i < bands.length; ++i) {
             if (bands[i].isVisible()) {
                 final EVEValue[] eveValues = values[i].getValues();
                 final ArrayList<Point> pointList = new ArrayList<Point>();
                 final LinkedList<Integer> warnLevels = new LinkedList<Integer>();
+                final LinkedList<String> warnLabels = new LinkedList<String>();
                 HashMap<String, Double> unconvertedWarnLevels = bands[i].getBandType().getWarnLevels();
 
                 Iterator<Entry<String, Double>> it = unconvertedWarnLevels.entrySet().iterator();
                 while (it.hasNext()) {
                     Map.Entry<String, Double> pairs = it.next();
                     warnLevels.add(computeY(pairs.getValue(), interval, graphArea, ratioY, logMinValue));
+                    warnLabels.add(pairs.getKey());
                     // it.remove(); // avoids a ConcurrentModificationException
                 }
 
@@ -88,7 +91,7 @@ public class EVEDrawableElement implements DrawableElement {
 
                     if (value == null) {
                         if (counter > 1) {
-                            graphPolylines.add(new GraphPolyline(pointList, bands[i].getGraphColor(), warnLevels));
+                            graphPolylines.add(new GraphPolyline(pointList, bands[i].getGraphColor(), warnLevels, warnLabels));
                         }
 
                         pointList.clear();
@@ -106,7 +109,7 @@ public class EVEDrawableElement implements DrawableElement {
                 }
 
                 if (counter > 0) {
-                    graphPolylines.add(new GraphPolyline(pointList, bands[i].getGraphColor(), warnLevels));
+                    graphPolylines.add(new GraphPolyline(pointList, bands[i].getGraphColor(), warnLevels, warnLabels));
                 }
             }
         }
@@ -121,6 +124,7 @@ public class EVEDrawableElement implements DrawableElement {
                 g.drawPolyline(line.xPoints, line.yPoints, line.numberOfPoints);
                 for (int j = 0; j < line.warnLevels.length; j++) {
                     g.drawLine(graphArea.x, line.warnLevels[j], graphArea.x + graphArea.width, line.warnLevels[j]);
+                    g.drawString(line.warnLabels[j], graphArea.x, line.warnLevels[j]);
                 }
             }
         }
@@ -149,6 +153,7 @@ public class EVEDrawableElement implements DrawableElement {
         public final int[] xPoints;
         public final int[] yPoints;
         public final int[] warnLevels;
+        public final String[] warnLabels;
 
         public final Color color;
 
@@ -156,13 +161,14 @@ public class EVEDrawableElement implements DrawableElement {
         // Methods
         // //////////////////////////////////////////////////////////////////////////
 
-        public GraphPolyline(final List<Point> points, final Color color, final List<Integer> warnLevels) {
-            this.numberOfPoints = points.size();
-            this.numberOfWarnLevels = warnLevels.size();
-            this.xPoints = new int[numberOfPoints];
-            this.yPoints = new int[numberOfPoints];
+        public GraphPolyline(final List<Point> points, final Color color, final List<Integer> warnLevels, final List<String> warnLabels) {
+            numberOfPoints = points.size();
+            numberOfWarnLevels = warnLevels.size();
+            xPoints = new int[numberOfPoints];
+            yPoints = new int[numberOfPoints];
             this.color = color;
             this.warnLevels = new int[numberOfWarnLevels];
+            this.warnLabels = new String[numberOfWarnLevels];
 
             int counter = 0;
             for (final Point point : points) {
@@ -176,6 +182,11 @@ public class EVEDrawableElement implements DrawableElement {
                 this.warnLevels[counter] = warnLevel;
                 counter++;
             }
+            counter = 0;
+            for (final String warnLabel : warnLabels) {
+                this.warnLabels[counter] = warnLabel;
+                counter++;
+            }
         }
     }
 
@@ -186,7 +197,7 @@ public class EVEDrawableElement implements DrawableElement {
 
     @Override
     public YAxisElement getYAxisElement() {
-        return this.yAxisElement;
+        return yAxisElement;
     }
 
     @Override
