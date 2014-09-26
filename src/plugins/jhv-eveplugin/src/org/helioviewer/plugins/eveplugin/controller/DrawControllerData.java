@@ -84,10 +84,11 @@ public class DrawControllerData {
                 elements.add(element);
 
                 Set<YAxisElement> tempSet = new HashSet<YAxisElement>(yAxisSet);
-                tempSet.add(element.getYAxisElement());
-                yAxisSet = tempSet;
+                if (element.getYAxisElement() != null) {
+                    tempSet.add(element.getYAxisElement());
+                    yAxisSet = tempSet;
+                }
             }
-
         });
         nrOfDrawableElements++;
     }
@@ -104,7 +105,9 @@ public class DrawControllerData {
                         nrOfDrawableElements--;
                         if (elements.isEmpty()) {
                             synchronized (yAxisSet) {
-                                yAxisSet.remove(element.getYAxisElement());
+                                if (element.getYAxisElement() != null) {
+                                    yAxisSet.remove(element.getYAxisElement());
+                                }
                             }
                         }
                     }
