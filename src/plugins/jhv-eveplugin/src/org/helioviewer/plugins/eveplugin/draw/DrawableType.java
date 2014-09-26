@@ -9,8 +9,8 @@ public enum DrawableType {
     public static List<DrawableType> getZOrderedList() {
         ArrayList<DrawableType> tempList = new ArrayList<DrawableType>();
         tempList.add(DrawableType.FULL_IMAGE);
-        tempList.add(DrawableType.LINE);
         tempList.add(DrawableType.TEXT_ICON);
+        tempList.add(DrawableType.LINE);
         tempList.add(DrawableType.ICON);
         tempList.add(DrawableType.TEXT);
         return tempList;
