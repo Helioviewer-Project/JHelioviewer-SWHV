@@ -57,7 +57,8 @@ public class EventPanel implements DrawableElement {
 
     @Override
     public YAxisElement getYAxisElement() {
-        return yAxisElement;
+        // return yAxisElement;
+        return null;
     }
 
     @Override
