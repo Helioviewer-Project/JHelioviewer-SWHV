@@ -52,7 +52,6 @@
         <mkdir dir="${lib}" /> 
         <mkdir dir="${src}" /> 
         <mkdir dir="${doc}" />
-        <mkdir dir="${sweksources.lib}" />
     </target>
 
     <!-- Delete generated files -->
