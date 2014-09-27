@@ -100,15 +100,20 @@ public class HEKParser implements SWEKParser {
         this.eventSource = eventSource;
         try {
             StringBuilder sb = new StringBuilder();
-            BufferedReader br = new BufferedReader(new InputStreamReader(downloadInputStream));
-            String line;
-            while ((line = br.readLine()) != null) {
-                sb.append(line);
+            if (downloadInputStream != null) {
+                BufferedReader br = new BufferedReader(new InputStreamReader(downloadInputStream));
+                String line;
+                while ((line = br.readLine()) != null) {
+                    sb.append(line);
+                }
+                JSONObject eventJSON;
+                eventJSON = new JSONObject(sb.toString());
+                parseEventJSON(eventJSON);
+                return eventStream;
+            } else {
+                // TODO inform the user hek is probably death...
+                Log.error("Download input stream was null. Probably the hek is down.");
             }
-            JSONObject eventJSON;
-            eventJSON = new JSONObject(sb.toString());
-            parseEventJSON(eventJSON);
-            return eventStream;
         } catch (IOException e) {
             Log.error("Could not read the inputstream. " + e);
             e.printStackTrace();
