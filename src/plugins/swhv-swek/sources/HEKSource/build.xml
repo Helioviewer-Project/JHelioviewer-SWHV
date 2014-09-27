@@ -13,12 +13,13 @@
     <property name="heksource.bin" value="${basedir}/bin" />
     <property name="heksource.lib" value="${basedir}/lib" />
     <property name="heksource.build.resources" value="${basedir}/build-resources/" />
+    <property name="heksource.resources" value="${basedir}/resources/" />
     <property name="source.name" value="heksource"/>
     <property name="server.lib.location" value="/Users/bramb/Documents/OMA/jhelioviewer/svn/SWHV_repos/trunk/data/server/swek_config/jars/" />
     <property name="swhv.build" value="${swhvproject.location}/build" />
     <property name="swhv.bin" value="${swhvproject.location}/bin/jhv" />
     <property name="swhv.lib" value="${swhvproject.location}/lib" />
-    <property name="swhv-swek.homedir.sources" value="${user.home}/JHelioviewer/PluginsResources/swek_plugin/sources" />
+    <property name="swhv-swek.homedir.sources" value="${user.home}/JHelioviewer/PluginResources/swek_plugin/sources" />
     
     <property name="revision" value="0" />
     <property name="version" value="0"/>
@@ -90,9 +91,10 @@
                 <attribute name="revision" value="${revision}" />
             </manifest>
             <fileset dir="${heksource.bin}" />
+            <fileset dir="${heksource.resources}" />
             <fileset file="README" />
             <fileset file="COPYING" />
-            <!--<zipgroupfileset dir="${heksource.lib}" includes="**/*.jar"/>-->
+            <!--<zipgroupfileset dir="${swhv-swek.build}" includes="**/*.jar"/>-->
         </jar>
     </target>
     
