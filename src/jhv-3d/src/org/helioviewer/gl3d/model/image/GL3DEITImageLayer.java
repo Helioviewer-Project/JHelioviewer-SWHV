@@ -26,7 +26,7 @@ public class GL3DEITImageLayer extends GL3DImageLayer {
         GLVertexShaderProgram vertexShader = GL3DShaderFactory.createVertexShaderProgram(gl, vertex);
         this.imageTextureView.setVertexShader(vertex);
 
-        sphere = new GL3DImageSphere(imageTextureView, vertexShader, sphereFragmentShader, this);
+        sphere = new GL3DImageSphere(imageTextureView, vertexShader, sphereFragmentShader, this, true, true);
         this.imageTextureView.metadata = this.metaDataView.getMetaData();
 
         this.sphereFragmentShader.setCutOffRadius((float) (Constants.SunRadius / this.imageTextureView.metadata.getPhysicalImageWidth()));

@@ -27,10 +27,14 @@ import org.helioviewer.viewmodel.view.opengl.shader.GLVertexShaderProgram;
 public class GL3DImageSphere extends GL3DImageMesh {
 
     private final GL3DImageLayer layer;
+    private boolean showSphere;
+    private boolean showCorona;
 
-    public GL3DImageSphere(GL3DImageTextureView imageTextureView, GLVertexShaderProgram vertexShaderProgram, GLFragmentShaderProgram fragmentShaderProgram, GL3DImageLayer imageLayer) {
+    public GL3DImageSphere(GL3DImageTextureView imageTextureView, GLVertexShaderProgram vertexShaderProgram, GLFragmentShaderProgram fragmentShaderProgram, GL3DImageLayer imageLayer, boolean showSphere, boolean showCorona) {
         super("Sphere", imageTextureView, vertexShaderProgram, fragmentShaderProgram);
         layer = imageLayer;
+        this.showSphere = showSphere;
+        this.showCorona = showCorona;
     }
 
     @Override
@@ -49,7 +53,6 @@ public class GL3DImageSphere extends GL3DImageMesh {
             int resolutionY = 50;
             int numberOfPositions = 0;
             MetaData metaData = this.layer.metaDataView.getMetaData();
-            boolean showSphere = true;
             if (metaData instanceof HelioviewerOcculterMetaData) {
                 HelioviewerOcculterMetaData md = (HelioviewerOcculterMetaData) metaData;
                 showSphere = false;
@@ -85,7 +88,6 @@ public class GL3DImageSphere extends GL3DImageMesh {
                     }
                 }
             }
-            boolean showCorona = true;
             if (metaData instanceof HelioviewerPositionedMetaData) {
                 HelioviewerPositionedMetaData md = (HelioviewerPositionedMetaData) metaData;
                 if (md.getInstrument().contains("HMI")) {

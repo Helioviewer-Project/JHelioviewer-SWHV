@@ -9,6 +9,7 @@ import org.helioviewer.viewmodel.view.opengl.shader.GLVertexShaderProgram;
 
 public class GL3DAIAImageLayer extends GL3DImageLayer {
     private GL3DImageSphere sphere;
+    private GL3DImageSphere corona;
 
     public GL3DAIAImageLayer(GL3DView mainView) {
         super("AIA Image Layer", mainView);
@@ -21,8 +22,10 @@ public class GL3DAIAImageLayer extends GL3DImageLayer {
         GLVertexShaderProgram vertexShader = GL3DShaderFactory.createVertexShaderProgram(gl, vertexShaderProgram);
         this.imageTextureView.setVertexShader(vertexShaderProgram);
         this.imageTextureView.metadata = this.metaDataView.getMetaData();
-        sphere = new GL3DImageSphere(imageTextureView, vertexShader, sphereFragmentShader, this);
+        sphere = new GL3DImageSphere(imageTextureView, vertexShader, sphereFragmentShader, this, true, false);
+        corona = new GL3DImageSphere(imageTextureView, vertexShader, sphereFragmentShader, this, false, true);
         this.addNode(sphere);
+        this.addNode(corona);
     }
 
     @Override
@@ -30,4 +33,8 @@ public class GL3DAIAImageLayer extends GL3DImageLayer {
         return this.sphere;
     }
 
+    @Override
+    public GL3DImageMesh getImageCorona() {
+        return this.corona;
+    }
 }

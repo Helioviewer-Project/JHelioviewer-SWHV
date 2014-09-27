@@ -10,6 +10,7 @@ import org.helioviewer.gl3d.camera.GL3DCamera;
 import org.helioviewer.gl3d.camera.GL3DCameraListener;
 import org.helioviewer.gl3d.model.GL3DHitReferenceShape;
 import org.helioviewer.gl3d.scenegraph.GL3DGroup;
+import org.helioviewer.gl3d.scenegraph.GL3DShape;
 import org.helioviewer.gl3d.scenegraph.GL3DState;
 import org.helioviewer.gl3d.scenegraph.math.GL3DVec3d;
 import org.helioviewer.gl3d.scenegraph.math.GL3DVec4d;
@@ -240,5 +241,9 @@ public abstract class GL3DImageLayer extends GL3DGroup implements GL3DCameraList
     @Override
     public void viewChanged(View sender, ChangeEvent aEvent) {
         this.updateROI(GL3DState.get().getActiveCamera());
+    }
+
+    protected GL3DShape getImageCorona() {
+        return null;
     }
 }
