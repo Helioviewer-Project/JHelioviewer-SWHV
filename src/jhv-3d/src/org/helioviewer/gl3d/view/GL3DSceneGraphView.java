@@ -81,25 +81,25 @@ public class GL3DSceneGraphView extends AbstractGL3DView implements GL3DView {
         }, KeyEvent.VK_B);
         /*
          * GL3DKeyController.getInstance().addListener(new GL3DKeyListener() {
-         * 
+         *
          * @Override public void keyHit(KeyEvent e) {
          * root.getDrawBits().toggle(Bit.Wireframe);
          * Displayer.getSingletonInstance().display();
          * Log.debug("Toggling Wireframe"); } }, KeyEvent.VK_W);
-         * 
+         *
          * GL3DKeyController.getInstance().addListener(new GL3DKeyListener() {
-         * 
+         *
          * @Override public void keyHit(KeyEvent e) {
          * root.getDrawBits().toggle(Bit.Normals);
          * Displayer.getSingletonInstance().display();
          * Log.debug("Toggling Normals"); } }, KeyEvent.VK_N);
          * GL3DKeyController.getInstance().addListener(new GL3DKeyListener() {
-         * 
+         *
          * @Override public void keyHit(KeyEvent e) {
          * Displayer.getSingletonInstance().display();
          * Log.debug("Toggling Framebuffer"); } }, KeyEvent.VK_F);
          * GL3DKeyController.getInstance().addListener(new GL3DKeyListener() {
-         * 
+         *
          * @Override public void keyHit(KeyEvent e) {
          * imageLayers.getDrawBits().toggle(Bit.Hidden);
          * Displayer.getSingletonInstance().display();
@@ -325,7 +325,7 @@ public class GL3DSceneGraphView extends AbstractGL3DView implements GL3DView {
 
         this.imageLayers = new GL3DImageLayers();
         root.addNode(this.imageLayers);
-        root.addNode(artificialObjects);
+        //root.addNode(artificialObjects);
 
         this.hitReferenceShape = new GL3DHitReferenceShape(false);
         root.addNode(this.hitReferenceShape);
@@ -377,7 +377,7 @@ public class GL3DSceneGraphView extends AbstractGL3DView implements GL3DView {
         /*
          * GL3DNode sibling = node; while((sibling = sibling.getNext()) != null)
          * { for(int i=0; i<level; ++i) System.out.print("   ");
-         *
+         * 
          * System.out.println("Sibling: " + sibling.getClass().getName() + " ("
          * + node.getName() + ")"); }
          */
