@@ -4,8 +4,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.Properties;
 
-import org.helioviewer.jhv.plugins.swek.SWEKPlugin;
-
 /**
  * Gives access to the HEK source properties
  * 
@@ -22,7 +20,7 @@ public class HEKSourceProperties {
      * Private default constructor.
      */
     private HEKSourceProperties() {
-        this.hekSourceProperties = new Properties();
+        hekSourceProperties = new Properties();
         loadProperties();
     }
 
@@ -44,16 +42,16 @@ public class HEKSourceProperties {
      * @return the hek source properties
      */
     public Properties getHEKSourceProperties() {
-        return this.hekSourceProperties;
+        return hekSourceProperties;
     }
 
     /**
      * Loads the overall hek source settings.
      */
     private void loadProperties() {
-        InputStream defaultPropStream = SWEKPlugin.class.getResourceAsStream("/heksource.properties");
+        InputStream defaultPropStream = HEKSourceProperties.class.getResourceAsStream("/heksource.properties");
         try {
-            this.hekSourceProperties.load(defaultPropStream);
+            hekSourceProperties.load(defaultPropStream);
         } catch (IOException ex) {
             System.out.println("Could not load the hek settings." + ex);
         }
