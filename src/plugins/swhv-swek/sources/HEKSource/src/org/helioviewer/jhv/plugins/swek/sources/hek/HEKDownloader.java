@@ -45,10 +45,10 @@ public class HEKDownloader implements SWEKDownloader {
             DownloadStream ds = new DownloadStream(new URL(urlString), JHVGlobals.getStdConnectTimeout(), JHVGlobals.getStdReadTimeout());
             return ds.getInput();
         } catch (MalformedURLException e) {
-            Log.error("Could not create URL from given string: " + urlString);
+            Log.error("Could not create URL from given string: " + urlString + " error : " + e);
             return null;
         } catch (IOException e) {
-            Log.error("Could not create input stream for given URL: " + urlString);
+            Log.error("Could not create input stream for given URL: " + urlString + " error : " + e);
             return null;
         }
 
