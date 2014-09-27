@@ -55,6 +55,7 @@ public class SWEKPlugin extends OverlayPlugin implements Plugin {
         SWEKConfig = SWEKConfigurationManager.getSingletonInstance();
         SWEKSources = SWEKSourceManager.getSingletonInstance();
         loadExternalJars = true;
+        SWEKSources.setPlugin(this);
         SWEKSources.loadExternalJars(loadExternalJars);
         outgoingRequestManager = OutgoingRequestManager.getSingletonInstance();
         incomingRequestManager = IncomingRequestManager.getSingletonInstance();
