@@ -101,7 +101,7 @@ public class GL3DGrid extends GL3DGroup {
             gl.glEnd();
         }
         for (int j = 0; j <= this.xticks - 1; j++) {
-            double theta = 2 * j * Math.PI / this.yticks;
+            double theta = 2 * j * Math.PI / this.xticks;
             gl.glBegin(GL2.GL_LINE_LOOP);
             for (int i = 0; i <= lineres; i++) {
                 double phi = i * Math.PI / lineres;
