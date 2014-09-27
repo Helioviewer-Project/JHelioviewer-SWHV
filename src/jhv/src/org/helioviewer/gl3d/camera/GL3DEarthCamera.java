@@ -22,9 +22,9 @@ import org.helioviewer.viewmodel.view.ViewListener;
  * {@link GL3DEarthCamera} by automatically rotating the camera around the
  * Y-Axis (pointing to solar north) by an amount calculated through
  * {@link DifferentialRotation}.
- * 
+ *
  * @author Simon Spoerri (simon.spoerri@fhnw.ch)
- * 
+ *
  */
 public class GL3DEarthCamera extends GL3DSolarRotationTrackingTrackballCamera implements ViewListener {
 
@@ -76,7 +76,7 @@ public class GL3DEarthCamera extends GL3DSolarRotationTrackingTrackballCamera im
         cal.setTime(new Date(currentDate.getTime()));
         double b0 = Astronomy.getB0InRadians(cal);
         this.getLocalRotation().clear();
-        this.getLocalRotation().rotate(GL3DQuatd.createRotation(-b0, new GL3DVec3d(1, 0, 0)));
+        this.getLocalRotation().rotate(GL3DQuatd.createRotation(b0, new GL3DVec3d(1, 0, 0)));
         this.getLocalRotation().rotate(GL3DQuatd.createRotation(this.currentRotation, new GL3DVec3d(0, 1, 0)));
         this.updateCameraTransformation();
     }
