@@ -65,6 +65,7 @@ public class GL3DText extends GL3DMesh {
         GL3DFont.getSingletonInstance().bindFont(this.font, gl);
         super.shapeDraw(state);
         gl.glEnable(GL2.GL_LIGHT0);
+        gl.glEnable(GL2.GL_COLOR_MATERIAL);
     }
 
     @Override
