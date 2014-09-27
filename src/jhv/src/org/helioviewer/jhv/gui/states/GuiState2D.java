@@ -10,7 +10,6 @@ import org.helioviewer.jhv.gui.controller.MainImagePanelMousePanController;
 import org.helioviewer.jhv.gui.interfaces.ImagePanelInputController;
 import org.helioviewer.viewmodel.view.ComponentView;
 import org.helioviewer.viewmodel.view.SynchronizeView;
-import org.helioviewer.viewmodel.view.opengl.GLTextureHelper;
 
 public class GuiState2D implements State {
 
@@ -21,7 +20,7 @@ public class GuiState2D implements State {
 
     protected RenderModeStatusPanel renderModeStatus;
 
-    private ViewchainFactory viewchainFactory;
+    private final ViewchainFactory viewchainFactory;
 
     public GuiState2D() {
         this(new ViewchainFactory());
@@ -31,21 +30,26 @@ public class GuiState2D implements State {
         this.viewchainFactory = viewchainFactory;
     }
 
+    @Override
     public void addStateSpecificComponents(SideContentPane sideContentPane) {
 
     }
 
+    @Override
     public void removeStateSpecificComponents(SideContentPane sideContentPane) {
 
     }
 
+    @Override
     public void activate() {
     }
 
+    @Override
     public void deactivate() {
         getMainComponentView().deactivate();
     }
 
+    @Override
     public boolean createViewChains() {
         Log.info("Start creating view chains");
 
@@ -70,9 +74,13 @@ public class GuiState2D implements State {
         return firstTime;
     }
 
+    @Override
     public boolean recreateViewChains(State previousState) {
         // Inhibit Event distribution during recreation
         ViewListenerDistributor.getSingletonInstance().setView(null);
+        System.out.println(previousState);
+        if (previousState != null)
+            System.out.println(previousState.getMainComponentView());
 
         if (previousState == null || previousState.getMainComponentView() == null) {
             return this.createViewChains();
@@ -89,10 +97,12 @@ public class GuiState2D implements State {
         }
     }
 
+    @Override
     public ViewStateEnum getType() {
         return ViewStateEnum.View2D;
     }
 
+    @Override
     public TopToolBar getTopToolBar() {
         if (topToolBar == null)
             topToolBar = new TopToolBar();
@@ -100,10 +110,12 @@ public class GuiState2D implements State {
         return topToolBar;
     }
 
+    @Override
     public ComponentView getMainComponentView() {
         return mainComponentView;
     }
 
+    @Override
     public ComponentView getOverviewComponentView() {
         return overviewComponentView;
     }
@@ -112,14 +124,17 @@ public class GuiState2D implements State {
         return renderModeStatus;
     }
 
+    @Override
     public ViewchainFactory getViewchainFactory() {
         return this.viewchainFactory;
     }
 
+    @Override
     public ImagePanelInputController getDefaultInputController() {
         return new MainImagePanelMousePanController();
     }
 
+    @Override
     public boolean isOverviewPanelInteractionEnabled() {
         return true;
     }

@@ -117,26 +117,19 @@ public class GL3DImageFragmentShaderProgram extends GLFragmentShaderProgram {
         this.builder = shaderBuilder;
         try {
             String program = "\tif(texcoord0.x<0.0||texcoord0.y<0.0||texcoord0.x>textureScaleThetaPhi.x||texcoord0.y>textureScaleThetaPhi.y){" + "discard;" + GLShaderBuilder.LINE_SEP + "\t}" + GLShaderBuilder.LINE_SEP;
-
-            program += "\tif(position.x*position.x+position.y*position.y+position.z*position.z<cutOffRadius*cutOffRadius){OUT.color.a=0.;}" + GLShaderBuilder.LINE_SEP;
-            program += "\tif(position.x*position.x+position.y*position.y+position.z*position.z>outerCutOffRadius*outerCutOffRadius){OUT.color.a=0.;}" + GLShaderBuilder.LINE_SEP;
-
+            program += "float dotpos = dot(position.xyz, position.xyz);" + GLShaderBuilder.LINE_SEP;
+            program += "\tif(dotpos<cutOffRadius*cutOffRadius ||dotpos>outerCutOffRadius*outerCutOffRadius ){OUT.color.a=0.;}" + GLShaderBuilder.LINE_SEP;
             program += "\tfloat theta = textureScaleThetaPhi.z;" + GLShaderBuilder.LINE_SEP;
             program += "\tfloat phi = textureScaleThetaPhi.w;" + GLShaderBuilder.LINE_SEP;
+            program += "\tfloat3x3 mat = float3x3( cos(phi), -sin(theta)*sin(phi), -cos(theta)*sin(phi), 0., cos(theta), -sin(theta), sin(phi), cos(phi)*sin(theta), cos(theta)*cos(phi));" + GLShaderBuilder.LINE_SEP;
+            program += "\tfloat3 zaxisrot = mul(mat,float3(0.,0.,1.));" + GLShaderBuilder.LINE_SEP;
+            program += "\tfloat projectionn = dot(position.xyz,zaxisrot);" + GLShaderBuilder.LINE_SEP;
 
-            program += "\tfloat zaxisxrott = 0.0;" + GLShaderBuilder.LINE_SEP;
-            program += "\tfloat zaxisyrott = 0.0*cos(theta) - 1.0*sin(theta);" + GLShaderBuilder.LINE_SEP;
-            program += "\tfloat zaxiszrott = 0.0*sin(theta) + 1.0*cos(theta);" + GLShaderBuilder.LINE_SEP;
+            program += "\tif((position.z!=0.0 && projectionn<-0.001) || (position.z==0.0 && dot(position.xy, position.xy)<1.)){" + "\t\tdiscard;" + GLShaderBuilder.LINE_SEP + "\t}" + GLShaderBuilder.LINE_SEP;
+            //program += "\tfloat dv = 0.5*(1000.+0.2)/(1000.-0.2)+position.w/position.z*(1000.*0.2)/(1000.-0.2)+0.5;" + GLShaderBuilder.LINE_SEP;
+            //program += "\tif(dot(position.xy, position.xy)>1.0){" + "\t\tdv = 1.;" + GLShaderBuilder.LINE_SEP + "\t}" + GLShaderBuilder.LINE_SEP;
 
-            program += "\tfloat zaxisxrot = zaxisxrott*cos(phi) - zaxiszrott*sin(phi);" + GLShaderBuilder.LINE_SEP;
-            program += "\tfloat zaxisyrot = zaxisyrott;" + GLShaderBuilder.LINE_SEP;
-            program += "\tfloat zaxiszrot = zaxisxrott*sin(phi) + zaxiszrott*cos(phi);" + GLShaderBuilder.LINE_SEP;
-
-            program += "\tfloat4 v1 = float4(position.x, position.y, position.z, 0.0);" + GLShaderBuilder.LINE_SEP;
-            program += "\tfloat4 v2 = float4(zaxisxrot, zaxisyrot, zaxiszrot, 0.0);" + GLShaderBuilder.LINE_SEP;
-            program += "\tfloat projectionn = dot(v1,v2);" + GLShaderBuilder.LINE_SEP;
-
-            program += "\tif((position.z!=0.0 && projectionn<-0.001) || (position.z==0.0 && position.x*position.x +position.y*position.y<0.9)){" + "\t\tdiscard;" + GLShaderBuilder.LINE_SEP + "\t}";
+            //program += "depth = dv;" + GLShaderBuilder.LINE_SEP;
 
             this.cutOffRadiusRef = shaderBuilder.addEnvParameter("float cutOffRadius");
             this.outerCutOffRadiusRef = shaderBuilder.addEnvParameter("float outerCutOffRadius");
@@ -147,6 +140,8 @@ public class GL3DImageFragmentShaderProgram extends GLFragmentShaderProgram {
             program = program.replace("position", shaderBuilder.useStandardParameter("float4", "TEXCOORD3"));
 
             program = program.replace("output", shaderBuilder.useOutputValue("float4", "COLOR"));
+            //program = program.replace("depth", shaderBuilder.useOutputValue("float", "DEPTH"));
+
             shaderBuilder.addMainFragment(program);
             System.out.println("GL3D Image Fragment Shader:\n" + shaderBuilder.getCode());
         } catch (GLBuildShaderException e) {

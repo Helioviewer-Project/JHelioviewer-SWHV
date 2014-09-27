@@ -25,7 +25,7 @@ public class GL3DHMIImageLayer extends GL3DImageLayer {
         GLVertexShaderProgram vertexShader = GL3DShaderFactory.createVertexShaderProgram(gl, vertex);
         this.imageTextureView.setVertexShader(vertex);
 
-        imageMesh = new GL3DImageSphere(imageTextureView, vertexShader, fragmentShader, this);
+        imageMesh = new GL3DImageSphere(imageTextureView, vertexShader, fragmentShader, this, true, true);
         this.imageTextureView.metadata = this.metaDataView.getMetaData();
 
         this.sphereFragmentShader.setCutOffRadius((float) (Constants.SunRadius / this.imageTextureView.metadata.getPhysicalImageWidth()));

@@ -20,9 +20,9 @@ import org.helioviewer.gl3d.view.GL3DImageTextureView;
  * The {@link GL3DImageLayers} node offers special capabilities for grouping
  * {@link GL3DImageLayer} nodes, because image nodes require special ordering
  * for the blending of different image layers.
- * 
+ *
  * @author Simon Spoerri (simon.spoerri@fhnw.ch)
- * 
+ *
  */
 public class GL3DImageLayers extends GL3DGroup {
 
@@ -77,8 +77,14 @@ public class GL3DImageLayers extends GL3DGroup {
         state.gl.glEnable(GL2.GL_DEPTH_TEST);
 
         for (GL3DImageLayer layer : layers) {
-            if (layer.getImageSphere() != null)
+            if (layer.getImageSphere() != null) {
                 layer.getImageSphere().draw(state);
+                state.gl.glDepthRange(1.f, 1.f);
+                layer.getImageCorona().draw(state);
+                state.gl.glDepthRange(0.f, 1.f);
+
+            }
+
         }
 
         // state.gl.glDepthMask(true);

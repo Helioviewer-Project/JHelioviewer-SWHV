@@ -1,12 +1,15 @@
 package org.helioviewer.gl3d.camera;
 
 import java.awt.Dimension;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 
 import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.JCheckBox;
+import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JSeparator;
@@ -20,7 +23,7 @@ import org.helioviewer.basegui.components.WheelSupport;
 import org.helioviewer.gl3d.scenegraph.GL3DDrawBits.Bit;
 import org.helioviewer.jhv.display.Displayer;
 
-public abstract class GL3DCameraOptionPanel extends JPanel {
+public abstract class GL3DCameraOptionPanel extends JPanel implements ActionListener {
 
     abstract public void deactivate();
 
@@ -28,27 +31,15 @@ public abstract class GL3DCameraOptionPanel extends JPanel {
     private JSpinner gridResolutionXSpinner;
     private JSpinner gridResolutionYSpinner;
     private JCheckBox gridVisibleCheckbox;
-
-    public JCheckBox getGridVisibleCheckbox() {
-        return gridVisibleCheckbox;
-    }
-
-    public JSpinner getGridResolutionXSpinner() {
-        return gridResolutionXSpinner;
-    }
-
-    public JSpinner getGridResolutionYSpinner() {
-        return gridResolutionYSpinner;
-    }
-
-    public void setGridVisibleCheckbox(JCheckBox fovCheckbox) {
-        this.gridVisibleCheckbox = fovCheckbox;
-    }
+    private final FontComboBox fontComboBox;
 
     private final GL3DCamera camera;
 
     public GL3DCameraOptionPanel(GL3DCamera camera) {
         this.camera = camera;
+        fontComboBox = new FontComboBox();
+        fontComboBox.addActionListener(this);
+        this.setLayout(new BoxLayout(this, BoxLayout.PAGE_AXIS));
     }
 
     public void createGridOptions() {
@@ -73,6 +64,7 @@ public abstract class GL3DCameraOptionPanel extends JPanel {
         this.gridPanel.add(gridVisibleCheckbox);
 
         add(this.gridPanel);
+        add(this.fontComboBox);
     }
 
     private void createVisibleCheckBox() {
@@ -121,4 +113,26 @@ public abstract class GL3DCameraOptionPanel extends JPanel {
         WheelSupport.installMouseWheelSupport(this.gridResolutionYSpinner);
     }
 
+    public JCheckBox getGridVisibleCheckbox() {
+        return gridVisibleCheckbox;
+    }
+
+    public JSpinner getGridResolutionXSpinner() {
+        return gridResolutionXSpinner;
+    }
+
+    public JSpinner getGridResolutionYSpinner() {
+        return gridResolutionYSpinner;
+    }
+
+    public void setGridVisibleCheckbox(JCheckBox fovCheckbox) {
+        this.gridVisibleCheckbox = fovCheckbox;
+    }
+
+    @Override
+    public void actionPerformed(ActionEvent evt) {
+        JComboBox source = (JComboBox) evt.getSource();
+        String item = (String) source.getSelectedItem();
+        camera.getGrid().setFont(item);
+    }
 }

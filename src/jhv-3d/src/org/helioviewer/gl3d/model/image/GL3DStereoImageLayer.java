@@ -21,7 +21,7 @@ public class GL3DStereoImageLayer extends GL3DImageLayer {
         GLVertexShaderProgram vertexShader = GL3DShaderFactory.createVertexShaderProgram(gl, vertexShaderProgram);
         this.imageTextureView.setVertexShader(vertexShaderProgram);
         this.imageTextureView.metadata = this.metaDataView.getMetaData();
-        sphere = new GL3DImageSphere(imageTextureView, vertexShader, sphereFragmentShader, this);
+        sphere = new GL3DImageSphere(imageTextureView, vertexShader, sphereFragmentShader, this, true, true);
         this.addNode(sphere);
     }
 
