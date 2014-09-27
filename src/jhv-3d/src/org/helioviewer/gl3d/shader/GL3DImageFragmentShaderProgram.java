@@ -118,18 +118,14 @@ public class GL3DImageFragmentShaderProgram extends GLFragmentShaderProgram {
         try {
             String program = "\tif(texcoord0.x<0.0||texcoord0.y<0.0||texcoord0.x>textureScaleThetaPhi.x||texcoord0.y>textureScaleThetaPhi.y){" + "discard;" + GLShaderBuilder.LINE_SEP + "\t}" + GLShaderBuilder.LINE_SEP;
             program += "float dotpos = dot(position.xyz, position.xyz);" + GLShaderBuilder.LINE_SEP;
-            program += "\tif(dotpos<cutOffRadius*cutOffRadius ||dotpos>outerCutOffRadius*outerCutOffRadius ){OUT.color.a=0.;}" + GLShaderBuilder.LINE_SEP;
+            program += "\tif(dotpos<cutOffRadius*cutOffRadius ||dotpos>outerCutOffRadius*outerCutOffRadius ){discard;}" + GLShaderBuilder.LINE_SEP;
             program += "\tfloat theta = textureScaleThetaPhi.z;" + GLShaderBuilder.LINE_SEP;
             program += "\tfloat phi = textureScaleThetaPhi.w;" + GLShaderBuilder.LINE_SEP;
             program += "\tfloat3x3 mat = float3x3( cos(phi), -sin(theta)*sin(phi), -cos(theta)*sin(phi), 0., cos(theta), -sin(theta), sin(phi), cos(phi)*sin(theta), cos(theta)*cos(phi));" + GLShaderBuilder.LINE_SEP;
             program += "\tfloat3 zaxisrot = mul(mat,float3(0.,0.,1.));" + GLShaderBuilder.LINE_SEP;
             program += "\tfloat projectionn = dot(position.xyz,zaxisrot);" + GLShaderBuilder.LINE_SEP;
 
-            program += "\tif((position.z!=0.0 && projectionn<-0.001) || (position.z==0.0 && dot(position.xy, position.xy)<1.)){" + "\t\tdiscard;" + GLShaderBuilder.LINE_SEP + "\t}" + GLShaderBuilder.LINE_SEP;
-            //program += "\tfloat dv = 0.5*(1000.+0.2)/(1000.-0.2)+position.w/position.z*(1000.*0.2)/(1000.-0.2)+0.5;" + GLShaderBuilder.LINE_SEP;
-            //program += "\tif(dot(position.xy, position.xy)>1.0){" + "\t\tdv = 1.;" + GLShaderBuilder.LINE_SEP + "\t}" + GLShaderBuilder.LINE_SEP;
-
-            //program += "depth = dv;" + GLShaderBuilder.LINE_SEP;
+            program += "\tif((position.z!=0.0 && projectionn<-0.0)){" + "\t\tdiscard;" + GLShaderBuilder.LINE_SEP + "\t}" + GLShaderBuilder.LINE_SEP;
 
             this.cutOffRadiusRef = shaderBuilder.addEnvParameter("float cutOffRadius");
             this.outerCutOffRadiusRef = shaderBuilder.addEnvParameter("float outerCutOffRadius");
@@ -140,7 +136,6 @@ public class GL3DImageFragmentShaderProgram extends GLFragmentShaderProgram {
             program = program.replace("position", shaderBuilder.useStandardParameter("float4", "TEXCOORD3"));
 
             program = program.replace("output", shaderBuilder.useOutputValue("float4", "COLOR"));
-            //program = program.replace("depth", shaderBuilder.useOutputValue("float", "DEPTH"));
 
             shaderBuilder.addMainFragment(program);
             System.out.println("GL3D Image Fragment Shader:\n" + shaderBuilder.getCode());
