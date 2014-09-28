@@ -21,12 +21,13 @@ public class GLSharedContext {
      * Sets the shared OpenGL context.
      *
      * This functions assign a new context only one time, every following call
-     * is ignored.
+     * is ignored, unless it is being tried to reset to null.
+     *
      *
      * @param sharedContext
      */
     public static void setSharedContext(GLContext sharedContext) {
-        if (context == null) {
+        if (context == null || sharedContext == null) {
             context = sharedContext;
         }
     }
