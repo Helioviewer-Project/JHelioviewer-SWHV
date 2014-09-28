@@ -303,7 +303,7 @@ public class ImageViewerGui {
          * count=count+1; } else{ ComponentView cv =
          * ImageViewerGui.getSingletonInstance().getMainView(); cv.activate();
          * Log.error("WindowListener method called: windowActivated."); } }
-         *
+         * 
          * public void windowLostFocus(WindowEvent e) { ComponentView cv =
          * ImageViewerGui.getSingletonInstance().getMainView(); cv.deactivate();
          * Log.error("WindowListener method called: windowDeactivated."); } });
@@ -386,7 +386,7 @@ public class ImageViewerGui {
             // Layer control
             imageSelectorPanel = new ImageSelectorPanel();
 
-            leftPane.addWithButton("Layers", imageSelectorPanel, true);
+            leftPane.add("Layers", imageSelectorPanel, true);
 
             // Image adjustments and filters
             FilterTabPanelManager compactPanelManager = new FilterTabPanelManager();
