@@ -457,10 +457,12 @@ public class LayersModel implements ViewListener {
      */
     public int findView(View view) {
         LayeredView lv = getLayeredView();
-        View theView = ViewHelper.findLastViewBeforeLayeredView(view);
-        int idx = lv.getLayerLevel(theView);
+        int idx = -1;
+        if (lv != null) {
+            View theView = ViewHelper.findLastViewBeforeLayeredView(view);
+            idx = lv.getLayerLevel(theView);
+        }
         return invertIndex(idx);
-
     }
 
     /**
@@ -1319,7 +1321,7 @@ public class LayersModel implements ViewListener {
         /*
          * ImageInfoView imageInfoView = view.getAdapter(ImageInfoView.class);
          * String typeString; String intervalString;
-         *
+         * 
          * if (imageInfoView != null) { SimpleDateFormat format = new
          * SimpleDateFormat("yyyy/MM/dd HH:mm"); Interval<Date> interval =
          * imageInfoView.getDateRange(); if (interval != null) { typeString =
