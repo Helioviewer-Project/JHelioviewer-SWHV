@@ -73,7 +73,7 @@ public class GL3DComponentView extends AbstractComponentView implements GLEventL
         Displayer.getSingletonInstance().register(this);
         Displayer.getSingletonInstance().addListener(this);
         this.getCanvas().addGLEventListener(this);
-
+        this.rebuildShadersRequest = true;
     }
 
     @Override

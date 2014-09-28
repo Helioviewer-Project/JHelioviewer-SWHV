@@ -22,16 +22,16 @@ import org.helioviewer.viewmodel.view.opengl.shader.GLSingleChannelLookupFragmen
 
 /**
  * Filter for applying a color table to a single channel image.
- * 
+ *
  * <p>
  * If the input image is not a single channel image, the filter does nothing and
  * returns the input data.
- * 
+ *
  * <p>
  * This filter supports software rendering as well as rendering in OpenGL2.
- * 
+ *
  * mostly rewritten
- * 
+ *
  * @author Helge Dietert
  */
 public class SOHOLUTFilter extends AbstractFilter implements FrameFilter, StandardFilter, GLFragmentShaderFilter {
@@ -51,7 +51,7 @@ public class SOHOLUTFilter extends AbstractFilter implements FrameFilter, Standa
 
     /**
      * {@inheritDoc}
-     * 
+     *
      * <p>
      * This filter is a major filter.
      */
@@ -69,7 +69,7 @@ public class SOHOLUTFilter extends AbstractFilter implements FrameFilter, Standa
 
     /**
      * Constructor setting the color table.
-     * 
+     *
      * @param startWithLut
      *            Color table to apply to the image
      */
@@ -79,7 +79,7 @@ public class SOHOLUTFilter extends AbstractFilter implements FrameFilter, Standa
 
     /**
      * Sets the corresponding SOHOLUT panel.
-     * 
+     *
      * @param panel
      *            Corresponding panel.
      */
@@ -90,7 +90,7 @@ public class SOHOLUTFilter extends AbstractFilter implements FrameFilter, Standa
 
     /**
      * Sets a new color table to use from now on.
-     * 
+     *
      * @param newLUT
      *            New color table
      */
@@ -150,6 +150,7 @@ public class SOHOLUTFilter extends AbstractFilter implements FrameFilter, Standa
     @Override
     public GLShaderBuilder buildFragmentShader(GLShaderBuilder shaderBuilder) {
         shader.build(shaderBuilder);
+        this.changed = true;
 
         if (lastLut == null) {
             GLTextureHelper textureHelper = new GLTextureHelper();
@@ -163,7 +164,7 @@ public class SOHOLUTFilter extends AbstractFilter implements FrameFilter, Standa
 
     /**
      * {@inheritDoc}
-     * 
+     *
      * In this case, also updates the color table, if necessary.
      */
     @Override
@@ -182,7 +183,7 @@ public class SOHOLUTFilter extends AbstractFilter implements FrameFilter, Standa
         }
 
         gl.glBindTexture(GL2.GL_TEXTURE_1D, lookupTex);
-        if (lastLut != currlut || invertLUT != lastInverted) {
+        if (changed || lastLut != currlut || invertLUT != lastInverted) {
             int[] intLUT;
 
             if (invertLUT) {
@@ -212,7 +213,7 @@ public class SOHOLUTFilter extends AbstractFilter implements FrameFilter, Standa
             gl.glTexParameteri(GL2.GL_TEXTURE_1D, GL2.GL_TEXTURE_MAG_FILTER, GL2.GL_NEAREST);
             gl.glTexParameteri(GL2.GL_TEXTURE_1D, GL2.GL_TEXTURE_WRAP_S, GL2.GL_CLAMP);
         }
-
+        changed = false;
     }
 
     @Override
