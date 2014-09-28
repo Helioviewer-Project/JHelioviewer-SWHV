@@ -1,6 +1,7 @@
 package org.helioviewer.jhv.gui.states;
 
 import org.helioviewer.base.logging.Log;
+import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.gui.ViewListenerDistributor;
 import org.helioviewer.jhv.gui.ViewchainFactory;
 import org.helioviewer.jhv.gui.components.SideContentPane;
@@ -81,7 +82,9 @@ public class GuiState2D implements State {
         System.out.println(previousState);
         if (previousState != null)
             System.out.println(previousState.getMainComponentView());
-
+        if (previousState instanceof GuiState3DWCS) {
+            Displayer.getSingletonInstance().removeListeners();
+        }
         if (previousState == null || previousState.getMainComponentView() == null) {
             return this.createViewChains();
         } else {

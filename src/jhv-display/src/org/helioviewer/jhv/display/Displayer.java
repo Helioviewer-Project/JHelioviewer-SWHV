@@ -7,14 +7,13 @@ import java.util.concurrent.Executors;
 public class Displayer {
     public static Object displaylock = new Object();
     private static Displayer instance = new Displayer();
-    private final ArrayList<DisplayListener> listeners = new ArrayList<DisplayListener>();
+    private ArrayList<DisplayListener> listeners = new ArrayList<DisplayListener>();
     private final ArrayList<RenderListener> renderListeners = new ArrayList<RenderListener>();
-    private GL3DComponentFakeInterface gl3dcomponent;
+    //private GL3DComponentFakeInterface gl3dcomponent;
     private final ExecutorService displayPool = Executors.newSingleThreadExecutor();
     private boolean displaying = false;
 
     public void register(GL3DComponentFakeInterface gl3dcomponent) {
-        this.gl3dcomponent = gl3dcomponent;
     }
 
     public static Displayer getSingletonInstance() {
@@ -76,6 +75,10 @@ public class Displayer {
 
     public void display() {
         displayPool.submit(new DisplayTask());
+    }
+
+    public void removeListeners() {
+        this.listeners = new ArrayList<DisplayListener>();
     }
 
 }
