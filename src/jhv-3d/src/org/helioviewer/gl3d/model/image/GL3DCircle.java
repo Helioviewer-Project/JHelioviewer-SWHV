@@ -13,14 +13,12 @@ import org.helioviewer.gl3d.scenegraph.math.GL3DVec4f;
 public class GL3DCircle extends GL3DMesh {
     private final double radius;
     private final GL3DVec4d color;
-    private final GL3DImageLayer layer;
     private final GL3DMat4d phiRotation = null;
 
     public GL3DCircle(double radius, GL3DVec4f color, String name, GL3DImageLayer layer) {
         super(name);
         this.radius = radius * 0.999;
         this.color = new GL3DVec4d(color.x, color.y, color.z, color.w);
-        this.layer = layer;
     }
 
     @Override
