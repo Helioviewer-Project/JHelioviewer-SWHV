@@ -72,7 +72,7 @@ public class Astronomy {
         double Lt = 280.4665 + 36000.7698 * t;
         double Lpt = 218.3165 + 481267.8813 * t;
         double ob1t = ob1 + 9.2 / 3600. * Math.cos(ob1tom / radeg) + 0.57 / 3600. * Math.cos(2 * Lt / radeg) + 0.1 / 3600. * Math.cos(2 * Lpt / radeg) - 0.09 / 3600. * Math.cos(2 * ob1tom / radeg);
-        double deps = 9.2 / 3600. * Math.cos(ob1tom) + 0.57 / 3600. * Math.cos(2 * Lt) + 0.1 / 3600. * Math.cos(2 * Lpt) - 0.09 / 3600. * Math.cos(2 * ob1tom);
+        //double deps = 9.2 / 3600. * Math.cos(ob1tom) + 0.57 / 3600. * Math.cos(2 * Lt) + 0.1 / 3600. * Math.cos(2 * Lpt) - 0.09 / 3600. * Math.cos(2 * ob1tom);
         double theta = (jd - 2398220.) * 360. / 25.38;
         double k = 73.6667 + 1.3958333 * (jd - 2396758.) / 36525.;
         double i = 7.25;

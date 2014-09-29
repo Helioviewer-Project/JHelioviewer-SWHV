@@ -126,7 +126,6 @@ public class GL3DImageTextureView extends AbstractGL3DView implements GL3DView, 
             double xScale = (1. / region.getWidth());
             double yScale = (1. / region.getHeight());
 
-            double deltat = sim.getSubimageData().getDateMillis() / 1000.0 - Constants.referenceDate;
             Calendar cal = new GregorianCalendar();
             cal.setTimeInMillis(sim.getSubimageData().getDateMillis());
             theta = -Astronomy.getB0InRadians(cal);
