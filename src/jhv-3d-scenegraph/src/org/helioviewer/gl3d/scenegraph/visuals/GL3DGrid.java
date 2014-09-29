@@ -9,6 +9,7 @@ import java.io.InputStream;
 import javax.media.opengl.GL2;
 
 import org.helioviewer.base.FileUtils;
+import org.helioviewer.base.logging.Log;
 import org.helioviewer.base.physics.Constants;
 import org.helioviewer.gl3d.scenegraph.GL3DDrawBits.Bit;
 import org.helioviewer.gl3d.scenegraph.GL3DGroup;
@@ -42,10 +43,10 @@ public class GL3DGrid extends GL3DGroup {
             font = Font.createFont(Font.TRUETYPE_FONT, is);
             font = font.deriveFont(20.f);
         } catch (FontFormatException e) {
-            System.out.println("Not loaded correctly");
+            Log.warn("Font Not loaded correctly, fallback to default");
             font = new Font("Serif", Font.PLAIN, fontsize);
         } catch (IOException e) {
-            System.out.println("Not loaded correctly");
+            Log.warn("Font Not loaded correctly, fallback to default");
             font = new Font("Serif", Font.PLAIN, fontsize);
         } finally {
         }
