@@ -130,7 +130,6 @@ public class GL3DImageTextureView extends AbstractGL3DView implements GL3DView, 
             Calendar cal = new GregorianCalendar();
             cal.setTimeInMillis(sim.getSubimageData().getDateMillis());
             theta = -Astronomy.getB0InRadians(cal);
-            System.out.println("THETA" + theta * 180. / Math.PI);
             phi = Astronomy.getL0Radians(new Date(sim.getSubimageData().getDateMillis()));//DifferentialRotation.calculateRotationInRadians(0.0, deltat) % (Math.PI * 2.0);
             if (metadataView.getMetaData() instanceof HelioviewerPositionedMetaData && ((HelioviewerPositionedMetaData) (metadataView.getMetaData())).getInstrument().equalsIgnoreCase("SECCHI")) {
                 System.out.println("HGLT_OBS:" + ((HelioviewerPositionedMetaData) (metadataView.getMetaData())).getStonyhurstLatitude());
