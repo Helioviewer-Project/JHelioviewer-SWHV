@@ -81,13 +81,18 @@ public class GL3DGrid extends GL3DGroup {
         state.gl.glColor3d(1., 1., 0.);
         GL2 gl = state.gl;
         super.shapeDraw(state);
-        drawText(gl);
         font = font.deriveFont((float) (this.fontsize + (state.getActiveCamera().getZTranslation() + 15.) / 3.));
-        renderer = new TextRenderer(font, false, true);//, new CustomRenderDelegate(0, Color.WHITE));
+        renderer = new TextRenderer(font, false, true);
         renderer.setUseVertexArrays(true);
         renderer.getSmoothing();
-        gl.glLineWidth(0.5f);
+        drawText(gl);
+        drawCircles(gl);
 
+    }
+
+    private void drawCircles(GL2 gl) {
+
+        gl.glLineWidth(0.5f);
         gl.glBlendFunc(GL2.GL_SRC_ALPHA, GL2.GL_ONE_MINUS_SRC_ALPHA);
         gl.glColor3f(1f, .0f, .0f);
         gl.glDisable(GL2.GL_LIGHTING);
@@ -95,6 +100,12 @@ public class GL3DGrid extends GL3DGroup {
             double phi = j * Math.PI / this.yticks;
             gl.glBegin(GL2.GL_LINE_LOOP);
             for (int i = 0; i <= lineres; i++) {
+                if (i % 2 == 0) {
+                    gl.glColor3f(0.f, 1.0f, .0f);
+
+                } else {
+                    gl.glColor3f(1f, .0f, .0f);
+                }
                 double theta = 2 * i * Math.PI / lineres;
                 gl.glVertex3d(Math.sin(theta) * Math.sin(phi), Math.cos(phi), Math.cos(theta) * Math.sin(phi));
             }
@@ -102,8 +113,14 @@ public class GL3DGrid extends GL3DGroup {
         }
         for (int j = 0; j <= this.xticks - 1; j++) {
             double theta = 2 * j * Math.PI / this.xticks;
-            gl.glBegin(GL2.GL_LINE_LOOP);
+            gl.glBegin(GL2.GL_LINE_STRIP);
             for (int i = 0; i <= lineres; i++) {
+                if (i % 2 == 0) {
+                    gl.glColor3f(0.f, 1.0f, .0f);
+
+                } else {
+                    gl.glColor3f(1f, .0f, .0f);
+                }
                 double phi = i * Math.PI / lineres;
                 gl.glVertex3d(Math.sin(theta) * Math.sin(phi), Math.cos(phi), Math.cos(theta) * Math.sin(phi));
             }
