@@ -104,7 +104,7 @@ public class SolarObject {
         programObject.attachVertexShader(gl, this.getClass().getResource("/data/vertex.glsl"));
         programObject.attachFragmentShader(gl, this.getClass().getResource("/data/fragment.glsl"));
         programObject.initializeProgram(gl, true);
-        for (int i = 0; i < this.MAX_TEXTURES; i++) {
+        for (int i = 0; i < SolarObject.MAX_TEXTURES; i++) {
             this.textureUnLoc[i] = gl.glGetUniformLocation(programObject.getProgId(), "solarTexture[" + i + "]");
             this.lutUnLoc[i] = gl.glGetUniformLocation(programObject.getProgId(), "lut[" + i + "]");
         }
@@ -192,14 +192,14 @@ public class SolarObject {
             gl.glEnableVertexAttribArray(1);
             {
                 int i = 0;
-                for (; i < this.MAX_TEXTURES; i++) {
+                for (; i < SolarObject.MAX_TEXTURES; i++) {
                     if (this.activeTexture[i]) {
                         gl.glActiveTexture(GL3.GL_TEXTURE0 + i);
                         gl.glBindTexture(GL3.GL_TEXTURE_2D, imdataBufferID[i].get(0));
                         gl.glUniform1i(textureUnLoc[i], i);
                     }
                 }
-                for (int j = 0; j < this.MAX_TEXTURES; j++) {
+                for (int j = 0; j < SolarObject.MAX_TEXTURES; j++) {
                     if (this.activeLUT[j]) {
                         gl.glActiveTexture(GL3.GL_TEXTURE0 + i + j);
                         gl.glBindTexture(GL3.GL_TEXTURE_1D, this.lutdataBufferID[j].get(0));
