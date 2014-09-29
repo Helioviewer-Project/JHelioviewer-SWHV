@@ -124,8 +124,8 @@ public class JHVSplashScreen extends JFrame implements StatusTextListener {
                 ip = new GLInitPanel(capabilities);
 
                 JLabel label = new JLabel("sdfsdfsdf");
-                label.setMinimumSize(new Dimension(100, 100));
-                label.setPreferredSize(new Dimension(100, 100));
+                label.setMinimumSize(new Dimension(1, 1));
+                label.setPreferredSize(new Dimension(1, 1));
 
                 add(ip);
                 this.pack();
