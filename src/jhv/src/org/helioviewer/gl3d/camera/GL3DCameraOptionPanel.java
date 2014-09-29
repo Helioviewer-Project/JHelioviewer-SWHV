@@ -34,6 +34,7 @@ public abstract class GL3DCameraOptionPanel extends JPanel implements ActionList
     private final FontComboBox fontComboBox;
 
     private final GL3DCamera camera;
+    private JSpinner fontSizeSpinner;
 
     public GL3DCameraOptionPanel(GL3DCamera camera) {
         this.camera = camera;
@@ -60,11 +61,15 @@ public abstract class GL3DCameraOptionPanel extends JPanel implements ActionList
         this.gridPanel.add(new JSeparator(SwingConstants.VERTICAL));
         this.gridPanel.add(Box.createHorizontalGlue());
 
+        this.createFontSizeSpinner();
+        this.gridPanel.add(fontSizeSpinner);
+
         createVisibleCheckBox();
         this.gridPanel.add(gridVisibleCheckbox);
 
         add(this.gridPanel);
-        add(this.fontComboBox);
+
+        //add(this.fontComboBox);
     }
 
     private void createVisibleCheckBox() {
@@ -111,6 +116,19 @@ public abstract class GL3DCameraOptionPanel extends JPanel implements ActionList
             }
         });
         WheelSupport.installMouseWheelSupport(this.gridResolutionYSpinner);
+    }
+
+    public void createFontSizeSpinner() {
+        this.fontSizeSpinner = new JSpinner();
+        this.fontSizeSpinner.setModel(new SpinnerNumberModel(new Float(0.8f), new Float(0.3f), new Float(2.5f), new Float(0.05f)));
+        this.fontSizeSpinner.addChangeListener(new ChangeListener() {
+            @Override
+            public void stateChanged(ChangeEvent e) {
+                camera.getGrid().setFontScale((Float) (fontSizeSpinner.getValue()));
+                Displayer.getSingletonInstance().render();
+            }
+        });
+        WheelSupport.installMouseWheelSupport(this.fontSizeSpinner);
     }
 
     public JCheckBox getGridVisibleCheckbox() {

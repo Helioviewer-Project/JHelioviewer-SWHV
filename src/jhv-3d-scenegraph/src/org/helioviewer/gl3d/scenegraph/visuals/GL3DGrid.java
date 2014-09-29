@@ -26,7 +26,7 @@ public class GL3DGrid extends GL3DGroup {
     private final GL3DVec4f color;
     private final GL3DVec4d textColor;
     private final int lineres = 120;
-
+    private float scale = .8f;
     private Font font;
     private TextRenderer renderer;
     private final int fontsize = 20;
@@ -81,7 +81,9 @@ public class GL3DGrid extends GL3DGroup {
         state.gl.glColor3d(1., 1., 0.);
         GL2 gl = state.gl;
         super.shapeDraw(state);
-        font = font.deriveFont((float) (this.fontsize + (state.getActiveCamera().getZTranslation() + 15.) / 3.));
+        float cfontsize = (float) (this.fontsize + (state.getActiveCamera().getZTranslation() + 15.) / 3.);
+        cfontsize = cfontsize < 10.f ? 10.f : cfontsize;
+        font = font.deriveFont(cfontsize);
         renderer = new TextRenderer(font, false, true);
         renderer.setUseVertexArrays(true);
         renderer.getSmoothing();
@@ -111,7 +113,7 @@ public class GL3DGrid extends GL3DGroup {
             }
             gl.glEnd();
         }
-        for (int j = 0; j <= this.xticks - 1; j++) {
+        for (int j = 0; j <= this.xticks; j++) {
             double theta = 2 * j * Math.PI / this.xticks;
             gl.glBegin(GL2.GL_LINE_STRIP);
             for (int i = 0; i <= lineres; i++) {
@@ -136,8 +138,8 @@ public class GL3DGrid extends GL3DGroup {
         for (int i = 1; i < this.xticks; i++) {
             double angle = i * Math.PI / this.xticks;
             String txt = "" + (int) (90 - 1.0 * i / this.xticks * 180);
-            renderer.draw3D(txt, (float) (Math.sin(angle) * size) - 0.f, (float) (Math.cos(angle) * size - 0.02f * 20. / font.getSize()), (float) zdist, 0.08f / font.getSize());
-            renderer.draw3D(txt, (float) (-Math.sin(angle) * size - 0.03f * txt.length() * 20. / font.getSize()), (float) (Math.cos(angle) * size - 0.02f * 20. / font.getSize()), (float) zdist, 0.08f / font.getSize());
+            renderer.draw3D(txt, (float) (Math.sin(angle) * size), (float) (Math.cos(angle) * size - scale * 0.02f * 20. / font.getSize()), (float) zdist, scale * 0.08f / font.getSize());
+            renderer.draw3D(txt, (float) (-Math.sin(angle) * size - scale * 0.03f * txt.length() * 20. / font.getSize()), (float) (Math.cos(angle) * size - scale * 0.02f * 20. / font.getSize()), (float) zdist, scale * 0.08f / font.getSize());
         }
         renderer.end3DRendering();
 
@@ -150,7 +152,7 @@ public class GL3DGrid extends GL3DGroup {
             gl.glPushMatrix();
             gl.glTranslatef((float) (Math.cos(angle) * size), 0f, (float) (Math.sin(angle) * size));
             gl.glRotated(90 - angle / Math.PI * 180., 0.f, 1.f, 0.f);
-            renderer.draw3D(txt, 0.f, 0f, 0.f, 0.08f / font.getSize());
+            renderer.draw3D(txt, 0.f, 0f, 0.f, scale * 0.08f / font.getSize());
             renderer.flush();
             renderer.end3DRendering();
             gl.glPopMatrix();
@@ -162,5 +164,9 @@ public class GL3DGrid extends GL3DGroup {
         renderer = new TextRenderer(font, false, true);//, new CustomRenderDelegate(0, Color.WHITE));
         renderer.setUseVertexArrays(true);
         renderer.getSmoothing();
+    }
+
+    public void setFontScale(float scale) {
+        this.scale = scale;
     }
 }
