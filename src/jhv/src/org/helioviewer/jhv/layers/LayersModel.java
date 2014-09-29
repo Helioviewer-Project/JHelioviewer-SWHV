@@ -40,7 +40,7 @@ import org.helioviewer.viewmodel.changeevent.ViewChainChangedReason;
 import org.helioviewer.viewmodel.changeevent.ViewportChangedReason;
 import org.helioviewer.viewmodel.io.APIResponse;
 import org.helioviewer.viewmodel.io.APIResponseDump;
-import org.helioviewer.viewmodel.metadata.HelioviewerPositionedMetaData;
+import org.helioviewer.viewmodel.metadata.HelioviewerMetaData;
 import org.helioviewer.viewmodel.metadata.MetaData;
 import org.helioviewer.viewmodel.metadata.ObserverMetaData;
 import org.helioviewer.viewmodel.region.Region;
@@ -330,8 +330,8 @@ public class LayersModel implements ViewListener {
             return null;
         }
         ImageInfoView imageInfoView = view.getAdapter(ImageInfoView.class);
-        if (imageInfoView != null) {
-            HelioviewerPositionedMetaData metaData = (HelioviewerPositionedMetaData) imageInfoView.getMetadata();
+        if (imageInfoView != null && imageInfoView.getMetadata() instanceof HelioviewerMetaData) {
+            HelioviewerMetaData metaData = (HelioviewerMetaData) imageInfoView.getMetadata();
             return metaData.getObservatory();
         } else {
             return view.toString();
@@ -1321,7 +1321,7 @@ public class LayersModel implements ViewListener {
         /*
          * ImageInfoView imageInfoView = view.getAdapter(ImageInfoView.class);
          * String typeString; String intervalString;
-         * 
+         *
          * if (imageInfoView != null) { SimpleDateFormat format = new
          * SimpleDateFormat("yyyy/MM/dd HH:mm"); Interval<Date> interval =
          * imageInfoView.getDateRange(); if (interval != null) { typeString =
