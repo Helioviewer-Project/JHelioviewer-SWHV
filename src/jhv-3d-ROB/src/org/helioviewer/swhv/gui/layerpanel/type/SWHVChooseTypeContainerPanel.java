@@ -9,6 +9,7 @@ import javax.swing.SwingUtilities;
 import org.helioviewer.swhv.mvc.SWHVPanel;
 
 public class SWHVChooseTypeContainerPanel extends JPanel implements SWHVChooseTypeContainerModelListener, SWHVPanel {
+    private static final long serialVersionUID = 1L;
 
     private static SWHVChooseTypeContainerPanel singletonInstance = new SWHVChooseTypeContainerPanel();
     private SWHVChooseTypeContainerController controller;

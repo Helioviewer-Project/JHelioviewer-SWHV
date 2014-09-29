@@ -28,10 +28,11 @@ import org.helioviewer.viewmodel.view.jp2view.JHVJP2View;
 import org.helioviewer.viewmodel.view.jp2view.JHVJPXView;
 
 public class RadioImageTestFrame extends JFrame implements ViewListener {
+    private static final long serialVersionUID = 1L;
 
-    private JPanel contentPane;
+    private final JPanel contentPane;
     private ResolutionSetting rs;
-    private JTabbedPane imageTabbedPane;
+    private final JTabbedPane imageTabbedPane;
     private int count;
     private byte[] previousData;
 
@@ -40,6 +41,7 @@ public class RadioImageTestFrame extends JFrame implements ViewListener {
      */
     public static void main(String[] args) {
         EventQueue.invokeLater(new Runnable() {
+            @Override
             public void run() {
                 try {
                     RadioImageTestFrame frame = new RadioImageTestFrame();

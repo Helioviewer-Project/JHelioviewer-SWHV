@@ -34,10 +34,11 @@ import org.helioviewer.viewmodel.view.jp2view.JHVJP2View;
 import org.helioviewer.viewmodel.view.jp2view.JHVJPXView;
 
 public class SendDataTestFrame extends JFrame implements RadioDataManagerListener {
+    private static final long serialVersionUID = 1L;
 
-    private JPanel contentPane;
+    private final JPanel contentPane;
     private ResolutionSetting rs;
-    private JTabbedPane imageTabbedPane;
+    private final JTabbedPane imageTabbedPane;
     private int count;
     private byte[] previousData;
 
@@ -46,6 +47,7 @@ public class SendDataTestFrame extends JFrame implements RadioDataManagerListene
      */
     public static void main(String[] args) {
         EventQueue.invokeLater(new Runnable() {
+            @Override
             public void run() {
                 try {
                     SendDataTestFrame frame = new SendDataTestFrame();
@@ -289,7 +291,7 @@ public class SendDataTestFrame extends JFrame implements RadioDataManagerListene
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see
      * org.helioviewer.plugins.eveplugin.radio.data.RadioDataManagerListener
      * #frequencyIntervalUpdated(java.lang.String,

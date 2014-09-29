@@ -20,6 +20,7 @@ import org.helioviewer.swhv.gui.layerpanel.layercontainer.SWHVLayerContainerMode
 import org.helioviewer.swhv.gui.layerpanel.layercontainer.SWHVLayerContainerPanel;
 
 public class SWHVGUI extends JFrame {
+    private static final long serialVersionUID = 1L;
 
     JPanel leftPanel;
     private final JSplitPane horizontalSplitPane;

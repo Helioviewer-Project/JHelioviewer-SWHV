@@ -24,6 +24,7 @@ import org.helioviewer.viewmodel.view.jp2view.datetime.ImmutableDateTime;
 
 public class CollapsiblePaneWithButton extends CollapsiblePane {
 
+    private static final long serialVersionUID = -9107038141279736802L;
     private ImageDataPanel observationImagePane;
     /**
      * Observation dialog to actually add new data
@@ -48,6 +49,7 @@ public class CollapsiblePaneWithButton extends CollapsiblePane {
         initActions();
     }
 
+    @Override
     public void setButtons() {
         topButtonsPanel = new JPanel();
         topButtonsPanel.setLayout(new BorderLayout());
@@ -61,7 +63,7 @@ public class CollapsiblePaneWithButton extends CollapsiblePane {
     private void initActions() {
         addLayerAction = new AbstractAction("Add Layer", IconBank.getIcon(JHVIcon.ADD)) {
             /**
-             * 
+             *
              */
             private static final long serialVersionUID = 1L;
             {
@@ -71,6 +73,7 @@ public class CollapsiblePaneWithButton extends CollapsiblePane {
             /**
              * {@inheritDoc}
              */
+            @Override
             public void actionPerformed(ActionEvent arg0) {
                 if (observationImagePane == null) {
                     observationImagePane = new ImageDataPanel();
@@ -82,17 +85,17 @@ public class CollapsiblePaneWithButton extends CollapsiblePane {
                  * TODO: Code Simplification - Cleanup Date selection when
                  * clicking on "add images", e.g. use
                  * LayersModel.getLatestDate(...), ...
-                 * 
+                 *
                  * Here are some more comments by Helge:
-                 * 
+                 *
                  * If it is a local file, the timestamps are read from the
                  * parsed JPX movie, i.e. a call will pause until the whole
                  * movie has finished loading.
-                 * 
+                 *
                  * If it has been reading through the API the frame time stamps
                  * already have been returned and it is not bad. For the time
                  * being it will only update if its already loaded.
-                 * 
+                 *
                  * I think there should be a better solution? Maybe a wait
                  * dialog? etc.?
                  */

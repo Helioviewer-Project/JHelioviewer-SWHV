@@ -7,6 +7,8 @@ import javax.swing.Icon;
 import javax.swing.JButton;
 
 public class FixedHeightButton extends JButton {
+    private static final long serialVersionUID = 1L;
+
     public FixedHeightButton() {
         super();
         this.setPreferredSize(new Dimension(15, -1));
