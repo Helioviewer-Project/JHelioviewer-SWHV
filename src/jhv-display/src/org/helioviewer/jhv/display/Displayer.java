@@ -6,12 +6,14 @@ import java.util.concurrent.Executors;
 
 public class Displayer {
     public static Object displaylock = new Object();
+    public static int STATE2D = 1;
+    public static int STATE3D = 2;
     private static Displayer instance = new Displayer();
     private ArrayList<DisplayListener> listeners = new ArrayList<DisplayListener>();
     private final ArrayList<RenderListener> renderListeners = new ArrayList<RenderListener>();
-    //private GL3DComponentFakeInterface gl3dcomponent;
     private final ExecutorService displayPool = Executors.newSingleThreadExecutor();
     private boolean displaying = false;
+    private int state = 2;
 
     public void register(GL3DComponentFakeInterface gl3dcomponent) {
     }
@@ -81,4 +83,11 @@ public class Displayer {
         this.listeners = new ArrayList<DisplayListener>();
     }
 
+    public void setState(int state) {
+        this.state = state;
+    }
+
+    public int getState() {
+        return state;
+    }
 }

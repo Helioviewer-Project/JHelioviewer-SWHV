@@ -5,6 +5,7 @@ import org.helioviewer.base.math.MathUtils;
 import org.helioviewer.base.math.Vector2dDouble;
 import org.helioviewer.base.math.Vector2dInt;
 import org.helioviewer.base.physics.Constants;
+import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.viewmodel.region.Region;
 import org.helioviewer.viewmodel.region.StaticRegion;
 import org.helioviewer.viewmodel.view.cache.HelioviewerDateTimeCache;
@@ -13,15 +14,15 @@ import org.helioviewer.viewmodel.view.jp2view.image.SubImage;
 
 /**
  * Implementation of MetaData representing solar images.
- * 
+ *
  * <p>
  * This class is supposed to be for solar images. Currently, it supports the
  * observatory SOHO with its instruments EIT, LASCO and MDI, as well as some
  * instruments on board of the observatory STEREO.
- * 
+ *
  * @author Ludwig Schmidt
  * @author Andre Dau
- * 
+ *
  */
 public class HelioviewerMetaData extends AbstractMetaData implements SunMetaData, ObserverMetaData, ImageSizeMetaData, NonConstantMetaData {
 
@@ -40,9 +41,9 @@ public class HelioviewerMetaData extends AbstractMetaData implements SunMetaData
 
     /**
      * Default constructor.
-     * 
+     *
      * Tries to read all informations required.
-     * 
+     *
      * @param m
      *            Meta data container serving as a base for the construction
      */
@@ -140,11 +141,11 @@ public class HelioviewerMetaData extends AbstractMetaData implements SunMetaData
 
     /**
      * Reads the non-constant pixel parameters of the meta data.
-     * 
+     *
      * This includes the resolution as well as position and size of the sun. The
      * function also checks, whether these values have changed and returns true
      * if so.
-     * 
+     *
      * @return true, if the pixel parameters have changed, false otherwise
      */
     protected boolean updatePixelParameters() {
@@ -226,8 +227,14 @@ public class HelioviewerMetaData extends AbstractMetaData implements SunMetaData
 
             double sunX = metaDataContainer.tryGetDouble("CRPIX1");
             double sunY;
-            if (detector.equals("EUVI")) {
-                sunY = 2048 - metaDataContainer.tryGetDouble("CRPIX2");
+            if (Displayer.getSingletonInstance().getState() == Displayer.STATE3D) {
+                if (detector.equals("EUVI")) {
+                    sunY = 2048 - metaDataContainer.tryGetDouble("CRPIX2");
+                } else if (detector.equals("C3")) {
+                    sunY = 1024 - metaDataContainer.tryGetDouble("CRPIX2");
+                } else {
+                    sunY = metaDataContainer.tryGetDouble("CRPIX2");
+                }
             } else {
                 sunY = metaDataContainer.tryGetDouble("CRPIX2");
             }
@@ -373,7 +380,7 @@ public class HelioviewerMetaData extends AbstractMetaData implements SunMetaData
 
     /**
      * {@inheritDoc}
-     * 
+     *
      * In this case, the resolution and the solar pixel position are checked.
      */
     @Override
