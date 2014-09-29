@@ -98,8 +98,8 @@ public class GL3DGrid extends GL3DGroup {
         gl.glBlendFunc(GL2.GL_SRC_ALPHA, GL2.GL_ONE_MINUS_SRC_ALPHA);
         gl.glColor3f(1f, .0f, .0f);
         gl.glDisable(GL2.GL_LIGHTING);
-        for (int j = 0; j <= this.yticks; j++) {
-            double phi = j * Math.PI / this.yticks;
+        for (int j = 0; j <= this.xticks; j++) {
+            double phi = j * Math.PI / this.xticks;
             gl.glBegin(GL2.GL_LINE_LOOP);
             for (int i = 0; i <= lineres; i++) {
                 if (i % 2 == 0) {
@@ -113,8 +113,8 @@ public class GL3DGrid extends GL3DGroup {
             }
             gl.glEnd();
         }
-        for (int j = 0; j <= this.xticks; j++) {
-            double theta = 2 * j * Math.PI / this.xticks;
+        for (int j = 0; j <= this.yticks; j++) {
+            double theta = 2 * j * Math.PI / this.yticks;
             gl.glBegin(GL2.GL_LINE_STRIP);
             for (int i = 0; i <= lineres; i++) {
                 if (i % 2 == 0) {
