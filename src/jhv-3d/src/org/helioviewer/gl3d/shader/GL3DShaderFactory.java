@@ -1,7 +1,6 @@
 package org.helioviewer.gl3d.shader;
 
 import javax.media.opengl.GL2;
-import javax.media.opengl.GL2;
 
 import org.helioviewer.gl3d.model.image.GL3DImageMesh;
 import org.helioviewer.viewmodel.view.opengl.shader.GLFragmentShaderProgram;

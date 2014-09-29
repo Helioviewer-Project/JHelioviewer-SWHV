@@ -17,7 +17,6 @@ import org.helioviewer.base.logging.Log;
 import org.helioviewer.base.math.Interval;
 import org.helioviewer.plugins.eveplugin.controller.DrawController;
 import org.helioviewer.plugins.eveplugin.draw.YAxisElement;
-import org.helioviewer.plugins.eveplugin.model.ChartModel;
 import org.helioviewer.plugins.eveplugin.radio.data.DownloadRequestData;
 import org.helioviewer.plugins.eveplugin.radio.data.FrequencyInterval;
 import org.helioviewer.plugins.eveplugin.radio.data.RadioDataManager;

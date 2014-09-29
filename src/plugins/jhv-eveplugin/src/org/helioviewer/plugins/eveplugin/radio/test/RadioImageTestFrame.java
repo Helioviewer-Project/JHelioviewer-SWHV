@@ -12,6 +12,7 @@ import java.io.StringWriter;
 
 import javax.swing.JFrame;
 import javax.swing.JPanel;
+import javax.swing.JTabbedPane;
 import javax.swing.border.EmptyBorder;
 
 import org.helioviewer.base.logging.Log;
@@ -25,8 +26,6 @@ import org.helioviewer.viewmodel.view.View;
 import org.helioviewer.viewmodel.view.ViewListener;
 import org.helioviewer.viewmodel.view.jp2view.JHVJP2View;
 import org.helioviewer.viewmodel.view.jp2view.JHVJPXView;
-
-import javax.swing.JTabbedPane;
 
 public class RadioImageTestFrame extends JFrame implements ViewListener {
 

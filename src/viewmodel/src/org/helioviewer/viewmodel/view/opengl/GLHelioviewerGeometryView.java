@@ -9,18 +9,14 @@ import org.helioviewer.viewmodel.metadata.HelioviewerOcculterMetaData;
 import org.helioviewer.viewmodel.metadata.MetaData;
 import org.helioviewer.viewmodel.view.HelioviewerGeometryView;
 import org.helioviewer.viewmodel.view.MetaDataView;
-import org.helioviewer.viewmodel.view.RegionView;
-import org.helioviewer.viewmodel.view.SubimageDataView;
 import org.helioviewer.viewmodel.view.View;
-import org.helioviewer.viewmodel.view.ViewportView;
-import org.helioviewer.viewmodel.view.jp2view.JHVJPXView;
 import org.helioviewer.viewmodel.view.opengl.shader.GLFragmentShaderProgram;
 import org.helioviewer.viewmodel.view.opengl.shader.GLFragmentShaderView;
 import org.helioviewer.viewmodel.view.opengl.shader.GLShaderBuilder;
+import org.helioviewer.viewmodel.view.opengl.shader.GLShaderBuilder.GLBuildShaderException;
 import org.helioviewer.viewmodel.view.opengl.shader.GLTextureCoordinate;
 import org.helioviewer.viewmodel.view.opengl.shader.GLVertexShaderProgram;
 import org.helioviewer.viewmodel.view.opengl.shader.GLVertexShaderView;
-import org.helioviewer.viewmodel.view.opengl.shader.GLShaderBuilder.GLBuildShaderException;
 
 /**
  * Implementation of HelioviewGeometryView for rendering in OpenGL mode.

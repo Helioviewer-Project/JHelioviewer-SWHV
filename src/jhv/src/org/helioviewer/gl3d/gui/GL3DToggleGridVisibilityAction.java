@@ -5,6 +5,7 @@ import java.awt.event.ActionEvent;
 import javax.swing.AbstractAction;
 
 import org.helioviewer.gl3d.camera.GL3DCamera;
+import org.helioviewer.gl3d.camera.GL3DSolarRotationTrackingTrackballCamera;
 import org.helioviewer.gl3d.view.GL3DSceneGraphView;
 import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.gui.ImageViewerGui;

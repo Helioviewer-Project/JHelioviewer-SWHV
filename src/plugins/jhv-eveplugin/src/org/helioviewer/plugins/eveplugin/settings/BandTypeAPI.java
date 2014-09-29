@@ -1,24 +1,24 @@
 package org.helioviewer.plugins.eveplugin.settings;
 
 
-import java.io.IOException;
 import java.io.File;
+import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.HashMap;
+import java.util.Properties;
+
 import org.helioviewer.base.DownloadStream;
 import org.helioviewer.base.FileUtils;
 import org.helioviewer.base.logging.Log;
 import org.helioviewer.base.logging.LogSettings;
 import org.helioviewer.jhv.JHVDirectory;
 import org.helioviewer.jhv.JHVGlobals;
-import org.helioviewer.plugins.eveplugin.settings.APIAbstract;
+import org.helioviewer.plugins.eveplugin.EVEPlugin;
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.json.JSONArray;
-import org.helioviewer.plugins.eveplugin.EVEPlugin;
-import java.util.HashMap;
-import java.util.Properties;
 
 public class BandTypeAPI extends APIAbstract {
     private static final BandTypeAPI singletonInstance = new BandTypeAPI();

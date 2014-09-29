@@ -1,19 +1,18 @@
 package org.helioviewer.jhv.gui;
 
+import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.FontMetrics;
-import java.awt.Component;
 
-import javax.swing.text.JTextComponent;
-import javax.swing.SwingUtilities;
 import javax.swing.JLabel;
-
 import javax.swing.JTable;
+import javax.swing.SwingUtilities;
 import javax.swing.table.JTableHeader;
-import javax.swing.table.TableColumnModel;
-import javax.swing.table.TableColumn;
 import javax.swing.table.TableCellRenderer;
+import javax.swing.table.TableColumn;
+import javax.swing.table.TableColumnModel;
+import javax.swing.text.JTextComponent;
 
 /**
  * Helperclass for resizing Table Columns so that all contained data fits in.

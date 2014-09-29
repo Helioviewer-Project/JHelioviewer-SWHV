@@ -6,10 +6,14 @@ package org.helioviewer.basegui.components;
  * Copyright 2002 - 2006 JIDE Software Inc. All rights reserved.
  */
 
-import javax.swing.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.MouseWheelEvent;
 import java.awt.event.MouseWheelListener;
+
+import javax.swing.Action;
+import javax.swing.JComponent;
+import javax.swing.JSlider;
+import javax.swing.JSpinner;
 
 /**
  * A helper class to add mouse wheel support to JSpinner. You can call

@@ -8,9 +8,8 @@ import javax.swing.JPanel;
 import javax.swing.tree.TreeNode;
 
 import org.helioviewer.jhv.layers.LayerDescriptor;
-import org.jhv.dataset.tree.models.DatasetLayer;
-import org.jhv.dataset.tree.views.TypePanel;
 import org.jhv.dataset.tree.views.LayerPanel;
+import org.jhv.dataset.tree.views.TypePanel;
 
 public class DatasetType implements TreeNode, DatasetNode {
 

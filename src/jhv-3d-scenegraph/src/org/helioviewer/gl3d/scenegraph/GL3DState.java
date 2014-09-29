@@ -3,6 +3,7 @@ package org.helioviewer.gl3d.scenegraph;
 import java.util.Date;
 import java.util.Stack;
 
+import javax.media.opengl.GL;
 import javax.media.opengl.GL2;
 import javax.media.opengl.glu.GLU;
 

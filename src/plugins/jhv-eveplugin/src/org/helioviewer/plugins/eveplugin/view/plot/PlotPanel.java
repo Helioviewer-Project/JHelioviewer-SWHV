@@ -1,6 +1,7 @@
 package org.helioviewer.plugins.eveplugin.view.plot;
 
 import java.awt.BorderLayout;
+
 import javax.swing.JPanel;
 
 import org.helioviewer.plugins.eveplugin.lines.model.EVEDrawController;

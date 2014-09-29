@@ -1,6 +1,5 @@
 package org.helioviewer.swhv.mvc;
 
-import org.helioviewer.swhv.gui.layerpanel.SWHVLayerModelListener;
 import org.helioviewer.swhv.gui.layerpanel.SWHVModelListener;
 
 public interface SWHVModel {

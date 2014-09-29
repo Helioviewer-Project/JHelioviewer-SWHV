@@ -8,6 +8,8 @@ import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JPanel;
 
+import org.helioviewer.gl3d.camera.GL3DCamera;
+
 /**
  * Currently not in use.
  * 

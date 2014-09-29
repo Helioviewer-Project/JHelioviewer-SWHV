@@ -15,6 +15,7 @@ import java.util.List;
 
 import javax.swing.JFrame;
 import javax.swing.JPanel;
+import javax.swing.JTabbedPane;
 import javax.swing.border.EmptyBorder;
 
 import org.helioviewer.base.logging.Log;
@@ -31,8 +32,6 @@ import org.helioviewer.viewmodel.imagetransport.Byte8ImageTransport;
 import org.helioviewer.viewmodel.view.View;
 import org.helioviewer.viewmodel.view.jp2view.JHVJP2View;
 import org.helioviewer.viewmodel.view.jp2view.JHVJPXView;
-
-import javax.swing.JTabbedPane;
 
 public class SendDataTestFrame extends JFrame implements RadioDataManagerListener {
 

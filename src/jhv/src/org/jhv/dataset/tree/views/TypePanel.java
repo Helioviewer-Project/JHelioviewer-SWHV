@@ -4,18 +4,18 @@ package org.jhv.dataset.tree.views;
  * @author Freek Verstringe
  */
 
-import org.helioviewer.jhv.layers.LayersModel;
+import java.awt.BorderLayout;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 
+import javax.swing.JLabel;
+import javax.swing.tree.TreePath;
+
+import org.helioviewer.jhv.layers.LayersModel;
 import org.helioviewer.viewmodel.view.View;
 import org.jhv.dataset.tree.models.DatasetLayer;
 import org.jhv.dataset.tree.models.DatasetType;
 import org.jhv.dataset.tree.models.LayersToDatasetLayers;
-import javax.swing.JLabel;
-import javax.swing.tree.TreePath;
-
-import java.awt.BorderLayout;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
 
 public class TypePanel extends DatasetPanel {
     private static final long serialVersionUID = 8669761869598533103L;

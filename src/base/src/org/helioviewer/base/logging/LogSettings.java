@@ -5,6 +5,10 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.Properties;
+import java.util.TimeZone;
 
 import org.apache.log4j.Appender;
 import org.apache.log4j.BasicConfigurator;
@@ -13,11 +17,6 @@ import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.apache.log4j.PropertyConfigurator;
 import org.helioviewer.base.FileUtils;
-
-import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.Properties;
-import java.util.TimeZone;
 
 /**
  * Class which manages the loading and saving of the log settings. This class

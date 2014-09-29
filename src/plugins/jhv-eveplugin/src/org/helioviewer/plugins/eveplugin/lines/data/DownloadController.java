@@ -18,9 +18,8 @@ import org.helioviewer.base.DownloadStream;
 import org.helioviewer.base.logging.Log;
 import org.helioviewer.base.math.Interval;
 import org.helioviewer.jhv.JHVGlobals;
-import org.helioviewer.plugins.eveplugin.settings.EVEAPI;
 import org.helioviewer.plugins.eveplugin.settings.BandType;
-
+import org.helioviewer.plugins.eveplugin.settings.EVEAPI;
 import org.helioviewer.plugins.eveplugin.settings.EVESettings;
 import org.helioviewer.plugins.eveplugin.view.linedataselector.LineDataSelectorModel;
 import org.json.JSONArray;

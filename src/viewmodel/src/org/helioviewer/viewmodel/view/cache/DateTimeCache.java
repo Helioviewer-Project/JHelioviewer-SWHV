@@ -2,8 +2,8 @@ package org.helioviewer.viewmodel.view.cache;
 
 import org.helioviewer.base.logging.Log;
 import org.helioviewer.viewmodel.changeevent.CacheStatusChangedReason;
-import org.helioviewer.viewmodel.changeevent.ChangeEvent;
 import org.helioviewer.viewmodel.changeevent.CacheStatusChangedReason.CacheType;
+import org.helioviewer.viewmodel.changeevent.ChangeEvent;
 import org.helioviewer.viewmodel.io.APIResponse;
 import org.helioviewer.viewmodel.io.APIResponseDump;
 import org.helioviewer.viewmodel.view.CachedMovieView;

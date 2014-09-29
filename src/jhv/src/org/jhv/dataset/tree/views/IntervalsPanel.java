@@ -1,9 +1,10 @@
 package org.jhv.dataset.tree.views;
 
-import javax.swing.JLabel;
-import org.jhv.dataset.tree.models.DatasetIntervals;
-
 import java.awt.BorderLayout;
+
+import javax.swing.JLabel;
+
+import org.jhv.dataset.tree.models.DatasetIntervals;
 
 public class IntervalsPanel extends DatasetPanel {
 

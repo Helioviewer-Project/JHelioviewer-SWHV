@@ -8,8 +8,8 @@ import javax.swing.Icon;
 
 import org.helioviewer.jhv.gui.IconBank;
 import org.helioviewer.jhv.gui.components.layerTable.renderers.DescriptorIconRenderer;
-import org.helioviewer.jhv.layers.LayersModel;
 import org.helioviewer.jhv.layers.LayerDescriptor;
+import org.helioviewer.jhv.layers.LayersModel;
 import org.helioviewer.viewmodel.view.View;
 
 /**

@@ -4,6 +4,12 @@ import java.awt.Dimension;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 
+import javax.swing.BorderFactory;
+import javax.swing.Box;
+import javax.swing.BoxLayout;
+import javax.swing.ImageIcon;
+import javax.swing.JLabel;
+
 import org.helioviewer.jhv.gui.IconBank;
 import org.helioviewer.jhv.gui.IconBank.JHVIcon;
 import org.helioviewer.jhv.layers.LayerDescriptor;
@@ -11,12 +17,6 @@ import org.helioviewer.jhv.layers.LayersModel;
 import org.helioviewer.viewmodel.view.View;
 import org.jhv.dataset.tree.models.DatasetLayer;
 import org.jhv.dataset.tree.models.LayersToDatasetLayers;
-
-import javax.swing.BorderFactory;
-import javax.swing.Box;
-import javax.swing.BoxLayout;
-import javax.swing.ImageIcon;
-import javax.swing.JLabel;
 
 public class LayerPanel extends DatasetPanel {
 

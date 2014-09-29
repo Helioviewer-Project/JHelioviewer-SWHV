@@ -1,18 +1,19 @@
 package org.helioviewer.jhv.gui.components;
 
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.LinkedList;
 
 import javax.swing.event.TreeModelListener;
 import javax.swing.text.BadLocationException;
-import javax.swing.tree.TreeModel;
-import javax.swing.tree.TreePath;
-import java.net.*;
-import java.io.*;
 import javax.swing.text.html.HTML;
 import javax.swing.text.html.HTMLDocument;
 import javax.swing.text.html.HTMLEditorKit;
+import javax.swing.tree.TreeModel;
+import javax.swing.tree.TreePath;
 
 import org.helioviewer.base.DownloadStream;
 import org.helioviewer.jhv.JHVGlobals;

@@ -7,8 +7,8 @@ import java.awt.image.Raster;
 
 import org.helioviewer.viewmodel.imageformat.ImageFormat;
 import org.helioviewer.viewmodel.imageformat.SingleChannelImageFormat;
-import org.helioviewer.viewmodel.imagetransport.ImageTransport;
 import org.helioviewer.viewmodel.imagetransport.Byte8ImageTransport;
+import org.helioviewer.viewmodel.imagetransport.ImageTransport;
 
 /**
  * Representation of image data in single channel format, using 8 bits per

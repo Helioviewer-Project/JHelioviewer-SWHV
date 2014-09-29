@@ -4,7 +4,6 @@ import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.GridLayout;
 
-import javax.swing.BoxLayout;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.SwingUtilities;
@@ -14,7 +13,6 @@ import org.helioviewer.swhv.gui.GUISettings;
 import org.helioviewer.swhv.gui.layerpanel.SWHVLayerController;
 import org.helioviewer.swhv.gui.layerpanel.SWHVLayerModel;
 import org.helioviewer.swhv.gui.layerpanel.SWHVLayerPanel;
-import org.helioviewer.swhv.mvc.SWHVController;
 import org.helioviewer.swhv.mvc.SWHVPanel;
 
 public class SWHVLayerContainerPanel extends JScrollPane implements SWHVPanel, SWHVLayerContainerModelListener{

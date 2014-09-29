@@ -1,18 +1,18 @@
 package org.helioviewer.viewmodel.factory;
 
-import org.helioviewer.viewmodel.view.FilterView;
 import org.helioviewer.viewmodel.view.ComponentView;
+import org.helioviewer.viewmodel.view.FilterView;
 import org.helioviewer.viewmodel.view.HelioviewerGeometryView;
 import org.helioviewer.viewmodel.view.LayeredView;
 import org.helioviewer.viewmodel.view.OverlayView;
 import org.helioviewer.viewmodel.view.StandardSolarRotationTrackingView;
 import org.helioviewer.viewmodel.view.SynchronizeView;
 import org.helioviewer.viewmodel.view.View;
-import org.helioviewer.viewmodel.view.opengl.GLHelioviewerGeometryView;
-import org.helioviewer.viewmodel.view.opengl.GLOverlayView;
-import org.helioviewer.viewmodel.view.opengl.GLFilterView;
 import org.helioviewer.viewmodel.view.opengl.GLComponentView;
+import org.helioviewer.viewmodel.view.opengl.GLFilterView;
+import org.helioviewer.viewmodel.view.opengl.GLHelioviewerGeometryView;
 import org.helioviewer.viewmodel.view.opengl.GLLayeredView;
+import org.helioviewer.viewmodel.view.opengl.GLOverlayView;
 import org.helioviewer.viewmodel.view.opengl.GLSolarRotationTrackingView;
 import org.helioviewer.viewmodel.view.opengl.GLSynchronizeOverviewChainView;
 

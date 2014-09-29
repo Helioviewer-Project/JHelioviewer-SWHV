@@ -3,8 +3,8 @@ package org.helioviewer.viewmodel.view.cache;
 import java.util.concurrent.locks.ReentrantLock;
 
 import org.helioviewer.viewmodel.changeevent.CacheStatusChangedReason;
-import org.helioviewer.viewmodel.changeevent.ChangeEvent;
 import org.helioviewer.viewmodel.changeevent.CacheStatusChangedReason.CacheType;
+import org.helioviewer.viewmodel.changeevent.ChangeEvent;
 import org.helioviewer.viewmodel.view.CachedMovieView;
 
 /**

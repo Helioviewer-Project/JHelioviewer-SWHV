@@ -29,9 +29,8 @@ import javax.swing.event.ListSelectionListener;
 
 import org.helioviewer.jhv.gui.ImageViewerGui;
 import org.helioviewer.plugins.eveplugin.lines.data.BandController;
-import org.helioviewer.plugins.eveplugin.settings.BandType;
 import org.helioviewer.plugins.eveplugin.settings.BandGroup;
-
+import org.helioviewer.plugins.eveplugin.settings.BandType;
 import org.helioviewer.plugins.eveplugin.settings.BandTypeAPI;
 
 public class PlotManagerDialog extends JDialog implements ActionListener {
