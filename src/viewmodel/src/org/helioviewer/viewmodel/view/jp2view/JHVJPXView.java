@@ -27,16 +27,16 @@ import org.helioviewer.viewmodel.view.jp2view.image.SubImage;
 
 /**
  * Implementation of TimedMovieView for JPX files.
- * 
+ *
  * <p>
  * This class is an extensions of {@link JHVJP2View} for JPX-Files, providing
  * additional movie commands.
- * 
+ *
  * <p>
  * For information about image series, see
  * {@link org.helioviewer.viewmodel.view.MovieView} and
  * {@link org.helioviewer.viewmodel.view.TimedMovieView}.
- * 
+ *
  * @author Markus Langenberg
  */
 public class JHVJPXView extends JHVJP2View implements TimedMovieView, CachedMovieView, RenderListener {
@@ -59,14 +59,14 @@ public class JHVJPXView extends JHVJP2View implements TimedMovieView, CachedMovi
 
     /**
      * Default constructor.
-     * 
+     *
      * <p>
      * When the view is not marked as a main view, it is assumed, that the view
      * will only serve one single image and will not have to perform any kind of
      * update any more. The effect of this assumption is, that the view will not
      * try to reconnect to the JPIP server when the connection breaks and that
      * there will be no other timestamps used than the first one.
-     * 
+     *
      * @param isMainView
      *            Whether the view is a main view or not
      */
@@ -401,7 +401,7 @@ public class JHVJPXView extends JHVJP2View implements TimedMovieView, CachedMovi
 
     /**
      * Abolishes the jpx view
-     * 
+     *
      * @param unlinkMovie
      *            true, if the movie should be unlinked before abolishing it
      */
@@ -411,7 +411,7 @@ public class JHVJPXView extends JHVJP2View implements TimedMovieView, CachedMovi
         }
         pauseMovie();
         dateTimeCache.stopParsing();
-        // super.abolish();
+        super.abolish();
     }
 
     /**
@@ -452,11 +452,11 @@ public class JHVJPXView extends JHVJP2View implements TimedMovieView, CachedMovi
 
     /**
      * Internal function for setting the current frame number.
-     * 
+     *
      * Before actually setting the new frame number, checks whether that is
      * necessary. If the frame number has changed, also triggers an update of
      * the image.
-     * 
+     *
      * @param frameNumber
      * @return true, if the frame number has changed
      */
@@ -486,15 +486,15 @@ public class JHVJPXView extends JHVJP2View implements TimedMovieView, CachedMovi
 
     /**
      * Recalculates the image parameters.
-     * 
+     *
      * <p>
      * This function maps between the set of parameters used within the view
      * chain and the set of parameters used within the jp2-package.
-     * 
+     *
      * <p>
      * To achieve this, calls {@link #calculateParameter(int, int)} with the
      * currently used number of quality layers and the current frame number.
-     * 
+     *
      * @return Set of parameters used within the jp2-package
      */
     @Override

@@ -877,8 +877,8 @@ public class LayersModel implements ViewListener {
         try {
             ImageViewerGui.getSingletonInstance().getMainImagePanel().setLoading(true);
             JP2Image localImage = new JP2Image(downloadDestination.toURI());
-            mainView.setJP2Image(localImage);
-            overviewView.setJP2Image(localImage);
+            //mainView.setJP2Image(localImage);
+            //overviewView.setJP2Image(localImage);
 
         } catch (IOException e) {
             e.printStackTrace();
@@ -1321,7 +1321,7 @@ public class LayersModel implements ViewListener {
         /*
          * ImageInfoView imageInfoView = view.getAdapter(ImageInfoView.class);
          * String typeString; String intervalString;
-         *
+         * 
          * if (imageInfoView != null) { SimpleDateFormat format = new
          * SimpleDateFormat("yyyy/MM/dd HH:mm"); Interval<Date> interval =
          * imageInfoView.getDateRange(); if (interval != null) { typeString =
