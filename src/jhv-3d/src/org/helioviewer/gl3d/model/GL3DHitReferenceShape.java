@@ -7,7 +7,6 @@ import java.util.List;
 
 import org.helioviewer.base.physics.Astronomy;
 import org.helioviewer.base.physics.Constants;
-import org.helioviewer.base.physics.DifferentialRotation;
 import org.helioviewer.gl3d.model.image.GL3DImageMesh;
 import org.helioviewer.gl3d.scenegraph.GL3DAABBox;
 import org.helioviewer.gl3d.scenegraph.GL3DDrawBits.Bit;
@@ -206,7 +205,7 @@ public class GL3DHitReferenceShape extends GL3DMesh implements ViewListener {
 
     public void updateRotation() {
         this.timediff = (currentDate.getTime()) / 1000 - Constants.referenceDate;
-        this.currentRotation = DifferentialRotation.calculateRotationInRadians(0., this.timediff) % (Math.PI * 2.0);
+        this.currentRotation = Astronomy.getL0Radians(currentDate);//DifferentialRotation.calculateRotationInRadians(0., this.timediff) % (Math.PI * 2.0);
         Calendar cal = new GregorianCalendar();
         cal.setTime(new Date(currentDate.getTime()));
         double b0 = -Astronomy.getB0InRadians(cal);

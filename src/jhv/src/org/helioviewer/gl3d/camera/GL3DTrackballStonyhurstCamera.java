@@ -4,6 +4,7 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
 
+import org.helioviewer.base.physics.Astronomy;
 import org.helioviewer.base.physics.Constants;
 import org.helioviewer.base.physics.DifferentialRotation;
 import org.helioviewer.gl3d.scenegraph.math.GL3DQuatd;
@@ -25,9 +26,9 @@ import org.helioviewer.viewmodel.view.ViewListener;
  * {@link GL3DTrackballStonyhurstCamera} by automatically rotating the camera
  * around the Y-Axis (pointing to solar north) by an amount calculated through
  * {@link DifferentialRotation}.
- * 
+ *
  * @author Simon Spoerri (simon.spoerri@fhnw.ch)
- * 
+ *
  */
 public class GL3DTrackballStonyhurstCamera extends GL3DSolarRotationTrackingTrackballCamera implements ViewListener {
 
@@ -79,7 +80,7 @@ public class GL3DTrackballStonyhurstCamera extends GL3DSolarRotationTrackingTrac
 
     public void updateRotation() {
         this.timediff = (currentDate.getTime()) / 1000 - Constants.referenceDate;
-        this.currentRotation = DifferentialRotation.calculateRotationInRadians(0., this.timediff) % (Math.PI * 2.0);
+        this.currentRotation = Astronomy.getL0Radians(currentDate);//DifferentialRotation.calculateRotationInRadians(0., this.timediff) % (Math.PI * 2.0);
         Calendar cal = new GregorianCalendar();
         cal.setTime(new Date(currentDate.getTime()));
         this.getLocalRotation().clear();

@@ -1,6 +1,7 @@
 package org.helioviewer.gl3d.view;
 
 import java.util.Calendar;
+import java.util.Date;
 import java.util.GregorianCalendar;
 
 import javax.media.opengl.GL2;
@@ -9,7 +10,6 @@ import org.helioviewer.base.math.MathUtils;
 import org.helioviewer.base.math.Vector2dDouble;
 import org.helioviewer.base.physics.Astronomy;
 import org.helioviewer.base.physics.Constants;
-import org.helioviewer.base.physics.DifferentialRotation;
 import org.helioviewer.gl3d.changeevent.ImageTextureRecapturedReason;
 import org.helioviewer.gl3d.model.image.GL3DImageMesh;
 import org.helioviewer.gl3d.scenegraph.GL3DState;
@@ -130,10 +130,13 @@ public class GL3DImageTextureView extends AbstractGL3DView implements GL3DView, 
             Calendar cal = new GregorianCalendar();
             cal.setTimeInMillis(sim.getSubimageData().getDateMillis());
             theta = -Astronomy.getB0InRadians(cal);
-            phi = DifferentialRotation.calculateRotationInRadians(0.0, deltat) % (Math.PI * 2.0);
+            System.out.println("THETA" + theta * 180. / Math.PI);
+            phi = Astronomy.getL0Radians(new Date(sim.getSubimageData().getDateMillis()));//DifferentialRotation.calculateRotationInRadians(0.0, deltat) % (Math.PI * 2.0);
             if (metadataView.getMetaData() instanceof HelioviewerPositionedMetaData && ((HelioviewerPositionedMetaData) (metadataView.getMetaData())).getInstrument().equalsIgnoreCase("SECCHI")) {
+                System.out.println("HGLT_OBS:" + ((HelioviewerPositionedMetaData) (metadataView.getMetaData())).getStonyhurstLatitude());
+
                 phi -= ((HelioviewerPositionedMetaData) (metadataView.getMetaData())).getStonyhurstLongitude() / MathUtils.radeg;
-                theta = ((HelioviewerPositionedMetaData) (metadataView.getMetaData())).getStonyhurstLatitude() / MathUtils.radeg;
+                theta = -((HelioviewerPositionedMetaData) (metadataView.getMetaData())).getStonyhurstLatitude() / MathUtils.radeg;
             }
             this.vertexShader.changeRect(xOffset, yOffset, xScale, yScale);
             this.vertexShader.changeTextureScale(sim.getSubimageData().getScaleX(), sim.getSubimageData().getScaleY());
@@ -148,7 +151,7 @@ public class GL3DImageTextureView extends AbstractGL3DView implements GL3DView, 
                     double differenceYScale = (1. / differenceRegion.getHeight());
                     double differenceDeltat = jhvjpx.getPreviousImageData().getDateMillis() / 1000.0 - Constants.referenceDate;
                     double differenceTheta = 0.0;
-                    double differencePhi = DifferentialRotation.calculateRotationInRadians(0.0, differenceDeltat) % (Math.PI * 2.0);
+                    double differencePhi = Astronomy.getL0Radians(new Date(jhvjpx.getPreviousImageData().getDateMillis()));//DifferentialRotation.calculateRotationInRadians(0.0, differenceDeltat) % (Math.PI * 2.0);
                     this.vertexShader.changeDifferenceTextureScale(jhvjpx.getPreviousImageData().getScaleX(), jhvjpx.getPreviousImageData().getScaleY());
                     this.vertexShader.setDifferenceRect(differenceXOffset, differenceYOffset, differenceXScale, differenceYScale);
                     this.vertexShader.changeDifferenceAngles(differenceTheta, differencePhi);
@@ -164,7 +167,7 @@ public class GL3DImageTextureView extends AbstractGL3DView implements GL3DView, 
                     double differenceDeltat = jhvjpx.getBaseDifferenceImageData().getDateMillis() / 1000.0 - Constants.referenceDate;
                     cal.setTimeInMillis((long) differenceDeltat * 1000);
                     double differenceTheta = Astronomy.getB0InRadians(cal);
-                    double differencePhi = DifferentialRotation.calculateRotationInRadians(0.0, differenceDeltat) % (Math.PI * 2.0);
+                    double differencePhi = Astronomy.getL0Radians(new Date(jhvjpx.getPreviousImageData().getDateMillis()));//DifferentialRotation.calculateRotationInRadians(0.0, differenceDeltat) % (Math.PI * 2.0);
                     this.vertexShader.changeDifferenceTextureScale(jhvjpx.getBaseDifferenceImageData().getScaleX(), jhvjpx.getBaseDifferenceImageData().getScaleY());
                     this.vertexShader.setDifferenceRect(differenceXOffset, differenceYOffset, differenceXScale, differenceYScale);
                     this.vertexShader.changeDifferenceAngles(differenceTheta, differencePhi);

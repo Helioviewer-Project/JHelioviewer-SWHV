@@ -3,8 +3,8 @@ package org.helioviewer.gl3d.camera;
 import java.util.ArrayList;
 import java.util.Date;
 
+import org.helioviewer.base.physics.Astronomy;
 import org.helioviewer.base.physics.Constants;
-import org.helioviewer.base.physics.DifferentialRotation;
 import org.helioviewer.gl3d.scenegraph.GL3DDrawBits.Bit;
 import org.helioviewer.gl3d.scenegraph.math.GL3DQuatd;
 import org.helioviewer.gl3d.scenegraph.math.GL3DVec3d;
@@ -126,7 +126,7 @@ public class GL3DFollowObjectCamera extends GL3DSolarRotationTrackingTrackballCa
     public void updateRotation() {
         if (this.positionLoading.isLoaded() && currentDate != null) {
             this.timediff = (currentCameraTime) / 1000 - Constants.referenceDate;
-            this.currentRotation = (-currentL + DifferentialRotation.calculateRotationInRadians(0., this.timediff)) % (Math.PI * 2.0);
+            this.currentRotation = (-currentL + Astronomy.getL0Radians(currentDate)) % (Math.PI * 2.0);
             GL3DQuatd newRotation = GL3DQuatd.createRotation(0., new GL3DVec3d(0, 1, 0));
             newRotation.rotate(GL3DQuatd.createRotation(currentB, new GL3DVec3d(1, 0, 0)));
             newRotation.rotate(GL3DQuatd.createRotation(this.currentRotation, new GL3DVec3d(0, 1, 0)));

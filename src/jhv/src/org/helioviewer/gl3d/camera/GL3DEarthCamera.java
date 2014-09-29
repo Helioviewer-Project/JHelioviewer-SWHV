@@ -71,7 +71,7 @@ public class GL3DEarthCamera extends GL3DSolarRotationTrackingTrackballCamera im
 
     public void updateRotation() {
         this.timediff = (currentDate.getTime()) / 1000 - Constants.referenceDate;
-        this.currentRotation = DifferentialRotation.calculateRotationInRadians(0., this.timediff) % (Math.PI * 2.0);
+        this.currentRotation = Astronomy.getL0Radians(currentDate);//DifferentialRotation.calculateRotationInRadians(0., this.timediff) % (Math.PI * 2.0);
         Calendar cal = new GregorianCalendar();
         cal.setTime(new Date(currentDate.getTime()));
         double b0 = Astronomy.getB0InRadians(cal);
