@@ -2,6 +2,7 @@ package org.helioviewer.gl3d.model.image;
 
 import javax.media.opengl.GL2;
 
+import org.helioviewer.gl3d.scenegraph.GL3DDrawBits.Bit;
 import org.helioviewer.gl3d.shader.GL3DImageVertexShaderProgram;
 import org.helioviewer.gl3d.shader.GL3DShaderFactory;
 import org.helioviewer.gl3d.view.GL3DView;
@@ -10,6 +11,7 @@ import org.helioviewer.viewmodel.view.opengl.shader.GLVertexShaderProgram;
 public class GL3DAIAImageLayer extends GL3DImageLayer {
     private GL3DImageSphere sphere;
     private GL3DImageSphere corona;
+    private Object coronaVisible;
 
     public GL3DAIAImageLayer(GL3DView mainView) {
         super("AIA Image Layer", mainView);
@@ -37,4 +39,14 @@ public class GL3DAIAImageLayer extends GL3DImageLayer {
     public GL3DImageMesh getImageCorona() {
         return this.corona;
     }
+
+    @Override
+    public void setCoronaVisibility(boolean visible) {
+        if (!visible) {
+            this.corona.getDrawBits().on(Bit.Hidden);
+        } else {
+            this.corona.getDrawBits().off(Bit.Hidden);
+        }
+    }
+
 }

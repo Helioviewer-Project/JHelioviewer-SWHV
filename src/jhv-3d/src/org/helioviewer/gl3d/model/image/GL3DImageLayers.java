@@ -117,7 +117,7 @@ public class GL3DImageLayers extends GL3DGroup {
         GL3DNode node = this.first;
         while (node != null) {
             if (node instanceof GL3DImageLayer) {
-                //((GL3DImageLayer) node).setCoronaVisibility(visible);
+                ((GL3DImageLayer) node).setCoronaVisibility(visible);
             }
 
             node = node.getNext();
