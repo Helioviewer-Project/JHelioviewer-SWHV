@@ -132,8 +132,6 @@ public class GL3DImageTextureView extends AbstractGL3DView implements GL3DView, 
             theta = -Astronomy.getB0InRadians(cal);
             phi = Astronomy.getL0Radians(new Date(sim.getSubimageData().getDateMillis()));//DifferentialRotation.calculateRotationInRadians(0.0, deltat) % (Math.PI * 2.0);
             if (metadataView.getMetaData() instanceof HelioviewerPositionedMetaData && ((HelioviewerPositionedMetaData) (metadataView.getMetaData())).getInstrument().equalsIgnoreCase("SECCHI")) {
-                System.out.println("HGLT_OBS:" + ((HelioviewerPositionedMetaData) (metadataView.getMetaData())).getStonyhurstLatitude());
-
                 phi -= ((HelioviewerPositionedMetaData) (metadataView.getMetaData())).getStonyhurstLongitude() / MathUtils.radeg;
                 theta = -((HelioviewerPositionedMetaData) (metadataView.getMetaData())).getStonyhurstLatitude() / MathUtils.radeg;
             }
@@ -148,8 +146,8 @@ public class GL3DImageTextureView extends AbstractGL3DView implements GL3DView, 
                     double differenceYOffset = (differenceRegion.getLowerLeftCorner().getY());
                     double differenceXScale = (1. / differenceRegion.getWidth());
                     double differenceYScale = (1. / differenceRegion.getHeight());
-                    double differenceDeltat = jhvjpx.getPreviousImageData().getDateMillis() / 1000.0 - Constants.referenceDate;
-                    double differenceTheta = 0.0;
+                    cal.setTimeInMillis(jhvjpx.getPreviousImageData().getDateMillis());
+                    double differenceTheta = -Astronomy.getB0InRadians(cal);
                     double differencePhi = Astronomy.getL0Radians(new Date(jhvjpx.getPreviousImageData().getDateMillis()));//DifferentialRotation.calculateRotationInRadians(0.0, differenceDeltat) % (Math.PI * 2.0);
                     this.vertexShader.changeDifferenceTextureScale(jhvjpx.getPreviousImageData().getScaleX(), jhvjpx.getPreviousImageData().getScaleY());
                     this.vertexShader.setDifferenceRect(differenceXOffset, differenceYOffset, differenceXScale, differenceYScale);
@@ -163,10 +161,9 @@ public class GL3DImageTextureView extends AbstractGL3DView implements GL3DView, 
                     double differenceYOffset = (differenceRegion.getLowerLeftCorner().getY());
                     double differenceXScale = (1. / differenceRegion.getWidth());
                     double differenceYScale = (1. / differenceRegion.getHeight());
-                    double differenceDeltat = jhvjpx.getBaseDifferenceImageData().getDateMillis() / 1000.0 - Constants.referenceDate;
-                    cal.setTimeInMillis((long) differenceDeltat * 1000);
-                    double differenceTheta = Astronomy.getB0InRadians(cal);
-                    double differencePhi = Astronomy.getL0Radians(new Date(jhvjpx.getPreviousImageData().getDateMillis()));//DifferentialRotation.calculateRotationInRadians(0.0, differenceDeltat) % (Math.PI * 2.0);
+                    cal.setTimeInMillis(jhvjpx.getBaseDifferenceImageData().getDateMillis());
+                    double differenceTheta = -Astronomy.getB0InRadians(cal);
+                    double differencePhi = Astronomy.getL0Radians(new Date(jhvjpx.getBaseDifferenceImageData().getDateMillis()));//DifferentialRotation.calculateRotationInRadians(0.0, differenceDeltat) % (Math.PI * 2.0);
                     this.vertexShader.changeDifferenceTextureScale(jhvjpx.getBaseDifferenceImageData().getScaleX(), jhvjpx.getBaseDifferenceImageData().getScaleY());
                     this.vertexShader.setDifferenceRect(differenceXOffset, differenceYOffset, differenceXScale, differenceYScale);
                     this.vertexShader.changeDifferenceAngles(differenceTheta, differencePhi);
@@ -185,6 +182,7 @@ public class GL3DImageTextureView extends AbstractGL3DView implements GL3DView, 
                 HelioviewerOcculterMetaData md = (HelioviewerOcculterMetaData) metadata;
                 this.fragmentShader.setCutOffRadius(md.getInnerPhysicalOcculterRadius());
                 this.fragmentShader.setOuterCutOffRadius(md.getOuterPhysicalOcculterRadius());
+                System.out.println("outercutoff" + md.getOuterPhysicalOcculterRadius());
             }
         }
 
