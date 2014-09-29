@@ -3,6 +3,7 @@ package org.helioviewer.jhv.internal_plugins.filter.SOHOLUTFilterPlugin;
 import java.nio.IntBuffer;
 
 import javax.media.opengl.GL2;
+import javax.media.opengl.GLException;
 
 import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.viewmodel.filter.AbstractFilter;
@@ -181,8 +182,14 @@ public class SOHOLUTFilter extends AbstractFilter implements FrameFilter, Standa
         } else {
             currlut = lut;
         }
-
-        gl.glBindTexture(GL2.GL_TEXTURE_1D, lookupTex);
+        //Bugfix: target id might change if 2D and 3D are switched. Better solutions?
+        try {
+            gl.glBindTexture(GL2.GL_TEXTURE_1D, lookupTex);
+        } catch (GLException e) {
+            GLTextureHelper textureHelper = new GLTextureHelper();
+            lookupTex = textureHelper.genTextureID(gl);
+            gl.glBindTexture(GL2.GL_TEXTURE_1D, lookupTex);
+        }
         if (changed || lastLut != currlut || invertLUT != lastInverted) {
             int[] intLUT;
 
