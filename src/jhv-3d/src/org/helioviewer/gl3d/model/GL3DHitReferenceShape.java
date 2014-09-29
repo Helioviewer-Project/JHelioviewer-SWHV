@@ -5,6 +5,7 @@ import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.List;
 
+import org.helioviewer.base.math.MathUtils;
 import org.helioviewer.base.physics.Astronomy;
 import org.helioviewer.base.physics.Constants;
 import org.helioviewer.gl3d.model.image.GL3DImageMesh;
@@ -21,7 +22,9 @@ import org.helioviewer.gl3d.scenegraph.math.GL3DVec4d;
 import org.helioviewer.gl3d.scenegraph.rt.GL3DRay;
 import org.helioviewer.viewmodel.changeevent.ChangeEvent;
 import org.helioviewer.viewmodel.changeevent.TimestampChangedReason;
+import org.helioviewer.viewmodel.metadata.HelioviewerPositionedMetaData;
 import org.helioviewer.viewmodel.view.LinkedMovieManager;
+import org.helioviewer.viewmodel.view.MetaDataView;
 import org.helioviewer.viewmodel.view.TimedMovieView;
 import org.helioviewer.viewmodel.view.View;
 import org.helioviewer.viewmodel.view.ViewListener;
@@ -199,18 +202,30 @@ public class GL3DHitReferenceShape extends GL3DMesh implements ViewListener {
         TimestampChangedReason timestampReason = aEvent.getLastChangedReasonByType(TimestampChangedReason.class);
         if ((timestampReason != null) && (timestampReason.getView() instanceof TimedMovieView) && LinkedMovieManager.getActiveInstance().isMaster((TimedMovieView) timestampReason.getView())) {
             currentDate = timestampReason.getNewDateTime().getTime();
-            updateRotation();
+            updateRotation(timestampReason.getView());
         }
     }
 
-    public void updateRotation() {
+    public void updateRotation(View view) {
         this.timediff = (currentDate.getTime()) / 1000 - Constants.referenceDate;
+        MetaDataView metadataView = view.getAdapter(MetaDataView.class);
+
         this.currentRotation = Astronomy.getL0Radians(currentDate);//DifferentialRotation.calculateRotationInRadians(0., this.timediff) % (Math.PI * 2.0);
+        if (metadataView.getMetaData() instanceof HelioviewerPositionedMetaData && ((HelioviewerPositionedMetaData) (metadataView.getMetaData())).getInstrument().equalsIgnoreCase("SECCHI")) {
+            this.currentRotation -= ((HelioviewerPositionedMetaData) (metadataView.getMetaData())).getStonyhurstLongitude() / MathUtils.radeg;
+        }
         Calendar cal = new GregorianCalendar();
         cal.setTime(new Date(currentDate.getTime()));
+        double bobs0 = 0.;
         double b0 = -Astronomy.getB0InRadians(cal);
+        if (metadataView.getMetaData() instanceof HelioviewerPositionedMetaData && ((HelioviewerPositionedMetaData) (metadataView.getMetaData())).getInstrument().equalsIgnoreCase("SECCHI")) {
+            bobs0 = ((HelioviewerPositionedMetaData) (metadataView.getMetaData())).getStonyhurstLatitude() / MathUtils.radeg - Astronomy.getB0InRadians(cal);
+
+        }
         this.localRotation.clear();
         this.localRotation.rotate(GL3DQuatd.createRotation(-b0, new GL3DVec3d(1, 0, 0)));
         this.localRotation.rotate(GL3DQuatd.createRotation(this.currentRotation, new GL3DVec3d(0, 1, 0)));
+        this.localRotation.rotate(GL3DQuatd.createRotation(-bobs0, new GL3DVec3d(1, 0, 0)));
+
     }
 }
