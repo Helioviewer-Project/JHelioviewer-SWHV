@@ -5,7 +5,6 @@ import java.util.List;
 import java.util.concurrent.locks.ReentrantLock;
 
 import javax.media.opengl.GL2;
-import javax.media.opengl.GL2;
 
 import org.helioviewer.base.physics.Constants;
 import org.helioviewer.gl3d.scenegraph.GL3DDrawBits.Bit;
@@ -21,9 +20,9 @@ import org.helioviewer.gl3d.scenegraph.rt.GL3DRay;
  * coordinates, and indices, that connect vertices to faces. An implementation
  * must provide these attributes and indices which will be converted to
  * {@link GL3DBuffer}.
- * 
+ *
  * @author Simon Spoerri (simon.spoerri@fhnw.ch)
- * 
+ *
  */
 public abstract class GL3DMesh extends GL3DShape {
     protected GL3DBuffer positionVBO;
@@ -269,16 +268,18 @@ public abstract class GL3DMesh extends GL3DShape {
 
     @Override
     public boolean shapeHit(GL3DRay ray) {
-        for (GL3DTriangle t : this.getTriangles()) {
-            if (t.intersects(ray)) {
-                ray.setOriginShape(this);
+        if (this.getTriangles() != null) {
+            for (GL3DTriangle t : this.getTriangles()) {
+                if (t.intersects(ray)) {
+                    ray.setOriginShape(this);
 
-                GL3DVec3d rayCopy2 = ray.getDirection().copy();
-                rayCopy2.multiply(ray.getLength());
-                GL3DVec3d rayCopy = ray.getOrigin().copy();
-                rayCopy.add(rayCopy2);
-                ray.setHitPoint(rayCopy);
-                return true;
+                    GL3DVec3d rayCopy2 = ray.getDirection().copy();
+                    rayCopy2.multiply(ray.getLength());
+                    GL3DVec3d rayCopy = ray.getOrigin().copy();
+                    rayCopy.add(rayCopy2);
+                    ray.setHitPoint(rayCopy);
+                    return true;
+                }
             }
         }
         return false;
