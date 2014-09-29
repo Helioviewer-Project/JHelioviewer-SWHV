@@ -59,7 +59,7 @@ public class GL3DPanel implements GLEventListener, GlobalTimeListener {
         localmat = vv.multiply(localmat);
         mat.multiply(vv);
         this.cube.render(gl, mat.m);
-        this.sun.render(gl, mat.m);
+        GL3DPanel.sun.render(gl, mat.m);
         glad.swapBuffers();
     }
 
@@ -79,7 +79,7 @@ public class GL3DPanel implements GLEventListener, GlobalTimeListener {
         gl.glViewport(0, 0, width, height);
         this.cube = new Cube();
         this.cube.initializeObject(gl);
-        this.sun.initializeObject(gl);
+        GL3DPanel.sun.initializeObject(gl);
     }
 
     @Override

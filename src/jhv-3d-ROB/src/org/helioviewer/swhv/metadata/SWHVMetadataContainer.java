@@ -178,7 +178,7 @@ public class SWHVMetadataContainer implements GlobalTimeListener {
                         break;
                     }
                 }
-                for (JPXViewWatcher jpxvw : this.jpxViewWatchers.get(key)) {
+                for (JPXViewWatcher jpxvw : SWHVMetadataContainer.jpxViewWatchers.get(key)) {
                     if (jpxvw.getJPXView() == jpxv) {
                         jpxvw.setActive(true);
                     } else {
