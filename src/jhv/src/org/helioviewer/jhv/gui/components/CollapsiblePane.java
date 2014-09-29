@@ -14,8 +14,8 @@ import javax.swing.JToggleButton;
 import javax.swing.SwingConstants;
 
 import org.helioviewer.jhv.gui.IconBank;
-import org.helioviewer.jhv.gui.ImageViewerGui;
 import org.helioviewer.jhv.gui.IconBank.JHVIcon;
+import org.helioviewer.jhv.gui.ImageViewerGui;
 
 /**
  * Panel managing a collapsible area.

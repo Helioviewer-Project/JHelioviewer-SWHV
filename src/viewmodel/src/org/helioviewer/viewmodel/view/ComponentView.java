@@ -1,7 +1,7 @@
 package org.helioviewer.viewmodel.view;
 
-import java.awt.Component;
 import java.awt.Color;
+import java.awt.Component;
 import java.io.File;
 import java.io.IOException;
 import java.util.AbstractList;

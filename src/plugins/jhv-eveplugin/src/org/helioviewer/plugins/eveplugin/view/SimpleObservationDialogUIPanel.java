@@ -1,7 +1,6 @@
 package org.helioviewer.plugins.eveplugin.view;
 
 import java.awt.BorderLayout;
-
 import java.awt.EventQueue;
 import java.awt.FlowLayout;
 import java.awt.GridLayout;

@@ -6,8 +6,8 @@ import java.util.List;
 
 import org.helioviewer.base.logging.Log;
 import org.helioviewer.base.math.Interval;
-import org.helioviewer.viewmodel.view.jp2view.image.ResolutionSet;
 import org.helioviewer.plugins.eveplugin.radio.model.ResolutionSetting;
+import org.helioviewer.viewmodel.view.jp2view.image.ResolutionSet;
 
 public class RadioImage {
     private Interval<Date> imageTimeInterval;

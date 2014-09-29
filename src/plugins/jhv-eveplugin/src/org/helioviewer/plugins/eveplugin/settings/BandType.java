@@ -1,16 +1,15 @@
 package org.helioviewer.plugins.eveplugin.settings;
 
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
-import java.net.MalformedURLException;
-import java.net.URL;
 
 import org.helioviewer.base.logging.Log;
 import org.helioviewer.base.math.Interval;
 import org.helioviewer.plugins.eveplugin.download.DataDownloader;
-import org.helioviewer.plugins.eveplugin.settings.EVEAPI;
 
 public class BandType {
     private String baseUrl;

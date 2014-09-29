@@ -1,8 +1,9 @@
 package org.jhv.dataset.tree.views;
 
-import javax.swing.JPanel;
-import java.awt.Color;
 import java.awt.BorderLayout;
+import java.awt.Color;
+
+import javax.swing.JPanel;
 import javax.swing.JTree;
 
 public class TimeViewerPanel extends JPanel {

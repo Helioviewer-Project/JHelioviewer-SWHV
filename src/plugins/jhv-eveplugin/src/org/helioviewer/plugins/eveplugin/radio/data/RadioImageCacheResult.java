@@ -1,8 +1,8 @@
 package org.helioviewer.plugins.eveplugin.radio.data;
 
 import java.util.ArrayList;
-import java.util.List;
 import java.util.Date;
+import java.util.List;
 
 import org.helioviewer.base.math.Interval;
 

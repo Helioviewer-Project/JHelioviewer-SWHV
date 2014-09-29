@@ -4,11 +4,6 @@ import java.awt.event.ActionListener;
 
 import javax.swing.ImageIcon;
 
-import org.helioviewer.jhv.gui.IconBank;
-import org.helioviewer.jhv.gui.IconBank.JHVIcon;
-import org.helioviewer.swhv.gui.layerpanel.SWHVLayerModel;
-import org.helioviewer.swhv.gui.layerpanel.SWHVRegistrableLayerModel;
-
 public class SWHVChooseTypeModel implements SWHVTypeModel{
 	private String type;
 	private SWHVChooseTypeController controller;	

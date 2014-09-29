@@ -3,7 +3,6 @@ package org.helioviewer.gl3d.camera;
 import java.util.List;
 
 import javax.media.opengl.GL2;
-import javax.media.opengl.GL2;
 
 import org.helioviewer.gl3d.scenegraph.GL3DMesh;
 import org.helioviewer.gl3d.scenegraph.GL3DState;

@@ -1,6 +1,7 @@
 package org.jhv.dataset.tree.models;
 
 import java.awt.FlowLayout;
+
 import javax.swing.JComponent;
 import javax.swing.JPanel;
 

@@ -1,9 +1,10 @@
 package org.helioviewer.plugins.eveplugin.radio.test;
 
+import java.awt.BorderLayout;
+
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
-import java.awt.BorderLayout;
 import javax.swing.JTextArea;
 import javax.swing.border.TitledBorder;
 

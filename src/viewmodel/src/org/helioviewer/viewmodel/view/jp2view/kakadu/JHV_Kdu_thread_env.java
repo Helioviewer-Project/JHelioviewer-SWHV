@@ -1,9 +1,9 @@
 package org.helioviewer.viewmodel.view.jp2view.kakadu;
 
-import org.helioviewer.base.math.MathUtils;
-
 import kdu_jni.KduException;
 import kdu_jni.Kdu_thread_env;
+
+import org.helioviewer.base.math.MathUtils;
 
 /**
  * Thread environment enabling one decode to use all cores of the machine.

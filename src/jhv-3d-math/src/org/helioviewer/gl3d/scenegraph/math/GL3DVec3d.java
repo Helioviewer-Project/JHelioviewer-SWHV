@@ -1,7 +1,5 @@
 package org.helioviewer.gl3d.scenegraph.math;
 
-import org.helioviewer.base.logging.Log;
-
 public class GL3DVec3d {
     /**
      * Predefined Vectors
@@ -252,6 +250,7 @@ public class GL3DVec3d {
         return new GL3DVec2d(x, y);
     }
 
+    @Override
     public boolean equals(Object o) {
         if (o instanceof GL3DVec3d)
             return isApproxEqual((GL3DVec3d) o, 0.0);
@@ -273,6 +272,7 @@ public class GL3DVec3d {
         return arr;
     }
 
+    @Override
     public String toString() {
         return "(" + x + ", " + y + ", " + z + ")";
     }

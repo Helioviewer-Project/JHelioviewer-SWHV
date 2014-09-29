@@ -7,8 +7,8 @@ import javax.swing.AbstractAction;
 import javax.swing.KeyStroke;
 
 import org.helioviewer.jhv.gui.IconBank;
-import org.helioviewer.jhv.gui.ImageViewerGui;
 import org.helioviewer.jhv.gui.IconBank.JHVIcon;
+import org.helioviewer.jhv.gui.ImageViewerGui;
 import org.helioviewer.jhv.gui.controller.ZoomController;
 import org.helioviewer.jhv.layers.LayersModel;
 import org.helioviewer.viewmodel.view.MetaDataView;

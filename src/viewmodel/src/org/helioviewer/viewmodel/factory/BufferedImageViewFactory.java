@@ -1,14 +1,14 @@
 package org.helioviewer.viewmodel.factory;
 
-import org.helioviewer.viewmodel.view.HelioviewerGeometryView;
-import org.helioviewer.viewmodel.view.OverlayView;
 import org.helioviewer.viewmodel.view.ComponentView;
+import org.helioviewer.viewmodel.view.HelioviewerGeometryView;
 import org.helioviewer.viewmodel.view.LayeredView;
+import org.helioviewer.viewmodel.view.OverlayView;
 import org.helioviewer.viewmodel.view.ScaleToViewportImageSizeView;
 import org.helioviewer.viewmodel.view.View;
+import org.helioviewer.viewmodel.view.bufferedimage.BufferedImageComponentView;
 import org.helioviewer.viewmodel.view.bufferedimage.BufferedImageHelioviewerGeometryView;
 import org.helioviewer.viewmodel.view.bufferedimage.BufferedImageLayeredView;
-import org.helioviewer.viewmodel.view.bufferedimage.BufferedImageComponentView;
 import org.helioviewer.viewmodel.view.bufferedimage.BufferedImageOverlayView;
 import org.helioviewer.viewmodel.view.bufferedimage.BufferedImageScaleToViewportImageSizeView;
 

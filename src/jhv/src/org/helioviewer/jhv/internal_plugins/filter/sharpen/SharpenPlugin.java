@@ -1,11 +1,11 @@
 package org.helioviewer.jhv.internal_plugins.filter.sharpen;
 
 import org.helioviewer.viewmodel.filter.Filter;
+import org.helioviewer.viewmodel.view.FilterView;
+import org.helioviewer.viewmodel.view.opengl.shader.GLShaderHelper;
 import org.helioviewer.viewmodelplugin.filter.FilterPanel;
 import org.helioviewer.viewmodelplugin.filter.FilterTabDescriptor;
 import org.helioviewer.viewmodelplugin.filter.SimpleFilterContainer;
-import org.helioviewer.viewmodel.view.FilterView;
-import org.helioviewer.viewmodel.view.opengl.shader.GLShaderHelper;
 
 /**
  * Plugin for sharpen the image.

@@ -7,9 +7,9 @@ import java.util.HashMap;
 import org.helioviewer.viewmodel.view.jp2view.io.ChunkedInputStream;
 import org.helioviewer.viewmodel.view.jp2view.io.http.HTTPHeaderKey;
 import org.helioviewer.viewmodel.view.jp2view.io.http.HTTPRequest;
+import org.helioviewer.viewmodel.view.jp2view.io.http.HTTPRequest.Method;
 import org.helioviewer.viewmodel.view.jp2view.io.http.HTTPResponse;
 import org.helioviewer.viewmodel.view.jp2view.io.http.HTTPSocket;
-import org.helioviewer.viewmodel.view.jp2view.io.http.HTTPRequest.Method;
 
 /**
  * Assumes a persistent HTTP connection.

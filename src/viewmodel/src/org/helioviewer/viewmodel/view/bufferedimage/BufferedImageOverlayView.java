@@ -17,10 +17,10 @@ import org.helioviewer.viewmodel.view.AbstractBasicView;
 import org.helioviewer.viewmodel.view.LayeredView;
 import org.helioviewer.viewmodel.view.OverlayView;
 import org.helioviewer.viewmodel.view.ScaleToViewportImageSizeView;
+import org.helioviewer.viewmodel.view.ScalingView.InterpolationMode;
 import org.helioviewer.viewmodel.view.SubimageDataView;
 import org.helioviewer.viewmodel.view.View;
 import org.helioviewer.viewmodel.view.ViewHelper;
-import org.helioviewer.viewmodel.view.ScalingView.InterpolationMode;
 import org.helioviewer.viewmodel.view.opengl.OverlayPluginContainer;
 
 /**

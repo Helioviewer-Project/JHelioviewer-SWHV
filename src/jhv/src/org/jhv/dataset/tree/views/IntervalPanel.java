@@ -5,7 +5,9 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 
 import javax.swing.BorderFactory;
+import javax.swing.BoxLayout;
 import javax.swing.JLabel;
+import javax.swing.tree.TreePath;
 
 import org.helioviewer.jhv.layers.LayersModel;
 import org.helioviewer.viewmodel.view.View;
@@ -13,9 +15,6 @@ import org.jhv.dataset.tree.models.DatasetInterval;
 import org.jhv.dataset.tree.models.DatasetLayer;
 import org.jhv.dataset.tree.models.DatasetType;
 import org.jhv.dataset.tree.models.LayersToDatasetLayers;
-
-import javax.swing.BoxLayout;
-import javax.swing.tree.TreePath;
 
 public class IntervalPanel extends DatasetPanel {
     private static final long serialVersionUID = 4342443227686604174L;

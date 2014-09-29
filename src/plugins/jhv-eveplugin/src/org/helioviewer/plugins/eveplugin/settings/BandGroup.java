@@ -1,7 +1,7 @@
 package org.helioviewer.plugins.eveplugin.settings;
 
-import java.util.List;
 import java.util.ArrayList;
+import java.util.List;
 
 public class BandGroup {
     private String groupLabel;

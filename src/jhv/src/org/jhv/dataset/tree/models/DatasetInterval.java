@@ -8,7 +8,6 @@ import javax.swing.JPanel;
 import javax.swing.tree.TreeNode;
 
 import org.helioviewer.jhv.layers.LayerDescriptor;
-import org.jhv.dataset.tree.models.DatasetType;
 import org.jhv.dataset.tree.views.IntervalPanel;
 
 public class DatasetInterval implements TreeNode, DatasetNode {
