@@ -182,7 +182,6 @@ public class GL3DImageTextureView extends AbstractGL3DView implements GL3DView, 
                 HelioviewerOcculterMetaData md = (HelioviewerOcculterMetaData) metadata;
                 this.fragmentShader.setCutOffRadius(md.getInnerPhysicalOcculterRadius());
                 this.fragmentShader.setOuterCutOffRadius(md.getOuterPhysicalOcculterRadius());
-                System.out.println("outercutoff" + md.getOuterPhysicalOcculterRadius());
             }
         }
 
