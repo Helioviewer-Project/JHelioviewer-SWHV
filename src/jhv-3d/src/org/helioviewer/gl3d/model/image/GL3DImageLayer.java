@@ -246,4 +246,7 @@ public abstract class GL3DImageLayer extends GL3DGroup implements GL3DCameraList
     protected GL3DShape getImageCorona() {
         return null;
     }
+
+    public void setCoronaVisibility(boolean visible) {
+    }
 }
