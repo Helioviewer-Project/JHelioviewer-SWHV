@@ -15,8 +15,8 @@ import nom.tam.fits.BinaryTableHDU;
 import nom.tam.fits.Fits;
 import nom.tam.fits.Header;
 
+import org.helioviewer.base.physics.Astronomy;
 import org.helioviewer.base.physics.Constants;
-import org.helioviewer.base.physics.DifferentialRotation;
 import org.helioviewer.gl3d.plugin.pfss.settings.PfssSettings;
 
 import com.jogamp.common.nio.Buffers;
@@ -109,7 +109,7 @@ public class PfssData {
             double deltat = dd.getTime() / 1000.0 - Constants.referenceDate;
             Calendar cal = new GregorianCalendar();
             cal.setTimeInMillis(dd.getTime());
-            double phi = DifferentialRotation.calculateRotationInRadians(0.0, deltat) % (Math.PI * 2.0) - Math.PI / 2.;
+            double phi = Astronomy.getL0Radians(dd);//DifferentialRotation.calculateRotationInRadians(0.0, deltat) % (Math.PI * 2.0) - Math.PI / 2.;
 
             for (int i = 0; i < fieldlinex.length; i++) {
                 if (i / PfssSettings.POINTS_PER_LINE % 8 <= 8 - PfssSettings.qualityReduction) {

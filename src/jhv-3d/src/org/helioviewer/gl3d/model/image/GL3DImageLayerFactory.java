@@ -11,9 +11,9 @@ import org.helioviewer.viewmodel.view.MetaDataView;
 /**
  * Factory to be used for creating GL3DImageLayer Objects. This class is used by
  * the GL3DSceneGraphView.
- * 
+ *
  * @author Simon Spoerri (simon.spoerri@fhnw.ch)
- * 
+ *
  */
 public class GL3DImageLayerFactory {
 
@@ -33,15 +33,9 @@ public class GL3DImageLayerFactory {
                 // HMI
                 Log.debug("GL3DImageLayerFactory: Creating HMI Image Layer!");
                 return new GL3DAIAImageLayer(mainView);
-            } else if (hvMetaData.getInstrument().equalsIgnoreCase("EIT")) {
-                // EIT
-                return new GL3DEITImageLayer(mainView);
             } else if (hvMetaData.getInstrument().equalsIgnoreCase("AIA")) {
                 // AIA
                 return new GL3DAIAImageLayer(mainView);
-            } else if (hvMetaData.getInstrument().equalsIgnoreCase("SECCHI")) {
-                // STEREO
-                return new GL3DStereoImageLayer(mainView);
             } else {
                 // GENERIC
                 return new GL3DAIAImageLayer(mainView);

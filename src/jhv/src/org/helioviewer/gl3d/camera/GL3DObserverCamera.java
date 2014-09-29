@@ -99,7 +99,7 @@ public class GL3DObserverCamera extends GL3DSolarRotationTrackingTrackballCamera
             }
 
             this.timediff = currentDate.getTime() / 1000 - Constants.referenceDate;
-            this.currentRotation = DifferentialRotation.calculateRotationInRadians(0., this.timediff) % (Math.PI * 2.0);
+            this.currentRotation = Astronomy.getL0Radians(currentDate);
 
             this.getLocalRotation().clear();
             this.getLocalRotation().rotate(GL3DQuatd.createRotation(addb0, new GL3DVec3d(1, 0, 0)));

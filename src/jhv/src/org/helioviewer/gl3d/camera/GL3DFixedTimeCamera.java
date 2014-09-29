@@ -2,6 +2,7 @@ package org.helioviewer.gl3d.camera;
 
 import java.util.Date;
 
+import org.helioviewer.base.physics.Astronomy;
 import org.helioviewer.base.physics.Constants;
 import org.helioviewer.base.physics.DifferentialRotation;
 import org.helioviewer.gl3d.scenegraph.math.GL3DQuatd;
@@ -23,9 +24,9 @@ import org.helioviewer.viewmodel.view.ViewListener;
  * {@link GL3DFixedTimeCamera} by automatically rotating the camera around the
  * Y-Axis (pointing to solar north) by an amount calculated through
  * {@link DifferentialRotation}.
- * 
+ *
  * @author Simon Spoerri (simon.spoerri@fhnw.ch)
- * 
+ *
  */
 public class GL3DFixedTimeCamera extends GL3DSolarRotationTrackingTrackballCamera implements ViewListener {
 
@@ -78,7 +79,7 @@ public class GL3DFixedTimeCamera extends GL3DSolarRotationTrackingTrackballCamer
 
     public void updateRotation() {
         this.timediff = this.getTimeDelay() / 1000 - Constants.referenceDate;
-        this.currentRotation = DifferentialRotation.calculateRotationInRadians(0., this.timediff) % (Math.PI * 2.0);
+        this.currentRotation = Astronomy.getL0Radians(currentDate);//DifferentialRotation.calculateRotationInRadians(0., this.timediff) % (Math.PI * 2.0);
         this.setLocalRotation(GL3DQuatd.createRotation(this.currentRotation, new GL3DVec3d(0, 1, 0)));
         this.updateCameraTransformation();
     }
