@@ -18,6 +18,8 @@ import javax.media.opengl.GL2;
  * @author Stefan Meier (stefan.meier@fhnw.ch)
  * */
 public class PfssFitsFile implements Serializable {
+    private static final long serialVersionUID = 1L;
+
     private PfssData data = null;
     private byte[] gzipFitsFile;
     private boolean loaded = false;

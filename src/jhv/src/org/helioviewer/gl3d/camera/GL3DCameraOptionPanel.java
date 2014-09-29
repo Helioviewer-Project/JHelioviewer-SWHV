@@ -24,6 +24,7 @@ import org.helioviewer.gl3d.scenegraph.GL3DDrawBits.Bit;
 import org.helioviewer.jhv.display.Displayer;
 
 public abstract class GL3DCameraOptionPanel extends JPanel implements ActionListener {
+    private static final long serialVersionUID = 1L;
 
     abstract public void deactivate();
 

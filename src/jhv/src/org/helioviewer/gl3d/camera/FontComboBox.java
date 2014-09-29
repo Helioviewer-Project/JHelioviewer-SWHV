@@ -5,6 +5,7 @@ import java.awt.GraphicsEnvironment;
 import javax.swing.JComboBox;
 
 public class FontComboBox extends JComboBox {
+    private static final long serialVersionUID = 1L;
 
     public FontComboBox() {
         this.setEditable(true);

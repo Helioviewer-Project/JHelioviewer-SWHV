@@ -36,6 +36,8 @@ import org.helioviewer.jhv.layers.LayersModel;
 import org.helioviewer.viewmodel.view.jp2view.datetime.ImmutableDateTime;
 
 public class GL3DFollowObjectCameraOptionPanel extends GL3DCameraOptionPanel implements GL3DFollowObjectCameraListener {
+    private static final long serialVersionUID = 1L;
+
     private final JTextArea loadedLabel;
     private final JLabel beginDateLabel;
     private JPanel beginDatetimePanel;

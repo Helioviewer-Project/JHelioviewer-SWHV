@@ -15,6 +15,8 @@ import org.helioviewer.swhv.gui.ImageDataPanel;
 import org.helioviewer.swhv.gui.layerpanel.SWHVAbstractOptionPanel;
 
 public class SWHVImageLayerOptionPanel extends SWHVAbstractOptionPanel {
+    private static final long serialVersionUID = 1L;
+
     private JPanel mainPanelContainer;
     private final SWHVImageLayerModel model;
 
