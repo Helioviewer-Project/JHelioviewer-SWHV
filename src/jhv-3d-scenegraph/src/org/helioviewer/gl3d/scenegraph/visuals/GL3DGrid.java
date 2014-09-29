@@ -136,8 +136,8 @@ public class GL3DGrid extends GL3DGroup {
         for (int i = 1; i < this.xticks; i++) {
             double angle = i * Math.PI / this.xticks;
             String txt = "" + (int) (90 - 1.0 * i / this.xticks * 180);
-            renderer.draw3D(txt, (float) (Math.sin(angle) * size) - 0.f, (float) (Math.cos(angle) * size), (float) zdist, 0.08f / font.getSize());
-            renderer.draw3D(txt, (float) (-Math.sin(angle) * size) - 0.03f * txt.length(), (float) (Math.cos(angle) * size), (float) zdist, 0.08f / font.getSize());
+            renderer.draw3D(txt, (float) (Math.sin(angle) * size) - 0.f, (float) (Math.cos(angle) * size - 0.02f * 20. / font.getSize()), (float) zdist, 0.08f / font.getSize());
+            renderer.draw3D(txt, (float) (-Math.sin(angle) * size - 0.03f * txt.length() * 20. / font.getSize()), (float) (Math.cos(angle) * size - 0.02f * 20. / font.getSize()), (float) zdist, 0.08f / font.getSize());
         }
         renderer.end3DRendering();
 
