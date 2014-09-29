@@ -269,8 +269,13 @@ public class SWEKSourceManager {
      */
     private boolean prepareDownloadersClassLoader() {
         URL[] urls = jarURLList.toArray(new URL[0]);
-        urlClassLoader = URLClassLoader.newInstance(urls, PluginManager.getSingeltonInstance().getPluginContainer(swekplugin)
-                .getClassLoader());
+        if (loadExternalJars) {
+            urlClassLoader = URLClassLoader.newInstance(urls, PluginManager.getSingeltonInstance().getPluginContainer(swekplugin)
+                    .getClassLoader());
+        } else {
+            urlClassLoader = URLClassLoader.newInstance(urls, Thread.currentThread().getContextClassLoader());
+        }
+
         return true;
     }
 }
