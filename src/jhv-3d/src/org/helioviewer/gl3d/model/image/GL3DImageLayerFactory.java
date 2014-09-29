@@ -25,7 +25,7 @@ public class GL3DImageLayerFactory {
         if (metaData instanceof HelioviewerOcculterMetaData) {
             // LASCO
             Log.debug("GL3DImageLayerFactory: Creating LASCO Image Layer");
-            return new GL3DLascoImageLayer(mainView);
+            return new GL3DAIAImageLayer(mainView);
         } else if (metaData instanceof HelioviewerMetaData) {
 
             HelioviewerMetaData hvMetaData = (HelioviewerMetaData) metaData;
