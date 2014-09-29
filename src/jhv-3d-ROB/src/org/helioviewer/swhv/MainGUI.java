@@ -251,8 +251,6 @@ public class MainGUI extends JFrame {
 
         // Directories where to search for lib config files
         URI libs = JHVDirectory.LIBS.getFile().toURI();
-        URI defaultPlugins = JHVDirectory.PLUGINS.getFile().toURI();
-        URI defaultPluginsBackup = JHVDirectory.PLUGINS_LAST_CONFIG.getFile().toURI();
         URI libsBackup = JHVDirectory.LIBS_LAST_CONFIG.getFile().toURI();
         URI libsRemote = null;
         try {
