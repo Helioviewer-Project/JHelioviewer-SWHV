@@ -1,6 +1,7 @@
 package org.helioviewer.jhv.plugins.swek.view.filter;
 
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
@@ -77,7 +78,9 @@ public abstract class AbstractFilterPanel extends JPanel {
      */
     private void initVisualComponents() {
         setLayout(new BorderLayout());
-        add(new JLabel(parameter.getParameterDisplayName()), BorderLayout.LINE_START);
+        setOpaque(false);
+        setBackground(Color.white);
+        add(new JLabel(parameter.getParameterDisplayName()), BorderLayout.PAGE_START);
         add(initFilterComponents(), BorderLayout.CENTER);
         JButton filter = new JButton("Filter");
         filter.addActionListener(new ActionListener() {
@@ -87,7 +90,7 @@ public abstract class AbstractFilterPanel extends JPanel {
                 filter();
             }
         });
-        add(filter, BorderLayout.LINE_END);
+        add(filter, BorderLayout.PAGE_END);
     }
 
     /**

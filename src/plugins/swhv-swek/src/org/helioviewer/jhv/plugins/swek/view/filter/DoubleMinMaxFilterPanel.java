@@ -1,32 +1,109 @@
 package org.helioviewer.jhv.plugins.swek.view.filter;
 
-import javax.swing.JComponent;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.util.ArrayList;
 
+import javax.swing.JComponent;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JSpinner;
+import javax.swing.SpinnerModel;
+import javax.swing.SpinnerNumberModel;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
+
+import org.helioviewer.basegui.components.WheelSupport;
 import org.helioviewer.jhv.plugins.swek.config.SWEKEventType;
 import org.helioviewer.jhv.plugins.swek.config.SWEKParameter;
+import org.helioviewer.jhv.plugins.swek.download.SWEKOperand;
+import org.helioviewer.jhv.plugins.swek.download.SWEKParam;
 
+/**
+ * Creates a filter that downloads events between a minimum and a maximum value.
+ * 
+ * @author Bram Bourgoignie (Bram.bourgoignie@oma.be)
+ * 
+ */
 public class DoubleMinMaxFilterPanel extends AbstractFilterPanel {
 
-    public DoubleMinMaxFilterPanel(SWEKEventType eventType, SWEKParameter parameter) {
-        super(eventType, parameter);
-        // TODO Auto-generated constructor stub
-    }
+    /** The UID */
+    private static final long serialVersionUID = -580186824513381393L;
+
+    /** Minimum value spinner */
+    private JSpinner minimumValueSpinner;
+
+    /** Maximum value spinner */
+    private JSpinner maximumValueSpinner;
 
     /**
-     * The UID.
+     * Creates a double min max filter for the given event type and parameter.
+     * 
+     * @param eventType
+     *            the event type
+     * @param parameter
+     *            the parameter
      */
-    private static final long serialVersionUID = -580186824513381393L;
+    public DoubleMinMaxFilterPanel(SWEKEventType eventType, SWEKParameter parameter) {
+        super(eventType, parameter);
+
+    }
 
     @Override
     public void filter() {
-        // TODO Auto-generated method stub
-
+        if ((Double) minimumValueSpinner.getValue() <= (Double) maximumValueSpinner.getValue()) {
+            SWEKParam paramMin = new SWEKParam(parameter.getParameterName(), "" + minimumValueSpinner.getValue(),
+                    SWEKOperand.BIGGER_OR_EQUAL);
+            SWEKParam paramMax = new SWEKParam(parameter.getParameterName(), "" + maximumValueSpinner.getValue(),
+                    SWEKOperand.SMALLER_OR_EQUAL);
+            ArrayList<SWEKParam> params = new ArrayList<SWEKParam>();
+            params.add(paramMin);
+            params.add(paramMax);
+            filterManager.addFilter(eventType, parameter, params);
+        }
     }
 
     @Override
     public JComponent initFilterComponents() {
-        // TODO Auto-generated method stub
-        return null;
+        SpinnerModel minimumSpinnerModel = new SpinnerNumberModel(middleValue, min, max, stepSize);
+        SpinnerModel maximumSpinnerModel = new SpinnerNumberModel(middleValue, min, max, stepSize);
+
+        minimumValueSpinner = new JSpinner(minimumSpinnerModel);
+        minimumValueSpinner.setEditor(new JSpinner.NumberEditor(minimumValueSpinner, "0.00000000"));
+        minimumSpinnerModel.addChangeListener(new ChangeListener() {
+            @Override
+            public void stateChanged(ChangeEvent e) {
+                if ((Double) minimumValueSpinner.getValue() > (Double) maximumValueSpinner.getValue()) {
+                    maximumValueSpinner.setValue(minimumValueSpinner.getValue());
+                }
+            }
+        });
+        WheelSupport.installMouseWheelSupport(minimumValueSpinner);
+        maximumValueSpinner = new JSpinner(maximumSpinnerModel);
+        maximumValueSpinner.setEditor(new JSpinner.NumberEditor(maximumValueSpinner, "0.0000000"));
+        maximumSpinnerModel.addChangeListener(new ChangeListener() {
+            @Override
+            public void stateChanged(ChangeEvent e) {
+                if ((Double) maximumValueSpinner.getValue() < (Double) minimumValueSpinner.getValue()) {
+                    minimumValueSpinner.setValue(maximumValueSpinner.getValue());
+                }
+            }
+        });
+        WheelSupport.installMouseWheelSupport(maximumValueSpinner);
+        JPanel p = new JPanel();
+        p.setLayout(new GridBagLayout());
+        GridBagConstraints c = new GridBagConstraints();
+        c.gridx = 0;
+        c.gridy = 0;
+        p.add(new JLabel("Minimum Value:"), c);
+        c.gridx = 1;
+        p.add(minimumValueSpinner, c);
+        c.gridx = 0;
+        c.gridy = 1;
+        p.add(new JLabel("Maximum Value:"), c);
+        c.gridx = 1;
+        p.add(maximumValueSpinner, c);
+        return p;
     }
 
 }
