@@ -14,6 +14,13 @@ import org.helioviewer.jhv.plugins.swek.config.SWEKParameter;
  */
 public class FilterPanelFactory {
 
+    /**
+     * Creates a list of filter panels for the given event type.
+     * 
+     * @param eventType
+     *            the event type for which to create the filter panels
+     * @return a list with filterpanels
+     */
     public static List<AbstractFilterPanel> createFilterPanel(SWEKEventType eventType) {
         List<AbstractFilterPanel> panels = new ArrayList<AbstractFilterPanel>();
         for (SWEKParameter parameter : eventType.getParameterList()) {
