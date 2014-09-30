@@ -18,12 +18,11 @@ public class DoubleValueFilterPanel extends AbstractFilterPanel {
     private static final long serialVersionUID = 1849764035063972566L;
 
     /** The value spinner */
-    private final JSpinner spinner;
+    private JSpinner spinner;
 
     public DoubleValueFilterPanel(SWEKEventType eventType, SWEKParameter parameter) {
         super(eventType, parameter);
-        SpinnerModel spinnerModel = new SpinnerNumberModel(min, max, middleValue, stepSize);
-        spinner = new JSpinner(spinnerModel);
+
     }
 
     @Override
@@ -36,6 +35,8 @@ public class DoubleValueFilterPanel extends AbstractFilterPanel {
 
     @Override
     public JComponent initFilterComponents() {
+        SpinnerModel spinnerModel = new SpinnerNumberModel(middleValue, min, max, stepSize);
+        spinner = new JSpinner(spinnerModel);
         return spinner;
     }
 }
