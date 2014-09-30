@@ -12,5 +12,6 @@
 	<classpathentry combineaccessrules="false" kind="src" path="/jhv-data"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/jhv-display"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/HEKSource"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/basegui"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
