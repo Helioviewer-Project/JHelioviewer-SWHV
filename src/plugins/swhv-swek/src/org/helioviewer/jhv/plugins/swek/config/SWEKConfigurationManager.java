@@ -735,6 +735,8 @@ public class SWEKConfigurationManager {
             filter.setFilterType(parseFilterType(filterobject));
             filter.setMin(parseMin(filterobject));
             filter.setMax(parseMax(filterobject));
+            filter.setStartValue(parseStartValue(filterobject));
+            filter.setStepSize(parseStepSize(filterobject));
             return filter;
         } else {
             return null;
@@ -771,13 +773,39 @@ public class SWEKConfigurationManager {
      * Parses the maximum filter value from the json.
      * 
      * @param object
-     *            the json from which to filter the maximum filter value
+     *            the json from which to parse the maximum filter value
      * @return the maximum filter value
      * @throws JSONException
      *             if the maximum filter value could not be parsed
      */
     private double parseMax(JSONObject object) throws JSONException {
         return object.getDouble("max");
+    }
+
+    /**
+     * Parses the step size from the json.
+     * 
+     * @param object
+     *            the json from which to parse the step size
+     * @return the step size
+     * @throws JSONException
+     *             if the step size could not be parsed
+     */
+    private double parseStepSize(JSONObject object) throws JSONException {
+        return object.getDouble("step_size");
+    }
+
+    /**
+     * Parses the start value from the json.
+     * 
+     * @param object
+     *            the json from which to parse the start value
+     * @return the start value
+     * @throws JSONException
+     *             is the start value could not be parsed
+     */
+    private Double parseStartValue(JSONObject object) throws JSONException {
+        return object.getDouble("start_value");
     }
 
     /**
