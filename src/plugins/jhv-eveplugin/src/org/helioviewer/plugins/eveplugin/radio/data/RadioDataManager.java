@@ -37,12 +37,12 @@ import org.helioviewer.viewmodel.viewport.ViewportAdapter;
 /**
  * The radio data manager manages all the downloaded data for radio
  * spectrograms.
- * 
+ *
  * It receives all of its input from the radio downloader as listener of the
  * radio downloader.
- * 
+ *
  * @author Bram.Bourgoignie@oma.be
- * 
+ *
  */
 public class RadioDataManager implements RadioDownloaderListener {
 
@@ -50,34 +50,34 @@ public class RadioDataManager implements RadioDownloaderListener {
     private static RadioDataManager instance;
 
     /** A list collecting all the radio data manager listeners. */
-    private List<RadioDataManagerListener> listeners;
+    private final List<RadioDataManagerListener> listeners;
 
     /** A map keeping the download request data. */
-    private Map<Long, DownloadRequestData> downloadRequestData;
+    private final Map<Long, DownloadRequestData> downloadRequestData;
 
     /** Instance of the radio downloader */
-    private RadioDownloader downloader;
+    private final RadioDownloader downloader;
 
     /** A buffer holding all the requests for data. */
-    private RequestForDataBuffer requestBuffer;
+    private final RequestForDataBuffer requestBuffer;
 
     /** The instance of the line data selector model */
-    private LineDataSelectorModel lineDataSelectorModel;
+    private final LineDataSelectorModel lineDataSelectorModel;
 
     /** Instance of the radio image cache */
-    private RadioImageCache cache;
+    private final RadioImageCache cache;
 
     /** Instance of the zoom manager */
-    private ZoomManager zoomManager;
+    private final ZoomManager zoomManager;
 
     /** Id for identifying the requests for data. */
     private long id = 0;
 
     /** Instance of eve state */
-    private EVEState eveState;
+    private final EVEState eveState;
 
     /** Instance of the y-value model manager */
-    private YValueModelManager yValueModelManager;
+    private final YValueModelManager yValueModelManager;
 
     /** Is there a request for data busy */
     private boolean requestForDataBusy;
@@ -85,7 +85,7 @@ public class RadioDataManager implements RadioDownloaderListener {
     /**
      * private constructor used when the instance is requested for the first
      * time.
-     * 
+     *
      */
     private RadioDataManager() {
         listeners = new ArrayList<RadioDataManagerListener>();
@@ -103,7 +103,7 @@ public class RadioDataManager implements RadioDownloaderListener {
 
     /**
      * Access to the singleton instance of the radio data manager
-     * 
+     *
      * @return The instance of the radio data manager
      */
     public static RadioDataManager getSingletonInstance() {
@@ -115,7 +115,7 @@ public class RadioDataManager implements RadioDownloaderListener {
 
     /**
      * Adds a radio data manager listener.
-     * 
+     *
      * @param l
      *            The listener to add
      */
@@ -125,7 +125,7 @@ public class RadioDataManager implements RadioDownloaderListener {
 
     /**
      * Removes a radio data manager listener.
-     * 
+     *
      * @param l
      *            The listener to remove
      */
@@ -136,8 +136,8 @@ public class RadioDataManager implements RadioDownloaderListener {
     /**
      * Inform the RadioDataManager about the new data that was received. The
      * RadioDataManagerListeners will be informed about the new received data.
-     * 
-     * 
+     *
+     *
      * @param data
      *            The data received
      * @param imageID
@@ -154,10 +154,10 @@ public class RadioDataManager implements RadioDownloaderListener {
     /**
      * Removes the given download request data. The data is removed from the
      * line selector model. The images are removed from the cache.
-     * 
+     *
      * The listeners are informed about the removal of the download request
      * data.
-     * 
+     *
      * @param drd
      *            The download request data that should be removed
      */
@@ -173,8 +173,8 @@ public class RadioDataManager implements RadioDownloaderListener {
     /**
      * Changed the visibility of the download request data. All radio data
      * manager listeners are informed.
-     * 
-     * 
+     *
+     *
      * @param drd
      *            The download request data for which the visiblility is changed
      */
@@ -184,14 +184,14 @@ public class RadioDataManager implements RadioDownloaderListener {
 
     /**
      * Request the radio data manager for new data.
-     * 
+     *
      * As long as the mouse is dragged no new data is requested. This to improve
      * the responsiveness of the program.
-     * 
+     *
      * This function can be called asynchronously. A request buffer is used to
      * store the all the calls. As long as there are requests in the buffer
      * function continues.
-     * 
+     *
      * @param xStart
      *            The start time for which new data is requested
      * @param xEnd
@@ -239,17 +239,13 @@ public class RadioDataManager implements RadioDownloaderListener {
         } else {
             Log.trace("Mouse is dragged");
         }
-        long end = System.currentTimeMillis();
-        // Log.debug("Finished request for data id: " + tempId + " time : " +
-        // end + " in " + (end - start) + " milliseconds by thread " +
-        // Thread.currentThread().getName());
     }
 
     /**
      * Informs the radio data manager about an image, identified by imageID from
      * download identified by downloadID, finished its downloading?
-     * 
-     * 
+     *
+     *
      * @param imageID
      *            The image id of the image that finished downloading
      * @param downloadID
@@ -352,7 +348,7 @@ public class RadioDataManager implements RadioDownloaderListener {
     /**
      * Define the maximum bound of the frequency interval. The y-value model is
      * updated.
-     * 
+     *
      * @param downloadID
      *            The download ID for which the bounds are defined
      * @param plotIdentifier
@@ -395,7 +391,7 @@ public class RadioDataManager implements RadioDownloaderListener {
 
     /**
      * Informs all RadioDataManagerListener of new received data.
-     * 
+     *
      * @param data
      *            The data received
      * @param imageID
@@ -430,7 +426,7 @@ public class RadioDataManager implements RadioDownloaderListener {
 
     /**
      * Informs the radio data manager listeners about new available data.
-     * 
+     *
      * @param drd
      *            The available data
      * @param iD
@@ -444,7 +440,7 @@ public class RadioDataManager implements RadioDownloaderListener {
 
     /**
      * Informs the radio data managers listeners about data that was removed.
-     * 
+     *
      * @param drd
      *            The data that was removed
      */
@@ -457,7 +453,7 @@ public class RadioDataManager implements RadioDownloaderListener {
     /**
      * Informs the radio data manager listeners about the data visibility that
      * was changed.
-     * 
+     *
      * @param drd
      *            The download request data for which the data visibility was
      *            changed.
@@ -472,7 +468,7 @@ public class RadioDataManager implements RadioDownloaderListener {
     /**
      * Informs the radio data manager listeners about the download request that
      * was answered.
-     * 
+     *
      * @param timeInterval
      *            The time interval over which the request was answered
      * @param downloadID
@@ -488,7 +484,7 @@ public class RadioDataManager implements RadioDownloaderListener {
 
     /**
      * Function handles a request configuration.
-     * 
+     *
      * @param requestConfig
      *            The request configuration to be handled
      * @param xStart
@@ -535,7 +531,7 @@ public class RadioDataManager implements RadioDownloaderListener {
 
     /**
      * Handles new available data send by the radio downloader
-     * 
+     *
      * @param xStart
      *            The start time of the currently visible time interval
      * @param xEnd
@@ -551,7 +547,7 @@ public class RadioDataManager implements RadioDownloaderListener {
      *            The identifier of the plot
      * @param drd
      *            The download request data
-     * 
+     *
      */
     private void handleAvailableData(DownloadedJPXData jpxData, Date xStart, Date xEnd, double yStart, double yEnd, String plotIdentifier, DownloadRequestData drd) {
         RadioImage ri = drd.getRadioImages().get(jpxData.getImageID());
@@ -603,7 +599,7 @@ public class RadioDataManager implements RadioDownloaderListener {
     /**
      * Instructs the radio data manager listeners to clear the saved images in
      * the list.
-     * 
+     *
      * @param downloadID
      *            The download identifier for which the images should be removed
      * @param toRemove
@@ -623,7 +619,7 @@ public class RadioDataManager implements RadioDownloaderListener {
 
     /**
      * Instructs the radio data managers about data that was not changed.
-     * 
+     *
      * @param timeInterval
      *            The visible interval over which the data did not change
      * @param freqInterval
@@ -650,7 +646,7 @@ public class RadioDataManager implements RadioDownloaderListener {
     /**
      * Informs the radio data manager listeners about a request for a too big
      * interval
-     * 
+     *
      * @param downloadID
      *            The download identifier for which the requested interval was
      *            too big
@@ -665,7 +661,7 @@ public class RadioDataManager implements RadioDownloaderListener {
 
     /**
      * Handles newly downloaded jpx-data.
-     * 
+     *
      * @param djd
      *            The jpx-data to be handled
      * @param drd
@@ -731,7 +727,7 @@ public class RadioDataManager implements RadioDownloaderListener {
 
     /**
      * Handles the download of additional jpx-data.
-     * 
+     *
      * @param ratioY
      *            The x-ratio of time per pixel
      * @param ratioX
@@ -748,7 +744,7 @@ public class RadioDataManager implements RadioDownloaderListener {
      * @param plotIdentifier
      *            The plot identifier for which new additional data was
      *            downloaded
-     * 
+     *
      */
     private void handleAdditionalJPXData(DownloadedJPXData djd, double ratioX, double ratioY, Long downloadID, DownloadRequestData drd, SimpleDateFormat sdf, String plotIdentifier) {
         JHVJP2View jpxView = djd.getView().getAdapter(JHVJP2View.class);
@@ -797,7 +793,7 @@ public class RadioDataManager implements RadioDownloaderListener {
     /**
      * Informs radio data manager listeners about interval with no data that
      * where reseive.
-     * 
+     *
      * @param noDataList
      *            A list with interval for which no data was received
      * @param downloadID
