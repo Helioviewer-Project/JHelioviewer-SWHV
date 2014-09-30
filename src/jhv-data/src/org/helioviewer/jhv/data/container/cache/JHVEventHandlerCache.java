@@ -62,14 +62,20 @@ public class JHVEventHandlerCache {
      */
     public void add(JHVEventHandler handler, Date date) {
         synchronized (JHVEventContainerLocks.eventHandlerCacheLock) {
-            Date roundedDate = DateUtil.getCurrentDate(date);
-            Set<JHVEventHandler> tempSet = new HashSet<JHVEventHandler>();
-            if (interestInDate.containsKey(roundedDate)) {
-                tempSet = interestInDate.get(roundedDate);
+            if (date != null && handler != null) {
+                Date roundedDate = DateUtil.getCurrentDate(date);
+                Set<JHVEventHandler> tempSet = new HashSet<JHVEventHandler>();
+                if (interestInDate.containsKey(roundedDate)) {
+                    tempSet = interestInDate.get(roundedDate);
+                }
+                tempSet.add(handler);
+                interestInDate.put(roundedDate, tempSet);
+                allJHVeventHandlers.add(handler);
+            } else {
+                // This should be logged, but the log system is part of the
+                // complete program. Should be stripped of.
+                System.err.println("The date or handler was null");
             }
-            tempSet.add(handler);
-            interestInDate.put(roundedDate, tempSet);
-            allJHVeventHandlers.add(handler);
         }
     }
 
