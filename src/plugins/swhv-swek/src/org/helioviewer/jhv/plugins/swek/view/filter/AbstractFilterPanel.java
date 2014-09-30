@@ -53,6 +53,7 @@ public abstract class AbstractFilterPanel extends JPanel {
      */
     public AbstractFilterPanel(SWEKEventType eventType, SWEKParameter parameter) {
         this.parameter = parameter;
+        this.eventType = eventType;
         filterManager = FilterManager.getSingletonInstance();
         initValues();
         initVisualComponents();
