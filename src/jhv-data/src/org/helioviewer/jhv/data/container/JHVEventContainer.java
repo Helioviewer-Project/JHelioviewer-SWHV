@@ -246,8 +246,10 @@ public class JHVEventContainer {
          * handler.cacheUpdated(); }
          */
         Set<JHVEventHandler> handlers = eventHandlerCache.getAllJHVEventHandlers();
-        for (JHVEventHandler handler : handlers) {
-            handler.cacheUpdated();
+        synchronized (JHVEventContainerLocks.eventHandlerCacheLock) {
+            for (JHVEventHandler handler : handlers) {
+                handler.cacheUpdated();
+            }
         }
     }
 
