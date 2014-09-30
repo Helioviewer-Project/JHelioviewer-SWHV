@@ -16,6 +16,7 @@ import org.helioviewer.base.math.Interval;
 import org.helioviewer.jhv.data.container.JHVEventContainer;
 import org.helioviewer.jhv.plugins.swek.SWEKPluginLocks;
 import org.helioviewer.jhv.plugins.swek.config.SWEKEventType;
+import org.helioviewer.jhv.plugins.swek.config.SWEKParameter;
 import org.helioviewer.jhv.plugins.swek.config.SWEKSource;
 import org.helioviewer.jhv.plugins.swek.config.SWEKSupplier;
 import org.helioviewer.jhv.plugins.swek.model.EventTypePanelModelListener;
@@ -29,7 +30,8 @@ import org.helioviewer.jhv.plugins.swek.settings.SWEKProperties;
  * @author Bram Bourgoignie (Bram.Bourgoignie@oma.be)
  * 
  */
-public class SWEKDownloadManager implements DownloadWorkerListener, IncomingRequestManagerListener, EventTypePanelModelListener {
+public class SWEKDownloadManager implements DownloadWorkerListener, IncomingRequestManagerListener, EventTypePanelModelListener,
+        FilterManagerListener {
 
     /** Singleton instance of the SWE */
     private static SWEKDownloadManager instance;
@@ -58,6 +60,9 @@ public class SWEKDownloadManager implements DownloadWorkerListener, IncomingRequ
     /** Local instance of the event container */
     private final JHVEventContainer eventContainer;
 
+    /** Local instance of filter manager */
+    private final FilterManager filterManager;
+
     /**
      * private constructor of the SWEKDownloadManager
      */
@@ -71,6 +76,8 @@ public class SWEKDownloadManager implements DownloadWorkerListener, IncomingRequ
         busyAndFinishedIntervalJobs = new HashMap<SWEKEventType, Map<SWEKSupplier, Map<Date, Set<Date>>>>();
         requestManager.addRequestManagerListener(this);
         eventContainer = JHVEventContainer.getSingletonInstance();
+        filterManager = FilterManager.getSingletonInstance();
+        filterManager.addFilterManagerListener(this);
     }
 
     /**
@@ -180,6 +187,18 @@ public class SWEKDownloadManager implements DownloadWorkerListener, IncomingRequ
     @Override
     public void newRequestForDateList(List<Date> dates) {
         downloadAllSelectedEventTypes(dates);
+    }
+
+    @Override
+    public void filtersAdded(SWEKEventType swekEventType) {
+        stopDownloadingEventType(swekEventType);
+        downloadSelectedSuppliers(swekEventType);
+    }
+
+    @Override
+    public void filtersRemoved(SWEKEventType swekEventType, SWEKParameter parameter) {
+        stopDownloadingEventType(swekEventType);
+        downloadSelectedSuppliers(swekEventType);
     }
 
     /**
@@ -507,7 +526,11 @@ public class SWEKDownloadManager implements DownloadWorkerListener, IncomingRequ
     private List<SWEKParam> defineParameters(SWEKEventType eventType, SWEKSource source, SWEKSupplier supplier) {
         List<SWEKParam> params = new ArrayList<SWEKParam>();
         params.add(new SWEKParam("provider", supplier.getSupplierName(), SWEKOperand.EQUALS));
-        // TODO bram: add filter here coming from event type
+        // TODO bram: add filter here coming from event type ==> done
+        Map<SWEKParameter, List<SWEKParam>> paramsPerEventParameter = filterManager.getFilterForEventType(eventType);
+        for (List<SWEKParam> paramPerParameter : paramsPerEventParameter.values()) {
+            params.addAll(paramPerParameter);
+        }
         return params;
     }
 
@@ -601,6 +624,22 @@ public class SWEKDownloadManager implements DownloadWorkerListener, IncomingRequ
             for (Date date : dates) {
                 downloadAllSelectedEventTypes(date);
             }
+        }
+    }
+
+    /**
+     * Downloads the event type for all the dates.
+     * 
+     * @param swekEventType
+     */
+    private void downloadSelectedSuppliers(SWEKEventType swekEventType) {
+        synchronized (SWEKPluginLocks.treeSelectionLock) {
+            for (SWEKSource source : activeEventTypes.get(swekEventType).keySet()) {
+                for (SWEKSupplier supplier : activeEventTypes.get(swekEventType).get(source)) {
+                    downloadForAllDates(swekEventType, source, supplier);
+                }
+            }
+
         }
     }
 }
