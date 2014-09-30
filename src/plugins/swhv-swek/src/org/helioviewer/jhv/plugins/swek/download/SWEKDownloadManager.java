@@ -100,9 +100,11 @@ public class SWEKDownloadManager implements DownloadWorkerListener, IncomingRequ
      */
     public void stopDownloadingEventType(SWEKEventType eventType) {
         synchronized (SWEKPluginLocks.downloadLock) {
-            Map<Date, DownloadWorker> dwMapOnDate = dwMap.get(eventType);
-            for (DownloadWorker dw : dwMapOnDate.values()) {
-                dw.stopWorker();
+            if (dwMap.containsKey(eventType)) {
+                Map<Date, DownloadWorker> dwMapOnDate = dwMap.get(eventType);
+                for (DownloadWorker dw : dwMapOnDate.values()) {
+                    dw.stopWorker();
+                }
             }
         }
         removeFromBusyAndFinishedJobs(eventType);
