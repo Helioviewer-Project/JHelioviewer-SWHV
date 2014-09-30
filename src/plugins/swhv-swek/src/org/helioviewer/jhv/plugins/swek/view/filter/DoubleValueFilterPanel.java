@@ -22,7 +22,6 @@ public class DoubleValueFilterPanel extends AbstractFilterPanel {
 
     public DoubleValueFilterPanel(SWEKEventType eventType, SWEKParameter parameter) {
         super(eventType, parameter);
-
     }
 
     @Override
