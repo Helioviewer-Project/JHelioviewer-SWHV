@@ -225,18 +225,14 @@ public class HelioviewerMetaData extends AbstractMetaData implements SunMetaData
                 changed = true;
             }
 
-            double sunX = metaDataContainer.tryGetDouble("CRPIX1");
+            double sunX = metaDataContainer.tryGetDouble("CRPIX1") - 1;
             double sunY;
             if (Displayer.getSingletonInstance().getState() == Displayer.STATE3D) {
-                if (detector.equals("EUVI")) {
-                    sunY = 2048 - metaDataContainer.tryGetDouble("CRPIX2");
-                } else if (detector.equals("C3")) {
-                    sunY = 1024 - metaDataContainer.tryGetDouble("CRPIX2");
-                } else {
-                    sunY = metaDataContainer.tryGetDouble("CRPIX2");
-                }
+
+                sunY = pixelImageSize.getY() - (metaDataContainer.tryGetDouble("CRPIX2") - 1);
+
             } else {
-                sunY = metaDataContainer.tryGetDouble("CRPIX2");
+                sunY = (metaDataContainer.tryGetDouble("CRPIX2") - 1);
             }
             if (changed || Math.abs(sunPixelPosition.getX() - sunX) > allowedAbsoluteDifference || Math.abs(sunPixelPosition.getY() - sunY) > allowedAbsoluteDifference) {
                 sunPixelPosition = new Vector2dDouble(sunX, sunY);
