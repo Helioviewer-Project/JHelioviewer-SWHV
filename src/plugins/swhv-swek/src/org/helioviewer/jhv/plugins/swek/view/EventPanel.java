@@ -1,8 +1,11 @@
 package org.helioviewer.jhv.plugins.swek.view;
 
 import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.GridLayout;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
+import java.util.List;
 
 import javax.swing.JPanel;
 import javax.swing.JTree;
@@ -11,6 +14,8 @@ import org.helioviewer.jhv.plugins.swek.config.SWEKEventType;
 import org.helioviewer.jhv.plugins.swek.download.SWEKDownloadManager;
 import org.helioviewer.jhv.plugins.swek.model.EventTypePanelModel;
 import org.helioviewer.jhv.plugins.swek.model.SWEKTreeModelEventType;
+import org.helioviewer.jhv.plugins.swek.view.filter.AbstractFilterPanel;
+import org.helioviewer.jhv.plugins.swek.view.filter.FilterPanelFactory;
 
 /**
  * Panel display one event type
@@ -38,10 +43,10 @@ public class EventPanel extends JPanel implements MouseListener {
      * Creates a event panel for a certain
      */
     public EventPanel(SWEKEventType eventType) {
-        this.downloadManager = SWEKDownloadManager.getSingletonInstance();
+        downloadManager = SWEKDownloadManager.getSingletonInstance();
         this.eventType = eventType;
-        this.eventPanelModel = new EventTypePanelModel(new SWEKTreeModelEventType(this.eventType));
-        this.eventPanelModel.addEventPanelModelListener(this.downloadManager);
+        eventPanelModel = new EventTypePanelModel(new SWEKTreeModelEventType(this.eventType));
+        eventPanelModel.addEventPanelModelListener(downloadManager);
         initVisisualComponents();
     }
 
@@ -50,21 +55,30 @@ public class EventPanel extends JPanel implements MouseListener {
      */
     private void initVisisualComponents() {
         setLayout(new BorderLayout());
-        this.eventTypeTree = new JTree(this.eventPanelModel);
-        this.eventTypeTree.setShowsRootHandles(true);
-        this.eventTypeTree.setSelectionModel(null);
-        this.eventTypeTree.addMouseListener(this);
-        this.eventTypeTree.addTreeExpansionListener(this.eventPanelModel);
-        this.eventTypeTree.setCellRenderer(new SWEKEventTreeRenderer());
-        add(this.eventTypeTree, BorderLayout.CENTER);
+        eventTypeTree = new JTree(eventPanelModel);
+        eventTypeTree.setShowsRootHandles(true);
+        eventTypeTree.setSelectionModel(null);
+        eventTypeTree.addMouseListener(this);
+        eventTypeTree.addTreeExpansionListener(eventPanelModel);
+        eventTypeTree.setCellRenderer(new SWEKEventTreeRenderer());
+        add(eventTypeTree, BorderLayout.CENTER);
+        List<AbstractFilterPanel> filterPanels = FilterPanelFactory.createFilterPanel(eventType);
+        JPanel filterPanel = new JPanel();
+        filterPanel.setLayout(new GridLayout(filterPanels.size(), 1));
+        filterPanel.setOpaque(false);
+        filterPanel.setBackground(Color.white);
+        for (AbstractFilterPanel afp : filterPanels) {
+            filterPanel.add(afp);
+        }
+        add(filterPanel, BorderLayout.PAGE_END);
     }
 
     @Override
     public void mouseClicked(MouseEvent e) {
-        int clickedOnRow = this.eventTypeTree.getRowForLocation(e.getX(), e.getY());
-        this.eventPanelModel.rowClicked(clickedOnRow);
-        this.eventTypeTree.revalidate();
-        this.eventTypeTree.repaint();
+        int clickedOnRow = eventTypeTree.getRowForLocation(e.getX(), e.getY());
+        eventPanelModel.rowClicked(clickedOnRow);
+        eventTypeTree.revalidate();
+        eventTypeTree.repaint();
     }
 
     @Override
