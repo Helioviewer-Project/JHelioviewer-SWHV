@@ -119,7 +119,10 @@ public interface JHVEvent {
     public abstract String getUniqueID();
 
     /**
-     * Gets the list of available position informations.
+     * Gets the list of available position informations. This is a list because
+     * the position information can be added to the event in different
+     * coordinate systems. Each element describes the same information but in a
+     * different format. One is free whatever format fits the best.
      * 
      * @return a list with positioning information
      */
