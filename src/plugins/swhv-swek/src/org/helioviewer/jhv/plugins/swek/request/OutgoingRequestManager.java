@@ -67,7 +67,7 @@ public class OutgoingRequestManager implements LayersListener {
                             requestDates.add(parsedDate);
                         }
                     } else {
-                        Log.error("Destroy myself with handgranade. No date-obs in whatever dialect could be found");
+                        Log.error("Destroy myself with handgrenade. No date-obs in whatever dialect could be found");
                     }
                 }
             }
