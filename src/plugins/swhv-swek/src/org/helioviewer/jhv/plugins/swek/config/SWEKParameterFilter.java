@@ -19,10 +19,12 @@ public class SWEKParameterFilter {
     private Double max;
     /** The start value. */
     private Double startValue;
+    /** The step size for the filter */
+    private Double stepSize;
 
     /**
-     * Creates a SWEK parameter filter of no type, with minimum value 0.0 and
-     * maximum value 0.0.
+     * Creates a SWEK parameter filter of no type, with minimum value null,
+     * maximum value null, startValue = null and stepSize = null.
      * 
      */
     public SWEKParameterFilter() {
@@ -30,6 +32,7 @@ public class SWEKParameterFilter {
         min = null;
         max = null;
         startValue = null;
+        stepSize = null;
     }
 
     /**
@@ -54,7 +57,8 @@ public class SWEKParameterFilter {
 
     /**
      * Creates a SWEK parameter filter description based on the given filter
-     * type, the minimum value, the maximum value and the start value.
+     * type, the minimum value, the maximum value, the start value and null step
+     * size.
      * 
      * @param filterType
      *            the filter
@@ -71,6 +75,32 @@ public class SWEKParameterFilter {
         this.min = min;
         this.max = max;
         this.startValue = startValue;
+        stepSize = null;
+    }
+
+    /**
+     * Creates a SWEK parameter filter description based on the given filter
+     * type, the minimum value, the maximum value, the start value and step
+     * size.
+     * 
+     * @param filterType
+     *            the filter
+     * @param min
+     *            the minimum value
+     * @param max
+     *            the maximum value
+     * @param startValue
+     *            the start value
+     * @param stepSize
+     *            the stepsize
+     */
+    public SWEKParameterFilter(String filterType, double min, double max, double startValue, Double stepsize) {
+        super();
+        this.filterType = filterType;
+        this.min = min;
+        this.max = max;
+        this.startValue = startValue;
+        stepSize = stepsize;
     }
 
     /**
@@ -147,5 +177,24 @@ public class SWEKParameterFilter {
      */
     public void setStartValue(Double startValue) {
         this.startValue = startValue;
+    }
+
+    /**
+     * Gets the step size of the filter.
+     * 
+     * @return the step size.
+     */
+    public Double getStepSize() {
+        return stepSize;
+    }
+
+    /**
+     * Sets the step size of the filter.
+     * 
+     * @param stepSize
+     *            the step size
+     */
+    public void setStepSize(double stepSize) {
+        this.stepSize = stepSize;
     }
 }
