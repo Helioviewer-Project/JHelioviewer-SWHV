@@ -18,8 +18,15 @@ public class FilterPanelFactory {
         List<AbstractFilterPanel> panels = new ArrayList<AbstractFilterPanel>();
         for (SWEKParameter parameter : eventType.getParameterList()) {
             if (parameter.getParameterFilter() != null) {
-                if (parameter.getParameterFilter().getFilterType().toLowerCase().equals("valuefilter")) {
+                String filterType = parameter.getParameterFilter().getFilterType().toLowerCase();
+                if (filterType.equals("doublevaluefilter")) {
                     panels.add(new DoubleValueFilterPanel(eventType, parameter));
+                } else if (filterType.equals("doubleminmaxfilter")) {
+                    panels.add(new DoubleMinMaxFilterPanel(eventType, parameter));
+                } else if (filterType.equals("doublemaxfilter")) {
+                    panels.add(new DoubleMaxFilterPanel(eventType, parameter));
+                } else if (filterType.equals("doubleminfilter")) {
+                    panels.add(new DoubleMinFilterPanel(eventType, parameter));
                 }
             }
         }
