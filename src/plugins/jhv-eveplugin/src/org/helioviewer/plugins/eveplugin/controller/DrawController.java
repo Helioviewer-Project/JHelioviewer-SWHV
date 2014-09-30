@@ -64,37 +64,47 @@ public class DrawController implements ZoomControllerListener, LineDataSelectorM
 
     public void addDrawControllerListenerForAllIdentifiers(DrawControllerListener listener) {
         forAllPlotIdentifiers.add(listener);
-        for (String identifier : drawControllerData.keySet()) {
-            DrawControllerData dcd = getDrawControllerData(identifier);
-            dcd.addDrawControllerListener(listener);
+        synchronized (drawControllerData) {
+            for (String identifier : drawControllerData.keySet()) {
+                DrawControllerData dcd = getDrawControllerData(identifier);
+                dcd.addDrawControllerListener(listener);
+            }
         }
     }
 
     public void removeDrawControllerListenerForAllIdentifiers(DrawControllerListener listener) {
         forAllPlotIdentifiers.remove(listener);
-        for (String identifier : drawControllerData.keySet()) {
+        synchronized (drawControllerData) {
+            for (String identifier : drawControllerData.keySet()) {
+                DrawControllerData dcd = getDrawControllerData(identifier);
+                dcd.removeDrawControllerListener(listener);
+            }
+        }
+    }
+
+    public void addDrawControllerListener(DrawControllerListener listener, String identifier) {
+        synchronized (drawControllerData) {
+            DrawControllerData dcd = getDrawControllerData(identifier);
+            dcd.addDrawControllerListener(listener);
+            listener.drawRequest();
+        }
+    }
+
+    public void removeDrawControllerListener(DrawControllerListener listener, String identifier) {
+        synchronized (drawControllerData) {
             DrawControllerData dcd = getDrawControllerData(identifier);
             dcd.removeDrawControllerListener(listener);
         }
     }
 
-    public void addDrawControllerListener(DrawControllerListener listener, String identifier) {
-        DrawControllerData dcd = getDrawControllerData(identifier);
-        dcd.addDrawControllerListener(listener);
-        listener.drawRequest();
-    }
-
-    public void removeDrawControllerListener(DrawControllerListener listener, String identifier) {
-        DrawControllerData dcd = getDrawControllerData(identifier);
-        dcd.removeDrawControllerListener(listener);
-    }
-
     public void addDrawableElement(DrawableElement element, String identifier) {
-        addDrawableElement(element, identifier, true);
+        synchronized (drawControllerData) {
+            addDrawableElement(element, identifier, true);
+        }
     }
 
     public void updateDrawableElement(DrawableElement drawableElement, String identifier) {
-        synchronized (this) {
+        synchronized (drawControllerData) {
             removeDrawableElement(drawableElement, identifier, false);
             this.addDrawableElement(drawableElement, identifier, false);
         }
@@ -118,26 +128,34 @@ public class DrawController implements ZoomControllerListener, LineDataSelectorM
     }
 
     public void removeDrawableElement(DrawableElement element, String identifier) {
-        removeDrawableElement(element, identifier, true);
+        synchronized (drawControllerData) {
+            removeDrawableElement(element, identifier, true);
+        }
     }
 
     public int getNumberOfYAxis(String identifier) {
-        DrawControllerData dcd = getDrawControllerData(identifier);
-        return dcd.getyAxisSet().size();
+        synchronized (drawControllerData) {
+            DrawControllerData dcd = getDrawControllerData(identifier);
+            return dcd.getyAxisSet().size();
+        }
     }
 
     public Set<YAxisElement> getYAxisElements(String identifier) {
-        DrawControllerData dcd = getDrawControllerData(identifier);
-        return dcd.getyAxisSet();
+        synchronized (drawControllerData) {
+            DrawControllerData dcd = getDrawControllerData(identifier);
+            return dcd.getyAxisSet();
+        }
     }
 
     public Map<DrawableType, Set<DrawableElement>> getDrawableElements(String identifier) {
-        DrawControllerData dcd = getDrawControllerData(identifier);
-        return dcd.getDrawableElements();
+        synchronized (drawControllerData) {
+            DrawControllerData dcd = getDrawControllerData(identifier);
+            return dcd.getDrawableElements();
+        }
     }
 
     public List<DrawableElement> getAllDrawableElements(String identifier) {
-        synchronized (this) {
+        synchronized (drawControllerData) {
             Collection<Set<DrawableElement>> allValues = getDrawableElements(identifier).values();
             ArrayList<DrawableElement> deList = new ArrayList<DrawableElement>();
             for (Set<DrawableElement> tempList : allValues) {
@@ -148,7 +166,7 @@ public class DrawController implements ZoomControllerListener, LineDataSelectorM
     }
 
     public boolean hasElementsToBeDrawn(String identifier) {
-        synchronized (this) {
+        synchronized (drawControllerData) {
             List<DrawableElement> allElements = this.getAllDrawableElements(identifier);
             return !allElements.isEmpty();
         }
@@ -180,19 +198,23 @@ public class DrawController implements ZoomControllerListener, LineDataSelectorM
     }
 
     private void fireRedrawRequest() {
-        for (DrawControllerData dcd : drawControllerData.values()) {
-            Log.info("DrawController listeners size: " + dcd.getListeners().size());
-            for (DrawControllerListener l : dcd.getListeners()) {
-                Log.info("Draw Controller listener : " + l);
-                l.drawRequest();
+        synchronized (drawControllerData) {
+            for (DrawControllerData dcd : drawControllerData.values()) {
+                Log.info("DrawController listeners size: " + dcd.getListeners().size());
+                for (DrawControllerListener l : dcd.getListeners()) {
+                    Log.info("Draw Controller listener : " + l);
+                    l.drawRequest();
+                }
             }
         }
     }
 
     private void fireRedrawRequest(String identifier) {
-        DrawControllerData dcd = getDrawControllerData(identifier);
-        for (DrawControllerListener l : dcd.getListeners()) {
-            l.drawRequest();
+        synchronized (drawControllerData) {
+            DrawControllerData dcd = getDrawControllerData(identifier);
+            for (DrawControllerListener l : dcd.getListeners()) {
+                l.drawRequest();
+            }
         }
     }
 
@@ -243,12 +265,13 @@ public class DrawController implements ZoomControllerListener, LineDataSelectorM
     }
 
     private void fireRedrawRequestMovieFrameChanged(Date time) {
-        for (DrawControllerData dcd : drawControllerData.values()) {
-            for (DrawControllerListener l : dcd.getListeners()) {
-                l.drawMovieLineRequest(time);
+        synchronized (drawControllerData) {
+            for (DrawControllerData dcd : drawControllerData.values()) {
+                for (DrawControllerListener l : dcd.getListeners()) {
+                    l.drawMovieLineRequest(time);
+                }
             }
         }
-
     }
 
     /*
