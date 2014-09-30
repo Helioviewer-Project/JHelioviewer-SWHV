@@ -58,11 +58,16 @@ public class OutgoingRequestManager implements LayersListener {
             if (jpxView != null) {
                 for (int frame = 1; frame <= jpxView.getMaximumFrameNumber(); frame++) {
                     String dateOBS = jpxView.getJP2Image().getValueFromXML("DATE-OBS", "fits", frame);
+                    if (dateOBS == null) {
+                        dateOBS = jpxView.getJP2Image().getValueFromXML("DATE_OBS", "fits", frame);
+                    }
                     if (dateOBS != null) {
                         Date parsedDate = parseDate(dateOBS);
                         if (parsedDate != null) {
                             requestDates.add(parsedDate);
                         }
+                    } else {
+                        Log.error("Destroy myself with handgranade. No date-obs in whatever dialect could be found");
                     }
                 }
             }
