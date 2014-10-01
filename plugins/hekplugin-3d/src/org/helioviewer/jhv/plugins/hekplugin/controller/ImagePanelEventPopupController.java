@@ -168,7 +168,6 @@ public class ImagePanelEventPopupController implements ImagePanelPlugin, MouseLi
      */
     @Override
     public void mouseClicked(final MouseEvent e) {
-        System.out.println("CLICKED");
         if (mouseOverJHVEvent != null) {
 
             // should never be the case
@@ -276,7 +275,7 @@ public class ImagePanelEventPopupController implements ImagePanelPlugin, MouseLi
                             double deltaX = Math.abs(hitpoint.x - x);
                             double deltaY = Math.abs(hitpoint.y + y);
                             double deltaZ = Math.abs(hitpoint.z - z);
-                            if (deltaX < 0.1 && deltaZ < 0.1 && deltaY < 0.1) {
+                            if (deltaX < 0.05 && deltaZ < 0.05 && deltaY < 0.05) {
                                 mouseOverJHVEvent = evt;
                                 mouseOverPosition = new Point(e.getX(), e.getY());
                             }
