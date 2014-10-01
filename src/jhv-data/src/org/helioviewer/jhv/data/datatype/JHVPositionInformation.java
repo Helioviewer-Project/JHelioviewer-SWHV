@@ -21,13 +21,20 @@ public interface JHVPositionInformation {
      * 
      * @return a list with coordinates defining the bounding box
      */
-    public List<JHVPoint> getBoundBox();
+    public abstract List<JHVPoint> getBoundBox();
 
     /**
      * Gets the central point of the event.
      * 
      * @return the central point.
      */
-    public JHVPoint centralPoint();
+    public abstract JHVPoint centralPoint();
+
+    /**
+     * Gets the bound coordinates. Finer grained than the bound box.
+     * 
+     * @return the bound coordinates
+     */
+    public abstract List<JHVPoint> getBoundCC();
 
 }

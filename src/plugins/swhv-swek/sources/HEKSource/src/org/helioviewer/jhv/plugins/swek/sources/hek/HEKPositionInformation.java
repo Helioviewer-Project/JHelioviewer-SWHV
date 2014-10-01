@@ -20,6 +20,9 @@ public class HEKPositionInformation implements JHVPositionInformation {
     /** bound box */
     private final List<JHVPoint> boundBox;
 
+    /** bound cc */
+    private final List<JHVPoint> boundCC;
+
     /** central point */
     private final JHVPoint centralPoint;
 
@@ -34,10 +37,12 @@ public class HEKPositionInformation implements JHVPositionInformation {
      * @param centralPoint
      *            the central point
      */
-    public HEKPositionInformation(JHVCoordinateSystem coordinateSystem, List<JHVPoint> boundBox, JHVPoint centralPoint) {
+    public HEKPositionInformation(JHVCoordinateSystem coordinateSystem, List<JHVPoint> boundBox, List<JHVPoint> boundCC,
+            JHVPoint centralPoint) {
         this.coordinateSystem = coordinateSystem;
         this.boundBox = boundBox;
         this.centralPoint = centralPoint;
+        this.boundCC = boundCC;
     }
 
     @Override
@@ -53,6 +58,11 @@ public class HEKPositionInformation implements JHVPositionInformation {
     @Override
     public JHVPoint centralPoint() {
         return centralPoint;
+    }
+
+    @Override
+    public List<JHVPoint> getBoundCC() {
+        return boundCC;
     }
 
 }

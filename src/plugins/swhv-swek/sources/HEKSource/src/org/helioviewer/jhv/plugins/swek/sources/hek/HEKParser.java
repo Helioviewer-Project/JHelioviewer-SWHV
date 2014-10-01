@@ -53,24 +53,28 @@ public class HEKParser implements SWEKParser {
 
     /** HGC coordinates */
     private List<JHVPoint> hgcBoundedBox;
+    private List<JHVPoint> hgcBoundCC;
     private JHVPoint hgcCentralPoint;
     private Double hgcX;
     private Double hgcY;
 
     /** HGS coordinates */
     private List<JHVPoint> hgsBoundedBox;
+    private List<JHVPoint> hgsBoundCC;
     private JHVPoint hgsCentralPoint;
     private Double hgsX;
     private Double hgsY;
 
     /** HPC coordinates */
     private List<JHVPoint> hpcBoundedBox;
+    private List<JHVPoint> hpcBoundCC;
     private JHVPoint hpcCentralPoint;
     private Double hpcX;
     private Double hpcY;
 
     /** HRC coordinates */
     private List<JHVPoint> hrcBoundedBox;
+    private List<JHVPoint> hrcBoundCC;
     private JHVPoint hrcCentralPoint;
     private Double hrcA;
     private Double hrcR;
@@ -213,6 +217,8 @@ public class HEKParser implements SWEKParser {
             // event positions (Not standard)
             if (keyString.toLowerCase().equals("hgc_bbox")) {
                 hgcBoundedBox = parsePolygon(value);
+            } else if (keyString.toLowerCase().equals("hgc_boundcc")) {
+                hgcBoundCC = parsePolygon(value);
             } else if (keyString.toLowerCase().equals("hgc_coord")) {
                 hgcCentralPoint = parsePoint(value);
             } else if (keyString.toLowerCase().equals("hgc_x")) {
@@ -225,6 +231,8 @@ public class HEKParser implements SWEKParser {
                 }
             } else if (keyString.toLowerCase().equals("hgs_bbox")) {
                 hgsBoundedBox = parsePolygon(value);
+            } else if (keyString.toLowerCase().equals("hgs_boundcc")) {
+                hgsBoundCC = parsePolygon(value);
             } else if (keyString.toLowerCase().equals("hgs_coord")) {
                 hgsCentralPoint = parsePoint(value);
             } else if (keyString.toLowerCase().equals("hgs_x")) {
@@ -237,6 +245,8 @@ public class HEKParser implements SWEKParser {
                 }
             } else if (keyString.toLowerCase().equals("hpc_bbox")) {
                 hpcBoundedBox = parsePolygon(value);
+            } else if (keyString.toLowerCase().equals("hpc_boundcc")) {
+                hpcBoundCC = parsePolygon(value);
             } else if (keyString.toLowerCase().equals("hpc_coord")) {
                 hpcCentralPoint = parsePoint(value);
             } else if (keyString.toLowerCase().equals("hpc_x")) {
@@ -249,6 +259,8 @@ public class HEKParser implements SWEKParser {
                 }
             } else if (keyString.toLowerCase().equals("hrc_bbox")) {
                 hrcBoundedBox = parsePolygon(value);
+            } else if (keyString.toLowerCase().equals("hrc_boundcc")) {
+                hrcBoundCC = parsePolygon(value);
             } else if (keyString.toLowerCase().equals("hrc_coord")) {
                 hrcCentralPoint = parsePoint(value);
             } else if (keyString.toLowerCase().equals("hrc_a")) {
@@ -311,21 +323,25 @@ public class HEKParser implements SWEKParser {
         coordinate3 = null;
 
         hgcBoundedBox = null;
+        hgcBoundCC = null;
         hgcCentralPoint = null;
         hgcX = null;
         hgcY = null;
 
         hgsBoundedBox = null;
+        hgsBoundCC = null;
         hgsCentralPoint = null;
         hgsX = null;
         hgsY = null;
 
         hrcBoundedBox = null;
+        hrcBoundCC = null;
         hrcCentralPoint = null;
         hrcA = null;
         hrcR = null;
 
         hpcBoundedBox = null;
+        hpcBoundCC = null;
         hpcCentralPoint = null;
         hpcX = null;
         hpcY = null;
@@ -436,7 +452,8 @@ public class HEKParser implements SWEKParser {
             JHVCoordinateSystem coorSys = parseCoordinateSystemString();
             if (coorSys != null) {
                 JHVPoint centralPoint = new JHVPoint(coordinate1, coordinate2, coordinate3);
-                currentEvent.addJHVPositionInformation(new HEKPositionInformation(coorSys, new ArrayList<JHVPoint>(), centralPoint));
+                currentEvent.addJHVPositionInformation(new HEKPositionInformation(coorSys, new ArrayList<JHVPoint>(),
+                        new ArrayList<JHVPoint>(), centralPoint));
             }
         }
     }
@@ -450,11 +467,11 @@ public class HEKParser implements SWEKParser {
     private JHVCoordinateSystem parseCoordinateSystemString() {
         if (coordinateSystemString.toLowerCase().contains("hgc")) {
             return JHVCoordinateSystem.HGC;
-        } else if (coordinateSystemString.contains("HGS")) {
+        } else if (coordinateSystemString.toLowerCase().contains("hgs")) {
             return JHVCoordinateSystem.HGS;
-        } else if (coordinateSystemString.contains("HPC")) {
+        } else if (coordinateSystemString.toLowerCase().contains("hpc")) {
             return JHVCoordinateSystem.HPC;
-        } else if (coordinateSystemString.contains("HRC")) {
+        } else if (coordinateSystemString.toLowerCase().contains("hrc")) {
             return JHVCoordinateSystem.HRC;
         } else {
             return null;
@@ -470,11 +487,15 @@ public class HEKParser implements SWEKParser {
      *            the current event being parsed.
      */
     private void handleHGCCoordinates(HEKEvent currentEvent) {
-        if (hgcBoundedBox != null || hgcCentralPoint != null || (hgcX != null && hgcY != null)) {
+        if (hgcBoundedBox != null || hgcCentralPoint != null || (hgcX != null && hgcY != null) || hgcBoundCC != null) {
             List<JHVPoint> localHGCBoundedBox = new ArrayList<JHVPoint>();
             JHVPoint localHGCCentralPoint = null;
+            List<JHVPoint> localHGCBoundCC = new ArrayList<JHVPoint>();
             if (hgcBoundedBox != null) {
                 localHGCBoundedBox = hgcBoundedBox;
+            }
+            if (hgcBoundCC != null) {
+                localHGCBoundCC = hgcBoundCC;
             }
             if (hgcCentralPoint != null) {
                 localHGCCentralPoint = hgcCentralPoint;
@@ -483,7 +504,7 @@ public class HEKParser implements SWEKParser {
                     localHGCCentralPoint = new JHVPoint(hgcX, hgcY, null);
                 }
             }
-            currentEvent.addJHVPositionInformation(new HEKPositionInformation(JHVCoordinateSystem.HGC, localHGCBoundedBox,
+            currentEvent.addJHVPositionInformation(new HEKPositionInformation(JHVCoordinateSystem.HGC, localHGCBoundedBox, localHGCBoundCC,
                     localHGCCentralPoint));
         }
     }
@@ -497,11 +518,15 @@ public class HEKParser implements SWEKParser {
      *            the current event being parsed.
      */
     private void handleHGSCoordinates(HEKEvent currentEvent) {
-        if (hgsBoundedBox != null || hgsCentralPoint != null || (hgsX != null && hgsY != null)) {
+        if (hgsBoundedBox != null || hgsCentralPoint != null || (hgsX != null && hgsY != null) || hgsBoundCC != null) {
             List<JHVPoint> localHGSBoundedBox = new ArrayList<JHVPoint>();
+            List<JHVPoint> localHGSBoundCC = new ArrayList<JHVPoint>();
             JHVPoint localHGSCentralPoint = null;
             if (hgsBoundedBox != null) {
                 localHGSBoundedBox = hgsBoundedBox;
+            }
+            if (hgsBoundCC != null) {
+                localHGSBoundCC = hgsBoundCC;
             }
             if (hgsCentralPoint != null) {
                 localHGSCentralPoint = hgsCentralPoint;
@@ -510,7 +535,7 @@ public class HEKParser implements SWEKParser {
                     localHGSCentralPoint = new JHVPoint(hgsX, hgsY, null);
                 }
             }
-            currentEvent.addJHVPositionInformation(new HEKPositionInformation(JHVCoordinateSystem.HGS, localHGSBoundedBox,
+            currentEvent.addJHVPositionInformation(new HEKPositionInformation(JHVCoordinateSystem.HGS, localHGSBoundedBox, localHGSBoundCC,
                     localHGSCentralPoint));
         }
     }
@@ -524,11 +549,15 @@ public class HEKParser implements SWEKParser {
      *            the current event being parsed.
      */
     private void handleHRCCoordinates(HEKEvent currentEvent) {
-        if (hrcBoundedBox != null || hrcCentralPoint != null || (hrcA != null && hrcR != null)) {
+        if (hrcBoundedBox != null || hrcCentralPoint != null || (hrcA != null && hrcR != null) || hrcBoundCC != null) {
             List<JHVPoint> localHRCBoundedBox = new ArrayList<JHVPoint>();
+            List<JHVPoint> localHRCBoundCC = new ArrayList<JHVPoint>();
             JHVPoint localHRCCentralPoint = null;
             if (hrcBoundedBox != null) {
                 localHRCBoundedBox = hrcBoundedBox;
+            }
+            if (hrcBoundCC != null) {
+                localHRCBoundCC = hrcBoundCC;
             }
             if (hrcCentralPoint != null) {
                 localHRCCentralPoint = hrcCentralPoint;
@@ -537,7 +566,7 @@ public class HEKParser implements SWEKParser {
                     localHRCCentralPoint = new JHVPoint(hrcA, hrcR, null);
                 }
             }
-            currentEvent.addJHVPositionInformation(new HEKPositionInformation(JHVCoordinateSystem.HRC, localHRCBoundedBox,
+            currentEvent.addJHVPositionInformation(new HEKPositionInformation(JHVCoordinateSystem.HRC, localHRCBoundedBox, localHRCBoundCC,
                     localHRCCentralPoint));
         }
 
@@ -552,11 +581,15 @@ public class HEKParser implements SWEKParser {
      *            the current event being parsed.
      */
     private void handleHPCCoordiantes(HEKEvent currentEvent) {
-        if (hpcBoundedBox != null || hpcCentralPoint != null || (hpcX != null && hpcY != null)) {
+        if (hpcBoundedBox != null || hpcCentralPoint != null || (hpcX != null && hpcY != null) || hpcBoundCC != null) {
             List<JHVPoint> localHPCBoundedBox = new ArrayList<JHVPoint>();
+            List<JHVPoint> localHPCBoundCC = new ArrayList<JHVPoint>();
             JHVPoint localHPCCentralPoint = null;
             if (hpcBoundedBox != null) {
                 localHPCBoundedBox = hpcBoundedBox;
+            }
+            if (hpcBoundCC != null) {
+                localHPCBoundCC = hpcBoundCC;
             }
             if (hpcCentralPoint != null) {
                 localHPCCentralPoint = hpcCentralPoint;
@@ -565,7 +598,7 @@ public class HEKParser implements SWEKParser {
                     localHPCCentralPoint = new JHVPoint(hpcX, hpcY, null);
                 }
             }
-            currentEvent.addJHVPositionInformation(new HEKPositionInformation(JHVCoordinateSystem.HPC, localHPCBoundedBox,
+            currentEvent.addJHVPositionInformation(new HEKPositionInformation(JHVCoordinateSystem.HPC, localHPCBoundedBox, localHPCBoundCC,
                     localHPCCentralPoint));
         }
 
