@@ -46,6 +46,8 @@ public class SWEKEventType {
     /** The color used for this event type */
     private Color color;
 
+    private boolean containsParameterFilter;
+
     /**
      * Create a SWEKEvenType with an empty name, suppliers list, parameter list,
      * not standard selected, grouped on nothing, no coordinate system, no
@@ -63,6 +65,7 @@ public class SWEKEventType {
         spatialRegion = new SWEKSpatialRegion();
         eventIcon = null;
         color = Color.BLACK;
+        containsParameterFilter = false;
     }
 
     /**
@@ -101,6 +104,7 @@ public class SWEKEventType {
         this.coordinateSystem = coordinateSystem;
         this.eventIcon = eventIcon;
         this.color = color;
+        containsParameterFilter = checkFilters(parameterList);
     }
 
     /**
@@ -158,6 +162,7 @@ public class SWEKEventType {
      */
     public void setParameterList(List<SWEKParameter> parameterList) {
         this.parameterList = parameterList;
+        containsParameterFilter = checkFilters(parameterList);
     }
 
     /**
@@ -327,5 +332,30 @@ public class SWEKEventType {
      */
     public void setColor(Color color) {
         this.color = color;
+    }
+
+    /**
+     * Checks if the event type contains parameter filter.
+     * 
+     * @return
+     */
+    public boolean containsFilter() {
+        return containsParameterFilter;
+    }
+
+    /**
+     * Checks if the parameter list contains filters.
+     * 
+     * @param parameters
+     *            the list of parameter for this event type
+     * @return true if there are filters in this event type, false if not
+     */
+    private boolean checkFilters(List<SWEKParameter> parameters) {
+        for (SWEKParameter parameter : parameters) {
+            if (parameter.getParameterFilter() != null) {
+                return true;
+            }
+        }
+        return false;
     }
 }
