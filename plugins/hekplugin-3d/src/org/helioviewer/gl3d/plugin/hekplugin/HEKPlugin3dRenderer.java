@@ -70,7 +70,15 @@ public class HEKPlugin3dRenderer extends PhysicalRenderer3d {
             i++;
         }
         GL2 gl = g.getGL();
-        List<JHVPoint> points = evt.getPositioningInformation().get(i).getBoundBox();
+
+        List<JHVPoint> points = evt.getPositioningInformation().get(i).getBoundCC();
+        if (points == null || points.size() == 0) {
+            points = evt.getPositioningInformation().get(i).getBoundBox();
+
+        }
+        if (points == null || points.size() == 0) {
+            return;
+        }
         String type = evt.getName();
         Color eventColor = evt.getColor();
 
@@ -85,7 +93,6 @@ public class HEKPlugin3dRenderer extends PhysicalRenderer3d {
         }
 
         // draw bounds
-        g.setColor(evt.getColor());
         Vector3dDouble oldBoundaryPoint3d = null;
 
         for (JHVPoint point : points) {
@@ -97,6 +104,7 @@ public class HEKPlugin3dRenderer extends PhysicalRenderer3d {
             double y = -Math.sin(theta);
             Vector3dDouble boundaryPoint3d = new Vector3dDouble(x, y, z);
             int divpoints = 10;
+            gl.glColor3d(evt.getColor().getRed(), evt.getColor().getGreen(), evt.getColor().getBlue());
             gl.glDisable(GL2.GL_TEXTURE_2D);
             gl.glEnable(GL2.GL_LINE_SMOOTH);
             gl.glLineWidth(0.5f);
