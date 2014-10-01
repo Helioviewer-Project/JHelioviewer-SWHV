@@ -6,7 +6,6 @@ import java.awt.Rectangle;
 import java.util.List;
 import java.util.Map;
 
-import org.helioviewer.base.logging.Log;
 import org.helioviewer.plugins.eveplugin.base.Range;
 import org.helioviewer.plugins.eveplugin.draw.DrawableElement;
 import org.helioviewer.plugins.eveplugin.draw.DrawableElementType;
@@ -38,14 +37,12 @@ public class EventPanel implements DrawableElement {
             int previousLine = 0;
             for (String eventType : epcs.keySet()) {
                 for (EventPlotConfiguration epc : epcs.get(eventType)) {
-                    epc.draw(g, graphArea, etpc.getNrOfEventTypes(), eventTypeNr, etpc.getMaxLinesPerEventType().get(eventType).intValue(),
-                            etpc.getTotalNrLines(), previousLine);
+                    epc.draw(g, graphArea, etpc.getNrOfEventTypes(), eventTypeNr, etpc.getMaxLinesPerEventType().get(eventType).intValue(), etpc.getTotalNrLines(), previousLine);
                 }
                 eventTypeNr++;
                 previousLine += etpc.getMaxLinesPerEventType().get(eventType).intValue();
             }
         }
-        Log.info("Run draw time: " + (System.currentTimeMillis() - start));
     }
 
     @Override

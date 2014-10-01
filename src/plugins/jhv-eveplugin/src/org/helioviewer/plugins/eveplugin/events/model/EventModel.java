@@ -22,10 +22,10 @@ import org.helioviewer.plugins.eveplugin.settings.EVEAPI.API_RESOLUTION_AVERAGES
 import org.helioviewer.plugins.eveplugin.view.plot.PlotsContainerPanel;
 
 /**
- * 
- * 
+ *
+ *
  * @author Bram Bourgoignie (Bram.Bourgoignie@oma.be)
- * 
+ *
  */
 public class EventModel implements ZoomControllerListener, EventRequesterListener {
 
@@ -74,7 +74,7 @@ public class EventModel implements ZoomControllerListener, EventRequesterListene
 
     /**
      * Gets the singleton instance of the EventModel.
-     * 
+     *
      * @return the singleton instance of the event model
      */
     public static EventModel getSingletonInstance() {
@@ -111,7 +111,6 @@ public class EventModel implements ZoomControllerListener, EventRequesterListene
         synchronized (intervalLock) {
             eventPlotConfiguration = new EventTypePlotConfiguration();
             this.events = events;
-            Log.info("New events received selected interval: " + selectedInterval + " availalble interval " + availableInterval);
             if (selectedInterval != null && availableInterval != null) {
                 createEventPlotConfiguration();
             }
