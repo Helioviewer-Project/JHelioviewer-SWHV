@@ -470,7 +470,11 @@ public class GLPhysicalRenderGraphics extends AbstractPhysicalRenderGraphics {
 
         gl.glDisable(GL2.GL_TEXTURE_2D);
         gl.glEnable(GL2.GL_LINE_SMOOTH);
-        gl.glBlendFunc(GL2.GL_SRC_ALPHA, GL2.GL_ONE_MINUS_SRC_ALPHA);
+        gl.glEnable(GL2.GL_BLEND);
+        gl.glDisable(GL2.GL_LIGHTING);
+        gl.glLineWidth(0.5f);
+        gl.glDepthRangef(0.f, 0.f);
+        gl.glBlendFunc(GL2.GL_ONE, GL2.GL_ONE);
 
         gl.glBegin(GL2.GL_LINES);
 

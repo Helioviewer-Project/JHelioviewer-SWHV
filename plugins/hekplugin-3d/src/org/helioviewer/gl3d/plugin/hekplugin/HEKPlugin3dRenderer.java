@@ -101,16 +101,15 @@ public class HEKPlugin3dRenderer extends PhysicalRenderer3d {
             yold = 0;
             zold = 0;
             if (oldBoundaryPoint3d != null) {
-                for (int j = 1; j <= divpoints; j++) {
-                    double alpha = 1. - 1. * i / divpoints;
+                for (int j = 0; j <= divpoints; j++) {
+                    double alpha = 1. - 1. * j / divpoints;
                     double xnew = alpha * oldBoundaryPoint3d.getX() + (1 - alpha) * boundaryPoint3d.getX();
                     double ynew = alpha * oldBoundaryPoint3d.getY() + (1 - alpha) * boundaryPoint3d.getY();
                     double znew = alpha * oldBoundaryPoint3d.getZ() + (1 - alpha) * boundaryPoint3d.getZ();
                     double r = Math.sqrt(x * x + y * y + z * z);
-                    xnew = xnew / r;
-                    ynew = ynew / r;
-                    znew = znew / r;
-                    System.out.println(xnew + " " + ynew + " " + znew);
+                    xnew = 1.01 * xnew / r;
+                    ynew = 1.01 * ynew / r;
+                    znew = 1.01 * znew / r;
                     if (xold != -2) {
                         g.drawLine3d(xold, yold, zold, xnew, ynew, znew);
                     }
@@ -120,7 +119,8 @@ public class HEKPlugin3dRenderer extends PhysicalRenderer3d {
                 }
 
             }
-            //g.drawLine3d(oldBoundaryPoint3d.getX(), oldBoundaryPoint3d.getY(), oldBoundaryPoint3d.getZ(), boundaryPoint3d.getX(), boundaryPoint3d.getY(), boundaryPoint3d.getZ());
+            //if (oldBoundaryPoint3d != null)
+            //    g.drawLine3d(oldBoundaryPoint3d.getX(), oldBoundaryPoint3d.getY(), oldBoundaryPoint3d.getZ(), boundaryPoint3d.getX(), boundaryPoint3d.getY(), boundaryPoint3d.getZ());
 
             oldBoundaryPoint3d = boundaryPoint3d;
         }
