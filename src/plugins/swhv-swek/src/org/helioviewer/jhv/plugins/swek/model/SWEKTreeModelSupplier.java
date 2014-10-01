@@ -30,7 +30,7 @@ public class SWEKTreeModelSupplier extends AbstractSWEKTreeModelElement {
      * @return The SWEK supplier
      */
     public SWEKSupplier getSwekSupplier() {
-        return this.swekSupplier;
+        return swekSupplier;
     }
 
     /**
