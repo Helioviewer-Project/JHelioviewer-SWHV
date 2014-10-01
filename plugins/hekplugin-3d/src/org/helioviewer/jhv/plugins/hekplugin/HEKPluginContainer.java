@@ -4,7 +4,6 @@ import java.util.Date;
 
 import org.helioviewer.base.math.Interval;
 import org.helioviewer.gl3d.plugin.hekplugin.HEKPlugin3dRenderer;
-import org.helioviewer.jhv.plugins.hekplugin.cache.HEKCache;
 import org.helioviewer.viewmodel.renderer.physical.PhysicalRenderer;
 import org.helioviewer.viewmodel.view.OverlayView;
 import org.helioviewer.viewmodel.view.opengl.OverlayPluginContainer;
@@ -22,14 +21,14 @@ import org.helioviewer.viewmodelplugin.overlay.OverlayControlComponentManager;
  * <li>Event Type (Coronal Holes, ...)</li>
  * <li>Feature Recognition Method</li>
  * <li>Event</li>
- * 
+ *
  * It is necessary to initially request the Tree structure for each Interval
  * currently looked at. Once the structure is loaded, the user can select
  * Different categories and download all the events "inside" these categories.
- * 
+ *
  * The basic architecture is heavily inspired by the event catalogue developed
  * by Stephan Pagel.
- * 
+ *
  * @author Malte Nuhn
  */
 public class HEKPluginContainer extends OverlayContainer {
@@ -58,7 +57,7 @@ public class HEKPluginContainer extends OverlayContainer {
     @Override
     protected void installOverlayImpl(OverlayView overlayView, OverlayControlComponentManager controlList) {
 
-        hekPanel = new HEKPluginPanel(HEKCache.getSingletonInstance());
+        hekPanel = new HEKPluginPanel();
         OverlayPluginContainer overlayPluginContainer = new OverlayPluginContainer();
         overlayPluginContainer.setRenderer(new HEKPluginRenderer());
         overlayPluginContainer.setRenderer3d(new HEKPlugin3dRenderer());
@@ -75,6 +74,7 @@ public class HEKPluginContainer extends OverlayContainer {
     /**
      * {@inheritDoc}
      */
+    @Override
     public String getDescription() {
         return null;
     }
@@ -82,6 +82,7 @@ public class HEKPluginContainer extends OverlayContainer {
     /**
      * {@inheritDoc}
      */
+    @Override
     public String getName() {
         return "HEK Events " + (builtin_mode ? "Built-In Version" : "");
     }
