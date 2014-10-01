@@ -11,7 +11,6 @@ import java.util.Set;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-import org.helioviewer.base.logging.Log;
 import org.helioviewer.base.math.Interval;
 import org.helioviewer.jhv.data.container.JHVEventContainer;
 import org.helioviewer.jhv.plugins.swek.SWEKPluginLocks;
@@ -141,12 +140,10 @@ public class SWEKDownloadManager implements DownloadWorkerListener, IncomingRequ
 
     @Override
     public void workerStarted(DownloadWorker worker) {
-        Log.debug("Worker " + worker + " is started");
     }
 
     @Override
     public void workerForcedToStop(DownloadWorker worker) {
-        Log.debug("Worker " + worker + " is forced stopped");
         synchronized (SWEKPluginLocks.downloadLock) {
             removeWorkerFromMap(worker);
             removeFromBusyAndFinishedJobs(worker.getEventType(), worker.getSupplier(), worker.getDownloadStartDate());
@@ -155,7 +152,6 @@ public class SWEKDownloadManager implements DownloadWorkerListener, IncomingRequ
 
     @Override
     public void workerFinished(DownloadWorker worker) {
-        Log.debug("Worker " + worker + " is finished");
         synchronized (SWEKPluginLocks.downloadLock) {
             removeWorkerFromMap(worker);
         }
@@ -291,8 +287,6 @@ public class SWEKDownloadManager implements DownloadWorkerListener, IncomingRequ
         dwMapOnDate = dwMap.get(eventType);
         if (!dwMapOnDate.containsKey(date)) {
             dwMapOnDate.put(date, dw);
-        } else {
-            Log.debug("The event type : " + eventType + " is already downloaded for date : " + date + ". No extra download is done.");
         }
         dwMap.put(eventType, dwMapOnDate);
     }

@@ -138,7 +138,6 @@ public class JHVEventContainer {
      *            the handler
      */
     public void requestForInterval(final Date startDate, final Date endDate, final JHVEventHandler handler) {
-        Thread.dumpStack();
         EventQueue.invokeLater(new Runnable() {
             @Override
             public void run() {
