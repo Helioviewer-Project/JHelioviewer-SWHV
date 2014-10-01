@@ -103,6 +103,15 @@ public class SWEKConfigurationManager {
                 isConfigParsed = parseConfigFile();
             } else if (checkAndOpenHomeDirectoryFile()) {
                 isConfigParsed = parseConfigFile();
+                if (isConfigParsed) {
+                    // check if the file is manually changed if not we download
+                    // the latest version anyway.
+                    if (!configuration.isManuallyChanged()) {
+                        if (checkAndOpenOnlineFile()) {
+                            isConfigParsed = parseConfigFile();
+                        }
+                    }
+                }
             } else if (checkAndOpenOnlineFile()) {
                 isConfigParsed = parseConfigFile();
             } else {
