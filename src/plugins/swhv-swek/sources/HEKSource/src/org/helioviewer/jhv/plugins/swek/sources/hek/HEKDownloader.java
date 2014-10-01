@@ -213,7 +213,11 @@ public class HEKDownloader implements SWEKDownloader {
             if (param.getParam().toLowerCase().equals("provider")) {
                 baseURL.append("param").append(paramCount).append("=").append("frm_name").append("&").append("op").append(paramCount)
                         .append("=").append(param.getOperand().URLEncodedRepresentation()).append("&").append("value").append(paramCount)
-                        .append("=").append(encodedValue);
+                        .append("=").append(encodedValue).append("&");
+            } else {
+                baseURL.append("param").append(paramCount).append("=").append(param.getParam()).append("&").append("op").append(paramCount)
+                        .append("=").append(param.getOperand().URLEncodedRepresentation()).append("&").append("value").append(paramCount)
+                        .append("=").append(encodedValue).append("&");
             }
             paramCount++;
         }
