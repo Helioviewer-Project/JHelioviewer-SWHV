@@ -119,16 +119,10 @@ public class HEKPlugin3dRenderer extends PhysicalRenderer3d {
                     xnew = xnew / r;
                     ynew = ynew / r;
                     znew = znew / r;
-                    //System.out.println(xnew * xnew + ynew * ynew + znew * znew);
-
                     gl.glVertex3d(xnew, -ynew, znew);
-
-                    //g.drawLine3d(xold, yold, zold, xnew, ynew, znew);
                 }
 
             }
-            //if (oldBoundaryPoint3d != null)
-            //    g.drawLine3d(oldBoundaryPoint3d.getX(), oldBoundaryPoint3d.getY(), oldBoundaryPoint3d.getZ(), boundaryPoint3d.getX(), boundaryPoint3d.getY(), boundaryPoint3d.getZ());
             gl.glEnd();
             gl.glDisable(GL2.GL_LINE_SMOOTH);
 
