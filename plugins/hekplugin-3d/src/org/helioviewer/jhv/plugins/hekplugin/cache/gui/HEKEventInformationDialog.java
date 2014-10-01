@@ -40,7 +40,6 @@ import org.helioviewer.jhv.gui.IconBank;
 import org.helioviewer.jhv.gui.IconBank.JHVIcon;
 import org.helioviewer.jhv.gui.TableColumnResizer;
 import org.helioviewer.jhv.layers.LayersModel;
-import org.helioviewer.jhv.plugins.hekplugin.settings.HEKConstants;
 
 /**
  * Popup displaying informations about a HEK event.
@@ -393,7 +392,7 @@ public class HEKEventInformationDialog extends JDialog implements ActionListener
         Date currentDate = LayersModel.getSingletonInstance().getLastUpdatedTimestamp();
 
         String typeAcronym = event.getName();
-        String type = HEKConstants.getSingletonInstance().acronymToString(typeAcronym);
+        String type = event.getName();
 
         textType.setText(type);
 
