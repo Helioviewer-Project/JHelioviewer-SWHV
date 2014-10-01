@@ -21,5 +21,10 @@
 	<classpathentry kind="lib" path="lib/gluegen-rt.jar"/>
 	<classpathentry kind="lib" path="lib/jogl.jar"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/jhv-data"/>
+	<classpathentry kind="lib" path="../lib/jogl.jar">
+		<attributes>
+			<attribute name="org.eclipse.jdt.launching.CLASSPATH_ATTR_LIBRARY_PATH_ENTRY" value="/Users/bramb/Documents/OMA/jhelioviewer/git/client/jhv-3d-wcs/resources/jogl/lib/macosx-universal"/>
+		</attributes>
+	</classpathentry>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
