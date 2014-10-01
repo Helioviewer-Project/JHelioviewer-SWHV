@@ -5,7 +5,7 @@
     <!-- FIXED "lowercase" -->
     <property name="plugin.name.lowercase" value="hekplugin" />
 	
-	<property name="jhv.root" value="${basedir}/../jhv-3d-wcs" />
+	<property name="jhv.root" value="${basedir}/../../" />
     <!--
 	<property name="jhv.root" value="C:/Users/jf/Documents/FHNW/projects/jhv-3d-wcs/trunk" />
 	<property name="jhv.root" value="${basedir}/../../" />
