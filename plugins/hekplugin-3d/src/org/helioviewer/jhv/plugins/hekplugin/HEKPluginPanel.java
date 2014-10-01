@@ -7,29 +7,16 @@ import java.awt.GridBagLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.Date;
-import java.util.HashMap;
-import java.util.Vector;
 
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JPanel;
 import javax.swing.JProgressBar;
-import javax.swing.JScrollPane;
 
 import org.helioviewer.base.math.Interval;
 import org.helioviewer.jhv.layers.LayersListener;
 import org.helioviewer.jhv.layers.LayersModel;
-import org.helioviewer.jhv.plugins.hekplugin.cache.HEKCache;
-import org.helioviewer.jhv.plugins.hekplugin.cache.HEKCacheListener;
-import org.helioviewer.jhv.plugins.hekplugin.cache.HEKCacheLoadingModel;
-import org.helioviewer.jhv.plugins.hekplugin.cache.HEKCacheModel;
-import org.helioviewer.jhv.plugins.hekplugin.cache.HEKCacheSelectionModel;
-import org.helioviewer.jhv.plugins.hekplugin.cache.HEKCacheTreeModel;
-import org.helioviewer.jhv.plugins.hekplugin.cache.HEKPath;
-import org.helioviewer.jhv.plugins.hekplugin.cache.HEKStupidDownloader;
 import org.helioviewer.jhv.plugins.hekplugin.cache.SWHVHEKData;
-import org.helioviewer.jhv.plugins.hekplugin.cache.gui.HEKCacheTreeView;
-import org.helioviewer.jhv.plugins.hekplugin.cache.gui.HEKCacheTreeViewContainer;
 import org.helioviewer.viewmodel.changeevent.ChangeEvent;
 import org.helioviewer.viewmodel.changeevent.SubImageDataChangedReason;
 import org.helioviewer.viewmodel.view.View;
@@ -40,45 +27,29 @@ import org.helioviewer.viewmodelplugin.overlay.OverlayPanel;
  *
  * @author Malte Nuhn
  * */
-public class HEKPluginPanel extends OverlayPanel implements ActionListener, HEKCacheListener, LayersListener {
+public class HEKPluginPanel extends OverlayPanel implements ActionListener, LayersListener {
 
     private static final long serialVersionUID = 1L;
 
     // UI Components
     private final JPanel buttonPanel = new JPanel(new BorderLayout());
     private final JProgressBar progressBar = new JProgressBar();
-    private final HEKCacheTreeView tree = new HEKCacheTreeView(HEKCache.getSingletonInstance());
-    private final JScrollPane treeView = new JScrollPane(tree);
     private final JButton cancelButton = new JButton(new ImageIcon(HEKPlugin.getResourceUrl("/images/hekCancel.png")));
     private final JButton reloadButton = new JButton(new ImageIcon(HEKPlugin.getResourceUrl("/images/hekReload.png")));
-    private final HEKCacheTreeViewContainer container = new HEKCacheTreeViewContainer();
-
-    private final HEKCacheModel cacheModel;
-    private final HEKCache cache;
-    private final HEKCacheSelectionModel selectionModel;
-    @SuppressWarnings("unused")
-    private final HEKCacheTreeModel treeModel;
-    private final HEKCacheLoadingModel loadingModel;
 
     /**
      * Default constructor
      *
      * @param hekCache
      * */
-    public HEKPluginPanel(HEKCache hekCache) {
+    public HEKPluginPanel() {
         SWHVHEKData.getSingletonInstance();
-        this.cache = hekCache;
-        this.cacheModel = hekCache.getModel();
-        this.selectionModel = hekCache.getSelectionModel();
-        this.treeModel = hekCache.getTreeModel();
-        this.loadingModel = hekCache.getLoadingModel();
 
         // set up visual components
         initVisualComponents();
 
         // register as layers listener
         LayersModel.getSingletonInstance().addLayersListener(this);
-        HEKCache.getSingletonInstance().getModel().addCacheListener(this);
     }
 
     /**
@@ -102,9 +73,7 @@ public class HEKPluginPanel extends OverlayPanel implements ActionListener, HEKC
      *
      */
     public void setCurInterval(Interval<Date> newPosition) {
-        if (!HEKCache.getSingletonInstance().getModel().getCurInterval().equals(newPosition)) {
-            HEKCache.getSingletonInstance().getController().setCurInterval(newPosition);
-        }
+
     }
 
     /**
@@ -117,8 +86,6 @@ public class HEKPluginPanel extends OverlayPanel implements ActionListener, HEKC
      *
      */
     public void getStructure() {
-        Interval<Date> selected = HEKCache.getSingletonInstance().getModel().getCurInterval();
-        HEKCache.getSingletonInstance().getController().requestStructure(selected);
     }
 
     /**
@@ -137,15 +104,6 @@ public class HEKPluginPanel extends OverlayPanel implements ActionListener, HEKC
         cancelButton.addActionListener(this);
         reloadButton.addActionListener(this);
 
-        tree.setModel(HEKCache.getSingletonInstance().getTreeModel());
-        tree.setController(HEKCache.getSingletonInstance().getController());
-        tree.setRootVisible(false);
-
-        container.setMain(treeView);
-        container.update();
-
-        HEKCache.getSingletonInstance().getController().fireEventsChanged((HEKCache.getSingletonInstance().getController().getRootPath()));
-
         setEnabled(true);
 
         GridBagConstraints c = new GridBagConstraints();
@@ -155,8 +113,6 @@ public class HEKPluginPanel extends OverlayPanel implements ActionListener, HEKC
         c.gridx = 0;
         c.gridy = 0;
         c.gridwidth = 2;
-
-        this.add(container, c);
 
         GridBagConstraints c2 = new GridBagConstraints();
         c2.fill = GridBagConstraints.HORIZONTAL;
@@ -192,21 +148,11 @@ public class HEKPluginPanel extends OverlayPanel implements ActionListener, HEKC
     @Override
     public void actionPerformed(ActionEvent act) {
 
-        if (act.getSource().equals(cancelButton)) {
-            HEKStupidDownloader.getSingletonInstance().cancelDownloads();
-        }
-
         if (act.getSource().equals(reloadButton)) {
             getStructure();
         }
 
         if (act.getActionCommand().equals("request")) {
-            // move into controller
-            // TODO move into loading watcher
-            HashMap<HEKPath, Vector<Interval<Date>>> selected = selectionModel.getSelection(cacheModel.getCurInterval());
-            HashMap<HEKPath, Vector<Interval<Date>>> needed = cache.needed(selected);
-            HashMap<HEKPath, Vector<Interval<Date>>> nonQueued = HEKCache.getSingletonInstance().getLoadingModel().filterState(needed, HEKCacheLoadingModel.PATH_NOTHING);
-            HEKCache.getSingletonInstance().getController().requestEvents(nonQueued);
         }
 
     }
@@ -214,12 +160,6 @@ public class HEKPluginPanel extends OverlayPanel implements ActionListener, HEKC
     @Override
     public void setEnabled(boolean b) {
         // super.setEnabled(b);
-        if (b == false) {
-            HEKCache.getSingletonInstance().getExpansionModel().expandToLevel(0, true, true);
-            HEKPath rootPath = HEKCache.getSingletonInstance().getController().getRootPath();
-            HEKCache.getSingletonInstance().getController().fireEventsChanged(rootPath);
-        }
-        tree.setEnabled(b);
     }
 
     @Override
@@ -236,7 +176,6 @@ public class HEKPluginPanel extends OverlayPanel implements ActionListener, HEKC
                 Date end = LayersModel.getSingletonInstance().getLastDate();
                 if (start != null && end != null) {
                     Interval<Date> range = new Interval<Date>(start, end);
-                    HEKCache.getSingletonInstance().getController().setCurInterval(range);
                     getStructure();
                 }
             }
@@ -265,27 +204,10 @@ public class HEKPluginPanel extends OverlayPanel implements ActionListener, HEKC
     public void viewportGeometryChanged() {
     }
 
-    @Override
-    public void cacheStateChanged() {
-        // anything loading?
-        boolean loading = loadingModel.getState(cacheModel.getRoot(), true) != HEKCacheLoadingModel.PATH_NOTHING;
-        this.setLoading(loading);
-    }
-
     private void setLoading(boolean loading) {
         progressBar.setVisible(loading);
         cancelButton.setVisible(loading);
         reloadButton.setVisible(!loading);
-    }
-
-    @Override
-    public void eventsChanged(HEKPath path) {
-        fireRedraw();
-    }
-
-    @Override
-    public void structureChanged(HEKPath path) {
-        fireRedraw();
     }
 
     /**
