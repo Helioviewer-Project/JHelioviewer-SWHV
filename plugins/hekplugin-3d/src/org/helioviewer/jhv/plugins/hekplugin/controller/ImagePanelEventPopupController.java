@@ -266,18 +266,20 @@ public class ImagePanelEventPopupController implements ImagePanelPlugin, MouseLi
                     }
                     if (i < evt.getPositioningInformation().size()) {
                         JHVPositionInformation el = evt.getPositioningInformation().get(i);
-                        double theta = el.centralPoint().getCoordinate2() / 180. * Math.PI;// - Astronomy.getB0InRadians(new Date((evt.getStartDate().getTime() + evt.getEndDate().getTime()) / 2));
-                        double phi = el.centralPoint().getCoordinate1() / 180. * Math.PI - Astronomy.getL0Radians(new Date((evt.getStartDate().getTime() + evt.getEndDate().getTime()) / 2));
-                        double x = Math.cos(theta) * Math.sin(phi);
-                        double z = Math.cos(theta) * Math.cos(phi);
-                        double y = -Math.sin(theta);
-                        if (hitpoint != null) {
-                            double deltaX = Math.abs(hitpoint.x - x);
-                            double deltaY = Math.abs(hitpoint.y + y);
-                            double deltaZ = Math.abs(hitpoint.z - z);
-                            if (deltaX < 0.05 && deltaZ < 0.05 && deltaY < 0.05) {
-                                mouseOverJHVEvent = evt;
-                                mouseOverPosition = new Point(e.getX(), e.getY());
+                        if (el.centralPoint() != null) {
+                            double theta = el.centralPoint().getCoordinate2() / 180. * Math.PI;// - Astronomy.getB0InRadians(new Date((evt.getStartDate().getTime() + evt.getEndDate().getTime()) / 2));
+                            double phi = el.centralPoint().getCoordinate1() / 180. * Math.PI - Astronomy.getL0Radians(new Date((evt.getStartDate().getTime() + evt.getEndDate().getTime()) / 2));
+                            double x = Math.cos(theta) * Math.sin(phi);
+                            double z = Math.cos(theta) * Math.cos(phi);
+                            double y = -Math.sin(theta);
+                            if (hitpoint != null) {
+                                double deltaX = Math.abs(hitpoint.x - x);
+                                double deltaY = Math.abs(hitpoint.y + y);
+                                double deltaZ = Math.abs(hitpoint.z - z);
+                                if (deltaX < 0.05 && deltaZ < 0.05 && deltaY < 0.05) {
+                                    mouseOverJHVEvent = evt;
+                                    mouseOverPosition = new Point(e.getX(), e.getY());
+                                }
                             }
                         }
                     }
