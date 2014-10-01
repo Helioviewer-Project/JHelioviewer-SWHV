@@ -25,7 +25,7 @@ public class SWEKEventHandler implements JHVEventHandler {
 
     /**
      * Gets the singleton instance of the SWEKEventHandler
-     * 
+     *
      * @return the singleton instance
      */
     public static SWEKEventHandler getSingletonInstace() {
@@ -37,7 +37,7 @@ public class SWEKEventHandler implements JHVEventHandler {
 
     /**
      * Adds a SWEKEventHandlerListener to the SWEKEventHandler
-     * 
+     *
      * @param listener
      *            the listener to add
      */
@@ -47,7 +47,7 @@ public class SWEKEventHandler implements JHVEventHandler {
 
     /**
      * Removes the SWEKEventHandlerListener from the SWEKEventHandler
-     * 
+     *
      * @param listener
      *            the listener to remove
      */
@@ -63,5 +63,4 @@ public class SWEKEventHandler implements JHVEventHandler {
     public void cacheUpdated() {
 
     }
-
 }
