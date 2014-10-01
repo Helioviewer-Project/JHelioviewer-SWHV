@@ -23,6 +23,7 @@ import org.helioviewer.jhv.data.datatype.JHVEventParameter;
 import org.helioviewer.jhv.data.datatype.JHVPoint;
 import org.helioviewer.jhv.data.datatype.JHVPositionInformation;
 import org.helioviewer.jhv.plugins.hekplugin.cache.SWHVHEKData;
+import org.helioviewer.jhv.plugins.hekplugin.settings.HEKSettings;
 import org.helioviewer.viewmodel.region.Region;
 import org.helioviewer.viewmodel.renderer.physical.PhysicalRenderGraphics;
 import org.helioviewer.viewmodel.renderer.physical.PhysicalRenderer3d;
@@ -74,8 +75,9 @@ public class HEKPlugin3dRenderer extends PhysicalRenderer3d {
         double thetaEnd = principleAngle + angularWidth / 2.;
         double phi = -Math.PI / 2. - Astronomy.getL0Radians(new Date((evt.getStartDate().getTime() + evt.getEndDate().getTime()) / 2));
         double lineResolution = 10;
+        Color eventColor = HEKSettings.getCactusColor();
+        gl.glColor3d(eventColor.getRed() / 255., eventColor.getGreen() / 255., eventColor.getBlue() / 255.);
 
-        gl.glColor3d(evt.getColor().getRed(), evt.getColor().getGreen(), evt.getColor().getBlue());
         gl.glDisable(GL2.GL_TEXTURE_2D);
         gl.glEnable(GL2.GL_LINE_SMOOTH);
         gl.glLineWidth(0.5f);
@@ -150,8 +152,6 @@ public class HEKPlugin3dRenderer extends PhysicalRenderer3d {
         if (points == null || points.size() == 0) {
             return;
         }
-        String type = evt.getName();
-        Color eventColor = evt.getColor();
 
         // draw bounds
         Vector3dDouble oldBoundaryPoint3d = null;
@@ -249,6 +249,7 @@ public class HEKPlugin3dRenderer extends PhysicalRenderer3d {
                 }
             }
         }
+        HEKSettings.resetCactusColor();
     }
 
     @Override
