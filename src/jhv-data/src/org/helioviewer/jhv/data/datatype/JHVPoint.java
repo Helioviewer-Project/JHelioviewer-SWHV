@@ -2,9 +2,9 @@ package org.helioviewer.jhv.data.datatype;
 
 /**
  * Represents a point in a coordinate system.
- * 
+ *
  * @author Bram Bourgoignie (Bram.Bourgoignie@oma.be)
- * 
+ *
  */
 public class JHVPoint {
     /** Coordinate 1 */
@@ -16,7 +16,7 @@ public class JHVPoint {
 
     /**
      * Creates a JHVPoint with the given coordinates.
-     * 
+     *
      * @param coordinate1
      *            first coordinate
      * @param coordinate2
@@ -32,7 +32,7 @@ public class JHVPoint {
 
     /**
      * Gets first coordinate.
-     * 
+     *
      * @return the first coordinate
      */
     public Double getCoordinate1() {
@@ -41,7 +41,7 @@ public class JHVPoint {
 
     /**
      * Gets the second coordinate.
-     * 
+     *
      * @return the second coordinate
      */
     public Double getCoordinate2() {
@@ -50,10 +50,15 @@ public class JHVPoint {
 
     /**
      * Gets the third coordinate.
-     * 
+     *
      * @return the third coordinate
      */
     public Double getCoordinate3() {
         return coordinate3;
+    }
+
+    @Override
+    public String toString() {
+        return "( " + this.coordinate1 + ", " + this.coordinate2 + ", " + this.coordinate3 + " )";
     }
 }

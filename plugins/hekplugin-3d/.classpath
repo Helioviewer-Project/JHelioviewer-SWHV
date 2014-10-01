@@ -20,5 +20,6 @@
 	<classpathentry combineaccessrules="false" kind="src" path="/jhv-display"/>
 	<classpathentry kind="lib" path="lib/gluegen-rt.jar"/>
 	<classpathentry kind="lib" path="lib/jogl.jar"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/jhv-data"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

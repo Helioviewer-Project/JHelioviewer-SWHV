@@ -37,15 +37,15 @@ import org.helioviewer.viewmodel.viewportimagesize.ViewportImageSize;
 
 /**
  * Implementation of ImagePanelPlugin for showing event popups.
- * 
+ *
  * <p>
  * This plugin provides the capability to open an event popup when clicking on
  * an event icon within the main image. Apart from that, it changes the mouse
  * pointer when hovering over an event icon to indicate that it is clickable.
- * 
+ *
  * @author Markus Langenberg
  * @author Malte Nuhn
- * 
+ *
  */
 public class ImagePanelEventPopupController implements ImagePanelPlugin, MouseListener, MouseMotionListener, ViewListener {
 
@@ -77,6 +77,7 @@ public class ImagePanelEventPopupController implements ImagePanelPlugin, MouseLi
     /**
      * {@inheritDoc}
      */
+    @Override
     public View getView() {
         return view;
     }
@@ -84,6 +85,7 @@ public class ImagePanelEventPopupController implements ImagePanelPlugin, MouseLi
     /**
      * {@inheritDoc}
      */
+    @Override
     public void setView(View newView) {
         view = newView;
 
@@ -94,6 +96,7 @@ public class ImagePanelEventPopupController implements ImagePanelPlugin, MouseLi
     /**
      * {@inheritDoc}
      */
+    @Override
     public void setImagePanel(BasicImagePanel newImagePanel) {
         imagePanel = newImagePanel;
         imagePanel.addMouseListener(this);
@@ -106,13 +109,14 @@ public class ImagePanelEventPopupController implements ImagePanelPlugin, MouseLi
     /**
      * {@inheritDoc}
      */
+    @Override
     public BasicImagePanel getImagePanel() {
         return imagePanel;
     }
 
     /**
      * Converts physical coordinate to screen coordinates
-     * 
+     *
      * @param x
      *            Physical x-coordinate
      * @param y
@@ -162,6 +166,7 @@ public class ImagePanelEventPopupController implements ImagePanelPlugin, MouseLi
     /**
      * {@inheritDoc}
      */
+    @Override
     public void mouseClicked(final MouseEvent e) {
 
         if (mouseOverHEKEvent != null) {
@@ -187,36 +192,42 @@ public class ImagePanelEventPopupController implements ImagePanelPlugin, MouseLi
     /**
      * {@inheritDoc}
      */
+    @Override
     public void mouseEntered(MouseEvent e) {
     }
 
     /**
      * {@inheritDoc}
      */
+    @Override
     public void mouseExited(MouseEvent e) {
     }
 
     /**
      * {@inheritDoc}
      */
+    @Override
     public void mousePressed(MouseEvent e) {
     }
 
     /**
      * {@inheritDoc}
      */
+    @Override
     public void mouseReleased(MouseEvent e) {
     }
 
     /**
      * {@inheritDoc}
      */
+    @Override
     public void mouseDragged(MouseEvent e) {
     }
 
     /**
      * {@inheritDoc}
      */
+    @Override
     public void mouseMoved(MouseEvent e) {
 
         HEKEvent lastHEKEvent = mouseOverHEKEvent;
@@ -227,7 +238,7 @@ public class ImagePanelEventPopupController implements ImagePanelPlugin, MouseLi
         GL3DVec3d hitpoint = null;
         mouseOverHEKEvent = null;
         mouseOverPosition = null;
-        if (view instanceof GL3DComponentView && GL3DState.get().getActiveCamera() != null) {
+        if (view instanceof GL3DComponentView && GL3DState.get() != null && GL3DState.get().getActiveCamera() != null) {
             state3D = true;
 
             GL3DComponentView gl3dview = (GL3DComponentView) view;
@@ -285,6 +296,7 @@ public class ImagePanelEventPopupController implements ImagePanelPlugin, MouseLi
     /**
      * {@inheritDoc}
      */
+    @Override
     public void viewChanged(View sender, ChangeEvent aEvent) {
         if (hekPopUp != null) {
             if (aEvent.reasonOccurred(RegionChangedReason.class) || aEvent.reasonOccurred(ViewportChangedReason.class) || aEvent.reasonOccurred(TimestampChangedReason.class)) {
@@ -309,6 +321,7 @@ public class ImagePanelEventPopupController implements ImagePanelPlugin, MouseLi
         }
     }
 
+    @Override
     public void detach() {
     }
 

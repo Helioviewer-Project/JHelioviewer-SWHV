@@ -34,6 +34,7 @@ public class SWHVHEKData implements LayersListener, JHVEventHandler {
     private Date beginDate;
     private Date endDate;
     private Map<String, NavigableMap<Date, NavigableMap<Date, List<JHVEvent>>>> data;
+    private ArrayList<JHVEvent> events;
 
     /** instance of the swek event handler */
 
@@ -153,20 +154,43 @@ public class SWHVHEKData implements LayersListener, JHVEventHandler {
 
     @Override
     public void newEventsReceived(Map<String, NavigableMap<Date, NavigableMap<Date, List<JHVEvent>>>> eventList) {
-        System.out.println("FFVNEW");
     }
 
     @Override
     public void cacheUpdated() {
-        Displayer.getSingletonInstance().display();
         data = JHVEventCache.getSingletonInstance().get(beginDate, endDate);
-
-        System.out.println("FFVNEW" + data.size());
-
+        ArrayList<JHVEvent> events = new ArrayList<JHVEvent>();
+        for (String eventType : data.keySet()) {
+            for (Date sDate : data.get(eventType).keySet()) {
+                for (Date eDate : data.get(eventType).get(sDate).keySet()) {
+                    for (JHVEvent event : data.get(eventType).get(sDate).get(eDate)) {
+                        events.add(event);
+                    }
+                }
+            }
+        }
+        this.events = events;
+        Displayer.getSingletonInstance().display();
     }
 
     public Map<String, NavigableMap<Date, NavigableMap<Date, List<JHVEvent>>>> getData() {
         return data;
+    }
+
+    public ArrayList<JHVEvent> getActiveEvents(Date currentDate) {
+        ArrayList<JHVEvent> activeEvents = new ArrayList<JHVEvent>();
+        if (this.events != null) {
+            for (JHVEvent event : this.events) {
+                if (event != null && event.getStartDate() != null && event.getEndDate() != null) {
+                    if (event.getStartDate().getTime() < currentDate.getTime() && event.getEndDate().getTime() > currentDate.getTime()) {
+                        activeEvents.add(event);
+                    }
+                } else {
+                    Log.warn("Possibly something strange is going on with incoming events. Either the date or the event is null");
+                }
+            }
+        }
+        return activeEvents;
     }
 
 }

@@ -27,6 +27,7 @@ import org.helioviewer.jhv.plugins.hekplugin.cache.HEKCacheSelectionModel;
 import org.helioviewer.jhv.plugins.hekplugin.cache.HEKCacheTreeModel;
 import org.helioviewer.jhv.plugins.hekplugin.cache.HEKPath;
 import org.helioviewer.jhv.plugins.hekplugin.cache.HEKStupidDownloader;
+import org.helioviewer.jhv.plugins.hekplugin.cache.SWHVHEKData;
 import org.helioviewer.jhv.plugins.hekplugin.cache.gui.HEKCacheTreeView;
 import org.helioviewer.jhv.plugins.hekplugin.cache.gui.HEKCacheTreeViewContainer;
 import org.helioviewer.viewmodel.changeevent.ChangeEvent;
@@ -36,7 +37,7 @@ import org.helioviewer.viewmodelplugin.overlay.OverlayPanel;
 
 /**
  * Represents the UI components which manage the HEK event catalog.
- * 
+ *
  * @author Malte Nuhn
  * */
 public class HEKPluginPanel extends OverlayPanel implements ActionListener, HEKCacheListener, LayersListener {
@@ -44,28 +45,28 @@ public class HEKPluginPanel extends OverlayPanel implements ActionListener, HEKC
     private static final long serialVersionUID = 1L;
 
     // UI Components
-    private JPanel buttonPanel = new JPanel(new BorderLayout());
-    private JProgressBar progressBar = new JProgressBar();
-    private HEKCacheTreeView tree = new HEKCacheTreeView(HEKCache.getSingletonInstance());
-    private JScrollPane treeView = new JScrollPane(tree);
-    private JButton cancelButton = new JButton(new ImageIcon(HEKPlugin.getResourceUrl("/images/hekCancel.png")));
-    private JButton reloadButton = new JButton(new ImageIcon(HEKPlugin.getResourceUrl("/images/hekReload.png")));
-    private HEKCacheTreeViewContainer container = new HEKCacheTreeViewContainer();
+    private final JPanel buttonPanel = new JPanel(new BorderLayout());
+    private final JProgressBar progressBar = new JProgressBar();
+    private final HEKCacheTreeView tree = new HEKCacheTreeView(HEKCache.getSingletonInstance());
+    private final JScrollPane treeView = new JScrollPane(tree);
+    private final JButton cancelButton = new JButton(new ImageIcon(HEKPlugin.getResourceUrl("/images/hekCancel.png")));
+    private final JButton reloadButton = new JButton(new ImageIcon(HEKPlugin.getResourceUrl("/images/hekReload.png")));
+    private final HEKCacheTreeViewContainer container = new HEKCacheTreeViewContainer();
 
-    private HEKCacheModel cacheModel;
-    private HEKCache cache;
-    private HEKCacheSelectionModel selectionModel;
+    private final HEKCacheModel cacheModel;
+    private final HEKCache cache;
+    private final HEKCacheSelectionModel selectionModel;
     @SuppressWarnings("unused")
-    private HEKCacheTreeModel treeModel;
-    private HEKCacheLoadingModel loadingModel;
+    private final HEKCacheTreeModel treeModel;
+    private final HEKCacheLoadingModel loadingModel;
 
     /**
      * Default constructor
-     * 
+     *
      * @param hekCache
      * */
     public HEKPluginPanel(HEKCache hekCache) {
-
+        SWHVHEKData.getSingletonInstance();
         this.cache = hekCache;
         this.cacheModel = hekCache.getModel();
         this.selectionModel = hekCache.getSelectionModel();
@@ -89,16 +90,16 @@ public class HEKPluginPanel extends OverlayPanel implements ActionListener, HEKC
 
     /**
      * Update the plugin's currently displayed interval.
-     * 
+     *
      * The plugin is currently stafeFUL, so keep in mind that just calling this
      * method without triggering any other update method might not be a good
      * decision.
-     * 
+     *
      * @param newInterval
      *            - the interval that should be displayed
-     * 
+     *
      * @see org.helioviewer.jhv.plugins.overlay.hek.cache.HEKCacheModel#setCurInterval
-     * 
+     *
      */
     public void setCurInterval(Interval<Date> newPosition) {
         if (!HEKCache.getSingletonInstance().getModel().getCurInterval().equals(newPosition)) {
@@ -109,11 +110,11 @@ public class HEKPluginPanel extends OverlayPanel implements ActionListener, HEKC
     /**
      * Request the plugin to download and display the Events available in the
      * catalogue
-     * 
+     *
      * The interval to be requested depends on the current state of the plug-in.
-     * 
+     *
      * @see org.helioviewer.jhv.plugins.overlay.hek.cache.HEKCacheController#requestStructure
-     * 
+     *
      */
     public void getStructure() {
         Interval<Date> selected = HEKCache.getSingletonInstance().getModel().getCurInterval();
@@ -188,6 +189,7 @@ public class HEKPluginPanel extends OverlayPanel implements ActionListener, HEKC
     public void updateComponents() {
     }
 
+    @Override
     public void actionPerformed(ActionEvent act) {
 
         if (act.getSource().equals(cancelButton)) {
@@ -209,6 +211,7 @@ public class HEKPluginPanel extends OverlayPanel implements ActionListener, HEKC
 
     }
 
+    @Override
     public void setEnabled(boolean b) {
         // super.setEnabled(b);
         if (b == false) {
@@ -219,12 +222,15 @@ public class HEKPluginPanel extends OverlayPanel implements ActionListener, HEKC
         tree.setEnabled(b);
     }
 
+    @Override
     public void activeLayerChanged(int idx) {
         View view = LayersModel.getSingletonInstance().getActiveView();
     }
 
+    @Override
     public void layerAdded(int idx) {
         Thread threadUpdate = new Thread(new Runnable() {
+            @Override
             public void run() {
                 Date start = LayersModel.getSingletonInstance().getFirstDate();
                 Date end = LayersModel.getSingletonInstance().getLastDate();
@@ -238,22 +244,28 @@ public class HEKPluginPanel extends OverlayPanel implements ActionListener, HEKC
         threadUpdate.start();
     }
 
+    @Override
     public void layerChanged(int idx) {
     }
 
+    @Override
     public void layerRemoved(View oldView, int oldIdx) {
     }
 
+    @Override
     public void subImageDataChanged() {
     }
 
+    @Override
     public void timestampChanged(int idx) {
         // Not used anymore
     }
 
+    @Override
     public void viewportGeometryChanged() {
     }
 
+    @Override
     public void cacheStateChanged() {
         // anything loading?
         boolean loading = loadingModel.getState(cacheModel.getRoot(), true) != HEKCacheLoadingModel.PATH_NOTHING;
@@ -266,10 +278,12 @@ public class HEKPluginPanel extends OverlayPanel implements ActionListener, HEKC
         reloadButton.setVisible(!loading);
     }
 
+    @Override
     public void eventsChanged(HEKPath path) {
         fireRedraw();
     }
 
+    @Override
     public void structureChanged(HEKPath path) {
         fireRedraw();
     }
@@ -283,6 +297,7 @@ public class HEKPluginPanel extends OverlayPanel implements ActionListener, HEKC
     /**
      * {@inheritDoc}
      */
+    @Override
     public void layerDownloaded(int idx) {
     }
 }
