@@ -10,6 +10,11 @@ public class Astronomy {
     private static final Calendar calendar = new GregorianCalendar();
     public static final double radeg = 180.0 / Math.PI;
 
+    public static double getB0InRadians(Date date) {
+        calendar.setTime(date);
+        return getB0InRadians(calendar);
+    }
+
     // This method is based on the SolarSoft GET_SUN routine
     public static double getB0InRadians(Calendar time) {
         Calendar item = time;

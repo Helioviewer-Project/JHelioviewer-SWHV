@@ -25,7 +25,7 @@ public class HEKPlugin extends OverlayPlugin implements Plugin {
     /**
      * Reference to the eventPlugin
      */
-    private HEKPluginContainer eventPlugin;
+    private final HEKPluginContainer eventPlugin;
 
     /**
      * Default constructor.
@@ -37,7 +37,7 @@ public class HEKPlugin extends OverlayPlugin implements Plugin {
     /**
      * Constructor with debug flag. If debug flag is set, the plugin name shows
      * "HEK Plugin Built-In Version"
-     * 
+     *
      * @param builtin_mode
      *            - debug flag
      */
@@ -60,6 +60,7 @@ public class HEKPlugin extends OverlayPlugin implements Plugin {
      * Overrides the default method because the internal provided filters are
      * activated by default.
      */
+    @Override
     public void installPlugin() {
         for (OverlayContainer overlay : overlayContainerList) {
             overlay.setActive(PluginSettings.getSingeltonInstance().isOverlayInPluginActivated(pluginLocation, overlay.getOverlayClass(), true));
@@ -75,6 +76,7 @@ public class HEKPlugin extends OverlayPlugin implements Plugin {
      * A description is not needed here because this plug-in is activated always
      * and will not be visible in the corresponding dialogs.
      */
+    @Override
     public String getDescription() {
         return null;
     }
@@ -82,13 +84,14 @@ public class HEKPlugin extends OverlayPlugin implements Plugin {
     /**
      * {@inheritDoc}
      */
+    @Override
     public String getName() {
         return "HEK Overlay Plugin " + (builtin_mode ? "Built-In Version" : "");
     }
 
     /**
      * Wrapper around HEKEventPlugins functions.
-     * 
+     *
      * @see org.helioviewer.jhv.plugins.overlay.hek.plugin.HEKEventPlugin
      * @see org.helioviewer.jhv.plugins.overlay.hek.plugin.HEKEventPlugin#setCurInterval
      * @param newInterval
@@ -99,7 +102,7 @@ public class HEKPlugin extends OverlayPlugin implements Plugin {
 
     /**
      * Wrapper around HEKEventPlugins functions.
-     * 
+     *
      * @see org.helioviewer.jhv.plugins.overlay.hek.plugin.HEKEventPlugin
      * @see org.helioviewer.jhv.plugins.overlay.hek.plugin.HEKEventPlugin#getStructure
      * @param newInterval
@@ -114,9 +117,10 @@ public class HEKPlugin extends OverlayPlugin implements Plugin {
 
     /**
      * {@inheritDoc}
-     * 
+     *
      * null because this is an internal plugin
      */
+    @Override
     public String getAboutLicenseText() {
         String description = "";
         description += "<p>" + "The plugin uses the <a href=\"http://www.json.org/java/\">JSON in Java</a> Library, licensed under a <a href=\"http://www.json.org/license.html\">custom License</a>.";
@@ -133,6 +137,7 @@ public class HEKPlugin extends OverlayPlugin implements Plugin {
     /**
      * {@inheritDoc} In this case, does nothing.
      */
+    @Override
     public void setState(String state) {
         // TODO Implement setState for HEKPlugin
     }
@@ -140,6 +145,7 @@ public class HEKPlugin extends OverlayPlugin implements Plugin {
     /**
      * {@inheritDoc} In this case, does nothing.
      */
+    @Override
     public String getState() {
         // TODO Implement getState for HEKPlugin
         return "";

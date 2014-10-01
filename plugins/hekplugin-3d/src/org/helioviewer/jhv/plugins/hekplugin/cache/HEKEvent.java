@@ -1,6 +1,7 @@
 package org.helioviewer.jhv.plugins.hekplugin.cache;
 
 import java.awt.image.BufferedImage;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.List;
@@ -33,10 +34,11 @@ import org.poly2tri.triangulation.delaunay.DelaunayTriangle;
  * The class represents a solar event and manages all the associated
  * information. The current implementation is build around a
  * {@link org.json.JSONObject} object.
- * 
+ *
  * @author Malte Nuhn
  * */
 public class HEKEvent implements IntervalComparison<Date> {
+    private static final Calendar calendar = new GregorianCalendar();
 
     public class GenericTriangle<Coordinate> {
 
@@ -91,7 +93,7 @@ public class HEKEvent implements IntervalComparison<Date> {
     /**
      * Constructor for an event containing a minimum of information The
      * JSONObject will be empty.
-     * 
+     *
      * @param id
      *            - id of the new event
      * @param duration
@@ -116,7 +118,7 @@ public class HEKEvent implements IntervalComparison<Date> {
 
     /**
      * Get the id of the event.
-     * 
+     *
      * @return
      */
     public String getId() {
@@ -125,7 +127,7 @@ public class HEKEvent implements IntervalComparison<Date> {
 
     /**
      * Set the id of the event.
-     * 
+     *
      * @param id
      */
     public void setId(String id) {
@@ -134,7 +136,7 @@ public class HEKEvent implements IntervalComparison<Date> {
 
     /**
      * Get the duration of the event.
-     * 
+     *
      * @return
      */
     public Interval<Date> getDuration() {
@@ -143,7 +145,7 @@ public class HEKEvent implements IntervalComparison<Date> {
 
     /**
      * Set the duration of the event.
-     * 
+     *
      * @param duration
      */
     public void setDuration(Interval<Date> duration) {
@@ -152,7 +154,7 @@ public class HEKEvent implements IntervalComparison<Date> {
 
     /**
      * Returns the beginning of the solar event period.
-     * 
+     *
      * @return time stamp of the beginning of the solar event period.
      */
     public Date getStart() {
@@ -165,7 +167,7 @@ public class HEKEvent implements IntervalComparison<Date> {
 
     /**
      * Returns the end of the solar event period.
-     * 
+     *
      * @return time stamp of the end of the solar event period.
      */
     public Date getEnd() {
@@ -187,7 +189,7 @@ public class HEKEvent implements IntervalComparison<Date> {
     /**
      * Returns an array which contains all available field names of the solar
      * event.
-     * 
+     *
      * @return array with all available field names of the solar event.
      */
     public String[] getFields() {
@@ -196,7 +198,7 @@ public class HEKEvent implements IntervalComparison<Date> {
 
     /**
      * Returns the value of a property as String.
-     * 
+     *
      * @param key
      *            read the value from this property.
      * @return value of passed property, null if property does not exist
@@ -213,7 +215,7 @@ public class HEKEvent implements IntervalComparison<Date> {
 
     /**
      * Returns the value of a property as Boolean.
-     * 
+     *
      * @param key
      *            read the value from this property.
      * @return value of passed property, null if property does not exist
@@ -230,7 +232,7 @@ public class HEKEvent implements IntervalComparison<Date> {
 
     /**
      * Returns the value of a property as Double.
-     * 
+     *
      * @param key
      *            read the value from this property.
      * @return value of passed property.
@@ -246,7 +248,7 @@ public class HEKEvent implements IntervalComparison<Date> {
 
     /**
      * Returns all property names in alphabetic order
-     * 
+     *
      * @return property names.
      */
     private String[] getNames() {
@@ -258,6 +260,7 @@ public class HEKEvent implements IntervalComparison<Date> {
     /**
      * Do not change. Used as key for hashtables.
      */
+    @Override
     public String toString() {
         return this.id;
     }
@@ -265,6 +268,7 @@ public class HEKEvent implements IntervalComparison<Date> {
     /**
      * Check whether two events are equal
      */
+    @Override
     public boolean equals(Object other) {
         if (other instanceof HEKEvent) {
             HEKEvent sother = (HEKEvent) other;
@@ -275,81 +279,90 @@ public class HEKEvent implements IntervalComparison<Date> {
 
     /**
      * Wrapper method around the event's duration methods.
-     * 
+     *
      * @see org.helioviewer.base.math.Interval#contains
      */
+    @Override
     public boolean contains(Interval<Date> other) {
         return this.duration.contains(other);
     }
 
     /**
      * Wrapper method around the event's duration methods.
-     * 
+     *
      * @see org.helioviewer.base.math.Interval#containsFully
      */
+    @Override
     public boolean containsFully(Interval<Date> other) {
         return this.duration.containsFully(other);
     }
 
     /**
      * Wrapper method around the event's duration methods.
-     * 
+     *
      * @see org.helioviewer.base.math.Interval#containsInclusive
      */
+    @Override
     public boolean containsInclusive(Interval<Date> other) {
         return this.containsInclusive(other);
     }
 
     /**
      * Wrapper method around the event's duration methods.
-     * 
+     *
      * @see org.helioviewer.base.math.Interval#containsPoint
      */
+    @Override
     public boolean containsPoint(Date other) {
         return this.duration.containsPoint(other);
     }
 
     /**
      * Wrapper method around the event's duration methods.
-     * 
+     *
      * @see org.helioviewer.base.math.Interval#containsPointFully
      */
+    @Override
     public boolean containsPointFully(Date other) {
         return this.duration.containsPointFully(other);
     }
 
     /**
      * Wrapper method around the event's duration methods.
-     * 
+     *
      * @see org.helioviewer.base.math.Interval#containsPointInclusive
      */
+    @Override
     public boolean containsPointInclusive(Date other) {
         return this.duration.containsPointInclusive(other);
     }
 
     /**
      * Wrapper method around the event's duration methods.
-     * 
+     *
      * @see org.helioviewer.base.math.Interval#overlaps
      */
+    @Override
     public boolean overlaps(Interval<Date> other) {
         return this.duration.overlaps(other);
     }
 
     /**
      * Wrapper method around the event's duration methods.
-     * 
+     *
      * @see org.helioviewer.base.math.Interval#overlapsInclusive
      */
+    @Override
     public boolean overlapsInclusive(Interval<Date> other) {
         return this.duration.overlapsInclusive(other);
     }
 
     /**
      * Wrapper method around the event's duration methods.
-     * 
+     *
      * @see org.helioviewer.base.math.Interval#compareTo
      */
+    @Override
     public int compareTo(Interval<Date> arg0) {
         return this.duration.compareTo(arg0);
     }
@@ -358,7 +371,7 @@ public class HEKEvent implements IntervalComparison<Date> {
      * Exception class for exceptions which can occur inside the solar event
      * class. Exceptions which occurred from the internal structure of the solar
      * event class should be mapped to this exception class.
-     * 
+     *
      * @author Malte Nuhn
      */
     public class HEKEventException extends Exception {
@@ -369,7 +382,7 @@ public class HEKEvent implements IntervalComparison<Date> {
     /**
      * Return the event Coordinates in Heliocentric Stonyhurst coordinates. This
      * might need internal coordinate transformations.
-     * 
+     *
      * @param now
      *            - point in time for which the coordinates are needed (e.g. for
      *            tracking the event)
@@ -383,8 +396,10 @@ public class HEKEvent implements IntervalComparison<Date> {
 
         SphericalCoord result = new SphericalCoord();
         try {
-            result.phi = this.getDouble("hgs_x");
-            result.theta = this.getDouble("hgs_y");
+            calendar.setTime(new Date(this.getStart().getTime()));
+            result.phi = this.getDouble("hgs_x") + 30.0;//+ 180. / Math.PI * Astronomy.getL0Radians(new Date(this.getStart().getTime()));
+            result.theta = this.getDouble("hgs_y") - 180. / Math.PI * Astronomy.getB0InRadians(calendar);
+            ;
             result.r = Constants.SunRadius;
 
             // rotate
@@ -462,7 +477,7 @@ public class HEKEvent implements IntervalComparison<Date> {
      * Check whether the event is on the visible side of the sun Internally
      * requests the events Stonyhurst coordinates and checks if the angle PHI is
      * in the visible range.
-     * 
+     *
      * @see #getStony
      * @param now
      *            - point in time for which the coordinates are needed (e.g. for
@@ -478,7 +493,7 @@ public class HEKEvent implements IntervalComparison<Date> {
 
     /**
      * Request the screencoordinates of this event
-     * 
+     *
      * @param now
      *            - point in time for which the coordinates are needed (e.g. for
      *            tracking the event)
@@ -491,7 +506,7 @@ public class HEKEvent implements IntervalComparison<Date> {
 
     /**
      * Converts Stonyhurst coordinates to screencoordinates
-     * 
+     *
      * @param stony
      *            - coordinates (stonyhurst) to be converted
      * @param now
@@ -517,7 +532,7 @@ public class HEKEvent implements IntervalComparison<Date> {
     /**
      * Converts Stonyhurst coordinates to 3d scenecoordinates with a normalized
      * radius == 1
-     * 
+     *
      * @param stony
      *            - coordinates (stonyhurst) to be converted
      * @param now
@@ -530,11 +545,14 @@ public class HEKEvent implements IntervalComparison<Date> {
             return new Vector3dDouble(0, 0, 0);
 
         GregorianCalendar c = new GregorianCalendar();
-        c.setTime(now);
-        double bzero = Astronomy.getB0InDegree(c);
-        double phizero = 0.0; // do we have a value for this?
+        // c.setTime(getStart());
+
+        double bzero = -Astronomy.getB0InDegree(c);
+        double phizero = Astronomy.getL0Radians(c.getTime()) * 180. / Math.PI; // do we have a value for this?
         SphericalCoord normalizedStony = new SphericalCoord(stony);
         normalizedStony.r = Constants.SunRadius;
+        System.out.println(phizero);
+        System.out.println(c.getTime());
 
         CartesianCoord result = HEKCoordinateTransform.StonyhurstToHeliocentricCartesian(normalizedStony, bzero, phizero);
 
@@ -652,7 +670,7 @@ public class HEKEvent implements IntervalComparison<Date> {
     /**
      * Caluclates a triangulation once - for the original position. Then
      * interpolates this triangultion by moving the points
-     * 
+     *
      * @param now
      * @return
      */
