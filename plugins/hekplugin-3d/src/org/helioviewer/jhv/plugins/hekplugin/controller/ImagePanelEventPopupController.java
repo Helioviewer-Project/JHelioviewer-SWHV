@@ -5,24 +5,24 @@ import java.awt.Point;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
+import java.util.ArrayList;
 import java.util.Date;
-import java.util.Vector;
 
-import org.helioviewer.base.math.SphericalCoord;
-import org.helioviewer.base.math.Vector2dDouble;
 import org.helioviewer.base.math.Vector2dInt;
-import org.helioviewer.base.math.Vector3dDouble;
+import org.helioviewer.base.physics.Astronomy;
 import org.helioviewer.gl3d.scenegraph.GL3DState;
 import org.helioviewer.gl3d.scenegraph.math.GL3DVec3d;
 import org.helioviewer.gl3d.scenegraph.rt.GL3DRay;
 import org.helioviewer.gl3d.scenegraph.rt.GL3DRayTracer;
 import org.helioviewer.gl3d.view.GL3DComponentView;
 import org.helioviewer.gl3d.view.GL3DSceneGraphView;
+import org.helioviewer.jhv.data.datatype.JHVCoordinateSystem;
+import org.helioviewer.jhv.data.datatype.JHVEvent;
+import org.helioviewer.jhv.data.datatype.JHVPositionInformation;
 import org.helioviewer.jhv.gui.components.BasicImagePanel;
 import org.helioviewer.jhv.gui.interfaces.ImagePanelPlugin;
 import org.helioviewer.jhv.layers.LayersModel;
-import org.helioviewer.jhv.plugins.hekplugin.cache.HEKCache;
-import org.helioviewer.jhv.plugins.hekplugin.cache.HEKEvent;
+import org.helioviewer.jhv.plugins.hekplugin.cache.SWHVHEKData;
 import org.helioviewer.jhv.plugins.hekplugin.cache.gui.HEKEventInformationDialog;
 import org.helioviewer.viewmodel.changeevent.ChangeEvent;
 import org.helioviewer.viewmodel.changeevent.RegionChangedReason;
@@ -63,7 +63,7 @@ public class ImagePanelEventPopupController implements ImagePanelPlugin, MouseLi
 
     private BasicImagePanel imagePanel;
 
-    private HEKEvent mouseOverHEKEvent = null;
+    private JHVEvent mouseOverJHVEvent = null;
     private Point mouseOverPosition = null;
     private Cursor lastCursor;
     private HEKEventInformationDialog hekPopUp = new HEKEventInformationDialog();
@@ -168,8 +168,8 @@ public class ImagePanelEventPopupController implements ImagePanelPlugin, MouseLi
      */
     @Override
     public void mouseClicked(final MouseEvent e) {
-
-        if (mouseOverHEKEvent != null) {
+        System.out.println("CLICKED");
+        if (mouseOverJHVEvent != null) {
 
             // should never be the case
             if (hekPopUp == null) {
@@ -177,7 +177,7 @@ public class ImagePanelEventPopupController implements ImagePanelPlugin, MouseLi
             }
 
             hekPopUp.setVisible(false);
-            hekPopUp.setEvent(mouseOverHEKEvent);
+            hekPopUp.setEvent(mouseOverJHVEvent);
 
             Point windowPosition = calcWindowPosition(mouseOverPosition);
             hekPopUp.setLocation(windowPosition);
@@ -230,13 +230,13 @@ public class ImagePanelEventPopupController implements ImagePanelPlugin, MouseLi
     @Override
     public void mouseMoved(MouseEvent e) {
 
-        HEKEvent lastHEKEvent = mouseOverHEKEvent;
+        JHVEvent lastJHVEvent = mouseOverJHVEvent;
 
         Date currentDate = LayersModel.getSingletonInstance().getLastUpdatedTimestamp();
 
         state3D = false;
         GL3DVec3d hitpoint = null;
-        mouseOverHEKEvent = null;
+        mouseOverJHVEvent = null;
         mouseOverPosition = null;
         if (view instanceof GL3DComponentView && GL3DState.get() != null && GL3DState.get().getActiveCamera() != null) {
             state3D = true;
@@ -257,37 +257,52 @@ public class ImagePanelEventPopupController implements ImagePanelPlugin, MouseLi
         }
 
         if (currentDate != null) {
-            Vector<HEKEvent> toDraw = HEKCache.getSingletonInstance().getModel().getActiveEvents(currentDate);
+            ArrayList<JHVEvent> toDraw = SWHVHEKData.getSingletonInstance().getActiveEvents(currentDate);
 
-            for (HEKEvent evt : toDraw) {
+            for (JHVEvent evt : toDraw) {
                 if (state3D) {
-                    SphericalCoord stony = evt.getStony(currentDate);
-                    Vector3dDouble coords = HEKEvent.convertToSceneCoordinates(stony, currentDate);
-
-                    if (hitpoint != null) {
-                        double deltaX = Math.abs(hitpoint.x - coords.getX());
-                        double deltaY = Math.abs(hitpoint.y + coords.getY());
-                        double deltaZ = Math.abs(hitpoint.z - coords.getZ());
-                        if (deltaX < 10000000 && deltaZ < 10000000 && deltaY < 10000000) {
-                            mouseOverHEKEvent = evt;
-                            mouseOverPosition = new Point(e.getX(), e.getY());
+                    int i = 0;
+                    while (i < evt.getPositioningInformation().size() && evt.getPositioningInformation().get(i).getCoordinateSystem() != JHVCoordinateSystem.HGS) {
+                        i++;
+                    }
+                    if (i < evt.getPositioningInformation().size()) {
+                        JHVPositionInformation el = evt.getPositioningInformation().get(i);
+                        double theta = el.centralPoint().getCoordinate2() / 180. * Math.PI;// - Astronomy.getB0InRadians(new Date((evt.getStartDate().getTime() + evt.getEndDate().getTime()) / 2));
+                        double phi = el.centralPoint().getCoordinate1() / 180. * Math.PI - Astronomy.getL0Radians(new Date((evt.getStartDate().getTime() + evt.getEndDate().getTime()) / 2));
+                        double x = Math.cos(theta) * Math.sin(phi);
+                        double z = Math.cos(theta) * Math.cos(phi);
+                        double y = -Math.sin(theta);
+                        if (hitpoint != null) {
+                            double deltaX = Math.abs(hitpoint.x - x);
+                            double deltaY = Math.abs(hitpoint.y + y);
+                            double deltaZ = Math.abs(hitpoint.z - z);
+                            if (deltaX < 0.1 && deltaZ < 0.1 && deltaY < 0.1) {
+                                mouseOverJHVEvent = evt;
+                                mouseOverPosition = new Point(e.getX(), e.getY());
+                            }
                         }
                     }
                 } else {
-                    Vector2dDouble eventPos = evt.getScreenCoordinates(currentDate);
-                    Vector2dInt screenPos = convertPhysicalToScreen(eventPos.getX(), eventPos.getY());
-
-                    if (e.getPoint().getX() >= screenPos.getX() - 8 && e.getPoint().getX() <= screenPos.getX() + 8 && e.getPoint().getY() >= screenPos.getY() - 8 && e.getPoint().getY() <= screenPos.getY() + 8) {
-                        mouseOverHEKEvent = evt;
-                        mouseOverPosition = new Point(screenPos.getX(), screenPos.getY());
-                    }
+                    /*
+                     * Vector2dDouble eventPos =
+                     * evt.getScreenCoordinates(currentDate); Vector2dInt
+                     * screenPos = convertPhysicalToScreen(eventPos.getX(),
+                     * eventPos.getY());
+                     * 
+                     * if (e.getPoint().getX() >= screenPos.getX() - 8 &&
+                     * e.getPoint().getX() <= screenPos.getX() + 8 &&
+                     * e.getPoint().getY() >= screenPos.getY() - 8 &&
+                     * e.getPoint().getY() <= screenPos.getY() + 8) {
+                     * mouseOverJHVEvent = evt; mouseOverPosition = new
+                     * Point(screenPos.getX(), screenPos.getY()); }
+                     */
                 }
             }
 
-            if (lastHEKEvent == null && mouseOverHEKEvent != null) {
+            if (lastJHVEvent == null && mouseOverJHVEvent != null) {
                 lastCursor = imagePanel.getCursor();
                 imagePanel.setCursor(helpCursor);
-            } else if (lastHEKEvent != null && mouseOverHEKEvent == null) {
+            } else if (lastJHVEvent != null && mouseOverJHVEvent == null) {
                 imagePanel.setCursor(lastCursor);
             }
         }
@@ -307,15 +322,7 @@ public class ImagePanelEventPopupController implements ImagePanelPlugin, MouseLi
                         hekPopUp.setVisible(false);
                         return;
                     }
-                    Vector<HEKEvent> toDraw = HEKCache.getSingletonInstance().getModel().getActiveEvents(currentDate);
-                    if (!toDraw.contains(hekPopUp.getEvent())) {
-                        // hide popup
-                        hekPopUp.setVisible(false);
-                        // do not show event in the future anymore
-                        if (hekPopUp.getEvent() != null) {
-                            hekPopUp.getEvent().setShowEventInfo(false);
-                        }
-                    }
+
                 }
             }
         }
