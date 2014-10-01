@@ -5,9 +5,9 @@ import java.awt.Color;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
+import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JComponent;
-import javax.swing.JLabel;
 import javax.swing.JPanel;
 
 import org.helioviewer.jhv.plugins.swek.config.SWEKEventType;
@@ -81,7 +81,7 @@ public abstract class AbstractFilterPanel extends JPanel {
         setLayout(new BorderLayout());
         setOpaque(false);
         setBackground(Color.white);
-        add(new JLabel(parameter.getParameterDisplayName()), BorderLayout.PAGE_START);
+        setBorder(BorderFactory.createTitledBorder(parameter.getParameterDisplayName()));
         add(initFilterComponents(), BorderLayout.CENTER);
         JButton filter = new JButton("Filter");
         filter.addActionListener(new ActionListener() {
