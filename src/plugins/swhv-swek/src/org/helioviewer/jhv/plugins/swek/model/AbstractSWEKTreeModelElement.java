@@ -13,7 +13,7 @@ public abstract class AbstractSWEKTreeModelElement {
     private boolean checkboxSelected;
 
     /** The icon */
-    private ImageIcon icon;
+    private final ImageIcon icon;
 
     /**
      * Default constructor
@@ -27,10 +27,11 @@ public abstract class AbstractSWEKTreeModelElement {
      * Creates an Abstract SWEK Tree element with the checkbox selected or not.
      * 
      * @param isCheckBoxSelected
-     *            Is the checkbox selected.
+     *            Is the checkbox selected
      */
     public AbstractSWEKTreeModelElement(boolean isCheckBoxSelected) {
         checkboxSelected = isCheckBoxSelected;
+        icon = null;
     }
 
     /**

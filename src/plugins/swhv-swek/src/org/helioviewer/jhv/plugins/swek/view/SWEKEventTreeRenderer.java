@@ -48,7 +48,6 @@ public class SWEKEventTreeRenderer extends DefaultTreeCellRenderer {
         JCheckBox checkBox = new JCheckBox();
         checkBox.setSelected(((AbstractSWEKTreeModelElement) whatToDisplay).isCheckboxSelected());
         JPanel panel = new JPanel();
-        // panel.setPreferredSize(new Dimension(150, 30));
         panel.setLayout(new BorderLayout());
         panel.add(checkBox, BorderLayout.LINE_START);
         ImageIcon icon = ((AbstractSWEKTreeModelElement) whatToDisplay).getIcon();
@@ -62,7 +61,6 @@ public class SWEKEventTreeRenderer extends DefaultTreeCellRenderer {
         } else {
             panel.add(new JLabel(name), BorderLayout.CENTER);
         }
-        // panel.setBackground(Color.WHITE);
         panel.setOpaque(false);
         return panel;
     }
