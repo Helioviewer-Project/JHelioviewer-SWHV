@@ -18,7 +18,6 @@ import java.util.Date;
 
 import javax.swing.BorderFactory;
 import javax.swing.Icon;
-import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JDialog;
 import javax.swing.JEditorPane;
@@ -34,30 +33,29 @@ import javax.swing.event.HyperlinkEvent;
 import javax.swing.event.HyperlinkListener;
 
 import org.helioviewer.jhv.JHVGlobals;
+import org.helioviewer.jhv.data.datatype.JHVEvent;
 import org.helioviewer.jhv.gui.ButtonCreator;
 import org.helioviewer.jhv.gui.ClipBoardCopier;
 import org.helioviewer.jhv.gui.IconBank;
 import org.helioviewer.jhv.gui.IconBank.JHVIcon;
 import org.helioviewer.jhv.gui.TableColumnResizer;
 import org.helioviewer.jhv.layers.LayersModel;
-import org.helioviewer.jhv.plugins.hekplugin.cache.HEKEvent;
-import org.helioviewer.jhv.plugins.hekplugin.cache.HEKEventTableModel;
 import org.helioviewer.jhv.plugins.hekplugin.settings.HEKConstants;
 
 /**
  * Popup displaying informations about a HEK event.
- * 
+ *
  * <p>
  * This panel is a JDialog, so that it can be displayed on top of an GLCanvas,
  * which is not possible for other swing components.
- * 
+ *
  * <p>
  * For further informations about solar events, see
  * {@link org.helioviewer.jhv.solarevents}.
- * 
+ *
  * @author Markus Langenberg
  * @author Malte Nuhn
- * 
+ *
  */
 public class HEKEventInformationDialog extends JDialog implements ActionListener, MouseListener, HyperlinkListener {
 
@@ -68,57 +66,57 @@ public class HEKEventInformationDialog extends JDialog implements ActionListener
 
     private boolean isAdvanced = false;
 
-    private HEKEvent event;
+    private JHVEvent event;
 
     /**
      * EditorPane showing all hyperlinks available for the event
      */
-    private JEditorPane hyperLinkPanel = new JEditorPane("text/html", "");
+    private final JEditorPane hyperLinkPanel = new JEditorPane("text/html", "");
 
     /**
      * Label showing the event type in the summary of the event
      */
-    private JTextArea textType = new JTextArea("N/A");
+    private final JTextArea textType = new JTextArea("N/A");
 
     /**
      * Label showing the event type in the summary of the event
      */
-    private JTextArea textDescription = new JTextArea("N/A");
+    private final JTextArea textDescription = new JTextArea("N/A");
 
     /**
      * Label showing the event date in the summary of the event
      */
-    private JTextArea textDuration = new JTextArea("N/A");
+    private final JTextArea textDuration = new JTextArea("N/A");
 
     /**
      * Label showing the event coordinates in the summary of the event
      */
-    private JTextArea textCoordinates = new JTextArea("N/A");
+    private final JTextArea textCoordinates = new JTextArea("N/A");
 
     /**
      * Label showing the event ID in the summary of the event
      */
-    private JTextArea textID = new JTextArea("N/A");
+    private final JTextArea textID = new JTextArea("N/A");
 
     /**
      * Label showing the event icon in the summary of the event
      */
-    private JLabel labelIcon = new JLabel("");
+    private final JLabel labelIcon = new JLabel("");
 
     /**
      * Button for showing more/less information about the event
      */
-    private JButton moreButton = ButtonCreator.createTextButton(IconBank.getIcon(JHVIcon.SHOW_MORE), "More", "More Event Information", this);
+    private final JButton moreButton = ButtonCreator.createTextButton(IconBank.getIcon(JHVIcon.SHOW_MORE), "More", "More Event Information", this);
 
     /**
      * Table showing all event fields
      */
-    private JTable infoTable = new JTable();
+    private final JTable infoTable = new JTable();
 
     /**
      * ScrollPane containing the infoTable
      */
-    private JScrollPane informationScroller = new JScrollPane(infoTable);
+    private final JScrollPane informationScroller = new JScrollPane(infoTable);
 
     /**
      * Preloaded icon
@@ -168,18 +166,20 @@ public class HEKEventInformationDialog extends JDialog implements ActionListener
         this.setCursor(clickCursor);
         this.setMinimumSize(new Dimension(550, 50));
         this.addWindowListener(new WindowAdapter() {
+            @Override
             public void windowClosed(WindowEvent arg0) {
                 // store information to not display the event anymore
                 if (event != null) {
-                    event.setShowEventInfo(false);
+                    //event.setShowEventInfo(false);
                     event = null;
                 }
             }
 
+            @Override
             public void windowClosing(WindowEvent arg0) {
                 // store information to not display the event anymore
                 if (event != null) {
-                    event.setShowEventInfo(false);
+                    //event.setShowEventInfo(false);
                     event = null;
                 }
             }
@@ -357,10 +357,12 @@ public class HEKEventInformationDialog extends JDialog implements ActionListener
                 }
             }
 
+            @Override
             public void mousePressed(MouseEvent e) {
                 showPopup(e);
             }
 
+            @Override
             public void mouseReleased(MouseEvent e) {
                 showPopup(e);
             }
@@ -371,68 +373,29 @@ public class HEKEventInformationDialog extends JDialog implements ActionListener
 
     /**
      * Sets the corresponding solar event.
-     * 
+     *
      * @param newEvent
      *            Corresponding solar event
      */
-    public void setEvent(HEKEvent newEvent) {
+    public void setEvent(JHVEvent newEvent) {
 
         if (event == newEvent || newEvent == null)
             return;
 
         // the old event is no longer displayed
-        if (event != null) {
-            event.setShowEventInfo(false);
-        }
 
         event = newEvent;
 
         // mark the new event as currently being displayed
-        event.setShowEventInfo(true);
-        infoTable.setModel(new HEKEventTableModel(event));
         infoTable.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
         TableColumnResizer.autoResizeTable(infoTable, true);
 
         Date currentDate = LayersModel.getSingletonInstance().getLastUpdatedTimestamp();
 
-        if (currentDate == null && event.getDuration() != null) {
-            currentDate = event.getDuration().getStart();
-        }
-
-        String typeAcronym = event.getString("event_type");
+        String typeAcronym = event.getName();
         String type = HEKConstants.getSingletonInstance().acronymToString(typeAcronym);
-        String description = event.getString("event_description");
 
-        labelIcon.setIcon(new ImageIcon(event.getIcon(true)));
         textType.setText(type);
-
-        // trim away the redundant information
-        String id = event.getId();
-
-        if (id.startsWith("ivo://helio-informatics.org/")) {
-            id = id.substring(28);
-        }
-
-        textID.setText(id);
-
-        // Nasty Workaround to have Radius Unit "m" available
-        if (currentDate != null) {
-            textCoordinates.setText(event.getStony(currentDate).toString() + "m");
-        } else {
-            textCoordinates.setText("?");
-        }
-
-        if (event.getDuration() != null) {
-            textDuration.setText(event.getDuration().getStart() + " - " + event.getDuration().getEnd());
-        } else {
-            textDuration.setText("?");
-        }
-
-        if (description.equals("")) {
-            textDescription.setText("No Description Available");
-        } else {
-            textDescription.setText(description);
-        }
 
         // build a short summary of all containing links to websites
         StringBuffer htmlLinks = new StringBuffer("<html>");
@@ -441,20 +404,21 @@ public class HEKEventInformationDialog extends JDialog implements ActionListener
         htmlLinks.append("<font style=\"font-family: '" + font.getFamily() + "'; font-size: " + font.getSize() + ";\">");
 
         // add a link to the HEK summary page
-        String archivid = newEvent.getString("kb_archivid");
+        //String archivid = newEvent.getString("kb_archivid");
 
-        if (archivid != null) {
-            htmlLinks.append("<a href=\"").append(HEKConstants.HEK_SUMMARY_URL + archivid).append("\"> ").append("HEK Summary Page").append("</a>, ");
-        }
+        //if (archivid != null) {
+        //    htmlLinks.append("<a href=\"").append(HEKConstants.HEK_SUMMARY_URL + archivid).append("\"> ").append("HEK Summary Page").append("</a>, ");
+        //}
 
         // add all other links that can be found
-        for (String fieldName : newEvent.getFields()) {
-            String currentField = newEvent.getString(fieldName);
-            if (currentField.toLowerCase().startsWith("http://")) {
-                htmlLinks.append("<a href=\"").append(currentField).append("\"> ").append(fieldName).append("</a>, ");
-            }
-        }
-
+        /*
+         * for (String fieldName : newEvent.getFields()) { String currentField =
+         * newEvent.getString(fieldName); if
+         * (currentField.toLowerCase().startsWith("http://")) {
+         * htmlLinks.append(
+         * "<a href=\"").append(currentField).append("\"> ").append
+         * (fieldName).append("</a>, "); } }
+         */
         // remove last ","
         if (htmlLinks.toString().contains(", ")) {
             htmlLinks.deleteCharAt(htmlLinks.lastIndexOf(", "));
@@ -470,7 +434,7 @@ public class HEKEventInformationDialog extends JDialog implements ActionListener
 
     /**
      * Expand the window to show more details
-     * 
+     *
      * @param advanced
      */
     private void setAdvanced(boolean advanced) {
@@ -483,6 +447,7 @@ public class HEKEventInformationDialog extends JDialog implements ActionListener
     /**
      * {@inheritDoc}
      */
+    @Override
     public void actionPerformed(ActionEvent e) {
 
         // did we get a click from "copyXXXtoClipboard"?
@@ -534,6 +499,7 @@ public class HEKEventInformationDialog extends JDialog implements ActionListener
     /**
      * {@inheritDoc}
      */
+    @Override
     public void hyperlinkUpdate(HyperlinkEvent e) {
         if (e.getEventType() == HyperlinkEvent.EventType.ENTERED) {
             setCursor(clickCursor);
@@ -547,12 +513,14 @@ public class HEKEventInformationDialog extends JDialog implements ActionListener
     /**
      * {@inheritDoc}
      */
+    @Override
     public void mouseClicked(MouseEvent e) {
     }
 
     /**
      * {@inheritDoc}
      */
+    @Override
     public void mouseEntered(MouseEvent e) {
         setCursor(clickCursor);
     }
@@ -560,6 +528,7 @@ public class HEKEventInformationDialog extends JDialog implements ActionListener
     /**
      * {@inheritDoc}
      */
+    @Override
     public void mouseExited(MouseEvent e) {
         setCursor(defaultCursor);
     }
@@ -567,16 +536,18 @@ public class HEKEventInformationDialog extends JDialog implements ActionListener
     /**
      * {@inheritDoc}
      */
+    @Override
     public void mousePressed(MouseEvent e) {
     }
 
     /**
      * {@inheritDoc}
      */
+    @Override
     public void mouseReleased(MouseEvent e) {
     }
 
-    public HEKEvent getEvent() {
+    public JHVEvent getEvent() {
         return event;
     }
 
