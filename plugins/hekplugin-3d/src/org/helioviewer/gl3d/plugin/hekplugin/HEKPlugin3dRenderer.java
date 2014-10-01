@@ -8,6 +8,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Vector;
 
+import javax.media.opengl.GL2;
 import javax.swing.ImageIcon;
 
 import org.helioviewer.base.logging.Log;
@@ -68,11 +69,12 @@ public class HEKPlugin3dRenderer extends PhysicalRenderer3d {
         while (i < evt.getPositioningInformation().size() && evt.getPositioningInformation().get(i).getCoordinateSystem() != JHVCoordinateSystem.HGS) {
             i++;
         }
+        GL2 gl = g.getGL();
         List<JHVPoint> points = evt.getPositioningInformation().get(i).getBoundBox();
         String type = evt.getName();
         Color eventColor = evt.getColor();
 
-        Vector<HEKEvent.GenericTriangle<Vector3dDouble>> triangles = null;//evt.getTriangulation3D(now);
+        Vector<HEKEvent.GenericTriangle<Vector3dDouble>> triangles = null;
 
         if (triangles != null) {
             g.setColor(eventColor);
@@ -83,44 +85,44 @@ public class HEKPlugin3dRenderer extends PhysicalRenderer3d {
         }
 
         // draw bounds
-        g.setColor(new Color(255, 255, 255, 255));
+        g.setColor(evt.getColor());
         Vector3dDouble oldBoundaryPoint3d = null;
 
         for (JHVPoint point : points) {
             double theta = point.getCoordinate2() / 180. * Math.PI;// - Astronomy.getB0InRadians(new Date((evt.getStartDate().getTime() + evt.getEndDate().getTime()) / 2));
             double phi = point.getCoordinate1() / 180. * Math.PI - Astronomy.getL0Radians(new Date((evt.getStartDate().getTime() + evt.getEndDate().getTime()) / 2));
 
-            //System.out.println(el.centralPoint().getCoordinate1() + " " + el.centralPoint().getCoordinate2());
             double x = Math.cos(theta) * Math.sin(phi);
             double z = Math.cos(theta) * Math.cos(phi);
             double y = -Math.sin(theta);
             Vector3dDouble boundaryPoint3d = new Vector3dDouble(x, y, z);
             int divpoints = 10;
-            double xold, yold, zold;
-            xold = -2;
-            yold = 0;
-            zold = 0;
+            gl.glDisable(GL2.GL_TEXTURE_2D);
+            gl.glEnable(GL2.GL_LINE_SMOOTH);
+            gl.glLineWidth(0.5f);
+            gl.glBegin(GL2.GL_LINE_STRIP);
             if (oldBoundaryPoint3d != null) {
                 for (int j = 0; j <= divpoints; j++) {
                     double alpha = 1. - 1. * j / divpoints;
                     double xnew = alpha * oldBoundaryPoint3d.getX() + (1 - alpha) * boundaryPoint3d.getX();
                     double ynew = alpha * oldBoundaryPoint3d.getY() + (1 - alpha) * boundaryPoint3d.getY();
                     double znew = alpha * oldBoundaryPoint3d.getZ() + (1 - alpha) * boundaryPoint3d.getZ();
-                    double r = Math.sqrt(x * x + y * y + z * z);
-                    xnew = 1.01 * xnew / r;
-                    ynew = 1.01 * ynew / r;
-                    znew = 1.01 * znew / r;
-                    if (xold != -2) {
-                        g.drawLine3d(xold, yold, zold, xnew, ynew, znew);
-                    }
-                    xold = xnew;
-                    yold = ynew;
-                    zold = znew;
+                    double r = Math.sqrt(xnew * xnew + ynew * ynew + znew * znew);
+                    xnew = xnew / r;
+                    ynew = ynew / r;
+                    znew = znew / r;
+                    //System.out.println(xnew * xnew + ynew * ynew + znew * znew);
+
+                    gl.glVertex3d(xnew, -ynew, znew);
+
+                    //g.drawLine3d(xold, yold, zold, xnew, ynew, znew);
                 }
 
             }
             //if (oldBoundaryPoint3d != null)
             //    g.drawLine3d(oldBoundaryPoint3d.getX(), oldBoundaryPoint3d.getY(), oldBoundaryPoint3d.getZ(), boundaryPoint3d.getX(), boundaryPoint3d.getY(), boundaryPoint3d.getZ());
+            gl.glEnd();
+            gl.glDisable(GL2.GL_LINE_SMOOTH);
 
             oldBoundaryPoint3d = boundaryPoint3d;
         }
@@ -143,7 +145,6 @@ public class HEKPlugin3dRenderer extends PhysicalRenderer3d {
         Graphics graph = bi.createGraphics();
         icon.paintIcon(null, graph, 0, 0);
         graph.dispose();
-        //SphericalCoord stony = evt.getStony(now);
         int i = 0;
         while (i < evt.getPositioningInformation().size() && evt.getPositioningInformation().get(i).getCoordinateSystem() != JHVCoordinateSystem.HGS) {
             i++;
@@ -152,8 +153,6 @@ public class HEKPlugin3dRenderer extends PhysicalRenderer3d {
             JHVPositionInformation el = evt.getPositioningInformation().get(i);
             double theta = el.centralPoint().getCoordinate2() / 180. * Math.PI;// - Astronomy.getB0InRadians(new Date((evt.getStartDate().getTime() + evt.getEndDate().getTime()) / 2));
             double phi = el.centralPoint().getCoordinate1() / 180. * Math.PI - Astronomy.getL0Radians(new Date((evt.getStartDate().getTime() + evt.getEndDate().getTime()) / 2));
-
-            //System.out.println(el.centralPoint().getCoordinate1() + " " + el.centralPoint().getCoordinate2());
             double x = Math.cos(theta) * Math.sin(phi);
             double z = Math.cos(theta) * Math.cos(phi);
             double y = -Math.sin(theta);
