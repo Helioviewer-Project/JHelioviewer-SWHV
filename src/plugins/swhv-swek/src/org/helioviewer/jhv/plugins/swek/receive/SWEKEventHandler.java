@@ -6,7 +6,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.NavigableMap;
 
-import org.helioviewer.base.logging.Log;
 import org.helioviewer.jhv.data.container.JHVEventHandler;
 import org.helioviewer.jhv.data.datatype.JHVEvent;
 
@@ -58,26 +57,11 @@ public class SWEKEventHandler implements JHVEventHandler {
 
     @Override
     public void newEventsReceived(Map<String, NavigableMap<Date, NavigableMap<Date, List<JHVEvent>>>> eventList) {
-        Log.info("New events received.");
-        /*
-         * for (JHVEvent event : eventList) { Log.info(event.getName() + " " +
-         * event.getDisplayName() + " " + event.getStartDate() + "-" +
-         * event.getEndDate()); }
-         */
-        for (String eventType : eventList.keySet()) {
-            for (Date sDate : eventList.get(eventType).keySet()) {
-                for (Date eDate : eventList.get(eventType).get(sDate).keySet()) {
-                    for (JHVEvent event : eventList.get(eventType).get(sDate).get(eDate)) {
-                        Log.info(event.getName() + " " + event.getDisplayName() + " " + event.getStartDate() + "-" + event.getEndDate());
-                    }
-                }
-            }
-        }
     }
 
     @Override
     public void cacheUpdated() {
-        Log.info("New Cache update received");
+
     }
 
 }

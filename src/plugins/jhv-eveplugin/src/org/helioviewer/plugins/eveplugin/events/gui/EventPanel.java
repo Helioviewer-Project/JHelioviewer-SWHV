@@ -31,7 +31,6 @@ public class EventPanel implements DrawableElement {
     @Override
     public void draw(Graphics g, Rectangle graphArea) {
         long start = System.currentTimeMillis();
-        Thread.dumpStack();
         if (EventModel.getSingletonInstance().isEventsVisible()) {
             EventTypePlotConfiguration etpc = EventModel.getSingletonInstance().getEventTypePlotConfiguration();
             Map<String, List<EventPlotConfiguration>> epcs = etpc.getEventPlotConfigurations();

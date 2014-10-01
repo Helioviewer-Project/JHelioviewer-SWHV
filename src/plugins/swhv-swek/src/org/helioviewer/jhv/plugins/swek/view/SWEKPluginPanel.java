@@ -11,7 +11,6 @@ import javax.swing.BoxLayout;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 
-import org.helioviewer.base.logging.Log;
 import org.helioviewer.jhv.plugins.swek.config.SWEKConfigurationManager;
 import org.helioviewer.jhv.plugins.swek.config.SWEKEventType;
 import org.helioviewer.jhv.plugins.swek.model.SWEKTreeModel;
@@ -39,9 +38,9 @@ public class SWEKPluginPanel extends OverlayPanel implements SWEKTreeModelListen
     private final SWEKTreeModel treeModelInstance;
 
     private SWEKPluginPanel() {
-        this.configManager = SWEKConfigurationManager.getSingletonInstance();
-        this.treeModelInstance = SWEKTreeModel.getSingletonInstance();
-        this.treeModelInstance.addSWEKTreeModelListener(this);
+        configManager = SWEKConfigurationManager.getSingletonInstance();
+        treeModelInstance = SWEKTreeModel.getSingletonInstance();
+        treeModelInstance.addSWEKTreeModelListener(this);
         initVisualComponents();
         this.revalidate();
         this.repaint();
@@ -57,7 +56,7 @@ public class SWEKPluginPanel extends OverlayPanel implements SWEKTreeModelListen
         JPanel eventTypePanel = new JPanel();
         BoxLayout boxLayout = new BoxLayout(eventTypePanel, BoxLayout.Y_AXIS);
         eventTypePanel.setLayout(boxLayout);
-        for (SWEKEventType eventType : this.configManager.getEventTypes().values()) {
+        for (SWEKEventType eventType : configManager.getEventTypes().values()) {
             EventPanel eventPanel = new EventPanel(eventType);
             eventPanel.setAlignmentX(Component.LEFT_ALIGNMENT);
             eventTypePanel.add(eventPanel);
@@ -80,7 +79,6 @@ public class SWEKPluginPanel extends OverlayPanel implements SWEKTreeModelListen
 
     @Override
     public void expansionChanged() {
-        Log.debug("revalidate and repaint");
         super.revalidate();
         super.repaint();
     }
