@@ -95,6 +95,7 @@ public class DoubleMinMaxFilterPanel extends AbstractFilterPanel {
         GridBagConstraints c = new GridBagConstraints();
         c.gridx = 0;
         c.gridy = 0;
+        c.weightx = 0.5;
         p.add(new JLabel("Minimum Value:"), c);
         c.gridx = 1;
         p.add(minimumValueSpinner, c);
