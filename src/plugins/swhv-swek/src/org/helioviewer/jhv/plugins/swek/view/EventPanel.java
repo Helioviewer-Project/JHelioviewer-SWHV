@@ -1,12 +1,13 @@
 package org.helioviewer.jhv.plugins.swek.view;
 
 import java.awt.BorderLayout;
-import java.awt.Color;
-import java.awt.GridLayout;
+import java.awt.Point;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
-import java.util.List;
 
+import javax.swing.JButton;
 import javax.swing.JPanel;
 import javax.swing.JTree;
 
@@ -14,8 +15,6 @@ import org.helioviewer.jhv.plugins.swek.config.SWEKEventType;
 import org.helioviewer.jhv.plugins.swek.download.SWEKDownloadManager;
 import org.helioviewer.jhv.plugins.swek.model.EventTypePanelModel;
 import org.helioviewer.jhv.plugins.swek.model.SWEKTreeModelEventType;
-import org.helioviewer.jhv.plugins.swek.view.filter.AbstractFilterPanel;
-import org.helioviewer.jhv.plugins.swek.view.filter.FilterPanelFactory;
 
 /**
  * Panel display one event type
@@ -62,15 +61,45 @@ public class EventPanel extends JPanel implements MouseListener {
         eventTypeTree.addTreeExpansionListener(eventPanelModel);
         eventTypeTree.setCellRenderer(new SWEKEventTreeRenderer());
         add(eventTypeTree, BorderLayout.CENTER);
-        List<AbstractFilterPanel> filterPanels = FilterPanelFactory.createFilterPanel(eventType);
-        JPanel filterPanel = new JPanel();
-        filterPanel.setLayout(new GridLayout(filterPanels.size(), 1));
-        filterPanel.setOpaque(false);
-        filterPanel.setBackground(Color.white);
-        for (AbstractFilterPanel afp : filterPanels) {
-            filterPanel.add(afp);
+        final FilterDialog filterDialog = new FilterDialog(eventType);
+
+        if (eventType.containsFilter()) {
+            JButton filterButton = new JButton("Filter");
+            filterButton.addActionListener(new ActionListener() {
+
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    filterDialog.setVisible(true);
+                }
+            });
+            filterButton.addMouseListener(new MouseListener() {
+
+                @Override
+                public void mouseReleased(MouseEvent arg0) {
+                }
+
+                @Override
+                public void mousePressed(MouseEvent arg0) {
+                    Point pressedLocation = arg0.getLocationOnScreen();
+                    Point windowLocation = new Point(pressedLocation.x, pressedLocation.y - filterDialog.getSize().height);
+                    filterDialog.setLocation(windowLocation);
+                }
+
+                @Override
+                public void mouseExited(MouseEvent arg0) {
+                }
+
+                @Override
+                public void mouseEntered(MouseEvent arg0) {
+                }
+
+                @Override
+                public void mouseClicked(MouseEvent arg0) {
+                }
+            });
+
+            add(filterButton, BorderLayout.PAGE_END);
         }
-        add(filterPanel, BorderLayout.PAGE_END);
     }
 
     @Override
