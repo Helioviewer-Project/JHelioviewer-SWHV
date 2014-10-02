@@ -11,7 +11,6 @@ import javax.media.opengl.GL2;
 import org.helioviewer.base.FileUtils;
 import org.helioviewer.base.logging.Log;
 import org.helioviewer.base.physics.Constants;
-import org.helioviewer.gl3d.scenegraph.GL3DDrawBits.Bit;
 import org.helioviewer.gl3d.scenegraph.GL3DGroup;
 import org.helioviewer.gl3d.scenegraph.GL3DState;
 import org.helioviewer.gl3d.scenegraph.math.GL3DMat4d;
@@ -22,8 +21,8 @@ import org.helioviewer.gl3d.scenegraph.math.GL3DVec4f;
 import com.jogamp.opengl.util.awt.TextRenderer;
 
 public class GL3DGrid extends GL3DGroup {
-    private final int xticks;
-    private final int yticks;
+    private final int lonstepDegrees;
+    private final int latstepDegrees;
     private final GL3DVec4f color;
     private final GL3DVec4d textColor;
     private final int lineres = 120;
@@ -32,10 +31,10 @@ public class GL3DGrid extends GL3DGroup {
     private TextRenderer renderer;
     private final int fontsize = 20;
 
-    public GL3DGrid(String name, int xticks, int yticks, GL3DVec4f color, GL3DVec4d textColor) {
+    public GL3DGrid(String name, int lonstepDegrees, int latstepDegrees, GL3DVec4f color, GL3DVec4d textColor) {
         super(name);
-        this.xticks = xticks;
-        this.yticks = yticks;
+        this.lonstepDegrees = lonstepDegrees;
+        this.latstepDegrees = latstepDegrees;
         this.color = color;
         this.textColor = textColor;
         InputStream is = FileUtils.getResourceInputStream("/fonts/DroidSans-Bold.ttf");
@@ -53,12 +52,6 @@ public class GL3DGrid extends GL3DGroup {
         renderer = new TextRenderer(font, false, true);//, new CustomRenderDelegate(0, Color.WHITE));
         renderer.setUseVertexArrays(true);
         renderer.getSmoothing();
-    }
-
-    private void loadGrid() {
-        GL3DSphere sphere = new GL3DSphere(Constants.SunRadius * 1.02, this.xticks, this.yticks, this.color);
-        sphere.getDrawBits().on(Bit.Wireframe);
-        this.addNode(sphere);
     }
 
     @Override
@@ -82,7 +75,9 @@ public class GL3DGrid extends GL3DGroup {
         state.gl.glColor3d(1., 1., 0.);
         GL2 gl = state.gl;
         super.shapeDraw(state);
-        float cfontsize = (float) (this.fontsize + (state.getActiveCamera().getZTranslation() + 15.) / 3.);
+        System.out.println("st " + state.getViewportHeight() + " " + state.getActiveCamera().getZTranslation());
+        float relhi = (float) ((-state.getActiveCamera().getZTranslation() - 1) / 10.f);
+        float cfontsize = this.fontsize / relhi;
         cfontsize = cfontsize < 10.f ? 10.f : cfontsize;
         font = font.deriveFont(cfontsize);
         renderer = new TextRenderer(font, false, true);
@@ -94,13 +89,15 @@ public class GL3DGrid extends GL3DGroup {
     }
 
     private void drawCircles(GL2 gl) {
-
+        //latitude positive
         gl.glLineWidth(0.5f);
         gl.glBlendFunc(GL2.GL_SRC_ALPHA, GL2.GL_ONE_MINUS_SRC_ALPHA);
         gl.glColor3f(1f, .0f, .0f);
         gl.glDisable(GL2.GL_LIGHTING);
-        for (int j = 0; j <= this.xticks; j++) {
-            double phi = j * Math.PI / this.xticks;
+        double phi = Math.PI / 2.;
+        double latstep = latstepDegrees / 180. * Math.PI;
+        for (; phi < Math.PI; phi = phi + latstep) {
+            //+ j * Math.PI / this.xticks;
             gl.glBegin(GL2.GL_LINE_LOOP);
             for (int i = 0; i <= lineres; i++) {
                 if (i % 2 == 0) {
@@ -114,8 +111,28 @@ public class GL3DGrid extends GL3DGroup {
             }
             gl.glEnd();
         }
-        for (int j = 0; j <= this.yticks; j++) {
-            double theta = 2 * j * Math.PI / this.yticks;
+        //latitude negative
+        phi = Math.PI / 2. - latstep;
+        for (; phi > 0.; phi = phi - latstep) {
+            //+ j * Math.PI / this.xticks;
+            gl.glBegin(GL2.GL_LINE_LOOP);
+            for (int i = 0; i <= lineres; i++) {
+                if (i % 2 == 0) {
+                    gl.glColor3f(0.f, 1.0f, .0f);
+
+                } else {
+                    gl.glColor3f(1f, .0f, .0f);
+                }
+                double theta = 2 * i * Math.PI / lineres;
+                gl.glVertex3d(Math.sin(theta) * Math.sin(phi), Math.cos(phi), Math.cos(theta) * Math.sin(phi));
+            }
+            gl.glEnd();
+        }
+
+        //longitude positive
+        double theta = 0.;
+        double lonstep = lonstepDegrees / 180. * Math.PI;
+        for (; theta <= Math.PI; theta = theta + lonstep) {
             gl.glBegin(GL2.GL_LINE_STRIP);
             for (int i = 0; i <= lineres; i++) {
                 if (i % 2 == 0) {
@@ -124,7 +141,23 @@ public class GL3DGrid extends GL3DGroup {
                 } else {
                     gl.glColor3f(1f, .0f, .0f);
                 }
-                double phi = i * Math.PI / lineres;
+                phi = i * Math.PI / lineres;
+                gl.glVertex3d(Math.sin(theta) * Math.sin(phi), Math.cos(phi), Math.cos(theta) * Math.sin(phi));
+            }
+            gl.glEnd();
+        }
+
+        //longitude negative
+        theta = -lonstep;
+        for (; theta >= -Math.PI; theta = theta - lonstep) {
+            gl.glBegin(GL2.GL_LINE_STRIP);
+            for (int i = 0; i <= lineres; i++) {
+                if (i % 2 == 0) {
+                    gl.glColor3f(0.f, 1.0f, .0f);
+                } else {
+                    gl.glColor3f(1f, .0f, .0f);
+                }
+                phi = i * Math.PI / lineres;
                 gl.glVertex3d(Math.sin(theta) * Math.sin(phi), Math.cos(phi), Math.cos(theta) * Math.sin(phi));
             }
             gl.glEnd();
@@ -136,23 +169,46 @@ public class GL3DGrid extends GL3DGroup {
         double zdist = 0.0;
         renderer.setColor(Color.WHITE);
         renderer.begin3DRendering();
-        for (int i = 1; i < this.xticks; i++) {
-            double angle = i * Math.PI / this.xticks;
-            String txt = "" + (int) (90 - 1.0 * i / this.xticks * 180);
+        for (int phi = 0; phi <= 90; phi = phi + this.latstepDegrees) {
+            double angle = (90 - phi) * Math.PI / 180.;
+            String txt = "" + (phi);
+
             renderer.draw3D(txt, (float) (Math.sin(angle) * size), (float) (Math.cos(angle) * size - scale * 0.02f * 20. / font.getSize()), (float) zdist, scale * 0.08f / font.getSize());
-            renderer.draw3D(txt, (float) (-Math.sin(angle) * size - scale * 0.03f * txt.length() * 20. / font.getSize()), (float) (Math.cos(angle) * size - scale * 0.02f * 20. / font.getSize()), (float) zdist, scale * 0.08f / font.getSize());
+            if (phi != 90) {
+                renderer.draw3D(txt, (float) (-Math.sin(angle) * size - scale * 0.03f * txt.length() * 20. / font.getSize()), (float) (Math.cos(angle) * size - scale * 0.02f * 20. / font.getSize()), (float) zdist, scale * 0.08f / font.getSize());
+            }
+        }
+        for (int phi = -this.latstepDegrees; phi >= -90; phi = phi - this.latstepDegrees) {
+            double angle = (90 - phi) * Math.PI / 180.;
+            String txt = "" + (phi);
+            renderer.draw3D(txt, (float) (Math.sin(angle) * size), (float) (Math.cos(angle) * size - scale * 0.02f * 20. / font.getSize()), (float) zdist, scale * 0.08f / font.getSize());
+            if (phi != -90) {
+                renderer.draw3D(txt, (float) (-Math.sin(angle) * size - scale * 0.03f * txt.length() * 20. / font.getSize()), (float) (Math.cos(angle) * size - scale * 0.02f * 20. / font.getSize()), (float) zdist, scale * 0.08f / font.getSize());
+            }
         }
         renderer.end3DRendering();
 
         size = Constants.SunRadius * 1.02;
 
-        for (int i = 1; i < this.yticks; i++) {
-            String txt = "" + (int) (90 - 1.0 * i / (this.yticks / 2.0) * 180);
-            double angle = i * Math.PI / (this.yticks / 2.0);
+        for (int theta = 0; theta <= 180; theta = theta + this.lonstepDegrees) {
+            String txt = "" + (theta);
+            double angle = (90 - theta) * Math.PI / 180.;
             renderer.begin3DRendering();
             gl.glPushMatrix();
             gl.glTranslatef((float) (Math.cos(angle) * size), 0f, (float) (Math.sin(angle) * size));
-            gl.glRotated(90 - angle / Math.PI * 180., 0.f, 1.f, 0.f);
+            gl.glRotated(theta, 0.f, 1.f, 0.f);
+            renderer.draw3D(txt, 0.f, 0f, 0.f, scale * 0.08f / font.getSize());
+            renderer.flush();
+            renderer.end3DRendering();
+            gl.glPopMatrix();
+        }
+        for (int theta = -this.lonstepDegrees; theta > -180.; theta = theta - this.lonstepDegrees) {
+            String txt = "" + (theta);
+            double angle = (90 - theta) * Math.PI / 180.;
+            renderer.begin3DRendering();
+            gl.glPushMatrix();
+            gl.glTranslatef((float) (Math.cos(angle) * size), 0f, (float) (Math.sin(angle) * size));
+            gl.glRotated(theta, 0.f, 1.f, 0.f);
             renderer.draw3D(txt, 0.f, 0f, 0.f, scale * 0.08f / font.getSize());
             renderer.flush();
             renderer.end3DRendering();
