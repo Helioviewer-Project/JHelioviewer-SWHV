@@ -381,11 +381,8 @@ public class HEKEventInformationDialog extends JDialog implements ActionListener
         if (event == newEvent || newEvent == null)
             return;
 
-        // the old event is no longer displayed
-
         event = newEvent;
 
-        // mark the new event as currently being displayed
         infoTable.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
         TableColumnResizer.autoResizeTable(infoTable, true);
 
@@ -396,29 +393,11 @@ public class HEKEventInformationDialog extends JDialog implements ActionListener
 
         textType.setText(type);
 
-        // build a short summary of all containing links to websites
         StringBuffer htmlLinks = new StringBuffer("<html>");
 
         Font font = hyperLinkPanel.getFont();
         htmlLinks.append("<font style=\"font-family: '" + font.getFamily() + "'; font-size: " + font.getSize() + ";\">");
 
-        // add a link to the HEK summary page
-        //String archivid = newEvent.getString("kb_archivid");
-
-        //if (archivid != null) {
-        //    htmlLinks.append("<a href=\"").append(HEKConstants.HEK_SUMMARY_URL + archivid).append("\"> ").append("HEK Summary Page").append("</a>, ");
-        //}
-
-        // add all other links that can be found
-        /*
-         * for (String fieldName : newEvent.getFields()) { String currentField =
-         * newEvent.getString(fieldName); if
-         * (currentField.toLowerCase().startsWith("http://")) {
-         * htmlLinks.append(
-         * "<a href=\"").append(currentField).append("\"> ").append
-         * (fieldName).append("</a>, "); } }
-         */
-        // remove last ","
         if (htmlLinks.toString().contains(", ")) {
             htmlLinks.deleteCharAt(htmlLinks.lastIndexOf(", "));
         }
@@ -449,13 +428,11 @@ public class HEKEventInformationDialog extends JDialog implements ActionListener
     @Override
     public void actionPerformed(ActionEvent e) {
 
-        // did we get a click from "copyXXXtoClipboard"?
         if (e.getSource() == copyNameToClipboardMenuItem || e.getSource() == copyBothToClipboardMenuItem || e.getSource() == copyValueToClipboardMenuItem) {
 
             boolean saveName = (e.getSource() == copyNameToClipboardMenuItem || e.getSource() == copyBothToClipboardMenuItem);
             boolean saveValue = (e.getSource() == copyValueToClipboardMenuItem || e.getSource() == copyBothToClipboardMenuItem);
 
-            // build a list of selected strings
             StringBuffer cellStringBuffer = new StringBuffer();
 
             for (int currentRow : infoTable.getSelectedRows()) {
