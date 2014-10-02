@@ -51,11 +51,16 @@ public abstract class GL3DCameraOptionPanel extends JPanel implements ActionList
         this.createGridResolutionX();
         this.createGridResolutionY();
 
-        this.gridResolutionXSpinner.setMaximumSize(new Dimension(6, 22));
+        this.gridResolutionXSpinner.setMinimumSize(new Dimension(42, 20));
+        this.gridResolutionXSpinner.setPreferredSize(new Dimension(62, 22));
+        this.gridResolutionXSpinner.setMaximumSize(new Dimension(82, 22));
+
         this.gridPanel.add(this.gridResolutionXSpinner);
         this.gridPanel.add(Box.createHorizontalGlue());
+        this.gridResolutionYSpinner.setMinimumSize(new Dimension(42, 20));
+        this.gridResolutionYSpinner.setPreferredSize(new Dimension(62, 22));
+        this.gridResolutionYSpinner.setMaximumSize(new Dimension(82, 22));
 
-        this.gridResolutionYSpinner.setMaximumSize(new Dimension(6, 22));
         this.gridPanel.add(this.gridResolutionYSpinner);
         this.gridPanel.add(Box.createHorizontalGlue());
 
@@ -63,7 +68,7 @@ public abstract class GL3DCameraOptionPanel extends JPanel implements ActionList
         this.gridPanel.add(Box.createHorizontalGlue());
 
         this.createFontSizeSpinner();
-        this.gridPanel.add(fontSizeSpinner);
+        //this.gridPanel.add(fontSizeSpinner);
 
         createVisibleCheckBox();
         this.gridPanel.add(gridVisibleCheckbox);
@@ -93,12 +98,12 @@ public abstract class GL3DCameraOptionPanel extends JPanel implements ActionList
 
     public void createGridResolutionX() {
         this.gridResolutionXSpinner = new JSpinner();
-        this.gridResolutionXSpinner.setModel(new SpinnerNumberModel(new Integer(20), new Integer(2), new Integer(250), new Integer(1)));
-        camera.setGridResolutionX((Integer) gridResolutionXSpinner.getValue());
+        this.gridResolutionXSpinner.setModel(new SpinnerNumberModel(new Double(13.2), new Double(1), new Double(90), new Double(0.1)));
+        camera.setGridResolutionX((Double) gridResolutionXSpinner.getValue());
         this.gridResolutionXSpinner.addChangeListener(new ChangeListener() {
             @Override
             public void stateChanged(ChangeEvent e) {
-                camera.setGridResolutionX((Integer) gridResolutionXSpinner.getValue());
+                camera.setGridResolutionX((Double) gridResolutionXSpinner.getValue());
                 Displayer.getSingletonInstance().render();
             }
         });
@@ -107,12 +112,12 @@ public abstract class GL3DCameraOptionPanel extends JPanel implements ActionList
 
     public void createGridResolutionY() {
         this.gridResolutionYSpinner = new JSpinner();
-        this.gridResolutionYSpinner.setModel(new SpinnerNumberModel(new Integer(20), new Integer(2), new Integer(250), new Integer(1)));
-        camera.setGridResolutionY((Integer) gridResolutionYSpinner.getValue());
+        this.gridResolutionYSpinner.setModel(new SpinnerNumberModel(new Double(15.), new Double(1), new Double(90), new Double(0.1)));
+        camera.setGridResolutionY((Double) gridResolutionYSpinner.getValue());
         this.gridResolutionYSpinner.addChangeListener(new ChangeListener() {
             @Override
             public void stateChanged(ChangeEvent e) {
-                camera.setGridResolutionY((Integer) gridResolutionYSpinner.getValue());
+                camera.setGridResolutionY((Double) gridResolutionYSpinner.getValue());
                 Displayer.getSingletonInstance().render();
             }
         });

@@ -21,8 +21,8 @@ import org.helioviewer.gl3d.scenegraph.math.GL3DVec4f;
 import com.jogamp.opengl.util.awt.TextRenderer;
 
 public class GL3DGrid extends GL3DGroup {
-    private final int lonstepDegrees;
-    private final int latstepDegrees;
+    private final double lonstepDegrees;
+    private final double latstepDegrees;
     private final GL3DVec4f color;
     private final GL3DVec4d textColor;
     private final int lineres = 120;
@@ -31,7 +31,7 @@ public class GL3DGrid extends GL3DGroup {
     private TextRenderer renderer;
     private final int fontsize = 20;
 
-    public GL3DGrid(String name, int lonstepDegrees, int latstepDegrees, GL3DVec4f color, GL3DVec4d textColor) {
+    public GL3DGrid(String name, double lonstepDegrees, double latstepDegrees, GL3DVec4f color, GL3DVec4d textColor) {
         super(name);
         this.lonstepDegrees = lonstepDegrees;
         this.latstepDegrees = latstepDegrees;
@@ -169,18 +169,18 @@ public class GL3DGrid extends GL3DGroup {
         double zdist = 0.0;
         renderer.setColor(Color.WHITE);
         renderer.begin3DRendering();
-        for (int phi = 0; phi <= 90; phi = phi + this.latstepDegrees) {
+        for (double phi = 0; phi <= 90; phi = phi + this.latstepDegrees) {
             double angle = (90 - phi) * Math.PI / 180.;
-            String txt = "" + (phi);
+            String txt = String.format("%.1f", phi);
 
             renderer.draw3D(txt, (float) (Math.sin(angle) * size), (float) (Math.cos(angle) * size - scale * 0.02f * 20. / font.getSize()), (float) zdist, scale * 0.08f / font.getSize());
             if (phi != 90) {
                 renderer.draw3D(txt, (float) (-Math.sin(angle) * size - scale * 0.03f * txt.length() * 20. / font.getSize()), (float) (Math.cos(angle) * size - scale * 0.02f * 20. / font.getSize()), (float) zdist, scale * 0.08f / font.getSize());
             }
         }
-        for (int phi = -this.latstepDegrees; phi >= -90; phi = phi - this.latstepDegrees) {
+        for (double phi = -this.latstepDegrees; phi >= -90; phi = phi - this.latstepDegrees) {
             double angle = (90 - phi) * Math.PI / 180.;
-            String txt = "" + (phi);
+            String txt = String.format("%.1f", phi);
             renderer.draw3D(txt, (float) (Math.sin(angle) * size), (float) (Math.cos(angle) * size - scale * 0.02f * 20. / font.getSize()), (float) zdist, scale * 0.08f / font.getSize());
             if (phi != -90) {
                 renderer.draw3D(txt, (float) (-Math.sin(angle) * size - scale * 0.03f * txt.length() * 20. / font.getSize()), (float) (Math.cos(angle) * size - scale * 0.02f * 20. / font.getSize()), (float) zdist, scale * 0.08f / font.getSize());
@@ -190,8 +190,8 @@ public class GL3DGrid extends GL3DGroup {
 
         size = Constants.SunRadius * 1.02;
 
-        for (int theta = 0; theta <= 180; theta = theta + this.lonstepDegrees) {
-            String txt = "" + (theta);
+        for (double theta = 0; theta <= 180; theta = theta + this.lonstepDegrees) {
+            String txt = String.format("%.1f", theta);
             double angle = (90 - theta) * Math.PI / 180.;
             renderer.begin3DRendering();
             gl.glPushMatrix();
@@ -202,8 +202,8 @@ public class GL3DGrid extends GL3DGroup {
             renderer.end3DRendering();
             gl.glPopMatrix();
         }
-        for (int theta = -this.lonstepDegrees; theta > -180.; theta = theta - this.lonstepDegrees) {
-            String txt = "" + (theta);
+        for (double theta = -this.lonstepDegrees; theta > -180.; theta = theta - this.lonstepDegrees) {
+            String txt = String.format("%.1f", theta);
             double angle = (90 - theta) * Math.PI / 180.;
             renderer.begin3DRendering();
             gl.glPushMatrix();
