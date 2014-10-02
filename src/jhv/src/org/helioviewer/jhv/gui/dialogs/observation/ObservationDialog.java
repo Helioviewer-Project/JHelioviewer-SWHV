@@ -15,6 +15,8 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 
 import org.helioviewer.base.message.Message;
+import org.helioviewer.jhv.JHVGlobals;
+import org.helioviewer.jhv.Settings;
 import org.helioviewer.jhv.gui.IconBank;
 import org.helioviewer.jhv.gui.IconBank.JHVIcon;
 import org.helioviewer.jhv.gui.ImageViewerGui;
@@ -49,6 +51,8 @@ public class ObservationDialog extends JDialog implements ActionListener, Showab
     private final JButton btnClose = new JButton("Cancel");
 
     private ObservationDialogPanel selectedPane = null;
+
+    private JButton availabilityButton;
 
     // //////////////////////////////////////////////////////////////////////////////
     // Methods
@@ -88,7 +92,26 @@ public class ObservationDialog extends JDialog implements ActionListener, Showab
         uiSelectionPane.setBorder(BorderFactory.createTitledBorder(" Choose type of data to add "));
         uiSelectionPane.add(new JLabel("Data type"));
         uiSelectionPane.add(uiSelectionComboBox);
-
+        availabilityButton = new JButton("Available data");
+        uiSelectionPane.add(availabilityButton);
+        availabilityButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                String str = (String) (uiSelectionComboBox.getSelectedItem());
+                if (str == "Image Data") {
+                    String url = Settings.getSingletonInstance().getProperty("availability.images.url");
+                    JHVGlobals.openURL(url);
+                }
+                if (str == "1-D Time Series") {
+                    String url = Settings.getSingletonInstance().getProperty("availability.timelines.url");
+                    JHVGlobals.openURL(url);
+                }
+                if (str == "Radio Data") {
+                    String url = Settings.getSingletonInstance().getProperty("availability.radio.url");
+                    JHVGlobals.openURL(url);
+                }
+            }
+        });
         uiSelectionComboBox.addActionListener(this);
 
         buttonPane.setLayout(new FlowLayout(FlowLayout.RIGHT, 3, 3));
