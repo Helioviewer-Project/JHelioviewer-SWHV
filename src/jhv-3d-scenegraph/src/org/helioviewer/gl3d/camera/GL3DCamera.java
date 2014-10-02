@@ -68,9 +68,11 @@ public abstract class GL3DCamera {
 
     private double ratio = 1.0;
 
-    private int gridResolutionX = 20;
-    private int gridResolutionY = 20;
+    private double gridResolutionX = 20;
+    private double gridResolutionY = 20;
     private GL3DGrid grid;
+
+    private long time;
 
     public GL3DCamera(double clipNear, double clipFar) {
         this();
@@ -101,12 +103,12 @@ public abstract class GL3DCamera {
         createNewGrid();
     }
 
-    public void setGridResolutionX(int resolution) {
+    public void setGridResolutionX(double resolution) {
         this.gridResolutionX = resolution;
         createNewGrid();
     }
 
-    public void setGridResolutionY(int resolution) {
+    public void setGridResolutionY(double resolution) {
         this.gridResolutionY = resolution;
         createNewGrid();
     }
@@ -385,11 +387,19 @@ public abstract class GL3DCamera {
         this.translation.z = this.translationz * this.ratio;
     }
 
-    public int getGridResolutionX() {
+    public double getGridResolutionX() {
         return gridResolutionX;
     }
 
-    public int getGridResolutionY() {
+    public double getGridResolutionY() {
         return gridResolutionY;
+    }
+
+    public void setTime(long time) {
+        this.time = time;
+    }
+
+    public long getTime() {
+        return time;
     }
 }

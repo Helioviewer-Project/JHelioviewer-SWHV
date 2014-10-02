@@ -81,8 +81,8 @@ public class GL3DCameraOptionsPanel extends JPanel implements GL3DCameraSelectio
 
     private void changeCamera(GL3DCamera newCamera) {
         boolean hidden = cameraSelectorModel.getCurrentCamera().getGrid().getDrawBits().get(Bit.Hidden);
-        int resx = cameraSelectorModel.getCurrentCamera().getGridResolutionX();
-        int resy = cameraSelectorModel.getCurrentCamera().getGridResolutionY();
+        double resx = cameraSelectorModel.getCurrentCamera().getGridResolutionX();
+        double resy = cameraSelectorModel.getCurrentCamera().getGridResolutionY();
 
         cameraSelectorModel.getCurrentCamera().deactivate();
         cameraSelectorModel.setCurrentCamera(newCamera);
