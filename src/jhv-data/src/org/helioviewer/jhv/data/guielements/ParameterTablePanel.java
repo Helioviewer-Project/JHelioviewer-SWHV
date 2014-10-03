@@ -1,4 +1,4 @@
-package org.helioviewer.jhv.plugins.swek.guielements;
+package org.helioviewer.jhv.data.guielements;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
@@ -15,8 +15,8 @@ import javax.swing.RowFilter;
 import javax.swing.table.TableRowSorter;
 
 import org.helioviewer.jhv.data.datatype.JHVEventParameter;
-import org.helioviewer.jhv.plugins.swek.guielements.model.EmptyRowFilter;
-import org.helioviewer.jhv.plugins.swek.guielements.model.ParameterTableModel;
+import org.helioviewer.jhv.data.guielements.model.EmptyRowFilter;
+import org.helioviewer.jhv.data.guielements.model.ParameterTableModel;
 
 /**
  * Represents a panel with a table containing all the parameters from the given

@@ -1,4 +1,4 @@
-package org.helioviewer.jhv.plugins.swek.guielements;
+package org.helioviewer.jhv.data.guielements;
 
 import java.awt.Component;
 import java.awt.Dimension;

@@ -1,4 +1,4 @@
-package org.helioviewer.jhv.plugins.swek.guielements.model;
+package org.helioviewer.jhv.data.guielements.model;
 
 import javax.swing.RowFilter;
 
