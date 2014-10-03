@@ -23,7 +23,7 @@ import org.helioviewer.jhv.gui.components.BasicImagePanel;
 import org.helioviewer.jhv.gui.interfaces.ImagePanelPlugin;
 import org.helioviewer.jhv.layers.LayersModel;
 import org.helioviewer.jhv.plugins.hekplugin.cache.SWHVHEKData;
-import org.helioviewer.jhv.plugins.hekplugin.cache.gui.HEKEventInformationDialog;
+import org.helioviewer.jhv.plugins.swek.guielements.SWEKEventInformationDialog;
 import org.helioviewer.viewmodel.changeevent.ChangeEvent;
 import org.helioviewer.viewmodel.changeevent.RegionChangedReason;
 import org.helioviewer.viewmodel.changeevent.TimestampChangedReason;
@@ -37,15 +37,15 @@ import org.helioviewer.viewmodel.viewportimagesize.ViewportImageSize;
 
 /**
  * Implementation of ImagePanelPlugin for showing event popups.
- *
+ * 
  * <p>
  * This plugin provides the capability to open an event popup when clicking on
  * an event icon within the main image. Apart from that, it changes the mouse
  * pointer when hovering over an event icon to indicate that it is clickable.
- *
+ * 
  * @author Markus Langenberg
  * @author Malte Nuhn
- *
+ * 
  */
 public class ImagePanelEventPopupController implements ImagePanelPlugin, MouseListener, MouseMotionListener, ViewListener {
 
@@ -66,7 +66,7 @@ public class ImagePanelEventPopupController implements ImagePanelPlugin, MouseLi
     private JHVEvent mouseOverJHVEvent = null;
     private Point mouseOverPosition = null;
     private Cursor lastCursor;
-    private HEKEventInformationDialog hekPopUp = new HEKEventInformationDialog();
+    private SWEKEventInformationDialog hekPopUp;
 
     private boolean state3D = false;
 
@@ -102,8 +102,9 @@ public class ImagePanelEventPopupController implements ImagePanelPlugin, MouseLi
         imagePanel.addMouseListener(this);
         imagePanel.addMouseMotionListener(this);
 
-        if (imagePanel.getView() != null)
+        if (imagePanel.getView() != null) {
             imagePanel.getView().addViewListener(this);
+        }
     }
 
     /**
@@ -116,7 +117,7 @@ public class ImagePanelEventPopupController implements ImagePanelPlugin, MouseLi
 
     /**
      * Converts physical coordinate to screen coordinates
-     *
+     * 
      * @param x
      *            Physical x-coordinate
      * @param y
@@ -126,7 +127,8 @@ public class ImagePanelEventPopupController implements ImagePanelPlugin, MouseLi
     private Vector2dInt convertPhysicalToScreen(double x, double y) {
         ViewportImageSize viewportImageSize = ViewHelper.calculateViewportImageSize(viewportView.getViewport(), regionView.getRegion());
 
-        Vector2dInt offset = ViewHelper.convertImageToScreenDisplacement(-regionView.getRegion().getUpperLeftCorner().getX(), regionView.getRegion().getUpperLeftCorner().getY(), regionView.getRegion(), viewportImageSize);
+        Vector2dInt offset = ViewHelper.convertImageToScreenDisplacement(-regionView.getRegion().getUpperLeftCorner().getX(), regionView
+                .getRegion().getUpperLeftCorner().getY(), regionView.getRegion(), viewportImageSize);
 
         return ViewHelper.convertImageToScreenDisplacement(x, y, regionView.getRegion(), viewportImageSize).add(offset);
     }
@@ -171,12 +173,11 @@ public class ImagePanelEventPopupController implements ImagePanelPlugin, MouseLi
         if (mouseOverJHVEvent != null) {
 
             // should never be the case
-            if (hekPopUp == null) {
-                hekPopUp = new HEKEventInformationDialog();
-            }
+            // if (hekPopUp == null) {
+            hekPopUp = new SWEKEventInformationDialog(mouseOverJHVEvent);
+            // }
 
-            hekPopUp.setVisible(false);
-            hekPopUp.setEvent(mouseOverJHVEvent);
+            // hekPopUp.setVisible(false);
 
             Point windowPosition = calcWindowPosition(mouseOverPosition);
             hekPopUp.setLocation(windowPosition);
@@ -261,14 +262,22 @@ public class ImagePanelEventPopupController implements ImagePanelPlugin, MouseLi
             for (JHVEvent evt : toDraw) {
                 if (state3D) {
                     int i = 0;
-                    while (i < evt.getPositioningInformation().size() && evt.getPositioningInformation().get(i).getCoordinateSystem() != JHVCoordinateSystem.HGS) {
+                    while (i < evt.getPositioningInformation().size()
+                            && evt.getPositioningInformation().get(i).getCoordinateSystem() != JHVCoordinateSystem.HGS) {
                         i++;
                     }
                     if (i < evt.getPositioningInformation().size()) {
                         JHVPositionInformation el = evt.getPositioningInformation().get(i);
                         if (el.centralPoint() != null) {
-                            double theta = el.centralPoint().getCoordinate2() / 180. * Math.PI;// - Astronomy.getB0InRadians(new Date((evt.getStartDate().getTime() + evt.getEndDate().getTime()) / 2));
-                            double phi = el.centralPoint().getCoordinate1() / 180. * Math.PI - Astronomy.getL0Radians(new Date((evt.getStartDate().getTime() + evt.getEndDate().getTime()) / 2));
+                            double theta = el.centralPoint().getCoordinate2() / 180. * Math.PI;// -
+                                                                                               // Astronomy.getB0InRadians(new
+                                                                                               // Date((evt.getStartDate().getTime()
+                                                                                               // +
+                                                                                               // evt.getEndDate().getTime())
+                                                                                               // /
+                                                                                               // 2));
+                            double phi = el.centralPoint().getCoordinate1() / 180. * Math.PI
+                                    - Astronomy.getL0Radians(new Date((evt.getStartDate().getTime() + evt.getEndDate().getTime()) / 2));
                             double x = Math.cos(theta) * Math.sin(phi);
                             double z = Math.cos(theta) * Math.cos(phi);
                             double y = -Math.sin(theta);
@@ -315,7 +324,8 @@ public class ImagePanelEventPopupController implements ImagePanelPlugin, MouseLi
     @Override
     public void viewChanged(View sender, ChangeEvent aEvent) {
         if (hekPopUp != null) {
-            if (aEvent.reasonOccurred(RegionChangedReason.class) || aEvent.reasonOccurred(ViewportChangedReason.class) || aEvent.reasonOccurred(TimestampChangedReason.class)) {
+            if (aEvent.reasonOccurred(RegionChangedReason.class) || aEvent.reasonOccurred(ViewportChangedReason.class)
+                    || aEvent.reasonOccurred(TimestampChangedReason.class)) {
                 // remove as soon as event is not visible anymore
                 if (hekPopUp != null && hekPopUp.isVisible()) {
                     Date currentDate = LayersModel.getSingletonInstance().getLastUpdatedTimestamp();
