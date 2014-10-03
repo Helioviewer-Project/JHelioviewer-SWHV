@@ -7,5 +7,6 @@
 	<classpathentry combineaccessrules="false" kind="src" path="/swhv-swek"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/viewmodelplugin"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/EVEPlugin"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/hekplugin"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
