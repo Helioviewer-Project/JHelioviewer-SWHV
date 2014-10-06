@@ -225,9 +225,11 @@ public class EventModel implements ZoomControllerListener, EventRequesterListene
                         Log.info("Worker was cancelled");
                     }
                 } catch (InterruptedException e) {
-                    Log.error("Could not create the event type plot configurations");
+                    Log.error("Could not create the event type plot configurations" + e.getMessage());
+                    Log.error("The error" + e.getMessage());
                 } catch (ExecutionException e) {
-                    Log.error("Could not create the event type plot configurations");
+                    Log.error("Could not create the event type plot configurations" + e.getMessage());
+                    Log.error("The error" + e.getMessage());
                 }
             }
         };
