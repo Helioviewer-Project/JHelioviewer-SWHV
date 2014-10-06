@@ -1,5 +1,6 @@
 package org.helioviewer.plugins.eveplugin.events.model;
 
+import java.awt.Point;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -140,6 +141,14 @@ public class EventModel implements ZoomControllerListener, EventRequesterListene
             DrawController.getSingletonInstance().removeDrawableElement(eventPanel, plot);
             DrawController.getSingletonInstance().addDrawableElement(eventPanel, plotIdentifier);
             plot = plotIdentifier;
+        }
+    }
+
+    public JHVEvent getEventAtPosition(Point point) {
+        if (eventPlotConfiguration != null) {
+            return eventPlotConfiguration.getEventOnLocation(point);
+        } else {
+            return null;
         }
     }
 

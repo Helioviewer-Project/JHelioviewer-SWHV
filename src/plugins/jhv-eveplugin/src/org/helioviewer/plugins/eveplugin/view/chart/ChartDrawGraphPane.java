@@ -27,12 +27,15 @@ import javax.swing.event.MouseInputListener;
 
 import org.helioviewer.base.logging.Log;
 import org.helioviewer.base.math.Interval;
+import org.helioviewer.jhv.data.datatype.JHVEvent;
+import org.helioviewer.jhv.data.guielements.SWEKEventInformationDialog;
 import org.helioviewer.plugins.eveplugin.EVEPlugin;
 import org.helioviewer.plugins.eveplugin.controller.DrawController;
 import org.helioviewer.plugins.eveplugin.controller.DrawControllerListener;
 import org.helioviewer.plugins.eveplugin.draw.DrawableElement;
 import org.helioviewer.plugins.eveplugin.draw.DrawableType;
 import org.helioviewer.plugins.eveplugin.draw.YAxisElement;
+import org.helioviewer.plugins.eveplugin.events.model.EventModel;
 import org.helioviewer.plugins.eveplugin.model.ChartModel;
 import org.helioviewer.plugins.eveplugin.model.ChartModelListener;
 import org.helioviewer.plugins.eveplugin.model.PlotAreaSpace;
@@ -74,6 +77,7 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
     private int twoYAxis = 0;
     private final ChartModel chartModel;
     private final PlotAreaSpaceManager plotAreaSpaceManager;
+    private final EventModel eventModel;
 
     // //////////////////////////////////////////////////////////////////////////////
     // Methods
@@ -92,6 +96,7 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
         drawController.addDrawControllerListener(this, identifier);
         chartModel.addChartModelListener(this);
         plotAreaSpaceManager = PlotAreaSpaceManager.getInstance();
+        eventModel = EventModel.getSingletonInstance();
     }
 
     private void initVisualComponents() {
@@ -443,7 +448,15 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
 
     @Override
     public void mouseClicked(final MouseEvent e) {
-        if (graphArea.contains(e.getPoint())) {
+        JHVEvent event = eventModel.getEventAtPosition(new Point(e.getPoint().x - ChartConstants.GRAPH_LEFT_SPACE, e.getPoint().y
+                - ChartConstants.GRAPH_TOP_SPACE));
+        if (event != null) {
+            SWEKEventInformationDialog dialog = new SWEKEventInformationDialog(event);
+            dialog.setLocation(e.getLocationOnScreen());
+            dialog.validate();
+            dialog.pack();
+            dialog.setVisible(true);
+        } else if (graphArea.contains(e.getPoint())) {
             setMovieFrameManually(e.getPoint());
         }
     }
@@ -504,6 +517,9 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
 
         if (movieLinePosition >= 0 && drawController.getIntervalAvailable() && frame.contains(e.getPoint())) {
             setCursor(new Cursor(Cursor.E_RESIZE_CURSOR));
+        } else if (eventModel.getEventAtPosition(new Point(e.getPoint().x - ChartConstants.GRAPH_LEFT_SPACE, e.getPoint().y
+                - ChartConstants.GRAPH_TOP_SPACE)) != null) {
+            setCursor(new Cursor(Cursor.HAND_CURSOR));
         } else {
             setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
         }

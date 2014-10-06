@@ -1,8 +1,11 @@
 package org.helioviewer.plugins.eveplugin.events.model;
 
+import java.awt.Point;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import org.helioviewer.jhv.data.datatype.JHVEvent;
 
 /**
  * Combines everything needed to draw the events on the eve plugin.
@@ -90,5 +93,24 @@ public class EventTypePlotConfiguration {
      */
     public Map<String, List<EventPlotConfiguration>> getEventPlotConfigurations() {
         return eventPlotConfigurations;
+    }
+
+    /**
+     * Gets the event at the given location.
+     * 
+     * @param p
+     *            the location to check.
+     * @return null if no event was found, or the event if found
+     */
+    public JHVEvent getEventOnLocation(Point p) {
+        for (String s : eventPlotConfigurations.keySet()) {
+            for (EventPlotConfiguration epc : eventPlotConfigurations.get(s)) {
+                JHVEvent event = epc.getEventAtPoint(p);
+                if (event != null) {
+                    return event;
+                }
+            }
+        }
+        return null;
     }
 }
