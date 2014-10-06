@@ -343,7 +343,7 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
     }
 
     private void drawMovieLine(final Graphics g) {
-        if (movieLinePosition < 0 || !drawController.getIntervalAvailable()) {
+        if (movieLinePosition < 0 || !drawController.getIntervalAvailable() || graphArea.height < 0) {
             return;
         }
 
