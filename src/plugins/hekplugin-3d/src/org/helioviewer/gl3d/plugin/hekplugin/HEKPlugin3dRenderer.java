@@ -204,7 +204,7 @@ public class HEKPlugin3dRenderer extends PhysicalRenderer3d {
      */
     public void drawIcon(PhysicalRenderGraphics g, JHVEvent evt, Date now) {
         ImageIcon icon = evt.getIcon();
-        BufferedImage bi = new BufferedImage(icon.getIconWidth(), icon.getIconHeight(), BufferedImage.TYPE_4BYTE_ABGR_PRE);
+        BufferedImage bi = new BufferedImage(icon.getIconWidth(), icon.getIconHeight(), BufferedImage.TYPE_4BYTE_ABGR);
         Graphics graph = bi.createGraphics();
         icon.paintIcon(null, graph, 0, 0);
         graph.dispose();
