@@ -40,6 +40,7 @@ public class HEKDownloader implements SWEKDownloader {
     @Override
     public InputStream downloadData(SWEKEventType eventType, Date startDate, Date endDate, List<SWEKParam> params) {
         String urlString = createURL(eventType, startDate, endDate, params);
+        System.out.println("URLSTRING" + urlString);
         Log.info("Download events using following URL: " + urlString);
         try {
             DownloadStream ds = new DownloadStream(new URL(urlString), JHVGlobals.getStdConnectTimeout(), JHVGlobals.getStdReadTimeout());
@@ -56,7 +57,7 @@ public class HEKDownloader implements SWEKDownloader {
 
     /**
      * Creates the download URL for the HEK.
-     * 
+     *
      * @param eventType
      *            the event type that should be downloaded
      * @param startDate
@@ -82,7 +83,7 @@ public class HEKDownloader implements SWEKDownloader {
 
     /**
      * Appends the command to the given URL.
-     * 
+     *
      * @param baseURL
      *            the current URL
      * @param eventType
@@ -99,7 +100,7 @@ public class HEKDownloader implements SWEKDownloader {
 
     /**
      * Appends the type to the given URL.
-     * 
+     *
      * @param baseURL
      *            the current URL
      * @param eventType
@@ -116,7 +117,7 @@ public class HEKDownloader implements SWEKDownloader {
 
     /**
      * Appends the event type to the given URL.
-     * 
+     *
      * @param baseURL
      *            the current URL
      * @param eventType
@@ -133,7 +134,7 @@ public class HEKDownloader implements SWEKDownloader {
 
     /**
      * Appends the event coordinate system to the given URL.
-     * 
+     *
      * @param baseURL
      *            the current URL
      * @param eventType
@@ -150,7 +151,7 @@ public class HEKDownloader implements SWEKDownloader {
 
     /**
      * Appends the spatial region to the given URL.
-     * 
+     *
      * @param baseURL
      *            the current URL
      * @param eventType
@@ -171,7 +172,7 @@ public class HEKDownloader implements SWEKDownloader {
 
     /**
      * Append cosec to the given URL.
-     * 
+     *
      * @param baseURL
      *            the current URL
      * @param eventType
@@ -188,7 +189,7 @@ public class HEKDownloader implements SWEKDownloader {
 
     /**
      * Appends params to the given URL.
-     * 
+     *
      * @param baseURL
      *            the current URL
      * @param eventType
@@ -211,13 +212,9 @@ public class HEKDownloader implements SWEKDownloader {
                 encodedValue = param.getValue();
             }
             if (param.getParam().toLowerCase().equals("provider")) {
-                baseURL.append("param").append(paramCount).append("=").append("frm_name").append("&").append("op").append(paramCount)
-                        .append("=").append(param.getOperand().URLEncodedRepresentation()).append("&").append("value").append(paramCount)
-                        .append("=").append(encodedValue).append("&");
+                baseURL.append("param").append(paramCount).append("=").append("frm_name").append("&").append("op").append(paramCount).append("=").append(param.getOperand().URLEncodedRepresentation()).append("&").append("value").append(paramCount).append("=").append(encodedValue).append("&");
             } else {
-                baseURL.append("param").append(paramCount).append("=").append(param.getParam()).append("&").append("op").append(paramCount)
-                        .append("=").append(param.getOperand().URLEncodedRepresentation()).append("&").append("value").append(paramCount)
-                        .append("=").append(encodedValue).append("&");
+                baseURL.append("param").append(paramCount).append("=").append(param.getParam()).append("&").append("op").append(paramCount).append("=").append(param.getOperand().URLEncodedRepresentation()).append("&").append("value").append(paramCount).append("=").append(encodedValue).append("&");
             }
             paramCount++;
         }
@@ -226,7 +223,7 @@ public class HEKDownloader implements SWEKDownloader {
 
     /**
      * Appends the event start time to the given URL.
-     * 
+     *
      * @param baseURL
      *            the current URL
      * @param eventType
@@ -241,7 +238,7 @@ public class HEKDownloader implements SWEKDownloader {
 
     /**
      * Appends the event end time to the given URL.
-     * 
+     *
      * @param baseURL
      *            the current URL
      * @param eventType
@@ -256,7 +253,7 @@ public class HEKDownloader implements SWEKDownloader {
 
     /**
      * Formats a date in the yyyy-mm-ddThh:mm:ss format.
-     * 
+     *
      * @param date
      *            the date to format
      * @return the date in format yyyy-mm-ddThh:mm-ss
