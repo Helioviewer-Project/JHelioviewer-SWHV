@@ -8,6 +8,7 @@ import java.awt.event.ItemListener;
 
 import javax.swing.BoxLayout;
 import javax.swing.ButtonGroup;
+import javax.swing.JCheckBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JRadioButton;
@@ -25,9 +26,9 @@ import org.helioviewer.viewmodelplugin.filter.FilterTabPanelManager.Area;
 
 /**
  * Panel to control running differences
- * 
+ *
  * @author Helge Dietert
- * 
+ *
  */
 public class RunningDifferencePanel extends FilterPanel implements ChangeListener {
     /**
@@ -46,7 +47,6 @@ public class RunningDifferencePanel extends FilterPanel implements ChangeListene
      */
     public RunningDifferencePanel() {
         this.setLayout(new BoxLayout(this, BoxLayout.PAGE_AXIS));
-        addRadioButtons();
         truncateSpinner = new JSpinner();
         truncateSpinner.setModel(new SpinnerNumberModel(new Float(0.8f), new Float(0), new Float(1), new Float(0.01f)));
         truncateSpinner.addChangeListener(this);
@@ -60,31 +60,31 @@ public class RunningDifferencePanel extends FilterPanel implements ChangeListene
         truncateSpinner.setEditor(editor);
         editor.getTextField().setColumns(3);
         editor.getTextField().setHorizontalAlignment(JTextField.CENTER);
-        // editor.getTextField().setValue(0.8);
         WheelSupport.installMouseWheelSupport(truncateSpinner);
         truncationLine.add(truncateSpinner);
         setEnabled(false);
         truncationLine.setAlignmentY(Component.LEFT_ALIGNMENT);
         add(truncationLine);
+        addRadioButtons();
         add(new JPanel());
     }
 
     private void addRadioButtons() {
         final JRadioButton radNone = new JRadioButton("No differences", true);
         final JRadioButton radRunDiff = new JRadioButton("Running difference");
-        final JRadioButton radRunDiffNoRot = new JRadioButton("Running difference(no correction)");
         final JRadioButton radBaseDiff = new JRadioButton("Base difference");
-        final JRadioButton radBaseDiffNoRot = new JRadioButton("Base difference(no correction)");
+        final JCheckBox diffRot = new JCheckBox("Rotation Correction (only in 3D mode)?");
+        diffRot.setSelected(true);
+        diffRot.setVisible(false);
 
         radNone.addItemListener(new ItemListener() {
             @Override
             public void itemStateChanged(ItemEvent e) {
                 if (e.getStateChange() == 1) {
+                    diffRot.setVisible(false);
                     filter.setActive(false);
                     radRunDiff.setSelected(false);
                     radBaseDiff.setSelected(false);
-                    radBaseDiffNoRot.setSelected(false);
-                    radRunDiffNoRot.setSelected(false);
                 }
                 Displayer.getSingletonInstance().display();
             }
@@ -94,29 +94,14 @@ public class RunningDifferencePanel extends FilterPanel implements ChangeListene
             @Override
             public void itemStateChanged(ItemEvent e) {
                 if (e.getStateChange() == 1) {
+                    diffRot.setVisible(true);
+
                     filter.setActive(true);
                     filter.setBaseDifference(false);
-                    filter.setRunDiffNoRot(false);
+                    filter.setRunDiffNoRot(!diffRot.isSelected());
 
                     radNone.setSelected(false);
                     radBaseDiff.setSelected(false);
-                    radBaseDiffNoRot.setSelected(false);
-                    radRunDiffNoRot.setSelected(false);
-                }
-                Displayer.getSingletonInstance().display();
-            }
-        });
-
-        radRunDiffNoRot.addItemListener(new ItemListener() {
-            @Override
-            public void itemStateChanged(ItemEvent e) {
-                if (e.getStateChange() == 1) {
-                    filter.setActive(true);
-                    filter.setBaseDifference(false);
-                    filter.setRunDiffNoRot(true);
-                    radNone.setSelected(false);
-                    radBaseDiff.setSelected(false);
-                    radBaseDiffNoRot.setSelected(false);
                 }
                 Displayer.getSingletonInstance().display();
             }
@@ -126,30 +111,27 @@ public class RunningDifferencePanel extends FilterPanel implements ChangeListene
             @Override
             public void itemStateChanged(ItemEvent e) {
                 if (e.getStateChange() == 1) {
+                    diffRot.setVisible(true);
+
                     filter.setActive(true);
                     filter.setBaseDifference(true);
-                    filter.setBaseDifferenceRot(false);
+                    filter.setBaseDifferenceRot(!diffRot.isSelected());
                     radNone.setSelected(false);
                     radRunDiff.setSelected(false);
-                    radBaseDiffNoRot.setSelected(false);
-                    radRunDiffNoRot.setSelected(false);
                 }
                 Displayer.getSingletonInstance().display();
             }
         });
 
-        radBaseDiffNoRot.addItemListener(new ItemListener() {
+        diffRot.addItemListener(new ItemListener() {
             @Override
             public void itemStateChanged(ItemEvent e) {
-                if (e.getStateChange() == 1) {
-                    filter.setActive(true);
-                    filter.setBaseDifference(true);
-                    filter.setBaseDifferenceRot(true);
-                    radNone.setSelected(false);
-                    radRunDiff.setSelected(false);
-                    radBaseDiff.setSelected(false);
-                    radRunDiffNoRot.setSelected(false);
+                if (radBaseDiff.isSelected()) {
+                    filter.setBaseDifferenceRot(!diffRot.isSelected());
+                } else {
+                    filter.setRunDiffNoRot(!diffRot.isSelected());
                 }
+
                 Displayer.getSingletonInstance().display();
             }
         });
@@ -157,9 +139,7 @@ public class RunningDifferencePanel extends FilterPanel implements ChangeListene
         ButtonGroup group = new ButtonGroup();
         group.add(radNone);
         group.add(radRunDiff);
-        group.add(radRunDiffNoRot);
         group.add(radBaseDiff);
-        group.add(radBaseDiffNoRot);
 
         JPanel radPanel = new JPanel();
         radPanel.setLayout(new GridLayout(0, 1));
@@ -167,13 +147,10 @@ public class RunningDifferencePanel extends FilterPanel implements ChangeListene
         radPanel.add(radNone);
         radRunDiff.setAlignmentX(Component.LEFT_ALIGNMENT);
         radPanel.add(radRunDiff);
-        radRunDiffNoRot.setAlignmentX(Component.LEFT_ALIGNMENT);
-        radPanel.add(radRunDiffNoRot);
         radBaseDiff.setAlignmentX(Component.LEFT_ALIGNMENT);
         radPanel.add(radBaseDiff);
-        radBaseDiffNoRot.setAlignmentX(Component.LEFT_ALIGNMENT);
-        radPanel.add(radBaseDiffNoRot);
-
+        diffRot.setAlignmentX(Component.LEFT_ALIGNMENT);
+        radPanel.add(diffRot);
         add(radPanel);
     }
 
