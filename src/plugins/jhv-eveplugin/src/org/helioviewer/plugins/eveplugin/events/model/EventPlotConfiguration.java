@@ -1,6 +1,7 @@
 package org.helioviewer.plugins.eveplugin.events.model;
 
 import java.awt.Graphics;
+import java.awt.Point;
 import java.awt.Rectangle;
 
 import org.helioviewer.jhv.data.datatype.JHVEvent;
@@ -21,6 +22,9 @@ public class EventPlotConfiguration {
 
     /** the Y position */
     private final int yPosition;
+
+    /** The position of the angle the event area */
+    private Rectangle drawPosition;
 
     /**
      * Creates a EventPlotConfiguration for the given event with scaledX0 start
@@ -66,6 +70,8 @@ public class EventPlotConfiguration {
         int spacePerLine = Math.min(4, (new Double(Math.floor(1.0 * graphArea.height / totalLines / 2))).intValue());
         int startPosition = spacePerLine * 2 * (nrPreviousLines + yPosition);
         g.setColor(event.getColor());
+        drawPosition = new Rectangle((new Double(Math.floor(graphArea.width * scaledX0))).intValue(), startPosition, (new Double(
+                Math.floor(graphArea.width * (scaledX1 - scaledX0)))).intValue(), spacePerLine);
         g.fillRect((new Double(Math.floor(graphArea.width * scaledX0))).intValue(), startPosition,
                 (new Double(Math.floor(graphArea.width * (scaledX1 - scaledX0)))).intValue(), spacePerLine);
         // g.drawString(event.getDisplayName(), (new
@@ -73,5 +79,35 @@ public class EventPlotConfiguration {
         // g.drawImage(event.getIcon().getImage(), (new
         // Double(Math.floor(graphArea.width * scaledX0))).intValue(), 60,
         // null);
+
+    }
+
+    /**
+     * Gets the event at the given point.
+     * 
+     * @param p
+     *            the location to check for an event.
+     * @return null if no event is located there, the event if found
+     */
+    public JHVEvent getEventAtPoint(Point p) {
+        if (containsPoint(p)) {
+            return event;
+        }
+        return null;
+    }
+
+    /**
+     * Checks if the given point is located where the event was drawn.
+     * 
+     * @param p
+     *            the point to check
+     * @return true if the point is located in the event area, false if the
+     *         point is not located in the event area.
+     */
+    private boolean containsPoint(Point p) {
+        if (drawPosition != null) {
+            return drawPosition.contains(p);
+        }
+        return false;
     }
 }
