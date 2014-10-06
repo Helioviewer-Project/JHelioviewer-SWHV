@@ -8,10 +8,8 @@ import java.net.URI;
 import java.net.URISyntaxException;
 
 import org.helioviewer.jhv.data.container.JHVEventContainer;
-import org.helioviewer.jhv.layers.LayersModel;
 import org.helioviewer.jhv.plugins.swek.config.SWEKConfigurationManager;
 import org.helioviewer.jhv.plugins.swek.request.IncomingRequestManager;
-import org.helioviewer.jhv.plugins.swek.request.OutgoingRequestManager;
 import org.helioviewer.jhv.plugins.swek.settings.SWEKSettings;
 import org.helioviewer.jhv.plugins.swek.sources.SWEKSourceManager;
 import org.helioviewer.viewmodelplugin.controller.PluginManager;
@@ -23,9 +21,9 @@ import org.helioviewer.viewmodelplugin.overlay.OverlayPlugin;
  * Part of these developments are based on the work done in the HEKPlugin
  * (lp:~jhelioviewer-dev/jhelioviewer/hekplugin) and HEKPlugin 3d
  * (lp:~jhelioviewer-dev/jhelioviewer/hekplugin-3d).
- * 
+ *
  * @author Bram.Bourgoignie@oma.be
- * 
+ *
  */
 public class SWEKPlugin extends OverlayPlugin implements Plugin {
 
@@ -36,7 +34,7 @@ public class SWEKPlugin extends OverlayPlugin implements Plugin {
     private final SWEKSourceManager SWEKSources;
 
     /** The outgoing request manager */
-    private final OutgoingRequestManager outgoingRequestManager;
+    //private final OutgoingRequestManager outgoingRequestManager;
 
     /** the incoming request manager */
     private final IncomingRequestManager incomingRequestManager;
@@ -49,7 +47,7 @@ public class SWEKPlugin extends OverlayPlugin implements Plugin {
 
     /**
      * Default constructor
-     * 
+     *
      */
     public SWEKPlugin() {
         SWEKConfig = SWEKConfigurationManager.getSingletonInstance();
@@ -57,7 +55,7 @@ public class SWEKPlugin extends OverlayPlugin implements Plugin {
         loadExternalJars = true;
         SWEKSources.setPlugin(this);
         SWEKSources.loadExternalJars(loadExternalJars);
-        outgoingRequestManager = OutgoingRequestManager.getSingletonInstance();
+        //outgoingRequestManager = OutgoingRequestManager.getSingletonInstance();
         incomingRequestManager = IncomingRequestManager.getSingletonInstance();
         eventContainer = JHVEventContainer.getSingletonInstance();
         try {
@@ -70,7 +68,7 @@ public class SWEKPlugin extends OverlayPlugin implements Plugin {
 
     /**
      * Creates a SWEKPlugin that loads or doesn't load the external jars
-     * 
+     *
      * @param loadExternalJars
      *            true is the source jar should be loaded, false if the source
      *            jars should not be loaded.
@@ -80,7 +78,7 @@ public class SWEKPlugin extends OverlayPlugin implements Plugin {
         SWEKSources = SWEKSourceManager.getSingletonInstance();
         this.loadExternalJars = loadExternalJars;
         SWEKSources.loadExternalJars(loadExternalJars);
-        outgoingRequestManager = OutgoingRequestManager.getSingletonInstance();
+        //outgoingRequestManager = OutgoingRequestManager.getSingletonInstance();
         incomingRequestManager = IncomingRequestManager.getSingletonInstance();
         eventContainer = JHVEventContainer.getSingletonInstance();
         try {
@@ -150,7 +148,7 @@ public class SWEKPlugin extends OverlayPlugin implements Plugin {
     private void configurePlugin() {
         SWEKConfig.loadConfiguration();
         SWEKSources.loadSources();
-        LayersModel.getSingletonInstance().addLayersListener(outgoingRequestManager);
+        //LayersModel.getSingletonInstance().addLayersListener(outgoingRequestManager);
         eventContainer.registerHandler(incomingRequestManager);
     }
 
@@ -159,8 +157,7 @@ public class SWEKPlugin extends OverlayPlugin implements Plugin {
      */
     private void registerPlugin() {
         SWEKPluginContainer container = new SWEKPluginContainer();
-        container.setActive(PluginSettings.getSingeltonInstance().isOverlayInPluginActivated(pluginLocation, container.getOverlayClass(),
-                true));
+        container.setActive(PluginSettings.getSingeltonInstance().isOverlayInPluginActivated(pluginLocation, container.getOverlayClass(), true));
         container.setPosition(PluginSettings.getSingeltonInstance().getOverlayPosition(pluginLocation, container.getOverlayClass()));
         PluginManager.getSingeltonInstance().addOverlayContainer(container);
     }
