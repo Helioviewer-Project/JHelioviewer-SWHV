@@ -4,8 +4,10 @@ import java.awt.Graphics;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 
+import javax.media.opengl.GL;
 import javax.media.opengl.GL2;
 import javax.swing.ImageIcon;
 
@@ -100,13 +102,24 @@ public class HEKPluginRenderer implements PhysicalRenderer {
      * @param now
      *            - Current point in time
      */
-    public void drawIcon(PhysicalRenderGraphics g, JHVEvent evt, Date now) {
-        ImageIcon icon = evt.getIcon();
-        BufferedImage bi = new BufferedImage(icon.getIconWidth(), icon.getIconHeight(), BufferedImage.TYPE_4BYTE_ABGR_PRE);
-        Graphics graph = bi.createGraphics();
-        icon.paintIcon(null, graph, 0, 0);
-        graph.dispose();
+    private static HashMap<String, BufferedImage> iconCache = new HashMap<String, BufferedImage>();
 
+    public void drawIcon(PhysicalRenderGraphics g, JHVEvent evt, Date now) {
+        BufferedImage bi;
+        String type = evt.getJHVEventType().getEventType();
+        GL2 gl = g.getGL();
+        gl.glDisable(GL.GL_TEXTURE_1D);
+        gl.glEnable(GL2.GL_TEXTURE_2D);
+        if (iconCache.containsKey(type)) {
+            bi = iconCache.get(type);
+        } else {
+            ImageIcon icon = evt.getIcon();
+            bi = new BufferedImage(icon.getIconWidth(), icon.getIconHeight(), BufferedImage.TYPE_INT_ARGB);
+            Graphics graph = bi.createGraphics();
+            icon.paintIcon(null, graph, 0, 0);
+            graph.dispose();
+            iconCache.put(type, bi);
+        }
         int i = 0;
         while (i < evt.getPositioningInformation().size() && evt.getPositioningInformation().get(i).getCoordinateSystem() != JHVCoordinateSystem.HGS) {
             i++;

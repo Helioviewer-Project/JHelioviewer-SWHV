@@ -79,7 +79,7 @@ public class SWHVHEKData implements LayersListener, JHVEventHandler {
                     }
                 }
             }
-            if (this.beginDate == null || requestDates.get(0).getTime() < this.beginDate.getTime()) {
+            if (this.beginDate == null || requestDates.size() == 0 || requestDates.get(0).getTime() < this.beginDate.getTime()) {
                 this.beginDate = requestDates.get(0);
             }
             if (this.endDate == null || requestDates.get(0).getTime() > this.endDate.getTime()) {
