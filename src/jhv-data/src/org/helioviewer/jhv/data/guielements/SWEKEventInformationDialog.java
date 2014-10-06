@@ -1,7 +1,6 @@
 package org.helioviewer.jhv.data.guielements;
 
 import java.awt.Component;
-import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
@@ -24,19 +23,19 @@ import org.helioviewer.jhv.gui.components.CollapsiblePane;
 
 /**
  * Popup displaying informations about a HEK event.
- * 
+ *
  * <p>
  * This panel is a JDialog, so that it can be displayed on top of an GLCanvas,
  * which is not possible for other swing components.
- * 
+ *
  * <p>
  * For further informations about solar events, see
  * {@link org.helioviewer.jhv.solarevents}.
- * 
+ *
  * @author Markus Langenberg
  * @author Malte Nuhn
  * @author Bram.Bourgoignie (Bram.Bourgoignie@oma.be)
- * 
+ *
  */
 public class SWEKEventInformationDialog extends JDialog implements WindowFocusListener, FocusListener {
 
@@ -78,12 +77,13 @@ public class SWEKEventInformationDialog extends JDialog implements WindowFocusLi
     private final JHVEvent event;
 
     /**
-     * 
-     * 
+     *
+     *
      * @param event
      */
     public SWEKEventInformationDialog(JHVEvent event) {
-        super();// ImageViewerGui.getMainFrame());
+        super();
+
         this.event = event;
 
         labelIcon = new JLabel(event.getIcon());
@@ -94,8 +94,8 @@ public class SWEKEventInformationDialog extends JDialog implements WindowFocusLi
         initParameterCollapsiblePanels();
 
         this.setLayout(new GridBagLayout());
-        this.setUndecorated(true);
-        this.setMinimumSize(new Dimension(550, 50));
+        //this.setUndecorated(true);
+        //this.setMinimumSize(new Dimension(250, 50));
 
         this.addWindowFocusListener(this);
         this.addFocusListener(this);
@@ -188,7 +188,7 @@ public class SWEKEventInformationDialog extends JDialog implements WindowFocusLi
 
     /**
      * Initialize the short description.
-     * 
+     *
      */
     private void initDescriptionText() {
         textDescription = new JTextArea(event.getShortDescription());
@@ -225,7 +225,7 @@ public class SWEKEventInformationDialog extends JDialog implements WindowFocusLi
 
     /**
      * initialize the allTablePanel
-     * 
+     *
      */
     private void initAllTablePanel() {
         allTablePanel = new JPanel();
@@ -251,7 +251,7 @@ public class SWEKEventInformationDialog extends JDialog implements WindowFocusLi
 
     /**
      * Add component to the summary panel.
-     * 
+     *
      * @param panel
      *            the panel to add to
      * @param y
