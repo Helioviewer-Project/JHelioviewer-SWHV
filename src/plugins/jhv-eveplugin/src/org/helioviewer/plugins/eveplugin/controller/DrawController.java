@@ -1,5 +1,6 @@
 package org.helioviewer.plugins.eveplugin.controller;
 
+import java.awt.EventQueue;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
@@ -264,14 +265,19 @@ public class DrawController implements ZoomControllerListener, LineDataSelectorM
         fireRedrawRequest(element.getPlotIdentifier());
     }
 
-    private void fireRedrawRequestMovieFrameChanged(Date time) {
-        synchronized (drawControllerData) {
-            for (DrawControllerData dcd : drawControllerData.values()) {
-                for (DrawControllerListener l : dcd.getListeners()) {
-                    l.drawMovieLineRequest(time);
+    private void fireRedrawRequestMovieFrameChanged(final Date time) {
+        EventQueue.invokeLater(new Runnable() {
+
+            @Override
+            public void run() {
+                for (DrawControllerData dcd : drawControllerData.values()) {
+                    for (DrawControllerListener l : dcd.getListeners()) {
+                        l.drawMovieLineRequest(time);
+                    }
                 }
             }
-        }
+        });
+
     }
 
     /*
