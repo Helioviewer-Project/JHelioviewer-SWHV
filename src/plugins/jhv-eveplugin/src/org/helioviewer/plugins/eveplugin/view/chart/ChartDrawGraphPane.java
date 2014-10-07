@@ -547,13 +547,19 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
 
     @Override
     public void componentResized(ComponentEvent e) {
-        synchronized (this) {
-            lastKnownWidth = getWidth()
-                    - (ChartConstants.GRAPH_LEFT_SPACE + ChartConstants.GRAPH_RIGHT_SPACE + twoYAxis * ChartConstants.TWO_AXIS_GRAPH_RIGHT);
-            lastKnownHeight = getHeight() - (ChartConstants.GRAPH_TOP_SPACE + ChartConstants.GRAPH_BOTTOM_SPACE);
-            zoomManager.setDisplaySize(new Rectangle(0, 0, lastKnownWidth, lastKnownHeight), identifier);
-            updateGraph();
-        }
+        EventQueue.invokeLater(new Runnable() {
+
+            @Override
+            public void run() {
+                lastKnownWidth = getWidth()
+                        - (ChartConstants.GRAPH_LEFT_SPACE + ChartConstants.GRAPH_RIGHT_SPACE + twoYAxis
+                                * ChartConstants.TWO_AXIS_GRAPH_RIGHT);
+                lastKnownHeight = getHeight() - (ChartConstants.GRAPH_TOP_SPACE + ChartConstants.GRAPH_BOTTOM_SPACE);
+                zoomManager.setDisplaySize(new Rectangle(0, 0, lastKnownWidth, lastKnownHeight), identifier);
+                updateGraph();
+            }
+        });
+
     }
 
     @Override
