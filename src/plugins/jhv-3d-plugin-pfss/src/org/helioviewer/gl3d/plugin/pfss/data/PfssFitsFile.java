@@ -62,7 +62,9 @@ public class PfssFitsFile implements Serializable {
             e.printStackTrace();
         } finally {
             try {
-                in.close();
+                if (in != null) {
+                    in.close();
+                }
             } catch (IOException e) {
                 e.printStackTrace();
             }
