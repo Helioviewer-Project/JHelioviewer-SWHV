@@ -23,9 +23,9 @@ import org.helioviewer.viewmodel.view.jp2view.kakadu.JHV_KduException;
 /**
  * This class intercepts changes of the layers and request data from the
  * JHVEventContainer.
- * 
+ *
  * @author Bram Bourgoignie (Bram.Bourgoignie@oma.be)
- * 
+ *
  */
 public class SWHVHEKData implements LayersListener, JHVEventHandler {
 
@@ -47,7 +47,7 @@ public class SWHVHEKData implements LayersListener, JHVEventHandler {
 
     /**
      * Gets the singleton instance of the outgoing request manager
-     * 
+     *
      * @return the singleton instance
      */
     public static SWHVHEKData getSingletonInstance() {
@@ -62,7 +62,7 @@ public class SWHVHEKData implements LayersListener, JHVEventHandler {
         try {
             View activeView = LayersModel.getSingletonInstance().getActiveView();
             if (activeView != null) {
-                List<Date> requestDates = new ArrayList<Date>();
+                ArrayList<Date> requestDates = new ArrayList<Date>();
                 JHVJPXView jpxView = activeView.getAdapter(JHVJPXView.class);
                 if (jpxView != null) {
                     for (int frame = 1; frame <= jpxView.getMaximumFrameNumber(); frame++) {
@@ -80,13 +80,15 @@ public class SWHVHEKData implements LayersListener, JHVEventHandler {
                         }
                     }
                 }
-                if (beginDate == null || requestDates.size() == 0 || requestDates.get(0).getTime() < beginDate.getTime()) {
-                    beginDate = requestDates.get(0);
+                if (!requestDates.isEmpty()) {
+                    if (beginDate == null || requestDates.get(0).getTime() < beginDate.getTime()) {
+                        beginDate = requestDates.get(0);
+                    }
+                    if (endDate == null || requestDates.get(0).getTime() > endDate.getTime()) {
+                        endDate = requestDates.get(requestDates.size() - 1);
+                    }
+                    JHVEventContainer.getSingletonInstance().requestForInterval(beginDate, endDate, this);
                 }
-                if (endDate == null || requestDates.get(0).getTime() > endDate.getTime()) {
-                    endDate = requestDates.get(requestDates.size() - 1);
-                }
-                JHVEventContainer.getSingletonInstance().requestForInterval(beginDate, endDate, this);
             }
         } catch (JHV_KduException ex) {
             Log.error("Received an kakadu exception. " + ex);
@@ -138,13 +140,18 @@ public class SWHVHEKData implements LayersListener, JHVEventHandler {
     /**
      * Parses a date in string with the format yyyy-MM-dd'T'HH:mm:ss.SSS into a
      * date object.
-     * 
+     *
      * @param dateOBS
      *            the date to parse
      * @return The parsed date
      */
     private Date parseDate(String dateOBS) {
-        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS");
+        SimpleDateFormat sdf;
+        if (dateOBS.length() == 23) {
+            sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS");
+        } else {
+            sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
+        }
         try {
             return sdf.parse(dateOBS);
         } catch (ParseException e) {
