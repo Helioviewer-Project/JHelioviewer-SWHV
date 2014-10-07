@@ -98,7 +98,7 @@ public class EventPanel extends JPanel implements MouseListener {
                 }
             });
 
-            add(filterButton, BorderLayout.PAGE_END);
+            add(filterButton, BorderLayout.LINE_END);
         }
     }
 
