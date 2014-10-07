@@ -105,7 +105,7 @@ public class GLOverlayView extends AbstractGLView implements OverlayView {
                 }
             }
         }
-        if (aEvent.reasonOccurred(ViewChainChangedReason.class)) {
+        if (aEvent != null && aEvent.reasonOccurred(ViewChainChangedReason.class)) {
             layeredView = ViewHelper.getViewAdapter(view, LayeredView.class);
         }
 
