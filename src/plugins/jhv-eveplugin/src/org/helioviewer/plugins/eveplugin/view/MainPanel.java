@@ -1,6 +1,7 @@
 package org.helioviewer.plugins.eveplugin.view;
 
 import java.awt.BorderLayout;
+import java.awt.Dimension;
 import java.util.Date;
 
 import javax.swing.JPanel;
@@ -28,10 +29,11 @@ public class MainPanel extends JPanel {
 
     public MainPanel() {
         initVisualComponents();
-        ZoomController.getSingletonInstance().setAvailableInterval(new Interval<Date>(new Date(), new Date()));        
+        ZoomController.getSingletonInstance().setAvailableInterval(new Interval<Date>(new Date(), new Date()));
     }
 
     private void initVisualComponents() {
+        setPreferredSize(new Dimension(300, 500));
         setLayout(new BorderLayout());
 
         add(plotsPane, BorderLayout.CENTER);
