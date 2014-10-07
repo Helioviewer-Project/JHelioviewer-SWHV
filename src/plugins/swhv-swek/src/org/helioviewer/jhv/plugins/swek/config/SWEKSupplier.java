@@ -16,13 +16,17 @@ public class SWEKSupplier {
     /** The source from where is supplied */
     private SWEKSource source;
 
+    /** The display name of the supplier */
+    private String supplierDisplayName;
+
     /**
      * Creates a SWEK supplier with an empty name and null source.
      */
     public SWEKSupplier() {
         super();
-        this.supplierName = "";
-        this.source = null;
+        supplierName = "";
+        supplierDisplayName = "";
+        source = null;
     }
 
     /**
@@ -30,12 +34,15 @@ public class SWEKSupplier {
      * 
      * @param supplierName
      *            The name of the supplier
+     * @param supplierDisplayName
+     *            The display name of the supplier
      * @param source
      *            The source on which the supplier supplies its events
      */
-    public SWEKSupplier(String supplierName, SWEKSource source) {
+    public SWEKSupplier(String supplierName, String supplierDisplayName, SWEKSource source) {
         super();
         this.supplierName = supplierName;
+        this.supplierDisplayName = supplierDisplayName;
         this.source = source;
     }
 
@@ -45,7 +52,7 @@ public class SWEKSupplier {
      * @return the supplierName
      */
     public String getSupplierName() {
-        return this.supplierName;
+        return supplierName;
     }
 
     /**
@@ -59,12 +66,31 @@ public class SWEKSupplier {
     }
 
     /**
+     * Gets the display name of the supplier
+     * 
+     * @return the display name of the supplier.
+     */
+    public String getSupplierDisplayName() {
+        return supplierDisplayName;
+    }
+
+    /**
+     * Sets the supplier display name.
+     * 
+     * @param supplierDisplayName
+     *            the supplier display name
+     */
+    public void setSupplierDisplayName(String supplierDisplayName) {
+        this.supplierDisplayName = supplierDisplayName;
+    }
+
+    /**
      * Gets the source on which the supplier supplies its events.
      * 
      * @return the source
      */
     public SWEKSource getSource() {
-        return this.source;
+        return source;
     }
 
     /**

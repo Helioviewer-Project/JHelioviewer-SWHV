@@ -102,15 +102,17 @@ public class SWEKConfigurationManager {
             if (checkAndOpenUserSetFile()) {
                 isConfigParsed = parseConfigFile();
             } else if (checkAndOpenHomeDirectoryFile()) {
-                isConfigParsed = parseConfigFile();
-                if (isConfigParsed) {
+                boolean manuallyChanged = isManuallyChanged();
+                if (!manuallyChanged) {
                     // check if the file is manually changed if not we download
                     // the latest version anyway.
-                    if (!configuration.isManuallyChanged()) {
-                        if (checkAndOpenOnlineFile()) {
-                            isConfigParsed = parseConfigFile();
-                        }
+                    if (checkAndOpenOnlineFile()) {
+                        isConfigParsed = parseConfigFile();
+                    } else {
+                        isConfigParsed = false;
                     }
+                } else {
+                    isConfigParsed = parseConfigFile();
                 }
             } else if (checkAndOpenOnlineFile()) {
                 isConfigParsed = parseConfigFile();
@@ -124,6 +126,34 @@ public class SWEKConfigurationManager {
                 configLoaded = true;
             }
         }
+    }
+
+    /**
+     * Checks if the configuration file was manually changed.
+     * 
+     * @return true if the configuration file was initially changed, false if
+     *         not
+     */
+    private boolean isManuallyChanged() {
+        try {
+            InputStream configIs = configFileURL.openStream();
+            StringBuilder sb = new StringBuilder();
+            BufferedReader br = new BufferedReader(new InputStreamReader(configIs));
+            String line;
+            while ((line = br.readLine()) != null) {
+                sb.append(line);
+            }
+
+            JSONObject configJSON = new JSONObject(sb.toString());
+            return parseManuallyChanged(configJSON);
+        } catch (JSONException e) {
+            Log.error("Could not parse the json : " + e.getMessage());
+            e.printStackTrace();
+        } catch (IOException e) {
+            Log.error("Could not load the file : " + e.getMessage());
+            e.printStackTrace();
+        }
+        return false;
     }
 
     /**
@@ -620,6 +650,7 @@ public class SWEKConfigurationManager {
     private SWEKSupplier parseSupplier(JSONObject object) throws JSONException {
         SWEKSupplier supplier = new SWEKSupplier();
         supplier.setSupplierName(parseSupplierName(object));
+        supplier.setSupplierDisplayName(parseSupplierDisplayName(object));
         supplier.setSource(parseSupplierSource(object));
         return supplier;
     }
@@ -635,6 +666,19 @@ public class SWEKConfigurationManager {
      */
     private String parseSupplierName(JSONObject object) throws JSONException {
         return object.getString("supplier_name");
+    }
+
+    /**
+     * Parses the supplier display name from a json
+     * 
+     * @param object
+     *            the JSON from which to parse the supplier display name
+     * @return the supplier display name
+     * @throws JSONException
+     *             if the supplier display name could not be parsed
+     */
+    private String parseSupplierDisplayName(JSONObject object) throws JSONException {
+        return object.getString("supplier_display_name");
     }
 
     /**
