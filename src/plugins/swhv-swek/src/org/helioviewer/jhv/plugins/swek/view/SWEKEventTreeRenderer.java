@@ -28,7 +28,7 @@ public class SWEKEventTreeRenderer extends DefaultTreeCellRenderer {
         if (whatToDisplay instanceof SWEKTreeModelEventType) {
             return createLeaf(((SWEKTreeModelEventType) whatToDisplay).getSwekEventType().getEventName(), whatToDisplay);
         } else if (whatToDisplay instanceof SWEKTreeModelSupplier) {
-            return createLeaf(((SWEKTreeModelSupplier) whatToDisplay).getSwekSupplier().getSupplierName(), whatToDisplay);
+            return createLeaf(((SWEKTreeModelSupplier) whatToDisplay).getSwekSupplier().getSupplierDisplayName(), whatToDisplay);
         } else {
             return super.getTreeCellRendererComponent(tree, whatToDisplay, selected, expanded, leaf, row, hasFocus);
         }
