@@ -105,7 +105,10 @@ public class EVEDrawController implements BandControllerListener, ZoomController
                 availableRange.setMin(v.getMinimumValue());
                 availableRange.setMax(v.getMaximumValue());
             }
+
         }
+        availableRange.setMin(data.getMinimumValue());
+        availableRange.setMax(data.getMaximumValue());
         if (oldAvailableRange.min != availableRange.min || oldAvailableRange.max != availableRange.max) {
             Log.trace("update band available range changed so we change the plotareaSpace");
             checkSelectedRange(availableRange, selectedRange);
@@ -181,7 +184,7 @@ public class EVEDrawController implements BandControllerListener, ZoomController
         double diffEnd = Math.log10(selectedRange.max) - Math.log10(availableRange.min);
         double startValue = plotAreaSpace.getScaledMinValue() + diffStart / diffAvailable;
         double endValue = plotAreaSpace.getScaledMinValue() + diffEnd / diffAvailable;
-        plotAreaSpace.setScaledSelectedValue(startValue, endValue, false);
+        plotAreaSpace.setScaledSelectedValue(startValue, endValue, true);
     }
 
     private void adjustAvailableRangeBorders(final Range availableRange) {
