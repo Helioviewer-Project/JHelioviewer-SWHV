@@ -19,6 +19,7 @@ import org.helioviewer.jhv.plugins.swek.config.SWEKParameter;
 import org.helioviewer.jhv.plugins.swek.config.SWEKSource;
 import org.helioviewer.jhv.plugins.swek.config.SWEKSupplier;
 import org.helioviewer.jhv.plugins.swek.model.EventTypePanelModelListener;
+import org.helioviewer.jhv.plugins.swek.model.SWEKTreeModel;
 import org.helioviewer.jhv.plugins.swek.request.IncomingRequestManager;
 import org.helioviewer.jhv.plugins.swek.request.IncomingRequestManagerListener;
 import org.helioviewer.jhv.plugins.swek.settings.SWEKProperties;
@@ -62,6 +63,9 @@ public class SWEKDownloadManager implements DownloadWorkerListener, IncomingRequ
     /** Local instance of filter manager */
     private final FilterManager filterManager;
 
+    /** The instance of the SWEKTreeModel */
+    private final SWEKTreeModel treeModel;
+
     /**
      * private constructor of the SWEKDownloadManager
      */
@@ -77,6 +81,7 @@ public class SWEKDownloadManager implements DownloadWorkerListener, IncomingRequ
         eventContainer = JHVEventContainer.getSingletonInstance();
         filterManager = FilterManager.getSingletonInstance();
         filterManager.addFilterManagerListener(this);
+        treeModel = SWEKTreeModel.getSingletonInstance();
     }
 
     /**
@@ -140,11 +145,13 @@ public class SWEKDownloadManager implements DownloadWorkerListener, IncomingRequ
 
     @Override
     public void workerStarted(DownloadWorker worker) {
+        treeModel.setStartLoading(worker.getEventType());
     }
 
     @Override
     public void workerForcedToStop(DownloadWorker worker) {
         synchronized (SWEKPluginLocks.downloadLock) {
+            treeModel.setStopLoading(worker.getEventType());
             removeWorkerFromMap(worker);
             removeFromBusyAndFinishedJobs(worker.getEventType(), worker.getSupplier(), worker.getDownloadStartDate());
         }
@@ -153,6 +160,7 @@ public class SWEKDownloadManager implements DownloadWorkerListener, IncomingRequ
     @Override
     public void workerFinished(DownloadWorker worker) {
         synchronized (SWEKPluginLocks.downloadLock) {
+            treeModel.setStopLoading(worker.getEventType());
             removeWorkerFromMap(worker);
         }
     }
