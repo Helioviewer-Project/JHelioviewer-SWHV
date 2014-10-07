@@ -3,6 +3,7 @@ package org.helioviewer.plugins.eveplugin.controller;
 import java.awt.EventQueue;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -36,7 +37,7 @@ public class DrawController implements ZoomControllerListener, LineDataSelectorM
     private Thread viewChangedThread;
 
     private DrawController() {
-        drawControllerData = new HashMap<String, DrawControllerData>();
+        drawControllerData = Collections.synchronizedMap(new HashMap<String, DrawControllerData>());
         ZoomController.getSingletonInstance().addZoomControllerListener(this);
         LineDataSelectorModel.getSingletonInstance().addLineDataSelectorModelListener(this);
         forAllPlotIdentifiers = new ArrayList<DrawControllerListener>();
@@ -51,16 +52,18 @@ public class DrawController implements ZoomControllerListener, LineDataSelectorM
     }
 
     private DrawControllerData getDrawControllerData(String identifier) {
-        DrawControllerData dcd = new DrawControllerData();
-        if (drawControllerData.containsKey(identifier)) {
-            dcd = drawControllerData.get(identifier);
-        } else {
-            for (DrawControllerListener l : forAllPlotIdentifiers) {
-                dcd.addDrawControllerListener(l);
+        synchronized (drawControllerData) {
+            DrawControllerData dcd = new DrawControllerData();
+            if (drawControllerData.containsKey(identifier)) {
+                dcd = drawControllerData.get(identifier);
+            } else {
+                for (DrawControllerListener l : forAllPlotIdentifiers) {
+                    dcd.addDrawControllerListener(l);
+                }
+                drawControllerData.put(identifier, dcd);
             }
-            drawControllerData.put(identifier, dcd);
+            return dcd;
         }
-        return dcd;
     }
 
     public void addDrawControllerListenerForAllIdentifiers(DrawControllerListener listener) {
@@ -202,9 +205,11 @@ public class DrawController implements ZoomControllerListener, LineDataSelectorM
         synchronized (drawControllerData) {
             for (DrawControllerData dcd : drawControllerData.values()) {
                 Log.info("DrawController listeners size: " + dcd.getListeners().size());
-                for (DrawControllerListener l : dcd.getListeners()) {
-                    Log.info("Draw Controller listener : " + l);
-                    l.drawRequest();
+                synchronized (dcd.getListeners()) {
+                    for (DrawControllerListener l : dcd.getListeners()) {
+                        Log.info("Draw Controller listener : " + l);
+                        l.drawRequest();
+                    }
                 }
             }
         }
@@ -213,8 +218,10 @@ public class DrawController implements ZoomControllerListener, LineDataSelectorM
     private void fireRedrawRequest(String identifier) {
         synchronized (drawControllerData) {
             DrawControllerData dcd = getDrawControllerData(identifier);
-            for (DrawControllerListener l : dcd.getListeners()) {
-                l.drawRequest();
+            synchronized (dcd.getListeners()) {
+                for (DrawControllerListener l : dcd.getListeners()) {
+                    l.drawRequest();
+                }
             }
         }
     }
@@ -271,8 +278,10 @@ public class DrawController implements ZoomControllerListener, LineDataSelectorM
             @Override
             public void run() {
                 for (DrawControllerData dcd : drawControllerData.values()) {
-                    for (DrawControllerListener l : dcd.getListeners()) {
-                        l.drawMovieLineRequest(time);
+                    synchronized (dcd.getListeners()) {
+                        for (DrawControllerListener l : dcd.getListeners()) {
+                            l.drawMovieLineRequest(time);
+                        }
                     }
                 }
             }
