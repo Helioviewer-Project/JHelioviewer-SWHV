@@ -92,23 +92,22 @@ public class GLOverlayView extends AbstractGLView implements OverlayView {
      */
     @Override
     public void viewChanged(View sender, ChangeEvent aEvent) {
-        // Log.debug("viewChange: sender : " + sender);
-        if (aEvent != null && aEvent.reasonOccurred(RegionChangedReason.class)) {
-
-            GLLayeredView layeredView = sender.getAdapter(GLLayeredView.class);
-            Iterator<OverlayPluginContainer> iterator = this.overlays.iterator();
-            // Region region = sender.getAdapter(RegionView.class);
-            while (iterator.hasNext()) {
-                OverlayPluginContainer overlay = iterator.next();
-                if (overlay.getRenderer3d() != null) {
-                    overlay.getRenderer3d().viewChanged(sender);
+        if (aEvent != null) {
+            if (aEvent.reasonOccurred(RegionChangedReason.class)) {
+                GLLayeredView layeredView = sender.getAdapter(GLLayeredView.class);
+                Iterator<OverlayPluginContainer> iterator = this.overlays.iterator();
+                // Region region = sender.getAdapter(RegionView.class);
+                while (iterator.hasNext()) {
+                    OverlayPluginContainer overlay = iterator.next();
+                    if (overlay.getRenderer3d() != null) {
+                        overlay.getRenderer3d().viewChanged(sender);
+                    }
                 }
             }
+            if (aEvent.reasonOccurred(ViewChainChangedReason.class)) {
+                layeredView = ViewHelper.getViewAdapter(view, LayeredView.class);
+            }
         }
-        if (aEvent != null && aEvent.reasonOccurred(ViewChainChangedReason.class)) {
-            layeredView = ViewHelper.getViewAdapter(view, LayeredView.class);
-        }
-
         super.viewChanged(sender, aEvent);
     }
 
