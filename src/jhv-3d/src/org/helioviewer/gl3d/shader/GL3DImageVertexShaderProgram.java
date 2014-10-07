@@ -50,6 +50,7 @@ public class GL3DImageVertexShaderProgram extends GLVertexShaderProgram {
             String program = "\tphysicalPosition = physicalPosition;" + GLShaderBuilder.LINE_SEP;
 
             program += "\tif(abs(position.x)>1.1){" + GLShaderBuilder.LINE_SEP;
+            //Corona
             program += "\tfloat theta = textureScaleThetaPhi.z;" + GLShaderBuilder.LINE_SEP;
             program += "\tfloat phi = textureScaleThetaPhi.w;" + GLShaderBuilder.LINE_SEP;
 
@@ -73,14 +74,8 @@ public class GL3DImageVertexShaderProgram extends GLVertexShaderProgram {
             program += "\tdifferenceOutput.y *= diffTextureScaleThetaPhi.y;" + GLShaderBuilder.LINE_SEP;
 
             program += "\tpositionPass = position;" + GLShaderBuilder.LINE_SEP;
-
-            program += "\tfloat xrott = physicalPosition.x;" + GLShaderBuilder.LINE_SEP;
-            program += "\tfloat yrott = physicalPosition.y*cos(theta) - physicalPosition.z*sin(theta);" + GLShaderBuilder.LINE_SEP;
-            program += "\tfloat zrott = physicalPosition.y*sin(theta) + physicalPosition.z*cos(theta);" + GLShaderBuilder.LINE_SEP;
-
-            program += "\t physicalPosition.x = xrott*cos(phi) - zrott*sin(phi);" + GLShaderBuilder.LINE_SEP;
-            program += "\t physicalPosition.y = yrott;" + GLShaderBuilder.LINE_SEP;
-            program += "\t physicalPosition.z = xrott*sin(phi) + zrott*cos(phi);" + GLShaderBuilder.LINE_SEP;
+            program += "\tfloat3x3 mat = float3x3(cos(phi), -sin(theta)*sin(phi), -sin(phi)*cos(theta), 0, cos(theta), -sin(theta), sin(phi), cos(phi)*sin(theta), cos(theta)*cos(phi));" + GLShaderBuilder.LINE_SEP;
+            program += "\tphysicalPosition.xyz = mul(mat, physicalPosition.xyz);" + GLShaderBuilder.LINE_SEP;
             program += "\t OUT.position = mul(state_matrix_mvp, physicalPosition);" + GLShaderBuilder.LINE_SEP;
             program += "\t OUT.position.y = OUT.position.y;" + GLShaderBuilder.LINE_SEP;
 
@@ -91,15 +86,11 @@ public class GL3DImageVertexShaderProgram extends GLVertexShaderProgram {
             program += "\tfloat theta = -textureScaleThetaPhi.z;" + GLShaderBuilder.LINE_SEP;
             program += "\tfloat phi = -textureScaleThetaPhi.w;" + GLShaderBuilder.LINE_SEP;
             program += "\tpositionPass = physicalPosition;" + GLShaderBuilder.LINE_SEP;
-            program += "\tfloat xrot = physicalPosition.x*cos(phi) - physicalPosition.z*sin(phi);" + GLShaderBuilder.LINE_SEP;
-            program += "\tfloat yrot = physicalPosition.y;" + GLShaderBuilder.LINE_SEP;
-            program += "\tfloat zrot = physicalPosition.x*sin(phi) + physicalPosition.z*cos(phi);" + GLShaderBuilder.LINE_SEP;
+            program += "\tfloat3x3 mat = float3x3(cos(phi), 0, -sin(phi), -sin(theta)*sin(phi), cos(theta), -sin(theta)*cos(phi), cos(theta)*sin(phi), sin(theta), cos(theta)*cos(phi));" + GLShaderBuilder.LINE_SEP;
+            program += "\tfloat3 rot = mul(mat, physicalPosition.xyz);" + GLShaderBuilder.LINE_SEP;
 
-            program += "\tfloat xrott = xrot;" + GLShaderBuilder.LINE_SEP;
-            program += "\tfloat yrott = yrot*cos(theta) - zrot*sin(theta);" + GLShaderBuilder.LINE_SEP;
-            program += "\tfloat zrott = yrot*sin(theta) + zrot*cos(theta);" + GLShaderBuilder.LINE_SEP;
-            program += "\toutput.x = xrott - rect.x;" + GLShaderBuilder.LINE_SEP;
-            program += "\toutput.y = -yrott - rect.y;" + GLShaderBuilder.LINE_SEP;
+            program += "\toutput.x = rot.x - rect.x;" + GLShaderBuilder.LINE_SEP;
+            program += "\toutput.y = -rot.y - rect.y;" + GLShaderBuilder.LINE_SEP;
 
             program += "\toutput.x *= rect.z;" + GLShaderBuilder.LINE_SEP;
             program += "\toutput.y *= rect.w;" + GLShaderBuilder.LINE_SEP;
@@ -110,17 +101,11 @@ public class GL3DImageVertexShaderProgram extends GLVertexShaderProgram {
 
             program += "\tfloat differencetheta = -textureScaleThetaPhi.z;" + GLShaderBuilder.LINE_SEP;
             program += "\tfloat differencephi = -diffTextureScaleThetaPhi.w;" + GLShaderBuilder.LINE_SEP;
+            program += "\tmat = float3x3(cos(differencephi), 0, -sin(differencephi), -sin(differencetheta)*sin(differencephi), cos(differencetheta), -sin(differencetheta)*cos(differencephi), cos(differencetheta)*sin(differencephi), sin(differencetheta), cos(differencetheta)*cos(differencephi));" + GLShaderBuilder.LINE_SEP;
+            program += "\trot = mul(mat, physicalPosition.xyz);" + GLShaderBuilder.LINE_SEP;
 
-            program += "\txrot = physicalPosition.x*cos(differencephi) - physicalPosition.z*sin(differencephi);" + GLShaderBuilder.LINE_SEP;
-            program += "\tyrot = physicalPosition.y;" + GLShaderBuilder.LINE_SEP;
-            program += "\tzrot = physicalPosition.x*sin(differencephi) + physicalPosition.z*cos(differencephi);" + GLShaderBuilder.LINE_SEP;
-
-            program += "\txrott = xrot;" + GLShaderBuilder.LINE_SEP;
-            program += "\tyrott = yrot*cos(differencetheta) - zrot*sin(differencetheta);" + GLShaderBuilder.LINE_SEP;
-            program += "\tzrott = yrot*sin(differencetheta) + zrot*cos(differencetheta);" + GLShaderBuilder.LINE_SEP;
-
-            program += "\tdifferenceOutput.x = xrott - differenceRect.x;" + GLShaderBuilder.LINE_SEP;
-            program += "\tdifferenceOutput.y = -yrott - differenceRect.y;" + GLShaderBuilder.LINE_SEP;
+            program += "\tdifferenceOutput.x = rot.x - differenceRect.x;" + GLShaderBuilder.LINE_SEP;
+            program += "\tdifferenceOutput.y = -rot.y - differenceRect.y;" + GLShaderBuilder.LINE_SEP;
 
             program += "\tdifferenceOutput.x *= differenceRect.z;" + GLShaderBuilder.LINE_SEP;
             program += "\tdifferenceOutput.y *= differenceRect.w;" + GLShaderBuilder.LINE_SEP;
@@ -156,7 +141,6 @@ public class GL3DImageVertexShaderProgram extends GLVertexShaderProgram {
         this.yScale = yScale;
     }
 
-
     public void changeAngles(double theta, double phi) {
         this.theta = theta;
         this.phi = phi;
@@ -171,6 +155,7 @@ public class GL3DImageVertexShaderProgram extends GLVertexShaderProgram {
         this.differenceXTextureScale = scaleX;
         this.differenceYTextureScale = scaleY;
     }
+
     public void changeDifferenceAngles(double theta, double phi) {
         this.differenceTheta = theta;
         this.differencePhi = phi;
