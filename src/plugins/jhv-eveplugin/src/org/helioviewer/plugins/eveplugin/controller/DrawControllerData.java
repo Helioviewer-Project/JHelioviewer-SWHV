@@ -23,7 +23,7 @@ public class DrawControllerData {
     public DrawControllerData() {
         nrOfDrawableElements = 0;
         drawableElements = new HashMap<DrawableType, Set<DrawableElement>>();
-        listeners = new ArrayList<DrawControllerListener>();
+        listeners = Collections.synchronizedList(new ArrayList<DrawControllerListener>());
         yAxisSet = new HashSet<YAxisElement>();
     }
 
@@ -54,19 +54,29 @@ public class DrawControllerData {
     }
 
     public List<DrawControllerListener> getListeners() {
-        return listeners;
+        synchronized (listeners) {
+            List<DrawControllerListener> temp = new ArrayList<DrawControllerListener>(listeners);
+            return temp;
+        }
+
     }
 
     public void setListeners(List<DrawControllerListener> listeners) {
-        this.listeners = listeners;
+        synchronized (this.listeners) {
+            this.listeners = listeners;
+        }
     }
 
     public void addDrawControllerListener(DrawControllerListener listener) {
-        listeners.add(listener);
+        synchronized (listeners) {
+            listeners.add(listener);
+        }
     }
 
     public void removeDrawControllerListener(DrawControllerListener listener) {
-        listeners.remove(listener);
+        synchronized (listeners) {
+            listeners.remove(listener);
+        }
 
     }
 
