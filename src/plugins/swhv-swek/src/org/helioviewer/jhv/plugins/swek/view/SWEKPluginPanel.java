@@ -82,4 +82,16 @@ public class SWEKPluginPanel extends OverlayPanel implements SWEKTreeModelListen
         super.revalidate();
         super.repaint();
     }
+
+    @Override
+    public void startedDownloadingEventType(SWEKEventType eventType) {
+        // TODO Auto-generated method stub
+
+    }
+
+    @Override
+    public void stoppedDownloadingEventType(SWEKEventType eventType) {
+        // TODO Auto-generated method stub
+
+    }
 }
