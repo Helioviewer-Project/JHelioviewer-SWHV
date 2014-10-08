@@ -504,7 +504,7 @@ public class ChartDrawIntervalPane extends JComponent implements ZoomControllerL
                 final double diffUnits = pas.getScaledMaxTime() - pas.getScaledMinTime();
                 final double timestamp = pas.getScaledMinTime() + ((useThisX - ChartConstants.GRAPH_LEFT_SPACE) / availableIntervalSpace)
                         * diffUnits;
-                pas.setScaledSelectedTime(timestamp, pas.getScaledSelectedMaxTime(), forced);
+                pas.setScaledSelectedTime(Math.max(timestamp, pas.getScaledMinTime()), pas.getScaledSelectedMaxTime(), forced);
             }
         } else if (mouseOverRightGraspPoint) {
             if (newMousePosition.x <= leftIntervalBorderPosition) {
@@ -517,7 +517,7 @@ public class ChartDrawIntervalPane extends JComponent implements ZoomControllerL
                 final double timestamp = pas.getScaledMinTime()
                         + (1.0 * (useThisX - ChartConstants.GRAPH_LEFT_SPACE) / availableIntervalSpace) * diffUnits;
 
-                pas.setScaledSelectedTime(pas.getScaledSelectedMinTime(), timestamp, forced);
+                pas.setScaledSelectedTime(pas.getScaledSelectedMinTime(), Math.min(timestamp, pas.getScaledMaxTime()), forced);
             }
         }
     }
