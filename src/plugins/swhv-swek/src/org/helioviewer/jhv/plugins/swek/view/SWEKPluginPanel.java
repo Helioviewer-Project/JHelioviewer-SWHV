@@ -5,11 +5,9 @@ package org.helioviewer.jhv.plugins.swek.view;
 
 import java.awt.BorderLayout;
 import java.awt.Component;
-import java.awt.Dimension;
 
 import javax.swing.BoxLayout;
 import javax.swing.JPanel;
-import javax.swing.JScrollPane;
 
 import org.helioviewer.jhv.plugins.swek.config.SWEKConfigurationManager;
 import org.helioviewer.jhv.plugins.swek.config.SWEKEventType;
@@ -19,9 +17,9 @@ import org.helioviewer.viewmodelplugin.overlay.OverlayPanel;
 
 /**
  * The main visual component of the SWEK-plugin.
- * 
+ *
  * @author Bram Bourgoignie (Bram.Bourgoignie@oma.be)
- * 
+ *
  */
 public class SWEKPluginPanel extends OverlayPanel implements SWEKTreeModelListener {
 
@@ -52,7 +50,7 @@ public class SWEKPluginPanel extends OverlayPanel implements SWEKTreeModelListen
      */
     private void initVisualComponents() {
         this.setLayout(new BorderLayout());
-        this.setPreferredSize(new Dimension(150, 200));
+        //this.setPreferredSize(new Dimension(150, 200));
         JPanel eventTypePanel = new JPanel();
         BoxLayout boxLayout = new BoxLayout(eventTypePanel, BoxLayout.Y_AXIS);
         eventTypePanel.setLayout(boxLayout);
@@ -61,13 +59,13 @@ public class SWEKPluginPanel extends OverlayPanel implements SWEKTreeModelListen
             eventPanel.setAlignmentX(Component.LEFT_ALIGNMENT);
             eventTypePanel.add(eventPanel);
         }
-        JScrollPane sp = new JScrollPane(eventTypePanel);
-        add(sp, BorderLayout.CENTER);
+        //JScrollPane sp = new JScrollPane(eventTypePanel);
+        add(eventTypePanel, BorderLayout.CENTER);
     }
 
     /**
      * Gives the main SWEKPluginPanel.
-     * 
+     *
      * @return The swekPluginPanel.
      */
     public static SWEKPluginPanel getSWEKPluginPanelInstance() {
