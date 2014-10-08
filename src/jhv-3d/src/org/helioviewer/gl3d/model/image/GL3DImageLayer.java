@@ -23,11 +23,11 @@ import org.helioviewer.viewmodel.changeevent.ChangeEvent;
 import org.helioviewer.viewmodel.metadata.MetaData;
 import org.helioviewer.viewmodel.region.Region;
 import org.helioviewer.viewmodel.region.StaticRegion;
+import org.helioviewer.viewmodel.view.ImageInfoView;
 import org.helioviewer.viewmodel.view.MetaDataView;
 import org.helioviewer.viewmodel.view.RegionView;
 import org.helioviewer.viewmodel.view.View;
 import org.helioviewer.viewmodel.view.ViewListener;
-import org.helioviewer.viewmodel.view.jp2view.JHVJPXView;
 
 /**
  * This is the scene graph equivalent of an image layer sub view chain attached
@@ -64,7 +64,7 @@ public abstract class GL3DImageLayer extends GL3DGroup implements GL3DCameraList
 
     protected GL2 gl;
     protected GL3DImageFragmentShaderProgram sphereFragmentShader = null;
-    private final JHVJPXView jpxView;
+    private final ImageInfoView jpxView;
 
     public GL3DImageLayer(String name, GL3DView mainLayerView) {
         super(name);
@@ -91,7 +91,7 @@ public abstract class GL3DImageLayer extends GL3DGroup implements GL3DCameraList
         }
 
         this.accellerationShape = new GL3DHitReferenceShape(false);
-        this.jpxView = this.mainLayerView.getAdapter(JHVJPXView.class);
+        this.jpxView = this.mainLayerView.getAdapter(ImageInfoView.class);
         if (this.regionView != null) {
             this.jpxView.addViewListener(this.accellerationShape);
             this.jpxView.addViewListener(this);
