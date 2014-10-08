@@ -36,7 +36,7 @@ public class GL3DPositionLoading {
     private final GregorianCalendar calendar = new GregorianCalendar();
     private String beginDate = "2014-07-28T00:00:00";
     private String endDate = "2014-05-30T00:00:00";
-    private String target = "Mercury";
+    private String target = "Earth";
     private final String observer = "SUN";
     private final String baseUrl = "http://swhv.oma.be:7789/position?";
     private final int deltat = 60 * 60 * 6; //6 hours by default

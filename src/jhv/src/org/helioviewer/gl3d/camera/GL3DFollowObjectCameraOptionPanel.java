@@ -234,6 +234,7 @@ public class GL3DFollowObjectCameraOptionPanel extends GL3DCameraOptionPanel imp
             }
         });
         add(objectCombobox);
+        objectCombobox.setSelectedItem(GL3DSpaceObject.earth);
     }
 
     private void addBeginDatePanel() {
