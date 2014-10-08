@@ -4,6 +4,8 @@ import java.awt.Dimension;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.FocusEvent;
+import java.awt.event.FocusListener;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.text.SimpleDateFormat;
@@ -120,7 +122,6 @@ public class GL3DFollowObjectCameraOptionPanel extends GL3DCameraOptionPanel imp
                     camera.cameraFOV.getDrawBits().off(Bit.Hidden);
                 }
                 Displayer.getSingletonInstance().display();
-
             }
         });
         this.fovPanel.add(fovCheckbox);
@@ -130,10 +131,36 @@ public class GL3DFollowObjectCameraOptionPanel extends GL3DCameraOptionPanel imp
         addObjectCombobox();
         beginDateLabel = new JLabel("Begin");
         beginDatePicker = new JHVCalendarDatePicker();
+        beginDatePicker.addFocusListener(new FocusListener() {
+
+            @Override
+            public void focusGained(FocusEvent arg0) {
+            }
+
+            @Override
+            public void focusLost(FocusEvent arg0) {
+                beginDatePicker.checkDateStringInTextField();
+                setBeginTime();
+                Displayer.getSingletonInstance().render();
+            }
+        });
         beginTimePicker = new TimeTextField();
         addBeginDatePanel();
         endDateLabel = new JLabel("End");
         endDatePicker = new JHVCalendarDatePicker();
+        endDatePicker.addFocusListener(new FocusListener() {
+
+            @Override
+            public void focusGained(FocusEvent arg0) {
+            }
+
+            @Override
+            public void focusLost(FocusEvent arg0) {
+                beginDatePicker.checkDateStringInTextField();
+                setEndTime();
+                Displayer.getSingletonInstance().render();
+            }
+        });
         endTimePicker = new TimeTextField();
         addEndDatePanel();
         addSyncButtons();

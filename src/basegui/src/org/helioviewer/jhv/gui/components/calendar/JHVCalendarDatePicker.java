@@ -41,7 +41,7 @@ import org.helioviewer.jhv.gui.IconBank.JHVIcon;
  * date like the user prefers and set the date which should be selected by
  * calling the method {@link #setDate(Date)}. To get the selected date call
  * {@link #getDate()}.
- * 
+ *
  * @see JHVCalendar
  * @author Stephan Pagel
  */
@@ -53,13 +53,13 @@ public class JHVCalendarDatePicker extends JPanel implements FocusListener, Acti
 
     private static final long serialVersionUID = 1L;
 
-    private AbstractList<JHVCalendarListener> listeners = new LinkedList<JHVCalendarListener>();
+    private final AbstractList<JHVCalendarListener> listeners = new LinkedList<JHVCalendarListener>();
     private SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd");
-    private Calendar calendar = new GregorianCalendar();
+    private final Calendar calendar = new GregorianCalendar();
 
     private JHVCalendar jhvCalendar = null;
-    private Icon icon = IconBank.getIcon(JHVIcon.DATE);
-    private JTextField textField = new JTextField();
+    private final Icon icon = IconBank.getIcon(JHVIcon.DATE);
+    private final JTextField textField = new JTextField();
     private JButton popupButton;
     private Popup popup = null;
 
@@ -101,7 +101,7 @@ public class JHVCalendarDatePicker extends JPanel implements FocusListener, Acti
 
     /**
      * Adds a listener which will be informed when a date has been selected.
-     * 
+     *
      * @param l
      *            listener which has to be informed.
      */
@@ -114,7 +114,7 @@ public class JHVCalendarDatePicker extends JPanel implements FocusListener, Acti
     /**
      * Removes a listener which should not be informed anymore when a date has
      * been selected.
-     * 
+     *
      * @param l
      *            listener which should not be informed anymore.
      */
@@ -126,7 +126,7 @@ public class JHVCalendarDatePicker extends JPanel implements FocusListener, Acti
 
     /**
      * Informs all listener of this class by passing the corresponding event.
-     * 
+     *
      * @param e
      *            event
      */
@@ -140,12 +140,14 @@ public class JHVCalendarDatePicker extends JPanel implements FocusListener, Acti
     /**
      * {@inheritDoc}
      */
+    @Override
     public void focusGained(FocusEvent arg0) {
     }
 
     /**
      * {@inheritDoc}
      */
+    @Override
     public void focusLost(FocusEvent arg0) {
 
         // has popup button or a subcomponent of jhvCalendar lost the focus?
@@ -168,6 +170,7 @@ public class JHVCalendarDatePicker extends JPanel implements FocusListener, Acti
     /**
      * {@inheritDoc}
      */
+    @Override
     public void actionPerformed(ActionEvent e) {
 
         // open or close the popup window when the event was fired by the
@@ -186,6 +189,7 @@ public class JHVCalendarDatePicker extends JPanel implements FocusListener, Acti
     /**
      * {@inheritDoc}
      */
+    @Override
     public void keyPressed(KeyEvent e) {
 
         if (e.getKeyCode() == KeyEvent.VK_ENTER) {
@@ -197,16 +201,18 @@ public class JHVCalendarDatePicker extends JPanel implements FocusListener, Acti
     /**
      * {@inheritDoc}
      */
+    @Override
     public void keyReleased(KeyEvent e) {
     }
 
     /**
      * {@inheritDoc}
      */
+    @Override
     public void keyTyped(KeyEvent e) {
     }
 
-    private void checkDateStringInTextField() {
+    public void checkDateStringInTextField() {
 
         Date date = parseDate(textField.getText());
 
@@ -257,7 +263,7 @@ public class JHVCalendarDatePicker extends JPanel implements FocusListener, Acti
     /**
      * Adds to all subcomponents of a component the focus listener off this
      * class.
-     * 
+     *
      * @param parent
      *            add focus listener to subcomponents of this parent
      */
@@ -287,6 +293,7 @@ public class JHVCalendarDatePicker extends JPanel implements FocusListener, Acti
     /**
      * {@inheritDoc}
      */
+    @Override
     public void actionPerformed(JHVCalendarEvent e) {
 
         // close popup
@@ -303,7 +310,7 @@ public class JHVCalendarDatePicker extends JPanel implements FocusListener, Acti
 
     /**
      * Set the date pattern. The date will be displayed in defined format.
-     * 
+     *
      * @param pattern
      *            pattern how date should be displayed.
      * @return boolean value if pattern is valid.
@@ -324,7 +331,7 @@ public class JHVCalendarDatePicker extends JPanel implements FocusListener, Acti
     /**
      * Sets the date format pattern. The date will be displayed in defined
      * format.
-     * 
+     *
      * @param newFormat
      *            new pattern to use
      */
@@ -334,7 +341,7 @@ public class JHVCalendarDatePicker extends JPanel implements FocusListener, Acti
     }
 
     /**
-     * 
+     *
      * @param date
      */
     public void setDate(Date date) {
@@ -347,7 +354,7 @@ public class JHVCalendarDatePicker extends JPanel implements FocusListener, Acti
 
     /**
      * Returns the selected date.
-     * 
+     *
      * @return the selected date.
      */
     public Date getDate() {
@@ -358,7 +365,7 @@ public class JHVCalendarDatePicker extends JPanel implements FocusListener, Acti
     /**
      * Tries to parse a given date string to a date object. If the string could
      * not be parsed the method returns a null value.
-     * 
+     *
      * @param source
      *            the given date string.
      * @return the corresponding date object.
@@ -379,6 +386,7 @@ public class JHVCalendarDatePicker extends JPanel implements FocusListener, Acti
      * Override the setEnabled method in order to keep the containing
      * components' enabledState synced with the enabledState of this component.
      */
+    @Override
     public void setEnabled(boolean enabled) {
         textField.setEnabled(enabled);
         popupButton.setEnabled(enabled);
