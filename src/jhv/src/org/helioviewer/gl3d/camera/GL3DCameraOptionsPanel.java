@@ -93,7 +93,7 @@ public class GL3DCameraOptionsPanel extends JPanel implements GL3DCameraSelectio
         ((GL3DCameraOptionPanel) optionsPanel).getGridResolutionXSpinner().setValue(resx);
         ((GL3DCameraOptionPanel) optionsPanel).getGridResolutionYSpinner().setValue(resy);
 
-        Displayer.getSingletonInstance().display();
+        Displayer.getSingletonInstance().render();
     }
 
     private JPanel infoPanel() {
