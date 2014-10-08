@@ -37,7 +37,7 @@ import org.helioviewer.viewmodel.view.ViewHelper;
 /**
  * The solar event renderer provides a possibility to draw solar events with
  * there associated icons.
- *
+ * 
  * @author Malte Nuhn
  */
 public class HEKPlugin3dRenderer extends PhysicalRenderer3d {
@@ -130,7 +130,7 @@ public class HEKPlugin3dRenderer extends PhysicalRenderer3d {
 
     /**
      * The actual rendering routine
-     *
+     * 
      * @param g
      *            - PhysicalRenderGraphics to render to
      * @param evt
@@ -140,7 +140,8 @@ public class HEKPlugin3dRenderer extends PhysicalRenderer3d {
      */
     public void drawPolygon(PhysicalRenderGraphics g, JHVEvent evt, Date now) {
         int i = 0;
-        while (i < evt.getPositioningInformation().size() && evt.getPositioningInformation().get(i).getCoordinateSystem() != JHVCoordinateSystem.HGS) {
+        while (i < evt.getPositioningInformation().size()
+                && evt.getPositioningInformation().get(i).getCoordinateSystem() != JHVCoordinateSystem.HGS) {
             i++;
         }
         GL2 gl = g.getGL();
@@ -158,8 +159,14 @@ public class HEKPlugin3dRenderer extends PhysicalRenderer3d {
         Vector3dDouble oldBoundaryPoint3d = null;
 
         for (JHVPoint point : points) {
-            double theta = point.getCoordinate2() / 180. * Math.PI;// - Astronomy.getB0InRadians(new Date((evt.getStartDate().getTime() + evt.getEndDate().getTime()) / 2));
-            double phi = point.getCoordinate1() / 180. * Math.PI - Astronomy.getL0Radians(new Date((evt.getStartDate().getTime() + evt.getEndDate().getTime()) / 2));
+            double theta = point.getCoordinate2() / 180. * Math.PI;// -
+                                                                   // Astronomy.getB0InRadians(new
+                                                                   // Date((evt.getStartDate().getTime()
+                                                                   // +
+                                                                   // evt.getEndDate().getTime())
+                                                                   // / 2));
+            double phi = point.getCoordinate1() / 180. * Math.PI
+                    - Astronomy.getL0Radians(new Date((evt.getStartDate().getTime() + evt.getEndDate().getTime()) / 2));
 
             double x = Math.cos(theta) * Math.sin(phi);
             double z = Math.cos(theta) * Math.cos(phi);
@@ -195,7 +202,7 @@ public class HEKPlugin3dRenderer extends PhysicalRenderer3d {
 
     /**
      * The actual rendering routine
-     *
+     * 
      * @param g
      *            - PhysicalRenderGraphics to render to
      * @param evt
@@ -219,14 +226,22 @@ public class HEKPlugin3dRenderer extends PhysicalRenderer3d {
             iconCache.put(type, bi);
         }
         int i = 0;
-        while (i < evt.getPositioningInformation().size() && evt.getPositioningInformation().get(i).getCoordinateSystem() != JHVCoordinateSystem.HGS) {
+        while (i < evt.getPositioningInformation().size()
+                && evt.getPositioningInformation().get(i).getCoordinateSystem() != JHVCoordinateSystem.HGS) {
             i++;
         }
         if (i < evt.getPositioningInformation().size()) {
             JHVPositionInformation el = evt.getPositioningInformation().get(i);
             if (el.centralPoint() != null) {
-                double theta = el.centralPoint().getCoordinate2() / 180. * Math.PI;// - Astronomy.getB0InRadians(new Date((evt.getStartDate().getTime() + evt.getEndDate().getTime()) / 2));
-                double phi = el.centralPoint().getCoordinate1() / 180. * Math.PI - Astronomy.getL0Radians(new Date((evt.getStartDate().getTime() + evt.getEndDate().getTime()) / 2));
+                double theta = el.centralPoint().getCoordinate2() / 180. * Math.PI;// -
+                                                                                   // Astronomy.getB0InRadians(new
+                                                                                   // Date((evt.getStartDate().getTime()
+                                                                                   // +
+                                                                                   // evt.getEndDate().getTime())
+                                                                                   // /
+                                                                                   // 2));
+                double phi = el.centralPoint().getCoordinate1() / 180. * Math.PI
+                        - Astronomy.getL0Radians(new Date((evt.getStartDate().getTime() + evt.getEndDate().getTime()) / 2));
                 double x = Math.cos(theta) * Math.sin(phi);
                 double z = Math.cos(theta) * Math.cos(phi);
                 double y = -Math.sin(theta);
@@ -238,7 +253,7 @@ public class HEKPlugin3dRenderer extends PhysicalRenderer3d {
 
     /**
      * {@inheritDoc}
-     *
+     * 
      * Draws all available and visible solar events with there associated icon.
      */
     @Override
@@ -265,14 +280,15 @@ public class HEKPlugin3dRenderer extends PhysicalRenderer3d {
     @Override
     public void viewChanged(View view) {
         GL3DLayeredView layeredView = ViewHelper.getViewAdapter(view, GL3DLayeredView.class);
-        if (layeredView != null) {
+        if (layeredView != null && layeredView.getNumLayers() != 0) {
             GL3DImageTextureView imageTextureView = (GL3DImageTextureView) layeredView.getLayer(0);
             Region region = imageTextureView.getAdapter(RegionView.class).getRegion();
             if (region != null) {
-                if (height < 0)
+                if (height < 0) {
                     height = region.getHeight();
-                else
+                } else {
                     scale = (float) (region.getHeight() / height);
+                }
             }
         }
     }
