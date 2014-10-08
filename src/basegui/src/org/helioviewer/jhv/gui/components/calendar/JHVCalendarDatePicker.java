@@ -60,6 +60,11 @@ public class JHVCalendarDatePicker extends JPanel implements FocusListener, Acti
     private JHVCalendar jhvCalendar = null;
     private final Icon icon = IconBank.getIcon(JHVIcon.DATE);
     private final JTextField textField = new JTextField();
+
+    public JTextField getTextField() {
+        return textField;
+    }
+
     private JButton popupButton;
     private Popup popup = null;
 

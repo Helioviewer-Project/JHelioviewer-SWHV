@@ -131,7 +131,7 @@ public class GL3DFollowObjectCameraOptionPanel extends GL3DCameraOptionPanel imp
         addObjectCombobox();
         beginDateLabel = new JLabel("Begin");
         beginDatePicker = new JHVCalendarDatePicker();
-        beginDatePicker.addFocusListener(new FocusListener() {
+        beginDatePicker.getTextField().addFocusListener(new FocusListener() {
 
             @Override
             public void focusGained(FocusEvent arg0) {
@@ -148,7 +148,7 @@ public class GL3DFollowObjectCameraOptionPanel extends GL3DCameraOptionPanel imp
         addBeginDatePanel();
         endDateLabel = new JLabel("End");
         endDatePicker = new JHVCalendarDatePicker();
-        endDatePicker.addFocusListener(new FocusListener() {
+        endDatePicker.getTextField().addFocusListener(new FocusListener() {
 
             @Override
             public void focusGained(FocusEvent arg0) {
