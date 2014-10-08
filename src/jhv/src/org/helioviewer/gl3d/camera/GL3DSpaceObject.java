@@ -1,9 +1,11 @@
 package org.helioviewer.gl3d.camera;
 
+
 public class GL3DSpaceObject {
     private final String urlName;
     private final String labelName;
     private static GL3DSpaceObject objectList[];
+    public static GL3DSpaceObject earth;
 
     public static GL3DSpaceObject[] getObjectList() {
         if (objectList == null) {
@@ -19,6 +21,7 @@ public class GL3DSpaceObject {
         objectList[1] = new GL3DSpaceObject("Venus", "Venus");
 
         objectList[2] = new GL3DSpaceObject("Earth", "Earth");
+        earth = objectList[2];
         objectList[3] = new GL3DSpaceObject("Moon", "Moon");
 
         objectList[4] = new GL3DSpaceObject("Mars%20Barycenter", "Mars");
