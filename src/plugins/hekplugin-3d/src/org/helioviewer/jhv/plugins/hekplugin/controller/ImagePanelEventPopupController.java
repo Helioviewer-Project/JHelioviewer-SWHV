@@ -10,7 +10,6 @@ import java.util.Date;
 import java.util.HashMap;
 
 import org.helioviewer.base.math.Vector2dInt;
-import org.helioviewer.base.physics.Astronomy;
 import org.helioviewer.gl3d.scenegraph.GL3DState;
 import org.helioviewer.gl3d.scenegraph.math.GL3DVec3d;
 import org.helioviewer.gl3d.scenegraph.rt.GL3DRay;
@@ -19,6 +18,7 @@ import org.helioviewer.gl3d.view.GL3DComponentView;
 import org.helioviewer.gl3d.view.GL3DSceneGraphView;
 import org.helioviewer.jhv.data.datatype.JHVCoordinateSystem;
 import org.helioviewer.jhv.data.datatype.JHVEvent;
+import org.helioviewer.jhv.data.datatype.JHVPoint;
 import org.helioviewer.jhv.data.datatype.JHVPositionInformation;
 import org.helioviewer.jhv.data.guielements.SWEKEventInformationDialog;
 import org.helioviewer.jhv.gui.components.BasicImagePanel;
@@ -263,24 +263,15 @@ public class ImagePanelEventPopupController implements ImagePanelPlugin, MouseLi
                 if (state3D) {
                     HashMap<JHVCoordinateSystem, JHVPositionInformation> pi = evt.getPositioningInformation();
 
-                    if (pi.containsKey(JHVCoordinateSystem.HGS)) {
-                        JHVPositionInformation el = pi.get(JHVCoordinateSystem.HGS);
+                    if (pi.containsKey(JHVCoordinateSystem.JHV)) {
+                        JHVPositionInformation el = pi.get(JHVCoordinateSystem.JHV);
                         if (el.centralPoint() != null) {
                             double theta = el.centralPoint().getCoordinate2() / 180. * Math.PI;// -
-                            // Astronomy.getB0InRadians(new
-                            // Date((evt.getStartDate().getTime()
-                            // +
-                            // evt.getEndDate().getTime())
-                            // /
-                            // 2));
-                            double phi = el.centralPoint().getCoordinate1() / 180. * Math.PI - Astronomy.getL0Radians(new Date((evt.getStartDate().getTime() + evt.getEndDate().getTime()) / 2));
-                            double x = Math.cos(theta) * Math.sin(phi);
-                            double z = Math.cos(theta) * Math.cos(phi);
-                            double y = -Math.sin(theta);
+                            JHVPoint pt = el.centralPoint();
                             if (hitpoint != null) {
-                                double deltaX = Math.abs(hitpoint.x - x);
-                                double deltaY = Math.abs(hitpoint.y + y);
-                                double deltaZ = Math.abs(hitpoint.z - z);
+                                double deltaX = Math.abs(hitpoint.x - pt.getCoordinate1());
+                                double deltaY = Math.abs(hitpoint.y + pt.getCoordinate2());
+                                double deltaZ = Math.abs(hitpoint.z - pt.getCoordinate3());
                                 if (deltaX < 0.05 && deltaZ < 0.05 && deltaY < 0.05) {
                                     mouseOverJHVEvent = evt;
                                     mouseOverPosition = new Point(e.getX(), e.getY());
@@ -291,16 +282,10 @@ public class ImagePanelEventPopupController implements ImagePanelPlugin, MouseLi
                 } else {
                     HashMap<JHVCoordinateSystem, JHVPositionInformation> pi = evt.getPositioningInformation();
 
-                    if (pi.containsKey(JHVCoordinateSystem.HGS)) {
-                        JHVPositionInformation el = pi.get(JHVCoordinateSystem.HGS);
+                    if (pi.containsKey(JHVCoordinateSystem.JHV)) {
+                        JHVPositionInformation el = pi.get(JHVCoordinateSystem.JHV);
                         if (el.centralPoint() != null) {
-                            double theta = el.centralPoint().getCoordinate2() / 180. * Math.PI;// - Astronomy.getB0InRadians(new Date((evt.getStartDate().getTime() + evt.getEndDate().getTime()) / 2));
-                            double phi = el.centralPoint().getCoordinate1() / 180. * Math.PI - Astronomy.getL0Radians(new Date((evt.getStartDate().getTime() + evt.getEndDate().getTime()) / 2));
-                            double x = Math.cos(theta) * Math.sin(phi);
-                            double z = Math.cos(theta) * Math.cos(phi);
-                            double y = -Math.sin(theta);
-
-                            Vector2dInt screenPos = convertPhysicalToScreen(x, y);
+                            Vector2dInt screenPos = convertPhysicalToScreen(el.centralPoint().getCoordinate1(), el.centralPoint().getCoordinate2());
 
                             if (e.getPoint().getX() >= screenPos.getX() - 8 && e.getPoint().getX() <= screenPos.getX() + 8 && e.getPoint().getY() >= screenPos.getY() - 8 && e.getPoint().getY() <= screenPos.getY() + 8) {
                                 mouseOverJHVEvent = evt;
