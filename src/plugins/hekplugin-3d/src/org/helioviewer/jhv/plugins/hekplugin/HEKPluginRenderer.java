@@ -11,7 +11,6 @@ import javax.media.opengl.GL;
 import javax.media.opengl.GL2;
 import javax.swing.ImageIcon;
 
-import org.helioviewer.base.math.Vector3dDouble;
 import org.helioviewer.base.physics.Astronomy;
 import org.helioviewer.jhv.data.datatype.JHVCoordinateSystem;
 import org.helioviewer.jhv.data.datatype.JHVEvent;
@@ -40,10 +39,10 @@ public class HEKPluginRenderer implements PhysicalRenderer {
     public void drawPolygon(PhysicalRenderGraphics g, JHVEvent evt, Date now) {
         HashMap<JHVCoordinateSystem, JHVPositionInformation> pi = evt.getPositioningInformation();
 
-        if (!pi.containsKey(JHVCoordinateSystem.HGS)) {
+        if (!pi.containsKey(JHVCoordinateSystem.JHV)) {
             return;
         }
-        JHVPositionInformation el = pi.get(JHVCoordinateSystem.HGS);
+        JHVPositionInformation el = pi.get(JHVCoordinateSystem.JHV);
         List<JHVPoint> points = el.getBoundCC();
         if (points == null || points.size() == 0) {
             points = el.getBoundBox();
@@ -56,16 +55,12 @@ public class HEKPluginRenderer implements PhysicalRenderer {
         GL2 gl = g.getGL();
 
         // draw bounds
-        Vector3dDouble oldBoundaryPoint3d = null;
+        JHVPoint oldBoundaryPoint3d = null;
 
         for (JHVPoint point : points) {
             double theta = point.getCoordinate2() / 180. * Math.PI;// - Astronomy.getB0InRadians(new Date((evt.getStartDate().getTime() + evt.getEndDate().getTime()) / 2));
             double phi = point.getCoordinate1() / 180. * Math.PI - Astronomy.getL0Radians(new Date((evt.getStartDate().getTime() + evt.getEndDate().getTime()) / 2));
 
-            double x = Math.cos(theta) * Math.sin(phi);
-            double z = Math.cos(theta) * Math.cos(phi);
-            double y = -Math.sin(theta);
-            Vector3dDouble boundaryPoint3d = new Vector3dDouble(x, y, z);
             int divpoints = 10;
             gl.glColor3d(evt.getColor().getRed(), evt.getColor().getGreen(), evt.getColor().getBlue());
             gl.glDisable(GL2.GL_TEXTURE_2D);
@@ -75,9 +70,9 @@ public class HEKPluginRenderer implements PhysicalRenderer {
             if (oldBoundaryPoint3d != null) {
                 for (int j = 0; j <= divpoints; j++) {
                     double alpha = 1. - 1. * j / divpoints;
-                    double xnew = alpha * oldBoundaryPoint3d.getX() + (1 - alpha) * boundaryPoint3d.getX();
-                    double ynew = alpha * oldBoundaryPoint3d.getY() + (1 - alpha) * boundaryPoint3d.getY();
-                    double znew = alpha * oldBoundaryPoint3d.getZ() + (1 - alpha) * boundaryPoint3d.getZ();
+                    double xnew = alpha * oldBoundaryPoint3d.getCoordinate1() + (1 - alpha) * point.getCoordinate1();
+                    double ynew = alpha * oldBoundaryPoint3d.getCoordinate2() + (1 - alpha) * point.getCoordinate2();
+                    double znew = alpha * oldBoundaryPoint3d.getCoordinate3() + (1 - alpha) * point.getCoordinate3();
                     double r = Math.sqrt(xnew * xnew + ynew * ynew + znew * znew);
                     xnew = xnew / r;
                     ynew = ynew / r;
@@ -89,7 +84,7 @@ public class HEKPluginRenderer implements PhysicalRenderer {
             gl.glEnd();
             gl.glDisable(GL2.GL_LINE_SMOOTH);
 
-            oldBoundaryPoint3d = boundaryPoint3d;
+            oldBoundaryPoint3d = point;
         }
 
     }
@@ -124,15 +119,11 @@ public class HEKPluginRenderer implements PhysicalRenderer {
         }
         HashMap<JHVCoordinateSystem, JHVPositionInformation> pi = evt.getPositioningInformation();
 
-        if (pi.containsKey(JHVCoordinateSystem.HGS)) {
-            JHVPositionInformation el = pi.get(JHVCoordinateSystem.HGS);
+        if (pi.containsKey(JHVCoordinateSystem.JHV)) {
+            JHVPositionInformation el = pi.get(JHVCoordinateSystem.JHV);
             if (el.centralPoint() != null) {
-                double theta = el.centralPoint().getCoordinate2() / 180. * Math.PI;// - Astronomy.getB0InRadians(new Date((evt.getStartDate().getTime() + evt.getEndDate().getTime()) / 2));
-                double phi = el.centralPoint().getCoordinate1() / 180. * Math.PI - Astronomy.getL0Radians(new Date((evt.getStartDate().getTime() + evt.getEndDate().getTime()) / 2));
-                double x = Math.cos(theta) * Math.sin(phi);
-                double z = Math.cos(theta) * Math.cos(phi);
-                double y = -Math.sin(theta);
-                g.drawImage(bi, x, y);
+                JHVPoint pt = el.centralPoint();
+                g.drawImage(bi, pt.getCoordinate1(), pt.getCoordinate2());
             }
         }
 
