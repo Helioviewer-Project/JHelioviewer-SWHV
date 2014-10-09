@@ -860,4 +860,14 @@ public class RadioDataManager implements RadioDownloaderListener {
             l.noDataInterval(noDataList, downloadID, plotIdentifier);
         }
     }
+
+    @Override
+    public void noDataInDownloadInterval(Interval<Date> requestInterval, Long downloadID, String identifier) {
+        DownloadRequestData drd = new DownloadRequestData(downloadID, identifier);
+        downloadRequestData.put(downloadID, drd);
+        lineDataSelectorModel.addLineData(drd);
+        fireNewDataAvailable(drd, downloadID);
+        fireDownloadRequestAnswered(requestInterval, downloadID, identifier);
+
+    }
 }
