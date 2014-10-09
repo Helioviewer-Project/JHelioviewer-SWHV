@@ -3,10 +3,12 @@ package org.helioviewer.jhv.plugins.swek.sources.hek;
 import java.awt.Color;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 
 import javax.swing.ImageIcon;
 
+import org.helioviewer.jhv.data.datatype.JHVCoordinateSystem;
 import org.helioviewer.jhv.data.datatype.JHVEvent;
 import org.helioviewer.jhv.data.datatype.JHVEventParameter;
 import org.helioviewer.jhv.data.datatype.JHVEventType;
@@ -14,9 +16,9 @@ import org.helioviewer.jhv.data.datatype.JHVPositionInformation;
 
 /**
  * Represents a JHVevent coming from the HEK source.
- * 
+ *
  * @author Bram Bourgoignie (Bram.Bourgoignie@oma.be)
- * 
+ *
  */
 public class HEKEvent implements JHVEvent {
 
@@ -66,7 +68,7 @@ public class HEKEvent implements JHVEvent {
     private String uniqueID;
 
     /** List with positioning information for this event */
-    private List<JHVPositionInformation> positionInformation;
+    private HashMap<JHVCoordinateSystem, JHVPositionInformation> positionInformation;
 
     /** The color in which the event should be drawn */
     private final Color color;
@@ -87,8 +89,8 @@ public class HEKEvent implements JHVEvent {
     /**
      * Creates a HEK event with an event name, event display name, short
      * description, an event type and color.
-     * 
-     * 
+     *
+     *
      * @param eventName
      *            the event name
      * @param eventDisplayName
@@ -113,7 +115,7 @@ public class HEKEvent implements JHVEvent {
     /**
      * Creates a HEK event with an event name, event display name, short
      * description, event type, an icon and color.
-     * 
+     *
      * @param eventName
      *            the event name
      * @param eventDisplayName
@@ -211,7 +213,7 @@ public class HEKEvent implements JHVEvent {
     }
 
     @Override
-    public List<JHVPositionInformation> getPositioningInformation() {
+    public HashMap<JHVCoordinateSystem, JHVPositionInformation> getPositioningInformation() {
         return positionInformation;
     }
 
@@ -222,7 +224,7 @@ public class HEKEvent implements JHVEvent {
 
     /**
      * Adds a parameter to the event.
-     * 
+     *
      * @param parameter
      *            the parameter to add
      * @param visible
@@ -253,7 +255,7 @@ public class HEKEvent implements JHVEvent {
 
     /**
      * Sets the start date of the HEKEvent.
-     * 
+     *
      * @param startDate
      *            the start date
      */
@@ -263,7 +265,7 @@ public class HEKEvent implements JHVEvent {
 
     /**
      * Sets the end date of the HEKEvent.
-     * 
+     *
      * @param endDate
      *            the end date
      */
@@ -274,7 +276,7 @@ public class HEKEvent implements JHVEvent {
 
     /**
      * Sets the unique ID for the HekEvent.
-     * 
+     *
      * @param uniqueID
      */
     public void setUniqueID(String uniqueID) {
@@ -283,12 +285,12 @@ public class HEKEvent implements JHVEvent {
 
     /**
      * Adds position information to the HEKEvent.
-     * 
+     *
      * @param positionInformation
      *            the position information to add
      */
-    public void addJHVPositionInformation(JHVPositionInformation positionInformation) {
-        this.positionInformation.add(positionInformation);
+    public void addJHVPositionInformation(JHVCoordinateSystem coorSys, JHVPositionInformation positionInformation) {
+        this.positionInformation.put(coorSys, positionInformation);
     }
 
     /**
@@ -302,7 +304,7 @@ public class HEKEvent implements JHVEvent {
         allNonVisibleParameters = new ArrayList<JHVEventParameter>();
         allNonVisibleNotNullParameters = new ArrayList<JHVEventParameter>();
         allNonVisibleNullParameters = new ArrayList<JHVEventParameter>();
-        positionInformation = new ArrayList<JHVPositionInformation>();
+        positionInformation = new HashMap<JHVCoordinateSystem, JHVPositionInformation>();
     }
 
 }
