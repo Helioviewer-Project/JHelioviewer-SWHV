@@ -27,9 +27,9 @@ import org.json.JSONObject;
 
 /**
  * Parser able to parse events coming from the HEK server.
- * 
+ *
  * @author Bram Bourgoignie (Bram.Bourgoignie@oma.be)
- * 
+ *
  */
 public class HEKParser implements SWEKParser {
 
@@ -81,12 +81,12 @@ public class HEKParser implements SWEKParser {
 
     /**
      * Creates a parser for the given event type and event source.
-     * 
+     *
      * @param eventType
      *            the type of the event
      * @param source
      *            the source of the event
-     * 
+     *
      */
     public HEKParser() {
         parserStopped = false;
@@ -130,7 +130,7 @@ public class HEKParser implements SWEKParser {
 
     /**
      * Parses the event JSON returned by the server.
-     * 
+     *
      * @param eventJSON
      *            the JSON object
      * @throws JSONException
@@ -140,8 +140,7 @@ public class HEKParser implements SWEKParser {
         JSONArray results = eventJSON.getJSONArray("result");
         HEKEventType hekEventType = new HEKEventType(eventType.getEventName(), eventSource.getSourceName(), eventSource.getProviderName());
         for (int i = 0; i < results.length() && !parserStopped; i++) {
-            HEKEvent currentEvent = new HEKEvent(eventType.getEventName(), eventType.getEventName(), "", hekEventType,
-                    eventType.getEventIcon(), eventType.getColor());
+            HEKEvent currentEvent = new HEKEvent(eventType.getEventName(), eventType.getEventName(), "", hekEventType, eventType.getEventIcon(), eventType.getColor());
             JSONObject result = results.getJSONObject(i);
             parseResult(result, currentEvent);
             handleCoordinates(currentEvent);
@@ -152,7 +151,7 @@ public class HEKParser implements SWEKParser {
 
     /**
      * Parses one result returned by the HEK server.
-     * 
+     *
      * @param result
      *            the result to be parsed.
      * @param currentEvent
@@ -169,7 +168,7 @@ public class HEKParser implements SWEKParser {
 
     /**
      * Parses the parameter
-     * 
+     *
      * @param result
      *            the result from where to parse the parameter
      * @param key
@@ -297,7 +296,7 @@ public class HEKParser implements SWEKParser {
 
     /**
      * Parses a date represented in the format yyyy-MM-dd'T'HH:mm:ss to a date.
-     * 
+     *
      * @param date
      *            the date to parse
      * @return the parsed date
@@ -314,7 +313,7 @@ public class HEKParser implements SWEKParser {
 
     /**
      * Set all coordinate again to null.
-     * 
+     *
      */
     private void reinitializeCoordinates() {
         coordinateSystemString = null;
@@ -350,7 +349,7 @@ public class HEKParser implements SWEKParser {
     /**
      * Parse a string of the format
      * "POLYGON((0.745758 77.471192,0.667026 75.963757,...,0.691115 69.443955,0.767379 71.565051,0.745758 77.471192))"
-     * 
+     *
      * @param value
      *            the value to parse
      * @return a list of JHV points
@@ -375,7 +374,7 @@ public class HEKParser implements SWEKParser {
 
     /**
      * Parses a point of the format POINT(0.716676950817756 73.6104596659652).
-     * 
+     *
      * @param value
      *            the point to parse
      * @return The JHVpoint or null if it could not be parsed.
@@ -391,7 +390,7 @@ public class HEKParser implements SWEKParser {
     /**
      * Parses a string of the format "0.716676950817756 73.6104596659652" to a
      * JHVPoint
-     * 
+     *
      * @param coordinateString
      *            the string to parse
      * @return the JHVPoint or null of it could not be parsed
@@ -429,7 +428,7 @@ public class HEKParser implements SWEKParser {
 
     /**
      * Handle the parsed information for positions
-     * 
+     *
      * @param currentEvent
      *            the current event being parsed
      */
@@ -443,7 +442,7 @@ public class HEKParser implements SWEKParser {
 
     /**
      * Handles the standard event position.
-     * 
+     *
      * @param currentEvent
      *            the current event being parsed
      */
@@ -452,15 +451,14 @@ public class HEKParser implements SWEKParser {
             JHVCoordinateSystem coorSys = parseCoordinateSystemString();
             if (coorSys != null) {
                 JHVPoint centralPoint = new JHVPoint(coordinate1, coordinate2, coordinate3);
-                currentEvent.addJHVPositionInformation(new HEKPositionInformation(coorSys, new ArrayList<JHVPoint>(),
-                        new ArrayList<JHVPoint>(), centralPoint));
+                currentEvent.addJHVPositionInformation(coorSys, new HEKPositionInformation(coorSys, new ArrayList<JHVPoint>(), new ArrayList<JHVPoint>(), centralPoint));
             }
         }
     }
 
     /**
      * Extract the used coordinate system from the coordinate system string.
-     * 
+     *
      * @return the correct JHVCoordinateSystem or null if the coordinate system
      *         could not be parsed.
      */
@@ -482,7 +480,7 @@ public class HEKParser implements SWEKParser {
      * Handles the HGC coordinates. Checks if a coordinate of that format was
      * found and if it is the case it is added to the JHVPositionInformation
      * list of the current event.
-     * 
+     *
      * @param currentEvent
      *            the current event being parsed.
      */
@@ -504,8 +502,7 @@ public class HEKParser implements SWEKParser {
                     localHGCCentralPoint = new JHVPoint(hgcX, hgcY, null);
                 }
             }
-            currentEvent.addJHVPositionInformation(new HEKPositionInformation(JHVCoordinateSystem.HGC, localHGCBoundedBox, localHGCBoundCC,
-                    localHGCCentralPoint));
+            currentEvent.addJHVPositionInformation(JHVCoordinateSystem.HGC, new HEKPositionInformation(JHVCoordinateSystem.HGC, localHGCBoundedBox, localHGCBoundCC, localHGCCentralPoint));
         }
     }
 
@@ -513,7 +510,7 @@ public class HEKParser implements SWEKParser {
      * Handles the HGS coordinates. Checks if a coordinate of that format was
      * found and if it is the case it is added to the JHVPositionInformation
      * list of the current event.
-     * 
+     *
      * @param currentEvent
      *            the current event being parsed.
      */
@@ -535,8 +532,7 @@ public class HEKParser implements SWEKParser {
                     localHGSCentralPoint = new JHVPoint(hgsX, hgsY, null);
                 }
             }
-            currentEvent.addJHVPositionInformation(new HEKPositionInformation(JHVCoordinateSystem.HGS, localHGSBoundedBox, localHGSBoundCC,
-                    localHGSCentralPoint));
+            currentEvent.addJHVPositionInformation(JHVCoordinateSystem.HGS, new HEKPositionInformation(JHVCoordinateSystem.HGS, localHGSBoundedBox, localHGSBoundCC, localHGSCentralPoint));
         }
     }
 
@@ -544,7 +540,7 @@ public class HEKParser implements SWEKParser {
      * Handles the HRC coordinates. Checks if a coordinate of that format was
      * found and if it is the case it is added to the JHVPositionInformation
      * list of the current event.
-     * 
+     *
      * @param currentEvent
      *            the current event being parsed.
      */
@@ -566,8 +562,7 @@ public class HEKParser implements SWEKParser {
                     localHRCCentralPoint = new JHVPoint(hrcA, hrcR, null);
                 }
             }
-            currentEvent.addJHVPositionInformation(new HEKPositionInformation(JHVCoordinateSystem.HRC, localHRCBoundedBox, localHRCBoundCC,
-                    localHRCCentralPoint));
+            currentEvent.addJHVPositionInformation(JHVCoordinateSystem.HRC, new HEKPositionInformation(JHVCoordinateSystem.HRC, localHRCBoundedBox, localHRCBoundCC, localHRCCentralPoint));
         }
 
     }
@@ -576,7 +571,7 @@ public class HEKParser implements SWEKParser {
      * Handles the HPC coordinates. Checks if a coordinate of that format was
      * found and if it is the case it is added to the JHVPositionInformation
      * list of the current event.
-     * 
+     *
      * @param currentEvent
      *            the current event being parsed.
      */
@@ -598,8 +593,7 @@ public class HEKParser implements SWEKParser {
                     localHPCCentralPoint = new JHVPoint(hpcX, hpcY, null);
                 }
             }
-            currentEvent.addJHVPositionInformation(new HEKPositionInformation(JHVCoordinateSystem.HPC, localHPCBoundedBox, localHPCBoundCC,
-                    localHPCCentralPoint));
+            currentEvent.addJHVPositionInformation(JHVCoordinateSystem.HPC, new HEKPositionInformation(JHVCoordinateSystem.HPC, localHPCBoundedBox, localHPCBoundCC, localHPCCentralPoint));
         }
 
     }

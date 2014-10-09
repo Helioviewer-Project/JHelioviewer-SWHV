@@ -7,6 +7,7 @@ import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 
 import org.helioviewer.base.math.Vector2dInt;
 import org.helioviewer.base.physics.Astronomy;
@@ -260,12 +261,10 @@ public class ImagePanelEventPopupController implements ImagePanelPlugin, MouseLi
 
             for (JHVEvent evt : toDraw) {
                 if (state3D) {
-                    int i = 0;
-                    while (i < evt.getPositioningInformation().size() && evt.getPositioningInformation().get(i).getCoordinateSystem() != JHVCoordinateSystem.HGS) {
-                        i++;
-                    }
-                    if (i < evt.getPositioningInformation().size()) {
-                        JHVPositionInformation el = evt.getPositioningInformation().get(i);
+                    HashMap<JHVCoordinateSystem, JHVPositionInformation> pi = evt.getPositioningInformation();
+
+                    if (pi.containsKey(JHVCoordinateSystem.HGS)) {
+                        JHVPositionInformation el = pi.get(JHVCoordinateSystem.HGS);
                         if (el.centralPoint() != null) {
                             double theta = el.centralPoint().getCoordinate2() / 180. * Math.PI;// -
                             // Astronomy.getB0InRadians(new
@@ -290,12 +289,10 @@ public class ImagePanelEventPopupController implements ImagePanelPlugin, MouseLi
                         }
                     }
                 } else {
-                    int i = 0;
-                    while (i < evt.getPositioningInformation().size() && evt.getPositioningInformation().get(i).getCoordinateSystem() != JHVCoordinateSystem.HGS) {
-                        i++;
-                    }
-                    if (i < evt.getPositioningInformation().size()) {
-                        JHVPositionInformation el = evt.getPositioningInformation().get(i);
+                    HashMap<JHVCoordinateSystem, JHVPositionInformation> pi = evt.getPositioningInformation();
+
+                    if (pi.containsKey(JHVCoordinateSystem.HGS)) {
+                        JHVPositionInformation el = pi.get(JHVCoordinateSystem.HGS);
                         if (el.centralPoint() != null) {
                             double theta = el.centralPoint().getCoordinate2() / 180. * Math.PI;// - Astronomy.getB0InRadians(new Date((evt.getStartDate().getTime() + evt.getEndDate().getTime()) / 2));
                             double phi = el.centralPoint().getCoordinate1() / 180. * Math.PI - Astronomy.getL0Radians(new Date((evt.getStartDate().getTime() + evt.getEndDate().getTime()) / 2));

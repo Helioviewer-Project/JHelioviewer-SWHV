@@ -38,20 +38,22 @@ public class HEKPluginRenderer implements PhysicalRenderer {
     }
 
     public void drawPolygon(PhysicalRenderGraphics g, JHVEvent evt, Date now) {
-        int i = 0;
-        while (i < evt.getPositioningInformation().size() && evt.getPositioningInformation().get(i).getCoordinateSystem() != JHVCoordinateSystem.HGS) {
-            i++;
-        }
-        GL2 gl = g.getGL();
+        HashMap<JHVCoordinateSystem, JHVPositionInformation> pi = evt.getPositioningInformation();
 
-        List<JHVPoint> points = evt.getPositioningInformation().get(i).getBoundCC();
+        if (!pi.containsKey(JHVCoordinateSystem.HGS)) {
+            return;
+        }
+        JHVPositionInformation el = pi.get(JHVCoordinateSystem.HGS);
+        List<JHVPoint> points = el.getBoundCC();
         if (points == null || points.size() == 0) {
-            points = evt.getPositioningInformation().get(i).getBoundBox();
+            points = el.getBoundBox();
 
         }
         if (points == null || points.size() == 0) {
             return;
         }
+
+        GL2 gl = g.getGL();
 
         // draw bounds
         Vector3dDouble oldBoundaryPoint3d = null;
@@ -120,12 +122,10 @@ public class HEKPluginRenderer implements PhysicalRenderer {
             graph.dispose();
             iconCache.put(type, bi);
         }
-        int i = 0;
-        while (i < evt.getPositioningInformation().size() && evt.getPositioningInformation().get(i).getCoordinateSystem() != JHVCoordinateSystem.HGS) {
-            i++;
-        }
-        if (i < evt.getPositioningInformation().size()) {
-            JHVPositionInformation el = evt.getPositioningInformation().get(i);
+        HashMap<JHVCoordinateSystem, JHVPositionInformation> pi = evt.getPositioningInformation();
+
+        if (pi.containsKey(JHVCoordinateSystem.HGS)) {
+            JHVPositionInformation el = pi.get(JHVCoordinateSystem.HGS);
             if (el.centralPoint() != null) {
                 double theta = el.centralPoint().getCoordinate2() / 180. * Math.PI;// - Astronomy.getB0InRadians(new Date((evt.getStartDate().getTime() + evt.getEndDate().getTime()) / 2));
                 double phi = el.centralPoint().getCoordinate1() / 180. * Math.PI - Astronomy.getL0Radians(new Date((evt.getStartDate().getTime() + evt.getEndDate().getTime()) / 2));
