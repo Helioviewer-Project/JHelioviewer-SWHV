@@ -23,13 +23,13 @@ public class RadioImagePane implements ImageObserver, RadioPlotModelListener, Dr
     ArrayList<BufferedImage> views = new ArrayList<BufferedImage>();
     private YAxisElement yAxisElement;
     private boolean intervalTooBig;
-    private String plotIdentifier;
-    private RadioPlotModel radioPlotModel;
+    private final String plotIdentifier;
+    private final RadioPlotModel radioPlotModel;
 
     public RadioImagePane(String plotIdentifier) {
-        this.intervalTooBig = false;
+        intervalTooBig = false;
         this.plotIdentifier = plotIdentifier;
-        this.radioPlotModel = RadioPlotModel.getSingletonInstance();
+        radioPlotModel = RadioPlotModel.getSingletonInstance();
     }
 
     @Override
@@ -57,7 +57,8 @@ public class RadioImagePane implements ImageObserver, RadioPlotModelListener, Dr
     @Override
     public void draw(Graphics g, Rectangle graphArea) {
         Log.trace("redraw radio image pane for plot : " + plotIdentifier);
-        if (!this.intervalTooBig) {
+        Thread.dumpStack();
+        if (!intervalTooBig) {
             Collection<NoDataConfig> noDataConfigs = radioPlotModel.getNoDataConfigurations(plotIdentifier);
             Log.trace("Draw no data configs. Size: " + noDataConfigs.size());
             for (NoDataConfig ndc : noDataConfigs) {
@@ -95,19 +96,20 @@ public class RadioImagePane implements ImageObserver, RadioPlotModelListener, Dr
 
     @Override
     public YAxisElement getYAxisElement() {
-        return this.yAxisElement;
+        return yAxisElement;
     }
 
     @Override
     public boolean hasElementsToDraw() {
-        return !(RadioPlotModel.getSingletonInstance().getPlotConfigurations(plotIdentifier) == null || RadioPlotModel.getSingletonInstance().getPlotConfigurations(plotIdentifier).isEmpty());
+        return !(RadioPlotModel.getSingletonInstance().getPlotConfigurations(plotIdentifier) == null || RadioPlotModel
+                .getSingletonInstance().getPlotConfigurations(plotIdentifier).isEmpty());
     }
 
     public void setIntervalTooBig(boolean b) {
-        this.intervalTooBig = b;
+        intervalTooBig = b;
     }
 
     public boolean getIntervalTooBig() {
-        return this.intervalTooBig;
+        return intervalTooBig;
     }
 }
