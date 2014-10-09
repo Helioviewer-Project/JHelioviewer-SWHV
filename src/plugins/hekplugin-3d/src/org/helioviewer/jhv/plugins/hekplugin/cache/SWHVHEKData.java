@@ -61,23 +61,25 @@ public class SWHVHEKData implements LayersListener, JHVEventHandler {
     @Override
     public void layerAdded(int idx) {
         int numLayers = LayersModel.getSingletonInstance().getNumLayers();
+        beginDate = null;
+        endDate = null;
         for (int i = 0; i < numLayers; i++) {
             View nextView = LayersModel.getSingletonInstance().getLayer(i);
             JHVJPXView jpxView = nextView.getAdapter(JHVJPXView.class);
-            DateTimeCache dtc = jpxView.getDateTimeCache();
-            beginDate = null;
-            endDate = null;
-            for (int frame = 0; frame < jpxView.getMaximumFrameNumber(); frame++) {
-                ImmutableDateTime date = dtc.getDateTime(frame);
-                if (beginDate == null || date.getTime().getTime() < beginDate.getTime()) {
-                    beginDate = date.getTime();
+            if (jpxView != null) {
+                DateTimeCache dtc = jpxView.getDateTimeCache();
+                for (int frame = 0; frame < jpxView.getMaximumFrameNumber(); frame++) {
+                    ImmutableDateTime date = dtc.getDateTime(frame);
+                    if (beginDate == null || date.getTime().getTime() < beginDate.getTime()) {
+                        beginDate = date.getTime();
+                    }
+                    if (endDate == null || date.getTime().getTime() > endDate.getTime()) {
+                        endDate = date.getTime();
+                    }
                 }
-                if (endDate == null || date.getTime().getTime() > endDate.getTime()) {
-                    endDate = date.getTime();
+                if (beginDate != null && endDate != null) {
+                    JHVEventContainer.getSingletonInstance().requestForInterval(beginDate, endDate, this);
                 }
-            }
-            if (beginDate != null && endDate != null) {
-                JHVEventContainer.getSingletonInstance().requestForInterval(beginDate, endDate, this);
             }
         }
     }
