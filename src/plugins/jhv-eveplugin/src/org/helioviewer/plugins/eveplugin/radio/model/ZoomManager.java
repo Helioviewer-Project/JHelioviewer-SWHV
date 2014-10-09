@@ -81,7 +81,7 @@ public class ZoomManager implements ZoomControllerListener, PlotAreaSpaceListene
                     config = new ZoomDataConfig(currentInterval.getStart(), currentInterval.getStart(), null, ID, identifier);
                 }
                 plotAreaSpaceManager.getPlotAreaSpace(identifier).addPlotAreaSpaceListener(config);
-                Log.trace("PlotAreaSpaceListener added");
+                // Log.trace("PlotAreaSpaceListener added");
                 zmd.addToZoomDataConfigMap(ID, config);
                 config.addListener(zoomDataConfigListener);
             }
@@ -261,6 +261,9 @@ public class ZoomManager implements ZoomControllerListener, PlotAreaSpaceListene
     }
 
     private int defineXInDestinationArea(Date dateToFind, ZoomDataConfig zdc) {
+        Log.debug(zdc);
+        Log.debug(zdc.getDisplaySize());
+        Log.debug(zdc.getDisplaySize().x);
         return zdc.getDisplaySize().x
                 + (int) Math.floor((dateToFind.getTime() - zdc.getMinX().getTime())
                         / (1.0 * (zdc.getMaxX().getTime() - zdc.getMinX().getTime()) / zdc.getDisplaySize().width));
