@@ -156,7 +156,10 @@ public class HEKPlugin3dRenderer extends PhysicalRenderer3d {
 
         // draw bounds
         Vector3dDouble oldBoundaryPoint3d = null;
-
+        gl.glColor3d(evt.getColor().getRed(), evt.getColor().getGreen(), evt.getColor().getBlue());
+        gl.glDisable(GL2.GL_TEXTURE_2D);
+        gl.glEnable(GL2.GL_LINE_SMOOTH);
+        gl.glLineWidth(0.8f);
         for (JHVPoint point : points) {
             double theta = point.getCoordinate2() / 180. * Math.PI;
             double phi = point.getCoordinate1() / 180. * Math.PI - Astronomy.getL0Radians(new Date((evt.getStartDate().getTime() + evt.getEndDate().getTime()) / 2));
@@ -166,10 +169,6 @@ public class HEKPlugin3dRenderer extends PhysicalRenderer3d {
             double y = -Math.sin(theta);
             Vector3dDouble boundaryPoint3d = new Vector3dDouble(x, y, z);
             int divpoints = 10;
-            gl.glColor3d(evt.getColor().getRed(), evt.getColor().getGreen(), evt.getColor().getBlue());
-            gl.glDisable(GL2.GL_TEXTURE_2D);
-            gl.glEnable(GL2.GL_LINE_SMOOTH);
-            gl.glLineWidth(0.5f);
             gl.glBegin(GL2.GL_LINE_STRIP);
             if (oldBoundaryPoint3d != null) {
                 for (int j = 0; j <= divpoints; j++) {
@@ -186,11 +185,10 @@ public class HEKPlugin3dRenderer extends PhysicalRenderer3d {
 
             }
             gl.glEnd();
-            gl.glDisable(GL2.GL_LINE_SMOOTH);
 
             oldBoundaryPoint3d = boundaryPoint3d;
         }
-
+        gl.glDisable(GL2.GL_LINE_SMOOTH);
     }
 
     /**
