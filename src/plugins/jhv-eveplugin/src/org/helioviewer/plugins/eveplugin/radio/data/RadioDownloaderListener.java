@@ -9,9 +9,11 @@ public interface RadioDownloaderListener {
 
     public abstract void intervalTooBig(Date requestedStartTime, Date requestedEndTime, long ID, String identifier);
 
-    public abstract void newJPXFilesDownloaded(List<DownloadedJPXData> jpxFiles, Date requestedStartTime, Date requestedEndTime, Long downloadID, String identifier);
+    public abstract void newJPXFilesDownloaded(List<DownloadedJPXData> jpxFiles, Date requestedStartTime, Date requestedEndTime,
+            Long downloadID, String identifier);
 
-    public abstract void newAdditionalDataDownloaded(List<DownloadedJPXData> jpxFiles, Long downloadID, String plotIdentifier, double ratioX, double ratioY);
+    public abstract void newAdditionalDataDownloaded(List<DownloadedJPXData> jpxFiles, Long downloadID, String plotIdentifier,
+            double ratioX, double ratioY);
 
     public abstract void newNoData(List<Interval<Date>> noDataList, String identifier, long downloadID);
 
@@ -24,4 +26,6 @@ public interface RadioDownloaderListener {
      *            be removed
      */
     public abstract void removeSpectrograms(String identifier);
+
+    public abstract void noDataInDownloadInterval(Interval<Date> requestInterval, Long downloadID, String identifier);
 }

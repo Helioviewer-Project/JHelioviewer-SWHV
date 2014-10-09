@@ -132,6 +132,9 @@ public class RadioDownloader {
                                 fireNewJPXDataAvailable(result.getImageInfoViews(), identifier, result.getRequestInterval().getStart(), result.getRequestInterval().getEnd(), result.getDownloadID());
                             }
                             if (!result.getNoDataIntervals().isEmpty()) {
+                                if (!result.isIntervalTooBig() && result.getImageInfoViews().isEmpty()) {
+                                    fireNoDataInDownloadInterval(result.getRequestInterval(), result.getDownloadID(), identifier);
+                                }
                                 List<Interval<Date>> noDataList = new ArrayList<Interval<Date>>();
                                 for (Interval<Date> noData : result.getNoDataIntervals()) {
                                     if (cache.addNoDataInterval(noData, identifier)) {
@@ -204,6 +207,13 @@ public class RadioDownloader {
          * 
          * thread.start();
          */
+    }
+
+    protected void fireNoDataInDownloadInterval(Interval<Date> requestInterval, Long downloadID, String identifier) {
+        for (RadioDownloaderListener l : listeners) {
+            l.noDataInDownloadInterval(requestInterval, downloadID, identifier);
+        }
+
     }
 
     private void fireIntervalTooBig(Date startDate, Date endDate, long downloadID, String plotIdentifier) {
