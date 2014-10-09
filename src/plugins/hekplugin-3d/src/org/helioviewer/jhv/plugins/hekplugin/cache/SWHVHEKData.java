@@ -1,7 +1,5 @@
 package org.helioviewer.jhv.plugins.hekplugin.cache;
 
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -110,29 +108,6 @@ public class SWHVHEKData implements LayersListener, JHVEventHandler {
 
     @Override
     public void layerDownloaded(int idx) {
-    }
-
-    /**
-     * Parses a date in string with the format yyyy-MM-dd'T'HH:mm:ss.SSS into a
-     * date object.
-     *
-     * @param dateOBS
-     *            the date to parse
-     * @return The parsed date
-     */
-    private Date parseDate(String dateOBS) {
-        SimpleDateFormat sdf;
-        if (dateOBS.length() == 23) {
-            sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS");
-        } else {
-            sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
-        }
-        try {
-            return sdf.parse(dateOBS);
-        } catch (ParseException e) {
-            Log.warn("Could not parse date:" + dateOBS + ". Returned null.");
-            return null;
-        }
     }
 
     @Override
