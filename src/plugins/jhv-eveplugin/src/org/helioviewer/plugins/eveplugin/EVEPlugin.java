@@ -45,7 +45,7 @@ public class EVEPlugin implements Plugin, MainContentPanelPlugin {
         pluginPanes.add(mainPanel);
 
         ImageViewerGui.getSingletonInstance().getLeftContentPane()
-                .add(new CollapsiblePane(getName(), ControlsPanel.getSingletonInstance(), true));
+                .add(new CollapsiblePane("Timeline Layers", ControlsPanel.getSingletonInstance(), true));
 
         ImageViewerGui.getSingletonInstance().getMainContentPanel().addPlugin(this);
         ObservationDialog.getSingletonInstance().addUserInterface(EVESettings.OBSERVATION_UI_NAME,

@@ -20,7 +20,6 @@ import javax.swing.JPanel;
 import org.helioviewer.base.math.Interval;
 import org.helioviewer.jhv.gui.IconBank;
 import org.helioviewer.jhv.gui.IconBank.JHVIcon;
-import org.helioviewer.jhv.gui.dialogs.observation.ObservationDialog;
 import org.helioviewer.jhv.layers.LayersListener;
 import org.helioviewer.jhv.layers.LayersModel;
 import org.helioviewer.plugins.eveplugin.controller.ZoomController;
@@ -31,7 +30,6 @@ import org.helioviewer.plugins.eveplugin.events.model.EventModelListener;
 import org.helioviewer.plugins.eveplugin.model.TimeIntervalLockModel;
 //import org.helioviewer.plugins.eveplugin.model.PlotTimeSpace;
 import org.helioviewer.plugins.eveplugin.settings.EVEAPI.API_RESOLUTION_AVERAGES;
-import org.helioviewer.plugins.eveplugin.settings.EVESettings;
 import org.helioviewer.plugins.eveplugin.view.periodpicker.PeriodPicker;
 import org.helioviewer.plugins.eveplugin.view.periodpicker.PeriodPickerListener;
 import org.helioviewer.viewmodel.view.View;
@@ -53,7 +51,6 @@ public class PlotsControlPanel extends JPanel implements ZoomControllerListener,
     private boolean setDefaultPeriod = true;
 
     private final ImageIcon movietimeIcon = IconBank.getIcon(JHVIcon.LAYER_MOVIE_TIME);
-    private final ImageIcon addIcon = IconBank.getIcon(JHVIcon.ADD);
 
     private final JLabel periodLabel = new JLabel("Period:");
     private final PeriodPicker periodPicker = new PeriodPicker();
@@ -69,8 +66,6 @@ public class PlotsControlPanel extends JPanel implements ZoomControllerListener,
     private final JCheckBox eventsCheckBox = new JCheckBox();
     private final String[] plots = { "Plot 1", "Plot 2" };
     private final JComboBox eventsComboBox = new JComboBox(plots);
-
-    private final JButton addLayerButton = new JButton("Add Layer", addIcon);
 
     private boolean selectedIndexSetByProgram = false;
 
@@ -111,7 +106,6 @@ public class PlotsControlPanel extends JPanel implements ZoomControllerListener,
         final JPanel groupPane = new JPanel();
         groupPane.setLayout(new FlowLayout(FlowLayout.RIGHT));
         groupPane.setPreferredSize(new Dimension(200, getHeight()));
-        groupPane.add(addLayerButton);
 
         add(periodPane, BorderLayout.LINE_START);
         add(zoomPane, BorderLayout.CENTER);
@@ -127,8 +121,6 @@ public class PlotsControlPanel extends JPanel implements ZoomControllerListener,
 
         zoomComboBox.addActionListener(this);
 
-        addLayerButton.setToolTipText("Add a new layer");
-        addLayerButton.addActionListener(this);
     }
 
     private void initEventsVisualComponents() {
@@ -332,8 +324,6 @@ public class PlotsControlPanel extends JPanel implements ZoomControllerListener,
             ZoomController.getSingletonInstance().setAvailableInterval(interval);
             // PlotTimeSpace.getInstance().setSelectedMinAndMaxTime(interval.getStart(),
             // interval.getEnd());
-        } else if (e.getSource().equals(addLayerButton)) {
-            ObservationDialog.getSingletonInstance().showDialog(EVESettings.OBSERVATION_UI_NAME);
         }
     }
 

@@ -67,7 +67,7 @@ public class PlotsContainerPanel extends JPanel implements LineDataSelectorModel
             return;
         }
 
-        ControlsPanel.getSingletonInstance().remove(lineDataSelectorPanelTwo);
+        ControlsPanel.getSingletonInstance().removeLineDataSelector(lineDataSelectorPanelTwo);
 
         if (isSecondPlotVisible) {
             splitPane.remove(plotOne);
@@ -82,12 +82,12 @@ public class PlotsContainerPanel extends JPanel implements LineDataSelectorModel
 
         if (isSecondPlotVisible) {
             plotTwo.setIntervalSlider(intervalPane);
-            ControlsPanel.getSingletonInstance().add(lineDataSelectorPanelTwo);
+            ControlsPanel.getSingletonInstance().addLineDataSelector(lineDataSelectorPanelTwo);
             splitPane.setTopComponent(plotOne);
             add(splitPane, BorderLayout.CENTER);
         } else {
             plotOne.setIntervalSlider(intervalPane);
-            ControlsPanel.getSingletonInstance().add(lineDataSelectorPanelOne);
+            ControlsPanel.getSingletonInstance().addLineDataSelector(lineDataSelectorPanelOne);
             add(plotOne, BorderLayout.CENTER);
         }
         revalidate();
