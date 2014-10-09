@@ -22,11 +22,11 @@ import org.helioviewer.plugins.eveplugin.radio.model.ZoomManager;
 import org.helioviewer.plugins.eveplugin.settings.EVESettings;
 import org.helioviewer.plugins.eveplugin.view.linedataselector.LineDataSelectorModel;
 import org.helioviewer.viewmodel.changeevent.ChangeEvent;
-import org.helioviewer.viewmodel.metadata.HelioviewerMetaData;
 import org.helioviewer.viewmodel.region.RegionAdapter;
 import org.helioviewer.viewmodel.region.StaticRegion;
 import org.helioviewer.viewmodel.view.MetaDataView;
 import org.helioviewer.viewmodel.view.View;
+import org.helioviewer.viewmodel.view.jp2view.JHVJP2CallistoView;
 import org.helioviewer.viewmodel.view.jp2view.JHVJP2View;
 import org.helioviewer.viewmodel.view.jp2view.JHVJP2View.ReaderMode;
 import org.helioviewer.viewmodel.view.jp2view.JP2Image;
@@ -37,12 +37,12 @@ import org.helioviewer.viewmodel.viewport.ViewportAdapter;
 /**
  * The radio data manager manages all the downloaded data for radio
  * spectrograms.
- *
+ * 
  * It receives all of its input from the radio downloader as listener of the
  * radio downloader.
- *
+ * 
  * @author Bram.Bourgoignie@oma.be
- *
+ * 
  */
 public class RadioDataManager implements RadioDownloaderListener {
 
@@ -85,7 +85,7 @@ public class RadioDataManager implements RadioDownloaderListener {
     /**
      * private constructor used when the instance is requested for the first
      * time.
-     *
+     * 
      */
     private RadioDataManager() {
         listeners = new ArrayList<RadioDataManagerListener>();
@@ -103,7 +103,7 @@ public class RadioDataManager implements RadioDownloaderListener {
 
     /**
      * Access to the singleton instance of the radio data manager
-     *
+     * 
      * @return The instance of the radio data manager
      */
     public static RadioDataManager getSingletonInstance() {
@@ -115,7 +115,7 @@ public class RadioDataManager implements RadioDownloaderListener {
 
     /**
      * Adds a radio data manager listener.
-     *
+     * 
      * @param l
      *            The listener to add
      */
@@ -125,7 +125,7 @@ public class RadioDataManager implements RadioDownloaderListener {
 
     /**
      * Removes a radio data manager listener.
-     *
+     * 
      * @param l
      *            The listener to remove
      */
@@ -136,8 +136,8 @@ public class RadioDataManager implements RadioDownloaderListener {
     /**
      * Inform the RadioDataManager about the new data that was received. The
      * RadioDataManagerListeners will be informed about the new received data.
-     *
-     *
+     * 
+     * 
      * @param data
      *            The data received
      * @param imageID
@@ -154,15 +154,15 @@ public class RadioDataManager implements RadioDownloaderListener {
     /**
      * Removes the given download request data. The data is removed from the
      * line selector model. The images are removed from the cache.
-     *
+     * 
      * The listeners are informed about the removal of the download request
      * data.
-     *
+     * 
      * @param drd
      *            The download request data that should be removed
      */
     public void removeDownloadRequestData(DownloadRequestData drd) {
-        this.downloadRequestData.remove(drd.getDownloadID());
+        downloadRequestData.remove(drd.getDownloadID());
         lineDataSelectorModel.removeLineData(drd);
         for (Long imageID : drd.getRadioImages().keySet()) {
             cache.remove(imageID, drd.getPlotIdentifier());
@@ -173,8 +173,8 @@ public class RadioDataManager implements RadioDownloaderListener {
     /**
      * Changed the visibility of the download request data. All radio data
      * manager listeners are informed.
-     *
-     *
+     * 
+     * 
      * @param drd
      *            The download request data for which the visiblility is changed
      */
@@ -184,14 +184,14 @@ public class RadioDataManager implements RadioDownloaderListener {
 
     /**
      * Request the radio data manager for new data.
-     *
+     * 
      * As long as the mouse is dragged no new data is requested. This to improve
      * the responsiveness of the program.
-     *
+     * 
      * This function can be called asynchronously. A request buffer is used to
      * store the all the calls. As long as there are requests in the buffer
      * function continues.
-     *
+     * 
      * @param xStart
      *            The start time for which new data is requested
      * @param xEnd
@@ -209,9 +209,10 @@ public class RadioDataManager implements RadioDownloaderListener {
      * @param plotIdentifier
      *            The identifier of the plot for which new data is requested
      */
-    public void requestForData(Date xStart, Date xEnd, double yStart, double yEnd, double xRatio, double yRatio, List<Long> iDs, String plotIdentifier) {
-        Long start = System.currentTimeMillis();
-        Long tempId = id;
+    public void requestForData(Date xStart, Date xEnd, double yStart, double yEnd, double xRatio, double yRatio, List<Long> iDs,
+            String plotIdentifier) {
+        // Long start = System.currentTimeMillis();
+        // Long tempId = id;
         id++;
         // Log.debug("Request for data : " + tempId + " time " + start +
         // " by thread " + Thread.currentThread().getName());
@@ -244,8 +245,8 @@ public class RadioDataManager implements RadioDownloaderListener {
     /**
      * Informs the radio data manager about an image, identified by imageID from
      * download identified by downloadID, finished its downloading?
-     *
-     *
+     * 
+     * 
      * @param imageID
      *            The image id of the image that finished downloading
      * @param downloadID
@@ -253,7 +254,7 @@ public class RadioDataManager implements RadioDownloaderListener {
      */
     public void finishedDownloadingID(Long imageID, Long downloadID) {
         synchronized (downloadRequestData) {
-            DownloadRequestData drd = this.downloadRequestData.get(downloadID);
+            DownloadRequestData drd = downloadRequestData.get(downloadID);
             if (drd != null) {
                 RadioImage image = drd.getRadioImages().get(imageID);
                 if (image != null) {
@@ -289,7 +290,8 @@ public class RadioDataManager implements RadioDownloaderListener {
     }
 
     @Override
-    public void newJPXFilesDownloaded(List<DownloadedJPXData> jpxFiles, Date requestedStartTime, Date requestedEndTime, Long downloadID, String plotIdentifier) {
+    public void newJPXFilesDownloaded(List<DownloadedJPXData> jpxFiles, Date requestedStartTime, Date requestedEndTime, Long downloadID,
+            String plotIdentifier) {
         Log.trace("Init the download request data in radio data manager");
         synchronized (downloadRequestData) {
             SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
@@ -301,7 +303,7 @@ public class RadioDataManager implements RadioDownloaderListener {
                     handleDownloadedJPXData(djd, sdf, drd, downloadID, plotIdentifier);
                 }
             }
-            this.downloadRequestData.put(downloadID, drd);
+            downloadRequestData.put(downloadID, drd);
             defineMaxBounds(downloadID, plotIdentifier);
             fireNewDataAvailable(drd, downloadID);
             fireDownloadRequestAnswered(new Interval<Date>(requestedStartTime, requestedEndTime), downloadID, plotIdentifier);
@@ -309,7 +311,8 @@ public class RadioDataManager implements RadioDownloaderListener {
     }
 
     @Override
-    public void newAdditionalDataDownloaded(List<DownloadedJPXData> jpxFiles, Long downloadID, String plotIdentifier, double ratioX, double ratioY) {
+    public void newAdditionalDataDownloaded(List<DownloadedJPXData> jpxFiles, Long downloadID, String plotIdentifier, double ratioX,
+            double ratioY) {
         synchronized (downloadRequestData) {
             SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
             DownloadRequestData drd = downloadRequestData.get(downloadID);
@@ -318,7 +321,7 @@ public class RadioDataManager implements RadioDownloaderListener {
             for (DownloadedJPXData djd : jpxFiles) {
                 handleAdditionalJPXData(djd, ratioX, ratioY, downloadID, drd, sdf, plotIdentifier);
             }
-            this.downloadRequestData.put(downloadID, drd);
+            downloadRequestData.put(downloadID, drd);
             defineMaxBounds(downloadID, plotIdentifier);
             fireNewDataAvailable(drd, downloadID);
         }
@@ -348,7 +351,7 @@ public class RadioDataManager implements RadioDownloaderListener {
     /**
      * Define the maximum bound of the frequency interval. The y-value model is
      * updated.
-     *
+     * 
      * @param downloadID
      *            The download ID for which the bounds are defined
      * @param plotIdentifier
@@ -357,7 +360,7 @@ public class RadioDataManager implements RadioDownloaderListener {
     private void defineMaxBounds(Long downloadID, String plotIdentifier) {
         synchronized (downloadRequestData) {
             FrequencyInterval maxFrequencyInterval = new FrequencyInterval();
-            DownloadRequestData drd = this.downloadRequestData.get(downloadID);
+            DownloadRequestData drd = downloadRequestData.get(downloadID);
             if (drd != null) {
                 Map<Long, RadioImage> radioImages = drd.getRadioImages();
                 if (!radioImages.isEmpty()) {
@@ -391,7 +394,7 @@ public class RadioDataManager implements RadioDownloaderListener {
 
     /**
      * Informs all RadioDataManagerListener of new received data.
-     *
+     * 
      * @param data
      *            The data received
      * @param imageID
@@ -411,7 +414,8 @@ public class RadioDataManager implements RadioDownloaderListener {
                         image.setLastDataSize(dataSize);
                         if (image.getVisibleImageFreqInterval() != null && image.getVisibleImageTimeInterval() != null) {
                             for (RadioDataManagerListener l : listeners) {
-                                l.newDataForIDReceived(data, image.getVisibleImageTimeInterval(), image.getVisibleImageFreqInterval(), dataSize, downloadID, drd.getPlotIdentifier(), imageID);
+                                l.newDataForIDReceived(data, image.getVisibleImageTimeInterval(), image.getVisibleImageFreqInterval(),
+                                        dataSize, downloadID, drd.getPlotIdentifier(), imageID);
                             }
                         }
                     }
@@ -426,7 +430,7 @@ public class RadioDataManager implements RadioDownloaderListener {
 
     /**
      * Informs the radio data manager listeners about new available data.
-     *
+     * 
      * @param drd
      *            The available data
      * @param iD
@@ -440,7 +444,7 @@ public class RadioDataManager implements RadioDownloaderListener {
 
     /**
      * Informs the radio data managers listeners about data that was removed.
-     *
+     * 
      * @param drd
      *            The data that was removed
      */
@@ -453,7 +457,7 @@ public class RadioDataManager implements RadioDownloaderListener {
     /**
      * Informs the radio data manager listeners about the data visibility that
      * was changed.
-     *
+     * 
      * @param drd
      *            The download request data for which the data visibility was
      *            changed.
@@ -468,7 +472,7 @@ public class RadioDataManager implements RadioDownloaderListener {
     /**
      * Informs the radio data manager listeners about the download request that
      * was answered.
-     *
+     * 
      * @param timeInterval
      *            The time interval over which the request was answered
      * @param downloadID
@@ -484,7 +488,7 @@ public class RadioDataManager implements RadioDownloaderListener {
 
     /**
      * Function handles a request configuration.
-     *
+     * 
      * @param requestConfig
      *            The request configuration to be handled
      * @param xStart
@@ -507,11 +511,13 @@ public class RadioDataManager implements RadioDownloaderListener {
                 fireIntervalTooBig(id, plotIdentifier);
             }
         } else {
-            RadioImageCacheResult result = cache.getRadioImageCacheResultForInterval(requestConfig.getxStart(), requestConfig.getxEnd(), 24L * 60 * 60 * 1000, plotIdentifier);
+            RadioImageCacheResult result = cache.getRadioImageCacheResultForInterval(requestConfig.getxStart(), requestConfig.getxEnd(),
+                    24L * 60 * 60 * 1000, plotIdentifier);
             for (Long id : requestConfig.getIDs()) {
                 DownloadRequestData drd = downloadRequestData.get(id);
                 if (drd != null) {
-                    downloader.requestAndOpenIntervals(result.getMissingInterval(), id, drd.getPlotIdentifier(), requestConfig.getxRatio(), requestConfig.getyRatio());
+                    downloader.requestAndOpenIntervals(result.getMissingInterval(), id, drd.getPlotIdentifier(), requestConfig.getxRatio(),
+                            requestConfig.getyRatio());
                 } else {
                     Log.trace("drd is null");
                 }
@@ -531,7 +537,7 @@ public class RadioDataManager implements RadioDownloaderListener {
 
     /**
      * Handles new available data send by the radio downloader
-     *
+     * 
      * @param xStart
      *            The start time of the currently visible time interval
      * @param xEnd
@@ -547,9 +553,10 @@ public class RadioDataManager implements RadioDownloaderListener {
      *            The identifier of the plot
      * @param drd
      *            The download request data
-     *
+     * 
      */
-    private void handleAvailableData(DownloadedJPXData jpxData, Date xStart, Date xEnd, double yStart, double yEnd, String plotIdentifier, DownloadRequestData drd) {
+    private void handleAvailableData(DownloadedJPXData jpxData, Date xStart, Date xEnd, double yStart, double yEnd, String plotIdentifier,
+            DownloadRequestData drd) {
         RadioImage ri = drd.getRadioImages().get(jpxData.getImageID());
         if (ri != null) {
             synchronized (ri) {
@@ -558,31 +565,58 @@ public class RadioDataManager implements RadioDownloaderListener {
                     Interval<Date> visibleDateInterval = ri.getVisibleImageTimeInterval();
                     FrequencyInterval visibleFrequencyInterval = ri.getVisibleImageFreqInterval();
                     if (!visibleDateInterval.getStart().equals(visibleDateInterval.getEnd())) {
-                        Log.trace("Visible start time : " + visibleDateInterval.getStart().getTime() + " Date : " + visibleDateInterval.getStart());
-                        Log.trace("Visible end time : " + visibleDateInterval.getEnd().getTime() + " Date : " + visibleDateInterval.getEnd());
-                        Rectangle viewport = zoomManager.getAvailableSpaceForInterval(visibleDateInterval.getStart(), visibleDateInterval.getEnd(), visibleFrequencyInterval.getStart(), visibleFrequencyInterval.getEnd(), id, plotIdentifier);
+                        /*
+                         * Log.trace("Visible start time : " +
+                         * visibleDateInterval.getStart().getTime() + " Date : "
+                         * + visibleDateInterval.getStart());
+                         * Log.trace("Visible end time : " +
+                         * visibleDateInterval.getEnd().getTime() + " Date : " +
+                         * visibleDateInterval.getEnd());
+                         */
+                        Rectangle viewport = zoomManager.getAvailableSpaceForInterval(visibleDateInterval.getStart(),
+                                visibleDateInterval.getEnd(), visibleFrequencyInterval.getStart(), visibleFrequencyInterval.getEnd(), id,
+                                plotIdentifier);
                         View v = jpxData.getView();
                         JHVJP2View jp2View = v.getAdapter(JHVJP2View.class);
                         MetaDataView metaDataView = v.getAdapter(MetaDataView.class);
                         if (jp2View != null) {
-                            jp2View.setViewport(new ViewportAdapter(new StaticViewport(new Vector2dInt(viewport.width, viewport.height))), new ChangeEvent());
+                            jp2View.setViewport(new ViewportAdapter(new StaticViewport(new Vector2dInt(viewport.width, viewport.height))),
+                                    new ChangeEvent());
                             Rectangle roi = ri.getROI();
-                            Log.trace("*********************************************");
-                            Log.trace("requested interval : " + xStart + " - " + xEnd + " , " + yStart + " - " + yEnd);
-                            Log.trace("image id : " + ri.getRadioImageID());
-                            Log.trace("image interval : " + ri.getTimeInterval().getStart() + " - " + ri.getTimeInterval().getEnd() + " , " + ri.getFreqInterval().getStart() + " - " + ri.getFreqInterval().getEnd());
-                            Log.trace("visible interval : " + ri.getVisibleImageTimeInterval().getStart() + " - " + ri.getVisibleImageTimeInterval().getEnd() + " , " + ri.getVisibleImageFreqInterval().getStart() + " - " + ri.getVisibleImageFreqInterval().getEnd());
-                            Log.trace("viewport[width-height] : " + viewport.width + " - " + viewport.height);
-                            Log.trace("ROI [x0,y0,width,height] : " + roi.x + "," + roi.y + "," + roi.width + "," + roi.height);
-                            Log.trace("*********************************************");
-                            HelioviewerMetaData md = (HelioviewerMetaData) metaDataView.getMetaData();
-                            Double mpp = md.getUnitsPerPixel();
-                            if (jp2View.setRegion(new RegionAdapter(new StaticRegion(roi.getX() * mpp, roi.getY() * mpp, new Vector2dDouble(roi.getWidth() * mpp, roi.getHeight() * mpp))), new ChangeEvent())) {
+                            /*
+                             * Log.trace(
+                             * "*********************************************");
+                             * Log.trace("requested interval : " + xStart +
+                             * " - " + xEnd + " , " + yStart + " - " + yEnd);
+                             * Log.trace("image id : " + ri.getRadioImageID());
+                             * Log.trace("image interval : " +
+                             * ri.getTimeInterval().getStart() + " - " +
+                             * ri.getTimeInterval().getEnd() + " , " +
+                             * ri.getFreqInterval().getStart() + " - " +
+                             * ri.getFreqInterval().getEnd());
+                             * Log.trace("visible interval : " +
+                             * ri.getVisibleImageTimeInterval().getStart() +
+                             * " - " + ri.getVisibleImageTimeInterval().getEnd()
+                             * + " , " +
+                             * ri.getVisibleImageFreqInterval().getStart() +
+                             * " - " +
+                             * ri.getVisibleImageFreqInterval().getEnd());
+                             * Log.trace("viewport[width-height] : " +
+                             * viewport.width + " - " + viewport.height);
+                             * Log.trace("ROI [x0,y0,width,height] : " + roi.x +
+                             * "," + roi.y + "," + roi.width + "," +
+                             * roi.height); Log.trace(
+                             * "*********************************************");
+                             */
+                            if (jp2View.setRegion(
+                                    new RegionAdapter(new StaticRegion(roi.getX(), roi.getY(), new Vector2dDouble(roi.getWidth(), roi
+                                            .getHeight()))), new ChangeEvent())) {
                                 Log.trace("The region is changed");
                             } else {
                                 Log.trace("The region has not changed send a data not changed for image id : " + ri.getRadioImageID());
                                 if (ri.getLastDataSize() != null) {
-                                    fireDataNotChanged(ri.getVisibleImageTimeInterval(), ri.getVisibleImageFreqInterval(), ri.getLastDataSize(), drd.getDownloadID(), drd.getPlotIdentifier(), ri.getRadioImageID());
+                                    fireDataNotChanged(ri.getVisibleImageTimeInterval(), ri.getVisibleImageFreqInterval(),
+                                            ri.getLastDataSize(), drd.getDownloadID(), drd.getPlotIdentifier(), ri.getRadioImageID());
                                 } else {
                                     Log.trace("Last data size was null for radio image id : " + ri.getRadioImageID());
                                 }
@@ -599,7 +633,7 @@ public class RadioDataManager implements RadioDownloaderListener {
     /**
      * Instructs the radio data manager listeners to clear the saved images in
      * the list.
-     *
+     * 
      * @param downloadID
      *            The download identifier for which the images should be removed
      * @param toRemove
@@ -608,7 +642,8 @@ public class RadioDataManager implements RadioDownloaderListener {
      *            The plot identifier for which the image should be removed
      */
     private void fireClearSavedImages(Long downloadID, List<Long> toRemove, String plotIdentifier) {
-        Log.trace("Clear images for downloadID " + downloadID + " and plotIdentifier " + plotIdentifier + " nr of elements to remove: " + toRemove.size());
+        Log.trace("Clear images for downloadID " + downloadID + " and plotIdentifier " + plotIdentifier + " nr of elements to remove: "
+                + toRemove.size());
         for (Long imageID : toRemove) {
             Log.trace("Remove image ID : " + imageID);
             for (RadioDataManagerListener l : listeners) {
@@ -619,7 +654,7 @@ public class RadioDataManager implements RadioDownloaderListener {
 
     /**
      * Instructs the radio data managers about data that was not changed.
-     *
+     * 
      * @param timeInterval
      *            The visible interval over which the data did not change
      * @param freqInterval
@@ -634,7 +669,8 @@ public class RadioDataManager implements RadioDownloaderListener {
      * @param imageID
      *            The image identifier for which the data did not change
      */
-    private void fireDataNotChanged(Interval<Date> timeInterval, FrequencyInterval freqInterval, Rectangle rectangle, Long downloadID, String plotIdentifier, long imageID) {
+    private void fireDataNotChanged(Interval<Date> timeInterval, FrequencyInterval freqInterval, Rectangle rectangle, Long downloadID,
+            String plotIdentifier, long imageID) {
         List<Long> tempList = new ArrayList<Long>();
         tempList.add(downloadID);
         for (RadioDataManagerListener l : listeners) {
@@ -646,7 +682,7 @@ public class RadioDataManager implements RadioDownloaderListener {
     /**
      * Informs the radio data manager listeners about a request for a too big
      * interval
-     *
+     * 
      * @param downloadID
      *            The download identifier for which the requested interval was
      *            too big
@@ -661,7 +697,7 @@ public class RadioDataManager implements RadioDownloaderListener {
 
     /**
      * Handles newly downloaded jpx-data.
-     *
+     * 
      * @param djd
      *            The jpx-data to be handled
      * @param drd
@@ -673,17 +709,19 @@ public class RadioDataManager implements RadioDownloaderListener {
      * @param plotIdentifier
      *            The plot identifier for which the data was downloaded
      */
-    private void handleDownloadedJPXData(DownloadedJPXData djd, SimpleDateFormat sdf, DownloadRequestData drd, Long downloadID, String plotIdentifier) {
-        JHVJP2View jpxView = djd.getView().getAdapter(JHVJP2View.class);
-        if (jpxView != null) {
-            jpxView.setReaderMode(ReaderMode.ONLYFIREONCOMPLETE);
-            JP2Image image = jpxView.getJP2Image();
+    private void handleDownloadedJPXData(DownloadedJPXData djd, SimpleDateFormat sdf, DownloadRequestData drd, Long downloadID,
+            String plotIdentifier) {
+        JHVJP2CallistoView jp2CallistoView = djd.getView().getAdapter(JHVJP2CallistoView.class);
+        if (jp2CallistoView != null) {
+            jp2CallistoView.setReaderMode(ReaderMode.ONLYFIREONCOMPLETE);
+            JP2Image image = jp2CallistoView.getJP2Image();
             ResolutionSet rs = image.getResolutionSet();
             Interval<Integer> interval = image.getCompositionLayerRange();
             LineDataSelectorModel.getSingletonInstance().downloadStarted(drd);
             for (int i = interval.getStart(); i <= interval.getEnd(); i++) {
                 try {
-                    FrequencyInterval fi = new FrequencyInterval(Integer.parseInt(image.get("STARTFRQ", i)), Integer.parseInt(image.get("END-FREQ", i)));
+                    FrequencyInterval fi = new FrequencyInterval(Integer.parseInt(image.get("STARTFRQ", i)), Integer.parseInt(image.get(
+                            "END-FREQ", i)));
                     Date start = null;
                     Date end = null;
                     try {
@@ -699,7 +737,10 @@ public class RadioDataManager implements RadioDownloaderListener {
                         Double freqEnd = Double.parseDouble(image.get("END-FREQ", i));
                         Interval<Date> dateInterval = new Interval<Date>(start, end);
                         for (int j = 0; j <= rs.getMaxResolutionLevels(); j++) {
-                            ResolutionSetting tempResSet = new ResolutionSetting((1.0 * (end.getTime() - start.getTime()) / rs.getResolutionLevel(j).getResolutionBounds().width), ((freqEnd - freqStart) / rs.getResolutionLevel(j).getResolutionBounds().height), j, rs.getResolutionLevel(j).getResolutionBounds().width, rs.getResolutionLevel(j).getResolutionBounds().height, rs.getResolutionLevel(j).getZoomLevel());
+                            ResolutionSetting tempResSet = new ResolutionSetting((1.0 * (end.getTime() - start.getTime()) / rs
+                                    .getResolutionLevel(j).getResolutionBounds().width), ((freqEnd - freqStart) / rs.getResolutionLevel(j)
+                                    .getResolutionBounds().height), j, rs.getResolutionLevel(j).getResolutionBounds().width, rs
+                                    .getResolutionLevel(j).getResolutionBounds().height, rs.getResolutionLevel(j).getZoomLevel());
                             resolutionSettings.add(tempResSet);
                         }
                         int highestLevel = -1;
@@ -710,8 +751,11 @@ public class RadioDataManager implements RadioDownloaderListener {
                                 lastUsedResolutionSetting = rst;
                             }
                         }
-                        jpxView.setViewport(new ViewportAdapter(new StaticViewport(lastUsedResolutionSetting.getVec2dIntRepresentation())), new ChangeEvent());
-                        RadioImage tempRs = new RadioImage(djd, downloadID, djd.getImageID(), dateInterval, fi, i, rs, resolutionSettings, plotIdentifier, true);
+                        jp2CallistoView.setViewport(
+                                new ViewportAdapter(new StaticViewport(lastUsedResolutionSetting.getVec2dIntRepresentation())),
+                                new ChangeEvent());
+                        RadioImage tempRs = new RadioImage(djd, downloadID, djd.getImageID(), dateInterval, fi, i, rs, resolutionSettings,
+                                plotIdentifier, true);
                         tempRs.setLastUsedResolutionSetting(lastUsedResolutionSetting);
                         drd.addRadioImage(tempRs);
                     } else {
@@ -727,7 +771,7 @@ public class RadioDataManager implements RadioDownloaderListener {
 
     /**
      * Handles the download of additional jpx-data.
-     *
+     * 
      * @param ratioY
      *            The x-ratio of time per pixel
      * @param ratioX
@@ -744,19 +788,21 @@ public class RadioDataManager implements RadioDownloaderListener {
      * @param plotIdentifier
      *            The plot identifier for which new additional data was
      *            downloaded
-     *
+     * 
      */
-    private void handleAdditionalJPXData(DownloadedJPXData djd, double ratioX, double ratioY, Long downloadID, DownloadRequestData drd, SimpleDateFormat sdf, String plotIdentifier) {
-        JHVJP2View jpxView = djd.getView().getAdapter(JHVJP2View.class);
-        if (jpxView != null) {
-            jpxView.setReaderMode(ReaderMode.ONLYFIREONCOMPLETE);
-            JP2Image image = jpxView.getJP2Image();
+    private void handleAdditionalJPXData(DownloadedJPXData djd, double ratioX, double ratioY, Long downloadID, DownloadRequestData drd,
+            SimpleDateFormat sdf, String plotIdentifier) {
+        JHVJP2CallistoView jpxCallistoView = djd.getView().getAdapter(JHVJP2CallistoView.class);
+        if (jpxCallistoView != null) {
+            jpxCallistoView.setReaderMode(ReaderMode.ONLYFIREONCOMPLETE);
+            JP2Image image = jpxCallistoView.getJP2Image();
             ResolutionSet rs = image.getResolutionSet();
             Interval<Integer> interval = image.getCompositionLayerRange();
             LineDataSelectorModel.getSingletonInstance().downloadStarted(drd);
             for (int i = interval.getStart(); i <= interval.getEnd(); i++) {
                 try {
-                    FrequencyInterval fi = new FrequencyInterval(Integer.parseInt(image.get("STARTFRQ", i)), Integer.parseInt(image.get("END-FREQ", i)));
+                    FrequencyInterval fi = new FrequencyInterval(Integer.parseInt(image.get("STARTFRQ", i)), Integer.parseInt(image.get(
+                            "END-FREQ", i)));
                     Date start = null;
                     Date end = null;
                     try {
@@ -772,12 +818,18 @@ public class RadioDataManager implements RadioDownloaderListener {
                         Double freqEnd = Double.parseDouble(image.get("END-FREQ", i));
                         Interval<Date> dateInterval = new Interval<Date>(start, end);
                         for (int j = 0; j <= rs.getMaxResolutionLevels(); j++) {
-                            ResolutionSetting tempResSet = new ResolutionSetting((1.0 * (end.getTime() - start.getTime()) / rs.getResolutionLevel(j).getResolutionBounds().width), ((freqEnd - freqStart) / rs.getResolutionLevel(j).getResolutionBounds().height), j, rs.getResolutionLevel(j).getResolutionBounds().width, rs.getResolutionLevel(j).getResolutionBounds().height, rs.getResolutionLevel(j).getZoomLevel());
+                            ResolutionSetting tempResSet = new ResolutionSetting((1.0 * (end.getTime() - start.getTime()) / rs
+                                    .getResolutionLevel(j).getResolutionBounds().width), ((freqEnd - freqStart) / rs.getResolutionLevel(j)
+                                    .getResolutionBounds().height), j, rs.getResolutionLevel(j).getResolutionBounds().width, rs
+                                    .getResolutionLevel(j).getResolutionBounds().height, rs.getResolutionLevel(j).getZoomLevel());
                             resolutionSettings.add(tempResSet);
                         }
-                        RadioImage tempRs = new RadioImage(djd, downloadID, djd.getImageID(), dateInterval, fi, i, rs, resolutionSettings, plotIdentifier, true);
+                        RadioImage tempRs = new RadioImage(djd, downloadID, djd.getImageID(), dateInterval, fi, i, rs, resolutionSettings,
+                                plotIdentifier, true);
                         ResolutionSetting lastUsedResolutionSetting = tempRs.defineBestResolutionSetting(ratioX, ratioY);
-                        jpxView.setViewport(new ViewportAdapter(new StaticViewport(lastUsedResolutionSetting.getVec2dIntRepresentation())), new ChangeEvent());
+                        jpxCallistoView.setViewport(
+                                new ViewportAdapter(new StaticViewport(lastUsedResolutionSetting.getVec2dIntRepresentation())),
+                                new ChangeEvent());
                         tempRs.setLastUsedResolutionSetting(lastUsedResolutionSetting);
                         drd.addRadioImage(tempRs);
                     } else {
@@ -793,7 +845,7 @@ public class RadioDataManager implements RadioDownloaderListener {
     /**
      * Informs radio data manager listeners about interval with no data that
      * where reseive.
-     *
+     * 
      * @param noDataList
      *            A list with interval for which no data was received
      * @param downloadID

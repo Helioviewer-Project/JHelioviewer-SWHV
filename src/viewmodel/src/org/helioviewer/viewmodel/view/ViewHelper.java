@@ -17,7 +17,9 @@ import org.helioviewer.viewmodel.region.Region;
 import org.helioviewer.viewmodel.region.StaticRegion;
 import org.helioviewer.viewmodel.view.ScalingView.InterpolationMode;
 import org.helioviewer.viewmodel.view.fitsview.JHVFITSView;
+import org.helioviewer.viewmodel.view.jp2view.JHVJP2CallistoView;
 import org.helioviewer.viewmodel.view.jp2view.JHVJP2View;
+import org.helioviewer.viewmodel.view.jp2view.JHVJPXCallistoView;
 import org.helioviewer.viewmodel.view.jp2view.JHVJPXView;
 import org.helioviewer.viewmodel.view.jp2view.JP2Image;
 import org.helioviewer.viewmodel.viewport.StaticViewport;
@@ -66,8 +68,9 @@ public final class ViewHelper {
      */
     public static Region expandRegionToViewportAspectRatio(Viewport v, Region r, MetaData m) {
 
-        if (v == null)
+        if (v == null) {
             return r;
+        }
 
         double viewportRatio = v.getAspectRatio();
 
@@ -104,7 +107,8 @@ public final class ViewHelper {
         double viewportRatio = v.getAspectRatio();
 
         if (Math.abs(r.getWidth() / r.getHeight() - viewportRatio) > JavaCompatibility.DOUBLE_MIN_NORMAL * 4) {
-            return cropRegionToImage(StaticRegion.createAdaptedRegion(r.getRectangle().contractToAspectRatioKeepingCenter(viewportRatio)), m);
+            return cropRegionToImage(StaticRegion.createAdaptedRegion(r.getRectangle().contractToAspectRatioKeepingCenter(viewportRatio)),
+                    m);
         } else {
             return r;
         }
@@ -203,7 +207,8 @@ public final class ViewHelper {
             screenSubImageHeight = r.getHeight() / screenMeterPerPixel;
         }
 
-        return StaticViewportImageSize.createAdaptedViewportImageSize((int) Math.round(screenSubImageWidth), (int) Math.round(screenSubImageHeight));
+        return StaticViewportImageSize.createAdaptedViewportImageSize((int) Math.round(screenSubImageWidth),
+                (int) Math.round(screenSubImageHeight));
     }
 
     /**
@@ -260,8 +265,10 @@ public final class ViewHelper {
      *            ViewportImageSize of the image within the current viewport
      * @return Displacement in image coordinates
      */
-    public static Vector2dDouble convertScreenToImageDisplacement(int screenDisplacementX, int screenDisplacementY, Region r, ViewportImageSize v) {
-        return new Vector2dDouble(r.getWidth() / ((double) v.getWidth()) * screenDisplacementX, -r.getHeight() / ((double) v.getHeight()) * screenDisplacementY);
+    public static Vector2dDouble convertScreenToImageDisplacement(int screenDisplacementX, int screenDisplacementY, Region r,
+            ViewportImageSize v) {
+        return new Vector2dDouble(r.getWidth() / (v.getWidth()) * screenDisplacementX, -r.getHeight() / (v.getHeight())
+                * screenDisplacementY);
     }
 
     /**
@@ -292,8 +299,10 @@ public final class ViewHelper {
      *            ViewportImageSize of the image within the current viewport
      * @return Displacement in screen coordinates
      */
-    public static Vector2dInt convertImageToScreenDisplacement(double imageDisplacementX, double imageDisplacementY, Region r, ViewportImageSize v) {
-        return new Vector2dInt((int) Math.round(imageDisplacementX / r.getWidth() * v.getWidth()), (int) Math.round(imageDisplacementY / r.getHeight() * v.getHeight()));
+    public static Vector2dInt convertImageToScreenDisplacement(double imageDisplacementX, double imageDisplacementY, Region r,
+            ViewportImageSize v) {
+        return new Vector2dInt((int) Math.round(imageDisplacementX / r.getWidth() * v.getWidth()), (int) Math.round(imageDisplacementY
+                / r.getHeight() * v.getHeight()));
     }
 
     /**
@@ -381,7 +390,8 @@ public final class ViewHelper {
      * @see #calculateInnerViewport
      */
     public static Vector2dInt calculateInnerViewportOffset(Region innerRegion, Region outerRegion, ViewportImageSize outerViewportImageSize) {
-        return ViewHelper.convertImageToScreenDisplacement(innerRegion.getUpperLeftCorner().subtract(outerRegion.getUpperLeftCorner()), outerRegion, outerViewportImageSize).negateY();
+        return ViewHelper.convertImageToScreenDisplacement(innerRegion.getUpperLeftCorner().subtract(outerRegion.getUpperLeftCorner()),
+                outerRegion, outerViewportImageSize).negateY();
     }
 
     /**
@@ -491,13 +501,15 @@ public final class ViewHelper {
      *             found, etc.)
      */
     public static ImageInfoView loadView(URI uri, URI downloadURI, boolean isMainView, Interval<Date> range) throws IOException {
-        if (uri == null || uri.getScheme() == null || uri.toString() == null)
+        if (uri == null || uri.getScheme() == null || uri.toString() == null) {
             throw new IOException("Invalid URI.");
+        }
 
         String[] parts = uri.toString().split("\\.");
         String ending = parts[parts.length - 1];
 
-        if (ending.equals("jpeg") || ending.equals("jpg") || ending.equals("JPEG") || ending.equals("JPG") || ending.equals("png") || ending.equals("PNG")) {
+        if (ending.equals("jpeg") || ending.equals("jpg") || ending.equals("JPEG") || ending.equals("JPG") || ending.equals("png")
+                || ending.equals("PNG")) {
 
             return new JHVSimpleImageView(uri, null);
 
@@ -509,6 +521,23 @@ public final class ViewHelper {
                 throw new IOException(e.getMessage());
             }
 
+        } else if (downloadURI.toString().toLowerCase().contains("callisto")) {
+            try {
+                JP2Image jp2Image = new JP2Image(uri, downloadURI);
+
+                if (jp2Image.isMultiFrame()) {
+                    JHVJPXCallistoView jpxCallistoView = new JHVJPXCallistoView(isMainView, range, true);
+                    jpxCallistoView.setJP2Image(jp2Image);
+                    return jpxCallistoView;
+                } else {
+                    JHVJP2CallistoView jp2CallistoView = new JHVJP2CallistoView(isMainView, range);
+                    jp2CallistoView.setJP2Image(jp2Image);
+                    return jp2CallistoView;
+                }
+            } catch (Exception e) {
+                Log.debug("ViewerHelper::loadView(\"" + uri + "\", \"" + downloadURI + "\", \"" + isMainView + "\") ", e);
+                throw new IOException(e.getMessage());
+            }
         } else {
             try {
                 JP2Image jp2Image = new JP2Image(uri, downloadURI);
@@ -545,14 +574,15 @@ public final class ViewHelper {
 
         for (ViewListener v : viewListeners) {
 
-            if (v instanceof LayeredView)
+            if (v instanceof LayeredView) {
                 return aView;
-            else {
+            } else {
                 if (v instanceof View) {
                     View result = findLastViewBeforeLayeredView((View) v);
 
-                    if (result != null)
+                    if (result != null) {
                         return result;
+                    }
                 }
             }
         }
