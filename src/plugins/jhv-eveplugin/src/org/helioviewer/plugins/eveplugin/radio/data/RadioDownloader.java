@@ -43,11 +43,11 @@ public class RadioDownloader {
         return instance;
     }
 
-    private static long imageID = -1L;
+    private static long nextID = -1L;
 
     private static long getNextID() {
-        imageID++;
-        return imageID;
+        nextID++;
+        return nextID;
     }
 
     public void requestAndOpenRemoteFile(final String startDateString, final String endDateString, final String identifier) {
@@ -159,11 +159,11 @@ public class RadioDownloader {
          * Thread thread = new Thread(new Runnable() { private String
          * startDataString; private String endDateString; private String
          * identifier;
-         *
+         * 
          * public Runnable init(String startTime, String endTime, String
          * identifier) { startDataString = startTime; endDateString = endTime;
          * this.identifier = identifier; return this; }
-         *
+         * 
          * @Override public void run() { try { // Log.debug("Request for date "
          * + startDataString + " - " + // endDateString); long duration =
          * calculateFrequencyDuration(startDataString, endDateString); long
@@ -198,10 +198,10 @@ public class RadioDownloader {
          * Log.error("An error occured while opening the remote file!", e);
          * Message.err("An error occured while opening the remote file!",
          * e.getMessage(), false); } }
-         *
-         *
+         * 
+         * 
          * }.init(startDateString, endDateString, identifier), "LoadNewImage");
-         *
+         * 
          * thread.start();
          */
     }
