@@ -7,6 +7,7 @@ import javax.swing.JComponent;
 
 import org.helioviewer.jhv.JavaHelioViewerLauncher;
 import org.helioviewer.jhv.gui.ImageViewerGui;
+import org.helioviewer.jhv.gui.components.CollapsiblePane;
 import org.helioviewer.jhv.gui.dialogs.observation.ObservationDialog;
 import org.helioviewer.jhv.gui.interfaces.MainContentPanelPlugin;
 import org.helioviewer.plugins.eveplugin.controller.ZoomController;
@@ -15,6 +16,7 @@ import org.helioviewer.plugins.eveplugin.events.model.EventModel;
 import org.helioviewer.plugins.eveplugin.lines.data.DatabaseController;
 import org.helioviewer.plugins.eveplugin.radio.model.RadioPlotModel;
 import org.helioviewer.plugins.eveplugin.settings.EVESettings;
+import org.helioviewer.plugins.eveplugin.view.ControlsPanel;
 import org.helioviewer.plugins.eveplugin.view.MainPanel;
 import org.helioviewer.plugins.eveplugin.view.ObservationDialogUIPanel;
 import org.helioviewer.plugins.eveplugin.view.SimpleObservationDialogUIPanel;
@@ -41,6 +43,9 @@ public class EVEPlugin implements Plugin, MainContentPanelPlugin {
         }
 
         pluginPanes.add(mainPanel);
+
+        ImageViewerGui.getSingletonInstance().getLeftContentPane()
+                .add(new CollapsiblePane(getName(), ControlsPanel.getSingletonInstance(), true));
 
         ImageViewerGui.getSingletonInstance().getMainContentPanel().addPlugin(this);
         ObservationDialog.getSingletonInstance().addUserInterface(EVESettings.OBSERVATION_UI_NAME,
