@@ -225,18 +225,12 @@ public class HEKPlugin3dRenderer extends PhysicalRenderer3d {
         if (i < evt.getPositioningInformation().size()) {
             JHVPositionInformation el = evt.getPositioningInformation().get(i);
             if (el.centralPoint() != null) {
-                double theta = el.centralPoint().getCoordinate2() / 180. * Math.PI;// -
-                // Astronomy.getB0InRadians(new
-                // Date((evt.getStartDate().getTime()
-                // +
-                // evt.getEndDate().getTime())
-                // /
-                // 2));
+                double theta = el.centralPoint().getCoordinate2() / 180. * Math.PI;
                 double phi = el.centralPoint().getCoordinate1() / 180. * Math.PI - Astronomy.getL0Radians(new Date((evt.getStartDate().getTime() + evt.getEndDate().getTime()) / 2));
                 double x = Math.cos(theta) * Math.sin(phi);
                 double z = Math.cos(theta) * Math.cos(phi);
                 double y = -Math.sin(theta);
-                g.drawImage3d(bi, x, y, z, 0.5f);
+                g.drawImage3d(bi, x, y, z, 0.7f);
             }
         }
 

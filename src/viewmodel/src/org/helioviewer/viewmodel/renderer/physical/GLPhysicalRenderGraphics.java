@@ -396,9 +396,8 @@ public class GLPhysicalRenderGraphics extends AbstractPhysicalRenderGraphics {
         double angle = Math.acos(sourceDir.dot(targetDir) / (sourceDir.length() * targetDir.length()));
         GL3DVec3d axis = sourceDir.cross(targetDir);
         axis.normalize();
-        GL3DMat4d r = GL3DMat4d.rotation(angle, axis);
-        r.setTranslation(x, y, z);
-
+        GL3DMat4d r = GL3DMat4d.rotation(Math.atan2(x, z), new GL3DVec3d(0., 1., 0.));
+        r.rotate(-Math.asin(y / targetDir.length()), new GL3DVec3d(1., 0., 0.));
         gl.glDisable(GL2.GL_LIGHTING);
         gl.glEnable(GL2.GL_BLEND);
         gl.glBlendFunc(GL2.GL_SRC_ALPHA, GL2.GL_ONE_MINUS_SRC_ALPHA);
@@ -410,10 +409,15 @@ public class GLPhysicalRenderGraphics extends AbstractPhysicalRenderGraphics {
         GL3DVec3d p1 = new GL3DVec3d(-width2, height2, 0);
         GL3DVec3d p2 = new GL3DVec3d(width2, height2, 0);
         GL3DVec3d p3 = new GL3DVec3d(width2, -height2, 0);
+
         p0 = r.multiply(p0);
         p1 = r.multiply(p1);
         p2 = r.multiply(p2);
         p3 = r.multiply(p3);
+        p0.add(targetDir);
+        p1.add(targetDir);
+        p2.add(targetDir);
+        p3.add(targetDir);
 
         gl.glBegin(GL2.GL_QUADS);
 
