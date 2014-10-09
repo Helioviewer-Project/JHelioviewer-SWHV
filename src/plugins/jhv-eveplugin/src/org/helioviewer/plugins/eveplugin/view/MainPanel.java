@@ -9,8 +9,9 @@ import javax.swing.JPanel;
 import org.helioviewer.base.math.Interval;
 import org.helioviewer.plugins.eveplugin.controller.ZoomController;
 import org.helioviewer.plugins.eveplugin.view.plot.PlotsContainerPanel;
-//import org.helioviewer.plugins.eveplugin.model.PlotTimeSpace;
 import org.helioviewer.plugins.eveplugin.view.plot.PlotsControlPanel;
+
+//import org.helioviewer.plugins.eveplugin.model.PlotTimeSpace;
 
 public class MainPanel extends JPanel {
 
@@ -21,6 +22,7 @@ public class MainPanel extends JPanel {
     private static final long serialVersionUID = 1L;
 
     private final PlotsContainerPanel plotsPane = new PlotsContainerPanel();
+
     private final PlotsControlPanel controlPane = new PlotsControlPanel();
 
     // //////////////////////////////////////////////////////////////////////////////

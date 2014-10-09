@@ -9,10 +9,12 @@ import javax.swing.JSplitPane;
 import org.helioviewer.jhv.gui.ImageViewerGui;
 import org.helioviewer.plugins.eveplugin.lines.data.Band;
 import org.helioviewer.plugins.eveplugin.lines.data.BandController;
+import org.helioviewer.plugins.eveplugin.view.ControlsPanel;
 import org.helioviewer.plugins.eveplugin.view.chart.ChartDrawIntervalPane;
 import org.helioviewer.plugins.eveplugin.view.linedataselector.LineDataSelectorElement;
 import org.helioviewer.plugins.eveplugin.view.linedataselector.LineDataSelectorModel;
 import org.helioviewer.plugins.eveplugin.view.linedataselector.LineDataSelectorModelListener;
+import org.helioviewer.plugins.eveplugin.view.linedataselector.LineDataSelectorPanel;
 
 public class PlotsContainerPanel extends JPanel implements LineDataSelectorModelListener {// BandControllerListener,
                                                                                           // {
@@ -30,7 +32,9 @@ public class PlotsContainerPanel extends JPanel implements LineDataSelectorModel
     private final ChartDrawIntervalPane intervalPane = new ChartDrawIntervalPane();
 
     private final PlotPanel plotOne = new PlotPanel(PLOT_IDENTIFIER_MASTER, "Plot 1: ");
+    private final LineDataSelectorPanel lineDataSelectorPanelOne = new LineDataSelectorPanel(PLOT_IDENTIFIER_MASTER, "Plot 1:");
     private final PlotPanel plotTwo = new PlotPanel(PLOT_IDENTIFIER_SLAVE, "Plot 2: ");
+    private final LineDataSelectorPanel lineDataSelectorPanelTwo = new LineDataSelectorPanel(PLOT_IDENTIFIER_SLAVE, "Plot 2:");
 
     private boolean isSecondPlotVisible = true;
 
@@ -63,10 +67,11 @@ public class PlotsContainerPanel extends JPanel implements LineDataSelectorModel
             return;
         }
 
+        ControlsPanel.getSingletonInstance().remove(lineDataSelectorPanelTwo);
+
         if (isSecondPlotVisible) {
             splitPane.remove(plotOne);
             remove(splitPane);
-
             plotTwo.setIntervalSlider(null);
         } else {
             remove(plotOne);
@@ -77,15 +82,16 @@ public class PlotsContainerPanel extends JPanel implements LineDataSelectorModel
 
         if (isSecondPlotVisible) {
             plotTwo.setIntervalSlider(intervalPane);
-
+            ControlsPanel.getSingletonInstance().add(lineDataSelectorPanelTwo);
             splitPane.setTopComponent(plotOne);
             add(splitPane, BorderLayout.CENTER);
         } else {
             plotOne.setIntervalSlider(intervalPane);
-
+            ControlsPanel.getSingletonInstance().add(lineDataSelectorPanelOne);
             add(plotOne, BorderLayout.CENTER);
         }
-
+        revalidate();
+        repaint();
         ImageViewerGui.getSingletonInstance().getContentPane().revalidate();
         ImageViewerGui.getSingletonInstance().getContentPane().repaint();
     }
@@ -115,20 +121,25 @@ public class PlotsContainerPanel extends JPanel implements LineDataSelectorModel
     }
 
     @Override
-    public void downloadStartded(LineDataSelectorElement element) {}
+    public void downloadStartded(LineDataSelectorElement element) {
+    }
 
     @Override
-    public void downloadFinished(LineDataSelectorElement element) {}
+    public void downloadFinished(LineDataSelectorElement element) {
+    }
 
     @Override
-    public void lineDataAdded(LineDataSelectorElement element) {}
+    public void lineDataAdded(LineDataSelectorElement element) {
+    }
 
     @Override
     public void lineDataRemoved(LineDataSelectorElement element) {
         if (element.getPlotIdentifier().equals(PLOT_IDENTIFIER_SLAVE)) {
-            List<LineDataSelectorElement> allElements = LineDataSelectorModel.getSingletonInstance().getAllLineDataSelectorElements(element.getPlotIdentifier());
+            List<LineDataSelectorElement> allElements = LineDataSelectorModel.getSingletonInstance().getAllLineDataSelectorElements(
+                    element.getPlotIdentifier());
             if (allElements != null) {
-                int numberOfLines = LineDataSelectorModel.getSingletonInstance().getAllLineDataSelectorElements(element.getPlotIdentifier()).size();
+                int numberOfLines = LineDataSelectorModel.getSingletonInstance()
+                        .getAllLineDataSelectorElements(element.getPlotIdentifier()).size();
                 setPlot2Visible(numberOfLines > 0);
             } else {
                 setPlot2Visible(false);
@@ -138,5 +149,6 @@ public class PlotsContainerPanel extends JPanel implements LineDataSelectorModel
     }
 
     @Override
-    public void lineDataUpdated(LineDataSelectorElement element) {}
+    public void lineDataUpdated(LineDataSelectorElement element) {
+    }
 }

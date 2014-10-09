@@ -1,7 +1,8 @@
 package org.helioviewer.plugins.eveplugin.view;
 
-import java.awt.BorderLayout;
+import java.awt.Dimension;
 
+import javax.swing.BoxLayout;
 import javax.swing.JPanel;
 
 /**
@@ -12,13 +13,27 @@ import javax.swing.JPanel;
  */
 public class ControlsPanel extends JPanel {
 
-    public ControlsPanel() {
+    /**
+     * 
+     */
+    private static final long serialVersionUID = 3639870635351984819L;
+
+    private static ControlsPanel singletongInstance;
+
+    private ControlsPanel() {
         initVisualComponents();
     }
 
     private void initVisualComponents() {
-        this.setLayout(new BorderLayout());
-
+        this.setPreferredSize(new Dimension(100, 300));
+        this.setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
     }
 
+    public static ControlsPanel getSingletonInstance() {
+        if (singletongInstance == null) {
+            singletongInstance = new ControlsPanel();
+        }
+
+        return singletongInstance;
+    }
 }
