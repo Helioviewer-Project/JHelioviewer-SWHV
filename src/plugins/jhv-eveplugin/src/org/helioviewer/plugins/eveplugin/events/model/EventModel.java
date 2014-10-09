@@ -19,7 +19,9 @@ import org.helioviewer.plugins.eveplugin.controller.DrawController;
 import org.helioviewer.plugins.eveplugin.controller.ZoomControllerListener;
 import org.helioviewer.plugins.eveplugin.events.data.EventRequesterListener;
 import org.helioviewer.plugins.eveplugin.events.gui.EventPanel;
+import org.helioviewer.plugins.eveplugin.events.gui.EventsSelectorElement;
 import org.helioviewer.plugins.eveplugin.settings.EVEAPI.API_RESOLUTION_AVERAGES;
+import org.helioviewer.plugins.eveplugin.view.linedataselector.LineDataSelectorModel;
 import org.helioviewer.plugins.eveplugin.view.plot.PlotsContainerPanel;
 
 /**
@@ -60,6 +62,12 @@ public class EventModel implements ZoomControllerListener, EventRequesterListene
     /** The swing worker creating the event type plot configurations */
     private SwingWorker<EventTypePlotConfiguration, Void> currentSwingWorker;
 
+    private final EventsSelectorElement eventSelectorElement;
+
+    private final List<EventModelListener> listeners;
+
+    private boolean eventsActivated;
+
     /**
      * Private default constructor.
      */
@@ -71,6 +79,9 @@ public class EventModel implements ZoomControllerListener, EventRequesterListene
         plot = PlotsContainerPanel.PLOT_IDENTIFIER_MASTER;
         eventPanel = new EventPanel();
         currentSwingWorker = null;
+        eventSelectorElement = new EventsSelectorElement(this);
+        listeners = new ArrayList<EventModelListener>();
+        eventsActivated = false;
     }
 
     /**
@@ -83,6 +94,16 @@ public class EventModel implements ZoomControllerListener, EventRequesterListene
             instance = new EventModel();
         }
         return instance;
+    }
+
+    /**
+     * Adds an event model listener to the event model.
+     * 
+     * @param listener
+     *            the listener to add
+     */
+    public void addEventModelListener(EventModelListener listener) {
+        listeners.add(listener);
     }
 
     @Override
@@ -132,15 +153,37 @@ public class EventModel implements ZoomControllerListener, EventRequesterListene
         if (eventsVisible != visible) {
             eventsVisible = visible;
             DrawController.getSingletonInstance().updateDrawableElement(eventPanel, plot);
+            LineDataSelectorModel.getSingletonInstance().lineDataElementUpdated(eventSelectorElement);
         }
 
     }
 
+    public void deactivateEvents() {
+        eventsVisible = false;
+        eventsActivated = false;
+        DrawController.getSingletonInstance().removeDrawableElement(eventPanel, plot);
+        LineDataSelectorModel.getSingletonInstance().removeLineData(eventSelectorElement);
+        fireEventsDeactivated();
+    }
+
+    public void activateEvents() {
+        eventsVisible = true;
+        eventsActivated = true;
+        DrawController.getSingletonInstance().updateDrawableElement(eventPanel, plot);
+        LineDataSelectorModel.getSingletonInstance().addLineData(eventSelectorElement);
+    }
+
     public void setPlotIdentifier(String plotIdentifier) {
         if (!plot.equals(plotIdentifier)) {
-            DrawController.getSingletonInstance().removeDrawableElement(eventPanel, plot);
-            DrawController.getSingletonInstance().addDrawableElement(eventPanel, plotIdentifier);
-            plot = plotIdentifier;
+            if (eventsActivated) {
+                DrawController.getSingletonInstance().removeDrawableElement(eventPanel, plot);
+                DrawController.getSingletonInstance().addDrawableElement(eventPanel, plotIdentifier);
+                LineDataSelectorModel.getSingletonInstance().removeLineData(eventSelectorElement);
+                plot = plotIdentifier;
+                LineDataSelectorModel.getSingletonInstance().addLineData(eventSelectorElement);
+            } else {
+                plot = plotIdentifier;
+            }
         }
     }
 
@@ -289,4 +332,13 @@ public class EventModel implements ZoomControllerListener, EventRequesterListene
         return position / selectedDuration;
     }
 
+    public String getPlotIdentifier() {
+        return plot;
+    }
+
+    private void fireEventsDeactivated() {
+        for (EventModelListener l : listeners) {
+            l.eventsDeactivated();
+        }
+    }
 }

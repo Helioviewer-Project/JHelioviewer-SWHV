@@ -27,6 +27,7 @@ import org.helioviewer.plugins.eveplugin.controller.ZoomController;
 import org.helioviewer.plugins.eveplugin.controller.ZoomController.ZOOM;
 import org.helioviewer.plugins.eveplugin.controller.ZoomControllerListener;
 import org.helioviewer.plugins.eveplugin.events.model.EventModel;
+import org.helioviewer.plugins.eveplugin.events.model.EventModelListener;
 import org.helioviewer.plugins.eveplugin.model.TimeIntervalLockModel;
 //import org.helioviewer.plugins.eveplugin.model.PlotTimeSpace;
 import org.helioviewer.plugins.eveplugin.settings.EVEAPI.API_RESOLUTION_AVERAGES;
@@ -38,7 +39,8 @@ import org.helioviewer.viewmodel.view.View;
 /**
  * @author Stephan Pagel
  * */
-public class PlotsControlPanel extends JPanel implements ZoomControllerListener, ActionListener, PeriodPickerListener, LayersListener {
+public class PlotsControlPanel extends JPanel implements ZoomControllerListener, ActionListener, PeriodPickerListener, LayersListener,
+        EventModelListener {
 
     // //////////////////////////////////////////////////////////////////////////////
     // Definitions
@@ -72,13 +74,15 @@ public class PlotsControlPanel extends JPanel implements ZoomControllerListener,
 
     private boolean selectedIndexSetByProgram = false;
 
+    private final PlotsContainerPanel plotsContainerPanel;
+
     // //////////////////////////////////////////////////////////////////////////////
     // Methods
     // //////////////////////////////////////////////////////////////////////////////
 
-    public PlotsControlPanel() {
+    public PlotsControlPanel(PlotsContainerPanel plotsContainerPanel) {
         initVisualComponents();
-
+        this.plotsContainerPanel = plotsContainerPanel;
         ZoomController.getSingletonInstance().addZoomControllerListener(this);
         LayersModel.getSingletonInstance().addLayersListener(this);
     }
@@ -116,7 +120,8 @@ public class PlotsControlPanel extends JPanel implements ZoomControllerListener,
         periodPicker.addPeriodPickerListener(this);
 
         periodFromLayersButton.setToolTipText("Request data of selected movie interval");
-        periodFromLayersButton.setPreferredSize(new Dimension(movietimeIcon.getIconWidth() + 14, periodFromLayersButton.getPreferredSize().height));
+        periodFromLayersButton.setPreferredSize(new Dimension(movietimeIcon.getIconWidth() + 14,
+                periodFromLayersButton.getPreferredSize().height));
         periodFromLayersButton.addActionListener(this);
         setEnabledStateOfPeriodMovieButton();
 
@@ -128,12 +133,16 @@ public class PlotsControlPanel extends JPanel implements ZoomControllerListener,
 
     private void initEventsVisualComponents() {
         eventsCheckBox.setSelected(EventModel.getSingletonInstance().isEventsVisible());
-
+        EventModel.getSingletonInstance().addEventModelListener(this);
         eventsCheckBox.addActionListener(new ActionListener() {
 
             @Override
             public void actionPerformed(ActionEvent e) {
-                EventModel.getSingletonInstance().setEventsVisible(eventsCheckBox.isSelected());
+                if (eventsCheckBox.isSelected()) {
+                    EventModel.getSingletonInstance().activateEvents();
+                } else {
+                    EventModel.getSingletonInstance().deactivateEvents();
+                }
             }
         });
 
@@ -145,6 +154,7 @@ public class PlotsControlPanel extends JPanel implements ZoomControllerListener,
                     EventModel.getSingletonInstance().setPlotIdentifier(PlotsContainerPanel.PLOT_IDENTIFIER_MASTER);
                 } else {
                     EventModel.getSingletonInstance().setPlotIdentifier(PlotsContainerPanel.PLOT_IDENTIFIER_SLAVE);
+                    plotsContainerPanel.setPlot2Visible(true);
                 }
             }
         });
@@ -217,7 +227,8 @@ public class PlotsControlPanel extends JPanel implements ZoomControllerListener,
         }
     }
 
-    private boolean addElementToModel(final DefaultComboBoxModel model, final Date startDate, final Interval<Date> interval, final int calendarField, final int calendarValue, final ZOOM zoom) {
+    private boolean addElementToModel(final DefaultComboBoxModel model, final Date startDate, final Interval<Date> interval,
+            final int calendarField, final int calendarValue, final ZOOM zoom) {
         final Calendar calendar = new GregorianCalendar();
 
         calendar.clear();
@@ -240,7 +251,8 @@ public class PlotsControlPanel extends JPanel implements ZoomControllerListener,
     public void layerAdded(int idx) {
         if (setDefaultPeriod) {
             setDefaultPeriod = false;
-            final Interval<Date> interval = new Interval<Date>(LayersModel.getSingletonInstance().getFirstDate(), LayersModel.getSingletonInstance().getLastDate());
+            final Interval<Date> interval = new Interval<Date>(LayersModel.getSingletonInstance().getFirstDate(), LayersModel
+                    .getSingletonInstance().getLastDate());
             ZoomController.getSingletonInstance().setAvailableInterval(interval);
             // PlotTimeSpace.getInstance().setSelectedMinAndMaxTime(interval.getStart(),
             // interval.getEnd());
@@ -315,7 +327,8 @@ public class PlotsControlPanel extends JPanel implements ZoomControllerListener,
                 }
             }
         } else if (e.getSource() == periodFromLayersButton) {
-            final Interval<Date> interval = new Interval<Date>(LayersModel.getSingletonInstance().getFirstDate(), LayersModel.getSingletonInstance().getLastDate());
+            final Interval<Date> interval = new Interval<Date>(LayersModel.getSingletonInstance().getFirstDate(), LayersModel
+                    .getSingletonInstance().getLastDate());
             ZoomController.getSingletonInstance().setAvailableInterval(interval);
             // PlotTimeSpace.getInstance().setSelectedMinAndMaxTime(interval.getStart(),
             // interval.getEnd());
@@ -410,5 +423,11 @@ public class PlotsControlPanel extends JPanel implements ZoomControllerListener,
 
             return "Custom";
         }
+    }
+
+    @Override
+    public void eventsDeactivated() {
+        eventsCheckBox.setSelected(false);
+        repaint();
     }
 }

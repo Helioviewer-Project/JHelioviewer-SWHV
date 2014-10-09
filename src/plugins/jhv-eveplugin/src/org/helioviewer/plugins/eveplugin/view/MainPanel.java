@@ -23,7 +23,7 @@ public class MainPanel extends JPanel {
 
     private final PlotsContainerPanel plotsPane = new PlotsContainerPanel();
 
-    private final PlotsControlPanel controlPane = new PlotsControlPanel();
+    private final PlotsControlPanel controlPane = new PlotsControlPanel(plotsPane);
 
     // //////////////////////////////////////////////////////////////////////////////
     // Methods
