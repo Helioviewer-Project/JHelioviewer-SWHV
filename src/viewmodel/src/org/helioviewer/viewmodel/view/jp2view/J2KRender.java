@@ -133,8 +133,9 @@ class J2KRender implements Runnable {
      * @param _parentViewRef
      */
     J2KRender(JHVJP2View _parentViewRef) {
-        if (_parentViewRef == null)
+        if (_parentViewRef == null) {
             throw new NullPointerException();
+        }
         parentViewRef = _parentViewRef;
 
         parentImageRef = parentViewRef.jp2Image;
@@ -147,8 +148,9 @@ class J2KRender implements Runnable {
     /** Starts the J2KRender thread. */
     void start() {
 
-        if (myThread != null)
+        if (myThread != null) {
             stop();
+        }
 
         myThread = new Thread(JHVJP2View.renderGroup, this, "J2KRender");
         stop = false;
@@ -302,6 +304,7 @@ class J2KRender implements Runnable {
             if (parentImageRef.getNumComponents() < 2) {
                 currentByteBuffer = (currentByteBuffer + 1) % NUM_BUFFERS;
                 byteBuffer[currentByteBuffer] = new byte[roi.getNumPixels()];
+
             } else {
                 currentIntBuffer = (currentIntBuffer + 1) % NUM_BUFFERS;
                 // if (differenceMode || roi.getNumPixels() !=
@@ -326,8 +329,9 @@ class J2KRender implements Runnable {
                 int newHeight = newSize.Get_y();
                 int newPixels = newWidth * newHeight;
 
-                if (newPixels == 0)
+                if (newPixels == 0) {
                     continue;
+                }
 
                 localIntBuffer = newPixels > localIntBuffer.length ? new int[newPixels << 1] : localIntBuffer;
 
@@ -345,8 +349,9 @@ class J2KRender implements Runnable {
                         }
                     }
                 } else {
-                    for (int row = 0; row < newHeight; row++, destIdx += roi.width, srcIdx += newWidth)
+                    for (int row = 0; row < newHeight; row++, destIdx += roi.width, srcIdx += newWidth) {
                         System.arraycopy(localIntBuffer, srcIdx, intBuffer[currentIntBuffer], destIdx, newWidth);
+                    }
                 }
                 // Log.debug("byteBuffer : " +
                 // Arrays.toString(byteBuffer[currentByteBuffer]));
@@ -366,8 +371,9 @@ class J2KRender implements Runnable {
                     int newHeight = newSize.Get_y();
                     int newPixels = newWidth * newHeight;
 
-                    if (newPixels == 0)
+                    if (newPixels == 0) {
                         continue;
+                    }
 
                     localIntBuffer = newPixels > localIntBuffer.length ? new int[newPixels << 1] : localIntBuffer;
 
@@ -383,7 +389,8 @@ class J2KRender implements Runnable {
                             // long unsignedValue =
                             // (intBuffer[currentByteBuffer][destIdx + col] &
                             // 0xffffffffl) >> 24;
-                            intBuffer[currentByteBuffer][destIdx + col] = (intBuffer[currentByteBuffer][destIdx + col] & 0x00FFFFFF) | ((localIntBuffer[srcIdx + col] & 0x00FF0000) << 8);
+                            intBuffer[currentByteBuffer][destIdx + col] = (intBuffer[currentByteBuffer][destIdx + col] & 0x00FFFFFF)
+                                    | ((localIntBuffer[srcIdx + col] & 0x00FF0000) << 8);
                         }
                     }
                     // Log.debug("byteBuffer : " +
@@ -391,8 +398,9 @@ class J2KRender implements Runnable {
                 }
             }
 
-            if (compositorBuf != null)
+            if (compositorBuf != null) {
                 compositorBuf.Native_destroy();
+            }
 
         } catch (KduException e) {
             e.printStackTrace();
@@ -458,7 +466,8 @@ class J2KRender implements Runnable {
 
                 if (parentImageRef.getNumComponents() < 2) {
                     if (roi.getNumPixels() == byteBuffer[currentByteBuffer].length) {
-                        SingleChannelByte8ImageData imdata = new SingleChannelByte8ImageData(width, height, byteBuffer[currentByteBuffer], new ColorMask());
+                        SingleChannelByte8ImageData imdata = new SingleChannelByte8ImageData(width, height, byteBuffer[currentByteBuffer],
+                                new ColorMask());
                         parentViewRef.setSubimageData(imdata, roi, curLayer, currParams.resolution.getZoomPercent(), false);
                     } else {
                         Log.warn("J2KRender: Params out of sync, skip frame");
@@ -470,16 +479,17 @@ class J2KRender implements Runnable {
                             singleChannel = true;
                         }
 
-                        ARGBInt32ImageData imdata = new ARGBInt32ImageData(singleChannel, width, height, intBuffer[currentIntBuffer], new ColorMask());
+                        ARGBInt32ImageData imdata = new ARGBInt32ImageData(singleChannel, width, height, intBuffer[currentIntBuffer],
+                                new ColorMask());
                         parentViewRef.setSubimageData(imdata, roi, curLayer, currParams.resolution.getZoomPercent(), false);
                     } else {
                         Log.warn("J2KRender: Params out of sync, skip frame");
                     }
                 }
 
-                if (!movieMode)
+                if (!movieMode) {
                     break;
-                else {
+                } else {
                     currParams = parentViewRef.getImageViewParams();
                     numFrames += currParams.compositionLayer - lastFrame;
                     lastFrame = currParams.compositionLayer;
@@ -629,7 +639,8 @@ class J2KRender implements Runnable {
                 nextCandidate = nextFrameCandidateChooser.getNextCandidate(nextCandidate);
 
                 lastDiff = nextDiff;
-                nextDiff = Math.abs(dateTimeCache.getDateTime(nextCandidate).getMillis() - absoluteStartTime) - ((System.currentTimeMillis() - systemStartTime) * movieSpeed);
+                nextDiff = Math.abs(dateTimeCache.getDateTime(nextCandidate).getMillis() - absoluteStartTime)
+                        - ((System.currentTimeMillis() - systemStartTime) * movieSpeed);
             } while (nextDiff < 0);
 
             if (-lastDiff < nextDiff) {

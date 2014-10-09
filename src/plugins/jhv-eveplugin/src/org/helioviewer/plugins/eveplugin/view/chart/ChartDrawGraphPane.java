@@ -26,7 +26,6 @@ import javax.swing.ImageIcon;
 import javax.swing.JComponent;
 import javax.swing.event.MouseInputListener;
 
-import org.helioviewer.base.logging.Log;
 import org.helioviewer.base.math.Interval;
 import org.helioviewer.jhv.data.datatype.JHVEvent;
 import org.helioviewer.jhv.data.guielements.SWEKEventInformationDialog;
@@ -150,7 +149,7 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
             drawLabels(g);
             drawZoomBox(g);
         }
-        Log.info("Run time: " + (System.currentTimeMillis() - start));
+        // Log.info("Run time: " + (System.currentTimeMillis() - start));
     }
 
     private void drawData(Graphics2D g) {
@@ -159,16 +158,17 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
         for (DrawableType dt : drawTypeList) {
             Set<DrawableElement> del = drawableElements.get(dt);
             if (del != null) {
-                Log.trace("Drawable element list is not null. Size is " + del.size());
+                // Log.trace("Drawable element list is not null. Size is " +
+                // del.size());
                 synchronized (del) {
-                    Log.info("Drawable Elements size : " + del.size());
+                    // Log.info("Drawable Elements size : " + del.size());
                     for (DrawableElement de : del) {
-                        Log.info("drawable element" + de);
+                        // Log.info("drawable element" + de);
                         de.draw(g, plotArea);
                     }
                 }
             } else {
-                Log.trace("Drawable element list is null");
+                // Log.trace("Drawable element list is null");
             }
         }
     }
