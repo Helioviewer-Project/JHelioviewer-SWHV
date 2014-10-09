@@ -1,5 +1,6 @@
 package org.helioviewer.gl3d.camera;
 
+import java.awt.EventQueue;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -158,17 +159,19 @@ public class GL3DPositionLoading {
     }
 
     public void addListener(GL3DPositionLoadingListener listener) {
-        synchronized (listeners) {
-            listeners.add(listener);
-        }
+        listeners.add(listener);
+
     }
 
-    public void fireLoaded(String state) {
-        synchronized (listeners) {
-            for (GL3DPositionLoadingListener listener : listeners) {
-                listener.fireNewLoaded(state);
+    public void fireLoaded(final String state) {
+        EventQueue.invokeLater(new Runnable() {
+            @Override
+            public void run() {
+                for (GL3DPositionLoadingListener listener : listeners) {
+                    listener.fireNewLoaded(state);
+                }
             }
-        }
+        });
     }
 
     public Date getBeginDate() {
