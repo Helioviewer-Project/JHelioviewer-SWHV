@@ -59,6 +59,8 @@ public class JHVEventRelation {
     }
 
     /**
+     * Gets the unique identifier of the related event.
+     * 
      * @return the uniqueIdentifier
      */
     public String getUniqueIdentifier() {
@@ -66,14 +68,21 @@ public class JHVEventRelation {
     }
 
     /**
+     * Sets the unique identifier of the relation.
+     * 
      * @param uniqueIdentifier
      *            the uniqueIdentifier to set
      */
     public void setUniqueIdentifier(String uniqueIdentifier) {
+        if (!theEvent.getUniqueID().equals(uniqueIdentifier)) {
+            theEvent = null;
+        }
         this.uniqueIdentifier = uniqueIdentifier;
     }
 
     /**
+     * Gets the event of the relation.
+     * 
      * @return the theEvent
      */
     public JHVEvent getTheEvent() {
@@ -81,10 +90,13 @@ public class JHVEventRelation {
     }
 
     /**
+     * Sets the event of the relation.
+     * 
      * @param theEvent
      *            the theEvent to set
      */
     public void setTheEvent(JHVEvent theEvent) {
+        uniqueIdentifier = theEvent.getUniqueID();
         this.theEvent = theEvent;
     }
 }
