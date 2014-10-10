@@ -19,6 +19,7 @@ import org.helioviewer.gl3d.scenegraph.rt.GL3DRayTracer;
 import org.helioviewer.gl3d.shader.GL3DImageFragmentShaderProgram;
 import org.helioviewer.gl3d.view.GL3DImageTextureView;
 import org.helioviewer.gl3d.view.GL3DView;
+import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.viewmodel.changeevent.ChangeEvent;
 import org.helioviewer.viewmodel.metadata.MetaData;
 import org.helioviewer.viewmodel.region.Region;
@@ -240,7 +241,9 @@ public abstract class GL3DImageLayer extends GL3DGroup implements GL3DCameraList
 
     @Override
     public void viewChanged(View sender, ChangeEvent aEvent) {
-        this.updateROI(GL3DState.get().getActiveCamera());
+        if (Displayer.getSingletonInstance().getState() == Displayer.STATE3D) {
+            this.updateROI(GL3DState.get().getActiveCamera());
+        }
     }
 
     protected GL3DShape getImageCorona() {
