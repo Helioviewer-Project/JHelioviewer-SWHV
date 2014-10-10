@@ -11,14 +11,15 @@ import javax.swing.ImageIcon;
 import org.helioviewer.jhv.data.datatype.event.JHVCoordinateSystem;
 import org.helioviewer.jhv.data.datatype.event.JHVEvent;
 import org.helioviewer.jhv.data.datatype.event.JHVEventParameter;
+import org.helioviewer.jhv.data.datatype.event.JHVEventRelationship;
 import org.helioviewer.jhv.data.datatype.event.JHVEventType;
 import org.helioviewer.jhv.data.datatype.event.JHVPositionInformation;
 
 /**
  * Represents a JHVevent coming from the HEK source.
- *
+ * 
  * @author Bram Bourgoignie (Bram.Bourgoignie@oma.be)
- *
+ * 
  */
 public class HEKEvent implements JHVEvent {
 
@@ -89,8 +90,8 @@ public class HEKEvent implements JHVEvent {
     /**
      * Creates a HEK event with an event name, event display name, short
      * description, an event type and color.
-     *
-     *
+     * 
+     * 
      * @param eventName
      *            the event name
      * @param eventDisplayName
@@ -115,7 +116,7 @@ public class HEKEvent implements JHVEvent {
     /**
      * Creates a HEK event with an event name, event display name, short
      * description, event type, an icon and color.
-     *
+     * 
      * @param eventName
      *            the event name
      * @param eventDisplayName
@@ -222,9 +223,15 @@ public class HEKEvent implements JHVEvent {
         return uniqueID;
     }
 
+    @Override
+    public JHVEventRelationship getEventRelationShip() {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
     /**
      * Adds a parameter to the event.
-     *
+     * 
      * @param parameter
      *            the parameter to add
      * @param visible
@@ -255,7 +262,7 @@ public class HEKEvent implements JHVEvent {
 
     /**
      * Sets the start date of the HEKEvent.
-     *
+     * 
      * @param startDate
      *            the start date
      */
@@ -265,7 +272,7 @@ public class HEKEvent implements JHVEvent {
 
     /**
      * Sets the end date of the HEKEvent.
-     *
+     * 
      * @param endDate
      *            the end date
      */
@@ -276,7 +283,7 @@ public class HEKEvent implements JHVEvent {
 
     /**
      * Sets the unique ID for the HekEvent.
-     *
+     * 
      * @param uniqueID
      */
     public void setUniqueID(String uniqueID) {
@@ -285,7 +292,7 @@ public class HEKEvent implements JHVEvent {
 
     /**
      * Adds position information to the HEKEvent.
-     *
+     * 
      * @param positionInformation
      *            the position information to add
      */
