@@ -1,6 +1,6 @@
 package org.helioviewer.jhv.plugins.swek.sources;
 
-import org.helioviewer.jhv.data.datatype.JHVEvent;
+import org.helioviewer.jhv.data.datatype.event.JHVEvent;
 
 public interface SWEKEventStream {
     /**

@@ -5,7 +5,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.NavigableMap;
 
-import org.helioviewer.jhv.data.datatype.JHVEvent;
+import org.helioviewer.jhv.data.datatype.event.JHVEvent;
 
 /**
  * Interface should be implemented by a class that handles received events by

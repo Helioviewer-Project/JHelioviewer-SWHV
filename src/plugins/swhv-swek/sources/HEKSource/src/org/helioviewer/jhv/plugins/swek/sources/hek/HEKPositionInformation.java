@@ -2,9 +2,9 @@ package org.helioviewer.jhv.plugins.swek.sources.hek;
 
 import java.util.List;
 
-import org.helioviewer.jhv.data.datatype.JHVCoordinateSystem;
-import org.helioviewer.jhv.data.datatype.JHVPoint;
-import org.helioviewer.jhv.data.datatype.JHVPositionInformation;
+import org.helioviewer.jhv.data.datatype.event.JHVCoordinateSystem;
+import org.helioviewer.jhv.data.datatype.event.JHVPoint;
+import org.helioviewer.jhv.data.datatype.event.JHVPositionInformation;
 
 /**
  * Defines the HEK event position information.

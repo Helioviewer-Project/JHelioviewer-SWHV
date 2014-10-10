@@ -2,7 +2,7 @@ package org.helioviewer.jhv.plugins.swek.receive;
 
 import java.util.List;
 
-import org.helioviewer.jhv.data.datatype.JHVEvent;
+import org.helioviewer.jhv.data.datatype.event.JHVEvent;
 
 /**
  * All classes interested in new events should implement the

@@ -1,6 +1,6 @@
 package org.helioviewer.jhv.plugins.swek.download;
 
-import org.helioviewer.jhv.data.datatype.JHVEventType;
+import org.helioviewer.jhv.data.datatype.event.JHVEventType;
 
 /**
  * JHV event type implementation for the swek.

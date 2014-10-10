@@ -12,8 +12,8 @@ import java.util.Set;
 import java.util.TreeMap;
 
 import org.helioviewer.jhv.data.container.util.DateUtil;
-import org.helioviewer.jhv.data.datatype.JHVEvent;
-import org.helioviewer.jhv.data.datatype.JHVEventType;
+import org.helioviewer.jhv.data.datatype.event.JHVEvent;
+import org.helioviewer.jhv.data.datatype.event.JHVEventType;
 import org.helioviewer.jhv.data.lock.JHVEventContainerLocks;
 
 public class JHVEventCache {

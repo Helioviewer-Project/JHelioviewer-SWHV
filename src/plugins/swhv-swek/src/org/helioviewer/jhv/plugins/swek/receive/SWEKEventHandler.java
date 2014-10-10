@@ -7,7 +7,7 @@ import java.util.Map;
 import java.util.NavigableMap;
 
 import org.helioviewer.jhv.data.container.JHVEventHandler;
-import org.helioviewer.jhv.data.datatype.JHVEvent;
+import org.helioviewer.jhv.data.datatype.event.JHVEvent;
 
 public class SWEKEventHandler implements JHVEventHandler {
     /** Singleton instance of the SWEKEventHandler */

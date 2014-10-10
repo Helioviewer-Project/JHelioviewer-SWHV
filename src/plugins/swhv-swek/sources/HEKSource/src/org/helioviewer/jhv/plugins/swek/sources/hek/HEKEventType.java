@@ -1,6 +1,6 @@
 package org.helioviewer.jhv.plugins.swek.sources.hek;
 
-import org.helioviewer.jhv.data.datatype.JHVEventType;
+import org.helioviewer.jhv.data.datatype.event.JHVEventType;
 
 /**
  * Defines an event type coming from the hek source.

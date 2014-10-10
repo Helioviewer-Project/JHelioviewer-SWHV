@@ -11,8 +11,8 @@ import java.util.logging.Logger;
 
 import org.helioviewer.jhv.data.container.cache.JHVEventCache;
 import org.helioviewer.jhv.data.container.cache.JHVEventHandlerCache;
-import org.helioviewer.jhv.data.datatype.JHVEvent;
-import org.helioviewer.jhv.data.datatype.JHVEventType;
+import org.helioviewer.jhv.data.datatype.event.JHVEvent;
+import org.helioviewer.jhv.data.datatype.event.JHVEventType;
 import org.helioviewer.jhv.data.lock.JHVEventContainerLocks;
 
 public class JHVEventContainer {

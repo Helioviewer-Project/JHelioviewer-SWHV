@@ -3,7 +3,7 @@ package org.helioviewer.jhv.plugins.swek.sources.hek;
 import java.util.LinkedList;
 import java.util.Queue;
 
-import org.helioviewer.jhv.data.datatype.JHVEvent;
+import org.helioviewer.jhv.data.datatype.event.JHVEvent;
 import org.helioviewer.jhv.plugins.swek.sources.SWEKEventStream;
 
 /**

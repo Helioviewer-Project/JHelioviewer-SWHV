@@ -14,7 +14,7 @@ import javax.swing.JTable;
 import javax.swing.RowFilter;
 import javax.swing.table.TableRowSorter;
 
-import org.helioviewer.jhv.data.datatype.JHVEventParameter;
+import org.helioviewer.jhv.data.datatype.event.JHVEventParameter;
 import org.helioviewer.jhv.data.guielements.model.EmptyRowFilter;
 import org.helioviewer.jhv.data.guielements.model.ParameterTableModel;
 

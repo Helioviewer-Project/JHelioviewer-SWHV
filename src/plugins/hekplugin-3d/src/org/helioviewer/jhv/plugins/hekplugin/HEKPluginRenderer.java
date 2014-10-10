@@ -12,10 +12,10 @@ import javax.media.opengl.GL2;
 import javax.swing.ImageIcon;
 
 import org.helioviewer.base.physics.Astronomy;
-import org.helioviewer.jhv.data.datatype.JHVCoordinateSystem;
-import org.helioviewer.jhv.data.datatype.JHVEvent;
-import org.helioviewer.jhv.data.datatype.JHVPoint;
-import org.helioviewer.jhv.data.datatype.JHVPositionInformation;
+import org.helioviewer.jhv.data.datatype.event.JHVCoordinateSystem;
+import org.helioviewer.jhv.data.datatype.event.JHVEvent;
+import org.helioviewer.jhv.data.datatype.event.JHVPoint;
+import org.helioviewer.jhv.data.datatype.event.JHVPositionInformation;
 import org.helioviewer.jhv.plugins.hekplugin.cache.SWHVHEKData;
 import org.helioviewer.viewmodel.renderer.physical.PhysicalRenderGraphics;
 import org.helioviewer.viewmodel.renderer.physical.PhysicalRenderer;

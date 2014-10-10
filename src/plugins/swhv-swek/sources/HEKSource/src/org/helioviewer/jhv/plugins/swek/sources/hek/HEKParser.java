@@ -14,9 +14,9 @@ import java.util.Scanner;
 
 import org.helioviewer.base.logging.Log;
 import org.helioviewer.base.physics.Astronomy;
-import org.helioviewer.jhv.data.datatype.JHVCoordinateSystem;
-import org.helioviewer.jhv.data.datatype.JHVEventParameter;
-import org.helioviewer.jhv.data.datatype.JHVPoint;
+import org.helioviewer.jhv.data.datatype.event.JHVCoordinateSystem;
+import org.helioviewer.jhv.data.datatype.event.JHVEventParameter;
+import org.helioviewer.jhv.data.datatype.event.JHVPoint;
 import org.helioviewer.jhv.plugins.swek.config.SWEKEventType;
 import org.helioviewer.jhv.plugins.swek.config.SWEKParameter;
 import org.helioviewer.jhv.plugins.swek.config.SWEKSource;

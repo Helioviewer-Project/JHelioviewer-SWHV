@@ -1,4 +1,4 @@
-package org.helioviewer.jhv.data.datatype;
+package org.helioviewer.jhv.data.datatype.event;
 
 import java.util.List;
 
