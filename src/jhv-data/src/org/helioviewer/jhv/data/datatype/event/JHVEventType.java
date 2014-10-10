@@ -1,4 +1,4 @@
-package org.helioviewer.jhv.data.datatype;
+package org.helioviewer.jhv.data.datatype.event;
 
 /**
  * Describes the type of an event.

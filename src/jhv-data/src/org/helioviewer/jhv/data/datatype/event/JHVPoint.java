@@ -1,4 +1,4 @@
-package org.helioviewer.jhv.data.datatype;
+package org.helioviewer.jhv.data.datatype.event;
 
 /**
  * Represents a point in a coordinate system.

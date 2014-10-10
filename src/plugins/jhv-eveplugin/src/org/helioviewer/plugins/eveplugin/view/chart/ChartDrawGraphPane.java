@@ -27,7 +27,7 @@ import javax.swing.JComponent;
 import javax.swing.event.MouseInputListener;
 
 import org.helioviewer.base.math.Interval;
-import org.helioviewer.jhv.data.datatype.JHVEvent;
+import org.helioviewer.jhv.data.datatype.event.JHVEvent;
 import org.helioviewer.jhv.data.guielements.SWEKEventInformationDialog;
 import org.helioviewer.plugins.eveplugin.EVEPlugin;
 import org.helioviewer.plugins.eveplugin.controller.DrawController;

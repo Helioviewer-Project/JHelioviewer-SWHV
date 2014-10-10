@@ -8,11 +8,11 @@ import java.util.List;
 
 import javax.swing.ImageIcon;
 
-import org.helioviewer.jhv.data.datatype.JHVCoordinateSystem;
-import org.helioviewer.jhv.data.datatype.JHVEvent;
-import org.helioviewer.jhv.data.datatype.JHVEventParameter;
-import org.helioviewer.jhv.data.datatype.JHVEventType;
-import org.helioviewer.jhv.data.datatype.JHVPositionInformation;
+import org.helioviewer.jhv.data.datatype.event.JHVCoordinateSystem;
+import org.helioviewer.jhv.data.datatype.event.JHVEvent;
+import org.helioviewer.jhv.data.datatype.event.JHVEventParameter;
+import org.helioviewer.jhv.data.datatype.event.JHVEventType;
+import org.helioviewer.jhv.data.datatype.event.JHVPositionInformation;
 
 /**
  * Represents a JHVevent coming from the HEK source.

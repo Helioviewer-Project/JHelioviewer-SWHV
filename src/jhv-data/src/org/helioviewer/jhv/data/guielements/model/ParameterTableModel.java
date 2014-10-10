@@ -4,7 +4,7 @@ import java.util.List;
 
 import javax.swing.table.AbstractTableModel;
 
-import org.helioviewer.jhv.data.datatype.JHVEventParameter;
+import org.helioviewer.jhv.data.datatype.event.JHVEventParameter;
 
 /**
  * The model for parameter table panel.
