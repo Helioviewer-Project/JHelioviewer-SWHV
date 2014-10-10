@@ -23,7 +23,6 @@ import org.helioviewer.viewmodel.region.Region;
 import org.helioviewer.viewmodel.region.RegionAdapter;
 import org.helioviewer.viewmodel.region.StaticRegion;
 import org.helioviewer.viewmodel.view.jp2view.JHVJP2View;
-import org.helioviewer.viewmodel.view.jp2view.JHVJPXView;
 import org.helioviewer.viewmodel.viewport.Viewport;
 import org.helioviewer.viewmodel.viewportimagesize.ViewportImageSize;
 
@@ -234,6 +233,7 @@ public abstract class AbstractLayeredView extends AbstractView implements Layere
         removeLayer(view, true);
     }
 
+    @Override
     public void removeLayer(View view, boolean needAbolish) {
 
         if (view == null) {
@@ -256,8 +256,8 @@ public abstract class AbstractLayeredView extends AbstractView implements Layere
         if (view.getAdapter(JHVJP2View.class) != null && needAbolish) {
             view.getAdapter(JHVJP2View.class).abolish();
         }
-        if (view.getAdapter(JHVJPXView.class) != null) {
-            view.getAdapter(JHVJPXView.class).removeRenderListener();
+        if (view.getAdapter(JHVJP2View.class) != null) {
+            view.getAdapter(JHVJP2View.class).removeRenderListener();
         }
         ChangeEvent event = new ChangeEvent(new LayerChangedReason(this, LayerChangeType.LAYER_REMOVED, view, index));
 

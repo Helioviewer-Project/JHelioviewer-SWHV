@@ -4,7 +4,6 @@ import java.util.Date;
 
 import org.helioviewer.base.math.Interval;
 import org.helioviewer.jhv.display.Displayer;
-import org.helioviewer.jhv.display.RenderListener;
 import org.helioviewer.viewmodel.changeevent.ChangeEvent;
 import org.helioviewer.viewmodel.changeevent.PlayStateChangedReason;
 import org.helioviewer.viewmodel.changeevent.TimestampChangedReason;
@@ -39,7 +38,7 @@ import org.helioviewer.viewmodel.view.jp2view.image.SubImage;
  *
  * @author Markus Langenberg
  */
-public class JHVJPXView extends JHVJP2View implements TimedMovieView, CachedMovieView, RenderListener {
+public class JHVJPXView extends JHVJP2View implements TimedMovieView, CachedMovieView {
 
     // Caching
     protected ImageCacheStatus imageCacheStatus;
@@ -73,17 +72,13 @@ public class JHVJPXView extends JHVJP2View implements TimedMovieView, CachedMovi
     public JHVJPXView(boolean isMainView, Interval<Date> range, boolean blockingMode) {
         super(isMainView, range);
         this.blockingMode = blockingMode;
-        if (isMainView) {
-            Displayer.getSingletonInstance().addRenderListener(this);
-        }
+
     }
 
     public JHVJPXView(boolean isMainView, Interval<Date> range) {
         super(isMainView, range);
         this.blockingMode = false;
-        if (isMainView) {
-            Displayer.getSingletonInstance().addRenderListener(this);
-        }
+
     }
 
     /**
@@ -516,15 +511,6 @@ public class JHVJPXView extends JHVJP2View implements TimedMovieView, CachedMovi
     @Override
     public boolean isReuseBuffer() {
         return render.isReuseBuffer();
-    }
-
-    @Override
-    public void render() {
-        renderRequestedSignal.signal(RenderReasons.NEW_DATA);
-    }
-
-    public void removeRenderListener() {
-        Displayer.getSingletonInstance().removeRenderListener(this);
     }
 
     @Override
