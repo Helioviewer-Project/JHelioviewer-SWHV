@@ -10,6 +10,7 @@ import kdu_jni.KduException;
 import org.helioviewer.base.math.Interval;
 import org.helioviewer.base.math.Vector2dInt;
 import org.helioviewer.jhv.display.Displayer;
+import org.helioviewer.jhv.display.RenderListener;
 import org.helioviewer.viewmodel.changeevent.ChangeEvent;
 import org.helioviewer.viewmodel.changeevent.ChangedReason;
 import org.helioviewer.viewmodel.changeevent.RegionChangedReason;
@@ -61,7 +62,7 @@ import org.helioviewer.viewmodel.viewportimagesize.ViewportImageSizeAdapter;
  * application.
  *
  */
-public class JHVJP2View extends AbstractView implements JP2View, ViewportView, RegionView, MetaDataView, SubimageDataView, ImageInfoView {
+public class JHVJP2View extends AbstractView implements JP2View, ViewportView, RegionView, MetaDataView, SubimageDataView, ImageInfoView, RenderListener {
 
     public enum ReaderMode {
         NEVERFIRE, ONLYFIREONCOMPLETE, ALWAYSFIREONNEWDATA, SIGNAL_RENDER_ONCE
@@ -116,6 +117,9 @@ public class JHVJP2View extends AbstractView implements JP2View, ViewportView, R
      */
     public JHVJP2View(boolean isMainView, Interval<Date> range) {
         this.isMainView = isMainView;
+        if (isMainView) {
+            Displayer.getSingletonInstance().addRenderListener(this);
+        }
         isPersistent = isMainView;
         this.range = range;
     }
@@ -859,5 +863,14 @@ public class JHVJP2View extends AbstractView implements JP2View, ViewportView, R
 
     public void refresh() {
         readerSignal.signal();
+    }
+
+    @Override
+    public void render() {
+        renderRequestedSignal.signal(RenderReasons.NEW_DATA);
+    }
+
+    public void removeRenderListener() {
+        Displayer.getSingletonInstance().removeRenderListener(this);
     }
 }
