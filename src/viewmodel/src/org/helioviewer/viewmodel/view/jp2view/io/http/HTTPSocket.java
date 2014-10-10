@@ -11,17 +11,17 @@ import java.net.URI;
 import org.helioviewer.viewmodel.view.jp2view.io.StringInputStream;
 
 /**
- * 
+ *
  * The class <code>HTTPSocket</code> is a simple implementation for read/write
  * HTTP messages. In this version are only supported to send requests and to
  * receive responses.
- * 
+ *
  * @author Juan Pablo Garcia Ortiz
  * @see java.net.Socket
  * @see HTTPResponse
  * @see HTTPRequest
  * @version 0.1
- * 
+ *
  */
 public class HTTPSocket extends Socket {
 
@@ -53,7 +53,7 @@ public class HTTPSocket extends Socket {
 
     /**
      * Connects to the specified host via the supplied URI.
-     * 
+     *
      * @param _uri
      * @throws IOException
      */
@@ -68,7 +68,7 @@ public class HTTPSocket extends Socket {
 
     /**
      * Reconnects to the last used host, and using the last used port.
-     * 
+     *
      * @throws java.io.IOException
      */
     public void reconnect() throws IOException {
@@ -78,7 +78,7 @@ public class HTTPSocket extends Socket {
     /**
      * Sends a HTTP message. Currently it is only supported to send HTTP
      * requests.
-     * 
+     *
      * @param _msg
      *            A <code>HTTPMessage</code> object with the message.
      * @throws java.io.IOException
@@ -122,7 +122,7 @@ public class HTTPSocket extends Socket {
     /**
      * Receives a HTTP message from the socket. Currently it is only supported
      * to receive HTTP responses.
-     * 
+     *
      * @return A new <code>HTTPMessage</code> object with the message read or
      *         <code>null</code> if the end of stream was reached.
      * @throws java.io.IOException
@@ -192,6 +192,7 @@ public class HTTPSocket extends Socket {
     }
 
     /** Returns the lastUsedPort */
+    @Override
     public int getPort() {
         return lastUsedPort;
     }

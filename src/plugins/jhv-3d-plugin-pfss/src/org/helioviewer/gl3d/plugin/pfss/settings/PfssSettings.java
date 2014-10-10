@@ -17,12 +17,12 @@ public class PfssSettings {
     /**
      * Maximal preload of cache data.
      */
-    public final static int PRELOAD = 5;
+    public final static int PRELOAD = 25;
 
     /**
      * Maximal preload of cache data.
      */
-    public final static int CACHE_SIZE = 25;
+    public final static int CACHE_SIZE = 125;
 
     /**
      * Stepsize for the Loading data
