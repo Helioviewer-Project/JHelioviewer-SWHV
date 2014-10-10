@@ -6,6 +6,7 @@ import java.awt.GridLayout;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 
+import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.ButtonGroup;
 import javax.swing.JCheckBox;
@@ -47,6 +48,7 @@ public class RunningDifferencePanel extends FilterPanel implements ChangeListene
      */
     public RunningDifferencePanel() {
         this.setLayout(new BoxLayout(this, BoxLayout.PAGE_AXIS));
+        addRadioButtons();
         truncateSpinner = new JSpinner();
         truncateSpinner.setModel(new SpinnerNumberModel(new Float(0.8f), new Float(0), new Float(1), new Float(0.01f)));
         truncateSpinner.addChangeListener(this);
@@ -65,8 +67,7 @@ public class RunningDifferencePanel extends FilterPanel implements ChangeListene
         setEnabled(false);
         truncationLine.setAlignmentY(Component.LEFT_ALIGNMENT);
         add(truncationLine);
-        addRadioButtons();
-        add(new JPanel());
+        add(Box.createVerticalGlue());
     }
 
     private void addRadioButtons() {
