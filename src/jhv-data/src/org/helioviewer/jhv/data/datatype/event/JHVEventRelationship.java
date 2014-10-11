@@ -3,8 +3,8 @@
  */
 package org.helioviewer.jhv.data.datatype.event;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Defines the relationship between events.
@@ -14,22 +14,22 @@ import java.util.List;
  */
 public class JHVEventRelationship {
     /** Events following this event */
-    private final List<JHVEventRelation> nextEvents;
+    private final Map<String, JHVEventRelation> nextEvents;
     /** Events preceding this event */
-    private final List<JHVEventRelation> precedingEvents;
+    private final Map<String, JHVEventRelation> precedingEvents;
     /** Rules for relation with this event */
-    private final List<JHVEventRelationShipRule> relationshipRules;
+    private final Map<String, JHVEventRelationShipRule> relationshipRules;
     /** Related events */
-    private final List<JHVEventRelation> relatedEventsByRule;
+    private final Map<String, JHVEventRelation> relatedEventsByRule;
 
     /**
      * Default constructor of JHV event relationship.
      */
     public JHVEventRelationship() {
-        nextEvents = new ArrayList<JHVEventRelation>();
-        precedingEvents = new ArrayList<JHVEventRelation>();
-        relationshipRules = new ArrayList<JHVEventRelationShipRule>();
-        relatedEventsByRule = new ArrayList<JHVEventRelation>();
+        nextEvents = new HashMap<String, JHVEventRelation>();
+        precedingEvents = new HashMap<String, JHVEventRelation>();
+        relationshipRules = new HashMap<String, JHVEventRelationShipRule>();
+        relatedEventsByRule = new HashMap<String, JHVEventRelation>();
     }
 
     /**
@@ -37,7 +37,7 @@ public class JHVEventRelationship {
      * 
      * @return the relatedEventsByRule
      */
-    public List<JHVEventRelation> getRelatedEventsByRule() {
+    public Map<String, JHVEventRelation> getRelatedEventsByRule() {
         return relatedEventsByRule;
     }
 
@@ -46,7 +46,7 @@ public class JHVEventRelationship {
      * 
      * @return the nextEvents
      */
-    public List<JHVEventRelation> getNextEvents() {
+    public Map<String, JHVEventRelation> getNextEvents() {
         return nextEvents;
     }
 
@@ -55,7 +55,7 @@ public class JHVEventRelationship {
      * 
      * @return the precedingEvents
      */
-    public List<JHVEventRelation> getPrecedingEvents() {
+    public Map<String, JHVEventRelation> getPrecedingEvents() {
         return precedingEvents;
     }
 
@@ -64,7 +64,7 @@ public class JHVEventRelationship {
      * 
      * @return the relationshipRules
      */
-    public List<JHVEventRelationShipRule> getRelationshipRules() {
+    public Map<String, JHVEventRelationShipRule> getRelationshipRules() {
         return relationshipRules;
     }
 
