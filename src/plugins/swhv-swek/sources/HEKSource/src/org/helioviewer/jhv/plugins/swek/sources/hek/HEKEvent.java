@@ -74,6 +74,8 @@ public class HEKEvent implements JHVEvent {
     /** The color in which the event should be drawn */
     private final Color color;
 
+    private final JHVEventRelationship eventRelationShip;
+
     /**
      * Default constructor
      */
@@ -85,6 +87,7 @@ public class HEKEvent implements JHVEvent {
         icon = null;
         eventType = null;
         color = Color.black;
+        eventRelationShip = new JHVEventRelationship();
     }
 
     /**
@@ -111,6 +114,7 @@ public class HEKEvent implements JHVEvent {
         icon = null;
         this.eventType = eventType;
         this.color = color;
+        eventRelationShip = new JHVEventRelationship();
     }
 
     /**
@@ -136,6 +140,7 @@ public class HEKEvent implements JHVEvent {
         this.icon = icon;
         this.eventType = eventType;
         this.color = color;
+        eventRelationShip = new JHVEventRelationship();
     }
 
     @Override
@@ -225,8 +230,7 @@ public class HEKEvent implements JHVEvent {
 
     @Override
     public JHVEventRelationship getEventRelationShip() {
-        // TODO Auto-generated method stub
-        return null;
+        return eventRelationShip;
     }
 
     /**
