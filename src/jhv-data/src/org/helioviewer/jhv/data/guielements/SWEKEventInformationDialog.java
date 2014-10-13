@@ -2,12 +2,17 @@ package org.helioviewer.jhv.data.guielements;
 
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowFocusListener;
+import java.awt.event.WindowListener;
+import java.util.Map;
 
 import javax.swing.BoxLayout;
+import javax.swing.JButton;
 import javax.swing.JDialog;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
@@ -32,7 +37,7 @@ import org.helioviewer.jhv.gui.components.CollapsiblePane;
  * @author Bram.Bourgoignie (Bram.Bourgoignie@oma.be)
  * 
  */
-public class SWEKEventInformationDialog extends JDialog implements WindowFocusListener, FocusListener {
+public class SWEKEventInformationDialog extends JDialog implements WindowFocusListener, FocusListener, WindowListener {
 
     private static final long serialVersionUID = 1L;
 
@@ -44,15 +49,13 @@ public class SWEKEventInformationDialog extends JDialog implements WindowFocusLi
 
     private CollapsiblePane allParameters;
 
-    private CollapsiblePane followedby;
+    private EventDescriptionPanel eventDescriptionPanel;
 
-    private CollapsiblePane precededBy;
+    private JHVEvent event;
 
-    private CollapsiblePane otherRelatedEvents;
+    private Integer nrOfWindowsOpened;
 
-    private final EventDescriptionPanel eventDescriptionPanel;
-
-    private final JHVEvent event;
+    private final SWEKEventInformationDialog parent;
 
     /**
      * 
@@ -61,9 +64,92 @@ public class SWEKEventInformationDialog extends JDialog implements WindowFocusLi
      */
     public SWEKEventInformationDialog(JHVEvent event) {
         super();
+        initDialog(event);
+        parent = null;
+    }
 
+    public SWEKEventInformationDialog(JHVEvent event, SWEKEventInformationDialog parent, boolean modal) {
+        super(parent, modal);
+        initDialog(event);
+        this.parent = parent;
+    }
+
+    @Override
+    public void windowGainedFocus(WindowEvent e) {
+        // TODO Auto-generated method stub
+
+    }
+
+    @Override
+    public void windowLostFocus(WindowEvent e) {
+        synchronized (nrOfWindowsOpened) {
+            if (nrOfWindowsOpened == 0) {
+                this.setVisible(false);
+                this.dispose();
+            }
+        }
+    }
+
+    @Override
+    public void focusGained(FocusEvent arg0) {
+        // TODO Auto-generated method stub
+
+    }
+
+    @Override
+    public void focusLost(FocusEvent arg0) {
+        synchronized (nrOfWindowsOpened) {
+            if (nrOfWindowsOpened == 0) {
+                this.setVisible(false);
+                this.dispose();
+            }
+        }
+    }
+
+    @Override
+    public void windowOpened(WindowEvent e) {
+        // TODO Auto-generated method stub
+
+    }
+
+    @Override
+    public void windowClosing(WindowEvent e) {
+        // TODO Auto-generated method stub
+
+    }
+
+    @Override
+    public void windowClosed(WindowEvent e) {
+        decrementNrOfWindows();
+    }
+
+    @Override
+    public void windowIconified(WindowEvent e) {
+        // TODO Auto-generated method stub
+
+    }
+
+    @Override
+    public void windowDeiconified(WindowEvent e) {
+        // TODO Auto-generated method stub
+
+    }
+
+    @Override
+    public void windowActivated(WindowEvent e) {
+        // TODO Auto-generated method stub
+
+    }
+
+    @Override
+    public void windowDeactivated(WindowEvent e) {
+        // TODO Auto-generated method stub
+
+    }
+
+    private void initDialog(JHVEvent event) {
         this.event = event;
-
+        nrOfWindowsOpened = 0;
         eventDescriptionPanel = new EventDescriptionPanel(event);
 
         initAllTablePanel();
@@ -96,33 +182,6 @@ public class SWEKEventInformationDialog extends JDialog implements WindowFocusLi
         allTablePanelConstraint.weighty = 1;
         allTablePanelConstraint.fill = GridBagConstraints.BOTH;
         this.add(new JScrollPane(allTablePanel), allTablePanelConstraint);
-
-    }
-
-    @Override
-    public void windowGainedFocus(WindowEvent e) {
-        // TODO Auto-generated method stub
-
-    }
-
-    @Override
-    public void windowLostFocus(WindowEvent e) {
-        this.setVisible(false);
-        this.dispose();
-
-    }
-
-    @Override
-    public void focusGained(FocusEvent arg0) {
-        // TODO Auto-generated method stub
-
-    }
-
-    @Override
-    public void focusLost(FocusEvent arg0) {
-        this.setVisible(false);
-        this.dispose();
-
     }
 
     /**
@@ -151,33 +210,72 @@ public class SWEKEventInformationDialog extends JDialog implements WindowFocusLi
         allTablePanel.add(allParameters);
 
         if (!event.getEventRelationShip().getPrecedingEvents().isEmpty()) {
-            JPanel allPrecedingEvents = new JPanel();
-            allPrecedingEvents.setLayout(new BoxLayout(allPrecedingEvents, BoxLayout.Y_AXIS));
-            for (JHVEventRelation er : event.getEventRelationShip().getPrecedingEvents().values()) {
-                allPrecedingEvents.add(new EventDescriptionPanel(er.getTheEvent()));
-            }
-            precededBy = new CollapsiblePane("Preceding Events", allPrecedingEvents, false);
-            allTablePanel.add(precededBy);
+            allTablePanel.add(createRelatedEventsCollapsiblePane("Preceding Events", event.getEventRelationShip().getPrecedingEvents()));
         }
 
         if (!event.getEventRelationShip().getNextEvents().isEmpty()) {
-            JPanel allNextEvents = new JPanel();
-            allNextEvents.setLayout(new BoxLayout(allNextEvents, BoxLayout.Y_AXIS));
-            for (JHVEventRelation er : event.getEventRelationShip().getNextEvents().values()) {
-                allNextEvents.add(new EventDescriptionPanel(er.getTheEvent()));
-            }
-            followedby = new CollapsiblePane("Succeeding Events", allNextEvents, false);
-            allTablePanel.add(followedby);
+            allTablePanel.add(createRelatedEventsCollapsiblePane("Following Events", event.getEventRelationShip().getNextEvents()));
         }
 
         if (!event.getEventRelationShip().getRelatedEventsByRule().isEmpty()) {
-            JPanel allOtherRelatedEvents = new JPanel();
-            allOtherRelatedEvents.setLayout(new BoxLayout(allOtherRelatedEvents, BoxLayout.Y_AXIS));
-            for (JHVEventRelation er : event.getEventRelationShip().getRelatedEventsByRule().values()) {
-                allOtherRelatedEvents.add(new EventDescriptionPanel(er.getTheEvent()));
-            }
-            otherRelatedEvents = new CollapsiblePane("Other Related Events", allOtherRelatedEvents, false);
-            allTablePanel.add(otherRelatedEvents);
+            allTablePanel.add(createRelatedEventsCollapsiblePane("Other Related Events", event.getEventRelationShip()
+                    .getRelatedEventsByRule()));
+        }
+    }
+
+    private CollapsiblePane createRelatedEventsCollapsiblePane(String relation, Map<String, JHVEventRelation> relations) {
+        JPanel allPrecedingEvents = new JPanel();
+        allPrecedingEvents.setLayout(new BoxLayout(allPrecedingEvents, BoxLayout.Y_AXIS));
+        for (final JHVEventRelation er : relations.values()) {
+            JPanel eventAndButtonPanel = new JPanel();
+
+            JButton detailsButton = new JButton("Details");
+            detailsButton.addActionListener(new ActionListener() {
+
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    incrementNrOfWindows();
+                    SWEKEventInformationDialog dialog = new SWEKEventInformationDialog(er.getTheEvent(), SWEKEventInformationDialog.this,
+                            true);
+                    // dialog.setLocation();
+                    dialog.addWindowListener(SWEKEventInformationDialog.this);
+                    dialog.validate();
+                    dialog.pack();
+                    dialog.setVisible(true);
+                }
+            });
+
+            eventAndButtonPanel.setLayout(new GridBagLayout());
+            GridBagConstraints c = new GridBagConstraints();
+            c.gridx = 0;
+            c.gridy = 0;
+            c.fill = GridBagConstraints.BOTH;
+            c.anchor = GridBagConstraints.CENTER;
+            c.weightx = 1;
+            c.weighty = 1;
+            eventAndButtonPanel.add(new EventDescriptionPanel(er.getTheEvent()), c);
+
+            c.gridy = 1;
+            c.fill = GridBagConstraints.NONE;
+            c.weightx = 0;
+            c.weighty = 0;
+            c.anchor = GridBagConstraints.EAST;
+
+            eventAndButtonPanel.add(detailsButton, c);
+            allPrecedingEvents.add(eventAndButtonPanel);
+        }
+        return new CollapsiblePane(relation, allPrecedingEvents, false);
+    }
+
+    private void incrementNrOfWindows() {
+        synchronized (nrOfWindowsOpened) {
+            nrOfWindowsOpened++;
+        }
+    }
+
+    private void decrementNrOfWindows() {
+        synchronized (nrOfWindowsOpened) {
+            nrOfWindowsOpened--;
         }
     }
 }
