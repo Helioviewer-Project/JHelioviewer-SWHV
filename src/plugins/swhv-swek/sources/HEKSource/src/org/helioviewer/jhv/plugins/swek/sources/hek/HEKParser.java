@@ -262,6 +262,9 @@ public class HEKParser implements SWEKParser {
                                 || association.getAssociationType().toLowerCase().equals("merges_into")) {
                             // Is a sequence relation so associated event is
                             // follow-up of current event
+                            if (currentEvent.getEventRelationShip().getPrecedingEvents().isEmpty()) {
+                                currentEvent.getEventRelationShip().setRelationshipColor(HEKColors.getNextColor());
+                            }
                             associatedEvent.getEventRelationShip().getPrecedingEvents()
                                     .put(currentEvent.getUniqueID(), new JHVEventRelation(currentEvent.getUniqueID(), currentEvent));
                             currentEvent
@@ -269,6 +272,9 @@ public class HEKParser implements SWEKParser {
                                     .getNextEvents()
                                     .put(associatedEvent.getUniqueID(),
                                             new JHVEventRelation(associatedEvent.getUniqueID(), associatedEvent));
+                            associatedEvent.getEventRelationShip().setRelationshipColor(
+                                    currentEvent.getEventRelationShip().getRelationshipColor());
+
                         } else {
                             // is not a sequence relationship just add the
                             // relation to the related events by rule
@@ -280,6 +286,10 @@ public class HEKParser implements SWEKParser {
                                     .put(associatedEvent.getUniqueID(),
                                             new JHVEventRelation(associatedEvent.getUniqueID(), associatedEvent));
                         }
+                    } else {
+                        // The associated event is not in the list so we start a
+                        // new color
+                        currentEvent.getEventRelationShip().setRelationshipColor(HEKColors.getNextColor());
                     }
                 } else if (association.getAssociationIvorn2().equals(currentEvent.getUniqueID())) {
                     // current event is the second event of the relationship
@@ -298,6 +308,8 @@ public class HEKParser implements SWEKParser {
                                     .getPrecedingEvents()
                                     .put(associatedEvent.getUniqueID(),
                                             new JHVEventRelation(associatedEvent.getUniqueID(), associatedEvent));
+                            currentEvent.getEventRelationShip().setRelationshipColor(
+                                    associatedEvent.getEventRelationShip().getRelationshipColor());
                         } else {
                             // it is not a sequence relationship just add the
                             // relation to the related events by rule.
@@ -309,6 +321,10 @@ public class HEKParser implements SWEKParser {
                                     .put(associatedEvent.getUniqueID(),
                                             new JHVEventRelation(associatedEvent.getUniqueID(), associatedEvent));
                         }
+                    } else {
+                        // The associated event is not in the list so we start a
+                        // new color
+                        currentEvent.getEventRelationShip().setRelationshipColor(HEKColors.getNextColor());
                     }
                 }
             }
