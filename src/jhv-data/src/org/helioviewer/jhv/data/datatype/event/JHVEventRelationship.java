@@ -3,6 +3,7 @@
  */
 package org.helioviewer.jhv.data.datatype.event;
 
+import java.awt.Color;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -21,6 +22,8 @@ public class JHVEventRelationship {
     private final Map<String, JHVEventRelationShipRule> relationshipRules;
     /** Related events */
     private final Map<String, JHVEventRelation> relatedEventsByRule;
+    /**  */
+    private Color relationshipColor;
 
     /**
      * Default constructor of JHV event relationship.
@@ -30,6 +33,7 @@ public class JHVEventRelationship {
         precedingEvents = new HashMap<String, JHVEventRelation>();
         relationshipRules = new HashMap<String, JHVEventRelationShipRule>();
         relatedEventsByRule = new HashMap<String, JHVEventRelation>();
+        relationshipColor = Color.WHITE;
     }
 
     /**
@@ -68,4 +72,14 @@ public class JHVEventRelationship {
         return relationshipRules;
     }
 
+    public Color getRelationshipColor() {
+        return relationshipColor;
+    }
+
+    public void setRelationshipColor(Color color) {
+        relationshipColor = color;
+        for (JHVEventRelation er : getNextEvents().values()) {
+            er.getTheEvent().getEventRelationShip().setRelationshipColor(relationshipColor);
+        }
+    }
 }
