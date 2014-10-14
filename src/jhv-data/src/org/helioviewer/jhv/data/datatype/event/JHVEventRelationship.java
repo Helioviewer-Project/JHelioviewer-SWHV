@@ -33,7 +33,7 @@ public class JHVEventRelationship {
         precedingEvents = new HashMap<String, JHVEventRelation>();
         relationshipRules = new HashMap<String, JHVEventRelationShipRule>();
         relatedEventsByRule = new HashMap<String, JHVEventRelation>();
-        relationshipColor = Color.WHITE;
+        relationshipColor = Color.BLACK;
     }
 
     /**
@@ -79,7 +79,9 @@ public class JHVEventRelationship {
     public void setRelationshipColor(Color color) {
         relationshipColor = color;
         for (JHVEventRelation er : getNextEvents().values()) {
-            er.getTheEvent().getEventRelationShip().setRelationshipColor(relationshipColor);
+            if (er.getTheEvent() != null) {
+                er.getTheEvent().getEventRelationShip().setRelationshipColor(relationshipColor);
+            }
         }
     }
 }
