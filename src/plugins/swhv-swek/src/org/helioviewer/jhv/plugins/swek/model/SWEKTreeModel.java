@@ -1,9 +1,9 @@
 package org.helioviewer.jhv.plugins.swek.model;
 
 import java.util.ArrayList;
-import java.util.HashSet;
+import java.util.HashMap;
 import java.util.List;
-import java.util.Set;
+import java.util.Map;
 
 import org.helioviewer.jhv.plugins.swek.config.SWEKEventType;
 
@@ -24,11 +24,11 @@ public class SWEKTreeModel {
     private final List<SWEKTreeModelListener> listeners;
 
     /**  */
-    private final Set<SWEKEventType> loadingTypes;
+    private final Map<SWEKEventType, Integer> loadingTypes;
 
     private SWEKTreeModel() {
         listeners = new ArrayList<SWEKTreeModelListener>();
-        loadingTypes = new HashSet<SWEKEventType>();
+        loadingTypes = new HashMap<SWEKEventType, Integer>();
     }
 
     public static SWEKTreeModel getSingletonInstance() {
@@ -79,8 +79,16 @@ public class SWEKTreeModel {
      *            the event type that started loading
      */
     public void setStartLoading(SWEKEventType eventType) {
-        loadingTypes.add(eventType);
-        fireEventTypeStartLoading(eventType);
+        synchronized (loadingTypes) {
+            if (loadingTypes.containsKey(eventType)) {
+                Integer i = loadingTypes.get(eventType);
+                i++;
+                loadingTypes.put(eventType, i);
+            } else {
+                loadingTypes.put(eventType, 0);
+                fireEventTypeStartLoading(eventType);
+            }
+        }
     }
 
     /**
@@ -90,8 +98,20 @@ public class SWEKTreeModel {
      *            the event type that stopped loading
      */
     public void setStopLoading(SWEKEventType eventType) {
-        loadingTypes.remove(eventType);
-        fireEventTypeStopLoading(eventType);
+        synchronized (loadingTypes) {
+            if (loadingTypes.containsKey(eventType)) {
+                Integer i = loadingTypes.get(eventType);
+                i--;
+                if (i == 0) {
+                    loadingTypes.remove(eventType);
+                    fireEventTypeStopLoading(eventType);
+                } else {
+                    loadingTypes.put(eventType, i);
+                }
+            } else {
+                fireEventTypeStopLoading(eventType);
+            }
+        }
     }
 
     /**
