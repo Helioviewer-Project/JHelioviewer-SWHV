@@ -86,6 +86,8 @@ public class HEKParser implements SWEKParser {
     private final Map<String, Association> associationsMap;
     private final Map<String, HEKEvent> associationEventsMap;
 
+    private boolean overmax;
+
     /**
      * Creates a parser for the given event type and event source.
      * 
@@ -100,6 +102,7 @@ public class HEKParser implements SWEKParser {
         eventStream = new HEKEventStream();
         associationsMap = new HashMap<String, Association>();
         associationEventsMap = new HashMap<String, HEKEvent>();
+        overmax = false;
     }
 
     @Override
@@ -121,6 +124,8 @@ public class HEKParser implements SWEKParser {
                 }
                 JSONObject eventJSON;
                 eventJSON = new JSONObject(sb.toString());
+                parseOvermax(eventJSON);
+                eventStream.setExtraDownloadNeeded(overmax);
                 parseAssociation(eventJSON);
                 parseEventJSON(eventJSON);
                 return eventStream;
@@ -136,6 +141,10 @@ public class HEKParser implements SWEKParser {
             e.printStackTrace();
         }
         return eventStream;
+    }
+
+    private void parseOvermax(JSONObject eventJSON) throws JSONException {
+        overmax = eventJSON.getBoolean("overmax");
     }
 
     /**
@@ -288,8 +297,18 @@ public class HEKParser implements SWEKParser {
                         }
                     } else {
                         // The associated event is not in the list so we start a
-                        // new color
+                        // new color and add an association in the list without
+                        // event reference.
                         currentEvent.getEventRelationShip().setRelationshipColor(HEKColors.getNextColor());
+                        if (association.getAssociationType().toLowerCase().equals("is_followed_by")
+                                || association.getAssociationType().toLowerCase().equals("splits_into")
+                                || association.getAssociationType().toLowerCase().equals("merges_into")) {
+                            currentEvent.getEventRelationShip().getNextEvents()
+                                    .put(association.getAssociationIvorn2(), new JHVEventRelation(association.getAssociationIvorn2()));
+                        } else {
+                            currentEvent.getEventRelationShip().getRelatedEventsByRule()
+                                    .put(association.getAssociationIvorn2(), new JHVEventRelation(association.getAssociationIvorn2()));
+                        }
                     }
                 } else if (association.getAssociationIvorn2().equals(currentEvent.getUniqueID())) {
                     // current event is the second event of the relationship
@@ -323,8 +342,18 @@ public class HEKParser implements SWEKParser {
                         }
                     } else {
                         // The associated event is not in the list so we start a
-                        // new color
+                        // new color add we already add a reference to the
+                        // previous event without event type.
                         currentEvent.getEventRelationShip().setRelationshipColor(HEKColors.getNextColor());
+                        if (association.getAssociationType().toLowerCase().equals("is_followed_by")
+                                || association.getAssociationType().toLowerCase().equals("splits_into")
+                                || association.getAssociationType().toLowerCase().equals("merges_into")) {
+                            currentEvent.getEventRelationShip().getPrecedingEvents()
+                                    .put(association.getAssociationIvorn1(), new JHVEventRelation(association.getAssociationIvorn1()));
+                        } else {
+                            currentEvent.getEventRelationShip().getRelatedEventsByRule()
+                                    .put(association.getAssociationIvorn1(), new JHVEventRelation(association.getAssociationIvorn1()));
+                        }
                     }
                 }
             }
