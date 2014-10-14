@@ -4,9 +4,11 @@ import java.awt.Point;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.NavigableMap;
+import java.util.Set;
 import java.util.concurrent.ExecutionException;
 
 import javax.swing.SwingWorker;
@@ -205,6 +207,7 @@ public class EventModel implements ZoomControllerListener, EventRequesterListene
 
             @Override
             public EventTypePlotConfiguration doInBackground() {
+                Set<String> uniqueIDs = new HashSet<String>();
                 int maxNrLines = 0;
                 Map<String, Integer> linesPerEventType = new HashMap<String, Integer>();
                 Map<String, List<EventPlotConfiguration>> eventPlotConfigPerEventType = new HashMap<String, List<EventPlotConfiguration>>();
@@ -220,43 +223,49 @@ public class EventModel implements ZoomControllerListener, EventRequesterListene
                     for (Date sDate : events.get(eventType).keySet()) {
                         for (Date eDate : events.get(eventType).get(sDate).keySet()) {
                             for (JHVEvent event : events.get(eventType).get(sDate).get(eDate)) {
-                                int eventPosition = 0;
-                                if (minimalEndDate == null || minimalEndDate.compareTo(event.getStartDate()) >= 0) {
-                                    // first event or event start before
-                                    // minimal end
-                                    // date so next line
-                                    minimalEndDate = event.getEndDate();
-                                    endDates.add(event.getEndDate());
-                                    eventPosition = nrLines;
-                                    nrLines++;
-                                } else {
-                                    if (event.getStartDate().after(maximumEndDate)) {
-                                        // After all other events so start
-                                        // new line
-                                        // and
-                                        // reset everything
-                                        eventPosition = 0;
-                                        nrLines = 1;
-                                        endDates = new ArrayList<Date>();
-                                        endDates.add(event.getEndDate());
-                                    } else {
-                                        // After minimal date so after
+                                if (!uniqueIDs.contains(event.getUniqueID())) {
+                                    uniqueIDs.add(event.getUniqueID());
+                                    int eventPosition = 0;
+                                    if (minimalEndDate == null || minimalEndDate.compareTo(event.getStartDate()) >= 0) {
+                                        // first event or event start before
                                         // minimal end
-                                        // date
-                                        eventPosition = minimalDateLine;
-                                        endDates.set(minimalDateLine, event.getEndDate());
+                                        // date so next line
+                                        minimalEndDate = event.getEndDate();
+                                        endDates.add(event.getEndDate());
+                                        eventPosition = nrLines;
+                                        nrLines++;
+                                    } else {
+                                        if (event.getStartDate().after(maximumEndDate)) {
+                                            // After all other events so start
+                                            // new line
+                                            // and
+                                            // reset everything
+                                            eventPosition = 0;
+                                            nrLines = 1;
+                                            endDates = new ArrayList<Date>();
+                                            endDates.add(event.getEndDate());
+                                        } else {
+                                            // After minimal date so after
+                                            // minimal end
+                                            // date
+                                            eventPosition = minimalDateLine;
+                                            endDates.set(minimalDateLine, event.getEndDate());
+                                        }
                                     }
+
+                                    minimalDateLine = defineMinimalDateLine(endDates);
+                                    minimalEndDate = endDates.get(minimalDateLine);
+                                    maximumDateLine = defineMaximumDateLine(endDates);
+                                    maximumEndDate = endDates.get(maximumDateLine);
+                                    double scaledX0 = defineScaledValue(event.getStartDate());
+                                    double scaledX1 = defineScaledValue(event.getEndDate());
+                                    if (nrLines > maxEventLines) {
+                                        maxEventLines = nrLines;
+                                    }
+                                    plotConfig.add(new EventPlotConfiguration(event, scaledX0, scaledX1, eventPosition));
+                                } else {
+                                    Log.debug("Event with unique ID : " + event.getUniqueID() + "not drawn");
                                 }
-                                minimalDateLine = defineMinimalDateLine(endDates);
-                                minimalEndDate = endDates.get(minimalDateLine);
-                                maximumDateLine = defineMaximumDateLine(endDates);
-                                maximumEndDate = endDates.get(maximumDateLine);
-                                double scaledX0 = defineScaledValue(event.getStartDate());
-                                double scaledX1 = defineScaledValue(event.getEndDate());
-                                if (nrLines > maxEventLines) {
-                                    maxEventLines = nrLines;
-                                }
-                                plotConfig.add(new EventPlotConfiguration(event, scaledX0, scaledX1, eventPosition));
                             }
                         }
                     }
