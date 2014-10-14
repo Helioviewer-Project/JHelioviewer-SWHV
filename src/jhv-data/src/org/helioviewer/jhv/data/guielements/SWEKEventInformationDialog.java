@@ -234,14 +234,16 @@ public class SWEKEventInformationDialog extends JDialog implements WindowFocusLi
 
                 @Override
                 public void actionPerformed(ActionEvent e) {
-                    incrementNrOfWindows();
-                    SWEKEventInformationDialog dialog = new SWEKEventInformationDialog(er.getTheEvent(), SWEKEventInformationDialog.this,
-                            true);
-                    // dialog.setLocation();
-                    dialog.addWindowListener(SWEKEventInformationDialog.this);
-                    dialog.validate();
-                    dialog.pack();
-                    dialog.setVisible(true);
+                    if (er.getTheEvent() != null) {
+                        incrementNrOfWindows();
+                        SWEKEventInformationDialog dialog = new SWEKEventInformationDialog(er.getTheEvent(),
+                                SWEKEventInformationDialog.this, true);
+                        // dialog.setLocation();
+                        dialog.addWindowListener(SWEKEventInformationDialog.this);
+                        dialog.validate();
+                        dialog.pack();
+                        dialog.setVisible(true);
+                    }
                 }
             });
 
