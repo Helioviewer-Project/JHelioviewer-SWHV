@@ -10,9 +10,11 @@ import java.util.Map;
 import java.util.NavigableMap;
 import java.util.Set;
 import java.util.TreeMap;
+import java.util.logging.Logger;
 
 import org.helioviewer.jhv.data.container.util.DateUtil;
 import org.helioviewer.jhv.data.datatype.event.JHVEvent;
+import org.helioviewer.jhv.data.datatype.event.JHVEventRelation;
 import org.helioviewer.jhv.data.datatype.event.JHVEventType;
 import org.helioviewer.jhv.data.lock.JHVEventContainerLocks;
 
@@ -23,8 +25,12 @@ public class JHVEventCache {
     /** The events received for a certain date */
     private final Map<Date, Map<Date, List<JHVEvent>>> events;
 
-    /**  */
+    /** A set with IDs */
     private final Set<String> eventIDs;
+
+    private final Map<String, JHVEvent> allEvents;
+
+    private final Map<String, List<JHVEvent>> missingEventsInEventRelations;
 
     /**
      * private default constructor
@@ -32,6 +38,8 @@ public class JHVEventCache {
     private JHVEventCache() {
         events = new HashMap<Date, Map<Date, List<JHVEvent>>>();
         eventIDs = new HashSet<String>();
+        allEvents = new HashMap<String, JHVEvent>();
+        missingEventsInEventRelations = new HashMap<String, List<JHVEvent>>();
     }
 
     /**
@@ -54,13 +62,20 @@ public class JHVEventCache {
      */
     public void add(JHVEvent event) {
         synchronized (JHVEventContainerLocks.cacheLock) {
+            Logger.getLogger(JHVEventCache.class.getName()).severe("Event with identifier: " + event.getUniqueID());
             if (!eventIDs.contains(event.getUniqueID())) {
+                allEvents.put(event.getUniqueID(), event);
                 Date startDate = DateUtil.getCurrentDate(event.getStartDate());
                 Date endDate = DateUtil.getNextDate(event.getEndDate());
                 addToList(startDate, endDate, event);
                 eventIDs.add(event.getUniqueID());
+                checkAndFixRelationShip(event);
+            } else {
+                Logger.getLogger(JHVEventCache.class.getName()).severe(
+                        "Event with identifier: " + event.getUniqueID() + " already in cache");
             }
         }
+
     }
 
     /**
@@ -205,6 +220,8 @@ public class JHVEventCache {
                         if (event.getJHVEventType().equals(eventType)) {
                             deleteList.add(event);
                             eventIDs.remove(event.getUniqueID());
+                            allEvents.remove(event.getUniqueID());
+                            missingEventsInEventRelations.remove(event.getUniqueID());
                         }
                     }
                     eventList.removeAll(deleteList);
@@ -212,6 +229,91 @@ public class JHVEventCache {
             }
         }
 
+    }
+
+    private void checkAndFixRelationShip(JHVEvent event) {
+        checkMissingRelations(event);
+        checkAndFixNextRelatedEvents(event);
+        checkAndFixPrecedingRelatedEvents(event);
+        checkAndFixRelatedEventsByRule(event);
+    }
+
+    private void checkMissingRelations(JHVEvent event) {
+        if (missingEventsInEventRelations.containsKey(event.getUniqueID())) {
+            List<JHVEvent> listOfRelatedEvents = missingEventsInEventRelations.get(event.getUniqueID());
+            for (JHVEvent relatedEvent : listOfRelatedEvents) {
+                if (relatedEvent.getEventRelationShip().getNextEvents().containsKey(event.getUniqueID())) {
+                    JHVEventRelation relation = relatedEvent.getEventRelationShip().getNextEvents().get(event.getUniqueID());
+                    relation.setTheEvent(event);
+                    event.getEventRelationShip().setRelationshipColor(relatedEvent.getColor());
+                }
+                if (relatedEvent.getEventRelationShip().getPrecedingEvents().containsKey(event.getUniqueID())) {
+                    JHVEventRelation relation = relatedEvent.getEventRelationShip().getPrecedingEvents().get(event.getUniqueID());
+                    relation.setTheEvent(event);
+                    relatedEvent.getEventRelationShip().setRelationshipColor(event.getEventRelationShip().getRelationshipColor());
+                }
+                if (relatedEvent.getEventRelationShip().getRelationshipRules().containsKey(event.getUniqueID())) {
+                    JHVEventRelation relation = relatedEvent.getEventRelationShip().getRelatedEventsByRule().get(event.getUniqueID());
+                    relation.setTheEvent(event);
+                }
+            }
+            missingEventsInEventRelations.remove(event.getUniqueID());
+        }
+    }
+
+    private void checkAndFixNextRelatedEvents(JHVEvent event) {
+        for (JHVEventRelation er : event.getEventRelationShip().getNextEvents().values()) {
+            if (er.getTheEvent() == null) {
+                if (allEvents.containsKey(er.getUniqueIdentifier())) {
+                    er.setTheEvent(allEvents.get(er.getUniqueIdentifier()));
+                    er.getTheEvent().getEventRelationShip().setRelationshipColor(event.getEventRelationShip().getRelationshipColor());
+                } else {
+                    List<JHVEvent> missingRelations = new ArrayList<JHVEvent>();
+                    if (missingEventsInEventRelations.containsKey(er.getUniqueIdentifier())) {
+                        missingRelations = missingEventsInEventRelations.get(er.getUniqueIdentifier());
+                    }
+                    missingRelations.add(event);
+                    missingEventsInEventRelations.put(er.getUniqueIdentifier(), missingRelations);
+                }
+            }
+        }
+    }
+
+    private void checkAndFixPrecedingRelatedEvents(JHVEvent event) {
+        for (JHVEventRelation er : event.getEventRelationShip().getPrecedingEvents().values()) {
+            if (er.getTheEvent() == null) {
+                if (allEvents.containsKey(er.getUniqueIdentifier())) {
+                    JHVEvent relatedEvent = allEvents.get(er.getUniqueIdentifier());
+                    er.setTheEvent(relatedEvent);
+                    event.getEventRelationShip().setRelationshipColor(relatedEvent.getEventRelationShip().getRelationshipColor());
+                } else {
+                    List<JHVEvent> missingRelations = new ArrayList<JHVEvent>();
+                    if (missingEventsInEventRelations.containsKey(er.getUniqueIdentifier())) {
+                        missingRelations = missingEventsInEventRelations.get(er.getUniqueIdentifier());
+                    }
+                    missingRelations.add(event);
+                    missingEventsInEventRelations.put(er.getUniqueIdentifier(), missingRelations);
+                }
+            }
+        }
+    }
+
+    private void checkAndFixRelatedEventsByRule(JHVEvent event) {
+        for (JHVEventRelation er : event.getEventRelationShip().getRelatedEventsByRule().values()) {
+            if (er.getTheEvent() == null) {
+                if (allEvents.containsKey(er.getUniqueIdentifier())) {
+                    JHVEvent relatedEvent = allEvents.get(er.getUniqueIdentifier());
+                    er.setTheEvent(relatedEvent);
+                } else {
+                    List<JHVEvent> missingRelations = new ArrayList<JHVEvent>();
+                    if (missingEventsInEventRelations.containsKey(er.getUniqueIdentifier())) {
+                        missingRelations = missingEventsInEventRelations.get(er.getUniqueIdentifier());
+                    }
+                    missingRelations.add(event);
+                    missingEventsInEventRelations.put(er.getUniqueIdentifier(), missingRelations);
+                }
+            }
+        }
     }
 
     /**
