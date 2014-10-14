@@ -16,6 +16,9 @@ public class HEKEventStream implements SWEKEventStream {
     /** Queue with events */
     Queue<JHVEvent> eventQueue = new LinkedList<JHVEvent>();
 
+    /** boolean indicating an extra download is needed */
+    private boolean extraDownloadNeeded;
+
     public HEKEventStream() {
         eventQueue = new LinkedList<JHVEvent>();
     }
@@ -37,5 +40,20 @@ public class HEKEventStream implements SWEKEventStream {
      */
     public void addJHVEvent(JHVEvent event) {
         eventQueue.add(event);
+    }
+
+    @Override
+    public boolean additionalDownloadNeeded() {
+        return extraDownloadNeeded;
+    }
+
+    /**
+     * Sets if extra download is needed.
+     * 
+     * @param extraNeeded
+     *            true if extra download is needed, false if not.
+     */
+    public void setExtraDownloadNeeded(boolean extraNeeded) {
+        extraDownloadNeeded = extraNeeded;
     }
 }

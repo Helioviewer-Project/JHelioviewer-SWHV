@@ -193,13 +193,17 @@ public class DownloadWorker implements Runnable {
         // create parser
         parser = createParser();
         //
-
-        // download the data
-        downloadData();
-        // parse the data
-        parseData();
-        // distribute the data
-        distributeData();
+        boolean moreDownloads = false;
+        int page = 0;
+        do {
+            // download the data
+            downloadData(page);
+            // parse the data
+            moreDownloads = parseData();
+            // distribute the data
+            distributeData();
+            page++;
+        } while (moreDownloads);
         // inform JHVEventContainer data finished downloading
         eventContainer.finishedDownload();
         fireDownloadWorkerFinished();
@@ -267,24 +271,30 @@ public class DownloadWorker implements Runnable {
 
     /**
      * Parses the source specific input stream to a jhv specific event type.
+     * 
+     * @return
      */
-    private void parseData() {
+    private boolean parseData() {
         if (!isStopped) {
             eventStream = parser.parseEventStream(downloadInputStream, eventType, swekSource);
+            return eventStream.additionalDownloadNeeded();
         } else {
             if (parser != null) {
                 parser.stopParser();
             }
             fireDownloadWorkerForcedStopped();
+            return false;
         }
     }
 
     /**
      * Downloads the data from the source.
+     * 
+     * @param page
      */
-    private void downloadData() {
+    private void downloadData(int page) {
         if (!isStopped) {
-            downloadInputStream = downloader.downloadData(eventType, downloadStartDate, downloadEndDate, params);
+            downloadInputStream = downloader.downloadData(eventType, downloadStartDate, downloadEndDate, params, page);
         } else {
             if (downloader != null) {
                 downloader.stopDownload();

@@ -16,4 +16,11 @@ public interface SWEKEventStream {
      * @return The next event or null if the stream has no events.hasEvents
      */
     public abstract JHVEvent next();
+
+    /**
+     * Indicates if the download was sufficient or not
+     * 
+     * @return true if an extra download is needed, false if not.
+     */
+    public abstract boolean additionalDownloadNeeded();
 }

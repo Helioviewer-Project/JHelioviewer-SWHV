@@ -28,8 +28,10 @@ public interface SWEKDownloader {
      *            downloaded
      * @param params
      *            list of parameters to be used in the downloader
+     * @param page
+     *            the page that should be downloaded
      * @return an input stream giving access to the data
      */
-    public abstract InputStream downloadData(SWEKEventType eventType, Date startDate, Date endDate, List<SWEKParam> params);
+    public abstract InputStream downloadData(SWEKEventType eventType, Date startDate, Date endDate, List<SWEKParam> params, int page);
 
 }
