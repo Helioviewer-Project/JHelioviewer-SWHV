@@ -8,6 +8,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 
+import javax.media.opengl.GL;
 import javax.media.opengl.GL2;
 import javax.swing.ImageIcon;
 
@@ -158,14 +159,16 @@ public class HEKPlugin3dRenderer extends PhysicalRenderer3d {
         JHVPoint oldBoundaryPoint3d = null;
         if (evt.getEventRelationShip().getRelationshipColor() != null) {
             Color evtColor = evt.getEventRelationShip().getRelationshipColor();
-            gl.glColor3d(evtColor.getRed(), evtColor.getGreen(), evtColor.getBlue());
+            gl.glColor3d(evtColor.getRed() / 255., evtColor.getGreen() / 255., evtColor.getBlue() / 255.);
         } else {
-            gl.glColor3d(evt.getColor().getRed(), evt.getColor().getGreen(), evt.getColor().getBlue());
+            gl.glColor3d(evt.getColor().getRed() / 255., evt.getColor().getGreen() / 255., evt.getColor().getBlue() / 255.);
         }
+        gl.glDisable(GL2.GL_BLEND);
+        gl.glDisable(GL.GL_LIGHTING);
 
         gl.glDisable(GL2.GL_TEXTURE_2D);
-        gl.glEnable(GL2.GL_LINE_SMOOTH);
-        gl.glLineWidth(0.8f);
+        // gl.glEnable(GL2.GL_LINE_SMOOTH);
+        gl.glLineWidth(3.f);
         for (JHVPoint point : points) {
             int divpoints = 10;
             gl.glBegin(GL2.GL_LINE_STRIP);
