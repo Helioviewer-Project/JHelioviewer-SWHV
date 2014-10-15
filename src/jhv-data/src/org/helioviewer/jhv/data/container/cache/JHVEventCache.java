@@ -1,5 +1,6 @@
 package org.helioviewer.jhv.data.container.cache;
 
+import java.awt.Color;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
@@ -32,6 +33,8 @@ public class JHVEventCache {
 
     private final Map<String, List<JHVEvent>> missingEventsInEventRelations;
 
+    private final Map<Color, Set<String>> idsPerColor;
+
     /**
      * private default constructor
      */
@@ -40,6 +43,7 @@ public class JHVEventCache {
         eventIDs = new HashSet<String>();
         allEvents = new HashMap<String, JHVEvent>();
         missingEventsInEventRelations = new HashMap<String, List<JHVEvent>>();
+        idsPerColor = new HashMap<Color, Set<String>>();
     }
 
     /**
@@ -72,7 +76,9 @@ public class JHVEventCache {
                 checkAndFixRelationShip(event);
             } else {
                 Logger.getLogger(JHVEventCache.class.getName()).severe(
-                        "Event with identifier: " + event.getUniqueID() + " already in cache");
+                        "Event with identifier: " + event.getUniqueID() + " already in cache, merge the events");
+                JHVEvent savedEvent = allEvents.get(event.getUniqueID());
+                savedEvent.merge(event);
             }
         }
 
@@ -232,10 +238,100 @@ public class JHVEventCache {
     }
 
     private void checkAndFixRelationShip(JHVEvent event) {
+        checkRelationColor(event);
         checkMissingRelations(event);
         checkAndFixNextRelatedEvents(event);
         checkAndFixPrecedingRelatedEvents(event);
         checkAndFixRelatedEventsByRule(event);
+    }
+
+    private void checkRelationColor(JHVEvent event) {
+        if (idsPerColor.containsKey(event.getEventRelationShip().getRelationshipColor())) {
+            // Color of event is already used check if the event is in the list
+            // of events that can use the color
+            Set<String> ids = idsPerColor.get(event.getEventRelationShip().getRelationshipColor());
+            if (ids.contains(event.getUniqueID())) {
+                // The event is in the list of events, add the following and
+                // preceding event ids to the list and give them the correct
+                // color
+                addRelatedEvents(event, new HashSet<String>());
+            } else {
+                // The event is not in the list check if one of the following or
+                // preceding events is in the list
+                if (checkFollowingAndPrecedingEvents(event)) {
+                    addRelatedEvents(event, new HashSet<String>());
+                } else {
+                    Color c = JHVCacheColors.getNextColor();
+                    event.getEventRelationShip().setRelationshipColor(c);
+                    ids = new HashSet<String>();
+                    ids.add(event.getUniqueID());
+                    idsPerColor.put(event.getEventRelationShip().getRelationshipColor(), ids);
+                    addRelatedEvents(event, new HashSet<String>());
+                }
+            }
+        } else {
+            // Color not present add the color and add all the preceding and
+            // following event unique identifiers. Check the color of them.
+            HashSet<String> ids = new HashSet<String>();
+            ids.add(event.getUniqueID());
+            JHVCacheColors.setColorUsed(event.getEventRelationShip().getRelationshipColor());
+            idsPerColor.put(event.getEventRelationShip().getRelationshipColor(), ids);
+            addRelatedEvents(event, new HashSet<String>());
+        }
+    }
+
+    private void addRelatedEvents(JHVEvent event, Set<String> handledEvents) {
+        if (!handledEvents.contains(event.getUniqueID())) {
+            handledEvents.add(event.getUniqueID());
+            for (JHVEventRelation relation : event.getEventRelationShip().getNextEvents().values()) {
+                if (relation.getTheEvent() != null) {
+                    relation.getTheEvent().getEventRelationShip().setRelationshipColor(event.getEventRelationShip().getRelationshipColor());
+                    idsPerColor.get(event.getEventRelationShip().getRelationshipColor()).add(relation.getTheEvent().getUniqueID());
+                    addRelatedEvents(event, handledEvents);
+                }
+            }
+            for (JHVEventRelation relation : event.getEventRelationShip().getPrecedingEvents().values()) {
+                if (relation.getTheEvent() != null) {
+                    relation.getTheEvent().getEventRelationShip().setRelationshipColor(event.getEventRelationShip().getRelationshipColor());
+                    idsPerColor.get(event.getEventRelationShip().getRelationshipColor()).add(relation.getTheEvent().getUniqueID());
+                    addRelatedEvents(event, handledEvents);
+                }
+            }
+        }
+    }
+
+    private boolean checkFollowingAndPrecedingEvents(JHVEvent event) {
+        if (checkPrecedingEvents(event, event.getEventRelationShip().getPrecedingEvents())) {
+            return true;
+        } else {
+            return checkFollowingEvent(event, event.getEventRelationShip().getNextEvents());
+        }
+    }
+
+    private boolean checkPrecedingEvents(JHVEvent event, Map<String, JHVEventRelation> precedingEvents) {
+        for (String key : precedingEvents.keySet()) {
+            if (idsPerColor.get(event.getEventRelationShip().getRelationshipColor()).contains(key)) {
+                return true;
+            } else {
+                if (precedingEvents.get(key).getTheEvent() != null) {
+                    return checkFollowingEvent(event, precedingEvents.get(key).getTheEvent().getEventRelationShip().getPrecedingEvents());
+                }
+            }
+        }
+        return false;
+    }
+
+    private boolean checkFollowingEvent(JHVEvent event, Map<String, JHVEventRelation> nextEvents) {
+        for (String key : nextEvents.keySet()) {
+            if (idsPerColor.get(event.getEventRelationShip().getRelationshipColor()).contains(key)) {
+                return true;
+            } else {
+                if (nextEvents.get(key).getTheEvent() != null) {
+                    return checkFollowingEvent(event, nextEvents.get(key).getTheEvent().getEventRelationShip().getNextEvents());
+                }
+            }
+        }
+        return false;
     }
 
     private void checkMissingRelations(JHVEvent event) {
