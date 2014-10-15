@@ -91,6 +91,12 @@ public class EventTypePanelModel implements TreeModel, TreeExpansionListener {
             supplier.setCheckboxSelected(!supplier.isCheckboxSelected());
             if (supplier.isCheckboxSelected()) {
                 eventType.setCheckboxSelected(true);
+            } else {
+                boolean eventTypeSelected = false;
+                for (SWEKTreeModelSupplier stms : eventType.getSwekTreeSuppliers()) {
+                    eventTypeSelected = eventTypeSelected || stms.isCheckboxSelected();
+                }
+                eventType.setCheckboxSelected(eventTypeSelected);
             }
             if (supplier.isCheckboxSelected()) {
                 fireNewEventTypeAndSourceActive(eventType.getSwekEventType(), supplier.getSwekSupplier().getSource(),
