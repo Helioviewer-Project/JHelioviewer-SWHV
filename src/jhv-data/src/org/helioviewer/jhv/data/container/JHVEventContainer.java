@@ -40,7 +40,7 @@ public class JHVEventContainer {
 
     /**
      * Gets the singleton instance of the JHVEventContainer
-     *
+     * 
      * @return the singleton instance
      */
     public static JHVEventContainer getSingletonInstance() {
@@ -52,8 +52,8 @@ public class JHVEventContainer {
 
     /**
      * Register a JHV event container request handler.
-     *
-     *
+     * 
+     * 
      * @param handler
      *            the handler to register
      */
@@ -65,7 +65,7 @@ public class JHVEventContainer {
 
     /**
      * Removes the JHV event container request handler.
-     *
+     * 
      * @param handler
      *            the handler to remove
      */
@@ -80,7 +80,7 @@ public class JHVEventContainer {
      * will be send to the given handler. Events already available will directly
      * be send to the handler. Events becoming available will also be send to
      * the handler in the future.
-     *
+     * 
      * @param date
      *            the date to send events for
      * @param handler
@@ -105,7 +105,7 @@ public class JHVEventContainer {
      * The events will be send to the given handler. Events already available
      * will directly be send to the handler. Events becoming available will also
      * be send to the handler in the future.
-     *
+     * 
      * @param dateList
      *            the list of dates to send events for
      * @param handler
@@ -129,7 +129,7 @@ public class JHVEventContainer {
      * The events will be send to the given handler. Events already available
      * will directly be send to the handler. Events becoming available will also
      * be send to the handler in the future.
-     *
+     * 
      * @param startDate
      *            the start date of the interval
      * @param endDate
@@ -144,6 +144,7 @@ public class JHVEventContainer {
                 Logger.getLogger(JHVEventContainer.class.getName()).info("Request for interval : [" + startDate + "," + endDate + "]");
                 eventHandlerCache.add(handler, startDate, endDate);
                 Map<String, NavigableMap<Date, NavigableMap<Date, List<JHVEvent>>>> events = eventCache.get(startDate, endDate);
+                // AssociationsPrinter.print(events);
                 handler.newEventsReceived(events);
                 requestEvents(startDate, endDate);
             }
@@ -152,7 +153,7 @@ public class JHVEventContainer {
 
     /**
      * Add an event to the event cache.
-     *
+     * 
      * @param event
      *            the event to add to the event cache
      */
@@ -185,7 +186,7 @@ public class JHVEventContainer {
 
     /**
      * Removes the events of the given eventType from the event cache.
-     *
+     * 
      * @param eventType
      *            the event type to remove from the cache.
      */
@@ -202,7 +203,7 @@ public class JHVEventContainer {
 
     /**
      * Request data from the request handlers for a date.
-     *
+     * 
      * @param date
      *            the date for which to request the data
      */
@@ -216,7 +217,7 @@ public class JHVEventContainer {
 
     /**
      * Request data from the request handlers over an interval.
-     *
+     * 
      * @param startDate
      *            the start of the interval
      * @param endDate
@@ -233,7 +234,7 @@ public class JHVEventContainer {
     /**
      * Notify the interested JHVEventhandler of about the cache that was
      * changed.
-     *
+     * 
      * @param date
      *            the date for which the cache was changed.
      */
