@@ -159,8 +159,8 @@ public class SWEKEventInformationDialog extends JDialog implements WindowFocusLi
         // this.setUndecorated(true);
         // this.setMinimumSize(new Dimension(250, 50));
 
-        this.addWindowFocusListener(this);
-        this.addFocusListener(this);
+        // this.addWindowFocusListener(this);
+        // this.addFocusListener(this);
 
         this.setAlwaysOnTop(true);
 
