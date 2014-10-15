@@ -143,4 +143,12 @@ public interface JHVEvent {
      */
     public abstract JHVEventRelationship getEventRelationShip();
 
+    /**
+     * Merges this event with the given event.
+     * 
+     * @param event
+     *            the event to merge with
+     */
+    public abstract void merge(JHVEvent event);
+
 }
