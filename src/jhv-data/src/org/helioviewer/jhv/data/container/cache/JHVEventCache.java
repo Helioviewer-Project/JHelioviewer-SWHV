@@ -11,7 +11,6 @@ import java.util.Map;
 import java.util.NavigableMap;
 import java.util.Set;
 import java.util.TreeMap;
-import java.util.logging.Logger;
 
 import org.helioviewer.jhv.data.container.util.DateUtil;
 import org.helioviewer.jhv.data.datatype.event.JHVEvent;
@@ -66,7 +65,6 @@ public class JHVEventCache {
      */
     public void add(JHVEvent event) {
         synchronized (JHVEventContainerLocks.cacheLock) {
-            Logger.getLogger(JHVEventCache.class.getName()).severe("Event with identifier: " + event.getUniqueID());
             if (!eventIDs.contains(event.getUniqueID())) {
                 allEvents.put(event.getUniqueID(), event);
                 Date startDate = DateUtil.getCurrentDate(event.getStartDate());
@@ -75,8 +73,6 @@ public class JHVEventCache {
                 eventIDs.add(event.getUniqueID());
                 checkAndFixRelationShip(event);
             } else {
-                Logger.getLogger(JHVEventCache.class.getName()).severe(
-                        "Event with identifier: " + event.getUniqueID() + " already in cache, merge the events");
                 JHVEvent savedEvent = allEvents.get(event.getUniqueID());
                 savedEvent.merge(event);
             }

@@ -7,7 +7,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.NavigableMap;
 import java.util.Set;
-import java.util.logging.Logger;
 
 import org.helioviewer.jhv.data.container.cache.JHVEventCache;
 import org.helioviewer.jhv.data.container.cache.JHVEventHandlerCache;
@@ -91,7 +90,8 @@ public class JHVEventContainer {
 
             @Override
             public void run() {
-                Logger.getLogger(JHVEventContainer.class.getName()).info("Request for date : " + date);
+                // Logger.getLogger(JHVEventContainer.class.getName()).info("Request for date : "
+                // + date);
                 eventHandlerCache.add(handler, date);
                 Map<String, NavigableMap<Date, NavigableMap<Date, List<JHVEvent>>>> events = eventCache.get(date);
                 handler.newEventsReceived(events);
@@ -116,7 +116,7 @@ public class JHVEventContainer {
 
             @Override
             public void run() {
-                Logger.getLogger(JHVEventContainer.class.getName()).info("Request for date list :");
+                // Logger.getLogger(JHVEventContainer.class.getName()).info("Request for date list :");
                 for (Date date : dateList) {
                     requestForDate(date, handler);
                 }
@@ -141,7 +141,8 @@ public class JHVEventContainer {
         EventQueue.invokeLater(new Runnable() {
             @Override
             public void run() {
-                Logger.getLogger(JHVEventContainer.class.getName()).info("Request for interval : [" + startDate + "," + endDate + "]");
+                // Logger.getLogger(JHVEventContainer.class.getName()).info("Request for interval : ["
+                // + startDate + "," + endDate + "]");
                 eventHandlerCache.add(handler, startDate, endDate);
                 Map<String, NavigableMap<Date, NavigableMap<Date, List<JHVEvent>>>> events = eventCache.get(startDate, endDate);
                 // AssociationsPrinter.print(events);
