@@ -233,6 +233,11 @@ public class HEKEvent implements JHVEvent {
         return eventRelationShip;
     }
 
+    @Override
+    public void merge(JHVEvent event) {
+        eventRelationShip.merge(event.getEventRelationShip());
+    }
+
     /**
      * Adds a parameter to the event.
      * 
@@ -317,5 +322,4 @@ public class HEKEvent implements JHVEvent {
         allNonVisibleNullParameters = new ArrayList<JHVEventParameter>();
         positionInformation = new HashMap<JHVCoordinateSystem, JHVPositionInformation>();
     }
-
 }

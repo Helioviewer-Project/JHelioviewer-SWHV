@@ -84,4 +84,10 @@ public class JHVEventRelationship {
             }
         }
     }
+
+    public void merge(JHVEventRelationship eventRelationShip) {
+        nextEvents.putAll(eventRelationShip.getNextEvents());
+        precedingEvents.putAll(eventRelationShip.getPrecedingEvents());
+        relatedEventsByRule.putAll(eventRelationShip.getRelatedEventsByRule());
+    }
 }
