@@ -13,6 +13,7 @@ public class HEKColors {
             new Color(100, 149, 237), new Color(190, 190, 190), new Color(106, 90, 205), };
     private final static int[] usedArray = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
     private static int minValue = 0;
+    private static int printerColorCounter = 0;
 
     public synchronized static Color getNextColor() {
         for (int i = 0; i < hekColorArray.length; i++) {
@@ -32,5 +33,14 @@ public class HEKColors {
                 minValue = usedArray[i];
             }
         }
+    }
+
+    public synchronized static Color getPrinterColor() {
+        if (printerColorCounter >= hekColorArray.length) {
+            printerColorCounter = 0;
+        }
+        Color c = hekColorArray[printerColorCounter];
+        printerColorCounter++;
+        return c;
     }
 }
