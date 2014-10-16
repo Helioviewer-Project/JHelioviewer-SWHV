@@ -93,7 +93,7 @@ public abstract class GL3DImageLayer extends GL3DGroup implements GL3DCameraList
 
         this.accellerationShape = new GL3DHitReferenceShape(false);
         this.jpxView = this.mainLayerView.getAdapter(ImageInfoView.class);
-        if (this.regionView != null) {
+        if (this.jpxView != null) {
             this.jpxView.addViewListener(this.accellerationShape);
             this.jpxView.addViewListener(this);
         }

@@ -43,7 +43,7 @@ public abstract class GL3DCamera {
 
     private double clipNear = Constants.SunRadius / 5.;
     private double clipFar = Constants.SunRadius * 1000.;
-    private double fov = 10;
+    private final double fov = 1;
     private double aspect = 0.0;
     private double width = 0.0;
     private double height = 0.0;
@@ -154,6 +154,7 @@ public abstract class GL3DCamera {
     protected void setZTranslation(double z) {
         this.translationz = Math.min(MIN_DISTANCE, Math.max(MAX_DISTANCE, z));
         this.translation.z = this.ratio * this.translationz;
+        System.out.println("ZTRANS" + this.translation.z + " " + this.translationz);
     }
 
     protected void addPanning(double x, double y) {

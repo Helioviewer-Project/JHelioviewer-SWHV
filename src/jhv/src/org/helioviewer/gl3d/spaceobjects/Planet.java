@@ -7,8 +7,13 @@ import java.util.Date;
 import java.util.List;
 
 import org.helioviewer.base.logging.Log;
+import org.helioviewer.base.physics.Astronomy;
+import org.helioviewer.base.physics.Constants;
 import org.helioviewer.gl3d.camera.GL3DPositionLoading;
 import org.helioviewer.gl3d.camera.GL3DPositionLoadingListener;
+import org.helioviewer.gl3d.scenegraph.GL3DState;
+import org.helioviewer.gl3d.scenegraph.math.GL3DMat4d;
+import org.helioviewer.gl3d.scenegraph.math.GL3DQuatd;
 import org.helioviewer.gl3d.scenegraph.math.GL3DVec3d;
 import org.helioviewer.gl3d.scenegraph.math.GL3DVec4f;
 import org.helioviewer.gl3d.scenegraph.visuals.GL3DSphere;
@@ -31,15 +36,20 @@ public class Planet extends GL3DSphere implements LayersListener, ViewListener, 
     private Date currentDate;
     private final GL3DSceneGraphView sceneGraphView;
     private boolean loaded;
+    private GL3DVec3d position;
 
     public Planet(GL3DSceneGraphView sceneGraphView) {
-        super(0.1, 10, 10, new GL3DVec4f(1.f, 0.f, 0.f, 1.f));
+        super(6052000 / Constants.SunRadiusInMeter, 10, 10, new GL3DVec4f(1.f, 0.f, 0.f, 1.f));
+        //super(4878000 / Constants.SunRadiusInMeter, 10, 10, new GL3DVec4f(1.f, 0.f, 0.f, 1.f));
         this.sceneGraphView = sceneGraphView;
         positionLoading = new GL3DPositionLoading();
         positionLoading.setObservingObject("Venus");
+        //positionLoading.setObservingObject("Mercury");
+
         positionLoading.requestData();
         this.sceneGraphView.addViewListener(this);
         LayersModel.getSingletonInstance().addLayersListener(this);
+
     }
 
     private Date parseDate(String dateOBS) {
@@ -75,15 +85,16 @@ public class Planet extends GL3DSphere implements LayersListener, ViewListener, 
                     }
                 }
             }
-            if (this.beginDate == null || requestDates.get(0).getTime() < this.beginDate.getTime()) {
-                this.beginDate = requestDates.get(0);
+            if (requestDates.size() > 0) {
+                if (this.beginDate == null || requestDates.get(0).getTime() < this.beginDate.getTime()) {
+                    this.beginDate = requestDates.get(0);
+                }
+                if (this.endDate == null || requestDates.get(0).getTime() > this.endDate.getTime()) {
+                    this.endDate = requestDates.get(requestDates.size() - 1);
+                }
+                this.positionLoading.setBeginDate(beginDate);
+                this.positionLoading.setEndDate(endDate);
             }
-            if (this.endDate == null || requestDates.get(0).getTime() > this.endDate.getTime()) {
-                this.endDate = requestDates.get(requestDates.size() - 1);
-            }
-            this.positionLoading.setBeginDate(beginDate);
-            this.positionLoading.setEndDate(endDate);
-
         } catch (JHV_KduException ex) {
             Log.error("Received an kakadu exception. " + ex);
         }
@@ -127,12 +138,49 @@ public class Planet extends GL3DSphere implements LayersListener, ViewListener, 
     }
 
     private void updatePosition() {
-        System.out.println("UPDATING");
-
-        if (this.loaded) {
-            GL3DVec3d position = this.positionLoading.getInterpolatedPosition(currentDate.getTime());
+        if (this.positionLoading.isLoaded()) {
+            this.position = this.positionLoading.getInterpolatedPosition(currentDate.getTime() + 1000 * 60 * 8);
             System.out.println("POSITION" + position);
-            this.m.translate(position);
+        }
+    }
+
+    @Override
+    public void shapeDraw(GL3DState state) {
+        this.markAsChanged();
+        super.shapeDraw(state);
+    }
+
+    @Override
+    public void update(GL3DState state) {
+
+        System.out.println("UPDATE");
+        if (!this.isInitialised) {
+            this.init(state);
+        }
+        if (position != null) {
+            state.pushMV();
+            //GL3DQuatd differentialRotation = state.getActiveCamera().getLocalRotation();
+            //this.m = differentialRotation.toMatrix().inverse();
+            GL3DQuatd differentialRotation = state.getActiveCamera().getLocalRotation();
+            System.out.println("CAMERA" + state.getActiveCamera().getZTranslation());
+            this.m.setIdentity();
+            //this.m.multiply(differentialRotation.toMatrix().inverse());
+            double currentRotation = Astronomy.getL0Radians(currentDate);
+            this.m.rotate(-currentRotation, new GL3DVec3d(0, 1, 0));
+
+            this.m.rotate(-Astronomy.getB0InRadians(this.currentDate), new GL3DVec3d(1., 0., 0.));
+
+            this.m.rotate(-position.z + Astronomy.getB0InRadians(this.currentDate), new GL3DVec3d(1., 0., 0.));
+
+            this.m.rotate(position.y, new GL3DVec3d(0., 1., 0.));
+
+            this.m.translate(new GL3DVec3d(0., 0, position.x));
+
+            this.wm = (this.m);
+            state.buildInverseAndNormalMatrix();
+            this.wmI = new GL3DMat4d(state.getMVInverse());
+            //this.shapeUpdate(state);
+            state.popMV();
         }
     }
 
