@@ -26,7 +26,7 @@ public class GL3DRayTracer {
     public GL3DRayTracer(GL3DNode sceneRoot, GL3DCamera camera) {
         this.sceneRoot = sceneRoot;
         this.camera = camera;
-        hh = Math.tan(Math.toRadians(camera.getFOV() / 2)) * camera.getClipNear();
+        hh = Math.tan(Math.toRadians(camera.getCameraFOV() / 2)) * camera.getClipNear();
         hw = hh * camera.getAspect();
         pixelSize = hw / camera.getWidth() * 2;
     }

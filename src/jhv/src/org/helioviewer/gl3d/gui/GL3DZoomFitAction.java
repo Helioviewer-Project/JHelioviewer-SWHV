@@ -17,9 +17,9 @@ import org.helioviewer.viewmodel.view.View;
  * Action that zooms in or out to fit the currently displayed image layers to
  * the displayed viewport. For 3D this results in a change in the
  * {@link GL3DCamera}'s distance to the sun.
- * 
+ *
  * @author Simon Spoerri (simon.spoerri@fhnw.ch)
- * 
+ *
  */
 public class GL3DZoomFitAction extends ZoomFitAction {
 
@@ -29,6 +29,7 @@ public class GL3DZoomFitAction extends ZoomFitAction {
         super(small);
     }
 
+    @Override
     public void actionPerformed(ActionEvent e) {
         View view = LayersModel.getSingletonInstance().getActiveView();
         GL3DCamera camera = GL3DCameraSelectorModel.getInstance().getCurrentCamera();
@@ -36,7 +37,7 @@ public class GL3DZoomFitAction extends ZoomFitAction {
             Region region = view.getAdapter(MetaDataView.class).getMetaData().getPhysicalRegion();
             if (region != null) {
                 double halfWidth = region.getWidth() / 2;
-                double halfFOVRad = Math.toRadians(camera.getFOV() / 2.0);
+                double halfFOVRad = Math.toRadians(camera.getCameraFOV() / 2.0);
                 double distance = halfWidth * Math.sin(Math.PI / 2 - halfFOVRad) / Math.sin(halfFOVRad);
                 distance = -distance - camera.getZTranslation();
                 Log.debug("GL3DZoomFitAction: Distance = " + distance + " Existing Distance: " + camera.getZTranslation());

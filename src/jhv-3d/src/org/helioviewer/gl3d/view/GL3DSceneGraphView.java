@@ -81,25 +81,25 @@ public class GL3DSceneGraphView extends AbstractGL3DView implements GL3DView {
         }, KeyEvent.VK_B);
         /*
          * GL3DKeyController.getInstance().addListener(new GL3DKeyListener() {
-         *
+         * 
          * @Override public void keyHit(KeyEvent e) {
          * root.getDrawBits().toggle(Bit.Wireframe);
          * Displayer.getSingletonInstance().display();
          * Log.debug("Toggling Wireframe"); } }, KeyEvent.VK_W);
-         *
+         * 
          * GL3DKeyController.getInstance().addListener(new GL3DKeyListener() {
-         *
+         * 
          * @Override public void keyHit(KeyEvent e) {
          * root.getDrawBits().toggle(Bit.Normals);
          * Displayer.getSingletonInstance().display();
          * Log.debug("Toggling Normals"); } }, KeyEvent.VK_N);
          * GL3DKeyController.getInstance().addListener(new GL3DKeyListener() {
-         *
+         * 
          * @Override public void keyHit(KeyEvent e) {
          * Displayer.getSingletonInstance().display();
          * Log.debug("Toggling Framebuffer"); } }, KeyEvent.VK_F);
          * GL3DKeyController.getInstance().addListener(new GL3DKeyListener() {
-         *
+         * 
          * @Override public void keyHit(KeyEvent e) {
          * imageLayers.getDrawBits().toggle(Bit.Hidden);
          * Displayer.getSingletonInstance().display();
@@ -269,11 +269,11 @@ public class GL3DSceneGraphView extends AbstractGL3DView implements GL3DView {
                 if (metaDataView != null && metaDataView.getMetaData() != null) {
                     Region region = metaDataView.getMetaData().getPhysicalRegion();
                     double halfWidth = region.getWidth() / 2;
-                    double halfFOVRad = Math.toRadians(camera.getFOV() / 2);
+                    double halfFOVRad = Math.toRadians(camera.getCameraFOV() / 2);
                     double distance = halfWidth * Math.sin(Math.PI / 2 - halfFOVRad) / Math.sin(halfFOVRad);
                     distance = -distance - camera.getZTranslation();
                     // Log.debug("GL3DZoomFitAction: Distance = "+distance+" Existing Distance: "+camera.getZTranslation());
-                    camera.addCameraAnimation(new GL3DCameraZoomAnimation(distance, 500));
+                    camera.addCameraAnimation(new GL3DCameraZoomAnimation(0.1, 500));
                 }
             }
             this.layersToAdd.clear();
@@ -377,7 +377,7 @@ public class GL3DSceneGraphView extends AbstractGL3DView implements GL3DView {
         /*
          * GL3DNode sibling = node; while((sibling = sibling.getNext()) != null)
          * { for(int i=0; i<level; ++i) System.out.print("   ");
-         * 
+         *
          * System.out.println("Sibling: " + sibling.getClass().getName() + " ("
          * + node.getName() + ")"); }
          */

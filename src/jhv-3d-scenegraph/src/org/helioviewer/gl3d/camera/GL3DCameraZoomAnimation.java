@@ -5,9 +5,9 @@ import org.helioviewer.jhv.display.Displayer;
 /**
  * This animation zooms the camera by a given amount. Zooming only affects the
  * z-component of the {@link GL3DCamera}'s translation.
- * 
+ *
  * @author Simon Spoerri (simon.spoerri@fhnw.ch)
- * 
+ *
  */
 public class GL3DCameraZoomAnimation implements GL3DCameraAnimation {
     private boolean isFinished = false;
@@ -16,20 +16,21 @@ public class GL3DCameraZoomAnimation implements GL3DCameraAnimation {
     private long lastAnimationTime = -1;
     private long timeLeft = 0;
 
-    private double distanceToTravel;
-    private double distanceDelta;
+    private double fovToTravel;
+    private double fovDelta;
 
-    private double targetDistance;
+    private double targetFov;
 
     public GL3DCameraZoomAnimation(double distanceToTravel) {
         this(distanceToTravel, GL3DCameraAnimation.DEFAULT_ANIMATION_TIME);
         Displayer.getSingletonInstance().render();
     }
 
-    public GL3DCameraZoomAnimation(double distanceToTravel, long duration) {
-        this.distanceToTravel = distanceToTravel;
+    public GL3DCameraZoomAnimation(double fovToTravel, long duration) {
+        this.fovToTravel = fovToTravel;
+        System.out.println("FOVTRAVEL" + fovToTravel);
         this.timeLeft = duration;
-        this.distanceDelta = distanceToTravel / this.timeLeft;
+        this.fovDelta = fovToTravel / this.timeLeft;
         // Displayer.getSingletonInstance().animate();
     }
 
@@ -38,7 +39,8 @@ public class GL3DCameraZoomAnimation implements GL3DCameraAnimation {
         if (this.startTime < 0) {
             this.startTime = System.currentTimeMillis();
             this.lastAnimationTime = System.currentTimeMillis();
-            this.targetDistance = Math.min(GL3DCamera.MIN_DISTANCE, Math.max(GL3DCamera.MAX_DISTANCE, camera.getZTranslation() + this.distanceToTravel));
+            this.targetFov = Math.min(GL3DCamera.MAX_FOV, Math.max(GL3DCamera.MIN_FOV, camera.getCameraFOV() + this.fovToTravel));
+            System.out.println("TTARGET" + this.targetFov + " " + camera.getCameraFOV() + " " + this.fovToTravel);
         }
 
         long timeDelta = System.currentTimeMillis() - lastAnimationTime;
@@ -46,16 +48,16 @@ public class GL3DCameraZoomAnimation implements GL3DCameraAnimation {
         this.timeLeft -= timeDelta;
 
         if (timeLeft <= 0) {
-            camera.setZTranslation(targetDistance);
+            camera.setCameraFOV(this.targetFov);
         } else {
-            double zTranslation = Math.min(camera.getZTranslation() + this.distanceDelta * timeDelta, targetDistance);
-            if (this.distanceToTravel < 0) {
-                zTranslation = Math.max(camera.getZTranslation() + this.distanceDelta * timeDelta, targetDistance);
+            double fovTranslation = Math.min(camera.getCameraFOV() + this.fovDelta * timeDelta, targetFov);
+            if (this.fovToTravel < 0) {
+                fovTranslation = Math.max(camera.getCameraFOV() + this.fovDelta * timeDelta, targetFov);
             }
-            camera.setZTranslation(zTranslation);
+            camera.setCameraFOV(fovTranslation);
         }
 
-        if (camera.getZTranslation() == this.targetDistance) {
+        if (camera.getCameraFOV() == this.targetFov) {
             this.isFinished = true;
             camera.updateCameraTransformation(true);
             Displayer.getSingletonInstance().render();
@@ -73,9 +75,10 @@ public class GL3DCameraZoomAnimation implements GL3DCameraAnimation {
         if (animation instanceof GL3DCameraZoomAnimation) {
             GL3DCameraZoomAnimation ani = (GL3DCameraZoomAnimation) animation;
             this.timeLeft = Math.min(2000, this.timeLeft / 5 + ani.timeLeft);
-            this.distanceToTravel += ani.distanceToTravel;
-            this.targetDistance = Math.min(GL3DCamera.MIN_DISTANCE, Math.max(GL3DCamera.MAX_DISTANCE, this.targetDistance + ani.distanceToTravel));
-            this.distanceDelta = this.distanceToTravel / this.timeLeft;
+            this.fovToTravel += ani.fovToTravel;
+            this.targetFov = Math.min(GL3DCamera.MAX_FOV, Math.max(GL3DCamera.MIN_FOV, this.targetFov + ani.fovToTravel));
+            System.out.println("EXTTARGET" + this.targetFov);
+            this.fovDelta = this.fovToTravel / this.timeLeft;
         }
     }
 

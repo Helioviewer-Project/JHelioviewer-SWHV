@@ -143,7 +143,7 @@ public class GL3DZoomBoxInteraction extends GL3DDefaultInteraction {
     private GL3DCameraZoomAnimation createZoomAnimation() {
 
         double halfWidth = Math.abs(this.zoomBoxEndPoint.x - this.zoomBoxStartPoint.x) / 2;
-        double halfFOVRad = Math.toRadians(camera.getFOV() / 2);
+        double halfFOVRad = Math.toRadians(camera.getCameraFOV() / 2);
         double distance = halfWidth * Math.sin(Math.PI / 2 - halfFOVRad) / Math.sin(halfFOVRad);
         distance = -distance - camera.getZTranslation();
 
