@@ -40,8 +40,8 @@ public class GL3DPositionLoading {
     private final GregorianCalendar calendar = new GregorianCalendar();
     private String beginDate = "2014-05-28T00:00:00";
     private String endDate = "2014-05-28T00:00:00";
-    private String target = "Earth";
-    private final String observer = "SUN";
+    private final String target = "Earth";
+    private String observer = "SUN";
     private final String baseUrl = "http://swhv.oma.be/position?";
     private final int deltat = 60 * 60 / 64; //1 hours by default
     private final ArrayList<GL3DPositionLoadingListener> listeners = new ArrayList<GL3DPositionLoadingListener>();
