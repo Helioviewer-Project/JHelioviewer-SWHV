@@ -10,12 +10,12 @@ import org.helioviewer.base.logging.Log;
 import org.helioviewer.base.physics.Astronomy;
 import org.helioviewer.base.physics.Constants;
 import org.helioviewer.gl3d.camera.GL3DPositionLoadingListener;
+import org.helioviewer.gl3d.camera.GL3DSpaceObject;
 import org.helioviewer.gl3d.scenegraph.GL3DState;
 import org.helioviewer.gl3d.scenegraph.math.GL3DMat4d;
 import org.helioviewer.gl3d.scenegraph.math.GL3DVec3d;
 import org.helioviewer.gl3d.scenegraph.math.GL3DVec4f;
 import org.helioviewer.gl3d.scenegraph.visuals.GL3DSphere;
-import org.helioviewer.gl3d.view.GL3DSceneGraphView;
 import org.helioviewer.jhv.layers.LayersListener;
 import org.helioviewer.jhv.layers.LayersModel;
 import org.helioviewer.viewmodel.changeevent.ChangeEvent;
@@ -34,31 +34,32 @@ public class Planet extends GL3DSphere implements LayersListener, ViewListener, 
     private Date beginDate;
     private Date endDate;
     private Date currentDate;
-    private final GL3DSceneGraphView sceneGraphView;
     private boolean loaded;
     private GL3DVec3d position;
+    private final GL3DSpaceObject spaceObject;
+    private final GL3DSpaceObject viewPoint;
 
-    public Planet(GL3DSceneGraphView sceneGraphView) {
+    public Planet(GL3DSpaceObject spaceObject, GL3DSpaceObject viewPoint) {
         //super(6052000 / Constants.SunRadiusInMeter, 10, 10, new GL3DVec4f(1.f, 0.f, 0.f, 1.f));
         super(2439700 / Constants.SunRadiusInMeter, 10, 10, new GL3DVec4f(1.f, 0.f, 0.f, 1.f));
         //super(173710000 / Constants.SunRadiusInMeter, 10, 10, new GL3DVec4f(1.f, 0.f, 0.f, 1.f));
-        this.sceneGraphView = sceneGraphView;
+        this.spaceObject = spaceObject;
+        this.viewPoint = viewPoint;
         positionLoading = new GL3DPositionLoadingPlanet();
         //positionLoading.setObserver("PROBA2");
-        positionLoading.setObserver("STEREO%20Ahead");
+        positionLoading.setObserver(viewPoint.getUrlName());
         //positionLoading.setObserver("SDO");
         positionLoading.setTarget("SUN");
         positionLoadingalt = new GL3DPositionLoadingPlanet();
         //positionLoadingalt.setObserver("PROBA2");
-        positionLoadingalt.setObserver("STEREO%20Ahead");
+        positionLoadingalt.setObserver(viewPoint.getUrlName());
         //positionLoadingalt.setObserver("SDO");
         //positionLoadingalt.setTarget("Venus");
-        positionLoadingalt.setTarget("Mercury");
+        positionLoadingalt.setTarget(spaceObject.getUrlName());
         //positionLoading.setTarget("Moon");
 
         positionLoading.requestData();
-        this.sceneGraphView.addViewListener(this);
-        LayersModel.getSingletonInstance().addLayersListener(this);
+        this.layerAdded(0);
 
     }
 
@@ -193,5 +194,10 @@ public class Planet extends GL3DSphere implements LayersListener, ViewListener, 
 
     @Override
     public void fireNewDate() {
+    }
+
+    @Override
+    public String toString() {
+        return spaceObject.toString() + " as seen from " + viewPoint.toString();
     }
 }

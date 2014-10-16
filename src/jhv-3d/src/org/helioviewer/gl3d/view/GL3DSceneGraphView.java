@@ -28,7 +28,6 @@ import org.helioviewer.gl3d.scenegraph.math.GL3DVec3d;
 import org.helioviewer.gl3d.scenegraph.math.GL3DVec4f;
 import org.helioviewer.gl3d.scenegraph.rt.GL3DRayTracer;
 import org.helioviewer.gl3d.scenegraph.visuals.GL3DArrow;
-import org.helioviewer.gl3d.spaceobjects.Planet;
 import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.viewmodel.changeevent.ChangeEvent;
 import org.helioviewer.viewmodel.changeevent.LayerChangedReason;
@@ -82,25 +81,25 @@ public class GL3DSceneGraphView extends AbstractGL3DView implements GL3DView {
         }, KeyEvent.VK_B);
         /*
          * GL3DKeyController.getInstance().addListener(new GL3DKeyListener() {
-         * 
+         *
          * @Override public void keyHit(KeyEvent e) {
          * root.getDrawBits().toggle(Bit.Wireframe);
          * Displayer.getSingletonInstance().display();
          * Log.debug("Toggling Wireframe"); } }, KeyEvent.VK_W);
-         * 
+         *
          * GL3DKeyController.getInstance().addListener(new GL3DKeyListener() {
-         * 
+         *
          * @Override public void keyHit(KeyEvent e) {
          * root.getDrawBits().toggle(Bit.Normals);
          * Displayer.getSingletonInstance().display();
          * Log.debug("Toggling Normals"); } }, KeyEvent.VK_N);
          * GL3DKeyController.getInstance().addListener(new GL3DKeyListener() {
-         * 
+         *
          * @Override public void keyHit(KeyEvent e) {
          * Displayer.getSingletonInstance().display();
          * Log.debug("Toggling Framebuffer"); } }, KeyEvent.VK_F);
          * GL3DKeyController.getInstance().addListener(new GL3DKeyListener() {
-         * 
+         *
          * @Override public void keyHit(KeyEvent e) {
          * imageLayers.getDrawBits().toggle(Bit.Hidden);
          * Displayer.getSingletonInstance().display();
@@ -342,10 +341,6 @@ public class GL3DSceneGraphView extends AbstractGL3DView implements GL3DView {
         south.modelView().rotate(Math.PI / 2, GL3DVec3d.XAxis);
         indicatorArrows.addNode(south);
 
-        GL3DGroup planets = new GL3DModel("Planets", "Planets");
-        planets.addNode(new Planet(this));
-        root.addNode(planets);
-
         return root;
     }
 
@@ -382,7 +377,7 @@ public class GL3DSceneGraphView extends AbstractGL3DView implements GL3DView {
         /*
          * GL3DNode sibling = node; while((sibling = sibling.getNext()) != null)
          * { for(int i=0; i<level; ++i) System.out.print("   ");
-         *
+         * 
          * System.out.println("Sibling: " + sibling.getClass().getName() + " ("
          * + node.getName() + ")"); }
          */
