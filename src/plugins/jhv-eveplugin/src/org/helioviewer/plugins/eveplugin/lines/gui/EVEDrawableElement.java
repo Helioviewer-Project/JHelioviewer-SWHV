@@ -91,7 +91,7 @@ public class EVEDrawableElement implements DrawableElement {
 
                     if (value == null) {
                         if (counter > 1) {
-                            graphPolylines.add(new GraphPolyline(pointList, bands[i].getGraphColor(), warnLevels, warnLabels));
+                            graphPolylines.add(new GraphPolyline(pointList, bands[i].getGraphColor(), warnLevels, warnLabels, ratioX));
                         }
 
                         pointList.clear();
@@ -109,7 +109,7 @@ public class EVEDrawableElement implements DrawableElement {
                 }
 
                 if (counter > 0) {
-                    graphPolylines.add(new GraphPolyline(pointList, bands[i].getGraphColor(), warnLevels, warnLabels));
+                    graphPolylines.add(new GraphPolyline(pointList, bands[i].getGraphColor(), warnLevels, warnLabels, ratioX));
                 }
             }
         }
@@ -162,11 +162,14 @@ public class EVEDrawableElement implements DrawableElement {
 
         public final Color color;
 
+        private final double ratioX;
+
         // //////////////////////////////////////////////////////////////////////////
         // Methods
         // //////////////////////////////////////////////////////////////////////////
 
-        public GraphPolyline(final List<Point> points, final Color color, final List<Integer> warnLevels, final List<String> warnLabels) {
+        public GraphPolyline(final List<Point> points, final Color color, final List<Integer> warnLevels, final List<String> warnLabels,
+                double ratioX) {
             numberOfPoints = points.size();
             numberOfWarnLevels = warnLevels.size();
             xPoints = new ArrayList<ArrayList<Integer>>();
@@ -176,12 +179,12 @@ public class EVEDrawableElement implements DrawableElement {
             this.color = color;
             this.warnLevels = new int[numberOfWarnLevels];
             this.warnLabels = new String[numberOfWarnLevels];
-
+            this.ratioX = ratioX;
             int counter = -1;
 
             Integer previousX = null;
             for (final Point point : points) {
-                if (previousX == null || (point.x - previousX) > 120000) {
+                if (previousX == null || (point.x - previousX) / ratioX > 120000) {
                     xPoints.add(new ArrayList<Integer>());
                     yPoints.add(new ArrayList<Integer>());
                     counter++;
