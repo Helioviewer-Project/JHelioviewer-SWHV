@@ -85,8 +85,11 @@ public abstract class GL3DCameraOptionPanel extends JPanel implements ActionList
             public void itemStateChanged(ItemEvent e) {
                 if (e.getStateChange() == ItemEvent.DESELECTED) {
                     camera.getGrid().getDrawBits().on(Bit.Hidden);
+                    camera.getFollowGrid().getDrawBits().on(Bit.Hidden);
+
                 } else {
                     camera.getGrid().getDrawBits().off(Bit.Hidden);
+                    camera.getFollowGrid().getDrawBits().off(Bit.Hidden);
                 }
                 Displayer.getSingletonInstance().display();
 

@@ -140,7 +140,7 @@ public class GL3DTestCamera extends GL3DCamera {
     }
 
     @Override
-    public void setGrid(GL3DGrid grid) {
+    public void setGrid(GL3DGrid grid, GL3DGrid followGrid) {
         // TODO Auto-generated method stub
 
     }
