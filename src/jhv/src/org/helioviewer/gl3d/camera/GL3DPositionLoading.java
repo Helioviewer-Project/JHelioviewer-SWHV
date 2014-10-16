@@ -62,6 +62,8 @@ public class GL3DPositionLoading {
             public void run() {
                 try {
                     buildRequestURL();
+                    System.out.println(url);
+
                     DownloadStream ds = new DownloadStream(url.toURI(), 30000, 30000, true);
                     Reader reader = new BufferedReader(new InputStreamReader(ds.getInput(), "UTF-8"));
                     if (!ds.getResponse400()) {
@@ -132,6 +134,7 @@ public class GL3DPositionLoading {
     public void setBeginDate(Date beginDate) {
         this.beginDate = this.format.format(beginDate);
         this.beginDatems = beginDate;
+        System.out.println(beginDate);
         applyChanges();
     }
 
@@ -149,12 +152,16 @@ public class GL3DPositionLoading {
     public void setEndDate(Date endDate) {
         this.endDate = this.format.format(endDate);
         this.endDatems = endDate;
+        System.out.println("ENDDATE" + endDate);
+
         applyChanges();
     }
 
     public void setEndDate(long endDate) {
         this.endDate = this.format.format(new Date(endDate));
         this.endDatems = new Date(endDate);
+        System.out.println("ENDDATE" + endDate);
+
         applyChanges();
     }
 
