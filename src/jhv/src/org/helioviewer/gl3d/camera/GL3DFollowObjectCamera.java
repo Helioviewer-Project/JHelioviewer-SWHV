@@ -96,7 +96,7 @@ public class GL3DFollowObjectCamera extends GL3DSolarRotationTrackingTrackballCa
                     currentCameraTime = t4;
                 }
                 this.fireCameratTime(new Date(currentCameraTime));
-                GL3DVec3d position = this.positionLoading.getInterpolatedPosition(currentCameraTime);
+                GL3DVec3d position = this.positionLoading.getInterpolatedPosition(currentCameraTime - 500 * 1000);
                 currentL = position.y;
                 currentB = -position.z;
                 currentDistance = position.x;
@@ -130,7 +130,8 @@ public class GL3DFollowObjectCamera extends GL3DSolarRotationTrackingTrackballCa
             newRotation.rotate(GL3DQuatd.createRotation(-currentB, new GL3DVec3d(1, 0, 0)));
             newRotation.rotate(GL3DQuatd.createRotation(this.currentRotation, new GL3DVec3d(0, 1, 0)));
             this.setLocalRotation(newRotation);
-            this.setRatio(lratio);
+            System.out.println("currentDistance " + currentDistance);
+            this.setZTranslation(-currentDistance);
             this.updateCameraTransformation();
         }
     }
@@ -174,7 +175,7 @@ public class GL3DFollowObjectCamera extends GL3DSolarRotationTrackingTrackballCa
     }
 
     public void setObservingObject(String object) {
-        this.positionLoading.setObservingObject(object);
+        this.positionLoading.setTarget(object);
     }
 
     public void setFOVangleDegrees(double fovAngle) {

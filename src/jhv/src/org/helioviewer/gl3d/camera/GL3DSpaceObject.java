@@ -15,7 +15,7 @@ public class GL3DSpaceObject {
     }
 
     private static void createObjectList() {
-        objectList = new GL3DSpaceObject[14];
+        objectList = new GL3DSpaceObject[15];
 
         objectList[0] = new GL3DSpaceObject("Mercury", "Mercury");
         objectList[1] = new GL3DSpaceObject("Venus", "Venus");
@@ -36,6 +36,8 @@ public class GL3DSpaceObject {
         objectList[12] = new GL3DSpaceObject("Solar%20Orbiter", "Solar Orbiter");
 
         objectList[13] = new GL3DSpaceObject("CHURYUMOV-GERASIMENKO", "67P/Churyumov-Gerasimenko");
+        objectList[13] = new GL3DSpaceObject("SDO", "SDO");
+
     }
 
     private GL3DSpaceObject(String urlName, String labelName) {

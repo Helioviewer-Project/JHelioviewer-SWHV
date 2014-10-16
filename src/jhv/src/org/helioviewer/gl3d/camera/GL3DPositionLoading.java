@@ -41,6 +41,7 @@ public class GL3DPositionLoading {
     private final String observer = "SUN";
     private final String baseUrl = "http://swhv.oma.be/position?";
     private final int deltat = 60 * 60 * 6; //6 hours by default
+    private final int deltat = 60 * 60; //1 hours by default
     private final ArrayList<GL3DPositionLoadingListener> listeners = new ArrayList<GL3DPositionLoadingListener>();
     private Date beginDatems;
     private Date endDatems;
@@ -50,7 +51,7 @@ public class GL3DPositionLoading {
 
     private void buildRequestURL() {
         try {
-            url = new URL(baseUrl + "utc=" + this.beginDate + "&utc_end=" + this.endDate + "&deltat=" + deltat + "&observer=" + observer + "&target=" + target + "&ref=HEEQ&kind=latitudinal");
+            url = new URL(baseUrl + "abcorr=XLT%2BS&utc=" + this.beginDate + "&utc_end=" + this.endDate + "&deltat=" + deltat + "&observer=" + observer + "&target=" + target + "&ref=HEEQ&kind=latitudinal");
         } catch (MalformedURLException e) {
             Log.error("A wrong url is given.", e);
         }
@@ -200,10 +201,14 @@ public class GL3DPositionLoading {
             GL3DVec3d vec = new GL3DVec3d(dist, hgln, hglt);
             return vec;
         } else {
-            double interpolatedIndex = (1. * (currentCameraTime - t3) / (t4 - t3) * this.positionDateTime.length);
+            double interpolatedIndex = (1. * (currentCameraTime - 500 * 1000 - t3) / (t4 - t3) * this.positionDateTime.length);
             int i = (int) interpolatedIndex;
             i = Math.min(i, this.positionDateTime.length - 1);
+            if (i < 0) {
+                i = 0;
+            }
             int inext = Math.min(i + 1, this.positionDateTime.length - 1);
+
             double alpha = 1. - interpolatedIndex % 1.;
             double hgln = alpha * this.positionDateTime[i].getPosition().y + (1 - alpha) * this.positionDateTime[inext].getPosition().y;
             double hglt = alpha * this.positionDateTime[i].getPosition().z + (1 - alpha) * this.positionDateTime[inext].getPosition().z;
@@ -214,8 +219,9 @@ public class GL3DPositionLoading {
         }
     }
 
-    public void setObservingObject(String object) {
+    public void setTarget(String object) {
         this.target = object;
         this.applyChanges();
     }
+
 }
