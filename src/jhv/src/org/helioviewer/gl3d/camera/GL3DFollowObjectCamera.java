@@ -97,7 +97,7 @@ public class GL3DFollowObjectCamera extends GL3DSolarRotationTrackingTrackballCa
                 }
                 currentCameraTime = timestampReason.getNewDateTime().getMillis();
                 this.fireCameratTime(new Date(currentCameraTime));
-                GL3DVec3d position = this.positionLoading.getInterpolatedPosition(currentCameraTime + 500000);
+                GL3DVec3d position = this.positionLoading.getInterpolatedPosition(currentCameraTime);
                 currentL = position.y;
                 currentB = -position.z;
                 currentDistance = position.x;

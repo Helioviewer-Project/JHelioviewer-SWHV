@@ -40,7 +40,7 @@ public class GL3DPositionLoadingPlanet {
     private String target = "Earth";
     private String observer = "SUN";
     private final String baseUrl = "http://127.0.0.1:7789/position?";
-    private final int deltat = 60 * 60 / 2; //1 hours by default
+    private final int deltat = 60 * 60 / 4; //1 hours by default
     private final ArrayList<GL3DPositionLoadingListener> listeners = new ArrayList<GL3DPositionLoadingListener>();
     private Date beginDatems;
     private Date endDatems;
@@ -132,8 +132,8 @@ public class GL3DPositionLoadingPlanet {
     }
 
     public void setBeginDate(Date beginDate) {
-        this.beginDate = this.format.format(beginDate);
-        this.beginDatems = beginDate;
+        this.beginDate = this.format.format(new Date(beginDate.getTime() - 1000 * 60 * 60 * 24));
+        this.beginDatems = new Date(beginDate.getTime() - 1000 * 60 * 60 * 24);
         System.out.println(beginDate);
         applyChanges();
     }
@@ -144,22 +144,22 @@ public class GL3DPositionLoadingPlanet {
     }
 
     public void setBeginDate(long beginDate) {
-        this.beginDate = this.format.format(new Date(beginDate));
-        this.beginDatems = new Date(beginDate);
+        this.beginDate = this.format.format(new Date(beginDate - 1000 * 60 * 60 * 24));
+        this.beginDatems = new Date(beginDate - 1000 * 60 * 60 * 24);
         applyChanges();
     }
 
     public void setEndDate(Date endDate) {
-        this.endDate = this.format.format(endDate);
-        this.endDatems = endDate;
+        this.endDate = this.format.format(new Date(endDate.getTime() + 1000 * 60 * 60 * 24));
+        this.endDatems = new Date(endDate.getTime() + 1000 * 60 * 60 * 24);
         System.out.println("ENDDATE" + endDate);
 
         applyChanges();
     }
 
     public void setEndDate(long endDate) {
-        this.endDate = this.format.format(new Date(endDate));
-        this.endDatems = new Date(endDate);
+        this.endDate = this.format.format(new Date(endDate + 1000 * 60 * 60 * 24));
+        this.endDatems = new Date(endDate + 1000 * 60 * 60 * 24);
         System.out.println("ENDDATE" + endDate);
 
         applyChanges();
@@ -218,11 +218,9 @@ public class GL3DPositionLoadingPlanet {
 
     public void setTarget(String object) {
         this.target = object;
-        this.applyChanges();
     }
 
     public void setObserver(String object) {
         this.observer = object;
-        this.applyChanges();
     }
 }
