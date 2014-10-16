@@ -48,6 +48,9 @@ public class HelioviewerPositionedMetaData extends HelioviewerMetaData implement
         this.carringtonAvailable = this.crlt != 0.0 || this.crln != 0.0;
 
         this.stonyhurstLatitude = metaDataContainer.tryGetDouble("HGLT_OBS");
+        if (this.stonyhurstLatitude == 0) {
+            this.stonyhurstLatitude = this.crlt;
+        }
         this.stonyhurstLongitude = metaDataContainer.tryGetDouble("HGLN_OBS");
         this.stonyhurstAvailable = this.stonyhurstLatitude != 0.0 || this.stonyhurstLongitude != 0.0;
     }

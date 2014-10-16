@@ -16,9 +16,9 @@ import org.helioviewer.gl3d.plugin.GL3DPluginConfiguration;
 /**
  * A static plugin configuration that includes the three internal plugins - PFSS
  * - Vectors - HEK 3d-Plugin
- * 
+ *
  * @author Julian Fisch (julian.fisch@fhnw.ch)
- * 
+ *
  */
 public class GL3DInternalPluginConfiguration implements GL3DPluginConfiguration {
 
@@ -43,7 +43,7 @@ public class GL3DInternalPluginConfiguration implements GL3DPluginConfiguration 
          * "org.helioviewer.gl3d.plugin.hekplugin.HEKPlugin")); entries.add(new
          * PluginEntry("C:\\Projects\\JHelioViewer\\pfss_plugin.jar",
          * "org.helioviewer.gl3d.plugin.pfss.PfssPlugin"));
-         * 
+         *
          * for(PluginEntry entry : entries) { GL3DModelPlugin p =
          * loadPlugin(entry.path, entry.clazz); if(p != null && p instanceof
          * GL3DModelPlugin) plugins.add((GL3DModelPlugin) p); }
@@ -77,11 +77,6 @@ public class GL3DInternalPluginConfiguration implements GL3DPluginConfiguration 
         // File hek = new
         // File("C:\\Users\\jf\\Documents\\FHNW\\projects\\hekplugin-3d\\trunk\\bin\\");
         File hek = new File("C:\\Projects\\JHelioViewer\\hekplugin-3d\\hek3d.jar");
-
-        if (hek.exists())
-            System.out.println("EXISTS ========================================================================================");
-        else
-            System.out.println("NOT EXISTS ========================================================================================");
 
         /*
          * try { //urls[0] = pfss.toURL(); //urls[1] = vectors.toURL();

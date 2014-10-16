@@ -129,6 +129,10 @@ public class GL3DFollowObjectCamera extends GL3DSolarRotationTrackingTrackballCa
             this.currentRotation = (-currentL + Astronomy.getL0Radians(new Date(currentCameraTime))) % (Math.PI * 2.0);
             GL3DQuatd newRotation = GL3DQuatd.createRotation(0., new GL3DVec3d(0, 1, 0));
             newRotation.rotate(GL3DQuatd.createRotation(-currentB, new GL3DVec3d(1, 0, 0)));
+            System.out.print("hpB" + currentB);
+            System.out.print("hpL" + currentL);
+            System.out.println("hpDOBS" + currentDistance);
+
             newRotation.rotate(GL3DQuatd.createRotation(this.currentRotation, new GL3DVec3d(0, 1, 0)));
             this.setLocalRotation(newRotation);
             this.setZTranslation(-currentDistance);
@@ -175,7 +179,7 @@ public class GL3DFollowObjectCamera extends GL3DSolarRotationTrackingTrackballCa
     }
 
     public void setObservingObject(String object) {
-        this.positionLoading.setTarget(object);
+        this.positionLoading.setObserver(object);
     }
 
     public void setFOVangleDegrees(double fovAngle) {

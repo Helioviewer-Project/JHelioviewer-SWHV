@@ -49,7 +49,6 @@ public abstract class GL3DDefaultInteraction extends GL3DInteraction {
             pos = 1.;
         }
         double fovDistance = -camera.getCameraFOV() / 2 * GL3DDefaultInteraction.ZOOM_WHEEL_FACTOR * pos;
-        System.out.println(fovDistance);
         camera.addCameraAnimation(new GL3DCameraZoomAnimation(fovDistance));
     }
 }

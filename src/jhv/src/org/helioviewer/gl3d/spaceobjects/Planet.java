@@ -11,6 +11,7 @@ import org.helioviewer.base.physics.Astronomy;
 import org.helioviewer.base.physics.Constants;
 import org.helioviewer.gl3d.camera.GL3DPositionLoadingListener;
 import org.helioviewer.gl3d.camera.GL3DSpaceObject;
+import org.helioviewer.gl3d.scenegraph.GL3DDrawBits.Bit;
 import org.helioviewer.gl3d.scenegraph.GL3DState;
 import org.helioviewer.gl3d.scenegraph.math.GL3DMat4d;
 import org.helioviewer.gl3d.scenegraph.math.GL3DVec3d;
@@ -41,8 +42,8 @@ public class Planet extends GL3DSphere implements LayersListener, ViewListener, 
 
     public Planet(GL3DSpaceObject spaceObject, GL3DSpaceObject viewPoint) {
         //super(6052000 / Constants.SunRadiusInMeter, 10, 10, new GL3DVec4f(1.f, 0.f, 0.f, 1.f));
-        super(2439700 / Constants.SunRadiusInMeter, 10, 10, new GL3DVec4f(1.f, 0.f, 0.f, 1.f));
-        //super(173710000 / Constants.SunRadiusInMeter, 10, 10, new GL3DVec4f(1.f, 0.f, 0.f, 1.f));
+        //super(2439700 / Constants.SunRadiusInMeter, 10, 10, new GL3DVec4f(1.f, 0.f, 0.f, 1.f));
+        super(spaceObject.getSize() / Constants.SunRadiusInMeter, 10, 10, new GL3DVec4f(1.f, 0.f, 0.f, 1.f));
         this.spaceObject = spaceObject;
         this.viewPoint = viewPoint;
         positionLoading = new GL3DPositionLoadingPlanet();
@@ -60,6 +61,7 @@ public class Planet extends GL3DSphere implements LayersListener, ViewListener, 
 
         positionLoading.requestData();
         this.layerAdded(0);
+        this.drawBits.set(Bit.Wireframe, true);
 
     }
 
