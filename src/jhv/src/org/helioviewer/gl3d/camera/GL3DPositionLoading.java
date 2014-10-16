@@ -50,7 +50,7 @@ public class GL3DPositionLoading {
 
     private void buildRequestURL() {
         try {
-            url = new URL(baseUrl + "abcorr=XLT%2BS&utc=" + this.beginDate + "&utc_end=" + this.endDate + "&deltat=" + deltat + "&observer=" + observer + "&target=" + target + "&ref=HEEQ&kind=latitudinal");
+            url = new URL(baseUrl + "abcorr=LT%2BS&utc=" + this.beginDate + "&utc_end=" + this.endDate + "&deltat=" + deltat + "&observer=" + target + "&target=" + observer + "&ref=HEEQ&kind=latitudinal");
         } catch (MalformedURLException e) {
             Log.error("A wrong url is given.", e);
         }
@@ -111,8 +111,8 @@ public class GL3DPositionLoading {
                 calendar.setTime(date);
                 JSONArray positionArray = ithObject.getJSONArray("val");
                 double x = positionArray.getDouble(0);
-                double y = positionArray.getDouble(1);
-                double z = positionArray.getDouble(2);
+                double y = (Math.PI + positionArray.getDouble(1)) % (2. * Math.PI);
+                double z = -positionArray.getDouble(2);
                 GL3DVec3d vec = new GL3DVec3d(x, y, z);
                 positionDateTimehelper[i] = new GL3DPositionDateTime(calendar.getTimeInMillis(), vec);
             }
