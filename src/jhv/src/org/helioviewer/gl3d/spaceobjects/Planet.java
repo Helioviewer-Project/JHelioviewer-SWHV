@@ -174,7 +174,6 @@ public class Planet extends GL3DSphere implements LayersListener, ViewListener, 
             this.wm = (this.m);
             state.buildInverseAndNormalMatrix();
             this.wmI = new GL3DMat4d(state.getMVInverse());
-            //this.shapeUpdate(state);
             state.popMV();
         }
     }

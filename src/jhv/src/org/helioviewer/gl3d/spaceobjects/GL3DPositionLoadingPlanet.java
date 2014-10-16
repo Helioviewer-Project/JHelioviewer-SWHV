@@ -107,7 +107,6 @@ public class GL3DPositionLoadingPlanet {
 
             @Override
             public void process(List<Integer> chunks) {
-                System.out.println("sdfs" + url);
             }
 
             public void finished() {
@@ -123,8 +122,6 @@ public class GL3DPositionLoadingPlanet {
     private void setLoaded(boolean isLoaded) {
         this.isLoaded = isLoaded;
         this.fireLoaded(this.LOADEDSTATE);
-        Log.error("SETLOAD" + isLoaded);
-        Thread.dumpStack();
     }
 
     private void parseData(JSONArray jsonResult) {
