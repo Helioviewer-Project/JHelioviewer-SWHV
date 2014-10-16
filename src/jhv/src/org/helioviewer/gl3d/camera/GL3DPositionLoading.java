@@ -195,7 +195,7 @@ public class GL3DPositionLoading {
             GL3DVec3d vec = new GL3DVec3d(dist, hgln, hglt);
             return vec;
         } else {
-            double interpolatedIndex = (1. * (currentCameraTime - 500 * 1000 - t3) / (t4 - t3) * this.positionDateTime.length);
+            double interpolatedIndex = (1. * (currentCameraTime - t3) / (t4 - t3) * this.positionDateTime.length);
             int i = (int) interpolatedIndex;
             i = Math.min(i, this.positionDateTime.length - 1);
             if (i < 0) {
