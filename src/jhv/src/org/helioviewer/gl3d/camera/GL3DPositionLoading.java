@@ -13,6 +13,9 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.GregorianCalendar;
+import java.util.List;
+
+import javax.swing.SwingWorker;
 
 import org.helioviewer.base.DownloadStream;
 import org.helioviewer.base.logging.Log;
@@ -44,6 +47,7 @@ public class GL3DPositionLoading {
     private final ArrayList<GL3DPositionLoadingListener> listeners = new ArrayList<GL3DPositionLoadingListener>();
     private Date beginDatems = new Date(0);
     private Date endDatems = new Date();
+    private SwingWorker<Integer, Integer> worker;
 
     public GL3DPositionLoading() {
     }
@@ -57,10 +61,14 @@ public class GL3DPositionLoading {
     }
 
     public void requestData() {
-        long now = System.currentTimeMillis();
-        Thread loadData = new Thread(new Runnable() {
+        if (worker != null && !worker.isDone()) {
+            worker.cancel(true);
+        }
+        worker = new SwingWorker<Integer, Integer>() {
+            private final String report = null;
+
             @Override
-            public void run() {
+            protected Integer doInBackground() throws Exception {
                 try {
                     buildRequestURL();
                     if (endDatems.getTime() - beginDatems.getTime() < 1000 * 60 * 60 * 24 * 20) {
@@ -89,11 +97,21 @@ public class GL3DPositionLoading {
                 } catch (URISyntaxException e) {
                     fireLoaded(FAILEDSTATE + ": wrong URI");
                 }
-
+                return 1;
             }
 
-        });
-        loadData.start();
+            @Override
+            public void process(List<Integer> chunks) {
+            }
+
+            public void finished() {
+                if (report != null) {
+                    fireLoaded(report);
+                }
+
+            }
+        };
+        worker.execute();
     }
 
     private void setLoaded(boolean isLoaded) {
