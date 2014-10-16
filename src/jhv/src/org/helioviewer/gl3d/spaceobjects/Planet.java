@@ -7,6 +7,7 @@ import java.util.Date;
 import java.util.List;
 
 import org.helioviewer.base.logging.Log;
+import org.helioviewer.base.math.MathUtils;
 import org.helioviewer.base.physics.Astronomy;
 import org.helioviewer.base.physics.Constants;
 import org.helioviewer.gl3d.camera.GL3DPositionLoading;
@@ -22,7 +23,10 @@ import org.helioviewer.jhv.layers.LayersListener;
 import org.helioviewer.jhv.layers.LayersModel;
 import org.helioviewer.viewmodel.changeevent.ChangeEvent;
 import org.helioviewer.viewmodel.changeevent.TimestampChangedReason;
+import org.helioviewer.viewmodel.metadata.HelioviewerPositionedMetaData;
+import org.helioviewer.viewmodel.metadata.MetaData;
 import org.helioviewer.viewmodel.view.LinkedMovieManager;
+import org.helioviewer.viewmodel.view.MetaDataView;
 import org.helioviewer.viewmodel.view.TimedMovieView;
 import org.helioviewer.viewmodel.view.View;
 import org.helioviewer.viewmodel.view.ViewListener;
@@ -152,7 +156,25 @@ public class Planet extends GL3DSphere implements LayersListener, ViewListener, 
 
     @Override
     public void update(GL3DState state) {
+        double addb0 = 0.;
+        if (LayersModel.getSingletonInstance().getActiveView() != null) {
+            MetaDataView mdv = LayersModel.getSingletonInstance().getActiveView().getAdapter(MetaDataView.class);
 
+            if (mdv != null) {
+                MetaData metadata = mdv.getMetaData();
+                if (metadata instanceof HelioviewerPositionedMetaData) {
+                    HelioviewerPositionedMetaData hvMetadata = (HelioviewerPositionedMetaData) metadata;
+                    if (!hvMetadata.isStonyhurstProvided()) {
+                        addb0 = Astronomy.getB0InRadians(this.currentDate);
+                    } else {
+                        addb0 = hvMetadata.getStonyhurstLatitude() / MathUtils.radeg;
+                    }
+
+                } else {
+                    addb0 = Astronomy.getB0InRadians(this.currentDate);
+                }
+            }
+        }
         System.out.println("UPDATE");
         if (!this.isInitialised) {
             this.init(state);
@@ -168,9 +190,9 @@ public class Planet extends GL3DSphere implements LayersListener, ViewListener, 
             double currentRotation = Astronomy.getL0Radians(currentDate);
             this.m.rotate(-currentRotation, new GL3DVec3d(0, 1, 0));
 
-            this.m.rotate(-Astronomy.getB0InRadians(this.currentDate), new GL3DVec3d(1., 0., 0.));
+            this.m.rotate(-addb0, new GL3DVec3d(1., 0., 0.));
 
-            this.m.rotate(-position.z + Astronomy.getB0InRadians(this.currentDate), new GL3DVec3d(1., 0., 0.));
+            this.m.rotate(-position.z + addb0, new GL3DVec3d(1., 0., 0.));
 
             this.m.rotate(position.y, new GL3DVec3d(0., 1., 0.));
 
