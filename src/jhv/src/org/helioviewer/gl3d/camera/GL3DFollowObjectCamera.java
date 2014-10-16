@@ -9,6 +9,7 @@ import org.helioviewer.gl3d.scenegraph.GL3DDrawBits.Bit;
 import org.helioviewer.gl3d.scenegraph.math.GL3DQuatd;
 import org.helioviewer.gl3d.scenegraph.math.GL3DVec3d;
 import org.helioviewer.gl3d.view.GL3DSceneGraphView;
+import org.helioviewer.jhv.layers.LayersListener;
 import org.helioviewer.jhv.layers.LayersModel;
 import org.helioviewer.viewmodel.changeevent.ChangeEvent;
 import org.helioviewer.viewmodel.changeevent.TimestampChangedReason;
@@ -16,8 +17,11 @@ import org.helioviewer.viewmodel.view.LinkedMovieManager;
 import org.helioviewer.viewmodel.view.TimedMovieView;
 import org.helioviewer.viewmodel.view.View;
 import org.helioviewer.viewmodel.view.ViewListener;
+import org.helioviewer.viewmodel.view.cache.DateTimeCache;
+import org.helioviewer.viewmodel.view.jp2view.JHVJPXView;
+import org.helioviewer.viewmodel.view.jp2view.datetime.ImmutableDateTime;
 
-public class GL3DFollowObjectCamera extends GL3DSolarRotationTrackingTrackballCamera implements ViewListener, GL3DPositionLoadingListener {
+public class GL3DFollowObjectCamera extends GL3DSolarRotationTrackingTrackballCamera implements ViewListener, GL3DPositionLoadingListener, LayersListener {
 
     private Date currentDate = null;
     private double currentRotation = 0.0;
@@ -26,6 +30,13 @@ public class GL3DFollowObjectCamera extends GL3DSolarRotationTrackingTrackballCa
     GL3DCameraFOV cameraFOV;
     private final GL3DPositionLoading positionLoading;
     private double FOVangle;
+    private double currentL = 0.;
+    private double currentB = 0.;
+    private double currentDistance = Constants.SunMeanDistanceToEarth / Constants.SunRadius;
+
+    private long currentCameraTime;
+    private double lratio;
+    private boolean interpolation;
 
     public GL3DFollowObjectCamera(GL3DSceneGraphView sceneGraphView) {
         super(sceneGraphView);
@@ -64,18 +75,6 @@ public class GL3DFollowObjectCamera extends GL3DSolarRotationTrackingTrackballCa
     public String getName() {
         return "Follow Object Camera";
     }
-
-    int i = 0;
-
-    private double currentL = 0.;
-
-    private double currentB = 0.;
-
-    private double currentDistance = Constants.SunRadius;
-
-    private long currentCameraTime;
-    private double lratio;
-    private boolean interpolation;
 
     @Override
     public void viewChanged(View sender, ChangeEvent aEvent) {
@@ -131,10 +130,6 @@ public class GL3DFollowObjectCamera extends GL3DSolarRotationTrackingTrackballCa
             this.currentRotation = (-currentL + Astronomy.getL0Radians(new Date(currentCameraTime))) % (Math.PI * 2.0);
             GL3DQuatd newRotation = GL3DQuatd.createRotation(0., new GL3DVec3d(0, 1, 0));
             newRotation.rotate(GL3DQuatd.createRotation(-currentB, new GL3DVec3d(1, 0, 0)));
-            System.out.print("hpB" + currentB);
-            System.out.print("hpL" + currentL);
-            System.out.println("hpDOBS" + currentDistance);
-
             newRotation.rotate(GL3DQuatd.createRotation(this.currentRotation, new GL3DVec3d(0, 1, 0)));
             this.setLocalRotation(newRotation);
             this.setZTranslation(-currentDistance);
@@ -191,6 +186,58 @@ public class GL3DFollowObjectCamera extends GL3DSolarRotationTrackingTrackballCa
 
     public void setInterpolation(boolean interpolation) {
         this.interpolation = interpolation;
+    }
+
+    @Override
+    public void layerAdded(int idx) {
+    }
+
+    @Override
+    public void layerRemoved(View oldView, int oldIdx) {
+    }
+
+    @Override
+    public void layerChanged(int idx) {
+    }
+
+    @Override
+    public void activeLayerChanged(int idx) {
+        if (!this.interpolation) {
+            View nextView = LayersModel.getSingletonInstance().getLayer(idx);
+            JHVJPXView jpxView = nextView.getAdapter(JHVJPXView.class);
+            if (jpxView != null) {
+                DateTimeCache dtc = jpxView.getDateTimeCache();
+                Date beginDate = null;
+                Date endDate = null;
+                for (int frame = 0; frame < jpxView.getMaximumFrameNumber(); frame++) {
+                    ImmutableDateTime date = dtc.getDateTime(frame);
+                    if (beginDate == null || date.getTime().getTime() < beginDate.getTime()) {
+                        beginDate = date.getTime();
+                    }
+                    if (endDate == null || date.getTime().getTime() > endDate.getTime()) {
+                        endDate = date.getTime();
+                    }
+                }
+                this.positionLoading.setBeginDate(beginDate);
+                this.positionLoading.setEndDate(endDate);
+            }
+        }
+    }
+
+    @Override
+    public void viewportGeometryChanged() {
+    }
+
+    @Override
+    public void timestampChanged(int idx) {
+    }
+
+    @Override
+    public void subImageDataChanged() {
+    }
+
+    @Override
+    public void layerDownloaded(int idx) {
     }
 
 }
