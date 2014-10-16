@@ -21,7 +21,7 @@ public class GL3DSpaceObject {
         objectList = new GL3DSpaceObject[16];
 
         objectList[0] = new GL3DSpaceObject("Mercury", "Mercury", 2439700);
-        objectList[1] = new GL3DSpaceObject("Venus", "Venus", 6052000);
+        objectList[1] = new GL3DSpaceObject("Venus", "Venus", 6051800);
 
         objectList[2] = new GL3DSpaceObject("Earth", "Earth", 6371000);
         earth = objectList[2];
@@ -32,7 +32,7 @@ public class GL3DSpaceObject {
         objectList[6] = new GL3DSpaceObject("Saturn%20Barycenter", "Saturn", 58232000);
         objectList[7] = new GL3DSpaceObject("Uranus%20Barycenter", "Uranus", 25362000);
         objectList[8] = new GL3DSpaceObject("Neptune%20Barycenter", "Neptune", 24622000);
-        objectList[9] = new GL3DSpaceObject("Pluto%20Barycenter", "Pluto", 1184000);
+        objectList[9] = new GL3DSpaceObject("Pluto%20Barycenter", "Pluto", 1195000);
 
         objectList[10] = new GL3DSpaceObject("STEREO%20Ahead", "STEREO Ahead", 2);
         objectList[11] = new GL3DSpaceObject("STEREO%20Behind", "STEREO Behind", 2);
