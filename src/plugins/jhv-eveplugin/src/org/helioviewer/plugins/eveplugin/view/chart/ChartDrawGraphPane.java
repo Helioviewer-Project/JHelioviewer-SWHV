@@ -134,7 +134,7 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
     }
 
     private void redrawGraph() {
-        long start = System.currentTimeMillis();
+        // long start = System.currentTimeMillis();
         int width = getWidth();
         int height = getHeight();
         if (width > 0 && height > 0 && ChartConstants.GRAPH_TOP_SPACE + ChartConstants.GRAPH_BOTTOM_SPACE + 1 < height
@@ -145,17 +145,21 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
             BufferedImage plotPart = screenImage.getSubimage(ChartConstants.GRAPH_LEFT_SPACE, ChartConstants.GRAPH_TOP_SPACE, width
                     - ChartConstants.GRAPH_LEFT_SPACE - ChartConstants.GRAPH_RIGHT_SPACE, height - ChartConstants.GRAPH_TOP_SPACE
                     - ChartConstants.GRAPH_BOTTOM_SPACE);
-            drawData(plotPart.createGraphics());
-            drawLabels(g);
+            drawData(plotPart.createGraphics(), g);
             drawZoomBox(g);
         }
         // Log.info("Run time: " + (System.currentTimeMillis() - start));
     }
 
-    private void drawData(Graphics2D g) {
+    private void drawData(Graphics2D chartg, Graphics2D plotG) {
         Map<DrawableType, Set<DrawableElement>> drawableElements = drawController.getDrawableElements(identifier);
         List<DrawableType> drawTypeList = DrawableType.getZOrderedList();
+        boolean labelsDrawn = false;
         for (DrawableType dt : drawTypeList) {
+            if ((dt != DrawableType.FULL_IMAGE) && !labelsDrawn) {
+                drawLabels(plotG);
+                labelsDrawn = true;
+            }
             Set<DrawableElement> del = drawableElements.get(dt);
             if (del != null) {
                 // Log.trace("Drawable element list is not null. Size is " +
@@ -164,7 +168,7 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
                     // Log.info("Drawable Elements size : " + del.size());
                     for (DrawableElement de : del) {
                         // Log.info("drawable element" + de);
-                        de.draw(g, plotArea);
+                        de.draw(chartg, plotArea);
                     }
                 }
             } else {
