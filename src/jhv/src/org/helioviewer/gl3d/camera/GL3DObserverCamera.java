@@ -36,8 +36,6 @@ public class GL3DObserverCamera extends GL3DSolarRotationTrackingTrackballCamera
     private Date currentDate = null;
     private double currentRotation = 0.0;
 
-    private long timediff;
-
     public GL3DObserverCamera(GL3DSceneGraphView sceneGraphView) {
         super(sceneGraphView);
     }
@@ -97,8 +95,7 @@ public class GL3DObserverCamera extends GL3DSolarRotationTrackingTrackballCamera
                     addb0 = Astronomy.getB0InRadians(cal);
                 }
             }
-
-            this.timediff = currentDate.getTime() / 1000 - Constants.referenceDate;
+            this.setTime(currentDate.getTime());
             this.currentRotation = Astronomy.getL0Radians(currentDate);
 
             this.getLocalRotation().clear();
