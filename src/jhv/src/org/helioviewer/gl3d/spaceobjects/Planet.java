@@ -43,12 +43,12 @@ public class Planet extends GL3DSphere implements LayersListener, ViewListener, 
     private GL3DVec3d position;
 
     public Planet(GL3DSceneGraphView sceneGraphView) {
-        super(6052000 / Constants.SunRadiusInMeter, 10, 10, new GL3DVec4f(1.f, 0.f, 0.f, 1.f));
-        //super(4878000 / Constants.SunRadiusInMeter, 10, 10, new GL3DVec4f(1.f, 0.f, 0.f, 1.f));
+        //super(6052000 / Constants.SunRadiusInMeter, 10, 10, new GL3DVec4f(1.f, 0.f, 0.f, 1.f));
+        super(4878000 / Constants.SunRadiusInMeter, 10, 10, new GL3DVec4f(1.f, 0.f, 0.f, 1.f));
         this.sceneGraphView = sceneGraphView;
         positionLoading = new GL3DPositionLoading();
-        positionLoading.setObservingObject("Venus");
-        //positionLoading.setObservingObject("Mercury");
+        //positionLoading.setObservingObject("Venus");
+        positionLoading.setObservingObject("Mercury");
 
         positionLoading.requestData();
         this.sceneGraphView.addViewListener(this);
@@ -188,13 +188,10 @@ public class Planet extends GL3DSphere implements LayersListener, ViewListener, 
             this.m.setIdentity();
             //this.m.multiply(differentialRotation.toMatrix().inverse());
             double currentRotation = Astronomy.getL0Radians(currentDate);
+
             this.m.rotate(-currentRotation, new GL3DVec3d(0, 1, 0));
-
-            this.m.rotate(-addb0, new GL3DVec3d(1., 0., 0.));
-
-            this.m.rotate(-position.z + addb0, new GL3DVec3d(1., 0., 0.));
-
             this.m.rotate(position.y, new GL3DVec3d(0., 1., 0.));
+            this.m.rotate(-position.z, new GL3DVec3d(1., 0., 0.));
 
             this.m.translate(new GL3DVec3d(0., 0, position.x));
 
