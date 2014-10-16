@@ -16,12 +16,12 @@ import org.helioviewer.gl3d.wcs.HeliocentricCartesian2000CoordinateSystem;
  * The trackball camera provides a trackball rotation behavior (
  * {@link GL3DTrackballRotationInteraction}) when in rotation mode. It is
  * currently the default camera.
- * 
+ *
  * @author Simon Spoerri (simon.spoerri@fhnw.ch)
- * 
+ *
  */
 public class GL3DSolarRotationTrackingTrackballCamera extends GL3DCamera {
-    public static final double DEFAULT_CAMERA_DISTANCE = 12 * Constants.SunRadius;
+    public static final double DEFAULT_CAMERA_DISTANCE = Constants.SunMeanDistanceToEarth / Constants.SunRadiusInMeter;
 
     private GL3DRay lastMouseRay;
 

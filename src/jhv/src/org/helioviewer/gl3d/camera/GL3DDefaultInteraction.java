@@ -3,10 +3,7 @@ package org.helioviewer.gl3d.camera;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseWheelEvent;
 
-import org.helioviewer.gl3d.scenegraph.math.GL3DVec3d;
 import org.helioviewer.gl3d.view.GL3DSceneGraphView;
-import org.helioviewer.viewmodel.region.Region;
-import org.helioviewer.viewmodel.view.MetaDataView;
 
 /**
  * Default {@link GL3DInteraction} class that provides a reference to the
@@ -40,22 +37,10 @@ public abstract class GL3DDefaultInteraction extends GL3DInteraction {
     }
 
     public void reset() {
-        MetaDataView view = sceneGraphView.getAdapter(MetaDataView.class);
-        if (view != null && view.getMetaData() != null) {
-            Region region = view.getMetaData().getPhysicalRegion();
-            double halfWidth = region.getWidth() / 2;
-            double halfFOVRad = Math.toRadians(camera.getCameraFOV() / 2);
-            double distance = halfWidth * Math.sin(Math.PI / 2 - halfFOVRad) / Math.sin(halfFOVRad);
-            distance = -distance - camera.getZTranslation();
-            // Log.debug("GL3DZoomFitAction: Distance = "+distance+" Existing Distance: "+camera.getZTranslation());
-            camera.setZTranslation(distance);
-            GL3DVec3d cameraTranslation = this.camera.getTranslation().copy();
-            cameraTranslation.negate();
-            camera.addCameraAnimation(new GL3DCameraPanAnimation(cameraTranslation));
-        } else {
-            camera.setZTranslation(-GL3DEarthCamera.DEFAULT_CAMERA_DISTANCE);
-            this.camera.updateCameraTransformation();
-        }
+
+        camera.setZTranslation(-GL3DEarthCamera.DEFAULT_CAMERA_DISTANCE);
+        this.camera.updateCameraTransformation();
+
     }
 
     @Override
