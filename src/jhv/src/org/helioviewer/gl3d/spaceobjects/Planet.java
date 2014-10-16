@@ -7,11 +7,10 @@ import java.util.Date;
 import java.util.List;
 
 import org.helioviewer.base.logging.Log;
-import org.helioviewer.base.math.MathUtils;
 import org.helioviewer.base.physics.Astronomy;
 import org.helioviewer.base.physics.Constants;
-import org.helioviewer.gl3d.camera.GL3DPositionLoading;
 import org.helioviewer.gl3d.camera.GL3DPositionLoadingListener;
+import org.helioviewer.gl3d.camera.GL3DPositionLoadingPlanet;
 import org.helioviewer.gl3d.scenegraph.GL3DState;
 import org.helioviewer.gl3d.scenegraph.math.GL3DMat4d;
 import org.helioviewer.gl3d.scenegraph.math.GL3DVec3d;
@@ -22,10 +21,7 @@ import org.helioviewer.jhv.layers.LayersListener;
 import org.helioviewer.jhv.layers.LayersModel;
 import org.helioviewer.viewmodel.changeevent.ChangeEvent;
 import org.helioviewer.viewmodel.changeevent.TimestampChangedReason;
-import org.helioviewer.viewmodel.metadata.HelioviewerPositionedMetaData;
-import org.helioviewer.viewmodel.metadata.MetaData;
 import org.helioviewer.viewmodel.view.LinkedMovieManager;
-import org.helioviewer.viewmodel.view.MetaDataView;
 import org.helioviewer.viewmodel.view.TimedMovieView;
 import org.helioviewer.viewmodel.view.View;
 import org.helioviewer.viewmodel.view.ViewListener;
@@ -33,7 +29,9 @@ import org.helioviewer.viewmodel.view.jp2view.JHVJPXView;
 import org.helioviewer.viewmodel.view.jp2view.kakadu.JHV_KduException;
 
 public class Planet extends GL3DSphere implements LayersListener, ViewListener, GL3DPositionLoadingListener {
-    private final GL3DPositionLoading positionLoading;
+    private final GL3DPositionLoadingPlanet positionLoading;
+    private final GL3DPositionLoadingPlanet positionLoadingalt;
+
     private Date beginDate;
     private Date endDate;
     private Date currentDate;
@@ -42,12 +40,16 @@ public class Planet extends GL3DSphere implements LayersListener, ViewListener, 
     private GL3DVec3d position;
 
     public Planet(GL3DSceneGraphView sceneGraphView) {
-        super(6052000 / Constants.SunRadiusInMeter, 10, 10, new GL3DVec4f(1.f, 0.f, 0.f, 1.f));
-        //super(4878000 / Constants.SunRadiusInMeter, 10, 10, new GL3DVec4f(1.f, 0.f, 0.f, 1.f));
+        //super(6052000 / Constants.SunRadiusInMeter, 10, 10, new GL3DVec4f(1.f, 0.f, 0.f, 1.f));
+        super(4878000 / Constants.SunRadiusInMeter, 10, 10, new GL3DVec4f(1.f, 0.f, 0.f, 1.f));
         //super(384399000 / Constants.SunRadiusInMeter, 10, 10, new GL3DVec4f(1.f, 0.f, 0.f, 1.f));
         this.sceneGraphView = sceneGraphView;
-        positionLoading = new GL3DPositionLoading();
-        positionLoading.setTarget("Venus");
+        positionLoading = new GL3DPositionLoadingPlanet();
+        positionLoading.setTarget("STEREO%20Ahead");
+        positionLoading.setObserver("SUN");
+        positionLoadingalt = new GL3DPositionLoadingPlanet();
+        positionLoadingalt.setTarget("STEREO%20Ahead");
+        positionLoadingalt.setObserver("Mercury");
         //positionLoading.setTarget("Mercury");
         //positionLoading.setTarget("Moon");
 
@@ -99,6 +101,8 @@ public class Planet extends GL3DSphere implements LayersListener, ViewListener, 
                 }
                 this.positionLoading.setBeginDate(beginDate);
                 this.positionLoading.setEndDate(endDate);
+                this.positionLoadingalt.setBeginDate(beginDate);
+                this.positionLoadingalt.setEndDate(endDate);
             }
         } catch (JHV_KduException ex) {
             Log.error("Received an kakadu exception. " + ex);
@@ -143,9 +147,11 @@ public class Planet extends GL3DSphere implements LayersListener, ViewListener, 
     }
 
     private void updatePosition() {
-        if (this.positionLoading.isLoaded()) {
-            this.position = this.positionLoading.getInterpolatedPosition(currentDate.getTime());
-            //System.out.println("POSITION" + position);
+        if (this.positionLoading.isLoaded() && this.positionLoadingalt.isLoaded()) {
+            GL3DVec3d position = this.positionLoading.getInterpolatedPosition(currentDate.getTime());
+            GL3DVec3d positionalt = this.positionLoadingalt.getInterpolatedPosition(currentDate.getTime());
+
+            this.position = new GL3DVec3d(position.x - positionalt.x, position.y - positionalt.y, position.z - positionalt.z);
         }
     }
 
@@ -157,42 +163,17 @@ public class Planet extends GL3DSphere implements LayersListener, ViewListener, 
 
     @Override
     public void update(GL3DState state) {
-        double addb0 = 0.;
-        if (LayersModel.getSingletonInstance().getActiveView() != null) {
-            MetaDataView mdv = LayersModel.getSingletonInstance().getActiveView().getAdapter(MetaDataView.class);
-
-            if (mdv != null) {
-                MetaData metadata = mdv.getMetaData();
-                if (metadata instanceof HelioviewerPositionedMetaData) {
-                    HelioviewerPositionedMetaData hvMetadata = (HelioviewerPositionedMetaData) metadata;
-                    if (!hvMetadata.isStonyhurstProvided()) {
-                        addb0 = Astronomy.getB0InRadians(this.currentDate);
-                    } else {
-                        addb0 = hvMetadata.getStonyhurstLatitude() / MathUtils.radeg;
-                    }
-
-                } else {
-                    addb0 = Astronomy.getB0InRadians(this.currentDate);
-                }
-            }
-        }
         if (!this.isInitialised) {
             this.init(state);
         }
         if (position != null) {
             state.pushMV();
-            //GL3DQuatd differentialRotation = state.getActiveCamera().getLocalRotation();
-            //this.m = differentialRotation.toMatrix().inverse();
 
             this.m.setIdentity();
-            //this.m.multiply(differentialRotation.toMatrix().inverse());
             double currentRotation = Astronomy.getL0Radians(currentDate);
 
             this.m.rotate(-currentRotation, new GL3DVec3d(0, 1, 0));
-            this.m.rotate(position.y, new GL3DVec3d(0., 1., 0.));
-            this.m.rotate(-position.z, new GL3DVec3d(1., 0., 0.));
-
-            this.m.translate(new GL3DVec3d(0., 0, position.x));
+            this.m.translate(position);
 
             this.wm = (this.m);
             state.buildInverseAndNormalMatrix();

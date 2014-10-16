@@ -111,7 +111,7 @@ public class GL3DPositionLoading {
                 calendar.setTime(date);
                 JSONArray positionArray = ithObject.getJSONArray("val");
                 double x = positionArray.getDouble(0);
-                double y = (Math.PI + positionArray.getDouble(1)) % (2. * Math.PI);
+                double y = Math.PI + positionArray.getDouble(1);
                 double z = -positionArray.getDouble(2);
                 GL3DVec3d vec = new GL3DVec3d(x, y, z);
                 positionDateTimehelper[i] = new GL3DPositionDateTime(calendar.getTimeInMillis(), vec);

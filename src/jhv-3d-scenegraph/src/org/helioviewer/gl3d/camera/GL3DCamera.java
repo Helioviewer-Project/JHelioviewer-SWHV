@@ -231,7 +231,6 @@ public abstract class GL3DCamera {
         gl.glPushMatrix();
         gl.glLoadIdentity();
         glu.gluPerspective(this.fov, this.aspect, this.clipNear, this.clipFar);
-
         gl.glMatrixMode(GL2.GL_MODELVIEW);
     }
 
