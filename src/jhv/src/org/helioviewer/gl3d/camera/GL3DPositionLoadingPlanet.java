@@ -40,7 +40,7 @@ public class GL3DPositionLoadingPlanet {
     private String target = "Earth";
     private String observer = "SUN";
     private final String baseUrl = "http://127.0.0.1:7789/position?";
-    private final int deltat = 60 * 60; //1 hours by default
+    private final int deltat = 60 * 60 / 2; //1 hours by default
     private final ArrayList<GL3DPositionLoadingListener> listeners = new ArrayList<GL3DPositionLoadingListener>();
     private Date beginDatems;
     private Date endDatems;
@@ -50,7 +50,7 @@ public class GL3DPositionLoadingPlanet {
 
     private void buildRequestURL() {
         try {
-            url = new URL(baseUrl + "abcorr=LT%2BS&utc=" + this.beginDate + "&utc_end=" + this.endDate + "&deltat=" + deltat + "&observer=" + target + "&target=" + observer + "&ref=HEEQ");
+            url = new URL(baseUrl + "abcorr=LT%2BS&utc=" + this.beginDate + "&utc_end=" + this.endDate + "&deltat=" + deltat + "&observer=" + observer + "&target=" + target + "&ref=HEEQ");
         } catch (MalformedURLException e) {
             Log.error("A wrong url is given.", e);
         }

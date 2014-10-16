@@ -134,7 +134,6 @@ public class GL3DPositionLoading {
     public void setBeginDate(Date beginDate) {
         this.beginDate = this.format.format(beginDate);
         this.beginDatems = beginDate;
-        System.out.println(beginDate);
         applyChanges();
     }
 
@@ -152,16 +151,12 @@ public class GL3DPositionLoading {
     public void setEndDate(Date endDate) {
         this.endDate = this.format.format(endDate);
         this.endDatems = endDate;
-        System.out.println("ENDDATE" + endDate);
-
         applyChanges();
     }
 
     public void setEndDate(long endDate) {
         this.endDate = this.format.format(new Date(endDate));
         this.endDatems = new Date(endDate);
-        System.out.println("ENDDATE" + endDate);
-
         applyChanges();
     }
 

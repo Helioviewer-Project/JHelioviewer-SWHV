@@ -28,7 +28,6 @@ public class GL3DCameraZoomAnimation implements GL3DCameraAnimation {
 
     public GL3DCameraZoomAnimation(double fovToTravel, long duration) {
         this.fovToTravel = fovToTravel;
-        System.out.println("FOVTRAVEL" + fovToTravel);
         this.timeLeft = duration;
         this.fovDelta = fovToTravel / this.timeLeft;
         // Displayer.getSingletonInstance().animate();
@@ -40,7 +39,6 @@ public class GL3DCameraZoomAnimation implements GL3DCameraAnimation {
             this.startTime = System.currentTimeMillis();
             this.lastAnimationTime = System.currentTimeMillis();
             this.targetFov = Math.min(GL3DCamera.MAX_FOV, Math.max(GL3DCamera.MIN_FOV, camera.getCameraFOV() + this.fovToTravel));
-            System.out.println("TTARGET" + this.targetFov + " " + camera.getCameraFOV() + " " + this.fovToTravel);
         }
 
         long timeDelta = System.currentTimeMillis() - lastAnimationTime;
@@ -77,7 +75,6 @@ public class GL3DCameraZoomAnimation implements GL3DCameraAnimation {
             this.timeLeft = Math.min(2000, this.timeLeft / 5 + ani.timeLeft);
             this.fovToTravel += ani.fovToTravel;
             this.targetFov = Math.min(GL3DCamera.MAX_FOV, Math.max(GL3DCamera.MIN_FOV, this.targetFov + ani.fovToTravel));
-            System.out.println("EXTTARGET" + this.targetFov);
             this.fovDelta = this.fovToTravel / this.timeLeft;
         }
     }

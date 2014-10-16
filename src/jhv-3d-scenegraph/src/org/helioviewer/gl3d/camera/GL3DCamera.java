@@ -322,7 +322,6 @@ public abstract class GL3DCamera {
             Thread.dumpStack();
             System.exit(1);
         }
-        System.out.println("SETTINGFOV" + fov);
         return this.fov = fov;
     }
 
