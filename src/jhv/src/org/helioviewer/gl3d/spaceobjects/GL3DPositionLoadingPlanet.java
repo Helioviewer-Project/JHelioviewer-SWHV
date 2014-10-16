@@ -1,4 +1,4 @@
-package org.helioviewer.gl3d.camera;
+package org.helioviewer.gl3d.spaceobjects;
 
 import java.awt.EventQueue;
 import java.io.BufferedReader;
@@ -17,6 +17,8 @@ import java.util.GregorianCalendar;
 import org.helioviewer.base.DownloadStream;
 import org.helioviewer.base.logging.Log;
 import org.helioviewer.base.physics.Constants;
+import org.helioviewer.gl3d.camera.GL3DPositionDateTime;
+import org.helioviewer.gl3d.camera.GL3DPositionLoadingListener;
 import org.helioviewer.gl3d.scenegraph.math.GL3DVec3d;
 import org.helioviewer.jhv.display.Displayer;
 import org.json.JSONArray;

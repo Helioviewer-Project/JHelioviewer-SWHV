@@ -10,7 +10,6 @@ import org.helioviewer.base.logging.Log;
 import org.helioviewer.base.physics.Astronomy;
 import org.helioviewer.base.physics.Constants;
 import org.helioviewer.gl3d.camera.GL3DPositionLoadingListener;
-import org.helioviewer.gl3d.camera.GL3DPositionLoadingPlanet;
 import org.helioviewer.gl3d.scenegraph.GL3DState;
 import org.helioviewer.gl3d.scenegraph.math.GL3DMat4d;
 import org.helioviewer.gl3d.scenegraph.math.GL3DVec3d;
