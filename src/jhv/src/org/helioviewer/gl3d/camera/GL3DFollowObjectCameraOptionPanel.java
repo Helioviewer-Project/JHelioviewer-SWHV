@@ -41,12 +41,12 @@ public class GL3DFollowObjectCameraOptionPanel extends GL3DCameraOptionPanel imp
     private static final long serialVersionUID = 1L;
 
     private final JTextArea loadedLabel;
-    private final JLabel beginDateLabel;
+    private JLabel beginDateLabel;
     private JPanel beginDatetimePanel;
     JHVCalendarDatePicker beginDatePicker;
     TimeTextField beginTimePicker;
 
-    private final JLabel endDateLabel;
+    private JLabel endDateLabel;
     private JPanel endDatetimePanel;
     JHVCalendarDatePicker endDatePicker;
     TimeTextField endTimePicker;
@@ -62,6 +62,8 @@ public class GL3DFollowObjectCameraOptionPanel extends GL3DCameraOptionPanel imp
     private JButton synchronizeWithCurrentButton;
     private final JPanel fovPanel;
     private final JSpinner fovSpinner;
+
+    private JPanel buttonPanel;
 
     public GL3DFollowObjectCameraOptionPanel(final GL3DFollowObjectCamera camera) {
         super(camera);
@@ -128,39 +130,28 @@ public class GL3DFollowObjectCameraOptionPanel extends GL3DCameraOptionPanel imp
         add(this.fovPanel);
         add(new JSeparator(SwingConstants.HORIZONTAL));
         addObjectCombobox();
-        beginDateLabel = new JLabel("Begin");
-        beginDatePicker = new JHVCalendarDatePicker();
-        beginDatePicker.getTextField().addFocusListener(new FocusListener() {
-            @Override
-            public void focusGained(FocusEvent arg0) {
-            }
-
-            @Override
-            public void focusLost(FocusEvent arg0) {
-                beginDatePicker.checkDateStringInTextField();
-                setBeginTime();
-                Displayer.getSingletonInstance().render();
-            }
-        });
-        beginTimePicker = new TimeTextField();
+        final JCheckBox exactDateCheckBox = new JCheckBox("Use active layer timestamps", true);
+        JPanel checkboxPanel = new JPanel();
+        checkboxPanel.add(exactDateCheckBox);
+        add(checkboxPanel);
         addBeginDatePanel();
-        endDateLabel = new JLabel("End");
-        endDatePicker = new JHVCalendarDatePicker();
-        endDatePicker.getTextField().addFocusListener(new FocusListener() {
+        addEndDatePanel();
+        addBeginDatePanel.setVisible(false);
+        addEndDatePanel.setVisible(false);
+        addSyncButtons();
+        buttonPanel.setVisible(false);
+        camera.setInterpolation(false);
+        exactDateCheckBox.addActionListener(new ActionListener() {
             @Override
-            public void focusGained(FocusEvent arg0) {
-            }
-
-            @Override
-            public void focusLost(FocusEvent arg0) {
-                beginDatePicker.checkDateStringInTextField();
-                setEndTime();
-                Displayer.getSingletonInstance().render();
+            public void actionPerformed(ActionEvent actionEvent) {
+                boolean selected = !exactDateCheckBox.isSelected();
+                addBeginDatePanel.setVisible(selected);
+                addEndDatePanel.setVisible(selected);
+                buttonPanel.setVisible(selected);
+                camera.setInterpolation(selected);
             }
         });
-        endTimePicker = new TimeTextField();
-        addEndDatePanel();
-        addSyncButtons();
+
         this.camera.addFollowObjectCameraListener(this);
         this.syncWithLayerBeginTime();
         this.syncWithLayerEndTime();
@@ -192,7 +183,7 @@ public class GL3DFollowObjectCameraOptionPanel extends GL3DCameraOptionPanel imp
                 Displayer.getSingletonInstance().display();
             }
         });
-        JPanel buttonPanel = new JPanel();
+        buttonPanel = new JPanel();
         buttonPanel.setLayout(new GridLayout(0, 3));
         this.synchronizeWithLayersButton.getMaximumSize().width = 15;
         buttonPanel.add(this.synchronizeWithLayersButton);
@@ -235,6 +226,21 @@ public class GL3DFollowObjectCameraOptionPanel extends GL3DCameraOptionPanel imp
     }
 
     private void addBeginDatePanel() {
+        beginDateLabel = new JLabel("Begin");
+        beginDatePicker = new JHVCalendarDatePicker();
+        beginDatePicker.getTextField().addFocusListener(new FocusListener() {
+            @Override
+            public void focusGained(FocusEvent arg0) {
+            }
+
+            @Override
+            public void focusLost(FocusEvent arg0) {
+                beginDatePicker.checkDateStringInTextField();
+                setBeginTime();
+                Displayer.getSingletonInstance().render();
+            }
+        });
+        beginTimePicker = new TimeTextField();
         addBeginDatePanel = new JPanel();
         addBeginDatePanel.setLayout(new BoxLayout(addBeginDatePanel, BoxLayout.LINE_AXIS));
         beginDateLabel.setPreferredSize(new Dimension(40, 0));
@@ -328,6 +334,21 @@ public class GL3DFollowObjectCameraOptionPanel extends GL3DCameraOptionPanel imp
     }
 
     private void addEndDatePanel() {
+        endDateLabel = new JLabel("End");
+        endDatePicker = new JHVCalendarDatePicker();
+        endDatePicker.getTextField().addFocusListener(new FocusListener() {
+            @Override
+            public void focusGained(FocusEvent arg0) {
+            }
+
+            @Override
+            public void focusLost(FocusEvent arg0) {
+                beginDatePicker.checkDateStringInTextField();
+                setEndTime();
+                Displayer.getSingletonInstance().render();
+            }
+        });
+        endTimePicker = new TimeTextField();
         addEndDatePanel = new JPanel();
         addEndDatePanel.setLayout(new BoxLayout(addEndDatePanel, BoxLayout.LINE_AXIS));
         endDateLabel.setPreferredSize(new Dimension(40, 0));

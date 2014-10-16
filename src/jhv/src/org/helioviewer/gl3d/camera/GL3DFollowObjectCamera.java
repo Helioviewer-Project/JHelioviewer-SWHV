@@ -75,6 +75,7 @@ public class GL3DFollowObjectCamera extends GL3DSolarRotationTrackingTrackballCa
 
     private long currentCameraTime;
     private double lratio;
+    private boolean interpolation;
 
     @Override
     public void viewChanged(View sender, ChangeEvent aEvent) {
@@ -88,14 +89,15 @@ public class GL3DFollowObjectCamera extends GL3DSolarRotationTrackingTrackballCa
                 //Camera times
                 long t3 = this.positionLoading.getBeginDate().getTime();
                 long t4 = this.positionLoading.getEndDate().getTime();
-
-                //Linear interpolation
-                if (t4 != t3) {
-                    currentCameraTime = (long) ((t3 + 1. * (t4 - t3) * (timestampReason.getNewDateTime().getMillis() - t1) / (t2 - t1)));
+                if (interpolation) {
+                    if (t4 != t3) {
+                        currentCameraTime = (long) ((t3 + 1. * (t4 - t3) * (timestampReason.getNewDateTime().getMillis() - t1) / (t2 - t1)));
+                    } else {
+                        currentCameraTime = t4;
+                    }
                 } else {
-                    currentCameraTime = t4;
+                    currentCameraTime = timestampReason.getNewDateTime().getMillis();
                 }
-                currentCameraTime = timestampReason.getNewDateTime().getMillis();
                 this.fireCameratTime(new Date(currentCameraTime));
                 GL3DVec3d position = this.positionLoading.getInterpolatedPosition(currentCameraTime);
                 currentL = position.y;
@@ -185,6 +187,10 @@ public class GL3DFollowObjectCamera extends GL3DSolarRotationTrackingTrackballCa
     public void setFOVangleDegrees(double fovAngle) {
         this.FOVangle = fovAngle * Math.PI / 180.0;
 
+    }
+
+    public void setInterpolation(boolean interpolation) {
+        this.interpolation = interpolation;
     }
 
 }
