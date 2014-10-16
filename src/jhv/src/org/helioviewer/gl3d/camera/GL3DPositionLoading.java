@@ -42,15 +42,15 @@ public class GL3DPositionLoading {
     private final String baseUrl = "http://swhv.oma.be/position?";
     private final int deltat = 60 * 60 / 64; //1 hours by default
     private final ArrayList<GL3DPositionLoadingListener> listeners = new ArrayList<GL3DPositionLoadingListener>();
-    private Date beginDatems;
-    private Date endDatems;
+    private Date beginDatems = new Date(0);
+    private Date endDatems = new Date();
 
     public GL3DPositionLoading() {
     }
 
     private void buildRequestURL() {
         try {
-            url = new URL(baseUrl + "abcorr=LT%2BS&utc=" + this.beginDate + "&utc_end=" + this.endDate + "&deltat=" + deltat + "&observer=" + target + "&target=" + observer + "&ref=HEEQ&kind=latitudinal");
+            url = new URL(baseUrl + "abcorr=LT%2BS&utc=" + this.beginDate + "&utc_end=" + this.endDate + "&deltat=" + deltat + "&observer=" + observer + "&target=" + target + "&ref=HEEQ&kind=latitudinal");
         } catch (MalformedURLException e) {
             Log.error("A wrong url is given.", e);
         }
@@ -58,27 +58,26 @@ public class GL3DPositionLoading {
 
     public void requestData() {
         long now = System.currentTimeMillis();
-        System.out.println("HERE");
         Thread loadData = new Thread(new Runnable() {
             @Override
             public void run() {
                 try {
                     buildRequestURL();
-                    System.out.println("PLOAD" + url);
-
-                    DownloadStream ds = new DownloadStream(url.toURI(), 30000, 30000, true);
-                    Reader reader = new BufferedReader(new InputStreamReader(ds.getInput(), "UTF-8"));
-                    if (!ds.getResponse400()) {
-                        jsonResult = new JSONArray(new JSONTokener(reader));
-                        parseData();
-                        if (positionDateTime.length > 0) {
-                            setLoaded(true);
-                        }
-                    } else {
-                        JSONObject jsonObject = new JSONObject(new JSONTokener(reader));
-                        if (jsonObject.has("faultstring")) {
-                            String faultstring = jsonObject.getString("faultstring");
-                            fireLoaded(faultstring);
+                    if (endDatems.getTime() - beginDatems.getTime() < 1000 * 60 * 60 * 24 * 20) {
+                        DownloadStream ds = new DownloadStream(url.toURI(), 30000, 30000, true);
+                        Reader reader = new BufferedReader(new InputStreamReader(ds.getInput(), "UTF-8"));
+                        if (!ds.getResponse400()) {
+                            jsonResult = new JSONArray(new JSONTokener(reader));
+                            parseData();
+                            if (positionDateTime.length > 0) {
+                                setLoaded(true);
+                            }
+                        } else {
+                            JSONObject jsonObject = new JSONObject(new JSONTokener(reader));
+                            if (jsonObject.has("faultstring")) {
+                                String faultstring = jsonObject.getString("faultstring");
+                                fireLoaded(faultstring);
+                            }
                         }
                     }
                 } catch (final IOException e1) {
@@ -94,9 +93,7 @@ public class GL3DPositionLoading {
             }
 
         });
-        loadData.run();
-        System.out.println("FINISHED" + (System.currentTimeMillis() - now));
-
+        loadData.start();
     }
 
     private void setLoaded(boolean isLoaded) {
@@ -220,8 +217,8 @@ public class GL3DPositionLoading {
         }
     }
 
-    public void setTarget(String object) {
-        this.target = object;
+    public void setObserver(String object) {
+        this.observer = object;
         this.applyChanges();
     }
 
