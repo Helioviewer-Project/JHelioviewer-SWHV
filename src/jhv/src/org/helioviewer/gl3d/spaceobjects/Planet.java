@@ -40,17 +40,17 @@ public class Planet extends GL3DSphere implements LayersListener, ViewListener, 
     private GL3DVec3d position;
 
     public Planet(GL3DSceneGraphView sceneGraphView) {
-        super(6052000 / Constants.SunRadiusInMeter, 10, 10, new GL3DVec4f(1.f, 0.f, 0.f, 1.f));
-        //super(4878000 / Constants.SunRadiusInMeter, 10, 10, new GL3DVec4f(1.f, 0.f, 0.f, 1.f));
+        //super(6052000 / Constants.SunRadiusInMeter, 10, 10, new GL3DVec4f(1.f, 0.f, 0.f, 1.f));
+        super(4878000 / Constants.SunRadiusInMeter, 10, 10, new GL3DVec4f(1.f, 0.f, 0.f, 1.f));
         //super(384399000 / Constants.SunRadiusInMeter, 10, 10, new GL3DVec4f(1.f, 0.f, 0.f, 1.f));
         this.sceneGraphView = sceneGraphView;
         positionLoading = new GL3DPositionLoadingPlanet();
-        positionLoading.setObserver("SDO");
+        positionLoading.setObserver("STEREO%20Ahead");
         positionLoading.setTarget("SUN");
         positionLoadingalt = new GL3DPositionLoadingPlanet();
-        positionLoadingalt.setObserver("SDO");
-        positionLoadingalt.setTarget("Venus");
-        //positionLoading.setTarget("Mercury");
+        positionLoadingalt.setObserver("STEREO%20Ahead");
+        //positionLoadingalt.setTarget("Venus");
+        positionLoadingalt.setTarget("Mercury");
         //positionLoading.setTarget("Moon");
 
         positionLoading.requestData();
@@ -148,8 +148,8 @@ public class Planet extends GL3DSphere implements LayersListener, ViewListener, 
 
     private void updatePosition() {
         if (this.positionLoading.isLoaded() && this.positionLoadingalt.isLoaded()) {
-            GL3DVec3d position = this.positionLoading.getInterpolatedPosition(currentDate.getTime() + 500000);
-            GL3DVec3d positionalt = this.positionLoadingalt.getInterpolatedPosition(currentDate.getTime() + 500000);
+            GL3DVec3d position = this.positionLoading.getInterpolatedPosition(currentDate.getTime());
+            GL3DVec3d positionalt = this.positionLoadingalt.getInterpolatedPosition(currentDate.getTime());
 
             this.position = new GL3DVec3d(position.x - positionalt.x, position.y - positionalt.y, position.z - positionalt.z);
         }
