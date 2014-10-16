@@ -28,6 +28,7 @@ import org.helioviewer.gl3d.scenegraph.math.GL3DVec3d;
 import org.helioviewer.gl3d.scenegraph.math.GL3DVec4f;
 import org.helioviewer.gl3d.scenegraph.rt.GL3DRayTracer;
 import org.helioviewer.gl3d.scenegraph.visuals.GL3DArrow;
+import org.helioviewer.gl3d.spaceobjects.Planet;
 import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.viewmodel.changeevent.ChangeEvent;
 import org.helioviewer.viewmodel.changeevent.LayerChangedReason;
@@ -340,6 +341,10 @@ public class GL3DSceneGraphView extends AbstractGL3DView implements GL3DView {
         GL3DShape south = new GL3DArrow("Southpole", Constants.SunRadius / 128, Constants.SunRadius, Constants.SunRadius / 4, 128, new GL3DVec4f(0.1f, 0.2f, 1.0f, 1.0f));
         south.modelView().rotate(Math.PI / 2, GL3DVec3d.XAxis);
         indicatorArrows.addNode(south);
+
+        GL3DGroup planets = new GL3DModel("Planets", "Planets");
+        planets.addNode(new Planet(this));
+        root.addNode(planets);
 
         return root;
     }
