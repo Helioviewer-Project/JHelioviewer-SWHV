@@ -184,7 +184,13 @@ public class EVEDrawableElement implements DrawableElement {
 
             Integer previousX = null;
             for (final Point point : points) {
-                if (previousX == null || (point.x - previousX) / ratioX > 120000) {
+                if (previousX != null) {
+                    if ((point.x - previousX) != 0) {
+                        // Log.debug("distance between previous and folowing x : "
+                        // + ((point.x - previousX) / ratioX));
+                    }
+                }
+                if (previousX == null || (point.x - previousX) / ratioX > Math.max(1 / ratioX, 120000)) {
                     xPoints.add(new ArrayList<Integer>());
                     yPoints.add(new ArrayList<Integer>());
                     counter++;
