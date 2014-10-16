@@ -24,7 +24,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import org.json.JSONTokener;
 
-public class GL3DPositionLoading {
+public class GL3DPositionLoadingPlanet {
     private final String LOADEDSTATE = "Loaded";
     private final String FAILEDSTATE = "Failed";
     private final String PARTIALSTATE = "Partial";
@@ -38,19 +38,19 @@ public class GL3DPositionLoading {
     private String beginDate = "2014-07-28T00:00:00";
     private String endDate = "2014-05-30T00:00:00";
     private String target = "Earth";
-    private final String observer = "SUN";
-    private final String baseUrl = "http://swhv.oma.be/position?";
+    private String observer = "SUN";
+    private final String baseUrl = "http://127.0.0.1:7789/position?";
     private final int deltat = 60 * 60; //1 hours by default
     private final ArrayList<GL3DPositionLoadingListener> listeners = new ArrayList<GL3DPositionLoadingListener>();
     private Date beginDatems;
     private Date endDatems;
 
-    public GL3DPositionLoading() {
+    public GL3DPositionLoadingPlanet() {
     }
 
     private void buildRequestURL() {
         try {
-            url = new URL(baseUrl + "abcorr=LT%2BS&utc=" + this.beginDate + "&utc_end=" + this.endDate + "&deltat=" + deltat + "&observer=" + target + "&target=" + observer + "&ref=HEEQ&kind=latitudinal");
+            url = new URL(baseUrl + "abcorr=LT%2BS&utc=" + this.beginDate + "&utc_end=" + this.endDate + "&deltat=" + deltat + "&observer=" + target + "&target=" + observer + "&ref=HEEQ");
         } catch (MalformedURLException e) {
             Log.error("A wrong url is given.", e);
         }
@@ -111,8 +111,8 @@ public class GL3DPositionLoading {
                 calendar.setTime(date);
                 JSONArray positionArray = ithObject.getJSONArray("val");
                 double x = positionArray.getDouble(0);
-                double y = Math.PI + positionArray.getDouble(1);
-                double z = -positionArray.getDouble(2);
+                double y = positionArray.getDouble(1);
+                double z = positionArray.getDouble(2);
                 GL3DVec3d vec = new GL3DVec3d(x, y, z);
                 positionDateTimehelper[i] = new GL3DPositionDateTime(calendar.getTimeInMillis(), vec);
             }
@@ -193,11 +193,10 @@ public class GL3DPositionLoading {
         long t3 = this.getBeginDate().getTime();
         long t4 = this.getEndDate().getTime();
         if (t3 == t4) {
-            double hgln = this.positionDateTime[0].getPosition().y;
-            double hglt = this.positionDateTime[0].getPosition().z;
-            double dist = this.positionDateTime[0].getPosition().x;
-            dist = dist * 1000 / Constants.SunRadiusInMeter;
-            GL3DVec3d vec = new GL3DVec3d(dist, hgln, hglt);
+            double x = this.positionDateTime[0].getPosition().x * 1000 / Constants.SunRadiusInMeter;
+            double y = this.positionDateTime[0].getPosition().y * 1000 / Constants.SunRadiusInMeter;
+            double z = this.positionDateTime[0].getPosition().z * 1000 / Constants.SunRadiusInMeter;
+            GL3DVec3d vec = new GL3DVec3d(-y, -z, -x);
             return vec;
         } else {
             double interpolatedIndex = (1. * (currentCameraTime - 500 * 1000 - t3) / (t4 - t3) * this.positionDateTime.length);
@@ -209,11 +208,10 @@ public class GL3DPositionLoading {
             int inext = Math.min(i + 1, this.positionDateTime.length - 1);
 
             double alpha = 1. - interpolatedIndex % 1.;
-            double hgln = alpha * this.positionDateTime[i].getPosition().y + (1 - alpha) * this.positionDateTime[inext].getPosition().y;
-            double hglt = alpha * this.positionDateTime[i].getPosition().z + (1 - alpha) * this.positionDateTime[inext].getPosition().z;
-            double dist = alpha * this.positionDateTime[i].getPosition().x + (1 - alpha) * this.positionDateTime[inext].getPosition().x;
-            dist = dist * 1000 / Constants.SunRadiusInMeter;
-            GL3DVec3d vec = new GL3DVec3d(dist, hgln, hglt);
+            double x = (alpha * this.positionDateTime[i].getPosition().x + (1 - alpha) * this.positionDateTime[inext].getPosition().x) * 1000 / Constants.SunRadiusInMeter;
+            double y = (alpha * this.positionDateTime[i].getPosition().y + (1 - alpha) * this.positionDateTime[inext].getPosition().y) * 1000 / Constants.SunRadiusInMeter;
+            double z = (alpha * this.positionDateTime[i].getPosition().z + (1 - alpha) * this.positionDateTime[inext].getPosition().z) * 1000 / Constants.SunRadiusInMeter;
+            GL3DVec3d vec = new GL3DVec3d(-y, -z, -x);
             return vec;
         }
     }
@@ -223,4 +221,8 @@ public class GL3DPositionLoading {
         this.applyChanges();
     }
 
+    public void setObserver(String object) {
+        this.observer = object;
+        this.applyChanges();
+    }
 }
