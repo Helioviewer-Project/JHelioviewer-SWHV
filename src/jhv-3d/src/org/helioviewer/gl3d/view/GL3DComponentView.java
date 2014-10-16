@@ -145,7 +145,6 @@ public class GL3DComponentView extends AbstractComponentView implements GLEventL
 
     @Override
     public synchronized void display(GLAutoDrawable glAD) {
-        System.out.println("dp");
         GL2 gl = (GL2) glAD.getGL();
 
         int width = this.viewportSize.getX();
