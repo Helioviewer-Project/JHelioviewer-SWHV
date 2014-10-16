@@ -135,7 +135,6 @@ public class GL3DImageTextureView extends AbstractGL3DView implements GL3DView, 
                 theta = -((HelioviewerPositionedMetaData) (metadataView.getMetaData())).getStonyhurstLatitude() / MathUtils.radeg;
             }
             if (metadataView.getMetaData() instanceof HelioviewerPositionedMetaData && ((HelioviewerPositionedMetaData) (metadataView.getMetaData())).getObservatory().equalsIgnoreCase("SDO")) {
-                System.out.println("APPLY SDO");
                 phi -= ((HelioviewerPositionedMetaData) (metadataView.getMetaData())).getStonyhurstLongitude() / MathUtils.radeg;
                 theta = -((HelioviewerPositionedMetaData) (metadataView.getMetaData())).getStonyhurstLatitude() / MathUtils.radeg;
             }

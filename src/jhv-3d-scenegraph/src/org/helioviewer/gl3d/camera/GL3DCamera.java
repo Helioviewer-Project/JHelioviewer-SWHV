@@ -154,7 +154,6 @@ public abstract class GL3DCamera {
     protected void setZTranslation(double z) {
         this.translationz = Math.min(MIN_DISTANCE, Math.max(MAX_DISTANCE, z));
         this.translation.z = this.ratio * this.translationz;
-        System.out.println("ZTRANS" + this.translation.z + " " + this.translationz);
     }
 
     protected void addPanning(double x, double y) {

@@ -23,9 +23,9 @@ import org.helioviewer.viewmodel.view.ComponentView;
  * Can be used as the global singleton for all available and the currently
  * active {@link GL3DCamera}. Also it implements the {@link ComboBoxModel} and
  * {@link ListModel} and can thus be used for GUI elements directly.
- * 
+ *
  * @author Simon Spoerri (simon.spoerri@fhnw.ch)
- * 
+ *
  */
 public class GL3DCameraSelectorModel extends AbstractListModel implements ComboBoxModel {
     private static final long serialVersionUID = 1L;
@@ -57,20 +57,6 @@ public class GL3DCameraSelectorModel extends AbstractListModel implements ComboB
     }
 
     private GL3DCameraSelectorModel() {
-        // StateController.getInstance().addStateChangeListener(new
-        // StateChangeListener() {
-        //
-        // public void stateChanged(State newState, State oldState,
-        // StateController stateController) {
-        // if(newState.getType()==ViewStateEnum.View3D) {
-        // //Needs to be checked, because if new State is 2D no CameraView is
-        // available.
-        //
-        // } else {
-        // Log.info("GL3DCameraSelectorModel: No camera change, no GL3DSceneGraphView available");
-        // }
-        // }
-        // });
     }
 
     public void activate(GL3DSceneGraphView sceneGraphView) {
