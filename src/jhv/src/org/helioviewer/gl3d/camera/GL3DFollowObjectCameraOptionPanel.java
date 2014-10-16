@@ -16,7 +16,6 @@ import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
-import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JSeparator;
@@ -50,7 +49,7 @@ public class GL3DFollowObjectCameraOptionPanel extends GL3DCameraOptionPanel imp
     private JPanel endDatetimePanel;
     JHVCalendarDatePicker endDatePicker;
     TimeTextField endTimePicker;
-    JComboBox objectCombobox;
+    JSeparatorComboBox objectCombobox;
     private final GL3DFollowObjectCamera camera;
     private final JLabel cameraTime;
     private final SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
@@ -204,10 +203,13 @@ public class GL3DFollowObjectCameraOptionPanel extends GL3DCameraOptionPanel imp
     }
 
     private void addObjectCombobox() {
-        objectCombobox = new JComboBox();
+        objectCombobox = new JSeparatorComboBox();
         GL3DSpaceObject[] objectList = GL3DSpaceObject.getObjectList();
         for (int i = 0; i < objectList.length; i++) {
             objectCombobox.addItem(objectList[i]);
+            if (i == GL3DSpaceObject.LINESEPSATS || i == GL3DSpaceObject.LINESEPPLANETS) {
+                objectCombobox.addItem(new JSeparator());
+            }
         }
         objectCombobox.addItemListener(new ItemListener() {
             @Override
