@@ -5,16 +5,19 @@ import java.awt.Font;
 import java.awt.FontFormatException;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Date;
 
 import javax.media.opengl.GL2;
 
 import org.helioviewer.base.FileUtils;
 import org.helioviewer.base.logging.Log;
+import org.helioviewer.base.physics.Astronomy;
 import org.helioviewer.base.physics.Constants;
 import org.helioviewer.gl3d.scenegraph.GL3DGroup;
 import org.helioviewer.gl3d.scenegraph.GL3DState;
 import org.helioviewer.gl3d.scenegraph.math.GL3DMat4d;
 import org.helioviewer.gl3d.scenegraph.math.GL3DQuatd;
+import org.helioviewer.gl3d.scenegraph.math.GL3DVec3d;
 import org.helioviewer.gl3d.scenegraph.math.GL3DVec4d;
 import org.helioviewer.gl3d.scenegraph.math.GL3DVec4f;
 
@@ -30,9 +33,11 @@ public class GL3DGrid extends GL3DGroup {
     private Font font;
     private TextRenderer renderer;
     private final int fontsize = 20;
+    private final boolean followCamera;
 
-    public GL3DGrid(String name, double lonstepDegrees, double latstepDegrees, GL3DVec4f color, GL3DVec4d textColor) {
+    public GL3DGrid(String name, double lonstepDegrees, double latstepDegrees, GL3DVec4f color, GL3DVec4d textColor, boolean followCamera) {
         super(name);
+        this.followCamera = followCamera;
         this.lonstepDegrees = lonstepDegrees;
         this.latstepDegrees = latstepDegrees;
         this.color = color;
@@ -60,8 +65,14 @@ public class GL3DGrid extends GL3DGroup {
             this.init(state);
         }
         state.pushMV();
-        GL3DQuatd differentialRotation = state.getActiveCamera().getLocalRotation();
-        this.m = differentialRotation.toMatrix().inverse();
+        if (followCamera) {
+            GL3DQuatd differentialRotation = state.getActiveCamera().getLocalRotation();
+            this.m = differentialRotation.toMatrix().inverse();
+        } else {
+            long currentTime = state.getActiveCamera().getTime();
+            GL3DQuatd rotation = GL3DQuatd.createRotation(-Astronomy.getL0Radians(new Date(currentTime)), new GL3DVec3d(0., 1., 0.));
+            this.m = rotation.toMatrix();
+        }
         this.wm = (this.m);
         state.buildInverseAndNormalMatrix();
         this.wmI = new GL3DMat4d(state.getMVInverse());
@@ -82,9 +93,10 @@ public class GL3DGrid extends GL3DGroup {
         renderer = new TextRenderer(font, false, true);
         renderer.setUseVertexArrays(true);
         renderer.getSmoothing();
-        drawText(gl);
+        if (!followCamera) {
+            drawText(gl);
+        }
         drawCircles(gl);
-
     }
 
     private void drawCircles(GL2 gl) {
@@ -100,10 +112,18 @@ public class GL3DGrid extends GL3DGroup {
             gl.glBegin(GL2.GL_LINE_LOOP);
             for (int i = 0; i <= lineres; i++) {
                 if (i % 2 == 0) {
-                    gl.glColor3f(0.f, 1.0f, .0f);
+                    if (followCamera) {
+                        gl.glColor3f(1.f, 1.0f, .0f);
+                    } else {
+                        gl.glColor3f(0.f, 1.0f, .0f);
+                    }
 
                 } else {
-                    gl.glColor3f(1f, .0f, .0f);
+                    if (followCamera) {
+                        gl.glColor3f(1.f, 1.0f, .0f);
+                    } else {
+                        gl.glColor3f(1f, .0f, .0f);
+                    }
                 }
                 double theta = 2 * i * Math.PI / lineres;
                 gl.glVertex3d(Math.sin(theta) * Math.sin(phi), Math.cos(phi), Math.cos(theta) * Math.sin(phi));
@@ -117,10 +137,17 @@ public class GL3DGrid extends GL3DGroup {
             gl.glBegin(GL2.GL_LINE_LOOP);
             for (int i = 0; i <= lineres; i++) {
                 if (i % 2 == 0) {
-                    gl.glColor3f(0.f, 1.0f, .0f);
-
+                    if (followCamera) {
+                        gl.glColor3f(1.f, 1.0f, .0f);
+                    } else {
+                        gl.glColor3f(0.f, 1.0f, .0f);
+                    }
                 } else {
-                    gl.glColor3f(1f, .0f, .0f);
+                    if (followCamera) {
+                        gl.glColor3f(1.f, 1.0f, .0f);
+                    } else {
+                        gl.glColor3f(1f, .0f, .0f);
+                    }
                 }
                 double theta = 2 * i * Math.PI / lineres;
                 gl.glVertex3d(Math.sin(theta) * Math.sin(phi), Math.cos(phi), Math.cos(theta) * Math.sin(phi));
@@ -135,10 +162,18 @@ public class GL3DGrid extends GL3DGroup {
             gl.glBegin(GL2.GL_LINE_STRIP);
             for (int i = 0; i <= lineres; i++) {
                 if (i % 2 == 0) {
-                    gl.glColor3f(0.f, 1.0f, .0f);
+                    if (followCamera) {
+                        gl.glColor3f(1.f, 1.0f, .0f);
+                    } else {
+                        gl.glColor3f(0.f, 1.0f, .0f);
+                    }
 
                 } else {
-                    gl.glColor3f(1f, .0f, .0f);
+                    if (followCamera) {
+                        gl.glColor3f(1.f, 1.0f, .0f);
+                    } else {
+                        gl.glColor3f(1f, .0f, .0f);
+                    }
                 }
                 phi = i * Math.PI / lineres;
                 gl.glVertex3d(Math.sin(theta) * Math.sin(phi), Math.cos(phi), Math.cos(theta) * Math.sin(phi));
@@ -152,9 +187,17 @@ public class GL3DGrid extends GL3DGroup {
             gl.glBegin(GL2.GL_LINE_STRIP);
             for (int i = 0; i <= lineres; i++) {
                 if (i % 2 == 0) {
-                    gl.glColor3f(0.f, 1.0f, .0f);
+                    if (followCamera) {
+                        gl.glColor3f(1.f, 1.0f, .0f);
+                    } else {
+                        gl.glColor3f(0.f, 1.0f, .0f);
+                    }
                 } else {
-                    gl.glColor3f(1f, .0f, .0f);
+                    if (followCamera) {
+                        gl.glColor3f(1.f, 1.0f, .0f);
+                    } else {
+                        gl.glColor3f(1f, .0f, .0f);
+                    }
                 }
                 phi = i * Math.PI / lineres;
                 gl.glVertex3d(Math.sin(theta) * Math.sin(phi), Math.cos(phi), Math.cos(theta) * Math.sin(phi));

@@ -75,6 +75,8 @@ public abstract class GL3DCamera {
 
     private long time;
 
+    private GL3DGrid followGrid;
+
     public GL3DCamera(double clipNear, double clipFar) {
         this();
         this.clipNear = clipNear;
@@ -87,12 +89,21 @@ public abstract class GL3DCamera {
         this.currentDragRotation = GL3DQuatd.createRotation(0.0, new GL3DVec3d(0, 1, 0));
         this.localRotation = GL3DQuatd.createRotation(0.0, new GL3DVec3d(0, 1, 0));
         this.translation = new GL3DVec3d();
-        this.grid = new GL3DGrid("grid", getGridResolutionX(), getGridResolutionY(), new GL3DVec4f(1.0f, 0.0f, 0.0f, 1.0f), new GL3DVec4d(0.0, 1.0, 0.0, 1.0));
+        this.grid = new GL3DGrid("grid", getGridResolutionX(), getGridResolutionY(), new GL3DVec4f(1.0f, 0.0f, 0.0f, 1.0f), new GL3DVec4d(0.0, 1.0, 0.0, 1.0), false);
+        this.followGrid = new GL3DGrid("grid", 90., 90., new GL3DVec4f(1.0f, 0.0f, 0.0f, 1.0f), new GL3DVec4d(0.0, 1.0, 0.0, 1.0), true);
+
         this.getGrid().getDrawBits().on(Bit.Hidden);
+        this.getFollowGrid().getDrawBits().on(Bit.Hidden);
+
     }
 
     public GL3DGrid getGrid() {
         return this.grid;
+
+    }
+
+    public GL3DGrid setFollowGrid(GL3DGrid followgrid) {
+        return this.followGrid = followgrid;
 
     }
 
@@ -114,9 +125,10 @@ public abstract class GL3DCamera {
         createNewGrid();
     }
 
-    public void setGrid(GL3DGrid grid) {
+    public void setGrid(GL3DGrid grid, GL3DGrid followGrid) {
 
         this.grid = grid;
+        this.followGrid = followGrid;
     };
 
     public abstract void reset();
@@ -405,5 +417,9 @@ public abstract class GL3DCamera {
 
     public long getTime() {
         return time;
+    }
+
+    public GL3DGrid getFollowGrid() {
+        return this.followGrid;
     }
 }
