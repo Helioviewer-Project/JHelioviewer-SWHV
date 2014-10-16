@@ -35,12 +35,12 @@ public class GL3DPositionLoading {
     public GL3DPositionDateTime[] positionDateTime;
     private final SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
     private final GregorianCalendar calendar = new GregorianCalendar();
-    private String beginDate = "2014-07-28T00:00:00";
-    private String endDate = "2014-05-30T00:00:00";
+    private String beginDate = "2014-05-28T00:00:00";
+    private String endDate = "2014-05-28T00:00:00";
     private String target = "Earth";
     private final String observer = "SUN";
     private final String baseUrl = "http://swhv.oma.be/position?";
-    private final int deltat = 60 * 60; //1 hours by default
+    private final int deltat = 60 * 60 / 64; //1 hours by default
     private final ArrayList<GL3DPositionLoadingListener> listeners = new ArrayList<GL3DPositionLoadingListener>();
     private Date beginDatems;
     private Date endDatems;
@@ -64,7 +64,7 @@ public class GL3DPositionLoading {
             public void run() {
                 try {
                     buildRequestURL();
-                    System.out.println(url);
+                    System.out.println("PLOAD" + url);
 
                     DownloadStream ds = new DownloadStream(url.toURI(), 30000, 30000, true);
                     Reader reader = new BufferedReader(new InputStreamReader(ds.getInput(), "UTF-8"));
@@ -94,7 +94,7 @@ public class GL3DPositionLoading {
             }
 
         });
-        loadData.start();
+        loadData.run();
         System.out.println("FINISHED" + (System.currentTimeMillis() - now));
 
     }
@@ -116,6 +116,9 @@ public class GL3DPositionLoading {
                 JSONArray positionArray = ithObject.getJSONArray("val");
                 double x = positionArray.getDouble(0);
                 double y = Math.PI + positionArray.getDouble(1);
+                if (positionArray.getDouble(1) > 0) {
+                    y = -Math.PI + positionArray.getDouble(1);
+                }
                 double z = -positionArray.getDouble(2);
                 GL3DVec3d vec = new GL3DVec3d(x, y, z);
                 positionDateTimehelper[i] = new GL3DPositionDateTime(calendar.getTimeInMillis(), vec);

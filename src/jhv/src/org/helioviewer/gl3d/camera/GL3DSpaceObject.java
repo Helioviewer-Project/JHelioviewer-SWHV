@@ -1,6 +1,5 @@
 package org.helioviewer.gl3d.camera;
 
-
 public class GL3DSpaceObject {
     private final String urlName;
     private final String labelName;
@@ -15,7 +14,7 @@ public class GL3DSpaceObject {
     }
 
     private static void createObjectList() {
-        objectList = new GL3DSpaceObject[15];
+        objectList = new GL3DSpaceObject[16];
 
         objectList[0] = new GL3DSpaceObject("Mercury", "Mercury");
         objectList[1] = new GL3DSpaceObject("Venus", "Venus");
@@ -36,7 +35,8 @@ public class GL3DSpaceObject {
         objectList[12] = new GL3DSpaceObject("Solar%20Orbiter", "Solar Orbiter");
 
         objectList[13] = new GL3DSpaceObject("CHURYUMOV-GERASIMENKO", "67P/Churyumov-Gerasimenko");
-        objectList[13] = new GL3DSpaceObject("SDO", "SDO");
+        objectList[14] = new GL3DSpaceObject("SDO", "SDO");
+        objectList[15] = new GL3DSpaceObject("PROBA2", "PROBA2");
 
     }
 
