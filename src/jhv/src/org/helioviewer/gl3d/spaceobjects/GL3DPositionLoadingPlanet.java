@@ -13,6 +13,9 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.GregorianCalendar;
+import java.util.List;
+
+import javax.swing.SwingWorker;
 
 import org.helioviewer.base.DownloadStream;
 import org.helioviewer.base.logging.Log;
@@ -33,7 +36,6 @@ public class GL3DPositionLoadingPlanet {
 
     private boolean isLoaded = false;
     private URL url;
-    private JSONArray jsonResult;
     public GL3DPositionDateTime[] positionDateTime;
     private final SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
     private final GregorianCalendar calendar = new GregorianCalendar();
@@ -46,8 +48,10 @@ public class GL3DPositionLoadingPlanet {
     private final ArrayList<GL3DPositionLoadingListener> listeners = new ArrayList<GL3DPositionLoadingListener>();
     private Date beginDatems = new Date();
     private Date endDatems = new Date(0);
+    private SwingWorker<Integer, Integer> worker;
 
     public GL3DPositionLoadingPlanet() {
+
     }
 
     private void buildRequestURL() {
@@ -63,48 +67,67 @@ public class GL3DPositionLoadingPlanet {
     }
 
     public void requestData() {
-        Thread loadData = new Thread(new Runnable() {
+        if (worker != null && !worker.isDone()) {
+            worker.cancel(true);
+        }
+        worker = new SwingWorker<Integer, Integer>() {
+            private String report = null;
+
             @Override
-            public void run() {
+            protected Integer doInBackground() throws Exception {
                 try {
+                    setLoaded(false);
                     buildRequestURL();
                     DownloadStream ds = new DownloadStream(url.toURI(), 30000, 30000, true);
                     Reader reader = new BufferedReader(new InputStreamReader(ds.getInput(), "UTF-8"));
                     if (!ds.getResponse400()) {
-                        jsonResult = new JSONArray(new JSONTokener(reader));
-                        parseData();
+                        JSONArray jsonResult = new JSONArray(new JSONTokener(reader));
+                        parseData(jsonResult);
                         if (positionDateTime.length > 0) {
+                            List<Integer> el = new ArrayList<Integer>();
                             setLoaded(true);
                         }
                     } else {
                         JSONObject jsonObject = new JSONObject(new JSONTokener(reader));
                         if (jsonObject.has("faultstring")) {
-                            String faultstring = jsonObject.getString("faultstring");
-                            fireLoaded(faultstring);
+                            report = jsonObject.getString("faultstring");
                         }
                     }
                 } catch (final IOException e1) {
                     Log.warn(e1);
                     e1.printStackTrace();
-                    fireLoaded(FAILEDSTATE + ": server problem");
+                    report = FAILEDSTATE + ": server problem";
                 } catch (JSONException e2) {
-                    fireLoaded(FAILEDSTATE + ": json parse problem");
+                    report = FAILEDSTATE + ": json parse problem";
                 } catch (URISyntaxException e) {
-                    fireLoaded(FAILEDSTATE + ": wrong URI");
+                    report = FAILEDSTATE + ": wrong URI";
+                }
+                return 1;
+            }
+
+            @Override
+            public void process(List<Integer> chunks) {
+                System.out.println("sdfs" + url);
+            }
+
+            public void finished() {
+                if (report != null) {
+                    fireLoaded(report);
                 }
 
             }
-
-        });
-        loadData.run();
+        };
+        worker.execute();
     }
 
     private void setLoaded(boolean isLoaded) {
         this.isLoaded = isLoaded;
         this.fireLoaded(this.LOADEDSTATE);
+        Log.error("SETLOAD" + isLoaded);
+        Thread.dumpStack();
     }
 
-    private void parseData() {
+    private void parseData(JSONArray jsonResult) {
         calendar.clear();
         try {
             GL3DPositionDateTime[] positionDateTimehelper = new GL3DPositionDateTime[jsonResult.length()];
@@ -142,7 +165,6 @@ public class GL3DPositionLoadingPlanet {
     }
 
     public void applyChanges() {
-        this.setLoaded(false);
         this.requestData();
     }
 
@@ -170,6 +192,7 @@ public class GL3DPositionLoadingPlanet {
     }
 
     public void fireLoaded(final String state) {
+        Log.error("STATE" + state);
         EventQueue.invokeLater(new Runnable() {
             @Override
             public void run() {
@@ -196,6 +219,7 @@ public class GL3DPositionLoadingPlanet {
             double y = this.positionDateTime[0].getPosition().y * 1000 / Constants.SunRadiusInMeter;
             double z = this.positionDateTime[0].getPosition().z * 1000 / Constants.SunRadiusInMeter;
             GL3DVec3d vec = new GL3DVec3d(-y, -z, -x);
+            System.out.println("VV" + vec);
             return vec;
         } else {
             double interpolatedIndex = (1. * (currentCameraTime - t3) / (t4 - t3) * this.positionDateTime.length);
