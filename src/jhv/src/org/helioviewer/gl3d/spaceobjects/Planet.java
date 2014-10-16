@@ -44,10 +44,12 @@ public class Planet extends GL3DSphere implements LayersListener, ViewListener, 
     public Planet(GL3DSceneGraphView sceneGraphView) {
         super(6052000 / Constants.SunRadiusInMeter, 10, 10, new GL3DVec4f(1.f, 0.f, 0.f, 1.f));
         //super(4878000 / Constants.SunRadiusInMeter, 10, 10, new GL3DVec4f(1.f, 0.f, 0.f, 1.f));
+        //super(384399000 / Constants.SunRadiusInMeter, 10, 10, new GL3DVec4f(1.f, 0.f, 0.f, 1.f));
         this.sceneGraphView = sceneGraphView;
         positionLoading = new GL3DPositionLoading();
         positionLoading.setTarget("Venus");
         //positionLoading.setTarget("Mercury");
+        //positionLoading.setTarget("Moon");
 
         positionLoading.requestData();
         this.sceneGraphView.addViewListener(this);
@@ -143,7 +145,7 @@ public class Planet extends GL3DSphere implements LayersListener, ViewListener, 
     private void updatePosition() {
         if (this.positionLoading.isLoaded()) {
             this.position = this.positionLoading.getInterpolatedPosition(currentDate.getTime());
-            System.out.println("POSITION" + position);
+            //System.out.println("POSITION" + position);
         }
     }
 
@@ -174,7 +176,6 @@ public class Planet extends GL3DSphere implements LayersListener, ViewListener, 
                 }
             }
         }
-        System.out.println("UPDATE");
         if (!this.isInitialised) {
             this.init(state);
         }

@@ -149,6 +149,7 @@ public class GL3DFollowObjectCameraOptionPanel extends GL3DCameraOptionPanel imp
         endDateLabel = new JLabel("End");
         endDatePicker = new JHVCalendarDatePicker();
         endDatePicker.getTextField().addFocusListener(new FocusListener() {
+        endDatePicker.addFocusListener(new FocusListener() {
 
             @Override
             public void focusGained(FocusEvent arg0) {
