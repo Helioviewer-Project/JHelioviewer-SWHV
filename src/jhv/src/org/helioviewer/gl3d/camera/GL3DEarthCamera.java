@@ -65,6 +65,7 @@ public class GL3DEarthCamera extends GL3DSolarRotationTrackingTrackballCamera im
         TimestampChangedReason timestampReason = aEvent.getLastChangedReasonByType(TimestampChangedReason.class);
         if ((timestampReason != null) && (timestampReason.getView() instanceof TimedMovieView) && LinkedMovieManager.getActiveInstance().isMaster((TimedMovieView) timestampReason.getView())) {
             currentDate = timestampReason.getNewDateTime().getTime();
+            this.setTime(currentDate.getTime());
             updateRotation();
         }
     }
