@@ -38,9 +38,12 @@ public abstract class GL3DCamera {
     public static final double MAX_DISTANCE = -Constants.SunMeanDistanceToEarth * 1.8;
     public static final double MIN_DISTANCE = -Constants.SunRadius * 1.2;
 
+    public static final double MIN_FOV = 0.5;
+    public static final double MAX_FOV = 1000;
+
     private double clipNear = Constants.SunRadius / 5.;
     private double clipFar = Constants.SunRadius * 1000.;
-    private final double fov = 10;
+    private double fov = 10;
     private double aspect = 0.0;
     private double width = 0.0;
     private double height = 0.0;
@@ -311,8 +314,17 @@ public abstract class GL3DCamera {
 
     public abstract void setCurrentInteraction(GL3DInteraction currentInteraction);
 
-    public double getFOV() {
+    public double getCameraFOV() {
         return this.fov;
+    }
+
+    public double setCameraFOV(double fov) {
+        if (fov < 0.1) {
+            Thread.dumpStack();
+            System.exit(1);
+        }
+        System.out.println("SETTINGFOV" + fov);
+        return this.fov = fov;
     }
 
     public double getClipNear() {
