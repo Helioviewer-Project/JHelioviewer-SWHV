@@ -35,22 +35,26 @@ public class GL3DPositionLoadingPlanet {
     public GL3DPositionDateTime[] positionDateTime;
     private final SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
     private final GregorianCalendar calendar = new GregorianCalendar();
-    private String beginDate = "2014-07-28T00:00:00";
-    private String endDate = "2014-05-30T00:00:00";
+    private String beginDate = "";
+    private String endDate = "";
     private String target = "Earth";
     private String observer = "SUN";
     private final String baseUrl = "http://127.0.0.1:7789/position?";
-    private final int deltat = 60 * 60 / 4; //1 hours by default
+    private final int deltat = 60 * 60 / 32; //1 hours by default
     private final ArrayList<GL3DPositionLoadingListener> listeners = new ArrayList<GL3DPositionLoadingListener>();
-    private Date beginDatems;
-    private Date endDatems;
+    private Date beginDatems = new Date();
+    private Date endDatems = new Date(0);
 
     public GL3DPositionLoadingPlanet() {
     }
 
     private void buildRequestURL() {
         try {
-            url = new URL(baseUrl + "abcorr=LT%2BS&utc=" + this.beginDate + "&utc_end=" + this.endDate + "&deltat=" + deltat + "&observer=" + observer + "&target=" + target + "&ref=HEEQ");
+            if (this.endDatems.getTime() - this.beginDatems.getTime() < 1000 * 60 * 60 * 24 * 10) {
+                url = new URL(baseUrl + "abcorr=LT%2BS&utc=" + this.beginDate + "&utc_end=" + this.endDate + "&deltat=" + deltat + "&observer=" + observer + "&target=" + target + "&ref=HEEQ");
+            } else {
+                url = new URL("");
+            }
         } catch (MalformedURLException e) {
             Log.error("A wrong url is given.", e);
         }
@@ -62,7 +66,7 @@ public class GL3DPositionLoadingPlanet {
             public void run() {
                 try {
                     buildRequestURL();
-                    System.out.println(url);
+                    System.out.println("PLANETLOAD" + url);
 
                     DownloadStream ds = new DownloadStream(url.toURI(), 30000, 30000, true);
                     Reader reader = new BufferedReader(new InputStreamReader(ds.getInput(), "UTF-8"));
