@@ -121,7 +121,10 @@ public class EVEDrawableElement implements DrawableElement {
             while (i.hasNext()) {
                 GraphPolyline line = i.next();
                 g.setColor(line.color);
-                g.drawPolyline(line.xPoints, line.yPoints, line.numberOfPoints);
+                for (int k = 0; k < line.xPoints.size(); k++) {
+                    g.drawPolyline(line.xPointsArray.get(k), line.yPointsArray.get(k), line.yPoints.get(k).size());
+                }
+
                 for (int j = 0; j < line.warnLevels.length; j++) {
                     g.drawLine(graphArea.x, line.warnLevels[j], graphArea.x + graphArea.width, line.warnLevels[j]);
                     g.drawString(line.warnLabels[j], graphArea.x, line.warnLevels[j]);
@@ -150,8 +153,10 @@ public class EVEDrawableElement implements DrawableElement {
 
         public final int numberOfPoints;
         public final int numberOfWarnLevels;
-        public final int[] xPoints;
-        public final int[] yPoints;
+        public final ArrayList<ArrayList<Integer>> xPoints;
+        public final ArrayList<ArrayList<Integer>> yPoints;
+        public final ArrayList<int[]> xPointsArray;
+        public final ArrayList<int[]> yPointsArray;
         public final int[] warnLevels;
         public final String[] warnLabels;
 
@@ -164,17 +169,37 @@ public class EVEDrawableElement implements DrawableElement {
         public GraphPolyline(final List<Point> points, final Color color, final List<Integer> warnLevels, final List<String> warnLabels) {
             numberOfPoints = points.size();
             numberOfWarnLevels = warnLevels.size();
-            xPoints = new int[numberOfPoints];
-            yPoints = new int[numberOfPoints];
+            xPoints = new ArrayList<ArrayList<Integer>>();
+            yPoints = new ArrayList<ArrayList<Integer>>();
+            xPointsArray = new ArrayList<int[]>();
+            yPointsArray = new ArrayList<int[]>();
             this.color = color;
             this.warnLevels = new int[numberOfWarnLevels];
             this.warnLabels = new String[numberOfWarnLevels];
 
-            int counter = 0;
+            int counter = -1;
+
+            Integer previousX = null;
             for (final Point point : points) {
-                xPoints[counter] = point.x;
-                yPoints[counter] = point.y;
-                counter++;
+                if (previousX == null || (point.x - previousX) > 120000) {
+                    xPoints.add(new ArrayList<Integer>());
+                    yPoints.add(new ArrayList<Integer>());
+                    counter++;
+                }
+                xPoints.get(counter).add(point.x);
+                yPoints.get(counter).add(point.y);
+                previousX = point.x;
+            }
+
+            for (int i = 0; i < xPoints.size(); i++) {
+                int[] xPointsArr = new int[xPoints.get(i).size()];
+                int[] yPointsArr = new int[yPoints.get(i).size()];
+                for (int j = 0; j < xPoints.get(i).size(); j++) {
+                    xPointsArr[j] = xPoints.get(i).get(j);
+                    yPointsArr[j] = yPoints.get(i).get(j);
+                }
+                xPointsArray.add(xPointsArr);
+                yPointsArray.add(yPointsArr);
             }
 
             counter = 0;
