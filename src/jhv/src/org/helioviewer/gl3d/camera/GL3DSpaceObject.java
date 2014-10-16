@@ -6,8 +6,8 @@ public class GL3DSpaceObject {
     private final double sizeInMeters;
     private static GL3DSpaceObject objectList[];
     public static GL3DSpaceObject earth;
-    public static int LINESEPPLANETS = 9;
-    public static int LINESEPSATS = 15;
+    public static int LINESEPPLANETS = 10;
+    public static int LINESEPSATS = 17;
 
     public static GL3DSpaceObject[] getObjectList() {
         if (objectList == null) {
@@ -18,7 +18,7 @@ public class GL3DSpaceObject {
 
 
     private static void createObjectList() {
-        objectList = new GL3DSpaceObject[16];
+        objectList = new GL3DSpaceObject[18];
 
         objectList[0] = new GL3DSpaceObject("Mercury", "Mercury", 2439700);
         objectList[1] = new GL3DSpaceObject("Venus", "Venus", 6051800);
@@ -34,14 +34,16 @@ public class GL3DSpaceObject {
         objectList[8] = new GL3DSpaceObject("Neptune%20Barycenter", "Neptune", 24622000);
         objectList[9] = new GL3DSpaceObject("Pluto%20Barycenter", "Pluto", 1195000);
 
-        objectList[10] = new GL3DSpaceObject("STEREO%20Ahead", "STEREO Ahead", 2);
-        objectList[11] = new GL3DSpaceObject("STEREO%20Behind", "STEREO Behind", 2);
-        objectList[12] = new GL3DSpaceObject("Solar%20Orbiter", "Solar Orbiter", 2);
+        objectList[10] = new GL3DSpaceObject("CHURYUMOV-GERASIMENKO", "67P/Churyumov-Gerasimenko", 2200);
 
-        objectList[13] = new GL3DSpaceObject("CHURYUMOV-GERASIMENKO", "67P/Churyumov-Gerasimenko", 2200);
-        objectList[14] = new GL3DSpaceObject("SDO", "SDO", 2);
-        objectList[15] = new GL3DSpaceObject("PROBA2", "PROBA2", 2);
+        objectList[11] = new GL3DSpaceObject("SOHO", "SOHO", 2);
+        objectList[12] = new GL3DSpaceObject("STEREO%20Ahead", "STEREO Ahead", 2);
+        objectList[13] = new GL3DSpaceObject("STEREO%20Behind", "STEREO Behind", 2);
+        objectList[14] = new GL3DSpaceObject("PROBA2", "PROBA2", 2);
+        objectList[15] = new GL3DSpaceObject("SDO", "SDO", 2);
 
+        objectList[16] = new GL3DSpaceObject("Solar%20Orbiter", "Solar Orbiter", 2);
+        objectList[17] = new GL3DSpaceObject("PROBA3", "PROBA3", 2);
     }
 
     private GL3DSpaceObject(String urlName, String labelName, double sizeInMeters) {
