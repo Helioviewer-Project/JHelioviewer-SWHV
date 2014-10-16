@@ -92,7 +92,6 @@ public class GL3DObserverCamera extends GL3DSolarRotationTrackingTrackballCamera
                         addl0 = hvMetadata.getStonyhurstLongitude() / MathUtils.radeg;
                         addb0 = hvMetadata.getStonyhurstLatitude() / MathUtils.radeg;
                     }
-                    System.out.println("DOBS" + hvMetadata.getDobs() / Constants.SunRadiusInMeter);
                     this.setZTranslation(-hvMetadata.getDobs() / Constants.SunRadiusInMeter);
                 } else {
                     addb0 = Astronomy.getB0InRadians(cal);
@@ -104,8 +103,6 @@ public class GL3DObserverCamera extends GL3DSolarRotationTrackingTrackballCamera
 
             this.getLocalRotation().clear();
             this.getLocalRotation().rotate(GL3DQuatd.createRotation(addb0, new GL3DVec3d(1, 0, 0)));
-            System.out.println("B0 " + addb0);
-            System.out.println("L0 " + addl0);
 
             this.getLocalRotation().rotate(GL3DQuatd.createRotation(this.currentRotation + addl0, new GL3DVec3d(0, 1, 0)));
             this.updateCameraTransformation();
