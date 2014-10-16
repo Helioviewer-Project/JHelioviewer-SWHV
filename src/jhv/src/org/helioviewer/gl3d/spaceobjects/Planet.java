@@ -46,9 +46,11 @@ public class Planet extends GL3DSphere implements LayersListener, ViewListener, 
         this.sceneGraphView = sceneGraphView;
         positionLoading = new GL3DPositionLoadingPlanet();
         positionLoading.setObserver("STEREO%20Ahead");
+        //positionLoading.setObserver("SDO");
         positionLoading.setTarget("SUN");
         positionLoadingalt = new GL3DPositionLoadingPlanet();
         positionLoadingalt.setObserver("STEREO%20Ahead");
+        //positionLoadingalt.setObserver("SDO");
         //positionLoadingalt.setTarget("Venus");
         positionLoadingalt.setTarget("Mercury");
         //positionLoading.setTarget("Moon");
