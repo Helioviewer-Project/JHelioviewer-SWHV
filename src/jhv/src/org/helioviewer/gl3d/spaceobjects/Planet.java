@@ -14,7 +14,6 @@ import org.helioviewer.gl3d.camera.GL3DPositionLoading;
 import org.helioviewer.gl3d.camera.GL3DPositionLoadingListener;
 import org.helioviewer.gl3d.scenegraph.GL3DState;
 import org.helioviewer.gl3d.scenegraph.math.GL3DMat4d;
-import org.helioviewer.gl3d.scenegraph.math.GL3DQuatd;
 import org.helioviewer.gl3d.scenegraph.math.GL3DVec3d;
 import org.helioviewer.gl3d.scenegraph.math.GL3DVec4f;
 import org.helioviewer.gl3d.scenegraph.visuals.GL3DSphere;
@@ -47,8 +46,8 @@ public class Planet extends GL3DSphere implements LayersListener, ViewListener, 
         super(4878000 / Constants.SunRadiusInMeter, 10, 10, new GL3DVec4f(1.f, 0.f, 0.f, 1.f));
         this.sceneGraphView = sceneGraphView;
         positionLoading = new GL3DPositionLoading();
-        //positionLoading.setObservingObject("Venus");
-        positionLoading.setObservingObject("Mercury");
+        //positionLoading.setTarget("Venus");
+        positionLoading.setTarget("Mercury");
 
         positionLoading.requestData();
         this.sceneGraphView.addViewListener(this);
@@ -143,7 +142,7 @@ public class Planet extends GL3DSphere implements LayersListener, ViewListener, 
 
     private void updatePosition() {
         if (this.positionLoading.isLoaded()) {
-            this.position = this.positionLoading.getInterpolatedPosition(currentDate.getTime() + 1000 * 60 * 8);
+            this.position = this.positionLoading.getInterpolatedPosition(currentDate.getTime());
             System.out.println("POSITION" + position);
         }
     }
@@ -183,8 +182,7 @@ public class Planet extends GL3DSphere implements LayersListener, ViewListener, 
             state.pushMV();
             //GL3DQuatd differentialRotation = state.getActiveCamera().getLocalRotation();
             //this.m = differentialRotation.toMatrix().inverse();
-            GL3DQuatd differentialRotation = state.getActiveCamera().getLocalRotation();
-            System.out.println("CAMERA" + state.getActiveCamera().getZTranslation());
+
             this.m.setIdentity();
             //this.m.multiply(differentialRotation.toMatrix().inverse());
             double currentRotation = Astronomy.getL0Radians(currentDate);
