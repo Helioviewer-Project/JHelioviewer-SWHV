@@ -44,7 +44,7 @@ public class GL3DPositionLoadingPlanet {
     private String target = "Earth";
     private String observer = "SUN";
     private final String baseUrl = "http://swhv.oma.be/position?";
-    private final int deltat = 60 * 60 / 32; //1 hours by default
+    private final int deltat = 60 * 60 / 32;
     private final ArrayList<GL3DPositionLoadingListener> listeners = new ArrayList<GL3DPositionLoadingListener>();
     private Date beginDatems = new Date();
     private Date endDatems = new Date(0);
