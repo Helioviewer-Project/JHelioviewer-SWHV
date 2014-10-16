@@ -128,6 +128,9 @@ public class GL3DPositionLoading {
         } catch (ParseException e) {
             this.fireLoaded(this.PARTIALSTATE);
             Log.warn("Problem Parsing the date in JSON Response.", e);
+        } catch (NumberFormatException e) {
+            this.fireLoaded(this.PARTIALSTATE);
+            Log.warn("Problem Parsing the date in JSON Response.", e);
         }
     }
 

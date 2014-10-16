@@ -41,28 +41,18 @@ public class Planet extends GL3DSphere implements LayersListener, ViewListener, 
     private final GL3DSpaceObject viewPoint;
 
     public Planet(GL3DSpaceObject spaceObject, GL3DSpaceObject viewPoint) {
-        //super(6052000 / Constants.SunRadiusInMeter, 10, 10, new GL3DVec4f(1.f, 0.f, 0.f, 1.f));
-        //super(2439700 / Constants.SunRadiusInMeter, 10, 10, new GL3DVec4f(1.f, 0.f, 0.f, 1.f));
-        super(spaceObject.getSize() / Constants.SunRadiusInMeter, 10, 10, new GL3DVec4f(1.f, 0.f, 0.f, 1.f));
+        super(0.9 * spaceObject.getSize() / Constants.SunRadiusInMeter, 10, 10, new GL3DVec4f(1.f, 0.f, 0.f, 1.f));
         this.spaceObject = spaceObject;
         this.viewPoint = viewPoint;
         positionLoading = new GL3DPositionLoadingPlanet();
-        //positionLoading.setObserver("PROBA2");
         positionLoading.setObserver(viewPoint.getUrlName());
-        //positionLoading.setObserver("SDO");
         positionLoading.setTarget("SUN");
         positionLoadingalt = new GL3DPositionLoadingPlanet();
-        //positionLoadingalt.setObserver("PROBA2");
         positionLoadingalt.setObserver(viewPoint.getUrlName());
-        //positionLoadingalt.setObserver("SDO");
-        //positionLoadingalt.setTarget("Venus");
         positionLoadingalt.setTarget(spaceObject.getUrlName());
-        //positionLoading.setTarget("Moon");
-
         positionLoading.requestData();
         this.layerAdded(0);
         this.drawBits.set(Bit.Wireframe, true);
-
     }
 
     private Date parseDate(String dateOBS) {
