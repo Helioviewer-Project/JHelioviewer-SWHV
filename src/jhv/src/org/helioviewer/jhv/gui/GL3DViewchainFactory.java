@@ -15,6 +15,8 @@ import org.helioviewer.viewmodel.view.View;
 import org.helioviewer.viewmodel.view.opengl.GLOverlayView;
 
 public class GL3DViewchainFactory extends ViewchainFactory {
+    public static GL3DSceneGraphView currentSceneGraph;
+
     public GL3DViewchainFactory() {
         super(new GL3DViewFactory());
     }
@@ -46,6 +48,7 @@ public class GL3DViewchainFactory extends ViewchainFactory {
         viewportView.setView(cameraView);
 
         GL3DSceneGraphView sceneGraph = new GL3DSceneGraphView();
+        currentSceneGraph = sceneGraph;
         sceneGraph.setView(viewportView);
         sceneGraph.setGLOverlayView(overlayView);
 
