@@ -113,7 +113,6 @@ public class GL3DFollowObjectCameraOptionPanel extends GL3DCameraOptionPanel imp
         JCheckBox fovCheckbox = new JCheckBox("Visible");
         fovCheckbox.setSelected(true);
         fovCheckbox.addItemListener(new ItemListener() {
-
             @Override
             public void itemStateChanged(ItemEvent e) {
                 if (e.getStateChange() == ItemEvent.DESELECTED) {
@@ -132,7 +131,6 @@ public class GL3DFollowObjectCameraOptionPanel extends GL3DCameraOptionPanel imp
         beginDateLabel = new JLabel("Begin");
         beginDatePicker = new JHVCalendarDatePicker();
         beginDatePicker.getTextField().addFocusListener(new FocusListener() {
-
             @Override
             public void focusGained(FocusEvent arg0) {
             }

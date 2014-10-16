@@ -57,6 +57,8 @@ public class GL3DPositionLoading {
     }
 
     public void requestData() {
+        long now = System.currentTimeMillis();
+        System.out.println("HERE");
         Thread loadData = new Thread(new Runnable() {
             @Override
             public void run() {
@@ -92,7 +94,9 @@ public class GL3DPositionLoading {
             }
 
         });
-        loadData.run();
+        loadData.start();
+        System.out.println("FINISHED" + (System.currentTimeMillis() - now));
+
     }
 
     private void setLoaded(boolean isLoaded) {

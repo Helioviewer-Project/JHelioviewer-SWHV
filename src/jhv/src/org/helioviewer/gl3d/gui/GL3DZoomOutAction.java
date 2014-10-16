@@ -27,7 +27,7 @@ public class GL3DZoomOutAction extends ZoomOutAction {
         GL3DCamera camera = GL3DCameraSelectorModel.getInstance().getCurrentCamera();
 
         double distance = -camera.getDistanceToSunSurface() / 2;
-        GL3DCameraSelectorModel.getInstance().getCurrentCamera().addCameraAnimation(new GL3DCameraZoomAnimation(-0.1, 500));
+        GL3DCameraSelectorModel.getInstance().getCurrentCamera().addCameraAnimation(new GL3DCameraZoomAnimation(0.1, 500));
         Displayer.getSingletonInstance().render();
 
     }

@@ -37,16 +37,19 @@ public abstract class GL3DDefaultInteraction extends GL3DInteraction {
     }
 
     public void reset() {
-
         camera.setZTranslation(-GL3DEarthCamera.DEFAULT_CAMERA_DISTANCE);
         this.camera.updateCameraTransformation();
-
     }
 
     @Override
     public void mouseWheelMoved(MouseWheelEvent e, GL3DCamera camera) {
-        double fovDistance = -camera.getCameraFOV() / 2 * GL3DDefaultInteraction.ZOOM_WHEEL_FACTOR;
+        double pos = -1.;
+        int wr = e.getWheelRotation();
+        if (wr < 0.) {
+            pos = 1.;
+        }
+        double fovDistance = -camera.getCameraFOV() / 2 * GL3DDefaultInteraction.ZOOM_WHEEL_FACTOR * pos;
+        System.out.println(fovDistance);
         camera.addCameraAnimation(new GL3DCameraZoomAnimation(fovDistance));
     }
-
 }
