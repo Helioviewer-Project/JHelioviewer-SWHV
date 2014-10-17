@@ -1206,7 +1206,7 @@ public class ExportMovieDialog extends JDialog implements ChangeListener, Action
 
                 // Write subtitles
                 String frameNumberText = "{" + (currentFrame - 1) + "}{" + (currentFrame - 1) + "}";
-                SimpleDateFormat subtitleFormatter = new SimpleDateFormat("yyyy/MM/dd - HH:mm:ss'Z'");
+                SimpleDateFormat subtitleFormatter = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
                 StringBuffer subtitleTextAll = new StringBuffer(frameNumberText);
 
                 for (View view : subtitleFiles.keySet()) {

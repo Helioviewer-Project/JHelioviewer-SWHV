@@ -31,7 +31,7 @@ public class PeriodPicker extends JPanel implements ActionListener, MouseListene
 
     private static final long serialVersionUID = 1L;
 
-    private SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd");
+    private SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
 
     private final LinkedList<PeriodPickerListener> listeners = new LinkedList<PeriodPickerListener>();
     private Interval<Date> interval = new Interval<Date>(null, null);
@@ -91,7 +91,7 @@ public class PeriodPicker extends JPanel implements ActionListener, MouseListene
     /**
      * Sets the date format pattern. The date will be displayed in defined
      * format.
-     * 
+     *
      * @param newFormat
      *            new pattern to use
      */
@@ -123,6 +123,7 @@ public class PeriodPicker extends JPanel implements ActionListener, MouseListene
     // Action Listener
     // ////////////////////////////////////////////////////////////////
 
+    @Override
     public void actionPerformed(ActionEvent e) {
         if (e.getSource() == popupButton) {
             showPeriodSelectionDialog();
@@ -133,21 +134,26 @@ public class PeriodPicker extends JPanel implements ActionListener, MouseListene
     // Mouse Listener
     // ////////////////////////////////////////////////////////////////
 
+    @Override
     public void mouseClicked(MouseEvent e) {
         if (e.getSource() == textField) {
             showPeriodSelectionDialog();
         }
     }
 
+    @Override
     public void mouseEntered(MouseEvent e) {
     }
 
+    @Override
     public void mouseExited(MouseEvent e) {
     }
 
+    @Override
     public void mousePressed(MouseEvent e) {
     }
 
+    @Override
     public void mouseReleased(MouseEvent e) {
     }
 }

@@ -59,7 +59,7 @@ public class PreferencesDialog extends JDialog implements ShowableDialog {
 
     private static final long serialVersionUID = 1L;
 
-    private final String defaultDateFormat = "yyyy/MM/dd";
+    private final String defaultDateFormat = "yyyy-MM-dd";
 
     private JRadioButton loadDefaultMovieOnStartUp;
     private JRadioButton doNothingOnStartUp;

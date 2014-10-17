@@ -54,7 +54,7 @@ public class JHVCalendarDatePicker extends JPanel implements FocusListener, Acti
     private static final long serialVersionUID = 1L;
 
     private final AbstractList<JHVCalendarListener> listeners = new LinkedList<JHVCalendarListener>();
-    private SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd");
+    private SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
     private final Calendar calendar = new GregorianCalendar();
 
     private JHVCalendar jhvCalendar = null;
