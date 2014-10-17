@@ -48,7 +48,7 @@ import org.helioviewer.jhv.gui.IconBank.JHVIcon;
  * This component acts as a subcomponent of the {@link JHVCalendarDatePicker}
  * too. It represents the content of the popup window of the
  * JHVCalendarDatePicker.
- * 
+ *
  * @author Stephan Pagel
  */
 public class JHVCalendar extends JPanel implements ComponentListener {
@@ -63,14 +63,14 @@ public class JHVCalendar extends JPanel implements ComponentListener {
         DAYS, MONTHS, YEARS
     }
 
-    private SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd");
+    private final SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
     private DisplayMode displayMode;
     private CalendarViewController calendarViewController = null;
-    private AbstractList<JHVCalendarListener> listeners = new LinkedList<JHVCalendarListener>();
+    private final AbstractList<JHVCalendarListener> listeners = new LinkedList<JHVCalendarListener>();
 
-    private NavigationPanel navigationPanel = new NavigationPanel();
-    private SelectionPanel selectionPanel = new SelectionPanel();
-    private BottomPanel bottomPanel = new BottomPanel();
+    private final NavigationPanel navigationPanel = new NavigationPanel();
+    private final SelectionPanel selectionPanel = new SelectionPanel();
+    private final BottomPanel bottomPanel = new BottomPanel();
 
     // ////////////////////////////////////////////////////////////////
     // Methods
@@ -87,7 +87,7 @@ public class JHVCalendar extends JPanel implements ComponentListener {
     /**
      * Constructor where to choose if the current date should be displayed at
      * the bottom or not.
-     * 
+     *
      * @param showToday
      *            True if the date of the current date should be displayed at
      *            the bottom; false if not.
@@ -103,7 +103,7 @@ public class JHVCalendar extends JPanel implements ComponentListener {
 
     /**
      * Initialize the visual parts of the component.
-     * 
+     *
      * @param showToday
      *            True if the date of the current date should be displayed at
      *            the bottom; false if not.
@@ -131,7 +131,7 @@ public class JHVCalendar extends JPanel implements ComponentListener {
 
     /**
      * Changes the view and the corresponding controller.
-     * 
+     *
      * @param newMode
      *            Defines which view has to be displayed.
      */
@@ -182,7 +182,7 @@ public class JHVCalendar extends JPanel implements ComponentListener {
 
     /**
      * Set the date pattern. The date will be displayed in defined format.
-     * 
+     *
      * @param pattern
      *            pattern how date should be displayed.
      * @return boolean value if pattern is valid.
@@ -202,7 +202,7 @@ public class JHVCalendar extends JPanel implements ComponentListener {
 
     /**
      * Sets the current date to the calendar component.
-     * 
+     *
      * @param date
      *            Selected date of the calendar component.
      */
@@ -217,7 +217,7 @@ public class JHVCalendar extends JPanel implements ComponentListener {
 
     /**
      * Returns the selected date of the calendar component.
-     * 
+     *
      * @return selected date.
      */
     public Date getDate() {
@@ -226,7 +226,7 @@ public class JHVCalendar extends JPanel implements ComponentListener {
 
     /**
      * Adds a listener which will be informed when a date has been selected.
-     * 
+     *
      * @param l
      *            listener which has to be informed.
      */
@@ -239,7 +239,7 @@ public class JHVCalendar extends JPanel implements ComponentListener {
     /**
      * Removes a listener which should not be informed anymore when a date has
      * been selected.
-     * 
+     *
      * @param l
      *            listener which should not be informed anymore.
      */
@@ -251,7 +251,7 @@ public class JHVCalendar extends JPanel implements ComponentListener {
 
     /**
      * Informs all listener of this class by passing the corresponding event.
-     * 
+     *
      * @param e
      *            event
      */
@@ -265,18 +265,21 @@ public class JHVCalendar extends JPanel implements ComponentListener {
     /**
      * {@inheritDoc}
      */
+    @Override
     public void componentHidden(ComponentEvent arg0) {
     }
 
     /**
      * {@inheritDoc}
      */
+    @Override
     public void componentMoved(ComponentEvent arg0) {
     }
 
     /**
      * {@inheritDoc}
      */
+    @Override
     public void componentResized(ComponentEvent arg0) {
 
         if (selectionPanel != null) {
@@ -289,13 +292,14 @@ public class JHVCalendar extends JPanel implements ComponentListener {
     /**
      * {@inheritDoc}
      */
+    @Override
     public void componentShown(ComponentEvent arg0) {
     }
 
     /**
      * Panel which acts as a container for the navigation buttons on the top of
      * the calendar component.
-     * 
+     *
      * @author Stephan Pagel
      */
     private class NavigationPanel extends JPanel implements ActionListener {
@@ -306,11 +310,11 @@ public class JHVCalendar extends JPanel implements ComponentListener {
 
         private static final long serialVersionUID = 1L;
 
-        private JButton quickForwardButton = new JButton(IconBank.getIcon(JHVIcon.SIMPLE_DOUBLEARROW_RIGHT));
-        private JButton quickBackButton = new JButton(IconBank.getIcon(JHVIcon.SIMPLE_DOUBLEARROW_LEFT));
-        private JButton forwardButton = new JButton(IconBank.getIcon(JHVIcon.SIMPLE_ARROW_RIGHT));
-        private JButton backButton = new JButton(IconBank.getIcon(JHVIcon.SIMPLE_ARROW_LEFT));
-        private JButton selectButton = new JButton("");
+        private final JButton quickForwardButton = new JButton(IconBank.getIcon(JHVIcon.SIMPLE_DOUBLEARROW_RIGHT));
+        private final JButton quickBackButton = new JButton(IconBank.getIcon(JHVIcon.SIMPLE_DOUBLEARROW_LEFT));
+        private final JButton forwardButton = new JButton(IconBank.getIcon(JHVIcon.SIMPLE_ARROW_RIGHT));
+        private final JButton backButton = new JButton(IconBank.getIcon(JHVIcon.SIMPLE_ARROW_LEFT));
+        private final JButton selectButton = new JButton("");
 
         // ////////////////////////////////////////////////////////////
         // Methods
@@ -370,7 +374,7 @@ public class JHVCalendar extends JPanel implements ComponentListener {
 
         /**
          * Sets the text of the button which changes the view.
-         * 
+         *
          * @param text
          *            text to display on the button.
          */
@@ -382,6 +386,7 @@ public class JHVCalendar extends JPanel implements ComponentListener {
         /**
          * Action event for all the buttons of this component.
          */
+        @Override
         public void actionPerformed(ActionEvent e) {
 
             if (e.getSource() == forwardButton) {
@@ -467,7 +472,7 @@ public class JHVCalendar extends JPanel implements ComponentListener {
     /**
      * Panel which acts as a container of the grid which displays the period of
      * the current view controller.
-     * 
+     *
      * @author Stephan Pagel
      */
     private class SelectionPanel extends JPanel implements MouseListener {
@@ -533,7 +538,7 @@ public class JHVCalendar extends JPanel implements ComponentListener {
 
         /**
          * Displays the passed data in the grid.
-         * 
+         *
          * @param data
          *            Data to display in the table. If this parameter is null
          *            the method will do nothing.
@@ -578,7 +583,7 @@ public class JHVCalendar extends JPanel implements ComponentListener {
          * Checks if the selected cell has a valid value. The method will return
          * false if the cell value is null or the user clicked in an empty table
          * space where no cell is located; otherwise the method returns true.
-         * 
+         *
          * @return boolean value if cell is unequal null and user clicked inside
          *         a cell.
          */
@@ -632,6 +637,7 @@ public class JHVCalendar extends JPanel implements ComponentListener {
          * When a cell in the table was clicked which contains a valid data, the
          * view controller and view mode will be changed.
          */
+        @Override
         public void mouseClicked(MouseEvent arg0) {
 
             if (arg0.getButton() == MouseEvent.BUTTON1) {
@@ -660,24 +666,28 @@ public class JHVCalendar extends JPanel implements ComponentListener {
         /**
          * {@inheritDoc}
          */
+        @Override
         public void mouseEntered(MouseEvent arg0) {
         }
 
         /**
          * {@inheritDoc}
          */
+        @Override
         public void mouseExited(MouseEvent arg0) {
         }
 
         /**
          * {@inheritDoc}
          */
+        @Override
         public void mousePressed(MouseEvent arg0) {
         }
 
         /**
          * {@inheritDoc}
          */
+        @Override
         public void mouseReleased(MouseEvent arg0) {
         }
     }
@@ -685,7 +695,7 @@ public class JHVCalendar extends JPanel implements ComponentListener {
     /**
      * Table model for the used JTable. This model did not allow to edit cells
      * of the table.
-     * 
+     *
      * @author Stephan Pagel
      */
     private class SelectionTableModel extends DefaultTableModel {
@@ -714,6 +724,7 @@ public class JHVCalendar extends JPanel implements ComponentListener {
          * Returns always false, so all cells cannot be edited.
          */
 
+        @Override
         public boolean isCellEditable(int row, int column) {
 
             return false;
@@ -723,9 +734,9 @@ public class JHVCalendar extends JPanel implements ComponentListener {
     /**
      * Table cell renderer for the used JTable. This renderer displays all cell
      * entries centered.
-     * 
+     *
      * @author Stephan Pagel
-     * 
+     *
      */
     private class CenterTableCellRenderer extends DefaultTableCellRenderer {
 
@@ -751,6 +762,7 @@ public class JHVCalendar extends JPanel implements ComponentListener {
          * Overrides this method so it will be set up correctly with super class
          * but returns its own instance.
          */
+        @Override
         public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
 
             super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
@@ -761,7 +773,7 @@ public class JHVCalendar extends JPanel implements ComponentListener {
     /**
      * Panel which acts as a container of the button which displays the current
      * date and allows to set the current date to the calendar component.
-     * 
+     *
      * @author Stephan Pagel
      */
     private class BottomPanel extends JPanel implements ActionListener {
@@ -772,7 +784,7 @@ public class JHVCalendar extends JPanel implements ComponentListener {
 
         private static final long serialVersionUID = 1L;
 
-        private JButton dateButton = new JButton();
+        private final JButton dateButton = new JButton();
 
         // ////////////////////////////////////////////////////////////
         // Methods
@@ -808,6 +820,7 @@ public class JHVCalendar extends JPanel implements ComponentListener {
          * <p>
          * Sets the calendar component to the current date.
          */
+        @Override
         public void actionPerformed(ActionEvent e) {
 
             changeDisplayMode(DisplayMode.DAYS);

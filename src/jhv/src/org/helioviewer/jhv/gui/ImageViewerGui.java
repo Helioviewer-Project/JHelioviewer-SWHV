@@ -304,7 +304,7 @@ public class ImageViewerGui {
          * count=count+1; } else{ ComponentView cv =
          * ImageViewerGui.getSingletonInstance().getMainView(); cv.activate();
          * Log.error("WindowListener method called: windowActivated."); } }
-         * 
+         *
          * public void windowLostFocus(WindowEvent e) { ComponentView cv =
          * ImageViewerGui.getSingletonInstance().getMainView(); cv.deactivate();
          * Log.error("WindowListener method called: windowDeactivated."); } });
@@ -420,7 +420,7 @@ public class ImageViewerGui {
             PlanetOptionsPanel planetOptionsPanel = new PlanetOptionsPanel();
             planetTab.addTab("Internal Plugins", planetOptionsPanel);
             planetTab.setEnabled(false);
-            //leftPane.add("Object Options", planetOptionsPanel, false);
+            leftPane.add("Object Options", planetOptionsPanel, false);
             return leftPane;
         }
     }

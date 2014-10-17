@@ -10,9 +10,9 @@ import java.util.TimeZone;
  * Class that holds Date and Time information. The data is stored in a Calendar
  * object. This class is immutable, if you want a mutable version look at
  * MutableDateTime.
- * 
+ *
  * @author caplins
- * 
+ *
  */
 public class ImmutableDateTime implements Comparable<ImmutableDateTime> {
 
@@ -81,7 +81,7 @@ public class ImmutableDateTime implements Comparable<ImmutableDateTime> {
      * Returns the requested field. Field keys are the same as the Calendar
      * class, since that is the underlying DateTime representation. NOTE: The
      * month is zero based... i.e. January is represented by 0
-     * 
+     *
      * @param _field
      * @return Requested field
      */
@@ -112,6 +112,7 @@ public class ImmutableDateTime implements Comparable<ImmutableDateTime> {
      * Via the Comparable interface. This method will be used to sort the
      * DataTime objects.
      */
+    @Override
     public int compareTo(ImmutableDateTime _dt) {
         long diff = (calendar.getTimeInMillis() - _dt.calendar.getTimeInMillis());
         return diff < 0 ? -1 : (diff > 0 ? +1 : 0);
@@ -128,6 +129,7 @@ public class ImmutableDateTime implements Comparable<ImmutableDateTime> {
 
     /** Overridden hashCode method */
 
+    @Override
     public int hashCode() {
         return (int) (calendar.getTimeInMillis() ^ (calendar.getTimeInMillis() >>> 32));
     }
@@ -135,7 +137,7 @@ public class ImmutableDateTime implements Comparable<ImmutableDateTime> {
     public String getCachedDate() {
         if (this.cachedDate == null) {
             SimpleDateFormat dateFormat;
-            dateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
+            dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
             this.cachedDate = dateFormat.format(calendar.getTime());
         }
         return this.cachedDate;
