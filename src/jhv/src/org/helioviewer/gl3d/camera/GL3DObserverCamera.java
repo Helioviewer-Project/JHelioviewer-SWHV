@@ -101,7 +101,7 @@ public class GL3DObserverCamera extends GL3DSolarRotationTrackingTrackballCamera
             this.getLocalRotation().clear();
             this.getLocalRotation().rotate(GL3DQuatd.createRotation(addb0, new GL3DVec3d(1, 0, 0)));
 
-            this.getLocalRotation().rotate(GL3DQuatd.createRotation(this.currentRotation + addl0, new GL3DVec3d(0, 1, 0)));
+            this.getLocalRotation().rotate(GL3DQuatd.createRotation(this.currentRotation - addl0, new GL3DVec3d(0, 1, 0)));
             this.updateCameraTransformation();
         }
     }
