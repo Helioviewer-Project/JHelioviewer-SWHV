@@ -85,6 +85,7 @@ public class GL3DGrid extends GL3DGroup {
         this.markAsChanged();
         state.gl.glColor3d(1., 1., 0.);
         GL2 gl = state.gl;
+        gl.glDisable(GL2.GL_LIGHTING);
         super.shapeDraw(state);
         float relhi = (float) ((-state.getActiveCamera().getZTranslation() - 1) / 10.f) / scale;
         float cfontsize = this.fontsize / relhi;
@@ -97,6 +98,8 @@ public class GL3DGrid extends GL3DGroup {
             drawText(gl);
         }
         drawCircles(gl);
+        gl.glEnable(GL2.GL_LIGHTING);
+
     }
 
     private void drawCircles(GL2 gl) {
