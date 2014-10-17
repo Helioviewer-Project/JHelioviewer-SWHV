@@ -159,11 +159,11 @@ public class LayerTable extends JTable {
         getColumnModel().getColumn(LayerTableModel.COLUMN_VISIBILITY).setCellRenderer(descriptorIconRenderer);
 
         getColumnModel().getColumn(LayerTableModel.COLUMN_TITLE).setCellRenderer(new DescriptorTitleRenderer(true));
-        getColumnModel().getColumn(LayerTableModel.COLUMN_TITLE).setPreferredWidth(35);
-        getColumnModel().getColumn(LayerTableModel.COLUMN_TITLE).setWidth(35);
+        getColumnModel().getColumn(LayerTableModel.COLUMN_TITLE).setPreferredWidth(18);
+        //getColumnModel().getColumn(LayerTableModel.COLUMN_TITLE).setWidth(5);
 
         getColumnModel().getColumn(LayerTableModel.COLUMN_TIMESTAMP).setCellRenderer(new DescriptorTimestampRenderer(true));
-        getColumnModel().getColumn(LayerTableModel.COLUMN_TIMESTAMP).setPreferredWidth(15);
+        //getColumnModel().getColumn(LayerTableModel.COLUMN_TIMESTAMP).setPreferredWidth(15);
         Border removeIconBorder = BorderFactory.createEmptyBorder(5, 14, 5, 9);
         IconRenderer iconRenderer = new IconRenderer("Remove Layer", IconBank.getIcon(JHVIcon.REMOVE_LAYER), removeIconBorder);
         iconRenderer.setFixedWidth(this, LayerTableModel.COLUMN_BUTTON_REMOVE);
