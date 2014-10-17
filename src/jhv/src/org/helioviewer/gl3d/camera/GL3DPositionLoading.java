@@ -162,8 +162,9 @@ public class GL3DPositionLoading {
         applyChanges();
     }
 
-    public void applyChanges() {
+    synchronized public void applyChanges() {
         this.setLoaded(false);
+        this.positionDateTime = null;
         this.requestData();
     }
 
@@ -209,32 +210,36 @@ public class GL3DPositionLoading {
         return this.endDatems;
     }
 
-    public GL3DVec3d getInterpolatedPosition(long currentCameraTime) {
-        long t3 = this.getBeginDate().getTime();
-        long t4 = this.getEndDate().getTime();
-        if (t3 == t4) {
-            double hgln = this.positionDateTime[0].getPosition().y;
-            double hglt = this.positionDateTime[0].getPosition().z;
-            double dist = this.positionDateTime[0].getPosition().x;
-            dist = dist * 1000 / Constants.SunRadiusInMeter;
-            GL3DVec3d vec = new GL3DVec3d(dist, hgln, hglt);
-            return vec;
-        } else {
-            double interpolatedIndex = (1. * (currentCameraTime - t3) / (t4 - t3) * this.positionDateTime.length);
-            int i = (int) interpolatedIndex;
-            i = Math.min(i, this.positionDateTime.length - 1);
-            if (i < 0) {
-                i = 0;
-            }
-            int inext = Math.min(i + 1, this.positionDateTime.length - 1);
+    synchronized public GL3DVec3d getInterpolatedPosition(long currentCameraTime) {
+        if (this.isLoaded) {
+            long t3 = this.getBeginDate().getTime();
+            long t4 = this.getEndDate().getTime();
+            if (t3 == t4) {
+                double hgln = this.positionDateTime[0].getPosition().y;
+                double hglt = this.positionDateTime[0].getPosition().z;
+                double dist = this.positionDateTime[0].getPosition().x;
+                dist = dist * 1000 / Constants.SunRadiusInMeter;
+                GL3DVec3d vec = new GL3DVec3d(dist, hgln, hglt);
+                return vec;
+            } else {
+                double interpolatedIndex = (1. * (currentCameraTime - t3) / (t4 - t3) * this.positionDateTime.length);
+                int i = (int) interpolatedIndex;
+                i = Math.min(i, this.positionDateTime.length - 1);
+                if (i < 0) {
+                    i = 0;
+                }
+                int inext = Math.min(i + 1, this.positionDateTime.length - 1);
 
-            double alpha = 1. - interpolatedIndex % 1.;
-            double hgln = alpha * this.positionDateTime[i].getPosition().y + (1 - alpha) * this.positionDateTime[inext].getPosition().y;
-            double hglt = alpha * this.positionDateTime[i].getPosition().z + (1 - alpha) * this.positionDateTime[inext].getPosition().z;
-            double dist = alpha * this.positionDateTime[i].getPosition().x + (1 - alpha) * this.positionDateTime[inext].getPosition().x;
-            dist = dist * 1000 / Constants.SunRadiusInMeter;
-            GL3DVec3d vec = new GL3DVec3d(dist, hgln, hglt);
-            return vec;
+                double alpha = 1. - interpolatedIndex % 1.;
+                double hgln = alpha * this.positionDateTime[i].getPosition().y + (1 - alpha) * this.positionDateTime[inext].getPosition().y;
+                double hglt = alpha * this.positionDateTime[i].getPosition().z + (1 - alpha) * this.positionDateTime[inext].getPosition().z;
+                double dist = alpha * this.positionDateTime[i].getPosition().x + (1 - alpha) * this.positionDateTime[inext].getPosition().x;
+                dist = dist * 1000 / Constants.SunRadiusInMeter;
+                GL3DVec3d vec = new GL3DVec3d(dist, hgln, hglt);
+                return vec;
+            }
+        } else {
+            return null;
         }
     }
 
