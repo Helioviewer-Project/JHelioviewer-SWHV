@@ -141,13 +141,15 @@ public class JHVEventContainer {
         EventQueue.invokeLater(new Runnable() {
             @Override
             public void run() {
-                // Logger.getLogger(JHVEventContainer.class.getName()).info("Request for interval : ["
-                // + startDate + "," + endDate + "]");
-                eventHandlerCache.add(handler, startDate, endDate);
-                Map<String, NavigableMap<Date, NavigableMap<Date, List<JHVEvent>>>> events = eventCache.get(startDate, endDate);
-                // AssociationsPrinter.print(events);
-                handler.newEventsReceived(events);
-                requestEvents(startDate, endDate);
+                if (startDate != null && endDate != null) {
+                    // Logger.getLogger(JHVEventContainer.class.getName()).info("Request for interval : ["
+                    // + startDate + "," + endDate + "]");
+                    eventHandlerCache.add(handler, startDate, endDate);
+                    Map<String, NavigableMap<Date, NavigableMap<Date, List<JHVEvent>>>> events = eventCache.get(startDate, endDate);
+                    // AssociationsPrinter.print(events);
+                    handler.newEventsReceived(events);
+                    requestEvents(startDate, endDate);
+                }
             }
         });
     }
