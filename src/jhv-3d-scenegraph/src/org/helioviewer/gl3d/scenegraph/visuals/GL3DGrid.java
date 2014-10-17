@@ -99,7 +99,6 @@ public class GL3DGrid extends GL3DGroup {
         }
         drawCircles(gl);
         gl.glEnable(GL2.GL_LIGHTING);
-
     }
 
     private void drawCircles(GL2 gl) {
@@ -217,7 +216,9 @@ public class GL3DGrid extends GL3DGroup {
         for (double phi = 0; phi <= 90; phi = phi + this.latstepDegrees) {
             double angle = (90 - phi) * Math.PI / 180.;
             String txt = String.format("%.1f", phi);
-
+            if (txt.substring(txt.length() - 1, txt.length()).equals("0")) {
+                txt = txt.substring(0, txt.length() - 2);
+            }
             renderer.draw3D(txt, (float) (Math.sin(angle) * size), (float) (Math.cos(angle) * size - scale * 0.02f * 20. / font.getSize()), (float) zdist, scale * 0.08f / font.getSize());
             if (phi != 90) {
                 renderer.draw3D(txt, (float) (-Math.sin(angle) * size - scale * 0.03f * txt.length() * 20. / font.getSize()), (float) (Math.cos(angle) * size - scale * 0.02f * 20. / font.getSize()), (float) zdist, scale * 0.08f / font.getSize());
@@ -226,6 +227,9 @@ public class GL3DGrid extends GL3DGroup {
         for (double phi = -this.latstepDegrees; phi >= -90; phi = phi - this.latstepDegrees) {
             double angle = (90 - phi) * Math.PI / 180.;
             String txt = String.format("%.1f", phi);
+            if (txt.substring(txt.length() - 1, txt.length()).equals("0")) {
+                txt = txt.substring(0, txt.length() - 2);
+            }
             renderer.draw3D(txt, (float) (Math.sin(angle) * size), (float) (Math.cos(angle) * size - scale * 0.02f * 20. / font.getSize()), (float) zdist, scale * 0.08f / font.getSize());
             if (phi != -90) {
                 renderer.draw3D(txt, (float) (-Math.sin(angle) * size - scale * 0.03f * txt.length() * 20. / font.getSize()), (float) (Math.cos(angle) * size - scale * 0.02f * 20. / font.getSize()), (float) zdist, scale * 0.08f / font.getSize());
@@ -237,6 +241,10 @@ public class GL3DGrid extends GL3DGroup {
 
         for (double theta = 0; theta <= 180; theta = theta + this.lonstepDegrees) {
             String txt = String.format("%.1f", theta);
+            System.out.println(txt.substring(txt.length() - 1, txt.length()));
+            if (txt.substring(txt.length() - 1, txt.length()).equals("0")) {
+                txt = txt.substring(0, txt.length() - 2);
+            }
             double angle = (90 - theta) * Math.PI / 180.;
             renderer.begin3DRendering();
             gl.glPushMatrix();
@@ -249,6 +257,9 @@ public class GL3DGrid extends GL3DGroup {
         }
         for (double theta = -this.lonstepDegrees; theta > -180.; theta = theta - this.lonstepDegrees) {
             String txt = String.format("%.1f", theta);
+            if (txt.substring(txt.length() - 1, txt.length()).equals("0")) {
+                txt = txt.substring(0, txt.length() - 2);
+            }
             double angle = (90 - theta) * Math.PI / 180.;
             renderer.begin3DRendering();
             gl.glPushMatrix();
