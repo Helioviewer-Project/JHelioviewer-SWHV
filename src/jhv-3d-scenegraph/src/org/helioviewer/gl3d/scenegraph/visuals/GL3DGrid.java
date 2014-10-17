@@ -241,7 +241,6 @@ public class GL3DGrid extends GL3DGroup {
 
         for (double theta = 0; theta <= 180; theta = theta + this.lonstepDegrees) {
             String txt = String.format("%.1f", theta);
-            System.out.println(txt.substring(txt.length() - 1, txt.length()));
             if (txt.substring(txt.length() - 1, txt.length()).equals("0")) {
                 txt = txt.substring(0, txt.length() - 2);
             }
