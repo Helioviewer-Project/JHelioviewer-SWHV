@@ -420,7 +420,7 @@ public class ImageViewerGui {
             PlanetOptionsPanel planetOptionsPanel = new PlanetOptionsPanel();
             planetTab.addTab("Internal Plugins", planetOptionsPanel);
             planetTab.setEnabled(false);
-            leftPane.add("Object Options", planetOptionsPanel, false);
+            //leftPane.add("Object Options", planetOptionsPanel, false);
             return leftPane;
         }
     }
