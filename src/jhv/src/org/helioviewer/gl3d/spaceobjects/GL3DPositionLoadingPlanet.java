@@ -20,8 +20,10 @@ import javax.swing.SwingWorker;
 import org.helioviewer.base.DownloadStream;
 import org.helioviewer.base.logging.Log;
 import org.helioviewer.base.physics.Constants;
+import org.helioviewer.gl3d.camera.GL3DFollowObjectCamera;
 import org.helioviewer.gl3d.camera.GL3DPositionDateTime;
 import org.helioviewer.gl3d.camera.GL3DPositionLoadingListener;
+import org.helioviewer.gl3d.scenegraph.GL3DState;
 import org.helioviewer.gl3d.scenegraph.math.GL3DVec3d;
 import org.helioviewer.jhv.display.Displayer;
 import org.json.JSONArray;
@@ -51,6 +53,11 @@ public class GL3DPositionLoadingPlanet {
     private SwingWorker<Integer, Integer> worker;
 
     public GL3DPositionLoadingPlanet() {
+        Date bt = ((GL3DFollowObjectCamera) GL3DState.get().getActiveCamera()).getBeginTime();
+        Date et = ((GL3DFollowObjectCamera) GL3DState.get().getActiveCamera()).getEndTime();
+
+        this.setBeginDate(bt);
+        this.setEndDate(et);
 
     }
 
@@ -209,6 +216,7 @@ public class GL3DPositionLoadingPlanet {
     }
 
     public GL3DVec3d getInterpolatedPosition(long currentCameraTime) {
+        currentCameraTime = GL3DState.get().getActiveCamera().getTime();
         long t3 = this.getBeginDate().getTime();
         long t4 = this.getEndDate().getTime();
         if (t3 == t4) {

@@ -211,7 +211,7 @@ public class GL3DPositionLoading {
     }
 
     synchronized public GL3DVec3d getInterpolatedPosition(long currentCameraTime) {
-        if (this.isLoaded) {
+        if (this.isLoaded && this.positionDateTime.length > 0) {
             long t3 = this.getBeginDate().getTime();
             long t4 = this.getEndDate().getTime();
             if (t3 == t4) {

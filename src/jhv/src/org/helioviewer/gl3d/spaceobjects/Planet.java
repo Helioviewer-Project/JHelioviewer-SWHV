@@ -9,6 +9,7 @@ import java.util.List;
 import org.helioviewer.base.logging.Log;
 import org.helioviewer.base.physics.Astronomy;
 import org.helioviewer.base.physics.Constants;
+import org.helioviewer.gl3d.camera.GL3DFollowObjectCamera;
 import org.helioviewer.gl3d.camera.GL3DPositionLoadingListener;
 import org.helioviewer.gl3d.camera.GL3DSpaceObject;
 import org.helioviewer.gl3d.scenegraph.GL3DDrawBits.Bit;
@@ -95,10 +96,10 @@ public class Planet extends GL3DSphere implements LayersListener, ViewListener, 
                 if (this.endDate == null || requestDates.get(0).getTime() > this.endDate.getTime()) {
                     this.endDate = requestDates.get(requestDates.size() - 1);
                 }
-                this.positionLoading.setBeginDate(beginDate);
-                this.positionLoading.setEndDate(endDate);
-                this.positionLoadingalt.setBeginDate(beginDate);
-                this.positionLoadingalt.setEndDate(endDate);
+                //this.positionLoading.setBeginDate(beginDate);
+                //this.positionLoading.setEndDate(endDate);
+                //this.positionLoadingalt.setBeginDate(beginDate);
+                //this.positionLoadingalt.setEndDate(endDate);
             }
         } catch (JHV_KduException ex) {
             Log.error("Received an kakadu exception. " + ex);
@@ -166,7 +167,8 @@ public class Planet extends GL3DSphere implements LayersListener, ViewListener, 
             state.pushMV();
 
             this.m.setIdentity();
-            double currentRotation = Astronomy.getL0Radians(currentDate);
+            GL3DFollowObjectCamera foc = (GL3DFollowObjectCamera) (GL3DState.get().getActiveCamera());
+            double currentRotation = Astronomy.getL0Radians(new Date(foc.getTime()));
 
             this.m.rotate(-currentRotation, new GL3DVec3d(0, 1, 0));
             this.m.translate(position);

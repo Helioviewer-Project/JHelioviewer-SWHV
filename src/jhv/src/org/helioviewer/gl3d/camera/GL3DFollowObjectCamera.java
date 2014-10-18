@@ -245,4 +245,11 @@ public class GL3DFollowObjectCamera extends GL3DSolarRotationTrackingTrackballCa
     public void layerDownloaded(int idx) {
     }
 
+    public Date getBeginTime() {
+        return this.positionLoading.getBeginDate();
+    }
+
+    public Date getEndTime() {
+        return this.positionLoading.getEndDate();
+    }
 }
