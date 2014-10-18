@@ -228,9 +228,7 @@ public class HelioviewerMetaData extends AbstractMetaData implements SunMetaData
             double sunX = metaDataContainer.tryGetDouble("CRPIX1") - 1;
             double sunY;
             if (Displayer.getSingletonInstance().getState() == Displayer.STATE3D) {
-
-                sunY = pixelImageSize.getY() - (metaDataContainer.tryGetDouble("CRPIX2") - 1);
-
+                sunY = metaDataContainer.tryGetDouble("NAXIS2") - (metaDataContainer.tryGetDouble("CRPIX2") - 1);
             } else {
                 sunY = (metaDataContainer.tryGetDouble("CRPIX2") - 1);
             }
