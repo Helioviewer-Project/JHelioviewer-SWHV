@@ -222,7 +222,6 @@ public class SideContentPane extends JComponent {
     @Override
     public void remove(Component component) {
         if (map.containsKey(component)) {
-            System.out.println("CONTAONSSSS");
             super.remove(map.get(component));
             map.remove(component);
         } else {
