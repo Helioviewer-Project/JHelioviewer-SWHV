@@ -42,7 +42,6 @@ public class GL3DObserverCamera extends GL3DSolarRotationTrackingTrackballCamera
 
     @Override
     public void reset() {
-        this.resetCurrentDragRotation();
         super.reset();
     }
 

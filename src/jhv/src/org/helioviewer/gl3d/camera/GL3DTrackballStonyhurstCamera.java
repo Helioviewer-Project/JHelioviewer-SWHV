@@ -5,7 +5,6 @@ import java.util.Date;
 import java.util.GregorianCalendar;
 
 import org.helioviewer.base.physics.Astronomy;
-import org.helioviewer.base.physics.Constants;
 import org.helioviewer.base.physics.DifferentialRotation;
 import org.helioviewer.gl3d.scenegraph.math.GL3DQuatd;
 import org.helioviewer.gl3d.scenegraph.math.GL3DVec3d;
@@ -41,15 +40,12 @@ public class GL3DTrackballStonyhurstCamera extends GL3DSolarRotationTrackingTrac
     private final SolarSphereCoordinateSystem solarSphereCoordinateSystem = new SolarSphereCoordinateSystem();
     private final SolarSphereToStonyhurstHeliographicConversion stonyhurstConversion = (SolarSphereToStonyhurstHeliographicConversion) solarSphereCoordinateSystem.getConversion(stonyhurstCoordinateSystem);
 
-    private long timediff;
-
     public GL3DTrackballStonyhurstCamera(GL3DSceneGraphView sceneGraphView) {
         super(sceneGraphView);
     }
 
     @Override
     public void reset() {
-        this.resetCurrentDragRotation();
         super.reset();
     }
 
@@ -79,7 +75,6 @@ public class GL3DTrackballStonyhurstCamera extends GL3DSolarRotationTrackingTrac
     }
 
     public void updateRotation() {
-        this.timediff = (currentDate.getTime()) / 1000 - Constants.referenceDate;
         this.currentRotation = Astronomy.getL0Radians(currentDate);//DifferentialRotation.calculateRotationInRadians(0., this.timediff) % (Math.PI * 2.0);
         Calendar cal = new GregorianCalendar();
         cal.setTime(new Date(currentDate.getTime()));

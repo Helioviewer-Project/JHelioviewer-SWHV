@@ -48,7 +48,6 @@ public class GL3DFollowObjectCamera extends GL3DSolarRotationTrackingTrackballCa
 
     @Override
     public void reset() {
-        this.resetCurrentDragRotation();
         super.reset();
     }
 
