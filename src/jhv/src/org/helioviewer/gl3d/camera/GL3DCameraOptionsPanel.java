@@ -142,7 +142,7 @@ public class GL3DCameraOptionsPanel extends JPanel implements GL3DCameraSelectio
         optionsPanel.visactivate();
         optionsPanel = cameraOptionsAttributeManager.getCameraOptionAttributePanel(cameraSelectorModel.getEarthCamera());
         optionsPanel.visactivate();
-        optionsPanel = cameraOptionsAttributeManager.getCameraOptionAttributePanel(cameraSelectorModel.getCurrentCamera());
+        optionsPanel = cameraOptionsAttributeManager.getCameraOptionAttributePanel(cameraSelectorModel.getFollowObjectCamera());
         optionsPanel.visactivate();
 
         this.active = true;
