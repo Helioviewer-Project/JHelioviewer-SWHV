@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.NavigableMap;
 import java.util.Set;
+import java.util.logging.Logger;
 
 import org.helioviewer.jhv.data.container.cache.JHVEventCache;
 import org.helioviewer.jhv.data.container.cache.JHVEventHandlerCache;
@@ -194,21 +195,22 @@ public class JHVEventContainer {
      *            the event type to remove from the cache.
      */
     public void removeEvents(final JHVEventType eventType) {
+        Logger.getLogger(JHVEventContainer.class.getName()).severe("remove events called");
         EventQueue.invokeLater(new Runnable() {
 
             @Override
             public void run() {
+                Logger.getLogger(JHVEventContainer.class.getName()).severe("remove events executed");
                 eventCache.removeEventType(eventType);
                 fireEventCacheChanged();
             }
         });
     }
 
-    /**
+    /*
      * Request data from the request handlers for a date.
      * 
-     * @param date
-     *            the date for which to request the data
+     * @param date the date for which to request the data
      */
     private void requestEvents(Date date) {
         synchronized (JHVEventContainerLocks.requestHandlerLock) {
@@ -248,6 +250,8 @@ public class JHVEventContainer {
          * (JHVEventHandler handler : jhvEventHandlers) {
          * handler.cacheUpdated(); }
          */
+        Logger.getLogger(JHVEventContainer.class.getName()).severe("event cache changed");
+        Thread.dumpStack();
         Set<JHVEventHandler> handlers = eventHandlerCache.getAllJHVEventHandlers();
         synchronized (JHVEventContainerLocks.eventHandlerCacheLock) {
             for (JHVEventHandler handler : handlers) {
