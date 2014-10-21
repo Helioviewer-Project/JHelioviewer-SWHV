@@ -49,6 +49,7 @@ import org.helioviewer.jhv.gui.controller.ZoomController;
 import org.helioviewer.jhv.gui.states.State;
 import org.helioviewer.jhv.gui.states.StateController;
 import org.helioviewer.jhv.gui.states.StateController.StateChangeListener;
+import org.helioviewer.jhv.gui.states.ViewStateEnum;
 import org.helioviewer.jhv.internal_plugins.filter.SOHOLUTFilterPlugin.SOHOLUTPanel;
 import org.helioviewer.jhv.internal_plugins.filter.channelMixer.ChannelMixerPanel;
 import org.helioviewer.jhv.internal_plugins.filter.contrast.ContrastPanel;
@@ -114,6 +115,8 @@ public class ImageViewerGui {
     private ControlPanelContainer moviePanelContainer;
     private ControlPanelContainer filterPanelContainer;
     private final JMenuBar menuBar;
+
+    private GL3DCameraOptionsPanel cameraOptionsPanel;
 
     // private SolarEventCatalogsPanel solarEventCatalogsPanel;
 
@@ -412,10 +415,10 @@ public class ImageViewerGui {
             leftPane.add("Image Adjustments", filterPanelContainer, false);
 
             JTabbedPane cameraTab = new JTabbedPane();
-            GL3DCameraOptionsPanel cameraOptionsPanel = new GL3DCameraOptionsPanel();
+            cameraOptionsPanel = new GL3DCameraOptionsPanel();
             cameraTab.addTab("Internal Plugins", cameraOptionsPanel);
             cameraTab.setEnabled(false);
-            leftPane.add("Camera Options", cameraOptionsPanel, false);
+            //leftPane.add("Camera Options", cameraOptionsPanel, false);
             JTabbedPane planetTab = new JTabbedPane();
             PlanetOptionsPanel planetOptionsPanel = new PlanetOptionsPanel();
             planetTab.addTab("Internal Plugins", planetOptionsPanel);
@@ -500,6 +503,7 @@ public class ImageViewerGui {
                 toolBar.updateStateButtons();
                 toolBar.setDisplayMode(null);
                 contentPanel.add(toolBar, BorderLayout.PAGE_START);
+
             }
         });
 
@@ -517,7 +521,11 @@ public class ImageViewerGui {
         } else {
             overviewImagePanel.disableInteraction();
         }
-
+        if (newState.getType() == ViewStateEnum.View3D) {
+            leftPane.add("Camera Options", cameraOptionsPanel, false);
+        } else {
+            leftPane.remove(GL3DCameraOptionsPanel.class);
+        }
         newState.activate();
     }
 

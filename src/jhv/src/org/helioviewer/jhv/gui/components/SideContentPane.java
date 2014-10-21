@@ -9,17 +9,17 @@ import javax.swing.JComponent;
 
 /**
  * Panel managing multiple {@link CollapsiblePane}s.
- * 
+ *
  * This panel hides the use of the {@link CollapsiblePane} and allows accessing
  * the children of the {@link CollapsiblePane} directly.
- * 
+ *
  * @author Markus Langenberg
  */
 public class SideContentPane extends JComponent {
 
     private static final long serialVersionUID = 1L;
 
-    private HashMap<Component, CollapsiblePane> map = new HashMap<Component, CollapsiblePane>();
+    private final HashMap<Component, CollapsiblePane> map = new HashMap<Component, CollapsiblePane>();
 
     /**
      * Default constructor.
@@ -31,7 +31,7 @@ public class SideContentPane extends JComponent {
 
     /**
      * Add new component into a new {@link CollapsiblePane}.
-     * 
+     *
      * @param title
      *            Text on the toggle button
      * @param component
@@ -46,7 +46,7 @@ public class SideContentPane extends JComponent {
 
     /**
      * Add new component into a new {@link CollapsiblePane} at the end.
-     * 
+     *
      * @param title
      *            Text on the toggle button
      * @param component
@@ -60,7 +60,7 @@ public class SideContentPane extends JComponent {
 
     /**
      * Add new component into a new {@link CollapsiblePane} at the end.
-     * 
+     *
      * @param title
      *            Text on the toggle button
      * @param component
@@ -74,7 +74,7 @@ public class SideContentPane extends JComponent {
 
     /**
      * Add new component into a new {@link CollapsiblePane}.
-     * 
+     *
      * @param title
      *            Text on the toggle button
      * @param component
@@ -98,7 +98,7 @@ public class SideContentPane extends JComponent {
 
     /**
      * Add new component into a new {@link CollapsiblePane}.
-     * 
+     *
      * @param title
      *            Text on the toggle button
      * @param component
@@ -122,11 +122,11 @@ public class SideContentPane extends JComponent {
 
     /**
      * Expands the given component.
-     * 
+     *
      * This function works if the given component is either a
      * {@link CollapsiblePane} itself or is the child of a
      * {@link CollapsiblePane}.
-     * 
+     *
      * @param component
      *            Component to expand
      */
@@ -144,7 +144,7 @@ public class SideContentPane extends JComponent {
 
     /**
      * Expands all children of {@link CollapsiblePane}s of the given class.
-     * 
+     *
      * @param c
      *            Pattern, which members should be expanded
      */
@@ -158,11 +158,11 @@ public class SideContentPane extends JComponent {
 
     /**
      * Collapses the given component.
-     * 
+     *
      * This function works if the given component is either a
      * {@link CollapsiblePane} itself or is the child of a
      * {@link CollapsiblePane}.
-     * 
+     *
      * @param component
      *            Component to collapse
      */
@@ -180,7 +180,7 @@ public class SideContentPane extends JComponent {
 
     /**
      * Collapses all children of {@link CollapsiblePane}s of the given class.
-     * 
+     *
      * @param c
      *            Pattern, which members should be collapsed
      */
@@ -195,7 +195,7 @@ public class SideContentPane extends JComponent {
     /**
      * Removes all CollapsiblePanes which includes an instance of the given
      * class.
-     * 
+     *
      * @param c
      *            Pattern, which members should be removed
      */
@@ -219,8 +219,10 @@ public class SideContentPane extends JComponent {
     /**
      * {@inheritDoc}
      */
+    @Override
     public void remove(Component component) {
         if (map.containsKey(component)) {
+            System.out.println("CONTAONSSSS");
             super.remove(map.get(component));
             map.remove(component);
         } else {
