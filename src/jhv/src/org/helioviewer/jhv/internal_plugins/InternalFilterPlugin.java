@@ -19,7 +19,7 @@ import org.helioviewer.viewmodelplugin.filter.FilterPlugin;
  * This class acts as a default plug-in and contains all internal supplied
  * filters. The plug-in will not appear in the dialog where the user can
  * activate or deactivate plug-ins because this plug-in is activated always.
- * 
+ *
  * @author Stephan Pagel
  */
 public class InternalFilterPlugin extends FilterPlugin implements InternalPlugin {
@@ -35,8 +35,8 @@ public class InternalFilterPlugin extends FilterPlugin implements InternalPlugin
         }
 
         addFilterContainer(new OpacityPlugin());
-        addFilterContainer(new SOHOLUTFilterPlugin());
         addFilterContainer(new ChannelMixerPlugin());
+        addFilterContainer(new SOHOLUTFilterPlugin());
         addFilterContainer(new ContrastPlugin());
         addFilterContainer(new GammaCorrectionPlugin());
         addFilterContainer(new SharpenPlugin());
@@ -50,6 +50,7 @@ public class InternalFilterPlugin extends FilterPlugin implements InternalPlugin
      * activated by default.
      */
 
+    @Override
     public void installPlugin() {
         for (FilterContainer filter : filterContainerList) {
             filter.setActive(PluginSettings.getSingeltonInstance().isFilterInPluginActivated(pluginLocation, filter.getFilterClass(), true));
@@ -64,6 +65,7 @@ public class InternalFilterPlugin extends FilterPlugin implements InternalPlugin
      * A description is not needed here because this plug-in is activated always
      * and will not be visible in the corresponding dialogs.
      */
+    @Override
     public String getDescription() {
         return null;
     }
@@ -71,15 +73,17 @@ public class InternalFilterPlugin extends FilterPlugin implements InternalPlugin
     /**
      * {@inheritDoc}
      */
+    @Override
     public String getName() {
         return "internal filters plugin";
     }
 
     /**
      * {@inheritDoc}
-     * 
+     *
      * null because this is an internal plugin
      */
+    @Override
     public String getAboutLicenseText() {
         return null;
     }

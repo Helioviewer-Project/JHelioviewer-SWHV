@@ -4,7 +4,7 @@ import javax.media.opengl.GL2;
 
 import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.viewmodel.filter.AbstractFilter;
-import org.helioviewer.viewmodel.filter.GLPostFilter;
+import org.helioviewer.viewmodel.filter.GLFragmentShaderFilter;
 import org.helioviewer.viewmodel.filter.StandardFilter;
 import org.helioviewer.viewmodel.imagedata.ARGBInt32ImageData;
 import org.helioviewer.viewmodel.imagedata.ColorMask;
@@ -16,31 +16,37 @@ import org.helioviewer.viewmodel.imageformat.SingleChannelImageFormat;
 import org.helioviewer.viewmodel.imagetransport.Byte8ImageTransport;
 import org.helioviewer.viewmodel.imagetransport.Int32ImageTransport;
 import org.helioviewer.viewmodel.imagetransport.Short16ImageTransport;
+import org.helioviewer.viewmodel.view.opengl.shader.GLShaderBuilder;
 
 /**
  * Filter for modifying the color mask of an image.
- * 
+ *
  * <p>
  * The output of the filter always has the same image format as the input.
- * 
+ *
  * <p>
  * This filter supports software rendering as well as rendering in OpenGL2.
- * 
+ *
  * <p>
  * To learn more about color masks, see
  * {@link org.helioviewer.viewmodel.imagedata.ColorMask}
- * 
+ *
  * @author Markus Langenberg
  */
-public class ChannelMixerFilter extends AbstractFilter implements StandardFilter, GLPostFilter {
+public class ChannelMixerFilter extends AbstractFilter implements StandardFilter, GLFragmentShaderFilter {
 
     private ColorMask colorMask = new ColorMask();
     private ChannelMixerPanel panel;
     private boolean forceRefilter = false;
+    private final ChannelMixerShader shader;
+
+    public ChannelMixerFilter() {
+        this.shader = new ChannelMixerShader();
+    }
 
     /**
      * Sets the corresponding channel mixer panel.
-     * 
+     *
      * @param panel
      *            Corresponding panel.
      */
@@ -51,7 +57,7 @@ public class ChannelMixerFilter extends AbstractFilter implements StandardFilter
 
     /**
      * Sets the color mask.
-     * 
+     *
      * @param showRed
      *            if true, the red channel will be shown
      * @param showGreen
@@ -99,30 +105,20 @@ public class ChannelMixerFilter extends AbstractFilter implements StandardFilter
 
     /**
      * {@inheritDoc}
-     * 
+     *
      * <p>
      * In this case, sets the color mask by calling the corresponding
      * OpenGL-function.
      */
     @Override
     public void applyGL(GL2 gl) {
-        gl.glColorMask(colorMask.showRed(), colorMask.showGreen(), colorMask.showBlue(), true);
+        shader.setChannelMixerValue(gl, colorMask.showRed() ? 1f : 0f, colorMask.showGreen() ? 1f : 0f, colorMask.showBlue() ? 1f : 0f);
+        shader.bind(gl);
     }
 
     /**
      * {@inheritDoc}
-     * 
-     * <p>
-     * In this case, the color mask is set back to the default value.
-     */
-    @Override
-    public void postApplyGL(GL2 gl) {
-        gl.glColorMask(true, true, true, true);
-    }
-
-    /**
-     * {@inheritDoc}
-     * 
+     *
      * <p>
      * This filter is a major filter.
      */
@@ -159,5 +155,11 @@ public class ChannelMixerFilter extends AbstractFilter implements StandardFilter
     @Override
     public String getState() {
         return colorMask.showRed() + " " + colorMask.showGreen() + " " + colorMask.showBlue();
+    }
+
+    @Override
+    public GLShaderBuilder buildFragmentShader(GLShaderBuilder shaderBuilder) {
+        shader.build(shaderBuilder);
+        return shaderBuilder;
     }
 }
