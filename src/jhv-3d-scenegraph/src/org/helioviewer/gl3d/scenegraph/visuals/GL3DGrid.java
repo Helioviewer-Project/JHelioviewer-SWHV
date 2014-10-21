@@ -88,9 +88,7 @@ public class GL3DGrid extends GL3DGroup {
         gl.glDisable(GL2.GL_LIGHTING);
         super.shapeDraw(state);
         float relhi = (float) (0.7 / (state.getActiveCamera().getCameraFOV())) * scale;
-        System.out.println("RELHI" + relhi);
         float cfontsize = this.fontsize * relhi;
-        System.out.println("cfontsize" + cfontsize);
 
         cfontsize = cfontsize < 10.f ? 10.f : cfontsize;
         font = font.deriveFont(cfontsize);
