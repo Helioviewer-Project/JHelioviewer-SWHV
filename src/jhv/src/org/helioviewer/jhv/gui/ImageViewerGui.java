@@ -406,7 +406,7 @@ public class ImageViewerGui {
             JPanel compactPanel = compactPanelManager.createCompactPanel();
 
             JTabbedPane tab = new JTabbedPane();
-            tab.addTab("Internal Plugins", compactPanel);
+            tab.addTab("Color Options", compactPanel);
             tab.setEnabled(false);
             compactPanel.setEnabled(false);
 
@@ -416,12 +416,12 @@ public class ImageViewerGui {
 
             JTabbedPane cameraTab = new JTabbedPane();
             cameraOptionsPanel = new GL3DCameraOptionsPanel();
-            cameraTab.addTab("Internal Plugins", cameraOptionsPanel);
+            cameraTab.addTab("Camera Options", cameraOptionsPanel);
             cameraTab.setEnabled(false);
             //leftPane.add("Camera Options", cameraOptionsPanel, false);
             JTabbedPane planetTab = new JTabbedPane();
             PlanetOptionsPanel planetOptionsPanel = new PlanetOptionsPanel();
-            planetTab.addTab("Internal Plugins", planetOptionsPanel);
+            planetTab.addTab("Planet Options", planetOptionsPanel);
             planetTab.setEnabled(false);
             //leftPane.add("Object Options", planetOptionsPanel, false);
             return leftPane;

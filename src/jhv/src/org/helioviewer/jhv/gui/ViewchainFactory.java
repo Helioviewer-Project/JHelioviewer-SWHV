@@ -219,7 +219,7 @@ public class ViewchainFactory {
             adjustPanel.setLayout(new BoxLayout(adjustPanel, BoxLayout.PAGE_AXIS));
 
             FilterTabPanelManager compactPanelManager = new FilterTabPanelManager();
-            tabList.add(new FilterTab(FilterTabDescriptor.Type.COMPACT_FILTER, "Internal Plugins", compactPanelManager));
+            tabList.add(new FilterTab(FilterTabDescriptor.Type.COMPACT_FILTER, "Color Options", compactPanelManager));
 
             // If JP2View, add QualitySlider
             if (newLayer instanceof JP2View) {
