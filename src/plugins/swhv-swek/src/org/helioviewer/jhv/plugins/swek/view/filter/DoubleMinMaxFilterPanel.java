@@ -50,16 +50,20 @@ public class DoubleMinMaxFilterPanel extends AbstractFilterPanel {
     }
 
     @Override
-    public void filter() {
-        if ((Double) minimumValueSpinner.getValue() <= (Double) maximumValueSpinner.getValue()) {
-            SWEKParam paramMin = new SWEKParam(parameter.getParameterName(), "" + minimumValueSpinner.getValue(),
-                    SWEKOperand.BIGGER_OR_EQUAL);
-            SWEKParam paramMax = new SWEKParam(parameter.getParameterName(), "" + maximumValueSpinner.getValue(),
-                    SWEKOperand.SMALLER_OR_EQUAL);
-            ArrayList<SWEKParam> params = new ArrayList<SWEKParam>();
-            params.add(paramMin);
-            params.add(paramMax);
-            filterManager.addFilter(eventType, parameter, params);
+    public void filter(boolean active) {
+        if (active) {
+            if ((Double) minimumValueSpinner.getValue() <= (Double) maximumValueSpinner.getValue()) {
+                SWEKParam paramMin = new SWEKParam(parameter.getParameterName(), "" + minimumValueSpinner.getValue(),
+                        SWEKOperand.BIGGER_OR_EQUAL);
+                SWEKParam paramMax = new SWEKParam(parameter.getParameterName(), "" + maximumValueSpinner.getValue(),
+                        SWEKOperand.SMALLER_OR_EQUAL);
+                ArrayList<SWEKParam> params = new ArrayList<SWEKParam>();
+                params.add(paramMin);
+                params.add(paramMax);
+                filterManager.addFilter(eventType, parameter, params);
+            }
+        } else {
+            filterManager.removedFilter(eventType, parameter);
         }
     }
 
@@ -75,6 +79,7 @@ public class DoubleMinMaxFilterPanel extends AbstractFilterPanel {
             public void stateChanged(ChangeEvent e) {
                 if ((Double) minimumValueSpinner.getValue() > (Double) maximumValueSpinner.getValue()) {
                     maximumValueSpinner.setValue(minimumValueSpinner.getValue());
+                    filterToggleButton.setSelected(false);
                 }
             }
         });
@@ -86,6 +91,7 @@ public class DoubleMinMaxFilterPanel extends AbstractFilterPanel {
             public void stateChanged(ChangeEvent e) {
                 if ((Double) maximumValueSpinner.getValue() < (Double) minimumValueSpinner.getValue()) {
                     minimumValueSpinner.setValue(maximumValueSpinner.getValue());
+                    filterToggleButton.setSelected(false);
                 }
             }
         });

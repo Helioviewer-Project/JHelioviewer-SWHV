@@ -6,9 +6,9 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
 import javax.swing.BorderFactory;
-import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.JPanel;
+import javax.swing.JToggleButton;
 
 import org.helioviewer.jhv.plugins.swek.config.SWEKEventType;
 import org.helioviewer.jhv.plugins.swek.config.SWEKParameter;
@@ -43,6 +43,8 @@ public abstract class AbstractFilterPanel extends JPanel {
     /** The filter manager instance */
     protected final FilterManager filterManager;
 
+    protected final JToggleButton filterToggleButton = new JToggleButton("Filter");
+
     /**
      * Creates an abstract Filter panel.
      * 
@@ -63,8 +65,11 @@ public abstract class AbstractFilterPanel extends JPanel {
      * Method should handle the filter call. Pass the input to the responsible
      * classes to handle the filtering.
      * 
+     * @param activ
+     *            true if the filter is activated, false if the filter is not
+     *            activated
      */
-    public abstract void filter();
+    public abstract void filter(boolean active);
 
     /**
      * Creates the visual component of the specific filter.
@@ -83,15 +88,15 @@ public abstract class AbstractFilterPanel extends JPanel {
         setBackground(Color.white);
         setBorder(BorderFactory.createTitledBorder(parameter.getParameterDisplayName()));
         add(initFilterComponents(), BorderLayout.CENTER);
-        JButton filter = new JButton("Filter");
-        filter.addActionListener(new ActionListener() {
+        filterToggleButton.setSelected(filterManager.isFiltered(eventType, parameter));
+        filterToggleButton.addActionListener(new ActionListener() {
 
             @Override
             public void actionPerformed(ActionEvent arg0) {
-                filter();
+                filter(filterToggleButton.isSelected());
             }
         });
-        add(filter, BorderLayout.PAGE_END);
+        add(filterToggleButton, BorderLayout.PAGE_END);
     }
 
     /**

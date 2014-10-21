@@ -1,5 +1,6 @@
 package org.helioviewer.jhv.plugins.swek.download;
 
+import java.awt.EventQueue;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -128,16 +129,33 @@ public class FilterManager {
         }
     }
 
+    public boolean isFiltered(SWEKEventType eventType, SWEKParameter parameter) {
+        synchronized (SWEKPluginLocks.filterManagerLock) {
+            Map<SWEKParameter, List<SWEKParam>> filteredParameterPerEventType = new HashMap<SWEKParameter, List<SWEKParam>>();
+            if (filters.containsKey(eventType)) {
+                filteredParameterPerEventType = filters.get(eventType);
+                return filteredParameterPerEventType.containsKey(parameter);
+            }
+            return false;
+        }
+    }
+
     /**
      * Inform the listeners about newly added filters.
      * 
      * @param swekEventType
      *            the event type for which the events were added
      */
-    private void fireFilterAdded(SWEKEventType swekEventType) {
-        for (FilterManagerListener fml : listeners) {
-            fml.filtersAdded(swekEventType);
-        }
+    private void fireFilterAdded(final SWEKEventType swekEventType) {
+        EventQueue.invokeLater(new Runnable() {
+
+            @Override
+            public void run() {
+                for (FilterManagerListener fml : listeners) {
+                    fml.filtersAdded(swekEventType);
+                }
+            }
+        });
 
     }
 
@@ -153,6 +171,6 @@ public class FilterManager {
         for (FilterManagerListener fml : listeners) {
             fml.filtersRemoved(swekEventType, parameter);
         }
-
     }
+
 }

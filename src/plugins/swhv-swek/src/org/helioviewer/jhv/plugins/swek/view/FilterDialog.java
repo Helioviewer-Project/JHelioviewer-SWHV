@@ -138,7 +138,7 @@ public class FilterDialog extends JDialog implements FocusListener, WindowFocusL
     @Override
     public void focusLost(FocusEvent arg0) {
         setVisible(false);
-        dispose();
+        // dispose();
     }
 
     @Override
@@ -150,7 +150,7 @@ public class FilterDialog extends JDialog implements FocusListener, WindowFocusL
     @Override
     public void windowLostFocus(WindowEvent arg0) {
         setVisible(false);
-        dispose();
+        // dispose();
     }
 
     private void initFilterDialog() {
