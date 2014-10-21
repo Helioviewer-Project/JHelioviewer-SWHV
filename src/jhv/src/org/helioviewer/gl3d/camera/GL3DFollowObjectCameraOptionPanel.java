@@ -157,8 +157,8 @@ public class GL3DFollowObjectCameraOptionPanel extends GL3DCameraOptionPanel imp
         });
 
         this.camera.addFollowObjectCameraListener(this);
-        this.syncWithLayerBeginTime();
-        this.syncWithLayerEndTime();
+        this.syncWithLayerBeginTime(false);
+        this.syncWithLayerEndTime(true);
     }
 
     public void addSyncButtons() {
@@ -262,7 +262,6 @@ public class GL3DFollowObjectCameraOptionPanel extends GL3DCameraOptionPanel imp
                 Displayer.getSingletonInstance().render();
             }
         });
-        syncWithLayerBeginTime();
         beginTimePicker.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -289,11 +288,11 @@ public class GL3DFollowObjectCameraOptionPanel extends GL3DCameraOptionPanel imp
     }
 
     private void syncWithLayer() {
-        syncWithLayerBeginTime();
-        syncWithLayerEndTime();
+        syncWithLayerBeginTime(false);
+        syncWithLayerEndTime(true);
     }
 
-    private void syncWithLayerBeginTime() {
+    private void syncWithLayerBeginTime(boolean applyChanges) {
         Date startDate = null;
         startDate = LayersModel.getSingletonInstance().getFirstDate();
         if (startDate == null) {
@@ -301,7 +300,7 @@ public class GL3DFollowObjectCameraOptionPanel extends GL3DCameraOptionPanel imp
         }
         beginDatePicker.setDate(new Date(startDate.getTime() - startDate.getTime() % (60 * 60 * 24 * 1000)));
         beginTimePicker.setText(TimeTextField.formatter.format(startDate));
-        setBeginTime(true);
+        setBeginTime(applyChanges);
     }
 
     private void syncBothLayerNow() {
@@ -332,7 +331,7 @@ public class GL3DFollowObjectCameraOptionPanel extends GL3DCameraOptionPanel imp
         setEndTime(true);
     }
 
-    private void syncWithLayerEndTime() {
+    private void syncWithLayerEndTime(boolean applyChanges) {
         Date endDate = null;
         endDate = LayersModel.getSingletonInstance().getLastDate();
         if (endDate == null) {
@@ -340,7 +339,7 @@ public class GL3DFollowObjectCameraOptionPanel extends GL3DCameraOptionPanel imp
         }
         endDatePicker.setDate(new Date(endDate.getTime() - endDate.getTime() % (60 * 60 * 24 * 1000)));
         endTimePicker.setText(TimeTextField.formatter.format(endDate));
-        setEndTime(true);
+        setEndTime(applyChanges);
     }
 
     private void addEndDatePanel() {
@@ -372,7 +371,6 @@ public class GL3DFollowObjectCameraOptionPanel extends GL3DCameraOptionPanel imp
                 Displayer.getSingletonInstance().render();
             }
         });
-        syncWithLayerEndTime();
         endTimePicker.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
