@@ -62,7 +62,6 @@ public class GL3DPositionLoading {
     }
 
     public void requestData() {
-        Thread.dumpStack();
 
         if (worker != null && !worker.isDone()) {
             worker.cancel(true);
