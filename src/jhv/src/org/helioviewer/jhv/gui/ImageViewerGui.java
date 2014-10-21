@@ -406,7 +406,7 @@ public class ImageViewerGui {
             JPanel compactPanel = compactPanelManager.createCompactPanel();
 
             JTabbedPane tab = new JTabbedPane();
-            tab.addTab("Color Options", compactPanel);
+            tab.addTab("Color", compactPanel);
             tab.setEnabled(false);
             compactPanel.setEnabled(false);
 
@@ -416,7 +416,7 @@ public class ImageViewerGui {
 
             JTabbedPane cameraTab = new JTabbedPane();
             cameraOptionsPanel = new GL3DCameraOptionsPanel();
-            cameraTab.addTab("Camera Options", cameraOptionsPanel);
+            cameraTab.addTab("Camera Adjustments", cameraOptionsPanel);
             cameraTab.setEnabled(false);
             //leftPane.add("Camera Options", cameraOptionsPanel, false);
             JTabbedPane planetTab = new JTabbedPane();
@@ -522,7 +522,7 @@ public class ImageViewerGui {
             overviewImagePanel.disableInteraction();
         }
         if (newState.getType() == ViewStateEnum.View3D) {
-            leftPane.add("Camera Options", cameraOptionsPanel, false);
+            leftPane.add("Camera Adjustments", cameraOptionsPanel, false);
         } else {
             leftPane.remove(GL3DCameraOptionsPanel.class);
         }
