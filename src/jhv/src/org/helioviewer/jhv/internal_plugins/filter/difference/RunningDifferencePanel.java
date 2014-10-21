@@ -74,7 +74,7 @@ public class RunningDifferencePanel extends FilterPanel implements ChangeListene
         final JRadioButton radNone = new JRadioButton("No differences", true);
         final JRadioButton radRunDiff = new JRadioButton("Running difference");
         final JRadioButton radBaseDiff = new JRadioButton("Base difference");
-        final JCheckBox diffRot = new JCheckBox("Rotation Correction (only in 3D mode)?");
+        final JCheckBox diffRot = new JCheckBox("Rotation Correction (only in 3D mode)");
         diffRot.setSelected(true);
         diffRot.setVisible(false);
 
