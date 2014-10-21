@@ -638,12 +638,13 @@ public class SWEKDownloadManager implements DownloadWorkerListener, IncomingRequ
      */
     private void downloadSelectedSuppliers(SWEKEventType swekEventType) {
         synchronized (SWEKPluginLocks.treeSelectionLock) {
-            for (SWEKSource source : activeEventTypes.get(swekEventType).keySet()) {
-                for (SWEKSupplier supplier : activeEventTypes.get(swekEventType).get(source)) {
-                    downloadForAllDates(swekEventType, source, supplier);
+            if (activeEventTypes.get(swekEventType) != null) {
+                for (SWEKSource source : activeEventTypes.get(swekEventType).keySet()) {
+                    for (SWEKSupplier supplier : activeEventTypes.get(swekEventType).get(source)) {
+                        downloadForAllDates(swekEventType, source, supplier);
+                    }
                 }
             }
-
         }
     }
 }
