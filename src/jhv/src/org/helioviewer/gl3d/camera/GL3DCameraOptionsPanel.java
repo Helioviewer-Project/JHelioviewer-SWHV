@@ -17,17 +17,21 @@ import org.helioviewer.gl3d.scenegraph.GL3DDrawBits.Bit;
 import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.gui.IconBank;
 import org.helioviewer.jhv.gui.IconBank.JHVIcon;
+import org.helioviewer.jhv.layers.LayersListener;
+import org.helioviewer.jhv.layers.LayersModel;
+import org.helioviewer.viewmodel.view.View;
 
-public class GL3DCameraOptionsPanel extends JPanel implements GL3DCameraSelectionModelListener {
+public class GL3DCameraOptionsPanel extends JPanel implements GL3DCameraSelectionModelListener, LayersListener {
     private static final long serialVersionUID = 3942154069677445408L;
     private GL3DCameraSelectorModel cameraSelectorModel;
     private JPanel optionsPanel;
     private final GL3DCameraOptionsAttributeManager cameraOptionsAttributeManager = GL3DCameraOptionsAttributeManager.getSingletonInstance();
     JTabbedPane tab;
+    private boolean active;
 
     public GL3DCameraOptionsPanel() {
+        LayersModel.getSingletonInstance().addLayersListener(this);
         setLayout(new BoxLayout(this, BoxLayout.PAGE_AXIS));
-
         EventQueue.invokeLater(new Runnable() {
             @Override
             public void run() {
@@ -125,5 +129,84 @@ public class GL3DCameraOptionsPanel extends JPanel implements GL3DCameraSelectio
     @Override
     public void fireInit() {
         this.initCamera(cameraSelectorModel.getObserverCamera());
+        if (LayersModel.getSingletonInstance().getNumLayers() > 0) {
+            visactivate();
+        } else {
+            visdeactivate();
+        }
+    }
+
+    void visactivate() {
+        GL3DCameraOptionPanel optionsPanel;
+        optionsPanel = cameraOptionsAttributeManager.getCameraOptionAttributePanel(cameraSelectorModel.getObserverCamera());
+        optionsPanel.visactivate();
+        optionsPanel = cameraOptionsAttributeManager.getCameraOptionAttributePanel(cameraSelectorModel.getEarthCamera());
+        optionsPanel.visactivate();
+        optionsPanel = cameraOptionsAttributeManager.getCameraOptionAttributePanel(cameraSelectorModel.getCurrentCamera());
+        optionsPanel.visactivate();
+
+        this.active = true;
+    }
+
+    void visdeactivate() {
+        GL3DCameraOptionPanel optionsPanel;
+        optionsPanel = cameraOptionsAttributeManager.getCameraOptionAttributePanel(cameraSelectorModel.getObserverCamera());
+        optionsPanel.visdeactivate();
+        optionsPanel = cameraOptionsAttributeManager.getCameraOptionAttributePanel(cameraSelectorModel.getEarthCamera());
+        optionsPanel.visdeactivate();
+        optionsPanel = cameraOptionsAttributeManager.getCameraOptionAttributePanel(cameraSelectorModel.getFollowObjectCamera());
+        optionsPanel.visdeactivate();
+
+        this.active = false;
+    }
+
+    @Override
+    public void layerAdded(int idx) {
+        if (LayersModel.getSingletonInstance().getNumLayers() >= 0) {
+            this.visactivate();
+        }
+    }
+
+    @Override
+    public void layerRemoved(View oldView, int oldIdx) {
+        if (LayersModel.getSingletonInstance().getNumLayers() == 0) {
+            this.visdeactivate();
+        }
+    }
+
+    @Override
+    public void layerChanged(int idx) {
+        // TODO Auto-generated method stub
+
+    }
+
+    @Override
+    public void activeLayerChanged(int idx) {
+        // TODO Auto-generated method stub
+
+    }
+
+    @Override
+    public void viewportGeometryChanged() {
+        // TODO Auto-generated method stub
+
+    }
+
+    @Override
+    public void timestampChanged(int idx) {
+        // TODO Auto-generated method stub
+
+    }
+
+    @Override
+    public void subImageDataChanged() {
+        // TODO Auto-generated method stub
+
+    }
+
+    @Override
+    public void layerDownloaded(int idx) {
+        // TODO Auto-generated method stub
+
     }
 }

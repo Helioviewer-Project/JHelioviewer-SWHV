@@ -82,6 +82,7 @@ public class GL3DCameraSelectorModel extends AbstractListModel implements ComboB
             }
         }
         getCameraView().setCurrentCamera(defaultCamera);
+
         this.fireInit();
     }
 

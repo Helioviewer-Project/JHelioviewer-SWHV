@@ -94,13 +94,13 @@ public class JHVCalendarDatePicker extends JPanel implements FocusListener, Acti
         textField.addKeyListener(this);
 
         // set up popup button
-        popupButton = new JButton(icon);
-        popupButton.setPreferredSize(new Dimension(icon.getIconWidth() + 14, popupButton.getPreferredSize().height));
-        popupButton.addFocusListener(this);
-        popupButton.addActionListener(this);
+        setPopupButton(new JButton(icon));
+        getPopupButton().setPreferredSize(new Dimension(icon.getIconWidth() + 14, getPopupButton().getPreferredSize().height));
+        getPopupButton().addFocusListener(this);
+        getPopupButton().addActionListener(this);
 
         // place sub components
-        add(popupButton, BorderLayout.EAST);
+        add(getPopupButton(), BorderLayout.EAST);
         add(textField, BorderLayout.CENTER);
     }
 
@@ -156,7 +156,7 @@ public class JHVCalendarDatePicker extends JPanel implements FocusListener, Acti
     public void focusLost(FocusEvent arg0) {
 
         // has popup button or a subcomponent of jhvCalendar lost the focus?
-        if (arg0.getComponent() == popupButton || (jhvCalendar != null && jhvCalendar.isAncestorOf(arg0.getComponent()))) {
+        if (arg0.getComponent() == getPopupButton() || (jhvCalendar != null && jhvCalendar.isAncestorOf(arg0.getComponent()))) {
 
             // if the receiver of the focus is not a subcomponent of the
             // jhvCalendar than hide the popup
@@ -180,7 +180,7 @@ public class JHVCalendarDatePicker extends JPanel implements FocusListener, Acti
 
         // open or close the popup window when the event was fired by the
         // corresponding popup button
-        if (e.getSource() == popupButton) {
+        if (e.getSource() == getPopupButton()) {
 
             setDate(parseDate(textField.getText()));
 
@@ -246,7 +246,7 @@ public class JHVCalendarDatePicker extends JPanel implements FocusListener, Acti
 
         // create popup
         PopupFactory factory = PopupFactory.getSharedInstance();
-        popup = factory.getPopup(popupButton, jhvCalendar, x, y);
+        popup = factory.getPopup(getPopupButton(), jhvCalendar, x, y);
         popup.show();
 
         jhvCalendar.componentResized(null);
@@ -261,7 +261,7 @@ public class JHVCalendarDatePicker extends JPanel implements FocusListener, Acti
         popup.hide();
 
         // show popup
-        popup = factory.getPopup(popupButton, jhvCalendar, x, y);
+        popup = factory.getPopup(getPopupButton(), jhvCalendar, x, y);
         popup.show();
     }
 
@@ -394,6 +394,14 @@ public class JHVCalendarDatePicker extends JPanel implements FocusListener, Acti
     @Override
     public void setEnabled(boolean enabled) {
         textField.setEnabled(enabled);
-        popupButton.setEnabled(enabled);
+        getPopupButton().setEnabled(enabled);
+    }
+
+    public JButton getPopupButton() {
+        return popupButton;
+    }
+
+    public void setPopupButton(JButton popupButton) {
+        this.popupButton = popupButton;
     }
 }

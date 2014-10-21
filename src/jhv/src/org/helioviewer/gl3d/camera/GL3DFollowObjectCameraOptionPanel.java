@@ -20,6 +20,7 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JSeparator;
 import javax.swing.JSpinner;
+import javax.swing.JSpinner.DefaultEditor;
 import javax.swing.JTextArea;
 import javax.swing.SpinnerNumberModel;
 import javax.swing.SwingConstants;
@@ -63,6 +64,10 @@ public class GL3DFollowObjectCameraOptionPanel extends GL3DCameraOptionPanel imp
     private final JSpinner fovSpinner;
 
     private JPanel buttonPanel;
+
+    private final JCheckBox fovCheckbox;
+
+    private final JCheckBox exactDateCheckBox;
 
     public GL3DFollowObjectCameraOptionPanel(final GL3DFollowObjectCamera camera) {
         super(camera);
@@ -111,7 +116,7 @@ public class GL3DFollowObjectCameraOptionPanel extends GL3DCameraOptionPanel imp
         this.fovPanel.add(Box.createHorizontalGlue());
         this.fovPanel.add(new JSeparator(SwingConstants.VERTICAL));
         this.fovPanel.add(Box.createHorizontalGlue());
-        JCheckBox fovCheckbox = new JCheckBox("Visible");
+        fovCheckbox = new JCheckBox("Visible");
         fovCheckbox.setSelected(true);
         fovCheckbox.addItemListener(new ItemListener() {
             @Override
@@ -129,7 +134,7 @@ public class GL3DFollowObjectCameraOptionPanel extends GL3DCameraOptionPanel imp
         add(this.fovPanel);
         add(new JSeparator(SwingConstants.HORIZONTAL));
         addObjectCombobox();
-        final JCheckBox exactDateCheckBox = new JCheckBox("Use active layer timestamps", true);
+        exactDateCheckBox = new JCheckBox("Use active layer timestamps", true);
         JPanel checkboxPanel = new JPanel();
         checkboxPanel.add(exactDateCheckBox);
         add(checkboxPanel);
@@ -395,5 +400,47 @@ public class GL3DFollowObjectCameraOptionPanel extends GL3DCameraOptionPanel imp
     @Override
     public void fireNewDate(Date date) {
         this.cameraTime.setText(this.format.format(date));
+    }
+
+    @Override
+    public void visdeactivate() {
+        super.visdeactivate();
+        ((DefaultEditor) this.fovSpinner.getEditor()).getTextField().setEnabled(false);
+        fovCheckbox.setEnabled(false);
+        this.endDatePicker.getTextField().setEnabled(false);
+        this.endDatePicker.getPopupButton().setEnabled(false);
+        this.beginDatePicker.getTextField().setEnabled(false);
+        this.beginDatePicker.getPopupButton().setEnabled(false);
+        this.endTimePicker.setEnabled(false);
+        this.beginTimePicker.setEnabled(false);
+        synchronizeWithLayersButton.setEnabled(false);
+        synchronizeWithNowButton.setEnabled(false);
+        synchronizeWithCurrentButton.setEnabled(false);
+        objectCombobox.setEnabled(false);
+        exactDateCheckBox.setEnabled(false);
+        WheelSupport.uninstallMouseWheelSupport(this.fovSpinner);
+
+    }
+
+    @Override
+    public void visactivate() {
+        super.visactivate();
+        ((DefaultEditor) this.fovSpinner.getEditor()).getTextField().setEnabled(true);
+        fovCheckbox.setEnabled(true);
+        this.endDatePicker.getTextField().setEnabled(true);
+        this.endDatePicker.getPopupButton().setEnabled(true);
+        this.beginDatePicker.getTextField().setEnabled(true);
+        this.beginDatePicker.getPopupButton().setEnabled(true);
+
+        this.endTimePicker.setEnabled(true);
+        this.beginTimePicker.setEnabled(true);
+
+        synchronizeWithLayersButton.setEnabled(true);
+        synchronizeWithNowButton.setEnabled(true);
+        synchronizeWithCurrentButton.setEnabled(true);
+        objectCombobox.setEnabled(true);
+        exactDateCheckBox.setEnabled(true);
+        WheelSupport.installMouseWheelSupport(this.fovSpinner);
+
     }
 }
