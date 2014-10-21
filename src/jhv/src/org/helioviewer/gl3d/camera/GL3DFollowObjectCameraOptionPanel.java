@@ -217,7 +217,7 @@ public class GL3DFollowObjectCameraOptionPanel extends GL3DCameraOptionPanel imp
                 if (event.getStateChange() == ItemEvent.SELECTED) {
                     GL3DSpaceObject object = (GL3DSpaceObject) event.getItem();
                     if (object != null) {
-                        camera.setObservingObject(object.getUrlName());
+                        camera.setObservingObject(object.getUrlName(), true);
                         revalidate();
                     }
                 }
@@ -238,7 +238,7 @@ public class GL3DFollowObjectCameraOptionPanel extends GL3DCameraOptionPanel imp
             @Override
             public void focusLost(FocusEvent arg0) {
                 beginDatePicker.checkDateStringInTextField();
-                setBeginTime();
+                setBeginTime(true);
                 Displayer.getSingletonInstance().render();
             }
         });
@@ -253,7 +253,7 @@ public class GL3DFollowObjectCameraOptionPanel extends GL3DCameraOptionPanel imp
         beginDatePicker.addJHVCalendarListener(new JHVCalendarListener() {
             @Override
             public void actionPerformed(JHVCalendarEvent e) {
-                setBeginTime();
+                setBeginTime(true);
                 Displayer.getSingletonInstance().render();
             }
         });
@@ -261,7 +261,7 @@ public class GL3DFollowObjectCameraOptionPanel extends GL3DCameraOptionPanel imp
         beginTimePicker.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                setBeginTime();
+                setBeginTime(true);
                 Displayer.getSingletonInstance().render();
             }
         });
@@ -271,16 +271,16 @@ public class GL3DFollowObjectCameraOptionPanel extends GL3DCameraOptionPanel imp
         add(addBeginDatePanel);
     }
 
-    private void setEndTime() {
+    private void setEndTime(boolean applyChanges) {
         Date dt = endTimePicker.getValue();
         Date end_date = new Date(endDatePicker.getDate().getTime() + dt.getTime());
-        camera.setEndDate(end_date);
+        camera.setEndDate(end_date, applyChanges);
     }
 
-    private void setBeginTime() {
+    private void setBeginTime(boolean applyChanges) {
         Date dt = beginTimePicker.getValue();
         Date begin_date = new Date(beginDatePicker.getDate().getTime() + dt.getTime());
-        camera.setBeginDate(begin_date);
+        camera.setBeginDate(begin_date, applyChanges);
     }
 
     private void syncWithLayer() {
@@ -296,7 +296,7 @@ public class GL3DFollowObjectCameraOptionPanel extends GL3DCameraOptionPanel imp
         }
         beginDatePicker.setDate(new Date(startDate.getTime() - startDate.getTime() % (60 * 60 * 24 * 1000)));
         beginTimePicker.setText(TimeTextField.formatter.format(startDate));
-        setBeginTime();
+        setBeginTime(true);
     }
 
     private void syncBothLayerNow() {
@@ -305,8 +305,8 @@ public class GL3DFollowObjectCameraOptionPanel extends GL3DCameraOptionPanel imp
         beginTimePicker.setText(TimeTextField.formatter.format(nowDate));
         endDatePicker.setDate(new Date(nowDate.getTime() - nowDate.getTime() % (60 * 60 * 24 * 1000)));
         endTimePicker.setText(TimeTextField.formatter.format(nowDate));
-        setBeginTime();
-        setEndTime();
+        setBeginTime(false);
+        setEndTime(true);
     }
 
     private void syncWithLayerCurrentTime() {
@@ -323,8 +323,8 @@ public class GL3DFollowObjectCameraOptionPanel extends GL3DCameraOptionPanel imp
         endTimePicker.setText(TimeTextField.formatter.format(currentDate));
         beginDatePicker.setDate(new Date(currentDate.getTime() - currentDate.getTime() % (60 * 60 * 24 * 1000)));
         beginTimePicker.setText(TimeTextField.formatter.format(currentDate));
-        setBeginTime();
-        setEndTime();
+        setBeginTime(false);
+        setEndTime(true);
     }
 
     private void syncWithLayerEndTime() {
@@ -335,7 +335,7 @@ public class GL3DFollowObjectCameraOptionPanel extends GL3DCameraOptionPanel imp
         }
         endDatePicker.setDate(new Date(endDate.getTime() - endDate.getTime() % (60 * 60 * 24 * 1000)));
         endTimePicker.setText(TimeTextField.formatter.format(endDate));
-        setEndTime();
+        setEndTime(true);
     }
 
     private void addEndDatePanel() {
@@ -349,7 +349,7 @@ public class GL3DFollowObjectCameraOptionPanel extends GL3DCameraOptionPanel imp
             @Override
             public void focusLost(FocusEvent arg0) {
                 beginDatePicker.checkDateStringInTextField();
-                setEndTime();
+                setEndTime(true);
                 Displayer.getSingletonInstance().render();
             }
         });
@@ -363,7 +363,7 @@ public class GL3DFollowObjectCameraOptionPanel extends GL3DCameraOptionPanel imp
         endDatePicker.addJHVCalendarListener(new JHVCalendarListener() {
             @Override
             public void actionPerformed(JHVCalendarEvent e) {
-                setEndTime();
+                setEndTime(true);
                 Displayer.getSingletonInstance().render();
             }
         });
@@ -371,7 +371,7 @@ public class GL3DFollowObjectCameraOptionPanel extends GL3DCameraOptionPanel imp
         endTimePicker.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                setEndTime();
+                setEndTime(true);
                 Displayer.getSingletonInstance().render();
             }
         });
