@@ -54,8 +54,8 @@ public class PfssPluginPanel extends OverlayPanel implements ActionListener, Lay
     private boolean showAgain = true;
     private boolean retry = false;
     // UI Components
-    private final JButton visibleButton = new JButton(new ImageIcon(PfssPlugin.getResourceUrl("/images/invisible_dm.png")));
-    private final JButton reloadButton = new JButton(new ImageIcon(PfssPlugin.getResourceUrl("/images/reload.png")));
+    private final JButton visibleButton;
+    private final JButton reloadButton;
     private JSpinner qualitySpinner;
 
     /**
@@ -64,6 +64,10 @@ public class PfssPluginPanel extends OverlayPanel implements ActionListener, Lay
      * */
     public PfssPluginPanel(PfssCache pfssCache) {
         this.pfssCache = pfssCache;
+        reloadButton = new JButton(new ImageIcon(PfssPlugin.getResourceUrl("/images/reload.png")));
+        reloadButton.setToolTipText("Reload data");
+        visibleButton = new JButton(new ImageIcon(PfssPlugin.getResourceUrl("/images/invisible_dm.png")));
+        visibleButton.setToolTipText("Toggle visibility");
         // set up visual components
         initVisualComponents();
         // register as layers listener
