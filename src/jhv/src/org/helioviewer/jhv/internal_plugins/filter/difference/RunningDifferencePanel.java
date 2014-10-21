@@ -21,6 +21,10 @@ import javax.swing.event.ChangeListener;
 
 import org.helioviewer.basegui.components.WheelSupport;
 import org.helioviewer.jhv.display.Displayer;
+import org.helioviewer.jhv.gui.states.State;
+import org.helioviewer.jhv.gui.states.StateController;
+import org.helioviewer.jhv.gui.states.StateController.StateChangeListener;
+import org.helioviewer.jhv.gui.states.ViewStateEnum;
 import org.helioviewer.viewmodel.filter.Filter;
 import org.helioviewer.viewmodelplugin.filter.FilterPanel;
 import org.helioviewer.viewmodelplugin.filter.FilterTabPanelManager.Area;
@@ -31,7 +35,7 @@ import org.helioviewer.viewmodelplugin.filter.FilterTabPanelManager.Area;
  * @author Helge Dietert
  *
  */
-public class RunningDifferencePanel extends FilterPanel implements ChangeListener {
+public class RunningDifferencePanel extends FilterPanel implements ChangeListener, StateChangeListener {
     /**
      * Generated serial id from Eclipse
      */
@@ -41,12 +45,15 @@ public class RunningDifferencePanel extends FilterPanel implements ChangeListene
      */
     private RunningDifferenceFilter filter;
     private final JSpinner truncateSpinner;
+    private JCheckBox diffRot;
 
     /**
      * Creates a new panel to control the running difference. Not active until a
      * valid filter has been set.
      */
     public RunningDifferencePanel() {
+        StateController.getInstance().addStateChangeListener(this);
+
         this.setLayout(new BoxLayout(this, BoxLayout.PAGE_AXIS));
         addRadioButtons();
         truncateSpinner = new JSpinner();
@@ -68,21 +75,24 @@ public class RunningDifferencePanel extends FilterPanel implements ChangeListene
         truncationLine.setAlignmentY(Component.LEFT_ALIGNMENT);
         add(truncationLine);
         add(Box.createVerticalGlue());
+        truncateSpinner.setEnabled(false);
+
     }
 
     private void addRadioButtons() {
         final JRadioButton radNone = new JRadioButton("No differences", true);
         final JRadioButton radRunDiff = new JRadioButton("Running difference");
         final JRadioButton radBaseDiff = new JRadioButton("Base difference");
-        final JCheckBox diffRot = new JCheckBox("Rotation correction (only in 3D mode)");
+        diffRot = new JCheckBox("Rotation correction");
         diffRot.setSelected(true);
-        diffRot.setVisible(false);
+        diffRot.setEnabled(false);
 
         radNone.addItemListener(new ItemListener() {
             @Override
             public void itemStateChanged(ItemEvent e) {
                 if (e.getStateChange() == 1) {
-                    diffRot.setVisible(false);
+                    diffRot.setEnabled(false);
+                    truncateSpinner.setEnabled(false);
                     filter.setActive(false);
                     radRunDiff.setSelected(false);
                     radBaseDiff.setSelected(false);
@@ -95,7 +105,8 @@ public class RunningDifferencePanel extends FilterPanel implements ChangeListene
             @Override
             public void itemStateChanged(ItemEvent e) {
                 if (e.getStateChange() == 1) {
-                    diffRot.setVisible(true);
+                    diffRot.setEnabled(true);
+                    truncateSpinner.setEnabled(true);
 
                     filter.setActive(true);
                     filter.setBaseDifference(false);
@@ -112,7 +123,8 @@ public class RunningDifferencePanel extends FilterPanel implements ChangeListene
             @Override
             public void itemStateChanged(ItemEvent e) {
                 if (e.getStateChange() == 1) {
-                    diffRot.setVisible(true);
+                    diffRot.setEnabled(true);
+                    truncateSpinner.setEnabled(true);
 
                     filter.setActive(true);
                     filter.setBaseDifference(true);
@@ -195,4 +207,12 @@ public class RunningDifferencePanel extends FilterPanel implements ChangeListene
         }
     }
 
+    @Override
+    public void stateChanged(State newState, State oldState, StateController stateController) {
+        if (newState.getType() == ViewStateEnum.View3D) {
+            diffRot.setVisible(true);
+        } else {
+            diffRot.setVisible(false);
+        }
+    }
 }
