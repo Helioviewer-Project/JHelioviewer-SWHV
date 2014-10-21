@@ -8,6 +8,7 @@ import java.io.Reader;
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.net.UnknownHostException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -88,9 +89,9 @@ public class GL3DPositionLoading {
                             }
                         }
                     }
+                } catch (UnknownHostException e) {
+                    Log.debug("Unknown host, network down?", e);
                 } catch (final IOException e1) {
-                    Log.warn(e1);
-                    e1.printStackTrace();
                     fireLoaded(FAILEDSTATE + ": server problem");
                 } catch (JSONException e2) {
                     fireLoaded(FAILEDSTATE + ": json parse problem");
