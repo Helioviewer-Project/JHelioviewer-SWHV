@@ -162,4 +162,16 @@ public abstract class GL3DCameraOptionPanel extends JPanel implements ActionList
         String item = (String) source.getSelectedItem();
         camera.getGrid().setFont(item);
     }
+
+    public void visdeactivate() {
+        gridResolutionXSpinner.setEnabled(false);
+        gridResolutionYSpinner.setEnabled(false);
+        gridVisibleCheckbox.setEnabled(false);
+    }
+
+    public void visactivate() {
+        gridResolutionXSpinner.setEnabled(true);
+        gridResolutionYSpinner.setEnabled(true);
+        gridVisibleCheckbox.setEnabled(true);
+    }
 }
