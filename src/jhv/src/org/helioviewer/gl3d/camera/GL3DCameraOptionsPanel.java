@@ -1,5 +1,7 @@
 package org.helioviewer.gl3d.camera;
 
+import java.awt.Component;
+import java.awt.Container;
 import java.awt.EventQueue;
 
 import javax.swing.BorderFactory;
@@ -136,28 +138,35 @@ public class GL3DCameraOptionsPanel extends JPanel implements GL3DCameraSelectio
         }
     }
 
+    public void enableComponents(Container container, boolean enable) {
+        Component[] components = container.getComponents();
+        for (Component component : components) {
+            component.setEnabled(enable);
+            if (component instanceof Container) {
+                enableComponents((Container) component, enable);
+            }
+        }
+    }
+
     void visactivate() {
         GL3DCameraOptionPanel optionsPanel;
+        enableComponents(tab, true);
         optionsPanel = cameraOptionsAttributeManager.getCameraOptionAttributePanel(cameraSelectorModel.getObserverCamera());
-        optionsPanel.visactivate();
+        enableComponents(optionsPanel, true);
         optionsPanel = cameraOptionsAttributeManager.getCameraOptionAttributePanel(cameraSelectorModel.getEarthCamera());
-        optionsPanel.visactivate();
+        enableComponents(optionsPanel, true);
         optionsPanel = cameraOptionsAttributeManager.getCameraOptionAttributePanel(cameraSelectorModel.getFollowObjectCamera());
-        optionsPanel.visactivate();
-
-        this.active = true;
+        enableComponents(optionsPanel, true);
     }
 
     void visdeactivate() {
-        GL3DCameraOptionPanel optionsPanel;
+        enableComponents(tab, false);
         optionsPanel = cameraOptionsAttributeManager.getCameraOptionAttributePanel(cameraSelectorModel.getObserverCamera());
-        optionsPanel.visdeactivate();
+        enableComponents(optionsPanel, false);
         optionsPanel = cameraOptionsAttributeManager.getCameraOptionAttributePanel(cameraSelectorModel.getEarthCamera());
-        optionsPanel.visdeactivate();
+        enableComponents(optionsPanel, false);
         optionsPanel = cameraOptionsAttributeManager.getCameraOptionAttributePanel(cameraSelectorModel.getFollowObjectCamera());
-        optionsPanel.visdeactivate();
-
-        this.active = false;
+        enableComponents(optionsPanel, false);
     }
 
     @Override
