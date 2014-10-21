@@ -37,7 +37,7 @@ import org.helioviewer.viewmodel.view.ViewHelper;
 /**
  * The solar event renderer provides a possibility to draw solar events with
  * there associated icons.
- *
+ * 
  * @author Malte Nuhn
  */
 public class HEKPlugin3dRenderer extends PhysicalRenderer3d {
@@ -76,7 +76,7 @@ public class HEKPlugin3dRenderer extends PhysicalRenderer3d {
         double thetaEnd = principleAngle + angularWidth / 2.;
         double phi = -Math.PI / 2. - Astronomy.getL0Radians(new Date((evt.getStartDate().getTime() + evt.getEndDate().getTime()) / 2));
         double lineResolution = 10;
-        Color eventColor = HEKSettings.getCactusColor();
+        Color eventColor = evt.getEventRelationShip().getRelationshipColor();
         gl.glColor3d(eventColor.getRed() / 255., eventColor.getGreen() / 255., eventColor.getBlue() / 255.);
         gl.glDisable(GL.GL_LIGHTING);
         gl.glDisable(GL2.GL_TEXTURE_2D);
@@ -132,7 +132,7 @@ public class HEKPlugin3dRenderer extends PhysicalRenderer3d {
 
     /**
      * The actual rendering routine
-     *
+     * 
      * @param g
      *            - PhysicalRenderGraphics to render to
      * @param evt
@@ -199,7 +199,7 @@ public class HEKPlugin3dRenderer extends PhysicalRenderer3d {
 
     /**
      * The actual rendering routine
-     *
+     * 
      * @param g
      *            - PhysicalRenderGraphics to render to
      * @param evt
@@ -236,7 +236,7 @@ public class HEKPlugin3dRenderer extends PhysicalRenderer3d {
 
     /**
      * {@inheritDoc}
-     *
+     * 
      * Draws all available and visible solar events with there associated icon.
      */
     @Override
