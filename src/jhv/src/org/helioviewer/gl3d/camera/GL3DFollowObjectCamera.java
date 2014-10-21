@@ -171,16 +171,16 @@ public class GL3DFollowObjectCamera extends GL3DSolarRotationTrackingTrackballCa
         }
     }
 
-    public void setBeginDate(Date date) {
-        this.positionLoading.setBeginDate(date);
+    public void setBeginDate(Date date, boolean applyChanges) {
+        this.positionLoading.setBeginDate(date, applyChanges);
     }
 
-    public void setEndDate(Date date) {
-        this.positionLoading.setEndDate(date);
+    public void setEndDate(Date date, boolean applyChanges) {
+        this.positionLoading.setEndDate(date, applyChanges);
     }
 
-    public void setObservingObject(String object) {
-        this.positionLoading.setObserver(object);
+    public void setObservingObject(String object, boolean applyChanges) {
+        this.positionLoading.setObserver(object, applyChanges);
     }
 
     public void setFOVangleDegrees(double fovAngle) {
@@ -222,8 +222,8 @@ public class GL3DFollowObjectCamera extends GL3DSolarRotationTrackingTrackballCa
                         endDate = date.getTime();
                     }
                 }
-                this.positionLoading.setBeginDate(beginDate);
-                this.positionLoading.setEndDate(endDate);
+                this.positionLoading.setBeginDate(beginDate, false);
+                this.positionLoading.setEndDate(endDate, true);
             }
         }
     }

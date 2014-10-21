@@ -44,7 +44,7 @@ public class GL3DPositionLoading {
     private final String target = "SUN";
     private String observer = "Earth";
     private final String baseUrl = "http://swhv.oma.be/position?";
-    private final int deltat = 60 * 60 / 64; //1 hours by default
+    private int deltat = 60 * 60 / 64; //1 hours by default
     private final ArrayList<GL3DPositionLoadingListener> listeners = new ArrayList<GL3DPositionLoadingListener>();
     private Date beginDatems = new Date(0);
     private Date endDatems = new Date();
@@ -65,30 +65,36 @@ public class GL3DPositionLoading {
         if (worker != null && !worker.isDone()) {
             worker.cancel(true);
         }
+        fireLoaded("Loading...");
         worker = new SwingWorker<Integer, Integer>() {
             private final String report = null;
 
             @Override
             protected Integer doInBackground() throws Exception {
                 try {
-                    buildRequestURL();
                     if (endDatems.getTime() - beginDatems.getTime() < 1000 * 60 * 60 * 24 * 20) {
-                        DownloadStream ds = new DownloadStream(url.toURI(), 30000, 30000, true);
-                        Reader reader = new BufferedReader(new InputStreamReader(ds.getInput(), "UTF-8"));
-                        if (!ds.getResponse400()) {
-                            jsonResult = new JSONArray(new JSONTokener(reader));
-                            parseData();
-                            if (positionDateTime.length > 0) {
-                                setLoaded(true);
-                            }
-                        } else {
-                            JSONObject jsonObject = new JSONObject(new JSONTokener(reader));
-                            if (jsonObject.has("faultstring")) {
-                                String faultstring = jsonObject.getString("faultstring");
-                                fireLoaded(faultstring);
-                            }
+                        deltat = 60 * 60 / 64;
+                    } else {
+                        deltat = 60 * 60 * 24;
+                    }
+                    buildRequestURL();
+
+                    DownloadStream ds = new DownloadStream(url.toURI(), 30000, 30000, true);
+                    Reader reader = new BufferedReader(new InputStreamReader(ds.getInput(), "UTF-8"));
+                    if (!ds.getResponse400()) {
+                        jsonResult = new JSONArray(new JSONTokener(reader));
+                        parseData();
+                        if (positionDateTime.length > 0) {
+                            setLoaded(true);
+                        }
+                    } else {
+                        JSONObject jsonObject = new JSONObject(new JSONTokener(reader));
+                        if (jsonObject.has("faultstring")) {
+                            String faultstring = jsonObject.getString("faultstring");
+                            fireLoaded(faultstring);
                         }
                     }
+
                 } catch (UnknownHostException e) {
                     Log.debug("Unknown host, network down?", e);
                 } catch (final IOException e1) {
@@ -109,7 +115,6 @@ public class GL3DPositionLoading {
                 if (report != null) {
                     fireLoaded(report);
                 }
-
             }
         };
         worker.execute();
@@ -117,7 +122,9 @@ public class GL3DPositionLoading {
 
     private void setLoaded(boolean isLoaded) {
         this.isLoaded = isLoaded;
-        this.fireLoaded(this.LOADEDSTATE);
+        if (isLoaded) {
+            this.fireLoaded(this.LOADEDSTATE);
+        }
     }
 
     private void parseData() {
@@ -157,10 +164,12 @@ public class GL3DPositionLoading {
         return this.isLoaded;
     }
 
-    public void setBeginDate(Date beginDate) {
+    public void setBeginDate(Date beginDate, boolean applyChanges) {
         this.beginDate = this.format.format(beginDate);
         this.beginDatems = beginDate;
-        applyChanges();
+        if (applyChanges) {
+            applyChanges();
+        }
     }
 
     synchronized public void applyChanges() {
@@ -169,22 +178,28 @@ public class GL3DPositionLoading {
         this.requestData();
     }
 
-    public void setBeginDate(long beginDate) {
+    public void setBeginDate(long beginDate, boolean applyChanges) {
         this.beginDate = this.format.format(new Date(beginDate));
         this.beginDatems = new Date(beginDate);
-        applyChanges();
+        if (applyChanges) {
+            applyChanges();
+        }
     }
 
-    public void setEndDate(Date endDate) {
+    public void setEndDate(Date endDate, boolean applyChanges) {
         this.endDate = this.format.format(endDate);
         this.endDatems = endDate;
-        applyChanges();
+        if (applyChanges) {
+            applyChanges();
+        }
     }
 
-    public void setEndDate(long endDate) {
+    public void setEndDate(long endDate, boolean applyChanges) {
         this.endDate = this.format.format(new Date(endDate));
         this.endDatems = new Date(endDate);
-        applyChanges();
+        if (applyChanges) {
+            applyChanges();
+        }
     }
 
     public void addListener(GL3DPositionLoadingListener listener) {
@@ -244,9 +259,11 @@ public class GL3DPositionLoading {
         }
     }
 
-    public void setObserver(String object) {
+    public void setObserver(String object, boolean applyChanges) {
         this.observer = object;
-        this.applyChanges();
+        if (applyChanges) {
+            applyChanges();
+        }
     }
 
 }
