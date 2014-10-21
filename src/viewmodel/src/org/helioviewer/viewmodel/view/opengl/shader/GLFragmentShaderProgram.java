@@ -2,6 +2,7 @@ package org.helioviewer.viewmodel.view.opengl.shader;
 
 import java.util.Stack;
 
+import javax.media.opengl.GL;
 import javax.media.opengl.GL2;
 
 /**
@@ -70,9 +71,15 @@ public abstract class GLFragmentShaderProgram {
     public void bind(GL2 gl) {
         bind(gl, shaderID);
     }
-    public void bindEnvVars(GL2 gl,int id, double [] param) {
+
+    public void bindEnvVars(GL2 gl, int id, double[] param) {
         gl.glProgramLocalParameter4dARB(target, id, param[0], param[1], param[2], param[3]);
     }
+
+    public void bindEnvVarsFloat(GL2 gl, int id, float[] param) {
+        gl.glProgramLocalParameter4fARB(target, id, param[0], param[1], param[2], param[3]);
+    }
+
     /**
      * Pushes the shader currently in use onto a stack.
      *
