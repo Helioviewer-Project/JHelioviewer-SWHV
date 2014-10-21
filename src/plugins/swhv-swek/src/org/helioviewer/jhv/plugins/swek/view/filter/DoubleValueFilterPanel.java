@@ -1,12 +1,17 @@
 package org.helioviewer.jhv.plugins.swek.view.filter;
 
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
 import java.util.ArrayList;
 
 import javax.swing.JComponent;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
 import javax.swing.JSpinner;
 import javax.swing.SpinnerModel;
 import javax.swing.SpinnerNumberModel;
 
+import org.helioviewer.basegui.components.WheelSupport;
 import org.helioviewer.jhv.plugins.swek.config.SWEKEventType;
 import org.helioviewer.jhv.plugins.swek.config.SWEKParameter;
 import org.helioviewer.jhv.plugins.swek.download.SWEKOperand;
@@ -25,17 +30,33 @@ public class DoubleValueFilterPanel extends AbstractFilterPanel {
     }
 
     @Override
-    public void filter() {
-        SWEKParam param = new SWEKParam(parameter.getParameterName(), "" + spinner.getValue(), SWEKOperand.EQUALS);
-        ArrayList<SWEKParam> params = new ArrayList<SWEKParam>();
-        params.add(param);
-        filterManager.addFilter(eventType, parameter, params);
+    public void filter(boolean active) {
+        if (active) {
+            SWEKParam param = new SWEKParam(parameter.getParameterName(), "" + spinner.getValue(), SWEKOperand.EQUALS);
+            ArrayList<SWEKParam> params = new ArrayList<SWEKParam>();
+            params.add(param);
+            filterManager.addFilter(eventType, parameter, params);
+        } else {
+            filterManager.removedFilter(eventType, parameter);
+        }
     }
 
     @Override
     public JComponent initFilterComponents() {
         SpinnerModel spinnerModel = new SpinnerNumberModel(middleValue, min, max, stepSize);
+
         spinner = new JSpinner(spinnerModel);
-        return spinner;
+        spinner.setEditor(new JSpinner.NumberEditor(spinner, "0.00000000"));
+        WheelSupport.installMouseWheelSupport(spinner);
+        JPanel p = new JPanel();
+        p.setLayout(new GridBagLayout());
+        GridBagConstraints c = new GridBagConstraints();
+        c.gridx = 0;
+        c.gridy = 0;
+        c.weightx = 0.5;
+        p.add(new JLabel("Value:"), c);
+        c.gridx = 1;
+        p.add(spinner, c);
+        return p;
     }
 }
