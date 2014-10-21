@@ -189,14 +189,14 @@ public class PfssPluginPanel extends OverlayPanel implements ActionListener, Lay
     public void layerAdded(int idx) {
         Date start = LayersModel.getSingletonInstance().getFirstDate();
         Date end = LayersModel.getSingletonInstance().getLastDate();
-
-        Calendar startCal = GregorianCalendar.getInstance();
-        startCal.setTime(start);
-
-        Calendar endCal = GregorianCalendar.getInstance();
-        endCal.setTime(end);
-
         if (start != null && end != null) {
+
+            Calendar startCal = GregorianCalendar.getInstance();
+            startCal.setTime(start);
+
+            Calendar endCal = GregorianCalendar.getInstance();
+            endCal.setTime(end);
+
             int startYear = startCal.get(Calendar.YEAR);
             int startMonth = startCal.get(Calendar.MONTH);
 
