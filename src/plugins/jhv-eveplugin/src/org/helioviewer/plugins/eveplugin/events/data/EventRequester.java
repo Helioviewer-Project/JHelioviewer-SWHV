@@ -130,10 +130,12 @@ public class EventRequester implements ZoomControllerListener, JHVEventHandler {
 
     @Override
     public void newEventsReceived(final Map<String, NavigableMap<Date, NavigableMap<Date, List<JHVEvent>>>> eventList) {
+
         EventQueue.invokeLater(new Runnable() {
 
             @Override
             public void run() {
+                Log.debug("new events received " + eventList.size());
                 fireNewEventsReceived(eventList);
             }
 
@@ -156,6 +158,7 @@ public class EventRequester implements ZoomControllerListener, JHVEventHandler {
 
             @Override
             public void run() {
+                Log.debug("Request for interval");
                 eventContainer.requestForInterval(selectedInterval.getStart(), selectedInterval.getEnd(), eventHandler);
             }
 

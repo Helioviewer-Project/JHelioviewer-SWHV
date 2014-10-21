@@ -205,7 +205,9 @@ public class DownloadWorker implements Runnable {
             page++;
         } while (moreDownloads);
         // inform JHVEventContainer data finished downloading
-        eventContainer.finishedDownload();
+        if (!isStopped) {
+            eventContainer.finishedDownload();
+        }
         fireDownloadWorkerFinished();
     }
 
@@ -260,7 +262,7 @@ public class DownloadWorker implements Runnable {
     private void distributeData() {
         if (!isStopped) {
             if (eventStream != null) {
-                while (eventStream.hasEvents()) {
+                while (eventStream.hasEvents() && !isStopped) {
                     eventContainer.addEvent(eventStream.next());
                 }
             }
