@@ -69,6 +69,8 @@ public class GL3DFollowObjectCameraOptionPanel extends GL3DCameraOptionPanel imp
 
     private final JCheckBox exactDateCheckBox;
 
+    protected boolean firstComboChanged = false;
+
     public GL3DFollowObjectCameraOptionPanel(final GL3DFollowObjectCamera camera) {
         super(camera);
         this.camera = camera;
@@ -219,12 +221,15 @@ public class GL3DFollowObjectCameraOptionPanel extends GL3DCameraOptionPanel imp
         objectCombobox.addItemListener(new ItemListener() {
             @Override
             public void itemStateChanged(ItemEvent event) {
-                if (event.getStateChange() == ItemEvent.SELECTED) {
+                if (event.getStateChange() == ItemEvent.SELECTED && firstComboChanged) {
                     GL3DSpaceObject object = (GL3DSpaceObject) event.getItem();
                     if (object != null) {
                         camera.setObservingObject(object.getUrlName(), true);
                         revalidate();
                     }
+                }
+                if (event.getStateChange() == ItemEvent.SELECTED && !firstComboChanged) {
+                    firstComboChanged = true;
                 }
             }
         });
