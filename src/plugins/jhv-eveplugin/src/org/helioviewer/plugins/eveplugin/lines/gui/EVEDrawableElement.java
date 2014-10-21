@@ -2,6 +2,7 @@ package org.helioviewer.plugins.eveplugin.lines.gui;
 
 import java.awt.Color;
 import java.awt.Graphics;
+import java.awt.Graphics2D;
 import java.awt.Point;
 import java.awt.Rectangle;
 import java.util.ArrayList;
@@ -53,7 +54,7 @@ public class EVEDrawableElement implements DrawableElement {
     }
 
     @Override
-    public void draw(Graphics g, Rectangle graphArea) {
+    public void draw(Graphics2D g, Graphics2D leftAxisG, Rectangle graphArea, Rectangle leftAxisArea) {
         updateGraphsData(interval, graphArea);
         drawGraphs(g, graphArea);
     }

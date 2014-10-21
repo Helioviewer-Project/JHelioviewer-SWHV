@@ -97,6 +97,10 @@ public class EventPlotConfiguration {
         return null;
     }
 
+    public JHVEvent getEvent() {
+        return event;
+    }
+
     /**
      * Checks if the given point is located where the event was drawn.
      * 
@@ -111,4 +115,5 @@ public class EventPlotConfiguration {
         }
         return false;
     }
+
 }
