@@ -78,6 +78,7 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
     private final ChartModel chartModel;
     private final PlotAreaSpaceManager plotAreaSpaceManager;
     private final EventModel eventModel;
+    private Rectangle leftAxisArea;
 
     // //////////////////////////////////////////////////////////////////////////////
     // Methods
@@ -145,13 +146,15 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
             BufferedImage plotPart = screenImage.getSubimage(ChartConstants.GRAPH_LEFT_SPACE, ChartConstants.GRAPH_TOP_SPACE, width
                     - ChartConstants.GRAPH_LEFT_SPACE - ChartConstants.GRAPH_RIGHT_SPACE, height - ChartConstants.GRAPH_TOP_SPACE
                     - ChartConstants.GRAPH_BOTTOM_SPACE);
-            drawData(plotPart.createGraphics(), g);
+            BufferedImage leftAxisPart = screenImage.getSubimage(0, ChartConstants.GRAPH_TOP_SPACE, ChartConstants.GRAPH_LEFT_SPACE, height
+                    - ChartConstants.GRAPH_TOP_SPACE - ChartConstants.GRAPH_BOTTOM_SPACE);
+            drawData(plotPart.createGraphics(), g, leftAxisPart.createGraphics());
             drawZoomBox(g);
         }
         // Log.info("Run time: " + (System.currentTimeMillis() - start));
     }
 
-    private void drawData(Graphics2D chartg, Graphics2D plotG) {
+    private void drawData(Graphics2D chartg, Graphics2D plotG, Graphics2D leftAxisG) {
         Map<DrawableType, Set<DrawableElement>> drawableElements = drawController.getDrawableElements(identifier);
         List<DrawableType> drawTypeList = DrawableType.getZOrderedList();
         boolean labelsDrawn = false;
@@ -168,7 +171,7 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
                     // Log.info("Drawable Elements size : " + del.size());
                     for (DrawableElement de : del) {
                         // Log.info("drawable element" + de);
-                        de.draw(chartg, plotArea);
+                        de.draw(chartg, leftAxisG, plotArea, leftAxisArea);
                     }
                 }
             } else {
@@ -400,6 +403,7 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
         final int graphHeight = getHeight() - (ChartConstants.GRAPH_TOP_SPACE + ChartConstants.GRAPH_BOTTOM_SPACE);
         graphArea = new Rectangle(ChartConstants.GRAPH_LEFT_SPACE, ChartConstants.GRAPH_TOP_SPACE, graphWidth, graphHeight);
         plotArea = new Rectangle(0, 0, graphWidth, graphHeight);
+        leftAxisArea = new Rectangle(0, 0, ChartConstants.GRAPH_LEFT_SPACE, graphHeight);
         zoomManager.setDisplaySize(plotArea, identifier);
     }
 

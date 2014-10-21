@@ -1,7 +1,7 @@
 package org.helioviewer.plugins.eveplugin.radio.gui;
 
 import java.awt.Color;
-import java.awt.Graphics;
+import java.awt.Graphics2D;
 import java.awt.Image;
 import java.awt.Rectangle;
 import java.awt.image.BufferedImage;
@@ -55,7 +55,7 @@ public class RadioImagePane implements ImageObserver, RadioPlotModelListener, Dr
     }
 
     @Override
-    public void draw(Graphics g, Rectangle graphArea) {
+    public void draw(Graphics2D g, Graphics2D leftAxisG, Rectangle graphArea, Rectangle leftAxisArea) {
         Log.trace("redraw radio image pane for plot : " + plotIdentifier);
         Thread.dumpStack();
         if (!intervalTooBig) {
