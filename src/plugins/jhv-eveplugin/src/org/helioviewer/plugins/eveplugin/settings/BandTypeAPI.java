@@ -1,11 +1,11 @@
 package org.helioviewer.plugins.eveplugin.settings;
 
-
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.net.UnknownHostException;
 import java.util.HashMap;
 import java.util.Properties;
 
@@ -26,8 +26,8 @@ public class BandTypeAPI extends APIAbstract {
     private Boolean isUpdated = Boolean.FALSE;
     public HashMap<String, BandGroup> groups = new HashMap<String, BandGroup>();
 
-    private Properties defaultProperties = new Properties();
-    
+    private final Properties defaultProperties = new Properties();
+
     public static BandTypeAPI getSingletonInstance() {
         return singletonInstance;
     }
@@ -54,6 +54,7 @@ public class BandTypeAPI extends APIAbstract {
         return this.getBaseUrl() + "/datasets/index.php";
     }
 
+    @Override
     public String getUrl() {
         return this.getBaseUrl();
     }
@@ -70,15 +71,17 @@ public class BandTypeAPI extends APIAbstract {
         try {
             DownloadStream ds = new DownloadStream(url, JHVGlobals.getStdConnectTimeout(), JHVGlobals.getStdReadTimeout());
             FileUtils.save(ds.getInput(), dstFile);
+        } catch (UnknownHostException e) {
+            Log.debug("Unknown host, network down?", e);
         } catch (final IOException e1) {
-            Log.error("Error downloading the bandtypes.", e1);
+            Log.debug("Error downloading the bandtypes.", e1);
         } catch (URISyntaxException e2) {
-            Log.error("Malformed url", e2);
+            Log.debug("Malformed url", e2);
         }
         try {
             string = FileUtils.read(dstFile);
         } catch (final IOException e1) {
-            Log.error("Error reading the bandtypes.", e1);
+            Log.debug("Error reading the bandtypes.", e1);
         }
         return string;
     }
@@ -113,7 +116,7 @@ public class BandTypeAPI extends APIAbstract {
                     BandGroup group = this.groups.get(job.getString("group"));
                     group.add(this.bandtypes[i]);
                     this.bandtypes[i].setGroup(group);
-                }                
+                }
             }
         } catch (JSONException e1) {
             Log.error("JSON parsing error", e1);
@@ -155,6 +158,7 @@ public class BandTypeAPI extends APIAbstract {
 
     public void updateDatasets() {
         final Thread t = new Thread(new Runnable() {
+            @Override
             public void run() {
                 try {
                     String jsonString = readJSON();
