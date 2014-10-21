@@ -20,7 +20,6 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JSeparator;
 import javax.swing.JSpinner;
-import javax.swing.JSpinner.DefaultEditor;
 import javax.swing.JTextArea;
 import javax.swing.SpinnerNumberModel;
 import javax.swing.SwingConstants;
@@ -405,45 +404,4 @@ public class GL3DFollowObjectCameraOptionPanel extends GL3DCameraOptionPanel imp
         this.cameraTime.setText(this.format.format(date));
     }
 
-    @Override
-    public void visdeactivate() {
-        super.visdeactivate();
-        ((DefaultEditor) this.fovSpinner.getEditor()).getTextField().setEnabled(false);
-        fovCheckbox.setEnabled(false);
-        this.endDatePicker.getTextField().setEnabled(false);
-        this.endDatePicker.getPopupButton().setEnabled(false);
-        this.beginDatePicker.getTextField().setEnabled(false);
-        this.beginDatePicker.getPopupButton().setEnabled(false);
-        this.endTimePicker.setEnabled(false);
-        this.beginTimePicker.setEnabled(false);
-        synchronizeWithLayersButton.setEnabled(false);
-        synchronizeWithNowButton.setEnabled(false);
-        synchronizeWithCurrentButton.setEnabled(false);
-        objectCombobox.setEnabled(false);
-        exactDateCheckBox.setEnabled(false);
-        WheelSupport.uninstallMouseWheelSupport(this.fovSpinner);
-
-    }
-
-    @Override
-    public void visactivate() {
-        super.visactivate();
-        ((DefaultEditor) this.fovSpinner.getEditor()).getTextField().setEnabled(true);
-        fovCheckbox.setEnabled(true);
-        this.endDatePicker.getTextField().setEnabled(true);
-        this.endDatePicker.getPopupButton().setEnabled(true);
-        this.beginDatePicker.getTextField().setEnabled(true);
-        this.beginDatePicker.getPopupButton().setEnabled(true);
-
-        this.endTimePicker.setEnabled(true);
-        this.beginTimePicker.setEnabled(true);
-
-        synchronizeWithLayersButton.setEnabled(true);
-        synchronizeWithNowButton.setEnabled(true);
-        synchronizeWithCurrentButton.setEnabled(true);
-        objectCombobox.setEnabled(true);
-        exactDateCheckBox.setEnabled(true);
-        WheelSupport.installMouseWheelSupport(this.fovSpinner);
-
-    }
 }
