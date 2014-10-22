@@ -1,5 +1,7 @@
 package org.helioviewer.gl3d.plugin.pfss;
 
+import java.awt.Component;
+import java.awt.Container;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
@@ -72,6 +74,11 @@ public class PfssPluginPanel extends OverlayPanel implements ActionListener, Lay
         initVisualComponents();
         // register as layers listener
         LayersModel.getSingletonInstance().addLayersListener(this);
+        if (LayersModel.getSingletonInstance().getNumLayers() == 0) {
+            enableComponents(this, false);
+        } else {
+            enableComponents(this, true);
+        }
     }
 
     /**
@@ -185,8 +192,19 @@ public class PfssPluginPanel extends OverlayPanel implements ActionListener, Lay
     public void activeLayerChanged(int idx) {
     }
 
+    public void enableComponents(Container container, boolean enable) {
+        Component[] components = container.getComponents();
+        for (Component component : components) {
+            component.setEnabled(enable);
+            if (component instanceof Container) {
+                enableComponents((Container) component, enable);
+            }
+        }
+    }
+
     @Override
     public void layerAdded(int idx) {
+        enableComponents(this, true);
         Date start = LayersModel.getSingletonInstance().getFirstDate();
         Date end = LayersModel.getSingletonInstance().getLastDate();
         if (start != null && end != null) {
@@ -271,6 +289,9 @@ public class PfssPluginPanel extends OverlayPanel implements ActionListener, Lay
 
     @Override
     public void layerRemoved(View oldView, int oldIdx) {
+        if (LayersModel.getSingletonInstance().getNumLayers() == 0) {
+            enableComponents(this, false);
+        }
     }
 
     @Override
