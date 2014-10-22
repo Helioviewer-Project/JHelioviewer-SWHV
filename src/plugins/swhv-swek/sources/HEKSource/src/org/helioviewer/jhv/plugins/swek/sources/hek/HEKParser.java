@@ -24,6 +24,7 @@ import org.helioviewer.jhv.data.datatype.event.JHVPoint;
 import org.helioviewer.jhv.plugins.swek.config.SWEKEventType;
 import org.helioviewer.jhv.plugins.swek.config.SWEKParameter;
 import org.helioviewer.jhv.plugins.swek.config.SWEKSource;
+import org.helioviewer.jhv.plugins.swek.config.SWEKSupplier;
 import org.helioviewer.jhv.plugins.swek.sources.SWEKEventStream;
 import org.helioviewer.jhv.plugins.swek.sources.SWEKParser;
 import org.json.JSONArray;
@@ -49,6 +50,8 @@ public class HEKParser implements SWEKParser {
 
     /** the event source for this parser */
     private SWEKSource eventSource;
+
+    private SWEKSupplier eventSupplier;
 
     /** Standard coordinate system parameters */
     private String coordinateSystemString;
@@ -113,10 +116,12 @@ public class HEKParser implements SWEKParser {
     }
 
     @Override
-    public SWEKEventStream parseEventStream(InputStream downloadInputStream, SWEKEventType eventType, SWEKSource eventSource) {
+    public SWEKEventStream parseEventStream(InputStream downloadInputStream, SWEKEventType eventType, SWEKSource eventSource,
+            SWEKSupplier eventSupplier) {
 
         this.eventType = eventType;
         this.eventSource = eventSource;
+        this.eventSupplier = eventSupplier;
         try {
             StringBuilder sb = new StringBuilder();
             if (downloadInputStream != null) {
@@ -273,7 +278,7 @@ public class HEKParser implements SWEKParser {
      */
     private void parseEventJSON(JSONObject eventJSON) throws JSONException {
         JSONArray results = eventJSON.getJSONArray("result");
-        HEKEventType hekEventType = new HEKEventType(eventType.getEventName(), eventSource.getSourceName(), eventSource.getProviderName());
+        HEKEventType hekEventType = new HEKEventType(eventType.getEventName(), eventSource.getSourceName(), eventSupplier.getSupplierName());
         for (int i = 0; i < results.length() && !parserStopped; i++) {
             HEKEvent currentEvent = new HEKEvent(eventType.getEventName(), eventType.getEventName(), "", hekEventType,
                     eventType.getEventIcon(), eventType.getColor());

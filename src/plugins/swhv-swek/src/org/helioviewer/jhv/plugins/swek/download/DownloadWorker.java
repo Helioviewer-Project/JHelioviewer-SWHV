@@ -6,6 +6,7 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
+import org.helioviewer.base.logging.Log;
 import org.helioviewer.base.math.Interval;
 import org.helioviewer.jhv.data.container.JHVEventContainer;
 import org.helioviewer.jhv.plugins.swek.config.SWEKEventType;
@@ -139,6 +140,8 @@ public class DownloadWorker implements Runnable {
      */
     public DownloadWorker(SWEKEventType eventType, SWEKSource swekSource, SWEKSupplier supplier, Interval<Date> interval,
             List<SWEKParam> params) {
+        Log.debug("Create dw " + this + " downloading interval " + interval);
+        Thread.dumpStack();
         isStopped = false;
         this.swekSource = swekSource;
         this.eventType = eventType;
@@ -176,6 +179,8 @@ public class DownloadWorker implements Runnable {
      * Stops the worker thread
      */
     public void stopWorker() {
+        Log.debug("Dw " + this + " is stopped. ");
+        Thread.dumpStack();
         isStopped = true;
         if (downloader != null) {
             downloader.stopDownload();
@@ -278,7 +283,7 @@ public class DownloadWorker implements Runnable {
      */
     private boolean parseData() {
         if (!isStopped) {
-            eventStream = parser.parseEventStream(downloadInputStream, eventType, swekSource);
+            eventStream = parser.parseEventStream(downloadInputStream, eventType, swekSource, supplier);
             return eventStream.additionalDownloadNeeded();
         } else {
             if (parser != null) {
