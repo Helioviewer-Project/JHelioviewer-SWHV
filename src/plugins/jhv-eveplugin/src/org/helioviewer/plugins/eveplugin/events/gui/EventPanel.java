@@ -68,7 +68,6 @@ public class EventPanel implements DrawableElement {
                     g.setStroke(normalStroke);
                 }
                 eventTypeNr++;
-
             }
         }
     }
