@@ -1,4 +1,4 @@
-package org.helioviewer.jhv.plugins.hekplugin;
+package org.helioviewer.jhv.plugins.swhvhekplugin;
 
 import java.awt.Graphics;
 import java.awt.image.BufferedImage;
@@ -16,7 +16,7 @@ import org.helioviewer.jhv.data.datatype.event.JHVCoordinateSystem;
 import org.helioviewer.jhv.data.datatype.event.JHVEvent;
 import org.helioviewer.jhv.data.datatype.event.JHVPoint;
 import org.helioviewer.jhv.data.datatype.event.JHVPositionInformation;
-import org.helioviewer.jhv.plugins.hekplugin.cache.SWHVHEKData;
+import org.helioviewer.jhv.plugins.swhvhekplugin.cache.SWHVHEKData;
 import org.helioviewer.viewmodel.renderer.physical.PhysicalRenderGraphics;
 import org.helioviewer.viewmodel.renderer.physical.PhysicalRenderer;
 import org.helioviewer.viewmodel.view.LinkedMovieManager;
@@ -28,12 +28,12 @@ import org.helioviewer.viewmodel.view.TimedMovieView;
  *
  * @author Malte Nuhn
  */
-public class HEKPluginRenderer implements PhysicalRenderer {
+public class SWHVHEKPluginRenderer implements PhysicalRenderer {
 
     /**
      * Default constructor.
      */
-    public HEKPluginRenderer() {
+    public SWHVHEKPluginRenderer() {
     }
 
     public void drawPolygon(PhysicalRenderGraphics g, JHVEvent evt, Date now) {

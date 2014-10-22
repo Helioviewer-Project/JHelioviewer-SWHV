@@ -1,4 +1,4 @@
-package org.helioviewer.jhv.plugins.hekplugin;
+package org.helioviewer.jhv.plugins.swhvhekplugin;
 
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -7,8 +7,8 @@ import java.util.Date;
 
 import org.helioviewer.base.math.Interval;
 import org.helioviewer.jhv.gui.ImageViewerGui;
-import org.helioviewer.jhv.plugins.hekplugin.controller.ImagePanelEventPopupController;
-import org.helioviewer.jhv.plugins.hekplugin.settings.HEKSettings;
+import org.helioviewer.jhv.plugins.swhvhekplugin.controller.SWHVHEKImagePanelEventPopupController;
+import org.helioviewer.jhv.plugins.swhvhekplugin.settings.SWHVHEKSettings;
 import org.helioviewer.viewmodelplugin.controller.PluginManager;
 import org.helioviewer.viewmodelplugin.controller.PluginSettings;
 import org.helioviewer.viewmodelplugin.interfaces.Plugin;
@@ -18,19 +18,19 @@ import org.helioviewer.viewmodelplugin.overlay.OverlayPlugin;
 /**
  * @author Malte Nuhn
  * */
-public class HEKPlugin extends OverlayPlugin implements Plugin {
+public class SWHVHEKPlugin extends OverlayPlugin implements Plugin {
 
     private boolean builtin_mode = false;
 
     /**
      * Reference to the eventPlugin
      */
-    private final HEKPluginContainer eventPlugin;
+    private final SWHVHEKPluginContainer eventPlugin;
 
     /**
      * Default constructor.
      */
-    public HEKPlugin() {
+    public SWHVHEKPlugin() {
         this(false);
     }
 
@@ -41,16 +41,16 @@ public class HEKPlugin extends OverlayPlugin implements Plugin {
      * @param builtin_mode
      *            - debug flag
      */
-    public HEKPlugin(boolean builtin_mode) {
+    public SWHVHEKPlugin(boolean builtin_mode) {
         this.builtin_mode = builtin_mode;
 
         try {
-            this.pluginLocation = new URI(HEKSettings.PLUGIN_LOCATION);
+            this.pluginLocation = new URI(SWHVHEKSettings.PLUGIN_LOCATION);
         } catch (URISyntaxException e) {
             e.printStackTrace();
         }
 
-        eventPlugin = new HEKPluginContainer(builtin_mode);
+        eventPlugin = new SWHVHEKPluginContainer(builtin_mode);
         addOverlayContainer(eventPlugin);
     }
 
@@ -66,7 +66,7 @@ public class HEKPlugin extends OverlayPlugin implements Plugin {
             overlay.setActive(PluginSettings.getSingeltonInstance().isOverlayInPluginActivated(pluginLocation, overlay.getOverlayClass(), true));
             overlay.setPosition(PluginSettings.getSingeltonInstance().getOverlayPosition(pluginLocation, overlay.getOverlayClass()));
             PluginManager.getSingeltonInstance().addOverlayContainer(overlay);
-            ImageViewerGui.getSingletonInstance().getMainImagePanel().addPlugin(new ImagePanelEventPopupController());
+            ImageViewerGui.getSingletonInstance().getMainImagePanel().addPlugin(new SWHVHEKImagePanelEventPopupController());
         }
     }
 
@@ -131,7 +131,7 @@ public class HEKPlugin extends OverlayPlugin implements Plugin {
     }
 
     public static URL getResourceUrl(String name) {
-        return HEKPlugin.class.getResource(name);
+        return SWHVHEKPlugin.class.getResource(name);
     }
 
     /**

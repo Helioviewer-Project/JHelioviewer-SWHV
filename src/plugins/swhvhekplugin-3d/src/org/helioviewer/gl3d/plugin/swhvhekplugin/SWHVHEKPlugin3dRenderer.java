@@ -1,4 +1,4 @@
-package org.helioviewer.gl3d.plugin.hekplugin;
+package org.helioviewer.gl3d.plugin.swhvhekplugin;
 
 import java.awt.Color;
 import java.awt.Graphics;
@@ -23,8 +23,8 @@ import org.helioviewer.jhv.data.datatype.event.JHVEvent;
 import org.helioviewer.jhv.data.datatype.event.JHVEventParameter;
 import org.helioviewer.jhv.data.datatype.event.JHVPoint;
 import org.helioviewer.jhv.data.datatype.event.JHVPositionInformation;
-import org.helioviewer.jhv.plugins.hekplugin.cache.SWHVHEKData;
-import org.helioviewer.jhv.plugins.hekplugin.settings.HEKSettings;
+import org.helioviewer.jhv.plugins.swhvhekplugin.cache.SWHVHEKData;
+import org.helioviewer.jhv.plugins.swhvhekplugin.settings.SWHVHEKSettings;
 import org.helioviewer.viewmodel.region.Region;
 import org.helioviewer.viewmodel.renderer.physical.PhysicalRenderGraphics;
 import org.helioviewer.viewmodel.renderer.physical.PhysicalRenderer3d;
@@ -40,7 +40,7 @@ import org.helioviewer.viewmodel.view.ViewHelper;
  * 
  * @author Malte Nuhn
  */
-public class HEKPlugin3dRenderer extends PhysicalRenderer3d {
+public class SWHVHEKPlugin3dRenderer extends PhysicalRenderer3d {
     private final SphericalCoordinateSystem sphericalCS = new SphericalCoordinateSystem();
     private final SolarSphereCoordinateSystem solarSphereCS = new SolarSphereCoordinateSystem();
     private float scale = 1;
@@ -50,7 +50,7 @@ public class HEKPlugin3dRenderer extends PhysicalRenderer3d {
     /**
      * Default constructor.
      */
-    public HEKPlugin3dRenderer() {
+    public SWHVHEKPlugin3dRenderer() {
     }
 
     public void drawCactusArc(PhysicalRenderGraphics g, JHVEvent evt, Date now) {
@@ -257,7 +257,7 @@ public class HEKPlugin3dRenderer extends PhysicalRenderer3d {
                 }
             }
         }
-        HEKSettings.resetCactusColor();
+        SWHVHEKSettings.resetCactusColor();
     }
 
     @Override
