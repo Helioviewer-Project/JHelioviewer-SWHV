@@ -1,19 +1,19 @@
 package org.helioviewer.gl3d.plugin.pfss.data.dataStructure;
 
-import java.util.ArrayList;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 /**
  * Bean for Month
- * 
+ *
  * @author Stefan Meier (stefan.meier@fhnw.ch)
  * */
 public class PfssMonth {
     private final int month;
-    private final ArrayList<PfssDayAndTime> dayAndTimes;
+    private final CopyOnWriteArrayList<PfssDayAndTime> dayAndTimes;
 
     public PfssMonth(int month) {
         this.month = month;
-        this.dayAndTimes = new ArrayList<PfssDayAndTime>();
+        this.dayAndTimes = new CopyOnWriteArrayList<PfssDayAndTime>();
     }
 
     public PfssDayAndTime addDayAndTime(int year, int month, int dayAndTime, String url) {
