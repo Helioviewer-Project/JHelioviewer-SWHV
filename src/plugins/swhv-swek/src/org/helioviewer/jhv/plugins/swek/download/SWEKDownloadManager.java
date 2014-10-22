@@ -132,14 +132,14 @@ public class SWEKDownloadManager implements DownloadWorkerListener, IncomingRequ
             if (dwMap.containsKey(eventType)) {
                 Map<Date, DownloadWorker> dwMapOnDate = dwMap.get(eventType);
                 for (DownloadWorker dw : dwMapOnDate.values()) {
-                    if (dw.getSource().equals(supplier)) {
+                    if (dw.getSupplier().equals(supplier)) {
                         dw.stopWorker();
                     }
                 }
             }
             removeFromBusyAndFinishedJobs(eventType, supplier);
             removeFromBusyAndFinishedIntervalJobs(eventType, supplier);
-            eventContainer.removeEvents(new JHVSWEKEventType(eventType.getEventName(), source.getSourceName(), source.getProviderName()));
+            eventContainer.removeEvents(new JHVSWEKEventType(eventType.getEventName(), source.getSourceName(), supplier.getSupplierName()));
         }
     }
 
@@ -176,7 +176,9 @@ public class SWEKDownloadManager implements DownloadWorkerListener, IncomingRequ
         synchronized (SWEKPluginLocks.treeSelectionLock) {
             removeEventTypeFromActiveEventTypeMap(eventType, swekSource, supplier);
         }
-        stopDownloadingEventType(eventType, swekSource, supplier);
+        synchronized (SWEKPluginLocks.downloadLock) {
+            stopDownloadingEventType(eventType, swekSource, supplier);
+        }
 
     }
 

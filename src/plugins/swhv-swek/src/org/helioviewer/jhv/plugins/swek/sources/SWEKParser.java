@@ -4,6 +4,7 @@ import java.io.InputStream;
 
 import org.helioviewer.jhv.plugins.swek.config.SWEKEventType;
 import org.helioviewer.jhv.plugins.swek.config.SWEKSource;
+import org.helioviewer.jhv.plugins.swek.config.SWEKSupplier;
 
 public interface SWEKParser {
 
@@ -23,6 +24,7 @@ public interface SWEKParser {
      *            the source from which the events are parsed
      * @return the stream containing the events in standard jhelioviewer format
      */
-    public abstract SWEKEventStream parseEventStream(InputStream downloadInputStream, SWEKEventType eventType, SWEKSource swekSource);
+    public abstract SWEKEventStream parseEventStream(InputStream downloadInputStream, SWEKEventType eventType, SWEKSource swekSource,
+            SWEKSupplier swekSupplier);
 
 }
