@@ -1,9 +1,9 @@
-package org.helioviewer.jhv.plugins.hekplugin;
+package org.helioviewer.jhv.plugins.swhvhekplugin;
 
 import java.util.Date;
 
 import org.helioviewer.base.math.Interval;
-import org.helioviewer.gl3d.plugin.hekplugin.HEKPlugin3dRenderer;
+import org.helioviewer.gl3d.plugin.swhvhekplugin.SWHVHEKPlugin3dRenderer;
 import org.helioviewer.viewmodel.renderer.physical.PhysicalRenderer;
 import org.helioviewer.viewmodel.view.OverlayView;
 import org.helioviewer.viewmodel.view.opengl.OverlayPluginContainer;
@@ -30,15 +30,15 @@ import org.helioviewer.viewmodelplugin.overlay.OverlayControlComponentManager;
  *
  * @author Malte Nuhn
  */
-public class HEKPluginContainer extends OverlayContainer {
+public class SWHVHEKPluginContainer extends OverlayContainer {
 
     // TODO: Malte Nuhn - Does storing the panel connected with this plugin fit
     // the architecture?
 
-    private HEKPluginPanel hekPanel;
+    private SWHVHEKPluginPanel hekPanel;
     private boolean builtin_mode = false;
 
-    public HEKPluginContainer(boolean builtin_mode) {
+    public SWHVHEKPluginContainer(boolean builtin_mode) {
         this.builtin_mode = builtin_mode;
     }
 
@@ -47,7 +47,7 @@ public class HEKPluginContainer extends OverlayContainer {
      */
     @Override
     public Class<? extends PhysicalRenderer> getOverlayClass() {
-        return HEKPluginRenderer.class;
+        return SWHVHEKPluginRenderer.class;
     }
 
     /**
@@ -56,10 +56,10 @@ public class HEKPluginContainer extends OverlayContainer {
     @Override
     protected void installOverlayImpl(OverlayView overlayView, OverlayControlComponentManager controlList) {
 
-        hekPanel = new HEKPluginPanel();
+        hekPanel = new SWHVHEKPluginPanel();
         OverlayPluginContainer overlayPluginContainer = new OverlayPluginContainer();
-        overlayPluginContainer.setRenderer(new HEKPluginRenderer());
-        overlayPluginContainer.setRenderer3d(new HEKPlugin3dRenderer());
+        overlayPluginContainer.setRenderer(new SWHVHEKPluginRenderer());
+        overlayPluginContainer.setRenderer3d(new SWHVHEKPlugin3dRenderer());
         overlayView.addOverlay(overlayPluginContainer);
         //controlList.add(new OverlayControlComponent(hekPanel, getName()));
 

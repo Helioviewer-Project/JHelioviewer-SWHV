@@ -1,4 +1,4 @@
-package org.helioviewer.jhv.plugins.hekplugin.cache;
+package org.helioviewer.jhv.plugins.swhvhekplugin.cache;
 
 import java.util.ArrayList;
 import java.util.Date;

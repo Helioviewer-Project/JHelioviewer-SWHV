@@ -1,4 +1,4 @@
-package org.helioviewer.jhv.plugins.hekplugin;
+package org.helioviewer.jhv.plugins.swhvhekplugin;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
@@ -16,7 +16,7 @@ import javax.swing.JProgressBar;
 import org.helioviewer.base.math.Interval;
 import org.helioviewer.jhv.layers.LayersListener;
 import org.helioviewer.jhv.layers.LayersModel;
-import org.helioviewer.jhv.plugins.hekplugin.cache.SWHVHEKData;
+import org.helioviewer.jhv.plugins.swhvhekplugin.cache.SWHVHEKData;
 import org.helioviewer.viewmodel.changeevent.ChangeEvent;
 import org.helioviewer.viewmodel.changeevent.SubImageDataChangedReason;
 import org.helioviewer.viewmodel.view.View;
@@ -27,22 +27,22 @@ import org.helioviewer.viewmodelplugin.overlay.OverlayPanel;
  *
  * @author Malte Nuhn
  * */
-public class HEKPluginPanel extends OverlayPanel implements ActionListener, LayersListener {
+public class SWHVHEKPluginPanel extends OverlayPanel implements ActionListener, LayersListener {
 
     private static final long serialVersionUID = 1L;
 
     // UI Components
     private final JPanel buttonPanel = new JPanel(new BorderLayout());
     private final JProgressBar progressBar = new JProgressBar();
-    private final JButton cancelButton = new JButton(new ImageIcon(HEKPlugin.getResourceUrl("/images/hekCancel.png")));
-    private final JButton reloadButton = new JButton(new ImageIcon(HEKPlugin.getResourceUrl("/images/hekReload.png")));
+    private final JButton cancelButton = new JButton(new ImageIcon(SWHVHEKPlugin.getResourceUrl("/images/hekCancel.png")));
+    private final JButton reloadButton = new JButton(new ImageIcon(SWHVHEKPlugin.getResourceUrl("/images/hekReload.png")));
 
     /**
      * Default constructor
      *
      * @param hekCache
      * */
-    public HEKPluginPanel() {
+    public SWHVHEKPluginPanel() {
         SWHVHEKData.getSingletonInstance();
 
         // set up visual components

@@ -1,4 +1,4 @@
-package org.helioviewer.jhv.plugins.hekplugin;
+package org.helioviewer.jhv.plugins.swhvhekplugin;
 
 import org.helioviewer.base.JavaCompatibility;
 import org.helioviewer.jhv.JavaHelioViewer;
@@ -10,7 +10,7 @@ import org.helioviewer.jhv.JavaHelioViewerLauncher;
  * @author Andre Dau
  *
  */
-public class HEKPluginLauncher {
+public class SWHVHEKPluginLauncher {
 
     /**
      * Used for testing the plugin
@@ -29,7 +29,7 @@ public class HEKPluginLauncher {
 
         args2[args2.length - 2] = "--deactivate-plugin";
         args2[args2.length - 1] = "HEKPlugin.jar";
-        JavaHelioViewer.main(args2, new HEKPlugin(false));
+        JavaHelioViewer.main(args2, new SWHVHEKPlugin(false));
         // JavaHelioViewer.main(args2);
     }
 }

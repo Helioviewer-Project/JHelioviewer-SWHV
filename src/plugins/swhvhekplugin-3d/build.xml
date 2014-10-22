@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
 
 <project name="build" default="all">
-    <property name="plugin.name" value="HEKPlugin" />
+    <property name="plugin.name" value="SWHVHEKPlugin" />
     <!-- FIXED "lowercase" -->
-    <property name="plugin.name.lowercase" value="hekplugin" />
+    <property name="plugin.name.lowercase" value="swhvhekplugin" />
 	
 	<property name="jhv.root" value="${basedir}/../../.." />
     <!--

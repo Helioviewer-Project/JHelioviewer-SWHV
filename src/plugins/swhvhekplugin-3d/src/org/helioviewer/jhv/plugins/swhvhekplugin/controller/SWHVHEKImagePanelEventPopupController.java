@@ -1,4 +1,4 @@
-package org.helioviewer.jhv.plugins.hekplugin.controller;
+package org.helioviewer.jhv.plugins.swhvhekplugin.controller;
 
 import java.awt.Cursor;
 import java.awt.Point;
@@ -24,7 +24,7 @@ import org.helioviewer.jhv.data.guielements.SWEKEventInformationDialog;
 import org.helioviewer.jhv.gui.components.BasicImagePanel;
 import org.helioviewer.jhv.gui.interfaces.ImagePanelPlugin;
 import org.helioviewer.jhv.layers.LayersModel;
-import org.helioviewer.jhv.plugins.hekplugin.cache.SWHVHEKData;
+import org.helioviewer.jhv.plugins.swhvhekplugin.cache.SWHVHEKData;
 import org.helioviewer.viewmodel.changeevent.ChangeEvent;
 import org.helioviewer.viewmodel.changeevent.RegionChangedReason;
 import org.helioviewer.viewmodel.changeevent.TimestampChangedReason;
@@ -48,7 +48,7 @@ import org.helioviewer.viewmodel.viewportimagesize.ViewportImageSize;
  * @author Malte Nuhn
  *
  */
-public class ImagePanelEventPopupController implements ImagePanelPlugin, MouseListener, MouseMotionListener, ViewListener {
+public class SWHVHEKImagePanelEventPopupController implements ImagePanelPlugin, MouseListener, MouseMotionListener, ViewListener {
 
     // ///////////////////////////////////////////////////////////////////////////
     // Definitions

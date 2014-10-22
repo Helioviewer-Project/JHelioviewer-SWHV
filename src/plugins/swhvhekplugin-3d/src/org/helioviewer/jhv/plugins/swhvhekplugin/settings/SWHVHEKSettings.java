@@ -1,8 +1,8 @@
-package org.helioviewer.jhv.plugins.hekplugin.settings;
+package org.helioviewer.jhv.plugins.swhvhekplugin.settings;
 
 import java.awt.Color;
 
-public class HEKSettings {
+public class SWHVHEKSettings {
 
     /**
      * Needed for the JHV plugin initialization

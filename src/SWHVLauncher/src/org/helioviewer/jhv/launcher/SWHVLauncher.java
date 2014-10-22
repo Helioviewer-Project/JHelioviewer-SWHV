@@ -3,8 +3,8 @@ package org.helioviewer.jhv.launcher;
 import org.helioviewer.base.JavaCompatibility;
 import org.helioviewer.jhv.JavaHelioViewer;
 import org.helioviewer.jhv.JavaHelioViewerLauncher;
-import org.helioviewer.jhv.plugins.hekplugin.HEKPlugin;
 import org.helioviewer.jhv.plugins.swek.SWEKPlugin;
+import org.helioviewer.jhv.plugins.swhvhekplugin.SWHVHEKPlugin;
 import org.helioviewer.plugins.eveplugin.EVEPlugin;
 import org.helioviewer.plugins.eveplugin.EVEPluginLauncher;
 import org.helioviewer.viewmodelplugin.controller.PluginManager;
@@ -33,7 +33,7 @@ public class SWHVLauncher {
         JavaHelioViewer.main(args2, new SWEKPlugin(false));
 
         PluginManager.getSingeltonInstance().addPlugin(EVEPluginLauncher.class.getClassLoader(), new EVEPlugin(), null);
-        PluginManager.getSingeltonInstance().addPlugin(HEKPlugin.class.getClassLoader(), new HEKPlugin(), null);
+        PluginManager.getSingeltonInstance().addPlugin(SWHVHEKPlugin.class.getClassLoader(), new SWHVHEKPlugin(), null);
     }
 
 }

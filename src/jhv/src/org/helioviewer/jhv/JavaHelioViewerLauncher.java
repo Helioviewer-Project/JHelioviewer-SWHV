@@ -127,7 +127,6 @@ public class JavaHelioViewerLauncher {
                 InputStream in = JavaHelioViewerLauncher.class.getResourceAsStream("/jogl/lib/" + pathlib + libs[i]);
                 File fileOut = new File(libpath + libs[i]);
                 OutputStream out = new FileOutputStream(fileOut);
-                //System.out.println(out);
                 FileUtils.copy(in, out);
                 in.close();
                 out.close();
