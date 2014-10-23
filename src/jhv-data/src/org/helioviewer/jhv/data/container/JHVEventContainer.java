@@ -144,9 +144,11 @@ public class JHVEventContainer {
      *            the handler
      */
     public void requestForInterval(final Date startDate, final Date endDate, final JHVEventHandler handler) {
-        Logger.getLogger(JHVEventContainer.class.getName()).info("Request for interval : [" + startDate + "," + endDate + "]");
-        Logger.getLogger(JHVEventContainer.class.getName()).info("handler : " + handler);
-        Thread.dumpStack();
+        // Logger.getLogger(JHVEventContainer.class.getName()).info("Request for interval : ["
+        // + startDate + "," + endDate + "]");
+        // Logger.getLogger(JHVEventContainer.class.getName()).info("handler : "
+        // + handler);
+        // Thread.dumpStack();
         EventQueue.invokeLater(new Runnable() {
             @Override
             public void run() {
@@ -262,8 +264,8 @@ public class JHVEventContainer {
          * (JHVEventHandler handler : jhvEventHandlers) {
          * handler.cacheUpdated(); }
          */
-        Logger.getLogger(JHVEventContainer.class.getName()).severe("event cache changed");
-        Thread.dumpStack();
+        // Logger.getLogger(JHVEventContainer.class.getName()).severe("event cache changed");
+        // Thread.dumpStack();
         Set<JHVEventHandler> handlers = eventHandlerCache.getAllJHVEventHandlers();
         synchronized (JHVEventContainerLocks.eventHandlerCacheLock) {
             for (JHVEventHandler handler : handlers) {
