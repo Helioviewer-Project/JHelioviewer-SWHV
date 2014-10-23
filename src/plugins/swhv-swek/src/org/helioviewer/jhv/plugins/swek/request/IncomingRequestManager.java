@@ -25,10 +25,10 @@ public class IncomingRequestManager implements JHVEventContainerRequestHandler {
     private final List<IncomingRequestManagerListener> listeners;
 
     /** List of requested intervals */
-    private final List<Interval<Date>> intervalList;
+    private final Map<Long, Interval<Date>> intervalList;
 
     /** List of requested dates */
-    private final List<Date> dateList;
+    private final Map<Long, List<Date>> dateList;
 
     /**  */
     private final Map<Date, Set<Date>> uniqueInterval;
@@ -40,8 +40,8 @@ public class IncomingRequestManager implements JHVEventContainerRequestHandler {
         eventContainer = JHVEventContainer.getSingletonInstance();
         eventContainer.registerHandler(this);
         listeners = new ArrayList<IncomingRequestManagerListener>();
-        intervalList = new ArrayList<Interval<Date>>();
-        dateList = new ArrayList<Date>();
+        intervalList = new HashMap<Long, Interval<Date>>();
+        dateList = new HashMap<Long, List<Date>>();
         uniqueInterval = new HashMap<Date, Set<Date>>();
     }
 
@@ -82,7 +82,7 @@ public class IncomingRequestManager implements JHVEventContainerRequestHandler {
      * 
      * @return the list of all requested dates
      */
-    public List<Date> getAllRequestedDates() {
+    public Map<Long, List<Date>> getAllRequestedDates() {
         synchronized (SWEKPluginLocks.requestLock) {
             return dateList;
         }
@@ -93,42 +93,59 @@ public class IncomingRequestManager implements JHVEventContainerRequestHandler {
      * 
      * @return the list of requested intervals
      */
-    public List<Interval<Date>> getAllRequestedIntervals() {
+    public Map<Long, Interval<Date>> getAllRequestedIntervals() {
         synchronized (SWEKPluginLocks.requestLock) {
-            List<Interval<Date>> tempIntervals = new ArrayList<Interval<Date>>();
-            tempIntervals.addAll(intervalList);
-            return tempIntervals;
+            return intervalList;
         }
     }
 
     @Override
-    public void handleRequestForDate(Date date) {
+    public void handleRequestForDate(Date date, Long requestID) {
         synchronized (SWEKPluginLocks.requestLock) {
-            dateList.add(date);
-            fireNewDateRequested(date);
+            ArrayList<Date> dates = new ArrayList<Date>();
+            dates.add(date);
+            dateList.put(requestID, dates);
+            fireNewDateRequested(date, requestID);
         }
     }
 
     @Override
-    public void handleRequestForInterval(Date startDate, Date endDate) {
+    public void handleRequestForInterval(Date startDate, Date endDate, Long requestID) {
         synchronized (SWEKPluginLocks.requestLock) {
             if (addToUniqueInterval(startDate, endDate)) {
                 Interval<Date> interval = new Interval<Date>(startDate, endDate);
-                intervalList.add(interval);
-                fireNewIntervalRequested(interval);
+                intervalList.put(requestID, interval);
+                fireNewIntervalRequested(interval, requestID);
             }
         }
     }
 
     @Override
-    public void handleRequestForDateList(List<Date> dates) {
+    public void handleRequestForDateList(List<Date> dates, Long requestID) {
         synchronized (SWEKPluginLocks.requestLock) {
-            for (Date date : dates) {
-                dateList.add(date);
-            }
-            firedNewDateListRequested(dates);
+            dateList.put(requestID, dates);
+            firedNewDateListRequested(dates, requestID);
         }
 
+    }
+
+    @Override
+    public void removeRequestID(Long requestID) {
+        synchronized (SWEKPluginLocks.requestLock) {
+            if (dateList.containsKey(requestID)) {
+                dateList.remove(requestID);
+                fireStopRequest(requestID);
+            } else if (intervalList.containsKey(requestID)) {
+                intervalList.remove(requestID);
+                fireStopRequest(requestID);
+            }
+        }
+    }
+
+    private void fireStopRequest(Long requestID) {
+        for (IncomingRequestManagerListener l : listeners) {
+            l.stopRequest(requestID);
+        }
     }
 
     /**
@@ -136,10 +153,11 @@ public class IncomingRequestManager implements JHVEventContainerRequestHandler {
      * 
      * @param date
      *            the date that was requested
+     * @param requestID
      */
-    private void fireNewDateRequested(Date date) {
+    private void fireNewDateRequested(Date date, Long requestID) {
         for (IncomingRequestManagerListener l : listeners) {
-            l.newRequestForDate(date);
+            l.newRequestForDate(date, requestID);
         }
     }
 
@@ -148,10 +166,11 @@ public class IncomingRequestManager implements JHVEventContainerRequestHandler {
      * 
      * @param interval
      *            interval that was requested
+     * @param requestID
      */
-    private void fireNewIntervalRequested(Interval<Date> interval) {
+    private void fireNewIntervalRequested(Interval<Date> interval, Long requestID) {
         for (IncomingRequestManagerListener l : listeners) {
-            l.newRequestForInterval(interval);
+            l.newRequestForInterval(interval, requestID);
         }
     }
 
@@ -160,10 +179,11 @@ public class IncomingRequestManager implements JHVEventContainerRequestHandler {
      * 
      * @param dates
      *            list of dates that was requested
+     * @param requestID
      */
-    private void firedNewDateListRequested(List<Date> dates) {
+    private void firedNewDateListRequested(List<Date> dates, Long requestID) {
         for (IncomingRequestManagerListener l : listeners) {
-            l.newRequestForDateList(dates);
+            l.newRequestForDateList(dates, requestID);
         }
     }
 
@@ -189,4 +209,5 @@ public class IncomingRequestManager implements JHVEventContainerRequestHandler {
         uniqueInterval.put(startDate, uniqueEndDates);
         return true;
     }
+
 }
