@@ -107,14 +107,15 @@ public class GL3DCameraOptionsPanel extends JPanel implements GL3DCameraSelectio
         JPanel infoExplainPanel = new JPanel();
         infoExplainPanel.setLayout(new BoxLayout(infoExplainPanel, BoxLayout.PAGE_AXIS));
         infoExplainPanel.setBorder(BorderFactory.createEmptyBorder(0, 4, 0, 4));
-        String explanation = "Observer camera: view from observer defined by active layer.\n\n";
-        explanation += "Earth camera: view from earth defined by active layer.\n\n";
-        explanation += "Expert camera: view from selected object. ";
-        explanation += "By default the current time follows the current timestamp of the active video. ";
-        explanation += "Optionally, when unchecking \"Use active layer timestamps\", the current camera time is interpolated in the chosen time interval";
-        explanation += "from the current data time relative to the current data interval.";
-        explanation += "E.g. choosing the two camera times equal will project the data ";
-        explanation += "as seen from the chosen viewpoint at the chosen time";
+
+        String explanation = "Observer camera: view from Observer.\n";
+        explanation += "Camera time defined by the active layer current timestamp.\n\n";
+        explanation += "Earth camera: view from Earth.\n";
+        explanation += "Camera time defined by the active layer current timestamp.\n\n";
+        explanation += "Expert camera: view from selected object.\n";
+        explanation += "Camera time defined by the active layer current timestamp, ";
+        explanation += "unless \"Use active layer timestamps\" is off. ";
+        explanation += "In that case, camera time is interpolated in the time interval set.";
 
         JTextArea infoText = new JTextArea(explanation);
         infoText.setEditable(false);
