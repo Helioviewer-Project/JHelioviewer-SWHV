@@ -29,7 +29,7 @@ public class JHVEventHandlerCache {
     /** Handlers that want events within an interval */
     private final Map<Date, Map<Date, Set<JHVEventHandler>>> interestInInterval;
 
-    private final Set<JHVEventHandler> allJHVeventHandlers;
+    private final Map<JHVEventHandler, Long> allJHVeventHandlers;
 
     /**
      * private default constructor
@@ -37,7 +37,7 @@ public class JHVEventHandlerCache {
     private JHVEventHandlerCache() {
         interestInDate = new HashMap<Date, Set<JHVEventHandler>>();
         interestInInterval = new HashMap<Date, Map<Date, Set<JHVEventHandler>>>();
-        allJHVeventHandlers = new HashSet<JHVEventHandler>();
+        allJHVeventHandlers = new HashMap<JHVEventHandler, Long>();
     }
 
     /**
@@ -59,8 +59,9 @@ public class JHVEventHandlerCache {
      *            the handler
      * @param date
      *            the date
+     * @param previousRequestID
      */
-    public void add(JHVEventHandler handler, Date date) {
+    public Long add(JHVEventHandler handler, Date date, Long requestID) {
         synchronized (JHVEventContainerLocks.eventHandlerCacheLock) {
             if (date != null && handler != null) {
                 Date roundedDate = DateUtil.getCurrentDate(date);
@@ -70,11 +71,18 @@ public class JHVEventHandlerCache {
                 }
                 tempSet.add(handler);
                 interestInDate.put(roundedDate, tempSet);
-                allJHVeventHandlers.add(handler);
+                if (allJHVeventHandlers.containsKey(handler)) {
+                    Long previousRequestID = allJHVeventHandlers.get(handler);
+                    allJHVeventHandlers.put(handler, requestID);
+                    return previousRequestID;
+                } else {
+                    return null;
+                }
             } else {
                 // This should be logged, but the log system is part of the
                 // complete program. Should be stripped of.
                 System.err.println("The date or handler was null");
+                return null;
             }
         }
     }
@@ -86,7 +94,7 @@ public class JHVEventHandlerCache {
      */
     public Set<JHVEventHandler> getAllJHVEventHandlers() {
         synchronized (JHVEventContainerLocks.eventHandlerCacheLock) {
-            return allJHVeventHandlers;
+            return allJHVeventHandlers.keySet();
         }
     }
 
@@ -99,8 +107,10 @@ public class JHVEventHandlerCache {
      *            the start date of the interval
      * @param endDate
      *            the end date of the interval
+     * @param requestID
+     * @return
      */
-    public void add(JHVEventHandler handler, Date startDate, Date endDate) {
+    public Long add(JHVEventHandler handler, Date startDate, Date endDate, Long requestID) {
         synchronized (JHVEventContainerLocks.eventHandlerCacheLock) {
             Date roundedStartDate = DateUtil.getCurrentDate(startDate);
             Date roundedEndDate = DateUtil.getNextDate(endDate);
@@ -115,7 +125,14 @@ public class JHVEventHandlerCache {
             eventHandlers.add(handler);
             eventHandlerEnd.put(roundedEndDate, eventHandlers);
             interestInInterval.put(roundedStartDate, eventHandlerEnd);
-            allJHVeventHandlers.add(handler);
+            if (allJHVeventHandlers.containsKey(handler)) {
+                Long previousRequestID = allJHVeventHandlers.get(handler);
+                allJHVeventHandlers.put(handler, requestID);
+                return previousRequestID;
+            } else {
+                allJHVeventHandlers.put(handler, requestID);
+                return null;
+            }
         }
     }
 

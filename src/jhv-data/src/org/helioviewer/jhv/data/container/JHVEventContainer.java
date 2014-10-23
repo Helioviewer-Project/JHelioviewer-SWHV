@@ -29,6 +29,8 @@ public class JHVEventContainer {
     /** the event handler cache */
     private final JHVEventHandlerCache eventHandlerCache;
 
+    private Long requestID;
+
     /**
      * Private constructor.
      */
@@ -36,6 +38,7 @@ public class JHVEventContainer {
         requestHandlers = new ArrayList<JHVEventContainerRequestHandler>();
         eventHandlerCache = JHVEventHandlerCache.getSingletonInstance();
         eventCache = JHVEventCache.getSingletonInstance();
+        requestID = 0L;
     }
 
     /**
@@ -91,12 +94,14 @@ public class JHVEventContainer {
 
             @Override
             public void run() {
-                // Logger.getLogger(JHVEventContainer.class.getName()).info("Request for date : "
-                // + date);
-                eventHandlerCache.add(handler, date);
+                Long requestID = nextDownloadID();
+                Long previousRequestID = eventHandlerCache.add(handler, date, requestID);
                 Map<String, NavigableMap<Date, NavigableMap<Date, List<JHVEvent>>>> events = eventCache.get(date);
                 handler.newEventsReceived(events);
-                requestEvents(date);
+                if (previousRequestID != null) {
+                    removeIntervalForRequestID(previousRequestID);
+                }
+                requestEvents(date, requestID);
             }
         });
     }
@@ -139,17 +144,22 @@ public class JHVEventContainer {
      *            the handler
      */
     public void requestForInterval(final Date startDate, final Date endDate, final JHVEventHandler handler) {
+        Logger.getLogger(JHVEventContainer.class.getName()).info("Request for interval : [" + startDate + "," + endDate + "]");
+        Logger.getLogger(JHVEventContainer.class.getName()).info("handler : " + handler);
+        Thread.dumpStack();
         EventQueue.invokeLater(new Runnable() {
             @Override
             public void run() {
                 if (startDate != null && endDate != null) {
-                    // Logger.getLogger(JHVEventContainer.class.getName()).info("Request for interval : ["
-                    // + startDate + "," + endDate + "]");
-                    eventHandlerCache.add(handler, startDate, endDate);
+                    Long requestID = nextDownloadID();
+                    Long previousRequestID = eventHandlerCache.add(handler, startDate, endDate, requestID);
                     Map<String, NavigableMap<Date, NavigableMap<Date, List<JHVEvent>>>> events = eventCache.get(startDate, endDate);
                     // AssociationsPrinter.print(events);
                     handler.newEventsReceived(events);
-                    requestEvents(startDate, endDate);
+                    if (previousRequestID != null) {
+                        removeIntervalForRequestID(previousRequestID);
+                    }
+                    requestEvents(startDate, endDate, requestID);
                 }
             }
         });
@@ -207,15 +217,16 @@ public class JHVEventContainer {
         });
     }
 
-    /*
+    /**
      * Request data from the request handlers for a date.
      * 
-     * @param date the date for which to request the data
+     * @param date
+     *            the date for which to request the data
      */
-    private void requestEvents(Date date) {
+    private void requestEvents(Date date, Long requestID2) {
         synchronized (JHVEventContainerLocks.requestHandlerLock) {
             for (JHVEventContainerRequestHandler handler : requestHandlers) {
-                handler.handleRequestForDate(date);
+                handler.handleRequestForDate(date, requestID2);
             }
         }
     }
@@ -227,11 +238,12 @@ public class JHVEventContainer {
      *            the start of the interval
      * @param endDate
      *            the end of the interval
+     * @param requestID2
      */
-    private void requestEvents(Date startDate, Date endDate) {
+    private void requestEvents(Date startDate, Date endDate, Long requestID2) {
         synchronized (JHVEventContainerLocks.requestHandlerLock) {
             for (JHVEventContainerRequestHandler handler : requestHandlers) {
-                handler.handleRequestForInterval(startDate, endDate);
+                handler.handleRequestForInterval(startDate, endDate, requestID);
             }
         }
     }
@@ -257,6 +269,21 @@ public class JHVEventContainer {
             for (JHVEventHandler handler : handlers) {
                 handler.cacheUpdated();
             }
+        }
+    }
+
+    private void removeIntervalForRequestID(Long previousRequestID) {
+        Set<JHVEventHandler> handlers = eventHandlerCache.getAllJHVEventHandlers();
+        synchronized (JHVEventContainerLocks.eventHandlerCacheLock) {
+            for (JHVEventContainerRequestHandler handler : requestHandlers) {
+                handler.removeRequestID(requestID);
+            }
+        }
+    }
+
+    private Long nextDownloadID() {
+        synchronized (requestID) {
+            return requestID++;
         }
     }
 
