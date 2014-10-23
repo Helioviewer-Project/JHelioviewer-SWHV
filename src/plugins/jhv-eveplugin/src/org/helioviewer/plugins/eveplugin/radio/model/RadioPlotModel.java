@@ -297,8 +297,8 @@ public class RadioPlotModel implements RadioDataManagerListener, ZoomDataConfigL
 
     @Override
     public void requestData(Date xStart, Date xEnd, double yStart, double yEnd, double xRatio, double yRatio, long ID, String plotIdentifier) {
-        Log.debug("Request for data in : " + xStart + " - " + xEnd);
-        Thread.dumpStack();
+        // Log.debug("Request for data in : " + xStart + " - " + xEnd);
+        // Thread.dumpStack();
         EventQueue.invokeLater(new Runnable() {
 
             Date xStart;

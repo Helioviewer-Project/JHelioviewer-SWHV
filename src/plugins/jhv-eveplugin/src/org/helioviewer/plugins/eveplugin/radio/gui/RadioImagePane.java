@@ -9,7 +9,6 @@ import java.awt.image.ImageObserver;
 import java.util.ArrayList;
 import java.util.Collection;
 
-import org.helioviewer.base.logging.Log;
 import org.helioviewer.plugins.eveplugin.draw.DrawableElement;
 import org.helioviewer.plugins.eveplugin.draw.DrawableElementType;
 import org.helioviewer.plugins.eveplugin.draw.YAxisElement;
@@ -56,18 +55,18 @@ public class RadioImagePane implements ImageObserver, RadioPlotModelListener, Dr
 
     @Override
     public void draw(Graphics2D g, Graphics2D leftAxisG, Rectangle graphArea, Rectangle leftAxisArea) {
-        Log.trace("redraw radio image pane for plot : " + plotIdentifier);
-        Thread.dumpStack();
+        // Log.trace("redraw radio image pane for plot : " + plotIdentifier);
+        // Thread.dumpStack();
         if (!intervalTooBig) {
             Collection<NoDataConfig> noDataConfigs = radioPlotModel.getNoDataConfigurations(plotIdentifier);
-            Log.trace("Draw no data configs. Size: " + noDataConfigs.size());
+            // Log.trace("Draw no data configs. Size: " + noDataConfigs.size());
             for (NoDataConfig ndc : noDataConfigs) {
                 ndc.draw(g);
             }
             Collection<PlotConfig> configs = radioPlotModel.getPlotConfigurations(plotIdentifier);
-            Log.trace("Number of plotconfigs: " + configs.size());
+            // Log.trace("Number of plotconfigs: " + configs.size());
             for (PlotConfig pc : configs) {
-                Log.trace("imageID" + pc.getImageId());
+                // Log.trace("imageID" + pc.getImageId());
                 pc.draw(g);
             }
         } else {
