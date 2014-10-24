@@ -20,14 +20,14 @@ import org.helioviewer.base.logging.Log;
  * General connection class which gives to a given URL a proper InputStream with
  * the response back, trying to use compressed transmission if the server
  * support it and hopefully as many protocols as needed.
- * 
+ *
  * To use it: - Create a new DownloadStream object - Add post data with
  * .setOutput() - Connect with the current parameters .connect(), automatically
  * done if used getInput() - Get input stream .getInput() - Get output filename
  * .getOutputName()
- * 
+ *
  * To save data @see UploadStream
- * 
+ *
  * @author Helge Dietert
  */
 public class DownloadStream {
@@ -66,7 +66,7 @@ public class DownloadStream {
     /**
      * Creates d download object for a given uri, assuming a file if not given a
      * scheme
-     * 
+     *
      * @param uri
      *            The used uri to connect
      * @throws URISyntaxException
@@ -91,7 +91,7 @@ public class DownloadStream {
 
     /**
      * Creates a downloadstream with the given url
-     * 
+     *
      * @param url
      *            The url to connect to
      */
@@ -107,7 +107,7 @@ public class DownloadStream {
 
     /**
      * Opens the connection with compression if the server supports
-     * 
+     *
      * @throws IOException
      *             From accessing the network
      */
@@ -122,6 +122,8 @@ public class DownloadStream {
             HttpURLConnection httpC = (HttpURLConnection) connection;
             // get compression if supported
             httpC.setRequestProperty("Accept-Encoding", "gzip, deflate");
+            httpC.setRequestProperty("User-Agent", "SWHVJHelioviewer");
+
             // Write post data if necessary
             if (output != null) {
                 connection.setDoOutput(true);
@@ -193,7 +195,7 @@ public class DownloadStream {
     /**
      * Gives the outstream to read the response, after calling connect. If it is
      * not already connected it will automatically connect
-     * 
+     *
      * @return output stream of the connection
      * @throws IOException
      *             Error from creating the connction
@@ -207,7 +209,7 @@ public class DownloadStream {
     /**
      * After requesting the data the associated file name to save from
      * Content-Disposition or the url name
-     * 
+     *
      * @return suggested download name
      */
     public String getOutputName() {
@@ -230,7 +232,7 @@ public class DownloadStream {
 
     /**
      * Set the output to send to the server (in HTTP as POST)
-     * 
+     *
      * @param output
      *            Send output to the server, null if nothing (GET in HTTP)
      */
