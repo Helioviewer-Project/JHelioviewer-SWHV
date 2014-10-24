@@ -48,6 +48,7 @@ public class ObservationDialogUIPanel extends SimpleObservationDialogUIPanel {
     public ObservationDialogUIPanel(final PlotsContainerPanel plotsContainerPanel) {
         super(plotsContainerPanel);
         EventQueue.invokeLater(new Runnable() {
+            @Override
             public void run() {
                 labelGroup = new JLabel("Group");
                 labelData = new JLabel();
@@ -89,7 +90,8 @@ public class ObservationDialogUIPanel extends SimpleObservationDialogUIPanel {
         final BandController bandController = BandController.getSingletonInstance();
         final DefaultComboBoxModel model = (DefaultComboBoxModel) comboBoxData.getModel();
         final BandGroup selectedGroup = (BandGroup) comboBoxGroup.getSelectedItem();
-        final String identifier = super.getPlotComboBoxSelectedIndex() == 0 ? PlotsContainerPanel.PLOT_IDENTIFIER_MASTER : PlotsContainerPanel.PLOT_IDENTIFIER_SLAVE;
+        final String identifier = super.getPlotComboBoxSelectedIndex() == 0 ? PlotsContainerPanel.PLOT_IDENTIFIER_MASTER
+                : PlotsContainerPanel.PLOT_IDENTIFIER_SLAVE;
         final BandType[] values = BandTypeAPI.getSingletonInstance().getBandTypes(selectedGroup);
 
         model.removeAllElements();
@@ -108,7 +110,6 @@ public class ObservationDialogUIPanel extends SimpleObservationDialogUIPanel {
         ObservationDialog.getSingletonInstance().setLoadButtonEnabled(super.getLoadButtonEnabled());
     }
 
-
     /**
      * Checks if the selected start date is before selected or equal to end
      * date. The methods checks the entered times when the dates are equal. If
@@ -120,7 +121,8 @@ public class ObservationDialogUIPanel extends SimpleObservationDialogUIPanel {
         final GregorianCalendar calendar = new GregorianCalendar();
         calendar.setTime(getStartDate());
 
-        final GregorianCalendar calendar2 = new GregorianCalendar(calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH), calendar.get(Calendar.DAY_OF_MONTH));
+        final GregorianCalendar calendar2 = new GregorianCalendar(calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH),
+                calendar.get(Calendar.DAY_OF_MONTH));
         final long start = calendar2.getTimeInMillis();
 
         calendar.clear();
@@ -140,14 +142,16 @@ public class ObservationDialogUIPanel extends SimpleObservationDialogUIPanel {
     private void updateBandController() {
         final BandController bandController = BandController.getSingletonInstance();
 
-        final String identifier = plotComboBox.getSelectedIndex() == 0 ? PlotsContainerPanel.PLOT_IDENTIFIER_MASTER : PlotsContainerPanel.PLOT_IDENTIFIER_SLAVE;
+        final String identifier = plotComboBox.getSelectedIndex() == 0 ? PlotsContainerPanel.PLOT_IDENTIFIER_MASTER
+                : PlotsContainerPanel.PLOT_IDENTIFIER_SLAVE;
         final BandGroup group = (BandGroup) comboBoxGroup.getSelectedItem();
         final BandType bandType = (BandType) comboBoxData.getSelectedItem();
         bandType.setDataDownloader(EVECacheController.getSingletonInstance());
 
-        if (!bandController.getSelectedGroup(identifier).equals(group)) {
-            bandController.removeAllBands(identifier);
-        }
+        /*
+         * if (!bandController.getSelectedGroup(identifier).equals(group)) {
+         * bandController.removeAllBands(identifier); }
+         */
 
         bandController.selectBandGroup(identifier, group);
         bandController.addBand(identifier, bandType);
@@ -171,7 +175,6 @@ public class ObservationDialogUIPanel extends SimpleObservationDialogUIPanel {
         plotComboBox.setSelectedIndex(0);
     }
 
-
     @Override
     public boolean loadButtonPressed() {
         // check if start date is before end date -> if not show message
@@ -190,6 +193,7 @@ public class ObservationDialogUIPanel extends SimpleObservationDialogUIPanel {
     // Action Listener
     // //////////////////////////////////////////////////////////////////////////////
 
+    @Override
     public void actionPerformed(final ActionEvent e) {
         if (e.getSource().equals(comboBoxGroup)) {
             updateGroupValues();

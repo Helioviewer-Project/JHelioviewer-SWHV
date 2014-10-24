@@ -281,7 +281,9 @@ public class EventModel implements ZoomControllerListener, EventRequesterListene
                 try {
                     if (!isCancelled()) {
                         eventPlotConfiguration = get();
-                        DrawController.getSingletonInstance().updateDrawableElement(eventPanel, plot);
+                        if (eventPlotConfiguration.getEventPlotConfigurations().size() > 0) {
+                            DrawController.getSingletonInstance().updateDrawableElement(eventPanel, plot);
+                        }
                     } else {
                         Log.info("Worker was cancelled");
                     }

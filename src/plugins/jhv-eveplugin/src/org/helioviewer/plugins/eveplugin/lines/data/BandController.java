@@ -28,7 +28,7 @@ public class BandController {
 
     private final HashMap<String, BandManager> bandManagerMap = new HashMap<String, BandManager>();
 
-    private LineDataSelectorModel selectorModel;
+    private final LineDataSelectorModel selectorModel;
 
     // //////////////////////////////////////////////////////////////////////////////
     // Methods
@@ -60,8 +60,9 @@ public class BandController {
      * 
      * */
     public void addBand(final String identifier, final BandType bandType) {
-        if (identifier == null || bandType == null || !bandManagerMap.containsKey(identifier))
+        if (identifier == null || bandType == null || !bandManagerMap.containsKey(identifier)) {
             return;
+        }
 
         final Band band = bandManagerMap.get(identifier).addBand(bandType);
 
@@ -71,7 +72,8 @@ public class BandController {
             }
             band.setPlotIndentifier(identifier);
             selectorModel.addLineData(band);
-            DownloadController.getSingletonInstance().updateBand(band, ZoomController.getSingletonInstance().getAvailableInterval(), ZoomController.getSingletonInstance().getSelectedInterval());
+            DownloadController.getSingletonInstance().updateBand(band, ZoomController.getSingletonInstance().getAvailableInterval(),
+                    ZoomController.getSingletonInstance().getSelectedInterval());
         }
     }
 
@@ -79,8 +81,9 @@ public class BandController {
      * 
      * */
     public void removeBand(final String identifier, final Band band) {
-        if (identifier == null || band == null || !bandManagerMap.containsKey(identifier))
+        if (identifier == null || band == null || !bandManagerMap.containsKey(identifier)) {
             return;
+        }
 
         if (!bandManagerMap.get(identifier).removeBand(band)) {
             return;
@@ -107,8 +110,9 @@ public class BandController {
     }
 
     public void removeAllBands(final String identifier) {
-        if (identifier == null || !bandManagerMap.containsKey(identifier))
+        if (identifier == null || !bandManagerMap.containsKey(identifier)) {
             return;
+        }
 
         final Band[] bands = bandManagerMap.get(identifier).getBands().toArray(new Band[0]);
 
@@ -119,8 +123,9 @@ public class BandController {
 
     /***/
     public void setBandVisibility(final String identifier, final BandType bandType, final boolean visible) {
-        if (identifier == null || bandType == null || !bandManagerMap.containsKey(identifier))
+        if (identifier == null || bandType == null || !bandManagerMap.containsKey(identifier)) {
             return;
+        }
 
         final Band band = bandManagerMap.get(identifier).getBand(bandType);
 
@@ -137,8 +142,9 @@ public class BandController {
     }
 
     public void selectBandGroup(final String identifier, final BandGroup group) {
-        if (identifier == null || group == null || !bandManagerMap.containsKey(identifier))
+        if (identifier == null || group == null || !bandManagerMap.containsKey(identifier)) {
             return;
+        }
 
         bandManagerMap.get(identifier).selectBandGroup(group);
 
@@ -150,8 +156,9 @@ public class BandController {
     }
 
     public BandGroup getSelectedGroup(final String identifier) {
-        if (identifier == null || !bandManagerMap.containsKey(identifier))
+        if (identifier == null || !bandManagerMap.containsKey(identifier)) {
             return null;
+        }
 
         return bandManagerMap.get(identifier).getSelectedGroup();
     }
@@ -201,8 +208,9 @@ public class BandController {
 
         final LinkedList<Band> availableBands = bandManagerMap.get(identifier).getBands();
 
-        if (availableBands == null)
+        if (availableBands == null) {
             return null;
+        }
 
         return availableBands.get(index);
     }
@@ -222,8 +230,9 @@ public class BandController {
 
         final LinkedList<Band> availableBands = bandManagerMap.get(identifier).getBands();
 
-        if (availableBands == null)
+        if (availableBands == null) {
             return new Band[0];
+        }
 
         return availableBands.toArray(new Band[0]);
     }
@@ -235,8 +244,9 @@ public class BandController {
 
         final LinkedList<Band> availableBands = bandManagerMap.get(identifier).getBands(group);
 
-        if (availableBands == null)
+        if (availableBands == null) {
             return new Band[0];
+        }
 
         return availableBands.toArray(new Band[0]);
     }
@@ -339,19 +349,20 @@ public class BandController {
         public LinkedList<Band> getBands(final BandGroup group) {
             final LinkedList<Band> availableBands = availableBandsInGroupMap.get(group);
 
-            if (availableBands == null)
+            if (availableBands == null) {
                 return new LinkedList<Band>();
+            }
 
             return availableBands;
         }
 
         public void selectBandGroup(final BandGroup group) {
             // set current group visible = false
-            final LinkedList<Band> bands = getBands();
-
-            for (final Band band : bands) {
-                band.setVisible(false);
-            }
+            /*
+             * final LinkedList<Band> bands = getBands();
+             * 
+             * for (final Band band : bands) { band.setVisible(false); }
+             */
 
             // set selected group visible = true
             selectedBandGroup = group;
