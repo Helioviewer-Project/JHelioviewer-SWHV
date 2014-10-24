@@ -17,7 +17,7 @@ import org.helioviewer.base.FileUtils;
 public class ChartConstants {
     private final static int screenfactor = 2;
 
-    private static final int GRAPH_LEFT_SPACE = 100;
+    private static final int GRAPH_LEFT_SPACE = 50;
     private static final int GRAPH_RIGHT_SPACE = 10;
     private static final int GRAPH_TOP_SPACE = 20;
     private static final int GRAPH_BOTTOM_SPACE = 22;
