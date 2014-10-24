@@ -70,24 +70,24 @@ public class RadioYAxisElement extends YAxisElement {
     @Override
     public Range getSelectedRange() {
         YValueModel yvm = yValueModelManager.getYValueModel(plotIdentifier);
-        return new Range(yvm.getSelectedYMin(), yvm.getSelectedYMax());
+        return new Range(yvm.getSelectedYMax(), yvm.getSelectedYMin());
     }
 
     @Override
     public Range getAvailableRange() {
         YValueModel yvm = yValueModelManager.getYValueModel(plotIdentifier);
-        return new Range(yvm.getAvailableYMin(), yvm.getAvailableYMax());
+        return new Range(yvm.getAvailableYMax(), yvm.getAvailableYMin());
     }
 
     @Override
     public double getMinValue() {
         YValueModel yvm = yValueModelManager.getYValueModel(plotIdentifier);
-        return yvm.getSelectedYMin();
+        return yvm.getSelectedYMax();
     }
 
     @Override
     public double getMaxValue() {
         YValueModel yvm = yValueModelManager.getYValueModel(plotIdentifier);
-        return yvm.getSelectedYMax();
+        return yvm.getSelectedYMin();
     }
 }
