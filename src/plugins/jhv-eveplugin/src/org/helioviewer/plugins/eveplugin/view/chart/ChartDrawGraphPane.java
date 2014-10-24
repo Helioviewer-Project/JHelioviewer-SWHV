@@ -326,7 +326,10 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
 
                 for (int i = 0; i <= verticalTicks; ++i) {
                     final double tickValue = logMinValue + i * tickDifferenceVertical;
-                    final String tickText = ChartConstants.DECIMAL_FORMAT.format(tickValue);
+                    String tickText = ChartConstants.DECIMAL_FORMAT.format(tickValue);
+                    if (yAxisElement.isLogScale()) {
+                        tickText = "10^" + tickText;
+                    }
                     Double yAxisRatio = yRatios.get(yAxisElement);
                     if (yAxisRatio == null) {
                         continue;

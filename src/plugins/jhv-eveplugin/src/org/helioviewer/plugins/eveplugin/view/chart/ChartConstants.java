@@ -9,11 +9,11 @@ import java.text.SimpleDateFormat;
  * */
 public interface ChartConstants {
 
-    public static final int GRAPH_LEFT_SPACE = 60;
+    public static final int GRAPH_LEFT_SPACE = 100;
     public static final int GRAPH_RIGHT_SPACE = 10;
     public static final int GRAPH_TOP_SPACE = 20;
     public static final int GRAPH_BOTTOM_SPACE = 20;
-    public static final int TWO_AXIS_GRAPH_RIGHT = 50;
+    public static final int TWO_AXIS_GRAPH_RIGHT = 70;
 
     public static final int MIN_VERTICAL_TICK_SPACE = 20;
 

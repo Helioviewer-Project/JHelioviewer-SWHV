@@ -23,7 +23,7 @@ public class EventPanel implements DrawableElement {
     private final YAxisElement yAxisElement;
 
     public EventPanel() {
-        yAxisElement = new YAxisElement(new Range(0, 0), new Range(0, 0), "", 0, 0, Color.BLACK);
+        yAxisElement = new YAxisElement(new Range(0, 0), new Range(0, 0), "", 0, 0, Color.BLACK, false);
     }
 
     @Override
