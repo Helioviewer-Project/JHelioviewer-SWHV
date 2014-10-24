@@ -43,7 +43,7 @@ public class EVEDrawController implements BandControllerListener, ZoomController
     private final String identifier;
 
     private final LinkedList<EVEDrawControllerListener> listeners = new LinkedList<EVEDrawControllerListener>();
-    private final HashMap<Band, DownloadedData> dataMap = new HashMap<Band, DownloadedData>();
+    private final Map<String, Map<Band, DownloadedData>> dataMapPerUnitLabel = new HashMap<String, Map<Band, DownloadedData>>();
 
     private Interval<Date> interval = new Interval<Date>(null, null);
     private final Map<String, Range> selectedRangeMap = new HashMap<String, Range>();
@@ -87,17 +87,28 @@ public class EVEDrawController implements BandControllerListener, ZoomController
 
     private void addToMap(final Band band) {
         DownloadedData data = retrieveData(band, interval);
+        if (!dataMapPerUnitLabel.containsKey(band.getUnitLabel())) {
+            dataMapPerUnitLabel.put(band.getUnitLabel(), new HashMap<Band, DownloadedData>());
+        }
         if (data != null) {
-            dataMap.put(band, data);
+            dataMapPerUnitLabel.get(band.getUnitLabel()).put(band, data);
         }
         fireRedrawRequest(true);
     }
 
     private void removeFromMap(final Band band) {
-        if (dataMap.containsKey(band)) {
-            dataMap.remove(band);
-
-            fireRedrawRequest(true);
+        if (dataMapPerUnitLabel.containsKey(band.getUnitLabel())) {
+            if (dataMapPerUnitLabel.get(band.getUnitLabel()).containsKey(band)) {
+                dataMapPerUnitLabel.get(band.getUnitLabel()).remove(band);
+                if (dataMapPerUnitLabel.get(band.getUnitLabel()).isEmpty()) {
+                    EVEDrawableElement removed = eveDrawableElementMap.remove(band.getUnitLabel());
+                    availableRangeMap.remove(band.getUnitLabel());
+                    selectedRangeMap.remove(band.getUnitLabel());
+                    yAxisElementMap.remove(band.getUnitLabel());
+                    drawController.removeDrawableElement(removed, identifier);
+                }
+                fireRedrawRequest(true);
+            }
         }
     }
 
@@ -106,9 +117,10 @@ public class EVEDrawController implements BandControllerListener, ZoomController
         if (!availableRangeMap.containsKey(band.getUnitLabel())) {
             availableRangeMap.put(band.getUnitLabel(), new Range());
             selectedRangeMap.put(band.getUnitLabel(), new Range());
+            dataMapPerUnitLabel.put(band.getUnitLabel(), new HashMap<Band, DownloadedData>());
         }
         Range oldAvailableRange = new Range(availableRangeMap.get(band.getUnitLabel()));
-        for (DownloadedData v : dataMap.values()) {
+        for (DownloadedData v : dataMapPerUnitLabel.get(band.getUnitLabel()).values()) {
             if (v != null) {
                 availableRangeMap.get(band.getUnitLabel()).setMin(v.getMinimumValue());
                 availableRangeMap.get(band.getUnitLabel()).setMax(v.getMaximumValue());
@@ -125,12 +137,14 @@ public class EVEDrawController implements BandControllerListener, ZoomController
         } else {
             Log.trace("Same available range");
         }
-        dataMap.put(band, data);
+        dataMapPerUnitLabel.get(band.getUnitLabel()).put(band, data);
     }
 
     private void updateBands() {
-        for (final Band band : dataMap.keySet()) {
-            updateBand(band);
+        for (String unit : dataMapPerUnitLabel.keySet()) {
+            for (final Band band : dataMapPerUnitLabel.get(unit).keySet()) {
+                updateBand(band);
+            }
         }
     }
 
@@ -145,58 +159,61 @@ public class EVEDrawController implements BandControllerListener, ZoomController
     }
 
     private void fireRedrawRequest(final boolean maxRange) {
-        final Band[] bands = dataMap.keySet().toArray(new Band[0]);
-        final LinkedList<DownloadedData> values = new LinkedList<DownloadedData>();
+        for (String unit : dataMapPerUnitLabel.keySet()) {
+            final Band[] bands = dataMapPerUnitLabel.get(unit).keySet().toArray(new Band[0]);
+            final LinkedList<DownloadedData> values = new LinkedList<DownloadedData>();
 
-        String unitLabel = "";
-        if (bands.length > 0) {
-            unitLabel = bands[0].getUnitLabel();
-        }
-
-        if (!availableRangeMap.containsKey(unitLabel)) {
-            availableRangeMap.put(unitLabel, new Range());
-            selectedRangeMap.put(unitLabel, new Range());
-            eveDrawableElementMap.put(unitLabel, new EVEDrawableElement());
-        }
-
-        Range oldAvailableRange = new Range(availableRangeMap.get(unitLabel));
-
-        for (DownloadedData v : dataMap.values()) {
-            if (v != null) {
-                availableRangeMap.get(unitLabel).setMin(v.getMinimumValue());
-                availableRangeMap.get(unitLabel).setMax(v.getMaximumValue());
-                values.add(v);
+            String unitLabel = "";
+            if (bands.length > 0) {
+                unitLabel = bands[0].getUnitLabel();
             }
-        }
 
-        if (maxRange) {
-            selectedRangeMap.put(unitLabel, new Range());
-        }
-        checkSelectedRange(availableRangeMap.get(unitLabel), selectedRangeMap.get(unitLabel));
-        if (oldAvailableRange.min != availableRangeMap.get(unitLabel).min || oldAvailableRange.max != availableRangeMap.get(unitLabel).max) {
-            Log.error("Available range changed in redraw request. So update plotAreaSpace");
-            Log.error("old range : " + oldAvailableRange.toString());
-            Log.error("new available range : " + availableRangeMap.get(unitLabel).toString());
-            updatePlotAreaSpace(availableRangeMap.get(unitLabel), selectedRangeMap.get(unitLabel));
+            if (!availableRangeMap.containsKey(unitLabel)) {
+                availableRangeMap.put(unitLabel, new Range());
+                selectedRangeMap.put(unitLabel, new Range());
+                eveDrawableElementMap.put(unitLabel, new EVEDrawableElement());
+            }
 
-        }
+            Range oldAvailableRange = new Range(availableRangeMap.get(unitLabel));
 
-        for (EVEDrawControllerListener listener : listeners) {
-            listener.drawRequest(interval, bands, values.toArray(new EVEValues[0]), availableRangeMap.get(unitLabel),
-                    selectedRangeMap.get(unitLabel));
-        }
-        YAxisElement yAxisElement = new YAxisElement();
-        if (yAxisElementMap.containsKey(unitLabel)) {
-            yAxisElement = yAxisElementMap.get(unitLabel);
-        }
-        yAxisElement.set(selectedRangeMap.get(unitLabel), availableRangeMap.get(unitLabel), unitLabel,
-                Math.log10(selectedRangeMap.get(unitLabel).min), Math.log10(selectedRangeMap.get(unitLabel).max), Color.PINK);
-        yAxisElementMap.put(unitLabel, yAxisElement);
-        eveDrawableElementMap.get(unitLabel).set(interval, bands, values.toArray(new EVEValues[0]), yAxisElement);
-        if (bands.length > 0) {
-            drawController.updateDrawableElement(eveDrawableElementMap.get(unitLabel), identifier);
-        } else {
-            drawController.removeDrawableElement(eveDrawableElementMap.get(unitLabel), identifier);
+            for (DownloadedData v : dataMapPerUnitLabel.get(unit).values()) {
+                if (v != null) {
+                    availableRangeMap.get(unitLabel).setMin(v.getMinimumValue());
+                    availableRangeMap.get(unitLabel).setMax(v.getMaximumValue());
+                    values.add(v);
+                }
+            }
+
+            if (maxRange) {
+                selectedRangeMap.put(unitLabel, new Range());
+            }
+            checkSelectedRange(availableRangeMap.get(unitLabel), selectedRangeMap.get(unitLabel));
+            if (oldAvailableRange.min != availableRangeMap.get(unitLabel).min
+                    || oldAvailableRange.max != availableRangeMap.get(unitLabel).max) {
+                Log.error("Available range changed in redraw request. So update plotAreaSpace");
+                Log.error("old range : " + oldAvailableRange.toString());
+                Log.error("new available range : " + availableRangeMap.get(unitLabel).toString());
+                updatePlotAreaSpace(availableRangeMap.get(unitLabel), selectedRangeMap.get(unitLabel));
+
+            }
+
+            for (EVEDrawControllerListener listener : listeners) {
+                listener.drawRequest(interval, bands, values.toArray(new EVEValues[0]), availableRangeMap.get(unitLabel),
+                        selectedRangeMap.get(unitLabel));
+            }
+            YAxisElement yAxisElement = new YAxisElement();
+            if (yAxisElementMap.containsKey(unitLabel)) {
+                yAxisElement = yAxisElementMap.get(unitLabel);
+            }
+            yAxisElement.set(selectedRangeMap.get(unitLabel), availableRangeMap.get(unitLabel), unitLabel,
+                    Math.log10(selectedRangeMap.get(unitLabel).min), Math.log10(selectedRangeMap.get(unitLabel).max), Color.PINK);
+            yAxisElementMap.put(unitLabel, yAxisElement);
+            eveDrawableElementMap.get(unitLabel).set(interval, bands, values.toArray(new EVEValues[0]), yAxisElement);
+            if (bands.length > 0) {
+                drawController.updateDrawableElement(eveDrawableElementMap.get(unitLabel), identifier);
+            } else {
+                drawController.removeDrawableElement(eveDrawableElementMap.get(unitLabel), identifier);
+            }
         }
     }
 
@@ -304,12 +321,15 @@ public class EVEDrawController implements BandControllerListener, ZoomController
     @Override
     public void bandGroupChanged(final String identifier) {
         if (this.identifier.equals(identifier)) {
-            dataMap.clear();
+            dataMapPerUnitLabel.clear();
 
             final Band[] activeBands = BandController.getSingletonInstance().getBands(identifier);
 
             for (final Band band : activeBands) {
-                dataMap.put(band, retrieveData(band, interval));
+                if (!dataMapPerUnitLabel.containsKey(band.getUnitLabel())) {
+                    dataMapPerUnitLabel.put(band.getUnitLabel(), new HashMap<Band, DownloadedData>());
+                }
+                dataMapPerUnitLabel.get(band.getUnitLabel()).put(band, retrieveData(band, interval));
             }
 
             fireRedrawRequest(true);
@@ -322,9 +342,11 @@ public class EVEDrawController implements BandControllerListener, ZoomController
 
     @Override
     public void dataAdded(final Band band) {
-        if (dataMap.containsKey(band)) {
-            updateBand(band);
-            fireRedrawRequest(true);
+        if (dataMapPerUnitLabel.containsKey(band.getUnitLabel())) {
+            if (dataMapPerUnitLabel.get(band.getUnitLabel()).containsKey(band)) {
+                updateBand(band);
+                fireRedrawRequest(true);
+            }
         }
     }
 
