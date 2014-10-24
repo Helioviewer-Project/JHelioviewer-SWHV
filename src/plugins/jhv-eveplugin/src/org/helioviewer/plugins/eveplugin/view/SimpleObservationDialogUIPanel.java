@@ -28,9 +28,7 @@ import org.helioviewer.jhv.gui.components.calendar.JHVCalendarListener;
 import org.helioviewer.jhv.gui.dialogs.observation.ObservationDialog;
 import org.helioviewer.jhv.gui.dialogs.observation.ObservationDialogPanel;
 import org.helioviewer.plugins.eveplugin.controller.ZoomController;
-import org.helioviewer.plugins.eveplugin.lines.data.BandController;
 import org.helioviewer.plugins.eveplugin.radio.data.RadioDownloader;
-import org.helioviewer.plugins.eveplugin.settings.BandGroup;
 import org.helioviewer.plugins.eveplugin.view.plot.PlotsContainerPanel;
 
 public class SimpleObservationDialogUIPanel extends ObservationDialogPanel implements JHVCalendarListener, ActionListener {
@@ -40,7 +38,7 @@ public class SimpleObservationDialogUIPanel extends ObservationDialogPanel imple
     // //////////////////////////////////////////////////////////////////////////////
 
     private static final long serialVersionUID = 1L;
-    
+
     protected PlotsContainerPanel plotsContainerPanel;
 
     protected boolean enableLoadButton = true;
@@ -57,7 +55,7 @@ public class SimpleObservationDialogUIPanel extends ObservationDialogPanel imple
 
     private JPanel timePane;
     private JPanel plotPane;
-    
+
     // //////////////////////////////////////////////////////////////////////////////
     // Methods
     // //////////////////////////////////////////////////////////////////////////////
@@ -65,6 +63,7 @@ public class SimpleObservationDialogUIPanel extends ObservationDialogPanel imple
     public SimpleObservationDialogUIPanel(final PlotsContainerPanel plotsContainerPanel) {
         this.plotsContainerPanel = plotsContainerPanel;
         EventQueue.invokeLater(new Runnable() {
+            @Override
             public void run() {
 
                 labelStartDate = new JLabel("Start Date");
@@ -148,7 +147,8 @@ public class SimpleObservationDialogUIPanel extends ObservationDialogPanel imple
         final GregorianCalendar calendar = new GregorianCalendar();
         calendar.setTime(getStartDate());
 
-        final GregorianCalendar calendar2 = new GregorianCalendar(calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH), calendar.get(Calendar.DAY_OF_MONTH));
+        final GregorianCalendar calendar2 = new GregorianCalendar(calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH),
+                calendar.get(Calendar.DAY_OF_MONTH));
         final long start = calendar2.getTimeInMillis();
 
         calendar.clear();
@@ -162,19 +162,21 @@ public class SimpleObservationDialogUIPanel extends ObservationDialogPanel imple
     }
 
     private void updateZoomController() {
-        ZoomController.getSingletonInstance().setAvailableInterval(new Interval<Date>(getStartDate(), getEndDate()));        
+        ZoomController.getSingletonInstance().setAvailableInterval(new Interval<Date>(getStartDate(), getEndDate()));
     }
 
     private void updateBandController() {
-        
-        final String identifier = plotComboBox.getSelectedIndex() == 0 ? PlotsContainerPanel.PLOT_IDENTIFIER_MASTER : PlotsContainerPanel.PLOT_IDENTIFIER_SLAVE;
+
+        final String identifier = plotComboBox.getSelectedIndex() == 0 ? PlotsContainerPanel.PLOT_IDENTIFIER_MASTER
+                : PlotsContainerPanel.PLOT_IDENTIFIER_SLAVE;
         if (identifier.equals(PlotsContainerPanel.PLOT_IDENTIFIER_SLAVE)) {
             plotsContainerPanel.setPlot2Visible(true);
         }
     }
 
     private void startRadioDownload() {
-        final String identifier = plotComboBox.getSelectedIndex() == 0 ? PlotsContainerPanel.PLOT_IDENTIFIER_MASTER : PlotsContainerPanel.PLOT_IDENTIFIER_SLAVE;
+        final String identifier = plotComboBox.getSelectedIndex() == 0 ? PlotsContainerPanel.PLOT_IDENTIFIER_MASTER
+                : PlotsContainerPanel.PLOT_IDENTIFIER_SLAVE;
         DateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
         Interval<Date> selectedInterval = ZoomController.getSingletonInstance().getSelectedInterval();
         String isoStart = df.format(selectedInterval.getStart());
@@ -233,6 +235,7 @@ public class SimpleObservationDialogUIPanel extends ObservationDialogPanel imple
     // JHV Calendar Listener
     // //////////////////////////////////////////////////////////////////////////////
 
+    @Override
     public void actionPerformed(final JHVCalendarEvent e) {
         if (e.getSource() == calendarStartDate && !isStartDateBeforeOrEqualEndDate()) {
             calendarEndDate.setDate(calendarStartDate.getDate());
@@ -247,12 +250,15 @@ public class SimpleObservationDialogUIPanel extends ObservationDialogPanel imple
     // Action Listener
     // //////////////////////////////////////////////////////////////////////////////
 
+    @Override
     public void actionPerformed(final ActionEvent e) {
         if (e.getSource().equals(plotComboBox)) {
-            final String identifier = plotComboBox.getSelectedIndex() == 0 ? PlotsContainerPanel.PLOT_IDENTIFIER_MASTER : PlotsContainerPanel.PLOT_IDENTIFIER_SLAVE;
-            final BandGroup group = BandController.getSingletonInstance().getSelectedGroup(identifier);
+            final String identifier = plotComboBox.getSelectedIndex() == 0 ? PlotsContainerPanel.PLOT_IDENTIFIER_MASTER
+                    : PlotsContainerPanel.PLOT_IDENTIFIER_SLAVE;
+            // final BandGroup group =
+            // BandController.getSingletonInstance().getSelectedGroup(identifier);
 
-            comboBoxGroup.setSelectedItem(group);
+            // comboBoxGroup.setSelectedItem(group);
         }
     }
 

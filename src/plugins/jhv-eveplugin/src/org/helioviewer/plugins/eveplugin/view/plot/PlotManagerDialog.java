@@ -125,6 +125,7 @@ public class PlotManagerDialog extends JDialog implements ActionListener {
     // Action Listener
     // //////////////////////////////////////////////////////////////////////////////
 
+    @Override
     public void actionPerformed(ActionEvent arg0) {
         if (arg0.getSource().equals(okButton)) {
             updateBandController();
@@ -162,7 +163,7 @@ public class PlotManagerDialog extends JDialog implements ActionListener {
 
         public PlotManagerPanel(final boolean deselectable, final String identifer, final String plotName) {
             this.deselectable = deselectable;
-            this.identifier = identifer;
+            identifier = identifer;
 
             initVisualComponents(plotName);
             initGroups();
@@ -287,7 +288,7 @@ public class PlotManagerDialog extends JDialog implements ActionListener {
                 groupComboBox.setSelectedIndex(0);
             } else {
                 final BandController bandController = BandController.getSingletonInstance();
-                groupComboBox.setSelectedItem(bandController.getSelectedGroup(identifier));
+                // groupComboBox.setSelectedItem(bandController.getSelectedGroup(identifier));
             }
         }
 
@@ -375,6 +376,7 @@ public class PlotManagerDialog extends JDialog implements ActionListener {
         // Action Listener
         // //////////////////////////////////////////////////////////////////////////////
 
+        @Override
         public void actionPerformed(ActionEvent arg0) {
             if (arg0.getSource().equals(groupComboBox)) {
                 enableComponents();
@@ -390,10 +392,12 @@ public class PlotManagerDialog extends JDialog implements ActionListener {
         // List Selection Listener
         // //////////////////////////////////////////////////////////////////////////////
 
+        @Override
         public void valueChanged(ListSelectionEvent e) {
             updateButtonStates();
         }
 
+        @Override
         public void mouseClicked(MouseEvent e) {
             if (e.getClickCount() == 2 && e.getSource().equals(availableList)) {
                 addValue();
@@ -402,15 +406,19 @@ public class PlotManagerDialog extends JDialog implements ActionListener {
             }
         }
 
+        @Override
         public void mouseEntered(MouseEvent e) {
         }
 
+        @Override
         public void mouseExited(MouseEvent e) {
         }
 
+        @Override
         public void mousePressed(MouseEvent e) {
         }
 
+        @Override
         public void mouseReleased(MouseEvent e) {
         }
     }
