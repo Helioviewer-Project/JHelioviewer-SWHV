@@ -123,8 +123,8 @@ public class YValueModel implements PlotAreaSpaceListener {
         double scaledDiff = scaledMaxValue - scaledMinValue;
         double absDiff = availableYMax - availableYMin;
         double freqPerScaled = absDiff / scaledDiff;
-        selectedYMin = (1.0 * availableYMin + (scaledSelectedMinValue - scaledMinValue) * freqPerScaled);
-        selectedYMax = (1.0 * availableYMin + (scaledSelectedMaxValue - scaledMinValue) * freqPerScaled);
+        selectedYMin = (1.0 * availableYMin + (scaledMaxValue - scaledSelectedMaxValue) * freqPerScaled);
+        selectedYMax = (1.0 * availableYMin + (scaledMaxValue - scaledSelectedMinValue) * freqPerScaled);
     }
 
     /**
