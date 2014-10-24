@@ -146,8 +146,7 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
             BufferedImage plotPart = screenImage.getSubimage(ChartConstants.GRAPH_LEFT_SPACE, ChartConstants.GRAPH_TOP_SPACE, width
                     - ChartConstants.GRAPH_LEFT_SPACE - ChartConstants.GRAPH_RIGHT_SPACE, height - ChartConstants.GRAPH_TOP_SPACE
                     - ChartConstants.GRAPH_BOTTOM_SPACE);
-            BufferedImage leftAxisPart = screenImage.getSubimage(0, ChartConstants.GRAPH_TOP_SPACE, ChartConstants.GRAPH_LEFT_SPACE, height
-                    - ChartConstants.GRAPH_TOP_SPACE - ChartConstants.GRAPH_BOTTOM_SPACE);
+            BufferedImage leftAxisPart = screenImage.getSubimage(0, 0, ChartConstants.GRAPH_LEFT_SPACE, height);
             drawData(plotPart.createGraphics(), g, leftAxisPart.createGraphics());
             drawZoomBox(g);
         }
@@ -403,7 +402,8 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
         final int graphHeight = getHeight() - (ChartConstants.GRAPH_TOP_SPACE + ChartConstants.GRAPH_BOTTOM_SPACE);
         graphArea = new Rectangle(ChartConstants.GRAPH_LEFT_SPACE, ChartConstants.GRAPH_TOP_SPACE, graphWidth, graphHeight);
         plotArea = new Rectangle(0, 0, graphWidth, graphHeight);
-        leftAxisArea = new Rectangle(0, 0, ChartConstants.GRAPH_LEFT_SPACE, graphHeight);
+        leftAxisArea = new Rectangle(0, ChartConstants.GRAPH_TOP_SPACE, ChartConstants.GRAPH_LEFT_SPACE, graphHeight
+                - (ChartConstants.GRAPH_TOP_SPACE + ChartConstants.GRAPH_BOTTOM_SPACE));
         zoomManager.setDisplaySize(plotArea, identifier);
     }
 
