@@ -1,8 +1,15 @@
 package org.helioviewer.plugins.eveplugin.view.chart;
 
 import java.awt.Color;
+import java.awt.Font;
+import java.awt.FontFormatException;
+import java.awt.Toolkit;
+import java.io.IOException;
+import java.io.InputStream;
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
+
+import org.helioviewer.base.FileUtils;
 
 /**
  * @author Stephan Pagel
@@ -13,7 +20,7 @@ public class ChartConstants {
     private static final int GRAPH_LEFT_SPACE = 100;
     private static final int GRAPH_RIGHT_SPACE = 10;
     private static final int GRAPH_TOP_SPACE = 20;
-    private static final int GRAPH_BOTTOM_SPACE = 20;
+    private static final int GRAPH_BOTTOM_SPACE = 22;
     private static final int TWO_AXIS_GRAPH_RIGHT = 70;
 
     private static final int MIN_VERTICAL_TICK_SPACE = 20;
@@ -35,7 +42,14 @@ public class ChartConstants {
 
     public static final DecimalFormat DECIMAL_FORMAT = new DecimalFormat("###,##0.00");
 
-    public static final SimpleDateFormat FULL_DATE_TIME_FORMAT = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+    public static final SimpleDateFormat FULL_DATE_TIME_FORMAT = new SimpleDateFormat("yyyy-MM-dd\nHH:mm:ss");
+    public static final SimpleDateFormat FULL_DATE_TIME_FORMAT_REVERSE = new SimpleDateFormat("HH:mm:ss\nyyyy-MM-dd");
+
+    public static final SimpleDateFormat MONTH_TIME_FORMAT = new SimpleDateFormat("MM-dd HH:mm:ss");
+    public static final SimpleDateFormat DAY_TIME_FORMAT = new SimpleDateFormat("dd HH:mm:ss");
+    public static final SimpleDateFormat HOUR_TIME_FORMAT = new SimpleDateFormat("HH:mm:ss");
+    public static final SimpleDateFormat MINUTE_TIME_FORMAT = new SimpleDateFormat("mm:ss");
+
     public static final SimpleDateFormat DAY_MONTH_YEAR_TIME_FORMAT = new SimpleDateFormat("yyyy-MM-dd");
     public static final SimpleDateFormat MONTH_YEAR_TIME_FORMAT = new SimpleDateFormat("MMM yyyy");
     public static final SimpleDateFormat YEAR_ONLY_TIME_FORMAT = new SimpleDateFormat("yyyy");
@@ -72,7 +86,44 @@ public class ChartConstants {
         return RANGE_SELECTION_WIDTH;
     }
 
+    private static int scale = -1;
+
     public static int getScreenfactor() {
-        return screenfactor;
+        if (scale == -1) {
+            scale = 1;
+
+            Object obj = Toolkit.getDefaultToolkit().getDesktopProperty("apple.awt.contentScaleFactor");
+            if (obj instanceof Float) {
+                Float f = (Float) obj;
+                scale = f.intValue();
+            }
+        }
+        return scale;
+    }
+
+    private static Font font = new Font("Arial", Font.PLAIN, 10);
+
+    public static Font getFont() {
+        if (font == null) {
+            InputStream is = FileUtils.getResourceInputStream("/fonts/DroidSans-Bold.ttf");
+            try {
+                font = Font.createFont(Font.TRUETYPE_FONT, is);
+            } catch (FontFormatException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            } catch (IOException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            }
+            font = font.deriveFont(10.f);
+
+        }
+        return font;
+    }
+
+    private final static String absentText = "No band / diode / line selected";
+
+    public static String getAbsentText() {
+        return absentText;
     }
 }
