@@ -126,12 +126,14 @@ public class EVEDataOfDay {
             GregorianCalendar calendar = new GregorianCalendar();
             calendar.setTime(interval.getStart());
             indexFrom = calendar.get(Calendar.HOUR_OF_DAY) * 60 + calendar.get(Calendar.MINUTE);
+            indexFrom = Math.max(0, indexFrom - 3);
         }
 
         if (available.containsPointInclusive(interval.getEnd())) {
             GregorianCalendar calendar = new GregorianCalendar();
             calendar.setTime(interval.getEnd());
             indexTo = calendar.get(Calendar.HOUR_OF_DAY) * 60 + calendar.get(Calendar.MINUTE);
+            indexTo = Math.min(indexTo + 3, MINUTES_PER_DAY - 1);
         }
 
         return Arrays.copyOfRange(values, indexFrom, indexTo);
