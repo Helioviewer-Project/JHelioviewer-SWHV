@@ -29,20 +29,21 @@ public class RadioPlotModelData {
         yAxisElement = new RadioYAxisElement(plotIdentifier);
         yAxisElement.setColor(Color.BLACK);
         yAxisElement.setLabel("Mhz");
+        yAxisElement.setIsLogScale(false);
         radioImagePane = new RadioImagePane(plotIdentifier);
         radioImagePane.setYAxisElement(yAxisElement);
-        this.downloadRequestData = new HashMap<Long, DownloadRequestData>();
+        downloadRequestData = new HashMap<Long, DownloadRequestData>();
         plotConfigList = new HashMap<Long, Map<Long, PlotConfig>>();
         noDataConfigList = new HashMap<Long, List<NoDataConfig>>();
         listeners = new HashSet<RadioPlotModelListener>();
     }
 
     public void addRadioPlotModelListener(RadioPlotModelListener listener) {
-        this.listeners.add(listener);
+        listeners.add(listener);
     }
 
     public void removeRadioPlotModelListener(RadioPlotModelListener listener) {
-        this.listeners.remove(listener);
+        listeners.remove(listener);
     }
 
     public YAxisElement getyAxisElement() {
