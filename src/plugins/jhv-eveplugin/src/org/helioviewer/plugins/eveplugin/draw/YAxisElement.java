@@ -5,7 +5,7 @@ import java.awt.Color;
 import org.helioviewer.plugins.eveplugin.base.Range;
 
 /**
- * This class describes an Y-axis. 
+ * This class describes an Y-axis.
  * 
  * @author Bram.Bourgoignie@oma.be
  */
@@ -25,44 +25,56 @@ public class YAxisElement {
     /**  */
     private Color color;
 
+    private boolean isLogScale;
+
     /**
-     * Creates a Y-axis element with a selected value range, an available value range, 
-     * a label, a minimum value, a maximum value and a color.  
+     * Creates a Y-axis element with a selected value range, an available value
+     * range, a label, a minimum value, a maximum value and a color.
      * 
-     * @param selectedRange     The current selected value range
-     * @param availableRange    The current available value range
-     * @param label             The label of the y axis element
-     * @param minValue          The minimum value of this y-axis element
-     * @param maxValue          The maximum value of this y-axis element 
-     * @param color             The color of this this y-axis element
+     * @param selectedRange
+     *            The current selected value range
+     * @param availableRange
+     *            The current available value range
+     * @param label
+     *            The label of the y axis element
+     * @param minValue
+     *            The minimum value of this y-axis element
+     * @param maxValue
+     *            The maximum value of this y-axis element
+     * @param color
+     *            The color of this this y-axis element
      */
-    public YAxisElement(Range selectedRange, Range availableRange, String label, double minValue, double maxValue, Color color) {
+    public YAxisElement(Range selectedRange, Range availableRange, String label, double minValue, double maxValue, Color color,
+            boolean isLogScale) {
         this.selectedRange = selectedRange;
         this.availableRange = availableRange;
         this.label = label;
         this.minValue = minValue;
         this.maxValue = maxValue;
         this.color = color;
+        this.isLogScale = isLogScale;
     }
 
     /**
-     * Creates a default Y-axis element with a selected range (0,0), available range (0,0), empty label, minimum and 
-     * maximum value of 0.0 and a black color.
-     *  
+     * Creates a default Y-axis element with a selected range (0,0), available
+     * range (0,0), empty label, minimum and maximum value of 0.0 and a black
+     * color.
+     * 
      */
     public YAxisElement() {
-        this.selectedRange = new Range();
-        this.availableRange = new Range();
-        this.label = "";
-        this.minValue = 0.0;
-        this.maxValue = 0.0;
-        this.color = Color.BLACK;
+        selectedRange = new Range();
+        availableRange = new Range();
+        label = "";
+        minValue = 0.0;
+        maxValue = 0.0;
+        color = Color.BLACK;
+        isLogScale = true;
     }
 
     /**
      * Gives the selected range.
-     *  
-     * @return  The selected range
+     * 
+     * @return The selected range
      */
     public Range getSelectedRange() {
         return selectedRange;
@@ -71,7 +83,8 @@ public class YAxisElement {
     /**
      * Sets the selected range.
      * 
-     * @param selectedRange     The selected range
+     * @param selectedRange
+     *            The selected range
      */
     public void setSelectedRange(Range selectedRange) {
         this.selectedRange = selectedRange;
@@ -80,7 +93,7 @@ public class YAxisElement {
     /**
      * Gets the available range.
      * 
-     * @return  The available range
+     * @return The available range
      */
     public Range getAvailableRange() {
         return availableRange;
@@ -89,7 +102,8 @@ public class YAxisElement {
     /**
      * Sets the available range.
      * 
-     * @param availableRange    The available range
+     * @param availableRange
+     *            The available range
      */
     public void setAvailableRange(Range availableRange) {
         this.availableRange = availableRange;
@@ -98,7 +112,7 @@ public class YAxisElement {
     /**
      * Gets the label.
      * 
-     * @return  The label
+     * @return The label
      */
     public String getLabel() {
         return label;
@@ -107,7 +121,8 @@ public class YAxisElement {
     /**
      * Sets the label.
      * 
-     * @param label     The label
+     * @param label
+     *            The label
      */
     public void setLabel(String label) {
         this.label = label;
@@ -116,7 +131,7 @@ public class YAxisElement {
     /**
      * Gets the minimum value.
      * 
-     * @return  The minimum value
+     * @return The minimum value
      */
     public double getMinValue() {
         return minValue;
@@ -125,7 +140,8 @@ public class YAxisElement {
     /**
      * Sets the minimum value.
      * 
-     * @param minValue  The minimum value
+     * @param minValue
+     *            The minimum value
      */
     public void setMinValue(double minValue) {
         this.minValue = minValue;
@@ -134,16 +150,17 @@ public class YAxisElement {
     /**
      * Gets the maximum value.
      * 
-     * @return  The maximum value
+     * @return The maximum value
      */
     public double getMaxValue() {
         return maxValue;
     }
 
-    /** 
+    /**
      * Sets the maximum value.
-     *  
-     * @param maxValue  The maximum value
+     * 
+     * @param maxValue
+     *            The maximum value
      */
     public void setMaxValue(double maxValue) {
         this.maxValue = maxValue;
@@ -151,8 +168,8 @@ public class YAxisElement {
 
     /**
      * Gets the color.
-     *     
-     * @return  The color.
+     * 
+     * @return The color.
      */
     public Color getColor() {
         return color;
@@ -161,28 +178,42 @@ public class YAxisElement {
     /**
      * Sets the color.
      * 
-     * @param color The color.
+     * @param color
+     *            The color.
      */
     public void setColor(Color color) {
         this.color = color;
     }
 
     /**
-     * Sets the available range, selected range, label minimum value, maximum value and color of the y-axis element.
+     * Sets the available range, selected range, label minimum value, maximum
+     * value and color of the y-axis element.
      * 
-     * @param availableRange    The available range
-     * @param selectedRange     The selected range
-     * @param label             The label
-     * @param minValue          The minimum value
-     * @param maxValue          The maximum value
-     * @param color             The color
+     * @param availableRange
+     *            The available range
+     * @param selectedRange
+     *            The selected range
+     * @param label
+     *            The label
+     * @param minValue
+     *            The minimum value
+     * @param maxValue
+     *            The maximum value
+     * @param color
+     *            The color
      */
-    public void set(Range availableRange, Range selectedRange, String label, double minValue, double maxValue, Color color) {
+    public void set(Range availableRange, Range selectedRange, String label, double minValue, double maxValue, Color color,
+            boolean isLogScale) {
         this.availableRange = availableRange;
         this.selectedRange = selectedRange;
         this.label = label;
         this.maxValue = maxValue;
         this.minValue = minValue;
         this.color = color;
+        this.isLogScale = isLogScale;
+    }
+
+    public boolean isLogScale() {
+        return isLogScale;
     }
 }

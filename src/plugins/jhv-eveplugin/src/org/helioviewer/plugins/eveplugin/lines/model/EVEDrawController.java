@@ -206,7 +206,7 @@ public class EVEDrawController implements BandControllerListener, ZoomController
                 yAxisElement = yAxisElementMap.get(unitLabel);
             }
             yAxisElement.set(selectedRangeMap.get(unitLabel), availableRangeMap.get(unitLabel), unitLabel,
-                    Math.log10(selectedRangeMap.get(unitLabel).min), Math.log10(selectedRangeMap.get(unitLabel).max), Color.PINK);
+                    Math.log10(selectedRangeMap.get(unitLabel).min), Math.log10(selectedRangeMap.get(unitLabel).max), Color.PINK, true);
             yAxisElementMap.put(unitLabel, yAxisElement);
             eveDrawableElementMap.get(unitLabel).set(interval, bands, values.toArray(new EVEValues[0]), yAxisElement);
             if (bands.length > 0) {
