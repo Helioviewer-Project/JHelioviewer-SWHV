@@ -216,4 +216,9 @@ public class YAxisElement {
     public boolean isLogScale() {
         return isLogScale;
     }
+
+    public void setIsLogScale(boolean isLogScale) {
+        this.isLogScale = isLogScale;
+
+    }
 }
