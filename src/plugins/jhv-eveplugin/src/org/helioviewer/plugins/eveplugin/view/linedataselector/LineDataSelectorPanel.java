@@ -8,8 +8,6 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JProgressBar;
 
-import org.helioviewer.plugins.eveplugin.lines.data.BandController;
-
 public class LineDataSelectorPanel extends JPanel implements LineDataSelectorModelListener {
 
     // //////////////////////////////////////////////////////////////////////////////
@@ -34,7 +32,7 @@ public class LineDataSelectorPanel extends JPanel implements LineDataSelectorMod
     // //////////////////////////////////////////////////////////////////////////////
 
     public LineDataSelectorPanel(final String identifer, final String plotName) {
-        this.identifier = identifer;
+        identifier = identifer;
         bandsContainer = new LineDataContainer(identifier);
 
         initVisualComponents(plotName);
@@ -49,7 +47,7 @@ public class LineDataSelectorPanel extends JPanel implements LineDataSelectorMod
         final JPanel headerPane = new JPanel();
         headerPane.setLayout(new FlowLayout(FlowLayout.LEFT));
         headerPane.add(new JLabel(plotName));
-        headerPane.add(groupLabel);
+        // headerPane.add(groupLabel);
 
         add(headerPane, BorderLayout.PAGE_START);
         add(bandsContainer, BorderLayout.CENTER);
@@ -59,8 +57,8 @@ public class LineDataSelectorPanel extends JPanel implements LineDataSelectorMod
     }
 
     public void bandGroupChanged(final String identifer) {
-        if (this.identifier.equals(identifer)) {
-            groupLabel.setText(BandController.getSingletonInstance().getSelectedGroup(identifer).getGroupLabel());
+        if (identifier.equals(identifer)) {
+            // groupLabel.setText(BandController.getSingletonInstance().getSelectedGroup(identifer).getGroupLabel());
         }
     }
 
