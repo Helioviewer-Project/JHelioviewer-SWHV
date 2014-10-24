@@ -14,6 +14,7 @@ import org.helioviewer.plugins.eveplugin.view.linedataselector.LineDataSelectorM
 /**
  * 
  * @author Stephan Pagel
+ * @author Bram Bourgoignie (Bram.Bourgoignie@oma.be)
  * */
 public class BandController {
 
