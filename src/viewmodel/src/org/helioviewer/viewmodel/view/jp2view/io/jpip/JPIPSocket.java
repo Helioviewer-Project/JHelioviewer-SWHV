@@ -13,9 +13,9 @@ import org.helioviewer.viewmodel.view.jp2view.io.http.HTTPSocket;
 
 /**
  * Assumes a persistent HTTP connection.
- * 
+ *
  * @author caplins
- * 
+ *
  */
 public class JPIPSocket extends HTTPSocket {
 
@@ -49,11 +49,12 @@ public class JPIPSocket extends HTTPSocket {
      * Connects to the specified URI. The second parameter only serves to
      * distinguish it from the super classes connect method (I want to return
      * something and the super class has a return type of void).
-     * 
+     *
      * @param _uri
      * @return The first response of the server when connecting.
      * @throws IOException
      */
+    @Override
     public Object connect(URI _uri) throws IOException {
         super.connect(_uri);
 
@@ -106,6 +107,7 @@ public class JPIPSocket extends HTTPSocket {
     };
 
     /** Closes the JPIPSocket */
+    @Override
     public void close() throws IOException {
         if (this.isClosed())
             return;
@@ -132,7 +134,7 @@ public class JPIPSocket extends HTTPSocket {
 
     /**
      * Sends a JPIPRequest
-     * 
+     *
      * @param _req
      * @throws IOException
      */
@@ -140,6 +142,8 @@ public class JPIPSocket extends HTTPSocket {
         String queryStr = _req.getQuery();
 
         // Adds some default headers if they were not already added.
+        if (!_req.headerExists(HTTPHeaderKey.USER_AGENT.toString()))
+            _req.setHeader(HTTPHeaderKey.USER_AGENT.toString(), "SWHVJHelioviewer");
         if (!_req.headerExists(HTTPHeaderKey.CACHE_CONTROL.toString()))
             _req.setHeader(HTTPHeaderKey.CACHE_CONTROL.toString(), "no-cache");
         if (!_req.headerExists(HTTPHeaderKey.HOST.toString()))
@@ -185,6 +189,7 @@ public class JPIPSocket extends HTTPSocket {
     }
 
     /** Receives a JPIPResponse returning null if EOS reached */
+    @Override
     public JPIPResponse receive() throws IOException {
         // long tini = System.currentTimeMillis();
 
