@@ -53,9 +53,10 @@ public class EventPanel implements DrawableElement {
                                 (new Double(Math.floor(1.0 * graphArea.height / etpc.getTotalNrLines() / 2))).intValue());
                         int spaceNeeded = spacePerLine * etpc.getMaxLinesPerEventType().get(eventType).intValue();
                         ImageIcon icon = epc.getEvent().getIcon();
-                        leftAxis.drawImage(icon.getImage(), 0, previousLine * spacePerLine + spaceNeeded / 2 - icon.getIconHeight() / 2,
-                                icon.getIconWidth(), previousLine * spacePerLine + spaceNeeded / 2 + icon.getIconHeight() / 2, 0, 0,
-                                icon.getIconWidth(), icon.getIconHeight(), null);
+                        leftAxis.drawImage(icon.getImage(), 0,
+                                leftAxisArea.y + previousLine * spacePerLine + spaceNeeded / 2 - icon.getIconHeight() / 2,
+                                icon.getIconWidth(), leftAxisArea.y + previousLine * spacePerLine + spaceNeeded / 2 + icon.getIconHeight()
+                                        / 2, 0, 0, icon.getIconWidth(), icon.getIconHeight(), null);
                     }
                     first = false;
                 }
