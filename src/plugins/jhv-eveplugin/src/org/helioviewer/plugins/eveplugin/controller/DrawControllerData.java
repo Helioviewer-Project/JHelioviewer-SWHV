@@ -51,7 +51,11 @@ public class DrawControllerData {
             Log.debug(dt + " : " + drawableElements.get(dt).size());
             for (DrawableElement de : drawableElements.get(dt)) {
                 Log.debug(de.hasElementsToDraw());
-                Log.debug(de.getYAxisElement().getLabel());
+                if (de.getYAxisElement() != null) {
+                    Log.debug(de.getYAxisElement().getLabel());
+                } else {
+                    Log.debug("Y axis as null");
+                }
             }
         }
         return drawableElements;
