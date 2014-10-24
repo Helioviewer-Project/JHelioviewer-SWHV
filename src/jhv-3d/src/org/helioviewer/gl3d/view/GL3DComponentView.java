@@ -261,7 +261,7 @@ public class GL3DComponentView extends AbstractComponentView implements GLEventL
     @Override
     public void viewChanged(View sender, ChangeEvent aEvent) {
 
-        if (aEvent.reasonOccurred(ViewChainChangedReason.class) || (aEvent.reasonOccurred(LayerChangedReason.class) && aEvent.getLastChangedReasonByType(LayerChangedReason.class).getLayerChangeType() == LayerChangeType.LAYER_ADDED)) {
+        if (aEvent != null && aEvent.reasonOccurred(ViewChainChangedReason.class) || (aEvent.reasonOccurred(LayerChangedReason.class) && aEvent.getLastChangedReasonByType(LayerChangedReason.class) != null && aEvent.getLastChangedReasonByType(LayerChangedReason.class).getLayerChangeType() == LayerChangeType.LAYER_ADDED)) {
             rebuildShadersRequest = true;
             this.viewportView = getAdapter(ViewportView.class);
         }
