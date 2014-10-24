@@ -68,7 +68,7 @@ public class ChartDrawValueRangePane extends JComponent implements EVEValueRange
     }
 
     private void initVisualComponents() {
-        setPreferredSize(new Dimension(ChartConstants.RANGE_SELECTION_WIDTH, getPreferredSize().height));
+        setPreferredSize(new Dimension(ChartConstants.getRangeSelectionWidth(), getPreferredSize().height));
         setSize(getPreferredSize());
     }
 
@@ -89,22 +89,22 @@ public class ChartDrawValueRangePane extends JComponent implements EVEValueRange
 
     private void computeRangeBorderPositions() {
         final double differenceAvailableValues = availableRange.max - availableRange.min;
-        final int availableRangeSpace = getHeight() - 1 - ChartConstants.GRAPH_TOP_SPACE - ChartConstants.GRAPH_BOTTOM_SPACE;
+        final int availableRangeSpace = getHeight() - 1 - ChartConstants.getGraphTopSpace() - ChartConstants.getGraphBottomSpace();
 
         final double min = selectedRange.min - availableRange.min;
         final double max = selectedRange.max - availableRange.min;
 
         topRangeBorderPosition = (availableRangeSpace - (int) ((max / differenceAvailableValues) * availableRangeSpace))
-                + ChartConstants.GRAPH_TOP_SPACE;
+                + ChartConstants.getGraphTopSpace();
         bottomRangeBorderPosition = (availableRangeSpace - (int) ((min / differenceAvailableValues) * availableRangeSpace))
-                + ChartConstants.GRAPH_TOP_SPACE;
+                + ChartConstants.getGraphTopSpace();
     }
 
     private void drawBackground(Graphics g) {
-        final int availableRangeSpace = getHeight() - 1 - ChartConstants.GRAPH_TOP_SPACE - ChartConstants.GRAPH_BOTTOM_SPACE;
+        final int availableRangeSpace = getHeight() - 1 - ChartConstants.getGraphTopSpace() - ChartConstants.getGraphBottomSpace();
 
         g.setColor(ChartConstants.AVAILABLE_INTERVAL_BACKGROUND_COLOR);
-        g.fillRect(0, ChartConstants.GRAPH_TOP_SPACE, getWidth(), availableRangeSpace);
+        g.fillRect(0, ChartConstants.getGraphTopSpace(), getWidth(), availableRangeSpace);
     }
 
     private void drawRange(Graphics g) {
@@ -170,7 +170,7 @@ public class ChartDrawValueRangePane extends JComponent implements EVEValueRange
         final int diffPixel = mousePressed.y > newMousePosition.y ? mousePressed.y - newMousePosition.y : newMousePosition.y
                 - mousePressed.y;
         final double diffRange = availableRange.max - availableRange.min;
-        final int availableRangeSpace = getHeight() - 1 - (ChartConstants.GRAPH_TOP_SPACE + ChartConstants.GRAPH_BOTTOM_SPACE);
+        final int availableRangeSpace = getHeight() - 1 - (ChartConstants.getGraphTopSpace() + ChartConstants.getGraphBottomSpace());
         final double movedValues = (diffPixel / (double) availableRangeSpace) * diffRange;
 
         final Range newRange = new Range();
@@ -203,12 +203,12 @@ public class ChartDrawValueRangePane extends JComponent implements EVEValueRange
             if (newMousePosition.y >= bottomRangeBorderPosition) {
                 useThisY = bottomRangeBorderPosition;
             }
-            if (newMousePosition.y < ChartConstants.GRAPH_TOP_SPACE) {
-                useThisY = ChartConstants.GRAPH_TOP_SPACE;
+            if (newMousePosition.y < ChartConstants.getGraphTopSpace()) {
+                useThisY = ChartConstants.getGraphTopSpace();
             }
-            final int availableRangeSpace = getHeight() - 1 - (ChartConstants.GRAPH_TOP_SPACE + ChartConstants.GRAPH_BOTTOM_SPACE);
+            final int availableRangeSpace = getHeight() - 1 - (ChartConstants.getGraphTopSpace() + ChartConstants.getGraphBottomSpace());
             final double diffRange = availableRange.max - availableRange.min;
-            final int position = (availableRangeSpace - (useThisY - ChartConstants.GRAPH_TOP_SPACE));
+            final int position = (availableRangeSpace - (useThisY - ChartConstants.getGraphTopSpace()));
             final double max = availableRange.min + ((position / (double) availableRangeSpace) * diffRange);
 
             plotAreaSpacemanager.getPlotAreaSpace(plotIdentifier).setScaledSelectedValue(selectedRange.min, max, forced);
@@ -216,13 +216,13 @@ public class ChartDrawValueRangePane extends JComponent implements EVEValueRange
             if (newMousePosition.y < topRangeBorderPosition) {
                 useThisY = topRangeBorderPosition;
             }
-            if (newMousePosition.y > getHeight() - ChartConstants.GRAPH_BOTTOM_SPACE + 1) {
-                useThisY = getHeight() - ChartConstants.GRAPH_BOTTOM_SPACE + 1;
+            if (newMousePosition.y > getHeight() - ChartConstants.getGraphBottomSpace() + 1) {
+                useThisY = getHeight() - ChartConstants.getGraphBottomSpace() + 1;
             }
-            final int availableRangeSpace = getHeight() - 1 - (ChartConstants.GRAPH_TOP_SPACE + ChartConstants.GRAPH_BOTTOM_SPACE);
+            final int availableRangeSpace = getHeight() - 1 - (ChartConstants.getGraphTopSpace() + ChartConstants.getGraphBottomSpace());
             final double diffRange = availableRange.max - availableRange.min;
             final double min = availableRange.min
-                    + (((availableRangeSpace - (useThisY - ChartConstants.GRAPH_TOP_SPACE)) / (double) availableRangeSpace) * diffRange);
+                    + (((availableRangeSpace - (useThisY - ChartConstants.getGraphTopSpace())) / (double) availableRangeSpace) * diffRange);
 
             plotAreaSpacemanager.getPlotAreaSpace(plotIdentifier).setScaledSelectedValue(min, selectedRange.max, forced);
         }
