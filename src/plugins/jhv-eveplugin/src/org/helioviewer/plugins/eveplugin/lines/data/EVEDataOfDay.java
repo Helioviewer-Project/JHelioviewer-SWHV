@@ -113,8 +113,12 @@ public class EVEDataOfDay {
      * @return Values within the given interval.
      * */
     public EVEValue[] getValuesInInterval(final Interval<Date> interval) {
-        if (values[MINUTES_PER_DAY - 1].date.compareTo(interval.getStart()) < 0 || values[0].date.compareTo(interval.getEnd()) > 0) {
-            return new EVEValue[0];
+        if (values[MINUTES_PER_DAY - 1].date.compareTo(interval.getStart()) < 0) {
+            return Arrays.copyOfRange(values, MINUTES_PER_DAY - 3, MINUTES_PER_DAY - 1);
+        }
+
+        if (values[0].date.compareTo(interval.getEnd()) > 0) {
+            return Arrays.copyOfRange(values, 0, 2);
         }
 
         int indexFrom = 0;
