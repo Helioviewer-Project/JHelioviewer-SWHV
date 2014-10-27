@@ -165,6 +165,10 @@ public class PlotAreaSpace {
         return value >= scaledMinValue && value <= scaledMaxValue;
     }
 
+    public void resetSelectedValueAndTimeInterval() {
+        setScaledSelectedTimeAndValue(scaledMinTime, scaledMaxTime, scaledMinValue, scaledMaxValue);
+    }
+
     @Override
     public String toString() {
         return "Scaled min time  : " + scaledMinTime + "\n" + "Scaled max time  : " + scaledMaxTime + "\n" + "Scaled min value : "
@@ -183,4 +187,5 @@ public class PlotAreaSpace {
                     scaledSelectedMaxValue, scaledSelectedMinTime, scaledSelectedMaxTime, forced);
         }
     }
+
 }

@@ -6,10 +6,11 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.helioviewer.plugins.eveplugin.model.PlotAreaSpaceManager;
 
 public class LineDataSelectorModel {
-    private List<LineDataSelectorModelListener> listeners;
-    private Map<String, List<LineDataSelectorElement>> elementMap;
+    private final List<LineDataSelectorModelListener> listeners;
+    private final Map<String, List<LineDataSelectorElement>> elementMap;
 
     private static LineDataSelectorModel instance;
 
@@ -50,12 +51,12 @@ public class LineDataSelectorModel {
 
     public synchronized void addLineData(LineDataSelectorElement element) {
         synchronized (elementMap) {
-            if (this.elementMap.containsKey(element.getPlotIdentifier())) {
-                this.elementMap.get(element.getPlotIdentifier()).add(element);
+            if (elementMap.containsKey(element.getPlotIdentifier())) {
+                elementMap.get(element.getPlotIdentifier()).add(element);
             } else {
                 ArrayList<LineDataSelectorElement> tempList = new ArrayList<LineDataSelectorElement>();
                 tempList.add(element);
-                this.elementMap.put(element.getPlotIdentifier(), tempList);
+                elementMap.put(element.getPlotIdentifier(), tempList);
             }
             fireLineDataSelectorElementAdded(element);
         }
@@ -63,7 +64,7 @@ public class LineDataSelectorModel {
 
     public List<LineDataSelectorElement> getAllLineDataSelectorElements(String identifier) {
         synchronized (elementMap) {
-            return this.elementMap.get(identifier);
+            return elementMap.get(identifier);
         }
     }
 
@@ -74,6 +75,7 @@ public class LineDataSelectorModel {
                 elements.remove(element);
                 if (elements.size() == 0) {
                     elementMap.remove(element.getPlotIdentifier());
+                    PlotAreaSpaceManager.getInstance().getPlotAreaSpace(element.getPlotIdentifier()).resetSelectedValueAndTimeInterval();
                 }
             }
 
