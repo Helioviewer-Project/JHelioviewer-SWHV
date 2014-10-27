@@ -424,29 +424,34 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
         final int y0 = Math.max(graphArea.y, Math.min(graphArea.y + graphArea.height, mousePressedPosition.y));
         final int x1 = Math.max(graphArea.x, Math.min(graphArea.x + graphArea.width, mouseDragPosition.x));
         final int y1 = Math.max(graphArea.y, Math.min(graphArea.y + graphArea.height, mouseDragPosition.y));
-        List<PlotAreaSpace> pass = new ArrayList<PlotAreaSpace>();
-        Map<PlotAreaSpace, Double> minTime = new HashMap<PlotAreaSpace, Double>();
-        Map<PlotAreaSpace, Double> maxTime = new HashMap<PlotAreaSpace, Double>();
-        for (PlotAreaSpace pas : plotAreaSpaceManager.getAllPlotAreaSpaces()) {
-            pass.add(pas);
-            double ratioTime = graphArea.width / (pas.getScaledSelectedMaxTime() - pas.getScaledSelectedMinTime());
+        if (!(x0 == x1 || y0 == y1)) {
+            List<PlotAreaSpace> pass = new ArrayList<PlotAreaSpace>();
+            Map<PlotAreaSpace, Double> minTime = new HashMap<PlotAreaSpace, Double>();
+            Map<PlotAreaSpace, Double> maxTime = new HashMap<PlotAreaSpace, Double>();
+            for (PlotAreaSpace pas : plotAreaSpaceManager.getAllPlotAreaSpaces()) {
+                pass.add(pas);
+                double ratioTime = graphArea.width / (pas.getScaledSelectedMaxTime() - pas.getScaledSelectedMinTime());
 
-            double startTime = pas.getScaledSelectedMinTime() + (Math.min(x0, x1) - graphArea.x) / ratioTime;
-            double endTime = pas.getScaledSelectedMinTime() + (Math.max(x0, x1) - graphArea.x) / ratioTime;
+                double startTime = pas.getScaledSelectedMinTime() + (Math.min(x0, x1) - graphArea.x) / ratioTime;
+                double endTime = pas.getScaledSelectedMinTime() + (Math.max(x0, x1) - graphArea.x) / ratioTime;
 
-            minTime.put(pas, startTime);
-            maxTime.put(pas, endTime);
+                minTime.put(pas, startTime);
+                maxTime.put(pas, endTime);
+            }
+            for (PlotAreaSpace pas : pass) {
+                pas.setScaledSelectedTime(minTime.get(pas), maxTime.get(pas), false);
+            }
+
+            PlotAreaSpace myPlotAreaSpace = plotAreaSpaceManager.getPlotAreaSpace(identifier);
+            double ratioValue = graphArea.height
+                    / (myPlotAreaSpace.getScaledSelectedMaxValue() - myPlotAreaSpace.getScaledSelectedMinValue());
+            double startValue = (graphArea.y + graphArea.height - Math.max(y0, y1)) / ratioValue
+                    + myPlotAreaSpace.getScaledSelectedMinValue();
+            double endValue = (graphArea.y + graphArea.height - Math.min(y0, y1)) / ratioValue
+                    + myPlotAreaSpace.getScaledSelectedMinValue();
+
+            myPlotAreaSpace.setScaledSelectedValue(startValue, endValue, false);
         }
-        for (PlotAreaSpace pas : pass) {
-            pas.setScaledSelectedTime(minTime.get(pas), maxTime.get(pas), false);
-        }
-
-        PlotAreaSpace myPlotAreaSpace = plotAreaSpaceManager.getPlotAreaSpace(identifier);
-        double ratioValue = graphArea.height / (myPlotAreaSpace.getScaledSelectedMaxValue() - myPlotAreaSpace.getScaledSelectedMinValue());
-        double startValue = (graphArea.y + graphArea.height - Math.max(y0, y1)) / ratioValue + myPlotAreaSpace.getScaledSelectedMinValue();
-        double endValue = (graphArea.y + graphArea.height - Math.min(y0, y1)) / ratioValue + myPlotAreaSpace.getScaledSelectedMinValue();
-
-        myPlotAreaSpace.setScaledSelectedValue(startValue, endValue, false);
     }
 
     private void updateGraphArea() {
