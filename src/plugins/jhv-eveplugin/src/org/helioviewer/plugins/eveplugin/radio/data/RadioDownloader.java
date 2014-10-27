@@ -140,9 +140,11 @@ public class RadioDownloader {
                                 }
                                 List<Interval<Date>> noDataList = new ArrayList<Interval<Date>>();
                                 for (Interval<Date> noData : result.getNoDataIntervals()) {
-                                    if (cache.addNoDataInterval(noData, identifier)) {
-                                        noDataList.add(noData);
-                                    }
+                                    // if (cache.addNoDataInterval(noData,
+                                    // identifier)) {
+                                    cache.addNoDataInterval(noData, identifier);
+                                    noDataList.add(noData);
+                                    // }
                                 }
                                 fireNoData(noDataList, identifier, result.getDownloadID());
                             }
