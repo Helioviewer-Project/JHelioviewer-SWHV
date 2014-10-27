@@ -2,6 +2,7 @@ package org.helioviewer.plugins.eveplugin.view.plot;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
+import java.awt.EventQueue;
 import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -241,21 +242,34 @@ public class PlotsControlPanel extends JPanel implements ZoomControllerListener,
 
     @Override
     public void layerAdded(int idx) {
-        if (setDefaultPeriod) {
-            setDefaultPeriod = false;
-            final Interval<Date> interval = new Interval<Date>(LayersModel.getSingletonInstance().getFirstDate(), LayersModel
-                    .getSingletonInstance().getLastDate());
-            ZoomController.getSingletonInstance().setAvailableInterval(interval);
-            // PlotTimeSpace.getInstance().setSelectedMinAndMaxTime(interval.getStart(),
-            // interval.getEnd());
-        }
+        EventQueue.invokeLater(new Runnable() {
 
-        setEnabledStateOfPeriodMovieButton();
+            @Override
+            public void run() {
+                if (setDefaultPeriod) {
+                    setDefaultPeriod = false;
+                    final Interval<Date> interval = new Interval<Date>(LayersModel.getSingletonInstance().getFirstDate(), LayersModel
+                            .getSingletonInstance().getLastDate());
+                    ZoomController.getSingletonInstance().setAvailableInterval(interval);
+                    // PlotTimeSpace.getInstance().setSelectedMinAndMaxTime(interval.getStart(),
+                    // interval.getEnd());
+                }
+
+                setEnabledStateOfPeriodMovieButton();
+            }
+        });
+
     }
 
     @Override
     public void layerRemoved(View oldView, int oldIdx) {
-        setEnabledStateOfPeriodMovieButton();
+        EventQueue.invokeLater(new Runnable() {
+            @Override
+            public void run() {
+                setEnabledStateOfPeriodMovieButton();
+            }
+        });
+
     }
 
     @Override
