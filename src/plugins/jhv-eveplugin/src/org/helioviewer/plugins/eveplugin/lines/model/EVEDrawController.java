@@ -132,11 +132,11 @@ public class EVEDrawController implements BandControllerListener, ZoomController
         availableRangeMap.get(band.getUnitLabel()).setMax(data.getMaximumValue());
         if (oldAvailableRange.min != availableRangeMap.get(band.getUnitLabel()).min
                 || oldAvailableRange.max != availableRangeMap.get(band.getUnitLabel()).max) {
-            Log.trace("update band available range changed so we change the plotareaSpace");
+            // Log.trace("update band available range changed so we change the plotareaSpace");
             checkSelectedRange(availableRangeMap.get(band.getUnitLabel()), selectedRangeMap.get(band.getUnitLabel()));
             updatePlotAreaSpace(availableRangeMap.get(band.getUnitLabel()), selectedRangeMap.get(band.getUnitLabel()));
         } else {
-            Log.trace("Same available range");
+            // Log.trace("Same available range");
         }
         dataMapPerUnitLabel.get(band.getUnitLabel()).put(band, data);
     }

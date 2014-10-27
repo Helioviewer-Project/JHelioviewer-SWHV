@@ -89,12 +89,12 @@ public class DownloadedJPXData implements ViewListener {
     @Override
     public synchronized void viewChanged(final View sender, final ChangeEvent aEvent) {
 
-        Log.trace("View changed for image ID : " + imageID);
-        Log.debug("Event type: " + aEvent);
-        Log.debug("dworker dowloadedjpxdata : " + this);
+        // Log.trace("View changed for image ID : " + imageID);
+        // Log.debug("Event type: " + aEvent);
+        // Log.debug("dworker dowloadedjpxdata : " + this);
         while (worker != null && !worker.isDone()) {
             try {
-                Log.debug("dworker is busy sleep 10ms");
+                // Log.debug("dworker is busy sleep 10ms");
                 Thread.sleep(10);
             } catch (InterruptedException e) {
                 // TODO Auto-generated catch block
@@ -108,8 +108,9 @@ public class DownloadedJPXData implements ViewListener {
 
             @Override
             protected DownloadedJPXDataWorkerResult doInBackground() {
-                Log.trace("dworker " + nr + " View changed for image ID : " + imageID);
-                Log.debug("dworker " + nr + " Event type: " + aEvent);
+                // Log.trace("dworker " + nr + " View changed for image ID : " +
+                // imageID);
+                // Log.debug("dworker " + nr + " Event type: " + aEvent);
                 for (ViewportChangedReason cr : aEvent.getAllChangedReasonsByType(ViewportChangedReason.class)) {
                     radioDataManager.finishedDownloadingID(imageID, downloadID);
                 }
@@ -136,7 +137,8 @@ public class DownloadedJPXData implements ViewListener {
                             // imageData.getHeight()));
                         }
                     } else {
-                        Log.debug("dworker " + nr + " Download not complete");
+                        // Log.debug("dworker " + nr +
+                        // " Download not complete");
                         return null;
                     }
                 } else {
@@ -175,10 +177,10 @@ public class DownloadedJPXData implements ViewListener {
                             radioDataManager.dataForIDReceived(result.getData(), result.getImageID(), result.getDownloadID(),
                                     result.getDataSize());
                         } else {
-                            Log.debug("dWorker" + nr + " : Result is null");
+                            // Log.debug("dWorker" + nr + " : Result is null");
                         }
                     } else {
-                        Log.debug("dWorker" + nr + " was cancelled");
+                        // Log.debug("dWorker" + nr + " was cancelled");
                     }
                 } catch (InterruptedException e) {
                     // TODO Auto-generated catch block

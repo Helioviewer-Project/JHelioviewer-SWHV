@@ -159,7 +159,7 @@ public class RadioPlotModel implements RadioDataManagerListener, ZoomDataConfigL
     @Override
     public void newDataReceived(byte[] data, Interval<Date> timeInterval, FrequencyInterval freqInterval, Rectangle area,
             List<Long> IDList, String identifier, Long radioImageID) {
-        Log.debug("Size of buffered images: " + bufferedImages.size());
+        // Log.debug("Size of buffered images: " + bufferedImages.size());
     }
 
     @Override
