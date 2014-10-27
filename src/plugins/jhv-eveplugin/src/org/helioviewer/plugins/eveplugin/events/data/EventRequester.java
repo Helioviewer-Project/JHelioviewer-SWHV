@@ -7,7 +7,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.NavigableMap;
 
-import org.helioviewer.base.logging.Log;
 import org.helioviewer.base.math.Interval;
 import org.helioviewer.jhv.data.container.JHVEventContainer;
 import org.helioviewer.jhv.data.container.JHVEventHandler;
@@ -100,7 +99,7 @@ public class EventRequester implements ZoomControllerListener, JHVEventHandler {
     @Override
     public void selectedIntervalChanged(Interval<Date> newInterval) {
         selectedInterval = newInterval;
-        Log.info("selectedInterval : " + newInterval);
+        // Log.info("selectedInterval : " + newInterval);
         if (!EVEState.getSingletonInstance().isMouseTimeIntervalDragging()) {
             EventQueue.invokeLater(new Runnable() {
                 private Interval<Date> interval;
@@ -119,7 +118,7 @@ public class EventRequester implements ZoomControllerListener, JHVEventHandler {
 
             }.init(newInterval, this));
         } else {
-            Log.info("Mouse dragging");
+            // Log.info("Mouse dragging");
         }
     }
 
@@ -135,7 +134,7 @@ public class EventRequester implements ZoomControllerListener, JHVEventHandler {
 
             @Override
             public void run() {
-                Log.debug("new events received " + eventList.size());
+                // Log.debug("new events received " + eventList.size());
                 fireNewEventsReceived(eventList);
             }
 
@@ -158,7 +157,7 @@ public class EventRequester implements ZoomControllerListener, JHVEventHandler {
 
             @Override
             public void run() {
-                Log.debug("Request for interval");
+                // Log.debug("Request for interval");
                 eventContainer.requestForInterval(selectedInterval.getStart(), selectedInterval.getEnd(), eventHandler);
             }
 

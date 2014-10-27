@@ -8,7 +8,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.helioviewer.base.logging.Log;
 import org.helioviewer.plugins.eveplugin.draw.DrawableElement;
 import org.helioviewer.plugins.eveplugin.draw.DrawableType;
 import org.helioviewer.plugins.eveplugin.draw.YAxisElement;
@@ -47,13 +46,13 @@ public class DrawControllerData {
 
     public Map<DrawableType, Set<DrawableElement>> getDrawableElements() {
         for (DrawableType dt : drawableElements.keySet()) {
-            Log.debug(dt + " : " + drawableElements.get(dt).size());
+            // Log.debug(dt + " : " + drawableElements.get(dt).size());
             for (DrawableElement de : drawableElements.get(dt)) {
-                Log.debug(de.hasElementsToDraw());
+                // Log.debug(de.hasElementsToDraw());
                 if (de.getYAxisElement() != null) {
-                    Log.debug(de.getYAxisElement().getLabel());
+                    // Log.debug(de.getYAxisElement().getLabel());
                 } else {
-                    Log.debug("Y axis as null");
+                    // Log.debug("Y axis as null");
                 }
             }
         }
@@ -110,8 +109,6 @@ public class DrawControllerData {
     }
 
     public void removeDrawableElement(final DrawableElement element) {
-        Log.error("Remove drawable element");
-        Thread.dumpStack();
         Set<DrawableElement> elements = drawableElements.get(element.getDrawableElementType().getLevel());
         if (elements != null) {
             synchronized (elements) {

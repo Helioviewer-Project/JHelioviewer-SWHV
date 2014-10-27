@@ -261,9 +261,9 @@ public class ZoomManager implements ZoomControllerListener, PlotAreaSpaceListene
     }
 
     private int defineXInDestinationArea(Date dateToFind, ZoomDataConfig zdc) {
-        Log.debug(zdc);
-        Log.debug(zdc.getDisplaySize());
-        Log.debug(zdc.getDisplaySize().x);
+        // Log.debug(zdc);
+        // Log.debug(zdc.getDisplaySize());
+        // Log.debug(zdc.getDisplaySize().x);
         return zdc.getDisplaySize().x
                 + (int) Math.floor((dateToFind.getTime() - zdc.getMinX().getTime())
                         / (1.0 * (zdc.getMaxX().getTime() - zdc.getMinX().getTime()) / zdc.getDisplaySize().width));

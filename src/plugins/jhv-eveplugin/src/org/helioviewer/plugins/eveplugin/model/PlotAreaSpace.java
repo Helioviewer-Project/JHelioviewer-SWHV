@@ -3,8 +3,6 @@ package org.helioviewer.plugins.eveplugin.model;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.helioviewer.base.logging.Log;
-
 public class PlotAreaSpace {
 
     private double scaledMinValue;
@@ -180,9 +178,9 @@ public class PlotAreaSpace {
     }
 
     private void firePlotAreaSpaceChanged(boolean forced) {
-        Log.info("Listeners size : " + listeners.size());
+        // Log.info("Listeners size : " + listeners.size());
         for (PlotAreaSpaceListener l : listeners) {
-            Log.info("listener : " + l);
+            // Log.info("listener : " + l);
             l.plotAreaSpaceChanged(scaledMinValue, scaledMaxValue, scaledMinTime, scaledMaxTime, scaledSelectedMinValue,
                     scaledSelectedMaxValue, scaledSelectedMinTime, scaledSelectedMaxTime, forced);
         }

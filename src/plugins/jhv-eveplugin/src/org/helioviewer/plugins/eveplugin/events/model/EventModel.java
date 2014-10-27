@@ -264,7 +264,8 @@ public class EventModel implements ZoomControllerListener, EventRequesterListene
                                     }
                                     plotConfig.add(new EventPlotConfiguration(event, scaledX0, scaledX1, eventPosition));
                                 } else {
-                                    Log.debug("Event with unique ID : " + event.getUniqueID() + "not drawn");
+                                    // Log.debug("Event with unique ID : " +
+                                    // event.getUniqueID() + "not drawn");
                                 }
                             }
                         }
@@ -285,7 +286,7 @@ public class EventModel implements ZoomControllerListener, EventRequesterListene
                             DrawController.getSingletonInstance().updateDrawableElement(eventPanel, plot);
                         }
                     } else {
-                        Log.info("Worker was cancelled");
+                        // Log.info("Worker was cancelled");
                     }
                 } catch (InterruptedException e) {
                     Log.error("Could not create the event type plot configurations" + e.getMessage());

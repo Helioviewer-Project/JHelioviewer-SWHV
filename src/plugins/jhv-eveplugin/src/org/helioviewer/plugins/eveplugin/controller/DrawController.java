@@ -204,10 +204,11 @@ public class DrawController implements ZoomControllerListener, LineDataSelectorM
     private void fireRedrawRequest() {
         synchronized (drawControllerData) {
             for (DrawControllerData dcd : drawControllerData.values()) {
-                Log.info("DrawController listeners size: " + dcd.getListeners().size());
+                // Log.info("DrawController listeners size: " +
+                // dcd.getListeners().size());
                 synchronized (dcd.getListeners()) {
                     for (DrawControllerListener l : dcd.getListeners()) {
-                        Log.info("Draw Controller listener : " + l);
+                        // Log.info("Draw Controller listener : " + l);
                         l.drawRequest();
                     }
                 }
