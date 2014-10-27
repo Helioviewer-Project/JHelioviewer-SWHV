@@ -110,7 +110,7 @@ public class PfssData {
             double phi = Astronomy.getL0Radians(dd) - Math.PI / 2.;//DifferentialRotation.calculateRotationInRadians(0.0, deltat) % (Math.PI * 2.0) - Math.PI / 2.;
 
             for (int i = 0; i < fieldlinex.length; i++) {
-                if (i / PfssSettings.POINTS_PER_LINE % 8 <= 8 - PfssSettings.qualityReduction) {
+                if (i / PfssSettings.POINTS_PER_LINE % 9 <= 8 - PfssSettings.qualityReduction) {
                     int rx = fieldlinex[i] + 32768;
                     int ry = fieldliney[i] + 32768;
                     int rz = fieldlinez[i] + 32768;
