@@ -79,20 +79,20 @@ public class DoubleMinMaxFilterPanel extends AbstractFilterPanel {
             public void stateChanged(ChangeEvent e) {
                 if ((Double) minimumValueSpinner.getValue() > (Double) maximumValueSpinner.getValue()) {
                     maximumValueSpinner.setValue(minimumValueSpinner.getValue());
-                    filterToggleButton.setSelected(false);
                 }
+                filterToggleButton.setSelected(false);
             }
         });
         WheelSupport.installMouseWheelSupport(minimumValueSpinner);
         maximumValueSpinner = new JSpinner(maximumSpinnerModel);
-        maximumValueSpinner.setEditor(new JSpinner.NumberEditor(maximumValueSpinner, "0.0000000"));
+        maximumValueSpinner.setEditor(new JSpinner.NumberEditor(maximumValueSpinner, "0.00000000"));
         maximumSpinnerModel.addChangeListener(new ChangeListener() {
             @Override
             public void stateChanged(ChangeEvent e) {
                 if ((Double) maximumValueSpinner.getValue() < (Double) minimumValueSpinner.getValue()) {
                     minimumValueSpinner.setValue(maximumValueSpinner.getValue());
-                    filterToggleButton.setSelected(false);
                 }
+                filterToggleButton.setSelected(false);
             }
         });
         WheelSupport.installMouseWheelSupport(maximumValueSpinner);
