@@ -5,7 +5,6 @@ import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.LinkedList;
 
-import org.helioviewer.base.logging.Log;
 import org.helioviewer.base.math.Interval;
 import org.helioviewer.plugins.eveplugin.lines.data.BandController;
 import org.helioviewer.plugins.eveplugin.lines.data.DownloadController;
@@ -271,7 +270,8 @@ public class ZoomController implements PlotAreaSpaceListener {
                 double selectedMax = (scaledSelectedMaxTime - scaledMinTime) / scaleDiff;
                 Date newSelectedStartTime = new Date(availableInterval.getStart().getTime() + Math.round(diffTime * selectedMin));
                 Date newSelectedEndTime = new Date(availableInterval.getStart().getTime() + Math.round(diffTime * selectedMax));
-                Log.info("plotareachanged starttime: " + newSelectedStartTime + " endtime: " + newSelectedEndTime);
+                // Log.info("plotareachanged starttime: " + newSelectedStartTime
+                // + " endtime: " + newSelectedEndTime);
                 if (forced
                         || !(newSelectedEndTime.equals(selectedInterval.getEnd()) && newSelectedStartTime.equals(selectedInterval
                                 .getStart()))) {
