@@ -1,6 +1,7 @@
 package org.helioviewer.plugins.eveplugin.lines.model;
 
 import java.awt.Color;
+import java.awt.EventQueue;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -375,9 +376,16 @@ public class EVEDrawController implements BandControllerListener, ZoomController
     }
 
     @Override
-    public void timestampChanged(int idx) {
-        final ImmutableDateTime timestamp = LayersModel.getSingletonInstance().getCurrentFrameTimestamp(idx);
-        fireRedrawRequestMovieFrameChanged(timestamp.getTime());
+    public void timestampChanged(final int idx) {
+        EventQueue.invokeLater(new Runnable() {
+
+            @Override
+            public void run() {
+                final ImmutableDateTime timestamp = LayersModel.getSingletonInstance().getCurrentFrameTimestamp(idx);
+                fireRedrawRequestMovieFrameChanged(timestamp.getTime());
+            }
+        });
+
     }
 
     @Override
