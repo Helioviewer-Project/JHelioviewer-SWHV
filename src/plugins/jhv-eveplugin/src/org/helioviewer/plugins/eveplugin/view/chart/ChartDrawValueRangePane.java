@@ -300,13 +300,13 @@ public class ChartDrawValueRangePane extends JComponent implements EVEValueRange
         }
 
         // is mouse cursor above of one of the grasp points?
-        if (e.getPoint().y >= topRangeBorderPosition - 5 && e.getPoint().y <= topRangeBorderPosition + 5
+        if (e.getPoint().y >= topRangeBorderPosition - 5 && e.getPoint().y <= topRangeBorderPosition
                 && e.getPoint().x >= (getWidth() / 2 - 5) && e.getPoint().x <= (getWidth() / 2 + 5)) {
             mouseOverTopGraspPoint = true;
             setCursor(new Cursor(Cursor.N_RESIZE_CURSOR));
         }
 
-        if (e.getPoint().y >= bottomRangeBorderPosition - 5 && e.getPoint().y <= bottomRangeBorderPosition + 5
+        if (e.getPoint().y >= bottomRangeBorderPosition && e.getPoint().y <= bottomRangeBorderPosition + 5
                 && e.getPoint().x >= (getWidth() / 2 - 5) && e.getPoint().x <= (getWidth() / 2 + 5)) {
             mouseOverBottomGraspPoint = true;
             setCursor(new Cursor(Cursor.N_RESIZE_CURSOR));
