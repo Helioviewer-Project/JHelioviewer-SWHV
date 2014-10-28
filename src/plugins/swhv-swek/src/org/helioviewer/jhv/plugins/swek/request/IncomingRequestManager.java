@@ -114,8 +114,14 @@ public class IncomingRequestManager implements JHVEventContainerRequestHandler {
         synchronized (SWEKPluginLocks.requestLock) {
             if (addToUniqueInterval(startDate, endDate)) {
                 Interval<Date> interval = new Interval<Date>(startDate, endDate);
+                for (Interval<Date> inter : intervalList.values()) {
+                    if (inter.containsInclusive(interval)) {
+                        return;
+                    }
+                }
                 intervalList.put(requestID, interval);
                 fireNewIntervalRequested(interval, requestID);
+
             }
         }
     }
