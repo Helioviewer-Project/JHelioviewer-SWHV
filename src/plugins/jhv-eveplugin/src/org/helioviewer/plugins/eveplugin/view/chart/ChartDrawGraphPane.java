@@ -105,23 +105,19 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
 
     @Override
     protected void paintComponent(Graphics g) {
-        synchronized (this) {
-            Graphics2D g2 = (Graphics2D) g;
-            // AffineTransform tf = g2.getTransform();
-            // tf.preConcatenate(AffineTransform.getScaleInstance(0.5, 0.5));
-            // g2.setTransform(tf);
-            super.paintComponent(g2);
-            if (lastKnownWidth != getWidth() || lastKnownHeight != getHeight()) {
-                updateGraph();
-                lastKnownWidth = getWidth();
-                lastKnownHeight = getHeight();
-            }
-            if (screenImage != null) {
-                g2.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BILINEAR);
+        Graphics2D g2 = (Graphics2D) g;
 
-                g2.drawImage(screenImage, 0, 0, getWidth(), getHeight(), 0, 0, screenImage.getWidth(), screenImage.getHeight(), null);
-                drawMovieLine(g2);
-            }
+        super.paintComponent(g2);
+        if (lastKnownWidth != getWidth() || lastKnownHeight != getHeight()) {
+            updateGraph();
+            lastKnownWidth = getWidth();
+            lastKnownHeight = getHeight();
+        }
+        if (screenImage != null) {
+            g2.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BILINEAR);
+
+            g2.drawImage(screenImage, 0, 0, getWidth(), getHeight(), 0, 0, screenImage.getWidth(), screenImage.getHeight(), null);
+            drawMovieLine(g2);
         }
     }
 
