@@ -230,6 +230,12 @@ public class JHVEventCache {
                             eventIDs.remove(event.getUniqueID());
                             allEvents.remove(event.getUniqueID());
                             missingEventsInEventRelations.remove(event.getUniqueID());
+                            eventsWithRelationRules.remove(event);
+                            for (JHVEventRelation relation : event.getEventRelationShip().getRelatedEventsByRule().values()) {
+                                if (relation.getTheEvent() != null) {
+                                    relation.getTheEvent().getEventRelationShip().getRelatedEventsByRule().remove(event.getUniqueID());
+                                }
+                            }
                         }
                     }
                     eventList.removeAll(deleteList);
