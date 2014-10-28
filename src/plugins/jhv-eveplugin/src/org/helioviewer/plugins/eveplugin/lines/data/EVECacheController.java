@@ -1,5 +1,6 @@
 package org.helioviewer.plugins.eveplugin.lines.data;
 
+import java.awt.EventQueue;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
@@ -67,15 +68,17 @@ public class EVECacheController implements DataDownloader {
     }
 
     public EVEValues getDataInInterval(final Band band, final Interval<Date> interval) {
-        if (band == null || interval == null || interval.getStart() == null || interval.getEnd() == null)
+        if (band == null || interval == null || interval.getStart() == null || interval.getEnd() == null) {
             return null;
+        }
 
         return cache.getValuesInInterval(band, interval);
     }
 
     public Range getMinMaxInInterval(final Band band, final Interval<Date> interval) {
-        if (band == null || interval == null || interval.getStart() == null || interval.getEnd() == null)
+        if (band == null || interval == null || interval.getStart() == null || interval.getEnd() == null) {
             return new Range();
+        }
 
         return cache.getMinMaxInInterval(band, interval);
     }
@@ -88,19 +91,29 @@ public class EVECacheController implements DataDownloader {
         GregorianCalendar calendar = new GregorianCalendar();
         calendar.setTime(date);
 
-        GregorianCalendar day = new GregorianCalendar(calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH), calendar.get(Calendar.DAY_OF_MONTH));
+        GregorianCalendar day = new GregorianCalendar(calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH),
+                calendar.get(Calendar.DAY_OF_MONTH));
         return day.getTime();
     }
 
     private void fireDataAdded(final Band band) {
-        for (EVECacheControllerListener listener : controllerListeners)
-            listener.dataAdded(band);
+        EventQueue.invokeLater(new Runnable() {
+
+            @Override
+            public void run() {
+                for (EVECacheControllerListener listener : controllerListeners) {
+                    listener.dataAdded(band);
+                }
+            }
+        });
+
     }
 
     @Override
     public DownloadedData downloadData(Band band, Interval<Date> interval) {
-        if (band == null || interval == null || interval.getStart() == null || interval.getEnd() == null)
+        if (band == null || interval == null || interval.getStart() == null || interval.getEnd() == null) {
             return null;
+        }
 
         return cache.getValuesInInterval(band, interval);
     }
