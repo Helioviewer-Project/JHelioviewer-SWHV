@@ -179,6 +179,16 @@ public class SWEKConfigurationManager {
     }
 
     /**
+     * Gets the related event rules.
+     * 
+     * @return the related event rules.
+     */
+    public List<SWEKRelatedEvents> getSWEKRelatedEvents() {
+        loadConfiguration();
+        return configuration.getRelatedEvents();
+    }
+
+    /**
      * Downloads the SWEK configuration from the Internet and saves it in the
      * plugin home directory.
      * 
@@ -1102,7 +1112,8 @@ public class SWEKConfigurationManager {
      *             if the "parameter from" could not be parsed
      */
     private SWEKParameter parseParameterFrom(JSONObject jsonObject) throws JSONException {
-        return parameters.get(jsonObject.getString("parameter_from"));
+        String parameterName = jsonObject.getString("parameter_from");
+        return new SWEKParameter("", parameterName, parameterName, null, false);
     }
 
     /**
@@ -1115,6 +1126,7 @@ public class SWEKConfigurationManager {
      *             if the "parameter with" could not be parsed
      */
     private SWEKParameter parseParameterWith(JSONObject jsonObject) throws JSONException {
-        return parameters.get(jsonObject.getString("parameter_with"));
+        String parameterName = jsonObject.getString("parameter_with");
+        return new SWEKParameter("", parameterName, parameterName, null, false);
     }
 }
