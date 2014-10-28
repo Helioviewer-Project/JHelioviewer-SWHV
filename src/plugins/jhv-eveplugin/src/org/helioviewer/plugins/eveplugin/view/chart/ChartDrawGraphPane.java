@@ -146,10 +146,11 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
             tf.preConcatenate(AffineTransform.getScaleInstance(screenfactor, screenfactor));
             g.setTransform(tf);
             drawBackground(g);
+
             BufferedImage plotPart = screenImage.getSubimage(screenfactor * ChartConstants.getGraphLeftSpace(), screenfactor
-                    * ChartConstants.getGraphTopSpace(),
-                    width - screenfactor * ChartConstants.getGraphLeftSpace() - 2 * ChartConstants.getGraphRightSpace(), height
-                            - screenfactor * ChartConstants.getGraphTopSpace() - screenfactor * ChartConstants.getGraphBottomSpace());
+                    * ChartConstants.getGraphTopSpace(), width - screenfactor * ChartConstants.getGraphLeftSpace() - screenfactor
+                    * ChartConstants.getGraphRightSpace() - screenfactor * twoYAxis * ChartConstants.getTwoAxisGraphRight(), height
+                    - screenfactor * ChartConstants.getGraphTopSpace() - screenfactor * ChartConstants.getGraphBottomSpace());
             Graphics2D gplotPart = plotPart.createGraphics();
             gplotPart.setTransform(tf);
             BufferedImage leftAxisPart = screenImage.getSubimage(0, 0, 2 * ChartConstants.getGraphLeftSpace(), height);
