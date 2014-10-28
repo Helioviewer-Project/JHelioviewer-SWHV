@@ -6,8 +6,8 @@ import java.awt.image.BufferedImage;
 import org.helioviewer.base.logging.Log;
 
 public class PlotConfig {
-    private BufferedImage image;
-    private DrawableAreaMap map;
+    private final BufferedImage image;
+    private final DrawableAreaMap map;
     private boolean visible;
     private Long downloadID;
     private Long imageId;
@@ -18,13 +18,15 @@ public class PlotConfig {
         this.map = map;
         this.visible = visible;
         this.downloadID = downloadID;
-        this.imageId = imageID;
+        imageId = imageID;
     }
 
     public void draw(Graphics g) {
         if (visible) {
+            Thread.dumpStack();
             Log.trace("Draw image on : " + map);
-            g.drawImage(image, map.getDestinationX0(), map.getDestinationY0(), map.getDestinationX1(), map.getDestinationY1(), map.getSourceX0(), map.getSourceY0(), map.getSourceX1(), map.getSourceY1(), null);
+            g.drawImage(image, map.getDestinationX0(), map.getDestinationY0(), map.getDestinationX1(), map.getDestinationY1(),
+                    map.getSourceX0(), map.getSourceY0(), map.getSourceX1(), map.getSourceY1(), null);
         }
     }
 
