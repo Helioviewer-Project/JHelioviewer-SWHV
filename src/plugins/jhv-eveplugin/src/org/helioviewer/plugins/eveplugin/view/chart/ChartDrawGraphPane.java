@@ -2,6 +2,7 @@ package org.helioviewer.plugins.eveplugin.view.chart;
 
 import java.awt.Color;
 import java.awt.Cursor;
+import java.awt.EventQueue;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Point;
@@ -679,29 +680,28 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
 
     @Override
     public void drawRequest() {
-        synchronized (this) {
-            updateGraph();
-            repaint();
-        }
+        EventQueue.invokeLater(new Runnable() {
+            @Override
+            public void run() {
+                updateGraph();
+                repaint();
+            }
+        });
     }
 
     @Override
     public void chartRedrawRequested() {
-        synchronized (this) {
-            this.redrawGraph();
-        }
+        this.redrawGraph();
     }
 
     @Override
     public void drawMovieLineRequest(Date time) {
-        synchronized (this) {
-            movieTimestamp = time;
+        movieTimestamp = time;
 
-            updateMovieLineInformation();
+        updateMovieLineInformation();
 
-            if (!TimeIntervalLockModel.getInstance().isLocked()) {
-                repaint();
-            }
+        if (!TimeIntervalLockModel.getInstance().isLocked()) {
+            repaint();
         }
     }
 }
