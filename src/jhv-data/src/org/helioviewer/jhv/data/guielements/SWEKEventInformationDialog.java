@@ -227,44 +227,46 @@ public class SWEKEventInformationDialog extends JDialog implements WindowFocusLi
         JPanel allPrecedingEvents = new JPanel();
         allPrecedingEvents.setLayout(new BoxLayout(allPrecedingEvents, BoxLayout.Y_AXIS));
         for (final JHVEventRelation er : relations.values()) {
-            JPanel eventAndButtonPanel = new JPanel();
+            if (er.getTheEvent() != null) {
+                JPanel eventAndButtonPanel = new JPanel();
 
-            JButton detailsButton = new JButton("Details");
-            detailsButton.addActionListener(new ActionListener() {
+                JButton detailsButton = new JButton("Details");
+                detailsButton.addActionListener(new ActionListener() {
 
-                @Override
-                public void actionPerformed(ActionEvent e) {
-                    if (er.getTheEvent() != null) {
-                        incrementNrOfWindows();
-                        SWEKEventInformationDialog dialog = new SWEKEventInformationDialog(er.getTheEvent(),
-                                SWEKEventInformationDialog.this, true);
-                        // dialog.setLocation();
-                        dialog.addWindowListener(SWEKEventInformationDialog.this);
-                        dialog.validate();
-                        dialog.pack();
-                        dialog.setVisible(true);
+                    @Override
+                    public void actionPerformed(ActionEvent e) {
+                        if (er.getTheEvent() != null) {
+                            incrementNrOfWindows();
+                            SWEKEventInformationDialog dialog = new SWEKEventInformationDialog(er.getTheEvent(),
+                                    SWEKEventInformationDialog.this, true);
+                            // dialog.setLocation();
+                            dialog.addWindowListener(SWEKEventInformationDialog.this);
+                            dialog.validate();
+                            dialog.pack();
+                            dialog.setVisible(true);
+                        }
                     }
-                }
-            });
+                });
 
-            eventAndButtonPanel.setLayout(new GridBagLayout());
-            GridBagConstraints c = new GridBagConstraints();
-            c.gridx = 0;
-            c.gridy = 0;
-            c.fill = GridBagConstraints.BOTH;
-            c.anchor = GridBagConstraints.CENTER;
-            c.weightx = 1;
-            c.weighty = 1;
-            eventAndButtonPanel.add(new EventDescriptionPanel(er.getTheEvent()), c);
+                eventAndButtonPanel.setLayout(new GridBagLayout());
+                GridBagConstraints c = new GridBagConstraints();
+                c.gridx = 0;
+                c.gridy = 0;
+                c.fill = GridBagConstraints.BOTH;
+                c.anchor = GridBagConstraints.CENTER;
+                c.weightx = 1;
+                c.weighty = 1;
+                eventAndButtonPanel.add(new EventDescriptionPanel(er.getTheEvent()), c);
 
-            c.gridy = 1;
-            c.fill = GridBagConstraints.NONE;
-            c.weightx = 0;
-            c.weighty = 0;
-            c.anchor = GridBagConstraints.EAST;
+                c.gridy = 1;
+                c.fill = GridBagConstraints.NONE;
+                c.weightx = 0;
+                c.weighty = 0;
+                c.anchor = GridBagConstraints.EAST;
 
-            eventAndButtonPanel.add(detailsButton, c);
-            allPrecedingEvents.add(eventAndButtonPanel);
+                eventAndButtonPanel.add(detailsButton, c);
+                allPrecedingEvents.add(eventAndButtonPanel);
+            }
         }
         return new CollapsiblePane(relation, allPrecedingEvents, false);
     }
