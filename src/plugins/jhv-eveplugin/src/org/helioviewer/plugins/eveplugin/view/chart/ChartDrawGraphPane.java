@@ -131,7 +131,7 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
         int screenfactor = ChartConstants.getScreenfactor();
         int width = screenfactor * getWidth();
         int height = screenfactor * getHeight();
-        if (width > 0 && height > 0 && screenfactor * ChartConstants.getGraphTopSpace() + screenfactor * ChartConstants.getGraphBottomSpace() + 1 < height && screenfactor * ChartConstants.getGraphLeftSpace() + screenfactor * ChartConstants.getGraphRightSpace() + 1 < width) {
+        if (width > 0 && height > 0 && screenfactor * (ChartConstants.getGraphTopSpace() + ChartConstants.getGraphBottomSpace() + 1) < height && screenfactor * (ChartConstants.getGraphLeftSpace() + ChartConstants.getGraphRightSpace() + 1) < width) {
             screenImage = new BufferedImage(width, height, BufferedImage.OPAQUE);
             final Graphics2D g = screenImage.createGraphics();
             AffineTransform tf = g.getTransform();
@@ -148,6 +148,8 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
             drawData(gplotPart, g, gleftAxisPart);
             drawZoomBox(g);
         }
+        this.repaint();
+
         // Log.info("Run time: " + (System.currentTimeMillis() - start));
     }
 

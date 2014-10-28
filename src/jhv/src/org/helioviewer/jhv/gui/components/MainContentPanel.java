@@ -19,7 +19,7 @@ import org.helioviewer.jhv.gui.interfaces.MainContentPanelPlugin;
  * This panel acts as a container for the GUI elements which are shown in the
  * main area of the application. Usually it contains the main image area. Below
  * the main image area plug-ins are able to display their GUI components.
- * 
+ *
  * @author Stephan Pagel
  * */
 public class MainContentPanel extends JPanel implements ActionListener {
@@ -72,7 +72,7 @@ public class MainContentPanel extends JPanel implements ActionListener {
 
     /**
      * Set the main component to the container, e.g. the main image panel.
-     * 
+     *
      * @param comp
      *            Main component to be displayed.
      * */
@@ -103,7 +103,7 @@ public class MainContentPanel extends JPanel implements ActionListener {
     /**
      * Adds a plug-in and the associated GUI to the container. The GUI will be
      * displayed below the main component.
-     * 
+     *
      * @param plugin
      *            Plugin to be added to the container.
      * */
@@ -121,7 +121,7 @@ public class MainContentPanel extends JPanel implements ActionListener {
 
     /**
      * Removes a plug-in and the associated GUI from the container.
-     * 
+     *
      * @param plugin
      *            Plugin to be removed from the container.
      * */
@@ -152,7 +152,7 @@ public class MainContentPanel extends JPanel implements ActionListener {
             if (pluginList.size() == 1 && pluginList.get(0).getVisualInterfaces().size() == 1) {
                 pluginContainer.add(pluginList.get(0).getVisualInterfaces().get(0), BorderLayout.CENTER);
                 collapsiblePane.setTitle(pluginList.get(0).getTabName());
-
+                collapsiblePane.setMinimumSize(new Dimension(200, 180));
                 splitpane.setBottomComponent(collapsiblePane);
                 splitpane.setDividerSize(3);
             } else if (!(pluginList.size() == 1 && pluginList.get(0).getVisualInterfaces().size() == 0) && pluginList.size() > 0) {
@@ -184,6 +184,7 @@ public class MainContentPanel extends JPanel implements ActionListener {
     /**
      * {@inheritDoc}
      * */
+    @Override
     public void actionPerformed(ActionEvent e) {
         updateLayout();
         Log.warn("Event " + e);
