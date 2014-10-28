@@ -1,5 +1,6 @@
 package org.helioviewer.plugins.eveplugin.events.model;
 
+import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Point;
 import java.awt.Rectangle;
@@ -7,10 +8,10 @@ import java.awt.Rectangle;
 import org.helioviewer.jhv.data.datatype.event.JHVEvent;
 
 /**
- * 
- * 
+ *
+ *
  * @author Bram Bourgoignie (Bram.Bourgoignie@oma.be)
- * 
+ *
  */
 public class EventPlotConfiguration {
     /** The event */
@@ -29,7 +30,7 @@ public class EventPlotConfiguration {
     /**
      * Creates a EventPlotConfiguration for the given event with scaledX0 start
      * position and scaledX1 end position.
-     * 
+     *
      * @param event
      *            the event for this plot configuration
      * @param scaledX0
@@ -49,7 +50,7 @@ public class EventPlotConfiguration {
 
     /**
      * Draws the event plot configuration on the given graph area.
-     * 
+     *
      * @param g
      *            the graphics on which to draw
      * @param graphArea
@@ -65,27 +66,29 @@ public class EventPlotConfiguration {
      * @param nrPreviousLines
      *            the number of lines used already
      */
-    public void draw(Graphics g, Rectangle graphArea, int nrOfEventTypes, int eventTypeNR, int linesForEventType, int totalLines,
-            int nrPreviousLines) {
+    public void draw(Graphics g, Rectangle graphArea, int nrOfEventTypes, int eventTypeNR, int linesForEventType, int totalLines, int nrPreviousLines) {
         int spacePerLine = Math.min(4, (new Double(Math.floor(1.0 * graphArea.height / totalLines / 2))).intValue());
         int startPosition = spacePerLine * 2 * (nrPreviousLines + yPosition);
         // g.setColor(event.getColor());
-        g.setColor(event.getEventRelationShip().getRelationshipColor());
-        drawPosition = new Rectangle((new Double(Math.floor(graphArea.width * scaledX0))).intValue(), startPosition, (new Double(
-                Math.floor(graphArea.width * (scaledX1 - scaledX0)))).intValue(), spacePerLine);
-        g.fillRect((new Double(Math.floor(graphArea.width * scaledX0))).intValue(), startPosition,
-                (new Double(Math.floor(graphArea.width * (scaledX1 - scaledX0)))).intValue(), spacePerLine);
-        // g.drawString(event.getDisplayName(), (new
-        // Double(Math.floor(graphArea.width * scaledX0))).intValue(), 60);
-        // g.drawImage(event.getIcon().getImage(), (new
-        // Double(Math.floor(graphArea.width * scaledX0))).intValue(), 60,
-        // null);
+        drawPosition = new Rectangle((new Double(Math.floor(graphArea.width * scaledX0))).intValue(), startPosition, (new Double(Math.floor(graphArea.width * (scaledX1 - scaledX0)))).intValue(), spacePerLine);
+        int endpointsMarkWidth = 2;
+        if (drawPosition.width > 10) {
+            g.setColor(Color.black);
+            g.fillRect(drawPosition.x, startPosition, endpointsMarkWidth, spacePerLine);
+            g.setColor(event.getEventRelationShip().getRelationshipColor());
+            g.fillRect(drawPosition.x + endpointsMarkWidth, startPosition, drawPosition.width - 2 * endpointsMarkWidth, spacePerLine);
+            g.setColor(Color.black);
+            g.fillRect(drawPosition.x + drawPosition.width - endpointsMarkWidth, startPosition, endpointsMarkWidth, spacePerLine);
+        } else {
+            g.setColor(event.getEventRelationShip().getRelationshipColor());
+            g.fillRect(drawPosition.x, startPosition, drawPosition.width, spacePerLine);
+        }
 
     }
 
     /**
      * Gets the event at the given point.
-     * 
+     *
      * @param p
      *            the location to check for an event.
      * @return null if no event is located there, the event if found
@@ -103,7 +106,7 @@ public class EventPlotConfiguration {
 
     /**
      * Checks if the given point is located where the event was drawn.
-     * 
+     *
      * @param p
      *            the point to check
      * @return true if the point is located in the event area, false if the
@@ -114,6 +117,10 @@ public class EventPlotConfiguration {
             return drawPosition.contains(p);
         }
         return false;
+    }
+
+    public int getEventPosition() {
+        return this.yPosition;
     }
 
 }
