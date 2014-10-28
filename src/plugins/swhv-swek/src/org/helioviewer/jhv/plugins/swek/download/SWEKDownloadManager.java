@@ -14,6 +14,7 @@ import java.util.concurrent.Executors;
 import org.helioviewer.base.math.Interval;
 import org.helioviewer.jhv.data.container.JHVEventContainer;
 import org.helioviewer.jhv.plugins.swek.SWEKPluginLocks;
+import org.helioviewer.jhv.plugins.swek.config.SWEKConfigurationManager;
 import org.helioviewer.jhv.plugins.swek.config.SWEKEventType;
 import org.helioviewer.jhv.plugins.swek.config.SWEKParameter;
 import org.helioviewer.jhv.plugins.swek.config.SWEKSource;
@@ -65,6 +66,9 @@ public class SWEKDownloadManager implements DownloadWorkerListener, IncomingRequ
 
     /** The instance of the SWEKTreeModel */
     private final SWEKTreeModel treeModel;
+
+    /** The configuration manager instance */
+    private final SWEKConfigurationManager configInstance = SWEKConfigurationManager.getSingletonInstance();
 
     /**
      * private constructor of the SWEKDownloadManager
@@ -539,7 +543,7 @@ public class SWEKDownloadManager implements DownloadWorkerListener, IncomingRequ
     private void startDownloadEventType(SWEKEventType eventType, SWEKSource source, Date date, SWEKSupplier supplier, Long requestID) {
         synchronized (SWEKPluginLocks.downloadLock) {
             List<SWEKParam> params = defineParameters(eventType, source, supplier);
-            DownloadWorker dw = new DownloadWorker(eventType, source, supplier, date, params);
+            DownloadWorker dw = new DownloadWorker(eventType, source, supplier, date, params, configInstance.getSWEKRelatedEvents());
             if (!inBusyAndFinishedJobs(eventType, supplier, date)) {
                 dw.addDownloadWorkerListener(this);
                 addToDownloaderMap(eventType, dw.getDownloadStartDate(), dw, requestID);
@@ -585,7 +589,7 @@ public class SWEKDownloadManager implements DownloadWorkerListener, IncomingRequ
             Long requestID) {
         synchronized (SWEKPluginLocks.downloadLock) {
             List<SWEKParam> params = defineParameters(eventType, swekSource, supplier);
-            DownloadWorker dw = new DownloadWorker(eventType, swekSource, supplier, interval, params);
+            DownloadWorker dw = new DownloadWorker(eventType, swekSource, supplier, interval, params, configInstance.getSWEKRelatedEvents());
             if (!inBusyAndFinishedIntervalJobs(eventType, supplier, interval)) {
                 dw.addDownloadWorkerListener(this);
                 addToDownloaderMap(eventType, dw.getDownloadStartDate(), dw, requestID);

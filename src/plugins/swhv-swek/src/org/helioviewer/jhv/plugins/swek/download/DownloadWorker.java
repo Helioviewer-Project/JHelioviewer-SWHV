@@ -9,6 +9,7 @@ import java.util.List;
 import org.helioviewer.base.math.Interval;
 import org.helioviewer.jhv.data.container.JHVEventContainer;
 import org.helioviewer.jhv.plugins.swek.config.SWEKEventType;
+import org.helioviewer.jhv.plugins.swek.config.SWEKRelatedEvents;
 import org.helioviewer.jhv.plugins.swek.config.SWEKSource;
 import org.helioviewer.jhv.plugins.swek.config.SWEKSupplier;
 import org.helioviewer.jhv.plugins.swek.sources.SWEKDownloader;
@@ -73,6 +74,9 @@ public class DownloadWorker implements Runnable {
     /** List of parameters to use in the download. */
     private final List<SWEKParam> params;
 
+    /** The related event rules */
+    private final List<SWEKRelatedEvents> relatedEvents;
+
     /**
      * Default constructor.
      */
@@ -89,6 +93,7 @@ public class DownloadWorker implements Runnable {
         isFireForceStoppedCalled = false;
         eventContainer = JHVEventContainer.getSingletonInstance();
         params = new ArrayList<SWEKParam>();
+        relatedEvents = new ArrayList<SWEKRelatedEvents>();
     }
 
     /**
@@ -107,7 +112,8 @@ public class DownloadWorker implements Runnable {
      *            the parameters to use in the downloader
      * 
      */
-    public DownloadWorker(SWEKEventType eventType, SWEKSource swekSource, SWEKSupplier supplier, Date date, List<SWEKParam> params) {
+    public DownloadWorker(SWEKEventType eventType, SWEKSource swekSource, SWEKSupplier supplier, Date date, List<SWEKParam> params,
+            List<SWEKRelatedEvents> relatedEventRules) {
         isStopped = false;
         this.swekSource = swekSource;
         this.eventType = eventType;
@@ -120,6 +126,7 @@ public class DownloadWorker implements Runnable {
         isFireForceStoppedCalled = false;
         eventContainer = JHVEventContainer.getSingletonInstance();
         this.params = params;
+        relatedEvents = relatedEventRules;
     }
 
     /**
@@ -138,7 +145,7 @@ public class DownloadWorker implements Runnable {
      *            the parameters to use in the download
      */
     public DownloadWorker(SWEKEventType eventType, SWEKSource swekSource, SWEKSupplier supplier, Interval<Date> interval,
-            List<SWEKParam> params) {
+            List<SWEKParam> params, List<SWEKRelatedEvents> relatedEventRules) {
         // Log.debug("Create dw " + this + " downloading interval " + interval);
         // Thread.dumpStack();
         isStopped = false;
@@ -152,6 +159,7 @@ public class DownloadWorker implements Runnable {
         eventContainer = JHVEventContainer.getSingletonInstance();
         this.params = params;
         this.supplier = supplier;
+        relatedEvents = relatedEventRules;
     }
 
     /**
@@ -282,7 +290,7 @@ public class DownloadWorker implements Runnable {
      */
     private boolean parseData() {
         if (!isStopped) {
-            eventStream = parser.parseEventStream(downloadInputStream, eventType, swekSource, supplier);
+            eventStream = parser.parseEventStream(downloadInputStream, eventType, swekSource, supplier, relatedEvents);
             return eventStream.additionalDownloadNeeded();
         } else {
             if (parser != null) {

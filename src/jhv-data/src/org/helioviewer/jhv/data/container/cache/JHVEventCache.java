@@ -14,8 +14,11 @@ import java.util.TreeMap;
 
 import org.helioviewer.jhv.data.container.util.DateUtil;
 import org.helioviewer.jhv.data.datatype.event.JHVEvent;
+import org.helioviewer.jhv.data.datatype.event.JHVEventParameter;
 import org.helioviewer.jhv.data.datatype.event.JHVEventRelation;
+import org.helioviewer.jhv.data.datatype.event.JHVEventRelationShipRule;
 import org.helioviewer.jhv.data.datatype.event.JHVEventType;
+import org.helioviewer.jhv.data.datatype.event.JHVRelatedOn;
 import org.helioviewer.jhv.data.lock.JHVEventContainerLocks;
 
 public class JHVEventCache {
@@ -34,6 +37,8 @@ public class JHVEventCache {
 
     private final Map<Color, Set<String>> idsPerColor;
 
+    private final List<JHVEvent> eventsWithRelationRules;
+
     /**
      * private default constructor
      */
@@ -43,6 +48,7 @@ public class JHVEventCache {
         allEvents = new HashMap<String, JHVEvent>();
         missingEventsInEventRelations = new HashMap<String, List<JHVEvent>>();
         idsPerColor = new HashMap<Color, Set<String>>();
+        eventsWithRelationRules = new ArrayList<JHVEvent>();
     }
 
     /**
@@ -239,6 +245,53 @@ public class JHVEventCache {
         checkAndFixNextRelatedEvents(event);
         checkAndFixPrecedingRelatedEvents(event);
         checkAndFixRelatedEventsByRule(event);
+        executeRelationshipRules(event);
+    }
+
+    private void executeRelationshipRules(JHVEvent event) {
+        List<JHVEventRelationShipRule> rules = event.getEventRelationShip().getRelationshipRules();
+        for (JHVEventRelationShipRule rule : rules) {
+            // Go over the rules
+            for (JHVEvent candidate : eventsWithRelationRules) {
+                // Check new candidate
+                if (candidate.getJHVEventType().getEventType().toLowerCase().equals(rule.getRelatedWith().getEventType().toLowerCase())) {
+                    // Candidate has the correct event type
+                    int foundCorrespondinParameters = 0;
+                    for (JHVRelatedOn relatedOn : rule.getRelatedOn()) {
+                        // Check all the related on parameters
+                        for (JHVEventParameter p : candidate.getAllEventParameters()) {
+                            // Loop over candidate parameters
+                            if (relatedOn.getRelatedOnWith().getParameterName().toLowerCase().equals(p.getParameterName().toLowerCase())) {
+                                // Candidate has the related on parameter
+                                for (JHVEventParameter eventP : event.getAllEventParameters()) {
+                                    // Loop over the event parameter to find the
+                                    // value of the related on parameter
+                                    if (eventP.getParameterName().toLowerCase()
+                                            .equals(relatedOn.getRelatedOnWith().getParameterName().toLowerCase())) {
+                                        // Parameter found in the event
+                                        if (eventP.getParameterValue().equals(p.getParameterValue())) {
+                                            // at least one of the related on
+                                            // parameters found
+                                            foundCorrespondinParameters++;
+                                        }
+                                    } else {
+                                        // parameter not found in the event skip
+                                        // rule.
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    if (foundCorrespondinParameters == rule.getRelatedOn().size()) {
+                        event.getEventRelationShip().getRelatedEventsByRule()
+                                .put(candidate.getUniqueID(), new JHVEventRelation(candidate.getUniqueID(), candidate));
+                        candidate.getEventRelationShip().getRelatedEventsByRule()
+                                .put(event.getUniqueID(), new JHVEventRelation(event.getUniqueID(), event));
+                    }
+                }
+            }
+        }
+        eventsWithRelationRules.add(event);
     }
 
     private void checkRelationColor(JHVEvent event) {
@@ -344,10 +397,14 @@ public class JHVEventCache {
                     relation.setTheEvent(event);
                     relatedEvent.getEventRelationShip().setRelationshipColor(event.getEventRelationShip().getRelationshipColor());
                 }
-                if (relatedEvent.getEventRelationShip().getRelationshipRules().containsKey(event.getUniqueID())) {
-                    JHVEventRelation relation = relatedEvent.getEventRelationShip().getRelatedEventsByRule().get(event.getUniqueID());
-                    relation.setTheEvent(event);
-                }
+                /*
+                 * if
+                 * (relatedEvent.getEventRelationShip().getRelationshipRules()
+                 * .containsKey(event.getUniqueID())) { JHVEventRelation
+                 * relation =
+                 * relatedEvent.getEventRelationShip().getRelatedEventsByRule
+                 * ().get(event.getUniqueID()); relation.setTheEvent(event); }
+                 */
             }
             missingEventsInEventRelations.remove(event.getUniqueID());
         }
