@@ -56,6 +56,7 @@ public class PlotsContainerPanel extends JPanel implements LineDataSelectorModel
         setLayout(new BorderLayout());
 
         splitPane.setOrientation(JSplitPane.VERTICAL_SPLIT);
+        splitPane.setResizeWeight(0.5);
         splitPane.setTopComponent(plotOne);
         splitPane.setBottomComponent(plotTwo);
 
