@@ -5,7 +5,7 @@ public enum HEKEventEnum {
     ACTIVE_REGION("ActiveRegion", "Active Region", "AR"), CORONAL_MASS_EJECTION("CME", "Coronal Mass Ejection", "CE"), CORONAL_DIMMING(
             "CoronalDimming", "Coronal Dimming", "CD"), CORONAL_HOLE("CoronalHole", "Coronal Hole", "CH"), CORONAL_WAVE("CoronalWave",
             "Coronal Wave", "CW"), FILAMENT("Filament", "Filament", "FI"), FILAMENT_ERUPTION("FilamentEruption", "Filament Eruption", "FE"), FLARE(
-            "Flare", "Flare", "FL"), SUNSPOT("Sunspot", "Sunspot", "SS"), EMERGING_FLUX("EmergingFlux", "Emerging flux", "EF"), ERUPTION(
+            "Flare", "Flare", "FL"), SUNSPOT("Sunspot", "Sunspot", "SS"), EMERGING_FLUX("EmergingFlux", "Emerging Flux", "EF"), ERUPTION(
             "Eruption", "Eruption", "ER"), UNKNOWN("Unknown", "Unknown", "UK");
 
     /** The abbreviation of the HEKEvent */
@@ -40,7 +40,7 @@ public enum HEKEventEnum {
      * @return the abbreviation
      */
     public String getAbbriviation() {
-        return this.eventAbbreviation;
+        return eventAbbreviation;
     }
 
     /**
@@ -49,7 +49,7 @@ public enum HEKEventEnum {
      * @return the SWEK event name
      */
     public String getSWEKEventName() {
-        return this.swekEventName;
+        return swekEventName;
     }
 
     /**
@@ -58,6 +58,6 @@ public enum HEKEventEnum {
      * @return the HEK event name
      */
     public String getHEKEventName() {
-        return this.hekEventName;
+        return hekEventName;
     }
 }
