@@ -269,7 +269,8 @@ public class JHVEventCache {
                                     if (eventP.getParameterName().toLowerCase()
                                             .equals(relatedOn.getRelatedOnWith().getParameterName().toLowerCase())) {
                                         // Parameter found in the event
-                                        if (eventP.getParameterValue().equals(p.getParameterValue())) {
+                                        if (eventP.getParameterValue() != null && p.getParameterValue() != null
+                                                && eventP.getParameterValue().equals(p.getParameterValue())) {
                                             // at least one of the related on
                                             // parameters found
                                             foundCorrespondinParameters++;
