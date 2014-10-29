@@ -53,7 +53,7 @@ public class DoubleMaxFilterPanel extends AbstractFilterPanel {
         SpinnerModel maximumSpinnerModel = new SpinnerNumberModel(middleValue, min, max, stepSize);
 
         maximumValueSpinner = new JSpinner(maximumSpinnerModel);
-        maximumValueSpinner.setEditor(new JSpinner.NumberEditor(maximumValueSpinner, "0.0000000"));
+        maximumValueSpinner.setEditor(new JSpinner.NumberEditor(maximumValueSpinner, getSpinnerFormat(min, max)));
         maximumValueSpinner.addChangeListener(new ChangeListener() {
 
             @Override

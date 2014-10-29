@@ -54,7 +54,7 @@ public class DoubleMinFilterPanel extends AbstractFilterPanel {
         SpinnerModel minimumSpinnerModel = new SpinnerNumberModel(middleValue, min, max, stepSize);
 
         minimumValueSpinner = new JSpinner(minimumSpinnerModel);
-        minimumValueSpinner.setEditor(new JSpinner.NumberEditor(minimumValueSpinner, "0.00000000"));
+        minimumValueSpinner.setEditor(new JSpinner.NumberEditor(minimumValueSpinner, getSpinnerFormat(min, max)));
         minimumValueSpinner.addChangeListener(new ChangeListener() {
 
             @Override

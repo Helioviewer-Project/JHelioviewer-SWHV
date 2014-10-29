@@ -4,6 +4,8 @@ import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.math.BigDecimal;
+import java.math.MathContext;
 
 import javax.swing.BorderFactory;
 import javax.swing.JComponent;
@@ -77,6 +79,23 @@ public abstract class AbstractFilterPanel extends JPanel {
      * @return the component representing the filter.
      */
     public abstract JComponent initFilterComponents();
+
+    protected String getSpinnerFormat(double minimumValue, double maximumValue) {
+        StringBuilder spinnerFormat = new StringBuilder("0");
+        String minString = (new BigDecimal(minimumValue, new MathContext(12))).stripTrailingZeros().toPlainString();
+        String maxString = (new BigDecimal(maximumValue, new MathContext(12))).stripTrailingZeros().toPlainString();
+        int integerPlacesMin = minString.indexOf('.');
+        int decimalPlacesMin = minString.length() - integerPlacesMin - 1;
+        int integerPlacesMax = maxString.indexOf('.');
+        int decimalPlacesMax = maxString.length() - integerPlacesMax - 1;
+        if (integerPlacesMax != -1 && integerPlacesMin != -1) {
+            spinnerFormat.append(".");
+            for (int i = 0; i < Math.max(decimalPlacesMax, decimalPlacesMin); i++) {
+                spinnerFormat.append("0");
+            }
+        }
+        return spinnerFormat.toString();
+    }
 
     /**
      * Creates the filter panel.
