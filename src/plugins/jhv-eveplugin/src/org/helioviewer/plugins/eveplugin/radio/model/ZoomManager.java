@@ -328,6 +328,8 @@ public class ZoomManager implements ZoomControllerListener, PlotAreaSpaceListene
     public void removeZoomManagerDataConfig(long downloadID, String plotIdentifier) {
         ZoomManagerData zmd = zoomManagerData.get(plotIdentifier);
         if (zmd != null) {
+            Map<Long, ZoomDataConfig> zoomDataConfigMap = zmd.getZoomDataConfigMap();
+            plotAreaSpaceManager.getPlotAreaSpace(plotIdentifier).removePlotAreaSpaceListener(zoomDataConfigMap.get(downloadID));
             zmd.getZoomDataConfigMap().remove(downloadID);
         }
     }
