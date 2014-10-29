@@ -1,6 +1,5 @@
 package org.helioviewer.jhv.plugins.swek.download;
 
-import java.awt.EventQueue;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -147,16 +146,9 @@ public class FilterManager {
      *            the event type for which the events were added
      */
     private void fireFilterAdded(final SWEKEventType swekEventType) {
-        EventQueue.invokeLater(new Runnable() {
-
-            @Override
-            public void run() {
-                for (FilterManagerListener fml : listeners) {
-                    fml.filtersAdded(swekEventType);
-                }
-            }
-        });
-
+        for (FilterManagerListener fml : listeners) {
+            fml.filtersAdded(swekEventType);
+        }
     }
 
     /**

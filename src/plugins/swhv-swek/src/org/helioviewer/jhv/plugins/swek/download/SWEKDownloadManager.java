@@ -122,7 +122,7 @@ public class SWEKDownloadManager implements DownloadWorkerListener, IncomingRequ
         removeFromBusyAndFinishedIntervalJobs(eventType);
         for (SWEKSupplier supplier : eventType.getSuppliers()) {
             eventContainer.removeEvents(new JHVSWEKEventType(eventType.getEventName(), supplier.getSource().getSourceName(), supplier
-                    .getSource().getProviderName()));
+                    .getSupplierName()));
         }
     }
 
