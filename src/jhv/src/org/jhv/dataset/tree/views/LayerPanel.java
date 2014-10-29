@@ -78,13 +78,13 @@ public class LayerPanel extends DatasetPanel {
         this.add(Box.createRigidArea(new Dimension(5, 5)));
         // Title
         titleLabel = new JLabel(model.getDescriptor().title);
-        titleLabel.setToolTipText("Name of the Layer");
+        titleLabel.setToolTipText("Layer name");
         this.add(titleLabel);
         // whitespace
         this.add(Box.createRigidArea(new Dimension(5, 5)));
         // timestamp
         timestampLabel = new JLabel(this.model.getDescriptor().timestamp);
-        timestampLabel.setToolTipText("Shown observation time (UTC) of this layer.");
+        timestampLabel.setToolTipText("UTC observation time");
         this.add(timestampLabel);
 
         // Icon
