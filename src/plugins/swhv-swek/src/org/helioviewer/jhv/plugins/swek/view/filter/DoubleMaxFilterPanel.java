@@ -10,6 +10,8 @@ import javax.swing.JPanel;
 import javax.swing.JSpinner;
 import javax.swing.SpinnerModel;
 import javax.swing.SpinnerNumberModel;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
 
 import org.helioviewer.basegui.components.WheelSupport;
 import org.helioviewer.jhv.plugins.swek.config.SWEKEventType;
@@ -52,6 +54,17 @@ public class DoubleMaxFilterPanel extends AbstractFilterPanel {
 
         maximumValueSpinner = new JSpinner(maximumSpinnerModel);
         maximumValueSpinner.setEditor(new JSpinner.NumberEditor(maximumValueSpinner, "0.0000000"));
+        maximumValueSpinner.addChangeListener(new ChangeListener() {
+
+            @Override
+            public void stateChanged(ChangeEvent e) {
+                if (filterToggleButton.isSelected()) {
+                    filterManager.removedFilter(eventType, parameter);
+                    filterToggleButton.setSelected(false);
+                }
+            }
+        });
+
         WheelSupport.installMouseWheelSupport(maximumValueSpinner);
         JPanel p = new JPanel();
         p.setLayout(new GridBagLayout());
