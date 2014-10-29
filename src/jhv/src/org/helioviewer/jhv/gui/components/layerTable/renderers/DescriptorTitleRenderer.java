@@ -52,7 +52,7 @@ public class DescriptorTitleRenderer extends DefaultTableCellRenderer {
             LayerDescriptor descriptor = (LayerDescriptor) value;
             String layerName = descriptor.observatory + " " + descriptor.title;
             JLabel label = (JLabel) super.getTableCellRendererComponent(table, layerName, isSelected, hasFocus, row, column);
-            label.setToolTipText("Name of the Layer : " + layerName);
+            label.setToolTipText("Layer name: " + layerName);
             if (drawLine && row > 0) {
                 label.setBorder(interBorder);
             }
