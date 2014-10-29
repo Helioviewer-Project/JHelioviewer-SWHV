@@ -2,6 +2,7 @@ package org.helioviewer.jhv.plugins.swek.view.filter;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
+import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.math.BigDecimal;
@@ -11,6 +12,7 @@ import javax.swing.BorderFactory;
 import javax.swing.JComponent;
 import javax.swing.JPanel;
 import javax.swing.JToggleButton;
+import javax.swing.border.TitledBorder;
 
 import org.helioviewer.jhv.plugins.swek.config.SWEKEventType;
 import org.helioviewer.jhv.plugins.swek.config.SWEKParameter;
@@ -105,8 +107,14 @@ public abstract class AbstractFilterPanel extends JPanel {
         setLayout(new BorderLayout());
         setOpaque(false);
         setBackground(Color.white);
-        setBorder(BorderFactory.createTitledBorder(parameter.getParameterDisplayName()));
-        add(initFilterComponents(), BorderLayout.CENTER);
+        JPanel contentPanel = new JPanel();
+        contentPanel.setLayout(new BorderLayout());
+        TitledBorder border = BorderFactory.createTitledBorder(parameter.getParameterDisplayName());
+        JComponent filter = initFilterComponents();
+        contentPanel.setPreferredSize(new Dimension(Math.max((int) border.getMinimumSize(contentPanel).getWidth(), (int) filter
+                .getMinimumSize().getWidth()) + 20, ((int) filter.getMinimumSize().getHeight()) + 55));
+        contentPanel.setBorder(BorderFactory.createTitledBorder(parameter.getParameterDisplayName()));
+        contentPanel.add(initFilterComponents(), BorderLayout.CENTER);
         filterToggleButton.setSelected(filterManager.isFiltered(eventType, parameter));
         filterToggleButton.addActionListener(new ActionListener() {
 
@@ -115,7 +123,8 @@ public abstract class AbstractFilterPanel extends JPanel {
                 filter(filterToggleButton.isSelected());
             }
         });
-        add(filterToggleButton, BorderLayout.PAGE_END);
+        contentPanel.add(filterToggleButton, BorderLayout.PAGE_END);
+        add(contentPanel, BorderLayout.CENTER);
     }
 
     /**
