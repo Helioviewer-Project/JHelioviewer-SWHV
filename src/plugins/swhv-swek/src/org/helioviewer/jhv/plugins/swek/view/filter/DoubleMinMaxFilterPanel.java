@@ -73,7 +73,7 @@ public class DoubleMinMaxFilterPanel extends AbstractFilterPanel {
         SpinnerModel maximumSpinnerModel = new SpinnerNumberModel(middleValue, min, max, stepSize);
 
         minimumValueSpinner = new JSpinner(minimumSpinnerModel);
-        minimumValueSpinner.setEditor(new JSpinner.NumberEditor(minimumValueSpinner, "0.00000000"));
+        minimumValueSpinner.setEditor(new JSpinner.NumberEditor(minimumValueSpinner, getSpinnerFormat(min, max)));
         minimumSpinnerModel.addChangeListener(new ChangeListener() {
             @Override
             public void stateChanged(ChangeEvent e) {
@@ -88,7 +88,7 @@ public class DoubleMinMaxFilterPanel extends AbstractFilterPanel {
         });
         WheelSupport.installMouseWheelSupport(minimumValueSpinner);
         maximumValueSpinner = new JSpinner(maximumSpinnerModel);
-        maximumValueSpinner.setEditor(new JSpinner.NumberEditor(maximumValueSpinner, "0.00000000"));
+        maximumValueSpinner.setEditor(new JSpinner.NumberEditor(maximumValueSpinner, getSpinnerFormat(min, max)));
         maximumSpinnerModel.addChangeListener(new ChangeListener() {
             @Override
             public void stateChanged(ChangeEvent e) {

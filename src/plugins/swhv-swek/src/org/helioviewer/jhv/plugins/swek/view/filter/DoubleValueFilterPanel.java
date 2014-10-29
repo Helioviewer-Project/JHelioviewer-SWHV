@@ -48,7 +48,7 @@ public class DoubleValueFilterPanel extends AbstractFilterPanel {
         SpinnerModel spinnerModel = new SpinnerNumberModel(middleValue, min, max, stepSize);
 
         spinner = new JSpinner(spinnerModel);
-        spinner.setEditor(new JSpinner.NumberEditor(spinner, "0.00000000"));
+        spinner.setEditor(new JSpinner.NumberEditor(spinner, getSpinnerFormat(min, max)));
         spinner.addChangeListener(new ChangeListener() {
 
             @Override
@@ -69,4 +69,5 @@ public class DoubleValueFilterPanel extends AbstractFilterPanel {
         p.add(spinner, c);
         return p;
     }
+
 }
