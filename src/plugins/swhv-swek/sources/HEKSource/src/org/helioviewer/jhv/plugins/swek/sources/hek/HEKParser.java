@@ -137,7 +137,10 @@ public class HEKParser implements SWEKParser {
                     sb.append(line);
                 }
                 JSONObject eventJSON;
-                eventJSON = new JSONObject(sb.toString().trim().replaceAll("[\n\r\t]", ""));
+                String reply = sb.toString().trim().replaceAll("[\n\r\t]", "");
+                Log.debug("reply:");
+                Log.debug(reply.toString());
+                eventJSON = new JSONObject(reply);
                 parseOvermax(eventJSON);
                 eventStream.setExtraDownloadNeeded(overmax);
                 parseAssociation(eventJSON);
