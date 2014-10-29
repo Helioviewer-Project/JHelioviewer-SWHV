@@ -80,7 +80,10 @@ public class DoubleMinMaxFilterPanel extends AbstractFilterPanel {
                 if ((Double) minimumValueSpinner.getValue() > (Double) maximumValueSpinner.getValue()) {
                     maximumValueSpinner.setValue(minimumValueSpinner.getValue());
                 }
-                filterToggleButton.setSelected(false);
+                if (filterToggleButton.isSelected()) {
+                    filterManager.removedFilter(eventType, parameter);
+                    filterToggleButton.setSelected(false);
+                }
             }
         });
         WheelSupport.installMouseWheelSupport(minimumValueSpinner);
@@ -92,7 +95,10 @@ public class DoubleMinMaxFilterPanel extends AbstractFilterPanel {
                 if ((Double) maximumValueSpinner.getValue() < (Double) minimumValueSpinner.getValue()) {
                     minimumValueSpinner.setValue(maximumValueSpinner.getValue());
                 }
-                filterToggleButton.setSelected(false);
+                if (filterToggleButton.isSelected()) {
+                    filterManager.removedFilter(eventType, parameter);
+                    filterToggleButton.setSelected(false);
+                }
             }
         });
         WheelSupport.installMouseWheelSupport(maximumValueSpinner);

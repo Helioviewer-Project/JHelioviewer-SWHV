@@ -10,6 +10,8 @@ import javax.swing.JPanel;
 import javax.swing.JSpinner;
 import javax.swing.SpinnerModel;
 import javax.swing.SpinnerNumberModel;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
 
 import org.helioviewer.basegui.components.WheelSupport;
 import org.helioviewer.jhv.plugins.swek.config.SWEKEventType;
@@ -53,6 +55,15 @@ public class DoubleMinFilterPanel extends AbstractFilterPanel {
 
         minimumValueSpinner = new JSpinner(minimumSpinnerModel);
         minimumValueSpinner.setEditor(new JSpinner.NumberEditor(minimumValueSpinner, "0.00000000"));
+        minimumValueSpinner.addChangeListener(new ChangeListener() {
+
+            @Override
+            public void stateChanged(ChangeEvent e) {
+                filterManager.removedFilter(eventType, parameter);
+                filterToggleButton.setSelected(false);
+            }
+        });
+
         WheelSupport.installMouseWheelSupport(minimumValueSpinner);
         JPanel p = new JPanel();
         p.setLayout(new GridBagLayout());
