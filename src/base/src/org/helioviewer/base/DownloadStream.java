@@ -134,7 +134,7 @@ public class DownloadStream {
             try {
                 httpC.connect();
             } catch (IOException e) {
-
+                Log.warn("HTTP connection failed: " + url + " " + e);
             }
             // Check the connection code
             if (httpC.getResponseCode() > 400) {
