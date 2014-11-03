@@ -37,7 +37,7 @@ public class GL3DVec4d {
     }
 
     public GL3DVec4d() {
-        this(0f, 0f, 0f, 0f);
+        this(0, 0, 0, 0);
     }
 
     public GL3DVec4d(double[] coordinates) {
@@ -95,7 +95,7 @@ public class GL3DVec4d {
     }
 
     public void divide(GL3DVec4d vec) {
-        if (vec.x == 0f || vec.y == 0f || vec.z == 0f || vec.w == 0f)
+        if (vec.x == 0 || vec.y == 0 || vec.z == 0 || vec.w == 0)
             throw new IllegalArgumentException("Division by 0 not allowed!");
         this.x /= vec.x;
         this.y /= vec.y;
@@ -104,7 +104,7 @@ public class GL3DVec4d {
     }
 
     public void divide(double s) {
-        if (s == 0f)
+        if (s == 0)
             throw new IllegalArgumentException("Division by 0 not allowed!");
         this.x /= s;
         this.y /= s;
@@ -113,13 +113,13 @@ public class GL3DVec4d {
     }
 
     public static GL3DVec4d divide(GL3DVec4d vec1, GL3DVec4d vec2) {
-        if (vec2.x == 0f || vec2.y == 0f || vec2.z == 0f)
+        if (vec2.x == 0 || vec2.y == 0 || vec2.z == 0)
             throw new IllegalArgumentException("Division by 0 not allowed!");
         return new GL3DVec4d(vec1.x / vec2.x, vec1.y / vec2.y, vec1.z / vec2.z, vec1.w / vec2.w);
     }
 
     public static GL3DVec4d divide(GL3DVec4d vec1, double s) {
-        if (s == 0f)
+        if (s == 0)
             throw new IllegalArgumentException("Division by 0 not allowed!");
         return new GL3DVec4d(vec1.x / s, vec1.y / s, vec1.z / s, vec1.w / s);
     }
@@ -159,7 +159,7 @@ public class GL3DVec4d {
     }
 
     public static GL3DVec4d cross(GL3DVec4d u, GL3DVec4d v) {
-        return new GL3DVec4d(u.y * v.z - u.z * v.y, u.z * v.x - u.x * v.z, u.x * v.y - u.y * v.x, 1f);
+        return new GL3DVec4d(u.y * v.z - u.z * v.y, u.z * v.x - u.x * v.z, u.x * v.y - u.y * v.x, 1);
     }
 
     public void negate() {
@@ -184,11 +184,11 @@ public class GL3DVec4d {
     }
 
     public double length() {
-        return (double) Math.sqrt(this.x * this.x + this.y * this.y + this.z * this.z + this.w * this.w);
+        return Math.sqrt(this.x * this.x + this.y * this.y + this.z * this.z + this.w * this.w);
     }
 
     public double length2() {
-        return (this.x * this.x + this.y * this.y + this.z * this.z + this.w * this.w);
+        return this.x * this.x + this.y * this.y + this.z * this.z + this.w * this.w;
     }
 
     public void normalize() {
@@ -201,7 +201,7 @@ public class GL3DVec4d {
 
     public boolean equals(Object o) {
         if (o instanceof GL3DVec4d)
-            return isApproxEqual((GL3DVec4d) o, 0.0f);
+            return isApproxEqual((GL3DVec4d) o, 0);
         return false;
     }
 
