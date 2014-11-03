@@ -184,7 +184,7 @@ public class JavaHelioViewerLauncher {
         } else {
             String argString = null;
             try {
-                List commandLine = new LinkedList();
+                List<String> commandLine = new LinkedList<String>();
 
                 // Path to java binary (should use the same with wich the
                 // launcher was invoked)
