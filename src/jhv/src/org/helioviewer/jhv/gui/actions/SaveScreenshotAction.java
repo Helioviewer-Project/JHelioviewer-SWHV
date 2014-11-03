@@ -17,11 +17,11 @@ import org.helioviewer.jhv.gui.ImageViewerGui;
 
 /**
  * Action to save a screenshot in default format (png) to default location.
- * 
+ *
  * <p>
  * The default location is {@link org.helioviewer.jhv.JHVDirectory#EXPORTS}. The
  * name of the file will be determined based in the source file.
- * 
+ *
  * @author Markus Langenberg
  */
 public class SaveScreenshotAction extends AbstractAction {
@@ -40,12 +40,13 @@ public class SaveScreenshotAction extends AbstractAction {
     /**
      * {@inheritDoc}
      */
+    @Override
     public void actionPerformed(ActionEvent e) {
         try {
             String filename = new String(JHVDirectory.EXPORTS.getPath() + getDefaultFileName() + ".png");
-            ImageViewerGui.getSingletonInstance().getMainView().saveScreenshot("png", new File(filename));
-
-            JOptionPane.showMessageDialog(ImageViewerGui.getMainFrame(), "Saved Screenshot at: " + filename);
+            if (ImageViewerGui.getSingletonInstance().getMainView().saveScreenshot("png", new File(filename))) {
+                JOptionPane.showMessageDialog(ImageViewerGui.getMainFrame(), "Saved Screenshot at: " + filename);
+            }
         } catch (IOException e1) {
             e1.printStackTrace();
         }
@@ -54,7 +55,7 @@ public class SaveScreenshotAction extends AbstractAction {
     /**
      * Returns the default name for a screenshot. The name consists of
      * "JHV_screenshot_created" plus the current system date and time.
-     * 
+     *
      * @return Default name for a screenshot.
      */
     static String getDefaultFileName() {

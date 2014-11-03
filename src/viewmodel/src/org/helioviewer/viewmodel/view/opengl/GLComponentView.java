@@ -237,10 +237,11 @@ public class GLComponentView extends AbstractComponentView implements ViewListen
      * request to save the screenshot.
      */
     @Override
-    public void saveScreenshot(String imageFormat, File outputFile) throws IOException {
+    public boolean saveScreenshot(String imageFormat, File outputFile) throws IOException {
         saveScreenshotRequest = true;
         saveScreenshotFormat = imageFormat;
         saveScreenshotFile = outputFile;
+        return true;
     }
 
     /**

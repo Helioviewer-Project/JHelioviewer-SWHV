@@ -67,7 +67,7 @@ public class BufferedImageComponentView extends AbstractComponentView {
      * {@inheritDoc}
      */
     @Override
-    public void saveScreenshot(String imageFormat, File outputFile) throws IOException {
+    public boolean saveScreenshot(String imageFormat, File outputFile) throws IOException {
         BufferedImage original = imageData.getBufferedImage();
         BufferedImage output = new BufferedImage(original.getWidth(), original.getHeight(), BufferedImage.TYPE_3BYTE_BGR);
 
@@ -75,8 +75,8 @@ public class BufferedImageComponentView extends AbstractComponentView {
         g.setColor(Color.BLACK);
         g.fillRect(0, 0, original.getWidth(), original.getHeight());
         g.drawImage(original, 0, 0, null);
-
         ImageIO.write(output, imageFormat, outputFile);
+        return true;
     }
 
     /**
