@@ -5,12 +5,9 @@ import javax.media.opengl.GL2;
 import org.helioviewer.viewmodel.view.opengl.shader.GLFragmentShaderProgram;
 import org.helioviewer.viewmodel.view.opengl.shader.GLShaderBuilder;
 import org.helioviewer.viewmodel.view.opengl.shader.GLShaderBuilder.GLBuildShaderException;
-import org.helioviewer.viewmodel.view.opengl.shader.GLTextureCoordinate;
 
 public class ChannelMixerShader extends GLFragmentShaderProgram {
-    private GLTextureCoordinate isDifference;
 
-    private static int ID = 0;
     int mode = -1;
     private int channelMixerValueRef;
     private GLShaderBuilder builder;

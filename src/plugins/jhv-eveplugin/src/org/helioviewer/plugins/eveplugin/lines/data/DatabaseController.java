@@ -15,7 +15,7 @@ import org.helioviewer.base.math.Interval;
 import org.helioviewer.plugins.eveplugin.settings.EVESettings;
 
 /**
- * 
+ *
  * @author Stephan Pagel
  * */
 public class DatabaseController {
@@ -35,7 +35,7 @@ public class DatabaseController {
 
     private final Object addQueueLock = new Object();
     private final LinkedList<DatabaseController.QueueItem> addQueue = new LinkedList<DatabaseController.QueueItem>();
-    
+
     // //////////////////////////////////////////////////////////////////////////////
     // Methods
     // //////////////////////////////////////////////////////////////////////////////
@@ -195,6 +195,7 @@ public class DatabaseController {
 
     private class AddToDatabaseThread implements Runnable {
 
+        @Override
         public void run() {
             while (true) {
                 QueueItem queueItem = null;

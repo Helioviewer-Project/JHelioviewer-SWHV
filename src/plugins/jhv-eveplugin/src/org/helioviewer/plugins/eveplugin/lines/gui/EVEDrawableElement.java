@@ -63,8 +63,7 @@ public class EVEDrawableElement implements DrawableElement {
         double logMinValue = yAxisElement.getMinValue();
         double logMaxValue = yAxisElement.getMaxValue();
 
-        double ratioX = !intervalAvailable ? 0 : (double) graphArea.width
-                / (double) (interval.getEnd().getTime() - interval.getStart().getTime());
+        double ratioX = !intervalAvailable ? 0 : (double) graphArea.width / (double) (interval.getEnd().getTime() - interval.getStart().getTime());
         double ratioY = logMaxValue < logMinValue ? 0 : graphArea.height / (logMaxValue - logMinValue);
 
         graphPolylines.clear();
@@ -169,8 +168,7 @@ public class EVEDrawableElement implements DrawableElement {
         // Methods
         // //////////////////////////////////////////////////////////////////////////
 
-        public GraphPolyline(final List<Point> points, final Color color, final List<Integer> warnLevels, final List<String> warnLabels,
-                double ratioX) {
+        public GraphPolyline(final List<Point> points, final Color color, final List<Integer> warnLevels, final List<String> warnLabels, double ratioX) {
             numberOfPoints = points.size();
             numberOfWarnLevels = warnLevels.size();
             xPoints = new ArrayList<ArrayList<Integer>>();
