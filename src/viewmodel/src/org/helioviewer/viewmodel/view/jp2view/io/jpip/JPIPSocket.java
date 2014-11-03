@@ -76,7 +76,7 @@ public class JPIPSocket extends HTTPSocket {
         }
 
         if (res == null)
-            throw new IOException("After conncting to the server, it did not send a response.");
+            throw new IOException("The server did not send a response after connection.");
 
         HashMap<String, String> map = null;
         String[] cnewParams = { "cid", "transport", "host", "path", "port", "auxport" };
@@ -142,8 +142,8 @@ public class JPIPSocket extends HTTPSocket {
         String queryStr = _req.getQuery();
 
         // Adds some default headers if they were not already added.
-        if (!_req.headerExists(HTTPHeaderKey.USER_AGENT.toString()))
-            _req.setHeader(HTTPHeaderKey.USER_AGENT.toString(), "SWHVJHelioviewer");
+        //if (!_req.headerExists(HTTPHeaderKey.USER_AGENT.toString()))
+        //    _req.setHeader(HTTPHeaderKey.USER_AGENT.toString(), "SWHVJHelioviewer");
         if (!_req.headerExists(HTTPHeaderKey.CACHE_CONTROL.toString()))
             _req.setHeader(HTTPHeaderKey.CACHE_CONTROL.toString(), "no-cache");
         if (!_req.headerExists(HTTPHeaderKey.HOST.toString()))
