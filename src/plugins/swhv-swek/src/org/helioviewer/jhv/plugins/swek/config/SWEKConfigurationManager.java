@@ -231,7 +231,7 @@ public class SWEKConfigurationManager {
         try {
             File f = new File(configFile);
             if (f.exists()) {
-                configFileURL = new URL("file://" + configFile);
+                configFileURL = f.toURI().toURL();
                 return true;
             } else {
                 Log.debug("File created from the settings : " + configFile + " does not exists on this system.");
