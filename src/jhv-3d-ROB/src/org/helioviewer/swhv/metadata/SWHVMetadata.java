@@ -4,7 +4,7 @@ import java.util.Date;
 
 import org.helioviewer.viewmodel.view.jp2view.JHVJPXView;
 
-public class SWHVMetadata implements Comparable {
+public class SWHVMetadata implements Comparable<SWHVMetadata> {
     private final Date date;
     private final double hgltobs;
     private final double hglnobs;
@@ -60,8 +60,8 @@ public class SWHVMetadata implements Comparable {
     }
 
     @Override
-    public int compareTo(Object o) {
-        return this.getDate().compareTo(((SWHVMetadata) o).getDate());
+    public int compareTo(SWHVMetadata o) {
+        return this.getDate().compareTo(o.getDate());
     }
 
     public double getSolarRadiusPixels() {
