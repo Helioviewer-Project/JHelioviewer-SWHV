@@ -152,7 +152,7 @@ public final class Vector2dLong {
 
     public static Vector2dLong normalize(final Vector2dLong v) {
         double length = Math.sqrt(v.x * v.x + v.y * v.y);
-        return new Vector2dLong((long) Math.round(v.x / length), (long) Math.round(v.y / length));
+        return new Vector2dLong(Math.round(v.x / length), Math.round(v.y / length));
     }
 
     public static long dot(final Vector2dLong v1, final Vector2dLong v2) {
@@ -160,7 +160,7 @@ public final class Vector2dLong {
     }
 
     public static double angle(final Vector2dLong v1, final Vector2dLong v2) {
-        return Math.acos((v1.x * v2.x + v1.y * v2.y) / ((Math.sqrt(v1.x * v1.x + v1.y * v1.y)) * (Math.sqrt(v2.x * v2.x + v2.y * v2.y))));
+        return Math.acos((v1.x * v2.x + v1.y * v2.y) / (Math.sqrt(v1.x * v1.x + v1.y * v1.y) * Math.sqrt(v2.x * v2.x + v2.y * v2.y)));
     }
 
     public Vector2dLong absolute() {

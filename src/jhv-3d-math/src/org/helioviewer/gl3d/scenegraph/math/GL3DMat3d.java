@@ -31,7 +31,7 @@ public class GL3DMat3d {
     }
 
     public GL3DMat3d identity() {
-        set(1f, 0f, 0f, 0f, 1f, 0f, 0f, 0f, 1f);
+        set(1, 0, 0, 0, 1, 0, 0, 0, 1);
         return this;
     }
 
@@ -83,10 +83,10 @@ public class GL3DMat3d {
     }
 
     public GL3DMat3d rotation(double degAng, double axisx, double axisy, double axisz) {
-        double radAng = degAng * (double) Math.PI / 180;
+        double radAng = degAng * Math.PI / 180.;
 
-        double ca = (double) Math.cos(radAng);
-        double sa = (double) Math.sin(radAng);
+        double ca = Math.cos(radAng);
+        double sa = Math.sin(radAng);
 
         if (axisx == 1 && axisy == 0 && axisz == 0) {
             m[0] = 1;
@@ -125,8 +125,8 @@ public class GL3DMat3d {
             y = axisy;
             z = axisz;
 
-            if ((l > 1.0001f || l < 0.9999f) && l != 0) {
-                l = 1f / (double) Math.sqrt(l);
+            if ((l > 1.0001 || l < 0.9999) && l != 0) {
+                l = 1. / Math.sqrt(l);
                 x *= l;
                 y *= l;
                 z *= l;
@@ -170,7 +170,7 @@ public class GL3DMat3d {
     public GL3DMat3d inverse() {
         double d = this.det();
 
-        if (Math.abs(d) <= 0.0000000001f) {
+        if (Math.abs(d) <= 0.0000000001) {
             throw new IllegalStateException("Matrix is singular. Inversion impossible.");
         }
 
