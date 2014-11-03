@@ -5,7 +5,16 @@
         <requirements>
         </requirements>
         <files>
-            <file srcName="HEKPlugin.jar" srcDir="default-plugins/" destName="HEKPlugin.jar" destDir="./" loadLibrary="false" md5="0bb9fd127d29fce6e492c9d821b099c8"/>
+            <file srcName="PfssPlugin.jar" srcDir="default-plugins/" destName="PFSSPlugin.jar" destDir="./" loadLibrary="false" md5="4c9f9840bf5cf718bfd33513a3fc1738"/>
+        </files>
+        <files>
+            <file srcName="SWEKPlugin.jar" srcDir="default-plugins/" destName="SWEKPlugin.jar" destDir="./" loadLibrary="false" md5="eae3c79c1f0c4013752a0e935a63b371"/>
+        </files>
+        <files>
+            <file srcName="SWHVHEKPlugin.jar" srcDir="default-plugins/" destName="SWHVHEKPlugin.jar" destDir="./" loadLibrary="false" md5="f4f5ceefaba9e61b676c5a01baa5b080"/>
+        </files>
+        <files>
+            <file srcName="EVEPlugin.jar" srcDir="default-plugins/" destName="EVEPlugin.jar" destDir="./" loadLibrary="false" md5="47fa876025ae3b7a70a63bd2b7f87120"/>
         </files>
     </configuration>
 </resourceDefinition>
