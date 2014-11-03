@@ -47,7 +47,7 @@ public class GL3DImageVertexShaderProgram extends GLVertexShaderProgram {
     @Override
     protected void buildImpl(GLShaderBuilder shaderBuilder) {
         try {
-            String program = "\tphysicalPosition = physicalPosition;" + GLShaderBuilder.LINE_SEP;
+            String program = "";
 
             program += "\tif(abs(position.x)>1.1){" + GLShaderBuilder.LINE_SEP;
             //Corona
@@ -77,8 +77,6 @@ public class GL3DImageVertexShaderProgram extends GLVertexShaderProgram {
             program += "\tfloat3x3 mat = float3x3(cos(phi), -sin(theta)*sin(phi), -sin(phi)*cos(theta), 0, cos(theta), -sin(theta), sin(phi), cos(phi)*sin(theta), cos(theta)*cos(phi));" + GLShaderBuilder.LINE_SEP;
             program += "\tphysicalPosition.xyz = mul(mat, physicalPosition.xyz);" + GLShaderBuilder.LINE_SEP;
             program += "\t OUT.position = mul(state_matrix_mvp, physicalPosition);" + GLShaderBuilder.LINE_SEP;
-            program += "\t OUT.position.y = OUT.position.y;" + GLShaderBuilder.LINE_SEP;
-
             program += "\t}" + GLShaderBuilder.LINE_SEP;
             program += "\telse{" + GLShaderBuilder.LINE_SEP;
             //Solar disk
