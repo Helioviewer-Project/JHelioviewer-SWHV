@@ -206,7 +206,7 @@ public class SWEKConfigurationManager {
             FileOutputStream fos = new FileOutputStream(saveFile);
             fos.getChannel().transferFrom(rbc, 0, Long.MAX_VALUE);
             fos.close();
-            configFileURL = new URL("file://" + saveFile);
+            configFileURL = (new File(saveFile)).toURI().toURL();
             return true;
         } catch (MalformedURLException e) {
             Log.debug("Could not create a URL from the value found in the properties file: "
