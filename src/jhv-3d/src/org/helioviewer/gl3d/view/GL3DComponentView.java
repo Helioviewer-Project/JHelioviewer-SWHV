@@ -13,6 +13,7 @@ import javax.media.opengl.awt.GLCanvas;
 
 import org.helioviewer.base.logging.Log;
 import org.helioviewer.base.math.Vector2dInt;
+import org.helioviewer.base.message.Message;
 import org.helioviewer.gl3d.scenegraph.GL3DState;
 import org.helioviewer.jhv.display.DisplayListener;
 import org.helioviewer.jhv.display.Displayer;
@@ -212,8 +213,10 @@ public class GL3DComponentView extends AbstractComponentView implements GLEventL
     }
 
     @Override
-    public void saveScreenshot(String imageFormat, File outputFile) throws IOException {
-        throw new UnsupportedOperationException("Cannot Save screenshots in 3D mode yet!");
+    public boolean saveScreenshot(String imageFormat, File outputFile) throws IOException {
+        Message.warnTitle("Screenshot 3D", "Cannot Save screenshots in 3D mode yet!");
+        return false;
+        //throw new UnsupportedOperationException("Cannot Save screenshots in 3D mode yet!");
     }
 
     @Override
