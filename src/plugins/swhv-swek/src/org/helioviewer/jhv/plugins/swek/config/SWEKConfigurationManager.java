@@ -202,6 +202,7 @@ public class SWEKConfigurationManager {
             URL url = new URL(swekProperties.getProperty("plugin.swek.onlineconfigfile"));
             ReadableByteChannel rbc = Channels.newChannel(url.openStream());
             String saveFile = SWEKSettings.SWEK_HOME + swekProperties.getProperty("plugin.swek.configfilename");
+            Log.debug("saveFile : " + saveFile);
             FileOutputStream fos = new FileOutputStream(saveFile);
             fos.getChannel().transferFrom(rbc, 0, Long.MAX_VALUE);
             fos.close();
