@@ -136,6 +136,7 @@ public class SWEKConfigurationManager {
      */
     private boolean isManuallyChanged() {
         try {
+            Log.debug("configURL : " + configFileURL.toString());
             InputStream configIs = configFileURL.openStream();
             StringBuilder sb = new StringBuilder();
             BufferedReader br = new BufferedReader(new InputStreamReader(configIs));
