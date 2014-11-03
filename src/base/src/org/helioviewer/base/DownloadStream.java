@@ -122,7 +122,7 @@ public class DownloadStream {
             HttpURLConnection httpC = (HttpURLConnection) connection;
             // get compression if supported
             httpC.setRequestProperty("Accept-Encoding", "gzip, deflate");
-            httpC.setRequestProperty("User-Agent", "SWHVJHelioviewer");
+            httpC.setRequestProperty("User-Agent", "JHelioviewer-SWHV");
 
             // Write post data if necessary
             if (output != null) {

@@ -20,7 +20,7 @@
     <property name="bin" value="${basedir}/build-bin/" />
     <property name="temp" value="${basedir}/temp/" />
     <property name="bzrpath" value="bzr" />
-    <property name="plugins.dir" value="${user.home}/JHelioviewer/Plugins/" />
+    <property name="plugins.dir" value="${user.home}/JHelioviewer-SWHV/Plugins/" />
     <property name="sweksources" value="${basedir}/sources" />
     <property name="sweksources.lib" value="${sweksources}/*/lib" />
 
