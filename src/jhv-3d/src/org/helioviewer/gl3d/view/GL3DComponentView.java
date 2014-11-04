@@ -1,6 +1,7 @@
 package org.helioviewer.gl3d.view;
 
 import java.awt.Color;
+import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 
@@ -14,10 +15,13 @@ import javax.media.opengl.awt.GLCanvas;
 import org.helioviewer.base.logging.Log;
 import org.helioviewer.base.math.Vector2dInt;
 import org.helioviewer.base.message.Message;
+import org.helioviewer.gl3d.movie.MovieExport;
 import org.helioviewer.gl3d.scenegraph.GL3DState;
 import org.helioviewer.jhv.display.DisplayListener;
 import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.display.GL3DComponentFakeInterface;
+import org.helioviewer.jhv.gui.ImageViewerGui;
+import org.helioviewer.jhv.layers.LayersModel;
 import org.helioviewer.viewmodel.changeevent.ChangeEvent;
 import org.helioviewer.viewmodel.changeevent.LayerChangedReason;
 import org.helioviewer.viewmodel.changeevent.LayerChangedReason.LayerChangeType;
@@ -31,6 +35,7 @@ import org.helioviewer.viewmodel.view.LinkedMovieManager;
 import org.helioviewer.viewmodel.view.TimedMovieView;
 import org.helioviewer.viewmodel.view.View;
 import org.helioviewer.viewmodel.view.ViewportView;
+import org.helioviewer.viewmodel.view.jp2view.JHVJPXView;
 import org.helioviewer.viewmodel.view.opengl.GLTextureHelper;
 import org.helioviewer.viewmodel.view.opengl.GLView;
 import org.helioviewer.viewmodel.view.opengl.shader.GLFragmentShaderView;
@@ -42,6 +47,11 @@ import org.helioviewer.viewmodel.view.opengl.shader.GLVertexShaderView;
 import org.helioviewer.viewmodel.viewport.StaticViewport;
 import org.helioviewer.viewmodel.viewport.Viewport;
 
+import com.jogamp.opengl.util.TileRenderer;
+import com.jogamp.opengl.util.TileRendererBase;
+import com.jogamp.opengl.util.awt.AWTGLPixelBuffer;
+import com.jogamp.opengl.util.awt.ImageUtil;
+
 /**
  * The top-most View in the 3D View Chain. Let's the viewchain render to its
  * {@link GLCanvas}.
@@ -52,6 +62,7 @@ import org.helioviewer.viewmodel.viewport.Viewport;
  */
 public class GL3DComponentView extends AbstractComponentView implements GLEventListener, ComponentView, DisplayListener, GL3DComponentFakeInterface {
     private GLCanvas canvas;
+    private final AWTGLPixelBuffer.SingleAWTGLPixelBufferProvider pixelBufferProvider = new AWTGLPixelBuffer.SingleAWTGLPixelBufferProvider(true);
 
     private Color backgroundColor = Color.BLACK;
     private boolean backGroundColorHasChanged = false;
@@ -66,6 +77,13 @@ public class GL3DComponentView extends AbstractComponentView implements GLEventL
 
     private Vector2dInt viewportSize;
 
+    private TileRenderer tileRenderer;
+    private BufferedImage screenshot;
+    private int previousScreenshot = -1;
+
+    private MovieExport export;
+    private boolean exportMode;
+
     public GL3DComponentView() {
         GLCapabilities caps = new GLCapabilities(GLProfile.getDefault());
         GLCanvas glCanvas = new GLCanvas(caps);
@@ -79,7 +97,6 @@ public class GL3DComponentView extends AbstractComponentView implements GLEventL
 
     @Override
     public void deactivate() {
-
     }
 
     @Override
@@ -93,6 +110,28 @@ public class GL3DComponentView extends AbstractComponentView implements GLEventL
 
     public void displayChanged(GLAutoDrawable arg0, boolean arg1, boolean arg2) {
         Log.debug("GL3DComponentView.DisplayChanged");
+    }
+
+    public void startExport() {
+        ImageViewerGui.getSingletonInstance().getLeftContentPane().setEnabled(false);
+        View v = LayersModel.getSingletonInstance().getActiveView();
+        JHVJPXView movieView = v.getAdapter(JHVJPXView.class);
+        movieView.pauseMovie();
+        movieView.setCurrentFrame(0, new ChangeEvent());
+        export = new MovieExport();
+        export.createProcess();
+        exportMode = true;
+        movieView.playMovie();
+    }
+
+    public void stopExport() {
+        View v = LayersModel.getSingletonInstance().getActiveView();
+        JHVJPXView movieView = v.getAdapter(JHVJPXView.class);
+        exportMode = false;
+        previousScreenshot = -1;
+        export.finishProcess();
+        ImageViewerGui.getSingletonInstance().getLeftContentPane().setEnabled(true);
+        movieView.pauseMovie();
     }
 
     @Override
@@ -146,12 +185,48 @@ public class GL3DComponentView extends AbstractComponentView implements GLEventL
 
     @Override
     public synchronized void display(GLAutoDrawable glAD) {
+        JHVJPXView mv = null;
+
+        if (exportMode) {
+            View v = LayersModel.getSingletonInstance().getActiveView();
+            if (v != null) {
+                mv = v.getAdapter(JHVJPXView.class);
+                if (tileRenderer == null) {
+                    tileRenderer = new TileRenderer();
+                } else if (!tileRenderer.isSetup()) {
+                    tileRenderer.reset();
+                }
+            } else {
+                this.stopExport();
+                Log.warn("Premature stopping the video export: no active layer found");
+            }
+        }
+
         GL2 gl = (GL2) glAD.getGL();
 
         int width = this.viewportSize.getX();
         int height = this.viewportSize.getY();
-        GL3DState.getUpdated(gl, width, height);
+        AWTGLPixelBuffer pixelBuffer = null;
+        if (exportMode && mv != null) {
+            tileRenderer.setTileSize(width, height, 0);
+            tileRenderer.setImageSize(width, height);
+            pixelBuffer = pixelBufferProvider.allocate(gl, AWTGLPixelBuffer.awtPixelAttributesIntRGB3, width, height, 1, true, 0);
+            tileRenderer.setImageBuffer(pixelBuffer);
+            int tileNum = 0;
+            while (!tileRenderer.eot()) {
+                ++tileNum;
+                if (tileNum > 1) {
+                    break;
+                }
+                tileRenderer.beginTile(gl);
+                int x = tileRenderer.getParam(TileRendererBase.TR_CURRENT_TILE_X_POS);
+                int y = tileRenderer.getParam(TileRendererBase.TR_CURRENT_TILE_Y_POS);
+                int w = tileRenderer.getParam(TileRendererBase.TR_CURRENT_TILE_WIDTH);
+                int h = tileRenderer.getParam(TileRendererBase.TR_CURRENT_TILE_HEIGHT);
 
+                GL3DState.getUpdated(gl, width, height);
+            }
+        }
         if (backGroundColorHasChanged) {
             gl.glClearColor(backgroundColor.getRed() / 255.0f, backgroundColor.getGreen() / 255.0f, backgroundColor.getBlue() / 255.0f, backgroundColor.getAlpha() / 255.0f);
 
@@ -209,6 +284,20 @@ public class GL3DComponentView extends AbstractComponentView implements GLEventL
 
         }
         gl.glPopMatrix();
+        if (exportMode && mv != null) {
+            int currentScreenshot = mv.getCurrentFrameNumber();
+            tileRenderer.endTile(gl);
+            screenshot = pixelBuffer.image;
+            ImageUtil.flipImageVertically(screenshot);
+            if (currentScreenshot != previousScreenshot) {
+                export.writeImage(screenshot);
+            }
+            previousScreenshot = currentScreenshot;
+            Log.debug("Exporting frame " + currentScreenshot + " / " + mv.getMaximumFrameNumber());
+            if (currentScreenshot == mv.getMaximumFrameNumber()) {
+                this.stopExport();
+            }
+        }
         GL3DState.get().checkGLErrors();
     }
 

@@ -74,7 +74,6 @@ import com.jogamp.opengl.util.awt.ImageUtil;
  * @author Markus Langenberg
  */
 public class GLComponentView extends AbstractComponentView implements ViewListener, GLEventListener {
-
     public static final String SETTING_TILE_WIDTH = "gl.screenshot.tile.width";
     public static final String SETTING_TILE_HEIGHT = "gl.screenshot.tile.height";
 

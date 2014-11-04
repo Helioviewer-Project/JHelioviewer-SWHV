@@ -73,6 +73,7 @@ import org.apache.log4j.Level;
 import org.helioviewer.base.FileUtils;
 import org.helioviewer.base.logging.Log;
 import org.helioviewer.base.message.Message;
+import org.helioviewer.gl3d.view.GL3DComponentView;
 import org.helioviewer.jhv.JHVDirectory;
 import org.helioviewer.jhv.JHVGlobals;
 import org.helioviewer.jhv.Settings;
@@ -158,28 +159,28 @@ public class ExportMovieDialog extends JDialog implements ChangeListener, Action
     // to make it easier to free members later
 
     // Swing components
-    private final JComboBox aspectRatioSelection;
-    private final JFormattedTextField txtImageWidth, txtImageHeight, txtTotalHeight;
-    private final JSpinner speedSpinner;
-    private final JCheckBox loadFirstCheckBox;
-    private final JCheckBox useDifferentialRotationTracking;
-    private final JCheckBox embedSoftSubtitle;
-    private final JCheckBox embedHardSubtitle;
-    private final JCheckBox embedHardSubtitleAspectRatio;
-    private final JButton cmdExport, cmdCancel;
-    private final JProgressBar progressBar;
-    private final JComboBox layerSelection;
-    private final JButton zoom1to1;
-    private final JButton zoomFit;
-    private final JSpinner zoomSpinner;
-    private final JPanel imagePanelContainer;
+    private JComboBox aspectRatioSelection;
+    private JFormattedTextField txtImageWidth, txtImageHeight, txtTotalHeight;
+    private JSpinner speedSpinner;
+    private JCheckBox loadFirstCheckBox;
+    private JCheckBox useDifferentialRotationTracking;
+    private JCheckBox embedSoftSubtitle;
+    private JCheckBox embedHardSubtitle;
+    private JCheckBox embedHardSubtitleAspectRatio;
+    private JButton cmdExport, cmdCancel;
+    private JProgressBar progressBar;
+    private JComboBox layerSelection;
+    private JButton zoom1to1;
+    private JButton zoomFit;
+    private JSpinner zoomSpinner;
+    private JPanel imagePanelContainer;
 
     // Collections
     private Map<View, File> subtitleFiles;
     private Map<View, Writer> subtitleWriters;
     private LinkedList<JP2ImageOriginalParent> jp2ImageOriginalParents;
     private HashMap<JComponent, Boolean> enableState;
-    private final List<JComponent> guiElements;
+    private List<JComponent> guiElements;
     private HashMap<TimedMovieView, StatusStruct> currentViewStatus = new HashMap<TimedMovieView, StatusStruct>();
     private HashMap<JHVJP2View, Integer> readerErrorCounter = new HashMap<JHVJP2View, Integer>();
 
@@ -239,225 +240,238 @@ public class ExportMovieDialog extends JDialog implements ChangeListener, Action
      */
     public ExportMovieDialog() {
         super(ImageViewerGui.getMainFrame(), "Export Movie", true);
-        guiElements = new ArrayList<JComponent>();
-
-        Log.debug(">> ExportMovieDialog() > Start initializing GUI");
-        addWindowListener(new WindowAdapter() {
-            @Override
-            public void windowClosing(WindowEvent e) {
-                exportFinished = true;
-                release();
-            }
-        });
-
-        setLayout(new BorderLayout());
-        setResizable(false);
-
-        // Parameters
-
-        JPanel parameterPanel = new JPanel(new GridBagLayout());
-        parameterPanel.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
-        parameterPanel.setComponentOrientation(ComponentOrientation.RIGHT_TO_LEFT);
-        GridBagConstraints c = new GridBagConstraints();
-        c.fill = GridBagConstraints.HORIZONTAL;
-        c.insets = new Insets(2, 2, 2, 2);
-
-        JPanel zoomPanel = new JPanel();
-        layerSelection = new JComboBox();
-
-        zoom1to1 = new JButton("Zoom 1:1");
-        zoomFit = new JButton("Zoom to Fit");
-        zoomSpinner = new JSpinner(new SpinnerNumberModel(new Double(1), new Double(0.0005), null, new Double(0.01f)));
-        JSpinner.NumberEditor editor = new JSpinner.NumberEditor(zoomSpinner, "0.00%");
-        zoomSpinner.setEditor(editor);
-        zoom1to1.addActionListener(this);
-        zoomFit.addActionListener(this);
-        zoomSpinner.addChangeListener(this);
-        zoomSpinner.addMouseWheelListener(this);
-        layerSelection.addActionListener(this);
-        guiElements.add(zoomSpinner);
-        guiElements.add(layerSelection);
-        guiElements.add(zoom1to1);
-        guiElements.add(zoomFit);
-
-        c.gridy = 1;
-        c.gridwidth = 1;
-        c.weightx = 0;
-        parameterPanel.add(zoom1to1, c);
-        parameterPanel.add(zoomFit, c);
-        c.gridwidth = 2;
-        zoomPanel.setLayout(new BoxLayout(zoomPanel, BoxLayout.X_AXIS));
-        zoomPanel.add(new JLabel("Zoom:   "));
-        zoomPanel.add(zoomSpinner);
-        zoomPanel.add(new JLabel("  of Layer"));
-        parameterPanel.add(layerSelection, c);
-        c.gridwidth = 1;
-        c.weightx = 1;
-        parameterPanel.add(new JLabel(" "), c);
-        c.weightx = 0;
-        parameterPanel.add(zoomPanel, c);
-        // Image Panel
-        Log.debug(">> ExportMovieDialog() > Create preview image panel");
-        imagePanelContainer = new JPanel(new FlowLayout(FlowLayout.CENTER, 0, 0));
-
-        c.gridy++;
-        c.weightx = 0;
-        c.gridwidth = 2;
-        c.gridheight = 8;
-        parameterPanel.add(imagePanelContainer, c);
-
-        c.gridheight = 1;
-
-        // Image dimensions
-        c.gridwidth = 2;
-
-        aspectRatioSelection = new JComboBox(aspectRatioPresets);
-        aspectRatioSelection.addActionListener(this);
-        parameterPanel.add(aspectRatioSelection, c);
-        c.gridwidth = 1;
-        parameterPanel.add(new JLabel(), c);
-        parameterPanel.add(new JLabel("Aspect ratio:"), c);
-        guiElements.add(aspectRatioSelection);
-
-        // Image Width
-        c.gridy++;
-        c.gridwidth = 2;
-        txtImageWidth = new JFormattedTextField(new Integer(640));
-        txtImageWidth.getDocument().addDocumentListener(this);
-        txtImageWidth.addActionListener(this);
-        ((NumberFormat) ((NumberFormatter) txtImageWidth.getFormatter()).getFormat()).setGroupingUsed(false);
-        parameterPanel.add(txtImageWidth, c);
-        c.gridwidth = 1;
-        c.weightx = 1;
-        parameterPanel.add(new JLabel(), c);
-        c.weightx = 0;
-        parameterPanel.add(new JLabel("Image Width:"), c);
-        guiElements.add(txtImageWidth);
-
-        // Image Height
-        c.gridy++;
-        txtImageHeight = new JFormattedTextField(new Integer(640));
-        txtImageHeight.getDocument().addDocumentListener(this);
-        txtImageHeight.addActionListener(this);
-        ((NumberFormat) ((NumberFormatter) txtImageHeight.getFormatter()).getFormat()).setGroupingUsed(false);
-        c.gridwidth = 2;
-        parameterPanel.add(txtImageHeight, c);
-        c.gridwidth = 1;
-        c.weightx = 1;
-        parameterPanel.add(new JLabel(), c);
-        c.weightx = 0;
-        parameterPanel.add(new JLabel("Image Height:"), c);
-        guiElements.add(txtImageHeight);
-
-        // Total height
-        c.gridy++;
-        txtTotalHeight = new JFormattedTextField(new Integer(640));
-        txtTotalHeight.setEnabled(false);
-        txtTotalHeight.getDocument().addDocumentListener(this);
-        txtTotalHeight.addActionListener(this);
-        ((NumberFormat) ((NumberFormatter) txtTotalHeight.getFormatter()).getFormat()).setGroupingUsed(false);
-        c.gridwidth = 2;
-        parameterPanel.add(txtTotalHeight, c);
-        c.gridwidth = 1;
-        c.weightx = 1;
-        parameterPanel.add(new JLabel(), c);
-        c.weightx = 0;
-        parameterPanel.add(new JLabel("Total Height With Subtitles:"), c);
-        guiElements.add(txtTotalHeight);
-
-        // Speed
-        c.gridy++;
-        c.gridwidth = 2;
-        speedSpinner = new JSpinner(new SpinnerNumberModel(20, 1, 99, 1));
-        speedSpinner.addMouseWheelListener(this);
-        parameterPanel.add(speedSpinner, c);
-        c.gridwidth = 1;
-        c.weightx = 1;
-        parameterPanel.add(new JLabel(), c);
-        c.weightx = 0;
-        parameterPanel.add(new JLabel("Speed (fps):"), c);
-        guiElements.add(speedSpinner);
-
-        c.gridy++;
-        parameterPanel.add(new JLabel(" "), c);
-
-        // Load First = Load all data via JPIP before exporting
-        c.gridy++;
-        c.gridwidth = 4;
-        loadFirstCheckBox = new JCheckBox("Download full quality before export", false);
-        parameterPanel.add(loadFirstCheckBox, c);
-        guiElements.add(loadFirstCheckBox);
-
-        // Use differential rotation tracking
-        c.gridy++;
-        c.gridwidth = 6;
-        StandardSolarRotationTrackingView trackingView = ImageViewerGui.getSingletonInstance().getMainView().getAdapter(StandardSolarRotationTrackingView.class);
-        useDifferentialRotationTracking = new JCheckBox("Use differential rotation tracking", trackingView != null && trackingView.getEnabled());
-        parameterPanel.add(useDifferentialRotationTracking, c);
-        guiElements.add(useDifferentialRotationTracking);
-
-        // Soft subtitle
-        c.gridy++;
-        c.gridx = 0;
-        c.gridwidth = 6;
-        embedSoftSubtitle = new JCheckBox("Embed soft subtitle (can be turned on and off during playback)", true);
-        parameterPanel.add(embedSoftSubtitle, c);
-        guiElements.add(embedSoftSubtitle);
-
-        // Hard subtitle
-        c.gridy++;
-        c.gridx = 0;
-        c.gridwidth = 6;
-        embedHardSubtitle = new JCheckBox("Embed hard subtitle (can NOT be turned on and off during playback)", false);
-        embedHardSubtitle.addActionListener(this);
-        parameterPanel.add(embedHardSubtitle, c);
-        c.gridy++;
-        c.gridx = 0;
-        c.gridwidth = 6;
-        embedHardSubtitleAspectRatio = new JCheckBox("Use total movie height instead of image height for aspect ratio", false);
-        embedHardSubtitleAspectRatio.setEnabled(false);
-        embedHardSubtitleAspectRatio.addActionListener(this);
-        guiElements.add(embedHardSubtitle);
-        guiElements.add(embedHardSubtitleAspectRatio);
-
-        parameterPanel.add(embedHardSubtitleAspectRatio, c);
-
-        // Stretch
-        c.gridy++;
-        c.weighty = 1.0;
-        parameterPanel.add(Box.createVerticalGlue(), c);
-
-        // Buttons
-        JPanel buttonPane = new JPanel();
-        buttonPane.setLayout(new BoxLayout(buttonPane, BoxLayout.LINE_AXIS));
-
-        cmdExport = new JButton("Export");
-        cmdExport.addActionListener(this);
-        guiElements.add(cmdExport);
-
-        cmdCancel = new JButton("Cancel");
-        cmdCancel.addActionListener(this);
-        guiElements.add(cmdCancel);
-
-        buttonPane.add(Box.createHorizontalGlue());
-
-        // Order depends on operation system
-        if (System.getProperty("os.name").toUpperCase().contains("WIN")) {
-            buttonPane.add(cmdExport);
-            buttonPane.add(cmdCancel);
+        ImageViewerGui.getSingletonInstance().getLeftContentPane().setEnabled(false);
+        final GL3DComponentView gl3dc = ImageViewerGui.getSingletonInstance().getMainView().getAdapter(GL3DComponentView.class);
+        if (gl3dc != null) {
+            JButton exportButton = new JButton("Click to start export");
+            exportButton.addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    gl3dc.startExport();
+                    release();
+                }
+            });
+            this.add(exportButton);
         } else {
-            buttonPane.add(cmdCancel);
-            buttonPane.add(cmdExport);
+            guiElements = new ArrayList<JComponent>();
+
+            Log.debug(">> ExportMovieDialog() > Start initializing GUI");
+            addWindowListener(new WindowAdapter() {
+                @Override
+                public void windowClosing(WindowEvent e) {
+                    exportFinished = true;
+                }
+            });
+
+            setLayout(new BorderLayout());
+            setResizable(false);
+
+            // Parameters
+
+            JPanel parameterPanel = new JPanel(new GridBagLayout());
+            parameterPanel.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
+            parameterPanel.setComponentOrientation(ComponentOrientation.RIGHT_TO_LEFT);
+            GridBagConstraints c = new GridBagConstraints();
+            c.fill = GridBagConstraints.HORIZONTAL;
+            c.insets = new Insets(2, 2, 2, 2);
+
+            JPanel zoomPanel = new JPanel();
+            layerSelection = new JComboBox();
+
+            zoom1to1 = new JButton("Zoom 1:1");
+            zoomFit = new JButton("Zoom to Fit");
+            zoomSpinner = new JSpinner(new SpinnerNumberModel(new Double(1), new Double(0.0005), null, new Double(0.01f)));
+            JSpinner.NumberEditor editor = new JSpinner.NumberEditor(zoomSpinner, "0.00%");
+            zoomSpinner.setEditor(editor);
+            zoom1to1.addActionListener(this);
+            zoomFit.addActionListener(this);
+            zoomSpinner.addChangeListener(this);
+            zoomSpinner.addMouseWheelListener(this);
+            layerSelection.addActionListener(this);
+            guiElements.add(zoomSpinner);
+            guiElements.add(layerSelection);
+            guiElements.add(zoom1to1);
+            guiElements.add(zoomFit);
+
+            c.gridy = 1;
+            c.gridwidth = 1;
+            c.weightx = 0;
+            parameterPanel.add(zoom1to1, c);
+            parameterPanel.add(zoomFit, c);
+            c.gridwidth = 2;
+            zoomPanel.setLayout(new BoxLayout(zoomPanel, BoxLayout.X_AXIS));
+            zoomPanel.add(new JLabel("Zoom:   "));
+            zoomPanel.add(zoomSpinner);
+            zoomPanel.add(new JLabel("  of Layer"));
+            parameterPanel.add(layerSelection, c);
+            c.gridwidth = 1;
+            c.weightx = 1;
+            parameterPanel.add(new JLabel(" "), c);
+            c.weightx = 0;
+            parameterPanel.add(zoomPanel, c);
+            // Image Panel
+            Log.debug(">> ExportMovieDialog() > Create preview image panel");
+            imagePanelContainer = new JPanel(new FlowLayout(FlowLayout.CENTER, 0, 0));
+
+            c.gridy++;
+            c.weightx = 0;
+            c.gridwidth = 2;
+            c.gridheight = 8;
+            parameterPanel.add(imagePanelContainer, c);
+
+            c.gridheight = 1;
+
+            // Image dimensions
+            c.gridwidth = 2;
+
+            aspectRatioSelection = new JComboBox(aspectRatioPresets);
+            aspectRatioSelection.addActionListener(this);
+            parameterPanel.add(aspectRatioSelection, c);
+            c.gridwidth = 1;
+            parameterPanel.add(new JLabel(), c);
+            parameterPanel.add(new JLabel("Aspect ratio:"), c);
+            guiElements.add(aspectRatioSelection);
+
+            // Image Width
+            c.gridy++;
+            c.gridwidth = 2;
+            txtImageWidth = new JFormattedTextField(new Integer(640));
+            txtImageWidth.getDocument().addDocumentListener(this);
+            txtImageWidth.addActionListener(this);
+            ((NumberFormat) ((NumberFormatter) txtImageWidth.getFormatter()).getFormat()).setGroupingUsed(false);
+            parameterPanel.add(txtImageWidth, c);
+            c.gridwidth = 1;
+            c.weightx = 1;
+            parameterPanel.add(new JLabel(), c);
+            c.weightx = 0;
+            parameterPanel.add(new JLabel("Image Width:"), c);
+            guiElements.add(txtImageWidth);
+
+            // Image Height
+            c.gridy++;
+            txtImageHeight = new JFormattedTextField(new Integer(640));
+            txtImageHeight.getDocument().addDocumentListener(this);
+            txtImageHeight.addActionListener(this);
+            ((NumberFormat) ((NumberFormatter) txtImageHeight.getFormatter()).getFormat()).setGroupingUsed(false);
+            c.gridwidth = 2;
+            parameterPanel.add(txtImageHeight, c);
+            c.gridwidth = 1;
+            c.weightx = 1;
+            parameterPanel.add(new JLabel(), c);
+            c.weightx = 0;
+            parameterPanel.add(new JLabel("Image Height:"), c);
+            guiElements.add(txtImageHeight);
+
+            // Total height
+            c.gridy++;
+            txtTotalHeight = new JFormattedTextField(new Integer(640));
+            txtTotalHeight.setEnabled(false);
+            txtTotalHeight.getDocument().addDocumentListener(this);
+            txtTotalHeight.addActionListener(this);
+            ((NumberFormat) ((NumberFormatter) txtTotalHeight.getFormatter()).getFormat()).setGroupingUsed(false);
+            c.gridwidth = 2;
+            parameterPanel.add(txtTotalHeight, c);
+            c.gridwidth = 1;
+            c.weightx = 1;
+            parameterPanel.add(new JLabel(), c);
+            c.weightx = 0;
+            parameterPanel.add(new JLabel("Total Height With Subtitles:"), c);
+            guiElements.add(txtTotalHeight);
+
+            // Speed
+            c.gridy++;
+            c.gridwidth = 2;
+            speedSpinner = new JSpinner(new SpinnerNumberModel(20, 1, 99, 1));
+            speedSpinner.addMouseWheelListener(this);
+            parameterPanel.add(speedSpinner, c);
+            c.gridwidth = 1;
+            c.weightx = 1;
+            parameterPanel.add(new JLabel(), c);
+            c.weightx = 0;
+            parameterPanel.add(new JLabel("Speed (fps):"), c);
+            guiElements.add(speedSpinner);
+
+            c.gridy++;
+            parameterPanel.add(new JLabel(" "), c);
+
+            // Load First = Load all data via JPIP before exporting
+            c.gridy++;
+            c.gridwidth = 4;
+            loadFirstCheckBox = new JCheckBox("Download full quality before export", false);
+            parameterPanel.add(loadFirstCheckBox, c);
+            guiElements.add(loadFirstCheckBox);
+
+            // Use differential rotation tracking
+            c.gridy++;
+            c.gridwidth = 6;
+            StandardSolarRotationTrackingView trackingView = ImageViewerGui.getSingletonInstance().getMainView().getAdapter(StandardSolarRotationTrackingView.class);
+            useDifferentialRotationTracking = new JCheckBox("Use differential rotation tracking", trackingView != null && trackingView.getEnabled());
+            parameterPanel.add(useDifferentialRotationTracking, c);
+            guiElements.add(useDifferentialRotationTracking);
+
+            // Soft subtitle
+            c.gridy++;
+            c.gridx = 0;
+            c.gridwidth = 6;
+            embedSoftSubtitle = new JCheckBox("Embed soft subtitle (can be turned on and off during playback)", true);
+            parameterPanel.add(embedSoftSubtitle, c);
+            guiElements.add(embedSoftSubtitle);
+
+            // Hard subtitle
+            c.gridy++;
+            c.gridx = 0;
+            c.gridwidth = 6;
+            embedHardSubtitle = new JCheckBox("Embed hard subtitle (can NOT be turned on and off during playback)", false);
+            embedHardSubtitle.addActionListener(this);
+            parameterPanel.add(embedHardSubtitle, c);
+            c.gridy++;
+            c.gridx = 0;
+            c.gridwidth = 6;
+            embedHardSubtitleAspectRatio = new JCheckBox("Use total movie height instead of image height for aspect ratio", false);
+            embedHardSubtitleAspectRatio.setEnabled(false);
+            embedHardSubtitleAspectRatio.addActionListener(this);
+            guiElements.add(embedHardSubtitle);
+            guiElements.add(embedHardSubtitleAspectRatio);
+
+            parameterPanel.add(embedHardSubtitleAspectRatio, c);
+
+            // Stretch
+            c.gridy++;
+            c.weighty = 1.0;
+            parameterPanel.add(Box.createVerticalGlue(), c);
+
+            // Buttons
+            JPanel buttonPane = new JPanel();
+            buttonPane.setLayout(new BoxLayout(buttonPane, BoxLayout.LINE_AXIS));
+
+            cmdExport = new JButton("Export");
+            cmdExport.addActionListener(this);
+            guiElements.add(cmdExport);
+
+            cmdCancel = new JButton("Cancel");
+            cmdCancel.addActionListener(this);
+            guiElements.add(cmdCancel);
+
+            buttonPane.add(Box.createHorizontalGlue());
+
+            // Order depends on operation system
+            if (System.getProperty("os.name").toUpperCase().contains("WIN")) {
+                buttonPane.add(cmdExport);
+                buttonPane.add(cmdCancel);
+            } else {
+                buttonPane.add(cmdCancel);
+                buttonPane.add(cmdExport);
+            }
+
+            c.gridy++;
+            parameterPanel.add(buttonPane, c);
+
+            add(parameterPanel);
+
+            // Progressbar
+            progressBar = new JProgressBar(JProgressBar.HORIZONTAL, 0, 100);
+            add(progressBar, BorderLayout.SOUTH);
         }
-
-        c.gridy++;
-        parameterPanel.add(buttonPane, c);
-
-        add(parameterPanel);
-
-        // Progressbar
-        progressBar = new JProgressBar(JProgressBar.HORIZONTAL, 0, 100);
-        add(progressBar, BorderLayout.SOUTH);
     }
 
     private void setGuiDuringExport() {
@@ -504,92 +518,98 @@ public class ExportMovieDialog extends JDialog implements ChangeListener, Action
 
     @Override
     public void init() {
-        Log.info("Initialize movie export dialog");
-
-        initializationDone = false;
-        currentViewStatus = new HashMap<TimedMovieView, StatusStruct>();
-        readerErrorCounter = new HashMap<JHVJP2View, Integer>();
-        zoomController = new ZoomController();
-        selectedOutputFormat = new MOVFilter();
-        viewChangedSemaphore = new Semaphore(1);
-        exportSuccessful = false;
-        savedDoubleBufferinOption = J2KRenderGlobalOptions.getDoubleBufferingOption();
-        linkedMovieManagerInstance = -1;
-        currentFrame = 0;
-        exportFinished = false;
-        updatingImageHeight = false;
-        updatingImageWidth = false;
-        updatingTotalHeight = false;
-        enableState = new HashMap<JComponent, Boolean>();
-
-        LayeredView layeredView = ImageViewerGui.getSingletonInstance().getMainView().getAdapter(LayeredView.class);
-        if (layeredView.getNumberOfVisibleLayer() == 0) {
-            Message.err("No visible layers!", "There are no visible layers loaded which can be exported", false);
-            release();
-            return;
+        ImageViewerGui.getSingletonInstance().getLeftContentPane().setEnabled(false);
+        final GL3DComponentView gl3dc = ImageViewerGui.getSingletonInstance().getMainView().getAdapter(GL3DComponentView.class);
+        if (gl3dc != null) {
+            this.showDialog();
         } else {
-            Log.debug(">> ExportMovieDialog() > Pause movies");
-            for (int i = 0; i < layeredView.getNumLayers(); i++) {
-                MovieView movieView = layeredView.getLayer(i).getAdapter(MovieView.class);
-                if (movieView != null) {
-                    movieView.pauseMovie();
-                }
-            }
-            imagePanel = new MainImagePanel();
-            imagePanel.setLoading(false);
-            imagePanel.setAutoscrolls(true);
-            imagePanel.setFocusable(false);
-            imagePanel.setUpdateViewportView(false);
-            imagePanel.setPreferredSize(new Dimension(PANEL_WIDTH, PANEL_HEIGHT));
-            imagePanel.setSize(new Dimension(PANEL_WIDTH, PANEL_HEIGHT));
-            MainImagePanelMousePanController mainImagePanelMousePanController = new MainImagePanelMousePanController();
-            imagePanel.setInputController(mainImagePanelMousePanController);
-            imagePanel.removeMouseWheelListener(mainImagePanelMousePanController);
-            imagePanel.setBackgroundImage(IconBank.getImage(JHVIcon.LOADING_BIG).getScaledInstance(PANEL_WIDTH, PANEL_HEIGHT, java.awt.Image.SCALE_SMOOTH));
-            imagePanel.setBackground(Color.BLACK);
-            imagePanelContainer.removeAll();
-            imagePanelContainer.add(imagePanel);
-            Log.debug(">> ExportMovieDialog() > Disable GUI until init is finished");
-            progressBar.setValue(0);
-            disableGUI();
-            initThread = new Thread(new Runnable() {
-                @Override
-                public void run() {
-                    Region initialRegion = initAndGetInitialRegion();
-                    initViewchain();
-                    Log.debug(">> ExportMovieDialog() > Viewchain initialization is finished. Loading settings");
-                    try {
-                        SwingUtilities.invokeAndWait(new Runnable() {
-                            @Override
-                            public void run() {
-                                setGuiBeforeExport();
-                                loadExportSettings();
-                            }
-                        });
-                    } catch (Throwable t) {
-                        Log.error(">> ExportMovieDialog() > Could not load settings!");
-                        Message.err("Movie export", "Error initializing movie export dialog.\nPlease consult the log files for more information.", false);
-                    }
-                    Log.debug(">> ExportMovieDialog() > Settings loaded. Set inital region.");
-                    imagePanel.getView().getAdapter(RegionView.class).setRegion(initialRegion, new ChangeEvent());
-                    try {
-                        SwingUtilities.invokeAndWait(new Runnable() {
-                            @Override
-                            public void run() {
-                                zoomSpinner.setValue(getCurrentZoom());
-                                Log.debug(">> ExportMovieDialog() > Region is set. Enable GUI.");
-                                enableGUI();
-                            }
-                        });
-                    } catch (Throwable e) {
-                        Log.error(">> ExportMovieDialog() > Error initializing dialog. ", e);
-                        release();
-                        return;
-                    }
-                }
-            }, "InitMovieExport");
+            Log.info("Initialize movie export dialog");
 
-            initThread.start();
+            initializationDone = false;
+            currentViewStatus = new HashMap<TimedMovieView, StatusStruct>();
+            readerErrorCounter = new HashMap<JHVJP2View, Integer>();
+            zoomController = new ZoomController();
+            selectedOutputFormat = new MOVFilter();
+            viewChangedSemaphore = new Semaphore(1);
+            exportSuccessful = false;
+            savedDoubleBufferinOption = J2KRenderGlobalOptions.getDoubleBufferingOption();
+            linkedMovieManagerInstance = -1;
+            currentFrame = 0;
+            exportFinished = false;
+            updatingImageHeight = false;
+            updatingImageWidth = false;
+            updatingTotalHeight = false;
+            enableState = new HashMap<JComponent, Boolean>();
+
+            LayeredView layeredView = ImageViewerGui.getSingletonInstance().getMainView().getAdapter(LayeredView.class);
+            if (layeredView.getNumberOfVisibleLayer() == 0) {
+                Message.err("No visible layers!", "There are no visible layers loaded which can be exported", false);
+                release();
+                return;
+            } else {
+                Log.debug(">> ExportMovieDialog() > Pause movies");
+                for (int i = 0; i < layeredView.getNumLayers(); i++) {
+                    MovieView movieView = layeredView.getLayer(i).getAdapter(MovieView.class);
+                    if (movieView != null) {
+                        movieView.pauseMovie();
+                    }
+                }
+                imagePanel = new MainImagePanel();
+                imagePanel.setLoading(false);
+                imagePanel.setAutoscrolls(true);
+                imagePanel.setFocusable(false);
+                imagePanel.setUpdateViewportView(false);
+                imagePanel.setPreferredSize(new Dimension(PANEL_WIDTH, PANEL_HEIGHT));
+                imagePanel.setSize(new Dimension(PANEL_WIDTH, PANEL_HEIGHT));
+                MainImagePanelMousePanController mainImagePanelMousePanController = new MainImagePanelMousePanController();
+                imagePanel.setInputController(mainImagePanelMousePanController);
+                imagePanel.removeMouseWheelListener(mainImagePanelMousePanController);
+                imagePanel.setBackgroundImage(IconBank.getImage(JHVIcon.LOADING_BIG).getScaledInstance(PANEL_WIDTH, PANEL_HEIGHT, java.awt.Image.SCALE_SMOOTH));
+                imagePanel.setBackground(Color.BLACK);
+                imagePanelContainer.removeAll();
+                imagePanelContainer.add(imagePanel);
+                Log.debug(">> ExportMovieDialog() > Disable GUI until init is finished");
+                progressBar.setValue(0);
+                disableGUI();
+                initThread = new Thread(new Runnable() {
+                    @Override
+                    public void run() {
+                        Region initialRegion = initAndGetInitialRegion();
+                        initViewchain();
+                        Log.debug(">> ExportMovieDialog() > Viewchain initialization is finished. Loading settings");
+                        try {
+                            SwingUtilities.invokeAndWait(new Runnable() {
+                                @Override
+                                public void run() {
+                                    setGuiBeforeExport();
+                                    loadExportSettings();
+                                }
+                            });
+                        } catch (Throwable t) {
+                            Log.error(">> ExportMovieDialog() > Could not load settings!");
+                            Message.err("Movie export", "Error initializing movie export dialog.\nPlease consult the log files for more information.", false);
+                        }
+                        Log.debug(">> ExportMovieDialog() > Settings loaded. Set inital region.");
+                        imagePanel.getView().getAdapter(RegionView.class).setRegion(initialRegion, new ChangeEvent());
+                        try {
+                            SwingUtilities.invokeAndWait(new Runnable() {
+                                @Override
+                                public void run() {
+                                    zoomSpinner.setValue(getCurrentZoom());
+                                    Log.debug(">> ExportMovieDialog() > Region is set. Enable GUI.");
+                                    enableGUI();
+                                }
+                            });
+                        } catch (Throwable e) {
+                            Log.error(">> ExportMovieDialog() > Error initializing dialog. ", e);
+                            release();
+                            return;
+                        }
+                    }
+                }, "InitMovieExport");
+
+                initThread.start();
+            }
         }
     }
 
@@ -1495,6 +1515,22 @@ public class ExportMovieDialog extends JDialog implements ChangeListener, Action
         setSize(getPreferredSize());
         setLocationRelativeTo(ImageViewerGui.getMainFrame());
         setVisible(true);
+    }
+
+    synchronized public void release3d() {
+
+        SwingUtilities.invokeLater(new Runnable() {
+            @Override
+            public void run() {
+                dispose();
+                new Thread() {
+                    @Override
+                    public void run() {
+                        JHVGlobals.gc();
+                    }
+                }.start();
+            }
+        });
     }
 
     /**
