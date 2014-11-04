@@ -250,7 +250,7 @@ public class PfssPluginPanel extends OverlayPanel implements ActionListener, Lay
                     // TODO Auto-generated catch block
                     e.printStackTrace();
                 } catch (IOException e) {
-                    if (showAgain) {
+                    if (showAgain && pfssCache.isVisible()) {
 
                         Object[] options = { "Retry", "OK" };
                         String message = "Pfss-Data for " + startYear + "-" + (startMonth + 1) + " isn't available";
