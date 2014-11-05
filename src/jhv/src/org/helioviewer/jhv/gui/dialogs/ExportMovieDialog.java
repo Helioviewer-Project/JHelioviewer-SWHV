@@ -217,6 +217,8 @@ public class ExportMovieDialog extends JDialog implements ChangeListener, Action
     private boolean updatingImageHeight = false;
     private boolean updatingImageWidth = false;
     private boolean updatingTotalHeight = false;
+    private final JLabel movieLabel = new JLabel("");
+    final JButton exportButton = new JButton("Click to start export");
 
     private class StatusStruct {
         public ImmutableDateTime currentDateTime = new ImmutableDateTime(0);
@@ -235,6 +237,17 @@ public class ExportMovieDialog extends JDialog implements ChangeListener, Action
         }
     }
 
+    public void setLabelText(String exportingText) {
+        this.movieLabel.setText(exportingText);
+    }
+
+    public void reset3D() {
+        setVisible(false);
+        this.movieLabel.setVisible(false);
+        this.exportButton.setEnabled(true);
+        this.exportButton.setVisible(true);
+    }
+
     /**
      * Default constructor
      */
@@ -242,13 +255,16 @@ public class ExportMovieDialog extends JDialog implements ChangeListener, Action
         super(ImageViewerGui.getMainFrame(), "Export Movie", true);
         ImageViewerGui.getSingletonInstance().getLeftContentPane().setEnabled(false);
         final GL3DComponentView gl3dc = ImageViewerGui.getSingletonInstance().getMainView().getAdapter(GL3DComponentView.class);
+        final ExportMovieDialog exportMovieDialog = this;
         if (gl3dc != null) {
-            JButton exportButton = new JButton("Click to start export");
             exportButton.addActionListener(new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent e) {
-                    gl3dc.startExport();
-                    release();
+                    gl3dc.startExport(exportMovieDialog);
+                    exportButton.setEnabled(false);
+                    exportButton.setVisible(false);
+                    add(movieLabel);
+                    movieLabel.setText("Export started...");
                 }
             });
             this.add(exportButton);
@@ -521,7 +537,7 @@ public class ExportMovieDialog extends JDialog implements ChangeListener, Action
         ImageViewerGui.getSingletonInstance().getLeftContentPane().setEnabled(false);
         final GL3DComponentView gl3dc = ImageViewerGui.getSingletonInstance().getMainView().getAdapter(GL3DComponentView.class);
         if (gl3dc != null) {
-            this.showDialog();
+            //this.showDialog();
         } else {
             Log.info("Initialize movie export dialog");
 

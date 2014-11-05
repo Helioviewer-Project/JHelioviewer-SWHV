@@ -21,6 +21,7 @@ import org.helioviewer.jhv.display.DisplayListener;
 import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.display.GL3DComponentFakeInterface;
 import org.helioviewer.jhv.gui.ImageViewerGui;
+import org.helioviewer.jhv.gui.dialogs.ExportMovieDialog;
 import org.helioviewer.jhv.layers.LayersModel;
 import org.helioviewer.viewmodel.changeevent.ChangeEvent;
 import org.helioviewer.viewmodel.changeevent.LayerChangedReason;
@@ -83,6 +84,7 @@ public class GL3DComponentView extends AbstractComponentView implements GLEventL
 
     private MovieExport export;
     private boolean exportMode;
+    private ExportMovieDialog exportMovieDialog;
 
     public GL3DComponentView() {
         GLCapabilities caps = new GLCapabilities(GLProfile.getDefault());
@@ -112,7 +114,8 @@ public class GL3DComponentView extends AbstractComponentView implements GLEventL
         Log.debug("GL3DComponentView.DisplayChanged");
     }
 
-    public void startExport() {
+    public void startExport(ExportMovieDialog exportMovieDialog) {
+        this.exportMovieDialog = exportMovieDialog;
         ImageViewerGui.getSingletonInstance().getLeftContentPane().setEnabled(false);
         View v = LayersModel.getSingletonInstance().getActiveView();
         JHVJPXView movieView = v.getAdapter(JHVJPXView.class);
@@ -132,6 +135,8 @@ public class GL3DComponentView extends AbstractComponentView implements GLEventL
         export.finishProcess();
         ImageViewerGui.getSingletonInstance().getLeftContentPane().setEnabled(true);
         movieView.pauseMovie();
+        exportMovieDialog.reset3D();
+        exportMovieDialog = null;
     }
 
     @Override
@@ -293,7 +298,7 @@ public class GL3DComponentView extends AbstractComponentView implements GLEventL
                 export.writeImage(screenshot);
             }
             previousScreenshot = currentScreenshot;
-            Log.debug("Exporting frame " + currentScreenshot + " / " + mv.getMaximumFrameNumber());
+            exportMovieDialog.setLabelText("Exporting frame " + currentScreenshot + " / " + mv.getMaximumFrameNumber());
             if (currentScreenshot == mv.getMaximumFrameNumber()) {
                 this.stopExport();
             }
