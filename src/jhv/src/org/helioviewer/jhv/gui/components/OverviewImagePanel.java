@@ -4,6 +4,7 @@ import java.awt.Color;
 import java.awt.Rectangle;
 import java.awt.event.ComponentEvent;
 
+import org.helioviewer.base.logging.Log;
 import org.helioviewer.base.math.Vector2dDouble;
 import org.helioviewer.base.math.Vector2dInt;
 import org.helioviewer.jhv.gui.controller.OverviewImagePanelMousePanController;
@@ -126,19 +127,24 @@ public class OverviewImagePanel extends BasicImagePanel {
 
                 // compute rectangle of current ROI
                 if (regionView.getRegion() != null && reason != null && reason.getRegionToSynchronize() != null) {
-                    Rectangle roi = calculateRectangle(viewportImageSize, reason.getRegionToSynchronize());
-                    roi.x = Math.abs(roi.x) + offset.getX();
-                    roi.y = Math.abs(roi.y) + offset.getY();
+                    //Catch occasional faulty rectangle.
+                    try {
+                        Rectangle roi = calculateRectangle(viewportImageSize, reason.getRegionToSynchronize());
+                        roi.x = Math.abs(roi.x) + offset.getX();
+                        roi.y = Math.abs(roi.y) + offset.getY();
 
-                    roi.width--;
-                    roi.height--;
-                    roi.width = roi.width < 1 ? 1 : roi.width;
-                    roi.height = roi.height < 1 ? 1 : roi.height;
+                        roi.width--;
+                        roi.height--;
+                        roi.width = roi.width < 1 ? 1 : roi.width;
+                        roi.height = roi.height < 1 ? 1 : roi.height;
 
-                    Vector2dInt center = calculateCenter(viewportImageSize, reason.getRegionToSynchronize());
-                    postRenderer.setROIRectangle(roi);
-                    postRenderer.setCenterRectangle(center);
-                    inputControllerPanning.setROIArea(roi);
+                        Vector2dInt center = calculateCenter(viewportImageSize, reason.getRegionToSynchronize());
+                        postRenderer.setROIRectangle(roi);
+                        postRenderer.setCenterRectangle(center);
+                        inputControllerPanning.setROIArea(roi);
+                    } catch (NullPointerException e) {
+                        Log.error(e);
+                    }
                 }
             } else {
                 // define "dummy" rectangle
