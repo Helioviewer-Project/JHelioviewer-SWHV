@@ -5,6 +5,7 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 
+import javax.imageio.ImageIO;
 import javax.media.opengl.GL2;
 import javax.media.opengl.GLAutoDrawable;
 import javax.media.opengl.GLCapabilities;
@@ -14,7 +15,6 @@ import javax.media.opengl.awt.GLCanvas;
 
 import org.helioviewer.base.logging.Log;
 import org.helioviewer.base.math.Vector2dInt;
-import org.helioviewer.base.message.Message;
 import org.helioviewer.gl3d.movie.MovieExport;
 import org.helioviewer.gl3d.scenegraph.GL3DState;
 import org.helioviewer.jhv.display.DisplayListener;
@@ -85,6 +85,8 @@ public class GL3DComponentView extends AbstractComponentView implements GLEventL
     private MovieExport export;
     private boolean exportMode;
     private ExportMovieDialog exportMovieDialog;
+    private boolean screenshotMode = false;
+    private File outputFile;
 
     public GL3DComponentView() {
         GLCapabilities caps = new GLCapabilities(GLProfile.getDefault());
@@ -137,6 +139,15 @@ public class GL3DComponentView extends AbstractComponentView implements GLEventL
         movieView.pauseMovie();
         exportMovieDialog.reset3D();
         exportMovieDialog = null;
+    }
+
+    public void startScreenshot() {
+        this.screenshotMode = true;
+        Displayer.getSingletonInstance().render();
+    }
+
+    public void stopScreenshot() {
+        this.screenshotMode = false;
     }
 
     @Override
@@ -192,7 +203,7 @@ public class GL3DComponentView extends AbstractComponentView implements GLEventL
     public synchronized void display(GLAutoDrawable glAD) {
         JHVJPXView mv = null;
 
-        if (exportMode) {
+        if (exportMode || screenshotMode) {
             View v = LayersModel.getSingletonInstance().getActiveView();
             if (v != null) {
                 mv = v.getAdapter(JHVJPXView.class);
@@ -212,7 +223,7 @@ public class GL3DComponentView extends AbstractComponentView implements GLEventL
         int width = this.viewportSize.getX();
         int height = this.viewportSize.getY();
         AWTGLPixelBuffer pixelBuffer = null;
-        if (exportMode && mv != null) {
+        if ((screenshotMode || exportMode) && mv != null) {
             tileRenderer.setTileSize(width, height, 0);
             tileRenderer.setImageSize(width, height);
             pixelBuffer = pixelBufferProvider.allocate(gl, AWTGLPixelBuffer.awtPixelAttributesIntRGB3, width, height, 1, true, 0);
@@ -303,14 +314,26 @@ public class GL3DComponentView extends AbstractComponentView implements GLEventL
                 this.stopExport();
             }
         }
+        if (screenshotMode && mv != null) {
+            tileRenderer.endTile(gl);
+            screenshot = pixelBuffer.image;
+            try {
+                ImageIO.write(screenshot, "png", outputFile);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            this.stopScreenshot();
+        }
         GL3DState.get().checkGLErrors();
     }
 
     @Override
     public boolean saveScreenshot(String imageFormat, File outputFile) throws IOException {
-        Message.warnTitle("Screenshot 3D", "Cannot Save screenshots in 3D mode yet!");
-        return false;
+        //Message.warnTitle("Screenshot 3D", "Cannot Save screenshots in 3D mode yet!");
+        this.outputFile = outputFile;
+        this.startScreenshot();
         //throw new UnsupportedOperationException("Cannot Save screenshots in 3D mode yet!");
+        return true;
     }
 
     @Override
