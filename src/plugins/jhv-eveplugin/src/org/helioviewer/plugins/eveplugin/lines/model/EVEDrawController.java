@@ -382,7 +382,9 @@ public class EVEDrawController implements BandControllerListener, ZoomController
             @Override
             public void run() {
                 final ImmutableDateTime timestamp = LayersModel.getSingletonInstance().getCurrentFrameTimestamp(idx);
-                fireRedrawRequestMovieFrameChanged(timestamp.getTime());
+                if (timestamp != null) {
+                    fireRedrawRequestMovieFrameChanged(timestamp.getTime());
+                }
             }
         });
 
