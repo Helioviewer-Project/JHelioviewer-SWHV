@@ -1323,7 +1323,7 @@ public class LayersModel implements ViewListener {
         /*
          * ImageInfoView imageInfoView = view.getAdapter(ImageInfoView.class);
          * String typeString; String intervalString;
-         *
+         * 
          * if (imageInfoView != null) { SimpleDateFormat format = new
          * SimpleDateFormat("yyyy/MM/dd HH:mm"); Interval<Date> interval =
          * imageInfoView.getDateRange(); if (interval != null) { typeString =
