@@ -16,6 +16,21 @@ import org.helioviewer.jhv.data.datatype.event.JHVPositionInformation;
 
 public class ComesepEvent implements JHVEvent {
 
+    private Date startDate;
+    private Date endDate;
+    private ImageIcon icon;
+    private String eventName;
+    private String eventDisplayName;
+    private String description;
+    private List<JHVEventParameter> allParameters;
+    private List<JHVEventParameter> allVisibleParameters;
+    private List<JHVEventParameter> allVisibleNotNullParameter;
+    private List<JHVEventParameter> allVisibleNullParameters;
+    private List<JHVEventParameter> allNonVisibleParameters;
+    private List<JHVEventParameter> allNonVisibleNotNullParameters;
+    private List<JHVEventParameter> allNonVisibleNullParameters;
+    private JHVEventType eventType;
+
     @Override
     public Date getStartDate() {
         // TODO Auto-generated method stub
