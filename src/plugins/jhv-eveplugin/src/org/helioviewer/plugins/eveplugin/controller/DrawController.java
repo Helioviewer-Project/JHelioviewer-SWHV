@@ -273,20 +273,13 @@ public class DrawController implements ZoomControllerListener, LineDataSelectorM
     }
 
     private void fireRedrawRequestMovieFrameChanged(final Date time) {
-        EventQueue.invokeLater(new Runnable() {
-
-            @Override
-            public void run() {
-                for (DrawControllerData dcd : drawControllerData.values()) {
-                    synchronized (dcd.getListeners()) {
-                        for (DrawControllerListener l : dcd.getListeners()) {
-                            l.drawMovieLineRequest(time);
-                        }
-                    }
+        for (DrawControllerData dcd : drawControllerData.values()) {
+            synchronized (dcd.getListeners()) {
+                for (DrawControllerListener l : dcd.getListeners()) {
+                    l.drawMovieLineRequest(time);
                 }
             }
-        });
-
+        }
     }
 
     /*
