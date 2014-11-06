@@ -2,7 +2,6 @@ package org.helioviewer.jhv.gui.components.layerTable.renderers;
 
 import java.awt.Color;
 import java.awt.Component;
-import java.awt.Font;
 
 import javax.swing.BorderFactory;
 import javax.swing.JLabel;
@@ -43,33 +42,11 @@ public class DescriptorTimestampRenderer extends DefaultTableCellRenderer {
      * @see javax.swing.table.DefaultTableCellRenderer#getTableCellRendererComponent(javax.swing.JTable,
      *      java.lang.Object, boolean, boolean, int, int)
      */
-    void setTextFit(JLabel label, String text) {
-        Font originalFont = (Font) label.getClientProperty("originalfont");
-        if (originalFont == null) {
-            originalFont = label.getFont();
-            label.putClientProperty("originalfont", originalFont);
-        }
-
-        int stringWidth = label.getFontMetrics(originalFont).stringWidth(text);
-        int componentWidth = label.getPreferredSize().width;
-
-        if (stringWidth > componentWidth - 5 && componentWidth - 5 > 0) {
-            double widthRatio = (double) (componentWidth) / (double) stringWidth;
-
-            int newFontSize = (int) Math.floor(originalFont.getSize() * widthRatio);
-            newFontSize = (newFontSize < 6) ? 6 : newFontSize;
-            label.setFont(new Font(originalFont.getName(), originalFont.getStyle(), newFontSize));
-        } else
-            label.setFont(originalFont);
-        label.setText(text);
-    }
-
     @Override
     public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
         if (value instanceof LayerDescriptor) {
             LayerDescriptor descriptor = (LayerDescriptor) value;
             JLabel label = (JLabel) super.getTableCellRendererComponent(table, descriptor.timestamp, isSelected, hasFocus, row, column);
-            setTextFit(label, label.getText());
             label.setToolTipText("UTC observation time");
             if (drawLine && row > 0) {
                 label.setBorder(interBorder);
