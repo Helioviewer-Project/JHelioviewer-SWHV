@@ -371,7 +371,7 @@ public class GLPhysicalRenderGraphics extends AbstractPhysicalRenderGraphics {
     @Override
     public void drawImage3d(BufferedImage image, Double x, Double y, Double z, float scale) {
         Vector2dDouble imageSize = convertScreenToPhysical(image.getWidth(), image.getHeight());
-        drawImage3d(image, x, y, z, imageSize.getX() * scale, imageSize.getY() * scale);
+        drawImage3d(image, x, y, z, 1. * scale, imageSize.getY() / imageSize.getX() * scale);
 
     }
 
