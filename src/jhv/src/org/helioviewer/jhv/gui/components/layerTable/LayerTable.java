@@ -159,7 +159,7 @@ public class LayerTable extends JTable {
         getColumnModel().getColumn(LayerTableModel.COLUMN_VISIBILITY).setCellRenderer(descriptorIconRenderer);
 
         getColumnModel().getColumn(LayerTableModel.COLUMN_TITLE).setCellRenderer(new DescriptorTitleRenderer(true));
-        getColumnModel().getColumn(LayerTableModel.COLUMN_TITLE).setPreferredWidth(18);
+        getColumnModel().getColumn(LayerTableModel.COLUMN_TITLE).setPreferredWidth(28);
         //getColumnModel().getColumn(LayerTableModel.COLUMN_TITLE).setWidth(5);
 
         getColumnModel().getColumn(LayerTableModel.COLUMN_TIMESTAMP).setCellRenderer(new DescriptorTimestampRenderer(true));
