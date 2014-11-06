@@ -37,7 +37,7 @@ import org.helioviewer.viewmodel.view.ViewHelper;
 /**
  * The solar event renderer provides a possibility to draw solar events with
  * there associated icons.
- * 
+ *
  * @author Malte Nuhn
  */
 public class SWHVHEKPlugin3dRenderer extends PhysicalRenderer3d {
@@ -132,7 +132,7 @@ public class SWHVHEKPlugin3dRenderer extends PhysicalRenderer3d {
 
     /**
      * The actual rendering routine
-     * 
+     *
      * @param g
      *            - PhysicalRenderGraphics to render to
      * @param evt
@@ -199,7 +199,7 @@ public class SWHVHEKPlugin3dRenderer extends PhysicalRenderer3d {
 
     /**
      * The actual rendering routine
-     * 
+     *
      * @param g
      *            - PhysicalRenderGraphics to render to
      * @param evt
@@ -228,7 +228,7 @@ public class SWHVHEKPlugin3dRenderer extends PhysicalRenderer3d {
             JHVPositionInformation el = pi.get(JHVCoordinateSystem.JHV);
             if (el.centralPoint() != null) {
                 JHVPoint pt = el.centralPoint();
-                g.drawImage3d(bi, pt.getCoordinate1(), pt.getCoordinate2(), pt.getCoordinate3(), 0.7f);
+                g.drawImage3d(bi, pt.getCoordinate1(), pt.getCoordinate2(), pt.getCoordinate3(), 0.1f);
             }
         }
 
@@ -236,7 +236,7 @@ public class SWHVHEKPlugin3dRenderer extends PhysicalRenderer3d {
 
     /**
      * {@inheritDoc}
-     * 
+     *
      * Draws all available and visible solar events with there associated icon.
      */
     @Override
