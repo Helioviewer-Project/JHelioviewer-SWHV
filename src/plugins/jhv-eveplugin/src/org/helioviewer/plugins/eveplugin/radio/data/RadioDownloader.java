@@ -70,8 +70,6 @@ public class RadioDownloader {
                             endDate.setTime(endDate.getTime());
                             // case there were not more than three days
 
-                            // List<Interval<Date>> noDataList = new
-                            // ArrayList<Interval<Date>>();
                             while (startDate.before(endDate) || startDate.equals(endDate)) {
                                 ImageInfoView v = APIRequestManager.requestAndOpenRemoteFile(false, null, createDateString(startDate),
                                         createDateString(startDate), "ROB-Humain", "CALLISTO", "CALLISTO", "RADIOGRAM", false);
@@ -84,30 +82,13 @@ public class RadioDownloader {
                                 } else {
                                     Log.error("Received null view in request and open for date " + startDate + " and " + endDate);
                                     noDataInterval.add(new Interval<Date>(startDate, calculateOneDayFurtherAsDate(startDate)));
-                                    /*
-                                     * if (cache.addNoDataInterval(new
-                                     * Interval<Date>(startDate,
-                                     * calculateOneDayFurtherAsDate(startDate)),
-                                     * identifier)) { noDataList.add(new
-                                     * Interval<Date>(startDate,
-                                     * calculateOneDayFurtherAsDate
-                                     * (startDate))); }
-                                     */
+
                                 }
                                 startDate = calculateOneDayFurtherAsDate(startDate);
                             }
-                            /*
-                             * fireNewJPXDataAvailable(jpxList, identifier,
-                             * requestedStartDate, endDate, downloadID);
-                             * Log.trace
-                             * ("Data in no data in request and open : " +
-                             * noDataList.size()); fireNoData(noDataList,
-                             * identifier, downloadID);
-                             */
+
                         }
                     } else {
-                        // fireIntervalTooBig(startDate, endDate, downloadID,
-                        // identifier);
                         intervalTooBig = true;
                     }
                     Interval<Date> requestInterval = new Interval<Date>(requestedStartDate, endDate);
@@ -162,56 +143,6 @@ public class RadioDownloader {
         };
 
         imageDownloadWorker.execute();
-
-        /*
-         * Thread thread = new Thread(new Runnable() { private String
-         * startDataString; private String endDateString; private String
-         * identifier;
-         * 
-         * public Runnable init(String startTime, String endTime, String
-         * identifier) { startDataString = startTime; endDateString = endTime;
-         * this.identifier = identifier; return this; }
-         * 
-         * @Override public void run() { try { // Log.debug("Request for date "
-         * + startDataString + " - " + // endDateString); long duration =
-         * calculateFrequencyDuration(startDataString, endDateString); long
-         * downloadID = Math.round(1000000 * Math.random()); Date startDate =
-         * parseDate(startDataString); Date endDate = parseDate(endDateString);
-         * if (duration >= 0 && duration <= MAXIMUM_DAYS) { Date
-         * requestedStartDate = new Date(startDate.getTime()); if (endDate !=
-         * null && startDate != null) { endDate.setTime(endDate.getTime()); //
-         * case there were not more than three days List<DownloadedJPXData>
-         * jpxList = new ArrayList<DownloadedJPXData>(); List<Interval<Date>>
-         * noDataList = new ArrayList<Interval<Date>>(); while
-         * (startDate.before(endDate) || startDate.equals(endDate)) {
-         * ImageInfoView v = APIRequestManager.requestAndOpenRemoteFile(false,
-         * null, createDateString(startDate), createDateString(startDate),
-         * "ROB-Humain", "CALLISTO", "CALLISTO", "RADIOGRAM", false); if (v !=
-         * null) { Long imageID = Math.round(1000000 * Math.random());
-         * DownloadedJPXData newJPXData = new DownloadedJPXData(v, imageID,
-         * startDate, endDate, identifier, downloadID); jpxList.add(newJPXData);
-         * cache.add(newJPXData); } else {
-         * Log.error("Received null view in request and open for date " +
-         * startDate + " and " + endDate); if (cache.addNoDataInterval(new
-         * Interval<Date>(startDate, calculateOneDayFurtherAsDate(startDate)),
-         * identifier)) { noDataList.add(new Interval<Date>(startDate,
-         * calculateOneDayFurtherAsDate(startDate))); } } startDate =
-         * calculateOneDayFurtherAsDate(startDate); }
-         * fireNewJPXDataAvailable(jpxList, identifier, requestedStartDate,
-         * endDate, downloadID);
-         * Log.trace("Data in no data in request and open : " +
-         * noDataList.size()); fireNoData(noDataList, identifier, downloadID); }
-         * } else { fireIntervalTooBig(startDate, endDate, downloadID,
-         * identifier); } } catch (IOException e) {
-         * Log.error("An error occured while opening the remote file!", e);
-         * Message.err("An error occured while opening the remote file!",
-         * e.getMessage(), false); } }
-         * 
-         * 
-         * }.init(startDateString, endDateString, identifier), "LoadNewImage");
-         * 
-         * thread.start();
-         */
     }
 
     protected void fireNoDataInDownloadInterval(Interval<Date> requestInterval, Long downloadID, String identifier) {
@@ -241,101 +172,96 @@ public class RadioDownloader {
         }
     }
 
-    public void requestAndOpenIntervals(List<Interval<Date>> intervals, Long downloadId, String plotIdentifier, double ratioX, double ratioY) {
-        for (Interval<Date> interval : intervals) {
-            // Log.debug("Request for data for interval " + interval.getStart()
-            // + " - " + interval.getEnd());
-            Thread thread = new Thread(
-                    new Runnable() {
-                        private String startDataString;
-                        private String endDateString;
-                        private String identifier;
-                        private Long downloadID;
-                        private double ratioX;
-                        private double ratioY;
-                        private List<Interval<Date>> noDataList;
+    public void requestAndOpenIntervals(List<Interval<Date>> intervals, final Long downloadId, final String plotIdentifier,
+            final double ratioX, final double ratioY) {
+        for (final Interval<Date> interval : intervals) {
+            final String startDataString = createDateString(interval.getStart());
+            SwingWorker<ImageDownloadWorkerResult, Void> imageDownloadWorker = new SwingWorker<ImageDownloadWorkerResult, Void>() {
 
-                        public Runnable init(String startTime, String endTime, String identifier, Long downloadID, double ratioX,
-                                double ratioY) {
-                            startDataString = startTime;
-                            endDateString = endTime;
-                            this.identifier = identifier;
-                            this.downloadID = downloadID;
-                            this.ratioX = ratioX;
-                            this.ratioY = ratioY;
-                            noDataList = new ArrayList<Interval<Date>>();
-                            return this;
-                        }
+                @Override
+                protected ImageDownloadWorkerResult doInBackground() {
+                    try {
+                        Date startDate = interval.getStart();
+                        Date requestedStartDate = new Date(startDate.getTime());
+                        Date endDate = interval.getEnd();
+                        List<Interval<Date>> noDataList = new ArrayList<Interval<Date>>();
+                        List<DownloadedJPXData> jpxList = new ArrayList<DownloadedJPXData>();
+                        if (endDate != null && startDate != null) {
+                            endDate.setTime(endDate.getTime());
+                            // case there were not more than three days
 
-                        @Override
-                        public void run() {
-                            try {
-                                Date startDate = parseDate(startDataString);
-                                Date requestedStartDate = new Date(startDate.getTime());
-                                Date endDate = parseDate(endDateString);
-                                if (endDate != null && startDate != null) {
-                                    endDate.setTime(endDate.getTime());
-                                    // case there were not more than three days
-                                    List<DownloadedJPXData> jpxList = new ArrayList<DownloadedJPXData>();
-                                    while (startDate.before(endDate) || startDate.equals(endDate)) {
-                                        boolean inRequestCache = true;
-                                        synchronized (requestDateCache) {
-                                            if (!requestDateCache.contains(startDate)) {
-                                                inRequestCache = false;
-                                                Log.trace("Add date " + startDate + " to request cache");
-                                                requestDateCache.add(startDate);
-                                            }
-                                        }
-                                        if (!(inRequestCache || cache.containsDate(startDate, identifier))) {
-                                            ImageInfoView v = APIRequestManager.requestAndOpenRemoteFile(false, null,
-                                                    createDateString(startDate), createDateString(startDate), "ROB-Humain", "CALLISTO",
-                                                    "CALLISTO", "RADIOGRAM", false);
-                                            if (v != null) {
-                                                Long imageID = getNextID();
-                                                DownloadedJPXData newJPXData = new DownloadedJPXData(v, imageID, startDate, endDate,
-                                                        identifier, downloadID);
-                                                jpxList.add(newJPXData);
-                                                cache.add(newJPXData);
-                                            } else {
-                                                Log.error("Received null view in request intervals for date " + startDate + " and "
-                                                        + endDate);
-                                                if (cache.addNoDataInterval(new Interval<Date>(startDate,
-                                                        calculateOneDayFurtherAsDate(startDate)), identifier)) {
-                                                    noDataList.add(new Interval<Date>(startDate, calculateOneDayFurtherAsDate(startDate)));
-                                                }
-                                            }
-                                        } else {
-                                            if (inRequestCache) {
-                                                Log.trace("Date was already in the request cache. Do nothing.");
-                                            } else {
-                                                Log.trace("Date was already in the radio image cache. Do nothing.");
-                                            }
-                                        }
-                                        synchronized (requestDateCache) {
-                                            requestDateCache.remove(startDate);
-                                            Log.trace("remove " + startDate + " from request cache");
-                                        }
-                                        startDate = calculateOneDayFurtherAsDate(startDate);
+                            while (startDate.before(endDate) || startDate.equals(endDate)) {
+                                boolean inRequestCache = true;
+                                synchronized (requestDateCache) {
+                                    if (!requestDateCache.contains(startDate)) {
+                                        inRequestCache = false;
+                                        Log.trace("Add date " + startDate + " to request cache");
+                                        requestDateCache.add(startDate);
                                     }
-                                    if (!jpxList.isEmpty()) {
-                                        fireAdditionalJPXDataAvailable(jpxList, identifier, requestedStartDate, endDate, downloadID,
-                                                ratioX, ratioY);
-                                    }
-                                    Log.trace("Size of noDataList in request intervals: " + noDataList.size());
-                                    fireNoData(noDataList, identifier, downloadID);
                                 }
-                            } catch (IOException e) {
-                                Log.error("An error occured while opening the remote file!", e);
-                                Message.err("An error occured while opening the remote file!", e.getMessage(), false);
+                                if (!(inRequestCache || cache.containsDate(startDate, plotIdentifier))) {
+                                    ImageInfoView v = APIRequestManager.requestAndOpenRemoteFile(false, null, createDateString(startDate),
+                                            createDateString(startDate), "ROB-Humain", "CALLISTO", "CALLISTO", "RADIOGRAM", false);
+                                    if (v != null) {
+                                        Long imageID = getNextID();
+                                        DownloadedJPXData newJPXData = new DownloadedJPXData(v, imageID, startDate, endDate,
+                                                plotIdentifier, downloadId);
+                                        jpxList.add(newJPXData);
+                                        cache.add(newJPXData);
+                                    } else {
+                                        Log.error("Received null view in request intervals for date " + startDate + " and " + endDate);
+                                        if (cache.addNoDataInterval(new Interval<Date>(startDate, calculateOneDayFurtherAsDate(startDate)),
+                                                plotIdentifier)) {
+                                            noDataList.add(new Interval<Date>(startDate, calculateOneDayFurtherAsDate(startDate)));
+                                        }
+                                    }
+                                } else {
+                                    if (inRequestCache) {
+                                        Log.trace("Date was already in the request cache. Do nothing.");
+                                    } else {
+                                        Log.trace("Date was already in the radio image cache. Do nothing.");
+                                    }
+                                }
+                                synchronized (requestDateCache) {
+                                    requestDateCache.remove(startDate);
+                                    Log.trace("remove " + startDate + " from request cache");
+                                }
+                                startDate = calculateOneDayFurtherAsDate(startDate);
                             }
                         }
+                        return new ImageDownloadWorkerResult(jpxList, noDataList, false, new Interval<Date>(requestedStartDate, endDate),
+                                downloadId);
+                    } catch (IOException e) {
+                        Log.error("An error occured while opening the remote file!", e);
+                        Message.err("An error occured while opening the remote file!", e.getMessage(), false);
+                        return null;
+                    }
+                }
 
-                    }.init(createDateString(interval.getStart()), createDateString(interval.getEnd()), plotIdentifier, downloadId, ratioX,
-                            ratioY),
-                    "LoadNewImage" + getNextID());
+                @Override
+                protected void done() {
+                    try {
+                        ImageDownloadWorkerResult result = get();
+                        if (result != null) {
+                            if (!result.getImageInfoViews().isEmpty()) {
+                                fireAdditionalJPXDataAvailable(result.getImageInfoViews(), plotIdentifier, result.getRequestInterval()
+                                        .getStart(), result.getRequestInterval().getEnd(), downloadId, ratioX, ratioY);
+                            }
 
-            thread.start();
+                            fireNoData(result.getNoDataIntervals(), plotIdentifier, downloadId);
+                        }
+                    } catch (InterruptedException e) {
+                        Log.error("ImageDownloadWorker execution interrupted: " + e.getMessage());
+                        e.printStackTrace();
+                    } catch (ExecutionException e) {
+                        Log.error("ImageDownloadWorker execution error: " + e.getMessage());
+                        e.printStackTrace();
+                    }
+                }
+            };
+            imageDownloadWorker.execute();
         }
+
     }
 
     private void fireAdditionalJPXDataAvailable(List<DownloadedJPXData> jpxList, String plotIdentifier, Date startDate, Date endDate,
