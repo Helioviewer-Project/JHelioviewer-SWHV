@@ -30,7 +30,7 @@ import org.helioviewer.viewmodel.view.jp2view.kakadu.KakaduUtils;
  * The J2KRender class handles all of the decompression, buffering, and
  * filtering of the image data. It essentially just waits for the shared object
  * in the JP2ImageView to signal it.
- * 
+ *
  * @author caplins
  * @author Benjamin Wamsler
  * @author Desmond Amadigwe
@@ -100,7 +100,7 @@ class J2KRender implements Runnable {
 
     /**
      * Gets whether to reuse the buffer
-     * 
+     *
      * @return the reuseBuffer
      */
     public boolean isReuseBuffer() {
@@ -109,7 +109,7 @@ class J2KRender implements Runnable {
 
     /**
      * Sets whether to reuse the buffer
-     * 
+     *
      * @param reuseBuffer
      *            the reuseBuffer to set
      */
@@ -129,7 +129,7 @@ class J2KRender implements Runnable {
 
     /**
      * The constructor.
-     * 
+     *
      * @param _parentViewRef
      */
     J2KRender(JHVJP2View _parentViewRef) {
@@ -169,8 +169,7 @@ class J2KRender implements Runnable {
                 } while (myThread.isAlive());
 
             } catch (InterruptedException ex) {
-                ex.printStackTrace();
-
+                Log.info("J2KRender Thread was interrupted");
             } catch (NullPointerException e) {
             } finally {
                 myThread = null;
@@ -389,8 +388,7 @@ class J2KRender implements Runnable {
                             // long unsignedValue =
                             // (intBuffer[currentByteBuffer][destIdx + col] &
                             // 0xffffffffl) >> 24;
-                            intBuffer[currentByteBuffer][destIdx + col] = (intBuffer[currentByteBuffer][destIdx + col] & 0x00FFFFFF)
-                                    | ((localIntBuffer[srcIdx + col] & 0x00FF0000) << 8);
+                            intBuffer[currentByteBuffer][destIdx + col] = (intBuffer[currentByteBuffer][destIdx + col] & 0x00FFFFFF) | ((localIntBuffer[srcIdx + col] & 0x00FF0000) << 8);
                         }
                     }
                     // Log.debug("byteBuffer : " +
@@ -466,8 +464,7 @@ class J2KRender implements Runnable {
 
                 if (parentImageRef.getNumComponents() < 2) {
                     if (roi.getNumPixels() == byteBuffer[currentByteBuffer].length) {
-                        SingleChannelByte8ImageData imdata = new SingleChannelByte8ImageData(width, height, byteBuffer[currentByteBuffer],
-                                new ColorMask());
+                        SingleChannelByte8ImageData imdata = new SingleChannelByte8ImageData(width, height, byteBuffer[currentByteBuffer], new ColorMask());
                         parentViewRef.setSubimageData(imdata, roi, curLayer, currParams.resolution.getZoomPercent(), false);
                     } else {
                         Log.warn("J2KRender: Params out of sync, skip frame");
@@ -479,8 +476,7 @@ class J2KRender implements Runnable {
                             singleChannel = true;
                         }
 
-                        ARGBInt32ImageData imdata = new ARGBInt32ImageData(singleChannel, width, height, intBuffer[currentIntBuffer],
-                                new ColorMask());
+                        ARGBInt32ImageData imdata = new ARGBInt32ImageData(singleChannel, width, height, intBuffer[currentIntBuffer], new ColorMask());
                         parentViewRef.setSubimageData(imdata, roi, curLayer, currParams.resolution.getZoomPercent(), false);
                     } else {
                         Log.warn("J2KRender: Params out of sync, skip frame");
@@ -639,8 +635,7 @@ class J2KRender implements Runnable {
                 nextCandidate = nextFrameCandidateChooser.getNextCandidate(nextCandidate);
 
                 lastDiff = nextDiff;
-                nextDiff = Math.abs(dateTimeCache.getDateTime(nextCandidate).getMillis() - absoluteStartTime)
-                        - ((System.currentTimeMillis() - systemStartTime) * movieSpeed);
+                nextDiff = Math.abs(dateTimeCache.getDateTime(nextCandidate).getMillis() - absoluteStartTime) - ((System.currentTimeMillis() - systemStartTime) * movieSpeed);
             } while (nextDiff < 0);
 
             if (-lastDiff < nextDiff) {
