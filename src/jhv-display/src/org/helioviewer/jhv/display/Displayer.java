@@ -1,6 +1,5 @@
 package org.helioviewer.jhv.display;
 
-import java.awt.EventQueue;
 import java.util.ArrayList;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -77,15 +76,7 @@ public class Displayer {
     }
 
     public void display() {
-        EventQueue.invokeLater(new Runnable() {
-            @Override
-            public void run() {
-                for (final DisplayListener listener : listeners) {
-                    listener.display();
-                }
-            }
-        });
-        //displayPool.submit(new DisplayTask());
+        displayPool.submit(new DisplayTask());
     }
 
     public void removeListeners() {
