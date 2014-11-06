@@ -4,18 +4,25 @@ import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 import java.io.File;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 
 import javax.swing.AbstractAction;
 import javax.swing.JOptionPane;
 import javax.swing.KeyStroke;
 
+import org.helioviewer.base.logging.Log;
 import org.helioviewer.jhv.JHVDirectory;
 import org.helioviewer.jhv.gui.ImageViewerGui;
 import org.helioviewer.viewmodel.view.LayeredView;
 
 /**
  * Action to terminate the application.
- * 
+ *
  * @author Markus Langenberg
  */
 public class ExitProgramAction extends AbstractAction {
@@ -34,6 +41,7 @@ public class ExitProgramAction extends AbstractAction {
     /**
      * {@inheritDoc}
      */
+    @Override
     public void actionPerformed(ActionEvent e) {
 
         if (ImageViewerGui.getSingletonInstance().getMainView() != null) {
@@ -45,20 +53,52 @@ public class ExitProgramAction extends AbstractAction {
             }
         }
 
-        // Delete all layers, to free resources
-        if (ImageViewerGui.getSingletonInstance().getMainView() != null) {
-            LayeredView layeredView = ImageViewerGui.getSingletonInstance().getMainView().getAdapter(LayeredView.class);
+        final ExecutorService executor = Executors.newFixedThreadPool(4);
 
-            while (layeredView.getNumLayers() > 0) {
-                layeredView.removeLayer(0);
+        Future<?> futureLayersRemove = executor.submit(new Runnable() {
+            @Override
+            public void run() {
+                if (ImageViewerGui.getSingletonInstance().getMainView() != null) {
+                    LayeredView layeredView = ImageViewerGui.getSingletonInstance().getMainView().getAdapter(LayeredView.class);
+
+                    while (layeredView.getNumLayers() > 0) {
+                        layeredView.removeLayer(0);
+                    }
+                }
             }
+        });
+        Future<?> futureFileDelete = executor.submit(new Runnable() {
+            @Override
+            public void run() {
+                File[] tempFiles = JHVDirectory.TEMP.getFile().listFiles();
+
+                for (File tempFile : tempFiles) {
+                    tempFile.delete();
+                }
+            }
+        });
+        executor.shutdown();
+
+        try {
+            futureLayersRemove.get(1500, TimeUnit.MILLISECONDS);
+        } catch (InterruptedException e1) {
+            Log.warn("LayersRemove job was interrupted");
+        } catch (ExecutionException e2) {
+            Log.warn("Caught exception on LayersRemove: " + e);
+        } catch (TimeoutException e3) {
+            futureLayersRemove.cancel(true);
+            Log.warn("Timeout upon deleting layers");
         }
 
-        // Delete all files in JHV/temp
-        File[] tempFiles = JHVDirectory.TEMP.getFile().listFiles();
-
-        for (File tempFile : tempFiles) {
-            tempFile.delete();
+        try {
+            futureFileDelete.get(1500, TimeUnit.MILLISECONDS);
+        } catch (InterruptedException e1) {
+            Log.warn("FileDelete job was interrupted");
+        } catch (ExecutionException e2) {
+            Log.warn("Caught exception on FileDelete: " + e);
+        } catch (TimeoutException e3) {
+            futureFileDelete.cancel(true);
+            Log.warn("Timeout upon deleting layers");
         }
 
         System.exit(0);
