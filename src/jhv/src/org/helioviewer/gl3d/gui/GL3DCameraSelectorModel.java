@@ -64,16 +64,25 @@ public class GL3DCameraSelectorModel extends AbstractListModel implements ComboB
         // getMainView().getAdapter(GL3DSceneGraphView.class);
 
         if (sceneGraphView != null) {
-            earthCamera = new GL3DEarthCamera(sceneGraphView);
-            observerCamera = new GL3DObserverCamera(sceneGraphView);
-            followObjectCamera = new GL3DFollowObjectCamera(sceneGraphView);
-            defaultCamera = observerCamera;
-            lastCamera = defaultCamera;
-            cameras.add(earthCamera);
-            cameras.add(observerCamera);
-            cameras.add(followObjectCamera);
+            if (earthCamera == null) {
+                earthCamera = new GL3DEarthCamera(sceneGraphView);
+                observerCamera = new GL3DObserverCamera(sceneGraphView);
+                followObjectCamera = new GL3DFollowObjectCamera(sceneGraphView);
+                defaultCamera = observerCamera;
+                lastCamera = defaultCamera;
+                cameras.add(earthCamera);
+                cameras.add(observerCamera);
+                cameras.add(followObjectCamera);
 
-            defaultCamera = earthCamera;
+                defaultCamera = observerCamera;
+            } else {
+                earthCamera.setSceneGraphView(sceneGraphView);
+                earthCamera.createNewGrid();
+                observerCamera.setSceneGraphView(sceneGraphView);
+                observerCamera.createNewGrid();
+                followObjectCamera.setSceneGraphView(sceneGraphView);
+                followObjectCamera.createNewGrid();
+            }
 
             if (getCameraView() != null) {
                 setCurrentCamera(lastCamera);
