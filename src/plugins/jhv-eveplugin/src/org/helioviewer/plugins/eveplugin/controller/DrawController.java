@@ -10,7 +10,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.helioviewer.base.logging.Log;
 import org.helioviewer.base.math.Interval;
 import org.helioviewer.jhv.gui.ViewListenerDistributor;
 import org.helioviewer.plugins.eveplugin.base.Range;
@@ -302,8 +301,8 @@ public class DrawController implements ZoomControllerListener, LineDataSelectorM
         TimestampChangedReason timestampReason = aEvent.getLastChangedReasonByType(TimestampChangedReason.class);
         if ((timestampReason != null) && (timestampReason.getView() instanceof TimedMovieView)
                 && LinkedMovieManager.getActiveInstance().isMaster((TimedMovieView) timestampReason.getView())) {
-            if (viewChangedThread == null || viewChangedThread.getState() == Thread.State.TERMINATED) {
-                viewChangedThread = new Thread(new Runnable() {
+            if (!EventQueue.isDispatchThread()) {
+                EventQueue.invokeLater(new Runnable() {
                     private Date date;
 
                     @Override
@@ -316,9 +315,8 @@ public class DrawController implements ZoomControllerListener, LineDataSelectorM
                         return this;
                     }
                 }.init(timestampReason.getNewDateTime().getTime()));
-                viewChangedThread.start();
             } else {
-                Log.trace("Ignore timestamp thread still running");
+                fireRedrawRequestMovieFrameChanged(timestampReason.getNewDateTime().getTime());
             }
         }
     }
