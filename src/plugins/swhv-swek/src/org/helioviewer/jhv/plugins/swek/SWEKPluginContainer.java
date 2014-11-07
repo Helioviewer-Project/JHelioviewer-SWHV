@@ -3,6 +3,8 @@
  */
 package org.helioviewer.jhv.plugins.swek;
 
+import java.awt.EventQueue;
+
 import org.helioviewer.jhv.plugins.swek.view.SWEKPluginPanel;
 import org.helioviewer.viewmodel.renderer.physical.PhysicalRenderer;
 import org.helioviewer.viewmodel.view.OverlayView;
@@ -28,11 +30,18 @@ public class SWEKPluginContainer extends OverlayContainer {
     }
 
     @Override
-    protected void installOverlayImpl(OverlayView overlayView, OverlayControlComponentManager controlList) {
-        SWEKPluginPanel swekPanel = SWEKPluginPanel.getSWEKPluginPanelInstance();
-        OverlayPluginContainer overlayPluginContainer = new OverlayPluginContainer();
-        overlayView.addOverlay(overlayPluginContainer);
-        controlList.add(new OverlayControlComponent(swekPanel, getName()));
+    protected void installOverlayImpl(final OverlayView overlayView, final OverlayControlComponentManager controlList) {
+        EventQueue.invokeLater(new Runnable() {
+
+            @Override
+            public void run() {
+                SWEKPluginPanel swekPanel = SWEKPluginPanel.getSWEKPluginPanelInstance();
+                OverlayPluginContainer overlayPluginContainer = new OverlayPluginContainer();
+                overlayView.addOverlay(overlayPluginContainer);
+                controlList.add(new OverlayControlComponent(swekPanel, getName()));
+            }
+
+        });
 
     }
 
