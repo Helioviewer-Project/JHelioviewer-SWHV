@@ -64,13 +64,13 @@ public class EventPanel extends JPanel implements MouseListener, SWEKTreeModelLi
         eventPanelModel.addEventPanelModelListener(downloadManager);
         loadingTimer = new Timer(500, this);
         loadingStep = 0;
-        initVisisualComponents();
+        initVisualComponents();
     }
 
     /**
      * Initializes the visual components
      */
-    private void initVisisualComponents() {
+    private void initVisualComponents() {
         setLayout(new BorderLayout());
         eventTypeTree = new JTree(eventPanelModel);
         eventTypeTree.setShowsRootHandles(true);
