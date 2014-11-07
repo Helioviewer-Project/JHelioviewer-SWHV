@@ -1,5 +1,6 @@
 package org.helioviewer.plugins.eveplugin;
 
+import java.awt.EventQueue;
 import java.net.URL;
 import java.util.LinkedList;
 
@@ -33,26 +34,33 @@ public class EVEPlugin implements Plugin, MainContentPanelPlugin {
 
     @Override
     public void installPlugin() {
-        EventRequester eventRequester = EventRequester.getSingletonInstance();
-        ZoomController.getSingletonInstance().addZoomControllerListener(eventRequester);
-        eventRequester.addListener(EventModel.getSingletonInstance());
-        ZoomController.getSingletonInstance().addZoomControllerListener(EventModel.getSingletonInstance());
-        if (mainPanel == null) {
-            mainPanel = new MainPanel();
-        }
+        EventQueue.invokeLater(new Runnable() {
 
-        pluginPanes.add(mainPanel);
+            @Override
+            public void run() {
+                EventRequester eventRequester = EventRequester.getSingletonInstance();
+                ZoomController.getSingletonInstance().addZoomControllerListener(eventRequester);
+                eventRequester.addListener(EventModel.getSingletonInstance());
+                ZoomController.getSingletonInstance().addZoomControllerListener(EventModel.getSingletonInstance());
+                if (mainPanel == null) {
+                    mainPanel = new MainPanel();
+                }
 
-        ImageViewerGui.getSingletonInstance().getLeftContentPane().add("Timeline Layers", ControlsPanel.getSingletonInstance(), true);
+                pluginPanes.add(mainPanel);
 
-        ImageViewerGui.getSingletonInstance().getMainContentPanel().addPlugin(this);
-        ObservationDialog.getSingletonInstance().addUserInterface(EVESettings.OBSERVATION_UI_NAME,
-                new ObservationDialogUIPanel(mainPanel.getPlotContainerPanel()));
-        ObservationDialog.getSingletonInstance().addUserInterface(EVESettings.RADIO_OBSERVATION_UI_NAME,
-                new SimpleObservationDialogUIPanel(mainPanel.getPlotContainerPanel()));
-        // initialize database connection
-        DatabaseController.getSingletonInstance();
-        RadioPlotModel.getSingletonInstance();
+                ImageViewerGui.getSingletonInstance().getLeftContentPane()
+                        .add("Timeline Layers", ControlsPanel.getSingletonInstance(), true);
+
+                ImageViewerGui.getSingletonInstance().getMainContentPanel().addPlugin(EVEPlugin.this);
+                ObservationDialog.getSingletonInstance().addUserInterface(EVESettings.OBSERVATION_UI_NAME,
+                        new ObservationDialogUIPanel(mainPanel.getPlotContainerPanel()));
+                ObservationDialog.getSingletonInstance().addUserInterface(EVESettings.RADIO_OBSERVATION_UI_NAME,
+                        new SimpleObservationDialogUIPanel(mainPanel.getPlotContainerPanel()));
+                // initialize database connection
+                DatabaseController.getSingletonInstance();
+                RadioPlotModel.getSingletonInstance();
+            }
+        });
 
     }
 
