@@ -300,6 +300,7 @@ public class RadioPlotModel implements RadioDataManagerListener, ZoomDataConfigL
     public void requestData(Date xStart, Date xEnd, double yStart, double yEnd, double xRatio, double yRatio, long ID, String plotIdentifier) {
         // Log.debug("Request for data in : " + xStart + " - " + xEnd);
         // Thread.dumpStack();
+
         EventQueue.invokeLater(new Runnable() {
 
             Date xStart;
@@ -313,11 +314,12 @@ public class RadioPlotModel implements RadioDataManagerListener, ZoomDataConfigL
 
             @Override
             public void run() {
-                long start = System.currentTimeMillis();
+                // long start = System.currentTimeMillis();
                 List<Long> idList = new ArrayList<Long>();
                 idList.add(ID);
                 radioDataManager.requestForData(xStart, xEnd, yStart, yEnd, xRatio, yRatio, idList, plotIdentifier);
-                Log.debug("requestData time:" + (System.currentTimeMillis() - start));
+                // Log.debug("requestData time:" + (System.currentTimeMillis() -
+                // start));
             }
 
             public Runnable init(Date xStart, Date xEnd, double yStart, double yEnd, double ratioX, double ratioY, Long ID,
