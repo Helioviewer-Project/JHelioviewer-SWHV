@@ -313,9 +313,11 @@ public class RadioPlotModel implements RadioDataManagerListener, ZoomDataConfigL
 
             @Override
             public void run() {
+                long start = System.currentTimeMillis();
                 List<Long> idList = new ArrayList<Long>();
                 idList.add(ID);
                 radioDataManager.requestForData(xStart, xEnd, yStart, yEnd, xRatio, yRatio, idList, plotIdentifier);
+                Log.debug("requestData time:" + (System.currentTimeMillis() - start));
             }
 
             public Runnable init(Date xStart, Date xEnd, double yStart, double yEnd, double ratioX, double ratioY, Long ID,

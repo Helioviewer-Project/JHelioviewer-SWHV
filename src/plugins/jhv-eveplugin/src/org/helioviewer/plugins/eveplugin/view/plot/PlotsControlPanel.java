@@ -246,6 +246,7 @@ public class PlotsControlPanel extends JPanel implements ZoomControllerListener,
 
             @Override
             public void run() {
+                // long start = System.currentTimeMillis();
                 if (setDefaultPeriod) {
                     setDefaultPeriod = false;
                     final Interval<Date> interval = new Interval<Date>(LayersModel.getSingletonInstance().getFirstDate(), LayersModel
@@ -256,6 +257,8 @@ public class PlotsControlPanel extends JPanel implements ZoomControllerListener,
                 }
 
                 setEnabledStateOfPeriodMovieButton();
+                // Log.debug("layer added time : " + (System.currentTimeMillis()
+                // - start));
             }
         });
 
@@ -266,7 +269,10 @@ public class PlotsControlPanel extends JPanel implements ZoomControllerListener,
         EventQueue.invokeLater(new Runnable() {
             @Override
             public void run() {
+                // long start = System.currentTimeMillis();
                 setEnabledStateOfPeriodMovieButton();
+                // Log.debug("Layer removed time : " +
+                // (System.currentTimeMillis() - start));
             }
         });
 

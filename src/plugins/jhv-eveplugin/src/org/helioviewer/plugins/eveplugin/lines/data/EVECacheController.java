@@ -101,9 +101,12 @@ public class EVECacheController implements DataDownloader {
 
             @Override
             public void run() {
+                // long start = System.currentTimeMillis();
                 for (EVECacheControllerListener listener : controllerListeners) {
                     listener.dataAdded(band);
                 }
+                // Log.debug("fireDataAdded time" + (System.currentTimeMillis()
+                // - start));
             }
         });
 
