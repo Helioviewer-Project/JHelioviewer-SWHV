@@ -7,6 +7,7 @@ import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.Calendar;
+import java.util.Collection;
 import java.util.Date;
 import java.util.GregorianCalendar;
 
@@ -28,6 +29,8 @@ import org.helioviewer.plugins.eveplugin.controller.ZoomController.ZOOM;
 import org.helioviewer.plugins.eveplugin.controller.ZoomControllerListener;
 import org.helioviewer.plugins.eveplugin.events.model.EventModel;
 import org.helioviewer.plugins.eveplugin.events.model.EventModelListener;
+import org.helioviewer.plugins.eveplugin.model.PlotAreaSpace;
+import org.helioviewer.plugins.eveplugin.model.PlotAreaSpaceManager;
 import org.helioviewer.plugins.eveplugin.model.TimeIntervalLockModel;
 //import org.helioviewer.plugins.eveplugin.model.PlotTimeSpace;
 import org.helioviewer.plugins.eveplugin.settings.EVEAPI.API_RESOLUTION_AVERAGES;
@@ -68,6 +71,8 @@ public class PlotsControlPanel extends JPanel implements ZoomControllerListener,
     private final String[] plots = { "Plot 1", "Plot 2" };
     private final JComboBox eventsComboBox = new JComboBox(plots);
 
+    private JButton resetPlot;
+
     private boolean selectedIndexSetByProgram = false;
 
     private final PlotsContainerPanel plotsContainerPanel;
@@ -88,6 +93,7 @@ public class PlotsControlPanel extends JPanel implements ZoomControllerListener,
 
         initLockIntervalCheckBox();
         initEventsVisualComponents();
+        initResetPlotButton();
 
         final JPanel periodPane = new JPanel();
         periodPane.setLayout(new FlowLayout(FlowLayout.LEFT));
@@ -103,6 +109,7 @@ public class PlotsControlPanel extends JPanel implements ZoomControllerListener,
         zoomPane.add(lockIntervalCheckBox);
         zoomPane.add(zoomLabel);
         zoomPane.add(zoomComboBox);
+        zoomPane.add(resetPlot);
 
         final JPanel groupPane = new JPanel();
         groupPane.setLayout(new FlowLayout(FlowLayout.RIGHT));
@@ -122,6 +129,22 @@ public class PlotsControlPanel extends JPanel implements ZoomControllerListener,
 
         zoomComboBox.addActionListener(this);
 
+    }
+
+    private void initResetPlotButton() {
+        resetPlot = new JButton("Reset Zoom");
+        resetPlot.addActionListener(new ActionListener() {
+
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                Collection<PlotAreaSpace> spaces = PlotAreaSpaceManager.getInstance().getAllPlotAreaSpaces();
+                for (PlotAreaSpace space : spaces) {
+                    space.setScaledSelectedTimeAndValue(space.getScaledMinTime(), space.getScaledMaxTime(), space.getScaledMinValue(),
+                            space.getScaledMaxValue());
+                }
+            }
+
+        });
     }
 
     private void initEventsVisualComponents() {
