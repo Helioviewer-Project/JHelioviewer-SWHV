@@ -50,6 +50,7 @@ public class ObservationDialogUIPanel extends SimpleObservationDialogUIPanel {
         EventQueue.invokeLater(new Runnable() {
             @Override
             public void run() {
+                // long start = System.currentTimeMillis();
                 labelGroup = new JLabel("Group");
                 labelData = new JLabel();
                 comboBoxGroup = new JComboBox(new DefaultComboBoxModel());
@@ -57,6 +58,8 @@ public class ObservationDialogUIPanel extends SimpleObservationDialogUIPanel {
                 dataPane = new JPanel();
                 initVisualComponents();
                 initGroups();
+                // Log.debug("ObservationDialogUIPanel time: " +
+                // (System.currentTimeMillis() - start));
             }
         });
 

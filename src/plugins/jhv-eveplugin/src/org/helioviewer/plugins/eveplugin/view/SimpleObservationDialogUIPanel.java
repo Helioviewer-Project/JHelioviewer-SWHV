@@ -20,6 +20,7 @@ import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 
+import org.helioviewer.base.logging.Log;
 import org.helioviewer.base.math.Interval;
 import org.helioviewer.jhv.Settings;
 import org.helioviewer.jhv.gui.components.calendar.JHVCalendarDatePicker;
@@ -65,7 +66,7 @@ public class SimpleObservationDialogUIPanel extends ObservationDialogPanel imple
         EventQueue.invokeLater(new Runnable() {
             @Override
             public void run() {
-
+                long start = System.currentTimeMillis();
                 labelStartDate = new JLabel("Start Date");
                 labelEndDate = new JLabel("End Date");
                 calendarStartDate = new JHVCalendarDatePicker();
@@ -78,6 +79,7 @@ public class SimpleObservationDialogUIPanel extends ObservationDialogPanel imple
                 timePane = new JPanel();
                 plotPane = new JPanel();
                 initVisualComponents();
+                Log.debug("SimpleObservationDialogUIPanel time : " + (System.currentTimeMillis() - start));
             }
         });
 

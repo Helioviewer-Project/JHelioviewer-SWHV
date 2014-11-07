@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.NavigableMap;
 
+import org.helioviewer.base.logging.Log;
 import org.helioviewer.base.math.Interval;
 import org.helioviewer.jhv.data.container.JHVEventContainer;
 import org.helioviewer.jhv.data.container.JHVEventHandler;
@@ -113,7 +114,9 @@ public class EventRequester implements ZoomControllerListener, JHVEventHandler {
 
                 @Override
                 public void run() {
+                    long start = System.currentTimeMillis();
                     JHVEventContainer.getSingletonInstance().requestForInterval(interval.getStart(), interval.getEnd(), eventHandler);
+                    Log.debug("selectedIntervalChanged" + (System.currentTimeMillis() - start));
                 }
 
             }.init(newInterval, this));
@@ -135,7 +138,10 @@ public class EventRequester implements ZoomControllerListener, JHVEventHandler {
             @Override
             public void run() {
                 // Log.debug("new events received " + eventList.size());
+                // long start = System.currentTimeMillis();
                 fireNewEventsReceived(eventList);
+                // Log.debug("newEventsReceived time : " +
+                // (System.currentTimeMillis() - start));
             }
 
         });
@@ -158,7 +164,9 @@ public class EventRequester implements ZoomControllerListener, JHVEventHandler {
             @Override
             public void run() {
                 // Log.debug("Request for interval");
+                long start = System.currentTimeMillis();
                 eventContainer.requestForInterval(selectedInterval.getStart(), selectedInterval.getEnd(), eventHandler);
+                Log.debug("cache updated time: " + (System.currentTimeMillis() - start));
             }
 
         }).init(selectedInterval, this));
