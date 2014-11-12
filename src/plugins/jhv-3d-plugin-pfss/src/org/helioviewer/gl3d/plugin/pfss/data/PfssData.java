@@ -100,9 +100,11 @@ public class PfssData {
             Header header = bhdu.getHeader();
 
             String date = header.findKey("DATE-OBS");
+
             SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
+            dateFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
+
             Date dd = dateFormat.parse(date.substring(11, 30));
-            dateFormat.setTimeZone(TimeZone.getTimeZone("GMT-2:00"));
 
             this.createBuffer(fieldlinex.length);
             Calendar cal = new GregorianCalendar();
