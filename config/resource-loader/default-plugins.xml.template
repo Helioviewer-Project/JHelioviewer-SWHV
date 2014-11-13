@@ -5,7 +5,7 @@
         <requirements>
         </requirements>
         <files>
-            <file srcName="PfssPlugin.jar" srcDir="default-plugins/" destName="PFSSPlugin.jar" destDir="./" loadLibrary="false" md5="md5pfss"/>
+            <file srcName="PfssPlugin.jar" srcDir="default-plugins/" destName="PfssPlugin.jar" destDir="./" loadLibrary="false" md5="md5pfss"/>
         </files>
         <files>
             <file srcName="SWEKPlugin.jar" srcDir="default-plugins/" destName="SWEKPlugin.jar" destDir="./" loadLibrary="false" md5="md5swek"/>
