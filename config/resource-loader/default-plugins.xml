@@ -5,16 +5,16 @@
         <requirements>
         </requirements>
         <files>
-            <file srcName="PfssPlugin.jar" srcDir="default-plugins/" destName="PFSSPlugin.jar" destDir="./" loadLibrary="false" md5="4c9f9840bf5cf718bfd33513a3fc1738"/>
+            <file srcName="PfssPlugin.jar" srcDir="default-plugins/" destName="PfssPlugin.jar" destDir="./" loadLibrary="false" md5="9adf84473f11819b337cca3d44ab86dd"/>
         </files>
         <files>
-            <file srcName="SWEKPlugin.jar" srcDir="default-plugins/" destName="SWEKPlugin.jar" destDir="./" loadLibrary="false" md5="eae3c79c1f0c4013752a0e935a63b371"/>
+            <file srcName="SWEKPlugin.jar" srcDir="default-plugins/" destName="SWEKPlugin.jar" destDir="./" loadLibrary="false" md5="a0d8086e97c2ae319479d0237ad9c4e7"/>
         </files>
         <files>
-            <file srcName="SWHVHEKPlugin.jar" srcDir="default-plugins/" destName="SWHVHEKPlugin.jar" destDir="./" loadLibrary="false" md5="f4f5ceefaba9e61b676c5a01baa5b080"/>
+            <file srcName="SWHVHEKPlugin.jar" srcDir="default-plugins/" destName="SWHVHEKPlugin.jar" destDir="./" loadLibrary="false" md5="8db3334f3f6c9e2eac8f09c52b19ec21"/>
         </files>
         <files>
-            <file srcName="EVEPlugin.jar" srcDir="default-plugins/" destName="EVEPlugin.jar" destDir="./" loadLibrary="false" md5="47fa876025ae3b7a70a63bd2b7f87120"/>
+            <file srcName="EVEPlugin.jar" srcDir="default-plugins/" destName="EVEPlugin.jar" destDir="./" loadLibrary="false" md5="7ef48924c12fccc575844bb4882856fc"/>
         </files>
     </configuration>
 </resourceDefinition>
