@@ -74,14 +74,14 @@ import org.helioviewer.viewmodelplugin.filter.FilterTabPanelManager;
 
 /**
  * A class that sets up the graphical user interface.
- *
+ * 
  * @author caplins
  * @author Benjamin Wamsler
  * @author Alen Agheksanterian
  * @author Stephan Pagel
  * @author Markus Langenberg
  * @author Andre Dau
- *
+ * 
  */
 public class ImageViewerGui {
 
@@ -167,7 +167,8 @@ public class ImageViewerGui {
             // leftPane.add("Features/Events", solarEventCatalogsPanel, false);
 
             // STATE - GET LEFT PANE
-            leftScrollPane = new JScrollPane(getLeftContentPane(), JScrollPane.VERTICAL_SCROLLBAR_ALWAYS, JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+            leftScrollPane = new JScrollPane(getLeftContentPane(), JScrollPane.VERTICAL_SCROLLBAR_ALWAYS,
+                    JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
             leftScrollPane.setFocusable(false);
             leftScrollPane.getVerticalScrollBar().setUnitIncrement(10);
             midSplitPane.setLeftComponent(leftScrollPane);
@@ -234,7 +235,7 @@ public class ImageViewerGui {
 
     /**
      * Packs, positions and shows the GUI
-     *
+     * 
      * @param _show
      *            If GUI should be displayed.
      */
@@ -286,7 +287,7 @@ public class ImageViewerGui {
 
     /**
      * Method that creates and initializes the main JFrame.
-     *
+     * 
      * @return the created and initialized main frame.
      */
     private JFrame createMainFrame() {
@@ -307,7 +308,7 @@ public class ImageViewerGui {
          * count=count+1; } else{ ComponentView cv =
          * ImageViewerGui.getSingletonInstance().getMainView(); cv.activate();
          * Log.error("WindowListener method called: windowActivated."); } }
-         *
+         * 
          * public void windowLostFocus(WindowEvent e) { ComponentView cv =
          * ImageViewerGui.getSingletonInstance().getMainView(); cv.deactivate();
          * Log.error("WindowListener method called: windowDeactivated."); } });
@@ -326,7 +327,7 @@ public class ImageViewerGui {
 
         minSize.width = Math.min(minSize.width, maxSize.width);
         minSize.height = Math.min(minSize.height, maxSize.height);
-        frame.setMaximumSize(maxSize);
+        // frame.setMaximumSize(maxSize);
         frame.setMinimumSize(minSize);
         frame.setPreferredSize(maxSize);
         frame.setFont(new Font("SansSerif", Font.BOLD, 12));
@@ -335,7 +336,7 @@ public class ImageViewerGui {
 
     /**
      * Returns instance of the main ComponentView.
-     *
+     * 
      * @return instance of the main ComponentView.
      */
     public ComponentView getMainView() {
@@ -344,7 +345,7 @@ public class ImageViewerGui {
 
     /**
      * Returns instance of the overview ComponentView.
-     *
+     * 
      * @return instance of the overview ComponentView.
      */
     public ComponentView getOverviewView() {
@@ -353,7 +354,7 @@ public class ImageViewerGui {
 
     /**
      * Returns the scrollpane containing the left content pane.
-     *
+     * 
      * @return instance of the scrollpane containing the left content pane.
      * */
     public SideContentPane getLeftContentPane() {
@@ -418,19 +419,19 @@ public class ImageViewerGui {
             cameraOptionsPanel = new GL3DCameraOptionsPanel();
             cameraTab.addTab("Camera Adjustments", cameraOptionsPanel);
             cameraTab.setEnabled(false);
-            //leftPane.add("Camera Options", cameraOptionsPanel, false);
+            // leftPane.add("Camera Options", cameraOptionsPanel, false);
             JTabbedPane planetTab = new JTabbedPane();
             PlanetOptionsPanel planetOptionsPanel = new PlanetOptionsPanel();
             planetTab.addTab("Planet Options", planetOptionsPanel);
             planetTab.setEnabled(false);
-            //leftPane.add("Object Options", planetOptionsPanel, false);
+            // leftPane.add("Object Options", planetOptionsPanel, false);
             return leftPane;
         }
     }
 
     /**
      * Returns the instance of the ImageSelectorPanel.
-     *
+     * 
      * @return instance of the image selector panel.
      * */
     public ImageSelectorPanel getImageSelectorPanel() {
@@ -482,7 +483,7 @@ public class ImageViewerGui {
 
     /**
      * Change the current state
-     *
+     * 
      * @param stateEnum
      */
     private void activateState(final State newState, State oldState) {
@@ -549,7 +550,7 @@ public class ImageViewerGui {
 
     /**
      * Loads the images which have to be displayed when the program starts.
-     *
+     * 
      * If there are any images defined in the command line, than this messages
      * tries to load this images. Otherwise it tries to load a default image
      * which is defined by the default entries of the observation panel.
@@ -575,7 +576,10 @@ public class ImageViewerGui {
             try {
                 for (int layer = 0; layer < jhvRequest.imageLayers.length; ++layer) {
                     // load image and memorize corresponding view
-                    ImageInfoView imageInfoView = APIRequestManager.requestAndOpenRemoteFile(true, jhvRequest.cadence, jhvRequest.startTime, jhvRequest.endTime, jhvRequest.imageLayers[layer].observatory, jhvRequest.imageLayers[layer].instrument, jhvRequest.imageLayers[layer].detector, jhvRequest.imageLayers[layer].measurement, true);
+                    ImageInfoView imageInfoView = APIRequestManager.requestAndOpenRemoteFile(true, jhvRequest.cadence,
+                            jhvRequest.startTime, jhvRequest.endTime, jhvRequest.imageLayers[layer].observatory,
+                            jhvRequest.imageLayers[layer].instrument, jhvRequest.imageLayers[layer].detector,
+                            jhvRequest.imageLayers[layer].measurement, true);
                     if (imageInfoView != null && getMainView() != null) {
                         // get the layered view
                         LayeredView layeredView = getMainView().getAdapter(LayeredView.class);
@@ -590,9 +594,11 @@ public class ImageViewerGui {
                             if (imageInfoView.equals(subView.getAdapter(ImageInfoView.class))) {
 
                                 // Set the correct image scale
-                                ImageSizeMetaData imageSizeMetaData = (ImageSizeMetaData) imageInfoView.getAdapter(MetaDataView.class).getMetaData();
+                                ImageSizeMetaData imageSizeMetaData = (ImageSizeMetaData) imageInfoView.getAdapter(MetaDataView.class)
+                                        .getMetaData();
                                 ZoomController zoomController = new ZoomController();
-                                zoomController.zoom(ImageViewerGui.getSingletonInstance().getMainView(), imageSizeMetaData.getUnitsPerPixel() / (jhvRequest.imageScale * 1000.0));
+                                zoomController.zoom(ImageViewerGui.getSingletonInstance().getMainView(),
+                                        imageSizeMetaData.getUnitsPerPixel() / (jhvRequest.imageScale * 1000.0));
 
                                 // Lock movie
                                 if (jhvRequest.linked) {
@@ -616,7 +622,8 @@ public class ImageViewerGui {
                                     // if opacity filter has been found set
                                     // opacity value
                                     if (filterView.getFilter() instanceof OpacityFilter) {
-                                        ((OpacityFilter) (filterView.getFilter())).setState(Float.toString(jhvRequest.imageLayers[layer].opacity / 100.0f));
+                                        ((OpacityFilter) (filterView.getFilter())).setState(Float
+                                                .toString(jhvRequest.imageLayers[layer].opacity / 100.0f));
                                         break;
                                     }
 
@@ -717,7 +724,7 @@ public class ImageViewerGui {
 
     /**
      * Returns the only instance of this class.
-     *
+     * 
      * @return the only instance of this class.
      * */
     public static ImageViewerGui getSingletonInstance() {
@@ -726,7 +733,7 @@ public class ImageViewerGui {
 
     /**
      * Returns the main frame.
-     *
+     * 
      * @return the main frame.
      * */
     public static JFrame getMainFrame() {
@@ -735,7 +742,7 @@ public class ImageViewerGui {
 
     /**
      * Returns the scrollpane containing the left content pane.
-     *
+     * 
      * @return instance of the scrollpane containing the left content pane.
      * */
     public JScrollPane getLeftScrollPane() {
@@ -767,7 +774,7 @@ public class ImageViewerGui {
 
     /**
      * Returns the content panel of JHV
-     *
+     * 
      * @return The content panel of JHV
      */
     public JPanel getContentPane() {
