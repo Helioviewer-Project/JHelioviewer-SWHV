@@ -33,26 +33,22 @@ public class ComesepEvent implements JHVEvent {
 
     @Override
     public Date getStartDate() {
-        // TODO Auto-generated method stub
-        return null;
+        return startDate;
     }
 
     @Override
     public Date getEndDate() {
-        // TODO Auto-generated method stub
-        return null;
+        return endDate;
     }
 
     @Override
     public String getName() {
-        // TODO Auto-generated method stub
-        return null;
+        return eventName;
     }
 
     @Override
     public String getDisplayName() {
-        // TODO Auto-generated method stub
-        return null;
+        return eventDisplayName;
     }
 
     @Override
