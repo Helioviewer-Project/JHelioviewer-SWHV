@@ -3,7 +3,7 @@ package org.helioviewer.jhv.gui;
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.Font;
-import java.awt.Toolkit;
+import java.awt.GraphicsEnvironment;
 import java.awt.event.ActionEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
@@ -302,34 +302,14 @@ public class ImageViewerGui {
                 exitAction.actionPerformed(new ActionEvent(this, 0, ""));
             }
         });
-        /*
-         * frame.addWindowFocusListener(new WindowAdapter() { int count=0;
-         * public void windowGainedFocus(WindowEvent e) { if(count==0){
-         * count=count+1; } else{ ComponentView cv =
-         * ImageViewerGui.getSingletonInstance().getMainView(); cv.activate();
-         * Log.error("WindowListener method called: windowActivated."); } }
-         * 
-         * public void windowLostFocus(WindowEvent e) { ComponentView cv =
-         * ImageViewerGui.getSingletonInstance().getMainView(); cv.deactivate();
-         * Log.error("WindowListener method called: windowDeactivated."); } });
-         */
-        Dimension maxSize = Toolkit.getDefaultToolkit().getScreenSize();
-        Dimension minSize = new Dimension(800, 600);
 
-        maxSize.width -= 200;
-        // if the display is not very high, we want to take most of the height,
-        // as the rest is not useful anyway
-        if (maxSize.height < 1000) {
-            maxSize.height -= 100;
-        } else {
-            maxSize.height -= 150;
-        }
+        Dimension maxSize = GraphicsEnvironment.getLocalGraphicsEnvironment().getMaximumWindowBounds().getSize();
+        Dimension minSize = new Dimension(800, 600);
 
         minSize.width = Math.min(minSize.width, maxSize.width);
         minSize.height = Math.min(minSize.height, maxSize.height);
-        // frame.setMaximumSize(maxSize);
         frame.setMinimumSize(minSize);
-        frame.setPreferredSize(maxSize);
+        frame.setPreferredSize(new Dimension(maxSize.width - 100, maxSize.height - 100));
         frame.setFont(new Font("SansSerif", Font.BOLD, 12));
         return frame;
     }
