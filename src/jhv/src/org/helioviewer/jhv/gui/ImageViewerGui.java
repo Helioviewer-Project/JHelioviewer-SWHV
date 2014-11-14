@@ -4,11 +4,13 @@ import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.GraphicsEnvironment;
+import java.awt.Window;
 import java.awt.event.ActionEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.File;
 import java.io.IOException;
+import java.lang.reflect.Method;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.util.AbstractList;
@@ -310,8 +312,21 @@ public class ImageViewerGui {
         minSize.height = Math.min(minSize.height, maxSize.height);
         frame.setMinimumSize(minSize);
         frame.setPreferredSize(new Dimension(maxSize.width - 100, maxSize.height - 100));
+        enableFullScreen(frame);
         frame.setFont(new Font("SansSerif", Font.BOLD, 12));
         return frame;
+    }
+
+    private static void enableFullScreen(Window window) {
+        if (System.getProperty("jhv.os").equals("mac")) {
+            try {
+                Class<?> fullScreenUtilities = Class.forName("com.apple.eawt.FullScreenUtilities");
+                Method setWindowCanFullScreen = fullScreenUtilities.getMethod("setWindowCanFullScreen", Window.class, boolean.class);
+                setWindowCanFullScreen.invoke(fullScreenUtilities, window, true);
+            } catch (Exception e) {
+                throw new RuntimeException("FullScreen utilities not available", e);
+            }
+        }
     }
 
     /**
