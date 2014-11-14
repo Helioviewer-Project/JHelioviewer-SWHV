@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="ISO-8859-1"?>
+<?xml version="1.0" encoding="utf-8"?>
 
 <project name="build" default="all">
 
@@ -21,50 +21,55 @@
         <pathelement location="${build.resources}/shared/ant-contrib-1.0b3.jar"/>
       </classpath>
     </taskdef>
-	<taskdef name="jarbundler" 
-			classname="net.sourceforge.jarbundler.JarBundler">
+
+    <!--
+    <taskdef name="bundleapp" classname="com.oracle.appbundler.AppBundlerTask">
+        <classpath path="${build.resources}/mac/lib/appbundler-1.0.jar"/>
+    </taskdef>
+    -->
+
+	<taskdef name="jarbundler" classname="net.sourceforge.jarbundler.JarBundler">
 		<classpath path="${build.resources}/mac/lib/jarbundler.jar"/>
 	</taskdef>
 
 	<target name="mkdir">
-        <mkdir dir="${bin}" /> 
-        <mkdir dir="${bin.jhv}" /> 
-        <mkdir dir="${build}" /> 
-        <mkdir dir="${temp}" /> 
-        <mkdir dir="${doc}" /> 
+        <mkdir dir="${bin}"/>
+        <mkdir dir="${bin.jhv}"/>
+        <mkdir dir="${build}"/>
+        <mkdir dir="${temp}"/>
+        <mkdir dir="${doc}"/>
 	</target>
-	
+
    	<target name="clean" depends="mkdir">
-        <delete file="JHelioviewer.jar"/> 
+        <delete file="JHelioviewer.jar"/>
         <delete includeemptydirs="true" verbose="true">
         	<fileset dir="${bin}" followsymlinks="false" defaultexcludes="no"/>
-        </delete> 
+        </delete>
         <delete includeemptydirs="true" verbose="true">
         	<fileset dir="${build}" followsymlinks="false" defaultexcludes="no"/>
-        </delete> 
+        </delete>
         <delete includeemptydirs="true" verbose="true">
         	<fileset dir="${temp}" followsymlinks="false" defaultexcludes="no"/>
-        </delete> 
+        </delete>
         <delete includeemptydirs="true" verbose="true">
         	<fileset dir="${doc}" followsymlinks="false" defaultexcludes="no"/>
-        </delete> 
+        </delete>
         <delete includeemptydirs="true" verbose="true">
         	<fileset dir="${src.base}" includes="${bin.eclipse}"  followsymlinks="false" defaultexcludes="no"/>
-        </delete> 
+        </delete>
         <antcall target="mkdir" />
 	</target>
 
 	<target name="all" depends="sign" />
 
     <!-- JAR file generation -->
-
     <target name="init" depends="mkdir">
        	<echo message="Trying to determine revision" />
-        <exec 
-            executable="${bzrpath}" 
-            outputproperty="jhv.revision.tmp" 
-            resolveexecutable="true" 
-            searchpath="true" 
+        <exec
+            executable="${bzrpath}"
+            outputproperty="jhv.revision.tmp"
+            resolveexecutable="true"
+            searchpath="true"
             resultproperty="jhv.revision.retcode"
             failifexecutionfails="false">
                 <arg value="revno"/>
@@ -85,7 +90,7 @@
     <target name="build-init" depends="init">
         <property name="jhv.pkg.name" value="jhv-${jhv.version}.${jhv.revision}" />
     </target>
-	
+
 	<target name="compile" depends="init" >
 		<javac srcdir="${src.path}" destdir="${bin.jhv}" target="1.6" source="1.6" debug="on" debuglevel="source,lines,vars" includeantruntime="false" encoding="utf-8">
 			<classpath>
@@ -97,7 +102,7 @@
  		</javac>
 		<!-- Copy, remove the suppress warning and compile-->
 		<mkdir dir="${temp}/src/org/helioviewer/jhv"/>
-		<copy 
+		<copy
             file="${src.base}/jhv/src/org/helioviewer/jhv/JavaHelioViewerLauncher.java" 
             tofile="${temp}/src/org/helioviewer/jhv/JavaHelioViewerLauncher.java"
         />
@@ -107,7 +112,7 @@
             <include name="JavaHelioViewerLauncher.java"/>
 		</javac>
     </target>
-	
+
 	<target name="jar-bundle" depends="compile">
 		<!-- JAR File -->
  		<jar destfile="JHelioviewer.jar">
@@ -153,9 +158,8 @@
 
 
     <!-- Mac OS bundle -->
-
 	<target name="release-mac" depends="sign, bundle-mac"/>
-    
+
     <target name="bundle-mac" depends="build-init">
         <if>
             <contains string="${os.name}" substring="mac" casesensitive="false"/>
@@ -165,16 +169,34 @@
                     <arg value="bundle.sh" />
                 </exec>
                 <mkdir dir="${temp}/build/mac/" />
+
                 <jarbundler dir="${temp}/build/mac/"
+                    jvmversion="1.6+"
                     name="JHelioviewer"
                     mainclass="org.helioviewer.jhv.JavaHelioViewerLauncher"
                     jar="${build}/JHelioviewer.jar"
                     version="${jhv.version}"
                     build="${jhv.revision}"
                     bundleid="org.helioviewer.jhv"
+                    copyright="©2014, European Space Agency"
                     icon="${build.resources}/mac/JHV_icon.icns">
                     <javaproperty name="apple.laf.useScreenMenuBar" value="true"/>
                 </jarbundler>
+
+                <!--
+                <bundleapp outputdirectory="${temp}/build/mac/"
+                           name="JHelioviewer"
+                           displayname="JHelioviewer"
+                           identifier=""
+                           mainclassname="org.helioviewer.jhv.JavaHelioViewerLauncher"
+                           icon="${build.resources}/mac/JHV_icon.icns"
+                           shortversion="${jhv.version}"
+                           copyright="©2014, European Space Agency">
+                    <classpath file="${build}/JHelioviewer.jar"/>
+                    <option value="-Dapple.laf.useScreenMenuBar=true"/>
+                </bundleapp>
+                -->
+
                 <exec executable="${build.resources}/mac/bundle.sh">
                 	<env key="TEMP" value="${temp}/build/mac" />
                 	<env key="RESOURCES" value="${build.resources}/mac" />
@@ -196,7 +218,7 @@
         <classpath location="${build.resources}/windows/nsisant-1.2.jar"/>
     </taskdef>
     <property name="nsis.path" value="${temp}/build/windows/nsis-2.46/" />
-    
+
     <target name="init-nsis" depends="build-init">
         <untar src="${build.resources}/windows/nsis-2.46.tar.bz2" dest="${temp}/build/windows" overwrite="false" compression="bzip2"/>
         <if>
@@ -227,7 +249,7 @@
             <else>
 	            <property name="makensis.executable" value="makensis.exe"/>
                 <property name="nsis.argument.prefix" value="/"/>
-            </else>            		
+            </else>
         </if>
         <if>
             <not>
@@ -241,9 +263,8 @@
             </then>
         </if>
     </target>
-    
+
     <target name="release-windows" depends="sign,bundle-windows"/>
- 
 
 	<target name="bundle-windows" depends="init-nsis">
 		<exec executable="${nsis.path}/${makensis.executable}" dir="${nsis.path}">
@@ -257,19 +278,18 @@
             <arg value="${nsis.argument.prefix}DVERSION_FILE=${basedir}/VERSION" />
 			<arg value="${build.resources}/windows/windows-setup.nsi"/>
         </exec>
-	</target>		
-    
+	</target>
+
     <!-- Linux (just a compressed tarball) -->
     <target name="release-tar" depends="sign, bundle-tar" />
-    
+
     <target name="bundle-tar" depends="build-init">
         <tar destfile="${build}/${jhv.pkg.name}.bin.tar.gz" compression="gzip" >
         	<zipfileset dir="." includes="JHelioviewer.jar, README, COPYING, VERSION" prefix="${jhv.pkg.name}" />
         </tar>
     </target>
-    
-    <!-- Source bundle -->
 
+    <!-- Source bundle -->
     <target name="bundle-src" depends ="bundle-src-zip, bundle-src-tar" />
 
     <target name="bundle-src-prepare" depends="build-init">
@@ -290,7 +310,7 @@
         <generateManifest input="${temp}/build/src/bzrstatus" output="${temp}/build/src/bzrfiles" />
         <loadfile property="jhv.files" srcFile="${temp}/build/src/bzrfiles" />
     </target>
-    
+
     <target name="bundle-src-tar" depends="bundle-src-prepare">
         <tar destfile="${build}/${jhv.pkg.name}.src.tar.gz" compression="gzip" defaultexcludes="no" longfile="gnu">
             <zipfileset dir="." includes="${jhv.files}" prefix="${jhv.pkg.name}-src/" defaultexcludes="no"/>
@@ -302,18 +322,17 @@
             <zipfileset dir="." includes="${jhv.files}" defaultexcludes="no" prefix="${jhv.pkg.name}-src/"/>
         </zip>
     </target>
-       
+
     <!-- all -->
     <target name="release-all" depends="release-no-src, bundle-src" />
     <target name="release-no-src" depends="release-mac, release-windows, release-tar" />
-    
+
     <target name="bundle-all" depends="bundle-no-src, bundle-src" />
     <target name="bundle-no-src" depends="bundle-mac, bundle-windows, bundle-tar" />
-    
+
     <!-- documentation -->
-    
     <target name="doc">
-        <javadoc 
+        <javadoc
             access="private"
             destdir="${doc}"
             author="true"
@@ -330,7 +349,7 @@
 			</classpath>
         </javadoc>
     </target>
-    
+
     <!-- plugins -->
     <target name="plugin-compile" depends="jar-bundle">
         <mkdir dir="${bin.plugins}/runningdifferenceplugin" />
@@ -343,7 +362,7 @@
     <target name="release-plugins" >
     	<ant antfile="plugins/build.xml" inheritAll="false" target="all"/>
     </target>
-    
+
     <target name="doc-plugins" >
     	<ant antfile="plugins/build.xml" inheritAll="false" target="doc"/>
     </target>
@@ -351,7 +370,7 @@
     <target name="clean-plugins" >
     	<ant antfile="plugins/build.xml" inheritAll="false" target="clean"/>
     </target>
-    
+
     <target name="install-plugins" >
     	<ant antfile="src/plugins/build.xml" inheritAll="false" target="install-plugins"/>
     </target>
