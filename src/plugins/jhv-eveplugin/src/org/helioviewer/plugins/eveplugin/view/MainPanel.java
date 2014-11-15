@@ -21,9 +21,9 @@ public class MainPanel extends JPanel {
 
     private static final long serialVersionUID = 1L;
 
-    private final PlotsContainerPanel plotsPane = new PlotsContainerPanel();
+    private final PlotsContainerPanel plotsPane = PlotsContainerPanel.getSingletonInstance();
 
-    private final PlotsControlPanel controlPane = new PlotsControlPanel(plotsPane);
+    private final PlotsControlPanel controlPane = new PlotsControlPanel();
 
     // //////////////////////////////////////////////////////////////////////////////
     // Methods
