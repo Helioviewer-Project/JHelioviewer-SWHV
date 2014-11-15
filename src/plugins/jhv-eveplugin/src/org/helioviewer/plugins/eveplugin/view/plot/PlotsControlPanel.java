@@ -1,7 +1,6 @@
 package org.helioviewer.plugins.eveplugin.view.plot;
 
 import java.awt.BorderLayout;
-import java.awt.Dimension;
 import java.awt.EventQueue;
 import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
@@ -80,12 +79,7 @@ public class PlotsControlPanel extends JPanel implements ZoomControllerListener,
         zoomPane.add(zoomComboBox);
         zoomPane.add(resetPlot);
 
-        final JPanel groupPane = new JPanel();
-        groupPane.setLayout(new FlowLayout(FlowLayout.RIGHT));
-        groupPane.setPreferredSize(new Dimension(200, getHeight()));
-
         add(zoomPane, BorderLayout.CENTER);
-        add(groupPane, BorderLayout.LINE_END);
 
         zoomComboBox.addActionListener(this);
 
