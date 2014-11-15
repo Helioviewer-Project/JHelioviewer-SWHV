@@ -12,7 +12,6 @@ import java.util.Date;
 import java.util.GregorianCalendar;
 
 import javax.swing.DefaultComboBoxModel;
-import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
@@ -20,29 +19,23 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 
 import org.helioviewer.base.math.Interval;
-import org.helioviewer.jhv.gui.IconBank;
-import org.helioviewer.jhv.gui.IconBank.JHVIcon;
 import org.helioviewer.jhv.layers.LayersListener;
 import org.helioviewer.jhv.layers.LayersModel;
 import org.helioviewer.plugins.eveplugin.controller.ZoomController;
 import org.helioviewer.plugins.eveplugin.controller.ZoomController.ZOOM;
 import org.helioviewer.plugins.eveplugin.controller.ZoomControllerListener;
-import org.helioviewer.plugins.eveplugin.events.model.EventModel;
-import org.helioviewer.plugins.eveplugin.events.model.EventModelListener;
 import org.helioviewer.plugins.eveplugin.model.PlotAreaSpace;
 import org.helioviewer.plugins.eveplugin.model.PlotAreaSpaceManager;
 import org.helioviewer.plugins.eveplugin.model.TimeIntervalLockModel;
 //import org.helioviewer.plugins.eveplugin.model.PlotTimeSpace;
 import org.helioviewer.plugins.eveplugin.settings.EVEAPI.API_RESOLUTION_AVERAGES;
-import org.helioviewer.plugins.eveplugin.view.periodpicker.PeriodPicker;
 import org.helioviewer.plugins.eveplugin.view.periodpicker.PeriodPickerListener;
 import org.helioviewer.viewmodel.view.View;
 
 /**
  * @author Stephan Pagel
  * */
-public class PlotsControlPanel extends JPanel implements ZoomControllerListener, ActionListener, PeriodPickerListener, LayersListener,
-        EventModelListener {
+public class PlotsControlPanel extends JPanel implements ZoomControllerListener, ActionListener, PeriodPickerListener, LayersListener {
 
     // //////////////////////////////////////////////////////////////////////////////
     // Definitions
@@ -54,36 +47,22 @@ public class PlotsControlPanel extends JPanel implements ZoomControllerListener,
 
     private boolean setDefaultPeriod = true;
 
-    private final ImageIcon movietimeIcon = IconBank.getIcon(JHVIcon.LAYER_MOVIE_TIME);
-
-    private final JLabel periodLabel = new JLabel("Period:");
-    private final PeriodPicker periodPicker = new PeriodPicker();
-    private final JButton periodFromLayersButton = new JButton(movietimeIcon);
-
     private final JLabel zoomLabel = new JLabel("Clip:");
     private final JComboBox zoomComboBox = new JComboBox(new DefaultComboBoxModel());
 
     private final JLabel lockIntervalLabel = new JLabel("Lock Time Interval:");
     private final JCheckBox lockIntervalCheckBox = new JCheckBox();
 
-    private final JLabel eventsLabel = new JLabel("Display events: ");
-    private final JCheckBox eventsCheckBox = new JCheckBox();
-    private final String[] plots = { "Plot 1", "Plot 2" };
-    private final JComboBox eventsComboBox = new JComboBox(plots);
-
     private JButton resetPlot;
 
     private boolean selectedIndexSetByProgram = false;
-
-    private final PlotsContainerPanel plotsContainerPanel;
 
     // //////////////////////////////////////////////////////////////////////////////
     // Methods
     // //////////////////////////////////////////////////////////////////////////////
 
-    public PlotsControlPanel(PlotsContainerPanel plotsContainerPanel) {
+    public PlotsControlPanel() {
         initVisualComponents();
-        this.plotsContainerPanel = plotsContainerPanel;
         ZoomController.getSingletonInstance().addZoomControllerListener(this);
         LayersModel.getSingletonInstance().addLayersListener(this);
     }
@@ -92,19 +71,9 @@ public class PlotsControlPanel extends JPanel implements ZoomControllerListener,
         setLayout(new BorderLayout());
 
         initLockIntervalCheckBox();
-        initEventsVisualComponents();
         initResetPlotButton();
 
-        final JPanel periodPane = new JPanel();
-        periodPane.setLayout(new FlowLayout(FlowLayout.LEFT));
-        periodPane.add(periodLabel);
-        periodPane.add(periodPicker);
-        periodPane.add(periodFromLayersButton);
-
         final JPanel zoomPane = new JPanel(new FlowLayout(FlowLayout.RIGHT));
-        zoomPane.add(eventsLabel);
-        zoomPane.add(eventsCheckBox);
-        zoomPane.add(eventsComboBox);
         zoomPane.add(lockIntervalLabel);
         zoomPane.add(lockIntervalCheckBox);
         zoomPane.add(zoomLabel);
@@ -115,17 +84,8 @@ public class PlotsControlPanel extends JPanel implements ZoomControllerListener,
         groupPane.setLayout(new FlowLayout(FlowLayout.RIGHT));
         groupPane.setPreferredSize(new Dimension(200, getHeight()));
 
-        add(periodPane, BorderLayout.LINE_START);
         add(zoomPane, BorderLayout.CENTER);
         add(groupPane, BorderLayout.LINE_END);
-
-        periodPicker.addPeriodPickerListener(this);
-
-        periodFromLayersButton.setToolTipText("Request data of selected movie interval");
-        periodFromLayersButton.setPreferredSize(new Dimension(movietimeIcon.getIconWidth() + 14,
-                periodFromLayersButton.getPreferredSize().height));
-        periodFromLayersButton.addActionListener(this);
-        setEnabledStateOfPeriodMovieButton();
 
         zoomComboBox.addActionListener(this);
 
@@ -147,35 +107,6 @@ public class PlotsControlPanel extends JPanel implements ZoomControllerListener,
         });
     }
 
-    private void initEventsVisualComponents() {
-        eventsCheckBox.setSelected(EventModel.getSingletonInstance().isEventsVisible());
-        EventModel.getSingletonInstance().addEventModelListener(this);
-        eventsCheckBox.addActionListener(new ActionListener() {
-
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                if (eventsCheckBox.isSelected()) {
-                    EventModel.getSingletonInstance().activateEvents();
-                } else {
-                    EventModel.getSingletonInstance().deactivateEvents();
-                }
-            }
-        });
-
-        eventsComboBox.addActionListener(new ActionListener() {
-
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                if (((String) eventsComboBox.getSelectedItem()).equals("Plot 1")) {
-                    EventModel.getSingletonInstance().setPlotIdentifier(PlotsContainerPanel.PLOT_IDENTIFIER_MASTER);
-                } else {
-                    EventModel.getSingletonInstance().setPlotIdentifier(PlotsContainerPanel.PLOT_IDENTIFIER_SLAVE);
-                    plotsContainerPanel.setPlot2Visible(true);
-                }
-            }
-        });
-    }
-
     /**
      *
      */
@@ -190,12 +121,6 @@ public class PlotsControlPanel extends JPanel implements ZoomControllerListener,
             }
 
         });
-    }
-
-    private void setEnabledStateOfPeriodMovieButton() {
-        final Interval<Date> frameInterval = LayersModel.getSingletonInstance().getFrameInterval();
-
-        periodFromLayersButton.setEnabled(frameInterval.getStart() != null && frameInterval.getEnd() != null);
     }
 
     private void fillZoomComboBox() {
@@ -279,7 +204,6 @@ public class PlotsControlPanel extends JPanel implements ZoomControllerListener,
                     // interval.getEnd());
                 }
 
-                setEnabledStateOfPeriodMovieButton();
                 // Log.debug("layer added time : " + (System.currentTimeMillis()
                 // - start));
             }
@@ -289,16 +213,6 @@ public class PlotsControlPanel extends JPanel implements ZoomControllerListener,
 
     @Override
     public void layerRemoved(View oldView, int oldIdx) {
-        EventQueue.invokeLater(new Runnable() {
-            @Override
-            public void run() {
-                // long start = System.currentTimeMillis();
-                setEnabledStateOfPeriodMovieButton();
-                // Log.debug("Layer removed time : " +
-                // (System.currentTimeMillis() - start));
-            }
-        });
-
     }
 
     @Override
@@ -361,12 +275,6 @@ public class PlotsControlPanel extends JPanel implements ZoomControllerListener,
                     selectedIndexSetByProgram = false;
                 }
             }
-        } else if (e.getSource() == periodFromLayersButton) {
-            final Interval<Date> interval = new Interval<Date>(LayersModel.getSingletonInstance().getFirstDate(), LayersModel
-                    .getSingletonInstance().getLastDate());
-            ZoomController.getSingletonInstance().setAvailableInterval(interval);
-            // PlotTimeSpace.getInstance().setSelectedMinAndMaxTime(interval.getStart(),
-            // interval.getEnd());
         }
     }
 
@@ -381,8 +289,6 @@ public class PlotsControlPanel extends JPanel implements ZoomControllerListener,
             calendar.clear();
             calendar.setTime(newInterval.getEnd());
             calendar.add(Calendar.DATE, -1);
-
-            periodPicker.setInterval(new Interval<Date>(newInterval.getStart(), calendar.getTime()));
 
             fillZoomComboBox();
         }
@@ -456,11 +362,5 @@ public class PlotsControlPanel extends JPanel implements ZoomControllerListener,
 
             return "Custom";
         }
-    }
-
-    @Override
-    public void eventsDeactivated() {
-        eventsCheckBox.setSelected(false);
-        repaint();
     }
 }

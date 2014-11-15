@@ -38,11 +38,13 @@ public class PlotsContainerPanel extends JPanel implements LineDataSelectorModel
 
     private boolean isSecondPlotVisible = true;
 
+    private static PlotsContainerPanel instance;
+
     // //////////////////////////////////////////////////////////////////////////////
     // Methods
     // //////////////////////////////////////////////////////////////////////////////
 
-    public PlotsContainerPanel() {
+    private PlotsContainerPanel() {
         BandController.getSingletonInstance().registerBandManager(PLOT_IDENTIFIER_MASTER);
         BandController.getSingletonInstance().registerBandManager(PLOT_IDENTIFIER_SLAVE);
 
@@ -50,6 +52,13 @@ public class PlotsContainerPanel extends JPanel implements LineDataSelectorModel
 
         // BandController.getSingletonInstance().addBandControllerListener(this);
         LineDataSelectorModel.getSingletonInstance().addLineDataSelectorModelListener(this);
+    }
+
+    public static PlotsContainerPanel getSingletonInstance() {
+        if (instance == null) {
+            instance = new PlotsContainerPanel();
+        }
+        return instance;
     }
 
     private void initVisualComponents() {
