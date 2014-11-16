@@ -1,11 +1,10 @@
 package org.helioviewer.plugins.eveplugin.view;
 
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.EventQueue;
 import java.awt.FlowLayout;
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.Date;
@@ -94,19 +93,13 @@ public class ControlsPanel extends JPanel implements ActionListener, LayersListe
         add(lineDataSelectorContainer, BorderLayout.CENTER);
 
         JPanel pageEndPanel = new JPanel();
-        pageEndPanel.setLayout(new GridBagLayout());
-        GridBagConstraints c = new GridBagConstraints();
-        c.gridx = 0;
-        c.gridy = 0;
-        c.fill = GridBagConstraints.NONE;
-        pageEndPanel.add(eventsComboBox, c);
-
-        c.gridx = 1;
+        pageEndPanel.setBackground(Color.BLUE);
         JPanel flowPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
+        flowPanel.add(eventsComboBox);
         flowPanel.add(periodFromLayersButton);
         flowPanel.add(addLayerButton);
-        pageEndPanel.add(flowPanel, c);
-        add(pageEndPanel, BorderLayout.PAGE_END);
+
+        add(flowPanel, BorderLayout.PAGE_END);
     }
 
     public static ControlsPanel getSingletonInstance() {
