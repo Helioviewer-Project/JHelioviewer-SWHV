@@ -64,10 +64,10 @@ public class ControlsPanel extends JPanel implements ActionListener, LayersListe
 
             @Override
             public void actionPerformed(ActionEvent e) {
-                if (((String) eventsComboBox.getSelectedItem()).equals("Events on plot 1")) {
+                if (((String) eventsComboBox.getSelectedItem()).equals("Events on Plot 1")) {
                     EventModel.getSingletonInstance().setPlotIdentifier(PlotsContainerPanel.PLOT_IDENTIFIER_MASTER);
                     EventModel.getSingletonInstance().activateEvents();
-                } else if (((String) eventsComboBox.getSelectedItem()).equals("Events on plot 2")) {
+                } else if (((String) eventsComboBox.getSelectedItem()).equals("Events on Plot 2")) {
                     EventModel.getSingletonInstance().setPlotIdentifier(PlotsContainerPanel.PLOT_IDENTIFIER_SLAVE);
                     PlotsContainerPanel.getSingletonInstance().setPlot2Visible(true);
                     EventModel.getSingletonInstance().activateEvents();
