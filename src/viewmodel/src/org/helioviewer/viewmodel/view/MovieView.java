@@ -4,36 +4,39 @@ import org.helioviewer.viewmodel.changeevent.ChangeEvent;
 
 /**
  * View to interact with image series.
- * 
+ *
  * <p>
  * This interface is designed to interact with image series, such as JPX-Files.
  * It provides basic functions to navigate within the image series.
- * 
+ *
  * <p>
  * Additional features are provides by {@link TimedMovieView} and
  * {@link CachedMovieView}.
- * 
+ *
  * @author Markus Langenberg
  */
 public interface MovieView extends View {
 
     /**
      * Animation mode.
-     * 
+     *
      * @see MovieView#setAnimationMode(AnimationMode)
      */
     public enum AnimationMode {
         LOOP {
+            @Override
             public String toString() {
                 return "Loop";
             }
         },
         STOP {
+            @Override
             public String toString() {
                 return "Stop";
             }
         },
         SWING {
+            @Override
             public String toString() {
                 return "Swing";
             }
@@ -42,9 +45,9 @@ public interface MovieView extends View {
 
     /**
      * Sets the frame currently shown.
-     * 
+     *
      * The given frameNumber is cropped to [0, maximumFrameNumber).
-     * 
+     *
      * @param frameNumber
      *            number of new frame, first frame = 0
      * @param event
@@ -57,9 +60,9 @@ public interface MovieView extends View {
 
     /**
      * Sets the frame currently shown.
-     * 
+     *
      * The given frameNumber is cropped to [0, maximumFrameNumber).
-     * 
+     *
      * @param frameNumber
      *            number of new frame, first frame = 0
      * @param event
@@ -75,7 +78,7 @@ public interface MovieView extends View {
 
     /**
      * Returns the current frame number.
-     * 
+     *
      * @return current frame number
      * @see #setCurrentFrame
      * @see TimedMovieView#setCurrentFrame
@@ -84,21 +87,21 @@ public interface MovieView extends View {
 
     /**
      * Returns the maximum frame number.
-     * 
+     *
      * @return maximum frame number
      */
     public int getMaximumFrameNumber();
 
     /**
      * Returns the last accessible frame number.
-     * 
+     *
      * @return maximum accessible frame number
      */
     public int getMaximumAccessibleFrameNumber();
 
     /**
      * Sets the current animation mode.
-     * 
+     *
      * The animation mode describes, what should happen when the last frames is
      * reached:
      * <p>
@@ -106,7 +109,7 @@ public interface MovieView extends View {
      * STOP: Go back to first frame and stop playing.<br>
      * SWING: On reaching the last frame, play movie backwards, on reaching the
      * first frame again, play movie forwards.
-     * 
+     *
      * @param mode
      *            new animation mode
      */
@@ -114,10 +117,10 @@ public interface MovieView extends View {
 
     /**
      * Sets the desired frame rate.
-     * 
+     *
      * Implicit, switches to relative mode and thus overrides all settings
      * previously set by {@link TimedMovieView#setDesiredAbsoluteSpeed}.
-     * 
+     *
      * @param framesPerSecond
      *            desired frame rate
      * @see TimedMovieView#setDesiredAbsoluteSpeed
@@ -126,17 +129,17 @@ public interface MovieView extends View {
 
     /**
      * Returns the frame rate, on which the MovieView is operating right now.
-     * 
+     *
      * The number has not be recalculated every frame, so changes on the desired
      * frame rate may not be visible immediately.
-     * 
+     *
      * @return average actual frame rate
      */
     public float getActualFramerate();
 
     /**
      * Starts playing the movie at the current frame.
-     * 
+     *
      * @see #pauseMovie
      * @see #isMoviePlaying
      */
@@ -144,7 +147,7 @@ public interface MovieView extends View {
 
     /**
      * Pauses playing the movie at the current frame.
-     * 
+     *
      * @see #playMovie
      * @see #isMoviePlaying
      */
@@ -152,7 +155,7 @@ public interface MovieView extends View {
 
     /**
      * Returns whether the movie is playing right now
-     * 
+     *
      * @return true if movie is playing, false otherwise
      * @see #playMovie
      * @see #pauseMovie
@@ -166,7 +169,7 @@ public interface MovieView extends View {
      * Normally this avoids garbage collection, but if you want to save the
      * previous frame or similar this cause problems. By default this is true
      * and views needing new buffers can request it
-     * 
+     *
      * @param reuseBuffer
      *            New boolean whether to reuse buffer
      */
@@ -174,11 +177,13 @@ public interface MovieView extends View {
 
     /**
      * Sets whether the buffers shall be reused between frames.
-     * 
+     *
      * @return The current behaviour to reuse buffer
      * @see #setReuseBuffer(boolean)
      */
     public boolean isReuseBuffer();
 
     public long getCurrentDateMillis();
+
+    public int getDesiredRelativeSpeed();
 }
