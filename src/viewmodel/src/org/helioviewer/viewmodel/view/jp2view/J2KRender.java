@@ -667,4 +667,8 @@ class J2KRender implements Runnable {
     public void setDifferenceMode(boolean differenceMode) {
         this.differenceMode = differenceMode;
     }
+
+    public int getMovieRelativeSpeed() {
+        return this.movieSpeed;
+    }
 }
