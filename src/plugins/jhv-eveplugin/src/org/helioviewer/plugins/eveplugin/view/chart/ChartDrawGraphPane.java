@@ -322,8 +322,11 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
         }
         final Rectangle2D verticalLabelBounds = g.getFontMetrics().getStringBounds(verticalLabel, g);
         g.setColor(ChartConstants.LABEL_TEXT_COLOR);
-        g.drawString(verticalLabel, ChartConstants.getGraphLeftSpace() + leftSide * graphArea.width - (leftSide + 1)
-                * (int) verticalLabelBounds.getWidth(), (int) verticalLabelBounds.getHeight());
+        g.drawString(
+                verticalLabel,
+                ChartConstants.getGraphLeftSpace()
+                        + Math.max((-1 * ChartConstants.getGraphLeftSpace() + 3), leftSide * graphArea.width - (leftSide + 1)
+                                * (int) verticalLabelBounds.getWidth()), (int) verticalLabelBounds.getHeight());
 
         double logMinValue = yAxisElement.getMinValue();
         double logMaxValue = yAxisElement.getMaxValue();
