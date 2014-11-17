@@ -1,5 +1,7 @@
 package org.helioviewer.viewmodel.view.jp2view;
 
+import java.awt.EventQueue;
+
 import kdu_jni.KduException;
 import kdu_jni.Kdu_compositor_buf;
 import kdu_jni.Kdu_coords;
@@ -127,6 +129,8 @@ class J2KRender implements Runnable {
 
     private boolean differenceMode = false;
 
+    protected boolean hardstop;
+
     /**
      * The constructor.
      *
@@ -149,7 +153,7 @@ class J2KRender implements Runnable {
     void start() {
 
         if (myThread != null) {
-            stop();
+            stop(null);
         }
 
         myThread = new Thread(JHVJP2View.renderGroup, this, "J2KRender");
@@ -157,32 +161,46 @@ class J2KRender implements Runnable {
         myThread.start();
     }
 
-    /** Stops the J2KRender thread. */
-    void stop() {
-        if (myThread != null && myThread.isAlive()) {
-            try {
-                stop = true;
-
-                do {
+    /**
+     * Stops the J2KRender thread.
+     *
+     * @param jp2Image
+     */
+    void stop(final JP2Image jp2Image) {
+        EventQueue.invokeLater(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    stop = true;
                     myThread.interrupt();
                     myThread.join(100);
-                } while (myThread.isAlive());
-
-            } catch (InterruptedException ex) {
-                Log.info("J2KRender Thread was interrupted");
-            } catch (NullPointerException e) {
-            } finally {
-                myThread = null;
-
-                intBuffer = new int[NUM_BUFFERS][0];
-                byteBuffer = new byte[NUM_BUFFERS][0];
+                    if (myThread.isAlive()) {
+                        stop(jp2Image);
+                        return;
+                    } else {
+                        myThread = null;
+                        intBuffer = new int[NUM_BUFFERS][0];
+                        byteBuffer = new byte[NUM_BUFFERS][0];
+                        if (jp2Image != null) {
+                            jp2Image.abolish();
+                        }
+                    }
+                } catch (InterruptedException ex) {
+                    Log.info("J2KRender Thread was interrupted");
+                } catch (NullPointerException e) {
+                }
             }
-        }
+        });
+
     }
 
-    /** Destroys the resources associated with this object */
-    void abolish() {
-        stop();
+    /**
+     * Destroys the resources associated with this object
+     *
+     * @param jp2Image
+     */
+    void abolish(JP2Image jp2Image) {
+        stop(jp2Image);
     }
 
     public void setMovieMode(boolean val) {
