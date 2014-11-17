@@ -387,6 +387,7 @@ public class GLTextureHelper {
             mainTexCoord.setValue(gl, 0.0f, 0.0f);
             gl.glVertex2f(x0, y1);
             gl.glEnd();
+            gl.glColorMask(true, true, true, true);
         }
     }
 
