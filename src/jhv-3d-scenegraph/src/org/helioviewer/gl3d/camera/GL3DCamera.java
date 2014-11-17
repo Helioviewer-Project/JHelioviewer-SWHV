@@ -41,9 +41,11 @@ public abstract class GL3DCamera {
     public static final double MIN_FOV = 0.05;
     public static final double MAX_FOV = 1000;
 
+    private static final double INITFOV = 0.7;
+
     private double clipNear = Constants.SunRadius * 3;
     private double clipFar = Constants.SunRadius * 10000.;
-    private double fov = 0.7;
+    private double fov = INITFOV;
     private double aspect = 0.0;
     private double width = 0.0;
     private double height = 0.0;
@@ -131,7 +133,13 @@ public abstract class GL3DCamera {
         this.followGrid = followGrid;
     };
 
-    public abstract void reset();
+    public void reset() {
+        this.resetFOV();
+    }
+
+    private void resetFOV() {
+        this.fov = INITFOV;
+    }
 
     /**
      * This method is called when the camera changes and should copy the

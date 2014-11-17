@@ -60,6 +60,7 @@ public class GL3DSolarRotationTrackingTrackballCamera extends GL3DCamera {
 
     @Override
     public void reset() {
+        super.reset();
         this.currentDragRotation.clear();
         this.currentInteraction.reset(this);
     }
@@ -116,7 +117,6 @@ public class GL3DSolarRotationTrackingTrackballCamera extends GL3DCamera {
 
     @Override
     public void createNewGrid() {
-
         boolean hidden = getGrid().getDrawBits().get(Bit.Hidden);
         getSceneGraphView().getRoot().removeNode(getGrid());
         if (lastScenegraph == getSceneGraphView()) {
