@@ -540,4 +540,9 @@ public class JHVJPXView extends JHVJP2View implements TimedMovieView, CachedMovi
     public boolean getBaseDifferenceMode() {
         return baseDifferenceMode;
     }
+
+    @Override
+    public int getDesiredRelativeSpeed() {
+        return this.render.getMovieRelativeSpeed();
+    }
 }

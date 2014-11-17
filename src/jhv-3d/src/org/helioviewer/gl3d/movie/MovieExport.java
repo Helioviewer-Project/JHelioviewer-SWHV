@@ -24,8 +24,10 @@ import org.helioviewer.jhv.JHVDirectory;
 import org.helioviewer.jhv.JHVGlobals;
 import org.helioviewer.jhv.JHVUncaughtExceptionHandler;
 import org.helioviewer.jhv.Settings;
+import org.helioviewer.jhv.layers.LayersModel;
 import org.helioviewer.jhv.resourceloader.ResourceLoader;
 import org.helioviewer.jhv.resourceloader.SystemProperties;
+import org.helioviewer.viewmodel.view.MovieView;
 
 public class MovieExport {
     int width = 640;
@@ -71,7 +73,7 @@ public class MovieExport {
         //BufferedImage bufferedImage = new BufferedImage(width, height, BufferedImage.TYPE_3BYTE_BGR);
         /*
          * Graphics2D g2d = bufferedImage.createGraphics();
-         * 
+         *
          * g2d.drawString("Iets van text", 100, 100); g2d.dispose();
          */
         try {
@@ -97,6 +99,14 @@ public class MovieExport {
         args.add("-s");
         args.add("" + width + "x" + height);
         args.add("-r");
+        MovieView movieView = LayersModel.getSingletonInstance().getActiveView().getAdapter(MovieView.class);
+        if (movieView != null) {
+            framerate = movieView.getDesiredRelativeSpeed();
+        }
+        if (framerate <= 0) {
+            framerate = 20;
+            Log.warn("Resetting framerate to reasonable value");
+        }
         args.add(Integer.toString(framerate));
         args.add("-y");
         args.add("-i");
