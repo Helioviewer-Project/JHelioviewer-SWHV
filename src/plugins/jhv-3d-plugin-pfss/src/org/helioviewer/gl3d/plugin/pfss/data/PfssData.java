@@ -16,6 +16,7 @@ import nom.tam.fits.Fits;
 import nom.tam.fits.Header;
 
 import org.helioviewer.base.physics.Astronomy;
+import org.helioviewer.gl3d.plugin.pfss.PfssPluginPanel;
 import org.helioviewer.gl3d.plugin.pfss.settings.PfssSettings;
 
 import com.jogamp.common.nio.Buffers;
@@ -37,6 +38,8 @@ public class PfssData {
     public boolean init = false;
 
     private boolean lastFixedColor;
+
+    private String dateString;
 
     /**
      * Constructor
@@ -100,12 +103,12 @@ public class PfssData {
             Header header = bhdu.getHeader();
 
             String date = header.findKey("DATE-OBS");
+            this.dateString = date.substring(11, 30);
 
             SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
             dateFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
 
-            Date dd = dateFormat.parse(date.substring(11, 30));
-
+            Date dd = dateFormat.parse(dateString);
             this.createBuffer(fieldlinex.length);
             Calendar cal = new GregorianCalendar();
             cal.setTimeInMillis(dd.getTime());
@@ -220,6 +223,7 @@ public class PfssData {
     }
 
     public void display(GL2 gl) {
+        PfssPluginPanel.currentPluginPanel.setDate(this.dateString);
         if (PfssSettings.qualityReduction != this.lastQuality || PfssSettings.fixedColor != this.lastFixedColor) {
             this.clear(gl);
             this.init = false;

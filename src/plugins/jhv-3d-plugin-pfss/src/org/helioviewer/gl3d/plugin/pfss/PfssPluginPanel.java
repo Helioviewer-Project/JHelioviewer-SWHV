@@ -52,6 +52,7 @@ import org.helioviewer.viewmodelplugin.overlay.OverlayPanel;
 public class PfssPluginPanel extends OverlayPanel implements ActionListener, LayersListener, ViewListener {
 
     private static final long serialVersionUID = 1L;
+    private static final String VOIDDATELABEL = "Date: ****-**-**T**:**:**";
     private PfssCache pfssCache = null;
     private boolean showAgain = true;
     private boolean retry = false;
@@ -59,12 +60,15 @@ public class PfssPluginPanel extends OverlayPanel implements ActionListener, Lay
     private final JButton visibleButton;
     private final JButton reloadButton;
     private JSpinner qualitySpinner;
+    private JLabel dateLabel;
+    public static PfssPluginPanel currentPluginPanel;
 
     /**
      * Default constructor
      *
      * */
     public PfssPluginPanel(PfssCache pfssCache) {
+        currentPluginPanel = this;
         this.pfssCache = pfssCache;
         reloadButton = new JButton(new ImageIcon(PfssPlugin.getResourceUrl("/images/reload.png")));
         reloadButton.setToolTipText("Reload data");
@@ -142,6 +146,13 @@ public class PfssPluginPanel extends OverlayPanel implements ActionListener, Lay
             }
         });
         this.add(fixedColors, c1);
+        this.dateLabel = new JLabel(VOIDDATELABEL);
+
+        GridBagConstraints c4 = new GridBagConstraints();
+        c4.insets = new Insets(0, 0, 5, 0);
+        c4.gridx = 0;
+        c4.gridy = 0;
+        this.add(dateLabel, c4);
 
         GridBagConstraints c2 = new GridBagConstraints();
         c2.insets = new Insets(0, 0, 5, 0);
@@ -333,5 +344,13 @@ public class PfssPluginPanel extends OverlayPanel implements ActionListener, Lay
 
     public static void main(String[] args) {
         new PfssPluginPanel(null);
+    }
+
+    public void setDate(String date) {
+        if (date == "" || date == null) {
+            this.dateLabel.setText("****-**-**T**:**:**");
+        } else {
+            this.dateLabel.setText("Date: " + date);
+        }
     }
 }
