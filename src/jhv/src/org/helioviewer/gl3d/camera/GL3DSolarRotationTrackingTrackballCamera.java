@@ -35,6 +35,10 @@ public class GL3DSolarRotationTrackingTrackballCamera extends GL3DCamera {
 
     protected GL3DInteraction currentInteraction;
 
+    private GL3DSceneGraphView lastScenegraph;
+
+    private GL3DGrid followCameraGrid;
+
     public GL3DSolarRotationTrackingTrackballCamera(GL3DSceneGraphView sceneGraphView) {
         super();
         this.setSceneGraphView(sceneGraphView);
@@ -112,11 +116,17 @@ public class GL3DSolarRotationTrackingTrackballCamera extends GL3DCamera {
 
     @Override
     public void createNewGrid() {
+
         boolean hidden = getGrid().getDrawBits().get(Bit.Hidden);
         getSceneGraphView().getRoot().removeNode(getGrid());
+        if (lastScenegraph == getSceneGraphView()) {
+            getSceneGraphView().getRoot().removeNode(followCameraGrid);
+        }
+        lastScenegraph = getSceneGraphView();
+
         GL3DGrid newGrid = new GL3DGrid("grid", getGridResolutionX(), getGridResolutionY(), new GL3DVec4f(1.0f, 0.0f, 0.0f, 1.0f), new GL3DVec4d(0.0, 1.0, 0.0, 1.0), false);
         newGrid.getDrawBits().set(Bit.Hidden, hidden);
-        GL3DGrid followCameraGrid = new GL3DGrid("grid", 90., 90., new GL3DVec4f(1.0f, 0.0f, 0.0f, 1.0f), new GL3DVec4d(0.0, 1.0, 0.0, 1.0), true);
+        followCameraGrid = new GL3DGrid("grid", 90., 90., new GL3DVec4f(1.0f, 0.0f, 0.0f, 1.0f), new GL3DVec4d(0.0, 1.0, 0.0, 1.0), true);
         newGrid.getDrawBits().set(Bit.Hidden, hidden);
         followCameraGrid.getDrawBits().set(Bit.Hidden, hidden);
         this.setGrid(newGrid, followCameraGrid);

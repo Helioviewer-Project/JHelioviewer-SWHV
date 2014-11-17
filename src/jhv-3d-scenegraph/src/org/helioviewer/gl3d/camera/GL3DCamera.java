@@ -221,7 +221,8 @@ public abstract class GL3DCamera {
 
     public void deactivate() {
         this.cameraAnimations.clear();
-        this.getGrid().getDrawBits().on(Bit.Hidden);
+        //this.getGrid().getDrawBits().on(Bit.Hidden);
+        //this.getFollowGrid().getDrawBits().on(Bit.Hidden);
     }
 
     public void activate() {

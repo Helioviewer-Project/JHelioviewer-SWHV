@@ -83,14 +83,14 @@ public class GL3DCameraSelectorModel extends AbstractListModel implements ComboB
                 followObjectCamera.setSceneGraphView(sceneGraphView);
                 followObjectCamera.createNewGrid();
             }
-
-            if (getCameraView() != null) {
+            if (lastCamera != null) {
                 setCurrentCamera(lastCamera);
+            } else if (getCameraView() != null) {
+                getCameraView().setCurrentCamera(defaultCamera);
             } else {
                 Log.warn("Cannot set Current Camera, no GL3DCameraView yet!");
             }
         }
-        getCameraView().setCurrentCamera(defaultCamera);
 
         this.fireInit();
     }
