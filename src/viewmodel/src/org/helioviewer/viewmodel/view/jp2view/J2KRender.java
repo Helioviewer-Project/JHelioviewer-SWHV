@@ -129,8 +129,6 @@ class J2KRender implements Runnable {
 
     private boolean differenceMode = false;
 
-    protected boolean hardstop;
-
     /**
      * The constructor.
      *
