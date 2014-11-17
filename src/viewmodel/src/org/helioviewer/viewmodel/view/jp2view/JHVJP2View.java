@@ -460,10 +460,10 @@ public class JHVJP2View extends AbstractView implements JP2View, ViewportView, R
             reader = null;
         }
         if (render != null) {
-            render.abolish();
+            render.abolish(jp2Image);
             render = null;
         }
-        jp2Image.abolish();
+        //jp2Image.abolish();
     }
 
     /**
