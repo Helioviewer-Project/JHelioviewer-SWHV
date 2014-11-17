@@ -109,7 +109,7 @@ public class PfssData {
             this.createBuffer(fieldlinex.length);
             Calendar cal = new GregorianCalendar();
             cal.setTimeInMillis(dd.getTime());
-            double phi = Astronomy.getL0Radians(dd) - Math.PI / 2.;//DifferentialRotation.calculateRotationInRadians(0.0, deltat) % (Math.PI * 2.0) - Math.PI / 2.;
+            double phi = Astronomy.getL0Radians(dd) - Math.PI / 2.;
 
             for (int i = 0; i < fieldlinex.length; i++) {
                 if (i / PfssSettings.POINTS_PER_LINE % 9 <= 8 - PfssSettings.qualityReduction) {
