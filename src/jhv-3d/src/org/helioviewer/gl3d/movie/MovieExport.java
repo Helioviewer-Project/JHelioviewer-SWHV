@@ -35,11 +35,13 @@ public class MovieExport {
     private OutputStream ffmpegStdin;
     private Process ffmpegProcess;
 
-    public MovieExport() {
+    public MovieExport(int width, int height) {
+        this.width = width;
+        this.height = height;
         init();
 
-        createProcess();
-        finishProcess();
+        //createProcess();
+        //finishProcess();
     }
 
     private void init() {
@@ -69,7 +71,7 @@ public class MovieExport {
         //BufferedImage bufferedImage = new BufferedImage(width, height, BufferedImage.TYPE_3BYTE_BGR);
         /*
          * Graphics2D g2d = bufferedImage.createGraphics();
-         *
+         * 
          * g2d.drawString("Iets van text", 100, 100); g2d.dispose();
          */
         try {
@@ -122,7 +124,7 @@ public class MovieExport {
             ffmpegStdin = ffmpegProcess.getOutputStream();
 
             try {
-                FileUtils.logProcessOutput(ffmpegProcess, "FFmpeg", Level.ERROR, false);
+                FileUtils.logProcessOutput(ffmpegProcess, "FFmpeg", Level.DEBUG, false);
 
             } catch (IOException e1) {
                 Log.error(">> ExportMovieDialog > Error logging FFmpeg process.", e1);
@@ -133,8 +135,6 @@ public class MovieExport {
             Log.error(">> ExportMovieDialog > Error starting ffmpeg. Cannot export movie", e);
             return;
         }
-        System.out.println("HERE");
-
     }
 
     public void release() {
@@ -269,6 +269,6 @@ public class MovieExport {
         } else {
             Log.info("Successfully installed FFmpeg tool");
         }
-        new MovieExport();
+        new MovieExport(640, 640);
     }
 }
