@@ -94,6 +94,7 @@ public class GL3DCameraOptionsPanel extends JPanel implements GL3DCameraSelectio
         cameraSelectorModel.setCurrentCamera(newCamera);
         cameraSelectorModel.getCurrentCamera().activate();
         cameraSelectorModel.getCurrentCamera().getGrid().getDrawBits().set(Bit.Hidden, hidden);
+        cameraSelectorModel.getCurrentCamera().getFollowGrid().getDrawBits().set(Bit.Hidden, hidden);
         optionsPanel = cameraOptionsAttributeManager.getCameraOptionAttributePanel(cameraSelectorModel.getCurrentCamera());
         ((GL3DCameraOptionPanel) optionsPanel).getGridVisibleCheckbox().setSelected(!hidden);
         ((GL3DCameraOptionPanel) optionsPanel).getGridResolutionXSpinner().setValue(resx);
