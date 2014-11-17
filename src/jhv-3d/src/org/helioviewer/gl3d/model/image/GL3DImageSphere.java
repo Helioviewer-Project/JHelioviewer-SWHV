@@ -29,9 +29,11 @@ public class GL3DImageSphere extends GL3DImageMesh {
     private final GL3DImageLayer layer;
     private boolean showSphere;
     private boolean showCorona;
+    private final boolean restoreColorMask;
 
-    public GL3DImageSphere(GL3DImageTextureView imageTextureView, GLVertexShaderProgram vertexShaderProgram, GLFragmentShaderProgram fragmentShaderProgram, GL3DImageLayer imageLayer, boolean showSphere, boolean showCorona) {
+    public GL3DImageSphere(GL3DImageTextureView imageTextureView, GLVertexShaderProgram vertexShaderProgram, GLFragmentShaderProgram fragmentShaderProgram, GL3DImageLayer imageLayer, boolean showSphere, boolean showCorona, boolean restoreColorMask) {
         super("Sphere", imageTextureView, vertexShaderProgram, fragmentShaderProgram);
+        this.restoreColorMask = restoreColorMask;
         layer = imageLayer;
         this.showSphere = showSphere;
         this.showCorona = showCorona;
@@ -44,6 +46,9 @@ public class GL3DImageSphere extends GL3DImageMesh {
         state.gl.glEnable(GL2.GL_BLEND);
 
         super.shapeDraw(state);
+        if (restoreColorMask) {
+            state.gl.glColorMask(true, true, true, true);
+        }
     }
 
     @Override

@@ -243,11 +243,11 @@ public class GL3DComponentView extends AbstractComponentView implements GLEventL
                 GL3DState.getUpdated(gl, width, height);
             }
         }
-        if (backGroundColorHasChanged) {
-            gl.glClearColor(backgroundColor.getRed() / 255.0f, backgroundColor.getGreen() / 255.0f, backgroundColor.getBlue() / 255.0f, backgroundColor.getAlpha() / 255.0f);
+        //if (backGroundColorHasChanged) {
+        gl.glClearColor(backgroundColor.getRed() / 255.0f, backgroundColor.getGreen() / 255.0f, backgroundColor.getBlue() / 255.0f, backgroundColor.getAlpha() / 255.0f);
 
-            backGroundColorHasChanged = false;
-        }
+        backGroundColorHasChanged = false;
+        //}
 
         // Rebuild all shaders, if necessary
         if (rebuildShadersRequest) {

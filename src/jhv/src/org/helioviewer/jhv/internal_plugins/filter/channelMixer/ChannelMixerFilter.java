@@ -4,7 +4,7 @@ import javax.media.opengl.GL2;
 
 import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.viewmodel.filter.AbstractFilter;
-import org.helioviewer.viewmodel.filter.GLFragmentShaderFilter;
+import org.helioviewer.viewmodel.filter.GLFilter;
 import org.helioviewer.viewmodel.filter.StandardFilter;
 import org.helioviewer.viewmodel.imagedata.ARGBInt32ImageData;
 import org.helioviewer.viewmodel.imagedata.ColorMask;
@@ -16,7 +16,6 @@ import org.helioviewer.viewmodel.imageformat.SingleChannelImageFormat;
 import org.helioviewer.viewmodel.imagetransport.Byte8ImageTransport;
 import org.helioviewer.viewmodel.imagetransport.Int32ImageTransport;
 import org.helioviewer.viewmodel.imagetransport.Short16ImageTransport;
-import org.helioviewer.viewmodel.view.opengl.shader.GLShaderBuilder;
 
 /**
  * Filter for modifying the color mask of an image.
@@ -33,15 +32,13 @@ import org.helioviewer.viewmodel.view.opengl.shader.GLShaderBuilder;
  *
  * @author Markus Langenberg
  */
-public class ChannelMixerFilter extends AbstractFilter implements StandardFilter, GLFragmentShaderFilter {
+public class ChannelMixerFilter extends AbstractFilter implements StandardFilter, GLFilter {
 
     private ColorMask colorMask = new ColorMask();
     private ChannelMixerPanel panel;
     private boolean forceRefilter = false;
-    private final ChannelMixerShader shader;
 
     public ChannelMixerFilter() {
-        this.shader = new ChannelMixerShader();
     }
 
     /**
@@ -112,8 +109,7 @@ public class ChannelMixerFilter extends AbstractFilter implements StandardFilter
      */
     @Override
     public void applyGL(GL2 gl) {
-        shader.setChannelMixerValue(gl, colorMask.showRed() ? 1f : 0f, colorMask.showGreen() ? 1f : 0f, colorMask.showBlue() ? 1f : 0f);
-        shader.bind(gl);
+        gl.glColorMask(colorMask.showRed(), colorMask.showGreen(), colorMask.showBlue(), true);
     }
 
     /**
@@ -157,9 +153,4 @@ public class ChannelMixerFilter extends AbstractFilter implements StandardFilter
         return colorMask.showRed() + " " + colorMask.showGreen() + " " + colorMask.showBlue();
     }
 
-    @Override
-    public GLShaderBuilder buildFragmentShader(GLShaderBuilder shaderBuilder) {
-        shader.build(shaderBuilder);
-        return shaderBuilder;
-    }
 }
