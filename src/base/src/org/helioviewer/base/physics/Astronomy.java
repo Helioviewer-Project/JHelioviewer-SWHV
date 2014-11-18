@@ -101,4 +101,10 @@ public class Astronomy {
         int nosecs = calendar.get(Calendar.HOUR_OF_DAY) * 60 * 60 + calendar.get(Calendar.MINUTE) * 60 + calendar.get(Calendar.SECOND);
         return -Math.PI / 180. * getL0Degree(calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH), calendar.get(Calendar.DATE), (nosecs) / 60. / 60.);
     }
+
+    public static double getL0Degree(Date date) {
+        calendar.setTime(date);
+        int nosecs = calendar.get(Calendar.HOUR_OF_DAY) * 60 * 60 + calendar.get(Calendar.MINUTE) * 60 + calendar.get(Calendar.SECOND);
+        return getL0Degree(calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH), calendar.get(Calendar.DATE), (nosecs) / 60. / 60.);
+    }
 }
