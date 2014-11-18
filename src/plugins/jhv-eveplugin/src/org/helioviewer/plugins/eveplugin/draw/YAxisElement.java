@@ -27,6 +27,8 @@ public class YAxisElement {
 
     private boolean isLogScale;
 
+    private long activationTime;
+
     /**
      * Creates a Y-axis element with a selected value range, an available value
      * range, a label, a minimum value, a maximum value and a color.
@@ -45,7 +47,7 @@ public class YAxisElement {
      *            The color of this this y-axis element
      */
     public YAxisElement(Range selectedRange, Range availableRange, String label, double minValue, double maxValue, Color color,
-            boolean isLogScale) {
+            boolean isLogScale, long activationTime) {
         this.selectedRange = selectedRange;
         this.availableRange = availableRange;
         this.label = label;
@@ -69,6 +71,7 @@ public class YAxisElement {
         maxValue = 0.0;
         color = Color.BLACK;
         isLogScale = true;
+        activationTime = System.currentTimeMillis();
     }
 
     /**
@@ -203,7 +206,7 @@ public class YAxisElement {
      *            The color
      */
     public void set(Range availableRange, Range selectedRange, String label, double minValue, double maxValue, Color color,
-            boolean isLogScale) {
+            boolean isLogScale, long activationTime) {
         this.availableRange = availableRange;
         this.selectedRange = selectedRange;
         this.label = label;
@@ -211,6 +214,7 @@ public class YAxisElement {
         this.minValue = minValue;
         this.color = color;
         this.isLogScale = isLogScale;
+        this.activationTime = activationTime;
     }
 
     public boolean isLogScale() {
@@ -220,5 +224,13 @@ public class YAxisElement {
     public void setIsLogScale(boolean isLogScale) {
         this.isLogScale = isLogScale;
 
+    }
+
+    public long getActivationTime() {
+        return activationTime;
+    }
+
+    public void setActivationTime(long activationTime) {
+        this.activationTime = activationTime;
     }
 }
