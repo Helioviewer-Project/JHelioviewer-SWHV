@@ -243,7 +243,7 @@ public class ExportMovieDialog extends JDialog implements ChangeListener, Action
 
     public void reset3D() {
         setVisible(false);
-        this.movieLabel.setVisible(false);
+        remove(movieLabel);
         this.exportButton.setEnabled(true);
         this.exportButton.setVisible(true);
     }
@@ -1528,9 +1528,15 @@ public class ExportMovieDialog extends JDialog implements ChangeListener, Action
         }
 
         pack();
-        setSize(getPreferredSize());
+        final GL3DComponentView gl3dc = ImageViewerGui.getSingletonInstance().getMainView().getAdapter(GL3DComponentView.class);
+        if (gl3dc != null) {
+            setSize(new Dimension(180, 60));
+        } else {
+            setSize(getPreferredSize());
+        }
         setLocationRelativeTo(ImageViewerGui.getMainFrame());
         setVisible(true);
+        repaint();
     }
 
     synchronized public void release3d() {
