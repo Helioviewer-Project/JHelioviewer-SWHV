@@ -1,5 +1,7 @@
 package org.helioviewer.viewmodel.metadata;
 
+import org.helioviewer.base.physics.Astronomy;
+
 public class HelioviewerPositionedMetaData extends HelioviewerMetaData implements PositionedMetaData {
     private double heeqX;
     private double heeqY;
@@ -19,6 +21,9 @@ public class HelioviewerPositionedMetaData extends HelioviewerMetaData implement
     private double stonyhurstLongitude;
     private double stonyhurstLatitude;
     private boolean stonyhurstAvailable = false;
+    private double refb0;
+    private double refl0;
+    private boolean refAvailable;
 
     public HelioviewerPositionedMetaData(MetaDataContainer mdc) {
         super(mdc);
@@ -47,11 +52,22 @@ public class HelioviewerPositionedMetaData extends HelioviewerMetaData implement
         this.dobs = metaDataContainer.tryGetDouble("DSUN_OBS");
         this.carringtonAvailable = this.crlt != 0.0 || this.crln != 0.0;
 
+        this.refb0 = metaDataContainer.tryGetDouble("REF_B0");
+        this.refl0 = metaDataContainer.tryGetDouble("REF_L0");
+        this.refAvailable = this.refb0 != 0.0 || this.refl0 != 0.0;
+
         this.stonyhurstLatitude = metaDataContainer.tryGetDouble("HGLT_OBS");
         if (this.stonyhurstLatitude == 0) {
             this.stonyhurstLatitude = this.crlt;
+            if (this.stonyhurstLatitude == 0) {
+                this.stonyhurstLatitude = this.refb0;
+            }
         }
         this.stonyhurstLongitude = metaDataContainer.tryGetDouble("HGLN_OBS");
+        if (this.stonyhurstLongitude == 0) {
+            this.stonyhurstLongitude = this.refl0 - Astronomy.getL0Degree(this.getDateTime().getTime());
+        }
+
         this.stonyhurstAvailable = this.stonyhurstLatitude != 0.0 || this.stonyhurstLongitude != 0.0;
     }
 
