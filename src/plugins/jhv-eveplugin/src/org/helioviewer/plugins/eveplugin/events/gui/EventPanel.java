@@ -23,7 +23,7 @@ public class EventPanel implements DrawableElement {
     private final YAxisElement yAxisElement;
 
     public EventPanel() {
-        yAxisElement = new YAxisElement(new Range(0, 0), new Range(0, 0), "", 0, 0, Color.BLACK, false);
+        yAxisElement = new YAxisElement(new Range(0, 0), new Range(0, 0), "", 0, 0, Color.BLACK, false, System.currentTimeMillis());
     }
 
     @Override
@@ -46,12 +46,18 @@ public class EventPanel implements DrawableElement {
                 boolean first = true;
                 int spacePerLine = 0;
                 for (EventPlotConfiguration epc : epcs.get(eventType)) {
-                    epc.draw(g, graphArea, etpc.getNrOfEventTypes(), eventTypeNr, etpc.getMaxLinesPerEventType().get(eventType).intValue(), etpc.getTotalNrLines(), previousLine);
+                    epc.draw(g, graphArea, etpc.getNrOfEventTypes(), eventTypeNr, etpc.getMaxLinesPerEventType().get(eventType).intValue(),
+                            etpc.getTotalNrLines(), previousLine);
                     if (first) {
-                        spacePerLine = 2 * Math.min(4, (new Double(Math.floor(1.0 * graphArea.height / etpc.getTotalNrLines() / 2))).intValue());
+                        spacePerLine = 2 * Math.min(4,
+                                (new Double(Math.floor(1.0 * graphArea.height / etpc.getTotalNrLines() / 2))).intValue());
                         int spaceNeeded = spacePerLine * etpc.getMaxLinesPerEventType().get(eventType).intValue();
                         ImageIcon icon = epc.getEvent().getIcon();
-                        leftAxis.drawImage(icon.getImage(), 0, leftAxisArea.y + previousLine * spacePerLine + spaceNeeded / 2 - icon.getIconHeight() / 2 / 2, icon.getIconWidth() / 2, leftAxisArea.y + previousLine * spacePerLine + spaceNeeded / 2 + icon.getIconHeight() / 2 / 2, 0, 0, icon.getIconWidth(), icon.getIconHeight(), null);
+                        leftAxis.drawImage(icon.getImage(), 0,
+                                leftAxisArea.y + previousLine * spacePerLine + spaceNeeded / 2 - icon.getIconHeight() / 2 / 2,
+                                icon.getIconWidth() / 2,
+                                leftAxisArea.y + previousLine * spacePerLine + spaceNeeded / 2 + icon.getIconHeight() / 2 / 2, 0, 0,
+                                icon.getIconWidth(), icon.getIconHeight(), null);
                     }
                     first = false;
                 }

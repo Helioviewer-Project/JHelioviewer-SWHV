@@ -19,6 +19,7 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -220,6 +221,7 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
 
     private void drawLabels(final Graphics2D g) {
         Set<YAxisElement> yAxisElements = drawController.getYAxisElements(identifier);
+        List<YAxisElement> orderedList = orderYAxes(yAxisElements);
         Interval<Date> interval = drawController.getInterval();
         if (!drawController.getIntervalAvailable()) {
             return;
@@ -229,7 +231,7 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
         // draw vertical ticks
         int counter = 0;
         synchronized (yAxisElements) {
-            for (YAxisElement yAxisElement : yAxisElements) {
+            for (YAxisElement yAxisElement : orderedList) {
                 drawVerticalLabels(g, yAxisElement, counter == 0 ? 0 : 1);
 
                 if (counter > 1) {
@@ -302,6 +304,24 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
          * y);
          */
 
+    }
+
+    private List<YAxisElement> orderYAxes(Set<YAxisElement> yAxisElements) {
+        LinkedList<YAxisElement> orderedList = new LinkedList<YAxisElement>();
+        for (YAxisElement element : yAxisElements) {
+            boolean added = false;
+            for (int i = 0; i < orderedList.size(); i++) {
+                if (orderedList.get(i).getActivationTime() > element.getActivationTime()) {
+                    orderedList.add(i, element);
+                    added = true;
+                    break;
+                }
+            }
+            if (!added) {
+                orderedList.add(orderedList.size(), element);
+            }
+        }
+        return orderedList;
     }
 
     private void drawVerticalLabels(Graphics g, YAxisElement yAxisElement, int leftSide) {

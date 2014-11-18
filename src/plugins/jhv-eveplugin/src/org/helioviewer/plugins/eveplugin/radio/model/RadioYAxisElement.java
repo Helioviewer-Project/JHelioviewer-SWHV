@@ -61,8 +61,8 @@ public class RadioYAxisElement extends YAxisElement {
      *            The plot identifier for this radio y-axis element
      */
     public RadioYAxisElement(Range selectedRange, Range availableRange, String label, double minValue, double maxValue, Color color,
-            String plotIdentifier) {
-        super(selectedRange, availableRange, label, minValue, maxValue, color, false);
+            String plotIdentifier, long activationTime) {
+        super(selectedRange, availableRange, label, minValue, maxValue, color, false, activationTime);
         yValueModelManager = YValueModelManager.getInstance();
         this.plotIdentifier = plotIdentifier;
     }
