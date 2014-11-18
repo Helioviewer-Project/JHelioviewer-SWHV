@@ -98,7 +98,7 @@ public class EventRequester implements ZoomControllerListener, JHVEventHandler {
     }
 
     @Override
-    public void selectedIntervalChanged(Interval<Date> newInterval) {
+    public void selectedIntervalChanged(Interval<Date> newInterval, boolean keepFullValueSpace) {
         selectedInterval = newInterval;
         // Log.info("selectedInterval : " + newInterval);
         if (!EVEState.getSingletonInstance().isMouseTimeIntervalDragging()) {

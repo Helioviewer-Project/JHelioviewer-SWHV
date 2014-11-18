@@ -285,7 +285,7 @@ public class ZoomManager implements ZoomControllerListener, PlotAreaSpaceListene
     }
 
     @Override
-    public void selectedIntervalChanged(Interval<Date> newInterval) {
+    public void selectedIntervalChanged(Interval<Date> newInterval, boolean keepFullValueSpace) {
         synchronized (intervalLock) {
             currentInterval = newInterval;
             for (ZoomManagerData zmd : zoomManagerData.values()) {

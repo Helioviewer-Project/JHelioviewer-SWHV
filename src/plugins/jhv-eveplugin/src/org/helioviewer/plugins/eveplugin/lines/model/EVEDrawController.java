@@ -113,7 +113,7 @@ public class EVEDrawController implements BandControllerListener, ZoomController
         }
     }
 
-    private void updateBand(final Band band) {
+    private void updateBand(final Band band, boolean keepFullValueRange) {
         DownloadedData data = retrieveData(band, interval);
         if (!availableRangeMap.containsKey(band.getUnitLabel())) {
             availableRangeMap.put(band.getUnitLabel(), new Range());
@@ -134,17 +134,17 @@ public class EVEDrawController implements BandControllerListener, ZoomController
                 || oldAvailableRange.max != availableRangeMap.get(band.getUnitLabel()).max) {
             // Log.trace("update band available range changed so we change the plotareaSpace");
             checkSelectedRange(availableRangeMap.get(band.getUnitLabel()), selectedRangeMap.get(band.getUnitLabel()));
-            updatePlotAreaSpace(availableRangeMap.get(band.getUnitLabel()), selectedRangeMap.get(band.getUnitLabel()));
+            updatePlotAreaSpace(availableRangeMap.get(band.getUnitLabel()), selectedRangeMap.get(band.getUnitLabel()), keepFullValueRange);
         } else {
             // Log.trace("Same available range");
         }
         dataMapPerUnitLabel.get(band.getUnitLabel()).put(band, data);
     }
 
-    private void updateBands() {
+    private void updateBands(boolean keepFullValueRange) {
         for (String unit : dataMapPerUnitLabel.keySet()) {
             for (final Band band : dataMapPerUnitLabel.get(unit).keySet()) {
-                updateBand(band);
+                updateBand(band, keepFullValueRange);
             }
         }
     }
@@ -194,7 +194,7 @@ public class EVEDrawController implements BandControllerListener, ZoomController
                 Log.error("Available range changed in redraw request. So update plotAreaSpace");
                 Log.error("old range : " + oldAvailableRange.toString());
                 Log.error("new available range : " + availableRangeMap.get(unitLabel).toString());
-                updatePlotAreaSpace(availableRangeMap.get(unitLabel), selectedRangeMap.get(unitLabel));
+                updatePlotAreaSpace(availableRangeMap.get(unitLabel), selectedRangeMap.get(unitLabel), false);
 
             }
 
@@ -218,13 +218,17 @@ public class EVEDrawController implements BandControllerListener, ZoomController
         }
     }
 
-    private void updatePlotAreaSpace(Range availableRange, Range selectedRange) {
-        double diffAvailable = Math.log10(availableRange.max) - Math.log10(availableRange.min);
-        double diffStart = Math.log10(selectedRange.min) - Math.log10(availableRange.min);
-        double diffEnd = Math.log10(selectedRange.max) - Math.log10(availableRange.min);
-        double startValue = plotAreaSpace.getScaledMinValue() + diffStart / diffAvailable;
-        double endValue = plotAreaSpace.getScaledMinValue() + diffEnd / diffAvailable;
-        plotAreaSpace.setScaledSelectedValue(startValue, endValue, true);
+    private void updatePlotAreaSpace(Range availableRange, Range selectedRange, boolean keepFullValueSpace) {
+        if (!keepFullValueSpace) {
+            double diffAvailable = Math.log10(availableRange.max) - Math.log10(availableRange.min);
+            double diffStart = Math.log10(selectedRange.min) - Math.log10(availableRange.min);
+            double diffEnd = Math.log10(selectedRange.max) - Math.log10(availableRange.min);
+            double startValue = plotAreaSpace.getScaledMinValue() + diffStart / diffAvailable;
+            double endValue = plotAreaSpace.getScaledMinValue() + diffEnd / diffAvailable;
+            plotAreaSpace.setScaledSelectedValue(startValue, endValue, true);
+        } else {
+            plotAreaSpace.setScaledSelectedValue(plotAreaSpace.getScaledMinValue(), plotAreaSpace.getScaledMaxValue(), true);
+        }
     }
 
     private void adjustAvailableRangeBorders(final Range availableRange) {
@@ -279,10 +283,10 @@ public class EVEDrawController implements BandControllerListener, ZoomController
     }
 
     @Override
-    public void selectedIntervalChanged(final Interval<Date> newInterval) {
+    public void selectedIntervalChanged(final Interval<Date> newInterval, boolean keepFullValueRange) {
         interval = newInterval;
 
-        updateBands();
+        updateBands(keepFullValueRange);
         fireRedrawRequest(false);
     }
 
@@ -345,7 +349,7 @@ public class EVEDrawController implements BandControllerListener, ZoomController
     public void dataAdded(final Band band) {
         if (dataMapPerUnitLabel.containsKey(band.getUnitLabel())) {
             if (dataMapPerUnitLabel.get(band.getUnitLabel()).containsKey(band)) {
-                updateBand(band);
+                updateBand(band, false);
                 fireRedrawRequest(true);
             }
         }

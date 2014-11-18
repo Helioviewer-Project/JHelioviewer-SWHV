@@ -13,7 +13,7 @@ public interface ZoomControllerListener {
 
     public void availableIntervalChanged(final Interval<Date> newInterval);
 
-    public void selectedIntervalChanged(final Interval<Date> newInterval);
+    public void selectedIntervalChanged(final Interval<Date> newInterval, boolean keepFullValueSpace);
 
     public void selectedResolutionChanged(final API_RESOLUTION_AVERAGES newResolution);
 }

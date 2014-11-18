@@ -220,7 +220,7 @@ public class PlotsControlPanel extends JPanel implements ZoomControllerListener,
         final ZoomController zoomController = ZoomController.getSingletonInstance();
 
         zoomController.setAvailableInterval(interval);
-        zoomController.setSelectedInterval(zoomController.getAvailableInterval());
+        zoomController.setSelectedInterval(zoomController.getAvailableInterval(), false);
         // PlotTimeSpace plotTimeSpace = PlotTimeSpace.getInstance();
         // plotTimeSpace.setMinAndMaxTime(interval.getStart(),
         // interval.getEnd());
@@ -265,7 +265,7 @@ public class PlotsControlPanel extends JPanel implements ZoomControllerListener,
     }
 
     @Override
-    public void selectedIntervalChanged(final Interval<Date> newInterval) {
+    public void selectedIntervalChanged(final Interval<Date> newInterval, boolean keepFullValueSpace) {
         if (selectedIntervalByZoombox != null && newInterval != null) {
             if (!selectedIntervalByZoombox.equals(newInterval)) {
                 try {
