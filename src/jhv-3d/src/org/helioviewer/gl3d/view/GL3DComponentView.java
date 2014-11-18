@@ -120,13 +120,18 @@ public class GL3DComponentView extends AbstractComponentView implements GLEventL
         this.exportMovieDialog = exportMovieDialog;
         ImageViewerGui.getSingletonInstance().getLeftContentPane().setEnabled(false);
         View v = LayersModel.getSingletonInstance().getActiveView();
-        JHVJPXView movieView = v.getAdapter(JHVJPXView.class);
-        movieView.pauseMovie();
-        movieView.setCurrentFrame(0, new ChangeEvent());
-        export = new MovieExport(canvas.getWidth(), canvas.getHeight());
-        export.createProcess();
-        exportMode = true;
-        movieView.playMovie();
+        if (v != null) {
+            JHVJPXView movieView = v.getAdapter(JHVJPXView.class);
+            movieView.pauseMovie();
+            movieView.setCurrentFrame(0, new ChangeEvent());
+            export = new MovieExport(canvas.getWidth(), canvas.getHeight());
+            export.createProcess();
+            exportMode = true;
+            movieView.playMovie();
+        } else {
+            exportMovieDialog.fail();
+            exportMovieDialog = null;
+        }
     }
 
     public void stopExport() {
