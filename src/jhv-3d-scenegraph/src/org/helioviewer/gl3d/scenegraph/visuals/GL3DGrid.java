@@ -20,6 +20,7 @@ import org.helioviewer.gl3d.scenegraph.math.GL3DQuatd;
 import org.helioviewer.gl3d.scenegraph.math.GL3DVec3d;
 import org.helioviewer.gl3d.scenegraph.math.GL3DVec4d;
 import org.helioviewer.gl3d.scenegraph.math.GL3DVec4f;
+import org.helioviewer.jhv.display.Displayer;
 
 import com.jogamp.opengl.util.awt.TextRenderer;
 
@@ -34,6 +35,10 @@ public class GL3DGrid extends GL3DGroup {
     private TextRenderer renderer;
     private final int fontsize = 20;
     private final boolean followCamera;
+    private Color firstColor = Color.RED;
+    private Color secondColor = Color.GREEN;
+    private Color thirdColor = Color.YELLOW;
+    private final float lineWidth = 0.5f;
 
     public GL3DGrid(String name, double lonstepDegrees, double latstepDegrees, GL3DVec4f color, GL3DVec4d textColor, boolean followCamera) {
         super(name);
@@ -104,9 +109,9 @@ public class GL3DGrid extends GL3DGroup {
 
     private void drawCircles(GL2 gl) {
         //latitude positive
-        gl.glLineWidth(0.5f);
+        gl.glLineWidth(lineWidth);
         gl.glBlendFunc(GL2.GL_SRC_ALPHA, GL2.GL_ONE_MINUS_SRC_ALPHA);
-        gl.glColor3f(1f, .0f, .0f);
+        gl.glColor3f((float) (firstColor.getRed() / 255.), (float) (firstColor.getGreen() / 255.), (float) (firstColor.getBlue() / 255.));
         gl.glDisable(GL2.GL_LIGHTING);
         double phi = Math.PI / 2.;
         double latstep = latstepDegrees / 180. * Math.PI;
@@ -116,16 +121,17 @@ public class GL3DGrid extends GL3DGroup {
             for (int i = 0; i <= lineres; i++) {
                 if (i % 2 == 0) {
                     if (followCamera) {
-                        gl.glColor3f(1.f, 1.0f, .0f);
+
+                        gl.glColor3f((float) (thirdColor.getRed() / 255.), (float) (thirdColor.getGreen() / 255.), (float) (thirdColor.getBlue() / 255.));
                     } else {
-                        gl.glColor3f(0.f, 1.0f, .0f);
+                        gl.glColor3f((float) (secondColor.getRed() / 255.), (float) (secondColor.getGreen() / 255.), (float) (secondColor.getBlue() / 255.));
                     }
 
                 } else {
                     if (followCamera) {
-                        gl.glColor3f(1.f, 1.0f, .0f);
+                        gl.glColor3f((float) (thirdColor.getRed() / 255.), (float) (thirdColor.getGreen() / 255.), (float) (thirdColor.getBlue() / 255.));
                     } else {
-                        gl.glColor3f(1f, .0f, .0f);
+                        gl.glColor3f((float) (firstColor.getRed() / 255.), (float) (firstColor.getGreen() / 255.), (float) (firstColor.getBlue() / 255.));
                     }
                 }
                 double theta = 2 * i * Math.PI / lineres;
@@ -141,15 +147,15 @@ public class GL3DGrid extends GL3DGroup {
             for (int i = 0; i <= lineres; i++) {
                 if (i % 2 == 0) {
                     if (followCamera) {
-                        gl.glColor3f(1.f, 1.0f, .0f);
+                        gl.glColor3f((float) (thirdColor.getRed() / 255.), (float) (thirdColor.getGreen() / 255.), (float) (thirdColor.getBlue() / 255.));
                     } else {
-                        gl.glColor3f(0.f, 1.0f, .0f);
+                        gl.glColor3f((float) (secondColor.getRed() / 255.), (float) (secondColor.getGreen() / 255.), (float) (secondColor.getBlue() / 255.));
                     }
                 } else {
                     if (followCamera) {
-                        gl.glColor3f(1.f, 1.0f, .0f);
+                        gl.glColor3f((float) (thirdColor.getRed() / 255.), (float) (thirdColor.getGreen() / 255.), (float) (thirdColor.getBlue() / 255.));
                     } else {
-                        gl.glColor3f(1f, .0f, .0f);
+                        gl.glColor3f((float) (firstColor.getRed() / 255.), (float) (firstColor.getGreen() / 255.), (float) (firstColor.getBlue() / 255.));
                     }
                 }
                 double theta = 2 * i * Math.PI / lineres;
@@ -166,16 +172,16 @@ public class GL3DGrid extends GL3DGroup {
             for (int i = 0; i <= lineres; i++) {
                 if (i % 2 == 0) {
                     if (followCamera) {
-                        gl.glColor3f(1.f, 1.0f, .0f);
+                        gl.glColor3f((float) (thirdColor.getRed() / 255.), (float) (thirdColor.getGreen() / 255.), (float) (thirdColor.getBlue() / 255.));
                     } else {
-                        gl.glColor3f(0.f, 1.0f, .0f);
+                        gl.glColor3f((float) (secondColor.getRed() / 255.), (float) (secondColor.getGreen() / 255.), (float) (secondColor.getBlue() / 255.));
                     }
 
                 } else {
                     if (followCamera) {
-                        gl.glColor3f(1.f, 1.0f, .0f);
+                        gl.glColor3f((float) (thirdColor.getRed() / 255.), (float) (thirdColor.getGreen() / 255.), (float) (thirdColor.getBlue() / 255.));
                     } else {
-                        gl.glColor3f(1f, .0f, .0f);
+                        gl.glColor3f((float) (firstColor.getRed() / 255.), (float) (firstColor.getGreen() / 255.), (float) (firstColor.getBlue() / 255.));
                     }
                 }
                 phi = i * Math.PI / lineres;
@@ -191,15 +197,15 @@ public class GL3DGrid extends GL3DGroup {
             for (int i = 0; i <= lineres; i++) {
                 if (i % 2 == 0) {
                     if (followCamera) {
-                        gl.glColor3f(1.f, 1.0f, .0f);
+                        gl.glColor3f((float) (thirdColor.getRed() / 255.), (float) (thirdColor.getGreen() / 255.), (float) (thirdColor.getBlue() / 255.));
                     } else {
-                        gl.glColor3f(0.f, 1.0f, .0f);
+                        gl.glColor3f((float) (secondColor.getRed() / 255.), (float) (secondColor.getGreen() / 255.), (float) (secondColor.getBlue() / 255.));
                     }
                 } else {
                     if (followCamera) {
-                        gl.glColor3f(1.f, 1.0f, .0f);
+                        gl.glColor3f((float) (thirdColor.getRed() / 255.), (float) (thirdColor.getGreen() / 255.), (float) (thirdColor.getBlue() / 255.));
                     } else {
-                        gl.glColor3f(1f, .0f, .0f);
+                        gl.glColor3f((float) (firstColor.getRed() / 255.), (float) (firstColor.getGreen() / 255.), (float) (firstColor.getBlue() / 255.));
                     }
                 }
                 phi = i * Math.PI / lineres;
@@ -281,5 +287,20 @@ public class GL3DGrid extends GL3DGroup {
 
     public void setFontScale(float scale) {
         this.scale = scale;
+    }
+
+    public void setFirstColor(Color color) {
+        this.firstColor = color;
+        Displayer.getSingletonInstance().display();
+    }
+
+    public void setSecondColor(Color color) {
+        this.secondColor = color;
+        Displayer.getSingletonInstance().display();
+    }
+
+    public void setThirdColor(Color color) {
+        this.thirdColor = color;
+        Displayer.getSingletonInstance().display();
     }
 }
