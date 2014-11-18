@@ -325,8 +325,10 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
         g.drawString(
                 verticalLabel,
                 ChartConstants.getGraphLeftSpace()
-                        + Math.max((-1 * ChartConstants.getGraphLeftSpace() + 3), leftSide * graphArea.width - (leftSide + 1)
-                                * (int) verticalLabelBounds.getWidth()), (int) verticalLabelBounds.getHeight());
+                        + Math.max(
+                                (-1 * ChartConstants.getGraphLeftSpace() + 3),
+                                leftSide * graphArea.width - (int) verticalLabelBounds.getWidth() + leftSide
+                                        * (ChartConstants.getTwoAxisGraphRight() - 3)), (int) verticalLabelBounds.getHeight());
 
         double logMinValue = yAxisElement.getMinValue();
         double logMaxValue = yAxisElement.getMaxValue();
