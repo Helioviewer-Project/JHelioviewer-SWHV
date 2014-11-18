@@ -248,6 +248,19 @@ public class ExportMovieDialog extends JDialog implements ChangeListener, Action
         this.exportButton.setVisible(true);
     }
 
+    private class CloseDialogTask extends TimerTask {
+        @Override
+        public void run() {
+            reset3D();
+        }
+    }
+
+    public void fail() {
+        this.movieLabel.setText("No image series. Aborting...");
+        Timer timer = new Timer();
+        timer.schedule(new CloseDialogTask(), 2000);
+    }
+
     /**
      * Default constructor
      */
@@ -260,11 +273,11 @@ public class ExportMovieDialog extends JDialog implements ChangeListener, Action
             exportButton.addActionListener(new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent e) {
+                    add(movieLabel);
+                    movieLabel.setText("Export started...");
                     gl3dc.startExport(exportMovieDialog);
                     exportButton.setEnabled(false);
                     exportButton.setVisible(false);
-                    add(movieLabel);
-                    movieLabel.setText("Export started...");
                 }
             });
             this.add(exportButton);
