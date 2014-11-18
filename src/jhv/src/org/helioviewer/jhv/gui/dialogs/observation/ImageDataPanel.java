@@ -61,7 +61,7 @@ public class ImageDataPanel extends ObservationDialogPanel {
 
     private final TimeSelectionPanel timeSelectionPanel = new TimeSelectionPanel();
     private final CadencePanel cadencePanel = new CadencePanel();
-    private final InstrumentsPanel instrumentsPanel = new InstrumentsPanel();
+    private final InstrumentsPanel instrumentsPanel;
 
     /**
      * Used format for the API of the data and time
@@ -77,9 +77,9 @@ public class ImageDataPanel extends ObservationDialogPanel {
      * */
     public ImageDataPanel() {
         super();
-
+        instrumentsPanel = new InstrumentsPanel(this);
         initVisualComponents();
-        initDataSources();
+        initDataSources(false);
     }
 
     /**
@@ -106,7 +106,7 @@ public class ImageDataPanel extends ObservationDialogPanel {
     /**
      * Adds available data to the displayed components
      * */
-    private void initDataSources() {
+    private void initDataSources(final boolean donotloadStartup) {
         // Start the longer taking setups of the data sources and the time a new
         // thread
         Thread t = new Thread(new Runnable() {
@@ -124,7 +124,7 @@ public class ImageDataPanel extends ObservationDialogPanel {
                     if (instrumentsPanel.validSelection()) {
                         timeSelectionPanel.setupTime();
 
-                        if (Boolean.parseBoolean(Settings.getSingletonInstance().getProperty("startup.loadmovie"))) {
+                        if (!donotloadStartup && Boolean.parseBoolean(Settings.getSingletonInstance().getProperty("startup.loadmovie"))) {
                             // wait until view chain is ready to go
                             while (ImageViewerGui.getSingletonInstance() == null || ImageViewerGui.getSingletonInstance().getMainView() == null) {
                                 Thread.sleep(100);
@@ -730,14 +730,22 @@ public class ImageDataPanel extends ObservationDialogPanel {
          * Combobox to select detector and/or measurement
          */
         private final JComboBox comboDetectorMeasurement = new JComboBox(new String[] { "Loading..." });
+        private final JComboBox comboServer = new JComboBox(new String[] { "ROB", "hv.org" });
+        private final JLabel labelServer = new JLabel("Server");
+        private ImageDataPanel imageDataPanel;
 
         /**
          * Default constructor which will setup the components and add listener
          * to update the available choices
+         *
+         * @param imageDataPanel
          */
-        public InstrumentsPanel() {
+        public InstrumentsPanel(final ImageDataPanel imageDataPanel) {
             // Setup grid
-            setLayout(new GridLayout(3, 2, GRIDLAYOUT_HGAP, GRIDLAYOUT_VGAP));
+            this.imageDataPanel = imageDataPanel;
+            setLayout(new GridLayout(4, 2, GRIDLAYOUT_HGAP, GRIDLAYOUT_VGAP));
+            add(labelServer);
+            add(comboServer);
             add(labelObservatory);
             add(comboObservatory);
             add(labelInstrument);
@@ -782,6 +790,23 @@ public class ImageDataPanel extends ObservationDialogPanel {
             comboDetectorMeasurement.setRenderer(itemRenderer);
 
             // Update the choices if necessary
+            comboServer.addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent arg0) {
+                    String server = (String) comboServer.getSelectedItem();
+                    if (server.contains("ROB")) {
+                        Settings.getSingletonInstance().setProperty("API.dataSources.path", "http://swhv.oma.be/hv/api/?action=getDataSources&verbose=true&enable=[STEREO_A,STEREO_B,PROBA2]");
+                        Settings.getSingletonInstance().setProperty("API.jp2images.path", "http://swhv.oma.be/hv/api/index.php");
+                        Settings.getSingletonInstance().setProperty("API.jp2series.path", "http://swhv.oma.be/hv/api/index.php");
+                    } else if (server.contains("hv")) {
+                        Settings.getSingletonInstance().setProperty("API.dataSources.path", "http://helioviewer.org/api/?action=getDataSources&verbose=true&enable=[STEREO_A,STEREO_B,PROBA2]");
+                        Settings.getSingletonInstance().setProperty("API.jp2images.path", "http://helioviewer.org/api/index.php");
+                        Settings.getSingletonInstance().setProperty("API.jp2series.path", "http://helioviewer.org/api/index.php");
+                    }
+                    DataSources.getSingletonInstance().reload();
+                    imageDataPanel.initDataSources(true);
+                }
+            });
             comboObservatory.addActionListener(new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent arg0) {

@@ -40,7 +40,7 @@ import org.json.JSONTokener;
  * <p>
  * For further improvements in the result also the URL for the data query could
  * be encoded to distribute the load to different server this way.
- * 
+ *
  * @author Helge Dietert
  */
 public class DataSources {
@@ -52,7 +52,7 @@ public class DataSources {
      * JComboBox
      * <p>
      * Also has some advanced sorting and overloaded equal.
-     * 
+     *
      * @author Helge Dietert
      */
     public class Item implements Comparable<Item> {
@@ -75,7 +75,7 @@ public class DataSources {
 
         /**
          * Creates a new item
-         * 
+         *
          * @param key
          *            Key to reference the API
          * @param defaultItem
@@ -94,19 +94,21 @@ public class DataSources {
 
         /**
          * Compare it to some other item with the advanced key
-         * 
+         *
          * @see java.lang.Comparable#compareTo(java.lang.Object)
          */
+        @Override
         public int compareTo(Item other) {
             return keyComparator.compare(key, other.key);
         }
 
         /**
          * Sorting and equal from sortKey,key
-         * 
+         *
          * @see java.lang.Object#equals(java.lang.Object)
          */
 
+        @Override
         public boolean equals(Object obj) {
             try {
                 Item other = (Item) obj;
@@ -141,7 +143,7 @@ public class DataSources {
 
         /**
          * True if it was created as default item
-         * 
+         *
          * @return the defaultItem
          */
         public boolean isDefaultItem() {
@@ -152,6 +154,7 @@ public class DataSources {
          * Shows a nice string (name)
          */
 
+        @Override
         public String toString() {
             return name;
         }
@@ -165,7 +168,7 @@ public class DataSources {
     /**
      * Returns the only instance of this class and will be initialize on the
      * first use.
-     * 
+     *
      * @return the only instance of this class.
      * */
     public static DataSources getSingletonInstance() {
@@ -180,16 +183,20 @@ public class DataSources {
     /**
      * Used comparator to sort the items after the key
      */
-    private Comparator<String> keyComparator = new AlphanumComparator();
+    private final Comparator<String> keyComparator = new AlphanumComparator();
 
     /**
      * Use singleton
      */
     private DataSources() {
+        reload();
+    }
+
+    public void reload() {
         Settings settingsInstance = Settings.getSingletonInstance();
         String prop = settingsInstance.getProperty("supported.data.sources");
 
-        if (prop != null) {
+        if (prop != null&& SUPPORTED_OBSERVATORIES.isEmpty()) {
             String supportedObservatories[] = prop.split(" ");
             for (String s : supportedObservatories) {
                 if (!s.isEmpty()) {
@@ -232,7 +239,7 @@ public class DataSources {
 
     /**
      * For the given root this will create a sorted list or items
-     * 
+     *
      * @param root
      *            Element for which the children will be created
      * @return List of items to select or null if some error occurs
@@ -247,10 +254,10 @@ public class DataSources {
                 String key = new String(((String) iter.next()).getBytes(), "UTF-8");
                 JSONObject child = root.getJSONObject(key);
                 Item newItem = new Item(key, child.optBoolean("default", false), child.getString("name").replace((char) 8287 /*
-                                                                                                                              * MEDIUM
-                                                                                                                              * MATHMATICAL
-                                                                                                                              * SPACE
-                                                                                                                              */, ' '), child.getString("description"));
+                 * MEDIUM
+                 * MATHMATICAL
+                 * SPACE
+                 */, ' '), child.getString("description"));
                 children.add(newItem);
             }
             return children.toArray(new Item[children.size()]);
@@ -264,7 +271,7 @@ public class DataSources {
 
     /**
      * Gives the JSON Object for an detector
-     * 
+     *
      * @param observatory
      *            Key of the observatory
      * @param instrument
@@ -280,7 +287,7 @@ public class DataSources {
 
     /**
      * Resolves the detectors for a observatory and instrument
-     * 
+     *
      * @param observatory
      *            Name of observatory to query
      * @param instrument
@@ -298,7 +305,7 @@ public class DataSources {
 
     /**
      * Gives the JSON Object for an instrument
-     * 
+     *
      * @param observatory
      *            Key of the observatory
      * @param instrument
@@ -312,7 +319,7 @@ public class DataSources {
 
     /**
      * Resolves the instruments for a observatory
-     * 
+     *
      * @param observatory
      *            Name of observatory for which the instruments are returned
      * @return List of available instruments, null if this observatory is not
@@ -329,7 +336,7 @@ public class DataSources {
 
     /**
      * Resolves the detectors for a observatory and instrument
-     * 
+     *
      * @param observatory
      *            Name of observatory to query
      * @param instrument
@@ -349,7 +356,7 @@ public class DataSources {
 
     /**
      * Resolve the available observatories
-     * 
+     *
      * @return List of available observatories
      */
     public Item[] getObservatories() {
@@ -364,7 +371,7 @@ public class DataSources {
 
     /**
      * Gives the JSON Object for an instrument
-     * 
+     *
      * @param observatory
      *            Key of the observatory
      * @return JSON object for the given observatory
