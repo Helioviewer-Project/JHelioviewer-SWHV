@@ -730,7 +730,7 @@ public class ImageDataPanel extends ObservationDialogPanel {
          * Combobox to select detector and/or measurement
          */
         private final JComboBox comboDetectorMeasurement = new JComboBox(new String[] { "Loading..." });
-        private final JComboBox comboServer = new JComboBox(new String[] { "ROB", "helioviewer.org", "ias.u-psud.fr" });
+        private final JComboBox comboServer = new JComboBox(new String[] { "ROB", "Helioviewer.org", "IAS" });
         private final JLabel labelServer = new JLabel("Server");
         private ImageDataPanel imageDataPanel;
 
@@ -798,11 +798,11 @@ public class ImageDataPanel extends ObservationDialogPanel {
                         Settings.getSingletonInstance().setProperty("API.dataSources.path", "http://swhv.oma.be/hv/api/?action=getDataSources&verbose=true&enable=[STEREO_A,STEREO_B,PROBA2]");
                         Settings.getSingletonInstance().setProperty("API.jp2images.path", "http://swhv.oma.be/hv/api/index.php");
                         Settings.getSingletonInstance().setProperty("API.jp2series.path", "http://swhv.oma.be/hv/api/index.php");
-                    } else if (server.contains("helioviewer")) {
+                    } else if (server.contains("Helioviewer")) {
                         Settings.getSingletonInstance().setProperty("API.dataSources.path", "http://helioviewer.org/api/?action=getDataSources&verbose=true&enable=[STEREO_A,STEREO_B,PROBA2]");
                         Settings.getSingletonInstance().setProperty("API.jp2images.path", "http://helioviewer.org/api/index.php");
                         Settings.getSingletonInstance().setProperty("API.jp2series.path", "http://helioviewer.org/api/index.php");
-                    } else if (server.contains("ias")) {
+                    } else if (server.contains("IAS")) {
                         Settings.getSingletonInstance().setProperty("API.dataSources.path", "http://helioviewer.ias.u-psud.fr/helioviewer/api/?action=getDataSources&verbose=true&enable=[STEREO_A,STEREO_B,PROBA2]");
                         Settings.getSingletonInstance().setProperty("API.jp2images.path", "http://helioviewer.ias.u-psud.fr/helioviewer/api/index.php");
                         Settings.getSingletonInstance().setProperty("API.jp2series.path", "http://helioviewer.ias.u-psud.fr/helioviewer/api/index.php");

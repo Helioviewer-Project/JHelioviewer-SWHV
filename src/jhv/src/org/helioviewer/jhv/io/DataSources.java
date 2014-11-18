@@ -253,11 +253,8 @@ public class DataSources {
             while (iter.hasNext()) {
                 String key = new String(((String) iter.next()).getBytes(), "UTF-8");
                 JSONObject child = root.getJSONObject(key);
-                Item newItem = new Item(key, child.optBoolean("default", false), child.getString("name").replace((char) 8287 /*
-                 * MEDIUM
-                 * MATHMATICAL
-                 * SPACE
-                 */, ' '), child.getString("description"));
+                Item newItem = new Item(key, child.optBoolean("default", false), child.getString("name").replace((char) 8287,
+                    ' '), child.getString("description"));
                 children.add(newItem);
             }
             return children.toArray(new Item[children.size()]);
