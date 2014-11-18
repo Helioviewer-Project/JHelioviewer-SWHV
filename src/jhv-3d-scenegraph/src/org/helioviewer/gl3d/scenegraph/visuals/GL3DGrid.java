@@ -92,7 +92,7 @@ public class GL3DGrid extends GL3DGroup {
         GL2 gl = state.gl;
         gl.glDisable(GL2.GL_LIGHTING);
         super.shapeDraw(state);
-        float relhi = (float) (0.7 / (state.getActiveCamera().getCameraFOV())) * scale;
+        float relhi = (float) (state.getActiveCamera().INITFOV / (state.getActiveCamera().getCameraFOV())) * scale;
         float cfontsize = this.fontsize * relhi;
 
         cfontsize = cfontsize < 10.f ? 10.f : cfontsize;
@@ -246,7 +246,7 @@ public class GL3DGrid extends GL3DGroup {
 
         size = Constants.SunRadius * 1.02;
 
-        for (double theta = 0; theta <= 180; theta = theta + this.lonstepDegrees) {
+        for (double theta = 0; theta <= 180.; theta = theta + this.lonstepDegrees) {
             String txt = String.format("%.1f", theta);
             if (txt.substring(txt.length() - 1, txt.length()).equals("0")) {
                 txt = txt.substring(0, txt.length() - 2);
@@ -280,7 +280,7 @@ public class GL3DGrid extends GL3DGroup {
 
     public void setFont(String item) {
         font = new Font(item, Font.PLAIN, this.fontsize);
-        renderer = new TextRenderer(font, false, true);//, new CustomRenderDelegate(0, Color.WHITE));
+        renderer = new TextRenderer(font, false, true);
         renderer.setUseVertexArrays(true);
         renderer.getSmoothing();
     }
