@@ -788,7 +788,7 @@ public class ImageDataPanel extends ObservationDialogPanel {
             comboObservatory.setRenderer(itemRenderer);
             comboInstrument.setRenderer(itemRenderer);
             comboDetectorMeasurement.setRenderer(itemRenderer);
-
+            comboServer.setRenderer(itemRenderer);
             // Update the choices if necessary
             comboServer.addActionListener(new ActionListener() {
                 @Override
