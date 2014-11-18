@@ -798,14 +798,23 @@ public class ImageDataPanel extends ObservationDialogPanel {
                         Settings.getSingletonInstance().setProperty("API.dataSources.path", "http://swhv.oma.be/hv/api/?action=getDataSources&verbose=true&enable=[STEREO_A,STEREO_B,PROBA2]");
                         Settings.getSingletonInstance().setProperty("API.jp2images.path", "http://swhv.oma.be/hv/api/index.php");
                         Settings.getSingletonInstance().setProperty("API.jp2series.path", "http://swhv.oma.be/hv/api/index.php");
+                        Settings.getSingletonInstance().setProperty("default.remote.path", "jpip://swhv.oma.be:8090");
+                        Settings.getSingletonInstance().setProperty("API.event.path", "http://swhv.oma.be/hv/api/");
+                        Settings.getSingletonInstance().setProperty("default.httpRemote.path", "http://swhv.oma.be/hv/jp2/");
                     } else if (server.contains("Helioviewer")) {
                         Settings.getSingletonInstance().setProperty("API.dataSources.path", "http://helioviewer.org/api/?action=getDataSources&verbose=true&enable=[STEREO_A,STEREO_B,PROBA2]");
                         Settings.getSingletonInstance().setProperty("API.jp2images.path", "http://helioviewer.org/api/index.php");
                         Settings.getSingletonInstance().setProperty("API.jp2series.path", "http://helioviewer.org/api/index.php");
+                        Settings.getSingletonInstance().setProperty("default.remote.path", "jpip://helioviewer.org:8090");
+                        Settings.getSingletonInstance().setProperty("API.event.path", "http://helioviewer.org/api/");
+                        Settings.getSingletonInstance().setProperty("default.httpRemote.path", "http://helioviewer.org/jp2/");
                     } else if (server.contains("IAS")) {
                         Settings.getSingletonInstance().setProperty("API.dataSources.path", "http://helioviewer.ias.u-psud.fr/helioviewer/api/?action=getDataSources&verbose=true&enable=[STEREO_A,STEREO_B,PROBA2]");
                         Settings.getSingletonInstance().setProperty("API.jp2images.path", "http://helioviewer.ias.u-psud.fr/helioviewer/api/index.php");
                         Settings.getSingletonInstance().setProperty("API.jp2series.path", "http://helioviewer.ias.u-psud.fr/helioviewer/api/index.php");
+                        Settings.getSingletonInstance().setProperty("default.remote.path", "jpip://helioviewer.ias.u-psud.fr:8080");
+                        Settings.getSingletonInstance().setProperty("API.event.path", "http://helioviewer.ias.u-psud.fr/helioviewer/api/");
+                        Settings.getSingletonInstance().setProperty("default.httpRemote.path", "http://helioviewer.ias.u-psud.fr/helioviewer/jp2/");
                     }
                     DataSources.getSingletonInstance().reload();
                     imageDataPanel.initDataSources(true);
