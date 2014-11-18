@@ -87,7 +87,7 @@ public class ZoomController implements PlotAreaSpaceListener {
 
         // check if selected interval is in available interval and correct it if
         // needed
-        setSelectedInterval(selectedInterval);
+        setSelectedInterval(selectedInterval, false);
         // PlotTimeSpace.getInstance().setSelectedMinAndMaxTime(interval.getStart(),
         // interval.getEnd());
     }
@@ -136,7 +136,7 @@ public class ZoomController implements PlotAreaSpaceListener {
         }
     }
 
-    public Interval<Date> setSelectedInterval(final Interval<Date> newSelectedInterval) {
+    public Interval<Date> setSelectedInterval(final Interval<Date> newSelectedInterval, boolean useFullValueSpace) {
         synchronized (selectedInterval) {
             if (availableInterval.getStart() == null || availableInterval.getEnd() == null) {
                 selectedInterval = new Interval<Date>(null, null);
@@ -160,7 +160,7 @@ public class ZoomController implements PlotAreaSpaceListener {
 
             updatePlotAreaSpace(selectedInterval);
 
-            fireSelectedIntervalChanged(selectedInterval);
+            fireSelectedIntervalChanged(selectedInterval, useFullValueSpace);
 
             return selectedInterval;
         }
@@ -188,7 +188,7 @@ public class ZoomController implements PlotAreaSpaceListener {
             newInterval = computeZoomInterval(selectedInterval, Calendar.YEAR, value);
             break;
         }
-        return setSelectedInterval(newInterval);
+        return setSelectedInterval(newInterval, true);
     }
 
     public Interval<Date> zoomTo(final ZOOM zoom) {
@@ -235,9 +235,9 @@ public class ZoomController implements PlotAreaSpaceListener {
         return selectedInterval;
     }
 
-    private void fireSelectedIntervalChanged(final Interval<Date> newInterval) {
+    private void fireSelectedIntervalChanged(final Interval<Date> newInterval, boolean keepFullValueSpace) {
         for (ZoomControllerListener listener : listeners) {
-            listener.selectedIntervalChanged(newInterval);
+            listener.selectedIntervalChanged(newInterval, keepFullValueSpace);
         }
     }
 
@@ -276,7 +276,7 @@ public class ZoomController implements PlotAreaSpaceListener {
                         || !(newSelectedEndTime.equals(selectedInterval.getEnd()) && newSelectedStartTime.equals(selectedInterval
                                 .getStart()))) {
                     selectedInterval = new Interval<Date>(newSelectedStartTime, newSelectedEndTime);
-                    fireSelectedIntervalChanged(selectedInterval);
+                    fireSelectedIntervalChanged(selectedInterval, false);
                 }
             }
         }
@@ -294,6 +294,7 @@ public class ZoomController implements PlotAreaSpaceListener {
                 double scaledSelectedEnd = pas.getScaledMinTime()
                         + (1.0 * (selectedInterval.getEnd().getTime() - availableInterval.getStart().getTime()) * diffPlotAreaTime / diffAvailable);
                 pas.setScaledSelectedTimeAndValue(scaledSelectedStart, scaledSelectedEnd, pas.getScaledMinValue(), pas.getScaledMaxValue());
+
             }
         }
     }

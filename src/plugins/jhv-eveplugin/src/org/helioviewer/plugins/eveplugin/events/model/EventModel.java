@@ -116,7 +116,7 @@ public class EventModel implements ZoomControllerListener, EventRequesterListene
     }
 
     @Override
-    public void selectedIntervalChanged(final Interval<Date> newInterval) {
+    public void selectedIntervalChanged(final Interval<Date> newInterval, boolean keepFullValueSpace) {
         selectedInterval = newInterval;
         if (!EVEState.getSingletonInstance().isMouseTimeIntervalDragging()) {
             createEventPlotConfiguration();

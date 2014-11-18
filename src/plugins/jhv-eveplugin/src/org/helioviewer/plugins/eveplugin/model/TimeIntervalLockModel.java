@@ -168,7 +168,7 @@ public class TimeIntervalLockModel implements ZoomControllerListener, DrawContro
      * selectedIntervalChanged(org.helioviewer.base.math.Interval)
      */
     @Override
-    public void selectedIntervalChanged(Interval<Date> newInterval) {
+    public void selectedIntervalChanged(Interval<Date> newInterval, boolean keepFullValueSpace) {
     }
 
     /*

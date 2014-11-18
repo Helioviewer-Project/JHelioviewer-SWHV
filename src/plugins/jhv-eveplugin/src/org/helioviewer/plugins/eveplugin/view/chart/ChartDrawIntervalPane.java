@@ -442,7 +442,8 @@ public class ChartDrawIntervalPane extends JComponent implements ZoomControllerL
         final int diffPixel = mousePressed.x > newMousePosition.x ? mousePressed.x - newMousePosition.x : newMousePosition.x
                 - mousePressed.x;
         final double availableIntervalSpace = getWidth()
-                - (ChartConstants.getGraphLeftSpace() + ChartConstants.getGraphRightSpace() + ChartConstants.getRangeSelectionWidth()) - 1.0;
+                - (ChartConstants.getGraphLeftSpace() + ChartConstants.getGraphRightSpace() + ChartConstants.getRangeSelectionWidth())
+                - 1.0;
         final double movedUnits = diffPixel / availableIntervalSpace;
 
         if (mousePressed.x > newMousePosition.x) {
@@ -499,11 +500,12 @@ public class ChartDrawIntervalPane extends JComponent implements ZoomControllerL
                 useThisX = rightIntervalBorderPosition;
             }
             final double availableIntervalSpace = getWidth()
-                    - (ChartConstants.getGraphLeftSpace() + ChartConstants.getGraphRightSpace() + ChartConstants.getRangeSelectionWidth()) - 1.0;
+                    - (ChartConstants.getGraphLeftSpace() + ChartConstants.getGraphRightSpace() + ChartConstants.getRangeSelectionWidth())
+                    - 1.0;
             for (PlotAreaSpace pas : plotAreaSpaceManager.getAllPlotAreaSpaces()) {
                 final double diffUnits = pas.getScaledMaxTime() - pas.getScaledMinTime();
-                final double timestamp = pas.getScaledMinTime() + ((useThisX - ChartConstants.getGraphLeftSpace()) / availableIntervalSpace)
-                        * diffUnits;
+                final double timestamp = pas.getScaledMinTime()
+                        + ((useThisX - ChartConstants.getGraphLeftSpace()) / availableIntervalSpace) * diffUnits;
                 pas.setScaledSelectedTime(Math.max(timestamp, pas.getScaledMinTime()), pas.getScaledSelectedMaxTime(), forced);
             }
         } else if (mouseOverRightGraspPoint) {
@@ -511,7 +513,8 @@ public class ChartDrawIntervalPane extends JComponent implements ZoomControllerL
                 useThisX = leftIntervalBorderPosition;
             }
             final double availableIntervalSpace = getWidth()
-                    - (ChartConstants.getGraphLeftSpace() + ChartConstants.getGraphRightSpace() + ChartConstants.getRangeSelectionWidth()) - 1.0;
+                    - (ChartConstants.getGraphLeftSpace() + ChartConstants.getGraphRightSpace() + ChartConstants.getRangeSelectionWidth())
+                    - 1.0;
             for (PlotAreaSpace pas : plotAreaSpaceManager.getAllPlotAreaSpaces()) {
                 final double diffUnits = pas.getScaledMaxTime() - pas.getScaledMinTime();
                 final double timestamp = pas.getScaledMinTime()
@@ -536,7 +539,7 @@ public class ChartDrawIntervalPane extends JComponent implements ZoomControllerL
     }
 
     @Override
-    public void selectedIntervalChanged(final Interval<Date> newInterval) {
+    public void selectedIntervalChanged(final Interval<Date> newInterval, boolean keepFullValueSpace) {
         // Log.debug("selected interval" + newInterval);
         // Thread.dumpStack();
         if (newInterval.getStart() == null || newInterval.getEnd() == null) {
