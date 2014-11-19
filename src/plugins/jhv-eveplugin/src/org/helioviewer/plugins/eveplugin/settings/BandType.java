@@ -20,6 +20,9 @@ public class BandType {
     public HashMap<String, Double> warnLevels = new HashMap<String, Double>();
     private double min;
     private double max;
+    private String scale = "";
+    private boolean isLog = false;
+
     // private double multiplier = 1.0;
     private DataDownloader dataDownloader;
 
@@ -27,7 +30,9 @@ public class BandType {
         final SimpleDateFormat eveAPIDateFormat = new SimpleDateFormat(EVEAPI.API_DATE_FORMAT);
         URL url = null;
         try {
-            url = new URL(this.baseUrl + EVEAPI.API_URL_PARAMETER_STARTDATE + eveAPIDateFormat.format(interval.getStart()) + "&" + EVEAPI.API_URL_PARAMETER_ENDDATE + eveAPIDateFormat.format(interval.getEnd()) + "&" + EVEAPI.API_URL_PARAMETER_TYPE + this.getName() + "&" + EVEAPI.API_URL_PARAMETER_FORMAT + EVEAPI.API_URL_PARAMETER_FORMAT_VALUES.JSON);
+            url = new URL(baseUrl + EVEAPI.API_URL_PARAMETER_STARTDATE + eveAPIDateFormat.format(interval.getStart()) + "&"
+                    + EVEAPI.API_URL_PARAMETER_ENDDATE + eveAPIDateFormat.format(interval.getEnd()) + "&" + EVEAPI.API_URL_PARAMETER_TYPE
+                    + this.getName() + "&" + EVEAPI.API_URL_PARAMETER_FORMAT + EVEAPI.API_URL_PARAMETER_FORMAT_VALUES.JSON);
         } catch (MalformedURLException e) {
             Log.error("Something is wrong with the EVEAPI url", e);
         }
@@ -35,10 +40,10 @@ public class BandType {
     }
 
     public String toStringAlt() {
-        String str = "baseUrl:" + this.baseUrl;
-        str += "\ngroup:" + this.group.toString();
-        str += "\nlabel:" + this.label;
-        str += "\nunitLabel:" + this.unitLabel;
+        String str = "baseUrl:" + baseUrl;
+        str += "\ngroup:" + group.toString();
+        str += "\nlabel:" + label;
+        str += "\nunitLabel:" + unitLabel;
         str += "\nwarnLevels: [";
         for (Map.Entry<String, Double> entry : warnLevels.entrySet()) {
             String key = entry.getKey();
@@ -50,8 +55,9 @@ public class BandType {
         return str;
     }
 
+    @Override
     public String toString() {
-        return this.label;
+        return label;
     }
 
     public String getBaseUrl() {
@@ -125,6 +131,20 @@ public class BandType {
     public String getName() {
         return name;
     }
+
+    public void setScale(String scale) {
+        this.scale = scale;
+        isLog = scale.equals("logarithmic");
+    }
+
+    public String getScale() {
+        return scale;
+    }
+
+    public boolean isLogScale() {
+        return isLog;
+    }
+
     /*
      * public double getMultiplier() { return multiplier; } public void
      * setMultiplier(double multiplier) { this.multiplier = multiplier; }
