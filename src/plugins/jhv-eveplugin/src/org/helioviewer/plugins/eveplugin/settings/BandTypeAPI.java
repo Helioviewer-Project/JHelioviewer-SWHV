@@ -34,7 +34,8 @@ public class BandTypeAPI extends APIAbstract {
 
     public BandTypeAPI() {
         super();
-        LogSettings.init("/settings/log4j.initial.properties", JHVDirectory.SETTINGS.getPath() + "log4j.properties", JHVDirectory.LOGS.getPath(), false);
+        LogSettings.init("/settings/log4j.initial.properties", JHVDirectory.SETTINGS.getPath() + "log4j.properties",
+                JHVDirectory.LOGS.getPath(), false);
         this.loadSettings();
         this.setBaseUrl(defaultProperties.getProperty("plugin.eve.dataseturl"));
         this.updateDatasets();
@@ -87,35 +88,44 @@ public class BandTypeAPI extends APIAbstract {
     }
 
     public void updateBandTypes(JSONArray jsonObjectArray) {
-        this.bandtypes = new BandType[jsonObjectArray.length()];
+        bandtypes = new BandType[jsonObjectArray.length()];
         try {
             for (int i = 0; i < jsonObjectArray.length(); i++) {
-                this.bandtypes[i] = new BandType();
+                bandtypes[i] = new BandType();
                 JSONObject job = (JSONObject) jsonObjectArray.get(i);
 
-                if (job.has("label"))
-                    this.bandtypes[i].setLabel((String) job.get("label"));
-                if (job.has("name"))
-                    this.bandtypes[i].setName((String) job.get("name"));
-                if (job.has("min"))
-                    this.bandtypes[i].setMin(job.getDouble("min"));
-                if (job.has("max"))
-                    this.bandtypes[i].setMax(job.getDouble("max"));
-                if (job.has("unitLabel"))
-                    this.bandtypes[i].setUnitLabel((String) job.get("unitLabel"));
-                if (job.has("baseUrl"))
-                    this.bandtypes[i].setBaseUrl((String) job.get("baseUrl"));
+                if (job.has("label")) {
+                    bandtypes[i].setLabel((String) job.get("label"));
+                }
+                if (job.has("name")) {
+                    bandtypes[i].setName((String) job.get("name"));
+                }
+                if (job.has("min")) {
+                    bandtypes[i].setMin(job.getDouble("min"));
+                }
+                if (job.has("max")) {
+                    bandtypes[i].setMax(job.getDouble("max"));
+                }
+                if (job.has("unitLabel")) {
+                    bandtypes[i].setUnitLabel((String) job.get("unitLabel"));
+                }
+                if (job.has("baseUrl")) {
+                    bandtypes[i].setBaseUrl((String) job.get("baseUrl"));
+                }
+                if (job.has("scale")) {
+                    bandtypes[i].setScale(job.getString("scale"));
+                }
                 if (job.has("warnLevels")) {
                     JSONArray warnLevels = job.getJSONArray("warnLevels");
                     for (int j = 0; j < warnLevels.length(); j++) {
                         JSONObject helpobj = (JSONObject) warnLevels.get(j);
-                        this.bandtypes[i].warnLevels.put((String) helpobj.get("warnLabel"), helpobj.getDouble("warnValue"));
+                        bandtypes[i].warnLevels.put((String) helpobj.get("warnLabel"), helpobj.getDouble("warnValue"));
                     }
                 }
                 if (job.has("group")) {
-                    BandGroup group = this.groups.get(job.getString("group"));
-                    group.add(this.bandtypes[i]);
-                    this.bandtypes[i].setGroup(group);
+                    BandGroup group = groups.get(job.getString("group"));
+                    group.add(bandtypes[i]);
+                    bandtypes[i].setGroup(group);
                 }
             }
         } catch (JSONException e1) {
@@ -124,16 +134,17 @@ public class BandTypeAPI extends APIAbstract {
     }
 
     public void updateBandGroups(JSONArray jsonGroupArray) {
-        this.bandtypes = new BandType[jsonGroupArray.length()];
+        bandtypes = new BandType[jsonGroupArray.length()];
         try {
             for (int i = 0; i < jsonGroupArray.length(); i++) {
                 BandGroup group = new BandGroup();
                 JSONObject job = (JSONObject) jsonGroupArray.get(i);
-                if (job.has("groupLabel"))
+                if (job.has("groupLabel")) {
                     group.setGroupLabel(job.getString("groupLabel"));
+                }
                 if (job.has("key")) {
                     group.setKey(job.getString("key"));
-                    this.groups.put(job.getString("key"), group);
+                    groups.put(job.getString("key"), group);
                 }
             }
         } catch (JSONException e1) {
@@ -152,7 +163,7 @@ public class BandTypeAPI extends APIAbstract {
         } catch (JSONException e1) {
             Log.error("JSON parsing error", e1);
         }
-        this.isUpdated = true;
+        isUpdated = true;
         return null;
     }
 
@@ -183,10 +194,10 @@ public class BandTypeAPI extends APIAbstract {
     }
 
     public BandType[] getDatasets() {
-        if (this.bandtypes == null) {
+        if (bandtypes == null) {
             this.updateDatasets();
         }
-        return this.bandtypes;
+        return bandtypes;
     }
 
     public BandType[] getBandTypes() {
@@ -201,6 +212,6 @@ public class BandTypeAPI extends APIAbstract {
         if (!isUpdated) {
             updateDatasets();
         }
-        return this.groups.values().toArray(new BandGroup[groups.size()]);
+        return groups.values().toArray(new BandGroup[groups.size()]);
     }
 }

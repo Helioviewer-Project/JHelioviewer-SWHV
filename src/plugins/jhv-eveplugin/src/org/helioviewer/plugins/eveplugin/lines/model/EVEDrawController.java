@@ -115,6 +115,7 @@ public class EVEDrawController implements BandControllerListener, ZoomController
 
     private void updateBand(final Band band, boolean keepFullValueRange) {
         DownloadedData data = retrieveData(band, interval);
+        boolean isLog = band.getBandType().isLogScale();
         if (!availableRangeMap.containsKey(band.getUnitLabel())) {
             availableRangeMap.put(band.getUnitLabel(), new Range());
             selectedRangeMap.put(band.getUnitLabel(), new Range());
@@ -134,7 +135,8 @@ public class EVEDrawController implements BandControllerListener, ZoomController
                 || oldAvailableRange.max != availableRangeMap.get(band.getUnitLabel()).max) {
             // Log.trace("update band available range changed so we change the plotareaSpace");
             checkSelectedRange(availableRangeMap.get(band.getUnitLabel()), selectedRangeMap.get(band.getUnitLabel()));
-            updatePlotAreaSpace(availableRangeMap.get(band.getUnitLabel()), selectedRangeMap.get(band.getUnitLabel()), keepFullValueRange);
+            updatePlotAreaSpace(availableRangeMap.get(band.getUnitLabel()), selectedRangeMap.get(band.getUnitLabel()), keepFullValueRange,
+                    isLog);
         } else {
             // Log.trace("Same available range");
         }
@@ -165,8 +167,10 @@ public class EVEDrawController implements BandControllerListener, ZoomController
             final LinkedList<DownloadedData> values = new LinkedList<DownloadedData>();
 
             String unitLabel = "";
+            boolean isLog = false;
             if (bands.length > 0) {
                 unitLabel = bands[0].getUnitLabel();
+                isLog = bands[0].getBandType().isLogScale();
             }
 
             if (!availableRangeMap.containsKey(unitLabel)) {
@@ -194,7 +198,7 @@ public class EVEDrawController implements BandControllerListener, ZoomController
                 Log.error("Available range changed in redraw request. So update plotAreaSpace");
                 Log.error("old range : " + oldAvailableRange.toString());
                 Log.error("new available range : " + availableRangeMap.get(unitLabel).toString());
-                updatePlotAreaSpace(availableRangeMap.get(unitLabel), selectedRangeMap.get(unitLabel), false);
+                updatePlotAreaSpace(availableRangeMap.get(unitLabel), selectedRangeMap.get(unitLabel), false, isLog);
 
             }
 
@@ -207,7 +211,7 @@ public class EVEDrawController implements BandControllerListener, ZoomController
                 yAxisElement = yAxisElementMap.get(unitLabel);
             }
             yAxisElement.set(selectedRangeMap.get(unitLabel), availableRangeMap.get(unitLabel), unitLabel,
-                    Math.log10(selectedRangeMap.get(unitLabel).min), Math.log10(selectedRangeMap.get(unitLabel).max), Color.PINK, true,
+                    selectedRangeMap.get(unitLabel).min, selectedRangeMap.get(unitLabel).max, Color.PINK, isLog,
                     yAxisElement.getActivationTime());
             yAxisElementMap.put(unitLabel, yAxisElement);
             eveDrawableElementMap.get(unitLabel).set(interval, bands, values.toArray(new EVEValues[0]), yAxisElement);
@@ -219,14 +223,23 @@ public class EVEDrawController implements BandControllerListener, ZoomController
         }
     }
 
-    private void updatePlotAreaSpace(Range availableRange, Range selectedRange, boolean keepFullValueSpace) {
+    private void updatePlotAreaSpace(Range availableRange, Range selectedRange, boolean keepFullValueSpace, boolean isLog) {
         if (!keepFullValueSpace) {
-            double diffAvailable = Math.log10(availableRange.max) - Math.log10(availableRange.min);
-            double diffStart = Math.log10(selectedRange.min) - Math.log10(availableRange.min);
-            double diffEnd = Math.log10(selectedRange.max) - Math.log10(availableRange.min);
-            double startValue = plotAreaSpace.getScaledMinValue() + diffStart / diffAvailable;
-            double endValue = plotAreaSpace.getScaledMinValue() + diffEnd / diffAvailable;
-            plotAreaSpace.setScaledSelectedValue(startValue, endValue, true);
+            if (isLog) {
+                double diffAvailable = Math.log10(availableRange.max) - Math.log10(availableRange.min);
+                double diffStart = Math.log10(selectedRange.min) - Math.log10(availableRange.min);
+                double diffEnd = Math.log10(selectedRange.max) - Math.log10(availableRange.min);
+                double startValue = plotAreaSpace.getScaledMinValue() + diffStart / diffAvailable;
+                double endValue = plotAreaSpace.getScaledMinValue() + diffEnd / diffAvailable;
+                plotAreaSpace.setScaledSelectedValue(startValue, endValue, true);
+            } else {
+                double diffAvailable = availableRange.max - availableRange.min;
+                double diffStart = selectedRange.min - availableRange.min;
+                double diffEnd = selectedRange.max - availableRange.min;
+                double startValue = plotAreaSpace.getScaledMinValue() + diffStart / diffAvailable;
+                double endValue = plotAreaSpace.getScaledMinValue() + diffEnd / diffAvailable;
+                plotAreaSpace.setScaledSelectedValue(startValue, endValue, true);
+            }
         } else {
             plotAreaSpace.setScaledSelectedValue(plotAreaSpace.getScaledMinValue(), plotAreaSpace.getScaledMaxValue(), true);
         }

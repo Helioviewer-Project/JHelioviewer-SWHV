@@ -353,11 +353,18 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
                                 verticalLabelBounds.getWidth() - ChartConstants.getTwoAxisGraphRight())))), (int) verticalLabelBounds
                 .getHeight());
 
-        double logMinValue = yAxisElement.getMinValue();
-        double logMaxValue = yAxisElement.getMaxValue();
+        double minValue = 0.0;
+        double maxValue = 0.0;
+        if (yAxisElement.isLogScale()) {
+            minValue = Math.log10(yAxisElement.getMinValue());
+            maxValue = Math.log10(yAxisElement.getMaxValue());
+        } else {
+            minValue = yAxisElement.getMinValue();
+            maxValue = yAxisElement.getMaxValue();
+        }
 
-        if (logMaxValue < logMinValue) {
-            final int dataSteps = ((int) ((logMinValue - logMaxValue) * 100));
+        if (maxValue < minValue) {
+            final int dataSteps = ((int) ((minValue - maxValue) * 100));
             final int sizeSteps = graphArea.height / ChartConstants.getMinVerticalTickSpace();
             final int verticalTicks = dataSteps < sizeSteps ? dataSteps : sizeSteps;
 
@@ -367,16 +374,16 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
                 g.setColor(ChartConstants.TICK_LINE_COLOR);
                 g.drawLine(graphArea.x - 3, y, graphArea.x + graphArea.width, y);
             } else {
-                final double tickDifferenceVertical = (logMinValue - logMaxValue) / verticalTicks;
+                final double tickDifferenceVertical = (minValue - maxValue) / verticalTicks;
 
                 for (int i = 0; i <= verticalTicks; ++i) {
-                    final double tickValue = logMaxValue + i * tickDifferenceVertical;
+                    final double tickValue = maxValue + i * tickDifferenceVertical;
                     String tickText = ChartConstants.DECIMAL_FORMAT.format(tickValue);
                     Double yAxisRatio = yRatios.get(yAxisElement);
                     if (yAxisRatio == null) {
                         continue;
                     }
-                    final int y = graphArea.y + graphArea.height - (int) (yAxisRatio * (logMinValue - tickValue));
+                    final int y = graphArea.y + graphArea.height - (int) (yAxisRatio * (minValue - tickValue));
 
                     g.setColor(ChartConstants.TICK_LINE_COLOR);
                     if (leftSide == 0) {
@@ -390,7 +397,7 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
                 }
             }
         } else {
-            final int dataSteps = ((int) ((logMaxValue - logMinValue) * 100));
+            final int dataSteps = ((int) ((maxValue - minValue) * 100));
             final int sizeSteps = graphArea.height / ChartConstants.getMinVerticalTickSpace();
             final int verticalTicks = dataSteps < sizeSteps ? dataSteps : sizeSteps;
 
@@ -400,22 +407,22 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
                 g.setColor(ChartConstants.TICK_LINE_COLOR);
                 g.drawLine(graphArea.x - 3, y, graphArea.x + graphArea.width, y);
             } else {
-                double tickDifferenceVertical = Math.abs(logMaxValue - logMinValue) / verticalTicks;
+                double tickDifferenceVertical = Math.abs(maxValue - minValue) / verticalTicks;
                 double factor = 1.;
                 while (tickDifferenceVertical > 0 && tickDifferenceVertical < 1.) {
                     tickDifferenceVertical *= 10.;
                     factor *= 10.;
                 }
                 tickDifferenceVertical = 5. / factor;
-                double tickValue = Math.round(logMinValue * factor) / (factor);
-                while (tickValue < logMaxValue) {
+                double tickValue = Math.round(minValue * factor) / (factor);
+                while (tickValue < maxValue) {
                     String tickText = ChartConstants.DECIMAL_FORMAT.format(tickValue);
 
                     Double yAxisRatio = yRatios.get(yAxisElement);
                     if (yAxisRatio == null) {
                         continue;
                     }
-                    final int y = graphArea.y + graphArea.height - (int) (yAxisRatio * (tickValue - logMinValue));
+                    final int y = graphArea.y + graphArea.height - (int) (yAxisRatio * (tickValue - minValue));
 
                     g.setColor(ChartConstants.TICK_LINE_COLOR);
                     if (leftSide == 0) {
@@ -505,11 +512,19 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
                 / (double) (interval.getEnd().getTime() - interval.getStart().getTime());
         yRatios = new HashMap<YAxisElement, Double>();
         for (YAxisElement yAxisElement : drawController.getYAxisElements(identifier)) {
-            double logMinValue = yAxisElement.getMinValue();
-            double logMaxValue = yAxisElement.getMaxValue();
+            double logMinValue;
+            double logMaxValue;
+            if (yAxisElement.isLogScale()) {
+                logMinValue = Math.log10(yAxisElement.getMinValue());
+                logMaxValue = Math.log10(yAxisElement.getMaxValue());
+            } else {
+                logMinValue = yAxisElement.getMinValue();
+                logMaxValue = yAxisElement.getMaxValue();
+            }
             double ratioY = logMaxValue < logMinValue ? graphArea.height / (logMinValue - logMaxValue) : graphArea.height
                     / (logMaxValue - logMinValue);
             yRatios.put(yAxisElement, ratioY);
+
         }
     }
 
