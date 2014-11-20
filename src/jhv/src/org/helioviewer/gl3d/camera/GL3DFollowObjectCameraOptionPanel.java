@@ -75,31 +75,11 @@ public class GL3DFollowObjectCameraOptionPanel extends GL3DCameraOptionPanel imp
         this.camera = camera;
         setLayout(new BoxLayout(this, BoxLayout.PAGE_AXIS));
         this.setBorder(BorderFactory.createEmptyBorder(0, 4, 0, 4));
-        add(new JSeparator(SwingConstants.HORIZONTAL));
-        JPanel cameraTimePanel = new JPanel();
-        cameraTimePanel.setLayout(new BoxLayout(cameraTimePanel, BoxLayout.LINE_AXIS));
-        cameraTime = new JLabel("Camera date: " + DISABLED_TEXT);
-        cameraTimePanel.add(cameraTime);
-        cameraTimePanel.add(Box.createHorizontalGlue());
-        add(cameraTimePanel);
-        JPanel loadedLabelPanel = new JPanel();
-        loadedLabelPanel.setMaximumSize(new Dimension(338, 40));
-
-        loadedLabelPanel.setLayout(new BoxLayout(loadedLabelPanel, BoxLayout.LINE_AXIS));
-        loadedLabel = new JTextArea("Status: Not loaded");
-        loadedLabel.setEditable(false);
-        loadedLabel.setLineWrap(true);
-        loadedLabel.setOpaque(false);
-        loadedLabelPanel.add(loadedLabel);
-        loadedLabelPanel.add(Box.createHorizontalGlue());
-        add(loadedLabelPanel);
-
-        add(new JSeparator(SwingConstants.HORIZONTAL));
         this.createGridOptions();
         add(new JSeparator(SwingConstants.HORIZONTAL));
         this.fovPanel = new JPanel();
         this.fovPanel.setLayout(new BoxLayout(fovPanel, BoxLayout.LINE_AXIS));
-        this.fovPanel.add(new JLabel("FOV angle (degree) "));
+        this.fovPanel.add(new JLabel("FOV angle"));
         this.fovSpinner = new JSpinner();
         this.fovSpinner.setModel(new SpinnerNumberModel(new Double(0.8), new Double(0.0), new Double(180.), new Double(0.01)));
         camera.setFOVangleDegrees((Double) fovSpinner.getValue());
@@ -113,9 +93,9 @@ public class GL3DFollowObjectCameraOptionPanel extends GL3DCameraOptionPanel imp
         });
         WheelSupport.installMouseWheelSupport(this.fovSpinner);
         this.fovPanel.add(this.fovSpinner);
+        this.fovPanel.add(new JLabel("degree"));
+
         this.fovSpinner.setMaximumSize(new Dimension(6, 22));
-        this.fovPanel.add(Box.createHorizontalGlue());
-        this.fovPanel.add(new JSeparator(SwingConstants.VERTICAL));
         this.fovPanel.add(Box.createHorizontalGlue());
         fovCheckbox = new JCheckBox("Visible");
         fovCheckbox.setSelected(true);
@@ -133,6 +113,26 @@ public class GL3DFollowObjectCameraOptionPanel extends GL3DCameraOptionPanel imp
         this.fovPanel.add(fovCheckbox);
 
         add(this.fovPanel);
+
+        add(new JSeparator(SwingConstants.HORIZONTAL));
+        JPanel cameraTimePanel = new JPanel();
+        cameraTimePanel.setLayout(new BoxLayout(cameraTimePanel, BoxLayout.LINE_AXIS));
+        cameraTime = new JLabel("Camera time: " + DISABLED_TEXT);
+        cameraTimePanel.add(cameraTime);
+        cameraTimePanel.add(Box.createHorizontalGlue());
+        add(cameraTimePanel);
+        JPanel loadedLabelPanel = new JPanel();
+        loadedLabelPanel.setMaximumSize(new Dimension(338, 40));
+
+        loadedLabelPanel.setLayout(new BoxLayout(loadedLabelPanel, BoxLayout.LINE_AXIS));
+        loadedLabel = new JTextArea("Status: Not loaded");
+        loadedLabel.setEditable(false);
+        loadedLabel.setLineWrap(true);
+        loadedLabel.setOpaque(false);
+        loadedLabelPanel.add(loadedLabel);
+        loadedLabelPanel.add(Box.createHorizontalGlue());
+        add(loadedLabelPanel);
+
         add(new JSeparator(SwingConstants.HORIZONTAL));
         addObjectCombobox();
         exactDateCheckBox = new JCheckBox("Use active layer timestamps", true);
@@ -396,7 +396,7 @@ public class GL3DFollowObjectCameraOptionPanel extends GL3DCameraOptionPanel imp
 
     @Override
     public void fireCameraTime(Date cameraDate) {
-        this.cameraTime.setText("Camera date: " + format.format(cameraDate));
+        this.cameraTime.setText("Camera time: " + format.format(cameraDate));
     }
 
     @Override

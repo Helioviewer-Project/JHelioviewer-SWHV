@@ -3,25 +3,23 @@ package org.helioviewer.gl3d.camera;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.ItemEvent;
-import java.awt.event.ItemListener;
 
 import javax.swing.Box;
 import javax.swing.BoxLayout;
-import javax.swing.JCheckBox;
+import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
-import javax.swing.JSeparator;
 import javax.swing.JSpinner;
 import javax.swing.SpinnerNumberModel;
-import javax.swing.SwingConstants;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
 import org.helioviewer.basegui.components.WheelSupport;
 import org.helioviewer.gl3d.scenegraph.GL3DDrawBits.Bit;
 import org.helioviewer.jhv.display.Displayer;
+import org.helioviewer.jhv.gui.IconBank;
+import org.helioviewer.jhv.gui.IconBank.JHVIcon;
 
 public abstract class GL3DCameraOptionPanel extends JPanel implements ActionListener {
     private static final long serialVersionUID = 1L;
@@ -31,11 +29,13 @@ public abstract class GL3DCameraOptionPanel extends JPanel implements ActionList
     private JPanel gridPanel;
     private JSpinner gridResolutionXSpinner;
     private JSpinner gridResolutionYSpinner;
-    private JCheckBox gridVisibleCheckbox;
+
     private final FontComboBox fontComboBox;
 
     private final GL3DCamera camera;
     private JSpinner fontSizeSpinner;
+    private JButton visibleButton;
+    private boolean gridVisible = false;
 
     public GL3DCameraOptionPanel(GL3DCamera camera) {
         this.camera = camera;
@@ -56,7 +56,7 @@ public abstract class GL3DCameraOptionPanel extends JPanel implements ActionList
         this.gridResolutionXSpinner.setMaximumSize(new Dimension(82, 22));
 
         this.gridPanel.add(this.gridResolutionXSpinner);
-        this.gridPanel.add(Box.createHorizontalGlue());
+        this.gridPanel.add(Box.createRigidArea(new Dimension(5, 0)));
         this.gridResolutionYSpinner.setMinimumSize(new Dimension(42, 20));
         this.gridResolutionYSpinner.setPreferredSize(new Dimension(62, 22));
         this.gridResolutionYSpinner.setMaximumSize(new Dimension(82, 22));
@@ -64,39 +64,35 @@ public abstract class GL3DCameraOptionPanel extends JPanel implements ActionList
         this.gridPanel.add(this.gridResolutionYSpinner);
         this.gridPanel.add(Box.createHorizontalGlue());
 
-        this.gridPanel.add(new JSeparator(SwingConstants.VERTICAL));
-        this.gridPanel.add(Box.createHorizontalGlue());
-
         this.createFontSizeSpinner();
-        //this.gridPanel.add(fontSizeSpinner);
 
-        createVisibleCheckBox();
-        this.gridPanel.add(gridVisibleCheckbox);
+        createGridVisibleToggleButton();
+        this.gridPanel.add(visibleButton);
 
         add(this.gridPanel);
 
         //add(this.fontComboBox);
     }
 
-    private void createVisibleCheckBox() {
-        gridVisibleCheckbox = new JCheckBox("Visible");
-        gridVisibleCheckbox.addItemListener(new ItemListener() {
+    private void createGridVisibleToggleButton() {
+        visibleButton = new JButton(IconBank.getIcon(JHVIcon.HIDDEN));
+        visibleButton.addActionListener(new ActionListener() {
             @Override
-            public void itemStateChanged(ItemEvent e) {
-                if (e.getStateChange() == ItemEvent.DESELECTED) {
+            public void actionPerformed(ActionEvent evt) {
+                if (gridVisible) {
                     camera.getGrid().getDrawBits().on(Bit.Hidden);
                     camera.getFollowGrid().getDrawBits().on(Bit.Hidden);
-
+                    visibleButton.setIcon(IconBank.getIcon(JHVIcon.HIDDEN));
                 } else {
                     camera.getGrid().getDrawBits().off(Bit.Hidden);
                     camera.getFollowGrid().getDrawBits().off(Bit.Hidden);
+                    visibleButton.setIcon(IconBank.getIcon(JHVIcon.VISIBLE));
                 }
+                gridVisible = !gridVisible;
                 Displayer.getSingletonInstance().display();
-
             }
         });
-        gridVisibleCheckbox.setSelected(false);
-
+        visibleButton.setToolTipText("Toggle visibility");
     }
 
     public void createGridResolutionX() {
@@ -140,10 +136,6 @@ public abstract class GL3DCameraOptionPanel extends JPanel implements ActionList
         WheelSupport.installMouseWheelSupport(this.fontSizeSpinner);
     }
 
-    public JCheckBox getGridVisibleCheckbox() {
-        return gridVisibleCheckbox;
-    }
-
     public JSpinner getGridResolutionXSpinner() {
         return gridResolutionXSpinner;
     }
@@ -152,14 +144,19 @@ public abstract class GL3DCameraOptionPanel extends JPanel implements ActionList
         return gridResolutionYSpinner;
     }
 
-    public void setGridVisibleCheckbox(JCheckBox fovCheckbox) {
-        this.gridVisibleCheckbox = fovCheckbox;
-    }
-
     @Override
     public void actionPerformed(ActionEvent evt) {
         JComboBox source = (JComboBox) evt.getSource();
         String item = (String) source.getSelectedItem();
         camera.getGrid().setFont(item);
+    }
+
+    public void setGridVisible(boolean gridVisible) {
+        this.gridVisible = gridVisible;
+        if (gridVisible) {
+            visibleButton.setIcon(IconBank.getIcon(JHVIcon.VISIBLE));
+        } else {
+            visibleButton.setIcon(IconBank.getIcon(JHVIcon.HIDDEN));
+        }
     }
 }
