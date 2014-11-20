@@ -62,69 +62,74 @@ public class EVEDrawableElement implements DrawableElement {
     private void updateGraphsData(Interval<Date> interval, Rectangle graphArea) {
         double minValue = yAxisElement.getMinValue();
         double maxValue = yAxisElement.getMaxValue();
+        if (!yAxisElement.isLogScale() || (yAxisElement.isLogScale() && minValue > 10e-50 && maxValue > 10e-50)) {
+            double ratioX = !intervalAvailable ? 0 : (double) graphArea.width
+                    / (double) (interval.getEnd().getTime() - interval.getStart().getTime());
+            double ratioY = 0.0;
+            if (yAxisElement.isLogScale()) {
+                ratioY = Math.log10(maxValue) < Math.log10(minValue) ? 0 : graphArea.height / (Math.log10(maxValue) - Math.log10(minValue));
+            } else {
+                ratioY = maxValue < minValue ? 0 : graphArea.height / (maxValue - minValue);
+            }
 
-        double ratioX = !intervalAvailable ? 0 : (double) graphArea.width
-                / (double) (interval.getEnd().getTime() - interval.getStart().getTime());
-        double ratioY = 0.0;
-        if (yAxisElement.isLogScale()) {
-            ratioY = Math.log10(maxValue) < Math.log10(minValue) ? 0 : graphArea.height / (Math.log10(maxValue) - Math.log10(minValue));
-        } else {
-            ratioY = maxValue < minValue ? 0 : graphArea.height / (maxValue - minValue);
-        }
+            graphPolylines.clear();
 
-        graphPolylines.clear();
+            for (int i = 0; i < bands.length; ++i) {
+                if (bands[i].isVisible()) {
+                    final EVEValue[] eveValues = values[i].getValues();
+                    final ArrayList<Point> pointList = new ArrayList<Point>();
+                    final LinkedList<Integer> warnLevels = new LinkedList<Integer>();
+                    final LinkedList<String> warnLabels = new LinkedList<String>();
+                    HashMap<String, Double> unconvertedWarnLevels = bands[i].getBandType().getWarnLevels();
 
-        for (int i = 0; i < bands.length; ++i) {
-            if (bands[i].isVisible()) {
-                final EVEValue[] eveValues = values[i].getValues();
-                final ArrayList<Point> pointList = new ArrayList<Point>();
-                final LinkedList<Integer> warnLevels = new LinkedList<Integer>();
-                final LinkedList<String> warnLabels = new LinkedList<String>();
-                HashMap<String, Double> unconvertedWarnLevels = bands[i].getBandType().getWarnLevels();
-
-                Iterator<Entry<String, Double>> it = unconvertedWarnLevels.entrySet().iterator();
-                while (it.hasNext()) {
-                    Map.Entry<String, Double> pairs = it.next();
-                    if (yAxisElement.isLogScale()) {
-                        warnLevels.add(computeY(Math.log10(pairs.getValue()), interval, graphArea, ratioY, Math.log10(minValue)));
-                    } else {
-                        warnLevels.add(computeY(pairs.getValue(), interval, graphArea, ratioY, minValue));
+                    Iterator<Entry<String, Double>> it = unconvertedWarnLevels.entrySet().iterator();
+                    while (it.hasNext()) {
+                        Map.Entry<String, Double> pairs = it.next();
+                        if (yAxisElement.isLogScale()) {
+                            if (pairs.getValue() > 10e-50) {
+                                warnLevels.add(computeY(Math.log10(pairs.getValue()), interval, graphArea, ratioY, Math.log10(minValue)));
+                            }
+                        } else {
+                            warnLevels.add(computeY(pairs.getValue(), interval, graphArea, ratioY, minValue));
+                        }
+                        warnLabels.add(pairs.getKey());
+                        // it.remove(); // avoids a
+                        // ConcurrentModificationException
                     }
-                    warnLabels.add(pairs.getKey());
-                    // it.remove(); // avoids a ConcurrentModificationException
-                }
 
-                int counter = 0;
+                    int counter = 0;
 
-                for (int j = 0; j < eveValues.length; j++) {
-                    final Double value = eveValues[j].getValue();
+                    for (int j = 0; j < eveValues.length; j++) {
+                        final Double value = eveValues[j].getValue();
 
-                    if (value == null) {
-                        if (counter > 1) {
-                            graphPolylines.add(new GraphPolyline(pointList, bands[i].getGraphColor(), warnLevels, warnLabels, ratioX));
+                        if (value == null || (yAxisElement.isLogScale() && value < 10e-50)) {
+                            if (counter > 1) {
+                                graphPolylines.add(new GraphPolyline(pointList, bands[i].getGraphColor(), warnLevels, warnLabels, ratioX));
+                            }
+
+                            pointList.clear();
+                            counter = 0;
+
+                            continue;
                         }
 
-                        pointList.clear();
-                        counter = 0;
+                        final int x = computeX(eveValues[j].getDate(), interval, graphArea, ratioX);
+                        int y = 0;
+                        if (yAxisElement.isLogScale()) {
+                            y = computeY(Math.log10(eveValues[j].getValue().doubleValue()), interval, graphArea, ratioY,
+                                    Math.log10(minValue));
+                        } else {
+                            y = computeY(eveValues[j].getValue().doubleValue(), interval, graphArea, ratioY, minValue);
+                        }
+                        final Point point = new Point(x, y);
 
-                        continue;
+                        pointList.add(point);
+                        counter++;
                     }
 
-                    final int x = computeX(eveValues[j].getDate(), interval, graphArea, ratioX);
-                    int y = 0;
-                    if (yAxisElement.isLogScale()) {
-                        y = computeY(Math.log10(eveValues[j].getValue().doubleValue()), interval, graphArea, ratioY, Math.log10(minValue));
-                    } else {
-                        y = computeY(eveValues[j].getValue().doubleValue(), interval, graphArea, ratioY, minValue);
+                    if (counter > 0) {
+                        graphPolylines.add(new GraphPolyline(pointList, bands[i].getGraphColor(), warnLevels, warnLabels, ratioX));
                     }
-                    final Point point = new Point(x, y);
-
-                    pointList.add(point);
-                    counter++;
-                }
-
-                if (counter > 0) {
-                    graphPolylines.add(new GraphPolyline(pointList, bands[i].getGraphColor(), warnLevels, warnLabels, ratioX));
                 }
             }
         }

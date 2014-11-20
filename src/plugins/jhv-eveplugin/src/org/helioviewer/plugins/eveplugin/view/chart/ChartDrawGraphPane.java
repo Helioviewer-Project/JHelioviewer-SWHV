@@ -109,6 +109,9 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
 
     @Override
     protected void paintComponent(Graphics g) {
+        Log.debug("PaintComponent");
+        Thread.dumpStack();
+
         Graphics2D g2 = (Graphics2D) g;
 
         super.paintComponent(g2);
@@ -158,7 +161,6 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
             drawZoomBox(g);
         }
         this.repaint();
-
         // Log.info("Run time: " + (System.currentTimeMillis() - start));
     }
 
@@ -356,8 +358,10 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
         double minValue = 0.0;
         double maxValue = 0.0;
         if (yAxisElement.isLogScale()) {
-            minValue = Math.log10(yAxisElement.getMinValue());
-            maxValue = Math.log10(yAxisElement.getMaxValue());
+            if (yAxisElement.getMinValue() > 10e-50 && yAxisElement.getMaxValue() > 10e-50) {
+                minValue = Math.log10(yAxisElement.getMinValue());
+                maxValue = Math.log10(yAxisElement.getMaxValue());
+            }
         } else {
             minValue = yAxisElement.getMinValue();
             maxValue = yAxisElement.getMaxValue();
@@ -514,17 +518,19 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
         for (YAxisElement yAxisElement : drawController.getYAxisElements(identifier)) {
             double logMinValue;
             double logMaxValue;
-            if (yAxisElement.isLogScale()) {
-                logMinValue = Math.log10(yAxisElement.getMinValue());
-                logMaxValue = Math.log10(yAxisElement.getMaxValue());
-            } else {
-                logMinValue = yAxisElement.getMinValue();
-                logMaxValue = yAxisElement.getMaxValue();
+            if (!yAxisElement.isLogScale()
+                    || (yAxisElement.isLogScale() && yAxisElement.getMinValue() > 10e-50 && yAxisElement.getMaxValue() > 10e-50)) {
+                if (yAxisElement.isLogScale()) {
+                    logMinValue = Math.log10(yAxisElement.getMinValue());
+                    logMaxValue = Math.log10(yAxisElement.getMaxValue());
+                } else {
+                    logMinValue = yAxisElement.getMinValue();
+                    logMaxValue = yAxisElement.getMaxValue();
+                }
+                double ratioY = logMaxValue < logMinValue ? graphArea.height / (logMinValue - logMaxValue) : graphArea.height
+                        / (logMaxValue - logMinValue);
+                yRatios.put(yAxisElement, ratioY);
             }
-            double ratioY = logMaxValue < logMinValue ? graphArea.height / (logMinValue - logMaxValue) : graphArea.height
-                    / (logMaxValue - logMinValue);
-            yRatios.put(yAxisElement, ratioY);
-
         }
     }
 
@@ -744,15 +750,27 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
 
     @Override
     public void drawRequest() {
-        EventQueue.invokeLater(new Runnable() {
-            @Override
-            public void run() {
-                long start = System.currentTimeMillis();
-                updateGraph();
-                repaint();
-                Log.debug("draw request time: " + (System.currentTimeMillis() - start));
-            }
-        });
+        if (!EventQueue.isDispatchThread()) {
+            Log.debug("Called outside the Event queue");
+            EventQueue.invokeLater(new Runnable() {
+                @Override
+                public void run() {
+                    long start = System.currentTimeMillis();
+                    updateGraph();
+                    Log.error("repaint request");
+                    Thread.dumpStack();
+                    repaint();
+                    Log.debug("draw request time: " + (System.currentTimeMillis() - start));
+                }
+            });
+        } else {
+            Log.debug("Called in eventQueue");
+            long start = System.currentTimeMillis();
+            updateGraph();
+            repaint();
+            Log.debug("draw request time: " + (System.currentTimeMillis() - start));
+        }
+
     }
 
     @Override
@@ -762,12 +780,14 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
 
     @Override
     public void drawMovieLineRequest(Date time) {
-        movieTimestamp = time;
+        if (movieTimestamp == null || !movieTimestamp.equals(time)) {
+            movieTimestamp = time;
 
-        updateMovieLineInformation();
+            updateMovieLineInformation();
 
-        if (!TimeIntervalLockModel.getInstance().isLocked()) {
-            repaint();
+            if (!TimeIntervalLockModel.getInstance().isLocked()) {
+                repaint();
+            }
         }
     }
 }
