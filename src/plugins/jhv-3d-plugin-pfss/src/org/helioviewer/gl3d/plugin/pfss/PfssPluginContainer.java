@@ -50,7 +50,7 @@ public class PfssPluginContainer extends OverlayContainer {
      */
     @Override
     public String getName() {
-        return "PFSS " + (builtin_mode ? "Built-In Version" : "");
+        return "PFSS Model " + (builtin_mode ? "Built-In Version" : "");
     }
 
     @Override
