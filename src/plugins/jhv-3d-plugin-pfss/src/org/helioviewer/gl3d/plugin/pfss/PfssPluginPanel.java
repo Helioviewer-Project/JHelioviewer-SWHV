@@ -112,6 +112,7 @@ public class PfssPluginPanel extends OverlayPanel implements ActionListener, Lay
         setEnabled(true);
 
         GridBagConstraints c0 = new GridBagConstraints();
+        c0.anchor = GridBagConstraints.WEST;
         c0.insets = new Insets(0, 0, 5, 0);
         c0.gridx = 0;
         c0.gridy = 1;
@@ -129,14 +130,9 @@ public class PfssPluginPanel extends OverlayPanel implements ActionListener, Lay
         WheelSupport.installMouseWheelSupport(qualitySpinner);
 
         JPanel helpPanel = new JPanel();
-        helpPanel.add(new JLabel("Level:"));
+        helpPanel.add(new JLabel("Level"));
         helpPanel.add(qualitySpinner);
-        this.add(helpPanel, c0);
 
-        GridBagConstraints c1 = new GridBagConstraints();
-        c1.insets = new Insets(0, 0, 5, 0);
-        c1.gridx = 0;
-        c1.gridy = 2;
         JCheckBox fixedColors = new JCheckBox("Fixed colors", false);
         fixedColors.addItemListener(new ItemListener() {
             @Override
@@ -145,7 +141,9 @@ public class PfssPluginPanel extends OverlayPanel implements ActionListener, Lay
                 Displayer.getSingletonInstance().display();
             }
         });
-        this.add(fixedColors, c1);
+        helpPanel.add(fixedColors);
+        this.add(helpPanel, c0);
+
         this.dateLabel = new JLabel(VOIDDATELABEL);
 
         GridBagConstraints c4 = new GridBagConstraints();
@@ -348,9 +346,9 @@ public class PfssPluginPanel extends OverlayPanel implements ActionListener, Lay
 
     public void setDate(String date) {
         if (date == "" || date == null) {
-            this.dateLabel.setText("****-**-**T**:**:**");
+            this.dateLabel.setText("PFSS time: ****-**-**T**:**:**");
         } else {
-            this.dateLabel.setText("Date: " + date);
+            this.dateLabel.setText("PFSS time: " + date);
         }
     }
 }
