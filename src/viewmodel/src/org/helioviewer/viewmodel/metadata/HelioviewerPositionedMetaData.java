@@ -64,7 +64,7 @@ public class HelioviewerPositionedMetaData extends HelioviewerMetaData implement
             }
         }
         this.stonyhurstLongitude = metaDataContainer.tryGetDouble("HGLN_OBS");
-        if (this.stonyhurstLongitude == 0) {
+        if (this.refl0 != 0.) {
             this.stonyhurstLongitude = this.refl0 - Astronomy.getL0Degree(this.getDateTime().getTime());
         }
 
