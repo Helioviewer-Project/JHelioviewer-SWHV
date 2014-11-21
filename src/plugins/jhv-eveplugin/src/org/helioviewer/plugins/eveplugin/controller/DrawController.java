@@ -312,4 +312,18 @@ public class DrawController implements ZoomControllerListener, LineDataSelectorM
             }
         }
     }
+
+    public Date getLastDateWithData() {
+        synchronized (drawControllerData) {
+            Date lastDate = null;
+            for (DrawControllerData dcd : drawControllerData.values()) {
+                if (dcd.getLastDateWithData() != null) {
+                    if (lastDate == null || lastDate.before(dcd.getLastDateWithData())) {
+                        lastDate = dcd.getLastDateWithData();
+                    }
+                }
+            }
+            return lastDate;
+        }
+    }
 }

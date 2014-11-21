@@ -197,7 +197,13 @@ public class ZoomController implements PlotAreaSpaceListener {
 
     private Interval<Date> computeZoomInterval(final Interval<Date> interval, final int calendarField, final int difference) {
         final Date startDate = interval.getStart();
-        final Date endDate = interval.getEnd();
+        Date endDate = interval.getEnd();
+        final Date lastdataDate = DrawController.getSingletonInstance().getLastDateWithData();
+        if (lastdataDate != null) {
+            if (endDate.after(lastdataDate)) {
+                endDate = lastdataDate;
+            }
+        }
         final Date availableStartDate = availableInterval.getStart();
 
         if (startDate == null || endDate == null || availableStartDate == null) {
@@ -209,7 +215,7 @@ public class ZoomController implements PlotAreaSpaceListener {
         // add difference to start date -> when calculated end date is within
         // available interval it is the result
         calendar.clear();
-        calendar.setTime(selectedInterval.getEnd());
+        calendar.setTime(endDate);
         calendar.add(calendarField, -difference);
 
         if (availableInterval.containsPointInclusive(calendar.getTime())) {

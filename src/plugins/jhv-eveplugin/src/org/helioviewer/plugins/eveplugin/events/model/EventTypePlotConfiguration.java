@@ -1,6 +1,7 @@
 package org.helioviewer.plugins.eveplugin.events.model;
 
 import java.awt.Point;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -26,6 +27,8 @@ public class EventTypePlotConfiguration {
     /** The plot configurations for all events ordered per event type */
     private final Map<String, List<EventPlotConfiguration>> eventPlotConfigurations;
 
+    private final Date lastDateWithData;
+
     /**
      * Default constructor.
      * 
@@ -35,6 +38,7 @@ public class EventTypePlotConfiguration {
         totalNrLines = 0;
         maxLinesPerEventType = new HashMap<String, Integer>();
         eventPlotConfigurations = new HashMap<String, List<EventPlotConfiguration>>();
+        lastDateWithData = null;
     }
 
     /**
@@ -52,11 +56,12 @@ public class EventTypePlotConfiguration {
      *            the event plot configurations
      */
     public EventTypePlotConfiguration(int nrOfEventTypes, int totalNrLines, Map<String, Integer> maxLinesPerEventType,
-            Map<String, List<EventPlotConfiguration>> eventPlotConfigurations) {
+            Map<String, List<EventPlotConfiguration>> eventPlotConfigurations, Date lastDateWithData) {
         this.nrOfEventTypes = nrOfEventTypes;
         this.totalNrLines = totalNrLines;
         this.maxLinesPerEventType = maxLinesPerEventType;
         this.eventPlotConfigurations = eventPlotConfigurations;
+        this.lastDateWithData = lastDateWithData;
     }
 
     /**
@@ -112,5 +117,9 @@ public class EventTypePlotConfiguration {
             }
         }
         return null;
+    }
+
+    public Date getLastDateWithData() {
+        return lastDateWithData;
     }
 }

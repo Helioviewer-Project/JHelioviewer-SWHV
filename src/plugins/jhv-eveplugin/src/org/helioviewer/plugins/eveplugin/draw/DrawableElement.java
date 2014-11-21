@@ -2,6 +2,7 @@ package org.helioviewer.plugins.eveplugin.draw;
 
 import java.awt.Graphics2D;
 import java.awt.Rectangle;
+import java.util.Date;
 
 public interface DrawableElement {
     public abstract DrawableElementType getDrawableElementType();
@@ -13,4 +14,6 @@ public interface DrawableElement {
     public abstract YAxisElement getYAxisElement();
 
     public abstract boolean hasElementsToDraw();
+
+    public abstract Date getLastDateWithData();
 }
