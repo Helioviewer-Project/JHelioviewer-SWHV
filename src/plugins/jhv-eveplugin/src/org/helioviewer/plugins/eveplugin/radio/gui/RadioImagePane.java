@@ -8,6 +8,7 @@ import java.awt.image.BufferedImage;
 import java.awt.image.ImageObserver;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Date;
 
 import org.helioviewer.plugins.eveplugin.draw.DrawableElement;
 import org.helioviewer.plugins.eveplugin.draw.DrawableElementType;
@@ -110,5 +111,10 @@ public class RadioImagePane implements ImageObserver, RadioPlotModelListener, Dr
 
     public boolean getIntervalTooBig() {
         return intervalTooBig;
+    }
+
+    @Override
+    public Date getLastDateWithData() {
+        return null;
     }
 }

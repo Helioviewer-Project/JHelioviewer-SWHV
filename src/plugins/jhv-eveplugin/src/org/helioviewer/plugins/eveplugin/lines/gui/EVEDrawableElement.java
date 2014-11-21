@@ -32,6 +32,7 @@ public class EVEDrawableElement implements DrawableElement {
     private EVEValues[] values = null;
     private Interval<Date> interval;
     private YAxisElement yAxisElement;
+    private Date lastDateWithData;
 
     public EVEDrawableElement(Interval<Date> interval, Band[] bands, EVEValues[] values, YAxisElement yAxisElement) {
         this.interval = interval;
@@ -39,6 +40,7 @@ public class EVEDrawableElement implements DrawableElement {
         this.values = values;
         this.yAxisElement = yAxisElement;
         intervalAvailable = interval.getStart() != null && interval.getEnd() != null;
+        lastDateWithData = null;
     }
 
     public EVEDrawableElement() {
@@ -122,7 +124,9 @@ public class EVEDrawableElement implements DrawableElement {
                             y = computeY(eveValues[j].getValue().doubleValue(), interval, graphArea, ratioY, minValue);
                         }
                         final Point point = new Point(x, y);
-
+                        if (lastDateWithData == null || eveValues[j].getDate().after(lastDateWithData)) {
+                            lastDateWithData = eveValues[j].getDate();
+                        }
                         pointList.add(point);
                         counter++;
                     }
@@ -265,5 +269,10 @@ public class EVEDrawableElement implements DrawableElement {
         this.values = values;
         this.yAxisElement = yAxisElement;
         intervalAvailable = interval.getStart() != null && interval.getEnd() != null;
+    }
+
+    @Override
+    public Date getLastDateWithData() {
+        return lastDateWithData;
     }
 }

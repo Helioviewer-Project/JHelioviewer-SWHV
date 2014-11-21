@@ -2,6 +2,7 @@ package org.helioviewer.plugins.eveplugin.controller;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -119,6 +120,20 @@ public class DrawControllerData {
                 }
             }
         }
+    }
+
+    public Date getLastDateWithData() {
+        Date lastDate = null;
+        for (Set<DrawableElement> des : drawableElements.values()) {
+            for (DrawableElement de : des) {
+                if (lastDate == null || de.getLastDateWithData().before(lastDate)) {
+                    if (de.getLastDateWithData() != null) {
+                        lastDate = de.getLastDateWithData();
+                    }
+                }
+            }
+        }
+        return lastDate;
     }
 
     private void createYAxisSet() {

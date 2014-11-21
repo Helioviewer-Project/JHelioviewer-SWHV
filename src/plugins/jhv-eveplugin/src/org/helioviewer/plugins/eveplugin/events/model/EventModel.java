@@ -215,6 +215,7 @@ public class EventModel implements ZoomControllerListener, EventRequesterListene
                 int maxNrLines = 0;
                 Map<String, Integer> linesPerEventType = new HashMap<String, Integer>();
                 Map<String, List<EventPlotConfiguration>> eventPlotConfigPerEventType = new HashMap<String, List<EventPlotConfiguration>>();
+                Date tempLastDateWithData = null;
                 for (String eventType : events.keySet()) {
                     ArrayList<Date> endDates = new ArrayList<Date>();
                     List<EventPlotConfiguration> plotConfig = new ArrayList<EventPlotConfiguration>();
@@ -266,6 +267,9 @@ public class EventModel implements ZoomControllerListener, EventRequesterListene
                                     if (nrLines > maxEventLines) {
                                         maxEventLines = nrLines;
                                     }
+                                    if (tempLastDateWithData == null || tempLastDateWithData.before(event.getEndDate())) {
+                                        tempLastDateWithData = event.getEndDate();
+                                    }
                                     plotConfig.add(new EventPlotConfiguration(event, scaledX0, scaledX1, eventPosition));
                                 } else {
                                     // Log.debug("Event with unique ID : " +
@@ -278,7 +282,8 @@ public class EventModel implements ZoomControllerListener, EventRequesterListene
                     maxNrLines += maxEventLines;
                     eventPlotConfigPerEventType.put(eventType, plotConfig);
                 }
-                return new EventTypePlotConfiguration(events.size(), maxNrLines, linesPerEventType, eventPlotConfigPerEventType);
+                return new EventTypePlotConfiguration(events.size(), maxNrLines, linesPerEventType, eventPlotConfigPerEventType,
+                        tempLastDateWithData);
             }
 
             @Override

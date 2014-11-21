@@ -5,6 +5,7 @@ import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.Rectangle;
 import java.awt.Stroke;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -89,5 +90,10 @@ public class EventPanel implements DrawableElement {
     @Override
     public boolean hasElementsToDraw() {
         return !EventModel.getSingletonInstance().getEventTypePlotConfiguration().getEventPlotConfigurations().isEmpty();
+    }
+
+    @Override
+    public Date getLastDateWithData() {
+        return EventModel.getSingletonInstance().getEventTypePlotConfiguration().getLastDateWithData();
     }
 }
