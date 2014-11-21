@@ -198,9 +198,9 @@ public class ZoomController implements PlotAreaSpaceListener {
     private Interval<Date> computeZoomInterval(final Interval<Date> interval, final int calendarField, final int difference) {
         final Date startDate = interval.getStart();
         final Date endDate = interval.getEnd();
-        final Date availableEndDate = availableInterval.getEnd();
+        final Date availableStartDate = availableInterval.getStart();
 
-        if (startDate == null || endDate == null || availableEndDate == null) {
+        if (startDate == null || endDate == null || availableStartDate == null) {
             return new Interval<Date>(null, null);
         }
 
@@ -209,21 +209,21 @@ public class ZoomController implements PlotAreaSpaceListener {
         // add difference to start date -> when calculated end date is within
         // available interval it is the result
         calendar.clear();
-        calendar.setTime(selectedInterval.getStart());
-        calendar.add(calendarField, difference);
+        calendar.setTime(selectedInterval.getEnd());
+        calendar.add(calendarField, -difference);
 
         if (availableInterval.containsPointInclusive(calendar.getTime())) {
-            return new Interval<Date>(startDate, calendar.getTime());
+            return new Interval<Date>(calendar.getTime(), endDate);
         }
 
         // computed end date is outside of available interval -> compute start
         // date from available end date based on difference
         calendar.clear();
-        calendar.setTime(availableEndDate);
-        calendar.add(calendarField, -difference);
+        calendar.setTime(availableStartDate);
+        calendar.add(calendarField, difference);
 
         if (availableInterval.containsPointInclusive(calendar.getTime())) {
-            return new Interval<Date>(calendar.getTime(), availableEndDate);
+            return new Interval<Date>(availableStartDate, calendar.getTime());
         }
 
         // available interval is smaller then requested one -> return available
