@@ -88,12 +88,12 @@ public class SWEKPlugin implements Plugin {
      */
     @Override
     public String getName() {
-        return "Space Weather Event Knowledgbase";
+        return "Space Weather Event Knowledgebase " + "$Rev$";
     }
 
     @Override
     public String getDescription() {
-        return "A description";
+        return "Space Weather Event Knowledgebase";
     }
 
     @Override

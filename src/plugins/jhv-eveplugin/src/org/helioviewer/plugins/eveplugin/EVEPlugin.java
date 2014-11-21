@@ -80,7 +80,7 @@ public class EVEPlugin implements Plugin, MainContentPanelPlugin {
 
     @Override
     public String getName() {
-        return "EVEPlugin";
+        return "EVEPlugin " + "$Rev$";
     }
 
     @Override
