@@ -234,8 +234,7 @@ public class DrawController implements ZoomControllerListener, LineDataSelectorM
 
     @Override
     public void selectedIntervalChanged(Interval<Date> newInterval, boolean keepFullValueSpace) {
-        interval = newInterval;
-
+        setInterval(newInterval);
     }
 
     @Override
