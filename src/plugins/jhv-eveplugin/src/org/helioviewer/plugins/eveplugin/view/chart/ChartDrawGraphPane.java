@@ -85,6 +85,7 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
     private Rectangle leftAxisArea;
 
     private SwingWorker<BufferedImage, Void> drawGraphWorker;
+    private SwingWorker<BufferedImage, Void> updateGraphWorker;
 
     // //////////////////////////////////////////////////////////////////////////////
     // Methods
@@ -130,11 +131,40 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
     }
 
     private void updateGraph() {
-        updateDrawInformation();
-        redrawGraph();
+        Log.debug("update graph");
+        if (updateGraphWorker != null && !updateGraphWorker.isDone()) {
+            Log.debug("Cancel update graph worker");
+            updateGraphWorker.cancel(true);
+        }
+        updateGraphWorker = new SwingWorker<BufferedImage, Void>() {
+
+            @Override
+            protected BufferedImage doInBackground() throws Exception {
+                Log.debug("Update draw information");
+                updateDrawInformation();
+                Log.debug("Redraw graph");
+                return redrawGraph();
+            }
+
+            @Override
+            protected void done() {
+                try {
+                    BufferedImage tempScreenImage = get();
+                    if (tempScreenImage != null) {
+                        screenImage = tempScreenImage;
+                        Log.debug("repaint chartgraph");
+                        ChartDrawGraphPane.this.repaint();
+                    }
+                } catch (Exception e) {
+
+                }
+            }
+        };
+
+        updateGraphWorker.execute();
     }
 
-    private void redrawGraph() {
+    private BufferedImage redrawGraph() {
         // long start = System.currentTimeMillis();
         final int screenfactor = ChartConstants.getScreenfactor();
         final int width = screenfactor * getWidth();
@@ -142,46 +172,28 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
         if (width > 0 && height > 0
                 && screenfactor * (ChartConstants.getGraphTopSpace() + ChartConstants.getGraphBottomSpace() + 1) < height
                 && screenfactor * (ChartConstants.getGraphLeftSpace() + ChartConstants.getGraphRightSpace() + 1) < width) {
-            if (drawGraphWorker != null && !drawGraphWorker.isDone()) {
-                drawGraphWorker.cancel(true);
-            }
-            drawGraphWorker = new SwingWorker<BufferedImage, Void>() {
+            BufferedImage tempScreenImage = new BufferedImage(width, height, BufferedImage.OPAQUE);
+            final Graphics2D g = tempScreenImage.createGraphics();
+            AffineTransform tf = g.getTransform();
+            tf.preConcatenate(AffineTransform.getScaleInstance(screenfactor, screenfactor));
+            g.setTransform(tf);
+            drawBackground(g);
 
-                @Override
-                protected BufferedImage doInBackground() throws Exception {
-                    BufferedImage screenImage = new BufferedImage(width, height, BufferedImage.OPAQUE);
-                    final Graphics2D g = screenImage.createGraphics();
-                    AffineTransform tf = g.getTransform();
-                    tf.preConcatenate(AffineTransform.getScaleInstance(screenfactor, screenfactor));
-                    g.setTransform(tf);
-                    drawBackground(g);
+            BufferedImage plotPart = tempScreenImage.getSubimage(screenfactor * ChartConstants.getGraphLeftSpace(), screenfactor
+                    * ChartConstants.getGraphTopSpace(), width - screenfactor * ChartConstants.getGraphLeftSpace() - screenfactor
+                    * ChartConstants.getGraphRightSpace() - screenfactor * twoYAxis * ChartConstants.getTwoAxisGraphRight(), height
+                    - screenfactor * ChartConstants.getGraphTopSpace() - screenfactor * ChartConstants.getGraphBottomSpace());
+            Graphics2D gplotPart = plotPart.createGraphics();
+            gplotPart.setTransform(tf);
+            BufferedImage leftAxisPart = tempScreenImage.getSubimage(0, 0, 2 * ChartConstants.getGraphLeftSpace(), height);
+            Graphics2D gleftAxisPart = leftAxisPart.createGraphics();
+            gleftAxisPart.setTransform(tf);
+            drawData(gplotPart, g, gleftAxisPart);
+            drawZoomBox(g);
+            return tempScreenImage;
 
-                    BufferedImage plotPart = screenImage.getSubimage(screenfactor * ChartConstants.getGraphLeftSpace(), screenfactor
-                            * ChartConstants.getGraphTopSpace(), width - screenfactor * ChartConstants.getGraphLeftSpace() - screenfactor
-                            * ChartConstants.getGraphRightSpace() - screenfactor * twoYAxis * ChartConstants.getTwoAxisGraphRight(), height
-                            - screenfactor * ChartConstants.getGraphTopSpace() - screenfactor * ChartConstants.getGraphBottomSpace());
-                    Graphics2D gplotPart = plotPart.createGraphics();
-                    gplotPart.setTransform(tf);
-                    BufferedImage leftAxisPart = screenImage.getSubimage(0, 0, 2 * ChartConstants.getGraphLeftSpace(), height);
-                    Graphics2D gleftAxisPart = leftAxisPart.createGraphics();
-                    gleftAxisPart.setTransform(tf);
-                    drawData(gplotPart, g, gleftAxisPart);
-                    drawZoomBox(g);
-                    return screenImage;
-                }
-
-                @Override
-                protected void done() {
-                    try {
-                        screenImage = get();
-                        ChartDrawGraphPane.this.repaint();
-                    } catch (Exception ignore) {
-                    }
-                }
-            };
-            drawGraphWorker.execute();
         }
-
+        return null;
         // Log.info("Run time: " + (System.currentTimeMillis() - start));
     }
 
