@@ -2,9 +2,9 @@
 
 <project name="build" default="all">
 
-	<property name="src.base" value="${basedir}/src/" />
+    <property name="src.base" value="${basedir}/src/" />
     <property name="src.path" value="${src.base}/jhv/src/:${src.base}/base/src/::${src.base}/basegui/src/:${src.base}/viewmodel/src/:${src.base}/viewmodelplugin/src/:${src.base}/jhv-3d/src/:${src.base}/jhv-3d-wcs/src/:${src.base}/jhv-3d-scenegraph/src/:${src.base}/jhv-3d-math/src/:${src.base}/jhv-3d-plugin/src/:${src.base}/jhv-3d-plugin-vectors/src/:${src.base}/jhv-display/src/:${src.base}/filterPlugins:${src.base}/jhv-3d-ROB:${src.base}/jhv-data/src" />
-        <property name="bin.eclipse" value="${src.base}/jhv/bin/ ${src.base}/base/bin/ ${src.base}/viewmodel/bin/ ${src.base}/viewmodelplugin/bin/ ${src.base}/JHVVectors/bin/ ${src.base}/jhv-3d/bin/ ${src.base}/jhv-3d-scenegraph/bin/ ${src.base}/jhv-3d-math/bin/ ${src.base}/jhv-3d-plugin/bin/ ${src.base}/jhv-3d-plugin-vectors/bin/ ${src.base}/jhv-3d-wcs/bin/ ${src.base}/jhv-display/bin/ ${src.base}/filterPlugins/bin ${src.base}/jhv-3d-ROB/bin" />
+    <property name="bin.eclipse" value="${src.base}/jhv/bin/ ${src.base}/base/bin/ ${src.base}/viewmodel/bin/ ${src.base}/viewmodelplugin/bin/ ${src.base}/JHVVectors/bin/ ${src.base}/jhv-3d/bin/ ${src.base}/jhv-3d-scenegraph/bin/ ${src.base}/jhv-3d-math/bin/ ${src.base}/jhv-3d-plugin/bin/ ${src.base}/jhv-3d-plugin-vectors/bin/ ${src.base}/jhv-3d-wcs/bin/ ${src.base}/jhv-display/bin/ ${src.base}/filterPlugins/bin ${src.base}/jhv-3d-ROB/bin" />
     <property name="doc" value="${basedir}/doc/" />
     <property name="bin" value="${basedir}/bin/" />
     <property name="bin.jhv" value="${bin}/jhv" />
@@ -17,9 +17,13 @@
     <property name="bzrpath" value="bzr" />
 
     <taskdef resource="net/sf/antcontrib/antcontrib.properties">
-      <classpath>
-        <pathelement location="${build.resources}/shared/ant-contrib-1.0b3.jar"/>
-      </classpath>
+        <classpath>
+            <pathelement location="${build.resources}/shared/ant-contrib-1.0b3.jar"/>
+        </classpath>
+    </taskdef>
+
+    <taskdef name="jarbundler" classname="net.sourceforge.jarbundler.JarBundler">
+        <classpath path="${build.resources}/mac/lib/jarbundler.jar"/>
     </taskdef>
 
     <!--
@@ -28,43 +32,39 @@
     </taskdef>
     -->
 
-	<taskdef name="jarbundler" classname="net.sourceforge.jarbundler.JarBundler">
-		<classpath path="${build.resources}/mac/lib/jarbundler.jar"/>
-	</taskdef>
-
-	<target name="mkdir">
+    <target name="mkdir">
         <mkdir dir="${bin}"/>
         <mkdir dir="${bin.jhv}"/>
         <mkdir dir="${build}"/>
         <mkdir dir="${temp}"/>
         <mkdir dir="${doc}"/>
-	</target>
+    </target>
 
-   	<target name="clean" depends="mkdir">
+    <target name="clean" depends="mkdir">
         <delete file="JHelioviewer.jar"/>
         <delete includeemptydirs="true" verbose="true">
-        	<fileset dir="${bin}" followsymlinks="false" defaultexcludes="no"/>
+            <fileset dir="${bin}" followsymlinks="false" defaultexcludes="no"/>
         </delete>
         <delete includeemptydirs="true" verbose="true">
-        	<fileset dir="${build}" followsymlinks="false" defaultexcludes="no"/>
+            <fileset dir="${build}" followsymlinks="false" defaultexcludes="no"/>
         </delete>
         <delete includeemptydirs="true" verbose="true">
-        	<fileset dir="${temp}" followsymlinks="false" defaultexcludes="no"/>
+            <fileset dir="${temp}" followsymlinks="false" defaultexcludes="no"/>
         </delete>
         <delete includeemptydirs="true" verbose="true">
-        	<fileset dir="${doc}" followsymlinks="false" defaultexcludes="no"/>
+            <fileset dir="${doc}" followsymlinks="false" defaultexcludes="no"/>
         </delete>
         <delete includeemptydirs="true" verbose="true">
-        	<fileset dir="${src.base}" includes="${bin.eclipse}"  followsymlinks="false" defaultexcludes="no"/>
+            <fileset dir="${src.base}" includes="${bin.eclipse}"  followsymlinks="false" defaultexcludes="no"/>
         </delete>
         <antcall target="mkdir" />
-	</target>
+    </target>
 
-	<target name="all" depends="sign" />
+    <target name="all" depends="sign" />
 
     <!-- JAR file generation -->
     <target name="init" depends="mkdir">
-       	<echo message="Trying to determine revision" />
+        <echo message="Trying to determine revision" />
         <exec
             executable="${bzrpath}"
             outputproperty="jhv.revision.tmp"
@@ -72,7 +72,7 @@
             searchpath="true"
             resultproperty="jhv.revision.retcode"
             failifexecutionfails="false">
-                <arg value="revno"/>
+            <arg value="revno"/>
         </exec>
         <loadfile property="jhv.version" srcFile="VERSION" />
         <property name="jhv.version" value="2.0.0" />
@@ -91,74 +91,74 @@
         <property name="jhv.pkg.name" value="jhv-${jhv.version}.${jhv.revision}" />
     </target>
 
-	<target name="compile" depends="init" >
-		<javac srcdir="${src.path}" destdir="${bin.jhv}" target="1.6" source="1.6" debug="on" debuglevel="source,lines,vars" includeantruntime="false" encoding="utf-8">
-			<classpath>
-				<fileset dir="${lib}">
-					<include name="**/*.jar" />
-				</fileset>
-			</classpath>
+    <target name="compile" depends="init" >
+        <javac srcdir="${src.path}" destdir="${bin.jhv}" target="1.6" source="1.6" debug="on" debuglevel="source,lines,vars" includeantruntime="false" encoding="utf-8">
+            <classpath>
+                <fileset dir="${lib}">
+                    <include name="**/*.jar" />
+                </fileset>
+            </classpath>
             <exclude name="**/JavaHelioViewerLauncher.java"/>
- 		</javac>
-		<!-- Copy, remove the suppress warning and compile-->
-		<mkdir dir="${temp}/src/org/helioviewer/jhv"/>
-		<copy
+        </javac>
+        <!-- Copy, remove the suppress warning and compile-->
+        <mkdir dir="${temp}/src/org/helioviewer/jhv"/>
+        <copy
             file="${src.base}/jhv/src/org/helioviewer/jhv/JavaHelioViewerLauncher.java" 
             tofile="${temp}/src/org/helioviewer/jhv/JavaHelioViewerLauncher.java"
         />
-		<replace file="${temp}/src/org/helioviewer/jhv/JavaHelioViewerLauncher.java" token='@SuppressWarnings("all")'/>
-		<javac destdir="${bin.jhv}" target="1.6" source="1.5" debug="true" debuglevel="source,lines,vars" includeantruntime="false">
-			<src path="${temp}/src/org/helioviewer/jhv/" />
+        <replace file="${temp}/src/org/helioviewer/jhv/JavaHelioViewerLauncher.java" token='@SuppressWarnings("all")'/>
+        <javac destdir="${bin.jhv}" target="1.6" source="1.5" debug="true" debuglevel="source,lines,vars" includeantruntime="false">
+            <src path="${temp}/src/org/helioviewer/jhv/" />
             <include name="JavaHelioViewerLauncher.java"/>
-		</javac>
+        </javac>
     </target>
 
-	<target name="jar-bundle" depends="compile">
-		<!-- JAR File -->
- 		<jar destfile="JHelioviewer.jar">
-			<manifest>
-				<attribute name="Main-Class" value="org.helioviewer.jhv.JavaHelioViewerLauncher" />
-				<attribute name="Class-Path" value="." />
+    <target name="jar-bundle" depends="compile">
+        <!-- JAR File -->
+        <jar destfile="JHelioviewer.jar">
+            <manifest>
+                <attribute name="Main-Class" value="org.helioviewer.jhv.JavaHelioViewerLauncher" />
+                <attribute name="Class-Path" value="." />
                 <attribute name="Implementation-Version" value="v${jhv.version}r${jhv.revision}" />
                 <attribute name="version" value="${jhv.version}" />
                 <attribute name="revision" value="${jhv.revision}" />
-			</manifest>
+            </manifest>
             <fileset dir="${bin.jhv}" />
             <fileset dir="${resources}" />
             <fileset file="README" />
             <fileset file="COPYING" />
-	        <zipgroupfileset dir="${lib}" includes="**/*.jar"/>
- 		</jar>
+            <zipgroupfileset dir="${lib}" includes="**/*.jar"/>
+        </jar>
         <copy file="JHelioviewer.jar" tofile="${build}/JHelioviewer.jar" />
-	</target>
+    </target>
 
-	<target name="sign" depends="jar-bundle" if="sign.jar">
-		<!-- Use "keytool -genkey -alias signFile -keystore myKeystore"
-			to generate keystore -->
-		<input message="keystore to sign jar file:"
-			addproperty="sign.keystore">
-		</input>
-		<input message="keystore password to sign jar file:"
-			addproperty="sign.storepass">
-			<handler classname="org.apache.tools.ant.input.SecureInputHandler"/>
-		</input>
-		<input message="alias to sign jar file:"
-			addproperty="sign.alias">
-		</input>
-		<input message="private key password to sign jar file:"
-			addproperty="sign.keypass">
-			<handler classname="org.apache.tools.ant.input.SecureInputHandler"/>
-		</input>
-		<signjar jar="JHelioviewer.jar"
-			alias="${sign.alias}"
-			keypass="${sign.keypass}"
-			keystore="${sign.keystore}"
-			storepass="${sign.storepass}"/>
-	</target>
+    <target name="sign" depends="jar-bundle" if="sign.jar">
+        <!-- Use "keytool -genkey -alias signFile -keystore myKeystore"
+            to generate keystore -->
+        <input message="keystore to sign jar file:"
+            addproperty="sign.keystore">
+        </input>
+        <input message="keystore password to sign jar file:"
+            addproperty="sign.storepass">
+            <handler classname="org.apache.tools.ant.input.SecureInputHandler"/>
+        </input>
+        <input message="alias to sign jar file:"
+            addproperty="sign.alias">
+        </input>
+        <input message="private key password to sign jar file:"
+            addproperty="sign.keypass">
+            <handler classname="org.apache.tools.ant.input.SecureInputHandler"/>
+        </input>
+        <signjar jar="JHelioviewer.jar"
+            alias="${sign.alias}"
+            keypass="${sign.keypass}"
+            keystore="${sign.keystore}"
+            storepass="${sign.storepass}"/>
+    </target>
 
 
     <!-- Mac OS bundle -->
-	<target name="release-mac" depends="sign, bundle-mac"/>
+    <target name="release-mac" depends="sign, bundle-mac"/>
 
     <target name="bundle-mac" depends="build-init">
         <if>
@@ -187,7 +187,7 @@
                 <bundleapp outputdirectory="${temp}/build/mac/"
                            name="JHelioviewer"
                            displayname="JHelioviewer"
-                           identifier=""
+                           identifier="org.helioviewer.jhv"
                            mainclassname="org.helioviewer.jhv.JavaHelioViewerLauncher"
                            icon="${build.resources}/mac/JHV_icon.icns"
                            shortversion="${jhv.version}"
@@ -198,20 +198,20 @@
                 -->
 
                 <exec executable="${build.resources}/mac/bundle.sh">
-                	<env key="TEMP" value="${temp}/build/mac" />
-                	<env key="RESOURCES" value="${build.resources}/mac" />
-                	<env key="BUILD" value="${build}" />
-                	<env key="NAME" value="${jhv.pkg.name}" />
-                	<env key="README" value="README" />
-                	<env key="COPYING" value="COPYING" />
-                	<env key="VERSION" value="VERSION" />
+                    <env key="TEMP" value="${temp}/build/mac" />
+                    <env key="RESOURCES" value="${build.resources}/mac" />
+                    <env key="BUILD" value="${build}" />
+                    <env key="NAME" value="${jhv.pkg.name}" />
+                    <env key="README" value="README" />
+                    <env key="COPYING" value="COPYING" />
+                    <env key="VERSION" value="VERSION" />
                 </exec>
             </then>
             <else>
                 <echo> Cannot build MacOS dmg file under ${os.name}.</echo>
             </else>
         </if>
-	</target>
+    </target>
 
     <!-- Windows setup -->
     <taskdef name="nsis" classname="net.sf.nsisant.Task">
@@ -233,8 +233,8 @@
                     <contains string="${os.arch}" substring="ppc" casesensitive="false"/>
                 </and>
                 <then>
-	                <property name="makensis.executable" value="makensis-mac-ppc"/>
-	                <property name="nsis.argument.prefix" value="-"/>
+                    <property name="makensis.executable" value="makensis-mac-ppc"/>
+                    <property name="nsis.argument.prefix" value="-"/>
                 </then>
             </elseif>
             <elseif>
@@ -242,12 +242,12 @@
                     <contains string="${os.name}" substring="mac" casesensitive="false"/>
                 </and>
                 <then>
-	                <property name="makensis.executable" value="makensis-mac-x86"/>
-	                <property name="nsis.argument.prefix" value="-"/>
+                    <property name="makensis.executable" value="makensis-mac-x86"/>
+                    <property name="nsis.argument.prefix" value="-"/>
                 </then>
             </elseif>
             <else>
-	            <property name="makensis.executable" value="makensis.exe"/>
+                <property name="makensis.executable" value="makensis.exe"/>
                 <property name="nsis.argument.prefix" value="/"/>
             </else>
         </if>
@@ -266,8 +266,8 @@
 
     <target name="release-windows" depends="sign,bundle-windows"/>
 
-	<target name="bundle-windows" depends="init-nsis">
-		<exec executable="${nsis.path}/${makensis.executable}" dir="${nsis.path}">
+    <target name="bundle-windows" depends="init-nsis">
+        <exec executable="${nsis.path}/${makensis.executable}" dir="${nsis.path}">
             <arg value="${nsis.argument.prefix}DJHV_VERSION=${jhv.version}" />
             <arg value="${nsis.argument.prefix}DJHV_REVISION=${jhv.revision}" />
             <arg value="${nsis.argument.prefix}DRESOURCE_PATH=${build.resources}/windows" />
@@ -276,16 +276,16 @@
             <arg value="${nsis.argument.prefix}DREADME_FILE=${basedir}/README" />
             <arg value="${nsis.argument.prefix}DCOPYING_FILE=${basedir}/COPYING" />
             <arg value="${nsis.argument.prefix}DVERSION_FILE=${basedir}/VERSION" />
-			<arg value="${build.resources}/windows/windows-setup.nsi"/>
+            <arg value="${build.resources}/windows/windows-setup.nsi"/>
         </exec>
-	</target>
+    </target>
 
     <!-- Linux (just a compressed tarball) -->
     <target name="release-tar" depends="sign, bundle-tar" />
 
     <target name="bundle-tar" depends="build-init">
         <tar destfile="${build}/${jhv.pkg.name}.bin.tar.gz" compression="gzip" >
-        	<zipfileset dir="." includes="JHelioviewer.jar, README, COPYING, VERSION" prefix="${jhv.pkg.name}" />
+            <zipfileset dir="." includes="JHelioviewer.jar, README, COPYING, VERSION" prefix="${jhv.pkg.name}" />
         </tar>
     </target>
 
@@ -346,7 +346,7 @@
                 <fileset dir="${lib}">
                     <include name="**/*.jar"/>
                 </fileset>
-			</classpath>
+            </classpath>
         </javadoc>
     </target>
 
@@ -360,18 +360,18 @@
             classpath="${build}/JHelioviewer.jar" />
     </target>
     <target name="release-plugins" >
-    	<ant antfile="plugins/build.xml" inheritAll="false" target="all"/>
+        <ant antfile="plugins/build.xml" inheritAll="false" target="all"/>
     </target>
 
     <target name="doc-plugins" >
-    	<ant antfile="plugins/build.xml" inheritAll="false" target="doc"/>
+        <ant antfile="plugins/build.xml" inheritAll="false" target="doc"/>
     </target>
 
     <target name="clean-plugins" >
-    	<ant antfile="plugins/build.xml" inheritAll="false" target="clean"/>
+        <ant antfile="plugins/build.xml" inheritAll="false" target="clean"/>
     </target>
 
     <target name="install-plugins" >
-    	<ant antfile="src/plugins/build.xml" inheritAll="false" target="install-plugins"/>
+        <ant antfile="src/plugins/build.xml" inheritAll="false" target="install-plugins"/>
     </target>
 </project>
