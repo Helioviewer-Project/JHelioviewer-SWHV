@@ -109,8 +109,6 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
 
     @Override
     protected void paintComponent(Graphics g) {
-        Log.debug("PaintComponent");
-        Thread.dumpStack();
 
         Graphics2D g2 = (Graphics2D) g;
 
