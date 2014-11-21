@@ -26,6 +26,7 @@ import java.util.Set;
 
 import javax.swing.ImageIcon;
 import javax.swing.JComponent;
+import javax.swing.SwingWorker;
 import javax.swing.event.MouseInputListener;
 
 import org.helioviewer.base.logging.Log;
@@ -83,6 +84,8 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
     private final EventModel eventModel;
     private Rectangle leftAxisArea;
 
+    private SwingWorker<BufferedImage, Void> drawGraphWorker;
+
     // //////////////////////////////////////////////////////////////////////////////
     // Methods
     // //////////////////////////////////////////////////////////////////////////////
@@ -133,32 +136,52 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
 
     private void redrawGraph() {
         // long start = System.currentTimeMillis();
-        int screenfactor = ChartConstants.getScreenfactor();
-        int width = screenfactor * getWidth();
-        int height = screenfactor * getHeight();
+        final int screenfactor = ChartConstants.getScreenfactor();
+        final int width = screenfactor * getWidth();
+        final int height = screenfactor * getHeight();
         if (width > 0 && height > 0
                 && screenfactor * (ChartConstants.getGraphTopSpace() + ChartConstants.getGraphBottomSpace() + 1) < height
                 && screenfactor * (ChartConstants.getGraphLeftSpace() + ChartConstants.getGraphRightSpace() + 1) < width) {
-            screenImage = new BufferedImage(width, height, BufferedImage.OPAQUE);
-            final Graphics2D g = screenImage.createGraphics();
-            AffineTransform tf = g.getTransform();
-            tf.preConcatenate(AffineTransform.getScaleInstance(screenfactor, screenfactor));
-            g.setTransform(tf);
-            drawBackground(g);
+            if (drawGraphWorker != null && !drawGraphWorker.isDone()) {
+                drawGraphWorker.cancel(true);
+            }
+            drawGraphWorker = new SwingWorker<BufferedImage, Void>() {
 
-            BufferedImage plotPart = screenImage.getSubimage(screenfactor * ChartConstants.getGraphLeftSpace(), screenfactor
-                    * ChartConstants.getGraphTopSpace(), width - screenfactor * ChartConstants.getGraphLeftSpace() - screenfactor
-                    * ChartConstants.getGraphRightSpace() - screenfactor * twoYAxis * ChartConstants.getTwoAxisGraphRight(), height
-                    - screenfactor * ChartConstants.getGraphTopSpace() - screenfactor * ChartConstants.getGraphBottomSpace());
-            Graphics2D gplotPart = plotPart.createGraphics();
-            gplotPart.setTransform(tf);
-            BufferedImage leftAxisPart = screenImage.getSubimage(0, 0, 2 * ChartConstants.getGraphLeftSpace(), height);
-            Graphics2D gleftAxisPart = leftAxisPart.createGraphics();
-            gleftAxisPart.setTransform(tf);
-            drawData(gplotPart, g, gleftAxisPart);
-            drawZoomBox(g);
+                @Override
+                protected BufferedImage doInBackground() throws Exception {
+                    BufferedImage screenImage = new BufferedImage(width, height, BufferedImage.OPAQUE);
+                    final Graphics2D g = screenImage.createGraphics();
+                    AffineTransform tf = g.getTransform();
+                    tf.preConcatenate(AffineTransform.getScaleInstance(screenfactor, screenfactor));
+                    g.setTransform(tf);
+                    drawBackground(g);
+
+                    BufferedImage plotPart = screenImage.getSubimage(screenfactor * ChartConstants.getGraphLeftSpace(), screenfactor
+                            * ChartConstants.getGraphTopSpace(), width - screenfactor * ChartConstants.getGraphLeftSpace() - screenfactor
+                            * ChartConstants.getGraphRightSpace() - screenfactor * twoYAxis * ChartConstants.getTwoAxisGraphRight(), height
+                            - screenfactor * ChartConstants.getGraphTopSpace() - screenfactor * ChartConstants.getGraphBottomSpace());
+                    Graphics2D gplotPart = plotPart.createGraphics();
+                    gplotPart.setTransform(tf);
+                    BufferedImage leftAxisPart = screenImage.getSubimage(0, 0, 2 * ChartConstants.getGraphLeftSpace(), height);
+                    Graphics2D gleftAxisPart = leftAxisPart.createGraphics();
+                    gleftAxisPart.setTransform(tf);
+                    drawData(gplotPart, g, gleftAxisPart);
+                    drawZoomBox(g);
+                    return screenImage;
+                }
+
+                @Override
+                protected void done() {
+                    try {
+                        screenImage = get();
+                        ChartDrawGraphPane.this.repaint();
+                    } catch (Exception ignore) {
+                    }
+                }
+            };
+            drawGraphWorker.execute();
         }
-        this.repaint();
+
         // Log.info("Run time: " + (System.currentTimeMillis() - start));
     }
 
@@ -621,7 +644,7 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
 
         if (repaintFlag) {
             updateGraph();
-            repaint();
+            // repaint();
         }
     }
 
@@ -635,7 +658,7 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
 
         if (mousePressedPosition != null && !mousePressedOnMovieFrame) {
             updateGraph();
-            repaint();
+            // repaint();
         }
     }
 
@@ -757,7 +780,7 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
                     updateGraph();
                     Log.error("repaint request");
                     Thread.dumpStack();
-                    repaint();
+                    // repaint();
                     Log.debug("draw request time: " + (System.currentTimeMillis() - start));
                 }
             });
@@ -765,7 +788,7 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
             Log.debug("Called in eventQueue");
             long start = System.currentTimeMillis();
             updateGraph();
-            repaint();
+            // repaint();
             Log.debug("draw request time: " + (System.currentTimeMillis() - start));
         }
 
