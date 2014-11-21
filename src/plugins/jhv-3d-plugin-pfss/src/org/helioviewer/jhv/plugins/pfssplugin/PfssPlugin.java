@@ -82,7 +82,7 @@ public class PfssPlugin extends OverlayPlugin implements Plugin {
      */
     @Override
     public String getName() {
-        return "Pfss Overlay Plugin " + (builtin_mode ? "Built-In Version" : "");
+        return "PFSS Overlay Plugin " + "$Rev$" + (builtin_mode ? " Built-In Version" : "");
     }
 
     /**

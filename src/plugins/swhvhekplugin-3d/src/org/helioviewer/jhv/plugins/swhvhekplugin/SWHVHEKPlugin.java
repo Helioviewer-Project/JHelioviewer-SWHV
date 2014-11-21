@@ -86,7 +86,7 @@ public class SWHVHEKPlugin extends OverlayPlugin implements Plugin {
      */
     @Override
     public String getName() {
-        return "HEK Overlay Plugin " + (builtin_mode ? "Built-In Version" : "");
+        return "SWHV HEK Overlay Plugin " + "$Rev$" + (builtin_mode ? " Built-In Version" : "");
     }
 
     /**
