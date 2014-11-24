@@ -30,7 +30,6 @@ public class GL3DCameraZoomAnimation implements GL3DCameraAnimation {
         this.fovToTravel = fovToTravel;
         this.timeLeft = duration;
         this.fovDelta = fovToTravel / this.timeLeft;
-        // Displayer.getSingletonInstance().animate();
     }
 
     @Override
@@ -61,7 +60,7 @@ public class GL3DCameraZoomAnimation implements GL3DCameraAnimation {
             Displayer.getSingletonInstance().render();
         } else {
             camera.updateCameraTransformation(true);
-            Displayer.getSingletonInstance().render();
+            Displayer.getSingletonInstance().display();
         }
 
         this.lastAnimationTime = System.currentTimeMillis();
