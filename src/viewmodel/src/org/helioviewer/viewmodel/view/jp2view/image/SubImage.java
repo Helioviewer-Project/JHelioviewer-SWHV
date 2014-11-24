@@ -42,7 +42,13 @@ public class SubImage {
      */
     public SubImage(int _x, int _y, int _width, int _height) {
         x = _x;
+        if (x < 0) {
+            x = 0;
+        }
         y = _y;
+        if (y < 0) {
+            y = 0;
+        }
         width = _width;
         height = _height;
 
