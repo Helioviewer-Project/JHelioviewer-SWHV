@@ -3,13 +3,13 @@ package org.helioviewer.plugins.eveplugin.view.chart;
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.FontFormatException;
-import java.awt.Toolkit;
 import java.io.IOException;
 import java.io.InputStream;
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 
 import org.helioviewer.base.FileUtils;
+import org.helioviewer.jhv.Settings;
 
 /**
  * @author Stephan Pagel
@@ -89,13 +89,8 @@ public class ChartConstants {
 
     public static int getScreenfactor() {
         if (scale == -1) {
-            scale = 1;
-
-            Object obj = Toolkit.getDefaultToolkit().getDesktopProperty("apple.awt.contentScaleFactor");
-            if (obj instanceof Float) {
-                Float f = (Float) obj;
-                scale = f.intValue();
-            }
+            scale = Integer.parseInt(Settings.getSingletonInstance().getProperty("apple.retina"));
+            scale = 2;
         }
         return scale;
     }
