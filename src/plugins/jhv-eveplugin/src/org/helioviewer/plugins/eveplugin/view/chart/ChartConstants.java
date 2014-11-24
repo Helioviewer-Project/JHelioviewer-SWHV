@@ -9,7 +9,7 @@ import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 
 import org.helioviewer.base.FileUtils;
-import org.helioviewer.jhv.Settings;
+import org.helioviewer.jhv.display.Displayer;
 
 /**
  * @author Stephan Pagel
@@ -88,11 +88,7 @@ public class ChartConstants {
     private static int scale = -1;
 
     public static int getScreenfactor() {
-        if (scale == -1) {
-            scale = Integer.parseInt(Settings.getSingletonInstance().getProperty("apple.retina"));
-            scale = 2;
-        }
-        return scale;
+        return Displayer.screenScale;
     }
 
     private static Font font = new Font("Arial", Font.PLAIN, 10);

@@ -17,6 +17,7 @@ public class Displayer {
     private boolean displaying = false;
     private int state = 2;
     public static ArrayList<GL3DVec3d> pointList = new ArrayList<GL3DVec3d>();
+    public static int screenScale = 1;
 
     public void register(GL3DComponentFakeInterface gl3dcomponent) {
     }
