@@ -14,6 +14,7 @@ import javax.media.opengl.awt.GLJPanel;
 import org.helioviewer.base.logging.Log;
 import org.helioviewer.base.message.Message;
 import org.helioviewer.jhv.JHVDirectory;
+import org.helioviewer.jhv.Settings;
 import org.helioviewer.jhv.gui.ImageViewerGui;
 import org.helioviewer.viewmodel.view.opengl.GLTextureHelper;
 import org.helioviewer.viewmodel.view.opengl.shader.GLShaderBuilder;
@@ -120,7 +121,7 @@ public class GLInitPanel extends GLJPanel {
                 //Fix for retina displays
                 GLTextureHelper.setPixelHIFactorWidth(parent.getCurrentSurfaceScale(new int[2])[0]);
                 GLTextureHelper.setPixelHIFactorHeight(parent.getCurrentSurfaceScale(new int[2])[1]);
-
+                Settings.getSingletonInstance().setProperty("apple.retina", "" + parent.getCurrentSurfaceScale(new int[2])[0]);
             } else {
                 Message.err("Could not initialize OpenGL", "OpenGL could not be initialized properly during startup. JHelioviewer will start in software mode. OpenGL is not available on the system or incompatible.", false);
             }
