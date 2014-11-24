@@ -57,30 +57,30 @@ public class GL3DCanvas extends GLCanvas implements GLEventListener {
 
     /*
      * private void renderVBO(GL3DState state) {
-     * 
+     *
      * GL2 gl = state.gl;
-     * 
+     *
      * gl.glEnableClientState(GL2.GL_VERTEX_ARRAY);
      * gl.glBindBuffer(GL2.GL_ARRAY_BUFFER, this.positionVBO);
      * gl.glVertexPointer(3, GL2.GL_FLOAT, 3 * BufferUtil.SIZEOF_FLOAT, 0);
-     * 
+     *
      * // Describe to OpenGL where the color data is in the buffer //
      * gl.glEnableClientState(GL2.GL_COLOR_ARRAY); //
      * gl.glBindBuffer(GL2.GL_COLOR_ARRAY, vbo[0]); // gl.glColorPointer(3,
      * GL2.GL_FLOAT, 6 * BufferUtil.SIZEOF_FLOAT, 3 * BufferUtil.SIZEOF_FLOAT);
-     * 
-     * 
+     *
+     *
      * // draw all the shells gl.glBindBuffer(GL2.GL_ELEMENT_ARRAY_BUFFER,
      * this.indexVBO); gl.glColor3f(1,1,0);
-     * 
-     * 
+     *
+     *
      * // draw the lines gl.glDrawElements(GL2.GL_QUADS, 4, GL2.GL_UNSIGNED_INT,
      * 0);
-     * 
+     *
      * gl.glDisableClientState(GL2.GL_VERTEX_ARRAY); //
      * gl.glDisableClientState(GL2.GL_COLOR_ARRAY);
-     * 
-     * 
+     *
+     *
      * // bind with 0, so, switch back to normal pointer operation //
      * gl.glBindBufferARB(GL2.GL_ARRAY_BUFFER_ARB, 0); //
      * gl.glBindBufferARB(GL2.GL_ELEMENT_ARRAY_BUFFER_ARB, 0); }
@@ -181,7 +181,7 @@ public class GL3DCanvas extends GLCanvas implements GLEventListener {
 
     @Override
     public void reshape(GLAutoDrawable autoDrawable, int x, int y, int width, int height) {
-        System.out.println("Reshape");
+
         GL2 gl = (GL2) autoDrawable.getGL();
         GLU glu = new GLU();
         gl.glViewport(0, 0, width, height);
