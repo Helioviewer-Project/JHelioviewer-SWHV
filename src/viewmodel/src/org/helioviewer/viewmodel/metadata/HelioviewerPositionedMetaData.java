@@ -1,5 +1,6 @@
 package org.helioviewer.viewmodel.metadata;
 
+import org.helioviewer.base.math.MathUtils;
 import org.helioviewer.base.physics.Astronomy;
 
 public class HelioviewerPositionedMetaData extends HelioviewerMetaData implements PositionedMetaData {
@@ -69,6 +70,11 @@ public class HelioviewerPositionedMetaData extends HelioviewerMetaData implement
         }
 
         this.stonyhurstAvailable = this.stonyhurstLatitude != 0.0 || this.stonyhurstLongitude != 0.0;
+
+        this.theta = -Astronomy.getB0InRadians(this.getDateTime().getTime());
+        this.phi = Astronomy.getL0Radians(this.getDateTime().getTime());
+        this.phi -= getStonyhurstLongitude() / MathUtils.radeg;
+        this.theta = getStonyhurstLatitude() / MathUtils.radeg;
     }
 
     public double getHEEX() {

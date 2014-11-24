@@ -1,7 +1,10 @@
 package org.helioviewer.jhv.plugins.swhvhekplugin.controller;
 
 import java.awt.Cursor;
+import java.awt.KeyEventDispatcher;
+import java.awt.KeyboardFocusManager;
 import java.awt.Point;
+import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
@@ -21,6 +24,7 @@ import org.helioviewer.jhv.data.datatype.event.JHVEvent;
 import org.helioviewer.jhv.data.datatype.event.JHVPoint;
 import org.helioviewer.jhv.data.datatype.event.JHVPositionInformation;
 import org.helioviewer.jhv.data.guielements.SWEKEventInformationDialog;
+import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.gui.components.BasicImagePanel;
 import org.helioviewer.jhv.gui.interfaces.ImagePanelPlugin;
 import org.helioviewer.jhv.layers.LayersModel;
@@ -48,7 +52,7 @@ import org.helioviewer.viewmodel.viewportimagesize.ViewportImageSize;
  * @author Malte Nuhn
  *
  */
-public class SWHVHEKImagePanelEventPopupController implements ImagePanelPlugin, MouseListener, MouseMotionListener, ViewListener {
+public class SWHVHEKImagePanelEventPopupController implements KeyEventDispatcher, ImagePanelPlugin, MouseListener, MouseMotionListener, ViewListener {
 
     // ///////////////////////////////////////////////////////////////////////////
     // Definitions
@@ -57,6 +61,7 @@ public class SWHVHEKImagePanelEventPopupController implements ImagePanelPlugin, 
     private static final Cursor helpCursor = Cursor.getPredefinedCursor(Cursor.HAND_CURSOR);
     private static final int xOffset = 12;
     private static final int yOffset = 12;
+    private boolean aPressed = false;
 
     private View view;
     private ViewportView viewportView;
@@ -74,6 +79,9 @@ public class SWHVHEKImagePanelEventPopupController implements ImagePanelPlugin, 
     // ///////////////////////////////////////////////////////////////////////////
     // Methods
     // ///////////////////////////////////////////////////////////////////////////
+    public SWHVHEKImagePanelEventPopupController() {
+        KeyboardFocusManager.getCurrentKeyboardFocusManager().addKeyEventDispatcher(this);
+    }
 
     /**
      * {@inheritDoc}
@@ -165,11 +173,49 @@ public class SWHVHEKImagePanelEventPopupController implements ImagePanelPlugin, 
 
     }
 
+    @Override
+    public boolean dispatchKeyEvent(KeyEvent ke) {
+        synchronized (this) {
+            switch (ke.getID()) {
+            case KeyEvent.KEY_PRESSED:
+                System.out.println(ke.getKeyCode());
+                if (ke.getKeyCode() == KeyEvent.VK_A) {
+                    aPressed = true;
+                }
+                if (ke.getKeyCode() == KeyEvent.VK_R) {
+                    Displayer.pointList = new ArrayList<GL3DVec3d>();
+                    Displayer.getSingletonInstance().display();
+                }
+                break;
+
+            case KeyEvent.KEY_RELEASED:
+                if (ke.getKeyCode() == KeyEvent.VK_A) {
+                    aPressed = false;
+                }
+                break;
+            }
+
+            return false;
+        }
+    }
+
+    public boolean isAPressed() {
+        synchronized (this) {
+            return aPressed;
+        }
+    }
+
     /**
      * {@inheritDoc}
      */
     @Override
     public void mouseClicked(final MouseEvent e) {
+        /*
+         * GL3DVec3d hitpoint = getHitPoint(e); if (hitpoint != null &&
+         * isAPressed()) { Displayer.pointList.add(new GL3DVec3d(hitpoint.x,
+         * -hitpoint.y, hitpoint.z)); }
+         */
+        //Uncomment to enable point and click
         if (mouseOverJHVEvent != null) {
 
             // should never be the case
@@ -330,4 +376,31 @@ public class SWHVHEKImagePanelEventPopupController implements ImagePanelPlugin, 
     public void detach() {
     }
 
+    public GL3DVec3d getHitPoint(MouseEvent e) {
+        GL3DVec3d hitpoint = null;
+
+        if (view instanceof GL3DComponentView && GL3DState.get() != null && GL3DState.get().getActiveCamera() != null) {
+            state3D = true;
+
+            GL3DComponentView gl3dview = (GL3DComponentView) view;
+            GL3DSceneGraphView scenegraphview = (GL3DSceneGraphView) gl3dview.getView();
+            scenegraphview.getHitReferenceShape().setHitCoronaPlane(true);
+            scenegraphview.getHitReferenceShape().setUseEarthPlane(true);
+            GL3DRayTracer rayTracer = new GL3DRayTracer(scenegraphview.getHitReferenceShape(), GL3DState.get().getActiveCamera());
+
+            GL3DRay ray = null;
+
+            ray = rayTracer.cast(e.getX(), e.getY());
+
+            if (ray != null) {
+                if (ray.getHitPoint() != null) {
+
+                    hitpoint = ray.getHitPoint();
+                }
+            }
+            scenegraphview.getHitReferenceShape().setHitCoronaPlane(false);
+
+        }
+        return hitpoint;
+    }
 }

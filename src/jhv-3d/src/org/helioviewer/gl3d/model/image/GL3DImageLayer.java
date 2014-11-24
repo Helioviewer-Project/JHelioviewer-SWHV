@@ -12,6 +12,8 @@ import org.helioviewer.gl3d.model.GL3DHitReferenceShape;
 import org.helioviewer.gl3d.scenegraph.GL3DGroup;
 import org.helioviewer.gl3d.scenegraph.GL3DShape;
 import org.helioviewer.gl3d.scenegraph.GL3DState;
+import org.helioviewer.gl3d.scenegraph.math.GL3DMat4d;
+import org.helioviewer.gl3d.scenegraph.math.GL3DQuatd;
 import org.helioviewer.gl3d.scenegraph.math.GL3DVec3d;
 import org.helioviewer.gl3d.scenegraph.math.GL3DVec4d;
 import org.helioviewer.gl3d.scenegraph.rt.GL3DRay;
@@ -21,6 +23,7 @@ import org.helioviewer.gl3d.view.GL3DImageTextureView;
 import org.helioviewer.gl3d.view.GL3DView;
 import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.viewmodel.changeevent.ChangeEvent;
+import org.helioviewer.viewmodel.metadata.HelioviewerMetaData;
 import org.helioviewer.viewmodel.metadata.MetaData;
 import org.helioviewer.viewmodel.region.Region;
 import org.helioviewer.viewmodel.region.StaticRegion;
@@ -29,7 +32,6 @@ import org.helioviewer.viewmodel.view.MetaDataView;
 import org.helioviewer.viewmodel.view.RegionView;
 import org.helioviewer.viewmodel.view.View;
 import org.helioviewer.viewmodel.view.ViewListener;
-import org.helioviewer.viewmodel.view.jp2view.JHVJPXView;
 
 /**
  * This is the scene graph equivalent of an image layer sub view chain attached
@@ -156,10 +158,24 @@ public abstract class GL3DImageLayer extends GL3DGroup implements GL3DCameraList
 
     private void updateROI(GL3DCamera activeCamera) {
         MetaData metaData = metaDataView.getMetaData();
+        HelioviewerMetaData hvmd = null;
+        if (metaData instanceof HelioviewerMetaData) {
+            hvmd = (HelioviewerMetaData) metaData;
+        }
         if (metaData == null) {
             return;
         }
-
+        double phi = 0;
+        double theta = 0;
+        phi = hvmd.getPhi();
+        theta = hvmd.getTheta();
+        this.accellerationShape.setPhi(phi);
+        this.accellerationShape.setTheta(theta);
+        //GL3DQuatd rth = GL3DQuatd.createRotation(phi, new GL3DVec3d(0, 1, 0));
+        //rth.rotate(GL3DQuatd.createRotation(-theta, new GL3DVec3d(1, 0, 0)));
+        GL3DQuatd rth = GL3DQuatd.createRotation(theta, new GL3DVec3d(1, 0, 0));
+        rth.rotate(GL3DQuatd.createRotation(phi, new GL3DVec3d(0, 1, 0)));
+        GL3DMat4d rt = rth.toMatrix();
         GL3DRayTracer rayTracer = new GL3DRayTracer(this.accellerationShape, activeCamera);
 
         int width = (int) activeCamera.getWidth();
@@ -170,6 +186,10 @@ public abstract class GL3DImageLayer extends GL3DGroup implements GL3DCameraList
         double maxPhysicalY = -Double.MAX_VALUE;
 
         double res = 10.;
+        boolean addpoints = false;
+        if (Displayer.pointList.size() == 0) {
+            //addpoints = true;//Uncomment to debug ROI problems, press "R" to capture region
+        }
         for (int i = 0; i <= res; i++) {
             for (int j = 0; j <= 1; j++) {
                 for (final boolean on : new boolean[] { false, true }) {
@@ -178,6 +198,10 @@ public abstract class GL3DImageLayer extends GL3DGroup implements GL3DCameraList
                     GL3DVec3d hitPoint = ray.getHitPoint();
                     if (hitPoint != null) {
                         hitPoint = ray.getHitPoint();
+                        if (addpoints && hitPoint != null) {
+                            Displayer.pointList.add(new GL3DVec3d(hitPoint.x, -hitPoint.y, hitPoint.z));
+                        }
+                        hitPoint = rt.multiply(hitPoint);
                         minPhysicalX = Math.min(minPhysicalX, hitPoint.x);
                         minPhysicalY = Math.min(minPhysicalY, hitPoint.y);
                         maxPhysicalX = Math.max(maxPhysicalX, hitPoint.x);
@@ -194,6 +218,11 @@ public abstract class GL3DImageLayer extends GL3DGroup implements GL3DCameraList
                     GL3DVec3d hitPoint = ray.getHitPoint();
                     if (hitPoint != null) {
                         hitPoint = ray.getHitPoint();
+                        if (addpoints && hitPoint != null) {
+                            Displayer.pointList.add(new GL3DVec3d(hitPoint.x, -hitPoint.y, hitPoint.z));
+                        }
+                        hitPoint = rt.multiply(hitPoint);
+
                         minPhysicalX = Math.min(minPhysicalX, hitPoint.x);
                         minPhysicalY = Math.min(minPhysicalY, hitPoint.y);
                         maxPhysicalX = Math.max(maxPhysicalX, hitPoint.x);
@@ -214,6 +243,7 @@ public abstract class GL3DImageLayer extends GL3DGroup implements GL3DCameraList
 
         double regionWidth = maxPhysicalX - minPhysicalX;
         double regionHeight = maxPhysicalY - minPhysicalY;
+        //if (addpoints) {//Uncomment to debug ROI problems,
         if (regionWidth > 0 && regionHeight > 0) {
             Region newRegion = StaticRegion.createAdaptedRegion(minPhysicalX, minPhysicalY, regionWidth, regionHeight);
             this.regionView.setRegion(newRegion, new ChangeEvent());
@@ -221,6 +251,7 @@ public abstract class GL3DImageLayer extends GL3DGroup implements GL3DCameraList
             Region newRegion = StaticRegion.createAdaptedRegion(metaData.getPhysicalLowerLeft().getX(), metaData.getPhysicalLowerLeft().getY(), metaData.getPhysicalUpperRight().getX() - metaData.getPhysicalLowerLeft().getX(), metaData.getPhysicalUpperRight().getY() - metaData.getPhysicalLowerLeft().getY());
             this.regionView.setRegion(newRegion, new ChangeEvent());
         }
+        //}
         this.markAsChanged();
     }
 

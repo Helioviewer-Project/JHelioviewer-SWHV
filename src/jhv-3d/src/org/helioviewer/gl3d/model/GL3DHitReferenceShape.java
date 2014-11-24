@@ -5,7 +5,6 @@ import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.List;
 
-import org.helioviewer.base.math.MathUtils;
 import org.helioviewer.base.physics.Astronomy;
 import org.helioviewer.base.physics.Constants;
 import org.helioviewer.gl3d.model.image.GL3DImageMesh;
@@ -20,12 +19,10 @@ import org.helioviewer.gl3d.scenegraph.math.GL3DVec2d;
 import org.helioviewer.gl3d.scenegraph.math.GL3DVec3d;
 import org.helioviewer.gl3d.scenegraph.math.GL3DVec4d;
 import org.helioviewer.gl3d.scenegraph.rt.GL3DRay;
+import org.helioviewer.jhv.layers.LayersModel;
 import org.helioviewer.viewmodel.changeevent.ChangeEvent;
-import org.helioviewer.viewmodel.changeevent.TimestampChangedReason;
-import org.helioviewer.viewmodel.metadata.HelioviewerPositionedMetaData;
-import org.helioviewer.viewmodel.view.LinkedMovieManager;
+import org.helioviewer.viewmodel.metadata.HelioviewerMetaData;
 import org.helioviewer.viewmodel.view.MetaDataView;
-import org.helioviewer.viewmodel.view.TimedMovieView;
 import org.helioviewer.viewmodel.view.View;
 import org.helioviewer.viewmodel.view.ViewListener;
 
@@ -47,11 +44,13 @@ public class GL3DHitReferenceShape extends GL3DMesh implements ViewListener {
 
     private Date currentDate;
 
-    private long timediff;
-
-    private double currentRotation;
-
     private final GL3DQuatd localRotation;
+
+    private double phi = 0.;
+
+    private double theta = 0.;
+
+    private boolean useEarthPlane = false;
 
     public GL3DHitReferenceShape() {
         this(false);
@@ -110,7 +109,6 @@ public class GL3DHitReferenceShape extends GL3DMesh implements ViewListener {
         if (isDrawBitOn(Bit.Hidden) || this.wmI == null) {
             return false;
         }
-
         ray.setOriginOS(this.wmI.multiply(this.localRotation.toMatrix().multiply(ray.getOrigin())));
         GL3DVec3d helpingDir = this.wmI.multiply(this.localRotation.toMatrix().multiply(ray.getDirection()));
         helpingDir.normalize();
@@ -121,13 +119,12 @@ public class GL3DHitReferenceShape extends GL3DMesh implements ViewListener {
     @Override
     public boolean shapeHit(GL3DRay ray) {
         boolean isSphereHit = false;
-        if (!this.hitCoronaPlane) {
-            isSphereHit = isSphereHit(ray);
-            if (isSphereHit) {
-                ray.isOnSun = true;
-            }
-        } else if (this.hitCoronaPlane || !isSphereHit) {
-            super.shapeHit(ray);
+        isSphereHit = isSphereHit(ray);
+        if (isSphereHit) {
+            ray.isOnSun = true;
+        }
+        if (this.hitCoronaPlane || !isSphereHit) {
+            super.shapeHit(ray, this.getExtraRotation());
         }
         if (ray.getHitPoint() != null) {
             ray.setHitPointOS(this.wmI.multiply(this.localRotation.toMatrix().multiply(ray.getHitPoint())));
@@ -199,33 +196,43 @@ public class GL3DHitReferenceShape extends GL3DMesh implements ViewListener {
 
     @Override
     public void viewChanged(View sender, ChangeEvent aEvent) {
-        TimestampChangedReason timestampReason = aEvent.getLastChangedReasonByType(TimestampChangedReason.class);
-        if ((timestampReason != null) && (timestampReason.getView() instanceof TimedMovieView) && LinkedMovieManager.getActiveInstance().isMaster((TimedMovieView) timestampReason.getView())) {
-            currentDate = timestampReason.getNewDateTime().getTime();
-            updateRotation(timestampReason.getView());
-        }
     }
 
-    public void updateRotation(View view) {
-        this.timediff = (currentDate.getTime()) / 1000 - Constants.referenceDate;
-        MetaDataView metadataView = view.getAdapter(MetaDataView.class);
+    public void setUseEarthPlane(boolean useEarthPlane) {
+        this.useEarthPlane = useEarthPlane;
+    }
 
-        this.currentRotation = Astronomy.getL0Radians(currentDate);//DifferentialRotation.calculateRotationInRadians(0., this.timediff) % (Math.PI * 2.0);
-        if (metadataView.getMetaData() instanceof HelioviewerPositionedMetaData && ((HelioviewerPositionedMetaData) (metadataView.getMetaData())).getInstrument().equalsIgnoreCase("SECCHI")) {
-            this.currentRotation -= ((HelioviewerPositionedMetaData) (metadataView.getMetaData())).getStonyhurstLongitude() / MathUtils.radeg;
+    public GL3DMat4d getExtraRotation() {
+        View view = LayersModel.getSingletonInstance().getActiveView();
+        if (view != null) {
+            if (useEarthPlane) {
+                MetaDataView metadataView = view.getAdapter(MetaDataView.class);
+                HelioviewerMetaData hvmd = (HelioviewerMetaData) metadataView.getMetaData();
+                double cr = 0.;
+                double b0 = 0.;
+                if (hvmd != null) {
+                    Calendar cal = new GregorianCalendar();
+                    cal.setTime(hvmd.getDateTime().getTime());
+                    b0 = -Astronomy.getB0InRadians(cal);
+                    cr = -Astronomy.getL0Radians(hvmd.getDateTime().getTime());
+                }
+                GL3DQuatd rt = GL3DQuatd.createRotation(cr, new GL3DVec3d(0, 1, 0));
+                rt.rotate(GL3DQuatd.createRotation(b0, new GL3DVec3d(1, 0, 0)));
+                return rt.toMatrix();
+            } else {
+                GL3DQuatd rt = GL3DQuatd.createRotation(-phi, new GL3DVec3d(0, 1, 0));
+                rt.rotate(GL3DQuatd.createRotation(-theta, new GL3DVec3d(1, 0, 0)));
+                return rt.toMatrix();
+            }
         }
-        Calendar cal = new GregorianCalendar();
-        cal.setTime(new Date(currentDate.getTime()));
-        double bobs0 = 0.;
-        double b0 = -Astronomy.getB0InRadians(cal);
-        if (metadataView.getMetaData() instanceof HelioviewerPositionedMetaData && ((HelioviewerPositionedMetaData) (metadataView.getMetaData())).getInstrument().equalsIgnoreCase("SECCHI")) {
-            bobs0 = ((HelioviewerPositionedMetaData) (metadataView.getMetaData())).getStonyhurstLatitude() / MathUtils.radeg - Astronomy.getB0InRadians(cal);
+        return GL3DMat4d.identity();
+    }
 
-        }
-        this.localRotation.clear();
-        this.localRotation.rotate(GL3DQuatd.createRotation(-b0, new GL3DVec3d(1, 0, 0)));
-        this.localRotation.rotate(GL3DQuatd.createRotation(this.currentRotation, new GL3DVec3d(0, 1, 0)));
-        this.localRotation.rotate(GL3DQuatd.createRotation(-bobs0, new GL3DVec3d(1, 0, 0)));
+    public void setPhi(double phi) {
+        this.phi = phi;
+    }
 
+    public void setTheta(double theta) {
+        this.theta = theta;
     }
 }

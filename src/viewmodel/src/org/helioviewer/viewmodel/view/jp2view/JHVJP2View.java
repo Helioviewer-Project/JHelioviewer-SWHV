@@ -700,16 +700,12 @@ public class JHVJP2View extends AbstractView implements JP2View, ViewportView, R
         newImageData.setFullyLoaded(fullyLoaded);
         if (this.imageData != null && compositionLayer == this.imageData.getFrameNumber() + 1) {
             this.previousImageData = this.imageData;
-            this.imageData = newImageData;
         } else if (this.previousImageData != null && this.previousImageData.getFrameNumber() - compositionLayer > 2) {
             this.previousImageData = newImageData;
-            this.imageData = newImageData;
         } else if (this.imageData != null && compositionLayer == this.imageData.getFrameNumber() - 1) {
             this.previousImageData = this.imageData;
-            this.imageData = newImageData;
-        } else {
-            this.imageData = newImageData;
         }
+        this.imageData = newImageData;
 
         Region lastRegionSaved = lastRegion;
         subImageBuffer.setLastRegion(roi);
