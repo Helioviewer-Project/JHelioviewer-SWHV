@@ -34,9 +34,11 @@ import org.helioviewer.viewmodel.view.SubimageDataView;
 import org.helioviewer.viewmodel.view.View;
 import org.helioviewer.viewmodel.view.ViewHelper;
 import org.helioviewer.viewmodel.view.ViewportView;
+import org.helioviewer.viewmodel.view.cache.DateTimeCache;
 import org.helioviewer.viewmodel.view.jp2view.J2KRender.RenderReasons;
 import org.helioviewer.viewmodel.view.jp2view.concurrency.BooleanSignal;
 import org.helioviewer.viewmodel.view.jp2view.concurrency.ReasonSignal;
+import org.helioviewer.viewmodel.view.jp2view.datetime.ImmutableDateTime;
 import org.helioviewer.viewmodel.view.jp2view.image.JP2ImageParameter;
 import org.helioviewer.viewmodel.view.jp2view.image.ResolutionSet.ResolutionLevel;
 import org.helioviewer.viewmodel.view.jp2view.image.SubImage;
@@ -101,6 +103,7 @@ public class JHVJP2View extends AbstractView implements JP2View, ViewportView, R
     private ImageData previousImageData;
 
     private ImageData baseDifferenceImageData;
+    protected DateTimeCache dateTimeCache;
 
     /**
      * Default constructor.
@@ -685,10 +688,17 @@ public class JHVJP2View extends AbstractView implements JP2View, ViewportView, R
      *            {@link org.helioviewer.viewmodel.region.Region}
      */
     void setSubimageData(ImageData newImageData, SubImage roi, int compositionLayer, double zoompercent, boolean fullyLoaded) {
+        if (metaData instanceof ObserverMetaData) {
+            ObserverMetaData observerMetaData = (ObserverMetaData) metaData;
+            if (dateTimeCache != null) {
+                ImmutableDateTime dtc = dateTimeCache.getDateTime(compositionLayer);
+                observerMetaData.updateDateTime(dtc);
+            }
+            event.addReason(new TimestampChangedReason(this, observerMetaData.getDateTime()));
+        }
         if (compositionLayer == 0) {
             this.baseDifferenceImageData = newImageData;
         }
-
         newImageData.setFrameNumber(compositionLayer);
         if (metaData instanceof HelioviewerMetaData) {
             HelioviewerMetaData hvmd = (HelioviewerMetaData) metaData;

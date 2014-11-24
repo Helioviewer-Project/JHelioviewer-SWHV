@@ -322,6 +322,7 @@ public class GL3DComponentView extends AbstractComponentView implements GLEventL
         if (screenshotMode && mv != null) {
             tileRenderer.endTile(gl);
             screenshot = pixelBuffer.image;
+            ImageUtil.flipImageVertically(screenshot);
             try {
                 ImageIO.write(screenshot, "png", outputFile);
             } catch (IOException e) {

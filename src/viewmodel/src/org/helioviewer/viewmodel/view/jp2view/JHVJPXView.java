@@ -6,10 +6,8 @@ import org.helioviewer.base.math.Interval;
 import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.viewmodel.changeevent.ChangeEvent;
 import org.helioviewer.viewmodel.changeevent.PlayStateChangedReason;
-import org.helioviewer.viewmodel.changeevent.TimestampChangedReason;
 import org.helioviewer.viewmodel.imagedata.ImageData;
 import org.helioviewer.viewmodel.metadata.HelioviewerMetaData;
-import org.helioviewer.viewmodel.metadata.ObserverMetaData;
 import org.helioviewer.viewmodel.view.CachedMovieView;
 import org.helioviewer.viewmodel.view.LinkedMovieManager;
 import org.helioviewer.viewmodel.view.TimedMovieView;
@@ -42,7 +40,6 @@ public class JHVJPXView extends JHVJP2View implements TimedMovieView, CachedMovi
 
     // Caching
     protected ImageCacheStatus imageCacheStatus;
-    protected DateTimeCache dateTimeCache;
     protected int lastRenderedCompositionLayer = -1;
     /*
      * Set to true if you want to use the displaylock.
@@ -427,13 +424,7 @@ public class JHVJPXView extends JHVJP2View implements TimedMovieView, CachedMovi
     }
 
     private void setSubimageDataHelper(ImageData newImageData, SubImage roi, int compositionLayer, double zoompercent, boolean fullyLoaded) {
-        lastRenderedCompositionLayer = compositionLayer;
 
-        if (metaData instanceof ObserverMetaData) {
-            ObserverMetaData observerMetaData = (ObserverMetaData) metaData;
-            observerMetaData.updateDateTime(dateTimeCache.getDateTime(compositionLayer));
-            event.addReason(new TimestampChangedReason(this, observerMetaData.getDateTime()));
-        }
         super.setSubimageData(newImageData, roi, compositionLayer, zoompercent, fullyLoaded);
     }
 
@@ -541,6 +532,7 @@ public class JHVJPXView extends JHVJP2View implements TimedMovieView, CachedMovi
         return baseDifferenceMode;
     }
 
+    @Override
     public int getDesiredRelativeSpeed() {
         return this.render.getMovieRelativeSpeed();
     }
