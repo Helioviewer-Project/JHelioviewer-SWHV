@@ -50,8 +50,13 @@ public class SubImage {
             y = 0;
         }
         width = _width;
+        if (width < 0) {
+            width = -width;
+        }
         height = _height;
-
+        if (height < 0) {
+            height = -height;
+        }
         domain = new Interval<Integer>(x, x + width);
         range = new Interval<Integer>(y, y + height);
     }
