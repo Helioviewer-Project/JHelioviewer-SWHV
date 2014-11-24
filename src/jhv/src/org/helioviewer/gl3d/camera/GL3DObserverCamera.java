@@ -21,6 +21,7 @@ import org.helioviewer.viewmodel.view.MetaDataView;
 import org.helioviewer.viewmodel.view.TimedMovieView;
 import org.helioviewer.viewmodel.view.View;
 import org.helioviewer.viewmodel.view.ViewListener;
+import org.helioviewer.viewmodel.view.jp2view.JHVJP2View;
 
 /**
  * This camera is used when solar rotation tracking is enabled. It extends the
@@ -65,9 +66,12 @@ public class GL3DObserverCamera extends GL3DSolarRotationTrackingTrackballCamera
     @Override
     public void viewChanged(View sender, ChangeEvent aEvent) {
         TimestampChangedReason timestampReason = aEvent.getLastChangedReasonByType(TimestampChangedReason.class);
-        if ((timestampReason != null) && (timestampReason.getView() instanceof TimedMovieView) && LinkedMovieManager.getActiveInstance().isMaster((TimedMovieView) timestampReason.getView())) {
-            currentDate = timestampReason.getNewDateTime().getTime();
-            updateRotation();
+        if (timestampReason != null && LayersModel.getSingletonInstance().getActiveView() != null) {
+            boolean isjp2 = LayersModel.getSingletonInstance().getActiveView().getAdapter(JHVJP2View.class).getClass() == JHVJP2View.class;
+            if (isjp2 || ((timestampReason.getView() instanceof TimedMovieView) && LinkedMovieManager.getActiveInstance().isMaster((TimedMovieView) timestampReason.getView()))) {
+                currentDate = timestampReason.getNewDateTime().getTime();
+                updateRotation();
+            }
         }
     }
 
@@ -96,7 +100,6 @@ public class GL3DObserverCamera extends GL3DSolarRotationTrackingTrackballCamera
             }
             this.setTime(currentDate.getTime());
             this.currentRotation = Astronomy.getL0Radians(currentDate);
-
             this.getLocalRotation().clear();
             this.getLocalRotation().rotate(GL3DQuatd.createRotation(addb0, new GL3DVec3d(1, 0, 0)));
 
