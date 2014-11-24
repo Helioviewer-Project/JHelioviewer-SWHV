@@ -224,7 +224,6 @@ public class GL3DPositionLoadingPlanet {
             double y = this.positionDateTime[0].getPosition().y * 1000 / Constants.SunRadiusInMeter;
             double z = this.positionDateTime[0].getPosition().z * 1000 / Constants.SunRadiusInMeter;
             GL3DVec3d vec = new GL3DVec3d(-y, -z, -x);
-            System.out.println("VV" + vec);
             return vec;
         } else {
             double interpolatedIndex = (1. * (currentCameraTime - t3) / (t4 - t3) * this.positionDateTime.length);

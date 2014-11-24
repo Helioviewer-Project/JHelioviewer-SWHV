@@ -178,7 +178,6 @@ public class SWHVHEKImagePanelEventPopupController implements KeyEventDispatcher
         synchronized (this) {
             switch (ke.getID()) {
             case KeyEvent.KEY_PRESSED:
-                System.out.println(ke.getKeyCode());
                 if (ke.getKeyCode() == KeyEvent.VK_A) {
                     aPressed = true;
                 }
