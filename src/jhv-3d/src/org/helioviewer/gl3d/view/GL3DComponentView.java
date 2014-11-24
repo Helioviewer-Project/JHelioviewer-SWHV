@@ -26,6 +26,7 @@ import org.helioviewer.jhv.layers.LayersModel;
 import org.helioviewer.viewmodel.changeevent.ChangeEvent;
 import org.helioviewer.viewmodel.changeevent.LayerChangedReason;
 import org.helioviewer.viewmodel.changeevent.LayerChangedReason.LayerChangeType;
+import org.helioviewer.viewmodel.changeevent.SubImageDataChangedReason;
 import org.helioviewer.viewmodel.changeevent.TimestampChangedReason;
 import org.helioviewer.viewmodel.changeevent.ViewChainChangedReason;
 import org.helioviewer.viewmodel.renderer.screen.GLScreenRenderGraphics;
@@ -393,9 +394,10 @@ public class GL3DComponentView extends AbstractComponentView implements GLEventL
         }
 
         TimestampChangedReason timestampReason = aEvent.getLastChangedReasonByType(TimestampChangedReason.class);
-        if ((timestampReason != null) && (timestampReason.getView() instanceof TimedMovieView) && LinkedMovieManager.getActiveInstance().isMaster((TimedMovieView) timestampReason.getView())) {
+        SubImageDataChangedReason sidReason = aEvent.getLastChangedReasonByType(SubImageDataChangedReason.class);
+
+        if (sidReason != null || ((timestampReason != null) && (timestampReason.getView() instanceof TimedMovieView) && LinkedMovieManager.getActiveInstance().isMaster((TimedMovieView) timestampReason.getView()))) {
             try {
-                // this.display();
                 Displayer.getSingletonInstance().display();
             } catch (Exception e) {
 
