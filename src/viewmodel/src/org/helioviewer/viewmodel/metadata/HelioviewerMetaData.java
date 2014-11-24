@@ -38,6 +38,9 @@ public class HelioviewerMetaData extends AbstractMetaData implements SunMetaData
 
     private double meterPerPixel;
     private ImmutableDateTime time;
+    protected double theta;
+    protected double phi;
+    private Vector2dDouble sunPixelPositionAlt;
 
     /**
      * Default constructor.
@@ -48,7 +51,6 @@ public class HelioviewerMetaData extends AbstractMetaData implements SunMetaData
      *            Meta data container serving as a base for the construction
      */
     public HelioviewerMetaData(MetaDataContainer m) {
-
         metaDataContainer = m;
 
         if (m.get("INSTRUME") == null)
@@ -192,7 +194,6 @@ public class HelioviewerMetaData extends AbstractMetaData implements SunMetaData
             }
 
         } else if (detector.equals("C2") || detector.equals("C3")) {
-
             newSolarPixelRadius = metaDataContainer.tryGetDouble("RSUN");
             allowedRelativeDifference = 0.05;
 
@@ -224,32 +225,32 @@ public class HelioviewerMetaData extends AbstractMetaData implements SunMetaData
             if (Math.abs(solarPixelRadius - newSolarPixelRadius) > allowedAbsoluteDifference) {
                 changed = true;
             }
-
             double sunX = metaDataContainer.tryGetDouble("CRPIX1") - 1;
             double sunY;
             if (Displayer.getSingletonInstance().getState() == Displayer.STATE3D) {
-                sunY = metaDataContainer.tryGetDouble("NAXIS2") - (metaDataContainer.tryGetDouble("CRPIX2") - 1);
+                sunY = (metaDataContainer.tryGetDouble("CRPIX2") - 1);
             } else {
                 sunY = (metaDataContainer.tryGetDouble("CRPIX2") - 1);
             }
+            sunPixelPositionAlt = new Vector2dDouble(sunX, metaDataContainer.tryGetDouble("NAXIS2") - sunY);
+
             if (changed || Math.abs(sunPixelPosition.getX() - sunX) > allowedAbsoluteDifference || Math.abs(sunPixelPosition.getY() - sunY) > allowedAbsoluteDifference) {
                 sunPixelPosition = new Vector2dDouble(sunX, sunY);
                 changed = true;
             }
+            changed = true;
         }
-
         if (changed) {
             solarPixelRadius = newSolarPixelRadius;
             meterPerPixel = Constants.SunRadius / solarPixelRadius;
             setPhysicalLowerLeftCorner(sunPixelPosition.scale(-meterPerPixel));
             setPhysicalImageSize(new Vector2dDouble(pixelImageSize.getX() * meterPerPixel, pixelImageSize.getY() * meterPerPixel));
         }
-
         return changed;
     }
 
     public Region roiToRegion(SubImage roi, double zoompercent) {
-        Region region = StaticRegion.createAdaptedRegion((roi.x / zoompercent - sunPixelPosition.getX()) * meterPerPixel, (roi.y / zoompercent - sunPixelPosition.getY()) * meterPerPixel, roi.width * meterPerPixel / zoompercent, roi.height * meterPerPixel / zoompercent);
+        Region region = StaticRegion.createAdaptedRegion((roi.x / zoompercent - sunPixelPositionAlt.getX()) * meterPerPixel, (roi.y / zoompercent - sunPixelPositionAlt.getY()) * meterPerPixel, roi.width * meterPerPixel / zoompercent, roi.height * meterPerPixel / zoompercent);
         return region;
     }
 
@@ -382,4 +383,11 @@ public class HelioviewerMetaData extends AbstractMetaData implements SunMetaData
         return updatePixelParameters();
     }
 
+    public double getPhi() {
+        return this.phi;
+    }
+
+    public double getTheta() {
+        return this.theta;
+    }
 }

@@ -8,6 +8,7 @@ import javax.media.opengl.GL2;
 
 import org.helioviewer.base.physics.Constants;
 import org.helioviewer.gl3d.scenegraph.GL3DDrawBits.Bit;
+import org.helioviewer.gl3d.scenegraph.math.GL3DMat4d;
 import org.helioviewer.gl3d.scenegraph.math.GL3DVec2d;
 import org.helioviewer.gl3d.scenegraph.math.GL3DVec3d;
 import org.helioviewer.gl3d.scenegraph.math.GL3DVec4d;
@@ -271,6 +272,24 @@ public abstract class GL3DMesh extends GL3DShape {
         if (this.getTriangles() != null) {
             for (GL3DTriangle t : this.getTriangles()) {
                 if (t.intersects(ray)) {
+                    ray.setOriginShape(this);
+
+                    GL3DVec3d rayCopy2 = ray.getDirection().copy();
+                    rayCopy2.multiply(ray.getLength());
+                    GL3DVec3d rayCopy = ray.getOrigin().copy();
+                    rayCopy.add(rayCopy2);
+                    ray.setHitPoint(rayCopy);
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    public boolean shapeHit(GL3DRay ray, GL3DMat4d extraRot) {
+        if (this.getTriangles() != null) {
+            for (GL3DTriangle t : this.getTriangles()) {
+                if (t.intersects(ray, extraRot)) {
                     ray.setOriginShape(this);
 
                     GL3DVec3d rayCopy2 = ray.getDirection().copy();

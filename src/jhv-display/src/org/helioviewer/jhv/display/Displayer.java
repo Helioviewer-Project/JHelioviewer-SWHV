@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
+import org.helioviewer.gl3d.scenegraph.math.GL3DVec3d;
+
 public class Displayer {
     public static Object displaylock = new Object();
     public static int STATE2D = 1;
@@ -14,6 +16,7 @@ public class Displayer {
     private final ExecutorService displayPool = Executors.newSingleThreadExecutor();
     private boolean displaying = false;
     private int state = 2;
+    public static ArrayList<GL3DVec3d> pointList = new ArrayList<GL3DVec3d>();
 
     public void register(GL3DComponentFakeInterface gl3dcomponent) {
     }
