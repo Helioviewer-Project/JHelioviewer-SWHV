@@ -17,7 +17,7 @@ public class DrawControllerData {
 
     private int nrOfDrawableElements;
     private Set<YAxisElement> yAxisSet;
-    private Map<DrawableType, Set<DrawableElement>> drawableElements;
+    private final Map<DrawableType, Set<DrawableElement>> drawableElements;
     private List<DrawControllerListener> listeners;
 
     public DrawControllerData() {
@@ -46,22 +46,7 @@ public class DrawControllerData {
     }
 
     public Map<DrawableType, Set<DrawableElement>> getDrawableElements() {
-        for (DrawableType dt : drawableElements.keySet()) {
-            // Log.debug(dt + " : " + drawableElements.get(dt).size());
-            for (DrawableElement de : drawableElements.get(dt)) {
-                // Log.debug(de.hasElementsToDraw());
-                if (de.getYAxisElement() != null) {
-                    // Log.debug(de.getYAxisElement().getLabel());
-                } else {
-                    // Log.debug("Y axis as null");
-                }
-            }
-        }
         return drawableElements;
-    }
-
-    public void setDrawableElements(Map<DrawableType, Set<DrawableElement>> drawableElements) {
-        this.drawableElements = drawableElements;
     }
 
     public List<DrawControllerListener> getListeners() {
