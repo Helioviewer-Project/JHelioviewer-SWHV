@@ -29,7 +29,6 @@ public class GL3DCameraOptionsPanel extends JPanel implements GL3DCameraSelectio
     private JPanel optionsPanel;
     private final GL3DCameraOptionsAttributeManager cameraOptionsAttributeManager = GL3DCameraOptionsAttributeManager.getSingletonInstance();
     JTabbedPane tab;
-    private boolean active;
 
     public GL3DCameraOptionsPanel() {
         LayersModel.getSingletonInstance().addLayersListener(this);
