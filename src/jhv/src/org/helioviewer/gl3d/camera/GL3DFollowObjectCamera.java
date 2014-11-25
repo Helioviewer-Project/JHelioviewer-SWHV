@@ -18,6 +18,7 @@ import org.helioviewer.viewmodel.view.TimedMovieView;
 import org.helioviewer.viewmodel.view.View;
 import org.helioviewer.viewmodel.view.ViewListener;
 import org.helioviewer.viewmodel.view.cache.DateTimeCache;
+import org.helioviewer.viewmodel.view.jp2view.JHVJP2View;
 import org.helioviewer.viewmodel.view.jp2view.JHVJPXView;
 import org.helioviewer.viewmodel.view.jp2view.datetime.ImmutableDateTime;
 
@@ -79,37 +80,40 @@ public class GL3DFollowObjectCamera extends GL3DSolarRotationTrackingTrackballCa
     public void viewChanged(View sender, ChangeEvent aEvent) {
         if (this.positionLoading.isLoaded()) {
             TimestampChangedReason timestampReason = aEvent.getLastChangedReasonByType(TimestampChangedReason.class);
-            if ((timestampReason != null) && (timestampReason.getView() instanceof TimedMovieView) && LinkedMovieManager.getActiveInstance().isMaster((TimedMovieView) timestampReason.getView())) {
-                currentDate = timestampReason.getNewDateTime().getTime();
-                //Layer times
-                long t1 = LayersModel.getSingletonInstance().getFirstDate().getTime();
-                long t2 = LayersModel.getSingletonInstance().getLastDate().getTime();
-                //Camera times
-                long t3 = this.positionLoading.getBeginDate().getTime();
-                long t4 = this.positionLoading.getEndDate().getTime();
-                if (interpolation) {
-                    if (t4 != t3) {
-                        currentCameraTime = (long) ((t3 + 1. * (t4 - t3) * (timestampReason.getNewDateTime().getMillis() - t1) / (t2 - t1)));
+            if (timestampReason != null && LayersModel.getSingletonInstance().getActiveView() != null) {
+                boolean isjp2 = LayersModel.getSingletonInstance().getActiveView().getAdapter(JHVJP2View.class).getClass() == JHVJP2View.class;
+                if (isjp2 || ((timestampReason.getView() instanceof TimedMovieView) && LinkedMovieManager.getActiveInstance().isMaster((TimedMovieView) timestampReason.getView()))) {
+                    currentDate = timestampReason.getNewDateTime().getTime();
+                    //Layer times
+                    long t1 = LayersModel.getSingletonInstance().getFirstDate().getTime();
+                    long t2 = LayersModel.getSingletonInstance().getLastDate().getTime();
+                    //Camera times
+                    long t3 = this.positionLoading.getBeginDate().getTime();
+                    long t4 = this.positionLoading.getEndDate().getTime();
+                    if (interpolation) {
+                        if (t4 != t3) {
+                            currentCameraTime = (long) ((t3 + 1. * (t4 - t3) * (timestampReason.getNewDateTime().getMillis() - t1) / (t2 - t1)));
+                        } else {
+                            currentCameraTime = t4;
+                        }
                     } else {
-                        currentCameraTime = t4;
+                        currentCameraTime = timestampReason.getNewDateTime().getMillis();
                     }
-                } else {
-                    currentCameraTime = timestampReason.getNewDateTime().getMillis();
-                }
-                this.setTime(currentCameraTime);
+                    this.setTime(currentCameraTime);
 
-                this.fireCameratTime(new Date(currentCameraTime));
+                    this.fireCameratTime(new Date(currentCameraTime));
 
-                GL3DVec3d position = this.positionLoading.getInterpolatedPosition(currentCameraTime);
-                if (position != null) {
-                    currentL = position.y;
-                    currentB = -position.z;
-                    currentDistance = position.x;
-                    GL3DVec3d initPosition = this.positionLoading.getInterpolatedPosition(t3);
-                    lratio = initPosition.x / position.x;
+                    GL3DVec3d position = this.positionLoading.getInterpolatedPosition(currentCameraTime);
+                    if (position != null) {
+                        currentL = position.y;
+                        currentB = -position.z;
+                        currentDistance = position.x;
+                        GL3DVec3d initPosition = this.positionLoading.getInterpolatedPosition(t3);
+                        lratio = initPosition.x / position.x;
 
-                    updateRotation();
-                    setFOV(currentDistance * Math.tan(FOVangle));
+                        updateRotation();
+                        setFOV(currentDistance * Math.tan(FOVangle));
+                    }
                 }
             }
 
