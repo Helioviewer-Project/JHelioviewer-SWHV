@@ -13,7 +13,6 @@ import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.display.RenderListener;
 import org.helioviewer.viewmodel.changeevent.ChangeEvent;
 import org.helioviewer.viewmodel.changeevent.ChangedReason;
-import org.helioviewer.viewmodel.changeevent.RegionChangedReason;
 import org.helioviewer.viewmodel.changeevent.RegionUpdatedReason;
 import org.helioviewer.viewmodel.changeevent.SubImageDataChangedReason;
 import org.helioviewer.viewmodel.changeevent.TimestampChangedReason;
@@ -717,15 +716,10 @@ public class JHVJP2View extends AbstractView implements JP2View, ViewportView, R
         }
         this.imageData = newImageData;
 
-        Region lastRegionSaved = lastRegion;
         subImageBuffer.setLastRegion(roi);
         event.addReason(new SubImageDataChangedReason(this));
 
         this.event.addReason(new RegionUpdatedReason(this, lastRegion));
-
-        if (!lastRegion.equals(lastRegionSaved)) {
-            this.event.addReason(new RegionChangedReason(this, lastRegion));
-        }
 
         ChangeEvent fireEvent = null;
         synchronized (event) {
