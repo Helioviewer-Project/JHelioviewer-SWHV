@@ -37,6 +37,7 @@ import org.helioviewer.viewmodel.view.LinkedMovieManager;
 import org.helioviewer.viewmodel.view.TimedMovieView;
 import org.helioviewer.viewmodel.view.View;
 import org.helioviewer.viewmodel.view.ViewportView;
+import org.helioviewer.viewmodel.view.jp2view.JHVJP2View;
 import org.helioviewer.viewmodel.view.jp2view.JHVJPXView;
 import org.helioviewer.viewmodel.view.opengl.GLTextureHelper;
 import org.helioviewer.viewmodel.view.opengl.GLView;
@@ -123,12 +124,18 @@ public class GL3DComponentView extends AbstractComponentView implements GLEventL
         View v = LayersModel.getSingletonInstance().getActiveView();
         if (v != null) {
             JHVJPXView movieView = v.getAdapter(JHVJPXView.class);
-            movieView.pauseMovie();
-            movieView.setCurrentFrame(0, new ChangeEvent());
+            if (movieView != null) {
+                movieView.pauseMovie();
+                movieView.setCurrentFrame(0, new ChangeEvent());
+            }
             export = new MovieExport(canvas.getWidth(), canvas.getHeight());
             export.createProcess();
             exportMode = true;
-            movieView.playMovie();
+            if (movieView != null) {
+                movieView.playMovie();
+            } else {
+                Displayer.getSingletonInstance().render();
+            }
         } else {
             exportMovieDialog.fail();
             exportMovieDialog = null;
@@ -142,7 +149,9 @@ public class GL3DComponentView extends AbstractComponentView implements GLEventL
         previousScreenshot = -1;
         export.finishProcess();
         ImageViewerGui.getSingletonInstance().getLeftContentPane().setEnabled(true);
-        movieView.pauseMovie();
+        if (movieView != null) {
+            movieView.pauseMovie();
+        }
         exportMovieDialog.reset3D();
         exportMovieDialog = null;
     }
@@ -207,12 +216,12 @@ public class GL3DComponentView extends AbstractComponentView implements GLEventL
 
     @Override
     public synchronized void display(GLAutoDrawable glAD) {
-        JHVJPXView mv = null;
+        JHVJP2View mv = null;
 
         if (exportMode || screenshotMode) {
             View v = LayersModel.getSingletonInstance().getActiveView();
             if (v != null) {
-                mv = v.getAdapter(JHVJPXView.class);
+                mv = v.getAdapter(JHVJP2View.class);
                 if (tileRenderer == null) {
                     tileRenderer = new TileRenderer();
                 } else if (!tileRenderer.isSetup()) {
@@ -307,7 +316,12 @@ public class GL3DComponentView extends AbstractComponentView implements GLEventL
         }
         gl.glPopMatrix();
         if (exportMode && mv != null) {
-            int currentScreenshot = mv.getCurrentFrameNumber();
+            int currentScreenshot = 1;
+            int maxframeno = 1;
+            if (mv instanceof JHVJPXView) {
+                currentScreenshot = ((JHVJPXView) mv).getCurrentFrameNumber();
+                maxframeno = ((JHVJPXView) mv).getMaximumFrameNumber();
+            }
             tileRenderer.endTile(gl);
             screenshot = pixelBuffer.image;
             ImageUtil.flipImageVertically(screenshot);
@@ -315,8 +329,8 @@ public class GL3DComponentView extends AbstractComponentView implements GLEventL
                 export.writeImage(screenshot);
             }
             previousScreenshot = currentScreenshot;
-            exportMovieDialog.setLabelText("Exporting frame " + currentScreenshot + " / " + mv.getMaximumFrameNumber());
-            if (currentScreenshot == mv.getMaximumFrameNumber()) {
+            exportMovieDialog.setLabelText("Exporting frame " + currentScreenshot + " / " + maxframeno);
+            if ((!(mv instanceof JHVJPXView)) || (mv instanceof JHVJPXView && currentScreenshot == ((JHVJPXView) mv).getMaximumFrameNumber())) {
                 this.stopExport();
             }
         }
