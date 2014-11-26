@@ -185,7 +185,7 @@ public abstract class GL3DImageLayer extends GL3DGroup implements GL3DCameraList
         double maxPhysicalX = -Double.MAX_VALUE;
         double maxPhysicalY = -Double.MAX_VALUE;
 
-        double res = 10.;
+        double res = 5.;
         boolean addpoints = false;
         if (Displayer.pointList.size() == 0) {
             //addpoints = true;//Uncomment to debug ROI problems, press "R" to capture region
@@ -231,7 +231,31 @@ public abstract class GL3DImageLayer extends GL3DGroup implements GL3DCameraList
                 }
             }
         }
-
+        //Increase computed region artificially
+        if (minPhysicalX < 0) {
+            minPhysicalX = minPhysicalX * 1.3;
+        } else {
+            minPhysicalX = minPhysicalX * 0.7;
+        }
+        if (minPhysicalY < 0) {
+            minPhysicalY = minPhysicalY * 1.3;
+        } else {
+            minPhysicalY = minPhysicalY * 0.7;
+        }
+        if (maxPhysicalX > 0) {
+            maxPhysicalX = maxPhysicalX * 1.3;
+        } else {
+            maxPhysicalX = maxPhysicalX * 0.7;
+        }
+        if (maxPhysicalY > 0) {
+            maxPhysicalY = maxPhysicalY * 1.3;
+        } else {
+            maxPhysicalY = maxPhysicalY * 0.7;
+        }
+        //Until here
+        maxPhysicalX = maxPhysicalX * 1.3;
+        minPhysicalY = minPhysicalY * 1.3;
+        maxPhysicalY = maxPhysicalY * 1.3;
         if (minPhysicalX < metaData.getPhysicalLowerLeft().getX())
             minPhysicalX = metaData.getPhysicalLowerLeft().getX();
         if (minPhysicalY < metaData.getPhysicalLowerLeft().getY())
