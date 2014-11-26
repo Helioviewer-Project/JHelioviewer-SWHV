@@ -81,6 +81,7 @@ public class SWHVHEKPlugin3dRenderer extends PhysicalRenderer3d {
         Color eventColor = evt.getEventRelationShip().getRelationshipColor();
         gl.glColor3d(eventColor.getRed() / 255., eventColor.getGreen() / 255., eventColor.getBlue() / 255.);
         gl.glDisable(GL.GL_LIGHTING);
+
         gl.glDisable(GL2.GL_TEXTURE_2D);
         gl.glEnable(GL2.GL_LINE_SMOOTH);
         gl.glLineWidth(0.8f);
@@ -172,7 +173,7 @@ public class SWHVHEKPlugin3dRenderer extends PhysicalRenderer3d {
 
         gl.glDisable(GL2.GL_TEXTURE_2D);
         // gl.glEnable(GL2.GL_LINE_SMOOTH);
-        gl.glLineWidth(3.f);
+        gl.glLineWidth(0.7f);
         for (JHVPoint point : points) {
             int divpoints = 10;
             gl.glBegin(GL2.GL_LINE_STRIP);
