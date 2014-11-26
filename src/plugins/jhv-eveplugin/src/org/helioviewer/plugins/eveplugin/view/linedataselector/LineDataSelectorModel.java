@@ -95,9 +95,11 @@ public class LineDataSelectorModel {
 
     public boolean atLeastOneDownloading(String identifier) {
         synchronized (elementMap) {
-            for (LineDataSelectorElement el : elementMap.get(identifier)) {
-                if (el.isDownloading()) {
-                    return true;
+            if (elementMap.containsKey(identifier)) {
+                for (LineDataSelectorElement el : elementMap.get(identifier)) {
+                    if (el.isDownloading()) {
+                        return true;
+                    }
                 }
             }
             return false;
