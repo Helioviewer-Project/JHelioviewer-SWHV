@@ -162,7 +162,7 @@ public abstract class GL3DImageLayer extends GL3DGroup implements GL3DCameraList
         if (metaData instanceof HelioviewerMetaData) {
             hvmd = (HelioviewerMetaData) metaData;
         }
-        if (metaData == null) {
+        if (metaData == null || activeCamera == null) {
             return;
         }
         double phi = 0;
