@@ -38,7 +38,7 @@ public class GL3DGrid extends GL3DGroup {
     private Color firstColor = Color.RED;
     private Color secondColor = Color.GREEN;
     private Color thirdColor = Color.YELLOW;
-    private final float lineWidth = 0.5f;
+    private final float lineWidth = 1.2f;
 
     public GL3DGrid(String name, double lonstepDegrees, double latstepDegrees, GL3DVec4f color, GL3DVec4d textColor, boolean followCamera) {
         super(name);
