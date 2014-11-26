@@ -168,14 +168,14 @@ public class SWHVHEKPlugin3dRenderer extends PhysicalRenderer3d {
         } else {
             gl.glColor3d(evt.getColor().getRed() / 255., evt.getColor().getGreen() / 255., evt.getColor().getBlue() / 255.);
         }
-        gl.glDisable(GL2.GL_BLEND);
+        gl.glEnable(GL2.GL_BLEND);
         gl.glDisable(GL.GL_LIGHTING);
 
         gl.glDisable(GL2.GL_TEXTURE_2D);
-        // gl.glEnable(GL2.GL_LINE_SMOOTH);
+        gl.glEnable(GL2.GL_LINE_SMOOTH);
         gl.glLineWidth(0.7f);
         for (JHVPoint point : points) {
-            int divpoints = 10;
+            int divpoints = 100;
             gl.glBegin(GL2.GL_LINE_STRIP);
             if (oldBoundaryPoint3d != null) {
                 for (int j = 0; j <= divpoints; j++) {
@@ -184,9 +184,9 @@ public class SWHVHEKPlugin3dRenderer extends PhysicalRenderer3d {
                     double ynew = alpha * oldBoundaryPoint3d.getCoordinate2() + (1 - alpha) * point.getCoordinate2();
                     double znew = alpha * oldBoundaryPoint3d.getCoordinate3() + (1 - alpha) * point.getCoordinate3();
                     double r = Math.sqrt(xnew * xnew + ynew * ynew + znew * znew);
-                    xnew = xnew / r;
-                    ynew = ynew / r;
-                    znew = znew / r;
+                    xnew = xnew / r * 1.0001;
+                    ynew = ynew / r * 1.0001;
+                    znew = znew / r * 1.0001;
                     gl.glVertex3d(xnew, -ynew, znew);
                 }
 

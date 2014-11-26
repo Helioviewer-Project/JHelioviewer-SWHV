@@ -26,7 +26,7 @@ public class DescriptorTimestampRenderer extends DefaultTableCellRenderer {
     /**
      * Used border to seperate
      */
-    private final Border interBorder = BorderFactory.createMatteBorder(1, 0, 0, 0, Color.gray);
+    private final Border interBorder = BorderFactory.createMatteBorder(0, 0, 1, 0, Color.gray);
 
     /**
      * Renderer to show the descriptor
@@ -48,9 +48,9 @@ public class DescriptorTimestampRenderer extends DefaultTableCellRenderer {
             LayerDescriptor descriptor = (LayerDescriptor) value;
             JLabel label = (JLabel) super.getTableCellRendererComponent(table, descriptor.timestamp, isSelected, hasFocus, row, column);
             label.setToolTipText("UTC observation time");
-            if (drawLine && row > 0) {
-                label.setBorder(interBorder);
-            }
+            //if (drawLine && row > 0) {
+            label.setBorder(interBorder);
+            //}
             return label;
         } else {
             return super.getTableCellRendererComponent(table, "Error", isSelected, hasFocus, row, column);
