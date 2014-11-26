@@ -91,7 +91,7 @@ public class ChartConstants {
         return Displayer.screenScale;
     }
 
-    private static Font font = new Font("Arial", Font.PLAIN, 10);
+    private static Font font = new Font("SansSerif", Font.PLAIN, 10);
 
     public static Font getFont() {
         if (font == null) {
@@ -108,6 +108,7 @@ public class ChartConstants {
             font = font.deriveFont(10.f);
 
         }
+
         return font;
     }
 
