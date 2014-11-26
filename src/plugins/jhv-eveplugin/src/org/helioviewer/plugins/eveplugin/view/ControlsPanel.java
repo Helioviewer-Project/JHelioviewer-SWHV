@@ -47,7 +47,7 @@ public class ControlsPanel extends JPanel implements ActionListener, LayersListe
     private final ImageIcon addIcon = IconBank.getIcon(JHVIcon.ADD);
     private final JButton addLayerButton = new JButton("Add Layer", addIcon);
 
-    private final String[] plots = { "No Events", "Events on plot 1", "Events on plot 2" };
+    private final String[] plots = { "No Events", "Events on Plot 1", "Events on Plot 2" };
     private final JComboBox eventsComboBox = new JComboBox(plots);
 
     private final ImageIcon movietimeIcon = IconBank.getIcon(JHVIcon.LAYER_MOVIE_TIME);
