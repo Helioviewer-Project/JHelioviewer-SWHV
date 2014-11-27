@@ -298,9 +298,14 @@ class J2KRender implements Runnable {
                         DateTimeCache dtc = ((JHVJPXView) parentViewRef).getDateTimeCache();
                         dt = dtc.getDateTime(numLayer);
                     }
-                    event.addReason(new TimestampChangedReason(parentViewRef, dt));
-                    tb.viewChanged(null, event);
-                    il.updateROI(tb);
+                    if (dt == null && hvmd != null) {
+                        dt = hvmd.getDateTime();
+                    }
+                    if (dt != null) {
+                        event.addReason(new TimestampChangedReason(parentViewRef, dt));
+                        tb.viewChanged(null, event);
+                        il.updateROI(tb);
+                    }
 
                 }
             }
