@@ -105,6 +105,16 @@ public class DownloadStream {
         return this.response400;
     }
 
+    private InputStream getEncodedStream(String encoding, InputStream httpStream) throws IOException {
+        if (encoding != null) {
+            if (encoding.equalsIgnoreCase("gzip"))
+                return new GZIPInputStream(httpStream);
+            else if (encoding.equalsIgnoreCase("deflate"))
+                return new InflaterInputStream(httpStream);
+        }
+        return httpStream;
+    }
+
     /**
      * Opens the connection with compression if the server supports
      *
@@ -146,28 +156,13 @@ public class DownloadStream {
                 Log.error(">> DownloadStream.connect() > Error opening http connection to " + url + " Response code: " + httpC.getResponseCode());
                 throw new IOException("Error opening http connection to " + url + " Response code: " + httpC.getResponseCode());
             }
-            // Now according to the encoding open the right input Stream
+
+            String encoding = httpC.getContentEncoding();
             if (httpC.getResponseCode() == 400) {
                 this.response400 = true;
-                String encoding = httpC.getContentEncoding();
-                Log.debug("Created http connection with encoding " + encoding);
-                if (encoding != null && encoding.equalsIgnoreCase("gzip")) {
-                    in = new GZIPInputStream(httpC.getErrorStream());
-                } else if (encoding != null && encoding.equalsIgnoreCase("deflate")) {
-                    in = new InflaterInputStream(httpC.getErrorStream());
-                } else {
-                    in = httpC.getErrorStream();
-                }
+                in = getEncodedStream(encoding, httpC.getErrorStream());
             } else {
-                String encoding = httpC.getContentEncoding();
-                Log.debug("Created http connection with encoding " + encoding);
-                if (encoding != null && encoding.equalsIgnoreCase("gzip")) {
-                    in = new GZIPInputStream(httpC.getInputStream());
-                } else if (encoding != null && encoding.equalsIgnoreCase("deflate")) {
-                    in = new InflaterInputStream(httpC.getInputStream());
-                } else {
-                    in = httpC.getInputStream();
-                }
+                in = getEncodedStream(encoding, httpC.getInputStream());
             }
         } else {
             Log.debug("No http connection, try no compression");
