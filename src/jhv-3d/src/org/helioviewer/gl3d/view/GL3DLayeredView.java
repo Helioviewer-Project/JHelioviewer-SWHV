@@ -79,7 +79,7 @@ public class GL3DLayeredView extends GLLayeredView implements GL3DView, LayeredV
             }
         }
         if (changed) {
-            notifyViewListeners(event);
+            //notifyViewListeners(event);
         }
         return changed;
     }

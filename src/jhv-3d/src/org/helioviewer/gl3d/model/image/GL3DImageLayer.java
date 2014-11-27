@@ -84,6 +84,7 @@ public abstract class GL3DImageLayer extends GL3DGroup implements GL3DCameraList
         if (this.imageTextureView == null) {
             throw new IllegalStateException("Cannot create GL3DImageLayer when no GL3DImageTextureView is present in Layer");
         }
+        this.imageTextureView.setImageLayer(this);
 
         this.metaDataView = this.mainLayerView.getAdapter(MetaDataView.class);
         if (this.metaDataView == null) {
@@ -115,7 +116,7 @@ public abstract class GL3DImageLayer extends GL3DGroup implements GL3DCameraList
 
         this.doUpdateROI = true;
         this.markAsChanged();
-        updateROI(state.getActiveCamera());
+        //updateROI(state.getActiveCamera());
 
         state.getActiveCamera().updateCameraTransformation();
     }
@@ -128,7 +129,7 @@ public abstract class GL3DImageLayer extends GL3DGroup implements GL3DCameraList
     public void shapeUpdate(GL3DState state) {
         super.shapeUpdate(state);
         // Log.debug("GL3DImageLayer: '"+getName()+" is updating its ROI");
-        this.updateROI(state.getActiveCamera());
+        //this.updateROI(state.getActiveCamera());
         doUpdateROI = false;
         this.accellerationShape.setUnchanged();
     }
@@ -156,7 +157,7 @@ public abstract class GL3DImageLayer extends GL3DGroup implements GL3DCameraList
         this.direction = direction;
     }
 
-    private void updateROI(GL3DCamera activeCamera) {
+    public void updateROI(GL3DCamera activeCamera) {
         MetaData metaData = metaDataView.getMetaData();
         HelioviewerMetaData hvmd = null;
         if (metaData instanceof HelioviewerMetaData) {
@@ -169,10 +170,12 @@ public abstract class GL3DImageLayer extends GL3DGroup implements GL3DCameraList
         double theta = 0;
         phi = hvmd.getPhi();
         theta = hvmd.getTheta();
+        System.out.println("ROIUP" + phi);
         this.accellerationShape.setPhi(phi);
         this.accellerationShape.setTheta(theta);
         //GL3DQuatd rth = GL3DQuatd.createRotation(phi, new GL3DVec3d(0, 1, 0));
-        //rth.rotate(GL3DQuatd.createRotation(-theta, new GL3DVec3d(1, 0, 0)));
+        //rth.rotate(GL3DQuatd.createRotation(theta, new GL3DVec3d(1, 0, 0)));
+
         GL3DQuatd rth = GL3DQuatd.createRotation(theta, new GL3DVec3d(1, 0, 0));
         rth.rotate(GL3DQuatd.createRotation(phi, new GL3DVec3d(0, 1, 0)));
         GL3DMat4d rt = rth.toMatrix();
@@ -185,7 +188,7 @@ public abstract class GL3DImageLayer extends GL3DGroup implements GL3DCameraList
         double maxPhysicalX = -Double.MAX_VALUE;
         double maxPhysicalY = -Double.MAX_VALUE;
 
-        double res = 5.;
+        double res = 10.;
         boolean addpoints = false;
         if (Displayer.pointList.size() == 0) {
             //addpoints = true;//Uncomment to debug ROI problems, press "R" to capture region
@@ -232,30 +235,8 @@ public abstract class GL3DImageLayer extends GL3DGroup implements GL3DCameraList
             }
         }
         //Increase computed region artificially
-        if (minPhysicalX < 0) {
-            minPhysicalX = minPhysicalX * 1.3;
-        } else {
-            minPhysicalX = minPhysicalX * 0.7;
-        }
-        if (minPhysicalY < 0) {
-            minPhysicalY = minPhysicalY * 1.3;
-        } else {
-            minPhysicalY = minPhysicalY * 0.7;
-        }
-        if (maxPhysicalX > 0) {
-            maxPhysicalX = maxPhysicalX * 1.3;
-        } else {
-            maxPhysicalX = maxPhysicalX * 0.7;
-        }
-        if (maxPhysicalY > 0) {
-            maxPhysicalY = maxPhysicalY * 1.3;
-        } else {
-            maxPhysicalY = maxPhysicalY * 0.7;
-        }
         //Until here
-        maxPhysicalX = maxPhysicalX * 1.3;
-        minPhysicalY = minPhysicalY * 1.3;
-        maxPhysicalY = maxPhysicalY * 1.3;
+
         if (minPhysicalX < metaData.getPhysicalLowerLeft().getX())
             minPhysicalX = metaData.getPhysicalLowerLeft().getX();
         if (minPhysicalY < metaData.getPhysicalLowerLeft().getY())
@@ -264,7 +245,22 @@ public abstract class GL3DImageLayer extends GL3DGroup implements GL3DCameraList
             maxPhysicalX = metaData.getPhysicalUpperRight().getX();
         if (maxPhysicalY > metaData.getPhysicalUpperRight().getY())
             maxPhysicalY = metaData.getPhysicalUpperRight().getY();
-
+        /*
+         * double widthxAdd = Math.abs((maxPhysicalX - minPhysicalX) * 0.1);
+         * double widthyAdd = Math.abs((maxPhysicalY - minPhysicalY) * 0.1);
+         * minPhysicalX = minPhysicalX - widthxAdd; maxPhysicalX = maxPhysicalX
+         * + widthxAdd; minPhysicalY = minPhysicalY - widthyAdd; maxPhysicalY =
+         * maxPhysicalY + widthyAdd;
+         *
+         * if (minPhysicalX < metaData.getPhysicalLowerLeft().getX())
+         * minPhysicalX = metaData.getPhysicalLowerLeft().getX(); if
+         * (minPhysicalY < metaData.getPhysicalLowerLeft().getY()) minPhysicalY
+         * = metaData.getPhysicalLowerLeft().getY(); if (maxPhysicalX >
+         * metaData.getPhysicalUpperRight().getX()) maxPhysicalX =
+         * metaData.getPhysicalUpperRight().getX(); if (maxPhysicalY >
+         * metaData.getPhysicalUpperRight().getY()) maxPhysicalY =
+         * metaData.getPhysicalUpperRight().getY();
+         */
         double regionWidth = maxPhysicalX - minPhysicalX;
         double regionHeight = maxPhysicalY - minPhysicalY;
         //if (addpoints) {//Uncomment to debug ROI problems,
@@ -298,7 +294,7 @@ public abstract class GL3DImageLayer extends GL3DGroup implements GL3DCameraList
     @Override
     public void viewChanged(View sender, ChangeEvent aEvent) {
         if (Displayer.getSingletonInstance().getState() == Displayer.STATE3D) {
-            this.updateROI(GL3DState.get().getActiveCamera());
+            //this.updateROI(GL3DState.get().getActiveCamera());
         }
     }
 

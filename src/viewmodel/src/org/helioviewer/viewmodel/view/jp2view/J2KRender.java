@@ -10,18 +10,29 @@ import kdu_jni.Kdu_region_compositor;
 
 import org.helioviewer.base.logging.Log;
 import org.helioviewer.base.math.Interval;
+import org.helioviewer.gl3d.camera.GL3DCamera;
+import org.helioviewer.gl3d.camera.GL3DSolarRotationTrackingTrackballCamera;
+import org.helioviewer.gl3d.model.image.GL3DImageLayer;
+import org.helioviewer.gl3d.scenegraph.GL3DState;
+import org.helioviewer.gl3d.view.GL3DImageTextureView;
+import org.helioviewer.jhv.layers.LayersModel;
 import org.helioviewer.viewmodel.changeevent.ChangeEvent;
 import org.helioviewer.viewmodel.changeevent.NonConstantMetaDataChangedReason;
+import org.helioviewer.viewmodel.changeevent.TimestampChangedReason;
 import org.helioviewer.viewmodel.imagedata.ARGBInt32ImageData;
 import org.helioviewer.viewmodel.imagedata.ColorMask;
 import org.helioviewer.viewmodel.imagedata.SingleChannelByte8ImageData;
+import org.helioviewer.viewmodel.metadata.HelioviewerMetaData;
 import org.helioviewer.viewmodel.metadata.MetaData;
 import org.helioviewer.viewmodel.metadata.NonConstantMetaData;
+import org.helioviewer.viewmodel.view.AbstractBasicView;
 import org.helioviewer.viewmodel.view.CachedMovieView;
 import org.helioviewer.viewmodel.view.LinkedMovieManager;
 import org.helioviewer.viewmodel.view.MovieView;
 import org.helioviewer.viewmodel.view.MovieView.AnimationMode;
+import org.helioviewer.viewmodel.view.View;
 import org.helioviewer.viewmodel.view.cache.DateTimeCache;
+import org.helioviewer.viewmodel.view.jp2view.datetime.ImmutableDateTime;
 import org.helioviewer.viewmodel.view.jp2view.image.JP2ImageParameter;
 import org.helioviewer.viewmodel.view.jp2view.image.SubImage;
 import org.helioviewer.viewmodel.view.jp2view.kakadu.JHV_Kdu_thread_env;
@@ -263,7 +274,40 @@ class J2KRender implements Runnable {
 
     private void renderLayer(int numLayer) {
         parentImageRef.getLock().lock();
+        System.out.println(numLayer + "NNL " + parentViewRef.getImageViewParams().compositionLayer);
+        View av = LayersModel.getSingletonInstance().getActiveView();
+        AbstractBasicView aabv = (AbstractBasicView) av;
+        if (av != null) {
+            HelioviewerMetaData hvmd = (HelioviewerMetaData) (parentViewRef.getMetadata());
+            hvmd.updateDateTime();
+            hvmd.checkForModifications();
+            System.out.println("HVMDPHI" + hvmd.getPhi());
 
+            GL3DImageTextureView tv = av.getAdapter(GL3DImageTextureView.class);
+            if (tv != null) {
+                GL3DImageLayer il = tv.getImageLayer();
+                GL3DCamera ac = null;
+                GL3DSolarRotationTrackingTrackballCamera tb = null;
+                if (GL3DState.get() != null) {
+                    ac = GL3DState.get().getActiveCamera();
+                    if (ac instanceof GL3DSolarRotationTrackingTrackballCamera) {
+                        tb = (GL3DSolarRotationTrackingTrackballCamera) ac;
+                    }
+                }
+                if (il != null && tb != null) {
+                    ChangeEvent event = new ChangeEvent();
+                    ImmutableDateTime dt = null;
+                    if (parentViewRef instanceof JHVJPXView) {
+                        DateTimeCache dtc = ((JHVJPXView) parentViewRef).getDateTimeCache();
+                        dt = dtc.getDateTime(numLayer);
+                    }
+                    event.addReason(new TimestampChangedReason(parentViewRef, dt));
+                    tb.viewChanged(null, event);
+                    il.updateROI(tb);
+
+                }
+            }
+        }
         try {
             if (JP2Image.numJP2ImagesInUse() == 1) {
                 compositorRef.Set_thread_env(JHV_Kdu_thread_env.getSingletonInstance(), 0);
@@ -293,6 +337,7 @@ class J2KRender implements Runnable {
                 if (metaData instanceof NonConstantMetaData && ((NonConstantMetaData) metaData).checkForModifications()) {
                     parentViewRef.updateParameter();
                     currParams = parentViewRef.getImageViewParams();
+                    System.out.println("CURPAR" + currParams);
                     parentViewRef.addChangedReason(new NonConstantMetaDataChangedReason(parentViewRef, metaData));
                 }
             }
@@ -332,6 +377,7 @@ class J2KRender implements Runnable {
                 // Arrays.fill(intBuffer[currentIntBuffer], 0);
                 // }
             }
+            //
 
             while (!compositorRef.Is_processing_complete()) {
                 compositorRef.Process(MAX_RENDER_SAMPLES, newRegion);
