@@ -15,6 +15,7 @@ import org.helioviewer.gl3d.camera.GL3DSolarRotationTrackingTrackballCamera;
 import org.helioviewer.gl3d.model.image.GL3DImageLayer;
 import org.helioviewer.gl3d.scenegraph.GL3DState;
 import org.helioviewer.gl3d.view.GL3DImageTextureView;
+import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.layers.LayersModel;
 import org.helioviewer.viewmodel.changeevent.ChangeEvent;
 import org.helioviewer.viewmodel.changeevent.NonConstantMetaDataChangedReason;
@@ -25,7 +26,6 @@ import org.helioviewer.viewmodel.imagedata.SingleChannelByte8ImageData;
 import org.helioviewer.viewmodel.metadata.HelioviewerMetaData;
 import org.helioviewer.viewmodel.metadata.MetaData;
 import org.helioviewer.viewmodel.metadata.NonConstantMetaData;
-import org.helioviewer.viewmodel.view.AbstractBasicView;
 import org.helioviewer.viewmodel.view.CachedMovieView;
 import org.helioviewer.viewmodel.view.LinkedMovieManager;
 import org.helioviewer.viewmodel.view.MovieView;
@@ -274,14 +274,11 @@ class J2KRender implements Runnable {
 
     private void renderLayer(int numLayer) {
         parentImageRef.getLock().lock();
-        System.out.println(numLayer + "NNL " + parentViewRef.getImageViewParams().compositionLayer);
         View av = LayersModel.getSingletonInstance().getActiveView();
-        AbstractBasicView aabv = (AbstractBasicView) av;
         if (av != null) {
             HelioviewerMetaData hvmd = (HelioviewerMetaData) (parentViewRef.getMetadata());
             hvmd.updateDateTime();
             hvmd.checkForModifications();
-            System.out.println("HVMDPHI" + hvmd.getPhi());
 
             GL3DImageTextureView tv = av.getAdapter(GL3DImageTextureView.class);
             if (tv != null) {
@@ -337,7 +334,6 @@ class J2KRender implements Runnable {
                 if (metaData instanceof NonConstantMetaData && ((NonConstantMetaData) metaData).checkForModifications()) {
                     parentViewRef.updateParameter();
                     currParams = parentViewRef.getImageViewParams();
-                    System.out.println("CURPAR" + currParams);
                     parentViewRef.addChangedReason(new NonConstantMetaDataChangedReason(parentViewRef, metaData));
                 }
             }
@@ -517,34 +513,34 @@ class J2KRender implements Runnable {
                         movieManager.updateCurrentFrameToMaster(new ChangeEvent());
                     }
                 }
+                synchronized (Displayer.displaylock) {
+                    renderLayer(curLayer);
 
-                renderLayer(curLayer);
+                    SubImage roi = currParams.subImage;
+                    int width = roi.width;
+                    int height = roi.height;
 
-                SubImage roi = currParams.subImage;
-                int width = roi.width;
-                int height = roi.height;
-
-                if (parentImageRef.getNumComponents() < 2) {
-                    if (roi.getNumPixels() == byteBuffer[currentByteBuffer].length) {
-                        SingleChannelByte8ImageData imdata = new SingleChannelByte8ImageData(width, height, byteBuffer[currentByteBuffer], new ColorMask());
-                        parentViewRef.setSubimageData(imdata, roi, curLayer, currParams.resolution.getZoomPercent(), false);
-                    } else {
-                        Log.warn("J2KRender: Params out of sync, skip frame");
-                    }
-                } else {
-                    if (roi.getNumPixels() == intBuffer[currentIntBuffer].length) {
-                        boolean singleChannel = false;
-                        if (parentImageRef.getNumComponents() == 2) {
-                            singleChannel = true;
+                    if (parentImageRef.getNumComponents() < 2) {
+                        if (roi.getNumPixels() == byteBuffer[currentByteBuffer].length) {
+                            SingleChannelByte8ImageData imdata = new SingleChannelByte8ImageData(width, height, byteBuffer[currentByteBuffer], new ColorMask());
+                            parentViewRef.setSubimageData(imdata, roi, curLayer, currParams.resolution.getZoomPercent(), false);
+                        } else {
+                            Log.warn("J2KRender: Params out of sync, skip frame");
                         }
-
-                        ARGBInt32ImageData imdata = new ARGBInt32ImageData(singleChannel, width, height, intBuffer[currentIntBuffer], new ColorMask());
-                        parentViewRef.setSubimageData(imdata, roi, curLayer, currParams.resolution.getZoomPercent(), false);
                     } else {
-                        Log.warn("J2KRender: Params out of sync, skip frame");
+                        if (roi.getNumPixels() == intBuffer[currentIntBuffer].length) {
+                            boolean singleChannel = false;
+                            if (parentImageRef.getNumComponents() == 2) {
+                                singleChannel = true;
+                            }
+
+                            ARGBInt32ImageData imdata = new ARGBInt32ImageData(singleChannel, width, height, intBuffer[currentIntBuffer], new ColorMask());
+                            parentViewRef.setSubimageData(imdata, roi, curLayer, currParams.resolution.getZoomPercent(), false);
+                        } else {
+                            Log.warn("J2KRender: Params out of sync, skip frame");
+                        }
                     }
                 }
-
                 if (!movieMode) {
                     break;
                 } else {

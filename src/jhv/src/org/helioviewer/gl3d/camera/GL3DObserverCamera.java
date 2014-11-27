@@ -20,7 +20,6 @@ import org.helioviewer.viewmodel.view.LinkedMovieManager;
 import org.helioviewer.viewmodel.view.MetaDataView;
 import org.helioviewer.viewmodel.view.TimedMovieView;
 import org.helioviewer.viewmodel.view.View;
-import org.helioviewer.viewmodel.view.ViewListener;
 import org.helioviewer.viewmodel.view.jp2view.JHVJP2View;
 
 /**
@@ -32,7 +31,7 @@ import org.helioviewer.viewmodel.view.jp2view.JHVJP2View;
  * @author Simon Spoerri (simon.spoerri@fhnw.ch)
  *
  */
-public class GL3DObserverCamera extends GL3DSolarRotationTrackingTrackballCamera implements ViewListener {
+public class GL3DObserverCamera extends GL3DSolarRotationTrackingTrackballCamera {
 
     private Date currentDate = null;
     private double currentRotation = 0.0;
@@ -49,13 +48,13 @@ public class GL3DObserverCamera extends GL3DSolarRotationTrackingTrackballCamera
     @Override
     public void activate(GL3DCamera precedingCamera) {
         super.activate(precedingCamera);
-        getSceneGraphView().addViewListener(this);
+        //getSceneGraphView().addViewListener(this);
     }
 
     @Override
     public void deactivate() {
         super.deactivate();
-        getSceneGraphView().removeViewListener(this);
+        //getSceneGraphView().removeViewListener(this);
     };
 
     @Override

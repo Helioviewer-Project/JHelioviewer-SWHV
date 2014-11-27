@@ -3,7 +3,6 @@ package org.helioviewer.viewmodel.view.jp2view;
 import java.util.Date;
 
 import org.helioviewer.base.math.Interval;
-import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.viewmodel.changeevent.ChangeEvent;
 import org.helioviewer.viewmodel.changeevent.PlayStateChangedReason;
 import org.helioviewer.viewmodel.imagedata.ImageData;
@@ -415,9 +414,9 @@ public class JHVJPXView extends JHVJP2View implements TimedMovieView, CachedMovi
         fullyLoaded = this.imageCacheStatus.getImageStatus(compositionLayer) == CacheStatus.COMPLETE;
 
         if (this.reader != null && blockingMode) {
-            synchronized (Displayer.displaylock) {
-                setSubimageDataHelper(newImageData, roi, compositionLayer, zoompercent, fullyLoaded);
-            }
+            // synchronized (Displayer.displaylock) {
+            setSubimageDataHelper(newImageData, roi, compositionLayer, zoompercent, fullyLoaded);
+            //}
         } else {
             setSubimageDataHelper(newImageData, roi, compositionLayer, zoompercent, fullyLoaded);
         }
