@@ -9,6 +9,7 @@ import org.helioviewer.base.math.Vector2dDouble;
 import org.helioviewer.base.physics.Astronomy;
 import org.helioviewer.base.physics.Constants;
 import org.helioviewer.gl3d.changeevent.ImageTextureRecapturedReason;
+import org.helioviewer.gl3d.model.image.GL3DImageLayer;
 import org.helioviewer.gl3d.model.image.GL3DImageMesh;
 import org.helioviewer.gl3d.scenegraph.GL3DState;
 import org.helioviewer.gl3d.shader.GL3DImageFragmentShaderProgram;
@@ -130,6 +131,7 @@ public class GL3DImageTextureView extends AbstractGL3DView implements GL3DView, 
                 phi -= ((HelioviewerPositionedMetaData) (metadataView.getMetaData())).getStonyhurstLongitude() / MathUtils.radeg;
                 theta = -((HelioviewerPositionedMetaData) (metadataView.getMetaData())).getStonyhurstLatitude() / MathUtils.radeg;
             }
+            System.out.println("TEXTUREPHITHETA" + phi + " " + theta);
             HelioviewerPositionedMetaData hvmd = (HelioviewerPositionedMetaData) metadataView.getMetaData();
             this.vertexShader.changeRect(xOffset, yOffset, xScale, yScale);
             this.vertexShader.changeTextureScale(sim.getSubimageData().getScaleX(), sim.getSubimageData().getScaleY());
@@ -187,6 +189,7 @@ public class GL3DImageTextureView extends AbstractGL3DView implements GL3DView, 
 
     public double phi = 0.0;
     public double theta = 0.0;
+    private GL3DImageLayer gl3dImageLayer;
 
     @Override
     protected void setViewSpecificImplementation(View newView, ChangeEvent changeEvent) {
@@ -236,5 +239,13 @@ public class GL3DImageTextureView extends AbstractGL3DView implements GL3DView, 
 
     public GL3DImageFragmentShaderProgram getFragmentShader() {
         return this.fragmentShader;
+    }
+
+    public void setImageLayer(GL3DImageLayer gl3dImageLayer) {
+        this.gl3dImageLayer = gl3dImageLayer;
+    }
+
+    public GL3DImageLayer getImageLayer() {
+        return this.gl3dImageLayer;
     }
 }
