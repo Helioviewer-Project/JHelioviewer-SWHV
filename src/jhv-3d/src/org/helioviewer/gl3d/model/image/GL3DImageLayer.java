@@ -170,7 +170,6 @@ public abstract class GL3DImageLayer extends GL3DGroup implements GL3DCameraList
         double theta = 0;
         phi = hvmd.getPhi();
         theta = hvmd.getTheta();
-        System.out.println("ROIUP" + phi);
         this.accellerationShape.setPhi(phi);
         this.accellerationShape.setTheta(theta);
         //GL3DQuatd rth = GL3DQuatd.createRotation(phi, new GL3DVec3d(0, 1, 0));
@@ -245,22 +244,23 @@ public abstract class GL3DImageLayer extends GL3DGroup implements GL3DCameraList
             maxPhysicalX = metaData.getPhysicalUpperRight().getX();
         if (maxPhysicalY > metaData.getPhysicalUpperRight().getY())
             maxPhysicalY = metaData.getPhysicalUpperRight().getY();
-        /*
-         * double widthxAdd = Math.abs((maxPhysicalX - minPhysicalX) * 0.1);
-         * double widthyAdd = Math.abs((maxPhysicalY - minPhysicalY) * 0.1);
-         * minPhysicalX = minPhysicalX - widthxAdd; maxPhysicalX = maxPhysicalX
-         * + widthxAdd; minPhysicalY = minPhysicalY - widthyAdd; maxPhysicalY =
-         * maxPhysicalY + widthyAdd;
-         *
-         * if (minPhysicalX < metaData.getPhysicalLowerLeft().getX())
-         * minPhysicalX = metaData.getPhysicalLowerLeft().getX(); if
-         * (minPhysicalY < metaData.getPhysicalLowerLeft().getY()) minPhysicalY
-         * = metaData.getPhysicalLowerLeft().getY(); if (maxPhysicalX >
-         * metaData.getPhysicalUpperRight().getX()) maxPhysicalX =
-         * metaData.getPhysicalUpperRight().getX(); if (maxPhysicalY >
-         * metaData.getPhysicalUpperRight().getY()) maxPhysicalY =
-         * metaData.getPhysicalUpperRight().getY();
-         */
+
+        double widthxAdd = Math.abs((maxPhysicalX - minPhysicalX) * 0.1);
+        double widthyAdd = Math.abs((maxPhysicalY - minPhysicalY) * 0.1);
+        minPhysicalX = minPhysicalX - widthxAdd;
+        maxPhysicalX = maxPhysicalX + widthxAdd;
+        minPhysicalY = minPhysicalY - widthyAdd;
+        maxPhysicalY = maxPhysicalY + widthyAdd;
+
+        if (minPhysicalX < metaData.getPhysicalLowerLeft().getX())
+            minPhysicalX = metaData.getPhysicalLowerLeft().getX();
+        if (minPhysicalY < metaData.getPhysicalLowerLeft().getY())
+            minPhysicalY = metaData.getPhysicalLowerLeft().getY();
+        if (maxPhysicalX > metaData.getPhysicalUpperRight().getX())
+            maxPhysicalX = metaData.getPhysicalUpperRight().getX();
+        if (maxPhysicalY > metaData.getPhysicalUpperRight().getY())
+            maxPhysicalY = metaData.getPhysicalUpperRight().getY();
+
         double regionWidth = maxPhysicalX - minPhysicalX;
         double regionHeight = maxPhysicalY - minPhysicalY;
         //if (addpoints) {//Uncomment to debug ROI problems,
