@@ -58,7 +58,7 @@ public class GL3DInternalPluginConfiguration implements GL3DPluginConfiguration 
         // Load plugins with a URLClassLoader
         try {
             URL[] urls = new URL[1];
-            urls[0] = f.toURL();
+            urls[0] = f.toURI().toURL();
 
             URLClassLoader classLoader = new URLClassLoader(urls);
             return (GL3DModelPlugin) classLoader.loadClass(clazz).newInstance();
@@ -90,7 +90,7 @@ public class GL3DInternalPluginConfiguration implements GL3DPluginConfiguration 
         try {
             URL[] urls = new URL[1];
 
-            urls[0] = hek.toURL();
+            urls[0] = hek.toURI().toURL();
 
             URLClassLoader classLoader = new URLClassLoader(urls);
 

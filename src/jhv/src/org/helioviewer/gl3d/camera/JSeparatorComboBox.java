@@ -1,4 +1,5 @@
 package org.helioviewer.gl3d.camera;
+
 import java.awt.Component;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
@@ -20,6 +21,8 @@ import javax.swing.plaf.basic.BasicComboBoxRenderer;
  */
 public class JSeparatorComboBox extends JComboBox implements KeyListener {
     //  Track key presses and releases
+
+    private static final long serialVersionUID = -13987864729937697L;
 
     private boolean released = true;
 
@@ -130,6 +133,8 @@ public class JSeparatorComboBox extends JComboBox implements KeyListener {
      * Class to render the JSeparator compenent
      */
     class SeparatorRenderer extends BasicComboBoxRenderer {
+        private static final long serialVersionUID = -5948578422346341592L;
+
         @Override
         public Component getListCellRendererComponent(JList list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
             super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);

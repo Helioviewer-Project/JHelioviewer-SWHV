@@ -14,7 +14,7 @@ import org.jhv.dataset.tree.models.DatasetNodeRenderer;
 import org.jhv.dataset.tree.models.DatasetTreeCellEditor;
 
 public class test2 extends JFrame {
-
+    private static final long serialVersionUID = 1L;
     DatasetIntervals modeltest;
     LayersModel layersModel;
     ArrayList<LayerDescriptor> descriptors;
