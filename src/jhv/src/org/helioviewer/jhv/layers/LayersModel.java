@@ -42,7 +42,6 @@ import org.helioviewer.viewmodel.changeevent.ViewportChangedReason;
 import org.helioviewer.viewmodel.io.APIResponse;
 import org.helioviewer.viewmodel.io.APIResponseDump;
 import org.helioviewer.viewmodel.metadata.HelioviewerMetaData;
-import org.helioviewer.viewmodel.metadata.HelioviewerMetadataContainer;
 import org.helioviewer.viewmodel.metadata.MetaData;
 import org.helioviewer.viewmodel.metadata.ObserverMetaData;
 import org.helioviewer.viewmodel.region.Region;
@@ -880,7 +879,6 @@ public class LayersModel implements ViewListener {
         try {
             ImageViewerGui.getSingletonInstance().getMainImagePanel().setLoading(true);
             JP2Image localImage = new JP2Image(downloadDestination.toURI());
-            HelioviewerMetadataContainer.parseMetaData(localImage);
             //mainView.setJP2Image(localImage);
             //overviewView.setJP2Image(localImage);
 
@@ -1325,7 +1323,7 @@ public class LayersModel implements ViewListener {
         /*
          * ImageInfoView imageInfoView = view.getAdapter(ImageInfoView.class);
          * String typeString; String intervalString;
-         *
+         * 
          * if (imageInfoView != null) { SimpleDateFormat format = new
          * SimpleDateFormat("yyyy/MM/dd HH:mm"); Interval<Date> interval =
          * imageInfoView.getDateRange(); if (interval != null) { typeString =
