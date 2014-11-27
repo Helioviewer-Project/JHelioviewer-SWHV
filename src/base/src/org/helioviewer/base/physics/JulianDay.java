@@ -2,27 +2,27 @@
  * Copyright (c) 2002, Raben Systems, Inc.
  * All rights reserved.
  *
- * Redistribution and use in source and binary forms, with or without 
+ * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
  *
- * Redistributions of source code must retain the above copyright notice, this 
- * list of conditions and the following disclaimer. 
- * Redistributions in binary form must reproduce the above copyright notice, 
- * this list of conditions and the following disclaimer in the documentation 
- * and/or other materials provided with the distribution. 
- * Neither the name of the Raben Systems, Inc. nor the names of its contributors 
- * may be used to endorse or promote products derived from this software without 
- * specific prior written permission. 
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" 
- * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE 
- * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE 
- * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE 
- * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR 
- * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF 
- * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS 
- * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN 
- * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) 
- * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF 
+ * Redistributions of source code must retain the above copyright notice, this
+ * list of conditions and the following disclaimer.
+ * Redistributions in binary form must reproduce the above copyright notice,
+ * this list of conditions and the following disclaimer in the documentation
+ * and/or other materials provided with the distribution.
+ * Neither the name of the Raben Systems, Inc. nor the names of its contributors
+ * may be used to endorse or promote products derived from this software without
+ * specific prior written permission.
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE
+ * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+ * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+ * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+ * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+ * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF
  * THE POSSIBILITY OF SUCH DAMAGE.
  */
 package org.helioviewer.base.physics;
@@ -42,7 +42,7 @@ import org.helioviewer.base.logging.Log;
  * Routines for calculating and setting Julian day number based on algorithms
  * from Jean Meeus, "Astronomical Algorithms", 2nd Edition, Willmann-Bell, Inc.,
  * 1998.
- * 
+ *
  * @author Vern Raben (mailto:vern@raben.com)
  * @version $Revision: 1.19 $ $Date: 2002/12/12 20:46:29 $
  */
@@ -100,7 +100,7 @@ public final class JulianDay implements Cloneable {
 
     /***
      * JulianCalendar constructor - sets JD passed as double
-     * 
+     *
      * @param jd
      *            double The Julian date
      */
@@ -111,7 +111,7 @@ public final class JulianDay implements Cloneable {
 
     /***
      * Constructor to create Julian day given year, month, and decimal day
-     * 
+     *
      * @param yr
      *            the year
      * @param mo
@@ -135,7 +135,7 @@ public final class JulianDay implements Cloneable {
 
     /***
      * Construct JulianDate given year, month, and date
-     * 
+     *
      * @param yr
      *            the year
      * @param mo
@@ -174,7 +174,7 @@ public final class JulianDay implements Cloneable {
 
     /***
      * Construct JulianDate given year, month, date, hour and minute
-     * 
+     *
      * @param yr
      *            the year
      * @param mo
@@ -216,7 +216,7 @@ public final class JulianDay implements Cloneable {
 
     /***
      * Construct JulianDate given year, month, day, hour, minute, and second
-     * 
+     *
      * @param yr
      *            the year
      * @param mo
@@ -258,18 +258,18 @@ public final class JulianDay implements Cloneable {
 
     /***
      * Construct JulianDay from system time in milli-seconds since Jan 1, 1970
-     * 
+     *
      * @param timeInMilliSec
      *            milliseconds since Jan 1, 1970
      */
     public JulianDay(long timeInMilliSec) {
         setDateTime("1970-01-01 0:00");
-        add(JulianDay.DATE, ((double) timeInMilliSec / 86400000.0));
+        add(JulianDay.DATE, (timeInMilliSec / 86400000.0));
     }
 
     /***
      * Copy constructor for JulianDate
-     * 
+     *
      * @param cal
      *            the date to copy
      */
@@ -291,7 +291,7 @@ public final class JulianDay implements Cloneable {
     /***
      * Set JulianDay from sql database compatible date/time string (yyyy-mm-dd
      * hh:mm:ss)
-     * 
+     *
      * @param dateStr
      *            a date string in the format yyyy-mm-dd hh:mm:ss
      */
@@ -302,7 +302,7 @@ public final class JulianDay implements Cloneable {
 
     /***
      * Construct JulianDate given Calendar as a parameter
-     * 
+     *
      * @param cal
      *            the date as a calendar object
      */
@@ -326,7 +326,7 @@ public final class JulianDay implements Cloneable {
      * thoroughly tested, typically 1-2 second errors may occur due to
      * round-off. Will be refactored "real soon  now" :) to utilize BigDecimal
      * internal representation of Julian Day.
-     * 
+     *
      * @param unit
      *            int Time unit
      * @param val
@@ -355,13 +355,13 @@ public final class JulianDay implements Cloneable {
             break;
         case HOUR:
         case HOUR_OF_DAY:
-            set(JD, getJDN() + (double) val / 24.0);
+            set(JD, getJDN() + val / 24.0);
             break;
         case MINUTE:
-            set(JD, getJDN() + (double) val / 1440.0);
+            set(JD, getJDN() + val / 1440.0);
             break;
         case SECOND:
-            set(JD, getJDN() + (double) val / 86400.0);
+            set(JD, getJDN() + val / 86400.0);
             break;
         default:
             Log.error("Error: JulianDate.add: The 'unit' parameter is not recognized=" + unit);
@@ -376,7 +376,7 @@ public final class JulianDay implements Cloneable {
     /***
      * Add specified value in specified time unit to current Julian Date
      * increments next higher field
-     * 
+     *
      * ISSUE - meaning of incrementing YEAR and MONTH by fractional value is not
      * clear since period of a month and year varies, that is ignored. Year is
      * assumed to be 365 days and month is assumed to be 30 days for computing
@@ -384,7 +384,7 @@ public final class JulianDay implements Cloneable {
      * second errors may occur due to round-off. Will be refactored
      * "real soon  now" :) to utilize BigDecimal internal representation of
      * Julian Day.
-     * 
+     *
      * @param unit
      *            int Time unit
      * @param val
@@ -425,11 +425,11 @@ public final class JulianDay implements Cloneable {
             break;
 
         case MINUTE:
-            set(JD, getJDN() + (double) val / 1440.0);
+            set(JD, getJDN() + val / 1440.0);
             break;
 
         case SECOND:
-            set(JD, getJDN() + (double) val / 86400.0);
+            set(JD, getJDN() + val / 86400.0);
             break;
         default:
             Log.error("Error: JulianDate.add: The 'unit' parameter is not recognized=" + unit);
@@ -448,14 +448,14 @@ public final class JulianDay implements Cloneable {
 
         Double jd2 = new Double(jd.doubleValue() + 0.5);
         long I = jd2.longValue();
-        double F = jd2.doubleValue() - (double) I;
+        double F = jd2.doubleValue() - I;
         long A = 0;
         long B = 0;
 
         if (I > 2299160) {
-            Double a1 = new Double(((double) I - 1867216.25) / 36524.25);
+            Double a1 = new Double((I - 1867216.25) / 36524.25);
             A = a1.longValue();
-            Double a3 = new Double((double) A / 4.0);
+            Double a3 = new Double(A / 4.0);
             B = I + 1 + A - a3.longValue();
         } else {
             B = I;
@@ -464,11 +464,11 @@ public final class JulianDay implements Cloneable {
         double C = (double) B + 1524;
         Double d1 = new Double((C - 122.1) / 365.25);
         long D = d1.longValue();
-        Double e1 = new Double(365.25 * (double) D);
+        Double e1 = new Double(365.25 * D);
         long E = e1.longValue();
-        Double g1 = new Double((double) (C - E) / 30.6001);
+        Double g1 = new Double((C - E) / 30.6001);
         long G = g1.longValue();
-        Double h = new Double((double) G * 30.6001);
+        Double h = new Double(G * 30.6001);
         long da = (long) C - E - h.longValue();
         date = new Integer((int) da);
 
@@ -487,9 +487,9 @@ public final class JulianDay implements Cloneable {
         // Calculate fractional part as hours, minutes, and seconds
         Double dhr = new Double(24.0 * F);
         hour = new Integer(dhr.intValue());
-        Double dmin = new Double((dhr.doubleValue() - (double) dhr.longValue()) * 60.0);
+        Double dmin = new Double((dhr.doubleValue() - dhr.longValue()) * 60.0);
         minute = new Integer(dmin.intValue());
-        Double dsec = new Double((dmin.doubleValue() - (double) dmin.longValue()) * 60.0);
+        Double dsec = new Double((dmin.doubleValue() - dmin.longValue()) * 60.0);
         second = new Integer(dsec.intValue());
 
     }
@@ -538,17 +538,17 @@ public final class JulianDay implements Cloneable {
         }
 
         if ((year.intValue() > 1582) || ((year.intValue() == 1582) && (month.intValue() >= 10) && (date.intValue() >= 15))) {
-            Double a1 = new Double((double) yr / 100.0);
+            Double a1 = new Double(yr / 100.0);
             A = a1.intValue();
-            Double b1 = new Double((double) A / 4.0);
+            Double b1 = new Double(A / 4.0);
             B = 2 - A + b1.intValue();
         } else {
             B = 0;
         }
 
-        Double c1 = new Double(365.25 * (double) yr);
+        Double c1 = new Double(365.25 * yr);
         if (yr < 0) {
-            c1 = new Double(365.25 * (double) yr - 0.75);
+            c1 = new Double(365.25 * yr - 0.75);
         }
 
         C = c1.intValue();
@@ -563,11 +563,11 @@ public final class JulianDay implements Cloneable {
     /***
      * Returns time difference in days between date specified and the JulianDay
      * of this object (parameter date-this date)
-     * 
+     *
      * @param date
      *            the date to which the difference should be calculated
      * @return double the difference as a double Julien day date number
-     * 
+     *
      */
     public double diff(JulianDay date) {
         return date != null ? date.getJDN() - getJDN() : Double.NaN;
@@ -575,7 +575,7 @@ public final class JulianDay implements Cloneable {
 
     /***
      * Returns true if Julian day number is within 0.001 of parameter id
-     * 
+     *
      * @return boolean true, if day number is within 0.001 of given Julien day
      *         number
      * @param jd
@@ -587,7 +587,7 @@ public final class JulianDay implements Cloneable {
 
     /***
      * Return true if JulianDates are equal, false otherwise
-     * 
+     *
      * @return boolean true, if day number is within 0.001 of given Julien day
      *         number
      * @param date
@@ -606,7 +606,7 @@ public final class JulianDay implements Cloneable {
 
     /***
      * Returns the specified field
-     * 
+     *
      * @param field
      *            The specified field
      * @return The field value
@@ -648,7 +648,7 @@ public final class JulianDay implements Cloneable {
      * setDateFormat By default the dateFormat is "yyyy-mm-dd hh:mm:ss" Dates
      * earlier than 0 AD will use be formatted as "yyyy-mm-dd hh:mm" regardless
      * of dateFormat setting.
-     * 
+     *
      * @return a string representing the date
      */
     public String getDateTimeStr() {
@@ -674,7 +674,7 @@ public final class JulianDay implements Cloneable {
 
     /***
      * Returns the Julian Date Number as a double
-     * 
+     *
      * @return double The double representation of the Julien day
      */
     public final double getJDN() {
@@ -689,7 +689,7 @@ public final class JulianDay implements Cloneable {
 
     /***
      * Returns milli-seconds since Jan 1, 1970
-     * 
+     *
      * @return Milli seconds since Jan 1, 1970
      */
     public long getMilliSeconds() {
@@ -701,7 +701,7 @@ public final class JulianDay implements Cloneable {
 
     /***
      * Return the modified Julian date
-     * 
+     *
      * @return Modified Julien day number
      */
     public final double getMJD() {
@@ -713,7 +713,7 @@ public final class JulianDay implements Cloneable {
      * Return date as YYYYMMDDHHSS string with the least unit to be returned
      * specified For example to to return YYYYMMDD specify least unit as
      * JulianDay.DATE
-     * 
+     *
      * @param leastUnit
      *            int least unit to be returned
      * @return string representation of the date
@@ -784,7 +784,7 @@ public final class JulianDay implements Cloneable {
 
     /***
      * This method sets Julian day or modified Julian day
-     * 
+     *
      * @param field
      *            int Field to be changed
      * @param value
@@ -862,7 +862,7 @@ public final class JulianDay implements Cloneable {
     /***
      * Set various JulianCalendar fields Example: JulianDay jd=new JulianDay();
      * jd.set(Calendar.YEAR,1999);
-     * 
+     *
      * @param field
      *            int The field to be set
      * @param value
@@ -902,7 +902,7 @@ public final class JulianDay implements Cloneable {
 
     /***
      * Set year, month, and day
-     * 
+     *
      * @param year
      *            int The year
      * @param month
@@ -922,7 +922,7 @@ public final class JulianDay implements Cloneable {
 
     /***
      * Set year, month,day, hour and minute
-     * 
+     *
      * @param year
      *            int The year
      * @param month
@@ -946,7 +946,7 @@ public final class JulianDay implements Cloneable {
 
     /***
      * Set year month, day, hour, minute and second
-     * 
+     *
      * @param year
      *            int The year
      * @param month
@@ -972,7 +972,7 @@ public final class JulianDay implements Cloneable {
 
     /**
      * Sets the Julien day of this object
-     * 
+     *
      * @param jd
      *            Julien day
      */
@@ -983,7 +983,7 @@ public final class JulianDay implements Cloneable {
 
     /***
      * Set date/time from string
-     * 
+     *
      * @param str
      *            String representing the date
      */
@@ -1043,7 +1043,7 @@ public final class JulianDay implements Cloneable {
 
     /***
      * Set date from Java Date
-     * 
+     *
      * @param dat
      *            The date
      */
@@ -1064,7 +1064,7 @@ public final class JulianDay implements Cloneable {
     /***
      * Set date from sting in the form YYYYMMDDhhmmss (YYYY=year MM=month DD=day
      * hh=hr mm=min ss=sec)
-     * 
+     *
      * @param str
      *            A date string of the form YYYYMMDDhhmmss
      */
@@ -1105,6 +1105,7 @@ public final class JulianDay implements Cloneable {
     /**
      * String representation of the Julien day object
      */
+    @Override
     public final String toString() {
 
         StringBuffer buf = new StringBuffer("JulianDay[jdn=");
@@ -1132,9 +1133,10 @@ public final class JulianDay implements Cloneable {
 
     /***
      * Return clone of JulianDay object
-     * 
+     *
      * @return clone of the Julien day
      */
+    @Override
     public Object clone() {
         JulianDay clone = null;
         try {
@@ -1147,7 +1149,7 @@ public final class JulianDay implements Cloneable {
 
     /***
      * Set SimpleDateFormat string ISSUE - only valid after Jan 1, 1970
-     * 
+     *
      * @param formatStr
      *            Date formatting string
      */
@@ -1159,7 +1161,7 @@ public final class JulianDay implements Cloneable {
 
     /***
      * Set SimpleDateFormat for displaying date/time string
-     * 
+     *
      * @param dateFormat
      *            Date formatter
      */
@@ -1169,7 +1171,7 @@ public final class JulianDay implements Cloneable {
 
     /***
      * Return Java Date
-     * 
+     *
      * @return Julien day as a Date object
      */
     public Date getTime() {
@@ -1186,7 +1188,7 @@ public final class JulianDay implements Cloneable {
 
     /***
      * Get increment in days given time unit and increment
-     * 
+     *
      * @param unit
      *            Time unit (DATE,HOUR,HOUR_OF_DAY,MINUTE, or SECOND
      * @param incr
@@ -1232,7 +1234,7 @@ public final class JulianDay implements Cloneable {
 
     /***
      * Get java Calendar equivalent of Julian Day
-     * 
+     *
      * @return Julien day as a Calendar object
      */
     public java.util.Calendar getCalendar() {

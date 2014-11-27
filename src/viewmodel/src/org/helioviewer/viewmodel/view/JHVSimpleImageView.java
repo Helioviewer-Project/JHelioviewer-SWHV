@@ -28,16 +28,16 @@ import org.helioviewer.viewmodel.viewport.Viewport;
 
 /**
  * Implementation of ImageInfoView for simple image formats.
- * 
+ *
  * <p>
  * Currently, the view supports JPG and PNG images.
- * 
+ *
  * <p>
  * For further informations about the behavior of this view,
  * {@link ImageInfoView} is a good start to get into the concept.
- * 
+ *
  * @author Andreas Hoelzl
- * 
+ *
  */
 public class JHVSimpleImageView extends AbstractView implements ViewportView, RegionView, MetaDataView, SubimageDataView, ImageInfoView {
 
@@ -47,11 +47,11 @@ public class JHVSimpleImageView extends AbstractView implements ViewportView, Re
     protected ImageData subImageData;
     protected BufferedImage bufferedImage;
     protected PixelBasedMetaData pixelBasedMetaData;
-    private Interval<Date> range;
+    private final Interval<Date> range;
 
     /**
      * Constructor which loads the corresponding image from given URI.
-     * 
+     *
      * @param _uri
      *            URI where the source image is located
      * @throws MalformedURLException
@@ -69,7 +69,7 @@ public class JHVSimpleImageView extends AbstractView implements ViewportView, Re
 
     /**
      * Constructor which uses a given buffered image.
-     * 
+     *
      * @param image
      *            Buffered image object which contains the image data.
      * @param uri
@@ -112,6 +112,7 @@ public class JHVSimpleImageView extends AbstractView implements ViewportView, Re
     /**
      * {@inheritDoc}
      */
+    @Override
     public Viewport getViewport() {
         return viewport;
     }
@@ -119,6 +120,7 @@ public class JHVSimpleImageView extends AbstractView implements ViewportView, Re
     /**
      * {@inheritDoc}
      */
+    @Override
     public boolean setViewport(Viewport v, ChangeEvent event) {
 
         // check if viewport has changed
@@ -135,7 +137,7 @@ public class JHVSimpleImageView extends AbstractView implements ViewportView, Re
     /**
      * Recalculates the image data by copying the desired region out of the full
      * image.
-     * 
+     *
      * @param event
      *            ChangeEvent to fire after the new data is available
      */
@@ -147,7 +149,7 @@ public class JHVSimpleImageView extends AbstractView implements ViewportView, Re
         int y = (int) ((region.getCornerY() - pixelBasedMetaData.getPhysicalLowerLeft().getY()) / pixelBasedMetaData.getPhysicalImageHeight() * bufferedImage.getHeight());
         if (width > 0 && height > 0) {
             BufferedImage bI = new BufferedImage(width, height, bufferedImage.getType());
-            bI.getGraphics().drawImage(bufferedImage.getSubimage(x, (int) bufferedImage.getHeight() - height - y, width, height), 0, 0, null);
+            bI.getGraphics().drawImage(bufferedImage.getSubimage(x, bufferedImage.getHeight() - height - y, width, height), 0, 0, null);
 
             if (bI.getColorModel().getPixelSize() <= 8) {
                 subImageData = new SingleChannelByte8ImageData(bI, new ColorMask());
@@ -167,6 +169,7 @@ public class JHVSimpleImageView extends AbstractView implements ViewportView, Re
     /**
      * {@inheritDoc}
      */
+    @Override
     @SuppressWarnings("unchecked")
     public <T extends View> T getAdapter(Class<T> c) {
         if (c.isInstance(this)) {
@@ -179,6 +182,7 @@ public class JHVSimpleImageView extends AbstractView implements ViewportView, Re
     /**
      * {@inheritDoc}
      */
+    @Override
     public Region getRegion() {
         return region;
     }
@@ -186,6 +190,7 @@ public class JHVSimpleImageView extends AbstractView implements ViewportView, Re
     /**
      * {@inheritDoc}
      */
+    @Override
     public boolean setRegion(Region r, ChangeEvent event) {
 
         event.addReason(new RegionUpdatedReason(this, r));
@@ -204,6 +209,7 @@ public class JHVSimpleImageView extends AbstractView implements ViewportView, Re
     /**
      * {@inheritDoc}
      */
+    @Override
     public MetaData getMetaData() {
         return pixelBasedMetaData;
     }
@@ -211,6 +217,7 @@ public class JHVSimpleImageView extends AbstractView implements ViewportView, Re
     /**
      * {@inheritDoc}
      */
+    @Override
     public ImageData getSubimageData() {
         return subImageData;
     }
@@ -218,6 +225,7 @@ public class JHVSimpleImageView extends AbstractView implements ViewportView, Re
     /**
      * {@inheritDoc}
      */
+    @Override
     public String getName() {
         String name = uri.getPath();
         return name.substring(name.lastIndexOf('/') + 1, name.lastIndexOf('.'));
@@ -226,6 +234,7 @@ public class JHVSimpleImageView extends AbstractView implements ViewportView, Re
     /**
      * {@inheritDoc}
      */
+    @Override
     public URI getUri() {
         return uri;
     }
@@ -233,10 +242,12 @@ public class JHVSimpleImageView extends AbstractView implements ViewportView, Re
     /**
      * {@inheritDoc}
      */
+    @Override
     public boolean isRemote() {
         return false;
     }
 
+    @Override
     public URI getDownloadURI() {
         return uri;
     }

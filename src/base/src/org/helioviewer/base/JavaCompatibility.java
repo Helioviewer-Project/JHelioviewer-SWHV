@@ -5,7 +5,7 @@ import java.lang.reflect.Array;
 /**
  * This class introduces some workarounds to have commonly used JAVA 6
  * functionality methods available in JAVA 5, too
- * 
+ *
  * @author Malte Nuhn
  */
 public class JavaCompatibility {
@@ -20,7 +20,7 @@ public class JavaCompatibility {
      * Workaround for having Arrays.CopyOf available in Java 1.5 reallocates an
      * array with a new size, and copies the contents of the old array to the
      * new array.
-     * 
+     *
      * @param oldArray
      *            the old array, to be reallocated.
      * @param newSize
@@ -39,7 +39,7 @@ public class JavaCompatibility {
      * Workaround for having Arrays.CopyOf available in Java 1.5 reallocates an
      * array with a new size, and copies the contents of the old array to the
      * new array.
-     * 
+     *
      * @param oldArray
      *            the old array, to be reallocated.
      * @param newSize
@@ -49,7 +49,7 @@ public class JavaCompatibility {
     public static String[] copyArrayString(final String[] oldArray, final int newSize) {
         String[] newArray = new String[newSize];
         System.arraycopy(oldArray, 0, newArray, 0, Math.min(newSize, oldArray.length));
-        String[] res = (String[]) newArray;
+        String[] res = newArray;
         return res;
     }
 
