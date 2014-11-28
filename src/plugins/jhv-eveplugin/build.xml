@@ -94,7 +94,8 @@
 	<!-- Compile sources -->
 
 	<target name="compile" depends="jhv.compile, init">
-		<javac srcdir="${src}" destdir="${bin}" target="1.5" source="1.5"  debug="on" debuglevel="source,lines,vars" includeantruntime="false">
+            <javac srcdir="${src}" destdir="${bin}" target="1.5" source="1.5"  debug="on" debuglevel="source,lines,vars" includeantruntime="false">
+                <compilerarg value="-Xlint:all"/>
 			<classpath>
 				<fileset dir="${lib}">
 					<include name="**/*.jar" />
@@ -139,7 +140,9 @@
 
     <target name="bundle-src-prepare" depends="build-init">
         <mkdir dir="${jhv.bin}/build" />
-        <javac destdir="${jhv.bin}/build/" srcdir="${jhv.build.resources}/shared/" includes="**/ManifestGenerator.java" />
+        <javac destdir="${jhv.bin}/build/" srcdir="${jhv.build.resources}/shared/" includes="**/ManifestGenerator.java" >
+            <compilerarg value="-Xlint:all"/>
+        </javac>
         <taskdef name="generateManifest" classname="ManifestGenerator">
             <classpath location="${jhv.bin}/build/"/>
         </taskdef>

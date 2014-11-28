@@ -179,7 +179,7 @@ public class SWHVHEKPluginPanel extends OverlayPanel implements ActionListener, 
                     getStructure();
                 }
             }
-        });
+        }, "HEKLAYERADDED");
         threadUpdate.start();
     }
 
