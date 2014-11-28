@@ -1,5 +1,6 @@
 package org.helioviewer.jhv.layers;
 
+import java.awt.EventQueue;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -1323,7 +1324,7 @@ public class LayersModel implements ViewListener {
         /*
          * ImageInfoView imageInfoView = view.getAdapter(ImageInfoView.class);
          * String typeString; String intervalString;
-         * 
+         *
          * if (imageInfoView != null) { SimpleDateFormat format = new
          * SimpleDateFormat("yyyy/MM/dd HH:mm"); Interval<Date> interval =
          * imageInfoView.getDateRange(); if (interval != null) { typeString =
@@ -1513,8 +1514,7 @@ public class LayersModel implements ViewListener {
      * Notify all LayersListeners
      */
     private void fireTimestampChanged(final int idx) {
-        Thread thread = new Thread(new Runnable() {
-
+        EventQueue.invokeLater(new Runnable() {
             @Override
             public void run() {
                 rwl.readLock().lock();
@@ -1526,10 +1526,7 @@ public class LayersModel implements ViewListener {
                     rwl.readLock().unlock();
                 }
             }
-        }, "LayersModelThread (timestamp changed)");
-
-        thread.start();
-
+        });
     }
 
     /**
