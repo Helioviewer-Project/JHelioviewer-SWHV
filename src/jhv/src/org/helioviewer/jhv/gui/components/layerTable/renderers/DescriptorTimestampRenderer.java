@@ -36,6 +36,7 @@ public class DescriptorTimestampRenderer extends DefaultTableCellRenderer {
      */
     public DescriptorTimestampRenderer(boolean drawLine) {
         this.drawLine = drawLine;
+        this.setHorizontalAlignment(JLabel.RIGHT);
     }
 
     /**
