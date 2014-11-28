@@ -260,7 +260,7 @@ public class JavaHelioViewerLauncher {
                     public void run() {
                         p.destroy();
                     }
-                }));
+                }, "SHUTDOWNHOOKTHREAD"));
                 logProcessOutput(p, "");
             } catch (IOException e) {
                 System.err.println("JavaHelioviewerLauncher > Could not launch JHelioviewer");

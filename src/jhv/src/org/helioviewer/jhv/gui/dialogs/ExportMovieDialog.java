@@ -962,12 +962,14 @@ public class ExportMovieDialog extends JDialog implements ChangeListener, Action
             if (topmostView != null) {
                 topmostView.removeViewListener(this);
             }
-            new Thread() {
+            Thread t = new Thread(new Runnable() {
                 @Override
                 public void run() {
                     release();
                 }
-            }.start();
+            }, "ExportMovieFinishThread");
+
+            t.start();
         } else if (e.getSource() == aspectRatioSelection) {
             AspectRatio aspectRatio = (AspectRatio) aspectRatioSelection.getSelectedItem();
             if (aspectRatio.getWidth() != 0) {
@@ -1493,22 +1495,24 @@ public class ExportMovieDialog extends JDialog implements ChangeListener, Action
                 jp2View.setReaderMode(ReaderMode.SIGNAL_RENDER_ONCE);
             } else if (chosenOption == 2) {
                 exportFinished = true;
-                new Thread() {
+                Thread t = new Thread(new Runnable() {
                     @Override
                     public void run() {
                         release();
                     }
-                }.start();
+                }, "ExportMovieFinishThread2");
+                t.start();
             }
         } else {
             if (chosenOption == 0) {
                 exportFinished = true;
-                new Thread() {
+                Thread t = new Thread(new Runnable() {
                     @Override
                     public void run() {
                         release();
                     }
-                }.start();
+                }, "ExportMovieFinishThread3");
+                t.start();
             }
         }
     }
@@ -1558,12 +1562,13 @@ public class ExportMovieDialog extends JDialog implements ChangeListener, Action
             @Override
             public void run() {
                 dispose();
-                new Thread() {
+                Thread t = new Thread(new Runnable() {
                     @Override
                     public void run() {
                         JHVGlobals.gc();
                     }
-                }.start();
+                }, "MOVIEEXPORTRELEASE");
+                t.start();
             }
         });
     }

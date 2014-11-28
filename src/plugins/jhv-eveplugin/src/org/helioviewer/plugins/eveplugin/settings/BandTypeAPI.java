@@ -34,8 +34,7 @@ public class BandTypeAPI extends APIAbstract {
 
     public BandTypeAPI() {
         super();
-        LogSettings.init("/settings/log4j.initial.properties", JHVDirectory.SETTINGS.getPath() + "log4j.properties",
-                JHVDirectory.LOGS.getPath(), false);
+        LogSettings.init("/settings/log4j.initial.properties", JHVDirectory.SETTINGS.getPath() + "log4j.properties", JHVDirectory.LOGS.getPath(), false);
         this.loadSettings();
         this.setBaseUrl(defaultProperties.getProperty("plugin.eve.dataseturl"));
         this.updateDatasets();
@@ -182,7 +181,7 @@ public class BandTypeAPI extends APIAbstract {
                     Log.error("JSON parsing error", e1);
                 }
             }
-        });
+        }, "UPDATEDATASETS");
         t.start();
         try {
             t.join();
