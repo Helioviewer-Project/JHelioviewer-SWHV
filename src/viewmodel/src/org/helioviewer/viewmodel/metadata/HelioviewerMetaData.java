@@ -131,13 +131,20 @@ public class HelioviewerMetaData extends AbstractMetaData implements SunMetaData
             fullName = "MDI " + measurement.substring(3, 6);
         }
 
-        else if (detector.equals("COR1") || detector.equals("COR2") || detector.equals("EUVI")) {
+        else if (detector.equals("COR1") || detector.equals("COR2")) {
             observatory = m.get("OBSRVTRY");
             measurement = m.get("WAVELNTH");
             if (measurement == null) {
                 measurement = "" + m.tryGetDouble("WAVELNTH");
             }
             fullName = instrument + " " + detector;
+        } else if (detector.equals("EUVI")) {
+            observatory = m.get("OBSRVTRY");
+            measurement = m.get("WAVELNTH");
+            if (measurement == null) {
+                measurement = "" + m.tryGetDouble("WAVELNTH");
+            }
+            fullName = instrument + " " + detector + " " + measurement;
         }
     }
 
