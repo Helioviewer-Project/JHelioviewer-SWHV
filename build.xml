@@ -22,15 +22,15 @@
         </classpath>
     </taskdef>
 
+    <!--
     <taskdef name="jarbundler" classname="net.sourceforge.jarbundler.JarBundler">
         <classpath path="${build.resources}/mac/lib/jarbundler.jar"/>
     </taskdef>
+    -->
 
-    <!--
     <taskdef name="bundleapp" classname="com.oracle.appbundler.AppBundlerTask">
         <classpath path="${build.resources}/mac/lib/appbundler-1.0.jar"/>
     </taskdef>
-    -->
 
     <target name="mkdir">
         <mkdir dir="${bin}"/>
@@ -170,6 +170,7 @@
                 </exec>
                 <mkdir dir="${temp}/build/mac/" />
 
+                <!--
                 <jarbundler dir="${temp}/build/mac/"
                     jvmversion="1.6+"
                     name="JHelioviewer"
@@ -182,8 +183,8 @@
                     icon="${build.resources}/mac/JHV_icon.icns">
                     <javaproperty name="apple.laf.useScreenMenuBar" value="true"/>
                 </jarbundler>
+                -->
 
-                <!--
                 <bundleapp outputdirectory="${temp}/build/mac/"
                            name="JHelioviewer"
                            displayname="JHelioviewer"
@@ -195,7 +196,6 @@
                     <classpath file="${build}/JHelioviewer.jar"/>
                     <option value="-Dapple.laf.useScreenMenuBar=true"/>
                 </bundleapp>
-                -->
 
                 <exec executable="${build.resources}/mac/bundle.sh">
                     <env key="TEMP" value="${temp}/build/mac" />
@@ -368,7 +368,7 @@
     </target>
 
     <target name="clean-plugins" >
-        <ant antfile="plugins/build.xml" inheritAll="false" target="clean"/>
+        <ant antfile="src/plugins/build.xml" inheritAll="false" target="clean"/>
     </target>
 
     <target name="install-plugins" >
