@@ -1,8 +1,8 @@
 package org.helioviewer.jhv.display;
 
 import java.util.ArrayList;
-import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.ThreadPoolExecutor;
 
 import org.helioviewer.gl3d.scenegraph.math.GL3DVec3d;
 
@@ -13,7 +13,8 @@ public class Displayer {
     private static Displayer instance = new Displayer();
     private ArrayList<DisplayListener> listeners = new ArrayList<DisplayListener>();
     private final ArrayList<RenderListener> renderListeners = new ArrayList<RenderListener>();
-    private final ExecutorService displayPool = Executors.newSingleThreadExecutor();
+    private final ThreadPoolExecutor displayPool = (ThreadPoolExecutor) Executors.newFixedThreadPool(1);//Executors.newSingleThreadExecutor();
+
     private boolean displaying = false;
     private int state = 2;
     public static ArrayList<GL3DVec3d> pointList = new ArrayList<GL3DVec3d>();
@@ -80,7 +81,9 @@ public class Displayer {
     }
 
     public void display() {
-        displayPool.submit(new DisplayTask());
+        if (displayPool.getActiveCount() == 0) {
+            displayPool.submit(new DisplayTask());
+        }
     }
 
     public void removeListeners() {
