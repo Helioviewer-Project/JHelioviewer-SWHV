@@ -17,7 +17,7 @@ public class PfssSettings {
     /**
      * Maximal preload of cache data.
      */
-    public final static int PRELOAD = 25;
+    public final static int PRELOAD = 0;
 
     /**
      * Maximal preload of cache data.

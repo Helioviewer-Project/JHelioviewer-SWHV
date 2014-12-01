@@ -2,6 +2,8 @@ package org.helioviewer.gl3d.plugin.pfss.data;
 
 import java.util.HashMap;
 import java.util.LinkedHashMap;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 import org.helioviewer.gl3d.plugin.pfss.data.dataStructure.PfssDayAndTime;
 import org.helioviewer.gl3d.plugin.pfss.data.dataStructure.PfssYear;
@@ -21,6 +23,7 @@ public class PfssCache {
     private boolean load = false;
     private String lastURL = "";
     private PfssFitsFile toDelete = null;
+    private final static ExecutorService pfssPool = Executors.newSingleThreadExecutor();
 
     /**
      * The private constructor to support the singleton pattern.
@@ -68,8 +71,7 @@ public class PfssCache {
 
                     pfssDatas.put(tmp.getUrl(), tmpFits);
                     Thread t = new Thread(new PfssDataLoader(tmp, tmpFits), "PFFSLoader");
-
-                    t.start();
+                    pfssPool.submit(t);
                     tmp = tmp.getNext();
                 }
             }
@@ -111,7 +113,7 @@ public class PfssCache {
 
     private void loadFile(PfssDayAndTime dayAndTime, PfssFitsFile fits) {
         Thread t = new Thread(new PfssDataLoader(dayAndTime, fits), "PFSSLOADER2");
-        t.start();
+        pfssPool.submit(t);
     }
 
     private void addFile(String url, PfssFitsFile fits) {
