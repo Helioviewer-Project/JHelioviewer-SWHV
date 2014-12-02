@@ -14,6 +14,5 @@
 	<classpathentry kind="src" path="/jhv-3d-math"/>
 	<classpathentry kind="lib" path="../lib/jogl.jar"/>
 	<classpathentry kind="lib" path="../lib/gluegen-rt.jar"/>
-	<classpathentry kind="lib" path="../lib/miglayout15-swing.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
