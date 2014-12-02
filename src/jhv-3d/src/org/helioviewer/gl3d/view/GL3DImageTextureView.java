@@ -131,7 +131,6 @@ public class GL3DImageTextureView extends AbstractGL3DView implements GL3DView, 
                 phi -= ((HelioviewerPositionedMetaData) (metadataView.getMetaData())).getStonyhurstLongitude() / MathUtils.radeg;
                 theta = -((HelioviewerPositionedMetaData) (metadataView.getMetaData())).getStonyhurstLatitude() / MathUtils.radeg;
             }
-            HelioviewerPositionedMetaData hvmd = (HelioviewerPositionedMetaData) metadataView.getMetaData();
             this.vertexShader.changeRect(xOffset, yOffset, xScale, yScale);
             this.vertexShader.changeTextureScale(sim.getSubimageData().getScaleX(), sim.getSubimageData().getScaleY());
             this.vertexShader.changeAngles(theta, phi);
