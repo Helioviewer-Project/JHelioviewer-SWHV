@@ -1,0 +1,1377 @@
+JavaHelioviewerLauncher > Detected Java version: 1.8
+JavaHelioviewerLauncher > Initialize settings and read arguments for JVM
+JavaHelioviewerLauncher > Start JHelioviewer with the following java virtual machine parameters:-cp JHelioviewer.jar:/Users/freekv/swhv/git/client/jhv-3d-wcs/JHelioviewer.jar -Djava.library.path=/Users/freekv/JHelioviewer-SWHV/Libs:/Users/freekv/Library/Java/Extensions:/Library/Java/Extensions:/Network/Library/Java/Extensions:/System/Library/Java/Extensions:/usr/lib/java:. -Djava.ext.dirs="" "-Dapple.laf.useScreenMenuBar=true"
+JavaHelioviewerLauncher > Start JHelioviewer with the following command-line options:
+2014-12-02 09:06:48,658 [main] INFO  root - JHelioviewer started with command-line options:
+2014-12-02 09:06:48,659 [main] INFO  root - Create directories...
+2014-12-02 09:06:48,661 [main] INFO  root - >> JHVGlobals.determineVersionAndRevision() > Look for jar file: /Users/freekv/swhv/git/client/jhv-3d-wcs/JHelioviewer.jar
+2014-12-02 09:06:48,662 [main] INFO  root - Initializing JHelioviewer
+2014-12-02 09:06:48,662 [main] DEBUG root - Create splash screen
+2014-12-02 09:06:50,479 [main] DEBUG root - Number of progress steps: 10
+2014-12-02 09:06:50,480 [main] INFO  root - Load settings
+2014-12-02 09:06:50,481 [main] DEBUG root - >> Settings.load() > Load default system settings: {export.speed=20, API.event.path=http://swhv.oma.be/hv/api/, API.dataSources.path=http://swhv.oma.be/hv/api/?action=getDataSources&verbose=true&enable=[STEREO_A,STEREO_B,PROBA2], availability.radio.url=http://swhv.oma.be/availability/images/availability/data_availability.php, supported.data.sources=SOHO SDO STEREO_A STEREO_B PROBA2 ROB-USET ROB-Humain NSO-GONG NSO-SOLIS Kanzelhoehe NRH, connection.read.timeout=180000, export.software.rendering=false, availability.images.url=http://swhv.oma.be/availability/images/availability/data_availability.php, export.image.height=640, default.remote.lib.path=http://swhv.oma.be/jhvlibs_releasev1.01/, export.aspect.ratio=1 : 1, jvm.arguments=-Dapple.laf.useScreenMenuBar=true, default.basicRemote.path=jpip://swhv.oma.be:8090, export.total.height=662, API.jp2images.path=http://swhv.oma.be/hv/api/index.php, default.httpRemote.path=http://swhv.oma.be/jp2/, export.soft.subtitle=true, jpip.cache.size=0.0, availability.timelines.url=http://swhv.oma.be/availability/timelines/availability/data_availability.php, export.full.quality=false, export.subtitle.aspect.ratio=false, opengl.enabled=true, API.jp2series.path=http://swhv.oma.be/hv/api/index.php, connection.connect.timeout=60000, update.check.next=0, default.remote.path=jpip://swhv.oma.be:8090, export.tile.width=1024, export.hard.subtitle=false, export.tile.height=1024, display.toolbar=iconandtext, default.date.format=yyyy-MM-dd, startup.loadmovie=true, VSO.showInfo=true, export.image.width=640, VSO.showAdvanced=false}
+2014-12-02 09:06:50,485 [main] INFO  root - OS: mac - arch: x86-64 - java arch: 64
+2014-12-02 09:06:50,488 [main] WARN  root - http://swhv.oma.be/jhvlibs_releasev1.01/
+2014-12-02 09:06:50,488 [main] DEBUG root - Instantiate Kakadu engine
+2014-12-02 09:06:50,490 [main] INFO  root - Try to load Kakadu libraries
+2014-12-02 09:06:50,493 [main] INFO  root - Connect to file:/Users/freekv/JHelioviewer-SWHV/Libs/kakadu.xml
+2014-12-02 09:06:50,493 [main] DEBUG root - No http connection, try no compression
+2014-12-02 09:06:50,493 [main] DEBUG root - >> ResourceLoader.loadResource(kakadu, file:/Users/freekv/JHelioviewer-SWHV/Libs/kakadu.xml, Properties systemProperties) > Could not open resource definition file: file:/Users/freekv/JHelioviewer-SWHV/Libs/kakadu.xml (java.io.FileNotFoundException)
+2014-12-02 09:06:50,493 [main] DEBUG root - >> ResourceLoader.loadResource(kakadu, http://swhv.oma.be/jhvlibs_releasev1.01/, file:/Users/freekv/JHelioviewer-SWHV/Libs/, file:/Users/freekv/JHelioviewer-SWHV/Libs/, file:/Users/freekv/JHelioviewer-SWHV/Libs/LastConfig/, Properties systemProperties) > Failed to load resources with custom resource definition file. Try default definiton file.
+2014-12-02 09:06:50,494 [main] INFO  root - Connect to http://swhv.oma.be/jhvlibs_releasev1.01/kakadu.xml
+2014-12-02 09:06:50,581 [main] WARN  root - > ResourceLoader.requirementsNotSatisfied() >> Requirement jhv.arch not satisfied. Current value: x86-64
+2014-12-02 09:06:50,581 [main] WARN  root - > ResourceLoader.requirementsNotSatisfied() >> Requirement jhv.os not satisfied. Current value: mac
+2014-12-02 09:06:50,581 [main] WARN  root - > ResourceLoader.requirementsNotSatisfied() >> Requirement jhv.os not satisfied. Current value: mac
+2014-12-02 09:06:50,581 [main] WARN  root - > ResourceLoader.requirementsNotSatisfied() >> Requirement jhv.os not satisfied. Current value: mac
+2014-12-02 09:06:50,581 [main] WARN  root - > ResourceLoader.requirementsNotSatisfied() >> Requirement jhv.os not satisfied. Current value: mac
+2014-12-02 09:06:50,582 [main] WARN  root - > ResourceLoader.requirementsNotSatisfied() >> Requirement jhv.os not satisfied. Current value: mac
+2014-12-02 09:06:50,582 [main] WARN  root - > ResourceLoader.requirementsNotSatisfied() >> Requirement jhv.os not satisfied. Current value: mac
+2014-12-02 09:06:50,582 [main] WARN  root - > ResourceLoader.requirementsNotSatisfied() >> Requirement jhv.os not satisfied. Current value: mac
+2014-12-02 09:06:50,582 [main] WARN  root - > ResourceLoader.requirementsNotSatisfied() >> Requirement jhv.os not satisfied. Current value: mac
+2014-12-02 09:06:50,582 [main] WARN  root - > ResourceLoader.requirementsNotSatisfied() >> Requirement jhv.java.arch not satisfied. Current value: 64
+2014-12-02 09:06:50,582 [main] INFO  root - Connect to file:/Users/freekv/JHelioviewer-SWHV/Libs/libkdu_jni-mac-x86-64.jnilib
+2014-12-02 09:06:50,582 [main] DEBUG root - No http connection, try no compression
+2014-12-02 09:06:50,604 [main] DEBUG root - >> ResourceLoader.downloadFile(ResourceFile, http://swhv.oma.be/jhvlibs_releasev1.01/kakadu/libkdu_jni-mac-x86-64.jnilib, file:/Users/freekv/JHelioviewer-SWHV/Libs/libkdu_jni-mac-x86-64.jnilib) > Correct destination file already present. Skip download.
+2014-12-02 09:06:50,604 [main] DEBUG root - >> initializeFile(libkdu_jni-mac-x86-64.jnilib, file:/Users/freekv/JHelioviewer-SWHV/Libs/libkdu_jni-mac-x86-64.jnilib) > Load library: /Users/freekv/JHelioviewer-SWHV/Libs/libkdu_jni-mac-x86-64.jnilib
+2014-12-02 09:06:50,608 [main] INFO  root - Successfully loaded Kakadu libraries
+2014-12-02 09:06:50,608 [main] DEBUG root - Setup Kakadu message handlers.
+2014-12-02 09:06:50,610 [main] INFO  root - Use cache directory: /Users/freekv/JHelioviewer-SWHV/Cache/
+2014-12-02 09:06:50,613 [main] INFO  root - Update settings
+2014-12-02 09:06:50,614 [main] INFO  root - Try to install CG Compiler
+2014-12-02 09:06:50,615 [main] INFO  root - Connect to file:/Users/freekv/JHelioviewer-SWHV/Libs/cgc.xml
+2014-12-02 09:06:50,615 [main] DEBUG root - No http connection, try no compression
+2014-12-02 09:06:50,615 [main] DEBUG root - >> ResourceLoader.loadResource(cgc, file:/Users/freekv/JHelioviewer-SWHV/Libs/cgc.xml, Properties systemProperties) > Could not open resource definition file: file:/Users/freekv/JHelioviewer-SWHV/Libs/cgc.xml (java.io.FileNotFoundException)
+2014-12-02 09:06:50,615 [main] DEBUG root - >> ResourceLoader.loadResource(cgc, http://swhv.oma.be/jhvlibs_releasev1.01/, file:/Users/freekv/JHelioviewer-SWHV/Libs/, file:/Users/freekv/JHelioviewer-SWHV/Libs/, file:/Users/freekv/JHelioviewer-SWHV/Libs/LastConfig/, Properties systemProperties) > Failed to load resources with custom resource definition file. Try default definiton file.
+2014-12-02 09:06:50,615 [main] INFO  root - Connect to http://swhv.oma.be/jhvlibs_releasev1.01/cgc.xml
+2014-12-02 09:06:50,631 [main] WARN  root - > ResourceLoader.requirementsNotSatisfied() >> Requirement jhv.os not satisfied. Current value: mac
+2014-12-02 09:06:50,631 [main] WARN  root - > ResourceLoader.requirementsNotSatisfied() >> Requirement jhv.os not satisfied. Current value: mac
+2014-12-02 09:06:50,631 [main] WARN  root - > ResourceLoader.requirementsNotSatisfied() >> Requirement jhv.os not satisfied. Current value: mac
+2014-12-02 09:06:50,631 [main] WARN  root - > ResourceLoader.requirementsNotSatisfied() >> Requirement jhv.os not satisfied. Current value: mac
+2014-12-02 09:06:50,632 [main] INFO  root - Connect to file:/Users/freekv/JHelioviewer-SWHV/Libs/cgc-mac
+2014-12-02 09:06:50,632 [main] DEBUG root - No http connection, try no compression
+2014-12-02 09:06:50,665 [main] DEBUG root - >> ResourceLoader.downloadFile(ResourceFile, http://swhv.oma.be/jhvlibs_releasev1.01/jogl/cgc-mac, file:/Users/freekv/JHelioviewer-SWHV/Libs/cgc-mac) > Correct destination file already present. Skip download.
+2014-12-02 09:06:50,665 [main] DEBUG root - >> initializeFile(cgc-mac, file:/Users/freekv/JHelioviewer-SWHV/Libs/cgc-mac) > Register executable: cgc-mac
+2014-12-02 09:06:50,665 [main] DEBUG root - >> FileUtils.registerExecutable(cgc, /Users/freekv/JHelioviewer-SWHV/Libs/cgc-mac) > Trying to use execFile.setExecutable from JDK 1.6+
+2014-12-02 09:06:50,667 [main] INFO  root - Successfully installed CG Compiler
+2014-12-02 09:06:50,667 [main] INFO  root - Install FFmpeg
+2014-12-02 09:06:50,667 [main] INFO  root - Connect to file:/Users/freekv/JHelioviewer-SWHV/Libs/ffmpeg-2-1.xml
+2014-12-02 09:06:50,667 [main] DEBUG root - No http connection, try no compression
+2014-12-02 09:06:50,667 [main] DEBUG root - >> ResourceLoader.loadResource(ffmpeg-2-1, file:/Users/freekv/JHelioviewer-SWHV/Libs/ffmpeg-2-1.xml, Properties systemProperties) > Could not open resource definition file: file:/Users/freekv/JHelioviewer-SWHV/Libs/ffmpeg-2-1.xml (java.io.FileNotFoundException)
+2014-12-02 09:06:50,668 [main] DEBUG root - >> ResourceLoader.loadResource(ffmpeg-2-1, http://swhv.oma.be/jhvlibs_releasev1.01/, file:/Users/freekv/JHelioviewer-SWHV/Libs/, file:/Users/freekv/JHelioviewer-SWHV/Libs/, file:/Users/freekv/JHelioviewer-SWHV/Libs/LastConfig/, Properties systemProperties) > Failed to load resources with custom resource definition file. Try default definiton file.
+2014-12-02 09:06:50,668 [main] INFO  root - Connect to http://swhv.oma.be/jhvlibs_releasev1.01/ffmpeg-2-1.xml
+2014-12-02 09:06:50,686 [main] WARN  root - > ResourceLoader.requirementsNotSatisfied() >> Requirement jhv.arch not satisfied. Current value: x86-64
+2014-12-02 09:06:50,686 [main] WARN  root - > ResourceLoader.requirementsNotSatisfied() >> Requirement jhv.os not satisfied. Current value: mac
+2014-12-02 09:06:50,687 [main] WARN  root - > ResourceLoader.requirementsNotSatisfied() >> Requirement jhv.os not satisfied. Current value: mac
+2014-12-02 09:06:50,687 [main] WARN  root - > ResourceLoader.requirementsNotSatisfied() >> Requirement jhv.os not satisfied. Current value: mac
+2014-12-02 09:06:50,687 [main] WARN  root - > ResourceLoader.requirementsNotSatisfied() >> Requirement jhv.os not satisfied. Current value: mac
+2014-12-02 09:06:50,687 [main] INFO  root - Connect to file:/Users/freekv/JHelioviewer-SWHV/Libs/ffmpeg-mac-x86-64
+2014-12-02 09:06:50,687 [main] DEBUG root - No http connection, try no compression
+2014-12-02 09:06:50,721 [main] DEBUG root - >> ResourceLoader.downloadFile(ResourceFile, http://swhv.oma.be/jhvlibs_releasev1.01/ffmpeg-2-1/ffmpeg-mac-x86-64, file:/Users/freekv/JHelioviewer-SWHV/Libs/ffmpeg-mac-x86-64) > Correct destination file already present. Skip download.
+2014-12-02 09:06:50,722 [main] DEBUG root - >> initializeFile(ffmpeg-mac-x86-64, file:/Users/freekv/JHelioviewer-SWHV/Libs/ffmpeg-mac-x86-64) > Register executable: ffmpeg-mac-x86-64
+2014-12-02 09:06:50,722 [main] DEBUG root - >> FileUtils.registerExecutable(ffmpeg, /Users/freekv/JHelioviewer-SWHV/Libs/ffmpeg-mac-x86-64) > Trying to use execFile.setExecutable from JDK 1.6+
+2014-12-02 09:06:50,722 [main] INFO  root - Successfully installed FFmpeg tool
+2014-12-02 09:06:50,723 [main] INFO  root - Install MP4Box
+2014-12-02 09:06:50,723 [main] INFO  root - Connect to file:/Users/freekv/JHelioviewer-SWHV/Libs/mp4box.xml
+2014-12-02 09:06:50,723 [main] DEBUG root - No http connection, try no compression
+2014-12-02 09:06:50,723 [main] DEBUG root - >> ResourceLoader.loadResource(mp4box, file:/Users/freekv/JHelioviewer-SWHV/Libs/mp4box.xml, Properties systemProperties) > Could not open resource definition file: file:/Users/freekv/JHelioviewer-SWHV/Libs/mp4box.xml (java.io.FileNotFoundException)
+2014-12-02 09:06:50,723 [main] DEBUG root - >> ResourceLoader.loadResource(mp4box, http://swhv.oma.be/jhvlibs_releasev1.01/, file:/Users/freekv/JHelioviewer-SWHV/Libs/, file:/Users/freekv/JHelioviewer-SWHV/Libs/, file:/Users/freekv/JHelioviewer-SWHV/Libs/LastConfig/, Properties systemProperties) > Failed to load resources with custom resource definition file. Try default definiton file.
+2014-12-02 09:06:50,724 [main] INFO  root - Connect to http://swhv.oma.be/jhvlibs_releasev1.01/mp4box.xml
+2014-12-02 09:06:50,743 [main] WARN  root - > ResourceLoader.requirementsNotSatisfied() >> Requirement jhv.os not satisfied. Current value: mac
+2014-12-02 09:06:50,743 [main] WARN  root - > ResourceLoader.requirementsNotSatisfied() >> Requirement jhv.os not satisfied. Current value: mac
+2014-12-02 09:06:50,743 [main] WARN  root - > ResourceLoader.requirementsNotSatisfied() >> Requirement jhv.os not satisfied. Current value: mac
+2014-12-02 09:06:50,743 [main] INFO  root - Connect to file:/Users/freekv/JHelioviewer-SWHV/Libs/mp4box-mac
+2014-12-02 09:06:50,743 [main] DEBUG root - No http connection, try no compression
+2014-12-02 09:06:50,761 [main] DEBUG root - >> ResourceLoader.downloadFile(ResourceFile, http://swhv.oma.be/jhvlibs_releasev1.01/mp4box/mp4box-mac, file:/Users/freekv/JHelioviewer-SWHV/Libs/mp4box-mac) > Correct destination file already present. Skip download.
+2014-12-02 09:06:50,761 [main] DEBUG root - >> initializeFile(mp4box-mac, file:/Users/freekv/JHelioviewer-SWHV/Libs/mp4box-mac) > Register executable: mp4box-mac
+2014-12-02 09:06:50,761 [main] DEBUG root - >> FileUtils.registerExecutable(mp4box, /Users/freekv/JHelioviewer-SWHV/Libs/mp4box-mac) > Trying to use execFile.setExecutable from JDK 1.6+
+2014-12-02 09:06:50,762 [main] INFO  root - Successfully installed MP4Box tool
+2014-12-02 09:06:50,762 [main] INFO  root - Initialize GUI
+2014-12-02 09:06:50,882 [main] DEBUG root - TopToolBar: Setting 3D as selected
+2014-12-02 09:06:50,971 [ObservationSetup] INFO  root - Connect to http://swhv.oma.be/hv/api/?action=getDataSources&verbose=true&enable=[STEREO_A,STEREO_B,PROBA2]
+2014-12-02 09:06:51,110 [ObservationSetup] INFO  root - Connect to http://swhv.oma.be/hv/api/index.php?action=getJP2Image&observatory=SDO&instrument=AIA&detector=AIA&measurement=171&date=2014-12-02T08:06:51Z&json=true&jpip=true
+2014-12-02 09:06:51,127 [ObservationSetup] DEBUG root - answer : {"uri":"jpip:\/\/swhv.oma.be:8090\/AIA171\/2014\/12\/02\/2014_12_02__05_58_23_34__SDO_AIA_AIA_171.jp2"}
+2014-12-02 09:06:51,579 [main] DEBUG root - Installing Overlap Watcher
+2014-12-02 09:06:51,579 [JHV Update Checker] TRACE root - Start cheching for updates
+2014-12-02 09:06:51,579 [JHV Update Checker] INFO  root - Connect to http://jhelioviewer.org/updateJHV.txt
+2014-12-02 09:06:51,579 [main] INFO  root - Load plugin settings
+2014-12-02 09:06:51,582 [main] INFO  root - Add internal plugin: FilterPlugin
+2014-12-02 09:06:51,590 [main] INFO  root - Download default plugins
+2014-12-02 09:06:51,590 [main] INFO  root - Connect to file:/Users/freekv/JHelioviewer-SWHV/Plugins/sdo-cutout.xml
+2014-12-02 09:06:51,590 [main] DEBUG root - No http connection, try no compression
+2014-12-02 09:06:51,590 [main] DEBUG root - >> ResourceLoader.loadResource(sdo-cutout, file:/Users/freekv/JHelioviewer-SWHV/Plugins/sdo-cutout.xml, Properties systemProperties) > Could not open resource definition file: file:/Users/freekv/JHelioviewer-SWHV/Plugins/sdo-cutout.xml (java.io.FileNotFoundException)
+2014-12-02 09:06:51,590 [main] DEBUG root - >> ResourceLoader.loadResource(sdo-cutout, http://swhv.oma.be/jhvlibs_releasev1.01/, file:/Users/freekv/JHelioviewer-SWHV/Plugins/, file:/Users/freekv/JHelioviewer-SWHV/Plugins/, file:/Users/freekv/JHelioviewer-SWHV/Plugins/LastConfig/, Properties systemProperties) > Failed to load resources with custom resource definition file. Try default definiton file.
+2014-12-02 09:06:51,590 [main] INFO  root - Connect to http://swhv.oma.be/jhvlibs_releasev1.01/sdo-cutout.xml
+2014-12-02 09:06:51,608 [main] INFO  root - Connect to file:/Users/freekv/JHelioviewer-SWHV/Plugins/SDOCutOutPlugin.jar
+2014-12-02 09:06:51,608 [main] DEBUG root - No http connection, try no compression
+2014-12-02 09:06:51,608 [main] DEBUG root - >> ResourceLoader.downloadFile(ResourceFile, http://swhv.oma.be/jhvlibs_releasev1.01/default-plugins/SDOCutOutPlugin.jar, file:/Users/freekv/JHelioviewer-SWHV/Plugins/SDOCutOutPlugin.jar) > Correct destination file already present. Skip download.
+2014-12-02 09:06:51,609 [main] INFO  root - Successfully downloaded SDO-Cutout plugin.
+2014-12-02 09:06:51,609 [main] INFO  root - Connect to file:/Users/freekv/JHelioviewer-SWHV/Plugins/default-plugins.xml
+2014-12-02 09:06:51,609 [main] DEBUG root - No http connection, try no compression
+2014-12-02 09:06:51,610 [main] INFO  root - Successfully downloaded default plugins.
+2014-12-02 09:06:51,611 [main] INFO  root - Search for plugins in /Users/freekv/JHelioviewer-SWHV/Plugins/
+2014-12-02 09:06:51,612 [main] DEBUG root - Found Plugin Jar File: file:/Users/freekv/JHelioviewer-SWHV/Plugins/EVEPlugin.jar
+2014-12-02 09:06:51,612 [main] INFO  root - PluginManager is trying to load the plugin located at file:/Users/freekv/JHelioviewer-SWHV/Plugins/EVEPlugin.jar
+2014-12-02 09:06:51,613 [main] DEBUG root - Found Manifest: Main-Class:org.helioviewer.plugins.eveplugin.EVEPlugin
+2014-12-02 09:06:51,613 [main] INFO  root - PluginManager: Load plugin class :org.helioviewer.plugins.eveplugin.EVEPlugin
+2014-12-02 09:06:51,616 [main] DEBUG root - Found Plugin Jar File: file:/Users/freekv/JHelioviewer-SWHV/Plugins/PfssPlugin.jar
+2014-12-02 09:06:51,616 [main] INFO  root - PluginManager is trying to load the plugin located at file:/Users/freekv/JHelioviewer-SWHV/Plugins/PfssPlugin.jar
+2014-12-02 09:06:51,617 [main] DEBUG root - Found Manifest: Main-Class:org.helioviewer.jhv.plugins.pfssplugin.PfssPlugin
+2014-12-02 09:06:51,617 [main] INFO  root - PluginManager: Load plugin class :org.helioviewer.jhv.plugins.pfssplugin.PfssPlugin
+2014-12-02 09:06:51,620 [main] DEBUG root - Found Plugin Jar File: file:/Users/freekv/JHelioviewer-SWHV/Plugins/SDOCutOutPlugin.jar
+2014-12-02 09:06:51,620 [main] INFO  root - PluginManager is trying to load the plugin located at file:/Users/freekv/JHelioviewer-SWHV/Plugins/SDOCutOutPlugin.jar
+2014-12-02 09:06:51,621 [main] DEBUG root - Found Manifest: Main-Class:org.helioviewer.plugins.sdocutoutplugin.SDOCutOutPlugin
+2014-12-02 09:06:51,621 [main] INFO  root - PluginManager: Load plugin class :org.helioviewer.plugins.sdocutoutplugin.SDOCutOutPlugin
+2014-12-02 09:06:51,627 [main] DEBUG root - Found Plugin Jar File: file:/Users/freekv/JHelioviewer-SWHV/Plugins/SWEKPlugin.jar
+2014-12-02 09:06:51,627 [main] INFO  root - PluginManager is trying to load the plugin located at file:/Users/freekv/JHelioviewer-SWHV/Plugins/SWEKPlugin.jar
+2014-12-02 09:06:51,627 [main] DEBUG root - Found Manifest: Main-Class:org.helioviewer.jhv.plugins.swek.SWEKPlugin
+2014-12-02 09:06:51,627 [main] INFO  root - PluginManager: Load plugin class :org.helioviewer.jhv.plugins.swek.SWEKPlugin
+2014-12-02 09:06:51,668 [main] DEBUG root - Found Plugin Jar File: file:/Users/freekv/JHelioviewer-SWHV/Plugins/SWHVHEKPlugin.jar
+2014-12-02 09:06:51,669 [main] INFO  root - PluginManager is trying to load the plugin located at file:/Users/freekv/JHelioviewer-SWHV/Plugins/SWHVHEKPlugin.jar
+2014-12-02 09:06:51,669 [main] DEBUG root - Found Manifest: Main-Class:org.helioviewer.jhv.plugins.swhvhekplugin.SWHVHEKPlugin
+2014-12-02 09:06:51,669 [main] INFO  root - PluginManager: Load plugin class :org.helioviewer.jhv.plugins.swhvhekplugin.SWHVHEKPlugin
+2014-12-02 09:06:51,672 [main] INFO  root - Start main window
+2014-12-02 09:06:51,678 [AWT-EventQueue-0] DEBUG root - Called in eventQueue
+2014-12-02 09:06:51,680 [AWT-EventQueue-0] DEBUG root - draw request time: 2
+2014-12-02 09:06:51,686 [AWT-EventQueue-0] DEBUG root - Called in eventQueue
+2014-12-02 09:06:51,687 [AWT-EventQueue-0] DEBUG root - draw request time: 1
+2014-12-02 09:06:51,700 [AWT-EventQueue-0] DEBUG root - Called in eventQueue
+2014-12-02 09:06:51,704 [AWT-EventQueue-0] DEBUG root - draw request time: 0
+2014-12-02 09:06:51,704 [AWT-EventQueue-0] DEBUG root - Called in eventQueue
+2014-12-02 09:06:51,704 [AWT-EventQueue-0] DEBUG root - draw request time: 0
+2014-12-02 09:06:51,707 [AWT-EventQueue-0] DEBUG root - Called in eventQueue
+2014-12-02 09:06:51,707 [AWT-EventQueue-0] DEBUG root - draw request time: 0
+2014-12-02 09:06:51,707 [AWT-EventQueue-0] DEBUG root - Called in eventQueue
+2014-12-02 09:06:51,707 [AWT-EventQueue-0] DEBUG root - draw request time: 0
+2014-12-02 09:06:51,905 [JHV Update Checker] INFO  root - Running the newest version of JHelioviewer
+2014-12-02 09:06:52,143 [AWT-EventQueue-0] DEBUG root - search and open the configuration file
+2014-12-02 09:06:52,143 [AWT-EventQueue-0] DEBUG root - Search for a user defined configuration file in the JHelioviewer setting file.
+2014-12-02 09:06:52,143 [AWT-EventQueue-0] DEBUG root - No configured filename found.
+2014-12-02 09:06:52,143 [AWT-EventQueue-0] DEBUG root - configURL : file:/Users/freekv/JHelioviewer-SWHV/Plugins/swek_plugin/SWEKSettings.json
+2014-12-02 09:06:52,146 [AWT-EventQueue-0] DEBUG root - Download the configuration file from the net and copy it to the plugin home directory
+2014-12-02 09:06:52,162 [AWT-EventQueue-0] DEBUG root - saveFile : /Users/freekv/JHelioviewer-SWHV/Plugins/swek_plugin/SWEKSettings.json
+2014-12-02 09:06:52,540 [AWT-EventQueue-0] DEBUG root - selectedIntervalChanged0
+2014-12-02 09:06:52,540 [AWT-EventQueue-0] DEBUG root - selectedIntervalChanged0
+2014-12-02 09:06:52,540 [AWT-EventQueue-0] DEBUG root - selectedIntervalChanged0
+2014-12-02 09:06:52,540 [AWT-EventQueue-0] DEBUG root - selectedIntervalChanged0
+2014-12-02 09:06:52,563 [UPDATEDATASETS] INFO  root - Connect to http://swhv.oma.be//datasets/index.php
+2014-12-02 09:06:52,580 [UPDATEDATASETS] DEBUG root - Saving stream to /Users/freekv/JHelioviewer-SWHV/Plugins/EVEPlugin/datasets.json
+2014-12-02 09:06:52,580 [UPDATEDATASETS] DEBUG root - Reading file /Users/freekv/JHelioviewer-SWHV/Plugins/EVEPlugin/datasets.json
+2014-12-02 09:06:52,582 [AWT-EventQueue-0] WARN  root - Thread is dead
+2014-12-02 09:06:53,179 [AWT-EventQueue-0] DEBUG root - >> GLInitPanel.init(GLAutoDrawable) > Dispose GLInitPanel: Stop the animator and make it invisible
+2014-12-02 09:06:53,179 [AWT-EventQueue-0] DEBUG root - >> GLInitPanel.init(GLAutoDrawable) > Set GL properties
+2014-12-02 09:06:53,179 [AWT-EventQueue-0] DEBUG root - >> GLInitPanel.init(GLAutoDrawable) > Shade model: flat
+2014-12-02 09:06:53,180 [AWT-EventQueue-0] DEBUG root - >> GLInitPanel.init(GLAutoDrawable) > Clear color: black
+2014-12-02 09:06:53,181 [AWT-EventQueue-0] DEBUG root - >> GLInitPanel.init(GLAutoDrawable) > Enable 1D texture
+2014-12-02 09:06:53,181 [AWT-EventQueue-0] DEBUG root - >> GLInitPanel.init(GLAutoDrawable) > Enable 2D texture
+2014-12-02 09:06:53,181 [AWT-EventQueue-0] DEBUG root - >> GLInfo.update(GL) > Version string: 2.1 NVIDIA-8.26.28 310.40.55b01
+2014-12-02 09:06:53,181 [AWT-EventQueue-0] DEBUG root - >> GLInfo.update(GL) > Extensions: GL_ARB_color_buffer_float GL_ARB_depth_buffer_float GL_ARB_depth_clamp GL_ARB_depth_texture GL_ARB_draw_buffers GL_ARB_draw_elements_base_vertex GL_ARB_draw_instanced GL_ARB_fragment_program GL_ARB_fragment_program_shadow GL_ARB_fragment_shader GL_ARB_framebuffer_object GL_ARB_framebuffer_sRGB GL_ARB_half_float_pixel GL_ARB_half_float_vertex GL_ARB_imaging GL_ARB_instanced_arrays GL_ARB_multisample GL_ARB_multitexture GL_ARB_occlusion_query GL_ARB_pixel_buffer_object GL_ARB_point_parameters GL_ARB_point_sprite GL_ARB_provoking_vertex GL_ARB_seamless_cube_map GL_ARB_shader_objects GL_ARB_shader_texture_lod GL_ARB_shading_language_100 GL_ARB_shadow GL_ARB_sync GL_ARB_texture_border_clamp GL_ARB_texture_compression GL_ARB_texture_compression_rgtc GL_ARB_texture_cube_map GL_ARB_texture_env_add GL_ARB_texture_env_combine GL_ARB_texture_env_crossbar GL_ARB_texture_env_dot3 GL_ARB_texture_float GL_ARB_texture_mirrored_repeat GL_ARB_texture_non_power_of_two GL_ARB_texture_rectangle GL_ARB_texture_rg GL_ARB_transpose_matrix GL_ARB_vertex_array_bgra GL_ARB_vertex_blend GL_ARB_vertex_buffer_object GL_ARB_vertex_program GL_ARB_vertex_shader GL_ARB_window_pos GL_EXT_abgr GL_EXT_bgra GL_EXT_bindable_uniform GL_EXT_blend_color GL_EXT_blend_equation_separate GL_EXT_blend_func_separate GL_EXT_blend_minmax GL_EXT_blend_subtract GL_EXT_clip_volume_hint GL_EXT_debug_label GL_EXT_debug_marker GL_EXT_depth_bounds_test GL_EXT_draw_buffers2 GL_EXT_draw_range_elements GL_EXT_fog_coord GL_EXT_framebuffer_blit GL_EXT_framebuffer_multisample GL_EXT_framebuffer_multisample_blit_scaled GL_EXT_framebuffer_object GL_EXT_framebuffer_sRGB GL_EXT_geometry_shader4 GL_EXT_gpu_program_parameters GL_EXT_gpu_shader4 GL_EXT_multi_draw_arrays GL_EXT_packed_depth_stencil GL_EXT_packed_float GL_EXT_provoking_vertex GL_EXT_rescale_normal GL_EXT_secondary_color GL_EXT_separate_specular_color GL_EXT_shadow_funcs GL_EXT_stencil_two_side GL_EXT_stencil_wrap GL_EXT_texture_array GL_EXT_texture_compression_dxt1 GL_EXT_texture_compression_s3tc GL_EXT_texture_env_add GL_EXT_texture_filter_anisotropic GL_EXT_texture_integer GL_EXT_texture_lod_bias GL_EXT_texture_mirror_clamp GL_EXT_texture_rectangle GL_EXT_texture_shared_exponent GL_EXT_texture_sRGB GL_EXT_texture_sRGB_decode GL_EXT_timer_query GL_EXT_transform_feedback GL_EXT_vertex_array_bgra GL_APPLE_aux_depth_stencil GL_APPLE_client_storage GL_APPLE_element_array GL_APPLE_fence GL_APPLE_float_pixels GL_APPLE_flush_buffer_range GL_APPLE_flush_render GL_APPLE_object_purgeable GL_APPLE_packed_pixels GL_APPLE_pixel_buffer GL_APPLE_rgb_422 GL_APPLE_row_bytes GL_APPLE_specular_vector GL_APPLE_texture_range GL_APPLE_transform_hint GL_APPLE_vertex_array_object GL_APPLE_vertex_array_range GL_APPLE_vertex_point_size GL_APPLE_vertex_program_evaluators GL_APPLE_ycbcr_422 GL_ATI_separate_stencil GL_ATI_texture_env_combine3 GL_ATI_texture_float GL_ATI_texture_mirror_once GL_IBM_rasterpos_clip GL_NV_blend_square GL_NV_conditional_render GL_NV_depth_clamp GL_NV_fog_distance GL_NV_fragment_program_option GL_NV_fragment_program2 GL_NV_light_max_exponent GL_NV_multisample_filter_hint GL_NV_point_sprite GL_NV_texgen_reflection GL_NV_texture_barrier GL_NV_vertex_program2_option GL_NV_vertex_program3 GL_SGIS_generate_mipmap GL_SGIS_texture_edge_clamp GL_SGIS_texture_lod 
+2014-12-02 09:06:53,182 [AWT-EventQueue-0] DEBUG root - >> GLInfo.update(GL) > GL_MAX_PROGRAM_INSTRUCTIONS = 262144
+2014-12-02 09:06:53,182 [AWT-EventQueue-0] DEBUG root - >> GLInfo.update(GL) > GL_MAX_PROGRAM_PARAMETERS   = 1024
+2014-12-02 09:06:53,182 [AWT-EventQueue-0] DEBUG root - >> GLInfo.update(GL) > GL_MAX_PROGRAM_TEMPORARIES   = 65535
+2014-12-02 09:06:53,182 [AWT-EventQueue-0] DEBUG root - >> GLInfo.update(GL) > GL_MAX_DRAW_BUFFERS = 8
+2014-12-02 09:06:53,182 [AWT-EventQueue-0] DEBUG root - >> GLInfo.update(GL) > GL usable: true - GL activated: true
+2014-12-02 09:06:53,183 [AWT-EventQueue-0] DEBUG root - >> GLShaderHelper.initHelper(GL2 gl, String _tmpPath) > Initialize helper functions
+2014-12-02 09:06:53,183 [AWT-EventQueue-0] DEBUG root - >> GLShaderHelper.initHelper(GL2 gl, String _tmpPath) > temp path: /Users/freekv/JHelioviewer-SWHV/Temp/
+2014-12-02 09:06:53,183 [AWT-EventQueue-0] DEBUG root - >> GLShaderHelper.initHelper(GL2 gl, String _tmpPath) > max texture indirections: 16384
+2014-12-02 09:06:53,184 [AWT-EventQueue-0] DEBUG root - >> GLShaderBuilder.initShaderBuilder(GL) > Initialize shader builder
+2014-12-02 09:06:53,184 [AWT-EventQueue-0] DEBUG root - >> GLShaderBuilder.initShaderBuilder(GL) > max texture image units: 16
+2014-12-02 09:06:53,184 [AWT-EventQueue-0] DEBUG root - >> GLShaderBuilder.initShaderBuilder(GL) > max texture coords: 8
+2014-12-02 09:06:53,184 [AWT-EventQueue-0] DEBUG root - >> GLShaderBuilder.initShaderBuilder(GL) > max fragment uniform components arb: 2048
+2014-12-02 09:06:53,184 [AWT-EventQueue-0] DEBUG root - >> GLShaderBuilder.initShaderBuilder(GL) > max vertex attributes arb: 16
+2014-12-02 09:06:53,185 [AWT-EventQueue-0] DEBUG root - >> GLTextureCoordinate.init(GL) > Initialize GLTextureCoordinate
+2014-12-02 09:06:53,186 [AWT-EventQueue-0] DEBUG root - >> GLInitPanel.init(GLAutoDrawable) > Start viewchain creation
+2014-12-02 09:06:53,222 [CreateViewChainsThread] INFO  root - Start creating view chains
+PRINTING SCENEGRAPH =======================>
+2014-12-02 09:06:53,236 [CreateViewChainsThread] DEBUG root - GL3DSceneGraphView.ViewChanged: Sender=org.helioviewer.gl3d.view.GL3DViewportView@3b018cb8 Event=[class org.helioviewer.viewmodel.changeevent.ViewChainChangedReason]
+2014-12-02 09:06:53,261 [AWT-EventQueue-0] DEBUG root - TopToolBar: Setting 3D as selected
+2014-12-02 09:06:53,340 [LoadNewMovie] DEBUG root - >> APIRequestManager.loadImageSeries(boolean,String,String,String,String,String,String,String) > jpip request url: http://swhv.oma.be/hv/api/index.php?action=getJPX&observatory=SDO&instrument=AIA&detector=AIA&measurement=171&startTime=2014-12-01T06:28:23Z&endTime=2014-12-02T06:28:23Z&cadence=1800&jpip=true&verbose=true&linked=true
+2014-12-02 09:06:53,341 [LoadNewMovie] DEBUG root - >> APIRequestManager.loadImageSeries(boolean,String,String,String,String,String,String,String) > http request url: http://swhv.oma.be/hv/api/index.php?action=getJPX&observatory=SDO&instrument=AIA&detector=AIA&measurement=171&startTime=2014-12-01T06:28:23Z&endTime=2014-12-02T06:28:23Z&cadence=1800
+2014-12-02 09:06:53,341 [LoadNewMovie] INFO  root - Connect to http://swhv.oma.be/hv/api/index.php?action=getJPX&observatory=SDO&instrument=AIA&detector=AIA&measurement=171&startTime=2014-12-01T06:28:23Z&endTime=2014-12-02T06:28:23Z&cadence=1800&jpip=true&verbose=true&linked=true
+2014-12-02 09:06:53,363 [LoadNewMovie] DEBUG root - answer : {"message":null,"uri":"jpip:\/\/swhv.oma.be:8090\/movies\/SDO_AIA_AIA_171_F2014-12-01T06.28.23Z_T2014-12-02T06.28.23ZB1800L.jpx","frames":[1417415903,1417417117,1417418951,1417420799,1417422612,1417424435,1417426271,1417428107,1417429955,1417431779,1417433003,1417434839,1417436687,1417438523,1417440383,1417442219,1417444055,1417445891,1417447739,1417449563,1417451411,1417453235,1417455083,1417456907,1417458719,1417460555,1417461791,1417463639,1417465475,1417467311,1417469147,1417470983,1417472819,1417474655,1417476479,1417478327,1417480343,1417482167,1417484003,1417485203,1417487039,1417488875,1417490723,1417492583,1417494431,1417496243,1417498079,1417499903]}
+2014-12-02 09:06:53,372 [AWT-EventQueue-0] DEBUG root - TopToolBar: Setting 3D as selected
+2014-12-02 09:06:53,409 [CreateViewChainsThread] DEBUG root - GL3DCamera: No Preceding Camera, resetting Camera
+2014-12-02 09:06:53,409 [CreateViewChainsThread] DEBUG root - GL3DCameraView: Set Current Camera to View from observer
+2014-12-02 09:06:53,410 [CreateViewChainsThread] DEBUG root - GL3DCameraView: Set Current Camera to View from observer
+2014-12-02 09:06:53,500 [SwingWorker-pool-2-thread-9] INFO  root - Connect to http://swhv.oma.be/position?abcorr=LT%2BS&utc=2014-12-02T08:06:53&utc_end=2014-12-02T08:06:53&deltat=56&observer=Earth&target=SUN&ref=HEEQ&kind=latitudinal
+2014-12-02 09:06:53,502 [CreateViewChainsThread] DEBUG root - GL3DPluginController.loadPlugins()...
+2014-12-02 09:06:53,738 [AWT-EventQueue-0] DEBUG root - GL3DComponentView.Init
+2014-12-02 09:06:53,741 [AWT-EventQueue-0] DEBUG root - >> GLTextureHelper.initHelper(GL) > Initialize helper functions
+2014-12-02 09:06:53,741 [AWT-EventQueue-0] DEBUG root - >> GLTextureHelper.initHelper(GL) > Use Non-Power-Of-Two-Textures: false
+2014-12-02 09:06:53,741 [AWT-EventQueue-0] DEBUG root - >> GLTextureHelper.initHelper(GL) > max texture size: 16384
+2014-12-02 09:06:53,750 [AWT-EventQueue-0] DEBUG root - >> FileUtils.invokeExecutable > Execute command:  "/Users/freekv/JHelioviewer-SWHV/Libs/cgc-mac" "-profile" "arbfp1" "-o" "/Users/freekv/JHelioviewer-SWHV/Temp/tmp.asm" "/Users/freekv/JHelioviewer-SWHV/Temp/tmp.cg"
+2014-12-02 09:06:53,796 [FILEUTILS1] DEBUG root - >> FileUtils.logProcessOutput(Process, cgc, DEBUG) > std out: /Users/freekv/JHelioviewer-SWHV/Temp/tmp.cg
+2014-12-02 09:06:53,796 [FILEUTILS2] DEBUG root - >> FileUtils.logProcessOutput(Process, cgc, DEBUG) > std err: 13 lines, 0 errors.
+2014-12-02 09:06:53,802 [AWT-EventQueue-0] DEBUG root - >> FileUtils.invokeExecutable > Execute command:  "/Users/freekv/JHelioviewer-SWHV/Libs/cgc-mac" "-profile" "arbvp1" "-o" "/Users/freekv/JHelioviewer-SWHV/Temp/tmp.asm" "/Users/freekv/JHelioviewer-SWHV/Temp/tmp.cg"
+2014-12-02 09:06:53,850 [FILEUTILS1] DEBUG root - >> FileUtils.logProcessOutput(Process, cgc, DEBUG) > std out: /Users/freekv/JHelioviewer-SWHV/Temp/tmp.cg
+2014-12-02 09:06:53,851 [FILEUTILS2] DEBUG root - >> FileUtils.logProcessOutput(Process, cgc, DEBUG) > std err: 19 lines, 0 errors.
+2014-12-02 09:06:53,872 [AWT-EventQueue-0] DEBUG root - >> FileUtils.invokeExecutable > Execute command:  "/Users/freekv/JHelioviewer-SWHV/Libs/cgc-mac" "-profile" "arbvp1" "-o" "/Users/freekv/JHelioviewer-SWHV/Temp/tmp.asm" "/Users/freekv/JHelioviewer-SWHV/Temp/tmp.cg"
+2014-12-02 09:06:53,917 [FILEUTILS1] DEBUG root - >> FileUtils.logProcessOutput(Process, cgc, DEBUG) > std out: /Users/freekv/JHelioviewer-SWHV/Temp/tmp.cg
+2014-12-02 09:06:53,918 [FILEUTILS2] DEBUG root - >> FileUtils.logProcessOutput(Process, cgc, DEBUG) > std err: 21 lines, 0 errors.
+2014-12-02 09:06:54,049 [DateTime Parser] DEBUG root - Raw Frames : 1417415903,1417417117,1417418951,1417420799,1417422612,1417424435,1417426271,1417428107,1417429955,1417431779,1417433003,1417434839,1417436687,1417438523,1417440383,1417442219,1417444055,1417445891,1417447739,1417449563,1417451411,1417453235,1417455083,1417456907,1417458719,1417460555,1417461791,1417463639,1417465475,1417467311,1417469147,1417470983,1417472819,1417474655,1417476479,1417478327,1417480343,1417482167,1417484003,1417485203,1417487039,1417488875,1417490723,1417492583,1417494431,1417496243,1417498079,1417499903
+2014-12-02 09:06:54,372 [LoadNewMovie] DEBUG root - Try to apply color table SDO-AIA 171 Å
+GL3D Image Fragment Shader:
+struct outputStruct {
+	float4 color : COLOR;
+};
+
+outputStruct main(
+	float4 texcoord0 : TEXCOORD0,
+	sampler2D texunit0 : TEXUNIT0,
+	float4 texcoord3 : TEXCOORD3,
+	float4 texcoord1 : TEXCOORD1,
+	uniform float truncationValue : C0,
+	float4 texcoord4 : TEXCOORD4,
+	uniform sampler2D differenceImage : TEXUNIT1,
+	uniform float4 pixelSizeWeighting : C1,
+	uniform float gamma : C2,
+	uniform float contrast : C3,
+	uniform sampler1D lut0 : TEXUNIT2,
+	uniform float alpha : C4,
+	uniform float4 cutOffRadius : C5,
+	uniform float4 outerCutOffRadius : C6,
+	uniform float4 textureScaleThetaPhi : C7,
+	uniform float4 diffTextureScaleThetaPhi : C8)
+{
+	outputStruct OUT;
+	OUT.color = tex2D(texunit0, texcoord0.xy);
+
+if(texcoord1.x>0.24 && texcoord1.x<0.27){
+	OUT.color.r = OUT.color.r - tex2D(differenceImage, texcoord0.xy).r;
+	OUT.color.r = clamp(OUT.color.r,-truncationValue,truncationValue)/truncationValue;
+	OUT.color.r = (OUT.color.r + 1.0f)/2.0f;
+}
+if(texcoord1.x>0.98 && texcoord1.x<1.01){
+	OUT.color.r = OUT.color.r - tex2D(differenceImage, texcoord4.xy).r;
+	OUT.color.r = clamp(OUT.color.r,-truncationValue,truncationValue)/truncationValue;
+	OUT.color.r = (OUT.color.r + 1.0f)/2.0f;
+}
+
+
+	float unsharpMaskingKernel[3][3] = {
+		{1, 2, 1},
+		{2, 4, 2},
+		{1, 2, 1}
+	};
+	float3 tmpConvolutionSum = float3(0, 0, 0);
+	for(int i=0; i<3; i++)
+	{
+		for(int j=0; j<3; j++)
+		{
+			tmpConvolutionSum += tex2D(texunit0, texcoord0.xy + float2(i-1, j-1) * pixelSizeWeighting.x).rgb
+				* unsharpMaskingKernel[i][j];
+		}
+	}
+	tmpConvolutionSum = (1 + pixelSizeWeighting.z) * OUT.color.rgb
+		- pixelSizeWeighting.z * tmpConvolutionSum / 16.0f;
+	OUT.color.rgb = saturate(tmpConvolutionSum);
+
+	OUT.color.rgb = pow(OUT.color.rgb, gamma);
+
+	OUT.color.rgb = 0.5f * sign(2.0f * OUT.color.rgb - 1.0f) * pow(abs(2.0f * OUT.color.rgb - 1.0f), pow(1.5f, -contrast)) + 0.5f;
+
+	OUT.color.rgb = tex1D(lut0, OUT.color.r).rgb;
+
+	OUT.color.a = OUT.color.a * alpha;
+
+	if(texcoord0.x<0.0||texcoord0.y<0.0||texcoord0.x>textureScaleThetaPhi.x||texcoord0.y>textureScaleThetaPhi.y){discard;
+	}
+float dotpos = dot(texcoord3.xyz, texcoord3.xyz);
+	if(dotpos<cutOffRadius.x*cutOffRadius.x ||dotpos>outerCutOffRadius.x*outerCutOffRadius.x ){discard;}
+	if((texcoord3.z==0.0 && dotpos<0.99)){		discard;
+	}
+	float theta = textureScaleThetaPhi.z;
+	float phi = textureScaleThetaPhi.w;
+	float3x3 mat = float3x3( cos(phi), -sin(theta)*sin(phi), -cos(theta)*sin(phi), 0., cos(theta), -sin(theta), sin(phi), cos(phi)*sin(theta), cos(theta)*cos(phi));
+	float3 zaxisrot = mul(mat,float3(0.,0.,1.));
+	float projectionn = dot(texcoord3.xyz,zaxisrot);
+	if((texcoord3.z!=0.0 && projectionn<-0.0)){		discard;
+	}
+
+
+	return OUT;
+}
+2014-12-02 09:06:54,387 [AWT-EventQueue-0] DEBUG root - >> FileUtils.invokeExecutable > Execute command:  "/Users/freekv/JHelioviewer-SWHV/Libs/cgc-mac" "-profile" "arbfp1" "-o" "/Users/freekv/JHelioviewer-SWHV/Temp/tmp.asm" "/Users/freekv/JHelioviewer-SWHV/Temp/tmp.cg"
+2014-12-02 09:06:54,441 [FILEUTILS1] DEBUG root - >> FileUtils.logProcessOutput(Process, cgc, DEBUG) > std out: /Users/freekv/JHelioviewer-SWHV/Temp/tmp.cg
+2014-12-02 09:06:54,452 [FILEUTILS2] DEBUG root - >> FileUtils.logProcessOutput(Process, cgc, DEBUG) > std err: 80 lines, 0 errors.
+2014-12-02 09:06:54,456 [AWT-EventQueue-0] DEBUG root - >> FileUtils.invokeExecutable > Execute command:  "/Users/freekv/JHelioviewer-SWHV/Libs/cgc-mac" "-profile" "arbfp1" "-o" "/Users/freekv/JHelioviewer-SWHV/Temp/tmp.asm" "/Users/freekv/JHelioviewer-SWHV/Temp/tmp.cg"
+2014-12-02 09:06:54,503 [FILEUTILS1] DEBUG root - >> FileUtils.logProcessOutput(Process, cgc, DEBUG) > std out: /Users/freekv/JHelioviewer-SWHV/Temp/tmp.cg
+2014-12-02 09:06:54,504 [FILEUTILS2] DEBUG root - >> FileUtils.logProcessOutput(Process, cgc, DEBUG) > std err: 13 lines, 0 errors.
+2014-12-02 09:06:54,507 [AWT-EventQueue-0] DEBUG root - >> FileUtils.invokeExecutable > Execute command:  "/Users/freekv/JHelioviewer-SWHV/Libs/cgc-mac" "-profile" "arbvp1" "-o" "/Users/freekv/JHelioviewer-SWHV/Temp/tmp.asm" "/Users/freekv/JHelioviewer-SWHV/Temp/tmp.cg"
+2014-12-02 09:06:54,551 [FILEUTILS1] DEBUG root - >> FileUtils.logProcessOutput(Process, cgc, DEBUG) > std out: /Users/freekv/JHelioviewer-SWHV/Temp/tmp.cg
+2014-12-02 09:06:54,553 [FILEUTILS2] DEBUG root - >> FileUtils.logProcessOutput(Process, cgc, DEBUG) > std err: 26 lines, 0 errors.
+2014-12-02 09:06:54,555 [AWT-EventQueue-0] DEBUG root - >> FileUtils.invokeExecutable > Execute command:  "/Users/freekv/JHelioviewer-SWHV/Libs/cgc-mac" "-profile" "arbvp1" "-o" "/Users/freekv/JHelioviewer-SWHV/Temp/tmp.asm" "/Users/freekv/JHelioviewer-SWHV/Temp/tmp.cg"
+2014-12-02 09:06:54,602 [FILEUTILS1] DEBUG root - >> FileUtils.logProcessOutput(Process, cgc, DEBUG) > std out: /Users/freekv/JHelioviewer-SWHV/Temp/tmp.cg
+2014-12-02 09:06:54,604 [FILEUTILS2] DEBUG root - >> FileUtils.logProcessOutput(Process, cgc, DEBUG) > std err: 22 lines, 0 errors.
+2014-12-02 09:06:54,606 [AWT-EventQueue-0] DEBUG root - >> FileUtils.invokeExecutable > Execute command:  "/Users/freekv/JHelioviewer-SWHV/Libs/cgc-mac" "-profile" "arbvp1" "-o" "/Users/freekv/JHelioviewer-SWHV/Temp/tmp.asm" "/Users/freekv/JHelioviewer-SWHV/Temp/tmp.cg"
+2014-12-02 09:06:54,656 [FILEUTILS1] DEBUG root - >> FileUtils.logProcessOutput(Process, cgc, DEBUG) > std out: /Users/freekv/JHelioviewer-SWHV/Temp/tmp.cg
+2014-12-02 09:06:54,657 [FILEUTILS2] DEBUG root - >> FileUtils.logProcessOutput(Process, cgc, DEBUG) > std err: 24 lines, 0 errors.
+2014-12-02 09:06:54,778 [LayersModelThread (layer added)] DEBUG root - Overlap fraction for layer 0 is 1.0
+VertexShader:
+struct outputStruct {
+	float4 color : COLOR;
+	float4 texcoord0 : TEXCOORD0;
+	float4 position : POSITION;
+	float4 texcoord4 : TEXCOORD4;
+	float4 texcoord3 : TEXCOORD3;
+};
+
+outputStruct main(
+	float4 color : COLOR,
+	float4 texcoord0 : TEXCOORD0,
+	float4 position : POSITION,
+	uniform float4x4 state_matrix_mvp : state.matrix.mvp,
+	uniform float4 rect : C0,
+	uniform float4 textureScaleThetaPhi : C1,
+	uniform float4 offset : C2,
+	uniform float4 differenceRect : C3,
+	uniform float4 diffTextureScaleThetaPhi : C4)
+{
+	outputStruct OUT;
+	OUT.color = color;
+	OUT.texcoord0 = float4(texcoord0.xy, 0, 1);
+	OUT.position = mul(state_matrix_mvp, position);
+
+	if(abs(position.x)>1.1){
+	float theta = textureScaleThetaPhi.z;
+	float phi = textureScaleThetaPhi.w;
+	OUT.texcoord0.x = position.x - rect.x;
+	OUT.texcoord0.y = -position.y - rect.y;
+	OUT.texcoord0.x *= rect.z;
+	OUT.texcoord0.y *= rect.w;
+	OUT.texcoord0.x *= textureScaleThetaPhi.x;
+	OUT.texcoord0.y *= textureScaleThetaPhi.y;
+	OUT.texcoord4.x = position.x - differenceRect.x;
+	OUT.texcoord4.y = -position.y - differenceRect.y;
+	OUT.texcoord4.x *= differenceRect.z;
+	OUT.texcoord4.y *= differenceRect.w;
+	OUT.texcoord4.x *= diffTextureScaleThetaPhi.x;
+	OUT.texcoord4.y *= diffTextureScaleThetaPhi.y;
+	OUT.texcoord3 = position;
+	float3x3 mat = float3x3(cos(phi), -sin(theta)*sin(phi), -sin(phi)*cos(theta), 0, cos(theta), -sin(theta), sin(phi), cos(phi)*sin(theta), cos(theta)*cos(phi));
+	position.xyz = mul(mat, position.xyz);
+	 OUT.position = mul(state_matrix_mvp, position);
+	}
+	else{
+	float theta = -textureScaleThetaPhi.z;
+	float phi = -textureScaleThetaPhi.w;
+	OUT.texcoord3 = position;
+	float3x3 mat = float3x3(cos(phi), 0, -sin(phi), -sin(theta)*sin(phi), cos(theta), -sin(theta)*cos(phi), cos(theta)*sin(phi), sin(theta), cos(theta)*cos(phi));
+	float3 rot = mul(mat, position.xyz);
+	OUT.texcoord0.x = rot.x - rect.x;
+	OUT.texcoord0.y = -rot.y - rect.y;
+	OUT.texcoord0.x *= rect.z;
+	OUT.texcoord0.y *= rect.w;
+	OUT.texcoord0.x *= textureScaleThetaPhi.x;
+	OUT.texcoord0.y *= textureScaleThetaPhi.y;
+	float differencetheta = -textureScaleThetaPhi.z;
+	float differencephi = -diffTextureScaleThetaPhi.w;
+	mat = float3x3(cos(differencephi), 0, -sin(differencephi), -sin(differencetheta)*sin(differencephi), cos(differencetheta), -sin(differencetheta)*cos(differencephi), cos(differencetheta)*sin(differencephi), sin(differencetheta), cos(differencetheta)*cos(differencephi));
+	rot = mul(mat, position.xyz);
+	OUT.texcoord4.x = rot.x - differenceRect.x;
+	OUT.texcoord4.y = -rot.y - differenceRect.y;
+	OUT.texcoord4.x *= differenceRect.z;
+	OUT.texcoord4.y *= differenceRect.w;
+	OUT.texcoord4.x *= diffTextureScaleThetaPhi.x;
+	OUT.texcoord4.y *= diffTextureScaleThetaPhi.y;
+}
+
+
+	return OUT;
+}
+2014-12-02 09:06:54,873 [AWT-EventQueue-0] DEBUG root - >> FileUtils.invokeExecutable > Execute command:  "/Users/freekv/JHelioviewer-SWHV/Libs/cgc-mac" "-profile" "arbvp1" "-o" "/Users/freekv/JHelioviewer-SWHV/Temp/tmp.asm" "/Users/freekv/JHelioviewer-SWHV/Temp/tmp.cg"
+2014-12-02 09:06:54,918 [FILEUTILS1] DEBUG root - >> FileUtils.logProcessOutput(Process, cgc, DEBUG) > std out: /Users/freekv/JHelioviewer-SWHV/Temp/tmp.cg
+2014-12-02 09:06:54,938 [FILEUTILS2] DEBUG root - >> FileUtils.logProcessOutput(Process, cgc, DEBUG) > std err: /Users/freekv/JHelioviewer-SWHV/Temp/tmp.cg(22) : warning C7050: "OUT.texcoord4.zw" might be used before being initialized
+2014-12-02 09:06:54,938 [FILEUTILS2] DEBUG root - >> FileUtils.logProcessOutput(Process, cgc, DEBUG) > std err: 74 lines, 1 warnings, 0 errors.
+2014-12-02 09:06:54,973 [AWT-EventQueue-0] DEBUG root - Called in eventQueue
+2014-12-02 09:06:54,973 [AWT-EventQueue-0] DEBUG root - draw request time: 0
+2014-12-02 09:06:54,973 [AWT-EventQueue-0] DEBUG root - Called in eventQueue
+2014-12-02 09:06:54,974 [AWT-EventQueue-0] DEBUG root - draw request time: 1
+2014-12-02 09:06:54,974 [AWT-EventQueue-0] DEBUG root - Called in eventQueue
+2014-12-02 09:06:54,975 [AWT-EventQueue-0] DEBUG root - draw request time: 1
+2014-12-02 09:06:54,975 [AWT-EventQueue-0] DEBUG root - Called in eventQueue
+2014-12-02 09:06:54,977 [AWT-EventQueue-0] DEBUG root - draw request time: 2
+2014-12-02 09:06:54,977 [AWT-EventQueue-0] DEBUG root - Called in eventQueue
+2014-12-02 09:06:54,977 [AWT-EventQueue-0] DEBUG root - draw request time: 0
+2014-12-02 09:06:54,977 [AWT-EventQueue-0] DEBUG root - Called in eventQueue
+2014-12-02 09:06:54,979 [AWT-EventQueue-0] DEBUG root - draw request time: 2
+2014-12-02 09:06:54,979 [AWT-EventQueue-0] DEBUG root - Called in eventQueue
+2014-12-02 09:06:54,979 [AWT-EventQueue-0] DEBUG root - draw request time: 0
+2014-12-02 09:06:54,980 [AWT-EventQueue-0] DEBUG root - Called in eventQueue
+2014-12-02 09:06:54,981 [AWT-EventQueue-0] DEBUG root - draw request time: 1
+2014-12-02 09:06:55,045 [AWT-EventQueue-0] DEBUG root - selectedIntervalChanged0
+2014-12-02 09:06:55,046 [AWT-EventQueue-0] DEBUG root - selectedIntervalChanged0
+2014-12-02 09:06:55,046 [AWT-EventQueue-0] DEBUG root - selectedIntervalChanged0
+2014-12-02 09:06:55,046 [AWT-EventQueue-0] DEBUG root - selectedIntervalChanged0
+2014-12-02 09:06:57,381 [AWT-EventQueue-0] DEBUG root - >> LayersModel.removeLayer()
+2014-12-02 09:06:57,384 [AWT-EventQueue-0] DEBUG root - GL3DImageLayers: Removed Layer AIA Image Layer
+2014-12-02 09:07:01,298 [OpenLocalFile] DEBUG root - Try to apply color table SDO-AIA 171 Å
+2014-12-02 09:07:01,324 [LayersModelThread (layer added)] DEBUG root - Overlap fraction for layer 0 is 1.0
+2014-12-02 09:07:01,370 [AWT-EventQueue-0] ERROR root - LOADING PFSS
+ERROR: java.lang.Exception: Stack trace
+ERROR: 	at java.lang.Thread.dumpStack(Thread.java:1329)
+ERROR: 	at org.helioviewer.gl3d.plugin.pfss.data.PfssDataLoader.<init>(PfssDataLoader.java:18)
+ERROR: 	at org.helioviewer.gl3d.plugin.pfss.data.PfssCache.loadFile(PfssCache.java:115)
+ERROR: 	at org.helioviewer.gl3d.plugin.pfss.data.PfssCache.updateData(PfssCache.java:106)
+ERROR: 	at org.helioviewer.gl3d.plugin.pfss.PfssPluginPanel.timestampChanged(PfssPluginPanel.java:318)
+ERROR: 	at org.helioviewer.jhv.layers.LayersModel$9.run(LayersModel.java:1523)
+ERROR: 	at java.awt.event.InvocationEvent.dispatch(InvocationEvent.java:311)
+ERROR: 	at java.awt.EventQueue.dispatchEventImpl(EventQueue.java:744)
+ERROR: 	at java.awt.EventQueue.access$400(EventQueue.java:97)
+ERROR: 	at java.awt.EventQueue$3.run(EventQueue.java:697)
+ERROR: 	at java.awt.EventQueue$3.run(EventQueue.java:691)
+ERROR: 	at java.security.AccessController.doPrivileged(Native Method)
+ERROR: 	at java.security.ProtectionDomain$1.doIntersectionPrivilege(ProtectionDomain.java:75)
+ERROR: 	at java.awt.EventQueue.dispatchEvent(EventQueue.java:714)
+ERROR: 	at java.awt.EventDispatchThread.pumpOneEventForFilters(EventDispatchThread.java:201)
+ERROR: 	at java.awt.EventDispatchThread.pumpEventsForFilter(EventDispatchThread.java:116)
+ERROR: 	at java.awt.EventDispatchThread.pumpEventsForHierarchy(EventDispatchThread.java:105)
+ERROR: 	at java.awt.EventDispatchThread.pumpEvents(EventDispatchThread.java:101)
+ERROR: 	at java.awt.EventDispatchThread.pumpEvents(EventDispatchThread.java:93)
+ERROR: 	at java.awt.EventDispatchThread.run(EventDispatchThread.java:82)
+2014-12-02 09:07:01,371 [AWT-EventQueue-0] ERROR root - LOADING PFSS
+ERROR: java.lang.Exception: Stack trace
+ERROR: 	at java.lang.Thread.dumpStack(Thread.java:1329)
+ERROR: 	at org.helioviewer.gl3d.plugin.pfss.data.PfssDataLoader.<init>(PfssDataLoader.java:18)
+ERROR: 	at org.helioviewer.gl3d.plugin.pfss.data.PfssCache.loadFile(PfssCache.java:115)
+ERROR: 	at org.helioviewer.gl3d.plugin.pfss.data.PfssCache.preload(PfssCache.java:132)
+ERROR: 	at org.helioviewer.gl3d.plugin.pfss.data.PfssCache.updateData(PfssCache.java:109)
+ERROR: 	at org.helioviewer.gl3d.plugin.pfss.PfssPluginPanel.timestampChanged(PfssPluginPanel.java:318)
+ERROR: 	at org.helioviewer.jhv.layers.LayersModel$9.run(LayersModel.java:1523)
+ERROR: 	at java.awt.event.InvocationEvent.dispatch(InvocationEvent.java:311)
+ERROR: 	at java.awt.EventQueue.dispatchEventImpl(EventQueue.java:744)
+ERROR: 	at java.awt.EventQueue.access$400(EventQueue.java:97)
+ERROR: 	at java.awt.EventQueue$3.run(EventQueue.java:697)
+ERROR: 	at java.awt.EventQueue$3.run(EventQueue.java:691)
+ERROR: 	at java.security.AccessController.doPrivileged(Native Method)
+ERROR: 	at java.security.ProtectionDomain$1.doIntersectionPrivilege(ProtectionDomain.java:75)
+ERROR: 	at java.awt.EventQueue.dispatchEvent(EventQueue.java:714)
+ERROR: 	at java.awt.EventDispatchThread.pumpOneEventForFilters(EventDispatchThread.java:201)
+ERROR: 	at java.awt.EventDispatchThread.pumpEventsForFilter(EventDispatchThread.java:116)
+ERROR: 	at java.awt.EventDispatchThread.pumpEventsForHierarchy(EventDispatchThread.java:105)
+ERROR: 	at java.awt.EventDispatchThread.pumpEvents(EventDispatchThread.java:101)
+ERROR: 	at java.awt.EventDispatchThread.pumpEvents(EventDispatchThread.java:93)
+ERROR: 	at java.awt.EventDispatchThread.run(EventDispatchThread.java:82)
+ERROR: java.lang.Exception: Stack trace
+ERROR: 	at java.lang.Thread.dumpStack(Thread.java:1329)
+ERROR: 	at org.helioviewer.gl3d.plugin.pfss.data.PfssDataLoader.<init>(PfssDataLoader.java:18)
+ERROR: 	at org.helioviewer.gl3d.plugin.pfss.data.PfssCache.loadFile(PfssCache.java:115)
+ERROR: 	at org.helioviewer.gl3d.plugin.pfss.data.PfssCache.preload(PfssCache.java:132)
+ERROR: 	at org.helioviewer.gl3d.plugin.pfss.data.PfssCache.updateData(PfssCache.java:109)
+ERROR: 	at org.helioviewer.gl3d.plugin.pfss.PfssPluginPanel.timestampChanged(PfssPluginPanel.java:318)
+ERROR: 	at org.helioviewer.jhv.layers.LayersModel$9.run(LayersModel.java:1523)
+ERROR: 	at java.awt.event.InvocationEvent.dispatch(InvocationEvent.java:311)
+ERROR: 	at java.awt.EventQueue.dispatchEventImpl(EventQueue.java:744)
+ERROR: 	at java.awt.EventQueue.access$400(EventQueue.java:97)
+ERROR: 	at java.awt.EventQueue$3.run(EventQueue.java:697)
+ERROR: 	at java.awt.EventQueue$3.run(EventQueue.java:691)
+ERROR: 	at java.security.AccessController.doPrivileged(Native Method)
+2014-12-02 09:07:01,371 [AWT-EventQueue-0] ERROR root - LOADING PFSS
+2014-12-02 09:07:01,372 [AWT-EventQueue-0] ERROR root - LOADING PFSS
+ERROR: 	at java.security.ProtectionDomain$1.doIntersectionPrivilege(ProtectionDomain.java:75)
+ERROR: 	at java.awt.EventQueue.dispatchEvent(EventQueue.java:714)
+ERROR: 	at java.awt.EventDispatchThread.pumpOneEventForFilters(EventDispatchThread.java:201)
+ERROR: 	at java.awt.EventDispatchThread.pumpEventsForFilter(EventDispatchThread.java:116)
+ERROR: 	at java.awt.EventDispatchThread.pumpEventsForHierarchy(EventDispatchThread.java:105)
+ERROR: 	at java.awt.EventDispatchThread.pumpEvents(EventDispatchThread.java:101)
+ERROR: 	at java.awt.EventDispatchThread.pumpEvents(EventDispatchThread.java:93)
+ERROR: 	at java.awt.EventDispatchThread.run(EventDispatchThread.java:82)
+ERROR: java.lang.Exception: Stack trace
+ERROR: 	at java.lang.Thread.dumpStack(Thread.java:1329)
+ERROR: 	at org.helioviewer.gl3d.plugin.pfss.data.PfssDataLoader.<init>(PfssDataLoader.java:18)
+2014-12-02 09:07:01,372 [AWT-EventQueue-0] ERROR root - LOADING PFSS
+ERROR: 	at org.helioviewer.gl3d.plugin.pfss.data.PfssCache.loadFile(PfssCache.java:115)
+ERROR: 	at org.helioviewer.gl3d.plugin.pfss.data.PfssCache.preload(PfssCache.java:132)
+ERROR: 	at org.helioviewer.gl3d.plugin.pfss.data.PfssCache.updateData(PfssCache.java:109)
+ERROR: 	at org.helioviewer.gl3d.plugin.pfss.PfssPluginPanel.timestampChanged(PfssPluginPanel.java:318)
+ERROR: 	at org.helioviewer.jhv.layers.LayersModel$9.run(LayersModel.java:1523)
+ERROR: 	at java.awt.event.InvocationEvent.dispatch(InvocationEvent.java:311)
+ERROR: 	at java.awt.EventQueue.dispatchEventImpl(EventQueue.java:744)
+ERROR: 	at java.awt.EventQueue.access$400(EventQueue.java:97)
+ERROR: 	at java.awt.EventQueue$3.run(EventQueue.java:697)
+ERROR: 	at java.awt.EventQueue$3.run(EventQueue.java:691)
+ERROR: 	at java.security.AccessController.doPrivileged(Native Method)
+ERROR: 	at java.security.ProtectionDomain$1.doIntersectionPrivilege(ProtectionDomain.java:75)
+ERROR: 	at java.awt.EventQueue.dispatchEvent(EventQueue.java:714)
+ERROR: 	at java.awt.EventDispatchThread.pumpOneEventForFilters(EventDispatchThread.java:201)
+ERROR: 	at java.awt.EventDispatchThread.pumpEventsForFilter(EventDispatchThread.java:116)
+ERROR: 	at java.awt.EventDispatchThread.pumpEventsForHierarchy(EventDispatchThread.java:105)
+ERROR: 	at java.awt.EventDispatchThread.pumpEvents(EventDispatchThread.java:101)
+ERROR: 	at java.awt.EventDispatchThread.pumpEvents(EventDispatchThread.java:93)
+ERROR: 	at java.awt.EventDispatchThread.run(EventDispatchThread.java:82)
+ERROR: java.lang.Exception: Stack trace
+ERROR: 	at java.lang.Thread.dumpStack(Thread.java:1329)
+ERROR: 	at org.helioviewer.gl3d.plugin.pfss.data.PfssDataLoader.<init>(PfssDataLoader.java:18)
+ERROR: 	at org.helioviewer.gl3d.plugin.pfss.data.PfssCache.loadFile(PfssCache.java:115)
+ERROR: 	at org.helioviewer.gl3d.plugin.pfss.data.PfssCache.preload(PfssCache.java:132)
+ERROR: 	at org.helioviewer.gl3d.plugin.pfss.data.PfssCache.updateData(PfssCache.java:109)
+ERROR: 	at org.helioviewer.gl3d.plugin.pfss.PfssPluginPanel.timestampChanged(PfssPluginPanel.java:318)
+ERROR: 	at org.helioviewer.jhv.layers.LayersModel$9.run(LayersModel.java:1523)
+ERROR: 	at java.awt.event.InvocationEvent.dispatch(InvocationEvent.java:311)
+ERROR: 	at java.awt.EventQueue.dispatchEventImpl(EventQueue.java:744)
+ERROR: 	at java.awt.EventQueue.access$400(EventQueue.java:97)
+ERROR: 	at java.awt.EventQueue$3.run(EventQueue.java:697)
+ERROR: 	at java.awt.EventQueue$3.run(EventQueue.java:691)
+ERROR: 	at java.security.AccessController.doPrivileged(Native Method)
+ERROR: 	at java.security.ProtectionDomain$1.doIntersectionPrivilege(ProtectionDomain.java:75)
+ERROR: 	at java.awt.EventQueue.dispatchEvent(EventQueue.java:714)
+ERROR: 	at java.awt.EventDispatchThread.pumpOneEventForFilters(EventDispatchThread.java:201)
+ERROR: 	at java.awt.EventDispatchThread.pumpEventsForFilter(EventDispatchThread.java:116)
+ERROR: 	at java.awt.EventDispatchThread.pumpEventsForHierarchy(EventDispatchThread.java:105)
+ERROR: 	at java.awt.EventDispatchThread.pumpEvents(EventDispatchThread.java:101)
+ERROR: 	at java.awt.EventDispatchThread.pumpEvents(EventDispatchThread.java:93)
+ERROR: 	at java.awt.EventDispatchThread.run(EventDispatchThread.java:82)
+2014-12-02 09:07:01,373 [LayersModelThread (layer added)] ERROR root - LOADING PFSS
+2014-12-02 09:07:01,373 [AWT-EventQueue-0] ERROR root - LOADING PFSS
+ERROR: java.lang.Exception: Stack trace
+ERROR: 	at java.lang.Thread.dumpStack(Thread.java:1329)
+ERROR: 	at org.helioviewer.gl3d.plugin.pfss.data.PfssDataLoader.<init>(PfssDataLoader.java:18)
+ERROR: 	at org.helioviewer.gl3d.plugin.pfss.data.PfssCache.preloadData(PfssCache.java:73)
+ERROR: 	at org.helioviewer.gl3d.plugin.pfss.PfssPluginPanel.layerAdded(PfssPluginPanel.java:279)
+ERROR: 	at org.helioviewer.jhv.layers.LayersModel$4.run(LayersModel.java:1407)
+ERROR: 	at java.lang.Thread.run(Thread.java:745)
+ERROR: java.lang.Exception: Stack trace
+ERROR: 	at java.lang.Thread.dumpStack(Thread.java:1329)
+ERROR: 	at org.helioviewer.gl3d.plugin.pfss.data.PfssDataLoader.<init>(PfssDataLoader.java:18)
+ERROR: 	at org.helioviewer.gl3d.plugin.pfss.data.PfssCache.loadFile(PfssCache.java:115)
+ERROR: 	at org.helioviewer.gl3d.plugin.pfss.data.PfssCache.preload(PfssCache.java:132)
+ERROR: 	at org.helioviewer.gl3d.plugin.pfss.data.PfssCache.updateData(PfssCache.java:109)
+ERROR: 	at org.helioviewer.gl3d.plugin.pfss.PfssPluginPanel.timestampChanged(PfssPluginPanel.java:318)
+ERROR: 	at org.helioviewer.jhv.layers.LayersModel$9.run(LayersModel.java:1523)
+ERROR: 	at java.awt.event.InvocationEvent.dispatch(InvocationEvent.java:311)
+ERROR: 	at java.awt.EventQueue.dispatchEventImpl(EventQueue.java:744)
+ERROR: 	at java.awt.EventQueue.access$400(EventQueue.java:97)
+ERROR: 	at java.awt.EventQueue$3.run(EventQueue.java:697)
+ERROR: 	at java.awt.EventQueue$3.run(EventQueue.java:691)
+ERROR: 	at java.security.AccessController.doPrivileged(Native Method)
+ERROR: 	at java.security.ProtectionDomain$1.doIntersectionPrivilege(ProtectionDomain.java:75)
+ERROR: 	at java.awt.EventQueue.dispatchEvent(EventQueue.java:714)
+ERROR: 	at java.awt.EventDispatchThread.pumpOneEventForFilters(EventDispatchThread.java:201)
+ERROR: 	at java.awt.EventDispatchThread.pumpEventsForFilter(EventDispatchThread.java:116)
+ERROR: 	at java.awt.EventDispatchThread.pumpEventsForHierarchy(EventDispatchThread.java:105)
+ERROR: 	at java.awt.EventDispatchThread.pumpEvents(EventDispatchThread.java:101)
+ERROR: 	at java.awt.EventDispatchThread.pumpEvents(EventDispatchThread.java:93)
+ERROR: 	at java.awt.EventDispatchThread.run(EventDispatchThread.java:82)
+ERROR: java.lang.Exception: Stack trace
+ERROR: 	at java.lang.Thread.dumpStack(Thread.java:1329)
+ERROR: 	at org.helioviewer.gl3d.plugin.pfss.data.PfssDataLoader.<init>(PfssDataLoader.java:18)
+ERROR: 	at org.helioviewer.gl3d.plugin.pfss.data.PfssCache.preloadData(PfssCache.java:73)
+ERROR: 	at org.helioviewer.gl3d.plugin.pfss.PfssPluginPanel.layerAdded(PfssPluginPanel.java:279)
+ERROR: 	at org.helioviewer.jhv.layers.LayersModel$4.run(LayersModel.java:1407)
+2014-12-02 09:07:01,374 [LayersModelThread (layer added)] ERROR root - LOADING PFSS
+2014-12-02 09:07:01,374 [AWT-EventQueue-0] ERROR root - LOADING PFSS
+2014-12-02 09:07:01,374 [LayersModelThread (layer added)] ERROR root - LOADING PFSS
+2014-12-02 09:07:01,374 [AWT-EventQueue-0] ERROR root - LOADING PFSS
+2014-12-02 09:07:01,374 [LayersModelThread (layer added)] ERROR root - LOADING PFSS
+ERROR: 	at java.lang.Thread.run(Thread.java:745)
+ERROR: java.lang.Exception: Stack trace
+ERROR: 	at java.lang.Thread.dumpStack(Thread.java:1329)
+ERROR: 	at org.helioviewer.gl3d.plugin.pfss.data.PfssDataLoader.<init>(PfssDataLoader.java:18)
+ERROR: 	at org.helioviewer.gl3d.plugin.pfss.data.PfssCache.loadFile(PfssCache.java:115)
+ERROR: 	at org.helioviewer.gl3d.plugin.pfss.data.PfssCache.preload(PfssCache.java:132)
+ERROR: 	at org.helioviewer.gl3d.plugin.pfss.data.PfssCache.updateData(PfssCache.java:109)
+ERROR: 	at org.helioviewer.gl3d.plugin.pfss.PfssPluginPanel.timestampChanged(PfssPluginPanel.java:318)
+ERROR: 	at org.helioviewer.jhv.layers.LayersModel$9.run(LayersModel.java:1523)
+ERROR: 	at java.awt.event.InvocationEvent.dispatch(InvocationEvent.java:311)
+ERROR: 	at java.awt.EventQueue.dispatchEventImpl(EventQueue.java:744)
+ERROR: 	at java.awt.EventQueue.access$400(EventQueue.java:97)
+ERROR: 	at java.awt.EventQueue$3.run(EventQueue.java:697)
+ERROR: 	at java.awt.EventQueue$3.run(EventQueue.java:691)
+ERROR: 	at java.security.AccessController.doPrivileged(Native Method)
+ERROR: 	at java.security.ProtectionDomain$1.doIntersectionPrivilege(ProtectionDomain.java:75)
+ERROR: 	at java.awt.EventQueue.dispatchEvent(EventQueue.java:714)
+ERROR: 	at java.awt.EventDispatchThread.pumpOneEventForFilters(EventDispatchThread.java:201)
+ERROR: 	at java.awt.EventDispatchThread.pumpEventsForFilter(EventDispatchThread.java:116)
+ERROR: 	at java.awt.EventDispatchThread.pumpEventsForHierarchy(EventDispatchThread.java:105)
+ERROR: 	at java.awt.EventDispatchThread.pumpEvents(EventDispatchThread.java:101)
+ERROR: 	at java.awt.EventDispatchThread.pumpEvents(EventDispatchThread.java:93)
+ERROR: 	at java.awt.EventDispatchThread.run(EventDispatchThread.java:82)
+ERROR: java.lang.Exception: Stack trace
+ERROR: 	at java.lang.Thread.dumpStack(Thread.java:1329)
+ERROR: 	at org.helioviewer.gl3d.plugin.pfss.data.PfssDataLoader.<init>(PfssDataLoader.java:18)
+ERROR: 	at org.helioviewer.gl3d.plugin.pfss.data.PfssCache.preloadData(PfssCache.java:73)
+ERROR: 	at org.helioviewer.gl3d.plugin.pfss.PfssPluginPanel.layerAdded(PfssPluginPanel.java:279)
+ERROR: 	at org.helioviewer.jhv.layers.LayersModel$4.run(LayersModel.java:1407)
+ERROR: 	at java.lang.Thread.run(Thread.java:745)
+ERROR: java.lang.Exception: Stack trace
+ERROR: 	at java.lang.Thread.dumpStack(Thread.java:1329)
+ERROR: 	at org.helioviewer.gl3d.plugin.pfss.data.PfssDataLoader.<init>(PfssDataLoader.java:18)
+ERROR: 	at org.helioviewer.gl3d.plugin.pfss.data.PfssCache.loadFile(PfssCache.java:115)
+ERROR: 	at org.helioviewer.gl3d.plugin.pfss.data.PfssCache.preload(PfssCache.java:132)
+ERROR: 	at org.helioviewer.gl3d.plugin.pfss.data.PfssCache.updateData(PfssCache.java:109)
+ERROR: 	at org.helioviewer.gl3d.plugin.pfss.PfssPluginPanel.timestampChanged(PfssPluginPanel.java:318)
+ERROR: 	at org.helioviewer.jhv.layers.LayersModel$9.run(LayersModel.java:1523)
+ERROR: 	at java.awt.event.InvocationEvent.dispatch(InvocationEvent.java:311)
+ERROR: 	at java.awt.EventQueue.dispatchEventImpl(EventQueue.java:744)
+ERROR: 	at java.awt.EventQueue.access$400(EventQueue.java:97)
+ERROR: 	at java.awt.EventQueue$3.run(EventQueue.java:697)
+ERROR: 	at java.awt.EventQueue$3.run(EventQueue.java:691)
+ERROR: 	at java.security.AccessController.doPrivileged(Native Method)
+ERROR: 	at java.security.ProtectionDomain$1.doIntersectionPrivilege(ProtectionDomain.java:75)
+ERROR: 	at java.awt.EventQueue.dispatchEvent(EventQueue.java:714)
+ERROR: 	at java.awt.EventDispatchThread.pumpOneEventForFilters(EventDispatchThread.java:201)
+ERROR: 	at java.awt.EventDispatchThread.pumpEventsForFilter(EventDispatchThread.java:116)
+ERROR: 	at java.awt.EventDispatchThread.pumpEventsForHierarchy(EventDispatchThread.java:105)
+ERROR: 	at java.awt.EventDispatchThread.pumpEvents(EventDispatchThread.java:101)
+ERROR: 	at java.awt.EventDispatchThread.pumpEvents(EventDispatchThread.java:93)
+ERROR: 	at java.awt.EventDispatchThread.run(EventDispatchThread.java:82)
+ERROR: java.lang.Exception: Stack trace
+ERROR: 	at java.lang.Thread.dumpStack(Thread.java:1329)
+ERROR: 	at org.helioviewer.gl3d.plugin.pfss.data.PfssDataLoader.<init>(PfssDataLoader.java:18)
+ERROR: 	at org.helioviewer.gl3d.plugin.pfss.data.PfssCache.preloadData(PfssCache.java:73)
+ERROR: 	at org.helioviewer.gl3d.plugin.pfss.PfssPluginPanel.layerAdded(PfssPluginPanel.java:279)
+ERROR: 	at org.helioviewer.jhv.layers.LayersModel$4.run(LayersModel.java:1407)
+ERROR: 	at java.lang.Thread.run(Thread.java:745)
+ERROR: java.lang.Exception: Stack trace
+ERROR: 	at java.lang.Thread.dumpStack(Thread.java:1329)
+ERROR: 	at org.helioviewer.gl3d.plugin.pfss.data.PfssDataLoader.<init>(PfssDataLoader.java:18)
+ERROR: 	at org.helioviewer.gl3d.plugin.pfss.data.PfssCache.preloadData(PfssCache.java:73)
+ERROR: 	at org.helioviewer.gl3d.plugin.pfss.PfssPluginPanel.layerAdded(PfssPluginPanel.java:279)
+ERROR: 	at org.helioviewer.jhv.layers.LayersModel$4.run(LayersModel.java:1407)
+ERROR: 	at java.lang.Thread.run(Thread.java:745)
+ERROR: java.lang.Exception: Stack trace
+2014-12-02 09:07:01,375 [LayersModelThread (layer added)] ERROR root - LOADING PFSS
+2014-12-02 09:07:01,375 [AWT-EventQueue-0] ERROR root - LOADING PFSS
+ERROR: 	at java.lang.Thread.dumpStack(Thread.java:1329)
+ERROR: 	at org.helioviewer.gl3d.plugin.pfss.data.PfssDataLoader.<init>(PfssDataLoader.java:18)
+ERROR: 	at org.helioviewer.gl3d.plugin.pfss.data.PfssCache.loadFile(PfssCache.java:115)
+ERROR: 	at org.helioviewer.gl3d.plugin.pfss.data.PfssCache.preload(PfssCache.java:132)
+ERROR: 	at org.helioviewer.gl3d.plugin.pfss.data.PfssCache.updateData(PfssCache.java:109)
+ERROR: 	at org.helioviewer.gl3d.plugin.pfss.PfssPluginPanel.timestampChanged(PfssPluginPanel.java:318)
+ERROR: 	at org.helioviewer.jhv.layers.LayersModel$9.run(LayersModel.java:1523)
+ERROR: 	at java.awt.event.InvocationEvent.dispatch(InvocationEvent.java:311)
+ERROR: 	at java.awt.EventQueue.dispatchEventImpl(EventQueue.java:744)
+ERROR: 	at java.awt.EventQueue.access$400(EventQueue.java:97)
+ERROR: 	at java.awt.EventQueue$3.run(EventQueue.java:697)
+ERROR: 	at java.awt.EventQueue$3.run(EventQueue.java:691)
+ERROR: 	at java.security.AccessController.doPrivileged(Native Method)
+ERROR: 	at java.security.ProtectionDomain$1.doIntersectionPrivilege(ProtectionDomain.java:75)
+ERROR: 	at java.awt.EventQueue.dispatchEvent(EventQueue.java:714)
+ERROR: 	at java.awt.EventDispatchThread.pumpOneEventForFilters(EventDispatchThread.java:201)
+ERROR: 	at java.awt.EventDispatchThread.pumpEventsForFilter(EventDispatchThread.java:116)
+ERROR: 	at java.awt.EventDispatchThread.pumpEventsForHierarchy(EventDispatchThread.java:105)
+ERROR: 	at java.awt.EventDispatchThread.pumpEvents(EventDispatchThread.java:101)
+ERROR: 	at java.awt.EventDispatchThread.pumpEvents(EventDispatchThread.java:93)
+ERROR: 	at java.awt.EventDispatchThread.run(EventDispatchThread.java:82)
+ERROR: java.lang.Exception: Stack trace
+ERROR: 	at java.lang.Thread.dumpStack(Thread.java:1329)
+ERROR: 	at org.helioviewer.gl3d.plugin.pfss.data.PfssDataLoader.<init>(PfssDataLoader.java:18)
+ERROR: 	at org.helioviewer.gl3d.plugin.pfss.data.PfssCache.preloadData(PfssCache.java:73)
+ERROR: 	at org.helioviewer.gl3d.plugin.pfss.PfssPluginPanel.layerAdded(PfssPluginPanel.java:279)
+2014-12-02 09:07:01,375 [LayersModelThread (layer added)] ERROR root - LOADING PFSS
+2014-12-02 09:07:01,376 [AWT-EventQueue-0] ERROR root - LOADING PFSS
+2014-12-02 09:07:01,376 [LayersModelThread (layer added)] ERROR root - LOADING PFSS
+ERROR: 	at org.helioviewer.jhv.layers.LayersModel$4.run(LayersModel.java:1407)
+ERROR: 	at java.lang.Thread.run(Thread.java:745)
+ERROR: java.lang.Exception: Stack trace
+ERROR: 	at java.lang.Thread.dumpStack(Thread.java:1329)
+2014-12-02 09:07:01,376 [AWT-EventQueue-0] ERROR root - LOADING PFSS
+ERROR: 	at org.helioviewer.gl3d.plugin.pfss.data.PfssDataLoader.<init>(PfssDataLoader.java:18)
+ERROR: 	at org.helioviewer.gl3d.plugin.pfss.data.PfssCache.loadFile(PfssCache.java:115)
+ERROR: 	at org.helioviewer.gl3d.plugin.pfss.data.PfssCache.preload(PfssCache.java:132)
+ERROR: 	at org.helioviewer.gl3d.plugin.pfss.data.PfssCache.updateData(PfssCache.java:109)
+ERROR: 	at org.helioviewer.gl3d.plugin.pfss.PfssPluginPanel.timestampChanged(PfssPluginPanel.java:318)
+ERROR: 	at org.helioviewer.jhv.layers.LayersModel$9.run(LayersModel.java:1523)
+ERROR: 	at java.awt.event.InvocationEvent.dispatch(InvocationEvent.java:311)
+2014-12-02 09:07:01,376 [LayersModelThread (layer added)] ERROR root - LOADING PFSS
+ERROR: 	at java.awt.EventQueue.dispatchEventImpl(EventQueue.java:744)
+ERROR: 	at java.awt.EventQueue.access$400(EventQueue.java:97)
+ERROR: 	at java.awt.EventQueue$3.run(EventQueue.java:697)
+ERROR: 	at java.awt.EventQueue$3.run(EventQueue.java:691)
+ERROR: 	at java.security.AccessController.doPrivileged(Native Method)
+ERROR: 	at java.security.ProtectionDomain$1.doIntersectionPrivilege(ProtectionDomain.java:75)
+ERROR: 	at java.awt.EventQueue.dispatchEvent(EventQueue.java:714)
+ERROR: 	at java.awt.EventDispatchThread.pumpOneEventForFilters(EventDispatchThread.java:201)
+ERROR: 	at java.awt.EventDispatchThread.pumpEventsForFilter(EventDispatchThread.java:116)
+ERROR: 	at java.awt.EventDispatchThread.pumpEventsForHierarchy(EventDispatchThread.java:105)
+ERROR: 	at java.awt.EventDispatchThread.pumpEvents(EventDispatchThread.java:101)
+ERROR: 	at java.awt.EventDispatchThread.pumpEvents(EventDispatchThread.java:93)
+ERROR: 	at java.awt.EventDispatchThread.run(EventDispatchThread.java:82)
+ERROR: java.lang.Exception: Stack trace
+ERROR: 	at java.lang.Thread.dumpStack(Thread.java:1329)
+ERROR: 	at org.helioviewer.gl3d.plugin.pfss.data.PfssDataLoader.<init>(PfssDataLoader.java:18)
+ERROR: 	at org.helioviewer.gl3d.plugin.pfss.data.PfssCache.preloadData(PfssCache.java:73)
+ERROR: 	at org.helioviewer.gl3d.plugin.pfss.PfssPluginPanel.layerAdded(PfssPluginPanel.java:279)
+ERROR: 	at org.helioviewer.jhv.layers.LayersModel$4.run(LayersModel.java:1407)
+ERROR: 	at java.lang.Thread.run(Thread.java:745)
+ERROR: java.lang.Exception: Stack trace
+ERROR: 	at java.lang.Thread.dumpStack(Thread.java:1329)
+ERROR: 	at org.helioviewer.gl3d.plugin.pfss.data.PfssDataLoader.<init>(PfssDataLoader.java:18)
+ERROR: 	at org.helioviewer.gl3d.plugin.pfss.data.PfssCache.loadFile(PfssCache.java:115)
+2014-12-02 09:07:01,376 [AWT-EventQueue-0] ERROR root - LOADING PFSS
+ERROR: 	at org.helioviewer.gl3d.plugin.pfss.data.PfssCache.preload(PfssCache.java:132)
+ERROR: 	at org.helioviewer.gl3d.plugin.pfss.data.PfssCache.updateData(PfssCache.java:109)
+ERROR: 	at org.helioviewer.gl3d.plugin.pfss.PfssPluginPanel.timestampChanged(PfssPluginPanel.java:318)
+ERROR: 	at org.helioviewer.jhv.layers.LayersModel$9.run(LayersModel.java:1523)
+ERROR: 	at java.awt.event.InvocationEvent.dispatch(InvocationEvent.java:311)
+ERROR: 	at java.awt.EventQueue.dispatchEventImpl(EventQueue.java:744)
+ERROR: 	at java.awt.EventQueue.access$400(EventQueue.java:97)
+ERROR: 	at java.awt.EventQueue$3.run(EventQueue.java:697)
+ERROR: 	at java.awt.EventQueue$3.run(EventQueue.java:691)
+ERROR: 	at java.security.AccessController.doPrivileged(Native Method)
+ERROR: 	at java.security.ProtectionDomain$1.doIntersectionPrivilege(ProtectionDomain.java:75)
+ERROR: 	at java.awt.EventQueue.dispatchEvent(EventQueue.java:714)
+ERROR: 	at java.awt.EventDispatchThread.pumpOneEventForFilters(EventDispatchThread.java:201)
+ERROR: 	at java.awt.EventDispatchThread.pumpEventsForFilter(EventDispatchThread.java:116)
+ERROR: 	at java.awt.EventDispatchThread.pumpEventsForHierarchy(EventDispatchThread.java:105)
+ERROR: 	at java.awt.EventDispatchThread.pumpEvents(EventDispatchThread.java:101)
+ERROR: 	at java.awt.EventDispatchThread.pumpEvents(EventDispatchThread.java:93)
+ERROR: 	at java.awt.EventDispatchThread.run(EventDispatchThread.java:82)
+ERROR: java.lang.Exception: Stack trace
+ERROR: 	at java.lang.Thread.dumpStack(Thread.java:1329)
+ERROR: 	at org.helioviewer.gl3d.plugin.pfss.data.PfssDataLoader.<init>(PfssDataLoader.java:18)
+ERROR: 	at org.helioviewer.gl3d.plugin.pfss.data.PfssCache.preloadData(PfssCache.java:73)
+ERROR: 	at org.helioviewer.gl3d.plugin.pfss.PfssPluginPanel.layerAdded(PfssPluginPanel.java:279)
+2014-12-02 09:07:01,377 [LayersModelThread (layer added)] ERROR root - LOADING PFSS
+2014-12-02 09:07:01,377 [LayersModelThread (layer added)] ERROR root - LOADING PFSS
+2014-12-02 09:07:01,377 [AWT-EventQueue-0] ERROR root - LOADING PFSS
+2014-12-02 09:07:01,377 [LayersModelThread (layer added)] ERROR root - LOADING PFSS
+2014-12-02 09:07:01,378 [AWT-EventQueue-0] ERROR root - LOADING PFSS
+2014-12-02 09:07:01,378 [LayersModelThread (layer added)] ERROR root - LOADING PFSS
+2014-12-02 09:07:01,378 [AWT-EventQueue-0] ERROR root - LOADING PFSS
+2014-12-02 09:07:01,378 [LayersModelThread (layer added)] ERROR root - LOADING PFSS
+2014-12-02 09:07:01,379 [AWT-EventQueue-0] ERROR root - LOADING PFSS
+2014-12-02 09:07:01,379 [LayersModelThread (layer added)] ERROR root - LOADING PFSS
+ERROR: 	at org.helioviewer.jhv.layers.LayersModel$4.run(LayersModel.java:1407)
+ERROR: 	at java.lang.Thread.run(Thread.java:745)
+ERROR: java.lang.Exception: Stack trace
+ERROR: 	at java.lang.Thread.dumpStack(Thread.java:1329)
+ERROR: 	at org.helioviewer.gl3d.plugin.pfss.data.PfssDataLoader.<init>(PfssDataLoader.java:18)
+ERROR: 	at org.helioviewer.gl3d.plugin.pfss.data.PfssCache.preloadData(PfssCache.java:73)
+ERROR: 	at org.helioviewer.gl3d.plugin.pfss.PfssPluginPanel.layerAdded(PfssPluginPanel.java:279)
+ERROR: 	at org.helioviewer.jhv.layers.LayersModel$4.run(LayersModel.java:1407)
+ERROR: 	at java.lang.Thread.run(Thread.java:745)
+ERROR: java.lang.Exception: Stack trace
+ERROR: 	at java.lang.Thread.dumpStack(Thread.java:1329)
+ERROR: 	at org.helioviewer.gl3d.plugin.pfss.data.PfssDataLoader.<init>(PfssDataLoader.java:18)
+ERROR: 	at org.helioviewer.gl3d.plugin.pfss.data.PfssCache.loadFile(PfssCache.java:115)
+ERROR: 	at org.helioviewer.gl3d.plugin.pfss.data.PfssCache.preload(PfssCache.java:132)
+ERROR: 	at org.helioviewer.gl3d.plugin.pfss.data.PfssCache.updateData(PfssCache.java:109)
+ERROR: 	at org.helioviewer.gl3d.plugin.pfss.PfssPluginPanel.timestampChanged(PfssPluginPanel.java:318)
+ERROR: 	at org.helioviewer.jhv.layers.LayersModel$9.run(LayersModel.java:1523)
+ERROR: 	at java.awt.event.InvocationEvent.dispatch(InvocationEvent.java:311)
+ERROR: 	at java.awt.EventQueue.dispatchEventImpl(EventQueue.java:744)
+ERROR: 	at java.awt.EventQueue.access$400(EventQueue.java:97)
+ERROR: 	at java.awt.EventQueue$3.run(EventQueue.java:697)
+ERROR: 	at java.awt.EventQueue$3.run(EventQueue.java:691)
+ERROR: 	at java.security.AccessController.doPrivileged(Native Method)
+ERROR: 	at java.security.ProtectionDomain$1.doIntersectionPrivilege(ProtectionDomain.java:75)
+ERROR: 	at java.awt.EventQueue.dispatchEvent(EventQueue.java:714)
+ERROR: 	at java.awt.EventDispatchThread.pumpOneEventForFilters(EventDispatchThread.java:201)
+ERROR: 	at java.awt.EventDispatchThread.pumpEventsForFilter(EventDispatchThread.java:116)
+ERROR: 	at java.awt.EventDispatchThread.pumpEventsForHierarchy(EventDispatchThread.java:105)
+ERROR: 	at java.awt.EventDispatchThread.pumpEvents(EventDispatchThread.java:101)
+ERROR: 	at java.awt.EventDispatchThread.pumpEvents(EventDispatchThread.java:93)
+ERROR: 	at java.awt.EventDispatchThread.run(EventDispatchThread.java:82)
+ERROR: java.lang.Exception: Stack trace
+ERROR: 	at java.lang.Thread.dumpStack(Thread.java:1329)
+ERROR: 	at org.helioviewer.gl3d.plugin.pfss.data.PfssDataLoader.<init>(PfssDataLoader.java:18)
+ERROR: 	at org.helioviewer.gl3d.plugin.pfss.data.PfssCache.preloadData(PfssCache.java:73)
+ERROR: 	at org.helioviewer.gl3d.plugin.pfss.PfssPluginPanel.layerAdded(PfssPluginPanel.java:279)
+ERROR: 	at org.helioviewer.jhv.layers.LayersModel$4.run(LayersModel.java:1407)
+ERROR: 	at java.lang.Thread.run(Thread.java:745)
+ERROR: java.lang.Exception: Stack trace
+ERROR: 	at java.lang.Thread.dumpStack(Thread.java:1329)
+ERROR: 	at org.helioviewer.gl3d.plugin.pfss.data.PfssDataLoader.<init>(PfssDataLoader.java:18)
+ERROR: 	at org.helioviewer.gl3d.plugin.pfss.data.PfssCache.loadFile(PfssCache.java:115)
+ERROR: 	at org.helioviewer.gl3d.plugin.pfss.data.PfssCache.preload(PfssCache.java:132)
+ERROR: 	at org.helioviewer.gl3d.plugin.pfss.data.PfssCache.updateData(PfssCache.java:109)
+ERROR: 	at org.helioviewer.gl3d.plugin.pfss.PfssPluginPanel.timestampChanged(PfssPluginPanel.java:318)
+ERROR: 	at org.helioviewer.jhv.layers.LayersModel$9.run(LayersModel.java:1523)
+ERROR: 	at java.awt.event.InvocationEvent.dispatch(InvocationEvent.java:311)
+ERROR: 	at java.awt.EventQueue.dispatchEventImpl(EventQueue.java:744)
+ERROR: 	at java.awt.EventQueue.access$400(EventQueue.java:97)
+ERROR: 	at java.awt.EventQueue$3.run(EventQueue.java:697)
+ERROR: 	at java.awt.EventQueue$3.run(EventQueue.java:691)
+ERROR: 	at java.security.AccessController.doPrivileged(Native Method)
+ERROR: 	at java.security.ProtectionDomain$1.doIntersectionPrivilege(ProtectionDomain.java:75)
+ERROR: 	at java.awt.EventQueue.dispatchEvent(EventQueue.java:714)
+ERROR: 	at java.awt.EventDispatchThread.pumpOneEventForFilters(EventDispatchThread.java:201)
+ERROR: 	at java.awt.EventDispatchThread.pumpEventsForFilter(EventDispatchThread.java:116)
+ERROR: 	at java.awt.EventDispatchThread.pumpEventsForHierarchy(EventDispatchThread.java:105)
+ERROR: 	at java.awt.EventDispatchThread.pumpEvents(EventDispatchThread.java:101)
+ERROR: 	at java.awt.EventDispatchThread.pumpEvents(EventDispatchThread.java:93)
+ERROR: 	at java.awt.EventDispatchThread.run(EventDispatchThread.java:82)
+ERROR: java.lang.Exception: Stack trace
+ERROR: 	at java.lang.Thread.dumpStack(Thread.java:1329)
+ERROR: 	at org.helioviewer.gl3d.plugin.pfss.data.PfssDataLoader.<init>(PfssDataLoader.java:18)
+ERROR: 	at org.helioviewer.gl3d.plugin.pfss.data.PfssCache.preloadData(PfssCache.java:73)
+ERROR: 	at org.helioviewer.gl3d.plugin.pfss.PfssPluginPanel.layerAdded(PfssPluginPanel.java:279)
+ERROR: 	at org.helioviewer.jhv.layers.LayersModel$4.run(LayersModel.java:1407)
+ERROR: 	at java.lang.Thread.run(Thread.java:745)
+ERROR: java.lang.Exception: Stack trace
+ERROR: 	at java.lang.Thread.dumpStack(Thread.java:1329)
+ERROR: 	at org.helioviewer.gl3d.plugin.pfss.data.PfssDataLoader.<init>(PfssDataLoader.java:18)
+ERROR: 	at org.helioviewer.gl3d.plugin.pfss.data.PfssCache.loadFile(PfssCache.java:115)
+ERROR: 	at org.helioviewer.gl3d.plugin.pfss.data.PfssCache.preload(PfssCache.java:132)
+ERROR: 	at org.helioviewer.gl3d.plugin.pfss.data.PfssCache.updateData(PfssCache.java:109)
+ERROR: 	at org.helioviewer.gl3d.plugin.pfss.PfssPluginPanel.timestampChanged(PfssPluginPanel.java:318)
+ERROR: 	at org.helioviewer.jhv.layers.LayersModel$9.run(LayersModel.java:1523)
+ERROR: 	at java.awt.event.InvocationEvent.dispatch(InvocationEvent.java:311)
+ERROR: 	at java.awt.EventQueue.dispatchEventImpl(EventQueue.java:744)
+ERROR: 	at java.awt.EventQueue.access$400(EventQueue.java:97)
+ERROR: 	at java.awt.EventQueue$3.run(EventQueue.java:697)
+ERROR: 	at java.awt.EventQueue$3.run(EventQueue.java:691)
+ERROR: 	at java.security.AccessController.doPrivileged(Native Method)
+ERROR: 	at java.security.ProtectionDomain$1.doIntersectionPrivilege(ProtectionDomain.java:75)
+ERROR: 	at java.awt.EventQueue.dispatchEvent(EventQueue.java:714)
+ERROR: 	at java.awt.EventDispatchThread.pumpOneEventForFilters(EventDispatchThread.java:201)
+ERROR: 	at java.awt.EventDispatchThread.pumpEventsForFilter(EventDispatchThread.java:116)
+ERROR: 	at java.awt.EventDispatchThread.pumpEventsForHierarchy(EventDispatchThread.java:105)
+ERROR: 	at java.awt.EventDispatchThread.pumpEvents(EventDispatchThread.java:101)
+ERROR: 	at java.awt.EventDispatchThread.pumpEvents(EventDispatchThread.java:93)
+ERROR: 	at java.awt.EventDispatchThread.run(EventDispatchThread.java:82)
+ERROR: java.lang.Exception: Stack trace
+ERROR: 	at java.lang.Thread.dumpStack(Thread.java:1329)
+ERROR: 	at org.helioviewer.gl3d.plugin.pfss.data.PfssDataLoader.<init>(PfssDataLoader.java:18)
+ERROR: 	at org.helioviewer.gl3d.plugin.pfss.data.PfssCache.preloadData(PfssCache.java:73)
+ERROR: 	at org.helioviewer.gl3d.plugin.pfss.PfssPluginPanel.layerAdded(PfssPluginPanel.java:279)
+ERROR: 	at org.helioviewer.jhv.layers.LayersModel$4.run(LayersModel.java:1407)
+2014-12-02 09:07:01,379 [AWT-EventQueue-0] ERROR root - LOADING PFSS
+2014-12-02 09:07:01,379 [LayersModelThread (layer added)] ERROR root - LOADING PFSS
+2014-12-02 09:07:01,380 [AWT-EventQueue-0] ERROR root - LOADING PFSS
+2014-12-02 09:07:01,380 [LayersModelThread (layer added)] ERROR root - LOADING PFSS
+2014-12-02 09:07:01,380 [AWT-EventQueue-0] ERROR root - LOADING PFSS
+ERROR: 	at java.lang.Thread.run(Thread.java:745)
+ERROR: java.lang.Exception: Stack trace
+ERROR: 	at java.lang.Thread.dumpStack(Thread.java:1329)
+ERROR: 	at org.helioviewer.gl3d.plugin.pfss.data.PfssDataLoader.<init>(PfssDataLoader.java:18)
+ERROR: 	at org.helioviewer.gl3d.plugin.pfss.data.PfssCache.loadFile(PfssCache.java:115)
+ERROR: 	at org.helioviewer.gl3d.plugin.pfss.data.PfssCache.preload(PfssCache.java:132)
+ERROR: 	at org.helioviewer.gl3d.plugin.pfss.data.PfssCache.updateData(PfssCache.java:109)
+ERROR: 	at org.helioviewer.gl3d.plugin.pfss.PfssPluginPanel.timestampChanged(PfssPluginPanel.java:318)
+ERROR: 	at org.helioviewer.jhv.layers.LayersModel$9.run(LayersModel.java:1523)
+ERROR: 	at java.awt.event.InvocationEvent.dispatch(InvocationEvent.java:311)
+ERROR: 	at java.awt.EventQueue.dispatchEventImpl(EventQueue.java:744)
+ERROR: 	at java.awt.EventQueue.access$400(EventQueue.java:97)
+ERROR: 	at java.awt.EventQueue$3.run(EventQueue.java:697)
+ERROR: 	at java.awt.EventQueue$3.run(EventQueue.java:691)
+2014-12-02 09:07:01,380 [LayersModelThread (layer added)] ERROR root - LOADING PFSS
+ERROR: 	at java.security.AccessController.doPrivileged(Native Method)
+ERROR: 	at java.security.ProtectionDomain$1.doIntersectionPrivilege(ProtectionDomain.java:75)
+ERROR: 	at java.awt.EventQueue.dispatchEvent(EventQueue.java:714)
+ERROR: 	at java.awt.EventDispatchThread.pumpOneEventForFilters(EventDispatchThread.java:201)
+ERROR: 	at java.awt.EventDispatchThread.pumpEventsForFilter(EventDispatchThread.java:116)
+ERROR: 	at java.awt.EventDispatchThread.pumpEventsForHierarchy(EventDispatchThread.java:105)
+ERROR: 	at java.awt.EventDispatchThread.pumpEvents(EventDispatchThread.java:101)
+ERROR: 	at java.awt.EventDispatchThread.pumpEvents(EventDispatchThread.java:93)
+ERROR: 	at java.awt.EventDispatchThread.run(EventDispatchThread.java:82)
+ERROR: java.lang.Exception: Stack trace
+ERROR: 	at java.lang.Thread.dumpStack(Thread.java:1329)
+ERROR: 	at org.helioviewer.gl3d.plugin.pfss.data.PfssDataLoader.<init>(PfssDataLoader.java:18)
+ERROR: 	at org.helioviewer.gl3d.plugin.pfss.data.PfssCache.preloadData(PfssCache.java:73)
+ERROR: 	at org.helioviewer.gl3d.plugin.pfss.PfssPluginPanel.layerAdded(PfssPluginPanel.java:279)
+ERROR: 	at org.helioviewer.jhv.layers.LayersModel$4.run(LayersModel.java:1407)
+ERROR: 	at java.lang.Thread.run(Thread.java:745)
+2014-12-02 09:07:01,380 [AWT-EventQueue-0] ERROR root - LOADING PFSS
+ERROR: java.lang.Exception: Stack trace
+ERROR: 	at java.lang.Thread.dumpStack(Thread.java:1329)
+ERROR: 	at org.helioviewer.gl3d.plugin.pfss.data.PfssDataLoader.<init>(PfssDataLoader.java:18)
+ERROR: 	at org.helioviewer.gl3d.plugin.pfss.data.PfssCache.loadFile(PfssCache.java:115)
+ERROR: 	at org.helioviewer.gl3d.plugin.pfss.data.PfssCache.preload(PfssCache.java:132)
+ERROR: 	at org.helioviewer.gl3d.plugin.pfss.data.PfssCache.updateData(PfssCache.java:109)
+ERROR: 	at org.helioviewer.gl3d.plugin.pfss.PfssPluginPanel.timestampChanged(PfssPluginPanel.java:318)
+ERROR: 	at org.helioviewer.jhv.layers.LayersModel$9.run(LayersModel.java:1523)
+ERROR: 	at java.awt.event.InvocationEvent.dispatch(InvocationEvent.java:311)
+2014-12-02 09:07:01,381 [LayersModelThread (layer added)] ERROR root - LOADING PFSS
+ERROR: 	at java.awt.EventQueue.dispatchEventImpl(EventQueue.java:744)
+ERROR: 	at java.awt.EventQueue.access$400(EventQueue.java:97)
+ERROR: 	at java.awt.EventQueue$3.run(EventQueue.java:697)
+ERROR: 	at java.awt.EventQueue$3.run(EventQueue.java:691)
+ERROR: 	at java.security.AccessController.doPrivileged(Native Method)
+ERROR: 	at java.security.ProtectionDomain$1.doIntersectionPrivilege(ProtectionDomain.java:75)
+ERROR: 	at java.awt.EventQueue.dispatchEvent(EventQueue.java:714)
+ERROR: 	at java.awt.EventDispatchThread.pumpOneEventForFilters(EventDispatchThread.java:201)
+ERROR: 	at java.awt.EventDispatchThread.pumpEventsForFilter(EventDispatchThread.java:116)
+ERROR: 	at java.awt.EventDispatchThread.pumpEventsForHierarchy(EventDispatchThread.java:105)
+ERROR: 	at java.awt.EventDispatchThread.pumpEvents(EventDispatchThread.java:101)
+ERROR: 	at java.awt.EventDispatchThread.pumpEvents(EventDispatchThread.java:93)
+ERROR: 	at java.awt.EventDispatchThread.run(EventDispatchThread.java:82)
+ERROR: java.lang.Exception: Stack trace
+ERROR: 	at java.lang.Thread.dumpStack(Thread.java:1329)
+ERROR: 	at org.helioviewer.gl3d.plugin.pfss.data.PfssDataLoader.<init>(PfssDataLoader.java:18)
+ERROR: 	at org.helioviewer.gl3d.plugin.pfss.data.PfssCache.preloadData(PfssCache.java:73)
+ERROR: 	at org.helioviewer.gl3d.plugin.pfss.PfssPluginPanel.layerAdded(PfssPluginPanel.java:279)
+ERROR: 	at org.helioviewer.jhv.layers.LayersModel$4.run(LayersModel.java:1407)
+ERROR: 	at java.lang.Thread.run(Thread.java:745)
+ERROR: java.lang.Exception: Stack trace
+ERROR: 	at java.lang.Thread.dumpStack(Thread.java:1329)
+ERROR: 	at org.helioviewer.gl3d.plugin.pfss.data.PfssDataLoader.<init>(PfssDataLoader.java:18)
+ERROR: 	at org.helioviewer.gl3d.plugin.pfss.data.PfssCache.loadFile(PfssCache.java:115)
+ERROR: 	at org.helioviewer.gl3d.plugin.pfss.data.PfssCache.preload(PfssCache.java:132)
+ERROR: 	at org.helioviewer.gl3d.plugin.pfss.data.PfssCache.updateData(PfssCache.java:109)
+ERROR: 	at org.helioviewer.gl3d.plugin.pfss.PfssPluginPanel.timestampChanged(PfssPluginPanel.java:318)
+ERROR: 	at org.helioviewer.jhv.layers.LayersModel$9.run(LayersModel.java:1523)
+ERROR: 	at java.awt.event.InvocationEvent.dispatch(InvocationEvent.java:311)
+ERROR: 	at java.awt.EventQueue.dispatchEventImpl(EventQueue.java:744)
+ERROR: 	at java.awt.EventQueue.access$400(EventQueue.java:97)
+ERROR: 	at java.awt.EventQueue$3.run(EventQueue.java:697)
+ERROR: 	at java.awt.EventQueue$3.run(EventQueue.java:691)
+ERROR: 	at java.security.AccessController.doPrivileged(Native Method)
+ERROR: 	at java.security.ProtectionDomain$1.doIntersectionPrivilege(ProtectionDomain.java:75)
+ERROR: 	at java.awt.EventQueue.dispatchEvent(EventQueue.java:714)
+2014-12-02 09:07:01,381 [AWT-EventQueue-0] ERROR root - LOADING PFSS
+ERROR: 	at java.awt.EventDispatchThread.pumpOneEventForFilters(EventDispatchThread.java:201)
+ERROR: 	at java.awt.EventDispatchThread.pumpEventsForFilter(EventDispatchThread.java:116)
+2014-12-02 09:07:01,381 [LayersModelThread (layer added)] ERROR root - LOADING PFSS
+ERROR: 	at java.awt.EventDispatchThread.pumpEventsForHierarchy(EventDispatchThread.java:105)
+ERROR: 	at java.awt.EventDispatchThread.pumpEvents(EventDispatchThread.java:101)
+ERROR: 	at java.awt.EventDispatchThread.pumpEvents(EventDispatchThread.java:93)
+ERROR: 	at java.awt.EventDispatchThread.run(EventDispatchThread.java:82)
+ERROR: java.lang.Exception: Stack trace
+ERROR: 	at java.lang.Thread.dumpStack(Thread.java:1329)
+ERROR: 	at org.helioviewer.gl3d.plugin.pfss.data.PfssDataLoader.<init>(PfssDataLoader.java:18)
+ERROR: 	at org.helioviewer.gl3d.plugin.pfss.data.PfssCache.preloadData(PfssCache.java:73)
+ERROR: 	at org.helioviewer.gl3d.plugin.pfss.PfssPluginPanel.layerAdded(PfssPluginPanel.java:279)
+ERROR: 	at org.helioviewer.jhv.layers.LayersModel$4.run(LayersModel.java:1407)
+ERROR: 	at java.lang.Thread.run(Thread.java:745)
+ERROR: java.lang.Exception: Stack trace
+ERROR: 	at java.lang.Thread.dumpStack(Thread.java:1329)
+ERROR: 	at org.helioviewer.gl3d.plugin.pfss.data.PfssDataLoader.<init>(PfssDataLoader.java:18)
+ERROR: 	at org.helioviewer.gl3d.plugin.pfss.data.PfssCache.loadFile(PfssCache.java:115)
+ERROR: 	at org.helioviewer.gl3d.plugin.pfss.data.PfssCache.preload(PfssCache.java:132)
+ERROR: 	at org.helioviewer.gl3d.plugin.pfss.data.PfssCache.updateData(PfssCache.java:109)
+ERROR: 	at org.helioviewer.gl3d.plugin.pfss.PfssPluginPanel.timestampChanged(PfssPluginPanel.java:318)
+ERROR: 	at org.helioviewer.jhv.layers.LayersModel$9.run(LayersModel.java:1523)
+ERROR: 	at java.awt.event.InvocationEvent.dispatch(InvocationEvent.java:311)
+ERROR: 	at java.awt.EventQueue.dispatchEventImpl(EventQueue.java:744)
+ERROR: 	at java.awt.EventQueue.access$400(EventQueue.java:97)
+ERROR: 	at java.awt.EventQueue$3.run(EventQueue.java:697)
+ERROR: 	at java.awt.EventQueue$3.run(EventQueue.java:691)
+ERROR: 	at java.security.AccessController.doPrivileged(Native Method)
+ERROR: 	at java.security.ProtectionDomain$1.doIntersectionPrivilege(ProtectionDomain.java:75)
+ERROR: 	at java.awt.EventQueue.dispatchEvent(EventQueue.java:714)
+ERROR: 	at java.awt.EventDispatchThread.pumpOneEventForFilters(EventDispatchThread.java:201)
+ERROR: 	at java.awt.EventDispatchThread.pumpEventsForFilter(EventDispatchThread.java:116)
+ERROR: 	at java.awt.EventDispatchThread.pumpEventsForHierarchy(EventDispatchThread.java:105)
+ERROR: 	at java.awt.EventDispatchThread.pumpEvents(EventDispatchThread.java:101)
+ERROR: 	at java.awt.EventDispatchThread.pumpEvents(EventDispatchThread.java:93)
+ERROR: 	at java.awt.EventDispatchThread.run(EventDispatchThread.java:82)
+ERROR: java.lang.Exception: Stack trace
+ERROR: 	at java.lang.Thread.dumpStack(Thread.java:1329)
+ERROR: 	at org.helioviewer.gl3d.plugin.pfss.data.PfssDataLoader.<init>(PfssDataLoader.java:18)
+ERROR: 	at org.helioviewer.gl3d.plugin.pfss.data.PfssCache.preloadData(PfssCache.java:73)
+ERROR: 	at org.helioviewer.gl3d.plugin.pfss.PfssPluginPanel.layerAdded(PfssPluginPanel.java:279)
+ERROR: 	at org.helioviewer.jhv.layers.LayersModel$4.run(LayersModel.java:1407)
+ERROR: 	at java.lang.Thread.run(Thread.java:745)
+ERROR: java.lang.Exception: Stack trace
+ERROR: 	at java.lang.Thread.dumpStack(Thread.java:1329)
+ERROR: 	at org.helioviewer.gl3d.plugin.pfss.data.PfssDataLoader.<init>(PfssDataLoader.java:18)
+ERROR: 	at org.helioviewer.gl3d.plugin.pfss.data.PfssCache.loadFile(PfssCache.java:115)
+ERROR: 	at org.helioviewer.gl3d.plugin.pfss.data.PfssCache.preload(PfssCache.java:132)
+ERROR: 	at org.helioviewer.gl3d.plugin.pfss.data.PfssCache.updateData(PfssCache.java:109)
+ERROR: 	at org.helioviewer.gl3d.plugin.pfss.PfssPluginPanel.timestampChanged(PfssPluginPanel.java:318)
+ERROR: 	at org.helioviewer.jhv.layers.LayersModel$9.run(LayersModel.java:1523)
+ERROR: 	at java.awt.event.InvocationEvent.dispatch(InvocationEvent.java:311)
+ERROR: 	at java.awt.EventQueue.dispatchEventImpl(EventQueue.java:744)
+ERROR: 	at java.awt.EventQueue.access$400(EventQueue.java:97)
+ERROR: 	at java.awt.EventQueue$3.run(EventQueue.java:697)
+ERROR: 	at java.awt.EventQueue$3.run(EventQueue.java:691)
+ERROR: 	at java.security.AccessController.doPrivileged(Native Method)
+ERROR: 	at java.security.ProtectionDomain$1.doIntersectionPrivilege(ProtectionDomain.java:75)
+ERROR: 	at java.awt.EventQueue.dispatchEvent(EventQueue.java:714)
+ERROR: 	at java.awt.EventDispatchThread.pumpOneEventForFilters(EventDispatchThread.java:201)
+ERROR: 	at java.awt.EventDispatchThread.pumpEventsForFilter(EventDispatchThread.java:116)
+ERROR: 	at java.awt.EventDispatchThread.pumpEventsForHierarchy(EventDispatchThread.java:105)
+ERROR: 	at java.awt.EventDispatchThread.pumpEvents(EventDispatchThread.java:101)
+ERROR: 	at java.awt.EventDispatchThread.pumpEvents(EventDispatchThread.java:93)
+ERROR: 	at java.awt.EventDispatchThread.run(EventDispatchThread.java:82)
+ERROR: java.lang.Exception: Stack trace
+ERROR: 	at java.lang.Thread.dumpStack(Thread.java:1329)
+ERROR: 	at org.helioviewer.gl3d.plugin.pfss.data.PfssDataLoader.<init>(PfssDataLoader.java:18)
+ERROR: 	at org.helioviewer.gl3d.plugin.pfss.data.PfssCache.preloadData(PfssCache.java:73)
+ERROR: 	at org.helioviewer.gl3d.plugin.pfss.PfssPluginPanel.layerAdded(PfssPluginPanel.java:279)
+ERROR: 	at org.helioviewer.jhv.layers.LayersModel$4.run(LayersModel.java:1407)
+ERROR: 	at java.lang.Thread.run(Thread.java:745)
+ERROR: java.lang.Exception: Stack trace
+ERROR: 	at java.lang.Thread.dumpStack(Thread.java:1329)
+ERROR: 	at org.helioviewer.gl3d.plugin.pfss.data.PfssDataLoader.<init>(PfssDataLoader.java:18)
+ERROR: 	at org.helioviewer.gl3d.plugin.pfss.data.PfssCache.loadFile(PfssCache.java:115)
+ERROR: 	at org.helioviewer.gl3d.plugin.pfss.data.PfssCache.preload(PfssCache.java:132)
+ERROR: 	at org.helioviewer.gl3d.plugin.pfss.data.PfssCache.updateData(PfssCache.java:109)
+ERROR: 	at org.helioviewer.gl3d.plugin.pfss.PfssPluginPanel.timestampChanged(PfssPluginPanel.java:318)
+2014-12-02 09:07:01,382 [AWT-EventQueue-0] ERROR root - LOADING PFSS
+2014-12-02 09:07:01,382 [LayersModelThread (layer added)] ERROR root - LOADING PFSS
+ERROR: 	at org.helioviewer.jhv.layers.LayersModel$9.run(LayersModel.java:1523)
+ERROR: 	at java.awt.event.InvocationEvent.dispatch(InvocationEvent.java:311)
+ERROR: 	at java.awt.EventQueue.dispatchEventImpl(EventQueue.java:744)
+ERROR: 	at java.awt.EventQueue.access$400(EventQueue.java:97)
+ERROR: 	at java.awt.EventQueue$3.run(EventQueue.java:697)
+ERROR: 	at java.awt.EventQueue$3.run(EventQueue.java:691)
+ERROR: 	at java.security.AccessController.doPrivileged(Native Method)
+ERROR: 	at java.security.ProtectionDomain$1.doIntersectionPrivilege(ProtectionDomain.java:75)
+ERROR: 	at java.awt.EventQueue.dispatchEvent(EventQueue.java:714)
+ERROR: 	at java.awt.EventDispatchThread.pumpOneEventForFilters(EventDispatchThread.java:201)
+ERROR: 	at java.awt.EventDispatchThread.pumpEventsForFilter(EventDispatchThread.java:116)
+ERROR: 	at java.awt.EventDispatchThread.pumpEventsForHierarchy(EventDispatchThread.java:105)
+ERROR: 	at java.awt.EventDispatchThread.pumpEvents(EventDispatchThread.java:101)
+ERROR: 	at java.awt.EventDispatchThread.pumpEvents(EventDispatchThread.java:93)
+ERROR: 	at java.awt.EventDispatchThread.run(EventDispatchThread.java:82)
+ERROR: java.lang.Exception: Stack trace
+ERROR: 	at java.lang.Thread.dumpStack(Thread.java:1329)
+ERROR: 	at org.helioviewer.gl3d.plugin.pfss.data.PfssDataLoader.<init>(PfssDataLoader.java:18)
+ERROR: 	at org.helioviewer.gl3d.plugin.pfss.data.PfssCache.preloadData(PfssCache.java:73)
+ERROR: 	at org.helioviewer.gl3d.plugin.pfss.PfssPluginPanel.layerAdded(PfssPluginPanel.java:279)
+ERROR: 	at org.helioviewer.jhv.layers.LayersModel$4.run(LayersModel.java:1407)
+ERROR: 	at java.lang.Thread.run(Thread.java:745)
+ERROR: java.lang.Exception: Stack trace
+ERROR: 	at java.lang.Thread.dumpStack(Thread.java:1329)
+ERROR: 	at org.helioviewer.gl3d.plugin.pfss.data.PfssDataLoader.<init>(PfssDataLoader.java:18)
+ERROR: 	at org.helioviewer.gl3d.plugin.pfss.data.PfssCache.loadFile(PfssCache.java:115)
+ERROR: 	at org.helioviewer.gl3d.plugin.pfss.data.PfssCache.preload(PfssCache.java:132)
+ERROR: 	at org.helioviewer.gl3d.plugin.pfss.data.PfssCache.updateData(PfssCache.java:109)
+ERROR: 	at org.helioviewer.gl3d.plugin.pfss.PfssPluginPanel.timestampChanged(PfssPluginPanel.java:318)
+ERROR: 	at org.helioviewer.jhv.layers.LayersModel$9.run(LayersModel.java:1523)
+ERROR: 	at java.awt.event.InvocationEvent.dispatch(InvocationEvent.java:311)
+ERROR: 	at java.awt.EventQueue.dispatchEventImpl(EventQueue.java:744)
+ERROR: 	at java.awt.EventQueue.access$400(EventQueue.java:97)
+ERROR: 	at java.awt.EventQueue$3.run(EventQueue.java:697)
+ERROR: 	at java.awt.EventQueue$3.run(EventQueue.java:691)
+ERROR: 	at java.security.AccessController.doPrivileged(Native Method)
+ERROR: 	at java.security.ProtectionDomain$1.doIntersectionPrivilege(ProtectionDomain.java:75)
+ERROR: 	at java.awt.EventQueue.dispatchEvent(EventQueue.java:714)
+ERROR: 	at java.awt.EventDispatchThread.pumpOneEventForFilters(EventDispatchThread.java:201)
+ERROR: 	at java.awt.EventDispatchThread.pumpEventsForFilter(EventDispatchThread.java:116)
+ERROR: 	at java.awt.EventDispatchThread.pumpEventsForHierarchy(EventDispatchThread.java:105)
+2014-12-02 09:07:01,382 [AWT-EventQueue-0] ERROR root - LOADING PFSS
+2014-12-02 09:07:01,383 [LayersModelThread (layer added)] ERROR root - LOADING PFSS
+ERROR: 	at java.awt.EventDispatchThread.pumpEvents(EventDispatchThread.java:101)
+ERROR: 	at java.awt.EventDispatchThread.pumpEvents(EventDispatchThread.java:93)
+ERROR: 	at java.awt.EventDispatchThread.run(EventDispatchThread.java:82)
+ERROR: java.lang.Exception: Stack trace
+ERROR: 	at java.lang.Thread.dumpStack(Thread.java:1329)
+ERROR: 	at org.helioviewer.gl3d.plugin.pfss.data.PfssDataLoader.<init>(PfssDataLoader.java:18)
+ERROR: 	at org.helioviewer.gl3d.plugin.pfss.data.PfssCache.preloadData(PfssCache.java:73)
+ERROR: 	at org.helioviewer.gl3d.plugin.pfss.PfssPluginPanel.layerAdded(PfssPluginPanel.java:279)
+ERROR: 	at org.helioviewer.jhv.layers.LayersModel$4.run(LayersModel.java:1407)
+ERROR: 	at java.lang.Thread.run(Thread.java:745)
+ERROR: java.lang.Exception: Stack trace
+ERROR: 	at java.lang.Thread.dumpStack(Thread.java:1329)
+ERROR: 	at org.helioviewer.gl3d.plugin.pfss.data.PfssDataLoader.<init>(PfssDataLoader.java:18)
+ERROR: 	at org.helioviewer.gl3d.plugin.pfss.data.PfssCache.loadFile(PfssCache.java:115)
+ERROR: 	at org.helioviewer.gl3d.plugin.pfss.data.PfssCache.preload(PfssCache.java:132)
+ERROR: 	at org.helioviewer.gl3d.plugin.pfss.data.PfssCache.updateData(PfssCache.java:109)
+ERROR: 	at org.helioviewer.gl3d.plugin.pfss.PfssPluginPanel.timestampChanged(PfssPluginPanel.java:318)
+ERROR: 	at org.helioviewer.jhv.layers.LayersModel$9.run(LayersModel.java:1523)
+ERROR: 	at java.awt.event.InvocationEvent.dispatch(InvocationEvent.java:311)
+ERROR: 	at java.awt.EventQueue.dispatchEventImpl(EventQueue.java:744)
+ERROR: 	at java.awt.EventQueue.access$400(EventQueue.java:97)
+ERROR: 	at java.awt.EventQueue$3.run(EventQueue.java:697)
+ERROR: 	at java.awt.EventQueue$3.run(EventQueue.java:691)
+ERROR: 	at java.security.AccessController.doPrivileged(Native Method)
+ERROR: 	at java.security.ProtectionDomain$1.doIntersectionPrivilege(ProtectionDomain.java:75)
+ERROR: 	at java.awt.EventQueue.dispatchEvent(EventQueue.java:714)
+2014-12-02 09:07:01,383 [AWT-EventQueue-0] ERROR root - LOADING PFSS
+ERROR: 	at java.awt.EventDispatchThread.pumpOneEventForFilters(EventDispatchThread.java:201)
+2014-12-02 09:07:01,383 [LayersModelThread (layer added)] ERROR root - LOADING PFSS
+ERROR: 	at java.awt.EventDispatchThread.pumpEventsForFilter(EventDispatchThread.java:116)
+ERROR: 	at java.awt.EventDispatchThread.pumpEventsForHierarchy(EventDispatchThread.java:105)
+ERROR: 	at java.awt.EventDispatchThread.pumpEvents(EventDispatchThread.java:101)
+ERROR: 	at java.awt.EventDispatchThread.pumpEvents(EventDispatchThread.java:93)
+ERROR: 	at java.awt.EventDispatchThread.run(EventDispatchThread.java:82)
+ERROR: java.lang.Exception: Stack trace
+ERROR: 	at java.lang.Thread.dumpStack(Thread.java:1329)
+ERROR: 	at org.helioviewer.gl3d.plugin.pfss.data.PfssDataLoader.<init>(PfssDataLoader.java:18)
+ERROR: 	at org.helioviewer.gl3d.plugin.pfss.data.PfssCache.preloadData(PfssCache.java:73)
+ERROR: 	at org.helioviewer.gl3d.plugin.pfss.PfssPluginPanel.layerAdded(PfssPluginPanel.java:279)
+ERROR: 	at org.helioviewer.jhv.layers.LayersModel$4.run(LayersModel.java:1407)
+ERROR: 	at java.lang.Thread.run(Thread.java:745)
+ERROR: java.lang.Exception: Stack trace
+ERROR: 	at java.lang.Thread.dumpStack(Thread.java:1329)
+ERROR: 	at org.helioviewer.gl3d.plugin.pfss.data.PfssDataLoader.<init>(PfssDataLoader.java:18)
+ERROR: 	at org.helioviewer.gl3d.plugin.pfss.data.PfssCache.loadFile(PfssCache.java:115)
+ERROR: 	at org.helioviewer.gl3d.plugin.pfss.data.PfssCache.preload(PfssCache.java:132)
+ERROR: 	at org.helioviewer.gl3d.plugin.pfss.data.PfssCache.updateData(PfssCache.java:109)
+ERROR: 	at org.helioviewer.gl3d.plugin.pfss.PfssPluginPanel.timestampChanged(PfssPluginPanel.java:318)
+ERROR: 	at org.helioviewer.jhv.layers.LayersModel$9.run(LayersModel.java:1523)
+ERROR: 	at java.awt.event.InvocationEvent.dispatch(InvocationEvent.java:311)
+ERROR: 	at java.awt.EventQueue.dispatchEventImpl(EventQueue.java:744)
+ERROR: 	at java.awt.EventQueue.access$400(EventQueue.java:97)
+ERROR: 	at java.awt.EventQueue$3.run(EventQueue.java:697)
+ERROR: 	at java.awt.EventQueue$3.run(EventQueue.java:691)
+ERROR: 	at java.security.AccessController.doPrivileged(Native Method)
+ERROR: 	at java.security.ProtectionDomain$1.doIntersectionPrivilege(ProtectionDomain.java:75)
+ERROR: 	at java.awt.EventQueue.dispatchEvent(EventQueue.java:714)
+ERROR: 	at java.awt.EventDispatchThread.pumpOneEventForFilters(EventDispatchThread.java:201)
+ERROR: 	at java.awt.EventDispatchThread.pumpEventsForFilter(EventDispatchThread.java:116)
+ERROR: 	at java.awt.EventDispatchThread.pumpEventsForHierarchy(EventDispatchThread.java:105)
+ERROR: 	at java.awt.EventDispatchThread.pumpEvents(EventDispatchThread.java:101)
+ERROR: 	at java.awt.EventDispatchThread.pumpEvents(EventDispatchThread.java:93)
+2014-12-02 09:07:01,383 [AWT-EventQueue-0] ERROR root - LOADING PFSS
+2014-12-02 09:07:01,383 [LayersModelThread (layer added)] ERROR root - LOADING PFSS
+ERROR: 	at java.awt.EventDispatchThread.run(EventDispatchThread.java:82)
+ERROR: java.lang.Exception: Stack trace
+ERROR: 	at java.lang.Thread.dumpStack(Thread.java:1329)
+ERROR: 	at org.helioviewer.gl3d.plugin.pfss.data.PfssDataLoader.<init>(PfssDataLoader.java:18)
+ERROR: 	at org.helioviewer.gl3d.plugin.pfss.data.PfssCache.preloadData(PfssCache.java:73)
+ERROR: 	at org.helioviewer.gl3d.plugin.pfss.PfssPluginPanel.layerAdded(PfssPluginPanel.java:279)
+ERROR: 	at org.helioviewer.jhv.layers.LayersModel$4.run(LayersModel.java:1407)
+ERROR: 	at java.lang.Thread.run(Thread.java:745)
+ERROR: java.lang.Exception: Stack trace
+ERROR: 	at java.lang.Thread.dumpStack(Thread.java:1329)
+ERROR: 	at org.helioviewer.gl3d.plugin.pfss.data.PfssDataLoader.<init>(PfssDataLoader.java:18)
+ERROR: 	at org.helioviewer.gl3d.plugin.pfss.data.PfssCache.loadFile(PfssCache.java:115)
+ERROR: 	at org.helioviewer.gl3d.plugin.pfss.data.PfssCache.preload(PfssCache.java:132)
+2014-12-02 09:07:01,384 [LayersModelThread (layer added)] ERROR root - LOADING PFSS
+ERROR: 	at org.helioviewer.gl3d.plugin.pfss.data.PfssCache.updateData(PfssCache.java:109)
+ERROR: 	at org.helioviewer.gl3d.plugin.pfss.PfssPluginPanel.timestampChanged(PfssPluginPanel.java:318)
+ERROR: 	at org.helioviewer.jhv.layers.LayersModel$9.run(LayersModel.java:1523)
+ERROR: 	at java.awt.event.InvocationEvent.dispatch(InvocationEvent.java:311)
+ERROR: 	at java.awt.EventQueue.dispatchEventImpl(EventQueue.java:744)
+ERROR: 	at java.awt.EventQueue.access$400(EventQueue.java:97)
+ERROR: 	at java.awt.EventQueue$3.run(EventQueue.java:697)
+ERROR: 	at java.awt.EventQueue$3.run(EventQueue.java:691)
+ERROR: 	at java.security.AccessController.doPrivileged(Native Method)
+ERROR: 	at java.security.ProtectionDomain$1.doIntersectionPrivilege(ProtectionDomain.java:75)
+ERROR: 	at java.awt.EventQueue.dispatchEvent(EventQueue.java:714)
+ERROR: 	at java.awt.EventDispatchThread.pumpOneEventForFilters(EventDispatchThread.java:201)
+ERROR: 	at java.awt.EventDispatchThread.pumpEventsForFilter(EventDispatchThread.java:116)
+ERROR: 	at java.awt.EventDispatchThread.pumpEventsForHierarchy(EventDispatchThread.java:105)
+ERROR: 	at java.awt.EventDispatchThread.pumpEvents(EventDispatchThread.java:101)
+ERROR: 	at java.awt.EventDispatchThread.pumpEvents(EventDispatchThread.java:93)
+ERROR: 	at java.awt.EventDispatchThread.run(EventDispatchThread.java:82)
+ERROR: java.lang.Exception: Stack trace
+ERROR: 	at java.lang.Thread.dumpStack(Thread.java:1329)
+ERROR: 	at org.helioviewer.gl3d.plugin.pfss.data.PfssDataLoader.<init>(PfssDataLoader.java:18)
+ERROR: 	at org.helioviewer.gl3d.plugin.pfss.data.PfssCache.preloadData(PfssCache.java:73)
+ERROR: 	at org.helioviewer.gl3d.plugin.pfss.PfssPluginPanel.layerAdded(PfssPluginPanel.java:279)
+ERROR: 	at org.helioviewer.jhv.layers.LayersModel$4.run(LayersModel.java:1407)
+ERROR: 	at java.lang.Thread.run(Thread.java:745)
+2014-12-02 09:07:01,384 [AWT-EventQueue-0] ERROR root - LOADING PFSS
+2014-12-02 09:07:01,384 [LayersModelThread (layer added)] ERROR root - LOADING PFSS
+ERROR: java.lang.Exception: Stack trace
+ERROR: 	at java.lang.Thread.dumpStack(Thread.java:1329)
+ERROR: 	at org.helioviewer.gl3d.plugin.pfss.data.PfssDataLoader.<init>(PfssDataLoader.java:18)
+ERROR: 	at org.helioviewer.gl3d.plugin.pfss.data.PfssCache.preloadData(PfssCache.java:73)
+ERROR: 	at org.helioviewer.gl3d.plugin.pfss.PfssPluginPanel.layerAdded(PfssPluginPanel.java:279)
+ERROR: 	at org.helioviewer.jhv.layers.LayersModel$4.run(LayersModel.java:1407)
+ERROR: 	at java.lang.Thread.run(Thread.java:745)
+ERROR: java.lang.Exception: Stack trace
+ERROR: 	at java.lang.Thread.dumpStack(Thread.java:1329)
+ERROR: 	at org.helioviewer.gl3d.plugin.pfss.data.PfssDataLoader.<init>(PfssDataLoader.java:18)
+ERROR: 	at org.helioviewer.gl3d.plugin.pfss.data.PfssCache.loadFile(PfssCache.java:115)
+ERROR: 	at org.helioviewer.gl3d.plugin.pfss.data.PfssCache.preload(PfssCache.java:132)
+ERROR: 	at org.helioviewer.gl3d.plugin.pfss.data.PfssCache.updateData(PfssCache.java:109)
+ERROR: 	at org.helioviewer.gl3d.plugin.pfss.PfssPluginPanel.timestampChanged(PfssPluginPanel.java:318)
+ERROR: 	at org.helioviewer.jhv.layers.LayersModel$9.run(LayersModel.java:1523)
+ERROR: 	at java.awt.event.InvocationEvent.dispatch(InvocationEvent.java:311)
+ERROR: 	at java.awt.EventQueue.dispatchEventImpl(EventQueue.java:744)
+ERROR: 	at java.awt.EventQueue.access$400(EventQueue.java:97)
+ERROR: 	at java.awt.EventQueue$3.run(EventQueue.java:697)
+ERROR: 	at java.awt.EventQueue$3.run(EventQueue.java:691)
+ERROR: 	at java.security.AccessController.doPrivileged(Native Method)
+ERROR: 	at java.security.ProtectionDomain$1.doIntersectionPrivilege(ProtectionDomain.java:75)
+ERROR: 	at java.awt.EventQueue.dispatchEvent(EventQueue.java:714)
+ERROR: 	at java.awt.EventDispatchThread.pumpOneEventForFilters(EventDispatchThread.java:201)
+ERROR: 	at java.awt.EventDispatchThread.pumpEventsForFilter(EventDispatchThread.java:116)
+ERROR: 	at java.awt.EventDispatchThread.pumpEventsForHierarchy(EventDispatchThread.java:105)
+ERROR: 	at java.awt.EventDispatchThread.pumpEvents(EventDispatchThread.java:101)
+ERROR: 	at java.awt.EventDispatchThread.pumpEvents(EventDispatchThread.java:93)
+ERROR: 	at java.awt.EventDispatchThread.run(EventDispatchThread.java:82)
+ERROR: java.lang.Exception: Stack trace
+ERROR: 	at java.lang.Thread.dumpStack(Thread.java:1329)
+ERROR: 	at org.helioviewer.gl3d.plugin.pfss.data.PfssDataLoader.<init>(PfssDataLoader.java:18)
+ERROR: 	at org.helioviewer.gl3d.plugin.pfss.data.PfssCache.preloadData(PfssCache.java:73)
+ERROR: 	at org.helioviewer.gl3d.plugin.pfss.PfssPluginPanel.layerAdded(PfssPluginPanel.java:279)
+ERROR: 	at org.helioviewer.jhv.layers.LayersModel$4.run(LayersModel.java:1407)
+ERROR: 	at java.lang.Thread.run(Thread.java:745)
+ERROR: java.lang.Exception: Stack trace
+ERROR: 	at java.lang.Thread.dumpStack(Thread.java:1329)
+ERROR: 	at org.helioviewer.gl3d.plugin.pfss.data.PfssDataLoader.<init>(PfssDataLoader.java:18)
+ERROR: 	at org.helioviewer.gl3d.plugin.pfss.data.PfssCache.loadFile(PfssCache.java:115)
+ERROR: 	at org.helioviewer.gl3d.plugin.pfss.data.PfssCache.preload(PfssCache.java:132)
+ERROR: 	at org.helioviewer.gl3d.plugin.pfss.data.PfssCache.updateData(PfssCache.java:109)
+ERROR: 	at org.helioviewer.gl3d.plugin.pfss.PfssPluginPanel.timestampChanged(PfssPluginPanel.java:318)
+ERROR: 	at org.helioviewer.jhv.layers.LayersModel$9.run(LayersModel.java:1523)
+ERROR: 	at java.awt.event.InvocationEvent.dispatch(InvocationEvent.java:311)
+ERROR: 	at java.awt.EventQueue.dispatchEventImpl(EventQueue.java:744)
+ERROR: 	at java.awt.EventQueue.access$400(EventQueue.java:97)
+ERROR: 	at java.awt.EventQueue$3.run(EventQueue.java:697)
+ERROR: 	at java.awt.EventQueue$3.run(EventQueue.java:691)
+ERROR: 	at java.security.AccessController.doPrivileged(Native Method)
+ERROR: 	at java.security.ProtectionDomain$1.doIntersectionPrivilege(ProtectionDomain.java:75)
+ERROR: 	at java.awt.EventQueue.dispatchEvent(EventQueue.java:714)
+ERROR: 	at java.awt.EventDispatchThread.pumpOneEventForFilters(EventDispatchThread.java:201)
+ERROR: 	at java.awt.EventDispatchThread.pumpEventsForFilter(EventDispatchThread.java:116)
+ERROR: 	at java.awt.EventDispatchThread.pumpEventsForHierarchy(EventDispatchThread.java:105)
+ERROR: 	at java.awt.EventDispatchThread.pumpEvents(EventDispatchThread.java:101)
+ERROR: 	at java.awt.EventDispatchThread.pumpEvents(EventDispatchThread.java:93)
+ERROR: 	at java.awt.EventDispatchThread.run(EventDispatchThread.java:82)
+ERROR: java.lang.Exception: Stack trace
+ERROR: 	at java.lang.Thread.dumpStack(Thread.java:1329)
+ERROR: 	at org.helioviewer.gl3d.plugin.pfss.data.PfssDataLoader.<init>(PfssDataLoader.java:18)
+ERROR: 	at org.helioviewer.gl3d.plugin.pfss.data.PfssCache.preloadData(PfssCache.java:73)
+ERROR: 	at org.helioviewer.gl3d.plugin.pfss.PfssPluginPanel.layerAdded(PfssPluginPanel.java:279)
+ERROR: 	at org.helioviewer.jhv.layers.LayersModel$4.run(LayersModel.java:1407)
+ERROR: 	at java.lang.Thread.run(Thread.java:745)
+GL3D Image Fragment Shader:
+struct outputStruct {
+	float4 color : COLOR;
+};
+
+outputStruct main(
+	float4 texcoord0 : TEXCOORD0,
+	sampler2D texunit0 : TEXUNIT0,
+	float4 texcoord3 : TEXCOORD3,
+	float4 texcoord1 : TEXCOORD1,
+	uniform float truncationValue : C0,
+	float4 texcoord4 : TEXCOORD4,
+	uniform sampler2D differenceImage : TEXUNIT1,
+	uniform float4 pixelSizeWeighting : C1,
+	uniform float gamma : C2,
+	uniform float contrast : C3,
+	uniform sampler1D lut1 : TEXUNIT2,
+	uniform float alpha : C4,
+	uniform float4 cutOffRadius : C5,
+	uniform float4 outerCutOffRadius : C6,
+	uniform float4 textureScaleThetaPhi : C7,
+	uniform float4 diffTextureScaleThetaPhi : C8)
+{
+	outputStruct OUT;
+	OUT.color = tex2D(texunit0, texcoord0.xy);
+
+if(texcoord1.x>0.24 && texcoord1.x<0.27){
+	OUT.color.r = OUT.color.r - tex2D(differenceImage, texcoord0.xy).r;
+	OUT.color.r = clamp(OUT.color.r,-truncationValue,truncationValue)/truncationValue;
+	OUT.color.r = (OUT.color.r + 1.0f)/2.0f;
+}
+if(texcoord1.x>0.98 && texcoord1.x<1.01){
+	OUT.color.r = OUT.color.r - tex2D(differenceImage, texcoord4.xy).r;
+	OUT.color.r = clamp(OUT.color.r,-truncationValue,truncationValue)/truncationValue;
+	OUT.color.r = (OUT.color.r + 1.0f)/2.0f;
+}
+
+
+	float unsharpMaskingKernel[3][3] = {
+		{1, 2, 1},
+		{2, 4, 2},
+		{1, 2, 1}
+	};
+	float3 tmpConvolutionSum = float3(0, 0, 0);
+	for(int i=0; i<3; i++)
+	{
+		for(int j=0; j<3; j++)
+		{
+			tmpConvolutionSum += tex2D(texunit0, texcoord0.xy + float2(i-1, j-1) * pixelSizeWeighting.x).rgb
+				* unsharpMaskingKernel[i][j];
+		}
+	}
+	tmpConvolutionSum = (1 + pixelSizeWeighting.z) * OUT.color.rgb
+		- pixelSizeWeighting.z * tmpConvolutionSum / 16.0f;
+	OUT.color.rgb = saturate(tmpConvolutionSum);
+
+	OUT.color.rgb = pow(OUT.color.rgb, gamma);
+
+	OUT.color.rgb = 0.5f * sign(2.0f * OUT.color.rgb - 1.0f) * pow(abs(2.0f * OUT.color.rgb - 1.0f), pow(1.5f, -contrast)) + 0.5f;
+
+	OUT.color.rgb = tex1D(lut1, OUT.color.r).rgb;
+
+	OUT.color.a = OUT.color.a * alpha;
+
+	if(texcoord0.x<0.0||texcoord0.y<0.0||texcoord0.x>textureScaleThetaPhi.x||texcoord0.y>textureScaleThetaPhi.y){discard;
+	}
+float dotpos = dot(texcoord3.xyz, texcoord3.xyz);
+	if(dotpos<cutOffRadius.x*cutOffRadius.x ||dotpos>outerCutOffRadius.x*outerCutOffRadius.x ){discard;}
+	if((texcoord3.z==0.0 && dotpos<0.99)){		discard;
+	}
+	float theta = textureScaleThetaPhi.z;
+	float phi = textureScaleThetaPhi.w;
+	float3x3 mat = float3x3( cos(phi), -sin(theta)*sin(phi), -cos(theta)*sin(phi), 0., cos(theta), -sin(theta), sin(phi), cos(phi)*sin(theta), cos(theta)*cos(phi));
+	float3 zaxisrot = mul(mat,float3(0.,0.,1.));
+	float projectionn = dot(texcoord3.xyz,zaxisrot);
+	if((texcoord3.z!=0.0 && projectionn<-0.0)){		discard;
+	}
+
+
+	return OUT;
+}
+2014-12-02 09:07:01,448 [AWT-EventQueue-0] DEBUG root - >> FileUtils.invokeExecutable > Execute command:  "/Users/freekv/JHelioviewer-SWHV/Libs/cgc-mac" "-profile" "arbfp1" "-o" "/Users/freekv/JHelioviewer-SWHV/Temp/tmp.asm" "/Users/freekv/JHelioviewer-SWHV/Temp/tmp.cg"
+2014-12-02 09:07:01,498 [FILEUTILS1] DEBUG root - >> FileUtils.logProcessOutput(Process, cgc, DEBUG) > std out: /Users/freekv/JHelioviewer-SWHV/Temp/tmp.cg
+2014-12-02 09:07:01,505 [FILEUTILS2] DEBUG root - >> FileUtils.logProcessOutput(Process, cgc, DEBUG) > std err: 80 lines, 0 errors.
+2014-12-02 09:07:01,508 [AWT-EventQueue-0] DEBUG root - >> FileUtils.invokeExecutable > Execute command:  "/Users/freekv/JHelioviewer-SWHV/Libs/cgc-mac" "-profile" "arbfp1" "-o" "/Users/freekv/JHelioviewer-SWHV/Temp/tmp.asm" "/Users/freekv/JHelioviewer-SWHV/Temp/tmp.cg"
+2014-12-02 09:07:01,555 [FILEUTILS1] DEBUG root - >> FileUtils.logProcessOutput(Process, cgc, DEBUG) > std out: /Users/freekv/JHelioviewer-SWHV/Temp/tmp.cg
+2014-12-02 09:07:01,556 [FILEUTILS2] DEBUG root - >> FileUtils.logProcessOutput(Process, cgc, DEBUG) > std err: 13 lines, 0 errors.
+2014-12-02 09:07:01,558 [AWT-EventQueue-0] DEBUG root - >> FileUtils.invokeExecutable > Execute command:  "/Users/freekv/JHelioviewer-SWHV/Libs/cgc-mac" "-profile" "arbvp1" "-o" "/Users/freekv/JHelioviewer-SWHV/Temp/tmp.asm" "/Users/freekv/JHelioviewer-SWHV/Temp/tmp.cg"
+2014-12-02 09:07:01,606 [FILEUTILS1] DEBUG root - >> FileUtils.logProcessOutput(Process, cgc, DEBUG) > std out: /Users/freekv/JHelioviewer-SWHV/Temp/tmp.cg
+2014-12-02 09:07:01,607 [FILEUTILS2] DEBUG root - >> FileUtils.logProcessOutput(Process, cgc, DEBUG) > std err: 26 lines, 0 errors.
+2014-12-02 09:07:01,609 [AWT-EventQueue-0] DEBUG root - >> FileUtils.invokeExecutable > Execute command:  "/Users/freekv/JHelioviewer-SWHV/Libs/cgc-mac" "-profile" "arbvp1" "-o" "/Users/freekv/JHelioviewer-SWHV/Temp/tmp.asm" "/Users/freekv/JHelioviewer-SWHV/Temp/tmp.cg"
+2014-12-02 09:07:01,655 [FILEUTILS1] DEBUG root - >> FileUtils.logProcessOutput(Process, cgc, DEBUG) > std out: /Users/freekv/JHelioviewer-SWHV/Temp/tmp.cg
+2014-12-02 09:07:01,656 [FILEUTILS2] DEBUG root - >> FileUtils.logProcessOutput(Process, cgc, DEBUG) > std err: 22 lines, 0 errors.
+VertexShader:
+struct outputStruct {
+	float4 color : COLOR;
+	float4 texcoord0 : TEXCOORD0;
+	float4 position : POSITION;
+	float4 texcoord4 : TEXCOORD4;
+	float4 texcoord3 : TEXCOORD3;
+};
+
+outputStruct main(
+	float4 color : COLOR,
+	float4 texcoord0 : TEXCOORD0,
+	float4 position : POSITION,
+	uniform float4x4 state_matrix_mvp : state.matrix.mvp,
+	uniform float4 rect : C0,
+	uniform float4 textureScaleThetaPhi : C1,
+	uniform float4 offset : C2,
+	uniform float4 differenceRect : C3,
+	uniform float4 diffTextureScaleThetaPhi : C4)
+{
+	outputStruct OUT;
+	OUT.color = color;
+	OUT.texcoord0 = float4(texcoord0.xy, 0, 1);
+	OUT.position = mul(state_matrix_mvp, position);
+
+	if(abs(position.x)>1.1){
+	float theta = textureScaleThetaPhi.z;
+	float phi = textureScaleThetaPhi.w;
+	OUT.texcoord0.x = position.x - rect.x;
+	OUT.texcoord0.y = -position.y - rect.y;
+	OUT.texcoord0.x *= rect.z;
+	OUT.texcoord0.y *= rect.w;
+	OUT.texcoord0.x *= textureScaleThetaPhi.x;
+	OUT.texcoord0.y *= textureScaleThetaPhi.y;
+	OUT.texcoord4.x = position.x - differenceRect.x;
+	OUT.texcoord4.y = -position.y - differenceRect.y;
+	OUT.texcoord4.x *= differenceRect.z;
+	OUT.texcoord4.y *= differenceRect.w;
+	OUT.texcoord4.x *= diffTextureScaleThetaPhi.x;
+	OUT.texcoord4.y *= diffTextureScaleThetaPhi.y;
+	OUT.texcoord3 = position;
+	float3x3 mat = float3x3(cos(phi), -sin(theta)*sin(phi), -sin(phi)*cos(theta), 0, cos(theta), -sin(theta), sin(phi), cos(phi)*sin(theta), cos(theta)*cos(phi));
+	position.xyz = mul(mat, position.xyz);
+	 OUT.position = mul(state_matrix_mvp, position);
+	}
+	else{
+	float theta = -textureScaleThetaPhi.z;
+	float phi = -textureScaleThetaPhi.w;
+	OUT.texcoord3 = position;
+	float3x3 mat = float3x3(cos(phi), 0, -sin(phi), -sin(theta)*sin(phi), cos(theta), -sin(theta)*cos(phi), cos(theta)*sin(phi), sin(theta), cos(theta)*cos(phi));
+	float3 rot = mul(mat, position.xyz);
+	OUT.texcoord0.x = rot.x - rect.x;
+	OUT.texcoord0.y = -rot.y - rect.y;
+	OUT.texcoord0.x *= rect.z;
+	OUT.texcoord0.y *= rect.w;
+	OUT.texcoord0.x *= textureScaleThetaPhi.x;
+	OUT.texcoord0.y *= textureScaleThetaPhi.y;
+	float differencetheta = -textureScaleThetaPhi.z;
+	float differencephi = -diffTextureScaleThetaPhi.w;
+	mat = float3x3(cos(differencephi), 0, -sin(differencephi), -sin(differencetheta)*sin(differencephi), cos(differencetheta), -sin(differencetheta)*cos(differencephi), cos(differencetheta)*sin(differencephi), sin(differencetheta), cos(differencetheta)*cos(differencephi));
+	rot = mul(mat, position.xyz);
+	OUT.texcoord4.x = rot.x - differenceRect.x;
+	OUT.texcoord4.y = -rot.y - differenceRect.y;
+	OUT.texcoord4.x *= differenceRect.z;
+	OUT.texcoord4.y *= differenceRect.w;
+	OUT.texcoord4.x *= diffTextureScaleThetaPhi.x;
+	OUT.texcoord4.y *= diffTextureScaleThetaPhi.y;
+}
+
+
+	return OUT;
+}
+2014-12-02 09:07:01,659 [AWT-EventQueue-0] DEBUG root - >> FileUtils.invokeExecutable > Execute command:  "/Users/freekv/JHelioviewer-SWHV/Libs/cgc-mac" "-profile" "arbvp1" "-o" "/Users/freekv/JHelioviewer-SWHV/Temp/tmp.asm" "/Users/freekv/JHelioviewer-SWHV/Temp/tmp.cg"
+2014-12-02 09:07:01,706 [FILEUTILS1] DEBUG root - >> FileUtils.logProcessOutput(Process, cgc, DEBUG) > std out: /Users/freekv/JHelioviewer-SWHV/Temp/tmp.cg
+2014-12-02 09:07:01,725 [FILEUTILS2] DEBUG root - >> FileUtils.logProcessOutput(Process, cgc, DEBUG) > std err: /Users/freekv/JHelioviewer-SWHV/Temp/tmp.cg(22) : warning C7050: "OUT.texcoord4.zw" might be used before being initialized
+2014-12-02 09:07:01,725 [FILEUTILS2] DEBUG root - >> FileUtils.logProcessOutput(Process, cgc, DEBUG) > std err: 74 lines, 1 warnings, 0 errors.
+2014-12-02 09:07:01,728 [AWT-EventQueue-0] DEBUG root - >> FileUtils.invokeExecutable > Execute command:  "/Users/freekv/JHelioviewer-SWHV/Libs/cgc-mac" "-profile" "arbvp1" "-o" "/Users/freekv/JHelioviewer-SWHV/Temp/tmp.asm" "/Users/freekv/JHelioviewer-SWHV/Temp/tmp.cg"
+2014-12-02 09:07:01,775 [FILEUTILS1] DEBUG root - >> FileUtils.logProcessOutput(Process, cgc, DEBUG) > std out: /Users/freekv/JHelioviewer-SWHV/Temp/tmp.cg
+2014-12-02 09:07:01,777 [FILEUTILS2] DEBUG root - >> FileUtils.logProcessOutput(Process, cgc, DEBUG) > std err: 24 lines, 0 errors.
