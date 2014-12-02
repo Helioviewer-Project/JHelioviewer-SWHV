@@ -55,12 +55,6 @@ public class PfssSettings {
     public final static float LINE_ALPHA = 1.0f;
 
     /**
-     * Cos of angle for LOD in degree or radian, if you would use degree
-     * Math.toRadian(DEGREEVALUE))
-     */
-    public final static double ANGLE_OF_LOD = Math.cos(Math.toRadians(5.0));
-
-    /**
      * Linewidth for the OpenGL visualization
      */
     public final static float LINE_WIDTH = 0.6f;
