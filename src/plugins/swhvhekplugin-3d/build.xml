@@ -99,7 +99,7 @@
 	<!-- Compile sources -->
 
 	<target name="compile" depends="jhv.compile, init">
-		<javac srcdir="${src}" destdir="${bin}" target="1.5" source="1.5" debug="on" debuglevel="lines,vars,source">
+		<javac srcdir="${src}" destdir="${bin}" target="1.6" source="1.6" debug="on" debuglevel="lines,vars,source">
 			<classpath>
 				<fileset dir="${lib}">
 					<include name="**/*.jar" />
