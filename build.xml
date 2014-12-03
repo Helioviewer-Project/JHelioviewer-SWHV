@@ -107,7 +107,7 @@
             tofile="${temp}/src/org/helioviewer/jhv/JavaHelioViewerLauncher.java"
         />
         <replace file="${temp}/src/org/helioviewer/jhv/JavaHelioViewerLauncher.java" token='@SuppressWarnings("all")'/>
-        <javac destdir="${bin.jhv}" target="1.6" source="1.5" debug="true" debuglevel="source,lines,vars" includeantruntime="false">
+        <javac destdir="${bin.jhv}" target="1.6" source="1.6" debug="true" debuglevel="source,lines,vars" includeantruntime="false">
             <src path="${temp}/src/org/helioviewer/jhv/" />
             <include name="JavaHelioViewerLauncher.java"/>
         </javac>
@@ -353,10 +353,10 @@
     <!-- plugins -->
     <target name="plugin-compile" depends="jar-bundle">
         <mkdir dir="${bin.plugins}/runningdifferenceplugin" />
-        <javac srcdir="${src.base}/filterPlugins/runningdifferenceplugin" destdir="${bin.plugins}/runningdifferenceplugin" target="1.6" source="1.5"
+        <javac srcdir="${src.base}/filterPlugins/runningdifferenceplugin" destdir="${bin.plugins}/runningdifferenceplugin" target="1.6" source="1.6"
                     classpath="${build}/JHelioviewer.jar" />
         <mkdir dir="${bin.plugins}/softwaremodeplugin" />
-        <javac srcdir="${src.base}/filterPlugins/softwaremodeplugin" destdir="${bin.plugins}/softwaremodeplugin" target="1.6" source="1.5"
+        <javac srcdir="${src.base}/filterPlugins/softwaremodeplugin" destdir="${bin.plugins}/softwaremodeplugin" target="1.6" source="1.6"
             classpath="${build}/JHelioviewer.jar" />
     </target>
     <target name="release-plugins" >
