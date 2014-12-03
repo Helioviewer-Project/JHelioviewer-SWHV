@@ -75,7 +75,7 @@ public class GL3DFollowObjectCamera extends GL3DSolarRotationTrackingTrackballCa
 
     @Override
     public void viewChanged(View sender, ChangeEvent aEvent) {
-        if (this.positionLoading.isLoaded()) {
+        if (this.positionLoading.isLoaded() && !this.getTrackingMode()) {
             TimestampChangedReason timestampReason = aEvent.getLastChangedReasonByType(TimestampChangedReason.class);
             if (timestampReason != null && LayersModel.getSingletonInstance().getActiveView() != null) {
                 boolean isjp2 = LayersModel.getSingletonInstance().getActiveView().getAdapter(JHVJP2View.class).getClass() == JHVJP2View.class;
