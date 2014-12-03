@@ -172,8 +172,8 @@ public class ObservationDialogUIPanel extends SimpleObservationDialogUIPanel {
         calendar.setTime(interval.getEnd());
         calendar.add(Calendar.DAY_OF_MONTH, -1);
 
-        setStartDate(interval.getStart());
-        setEndDate(calendar.getTime());
+        // setStartDate(interval.getStart());
+        // setEndDate(calendar.getTime());
 
         plotComboBox.setSelectedIndex(0);
     }

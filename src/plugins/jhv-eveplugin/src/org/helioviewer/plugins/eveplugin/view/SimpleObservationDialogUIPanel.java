@@ -27,11 +27,17 @@ import org.helioviewer.jhv.gui.components.calendar.JHVCalendarEvent;
 import org.helioviewer.jhv.gui.components.calendar.JHVCalendarListener;
 import org.helioviewer.jhv.gui.dialogs.observation.ObservationDialog;
 import org.helioviewer.jhv.gui.dialogs.observation.ObservationDialogPanel;
+import org.helioviewer.jhv.layers.LayersListener;
+import org.helioviewer.jhv.layers.LayersModel;
 import org.helioviewer.plugins.eveplugin.controller.ZoomController;
 import org.helioviewer.plugins.eveplugin.radio.data.RadioDownloader;
 import org.helioviewer.plugins.eveplugin.view.plot.PlotsContainerPanel;
+import org.helioviewer.viewmodel.view.View;
+import org.helioviewer.viewmodel.view.cache.DateTimeCache;
+import org.helioviewer.viewmodel.view.jp2view.JHVJPXView;
+import org.helioviewer.viewmodel.view.jp2view.datetime.ImmutableDateTime;
 
-public class SimpleObservationDialogUIPanel extends ObservationDialogPanel implements JHVCalendarListener, ActionListener {
+public class SimpleObservationDialogUIPanel extends ObservationDialogPanel implements JHVCalendarListener, ActionListener, LayersListener {
 
     // //////////////////////////////////////////////////////////////////////////////
     // Definitions
@@ -62,6 +68,7 @@ public class SimpleObservationDialogUIPanel extends ObservationDialogPanel imple
 
     public SimpleObservationDialogUIPanel(final PlotsContainerPanel plotsContainerPanel) {
         this.plotsContainerPanel = plotsContainerPanel;
+        LayersModel.getSingletonInstance().addLayersListener(this);
         EventQueue.invokeLater(new Runnable() {
             @Override
             public void run() {
@@ -199,8 +206,8 @@ public class SimpleObservationDialogUIPanel extends ObservationDialogPanel imple
         calendar.setTime(interval.getEnd());
         calendar.add(Calendar.DAY_OF_MONTH, -1);
 
-        setStartDate(interval.getStart());
-        setEndDate(calendar.getTime());
+        // setStartDate(interval.getStart());
+        // setEndDate(calendar.getTime());
 
         plotComboBox.setSelectedIndex(0);
     }
@@ -274,6 +281,72 @@ public class SimpleObservationDialogUIPanel extends ObservationDialogPanel imple
 
     public boolean getLoadButtonEnabled() {
         return enableLoadButton;
+    }
+
+    @Override
+    public void layerAdded(int idx) {
+        Date beginDate = null;
+        Date endDate = null;
+        View nextView = LayersModel.getSingletonInstance().getLayer(LayersModel.getSingletonInstance().getActiveLayer());
+        JHVJPXView jpxView = nextView.getAdapter(JHVJPXView.class);
+        if (jpxView != null) {
+            DateTimeCache dtc = jpxView.getDateTimeCache();
+            for (int frame = 0; frame < jpxView.getMaximumFrameNumber(); frame++) {
+                ImmutableDateTime date = dtc.getDateTime(frame);
+                if (beginDate == null || date.getTime().getTime() < beginDate.getTime()) {
+                    beginDate = date.getTime();
+                }
+                if (endDate == null || date.getTime().getTime() > endDate.getTime()) {
+                    endDate = date.getTime();
+                }
+            }
+            if (beginDate != null && endDate != null) {
+                calendarStartDate.setDate(beginDate);
+                calendarEndDate.setDate(endDate);
+            }
+        }
+    }
+
+    @Override
+    public void layerRemoved(View oldView, int oldIdx) {
+        // TODO Auto-generated method stub
+
+    }
+
+    @Override
+    public void layerChanged(int idx) {
+        // TODO Auto-generated method stub
+
+    }
+
+    @Override
+    public void activeLayerChanged(int idx) {
+        // TODO Auto-generated method stub
+
+    }
+
+    @Override
+    public void viewportGeometryChanged() {
+        // TODO Auto-generated method stub
+
+    }
+
+    @Override
+    public void timestampChanged(int idx) {
+        // TODO Auto-generated method stub
+
+    }
+
+    @Override
+    public void subImageDataChanged() {
+        // TODO Auto-generated method stub
+
+    }
+
+    @Override
+    public void layerDownloaded(int idx) {
+        // TODO Auto-generated method stub
+
     }
 
 }
