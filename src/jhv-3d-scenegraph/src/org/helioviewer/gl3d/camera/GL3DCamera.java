@@ -135,6 +135,7 @@ public abstract class GL3DCamera {
 
     public void reset() {
         this.resetFOV();
+        this.translation = new GL3DVec3d(0., 0., 0.);
     }
 
     private void resetFOV() {
