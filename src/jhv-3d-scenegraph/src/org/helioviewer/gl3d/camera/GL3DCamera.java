@@ -79,6 +79,8 @@ public abstract class GL3DCamera {
 
     private GL3DGrid followGrid;
 
+    private boolean trackingMode;
+
     public GL3DCamera(double clipNear, double clipFar) {
         this();
         this.clipNear = clipNear;
@@ -431,5 +433,13 @@ public abstract class GL3DCamera {
 
     public GL3DGrid getFollowGrid() {
         return this.followGrid;
+    }
+
+    public void setTrackingMode(boolean trackingMode) {
+        this.trackingMode = trackingMode;
+    }
+
+    public boolean getTrackingMode() {
+        return this.trackingMode;
     }
 }

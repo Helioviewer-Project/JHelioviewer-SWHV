@@ -61,13 +61,15 @@ public class GL3DEarthCamera extends GL3DSolarRotationTrackingTrackballCamera {
 
     @Override
     public void viewChanged(View sender, ChangeEvent aEvent) {
-        TimestampChangedReason timestampReason = aEvent.getLastChangedReasonByType(TimestampChangedReason.class);
-        if (timestampReason != null && LayersModel.getSingletonInstance().getActiveView() != null) {
-            boolean isjp2 = LayersModel.getSingletonInstance().getActiveView().getAdapter(JHVJP2View.class).getClass() == JHVJP2View.class;
-            if (isjp2 || ((timestampReason.getView() instanceof TimedMovieView) && LinkedMovieManager.getActiveInstance().isMaster((TimedMovieView) timestampReason.getView()))) {
-                currentDate = timestampReason.getNewDateTime().getTime();
-                this.setTime(currentDate.getTime());
-                updateRotation();
+        if (!this.getTrackingMode()) {
+            TimestampChangedReason timestampReason = aEvent.getLastChangedReasonByType(TimestampChangedReason.class);
+            if (timestampReason != null && LayersModel.getSingletonInstance().getActiveView() != null) {
+                boolean isjp2 = LayersModel.getSingletonInstance().getActiveView().getAdapter(JHVJP2View.class).getClass() == JHVJP2View.class;
+                if (isjp2 || ((timestampReason.getView() instanceof TimedMovieView) && LinkedMovieManager.getActiveInstance().isMaster((TimedMovieView) timestampReason.getView()))) {
+                    currentDate = timestampReason.getNewDateTime().getTime();
+                    this.setTime(currentDate.getTime());
+                    updateRotation();
+                }
             }
         }
     }
