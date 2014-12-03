@@ -1,13 +1,16 @@
 package org.helioviewer.plugins.eveplugin.view.chart;
 
+import java.awt.Color;
 import java.awt.Cursor;
 import java.awt.Dimension;
+import java.awt.GradientPaint;
 import java.awt.Graphics;
+import java.awt.Graphics2D;
 import java.awt.Point;
-import java.awt.Polygon;
 import java.awt.Rectangle;
 import java.awt.event.MouseEvent;
 import java.awt.geom.Rectangle2D;
+import java.awt.geom.RoundRectangle2D;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
@@ -32,7 +35,7 @@ import org.helioviewer.plugins.eveplugin.settings.EVEAPI.API_RESOLUTION_AVERAGES
 import org.helioviewer.viewmodel.view.View;
 
 /**
- * 
+ *
  * @author Stephan Pagel
  * */
 public class ChartDrawIntervalPane extends JComponent implements ZoomControllerListener, MouseInputListener, LayersListener {
@@ -106,40 +109,36 @@ public class ChartDrawIntervalPane extends JComponent implements ZoomControllerL
         long end = selectedInterval.getEnd().getTime() - availableInterval.getStart().getTime();
         end = Math.round(end / 60000.0);
 
-        final int availableIntervalSpace = getWidth()
-                - (ChartConstants.getGraphLeftSpace() + ChartConstants.getGraphRightSpace() + ChartConstants.getRangeSelectionWidth()) - 1;
+        final int availableIntervalSpace = getWidth() - (ChartConstants.getGraphLeftSpace() + ChartConstants.getGraphRightSpace() + ChartConstants.getRangeSelectionWidth()) - 1;
         leftIntervalBorderPosition = (int) ((start / diffMin) * availableIntervalSpace) + ChartConstants.getGraphLeftSpace();
         rightIntervalBorderPosition = (int) ((end / diffMin) * availableIntervalSpace) + ChartConstants.getGraphLeftSpace();
     }
 
     private void drawBackground(Graphics g) {
-        final int availableIntervalSpace = getWidth()
-                - (ChartConstants.getGraphLeftSpace() + ChartConstants.getGraphRightSpace() + ChartConstants.getRangeSelectionWidth()) - 1;
+        final int availableIntervalSpace = getWidth() - (ChartConstants.getGraphLeftSpace() + ChartConstants.getGraphRightSpace() + ChartConstants.getRangeSelectionWidth()) - 1;
 
         g.setColor(ChartConstants.AVAILABLE_INTERVAL_BACKGROUND_COLOR);
         g.fillRect(ChartConstants.getGraphLeftSpace(), 2, availableIntervalSpace, getHeight() - 3);
     }
 
     private void drawInterval(Graphics g) {
-        g.setColor(ChartConstants.SELECTED_INTERVAL_BACKGROUND_COLOR);
-        g.fillRect(leftIntervalBorderPosition, 2, rightIntervalBorderPosition - leftIntervalBorderPosition, getHeight() - 3);
+        Graphics2D g2 = ((Graphics2D) g);
+        GradientPaint redtowhite = new GradientPaint(0, getHeight() / 2 - getHeight() / (3 * 2), Color.BLACK, 0, getHeight() / 2 + getHeight() / (3 * 2), Color.WHITE);
+        g2.setPaint(redtowhite);
+        g2.fillRect(leftIntervalBorderPosition, getHeight() / 2 - getHeight() / (3 * 2), rightIntervalBorderPosition - leftIntervalBorderPosition, getHeight() / 3);
     }
 
     private void drawMovieInterval(Graphics g) {
-        if (availableInterval.getStart() == null || availableInterval.getEnd() == null || movieInterval.getStart() == null
-                || movieInterval.getEnd() == null) {
+        if (availableInterval.getStart() == null || availableInterval.getEnd() == null || movieInterval.getStart() == null || movieInterval.getEnd() == null) {
             return;
         }
 
-        if (movieInterval.getEnd().getTime() < availableInterval.getStart().getTime()
-                || movieInterval.getStart().getTime() > availableInterval.getEnd().getTime()) {
+        if (movieInterval.getEnd().getTime() < availableInterval.getStart().getTime() || movieInterval.getStart().getTime() > availableInterval.getEnd().getTime()) {
             return;
         }
 
-        final int availableIntervalWidth = getWidth()
-                - (ChartConstants.getGraphLeftSpace() + ChartConstants.getGraphRightSpace() + ChartConstants.getRangeSelectionWidth()) - 1;
-        final double ratioX = (double) availableIntervalWidth
-                / (double) (availableInterval.getEnd().getTime() - availableInterval.getStart().getTime());
+        final int availableIntervalWidth = getWidth() - (ChartConstants.getGraphLeftSpace() + ChartConstants.getGraphRightSpace() + ChartConstants.getRangeSelectionWidth()) - 1;
+        final double ratioX = (double) availableIntervalWidth / (double) (availableInterval.getEnd().getTime() - availableInterval.getStart().getTime());
 
         int min = ChartConstants.getGraphLeftSpace();
         if (availableInterval.containsPointInclusive(movieInterval.getStart())) {
@@ -148,28 +147,26 @@ public class ChartDrawIntervalPane extends JComponent implements ZoomControllerL
 
         int max = ChartConstants.getGraphLeftSpace() + availableIntervalWidth;
         if (availableInterval.containsPointInclusive(movieInterval.getEnd())) {
-            max = ChartConstants.getGraphLeftSpace()
-                    + (int) ((movieInterval.getEnd().getTime() - availableInterval.getStart().getTime()) * ratioX);
+            max = ChartConstants.getGraphLeftSpace() + (int) ((movieInterval.getEnd().getTime() - availableInterval.getStart().getTime()) * ratioX);
         }
-
+        int offset = 0;
         g.setColor(ChartConstants.MOVIE_INTERVAL_COLOR);
-        g.drawLine(min, 6, max, 6);
-        g.drawLine(min, 9, max, 9);
-        g.drawLine(min, 17, max, 17);
-        g.drawLine(min, 20, max, 20);
-
+        g.drawLine(min, offset, max, offset);
+        g.drawLine(min, offset + 2, max, offset + 2);
+        g.drawLine(min, offset + 9, max, offset + 9);
+        g.drawLine(min, offset + 11, max, offset + 11);
         for (int x = min; x <= max; ++x) {
             final int mod4 = (x - min) % 4;
             final int mod12 = (x - min) % 12;
 
             if (mod4 == 0) {
-                final int width = x + 1 > max ? 1 : 2;
+                final int width = 1;
 
                 if (mod12 == 0) {
-                    g.fillRect(x, 7, width, 13);
+                    g.fillRect(x, offset + 1, width, 10);
                 } else {
-                    g.fillRect(x, 7, width, 2);
-                    g.fillRect(x, 18, width, 2);
+                    g.fillRect(x, offset + 1, width, 2);
+                    g.fillRect(x, offset + 9, width, 2);
                 }
             }
         }
@@ -177,42 +174,31 @@ public class ChartDrawIntervalPane extends JComponent implements ZoomControllerL
 
     private void drawBorders(Graphics g) {
         g.setColor(ChartConstants.BORDER_COLOR);
-        g.drawLine(0, 0, getWidth() - 1 - ChartConstants.getRangeSelectionWidth(), 0);
-        g.drawLine(leftIntervalBorderPosition, 2, rightIntervalBorderPosition, 2);
-        g.drawLine(leftIntervalBorderPosition, getHeight() - 1, rightIntervalBorderPosition, getHeight() - 1);
-        g.drawLine(leftIntervalBorderPosition, 2, leftIntervalBorderPosition, getHeight() - 1);
-        g.drawLine(rightIntervalBorderPosition, 2, rightIntervalBorderPosition, getHeight() - 1);
+        g.drawRect(leftIntervalBorderPosition, getHeight() / 2 - getHeight() / (3 * 2), rightIntervalBorderPosition - leftIntervalBorderPosition, getHeight() / 3);
+
     }
 
     private void drawIntervalGraspPoints(Graphics g) {
         if (!mouseOverComponent) {
             return;
         }
+        Graphics2D g2 = ((Graphics2D) g);
+        GradientPaint redtowhite = new GradientPaint(0, 0, Color.BLACK, 0, getHeight() - 5, Color.WHITE);
+        g2.setPaint(redtowhite);
+        g2.fill(new RoundRectangle2D.Double(leftIntervalBorderPosition, 2, 5, getHeight() - 5, 5, 5));
+        g2.fill(new RoundRectangle2D.Double(rightIntervalBorderPosition - 4, 2, 5, getHeight() - 5, 5, 5));
 
-        Polygon p0 = new Polygon();
-        p0.addPoint(leftIntervalBorderPosition, getHeight() / 2 - 5);
-        p0.addPoint(leftIntervalBorderPosition - 5, getHeight() / 2);
-        p0.addPoint(leftIntervalBorderPosition, getHeight() / 2 + 5);
-        p0.addPoint(leftIntervalBorderPosition + 5, getHeight() / 2);
+        g.setColor(ChartConstants.BORDER_COLOR);
+        g2.draw(new RoundRectangle2D.Double(leftIntervalBorderPosition, 2, 5, getHeight() - 5, 5, 5));
+        g2.draw(new RoundRectangle2D.Double(rightIntervalBorderPosition - 4, 2, 5, getHeight() - 5, 5, 5));
 
-        Polygon p1 = new Polygon();
-        p1.addPoint(rightIntervalBorderPosition, getHeight() / 2 - 5);
-        p1.addPoint(rightIntervalBorderPosition - 5, getHeight() / 2);
-        p1.addPoint(rightIntervalBorderPosition, getHeight() / 2 + 5);
-        p1.addPoint(rightIntervalBorderPosition + 5, getHeight() / 2);
-
-        g.setColor(ChartConstants.GRASP_POINT_COLOR);
-        g.fillPolygon(p0);
-        g.fillPolygon(p1);
     }
 
     private void drawGraspPointLabels(Graphics g) {
         if (mouseOverInterval && mousePressed != null && selectedInterval.getStart() != null && selectedInterval.getEnd() != null) {
             final String leftLabelText = ChartConstants.FULL_DATE_TIME_FORMAT.format(selectedInterval.getStart());
             final Rectangle2D leftLabelTextRectangle = g.getFontMetrics().getStringBounds(leftLabelText, g);
-            final Rectangle leftRectangle = new Rectangle(leftIntervalBorderPosition - 10 - (int) leftLabelTextRectangle.getWidth(),
-                    (getHeight() / 2) - ((int) leftLabelTextRectangle.getHeight() / 2), (int) leftLabelTextRectangle.getWidth(),
-                    (int) leftLabelTextRectangle.getHeight());
+            final Rectangle leftRectangle = new Rectangle(leftIntervalBorderPosition - 10 - (int) leftLabelTextRectangle.getWidth(), (getHeight() / 2) - ((int) leftLabelTextRectangle.getHeight() / 2), (int) leftLabelTextRectangle.getWidth(), (int) leftLabelTextRectangle.getHeight());
 
             if (leftRectangle.x <= 5) {
                 leftRectangle.x = leftIntervalBorderPosition + 10;
@@ -220,9 +206,7 @@ public class ChartDrawIntervalPane extends JComponent implements ZoomControllerL
 
             final String rightLabelText = ChartConstants.FULL_DATE_TIME_FORMAT.format(selectedInterval.getEnd());
             final Rectangle2D rightLabelTextRectangle = g.getFontMetrics().getStringBounds(rightLabelText, g);
-            final Rectangle rightRectangle = new Rectangle(rightIntervalBorderPosition + 10, (getHeight() / 2)
-                    - ((int) rightLabelTextRectangle.getHeight() / 2), (int) rightLabelTextRectangle.getWidth(),
-                    (int) rightLabelTextRectangle.getHeight());
+            final Rectangle rightRectangle = new Rectangle(rightIntervalBorderPosition + 10, (getHeight() / 2) - ((int) rightLabelTextRectangle.getHeight() / 2), (int) rightLabelTextRectangle.getWidth(), (int) rightLabelTextRectangle.getHeight());
 
             if (rightRectangle.x + rightRectangle.width >= getWidth() - 5) {
                 rightRectangle.x = rightIntervalBorderPosition - 10 - (int) rightLabelTextRectangle.getWidth();
@@ -239,35 +223,31 @@ public class ChartDrawIntervalPane extends JComponent implements ZoomControllerL
     }
 
     private void drawGraspPointLabel(Graphics g, final Rectangle rectangle, final String text) {
-        g.setColor(ChartConstants.GRASP_POINT_COLOR);
-        g.fillRect(rectangle.x - 2, rectangle.y - 2, rectangle.width + 4, rectangle.height + 4);
+        g.setColor(Color.GRAY);
+        g.fillRect(rectangle.x - 2, rectangle.y - 1, rectangle.width + 4, rectangle.height);
 
         g.setColor(ChartConstants.BORDER_COLOR);
-        g.drawRect(rectangle.x - 2, rectangle.y - 2, rectangle.width + 4, rectangle.height + 4);
+        g.drawRect(rectangle.x - 2, rectangle.y - 1, rectangle.width + 4, rectangle.height);
 
         g.setColor(ChartConstants.SELECTED_INTERVAL_BACKGROUND_COLOR);
         g.drawString(text, rectangle.x, rectangle.y - 2 + rectangle.height);
     }
 
     private void drawLabels(Graphics g) {
-        if (availableInterval.getStart() == null || availableInterval.getEnd() == null
-                || availableInterval.getStart().getTime() > availableInterval.getEnd().getTime()) {
+        if (availableInterval.getStart() == null || availableInterval.getEnd() == null || availableInterval.getStart().getTime() > availableInterval.getEnd().getTime()) {
             return;
         }
+        g.setFont(ChartConstants.getFont());
 
-        final int tickTextWidth = (int) g.getFontMetrics().getStringBounds(ChartConstants.FULL_DATE_TIME_FORMAT.format(new Date()), g)
-                .getWidth();
-        final int availableIntervalWidth = getWidth()
-                - (ChartConstants.getGraphLeftSpace() + ChartConstants.getGraphRightSpace() + ChartConstants.getRangeSelectionWidth()) - 1;
+        final int tickTextWidth = (int) g.getFontMetrics().getStringBounds(ChartConstants.FULL_DATE_TIME_FORMAT.format(new Date()), g).getWidth();
+        final int availableIntervalWidth = getWidth() - (ChartConstants.getGraphLeftSpace() + ChartConstants.getGraphRightSpace() + ChartConstants.getRangeSelectionWidth()) - 1;
         final int maxTicks = Math.max(2, (availableIntervalWidth - tickTextWidth * 2) / tickTextWidth);
-        final double ratioX = (double) availableIntervalWidth
-                / (double) (availableInterval.getEnd().getTime() - availableInterval.getStart().getTime());
+        final double ratioX = (double) availableIntervalWidth / (double) (availableInterval.getEnd().getTime() - availableInterval.getStart().getTime());
 
         final Calendar calendar = new GregorianCalendar();
         calendar.clear();
         calendar.setTime(availableInterval.getStart());
         calendar.add(Calendar.YEAR, 3);
-
         if (availableInterval.containsPointInclusive(calendar.getTime())) {
             drawLabelsYear(g, maxTicks, availableIntervalWidth, ratioX);
             return;
@@ -276,7 +256,6 @@ public class ChartDrawIntervalPane extends JComponent implements ZoomControllerL
         calendar.clear();
         calendar.setTime(availableInterval.getStart());
         calendar.add(Calendar.MONTH, 3);
-
         if (availableInterval.containsPointInclusive(calendar.getTime())) {
             drawLabelsMonth(g, maxTicks, availableIntervalWidth, ratioX);
             return;
@@ -285,28 +264,36 @@ public class ChartDrawIntervalPane extends JComponent implements ZoomControllerL
         calendar.clear();
         calendar.setTime(availableInterval.getStart());
         calendar.add(Calendar.DAY_OF_YEAR, 3);
-
         if (availableInterval.containsPointInclusive(calendar.getTime())) {
             drawLabelsDay(g, maxTicks, availableIntervalWidth, ratioX);
             return;
         }
 
         drawLabelsTime(g, maxTicks, availableIntervalWidth, ratioX);
+
     }
 
     private void drawLabelsTime(Graphics g, final int maxTicks, final int availableIntervalWidth, final double ratioX) {
         final long timeDiff = availableInterval.getEnd().getTime() - availableInterval.getStart().getTime();
         final double ratioTime = timeDiff / (double) maxTicks;
-
+        int day = -1;
+        String tickText;
         for (int i = 0; i < maxTicks; ++i) {
             final Date tickValue = new Date(availableInterval.getStart().getTime() + (long) (i * ratioTime));
-            final String tickText = ChartConstants.FULL_DATE_TIME_FORMAT.format(tickValue);
+            int currentday = tickValue.getDay();
+            if (day != currentday) {
+                tickText = ChartConstants.FULL_DATE_TIME_FORMAT.format(tickValue);
+                day = currentday;
+            } else {
+                tickText = ChartConstants.HOUR_TIME_FORMAT.format(tickValue);
+            }
 
             drawLabel(g, tickText, availableIntervalWidth, tickValue, ratioX);
         }
     }
 
     private void drawLabelsDay(Graphics g, final int maxTicks, final int availableIntervalWidth, final double ratioX) {
+
         final Calendar calendar = new GregorianCalendar();
 
         calendar.clear();
@@ -331,7 +318,6 @@ public class ChartDrawIntervalPane extends JComponent implements ZoomControllerL
         final int numberOfDays = (int) Math.round(diffMillis / (1000. * 60. * 60. * 24.));
         final int tickCount = Math.min(numberOfDays, maxTicks);
         final double ratioDays = (double) numberOfDays / (double) tickCount;
-
         for (int i = 0; i < maxTicks; ++i) {
             calendar.clear();
             calendar.set(startYear, startMonth, startDay);
@@ -370,8 +356,7 @@ public class ChartDrawIntervalPane extends JComponent implements ZoomControllerL
 
         final int yearDifference = endYear - startYear;
         final int monthDifference = endMonth - startMonth;
-        final int numberOfMonths = monthDifference > 0 ? yearDifference * 12 + monthDifference + 1 : yearDifference * 12 - monthDifference
-                + 1;
+        final int numberOfMonths = monthDifference > 0 ? yearDifference * 12 + monthDifference + 1 : yearDifference * 12 - monthDifference + 1;
         final int tickCount = Math.min(numberOfMonths, maxTicks);
         final double ratioMonth = (double) numberOfMonths / (double) tickCount;
 
@@ -439,11 +424,8 @@ public class ChartDrawIntervalPane extends JComponent implements ZoomControllerL
     }
 
     private void moveSelectedInterval(final Point newMousePosition, boolean forced) {
-        final int diffPixel = mousePressed.x > newMousePosition.x ? mousePressed.x - newMousePosition.x : newMousePosition.x
-                - mousePressed.x;
-        final double availableIntervalSpace = getWidth()
-                - (ChartConstants.getGraphLeftSpace() + ChartConstants.getGraphRightSpace() + ChartConstants.getRangeSelectionWidth())
-                - 1.0;
+        final int diffPixel = mousePressed.x > newMousePosition.x ? mousePressed.x - newMousePosition.x : newMousePosition.x - mousePressed.x;
+        final double availableIntervalSpace = getWidth() - (ChartConstants.getGraphLeftSpace() + ChartConstants.getGraphRightSpace() + ChartConstants.getRangeSelectionWidth()) - 1.0;
         final double movedUnits = diffPixel / availableIntervalSpace;
 
         if (mousePressed.x > newMousePosition.x) {
@@ -499,26 +481,20 @@ public class ChartDrawIntervalPane extends JComponent implements ZoomControllerL
             if (newMousePosition.x >= rightIntervalBorderPosition) {
                 useThisX = rightIntervalBorderPosition;
             }
-            final double availableIntervalSpace = getWidth()
-                    - (ChartConstants.getGraphLeftSpace() + ChartConstants.getGraphRightSpace() + ChartConstants.getRangeSelectionWidth())
-                    - 1.0;
+            final double availableIntervalSpace = getWidth() - (ChartConstants.getGraphLeftSpace() + ChartConstants.getGraphRightSpace() + ChartConstants.getRangeSelectionWidth()) - 1.0;
             for (PlotAreaSpace pas : plotAreaSpaceManager.getAllPlotAreaSpaces()) {
                 final double diffUnits = pas.getScaledMaxTime() - pas.getScaledMinTime();
-                final double timestamp = pas.getScaledMinTime()
-                        + ((useThisX - ChartConstants.getGraphLeftSpace()) / availableIntervalSpace) * diffUnits;
+                final double timestamp = pas.getScaledMinTime() + ((useThisX - ChartConstants.getGraphLeftSpace()) / availableIntervalSpace) * diffUnits;
                 pas.setScaledSelectedTime(Math.max(timestamp, pas.getScaledMinTime()), pas.getScaledSelectedMaxTime(), forced);
             }
         } else if (mouseOverRightGraspPoint) {
             if (newMousePosition.x <= leftIntervalBorderPosition) {
                 useThisX = leftIntervalBorderPosition;
             }
-            final double availableIntervalSpace = getWidth()
-                    - (ChartConstants.getGraphLeftSpace() + ChartConstants.getGraphRightSpace() + ChartConstants.getRangeSelectionWidth())
-                    - 1.0;
+            final double availableIntervalSpace = getWidth() - (ChartConstants.getGraphLeftSpace() + ChartConstants.getGraphRightSpace() + ChartConstants.getRangeSelectionWidth()) - 1.0;
             for (PlotAreaSpace pas : plotAreaSpaceManager.getAllPlotAreaSpaces()) {
                 final double diffUnits = pas.getScaledMaxTime() - pas.getScaledMinTime();
-                final double timestamp = pas.getScaledMinTime()
-                        + (1.0 * (useThisX - ChartConstants.getGraphLeftSpace()) / availableIntervalSpace) * diffUnits;
+                final double timestamp = pas.getScaledMinTime() + (1.0 * (useThisX - ChartConstants.getGraphLeftSpace()) / availableIntervalSpace) * diffUnits;
 
                 pas.setScaledSelectedTime(pas.getScaledSelectedMinTime(), Math.min(timestamp, pas.getScaledMaxTime()), forced);
             }
@@ -635,14 +611,12 @@ public class ChartDrawIntervalPane extends JComponent implements ZoomControllerL
         }
 
         // is mouse cursor above of one of the grasp points?
-        if (e.getPoint().x >= leftIntervalBorderPosition - 5 && e.getPoint().x <= leftIntervalBorderPosition + 5
-                && e.getPoint().y >= (getHeight() / 2 - 5) && e.getPoint().y <= (getHeight() / 2 + 5)) {
+        if (e.getPoint().x >= leftIntervalBorderPosition - 8 && e.getPoint().x <= leftIntervalBorderPosition + 8 && e.getPoint().y >= 0 && e.getPoint().y <= getHeight()) {
             mouseOverLeftGraspPoint = true;
             setCursor(new Cursor(Cursor.E_RESIZE_CURSOR));
         }
 
-        if (e.getPoint().x >= rightIntervalBorderPosition - 5 && e.getPoint().x <= rightIntervalBorderPosition + 5
-                && e.getPoint().y >= (getHeight() / 2 - 5) && e.getPoint().y <= (getHeight() / 2 + 5)) {
+        if (e.getPoint().x >= rightIntervalBorderPosition - 8 && e.getPoint().x <= rightIntervalBorderPosition + 8 && e.getPoint().y >= 0 && e.getPoint().y <= getHeight()) {
             mouseOverRightGraspPoint = true;
             setCursor(new Cursor(Cursor.E_RESIZE_CURSOR));
         }
