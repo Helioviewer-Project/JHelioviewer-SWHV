@@ -51,7 +51,7 @@ public class ChartDrawIntervalPane extends JComponent implements ZoomControllerL
     private Interval<Date> movieInterval = new Interval<Date>(null, null);
 
     private boolean mouseOverComponent = false;
-    private boolean mouseOverInterval = false;
+    private boolean mouseOverInterval = true;
     private boolean mouseOverLeftGraspPoint = false;
     private boolean mouseOverRightGraspPoint = false;
     private Point mousePressed = null;
@@ -189,9 +189,6 @@ public class ChartDrawIntervalPane extends JComponent implements ZoomControllerL
     }
 
     private void drawIntervalGraspPoints(Graphics g) {
-        if (!mouseOverComponent) {
-            return;
-        }
         Graphics2D g2 = ((Graphics2D) g);
         GradientPaint redtowhite = new GradientPaint(0, 0, Color.BLACK, 0, getHeight() - 5, Color.WHITE);
         g2.setPaint(redtowhite);
@@ -205,7 +202,7 @@ public class ChartDrawIntervalPane extends JComponent implements ZoomControllerL
     }
 
     private void drawGraspPointLabels(Graphics g) {
-        if (mouseOverInterval && mousePressed != null && selectedInterval.getStart() != null && selectedInterval.getEnd() != null) {
+        if (mousePressed != null && selectedInterval.getStart() != null && selectedInterval.getEnd() != null) {
             final String leftLabelText = ChartConstants.FULL_DATE_TIME_FORMAT.format(selectedInterval.getStart());
             final Rectangle2D leftLabelTextRectangle = g.getFontMetrics().getStringBounds(leftLabelText, g);
             final Rectangle leftRectangle = new Rectangle(leftIntervalBorderPosition - 10 - (int) leftLabelTextRectangle.getWidth(),
