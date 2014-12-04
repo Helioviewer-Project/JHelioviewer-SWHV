@@ -52,7 +52,7 @@ import org.helioviewer.viewmodelplugin.overlay.OverlayPanel;
 public class PfssPluginPanel extends OverlayPanel implements ActionListener, LayersListener, ViewListener {
 
     private static final long serialVersionUID = 1L;
-    private static final String VOIDDATELABEL = "Date: ****-**-**T**:**:**";
+    private static final String VOIDDATELABEL = "Model time: ****-**-**T**:**:**";
     private PfssCache pfssCache = null;
     private boolean showAgain = true;
     private boolean retry = false;
@@ -346,9 +346,9 @@ public class PfssPluginPanel extends OverlayPanel implements ActionListener, Lay
 
     public void setDate(String date) {
         if (date == "" || date == null) {
-            this.dateLabel.setText("PFSS time: ****-**-**T**:**:**");
+            this.dateLabel.setText(VOIDDATELABEL);
         } else {
-            this.dateLabel.setText("PFSS time: " + date);
+            this.dateLabel.setText("Model time: " + date);
         }
     }
 }
