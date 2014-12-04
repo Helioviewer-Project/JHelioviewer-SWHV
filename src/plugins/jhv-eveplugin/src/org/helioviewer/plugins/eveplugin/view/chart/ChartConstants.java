@@ -42,11 +42,15 @@ public class ChartConstants {
     public static final DecimalFormat DECIMAL_FORMAT = new DecimalFormat("###,##0.00");
 
     public static final SimpleDateFormat FULL_DATE_TIME_FORMAT = new SimpleDateFormat("yyyy-MM-dd\nHH:mm:ss");
+    public static final SimpleDateFormat FULL_DATE_TIME_FORMAT_NO_SEC = new SimpleDateFormat("yyyy-MM-dd\nHH:mm");
     public static final SimpleDateFormat FULL_DATE_TIME_FORMAT_REVERSE = new SimpleDateFormat("HH:mm:ss\nyyyy-MM-dd");
 
     public static final SimpleDateFormat MONTH_TIME_FORMAT = new SimpleDateFormat("MM-dd HH:mm:ss");
+    public static final SimpleDateFormat MONTH_TIME_FORMAT_NO_SEC = new SimpleDateFormat("MM-dd HH:mm:ss");
     public static final SimpleDateFormat DAY_TIME_FORMAT = new SimpleDateFormat("dd HH:mm:ss");
+    public static final SimpleDateFormat DAY_TIME_FORMAT_NO_SEC = new SimpleDateFormat("dd HH:mm");
     public static final SimpleDateFormat HOUR_TIME_FORMAT = new SimpleDateFormat("HH:mm:ss");
+    public static final SimpleDateFormat HOUR_TIME_FORMAT_NO_SEC = new SimpleDateFormat("HH:mm");
     public static final SimpleDateFormat MINUTE_TIME_FORMAT = new SimpleDateFormat("mm:ss");
 
     public static final SimpleDateFormat DAY_MONTH_YEAR_TIME_FORMAT = new SimpleDateFormat("yyyy-MM-dd");
