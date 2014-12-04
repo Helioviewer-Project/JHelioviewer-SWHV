@@ -42,7 +42,7 @@ public class PlotsControlPanel extends JPanel implements ZoomControllerListener,
 
     private boolean setDefaultPeriod = true;
 
-    private final JLabel zoomLabel = new JLabel("Zoom:");
+    private final JLabel zoomLabel = new JLabel("Time interval:");
     private final JComboBox zoomComboBox = new JComboBox(new DefaultComboBoxModel());
 
     private final JLabel lockIntervalLabel = new JLabel("Lock Time Interval:");
@@ -113,7 +113,6 @@ public class PlotsControlPanel extends JPanel implements ZoomControllerListener,
         final DefaultComboBoxModel model = (DefaultComboBoxModel) zoomComboBox.getModel();
         model.removeAllElements();
 
-        model.addElement(new ZoomComboboxItem(ZOOM.CUSTOM, 0));
         model.addElement(new ZoomComboboxItem(ZOOM.All, 0));
 
         addElementToModel(model, startDate, interval, Calendar.YEAR, 10, ZOOM.Year);
@@ -317,7 +316,7 @@ public class PlotsControlPanel extends JPanel implements ZoomControllerListener,
 
             switch (zoom) {
             case All:
-                return "Reset";
+                return "Maximum";
             case Hour:
                 return Integer.toString(number) + " Hour" + plural;
             case Day:
