@@ -6,7 +6,9 @@ import java.io.InputStream;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.UnknownHostException;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Properties;
 
 import org.helioviewer.base.DownloadStream;
@@ -24,7 +26,8 @@ public class BandTypeAPI extends APIAbstract {
     private static final BandTypeAPI singletonInstance = new BandTypeAPI();
     private BandType[] bandtypes;
     private Boolean isUpdated = Boolean.FALSE;
-    public HashMap<String, BandGroup> groups = new HashMap<String, BandGroup>();
+    private final HashMap<String, BandGroup> groups = new HashMap<String, BandGroup>();
+    private final List<BandGroup> orderedGroups = new ArrayList<BandGroup>();
 
     private final Properties defaultProperties = new Properties();
 
@@ -34,7 +37,8 @@ public class BandTypeAPI extends APIAbstract {
 
     public BandTypeAPI() {
         super();
-        LogSettings.init("/settings/log4j.initial.properties", JHVDirectory.SETTINGS.getPath() + "log4j.properties", JHVDirectory.LOGS.getPath(), false);
+        LogSettings.init("/settings/log4j.initial.properties", JHVDirectory.SETTINGS.getPath() + "log4j.properties",
+                JHVDirectory.LOGS.getPath(), false);
         this.loadSettings();
         this.setBaseUrl(defaultProperties.getProperty("plugin.eve.dataseturl"));
         this.updateDatasets();
@@ -144,6 +148,7 @@ public class BandTypeAPI extends APIAbstract {
                 if (job.has("key")) {
                     group.setKey(job.getString("key"));
                     groups.put(job.getString("key"), group);
+                    orderedGroups.add(group);
                 }
             }
         } catch (JSONException e1) {
@@ -212,5 +217,12 @@ public class BandTypeAPI extends APIAbstract {
             updateDatasets();
         }
         return groups.values().toArray(new BandGroup[groups.size()]);
+    }
+
+    public List<BandGroup> getOrderedGroups() {
+        if (!isUpdated) {
+            updateDatasets();
+        }
+        return orderedGroups;
     }
 }
