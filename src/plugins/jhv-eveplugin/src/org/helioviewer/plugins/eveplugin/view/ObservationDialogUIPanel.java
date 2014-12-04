@@ -6,6 +6,7 @@ import java.awt.event.ActionEvent;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
+import java.util.List;
 
 import javax.swing.BorderFactory;
 import javax.swing.DefaultComboBoxModel;
@@ -79,7 +80,7 @@ public class ObservationDialogUIPanel extends SimpleObservationDialogUIPanel {
     }
 
     private void initGroups() {
-        final BandGroup[] groups = BandTypeAPI.getSingletonInstance().getGroups();
+        final List<BandGroup> groups = BandTypeAPI.getSingletonInstance().getOrderedGroups();
         final DefaultComboBoxModel model = (DefaultComboBoxModel) comboBoxGroup.getModel();
         model.removeAllElements();
 
