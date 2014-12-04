@@ -61,6 +61,8 @@ public class SWEKConfigurationManager {
     /** Map containing the event types */
     private final Map<String, SWEKEventType> eventTypes;
 
+    private final List<SWEKEventType> orderedEventTypes;
+
     /** The properties of the swek plugin */
     private final Properties swekProperties;
 
@@ -73,6 +75,7 @@ public class SWEKConfigurationManager {
         parameters = new HashMap<String, SWEKParameter>();
         eventTypes = new HashMap<String, SWEKEventType>();
         swekProperties = SWEKProperties.getSingletonInstance().getSWEKProperties();
+        orderedEventTypes = new ArrayList<SWEKEventType>();
     }
 
     /**
@@ -166,6 +169,16 @@ public class SWEKConfigurationManager {
     public Map<String, SWEKEventType> getEventTypes() {
         loadConfiguration();
         return eventTypes;
+    }
+
+    /**
+     * Gives an configuration ordered list with all the event types.
+     * 
+     * @return map containing the event types found in the configuration file
+     */
+    public List<SWEKEventType> getOrderedEventTypes() {
+        loadConfiguration();
+        return orderedEventTypes;
     }
 
     /**
@@ -499,6 +512,7 @@ public class SWEKConfigurationManager {
             SWEKEventType eventType = parseEventType(eventJSONArray.getJSONObject(i));
             result.add(eventType);
             eventTypes.put(eventType.getEventName(), eventType);
+            orderedEventTypes.add(eventType);
         }
         return result;
     }
