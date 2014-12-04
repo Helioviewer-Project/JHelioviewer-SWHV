@@ -573,8 +573,9 @@ public class ChartDrawIntervalPane extends JComponent implements ZoomControllerL
         Log.debug("Mouse clicked");
 
         if (e.getPoint().x >= ChartConstants.getGraphLeftSpace() && e.getPoint().x <= getWidth() - ChartConstants.getGraphRightSpace()) {
-            mousePressed = e.getPoint();
+            mousePressed = new Point(leftIntervalBorderPosition + (rightIntervalBorderPosition - leftIntervalBorderPosition) / 2, 0);
             moveSelectedInterval(e.getPoint(), true);
+            mousePressed = null;
         }
 
     }
