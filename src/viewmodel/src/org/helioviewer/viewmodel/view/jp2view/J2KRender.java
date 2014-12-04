@@ -95,12 +95,10 @@ class J2KRender implements Runnable {
 
     /** Maximum rendering iterations per layer allowed */
     // Is now calculated automatically as num_pix / MAX_RENDER_SAMPLES
-    private final int MAX_RENDER_ITERATIONS = 150;
+    //private final int MAX_RENDER_ITERATIONS = 150;
 
     /** It says if the render is going to play a movie instead of a single image */
     private boolean movieMode = false;
-
-    private boolean linkedMovieMode = false;
 
     /**
      * Sets whether the byte and integer buffers should be reused between
@@ -137,8 +135,6 @@ class J2KRender implements Runnable {
 
     private NextFrameCandidateChooser nextFrameCandidateChooser = new NextFrameCandidateLoopChooser();
     private FrameChooser frameChooser = new RelativeFrameChooser();
-
-    private boolean differenceMode = false;
 
     /**
      * The constructor.
@@ -224,10 +220,6 @@ class J2KRender implements Runnable {
             ((AbsoluteFrameChooser) frameChooser).resetStartTime(currParams.compositionLayer);
         }
 
-    }
-
-    public void setLinkedMovieMode(boolean val) {
-        linkedMovieMode = val;
     }
 
     public void setMovieRelativeSpeed(int framesPerSecond) {
@@ -709,10 +701,6 @@ class J2KRender implements Runnable {
                 return nextDiff / movieSpeed;
             }
         }
-    }
-
-    public void setDifferenceMode(boolean differenceMode) {
-        this.differenceMode = differenceMode;
     }
 
     public int getMovieRelativeSpeed() {

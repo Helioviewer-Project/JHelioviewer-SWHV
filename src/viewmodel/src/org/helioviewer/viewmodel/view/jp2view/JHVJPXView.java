@@ -323,7 +323,6 @@ public class JHVJPXView extends JHVJP2View implements TimedMovieView, CachedMovi
         readerSignal.signal();
         if (render != null) {
             render.setMovieMode(false);
-            render.setLinkedMovieMode(false);
         }
 
         // send notification
@@ -351,10 +350,6 @@ public class JHVJPXView extends JHVJP2View implements TimedMovieView, CachedMovi
                     readerSignal.signal();
                     if (readerMode != ReaderMode.ONLYFIREONCOMPLETE) {
                         renderRequestedSignal.signal(RenderReasons.MOVIE_PLAY);
-                    }
-                } else {
-                    if (render != null) {
-                        render.setLinkedMovieMode(true);
                     }
                 }
                 // send notification
@@ -512,7 +507,6 @@ public class JHVJPXView extends JHVJP2View implements TimedMovieView, CachedMovi
 
     public void setDifferenceMode(boolean differenceMode) {
         this.differenceMode = differenceMode;
-        this.render.setDifferenceMode(differenceMode);
     }
 
     public void setFullyLoadedMode(boolean fullyLoadedMode) {
