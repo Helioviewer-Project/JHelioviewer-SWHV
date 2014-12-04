@@ -641,9 +641,7 @@ public class ChartDrawIntervalPane extends JComponent implements ZoomControllerL
     @Override
     public void mouseDragged(MouseEvent e) {
         eveState.setMouseTimeIntervalDragging(true);
-        if (mouseOverLeftGraspPoint || mouseOverRightGraspPoint) {
-            resizeSelectedInterval(e.getPoint(), false);
-        } else if (mouseOverInterval) {
+        if (mouseOverInterval) {
             moveSelectedInterval(e.getPoint(), false);
         }
     }
@@ -658,19 +656,6 @@ public class ChartDrawIntervalPane extends JComponent implements ZoomControllerL
         if (e.getPoint().x >= leftIntervalBorderPosition && e.getPoint().x <= rightIntervalBorderPosition) {
             mouseOverInterval = true;
             setCursor(openHandCursor);
-        }
-
-        // is mouse cursor above of one of the grasp points?
-        if (e.getPoint().x >= leftIntervalBorderPosition - 8 && e.getPoint().x <= leftIntervalBorderPosition + 8 && e.getPoint().y >= 0
-                && e.getPoint().y <= getHeight()) {
-            mouseOverLeftGraspPoint = true;
-            setCursor(new Cursor(Cursor.E_RESIZE_CURSOR));
-        }
-
-        if (e.getPoint().x >= rightIntervalBorderPosition - 8 && e.getPoint().x <= rightIntervalBorderPosition + 8 && e.getPoint().y >= 0
-                && e.getPoint().y <= getHeight()) {
-            mouseOverRightGraspPoint = true;
-            setCursor(new Cursor(Cursor.E_RESIZE_CURSOR));
         }
 
         // reset cursor if it does not point to the interval area
