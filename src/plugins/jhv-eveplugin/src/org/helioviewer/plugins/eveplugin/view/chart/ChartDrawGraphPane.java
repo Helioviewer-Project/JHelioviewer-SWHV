@@ -279,6 +279,9 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
                 tickTextBounds = g.getFontMetrics().getStringBounds(line, g);
                 tickTextWidth = (int) tickTextBounds.getWidth();
                 int xl = x - (tickTextWidth / 2);
+                if (xl + tickTextWidth > getWidth() - ChartConstants.getGraphRightSpace()) {
+                    xl = getWidth() - ChartConstants.getGraphRightSpace() - tickTextWidth;
+                }
                 g.drawString(line, xl, yl);
                 yl += g.getFontMetrics().getHeight() * 2 / 3;
             }
