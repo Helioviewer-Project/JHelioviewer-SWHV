@@ -8,6 +8,7 @@ import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Point;
 import java.awt.Rectangle;
+import java.awt.Toolkit;
 import java.awt.event.MouseEvent;
 import java.awt.geom.Rectangle2D;
 import java.awt.geom.RoundRectangle2D;
@@ -24,6 +25,8 @@ import javax.swing.event.MouseInputListener;
 
 import org.helioviewer.base.logging.Log;
 import org.helioviewer.base.math.Interval;
+import org.helioviewer.jhv.gui.IconBank;
+import org.helioviewer.jhv.gui.IconBank.JHVIcon;
 import org.helioviewer.jhv.layers.LayersListener;
 import org.helioviewer.jhv.layers.LayersModel;
 import org.helioviewer.plugins.eveplugin.EVEState;
@@ -62,6 +65,11 @@ public class ChartDrawIntervalPane extends JComponent implements ZoomControllerL
     private final PlotAreaSpaceManager plotAreaSpaceManager;
     private final EVEState eveState;
 
+    private static final Cursor closedHandCursor = Toolkit.getDefaultToolkit().createCustomCursor(
+            IconBank.getIcon(JHVIcon.CLOSED_HAND).getImage(), new Point(9, 9), IconBank.getIcon(JHVIcon.CLOSED_HAND).toString());
+    private static final Cursor openHandCursor = Toolkit.getDefaultToolkit().createCustomCursor(
+            IconBank.getIcon(JHVIcon.OPEN_HAND).getImage(), new Point(9, 9), IconBank.getIcon(JHVIcon.OPEN_HAND).toString());
+
     // //////////////////////////////////////////////////////////////////////////////
     // Methods
     // //////////////////////////////////////////////////////////////////////////////
@@ -96,7 +104,7 @@ public class ChartDrawIntervalPane extends JComponent implements ZoomControllerL
             drawLabels(g);
             drawBorders(g);
             drawIntervalGraspPoints(g);
-            drawGraspPointLabels(g);
+            // drawGraspPointLabels(g);
         }
     }
 
@@ -562,11 +570,24 @@ public class ChartDrawIntervalPane extends JComponent implements ZoomControllerL
 
     @Override
     public void mouseClicked(MouseEvent e) {
+        // Log.debug("Mouse clicked");
+        /*
+         * if (e.getPoint().x >= ChartConstants.getGraphLeftSpace() &&
+         * e.getPoint().x <= getWidth() - ChartConstants.getGraphRightSpace()) {
+         * mousePressed = e.getPoint(); moveSelectedInterval(e.getPoint(),
+         * true); }
+         */
     }
 
     @Override
     public void mouseEntered(MouseEvent e) {
         mouseOverComponent = true;
+        /*
+         * if (e.getPoint().x >= ChartConstants.getGraphLeftSpace() &&
+         * e.getPoint().x <= getWidth() - ChartConstants.getGraphRightSpace()) {
+         * setCursor(new Cursor(Cursor.HAND_CURSOR)); } else { setCursor(new
+         * Cursor(Cursor.DEFAULT_CURSOR)); }
+         */
         repaint();
     }
 
@@ -593,6 +614,9 @@ public class ChartDrawIntervalPane extends JComponent implements ZoomControllerL
     @Override
     public void mousePressed(MouseEvent e) {
         mousePressed = e.getPoint();
+        if (mouseOverInterval && !mouseOverLeftGraspPoint && !mouseOverRightGraspPoint) {
+            setCursor(closedHandCursor);
+        }
     }
 
     @Override
@@ -603,6 +627,7 @@ public class ChartDrawIntervalPane extends JComponent implements ZoomControllerL
             resizeSelectedInterval(e.getPoint(), true);
         } else if (mouseOverInterval) {
             moveSelectedInterval(e.getPoint(), true);
+            setCursor(openHandCursor);
         }
         mousePressed = null;
 
@@ -632,7 +657,7 @@ public class ChartDrawIntervalPane extends JComponent implements ZoomControllerL
         // is mouse cursor above selected interval?
         if (e.getPoint().x >= leftIntervalBorderPosition && e.getPoint().x <= rightIntervalBorderPosition) {
             mouseOverInterval = true;
-            setCursor(new Cursor(Cursor.HAND_CURSOR));
+            setCursor(openHandCursor);
         }
 
         // is mouse cursor above of one of the grasp points?
@@ -650,7 +675,14 @@ public class ChartDrawIntervalPane extends JComponent implements ZoomControllerL
 
         // reset cursor if it does not point to the interval area
         if (!mouseOverInterval) {
+            /*
+             * if (e.getPoint().x >= ChartConstants.getGraphLeftSpace() &&
+             * e.getPoint().x <= getWidth() -
+             * ChartConstants.getGraphRightSpace()) { setCursor(new
+             * Cursor(Cursor.HAND_CURSOR)); } else {
+             */
             setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
+            // }
         }
     }
 
