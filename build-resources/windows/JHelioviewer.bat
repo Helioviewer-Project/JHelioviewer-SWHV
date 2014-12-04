@@ -43,7 +43,7 @@ pause
 exit
 
 :ERROR
-echo "ERROR: Could not find Java Runtime Environment! JHelioviewer needs Java 1.5 or higher. You can get the latest version from http://www.java.com/download/"
+echo "ERROR: Could not find the Java Runtime Environment. JHelioviewer needs Java 6 or higher. You can get the latest version from http://www.java.com/download/"
 echo "Try to start JHelioviewer without specifying java.exe using default associated program."
 echo "Console log output wont be available. Log files are stored in %HOME%\JHelioviewer\Logs"
 start JHelioviewer.jar
