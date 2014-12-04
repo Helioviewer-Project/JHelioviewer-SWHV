@@ -291,7 +291,7 @@ public class SWHVHEKImagePanelEventPopupController implements KeyEventDispatcher
             GL3DRayTracer rayTracer = new GL3DRayTracer(scenegraphview.getHitReferenceShape(), GL3DState.get().getActiveCamera());
             GL3DRay ray = null;
 
-            ray = rayTracer.cast(e.getX(), e.getY());
+            ray = rayTracer.cast(e.getX() * Displayer.screenScale, e.getY() * Displayer.screenScale);
 
             if (ray != null) {
                 if (ray.getHitPoint() != null) {
