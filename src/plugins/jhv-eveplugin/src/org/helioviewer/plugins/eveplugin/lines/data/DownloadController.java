@@ -27,7 +27,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 /**
- * 
+ *
  * @author Stephan Pagel
  * */
 public class DownloadController {
@@ -107,7 +107,6 @@ public class DownloadController {
 
         // try to find data in local database. If data is available in local
         // database it will be transfered to cache
-        updateBandFromDatabase(band, intervals);
 
         // get all intervals within query interval where data is missing again
         intervals = getIntervals(band, queryInterval);
@@ -169,21 +168,6 @@ public class DownloadController {
         }
 
         return intervals;
-    }
-
-    private void updateBandFromDatabase(final Band band, final LinkedList<Interval<Date>> intervals) {
-        final Calendar calendar = new GregorianCalendar();
-
-        for (final Interval<Date> interval : intervals) {
-            // one day has to be added otherwise the last day of the given
-            // interval will be ignored
-            calendar.clear();
-            calendar.setTime(interval.getEnd());
-            calendar.add(Calendar.DAY_OF_YEAR, 1);
-
-            final EVEValue[] values = DatabaseController.getSingletonInstance().getDataInInterval(band, new Interval<Date>(interval.getStart(), calendar.getTime()));
-            EVECacheController.getSingletonInstance().addToCache(values, band);
-        }
     }
 
     public void stopAllDownloads() {
@@ -401,6 +385,7 @@ public class DownloadController {
         // Methods
         // //////////////////////////////////////////////////////////////////////////
 
+        @Override
         public void run() {
             while (true) {
                 try {
@@ -465,6 +450,7 @@ public class DownloadController {
             this.semaphore = semaphore;
         }
 
+        @Override
         public void run() {
             try {
                 if (interval != null && interval.getStart() != null && interval.getEnd() != null && band != null)
@@ -544,7 +530,7 @@ public class DownloadController {
 
                     // used time system in data is TAI -> compute to UTC
                     final long millis = ((long) entry.getDouble(0)) * 1000;// -
-                                                                           // 378691234000L;
+                    // 378691234000L;
                     // final long millis = ((long) entry.getDouble(0)*1000);
                     values[i] = new EVEValue(new Date(millis), entry.getDouble(1) * multiplier);
                     if (test) {
@@ -553,7 +539,6 @@ public class DownloadController {
                     }
                 }
 
-                DatabaseController.getSingletonInstance().addToDatabase(band, values);
                 EVECacheController.getSingletonInstance().addToCache(values, band);
             } catch (JSONException e) {
                 Log.error("", e);
