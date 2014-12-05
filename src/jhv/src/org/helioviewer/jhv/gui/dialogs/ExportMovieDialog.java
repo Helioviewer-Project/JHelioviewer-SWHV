@@ -61,6 +61,7 @@ import javax.swing.JPanel;
 import javax.swing.JProgressBar;
 import javax.swing.JSpinner;
 import javax.swing.SpinnerNumberModel;
+import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
 import javax.swing.event.ChangeListener;
 import javax.swing.event.DocumentEvent;
@@ -217,7 +218,7 @@ public class ExportMovieDialog extends JDialog implements ChangeListener, Action
     private boolean updatingImageHeight = false;
     private boolean updatingImageWidth = false;
     private boolean updatingTotalHeight = false;
-    private final JLabel movieLabel = new JLabel("");
+    private final JLabel movieLabel = new JLabel("", SwingConstants.CENTER);
     final JButton exportButton = new JButton("Click to start export");
 
     private class StatusStruct {
