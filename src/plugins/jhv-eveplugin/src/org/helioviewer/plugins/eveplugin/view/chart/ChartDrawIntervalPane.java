@@ -136,8 +136,8 @@ public class ChartDrawIntervalPane extends JComponent implements ZoomControllerL
         GradientPaint redtowhite = new GradientPaint(0, getHeight() / 2 - getHeight() / (3 * 2), Color.BLACK, 0, getHeight() / 2
                 + getHeight() / (3 * 2), Color.WHITE);
         g2.setPaint(redtowhite);
-        g2.fillRect(leftIntervalBorderPosition, getHeight() / 2 - getHeight() / (3 * 2), rightIntervalBorderPosition
-                - leftIntervalBorderPosition, getHeight() / 3);
+        g2.fillRect(leftIntervalBorderPosition, getHeight() / 7 * 3, rightIntervalBorderPosition - leftIntervalBorderPosition,
+                getHeight() / 7);
     }
 
     private void drawMovieInterval(Graphics g) {
@@ -191,8 +191,8 @@ public class ChartDrawIntervalPane extends JComponent implements ZoomControllerL
 
     private void drawBorders(Graphics g) {
         g.setColor(ChartConstants.BORDER_COLOR);
-        g.drawRect(leftIntervalBorderPosition, getHeight() / 2 - getHeight() / (3 * 2), rightIntervalBorderPosition
-                - leftIntervalBorderPosition, getHeight() / 3);
+        g.drawRect(leftIntervalBorderPosition, getHeight() / 7 * 3, rightIntervalBorderPosition - leftIntervalBorderPosition,
+                getHeight() / 7);
 
     }
 
@@ -200,12 +200,12 @@ public class ChartDrawIntervalPane extends JComponent implements ZoomControllerL
         Graphics2D g2 = ((Graphics2D) g);
         GradientPaint redtowhite = new GradientPaint(0, 0, Color.BLACK, 0, getHeight() - 5, Color.WHITE);
         g2.setPaint(redtowhite);
-        g2.fill(new RoundRectangle2D.Double(leftIntervalBorderPosition, 2, 5, getHeight() - 5, 5, 5));
-        g2.fill(new RoundRectangle2D.Double(rightIntervalBorderPosition - 4, 2, 5, getHeight() - 5, 5, 5));
+        g2.fill(new RoundRectangle2D.Double(leftIntervalBorderPosition, 7, 5, getHeight() - 20, 5, 5));
+        g2.fill(new RoundRectangle2D.Double(rightIntervalBorderPosition - 4, 7, 5, getHeight() - 20, 5, 5));
 
         g.setColor(ChartConstants.BORDER_COLOR);
-        g2.draw(new RoundRectangle2D.Double(leftIntervalBorderPosition, 2, 5, getHeight() - 5, 5, 5));
-        g2.draw(new RoundRectangle2D.Double(rightIntervalBorderPosition - 4, 2, 5, getHeight() - 5, 5, 5));
+        g2.draw(new RoundRectangle2D.Double(leftIntervalBorderPosition, 7, 5, getHeight() - 20, 5, 5));
+        g2.draw(new RoundRectangle2D.Double(rightIntervalBorderPosition - 4, 7, 5, getHeight() - 20, 5, 5));
 
     }
 
