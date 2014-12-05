@@ -69,6 +69,10 @@ public class HelioviewerPositionedMetaData extends HelioviewerMetaData implement
             this.stonyhurstLongitude = this.refl0 - Astronomy.getL0Degree(this.getDateTime().getTime());
         }
 
+        if (this.getInstrument().contains("GONG") || this.getObservatory().contains("USET") || this.getObservatory().contains("SOLIS")) {
+            this.stonyhurstLongitude = -Astronomy.getL0Degree(this.getDateTime().getTime());
+        }
+
         this.stonyhurstAvailable = this.stonyhurstLatitude != 0.0 || this.stonyhurstLongitude != 0.0;
 
         this.theta = -Astronomy.getB0InRadians(this.getDateTime().getTime());
