@@ -165,7 +165,7 @@ public class EventModel implements ZoomControllerListener, EventRequesterListene
             eventsVisible = false;
             eventsActivated = false;
             DrawController.getSingletonInstance().removeDrawableElement(eventPanel, plot);
-            LineDataSelectorModel.getSingletonInstance().removeLineData(eventSelectorElement);
+            // LineDataSelectorModel.getSingletonInstance().removeLineData(eventSelectorElement);
             fireEventsDeactivated();
         }
     }
@@ -175,7 +175,7 @@ public class EventModel implements ZoomControllerListener, EventRequesterListene
             eventsVisible = true;
             eventsActivated = true;
             DrawController.getSingletonInstance().updateDrawableElement(eventPanel, plot);
-            LineDataSelectorModel.getSingletonInstance().addLineData(eventSelectorElement);
+            // LineDataSelectorModel.getSingletonInstance().addLineData(eventSelectorElement);
         }
     }
 
