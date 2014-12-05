@@ -12,6 +12,7 @@ import javax.media.opengl.GLCapabilities;
 import javax.media.opengl.GLEventListener;
 import javax.media.opengl.GLProfile;
 import javax.media.opengl.awt.GLCanvas;
+import javax.swing.JOptionPane;
 
 import org.helioviewer.base.logging.Log;
 import org.helioviewer.base.math.Vector2dInt;
@@ -148,6 +149,8 @@ public class GL3DComponentView extends AbstractComponentView implements GLEventL
         exportMode = false;
         previousScreenshot = -1;
         export.finishProcess();
+        JOptionPane.showMessageDialog(ImageViewerGui.getSingletonInstance().getMainImagePanel(), "The exported movie is created at : " + export.getFileName());
+
         ImageViewerGui.getSingletonInstance().getLeftContentPane().setEnabled(true);
         if (movieView != null) {
             movieView.pauseMovie();
