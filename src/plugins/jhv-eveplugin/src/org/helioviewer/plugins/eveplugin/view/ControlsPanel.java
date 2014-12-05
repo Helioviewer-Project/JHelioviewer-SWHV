@@ -62,25 +62,6 @@ public class ControlsPanel extends JPanel implements ActionListener, LayersListe
 
     private void initVisualComponents() {
         EventModel.getSingletonInstance().addEventModelListener(this);
-        /*
-         * eventsComboBox.addActionListener(new ActionListener() {
-         * 
-         * @Override public void actionPerformed(ActionEvent e) { if (((String)
-         * eventsComboBox.getSelectedItem()).equals("Events on Plot 1")) {
-         * EventModel
-         * .getSingletonInstance().setPlotIdentifier(PlotsContainerPanel
-         * .PLOT_IDENTIFIER_MASTER);
-         * EventModel.getSingletonInstance().activateEvents(); } else if
-         * (((String)
-         * eventsComboBox.getSelectedItem()).equals("Events on Plot 2")) {
-         * EventModel
-         * .getSingletonInstance().setPlotIdentifier(PlotsContainerPanel
-         * .PLOT_IDENTIFIER_SLAVE);
-         * PlotsContainerPanel.getSingletonInstance().setPlot2Visible(true);
-         * EventModel.getSingletonInstance().activateEvents(); } else if
-         * (((String) eventsComboBox.getSelectedItem()).equals("No Events")) {
-         * EventModel.getSingletonInstance().deactivateEvents(); } } });
-         */
 
         eventsCheckBox.addActionListener(new ActionListener() {
             @Override
@@ -111,7 +92,6 @@ public class ControlsPanel extends JPanel implements ActionListener, LayersListe
         JPanel pageEndPanel = new JPanel();
         pageEndPanel.setBackground(Color.BLUE);
         JPanel flowPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
-        // flowPanel.add(eventsComboBox);
         flowPanel.add(eventsLabel);
         flowPanel.add(eventsCheckBox);
         flowPanel.add(periodFromLayersButton);
