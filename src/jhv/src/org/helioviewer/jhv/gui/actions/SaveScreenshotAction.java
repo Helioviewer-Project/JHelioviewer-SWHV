@@ -10,6 +10,7 @@ import java.util.Date;
 
 import javax.swing.AbstractAction;
 import javax.swing.JOptionPane;
+import javax.swing.JTextArea;
 import javax.swing.KeyStroke;
 
 import org.helioviewer.jhv.JHVDirectory;
@@ -45,7 +46,9 @@ public class SaveScreenshotAction extends AbstractAction {
         try {
             String filename = new String(JHVDirectory.EXPORTS.getPath() + getDefaultFileName() + ".png");
             if (ImageViewerGui.getSingletonInstance().getMainView().saveScreenshot("png", new File(filename))) {
-                JOptionPane.showMessageDialog(ImageViewerGui.getMainFrame(), "Saved Screenshot at: " + filename);
+                JTextArea text = new JTextArea("Saved screenshot at: " + filename);
+                text.setBackground(null);
+                JOptionPane.showMessageDialog(ImageViewerGui.getMainFrame(), text);
             }
         } catch (IOException e1) {
             e1.printStackTrace();

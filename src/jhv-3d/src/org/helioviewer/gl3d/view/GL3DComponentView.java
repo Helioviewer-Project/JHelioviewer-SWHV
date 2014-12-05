@@ -150,7 +150,7 @@ public class GL3DComponentView extends AbstractComponentView implements GLEventL
         exportMode = false;
         previousScreenshot = -1;
         export.finishProcess();
-        JTextArea text = new JTextArea("The exported movie is created at : " + export.getFileName());
+        JTextArea text = new JTextArea("Exported movie at: " + export.getFileName());
         text.setBackground(null);
         JOptionPane.showMessageDialog(ImageViewerGui.getSingletonInstance().getMainImagePanel(), text);
 
