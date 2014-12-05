@@ -4,8 +4,6 @@ import java.awt.BorderLayout;
 import java.awt.EventQueue;
 import java.awt.FlowLayout;
 import java.awt.GridLayout;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
@@ -37,7 +35,7 @@ import org.helioviewer.viewmodel.view.cache.DateTimeCache;
 import org.helioviewer.viewmodel.view.jp2view.JHVJPXView;
 import org.helioviewer.viewmodel.view.jp2view.datetime.ImmutableDateTime;
 
-public class SimpleObservationDialogUIPanel extends ObservationDialogPanel implements JHVCalendarListener, ActionListener, LayersListener {
+public class SimpleObservationDialogUIPanel extends ObservationDialogPanel implements JHVCalendarListener, LayersListener {
 
     // //////////////////////////////////////////////////////////////////////////////
     // Definitions
@@ -54,7 +52,7 @@ public class SimpleObservationDialogUIPanel extends ObservationDialogPanel imple
     private JHVCalendarDatePicker calendarStartDate;
     private JHVCalendarDatePicker calendarEndDate;
 
-    protected JComboBox plotComboBox;
+    // protected JComboBox plotComboBox;
 
     protected JComboBox comboBoxGroup;
     protected JComboBox comboBoxData;
@@ -78,7 +76,8 @@ public class SimpleObservationDialogUIPanel extends ObservationDialogPanel imple
                 calendarStartDate = new JHVCalendarDatePicker();
                 calendarEndDate = new JHVCalendarDatePicker();
 
-                plotComboBox = new JComboBox(new String[] { "Plot 1", "Plot 2" });
+                // plotComboBox = new JComboBox(new String[] { "Plot 1",
+                // "Plot 2" });
 
                 comboBoxGroup = new JComboBox(new DefaultComboBoxModel());
                 comboBoxData = new JComboBox(new DefaultComboBoxModel());
@@ -119,9 +118,9 @@ public class SimpleObservationDialogUIPanel extends ObservationDialogPanel imple
         // set up plot selection
         plotPane.setLayout(new FlowLayout(FlowLayout.LEFT));
         plotPane.setBorder(BorderFactory.createTitledBorder(" Choose plot where to display the data "));
-        plotPane.add(plotComboBox);
+        // plotPane.add(plotComboBox);
 
-        plotComboBox.addActionListener(this);
+        // plotComboBox.addActionListener(this);
 
         // set basic layout
         this.setLayout(new BoxLayout(this, BoxLayout.PAGE_AXIS));
@@ -174,18 +173,19 @@ public class SimpleObservationDialogUIPanel extends ObservationDialogPanel imple
         ZoomController.getSingletonInstance().setAvailableInterval(new Interval<Date>(getStartDate(), getEndDate()));
     }
 
-    private void updateBandController() {
+    // private void updateBandController() {
 
-        final String identifier = plotComboBox.getSelectedIndex() == 0 ? PlotsContainerPanel.PLOT_IDENTIFIER_MASTER
-                : PlotsContainerPanel.PLOT_IDENTIFIER_SLAVE;
-        if (identifier.equals(PlotsContainerPanel.PLOT_IDENTIFIER_SLAVE)) {
-            plotsContainerPanel.setPlot2Visible(true);
-        }
-    }
+    /*
+     * final String identifier = plotComboBox.getSelectedIndex() == 0 ?
+     * PlotsContainerPanel.PLOT_IDENTIFIER_MASTER :
+     * PlotsContainerPanel.PLOT_IDENTIFIER_SLAVE; if
+     * (identifier.equals(PlotsContainerPanel.PLOT_IDENTIFIER_SLAVE)) {
+     * plotsContainerPanel.setPlot2Visible(true); }
+     */
+    // }
 
     private void startRadioDownload() {
-        final String identifier = plotComboBox.getSelectedIndex() == 0 ? PlotsContainerPanel.PLOT_IDENTIFIER_MASTER
-                : PlotsContainerPanel.PLOT_IDENTIFIER_SLAVE;
+        final String identifier = PlotsContainerPanel.PLOT_IDENTIFIER_MASTER;
         DateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
         Interval<Date> selectedInterval = ZoomController.getSingletonInstance().getSelectedInterval();
         String isoStart = df.format(selectedInterval.getStart());
@@ -209,7 +209,7 @@ public class SimpleObservationDialogUIPanel extends ObservationDialogPanel imple
         // setStartDate(interval.getStart());
         // setEndDate(calendar.getTime());
 
-        plotComboBox.setSelectedIndex(0);
+        // plotComboBox.setSelectedIndex(0);
     }
 
     @Override
@@ -230,7 +230,7 @@ public class SimpleObservationDialogUIPanel extends ObservationDialogPanel imple
         }
 
         updateZoomController();
-        updateBandController();
+        // updateBandController();
         startRadioDownload();
 
         return true;
@@ -258,23 +258,6 @@ public class SimpleObservationDialogUIPanel extends ObservationDialogPanel imple
     // //////////////////////////////////////////////////////////////////////////////
     // Action Listener
     // //////////////////////////////////////////////////////////////////////////////
-
-    @Override
-    public void actionPerformed(final ActionEvent e) {
-        if (e.getSource().equals(plotComboBox)) {
-            final String identifier = plotComboBox.getSelectedIndex() == 0 ? PlotsContainerPanel.PLOT_IDENTIFIER_MASTER
-                    : PlotsContainerPanel.PLOT_IDENTIFIER_SLAVE;
-            // final BandGroup group =
-            // BandController.getSingletonInstance().getSelectedGroup(identifier);
-
-            // comboBoxGroup.setSelectedItem(group);
-        }
-    }
-
-    public int getPlotComboBoxSelectedIndex() {
-        return plotComboBox.getSelectedIndex();
-    }
-
     public void setLoadButtonEnabled(boolean shouldBeEnabled) {
         enableLoadButton = shouldBeEnabled;
     }
