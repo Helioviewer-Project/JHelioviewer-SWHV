@@ -12,7 +12,8 @@ import java.util.Date;
 import javax.swing.BoxLayout;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
-import javax.swing.JComboBox;
+import javax.swing.JCheckBox;
+import javax.swing.JLabel;
 import javax.swing.JPanel;
 
 import org.helioviewer.base.math.Interval;
@@ -26,7 +27,6 @@ import org.helioviewer.plugins.eveplugin.events.model.EventModel;
 import org.helioviewer.plugins.eveplugin.events.model.EventModelListener;
 import org.helioviewer.plugins.eveplugin.settings.EVESettings;
 import org.helioviewer.plugins.eveplugin.view.linedataselector.LineDataSelectorPanel;
-import org.helioviewer.plugins.eveplugin.view.plot.PlotsContainerPanel;
 import org.helioviewer.viewmodel.view.View;
 
 /**
@@ -47,9 +47,11 @@ public class ControlsPanel extends JPanel implements ActionListener, LayersListe
     private final ImageIcon addIcon = IconBank.getIcon(JHVIcon.ADD);
     private final JButton addLayerButton = new JButton("Add Layer", addIcon);
 
-    private final String[] plots = { "No Events", "Events on Plot 1", "Events on Plot 2" };
-    private final JComboBox eventsComboBox = new JComboBox(plots);
-
+    // private final String[] plots = { "No Events", "Events on Plot 1",
+    // "Events on Plot 2" };
+    // private final JComboBox eventsComboBox = new JComboBox(plots);
+    private final JCheckBox eventsCheckBox = new JCheckBox();
+    private final JLabel eventsLabel = new JLabel("Display events: ");
     private final ImageIcon movietimeIcon = IconBank.getIcon(JHVIcon.LAYER_MOVIE_TIME);
     private final JButton periodFromLayersButton = new JButton(movietimeIcon);
 
@@ -60,18 +62,32 @@ public class ControlsPanel extends JPanel implements ActionListener, LayersListe
 
     private void initVisualComponents() {
         EventModel.getSingletonInstance().addEventModelListener(this);
-        eventsComboBox.addActionListener(new ActionListener() {
+        /*
+         * eventsComboBox.addActionListener(new ActionListener() {
+         * 
+         * @Override public void actionPerformed(ActionEvent e) { if (((String)
+         * eventsComboBox.getSelectedItem()).equals("Events on Plot 1")) {
+         * EventModel
+         * .getSingletonInstance().setPlotIdentifier(PlotsContainerPanel
+         * .PLOT_IDENTIFIER_MASTER);
+         * EventModel.getSingletonInstance().activateEvents(); } else if
+         * (((String)
+         * eventsComboBox.getSelectedItem()).equals("Events on Plot 2")) {
+         * EventModel
+         * .getSingletonInstance().setPlotIdentifier(PlotsContainerPanel
+         * .PLOT_IDENTIFIER_SLAVE);
+         * PlotsContainerPanel.getSingletonInstance().setPlot2Visible(true);
+         * EventModel.getSingletonInstance().activateEvents(); } else if
+         * (((String) eventsComboBox.getSelectedItem()).equals("No Events")) {
+         * EventModel.getSingletonInstance().deactivateEvents(); } } });
+         */
 
+        eventsCheckBox.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                if (((String) eventsComboBox.getSelectedItem()).equals("Events on Plot 1")) {
-                    EventModel.getSingletonInstance().setPlotIdentifier(PlotsContainerPanel.PLOT_IDENTIFIER_MASTER);
+                if (eventsCheckBox.isSelected()) {
                     EventModel.getSingletonInstance().activateEvents();
-                } else if (((String) eventsComboBox.getSelectedItem()).equals("Events on Plot 2")) {
-                    EventModel.getSingletonInstance().setPlotIdentifier(PlotsContainerPanel.PLOT_IDENTIFIER_SLAVE);
-                    PlotsContainerPanel.getSingletonInstance().setPlot2Visible(true);
-                    EventModel.getSingletonInstance().activateEvents();
-                } else if (((String) eventsComboBox.getSelectedItem()).equals("No Events")) {
+                } else {
                     EventModel.getSingletonInstance().deactivateEvents();
                 }
             }
@@ -95,7 +111,9 @@ public class ControlsPanel extends JPanel implements ActionListener, LayersListe
         JPanel pageEndPanel = new JPanel();
         pageEndPanel.setBackground(Color.BLUE);
         JPanel flowPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
-        flowPanel.add(eventsComboBox);
+        // flowPanel.add(eventsComboBox);
+        flowPanel.add(eventsLabel);
+        flowPanel.add(eventsCheckBox);
         flowPanel.add(periodFromLayersButton);
         flowPanel.add(addLayerButton);
 
@@ -207,6 +225,7 @@ public class ControlsPanel extends JPanel implements ActionListener, LayersListe
 
     @Override
     public void eventsDeactivated() {
-        eventsComboBox.setSelectedItem("No Events");
+        eventsCheckBox.setSelected(false);
+        repaint();
     }
 }
