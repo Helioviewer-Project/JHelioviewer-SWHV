@@ -130,7 +130,7 @@ public class MovieExport {
             SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd'T'HHmmss");
             Date d = new Date(System.currentTimeMillis());
             String dateString = format.format(d);
-            path = "JHV_" + jpx.getName() + "__" + dateString;
+            path = "JHV_" + (jpx.getName().replace(" ", "_")) + "__" + dateString;
         } else {
             path = "JHV_movie_" + i;
         }
