@@ -65,8 +65,7 @@ public class EVEDrawableElement implements DrawableElement {
         double minValue = yAxisElement.getMinValue();
         double maxValue = yAxisElement.getMaxValue();
         if (!yAxisElement.isLogScale() || (yAxisElement.isLogScale() && minValue > 10e-50 && maxValue > 10e-50)) {
-            double ratioX = !intervalAvailable ? 0 : (double) graphArea.width
-                    / (double) (interval.getEnd().getTime() - interval.getStart().getTime());
+            double ratioX = !intervalAvailable ? 0 : (double) graphArea.width / (double) (interval.getEnd().getTime() - interval.getStart().getTime());
             double ratioY = 0.0;
             if (yAxisElement.isLogScale()) {
                 ratioY = Math.log10(maxValue) < Math.log10(minValue) ? 0 : graphArea.height / (Math.log10(maxValue) - Math.log10(minValue));
@@ -118,8 +117,7 @@ public class EVEDrawableElement implements DrawableElement {
                         final int x = computeX(eveValues[j].getDate(), interval, graphArea, ratioX);
                         int y = 0;
                         if (yAxisElement.isLogScale()) {
-                            y = computeY(Math.log10(eveValues[j].getValue().doubleValue()), interval, graphArea, ratioY,
-                                    Math.log10(minValue));
+                            y = computeY(Math.log10(eveValues[j].getValue().doubleValue()), interval, graphArea, ratioY, Math.log10(minValue));
                         } else {
                             y = computeY(eveValues[j].getValue().doubleValue(), interval, graphArea, ratioY, minValue);
                         }
@@ -192,8 +190,7 @@ public class EVEDrawableElement implements DrawableElement {
         // Methods
         // //////////////////////////////////////////////////////////////////////////
 
-        public GraphPolyline(final List<Point> points, final Color color, final List<Integer> warnLevels, final List<String> warnLabels,
-                double ratioX) {
+        public GraphPolyline(final List<Point> points, final Color color, final List<Integer> warnLevels, final List<String> warnLabels, double ratioX) {
             numberOfPoints = points.size();
             numberOfWarnLevels = warnLevels.size();
             xPoints = new ArrayList<ArrayList<Integer>>();
@@ -207,7 +204,14 @@ public class EVEDrawableElement implements DrawableElement {
             int counter = -1;
 
             Integer previousX = null;
-            for (final Point point : points) {
+            int len = points.size();
+            int jump = len / 10000;
+            if (jump == 0) {
+                jump = 1;
+            }
+            int index = 0;
+            while (index < len) {
+                Point point = points.get(index);
                 if (previousX != null) {
                     if ((point.x - previousX) != 0) {
                         // Log.debug("distance between previous and folowing x : "
@@ -222,6 +226,7 @@ public class EVEDrawableElement implements DrawableElement {
                 xPoints.get(counter).add(point.x);
                 yPoints.get(counter).add(point.y);
                 previousX = point.x;
+                index += jump;
             }
 
             for (int i = 0; i < xPoints.size(); i++) {
