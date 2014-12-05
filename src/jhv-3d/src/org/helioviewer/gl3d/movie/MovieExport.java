@@ -7,7 +7,9 @@ import java.io.OutputStream;
 import java.lang.reflect.Method;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 import java.util.TimeZone;
@@ -28,6 +30,7 @@ import org.helioviewer.jhv.layers.LayersModel;
 import org.helioviewer.jhv.resourceloader.ResourceLoader;
 import org.helioviewer.jhv.resourceloader.SystemProperties;
 import org.helioviewer.viewmodel.view.MovieView;
+import org.helioviewer.viewmodel.view.jp2view.JHVJPXView;
 
 public class MovieExport {
     int width = 640;
@@ -36,6 +39,7 @@ public class MovieExport {
     String codec = "mpeg4";
     private OutputStream ffmpegStdin;
     private Process ffmpegProcess;
+    private String filename = "";
 
     public MovieExport(int width, int height) {
         this.width = width;
@@ -73,7 +77,7 @@ public class MovieExport {
         //BufferedImage bufferedImage = new BufferedImage(width, height, BufferedImage.TYPE_3BYTE_BGR);
         /*
          * Graphics2D g2d = bufferedImage.createGraphics();
-         *
+         * 
          * g2d.drawString("Iets van text", 100, 100); g2d.dispose();
          */
         try {
@@ -119,10 +123,23 @@ public class MovieExport {
         JHVDirectory exportdir = JHVDirectory.EXPORTS;
         String exportPath = exportdir.getPath();
         int i = 0;
-        File f = new File(exportPath + "movie_" + i + ".mov");
+
+        JHVJPXView jpx = LayersModel.getSingletonInstance().getActiveView().getAdapter(JHVJPXView.class);
+        String path;
+        if (jpx != null) {
+            SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd'T'HHmmss");
+            Date d = new Date(System.currentTimeMillis());
+            String dateString = format.format(d);
+            path = "JHV_" + jpx.getName() + "__" + dateString;
+        } else {
+            path = "JHV_movie_" + i;
+        }
+        filename = exportPath + path + ".mov";
+        File f = new File(filename);
         while (f.exists()) {
             i++;
-            f = new File(exportPath + "movie_" + i + ".mov");
+            filename = exportPath + path + i + ".mov";
+            f = new File(exportPath + path + i + ".mov");
         }
 
         args.add(f.getPath());
@@ -280,5 +297,9 @@ public class MovieExport {
             Log.info("Successfully installed FFmpeg tool");
         }
         new MovieExport(640, 640);
+    }
+
+    public String getFileName() {
+        return filename;
     }
 }
