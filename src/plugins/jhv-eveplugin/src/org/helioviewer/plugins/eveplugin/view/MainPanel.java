@@ -35,7 +35,7 @@ public class MainPanel extends JPanel {
     }
 
     private void initVisualComponents() {
-        setPreferredSize(new Dimension(300, 500));
+        setPreferredSize(new Dimension(300, 250));
         setLayout(new BorderLayout());
 
         add(plotsPane, BorderLayout.CENTER);

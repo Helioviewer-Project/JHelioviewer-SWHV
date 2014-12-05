@@ -46,8 +46,6 @@ public class LineDataSelectorPanel extends JPanel implements LineDataSelectorMod
 
         final JPanel headerPane = new JPanel();
         headerPane.setLayout(new FlowLayout(FlowLayout.LEFT));
-        headerPane.add(new JLabel(plotName));
-        // headerPane.add(groupLabel);
 
         add(headerPane, BorderLayout.PAGE_START);
         add(bandsContainer, BorderLayout.CENTER);

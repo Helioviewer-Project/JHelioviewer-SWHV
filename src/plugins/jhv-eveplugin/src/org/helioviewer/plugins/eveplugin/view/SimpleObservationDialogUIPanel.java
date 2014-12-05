@@ -2,7 +2,6 @@ package org.helioviewer.plugins.eveplugin.view;
 
 import java.awt.BorderLayout;
 import java.awt.EventQueue;
-import java.awt.FlowLayout;
 import java.awt.GridLayout;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -114,13 +113,6 @@ public class SimpleObservationDialogUIPanel extends ObservationDialogPanel imple
         timePane.setBorder(BorderFactory.createTitledBorder(" Select time range of interest "));
         timePane.add(startDatePane);
         timePane.add(endDatePane);
-
-        // set up plot selection
-        plotPane.setLayout(new FlowLayout(FlowLayout.LEFT));
-        plotPane.setBorder(BorderFactory.createTitledBorder(" Choose plot where to display the data "));
-        // plotPane.add(plotComboBox);
-
-        // plotComboBox.addActionListener(this);
 
         // set basic layout
         this.setLayout(new BoxLayout(this, BoxLayout.PAGE_AXIS));
