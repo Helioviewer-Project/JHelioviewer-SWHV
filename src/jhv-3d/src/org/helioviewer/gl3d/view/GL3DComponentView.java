@@ -335,7 +335,7 @@ public class GL3DComponentView extends AbstractComponentView implements GLEventL
                 export.writeImage(screenshot);
             }
             previousScreenshot = currentScreenshot;
-            exportMovieDialog.setLabelText("Exporting frame " + currentScreenshot + " / " + maxframeno);
+            exportMovieDialog.setLabelText("Exporting frame " + (currentScreenshot + 1) + " / " + (maxframeno + 1));
             if ((!(mv instanceof JHVJPXView)) || (mv instanceof JHVJPXView && currentScreenshot == ((JHVJPXView) mv).getMaximumFrameNumber())) {
                 this.stopExport();
             }
