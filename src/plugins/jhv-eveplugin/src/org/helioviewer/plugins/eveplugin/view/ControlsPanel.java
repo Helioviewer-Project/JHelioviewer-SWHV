@@ -103,7 +103,7 @@ public class ControlsPanel extends JPanel implements ActionListener, LayersListe
         setEnabledStateOfPeriodMovieButton();
         // this.setPreferredSize(new Dimension(100, 300));
         lineDataSelectorContainer.setLayout(new BoxLayout(lineDataSelectorContainer, BoxLayout.Y_AXIS));
-        lineDataSelectorContainer.setPreferredSize(new Dimension(100, 300));
+        lineDataSelectorContainer.setPreferredSize(new Dimension(100, 150));
         this.setLayout(new BorderLayout());
 
         add(lineDataSelectorContainer, BorderLayout.CENTER);
