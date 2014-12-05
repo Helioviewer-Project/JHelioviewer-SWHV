@@ -2,7 +2,6 @@ package org.helioviewer.plugins.eveplugin.view.linedataselector;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
-import java.awt.FlowLayout;
 
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -44,10 +43,6 @@ public class LineDataSelectorPanel extends JPanel implements LineDataSelectorMod
         setLayout(new BorderLayout());
         setPreferredSize(new Dimension(200, getHeight()));
 
-        final JPanel headerPane = new JPanel();
-        headerPane.setLayout(new FlowLayout(FlowLayout.LEFT));
-
-        add(headerPane, BorderLayout.PAGE_START);
         add(bandsContainer, BorderLayout.CENTER);
         add(progressBar, BorderLayout.PAGE_END);
 
