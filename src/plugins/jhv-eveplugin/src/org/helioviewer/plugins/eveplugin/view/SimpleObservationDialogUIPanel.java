@@ -263,21 +263,23 @@ public class SimpleObservationDialogUIPanel extends ObservationDialogPanel imple
         Date beginDate = null;
         Date endDate = null;
         View nextView = LayersModel.getSingletonInstance().getLayer(LayersModel.getSingletonInstance().getActiveLayer());
-        JHVJPXView jpxView = nextView.getAdapter(JHVJPXView.class);
-        if (jpxView != null) {
-            DateTimeCache dtc = jpxView.getDateTimeCache();
-            for (int frame = 0; frame < jpxView.getMaximumFrameNumber(); frame++) {
-                ImmutableDateTime date = dtc.getDateTime(frame);
-                if (beginDate == null || date.getTime().getTime() < beginDate.getTime()) {
-                    beginDate = date.getTime();
+        if (nextView != null) {
+            JHVJPXView jpxView = nextView.getAdapter(JHVJPXView.class);
+            if (jpxView != null) {
+                DateTimeCache dtc = jpxView.getDateTimeCache();
+                for (int frame = 0; frame < jpxView.getMaximumFrameNumber(); frame++) {
+                    ImmutableDateTime date = dtc.getDateTime(frame);
+                    if (beginDate == null || date.getTime().getTime() < beginDate.getTime()) {
+                        beginDate = date.getTime();
+                    }
+                    if (endDate == null || date.getTime().getTime() > endDate.getTime()) {
+                        endDate = date.getTime();
+                    }
                 }
-                if (endDate == null || date.getTime().getTime() > endDate.getTime()) {
-                    endDate = date.getTime();
+                if (beginDate != null && endDate != null) {
+                    calendarStartDate.setDate(beginDate);
+                    calendarEndDate.setDate(endDate);
                 }
-            }
-            if (beginDate != null && endDate != null) {
-                calendarStartDate.setDate(beginDate);
-                calendarEndDate.setDate(endDate);
             }
         }
     }
