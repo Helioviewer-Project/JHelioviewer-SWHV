@@ -107,7 +107,7 @@ public class MovieExport {
         if (movieView != null) {
             framerate = movieView.getDesiredRelativeSpeed();
         }
-        if (framerate <= 0) {
+        if (framerate <= 0 || framerate > 60) {
             framerate = 20;
             Log.warn("Resetting framerate to reasonable value");
         }
@@ -119,6 +119,11 @@ public class MovieExport {
         args.add(codec);
         args.add("-qscale:v");
         args.add("1");
+        args.add("-pix_fmt");
+        args.add("yuv420p");
+        args.add("-vf");
+        args.add("scale=out_range=jpeg");
+
         args.add("-an");
         JHVDirectory exportdir = JHVDirectory.EXPORTS;
         String exportPath = exportdir.getPath();
@@ -134,19 +139,18 @@ public class MovieExport {
         } else {
             path = "JHV_movie_" + i;
         }
-        filename = exportPath + path + ".mov";
+        filename = exportPath + path + ".mp4";
         File f = new File(filename);
         while (f.exists()) {
             i++;
-            filename = exportPath + path + i + ".mov";
-            f = new File(exportPath + path + i + ".mov");
+            filename = exportPath + path + i + ".mp4";
+            f = new File(exportPath + path + i + ".mp4");
         }
 
         args.add(f.getPath());
         //args.add("/Users/freekv/test/ttt.mov");
         //[-f, image2pipe, -vcodec, bmp, -s, 640x640, -r, 20, -y, -i, -, -vcodec, mpeg4, -qscale:v, 1, -an, /Users/freekv/JHelioviewer/Exports/JHV_movie_created_2014-09-22_19.14.23.mov]
         try {
-
             ffmpegProcess = FileUtils.invokeExecutable("ffmpeg", args);
             ffmpegStdin = ffmpegProcess.getOutputStream();
 
