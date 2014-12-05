@@ -35,7 +35,6 @@ public class LineDataListEntry extends JPanel implements MouseListener {
     private final JLabel titleLabel = new JLabel();
     private final JLabel removeLabel = new JLabel();
 
-
     // //////////////////////////////////////////////////////////////////////////////
     // Methods
     // //////////////////////////////////////////////////////////////////////////////
@@ -62,14 +61,14 @@ public class LineDataListEntry extends JPanel implements MouseListener {
 
         final JPanel westPane = new JPanel();
         westPane.setLayout(new BorderLayout());
-        westPane.setBorder(BorderFactory.createEmptyBorder(0, 5, 0, 5));
+        westPane.setBorder(BorderFactory.createEmptyBorder(0, 0, 0, 0));
         westPane.setOpaque(false);
         westPane.add(visibilityLabel, BorderLayout.WEST);
         westPane.add(downloadPane, BorderLayout.EAST);
 
         final JPanel eastPane = new JPanel();
         eastPane.setLayout(new BorderLayout());
-        eastPane.setBorder(BorderFactory.createEmptyBorder(0, 5, 0, 5));
+        eastPane.setBorder(BorderFactory.createEmptyBorder(0, 0, 0, 0));
         eastPane.setOpaque(false);
         eastPane.add(removeLabel, BorderLayout.EAST);
 
@@ -118,6 +117,7 @@ public class LineDataListEntry extends JPanel implements MouseListener {
     // Mouse Listener
     // //////////////////////////////////////////////////////////////////////////////
 
+    @Override
     public void mouseClicked(MouseEvent arg0) {
         if (arg0.getSource() == visibilityLabel) {
             element.setVisibility(!element.isVisible());
@@ -129,15 +129,19 @@ public class LineDataListEntry extends JPanel implements MouseListener {
         }
     }
 
+    @Override
     public void mouseEntered(MouseEvent arg0) {
     }
 
+    @Override
     public void mouseExited(MouseEvent arg0) {
     }
 
+    @Override
     public void mousePressed(MouseEvent arg0) {
     }
 
+    @Override
     public void mouseReleased(MouseEvent arg0) {
     }
 
