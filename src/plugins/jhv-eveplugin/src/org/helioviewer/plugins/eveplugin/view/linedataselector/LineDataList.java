@@ -21,7 +21,11 @@ public class LineDataList extends JPanel implements LineDataSelectorModelListene
 
     private static final long serialVersionUID = 1L;
 
-    private static final Color[] bandColors = { new Color(0, 0, 0), new Color(31, 26, 178), new Color(242, 159, 5), new Color(19, 137, 0), new Color(140, 64, 47), new Color(199, 0, 125), new Color(197, 230, 231), new Color(242, 92, 5), new Color(217, 37, 37), new Color(136, 166, 27), new Color(129, 0, 81), new Color(217, 136, 75), new Color(48, 110, 115), new Color(178, 156, 133), new Color(255, 83, 53), new Color(242, 209, 110), new Color(201, 255, 237), new Color(14, 61, 89), new Color(89, 115, 88), new Color(178, 3, 33), new Color(206, 224, 200), new Color(59, 66, 76), new Color(219, 108, 124) };
+    private static final Color[] bandColors = { new Color(0, 0, 0), new Color(31, 26, 178), new Color(242, 159, 5), new Color(19, 137, 0),
+            new Color(140, 64, 47), new Color(199, 0, 125), new Color(197, 230, 231), new Color(242, 92, 5), new Color(217, 37, 37),
+            new Color(136, 166, 27), new Color(129, 0, 81), new Color(217, 136, 75), new Color(48, 110, 115), new Color(178, 156, 133),
+            new Color(255, 83, 53), new Color(242, 209, 110), new Color(201, 255, 237), new Color(14, 61, 89), new Color(89, 115, 88),
+            new Color(178, 3, 33), new Color(206, 224, 200), new Color(59, 66, 76), new Color(219, 108, 124) };
 
     private final String identifier;
 
@@ -29,7 +33,7 @@ public class LineDataList extends JPanel implements LineDataSelectorModelListene
     private final Color selectionForegroundColor = new JList().getSelectionForeground();
     private final LinkedList<LineDataListEntry> entryList = new LinkedList<LineDataListEntry>();
 
-    private LineDataSelectorModel model;
+    private final LineDataSelectorModel model;
 
     // //////////////////////////////////////////////////////////////////////////////
     // Methods
@@ -45,6 +49,7 @@ public class LineDataList extends JPanel implements LineDataSelectorModelListene
 
     private void initVisualComponents() {
         setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
+        setBackground(Color.WHITE);
     }
 
     private void refillListEntries() {
@@ -61,8 +66,9 @@ public class LineDataList extends JPanel implements LineDataSelectorModelListene
     }
 
     private void removeEntry(final Band band) {
-        if (band == null)
+        if (band == null) {
             return;
+        }
 
         for (int i = 0; i < entryList.size(); i++) {
             final LineDataListEntry entry = entryList.get(i);
@@ -91,8 +97,9 @@ public class LineDataList extends JPanel implements LineDataSelectorModelListene
     }
 
     public void selectItem(final LineDataSelectorElement element) {
-        if (element == null)
+        if (element == null) {
             return;
+        }
 
         for (int i = 0; i < entryList.size(); i++) {
             final LineDataListEntry entry = entryList.get(i);
@@ -110,8 +117,9 @@ public class LineDataList extends JPanel implements LineDataSelectorModelListene
     public void selectItem(final int index) {
         final int itemCount = entryList.size();
 
-        if (itemCount == 0)
+        if (itemCount == 0) {
             return;
+        }
 
         final int pos = Math.max(0, Math.min(itemCount - 1, index));
 
@@ -195,7 +203,7 @@ public class LineDataList extends JPanel implements LineDataSelectorModelListene
     @Override
     public void lineDataRemoved(LineDataSelectorElement element) {
         LineDataListEntry toRemove = null;
-        if (this.identifier.equals(element.getPlotIdentifier()) && element != null) {
+        if (identifier.equals(element.getPlotIdentifier()) && element != null) {
             for (final LineDataListEntry entry : entryList) {
                 if (entry.getLineDataSelectorElement().equals(element)) {
                     entry.updateVisualComponentValues();
