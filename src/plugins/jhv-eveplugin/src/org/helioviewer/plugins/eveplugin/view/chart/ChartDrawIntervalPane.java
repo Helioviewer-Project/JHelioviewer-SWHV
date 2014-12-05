@@ -66,9 +66,9 @@ public class ChartDrawIntervalPane extends JComponent implements ZoomControllerL
     private final EVEState eveState;
 
     private static final Cursor closedHandCursor = Toolkit.getDefaultToolkit().createCustomCursor(
-            IconBank.getIcon(JHVIcon.CLOSED_HAND).getImage(), new Point(9, 9), IconBank.getIcon(JHVIcon.CLOSED_HAND).toString());
+            IconBank.getIcon(JHVIcon.CLOSED_HAND).getImage(), new Point(16, 0), IconBank.getIcon(JHVIcon.CLOSED_HAND).toString());
     private static final Cursor openHandCursor = Toolkit.getDefaultToolkit().createCustomCursor(
-            IconBank.getIcon(JHVIcon.OPEN_HAND).getImage(), new Point(9, 9), IconBank.getIcon(JHVIcon.OPEN_HAND).toString());
+            IconBank.getIcon(JHVIcon.OPEN_HAND).getImage(), new Point(16, 0), IconBank.getIcon(JHVIcon.OPEN_HAND).toString());
 
     // //////////////////////////////////////////////////////////////////////////////
     // Methods
