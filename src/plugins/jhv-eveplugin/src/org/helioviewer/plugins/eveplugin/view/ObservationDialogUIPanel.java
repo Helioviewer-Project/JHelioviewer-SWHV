@@ -3,6 +3,7 @@ package org.helioviewer.plugins.eveplugin.view;
 import java.awt.EventQueue;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
@@ -28,7 +29,7 @@ import org.helioviewer.plugins.eveplugin.view.plot.PlotsContainerPanel;
 /**
  * @author Stephan Pagel
  * */
-public class ObservationDialogUIPanel extends SimpleObservationDialogUIPanel {
+public class ObservationDialogUIPanel extends SimpleObservationDialogUIPanel implements ActionListener {
 
     // //////////////////////////////////////////////////////////////////////////////
     // Definitions
@@ -94,8 +95,7 @@ public class ObservationDialogUIPanel extends SimpleObservationDialogUIPanel {
         final BandController bandController = BandController.getSingletonInstance();
         final DefaultComboBoxModel model = (DefaultComboBoxModel) comboBoxData.getModel();
         final BandGroup selectedGroup = (BandGroup) comboBoxGroup.getSelectedItem();
-        final String identifier = super.getPlotComboBoxSelectedIndex() == 0 ? PlotsContainerPanel.PLOT_IDENTIFIER_MASTER
-                : PlotsContainerPanel.PLOT_IDENTIFIER_SLAVE;
+        final String identifier = PlotsContainerPanel.PLOT_IDENTIFIER_MASTER;
         final BandType[] values = BandTypeAPI.getSingletonInstance().getBandTypes(selectedGroup);
 
         model.removeAllElements();
@@ -146,8 +146,7 @@ public class ObservationDialogUIPanel extends SimpleObservationDialogUIPanel {
     private void updateBandController() {
         final BandController bandController = BandController.getSingletonInstance();
 
-        final String identifier = plotComboBox.getSelectedIndex() == 0 ? PlotsContainerPanel.PLOT_IDENTIFIER_MASTER
-                : PlotsContainerPanel.PLOT_IDENTIFIER_SLAVE;
+        final String identifier = PlotsContainerPanel.PLOT_IDENTIFIER_MASTER;
         final BandGroup group = (BandGroup) comboBoxGroup.getSelectedItem();
         final BandType bandType = (BandType) comboBoxData.getSelectedItem();
         bandType.setDataDownloader(EVECacheController.getSingletonInstance());
@@ -175,8 +174,6 @@ public class ObservationDialogUIPanel extends SimpleObservationDialogUIPanel {
 
         // setStartDate(interval.getStart());
         // setEndDate(calendar.getTime());
-
-        plotComboBox.setSelectedIndex(0);
     }
 
     @Override
@@ -201,8 +198,6 @@ public class ObservationDialogUIPanel extends SimpleObservationDialogUIPanel {
     public void actionPerformed(final ActionEvent e) {
         if (e.getSource().equals(comboBoxGroup)) {
             updateGroupValues();
-        } else {
-            super.actionPerformed(e);
         }
     }
 }
