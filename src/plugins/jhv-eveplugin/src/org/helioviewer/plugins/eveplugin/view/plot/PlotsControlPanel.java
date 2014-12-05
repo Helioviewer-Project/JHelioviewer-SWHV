@@ -113,6 +113,7 @@ public class PlotsControlPanel extends JPanel implements ZoomControllerListener,
         final DefaultComboBoxModel model = (DefaultComboBoxModel) zoomComboBox.getModel();
         model.removeAllElements();
 
+        model.addElement(new ZoomComboboxItem(ZOOM.CUSTOM, 0));
         model.addElement(new ZoomComboboxItem(ZOOM.All, 0));
 
         addElementToModel(model, startDate, interval, Calendar.YEAR, 10, ZOOM.Year);
