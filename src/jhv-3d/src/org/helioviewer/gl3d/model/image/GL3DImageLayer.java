@@ -84,7 +84,6 @@ public abstract class GL3DImageLayer extends GL3DGroup implements GL3DCameraList
         if (this.imageTextureView == null) {
             throw new IllegalStateException("Cannot create GL3DImageLayer when no GL3DImageTextureView is present in Layer");
         }
-        this.imageTextureView.setImageLayer(this);
 
         this.metaDataView = this.mainLayerView.getAdapter(MetaDataView.class);
         if (this.metaDataView == null) {
@@ -116,7 +115,7 @@ public abstract class GL3DImageLayer extends GL3DGroup implements GL3DCameraList
 
         this.doUpdateROI = true;
         this.markAsChanged();
-        //updateROI(state.getActiveCamera());
+        updateROI(state.getActiveCamera());
 
         state.getActiveCamera().updateCameraTransformation();
     }
@@ -129,7 +128,7 @@ public abstract class GL3DImageLayer extends GL3DGroup implements GL3DCameraList
     public void shapeUpdate(GL3DState state) {
         super.shapeUpdate(state);
         // Log.debug("GL3DImageLayer: '"+getName()+" is updating its ROI");
-        //this.updateROI(state.getActiveCamera());
+        this.updateROI(state.getActiveCamera());
         doUpdateROI = false;
         this.accellerationShape.setUnchanged();
     }
@@ -233,17 +232,6 @@ public abstract class GL3DImageLayer extends GL3DGroup implements GL3DCameraList
                 }
             }
         }
-        //Increase computed region artificially
-        //Until here
-
-        if (minPhysicalX < metaData.getPhysicalLowerLeft().getX())
-            minPhysicalX = metaData.getPhysicalLowerLeft().getX();
-        if (minPhysicalY < metaData.getPhysicalLowerLeft().getY())
-            minPhysicalY = metaData.getPhysicalLowerLeft().getY();
-        if (maxPhysicalX > metaData.getPhysicalUpperRight().getX())
-            maxPhysicalX = metaData.getPhysicalUpperRight().getX();
-        if (maxPhysicalY > metaData.getPhysicalUpperRight().getY())
-            maxPhysicalY = metaData.getPhysicalUpperRight().getY();
 
         double widthxAdd = Math.abs((maxPhysicalX - minPhysicalX) * 0.1);
         double widthyAdd = Math.abs((maxPhysicalY - minPhysicalY) * 0.1);
@@ -294,7 +282,7 @@ public abstract class GL3DImageLayer extends GL3DGroup implements GL3DCameraList
     @Override
     public void viewChanged(View sender, ChangeEvent aEvent) {
         if (Displayer.getSingletonInstance().getState() == Displayer.STATE3D) {
-            //this.updateROI(GL3DState.get().getActiveCamera());
+            this.updateROI(GL3DState.get().getActiveCamera());
         }
     }
 
