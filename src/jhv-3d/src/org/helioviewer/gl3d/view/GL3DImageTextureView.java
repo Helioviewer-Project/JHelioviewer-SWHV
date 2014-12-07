@@ -9,7 +9,6 @@ import org.helioviewer.base.math.Vector2dDouble;
 import org.helioviewer.base.physics.Astronomy;
 import org.helioviewer.base.physics.Constants;
 import org.helioviewer.gl3d.changeevent.ImageTextureRecapturedReason;
-import org.helioviewer.gl3d.model.image.GL3DImageLayer;
 import org.helioviewer.gl3d.model.image.GL3DImageMesh;
 import org.helioviewer.gl3d.scenegraph.GL3DState;
 import org.helioviewer.gl3d.shader.GL3DImageFragmentShaderProgram;
@@ -65,6 +64,8 @@ public class GL3DImageTextureView extends AbstractGL3DView implements GL3DView, 
     public double minZ = 0.0;
     public double maxZ = Constants.SunRadius;
     private final GL3DImageFragmentShaderProgram fragmentShader = new GL3DImageFragmentShaderProgram();
+    public double phi = 0.0;
+    public double theta = 0.0;
 
     @Override
     public void renderGL(GL2 gl, boolean nextView) {
@@ -185,10 +186,6 @@ public class GL3DImageTextureView extends AbstractGL3DView implements GL3DView, 
         return region;
     }
 
-    public double phi = 0.0;
-    public double theta = 0.0;
-    private GL3DImageLayer gl3dImageLayer;
-
     @Override
     protected void setViewSpecificImplementation(View newView, ChangeEvent changeEvent) {
         newView.addViewListener(new ViewListener() {
@@ -237,13 +234,5 @@ public class GL3DImageTextureView extends AbstractGL3DView implements GL3DView, 
 
     public GL3DImageFragmentShaderProgram getFragmentShader() {
         return this.fragmentShader;
-    }
-
-    public void setImageLayer(GL3DImageLayer gl3dImageLayer) {
-        this.gl3dImageLayer = gl3dImageLayer;
-    }
-
-    public GL3DImageLayer getImageLayer() {
-        return this.gl3dImageLayer;
     }
 }

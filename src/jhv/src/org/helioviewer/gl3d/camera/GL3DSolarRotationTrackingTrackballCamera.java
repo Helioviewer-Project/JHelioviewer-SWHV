@@ -11,8 +11,6 @@ import org.helioviewer.gl3d.scenegraph.visuals.GL3DGrid;
 import org.helioviewer.gl3d.view.GL3DSceneGraphView;
 import org.helioviewer.gl3d.wcs.CoordinateSystem;
 import org.helioviewer.gl3d.wcs.HeliocentricCartesian2000CoordinateSystem;
-import org.helioviewer.viewmodel.changeevent.ChangeEvent;
-import org.helioviewer.viewmodel.view.View;
 
 /**
  * The trackball camera provides a trackball rotation behavior (
@@ -146,6 +144,4 @@ public class GL3DSolarRotationTrackingTrackballCamera extends GL3DCamera {
         return sceneGraphView;
     }
 
-    public void viewChanged(View sender, ChangeEvent aEvent) {
-    }
 }

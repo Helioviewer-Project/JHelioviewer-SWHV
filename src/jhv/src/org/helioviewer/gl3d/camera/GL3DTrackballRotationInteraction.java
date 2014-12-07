@@ -49,7 +49,7 @@ public class GL3DTrackballRotationInteraction extends GL3DDefaultInteraction {
         this.currentRotationEndPoint = null;
 
         camera.fireCameraMoved();
-        Displayer.getSingletonInstance().render();
+        Displayer.getSingletonInstance().display();
 
     }
 
