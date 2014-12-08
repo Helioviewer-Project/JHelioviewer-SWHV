@@ -3,6 +3,7 @@ package org.helioviewer.viewmodel.view.opengl;
 import javax.media.opengl.GL2;
 
 import org.helioviewer.base.physics.Constants;
+import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.viewmodel.changeevent.ChangeEvent;
 import org.helioviewer.viewmodel.metadata.HelioviewerMetaData;
 import org.helioviewer.viewmodel.metadata.HelioviewerOcculterMetaData;
@@ -20,37 +21,44 @@ import org.helioviewer.viewmodel.view.opengl.shader.GLVertexShaderView;
 
 /**
  * Implementation of HelioviewGeometryView for rendering in OpenGL mode.
- * 
+ *
  * <p>
  * This class provides vertex- and fragment shader blocks to cut away invalid
  * parts of solar images. It does so by calculating the distance from the center
  * for every single pixel on the screen. If the distance is outside the valid
  * area of that specific image, its alpha value is set to zero, otherwise it
  * remains untouched.
- * 
+ *
  * <p>
  * For further information about the role of the HelioviewerGeometryView within
  * the view chain, see
  * {@link org.helioviewer.viewmodel.view.HelioviewerGeometryView}
- * 
+ *
  * @author Markus Langenberg
  */
 public class GLHelioviewerGeometryView extends AbstractGLView implements HelioviewerGeometryView, GLFragmentShaderView, GLVertexShaderView {
 
     GeometryVertexShaderProgram vertexShader = new GeometryVertexShaderProgram();
     GeometryFragmentShaderProgram fragmentShader = new GeometryFragmentShaderProgram();
+    private final boolean test;
+
+    public GLHelioviewerGeometryView() {
+        this.test = true;
+    }
 
     /**
      * {@inheritDoc}
-     * 
+     *
      * In this case, does nothing.
      */
+    @Override
     protected void setViewSpecificImplementation(View newView, ChangeEvent changeEvent) {
     }
 
     /**
      * {@inheritDoc}
      */
+    @Override
     public void renderGL(GL2 gl, boolean nextView) {
         gl.glEnable(GL2.GL_FRAGMENT_PROGRAM_ARB);
         gl.glEnable(GL2.GL_VERTEX_PROGRAM_ARB);
@@ -72,19 +80,21 @@ public class GLHelioviewerGeometryView extends AbstractGLView implements Heliovi
     /**
      * {@inheritDoc}
      */
+    @Override
     public GLShaderBuilder buildFragmentShader(GLShaderBuilder shaderBuilder) {
         GLFragmentShaderView nextView = view.getAdapter(GLFragmentShaderView.class);
         if (nextView != null) {
             shaderBuilder = nextView.buildFragmentShader(shaderBuilder);
         }
 
-        // fragmentShader.build(shaderBuilder);
+        fragmentShader.build(shaderBuilder);
         return shaderBuilder;
     }
 
     /**
      * {@inheritDoc}
      */
+    @Override
     public GLShaderBuilder buildVertexShader(GLShaderBuilder shaderBuilder) {
         GLVertexShaderView nextView = view.getAdapter(GLVertexShaderView.class);
         if (nextView != null) {
@@ -98,7 +108,7 @@ public class GLHelioviewerGeometryView extends AbstractGLView implements Heliovi
     /**
      * Private class representing a fragment shader block capable to cut out
      * invalid parts of solar images.
-     * 
+     *
      * <p>
      * Since branching (=using if statements) is not supported on most graphics
      * cards, the decision whether to set the alpha value to zero or leave it
@@ -106,11 +116,11 @@ public class GLHelioviewerGeometryView extends AbstractGLView implements Heliovi
      * disc images, the current alpha value of the pixel is multiplied with a
      * shifted and mirrored step function. For occulter images, a shifted and a
      * shifted and mirrored step function are used.
-     * 
+     *
      * <p>
      * The physical position is provides in the third texture coordinate by the
      * {@link GeometryVertexShaderProgram}.
-     * 
+     *
      * <p>
      * For further information about how to build shaders, see
      * {@link org.helioviewer.viewmodel.view.opengl.shader.GLShaderBuilder} as
@@ -128,6 +138,7 @@ public class GLHelioviewerGeometryView extends AbstractGLView implements Heliovi
         /**
          * {@inheritDoc}
          */
+        @Override
         protected void buildImpl(GLShaderBuilder shaderBuilder) {
 
             MetaData metaData = view.getAdapter(MetaDataView.class).getMetaData();
@@ -150,8 +161,9 @@ public class GLHelioviewerGeometryView extends AbstractGLView implements Heliovi
                     program = program.replace("innerRadius", Double.toString(hvMetaData.getInnerPhysicalOcculterRadius() * roccInnerFactor).replace(',', '.'));
                     program = program.replace("outerRadius", Double.toString(hvMetaData.getOuterPhysicalOcculterRadius() * roccOuterFactor).replace(',', '.'));
                     program = program.replace("flatDist", Double.toString(hvMetaData.getPhysicalFlatOcculterSize()).replace(',', '.'));
-
-                    // shaderBuilder.addMainFragment(program);
+                    if (Displayer.getSingletonInstance().getState() == Displayer.STATE2D) {
+                        shaderBuilder.addMainFragment(program);
+                    }
                 } catch (GLBuildShaderException e) {
                     e.printStackTrace();
                 }
@@ -170,7 +182,9 @@ public class GLHelioviewerGeometryView extends AbstractGLView implements Heliovi
                         program = program.replace("physicalPosition", shaderBuilder.useStandardParameter("float4", "TEXCOORD0"));
                         program = program.replace("sunRadius", Double.toString(Constants.SunRadius * discFactor).replace(',', '.'));
 
-                        // shaderBuilder.addMainFragment(program);
+                        if (Displayer.getSingletonInstance().getState() == Displayer.STATE2D) {
+                            shaderBuilder.addMainFragment(program);
+                        }
                     } catch (GLBuildShaderException e) {
                         e.printStackTrace();
                     }
@@ -188,20 +202,21 @@ public class GLHelioviewerGeometryView extends AbstractGLView implements Heliovi
                         program = program.replace("sunRadius", Double.toString(Constants.SunRadius).replace(',', '.'));
                         program = program.replace("fadedSunRadius", Double.toString(Constants.SunRadius * discFadingFactor).replace(',', '.'));
 
-                        shaderBuilder.addMainFragment(program);
+                        if (Displayer.getSingletonInstance().getState() == Displayer.STATE2D) {
+                            shaderBuilder.addMainFragment(program);
+                        }
                     } catch (GLBuildShaderException e) {
                         e.printStackTrace();
                     }
                 }
             }
-            System.out.println("GLHELGEOM" + shaderBuilder.getCode());
         }
     }
 
     /**
      * Private class representing a vertex shader block, providing information
      * necessary cutting out invalid areas of solar images.
-     * 
+     *
      * <p>
      * To decide, whether a pixel belongs to an invalid area or not, it needs
      * the physical position of the pixel. From within the view chain, this is
@@ -216,6 +231,7 @@ public class GLHelioviewerGeometryView extends AbstractGLView implements Heliovi
         /**
          * {@inheritDoc}
          */
+        @Override
         protected void buildImpl(GLShaderBuilder shaderBuilder) {
             try {
                 String program = "\toutput.zw = physicalPosition.xy;";
