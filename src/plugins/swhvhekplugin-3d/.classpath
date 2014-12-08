@@ -4,10 +4,7 @@
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.6"/>
 	<classpathentry kind="src" path="/base"/>
 	<classpathentry kind="lib" path="resources"/>
-	<classpathentry kind="lib" path="lib/poly2tri-core.jar"/>
-	<classpathentry kind="lib" path="lib/slf4j-api-1.6.1.jar"/>
-	<classpathentry kind="lib" path="lib/slf4j-log4j12-1.6.1.jar"/>
-	<classpathentry kind="lib" path="lib/json.jar"/>
+	<classpathentry kind="lib" path="../lib/json.jar"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/basegui"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/viewmodel"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/viewmodelplugin"/>
@@ -18,8 +15,7 @@
 	<classpathentry combineaccessrules="false" kind="src" path="/jhv"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/jhv-3d"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/jhv-display"/>
-	<classpathentry kind="lib" path="lib/gluegen-rt.jar"/>
-	<classpathentry kind="lib" path="lib/jogl.jar"/>
+	<classpathentry kind="lib" path="../lib/gluegen-rt.jar"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/jhv-data"/>
 	<classpathentry kind="lib" path="../lib/jogl.jar">
 		<attributes>
