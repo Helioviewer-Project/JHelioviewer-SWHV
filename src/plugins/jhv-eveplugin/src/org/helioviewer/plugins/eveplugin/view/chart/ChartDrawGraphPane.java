@@ -15,6 +15,8 @@ import java.awt.event.KeyListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseWheelEvent;
 import java.awt.event.MouseWheelListener;
+import java.awt.event.WindowEvent;
+import java.awt.event.WindowFocusListener;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
@@ -32,9 +34,11 @@ import javax.swing.ImageIcon;
 import javax.swing.JComponent;
 import javax.swing.event.MouseInputListener;
 
+import org.helioviewer.base.logging.Log;
 import org.helioviewer.base.math.Interval;
 import org.helioviewer.jhv.data.datatype.event.JHVEvent;
 import org.helioviewer.jhv.data.guielements.SWEKEventInformationDialog;
+import org.helioviewer.jhv.gui.ImageViewerGui;
 import org.helioviewer.plugins.eveplugin.EVEPlugin;
 import org.helioviewer.plugins.eveplugin.controller.DrawController;
 import org.helioviewer.plugins.eveplugin.controller.DrawControllerListener;
@@ -57,7 +61,7 @@ import org.helioviewer.viewmodel.view.jp2view.datetime.ImmutableDateTime;
  * @author Stephan Pagel
  * */
 public class ChartDrawGraphPane extends JComponent implements MouseInputListener, ComponentListener, DrawControllerListener,
-        ChartModelListener, MouseWheelListener, KeyListener {
+        ChartModelListener, MouseWheelListener, KeyListener, WindowFocusListener {
 
     // //////////////////////////////////////////////////////////////////////////////
     // Definitions
@@ -108,6 +112,7 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
         chartModel.addChartModelListener(this);
         plotAreaSpaceManager = PlotAreaSpaceManager.getInstance();
         eventModel = EventModel.getSingletonInstance();
+        ImageViewerGui.getMainFrame().addWindowFocusListener(this);
     }
 
     private void initVisualComponents() {
@@ -163,7 +168,7 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
             Graphics2D gleftAxisPart = leftAxisPart.createGraphics();
             gleftAxisPart.setTransform(tf);
             drawData(gplotPart, g, gleftAxisPart);
-            drawZoomBox(g);
+            // drawZoomBox(g);
         }
         this.repaint();
         // Log.info("Run time: " + (System.currentTimeMillis() - start));
@@ -205,25 +210,6 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
     private void drawBackground(final Graphics2D g) {
         g.setColor(ChartConstants.SELECTED_INTERVAL_BACKGROUND_COLOR);
         g.fillRect(0, 0, getWidth(), getHeight());
-        if (mousePressedPosition != null && mouseDragPosition != null) {
-            g.setColor(ChartConstants.UNSELECTED_AREA_COLOR);
-            g.fillRect(graphArea.x, graphArea.y, graphArea.width, graphArea.height);
-        }
-    }
-
-    private void drawZoomBox(final Graphics2D g) {
-        if (mousePressedPosition == null || mouseDragPosition == null || mousePressedOnMovieFrame) {
-            return;
-        }
-
-        final int x = mousePressedPosition.x < mouseDragPosition.x ? mousePressedPosition.x : mouseDragPosition.x;
-        final int y = mousePressedPosition.y < mouseDragPosition.y ? mousePressedPosition.y : mouseDragPosition.y;
-        final int width = Math.abs(mouseDragPosition.x - mousePressedPosition.x);
-        final int height = Math.abs(mouseDragPosition.y - mousePressedPosition.y);
-
-        // g.setColor(ChartConstants.SELECTED_INTERVAL_BACKGROUND_COLOR);
-        g.setColor(Color.BLUE);
-        g.drawRect(x, y, width, height);
     }
 
     private void drawLabels(final Graphics2D g) {
@@ -464,45 +450,6 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
         g.drawLine(movieLinePosition, graphArea.y, movieLinePosition, graphArea.y + graphArea.height);
     }
 
-    private void zoomFromZoomBox() {
-        if (mousePressedPosition == null || mouseDragPosition == null) {
-            return;
-        }
-
-        final int x0 = Math.max(graphArea.x, Math.min(graphArea.x + graphArea.width, mousePressedPosition.x));
-        final int y0 = Math.max(graphArea.y, Math.min(graphArea.y + graphArea.height, mousePressedPosition.y));
-        final int x1 = Math.max(graphArea.x, Math.min(graphArea.x + graphArea.width, mouseDragPosition.x));
-        final int y1 = Math.max(graphArea.y, Math.min(graphArea.y + graphArea.height, mouseDragPosition.y));
-        if (!(x0 == x1 || y0 == y1)) {
-            List<PlotAreaSpace> pass = new ArrayList<PlotAreaSpace>();
-            Map<PlotAreaSpace, Double> minTime = new HashMap<PlotAreaSpace, Double>();
-            Map<PlotAreaSpace, Double> maxTime = new HashMap<PlotAreaSpace, Double>();
-            for (PlotAreaSpace pas : plotAreaSpaceManager.getAllPlotAreaSpaces()) {
-                pass.add(pas);
-                double ratioTime = graphArea.width / (pas.getScaledSelectedMaxTime() - pas.getScaledSelectedMinTime());
-
-                double startTime = pas.getScaledSelectedMinTime() + (Math.min(x0, x1) - graphArea.x) / ratioTime;
-                double endTime = pas.getScaledSelectedMinTime() + (Math.max(x0, x1) - graphArea.x) / ratioTime;
-
-                minTime.put(pas, startTime);
-                maxTime.put(pas, endTime);
-            }
-            for (PlotAreaSpace pas : pass) {
-                pas.setScaledSelectedTime(minTime.get(pas), maxTime.get(pas), false);
-            }
-
-            PlotAreaSpace myPlotAreaSpace = plotAreaSpaceManager.getPlotAreaSpace(identifier);
-            double ratioValue = graphArea.height
-                    / (myPlotAreaSpace.getScaledSelectedMaxValue() - myPlotAreaSpace.getScaledSelectedMinValue());
-            double startValue = (graphArea.y + graphArea.height - Math.max(y0, y1)) / ratioValue
-                    + myPlotAreaSpace.getScaledSelectedMinValue();
-            double endValue = (graphArea.y + graphArea.height - Math.min(y0, y1)) / ratioValue
-                    + myPlotAreaSpace.getScaledSelectedMinValue();
-
-            myPlotAreaSpace.setScaledSelectedValue(startValue, endValue, false);
-        }
-    }
-
     private void updateGraphArea() {
         if (drawController.getYAxisElements(identifier).size() >= 2) {
             twoYAxis = 1;
@@ -621,20 +568,42 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
 
     @Override
     public void mouseReleased(final MouseEvent e) {
-        boolean repaintFlag = false;
 
         if (mousePressedPosition != null && mouseDragPosition != null && !mousePressedOnMovieFrame) {
-            zoomFromZoomBox();
-            repaintFlag = true;
+            PlotAreaSpace myPlotAreaSpace = plotAreaSpaceManager.getPlotAreaSpace(identifier);
+            final int mouseX = e.getX();
+            final int mouseY = e.getY();
+            double distanceX = -1 * (mouseX - mousePressedPosition.x);
+            double distanceY = mouseY - mousePressedPosition.y;
+            double ratioTime = graphArea.width / (myPlotAreaSpace.getScaledSelectedMaxTime() - myPlotAreaSpace.getScaledSelectedMinTime());
+            double ratioValue = graphArea.height
+                    / (myPlotAreaSpace.getScaledSelectedMaxValue() - myPlotAreaSpace.getScaledSelectedMinValue());
+            double startValue = myPlotAreaSpace.getScaledSelectedMinValue() + distanceY / ratioValue;
+            double startTime = myPlotAreaSpace.getScaledSelectedMinTime() + distanceX / ratioTime;
+            double endValue = startValue + graphArea.height / ratioValue;
+            double endTime = startTime + graphArea.width / ratioTime;
+            if (startTime < myPlotAreaSpace.getScaledMinTime()) {
+                startTime = myPlotAreaSpace.getScaledMinTime();
+                endTime = startTime + graphArea.width / ratioTime;
+            }
+            if (startValue < myPlotAreaSpace.getScaledMinValue()) {
+                startValue = myPlotAreaSpace.getScaledMinValue();
+                endValue = startValue + graphArea.height / ratioValue;
+            }
+            if (endValue > myPlotAreaSpace.getScaledMaxValue()) {
+                endValue = myPlotAreaSpace.getScaledMaxValue();
+                startValue = endValue - graphArea.height / ratioValue;
+            }
+            if (endTime > myPlotAreaSpace.getScaledMaxTime()) {
+                endTime = myPlotAreaSpace.getScaledMaxTime();
+                startTime = endTime - graphArea.width / ratioTime;
+            }
+            myPlotAreaSpace.setScaledSelectedTimeAndValue(startTime, endTime, startValue, endValue);
         }
 
         mousePressedPosition = null;
         mouseDragPosition = null;
 
-        if (repaintFlag) {
-            updateGraph();
-            repaint();
-        }
     }
 
     @Override
@@ -646,9 +615,39 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
         }
 
         if (mousePressedPosition != null && !mousePressedOnMovieFrame) {
-            updateGraph();
-            repaint();
+            // updateGraph();
+            // repaint();
+            PlotAreaSpace myPlotAreaSpace = plotAreaSpaceManager.getPlotAreaSpace(identifier);
+            final int mouseX = e.getX();
+            final int mouseY = e.getY();
+            double distanceX = -1 * (mouseX - mousePressedPosition.x);
+            double distanceY = mouseY - mousePressedPosition.y;
+            double ratioTime = graphArea.width / (myPlotAreaSpace.getScaledSelectedMaxTime() - myPlotAreaSpace.getScaledSelectedMinTime());
+            double ratioValue = graphArea.height
+                    / (myPlotAreaSpace.getScaledSelectedMaxValue() - myPlotAreaSpace.getScaledSelectedMinValue());
+            double startValue = myPlotAreaSpace.getScaledSelectedMinValue() + distanceY / ratioValue;
+            double startTime = myPlotAreaSpace.getScaledSelectedMinTime() + distanceX / ratioTime;
+            double endValue = startValue + graphArea.height / ratioValue;
+            double endTime = startTime + graphArea.width / ratioTime;
+            if (startTime < myPlotAreaSpace.getScaledMinTime()) {
+                startTime = myPlotAreaSpace.getScaledMinTime();
+                endTime = startTime + graphArea.width / ratioTime;
+            }
+            if (startValue < myPlotAreaSpace.getScaledMinValue()) {
+                startValue = myPlotAreaSpace.getScaledMinValue();
+                endValue = startValue + graphArea.height / ratioValue;
+            }
+            if (endValue > myPlotAreaSpace.getScaledMaxValue()) {
+                endValue = myPlotAreaSpace.getScaledMaxValue();
+                startValue = endValue - graphArea.height / ratioValue;
+            }
+            if (endTime > myPlotAreaSpace.getScaledMaxTime()) {
+                endTime = myPlotAreaSpace.getScaledMaxTime();
+                startTime = endTime - graphArea.width / ratioTime;
+            }
+            myPlotAreaSpace.setScaledSelectedTimeAndValue(startTime, endTime, startValue, endValue);
         }
+        mousePressedPosition = e.getPoint();
     }
 
     @Override
@@ -885,13 +884,26 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
 
     @Override
     public void keyPressed(KeyEvent e) {
+        Log.debug("key pressed");
         ctrlPressed = e.isControlDown();
         shiftPressed = e.isShiftDown();
     }
 
     @Override
     public void keyReleased(KeyEvent e) {
+        Log.debug("Key released");
         ctrlPressed = e.isControlDown();
         shiftPressed = e.isShiftDown();
+    }
+
+    @Override
+    public void windowGainedFocus(WindowEvent e) {
+        this.requestFocusInWindow();
+    }
+
+    @Override
+    public void windowLostFocus(WindowEvent e) {
+        // TODO Auto-generated method stub
+
     }
 }
