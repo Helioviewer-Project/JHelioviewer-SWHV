@@ -7,7 +7,6 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 
-import javax.media.opengl.GL;
 import javax.media.opengl.GL2;
 import javax.swing.ImageIcon;
 
@@ -105,7 +104,7 @@ public class SWHVHEKPluginRenderer implements PhysicalRenderer {
         BufferedImage bi;
         String type = evt.getJHVEventType().getEventType();
         GL2 gl = g.getGL();
-        gl.glDisable(GL.GL_TEXTURE_1D);
+        gl.glDisable(GL2.GL_TEXTURE_1D);
         gl.glEnable(GL2.GL_TEXTURE_2D);
         if (iconCache.containsKey(type)) {
             bi = iconCache.get(type);
