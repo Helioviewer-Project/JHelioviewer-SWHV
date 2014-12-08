@@ -88,7 +88,7 @@ public class GLComponentView extends AbstractComponentView implements ViewListen
 
     // render options
     private Color backgroundColor = Color.BLACK;
-    private final Color outsideViewportColor = Color.DARK_GRAY;
+    private final Color outsideViewportColor = Color.BLACK;
     private float xOffset = 0.0f;
     private float yOffset = 0.0f;
     private final AbstractList<ScreenRenderer> postRenderers = new LinkedList<ScreenRenderer>();
