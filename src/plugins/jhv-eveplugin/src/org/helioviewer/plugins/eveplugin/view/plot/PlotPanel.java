@@ -7,7 +7,6 @@ import javax.swing.JPanel;
 import org.helioviewer.plugins.eveplugin.lines.model.EVEDrawController;
 import org.helioviewer.plugins.eveplugin.view.chart.ChartDrawGraphPane;
 import org.helioviewer.plugins.eveplugin.view.chart.ChartDrawIntervalPane;
-import org.helioviewer.plugins.eveplugin.view.chart.ChartDrawValueRangePane;
 
 public class PlotPanel extends JPanel {
 
@@ -20,9 +19,7 @@ public class PlotPanel extends JPanel {
     private final EVEDrawController drawController;
 
     private final JPanel plotPane = new JPanel();
-    // private final LineDataSelectorPanel lineDataSelectorPane;
     private final ChartDrawGraphPane graphPane;
-    private final ChartDrawValueRangePane valueRangePane;
     private ChartDrawIntervalPane intervalPane = null;
 
     // //////////////////////////////////////////////////////////////////////////////
@@ -30,14 +27,10 @@ public class PlotPanel extends JPanel {
     // //////////////////////////////////////////////////////////////////////////////
 
     public PlotPanel(final String identifier, final String plotName) {
-        // lineDataSelectorPane = new LineDataSelectorPanel(identifier,
-        // plotName);
 
         drawController = new EVEDrawController(identifier);
 
         graphPane = new ChartDrawGraphPane(identifier);
-        valueRangePane = new ChartDrawValueRangePane(drawController, identifier);
-
         initVisualComponents();
     }
 
@@ -47,10 +40,8 @@ public class PlotPanel extends JPanel {
 
         plotPane.setLayout(new BorderLayout());
         plotPane.add(graphPane, BorderLayout.CENTER);
-        plotPane.add(valueRangePane, BorderLayout.LINE_END);
 
         add(plotPane, BorderLayout.CENTER);
-        // add(lineDataSelectorPane, BorderLayout.LINE_END);
     }
 
     public void setIntervalSlider(final ChartDrawIntervalPane intervalPane) {
