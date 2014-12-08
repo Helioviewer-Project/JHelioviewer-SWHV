@@ -11,7 +11,6 @@ import java.util.LinkedList;
 
 import javax.imageio.ImageIO;
 import javax.media.opengl.DebugGL2;
-import javax.media.opengl.GL;
 import javax.media.opengl.GL2;
 import javax.media.opengl.GLAutoDrawable;
 import javax.media.opengl.GLCapabilities;
@@ -343,7 +342,7 @@ public class GLComponentView extends AbstractComponentView implements ViewListen
      * This function is called when the canvas is visible the first time. It
      * initializes OpenGL by setting some system properties, such as switching
      * on some OpenGL features. Apart from that, the function also calls
-     * {@link GLTextureHelper#initHelper(GL)}.
+     * {@link GLTextureHelper#initHelper(GL2)}.
      *
      * <p>
      * Note, that this function should not be called by any user defined
@@ -381,7 +380,7 @@ public class GLComponentView extends AbstractComponentView implements ViewListen
         gl.glColor3f(1.0f, 1.0f, 1.0f);
     }
 
-    private void generateNewRenderBuffers(GL gl) {
+    private void generateNewRenderBuffers(GL2 gl) {
         tileWidth = defaultTileWidth;
         tileHeight = defaultTileHeight;
         if (renderBufferDepth != null) {

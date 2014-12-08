@@ -2,7 +2,6 @@ package org.helioviewer.viewmodel.view.opengl.shader;
 
 import java.util.Stack;
 
-import javax.media.opengl.GL;
 import javax.media.opengl.GL2;
 
 /**
@@ -88,7 +87,7 @@ public abstract class GLFragmentShaderProgram {
      *
      * @param gl
      *            Valid reference to the current gl object
-     * @see #popShader(GL)
+     * @see #popShader(GL2)
      */
     public static void pushShader(GL2 gl) {
         shaderStack.push(shaderCurrentlyUsed);
@@ -104,7 +103,7 @@ public abstract class GLFragmentShaderProgram {
      *
      * @param gl
      *            Valid reference to the current gl object
-     * @see #pushShader(GL)
+     * @see #pushShader(GL2)
      */
     public static void popShader(GL2 gl) {
         gl.glPopAttrib();
