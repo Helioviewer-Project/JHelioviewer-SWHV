@@ -8,7 +8,6 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 
-import javax.media.opengl.GL;
 import javax.media.opengl.GL2;
 import javax.swing.ImageIcon;
 
@@ -80,7 +79,7 @@ public class SWHVHEKPlugin3dRenderer extends PhysicalRenderer3d {
         double lineResolution = 10;
         Color eventColor = evt.getEventRelationShip().getRelationshipColor();
         gl.glColor3d(eventColor.getRed() / 255., eventColor.getGreen() / 255., eventColor.getBlue() / 255.);
-        gl.glDisable(GL.GL_LIGHTING);
+        gl.glDisable(GL2.GL_LIGHTING);
 
         gl.glDisable(GL2.GL_TEXTURE_2D);
         gl.glEnable(GL2.GL_LINE_SMOOTH);
@@ -129,7 +128,7 @@ public class SWHVHEKPlugin3dRenderer extends PhysicalRenderer3d {
         }
         gl.glEnd();
         gl.glDisable(GL2.GL_LINE_SMOOTH);
-        gl.glEnable(GL.GL_LIGHTING);
+        gl.glEnable(GL2.GL_LIGHTING);
 
     }
 
@@ -169,7 +168,7 @@ public class SWHVHEKPlugin3dRenderer extends PhysicalRenderer3d {
             gl.glColor3d(evt.getColor().getRed() / 255., evt.getColor().getGreen() / 255., evt.getColor().getBlue() / 255.);
         }
         gl.glEnable(GL2.GL_BLEND);
-        gl.glDisable(GL.GL_LIGHTING);
+        gl.glDisable(GL2.GL_LIGHTING);
 
         gl.glDisable(GL2.GL_TEXTURE_2D);
         gl.glEnable(GL2.GL_LINE_SMOOTH);
@@ -196,7 +195,7 @@ public class SWHVHEKPlugin3dRenderer extends PhysicalRenderer3d {
             oldBoundaryPoint3d = point;
         }
         gl.glDisable(GL2.GL_LINE_SMOOTH);
-        gl.glEnable(GL.GL_LIGHTING);
+        gl.glEnable(GL2.GL_LIGHTING);
 
     }
 
