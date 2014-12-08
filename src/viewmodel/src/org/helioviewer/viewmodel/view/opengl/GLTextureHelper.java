@@ -13,7 +13,6 @@ import java.nio.IntBuffer;
 import java.nio.ShortBuffer;
 import java.util.HashMap;
 
-import javax.media.opengl.GL;
 import javax.media.opengl.GL2;
 import javax.media.opengl.glu.GLU;
 
@@ -165,7 +164,7 @@ public class GLTextureHelper {
      *            Valid reference to the current gl object
      * @param texture
      *            texture id to bind
-     * @see #bindTexture(GL, int, int)
+     * @see #bindTexture(GL2, int, int)
      */
     public synchronized void bindTexture(GL2 gl, int texture) {
         textureImplementation.bindTexture(gl, texture);
@@ -186,7 +185,7 @@ public class GLTextureHelper {
      *            texture type, such as GL_TEXTURE_2D
      * @param texture
      *            texture id to bind
-     * @see #bindTexture(GL, int, int)
+     * @see #bindTexture(GL2, int, int)
      */
     public synchronized void bindTexture(GL2 gl, int target, int texture) {
         textureImplementation.bindTexture(gl, target, texture);
@@ -534,7 +533,7 @@ public class GLTextureHelper {
      * Saves a given BufferedImage to a given texture.
      *
      * If it is possible to use
-     * {@link #moveImageDataToGLTexture(GL, ImageData, int)}, that function
+     * {@link #moveImageDataToGLTexture(GL2, ImageData, int)}, that function
      * should be preferred because the it is faster.
      *
      * @param gl
@@ -543,7 +542,7 @@ public class GLTextureHelper {
      *            BufferedImage to copy to the texture
      * @param target
      *            Valid texture id
-     * @see #moveImageDataToGLTexture(GL, ImageData, int)
+     * @see #moveImageDataToGLTexture(GL2, ImageData, int)
      */
     public void moveBufferedImageToGLTexture(GL2 gl, BufferedImage source, int target) {
 
@@ -781,7 +780,7 @@ public class GLTextureHelper {
          *            Valid reference to the current gl object
          * @param texture
          *            texture id to bind
-         * @see #bindTexture(GL, int, int)
+         * @see #bindTexture(GL2, int, int)
          */
         public void bindTexture(GL2 gl, int texture);
 
@@ -794,7 +793,7 @@ public class GLTextureHelper {
          *            texture type, such as GL_TEXTURE_2D
          * @param texture
          *            texture id to bind
-         * @see #bindTexture(GL, int, int)
+         * @see #bindTexture(GL2, int, int)
          */
         public void bindTexture(GL2 gl, int target, int texture);
 

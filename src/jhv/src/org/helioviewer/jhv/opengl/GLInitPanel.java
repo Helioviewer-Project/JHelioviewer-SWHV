@@ -4,7 +4,6 @@ import java.awt.Dimension;
 import java.awt.Toolkit;
 import java.lang.Thread.UncaughtExceptionHandler;
 
-import javax.media.opengl.GL;
 import javax.media.opengl.GL2;
 import javax.media.opengl.GLAutoDrawable;
 import javax.media.opengl.GLCapabilities;
@@ -26,7 +25,7 @@ import org.helioviewer.viewmodel.view.opengl.shader.GLShaderHelper;
  *
  * <p>
  * The only purpose of this component is to be visible for one moment during the
- * startup sequence of JHV. It calls {@link GLInfo#update(GL)} to get the
+ * startup sequence of JHV. It calls {@link GLInfo#update(GL2)} to get the
  * application running and initializes some OpenGL classes.
  *
  * @author Markus Langenberg

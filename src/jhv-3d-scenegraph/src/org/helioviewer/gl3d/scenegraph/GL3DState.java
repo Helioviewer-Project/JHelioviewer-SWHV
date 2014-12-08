@@ -3,7 +3,6 @@ package org.helioviewer.gl3d.scenegraph;
 import java.util.Date;
 import java.util.Stack;
 
-import javax.media.opengl.GL;
 import javax.media.opengl.GL2;
 import javax.media.opengl.glu.GLU;
 
@@ -14,9 +13,10 @@ import org.helioviewer.gl3d.scenegraph.math.GL3DMat4d;
 
 /**
  * The {@link GL3DState} is recreated every render pass by the
- * {@link GL3DComponentView}. It provides the reference to the {@link GL} object
- * and stores some globally relevant information such as width and height of the
- * viewport, etc. Also it allows for the stacking of the view transformations.
+ * {@link GL3DComponentView}. It provides the reference to the {@link GL2}
+ * object and stores some globally relevant information such as width and height
+ * of the viewport, etc. Also it allows for the stacking of the view
+ * transformations.
  *
  * @author Simon Spoerri (simon.spoerri@fhnw.ch)
  *

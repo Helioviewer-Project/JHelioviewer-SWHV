@@ -4,7 +4,6 @@ import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
 import java.util.Stack;
 
-import javax.media.opengl.GL;
 import javax.media.opengl.GL2;
 import javax.media.opengl.glu.GLU;
 
@@ -17,18 +16,18 @@ import org.helioviewer.viewmodel.view.opengl.shader.GLVertexShaderProgram;
 
 /**
  * Class to render a to a texture and reuse the image at a later point.
- * 
+ *
  * <p>
  * Using this class, it is possible to use multiple shaders on the same image.
  * This might be useful, if some shaders are too heavy for the graphics card or
  * if shaders should be used before and after a
  * {@link org.helioviewer.viewmodel.view.LayeredView}.
- * 
+ *
  * <p>
  * This class is not used in the current code (March 2010), and during tests it
  * slowed down the rendering performance significant. Thus, using it should be
  * well considered.
- * 
+ *
  * @author Markus Langenberg
  */
 public class GLSceneSaver {
@@ -40,11 +39,11 @@ public class GLSceneSaver {
 
     /**
      * Saves the current scene, including all attributes and shaders.
-     * 
+     *
      * The current state is pushed onto a stack and can be restored later using
-     * {@link #popScene(GL)}. The design of this function is thought to be
+     * {@link #popScene(GL2)}. The design of this function is thought to be
      * similar to usual OpenGL behavior (e.g. glPushMatrix).
-     * 
+     *
      * @param gl
      *            Valid reference to the current gl object
      */
@@ -60,11 +59,11 @@ public class GLSceneSaver {
 
     /**
      * Restores a saved scene, including all attributes and shaders.
-     * 
+     *
      * The saved state is taken from a stack, where it was saved before using
-     * {@link #popScene(GL)}. The design of this function is thought to be
+     * {@link #popScene(GL2)}. The design of this function is thought to be
      * similar to usual OpenGL behavior (e.g. glPuopMatrix).
-     * 
+     *
      * @param gl
      *            Valid reference to the current gl object
      */
