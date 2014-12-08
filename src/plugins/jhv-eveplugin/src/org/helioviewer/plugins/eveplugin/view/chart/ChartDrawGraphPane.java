@@ -32,7 +32,6 @@ import javax.swing.ImageIcon;
 import javax.swing.JComponent;
 import javax.swing.event.MouseInputListener;
 
-import org.helioviewer.base.logging.Log;
 import org.helioviewer.base.math.Interval;
 import org.helioviewer.jhv.data.datatype.event.JHVEvent;
 import org.helioviewer.jhv.data.guielements.SWEKEventInformationDialog;
@@ -762,24 +761,26 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
     @Override
     public void drawRequest() {
         if (!EventQueue.isDispatchThread()) {
-            Log.debug("Called outside the Event queue");
+            // Log.debug("Called outside the Event queue");
             EventQueue.invokeLater(new Runnable() {
                 @Override
                 public void run() {
                     long start = System.currentTimeMillis();
                     updateGraph();
-                    Log.error("repaint request");
+                    // Log.error("repaint request");
                     Thread.dumpStack();
                     repaint();
-                    Log.debug("draw request time: " + (System.currentTimeMillis() - start));
+                    // Log.debug("draw request time: " +
+                    // (System.currentTimeMillis() - start));
                 }
             });
         } else {
-            Log.debug("Called in eventQueue");
+            // Log.debug("Called in eventQueue");
             long start = System.currentTimeMillis();
             updateGraph();
             repaint();
-            Log.debug("draw request time: " + (System.currentTimeMillis() - start));
+            // Log.debug("draw request time: " + (System.currentTimeMillis() -
+            // start));
         }
 
     }
@@ -817,8 +818,6 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
                 final double ratioXRight = (1.0 * (graphArea.x + graphArea.width - mouseX) / graphArea.width);
                 final double ratioYTop = (1.0 * (mouseY - graphArea.y)) / graphArea.height;
                 final double ratioYBottom = (1.0 * (graphArea.y + graphArea.height - mouseY)) / graphArea.height;
-                Log.debug("Scroll Value : " + scrollValue);
-                Log.debug("Scroll Distance : " + scrollDistance);
 
                 // zoom in
                 if (!shiftPressed) {
@@ -833,18 +832,10 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
                         if (scrollValue < 0) {
                             startTime = pas.getScaledSelectedMinTime() + zoomTimeFactor * scrollDistance * ratioXLeft / ratioTime;
                             endTime = pas.getScaledSelectedMaxTime() - zoomTimeFactor * scrollDistance * ratioXRight / ratioTime;
-                            Log.debug("Start Time : " + pas.getScaledSelectedMinTime() + " + " + scrollDistance + " * " + ratioXLeft
-                                    + " / " + ratioTime + " = " + startTime);
-                            Log.debug("End Time : " + pas.getScaledSelectedMaxTime() + " - " + scrollDistance + " * " + ratioXRight + " / "
-                                    + ratioTime + " = " + endTime);
 
                         } else {
                             startTime = pas.getScaledSelectedMinTime() - zoomTimeFactor * scrollDistance * ratioXLeft / ratioTime;
                             endTime = pas.getScaledSelectedMaxTime() + zoomTimeFactor * scrollDistance * ratioXRight / ratioTime;
-                            Log.debug("Start Time : " + pas.getScaledSelectedMinTime() + " + " + scrollDistance + " * " + ratioXLeft
-                                    + " / " + ratioTime + " = " + startTime);
-                            Log.debug("End Time : " + pas.getScaledSelectedMaxTime() + " - " + scrollDistance + " * " + ratioXRight + " / "
-                                    + ratioTime + " = " + endTime);
                         }
                         startTime = Math.max(pas.getScaledMinTime(), startTime);
                         endTime = Math.min(pas.getScaledMaxValue(), endTime);
@@ -869,17 +860,9 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
                 if (scrollValue < 0) {
                     endValue = myPlotAreaSpace.getScaledSelectedMaxValue() - zoomValueFactor * scrollDistance * ratioYTop / ratioValue;
                     startValue = myPlotAreaSpace.getScaledSelectedMinValue() + zoomValueFactor * scrollDistance * ratioYBottom / ratioValue;
-                    Log.debug("Start Value : " + myPlotAreaSpace.getScaledSelectedMaxValue() + " - " + scrollDistance + " * " + ratioYTop
-                            + " / " + ratioValue + " = " + startValue);
-                    Log.debug("End Value : " + myPlotAreaSpace.getScaledSelectedMinValue() + " + " + scrollDistance + " * " + ratioYBottom
-                            + " / " + ratioValue + "=" + endValue);
                 } else {
                     endValue = myPlotAreaSpace.getScaledSelectedMaxValue() + zoomValueFactor * scrollDistance * ratioYTop / ratioValue;
                     startValue = myPlotAreaSpace.getScaledSelectedMinValue() - zoomValueFactor * scrollDistance * ratioYBottom / ratioValue;
-                    Log.debug("Start Value : " + myPlotAreaSpace.getScaledSelectedMaxValue() + " - " + scrollDistance + " * " + ratioYTop
-                            + " / " + ratioValue + " = " + startValue);
-                    Log.debug("End Value : " + myPlotAreaSpace.getScaledSelectedMinValue() + " + " + scrollDistance + " * " + ratioYBottom
-                            + " / " + ratioValue + "=" + endValue);
                 }
                 if (!ctrlPressed || !shiftPressed) {
                     startValue = Math.max(myPlotAreaSpace.getScaledMinValue(), startValue);
@@ -902,14 +885,12 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
 
     @Override
     public void keyPressed(KeyEvent e) {
-        Log.debug("Key pressed");
         ctrlPressed = e.isControlDown();
         shiftPressed = e.isShiftDown();
     }
 
     @Override
     public void keyReleased(KeyEvent e) {
-        Log.debug("Key released");
         ctrlPressed = e.isControlDown();
         shiftPressed = e.isShiftDown();
     }
