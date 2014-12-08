@@ -114,9 +114,10 @@ public class EventRequester implements ZoomControllerListener, JHVEventHandler {
 
                 @Override
                 public void run() {
-                    long start = System.currentTimeMillis();
+                    // long start = System.currentTimeMillis();
                     JHVEventContainer.getSingletonInstance().requestForInterval(interval.getStart(), interval.getEnd(), eventHandler);
-                    Log.debug("selectedIntervalChanged" + (System.currentTimeMillis() - start));
+                    // Log.debug("selectedIntervalChanged" +
+                    // (System.currentTimeMillis() - start));
                 }
 
             }.init(newInterval, this));
