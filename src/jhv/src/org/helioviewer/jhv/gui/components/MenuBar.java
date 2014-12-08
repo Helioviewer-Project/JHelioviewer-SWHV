@@ -30,12 +30,12 @@ import org.helioviewer.jhv.gui.dialogs.plugins.PluginsDialog;
 
 /**
  * Menu bar of the main window.
- * 
+ *
  * <p>
  * Basically, contains all actions from {@link org.helioviewer.jhv.gui.actions}.
- * 
+ *
  * @author Markus Langenberg
- * 
+ *
  */
 public class MenuBar extends JMenuBar {
 
@@ -68,7 +68,7 @@ public class MenuBar extends JMenuBar {
         fileMenu.addSeparator();
         fileMenu.add(new SaveScreenshotAction());
         fileMenu.add(new SaveScreenshotAsAction());
-        fileMenu.add(new ShowDialogAction("Export Movie...", ExportMovieDialog.class));
+        fileMenu.add(new ShowDialogAction("Export Movie...", ExportMovieDialog.class, ExportMovieDialog.class));
 
         // VSO Export - DEACTIVATED FOR NOW
         // fileMenu.addSeparator();
