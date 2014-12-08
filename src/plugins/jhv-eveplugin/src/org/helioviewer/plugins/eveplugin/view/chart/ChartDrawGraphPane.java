@@ -11,6 +11,8 @@ import java.awt.RenderingHints;
 import java.awt.event.ComponentEvent;
 import java.awt.event.ComponentListener;
 import java.awt.event.MouseEvent;
+import java.awt.event.MouseWheelEvent;
+import java.awt.event.MouseWheelListener;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
@@ -54,7 +56,7 @@ import org.helioviewer.viewmodel.view.jp2view.datetime.ImmutableDateTime;
  * @author Stephan Pagel
  * */
 public class ChartDrawGraphPane extends JComponent implements MouseInputListener, ComponentListener, DrawControllerListener,
-        ChartModelListener {
+        ChartModelListener, MouseWheelListener {
 
     // //////////////////////////////////////////////////////////////////////////////
     // Definitions
@@ -94,6 +96,7 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
         initVisualComponents();
         addMouseListener(this);
         addMouseMotionListener(this);
+        addMouseWheelListener(this);
         addComponentListener(this);
         zoomManager = ZoomManager.getSingletonInstance();
         yRatios = new HashMap<YAxisElement, Double>();
@@ -790,6 +793,62 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
 
             if (!TimeIntervalLockModel.getInstance().isLocked()) {
                 repaint();
+            }
+        }
+    }
+
+    @Override
+    public void mouseWheelMoved(MouseWheelEvent e) {
+        int scrollValue = e.getWheelRotation();
+        if (e.getScrollType() == MouseWheelEvent.WHEEL_UNIT_SCROLL) {
+            int scrollDistance = e.getScrollAmount();
+            if (scrollValue < 0) {
+                // zoom in
+                final int mouseX = e.getX();
+                final int mouseY = e.getY();
+                if (mouseX >= graphArea.x && mouseX <= graphArea.x + graphArea.width && mouseY > graphArea.y
+                        && mouseY <= graphArea.y + graphArea.height) {
+                    final double ratioXLeft = (1.0 * (mouseX - graphArea.x) / graphArea.width);
+                    final double ratioXRight = (1.0 * (graphArea.x + graphArea.width - mouseX) / graphArea.width);
+                    final double ratioYTop = (1.0 * (mouseY - graphArea.y)) / graphArea.height;
+                    final double ratioYBottom = (1.0 * (graphArea.y + graphArea.height - mouseY)) / graphArea.height;
+                    Log.debug("Scroll Value : " + scrollValue);
+                    Log.debug("Scroll Distance : " + scrollDistance);
+
+                    List<PlotAreaSpace> pass = new ArrayList<PlotAreaSpace>();
+                    Map<PlotAreaSpace, Double> minTime = new HashMap<PlotAreaSpace, Double>();
+                    Map<PlotAreaSpace, Double> maxTime = new HashMap<PlotAreaSpace, Double>();
+                    for (PlotAreaSpace pas : plotAreaSpaceManager.getAllPlotAreaSpaces()) {
+                        pass.add(pas);
+                        double ratioTime = graphArea.width / (pas.getScaledSelectedMaxTime() - pas.getScaledSelectedMinTime());
+
+                        double startTime = pas.getScaledSelectedMinTime() + scrollDistance * ratioXLeft / ratioTime;
+                        double endTime = pas.getScaledSelectedMaxTime() - scrollDistance * ratioXRight / ratioTime;
+                        Log.debug("Start Time : " + startTime);
+                        Log.debug("End Time : " + endTime);
+                        if (startTime < endTime) {
+                            minTime.put(pas, startTime);
+                            maxTime.put(pas, endTime);
+                        }
+                    }
+                    for (PlotAreaSpace pas : pass) {
+                        pas.setScaledSelectedTime(minTime.get(pas), maxTime.get(pas), false);
+                    }
+
+                    PlotAreaSpace myPlotAreaSpace = plotAreaSpaceManager.getPlotAreaSpace(identifier);
+                    double ratioValue = graphArea.height
+                            / (myPlotAreaSpace.getScaledSelectedMaxValue() - myPlotAreaSpace.getScaledSelectedMinValue());
+                    double endValue = myPlotAreaSpace.getScaledMaxValue() - scrollDistance * ratioYTop / ratioValue;
+                    double startValue = myPlotAreaSpace.getScaledMinValue() + scrollDistance * ratioYBottom / ratioValue;
+                    Log.debug("Start Value : " + startValue);
+                    Log.debug("End Value : " + endValue);
+
+                    if (startValue < endValue) {
+                        myPlotAreaSpace.setScaledSelectedValue(startValue, endValue, false);
+                    }
+                }
+            } else {
+                // zoom out
             }
         }
     }
