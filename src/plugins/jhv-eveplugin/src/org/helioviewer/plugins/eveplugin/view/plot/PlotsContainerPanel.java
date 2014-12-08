@@ -33,8 +33,10 @@ public class PlotsContainerPanel extends JPanel implements LineDataSelectorModel
 
     private final PlotPanel plotOne = new PlotPanel(PLOT_IDENTIFIER_MASTER, "Plot 1: ");
     private final LineDataSelectorPanel lineDataSelectorPanelOne = new LineDataSelectorPanel(PLOT_IDENTIFIER_MASTER, "Plot 1:");
-    private final PlotPanel plotTwo = new PlotPanel(PLOT_IDENTIFIER_SLAVE, "Plot 2: ");
-    private final LineDataSelectorPanel lineDataSelectorPanelTwo = new LineDataSelectorPanel(PLOT_IDENTIFIER_SLAVE, "Plot 2:");
+    // private final PlotPanel plotTwo = new PlotPanel(PLOT_IDENTIFIER_SLAVE,
+    // "Plot 2: ");
+    // private final LineDataSelectorPanel lineDataSelectorPanelTwo = new
+    // LineDataSelectorPanel(PLOT_IDENTIFIER_SLAVE, "Plot 2:");
 
     private boolean isSecondPlotVisible = true;
 
@@ -67,7 +69,7 @@ public class PlotsContainerPanel extends JPanel implements LineDataSelectorModel
         splitPane.setOrientation(JSplitPane.VERTICAL_SPLIT);
         splitPane.setResizeWeight(0.5);
         splitPane.setTopComponent(plotOne);
-        splitPane.setBottomComponent(plotTwo);
+        // splitPane.setBottomComponent(plotTwo);
 
         setPlot2Visible(false);
     }
@@ -77,12 +79,12 @@ public class PlotsContainerPanel extends JPanel implements LineDataSelectorModel
             return;
         }
 
-        ControlsPanel.getSingletonInstance().removeLineDataSelector(lineDataSelectorPanelTwo);
+        // ControlsPanel.getSingletonInstance().removeLineDataSelector(lineDataSelectorPanelTwo);
 
         if (isSecondPlotVisible) {
             splitPane.remove(plotOne);
             remove(splitPane);
-            plotTwo.setIntervalSlider(null);
+            // plotTwo.setIntervalSlider(null);
         } else {
             remove(plotOne);
             plotOne.setIntervalSlider(null);
@@ -91,8 +93,8 @@ public class PlotsContainerPanel extends JPanel implements LineDataSelectorModel
         isSecondPlotVisible = visible;
 
         if (isSecondPlotVisible) {
-            plotTwo.setIntervalSlider(intervalPane);
-            ControlsPanel.getSingletonInstance().addLineDataSelector(lineDataSelectorPanelTwo);
+            // plotTwo.setIntervalSlider(intervalPane);
+            // ControlsPanel.getSingletonInstance().addLineDataSelector(lineDataSelectorPanelTwo);
             splitPane.setTopComponent(plotOne);
             add(splitPane, BorderLayout.CENTER);
         } else {
