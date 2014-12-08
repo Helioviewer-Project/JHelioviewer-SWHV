@@ -8,6 +8,7 @@ import java.awt.Graphics2D;
 import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.RenderingHints;
+import java.awt.Toolkit;
 import java.awt.event.ComponentEvent;
 import java.awt.event.ComponentListener;
 import java.awt.event.KeyEvent;
@@ -38,6 +39,8 @@ import org.helioviewer.base.logging.Log;
 import org.helioviewer.base.math.Interval;
 import org.helioviewer.jhv.data.datatype.event.JHVEvent;
 import org.helioviewer.jhv.data.guielements.SWEKEventInformationDialog;
+import org.helioviewer.jhv.gui.IconBank;
+import org.helioviewer.jhv.gui.IconBank.JHVIcon;
 import org.helioviewer.jhv.gui.ImageViewerGui;
 import org.helioviewer.plugins.eveplugin.EVEPlugin;
 import org.helioviewer.plugins.eveplugin.controller.DrawController;
@@ -91,6 +94,10 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
     private Rectangle leftAxisArea;
     private boolean ctrlPressed = false;
     private boolean shiftPressed = false;
+    private static final Cursor closedHandCursor = Toolkit.getDefaultToolkit().createCustomCursor(
+            IconBank.getIcon(JHVIcon.CLOSED_HAND).getImage(), new Point(16, 0), IconBank.getIcon(JHVIcon.CLOSED_HAND).toString());
+    private static final Cursor openHandCursor = Toolkit.getDefaultToolkit().createCustomCursor(
+            IconBank.getIcon(JHVIcon.OPEN_HAND).getImage(), new Point(16, 0), IconBank.getIcon(JHVIcon.OPEN_HAND).toString());
 
     // //////////////////////////////////////////////////////////////////////////////
     // Methods
@@ -564,12 +571,22 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
         // mousePressedPosition = graphArea.contains(e.getPoint()) ?
         // e.getPoint() : null;
         mousePressedPosition = plotArea.contains(e.getPoint()) ? e.getPoint() : null;
+        if (e.getPoint().x >= graphArea.x && e.getPoint().x <= graphArea.x + graphArea.width && e.getPoint().y >= graphArea.y
+                && e.getPoint().y <= graphArea.y + graphArea.height) {
+            setCursor(closedHandCursor);
+        }
     }
 
     @Override
     public void mouseReleased(final MouseEvent e) {
-
+        if (e.getPoint().x >= graphArea.x && e.getPoint().x <= graphArea.x + graphArea.width && e.getPoint().y >= graphArea.y
+                && e.getPoint().y <= graphArea.y + graphArea.height) {
+            setCursor(openHandCursor);
+        } else {
+            setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
+        }
         if (mousePressedPosition != null && mouseDragPosition != null && !mousePressedOnMovieFrame) {
+
             PlotAreaSpace myPlotAreaSpace = plotAreaSpaceManager.getPlotAreaSpace(identifier);
             final int mouseX = e.getX();
             final int mouseY = e.getY();
@@ -617,6 +634,7 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
         if (mousePressedPosition != null && !mousePressedOnMovieFrame) {
             // updateGraph();
             // repaint();
+            setCursor(closedHandCursor);
             PlotAreaSpace myPlotAreaSpace = plotAreaSpaceManager.getPlotAreaSpace(identifier);
             final int mouseX = e.getX();
             final int mouseY = e.getY();
@@ -659,6 +677,9 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
         } else if (eventModel.getEventAtPosition(new Point(e.getPoint().x - ChartConstants.getGraphLeftSpace(), e.getPoint().y
                 - ChartConstants.getGraphTopSpace())) != null) {
             setCursor(new Cursor(Cursor.HAND_CURSOR));
+        } else if (e.getPoint().x >= graphArea.x && e.getPoint().x <= graphArea.x + graphArea.width && e.getPoint().y >= graphArea.y
+                && e.getPoint().y <= graphArea.y + graphArea.height) {
+            setCursor(openHandCursor);
         } else {
             setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
         }
