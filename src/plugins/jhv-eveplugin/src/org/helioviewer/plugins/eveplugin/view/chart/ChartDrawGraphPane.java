@@ -881,7 +881,7 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
                     Log.debug("End Value : " + myPlotAreaSpace.getScaledSelectedMinValue() + " + " + scrollDistance + " * " + ratioYBottom
                             + " / " + ratioValue + "=" + endValue);
                 }
-                if (ctrlPressed || shiftPressed) {
+                if (!ctrlPressed || !shiftPressed) {
                     startValue = Math.max(myPlotAreaSpace.getScaledMinValue(), startValue);
                     endValue = Math.min(myPlotAreaSpace.getScaledMaxValue(), endValue);
                     if (startValue <= endValue && startValue >= myPlotAreaSpace.getScaledMinValue()
