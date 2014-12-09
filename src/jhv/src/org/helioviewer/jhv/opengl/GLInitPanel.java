@@ -1,6 +1,7 @@
 package org.helioviewer.jhv.opengl;
 
 import java.awt.Dimension;
+import java.awt.EventQueue;
 import java.awt.Toolkit;
 import java.lang.Thread.UncaughtExceptionHandler;
 
@@ -64,13 +65,12 @@ public class GLInitPanel extends GLJPanel {
      * Starts the view chain creation in a separate thread
      */
     public static void startViewChainThread() {
-        Thread thread = new Thread(new Runnable() {
+        EventQueue.invokeLater(new Runnable() {
             @Override
             public void run() {
                 ImageViewerGui.getSingletonInstance().createViewchains();
             }
-        }, "CreateViewChainsThread");
-        thread.start();
+        });
     }
 
     /**
