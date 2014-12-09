@@ -5,6 +5,7 @@ import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.LinkedList;
 
+import org.helioviewer.base.logging.Log;
 import org.helioviewer.base.math.Interval;
 import org.helioviewer.plugins.eveplugin.lines.data.BandController;
 import org.helioviewer.plugins.eveplugin.lines.data.DownloadController;
@@ -71,7 +72,9 @@ public class ZoomController implements PlotAreaSpaceListener {
     }
 
     public void setAvailableInterval(final Interval<Date> interval) {
+
         availableInterval = makeCompleteDay(interval);
+        Log.debug("New available interval : " + availableInterval);
         fireAvailableIntervalChanged(availableInterval);
 
         // request data if needed
@@ -98,9 +101,14 @@ public class ZoomController implements PlotAreaSpaceListener {
 
     private Interval<Date> makeCompleteDay(final Date start, final Date end) {
         final Interval<Date> interval = new Interval<Date>(null, null);
+        Date endDate = end;
 
         if (start == null || end == null) {
             return interval;
+        }
+
+        if (end.getTime() > System.currentTimeMillis()) {
+            endDate = new Date();
         }
 
         final Calendar calendar = new GregorianCalendar();
@@ -114,7 +122,7 @@ public class ZoomController implements PlotAreaSpaceListener {
         interval.setStart(calendar.getTime());
 
         calendar.clear();
-        calendar.setTime(end);
+        calendar.setTime(endDate);
         calendar.set(Calendar.HOUR_OF_DAY, 0);
         calendar.set(Calendar.MINUTE, 0);
         calendar.set(Calendar.SECOND, 0);
@@ -303,5 +311,22 @@ public class ZoomController implements PlotAreaSpaceListener {
 
             }
         }
+    }
+
+    @Override
+    public void availablePlotAreaSpaceChanged(double oldMinValue, double oldMaxValue, double oldMinTime, double oldMaxTime,
+            double newMinValue, double newMaxValue, double newMinTime, double newMaxTime) {
+        if (availableInterval != null && availableInterval.getStart() != null && availableInterval.getEnd() != null
+                && (oldMinTime > newMinTime || oldMaxTime < newMaxTime)) {
+            double timeRatio = (availableInterval.getEnd().getTime() - availableInterval.getStart().getTime()) / (oldMaxTime - oldMinTime);
+            double startDifference = oldMinTime - newMinTime;
+            double endDifference = newMaxTime - oldMaxTime;
+
+            Date tempStartDate = new Date(availableInterval.getStart().getTime() - Math.round(startDifference * timeRatio));
+            Date tempEndDate = new Date(availableInterval.getEnd().getTime() + Math.round(endDifference * timeRatio));
+
+            setAvailableInterval(new Interval<Date>(tempStartDate, tempEndDate));
+        }
+
     }
 }

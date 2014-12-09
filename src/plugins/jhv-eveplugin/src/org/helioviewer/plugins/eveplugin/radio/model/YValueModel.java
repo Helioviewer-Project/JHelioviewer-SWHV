@@ -139,4 +139,11 @@ public class YValueModel implements PlotAreaSpaceListener {
         selectedYMax = (1.0 * availableYMin + (pas.getScaledSelectedMaxValue() - pas.getScaledMinValue()) * freqPerScaled);
     }
 
+    @Override
+    public void availablePlotAreaSpaceChanged(double oldMinValue, double oldMaxValue, double oldMinTime, double oldMaxTime,
+            double newMinValue, double newMaxValue, double newMinTime, double newMaxTime) {
+        // TODO Auto-generated method stub
+
+    }
+
 }

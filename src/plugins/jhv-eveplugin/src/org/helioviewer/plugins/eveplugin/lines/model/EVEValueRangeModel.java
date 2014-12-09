@@ -108,4 +108,11 @@ public class EVEValueRangeModel implements PlotAreaSpaceListener {
         // TODO Auto-generated method stub
 
     }
+
+    @Override
+    public void availablePlotAreaSpaceChanged(double oldMinValue, double oldMaxValue, double oldMinTime, double oldMaxTime,
+            double newMinValue, double newMaxValue, double newMinTime, double newMaxTime) {
+        // TODO Auto-generated method stub
+
+    }
 }
