@@ -282,6 +282,7 @@ public class ZoomManager implements ZoomControllerListener, PlotAreaSpaceListene
 
     @Override
     public void availableIntervalChanged(Interval<Date> newInterval) {
+        currentInterval = newInterval;
     }
 
     @Override
