@@ -151,8 +151,30 @@ public class PlotAreaSpace {
             this.scaledSelectedMaxTime = scaledSelectedMaxTime;
             this.scaledSelectedMinValue = scaledSelectedMinValue;
             this.scaledSelectedMaxValue = scaledSelectedMaxValue;
+            if (this.scaledSelectedMinTime < scaledMinTime || this.scaledSelectedMaxTime > scaledMaxTime
+                    || this.scaledSelectedMinValue < scaledMinValue || this.scaledSelectedMaxValue > scaledMaxValue) {
+                double oldScaledMinTime = scaledMinTime;
+                double oldScaledMaxTime = scaledMaxTime;
+                double oldScaledMinValue = scaledMinValue;
+                double oldScaledMaxValue = scaledMaxValue;
+                scaledMinTime = Math.min(this.scaledSelectedMinTime, scaledMinTime);
+                scaledMaxTime = Math.max(this.scaledSelectedMaxTime, scaledMaxTime);
+                scaledMinValue = Math.min(this.scaledSelectedMinValue, scaledMinValue);
+                scaledMaxValue = Math.max(this.scaledSelectedMaxValue, scaledMaxValue);
+                fireAvailableAreaSpaceChanged(oldScaledMinValue, oldScaledMaxValue, oldScaledMinTime, oldScaledMaxTime, scaledMinValue,
+                        scaledMaxValue, scaledMinTime, scaledMaxTime);
+            }
             firePlotAreaSpaceChanged(false);
         }
+    }
+
+    private void fireAvailableAreaSpaceChanged(double oldScaledMinValue, double oldScaledMaxValue, double oldScaledMinTime,
+            double oldScaledMaxTime, double newMinValue, double newMaxValue, double newMinTime, double newMaxTime) {
+        for (PlotAreaSpaceListener l : listeners) {
+            l.availablePlotAreaSpaceChanged(oldScaledMinValue, oldScaledMaxValue, oldScaledMinTime, oldScaledMaxTime, newMinValue,
+                    newMaxValue, newMinTime, newMaxTime);
+        }
+
     }
 
     public boolean minMaxTimeIntervalContainsTime(double value) {

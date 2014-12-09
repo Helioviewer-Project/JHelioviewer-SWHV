@@ -125,6 +125,7 @@ public class EVECache {
                 }
             } else {
                 if (gap != null) {
+                    gap.setEnd(calendar.getTime());
                     result.add(gap);
                     gap = null;
                 }

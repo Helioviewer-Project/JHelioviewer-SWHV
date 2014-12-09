@@ -439,4 +439,11 @@ public class EVEDrawController implements BandControllerListener, ZoomController
             }
         }
     }
+
+    @Override
+    public void availablePlotAreaSpaceChanged(double oldMinValue, double oldMaxValue, double oldMinTime, double oldMaxTime,
+            double newMinValue, double newMaxValue, double newMinTime, double newMaxTime) {
+        // TODO Auto-generated method stub
+
+    }
 }

@@ -104,4 +104,11 @@ public class PlotValueSpace implements PlotAreaSpaceListener {
         }
     }
 
+    @Override
+    public void availablePlotAreaSpaceChanged(double oldMinValue, double oldMaxValue, double oldMinTime, double oldMaxTime,
+            double newMinValue, double newMaxValue, double newMinTime, double newMaxTime) {
+        // TODO Auto-generated method stub
+
+    }
+
 }

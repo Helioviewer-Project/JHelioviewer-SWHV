@@ -6,4 +6,6 @@ public interface PlotAreaSpaceListener {
             double scaledSelectedMinValue, double scaledSelectedMaxValue, double scaledSelectedMinTime, double scaledSelectedMaxTime,
             boolean forced);
 
+    public abstract void availablePlotAreaSpaceChanged(double oldMinValue, double oldMaxValue, double oldMinTime, double oldMaxTime,
+            double newMinValue, double newMaxValue, double newMinTime, double newMaxTime);
 }
