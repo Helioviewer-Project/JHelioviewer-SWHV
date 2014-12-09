@@ -123,7 +123,7 @@ public class ControlsPanel extends JPanel implements ActionListener, LayersListe
         } else if (e.getSource() == periodFromLayersButton) {
             final Interval<Date> interval = new Interval<Date>(LayersModel.getSingletonInstance().getFirstDate(), LayersModel
                     .getSingletonInstance().getLastDate());
-            ZoomController.getSingletonInstance().setAvailableInterval(interval);
+            ZoomController.getSingletonInstance().setSelectedInterval(interval, true);
         }
     }
 
