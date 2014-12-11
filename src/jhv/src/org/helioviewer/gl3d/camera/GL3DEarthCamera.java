@@ -1,11 +1,8 @@
 package org.helioviewer.gl3d.camera;
 
-import java.util.Calendar;
 import java.util.Date;
-import java.util.GregorianCalendar;
 
 import org.helioviewer.base.physics.Astronomy;
-import org.helioviewer.base.physics.Constants;
 import org.helioviewer.base.physics.DifferentialRotation;
 import org.helioviewer.gl3d.scenegraph.math.GL3DQuatd;
 import org.helioviewer.gl3d.scenegraph.math.GL3DVec3d;
@@ -31,9 +28,7 @@ import org.helioviewer.viewmodel.view.jp2view.JHVJP2View;
 public class GL3DEarthCamera extends GL3DSolarRotationTrackingTrackballCamera implements ViewListener {
 
     private Date currentDate = null;
-    private double currentRotation = 0.0;
-
-    private long timediff;
+    private final double currentRotation = 0.0;
 
     public GL3DEarthCamera(GL3DSceneGraphView sceneGraphView) {
         super(sceneGraphView);
@@ -79,11 +74,7 @@ public class GL3DEarthCamera extends GL3DSolarRotationTrackingTrackballCamera im
     }
 
     public void updateRotation() {
-        this.timediff = (currentDate.getTime()) / 1000 - Constants.referenceDate;
-        this.currentRotation = Astronomy.getL0Radians(currentDate);//DifferentialRotation.calculateRotationInRadians(0., this.timediff) % (Math.PI * 2.0);
-        Calendar cal = new GregorianCalendar();
-        cal.setTime(new Date(currentDate.getTime()));
-        double b0 = Astronomy.getB0InRadians(cal);
+        double b0 = Astronomy.getB0InRadians(currentDate);
         this.getLocalRotation().clear();
         this.getLocalRotation().rotate(GL3DQuatd.createRotation(b0, new GL3DVec3d(1, 0, 0)));
         this.getLocalRotation().rotate(GL3DQuatd.createRotation(this.currentRotation, new GL3DVec3d(0, 1, 0)));

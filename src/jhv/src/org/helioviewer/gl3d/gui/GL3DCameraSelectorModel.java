@@ -57,8 +57,6 @@ public class GL3DCameraSelectorModel extends AbstractListModel implements ComboB
     }
 
     public void activate(GL3DSceneGraphView sceneGraphView) {
-        // GL3DSceneGraphView sceneGraphView =
-        // getMainView().getAdapter(GL3DSceneGraphView.class);
 
         if (sceneGraphView != null) {
             if (earthCamera == null) {
