@@ -2,10 +2,7 @@ package org.helioviewer.gl3d.gui;
 
 import java.awt.event.ActionEvent;
 
-import org.helioviewer.base.logging.Log;
 import org.helioviewer.gl3d.camera.GL3DCamera;
-import org.helioviewer.gl3d.camera.GL3DCameraPanAnimation;
-import org.helioviewer.gl3d.camera.GL3DCameraZoomAnimation;
 import org.helioviewer.gl3d.scenegraph.math.GL3DVec3d;
 import org.helioviewer.jhv.gui.actions.ZoomFitAction;
 import org.helioviewer.jhv.layers.LayersModel;
@@ -40,11 +37,8 @@ public class GL3DZoomFitAction extends ZoomFitAction {
                 double halfFOVRad = Math.toRadians(camera.getCameraFOV() / 2.0);
                 double distance = halfWidth * Math.sin(Math.PI / 2 - halfFOVRad) / Math.sin(halfFOVRad);
                 distance = -distance - camera.getZTranslation();
-                Log.debug("GL3DZoomFitAction: Distance = " + distance + " Existing Distance: " + camera.getZTranslation());
-                camera.addCameraAnimation(new GL3DCameraZoomAnimation(distance, 500));
                 GL3DVec3d cameraTranslation = camera.getTranslation().copy();
                 cameraTranslation.negate();
-                camera.addCameraAnimation(new GL3DCameraPanAnimation(cameraTranslation));
             }
         }
     }

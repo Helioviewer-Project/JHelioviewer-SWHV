@@ -93,7 +93,6 @@ public class GL3DCameraView extends AbstractGL3DView implements GL3DView, GL3DCa
     public void setCurrentCamera(GL3DCamera cam) {
         if (this.camera != null) {
             this.camera.removeCameraListener(this);
-            this.camera.deactivate();
         }
         cam.activate(this.camera);
         this.camera = cam;

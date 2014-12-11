@@ -1,9 +1,7 @@
 package org.helioviewer.gl3d.camera;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
-import java.util.Stack;
 
 import javax.media.opengl.GL2;
 import javax.media.opengl.glu.GLU;
@@ -58,8 +56,6 @@ public abstract class GL3DCamera {
 
     protected GL3DQuatd rotation;
     protected GL3DVec3d translation;
-
-    private final Stack<GL3DCameraAnimation> cameraAnimations = new Stack<GL3DCameraAnimation>();
 
     protected GL3DQuatd currentDragRotation;
 
@@ -230,12 +226,6 @@ public abstract class GL3DCamera {
         this.updateCameraTransformation();
     }
 
-    public void deactivate() {
-        this.cameraAnimations.clear();
-        //this.getGrid().getDrawBits().on(Bit.Hidden);
-        //this.getFollowGrid().getDrawBits().on(Bit.Hidden);
-    }
-
     public void activate() {
         //this.getGrid().getDrawBits().off(Bit.Hidden);
     }
@@ -292,27 +282,7 @@ public abstract class GL3DCamera {
     }
 
     public void applyCamera(GL3DState state) {
-        for (Iterator<GL3DCameraAnimation> iter = this.cameraAnimations.iterator(); iter.hasNext();) {
-            GL3DCameraAnimation animation = iter.next();
-            if (!animation.isFinished()) {
-                animation.animate(this);
-            } else {
-                iter.remove();
-            }
-        }
         state.multiplyMV(cameraTransformation);
-    }
-
-    public void addCameraAnimation(GL3DCameraAnimation animation) {
-        for (Iterator<GL3DCameraAnimation> iter = this.cameraAnimations.iterator(); iter.hasNext();) {
-            GL3DCameraAnimation ani = iter.next();
-            if (!ani.isFinished() && ani.getClass().isInstance(animation)) {
-                ani.updateWithAnimation(animation);
-                return;
-            }
-        }
-
-        this.cameraAnimations.add(animation);
     }
 
     public abstract GL3DMat4d getVM();
@@ -390,10 +360,6 @@ public abstract class GL3DCamera {
 
     public abstract CoordinateSystem getViewSpaceCoordinateSystem();
 
-    public boolean isAnimating() {
-        return !this.cameraAnimations.isEmpty();
-    }
-
     public void updateRotation(long dateMillis) {
 
     }
@@ -441,5 +407,8 @@ public abstract class GL3DCamera {
 
     public boolean getTrackingMode() {
         return this.trackingMode;
+    }
+
+    public void deactivate() {
     }
 }
