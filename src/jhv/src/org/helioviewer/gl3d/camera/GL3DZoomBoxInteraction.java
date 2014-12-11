@@ -5,7 +5,6 @@ import java.awt.event.MouseEvent;
 
 import javax.media.opengl.GL2;
 
-import org.helioviewer.base.logging.Log;
 import org.helioviewer.gl3d.scenegraph.GL3DState;
 import org.helioviewer.gl3d.scenegraph.math.GL3DVec3d;
 import org.helioviewer.gl3d.scenegraph.rt.GL3DRay;
@@ -22,9 +21,9 @@ import org.helioviewer.jhv.display.Displayer;
  * restricted to the solar disk, the camera panning will be reset and a rotation
  * is applied. When the zoom box intersects with the corona the rotation is
  * reset and only a panning is applied.
- * 
+ *
  * @author Simon Spoerri (simon.spoerri@fhnw.ch)
- * 
+ *
  */
 public class GL3DZoomBoxInteraction extends GL3DDefaultInteraction {
     private GL3DRayTracer rayTracer;
@@ -97,57 +96,9 @@ public class GL3DZoomBoxInteraction extends GL3DDefaultInteraction {
 
     @Override
     public void mouseReleased(MouseEvent e, GL3DCamera camera) {
-
-        if (this.isValidZoomBox()) {
-            camera.addCameraAnimation(createZoomAnimation());
-            if (isCompletelyOnSphere()) {
-                if (camera.getTranslation().x != 0 || camera.getTranslation().y != 0) {
-                    // Reset Panning
-                    camera.addCameraAnimation(createPanAnimation(0, 0));
-                    // Rotate from middle point
-                    camera.addCameraAnimation(createRotationAnimation(new GL3DVec3d(0, 0, 1)));
-                } else {
-                    GL3DVec3d hitPoint = getHitPoint(new Point((int) this.camera.getWidth() / 2, (int) this.camera.getHeight() / 2));
-                    if (hitPoint != null) {
-                        hitPoint.normalize();
-                        camera.addCameraAnimation(createRotationAnimation(hitPoint));
-                    } else {
-                        Log.error("GL3DZoomBoxInteraction: No Hitpoint returned on Sphere!");
-                    }
-                }
-            } else {
-                long x = Math.round(-(this.zoomBoxEndPoint.x + this.zoomBoxStartPoint.x) / 2);
-                long y = Math.round(-(this.zoomBoxEndPoint.y + this.zoomBoxStartPoint.y) / 2);
-                camera.addCameraAnimation(createPanAnimation(x, y));
-            }
-        }
         this.zoomBoxEndPoint = null;
         this.zoomBoxStartPoint = null;
         Displayer.getSingletonInstance().display();
-    }
-
-    private GL3DCameraRotationAnimation createRotationAnimation(GL3DVec3d startPoint) {
-
-        GL3DVec3d endPoint = GL3DVec3d.add(camera.getLocalRotation().toMatrix().multiply(this.zoomBoxEndPoint), camera.getLocalRotation().toMatrix().multiply(this.zoomBoxStartPoint));
-        endPoint.divide(2);
-        endPoint.normalize();
-        return new GL3DCameraRotationAnimation(new GL3DVec3d(0., 0., 1.), endPoint, 700);
-    }
-
-    private GL3DCameraPanAnimation createPanAnimation(long x, long y) {
-        GL3DVec3d distanceToMove = new GL3DVec3d((x - camera.translation.x), (y - camera.translation.y), 0);
-        // Log.debug("GL3DZoomBoxInteraction: Panning "+distanceToMove);
-        return new GL3DCameraPanAnimation(distanceToMove);
-    }
-
-    private GL3DCameraZoomAnimation createZoomAnimation() {
-
-        double halfWidth = Math.abs(this.zoomBoxEndPoint.x - this.zoomBoxStartPoint.x) / 2;
-        double halfFOVRad = Math.toRadians(camera.getCameraFOV() / 2);
-        double distance = halfWidth * Math.sin(Math.PI / 2 - halfFOVRad) / Math.sin(halfFOVRad);
-        distance = -distance - camera.getZTranslation();
-
-        return new GL3DCameraZoomAnimation(distance, 700);
     }
 
     private boolean isCompletelyOnSphere() {

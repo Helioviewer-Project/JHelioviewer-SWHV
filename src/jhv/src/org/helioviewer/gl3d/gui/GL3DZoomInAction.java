@@ -3,7 +3,7 @@ package org.helioviewer.gl3d.gui;
 import java.awt.event.ActionEvent;
 
 import org.helioviewer.gl3d.camera.GL3DCamera;
-import org.helioviewer.gl3d.camera.GL3DCameraZoomAnimation;
+import org.helioviewer.gl3d.scenegraph.GL3DState;
 import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.gui.actions.ZoomInAction;
 
@@ -24,8 +24,10 @@ public class GL3DZoomInAction extends ZoomInAction {
 
     @Override
     public void actionPerformed(ActionEvent e) {
-        GL3DCameraSelectorModel.getInstance().getCurrentCamera().addCameraAnimation(new GL3DCameraZoomAnimation(-0.2, 250));
-        Displayer.getSingletonInstance().render();
+        GL3DCamera camera = GL3DState.get().getActiveCamera();
+        camera.setCameraFOV(camera.getCameraFOV() + 0.01);
+        camera.updateCameraTransformation(true);
+        Displayer.getSingletonInstance().display();
     }
 
 }
