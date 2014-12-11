@@ -36,11 +36,10 @@ public abstract class GL3DCamera {
     public static final double MAX_DISTANCE = -Constants.SunMeanDistanceToEarth * 1.8;
     public static final double MIN_DISTANCE = -Constants.SunRadius * 1.2;
 
-    public static final double MIN_FOV = 0.05;
-    public static final double MAX_FOV = 1000;
-
     public static final double INITFOV = 0.6 * 4096. / 3600.;
 
+    public static final double MIN_FOV = INITFOV * 0.05;
+    public static final double MAX_FOV = INITFOV * 100;
     private double clipNear = Constants.SunRadius * 3;
     private double clipFar = Constants.SunRadius * 10000.;
     private double fov = INITFOV;
@@ -310,7 +309,14 @@ public abstract class GL3DCamera {
     }
 
     public double setCameraFOV(double fov) {
-        return this.fov = fov;
+        if (fov < MIN_FOV) {
+            this.fov = MIN_FOV;
+        } else if (fov > MAX_FOV) {
+            this.fov = MAX_FOV;
+        } else {
+            this.fov = fov;
+        }
+        return this.fov;
     }
 
     public double getClipNear() {
@@ -410,5 +416,9 @@ public abstract class GL3DCamera {
     }
 
     public void deactivate() {
+    }
+
+    public void setDefaultFOV() {
+        this.fov = INITFOV;
     }
 }
