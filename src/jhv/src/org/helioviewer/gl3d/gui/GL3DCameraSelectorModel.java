@@ -10,7 +10,6 @@ import javax.swing.ListModel;
 import org.helioviewer.base.logging.Log;
 import org.helioviewer.gl3d.camera.GL3DCamera;
 import org.helioviewer.gl3d.camera.GL3DEarthCamera;
-import org.helioviewer.gl3d.camera.GL3DFixedTimeCamera;
 import org.helioviewer.gl3d.camera.GL3DFollowObjectCamera;
 import org.helioviewer.gl3d.camera.GL3DObserverCamera;
 import org.helioviewer.gl3d.camera.GL3DSolarRotationTrackingTrackballCamera;
@@ -41,8 +40,6 @@ public class GL3DCameraSelectorModel extends AbstractListModel implements ComboB
     private GL3DEarthCamera earthCamera;
 
     private GL3DSolarRotationTrackingTrackballCamera solarRotationCamera;
-
-    private GL3DFixedTimeCamera fixedTimeCamera;
 
     private GL3DObserverCamera observerCamera;
 
@@ -160,10 +157,6 @@ public class GL3DCameraSelectorModel extends AbstractListModel implements ComboB
 
     public GL3DSolarRotationTrackingTrackballCamera getSolarRotationCamera() {
         return solarRotationCamera;
-    }
-
-    public GL3DFixedTimeCamera getFixedTimeCamera() {
-        return fixedTimeCamera;
     }
 
     public GL3DObserverCamera getStonyHurstCamera() {
