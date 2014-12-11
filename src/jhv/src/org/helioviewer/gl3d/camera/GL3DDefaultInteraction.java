@@ -22,32 +22,32 @@ public abstract class GL3DDefaultInteraction extends GL3DInteraction {
     protected GL3DDefaultInteraction(GL3DCamera camera, GL3DSceneGraphView sceneGraph) {
         super(camera);
         this.sceneGraphView = sceneGraph;
-        this.reset();
     }
 
     @Override
     public void reset(GL3DCamera camera) {
-        reset();
     }
 
     @Override
     public void mouseClicked(MouseEvent e, GL3DCamera camera) {
         if (e.getClickCount() == 2) {
-            reset();
+            camera.reset();
         }
     }
 
     public void reset() {
-        camera.setZTranslation(-GL3DEarthCamera.DEFAULT_CAMERA_DISTANCE);
-        this.camera.updateCameraTransformation();
+        //camera.setDefaultFOV();
+        //this.camera.updateCameraTransformation();
     }
 
     @Override
     public void mouseWheelMoved(MouseWheelEvent e, GL3DCamera camera) {
         int wr = e.getWheelRotation();
+        double previousFOV = camera.getCameraFOV();
 
         camera.setCameraFOV(camera.getCameraFOV() + 0.02 * ZOOM_WHEEL_FACTOR * wr);
-        camera.updateCameraTransformation(true);
-        Displayer.getSingletonInstance().display();
+        if (previousFOV != camera.getCameraFOV()) {
+            Displayer.getSingletonInstance().display();
+        }
     }
 }
