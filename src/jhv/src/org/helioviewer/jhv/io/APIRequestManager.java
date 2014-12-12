@@ -9,8 +9,8 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.UnknownHostException;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.Calendar;
 import java.util.Date;
 
 import org.helioviewer.base.DownloadStream;
@@ -33,10 +33,10 @@ import org.helioviewer.viewmodel.view.jp2view.JHVJP2View;
 
 /**
  * This class provides methods to download files from a server.
- * 
+ *
  * Most of the methods only will work with the current Helioviewer server
  * because they modify links and requests that they will fit with the API.
- * 
+ *
  * @author Stephan Pagel
  * @author Andre Dau
  * @author Helge Dietert
@@ -44,7 +44,7 @@ import org.helioviewer.viewmodel.view.jp2view.JHVJP2View;
 public class APIRequestManager {
     /**
      * Returns the date of the latest image available from the server
-     * 
+     *
      * @param observatory
      *            observatory of the requested image.
      * @param instrument
@@ -99,7 +99,7 @@ public class APIRequestManager {
     /**
      * Sends an request to the server to compute where the nearest image is
      * located on the server. The address of the file will be returned.
-     * 
+     *
      * @param addToViewChain
      *            specifies whether the generated ImageInfoView should be added
      *            to the view chain of the main image
@@ -143,7 +143,7 @@ public class APIRequestManager {
     /**
      * Sends an request to the server to compute where the image series is
      * located on the server. The address of the file will be returned.
-     * 
+     *
      * @param addToViewChain
      *            specifies whether the generated ImageInfoView should be added
      *            to the view chain of the main image
@@ -170,24 +170,20 @@ public class APIRequestManager {
      */
     private static ImageInfoView loadImageSeries(boolean addToViewChain, String observatory, String instrument, String detector, String measurement, String startTime, String endTime, String cadence, boolean message) throws MalformedURLException, IOException {
         String fileRequest = Settings.getSingletonInstance().getProperty("API.jp2series.path") + "?action=getJPX&observatory=" + observatory + "&instrument=" + instrument + "&detector=" + detector + "&measurement=" + measurement + "&startTime=" + startTime + "&endTime=" + endTime;
-        Calendar cal = Calendar.getInstance();
-        cal.set(Calendar.YEAR, Integer.parseInt(startTime.substring(0, 4)));
-        cal.set(Calendar.MONTH, -1 + Integer.parseInt(startTime.substring(5, 7)));
-        cal.set(Calendar.DATE, Integer.parseInt(startTime.substring(8, 10)));
-        cal.set(Calendar.HOUR_OF_DAY, Integer.parseInt(startTime.substring(11, 13)));
-        cal.set(Calendar.MINUTE, Integer.parseInt(startTime.substring(14, 16)));
-        cal.set(Calendar.SECOND, Integer.parseInt(startTime.substring(17, 19)));
-        Date beginDate = cal.getTime();
+        SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
+        Date startDate = new Date();
+        try {
+            startDate = format.parse(startTime);
+        } catch (ParseException e1) {
+        }
 
-        cal.set(Calendar.YEAR, Integer.parseInt(endTime.substring(0, 4)));
-        cal.set(Calendar.MONTH, -1 + Integer.parseInt(endTime.substring(5, 7)));
-        cal.set(Calendar.DATE, Integer.parseInt(endTime.substring(8, 10)));
-        cal.set(Calendar.HOUR_OF_DAY, Integer.parseInt(endTime.substring(11, 13)));
-        cal.set(Calendar.MINUTE, Integer.parseInt(endTime.substring(14, 16)));
-        cal.set(Calendar.SECOND, Integer.parseInt(endTime.substring(17, 19)));
-        Date endDate = cal.getTime();
+        Date endDate = new Date();
+        try {
+            endDate = format.parse(startTime);
+        } catch (ParseException e1) {
+        }
 
-        Interval<Date> range = new Interval<Date>(beginDate, endDate);
+        Interval<Date> range = new Interval<Date>(startDate, endDate);
         if (cadence != null) {
             fileRequest += "&cadence=" + cadence;
         }
@@ -226,7 +222,7 @@ public class APIRequestManager {
      * message from the server.
      * <p>
      * Returns the corresponding ImageInfoView for the file.
-     * 
+     *
      * @param addToViewChain
      *            specifies whether the generated ImageInfoView should be added
      *            to the view chain of the main image
@@ -297,7 +293,7 @@ public class APIRequestManager {
     /**
      * Loads the image or image series from the given URI, creates a new image
      * info view and adds it as a new layer to the view chain of the main image.
-     * 
+     *
      * @param uri
      *            specifies the location of the file.
      * @param addToViewChain
@@ -326,7 +322,7 @@ public class APIRequestManager {
     /**
      * Loads the image or image series from the given URI, creates a new image
      * info view and adds it as a new layer to the view chain of the main image.
-     * 
+     *
      * @param uri
      *            specifies the location of the file.
      * @param downloadURI
@@ -359,7 +355,7 @@ public class APIRequestManager {
     /**
      * Method does remote opening. If image series, file is downloaded. If
      * single frame, file is opened via JPIP on delphi.nascom.nasa.gov:8090.
-     * 
+     *
      * @param addToViewChain
      *            specifies whether the generated ImageInfoView should be added
      *            to the view chain of the main image
