@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+
+<project basedir="." default="all" name="comesepsource">
+    <property environment="env"/>
+    <property name="source.name" value="comesepsource" />
+    <property name="swhvproject.location" value="${basedir}/../../../../.." />
+    <property name="swhv-swek.location" value="../../"/>
+    <property name="swhv-swek.build" value="${swhv-swek.location}/build" />
+    <property name="debuglevel" value="source,lines,vars"/>
+    <property name="target" value="1.6"/>
+    <property name="source" value="1.6"/>
+    <property name="comesepsource.build" value="${basedir}/build" />
+    <property name="comesepsource.bin" value="${basedir}/bin" />
+    <property name="comesepsource.lib" value="${basedir}/lib" />
+    <property name="comesepsource.build.resources" value="${basedir}/build-resources/" />
+    <property name="comesepsource.resources" value="${basedir}/resources/" />
+    <property name="server.lib.location" value="/Users/bramb/Documents/OMA/jhelioviewer/svn/SWHV_repos/trunk/data/server/swek_config/jars/" />
+    <property name="swhv.build" value="${swhvproject.location}/build" />
+    <property name="swhv.bin" value="${swhvproject.location}/bin/jhv" />
+    <property name="swhv.lib" value="${swhvproject.location}/lib" />
+    <property name="swhv-swek.homedir.sources" value="${user.home}/JHelioviewer/PluginResources/swek_plugin/sources" />
+    
+    <property name="revision" value="0" />
+    <property name="version" value="0"/>
+
+    <path id="swhv-swek.classpath">
+        <pathelement location="${swhv-swek.location}/bin"/>
+    </path>
+
+    <target name="all" depends="copy-to-root-build" />
+        
+    <target name="copy-to-root-build" depends="jar-bundle">
+        <copy todir="${swhv.build}">
+                <fileset dir="${comesepsource.build}" />
+        </copy>
+    </target>
+
+    <target name="init">
+        <mkdir dir="${comesepsource.build}"/>
+        <mkdir dir="${comesepsource.bin}" />
+        <copy includeemptydirs="false" todir="${comesepsource.bin}">
+            <fileset dir="src">
+                <exclude name="**/*.launch"/>
+                <exclude name="**/*.java"/>
+            </fileset>
+        </copy>
+    </target>
+
+    <target name="omabuild" depends="all">
+        <copy todir="${server.lib.location}" file="${comesepsource.build}/${source.name}.jar"/>
+    </target>
+
+    <target name="clean">
+        <delete dir="${comesepsource.bin}"/>
+        <delete dir="${comesepsource.build}"/>
+    </target>
+
+    <target name="cleanall" depends="clean" >
+        <ant antfile="build.xml" dir="${swhv-swek.location}" inheritAll="false" target="clean"/>
+    </target>
+
+    <target name="build-subprojects">
+        <!--<ant antfile="build.xml" dir="${swhv-swek.location}" inheritAll="false" target="all"/>-->
+    </target>
+
+    <target name="compile" depends="init" >
+        <echo message="${ant.project.name}: ${ant.file}"/>
+        <echo message="${swhv.bin}" />
+        <javac debug="true" debuglevel="${debuglevel}" destdir="${comesepsource.bin}" includeantruntime="false" source="${source}" target="${target}">
+            <src path="src"/>
+            <classpath>
+                <fileset dir="${swhv-swek.build}">
+                    <include name="**/*.jar" />
+                </fileset>
+                <fileset dir="${swhv.lib}" >
+                    <include name="**/*.jar" />
+                </fileset>
+                <pathelement location="${swhv.bin}" />
+            </classpath>
+        </javac>
+    </target>
+
+    <target name="jar-bundle" depends="compile">
+        <!-- JAR File -->
+        <jar destfile="${comesepsource.build}/${source.name}.jar">
+            <manifest>
+                <attribute name="Class-Path" value="." />
+                <attribute name="Implementation-Version" value="v${version}r${revision}" />
+                <attribute name="version" value="${version}" />
+                <attribute name="revision" value="${revision}" />
+            </manifest>
+            <fileset dir="${comesepsource.bin}" />
+            <fileset dir="${comesepsource.resources}" />
+            <fileset file="README" />
+            <fileset file="COPYING" />
+            <!--<zipgroupfileset dir="${swhv-swek.build}" includes="**/*.jar"/>-->
+        </jar>
+    </target>
+    
+    <target name="doc" />
+    
+    <target name="bundle-src" />
+    
+    <target name="install-source" depends="jar-bundle">
+        <copy file="${comesepsource.build}/${source.name}.jar" todir="${swhv-swek.homedir.sources}" />
+    </target>
+    
+</project>
