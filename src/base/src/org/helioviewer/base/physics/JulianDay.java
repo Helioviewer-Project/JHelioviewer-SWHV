@@ -275,12 +275,7 @@ public final class JulianDay implements Cloneable {
      */
     public JulianDay(JulianDay cal) {
         if (cal != null) {
-            set(Calendar.YEAR, cal.get(Calendar.YEAR));
-            set(Calendar.MONTH, cal.get(Calendar.MONTH));
-            set(Calendar.DATE, cal.get(Calendar.DATE));
-            set(Calendar.HOUR_OF_DAY, cal.get(Calendar.HOUR_OF_DAY));
-            set(Calendar.MINUTE, cal.get(Calendar.MINUTE));
-            set(Calendar.SECOND, cal.get(Calendar.SECOND));
+            cal.clone();
             calcJD();
         } else {
             Calendar calendar = new GregorianCalendar(tz);
