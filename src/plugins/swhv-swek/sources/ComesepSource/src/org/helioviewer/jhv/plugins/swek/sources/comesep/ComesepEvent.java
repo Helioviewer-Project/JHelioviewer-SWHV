@@ -1,6 +1,7 @@
 package org.helioviewer.jhv.plugins.swek.sources.comesep;
 
 import java.awt.Color;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -14,22 +15,81 @@ import org.helioviewer.jhv.data.datatype.event.JHVEventRelationship;
 import org.helioviewer.jhv.data.datatype.event.JHVEventType;
 import org.helioviewer.jhv.data.datatype.event.JHVPositionInformation;
 
+/**
+ * Represents a JHVevent coming from the Comsep source.
+ * 
+ * @author Bram Bourgoignie (Bram.Bourgoignie@oma.be)
+ * 
+ */
 public class ComesepEvent implements JHVEvent {
 
+    /** the start date of the event */
     private Date startDate;
+
+    /** the end date of the event */
     private Date endDate;
-    private ImageIcon icon;
-    private String eventName;
-    private String eventDisplayName;
-    private String description;
+
+    /** the icon */
+    private final ImageIcon icon;
+
+    /** the event name */
+    private final String eventName;
+
+    /** the event display name */
+    private final String eventDisplayName;
+
+    /** the event short description */
+    private final String description;
+
+    /** all the parameters */
     private List<JHVEventParameter> allParameters;
+
+    /** all the visible parameters */
     private List<JHVEventParameter> allVisibleParameters;
-    private List<JHVEventParameter> allVisibleNotNullParameter;
+
+    /** all the visible not null parameters */
+    private List<JHVEventParameter> allVisibleNotNullParameters;
+
+    /** all the visible null parameters */
     private List<JHVEventParameter> allVisibleNullParameters;
+
+    /** all the non visible parameters */
     private List<JHVEventParameter> allNonVisibleParameters;
+
+    /** all the non visible not null parameters */
     private List<JHVEventParameter> allNonVisibleNotNullParameters;
+
+    /** all the non visible null parameters */
     private List<JHVEventParameter> allNonVisibleNullParameters;
-    private JHVEventType eventType;
+
+    /** The event type */
+    private final JHVEventType eventType;
+
+    /** The unique identifier */
+    private String uniqueID;
+
+    /** List with positioning information for this event */
+    private HashMap<JHVCoordinateSystem, JHVPositionInformation> positionInformation;
+
+    /** The color in which the event should be drawn */
+    private final Color color;
+
+    /** The event relation ships of the event */
+    private final JHVEventRelationship eventRelationShip;
+
+    /**
+     * Default constructor
+     */
+    public ComesepEvent() {
+        initLists();
+        eventName = "";
+        eventDisplayName = "";
+        description = "";
+        icon = null;
+        eventType = null;
+        color = Color.black;
+        eventRelationShip = new JHVEventRelationship();
+    }
 
     @Override
     public Date getStartDate() {
@@ -53,92 +113,161 @@ public class ComesepEvent implements JHVEvent {
 
     @Override
     public ImageIcon getIcon() {
-        // TODO Auto-generated method stub
-        return null;
+        return icon;
     }
 
     @Override
     public String getShortDescription() {
-        // TODO Auto-generated method stub
-        return null;
+        return description;
     }
 
     @Override
     public List<JHVEventParameter> getAllEventParameters() {
-        // TODO Auto-generated method stub
-        return null;
+        return allParameters;
     }
 
     @Override
     public List<JHVEventParameter> getVisibleEventParameters() {
-        // TODO Auto-generated method stub
-        return null;
+        return allVisibleParameters;
     }
 
     @Override
     public List<JHVEventParameter> getVisibleNotNullEventParameters() {
-        // TODO Auto-generated method stub
-        return null;
+        return allVisibleNotNullParameters;
     }
 
     @Override
     public List<JHVEventParameter> getVisibleNullEventParameters() {
-        // TODO Auto-generated method stub
-        return null;
+        return allVisibleNullParameters;
     }
 
     @Override
     public List<JHVEventParameter> getNonVisibleEventParameters() {
-        // TODO Auto-generated method stub
-        return null;
+        return allNonVisibleParameters;
     }
 
     @Override
     public List<JHVEventParameter> getNonVisibleNotNullEventParameters() {
-        // TODO Auto-generated method stub
-        return null;
+        return allNonVisibleNotNullParameters;
     }
 
     @Override
     public List<JHVEventParameter> getNonVisibleNullEventParameters() {
-        // TODO Auto-generated method stub
-        return null;
+        return allNonVisibleNullParameters;
     }
 
     @Override
     public JHVEventType getJHVEventType() {
-        // TODO Auto-generated method stub
-        return null;
+        return eventType;
     }
 
     @Override
     public String getUniqueID() {
-        // TODO Auto-generated method stub
-        return null;
+        return uniqueID;
     }
 
     @Override
     public HashMap<JHVCoordinateSystem, JHVPositionInformation> getPositioningInformation() {
-        // TODO Auto-generated method stub
-        return null;
+        return positionInformation;
     }
 
     @Override
     public Color getColor() {
-        // TODO Auto-generated method stub
-        return null;
+        return color;
     }
 
     @Override
     public JHVEventRelationship getEventRelationShip() {
-        // TODO Auto-generated method stub
-        return null;
+        return eventRelationShip;
     }
 
     @Override
     public void merge(JHVEvent event) {
-        // TODO Auto-generated method stub
+        eventRelationShip.merge(event.getEventRelationShip());
+    }
+
+    /**
+     * Adds a parameter to the event.
+     * 
+     * @param parameter
+     *            the parameter to add
+     * @param visible
+     *            is the parameter visible
+     * @param configured
+     *            was the event in the configuration file
+     */
+    public void addParameter(JHVEventParameter parameter, boolean visible, boolean configured) {
+        allParameters.add(parameter);
+        if (configured) {
+            if (visible) {
+                allVisibleParameters.add(parameter);
+                if (parameter.getParameterValue() == null) {
+                    allVisibleNullParameters.add(parameter);
+                } else {
+                    allVisibleNotNullParameters.add(parameter);
+                }
+            } else {
+                allNonVisibleParameters.add(parameter);
+                if (parameter.getParameterValue() == null) {
+                    allNonVisibleNullParameters.add(parameter);
+                } else {
+                    allNonVisibleNotNullParameters.add(parameter);
+                }
+            }
+        }
+    }
+
+    /**
+     * Sets the start date of the ComesepEvent.
+     * 
+     * @param startDate
+     *            the start date
+     */
+    public void setStartTime(Date startDate) {
+        this.startDate = startDate;
+    }
+
+    /**
+     * Sets the end date of the ComesepEvent.
+     * 
+     * @param endDate
+     *            the end date
+     */
+    public void setEndTime(Date endDate) {
+        this.endDate = endDate;
 
     }
 
+    /**
+     * Sets the unique ID for the HekEvent.
+     * 
+     * @param uniqueID
+     */
+    public void setUniqueID(String uniqueID) {
+        this.uniqueID = uniqueID;
+    }
+
+    /**
+     * Adds position information to the HEKEvent.
+     * 
+     * @param positionInformation
+     *            the position information to add
+     */
+    public void addJHVPositionInformation(JHVCoordinateSystem coorSys, JHVPositionInformation positionInformation) {
+        this.positionInformation.put(coorSys, positionInformation);
+    }
+
+    /**
+     * Initialize all the lists.
+     */
+    private void initLists() {
+        allParameters = new ArrayList<JHVEventParameter>();
+        allVisibleParameters = new ArrayList<JHVEventParameter>();
+        allVisibleNotNullParameters = new ArrayList<JHVEventParameter>();
+        allVisibleNullParameters = new ArrayList<JHVEventParameter>();
+        allNonVisibleParameters = new ArrayList<JHVEventParameter>();
+        allNonVisibleNotNullParameters = new ArrayList<JHVEventParameter>();
+        allNonVisibleNullParameters = new ArrayList<JHVEventParameter>();
+        positionInformation = new HashMap<JHVCoordinateSystem, JHVPositionInformation>();
+    }
 }
