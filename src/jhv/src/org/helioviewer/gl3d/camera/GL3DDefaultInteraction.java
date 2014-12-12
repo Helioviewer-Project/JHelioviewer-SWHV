@@ -15,7 +15,7 @@ import org.helioviewer.jhv.display.Displayer;
  *
  */
 public abstract class GL3DDefaultInteraction extends GL3DInteraction {
-    private static final double ZOOM_WHEEL_FACTOR = 1.0 / 20;
+    private static final double ZOOM_WHEEL_FACTOR = 0.002;
 
     protected GL3DSceneGraphView sceneGraphView;
 
@@ -36,8 +36,6 @@ public abstract class GL3DDefaultInteraction extends GL3DInteraction {
     }
 
     public void reset() {
-        //camera.setDefaultFOV();
-        //this.camera.updateCameraTransformation();
     }
 
     @Override
@@ -45,7 +43,7 @@ public abstract class GL3DDefaultInteraction extends GL3DInteraction {
         int wr = e.getWheelRotation();
         double previousFOV = camera.getCameraFOV();
 
-        camera.setCameraFOV(camera.getCameraFOV() + 0.04 * ZOOM_WHEEL_FACTOR * wr);
+        camera.setCameraFOV(camera.getCameraFOV() + ZOOM_WHEEL_FACTOR * wr);
         if (previousFOV != camera.getCameraFOV()) {
             Displayer.getSingletonInstance().display();
         }
