@@ -92,5 +92,6 @@ public class SWEKIconBank {
         iconBank.put("Sigmoid", new ImageIcon(SWEKPlugin.class.getResource("/images/EventIcons/sg_icon.png")));
         iconBank.put("SpraySurge", new ImageIcon(SWEKPlugin.class.getResource("/images/EventIcons/sp_icon.png")));
         iconBank.put("SunSpot", new ImageIcon(SWEKPlugin.class.getResource("/images/EventIcons/ss_icon.png")));
+        iconBank.put("Comesep", new ImageIcon(SWEKPlugin.class.getResource("/images/EventIcons/comesep.png")));
     }
 }
