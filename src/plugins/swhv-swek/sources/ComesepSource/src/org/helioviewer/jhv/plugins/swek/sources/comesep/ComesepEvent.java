@@ -102,6 +102,7 @@ public class ComesepEvent implements JHVEvent {
      */
     public ComesepEvent(String eventName, String eventDisplayName, String description, ComesepEventType comesepEventType,
             ImageIcon eventIcon, Color color) {
+        initLists();
         this.eventName = eventName;
         this.eventDisplayName = eventDisplayName;
         this.description = description;
