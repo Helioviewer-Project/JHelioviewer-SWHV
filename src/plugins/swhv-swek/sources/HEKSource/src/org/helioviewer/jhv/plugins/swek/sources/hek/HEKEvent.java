@@ -74,6 +74,7 @@ public class HEKEvent implements JHVEvent {
     /** The color in which the event should be drawn */
     private final Color color;
 
+    /** The event relation ships of the event */
     private final JHVEventRelationship eventRelationShip;
 
     /**
