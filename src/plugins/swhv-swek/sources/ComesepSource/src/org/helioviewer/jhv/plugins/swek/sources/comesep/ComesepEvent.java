@@ -91,6 +91,26 @@ public class ComesepEvent implements JHVEvent {
         eventRelationShip = new JHVEventRelationship();
     }
 
+    /**
+     * 
+     * @param eventName
+     * @param eventDisplayName
+     * @param description
+     * @param comesepEventType
+     * @param eventIcon
+     * @param color
+     */
+    public ComesepEvent(String eventName, String eventDisplayName, String description, ComesepEventType comesepEventType,
+            ImageIcon eventIcon, Color color) {
+        this.eventName = eventName;
+        this.eventDisplayName = eventDisplayName;
+        this.description = description;
+        eventType = comesepEventType;
+        icon = eventIcon;
+        this.color = color;
+        eventRelationShip = new JHVEventRelationship();
+    }
+
     @Override
     public Date getStartDate() {
         return startDate;
