@@ -66,11 +66,11 @@ public class ComesepDownloader implements SWEKDownloader {
      * @return the url represented as string
      */
     private String createURL(SWEKEventType eventType, Date startDate, Date endDate, List<SWEKParam> params) {
-        StringBuilder baseURL = new StringBuilder(comesepSourceProperties.getProperty("heksource.baseurl")).append("?");
+        StringBuilder baseURL = new StringBuilder(comesepSourceProperties.getProperty("comesepsource.baseurl")).append("?");
         baseURL = appendModel(baseURL, params).append("&");
         baseURL = appendEventStartTime(baseURL, startDate).append("&");
         baseURL = appendEventEndTime(baseURL, endDate).append("&");
-        return null;
+        return baseURL.toString();
     }
 
     /**
