@@ -34,6 +34,9 @@ public class ComesepParser implements SWEKParser {
     private boolean parserStopped;
     private final HashMap<String, List<Association>> associationsMap;
     private final HashMap<String, ComesepEvent> associationEventsMap;
+    private Long cactusLiftOff = null;
+    private boolean startTimeSet = false;
+    private boolean endTimeSet = false;
 
     /**
      * Creates a parser for the given event type and event source.
@@ -58,8 +61,7 @@ public class ComesepParser implements SWEKParser {
     }
 
     @Override
-    public SWEKEventStream parseEventStream(InputStream downloadInputStream, SWEKEventType eventType, SWEKSource swekSource,
-            SWEKSupplier swekSupplier, List<SWEKRelatedEvents> relatedEvents) {
+    public SWEKEventStream parseEventStream(InputStream downloadInputStream, SWEKEventType eventType, SWEKSource swekSource, SWEKSupplier swekSupplier, List<SWEKRelatedEvents> relatedEvents) {
         this.eventType = eventType;
         eventSource = swekSource;
         eventSupplier = swekSupplier;
@@ -74,8 +76,8 @@ public class ComesepParser implements SWEKParser {
                 }
                 JSONObject eventJSON;
                 String reply = sb.toString().trim().replaceAll("[\n\r\t]", "");
-                // Log.debug("reply:");
-                // Log.debug(reply.toString());
+                Log.debug("reply:");
+                Log.debug(reply.toString());
                 eventJSON = new JSONObject(reply);
                 parseAssociation(eventJSON);
                 parseEventJSON(eventJSON);
@@ -96,11 +98,9 @@ public class ComesepParser implements SWEKParser {
 
     private void parseEventJSON(JSONObject eventJSON) throws JSONException {
         JSONArray results = eventJSON.getJSONArray("results");
-        ComesepEventType comesepEventType = new ComesepEventType(eventType.getEventName(), eventSource.getSourceName(),
-                eventSupplier.getSupplierName());
+        ComesepEventType comesepEventType = new ComesepEventType(eventType.getEventName(), eventSource.getSourceName(), eventSupplier.getSupplierName());
         for (int i = 0; i < results.length() && !parserStopped; i++) {
-            ComesepEvent currentEvent = new ComesepEvent(eventType.getEventName(), eventType.getEventName(), "", comesepEventType,
-                    eventType.getEventIcon(), eventType.getColor());
+            ComesepEvent currentEvent = new ComesepEvent(eventType.getEventName(), eventType.getEventName(), "", comesepEventType, eventType.getEventIcon(), eventType.getColor());
             JSONObject result = results.getJSONObject(i);
             parseResult(result, currentEvent);
             if (associationsMap.containsKey(currentEvent.getUniqueID())) {
@@ -110,23 +110,17 @@ public class ComesepParser implements SWEKParser {
                 for (Association association : associationsList) {
                     if (association.getAssociationParent().equals(currentEvent.getUniqueID())) {
                         // current event is the parent of the association
-                        if (associationEventsMap.containsKey(association.getAssociationParent())) {
+                        if (associationEventsMap.containsKey(association.getAssociationChild())) {
                             // The parent event of the association is available
-                            ComesepEvent associatedEvent = associationEventsMap.get(association.getAssociationParent());
+                            ComesepEvent associatedEvent = associationEventsMap.get(association.getAssociationChild());
                             // Is a sequence relation so associated event is
                             // follow-up of current event
                             if (currentEvent.getEventRelationShip().getPrecedingEvents().isEmpty()) {
                                 currentEvent.getEventRelationShip().setRelationshipColor(ComesepColors.getNextColor());
                             }
-                            associatedEvent.getEventRelationShip().getPrecedingEvents()
-                                    .put(currentEvent.getUniqueID(), new JHVEventRelation(currentEvent.getUniqueID(), currentEvent));
-                            currentEvent
-                                    .getEventRelationShip()
-                                    .getNextEvents()
-                                    .put(associatedEvent.getUniqueID(),
-                                            new JHVEventRelation(associatedEvent.getUniqueID(), associatedEvent));
-                            associatedEvent.getEventRelationShip().setRelationshipColor(
-                                    currentEvent.getEventRelationShip().getRelationshipColor());
+                            associatedEvent.getEventRelationShip().getPrecedingEvents().put(currentEvent.getUniqueID(), new JHVEventRelation(currentEvent.getUniqueID(), currentEvent));
+                            currentEvent.getEventRelationShip().getNextEvents().put(associatedEvent.getUniqueID(), new JHVEventRelation(associatedEvent.getUniqueID(), associatedEvent));
+                            associatedEvent.getEventRelationShip().setRelationshipColor(currentEvent.getEventRelationShip().getRelationshipColor());
                         } else {
                             // The associated event is not in the list so we
                             // start a
@@ -134,8 +128,7 @@ public class ComesepParser implements SWEKParser {
                             // without
                             // event reference.
                             currentEvent.getEventRelationShip().setRelationshipColor(ComesepColors.getNextColor());
-                            currentEvent.getEventRelationShip().getNextEvents()
-                                    .put(association.getAssociationChild(), new JHVEventRelation(association.getAssociationChild()));
+                            currentEvent.getEventRelationShip().getNextEvents().put(association.getAssociationChild(), new JHVEventRelation(association.getAssociationChild()));
 
                         }
                     } else if (association.getAssociationChild().equals(currentEvent.getUniqueID())) {
@@ -146,15 +139,9 @@ public class ComesepParser implements SWEKParser {
                             // Is a sequence relation so the current event
                             // is
                             // the follow-up of the associated event
-                            associatedEvent.getEventRelationShip().getNextEvents()
-                                    .put(currentEvent.getUniqueID(), new JHVEventRelation(currentEvent.getUniqueID(), currentEvent));
-                            currentEvent
-                                    .getEventRelationShip()
-                                    .getPrecedingEvents()
-                                    .put(associatedEvent.getUniqueID(),
-                                            new JHVEventRelation(associatedEvent.getUniqueID(), associatedEvent));
-                            currentEvent.getEventRelationShip().setRelationshipColor(
-                                    associatedEvent.getEventRelationShip().getRelationshipColor());
+                            associatedEvent.getEventRelationShip().getNextEvents().put(currentEvent.getUniqueID(), new JHVEventRelation(currentEvent.getUniqueID(), currentEvent));
+                            currentEvent.getEventRelationShip().getPrecedingEvents().put(associatedEvent.getUniqueID(), new JHVEventRelation(associatedEvent.getUniqueID(), associatedEvent));
+                            currentEvent.getEventRelationShip().setRelationshipColor(associatedEvent.getEventRelationShip().getRelationshipColor());
 
                         } else {
                             // The associated event is not in the list so we
@@ -162,15 +149,22 @@ public class ComesepParser implements SWEKParser {
                             // new color add we already add a reference to the
                             // previous event without event type.
                             currentEvent.getEventRelationShip().setRelationshipColor(ComesepColors.getNextColor());
-                            currentEvent.getEventRelationShip().getPrecedingEvents()
-                                    .put(association.getAssociationParent(), new JHVEventRelation(association.getAssociationParent()));
+                            currentEvent.getEventRelationShip().getPrecedingEvents().put(association.getAssociationParent(), new JHVEventRelation(association.getAssociationParent()));
 
                         }
                     }
                 }
             }
+            initLocalVariables();
             eventStream.addJHVEvent(currentEvent);
         }
+    }
+
+    private void initLocalVariables() {
+        startTimeSet = false;
+        endTimeSet = false;
+        cactusLiftOff = null;
+
     }
 
     private void parseResult(JSONObject result, ComesepEvent currentEvent) throws JSONException {
@@ -189,15 +183,35 @@ public class ComesepParser implements SWEKParser {
             }
             // Event start time
             if (keyString.toLowerCase().equals("atearliest")) {
+                startTimeSet = true;
                 currentEvent.setStartTime(parseDate(value));
+                if (cactusLiftOff != null) {
+                    currentEvent.setEndTime(new Date(currentEvent.getStartDate().getTime() + cactusLiftOff * 60000));
+                    endTimeSet = true;
+                }
             } else
             // Event end time
             if (keyString.toLowerCase().equals("atlatest")) {
-                currentEvent.setEndTime(parseDate(value));
+                if (!endTimeSet) {
+                    currentEvent.setEndTime(parseDate(value));
+                    endTimeSet = true;
+                }
             } else
             // event unique ID
             if (keyString.toLowerCase().equals("alertid")) {
                 currentEvent.setUniqueID(value);
+            } else if (keyString.toLowerCase().equals("liftoffduration_value")) {
+                cactusLiftOff = Long.parseLong(value);
+                if (startTimeSet) {
+                    currentEvent.setEndTime(new Date(currentEvent.getStartDate().getTime() + cactusLiftOff * 60000));
+                    endTimeSet = true;
+                }
+            } else if (keyString.toLowerCase().equals("begin_time_value")) {
+                currentEvent.setStartTime(new Date(Long.parseLong(value) * 1000));
+                startTimeSet = true;
+            } else if (keyString.toLowerCase().equals("end_time_value")) {
+                currentEvent.setStartTime(new Date(Long.parseLong(value) * 1000));
+                endTimeSet = true;
             } else {
                 boolean visible = false;
                 boolean configured = false;
@@ -223,7 +237,7 @@ public class ComesepParser implements SWEKParser {
     }
 
     private Date parseDate(String value) {
-        return new Date(Long.parseLong(value));
+        return new Date(Long.parseLong(value) * 1000);
     }
 
     /**
@@ -261,7 +275,7 @@ public class ComesepParser implements SWEKParser {
      * @throws JSONException
      */
     private String parseAssociationParent(JSONObject jsonObject) throws JSONException {
-        return jsonObject.getString("child");
+        return jsonObject.getString("parent");
     }
 
     /**
@@ -272,7 +286,7 @@ public class ComesepParser implements SWEKParser {
      * @throws JSONException
      */
     private String parseAssociationChild(JSONObject jsonObject) throws JSONException {
-        return jsonObject.getString("parent");
+        return jsonObject.getString("child");
     }
 
     private class Association {
