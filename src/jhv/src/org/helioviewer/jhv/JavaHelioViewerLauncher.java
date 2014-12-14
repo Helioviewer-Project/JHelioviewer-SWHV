@@ -150,6 +150,7 @@ public class JavaHelioViewerLauncher {
         // majorVersionNumber.minorVersionNumber
         String versionString = System.getProperty("java.specification.version");
         System.out.println("JavaHelioviewerLauncher > Detected Java version: " + versionString);
+        String osName = System.getProperty("os.name");
 
         // Check if version is high enough
         int firstDot = versionString.indexOf('.');
@@ -217,11 +218,11 @@ public class JavaHelioViewerLauncher {
                 commandLine.add(extArg);
 
                 // Mac OS
-                if (System.getProperty("mrj.version") != null) {
+                if (osName.startsWith("Mac OS")) {
                     commandLine.add("-Xdock:name=JHelioviewer");
                     jvmArgs += " \"" + "-Xdock:name=JHelioviewer" + "\"";
-                    jvmArgs += " \"" + "-Xdock:icon=" + sourceLocation.getParentFile().getParentFile() + File.separator + "JHV_icon.icns\"";
-                    commandLine.add("-Xdock:icon=" + sourceLocation.getParentFile().getParentFile() + File.separator + "JHV_icon.icns");
+                    jvmArgs += " \"" + "-Xdock:icon=" + sourceLocation.getParentFile().getParentFile() + "/Resources/JHV_icon.icns\"";
+                    commandLine.add("-Xdock:icon=" + sourceLocation.getParentFile().getParentFile() + "/Resources/JHV_icon.icns");
                 }
 
                 // Read JVM settings from properties file
