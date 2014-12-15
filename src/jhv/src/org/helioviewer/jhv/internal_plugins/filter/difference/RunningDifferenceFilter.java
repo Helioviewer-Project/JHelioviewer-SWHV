@@ -4,6 +4,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 import javax.media.opengl.GL2;
+import javax.media.opengl.GLException;
 
 import org.helioviewer.base.logging.Log;
 import org.helioviewer.jhv.gui.states.StateController;
@@ -45,7 +46,7 @@ public class RunningDifferenceFilter implements FrameFilter, StandardFilter, Obs
      */
     // private TimeMachineData timeMachineData;
     private final DifferenceShader shader = new DifferenceShader();
-    private int lookupDiff;
+    private int lookupDiff = -1;
     private ImageData currentFrame;
     private float truncationValue = 0.2f;
     private JHVJPXView jpxView;
@@ -215,10 +216,15 @@ public class RunningDifferenceFilter implements FrameFilter, StandardFilter, Obs
                 gl.glActiveTexture(shader.mode);
 
                 shader.activateDifferenceTexture(gl);
-
-                gl.glBindTexture(GL2.GL_TEXTURE_2D, lookupDiff);
-                GLTextureHelper th = new GLTextureHelper();
-                th.moveImageDataToGLTexture(gl, previousFrame, 0, 0, previousFrame.getWidth(), previousFrame.getHeight(), lookupDiff);
+                //Bugfix: target id might change if 2D and 3D are switched. Better solutions?
+                try {
+                    GLTextureHelper textureHelper = new GLTextureHelper();
+                    textureHelper.moveImageDataToGLTexture(gl, previousFrame, 0, 0, previousFrame.getWidth(), previousFrame.getHeight(), lookupDiff);
+                } catch (GLException e) {
+                    GLTextureHelper textureHelper = new GLTextureHelper();
+                    lookupDiff = textureHelper.genTextureID(gl);
+                    textureHelper.moveImageDataToGLTexture(gl, previousFrame, 0, 0, previousFrame.getWidth(), previousFrame.getHeight(), lookupDiff);
+                }
             }
         } else {
             shader.setIsDifference(gl, 0.0f);
@@ -229,7 +235,9 @@ public class RunningDifferenceFilter implements FrameFilter, StandardFilter, Obs
     public GLShaderBuilder buildFragmentShader(GLShaderBuilder shaderBuilder) {
         shader.build(shaderBuilder);
         GLTextureHelper textureHelper = new GLTextureHelper();
-        textureHelper.delTextureID(shaderBuilder.getGL(), lookupDiff);
+        if (lookupDiff != -1) {
+            textureHelper.delTextureID(shaderBuilder.getGL(), lookupDiff);
+        }
         lookupDiff = textureHelper.genTextureID(shaderBuilder.getGL());
 
         return shaderBuilder;
