@@ -87,14 +87,8 @@ public class OpacityFilter extends AbstractFilter implements StandardFilter, GLF
         }
 
         opacity = newOpacity;
-        Thread t = new Thread(new Runnable() {
-            @Override
-            public void run() {
-                notifyAllListeners();
-                Displayer.getSingletonInstance().display();
-            }
-        }, "NotifyFilterListenersThread");
-        t.start();
+        notifyAllListeners();
+        Displayer.getSingletonInstance().display();
     }
 
     /**
