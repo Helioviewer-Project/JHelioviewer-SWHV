@@ -19,7 +19,7 @@ import org.helioviewer.jhv.gui.interfaces.MainContentPanelPlugin;
  * This panel acts as a container for the GUI elements which are shown in the
  * main area of the application. Usually it contains the main image area. Below
  * the main image area plug-ins are able to display their GUI components.
- *
+ * 
  * @author Stephan Pagel
  * */
 public class MainContentPanel extends JPanel implements ActionListener {
@@ -72,13 +72,14 @@ public class MainContentPanel extends JPanel implements ActionListener {
 
     /**
      * Set the main component to the container, e.g. the main image panel.
-     *
+     * 
      * @param comp
      *            Main component to be displayed.
      * */
     public boolean setMainComponent(final Component comp) {
-        if (comp == null || mainComponent == comp)
+        if (comp == null || mainComponent == comp) {
             return false;
+        }
 
         if (mainComponent != null) {
             splitpane.remove(mainComponent);
@@ -103,16 +104,18 @@ public class MainContentPanel extends JPanel implements ActionListener {
     /**
      * Adds a plug-in and the associated GUI to the container. The GUI will be
      * displayed below the main component.
-     *
+     * 
      * @param plugin
      *            Plugin to be added to the container.
      * */
     public boolean addPlugin(final MainContentPanelPlugin plugin) {
-        if (plugin == null || pluginList.contains(plugin))
+        if (plugin == null || pluginList.contains(plugin)) {
             return false;
+        }
 
-        if (!pluginList.add(plugin))
+        if (!pluginList.add(plugin)) {
             return false;
+        }
 
         updateLayout();
 
@@ -121,13 +124,14 @@ public class MainContentPanel extends JPanel implements ActionListener {
 
     /**
      * Removes a plug-in and the associated GUI from the container.
-     *
+     * 
      * @param plugin
      *            Plugin to be removed from the container.
      * */
     public boolean removePlugin(final MainContentPanelPlugin plugin) {
-        if (!pluginList.remove(plugin))
+        if (!pluginList.remove(plugin)) {
             return false;
+        }
 
         updateLayout();
 
@@ -154,7 +158,7 @@ public class MainContentPanel extends JPanel implements ActionListener {
                 collapsiblePane.setTitle(pluginList.get(0).getTabName());
                 collapsiblePane.setMinimumSize(new Dimension(200, 180));
                 splitpane.setBottomComponent(collapsiblePane);
-                splitpane.setDividerSize(3);
+                splitpane.setDividerSize(5);
             } else if (!(pluginList.size() == 1 && pluginList.get(0).getVisualInterfaces().size() == 0) && pluginList.size() > 0) {
                 JTabbedPane tabbedPane = new JTabbedPane();
 
@@ -168,7 +172,7 @@ public class MainContentPanel extends JPanel implements ActionListener {
                 collapsiblePane.setTitle("Plugins");
 
                 splitpane.setBottomComponent(collapsiblePane);
-                splitpane.setDividerSize(3);
+                splitpane.setDividerSize(5);
             }
         } else {
             add(collapsiblePane, BorderLayout.PAGE_END);
