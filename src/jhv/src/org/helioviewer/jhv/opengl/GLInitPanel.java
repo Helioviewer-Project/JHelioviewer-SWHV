@@ -191,7 +191,7 @@ public class GLInitPanel extends GLJPanel {
                 Throwable cause = e.getCause();
                 if (cause == null || cause instanceof GLException) {
                     e.printStackTrace();
-                    Log.warn("GLExpection detected. Disable OpenGL as a precaution.", cause);
+                    Log.warn("GLException detected. Disable OpenGL as a precaution.", cause);
                     Message.err("OpenGL error detected.", "JHelioviewer will run in software mode. OpenGL is not available on the system or incompatible.", false);
                     GLInfo.glUnusable();
                     Thread.setDefaultUncaughtExceptionHandler(baseHandler);
