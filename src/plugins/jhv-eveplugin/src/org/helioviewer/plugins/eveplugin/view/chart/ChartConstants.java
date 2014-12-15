@@ -20,7 +20,7 @@ public class ChartConstants {
     private static final int GRAPH_RIGHT_SPACE = 10;
     private static final int GRAPH_TOP_SPACE = 20;
     private static final int GRAPH_BOTTOM_SPACE = 22;
-    private static final int TWO_AXIS_GRAPH_RIGHT = 70;
+    private static final int TWO_AXIS_GRAPH_RIGHT = 30;
 
     private static final int MIN_VERTICAL_TICK_SPACE = 20;
 
