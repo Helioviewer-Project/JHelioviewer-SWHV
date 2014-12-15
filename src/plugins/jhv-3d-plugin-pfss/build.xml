@@ -73,7 +73,7 @@
         <!-- Determine revision and version -->
         <target name="init" depends="mkdir">
         <echo message="Trying to determine revision" />
-        <exec 
+        <!-- <exec 
             executable="${bzrpath}" 
             outputproperty="revision.tmp" 
             resolveexecutable="true" 
@@ -81,7 +81,7 @@
             resultproperty="revision.retcode"
             failifexecutionfails="false">
                 <arg value="revno"/>
-        </exec>
+        </exec> -->
         <loadfile property="version" srcFile="VERSION" />
         <property name="version" value="1.0.0" />
         <if>
