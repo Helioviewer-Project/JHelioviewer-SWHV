@@ -62,8 +62,8 @@ public class MainContentPanel extends JPanel implements ActionListener {
 
         splitpane.setResizeWeight(0.66);
         splitpane.setOneTouchExpandable(false);
-        splitpane.setDividerSize(3);
-        splitpane.setContinuousLayout(true);
+        splitpane.setDividerSize(5);
+        // splitpane.setContinuousLayout(true);
 
         collapsiblePane.toggleButton.addActionListener(this);
 
