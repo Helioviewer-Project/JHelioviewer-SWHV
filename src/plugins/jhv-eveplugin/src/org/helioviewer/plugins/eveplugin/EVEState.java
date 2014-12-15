@@ -1,6 +1,5 @@
 package org.helioviewer.plugins.eveplugin;
 
-import org.helioviewer.base.logging.Log;
 
 /**
  * This singleton holds some general state of the Eve plugin.
@@ -57,7 +56,7 @@ public class EVEState {
      *            dragged.
      */
     public void setMouseTimeIntervalDragging(boolean mouseDragging) {
-        Log.trace("State set on " + mouseDragging + " by: ");
+        // Log.trace("State set on " + mouseDragging + " by: ");
         mouseTimeIntervalDragging = mouseDragging;
     }
 
