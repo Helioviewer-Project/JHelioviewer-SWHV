@@ -23,8 +23,7 @@ public class SWEKEventTreeRenderer extends DefaultTreeCellRenderer {
     private static final long serialVersionUID = -436392148995692409L;
 
     @Override
-    public Component getTreeCellRendererComponent(JTree tree, Object whatToDisplay, boolean selected, boolean expanded, boolean leaf,
-            int row, boolean hasFocus) {
+    public Component getTreeCellRendererComponent(JTree tree, Object whatToDisplay, boolean selected, boolean expanded, boolean leaf, int row, boolean hasFocus) {
         if (whatToDisplay instanceof SWEKTreeModelEventType) {
             return createLeaf(((SWEKTreeModelEventType) whatToDisplay).getSwekEventType().getEventName(), whatToDisplay);
         } else if (whatToDisplay instanceof SWEKTreeModelSupplier) {
@@ -34,10 +33,29 @@ public class SWEKEventTreeRenderer extends DefaultTreeCellRenderer {
         }
     }
 
+    class TreeLabel extends JPanel {
+        ImageIcon imageIcon;
+
+        public TreeLabel(ImageIcon icon) {
+            super();
+            this.imageIcon = icon;
+        }
+
+        @Override
+        public void paintComponent(Graphics g) {
+            //super.paintComponent(g);
+            Image image = imageIcon.getImage();
+            int minDim = getWidth() < getHeight() ? getWidth() : getHeight();
+            int diffx = (getWidth() - minDim) / 2;
+            int diffy = (getHeight() - minDim) / 2;
+            g.drawImage(image, diffx, diffy, diffx + minDim, diffy + minDim, 0, 0, imageIcon.getIconWidth(), imageIcon.getIconHeight(), this);
+        }
+    }
+
     /**
      * Creates a leaf of the tree. This leaf will be a panel with the name of
      * the leaf and a checkbox indicating whether the leaf was selected or not.
-     * 
+     *
      * @param name
      *            The name of the leaf
      * @param whatToDisplay
@@ -54,7 +72,7 @@ public class SWEKEventTreeRenderer extends DefaultTreeCellRenderer {
         if (icon != null) {
             JPanel tempPanel = new JPanel();
             tempPanel.setLayout(new BorderLayout());
-            tempPanel.add(new JLabel(resizeIcon(icon)), BorderLayout.LINE_START);
+            tempPanel.add(new TreeLabel(icon), BorderLayout.LINE_START);
             tempPanel.add(new JLabel(name), BorderLayout.CENTER);
             tempPanel.setOpaque(false);
             panel.add(tempPanel);
@@ -67,7 +85,7 @@ public class SWEKEventTreeRenderer extends DefaultTreeCellRenderer {
 
     /**
      * Resizes an icon to the correct size.
-     * 
+     *
      * @param icon
      *            the icon to resize
      * @return the resized icon
