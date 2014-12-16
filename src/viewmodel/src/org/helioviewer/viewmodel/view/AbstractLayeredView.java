@@ -204,7 +204,7 @@ public abstract class AbstractLayeredView extends AbstractView implements Layere
      */
     @Override
     public View getLayer(int index) {
-        CopyOnWriteArrayList<View> oldLayers = (CopyOnWriteArrayList<View>) layers.clone();
+        CopyOnWriteArrayList<View> oldLayers = layers;
         if (index < oldLayers.size())
             return oldLayers.get(index);
         return null;
