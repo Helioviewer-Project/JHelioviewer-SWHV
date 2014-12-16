@@ -134,6 +134,9 @@ public class SWHVHEKImagePanelEventPopupController implements KeyEventDispatcher
      * @return Corresponding screen coordinate
      */
     private Vector2dInt convertPhysicalToScreen(double x, double y) {
+        if (regionView == null || viewportView == null) {
+            return null;
+        }
         ViewportImageSize viewportImageSize = ViewHelper.calculateViewportImageSize(viewportView.getViewport(), regionView.getRegion());
 
         Vector2dInt offset = ViewHelper.convertImageToScreenDisplacement(-regionView.getRegion().getUpperLeftCorner().getX(), regionView.getRegion().getUpperLeftCorner().getY(), regionView.getRegion(), viewportImageSize);
@@ -332,7 +335,7 @@ public class SWHVHEKImagePanelEventPopupController implements KeyEventDispatcher
                         if (el.centralPoint() != null) {
                             Vector2dInt screenPos = convertPhysicalToScreen(el.centralPoint().getCoordinate1(), el.centralPoint().getCoordinate2());
 
-                            if (e.getPoint().getX() >= screenPos.getX() - 8 && e.getPoint().getX() <= screenPos.getX() + 8 && e.getPoint().getY() >= screenPos.getY() - 8 && e.getPoint().getY() <= screenPos.getY() + 8) {
+                            if (screenPos != null && e.getPoint().getX() >= screenPos.getX() - 8 && e.getPoint().getX() <= screenPos.getX() + 8 && e.getPoint().getY() >= screenPos.getY() - 8 && e.getPoint().getY() <= screenPos.getY() + 8) {
                                 mouseOverJHVEvent = evt;
                                 mouseOverPosition = new Point(screenPos.getX(), screenPos.getY());
                             }
