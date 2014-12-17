@@ -206,7 +206,6 @@ public class ObservationDialogUIPanel extends SimpleObservationDialogUIPanel imp
 
         if (updateBandController()) {
             updateZoomController();
-            return true;
         }
         return true;
     }
