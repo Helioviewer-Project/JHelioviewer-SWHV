@@ -111,8 +111,9 @@ public class DrawControllerData {
         Date lastDate = null;
         for (Set<DrawableElement> des : drawableElements.values()) {
             for (DrawableElement de : des) {
-                if (lastDate == null || de.getLastDateWithData().before(lastDate)) {
-                    if (de.getLastDateWithData() != null) {
+                if (de.getLastDateWithData() != null) {
+                    if (lastDate == null || de.getLastDateWithData().before(lastDate)) {
+
                         lastDate = de.getLastDateWithData();
                     }
                 }
