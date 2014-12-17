@@ -90,7 +90,6 @@ public class DrawControllerData {
             tempSet.add(element.getYAxisElement());
             yAxisSet = tempSet;
         }
-
         nrOfDrawableElements++;
     }
 
@@ -113,7 +112,6 @@ public class DrawControllerData {
             for (DrawableElement de : des) {
                 if (de.getLastDateWithData() != null) {
                     if (lastDate == null || de.getLastDateWithData().before(lastDate)) {
-
                         lastDate = de.getLastDateWithData();
                     }
                 }
