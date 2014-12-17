@@ -8,6 +8,7 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.List;
+import java.util.Set;
 
 import javax.swing.BorderFactory;
 import javax.swing.DefaultComboBoxModel;
@@ -17,8 +18,11 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 
 import org.helioviewer.base.math.Interval;
+import org.helioviewer.jhv.gui.ImageViewerGui;
 import org.helioviewer.jhv.gui.dialogs.observation.ObservationDialog;
+import org.helioviewer.plugins.eveplugin.controller.DrawController;
 import org.helioviewer.plugins.eveplugin.controller.ZoomController;
+import org.helioviewer.plugins.eveplugin.draw.YAxisElement;
 import org.helioviewer.plugins.eveplugin.lines.data.BandController;
 import org.helioviewer.plugins.eveplugin.lines.data.EVECacheController;
 import org.helioviewer.plugins.eveplugin.settings.BandGroup;
@@ -125,8 +129,7 @@ public class ObservationDialogUIPanel extends SimpleObservationDialogUIPanel imp
         final GregorianCalendar calendar = new GregorianCalendar();
         calendar.setTime(getStartDate());
 
-        final GregorianCalendar calendar2 = new GregorianCalendar(calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH),
-                calendar.get(Calendar.DAY_OF_MONTH));
+        final GregorianCalendar calendar2 = new GregorianCalendar(calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH), calendar.get(Calendar.DAY_OF_MONTH));
         final long start = calendar2.getTimeInMillis();
 
         calendar.clear();
@@ -143,13 +146,29 @@ public class ObservationDialogUIPanel extends SimpleObservationDialogUIPanel imp
         ZoomController.getSingletonInstance().setAvailableInterval(new Interval<Date>(getStartDate(), getEndDate()));
     }
 
-    private void updateBandController() {
+    private boolean updateBandController() {
         final BandController bandController = BandController.getSingletonInstance();
 
         final String identifier = PlotsContainerPanel.PLOT_IDENTIFIER_MASTER;
         final BandGroup group = (BandGroup) comboBoxGroup.getSelectedItem();
         final BandType bandType = (BandType) comboBoxData.getSelectedItem();
         bandType.setDataDownloader(EVECacheController.getSingletonInstance());
+
+        Set<YAxisElement> yAxisElements = DrawController.getSingletonInstance().getYAxisElements(identifier);
+        if (yAxisElements.size() >= 2) {
+            boolean present = false;
+            for (YAxisElement el : yAxisElements) {
+                if (el.getOriginalLabel().equals(bandType.getLabel())) {
+                    present = true;
+                    break;
+                }
+            }
+            if (!present) {
+                // Show dialog box to unselect one of the lines.
+                JOptionPane.showMessageDialog(ImageViewerGui.getMainFrame(), "No more than two Y-axes can be used. Remove some of the lines before adding a new line.", "Too much y-axes", JOptionPane.WARNING_MESSAGE);
+                return false;
+            }
+        }
 
         /*
          * if (!bandController.getSelectedGroup(identifier).equals(group)) {
@@ -162,6 +181,7 @@ public class ObservationDialogUIPanel extends SimpleObservationDialogUIPanel imp
         if (identifier.equals(PlotsContainerPanel.PLOT_IDENTIFIER_SLAVE)) {
             plotsContainerPanel.setPlot2Visible(true);
         }
+        return true;
     }
 
     @Override
@@ -184,9 +204,10 @@ public class ObservationDialogUIPanel extends SimpleObservationDialogUIPanel imp
             return false;
         }
 
-        updateZoomController();
-        updateBandController();
-
+        if (updateBandController()) {
+            updateZoomController();
+            return true;
+        }
         return true;
     }
 

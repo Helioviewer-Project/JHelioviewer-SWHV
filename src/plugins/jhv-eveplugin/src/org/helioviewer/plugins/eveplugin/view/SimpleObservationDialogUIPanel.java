@@ -8,6 +8,7 @@ import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
+import java.util.Set;
 
 import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
@@ -19,6 +20,7 @@ import javax.swing.JPanel;
 
 import org.helioviewer.base.math.Interval;
 import org.helioviewer.jhv.Settings;
+import org.helioviewer.jhv.gui.ImageViewerGui;
 import org.helioviewer.jhv.gui.components.calendar.JHVCalendarDatePicker;
 import org.helioviewer.jhv.gui.components.calendar.JHVCalendarEvent;
 import org.helioviewer.jhv.gui.components.calendar.JHVCalendarListener;
@@ -26,7 +28,9 @@ import org.helioviewer.jhv.gui.dialogs.observation.ObservationDialog;
 import org.helioviewer.jhv.gui.dialogs.observation.ObservationDialogPanel;
 import org.helioviewer.jhv.layers.LayersListener;
 import org.helioviewer.jhv.layers.LayersModel;
+import org.helioviewer.plugins.eveplugin.controller.DrawController;
 import org.helioviewer.plugins.eveplugin.controller.ZoomController;
+import org.helioviewer.plugins.eveplugin.draw.YAxisElement;
 import org.helioviewer.plugins.eveplugin.radio.data.RadioDownloader;
 import org.helioviewer.plugins.eveplugin.view.plot.PlotsContainerPanel;
 import org.helioviewer.viewmodel.view.View;
@@ -147,8 +151,7 @@ public class SimpleObservationDialogUIPanel extends ObservationDialogPanel imple
         final GregorianCalendar calendar = new GregorianCalendar();
         calendar.setTime(getStartDate());
 
-        final GregorianCalendar calendar2 = new GregorianCalendar(calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH),
-                calendar.get(Calendar.DAY_OF_MONTH));
+        final GregorianCalendar calendar2 = new GregorianCalendar(calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH), calendar.get(Calendar.DAY_OF_MONTH));
         final long start = calendar2.getTimeInMillis();
 
         calendar.clear();
@@ -221,9 +224,24 @@ public class SimpleObservationDialogUIPanel extends ObservationDialogPanel imple
             return false;
         }
 
-        updateZoomController();
-        // updateBandController();
-        startRadioDownload();
+        Set<YAxisElement> yAxisElements = DrawController.getSingletonInstance().getYAxisElements(PlotsContainerPanel.PLOT_IDENTIFIER_MASTER);
+        boolean downloadOK = false;
+        if (yAxisElements.size() >= 2) {
+            for (YAxisElement el : yAxisElements) {
+                if (el.getOriginalLabel().equals("Mhz")) {
+                    downloadOK = true;
+                    break;
+                }
+            }
+        } else {
+            downloadOK = true;
+        }
+        if (downloadOK) {
+            updateZoomController();
+            startRadioDownload();
+        } else {
+            JOptionPane.showMessageDialog(ImageViewerGui.getMainFrame(), "No more than two y-axes can be used. Remove some of the lines before adding a new line.", "Too much y-axes", JOptionPane.WARNING_MESSAGE);
+        }
 
         return true;
     }
