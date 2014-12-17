@@ -55,7 +55,9 @@ public class APIResponse {
             }
             // data = new JSONObject(new JSONTokener(source));
             data = new JSONObject(new JSONTokener(new StringReader(sb.toString())));
-            uri = new URI(data.getString("uri"));
+            if (data.has("uri")) {
+                uri = new URI(data.getString("uri"));
+            }
         } catch (JSONException e) {
             Log.error("Invalid JSON response " + data, e);
         } catch (URISyntaxException e) {
@@ -128,7 +130,7 @@ public class APIResponse {
      */
     public String getXMLRepresentation() {
         try {
-            return XML.toString(this.data);
+            return XML.toString(data);
         } catch (JSONException e) {
             return "";
         }
