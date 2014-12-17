@@ -134,8 +134,11 @@ public class PlotsControlPanel extends JPanel implements ZoomControllerListener,
         addElementToModel(model, startDate, interval, Calendar.YEAR, 1, ZOOM.Year);
         addElementToModel(model, startDate, interval, Calendar.MONTH, 6, ZOOM.Month);
         addElementToModel(model, startDate, interval, Calendar.MONTH, 3, ZOOM.Month);
-
         addElementToModel(model, startDate, interval, Calendar.MONTH, 1, ZOOM.Month);
+
+        addCarringtonRotationToModel(model, startDate, interval, 6);
+        addCarringtonRotationToModel(model, startDate, interval, 3);
+        addCarringtonRotationToModel(model, startDate, interval, 1);
 
         if (!years) {
             addElementToModel(model, startDate, interval, Calendar.DATE, 14, ZOOM.Day);
@@ -148,6 +151,20 @@ public class PlotsControlPanel extends JPanel implements ZoomControllerListener,
                 addElementToModel(model, startDate, interval, Calendar.HOUR, 1, ZOOM.Hour);
             }
         }
+    }
+
+    private boolean addCarringtonRotationToModel(final DefaultComboBoxModel model, final Date startDate, final Interval<Date> interval, final int numberOfRotations) {
+        final Calendar calendar = new GregorianCalendar();
+
+        calendar.clear();
+        calendar.setTime(new Date(startDate.getTime() + numberOfRotations * 2356585820l));
+
+        if (interval.containsPointInclusive(calendar.getTime())) {
+            model.addElement(new ZoomComboboxItem(ZOOM.Carrington, numberOfRotations));
+            return true;
+        }
+
+        return false;
     }
 
     private boolean addElementToModel(final DefaultComboBoxModel model, final Date startDate, final Interval<Date> interval, final int calendarField, final int calendarValue, final ZOOM zoom) {
@@ -336,6 +353,8 @@ public class PlotsControlPanel extends JPanel implements ZoomControllerListener,
                 return Integer.toString(number) + " Month" + plural;
             case Year:
                 return Integer.toString(number) + " Year" + plural;
+            case Carrington:
+                return Integer.toString(number) + " Carrington Rotation" + plural;
             default:
                 break;
             }
