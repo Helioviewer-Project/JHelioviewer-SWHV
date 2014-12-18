@@ -8,6 +8,7 @@ import java.awt.Graphics2D;
 import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.Toolkit;
+import java.awt.event.InputEvent;
 import java.awt.event.MouseEvent;
 import java.awt.geom.Rectangle2D;
 import java.awt.geom.RoundRectangle2D;
@@ -549,14 +550,56 @@ public class ChartDrawIntervalPane extends JComponent implements ZoomControllerL
 
     @Override
     public void mouseClicked(MouseEvent e) {
-        Log.debug("Mouse clicked");
-
-        if (e.getPoint().x >= ChartConstants.getGraphLeftSpace() && e.getPoint().x <= getWidth() - ChartConstants.getGraphRightSpace()) {
-            mousePressed = new Point(leftIntervalBorderPosition + (rightIntervalBorderPosition - leftIntervalBorderPosition) / 2, 0);
-            moveSelectedInterval(e.getPoint(), true);
-            mousePressed = null;
+        if ((e.getModifiers() & InputEvent.BUTTON1_MASK) == InputEvent.BUTTON1_MASK) {
+            if (e.getPoint().x >= ChartConstants.getGraphLeftSpace() && e.getPoint().x <= getWidth() - ChartConstants.getGraphRightSpace()) {
+                mousePressed = new Point(leftIntervalBorderPosition + (rightIntervalBorderPosition - leftIntervalBorderPosition) / 2, 0);
+                moveSelectedInterval(e.getPoint(), true);
+                mousePressed = null;
+            }
+        } else if ((e.getModifiers() & InputEvent.BUTTON3_MASK) == InputEvent.BUTTON3_MASK) {
+            jumpSelectedInterval(e.getPoint());
         }
 
+    }
+
+    private void jumpSelectedInterval(Point point) {
+        final double availableIntervalSpace = getWidth() - (ChartConstants.getGraphLeftSpace() + ChartConstants.getGraphRightSpace() + ChartConstants.getRangeSelectionWidth()) - 1.0;
+        final double position = (point.getX() - ChartConstants.getGraphLeftSpace()) / availableIntervalSpace;
+        List<PlotAreaSpace> pasList = new ArrayList<PlotAreaSpace>();
+        Map<PlotAreaSpace, Double> minList = new HashMap<PlotAreaSpace, Double>();
+        Map<PlotAreaSpace, Double> maxList = new HashMap<PlotAreaSpace, Double>();
+        for (PlotAreaSpace pas : PlotAreaSpaceManager.getInstance().getAllPlotAreaSpaces()) {
+            double middlePosition = pas.getScaledSelectedMinTime() + pas.getScaledSelectedMaxTime() - pas.getScaledSelectedMinTime();
+            if (position <= middlePosition) {
+                // jump to left
+                double start = pas.getScaledSelectedMinTime() - (pas.getScaledSelectedMaxTime() - pas.getScaledSelectedMinTime());
+                double end = pas.getScaledSelectedMaxTime() - (pas.getScaledSelectedMaxTime() - pas.getScaledSelectedMinTime());
+                pasList.add(pas);
+                if (start < pas.getScaledMinTime()) {
+                    end += (pas.getScaledMinTime() - start);
+                    start = pas.getScaledMinTime();
+                }
+                minList.put(pas, start);
+                maxList.put(pas, end);
+            } else {
+                // jump to right
+                double start = pas.getScaledSelectedMinTime() + (pas.getScaledSelectedMaxTime() - pas.getScaledSelectedMinTime());
+                double end = pas.getScaledSelectedMaxTime() + (pas.getScaledSelectedMaxTime() - pas.getScaledSelectedMinTime());
+                pasList.add(pas);
+                if (end > pas.getScaledMaxTime()) {
+                    start -= (end - pas.getScaledMaxTime());
+                    end = pas.getScaledMaxTime();
+                }
+                minList.put(pas, start);
+                maxList.put(pas, end);
+            }
+        }
+
+        for (PlotAreaSpace pas : pasList) {
+            if (pas.minMaxTimeIntervalContainsTime(minList.get(pas))) {
+                pas.setScaledSelectedTime(minList.get(pas), maxList.get(pas), true);
+            }
+        }
     }
 
     @Override
