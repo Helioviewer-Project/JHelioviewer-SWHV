@@ -38,6 +38,7 @@ public class GL3DFollowObjectCamera extends GL3DSolarRotationTrackingTrackballCa
     private long currentCameraTime;
     private double lratio;
     private boolean interpolation;
+    private boolean fovhidden = false;
 
     public GL3DFollowObjectCamera(GL3DSceneGraphView sceneGraphView) {
         super(sceneGraphView);
@@ -60,17 +61,16 @@ public class GL3DFollowObjectCamera extends GL3DSolarRotationTrackingTrackballCa
     @Override
     public void activate() {
         super.activate();
-        this.cameraFOV.getDrawBits().off(Bit.Hidden);
+        this.cameraFOV.getDrawBits().set(Bit.Hidden, this.fovhidden);
         getSceneGraphView().addViewListener(this);
-
     };
 
     @Override
     public void deactivate() {
         super.deactivate();
+        this.fovhidden = this.cameraFOV.getDrawBits().get(Bit.Hidden);
         this.cameraFOV.getDrawBits().on(Bit.Hidden);
         getSceneGraphView().removeViewListener(this);
-
     };
 
     @Override
@@ -78,6 +78,7 @@ public class GL3DFollowObjectCamera extends GL3DSolarRotationTrackingTrackballCa
         return "Follow Object Camera";
     }
 
+    @Override
     public void viewChanged(View sender, ChangeEvent aEvent) {
         if (this.positionLoading.isLoaded() && !this.getTrackingMode()) {
             TimestampChangedReason timestampReason = aEvent.getLastChangedReasonByType(TimestampChangedReason.class);
