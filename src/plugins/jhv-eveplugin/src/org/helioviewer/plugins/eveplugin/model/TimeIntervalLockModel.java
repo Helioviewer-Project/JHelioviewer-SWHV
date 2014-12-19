@@ -21,7 +21,7 @@ import org.helioviewer.plugins.eveplugin.settings.EVEAPI.API_RESOLUTION_AVERAGES
  * @author Bram.Bourgoignie@oma.be
  * 
  */
-public class TimeIntervalLockModel implements ZoomControllerListener, DrawControllerListener {
+public class TimeIntervalLockModel implements ZoomControllerListener, DrawControllerListener, PlotAreaSpaceListener {
     /** Instance of the zoom controller */
     private final ZoomController zoomController;
 
@@ -59,6 +59,7 @@ public class TimeIntervalLockModel implements ZoomControllerListener, DrawContro
         drawController.addDrawControllerListenerForAllIdentifiers(this);
         selectedSpaceWidth = new HashMap<PlotAreaSpace, Double>();
         previousMovieTime = new Date();
+        plotAreaSpaceManager.addPlotAreaSpaceListenerToAllSpaces(this);
     }
 
     /**
@@ -132,8 +133,7 @@ public class TimeIntervalLockModel implements ZoomControllerListener, DrawContro
                 double selectedIntervalWidth = selectedSpaceWidth.get(space);
                 long movieTimeDiff = time.getTime() - currentAvailableInterval.getStart().getTime();
                 double availableIntervalWidthScaled = space.getScaledMaxTime() - space.getScaledMinTime();
-                long availableIntervalWidthAbs = currentAvailableInterval.getEnd().getTime()
-                        - currentAvailableInterval.getStart().getTime();
+                long availableIntervalWidthAbs = currentAvailableInterval.getEnd().getTime() - currentAvailableInterval.getStart().getTime();
                 double scaledPerTime = availableIntervalWidthScaled / availableIntervalWidthAbs;
                 double scaledMoviePosition = space.getScaledMinTime() + movieTimeDiff * scaledPerTime;
                 double newSelectedScaledStart = Math.max(space.getScaledMinTime(), scaledMoviePosition - (selectedIntervalWidth / 2));
@@ -181,6 +181,20 @@ public class TimeIntervalLockModel implements ZoomControllerListener, DrawContro
      */
     @Override
     public void selectedResolutionChanged(API_RESOLUTION_AVERAGES newResolution) {
+    }
+
+    @Override
+    public void plotAreaSpaceChanged(double scaledMinValue, double scaledMaxValue, double scaledMinTime, double scaledMaxTime, double scaledSelectedMinValue, double scaledSelectedMaxValue, double scaledSelectedMinTime, double scaledSelectedMaxTime, boolean forced) {
+        Collection<PlotAreaSpace> spaces = plotAreaSpaceManager.getAllPlotAreaSpaces();
+        for (PlotAreaSpace space : spaces) {
+            selectedSpaceWidth.put(space, scaledSelectedMaxTime - scaledSelectedMinTime);
+        }
+    }
+
+    @Override
+    public void availablePlotAreaSpaceChanged(double oldMinValue, double oldMaxValue, double oldMinTime, double oldMaxTime, double newMinValue, double newMaxValue, double newMinTime, double newMaxTime) {
+        // TODO Auto-generated method stub
+
     }
 
 }
