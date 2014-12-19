@@ -53,7 +53,7 @@ public class SimpleObservationDialogUIPanel extends ObservationDialogPanel imple
     private JLabel labelStartDate;
     private JLabel labelEndDate;
     private JHVCalendarDatePicker calendarStartDate;
-    private JHVCalendarDatePicker calendarEndDate;
+    // private JHVCalendarDatePicker calendarEndDate;
 
     // protected JComboBox plotComboBox;
 
@@ -77,7 +77,7 @@ public class SimpleObservationDialogUIPanel extends ObservationDialogPanel imple
                 labelStartDate = new JLabel("Start Date");
                 labelEndDate = new JLabel("End Date");
                 calendarStartDate = new JHVCalendarDatePicker();
-                calendarEndDate = new JHVCalendarDatePicker();
+                // calendarEndDate = new JHVCalendarDatePicker();
 
                 // plotComboBox = new JComboBox(new String[] { "Plot 1",
                 // "Plot 2" });
@@ -101,9 +101,9 @@ public class SimpleObservationDialogUIPanel extends ObservationDialogPanel imple
         calendarStartDate.addJHVCalendarListener(this);
         calendarStartDate.setToolTipText("Date in UTC starting the observation");
 
-        calendarEndDate.setDateFormat(Settings.getSingletonInstance().getProperty("default.date.format"));
-        calendarEndDate.addJHVCalendarListener(this);
-        calendarEndDate.setToolTipText("Date in UTC ending the observation.");
+        // calendarEndDate.setDateFormat(Settings.getSingletonInstance().getProperty("default.date.format"));
+        // calendarEndDate.addJHVCalendarListener(this);
+        // calendarEndDate.setToolTipText("Date in UTC ending the observation.");
 
         final JPanel startDatePane = new JPanel(new BorderLayout());
         startDatePane.add(labelStartDate, BorderLayout.PAGE_START);
@@ -111,7 +111,7 @@ public class SimpleObservationDialogUIPanel extends ObservationDialogPanel imple
 
         final JPanel endDatePane = new JPanel(new BorderLayout());
         endDatePane.add(labelEndDate, BorderLayout.PAGE_START);
-        endDatePane.add(calendarEndDate, BorderLayout.CENTER);
+        // endDatePane.add(calendarEndDate, BorderLayout.CENTER);
 
         timePane.setLayout(new GridLayout(1, 2, GRIDLAYOUT_HGAP, GRIDLAYOUT_VGAP));
         timePane.setBorder(BorderFactory.createTitledBorder(" Select time range of interest "));
@@ -124,21 +124,21 @@ public class SimpleObservationDialogUIPanel extends ObservationDialogPanel imple
         this.add(plotPane);
     }
 
-    public void setStartDate(final Date start) {
+    public void setDate(final Date start) {
         calendarStartDate.setDate(start);
     }
 
-    public void setEndDate(final Date end) {
-        calendarEndDate.setDate(end);
-    }
+    /*
+     * public void setEndDate(final Date end) { calendarEndDate.setDate(end); }
+     */
 
-    public Date getStartDate() {
+    public Date getDate() {
         return calendarStartDate.getDate();
     }
 
-    public Date getEndDate() {
-        return calendarEndDate.getDate();
-    }
+    /*
+     * public Date getEndDate() { return calendarEndDate.getDate(); }
+     */
 
     /**
      * Checks if the selected start date is before selected or equal to end
@@ -147,25 +147,63 @@ public class SimpleObservationDialogUIPanel extends ObservationDialogPanel imple
      * 
      * @return boolean value if selected start date is before selected end date.
      */
-    private boolean isStartDateBeforeOrEqualEndDate() {
-        final GregorianCalendar calendar = new GregorianCalendar();
-        calendar.setTime(getStartDate());
-
-        final GregorianCalendar calendar2 = new GregorianCalendar(calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH), calendar.get(Calendar.DAY_OF_MONTH));
-        final long start = calendar2.getTimeInMillis();
-
-        calendar.clear();
-        calendar2.clear();
-
-        calendar.setTime(getEndDate());
-        calendar2.set(calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH), calendar.get(Calendar.DAY_OF_MONTH));
-        final long end = calendar2.getTimeInMillis();
-
-        return start <= end;
-    }
+    /*
+     * private boolean isStartDateBeforeOrEqualEndDate() { final
+     * GregorianCalendar calendar = new GregorianCalendar();
+     * calendar.setTime(getStartDate());
+     * 
+     * final GregorianCalendar calendar2 = new
+     * GregorianCalendar(calendar.get(Calendar.YEAR),
+     * calendar.get(Calendar.MONTH), calendar.get(Calendar.DAY_OF_MONTH)); final
+     * long start = calendar2.getTimeInMillis();
+     * 
+     * calendar.clear(); calendar2.clear();
+     * 
+     * calendar.setTime(getEndDate());
+     * calendar2.set(calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH),
+     * calendar.get(Calendar.DAY_OF_MONTH)); final long end =
+     * calendar2.getTimeInMillis();
+     * 
+     * return start <= end; }
+     */
 
     private void updateZoomController() {
-        ZoomController.getSingletonInstance().setAvailableInterval(new Interval<Date>(getStartDate(), getEndDate()));
+        Interval<Date> interval = defineInterval(getDate());
+        ZoomController.getSingletonInstance().setAvailableInterval(interval);
+    }
+
+    protected Interval<Date> defineInterval(Date date) {
+        GregorianCalendar gce = new GregorianCalendar();
+        gce.clear();
+        gce.setTime(date);
+        gce.set(Calendar.HOUR, 0);
+        gce.set(Calendar.MINUTE, 0);
+        gce.set(Calendar.SECOND, 0);
+        gce.set(Calendar.MILLISECOND, 0);
+        gce.add(Calendar.DAY_OF_MONTH, 1);
+        Date endDate = gce.getTime();
+
+        if (endDate.after(new Date())) {
+            gce.clear();
+            gce.setTime(new Date());
+            gce.set(Calendar.HOUR, 0);
+            gce.set(Calendar.MINUTE, 0);
+            gce.set(Calendar.SECOND, 0);
+            gce.set(Calendar.MILLISECOND, 0);
+            endDate = gce.getTime();
+        }
+
+        GregorianCalendar gcs = new GregorianCalendar();
+        gcs.clear();
+        gcs.setTime(date);
+        gcs.set(Calendar.HOUR, 0);
+        gcs.set(Calendar.MINUTE, 0);
+        gcs.set(Calendar.SECOND, 0);
+        gcs.set(Calendar.MILLISECOND, 0);
+        gcs.add(Calendar.DAY_OF_MONTH, -2);
+        Date startDate = gcs.getTime();
+
+        return new Interval<Date>(startDate, endDate);
     }
 
     // private void updateBandController() {
@@ -189,7 +227,7 @@ public class SimpleObservationDialogUIPanel extends ObservationDialogPanel imple
         end.set(Calendar.HOUR_OF_DAY, 23);
         end.set(Calendar.MINUTE, 59);
         end.set(Calendar.SECOND, 59);
-        String isoEnd = df.format(getEndDate());
+        String isoEnd = df.format(end.getTime());
         RadioDownloader.getSingletonInstance().requestAndOpenRemoteFile(isoStart, isoEnd, identifier);
     }
 
@@ -219,10 +257,11 @@ public class SimpleObservationDialogUIPanel extends ObservationDialogPanel imple
     @Override
     public boolean loadButtonPressed() {
         // check if start date is before end date -> if not show message
-        if (!isStartDateBeforeOrEqualEndDate()) {
-            JOptionPane.showMessageDialog(null, "End date is before start date!", "", JOptionPane.ERROR_MESSAGE);
-            return false;
-        }
+        /*
+         * if (!isStartDateBeforeOrEqualEndDate()) {
+         * JOptionPane.showMessageDialog(null, "End date is before start date!",
+         * "", JOptionPane.ERROR_MESSAGE); return false; }
+         */
 
         Set<YAxisElement> yAxisElements = DrawController.getSingletonInstance().getYAxisElements(PlotsContainerPanel.PLOT_IDENTIFIER_MASTER);
         boolean downloadOK = false;
@@ -256,13 +295,15 @@ public class SimpleObservationDialogUIPanel extends ObservationDialogPanel imple
 
     @Override
     public void actionPerformed(final JHVCalendarEvent e) {
-        if (e.getSource() == calendarStartDate && !isStartDateBeforeOrEqualEndDate()) {
-            calendarEndDate.setDate(calendarStartDate.getDate());
-        }
-
-        if (e.getSource() == calendarEndDate && !isStartDateBeforeOrEqualEndDate()) {
-            calendarStartDate.setDate(calendarStartDate.getDate());
-        }
+        /*
+         * if (e.getSource() == calendarStartDate &&
+         * !isStartDateBeforeOrEqualEndDate()) {
+         * calendarEndDate.setDate(calendarStartDate.getDate()); }
+         * 
+         * if (e.getSource() == calendarEndDate &&
+         * !isStartDateBeforeOrEqualEndDate()) {
+         * calendarStartDate.setDate(calendarStartDate.getDate()); }
+         */
     }
 
     // //////////////////////////////////////////////////////////////////////////////
@@ -295,8 +336,8 @@ public class SimpleObservationDialogUIPanel extends ObservationDialogPanel imple
                     }
                 }
                 if (beginDate != null && endDate != null) {
-                    calendarStartDate.setDate(beginDate);
-                    calendarEndDate.setDate(endDate);
+                    calendarStartDate.setDate(new Date(beginDate.getTime() + (endDate.getTime() - beginDate.getTime())));
+                    // calendarEndDate.setDate(endDate);
                 }
             }
         }
