@@ -128,29 +128,35 @@ public class PlotsControlPanel extends JPanel implements ZoomControllerListener,
         model.addElement(new ZoomComboboxItem(ZOOM.CUSTOM, 0));
         model.addElement(new ZoomComboboxItem(ZOOM.All, 0));
 
-        addElementToModel(model, startDate, interval, Calendar.YEAR, 10, ZOOM.Year);
-        addElementToModel(model, startDate, interval, Calendar.YEAR, 5, ZOOM.Year);
+        // addElementToModel(model, startDate, interval, Calendar.YEAR, 10,
+        // ZOOM.Year);
+        // addElementToModel(model, startDate, interval, Calendar.YEAR, 5,
+        // ZOOM.Year);
 
         addElementToModel(model, startDate, interval, Calendar.YEAR, 1, ZOOM.Year);
         addElementToModel(model, startDate, interval, Calendar.MONTH, 6, ZOOM.Month);
         addElementToModel(model, startDate, interval, Calendar.MONTH, 3, ZOOM.Month);
-        addElementToModel(model, startDate, interval, Calendar.MONTH, 1, ZOOM.Month);
+        // addElementToModel(model, startDate, interval, Calendar.MONTH, 1,
+        // ZOOM.Month);
 
-        addCarringtonRotationToModel(model, startDate, interval, 6);
-        addCarringtonRotationToModel(model, startDate, interval, 3);
+        // addCarringtonRotationToModel(model, startDate, interval, 6);
+        // addCarringtonRotationToModel(model, startDate, interval, 3);
         addCarringtonRotationToModel(model, startDate, interval, 1);
 
-        if (!years) {
-            addElementToModel(model, startDate, interval, Calendar.DATE, 14, ZOOM.Day);
-            addElementToModel(model, startDate, interval, Calendar.DATE, 7, ZOOM.Day);
-            addElementToModel(model, startDate, interval, Calendar.DATE, 1, ZOOM.Day);
+        // if (!years) {
+        // addElementToModel(model, startDate, interval, Calendar.DATE, 14,
+        // ZOOM.Day);
+        addElementToModel(model, startDate, interval, Calendar.DATE, 7, ZOOM.Day);
+        // addElementToModel(model, startDate, interval, Calendar.DATE, 1,
+        // ZOOM.Day);
 
-            if (!months) {
-                addElementToModel(model, startDate, interval, Calendar.HOUR, 12, ZOOM.Hour);
-                addElementToModel(model, startDate, interval, Calendar.HOUR, 6, ZOOM.Hour);
-                addElementToModel(model, startDate, interval, Calendar.HOUR, 1, ZOOM.Hour);
-            }
-        }
+        /*
+         * if (!months) { addElementToModel(model, startDate, interval,
+         * Calendar.HOUR, 12, ZOOM.Hour); addElementToModel(model, startDate,
+         * interval, Calendar.HOUR, 6, ZOOM.Hour); addElementToModel(model,
+         * startDate, interval, Calendar.HOUR, 1, ZOOM.Hour); }
+         */
+        // }
     }
 
     private boolean addCarringtonRotationToModel(final DefaultComboBoxModel model, final Date startDate, final Interval<Date> interval, final int numberOfRotations) {
@@ -159,12 +165,12 @@ public class PlotsControlPanel extends JPanel implements ZoomControllerListener,
         calendar.clear();
         calendar.setTime(new Date(startDate.getTime() + numberOfRotations * 2356585820l));
 
-        if (interval.containsPointInclusive(calendar.getTime())) {
-            model.addElement(new ZoomComboboxItem(ZOOM.Carrington, numberOfRotations));
-            return true;
-        }
+        // if (interval.containsPointInclusive(calendar.getTime())) {
+        model.addElement(new ZoomComboboxItem(ZOOM.Carrington, numberOfRotations));
+        return true;
+        // }
 
-        return false;
+        // return false;
     }
 
     private boolean addElementToModel(final DefaultComboBoxModel model, final Date startDate, final Interval<Date> interval, final int calendarField, final int calendarValue, final ZOOM zoom) {
@@ -174,12 +180,12 @@ public class PlotsControlPanel extends JPanel implements ZoomControllerListener,
         calendar.setTime(startDate);
         calendar.add(calendarField, calendarValue);
 
-        if (interval.containsPointInclusive(calendar.getTime())) {
-            model.addElement(new ZoomComboboxItem(zoom, calendarValue));
-            return true;
-        }
+        // if (interval.containsPointInclusive(calendar.getTime())) {
+        model.addElement(new ZoomComboboxItem(zoom, calendarValue));
+        return true;
+        // }
 
-        return false;
+        // return false;
     }
 
     // //////////////////////////////////////////////////////////////////////////////
