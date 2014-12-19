@@ -201,13 +201,25 @@ public class ZoomController implements PlotAreaSpaceListener {
     }
 
     private Interval<Date> computeCarringtonInterval(Interval<Date> interval, int value) {
-        final Date startDate = interval.getStart();
-        Date endDate = interval.getEnd();
+        return computeZoomForMilliSeconds( interval,  value * 2356585920l);
+    }
+
+    private Interval<Date> computeZoomForMilliSeconds(final Interval<Date> interval, long differenceMilli) {
+        Date middle = new Date(interval.getStart().getTime() + (interval.getEnd().getTime() - interval.getStart().getTime()) / 2);
+        Date startDate = interval.getStart();
+        // Date endDate = interval.getEnd();
+        GregorianCalendar gce = new GregorianCalendar();
+        gce.clear();
+        gce.setTime(new Date(middle.getTime() + differenceMilli / 2));
+        Date endDate = gce.getTime();
+
         final Date lastdataDate = DrawController.getSingletonInstance().getLastDateWithData();
         if (lastdataDate != null) {
             if (endDate.after(lastdataDate)) {
                 endDate = lastdataDate;
             }
+        } else if (endDate.after(new Date())) {
+            endDate = new Date();
         }
         final Date availableStartDate = availableInterval.getStart();
 
@@ -220,24 +232,24 @@ public class ZoomController implements PlotAreaSpaceListener {
         // add difference to start date -> when calculated end date is within
         // available interval it is the result
         calendar.clear();
-        calendar.setTime(new Date(endDate.getTime() - value * 2356585920l));
+        calendar.setTime(new Date(endDate.getTime() - differenceMilli));
 
-        if (availableInterval.containsPointInclusive(calendar.getTime())) {
-            return new Interval<Date>(calendar.getTime(), endDate);
+        startDate = calendar.getTime();
+
+        boolean sInAvailable = availableInterval.containsPointInclusive(startDate);
+        boolean eInAvailable = availableInterval.containsPointInclusive(endDate);
+
+        if (sInAvailable && eInAvailable) {
+            return new Interval<Date>(startDate, endDate);
         }
 
-        // computed end date is outside of available interval -> compute start
-        // date from available end date based on difference
-        calendar.clear();
-        calendar.setTime(new Date(availableStartDate.getTime() + value * 2356585920l));
+        Date availableS = sInAvailable ? availableInterval.getStart() : startDate;
+        Date availableE = eInAvailable ? availableInterval.getEnd() : endDate;
 
-        if (availableInterval.containsPointInclusive(calendar.getTime())) {
-            return new Interval<Date>(availableStartDate, calendar.getTime());
-        }
+        setAvailableInterval(new Interval<Date>(availableS, availableE));
 
-        // available interval is smaller then requested one -> return available
-        // interval
-        return new Interval<Date>(availableInterval);
+        return new Interval<Date>(startDate, endDate);
+
     }
 
     public Interval<Date> zoomTo(final ZOOM zoom) {
@@ -245,45 +257,32 @@ public class ZoomController implements PlotAreaSpaceListener {
     }
 
     private Interval<Date> computeZoomInterval(final Interval<Date> interval, final int calendarField, final int difference) {
-        final Date startDate = interval.getStart();
-        Date endDate = interval.getEnd();
-        final Date lastdataDate = DrawController.getSingletonInstance().getLastDateWithData();
-        if (lastdataDate != null) {
-            if (endDate.after(lastdataDate)) {
-                endDate = lastdataDate;
-            }
+        return computeZoomForMilliSeconds(interval, differenceInMilliseconds(calendarField, difference));
+    }
+
+    private Long differenceInMilliseconds(final int calendarField, final int value) {
+        switch (calendarField) {
+        case Calendar.YEAR:
+            return value * 365 * 24 * 60 * 60 * 1000l;
+        case Calendar.MONTH:
+            return value * 30 * 24 * 60 * 60 * 1000l;
+        case Calendar.DAY_OF_MONTH:
+        case Calendar.DAY_OF_WEEK:
+        case Calendar.DAY_OF_WEEK_IN_MONTH:
+        case Calendar.DAY_OF_YEAR:
+            return value * 24 * 60 * 60 * 1000l;
+        case Calendar.HOUR:
+        case Calendar.HOUR_OF_DAY:
+            return value * 60 * 60 * 1000l;
+        case Calendar.MINUTE:
+            return value * 60 * 1000l;
+        case Calendar.SECOND:
+            return value * 1000l;
+        case Calendar.MILLISECOND:
+            return value * 1l;
+        default:
+            return null;
         }
-        final Date availableStartDate = availableInterval.getStart();
-
-        if (startDate == null || endDate == null || availableStartDate == null) {
-            return new Interval<Date>(null, null);
-        }
-
-        final GregorianCalendar calendar = new GregorianCalendar();
-
-        // add difference to start date -> when calculated end date is within
-        // available interval it is the result
-        calendar.clear();
-        calendar.setTime(endDate);
-        calendar.add(calendarField, -difference);
-
-        if (availableInterval.containsPointInclusive(calendar.getTime())) {
-            return new Interval<Date>(calendar.getTime(), endDate);
-        }
-
-        // computed end date is outside of available interval -> compute start
-        // date from available end date based on difference
-        calendar.clear();
-        calendar.setTime(availableStartDate);
-        calendar.add(calendarField, difference);
-
-        if (availableInterval.containsPointInclusive(calendar.getTime())) {
-            return new Interval<Date>(availableStartDate, calendar.getTime());
-        }
-
-        // available interval is smaller then requested one -> return available
-        // interval
-        return new Interval<Date>(availableInterval);
     }
 
     public Interval<Date> getSelectedInterval() {
