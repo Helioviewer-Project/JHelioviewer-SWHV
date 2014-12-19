@@ -91,6 +91,7 @@ public class GL3DCameraOptionsPanel extends JPanel implements GL3DCameraSelectio
 
         cameraSelectorModel.getCurrentCamera().getGrid().getDrawBits().set(Bit.Hidden, true);
         cameraSelectorModel.getCurrentCamera().getFollowGrid().getDrawBits().set(Bit.Hidden, true);
+        cameraSelectorModel.getCurrentCamera().deactivate();
         boolean trackingMode = cameraSelectorModel.getCurrentCamera().getTrackingMode();
         newCamera.setTrackingMode(trackingMode);
         cameraSelectorModel.setCurrentCamera(newCamera);
