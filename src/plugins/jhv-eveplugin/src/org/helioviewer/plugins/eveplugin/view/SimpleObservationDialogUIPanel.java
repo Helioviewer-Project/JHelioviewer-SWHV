@@ -75,7 +75,7 @@ public class SimpleObservationDialogUIPanel extends ObservationDialogPanel imple
             public void run() {
                 // long start = System.currentTimeMillis();
                 labelStartDate = new JLabel("Start Date");
-                labelEndDate = new JLabel("End Date");
+                // labelEndDate = new JLabel("End Date");
                 calendarStartDate = new JHVCalendarDatePicker();
                 // calendarEndDate = new JHVCalendarDatePicker();
 
@@ -109,14 +109,9 @@ public class SimpleObservationDialogUIPanel extends ObservationDialogPanel imple
         startDatePane.add(labelStartDate, BorderLayout.PAGE_START);
         startDatePane.add(calendarStartDate, BorderLayout.CENTER);
 
-        final JPanel endDatePane = new JPanel(new BorderLayout());
-        endDatePane.add(labelEndDate, BorderLayout.PAGE_START);
-        // endDatePane.add(calendarEndDate, BorderLayout.CENTER);
-
         timePane.setLayout(new GridLayout(1, 2, GRIDLAYOUT_HGAP, GRIDLAYOUT_VGAP));
-        timePane.setBorder(BorderFactory.createTitledBorder(" Select time range of interest "));
+        timePane.setBorder(BorderFactory.createTitledBorder(" Select the date of interest "));
         timePane.add(startDatePane);
-        timePane.add(endDatePane);
 
         // set basic layout
         this.setLayout(new BoxLayout(this, BoxLayout.PAGE_AXIS));
