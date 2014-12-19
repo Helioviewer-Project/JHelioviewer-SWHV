@@ -170,8 +170,7 @@ public class ImageViewerGui {
             // leftPane.add("Features/Events", solarEventCatalogsPanel, false);
 
             // STATE - GET LEFT PANE
-            leftScrollPane = new JScrollPane(getLeftContentPane(), JScrollPane.VERTICAL_SCROLLBAR_ALWAYS,
-                    JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+            leftScrollPane = new JScrollPane(getLeftContentPane(), JScrollPane.VERTICAL_SCROLLBAR_ALWAYS, JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
             leftScrollPane.setFocusable(false);
             leftScrollPane.getVerticalScrollBar().setUnitIncrement(10);
             midSplitPane.setLeftComponent(leftScrollPane);
@@ -375,7 +374,7 @@ public class ImageViewerGui {
             overviewImagePanelContainer.setLayout(new BoxLayout(overviewImagePanelContainer, BoxLayout.Y_AXIS));
             overviewImagePanelContainer.add(overviewImagePanel);
 
-            leftPane.add("Overview", overviewImagePanelContainer, true);
+            leftPane.add("Overview", overviewImagePanelContainer, false);
 
             // Movie control
             moviePanelContainer = new ControlPanelContainer();
@@ -576,10 +575,7 @@ public class ImageViewerGui {
             try {
                 for (int layer = 0; layer < jhvRequest.imageLayers.length; ++layer) {
                     // load image and memorize corresponding view
-                    ImageInfoView imageInfoView = APIRequestManager.requestAndOpenRemoteFile(true, jhvRequest.cadence,
-                            jhvRequest.startTime, jhvRequest.endTime, jhvRequest.imageLayers[layer].observatory,
-                            jhvRequest.imageLayers[layer].instrument, jhvRequest.imageLayers[layer].detector,
-                            jhvRequest.imageLayers[layer].measurement, true);
+                    ImageInfoView imageInfoView = APIRequestManager.requestAndOpenRemoteFile(true, jhvRequest.cadence, jhvRequest.startTime, jhvRequest.endTime, jhvRequest.imageLayers[layer].observatory, jhvRequest.imageLayers[layer].instrument, jhvRequest.imageLayers[layer].detector, jhvRequest.imageLayers[layer].measurement, true);
                     if (imageInfoView != null && getMainView() != null) {
                         // get the layered view
                         LayeredView layeredView = getMainView().getAdapter(LayeredView.class);
@@ -594,11 +590,9 @@ public class ImageViewerGui {
                             if (imageInfoView.equals(subView.getAdapter(ImageInfoView.class))) {
 
                                 // Set the correct image scale
-                                ImageSizeMetaData imageSizeMetaData = (ImageSizeMetaData) imageInfoView.getAdapter(MetaDataView.class)
-                                        .getMetaData();
+                                ImageSizeMetaData imageSizeMetaData = (ImageSizeMetaData) imageInfoView.getAdapter(MetaDataView.class).getMetaData();
                                 ZoomController zoomController = new ZoomController();
-                                zoomController.zoom(ImageViewerGui.getSingletonInstance().getMainView(),
-                                        imageSizeMetaData.getUnitsPerPixel() / (jhvRequest.imageScale * 1000.0));
+                                zoomController.zoom(ImageViewerGui.getSingletonInstance().getMainView(), imageSizeMetaData.getUnitsPerPixel() / (jhvRequest.imageScale * 1000.0));
 
                                 // Lock movie
                                 if (jhvRequest.linked) {
@@ -622,8 +616,7 @@ public class ImageViewerGui {
                                     // if opacity filter has been found set
                                     // opacity value
                                     if (filterView.getFilter() instanceof OpacityFilter) {
-                                        ((OpacityFilter) (filterView.getFilter())).setState(Float
-                                                .toString(jhvRequest.imageLayers[layer].opacity / 100.0f));
+                                        ((OpacityFilter) (filterView.getFilter())).setState(Float.toString(jhvRequest.imageLayers[layer].opacity / 100.0f));
                                         break;
                                     }
 
