@@ -146,7 +146,9 @@ public class ObservationDialogUIPanel extends SimpleObservationDialogUIPanel imp
      */
 
     private void updateZoomController() {
-        ZoomController.getSingletonInstance().setAvailableInterval(defineInterval(getDate()));
+        Interval<Date> interval = defineInterval(getDate());
+        ZoomController.getSingletonInstance().setAvailableInterval(interval);
+        ZoomController.getSingletonInstance().setSelectedInterval(interval, true);
     }
 
     private boolean updateBandController() {

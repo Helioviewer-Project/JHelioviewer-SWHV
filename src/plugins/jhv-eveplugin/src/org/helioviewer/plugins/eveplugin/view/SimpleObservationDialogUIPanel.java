@@ -170,40 +170,46 @@ public class SimpleObservationDialogUIPanel extends ObservationDialogPanel imple
     private void updateZoomController() {
         Interval<Date> interval = defineInterval(getDate());
         ZoomController.getSingletonInstance().setAvailableInterval(interval);
+        ZoomController.getSingletonInstance().setSelectedInterval(interval, true);
     }
 
     protected Interval<Date> defineInterval(Date date) {
-        GregorianCalendar gce = new GregorianCalendar();
-        gce.clear();
-        gce.setTime(date);
-        gce.set(Calendar.HOUR, 0);
-        gce.set(Calendar.MINUTE, 0);
-        gce.set(Calendar.SECOND, 0);
-        gce.set(Calendar.MILLISECOND, 0);
-        gce.add(Calendar.DAY_OF_MONTH, 1);
-        Date endDate = gce.getTime();
-
-        if (endDate.after(new Date())) {
+        Interval<Date> movieInterval = new Interval<Date>(LayersModel.getSingletonInstance().getFirstDate(), LayersModel.getSingletonInstance().getLastDate());
+        if (movieInterval.containsPointInclusive(date)) {
+            return movieInterval;
+        } else {
+            GregorianCalendar gce = new GregorianCalendar();
             gce.clear();
-            gce.setTime(new Date());
+            gce.setTime(date);
             gce.set(Calendar.HOUR, 0);
             gce.set(Calendar.MINUTE, 0);
             gce.set(Calendar.SECOND, 0);
             gce.set(Calendar.MILLISECOND, 0);
-            endDate = gce.getTime();
+            gce.add(Calendar.DAY_OF_MONTH, 1);
+            Date endDate = gce.getTime();
+
+            if (endDate.after(new Date())) {
+                gce.clear();
+                gce.setTime(new Date());
+                gce.set(Calendar.HOUR, 0);
+                gce.set(Calendar.MINUTE, 0);
+                gce.set(Calendar.SECOND, 0);
+                gce.set(Calendar.MILLISECOND, 0);
+                endDate = gce.getTime();
+            }
+
+            GregorianCalendar gcs = new GregorianCalendar();
+            gcs.clear();
+            gcs.setTime(endDate);
+            gcs.set(Calendar.HOUR, 0);
+            gcs.set(Calendar.MINUTE, 0);
+            gcs.set(Calendar.SECOND, 0);
+            gcs.set(Calendar.MILLISECOND, 0);
+            gcs.add(Calendar.DAY_OF_MONTH, -2);
+            Date startDate = gcs.getTime();
+
+            return new Interval<Date>(startDate, endDate);
         }
-
-        GregorianCalendar gcs = new GregorianCalendar();
-        gcs.clear();
-        gcs.setTime(endDate);
-        gcs.set(Calendar.HOUR, 0);
-        gcs.set(Calendar.MINUTE, 0);
-        gcs.set(Calendar.SECOND, 0);
-        gcs.set(Calendar.MILLISECOND, 0);
-        gcs.add(Calendar.DAY_OF_MONTH, -2);
-        Date startDate = gcs.getTime();
-
-        return new Interval<Date>(startDate, endDate);
     }
 
     // private void updateBandController() {
