@@ -1,7 +1,9 @@
 package org.helioviewer.plugins.eveplugin.view;
 
+import java.awt.BorderLayout;
 import java.awt.EventQueue;
-import java.awt.GridLayout;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.Calendar;
@@ -74,14 +76,34 @@ public class ObservationDialogUIPanel extends SimpleObservationDialogUIPanel imp
     private void initVisualComponents() {
         comboBoxGroup.addActionListener(this);
 
-        dataPane.setLayout(new GridLayout(2, 2, GRIDLAYOUT_HGAP, GRIDLAYOUT_VGAP));
-        dataPane.setBorder(BorderFactory.createTitledBorder(" Choose experiment specific data source "));
-        dataPane.add(labelGroup);
-        dataPane.add(comboBoxGroup);
-        dataPane.add(labelData);
-        dataPane.add(comboBoxData);
+        JPanel container = new JPanel();
+        container.setLayout(new BorderLayout());
+        dataPane.setLayout(new GridBagLayout());
 
-        this.add(dataPane);
+        GridBagConstraints c = new GridBagConstraints();
+        c.gridx = 0;
+        c.gridy = 0;
+        c.anchor = GridBagConstraints.WEST;
+        c.fill = GridBagConstraints.HORIZONTAL;
+        c.weightx = 0.5;
+
+        dataPane.setBorder(BorderFactory.createTitledBorder(" Choose experiment specific data source "));
+        dataPane.add(labelGroup, c);
+
+        c.gridx = 1;
+        c.gridy = 0;
+        dataPane.add(comboBoxGroup, c);
+
+        c.gridx = 0;
+        c.gridy = 1;
+        dataPane.add(labelData, c);
+
+        c.gridx = 1;
+        c.gridy = 1;
+        dataPane.add(comboBoxData, c);
+
+        container.add(dataPane, BorderLayout.CENTER);
+        this.add(container);
     }
 
     private void initGroups() {
