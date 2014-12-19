@@ -15,6 +15,7 @@ import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.JToggleButton;
 
 import org.helioviewer.base.math.Interval;
 import org.helioviewer.jhv.gui.IconBank;
@@ -25,6 +26,7 @@ import org.helioviewer.jhv.layers.LayersModel;
 import org.helioviewer.plugins.eveplugin.controller.ZoomController;
 import org.helioviewer.plugins.eveplugin.events.model.EventModel;
 import org.helioviewer.plugins.eveplugin.events.model.EventModelListener;
+import org.helioviewer.plugins.eveplugin.model.TimeIntervalLockModel;
 import org.helioviewer.plugins.eveplugin.settings.EVESettings;
 import org.helioviewer.plugins.eveplugin.view.linedataselector.LineDataSelectorPanel;
 import org.helioviewer.viewmodel.view.View;
@@ -53,7 +55,7 @@ public class ControlsPanel extends JPanel implements ActionListener, LayersListe
     private final JCheckBox eventsCheckBox = new JCheckBox();
     private final JLabel eventsLabel = new JLabel("Display events: ");
     private final ImageIcon movietimeIcon = IconBank.getIcon(JHVIcon.LAYER_MOVIE_TIME);
-    private final JButton periodFromLayersButton = new JButton(movietimeIcon);
+    private final JToggleButton periodFromLayersButton = new JToggleButton(movietimeIcon);
 
     private ControlsPanel() {
         initVisualComponents();
@@ -78,8 +80,7 @@ public class ControlsPanel extends JPanel implements ActionListener, LayersListe
         addLayerButton.addActionListener(this);
 
         periodFromLayersButton.setToolTipText("Request data of selected movie interval");
-        periodFromLayersButton.setPreferredSize(new Dimension(movietimeIcon.getIconWidth() + 14,
-                periodFromLayersButton.getPreferredSize().height));
+        periodFromLayersButton.setPreferredSize(new Dimension(movietimeIcon.getIconWidth() + 14, periodFromLayersButton.getPreferredSize().height));
         periodFromLayersButton.addActionListener(this);
         setEnabledStateOfPeriodMovieButton();
         // this.setPreferredSize(new Dimension(100, 300));
@@ -121,9 +122,9 @@ public class ControlsPanel extends JPanel implements ActionListener, LayersListe
         if (e.getSource().equals(addLayerButton)) {
             ObservationDialog.getSingletonInstance().showDialog(EVESettings.OBSERVATION_UI_NAME);
         } else if (e.getSource() == periodFromLayersButton) {
-            final Interval<Date> interval = new Interval<Date>(LayersModel.getSingletonInstance().getFirstDate(), LayersModel
-                    .getSingletonInstance().getLastDate());
+            final Interval<Date> interval = new Interval<Date>(LayersModel.getSingletonInstance().getFirstDate(), LayersModel.getSingletonInstance().getLastDate());
             ZoomController.getSingletonInstance().setSelectedInterval(interval, true);
+            TimeIntervalLockModel.getInstance().setLocked(periodFromLayersButton.isSelected());
         }
     }
 
