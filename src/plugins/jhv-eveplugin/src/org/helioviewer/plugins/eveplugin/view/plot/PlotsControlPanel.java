@@ -78,8 +78,8 @@ public class PlotsControlPanel extends JPanel implements ZoomControllerListener,
         lockIntervalLabel.setBorder(BorderFactory.createEmptyBorder(0, 0, 0, 0));
         zoomLabel.setBorder(BorderFactory.createEmptyBorder(0, 0, 0, 0));
         zoomComboBox.setBorder(BorderFactory.createEmptyBorder(0, 0, 0, 0));
-        zoomPane.add(lockIntervalLabel);
-        zoomPane.add(lockIntervalCheckBox);
+        // zoomPane.add(lockIntervalLabel);
+        // zoomPane.add(lockIntervalCheckBox);
         zoomPane.add(zoomLabel);
         zoomPane.add(zoomComboBox);
 
