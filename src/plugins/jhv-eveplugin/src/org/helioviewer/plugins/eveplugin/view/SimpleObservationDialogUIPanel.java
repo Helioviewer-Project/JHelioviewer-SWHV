@@ -195,7 +195,7 @@ public class SimpleObservationDialogUIPanel extends ObservationDialogPanel imple
 
         GregorianCalendar gcs = new GregorianCalendar();
         gcs.clear();
-        gcs.setTime(date);
+        gcs.setTime(endDate);
         gcs.set(Calendar.HOUR, 0);
         gcs.set(Calendar.MINUTE, 0);
         gcs.set(Calendar.SECOND, 0);
