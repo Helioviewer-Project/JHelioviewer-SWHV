@@ -79,7 +79,7 @@ public class ControlsPanel extends JPanel implements ActionListener, LayersListe
         addLayerButton.setToolTipText("Add a new layer");
         addLayerButton.addActionListener(this);
 
-        periodFromLayersButton.setToolTipText("Request data of selected movie interval");
+        periodFromLayersButton.setToolTipText("Synchronize movie and time series display");
         periodFromLayersButton.setPreferredSize(new Dimension(movietimeIcon.getIconWidth() + 14, periodFromLayersButton.getPreferredSize().height));
         periodFromLayersButton.addActionListener(this);
         setEnabledStateOfPeriodMovieButton();

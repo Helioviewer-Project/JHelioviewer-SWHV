@@ -119,7 +119,7 @@ public class ObservationDialog extends JDialog implements ActionListener, Showab
         buttonPane.add(btnImages);
 
         btnImages.setIcon(IconBank.getIcon(JHVIcon.ADD));
-        btnImages.setToolTipText("Request the selected image data and display it");
+        btnImages.setToolTipText("Request the selected data and display it");
 
         btnClose.setIcon(IconBank.getIcon(JHVIcon.REMOVE_LAYER));
         btnClose.setToolTipText("Close this Dialog");
