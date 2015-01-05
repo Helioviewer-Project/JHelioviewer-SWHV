@@ -85,7 +85,7 @@ public class SWEKTreeModel {
                 i++;
                 loadingTypes.put(eventType, i);
             } else {
-                loadingTypes.put(eventType, 0);
+                loadingTypes.put(eventType, 1);
                 fireEventTypeStartLoading(eventType);
             }
         }
