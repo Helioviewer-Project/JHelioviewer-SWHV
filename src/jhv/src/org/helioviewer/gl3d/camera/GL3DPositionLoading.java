@@ -32,13 +32,13 @@ public class GL3DPositionLoading {
     private final String LOADEDSTATE = "Loaded";
     private final String FAILEDSTATE = "Failed";
     private final String PARTIALSTATE = "Partial";
+    boolean running = false;
 
     private boolean isLoaded = false;
     private URL url;
     private JSONArray jsonResult;
     public GL3DPositionDateTime[] positionDateTime;
     private final SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS");
-    private final GregorianCalendar calendar = new GregorianCalendar();
     private String beginDate = "2014-05-28T00:00:00";
     private String endDate = "2014-05-28T00:00:00";
     private final String target = "SUN";
@@ -62,9 +62,13 @@ public class GL3DPositionLoading {
     }
 
     public void requestData() {
-
-        if (worker != null && !worker.isDone()) {
+        while (running) {
             worker.cancel(true);
+            try {
+                Thread.sleep(100);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
         }
         fireLoaded("Loading...");
         worker = new SwingWorker<Integer, Integer>() {
@@ -72,6 +76,7 @@ public class GL3DPositionLoading {
 
             @Override
             protected Integer doInBackground() throws Exception {
+                running = true;
                 try {
                     if (endDatems.getTime() - beginDatems.getTime() < 1000 * 60 * 60 * 24 * 20) {
                         deltat = 60 * 60 / 64;
@@ -105,6 +110,7 @@ public class GL3DPositionLoading {
                 } catch (URISyntaxException e) {
                     fireLoaded(FAILEDSTATE + ": wrong URI");
                 }
+                running = false;
                 return 1;
             }
 
@@ -129,12 +135,17 @@ public class GL3DPositionLoading {
     }
 
     private void parseData() {
+        GregorianCalendar calendar = new GregorianCalendar();
+
         calendar.clear();
         try {
             GL3DPositionDateTime[] positionDateTimehelper = new GL3DPositionDateTime[jsonResult.length()];
             for (int i = 0; i < jsonResult.length(); i++) {
                 JSONObject ithObject = jsonResult.getJSONObject(i);
                 String dateString = ithObject.getString("utc").toString();
+                //System.out.println("DATESTRING:" + dateString);
+                //System.out.println("index" + i);
+                //System.out.println("len" + jsonResult.length());
 
                 Date date = format.parse(dateString);
                 calendar.setTime(date);
