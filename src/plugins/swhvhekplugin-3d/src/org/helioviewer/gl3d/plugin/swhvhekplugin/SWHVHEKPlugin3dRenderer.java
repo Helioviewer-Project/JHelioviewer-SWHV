@@ -65,7 +65,7 @@ public class SWHVHEKPlugin3dRenderer extends PhysicalRenderer3d {
                 angularWidth = Double.parseDouble(param.getParameterValue()) * Math.PI / 180.;
             }
             if (param.getParameterName().equals("event_coord1")) {
-                principleAngle = Double.parseDouble(param.getParameterValue()) * Math.PI / 180.;
+                principleAngle = -(Double.parseDouble(param.getParameterValue()) - 90.) * Math.PI / 180.;
             }
             if (param.getParameterName().equals("event_coord2")) {
                 distSun = Double.parseDouble(param.getParameterValue());
