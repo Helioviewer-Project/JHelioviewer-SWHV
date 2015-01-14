@@ -63,6 +63,7 @@ public class GL3DObserverCamera extends GL3DSolarRotationTrackingTrackballCamera
         return "View from observer";
     }
 
+    @Override
     public void viewChanged(View sender, ChangeEvent aEvent) {
         if (!this.getTrackingMode()) {
             TimestampChangedReason timestampReason = aEvent.getLastChangedReasonByType(TimestampChangedReason.class);

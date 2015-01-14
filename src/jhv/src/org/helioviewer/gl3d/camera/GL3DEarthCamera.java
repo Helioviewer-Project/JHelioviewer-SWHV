@@ -28,7 +28,7 @@ import org.helioviewer.viewmodel.view.jp2view.JHVJP2View;
 public class GL3DEarthCamera extends GL3DSolarRotationTrackingTrackballCamera implements ViewListener {
 
     private Date currentDate = null;
-    private final double currentRotation = 0.0;
+    private double currentRotation = 0.0;
 
     public GL3DEarthCamera(GL3DSceneGraphView sceneGraphView) {
         super(sceneGraphView);
@@ -75,6 +75,7 @@ public class GL3DEarthCamera extends GL3DSolarRotationTrackingTrackballCamera im
 
     public void updateRotation() {
         double b0 = Astronomy.getB0InRadians(currentDate);
+        this.currentRotation = Astronomy.getL0Radians(currentDate);
         this.getLocalRotation().clear();
         this.getLocalRotation().rotate(GL3DQuatd.createRotation(b0, new GL3DVec3d(1, 0, 0)));
         this.getLocalRotation().rotate(GL3DQuatd.createRotation(this.currentRotation, new GL3DVec3d(0, 1, 0)));
