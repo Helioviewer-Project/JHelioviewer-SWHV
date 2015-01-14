@@ -46,6 +46,7 @@ public class GL3DFollowObjectCamera extends GL3DSolarRotationTrackingTrackballCa
         positionLoading.addListener(this);
         cameraFOV = new GL3DCameraFOV(1., 1.);
         sceneGraphView.getRoot().addNode(cameraFOV);
+        LayersModel.getSingletonInstance().addLayersListener(this);
     }
 
     @Override
@@ -200,6 +201,7 @@ public class GL3DFollowObjectCamera extends GL3DSolarRotationTrackingTrackballCa
 
     @Override
     public void layerAdded(int idx) {
+
     }
 
     @Override
@@ -212,24 +214,28 @@ public class GL3DFollowObjectCamera extends GL3DSolarRotationTrackingTrackballCa
 
     @Override
     public void activeLayerChanged(int idx) {
+
         if (!this.interpolation) {
             View nextView = LayersModel.getSingletonInstance().getLayer(idx);
-            JHVJPXView jpxView = nextView.getAdapter(JHVJPXView.class);
-            if (jpxView != null) {
-                DateTimeCache dtc = jpxView.getDateTimeCache();
-                Date beginDate = null;
-                Date endDate = null;
-                for (int frame = 0; frame < jpxView.getMaximumFrameNumber(); frame++) {
-                    ImmutableDateTime date = dtc.getDateTime(frame);
-                    if (beginDate == null || date.getTime().getTime() < beginDate.getTime()) {
-                        beginDate = date.getTime();
+            if (nextView != null) {
+
+                JHVJPXView jpxView = nextView.getAdapter(JHVJPXView.class);
+                if (jpxView != null) {
+                    DateTimeCache dtc = jpxView.getDateTimeCache();
+                    Date beginDate = null;
+                    Date endDate = null;
+                    for (int frame = 0; frame < jpxView.getMaximumFrameNumber(); frame++) {
+                        ImmutableDateTime date = dtc.getDateTime(frame);
+                        if (beginDate == null || date.getTime().getTime() < beginDate.getTime()) {
+                            beginDate = date.getTime();
+                        }
+                        if (endDate == null || date.getTime().getTime() > endDate.getTime()) {
+                            endDate = date.getTime();
+                        }
                     }
-                    if (endDate == null || date.getTime().getTime() > endDate.getTime()) {
-                        endDate = date.getTime();
-                    }
+                    this.positionLoading.setBeginDate(beginDate, false);
+                    this.positionLoading.setEndDate(endDate, true);
                 }
-                this.positionLoading.setBeginDate(beginDate, false);
-                this.positionLoading.setEndDate(endDate, true);
             }
         }
     }
