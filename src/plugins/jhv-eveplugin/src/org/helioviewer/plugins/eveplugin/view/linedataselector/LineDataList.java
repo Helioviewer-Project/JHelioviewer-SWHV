@@ -8,7 +8,6 @@ import javax.swing.BoxLayout;
 import javax.swing.JList;
 import javax.swing.JPanel;
 
-import org.helioviewer.base.logging.Log;
 import org.helioviewer.plugins.eveplugin.lines.data.Band;
 
 /**
@@ -177,13 +176,10 @@ public class LineDataList extends JPanel implements LineDataSelectorModelListene
     }
 
     @Override
-    public void downloadFinished(LineDataSelectorElement element, int downloadNumber) {
+    public void downloadFinished(LineDataSelectorElement element) {
         for (final LineDataListEntry entry : entryList) {
             if (entry.getLineDataSelectorElement().equals(element)) {
                 entry.setDownloadActive(false);
-                Log.debug("" + downloadNumber + " entry set download active false ");
-            } else {
-                Log.debug("" + downloadNumber + " element not the same ");
             }
         }
     }
