@@ -51,6 +51,7 @@ public class GL3DPositionLoadingPlanet {
     private Date beginDatems = new Date();
     private Date endDatems = new Date(0);
     private SwingWorker<Integer, Integer> worker;
+    public boolean running = false;
 
     public GL3DPositionLoadingPlanet() {
         Date bt = ((GL3DFollowObjectCamera) GL3DState.get().getActiveCamera()).getBeginTime();
@@ -74,14 +75,20 @@ public class GL3DPositionLoadingPlanet {
     }
 
     public void requestData() {
-        if (worker != null && !worker.isDone()) {
+        while (running) {
             worker.cancel(true);
+            try {
+                Thread.sleep(100);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
         }
         worker = new SwingWorker<Integer, Integer>() {
             private String report = null;
 
             @Override
             protected Integer doInBackground() throws Exception {
+                running = true;
                 try {
                     setLoaded(false);
                     buildRequestURL();
@@ -109,6 +116,7 @@ public class GL3DPositionLoadingPlanet {
                 } catch (URISyntaxException e) {
                     report = FAILEDSTATE + ": wrong URI";
                 }
+                running = false;
                 return 1;
             }
 
