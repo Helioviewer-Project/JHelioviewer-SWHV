@@ -37,7 +37,7 @@ public class GL3DPositionLoading {
     private URL url;
     private JSONArray jsonResult;
     public GL3DPositionDateTime[] positionDateTime;
-    private final SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
+    private final SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS");
     private final GregorianCalendar calendar = new GregorianCalendar();
     private String beginDate = "2014-05-28T00:00:00";
     private String endDate = "2014-05-28T00:00:00";
@@ -135,6 +135,7 @@ public class GL3DPositionLoading {
             for (int i = 0; i < jsonResult.length(); i++) {
                 JSONObject ithObject = jsonResult.getJSONObject(i);
                 String dateString = ithObject.getString("utc").toString();
+
                 Date date = format.parse(dateString);
                 calendar.setTime(date);
                 JSONArray positionArray = ithObject.getJSONArray("val");
