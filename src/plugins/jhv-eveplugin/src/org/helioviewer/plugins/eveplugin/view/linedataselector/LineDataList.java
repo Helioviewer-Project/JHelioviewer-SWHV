@@ -8,6 +8,7 @@ import javax.swing.BoxLayout;
 import javax.swing.JList;
 import javax.swing.JPanel;
 
+import org.helioviewer.base.logging.Log;
 import org.helioviewer.plugins.eveplugin.lines.data.Band;
 
 /**
@@ -21,11 +22,7 @@ public class LineDataList extends JPanel implements LineDataSelectorModelListene
 
     private static final long serialVersionUID = 1L;
 
-    private static final Color[] bandColors = { new Color(0, 0, 0), new Color(31, 26, 178), new Color(242, 159, 5), new Color(19, 137, 0),
-            new Color(140, 64, 47), new Color(199, 0, 125), new Color(197, 230, 231), new Color(242, 92, 5), new Color(217, 37, 37),
-            new Color(136, 166, 27), new Color(129, 0, 81), new Color(217, 136, 75), new Color(48, 110, 115), new Color(178, 156, 133),
-            new Color(255, 83, 53), new Color(242, 209, 110), new Color(201, 255, 237), new Color(14, 61, 89), new Color(89, 115, 88),
-            new Color(178, 3, 33), new Color(206, 224, 200), new Color(59, 66, 76), new Color(219, 108, 124) };
+    private static final Color[] bandColors = { new Color(0, 0, 0), new Color(31, 26, 178), new Color(242, 159, 5), new Color(19, 137, 0), new Color(140, 64, 47), new Color(199, 0, 125), new Color(197, 230, 231), new Color(242, 92, 5), new Color(217, 37, 37), new Color(136, 166, 27), new Color(129, 0, 81), new Color(217, 136, 75), new Color(48, 110, 115), new Color(178, 156, 133), new Color(255, 83, 53), new Color(242, 209, 110), new Color(201, 255, 237), new Color(14, 61, 89), new Color(89, 115, 88), new Color(178, 3, 33), new Color(206, 224, 200), new Color(59, 66, 76), new Color(219, 108, 124) };
 
     private final String identifier;
 
@@ -180,12 +177,13 @@ public class LineDataList extends JPanel implements LineDataSelectorModelListene
     }
 
     @Override
-    public void downloadFinished(LineDataSelectorElement element) {
-        if (!model.atLeastOneDownloading(element.getPlotIdentifier())) {
-            for (final LineDataListEntry entry : entryList) {
-                if (entry.getLineDataSelectorElement().equals(element)) {
-                    entry.setDownloadActive(false);
-                }
+    public void downloadFinished(LineDataSelectorElement element, int downloadNumber) {
+        for (final LineDataListEntry entry : entryList) {
+            if (entry.getLineDataSelectorElement().equals(element)) {
+                entry.setDownloadActive(false);
+                Log.debug("" + downloadNumber + " entry set download active false ");
+            } else {
+                Log.debug("" + downloadNumber + " element not the same ");
             }
         }
     }
