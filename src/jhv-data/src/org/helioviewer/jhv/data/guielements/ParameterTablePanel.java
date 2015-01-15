@@ -50,12 +50,14 @@ public class ParameterTablePanel extends JPanel {
         setLayout(new BorderLayout());
         parameterModel = new ParameterTableModel(parameters);
         table = new JTable(parameterModel) {
-            @Override
-            public boolean getScrollableTracksViewportWidth() {
-                return getPreferredSize().width < getParent().getWidth();
-            }
+            /*
+             * @Override public boolean getScrollableTracksViewportWidth() {
+             * return getPreferredSize().width < getParent().getWidth(); }
+             */
         };
         table.setAutoCreateRowSorter(true);
+        table.getColumnModel().getColumn(0).setPreferredWidth(180);
+        table.getColumnModel().getColumn(1).setPreferredWidth(200);
         table.setPreferredScrollableViewportSize(new Dimension(table.getWidth(), 150));
         table.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
         sorter = new TableRowSorter<ParameterTableModel>(parameterModel);
