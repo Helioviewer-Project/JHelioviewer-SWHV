@@ -12,8 +12,6 @@ import java.util.Date;
 import javax.swing.BoxLayout;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
-import javax.swing.JCheckBox;
-import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JToggleButton;
 
@@ -52,8 +50,6 @@ public class ControlsPanel extends JPanel implements ActionListener, LayersListe
     // private final String[] plots = { "No Events", "Events on Plot 1",
     // "Events on Plot 2" };
     // private final JComboBox eventsComboBox = new JComboBox(plots);
-    private final JCheckBox eventsCheckBox = new JCheckBox();
-    private final JLabel eventsLabel = new JLabel("Display events: ");
     private final ImageIcon movietimeIcon = IconBank.getIcon(JHVIcon.LAYER_MOVIE_TIME);
     private final JToggleButton periodFromLayersButton = new JToggleButton(movietimeIcon);
 
@@ -64,17 +60,6 @@ public class ControlsPanel extends JPanel implements ActionListener, LayersListe
 
     private void initVisualComponents() {
         EventModel.getSingletonInstance().addEventModelListener(this);
-
-        eventsCheckBox.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                if (eventsCheckBox.isSelected()) {
-                    EventModel.getSingletonInstance().activateEvents();
-                } else {
-                    EventModel.getSingletonInstance().deactivateEvents();
-                }
-            }
-        });
 
         addLayerButton.setToolTipText("Add a new layer");
         addLayerButton.addActionListener(this);
@@ -93,8 +78,6 @@ public class ControlsPanel extends JPanel implements ActionListener, LayersListe
         JPanel pageEndPanel = new JPanel();
         pageEndPanel.setBackground(Color.BLUE);
         JPanel flowPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
-        flowPanel.add(eventsLabel);
-        flowPanel.add(eventsCheckBox);
         flowPanel.add(periodFromLayersButton);
         flowPanel.add(addLayerButton);
 
@@ -206,7 +189,6 @@ public class ControlsPanel extends JPanel implements ActionListener, LayersListe
 
     @Override
     public void eventsDeactivated() {
-        eventsCheckBox.setSelected(false);
         repaint();
     }
 }
