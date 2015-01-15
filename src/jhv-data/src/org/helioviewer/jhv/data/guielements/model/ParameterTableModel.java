@@ -66,9 +66,4 @@ public class ParameterTableModel extends AbstractTableModel {
             return super.getColumnName(column);
         }
     }
-
-    @Override
-    public boolean isCellEditable(int rowIndex, int columnIndex) {
-        return columnIndex == 1;
-    }
 }

@@ -49,9 +49,15 @@ public class ParameterTablePanel extends JPanel {
         super();
         setLayout(new BorderLayout());
         parameterModel = new ParameterTableModel(parameters);
-        table = new JTable(parameterModel);
+        table = new JTable(parameterModel) {
+            @Override
+            public boolean getScrollableTracksViewportWidth() {
+                return getPreferredSize().width < getParent().getWidth();
+            }
+        };
         table.setAutoCreateRowSorter(true);
         table.setPreferredScrollableViewportSize(new Dimension(table.getWidth(), 150));
+        table.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
         sorter = new TableRowSorter<ParameterTableModel>(parameterModel);
         table.setRowSorter(sorter);
         nullValue = new JCheckBox();
