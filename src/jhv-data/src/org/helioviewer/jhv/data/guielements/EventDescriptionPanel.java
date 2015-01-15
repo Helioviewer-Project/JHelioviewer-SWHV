@@ -50,6 +50,11 @@ public class EventDescriptionPanel extends JPanel {
     private JTextArea textEndTime = new JTextArea("N/A");
 
     /**
+     * Label showing the color of the selected event.
+     */
+    private final JLabel colorLabel = new JLabel();
+
+    /**
      * 
      * 
      * @param event
@@ -65,6 +70,8 @@ public class EventDescriptionPanel extends JPanel {
         setLayout(new GridBagLayout());
 
         labelIcon = new JLabel(event.getIcon());
+        colorLabel.setBackground(event.getEventRelationShip().getRelationshipColor());
+        colorLabel.setOpaque(true);
 
         GridBagConstraints iconLabelConstraint = new GridBagConstraints();
         iconLabelConstraint.gridx = 0;
@@ -86,6 +93,7 @@ public class EventDescriptionPanel extends JPanel {
         this.addLineToSummaryPanel(summaryPanel, 1, "Description", textDescription);
         this.addLineToSummaryPanel(summaryPanel, 2, "Start Time", textStartTime);
         this.addLineToSummaryPanel(summaryPanel, 3, "End Time", textEndTime);
+        this.addLineToSummaryPanel(summaryPanel, 4, "Event color", colorLabel);
 
         // add the shortPanel
         GridBagConstraints shortPanelConstraint = new GridBagConstraints();
