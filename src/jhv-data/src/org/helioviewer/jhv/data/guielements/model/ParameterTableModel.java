@@ -67,4 +67,8 @@ public class ParameterTableModel extends AbstractTableModel {
         }
     }
 
+    @Override
+    public boolean isCellEditable(int rowIndex, int columnIndex) {
+        return columnIndex == 1;
+    }
 }
