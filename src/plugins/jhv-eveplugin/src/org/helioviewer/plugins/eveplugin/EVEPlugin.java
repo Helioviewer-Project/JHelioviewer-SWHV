@@ -22,8 +22,8 @@ import org.helioviewer.plugins.eveplugin.view.SimpleObservationDialogUIPanel;
 import org.helioviewer.viewmodelplugin.interfaces.Plugin;
 
 /**
- *
- *
+ * 
+ * 
  * @author Stephan Pagel
  * */
 public class EVEPlugin implements Plugin, MainContentPanelPlugin {
@@ -54,6 +54,7 @@ public class EVEPlugin implements Plugin, MainContentPanelPlugin {
                 ObservationDialog.getSingletonInstance().addUserInterface(EVESettings.RADIO_OBSERVATION_UI_NAME, new SimpleObservationDialogUIPanel(mainPanel.getPlotContainerPanel()));
                 // initialize database connection
                 RadioPlotModel.getSingletonInstance();
+                EventModel.getSingletonInstance().activateEvents();
             }
         });
 
@@ -93,7 +94,7 @@ public class EVEPlugin implements Plugin, MainContentPanelPlugin {
 
     /**
      * Used for testing the plugin
-     *
+     * 
      * @see org.helioviewer.plugins.eveplugin.EVEPluginLauncher#main(String[])
      * @param args
      */
