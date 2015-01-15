@@ -35,7 +35,7 @@ public class JHVEventRelationship {
         precedingEvents = new HashMap<String, JHVEventRelation>();
         relationshipRules = new ArrayList<JHVEventRelationShipRule>();
         relatedEventsByRule = new HashMap<String, JHVEventRelation>();
-        relationshipColor = Color.BLACK;
+        relationshipColor = null;
     }
 
     /**
