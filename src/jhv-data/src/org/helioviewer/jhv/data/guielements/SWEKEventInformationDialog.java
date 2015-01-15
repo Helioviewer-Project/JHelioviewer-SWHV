@@ -162,7 +162,7 @@ public class SWEKEventInformationDialog extends JDialog implements WindowFocusLi
         // this.addWindowFocusListener(this);
         // this.addFocusListener(this);
 
-        this.setAlwaysOnTop(true);
+        this.setAlwaysOnTop(false);
 
         GridBagConstraints eventDescriptionConstraint = new GridBagConstraints();
         eventDescriptionConstraint.gridx = 0;
@@ -218,8 +218,7 @@ public class SWEKEventInformationDialog extends JDialog implements WindowFocusLi
         }
 
         if (!event.getEventRelationShip().getRelatedEventsByRule().isEmpty()) {
-            allTablePanel.add(createRelatedEventsCollapsiblePane("Other Related Events", event.getEventRelationShip()
-                    .getRelatedEventsByRule()));
+            allTablePanel.add(createRelatedEventsCollapsiblePane("Other Related Events", event.getEventRelationShip().getRelatedEventsByRule()));
         }
     }
 
@@ -237,8 +236,7 @@ public class SWEKEventInformationDialog extends JDialog implements WindowFocusLi
                     public void actionPerformed(ActionEvent e) {
                         if (er.getTheEvent() != null) {
                             incrementNrOfWindows();
-                            SWEKEventInformationDialog dialog = new SWEKEventInformationDialog(er.getTheEvent(),
-                                    SWEKEventInformationDialog.this, false);
+                            SWEKEventInformationDialog dialog = new SWEKEventInformationDialog(er.getTheEvent(), SWEKEventInformationDialog.this, false);
                             // dialog.setLocation();
                             dialog.addWindowListener(SWEKEventInformationDialog.this);
                             dialog.validate();
