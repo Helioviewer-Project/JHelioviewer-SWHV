@@ -37,7 +37,7 @@ public class EventDescriptionPanel extends JPanel {
     /**
      * Label showing the event type in the summary of the event
      */
-    private JTextArea textDescription = new JTextArea("N/A");
+    private final JTextArea textDescription = new JTextArea("N/A");
 
     /**
      * Label showing the event date in the summary of the event
@@ -89,11 +89,20 @@ public class EventDescriptionPanel extends JPanel {
         JPanel summaryPanel = new JPanel(new GridBagLayout());
         summaryPanel.setBorder(BorderFactory.createEmptyBorder(3, 20, 3, 20));
 
-        this.addLineToSummaryPanel(summaryPanel, 0, "Type", textType);
-        this.addLineToSummaryPanel(summaryPanel, 1, "Description", textDescription);
-        this.addLineToSummaryPanel(summaryPanel, 2, "Start Time", textStartTime);
-        this.addLineToSummaryPanel(summaryPanel, 3, "End Time", textEndTime);
-        this.addLineToSummaryPanel(summaryPanel, 4, "Event color", colorLabel);
+        this.addLineToSummaryPanel(summaryPanel, 0, "Start Time", textStartTime);
+        this.addLineToSummaryPanel(summaryPanel, 1, "End Time", textEndTime);
+
+        GridBagConstraints colorLabelConstraint = new GridBagConstraints();
+        colorLabelConstraint.gridx = 2;
+        colorLabelConstraint.gridy = 2;
+        colorLabelConstraint.weightx = 0;
+        colorLabelConstraint.weighty = 0;
+
+        colorLabelConstraint.fill = GridBagConstraints.BOTH;
+        colorLabelConstraint.anchor = GridBagConstraints.CENTER;
+        colorLabelConstraint.ipadx = 10;
+        colorLabelConstraint.ipady = 4;
+        summaryPanel.add(colorLabel, colorLabelConstraint);
 
         // add the shortPanel
         GridBagConstraints shortPanelConstraint = new GridBagConstraints();
@@ -113,13 +122,6 @@ public class EventDescriptionPanel extends JPanel {
      * 
      */
     private void initDescriptionText() {
-        textDescription = new JTextArea(event.getShortDescription());
-        textDescription.setLineWrap(true);
-        textDescription.setFocusable(false);
-        textDescription.setBackground(this.getBackground());
-        textDescription.setWrapStyleWord(true);
-        textDescription.setFont(labelIcon.getFont());
-        textDescription.setMargin(new Insets(0, 0, 0, 0));
 
         textType = new JTextArea(event.getJHVEventType().getEventType());
         textType.setBackground(this.getBackground());

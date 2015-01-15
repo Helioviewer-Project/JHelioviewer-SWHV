@@ -19,6 +19,7 @@ import javax.swing.JScrollPane;
 
 import org.helioviewer.jhv.data.datatype.event.JHVEvent;
 import org.helioviewer.jhv.data.datatype.event.JHVEventRelation;
+import org.helioviewer.jhv.gui.ImageViewerGui;
 import org.helioviewer.jhv.gui.components.CollapsiblePane;
 
 /**
@@ -63,13 +64,13 @@ public class SWEKEventInformationDialog extends JDialog implements WindowFocusLi
      * @param event
      */
     public SWEKEventInformationDialog(JHVEvent event) {
-        super();
+        super(ImageViewerGui.getMainFrame(), event.getJHVEventType().getEventType());
         initDialog(event);
         parent = null;
     }
 
     public SWEKEventInformationDialog(JHVEvent event, SWEKEventInformationDialog parent, boolean modal) {
-        super(parent, modal);
+        super(parent, event.getJHVEventType().getEventType(), modal);
         initDialog(event);
         this.parent = parent;
     }
