@@ -122,8 +122,7 @@ public class HEKParser implements SWEKParser {
     }
 
     @Override
-    public SWEKEventStream parseEventStream(InputStream downloadInputStream, SWEKEventType eventType, SWEKSource eventSource,
-            SWEKSupplier eventSupplier, List<SWEKRelatedEvents> relationEventRules) {
+    public SWEKEventStream parseEventStream(InputStream downloadInputStream, SWEKEventType eventType, SWEKSource eventSource, SWEKSupplier eventSupplier, List<SWEKRelatedEvents> relationEventRules) {
         this.eventType = eventType;
         this.eventSource = eventSource;
         this.eventSupplier = eventSupplier;
@@ -289,8 +288,7 @@ public class HEKParser implements SWEKParser {
         JSONArray results = eventJSON.getJSONArray("result");
         HEKEventType hekEventType = new HEKEventType(eventType.getEventName(), eventSource.getSourceName(), eventSupplier.getSupplierName());
         for (int i = 0; i < results.length() && !parserStopped; i++) {
-            HEKEvent currentEvent = new HEKEvent(eventType.getEventName(), eventType.getEventName(), "", hekEventType,
-                    eventType.getEventIcon(), eventType.getColor());
+            HEKEvent currentEvent = new HEKEvent(eventType.getEventName(), eventType.getEventName(), "", hekEventType, eventType.getEventIcon(), eventType.getColor());
             JSONObject result = results.getJSONObject(i);
             parseResult(result, currentEvent);
             handleCoordinates(currentEvent);
@@ -304,34 +302,21 @@ public class HEKParser implements SWEKParser {
                         if (associationEventsMap.containsKey(association.getAssociationIvorn2())) {
                             // The other event of the association is available
                             HEKEvent associatedEvent = associationEventsMap.get(association.getAssociationIvorn2());
-                            if (association.getAssociationType().toLowerCase().equals("is_followed_by")
-                                    || association.getAssociationType().toLowerCase().equals("splits_into")
-                                    || association.getAssociationType().toLowerCase().equals("merges_into")) {
+                            if (association.getAssociationType().toLowerCase().equals("is_followed_by") || association.getAssociationType().toLowerCase().equals("splits_into") || association.getAssociationType().toLowerCase().equals("merges_into")) {
                                 // Is a sequence relation so associated event is
                                 // follow-up of current event
                                 if (currentEvent.getEventRelationShip().getPrecedingEvents().isEmpty()) {
                                     currentEvent.getEventRelationShip().setRelationshipColor(HEKColors.getNextColor());
                                 }
-                                associatedEvent.getEventRelationShip().getPrecedingEvents()
-                                        .put(currentEvent.getUniqueID(), new JHVEventRelation(currentEvent.getUniqueID(), currentEvent));
-                                currentEvent
-                                        .getEventRelationShip()
-                                        .getNextEvents()
-                                        .put(associatedEvent.getUniqueID(),
-                                                new JHVEventRelation(associatedEvent.getUniqueID(), associatedEvent));
-                                associatedEvent.getEventRelationShip().setRelationshipColor(
-                                        currentEvent.getEventRelationShip().getRelationshipColor());
+                                associatedEvent.getEventRelationShip().getPrecedingEvents().put(currentEvent.getUniqueID(), new JHVEventRelation(currentEvent.getUniqueID(), currentEvent));
+                                currentEvent.getEventRelationShip().getNextEvents().put(associatedEvent.getUniqueID(), new JHVEventRelation(associatedEvent.getUniqueID(), associatedEvent));
+                                associatedEvent.getEventRelationShip().setRelationshipColor(currentEvent.getEventRelationShip().getRelationshipColor());
 
                             } else {
                                 // is not a sequence relationship just add the
                                 // relation to the related events by rule
-                                associatedEvent.getEventRelationShip().getRelatedEventsByRule()
-                                        .put(currentEvent.getUniqueID(), new JHVEventRelation(currentEvent.getUniqueID(), currentEvent));
-                                currentEvent
-                                        .getEventRelationShip()
-                                        .getRelatedEventsByRule()
-                                        .put(associatedEvent.getUniqueID(),
-                                                new JHVEventRelation(associatedEvent.getUniqueID(), associatedEvent));
+                                associatedEvent.getEventRelationShip().getRelatedEventsByRule().put(currentEvent.getUniqueID(), new JHVEventRelation(currentEvent.getUniqueID(), currentEvent));
+                                currentEvent.getEventRelationShip().getRelatedEventsByRule().put(associatedEvent.getUniqueID(), new JHVEventRelation(associatedEvent.getUniqueID(), associatedEvent));
                             }
                         } else {
                             // The associated event is not in the list so we
@@ -340,14 +325,10 @@ public class HEKParser implements SWEKParser {
                             // without
                             // event reference.
                             currentEvent.getEventRelationShip().setRelationshipColor(HEKColors.getNextColor());
-                            if (association.getAssociationType().toLowerCase().equals("is_followed_by")
-                                    || association.getAssociationType().toLowerCase().equals("splits_into")
-                                    || association.getAssociationType().toLowerCase().equals("merges_into")) {
-                                currentEvent.getEventRelationShip().getNextEvents()
-                                        .put(association.getAssociationIvorn2(), new JHVEventRelation(association.getAssociationIvorn2()));
+                            if (association.getAssociationType().toLowerCase().equals("is_followed_by") || association.getAssociationType().toLowerCase().equals("splits_into") || association.getAssociationType().toLowerCase().equals("merges_into")) {
+                                currentEvent.getEventRelationShip().getNextEvents().put(association.getAssociationIvorn2(), new JHVEventRelation(association.getAssociationIvorn2()));
                             } else {
-                                currentEvent.getEventRelationShip().getRelatedEventsByRule()
-                                        .put(association.getAssociationIvorn2(), new JHVEventRelation(association.getAssociationIvorn2()));
+                                currentEvent.getEventRelationShip().getRelatedEventsByRule().put(association.getAssociationIvorn2(), new JHVEventRelation(association.getAssociationIvorn2()));
                             }
                         }
                     } else if (association.getAssociationIvorn2().equals(currentEvent.getUniqueID())) {
@@ -355,32 +336,19 @@ public class HEKParser implements SWEKParser {
                         if (associationEventsMap.containsKey(association.getAssociationIvorn1())) {
                             // the associated event is available
                             HEKEvent associatedEvent = associationEventsMap.get(association.getAssociationIvorn1());
-                            if (association.getAssociationType().toLowerCase().equals("is_followed_by")
-                                    || association.getAssociationType().toLowerCase().equals("splits_into")
-                                    || association.getAssociationType().toLowerCase().equals("merges_into")) {
+                            if (association.getAssociationType().toLowerCase().equals("is_followed_by") || association.getAssociationType().toLowerCase().equals("splits_into") || association.getAssociationType().toLowerCase().equals("merges_into")) {
                                 // Is a sequence relation so the current event
                                 // is
                                 // the follow-up of the associated event
-                                associatedEvent.getEventRelationShip().getNextEvents()
-                                        .put(currentEvent.getUniqueID(), new JHVEventRelation(currentEvent.getUniqueID(), currentEvent));
-                                currentEvent
-                                        .getEventRelationShip()
-                                        .getPrecedingEvents()
-                                        .put(associatedEvent.getUniqueID(),
-                                                new JHVEventRelation(associatedEvent.getUniqueID(), associatedEvent));
-                                currentEvent.getEventRelationShip().setRelationshipColor(
-                                        associatedEvent.getEventRelationShip().getRelationshipColor());
+                                associatedEvent.getEventRelationShip().getNextEvents().put(currentEvent.getUniqueID(), new JHVEventRelation(currentEvent.getUniqueID(), currentEvent));
+                                currentEvent.getEventRelationShip().getPrecedingEvents().put(associatedEvent.getUniqueID(), new JHVEventRelation(associatedEvent.getUniqueID(), associatedEvent));
+                                currentEvent.getEventRelationShip().setRelationshipColor(associatedEvent.getEventRelationShip().getRelationshipColor());
                             } else {
                                 // it is not a sequence relationship just add
                                 // the
                                 // relation to the related events by rule.
-                                associatedEvent.getEventRelationShip().getRelatedEventsByRule()
-                                        .put(currentEvent.getUniqueID(), new JHVEventRelation(currentEvent.getUniqueID(), currentEvent));
-                                currentEvent
-                                        .getEventRelationShip()
-                                        .getRelatedEventsByRule()
-                                        .put(associatedEvent.getUniqueID(),
-                                                new JHVEventRelation(associatedEvent.getUniqueID(), associatedEvent));
+                                associatedEvent.getEventRelationShip().getRelatedEventsByRule().put(currentEvent.getUniqueID(), new JHVEventRelation(currentEvent.getUniqueID(), currentEvent));
+                                currentEvent.getEventRelationShip().getRelatedEventsByRule().put(associatedEvent.getUniqueID(), new JHVEventRelation(associatedEvent.getUniqueID(), associatedEvent));
                             }
                         } else {
                             // The associated event is not in the list so we
@@ -388,14 +356,10 @@ public class HEKParser implements SWEKParser {
                             // new color add we already add a reference to the
                             // previous event without event type.
                             currentEvent.getEventRelationShip().setRelationshipColor(HEKColors.getNextColor());
-                            if (association.getAssociationType().toLowerCase().equals("is_followed_by")
-                                    || association.getAssociationType().toLowerCase().equals("splits_into")
-                                    || association.getAssociationType().toLowerCase().equals("merges_into")) {
-                                currentEvent.getEventRelationShip().getPrecedingEvents()
-                                        .put(association.getAssociationIvorn1(), new JHVEventRelation(association.getAssociationIvorn1()));
+                            if (association.getAssociationType().toLowerCase().equals("is_followed_by") || association.getAssociationType().toLowerCase().equals("splits_into") || association.getAssociationType().toLowerCase().equals("merges_into")) {
+                                currentEvent.getEventRelationShip().getPrecedingEvents().put(association.getAssociationIvorn1(), new JHVEventRelation(association.getAssociationIvorn1()));
                             } else {
-                                currentEvent.getEventRelationShip().getRelatedEventsByRule()
-                                        .put(association.getAssociationIvorn1(), new JHVEventRelation(association.getAssociationIvorn1()));
+                                currentEvent.getEventRelationShip().getRelatedEventsByRule().put(association.getAssociationIvorn1(), new JHVEventRelation(association.getAssociationIvorn1()));
                             }
                         }
                     }
@@ -691,11 +655,42 @@ public class HEKParser implements SWEKParser {
      *            the current event being parsed
      */
     private void handleCoordinates(HEKEvent currentEvent) {
+        checkAndFixBoundingBox();
         handleStandardPosition(currentEvent);
-        handleHGCCoordinates(currentEvent);
         handleHGSCoordinates(currentEvent);
+        handleHGCCoordinates(currentEvent);
         handleHRCCoordinates(currentEvent);
         handleHPCCoordiantes(currentEvent);
+    }
+
+    private void checkAndFixBoundingBox() {
+        if (hgsBoundedBox != null) {
+            double minX = 0.0;
+            double minY = 0.0;
+            double maxX = 0.0;
+            double maxY = 0.0;
+            boolean first = true;
+            for (JHVPoint p : hgsBoundedBox) {
+                if (first) {
+                    minX = p.getCoordinate1();
+                    maxX = p.getCoordinate1();
+                    minY = p.getCoordinate2();
+                    maxY = p.getCoordinate2();
+                    first = false;
+                } else {
+                    minX = Math.min(minX, p.getCoordinate1());
+                    maxX = Math.max(maxX, p.getCoordinate1());
+                    minY = Math.min(minY, p.getCoordinate2());
+                    maxY = Math.max(maxY, p.getCoordinate2());
+                }
+            }
+            if ((maxX - minX) > 160 && (maxY - minY) > 160) {
+                hgsBoundedBox = null;
+                hgcBoundedBox = null;
+                hpcBoundedBox = null;
+                hrcBoundedBox = null;
+            }
+        }
     }
 
     /**
@@ -709,8 +704,7 @@ public class HEKParser implements SWEKParser {
             JHVCoordinateSystem coorSys = parseCoordinateSystemString();
             if (coorSys != null) {
                 JHVPoint centralPoint = new JHVPoint(coordinate1, coordinate2, coordinate3);
-                currentEvent.addJHVPositionInformation(coorSys, new HEKPositionInformation(coorSys, new ArrayList<JHVPoint>(),
-                        new ArrayList<JHVPoint>(), centralPoint));
+                currentEvent.addJHVPositionInformation(coorSys, new HEKPositionInformation(coorSys, new ArrayList<JHVPoint>(), new ArrayList<JHVPoint>(), centralPoint));
             }
         }
     }
@@ -761,8 +755,7 @@ public class HEKParser implements SWEKParser {
                     localHGCCentralPoint = new JHVPoint(hgcX, hgcY, null);
                 }
             }
-            currentEvent.addJHVPositionInformation(JHVCoordinateSystem.HGC, new HEKPositionInformation(JHVCoordinateSystem.HGC,
-                    localHGCBoundedBox, localHGCBoundCC, localHGCCentralPoint));
+            currentEvent.addJHVPositionInformation(JHVCoordinateSystem.HGC, new HEKPositionInformation(JHVCoordinateSystem.HGC, localHGCBoundedBox, localHGCBoundCC, localHGCCentralPoint));
         }
     }
 
@@ -792,8 +785,7 @@ public class HEKParser implements SWEKParser {
                     localHGSCentralPoint = new JHVPoint(hgsX, hgsY, null);
                 }
             }
-            currentEvent.addJHVPositionInformation(JHVCoordinateSystem.HGS, new HEKPositionInformation(JHVCoordinateSystem.HGS,
-                    localHGSBoundedBox, localHGSBoundCC, localHGSCentralPoint));
+            currentEvent.addJHVPositionInformation(JHVCoordinateSystem.HGS, new HEKPositionInformation(JHVCoordinateSystem.HGS, localHGSBoundedBox, localHGSBoundCC, localHGSCentralPoint));
             ArrayList<JHVPoint> jhvBoundedBox = new ArrayList<JHVPoint>();
             for (JHVPoint el : localHGSBoundedBox) {
                 jhvBoundedBox.add(convertHGSJHV(el, currentEvent));
@@ -806,15 +798,13 @@ public class HEKParser implements SWEKParser {
             if (localHGSCentralPoint != null) {
                 jhvCentralPoint = convertHGSJHV(localHGSCentralPoint, currentEvent);
             }
-            currentEvent.addJHVPositionInformation(JHVCoordinateSystem.JHV, new HEKPositionInformation(JHVCoordinateSystem.JHV,
-                    jhvBoundedBox, jhvBoundCC, jhvCentralPoint));
+            currentEvent.addJHVPositionInformation(JHVCoordinateSystem.JHV, new HEKPositionInformation(JHVCoordinateSystem.JHV, jhvBoundedBox, jhvBoundCC, jhvCentralPoint));
         }
     }
 
     public JHVPoint convertHGSJHV(JHVPoint el, HEKEvent evt) {
         double theta = el.getCoordinate2() / 180. * Math.PI;
-        double phi = el.getCoordinate1() / 180. * Math.PI
-                - Astronomy.getL0Radians(new Date((evt.getStartDate().getTime() + evt.getEndDate().getTime()) / 2));
+        double phi = el.getCoordinate1() / 180. * Math.PI - Astronomy.getL0Radians(new Date((evt.getStartDate().getTime() + evt.getEndDate().getTime()) / 2));
         double x = Math.cos(theta) * Math.sin(phi);
         double z = Math.cos(theta) * Math.cos(phi);
         double y = -Math.sin(theta);
@@ -847,8 +837,7 @@ public class HEKParser implements SWEKParser {
                     localHRCCentralPoint = new JHVPoint(hrcA, hrcR, null);
                 }
             }
-            currentEvent.addJHVPositionInformation(JHVCoordinateSystem.HRC, new HEKPositionInformation(JHVCoordinateSystem.HRC,
-                    localHRCBoundedBox, localHRCBoundCC, localHRCCentralPoint));
+            currentEvent.addJHVPositionInformation(JHVCoordinateSystem.HRC, new HEKPositionInformation(JHVCoordinateSystem.HRC, localHRCBoundedBox, localHRCBoundCC, localHRCCentralPoint));
         }
 
     }
@@ -879,8 +868,7 @@ public class HEKParser implements SWEKParser {
                     localHPCCentralPoint = new JHVPoint(hpcX, hpcY, null);
                 }
             }
-            currentEvent.addJHVPositionInformation(JHVCoordinateSystem.HPC, new HEKPositionInformation(JHVCoordinateSystem.HPC,
-                    localHPCBoundedBox, localHPCBoundCC, localHPCCentralPoint));
+            currentEvent.addJHVPositionInformation(JHVCoordinateSystem.HPC, new HEKPositionInformation(JHVCoordinateSystem.HPC, localHPCBoundedBox, localHPCBoundCC, localHPCCentralPoint));
         }
 
     }
@@ -893,16 +881,13 @@ public class HEKParser implements SWEKParser {
                     List<JHVRelatedOn> relatedOnList = new ArrayList<JHVRelatedOn>();
                     for (SWEKRelatedOn ro : er.getRelatedOnList()) {
                         if (ro.getParameterFrom() != null && ro.getParameterWith() != null) {
-                            JHVEventParameter relatedOnFrom = new JHVEventParameter(ro.getParameterFrom().getParameterName(), ro
-                                    .getParameterFrom().getParameterDisplayName(), "");
-                            JHVEventParameter relatedOnWith = new JHVEventParameter(ro.getParameterWith().getParameterName(), ro
-                                    .getParameterWith().getParameterDisplayName(), "");
+                            JHVEventParameter relatedOnFrom = new JHVEventParameter(ro.getParameterFrom().getParameterName(), ro.getParameterFrom().getParameterDisplayName(), "");
+                            JHVEventParameter relatedOnWith = new JHVEventParameter(ro.getParameterWith().getParameterName(), ro.getParameterWith().getParameterDisplayName(), "");
                             JHVRelatedOn jhvRelatedOn = new JHVRelatedOn(relatedOnFrom, relatedOnWith);
                             relatedOnList.add(jhvRelatedOn);
                         }
                     }
-                    HEKEventType relatedWith = new HEKEventType(er.getRelatedWith().getEventName(), eventSource.getSourceName(),
-                            eventSupplier.getSupplierName());
+                    HEKEventType relatedWith = new HEKEventType(er.getRelatedWith().getEventName(), eventSource.getSourceName(), eventSupplier.getSupplierName());
                     JHVEventRelationShipRule rule = new JHVEventRelationShipRule(relatedWith, relatedOnList);
                     rules.add(rule);
                 }
@@ -911,16 +896,13 @@ public class HEKParser implements SWEKParser {
                 List<JHVRelatedOn> relatedOnList = new ArrayList<JHVRelatedOn>();
                 for (SWEKRelatedOn ro : er.getRelatedOnList()) {
                     if (ro.getParameterFrom() != null && ro.getParameterWith() != null) {
-                        JHVEventParameter relatedOnFrom = new JHVEventParameter(ro.getParameterWith().getParameterName(), ro
-                                .getParameterWith().getParameterDisplayName(), "");
-                        JHVEventParameter relatedOnWith = new JHVEventParameter(ro.getParameterFrom().getParameterName(), ro
-                                .getParameterFrom().getParameterDisplayName(), "");
+                        JHVEventParameter relatedOnFrom = new JHVEventParameter(ro.getParameterWith().getParameterName(), ro.getParameterWith().getParameterDisplayName(), "");
+                        JHVEventParameter relatedOnWith = new JHVEventParameter(ro.getParameterFrom().getParameterName(), ro.getParameterFrom().getParameterDisplayName(), "");
                         JHVRelatedOn jhvRelatedOn = new JHVRelatedOn(relatedOnFrom, relatedOnWith);
                         relatedOnList.add(jhvRelatedOn);
                     }
                 }
-                HEKEventType relatedWith = new HEKEventType(er.getEvent().getEventName(), eventSource.getSourceName(),
-                        eventSupplier.getSupplierName());
+                HEKEventType relatedWith = new HEKEventType(er.getEvent().getEventName(), eventSource.getSourceName(), eventSupplier.getSupplierName());
                 JHVEventRelationShipRule rule = new JHVEventRelationShipRule(relatedWith, relatedOnList);
                 rules.add(rule);
             }
