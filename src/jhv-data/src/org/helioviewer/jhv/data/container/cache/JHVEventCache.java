@@ -272,11 +272,9 @@ public class JHVEventCache {
                                 for (JHVEventParameter eventP : event.getAllEventParameters()) {
                                     // Loop over the event parameter to find the
                                     // value of the related on parameter
-                                    if (eventP.getParameterName().toLowerCase()
-                                            .equals(relatedOn.getRelatedOnWith().getParameterName().toLowerCase())) {
+                                    if (eventP.getParameterName().toLowerCase().equals(relatedOn.getRelatedOnWith().getParameterName().toLowerCase())) {
                                         // Parameter found in the event
-                                        if (eventP.getParameterValue() != null && p.getParameterValue() != null
-                                                && eventP.getParameterValue().equals(p.getParameterValue())) {
+                                        if (eventP.getParameterValue() != null && p.getParameterValue() != null && eventP.getParameterValue().equals(p.getParameterValue())) {
                                             // at least one of the related on
                                             // parameters found
                                             foundCorrespondinParameters++;
@@ -290,10 +288,8 @@ public class JHVEventCache {
                         }
                     }
                     if (foundCorrespondinParameters == rule.getRelatedOn().size()) {
-                        event.getEventRelationShip().getRelatedEventsByRule()
-                                .put(candidate.getUniqueID(), new JHVEventRelation(candidate.getUniqueID(), candidate));
-                        candidate.getEventRelationShip().getRelatedEventsByRule()
-                                .put(event.getUniqueID(), new JHVEventRelation(event.getUniqueID(), event));
+                        event.getEventRelationShip().getRelatedEventsByRule().put(candidate.getUniqueID(), new JHVEventRelation(candidate.getUniqueID(), candidate));
+                        candidate.getEventRelationShip().getRelatedEventsByRule().put(event.getUniqueID(), new JHVEventRelation(event.getUniqueID(), event));
                     }
                 }
             }
@@ -302,8 +298,12 @@ public class JHVEventCache {
     }
 
     private void checkRelationColor(JHVEvent event) {
+        if (event.getEventRelationShip().getRelationshipColor() == null) {
+            event.getEventRelationShip().setRelationshipColor(JHVCacheColors.getNextColor());
+        }
         if (idsPerColor.containsKey(event.getEventRelationShip().getRelationshipColor())) {
-            // Color of event is already used check if the event is in the list
+            // Color of event is already used check if the event is in the
+            // list
             // of events that can use the color
             Set<String> ids = idsPerColor.get(event.getEventRelationShip().getRelationshipColor());
             if (ids.contains(event.getUniqueID())) {
@@ -312,7 +312,8 @@ public class JHVEventCache {
                 // color
                 addRelatedEvents(event, new HashSet<String>());
             } else {
-                // The event is not in the list check if one of the following or
+                // The event is not in the list check if one of the
+                // following or
                 // preceding events is in the list
                 if (checkFollowingAndPrecedingEvents(event)) {
                     addRelatedEvents(event, new HashSet<String>());
@@ -505,8 +506,7 @@ public class JHVEventCache {
      * @param tempEvents
      *            the events that should be added
      */
-    private void addEventsToResult(Map<String, NavigableMap<Date, NavigableMap<Date, List<JHVEvent>>>> eventsResult,
-            List<JHVEvent> tempEvents) {
+    private void addEventsToResult(Map<String, NavigableMap<Date, NavigableMap<Date, List<JHVEvent>>>> eventsResult, List<JHVEvent> tempEvents) {
         for (JHVEvent event : tempEvents) {
             NavigableMap<Date, NavigableMap<Date, List<JHVEvent>>> datesPerType = new TreeMap<Date, NavigableMap<Date, List<JHVEvent>>>();
             NavigableMap<Date, List<JHVEvent>> endDatesPerStartDate = new TreeMap<Date, List<JHVEvent>>();
@@ -527,9 +527,7 @@ public class JHVEventCache {
         }
     }
 
-    private Map<String, NavigableMap<Date, NavigableMap<Date, List<JHVEvent>>>> mergeMaps(
-            Map<String, NavigableMap<Date, NavigableMap<Date, List<JHVEvent>>>> eventsResult,
-            Map<String, NavigableMap<Date, NavigableMap<Date, List<JHVEvent>>>> map) {
+    private Map<String, NavigableMap<Date, NavigableMap<Date, List<JHVEvent>>>> mergeMaps(Map<String, NavigableMap<Date, NavigableMap<Date, List<JHVEvent>>>> eventsResult, Map<String, NavigableMap<Date, NavigableMap<Date, List<JHVEvent>>>> map) {
         for (String eventType : map.keySet()) {
             if (eventsResult.containsKey(eventType)) {
                 NavigableMap<Date, NavigableMap<Date, List<JHVEvent>>> datesPerTypeMap = map.get(eventType);
