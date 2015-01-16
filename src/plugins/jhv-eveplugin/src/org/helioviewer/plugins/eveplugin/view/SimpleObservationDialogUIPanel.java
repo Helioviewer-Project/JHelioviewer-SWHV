@@ -170,7 +170,7 @@ public class SimpleObservationDialogUIPanel extends ObservationDialogPanel imple
 
     protected Interval<Date> defineInterval(Date date) {
         Interval<Date> movieInterval = new Interval<Date>(LayersModel.getSingletonInstance().getFirstDate(), LayersModel.getSingletonInstance().getLastDate());
-        if (movieInterval.containsPointInclusive(date)) {
+        if (movieInterval.getStart() != null && movieInterval.getEnd() != null && movieInterval.containsPointInclusive(date)) {
             return movieInterval;
         } else {
             GregorianCalendar gce = new GregorianCalendar();
