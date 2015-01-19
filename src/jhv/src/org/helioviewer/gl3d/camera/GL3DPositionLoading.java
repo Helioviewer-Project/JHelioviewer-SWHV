@@ -1,6 +1,5 @@
 package org.helioviewer.gl3d.camera;
 
-import java.awt.EventQueue;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -63,17 +62,13 @@ public class GL3DPositionLoading {
     }
 
     public void requestData() {
-        while (running) {
-            worker.cancel(true);
-            try {
-                Thread.sleep(100);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
+        if (worker != null) {
+            worker.cancel(false);
         }
         fireLoaded("Loading...");
         worker = new SwingWorker<Integer, Integer>() {
-            private final String report = null;
+            private String report = null;
+            public boolean affect = true;
 
             @Override
             protected Integer doInBackground() throws Exception {
@@ -90,26 +85,22 @@ public class GL3DPositionLoading {
                     Reader reader = new BufferedReader(new InputStreamReader(ds.getInput(), "UTF-8"));
                     if (!ds.getResponse400()) {
                         jsonResult = new JSONObject(new JSONTokener(reader));
-                        parseData();
-                        if (positionDateTime.length > 0) {
-                            setLoaded(true);
-                        }
                     } else {
                         JSONObject jsonObject = new JSONObject(new JSONTokener(reader));
                         if (jsonObject.has("faultstring")) {
                             String faultstring = jsonObject.getString("faultstring");
-                            fireLoaded(faultstring);
+                            report = faultstring;
                         }
                     }
 
                 } catch (UnknownHostException e) {
                     Log.debug("Unknown host, network down?", e);
                 } catch (final IOException e1) {
-                    fireLoaded(FAILEDSTATE + ": server problem");
+                    report = FAILEDSTATE + ": server problem";
                 } catch (JSONException e2) {
-                    fireLoaded(FAILEDSTATE + ": json parse problem");
+                    report = FAILEDSTATE + ": json parse problem";
                 } catch (URISyntaxException e) {
-                    fireLoaded(FAILEDSTATE + ": wrong URI");
+                    report = FAILEDSTATE + ": wrong URI";
                 }
                 running = false;
                 return 1;
@@ -119,8 +110,17 @@ public class GL3DPositionLoading {
             public void process(List<Integer> chunks) {
             }
 
-            public void finished() {
-                if (report != null) {
+            @Override
+            public void done() {
+                if (report == null) {
+                    parseData();
+                    if (positionDateTime.length > 0) {
+                        setLoaded(true);
+                    } else {
+                        report = "response is zero length array";
+                    }
+                }
+                if (report != null && !this.isCancelled()) {
                     fireLoaded(report);
                 }
             }
@@ -221,14 +221,9 @@ public class GL3DPositionLoading {
     }
 
     public void fireLoaded(final String state) {
-        EventQueue.invokeLater(new Runnable() {
-            @Override
-            public void run() {
-                for (GL3DPositionLoadingListener listener : listeners) {
-                    listener.fireNewLoaded(state);
-                }
-            }
-        });
+        for (GL3DPositionLoadingListener listener : listeners) {
+            listener.fireNewLoaded(state);
+        }
     }
 
     public Date getBeginDate() {
