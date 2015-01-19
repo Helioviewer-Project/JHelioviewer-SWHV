@@ -96,6 +96,8 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
     private static final Cursor closedHandCursor = Toolkit.getDefaultToolkit().createCustomCursor(IconBank.getIcon(JHVIcon.CLOSED_HAND).getImage(), new Point(16, 0), IconBank.getIcon(JHVIcon.CLOSED_HAND).toString());
     private static final Cursor openHandCursor = Toolkit.getDefaultToolkit().createCustomCursor(IconBank.getIcon(JHVIcon.OPEN_HAND).getImage(), new Point(16, 0), IconBank.getIcon(JHVIcon.OPEN_HAND).toString());
     private boolean reschedule = false;
+    private Point mousePosition;
+    private boolean mouseOverEvent;
 
     // //////////////////////////////////////////////////////////////////////////////
     // Methods
@@ -180,7 +182,7 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
             BufferedImage leftAxisPart = screenTempImage.getSubimage(0, 0, 2 * ChartConstants.getGraphLeftSpace(), height);
             Graphics2D gleftAxisPart = leftAxisPart.createGraphics();
             gleftAxisPart.setTransform(tf);
-            drawData(gplotPart, g, gleftAxisPart);
+            drawData(gplotPart, g, gleftAxisPart, mousePosition);
             // drawZoomBox(g);
             screenImage = screenTempImage;
         }
@@ -188,7 +190,7 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
         // Log.info("Run time: " + (System.currentTimeMillis() - start));
     }
 
-    private void drawData(Graphics2D chartg, Graphics2D plotG, Graphics2D leftAxisG) {
+    private void drawData(Graphics2D chartg, Graphics2D plotG, Graphics2D leftAxisG, Point mousePosition) {
         Map<DrawableType, Set<DrawableElement>> drawableElements = drawController.getDrawableElements(identifier);
         List<DrawableType> drawTypeList = DrawableType.getZOrderedList();
         boolean labelsDrawn = false;
@@ -205,7 +207,7 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
                     // Log.info("Drawable Elements size : " + del.size());
                     for (DrawableElement de : del) {
                         // Log.info("drawable element" + de);
-                        de.draw(chartg, leftAxisG, plotArea, leftAxisArea);
+                        de.draw(chartg, leftAxisG, plotArea, leftAxisArea, mousePosition);
                     }
                 }
             } else {
@@ -665,16 +667,23 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
 
     @Override
     public void mouseMoved(final MouseEvent e) {
+        mousePosition = new Point(e.getPoint().x - ChartConstants.getGraphLeftSpace(), e.getPoint().y - ChartConstants.getGraphTopSpace());
         final Rectangle frame = new Rectangle(movieLinePosition - 1, graphArea.y, 3, graphArea.height);
 
         if (movieLinePosition >= 0 && drawController.getIntervalAvailable() && frame.contains(e.getPoint())) {
             setCursor(new Cursor(Cursor.E_RESIZE_CURSOR));
         } else if (eventModel.getEventAtPosition(new Point(e.getPoint().x - ChartConstants.getGraphLeftSpace(), e.getPoint().y - ChartConstants.getGraphTopSpace())) != null) {
             setCursor(new Cursor(Cursor.HAND_CURSOR));
+            redrawGraph();
+            mouseOverEvent = true;
         } else if (e.getPoint().x >= graphArea.x && e.getPoint().x <= graphArea.x + graphArea.width && e.getPoint().y >= graphArea.y && e.getPoint().y <= graphArea.y + graphArea.height) {
             setCursor(openHandCursor);
         } else {
             setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
+        }
+        if (mouseOverEvent && (eventModel.getEventAtPosition(new Point(e.getPoint().x - ChartConstants.getGraphLeftSpace(), e.getPoint().y - ChartConstants.getGraphTopSpace())) == null)) {
+            mouseOverEvent = false;
+            redrawGraph();
         }
     }
 
