@@ -1,6 +1,7 @@
 package org.helioviewer.jhv.data.guielements;
 
 import java.awt.BorderLayout;
+import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.List;
@@ -57,8 +58,7 @@ public class ParameterTablePanel extends JPanel {
         table.setAutoCreateRowSorter(true);
         table.getColumnModel().getColumn(0).setPreferredWidth(180);
         table.getColumnModel().getColumn(1).setPreferredWidth(200);
-        // table.setPreferredScrollableViewportSize(new
-        // Dimension(table.getWidth(), 150));
+        table.setPreferredScrollableViewportSize(new Dimension(table.getWidth(), 150));
         table.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
         sorter = new TableRowSorter<ParameterTableModel>(parameterModel);
         table.setRowSorter(sorter);
