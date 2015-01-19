@@ -1,5 +1,6 @@
 package org.helioviewer.jhv.data.guielements;
 
+import java.awt.Color;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.event.ActionEvent;
@@ -199,6 +200,8 @@ public class SWEKEventInformationDialog extends JDialog implements WindowFocusLi
      */
     private void initParameterCollapsiblePanels() {
         ParameterTablePanel standardParameterPanel = new ParameterTablePanel(event.getVisibleEventParameters());
+        standardParameterPanel.setOpaque(true);
+        standardParameterPanel.setBackground(Color.green);
         standardParameters = new CollapsiblePane("Standard Parameters", standardParameterPanel, true);
         allTablePanel.add(standardParameters);
 
