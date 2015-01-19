@@ -56,7 +56,7 @@ public class EVEDrawableElement implements DrawableElement {
     }
 
     @Override
-    public void draw(Graphics2D g, Graphics2D leftAxisG, Rectangle graphArea, Rectangle leftAxisArea) {
+    public void draw(Graphics2D g, Graphics2D leftAxisG, Rectangle graphArea, Rectangle leftAxisArea, Point mousePosition) {
         updateGraphsData(interval, graphArea);
         drawGraphs(g, graphArea);
     }
@@ -65,8 +65,7 @@ public class EVEDrawableElement implements DrawableElement {
         double minValue = yAxisElement.getMinValue();
         double maxValue = yAxisElement.getMaxValue();
         if (!yAxisElement.isLogScale() || (yAxisElement.isLogScale() && minValue > 10e-50 && maxValue > 10e-50)) {
-            double ratioX = !intervalAvailable ? 0 : (double) graphArea.width
-                    / (double) (interval.getEnd().getTime() - interval.getStart().getTime());
+            double ratioX = !intervalAvailable ? 0 : (double) graphArea.width / (double) (interval.getEnd().getTime() - interval.getStart().getTime());
             double ratioY = 0.0;
             if (yAxisElement.isLogScale()) {
                 ratioY = Math.log10(maxValue) < Math.log10(minValue) ? 0 : graphArea.height / (Math.log10(maxValue) - Math.log10(minValue));
@@ -106,8 +105,7 @@ public class EVEDrawableElement implements DrawableElement {
 
                         if (value == null || (yAxisElement.isLogScale() && value < 10e-50)) {
                             if (counter > 1) {
-                                graphPolylines.add(new GraphPolyline(pointList, bands[i].getGraphColor(), warnLevels, warnLabels, ratioX,
-                                        graphArea.getWidth()));
+                                graphPolylines.add(new GraphPolyline(pointList, bands[i].getGraphColor(), warnLevels, warnLabels, ratioX, graphArea.getWidth()));
                             }
 
                             pointList.clear();
@@ -119,8 +117,7 @@ public class EVEDrawableElement implements DrawableElement {
                         final int x = computeX(eveValues[j].getDate(), interval, graphArea, ratioX);
                         int y = 0;
                         if (yAxisElement.isLogScale()) {
-                            y = computeY(Math.log10(eveValues[j].getValue().doubleValue()), interval, graphArea, ratioY,
-                                    Math.log10(minValue));
+                            y = computeY(Math.log10(eveValues[j].getValue().doubleValue()), interval, graphArea, ratioY, Math.log10(minValue));
                         } else {
                             y = computeY(eveValues[j].getValue().doubleValue(), interval, graphArea, ratioY, minValue);
                         }
@@ -133,8 +130,7 @@ public class EVEDrawableElement implements DrawableElement {
                     }
 
                     if (counter > 0) {
-                        graphPolylines.add(new GraphPolyline(pointList, bands[i].getGraphColor(), warnLevels, warnLabels, ratioX, graphArea
-                                .getWidth()));
+                        graphPolylines.add(new GraphPolyline(pointList, bands[i].getGraphColor(), warnLevels, warnLabels, ratioX, graphArea.getWidth()));
                     }
                 }
             }
@@ -194,8 +190,7 @@ public class EVEDrawableElement implements DrawableElement {
         // Methods
         // //////////////////////////////////////////////////////////////////////////
 
-        public GraphPolyline(final List<Point> points, final Color color, final List<Integer> warnLevels, final List<String> warnLabels,
-                double ratioX, double graphWidth) {
+        public GraphPolyline(final List<Point> points, final Color color, final List<Integer> warnLevels, final List<String> warnLabels, double ratioX, double graphWidth) {
             numberOfPoints = points.size();
             numberOfWarnLevels = warnLevels.size();
             xPoints = new ArrayList<ArrayList<Integer>>();

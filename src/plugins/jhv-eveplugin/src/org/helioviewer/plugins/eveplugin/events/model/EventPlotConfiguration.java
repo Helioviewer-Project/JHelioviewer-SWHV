@@ -73,12 +73,19 @@ public class EventPlotConfiguration {
         int spacePerLine = Math.min(4, (new Double(Math.floor(1.0 * graphArea.height / totalLines / 2))).intValue());
         int startPosition = spacePerLine * 2 * (nrPreviousLines + yPosition);
         // g.setColor(event.getColor());
-        drawPosition = new Rectangle((new Double(Math.floor(graphArea.width * scaledX0))).intValue(), startPosition, (new Double(Math.floor(graphArea.width * (scaledX1 - scaledX0)))).intValue(), spacePerLine);
+        drawPosition = new Rectangle((new Double(Math.floor(graphArea.width * scaledX0))).intValue(), startPosition, (new Double(Math.floor(graphArea.width * (scaledX1 - scaledX0)))).intValue() + 1, spacePerLine);
         if (drawPosition.width < 5) {
             drawPosition.x = drawPosition.x - (5 / drawPosition.width);
             drawPosition.width = 5;
         }
+
         clickPosition = new Rectangle(drawPosition.x - 1, drawPosition.y - 1, drawPosition.width + 2, drawPosition.height + 2);
+        if (containsPoint(mousePosition)) {
+            drawPosition.x = drawPosition.x - 5;
+            drawPosition.y = drawPosition.y - 5;
+            drawPosition.width = drawPosition.width + 10;
+            drawPosition.height = drawPosition.height + 10;
+        }
         int endpointsMarkWidth = 2;
         if (drawPosition.width > 10) {
             g.setColor(Color.black);
