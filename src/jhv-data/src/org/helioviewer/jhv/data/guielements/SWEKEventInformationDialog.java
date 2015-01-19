@@ -1,6 +1,7 @@
 package org.helioviewer.jhv.data.guielements;
 
 import java.awt.Color;
+import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.event.ActionEvent;
@@ -16,12 +17,12 @@ import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JDialog;
 import javax.swing.JPanel;
-import javax.swing.JScrollPane;
 
 import org.helioviewer.jhv.data.datatype.event.JHVEvent;
 import org.helioviewer.jhv.data.datatype.event.JHVEventRelation;
+import org.helioviewer.jhv.data.guielements.listeners.DataCollapsiblePanelModelListener;
+import org.helioviewer.jhv.data.guielements.model.DataCollapsiblePanelModel;
 import org.helioviewer.jhv.gui.ImageViewerGui;
-import org.helioviewer.jhv.gui.components.CollapsiblePane;
 
 /**
  * Popup displaying informations about a HEK event.
@@ -39,17 +40,20 @@ import org.helioviewer.jhv.gui.components.CollapsiblePane;
  * @author Bram.Bourgoignie (Bram.Bourgoignie@oma.be)
  * 
  */
-public class SWEKEventInformationDialog extends JDialog implements WindowFocusListener, FocusListener, WindowListener {
+public class SWEKEventInformationDialog extends JDialog implements WindowFocusListener, FocusListener, WindowListener, DataCollapsiblePanelModelListener {
 
     private static final long serialVersionUID = 1L;
 
     private JPanel allTablePanel;
 
-    private CollapsiblePane standardParameters;
+    private DataCollapsiblePanel standardParameters;
+    private DataCollapsiblePanel advancedParameters;
+    private DataCollapsiblePanel allParameters;
+    private DataCollapsiblePanel precedingEventsPanel;
+    private DataCollapsiblePanel followingEventsPanel;
+    private DataCollapsiblePanel otherRelatedEvents;
 
-    private CollapsiblePane advancedParameters;
-
-    private CollapsiblePane allParameters;
+    private int expandedPanels;
 
     private EventDescriptionPanel eventDescriptionPanel;
 
@@ -59,6 +63,10 @@ public class SWEKEventInformationDialog extends JDialog implements WindowFocusLi
 
     private final SWEKEventInformationDialog parent;
 
+    private final DataCollapsiblePanelModel model;
+
+    // CollapsiblePanels
+
     /**
      * 
      * 
@@ -66,12 +74,17 @@ public class SWEKEventInformationDialog extends JDialog implements WindowFocusLi
      */
     public SWEKEventInformationDialog(JHVEvent event) {
         super(ImageViewerGui.getMainFrame(), event.getJHVEventType().getEventType());
+        model = new DataCollapsiblePanelModel();
+        model.addListener(this);
         initDialog(event);
         parent = null;
+
     }
 
     public SWEKEventInformationDialog(JHVEvent event, SWEKEventInformationDialog parent, boolean modal) {
         super(parent, event.getJHVEventType().getEventType(), modal);
+        model = new DataCollapsiblePanelModel();
+        model.addListener(this);
         initDialog(event);
         this.parent = parent;
     }
@@ -156,6 +169,7 @@ public class SWEKEventInformationDialog extends JDialog implements WindowFocusLi
 
         initAllTablePanel();
         initParameterCollapsiblePanels();
+        setCollapsiblePanels();
 
         this.setLayout(new GridBagLayout());
         // this.setUndecorated(true);
@@ -183,7 +197,8 @@ public class SWEKEventInformationDialog extends JDialog implements WindowFocusLi
         allTablePanelConstraint.weightx = 1;
         allTablePanelConstraint.weighty = 1;
         allTablePanelConstraint.fill = GridBagConstraints.BOTH;
-        this.add(new JScrollPane(allTablePanel), allTablePanelConstraint);
+        // this.add(new JScrollPane(allTablePanel), allTablePanelConstraint);
+        this.add(allTablePanel, allTablePanelConstraint);
     }
 
     /**
@@ -192,7 +207,9 @@ public class SWEKEventInformationDialog extends JDialog implements WindowFocusLi
      */
     private void initAllTablePanel() {
         allTablePanel = new JPanel();
-        allTablePanel.setLayout(new BoxLayout(allTablePanel, BoxLayout.Y_AXIS));
+        // allTablePanel.setLayout(new BoxLayout(allTablePanel,
+        // BoxLayout.Y_AXIS));
+        allTablePanel.setLayout(new GridBagLayout());
     }
 
     /**
@@ -202,31 +219,94 @@ public class SWEKEventInformationDialog extends JDialog implements WindowFocusLi
         ParameterTablePanel standardParameterPanel = new ParameterTablePanel(event.getVisibleEventParameters());
         standardParameterPanel.setOpaque(true);
         standardParameterPanel.setBackground(Color.green);
-        standardParameters = new CollapsiblePane("Standard Parameters", standardParameterPanel, true);
-        allTablePanel.add(standardParameters);
+        expandedPanels = 1;
+        standardParameters = new DataCollapsiblePanel("Standard Parameters", standardParameterPanel, true, model);
 
         ParameterTablePanel advancedParameterPanel = new ParameterTablePanel(event.getNonVisibleEventParameters());
-        advancedParameters = new CollapsiblePane("Advanced Parameters", advancedParameterPanel, false);
-        allTablePanel.add(advancedParameters);
+        advancedParameters = new DataCollapsiblePanel("Advanced Parameters", advancedParameterPanel, false, model);
 
         ParameterTablePanel allEventsPanel = new ParameterTablePanel(event.getAllEventParameters());
-        allParameters = new CollapsiblePane("All Parameters", allEventsPanel, false);
-        allTablePanel.add(allParameters);
+        allParameters = new DataCollapsiblePanel("All Parameters", allEventsPanel, false, model);
 
         if (!event.getEventRelationShip().getPrecedingEvents().isEmpty()) {
-            allTablePanel.add(createRelatedEventsCollapsiblePane("Preceding Events", event.getEventRelationShip().getPrecedingEvents()));
+            precedingEventsPanel = createRelatedEventsCollapsiblePane("Preceding Events", event.getEventRelationShip().getPrecedingEvents());
         }
 
         if (!event.getEventRelationShip().getNextEvents().isEmpty()) {
-            allTablePanel.add(createRelatedEventsCollapsiblePane("Following Events", event.getEventRelationShip().getNextEvents()));
+            followingEventsPanel = createRelatedEventsCollapsiblePane("Following Events", event.getEventRelationShip().getNextEvents());
         }
 
         if (!event.getEventRelationShip().getRelatedEventsByRule().isEmpty()) {
-            allTablePanel.add(createRelatedEventsCollapsiblePane("Other Related Events", event.getEventRelationShip().getRelatedEventsByRule()));
+            otherRelatedEvents = createRelatedEventsCollapsiblePane("Other Related Events", event.getEventRelationShip().getRelatedEventsByRule());
         }
     }
 
-    private CollapsiblePane createRelatedEventsCollapsiblePane(String relation, Map<String, JHVEventRelation> relations) {
+    private void setCollapsiblePanels() {
+        GridBagConstraints gc = new GridBagConstraints();
+        gc.gridx = 0;
+        gc.gridy = 0;
+        gc.fill = GridBagConstraints.BOTH;
+        gc.weightx = 1;
+        if (standardParameters.isExpanded()) {
+            gc.weighty = 1;
+        } else {
+            gc.weighty = 0;
+        }
+        allTablePanel.add(standardParameters, gc);
+
+        gc.gridy = 1;
+        if (advancedParameters.isExpanded()) {
+            gc.weighty = 1;
+        } else {
+            gc.weighty = 0;
+        }
+        allTablePanel.add(advancedParameters, gc);
+
+        gc.gridy = 2;
+        if (allParameters.isExpanded()) {
+            gc.weighty = 1;
+        } else {
+            gc.weighty = 0;
+        }
+        allTablePanel.add(allParameters, gc);
+
+        int gridYPosition = 3;
+
+        if (!event.getEventRelationShip().getPrecedingEvents().isEmpty()) {
+            gc.gridy = gridYPosition;
+            if (precedingEventsPanel.isExpanded()) {
+                gc.weighty = 1;
+            } else {
+                gc.weighty = 0;
+            }
+            allTablePanel.add(precedingEventsPanel, gc);
+            gridYPosition++;
+        }
+
+        if (!event.getEventRelationShip().getNextEvents().isEmpty()) {
+            gc.gridy = gridYPosition;
+            if (followingEventsPanel.isExpanded()) {
+                gc.weighty = 1;
+            } else {
+                gc.weighty = 0;
+            }
+            allTablePanel.add(followingEventsPanel);
+            gridYPosition++;
+        }
+
+        if (!event.getEventRelationShip().getRelatedEventsByRule().isEmpty()) {
+            gc.gridy = gridYPosition;
+            if (otherRelatedEvents.isExpanded()) {
+                gc.weighty = 1;
+            } else {
+                gc.weighty = 0;
+            }
+            allTablePanel.add(otherRelatedEvents);
+            gridYPosition++;
+        }
+    }
+
+    private DataCollapsiblePanel createRelatedEventsCollapsiblePane(String relation, Map<String, JHVEventRelation> relations) {
         JPanel allPrecedingEvents = new JPanel();
         allPrecedingEvents.setLayout(new BoxLayout(allPrecedingEvents, BoxLayout.Y_AXIS));
         for (final JHVEventRelation er : relations.values()) {
@@ -270,7 +350,7 @@ public class SWEKEventInformationDialog extends JDialog implements WindowFocusLi
                 allPrecedingEvents.add(eventAndButtonPanel);
             }
         }
-        return new CollapsiblePane(relation, allPrecedingEvents, false);
+        return new DataCollapsiblePanel(relation, allPrecedingEvents, false, model);
     }
 
     private void incrementNrOfWindows() {
@@ -283,5 +363,41 @@ public class SWEKEventInformationDialog extends JDialog implements WindowFocusLi
         synchronized (nrOfWindowsOpened) {
             nrOfWindowsOpened--;
         }
+    }
+
+    @Override
+    public void repack() {
+        int newExpandedPanels = nrOfExpandedPanels();
+        if (!(newExpandedPanels == 0 || (newExpandedPanels == 1 && expandedPanels == 0))) {
+            this.setPreferredSize(new Dimension(this.getWidth(), this.getHeight()));
+        }
+        allTablePanel.removeAll();
+        setCollapsiblePanels();
+        this.revalidate();
+        this.pack();
+        expandedPanels = newExpandedPanels;
+    }
+
+    private int nrOfExpandedPanels() {
+        int newExpandedPanels = 0;
+        if (allParameters.isExpanded()) {
+            newExpandedPanels++;
+        }
+        if (standardParameters.isExpanded()) {
+            newExpandedPanels++;
+        }
+        if (advancedParameters.isExpanded()) {
+            newExpandedPanels++;
+        }
+        if ((followingEventsPanel != null && followingEventsPanel.isExpanded())) {
+            newExpandedPanels++;
+        }
+        if ((precedingEventsPanel != null && precedingEventsPanel.isExpanded())) {
+            newExpandedPanels++;
+        }
+        if ((otherRelatedEvents != null && otherRelatedEvents.isExpanded())) {
+            newExpandedPanels++;
+        }
+        return newExpandedPanels;
     }
 }
