@@ -69,7 +69,7 @@ public class EventPlotConfiguration {
      * @param nrPreviousLines
      *            the number of lines used already
      */
-    public void draw(Graphics g, Rectangle graphArea, int nrOfEventTypes, int eventTypeNR, int linesForEventType, int totalLines, int nrPreviousLines) {
+    public void draw(Graphics g, Rectangle graphArea, int nrOfEventTypes, int eventTypeNR, int linesForEventType, int totalLines, int nrPreviousLines, Point mousePosition) {
         int spacePerLine = Math.min(4, (new Double(Math.floor(1.0 * graphArea.height / totalLines / 2))).intValue());
         int startPosition = spacePerLine * 2 * (nrPreviousLines + yPosition);
         // g.setColor(event.getColor());
@@ -121,7 +121,7 @@ public class EventPlotConfiguration {
      *         point is not located in the event area.
      */
     private boolean containsPoint(Point p) {
-        if (drawPosition != null) {
+        if (clickPosition != null) {
             return clickPosition.contains(p);
         }
         return false;
