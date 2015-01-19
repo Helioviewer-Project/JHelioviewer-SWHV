@@ -562,7 +562,7 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
         // mousePressedPosition = graphArea.contains(e.getPoint()) ?
         // e.getPoint() : null;
         mousePressedPosition = plotArea.contains(e.getPoint()) ? e.getPoint() : null;
-        if (e.getPoint().x >= graphArea.x && e.getPoint().x <= graphArea.x + graphArea.width && e.getPoint().y >= graphArea.y && e.getPoint().y <= graphArea.y + graphArea.height) {
+        if (e.getPoint().x >= graphArea.x && e.getPoint().x <= graphArea.x + graphArea.width && e.getPoint().y >= graphArea.y && e.getPoint().y <= graphArea.y + graphArea.height && !(eventModel.getEventAtPosition(new Point(e.getPoint().x - ChartConstants.getGraphLeftSpace(), e.getPoint().y - ChartConstants.getGraphTopSpace())) != null)) {
             setCursor(closedHandCursor);
         }
     }
