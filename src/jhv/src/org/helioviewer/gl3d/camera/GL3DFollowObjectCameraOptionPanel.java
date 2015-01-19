@@ -20,7 +20,6 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JSeparator;
 import javax.swing.JSpinner;
-import javax.swing.JTextArea;
 import javax.swing.SpinnerNumberModel;
 import javax.swing.SwingConstants;
 import javax.swing.event.ChangeEvent;
@@ -41,7 +40,7 @@ import org.helioviewer.viewmodel.view.jp2view.datetime.ImmutableDateTime;
 public class GL3DFollowObjectCameraOptionPanel extends GL3DCameraOptionPanel implements GL3DFollowObjectCameraListener {
     private static final long serialVersionUID = 1L;
 
-    private final JTextArea loadedLabel;
+    private final JLabel loadedLabel;
     private JLabel beginDateLabel;
     private JPanel beginDatetimePanel;
     JHVCalendarDatePicker beginDatePicker;
@@ -94,10 +93,13 @@ public class GL3DFollowObjectCameraOptionPanel extends GL3DCameraOptionPanel imp
         loadedLabelPanel.setMaximumSize(new Dimension(338, 40));
 
         loadedLabelPanel.setLayout(new BoxLayout(loadedLabelPanel, BoxLayout.LINE_AXIS));
-        loadedLabel = new JTextArea("Status: Not loaded");
-        loadedLabel.setEditable(false);
-        loadedLabel.setLineWrap(true);
+
+        loadedLabel = new JLabel("Status: Not loaded");
+        //loadedLabel.setEditable(false);
+        //loadedLabel.setLineWrap(true);
         loadedLabel.setOpaque(false);
+        //loadedLabel.setEditable(false);
+
         loadedLabelPanel.add(loadedLabel);
         loadedLabelPanel.add(Box.createHorizontalGlue());
         add(loadedLabelPanel);
@@ -402,7 +404,10 @@ public class GL3DFollowObjectCameraOptionPanel extends GL3DCameraOptionPanel imp
 
     @Override
     public void fireLoaded(String state) {
-        this.loadedLabel.setText("Status: " + state);
+        String htmlstart = "<html><body style='width: 200px'>";
+        String htmlend = "</body></html>";
+
+        this.loadedLabel.setText(htmlstart + "Status: " + state + htmlend);
     }
 
     @Override
