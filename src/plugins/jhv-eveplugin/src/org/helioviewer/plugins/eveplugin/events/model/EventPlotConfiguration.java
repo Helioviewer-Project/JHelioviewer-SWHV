@@ -8,10 +8,10 @@ import java.awt.Rectangle;
 import org.helioviewer.jhv.data.datatype.event.JHVEvent;
 
 /**
- *
- *
+ * 
+ * 
  * @author Bram Bourgoignie (Bram.Bourgoignie@oma.be)
- *
+ * 
  */
 public class EventPlotConfiguration {
     /** The event */
@@ -27,10 +27,13 @@ public class EventPlotConfiguration {
     /** The position of the angle the event area */
     private Rectangle drawPosition;
 
+    /** The click position */
+    private Rectangle clickPosition;
+
     /**
      * Creates a EventPlotConfiguration for the given event with scaledX0 start
      * position and scaledX1 end position.
-     *
+     * 
      * @param event
      *            the event for this plot configuration
      * @param scaledX0
@@ -50,7 +53,7 @@ public class EventPlotConfiguration {
 
     /**
      * Draws the event plot configuration on the given graph area.
-     *
+     * 
      * @param g
      *            the graphics on which to draw
      * @param graphArea
@@ -71,6 +74,11 @@ public class EventPlotConfiguration {
         int startPosition = spacePerLine * 2 * (nrPreviousLines + yPosition);
         // g.setColor(event.getColor());
         drawPosition = new Rectangle((new Double(Math.floor(graphArea.width * scaledX0))).intValue(), startPosition, (new Double(Math.floor(graphArea.width * (scaledX1 - scaledX0)))).intValue(), spacePerLine);
+        if (drawPosition.width < 5) {
+            drawPosition.x = drawPosition.x - (5 / drawPosition.width);
+            drawPosition.width = 5;
+        }
+        clickPosition = new Rectangle(drawPosition.x - 1, drawPosition.y - 1, drawPosition.width + 2, drawPosition.height + 2);
         int endpointsMarkWidth = 2;
         if (drawPosition.width > 10) {
             g.setColor(Color.black);
@@ -88,7 +96,7 @@ public class EventPlotConfiguration {
 
     /**
      * Gets the event at the given point.
-     *
+     * 
      * @param p
      *            the location to check for an event.
      * @return null if no event is located there, the event if found
@@ -106,7 +114,7 @@ public class EventPlotConfiguration {
 
     /**
      * Checks if the given point is located where the event was drawn.
-     *
+     * 
      * @param p
      *            the point to check
      * @return true if the point is located in the event area, false if the
@@ -114,13 +122,13 @@ public class EventPlotConfiguration {
      */
     private boolean containsPoint(Point p) {
         if (drawPosition != null) {
-            return drawPosition.contains(p);
+            return clickPosition.contains(p);
         }
         return false;
     }
 
     public int getEventPosition() {
-        return this.yPosition;
+        return yPosition;
     }
 
 }
