@@ -5,6 +5,7 @@ import java.awt.Graphics;
 import java.awt.Point;
 import java.awt.Rectangle;
 
+import org.helioviewer.base.logging.Log;
 import org.helioviewer.jhv.data.datatype.event.JHVEvent;
 
 /**
@@ -80,13 +81,21 @@ public class EventPlotConfiguration {
         }
 
         clickPosition = new Rectangle(drawPosition.x - 1, drawPosition.y - 1, drawPosition.width + 2, drawPosition.height + 2);
-        if (containsPoint(mousePosition) || event.isHighlighted()) {
+
+        boolean containsMouse = containsPoint(mousePosition);
+        if (containsMouse || event.isHighlighted()) {
+            Log.debug("Contains mouse: " + containsMouse + " " + event.isHighlighted());
+        }
+        if (containsMouse || event.isHighlighted()) {
             drawPosition.x = drawPosition.x - 5;
             drawPosition.y = drawPosition.y - 5;
             drawPosition.width = drawPosition.width + 10;
             drawPosition.height = drawPosition.height + 10;
-            event.highlight(true);
-        } else {
+            if (!event.isHighlighted()) {
+                event.highlight(true);
+            }
+        }
+        if (!containsMouse && event.isHighlighted()) {
             event.highlight(false);
         }
         int endpointsMarkWidth = 2;
