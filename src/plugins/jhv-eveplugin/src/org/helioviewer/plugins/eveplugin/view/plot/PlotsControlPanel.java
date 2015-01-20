@@ -203,6 +203,9 @@ public class PlotsControlPanel extends JPanel implements ZoomControllerListener,
                     setDefaultPeriod = false;
                     final Interval<Date> interval = new Interval<Date>(LayersModel.getSingletonInstance().getFirstDate(), LayersModel.getSingletonInstance().getLastDate());
                     ZoomController.getSingletonInstance().setAvailableInterval(interval);
+                    if (TimeIntervalLockModel.getInstance().isLocked()) {
+                        ZoomController.getSingletonInstance().setSelectedInterval(interval, false);
+                    }
                     // PlotTimeSpace.getInstance().setSelectedMinAndMaxTime(interval.getStart(),
                     // interval.getEnd());
                 }
