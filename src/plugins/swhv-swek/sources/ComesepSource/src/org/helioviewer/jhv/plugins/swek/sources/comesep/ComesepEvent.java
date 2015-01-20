@@ -8,6 +8,7 @@ import java.util.List;
 
 import javax.swing.ImageIcon;
 
+import org.helioviewer.jhv.data.datatype.event.AbstractJHVEvent;
 import org.helioviewer.jhv.data.datatype.event.JHVCoordinateSystem;
 import org.helioviewer.jhv.data.datatype.event.JHVEvent;
 import org.helioviewer.jhv.data.datatype.event.JHVEventParameter;
@@ -21,7 +22,7 @@ import org.helioviewer.jhv.data.datatype.event.JHVPositionInformation;
  * @author Bram Bourgoignie (Bram.Bourgoignie@oma.be)
  * 
  */
-public class ComesepEvent implements JHVEvent {
+public class ComesepEvent extends AbstractJHVEvent {
 
     /** the start date of the event */
     private Date startDate;
@@ -100,8 +101,7 @@ public class ComesepEvent implements JHVEvent {
      * @param eventIcon
      * @param color
      */
-    public ComesepEvent(String eventName, String eventDisplayName, String description, ComesepEventType comesepEventType,
-            ImageIcon eventIcon, Color color) {
+    public ComesepEvent(String eventName, String eventDisplayName, String description, ComesepEventType comesepEventType, ImageIcon eventIcon, Color color) {
         initLists();
         this.eventName = eventName;
         this.eventDisplayName = eventDisplayName;
