@@ -114,8 +114,10 @@ public class GL3DPositionLoading {
             public void done() {
                 if (report == null) {
                     parseData();
-                    if (positionDateTime.length > 0) {
+                    if (positionDateTime != null && positionDateTime.length > 0) {
                         setLoaded(true);
+                    } else if (positionDateTime == null) {
+                        report = "response is void";
                     } else {
                         report = "response is zero length array";
                     }
