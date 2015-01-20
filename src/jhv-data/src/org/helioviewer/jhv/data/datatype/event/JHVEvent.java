@@ -151,4 +151,17 @@ public interface JHVEvent {
      */
     public abstract void merge(JHVEvent event);
 
+    /**
+     * Highlights the event.
+     * 
+     * @param isHighlighted
+     */
+    public abstract void highlight(boolean isHighlighted);
+
+    /**
+     * 
+     */
+    public abstract void addHighlightListener(JHVEventHighlightListener listener);
+
+    public abstract void removeHighlightListener(JHVEventHighlightListener listener);
 }
