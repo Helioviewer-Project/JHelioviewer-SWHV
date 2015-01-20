@@ -370,7 +370,8 @@ public class SWEKEventInformationDialog extends JDialog implements WindowFocusLi
         }
         allTablePanel.removeAll();
         setCollapsiblePanels();
-        this.revalidate();
+        this.invalidate();
+        this.validate();
         this.pack();
         expandedPanels = newExpandedPanels;
     }
