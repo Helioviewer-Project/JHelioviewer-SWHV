@@ -270,6 +270,7 @@ public class EventModel implements ZoomControllerListener, EventRequesterListene
                                     if (tempLastDateWithData == null || tempLastDateWithData.before(event.getEndDate())) {
                                         tempLastDateWithData = event.getEndDate();
                                     }
+                                    event.addHighlightListener(DrawController.getSingletonInstance());
                                     plotConfig.add(new EventPlotConfiguration(event, scaledX0, scaledX1, eventPosition));
                                 } else {
                                     // Log.debug("Event with unique ID : " +
@@ -282,8 +283,7 @@ public class EventModel implements ZoomControllerListener, EventRequesterListene
                     maxNrLines += maxEventLines;
                     eventPlotConfigPerEventType.put(eventType, plotConfig);
                 }
-                return new EventTypePlotConfiguration(events.size(), maxNrLines, linesPerEventType, eventPlotConfigPerEventType,
-                        tempLastDateWithData);
+                return new EventTypePlotConfiguration(events.size(), maxNrLines, linesPerEventType, eventPlotConfigPerEventType, tempLastDateWithData);
             }
 
             @Override

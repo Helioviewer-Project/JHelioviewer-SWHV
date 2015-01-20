@@ -80,11 +80,14 @@ public class EventPlotConfiguration {
         }
 
         clickPosition = new Rectangle(drawPosition.x - 1, drawPosition.y - 1, drawPosition.width + 2, drawPosition.height + 2);
-        if (containsPoint(mousePosition)) {
+        if (containsPoint(mousePosition) || event.isHighlighted()) {
             drawPosition.x = drawPosition.x - 5;
             drawPosition.y = drawPosition.y - 5;
             drawPosition.width = drawPosition.width + 10;
             drawPosition.height = drawPosition.height + 10;
+            event.highlight(true);
+        } else {
+            event.highlight(false);
         }
         int endpointsMarkWidth = 2;
         if (drawPosition.width > 10) {

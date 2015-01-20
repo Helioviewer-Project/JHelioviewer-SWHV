@@ -11,6 +11,8 @@ import java.util.Map;
 import java.util.Set;
 
 import org.helioviewer.base.math.Interval;
+import org.helioviewer.jhv.data.datatype.event.JHVEvent;
+import org.helioviewer.jhv.data.datatype.event.JHVEventHighlightListener;
 import org.helioviewer.jhv.gui.ViewListenerDistributor;
 import org.helioviewer.plugins.eveplugin.base.Range;
 import org.helioviewer.plugins.eveplugin.draw.DrawableElement;
@@ -27,7 +29,7 @@ import org.helioviewer.viewmodel.view.TimedMovieView;
 import org.helioviewer.viewmodel.view.View;
 import org.helioviewer.viewmodel.view.ViewListener;
 
-public class DrawController implements ZoomControllerListener, LineDataSelectorModelListener, ViewListener {
+public class DrawController implements ZoomControllerListener, LineDataSelectorModelListener, ViewListener, JHVEventHighlightListener {
 
     private static DrawController instance;
     private final Map<String, DrawControllerData> drawControllerData;
@@ -291,8 +293,7 @@ public class DrawController implements ZoomControllerListener, LineDataSelectorM
     @Override
     public void viewChanged(View sender, ChangeEvent aEvent) {
         TimestampChangedReason timestampReason = aEvent.getLastChangedReasonByType(TimestampChangedReason.class);
-        if ((timestampReason != null) && (timestampReason.getView() instanceof TimedMovieView)
-                && LinkedMovieManager.getActiveInstance().isMaster((TimedMovieView) timestampReason.getView())) {
+        if ((timestampReason != null) && (timestampReason.getView() instanceof TimedMovieView) && LinkedMovieManager.getActiveInstance().isMaster((TimedMovieView) timestampReason.getView())) {
             if (!EventQueue.isDispatchThread()) {
                 EventQueue.invokeLater(new Runnable() {
                     private Date date;
@@ -325,5 +326,10 @@ public class DrawController implements ZoomControllerListener, LineDataSelectorM
             }
             return lastDate;
         }
+    }
+
+    @Override
+    public void eventHightChanged(JHVEvent event) {
+        fireRedrawRequest();
     }
 }
