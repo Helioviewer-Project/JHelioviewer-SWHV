@@ -160,8 +160,19 @@ public interface JHVEvent {
 
     /**
      * 
+     * @return
+     */
+    public abstract boolean isHighlighted();
+
+    /**
+     * 
+     * @param listener
      */
     public abstract void addHighlightListener(JHVEventHighlightListener listener);
 
+    /**
+     * 
+     * @param listener
+     */
     public abstract void removeHighlightListener(JHVEventHighlightListener listener);
 }

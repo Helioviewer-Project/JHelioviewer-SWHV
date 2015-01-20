@@ -15,8 +15,10 @@ public abstract class AbstractJHVEvent implements JHVEvent {
 
     @Override
     public void highlight(boolean isHighlighted) {
-        highlighted = isHighlighted;
-        fireHighlightChanged();
+        if (isHighlighted != highlighted) {
+            highlighted = isHighlighted;
+            fireHighlightChanged();
+        }
     }
 
     @Override
@@ -27,6 +29,11 @@ public abstract class AbstractJHVEvent implements JHVEvent {
     @Override
     public void removeHighlightListener(JHVEventHighlightListener l) {
         listeners.remove(listeners);
+    }
+
+    @Override
+    public boolean isHighlighted() {
+        return highlighted;
     }
 
     private void fireHighlightChanged() {
