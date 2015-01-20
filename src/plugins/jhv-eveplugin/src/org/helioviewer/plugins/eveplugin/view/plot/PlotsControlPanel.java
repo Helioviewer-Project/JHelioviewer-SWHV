@@ -199,7 +199,7 @@ public class PlotsControlPanel extends JPanel implements ZoomControllerListener,
             @Override
             public void run() {
                 // long start = System.currentTimeMillis();
-                if (setDefaultPeriod) {
+                if (setDefaultPeriod || TimeIntervalLockModel.getInstance().isLocked()) {
                     setDefaultPeriod = false;
                     final Interval<Date> interval = new Interval<Date>(LayersModel.getSingletonInstance().getFirstDate(), LayersModel.getSingletonInstance().getLastDate());
                     ZoomController.getSingletonInstance().setAvailableInterval(interval);
