@@ -18,7 +18,7 @@
     <property name="swhv.build" value="${swhvproject.location}/build" />
     <property name="swhv.bin" value="${swhvproject.location}/bin/jhv" />
     <property name="swhv.lib" value="${swhvproject.location}/lib" />
-    <property name="swhv-swek.homedir.sources" value="${user.home}/JHelioviewer/PluginResources/swek_plugin/sources" />
+    <property name="swhv-swek.homedir.sources" value="${user.home}/JHelioviewer-SWHV/PluginResources/swek_plugin/sources" />
     
     <property name="revision" value="0" />
     <property name="version" value="0"/>

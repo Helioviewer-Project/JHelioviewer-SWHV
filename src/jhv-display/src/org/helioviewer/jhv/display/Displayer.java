@@ -5,8 +5,10 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadPoolExecutor;
 
 import org.helioviewer.gl3d.scenegraph.math.GL3DVec3d;
+import org.helioviewer.jhv.data.datatype.event.JHVEvent;
+import org.helioviewer.jhv.data.datatype.event.JHVEventHighlightListener;
 
-public class Displayer {
+public class Displayer implements JHVEventHighlightListener {
     public static Object displaylock = new Object();
     public static int STATE2D = 1;
     public static int STATE3D = 2;
@@ -96,5 +98,10 @@ public class Displayer {
 
     public int getState() {
         return state;
+    }
+
+    @Override
+    public void eventHightChanged(JHVEvent event) {
+        this.display();
     }
 }

@@ -83,7 +83,11 @@ public class SWHVHEKPlugin3dRenderer extends PhysicalRenderer3d {
 
         gl.glDisable(GL2.GL_TEXTURE_2D);
         gl.glEnable(GL2.GL_LINE_SMOOTH);
-        gl.glLineWidth(0.8f);
+        if (evt.isHighlighted()) {
+            gl.glLineWidth(1.6f);
+        } else {
+            gl.glLineWidth(0.8f);
+        }
         gl.glBegin(GL2.GL_LINE_STRIP);
         for (int i = 0; i <= lineResolution; i++) {
             double alpha = 1. - 1. * i / arcResolution;
@@ -172,7 +176,11 @@ public class SWHVHEKPlugin3dRenderer extends PhysicalRenderer3d {
 
         gl.glDisable(GL2.GL_TEXTURE_2D);
         gl.glEnable(GL2.GL_LINE_SMOOTH);
-        gl.glLineWidth(0.7f);
+        if (evt.isHighlighted()) {
+            gl.glLineWidth(1.6f);
+        } else {
+            gl.glLineWidth(0.7f);
+        }
         for (JHVPoint point : points) {
             int divpoints = 10;
             gl.glBegin(GL2.GL_LINE_STRIP);
@@ -230,7 +238,11 @@ public class SWHVHEKPlugin3dRenderer extends PhysicalRenderer3d {
             JHVPositionInformation el = pi.get(JHVCoordinateSystem.JHV);
             if (el.centralPoint() != null) {
                 JHVPoint pt = el.centralPoint();
-                g.drawImage3d(bi, pt.getCoordinate1(), pt.getCoordinate2(), pt.getCoordinate3(), 0.1f);
+                if (evt.isHighlighted()) {
+                    g.drawImage3d(bi, pt.getCoordinate1(), pt.getCoordinate2(), pt.getCoordinate3(), 0.16f);
+                } else {
+                    g.drawImage3d(bi, pt.getCoordinate1(), pt.getCoordinate2(), pt.getCoordinate3(), 0.1f);
+                }
             }
         }
 
