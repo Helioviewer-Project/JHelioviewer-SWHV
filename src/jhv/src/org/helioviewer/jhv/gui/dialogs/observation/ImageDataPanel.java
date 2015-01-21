@@ -112,6 +112,7 @@ public class ImageDataPanel extends ObservationDialogPanel {
         Thread t = new Thread(new Runnable() {
             @Override
             public void run() {
+                ObservationDialog.getSingletonInstance().setLoadButtonEnabled(false);
                 DataSources.getSingletonInstance().reload();
 
                 try {
@@ -145,6 +146,7 @@ public class ImageDataPanel extends ObservationDialogPanel {
                     Log.error("Could not setup observation dialog", e);
                     Message.err("Could not retrieve data sources", "The list of avaible data could not be fetched. So you cannot use the GUI to add data!" + System.getProperty("line.separator") + " This may happen if you do not have an internet connection or the there are server problems. You can still open local files.", false);
                 }
+                ObservationDialog.getSingletonInstance().setLoadButtonEnabled(true);
             }
         }, "ObservationSetup");
         t.start();
