@@ -32,6 +32,8 @@ import org.helioviewer.base.logging.Log;
 import org.helioviewer.basegui.components.WheelSupport;
 import org.helioviewer.gl3d.plugin.pfss.data.PfssCache;
 import org.helioviewer.gl3d.plugin.pfss.settings.PfssSettings;
+import org.helioviewer.jhv.JHVGlobals;
+import org.helioviewer.jhv.Settings;
 import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.layers.LayersListener;
 import org.helioviewer.jhv.layers.LayersModel;
@@ -146,26 +148,36 @@ public class PfssPluginPanel extends OverlayPanel implements ActionListener, Lay
 
         this.dateLabel = new JLabel(VOIDDATELABEL);
 
-        GridBagConstraints c4 = new GridBagConstraints();
-        c4.insets = new Insets(0, 0, 5, 0);
-        c4.gridx = 0;
-        c4.gridy = 0;
-        this.add(dateLabel, c4);
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.insets = new Insets(0, 0, 5, 0);
+        gbc.gridx = 0;
+        gbc.gridy = 0;
+        this.add(dateLabel, gbc);
 
-        GridBagConstraints c2 = new GridBagConstraints();
-        c2.insets = new Insets(0, 0, 5, 0);
-        c2.gridx = 2;
-        c2.gridy = 0;
+        gbc.insets = new Insets(0, 0, 5, 0);
+        gbc.gridx = 2;
+        gbc.gridy = 0;
+        this.add(visibleButton, gbc);
 
-        this.add(visibleButton, c2);
+        gbc.insets = new Insets(0, 0, 5, 0);
+        gbc.gridx = 3;
+        gbc.gridy = 0;
+        this.add(reloadButton, gbc);
 
-        GridBagConstraints c3 = new GridBagConstraints();
-        c3.insets = new Insets(0, 0, 5, 0);
-        c3.gridx = 3;
-        c3.gridy = 0;
-
-        this.add(reloadButton, c3);
-
+        JButton availabilityButton = new JButton("Available data");
+        availabilityButton.setToolTipText("Click here to check the availability of PFSS data");
+        availabilityButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                String url = Settings.getSingletonInstance().getProperty("availability.pfss.url");
+                JHVGlobals.openURL(url);
+            }
+        });
+        gbc.insets = new Insets(0, 0, 5, 0);
+        gbc.gridx = 0;
+        gbc.gridy = 2;
+        gbc.anchor = GridBagConstraints.WEST;
+        this.add(availabilityButton, gbc);
     }
 
     /**
