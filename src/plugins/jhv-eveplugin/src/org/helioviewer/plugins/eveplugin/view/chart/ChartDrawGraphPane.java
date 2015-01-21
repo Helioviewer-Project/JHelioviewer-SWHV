@@ -35,7 +35,6 @@ import javax.swing.JComponent;
 import javax.swing.SwingWorker;
 import javax.swing.event.MouseInputListener;
 
-import org.helioviewer.base.logging.Log;
 import org.helioviewer.base.math.Interval;
 import org.helioviewer.jhv.data.datatype.event.JHVEvent;
 import org.helioviewer.jhv.data.guielements.SWEKEventInformationDialog;
@@ -59,7 +58,7 @@ import org.helioviewer.viewmodel.view.LinkedMovieManager;
 import org.helioviewer.viewmodel.view.jp2view.datetime.ImmutableDateTime;
 
 /**
- *
+ * 
  * @author Stephan Pagel
  * */
 public class ChartDrawGraphPane extends JComponent implements MouseInputListener, ComponentListener, DrawControllerListener, ChartModelListener, MouseWheelListener, KeyListener, WindowFocusListener {
@@ -139,7 +138,7 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
             drawMovieLine(g2);
         }
 
-        if (reschedule) {
+        if (reschedule && !TimeIntervalLockModel.getInstance().isLocked()) {
             reschedule = false;
             updateGraph();
         }
@@ -498,9 +497,7 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
             movieLinePosition = -1;
             return;
         }
-
         movieLinePosition = (int) ((movieTimestamp.getTime() - interval.getStart().getTime()) * ratioX) + graphArea.x;
-
         if (movieLinePosition < graphArea.x || movieLinePosition > (graphArea.x + graphArea.width)) {
             movieLinePosition = -1;
         }
@@ -815,11 +812,9 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
     public void drawMovieLineRequest(Date time) {
         if (movieTimestamp == null || !movieTimestamp.equals(time)) {
             movieTimestamp = time;
-
-            updateMovieLineInformation();
-
             if (!TimeIntervalLockModel.getInstance().isLocked()) {
-                repaint();
+                updateMovieLineInformation();
+                chartRedrawRequested();
             }
         }
     }
@@ -887,11 +882,11 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
                 }
                 if (startValue <= endValue /* && startTime <= endTime */&& startValue >= myPlotAreaSpace.getScaledMinValue() && startValue <= myPlotAreaSpace.getScaledMaxValue() && endValue >= myPlotAreaSpace.getScaledMinValue() && endValue <= myPlotAreaSpace.getScaledMaxValue() // &&
 
-                        // startTime >= myPlotAreaSpace.getScaledMinTime()
-                        // && endTime <= myPlotAreaSpace.getScaledMaxTime() && startTime
-                        // <= myPlotAreaSpace.getScaledMaxTime()
-                        // && endTime >= myPlotAreaSpace.getScaledMinTime()) {
-                        ) {
+                // startTime >= myPlotAreaSpace.getScaledMinTime()
+                // && endTime <= myPlotAreaSpace.getScaledMaxTime() && startTime
+                // <= myPlotAreaSpace.getScaledMaxTime()
+                // && endTime >= myPlotAreaSpace.getScaledMinTime()) {
+                ) {
                     myPlotAreaSpace.setScaledSelectedTimeAndValue(startTime, endTime, startValue, endValue);
                 }
             }
@@ -906,14 +901,12 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
 
     @Override
     public void keyPressed(KeyEvent e) {
-        Log.debug("key pressed");
         ctrlPressed = e.isControlDown();
         shiftPressed = e.isShiftDown();
     }
 
     @Override
     public void keyReleased(KeyEvent e) {
-        Log.debug("Key released");
         ctrlPressed = e.isControlDown();
         shiftPressed = e.isShiftDown();
     }
