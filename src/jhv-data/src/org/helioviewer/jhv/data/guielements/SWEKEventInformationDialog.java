@@ -287,7 +287,7 @@ public class SWEKEventInformationDialog extends JDialog implements WindowFocusLi
             } else {
                 gc.weighty = 0;
             }
-            allTablePanel.add(followingEventsPanel);
+            allTablePanel.add(followingEventsPanel, gc);
             gridYPosition++;
         }
 
@@ -298,7 +298,7 @@ public class SWEKEventInformationDialog extends JDialog implements WindowFocusLi
             } else {
                 gc.weighty = 0;
             }
-            allTablePanel.add(otherRelatedEvents);
+            allTablePanel.add(otherRelatedEvents, gc);
             gridYPosition++;
         }
     }
