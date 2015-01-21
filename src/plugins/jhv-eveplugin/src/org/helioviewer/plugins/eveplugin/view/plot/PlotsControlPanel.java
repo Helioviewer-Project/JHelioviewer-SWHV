@@ -106,6 +106,7 @@ public class PlotsControlPanel extends JPanel implements ZoomControllerListener,
     }
 
     private void fillZoomComboBox() {
+        selectedIndexSetByProgram = true;
         final Interval<Date> interval = ZoomController.getSingletonInstance().getAvailableInterval();
         final Date startDate = interval.getStart();
 
