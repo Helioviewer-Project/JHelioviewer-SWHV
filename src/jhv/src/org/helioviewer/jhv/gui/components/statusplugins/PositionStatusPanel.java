@@ -4,7 +4,6 @@ import java.awt.Dimension;
 import java.awt.Point;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseMotionListener;
-import java.util.Formatter;
 
 import javax.swing.BorderFactory;
 
@@ -26,15 +25,15 @@ import org.helioviewer.viewmodel.viewportimagesize.ViewportImageSize;
 
 /**
  * Status panel for displaying the current mouse position.
- * 
+ *
  * <p>
  * If the the physical dimension of the image are known, the physical position
  * will be shown, otherwise, shows the screen position.
- * 
+ *
  * <p>
  * Basically, the information of this panel is independent from the active
  * layer.
- * 
+ *
  * <p>
  * If there is no layer present, this panel will be invisible.
  */
@@ -53,7 +52,7 @@ public class PositionStatusPanel extends ViewStatusPanelPlugin implements MouseM
 
     /**
      * Default constructor.
-     * 
+     *
      * @param imagePanel
      *            ImagePanel to show mouse position for
      */
@@ -71,10 +70,10 @@ public class PositionStatusPanel extends ViewStatusPanelPlugin implements MouseM
 
     /**
      * Updates the displayed position.
-     * 
+     *
      * If the physical dimensions are available, translates the screen
      * coordinates to physical coordinates.
-     * 
+     *
      * @param position
      *            Position on the screen.
      */
@@ -104,12 +103,8 @@ public class PositionStatusPanel extends ViewStatusPanelPlugin implements MouseM
 
             Vector2dDouble pos = new Vector2dDouble(position.x - solarcenter.getX(), -position.y + solarcenter.getY()).invertedScale(solarRadius).scale(959.705);
 
-            Formatter fmt = new Formatter();
-            String xStr = fmt.format(" %5d", (int) Math.round(pos.getX())).toString();
-            String yStr = fmt.format(" %5d", (int) Math.round(pos.getY())).toString();
-            fmt.close();
-
-            setText("(x, y) = " + "(" + xStr + PRIME + PRIME + "," + yStr + PRIME + PRIME + ")");
+            String text = String.format("(x, y) = (% 5d\u2032\u2032, % 5d\u2032\u2032)", (int) Math.round(pos.getX()), (int) Math.round(pos.getY()));
+            setText(text);
         } else {
 
             // computes pixel position for simple images (e.g. jpg and png)
@@ -117,7 +112,7 @@ public class PositionStatusPanel extends ViewStatusPanelPlugin implements MouseM
 
             // compute coordinates in image
             int x = (int) (r.getWidth() * (position.getX() / vis.getWidth()) + r.getCornerX());
-            int y = (int) (m.getPhysicalImageHeight() - (r.getCornerY() + r.getHeight()) + position.getY() / (double) vis.getHeight() * r.getHeight() + 0.5);
+            int y = (int) (m.getPhysicalImageHeight() - (r.getCornerY() + r.getHeight()) + position.getY() / vis.getHeight() * r.getHeight() + 0.5);
 
             // show coordinates
             setText("(x, y) = " + "(" + x + "," + y + ")");
@@ -129,6 +124,7 @@ public class PositionStatusPanel extends ViewStatusPanelPlugin implements MouseM
     /**
      * {@inheritDoc}
      */
+    @Override
     public View getView() {
         return view;
     }
@@ -136,6 +132,7 @@ public class PositionStatusPanel extends ViewStatusPanelPlugin implements MouseM
     /**
      * {@inheritDoc}
      */
+    @Override
     public void setView(View newView) {
         view = newView;
         regionView = ViewHelper.getViewAdapter(newView, RegionView.class);
@@ -146,6 +143,7 @@ public class PositionStatusPanel extends ViewStatusPanelPlugin implements MouseM
     /**
      * {@inheritDoc}
      */
+    @Override
     public BasicImagePanel getImagePanel() {
         return imagePanel;
     }
@@ -153,6 +151,7 @@ public class PositionStatusPanel extends ViewStatusPanelPlugin implements MouseM
     /**
      * {@inheritDoc}
      */
+    @Override
     public void setImagePanel(BasicImagePanel newImagePanel) {
         if (imagePanel != null) {
             imagePanel.removeMouseMotionListener(this);
@@ -164,6 +163,7 @@ public class PositionStatusPanel extends ViewStatusPanelPlugin implements MouseM
     /**
      * {@inheritDoc}
      */
+    @Override
     public void mouseDragged(MouseEvent e) {
         updatePosition(e.getPoint());
     }
@@ -171,6 +171,7 @@ public class PositionStatusPanel extends ViewStatusPanelPlugin implements MouseM
     /**
      * {@inheritDoc}
      */
+    @Override
     public void mouseMoved(MouseEvent e) {
         updatePosition(e.getPoint());
     }
@@ -178,6 +179,7 @@ public class PositionStatusPanel extends ViewStatusPanelPlugin implements MouseM
     /**
      * {@inheritDoc}
      */
+    @Override
     public void activeLayerChanged(int idx) {
         if (LayersModel.getSingletonInstance().isValidIndex(idx)) {
             setVisible(true);
@@ -190,6 +192,7 @@ public class PositionStatusPanel extends ViewStatusPanelPlugin implements MouseM
      * {@inheritDoc}
      */
 
+    @Override
     public void viewportGeometryChanged() {
         // a view change (e.g. a zoom) can change the coordinates in the
         // picture,
@@ -199,6 +202,7 @@ public class PositionStatusPanel extends ViewStatusPanelPlugin implements MouseM
         }
     }
 
+    @Override
     public void detach() {
     }
 
