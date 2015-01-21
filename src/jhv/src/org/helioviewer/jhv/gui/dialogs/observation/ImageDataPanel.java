@@ -45,7 +45,7 @@ import org.helioviewer.jhv.io.DataSources.Item;
  * In order to select and load image data from the Helioviewer server this class
  * provides the corresponding user interface. The UI will be displayed within
  * the {@link ObservationDialog}.
- * 
+ *
  * @author Stephan Pagel
  * */
 public class ImageDataPanel extends ObservationDialogPanel {
@@ -112,6 +112,8 @@ public class ImageDataPanel extends ObservationDialogPanel {
         Thread t = new Thread(new Runnable() {
             @Override
             public void run() {
+                DataSources.getSingletonInstance().reload();
+
                 try {
                     instrumentsPanel.setupSources();
 
@@ -150,7 +152,7 @@ public class ImageDataPanel extends ObservationDialogPanel {
 
     /**
      * Returns the selected start time.
-     * 
+     *
      * @return selected start time.
      * */
     public String getStartTime() {
@@ -159,7 +161,7 @@ public class ImageDataPanel extends ObservationDialogPanel {
 
     /**
      * Returns the selected end time.
-     * 
+     *
      * @return seleted end time.
      */
     public String getEndTime() {
@@ -168,7 +170,7 @@ public class ImageDataPanel extends ObservationDialogPanel {
 
     /**
      * Set a new end date and time
-     * 
+     *
      * @param newEnd
      *            new start date and time
      */
@@ -178,7 +180,7 @@ public class ImageDataPanel extends ObservationDialogPanel {
 
     /**
      * Set a new start date and time
-     * 
+     *
      * @param newStart
      *            new start date and time
      */
@@ -188,7 +190,7 @@ public class ImageDataPanel extends ObservationDialogPanel {
 
     /**
      * Returns the selected cadence.
-     * 
+     *
      * @return selected cadence.
      */
     public String getCadence() {
@@ -197,7 +199,7 @@ public class ImageDataPanel extends ObservationDialogPanel {
 
     /**
      * Returns the selected observatory.
-     * 
+     *
      * @return selected observatory.
      */
     public String getObservation() {
@@ -206,7 +208,7 @@ public class ImageDataPanel extends ObservationDialogPanel {
 
     /**
      * Returns the selected instrument.
-     * 
+     *
      * @return selected instrument.
      * */
     public String getInstrument() {
@@ -215,7 +217,7 @@ public class ImageDataPanel extends ObservationDialogPanel {
 
     /**
      * Returns the selected detector.
-     * 
+     *
      * @return selected detector.
      * */
     public String getDetector() {
@@ -224,7 +226,7 @@ public class ImageDataPanel extends ObservationDialogPanel {
 
     /**
      * Returns the selected measurement.
-     * 
+     *
      * @return selected measurement.
      * */
     public String getMeasurement() {
@@ -368,7 +370,7 @@ public class ImageDataPanel extends ObservationDialogPanel {
 
     /**
      * The panel bundles the components to select the start and end time.
-     * 
+     *
      * @author Stephan Pagel
      * */
     private class TimeSelectionPanel extends JPanel implements JHVCalendarListener {
@@ -468,7 +470,7 @@ public class ImageDataPanel extends ObservationDialogPanel {
          * operations run in EventQueue.
          * <p>
          * Must be called after the instrumentPanel has been setup
-         * 
+         *
          * @throws InvocationTargetException
          *             From inserting into the AWT Queue
          * @throws InterruptedException
@@ -494,7 +496,7 @@ public class ImageDataPanel extends ObservationDialogPanel {
 
         /**
          * Set a new end date and time
-         * 
+         *
          * @param newEnd
          *            new start date and time
          */
@@ -505,7 +507,7 @@ public class ImageDataPanel extends ObservationDialogPanel {
 
         /**
          * Set a new start date and time
-         * 
+         *
          * @param newStart
          *            new start date and time
          */
@@ -556,7 +558,7 @@ public class ImageDataPanel extends ObservationDialogPanel {
          * methods checks the entered times when the dates are equal. If the
          * start time is greater or equal than the end time the method will
          * return false.
-         * 
+         *
          * @return boolean value if selected start date is before selected end
          *         date.
          */
@@ -566,7 +568,7 @@ public class ImageDataPanel extends ObservationDialogPanel {
 
         /**
          * Returns the selected start time.
-         * 
+         *
          * @return selected start time.
          * */
         public String getStartTime() {
@@ -576,7 +578,7 @@ public class ImageDataPanel extends ObservationDialogPanel {
 
         /**
          * Returns the selected end time.
-         * 
+         *
          * @return selected end time.
          */
         public String getEndTime() {
@@ -591,7 +593,7 @@ public class ImageDataPanel extends ObservationDialogPanel {
 
     /**
      * The panel bundles the components to select the cadence.
-     * 
+     *
      * @author Stephan Pagel
      * */
     @SuppressWarnings("unused")
@@ -664,9 +666,9 @@ public class ImageDataPanel extends ObservationDialogPanel {
 
         /**
          * Returns the number of seconds of the selected cadence.
-         * 
+         *
          * If no cadence is specified, returns -1.
-         * 
+         *
          * @return number of seconds of the selected cadence.
          * */
         public int getCadence() {
@@ -700,7 +702,7 @@ public class ImageDataPanel extends ObservationDialogPanel {
      * The panel bundles the components to select the instrument etc.
      * <p>
      * Reads the available data from org.helioviewer.jhv.io.DataSources
-     * 
+     *
      * @author rewritten Helge Dietert
      * @author original Stephan Pagel
      * */
@@ -738,7 +740,7 @@ public class ImageDataPanel extends ObservationDialogPanel {
         /**
          * Default constructor which will setup the components and add listener
          * to update the available choices
-         * 
+         *
          * @param imageDataPanel
          */
         public InstrumentsPanel(final ImageDataPanel imageDataPanel) {
@@ -766,7 +768,7 @@ public class ImageDataPanel extends ObservationDialogPanel {
 
                 /**
                  * Override display component to show tooltip
-                 * 
+                 *
                  * @see javax.swing.DefaultListCellRenderer#getListCellRendererComponent(javax.swing.JList,
                  *      java.lang.Object, int, boolean, boolean)
                  */
@@ -817,7 +819,6 @@ public class ImageDataPanel extends ObservationDialogPanel {
                         Settings.getSingletonInstance().setProperty("API.event.path", "http://helioviewer.ias.u-psud.fr/helioviewer/api/");
                         Settings.getSingletonInstance().setProperty("default.httpRemote.path", "http://helioviewer.ias.u-psud.fr/helioviewer/jp2/");
                     }
-                    DataSources.getSingletonInstance().reload();
                     imageDataPanel.initDataSources(true);
                 }
             });
@@ -862,7 +863,7 @@ public class ImageDataPanel extends ObservationDialogPanel {
          * Function which will setup the data sources. Can be called from any
          * thread and will take care that EventQueue does the job and wait until
          * it is set to return
-         * 
+         *
          * @throws InvocationTargetException
          *             From inserting into the AWT Queue
          * @throws InterruptedException
@@ -881,7 +882,7 @@ public class ImageDataPanel extends ObservationDialogPanel {
         /**
          * Set the items combobox to the to the given parameter and selects the
          * first default item or otherwise the first item
-         * 
+         *
          * @param items
          *            string array which contains the names for the items of the
          *            combobox.
@@ -904,7 +905,7 @@ public class ImageDataPanel extends ObservationDialogPanel {
         /**
          * Set the items combobox to the to the given parameter and selects the
          * first default item or otherwise the first item
-         * 
+         *
          * @param items
          *            string array which contains the names for the items of the
          *            combobox.
@@ -924,7 +925,7 @@ public class ImageDataPanel extends ObservationDialogPanel {
 
         /**
          * Checks whether the user did some valid selection
-         * 
+         *
          * @return true if the user did some valid selecion
          */
         public boolean validSelection() {
@@ -933,7 +934,7 @@ public class ImageDataPanel extends ObservationDialogPanel {
 
         /**
          * Returns the selected observation.
-         * 
+         *
          * @return selected observation (key value), null if no is selected
          * */
         public String getObservatory() {
@@ -948,7 +949,7 @@ public class ImageDataPanel extends ObservationDialogPanel {
 
         /**
          * Returns the selected instrument.
-         * 
+         *
          * @return selected instrument (key value), null if no is selected
          * */
         public String getInstrument() {
@@ -963,7 +964,7 @@ public class ImageDataPanel extends ObservationDialogPanel {
 
         /**
          * Returns the selected detector.
-         * 
+         *
          * @return selected detector (key value), null if no is selected
          * */
         public String getDetector() {
@@ -978,7 +979,7 @@ public class ImageDataPanel extends ObservationDialogPanel {
 
         /**
          * Returns the selected measurement.
-         * 
+         *
          * @return selected measurement (key value), null if no is selected
          * */
         public String getMeasurement() {
@@ -1009,7 +1010,7 @@ public class ImageDataPanel extends ObservationDialogPanel {
 
             /**
              * Returns the first item.
-             * 
+             *
              * @return the fist item
              */
             public Item getFirstItem() {
@@ -1018,7 +1019,7 @@ public class ImageDataPanel extends ObservationDialogPanel {
 
             /**
              * Returns the second item.
-             * 
+             *
              * @return the second item
              */
             public Item getSecondItem() {
@@ -1027,7 +1028,7 @@ public class ImageDataPanel extends ObservationDialogPanel {
 
             /**
              * True if it was created as default item
-             * 
+             *
              * @return the defaultItem
              */
             public boolean isDefaultItem() {
