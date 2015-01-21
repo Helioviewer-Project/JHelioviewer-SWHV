@@ -102,7 +102,6 @@ public class GL3DPositionLoading {
                 } catch (URISyntaxException e) {
                     report = FAILEDSTATE + ": wrong URI";
                 }
-                running = false;
                 return 1;
             }
 
@@ -112,18 +111,20 @@ public class GL3DPositionLoading {
 
             @Override
             public void done() {
-                if (report == null) {
-                    parseData();
-                    if (positionDateTime != null && positionDateTime.length > 0) {
-                        setLoaded(true);
-                    } else if (positionDateTime == null) {
-                        report = "response is void";
-                    } else {
-                        report = "response is zero length array";
+                if (!this.isCancelled()) {
+                    if (report == null) {
+                        parseData();
+                        if (positionDateTime != null && positionDateTime.length > 0) {
+                            setLoaded(true);
+                        } else if (positionDateTime == null) {
+                            report = "response is void";
+                        } else {
+                            report = "response is zero length array";
+                        }
                     }
-                }
-                if (report != null && !this.isCancelled()) {
-                    fireLoaded(report);
+                    if (report != null) {
+                        fireLoaded(report);
+                    }
                 }
             }
         };
