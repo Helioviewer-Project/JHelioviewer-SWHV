@@ -82,6 +82,7 @@ public class HEKEvent extends AbstractJHVEvent {
      * Default constructor
      */
     public HEKEvent() {
+        super();
         initLists();
         eventName = "";
         eventDisplayName = "";
