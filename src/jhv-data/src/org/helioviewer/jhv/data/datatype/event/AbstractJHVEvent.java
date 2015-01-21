@@ -7,6 +7,7 @@ public abstract class AbstractJHVEvent implements JHVEvent {
 
     protected boolean highlighted;
     protected Set<JHVEventHighlightListener> listeners;
+    private Object owner;
 
     public AbstractJHVEvent() {
         highlighted = false;
@@ -14,9 +15,10 @@ public abstract class AbstractJHVEvent implements JHVEvent {
     }
 
     @Override
-    public void highlight(boolean isHighlighted) {
-        if (isHighlighted != highlighted) {
+    public void highlight(boolean isHighlighted, Object owner) {
+        if ((isHighlighted || (!isHighlighted && owner == this.owner)) && isHighlighted != highlighted) {
             highlighted = isHighlighted;
+            this.owner = owner;
             fireHighlightChanged();
         }
     }

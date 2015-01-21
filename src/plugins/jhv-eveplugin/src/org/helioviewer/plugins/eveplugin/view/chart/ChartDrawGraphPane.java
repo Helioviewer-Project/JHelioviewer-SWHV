@@ -59,7 +59,7 @@ import org.helioviewer.viewmodel.view.LinkedMovieManager;
 import org.helioviewer.viewmodel.view.jp2view.datetime.ImmutableDateTime;
 
 /**
- * 
+ *
  * @author Stephan Pagel
  * */
 public class ChartDrawGraphPane extends JComponent implements MouseInputListener, ComponentListener, DrawControllerListener, ChartModelListener, MouseWheelListener, KeyListener, WindowFocusListener {
@@ -790,7 +790,6 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
                     long start = System.currentTimeMillis();
                     updateGraph();
                     // Log.error("repaint request");
-                    Thread.dumpStack();
                     repaint();
                     // Log.debug("draw request time: " +
                     // (System.currentTimeMillis() - start));
@@ -888,11 +887,11 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
                 }
                 if (startValue <= endValue /* && startTime <= endTime */&& startValue >= myPlotAreaSpace.getScaledMinValue() && startValue <= myPlotAreaSpace.getScaledMaxValue() && endValue >= myPlotAreaSpace.getScaledMinValue() && endValue <= myPlotAreaSpace.getScaledMaxValue() // &&
 
-                // startTime >= myPlotAreaSpace.getScaledMinTime()
-                // && endTime <= myPlotAreaSpace.getScaledMaxTime() && startTime
-                // <= myPlotAreaSpace.getScaledMaxTime()
-                // && endTime >= myPlotAreaSpace.getScaledMinTime()) {
-                ) {
+                        // startTime >= myPlotAreaSpace.getScaledMinTime()
+                        // && endTime <= myPlotAreaSpace.getScaledMaxTime() && startTime
+                        // <= myPlotAreaSpace.getScaledMaxTime()
+                        // && endTime >= myPlotAreaSpace.getScaledMinTime()) {
+                        ) {
                     myPlotAreaSpace.setScaledSelectedTimeAndValue(startTime, endTime, startValue, endValue);
                 }
             }

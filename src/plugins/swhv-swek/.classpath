@@ -10,7 +10,6 @@
 	<classpathentry kind="lib" path="../lib/json.jar"/>
 	<classpathentry kind="lib" path="resources"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/jhv-data"/>
-	<classpathentry combineaccessrules="false" kind="src" path="/jhv-display"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/HEKSource"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/basegui"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/ComesepSource"/>

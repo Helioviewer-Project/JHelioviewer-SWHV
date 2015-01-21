@@ -18,9 +18,9 @@ import org.helioviewer.jhv.data.datatype.event.JHVPositionInformation;
 
 /**
  * Represents a JHVevent coming from the Comsep source.
- * 
+ *
  * @author Bram Bourgoignie (Bram.Bourgoignie@oma.be)
- * 
+ *
  */
 public class ComesepEvent extends AbstractJHVEvent {
 
@@ -82,6 +82,7 @@ public class ComesepEvent extends AbstractJHVEvent {
      * Default constructor
      */
     public ComesepEvent() {
+        super();
         initLists();
         eventName = "";
         eventDisplayName = "";
@@ -93,7 +94,7 @@ public class ComesepEvent extends AbstractJHVEvent {
     }
 
     /**
-     * 
+     *
      * @param eventName
      * @param eventDisplayName
      * @param description
@@ -209,7 +210,7 @@ public class ComesepEvent extends AbstractJHVEvent {
 
     /**
      * Adds a parameter to the event.
-     * 
+     *
      * @param parameter
      *            the parameter to add
      * @param visible
@@ -240,7 +241,7 @@ public class ComesepEvent extends AbstractJHVEvent {
 
     /**
      * Sets the start date of the ComesepEvent.
-     * 
+     *
      * @param startDate
      *            the start date
      */
@@ -250,7 +251,7 @@ public class ComesepEvent extends AbstractJHVEvent {
 
     /**
      * Sets the end date of the ComesepEvent.
-     * 
+     *
      * @param endDate
      *            the end date
      */
@@ -261,7 +262,7 @@ public class ComesepEvent extends AbstractJHVEvent {
 
     /**
      * Sets the unique ID for the HekEvent.
-     * 
+     *
      * @param uniqueID
      */
     public void setUniqueID(String uniqueID) {
@@ -270,7 +271,7 @@ public class ComesepEvent extends AbstractJHVEvent {
 
     /**
      * Adds position information to the HEKEvent.
-     * 
+     *
      * @param positionInformation
      *            the position information to add
      */

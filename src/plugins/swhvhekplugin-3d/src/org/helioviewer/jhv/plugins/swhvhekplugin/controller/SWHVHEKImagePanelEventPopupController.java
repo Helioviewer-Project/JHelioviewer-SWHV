@@ -344,7 +344,12 @@ public class SWHVHEKImagePanelEventPopupController implements KeyEventDispatcher
 
                 }
             }
-
+            if (mouseOverJHVEvent != null) {
+                mouseOverJHVEvent.highlight(true, this);
+            }
+            if (lastJHVEvent != mouseOverJHVEvent && lastJHVEvent != null) {
+                lastJHVEvent.highlight(false, this);
+            }
             if (lastJHVEvent == null && mouseOverJHVEvent != null) {
                 lastCursor = imagePanel.getCursor();
                 imagePanel.setCursor(helpCursor);

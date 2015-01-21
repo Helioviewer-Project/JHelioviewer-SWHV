@@ -145,6 +145,7 @@ public class SWHVHEKData implements LayersListener, JHVEventHandler {
                     if (event.getStartDate().getTime() < currentDate.getTime() && event.getEndDate().getTime() > currentDate.getTime()) {
                         activeEvents.add(event);
                     }
+                    event.addHighlightListener(Displayer.getSingletonInstance());
                 } else {
                     Log.warn("Possibly something strange is going on with incoming events. Either the date or the event is null");
                 }

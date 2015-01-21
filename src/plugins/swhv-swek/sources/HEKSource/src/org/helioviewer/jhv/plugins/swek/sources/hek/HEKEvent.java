@@ -18,9 +18,9 @@ import org.helioviewer.jhv.data.datatype.event.JHVPositionInformation;
 
 /**
  * Represents a JHVevent coming from the HEK source.
- * 
+ *
  * @author Bram Bourgoignie (Bram.Bourgoignie@oma.be)
- * 
+ *
  */
 public class HEKEvent extends AbstractJHVEvent {
 
@@ -95,8 +95,8 @@ public class HEKEvent extends AbstractJHVEvent {
     /**
      * Creates a HEK event with an event name, event display name, short
      * description, an event type and color.
-     * 
-     * 
+     *
+     *
      * @param eventName
      *            the event name
      * @param eventDisplayName
@@ -122,7 +122,7 @@ public class HEKEvent extends AbstractJHVEvent {
     /**
      * Creates a HEK event with an event name, event display name, short
      * description, event type, an icon and color.
-     * 
+     *
      * @param eventName
      *            the event name
      * @param eventDisplayName
@@ -242,7 +242,7 @@ public class HEKEvent extends AbstractJHVEvent {
 
     /**
      * Adds a parameter to the event.
-     * 
+     *
      * @param parameter
      *            the parameter to add
      * @param visible
@@ -273,7 +273,7 @@ public class HEKEvent extends AbstractJHVEvent {
 
     /**
      * Sets the start date of the HEKEvent.
-     * 
+     *
      * @param startDate
      *            the start date
      */
@@ -283,7 +283,7 @@ public class HEKEvent extends AbstractJHVEvent {
 
     /**
      * Sets the end date of the HEKEvent.
-     * 
+     *
      * @param endDate
      *            the end date
      */
@@ -294,7 +294,7 @@ public class HEKEvent extends AbstractJHVEvent {
 
     /**
      * Sets the unique ID for the HekEvent.
-     * 
+     *
      * @param uniqueID
      */
     public void setUniqueID(String uniqueID) {
@@ -303,7 +303,7 @@ public class HEKEvent extends AbstractJHVEvent {
 
     /**
      * Adds position information to the HEKEvent.
-     * 
+     *
      * @param positionInformation
      *            the position information to add
      */
