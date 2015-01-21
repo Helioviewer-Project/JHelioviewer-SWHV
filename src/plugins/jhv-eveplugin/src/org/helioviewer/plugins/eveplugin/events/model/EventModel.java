@@ -133,7 +133,6 @@ public class EventModel implements ZoomControllerListener, EventRequesterListene
     @Override
     public void newEventsReceived(Map<String, NavigableMap<Date, NavigableMap<Date, List<JHVEvent>>>> events) {
         synchronized (intervalLock) {
-            eventPlotConfiguration = new EventTypePlotConfiguration();
             this.events = events;
             if (selectedInterval != null && availableInterval != null) {
                 createEventPlotConfiguration();
