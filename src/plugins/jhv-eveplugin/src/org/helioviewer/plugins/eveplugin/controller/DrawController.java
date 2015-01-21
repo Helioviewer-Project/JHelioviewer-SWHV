@@ -36,6 +36,7 @@ public class DrawController implements ZoomControllerListener, LineDataSelectorM
     private Interval<Date> interval;
     private final List<DrawControllerListener> forAllPlotIdentifiers;
     private Thread viewChangedThread;
+    private Date previousTimestamp;
 
     private DrawController() {
         drawControllerData = Collections.synchronizedMap(new HashMap<String, DrawControllerData>());
@@ -294,22 +295,26 @@ public class DrawController implements ZoomControllerListener, LineDataSelectorM
     public void viewChanged(View sender, ChangeEvent aEvent) {
         TimestampChangedReason timestampReason = aEvent.getLastChangedReasonByType(TimestampChangedReason.class);
         if ((timestampReason != null) && (timestampReason.getView() instanceof TimedMovieView) && LinkedMovieManager.getActiveInstance().isMaster((TimedMovieView) timestampReason.getView())) {
-            if (!EventQueue.isDispatchThread()) {
-                EventQueue.invokeLater(new Runnable() {
-                    private Date date;
+            Date date = timestampReason.getNewDateTime().getTime();
+            if ((previousTimestamp == null || date == null) || previousTimestamp.getTime() != date.getTime()) {
+                if (!EventQueue.isDispatchThread()) {
+                    EventQueue.invokeLater(new Runnable() {
+                        private Date date;
 
-                    @Override
-                    public void run() {
-                        fireRedrawRequestMovieFrameChanged(date);
-                    }
+                        @Override
+                        public void run() {
+                            fireRedrawRequestMovieFrameChanged(date);
+                        }
 
-                    public Runnable init(Date date) {
-                        this.date = date;
-                        return this;
-                    }
-                }.init(timestampReason.getNewDateTime().getTime()));
-            } else {
-                fireRedrawRequestMovieFrameChanged(timestampReason.getNewDateTime().getTime());
+                        public Runnable init(Date date) {
+                            this.date = date;
+                            return this;
+                        }
+                    }.init(date));
+                } else {
+                    fireRedrawRequestMovieFrameChanged(date);
+                }
+                previousTimestamp = date;
             }
         }
     }
