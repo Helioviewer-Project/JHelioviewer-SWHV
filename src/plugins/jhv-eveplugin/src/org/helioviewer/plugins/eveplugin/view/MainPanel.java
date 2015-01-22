@@ -38,7 +38,7 @@ public class MainPanel extends JPanel {
         setLayout(new BorderLayout());
 
         add(plotsPane, BorderLayout.CENTER);
-        add(controlPane, BorderLayout.PAGE_END);
+        // add(controlPane, BorderLayout.PAGE_END);
     }
 
     public PlotsContainerPanel getPlotContainerPanel() {
