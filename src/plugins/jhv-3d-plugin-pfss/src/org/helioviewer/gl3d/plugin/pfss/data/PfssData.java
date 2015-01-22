@@ -1,5 +1,6 @@
 package org.helioviewer.gl3d.plugin.pfss.data;
 
+import java.awt.Color;
 import java.io.ByteArrayInputStream;
 import java.nio.FloatBuffer;
 import java.text.SimpleDateFormat;
@@ -27,6 +28,10 @@ import com.jogamp.common.nio.Buffers;
  * @author Stefan Meier (stefan.meier@fhnw.ch)
  * */
 public class PfssData {
+    Color OPENFIELDCOLOR = Color.RED;
+    Color LOOPCOLOR = Color.WHITE;
+    Color INSIDEFIELDCOLOR = Color.MAGENTA;
+
     private byte[] gzipFitsFile = null;
 
     private int[] buffer;
@@ -59,11 +64,11 @@ public class PfssData {
         vertices = Buffers.newDirectFloatBuffer(len * (3 + 4) + 2 * numberOfLines * (3 + 4));
     }
 
-    private int addColor(float x, float y, float z, float opacity, int counter) {
-        vertices.put(x);
-        vertices.put(y);
-        vertices.put(z);
-        vertices.put(opacity);
+    private int addColor(Color color, int counter) {
+        vertices.put(color.getRed() / 255.f);
+        vertices.put(color.getGreen() / 255.f);
+        vertices.put(color.getBlue() / 255.f);
+        vertices.put(color.getAlpha() / 255.f);
         return ++counter;
     }
 
@@ -76,9 +81,9 @@ public class PfssData {
 
     private int addColor(double bright, float opacity, int countercolor) {
         if (bright > 0) {
-            return this.addColor(1.f, (float) (1. - bright), (float) (1. - bright), opacity, countercolor);
+            return this.addColor(new Color(1.f, (float) (1. - bright), (float) (1. - bright), opacity), countercolor);
         } else {
-            return this.addColor((float) (1. + bright), (float) (1. + bright), 1.f, opacity, countercolor);
+            return this.addColor(new Color((float) (1. + bright), (float) (1. + bright), 1.f, opacity), countercolor);
         }
     }
 
@@ -149,13 +154,13 @@ public class PfssData {
 
                             if (r < 1.5 && ro < 1.5) {
                                 type = 0;
-                                counter = this.addColor(1.f, 1.f, 1.f, 1.0f, counter);
+                                counter = this.addColor(this.LOOPCOLOR, counter);
                             } else if (bright < 0) {
                                 type = 1;
-                                counter = this.addColor(1.f, 0.f, 0.f, 1.0f, counter);
+                                counter = this.addColor(this.INSIDEFIELDCOLOR, counter);
                             } else {
                                 type = 2;
-                                counter = this.addColor(1.f, 0.f, 1.f, 1.0f, counter);
+                                counter = this.addColor(this.OPENFIELDCOLOR, counter);
                             }
 
                         }
@@ -165,11 +170,11 @@ public class PfssData {
                             counter = this.addColor(bright, 1.f, counter);
                         } else {
                             if (type == 0) {
-                                counter = this.addColor(1.f, 1.f, 1.f, 1.0f, counter);
+                                counter = this.addColor(this.LOOPCOLOR, counter);
                             } else if (type == 1) {
-                                counter = this.addColor(1.f, 0.f, 0.f, 1.0f, counter);
+                                counter = this.addColor(this.INSIDEFIELDCOLOR, counter);
                             } else {
-                                counter = this.addColor(1.f, 0.f, 1.f, 1.0f, counter);
+                                counter = this.addColor(this.OPENFIELDCOLOR, counter);
                             }
                         }
                         counter = this.addVertex((float) x, (float) z, (float) -y, counter);
@@ -181,11 +186,11 @@ public class PfssData {
                             counter = this.addColor(bright, 1.f, counter);
                         } else {
                             if (type == 0) {
-                                counter = this.addColor(1.f, 1.f, 1.f, 1.0f, counter);
+                                counter = this.addColor(this.LOOPCOLOR, counter);
                             } else if (type == 1) {
-                                counter = this.addColor(1.f, 0.f, 0.f, 1.0f, counter);
+                                counter = this.addColor(this.INSIDEFIELDCOLOR, counter);
                             } else {
-                                counter = this.addColor(1.f, 0.f, 1.f, 1.0f, counter);
+                                counter = this.addColor(this.OPENFIELDCOLOR, counter);
                             }
                         }
                     }
