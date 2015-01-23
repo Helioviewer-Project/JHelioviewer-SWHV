@@ -5,20 +5,22 @@ import javax.media.opengl.GL2;
 import org.helioviewer.viewmodel.view.opengl.shader.GLFragmentShaderProgram;
 import org.helioviewer.viewmodel.view.opengl.shader.GLShaderBuilder;
 import org.helioviewer.viewmodel.view.opengl.shader.GLShaderBuilder.GLBuildShaderException;
-import org.helioviewer.viewmodel.view.opengl.shader.GLTextureCoordinate;
 
 public class DifferenceShader extends GLFragmentShaderProgram {
-    private GLTextureCoordinate isDifference;
 
     private static int ID = 0;
     int mode = -1;
-    private int truncationValueRef;
-    private GLShaderBuilder builder;
 
     private double[] truncationValueFloat;
+    private int truncationValueRef;
+
+    private double[] isDifferenceValueFloat;
+    private int isDifferenceValueRef;
+
+    private GLShaderBuilder builder;
 
     public void setIsDifference(GL2 gl, float isDifference) {
-        this.isDifference.setValue(gl, isDifference);
+        this.isDifferenceValueFloat[0] = isDifference;
     }
 
     public void setTruncationValue(GL2 gl, float truncationValue) {
@@ -29,6 +31,8 @@ public class DifferenceShader extends GLFragmentShaderProgram {
     public void bind(GL2 gl) {
         super.bind(gl);
         this.bindEnvVars(gl, this.truncationValueRef, truncationValueFloat);
+        this.bindEnvVars(gl, this.isDifferenceValueRef, isDifferenceValueFloat);
+
     }
 
     /**
@@ -38,9 +42,11 @@ public class DifferenceShader extends GLFragmentShaderProgram {
     protected void buildImpl(GLShaderBuilder shaderBuilder) {
         this.builder = shaderBuilder;
         try {
-            isDifference = shaderBuilder.addTexCoordParameter(1);
             this.truncationValueRef = shaderBuilder.addEnvParameter("float truncationValue");
             this.truncationValueFloat = this.builder.getEnvParameter(this.truncationValueRef);
+
+            this.isDifferenceValueRef = shaderBuilder.addEnvParameter("float isdifference");
+            this.isDifferenceValueFloat = this.builder.getEnvParameter(this.isDifferenceValueRef);
 
             shaderBuilder.getParameterList().add("float4 " + "texcoord4" + " : TEXCOORD4");
             String program = "";
@@ -63,7 +69,7 @@ public class DifferenceShader extends GLFragmentShaderProgram {
 
             mode = shaderBuilder.addTextureParameter("sampler2D differenceImage");
             ID = (ID + 1) & 15;
-            program = program.replace("isdifference", isDifference.getIdentifier(1));
+            //program = program.replace("isdifference", isDifference.getIdentifier(1));
             // program = program.replace("truncationValue",
             // truncationValue.getIdentifier(1));
 

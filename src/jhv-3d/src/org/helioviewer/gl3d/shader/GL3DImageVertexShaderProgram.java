@@ -126,7 +126,7 @@ public class GL3DImageVertexShaderProgram extends GLVertexShaderProgram {
             program = program.replace("color", shaderBuilder.useStandardParameter("float4", "COLOR"));
             shaderBuilder.addMainFragment(program);
 
-            // System.out.println("VertexShader:\n" + shaderBuilder.getCode());
+            System.out.println("VertexShader:\n" + shaderBuilder.getCode());
         } catch (GLBuildShaderException e) {
             e.printStackTrace();
         }
