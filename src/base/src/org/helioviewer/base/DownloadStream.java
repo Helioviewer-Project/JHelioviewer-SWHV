@@ -165,7 +165,7 @@ public class DownloadStream {
                 in = getEncodedStream(encoding, httpC.getInputStream());
             }
         } else {
-            Log.debug("No http connection, try no compression");
+            // Not an http connection
             // Write post data if necessary
             if (output != null) {
                 connection.setDoOutput(true);
