@@ -34,7 +34,7 @@ public class PfssMonth {
                 break;
             }
         }
-        if (entry == null)
+        if (entry == null && last != null)
             return last.getNext();
         return entry;
     }
