@@ -17,12 +17,10 @@ public class GL3DImageFragmentShaderProgram extends GLFragmentShaderProgram {
     private double yyTextureScale = 1.0;
     private double differenceXTextureScale;
     private double differenceYTextureScale;
-    private double differenceXOffset;
-    private double differenceYOffset;
+
     private double differenceTheta;
     private double differencePhi;
-    private double differenceXScale;
-    private double differenceYScale;
+
     private int cutOffRadiusRef;
     private int outerCutOffRadiusRef;
 
@@ -171,10 +169,4 @@ public class GL3DImageFragmentShaderProgram extends GLFragmentShaderProgram {
         this.differencePhi = phi;
     }
 
-    public void setDifferenceRect(double differenceXOffset, double differenceYOffset, double differenceXScale, double differenceYScale) {
-        this.differenceXOffset = differenceXOffset;
-        this.differenceYOffset = differenceYOffset;
-        this.differenceXScale = differenceXScale;
-        this.differenceYScale = differenceYScale;
-    }
 }

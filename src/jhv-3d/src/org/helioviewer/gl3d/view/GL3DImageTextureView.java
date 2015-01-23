@@ -92,6 +92,10 @@ public class GL3DImageTextureView extends AbstractGL3DView implements GL3DView, 
 
     @Override
     public void deactivate(GL3DState state) {
+        if (state.gl == null) {
+            System.out.println("Houston...");
+            System.exit(1);
+        }
         textureHelper.delTextureID(state.gl, this.textureId);
         this.textureId = -1;
     }
@@ -150,7 +154,6 @@ public class GL3DImageTextureView extends AbstractGL3DView implements GL3DView, 
                     this.vertexShader.setDifferenceRect(differenceXOffset, differenceYOffset, differenceXScale, differenceYScale);
                     this.vertexShader.changeDifferenceAngles(differenceTheta, differencePhi);
                     this.fragmentShader.changeDifferenceTextureScale(jhvjpx.getPreviousImageData().getScaleX(), jhvjpx.getPreviousImageData().getScaleY());
-                    this.fragmentShader.setDifferenceRect(differenceXOffset, differenceYOffset, differenceXScale, differenceYScale);
                     this.fragmentShader.changeDifferenceAngles(differenceTheta, differencePhi);
                 } else if (jhvjpx.getBaseDifferenceMode() && jhvjpx.getBaseDifferenceImageData() != null) {
                     Region differenceRegion = jhvjpx.getBaseDifferenceImageData().getRegion();
@@ -165,11 +168,9 @@ public class GL3DImageTextureView extends AbstractGL3DView implements GL3DView, 
                     this.vertexShader.setDifferenceRect(differenceXOffset, differenceYOffset, differenceXScale, differenceYScale);
                     this.vertexShader.changeDifferenceAngles(differenceTheta, differencePhi);
                     this.fragmentShader.changeDifferenceTextureScale(jhvjpx.getBaseDifferenceImageData().getScaleX(), jhvjpx.getBaseDifferenceImageData().getScaleY());
-                    this.fragmentShader.setDifferenceRect(differenceXOffset, differenceYOffset, differenceXScale, differenceYScale);
                     this.fragmentShader.changeDifferenceAngles(differenceTheta, differencePhi);
                 } else {
                     this.fragmentShader.changeDifferenceTextureScale(jhvjpx.getImageData().getScaleX(), jhvjpx.getImageData().getScaleY());
-                    this.fragmentShader.setDifferenceRect(xOffset, yOffset, xScale, yScale);
                     this.fragmentShader.changeDifferenceAngles(theta, phi);
                 }
             }
