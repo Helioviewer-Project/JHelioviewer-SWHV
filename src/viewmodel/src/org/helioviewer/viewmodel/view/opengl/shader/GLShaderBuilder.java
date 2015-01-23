@@ -10,29 +10,29 @@ import org.helioviewer.base.logging.Log;
 
 /**
  * Class to build new OpenGL shader build in Cg.
- * 
+ *
  * <p>
  * Since a graphics card only supports one active vertex shader and one active
  * fragment shader at a time, it is necessary to merge all operations that
  * should be applied to one image into one big, final shader.
- * 
+ *
  * <p>
  * Therefore, this class provides functions to add different input and output
  * parameter to the current shader as well as adding code pieces. After adding
  * all different parts of the shader, they can be compiled into one single
  * shader. For programming, Cg (C for Graphics, developed by NVIDIA) is used as
  * the shading language. To use this class, you have to be familiar with Cg.
- * 
+ *
  * <p>
  * When adding code pieces, it is highly recommended to use a specific prefix,
  * so that your names do not collide with names from other parts.
- * 
+ *
  * <p>
  * For further informations about programming shaders, refer to the Cg User
  * Manual.
- * 
+ *
  * @author Markus Langenberg
- * 
+ *
  */
 public class GLShaderBuilder {
 
@@ -55,8 +55,9 @@ public class GLShaderBuilder {
     private final ArrayList<double[]> glEnvParameters = new ArrayList<double[]>();
 
     private final int[] componentsAvailableInTexCoord;
-
-    private int nextTexUnit = 1;
+    //0 for images
+    //1 for lookuptables
+    private int nextTexUnit = 2;
     private int nextConstantRegister = 0;
     private int nextVertexAttribute = 0;
     private static int highestTexCoordEverUsed = 0;
@@ -71,7 +72,7 @@ public class GLShaderBuilder {
     /**
      * Initializes the static members of the shader builder. This has to happen
      * during runtime, since many of this values are driver dependent.
-     * 
+     *
      * @param gl
      *            current GL object
      */
@@ -104,7 +105,7 @@ public class GLShaderBuilder {
 
     /**
      * Generates a new GLShaderBuilder.
-     * 
+     *
      * @param gl
      *            Valid reference to the current gl object
      * @param type
@@ -136,7 +137,7 @@ public class GLShaderBuilder {
      * Returns the GL object assigned to this ShaderBuilder. Warning: Only use
      * this function within a build*Shader-method, otherwise the object might
      * not be valid.
-     * 
+     *
      * @return Reference to the current gl object
      */
     public GL2 getGL() {
@@ -146,7 +147,7 @@ public class GLShaderBuilder {
     /**
      * Returns OpenGL shader id assigned to this shader. To use this shader,
      * bind shader id.
-     * 
+     *
      * @return assigned shader id
      */
     public int getShaderID() {
@@ -156,7 +157,7 @@ public class GLShaderBuilder {
     /**
      * Advises the GLShaderBuilder to provide this output value in its output.
      * Typical values are for example POSITION, COLOR or TEXCOORD0
-     * 
+     *
      * @param type
      *            the type of the output value to use (since this is not a
      *            1:1-binding to the value)
@@ -187,7 +188,7 @@ public class GLShaderBuilder {
      * Advises the GLShaderBuilder to provide this output value in its output,
      * initialing it the given value. Typical values are for example POSITION,
      * COLOR or TEXCOORD0
-     * 
+     *
      * @param type
      *            the type of the output value to use (since this is not a
      *            1:1-binding to the value)
@@ -222,7 +223,7 @@ public class GLShaderBuilder {
      * parameter list. This function should be used for all kind of parameters,
      * which do not have a special function and may be used by multiple code
      * fragments, such as COLOR, TEXUNIT0, TEXCOORD0 or all members of state.
-     * 
+     *
      * @param type
      *            the type of the standard parameter to use (since this is not a
      *            1:1-binding to the parameter)
@@ -272,7 +273,7 @@ public class GLShaderBuilder {
      * coordinate is added to the parameter list. It returns an abstract
      * representation of the texture coordinate, which has be used to access the
      * values. The object wrappes the call to the actual OpenGL functions
-     * 
+     *
      * @param numDimensions
      *            Number of values to add to texture coordinate
      * @return GLTextureCoordinate presenting the new values
@@ -323,7 +324,7 @@ public class GLShaderBuilder {
      * Adds a new texture unit to the parameter list. It returns the OpenGL
      * constant, which has to be used by glActiveTexture to access this
      * parameter, for example GL_TEXTURE1 or GL_TEXTURE4.
-     * 
+     *
      * @param declaration
      *            declaration of the new parameter, including type and name. for
      *            example "sampler2D myTexture".
@@ -344,7 +345,7 @@ public class GLShaderBuilder {
      * Adds a new environment parameter to the parameter list. It returns the
      * index, which has to be used by glProgramEnvParameter*ARB to access this
      * parameter.
-     * 
+     *
      * @param declaration
      *            declaration of the new parameter, including type and name. for
      *            example "float2 myParam".
@@ -375,7 +376,7 @@ public class GLShaderBuilder {
      * Adds a new generic vertex attribute to the parameter list. It returns the
      * index, which has to be used by glVertexAttrib*ARB to access this
      * parameter.
-     * 
+     *
      * @param declaration
      *            declaration of the new parameter, including type and name. for
      *            example "float2 myParam".
@@ -399,7 +400,7 @@ public class GLShaderBuilder {
      * parameters and body. Make sure to add a code fragment to the main
      * function by calling addMainFragment(), where the new function is called
      * in some way.
-     * 
+     *
      * @param code
      *            new code fragment
      */
@@ -411,7 +412,7 @@ public class GLShaderBuilder {
      * Adds a new code fragment to the program code. Use the names returned by
      * useOutputValue and useStandardParameter or the ones assigned by yourself
      * calling a add*-method.
-     * 
+     *
      * @param code
      *            new code fragment
      */
@@ -493,11 +494,11 @@ public class GLShaderBuilder {
 
     /**
      * Compiles the given shaders and creates a new shader builder to continue.
-     * 
+     *
      * The new shader builder is initialized with a GLMinimalXShaderProgram.
      * This function might be useful, if multiple shaders should be used on path
      * path through the view chain.
-     * 
+     *
      * @param shaderBuilder
      * @return new shader builder
      */
@@ -531,14 +532,14 @@ public class GLShaderBuilder {
     /**
      * GLTextureCoordinate implementation for the all texture coordinates
      * managed by GLShaderBuilder
-     * 
+     *
      * @see GLShaderBuilder#addTextureParameter(String)
      */
     private class GLShaderTextureCoordinate extends GLTextureCoordinate {
 
         /**
          * Default constructor.
-         * 
+         *
          * @param target
          *            OpenGL constant, representing the texture coordinate, such
          *            as GL_TEXTURE0 or GL_TEXTURE3
