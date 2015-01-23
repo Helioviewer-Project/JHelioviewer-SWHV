@@ -112,7 +112,9 @@ public class ImageDataPanel extends ObservationDialogPanel {
         Thread t = new Thread(new Runnable() {
             @Override
             public void run() {
-                ObservationDialog.getSingletonInstance().setLoadButtonEnabled(false);
+                if (!donotloadStartup) {
+                    ObservationDialog.getSingletonInstance().setLoadButtonEnabled(false);
+                }
                 DataSources.getSingletonInstance().reload();
 
                 try {
