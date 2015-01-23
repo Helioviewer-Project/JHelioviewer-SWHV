@@ -223,14 +223,6 @@ public class SOHOLUTFilter extends AbstractFilter implements FrameFilter, Standa
         gl.glActiveTexture(GL2.GL_TEXTURE0);
     }
 
-    @Override
-    protected void finalize() {
-        if (lookupTex != 0) {
-            GLTextureHelper textureHelper = new GLTextureHelper();
-            textureHelper.delTextureID(null, lookupTex);
-        }
-    }
-
     /**
      * {@inheritDoc}
      */
