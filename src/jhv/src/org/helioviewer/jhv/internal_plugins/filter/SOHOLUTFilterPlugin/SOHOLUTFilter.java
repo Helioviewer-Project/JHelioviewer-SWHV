@@ -144,6 +144,7 @@ public class SOHOLUTFilter extends AbstractFilter implements FrameFilter, Standa
     private LUT lastLut = null;
     private boolean lastInverted = false;
     private JHVJP2View jp2View;
+    GLTextureHelper textureHelper = new GLTextureHelper();
 
     /**
      * {@inheritDoc}
@@ -154,10 +155,12 @@ public class SOHOLUTFilter extends AbstractFilter implements FrameFilter, Standa
         this.changed = true;
 
         if (lastLut == null) {
-            GLTextureHelper textureHelper = new GLTextureHelper();
-            textureHelper.delTextureID(shaderBuilder.getGL(), lookupTex);
             // I think this may be wrong, but I just reused the openGL code
+            GL2 gl = shaderBuilder.getGL();
+            shader.activateLutTexture(gl);
+            //textureHelper.delTextureID(shaderBuilder.getGL(), lookupTex);
             lookupTex = textureHelper.genTextureID(shaderBuilder.getGL());
+            gl.glActiveTexture(GL2.GL_TEXTURE0);
         }
 
         return shaderBuilder;
@@ -170,8 +173,8 @@ public class SOHOLUTFilter extends AbstractFilter implements FrameFilter, Standa
      */
     @Override
     public void applyGL(GL2 gl) {
-        shader.bind(gl);
         shader.activateLutTexture(gl);
+        shader.bind(gl);
         LUT currlut;
         // Note: The lookup table will always be power of two,
         // so we won't get any problems here.
