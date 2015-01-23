@@ -11,7 +11,7 @@ import org.helioviewer.viewmodel.view.opengl.shader.GLShaderBuilder.GLBuildShade
  * <p>
  * To use this program, it is not necessary to derive another class from this
  * one. A one-dimensional texture is used as the lookup table. To set the lookup
- * table, call {@link #activateLutTexture(GL)}. This binds the texture id used
+ * table, call {@link #activateLutTexture(GL2)}. This binds the texture id used
  * for the lookup table. After that, the texture can be filled with the lookup
  * data. The rest is done by the class itself.
  *
@@ -20,7 +20,6 @@ import org.helioviewer.viewmodel.view.opengl.shader.GLShaderBuilder.GLBuildShade
 public class GLSingleChannelLookupFragmentShaderProgram extends GLFragmentShaderProgram {
 
     private static int lutID = 0;
-    int lutMode = -1;
     private GLShaderBuilder builder;
 
     /**
@@ -32,13 +31,15 @@ public class GLSingleChannelLookupFragmentShaderProgram extends GLFragmentShader
      *            Valid reference to the current gl object
      */
     public void activateLutTexture(GL2 gl) {
-        gl.glActiveTexture(lutMode);
+        gl.glActiveTexture(GL2.GL_TEXTURE1);
     }
+
     @Override
-    public void bind(GL2 gl){
+    public void bind(GL2 gl) {
         super.bind(gl);
         gl.glBindProgramARB(target, shaderID);
     }
+
     /**
      * {@inheritDoc}
      */
@@ -49,8 +50,8 @@ public class GLSingleChannelLookupFragmentShaderProgram extends GLFragmentShader
             String program = "\toutput.rgb = tex1D(lut, output.r).rgb;";
 
             program = program.replaceAll("output", shaderBuilder.useOutputValue("float4", "COLOR"));
+            shaderBuilder.getParameterList().add("uniform sampler1D lut" + lutID + " : TEXUNIT1");
 
-            lutMode = shaderBuilder.addTextureParameter("sampler1D lut" + lutID);
             program = program.replaceAll("lut", "lut" + lutID);
             lutID = (lutID + 1) & 15;
 
