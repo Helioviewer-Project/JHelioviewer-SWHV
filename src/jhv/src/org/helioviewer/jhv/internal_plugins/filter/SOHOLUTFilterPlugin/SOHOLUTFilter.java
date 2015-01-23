@@ -154,10 +154,9 @@ public class SOHOLUTFilter extends AbstractFilter implements FrameFilter, Standa
         this.changed = true;
 
         if (lastLut == null) {
-            // I think this may be wrong, but I just reused the openGL code
             GL2 gl = shaderBuilder.getGL();
             shader.activateLutTexture(gl);
-            //textureHelper.delTextureID(shaderBuilder.getGL(), lookupTex);
+            textureHelper.delTextureID(shaderBuilder.getGL(), lookupTex);
             lookupTex = textureHelper.genTextureID(shaderBuilder.getGL());
             gl.glActiveTexture(GL2.GL_TEXTURE0);
         }
