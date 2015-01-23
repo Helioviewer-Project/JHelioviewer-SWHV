@@ -415,7 +415,7 @@ public class GLTextureHelper {
             return;
         if (source.getWidth() <= maxTextureSize && source.getHeight() <= maxTextureSize) {
             if (jpxView != null) {
-                if (!allTextures.containsKey(texID)) {
+                if (!allTextures.containsKey(jpxView.texID)) {
                     jpxView.texID = genTextureID(gl);
                 }
                 moveImageDataToGLTexture(gl, source, jpxView.texID);
