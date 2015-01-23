@@ -22,18 +22,6 @@ public class GLSingleChannelLookupFragmentShaderProgram extends GLFragmentShader
     private static int lutID = 0;
     private GLShaderBuilder builder;
 
-    /**
-     * Binds the texture used for the lookup table.
-     *
-     * As a result, copying the lookup data to the texture can take place.
-     *
-     * @param gl
-     *            Valid reference to the current gl object
-     */
-    public void activateLutTexture(GL2 gl) {
-        gl.glActiveTexture(GL2.GL_TEXTURE1);
-    }
-
     @Override
     public void bind(GL2 gl) {
         super.bind(gl);
