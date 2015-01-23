@@ -136,7 +136,7 @@ public class GL3DImageFragmentShaderProgram extends GLFragmentShaderProgram {
             program = program.replace("output", shaderBuilder.useOutputValue("float4", "COLOR"));
 
             shaderBuilder.addMainFragment(program);
-            System.out.println("GL3D Image Fragment Shader:\n" + shaderBuilder.getCode());
+            //System.out.println("GL3D Image Fragment Shader:\n" + shaderBuilder.getCode());
         } catch (GLBuildShaderException e) {
             e.printStackTrace();
         }
