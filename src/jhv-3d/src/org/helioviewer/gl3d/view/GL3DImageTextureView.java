@@ -92,10 +92,6 @@ public class GL3DImageTextureView extends AbstractGL3DView implements GL3DView, 
 
     @Override
     public void deactivate(GL3DState state) {
-        if (state.gl == null) {
-            System.out.println("Houston...");
-            System.exit(1);
-        }
         textureHelper.delTextureID(state.gl, this.textureId);
         this.textureId = -1;
     }
