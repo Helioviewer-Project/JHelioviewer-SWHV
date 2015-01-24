@@ -3,6 +3,7 @@ package org.helioviewer.jhv.internal_plugins.filter.SOHOLUTFilterPlugin;
 import java.nio.IntBuffer;
 
 import javax.media.opengl.GL2;
+import javax.media.opengl.glu.GLU;
 
 import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.viewmodel.filter.AbstractFilter;
@@ -139,7 +140,7 @@ public class SOHOLUTFilter extends AbstractFilter implements FrameFilter, Standa
     // OPENGL //
     // /////////////////////////
     private final GLSingleChannelLookupFragmentShaderProgram shader = new GLSingleChannelLookupFragmentShaderProgram();
-    private int lookupTex = 0;
+    private static int lookupTex = 0;
     private LUT lastLut = null;
     private boolean lastInverted = false;
     private JHVJP2View jp2View;
@@ -156,10 +157,12 @@ public class SOHOLUTFilter extends AbstractFilter implements FrameFilter, Standa
         if (lastLut == null) {
             GL2 gl = shaderBuilder.getGL();
 
-            gl.glActiveTexture(GL2.GL_TEXTURE1);
-            textureHelper.delTextureID(shaderBuilder.getGL(), lookupTex);
-            lookupTex = textureHelper.genTextureID(shaderBuilder.getGL());
-            gl.glActiveTexture(GL2.GL_TEXTURE0);
+            int[] tmp = new int[1];
+
+            tmp[0] = lookupTex;
+            gl.glDeleteTextures(1, tmp, 0);
+            gl.glGenTextures(1, tmp, 0);
+            lookupTex = tmp[0];
         }
 
         return shaderBuilder;
@@ -188,7 +191,7 @@ public class SOHOLUTFilter extends AbstractFilter implements FrameFilter, Standa
 
         gl.glBindTexture(GL2.GL_TEXTURE_1D, lookupTex);
 
-        if (changed || lastLut != currlut || invertLUT != lastInverted) {
+        /* if (changed || lastLut != currlut || invertLUT != lastInverted) */ {
             int[] intLUT;
 
             if (invertLUT) {
@@ -222,6 +225,18 @@ public class SOHOLUTFilter extends AbstractFilter implements FrameFilter, Standa
 
         gl.glActiveTexture(GL2.GL_TEXTURE0);
     }
+
+    @Override
+    protected void finalize() {
+        if (lookupTex != 0) {
+            GL2 gl = (GL2) GLU.getCurrentGL();
+
+            int[] tmp = new int[1];
+            tmp[0] = lookupTex;
+            gl.glDeleteTextures(1, tmp, 0);
+        }
+    }
+
 
     /**
      * {@inheritDoc}
