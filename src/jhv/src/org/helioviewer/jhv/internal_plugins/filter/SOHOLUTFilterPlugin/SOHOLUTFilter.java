@@ -17,7 +17,6 @@ import org.helioviewer.viewmodel.imagetransport.Byte8ImageTransport;
 import org.helioviewer.viewmodel.imagetransport.Short16ImageTransport;
 import org.helioviewer.viewmodel.view.jp2view.JHVJP2View;
 import org.helioviewer.viewmodel.view.jp2view.JHVJPXView;
-import org.helioviewer.viewmodel.view.opengl.GLTextureHelper;
 import org.helioviewer.viewmodel.view.opengl.shader.GLShaderBuilder;
 import org.helioviewer.viewmodel.view.opengl.shader.GLSingleChannelLookupFragmentShaderProgram;
 
@@ -140,11 +139,10 @@ public class SOHOLUTFilter extends AbstractFilter implements FrameFilter, Standa
     // OPENGL //
     // /////////////////////////
     private final GLSingleChannelLookupFragmentShaderProgram shader = new GLSingleChannelLookupFragmentShaderProgram();
-    private static int lookupTex = 0;
+    private int lookupTex = -1;
     private LUT lastLut = null;
     private boolean lastInverted = false;
     private JHVJP2View jp2View;
-    GLTextureHelper textureHelper = new GLTextureHelper();
 
     /**
      * {@inheritDoc}
@@ -154,7 +152,7 @@ public class SOHOLUTFilter extends AbstractFilter implements FrameFilter, Standa
         shader.build(shaderBuilder);
         this.changed = true;
 
-        if (lastLut == null) {
+        if (lookupTex == -1) {
             GL2 gl = shaderBuilder.getGL();
 
             int[] tmp = new int[1];
@@ -228,12 +226,14 @@ public class SOHOLUTFilter extends AbstractFilter implements FrameFilter, Standa
 
     @Override
     protected void finalize() {
-        if (lookupTex != 0) {
+        if (lookupTex != -1) {
             GL2 gl = (GL2) GLU.getCurrentGL();
 
             int[] tmp = new int[1];
             tmp[0] = lookupTex;
             gl.glDeleteTextures(1, tmp, 0);
+
+            lookupTex = -1;
         }
     }
 
