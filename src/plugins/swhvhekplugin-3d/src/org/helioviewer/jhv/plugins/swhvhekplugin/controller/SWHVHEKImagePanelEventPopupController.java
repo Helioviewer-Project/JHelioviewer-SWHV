@@ -318,7 +318,7 @@ public class SWHVHEKImagePanelEventPopupController implements KeyEventDispatcher
                                 double deltaX = Math.abs(hitpoint.x - pt.getCoordinate1());
                                 double deltaY = Math.abs(hitpoint.y + pt.getCoordinate2());
                                 double deltaZ = Math.abs(hitpoint.z - pt.getCoordinate3());
-                                if (deltaX < 0.05 && deltaZ < 0.05 && deltaY < 0.05) {
+                                if (deltaX < 0.08 && deltaZ < 0.08 && deltaY < 0.08) {
                                     mouseOverJHVEvent = evt;
                                     mouseOverPosition = new Point(e.getX(), e.getY());
                                 }
