@@ -303,7 +303,6 @@ public class SWHVHEKImagePanelEventPopupController implements KeyEventDispatcher
                 }
             }
         }
-
         if (currentDate != null) {
             ArrayList<JHVEvent> toDraw = SWHVHEKData.getSingletonInstance().getActiveEvents(currentDate);
 
@@ -314,7 +313,6 @@ public class SWHVHEKImagePanelEventPopupController implements KeyEventDispatcher
                     if (pi.containsKey(JHVCoordinateSystem.JHV)) {
                         JHVPositionInformation el = pi.get(JHVCoordinateSystem.JHV);
                         if (el.centralPoint() != null) {
-                            double theta = el.centralPoint().getCoordinate2() / 180. * Math.PI;// -
                             JHVPoint pt = el.centralPoint();
                             if (hitpoint != null) {
                                 double deltaX = Math.abs(hitpoint.x - pt.getCoordinate1());
