@@ -24,7 +24,6 @@ import org.helioviewer.jhv.gui.ImageViewerGui;
 import org.helioviewer.jhv.gui.components.calendar.JHVCalendarDatePicker;
 import org.helioviewer.jhv.gui.components.calendar.JHVCalendarEvent;
 import org.helioviewer.jhv.gui.components.calendar.JHVCalendarListener;
-import org.helioviewer.jhv.gui.dialogs.observation.ObservationDialog;
 import org.helioviewer.jhv.gui.dialogs.observation.ObservationDialogPanel;
 import org.helioviewer.jhv.layers.LayersListener;
 import org.helioviewer.jhv.layers.LayersModel;
@@ -139,26 +138,26 @@ public class SimpleObservationDialogUIPanel extends ObservationDialogPanel imple
      * Checks if the selected start date is before selected or equal to end
      * date. The methods checks the entered times when the dates are equal. If
      * the start time is greater than the end time the method will return false.
-     * 
+     *
      * @return boolean value if selected start date is before selected end date.
      */
     /*
      * private boolean isStartDateBeforeOrEqualEndDate() { final
      * GregorianCalendar calendar = new GregorianCalendar();
      * calendar.setTime(getStartDate());
-     * 
+     *
      * final GregorianCalendar calendar2 = new
      * GregorianCalendar(calendar.get(Calendar.YEAR),
      * calendar.get(Calendar.MONTH), calendar.get(Calendar.DAY_OF_MONTH)); final
      * long start = calendar2.getTimeInMillis();
-     * 
+     *
      * calendar.clear(); calendar2.clear();
-     * 
+     *
      * calendar.setTime(getEndDate());
      * calendar2.set(calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH),
      * calendar.get(Calendar.DAY_OF_MONTH)); final long end =
      * calendar2.getTimeInMillis();
-     * 
+     *
      * return start <= end; }
      */
 
@@ -248,7 +247,7 @@ public class SimpleObservationDialogUIPanel extends ObservationDialogPanel imple
 
     @Override
     public void selected() {
-        ObservationDialog.getSingletonInstance().setLoadButtonEnabled(enableLoadButton);
+        ImageViewerGui.getSingletonInstance().getObservationDialog().setLoadButtonEnabled(enableLoadButton);
     }
 
     @Override
@@ -300,7 +299,7 @@ public class SimpleObservationDialogUIPanel extends ObservationDialogPanel imple
          * if (e.getSource() == calendarStartDate &&
          * !isStartDateBeforeOrEqualEndDate()) {
          * calendarEndDate.setDate(calendarStartDate.getDate()); }
-         * 
+         *
          * if (e.getSource() == calendarEndDate &&
          * !isStartDateBeforeOrEqualEndDate()) {
          * calendarStartDate.setDate(calendarStartDate.getDate()); }

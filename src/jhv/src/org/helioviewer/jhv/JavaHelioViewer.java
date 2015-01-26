@@ -289,6 +289,7 @@ public class JavaHelioViewer {
 
         // This code updates the ImageViewer
         Log.info("Initialize GUI");
+        ImageViewerGui.getSingletonInstance().prepareGui();
         ImageViewerGui.getSingletonInstance().updateComponents();
 
         // Check for updates in parallel, if newer version is available a small

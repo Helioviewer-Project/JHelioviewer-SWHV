@@ -23,7 +23,7 @@ import javax.swing.JToggleButton;
 import org.helioviewer.base.math.Interval;
 import org.helioviewer.jhv.gui.IconBank;
 import org.helioviewer.jhv.gui.IconBank.JHVIcon;
-import org.helioviewer.jhv.gui.dialogs.observation.ObservationDialog;
+import org.helioviewer.jhv.gui.ImageViewerGui;
 import org.helioviewer.jhv.layers.LayersListener;
 import org.helioviewer.jhv.layers.LayersModel;
 import org.helioviewer.plugins.eveplugin.controller.ZoomController;
@@ -38,15 +38,15 @@ import org.helioviewer.plugins.eveplugin.view.linedataselector.LineDataSelectorP
 import org.helioviewer.viewmodel.view.View;
 
 /**
- * 
- * 
+ *
+ *
  * @author Bram Bourgoignie (Bram.Bourgoignie@oma.be)
- * 
+ *
  */
 public class ControlsPanel extends JPanel implements ActionListener, LayersListener, EventModelListener, ZoomControllerListener {
 
     /**
-     * 
+     *
      */
     private static final long serialVersionUID = 3639870635351984819L;
 
@@ -124,7 +124,7 @@ public class ControlsPanel extends JPanel implements ActionListener, LayersListe
     @Override
     public void actionPerformed(ActionEvent e) {
         if (e.getSource().equals(addLayerButton)) {
-            ObservationDialog.getSingletonInstance().showDialog(EVESettings.OBSERVATION_UI_NAME);
+            ImageViewerGui.getSingletonInstance().getObservationDialog().showDialog(EVESettings.OBSERVATION_UI_NAME);
         } else if (e.getSource() == periodFromLayersButton) {
             final Interval<Date> interval = new Interval<Date>(LayersModel.getSingletonInstance().getFirstDate(), LayersModel.getSingletonInstance().getLastDate());
             ZoomController.getSingletonInstance().setSelectedInterval(interval, true);

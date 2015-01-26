@@ -49,6 +49,7 @@ import org.helioviewer.jhv.gui.components.statusplugins.QualityStatusPanel;
 import org.helioviewer.jhv.gui.components.statusplugins.RenderModeStatusPanel;
 import org.helioviewer.jhv.gui.components.statusplugins.ZoomStatusPanel;
 import org.helioviewer.jhv.gui.controller.ZoomController;
+import org.helioviewer.jhv.gui.dialogs.observation.ObservationDialog;
 import org.helioviewer.jhv.gui.states.State;
 import org.helioviewer.jhv.gui.states.StateController;
 import org.helioviewer.jhv.gui.states.StateController.StateChangeListener;
@@ -77,14 +78,14 @@ import org.helioviewer.viewmodelplugin.filter.FilterTabPanelManager;
 
 /**
  * A class that sets up the graphical user interface.
- * 
+ *
  * @author caplins
  * @author Benjamin Wamsler
  * @author Alen Agheksanterian
  * @author Stephan Pagel
  * @author Markus Langenberg
  * @author Andre Dau
- * 
+ *
  */
 public class ImageViewerGui {
 
@@ -125,6 +126,7 @@ public class ImageViewerGui {
 
     public static final int SIDE_PANEL_WIDTH = 320;
     public static final int SIDE_PADDING = 10;
+    private final ObservationDialog observationDialog;
 
     /**
      * The private constructor that creates and positions all the gui
@@ -139,14 +141,12 @@ public class ImageViewerGui {
         });
 
         mainFrame = createMainFrame();
-
+        observationDialog = new ObservationDialog(mainFrame);
         menuBar = new MenuBar();
         menuBar.setFocusable(false);
 
         mainFrame.setJMenuBar(menuBar);
         mainFrame.setFocusable(true);
-
-        prepareGui();
     }
 
     public void prepareGui() {
@@ -237,7 +237,7 @@ public class ImageViewerGui {
 
     /**
      * Packs, positions and shows the GUI
-     * 
+     *
      * @param _show
      *            If GUI should be displayed.
      */
@@ -289,7 +289,7 @@ public class ImageViewerGui {
 
     /**
      * Method that creates and initializes the main JFrame.
-     * 
+     *
      * @return the created and initialized main frame.
      */
     private JFrame createMainFrame() {
@@ -331,7 +331,7 @@ public class ImageViewerGui {
 
     /**
      * Returns instance of the main ComponentView.
-     * 
+     *
      * @return instance of the main ComponentView.
      */
     public ComponentView getMainView() {
@@ -340,7 +340,7 @@ public class ImageViewerGui {
 
     /**
      * Returns instance of the overview ComponentView.
-     * 
+     *
      * @return instance of the overview ComponentView.
      */
     public ComponentView getOverviewView() {
@@ -349,7 +349,7 @@ public class ImageViewerGui {
 
     /**
      * Returns the scrollpane containing the left content pane.
-     * 
+     *
      * @return instance of the scrollpane containing the left content pane.
      * */
     public SideContentPane getLeftContentPane() {
@@ -426,7 +426,7 @@ public class ImageViewerGui {
 
     /**
      * Returns the instance of the ImageSelectorPanel.
-     * 
+     *
      * @return instance of the image selector panel.
      * */
     public ImageSelectorPanel getImageSelectorPanel() {
@@ -478,7 +478,7 @@ public class ImageViewerGui {
 
     /**
      * Change the current state
-     * 
+     *
      * @param stateEnum
      */
     private void activateState(final State newState, State oldState) {
@@ -549,7 +549,7 @@ public class ImageViewerGui {
 
     /**
      * Loads the images which have to be displayed when the program starts.
-     * 
+     *
      * If there are any images defined in the command line, than this messages
      * tries to load this images. Otherwise it tries to load a default image
      * which is defined by the default entries of the observation panel.
@@ -717,7 +717,7 @@ public class ImageViewerGui {
 
     /**
      * Returns the only instance of this class.
-     * 
+     *
      * @return the only instance of this class.
      * */
     public static ImageViewerGui getSingletonInstance() {
@@ -726,7 +726,7 @@ public class ImageViewerGui {
 
     /**
      * Returns the main frame.
-     * 
+     *
      * @return the main frame.
      * */
     public static JFrame getMainFrame() {
@@ -735,7 +735,7 @@ public class ImageViewerGui {
 
     /**
      * Returns the scrollpane containing the left content pane.
-     * 
+     *
      * @return instance of the scrollpane containing the left content pane.
      * */
     public JScrollPane getLeftScrollPane() {
@@ -767,7 +767,7 @@ public class ImageViewerGui {
 
     /**
      * Returns the content panel of JHV
-     * 
+     *
      * @return The content panel of JHV
      */
     public JPanel getContentPane() {
@@ -780,5 +780,9 @@ public class ImageViewerGui {
 
     public boolean viewchainCreated() {
         return getMainView() != null;
+    }
+
+    public ObservationDialog getObservationDialog() {
+        return this.observationDialog;
     }
 }

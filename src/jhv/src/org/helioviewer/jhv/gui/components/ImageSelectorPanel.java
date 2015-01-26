@@ -26,7 +26,6 @@ import org.helioviewer.jhv.gui.ImageViewerGui;
 import org.helioviewer.jhv.gui.components.layerTable.LayerTable;
 import org.helioviewer.jhv.gui.components.layerTable.LayerTableContainer;
 import org.helioviewer.jhv.gui.dialogs.observation.ImageDataPanel;
-import org.helioviewer.jhv.gui.dialogs.observation.ObservationDialog;
 import org.helioviewer.jhv.layers.LayersListener;
 import org.helioviewer.jhv.layers.LayersModel;
 import org.helioviewer.viewmodel.view.MovieView;
@@ -64,11 +63,6 @@ public class ImageSelectorPanel extends JPanel implements LayersListener {
     private static final long serialVersionUID = 1L;
 
     private final ImageDataPanel observationImagePane = new ImageDataPanel();
-
-    /**
-     * Observation dialog to actually add new data
-     */
-    private final ObservationDialog observationDialog = ObservationDialog.getSingletonInstance();
 
     /**
      * Action to add a new layer. If there is a current active layer which much
@@ -135,7 +129,7 @@ public class ImageSelectorPanel extends JPanel implements LayersListener {
                 }
             }
             // Show dialog
-            observationDialog.showDialog();
+            ImageViewerGui.getSingletonInstance().getObservationDialog().showDialog();
         }
     };
     /**
@@ -272,7 +266,7 @@ public class ImageSelectorPanel extends JPanel implements LayersListener {
      */
     public ImageSelectorPanel() {
         // set up observation dialog
-        observationDialog.addUserInterface("Image Data", observationImagePane);
+        ImageViewerGui.getSingletonInstance().getObservationDialog().addUserInterface("Image Data", observationImagePane);
 
         // add components
         JPanel southPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));

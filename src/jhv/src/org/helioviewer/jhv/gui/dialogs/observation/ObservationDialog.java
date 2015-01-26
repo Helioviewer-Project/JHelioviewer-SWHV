@@ -11,6 +11,7 @@ import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JDialog;
+import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 
@@ -39,8 +40,6 @@ public class ObservationDialog extends JDialog implements ActionListener, Showab
 
     private static final long serialVersionUID = 1L;
 
-    private static final ObservationDialog singletonInstace = new ObservationDialog();
-
     private final HashMap<String, ObservationDialogPanel> uiMap = new HashMap<String, ObservationDialogPanel>();
 
     private final JPanel contentPane = new JPanel();
@@ -53,6 +52,7 @@ public class ObservationDialog extends JDialog implements ActionListener, Showab
     private ObservationDialogPanel selectedPane = null;
 
     private JButton availabilityButton;
+    private final static Object lock = new Object();
 
     // //////////////////////////////////////////////////////////////////////////////
     // Methods
@@ -61,17 +61,10 @@ public class ObservationDialog extends JDialog implements ActionListener, Showab
     /**
      * Default constructor.
      * */
-    private ObservationDialog() {
-        super(ImageViewerGui.getMainFrame(), true);
+    public ObservationDialog(JFrame mainFrame) {
+        super(mainFrame, true);
 
         initVisualComponents();
-    }
-
-    /**
-     * Returns the singleton instance of the dialog.
-     * */
-    public static ObservationDialog getSingletonInstance() {
-        return singletonInstace;
     }
 
     /**

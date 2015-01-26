@@ -8,7 +8,6 @@ import javax.swing.JComponent;
 
 import org.helioviewer.jhv.JavaHelioViewerLauncher;
 import org.helioviewer.jhv.gui.ImageViewerGui;
-import org.helioviewer.jhv.gui.dialogs.observation.ObservationDialog;
 import org.helioviewer.jhv.gui.interfaces.MainContentPanelPlugin;
 import org.helioviewer.plugins.eveplugin.controller.ZoomController;
 import org.helioviewer.plugins.eveplugin.events.data.EventRequester;
@@ -22,8 +21,8 @@ import org.helioviewer.plugins.eveplugin.view.SimpleObservationDialogUIPanel;
 import org.helioviewer.viewmodelplugin.interfaces.Plugin;
 
 /**
- * 
- * 
+ *
+ *
  * @author Stephan Pagel
  * */
 public class EVEPlugin implements Plugin, MainContentPanelPlugin {
@@ -50,8 +49,8 @@ public class EVEPlugin implements Plugin, MainContentPanelPlugin {
                 ImageViewerGui.getSingletonInstance().getLeftContentPane().add("Timeline Layers", ControlsPanel.getSingletonInstance(), true);
 
                 ImageViewerGui.getSingletonInstance().getMainContentPanel().addPlugin(EVEPlugin.this);
-                ObservationDialog.getSingletonInstance().addUserInterface(EVESettings.OBSERVATION_UI_NAME, new ObservationDialogUIPanel(mainPanel.getPlotContainerPanel()));
-                ObservationDialog.getSingletonInstance().addUserInterface(EVESettings.RADIO_OBSERVATION_UI_NAME, new SimpleObservationDialogUIPanel(mainPanel.getPlotContainerPanel()));
+                ImageViewerGui.getSingletonInstance().getObservationDialog().addUserInterface(EVESettings.OBSERVATION_UI_NAME, new ObservationDialogUIPanel(mainPanel.getPlotContainerPanel()));
+                ImageViewerGui.getSingletonInstance().getObservationDialog().addUserInterface(EVESettings.RADIO_OBSERVATION_UI_NAME, new SimpleObservationDialogUIPanel(mainPanel.getPlotContainerPanel()));
                 // initialize database connection
                 RadioPlotModel.getSingletonInstance();
                 EventModel.getSingletonInstance().activateEvents();
@@ -62,8 +61,8 @@ public class EVEPlugin implements Plugin, MainContentPanelPlugin {
 
     @Override
     public void uninstallPlugin() {
-        ObservationDialog.getSingletonInstance().removeUserInterface(EVESettings.OBSERVATION_UI_NAME, new ObservationDialogUIPanel(mainPanel.getPlotContainerPanel()));
-        ObservationDialog.getSingletonInstance().removeUserInterface(EVESettings.RADIO_OBSERVATION_UI_NAME, new SimpleObservationDialogUIPanel(mainPanel.getPlotContainerPanel()));
+        ImageViewerGui.getSingletonInstance().getObservationDialog().removeUserInterface(EVESettings.OBSERVATION_UI_NAME, new ObservationDialogUIPanel(mainPanel.getPlotContainerPanel()));
+        ImageViewerGui.getSingletonInstance().getObservationDialog().removeUserInterface(EVESettings.RADIO_OBSERVATION_UI_NAME, new SimpleObservationDialogUIPanel(mainPanel.getPlotContainerPanel()));
         ImageViewerGui.getSingletonInstance().getMainContentPanel().removePlugin(this);
         ImageViewerGui.getSingletonInstance().getLeftContentPane().remove(ControlsPanel.getSingletonInstance());
     }
@@ -94,7 +93,7 @@ public class EVEPlugin implements Plugin, MainContentPanelPlugin {
 
     /**
      * Used for testing the plugin
-     * 
+     *
      * @see org.helioviewer.plugins.eveplugin.EVEPluginLauncher#main(String[])
      * @param args
      */
