@@ -332,8 +332,10 @@ public class SWHVHEKImagePanelEventPopupController implements KeyEventDispatcher
                         JHVPositionInformation el = pi.get(JHVCoordinateSystem.JHV2D);
                         if (el.centralPoint() != null) {
                             Vector2dInt screenPos = convertPhysicalToScreen(el.centralPoint().getCoordinate1(), el.centralPoint().getCoordinate2());
+                            double x = e.getX() * Displayer.screenScale;
+                            double y = e.getY() * Displayer.screenScale;
 
-                            if (screenPos != null && e.getPoint().getX() >= screenPos.getX() - 8 && e.getPoint().getX() <= screenPos.getX() + 8 && e.getPoint().getY() >= screenPos.getY() - 8 && e.getPoint().getY() <= screenPos.getY() + 8) {
+                            if (screenPos != null && x >= screenPos.getX() - 8 && x <= screenPos.getX() + 8 && y >= screenPos.getY() - 8 && y <= screenPos.getY() + 8) {
                                 mouseOverJHVEvent = evt;
                                 mouseOverPosition = new Point(screenPos.getX(), screenPos.getY());
                             }
