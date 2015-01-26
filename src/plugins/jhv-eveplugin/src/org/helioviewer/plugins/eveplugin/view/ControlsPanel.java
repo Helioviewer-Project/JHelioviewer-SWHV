@@ -1,10 +1,11 @@
 package org.helioviewer.plugins.eveplugin.view;
 
-import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.EventQueue;
-import java.awt.FlowLayout;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.Calendar;
@@ -38,10 +39,10 @@ import org.helioviewer.plugins.eveplugin.view.linedataselector.LineDataSelectorP
 import org.helioviewer.viewmodel.view.View;
 
 /**
- *
- *
+ * 
+ * 
  * @author Bram Bourgoignie (Bram.Bourgoignie@oma.be)
- *
+ * 
  */
 public class ControlsPanel extends JPanel implements ActionListener, LayersListener, EventModelListener, ZoomControllerListener {
 
@@ -78,17 +79,26 @@ public class ControlsPanel extends JPanel implements ActionListener, LayersListe
 
         addLayerButton.setToolTipText("Add a new layer");
         addLayerButton.addActionListener(this);
+        addLayerButton.setMargin(new Insets(0, 0, 0, 0));
 
         periodFromLayersButton.setToolTipText("Synchronize movie and time series display");
         periodFromLayersButton.setPreferredSize(new Dimension(movietimeIcon.getIconWidth() + 14, periodFromLayersButton.getPreferredSize().height));
         periodFromLayersButton.addActionListener(this);
+        periodFromLayersButton.setMargin(new Insets(0, 0, 0, 0));
+
         setEnabledStateOfPeriodMovieButton();
         // this.setPreferredSize(new Dimension(100, 300));
         lineDataSelectorContainer.setLayout(new BoxLayout(lineDataSelectorContainer, BoxLayout.Y_AXIS));
         lineDataSelectorContainer.setPreferredSize(new Dimension(100, 130));
-        this.setLayout(new BorderLayout());
+        this.setLayout(new GridBagLayout());
 
-        add(lineDataSelectorContainer, BorderLayout.CENTER);
+        GridBagConstraints gc = new GridBagConstraints();
+        gc.gridx = 0;
+        gc.gridy = 0;
+        gc.weightx = 1.0;
+        gc.weighty = 1.0;
+        gc.fill = GridBagConstraints.BOTH;
+        add(lineDataSelectorContainer, gc);
 
         JPanel pageEndPanel = new JPanel();
         pageEndPanel.setBackground(Color.BLUE);
@@ -96,12 +106,26 @@ public class ControlsPanel extends JPanel implements ActionListener, LayersListe
         zoomComboBox.setBorder(BorderFactory.createEmptyBorder(0, 0, 0, 0));
         zoomComboBox.addActionListener(this);
 
-        JPanel flowPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
-        flowPanel.add(zoomComboBox);
-        flowPanel.add(periodFromLayersButton);
-        flowPanel.add(addLayerButton);
+        GridBagConstraints gbc = new GridBagConstraints();
 
-        add(flowPanel, BorderLayout.PAGE_END);
+        JPanel flowPanel = new JPanel(new GridBagLayout());
+
+        gbc.gridx = 0;
+        gbc.gridy = 0;
+
+        flowPanel.add(zoomComboBox, gbc);
+
+        gbc.gridx = 1;
+        flowPanel.add(periodFromLayersButton, gbc);
+
+        gbc.gridx = 2;
+        flowPanel.add(addLayerButton, gbc);
+
+        gc.gridy = 1;
+        gc.fill = GridBagConstraints.HORIZONTAL;
+        gc.weightx = 0.0;
+        gc.weighty = 1.0;
+        add(flowPanel, gc);
 
     }
 
@@ -360,7 +384,7 @@ public class ControlsPanel extends JPanel implements ActionListener, LayersListe
 
             switch (zoom) {
             case All:
-                return "Maximum";
+                return "Maximum Interval";
             case Hour:
                 return Integer.toString(number) + " Hour" + plural;
             case Day:
@@ -370,12 +394,12 @@ public class ControlsPanel extends JPanel implements ActionListener, LayersListe
             case Year:
                 return Integer.toString(number) + " Year" + plural;
             case Carrington:
-                return Integer.toString(number) + " Carrington" + plural;
+                return Integer.toString(number) + " Carrington Rotation" + plural;
             default:
                 break;
             }
 
-            return "Custom";
+            return "Custom Interval";
         }
     }
 
