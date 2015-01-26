@@ -562,6 +562,7 @@ public class GLComponentView extends AbstractComponentView implements ViewListen
             AWTGLPixelBuffer pixelBuffer = pixelBufferProvider.allocate(gl, AWTGLPixelBuffer.awtPixelAttributesIntRGB3, v.getWidth(), v.getHeight(), 1, true, 0);
             tileRenderer.setImageBuffer(pixelBuffer);
             int tileNum = 0;
+            boolean first = true;
             while (!tileRenderer.eot()) {
                 ++tileNum;
                 tileRenderer.beginTile(gl);
@@ -575,9 +576,12 @@ public class GLComponentView extends AbstractComponentView implements ViewListen
                 gl.glLoadIdentity();
                 gl.glOrtho(x, x + w, y, y + h, -1, 1);
                 gl.glMatrixMode(matrixMode[0]);
-                gl.glClearColor(backgroundColor.getRed() / 255.0f, backgroundColor.getGreen() / 255.0f, backgroundColor.getBlue() / 255.0f, backgroundColor.getAlpha() / 255.0f);
                 displayBody(gl, 0, 0);
+                if (first) {
+                    displayBody(gl, 0, 0);
+                }
                 tileRenderer.endTile(gl);
+                first = false;
             }
             ;
             Log.trace(">> GLComponentView.display() > Rendered " + tileNum + " tiles.");
