@@ -114,7 +114,7 @@ public class GL3DPositionLoading {
             @Override
             public void done() {
                 if (!this.isCancelled()) {
-                    if (report == null) {
+                    if (report == null && jsonResult != null) {
                         parseData();
                         if (positionDateTime != null && positionDateTime.length > 0) {
                             setLoaded(true);
