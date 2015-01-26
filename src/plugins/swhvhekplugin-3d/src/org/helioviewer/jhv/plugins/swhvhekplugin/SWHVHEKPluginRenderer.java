@@ -67,7 +67,11 @@ public class SWHVHEKPluginRenderer implements PhysicalRenderer {
             gl.glColor3d(evtColor.getRed() / 255., evtColor.getGreen() / 255., evtColor.getBlue() / 255.);
             gl.glDisable(GL2.GL_TEXTURE_2D);
             gl.glEnable(GL2.GL_LINE_SMOOTH);
-            gl.glLineWidth(0.5f);
+            if (evt.isHighlighted()) {
+                gl.glLineWidth(1.1f);
+            } else {
+                gl.glLineWidth(0.5f);
+            }
             gl.glBegin(GL2.GL_LINE_STRIP);
             if (oldBoundaryPoint3d != null) {
                 for (int j = 0; j <= divpoints; j++) {
@@ -125,7 +129,12 @@ public class SWHVHEKPluginRenderer implements PhysicalRenderer {
             JHVPositionInformation el = pi.get(JHVCoordinateSystem.JHV2D);
             if (el.centralPoint() != null) {
                 JHVPoint pt = el.centralPoint();
-                g.drawImage(bi, pt.getCoordinate1(), pt.getCoordinate2());
+                if (evt.isHighlighted()) {
+                    g.drawImage(bi, pt.getCoordinate1(), pt.getCoordinate2(), 0.8f);
+                } else {
+                    g.drawImage(bi, pt.getCoordinate1(), pt.getCoordinate2(), 0.6f);
+
+                }
             }
         }
 
