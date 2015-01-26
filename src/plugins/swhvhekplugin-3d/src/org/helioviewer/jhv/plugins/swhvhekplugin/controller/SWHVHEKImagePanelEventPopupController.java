@@ -328,8 +328,8 @@ public class SWHVHEKImagePanelEventPopupController implements KeyEventDispatcher
                 } else {
                     HashMap<JHVCoordinateSystem, JHVPositionInformation> pi = evt.getPositioningInformation();
 
-                    if (pi.containsKey(JHVCoordinateSystem.JHV)) {
-                        JHVPositionInformation el = pi.get(JHVCoordinateSystem.JHV);
+                    if (pi.containsKey(JHVCoordinateSystem.JHV2D)) {
+                        JHVPositionInformation el = pi.get(JHVCoordinateSystem.JHV2D);
                         if (el.centralPoint() != null) {
                             Vector2dInt screenPos = convertPhysicalToScreen(el.centralPoint().getCoordinate1(), el.centralPoint().getCoordinate2());
 
