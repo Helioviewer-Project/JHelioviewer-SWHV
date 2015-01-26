@@ -35,7 +35,11 @@ import org.helioviewer.plugins.eveplugin.events.model.EventModelListener;
 import org.helioviewer.plugins.eveplugin.model.TimeIntervalLockModel;
 import org.helioviewer.plugins.eveplugin.settings.EVEAPI.API_RESOLUTION_AVERAGES;
 import org.helioviewer.plugins.eveplugin.settings.EVESettings;
+import org.helioviewer.plugins.eveplugin.view.linedataselector.LineDataSelectorElement;
+import org.helioviewer.plugins.eveplugin.view.linedataselector.LineDataSelectorModel;
+import org.helioviewer.plugins.eveplugin.view.linedataselector.LineDataSelectorModelListener;
 import org.helioviewer.plugins.eveplugin.view.linedataselector.LineDataSelectorPanel;
+import org.helioviewer.plugins.eveplugin.view.plot.PlotsContainerPanel;
 import org.helioviewer.viewmodel.view.View;
 
 /**
@@ -44,7 +48,7 @@ import org.helioviewer.viewmodel.view.View;
  * @author Bram Bourgoignie (Bram.Bourgoignie@oma.be)
  * 
  */
-public class ControlsPanel extends JPanel implements ActionListener, LayersListener, EventModelListener, ZoomControllerListener {
+public class ControlsPanel extends JPanel implements ActionListener, LayersListener, EventModelListener, ZoomControllerListener, LineDataSelectorModelListener {
 
     /**
      *
@@ -77,6 +81,8 @@ public class ControlsPanel extends JPanel implements ActionListener, LayersListe
     private void initVisualComponents() {
         EventModel.getSingletonInstance().addEventModelListener(this);
 
+        LineDataSelectorModel.getSingletonInstance().addLineDataSelectorModelListener(this);
+
         addLayerButton.setToolTipText("Add a new layer");
         addLayerButton.addActionListener(this);
         addLayerButton.setMargin(new Insets(0, 0, 0, 0));
@@ -105,6 +111,7 @@ public class ControlsPanel extends JPanel implements ActionListener, LayersListe
 
         zoomComboBox.setBorder(BorderFactory.createEmptyBorder(0, 0, 0, 0));
         zoomComboBox.addActionListener(this);
+        zoomComboBox.setEnabled(false);
 
         GridBagConstraints gbc = new GridBagConstraints();
 
@@ -430,6 +437,36 @@ public class ControlsPanel extends JPanel implements ActionListener, LayersListe
 
     @Override
     public void selectedResolutionChanged(API_RESOLUTION_AVERAGES newResolution) {
+        // TODO Auto-generated method stub
+
+    }
+
+    @Override
+    public void downloadStartded(LineDataSelectorElement element) {
+        // TODO Auto-generated method stub
+
+    }
+
+    @Override
+    public void downloadFinished(LineDataSelectorElement element) {
+        // TODO Auto-generated method stub
+
+    }
+
+    @Override
+    public void lineDataAdded(LineDataSelectorElement element) {
+        zoomComboBox.setEnabled(true);
+    }
+
+    @Override
+    public void lineDataRemoved(LineDataSelectorElement element) {
+        if (LineDataSelectorModel.getSingletonInstance().getNumberOfAvailableLineData(PlotsContainerPanel.PLOT_IDENTIFIER_MASTER) == 0) {
+            zoomComboBox.setEnabled(false);
+        }
+    }
+
+    @Override
+    public void lineDataUpdated(LineDataSelectorElement element) {
         // TODO Auto-generated method stub
 
     }
