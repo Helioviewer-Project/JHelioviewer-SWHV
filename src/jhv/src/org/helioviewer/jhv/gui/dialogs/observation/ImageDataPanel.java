@@ -113,7 +113,7 @@ public class ImageDataPanel extends ObservationDialogPanel {
             @Override
             public void run() {
                 if (!donotloadStartup) {
-                    ObservationDialog.getSingletonInstance().setLoadButtonEnabled(false);
+                    ImageViewerGui.getSingletonInstance().getObservationDialog().setLoadButtonEnabled(false);
                 }
                 DataSources.getSingletonInstance().reload();
 
@@ -122,7 +122,7 @@ public class ImageDataPanel extends ObservationDialogPanel {
 
                     enableLoadButton = true;
                     if (isSelected) {
-                        ObservationDialog.getSingletonInstance().setLoadButtonEnabled(enableLoadButton);
+                        ImageViewerGui.getSingletonInstance().getObservationDialog().setLoadButtonEnabled(enableLoadButton);
                     }
 
                     // Check if we were able to set it up
@@ -148,7 +148,7 @@ public class ImageDataPanel extends ObservationDialogPanel {
                     Log.error("Could not setup observation dialog", e);
                     Message.err("Could not retrieve data sources", "The list of avaible data could not be fetched. So you cannot use the GUI to add data!" + System.getProperty("line.separator") + " This may happen if you do not have an internet connection or the there are server problems. You can still open local files.", false);
                 }
-                ObservationDialog.getSingletonInstance().setLoadButtonEnabled(true);
+                ImageViewerGui.getSingletonInstance().getObservationDialog().setLoadButtonEnabled(true);
             }
         }, "ObservationSetup");
         t.start();
@@ -317,7 +317,7 @@ public class ImageDataPanel extends ObservationDialogPanel {
     @Override
     public void selected() {
         isSelected = true;
-        ObservationDialog.getSingletonInstance().setLoadButtonEnabled(enableLoadButton);
+        ImageViewerGui.getSingletonInstance().getObservationDialog().setLoadButtonEnabled(enableLoadButton);
     }
 
     /**

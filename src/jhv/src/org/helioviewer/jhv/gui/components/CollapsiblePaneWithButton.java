@@ -14,8 +14,8 @@ import javax.swing.JPanel;
 import org.helioviewer.base.logging.Log;
 import org.helioviewer.jhv.gui.IconBank;
 import org.helioviewer.jhv.gui.IconBank.JHVIcon;
+import org.helioviewer.jhv.gui.ImageViewerGui;
 import org.helioviewer.jhv.gui.dialogs.observation.ImageDataPanel;
-import org.helioviewer.jhv.gui.dialogs.observation.ObservationDialog;
 import org.helioviewer.jhv.layers.LayersModel;
 import org.helioviewer.viewmodel.view.MovieView;
 import org.helioviewer.viewmodel.view.TimedMovieView;
@@ -26,10 +26,6 @@ public class CollapsiblePaneWithButton extends CollapsiblePane {
 
     private static final long serialVersionUID = -9107038141279736802L;
     private ImageDataPanel observationImagePane;
-    /**
-     * Observation dialog to actually add new data
-     */
-    private final ObservationDialog observationDialog = ObservationDialog.getSingletonInstance();
 
     /**
      * Action to add a new layer. If there is a current active layer which much
@@ -85,17 +81,17 @@ public class CollapsiblePaneWithButton extends CollapsiblePane {
                  * TODO: Code Simplification - Cleanup Date selection when
                  * clicking on "add images", e.g. use
                  * LayersModel.getLatestDate(...), ...
-                 * 
+                 *
                  * Here are some more comments by Helge:
-                 * 
+                 *
                  * If it is a local file, the timestamps are read from the
                  * parsed JPX movie, i.e. a call will pause until the whole
                  * movie has finished loading.
-                 * 
+                 *
                  * If it has been reading through the API the frame time stamps
                  * already have been returned and it is not bad. For the time
                  * being it will only update if its already loaded.
-                 * 
+                 *
                  * I think there should be a better solution? Maybe a wait
                  * dialog? etc.?
                  */
@@ -126,7 +122,7 @@ public class CollapsiblePaneWithButton extends CollapsiblePane {
                     }
                 }
                 // Show dialog
-                observationDialog.showDialog();
+                ImageViewerGui.getSingletonInstance().getObservationDialog().showDialog();
             }
         };
     }
