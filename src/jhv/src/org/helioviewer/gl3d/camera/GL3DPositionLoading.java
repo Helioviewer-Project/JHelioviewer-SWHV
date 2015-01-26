@@ -90,6 +90,8 @@ public class GL3DPositionLoading {
                         if (jsonObject.has("faultstring")) {
                             String faultstring = jsonObject.getString("faultstring");
                             report = faultstring;
+                        } else {
+                            report = "Invalid network response.";
                         }
                     }
 
