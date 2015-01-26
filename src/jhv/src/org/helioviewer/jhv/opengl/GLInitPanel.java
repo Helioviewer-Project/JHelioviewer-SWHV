@@ -2,7 +2,6 @@ package org.helioviewer.jhv.opengl;
 
 import java.awt.Dimension;
 import java.awt.EventQueue;
-import java.awt.Toolkit;
 import java.lang.Thread.UncaughtExceptionHandler;
 
 import javax.media.opengl.GL2;
@@ -122,14 +121,7 @@ public class GLInitPanel extends GLJPanel {
                 GLTextureHelper.setPixelHIFactorWidth(parent.getCurrentSurfaceScale(new int[2])[0]);
                 GLTextureHelper.setPixelHIFactorHeight(parent.getCurrentSurfaceScale(new int[2])[1]);
                 int scale = parent.getCurrentSurfaceScale(new int[2])[0];
-                Object obj = Toolkit.getDefaultToolkit().getDesktopProperty("apple.awt.contentScaleFactor");
 
-                if (obj instanceof Float) {
-                    Float f = (Float) obj;
-                    if (f > scale) {
-                        scale = f.intValue();
-                    }
-                }
                 Displayer.screenScale = scale;
 
             } else {
