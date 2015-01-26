@@ -1,5 +1,6 @@
 package org.helioviewer.jhv.plugins.swhvhekplugin;
 
+import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
@@ -38,10 +39,10 @@ public class SWHVHEKPluginRenderer implements PhysicalRenderer {
     public void drawPolygon(PhysicalRenderGraphics g, JHVEvent evt, Date now) {
         HashMap<JHVCoordinateSystem, JHVPositionInformation> pi = evt.getPositioningInformation();
 
-        if (!pi.containsKey(JHVCoordinateSystem.JHV)) {
+        if (!pi.containsKey(JHVCoordinateSystem.JHV2D)) {
             return;
         }
-        JHVPositionInformation el = pi.get(JHVCoordinateSystem.JHV);
+        JHVPositionInformation el = pi.get(JHVCoordinateSystem.JHV2D);
         List<JHVPoint> points = el.getBoundCC();
         if (points == null || points.size() == 0) {
             points = el.getBoundBox();
@@ -61,7 +62,9 @@ public class SWHVHEKPluginRenderer implements PhysicalRenderer {
             double phi = point.getCoordinate1() / 180. * Math.PI - Astronomy.getL0Radians(new Date((evt.getStartDate().getTime() + evt.getEndDate().getTime()) / 2));
 
             int divpoints = 10;
-            gl.glColor3d(evt.getColor().getRed(), evt.getColor().getGreen(), evt.getColor().getBlue());
+            Color evtColor = evt.getEventRelationShip().getRelationshipColor();
+
+            gl.glColor3d(evtColor.getRed() / 255., evtColor.getGreen() / 255., evtColor.getBlue() / 255.);
             gl.glDisable(GL2.GL_TEXTURE_2D);
             gl.glEnable(GL2.GL_LINE_SMOOTH);
             gl.glLineWidth(0.5f);
@@ -118,8 +121,8 @@ public class SWHVHEKPluginRenderer implements PhysicalRenderer {
         }
         HashMap<JHVCoordinateSystem, JHVPositionInformation> pi = evt.getPositioningInformation();
 
-        if (pi.containsKey(JHVCoordinateSystem.JHV)) {
-            JHVPositionInformation el = pi.get(JHVCoordinateSystem.JHV);
+        if (pi.containsKey(JHVCoordinateSystem.JHV2D)) {
+            JHVPositionInformation el = pi.get(JHVCoordinateSystem.JHV2D);
             if (el.centralPoint() != null) {
                 JHVPoint pt = el.centralPoint();
                 g.drawImage(bi, pt.getCoordinate1(), pt.getCoordinate2());
