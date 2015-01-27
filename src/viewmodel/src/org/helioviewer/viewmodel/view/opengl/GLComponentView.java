@@ -1,5 +1,7 @@
 package org.helioviewer.viewmodel.view.opengl;
 
+import javax.media.opengl.GLPipelineFactory;
+
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
@@ -357,6 +359,7 @@ public class GLComponentView extends AbstractComponentView implements ViewListen
         GLSharedContext.setSharedContext(drawable.getContext());
         //GLDrawableFactory.getFactory(GLProfile.getDefault()).createExternalGLContext();
         final GL2 gl = drawable.getGL().getGL2();
+        //gl.getContext().setGL(GLPipelineFactory.create("javax.media.opengl.Trace", null, gl, new Object[] { System.err }));
 
         frameBufferObject = new int[1];
         gl.glGenFramebuffers(1, frameBufferObject, 0);
@@ -473,11 +476,11 @@ public class GLComponentView extends AbstractComponentView implements ViewListen
 
             gl.glTranslatef(xOffsetFinal, yOffsetFinal, 0.0f);
             gl.glScalef(viewportImageSize.getWidth() / (float) region.getWidth(), viewportImageSize.getHeight() / (float) region.getHeight(), 1.0f);
-            gl.glTranslated(-region.getCornerX(), -region.getCornerY(), 0.0);
+            gl.glTranslatef((float) -region.getCornerX(), (float) -region.getCornerY(), 0.0f);
 
             // clear viewport
-            gl.glColor4f(backgroundColor.getRed() / 255.0f, backgroundColor.getGreen() / 255.0f, backgroundColor.getBlue() / 255.0f, backgroundColor.getAlpha() / 255.0f);
-            gl.glRectd(region.getCornerX(), region.getCornerY(), region.getUpperRightCorner().getX(), region.getUpperRightCorner().getY());
+            // gl.glColor4f(backgroundColor.getRed() / 255.0f, backgroundColor.getGreen() / 255.0f, backgroundColor.getBlue() / 255.0f, backgroundColor.getAlpha() / 255.0f);
+            // gl.glRectd(region.getCornerX(), region.getCornerY(), region.getUpperRightCorner().getX(), region.getUpperRightCorner().getY());
 
             if (view instanceof GLView) {
                 ((GLView) view).renderGL(gl, true);
@@ -562,7 +565,6 @@ public class GLComponentView extends AbstractComponentView implements ViewListen
             AWTGLPixelBuffer pixelBuffer = pixelBufferProvider.allocate(gl, AWTGLPixelBuffer.awtPixelAttributesIntRGB3, v.getWidth(), v.getHeight(), 1, true, 0);
             tileRenderer.setImageBuffer(pixelBuffer);
             int tileNum = 0;
-            boolean first = true;
             while (!tileRenderer.eot()) {
                 ++tileNum;
                 tileRenderer.beginTile(gl);
@@ -576,16 +578,13 @@ public class GLComponentView extends AbstractComponentView implements ViewListen
                 gl.glLoadIdentity();
                 gl.glOrtho(x, x + w, y, y + h, -1, 1);
                 gl.glMatrixMode(matrixMode[0]);
+                // gl.glClearColor(backgroundColor.getRed() / 255.0f, backgroundColor.getGreen() / 255.0f, backgroundColor.getBlue() / 255.0f, backgroundColor.getAlpha() / 255.0f);
                 displayBody(gl, 0, 0);
-                if (first) {
-                    displayBody(gl, 0, 0);
-                }
                 tileRenderer.endTile(gl);
-                first = false;
             }
-            ;
+
             Log.trace(">> GLComponentView.display() > Rendered " + tileNum + " tiles.");
-            reshape(drawable, 0, 0, v.getWidth(), v.getHeight());
+            // reshape(drawable, 0, 0, v.getWidth(), v.getHeight());
 
             if (useOffscreenRendering) {
                 gl.glBindFramebuffer(GL2.GL_FRAMEBUFFER, 0);
