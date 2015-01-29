@@ -4,6 +4,7 @@ import java.util.AbstractList;
 import java.util.LinkedList;
 
 import org.helioviewer.base.math.Vector2dInt;
+import org.helioviewer.jhv.gui.dialogs.ExportMovieDialog;
 import org.helioviewer.viewmodel.renderer.screen.ScreenRenderer;
 
 public abstract class AbstractComponentView extends AbstractBasicView implements ComponentView {
@@ -12,6 +13,7 @@ public abstract class AbstractComponentView extends AbstractBasicView implements
 
     protected AbstractList<ScreenRenderer> postRenderers = new LinkedList<ScreenRenderer>();
 
+    @Override
     public void updateMainImagePanelSize(Vector2dInt size) {
         mainImagePanelSize = size;
     }
@@ -19,6 +21,7 @@ public abstract class AbstractComponentView extends AbstractBasicView implements
     /**
      * {@inheritDoc}
      */
+    @Override
     public void addPostRenderer(ScreenRenderer postRenderer) {
         if (postRenderer != null) {
             synchronized (postRenderers) {
@@ -44,6 +47,7 @@ public abstract class AbstractComponentView extends AbstractBasicView implements
     /**
      * {@inheritDoc}
      */
+    @Override
     public void removePostRenderer(ScreenRenderer postRenderer) {
         if (postRenderer != null) {
             synchronized (postRenderers) {
@@ -60,7 +64,11 @@ public abstract class AbstractComponentView extends AbstractBasicView implements
     /**
      * {@inheritDoc}
      */
+    @Override
     public AbstractList<ScreenRenderer> getAllPostRenderer() {
         return postRenderers;
     }
+
+    abstract public void startExport(ExportMovieDialog exportMovieDialog);
+
 }

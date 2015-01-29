@@ -55,7 +55,7 @@ public class Displayer implements JHVEventHighlightListener {
     }
 
     public void render() {
-        if (this.getState() == STATE3D && !displaying) {
+        if (!displaying) {
             displaying = true;
             synchronized (renderListeners) {
                 for (final RenderListener renderListener : renderListeners) {
@@ -83,7 +83,7 @@ public class Displayer implements JHVEventHighlightListener {
     }
 
     public void display() {
-        if (this.getState() == STATE3D && displayPool.getActiveCount() == 0) {
+        if (displayPool.getActiveCount() == 0) {
             displayPool.submit(new DisplayTask());
         }
     }

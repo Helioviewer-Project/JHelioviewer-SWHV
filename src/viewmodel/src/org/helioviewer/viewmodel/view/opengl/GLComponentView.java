@@ -1,7 +1,5 @@
 package org.helioviewer.viewmodel.view.opengl;
 
-import javax.media.opengl.GLPipelineFactory;
-
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
@@ -18,29 +16,40 @@ import javax.media.opengl.GLAutoDrawable;
 import javax.media.opengl.GLCapabilities;
 import javax.media.opengl.GLEventListener;
 import javax.media.opengl.GLProfile;
-import javax.media.opengl.GLSharedContextSetter;
 import javax.media.opengl.awt.GLCanvas;
-import javax.media.opengl.awt.GLJPanel;
 import javax.media.opengl.glu.GLU;
+import javax.swing.JOptionPane;
+import javax.swing.JTextArea;
 
 import org.helioviewer.base.logging.Log;
 import org.helioviewer.base.math.Vector2dInt;
+import org.helioviewer.gl3d.movie.MovieExport;
+import org.helioviewer.jhv.display.DisplayListener;
+import org.helioviewer.jhv.display.Displayer;
+import org.helioviewer.jhv.gui.ImageViewerGui;
+import org.helioviewer.jhv.gui.dialogs.ExportMovieDialog;
+import org.helioviewer.jhv.layers.LayersModel;
 import org.helioviewer.viewmodel.changeevent.ChangeEvent;
 import org.helioviewer.viewmodel.changeevent.LayerChangedReason;
 import org.helioviewer.viewmodel.changeevent.LayerChangedReason.LayerChangeType;
+import org.helioviewer.viewmodel.changeevent.SubImageDataChangedReason;
+import org.helioviewer.viewmodel.changeevent.TimestampChangedReason;
 import org.helioviewer.viewmodel.changeevent.ViewChainChangedReason;
 import org.helioviewer.viewmodel.region.Region;
 import org.helioviewer.viewmodel.renderer.screen.GLScreenRenderGraphics;
 import org.helioviewer.viewmodel.renderer.screen.ScreenRenderer;
 import org.helioviewer.viewmodel.view.AbstractComponentView;
 import org.helioviewer.viewmodel.view.ComponentView;
+import org.helioviewer.viewmodel.view.LinkedMovieManager;
 import org.helioviewer.viewmodel.view.RegionView;
 import org.helioviewer.viewmodel.view.SubimageDataView;
+import org.helioviewer.viewmodel.view.TimedMovieView;
 import org.helioviewer.viewmodel.view.View;
 import org.helioviewer.viewmodel.view.ViewHelper;
 import org.helioviewer.viewmodel.view.ViewListener;
 import org.helioviewer.viewmodel.view.ViewportView;
 import org.helioviewer.viewmodel.view.jp2view.JHVJP2View;
+import org.helioviewer.viewmodel.view.jp2view.JHVJPXView;
 import org.helioviewer.viewmodel.view.opengl.shader.GLFragmentShaderView;
 import org.helioviewer.viewmodel.view.opengl.shader.GLMinimalFragmentShaderProgram;
 import org.helioviewer.viewmodel.view.opengl.shader.GLMinimalVertexShaderProgram;
@@ -52,7 +61,6 @@ import org.helioviewer.viewmodel.viewportimagesize.ViewportImageSize;
 
 import com.jogamp.opengl.util.FPSAnimator;
 import com.jogamp.opengl.util.TileRenderer;
-import com.jogamp.opengl.util.TileRendererBase;
 import com.jogamp.opengl.util.awt.AWTGLPixelBuffer;
 import com.jogamp.opengl.util.awt.ImageUtil;
 
@@ -74,18 +82,23 @@ import com.jogamp.opengl.util.awt.ImageUtil;
  *
  * @author Markus Langenberg
  */
-public class GLComponentView extends AbstractComponentView implements ViewListener, GLEventListener {
+public class GLComponentView extends AbstractComponentView implements ViewListener, GLEventListener, DisplayListener {
     public static final String SETTING_TILE_WIDTH = "gl.screenshot.tile.width";
     public static final String SETTING_TILE_HEIGHT = "gl.screenshot.tile.height";
 
     private static final boolean DEBUG = true;
 
     // general
-    private Component canvas;
-    private GLAutoDrawable canvasDrawable;
+    private final GLCanvas canvas;
+    private final GLAutoDrawable canvasDrawable;
     private RegionView regionView;
     private FPSAnimator animator;
-    private boolean useOffscreenRendering;
+
+    private int previousScreenshot = -1;
+
+    private MovieExport export;
+    private ExportMovieDialog exportMovieDialog;
+    private File outputFile;
 
     // render options
     private Color backgroundColor = Color.BLACK;
@@ -110,14 +123,14 @@ public class GLComponentView extends AbstractComponentView implements ViewListen
     private TileRenderer tileRenderer;
     private final AWTGLPixelBuffer.SingleAWTGLPixelBufferProvider pixelBufferProvider = new AWTGLPixelBuffer.SingleAWTGLPixelBufferProvider(true);
 
-    private int[] frameBufferObject;
-    private int[] renderBufferDepth;
-    private int[] renderBufferColor;
-
     private static int defaultTileWidth = 640;
     private static int defaultTileHeight = 640;
     private int tileWidth;
     private int tileHeight;
+    private final boolean sharedObjectCreate = false;
+    private Vector2dInt viewportSize;
+    private boolean exportMode;
+    private boolean screenshotMode;
 
     /**
      * Default constructor.
@@ -125,36 +138,14 @@ public class GLComponentView extends AbstractComponentView implements ViewListen
      * Also initializes all OpenGL Helper classes.
      */
     public GLComponentView() {
-        setUpCanvas(false);
-    }
-
-    public void useOffscreenRendering() {
-        animator.stop();
-        canvasDrawable.destroy();
-        setUpCanvas(true);
-    }
-
-    private void setUpCanvas(boolean useOffscreenRendering) {
-        this.useOffscreenRendering = useOffscreenRendering;
         GLCapabilities caps = new GLCapabilities(GLProfile.getDefault());
-        if (useOffscreenRendering) {
-            // Bad performance but better Swing compatibility.
-            // For some reason GLCanvas in combination with offscreen framebuffers
-            // screws up the canvas positioning.
-            caps.setOnscreen(false);
-            GLJPanel glPanel = new GLJPanel(caps);
-            canvas = glPanel;
-            canvasDrawable = glPanel;
-        } else {
-            GLCanvas glCanvas = new GLCanvas(caps);
-            canvas = glCanvas;
-            canvasDrawable = glCanvas;
-        }
+
+        GLCanvas glCanvas = new GLCanvas(caps);
+        canvas = glCanvas;
+        canvasDrawable = glCanvas;
+
         canvas.setMinimumSize(new Dimension());
 
-        if (GLSharedContext.getSharedContext() != null) {
-            ((GLSharedContextSetter) canvas).setSharedContext(GLSharedContext.getSharedContext());
-        }
         canvasDrawable.addGLEventListener(this);
         animator = new FPSAnimator(canvasDrawable, 30);
         animator.start();
@@ -165,17 +156,11 @@ public class GLComponentView extends AbstractComponentView implements ViewListen
             screenshot.flush();
             screenshot = null;
         }
-        GLSharedContext.setSharedContext(null);
-
         tileRenderer = null;
     }
 
     @Override
     public void dispose(GLAutoDrawable drawable) {
-        final GL2 gl = drawable.getGL().getGL2();
-        gl.glDeleteFramebuffers(1, frameBufferObject, 0);
-        gl.glDeleteRenderbuffers(1, renderBufferDepth, 0);
-        gl.glDeleteRenderbuffers(1, renderBufferColor, 0);
         dispose();
     }
 
@@ -325,6 +310,19 @@ public class GLComponentView extends AbstractComponentView implements ViewListen
         // inform all listener of the latest change reason
         // frameUpdated++;
         notifyViewListeners(aEvent);
+        if (this.exportMode) {
+            TimestampChangedReason timestampReason = aEvent.getLastChangedReasonByType(TimestampChangedReason.class);
+            SubImageDataChangedReason sidReason = aEvent.getLastChangedReasonByType(SubImageDataChangedReason.class);
+
+            if (sidReason != null || ((timestampReason != null) && (timestampReason.getView() instanceof TimedMovieView) && LinkedMovieManager.getActiveInstance().isMaster((TimedMovieView) timestampReason.getView()))) {
+                try {
+
+                    Displayer.getSingletonInstance().display();
+                } catch (Exception e) {
+
+                }
+            }
+        }
     }
 
     @Override
@@ -356,17 +354,9 @@ public class GLComponentView extends AbstractComponentView implements ViewListen
      */
     @Override
     public void init(GLAutoDrawable drawable) {
-        GLSharedContext.setSharedContext(drawable.getContext());
         //GLDrawableFactory.getFactory(GLProfile.getDefault()).createExternalGLContext();
         final GL2 gl = drawable.getGL().getGL2();
         //gl.getContext().setGL(GLPipelineFactory.create("javax.media.opengl.Trace", null, gl, new Object[] { System.err }));
-
-        frameBufferObject = new int[1];
-        gl.glGenFramebuffers(1, frameBufferObject, 0);
-        gl.glBindFramebuffer(GL2.GL_FRAMEBUFFER, frameBufferObject[0]);
-        generateNewRenderBuffers(gl);
-        gl.glBindFramebuffer(GL2.GL_FRAMEBUFFER, 0);
-
         textureHelper.delAllTextures(gl);
         GLTextureHelper.initHelper(gl);
 
@@ -381,30 +371,7 @@ public class GLComponentView extends AbstractComponentView implements ViewListen
         gl.glBlendFunc(GL2.GL_SRC_ALPHA, GL2.GL_ONE_MINUS_SRC_ALPHA);
 
         gl.glColor3f(1.0f, 1.0f, 1.0f);
-    }
 
-    private void generateNewRenderBuffers(GL2 gl) {
-        tileWidth = defaultTileWidth;
-        tileHeight = defaultTileHeight;
-        if (renderBufferDepth != null) {
-            gl.glDeleteRenderbuffers(1, renderBufferDepth, 0);
-        }
-        renderBufferDepth = new int[1];
-        gl.glGenRenderbuffers(1, renderBufferDepth, 0);
-        gl.glBindRenderbuffer(GL2.GL_RENDERBUFFER, renderBufferDepth[0]);
-        gl.glRenderbufferStorage(GL2.GL_RENDERBUFFER, GL2.GL_DEPTH_COMPONENT, tileWidth, tileHeight);
-        gl.glFramebufferRenderbuffer(GL2.GL_FRAMEBUFFER, GL2.GL_DEPTH_ATTACHMENT, GL2.GL_RENDERBUFFER, renderBufferDepth[0]);
-        gl.glFramebufferRenderbuffer(GL2.GL_READ_FRAMEBUFFER, GL2.GL_DEPTH_ATTACHMENT, GL2.GL_RENDERBUFFER, renderBufferDepth[0]);
-
-        if (renderBufferColor != null) {
-            gl.glDeleteRenderbuffers(1, renderBufferColor, 0);
-        }
-        renderBufferColor = new int[1];
-        gl.glGenRenderbuffers(1, renderBufferColor, 0);
-        gl.glBindRenderbuffer(GL2.GL_RENDERBUFFER, renderBufferColor[0]);
-        gl.glRenderbufferStorage(GL2.GL_RENDERBUFFER, GL2.GL_RGBA8, tileWidth, tileHeight);
-        gl.glFramebufferRenderbuffer(GL2.GL_FRAMEBUFFER, GL2.GL_COLOR_ATTACHMENT0, GL2.GL_RENDERBUFFER, renderBufferColor[0]);
-        gl.glFramebufferRenderbuffer(GL2.GL_READ_FRAMEBUFFER, GL2.GL_COLOR_ATTACHMENT0, GL2.GL_RENDERBUFFER, renderBufferColor[0]);
     }
 
     /**
@@ -432,6 +399,7 @@ public class GLComponentView extends AbstractComponentView implements ViewListen
     @Override
     public void reshape(GLAutoDrawable drawable, int x, int y, int width, int height) {
         final GL2 gl = drawable.getGL().getGL2();
+        this.viewportSize = new Vector2dInt(width, height);
 
         gl.setSwapInterval(1);
 
@@ -461,6 +429,7 @@ public class GLComponentView extends AbstractComponentView implements ViewListen
      */
     protected void displayBody(GL2 gl, float xOffsetFinal, float yOffsetFinal) {
         // Set up screen
+
         gl.glClear(GL2.GL_COLOR_BUFFER_BIT);
         gl.glLoadIdentity();
 
@@ -476,11 +445,7 @@ public class GLComponentView extends AbstractComponentView implements ViewListen
 
             gl.glTranslatef(xOffsetFinal, yOffsetFinal, 0.0f);
             gl.glScalef(viewportImageSize.getWidth() / (float) region.getWidth(), viewportImageSize.getHeight() / (float) region.getHeight(), 1.0f);
-            gl.glTranslatef((float) -region.getCornerX(), (float) -region.getCornerY(), 0.0f);
-
-            // clear viewport
-            // gl.glColor4f(backgroundColor.getRed() / 255.0f, backgroundColor.getGreen() / 255.0f, backgroundColor.getBlue() / 255.0f, backgroundColor.getAlpha() / 255.0f);
-            // gl.glRectd(region.getCornerX(), region.getCornerY(), region.getUpperRightCorner().getX(), region.getUpperRightCorner().getY());
+            gl.glTranslated(-region.getCornerX(), -region.getCornerY(), 0.0);
 
             if (view instanceof GLView) {
                 ((GLView) view).renderGL(gl, true);
@@ -522,7 +487,23 @@ public class GLComponentView extends AbstractComponentView implements ViewListen
      * @see ComponentView#addPostRenderer(ScreenRenderer)
      */
     @Override
-    public synchronized void display(GLAutoDrawable drawable) {
+    public void display(GLAutoDrawable drawable) {
+
+        JHVJP2View mv = null;
+        if (exportMode || screenshotMode) {
+            View v = LayersModel.getSingletonInstance().getActiveView();
+            if (v != null) {
+                mv = v.getAdapter(JHVJP2View.class);
+                if (tileRenderer == null) {
+                    tileRenderer = new TileRenderer();
+                } else if (!tileRenderer.isSetup()) {
+                    tileRenderer.reset();
+                }
+            } else {
+                this.stopExport();
+                Log.warn("Premature stopping the video export: no active layer found");
+            }
+        }
 
         if (view == null) {
             return;
@@ -538,94 +519,90 @@ public class GLComponentView extends AbstractComponentView implements ViewListen
             gl = drawable.getGL().getGL2();
         }
 
-        // Rebuild all shaders, if necessary
-        if (rebuildShadersRequest) {
+        while (rebuildShadersRequest) {
             rebuildShaders(gl);
         }
-        // Save Screenshot, if requested
-        if (saveScreenshotRequest || saveBufferedImage) {
-            if (useOffscreenRendering) {
-                gl.glBindFramebuffer(GL2.GL_FRAMEBUFFER, frameBufferObject[0]);
-            }
-            if (tileWidth != defaultTileWidth || tileHeight != defaultTileHeight) {
-                generateNewRenderBuffers(gl);
-            }
-
-            Log.trace(">> GLComponentView.display() > Default read buffer: " + gl.getGL2ES3().getDefaultReadBuffer());
-            Log.trace(">> GLComponentView.display() > Start taking screenshot");
-            Viewport v = getAdapter(ViewportView.class).getViewport();
-            Log.trace(">> GLComponentView.display() > Initialize tile renderer - Tile size: " + tileWidth + "x" + tileHeight + " - Image size: " + v.getWidth() + "x" + v.getHeight());
-            if (tileRenderer == null) {
-                tileRenderer = new TileRenderer();
-            } else if (!tileRenderer.isSetup()) {
-                tileRenderer.reset();
-            }
-            tileRenderer.setTileSize(tileWidth, tileHeight, 0);
-            tileRenderer.setImageSize(v.getWidth(), v.getHeight());
-            AWTGLPixelBuffer pixelBuffer = pixelBufferProvider.allocate(gl, AWTGLPixelBuffer.awtPixelAttributesIntRGB3, v.getWidth(), v.getHeight(), 1, true, 0);
+        int width = this.viewportSize.getX();
+        int height = this.viewportSize.getY();
+        AWTGLPixelBuffer pixelBuffer = null;
+        if ((screenshotMode || exportMode) && mv != null) {
+            tileRenderer.setTileSize(width, height, 0);
+            tileRenderer.setImageSize(width, height);
+            pixelBuffer = pixelBufferProvider.allocate(gl, AWTGLPixelBuffer.awtPixelAttributesIntRGB3, width, height, 1, true, 0);
             tileRenderer.setImageBuffer(pixelBuffer);
             int tileNum = 0;
             while (!tileRenderer.eot()) {
                 ++tileNum;
+                if (tileNum > 1) {
+                    break;
+                }
                 tileRenderer.beginTile(gl);
-                int x = tileRenderer.getParam(TileRendererBase.TR_CURRENT_TILE_X_POS);
-                int y = tileRenderer.getParam(TileRendererBase.TR_CURRENT_TILE_Y_POS);
-                int w = tileRenderer.getParam(TileRendererBase.TR_CURRENT_TILE_WIDTH);
-                int h = tileRenderer.getParam(TileRendererBase.TR_CURRENT_TILE_HEIGHT);
-                int[] matrixMode = new int[1];
-                gl.glGetIntegerv(GL2.GL_MATRIX_MODE, matrixMode, 0);
-                gl.glMatrixMode(GL2.GL_PROJECTION);
-                gl.glLoadIdentity();
-                gl.glOrtho(x, x + w, y, y + h, -1, 1);
-                gl.glMatrixMode(matrixMode[0]);
-                // gl.glClearColor(backgroundColor.getRed() / 255.0f, backgroundColor.getGreen() / 255.0f, backgroundColor.getBlue() / 255.0f, backgroundColor.getAlpha() / 255.0f);
-                displayBody(gl, 0, 0);
-                tileRenderer.endTile(gl);
             }
-
-            Log.trace(">> GLComponentView.display() > Rendered " + tileNum + " tiles.");
-            // reshape(drawable, 0, 0, v.getWidth(), v.getHeight());
-
-            if (useOffscreenRendering) {
-                gl.glBindFramebuffer(GL2.GL_FRAMEBUFFER, 0);
-            }
-
-            screenshot = pixelBuffer.image;
-            ImageUtil.flipImageVertically(screenshot);
-            if (saveScreenshotRequest) {
-                // save image
-                try {
-                    Log.trace(">> GLComponentView.display() > Write image");
-                    ImageIO.write(screenshot, saveScreenshotFormat, saveScreenshotFile);
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-                saveScreenshotRequest = false;
-            }
-            saveBufferedImage = false;
-
-        } else {
-            float xOffsetFinal = xOffset;
-            float yOffsetFinal = yOffset;
-            gl.glClearColor(outsideViewportColor.getRed() / 255.0f, outsideViewportColor.getGreen() / 255.0f, outsideViewportColor.getBlue() / 255.0f, outsideViewportColor.getAlpha() / 255.0f);
-
-            ViewportImageSize viewportImageSize = ViewHelper.calculateViewportImageSize(view);
-            if (viewportImageSize != null && canvas != null) {
-                if (viewportImageSize.getWidth() < canvas.getWidth()) {
-                    xOffsetFinal += (canvas.getWidth() - viewportImageSize.getWidth()) / 2;
-                }
-                if (viewportImageSize.getHeight() < canvas.getHeight()) {
-                    yOffsetFinal += canvas.getHeight() - viewportImageSize.getHeight() - yOffsetFinal - (canvas.getHeight() - viewportImageSize.getHeight()) / 2;
-                }
-            }
-            displayBody(gl, xOffsetFinal, yOffsetFinal);
         }
+
+        float xOffsetFinal = xOffset;
+        float yOffsetFinal = yOffset;
+        gl.glClearColor(outsideViewportColor.getRed() / 255.0f, outsideViewportColor.getGreen() / 255.0f, outsideViewportColor.getBlue() / 255.0f, outsideViewportColor.getAlpha() / 255.0f);
+
+        ViewportImageSize viewportImageSize = ViewHelper.calculateViewportImageSize(view);
+        if (viewportImageSize != null && canvas != null) {
+            if (viewportImageSize.getWidth() < canvas.getWidth()) {
+                xOffsetFinal += (canvas.getWidth() - viewportImageSize.getWidth()) / 2;
+            }
+            if (viewportImageSize.getHeight() < canvas.getHeight()) {
+                yOffsetFinal += canvas.getHeight() - viewportImageSize.getHeight() - yOffsetFinal - (canvas.getHeight() - viewportImageSize.getHeight()) / 2;
+            }
+        }
+        displayBody(gl, xOffsetFinal, yOffsetFinal);
 
         // check for errors
         int errorCode = gl.glGetError();
         if (errorCode != GL2.GL_NO_ERROR) {
             GLU glu = new GLU();
             Log.error("OpenGL Error (" + errorCode + ") : " + glu.gluErrorString(errorCode));
+        }
+        if (exportMode && mv != null) {
+            int currentScreenshot = 1;
+            int maxframeno = 1;
+            if (mv instanceof JHVJPXView) {
+                currentScreenshot = ((JHVJPXView) mv).getCurrentFrameNumber();
+                maxframeno = ((JHVJPXView) mv).getMaximumFrameNumber();
+            }
+            tileRenderer.endTile(gl);
+            screenshot = pixelBuffer.image;
+            ImageUtil.flipImageVertically(screenshot);
+            if (currentScreenshot != previousScreenshot) {
+                export.writeImage(screenshot);
+            }
+            exportMovieDialog.setLabelText("Exporting frame " + (currentScreenshot + 1) + " / " + (maxframeno + 1));
+
+            if ((!(mv instanceof JHVJPXView)) || (mv instanceof JHVJPXView && currentScreenshot < previousScreenshot)) {
+                this.stopExport();
+            }
+            previousScreenshot = currentScreenshot;
+
+        }
+        if (screenshotMode && mv != null) {
+            tileRenderer.endTile(gl);
+            screenshot = pixelBuffer.image;
+            ImageUtil.flipImageVertically(screenshot);
+            try {
+                ImageIO.write(screenshot, "png", outputFile);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            this.stopScreenshot();
+        }
+    }
+
+    @Override
+    public void display() {
+        Log.error("CANVASDISPLAY");
+
+        try {
+            this.canvas.display();
+        } catch (Exception e) {
+            Log.warn("Display of GL3DComponentView canvas failed", e);
         }
     }
 
@@ -651,6 +628,15 @@ public class GLComponentView extends AbstractComponentView implements ViewListen
         shaderHelper.delAllShaderIDs(gl);
 
         GLFragmentShaderView fragmentView = view.getAdapter(GLFragmentShaderView.class);
+        GLVertexShaderView vertexView = view.getAdapter(GLVertexShaderView.class);
+        GLVertexShaderView vertexHelperView = null;
+        GLFragmentShaderView fragmentHelperView = null;
+        while (vertexView != vertexHelperView && fragmentView != fragmentHelperView) {
+            fragmentView = fragmentHelperView;
+            vertexView = vertexHelperView;
+            fragmentHelperView = view.getAdapter(GLFragmentShaderView.class);
+            vertexHelperView = view.getAdapter(GLVertexShaderView.class);
+        }
         if (fragmentView != null) {
             // create new shader builder
             GLShaderBuilder newShaderBuilder = new GLShaderBuilder(gl, GL2.GL_FRAGMENT_PROGRAM_ARB);
@@ -663,7 +649,6 @@ public class GLComponentView extends AbstractComponentView implements ViewListen
             fragmentView.buildFragmentShader(newShaderBuilder).compile();
         }
 
-        GLVertexShaderView vertexView = view.getAdapter(GLVertexShaderView.class);
         if (vertexView != null) {
             // create new shader builder
             GLShaderBuilder newShaderBuilder = new GLShaderBuilder(gl, GL2.GL_VERTEX_PROGRAM_ARB);
@@ -689,4 +674,55 @@ public class GLComponentView extends AbstractComponentView implements ViewListen
 
     }
 
+    @Override
+    public void startExport(ExportMovieDialog exportMovieDialog) {
+        animator.stop();
+        Displayer.getSingletonInstance().addListener(this);
+        this.exportMovieDialog = exportMovieDialog;
+        ImageViewerGui.getSingletonInstance().getLeftContentPane().setEnabled(false);
+        View v = LayersModel.getSingletonInstance().getActiveView();
+        System.out.println("STARTEXPORT");
+        if (v != null) {
+            JHVJPXView movieView = v.getAdapter(JHVJPXView.class);
+            if (movieView != null) {
+                movieView.pauseMovie();
+                movieView.setCurrentFrame(0, new ChangeEvent());
+            }
+            export = new MovieExport(canvas.getWidth(), canvas.getHeight());
+            export.createProcess();
+            exportMode = true;
+            System.out.println("STARTEXPORTSETEXPORT");
+
+            if (movieView != null) {
+                movieView.playMovie();
+            }
+        } else {
+            exportMovieDialog.fail();
+            exportMovieDialog = null;
+        }
+    }
+
+    public void stopExport() {
+        Displayer.getSingletonInstance().removeListener(this);
+        View v = LayersModel.getSingletonInstance().getActiveView();
+        JHVJPXView movieView = v.getAdapter(JHVJPXView.class);
+        exportMode = false;
+        previousScreenshot = -1;
+        export.finishProcess();
+        JTextArea text = new JTextArea("Exported movie at: " + export.getFileName());
+        text.setBackground(null);
+        JOptionPane.showMessageDialog(ImageViewerGui.getSingletonInstance().getMainImagePanel(), text);
+
+        ImageViewerGui.getSingletonInstance().getLeftContentPane().setEnabled(true);
+        if (movieView != null) {
+            movieView.pauseMovie();
+        }
+        exportMovieDialog.reset3D();
+        exportMovieDialog = null;
+        animator.start();
+    }
+
+    public void stopScreenshot() {
+        this.screenshotMode = false;
+    }
 }
