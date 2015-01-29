@@ -14,6 +14,7 @@ import javax.imageio.ImageIO;
 import javax.swing.JPanel;
 
 import org.helioviewer.base.math.Vector2dInt;
+import org.helioviewer.jhv.gui.dialogs.ExportMovieDialog;
 import org.helioviewer.viewmodel.changeevent.ChangeEvent;
 import org.helioviewer.viewmodel.changeevent.RegionChangedReason;
 import org.helioviewer.viewmodel.changeevent.SubImageDataChangedReason;
@@ -308,6 +309,11 @@ public class BufferedImageComponentView extends AbstractComponentView {
                 r.render(gRenderer);
             }
         }
+    }
+
+    @Override
+    public void startExport(ExportMovieDialog exportMovieDialog) {
+
     }
 
 }

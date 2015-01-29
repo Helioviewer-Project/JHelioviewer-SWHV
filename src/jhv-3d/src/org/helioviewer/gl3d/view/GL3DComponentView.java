@@ -53,7 +53,6 @@ import org.helioviewer.viewmodel.viewport.StaticViewport;
 import org.helioviewer.viewmodel.viewport.Viewport;
 
 import com.jogamp.opengl.util.TileRenderer;
-import com.jogamp.opengl.util.TileRendererBase;
 import com.jogamp.opengl.util.awt.AWTGLPixelBuffer;
 import com.jogamp.opengl.util.awt.ImageUtil;
 
@@ -87,7 +86,7 @@ public class GL3DComponentView extends AbstractComponentView implements GLEventL
     private int previousScreenshot = -1;
 
     private MovieExport export;
-    private boolean exportMode;
+    private boolean exportMode = false;
     private ExportMovieDialog exportMovieDialog;
     private boolean screenshotMode = false;
     private File outputFile;
@@ -120,6 +119,7 @@ public class GL3DComponentView extends AbstractComponentView implements GLEventL
         Log.debug("GL3DComponentView.DisplayChanged");
     }
 
+    @Override
     public void startExport(ExportMovieDialog exportMovieDialog) {
         this.exportMovieDialog = exportMovieDialog;
         ImageViewerGui.getSingletonInstance().getLeftContentPane().setEnabled(false);
@@ -256,11 +256,6 @@ public class GL3DComponentView extends AbstractComponentView implements GLEventL
                     break;
                 }
                 tileRenderer.beginTile(gl);
-                int x = tileRenderer.getParam(TileRendererBase.TR_CURRENT_TILE_X_POS);
-                int y = tileRenderer.getParam(TileRendererBase.TR_CURRENT_TILE_Y_POS);
-                int w = tileRenderer.getParam(TileRendererBase.TR_CURRENT_TILE_WIDTH);
-                int h = tileRenderer.getParam(TileRendererBase.TR_CURRENT_TILE_HEIGHT);
-
                 GL3DState.getUpdated(gl, width, height);
             }
         }
@@ -334,11 +329,13 @@ public class GL3DComponentView extends AbstractComponentView implements GLEventL
             if (currentScreenshot != previousScreenshot) {
                 export.writeImage(screenshot);
             }
-            previousScreenshot = currentScreenshot;
             exportMovieDialog.setLabelText("Exporting frame " + (currentScreenshot + 1) + " / " + (maxframeno + 1));
-            if ((!(mv instanceof JHVJPXView)) || (mv instanceof JHVJPXView && currentScreenshot == ((JHVJPXView) mv).getMaximumFrameNumber())) {
+
+            if ((!(mv instanceof JHVJPXView)) || (mv instanceof JHVJPXView && currentScreenshot < previousScreenshot)) {
                 this.stopExport();
             }
+            previousScreenshot = currentScreenshot;
+
         }
         if (screenshotMode && mv != null) {
             tileRenderer.endTile(gl);
