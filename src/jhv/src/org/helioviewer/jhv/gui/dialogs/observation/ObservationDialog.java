@@ -14,6 +14,7 @@ import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.SwingUtilities;
 
 import org.helioviewer.base.message.Message;
 import org.helioviewer.jhv.JHVGlobals;
@@ -221,6 +222,7 @@ public class ObservationDialog extends JDialog implements ActionListener, Showab
         setLocationRelativeTo(ImageViewerGui.getMainFrame());
 
         pack();
+        SwingUtilities.getRootPane(btnImages).setDefaultButton(btnImages);
 
         setVisible(true);
     }
