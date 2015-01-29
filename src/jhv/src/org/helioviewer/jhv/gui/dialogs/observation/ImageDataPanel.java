@@ -737,7 +737,8 @@ public class ImageDataPanel extends ObservationDialogPanel {
          * Combobox to select detector and/or measurement
          */
         private final JComboBox comboDetectorMeasurement = new JComboBox(new String[] { "Loading..." });
-        private final JComboBox comboServer = new JComboBox(new String[] { "ROB", "Helioviewer.org", "IAS" });
+        private final String[] serverList = new String[] { "ROB", "Helioviewer.org", "IAS" };
+        private final JComboBox comboServer = new JComboBox(serverList);
         private final JLabel labelServer = new JLabel("Server");
         private ImageDataPanel imageDataPanel;
 
@@ -826,6 +827,14 @@ public class ImageDataPanel extends ObservationDialogPanel {
                     imageDataPanel.initDataSources(true);
                 }
             });
+            String datasourcesPath = Settings.getSingletonInstance().getProperty("API.dataSources.path");
+            if (datasourcesPath.contains("ias")) {
+                comboServer.setSelectedItem(serverList[2]);
+            } else if (datasourcesPath.contains("helioviewer")) {
+                comboServer.setSelectedItem(serverList[1]);
+            } else {
+                comboServer.setSelectedItem(serverList[0]);
+            }
             comboObservatory.addActionListener(new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent arg0) {
