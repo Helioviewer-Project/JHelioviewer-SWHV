@@ -46,8 +46,13 @@ public class EventPlotConfiguration {
      */
     public EventPlotConfiguration(JHVEvent event, double scaledX0, double scaledX1, int yPosition) {
         this.event = event;
-        this.scaledX0 = scaledX0;
-        this.scaledX1 = scaledX1;
+        if (scaledX0 < scaledX1) {
+            this.scaledX0 = scaledX0;
+            this.scaledX1 = scaledX1;
+        } else {
+            this.scaledX0 = scaledX1;
+            this.scaledX1 = scaledX0;
+        }
         this.yPosition = yPosition;
     }
 
