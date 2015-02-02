@@ -11,6 +11,8 @@ import java.awt.event.WindowEvent;
 import java.awt.event.WindowFocusListener;
 import java.awt.event.WindowListener;
 import java.util.Map;
+import java.util.SortedSet;
+import java.util.TreeSet;
 
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
@@ -19,6 +21,7 @@ import javax.swing.JPanel;
 
 import org.helioviewer.jhv.data.datatype.event.JHVEvent;
 import org.helioviewer.jhv.data.datatype.event.JHVEventRelation;
+import org.helioviewer.jhv.data.datatype.event.comparator.JHVEventRelationComparator;
 import org.helioviewer.jhv.data.guielements.listeners.DataCollapsiblePanelModelListener;
 import org.helioviewer.jhv.data.guielements.model.DataCollapsiblePanelModel;
 import org.helioviewer.jhv.gui.ImageViewerGui;
@@ -306,7 +309,11 @@ public class SWEKEventInformationDialog extends JDialog implements WindowFocusLi
     private DataCollapsiblePanel createRelatedEventsCollapsiblePane(String relation, Map<String, JHVEventRelation> relations) {
         JPanel allPrecedingEvents = new JPanel();
         allPrecedingEvents.setLayout(new BoxLayout(allPrecedingEvents, BoxLayout.Y_AXIS));
+        SortedSet<JHVEventRelation> sortedER = new TreeSet<JHVEventRelation>(new JHVEventRelationComparator());
         for (final JHVEventRelation er : relations.values()) {
+            sortedER.add(er);
+        }
+        for (final JHVEventRelation er : sortedER) {
             if (er.getTheEvent() != null) {
                 JPanel eventAndButtonPanel = new JPanel();
 
