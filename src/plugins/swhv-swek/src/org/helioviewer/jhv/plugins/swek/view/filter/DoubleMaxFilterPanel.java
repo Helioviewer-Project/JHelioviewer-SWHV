@@ -24,6 +24,8 @@ public class DoubleMaxFilterPanel extends AbstractFilterPanel {
     /** Maximum value spinner */
     private JSpinner maximumValueSpinner;
 
+    private JLabel units;
+
     public DoubleMaxFilterPanel(SWEKEventType eventType, SWEKParameter parameter) {
         super(eventType, parameter);
         // TODO Auto-generated constructor stub
@@ -37,8 +39,7 @@ public class DoubleMaxFilterPanel extends AbstractFilterPanel {
     @Override
     public void filter(boolean active) {
         if (active) {
-            SWEKParam paramMax = new SWEKParam(parameter.getParameterName(), "" + maximumValueSpinner.getValue(),
-                    SWEKOperand.SMALLER_OR_EQUAL);
+            SWEKParam paramMax = new SWEKParam(parameter.getParameterName(), "" + maximumValueSpinner.getValue(), SWEKOperand.SMALLER_OR_EQUAL);
             ArrayList<SWEKParam> params = new ArrayList<SWEKParam>();
             params.add(paramMax);
             filterManager.addFilter(eventType, parameter, params);
@@ -74,6 +75,8 @@ public class DoubleMaxFilterPanel extends AbstractFilterPanel {
         p.add(new JLabel("Maximum Value:"), c);
         c.gridx = 1;
         p.add(maximumValueSpinner, c);
+        c.gridx = 2;
+        p.add(new JLabel(super.units), c);
         return p;
 
     }

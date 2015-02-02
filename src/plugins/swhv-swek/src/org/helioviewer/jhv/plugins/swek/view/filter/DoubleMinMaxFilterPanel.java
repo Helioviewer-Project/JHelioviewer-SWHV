@@ -53,10 +53,8 @@ public class DoubleMinMaxFilterPanel extends AbstractFilterPanel {
     public void filter(boolean active) {
         if (active) {
             if ((Double) minimumValueSpinner.getValue() <= (Double) maximumValueSpinner.getValue()) {
-                SWEKParam paramMin = new SWEKParam(parameter.getParameterName(), "" + minimumValueSpinner.getValue(),
-                        SWEKOperand.BIGGER_OR_EQUAL);
-                SWEKParam paramMax = new SWEKParam(parameter.getParameterName(), "" + maximumValueSpinner.getValue(),
-                        SWEKOperand.SMALLER_OR_EQUAL);
+                SWEKParam paramMin = new SWEKParam(parameter.getParameterName(), "" + minimumValueSpinner.getValue(), SWEKOperand.BIGGER_OR_EQUAL);
+                SWEKParam paramMax = new SWEKParam(parameter.getParameterName(), "" + maximumValueSpinner.getValue(), SWEKOperand.SMALLER_OR_EQUAL);
                 ArrayList<SWEKParam> params = new ArrayList<SWEKParam>();
                 params.add(paramMin);
                 params.add(paramMax);
@@ -111,11 +109,15 @@ public class DoubleMinMaxFilterPanel extends AbstractFilterPanel {
         p.add(new JLabel("Minimum Value:"), c);
         c.gridx = 1;
         p.add(minimumValueSpinner, c);
+        c.gridx = 2;
+        p.add(new JLabel(super.units), c);
         c.gridx = 0;
         c.gridy = 1;
         p.add(new JLabel("Maximum Value:"), c);
         c.gridx = 1;
         p.add(maximumValueSpinner, c);
+        c.gridx = 2;
+        p.add(new JLabel(super.units), c);
         return p;
     }
 

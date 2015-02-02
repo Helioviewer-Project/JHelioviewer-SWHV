@@ -67,6 +67,8 @@ public class DoubleValueFilterPanel extends AbstractFilterPanel {
         p.add(new JLabel("Value:"), c);
         c.gridx = 1;
         p.add(spinner, c);
+        c.gridx = 2;
+        p.add(new JLabel(super.units), c);
         return p;
     }
 
