@@ -74,7 +74,7 @@ public class EventPlotConfiguration {
         int startPosition = spacePerLine * 2 * (nrPreviousLines + yPosition);
         // g.setColor(event.getColor());
         drawPosition = new Rectangle((new Double(Math.floor(graphArea.width * scaledX0))).intValue(), startPosition, (new Double(Math.floor(graphArea.width * (scaledX1 - scaledX0)))).intValue() + 1, spacePerLine);
-        if (drawPosition.width != 0 && drawPosition.width < 5) {
+        if (drawPosition.width != 0 && Math.abs(drawPosition.width) < 5) {
             drawPosition.x = drawPosition.x - (5 / drawPosition.width);
             drawPosition.width = 5;
         } else if (drawPosition.width == 0) {
