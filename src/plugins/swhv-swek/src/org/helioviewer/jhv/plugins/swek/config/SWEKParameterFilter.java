@@ -21,6 +21,8 @@ public class SWEKParameterFilter {
     private Double startValue;
     /** The step size for the filter */
     private Double stepSize;
+    /** The units for this filter */
+    private String units;
 
     /**
      * Creates a SWEK parameter filter of no type, with minimum value null,
@@ -33,6 +35,7 @@ public class SWEKParameterFilter {
         max = null;
         startValue = null;
         stepSize = null;
+        units = "";
     }
 
     /**
@@ -47,12 +50,13 @@ public class SWEKParameterFilter {
      * @param max
      *            The maximum value
      */
-    public SWEKParameterFilter(String filterType, double min, double max) {
+    public SWEKParameterFilter(String filterType, double min, double max, String units) {
         super();
         this.filterType = filterType;
         this.min = min;
         this.max = max;
         startValue = null;
+        this.units = units;
     }
 
     /**
@@ -69,13 +73,14 @@ public class SWEKParameterFilter {
      * @param startValue
      *            the start value
      */
-    public SWEKParameterFilter(String filterType, double min, double max, double startValue) {
+    public SWEKParameterFilter(String filterType, double min, double max, double startValue, String units) {
         super();
         this.filterType = filterType;
         this.min = min;
         this.max = max;
         this.startValue = startValue;
         stepSize = null;
+        this.units = units;
     }
 
     /**
@@ -94,13 +99,14 @@ public class SWEKParameterFilter {
      * @param stepSize
      *            the stepsize
      */
-    public SWEKParameterFilter(String filterType, double min, double max, double startValue, Double stepsize) {
+    public SWEKParameterFilter(String filterType, double min, double max, double startValue, Double stepsize, String units) {
         super();
         this.filterType = filterType;
         this.min = min;
         this.max = max;
         this.startValue = startValue;
         stepSize = stepsize;
+        this.units = units;
     }
 
     /**
@@ -196,5 +202,24 @@ public class SWEKParameterFilter {
      */
     public void setStepSize(double stepSize) {
         this.stepSize = stepSize;
+    }
+
+    /**
+     * Gets the units
+     * 
+     * @return the units
+     */
+    public String getUnits() {
+        return units;
+    }
+
+    /**
+     * Sets the units
+     * 
+     * @param units
+     *            the new units
+     */
+    public void setUnits(String units) {
+        this.units = units;
     }
 }

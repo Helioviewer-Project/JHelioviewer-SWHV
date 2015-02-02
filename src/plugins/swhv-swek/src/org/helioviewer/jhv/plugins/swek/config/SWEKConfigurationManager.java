@@ -223,8 +223,7 @@ public class SWEKConfigurationManager {
             configFileURL = (new File(saveFile)).toURI().toURL();
             return true;
         } catch (MalformedURLException e) {
-            Log.debug("Could not create a URL from the value found in the properties file: "
-                    + swekProperties.getProperty("plugin.swek.onlineconfigfile") + " : " + e);
+            Log.debug("Could not create a URL from the value found in the properties file: " + swekProperties.getProperty("plugin.swek.onlineconfigfile") + " : " + e);
         } catch (IOException e) {
             Log.debug("Something went wrong downloading the configuration file from the server or saving it to the local machine : " + e);
         }
@@ -816,10 +815,22 @@ public class SWEKConfigurationManager {
             filter.setMax(parseMax(filterobject));
             filter.setStartValue(parseStartValue(filterobject));
             filter.setStepSize(parseStepSize(filterobject));
+            filter.setUnits(parseUnits(filterobject));
             return filter;
         } else {
             return null;
         }
+    }
+
+    /**
+     * Parses the filter units from the json.
+     * 
+     * @param filterobject
+     * @return
+     * @throws JSONException
+     */
+    private String parseUnits(JSONObject filterobject) throws JSONException {
+        return filterobject.getString("units");
     }
 
     /**

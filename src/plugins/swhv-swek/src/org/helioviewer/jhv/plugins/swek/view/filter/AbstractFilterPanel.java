@@ -45,6 +45,8 @@ public abstract class AbstractFilterPanel extends JPanel {
     /** The stepSize */
     protected Double stepSize;
     /** The filter manager instance */
+    protected String units;
+
     protected final FilterManager filterManager;
 
     protected final JToggleButton filterToggleButton = new JToggleButton("Filter");
@@ -111,8 +113,7 @@ public abstract class AbstractFilterPanel extends JPanel {
         contentPanel.setLayout(new BorderLayout());
         TitledBorder border = BorderFactory.createTitledBorder(parameter.getParameterDisplayName());
         JComponent filter = initFilterComponents();
-        contentPanel.setPreferredSize(new Dimension(Math.max((int) border.getMinimumSize(contentPanel).getWidth(), (int) filter
-                .getMinimumSize().getWidth()) + 20, ((int) filter.getMinimumSize().getHeight()) + 55));
+        contentPanel.setPreferredSize(new Dimension(Math.max((int) border.getMinimumSize(contentPanel).getWidth(), (int) filter.getMinimumSize().getWidth()) + 20, ((int) filter.getMinimumSize().getHeight()) + 55));
         contentPanel.setBorder(BorderFactory.createTitledBorder(parameter.getParameterDisplayName()));
         contentPanel.add(initFilterComponents(), BorderLayout.CENTER);
         filterToggleButton.setSelected(filterManager.isFiltered(eventType, parameter));
@@ -136,7 +137,7 @@ public abstract class AbstractFilterPanel extends JPanel {
         min = parameter.getParameterFilter().getMin() == null ? Double.MIN_VALUE : parameter.getParameterFilter().getMin();
         max = parameter.getParameterFilter().getMax() == null ? Double.MAX_VALUE : parameter.getParameterFilter().getMax();
         stepSize = parameter.getParameterFilter().getStepSize() == null ? 0.1 : parameter.getParameterFilter().getStepSize();
-        middleValue = parameter.getParameterFilter().getStartValue() == null ? (min + max) / 2 : parameter.getParameterFilter()
-                .getStartValue();
+        middleValue = parameter.getParameterFilter().getStartValue() == null ? (min + max) / 2 : parameter.getParameterFilter().getStartValue();
+        units = parameter.getParameterFilter().getUnits();
     }
 }

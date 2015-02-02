@@ -37,8 +37,7 @@ public class DoubleMinFilterPanel extends AbstractFilterPanel {
     @Override
     public void filter(boolean active) {
         if (active) {
-            SWEKParam paramMin = new SWEKParam(parameter.getParameterName(), "" + minimumValueSpinner.getValue(),
-                    SWEKOperand.BIGGER_OR_EQUAL);
+            SWEKParam paramMin = new SWEKParam(parameter.getParameterName(), "" + minimumValueSpinner.getValue(), SWEKOperand.BIGGER_OR_EQUAL);
             ArrayList<SWEKParam> params = new ArrayList<SWEKParam>();
             params.add(paramMin);
             filterManager.addFilter(eventType, parameter, params);
@@ -74,6 +73,8 @@ public class DoubleMinFilterPanel extends AbstractFilterPanel {
         p.add(new JLabel("Minimum Value:"), c);
         c.gridx = 1;
         p.add(minimumValueSpinner, c);
+        c.gridx = 2;
+        p.add(new JLabel(super.units), c);
         return p;
     }
 
