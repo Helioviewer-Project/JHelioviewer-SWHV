@@ -18,7 +18,6 @@ import org.helioviewer.plugins.eveplugin.view.ControlsPanel;
 import org.helioviewer.plugins.eveplugin.view.MainPanel;
 import org.helioviewer.plugins.eveplugin.view.ObservationDialogUIPanel;
 import org.helioviewer.plugins.eveplugin.view.RadioObservationDialogUIPanel;
-import org.helioviewer.plugins.eveplugin.view.SimpleObservationDialogUIPanel;
 import org.helioviewer.viewmodelplugin.interfaces.Plugin;
 
 /**
@@ -63,7 +62,7 @@ public class EVEPlugin implements Plugin, MainContentPanelPlugin {
     @Override
     public void uninstallPlugin() {
         ImageViewerGui.getSingletonInstance().getObservationDialog().removeUserInterface(EVESettings.OBSERVATION_UI_NAME, new ObservationDialogUIPanel(mainPanel.getPlotContainerPanel()));
-        ImageViewerGui.getSingletonInstance().getObservationDialog().removeUserInterface(EVESettings.RADIO_OBSERVATION_UI_NAME, new SimpleObservationDialogUIPanel(mainPanel.getPlotContainerPanel()));
+        ImageViewerGui.getSingletonInstance().getObservationDialog().removeUserInterface(EVESettings.RADIO_OBSERVATION_UI_NAME, new RadioObservationDialogUIPanel(mainPanel.getPlotContainerPanel()));
         ImageViewerGui.getSingletonInstance().getMainContentPanel().removePlugin(this);
         ImageViewerGui.getSingletonInstance().getLeftContentPane().remove(ControlsPanel.getSingletonInstance());
     }
