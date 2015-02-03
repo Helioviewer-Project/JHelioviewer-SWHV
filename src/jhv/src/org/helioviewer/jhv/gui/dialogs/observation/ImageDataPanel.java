@@ -37,6 +37,8 @@ import org.helioviewer.jhv.gui.ImageViewerGui;
 import org.helioviewer.jhv.gui.components.calendar.JHVCalendarDatePicker;
 import org.helioviewer.jhv.gui.components.calendar.JHVCalendarEvent;
 import org.helioviewer.jhv.gui.components.calendar.JHVCalendarListener;
+import org.helioviewer.jhv.gui.dialogs.model.ObservationDialogDateModel;
+import org.helioviewer.jhv.gui.dialogs.model.ObservationDialogDateModelListener;
 import org.helioviewer.jhv.io.APIRequestManager;
 import org.helioviewer.jhv.io.DataSourceServerListener;
 import org.helioviewer.jhv.io.DataSourceServers;
@@ -423,7 +425,7 @@ public class ImageDataPanel extends ObservationDialogPanel implements DataSource
      * 
      * @author Stephan Pagel
      * */
-    private class TimeSelectionPanel extends JPanel implements JHVCalendarListener {
+    private class TimeSelectionPanel extends JPanel implements JHVCalendarListener, ObservationDialogDateModelListener {
 
         // //////////////////////////////////////////////////////////////////////////
         // Definitions
@@ -441,12 +443,15 @@ public class ImageDataPanel extends ObservationDialogPanel implements DataSource
         private JHVCalendarDatePicker calendarStartDate;
         private JHVCalendarDatePicker calendarEndDate;
 
+        private boolean setFromOutside = false;
+
         // //////////////////////////////////////////////////////////////////////////
         // Methods
         // //////////////////////////////////////////////////////////////////////////
 
         public TimeSelectionPanel() {
             // set up the visual components (GUI)
+            ObservationDialogDateModel.getInstance().addListener(this);
             initVisualComponents();
         }
 
@@ -535,11 +540,13 @@ public class ImageDataPanel extends ObservationDialogPanel implements DataSource
             EventQueue.invokeAndWait(new Runnable() {
                 @Override
                 public void run() {
-                    calendarEndDate.setDate(gregorianCalendar.getTime());
-                    textEndTime.setText(TimeTextField.formatter.format(gregorianCalendar.getTime()));
+                    // calendarEndDate.setDate(gregorianCalendar.getTime());
+                    // textEndTime.setText(TimeTextField.formatter.format(gregorianCalendar.getTime()));
+                    setEndDate(gregorianCalendar.getTime());
                     gregorianCalendar.add(GregorianCalendar.DAY_OF_MONTH, -1);
-                    calendarStartDate.setDate(gregorianCalendar.getTime());
-                    textStartTime.setText(TimeTextField.formatter.format(gregorianCalendar.getTime()));
+                    // calendarStartDate.setDate(gregorianCalendar.getTime());
+                    // textStartTime.setText(TimeTextField.formatter.format(gregorianCalendar.getTime()));
+                    setStartDate(gregorianCalendar.getTime());
                 }
             });
         }
@@ -553,6 +560,11 @@ public class ImageDataPanel extends ObservationDialogPanel implements DataSource
         public void setEndDate(Date newEnd) {
             calendarEndDate.setDate(newEnd);
             textEndTime.setText(TimeTextField.formatter.format(newEnd));
+            if (!setFromOutside) {
+                ObservationDialogDateModel.getInstance().setEndDate(newEnd);
+            } else {
+                setFromOutside = false;
+            }
         }
 
         /**
@@ -564,6 +576,11 @@ public class ImageDataPanel extends ObservationDialogPanel implements DataSource
         public void setStartDate(Date newStart) {
             calendarStartDate.setDate(newStart);
             textStartTime.setText(TimeTextField.formatter.format(newStart));
+            if (!setFromOutside) {
+                ObservationDialogDateModel.getInstance().setStartDate(newStart);
+            } else {
+                setFromOutside = false;
+            }
         }
 
         /**
@@ -586,20 +603,26 @@ public class ImageDataPanel extends ObservationDialogPanel implements DataSource
         @Override
         public void actionPerformed(JHVCalendarEvent e) {
 
-            if (e.getSource() == calendarStartDate && !isStartDateBeforeEndDate()) {
-
+            if (e.getSource() == calendarStartDate) {
                 Calendar calendar = new GregorianCalendar();
                 calendar.setTime(calendarStartDate.getDate());
-                calendar.add(Calendar.DATE, 1);
-                calendarEndDate.setDate(calendar.getTime());
+                setStartDate(calendar.getTime());
+                if (!isStartDateBeforeEndDate()) {
+                    calendar.add(Calendar.DATE, 1);
+                    // calendarEndDate.setDate(calendar.getTime());
+                    setEndDate(calendar.getTime());
+                }
             }
 
-            if (e.getSource() == calendarEndDate && !isStartDateBeforeEndDate()) {
-
+            if (e.getSource() == calendarEndDate) {
                 Calendar calendar = new GregorianCalendar();
                 calendar.setTime(calendarEndDate.getDate());
-                calendar.add(Calendar.DATE, -1);
-                calendarStartDate.setDate(calendar.getTime());
+                setEndDate(calendar.getTime());
+                if (!isStartDateBeforeEndDate()) {
+                    calendar.add(Calendar.DATE, -1);
+                    // calendarStartDate.setDate(calendar.getTime());
+                    setStartDate(calendar.getTime());
+                }
             }
         }
 
@@ -634,6 +657,18 @@ public class ImageDataPanel extends ObservationDialogPanel implements DataSource
         public String getEndTime() {
             SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'");
             return dateFormat.format(calendarEndDate.getDate()) + textEndTime.getFormattedInput() + "Z";
+        }
+
+        @Override
+        public void startDateChanged(Date startDate) {
+            setFromOutside = true;
+            setStartDate(startDate);
+        }
+
+        @Override
+        public void endDateChanged(Date endDate) {
+            setFromOutside = true;
+            setEndDate(endDate);
         }
     }
 
