@@ -245,8 +245,8 @@ public class ContrastFilter extends AbstractFilter implements StandardFilter, GL
      */
     @Override
     public void applyGL(GL2 gl) {
-        shader.bind(gl);
         shader.setContrast(gl, contrast);
+        shader.bind(gl);
     }
 
     /**

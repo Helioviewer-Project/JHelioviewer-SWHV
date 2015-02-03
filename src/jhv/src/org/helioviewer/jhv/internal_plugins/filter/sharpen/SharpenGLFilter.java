@@ -109,8 +109,8 @@ public class SharpenGLFilter extends SharpenFilter implements GLFragmentShaderFi
      */
     @Override
     public void applyGL(GL2 gl) {
-        shader.bind(gl);
         shader.setFactors(gl, weighting, pixelWidth, pixelHeight);
+        shader.bind(gl);
     }
 
     /**

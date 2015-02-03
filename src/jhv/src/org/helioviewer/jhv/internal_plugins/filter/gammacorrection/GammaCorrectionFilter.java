@@ -243,8 +243,8 @@ public class GammaCorrectionFilter extends AbstractFilter implements StandardFil
      */
     @Override
     public void applyGL(GL2 gl) {
-        shader.bind(gl);
         shader.setGamma(gl, gamma);
+        shader.bind(gl);
     }
 
     /**
