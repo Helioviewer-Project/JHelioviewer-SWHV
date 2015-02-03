@@ -24,6 +24,8 @@ import org.helioviewer.jhv.gui.ImageViewerGui;
 import org.helioviewer.jhv.gui.components.calendar.JHVCalendarDatePicker;
 import org.helioviewer.jhv.gui.components.calendar.JHVCalendarEvent;
 import org.helioviewer.jhv.gui.components.calendar.JHVCalendarListener;
+import org.helioviewer.jhv.gui.dialogs.model.ObservationDialogDateModel;
+import org.helioviewer.jhv.gui.dialogs.model.ObservationDialogDateModelListener;
 import org.helioviewer.jhv.gui.dialogs.observation.ObservationDialogPanel;
 import org.helioviewer.jhv.layers.LayersListener;
 import org.helioviewer.jhv.layers.LayersModel;
@@ -37,7 +39,7 @@ import org.helioviewer.viewmodel.view.cache.DateTimeCache;
 import org.helioviewer.viewmodel.view.jp2view.JHVJPXView;
 import org.helioviewer.viewmodel.view.jp2view.datetime.ImmutableDateTime;
 
-public abstract class SimpleObservationDialogUIPanel extends ObservationDialogPanel implements JHVCalendarListener, LayersListener {
+public abstract class SimpleObservationDialogUIPanel extends ObservationDialogPanel implements JHVCalendarListener, LayersListener, ObservationDialogDateModelListener {
 
     // //////////////////////////////////////////////////////////////////////////////
     // Definitions
@@ -68,6 +70,7 @@ public abstract class SimpleObservationDialogUIPanel extends ObservationDialogPa
 
     public SimpleObservationDialogUIPanel(final PlotsContainerPanel plotsContainerPanel) {
         this.plotsContainerPanel = plotsContainerPanel;
+        ObservationDialogDateModel.getInstance().addListener(this);
         LayersModel.getSingletonInstance().addLayersListener(this);
         EventQueue.invokeLater(new Runnable() {
             @Override
@@ -295,11 +298,11 @@ public abstract class SimpleObservationDialogUIPanel extends ObservationDialogPa
 
     @Override
     public void actionPerformed(final JHVCalendarEvent e) {
+
+        if (e.getSource() == calendarStartDate && calendarStartDate.getDate() != null) {
+            ObservationDialogDateModel.getInstance().setStartDate(calendarStartDate.getDate());
+        }
         /*
-         * if (e.getSource() == calendarStartDate &&
-         * !isStartDateBeforeOrEqualEndDate()) {
-         * calendarEndDate.setDate(calendarStartDate.getDate()); }
-         * 
          * if (e.getSource() == calendarEndDate &&
          * !isStartDateBeforeOrEqualEndDate()) {
          * calendarStartDate.setDate(calendarStartDate.getDate()); }
@@ -336,7 +339,9 @@ public abstract class SimpleObservationDialogUIPanel extends ObservationDialogPa
                     }
                 }
                 if (beginDate != null && endDate != null) {
-                    calendarStartDate.setDate(new Date(beginDate.getTime() + (endDate.getTime() - beginDate.getTime())));
+                    Date startDate = new Date(beginDate.getTime() + (endDate.getTime() - beginDate.getTime()));
+                    calendarStartDate.setDate(startDate);
+                    ObservationDialogDateModel.getInstance().setStartDate(startDate);
                     // calendarEndDate.setDate(endDate);
                 }
             }
@@ -385,4 +390,13 @@ public abstract class SimpleObservationDialogUIPanel extends ObservationDialogPa
 
     }
 
+    @Override
+    public void startDateChanged(Date startDate) {
+        calendarStartDate.setDate(startDate);
+    }
+
+    @Override
+    public void endDateChanged(Date endDate) {
+
+    }
 }
