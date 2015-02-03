@@ -38,6 +38,8 @@ import org.helioviewer.jhv.gui.components.calendar.JHVCalendarDatePicker;
 import org.helioviewer.jhv.gui.components.calendar.JHVCalendarEvent;
 import org.helioviewer.jhv.gui.components.calendar.JHVCalendarListener;
 import org.helioviewer.jhv.io.APIRequestManager;
+import org.helioviewer.jhv.io.DataSourceServerListener;
+import org.helioviewer.jhv.io.DataSourceServers;
 import org.helioviewer.jhv.io.DataSources;
 import org.helioviewer.jhv.io.DataSources.Item;
 
@@ -45,10 +47,10 @@ import org.helioviewer.jhv.io.DataSources.Item;
  * In order to select and load image data from the Helioviewer server this class
  * provides the corresponding user interface. The UI will be displayed within
  * the {@link ObservationDialog}.
- *
+ * 
  * @author Stephan Pagel
  * */
-public class ImageDataPanel extends ObservationDialogPanel {
+public class ImageDataPanel extends ObservationDialogPanel implements DataSourceServerListener {
 
     // //////////////////////////////////////////////////////////////////////////////
     // Definitions
@@ -78,6 +80,7 @@ public class ImageDataPanel extends ObservationDialogPanel {
     public ImageDataPanel() {
         super();
         instrumentsPanel = new InstrumentsPanel(this);
+        DataSourceServers.getSingletonInstance().addListener(this);
         initVisualComponents();
         initDataSources(false);
     }
@@ -156,7 +159,7 @@ public class ImageDataPanel extends ObservationDialogPanel {
 
     /**
      * Returns the selected start time.
-     *
+     * 
      * @return selected start time.
      * */
     public String getStartTime() {
@@ -165,7 +168,7 @@ public class ImageDataPanel extends ObservationDialogPanel {
 
     /**
      * Returns the selected end time.
-     *
+     * 
      * @return seleted end time.
      */
     public String getEndTime() {
@@ -174,7 +177,7 @@ public class ImageDataPanel extends ObservationDialogPanel {
 
     /**
      * Set a new end date and time
-     *
+     * 
      * @param newEnd
      *            new start date and time
      */
@@ -184,7 +187,7 @@ public class ImageDataPanel extends ObservationDialogPanel {
 
     /**
      * Set a new start date and time
-     *
+     * 
      * @param newStart
      *            new start date and time
      */
@@ -194,7 +197,7 @@ public class ImageDataPanel extends ObservationDialogPanel {
 
     /**
      * Returns the selected cadence.
-     *
+     * 
      * @return selected cadence.
      */
     public String getCadence() {
@@ -203,7 +206,7 @@ public class ImageDataPanel extends ObservationDialogPanel {
 
     /**
      * Returns the selected observatory.
-     *
+     * 
      * @return selected observatory.
      */
     public String getObservation() {
@@ -212,7 +215,7 @@ public class ImageDataPanel extends ObservationDialogPanel {
 
     /**
      * Returns the selected instrument.
-     *
+     * 
      * @return selected instrument.
      * */
     public String getInstrument() {
@@ -221,7 +224,7 @@ public class ImageDataPanel extends ObservationDialogPanel {
 
     /**
      * Returns the selected detector.
-     *
+     * 
      * @return selected detector.
      * */
     public String getDetector() {
@@ -230,7 +233,7 @@ public class ImageDataPanel extends ObservationDialogPanel {
 
     /**
      * Returns the selected measurement.
-     *
+     * 
      * @return selected measurement.
      * */
     public String getMeasurement() {
@@ -368,13 +371,56 @@ public class ImageDataPanel extends ObservationDialogPanel {
     public void dialogOpened() {
     }
 
+    @Override
+    public void serverChanged(final boolean donotloadStartup) {
+        Thread t = new Thread(new Runnable() {
+            @Override
+            public void run() {
+
+                try {
+                    instrumentsPanel.setupSources();
+
+                    enableLoadButton = true;
+                    if (isSelected) {
+                        ImageViewerGui.getSingletonInstance().getObservationDialog().setLoadButtonEnabled(enableLoadButton);
+                    }
+
+                    // Check if we were able to set it up
+                    if (instrumentsPanel.validSelection()) {
+                        if (!donotloadStartup) {
+                            timeSelectionPanel.setupTime();
+                        }
+                        if (!donotloadStartup && Boolean.parseBoolean(Settings.getSingletonInstance().getProperty("startup.loadmovie"))) {
+                            // wait until view chain is ready to go
+                            while (ImageViewerGui.getSingletonInstance() == null || ImageViewerGui.getSingletonInstance().getMainView() == null) {
+                                Thread.sleep(100);
+                            }
+
+                            loadMovie();
+                        }
+                    } else {
+                        Message.err("Could not retrieve data sources", "The list of avaible data could not be fetched. So you cannot use the GUI to add data!" + System.getProperty("line.separator") + " This may happen if you do not have an internet connection or the there are server problems. You can still open local files.", false);
+                    }
+                } catch (InterruptedException e) {
+                    Log.error("Could not setup observation dialog", e);
+                    Message.err("Could not retrieve data sources", "The list of avaible data could not be fetched. So you cannot use the GUI to add data!" + System.getProperty("line.separator") + " This may happen if you do not have an internet connection or the there are server problems. You can still open local files.", false);
+                } catch (InvocationTargetException e) {
+                    Log.error("Could not setup observation dialog", e);
+                    Message.err("Could not retrieve data sources", "The list of avaible data could not be fetched. So you cannot use the GUI to add data!" + System.getProperty("line.separator") + " This may happen if you do not have an internet connection or the there are server problems. You can still open local files.", false);
+                }
+                ImageViewerGui.getSingletonInstance().getObservationDialog().setLoadButtonEnabled(true);
+            }
+        }, "ObservationSetup");
+        t.start();
+    }
+
     // //////////////////////////////////////////////////////////////////////////////
     // Time Selection Panel
     // //////////////////////////////////////////////////////////////////////////////
 
     /**
      * The panel bundles the components to select the start and end time.
-     *
+     * 
      * @author Stephan Pagel
      * */
     private class TimeSelectionPanel extends JPanel implements JHVCalendarListener {
@@ -474,7 +520,7 @@ public class ImageDataPanel extends ObservationDialogPanel {
          * operations run in EventQueue.
          * <p>
          * Must be called after the instrumentPanel has been setup
-         *
+         * 
          * @throws InvocationTargetException
          *             From inserting into the AWT Queue
          * @throws InterruptedException
@@ -500,7 +546,7 @@ public class ImageDataPanel extends ObservationDialogPanel {
 
         /**
          * Set a new end date and time
-         *
+         * 
          * @param newEnd
          *            new start date and time
          */
@@ -511,7 +557,7 @@ public class ImageDataPanel extends ObservationDialogPanel {
 
         /**
          * Set a new start date and time
-         *
+         * 
          * @param newStart
          *            new start date and time
          */
@@ -562,7 +608,7 @@ public class ImageDataPanel extends ObservationDialogPanel {
          * methods checks the entered times when the dates are equal. If the
          * start time is greater or equal than the end time the method will
          * return false.
-         *
+         * 
          * @return boolean value if selected start date is before selected end
          *         date.
          */
@@ -572,7 +618,7 @@ public class ImageDataPanel extends ObservationDialogPanel {
 
         /**
          * Returns the selected start time.
-         *
+         * 
          * @return selected start time.
          * */
         public String getStartTime() {
@@ -582,7 +628,7 @@ public class ImageDataPanel extends ObservationDialogPanel {
 
         /**
          * Returns the selected end time.
-         *
+         * 
          * @return selected end time.
          */
         public String getEndTime() {
@@ -597,7 +643,7 @@ public class ImageDataPanel extends ObservationDialogPanel {
 
     /**
      * The panel bundles the components to select the cadence.
-     *
+     * 
      * @author Stephan Pagel
      * */
     @SuppressWarnings("unused")
@@ -670,9 +716,9 @@ public class ImageDataPanel extends ObservationDialogPanel {
 
         /**
          * Returns the number of seconds of the selected cadence.
-         *
+         * 
          * If no cadence is specified, returns -1.
-         *
+         * 
          * @return number of seconds of the selected cadence.
          * */
         public int getCadence() {
@@ -706,11 +752,11 @@ public class ImageDataPanel extends ObservationDialogPanel {
      * The panel bundles the components to select the instrument etc.
      * <p>
      * Reads the available data from org.helioviewer.jhv.io.DataSources
-     *
+     * 
      * @author rewritten Helge Dietert
      * @author original Stephan Pagel
      * */
-    private static class InstrumentsPanel extends JPanel {
+    private static class InstrumentsPanel extends JPanel implements DataSourceServerListener {
 
         private static final long serialVersionUID = 1L;
         /**
@@ -737,20 +783,26 @@ public class ImageDataPanel extends ObservationDialogPanel {
          * Combobox to select detector and/or measurement
          */
         private final JComboBox comboDetectorMeasurement = new JComboBox(new String[] { "Loading..." });
-        private final String[] serverList = new String[] { "ROB", "Helioviewer.org", "IAS" };
-        private final JComboBox comboServer = new JComboBox(serverList);
+        private final String[] serverList;
+        private final JComboBox comboServer;
         private final JLabel labelServer = new JLabel("Server");
         private ImageDataPanel imageDataPanel;
+
+        private boolean setFromOutside;
 
         /**
          * Default constructor which will setup the components and add listener
          * to update the available choices
-         *
+         * 
          * @param imageDataPanel
          */
         public InstrumentsPanel(final ImageDataPanel imageDataPanel) {
             // Setup grid
+            setFromOutside = false;
             this.imageDataPanel = imageDataPanel;
+            serverList = DataSourceServers.getSingletonInstance().getServerList();
+            DataSourceServers.getSingletonInstance().addListener(this);
+            comboServer = new JComboBox(serverList);
             setLayout(new GridLayout(4, 2, GRIDLAYOUT_HGAP, GRIDLAYOUT_VGAP));
             add(labelServer);
             add(comboServer);
@@ -773,7 +825,7 @@ public class ImageDataPanel extends ObservationDialogPanel {
 
                 /**
                  * Override display component to show tooltip
-                 *
+                 * 
                  * @see javax.swing.DefaultListCellRenderer#getListCellRendererComponent(javax.swing.JList,
                  *      java.lang.Object, int, boolean, boolean)
                  */
@@ -801,30 +853,12 @@ public class ImageDataPanel extends ObservationDialogPanel {
             comboServer.addActionListener(new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent arg0) {
-                    String server = (String) comboServer.getSelectedItem();
-                    if (server.contains("ROB")) {
-                        Settings.getSingletonInstance().setProperty("API.dataSources.path", "http://swhv.oma.be/hv/api/?action=getDataSources&verbose=true&enable=[STEREO_A,STEREO_B,PROBA2]");
-                        Settings.getSingletonInstance().setProperty("API.jp2images.path", "http://swhv.oma.be/hv/api/index.php");
-                        Settings.getSingletonInstance().setProperty("API.jp2series.path", "http://swhv.oma.be/hv/api/index.php");
-                        Settings.getSingletonInstance().setProperty("default.remote.path", "jpip://swhv.oma.be:8090");
-                        Settings.getSingletonInstance().setProperty("API.event.path", "http://swhv.oma.be/hv/api/");
-                        Settings.getSingletonInstance().setProperty("default.httpRemote.path", "http://swhv.oma.be/hv/jp2/");
-                    } else if (server.contains("Helioviewer")) {
-                        Settings.getSingletonInstance().setProperty("API.dataSources.path", "http://helioviewer.org/api/?action=getDataSources&verbose=true&enable=[STEREO_A,STEREO_B,PROBA2]");
-                        Settings.getSingletonInstance().setProperty("API.jp2images.path", "http://helioviewer.org/api/index.php");
-                        Settings.getSingletonInstance().setProperty("API.jp2series.path", "http://helioviewer.org/api/index.php");
-                        Settings.getSingletonInstance().setProperty("default.remote.path", "jpip://helioviewer.org:8090");
-                        Settings.getSingletonInstance().setProperty("API.event.path", "http://helioviewer.org/api/");
-                        Settings.getSingletonInstance().setProperty("default.httpRemote.path", "http://helioviewer.org/jp2/");
-                    } else if (server.contains("IAS")) {
-                        Settings.getSingletonInstance().setProperty("API.dataSources.path", "http://helioviewer.ias.u-psud.fr/helioviewer/api/?action=getDataSources&verbose=true&enable=[STEREO_A,STEREO_B,PROBA2]");
-                        Settings.getSingletonInstance().setProperty("API.jp2images.path", "http://helioviewer.ias.u-psud.fr/helioviewer/api/index.php");
-                        Settings.getSingletonInstance().setProperty("API.jp2series.path", "http://helioviewer.ias.u-psud.fr/helioviewer/api/index.php");
-                        Settings.getSingletonInstance().setProperty("default.remote.path", "jpip://helioviewer.ias.u-psud.fr:8080");
-                        Settings.getSingletonInstance().setProperty("API.event.path", "http://helioviewer.ias.u-psud.fr/helioviewer/api/");
-                        Settings.getSingletonInstance().setProperty("default.httpRemote.path", "http://helioviewer.ias.u-psud.fr/helioviewer/jp2/");
+                    if (!setFromOutside) {
+                        String server = (String) comboServer.getSelectedItem();
+                        DataSourceServers.getSingletonInstance().changeServer(server, true);
+                    } else {
+                        setFromOutside = false;
                     }
-                    imageDataPanel.initDataSources(true);
                 }
             });
             String datasourcesPath = Settings.getSingletonInstance().getProperty("API.dataSources.path");
@@ -876,7 +910,7 @@ public class ImageDataPanel extends ObservationDialogPanel {
          * Function which will setup the data sources. Can be called from any
          * thread and will take care that EventQueue does the job and wait until
          * it is set to return
-         *
+         * 
          * @throws InvocationTargetException
          *             From inserting into the AWT Queue
          * @throws InterruptedException
@@ -895,7 +929,7 @@ public class ImageDataPanel extends ObservationDialogPanel {
         /**
          * Set the items combobox to the to the given parameter and selects the
          * first default item or otherwise the first item
-         *
+         * 
          * @param items
          *            string array which contains the names for the items of the
          *            combobox.
@@ -918,7 +952,7 @@ public class ImageDataPanel extends ObservationDialogPanel {
         /**
          * Set the items combobox to the to the given parameter and selects the
          * first default item or otherwise the first item
-         *
+         * 
          * @param items
          *            string array which contains the names for the items of the
          *            combobox.
@@ -938,7 +972,7 @@ public class ImageDataPanel extends ObservationDialogPanel {
 
         /**
          * Checks whether the user did some valid selection
-         *
+         * 
          * @return true if the user did some valid selecion
          */
         public boolean validSelection() {
@@ -947,7 +981,7 @@ public class ImageDataPanel extends ObservationDialogPanel {
 
         /**
          * Returns the selected observation.
-         *
+         * 
          * @return selected observation (key value), null if no is selected
          * */
         public String getObservatory() {
@@ -962,7 +996,7 @@ public class ImageDataPanel extends ObservationDialogPanel {
 
         /**
          * Returns the selected instrument.
-         *
+         * 
          * @return selected instrument (key value), null if no is selected
          * */
         public String getInstrument() {
@@ -977,7 +1011,7 @@ public class ImageDataPanel extends ObservationDialogPanel {
 
         /**
          * Returns the selected detector.
-         *
+         * 
          * @return selected detector (key value), null if no is selected
          * */
         public String getDetector() {
@@ -992,7 +1026,7 @@ public class ImageDataPanel extends ObservationDialogPanel {
 
         /**
          * Returns the selected measurement.
-         *
+         * 
          * @return selected measurement (key value), null if no is selected
          * */
         public String getMeasurement() {
@@ -1023,7 +1057,7 @@ public class ImageDataPanel extends ObservationDialogPanel {
 
             /**
              * Returns the first item.
-             *
+             * 
              * @return the fist item
              */
             public Item getFirstItem() {
@@ -1032,7 +1066,7 @@ public class ImageDataPanel extends ObservationDialogPanel {
 
             /**
              * Returns the second item.
-             *
+             * 
              * @return the second item
              */
             public Item getSecondItem() {
@@ -1041,7 +1075,7 @@ public class ImageDataPanel extends ObservationDialogPanel {
 
             /**
              * True if it was created as default item
-             *
+             * 
              * @return the defaultItem
              */
             public boolean isDefaultItem() {
@@ -1077,5 +1111,12 @@ public class ImageDataPanel extends ObservationDialogPanel {
                 }
             }
         }
+
+        @Override
+        public void serverChanged(boolean donotloadStartup) {
+            setFromOutside = true;
+            comboServer.setSelectedItem(DataSourceServers.getSingletonInstance().getSelectedServer());
+        }
     }
+
 }
