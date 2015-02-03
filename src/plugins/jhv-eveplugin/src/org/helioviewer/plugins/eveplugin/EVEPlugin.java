@@ -17,12 +17,13 @@ import org.helioviewer.plugins.eveplugin.settings.EVESettings;
 import org.helioviewer.plugins.eveplugin.view.ControlsPanel;
 import org.helioviewer.plugins.eveplugin.view.MainPanel;
 import org.helioviewer.plugins.eveplugin.view.ObservationDialogUIPanel;
+import org.helioviewer.plugins.eveplugin.view.RadioObservationDialogUIPanel;
 import org.helioviewer.plugins.eveplugin.view.SimpleObservationDialogUIPanel;
 import org.helioviewer.viewmodelplugin.interfaces.Plugin;
 
 /**
- *
- *
+ * 
+ * 
  * @author Stephan Pagel
  * */
 public class EVEPlugin implements Plugin, MainContentPanelPlugin {
@@ -50,7 +51,7 @@ public class EVEPlugin implements Plugin, MainContentPanelPlugin {
 
                 ImageViewerGui.getSingletonInstance().getMainContentPanel().addPlugin(EVEPlugin.this);
                 ImageViewerGui.getSingletonInstance().getObservationDialog().addUserInterface(EVESettings.OBSERVATION_UI_NAME, new ObservationDialogUIPanel(mainPanel.getPlotContainerPanel()));
-                ImageViewerGui.getSingletonInstance().getObservationDialog().addUserInterface(EVESettings.RADIO_OBSERVATION_UI_NAME, new SimpleObservationDialogUIPanel(mainPanel.getPlotContainerPanel()));
+                ImageViewerGui.getSingletonInstance().getObservationDialog().addUserInterface(EVESettings.RADIO_OBSERVATION_UI_NAME, new RadioObservationDialogUIPanel(mainPanel.getPlotContainerPanel()));
                 // initialize database connection
                 RadioPlotModel.getSingletonInstance();
                 EventModel.getSingletonInstance().activateEvents();
@@ -93,7 +94,7 @@ public class EVEPlugin implements Plugin, MainContentPanelPlugin {
 
     /**
      * Used for testing the plugin
-     *
+     * 
      * @see org.helioviewer.plugins.eveplugin.EVEPluginLauncher#main(String[])
      * @param args
      */
