@@ -14,6 +14,8 @@ public class DataSourceServers {
 
     private String selectedServer;
 
+    private final String[] serverList = new String[] { "ROB", "Helioviewer.org", "IAS" };
+
     private DataSourceServers() {
         listeners = new ArrayList<DataSourceServerListener>();
         selectedServer = "";
@@ -67,7 +69,7 @@ public class DataSourceServers {
                 }
                 DataSources.getSingletonInstance().reload();
                 for (DataSourceServerListener l : listeners) {
-                    l.serverChanged();
+                    l.serverChanged(donotloadStartup);
                 }
                 ImageViewerGui.getSingletonInstance().getObservationDialog().setLoadButtonEnabled(true);
             }
@@ -76,4 +78,11 @@ public class DataSourceServers {
         t.start();
     }
 
+    public String[] getServerList() {
+        return serverList;
+    }
+
+    public String getSelectedServer() {
+        return selectedServer;
+    }
 }
