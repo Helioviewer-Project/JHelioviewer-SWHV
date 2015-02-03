@@ -174,8 +174,8 @@ public class OpacityFilter extends AbstractFilter implements StandardFilter, GLF
      */
     @Override
     public void applyGL(GL2 gl) {
-        shader.bind(gl);
         shader.setAlpha(gl, opacity);
+        shader.bind(gl);
     }
 
     /**
