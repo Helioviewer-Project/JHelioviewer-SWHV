@@ -172,6 +172,7 @@ public class JHVCalendarDatePicker extends JPanel implements FocusListener, Acti
 
             // check the entered date when text field lost the focus
             checkDateStringInTextField();
+            informAllJHVCalendarListeners(new JHVCalendarEvent(this));
         }
     }
 
@@ -229,6 +230,7 @@ public class JHVCalendarDatePicker extends JPanel implements FocusListener, Acti
             textField.setText(dateFormat.format(calendar.getTime()));
         } else {
             setDate(date);
+
         }
     }
 
@@ -257,12 +259,10 @@ public class JHVCalendarDatePicker extends JPanel implements FocusListener, Acti
         jhvCalendar.componentResized(null);
 
         // correct position of popup when it does not fit into screen area
-        x = x + jhvCalendar.getSize().width > Toolkit.getDefaultToolkit().getScreenSize().width ? Toolkit.getDefaultToolkit()
-                .getScreenSize().width - jhvCalendar.getSize().width : x;
+        x = x + jhvCalendar.getSize().width > Toolkit.getDefaultToolkit().getScreenSize().width ? Toolkit.getDefaultToolkit().getScreenSize().width - jhvCalendar.getSize().width : x;
         x = x < 0 ? 0 : x;
 
-        y = y + jhvCalendar.getSize().height > Toolkit.getDefaultToolkit().getScreenSize().height ? textField.getLocationOnScreen().y
-                - jhvCalendar.getSize().height : y;
+        y = y + jhvCalendar.getSize().height > Toolkit.getDefaultToolkit().getScreenSize().height ? textField.getLocationOnScreen().y - jhvCalendar.getSize().height : y;
         y = y < 0 ? 0 : y;
 
         popup.hide();
