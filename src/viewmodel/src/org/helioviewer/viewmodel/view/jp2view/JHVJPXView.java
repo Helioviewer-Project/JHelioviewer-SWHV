@@ -115,6 +115,7 @@ public class JHVJPXView extends JHVJP2View implements TimedMovieView, CachedMovi
     @Override
     public DateTimeCache getDateTimeCache() {
         return dateTimeCache;
+
     }
 
     /**

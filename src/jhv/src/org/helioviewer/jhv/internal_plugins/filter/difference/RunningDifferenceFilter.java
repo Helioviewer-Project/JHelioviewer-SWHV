@@ -213,9 +213,8 @@ public class RunningDifferenceFilter implements FrameFilter, StandardFilter, Obs
             }
             if (this.currentFrame != previousFrame) {
                 shader.setTruncationValue(gl, this.truncationValue);
-                gl.glActiveTexture(shader.mode);
+                gl.glActiveTexture(GL2.GL_TEXTURE2);
 
-                shader.activateDifferenceTexture(gl);
                 //Bugfix: target id might change if 2D and 3D are switched. Better solutions?
                 try {
                     GLTextureHelper textureHelper = new GLTextureHelper();
@@ -225,9 +224,12 @@ public class RunningDifferenceFilter implements FrameFilter, StandardFilter, Obs
                     lookupDiff = textureHelper.genTextureID(gl);
                     textureHelper.moveImageDataToGLTexture(gl, previousFrame, 0, 0, previousFrame.getWidth(), previousFrame.getHeight(), lookupDiff);
                 }
+                gl.glActiveTexture(GL2.GL_TEXTURE0);
+
             }
         } else {
             shader.setIsDifference(gl, 0.0f);
+            shader.bind(gl);
         }
     }
 
