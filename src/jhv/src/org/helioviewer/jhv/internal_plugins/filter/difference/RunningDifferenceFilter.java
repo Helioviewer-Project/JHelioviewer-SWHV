@@ -5,6 +5,7 @@ import java.util.List;
 
 import javax.media.opengl.GL2;
 import javax.media.opengl.GLException;
+import javax.media.opengl.glu.GLU;
 
 import org.helioviewer.base.logging.Log;
 import org.helioviewer.jhv.gui.states.StateController;
@@ -46,7 +47,8 @@ public class RunningDifferenceFilter implements FrameFilter, StandardFilter, Obs
      */
     // private TimeMachineData timeMachineData;
     private final DifferenceShader shader = new DifferenceShader();
-    private int lookupDiff = -1;
+    private static GLTextureHelper textureHelper;
+    private int diffTex = -1;
     private ImageData currentFrame;
     private float truncationValue = 0.2f;
     private JHVJPXView jpxView;
@@ -182,6 +184,7 @@ public class RunningDifferenceFilter implements FrameFilter, StandardFilter, Obs
 
     @Override
     public void applyGL(GL2 gl) {
+
         if (isActive) {
             if (StateController.getInstance().getCurrentState().getType() == ViewStateEnum.View3D) {
                 if (jpxView.getBaseDifferenceMode()) {
@@ -213,19 +216,10 @@ public class RunningDifferenceFilter implements FrameFilter, StandardFilter, Obs
             }
             if (this.currentFrame != previousFrame) {
                 shader.setTruncationValue(gl, this.truncationValue);
+
                 gl.glActiveTexture(GL2.GL_TEXTURE2);
-
-                //Bugfix: target id might change if 2D and 3D are switched. Better solutions?
-                try {
-                    GLTextureHelper textureHelper = new GLTextureHelper();
-                    textureHelper.moveImageDataToGLTexture(gl, previousFrame, 0, 0, previousFrame.getWidth(), previousFrame.getHeight(), lookupDiff);
-                } catch (GLException e) {
-                    GLTextureHelper textureHelper = new GLTextureHelper();
-                    lookupDiff = textureHelper.genTextureID(gl);
-                    textureHelper.moveImageDataToGLTexture(gl, previousFrame, 0, 0, previousFrame.getWidth(), previousFrame.getHeight(), lookupDiff);
-                }
+                textureHelper.moveImageDataToGLTexture(gl, previousFrame, 0, 0, previousFrame.getWidth(), previousFrame.getHeight(), diffTex);
                 gl.glActiveTexture(GL2.GL_TEXTURE0);
-
             }
         } else {
             shader.setIsDifference(gl, 0.0f);
@@ -236,13 +230,31 @@ public class RunningDifferenceFilter implements FrameFilter, StandardFilter, Obs
     @Override
     public GLShaderBuilder buildFragmentShader(GLShaderBuilder shaderBuilder) {
         shader.build(shaderBuilder);
-        GLTextureHelper textureHelper = new GLTextureHelper();
-        if (lookupDiff != -1) {
-            textureHelper.delTextureID(shaderBuilder.getGL(), lookupDiff);
+
+        GL2 gl = shaderBuilder.getGL();
+        int[] tmp = new int[1];
+
+        if (diffTex != -1) {
+            tmp[0] = diffTex;
+            gl.glDeleteTextures(1, tmp, 0);
         }
-        lookupDiff = textureHelper.genTextureID(shaderBuilder.getGL());
+        gl.glGenTextures(1, tmp, 0);
+        diffTex = tmp[0];
+
+        textureHelper = new GLTextureHelper();
 
         return shaderBuilder;
+    }
+
+    @Override
+    protected void finalize() {
+        if (diffTex != -1) {
+            GL2 gl = (GL2) GLU.getCurrentGL();
+
+            int[] tmp = new int[1];
+            tmp[0] = diffTex;
+            gl.glDeleteTextures(1, tmp, 0);
+        }
     }
 
     public void setTruncationvalue(float truncationValue) {

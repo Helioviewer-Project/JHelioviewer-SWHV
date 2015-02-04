@@ -152,7 +152,7 @@ public class SOHOLUTFilter extends AbstractFilter implements FrameFilter, Standa
         shader.build(shaderBuilder);
         this.changed = true;
 
-        if (lookupTex == -1) {
+        if (lastLut == null) {
             GL2 gl = shaderBuilder.getGL();
 
             int[] tmp = new int[1];
@@ -189,7 +189,7 @@ public class SOHOLUTFilter extends AbstractFilter implements FrameFilter, Standa
 
         gl.glBindTexture(GL2.GL_TEXTURE_1D, lookupTex);
 
-        /* if (changed || lastLut != currlut || invertLUT != lastInverted) */ {
+        if (changed || lastLut != currlut || invertLUT != lastInverted) {
             int[] intLUT;
 
             if (invertLUT) {
@@ -232,8 +232,6 @@ public class SOHOLUTFilter extends AbstractFilter implements FrameFilter, Standa
             int[] tmp = new int[1];
             tmp[0] = lookupTex;
             gl.glDeleteTextures(1, tmp, 0);
-
-            lookupTex = -1;
         }
     }
 
