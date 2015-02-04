@@ -184,7 +184,6 @@ public class RunningDifferenceFilter implements FrameFilter, StandardFilter, Obs
 
     @Override
     public void applyGL(GL2 gl) {
-
         if (isActive) {
             if (StateController.getInstance().getCurrentState().getType() == ViewStateEnum.View3D) {
                 if (jpxView.getBaseDifferenceMode()) {

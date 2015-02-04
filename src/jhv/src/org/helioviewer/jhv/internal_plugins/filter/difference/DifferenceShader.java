@@ -58,7 +58,7 @@ public class DifferenceShader extends GLFragmentShaderProgram {
             program += "if(isdifference>0.24 && isdifference<0.27){" + GLShaderBuilder.LINE_SEP + "\toutput.r = output.r - tex2D(differenceImage, texcoord0.xy).r;" + GLShaderBuilder.LINE_SEP;
             program += "\toutput.r = clamp(output.r,-truncationValue,truncationValue)/truncationValue;" + GLShaderBuilder.LINE_SEP;
             program += "\toutput.r = (output.r + 1.0f)/2.0f;" + GLShaderBuilder.LINE_SEP;
-            program += "}" + GLShaderBuilder.LINE_SEP;
+            program += "} else" + GLShaderBuilder.LINE_SEP;
 
             program += "if(isdifference>0.98 && isdifference<1.01){" + GLShaderBuilder.LINE_SEP + "\toutput.r = output.r - tex2D(differenceImage, texcoord4.xy).r;" + GLShaderBuilder.LINE_SEP;
             program += "\toutput.r = clamp(output.r,-truncationValue,truncationValue)/truncationValue;" + GLShaderBuilder.LINE_SEP;
