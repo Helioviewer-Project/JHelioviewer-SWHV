@@ -78,7 +78,4 @@ public class DifferenceShader extends GLFragmentShaderProgram {
             e.printStackTrace();
         }
     }
-
-    public void activateDifferenceTexture(GL2 gl) {
-    }
 }
