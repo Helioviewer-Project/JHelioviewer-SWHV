@@ -32,7 +32,6 @@ import org.helioviewer.viewmodel.view.ViewListener;
 import org.helioviewer.viewmodel.view.ViewportView;
 import org.helioviewer.viewmodel.view.jp2view.JHVJP2View;
 import org.helioviewer.viewmodel.view.jp2view.JHVJPXView;
-import org.helioviewer.viewmodel.view.opengl.GLTextureHelper;
 import org.helioviewer.viewmodel.view.opengl.shader.GLFragmentShaderView;
 import org.helioviewer.viewmodel.view.opengl.shader.GLShaderBuilder;
 import org.helioviewer.viewmodel.viewport.Viewport;
@@ -76,9 +75,8 @@ public class GL3DImageTextureView extends AbstractGL3DView implements GL3DView, 
     public void render3D(GL3DState state) {
         if (this.getView() != null) {
             // Only copy Framebuffer if necessary
-            GLTextureHelper th = new GLTextureHelper();
             if (true) {
-                this.capturedRegion = copyScreenToTexture(state, th);
+                this.capturedRegion = copyScreenToTexture(state);
                 // gl.glClear(GL2.GL_COLOR_BUFFER_BIT | GL2.GL_DEPTH_BUFFER_BIT);
                 if (forceUpdate) {
                     this.notifyViewListeners(new ChangeEvent(new ImageTextureRecapturedReason(this, this.textureId, this.textureScale, StaticRegion.createAdaptedRegion(this.capturedRegion.getRectangle()))));
@@ -103,7 +101,7 @@ public class GL3DImageTextureView extends AbstractGL3DView implements GL3DView, 
         return this.textureId;
     }
 
-    public Region copyScreenToTexture(GL3DState state, GLTextureHelper th) {
+    public Region copyScreenToTexture(GL3DState state) {
         SubimageDataView sim = this.getAdapter(ImageInfoView.class).getAdapter(SubimageDataView.class);
         MetaDataView metadataView = this.getAdapter(MetaDataView.class);
 
@@ -116,8 +114,7 @@ public class GL3DImageTextureView extends AbstractGL3DView implements GL3DView, 
         }
 
         this.textureId = getAdapter(JHVJP2View.class).texID;
-        // th.copyFrameBufferToTexture(gl, textureId, captureRectangle);
-        this.textureScale = th.getTextureScale(textureId);
+        this.textureScale = textureHelper.getTextureScale(textureId);
         if (vertexShader != null) {
 
             double xOffset = (region.getLowerLeftCorner().getX());
