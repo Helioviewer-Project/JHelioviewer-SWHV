@@ -5,7 +5,6 @@ import java.util.Date;
 import javax.media.opengl.GL2;
 
 import org.helioviewer.base.math.MathUtils;
-import org.helioviewer.base.math.Vector2dDouble;
 import org.helioviewer.base.physics.Astronomy;
 import org.helioviewer.base.physics.Constants;
 import org.helioviewer.gl3d.changeevent.ImageTextureRecapturedReason;
@@ -52,8 +51,6 @@ public class GL3DImageTextureView extends AbstractGL3DView implements GL3DView, 
         super();
     }
 
-    private int textureId = -1;
-    private Vector2dDouble textureScale = null;
     private Region capturedRegion = null;
     private boolean recaptureRequested = true;
     private boolean regionChanged = true;
@@ -79,26 +76,13 @@ public class GL3DImageTextureView extends AbstractGL3DView implements GL3DView, 
                 this.capturedRegion = copyScreenToTexture(state);
                 // gl.glClear(GL2.GL_COLOR_BUFFER_BIT | GL2.GL_DEPTH_BUFFER_BIT);
                 if (forceUpdate) {
-                    this.notifyViewListeners(new ChangeEvent(new ImageTextureRecapturedReason(this, this.textureId, this.textureScale, StaticRegion.createAdaptedRegion(this.capturedRegion.getRectangle()))));
+                    this.notifyViewListeners(new ChangeEvent(new ImageTextureRecapturedReason(this, StaticRegion.createAdaptedRegion(this.capturedRegion.getRectangle()))));
                 }
                 regionChanged = false;
                 forceUpdate = false;
                 recaptureRequested = false;
             }
         }
-    }
-
-    @Override
-    public void deactivate(GL3DState state) {
-        textureHelper.delTextureID(state.gl, this.textureId);
-        this.textureId = -1;
-    }
-
-    public int getTextureId() {
-        if (this.textureId == 0 || this.textureId == -1) {
-            this.textureId = getAdapter(JHVJP2View.class).texID;
-        }
-        return this.textureId;
     }
 
     public Region copyScreenToTexture(GL3DState state) {
@@ -113,10 +97,7 @@ public class GL3DImageTextureView extends AbstractGL3DView implements GL3DView, 
             return null;
         }
 
-        this.textureId = getAdapter(JHVJP2View.class).texID;
-        this.textureScale = textureHelper.getTextureScale(textureId);
         if (vertexShader != null) {
-
             double xOffset = (region.getLowerLeftCorner().getX());
             double yOffset = (region.getLowerLeftCorner().getY());
             double xScale = (1. / region.getWidth());
@@ -198,10 +179,6 @@ public class GL3DImageTextureView extends AbstractGL3DView implements GL3DView, 
                 }
             }
         });
-    }
-
-    public Vector2dDouble getTextureScale() {
-        return textureScale;
     }
 
     public Region getCapturedRegion() {
