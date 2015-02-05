@@ -33,10 +33,10 @@ import org.helioviewer.viewmodel.view.jp2view.JHVJP2View;
 
 /**
  * This class provides methods to download files from a server.
- *
+ * 
  * Most of the methods only will work with the current Helioviewer server
  * because they modify links and requests that they will fit with the API.
- *
+ * 
  * @author Stephan Pagel
  * @author Andre Dau
  * @author Helge Dietert
@@ -44,7 +44,7 @@ import org.helioviewer.viewmodel.view.jp2view.JHVJP2View;
 public class APIRequestManager {
     /**
      * Returns the date of the latest image available from the server
-     *
+     * 
      * @param observatory
      *            observatory of the requested image.
      * @param instrument
@@ -99,7 +99,7 @@ public class APIRequestManager {
     /**
      * Sends an request to the server to compute where the nearest image is
      * located on the server. The address of the file will be returned.
-     *
+     * 
      * @param addToViewChain
      *            specifies whether the generated ImageInfoView should be added
      *            to the view chain of the main image
@@ -143,7 +143,7 @@ public class APIRequestManager {
     /**
      * Sends an request to the server to compute where the image series is
      * located on the server. The address of the file will be returned.
-     *
+     * 
      * @param addToViewChain
      *            specifies whether the generated ImageInfoView should be added
      *            to the view chain of the main image
@@ -179,7 +179,7 @@ public class APIRequestManager {
 
         Date endDate = new Date();
         try {
-            endDate = format.parse(startTime);
+            endDate = format.parse(endTime);
         } catch (ParseException e1) {
         }
 
@@ -222,7 +222,7 @@ public class APIRequestManager {
      * message from the server.
      * <p>
      * Returns the corresponding ImageInfoView for the file.
-     *
+     * 
      * @param addToViewChain
      *            specifies whether the generated ImageInfoView should be added
      *            to the view chain of the main image
@@ -293,7 +293,7 @@ public class APIRequestManager {
     /**
      * Loads the image or image series from the given URI, creates a new image
      * info view and adds it as a new layer to the view chain of the main image.
-     *
+     * 
      * @param uri
      *            specifies the location of the file.
      * @param addToViewChain
@@ -322,7 +322,7 @@ public class APIRequestManager {
     /**
      * Loads the image or image series from the given URI, creates a new image
      * info view and adds it as a new layer to the view chain of the main image.
-     *
+     * 
      * @param uri
      *            specifies the location of the file.
      * @param downloadURI
@@ -355,7 +355,7 @@ public class APIRequestManager {
     /**
      * Method does remote opening. If image series, file is downloaded. If
      * single frame, file is opened via JPIP on delphi.nascom.nasa.gov:8090.
-     *
+     * 
      * @param addToViewChain
      *            specifies whether the generated ImageInfoView should be added
      *            to the view chain of the main image
