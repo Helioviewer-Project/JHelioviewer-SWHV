@@ -265,7 +265,7 @@ public abstract class SimpleObservationDialogUIPanel extends ObservationDialogPa
          * JOptionPane.showMessageDialog(null, "End date is before start date!",
          * "", JOptionPane.ERROR_MESSAGE); return false; }
          */
-
+        ObservationDialogDateModel.getInstance().setStartDate(getDate());
         Set<YAxisElement> yAxisElements = DrawController.getSingletonInstance().getYAxisElements(PlotsContainerPanel.PLOT_IDENTIFIER_MASTER);
         boolean downloadOK = false;
         if (yAxisElements.size() >= 2) {
