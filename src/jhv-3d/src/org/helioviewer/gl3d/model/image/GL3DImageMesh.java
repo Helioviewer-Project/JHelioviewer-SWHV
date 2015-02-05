@@ -2,7 +2,6 @@ package org.helioviewer.gl3d.model.image;
 
 import javax.media.opengl.GL2;
 
-import org.helioviewer.base.math.Vector2dDouble;
 import org.helioviewer.gl3d.changeevent.ImageTextureRecapturedReason;
 import org.helioviewer.gl3d.scenegraph.GL3DMesh;
 import org.helioviewer.gl3d.scenegraph.GL3DState;
@@ -32,7 +31,6 @@ public abstract class GL3DImageMesh extends GL3DMesh {
     private final GLFragmentShaderProgram fragmentShaderProgram;
 
     protected Region capturedRegion;
-    protected Vector2dDouble textureScale;
 
     private boolean reshapeRequested = false;
 
@@ -51,7 +49,6 @@ public abstract class GL3DImageMesh extends GL3DMesh {
                 if (reason != null) {
                     reshapeRequested = true;
                     capturedRegion = reason.getCapturedRegion();
-                    textureScale = reason.getTextureScale();
                     markAsChanged();
                     // Log.debug("GL3DImageMesh.reshape: "+getName()+" Reason="+reason+", Event="+aEvent);
                 }
