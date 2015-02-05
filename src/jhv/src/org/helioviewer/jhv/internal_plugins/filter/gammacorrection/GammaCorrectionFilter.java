@@ -162,21 +162,22 @@ public class GammaCorrectionFilter extends AbstractFilter implements StandardFil
                 if (forceRefilter || rebuildTable) {
                     buildTable8();
                 }
+
                 int[] pixelData = ((Int32ImageTransport) data.getImageTransport()).getInt32PixelData();
                 int[] resultPixelData = new int[pixelData.length];
-                for (int i = 0; i < pixelData.length; i++) {
 
+                for (int i = 0; i < pixelData.length; i++) {
                     int rgb = pixelData[i];
                     int a = rgb >>> 24;
-                int r = (rgb >>> 16) & 0xFF;
-                int g = (rgb >>> 8) & 0xFF;
-                int b = rgb & 0xff;
+                    int r = (rgb >>> 16) & 0xFF;
+                    int g = (rgb >>> 8) & 0xFF;
+                    int b = rgb & 0xff;
 
-                r = gammaTable8[r] & 0xFF;
-                g = gammaTable8[g] & 0xFF;
-                b = gammaTable8[b] & 0xFF;
+                    r = gammaTable8[r] & 0xFF;
+                    g = gammaTable8[g] & 0xFF;
+                    b = gammaTable8[b] & 0xFF;
 
-                resultPixelData[i] = (a << 24) | (r << 16) | (g << 8) | b;
+                    resultPixelData[i] = (a << 24) | (r << 16) | (g << 8) | b;
                 }
                 return new ARGBInt32ImageData(data, resultPixelData);
             }
@@ -192,7 +193,7 @@ public class GammaCorrectionFilter extends AbstractFilter implements StandardFil
      */
     private class GammaCorrectionShader extends GLFragmentShaderProgram {
         private int gammaParamRef;
-        private double[] gammaParamFloat;
+        private double[] gammaParamFloat = new double[1];
 
         /**
          * Sets the gamma value

@@ -32,7 +32,6 @@ public class DifferenceShader extends GLFragmentShaderProgram {
         super.bind(gl);
         this.bindEnvVars(gl, this.truncationValueRef, truncationValueFloat);
         this.bindEnvVars(gl, this.isDifferenceValueRef, isDifferenceValueFloat);
-
     }
 
     /**
