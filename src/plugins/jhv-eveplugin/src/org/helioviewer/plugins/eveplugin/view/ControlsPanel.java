@@ -21,6 +21,7 @@ import javax.swing.JComboBox;
 import javax.swing.JPanel;
 import javax.swing.JToggleButton;
 
+import org.helioviewer.base.logging.Log;
 import org.helioviewer.base.math.Interval;
 import org.helioviewer.jhv.gui.IconBank;
 import org.helioviewer.jhv.gui.IconBank.JHVIcon;
@@ -41,6 +42,7 @@ import org.helioviewer.plugins.eveplugin.view.linedataselector.LineDataSelectorM
 import org.helioviewer.plugins.eveplugin.view.linedataselector.LineDataSelectorPanel;
 import org.helioviewer.plugins.eveplugin.view.plot.PlotsContainerPanel;
 import org.helioviewer.viewmodel.view.View;
+import org.helioviewer.viewmodel.view.jp2view.JHVJPXView;
 
 /**
  * 
@@ -157,9 +159,7 @@ public class ControlsPanel extends JPanel implements ActionListener, LayersListe
         if (e.getSource().equals(addLayerButton)) {
             ImageViewerGui.getSingletonInstance().getObservationDialog().showDialog(EVESettings.OBSERVATION_UI_NAME);
         } else if (e.getSource() == periodFromLayersButton) {
-            final Interval<Date> interval = new Interval<Date>(LayersModel.getSingletonInstance().getFirstDate(), LayersModel.getSingletonInstance().getLastDate());
-            ZoomController.getSingletonInstance().setSelectedInterval(interval, true);
-            TimeIntervalLockModel.getInstance().setLocked(periodFromLayersButton.isSelected());
+            setDateRange();
         } else if (e.getSource().equals(zoomComboBox)) {
             final ZoomComboboxItem item = (ZoomComboboxItem) zoomComboBox.getSelectedItem();
             selectedIntervalByZoombox = null;
@@ -171,6 +171,19 @@ public class ControlsPanel extends JPanel implements ActionListener, LayersListe
                     selectedIndexSetByProgram = false;
                 }
             }
+        }
+    }
+
+    private void setDateRange() {
+        View activeView = LayersModel.getSingletonInstance().getActiveView();
+        JHVJPXView jpxView = activeView.getAdapter(JHVJPXView.class);
+        if (jpxView != null) {
+            Date start = jpxView.getDateRange().getStart();
+            Date end = jpxView.getDateRange().getEnd();
+            Log.debug("start " + start + " end " + end);
+            final Interval<Date> interval = new Interval<Date>(start, end);
+            ZoomController.getSingletonInstance().setSelectedInterval(interval, true);
+            TimeIntervalLockModel.getInstance().setLocked(periodFromLayersButton.isSelected());
         }
     }
 
@@ -321,13 +334,10 @@ public class ControlsPanel extends JPanel implements ActionListener, LayersListe
         // addElementToModel(model, startDate, interval, Calendar.DATE, 1,
         // ZOOM.Day);
 
-        /*
-         * if (!months) { addElementToModel(model, startDate, interval,
-         * Calendar.HOUR, 12, ZOOM.Hour); addElementToModel(model, startDate,
-         * interval, Calendar.HOUR, 6, ZOOM.Hour); addElementToModel(model,
-         * startDate, interval, Calendar.HOUR, 1, ZOOM.Hour); }
-         */
-        // }
+        addElementToModel(model, startDate, interval, Calendar.HOUR, 12, ZOOM.Hour);
+        addElementToModel(model, startDate, interval, Calendar.HOUR, 6, ZOOM.Hour);
+        addElementToModel(model, startDate, interval, Calendar.HOUR, 1, ZOOM.Hour);
+
     }
 
     private boolean addCarringtonRotationToModel(final DefaultComboBoxModel model, final Date startDate, final Interval<Date> interval, final int numberOfRotations) {
