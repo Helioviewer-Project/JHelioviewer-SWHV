@@ -317,7 +317,6 @@ public class GLTextureHelper {
     }
 
     public int copyFrameBufferToSubTexture(GL2 gl, int texture, Rectangle rect) {
-        gl.glActiveTexture(GL2.GL_TEXTURE0);
         textureImplementation.genTexture2D(gl, texture, GL2.GL_RGBA, rect.width, rect.height, GL2.GL_RGBA, GL2.GL_UNSIGNED_BYTE, null);
         textureImplementation.copyFrameBufferToTexture(gl, texture, rect);
         // Log.debug("GLTextureHelper.copyFrameBuffer: Viewport= "+rect.x+", "+rect.y+", "+rect.width+", "+rect.height);
@@ -340,7 +339,6 @@ public class GLTextureHelper {
      * @return texture the frame buffer was copied to
      */
     public int copyFrameBufferToTexture(GL2 gl, int texture, Rectangle rect) {
-        gl.glActiveTexture(GL2.GL_TEXTURE0);
         textureImplementation.genTexture2D(gl, texture, GL2.GL_RGBA, rect.width, rect.height, GL2.GL_RGBA, GL2.GL_UNSIGNED_BYTE, null);
         textureImplementation.copyFrameBufferToTexture(gl, texture, rect);
         // Log.debug("GLTextureHelper.copyFrameBuffer: Viewport= "+rect.x+", "+rect.y+", "+rect.width+", "+rect.height);
@@ -424,9 +422,6 @@ public class GLTextureHelper {
      */
     public void renderImageDataToScreen(GL2 gl, Region region, ImageData source, JHVJP2View jpxView) {
         synchronized (allTextures) {
-
-            gl.glActiveTexture(GL2.GL_TEXTURE0);
-
             if (source == null)
                 return;
             if (source.getWidth() <= maxTextureSize && source.getHeight() <= maxTextureSize) {

@@ -597,8 +597,6 @@ public class GLComponentView extends AbstractComponentView implements ViewListen
 
     @Override
     public void display() {
-        Log.error("CANVASDISPLAY");
-
         try {
             this.canvas.display();
         } catch (Exception e) {
