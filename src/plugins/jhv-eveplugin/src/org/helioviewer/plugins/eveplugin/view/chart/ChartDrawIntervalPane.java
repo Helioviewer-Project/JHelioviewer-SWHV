@@ -36,6 +36,7 @@ import org.helioviewer.plugins.eveplugin.model.PlotAreaSpace;
 import org.helioviewer.plugins.eveplugin.model.PlotAreaSpaceManager;
 import org.helioviewer.plugins.eveplugin.settings.EVEAPI.API_RESOLUTION_AVERAGES;
 import org.helioviewer.viewmodel.view.View;
+import org.helioviewer.viewmodel.view.jp2view.JHVJPXView;
 
 /**
  * 
@@ -697,21 +698,57 @@ public class ChartDrawIntervalPane extends JComponent implements ZoomControllerL
     @Override
     public void layerAdded(int idx) {
         movieInterval = LayersModel.getSingletonInstance().getFrameInterval();
-        repaint();
+        View activeView = LayersModel.getSingletonInstance().getActiveView();
+        JHVJPXView jpxView = activeView.getAdapter(JHVJPXView.class);
+        if (jpxView != null) {
+            Date start = jpxView.getDateRange().getStart();
+            Date end = jpxView.getDateRange().getEnd();
+            movieInterval = new Interval<Date>(start, end);
+            repaint();
+        }
     }
 
     @Override
     public void layerRemoved(View oldView, int oldIdx) {
         movieInterval = LayersModel.getSingletonInstance().getFrameInterval();
-        repaint();
+        View activeView = LayersModel.getSingletonInstance().getActiveView();
+        if (activeView != null) {
+            JHVJPXView jpxView = activeView.getAdapter(JHVJPXView.class);
+            if (jpxView != null) {
+                Date start = jpxView.getDateRange().getStart();
+                Date end = jpxView.getDateRange().getEnd();
+                movieInterval = new Interval<Date>(start, end);
+                repaint();
+            }
+            movieInterval = null;
+            repaint();
+        }
     }
 
     @Override
     public void layerChanged(int idx) {
+        movieInterval = LayersModel.getSingletonInstance().getFrameInterval();
+        View activeView = LayersModel.getSingletonInstance().getActiveView();
+        JHVJPXView jpxView = activeView.getAdapter(JHVJPXView.class);
+        if (jpxView != null) {
+            Date start = jpxView.getDateRange().getStart();
+            Date end = jpxView.getDateRange().getEnd();
+            movieInterval = new Interval<Date>(start, end);
+            repaint();
+        }
     }
 
     @Override
     public void activeLayerChanged(int idx) {
+        movieInterval = LayersModel.getSingletonInstance().getFrameInterval();
+        View activeView = LayersModel.getSingletonInstance().getActiveView();
+        JHVJPXView jpxView = activeView.getAdapter(JHVJPXView.class);
+        if (jpxView != null) {
+            Date start = jpxView.getDateRange().getStart();
+            Date end = jpxView.getDateRange().getEnd();
+            movieInterval = new Interval<Date>(start, end);
+            repaint();
+        }
     }
 
     @Override

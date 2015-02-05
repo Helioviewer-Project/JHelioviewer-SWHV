@@ -21,7 +21,6 @@ import javax.swing.JComboBox;
 import javax.swing.JPanel;
 import javax.swing.JToggleButton;
 
-import org.helioviewer.base.logging.Log;
 import org.helioviewer.base.math.Interval;
 import org.helioviewer.jhv.gui.IconBank;
 import org.helioviewer.jhv.gui.IconBank.JHVIcon;
@@ -180,7 +179,7 @@ public class ControlsPanel extends JPanel implements ActionListener, LayersListe
         if (jpxView != null) {
             Date start = jpxView.getDateRange().getStart();
             Date end = jpxView.getDateRange().getEnd();
-            Log.debug("start " + start + " end " + end);
+            // Log.debug("start " + start + " end " + end);
             final Interval<Date> interval = new Interval<Date>(start, end);
             ZoomController.getSingletonInstance().setSelectedInterval(interval, true);
             TimeIntervalLockModel.getInstance().setLocked(periodFromLayersButton.isSelected());
