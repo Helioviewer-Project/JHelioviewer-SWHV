@@ -817,6 +817,11 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
                 chartRedrawRequested();
             }
         }
+        if (time == null) {
+            movieTimestamp = null;
+            updateMovieLineInformation();
+            chartRedrawRequested();
+        }
     }
 
     @Override

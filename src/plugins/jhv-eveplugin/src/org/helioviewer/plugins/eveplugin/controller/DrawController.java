@@ -14,6 +14,8 @@ import org.helioviewer.base.math.Interval;
 import org.helioviewer.jhv.data.datatype.event.JHVEvent;
 import org.helioviewer.jhv.data.datatype.event.JHVEventHighlightListener;
 import org.helioviewer.jhv.gui.ViewListenerDistributor;
+import org.helioviewer.jhv.layers.LayersListener;
+import org.helioviewer.jhv.layers.LayersModel;
 import org.helioviewer.plugins.eveplugin.base.Range;
 import org.helioviewer.plugins.eveplugin.draw.DrawableElement;
 import org.helioviewer.plugins.eveplugin.draw.DrawableType;
@@ -29,7 +31,7 @@ import org.helioviewer.viewmodel.view.TimedMovieView;
 import org.helioviewer.viewmodel.view.View;
 import org.helioviewer.viewmodel.view.ViewListener;
 
-public class DrawController implements ZoomControllerListener, LineDataSelectorModelListener, ViewListener, JHVEventHighlightListener {
+public class DrawController implements ZoomControllerListener, LineDataSelectorModelListener, ViewListener, JHVEventHighlightListener, LayersListener {
 
     private static DrawController instance;
     private final Map<String, DrawControllerData> drawControllerData;
@@ -44,6 +46,7 @@ public class DrawController implements ZoomControllerListener, LineDataSelectorM
         LineDataSelectorModel.getSingletonInstance().addLineDataSelectorModelListener(this);
         forAllPlotIdentifiers = new ArrayList<DrawControllerListener>();
         ViewListenerDistributor.getSingletonInstance().addViewListener(this);
+        LayersModel.getSingletonInstance().addLayersListener(this);
     }
 
     public static DrawController getSingletonInstance() {
@@ -336,5 +339,55 @@ public class DrawController implements ZoomControllerListener, LineDataSelectorM
     @Override
     public void eventHightChanged(JHVEvent event) {
         fireRedrawRequest();
+    }
+
+    @Override
+    public void layerAdded(int idx) {
+        // TODO Auto-generated method stub
+
+    }
+
+    @Override
+    public void layerRemoved(View oldView, int oldIdx) {
+        View activeView = LayersModel.getSingletonInstance().getActiveView();
+        if (activeView == null) {
+            fireRedrawRequestMovieFrameChanged(null);
+        }
+    }
+
+    @Override
+    public void layerChanged(int idx) {
+        // TODO Auto-generated method stub
+
+    }
+
+    @Override
+    public void activeLayerChanged(int idx) {
+        // TODO Auto-generated method stub
+
+    }
+
+    @Override
+    public void viewportGeometryChanged() {
+        // TODO Auto-generated method stub
+
+    }
+
+    @Override
+    public void timestampChanged(int idx) {
+        // TODO Auto-generated method stub
+
+    }
+
+    @Override
+    public void subImageDataChanged() {
+        // TODO Auto-generated method stub
+
+    }
+
+    @Override
+    public void layerDownloaded(int idx) {
+        // TODO Auto-generated method stub
+
     }
 }
