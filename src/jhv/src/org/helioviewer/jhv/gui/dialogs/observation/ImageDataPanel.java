@@ -9,6 +9,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
@@ -343,7 +344,14 @@ public class ImageDataPanel extends ObservationDialogPanel implements DataSource
             Message.err("Data is not selected", "There is no information what to add", false);
             return false;
         }
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ");
+        try {
+            ObservationDialogDateModel.getInstance().setStartDate(sdf.parse(timeSelectionPanel.getStartTime()));
+        } catch (ParseException e) {
+            Log.debug("Date could not be parsed" + e);
+        }
         if (timeSelectionPanel.getStartTime().equals(timeSelectionPanel.getEndTime())) {
+
             // load image
             loadImage();
 
