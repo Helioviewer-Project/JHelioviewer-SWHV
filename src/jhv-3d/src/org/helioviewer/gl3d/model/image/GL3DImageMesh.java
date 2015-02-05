@@ -2,7 +2,6 @@ package org.helioviewer.gl3d.model.image;
 
 import javax.media.opengl.GL2;
 
-import org.helioviewer.base.math.Vector2dDouble;
 import org.helioviewer.gl3d.changeevent.ImageTextureRecapturedReason;
 import org.helioviewer.gl3d.scenegraph.GL3DMesh;
 import org.helioviewer.gl3d.scenegraph.GL3DState;
@@ -13,7 +12,6 @@ import org.helioviewer.viewmodel.region.Region;
 import org.helioviewer.viewmodel.view.View;
 import org.helioviewer.viewmodel.view.ViewListener;
 import org.helioviewer.viewmodel.view.opengl.GLFilterView;
-import org.helioviewer.viewmodel.view.opengl.GLTextureHelper;
 import org.helioviewer.viewmodel.view.opengl.shader.GLFragmentShaderProgram;
 import org.helioviewer.viewmodel.view.opengl.shader.GLVertexShaderProgram;
 
@@ -29,13 +27,10 @@ public abstract class GL3DImageMesh extends GL3DMesh {
 
     protected GL3DImageTextureView imageTextureView;
 
-    private final GLTextureHelper th = new GLTextureHelper();
-
     private final GLVertexShaderProgram vertexShaderProgram;
     private final GLFragmentShaderProgram fragmentShaderProgram;
 
     protected Region capturedRegion;
-    protected Vector2dDouble textureScale;
 
     private boolean reshapeRequested = false;
 
@@ -54,7 +49,6 @@ public abstract class GL3DImageMesh extends GL3DMesh {
                 if (reason != null) {
                     reshapeRequested = true;
                     capturedRegion = reason.getCapturedRegion();
-                    textureScale = reason.getTextureScale();
                     markAsChanged();
                     // Log.debug("GL3DImageMesh.reshape: "+getName()+" Reason="+reason+", Event="+aEvent);
                 }
@@ -99,10 +93,6 @@ public abstract class GL3DImageMesh extends GL3DMesh {
             glfilter.renderGL(state.gl, true);
         }
 
-        th.bindTexture(state.gl, this.imageTextureView.getTextureId());
-        state.gl.glTexParameteri(GL2.GL_TEXTURE_2D, GL2.GL_TEXTURE_MIN_FILTER, GL2.GL_LINEAR);
-        state.gl.glTexParameteri(GL2.GL_TEXTURE_2D, GL2.GL_TEXTURE_MAG_FILTER, GL2.GL_LINEAR);
-
         GLVertexShaderProgram.pushShader(state.gl);
         GLFragmentShaderProgram.pushShader(state.gl);
         this.vertexShaderProgram.bind(state.gl);
@@ -112,8 +102,6 @@ public abstract class GL3DImageMesh extends GL3DMesh {
 
         GLVertexShaderProgram.popShader(state.gl);
         GLFragmentShaderProgram.popShader(state.gl);
-
-        // th.bindTexture(state.gl, 0);
     }
 
     public GL3DImageTextureView getImageTextureView() {
