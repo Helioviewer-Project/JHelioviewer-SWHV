@@ -47,7 +47,6 @@ public class RunningDifferenceFilter implements FrameFilter, StandardFilter, Obs
      */
     // private TimeMachineData timeMachineData;
     private final DifferenceShader shader = new DifferenceShader();
-    private static GLTextureHelper textureHelper;
     private int diffTex = -1;
     private ImageData currentFrame;
     private float truncationValue = 0.2f;
@@ -217,7 +216,7 @@ public class RunningDifferenceFilter implements FrameFilter, StandardFilter, Obs
                 shader.setTruncationValue(gl, this.truncationValue);
 
                 gl.glActiveTexture(GL2.GL_TEXTURE2);
-                textureHelper.moveImageDataToGLTexture(gl, previousFrame, 0, 0, previousFrame.getWidth(), previousFrame.getHeight(), diffTex);
+                GLTextureHelper.moveImageDataToGLTexture(gl, previousFrame, 0, 0, previousFrame.getWidth(), previousFrame.getHeight(), diffTex);
                 gl.glActiveTexture(GL2.GL_TEXTURE0);
             }
         } else {
@@ -239,8 +238,6 @@ public class RunningDifferenceFilter implements FrameFilter, StandardFilter, Obs
         }
         gl.glGenTextures(1, tmp, 0);
         diffTex = tmp[0];
-
-        textureHelper = new GLTextureHelper();
 
         return shaderBuilder;
     }
