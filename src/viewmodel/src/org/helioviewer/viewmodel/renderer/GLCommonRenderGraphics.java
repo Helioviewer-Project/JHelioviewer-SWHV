@@ -106,7 +106,7 @@ public class GLCommonRenderGraphics {
             }
 
             texID = textureHelper.genTextureID(gl);
-            textureHelper.moveBufferedImageToGLTexture(gl, image, texID.intValue());
+            GLTextureHelper.moveBufferedImageToGLTexture(gl, image, texID.intValue());
             mapImageToTexture.put(image, texID);
         }
 
@@ -146,7 +146,7 @@ public class GLCommonRenderGraphics {
             graphics.drawString(string, 0, metrics.getAscent());
 
             texID = textureHelper.genTextureID(gl);
-            textureHelper.moveBufferedImageToGLTexture(gl, image, texID.intValue());
+            GLTextureHelper.moveBufferedImageToGLTexture(gl, image, texID.intValue());
             mapStringToTexture.put(stringFontPair, texID);
         }
 

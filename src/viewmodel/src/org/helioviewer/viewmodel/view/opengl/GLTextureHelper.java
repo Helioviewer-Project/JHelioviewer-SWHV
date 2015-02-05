@@ -480,7 +480,7 @@ public class GLTextureHelper {
      * @param target
      *            Valid texture id
      */
-    public void moveImageDataToGLTexture(GL2 gl, ImageData source, int target) {
+    public static void moveImageDataToGLTexture(GL2 gl, ImageData source, int target) {
         moveImageDataToGLTexture(gl, source, 0, 0, source.getWidth(), source.getHeight(), target);
     }
 
@@ -505,7 +505,7 @@ public class GLTextureHelper {
      * @param target
      *            Valid texture id
      */
-    public void moveImageDataToGLTexture(GL2 gl, ImageData source, int x, int y, int width, int height, int target) {
+    public static void moveImageDataToGLTexture(GL2 gl, ImageData source, int x, int y, int width, int height, int target) {
 
         if (source == null)
             return;
@@ -534,7 +534,10 @@ public class GLTextureHelper {
 
         ImageFormat imageFormat = source.getImageFormat();
 
-        textureImplementation.genTexture2D(gl, target, mapImageFormatToInternalGLFormat(imageFormat), width, height, mapImageFormatToInputGLFormat(imageFormat), mapBitsPerPixelToGLType(bitsPerPixel), buffer);
+        if (source.getHeight() > 1) {
+            textureImplementation.genTexture2D(gl, target, mapImageFormatToInternalGLFormat(imageFormat), width, height, mapImageFormatToInputGLFormat(imageFormat), mapBitsPerPixelToGLType(bitsPerPixel), buffer);
+        } else
+            throw new IllegalArgumentException("Format is not supported");
     }
 
     /**
@@ -552,7 +555,7 @@ public class GLTextureHelper {
      *            Valid texture id
      * @see #moveImageDataToGLTexture(GL2, ImageData, int)
      */
-    public void moveBufferedImageToGLTexture(GL2 gl, BufferedImage source, int target) {
+    public static void moveBufferedImageToGLTexture(GL2 gl, BufferedImage source, int target) {
 
         if (source == null)
             return;
@@ -582,7 +585,10 @@ public class GLTextureHelper {
         gl.glPixelStorei(GL2.GL_UNPACK_ROW_LENGTH, 0);
         gl.glPixelStorei(GL2.GL_UNPACK_ALIGNMENT, mapDataBufferTypeToGLAlign(rawBuffer.getDataType()));
 
-        textureImplementation.genTexture2D(gl, target, mapTypeToInternalGLFormat(source.getType()), source.getWidth(), source.getHeight(), mapTypeToInputGLFormat(source.getType()), mapDataBufferTypeToGLType(rawBuffer.getDataType()), buffer);
+        if (source.getHeight() > 1) {
+            textureImplementation.genTexture2D(gl, target, mapTypeToInternalGLFormat(source.getType()), source.getWidth(), source.getHeight(), mapTypeToInputGLFormat(source.getType()), mapDataBufferTypeToGLType(rawBuffer.getDataType()), buffer);
+        } else
+            throw new IllegalArgumentException("Format is not supported");
     }
 
     /**
@@ -593,8 +599,7 @@ public class GLTextureHelper {
      *            Application internal image format
      * @return OpenGL memory image format
      */
-    private int mapImageFormatToInternalGLFormat(ImageFormat imageFormat) {
-
+    private static int mapImageFormatToInternalGLFormat(ImageFormat imageFormat) {
         if (imageFormat instanceof SingleChannelImageFormat)
             return formatMap[((SingleChannelImageFormat) imageFormat).getBitDepth() - 1];
         else if (imageFormat instanceof ARGB32ImageFormat || imageFormat instanceof RGB24ImageFormat)
@@ -611,8 +616,7 @@ public class GLTextureHelper {
      *            Application internal image format
      * @return OpenGL input image format
      */
-    private int mapImageFormatToInputGLFormat(ImageFormat imageFormat) {
-
+    private static int mapImageFormatToInputGLFormat(ImageFormat imageFormat) {
         if (imageFormat instanceof SingleChannelImageFormat)
             return GL2.GL_LUMINANCE;
         else if (imageFormat instanceof ARGB32ImageFormat || imageFormat instanceof RGB24ImageFormat)
@@ -629,7 +633,7 @@ public class GLTextureHelper {
      *            BufferedImage internal image format
      * @return OpenGL memory image format
      */
-    private int mapTypeToInternalGLFormat(int type) {
+    private static int mapTypeToInternalGLFormat(int type) {
         if (type == BufferedImage.TYPE_BYTE_GRAY || type == BufferedImage.TYPE_BYTE_INDEXED)
             return GL2.GL_LUMINANCE;
         else
@@ -644,7 +648,7 @@ public class GLTextureHelper {
      *            BufferedImage internal image format
      * @return OpenGL input image format
      */
-    private int mapTypeToInputGLFormat(int type) {
+    private static int mapTypeToInputGLFormat(int type) {
         if (type == BufferedImage.TYPE_BYTE_GRAY || type == BufferedImage.TYPE_BYTE_INDEXED)
             return GL2.GL_LUMINANCE;
         else if (type == BufferedImage.TYPE_4BYTE_ABGR || type == BufferedImage.TYPE_INT_BGR || type == BufferedImage.TYPE_INT_ARGB)
@@ -661,7 +665,7 @@ public class GLTextureHelper {
      *            Bits per pixel of the input data
      * @return OpenGL type to use
      */
-    private int mapBitsPerPixelToGLType(int bitsPerPixel) {
+    private static int mapBitsPerPixelToGLType(int bitsPerPixel) {
         switch (bitsPerPixel) {
         case 8:
             return GL2.GL_UNSIGNED_BYTE;
@@ -682,7 +686,7 @@ public class GLTextureHelper {
      *            DataBuffer type of the input data
      * @return OpenGL type to use
      */
-    private int mapDataBufferTypeToGLType(int dataBufferType) {
+    private static int mapDataBufferTypeToGLType(int dataBufferType) {
         switch (dataBufferType) {
         case DataBuffer.TYPE_BYTE:
             return GL2.GL_UNSIGNED_BYTE;
@@ -705,7 +709,7 @@ public class GLTextureHelper {
      *            DataBuffer type of the input data
      * @return OpenGL type to use
      */
-    private int mapDataBufferTypeToGLAlign(int dataBufferType) {
+    private static int mapDataBufferTypeToGLAlign(int dataBufferType) {
         switch (dataBufferType) {
         case DataBuffer.TYPE_BYTE:
             return 1;
