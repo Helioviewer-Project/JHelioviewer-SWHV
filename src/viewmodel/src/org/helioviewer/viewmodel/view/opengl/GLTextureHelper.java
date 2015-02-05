@@ -44,7 +44,6 @@ import org.helioviewer.viewmodel.view.opengl.shader.GLTextureCoordinate;
 public class GLTextureHelper {
     public static boolean is2DState = false;
     private static TextureImplementation textureImplementation = null;
-    public static int texID = 0;
     private static boolean textureNonPowerOfTwo = false;
     private static int maxTextureSize = 2048;
 
@@ -121,11 +120,6 @@ public class GLTextureHelper {
         gl.glGetIntegerv(GL2.GL_MAX_TEXTURE_SIZE, tmp, 0);
         maxTextureSize = tmp[0];
         Log.debug(">> GLTextureHelper.initHelper(GL) > max texture size: " + maxTextureSize);
-
-        if (texID == 0) {
-            gl.glGenTextures(1, tmp, 0);
-            texID = tmp[0];
-        }
 
         scaleTexCoord.setValue(gl, 1.0f, 1.0f);
     }
@@ -238,16 +232,8 @@ public class GLTextureHelper {
      */
     public void delAllTextures(GL2 gl) {
         synchronized (allTextures) {
-
             GLCommonRenderGraphics.clearImageTextureBuffer(gl);
             GLCommonRenderGraphics.clearStringTextureBuffer(gl);
-
-            if (texID != 0) {
-                int[] tmp = new int[1];
-                tmp[0] = texID;
-                gl.glDeleteTextures(1, tmp, 0);
-                texID = 0;
-            }
 
             if (!allTextures.keySet().isEmpty()) {
                 int[] textureIDs = new int[allTextures.keySet().size()];
@@ -361,7 +347,7 @@ public class GLTextureHelper {
      * @param region
      *            Position and size to draw the texture
      */
-    public void renderTextureToScreen(GL2 gl, Region region) {
+    private static void renderTextureToScreen(GL2 gl, Region region) {
         Vector2dDouble lowerleftCorner = region.getLowerLeftCorner();
         Vector2dDouble size = region.getSize();
 
@@ -386,7 +372,7 @@ public class GLTextureHelper {
      * @param x0
      *            , y0 , x1 , y1 - Position and size to draw the texture
      */
-    public void renderTextureToScreen(GL2 gl, float x0, float y0, float x1, float y1) {
+    private static void renderTextureToScreen(GL2 gl, float x0, float y0, float x1, float y1) {
         if (is2DState) {
             gl.glBegin(GL2.GL_QUADS);
             mainTexCoord.setValue(gl, 0.0f, 1.0f);
@@ -430,9 +416,6 @@ public class GLTextureHelper {
                         jpxView.texID = genTextureID(gl);
                     }
                     moveImageDataToGLTexture(gl, source, jpxView.texID);
-                } else {
-                    moveImageDataToGLTexture(gl, source, texID);
-
                 }
                 renderTextureToScreen(gl, region);
 
@@ -455,16 +438,12 @@ public class GLTextureHelper {
                                 jpxView.texID = genTextureID(gl);
                             }
                             moveImageDataToGLTexture(gl, source, x, y, width, height, jpxView.texID);
-
-                        } else {
-                            moveImageDataToGLTexture(gl, source, x, y, width, height, texID);
                         }
                         float x0 = (float) lowerleftCorner.getX() + (float) size.getX() * x / source.getWidth();
                         float y1 = (float) lowerleftCorner.getY() + (float) size.getY() * (source.getHeight() - y) / source.getHeight();
                         renderTextureToScreen(gl, x0, y1 - ((float) size.getY()) * (height + 1.5f) / source.getHeight(), x0 + ((float) size.getX()) * (width + 1.5f) / source.getWidth(), y1);
                     }
                 }
-
                 gl.glColorMask(true, true, true, true);
             }
         }
