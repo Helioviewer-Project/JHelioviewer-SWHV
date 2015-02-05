@@ -56,7 +56,7 @@ public class TimeIntervalLockModel implements ZoomControllerListener, DrawContro
         drawController = DrawController.getSingletonInstance();
         plotAreaSpaceManager = PlotAreaSpaceManager.getInstance();
         isLocked = false;
-        currentAvailableInterval = new Interval<Date>(null, null);
+        // currentAvailableInterval = new Interval<Date>(null, null);
         zoomController.addZoomControllerListener(this);
         drawController.addDrawControllerListenerForAllIdentifiers(this);
         selectedSpaceWidth = new HashMap<PlotAreaSpace, Double>();
@@ -128,7 +128,7 @@ public class TimeIntervalLockModel implements ZoomControllerListener, DrawContro
     @Override
     public void drawMovieLineRequest(Date time) {
         latestMovieTime = time;
-        if (time != null && isLocked && currentAvailableInterval.containsPointInclusive(time) && !previousMovieTime.equals(time)) {
+        if (time != null && currentAvailableInterval != null && isLocked && currentAvailableInterval.containsPointInclusive(time) && !previousMovieTime.equals(time)) {
             // Log.debug("Execute drawMovieline : " + time);
             // Log.trace("previousTimeInterval : " + previousMovieTime +
             // " currentMovieTime : " + time);
