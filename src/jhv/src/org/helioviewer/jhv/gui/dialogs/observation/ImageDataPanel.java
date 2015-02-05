@@ -344,9 +344,10 @@ public class ImageDataPanel extends ObservationDialogPanel implements DataSource
             Message.err("Data is not selected", "There is no information what to add", false);
             return false;
         }
-        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ");
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
         try {
             ObservationDialogDateModel.getInstance().setStartDate(sdf.parse(timeSelectionPanel.getStartTime()));
+            ObservationDialogDateModel.getInstance().setEndDate(sdf.parse(timeSelectionPanel.getEndTime()));
         } catch (ParseException e) {
             Log.debug("Date could not be parsed" + e);
         }
@@ -615,22 +616,24 @@ public class ImageDataPanel extends ObservationDialogPanel implements DataSource
                 Calendar calendar = new GregorianCalendar();
                 calendar.setTime(calendarStartDate.getDate());
                 setStartDate(calendar.getTime());
-                if (!isStartDateBeforeEndDate()) {
-                    calendar.add(Calendar.DATE, 1);
-                    // calendarEndDate.setDate(calendar.getTime());
-                    setEndDate(calendar.getTime());
-                }
+                /*
+                 * if (!isStartDateBeforeEndDate()) {
+                 * calendar.add(Calendar.DATE, 1); //
+                 * calendarEndDate.setDate(calendar.getTime());
+                 * setEndDate(calendar.getTime()); }
+                 */
             }
 
             if (e.getSource() == calendarEndDate) {
                 Calendar calendar = new GregorianCalendar();
                 calendar.setTime(calendarEndDate.getDate());
                 setEndDate(calendar.getTime());
-                if (!isStartDateBeforeEndDate()) {
-                    calendar.add(Calendar.DATE, -1);
-                    // calendarStartDate.setDate(calendar.getTime());
-                    setStartDate(calendar.getTime());
-                }
+                /*
+                 * if (!isStartDateBeforeEndDate()) {
+                 * calendar.add(Calendar.DATE, -1); //
+                 * calendarStartDate.setDate(calendar.getTime());
+                 * setStartDate(calendar.getTime()); }
+                 */
             }
         }
 
