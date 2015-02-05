@@ -611,11 +611,16 @@ public class ImageDataPanel extends ObservationDialogPanel implements DataSource
          */
         @Override
         public void actionPerformed(JHVCalendarEvent e) {
-
+            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
             if (e.getSource() == calendarStartDate) {
                 Calendar calendar = new GregorianCalendar();
-                calendar.setTime(calendarStartDate.getDate());
-                setStartDate(calendar.getTime());
+                try {
+                    calendar.setTime(sdf.parse(getStartTime()));
+                    setStartDate(calendar.getTime());
+                } catch (ParseException e1) {
+                    Log.error("Could not parse start date " + getStartTime());
+                }
+
                 /*
                  * if (!isStartDateBeforeEndDate()) {
                  * calendar.add(Calendar.DATE, 1); //
@@ -626,8 +631,13 @@ public class ImageDataPanel extends ObservationDialogPanel implements DataSource
 
             if (e.getSource() == calendarEndDate) {
                 Calendar calendar = new GregorianCalendar();
-                calendar.setTime(calendarEndDate.getDate());
-                setEndDate(calendar.getTime());
+                try {
+                    calendar.setTime(sdf.parse(getEndTime()));
+                    setEndDate(calendar.getTime());
+                } catch (ParseException e1) {
+                    Log.error("Could not parse end date " + getEndTime());
+                }
+
                 /*
                  * if (!isStartDateBeforeEndDate()) {
                  * calendar.add(Calendar.DATE, -1); //
