@@ -123,7 +123,7 @@ public class OpacityFilter extends AbstractFilter implements StandardFilter, GLF
      */
     private class OpacityShader extends GLFragmentShaderProgram {
         private int alphaParamRef;
-        private double[] alphaParamFloat;
+        private double[] alphaParamFloat = new double[1];
 
         /**
          * Sets the new alpha value.

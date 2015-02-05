@@ -193,7 +193,7 @@ public class ContrastFilter extends AbstractFilter implements StandardFilter, GL
     private class ContrastShader extends GLFragmentShaderProgram {
 
         private int contrastParamRef;
-        private double[] contrastParamFloat;
+        private double[] contrastParamFloat = new double[1];
 
         /**
          * Sets the contrast parameter
