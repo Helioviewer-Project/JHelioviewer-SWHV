@@ -8,7 +8,6 @@ import javax.swing.JPanel;
 import org.helioviewer.base.math.Interval;
 import org.helioviewer.plugins.eveplugin.controller.ZoomController;
 import org.helioviewer.plugins.eveplugin.view.plot.PlotsContainerPanel;
-import org.helioviewer.plugins.eveplugin.view.plot.PlotsControlPanel;
 
 //import org.helioviewer.plugins.eveplugin.model.PlotTimeSpace;
 
@@ -22,7 +21,7 @@ public class MainPanel extends JPanel {
 
     private final PlotsContainerPanel plotsPane = PlotsContainerPanel.getSingletonInstance();
 
-    private final PlotsControlPanel controlPane = new PlotsControlPanel();
+    // private final PlotsControlPanel controlPane = new PlotsControlPanel();
 
     // //////////////////////////////////////////////////////////////////////////////
     // Methods
