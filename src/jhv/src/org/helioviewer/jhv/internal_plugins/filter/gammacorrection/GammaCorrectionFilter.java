@@ -16,7 +16,6 @@ import org.helioviewer.viewmodel.imagetransport.Short16ImageTransport;
 import org.helioviewer.viewmodel.view.opengl.shader.GLFragmentShaderProgram;
 import org.helioviewer.viewmodel.view.opengl.shader.GLShaderBuilder;
 import org.helioviewer.viewmodel.view.opengl.shader.GLShaderBuilder.GLBuildShaderException;
-import org.helioviewer.viewmodel.view.opengl.shader.GLTextureCoordinate;
 
 /**
  * Filter for applying gamma correction.
@@ -169,15 +168,15 @@ public class GammaCorrectionFilter extends AbstractFilter implements StandardFil
 
                     int rgb = pixelData[i];
                     int a = rgb >>> 24;
-                    int r = (rgb >>> 16) & 0xFF;
-                    int g = (rgb >>> 8) & 0xFF;
-                    int b = rgb & 0xff;
+                int r = (rgb >>> 16) & 0xFF;
+                int g = (rgb >>> 8) & 0xFF;
+                int b = rgb & 0xff;
 
-                    r = gammaTable8[r] & 0xFF;
-                    g = gammaTable8[g] & 0xFF;
-                    b = gammaTable8[b] & 0xFF;
+                r = gammaTable8[r] & 0xFF;
+                g = gammaTable8[g] & 0xFF;
+                b = gammaTable8[b] & 0xFF;
 
-                    resultPixelData[i] = (a << 24) | (r << 16) | (g << 8) | b;
+                resultPixelData[i] = (a << 24) | (r << 16) | (g << 8) | b;
                 }
                 return new ARGBInt32ImageData(data, resultPixelData);
             }
@@ -192,7 +191,6 @@ public class GammaCorrectionFilter extends AbstractFilter implements StandardFil
      * Fragment shader for applying the gamma correction.
      */
     private class GammaCorrectionShader extends GLFragmentShaderProgram {
-        private GLTextureCoordinate gammaParam;
         private int gammaParamRef;
         private double[] gammaParamFloat;
 
@@ -207,11 +205,13 @@ public class GammaCorrectionFilter extends AbstractFilter implements StandardFil
         private void setGamma(GL2 gl, float gamma) {
             gammaParamFloat[0] = gamma;
         }
+
         @Override
-        public void bind(GL2 gl){
+        public void bind(GL2 gl) {
             super.bind(gl);
             this.bindEnvVars(gl, this.gammaParamRef, gammaParamFloat);
         }
+
         /**
          * {@inheritDoc}
          */

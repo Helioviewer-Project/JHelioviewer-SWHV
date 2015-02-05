@@ -16,7 +16,6 @@ import org.helioviewer.viewmodel.imagedata.JavaBufferedImageData;
 import org.helioviewer.viewmodel.view.opengl.shader.GLFragmentShaderProgram;
 import org.helioviewer.viewmodel.view.opengl.shader.GLShaderBuilder;
 import org.helioviewer.viewmodel.view.opengl.shader.GLShaderBuilder.GLBuildShaderException;
-import org.helioviewer.viewmodel.view.opengl.shader.GLTextureCoordinate;
 
 /**
  * Filter for changing the opacity of an image.
@@ -123,7 +122,6 @@ public class OpacityFilter extends AbstractFilter implements StandardFilter, GLF
      * Fragment shader setting the opacity.
      */
     private class OpacityShader extends GLFragmentShaderProgram {
-        private GLTextureCoordinate alphaParam;
         private int alphaParamRef;
         private double[] alphaParamFloat;
 
@@ -138,11 +136,13 @@ public class OpacityFilter extends AbstractFilter implements StandardFilter, GLF
         private void setAlpha(GL2 gl, float alpha) {
             alphaParamFloat[0] = alpha;
         }
+
         @Override
-        public void bind(GL2 gl){
+        public void bind(GL2 gl) {
             super.bind(gl);
             this.bindEnvVars(gl, this.alphaParamRef, alphaParamFloat);
         }
+
         /**
          * {@inheritDoc}
          */

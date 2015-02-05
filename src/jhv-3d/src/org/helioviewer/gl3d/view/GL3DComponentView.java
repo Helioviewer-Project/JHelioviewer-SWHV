@@ -179,7 +179,6 @@ public class GL3DComponentView extends AbstractComponentView implements GLEventL
         GL2 gl = (GL2) glAD.getGL();
         GL3DState.create(gl);
 
-        // GLTextureCoordinate.init(gl);
         textureHelper.delAllTextures(gl);
         GLTextureHelper.initHelper(gl);
 
