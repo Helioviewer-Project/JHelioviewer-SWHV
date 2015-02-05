@@ -70,7 +70,7 @@ public class HelioviewerPositionedMetaData extends HelioviewerMetaData implement
         }
 
         if (this.getInstrument().contains("GONG") || this.getObservatory().contains("USET") || this.getObservatory().contains("SOLIS")) {
-            this.stonyhurstLongitude = -Astronomy.getL0Degree(this.getDateTime().getTime());
+            this.stonyhurstLongitude = 0.0;
         }
 
         this.stonyhurstAvailable = this.stonyhurstLatitude != 0.0 || this.stonyhurstLongitude != 0.0;
