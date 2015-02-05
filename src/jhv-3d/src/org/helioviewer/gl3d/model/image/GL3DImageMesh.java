@@ -100,7 +100,6 @@ public abstract class GL3DImageMesh extends GL3DMesh {
         }
 
         th.bindTexture(state.gl, this.imageTextureView.getTextureId());
-        //this.imageTextureView.copyScreenToTexture(state,th);
         state.gl.glTexParameteri(GL2.GL_TEXTURE_2D, GL2.GL_TEXTURE_MIN_FILTER, GL2.GL_LINEAR);
         state.gl.glTexParameteri(GL2.GL_TEXTURE_2D, GL2.GL_TEXTURE_MAG_FILTER, GL2.GL_LINEAR);
 
