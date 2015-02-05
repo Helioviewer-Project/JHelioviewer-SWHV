@@ -158,7 +158,10 @@ public class ControlsPanel extends JPanel implements ActionListener, LayersListe
         if (e.getSource().equals(addLayerButton)) {
             ImageViewerGui.getSingletonInstance().getObservationDialog().showDialog(EVESettings.OBSERVATION_UI_NAME);
         } else if (e.getSource() == periodFromLayersButton) {
-            setDateRange();
+            TimeIntervalLockModel.getInstance().setLocked(periodFromLayersButton.isSelected());
+            if (periodFromLayersButton.isSelected()) {
+                setDateRange();
+            }
         } else if (e.getSource().equals(zoomComboBox)) {
             final ZoomComboboxItem item = (ZoomComboboxItem) zoomComboBox.getSelectedItem();
             selectedIntervalByZoombox = null;
@@ -182,7 +185,6 @@ public class ControlsPanel extends JPanel implements ActionListener, LayersListe
             // Log.debug("start " + start + " end " + end);
             final Interval<Date> interval = new Interval<Date>(start, end);
             ZoomController.getSingletonInstance().setSelectedInterval(interval, true);
-            TimeIntervalLockModel.getInstance().setLocked(periodFromLayersButton.isSelected());
         }
     }
 
@@ -198,10 +200,18 @@ public class ControlsPanel extends JPanel implements ActionListener, LayersListe
             setEnabledStateOfPeriodMovieButton();
             if (setDefaultPeriod || TimeIntervalLockModel.getInstance().isLocked()) {
                 setDefaultPeriod = false;
-                final Interval<Date> interval = new Interval<Date>(LayersModel.getSingletonInstance().getFirstDate(), LayersModel.getSingletonInstance().getLastDate());
-                ZoomController.getSingletonInstance().setAvailableInterval(interval);
-                if (TimeIntervalLockModel.getInstance().isLocked()) {
-                    ZoomController.getSingletonInstance().setSelectedInterval(interval, false);
+                View activeView = LayersModel.getSingletonInstance().getActiveView();
+                JHVJPXView jpxView = activeView.getAdapter(JHVJPXView.class);
+                if (jpxView != null) {
+                    Date start = jpxView.getDateRange().getStart();
+                    Date end = jpxView.getDateRange().getEnd();
+                    // Log.debug("start " + start + " end " + end);
+                    final Interval<Date> interval = new Interval<Date>(start, end);
+                    ZoomController.getSingletonInstance().setAvailableInterval(interval);
+                    if (TimeIntervalLockModel.getInstance().isLocked()) {
+                        ZoomController.getSingletonInstance().setSelectedInterval(interval, false);
+                    }
+
                 }
                 // PlotTimeSpace.getInstance().setSelectedMinAndMaxTime(interval.getStart(),
                 // interval.getEnd());
@@ -214,13 +224,20 @@ public class ControlsPanel extends JPanel implements ActionListener, LayersListe
                     setEnabledStateOfPeriodMovieButton();
                     if (setDefaultPeriod || TimeIntervalLockModel.getInstance().isLocked()) {
                         setDefaultPeriod = false;
-                        final Interval<Date> interval = new Interval<Date>(LayersModel.getSingletonInstance().getFirstDate(), LayersModel.getSingletonInstance().getLastDate());
-                        ZoomController.getSingletonInstance().setAvailableInterval(interval);
-                        if (TimeIntervalLockModel.getInstance().isLocked()) {
-                            ZoomController.getSingletonInstance().setSelectedInterval(interval, false);
+                        final Interval<Date> availableInterval = new Interval<Date>(LayersModel.getSingletonInstance().getFirstDate(), LayersModel.getSingletonInstance().getLastDate());
+                        View activeView = LayersModel.getSingletonInstance().getActiveView();
+                        JHVJPXView jpxView = activeView.getAdapter(JHVJPXView.class);
+                        if (jpxView != null) {
+                            Date start = jpxView.getDateRange().getStart();
+                            Date end = jpxView.getDateRange().getEnd();
+                            // Log.debug("start " + start + " end " + end);
+                            final Interval<Date> interval = new Interval<Date>(start, end);
+                            ZoomController.getSingletonInstance().setAvailableInterval(availableInterval);
+                            if (TimeIntervalLockModel.getInstance().isLocked()) {
+                                ZoomController.getSingletonInstance().setSelectedInterval(interval, false);
+                            }
+
                         }
-                        // PlotTimeSpace.getInstance().setSelectedMinAndMaxTime(interval.getStart(),
-                        // interval.getEnd());
                     }
                 }
 
@@ -254,8 +271,51 @@ public class ControlsPanel extends JPanel implements ActionListener, LayersListe
 
     @Override
     public void activeLayerChanged(int idx) {
-        // TODO Auto-generated method stub
+        if (EventQueue.isDispatchThread()) {
+            setEnabledStateOfPeriodMovieButton();
+            if (setDefaultPeriod || TimeIntervalLockModel.getInstance().isLocked()) {
+                setDefaultPeriod = false;
+                View activeView = LayersModel.getSingletonInstance().getActiveView();
+                JHVJPXView jpxView = activeView.getAdapter(JHVJPXView.class);
+                if (jpxView != null) {
+                    Date start = jpxView.getDateRange().getStart();
+                    Date end = jpxView.getDateRange().getEnd();
+                    // Log.debug("start " + start + " end " + end);
+                    final Interval<Date> interval = new Interval<Date>(start, end);
+                    // ZoomController.getSingletonInstance().setAvailableInterval(interval);
+                    if (TimeIntervalLockModel.getInstance().isLocked()) {
+                        ZoomController.getSingletonInstance().setSelectedInterval(interval, false);
+                    }
 
+                }
+            }
+        } else {
+            EventQueue.invokeLater(new Runnable() {
+
+                @Override
+                public void run() {
+                    setEnabledStateOfPeriodMovieButton();
+                    if (setDefaultPeriod || TimeIntervalLockModel.getInstance().isLocked()) {
+                        setDefaultPeriod = false;
+                        View activeView = LayersModel.getSingletonInstance().getActiveView();
+                        JHVJPXView jpxView = activeView.getAdapter(JHVJPXView.class);
+                        if (jpxView != null) {
+                            Date start = jpxView.getDateRange().getStart();
+                            Date end = jpxView.getDateRange().getEnd();
+                            // Log.debug("start " + start + " end " + end);
+                            final Interval<Date> interval = new Interval<Date>(start, end);
+                            // ZoomController.getSingletonInstance().setAvailableInterval(interval);
+                            if (TimeIntervalLockModel.getInstance().isLocked()) {
+                                ZoomController.getSingletonInstance().setSelectedInterval(interval, false);
+                            }
+
+                        }
+                    }
+                }
+
+            });
+
+        }
     }
 
     @Override
@@ -426,7 +486,7 @@ public class ControlsPanel extends JPanel implements ActionListener, LayersListe
             calendar.clear();
             calendar.setTime(newInterval.getEnd());
             calendar.add(Calendar.DATE, -1);
-
+            selectedIndexSetByProgram = true;
             fillZoomComboBox();
         }
     }
