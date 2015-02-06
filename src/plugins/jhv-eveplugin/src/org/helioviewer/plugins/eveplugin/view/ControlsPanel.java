@@ -298,17 +298,18 @@ public class ControlsPanel extends JPanel implements ActionListener, LayersListe
                     if (setDefaultPeriod || TimeIntervalLockModel.getInstance().isLocked()) {
                         setDefaultPeriod = false;
                         View activeView = LayersModel.getSingletonInstance().getActiveView();
-                        JHVJPXView jpxView = activeView.getAdapter(JHVJPXView.class);
-                        if (jpxView != null) {
-                            Date start = jpxView.getDateRange().getStart();
-                            Date end = jpxView.getDateRange().getEnd();
-                            // Log.debug("start " + start + " end " + end);
-                            final Interval<Date> interval = new Interval<Date>(start, end);
-                            // ZoomController.getSingletonInstance().setAvailableInterval(interval);
-                            if (TimeIntervalLockModel.getInstance().isLocked()) {
-                                ZoomController.getSingletonInstance().setSelectedInterval(interval, false);
+                        if (activeView != null) {
+                            JHVJPXView jpxView = activeView.getAdapter(JHVJPXView.class);
+                            if (jpxView != null) {
+                                Date start = jpxView.getDateRange().getStart();
+                                Date end = jpxView.getDateRange().getEnd();
+                                // Log.debug("start " + start + " end " + end);
+                                final Interval<Date> interval = new Interval<Date>(start, end);
+                                // ZoomController.getSingletonInstance().setAvailableInterval(interval);
+                                if (TimeIntervalLockModel.getInstance().isLocked()) {
+                                    ZoomController.getSingletonInstance().setSelectedInterval(interval, false);
+                                }
                             }
-
                         }
                     }
                 }
@@ -367,8 +368,9 @@ public class ControlsPanel extends JPanel implements ActionListener, LayersListe
 
         final DefaultComboBoxModel model = (DefaultComboBoxModel) zoomComboBox.getModel();
         model.removeAllElements();
-
+        selectedIndexSetByProgram = true;
         model.addElement(new ZoomComboboxItem(ZOOM.CUSTOM, 0));
+        selectedIndexSetByProgram = true;
         model.addElement(new ZoomComboboxItem(ZOOM.All, 0));
 
         // addElementToModel(model, startDate, interval, Calendar.YEAR, 10,
