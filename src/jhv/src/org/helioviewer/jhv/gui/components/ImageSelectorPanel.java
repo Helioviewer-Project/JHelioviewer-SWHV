@@ -119,10 +119,10 @@ public class ImageSelectorPanel extends JPanel implements LayersListener {
                             // tolerance of an hour
                             final int tolerance = 60 * 60 * 1000;
                             if (Math.abs(startDate.getTime() - obsStartDate.getTime()) > tolerance || Math.abs(endDate.getTime() - obsEndDate.getTime()) > tolerance) {
-                                if (ObservationDialogDateModel.getInstance().getStartDate() == null || ObservationDialogDateModel.getInstance().isStartDateSetByUser()) {
+                                if (ObservationDialogDateModel.getInstance().getStartDate() == null || !ObservationDialogDateModel.getInstance().isStartDateSetByUser()) {
                                     ObservationDialogDateModel.getInstance().setStartDate(startDate, false);
                                 }
-                                if (ObservationDialogDateModel.getInstance().getEndDate() == null || ObservationDialogDateModel.getInstance().isEndDateSetByUser()) {
+                                if (ObservationDialogDateModel.getInstance().getEndDate() == null || !ObservationDialogDateModel.getInstance().isEndDateSetByUser()) {
                                     ObservationDialogDateModel.getInstance().setEndDate(endDate, false);
                                 }
                             }
