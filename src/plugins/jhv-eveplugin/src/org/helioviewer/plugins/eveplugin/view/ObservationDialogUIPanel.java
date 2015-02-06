@@ -232,7 +232,7 @@ public class ObservationDialogUIPanel extends SimpleObservationDialogUIPanel imp
          * "", JOptionPane.ERROR_MESSAGE); return false; }
          */
 
-        ObservationDialogDateModel.getInstance().setStartDate(getDate());
+        ObservationDialogDateModel.getInstance().setStartDate(getDate(), true);
         if (updateBandController()) {
             updateZoomController();
         }

@@ -265,7 +265,7 @@ public abstract class SimpleObservationDialogUIPanel extends ObservationDialogPa
          * JOptionPane.showMessageDialog(null, "End date is before start date!",
          * "", JOptionPane.ERROR_MESSAGE); return false; }
          */
-        ObservationDialogDateModel.getInstance().setStartDate(getDate());
+        ObservationDialogDateModel.getInstance().setStartDate(getDate(), true);
         Set<YAxisElement> yAxisElements = DrawController.getSingletonInstance().getYAxisElements(PlotsContainerPanel.PLOT_IDENTIFIER_MASTER);
         boolean downloadOK = false;
         if (yAxisElements.size() >= 2) {
@@ -300,7 +300,7 @@ public abstract class SimpleObservationDialogUIPanel extends ObservationDialogPa
     public void actionPerformed(final JHVCalendarEvent e) {
 
         if (e.getSource() == calendarStartDate && calendarStartDate.getDate() != null) {
-            ObservationDialogDateModel.getInstance().setStartDate(calendarStartDate.getDate());
+            ObservationDialogDateModel.getInstance().setStartDate(calendarStartDate.getDate(), true);
         }
         /*
          * if (e.getSource() == calendarEndDate &&
@@ -341,7 +341,7 @@ public abstract class SimpleObservationDialogUIPanel extends ObservationDialogPa
                 if (beginDate != null && endDate != null) {
                     Date startDate = new Date(beginDate.getTime() + (endDate.getTime() - beginDate.getTime()));
                     calendarStartDate.setDate(startDate);
-                    ObservationDialogDateModel.getInstance().setStartDate(startDate);
+                    ObservationDialogDateModel.getInstance().setStartDate(startDate, true);
                     // calendarEndDate.setDate(endDate);
                 }
             }

@@ -12,6 +12,10 @@ public class ObservationDialogDateModel {
     private Date startDate;
     private Date endDate;
 
+    private boolean endDateSetByUser;
+
+    private boolean startDateSetByUser;
+
     private ObservationDialogDateModel() {
         listeners = new ArrayList<ObservationDialogDateModelListener>();
     }
@@ -31,22 +35,40 @@ public class ObservationDialogDateModel {
         listeners.remove(listener);
     }
 
-    public void setEndDate(Date endDate) {
-        this.endDate = endDate;
-        fireEndDateChanged();
+    public void setEndDate(Date endDate, boolean byUser) {
+        if (!endDateSetByUser) {
+            endDateSetByUser = byUser;
+        }
+        if (!endDateSetByUser || byUser) {
+            this.endDate = endDate;
+            fireEndDateChanged();
+        }
     }
 
     public Date getStartDate() {
         return startDate;
     }
 
-    public void setStartDate(Date startDate) {
-        this.startDate = startDate;
-        fireStartDateChanged();
+    public void setStartDate(Date startDate, boolean byUser) {
+        if (!startDateSetByUser) {
+            startDateSetByUser = byUser;
+        }
+        if (!startDateSetByUser || byUser) {
+            this.startDate = startDate;
+            fireStartDateChanged();
+        }
     }
 
     public Date getEndDate() {
         return endDate;
+    }
+
+    public boolean isEndDateSetByUser() {
+        return endDateSetByUser;
+    }
+
+    public boolean isStartDateSetByUser() {
+        return startDateSetByUser;
     }
 
     private void fireStartDateChanged() {

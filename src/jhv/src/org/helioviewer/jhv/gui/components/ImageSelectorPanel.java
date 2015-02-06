@@ -25,6 +25,7 @@ import org.helioviewer.jhv.gui.IconBank.JHVIcon;
 import org.helioviewer.jhv.gui.ImageViewerGui;
 import org.helioviewer.jhv.gui.components.layerTable.LayerTable;
 import org.helioviewer.jhv.gui.components.layerTable.LayerTableContainer;
+import org.helioviewer.jhv.gui.dialogs.model.ObservationDialogDateModel;
 import org.helioviewer.jhv.gui.dialogs.observation.ImageDataPanel;
 import org.helioviewer.jhv.layers.LayersListener;
 import org.helioviewer.jhv.layers.LayersModel;
@@ -41,20 +42,20 @@ import org.helioviewer.viewmodel.view.jp2view.datetime.ImmutableDateTime;
  * Except the LayersListener this is a GUI class expecting to be run in the
  * EventQueue.
  * <p>
- *
+ * 
  * TODO: Low-Importance - Fix the issue that everything runs in the EventQueue
- *
+ * 
  * At the moment, a lot of GUI calls are not fired on the EventDispatchThread
  * According to the Java specifications, this IS NOT ALLOWED and could cause
  * problems!
- *
+ * 
  * In order to fix this use SwingUtilities.invokeLater or
  * Swingutilities.invokeAndWait to make GUI interactions
- *
+ * 
  * Ludwig already tried to fix all of this "with one line of code" by adding
  * invokeLater to the ViewListenerDistributor However, this calls TOO MUCH stuff
  * on the event queue - and the GUI becomes unresponsive
- *
+ * 
  * @author Markus Langenberg
  * @author Malte Nuhn
  */
@@ -88,17 +89,17 @@ public class ImageSelectorPanel extends JPanel implements LayersListener {
             /*
              * TODO: Code Simplification - Cleanup Date selection when clicking
              * on "add images", e.g. use LayersModel.getLatestDate(...), ...
-             *
+             * 
              * Here are some more comments by Helge:
-             *
+             * 
              * If it is a local file, the timestamps are read from the parsed
              * JPX movie, i.e. a call will pause until the whole movie has
              * finished loading.
-             *
+             * 
              * If it has been reading through the API the frame time stamps
              * already have been returned and it is not bad. For the time being
              * it will only update if its already loaded.
-             *
+             * 
              * I think there should be a better solution? Maybe a wait dialog?
              * etc.?
              */
@@ -118,8 +119,12 @@ public class ImageSelectorPanel extends JPanel implements LayersListener {
                             // tolerance of an hour
                             final int tolerance = 60 * 60 * 1000;
                             if (Math.abs(startDate.getTime() - obsStartDate.getTime()) > tolerance || Math.abs(endDate.getTime() - obsEndDate.getTime()) > tolerance) {
-                                observationImagePane.setStartDate(startDate);
-                                observationImagePane.setEndDate(endDate);
+                                if (ObservationDialogDateModel.getInstance().getStartDate() == null || ObservationDialogDateModel.getInstance().isStartDateSetByUser()) {
+                                    ObservationDialogDateModel.getInstance().setStartDate(startDate, false);
+                                }
+                                if (ObservationDialogDateModel.getInstance().getEndDate() == null || ObservationDialogDateModel.getInstance().isEndDateSetByUser()) {
+                                    ObservationDialogDateModel.getInstance().setEndDate(endDate, false);
+                                }
                             }
                         } catch (ParseException e) {
                             // Should not happen

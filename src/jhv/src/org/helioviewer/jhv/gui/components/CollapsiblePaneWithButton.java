@@ -81,17 +81,17 @@ public class CollapsiblePaneWithButton extends CollapsiblePane {
                  * TODO: Code Simplification - Cleanup Date selection when
                  * clicking on "add images", e.g. use
                  * LayersModel.getLatestDate(...), ...
-                 *
+                 * 
                  * Here are some more comments by Helge:
-                 *
+                 * 
                  * If it is a local file, the timestamps are read from the
                  * parsed JPX movie, i.e. a call will pause until the whole
                  * movie has finished loading.
-                 *
+                 * 
                  * If it has been reading through the API the frame time stamps
                  * already have been returned and it is not bad. For the time
                  * being it will only update if its already loaded.
-                 *
+                 * 
                  * I think there should be a better solution? Maybe a wait
                  * dialog? etc.?
                  */
@@ -111,8 +111,8 @@ public class CollapsiblePaneWithButton extends CollapsiblePane {
                                 // tolerance of an hour
                                 final int tolerance = 60 * 60 * 1000;
                                 if (Math.abs(startDate.getTime() - obsStartDate.getTime()) > tolerance || Math.abs(endDate.getTime() - obsEndDate.getTime()) > tolerance) {
-                                    observationImagePane.setStartDate(startDate);
-                                    observationImagePane.setEndDate(endDate);
+                                    observationImagePane.setStartDate(startDate, false);
+                                    observationImagePane.setEndDate(endDate, false);
                                 }
                             } catch (ParseException e) {
                                 // Should not happen
