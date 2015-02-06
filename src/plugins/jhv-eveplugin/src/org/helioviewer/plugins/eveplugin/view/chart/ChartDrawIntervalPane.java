@@ -139,7 +139,7 @@ public class ChartDrawIntervalPane extends JComponent implements ZoomControllerL
     }
 
     private void drawMovieInterval(Graphics g) {
-        if (availableInterval.getStart() == null || availableInterval.getEnd() == null || movieInterval.getStart() == null || movieInterval.getEnd() == null) {
+        if (availableInterval == null || movieInterval == null || availableInterval.getStart() == null || availableInterval.getEnd() == null || movieInterval.getStart() == null || movieInterval.getEnd() == null) {
             return;
         }
 
