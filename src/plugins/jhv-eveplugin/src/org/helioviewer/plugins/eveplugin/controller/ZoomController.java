@@ -6,6 +6,8 @@ import java.util.GregorianCalendar;
 import java.util.LinkedList;
 
 import org.helioviewer.base.math.Interval;
+import org.helioviewer.jhv.layers.LayersListener;
+import org.helioviewer.jhv.layers.LayersModel;
 import org.helioviewer.plugins.eveplugin.lines.data.BandController;
 import org.helioviewer.plugins.eveplugin.lines.data.DownloadController;
 import org.helioviewer.plugins.eveplugin.model.PlotAreaSpace;
@@ -14,12 +16,13 @@ import org.helioviewer.plugins.eveplugin.model.PlotAreaSpaceManager;
 import org.helioviewer.plugins.eveplugin.settings.BandType;
 //import org.helioviewer.plugins.eveplugin.model.PlotTimeSpace;
 import org.helioviewer.plugins.eveplugin.settings.EVEAPI.API_RESOLUTION_AVERAGES;
+import org.helioviewer.viewmodel.view.View;
 
 /**
  * 
  * @author Stephan Pagel
  * */
-public class ZoomController implements PlotAreaSpaceListener {
+public class ZoomController implements PlotAreaSpaceListener, LayersListener {
 
     // //////////////////////////////////////////////////////////////////////////////
     // Definitions
@@ -51,6 +54,7 @@ public class ZoomController implements PlotAreaSpaceListener {
     private ZoomController() {
         plotAreaSpaceManager = PlotAreaSpaceManager.getInstance();
         plotAreaSpaceManager.addPlotAreaSpaceListenerToAllSpaces(this);
+        LayersModel.getSingletonInstance().addLayersListener(this);
     }
 
     /**
@@ -201,7 +205,7 @@ public class ZoomController implements PlotAreaSpaceListener {
     }
 
     private Interval<Date> computeCarringtonInterval(Interval<Date> interval, int value) {
-        return computeZoomForMilliSeconds( interval,  value * 2356585920l);
+        return computeZoomForMilliSeconds(interval, value * 2356585920l);
     }
 
     private Interval<Date> computeZoomForMilliSeconds(final Interval<Date> interval, long differenceMilli) {
@@ -357,6 +361,66 @@ public class ZoomController implements PlotAreaSpaceListener {
 
             setAvailableInterval(new Interval<Date>(tempStartDate, tempEndDate));
         }
+
+    }
+
+    @Override
+    public void layerAdded(int idx) {
+        final Interval<Date> interval = new Interval<Date>(LayersModel.getSingletonInstance().getFirstDate(), LayersModel.getSingletonInstance().getLastDate());
+        if (availableInterval == null || availableInterval.getStart() == null || availableInterval.getEnd() == null) {
+            availableInterval = interval;
+        } else {
+            Date start = availableInterval.getStart();
+            if (interval.getStart().before(availableInterval.getStart())) {
+                start = interval.getStart();
+            }
+            Date end = availableInterval.getEnd();
+            if (interval.getEnd().after(availableInterval.getEnd())) {
+                end = interval.getEnd();
+            }
+            this.setAvailableInterval(new Interval<Date>(start, end));
+        }
+    }
+
+    @Override
+    public void layerRemoved(View oldView, int oldIdx) {
+        // TODO Auto-generated method stub
+
+    }
+
+    @Override
+    public void layerChanged(int idx) {
+        // TODO Auto-generated method stub
+
+    }
+
+    @Override
+    public void activeLayerChanged(int idx) {
+        // TODO Auto-generated method stub
+
+    }
+
+    @Override
+    public void viewportGeometryChanged() {
+        // TODO Auto-generated method stub
+
+    }
+
+    @Override
+    public void timestampChanged(int idx) {
+        // TODO Auto-generated method stub
+
+    }
+
+    @Override
+    public void subImageDataChanged() {
+        // TODO Auto-generated method stub
+
+    }
+
+    @Override
+    public void layerDownloaded(int idx) {
+        // TODO Auto-generated method stub
 
     }
 }
