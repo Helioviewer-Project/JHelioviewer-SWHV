@@ -7,6 +7,8 @@ import java.util.Date;
 import kdu_jni.Jp2_palette;
 import kdu_jni.KduException;
 
+import javax.media.opengl.GL2;
+
 import org.helioviewer.base.math.Interval;
 import org.helioviewer.base.math.Vector2dInt;
 import org.helioviewer.jhv.display.Displayer;
@@ -70,7 +72,10 @@ public class JHVJP2View extends AbstractView implements JP2View, ViewportView, R
     };
 
     private Interval<Date> range;
+
+    /* to be separated */
     public int texID = -1;
+    public GL2 gl;
 
     // Member related to the view chain
     protected Viewport viewport;
@@ -453,10 +458,17 @@ public class JHVJP2View extends AbstractView implements JP2View, ViewportView, R
         super.notifyViewListeners(aEvent);
     }
 
+    private static void delT(GL2 gl, int texID) {
+        gl.glDeleteTextures(1, new int[] { texID }, 0);
+    }
+
     /**
      * Destroy the resources associated with this object.
      */
     public void abolish() {
+        if (texID != -1)
+            delT(gl, texID);
+
         if (reader != null) {
             reader.abolish();
             reader = null;

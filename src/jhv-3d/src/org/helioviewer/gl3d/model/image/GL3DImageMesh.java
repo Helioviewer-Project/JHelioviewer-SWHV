@@ -42,7 +42,6 @@ public abstract class GL3DImageMesh extends GL3DMesh {
         this.fragmentShaderProgram = fragmentShaderProgram;
 
         imageTextureView.addViewListener(new ViewListener() {
-
             @Override
             public void viewChanged(View sender, ChangeEvent aEvent) {
                 ImageTextureRecapturedReason reason = aEvent.getLastChangedReasonByType(ImageTextureRecapturedReason.class);
