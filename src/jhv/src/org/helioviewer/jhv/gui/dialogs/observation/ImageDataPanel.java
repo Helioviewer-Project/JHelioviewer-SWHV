@@ -184,8 +184,8 @@ public class ImageDataPanel extends ObservationDialogPanel implements DataSource
      * @param newEnd
      *            new start date and time
      */
-    public void setEndDate(Date newEnd) {
-        timeSelectionPanel.setEndDate(newEnd);
+    public void setEndDate(Date newEnd, boolean byUser) {
+        timeSelectionPanel.setEndDate(newEnd, byUser);
     }
 
     /**
@@ -194,8 +194,8 @@ public class ImageDataPanel extends ObservationDialogPanel implements DataSource
      * @param newStart
      *            new start date and time
      */
-    public void setStartDate(Date newStart) {
-        timeSelectionPanel.setStartDate(newStart);
+    public void setStartDate(Date newStart, boolean byUser) {
+        timeSelectionPanel.setStartDate(newStart, byUser);
     }
 
     /**
@@ -346,8 +346,8 @@ public class ImageDataPanel extends ObservationDialogPanel implements DataSource
         }
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
         try {
-            ObservationDialogDateModel.getInstance().setStartDate(sdf.parse(timeSelectionPanel.getStartTime()));
-            ObservationDialogDateModel.getInstance().setEndDate(sdf.parse(timeSelectionPanel.getEndTime()));
+            ObservationDialogDateModel.getInstance().setStartDate(sdf.parse(timeSelectionPanel.getStartTime()), true);
+            ObservationDialogDateModel.getInstance().setEndDate(sdf.parse(timeSelectionPanel.getEndTime()), true);
         } catch (ParseException e) {
             Log.debug("Date could not be parsed" + e);
         }
@@ -551,11 +551,11 @@ public class ImageDataPanel extends ObservationDialogPanel implements DataSource
                 public void run() {
                     // calendarEndDate.setDate(gregorianCalendar.getTime());
                     // textEndTime.setText(TimeTextField.formatter.format(gregorianCalendar.getTime()));
-                    setEndDate(gregorianCalendar.getTime());
+                    setEndDate(gregorianCalendar.getTime(), false);
                     gregorianCalendar.add(GregorianCalendar.DAY_OF_MONTH, -1);
                     // calendarStartDate.setDate(gregorianCalendar.getTime());
                     // textStartTime.setText(TimeTextField.formatter.format(gregorianCalendar.getTime()));
-                    setStartDate(gregorianCalendar.getTime());
+                    setStartDate(gregorianCalendar.getTime(), false);
                 }
             });
         }
@@ -566,11 +566,11 @@ public class ImageDataPanel extends ObservationDialogPanel implements DataSource
          * @param newEnd
          *            new start date and time
          */
-        public void setEndDate(Date newEnd) {
+        public void setEndDate(Date newEnd, boolean byUser) {
             calendarEndDate.setDate(newEnd);
             textEndTime.setText(TimeTextField.formatter.format(newEnd));
             if (!setFromOutside) {
-                ObservationDialogDateModel.getInstance().setEndDate(newEnd);
+                ObservationDialogDateModel.getInstance().setEndDate(newEnd, byUser);
             } else {
                 setFromOutside = false;
             }
@@ -582,11 +582,11 @@ public class ImageDataPanel extends ObservationDialogPanel implements DataSource
          * @param newStart
          *            new start date and time
          */
-        public void setStartDate(Date newStart) {
+        public void setStartDate(Date newStart, boolean byUser) {
             calendarStartDate.setDate(newStart);
             textStartTime.setText(TimeTextField.formatter.format(newStart));
             if (!setFromOutside) {
-                ObservationDialogDateModel.getInstance().setStartDate(newStart);
+                ObservationDialogDateModel.getInstance().setStartDate(newStart, byUser);
             } else {
                 setFromOutside = false;
             }
@@ -616,7 +616,7 @@ public class ImageDataPanel extends ObservationDialogPanel implements DataSource
                 Calendar calendar = new GregorianCalendar();
                 try {
                     calendar.setTime(sdf.parse(getStartTime()));
-                    setStartDate(calendar.getTime());
+                    setStartDate(calendar.getTime(), true);
                 } catch (ParseException e1) {
                     Log.error("Could not parse start date " + getStartTime());
                 }
@@ -633,7 +633,7 @@ public class ImageDataPanel extends ObservationDialogPanel implements DataSource
                 Calendar calendar = new GregorianCalendar();
                 try {
                     calendar.setTime(sdf.parse(getEndTime()));
-                    setEndDate(calendar.getTime());
+                    setEndDate(calendar.getTime(), true);
                 } catch (ParseException e1) {
                     Log.error("Could not parse end date " + getEndTime());
                 }
@@ -683,13 +683,13 @@ public class ImageDataPanel extends ObservationDialogPanel implements DataSource
         @Override
         public void startDateChanged(Date startDate) {
             setFromOutside = true;
-            setStartDate(startDate);
+            setStartDate(startDate, false);
         }
 
         @Override
         public void endDateChanged(Date endDate) {
             setFromOutside = true;
-            setEndDate(endDate);
+            setEndDate(endDate, false);
         }
     }
 
