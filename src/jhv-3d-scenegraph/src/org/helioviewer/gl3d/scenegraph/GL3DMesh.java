@@ -26,11 +26,11 @@ import org.helioviewer.gl3d.scenegraph.rt.GL3DRay;
  *
  */
 public abstract class GL3DMesh extends GL3DShape {
-    protected GL3DBuffer positionVBO;
-    protected GL3DBuffer normalVBO;
-    protected GL3DBuffer colorVBO;
-    protected GL3DBuffer texcoordVBO;
-    protected GL3DBuffer indexVBO;
+    private GL3DBuffer positionVBO;
+    private GL3DBuffer normalVBO;
+    private GL3DBuffer colorVBO;
+    private GL3DBuffer texcoordVBO;
+    private GL3DBuffer indexVBO;
 
     private GL3DMeshPrimitive primitive;
 
@@ -92,37 +92,8 @@ public abstract class GL3DMesh extends GL3DShape {
     }
 
     protected void recreateMesh(GL3DState state) {
-        meshLock.lock();
-
-        this.positionVBO.disable(state);
-        this.normalVBO.disable(state);
-        this.colorVBO.disable(state);
-        this.texcoordVBO.disable(state);
-        this.indexVBO.disable(state);
-
-        this.positionVBO.delete(state);
-        this.normalVBO.delete(state);
-        this.colorVBO.delete(state);
-        this.texcoordVBO.delete(state);
-        this.indexVBO.delete(state);
-
-        positions.clear();
-        normals.clear();
-        colors.clear();
-        textCoords.clear();
-        indices.clear();
-
-        this.primitive = this.createMesh(state, positions, normals, textCoords, indices, colors);
-
-        this.positionVBO = GL3DBuffer.createPositionBuffer(state, positions);
-        this.normalVBO = GL3DBuffer.createNormalBuffer(state, normals);
-        this.colorVBO = GL3DBuffer.createColorBuffer(state, colors);
-        this.texcoordVBO = GL3DBuffer.create2DTextureCoordinateBuffer(state, textCoords);
-        this.indexVBO = GL3DBuffer.createIndexBuffer(state, indices);
-
-        this.setTriangles(buildTriangles());
-
-        meshLock.unlock();
+        this.shapeDelete(state);
+        this.shapeInit(state);
     }
 
     @Override
@@ -131,6 +102,7 @@ public abstract class GL3DMesh extends GL3DShape {
 
         // If Mesh does not have any data, do not draw!
         if (this.positions.size() < 1) {
+            meshLock.unlock();
             // Log.debug("Mesh '"+this+"' is not initialised, abortingDraw");
             return;
         }
@@ -195,7 +167,6 @@ public abstract class GL3DMesh extends GL3DShape {
 
             for (int i = 0; i < this.indices.size(); i++) {
                 if (i % 4 == 0)
-
                     gl.glBegin(GL2.GL_LINE_LOOP);
                 int index = this.indices.get(i);
                 GL3DVec3d position = this.positions.get(index);
@@ -310,6 +281,8 @@ public abstract class GL3DMesh extends GL3DShape {
 
     @Override
     public void shapeDelete(GL3DState state) {
+        meshLock.lock();
+
         this.positionVBO.disable(state);
         this.colorVBO.disable(state);
         this.normalVBO.disable(state);
@@ -327,6 +300,8 @@ public abstract class GL3DMesh extends GL3DShape {
         colors.clear();
         textCoords.clear();
         indices.clear();
+
+        meshLock.unlock();
     }
 
     private List<GL3DTriangle> buildTriangles() {

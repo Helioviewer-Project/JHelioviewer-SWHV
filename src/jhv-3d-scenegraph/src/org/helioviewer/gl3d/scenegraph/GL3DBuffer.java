@@ -25,7 +25,7 @@ import com.jogamp.common.nio.Buffers;
 public class GL3DBuffer {
     private final static int drawType = GL2.GL_DYNAMIC_DRAW;
 
-    protected int id;
+    protected int id = -1;
     protected GL3DBufferType type;
     protected GL3DBufferAttribute attribute;
     protected GL3DBufferDataType dataType;
@@ -37,7 +37,6 @@ public class GL3DBuffer {
 
     // Offset between 2 elements within the array
     private int stride = 0;
-
     private final int offset = 0;
 
     private Buffer data;

@@ -47,7 +47,6 @@ public class GL3DImageLayers extends GL3DGroup {
             GL3DState.get().checkGLErrors("GL3DImageLayers.beforeEnable");
             state.gl.glEnable(GL2.GL_FRAGMENT_PROGRAM_ARB);
             state.gl.glEnable(GL2.GL_VERTEX_PROGRAM_ARB);
-
         }
 
         this.drawImageLayers(state);
@@ -82,14 +81,11 @@ public class GL3DImageLayers extends GL3DGroup {
                 state.gl.glDepthRange(1.f, 1.f);
                 layer.getImageCorona().draw(state);
                 state.gl.glDepthRange(0.f, 1.f);
-
             }
-
         }
 
         // state.gl.glDepthMask(true);
         state.gl.glDisable(GL2.GL_BLEND);
-
     }
 
     @Override
@@ -110,7 +106,6 @@ public class GL3DImageLayers extends GL3DGroup {
         VM.readLookAt(EYE, LA, LU, LR);
 
         LA.negate();
-
     }
 
     public void setCoronaVisibility(boolean visible) {
@@ -141,7 +136,6 @@ public class GL3DImageLayers extends GL3DGroup {
         layer.delete(state);
         Log.debug("GL3DImageLayers: Removed Layer " + layer.getName());
         this.imageLayerMap.remove(view);
-
     }
 
     public void moveImages(GL3DImageTextureView view, int index) {
