@@ -132,12 +132,14 @@ public class GLTextureHelper {
      * @return new texture id
      */
     public int genTextureID(GL2 gl) {
+        int[] tmp = new int[1];
+        gl.glGenTextures(1, tmp, 0);
+
         synchronized (allTextures) {
-            int[] tmp = new int[1];
-            gl.glGenTextures(1, tmp, 0);
             allTextures.put(tmp[0], null);
-            return tmp[0];
         }
+
+        return tmp[0];
     }
 
     /**
@@ -156,9 +158,7 @@ public class GLTextureHelper {
      * @see #bindTexture(GL2, int, int)
      */
     public void bindTexture(GL2 gl, int texture) {
-        synchronized (allTextures) {
-            textureImplementation.bindTexture(gl, texture);
-        }
+        textureImplementation.bindTexture(gl, texture);
     }
 
     /**
@@ -179,9 +179,7 @@ public class GLTextureHelper {
      * @see #bindTexture(GL2, int, int)
      */
     public void bindTexture(GL2 gl, int target, int texture) {
-        synchronized (allTextures) {
-            textureImplementation.bindTexture(gl, target, texture);
-        }
+        textureImplementation.bindTexture(gl, target, texture);
     }
 
     /**
@@ -759,57 +757,25 @@ public class GLTextureHelper {
          */
         @Override
         public void genTexture2D(GL2 gl, int texID, int internalFormat, int width, int height, int inputFormat, int inputType, Buffer buffer) {
+            gl.glBindTexture(GL2.GL_TEXTURE_2D, texID);
+            int width2 = nextPowerOfTwo(width);
+            int height2 = nextPowerOfTwo(height);
+
+            gl.glTexImage2D(GL2.GL_TEXTURE_2D, 0, internalFormat, width2, height2, 0, inputFormat, inputType, null);
+            gl.glTexSubImage2D(GL2.GL_TEXTURE_2D, 0, 0, 0, width, height, inputFormat, inputType, buffer);
+
+            gl.glTexParameteri(GL2.GL_TEXTURE_2D, GL2.GL_TEXTURE_MIN_FILTER, GL2.GL_LINEAR);
+            //Does the 2D mode need GL_NEAREST??
+            gl.glTexParameteri(GL2.GL_TEXTURE_2D, GL2.GL_TEXTURE_MAG_FILTER, GL2.GL_LINEAR);
+            gl.glTexParameteri(GL2.GL_TEXTURE_2D, GL2.GL_TEXTURE_WRAP_S, GL2.GL_CLAMP_TO_BORDER);
+            gl.glTexParameteri(GL2.GL_TEXTURE_2D, GL2.GL_TEXTURE_WRAP_T, GL2.GL_CLAMP_TO_BORDER);
+
+            scaleX = (float) 1.0 * width / width2;
+            scaleY = (float) 1.0 * height / height2;
+            scaleTexCoord.setValue(gl, (float) scaleX, (float) scaleY);
+            // System.out.println("SCALESET " +scaleX + " " +scaleY);
+
             synchronized (allTextures) {
-                gl.glBindTexture(GL2.GL_TEXTURE_2D, texID);
-                int width2 = nextPowerOfTwo(width);
-                int height2 = nextPowerOfTwo(height);
-
-                int bpp = 3;
-                switch (inputFormat) {
-                case GL2.GL_LUMINANCE:
-                case GL2.GL_ALPHA:
-                    bpp = 1;
-                    break;
-                case GL2.GL_LUMINANCE_ALPHA:
-                    bpp = 2;
-                    break;
-                case GL2.GL_RGB:
-                    bpp = 3;
-                    break;
-                case GL2.GL_RGBA:
-                    bpp = 4;
-                    break;
-                }
-                switch (inputType) {
-                case GL2.GL_UNSIGNED_BYTE:
-                    bpp *= 1;
-                    break;
-                case GL2.GL_UNSIGNED_SHORT:
-                case GL2.GL_UNSIGNED_SHORT_5_6_5:
-                case GL2.GL_UNSIGNED_SHORT_4_4_4_4:
-                case GL2.GL_UNSIGNED_SHORT_5_5_5_1:
-                    bpp *= 2;
-                    break;
-                }
-
-                gl.glTexImage2D(GL2.GL_TEXTURE_2D, 0, internalFormat, width2, height2, 0, inputFormat, inputType, null);
-
-                // Log.debug("GLTextureHelper.genTexture2D: Width="+width+", Height="+height+" Width2="+width2+", Height2="+height2);
-                if (buffer != null) {
-                    // System.out.println("TEXSUBIM" + width + " " + height);
-                    gl.glTexSubImage2D(GL2.GL_TEXTURE_2D, 0, 0, 0, width, height, inputFormat, inputType, buffer);
-                }
-
-                gl.glTexParameteri(GL2.GL_TEXTURE_2D, GL2.GL_TEXTURE_MIN_FILTER, GL2.GL_LINEAR);
-                //Does the 2D mode need GL_NEAREST??
-                gl.glTexParameteri(GL2.GL_TEXTURE_2D, GL2.GL_TEXTURE_MAG_FILTER, GL2.GL_LINEAR);
-                gl.glTexParameteri(GL2.GL_TEXTURE_2D, GL2.GL_TEXTURE_WRAP_S, GL2.GL_CLAMP_TO_BORDER);
-                gl.glTexParameteri(GL2.GL_TEXTURE_2D, GL2.GL_TEXTURE_WRAP_T, GL2.GL_CLAMP_TO_BORDER);
-
-                scaleX = (float) 1.0 * width / width2;
-                scaleY = (float) 1.0 * height / height2;
-                scaleTexCoord.setValue(gl, (float) scaleX, (float) scaleY);
-                // System.out.println("SCALESET " +scaleX + " " +scaleY);
                 allTextures.put(texID, new Vector2dDouble(scaleX, scaleY));
             }
         }
@@ -835,9 +801,9 @@ public class GLTextureHelper {
          */
         @Override
         public void bindTexture(GL2 gl, int target, int texture) {
-            synchronized (allTextures) {
-                gl.glBindTexture(target, texture);
+            gl.glBindTexture(target, texture);
 
+            synchronized (allTextures) {
                 Vector2dDouble scaleVector = allTextures.get(texture);
                 if (scaleVector != null) {
                     scaleTexCoord.setValue(gl, (float) scaleVector.getX(), (float) scaleVector.getY());
