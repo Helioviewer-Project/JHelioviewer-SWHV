@@ -417,7 +417,6 @@ public class MoviePanel extends JPanel implements ActionListener, ChangeListener
     private void updateMovieSpeed() {
         if (speedUnitComboBox.getSelectedItem() == SpeedUnit.FRAMESPERSECOND) {
             view.setDesiredRelativeSpeed(((SpinnerNumberModel) speedSpinner.getModel()).getNumber().intValue());
-
         } else {
             timedView.setDesiredAbsoluteSpeed(((SpinnerNumberModel) speedSpinner.getModel()).getNumber().intValue() * ((SpeedUnit) speedUnitComboBox.getSelectedItem()).getSecondsPerSecond());
         }
@@ -588,8 +587,8 @@ public class MoviePanel extends JPanel implements ActionListener, ChangeListener
 
     @Override
     public void viewChanged(View sender, ChangeEvent aEvent) {
-        Log.debug("Sender : " + sender);
-        Log.debug("Event : " + aEvent);
+        //Log.debug("Sender : " + sender);
+        //Log.debug("Event : " + aEvent);
         // Stop movie, when the layer was removed.
         LayerChangedReason layerReason = aEvent.getLastChangedReasonByType(LayerChangedReason.class);
 
@@ -605,8 +604,8 @@ public class MoviePanel extends JPanel implements ActionListener, ChangeListener
         SubImageDataChangedReason subImageDataChangedReason = aEvent.getLastChangedReasonByTypeAndView(SubImageDataChangedReason.class, view);
         if (subImageDataChangedReason != null) {
             if (!isDragging) {
-                Thread.dumpStack();
-                Log.debug(view.getCurrentFrameNumber());
+                //Thread.dumpStack();
+                //Log.debug(view.getCurrentFrameNumber());
                 timeSlider.setValue(view.getCurrentFrameNumber());
             }
         }
