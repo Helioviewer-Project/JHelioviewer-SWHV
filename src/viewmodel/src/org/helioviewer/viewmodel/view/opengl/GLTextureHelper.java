@@ -124,15 +124,6 @@ public class GLTextureHelper {
         scaleTexCoord.setValue(gl, 1.0f, 1.0f);
     }
 
-    public Vector2dDouble getTextureScale(int texId) {
-        synchronized (allTextures) {
-            if (allTextures.containsKey(texId)) {
-                return allTextures.get(texId);
-            }
-        }
-        return null;
-    }
-
     /**
      * Generates a new texture.
      *
@@ -307,6 +298,12 @@ public class GLTextureHelper {
         }
     }
 
+    private static int genT(GL2 gl) {
+        int[] tmp = new int[1];
+        gl.glGenTextures(1, tmp, 0);
+        return tmp[0];
+    }
+
     /**
      * Renders the content of the given image data object to the screen.
      *
@@ -331,8 +328,10 @@ public class GLTextureHelper {
                 return;
             if (source.getWidth() <= maxTextureSize && source.getHeight() <= maxTextureSize) {
                 if (jpxView != null) {
-                    if (!allTextures.containsKey(jpxView.texID)) {
-                        jpxView.texID = genTextureID(gl);
+                    if (jpxView.texID == -1) {
+                        /* to be encapsulated */
+                        jpxView.texID = genT(gl);
+                        jpxView.gl = gl;
                     }
                     moveImageDataToGLTexture(gl, source, jpxView.texID);
                 }
@@ -354,7 +353,8 @@ public class GLTextureHelper {
                         int height = Math.min(source.getHeight() - y, maxTextureSize);
                         if (jpxView != null) {
                             if (jpxView.texID == -1) {
-                                jpxView.texID = genTextureID(gl);
+                                jpxView.texID = genT(gl);
+                                jpxView.gl = gl;
                             }
                             moveImageDataToGLTexture(gl, source, x, y, width, height, jpxView.texID);
                         }

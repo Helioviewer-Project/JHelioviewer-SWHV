@@ -148,8 +148,7 @@ public abstract class GL3DMesh extends GL3DShape {
             this.normalVBO.disable(state);
             this.texcoordVBO.disable(state);
             this.indexVBO.disable(state);
-
-            GL3DState.get().checkGLErrors("GL3DImageMesh.afterDisableVBOs " + getName());
+            // GL3DState.get().checkGLErrors("GL3DImageMesh.afterDisableVBOs " + getName());
         }
 
         if (isDrawBitOn(Bit.Normals)) {
