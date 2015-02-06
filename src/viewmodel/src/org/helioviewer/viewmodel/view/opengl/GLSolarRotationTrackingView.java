@@ -15,8 +15,6 @@ import org.helioviewer.viewmodel.view.jp2view.JHVJPXView;
  */
 public class GLSolarRotationTrackingView extends StandardSolarRotationTrackingView implements GLView {
 
-    protected final static GLTextureHelper textureHelper = new GLTextureHelper();
-
     /**
      * {@inheritDoc}
      */
@@ -24,7 +22,7 @@ public class GLSolarRotationTrackingView extends StandardSolarRotationTrackingVi
         if (view instanceof GLView) {
             ((GLView) view).renderGL(gl, true);
         } else {
-            textureHelper.renderImageDataToScreen(gl, view.getAdapter(RegionView.class).getRegion(), view.getAdapter(SubimageDataView.class).getSubimageData(), view.getAdapter(JHVJPXView.class));
+            GLTextureHelper.renderImageDataToScreen(gl, view.getAdapter(RegionView.class).getRegion(), view.getAdapter(SubimageDataView.class).getSubimageData(), view.getAdapter(JHVJPXView.class));
         }
     }
 }

@@ -25,8 +25,6 @@ import org.helioviewer.viewmodel.view.jp2view.JHVJP2View;
  */
 public abstract class AbstractGLView extends AbstractBasicView implements GLView, ModifiableInnerViewView, ViewListener {
 
-    protected final static GLTextureHelper textureHelper = new GLTextureHelper();
-
     /**
      * {@inheritDoc}
      */
@@ -50,7 +48,7 @@ public abstract class AbstractGLView extends AbstractBasicView implements GLView
         if (view instanceof GLView) {
             ((GLView) view).renderGL(gl, true);
         } else {
-            textureHelper.renderImageDataToScreen(gl, view.getAdapter(RegionView.class).getRegion(), view.getAdapter(SubimageDataView.class).getSubimageData(), view.getAdapter(JHVJP2View.class));
+            GLTextureHelper.renderImageDataToScreen(gl, view.getAdapter(RegionView.class).getRegion(), view.getAdapter(SubimageDataView.class).getSubimageData(), view.getAdapter(JHVJP2View.class));
         }
     }
 

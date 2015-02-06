@@ -33,8 +33,6 @@ import org.helioviewer.viewmodel.view.opengl.shader.GLVertexShaderView;
  */
 public class GLLayeredView extends AbstractLayeredView implements GLFragmentShaderView, GLVertexShaderView {
 
-    private final GLTextureHelper textureHelper = new GLTextureHelper();
-
     /**
      * {@inheritDoc}
      */
@@ -136,7 +134,7 @@ public class GLLayeredView extends AbstractLayeredView implements GLFragmentShad
                     if (v instanceof GLView) {
                         ((GLView) v).renderGL(gl, true);
                     } else {
-                        textureHelper.renderImageDataToScreen(gl, layer.regionView.getRegion(), v.getAdapter(SubimageDataView.class).getSubimageData(), v.getAdapter(JHVJP2View.class));
+                        GLTextureHelper.renderImageDataToScreen(gl, layer.regionView.getRegion(), v.getAdapter(SubimageDataView.class).getSubimageData(), v.getAdapter(JHVJP2View.class));
                     }
                 }
             }

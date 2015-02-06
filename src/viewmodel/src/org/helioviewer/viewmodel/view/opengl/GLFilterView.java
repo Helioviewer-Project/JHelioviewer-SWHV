@@ -54,7 +54,6 @@ import org.helioviewer.viewmodel.viewport.Viewport;
  */
 public class GLFilterView extends StandardFilterView implements GLFragmentShaderView {
 
-    protected static GLTextureHelper textureHelper = new GLTextureHelper();
     protected ViewportView viewportView;
 
     protected boolean filteredDataIsUpToDate = false;
@@ -96,7 +95,7 @@ public class GLFilterView extends StandardFilterView implements GLFragmentShader
                 ((GLView) view).renderGL(gl, true);
             } else {
                 if (subimageDataView != null) {
-                    textureHelper.renderImageDataToScreen(gl, regionView.getRegion(), subimageDataView.getSubimageData(), view.getAdapter(JHVJP2View.class));
+                    GLTextureHelper.renderImageDataToScreen(gl, regionView.getRegion(), subimageDataView.getSubimageData(), view.getAdapter(JHVJP2View.class));
                 }
             }
 

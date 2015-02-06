@@ -109,7 +109,6 @@ public class GLComponentView extends AbstractComponentView implements ViewListen
 
     // Helper
     private boolean rebuildShadersRequest = false;
-    private final GLTextureHelper textureHelper = new GLTextureHelper();
     private final GLShaderHelper shaderHelper = new GLShaderHelper();
 
     // screenshot
@@ -357,7 +356,7 @@ public class GLComponentView extends AbstractComponentView implements ViewListen
         //GLDrawableFactory.getFactory(GLProfile.getDefault()).createExternalGLContext();
         final GL2 gl = drawable.getGL().getGL2();
         //gl.getContext().setGL(GLPipelineFactory.create("javax.media.opengl.Trace", null, gl, new Object[] { System.err }));
-        textureHelper.delAllTextures(gl);
+
         GLTextureHelper.initHelper(gl);
 
         shaderHelper.delAllShaderIDs(gl);
@@ -450,7 +449,7 @@ public class GLComponentView extends AbstractComponentView implements ViewListen
             if (view instanceof GLView) {
                 ((GLView) view).renderGL(gl, true);
             } else {
-                textureHelper.renderImageDataToScreen(gl, view.getAdapter(RegionView.class).getRegion(), view.getAdapter(SubimageDataView.class).getSubimageData(), view.getAdapter(JHVJP2View.class));
+                GLTextureHelper.renderImageDataToScreen(gl, view.getAdapter(RegionView.class).getRegion(), view.getAdapter(SubimageDataView.class).getSubimageData(), view.getAdapter(JHVJP2View.class));
             }
             gl.glPopMatrix();
         }
