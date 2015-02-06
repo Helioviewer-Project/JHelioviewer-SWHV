@@ -95,6 +95,7 @@ public abstract class GL3DImageMesh extends GL3DMesh {
 
         GLVertexShaderProgram.pushShader(state.gl);
         GLFragmentShaderProgram.pushShader(state.gl);
+
         this.vertexShaderProgram.bind(state.gl);
         this.fragmentShaderProgram.bind(state.gl);
 
