@@ -338,7 +338,6 @@ public class GLPhysicalRenderGraphics extends AbstractPhysicalRenderGraphics {
     public void drawText(String text, Double x, Double y) {
         y = -y;
 
-        commonRenderGraphics.bindScalingShader();
         commonRenderGraphics.bindString(text, font);
 
         Vector2dDouble size = convertScreenToPhysical(commonRenderGraphics.getStringDisplaySize(text, font));
@@ -358,8 +357,6 @@ public class GLPhysicalRenderGraphics extends AbstractPhysicalRenderGraphics {
         gl.glVertex2d(x + width2, y - height2);
 
         gl.glEnd();
-
-        commonRenderGraphics.unbindScalingShader();
     }
 
     @Override
@@ -381,7 +378,6 @@ public class GLPhysicalRenderGraphics extends AbstractPhysicalRenderGraphics {
 
         gl.glDisable(GL2.GL_VERTEX_PROGRAM_ARB);
         gl.glDisable(GL2.GL_FRAGMENT_PROGRAM_ARB);
-        commonRenderGraphics.bindScalingShader();
 
         commonRenderGraphics.bindImage(image);
         gl.glTexParameteri(GL2.GL_TEXTURE_2D, GL2.GL_TEXTURE_MAG_FILTER, GL2.GL_LINEAR);
@@ -440,7 +436,6 @@ public class GLPhysicalRenderGraphics extends AbstractPhysicalRenderGraphics {
         gl.glEnable(GL2.GL_BLEND);
         gl.glDisable(GL2.GL_VERTEX_PROGRAM_ARB);
         gl.glDisable(GL2.GL_FRAGMENT_PROGRAM_ARB);
-
     }
 
     @Override

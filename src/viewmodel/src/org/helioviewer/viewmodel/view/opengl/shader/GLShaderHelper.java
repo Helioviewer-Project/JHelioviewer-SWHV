@@ -18,7 +18,6 @@ import javax.media.opengl.glu.GLU;
 import org.apache.log4j.Level;
 import org.helioviewer.base.FileUtils;
 import org.helioviewer.base.logging.Log;
-import org.helioviewer.viewmodel.renderer.GLCommonRenderGraphics;
 
 /**
  * Helper class to handle OpenGL shaders.
@@ -126,7 +125,6 @@ public class GLShaderHelper {
      *            Valid reference to the current gl object
      */
     public void delAllShaderIDs(GL2 gl) {
-        GLCommonRenderGraphics.clearShader();
         for (int i = allShaders.size() - 1; i >= 0; i--) {
             delShaderID(gl, allShaders.get(i));
         }

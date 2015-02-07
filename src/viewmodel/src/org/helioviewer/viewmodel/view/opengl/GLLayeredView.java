@@ -42,23 +42,6 @@ public class GLLayeredView extends AbstractLayeredView implements GLFragmentShad
             return;
         }
 
-        if (!GLTextureHelper.textureNonPowerOfTwoAvailable() && newLayer.getAdapter(GLScalePowerOfTwoView.class) == null) {
-            GLScalePowerOfTwoView scaleView = new GLScalePowerOfTwoView();
-            scaleView.setView(newLayer);
-            newLayer = scaleView;
-        }
-
-        // Add filter for dynamic view angle dependant opacity
-        /*
-         * GLFilterView filterView = new GLFilterView(); OpacityFilter filter =
-         * new OpacityFilter(0.5f); filterView.setFilter(filter);
-         *
-         * GLHelioviewerGeometryView geomView =
-         * newLayer.getAdapter(GLHelioviewerGeometryView.class); if(geomView !=
-         * null) { View firstFilter = geomView.getView();
-         * filterView.setView(firstFilter); geomView.setView(filterView); }
-         */
-
         super.addLayer(newLayer, newIndex);
     }
 

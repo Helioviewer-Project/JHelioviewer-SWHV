@@ -12,7 +12,6 @@ import javax.media.opengl.GL2;
 
 import org.helioviewer.base.math.Vector2dInt;
 import org.helioviewer.viewmodel.view.opengl.GLTextureHelper;
-import org.helioviewer.viewmodel.view.opengl.shader.GLScalePowerOfTwoVertexShaderProgram;
 import org.helioviewer.viewmodel.view.opengl.shader.GLTextureCoordinate;
 
 /**
@@ -27,7 +26,6 @@ import org.helioviewer.viewmodel.view.opengl.shader.GLTextureCoordinate;
  */
 public class GLCommonRenderGraphics {
 
-    private static GLScalePowerOfTwoVertexShaderProgram scalingShader;
     private static GLTextureCoordinate texCoord = new GLTextureHelper.GLMainTextureCoordinate();
 
     private final GL2 gl;
@@ -50,11 +48,6 @@ public class GLCommonRenderGraphics {
      */
     public GLCommonRenderGraphics(GL2 _gl) {
         gl = _gl;
-
-        if (!GLTextureHelper.textureNonPowerOfTwoAvailable() && scalingShader == null) {
-            scalingShader = new GLScalePowerOfTwoVertexShaderProgram();
-            scalingShader.buildStandAlone(_gl);
-        }
     }
 
     /**
@@ -110,7 +103,7 @@ public class GLCommonRenderGraphics {
             mapImageToTexture.put(image, texID);
         }
 
-        textureHelper.bindTexture(gl, texID.intValue());
+        gl.glBindTexture(GL2.GL_TEXTURE_2D, texID.intValue());
     }
 
     /**
@@ -150,34 +143,7 @@ public class GLCommonRenderGraphics {
             mapStringToTexture.put(stringFontPair, texID);
         }
 
-        textureHelper.bindTexture(gl, texID.intValue());
-    }
-
-    /**
-     * Binds the scaling shader.
-     * 
-     * This should be done before using a texture. After using the texture,
-     * {@link #unbindScalingShader()} should be called.
-     * 
-     * <p>
-     * This function only has an effect, if non-power-of-two- textures are
-     * disabled.
-     */
-    public void bindScalingShader() {
-        if (GLTextureHelper.textureNonPowerOfTwoAvailable())
-            return;
-
-        gl.glEnable(GL2.GL_VERTEX_PROGRAM_ARB);
-        scalingShader.bind(gl);
-    }
-
-    /**
-     * Unbinds the scaling shader.
-     * 
-     * This is the corresponding call to {@link #bindScalingShader()}.
-     */
-    public void unbindScalingShader() {
-        gl.glDisable(GL2.GL_VERTEX_PROGRAM_ARB);
+        gl.glBindTexture(GL2.GL_TEXTURE_2D, texID.intValue());
     }
 
     /**
@@ -208,13 +174,6 @@ public class GLCommonRenderGraphics {
             textureHelper.delTextureID(gl, i);
         }
         mapStringToTexture.clear();
-    }
-
-    /**
-     * Clears the shader shared by this render graphics objects.
-     */
-    public static void clearShader() {
-        scalingShader = null;
     }
 
     private class StringFontPair {
