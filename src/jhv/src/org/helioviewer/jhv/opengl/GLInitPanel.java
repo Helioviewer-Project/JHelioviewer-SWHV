@@ -116,8 +116,6 @@ public class GLInitPanel extends GLJPanel {
                 GLShaderHelper.initHelper(gl, JHVDirectory.TEMP.getPath());
                 GLShaderBuilder.initShaderBuilder(gl);
 
-                GLTextureHelper.setTextureNonPowerOfTwo(false);
-
                 //Fix for retina displays
                 GLTextureHelper.setPixelHIFactorWidth(parent.getCurrentSurfaceScale(new int[2])[0]);
                 GLTextureHelper.setPixelHIFactorHeight(parent.getCurrentSurfaceScale(new int[2])[1]);

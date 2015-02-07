@@ -43,56 +43,13 @@ import org.helioviewer.viewmodel.view.opengl.shader.GLTextureCoordinate;
  */
 public class GLTextureHelper {
     public static boolean is2DState = false;
-    private static TextureImplementation textureImplementation = null;
-    private static boolean textureNonPowerOfTwo = false;
     private static int maxTextureSize = 2048;
 
     private static GLTextureCoordinate mainTexCoord = new GLMainTextureCoordinate();
-    private static GLTextureCoordinate scaleTexCoord = new GLScaleTextureCoordinate();
-    public static double scaleX;
-    public static double scaleY;
 
     private static HashMap<Integer, Vector2dDouble> allTextures = new HashMap<Integer, Vector2dDouble>();
 
     private final static int[] formatMap = { GL2.GL_LUMINANCE4, GL2.GL_LUMINANCE4, GL2.GL_LUMINANCE4, GL2.GL_LUMINANCE4, GL2.GL_LUMINANCE8, GL2.GL_LUMINANCE8, GL2.GL_LUMINANCE8, GL2.GL_LUMINANCE8, GL2.GL_LUMINANCE12, GL2.GL_LUMINANCE12, GL2.GL_LUMINANCE12, GL2.GL_LUMINANCE12, GL2.GL_LUMINANCE16, GL2.GL_LUMINANCE16, GL2.GL_LUMINANCE16, GL2.GL_LUMINANCE16 };
-
-    /**
-     * Sets whether non power of two textures should be used.
-     *
-     * If non power of two textures are deactivated, they are simulated by using
-     * parts of power of two textures. On some architectures, this is faster,
-     * some architectures do not even support non power of two textures. In any
-     * case, the memory use is higher for power of two textures.
-     *
-     * @param nonPowerOfTwo
-     *            true for using non power of two textures, false otherwise.
-     * @see #textureNonPowerOfTwoAvailable()
-     */
-    public static void setTextureNonPowerOfTwo(boolean nonPowerOfTwo) {
-        if (nonPowerOfTwo != textureNonPowerOfTwo) {
-            if (nonPowerOfTwo)
-                textureImplementation = new NonPowerOfTwoTextureImplementation();
-            else
-                textureImplementation = new PowerOfTwoTextureImplementation();
-        }
-
-        textureNonPowerOfTwo = nonPowerOfTwo;
-    }
-
-    /**
-     * Returns whether non power of two textures are activated.
-     *
-     * If non power of two textures are deactivated, they are simulated by using
-     * parts of power of two textures. On some architectures, this is faster,
-     * some architectures do not even support non power of two textures. In any
-     * case, the memory use is higher for power of two textures.
-     *
-     * @return true if non power of two textures are activated, false otherwise.
-     * @see #setTextureNonPowerOfTwo(boolean)
-     */
-    public static boolean textureNonPowerOfTwoAvailable() {
-        return textureNonPowerOfTwo;
-    }
 
     /**
      * Initializes the helper.
@@ -107,21 +64,10 @@ public class GLTextureHelper {
     public static void initHelper(GL2 gl) {
         Log.debug(">> GLTextureHelper.initHelper(GL) > Initialize helper functions");
 
-        if (textureImplementation == null) {
-            Log.debug(">> GLTextureHelper.initHelper(GL) > Use Non-Power-Of-Two-Textures: " + textureNonPowerOfTwoAvailable());
-
-            if (textureNonPowerOfTwoAvailable())
-                textureImplementation = new NonPowerOfTwoTextureImplementation();
-            else
-                textureImplementation = new PowerOfTwoTextureImplementation();
-        }
-
         int tmp[] = new int[1];
         gl.glGetIntegerv(GL2.GL_MAX_TEXTURE_SIZE, tmp, 0);
         maxTextureSize = tmp[0];
         Log.debug(">> GLTextureHelper.initHelper(GL) > max texture size: " + maxTextureSize);
-
-        scaleTexCoord.setValue(gl, 1.0f, 1.0f);
     }
 
     /**
@@ -140,46 +86,6 @@ public class GLTextureHelper {
         }
 
         return tmp[0];
-    }
-
-    /**
-     * Binds a 2D texture.
-     *
-     * If PowerOfTextures are used, this will also load the texture scaling to
-     * the texture coordinate GL_TEXTURE1, which will be used by
-     * {@link org.helioviewer.viewmodel.view.opengl.shader.GLScalePowerOfTwoVertexShaderProgram}
-     * . Thus, it is highly recommended to use this function for GL_TEXTURE0
-     * instead of calling OpenGL directly.
-     *
-     * @param gl
-     *            Valid reference to the current gl object
-     * @param texture
-     *            texture id to bind
-     * @see #bindTexture(GL2, int, int)
-     */
-    public void bindTexture(GL2 gl, int texture) {
-        textureImplementation.bindTexture(gl, texture);
-    }
-
-    /**
-     * Binds a texture.
-     *
-     * If PowerOfTextures are used, this will also load the texture scaling to
-     * the texture coordinate GL_TEXTURE1, which will be used by
-     * {@link org.helioviewer.viewmodel.view.opengl.shader.GLScalePowerOfTwoVertexShaderProgram}
-     * . Thus, it is highly recommended to use this function for GL_TEXTURE0
-     * instead of calling OpenGL directly.
-     *
-     * @param gl
-     *            Valid reference to the current gl object
-     * @param target
-     *            texture type, such as GL_TEXTURE_2D
-     * @param texture
-     *            texture id to bind
-     * @see #bindTexture(GL2, int, int)
-     */
-    public void bindTexture(GL2 gl, int target, int texture) {
-        textureImplementation.bindTexture(gl, target, texture);
     }
 
     /**
@@ -237,6 +143,16 @@ public class GLTextureHelper {
                 }
             }
         }
+    }
+
+    private static void genTexture2D(GL2 gl, int texID, int internalFormat, int width, int height, int inputFormat, int inputType, Buffer buffer) {
+        gl.glBindTexture(GL2.GL_TEXTURE_2D, texID);
+        gl.glTexImage2D(GL2.GL_TEXTURE_2D, 0, internalFormat, width, height, 0, inputFormat, inputType, buffer);
+
+        gl.glTexParameteri(GL2.GL_TEXTURE_2D, GL2.GL_TEXTURE_MIN_FILTER, GL2.GL_LINEAR);
+        gl.glTexParameteri(GL2.GL_TEXTURE_2D, GL2.GL_TEXTURE_MAG_FILTER, GL2.GL_LINEAR);
+        gl.glTexParameteri(GL2.GL_TEXTURE_2D, GL2.GL_TEXTURE_WRAP_S, GL2.GL_CLAMP_TO_EDGE);
+        gl.glTexParameteri(GL2.GL_TEXTURE_2D, GL2.GL_TEXTURE_WRAP_T, GL2.GL_CLAMP_TO_EDGE);
     }
 
     /**
@@ -330,7 +246,7 @@ public class GLTextureHelper {
                     jpxView.texID = genT(gl);
                     jpxView.gl = gl;
                 }
-                moveImageDataToGLTexture(gl, source, jpxView.texID);
+                moveImageDataToGLTexture(gl, source, 0, 0, source.getWidth(), source.getHeight(), jpxView.texID);
             }
             renderTextureToScreen(gl, region);
 
@@ -362,21 +278,6 @@ public class GLTextureHelper {
             }
             gl.glColorMask(true, true, true, true);
         }
-    }
-
-
-    /**
-     * Saves a given image data object to a given texture.
-     *
-     * @param gl
-     *            Valid reference to the current gl object
-     * @param source
-     *            Image data to copy to the texture
-     * @param target
-     *            Valid texture id
-     */
-    public static void moveImageDataToGLTexture(GL2 gl, ImageData source, int target) {
-        moveImageDataToGLTexture(gl, source, 0, 0, source.getWidth(), source.getHeight(), target);
     }
 
     /**
@@ -430,7 +331,7 @@ public class GLTextureHelper {
         ImageFormat imageFormat = source.getImageFormat();
 
         if (source.getHeight() > 1) {
-            textureImplementation.genTexture2D(gl, target, mapImageFormatToInternalGLFormat(imageFormat), width, height, mapImageFormatToInputGLFormat(imageFormat), mapBitsPerPixelToGLType(bitsPerPixel), buffer);
+            genTexture2D(gl, target, mapImageFormatToInternalGLFormat(imageFormat), width, height, mapImageFormatToInputGLFormat(imageFormat), mapBitsPerPixelToGLType(bitsPerPixel), buffer);
         } else
             throw new IllegalArgumentException("Format is not supported");
     }
@@ -481,7 +382,7 @@ public class GLTextureHelper {
         gl.glPixelStorei(GL2.GL_UNPACK_ALIGNMENT, mapDataBufferTypeToGLAlign(rawBuffer.getDataType()));
 
         if (source.getHeight() > 1) {
-            textureImplementation.genTexture2D(gl, target, mapTypeToInternalGLFormat(source.getType()), source.getWidth(), source.getHeight(), mapTypeToInputGLFormat(source.getType()), mapDataBufferTypeToGLType(rawBuffer.getDataType()), buffer);
+            genTexture2D(gl, target, mapTypeToInternalGLFormat(source.getType()), source.getWidth(), source.getHeight(), mapTypeToInputGLFormat(source.getType()), mapDataBufferTypeToGLType(rawBuffer.getDataType()), buffer);
         } else
             throw new IllegalArgumentException("Format is not supported");
     }
@@ -620,228 +521,6 @@ public class GLTextureHelper {
     }
 
     /**
-     * Private interface to perform the actual transfer of input data to the
-     * graphics card and bind textures
-     *
-     * <p>
-     * This interface has been introduced for not having to check every render
-     * cycle, whether non power of two textures are activated or not. There is
-     * one implementation per type: {@link NonPowerOfTwoTextureImplementation}
-     * and {@link PowerOfTwoTextureImplementation}.
-     *
-     */
-    private static interface TextureImplementation {
-
-        /**
-         * Copies image data to a two-dimensional texture to the graphics
-         * memory.
-         *
-         * @param gl
-         *            Valid reference to the current gl object
-         * @param texID
-         *            Target texture id
-         * @param internalFormat
-         *            OpenGL format used for saving the data
-         * @param width
-         *            Width of the image
-         * @param height
-         *            Height of the image
-         * @param inputFormat
-         *            OpenGL format used for transferring the data
-         * @param inputType
-         *            OpenGL type used for reading the data
-         * @param buffer
-         *            Source data
-         */
-        public void genTexture2D(GL2 gl, int texID, int internalFormat, int width, int height, int inputFormat, int inputType, Buffer buffer);
-
-        /**
-         * Binds a 2D texture.
-         *
-         * @param gl
-         *            Valid reference to the current gl object
-         * @param texture
-         *            texture id to bind
-         * @see #bindTexture(GL2, int, int)
-         */
-        public void bindTexture(GL2 gl, int texture);
-
-        /**
-         * Binds a texture.
-         *
-         * @param gl
-         *            Valid reference to the current gl object
-         * @param target
-         *            texture type, such as GL_TEXTURE_2D
-         * @param texture
-         *            texture id to bind
-         * @see #bindTexture(GL2, int, int)
-         */
-        public void bindTexture(GL2 gl, int target, int texture);
-
-        /**
-         * Copies the current frame buffer to a texture.
-         *
-         * @param gl
-         *            Valid reference to the current gl object
-         * @param texture
-         *            target texture
-         * @param rect
-         *            area of the frame buffer to copy
-         */
-        public void copyFrameBufferToTexture(GL2 gl, int texture, Rectangle rect);
-    }
-
-    /**
-     * Implementation of Texture Loader for non power of two textures.
-     */
-    private static class NonPowerOfTwoTextureImplementation implements TextureImplementation {
-
-        /**
-         * {@inheritDoc}
-         */
-        @Override
-        public void genTexture2D(GL2 gl, int texID, int internalFormat, int width, int height, int inputFormat, int inputType, Buffer buffer) {
-
-            gl.glBindTexture(GL2.GL_TEXTURE_2D, texID);
-            gl.glTexImage2D(GL2.GL_TEXTURE_2D, 0, internalFormat, width, height, 0, inputFormat, inputType, buffer);
-
-            gl.glTexParameteri(GL2.GL_TEXTURE_2D, GL2.GL_TEXTURE_MIN_FILTER, GL2.GL_LINEAR);
-            gl.glTexParameteri(GL2.GL_TEXTURE_2D, GL2.GL_TEXTURE_MAG_FILTER, GL2.GL_LINEAR);
-            gl.glTexParameteri(GL2.GL_TEXTURE_2D, GL2.GL_TEXTURE_WRAP_S, GL2.GL_CLAMP);
-            gl.glTexParameteri(GL2.GL_TEXTURE_2D, GL2.GL_TEXTURE_WRAP_T, GL2.GL_CLAMP);
-        }
-
-        /**
-         * {@inheritDoc}
-         */
-        @Override
-        public void bindTexture(GL2 gl, int texture) {
-            gl.glBindTexture(GL2.GL_TEXTURE_2D, texture);
-        }
-
-        /**
-         * {@inheritDoc}
-         */
-        @Override
-        public void bindTexture(GL2 gl, int target, int texture) {
-            gl.glBindTexture(target, texture);
-        }
-
-        /**
-         * {@inheritDoc}
-         */
-        @Override
-        public void copyFrameBufferToTexture(GL2 gl, int texture, Rectangle rect) {
-            gl.glCopyTexImage2D(GL2.GL_TEXTURE_2D, 0, GL2.GL_RGBA, rect.x, rect.y, rect.width, rect.height, 0);
-        }
-
-    }
-
-    /**
-     * Texture implementation for power of two textures. After copying the
-     * image, the loader also sets the scaling factor used by
-     * {@link GLScalePowerOfTwoView} and
-     * {@link org.helioviewer.viewmodel.view.opengl.shader.GLScalePowerOfTwoVertexShaderProgram}
-     * .
-     */
-    private static class PowerOfTwoTextureImplementation implements TextureImplementation {
-
-        /**
-         * {@inheritDoc}
-         */
-        private int bytebufferlength;
-
-        /**
-         * {@inheritDoc}
-         */
-        @Override
-        public void genTexture2D(GL2 gl, int texID, int internalFormat, int width, int height, int inputFormat, int inputType, Buffer buffer) {
-            gl.glBindTexture(GL2.GL_TEXTURE_2D, texID);
-            int width2 = nextPowerOfTwo(width);
-            int height2 = nextPowerOfTwo(height);
-
-            gl.glTexImage2D(GL2.GL_TEXTURE_2D, 0, internalFormat, width2, height2, 0, inputFormat, inputType, null);
-            gl.glTexSubImage2D(GL2.GL_TEXTURE_2D, 0, 0, 0, width, height, inputFormat, inputType, buffer);
-
-            gl.glTexParameteri(GL2.GL_TEXTURE_2D, GL2.GL_TEXTURE_MIN_FILTER, GL2.GL_LINEAR);
-            //Does the 2D mode need GL_NEAREST??
-            gl.glTexParameteri(GL2.GL_TEXTURE_2D, GL2.GL_TEXTURE_MAG_FILTER, GL2.GL_LINEAR);
-            gl.glTexParameteri(GL2.GL_TEXTURE_2D, GL2.GL_TEXTURE_WRAP_S, GL2.GL_CLAMP_TO_BORDER);
-            gl.glTexParameteri(GL2.GL_TEXTURE_2D, GL2.GL_TEXTURE_WRAP_T, GL2.GL_CLAMP_TO_BORDER);
-
-            scaleX = (float) 1.0 * width / width2;
-            scaleY = (float) 1.0 * height / height2;
-            scaleTexCoord.setValue(gl, (float) scaleX, (float) scaleY);
-            // System.out.println("SCALESET " +scaleX + " " +scaleY);
-
-            synchronized (allTextures) {
-                allTextures.put(texID, new Vector2dDouble(scaleX, scaleY));
-            }
-        }
-
-        /**
-         * {@inheritDoc}
-         *
-         * In this case, this function will also load the texture scaling to the
-         * texture coordinate GL_TEXTURE1, which will be used by
-         * {@link org.helioviewer.viewmodel.view.opengl.shader.GLScalePowerOfTwoVertexShaderProgram}
-         */
-        @Override
-        public void bindTexture(GL2 gl, int texture) {
-            bindTexture(gl, GL2.GL_TEXTURE_2D, texture);
-        }
-
-        /**
-         * {@inheritDoc}
-         *
-         * In this case, this function will also load the texture scaling to the
-         * texture coordinate GL_TEXTURE1, which will be used by
-         * {@link org.helioviewer.viewmodel.view.opengl.shader.GLScalePowerOfTwoVertexShaderProgram}
-         */
-        @Override
-        public void bindTexture(GL2 gl, int target, int texture) {
-            gl.glBindTexture(target, texture);
-
-            synchronized (allTextures) {
-                Vector2dDouble scaleVector = allTextures.get(texture);
-                if (scaleVector != null) {
-                    scaleTexCoord.setValue(gl, (float) scaleVector.getX(), (float) scaleVector.getY());
-                }
-            }
-        }
-
-        /**
-         * {@inheritDoc}
-         */
-        @Override
-        public void copyFrameBufferToTexture(GL2 gl, int texture, Rectangle rect) {
-            int width = nextPowerOfTwo(rect.width);
-            int height = nextPowerOfTwo(rect.height);
-            // Log.debug("GLTextureHelper.glCopyTexImage2D: Width="+width+", Height="+height+" x="+rect.x+", y="+rect.y);
-            gl.glCopyTexImage2D(GL2.GL_TEXTURE_2D, 0, GL2.GL_RGBA, rect.x, rect.y, width, height, 0);
-        }
-
-        /**
-         * Internal function for calculation the next power of two.
-         *
-         * The returned value is greater or equal than the input and a power of
-         * two.
-         *
-         * @param input
-         *            Search next power of two for this input
-         * @return Next power of two
-         */
-        private int nextPowerOfTwo(int input) {
-            int output = 1;
-            while (output < input) {
-                output <<= 1;
-            }
-            return output;
-        }
-    }
-
-    /**
      * GLTextureCoordinate implementation for the standard texture coordinate.
      *
      * This coordinate should be used instead of all calls to gl.glTexCoord2x.
@@ -853,19 +532,6 @@ public class GLTextureHelper {
          */
         public GLMainTextureCoordinate() {
             super(GL2.GL_TEXTURE0, 0, 2, "texcoord0.xy");
-        }
-    }
-
-    /**
-     * GLTextureCoordinate implementation for the scaling texture coordinate.
-     */
-    private static class GLScaleTextureCoordinate extends GLTextureCoordinate {
-
-        /**
-         * Default constructor
-         */
-        protected GLScaleTextureCoordinate() {
-            super(GL2.GL_TEXTURE0, 2, 2, "texcoord0.zw");
         }
     }
 

@@ -261,8 +261,6 @@ public class GLScreenRenderGraphics extends AbstractScreenRenderGraphics {
      */
     @Override
     public void drawImage(BufferedImage image, Integer x, Integer y, Integer width, Integer height) {
-
-        commonRenderGraphics.bindScalingShader();
         commonRenderGraphics.bindImage(image);
 
         gl.glColor3f(1.0f, 1.0f, 1.0f);
@@ -279,8 +277,6 @@ public class GLScreenRenderGraphics extends AbstractScreenRenderGraphics {
         gl.glVertex2i(x + width, y);
 
         gl.glEnd();
-
-        commonRenderGraphics.unbindScalingShader();
     }
 
     /**
@@ -288,7 +284,6 @@ public class GLScreenRenderGraphics extends AbstractScreenRenderGraphics {
      */
     @Override
     public void drawText(String text, Integer x, Integer y) {
-        commonRenderGraphics.bindScalingShader();
         commonRenderGraphics.bindString(text, font);
 
         Vector2dInt size = commonRenderGraphics.getStringDisplaySize(text, font);
@@ -305,8 +300,6 @@ public class GLScreenRenderGraphics extends AbstractScreenRenderGraphics {
         gl.glVertex2i(x + size.getX(), y);
 
         gl.glEnd();
-
-        commonRenderGraphics.unbindScalingShader();
     }
 
     @Override

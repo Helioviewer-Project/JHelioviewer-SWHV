@@ -10,7 +10,6 @@ import org.helioviewer.viewmodel.view.RegionView;
 import org.helioviewer.viewmodel.view.View;
 import org.helioviewer.viewmodel.view.ViewportView;
 import org.helioviewer.viewmodel.view.opengl.GLLayeredView;
-import org.helioviewer.viewmodel.view.opengl.GLScalePowerOfTwoView;
 import org.helioviewer.viewmodel.view.opengl.GLTextureHelper;
 import org.helioviewer.viewmodel.view.opengl.GLView;
 
@@ -26,12 +25,6 @@ public class GL3DLayeredView extends GLLayeredView implements GL3DView, LayeredV
     public void addLayer(View newLayer, int newIndex) {
         if (newLayer == null)
             return;
-
-        if (!GLTextureHelper.textureNonPowerOfTwoAvailable() && newLayer.getAdapter(GLScalePowerOfTwoView.class) == null) {
-            GLScalePowerOfTwoView scaleView = new GLScalePowerOfTwoView();
-            scaleView.setView(newLayer);
-            newLayer = scaleView;
-        }
 
         if (newLayer.getAdapter(GL3DImageTextureView.class) == null) {
             GL3DImageTextureView imageToTextureView = new GL3DImageTextureView();
