@@ -314,12 +314,7 @@ public class GLComponentView extends AbstractComponentView implements ViewListen
             SubImageDataChangedReason sidReason = aEvent.getLastChangedReasonByType(SubImageDataChangedReason.class);
 
             if (sidReason != null || ((timestampReason != null) && (timestampReason.getView() instanceof TimedMovieView) && LinkedMovieManager.getActiveInstance().isMaster((TimedMovieView) timestampReason.getView()))) {
-                try {
-
-                    Displayer.getSingletonInstance().display();
-                } catch (Exception e) {
-
-                }
+                Displayer.getSingletonInstance().display();
             }
         }
     }
@@ -370,7 +365,6 @@ public class GLComponentView extends AbstractComponentView implements ViewListen
         gl.glBlendFunc(GL2.GL_SRC_ALPHA, GL2.GL_ONE_MINUS_SRC_ALPHA);
 
         gl.glColor3f(1.0f, 1.0f, 1.0f);
-
     }
 
     /**
@@ -677,8 +671,8 @@ public class GLComponentView extends AbstractComponentView implements ViewListen
         Displayer.getSingletonInstance().addListener(this);
         this.exportMovieDialog = exportMovieDialog;
         ImageViewerGui.getSingletonInstance().getLeftContentPane().setEnabled(false);
+
         View v = LayersModel.getSingletonInstance().getActiveView();
-        System.out.println("STARTEXPORT");
         if (v != null) {
             JHVJPXView movieView = v.getAdapter(JHVJPXView.class);
             if (movieView != null) {
@@ -688,7 +682,6 @@ public class GLComponentView extends AbstractComponentView implements ViewListen
             export = new MovieExport(canvas.getWidth(), canvas.getHeight());
             export.createProcess();
             exportMode = true;
-            System.out.println("STARTEXPORTSETEXPORT");
 
             if (movieView != null) {
                 movieView.playMovie();
