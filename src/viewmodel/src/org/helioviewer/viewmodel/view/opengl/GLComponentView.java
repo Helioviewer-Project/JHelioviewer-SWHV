@@ -354,8 +354,6 @@ public class GLComponentView extends AbstractComponentView implements ViewListen
 
         GLTextureHelper.initHelper(gl);
 
-        shaderHelper.delAllShaderIDs(gl);
-
         gl.glShadeModel(GL2.GL_FLAT);
         gl.glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
         gl.glEnable(GL2.GL_TEXTURE_1D);
@@ -364,6 +362,7 @@ public class GLComponentView extends AbstractComponentView implements ViewListen
         gl.glEnable(GL2.GL_POINT_SMOOTH);
         gl.glBlendFunc(GL2.GL_SRC_ALPHA, GL2.GL_ONE_MINUS_SRC_ALPHA);
 
+        this.rebuildShadersRequest = true;
         gl.glColor3f(1.0f, 1.0f, 1.0f);
     }
 
@@ -614,7 +613,6 @@ public class GLComponentView extends AbstractComponentView implements ViewListen
      *            Valid reference to the current gl object
      */
     private void rebuildShaders(GL2 gl) {
-
         rebuildShadersRequest = false;
         shaderHelper.delAllShaderIDs(gl);
 
