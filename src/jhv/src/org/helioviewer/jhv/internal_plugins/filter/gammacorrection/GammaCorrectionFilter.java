@@ -193,7 +193,7 @@ public class GammaCorrectionFilter extends AbstractFilter implements StandardFil
      */
     private class GammaCorrectionShader extends GLFragmentShaderProgram {
         private int gammaParamRef;
-        private double[] gammaParamFloat = new double[1];
+        private double[] gammaParamFloat = new double[4];
 
         /**
          * Sets the gamma value
