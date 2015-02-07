@@ -98,7 +98,6 @@ public class GL3DComponentView extends AbstractComponentView implements GLEventL
         Displayer.getSingletonInstance().register(this);
         Displayer.getSingletonInstance().addListener(this);
         this.getCanvas().addGLEventListener(this);
-        this.rebuildShadersRequest = true;
     }
 
     @Override
@@ -180,7 +179,6 @@ public class GL3DComponentView extends AbstractComponentView implements GLEventL
 
         GLTextureHelper.initHelper(gl);
 
-        shaderHelper.delAllShaderIDs(gl);
         // gl.glEnable(GL2.GL_LINE_SMOOTH);
         gl.glHint(GL2.GL_LINE_SMOOTH_HINT, GL2.GL_NICEST);
         // gl.glShadeModel(GL2.GL_FLAT);
