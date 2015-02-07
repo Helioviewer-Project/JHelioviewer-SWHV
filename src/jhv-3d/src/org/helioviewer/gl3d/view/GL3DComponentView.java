@@ -73,7 +73,6 @@ public class GL3DComponentView extends AbstractComponentView implements GLEventL
 
     private boolean rebuildShadersRequest = false;
 
-    private final GLTextureHelper textureHelper = new GLTextureHelper();
     private final GLShaderHelper shaderHelper = new GLShaderHelper();
 
     // private GL3DOrthoView orthoView;
@@ -179,7 +178,6 @@ public class GL3DComponentView extends AbstractComponentView implements GLEventL
         GL2 gl = (GL2) glAD.getGL();
         GL3DState.create(gl);
 
-        textureHelper.delAllTextures(gl);
         GLTextureHelper.initHelper(gl);
 
         shaderHelper.delAllShaderIDs(gl);
