@@ -17,11 +17,11 @@ import org.helioviewer.viewmodel.view.opengl.shader.GLTextureCoordinate;
 /**
  * Class containing OpenGL specific render functions equal for both renderer
  * types.
- * 
+ *
  * This class should only be used by org.helioviewer.viewmodel
  * .renderer.physical.GLPhysicalRenderGraphics and
  * org.helioviewer.viewmodel.renderer.screen.GLScreenRenderGraphics
- * 
+ *
  * @author Markus Langenberg
  */
 public class GLCommonRenderGraphics {
@@ -29,7 +29,6 @@ public class GLCommonRenderGraphics {
     private static GLTextureCoordinate texCoord = new GLTextureHelper.GLMainTextureCoordinate();
 
     private final GL2 gl;
-    private static GLTextureHelper textureHelper = new GLTextureHelper();
     private static HashMap<BufferedImage, Integer> mapImageToTexture = new HashMap<BufferedImage, Integer>();
     private static HashMap<StringFontPair, Integer> mapStringToTexture = new HashMap<StringFontPair, Integer>();
 
@@ -38,11 +37,11 @@ public class GLCommonRenderGraphics {
 
     /**
      * Default constructor.
-     * 
+     *
      * <p>
      * The caller has to provide a gl object, which can be used by this
      * renderer.
-     * 
+     *
      * @param _gl
      *            gl object, that should be used for drawing.
      */
@@ -50,14 +49,21 @@ public class GLCommonRenderGraphics {
         gl = _gl;
     }
 
+    private int genTextureID(GL2 gl) {
+        int[] tmp = new int[1];
+        gl.glGenTextures(1, tmp, 0);
+
+        return tmp[0];
+    }
+
     /**
      * Sets the standard texture coordinate.
-     * 
+     *
      * This function has to be called instead of the pure OpenGL-function to be
      * able to use
      * {@link org.helioviewer.viewmodel.view.opengl.shader.GLScalePowerOfTwoVertexShaderProgram}
      * .
-     * 
+     *
      * @param x
      *            X-coordinate to set
      * @param y
@@ -98,7 +104,7 @@ public class GLCommonRenderGraphics {
                 clearImageTextureBuffer(gl);
             }
 
-            texID = textureHelper.genTextureID(gl);
+            texID = genTextureID(gl);
             GLTextureHelper.moveBufferedImageToGLTexture(gl, image, texID.intValue());
             mapImageToTexture.put(image, texID);
         }
@@ -138,7 +144,7 @@ public class GLCommonRenderGraphics {
             graphics.setFont(font);
             graphics.drawString(string, 0, metrics.getAscent());
 
-            texID = textureHelper.genTextureID(gl);
+            texID = genTextureID(gl);
             GLTextureHelper.moveBufferedImageToGLTexture(gl, image, texID.intValue());
             mapStringToTexture.put(stringFontPair, texID);
         }
@@ -156,7 +162,7 @@ public class GLCommonRenderGraphics {
      */
     public static void clearImageTextureBuffer(GL2 gl) {
         for (Integer i : mapImageToTexture.values()) {
-            textureHelper.delTextureID(gl, i);
+            gl.glDeleteTextures(1, new int[] { i }, 0);
         }
         mapImageToTexture.clear();
     }
@@ -171,7 +177,7 @@ public class GLCommonRenderGraphics {
      */
     public static void clearStringTextureBuffer(GL2 gl) {
         for (Integer i : mapStringToTexture.values()) {
-            textureHelper.delTextureID(gl, i);
+            gl.glDeleteTextures(1, new int[] { i }, 0);
         }
         mapStringToTexture.clear();
     }
