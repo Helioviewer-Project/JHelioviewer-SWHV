@@ -228,10 +228,7 @@ public class SOHOLUTFilter extends AbstractFilter implements FrameFilter, Standa
     protected void finalize() {
         if (lookupTex != -1) {
             GL2 gl = (GL2) GLU.getCurrentGL();
-
-            int[] tmp = new int[1];
-            tmp[0] = lookupTex;
-            gl.glDeleteTextures(1, tmp, 0);
+            gl.glDeleteTextures(1, new int[] { lookupTex }, 0);
         }
     }
 

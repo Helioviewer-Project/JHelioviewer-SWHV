@@ -131,6 +131,13 @@ public class JHVJP2View extends AbstractView implements JP2View, ViewportView, R
         this.range = range;
     }
 
+    @Override
+    protected void finalize() {
+        if (texID != -1) {
+            gl.glDeleteTextures(1, new int[] { texID }, 0);
+        }
+    }
+
     /**
      * Returns the JPG2000 image managed by this class.
      *
@@ -458,17 +465,10 @@ public class JHVJP2View extends AbstractView implements JP2View, ViewportView, R
         super.notifyViewListeners(aEvent);
     }
 
-    private static void delT(GL2 gl, int texID) {
-        gl.glDeleteTextures(1, new int[] { texID }, 0);
-    }
-
     /**
      * Destroy the resources associated with this object.
      */
     public void abolish() {
-        if (texID != -1)
-            delT(gl, texID);
-
         if (reader != null) {
             reader.abolish();
             reader = null;
