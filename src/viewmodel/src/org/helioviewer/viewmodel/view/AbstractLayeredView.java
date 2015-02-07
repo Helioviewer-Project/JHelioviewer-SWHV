@@ -204,14 +204,10 @@ public abstract class AbstractLayeredView extends AbstractView implements Layere
      */
     @Override
     public View getLayer(int index) {
-        layerLock.lock();
-
-        View layersView = null;
-        if (index < layers.size())
-            layersView = layers.get(index);
-        layerLock.unlock();
-
-        return layersView;
+        if (index < layers.size()) {
+            return layers.get(index);
+        }
+        return null;
     }
 
     /**
@@ -258,12 +254,15 @@ public abstract class AbstractLayeredView extends AbstractView implements Layere
         } finally {
             layerLock.unlock();
         }
-        if (view.getAdapter(JHVJP2View.class) != null && needAbolish) {
-            view.getAdapter(JHVJP2View.class).abolish();
+
+        JHVJP2View jhvjp2 = view.getAdapter(JHVJP2View.class);
+        if (jhvjp2 != null) {
+            if (needAbolish) {
+                jhvjp2.abolish();
+            }
+            jhvjp2.removeRenderListener();
         }
-        if (view.getAdapter(JHVJP2View.class) != null) {
-            view.getAdapter(JHVJP2View.class).removeRenderListener();
-        }
+
         ChangeEvent event = new ChangeEvent(new LayerChangedReason(this, LayerChangeType.LAYER_REMOVED, view, index));
 
         recalculateMetaData(false);
