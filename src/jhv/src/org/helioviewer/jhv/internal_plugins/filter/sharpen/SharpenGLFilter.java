@@ -26,7 +26,7 @@ public class SharpenGLFilter extends SharpenFilter implements GLFragmentShaderFi
      */
     private class UnsharpMaskingShader extends GLFragmentShaderProgram {
         private int sharpenParamRef;
-        private double[] sharpenParamFloat = new double[3];
+        private double[] sharpenParamFloat = new double[4];
 
         /**
          * Sets all necessary parameters: The size of a pixel and the weighting.

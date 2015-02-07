@@ -11,10 +11,10 @@ public class DifferenceShader extends GLFragmentShaderProgram {
     private static int ID = 0;
     int mode = -1;
 
-    private double[] truncationValueFloat;
+    private double[] truncationValueFloat = new double[4];
     private int truncationValueRef;
 
-    private double[] isDifferenceValueFloat;
+    private double[] isDifferenceValueFloat = new double[4];
     private int isDifferenceValueRef;
 
     private GLShaderBuilder builder;
