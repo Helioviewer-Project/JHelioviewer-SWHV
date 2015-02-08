@@ -459,8 +459,6 @@ public class JHVJP2View extends AbstractView implements JP2View, ViewportView, R
      * Destroy the resources associated with this object.
      */
     public void abolish() {
-        tex = null;
-
         if (reader != null) {
             reader.abolish();
             reader = null;
