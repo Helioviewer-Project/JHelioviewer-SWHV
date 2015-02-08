@@ -98,7 +98,7 @@ public abstract class GLTextureCoordinate {
      */
     public void setValue(GL2 gl, float value1) {
         if (length != 1) {
-            throw new IllegalArgumentException("Calling this function is not valid for GLTextureCoordinate with lenght " + length + ".");
+            throw new IllegalArgumentException("Calling this function is not valid for GLTextureCoordinate with length " + length + ".");
         }
 
         currentValues[target][offset] = value1;
@@ -119,7 +119,7 @@ public abstract class GLTextureCoordinate {
      */
     public void setValue(GL2 gl, float value1, float value2) {
         if (length != 2) {
-            throw new IllegalArgumentException("Calling this function is not valid for GLTextureCoordinate with lenght " + length + ".");
+            throw new IllegalArgumentException("Calling this function is not valid for GLTextureCoordinate with length " + length + ".");
         }
 
         currentValues[target][offset] = value1;
@@ -143,7 +143,7 @@ public abstract class GLTextureCoordinate {
      */
     public void setValue(GL2 gl, float value1, float value2, float value3) {
         if (length != 3) {
-            throw new IllegalArgumentException("Calling this function is not valid for GLTextureCoordinate with lenght " + length + ".");
+            throw new IllegalArgumentException("Calling this function is not valid for GLTextureCoordinate with length " + length + ".");
         }
 
         currentValues[target][offset] = value1;
@@ -170,7 +170,7 @@ public abstract class GLTextureCoordinate {
      */
     public void setValue(GL2 gl, float value1, float value2, float value3, float value4) {
         if (length != 4) {
-            throw new IllegalArgumentException("Calling this function is not valid for GLTextureCoordinate with lenght " + length + ".");
+            throw new IllegalArgumentException("Calling this function is not valid for GLTextureCoordinate with length " + length + ".");
         }
 
         currentValues[target][offset] = value1;
