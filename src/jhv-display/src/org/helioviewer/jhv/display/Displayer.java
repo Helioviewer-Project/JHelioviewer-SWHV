@@ -68,7 +68,7 @@ public class Displayer implements JHVEventHighlightListener {
     }
 
     private void tdisplay() {
-        synchronized (displaylock) {
+        /*synchronized (displaylock)*/ {
             for (final DisplayListener listener : listeners) {
                 listener.display();
             }
