@@ -1,6 +1,5 @@
 package org.helioviewer.viewmodel.view.opengl;
 
-import java.awt.EventQueue;
 import java.awt.Rectangle;
 import java.awt.image.BufferedImage;
 import java.awt.image.DataBuffer;
@@ -460,12 +459,7 @@ public class GLTextureHelper {
 
         protected void finalize() {
             if (texID != -1) {
-                EventQueue.invokeLater(new Runnable() {
-                    @Override
-                    public void run() {
-                        gl.glDeleteTextures(1, new int[] { texID }, 0);
-                    }
-                });
+                gl.glDeleteTextures(1, new int[] { texID }, 0);
             }
         }
     }
