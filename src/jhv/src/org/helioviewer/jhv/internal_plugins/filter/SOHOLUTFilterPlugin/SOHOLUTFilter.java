@@ -17,6 +17,7 @@ import org.helioviewer.viewmodel.imagetransport.Byte8ImageTransport;
 import org.helioviewer.viewmodel.imagetransport.Short16ImageTransport;
 import org.helioviewer.viewmodel.view.jp2view.JHVJP2View;
 import org.helioviewer.viewmodel.view.jp2view.JHVJPXView;
+import org.helioviewer.viewmodel.view.opengl.GLTextureHelper;
 import org.helioviewer.viewmodel.view.opengl.shader.GLShaderBuilder;
 import org.helioviewer.viewmodel.view.opengl.shader.GLSingleChannelLookupFragmentShaderProgram;
 
@@ -139,7 +140,7 @@ public class SOHOLUTFilter extends AbstractFilter implements FrameFilter, Standa
     // OPENGL //
     // /////////////////////////
     private final GLSingleChannelLookupFragmentShaderProgram shader = new GLSingleChannelLookupFragmentShaderProgram();
-    private int lookupTex = -1;
+    private GLTextureHelper.GLTexture tex = new GLTextureHelper.GLTexture();
     private LUT lastLut = null;
     private boolean lastInverted = false;
     private JHVJP2View jp2View;
@@ -151,17 +152,6 @@ public class SOHOLUTFilter extends AbstractFilter implements FrameFilter, Standa
     public GLShaderBuilder buildFragmentShader(GLShaderBuilder shaderBuilder) {
         shader.build(shaderBuilder);
         this.changed = true;
-
-        if (lastLut == null) {
-            GL2 gl = shaderBuilder.getGL();
-
-            int[] tmp = new int[1];
-
-            tmp[0] = lookupTex;
-            gl.glDeleteTextures(1, tmp, 0);
-            gl.glGenTextures(1, tmp, 0);
-            lookupTex = tmp[0];
-        }
 
         return shaderBuilder;
     }
@@ -187,7 +177,7 @@ public class SOHOLUTFilter extends AbstractFilter implements FrameFilter, Standa
             currlut = lut;
         }
 
-        gl.glBindTexture(GL2.GL_TEXTURE_1D, lookupTex);
+        gl.glBindTexture(GL2.GL_TEXTURE_1D, tex.get(gl));
 
         if (changed || lastLut != currlut || invertLUT != lastInverted) {
             int[] intLUT;
@@ -217,21 +207,12 @@ public class SOHOLUTFilter extends AbstractFilter implements FrameFilter, Standa
             gl.glTexImage1D(GL2.GL_TEXTURE_1D, 0, GL2.GL_RGBA, buffer.limit(), 0, GL2.GL_BGRA, GL2.GL_UNSIGNED_INT_8_8_8_8_REV, buffer);
             gl.glTexParameteri(GL2.GL_TEXTURE_1D, GL2.GL_TEXTURE_MIN_FILTER, GL2.GL_NEAREST);
             gl.glTexParameteri(GL2.GL_TEXTURE_1D, GL2.GL_TEXTURE_MAG_FILTER, GL2.GL_NEAREST);
-            gl.glTexParameteri(GL2.GL_TEXTURE_1D, GL2.GL_TEXTURE_WRAP_S, GL2.GL_CLAMP);
+            gl.glTexParameteri(GL2.GL_TEXTURE_1D, GL2.GL_TEXTURE_WRAP_S, GL2.GL_CLAMP_TO_EDGE);
         }
         changed = false;
 
         gl.glActiveTexture(GL2.GL_TEXTURE0);
     }
-
-    @Override
-    protected void finalize() {
-        if (lookupTex != -1) {
-            GL2 gl = (GL2) GLU.getCurrentGL();
-            gl.glDeleteTextures(1, new int[] { lookupTex }, 0);
-        }
-    }
-
 
     /**
      * {@inheritDoc}
