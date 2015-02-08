@@ -7,8 +7,6 @@ import java.util.Date;
 import kdu_jni.Jp2_palette;
 import kdu_jni.KduException;
 
-import javax.media.opengl.GL2;
-
 import org.helioviewer.base.math.Interval;
 import org.helioviewer.base.math.Vector2dInt;
 import org.helioviewer.jhv.display.Displayer;
@@ -36,6 +34,7 @@ import org.helioviewer.viewmodel.view.View;
 import org.helioviewer.viewmodel.view.ViewHelper;
 import org.helioviewer.viewmodel.view.ViewportView;
 import org.helioviewer.viewmodel.view.cache.DateTimeCache;
+import org.helioviewer.viewmodel.view.opengl.GLTextureHelper;
 import org.helioviewer.viewmodel.view.jp2view.J2KRender.RenderReasons;
 import org.helioviewer.viewmodel.view.jp2view.concurrency.BooleanSignal;
 import org.helioviewer.viewmodel.view.jp2view.concurrency.ReasonSignal;
@@ -73,9 +72,7 @@ public class JHVJP2View extends AbstractView implements JP2View, ViewportView, R
 
     private Interval<Date> range;
 
-    /* to be separated */
-    public int texID = -1;
-    public GL2 gl;
+    public GLTextureHelper.GLTexture tex = new GLTextureHelper.GLTexture();
 
     // Member related to the view chain
     protected Viewport viewport;
@@ -129,13 +126,6 @@ public class JHVJP2View extends AbstractView implements JP2View, ViewportView, R
         }
         isPersistent = isMainView;
         this.range = range;
-    }
-
-    @Override
-    protected void finalize() {
-        if (texID != -1) {
-            gl.glDeleteTextures(1, new int[] { texID }, 0);
-        }
     }
 
     /**
@@ -469,6 +459,8 @@ public class JHVJP2View extends AbstractView implements JP2View, ViewportView, R
      * Destroy the resources associated with this object.
      */
     public void abolish() {
+        tex = null;
+
         if (reader != null) {
             reader.abolish();
             reader = null;

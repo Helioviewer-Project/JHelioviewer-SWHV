@@ -1,5 +1,6 @@
 package org.helioviewer.viewmodel.view.opengl;
 
+import java.awt.EventQueue;
 import java.awt.Rectangle;
 import java.awt.image.BufferedImage;
 import java.awt.image.DataBuffer;
@@ -134,12 +135,6 @@ public class GLTextureHelper {
         }
     }
 
-    private static int genT(GL2 gl) {
-        int[] tmp = new int[1];
-        gl.glGenTextures(1, tmp, 0);
-        return tmp[0];
-    }
-
     /**
      * Renders the content of the given image data object to the screen.
      *
@@ -163,12 +158,7 @@ public class GLTextureHelper {
             return;
         if (source.getWidth() <= maxTextureSize && source.getHeight() <= maxTextureSize) {
             if (jpxView != null) {
-                if (jpxView.texID == -1) {
-                    /* to be encapsulated */
-                    jpxView.texID = genT(gl);
-                    jpxView.gl = gl;
-                }
-                moveImageDataToGLTexture(gl, source, 0, 0, source.getWidth(), source.getHeight(), jpxView.texID);
+                moveImageDataToGLTexture(gl, source, 0, 0, source.getWidth(), source.getHeight(), jpxView.tex.get(gl));
             }
             renderTextureToScreen(gl, region);
 
@@ -187,11 +177,7 @@ public class GLTextureHelper {
                     int width = Math.min(source.getWidth() - x, maxTextureSize);
                     int height = Math.min(source.getHeight() - y, maxTextureSize);
                     if (jpxView != null) {
-                        if (jpxView.texID == -1) {
-                            jpxView.texID = genT(gl);
-                            jpxView.gl = gl;
-                        }
-                        moveImageDataToGLTexture(gl, source, x, y, width, height, jpxView.texID);
+                        moveImageDataToGLTexture(gl, source, x, y, width, height, jpxView.tex.get(gl));
                     }
                     float x0 = (float) lowerleftCorner.getX() + (float) size.getX() * x / source.getWidth();
                     float y1 = (float) lowerleftCorner.getY() + (float) size.getY() * (source.getHeight() - y) / source.getHeight();
@@ -454,6 +440,33 @@ public class GLTextureHelper {
          */
         public GLMainTextureCoordinate() {
             super(GL2.GL_TEXTURE0, 0, 2, "texcoord0.xy");
+        }
+    }
+
+    public static class GLTexture {
+        private int texID = -1;
+        private GL2 gl;
+
+        public int get(GL2 _gl) {
+            if (texID == -1) {
+                gl = _gl;
+
+                int[] tmp = new int[1];
+                gl.glGenTextures(1, tmp, 0);
+                texID = tmp[0];
+            }
+            return texID;
+        }
+
+        protected void finalize() {
+            if (texID != -1) {
+                EventQueue.invokeLater(new Runnable() {
+                    @Override
+                    public void run() {
+                        gl.glDeleteTextures(1, new int[] { texID }, 0);
+                    }
+                });
+            }
         }
     }
 
