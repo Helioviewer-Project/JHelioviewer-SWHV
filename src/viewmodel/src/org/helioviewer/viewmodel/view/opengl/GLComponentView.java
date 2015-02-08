@@ -13,9 +13,7 @@ import javax.imageio.ImageIO;
 import javax.media.opengl.DebugGL2;
 import javax.media.opengl.GL2;
 import javax.media.opengl.GLAutoDrawable;
-import javax.media.opengl.GLCapabilities;
 import javax.media.opengl.GLEventListener;
-import javax.media.opengl.GLProfile;
 import javax.media.opengl.awt.GLCanvas;
 import javax.media.opengl.glu.GLU;
 import javax.swing.JOptionPane;
@@ -90,7 +88,6 @@ public class GLComponentView extends AbstractComponentView implements ViewListen
 
     // general
     private final GLCanvas canvas;
-    private final GLAutoDrawable canvasDrawable;
     private RegionView regionView;
     private FPSAnimator animator;
 
@@ -137,16 +134,13 @@ public class GLComponentView extends AbstractComponentView implements ViewListen
      * Also initializes all OpenGL Helper classes.
      */
     public GLComponentView() {
-        GLCapabilities caps = new GLCapabilities(GLProfile.getDefault());
+        Log.debug("GLComponentView()");
+        GLSharedDrawable shared = GLSharedDrawable.getSingletonInstance();
+        canvas = new GLCanvas(shared.caps);
+        canvas.setSharedAutoDrawable(shared.sharedDrawable);
 
-        GLCanvas glCanvas = new GLCanvas(caps);
-        canvas = glCanvas;
-        canvasDrawable = glCanvas;
-
-        canvas.setMinimumSize(new Dimension());
-
-        canvasDrawable.addGLEventListener(this);
-        animator = new FPSAnimator(canvasDrawable, 30);
+        canvas.addGLEventListener(this);
+        animator = new FPSAnimator(canvas, 30);
         animator.start();
     }
 
@@ -177,7 +171,7 @@ public class GLComponentView extends AbstractComponentView implements ViewListen
      */
     public void startAnimation() {
         if (animator == null)
-            animator = new FPSAnimator(canvasDrawable, 30);
+            animator = new FPSAnimator(canvas, 30);
         if (!animator.isAnimating())
             animator.start();
     }
@@ -196,7 +190,7 @@ public class GLComponentView extends AbstractComponentView implements ViewListen
      */
     public BufferedImage getBufferedImage() {
         saveBufferedImage = true;
-        canvasDrawable.display();
+        canvas.display();
         return screenshot;
     }
 
@@ -348,7 +342,7 @@ public class GLComponentView extends AbstractComponentView implements ViewListen
      */
     @Override
     public void init(GLAutoDrawable drawable) {
-        //GLDrawableFactory.getFactory(GLProfile.getDefault()).createExternalGLContext();
+        Log.debug("GLComponentView.Init");
         final GL2 gl = drawable.getGL().getGL2();
         //gl.getContext().setGL(GLPipelineFactory.create("javax.media.opengl.Trace", null, gl, new Object[] { System.err }));
 

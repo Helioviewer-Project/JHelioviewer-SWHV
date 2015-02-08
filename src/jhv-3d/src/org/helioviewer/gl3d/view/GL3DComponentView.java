@@ -8,9 +8,7 @@ import java.io.IOException;
 import javax.imageio.ImageIO;
 import javax.media.opengl.GL2;
 import javax.media.opengl.GLAutoDrawable;
-import javax.media.opengl.GLCapabilities;
 import javax.media.opengl.GLEventListener;
-import javax.media.opengl.GLProfile;
 import javax.media.opengl.awt.GLCanvas;
 import javax.swing.JOptionPane;
 import javax.swing.JTextArea;
@@ -41,6 +39,7 @@ import org.helioviewer.viewmodel.view.View;
 import org.helioviewer.viewmodel.view.ViewportView;
 import org.helioviewer.viewmodel.view.jp2view.JHVJP2View;
 import org.helioviewer.viewmodel.view.jp2view.JHVJPXView;
+import org.helioviewer.viewmodel.view.opengl.GLSharedDrawable;
 import org.helioviewer.viewmodel.view.opengl.GLTextureHelper;
 import org.helioviewer.viewmodel.view.opengl.GLView;
 import org.helioviewer.viewmodel.view.opengl.shader.GLFragmentShaderView;
@@ -91,10 +90,12 @@ public class GL3DComponentView extends AbstractComponentView implements GLEventL
     private File outputFile;
 
     public GL3DComponentView() {
-        GLCapabilities caps = new GLCapabilities(GLProfile.getDefault());
-        GLCanvas glCanvas = new GLCanvas(caps);
+        Log.debug("GL3DComponentView()");
+        GLSharedDrawable shared = GLSharedDrawable.getSingletonInstance();
+        GLCanvas glCanvas = new GLCanvas(shared.caps);
+        glCanvas.setSharedAutoDrawable(shared.sharedDrawable);
         this.setCanvas(glCanvas);
-        this.getCanvas().setMinimumSize(new java.awt.Dimension(100, 100));
+
         Displayer.getSingletonInstance().register(this);
         Displayer.getSingletonInstance().addListener(this);
         this.getCanvas().addGLEventListener(this);
@@ -170,11 +171,10 @@ public class GL3DComponentView extends AbstractComponentView implements GLEventL
     }
 
     @Override
-    public void init(GLAutoDrawable glAD) {
+    public void init(GLAutoDrawable drawable) {
         Log.debug("GL3DComponentView.Init");
-        //GLSharedContext.setSharedContext(glAD.getContext());
 
-        GL2 gl = (GL2) glAD.getGL();
+        GL2 gl = drawable.getGL().getGL2();
         GL3DState.create(gl);
 
         GLTextureHelper.initHelper(gl);
@@ -211,7 +211,7 @@ public class GL3DComponentView extends AbstractComponentView implements GLEventL
     @Override
     public void reshape(GLAutoDrawable glAD, int x, int y, int width, int height) {
         viewportSize = new Vector2dInt(width, height);
-        GL2 gl = (GL2) glAD.getGL();
+        GL2 gl = glAD.getGL().getGL2();
         gl.setSwapInterval(1);
     }
 
@@ -234,7 +234,7 @@ public class GL3DComponentView extends AbstractComponentView implements GLEventL
             }
         }
 
-        GL2 gl = (GL2) glAD.getGL();
+        GL2 gl = glAD.getGL().getGL2();
 
         int width = this.viewportSize.getX();
         int height = this.viewportSize.getY();
