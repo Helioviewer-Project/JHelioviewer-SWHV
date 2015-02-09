@@ -26,8 +26,8 @@ import org.helioviewer.viewmodel.view.opengl.GLTextureHelper;
 public class GLCommonRenderGraphics {
 
     private final GL2 gl;
-    private static HashMap<BufferedImage, Integer> mapImageToTexture = new HashMap<BufferedImage, Integer>();
-    private static HashMap<StringFontPair, Integer> mapStringToTexture = new HashMap<StringFontPair, Integer>();
+    private static HashMap<BufferedImage, GLTextureHelper.GLTexture> mapImageToTexture = new HashMap<BufferedImage, GLTextureHelper.GLTexture>();
+    private static HashMap<StringFontPair, GLTextureHelper.GLTexture> mapStringToTexture = new HashMap<StringFontPair, GLTextureHelper.GLTexture>();
 
     private static BufferedImage stringSizeImage = new BufferedImage(1, 1, BufferedImage.TYPE_BYTE_GRAY);
     private static Graphics2D stringSizeGraphics = stringSizeImage.createGraphics();
@@ -44,13 +44,6 @@ public class GLCommonRenderGraphics {
      */
     public GLCommonRenderGraphics(GL2 _gl) {
         gl = _gl;
-    }
-
-    private int genTextureID(GL2 gl) {
-        int[] tmp = new int[1];
-        gl.glGenTextures(1, tmp, 0);
-
-        return tmp[0];
     }
 
     /**
@@ -78,18 +71,18 @@ public class GLCommonRenderGraphics {
      *            Image corresponding to the texture to bind
      */
     public void bindImage(BufferedImage image) {
-        Integer texID = mapImageToTexture.get(image);
-        if (texID == null) {
+        GLTextureHelper.GLTexture tex = mapImageToTexture.get(image);
+        if (tex == null) {
             if (mapImageToTexture.size() > 256) {
-                clearImageTextureBuffer(gl);
+                mapImageToTexture.clear();
             }
 
-            texID = genTextureID(gl);
-            GLTextureHelper.moveBufferedImageToGLTexture(gl, image, texID.intValue());
-            mapImageToTexture.put(image, texID);
+            tex = new GLTextureHelper.GLTexture();
+            GLTextureHelper.moveBufferedImageToGLTexture(gl, image, tex.get(gl));
+            mapImageToTexture.put(image, tex);
         }
 
-        gl.glBindTexture(GL2.GL_TEXTURE_2D, texID.intValue());
+        gl.glBindTexture(GL2.GL_TEXTURE_2D, tex.get(gl));
     }
 
     /**
@@ -104,10 +97,10 @@ public class GLCommonRenderGraphics {
      */
     public void bindString(String string, Font font) {
         StringFontPair stringFontPair = new StringFontPair(string, font);
-        Integer texID = mapStringToTexture.get(stringFontPair);
-        if (texID == null) {
+        GLTextureHelper.GLTexture tex = mapStringToTexture.get(stringFontPair);
+        if (tex == null) {
             if (mapStringToTexture.size() > 256) {
-                clearStringTextureBuffer(gl);
+                mapStringToTexture.clear();
             }
 
             if (font != null)
@@ -124,42 +117,12 @@ public class GLCommonRenderGraphics {
             graphics.setFont(font);
             graphics.drawString(string, 0, metrics.getAscent());
 
-            texID = genTextureID(gl);
-            GLTextureHelper.moveBufferedImageToGLTexture(gl, image, texID.intValue());
-            mapStringToTexture.put(stringFontPair, texID);
+            tex = new GLTextureHelper.GLTexture();
+            GLTextureHelper.moveBufferedImageToGLTexture(gl, image, tex.get(gl));
+            mapStringToTexture.put(stringFontPair, tex);
         }
 
-        gl.glBindTexture(GL2.GL_TEXTURE_2D, texID.intValue());
-    }
-
-    /**
-     * Clears all saved image textures.
-     * 
-     * This might be useful to clean up after switching drawing modes.
-     * 
-     * @param gl
-     *            valid gl object to use.
-     */
-    public static void clearImageTextureBuffer(GL2 gl) {
-        for (Integer i : mapImageToTexture.values()) {
-            gl.glDeleteTextures(1, new int[] { i }, 0);
-        }
-        mapImageToTexture.clear();
-    }
-
-    /**
-     * Clears all saved text textures.
-     * 
-     * This might be useful to clean up after switching drawing modes.
-     * 
-     * @param gl
-     *            valid gl object to use.
-     */
-    public static void clearStringTextureBuffer(GL2 gl) {
-        for (Integer i : mapStringToTexture.values()) {
-            gl.glDeleteTextures(1, new int[] { i }, 0);
-        }
-        mapStringToTexture.clear();
+        gl.glBindTexture(GL2.GL_TEXTURE_2D, tex.get(gl));
     }
 
     private class StringFontPair {
@@ -175,9 +138,9 @@ public class GLCommonRenderGraphics {
         public boolean equals(Object o) {
             if (o instanceof StringFontPair) {
                 StringFontPair other = (StringFontPair) o;
-                if (font == null)
+                if (font == null) {
                     return string.equals(other.string) && other.font == null;
-
+                }
                 return string.equals(other.string) && font.equals(other.font);
             }
             return false;
@@ -185,9 +148,9 @@ public class GLCommonRenderGraphics {
 
         @Override
         public int hashCode() {
-            if (font == null)
+            if (font == null) {
                 return string.hashCode();
-
+            }
             return 2 * string.hashCode() + font.hashCode();
         }
     }
