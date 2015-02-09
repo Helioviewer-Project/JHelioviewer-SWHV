@@ -261,22 +261,6 @@ public class HelioviewerMetaData extends AbstractMetaData implements SunMetaData
         return region;
     }
 
-    public double getScaleX(SubImage roi) {
-        return 1. * roi.width / nextPowerOfTwo(roi.width);
-    }
-
-    public double getScaleY(SubImage roi) {
-        return 1. * roi.height / nextPowerOfTwo(roi.height);
-    }
-
-    private int nextPowerOfTwo(int input) {
-        int output = 1;
-        while (output < input) {
-            output <<= 1;
-        }
-        return output;
-    }
-
     /**
      * {@inheritDoc}
      */

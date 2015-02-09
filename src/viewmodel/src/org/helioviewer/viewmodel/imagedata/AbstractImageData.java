@@ -20,8 +20,6 @@ public abstract class AbstractImageData implements JavaBufferedImageData {
     protected ColorMask colorMask;
     private long dateMillis;
     private Region region;
-    private double scaleY;
-    private double scaleX;
     private SubImage subImage;
     private int frameNumber;
     private double zoomPercent;
@@ -141,26 +139,6 @@ public abstract class AbstractImageData implements JavaBufferedImageData {
     @Override
     public SubImage getSubImage() {
         return this.subImage;
-    }
-
-    @Override
-    public double getScaleX() {
-        return this.scaleX;
-    }
-
-    @Override
-    public void setScaleX(double scaleX) {
-        this.scaleX = scaleX;
-    }
-
-    @Override
-    public double getScaleY() {
-        return this.scaleY;
-    }
-
-    @Override
-    public void setScaleY(double scaleY) {
-        this.scaleY = scaleY;
     }
 
     @Override
