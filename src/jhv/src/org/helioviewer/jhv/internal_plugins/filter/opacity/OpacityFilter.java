@@ -124,7 +124,7 @@ public class OpacityFilter extends AbstractFilter implements StandardFilter, GLF
      */
     private class OpacityShader extends GLFragmentShaderProgram {
         private int alphaParamRef;
-        private double[] alphaParamFloat = new double[4];
+        private final double[] alphaParamFloat = new double[4];
 
         /**
          * Sets the new alpha value.
@@ -151,7 +151,6 @@ public class OpacityFilter extends AbstractFilter implements StandardFilter, GLF
         protected void buildImpl(GLShaderBuilder shaderBuilder) {
             try {
                 alphaParamRef = shaderBuilder.addEnvParameter("float alpha");
-                alphaParamFloat = shaderBuilder.getEnvParameter(alphaParamRef);
                 String program = "\toutput.a = output.a * alpha;";
                 program = program.replace("output", shaderBuilder.useOutputValue("float4", "COLOR"));
                 shaderBuilder.addMainFragment(program);
