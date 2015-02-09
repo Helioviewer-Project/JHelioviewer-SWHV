@@ -3,7 +3,6 @@ package org.helioviewer.jhv.internal_plugins.filter.SOHOLUTFilterPlugin;
 import java.nio.IntBuffer;
 
 import javax.media.opengl.GL2;
-import javax.media.opengl.glu.GLU;
 
 import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.viewmodel.filter.AbstractFilter;
