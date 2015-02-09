@@ -26,7 +26,7 @@ public class SharpenGLFilter extends SharpenFilter implements GLFragmentShaderFi
      */
     private class UnsharpMaskingShader extends GLFragmentShaderProgram {
         private int sharpenParamRef;
-        private double[] sharpenParamFloat = new double[4];
+        private final double[] sharpenParamFloat = new double[4];
 
         /**
          * Sets all necessary parameters: The size of a pixel and the weighting.
@@ -60,7 +60,6 @@ public class SharpenGLFilter extends SharpenFilter implements GLFragmentShaderFi
 
             try {
                 sharpenParamRef = shaderBuilder.addEnvParameter("float4 pixelSizeWeighting");
-                sharpenParamFloat = shaderBuilder.getEnvParameter(sharpenParamRef);
                 String program = "\tfloat unsharpMaskingKernel[3][3] = {" + GLShaderBuilder.LINE_SEP
                         + "\t\t{1, 2, 1}," + GLShaderBuilder.LINE_SEP + "\t\t{2, 4, 2}," + GLShaderBuilder.LINE_SEP + "\t\t{1, 2, 1}" + GLShaderBuilder.LINE_SEP + "\t};" + GLShaderBuilder.LINE_SEP
                         + "\tfloat3 tmpConvolutionSum = float3(0, 0, 0);" + GLShaderBuilder.LINE_SEP
