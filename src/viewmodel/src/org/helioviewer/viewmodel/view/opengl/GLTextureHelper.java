@@ -13,7 +13,6 @@ import java.nio.IntBuffer;
 import java.nio.ShortBuffer;
 
 import javax.media.opengl.GL2;
-import javax.media.opengl.glu.GLU;
 
 import org.helioviewer.base.logging.Log;
 import org.helioviewer.base.math.Vector2dDouble;

@@ -4,8 +4,6 @@ import java.util.LinkedList;
 import java.util.List;
 
 import javax.media.opengl.GL2;
-import javax.media.opengl.GLException;
-import javax.media.opengl.glu.GLU;
 
 import org.helioviewer.base.logging.Log;
 import org.helioviewer.jhv.gui.states.StateController;
@@ -47,7 +45,7 @@ public class RunningDifferenceFilter implements FrameFilter, StandardFilter, Obs
      */
     // private TimeMachineData timeMachineData;
     private final DifferenceShader shader = new DifferenceShader();
-    private int diffTex = -1;
+    private GLTextureHelper.GLTexture tex = new GLTextureHelper.GLTexture();
     private ImageData currentFrame;
     private float truncationValue = 0.2f;
     private JHVJPXView jpxView;
@@ -216,7 +214,7 @@ public class RunningDifferenceFilter implements FrameFilter, StandardFilter, Obs
                 shader.setTruncationValue(gl, this.truncationValue);
 
                 gl.glActiveTexture(GL2.GL_TEXTURE2);
-                GLTextureHelper.moveImageDataToGLTexture(gl, previousFrame, 0, 0, previousFrame.getWidth(), previousFrame.getHeight(), diffTex);
+                GLTextureHelper.moveImageDataToGLTexture(gl, previousFrame, 0, 0, previousFrame.getWidth(), previousFrame.getHeight(), tex.get(gl));
                 gl.glActiveTexture(GL2.GL_TEXTURE0);
             }
         } else {
@@ -229,28 +227,7 @@ public class RunningDifferenceFilter implements FrameFilter, StandardFilter, Obs
     public GLShaderBuilder buildFragmentShader(GLShaderBuilder shaderBuilder) {
         shader.build(shaderBuilder);
 
-        GL2 gl = shaderBuilder.getGL();
-        int[] tmp = new int[1];
-
-        if (diffTex != -1) {
-            tmp[0] = diffTex;
-            gl.glDeleteTextures(1, tmp, 0);
-        }
-        gl.glGenTextures(1, tmp, 0);
-        diffTex = tmp[0];
-
         return shaderBuilder;
-    }
-
-    @Override
-    protected void finalize() {
-        if (diffTex != -1) {
-            GL2 gl = (GL2) GLU.getCurrentGL();
-
-            int[] tmp = new int[1];
-            tmp[0] = diffTex;
-            gl.glDeleteTextures(1, tmp, 0);
-        }
     }
 
     public void setTruncationvalue(float truncationValue) {
