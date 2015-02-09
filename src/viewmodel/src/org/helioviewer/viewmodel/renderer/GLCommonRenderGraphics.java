@@ -12,7 +12,6 @@ import javax.media.opengl.GL2;
 
 import org.helioviewer.base.math.Vector2dInt;
 import org.helioviewer.viewmodel.view.opengl.GLTextureHelper;
-import org.helioviewer.viewmodel.view.opengl.shader.GLTextureCoordinate;
 
 /**
  * Class containing OpenGL specific render functions equal for both renderer
@@ -25,8 +24,6 @@ import org.helioviewer.viewmodel.view.opengl.shader.GLTextureCoordinate;
  * @author Markus Langenberg
  */
 public class GLCommonRenderGraphics {
-
-    private static GLTextureCoordinate texCoord = new GLTextureHelper.GLMainTextureCoordinate();
 
     private final GL2 gl;
     private static HashMap<BufferedImage, Integer> mapImageToTexture = new HashMap<BufferedImage, Integer>();
@@ -54,23 +51,6 @@ public class GLCommonRenderGraphics {
         gl.glGenTextures(1, tmp, 0);
 
         return tmp[0];
-    }
-
-    /**
-     * Sets the standard texture coordinate.
-     *
-     * This function has to be called instead of the pure OpenGL-function to be
-     * able to use
-     * {@link org.helioviewer.viewmodel.view.opengl.shader.GLScalePowerOfTwoVertexShaderProgram}
-     * .
-     *
-     * @param x
-     *            X-coordinate to set
-     * @param y
-     *            Y-coordinate to set
-     */
-    public void setTexCoord(float x, float y) {
-        texCoord.setValue(gl, x, y);
     }
 
     /**

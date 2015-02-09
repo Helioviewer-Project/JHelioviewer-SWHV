@@ -26,9 +26,7 @@ import org.helioviewer.viewmodel.imagetransport.Byte8ImageTransport;
 import org.helioviewer.viewmodel.imagetransport.Int32ImageTransport;
 import org.helioviewer.viewmodel.imagetransport.Short16ImageTransport;
 import org.helioviewer.viewmodel.region.Region;
-import org.helioviewer.viewmodel.renderer.GLCommonRenderGraphics;
 import org.helioviewer.viewmodel.view.jp2view.JHVJP2View;
-import org.helioviewer.viewmodel.view.opengl.shader.GLTextureCoordinate;
 
 /**
  * Helper class to handle OpenGL textures.
@@ -42,8 +40,6 @@ import org.helioviewer.viewmodel.view.opengl.shader.GLTextureCoordinate;
 public class GLTextureHelper {
     public static boolean is2DState = false;
     private static int maxTextureSize = 2048;
-
-    private static GLTextureCoordinate mainTexCoord = new GLMainTextureCoordinate();
 
     private final static int[] formatMap = { GL2.GL_LUMINANCE4, GL2.GL_LUMINANCE4, GL2.GL_LUMINANCE4, GL2.GL_LUMINANCE4, GL2.GL_LUMINANCE8, GL2.GL_LUMINANCE8, GL2.GL_LUMINANCE8, GL2.GL_LUMINANCE8, GL2.GL_LUMINANCE12, GL2.GL_LUMINANCE12, GL2.GL_LUMINANCE12, GL2.GL_LUMINANCE12, GL2.GL_LUMINANCE16, GL2.GL_LUMINANCE16, GL2.GL_LUMINANCE16, GL2.GL_LUMINANCE16 };
 
@@ -120,15 +116,18 @@ public class GLTextureHelper {
     private static void renderTextureToScreen(GL2 gl, float x0, float y0, float x1, float y1) {
         if (is2DState) {
             gl.glBegin(GL2.GL_QUADS);
-            mainTexCoord.setValue(gl, 0.0f, 1.0f);
-            gl.glVertex2f(x0, y0);
-            mainTexCoord.setValue(gl, 1.0f, 1.0f);
-            gl.glVertex2f(x1, y0);
-            mainTexCoord.setValue(gl, 1.0f, 0.0f);
-            gl.glVertex2f(x1, y1);
-            mainTexCoord.setValue(gl, 0.0f, 0.0f);
-            gl.glVertex2f(x0, y1);
+            {
+                gl.glTexCoord2f(0.0f, 1.0f);
+                gl.glVertex2f(x0, y0);
+                gl.glTexCoord2f(1.0f, 1.0f);
+                gl.glVertex2f(x1, y0);
+                gl.glTexCoord2f(1.0f, 0.0f);
+                gl.glVertex2f(x1, y1);
+                gl.glTexCoord2f(0.0f, 0.0f);
+                gl.glVertex2f(x0, y1);
+            }
             gl.glEnd();
+
             gl.glColorMask(true, true, true, true);
         }
     }
@@ -423,21 +422,6 @@ public class GLTextureHelper {
             return 4;
         default:
             return 0;
-        }
-    }
-
-    /**
-     * GLTextureCoordinate implementation for the standard texture coordinate.
-     *
-     * This coordinate should be used instead of all calls to gl.glTexCoord2x.
-     */
-    public static class GLMainTextureCoordinate extends GLTextureCoordinate {
-
-        /**
-         * Default constructor
-         */
-        public GLMainTextureCoordinate() {
-            super(GL2.GL_TEXTURE0, 0, 2, "texcoord0.xy");
         }
     }
 
