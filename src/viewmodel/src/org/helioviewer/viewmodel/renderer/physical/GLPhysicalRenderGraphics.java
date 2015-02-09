@@ -304,7 +304,6 @@ public class GLPhysicalRenderGraphics extends AbstractPhysicalRenderGraphics {
     public void drawImage(BufferedImage image, Double x, Double y, Double width, Double height) {
         y = -y;
 
-        // commonRenderGraphics.bindScalingShader();
         commonRenderGraphics.bindImage(image);
 
         gl.glColor3f(1.0f, 1.0f, 1.0f);
@@ -312,23 +311,17 @@ public class GLPhysicalRenderGraphics extends AbstractPhysicalRenderGraphics {
         double height2 = height * 0.5;
 
         gl.glBegin(GL2.GL_QUADS);
-
-        // commonRenderGraphics.setTexCoord(0.0f, 0.0f);
-        gl.glTexCoord2d(0, 0);
-        gl.glVertex2d(x - width2, y - height2);
-        // commonRenderGraphics.setTexCoord(0.0f, 1.0f);
-        gl.glTexCoord2d(0, 1);
-        gl.glVertex2d(x - width2, y + height2);
-        // commonRenderGraphics.setTexCoord(1.0f, 1.0f);
-        gl.glTexCoord2d(1, 1);
-        gl.glVertex2d(x + width2, y + height2);
-        // commonRenderGraphics.setTexCoord(1.0f, 0.0f);
-        gl.glTexCoord2d(1, 0);
-        gl.glVertex2d(x + width2, y - height2);
-
+        {
+            gl.glTexCoord2f(0.0f, 0.0f);
+            gl.glVertex2d(x - width2, y - height2);
+            gl.glTexCoord2f(0.0f, 1.0f);
+            gl.glVertex2d(x - width2, y + height2);
+            gl.glTexCoord2f(1.0f, 1.0f);
+            gl.glVertex2d(x + width2, y + height2);
+            gl.glTexCoord2f(1.0f, 0.0f);
+            gl.glVertex2d(x + width2, y - height2);
+        }
         gl.glEnd();
-
-        // commonRenderGraphics.unbindScalingShader();
     }
 
     /**
@@ -346,16 +339,16 @@ public class GLPhysicalRenderGraphics extends AbstractPhysicalRenderGraphics {
         double height2 = size.getY() * 0.5;
 
         gl.glBegin(GL2.GL_QUADS);
-
-        commonRenderGraphics.setTexCoord(0.0f, 0.0f);
-        gl.glVertex2d(x - width2, y - height2);
-        commonRenderGraphics.setTexCoord(0.0f, 1.0f);
-        gl.glVertex2d(x - width2, y + height2);
-        commonRenderGraphics.setTexCoord(1.0f, 1.0f);
-        gl.glVertex2d(x + width2, y + height2);
-        commonRenderGraphics.setTexCoord(1.0f, 0.0f);
-        gl.glVertex2d(x + width2, y - height2);
-
+        {
+            gl.glTexCoord2f(0.0f, 0.0f);
+            gl.glVertex2d(x - width2, y - height2);
+            gl.glTexCoord2f(0.0f, 1.0f);
+            gl.glVertex2d(x - width2, y + height2);
+            gl.glTexCoord2f(1.0f, 1.0f);
+            gl.glVertex2d(x + width2, y + height2);
+            gl.glTexCoord2f(1.0f, 0.0f);
+            gl.glVertex2d(x + width2, y - height2);
+        }
         gl.glEnd();
     }
 
@@ -375,9 +368,6 @@ public class GLPhysicalRenderGraphics extends AbstractPhysicalRenderGraphics {
     @Override
     public void drawImage3d(BufferedImage image, Double x, Double y, Double z, Double width, Double height) {
         y = -y;
-
-        gl.glDisable(GL2.GL_VERTEX_PROGRAM_ARB);
-        gl.glDisable(GL2.GL_FRAGMENT_PROGRAM_ARB);
 
         commonRenderGraphics.bindImage(image);
         gl.glTexParameteri(GL2.GL_TEXTURE_2D, GL2.GL_TEXTURE_MAG_FILTER, GL2.GL_LINEAR);
@@ -416,16 +406,16 @@ public class GLPhysicalRenderGraphics extends AbstractPhysicalRenderGraphics {
         p3.add(targetDir);
 
         gl.glBegin(GL2.GL_QUADS);
-
-        commonRenderGraphics.setTexCoord(0.0f, 0.0f);
-        gl.glVertex3d(p0.x, p0.y, p0.z);
-        commonRenderGraphics.setTexCoord(0.0f, 1.0f);
-        gl.glVertex3d(p1.x, p1.y, p1.z);
-        commonRenderGraphics.setTexCoord(1.0f, 1.0f);
-        gl.glVertex3d(p2.x, p2.y, p2.z);
-        commonRenderGraphics.setTexCoord(1.0f, 0.0f);
-        gl.glVertex3d(p3.x, p3.y, p3.z);
-
+        {
+            gl.glTexCoord2f(0.0f, 0.0f);
+            gl.glVertex3d(p0.x, p0.y, p0.z);
+            gl.glTexCoord2f(0.0f, 1.0f);
+            gl.glVertex3d(p1.x, p1.y, p1.z);
+            gl.glTexCoord2f(1.0f, 1.0f);
+            gl.glVertex3d(p2.x, p2.y, p2.z);
+            gl.glTexCoord2f(1.0f, 0.0f);
+            gl.glVertex3d(p3.x, p3.y, p3.z);
+        }
         gl.glEnd();
 
         gl.glDisable(GL2.GL_TEXTURE_2D);
@@ -434,8 +424,6 @@ public class GLPhysicalRenderGraphics extends AbstractPhysicalRenderGraphics {
         gl.glEnable(GL2.GL_DEPTH_TEST);
         gl.glDisable(GL2.GL_CULL_FACE);
         gl.glEnable(GL2.GL_BLEND);
-        gl.glDisable(GL2.GL_VERTEX_PROGRAM_ARB);
-        gl.glDisable(GL2.GL_FRAGMENT_PROGRAM_ARB);
     }
 
     @Override

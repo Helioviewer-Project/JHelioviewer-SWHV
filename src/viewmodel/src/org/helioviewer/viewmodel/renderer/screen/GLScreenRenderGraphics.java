@@ -266,16 +266,16 @@ public class GLScreenRenderGraphics extends AbstractScreenRenderGraphics {
         gl.glColor3f(1.0f, 1.0f, 1.0f);
 
         gl.glBegin(GL2.GL_QUADS);
-
-        commonRenderGraphics.setTexCoord(0.0f, 0.0f);
-        gl.glVertex2i(x, y);
-        commonRenderGraphics.setTexCoord(0.0f, 1.0f);
-        gl.glVertex2i(x, y + height);
-        commonRenderGraphics.setTexCoord(1.0f, 1.0f);
-        gl.glVertex2i(x + width, y + height);
-        commonRenderGraphics.setTexCoord(1.0f, 0.0f);
-        gl.glVertex2i(x + width, y);
-
+        {
+            gl.glTexCoord2f(0.0f, 0.0f);
+            gl.glVertex2i(x, y);
+            gl.glTexCoord2f(0.0f, 1.0f);
+            gl.glVertex2i(x, y + height);
+            gl.glTexCoord2f(1.0f, 1.0f);
+            gl.glVertex2i(x + width, y + height);
+            gl.glTexCoord2f(1.0f, 0.0f);
+            gl.glVertex2i(x + width, y);
+        }
         gl.glEnd();
     }
 
@@ -289,16 +289,16 @@ public class GLScreenRenderGraphics extends AbstractScreenRenderGraphics {
         Vector2dInt size = commonRenderGraphics.getStringDisplaySize(text, font);
 
         gl.glBegin(GL2.GL_QUADS);
-
-        commonRenderGraphics.setTexCoord(0.0f, 0.0f);
-        gl.glVertex2i(x, y);
-        commonRenderGraphics.setTexCoord(0.0f, 1.0f);
-        gl.glVertex2i(x, y + size.getY());
-        commonRenderGraphics.setTexCoord(1.0f, 1.0f);
-        gl.glVertex2i(x + size.getX(), y + size.getY());
-        commonRenderGraphics.setTexCoord(1.0f, 0.0f);
-        gl.glVertex2i(x + size.getX(), y);
-
+        {
+            gl.glTexCoord2f(0.0f, 0.0f);
+            gl.glVertex2i(x, y);
+            gl.glTexCoord2f(0.0f, 1.0f);
+            gl.glVertex2i(x, y + size.getY());
+            gl.glTexCoord2f(1.0f, 1.0f);
+            gl.glVertex2i(x + size.getX(), y + size.getY());
+            gl.glTexCoord2f(1.0f, 0.0f);
+            gl.glVertex2i(x + size.getX(), y);
+        }
         gl.glEnd();
     }
 
