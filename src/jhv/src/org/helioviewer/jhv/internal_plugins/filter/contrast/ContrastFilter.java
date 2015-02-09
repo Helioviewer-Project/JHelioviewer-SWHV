@@ -168,15 +168,15 @@ public class ContrastFilter extends AbstractFilter implements StandardFilter, GL
 
                     int rgb = pixelData[i];
                     int a = rgb >>> 24;
-                    int r = (rgb >>> 16) & 0xFF;
-                    int g = (rgb >>> 8) & 0xFF;
-                    int b = rgb & 0xff;
+                int r = (rgb >>> 16) & 0xFF;
+                int g = (rgb >>> 8) & 0xFF;
+                int b = rgb & 0xff;
 
-                    r = contrastTable8[r] & 0xFF;
-                    g = contrastTable8[g] & 0xFF;
-                    b = contrastTable8[b] & 0xFF;
+                r = contrastTable8[r] & 0xFF;
+                g = contrastTable8[g] & 0xFF;
+                b = contrastTable8[b] & 0xFF;
 
-                    resultPixelData[i] = (a << 24) | (r << 16) | (g << 8) | b;
+                resultPixelData[i] = (a << 24) | (r << 16) | (g << 8) | b;
                 }
                 return new ARGBInt32ImageData(data, resultPixelData);
             }
@@ -193,7 +193,7 @@ public class ContrastFilter extends AbstractFilter implements StandardFilter, GL
     private class ContrastShader extends GLFragmentShaderProgram {
 
         private int contrastParamRef;
-        private double[] contrastParamFloat = new double[4];
+        private final double[] contrastParamFloat = new double[4];
 
         /**
          * Sets the contrast parameter
@@ -222,7 +222,6 @@ public class ContrastFilter extends AbstractFilter implements StandardFilter, GL
         protected void buildImpl(GLShaderBuilder shaderBuilder) {
             try {
                 contrastParamRef = shaderBuilder.addEnvParameter("float contrast");
-                contrastParamFloat = shaderBuilder.getEnvParameter(contrastParamRef);
                 String program = "\toutput.rgb = 0.5f * sign(2.0f * output.rgb - 1.0f) * pow(abs(2.0f * output.rgb - 1.0f), pow(1.5f, -contrast)) + 0.5f;";
                 program = program.replace("output", shaderBuilder.useOutputValue("float4", "COLOR"));
                 shaderBuilder.addMainFragment(program);
