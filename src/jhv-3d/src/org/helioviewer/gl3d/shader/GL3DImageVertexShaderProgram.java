@@ -10,10 +10,10 @@ public class GL3DImageVertexShaderProgram extends GLVertexShaderProgram {
     private double theta;
     private double phi;
 
-    private float xxTextureScale = 1.0f;
-    private float yyTextureScale = 1.0f;
-    private float differenceXTextureScale = 1.0f;
-    private float differenceYTextureScale = 1.0f;
+    private final float xxTextureScale = 1.0f;
+    private final float yyTextureScale = 1.0f;
+    private final float differenceXTextureScale = 1.0f;
+    private final float differenceYTextureScale = 1.0f;
 
     private double differenceXOffset;
     private double differenceYOffset;
@@ -21,6 +21,11 @@ public class GL3DImageVertexShaderProgram extends GLVertexShaderProgram {
     private double differencePhi;
     private double differenceXScale;
     private double differenceYScale;
+    private int rectRef;
+    private int textureScaleThetaPhiRef;
+    private int diffTextureScaleThetaPhiRef;
+    private int differenceRectRef;
+    private int offsetRef;
 
     /**
      * {@inheritDoc}
@@ -34,11 +39,11 @@ public class GL3DImageVertexShaderProgram extends GLVertexShaderProgram {
         if (shader != shaderCurrentlyUsed) {
             shaderCurrentlyUsed = shader;
             gl.glBindProgramARB(target, shader);
-            gl.glProgramLocalParameter4dARB(target, 0, xOffset, yOffset, xScale, yScale);
-            gl.glProgramLocalParameter4dARB(target, 1, xTextureScale, yTextureScale, theta, phi);
-            gl.glProgramLocalParameter4dARB(target, 2, defaultXOffset, defaultYOffset, 0, 0);
-            gl.glProgramLocalParameter4dARB(target, 3, differenceXOffset, differenceYOffset, differenceXScale, differenceYScale);
-            gl.glProgramLocalParameter4dARB(target, 4, differenceXTextureScale, differenceYTextureScale, differenceTheta, differencePhi);
+            gl.glProgramLocalParameter4dARB(target, this.rectRef, xOffset, yOffset, xScale, yScale);
+            gl.glProgramLocalParameter4dARB(target, this.textureScaleThetaPhiRef, xTextureScale, yTextureScale, theta, phi);
+            gl.glProgramLocalParameter4dARB(target, this.offsetRef, defaultXOffset, defaultYOffset, 0, 0);
+            gl.glProgramLocalParameter4dARB(target, this.differenceRectRef, differenceXOffset, differenceYOffset, differenceXScale, differenceYScale);
+            gl.glProgramLocalParameter4dARB(target, this.diffTextureScaleThetaPhiRef, differenceXTextureScale, differenceYTextureScale, differenceTheta, differencePhi);
 
         }
     }
@@ -114,11 +119,11 @@ public class GL3DImageVertexShaderProgram extends GLVertexShaderProgram {
             program += "\tdifferenceOutput.y *= diffTextureScaleThetaPhi.y;" + GLShaderBuilder.LINE_SEP;
             program += "}" + GLShaderBuilder.LINE_SEP;
 
-            shaderBuilder.addEnvParameter("float4 rect");
-            shaderBuilder.addEnvParameter("float4 textureScaleThetaPhi");
-            shaderBuilder.addEnvParameter("float4 offset");
-            shaderBuilder.addEnvParameter("float4 differenceRect");
-            shaderBuilder.addEnvParameter("float4 diffTextureScaleThetaPhi");
+            this.rectRef = shaderBuilder.addEnvParameter("float4 rect");
+            this.textureScaleThetaPhiRef = shaderBuilder.addEnvParameter("float4 textureScaleThetaPhi");
+            this.offsetRef = shaderBuilder.addEnvParameter("float4 offset");
+            this.differenceRectRef = shaderBuilder.addEnvParameter("float4 differenceRect");
+            this.diffTextureScaleThetaPhiRef = shaderBuilder.addEnvParameter("float4 diffTextureScaleThetaPhi");
 
             program = program.replace("output", shaderBuilder.useOutputValue("float4", "TEXCOORD0"));
             program = program.replace("physicalPosition", shaderBuilder.useStandardParameter("float4", "POSITION"));
