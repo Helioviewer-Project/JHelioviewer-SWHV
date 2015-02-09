@@ -704,8 +704,6 @@ public class JHVJP2View extends AbstractView implements JP2View, ViewportView, R
         if (metaData instanceof HelioviewerMetaData) {
             HelioviewerMetaData hvmd = (HelioviewerMetaData) metaData;
             newImageData.setRegion(hvmd.roiToRegion(roi, zoompercent));
-            newImageData.setScaleX(hvmd.getScaleX(roi));
-            newImageData.setScaleY(hvmd.getScaleY(roi));
             newImageData.setDateMillis(hvmd.getDateTime().getMillis());
         }
         newImageData.setFullyLoaded(fullyLoaded);

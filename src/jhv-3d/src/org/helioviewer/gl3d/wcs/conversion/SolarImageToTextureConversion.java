@@ -23,12 +23,6 @@ public class SolarImageToTextureConversion implements CoordinateConversion {
         double _x = (x - this.textureCoordinateSystem.getRegion().getCornerX()) / textureCoordinateSystem.getRegion().getWidth();
         double _y = (y - this.textureCoordinateSystem.getRegion().getCornerY()) / textureCoordinateSystem.getRegion().getHeight();
 
-        // Relative Coordinates within Texture, because Texture is usually
-        // larger than the
-        // captured image, due to PowerOf2 Texture size Restrictions
-        _x = _x * this.textureCoordinateSystem.getTextureScaleX();
-        _y = _y * this.textureCoordinateSystem.getTextureScaleY();
-
         CoordinateVector textureCoordinate = textureCoordinateSystem.createCoordinateVector(_x, _y);
 
         return textureCoordinate;

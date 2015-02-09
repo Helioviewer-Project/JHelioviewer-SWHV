@@ -65,15 +65,10 @@ public interface ImageData {
     public double getZoomPercent();
     public void setSubImage(SubImage subImage);
     public SubImage getSubImage();
-    public double getScaleX();
-    public void setScaleX(double scaleX);
-    public double getScaleY();
-    public void setScaleY(double scaleY);
     public Region getRegion();
     public void setRegion(Region r);
 
     boolean getFullyLoaded();
     void setFullyLoaded(boolean fullyLoaded);
-
 
 }

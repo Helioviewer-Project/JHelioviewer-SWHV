@@ -9,10 +9,12 @@ import org.helioviewer.viewmodel.view.opengl.shader.GLVertexShaderProgram;
 public class GL3DImageVertexShaderProgram extends GLVertexShaderProgram {
     private double theta;
     private double phi;
-    private double xxTextureScale;
-    private double yyTextureScale;
-    private double differenceXTextureScale;
-    private double differenceYTextureScale;
+
+    private float xxTextureScale = 1.0f;
+    private float yyTextureScale = 1.0f;
+    private float differenceXTextureScale = 1.0f;
+    private float differenceYTextureScale = 1.0f;
+
     private double differenceXOffset;
     private double differenceYOffset;
     private double differenceTheta;
@@ -142,16 +144,6 @@ public class GL3DImageVertexShaderProgram extends GLVertexShaderProgram {
     public void changeAngles(double theta, double phi) {
         this.theta = theta;
         this.phi = phi;
-    }
-
-    public void changeTextureScale(double scaleX, double scaleY) {
-        this.xxTextureScale = scaleX;
-        this.yyTextureScale = scaleY;
-    }
-
-    public void changeDifferenceTextureScale(double scaleX, double scaleY) {
-        this.differenceXTextureScale = scaleX;
-        this.differenceYTextureScale = scaleY;
     }
 
     public void changeDifferenceAngles(double theta, double phi) {

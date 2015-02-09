@@ -13,10 +13,11 @@ public class GL3DImageFragmentShaderProgram extends GLFragmentShaderProgram {
 
     private double theta;
     private double phi;
-    private double xxTextureScale = 1.0;
-    private double yyTextureScale = 1.0;
-    private double differenceXTextureScale;
-    private double differenceYTextureScale;
+
+    private float xxTextureScale = 1.0f;
+    private float yyTextureScale = 1.0f;
+    private float differenceXTextureScale = 1.0f;
+    private float differenceYTextureScale = 1.0f;
 
     private double differenceTheta;
     private double differencePhi;
@@ -141,11 +142,6 @@ public class GL3DImageFragmentShaderProgram extends GLFragmentShaderProgram {
 
     }
 
-    public void changeTextureScale(double xTextureScale, double yTextureScale) {
-        this.xxTextureScale = xTextureScale;
-        this.yyTextureScale = yTextureScale;
-    }
-
     public void setCutOffRadius(double cutOffRadius) {
         this.cutOffRadius = cutOffRadius;
     }
@@ -157,11 +153,6 @@ public class GL3DImageFragmentShaderProgram extends GLFragmentShaderProgram {
     public void changeAngles(double theta, double phi) {
         this.theta = theta;
         this.phi = phi;
-    }
-
-    public void changeDifferenceTextureScale(double scaleX, double scaleY) {
-        this.differenceXTextureScale = scaleX;
-        this.differenceYTextureScale = scaleY;
     }
 
     public void changeDifferenceAngles(double theta, double phi) {

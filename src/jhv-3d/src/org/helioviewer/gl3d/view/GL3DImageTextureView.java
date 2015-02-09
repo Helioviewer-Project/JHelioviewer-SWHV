@@ -111,7 +111,6 @@ public class GL3DImageTextureView extends AbstractGL3DView implements GL3DView, 
                 theta = -((HelioviewerPositionedMetaData) (metadataView.getMetaData())).getStonyhurstLatitude() / MathUtils.radeg;
             }
             this.vertexShader.changeRect(xOffset, yOffset, xScale, yScale);
-            this.vertexShader.changeTextureScale(sim.getSubimageData().getScaleX(), sim.getSubimageData().getScaleY());
             this.vertexShader.changeAngles(theta, phi);
             JHVJPXView jhvjpx = this.getAdapter(JHVJPXView.class);
             if (jhvjpx != null) {
@@ -124,10 +123,8 @@ public class GL3DImageTextureView extends AbstractGL3DView implements GL3DView, 
                     Date previousDate = new Date(jhvjpx.getPreviousImageData().getDateMillis());
                     double differenceTheta = -Astronomy.getB0InRadians(previousDate);
                     double differencePhi = Astronomy.getL0Radians(previousDate);
-                    this.vertexShader.changeDifferenceTextureScale(jhvjpx.getPreviousImageData().getScaleX(), jhvjpx.getPreviousImageData().getScaleY());
                     this.vertexShader.setDifferenceRect(differenceXOffset, differenceYOffset, differenceXScale, differenceYScale);
                     this.vertexShader.changeDifferenceAngles(differenceTheta, differencePhi);
-                    this.fragmentShader.changeDifferenceTextureScale(jhvjpx.getPreviousImageData().getScaleX(), jhvjpx.getPreviousImageData().getScaleY());
                     this.fragmentShader.changeDifferenceAngles(differenceTheta, differencePhi);
                 } else if (jhvjpx.getBaseDifferenceMode() && jhvjpx.getBaseDifferenceImageData() != null) {
                     Region differenceRegion = jhvjpx.getBaseDifferenceImageData().getRegion();
@@ -138,17 +135,14 @@ public class GL3DImageTextureView extends AbstractGL3DView implements GL3DView, 
                     Date baseDate = new Date(jhvjpx.getBaseDifferenceImageData().getDateMillis());
                     double differenceTheta = -Astronomy.getB0InRadians(baseDate);
                     double differencePhi = Astronomy.getL0Radians(baseDate);
-                    this.vertexShader.changeDifferenceTextureScale(jhvjpx.getBaseDifferenceImageData().getScaleX(), jhvjpx.getBaseDifferenceImageData().getScaleY());
                     this.vertexShader.setDifferenceRect(differenceXOffset, differenceYOffset, differenceXScale, differenceYScale);
                     this.vertexShader.changeDifferenceAngles(differenceTheta, differencePhi);
-                    this.fragmentShader.changeDifferenceTextureScale(jhvjpx.getBaseDifferenceImageData().getScaleX(), jhvjpx.getBaseDifferenceImageData().getScaleY());
                     this.fragmentShader.changeDifferenceAngles(differenceTheta, differencePhi);
                 } else {
-                    this.fragmentShader.changeDifferenceTextureScale(jhvjpx.getImageData().getScaleX(), jhvjpx.getImageData().getScaleY());
                     this.fragmentShader.changeDifferenceAngles(theta, phi);
                 }
             }
-            this.fragmentShader.changeTextureScale(sim.getSubimageData().getScaleX(), sim.getSubimageData().getScaleY());
+
             this.fragmentShader.changeAngles(theta, phi);
             if (metadata instanceof HelioviewerOcculterMetaData) {
                 HelioviewerOcculterMetaData md = (HelioviewerOcculterMetaData) metadata;
