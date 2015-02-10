@@ -33,13 +33,6 @@ public interface OcculterMetaData {
      * 
      * @return Physical distance to the flat ends of the image.
      */
-    public double getPhysicalFlatOcculterSize();
-
-    /**
-     * Returns the rotation of the mask.
-     * 
-     * @return Rotation of the mask
-     */
-    public double getMaskRotation();
+    // public double getPhysicalFlatOcculterSize();
 
 }

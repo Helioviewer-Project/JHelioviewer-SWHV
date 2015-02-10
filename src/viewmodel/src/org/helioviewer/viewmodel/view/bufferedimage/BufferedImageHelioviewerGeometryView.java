@@ -143,13 +143,14 @@ public class BufferedImageHelioviewerGeometryView extends AbstractBasicView impl
                     g.setComposite(AlphaComposite.Src);
                     g.fillOval(offset.getX() - radius.getY(), offset.getY() - radius.getY(), radius.getY() * 2, radius.getY() * 2);
 
+                    /* most likely not right
                     if (radius.getX() != 0) {
                         g.setComposite(AlphaComposite.Clear);
                         g.fillOval(offset.getX() - radius.getX(), offset.getY() - radius.getX(), radius.getX() * 2, radius.getX() * 2);
 
                         HelioviewerOcculterMetaData occulterMetaData = (HelioviewerOcculterMetaData) metaData;
                         int flatSize = ViewHelper.convertImageToScreenDisplacement(occulterMetaData.getPhysicalFlatOcculterSize(), 0, region, viewportImageSize).getX();
-                        double rotation = occulterMetaData.getMaskRotation();
+                        double rotation = occulterMetaData.getMaskRotation(); -- this should not exist
 
                         if (Math.abs(rotation) > 1e-3) {
                             g.rotate(-rotation, offset.getX(), offset.getY());
@@ -159,6 +160,7 @@ public class BufferedImageHelioviewerGeometryView extends AbstractBasicView impl
                             g.fillRect(offset.getX() - flatSize, offset.getY() + flatSize, 2 * flatSize, flatSize);
                         }
                     }
+                    */
 
                 } else { // EIT and AIA
                     int[] sourcePixels = new int[data.getWidth() * data.getHeight()];
