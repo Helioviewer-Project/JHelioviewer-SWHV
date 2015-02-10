@@ -100,7 +100,7 @@ public class DataChecker implements RadioDataManagerListener {
     }
 
     @Override
-    public void newDataForIDReceived(byte[] data, Interval<Date> timeInterval, FrequencyInterval freqInterval, Rectangle area, Long ID, String identifier, Long imageID) {
+    public void newDataForIDReceived(int[] data, Interval<Date> timeInterval, FrequencyInterval freqInterval, Rectangle area, Long ID, String identifier, Long imageID) {
         // TODO Auto-generated method stub
     }
 

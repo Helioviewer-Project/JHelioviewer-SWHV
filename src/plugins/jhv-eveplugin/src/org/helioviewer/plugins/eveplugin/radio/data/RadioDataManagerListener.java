@@ -26,7 +26,7 @@ public interface RadioDataManagerListener {
 
     public abstract void downloadRequestDataVisibilityChanged(DownloadRequestData drd, long ID);
 
-    public abstract void newDataForIDReceived(byte[] data, Interval<Date> timeInterval, FrequencyInterval freqInterval, Rectangle area, Long downloadID, String identifier, Long imageID);
+    public abstract void newDataForIDReceived(int[] data, Interval<Date> timeInterval, FrequencyInterval freqInterval, Rectangle area, Long downloadID, String identifier, Long imageID);
 
     public abstract void clearAllSavedImagesForID(Long downloadID, Long imageID, String plotIdentifier);
 

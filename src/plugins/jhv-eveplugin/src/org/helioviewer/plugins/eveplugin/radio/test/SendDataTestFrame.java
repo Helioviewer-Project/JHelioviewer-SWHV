@@ -266,7 +266,7 @@ public class SendDataTestFrame extends JFrame implements RadioDataManagerListene
     }
 
     @Override
-    public void newDataForIDReceived(byte[] data, Interval<Date> timeInterval, FrequencyInterval freqInterval, Rectangle area, Long ID, String identifier, Long imageID) {
+    public void newDataForIDReceived(int[] data, Interval<Date> timeInterval, FrequencyInterval freqInterval, Rectangle area, Long ID, String identifier, Long imageID) {
         // TODO Auto-generated method stub
 
     }
@@ -291,7 +291,7 @@ public class SendDataTestFrame extends JFrame implements RadioDataManagerListene
 
     /*
      * (non-Javadoc)
-     *
+     * 
      * @see
      * org.helioviewer.plugins.eveplugin.radio.data.RadioDataManagerListener
      * #frequencyIntervalUpdated(java.lang.String,
