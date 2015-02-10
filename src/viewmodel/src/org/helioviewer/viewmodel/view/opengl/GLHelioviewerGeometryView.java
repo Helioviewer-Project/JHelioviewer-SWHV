@@ -144,6 +144,7 @@ public class GLHelioviewerGeometryView extends AbstractGLView implements Heliovi
                     program = program.replace("physicalPosition", shaderBuilder.useStandardParameter("float4", "TEXCOORD0"));
                     program = program.replace("innerRadius", String.format(Locale.US, "%f", hvMetaData.getInnerPhysicalOcculterRadius() * roccInnerFactor));
                     program = program.replace("outerRadius", String.format(Locale.US, "%f", hvMetaData.getOuterPhysicalOcculterRadius() * roccOuterFactor));
+
                     if (Displayer.getSingletonInstance().getState() == Displayer.STATE2D) {
                         shaderBuilder.addMainFragment(program);
                     }
