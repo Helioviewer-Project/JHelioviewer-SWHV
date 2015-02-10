@@ -1,6 +1,5 @@
 package org.helioviewer.plugins.eveplugin.view;
 
-import java.awt.BorderLayout;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.event.ActionEvent;
@@ -8,7 +7,6 @@ import java.awt.event.ActionListener;
 import java.io.IOException;
 import java.util.Map;
 
-import javax.swing.BorderFactory;
 import javax.swing.JComboBox;
 import javax.swing.JFileChooser;
 import javax.swing.JLabel;
@@ -37,7 +35,7 @@ public class RadioOptionsPanel extends JPanel implements ActionListener {
 
     private void initVisualComponents() {
 
-        setLayout(new BorderLayout());
+        setLayout(new GridBagLayout());
 
         lut = new JComboBox(lutMap.keySet().toArray());
         lut.setSelectedItem("Rainbow 2");
@@ -46,7 +44,6 @@ public class RadioOptionsPanel extends JPanel implements ActionListener {
         color = new JLabel("Color:");
 
         JPanel panel = new JPanel();
-        panel.setBorder(BorderFactory.createTitledBorder("Radio Options"));
         panel.setLayout(new GridBagLayout());
 
         GridBagConstraints gc = new GridBagConstraints();
@@ -59,7 +56,10 @@ public class RadioOptionsPanel extends JPanel implements ActionListener {
         gc.weightx = 1;
         panel.add(lut, gc);
 
-        add(panel, BorderLayout.CENTER);
+        gc.gridx = 0;
+        gc.gridy = 0;
+        gc.fill = GridBagConstraints.BOTH;
+        add(panel, gc);
     }
 
     @Override
