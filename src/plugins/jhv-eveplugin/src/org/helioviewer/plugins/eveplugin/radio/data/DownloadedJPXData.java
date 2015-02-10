@@ -8,10 +8,14 @@ import java.util.concurrent.ExecutionException;
 import javax.swing.SwingWorker;
 
 import org.helioviewer.base.logging.Log;
+import org.helioviewer.plugins.eveplugin.radio.filter.FilterModel;
 import org.helioviewer.viewmodel.changeevent.ChangeEvent;
 import org.helioviewer.viewmodel.changeevent.ViewportChangedReason;
+import org.helioviewer.viewmodel.imagedata.ARGBInt32ImageData;
+import org.helioviewer.viewmodel.imagedata.ImageData;
 import org.helioviewer.viewmodel.imagedata.SingleChannelByte8ImageData;
 import org.helioviewer.viewmodel.imagetransport.Byte8ImageTransport;
+import org.helioviewer.viewmodel.imagetransport.Int32ImageTransport;
 import org.helioviewer.viewmodel.metadata.HelioviewerMetaData;
 import org.helioviewer.viewmodel.view.ImageInfoView;
 import org.helioviewer.viewmodel.view.MetaDataView;
@@ -118,19 +122,24 @@ public class DownloadedJPXData implements ViewListener {
                 if (jpxCallistoView != null) {
                     ImageCacheStatus status = jpxCallistoView.getImageCacheStatus();
                     if (status.getImageStatus(0) == CacheStatus.COMPLETE) {
-                        byte[] data = new byte[0];
-                        SingleChannelByte8ImageData imageData = (SingleChannelByte8ImageData) (jpxCallistoView.getSubimageData());
+                        int[] data = new int[0];
+                        ImageData imData = FilterModel.getInstance().colorFilter(jpxCallistoView.getSubimageData());
+                        SingleChannelByte8ImageData imageData = (SingleChannelByte8ImageData) (imData);
                         if (imageData != null) {
+
                             MetaDataView metaDataView = sender.getAdapter(MetaDataView.class);
                             Byte8ImageTransport bytetrs = (Byte8ImageTransport) imageData.getImageTransport();
-                            data = bytetrs.getByte8PixelData();
+                            // data = bytetrs.getByte8PixelData();
 
                             HelioviewerMetaData md = (HelioviewerMetaData) metaDataView.getMetaData();
                             Double mpp = md.getUnitsPerPixel();
-                            byte[] copyData = Arrays.copyOf(data, data.length);
-                            data = new byte[0];
-                            return new DownloadedJPXDataWorkerResult(copyData, imageID, downloadID, new Rectangle(imageData.getWidth(),
-                                    imageData.getHeight()));
+                            // byte[] copyData = Arrays.copyOf(data,
+                            // data.length);
+                            // data = new byte[0];
+                            // return new
+                            // DownloadedJPXDataWorkerResult(copyData, imageID,
+                            // downloadID, new Rectangle(imageData.getWidth(),
+                            // imageData.getHeight()));
                             // radioDataManager.dataForIDReceived(copyData,
                             // imageID, downloadID,
                             // new Rectangle(imageData.getWidth(),
@@ -144,17 +153,17 @@ public class DownloadedJPXData implements ViewListener {
                 } else {
                     JHVJP2CallistoView jp2CallistoView = sender.getAdapter(JHVJP2CallistoView.class);
                     MetaDataView metaDataView = sender.getAdapter(MetaDataView.class);
-                    byte[] data = new byte[0];
-                    SingleChannelByte8ImageData imageData = (SingleChannelByte8ImageData) (jp2CallistoView.getSubimageData());
+                    int[] data = new int[0];
+                    ImageData imData = FilterModel.getInstance().colorFilter(jp2CallistoView.getSubimageData());
+                    ARGBInt32ImageData imageData = (ARGBInt32ImageData) (imData);
                     if (imageData != null) {
-                        Byte8ImageTransport bytetrs = (Byte8ImageTransport) imageData.getImageTransport();
-                        data = bytetrs.getByte8PixelData();
+                        Int32ImageTransport bytetrs = (Int32ImageTransport) imageData.getImageTransport();
+                        data = bytetrs.getInt32PixelData();
                         HelioviewerMetaData md = (HelioviewerMetaData) metaDataView.getMetaData();
-                        byte[] copyData = Arrays.copyOf(data, data.length);
-                        data = new byte[0];
+                        int[] copyData = Arrays.copyOf(data, data.length);
+                        data = new int[0];
                         Log.debug("dworker" + nr + ": new result");
-                        return new DownloadedJPXDataWorkerResult(copyData, imageID, downloadID, new Rectangle(imageData.getWidth(),
-                                imageData.getHeight()));
+                        return new DownloadedJPXDataWorkerResult(copyData, imageID, downloadID, new Rectangle(imageData.getWidth(), imageData.getHeight()));
 
                     } else {
                         Log.trace("dworker" + nr + ": image data null");
@@ -174,8 +183,7 @@ public class DownloadedJPXData implements ViewListener {
                     if (!isCancelled()) {
                         DownloadedJPXDataWorkerResult result = get();
                         if (result != null) {
-                            radioDataManager.dataForIDReceived(result.getData(), result.getImageID(), result.getDownloadID(),
-                                    result.getDataSize());
+                            radioDataManager.dataForIDReceived(result.getData(), result.getImageID(), result.getDownloadID(), result.getDataSize());
                         } else {
                             // Log.debug("dWorker" + nr + " : Result is null");
                         }
