@@ -39,7 +39,6 @@ public class GLShaderBuilder {
     public static final String LINE_SEP = System.getProperty("line.separator");
 
     private static GLShaderHelper shaderHelper = new GLShaderHelper();
-    private static int maxTexCoords = 32;
     private static int maxTexUnits = 32;
     private static int maxConstantRegisters = Integer.MAX_VALUE;
     private static int maxVertexAttributes = Integer.MAX_VALUE;
@@ -54,13 +53,11 @@ public class GLShaderBuilder {
     private final HashMap<String, String> standardParameterTypes = new HashMap<String, String>();
     private final ArrayList<double[]> glEnvParameters = new ArrayList<double[]>();
 
-    private final int[] componentsAvailableInTexCoord;
     //0 for images
     //1 for lookuptables
     private int nextTexUnit = 2;
     private int nextConstantRegister = 0;
     private int nextVertexAttribute = 0;
-    private static int highestTexCoordEverUsed = 0;
 
     private final GL2 gl;
     private final int shaderID;
@@ -86,11 +83,6 @@ public class GLShaderBuilder {
         Log.debug(">> GLShaderBuilder.initShaderBuilder(GL) > max texture image units: " + maxTexUnits);
 
         tmp[0] = 0;
-        gl.glGetIntegerv(GL2.GL_MAX_TEXTURE_COORDS, tmp, 0);
-        maxTexCoords = tmp[0];
-        Log.debug(">> GLShaderBuilder.initShaderBuilder(GL) > max texture coords: " + maxTexCoords);
-
-        tmp[0] = 0;
         gl.glGetIntegerv(GL2.GL_MAX_FRAGMENT_UNIFORM_COMPONENTS, tmp, 0);
         maxConstantRegisters = tmp[0];
         Log.debug(">> GLShaderBuilder.initShaderBuilder(GL) > max fragment uniform components arb: " + maxConstantRegisters);
@@ -99,8 +91,6 @@ public class GLShaderBuilder {
         gl.glGetIntegerv(GL2.GL_MAX_VERTEX_ATTRIBS_ARB, tmp, 0);
         maxVertexAttributes = tmp[0];
         Log.debug(">> GLShaderBuilder.initShaderBuilder(GL) > max vertex attributes arb: " + maxVertexAttributes);
-
-        GLTextureCoordinate.init(gl);
     }
 
     /**
@@ -119,16 +109,6 @@ public class GLShaderBuilder {
     public GLShaderBuilder(GL2 gl, int type, boolean standalone) {
         this.gl = gl;
         this.type = type;
-
-        componentsAvailableInTexCoord = new int[maxTexCoords];
-
-        // Reserved for actual texture coordinate, scaling and physical position
-        componentsAvailableInTexCoord[0] = 0;
-
-        // Rest is free
-        for (int i = 1; i < maxTexCoords; i++) {
-            componentsAvailableInTexCoord[i] = 4;
-        }
 
         shaderID = !standalone ? shaderHelper.genShaderID(gl) : shaderHelper.genStandaloneShaderID(gl);
     }
@@ -269,58 +249,6 @@ public class GLShaderBuilder {
     }
 
     /**
-     * Adds new values to a texture coordinate. If necessary, a new texture
-     * coordinate is added to the parameter list. It returns an abstract
-     * representation of the texture coordinate, which has be used to access the
-     * values. The object wrappes the call to the actual OpenGL functions
-     *
-     * @param numDimensions
-     *            Number of values to add to texture coordinate
-     * @return GLTextureCoordinate presenting the new values
-     * @throws GLBuildShaderException
-     *             if there is no free texture coordinate available
-     */
-    public GLTextureCoordinate addTexCoordParameter(int numDimensions) throws GLBuildShaderException {
-        int texCoord = 0;
-        while (texCoord < maxTexCoords) {
-            if (componentsAvailableInTexCoord[texCoord] >= numDimensions) {
-                if (type == GL2.GL_FRAGMENT_PROGRAM_ARB && texCoord > highestTexCoordEverUsed) {
-                    highestTexCoordEverUsed = texCoord;
-                }
-
-                String identifier = "texcoord" + texCoord;
-                int offset = 4 - componentsAvailableInTexCoord[texCoord];
-
-                String searchFor = "TEXCOORD" + texCoord;
-                boolean alreadyUsed = standardParameterList.contains(searchFor);
-                for (String parameter : getParameterList()) {
-                    if (parameter.contains(searchFor)) {
-                        alreadyUsed = true;
-                        break;
-                    }
-                }
-                if (!alreadyUsed) {
-                    getParameterList().add("float4 " + identifier + " : TEXCOORD" + texCoord);
-                }
-
-                identifier += ".";
-
-                for (int i = offset; i < offset + numDimensions; i++) {
-                    identifier += coordinateDimension[i];
-                }
-
-                GLTextureCoordinate output = new GLShaderTextureCoordinate(GL2.GL_TEXTURE0 + texCoord, offset, numDimensions, identifier);
-
-                componentsAvailableInTexCoord[texCoord] -= numDimensions;
-
-                return output;
-            }
-            texCoord++;
-        }
-        throw new GLBuildShaderException("Number of available texture coordinates exceeded (Max: " + maxTexCoords + ")");
-    }
-
-    /**
      * Adds a new texture unit to the parameter list. It returns the OpenGL
      * constant, which has to be used by glActiveTexture to access this
      * parameter, for example GL_TEXTURE1 or GL_TEXTURE4.
@@ -429,25 +357,6 @@ public class GLShaderBuilder {
             shaderHelper.delShaderID(gl, shaderID);
             return;
         }
-        if (type == GL2.GL_VERTEX_PROGRAM_ARB) {
-            for (int i = 0; i <= highestTexCoordEverUsed; i++) {
-                String searchFor = "TEXCOORD" + i;
-                boolean alreadyUsed = outputStruct.contains(searchFor);
-                for (String parameter : getParameterList()) {
-                    if (parameter.contains(searchFor)) {
-                        alreadyUsed = true;
-                        break;
-                    }
-                }
-                if (!alreadyUsed) {
-                    try {
-                        useOutputValue("float4", searchFor, useStandardParameter("float4", searchFor));
-                    } catch (GLBuildShaderException e) {
-                        e.printStackTrace();
-                    }
-                }
-            }
-        }
 
         // output struct
         String finalCode = "struct outputStruct {" + LINE_SEP;
@@ -527,77 +436,6 @@ public class GLShaderBuilder {
         public GLBuildShaderException(String message) {
             super(message);
         }
-    }
-
-    /**
-     * GLTextureCoordinate implementation for the all texture coordinates
-     * managed by GLShaderBuilder
-     *
-     * @see GLShaderBuilder#addTextureParameter(String)
-     */
-    private class GLShaderTextureCoordinate extends GLTextureCoordinate {
-
-        /**
-         * Default constructor.
-         *
-         * @param target
-         *            OpenGL constant, representing the texture coordinate, such
-         *            as GL_TEXTURE0 or GL_TEXTURE3
-         * @param offset
-         *            The offset within the 4d-coordinate. Has to be within [0,
-         *            3]
-         * @param length
-         *            The length of the subset. Has to be within [1, 4]
-         * @param identifier
-         *            The identifier for this coordinate, which has to be used
-         *            in shader programs
-         */
-        protected GLShaderTextureCoordinate(int target, int offset, int length, String identifier) {
-            super(target, offset, length, identifier);
-        }
-    }
-
-    public String getCode() {
-        String finalCode = "struct outputStruct {" + LINE_SEP;
-
-        for (String output : outputStruct) {
-            finalCode += '\t' + outputTypes.get(output) + ' ' + output.toLowerCase() + " : " + output + ';' + LINE_SEP;
-        }
-
-        finalCode += "};" + LINE_SEP + LINE_SEP;
-
-        // other functions
-        if (functions.length() > 0) {
-            finalCode += functions + LINE_SEP + LINE_SEP;
-        }
-
-        // main function header
-        finalCode += "outputStruct main(";
-        for (String parameter : standardParameterList) {
-            if (parameter.contains(".")) {
-                finalCode += LINE_SEP + '\t' + standardParameterTypes.get(parameter) + ' ' + parameter.replace('.', '_') + " : " + parameter + ',';
-            } else {
-                finalCode += LINE_SEP + '\t' + standardParameterTypes.get(parameter) + ' ' + parameter.toLowerCase() + " : " + parameter + ',';
-            }
-        }
-
-        for (String parameter : getParameterList()) {
-            finalCode += LINE_SEP + '\t' + parameter + ',';
-        }
-
-        finalCode = finalCode.substring(0, finalCode.length() - 1);
-        finalCode += ')' + LINE_SEP + '{' + LINE_SEP + "\toutputStruct OUT;" + LINE_SEP;
-
-        for (String output : outputStruct) {
-            if (outputInit.containsKey(output)) {
-                finalCode += "\tOUT." + output.toLowerCase() + " = " + outputInit.get(output) + ";" + LINE_SEP;
-            }
-        }
-
-        // main function body
-        finalCode += LINE_SEP + mainBody + "\treturn OUT;" + LINE_SEP + '}';
-
-        return finalCode;
     }
 
     public LinkedList<String> getParameterList() {
