@@ -9,6 +9,7 @@ import javax.swing.SwingWorker;
 
 import org.helioviewer.base.logging.Log;
 import org.helioviewer.plugins.eveplugin.radio.filter.FilterModel;
+import org.helioviewer.plugins.eveplugin.radio.filter.FilterModelListener;
 import org.helioviewer.viewmodel.changeevent.ChangeEvent;
 import org.helioviewer.viewmodel.changeevent.ViewportChangedReason;
 import org.helioviewer.viewmodel.imagedata.ARGBInt32ImageData;
@@ -26,7 +27,7 @@ import org.helioviewer.viewmodel.view.cache.ImageCacheStatus.CacheStatus;
 import org.helioviewer.viewmodel.view.jp2view.JHVJP2CallistoView;
 import org.helioviewer.viewmodel.view.jp2view.JHVJPXCallistoView;
 
-public class DownloadedJPXData implements ViewListener {
+public class DownloadedJPXData implements ViewListener, FilterModelListener {
     private ImageInfoView view;
     private Long imageID;
     private Date startDate;
@@ -39,6 +40,7 @@ public class DownloadedJPXData implements ViewListener {
 
     public DownloadedJPXData(ImageInfoView view, Long imageID, Date startDate, Date endDate, String plotIdentifier, Long downloadID) {
         super();
+        FilterModel.getInstance().addFilterModelListener(this);
         this.view = view;
         this.imageID = imageID;
         this.startDate = startDate;
@@ -118,58 +120,8 @@ public class DownloadedJPXData implements ViewListener {
                 for (ViewportChangedReason cr : aEvent.getAllChangedReasonsByType(ViewportChangedReason.class)) {
                     radioDataManager.finishedDownloadingID(imageID, downloadID);
                 }
-                JHVJPXCallistoView jpxCallistoView = sender.getAdapter(JHVJPXCallistoView.class);
-                if (jpxCallistoView != null) {
-                    ImageCacheStatus status = jpxCallistoView.getImageCacheStatus();
-                    if (status.getImageStatus(0) == CacheStatus.COMPLETE) {
-                        int[] data = new int[0];
-                        ImageData imData = FilterModel.getInstance().colorFilter(jpxCallistoView.getSubimageData());
-                        SingleChannelByte8ImageData imageData = (SingleChannelByte8ImageData) (imData);
-                        if (imageData != null) {
 
-                            MetaDataView metaDataView = sender.getAdapter(MetaDataView.class);
-                            Byte8ImageTransport bytetrs = (Byte8ImageTransport) imageData.getImageTransport();
-                            // data = bytetrs.getByte8PixelData();
-
-                            HelioviewerMetaData md = (HelioviewerMetaData) metaDataView.getMetaData();
-                            Double mpp = md.getUnitsPerPixel();
-                            // byte[] copyData = Arrays.copyOf(data,
-                            // data.length);
-                            // data = new byte[0];
-                            // return new
-                            // DownloadedJPXDataWorkerResult(copyData, imageID,
-                            // downloadID, new Rectangle(imageData.getWidth(),
-                            // imageData.getHeight()));
-                            // radioDataManager.dataForIDReceived(copyData,
-                            // imageID, downloadID,
-                            // new Rectangle(imageData.getWidth(),
-                            // imageData.getHeight()));
-                        }
-                    } else {
-                        // Log.debug("dworker " + nr +
-                        // " Download not complete");
-                        return null;
-                    }
-                } else {
-                    JHVJP2CallistoView jp2CallistoView = sender.getAdapter(JHVJP2CallistoView.class);
-                    MetaDataView metaDataView = sender.getAdapter(MetaDataView.class);
-                    int[] data = new int[0];
-                    ImageData imData = FilterModel.getInstance().colorFilter(jp2CallistoView.getSubimageData());
-                    ARGBInt32ImageData imageData = (ARGBInt32ImageData) (imData);
-                    if (imageData != null) {
-                        Int32ImageTransport bytetrs = (Int32ImageTransport) imageData.getImageTransport();
-                        data = bytetrs.getInt32PixelData();
-                        HelioviewerMetaData md = (HelioviewerMetaData) metaDataView.getMetaData();
-                        int[] copyData = Arrays.copyOf(data, data.length);
-                        data = new int[0];
-                        Log.debug("dworker" + nr + ": new result");
-                        return new DownloadedJPXDataWorkerResult(copyData, imageID, downloadID, new Rectangle(imageData.getWidth(), imageData.getHeight()));
-
-                    } else {
-                        Log.trace("dworker" + nr + ": image data null");
-                    }
-                }
-                return null;
+                return getJPXData(sender);
             }
 
             public SwingWorker<DownloadedJPXDataWorkerResult, Void> init(int workernumber) {
@@ -244,4 +196,120 @@ public class DownloadedJPXData implements ViewListener {
          * imageData.getHeight())); } } }
          */
     }
+
+    @Override
+    public void colorLUTChanged() {
+        while (worker != null && !worker.isDone()) {
+            try {
+                // Log.debug("dworker is busy sleep 10ms");
+                Thread.sleep(10);
+            } catch (InterruptedException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            }
+        }
+
+        worker = new SwingWorker<DownloadedJPXDataWorkerResult, Void>() {
+
+            private int nr;
+
+            @Override
+            protected DownloadedJPXDataWorkerResult doInBackground() {
+                // Log.trace("dworker " + nr + " View changed for image ID : " +
+                // imageID);
+                // Log.debug("dworker " + nr + " Event type: " + aEvent);
+
+                return getJPXData(view);
+            }
+
+            public SwingWorker<DownloadedJPXDataWorkerResult, Void> init(int workernumber) {
+                nr = workernumber;
+                return this;
+            }
+
+            @Override
+            protected void done() {
+                try {
+                    if (!isCancelled()) {
+                        DownloadedJPXDataWorkerResult result = get();
+                        if (result != null) {
+                            radioDataManager.dataForIDReceived(result.getData(), result.getImageID(), result.getDownloadID(), result.getDataSize());
+                        } else {
+                            // Log.debug("dWorker" + nr + " : Result is null");
+                        }
+                    } else {
+                        // Log.debug("dWorker" + nr + " was cancelled");
+                    }
+                } catch (InterruptedException e) {
+                    // TODO Auto-generated catch block
+                    Log.error("dWorker" + nr + " interrupted " + e.getMessage());
+                    e.printStackTrace();
+                } catch (ExecutionException e) {
+                    Log.error("dWorker " + nr + "execution error " + e.getMessage());
+                    e.printStackTrace();
+                }
+
+            }
+
+        }.init(workernumber++);
+
+        worker.execute();
+
+    }
+
+    private DownloadedJPXDataWorkerResult getJPXData(View view) {
+        JHVJPXCallistoView jpxCallistoView = view.getAdapter(JHVJPXCallistoView.class);
+        if (jpxCallistoView != null) {
+            ImageCacheStatus status = jpxCallistoView.getImageCacheStatus();
+            if (status.getImageStatus(0) == CacheStatus.COMPLETE) {
+                int[] data = new int[0];
+                ImageData imData = FilterModel.getInstance().colorFilter(jpxCallistoView.getSubimageData());
+                SingleChannelByte8ImageData imageData = (SingleChannelByte8ImageData) (imData);
+                if (imageData != null) {
+
+                    MetaDataView metaDataView = view.getAdapter(MetaDataView.class);
+                    Byte8ImageTransport bytetrs = (Byte8ImageTransport) imageData.getImageTransport();
+                    // data = bytetrs.getByte8PixelData();
+
+                    HelioviewerMetaData md = (HelioviewerMetaData) metaDataView.getMetaData();
+                    Double mpp = md.getUnitsPerPixel();
+                    // byte[] copyData = Arrays.copyOf(data,
+                    // data.length);
+                    // data = new byte[0];
+                    // return new
+                    // DownloadedJPXDataWorkerResult(copyData, imageID,
+                    // downloadID, new Rectangle(imageData.getWidth(),
+                    // imageData.getHeight()));
+                    // radioDataManager.dataForIDReceived(copyData,
+                    // imageID, downloadID,
+                    // new Rectangle(imageData.getWidth(),
+                    // imageData.getHeight()));
+                }
+            } else {
+                // Log.debug("dworker " + nr +
+                // " Download not complete");
+                return null;
+            }
+        } else {
+            JHVJP2CallistoView jp2CallistoView = view.getAdapter(JHVJP2CallistoView.class);
+            MetaDataView metaDataView = view.getAdapter(MetaDataView.class);
+            int[] data = new int[0];
+            ImageData imData = FilterModel.getInstance().colorFilter(jp2CallistoView.getSubimageData());
+            ARGBInt32ImageData imageData = (ARGBInt32ImageData) (imData);
+            if (imageData != null) {
+                Int32ImageTransport bytetrs = (Int32ImageTransport) imageData.getImageTransport();
+                data = bytetrs.getInt32PixelData();
+                HelioviewerMetaData md = (HelioviewerMetaData) metaDataView.getMetaData();
+                int[] copyData = Arrays.copyOf(data, data.length);
+                data = new int[0];
+                // Log.debug("dworker" + nr + ": new result");
+                return new DownloadedJPXDataWorkerResult(copyData, imageID, downloadID, new Rectangle(imageData.getWidth(), imageData.getHeight()));
+
+            } else {
+                // Log.trace("dworker" + nr + ": image data null");
+            }
+        }
+        return null;
+    }
+
 }
