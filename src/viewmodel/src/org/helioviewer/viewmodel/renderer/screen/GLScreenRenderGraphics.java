@@ -82,10 +82,10 @@ public class GLScreenRenderGraphics extends AbstractScreenRenderGraphics {
         gl.glDisable(GL2.GL_TEXTURE_2D);
 
         gl.glBegin(GL2.GL_LINES);
-
-        gl.glVertex2i(x0, y0);
-        gl.glVertex2i(x1, y1);
-
+        {
+            gl.glVertex2i(x0, y0);
+            gl.glVertex2i(x1, y1);
+        }
         gl.glEnd();
 
         gl.glEnable(GL2.GL_TEXTURE_2D);
@@ -99,12 +99,12 @@ public class GLScreenRenderGraphics extends AbstractScreenRenderGraphics {
         gl.glDisable(GL2.GL_TEXTURE_2D);
 
         gl.glBegin(GL2.GL_LINE_LOOP);
-
-        gl.glVertex2i(x, y);
-        gl.glVertex2i(x, y + height);
-        gl.glVertex2i(x + width, y + height);
-        gl.glVertex2i(x + width, y);
-
+        {
+            gl.glVertex2i(x, y);
+            gl.glVertex2i(x, y + height);
+            gl.glVertex2i(x + width, y + height);
+            gl.glVertex2i(x + width, y);
+        }
         gl.glEnd();
 
         gl.glEnable(GL2.GL_TEXTURE_2D);
@@ -118,12 +118,12 @@ public class GLScreenRenderGraphics extends AbstractScreenRenderGraphics {
         gl.glBindTexture(GL2.GL_TEXTURE_2D, 0);
 
         gl.glBegin(GL2.GL_QUADS);
-
-        gl.glVertex2i(x, y);
-        gl.glVertex2i(x, y + height);
-        gl.glVertex2i(x + width, y + height);
-        gl.glVertex2i(x + width, y);
-
+        {
+            gl.glVertex2i(x, y);
+            gl.glVertex2i(x, y + height);
+            gl.glVertex2i(x + width, y + height);
+            gl.glVertex2i(x + width, y);
+        }
         gl.glEnd();
     }
 
@@ -140,11 +140,9 @@ public class GLScreenRenderGraphics extends AbstractScreenRenderGraphics {
         int centerY = y + radiusY;
 
         gl.glBegin(GL2.GL_LINE_LOOP);
-
         for (int i = 0; i < edgesPerOval; i++) {
             gl.glVertex2i(centerX + (int) (radiusX * sinOval[i]), centerY + (int) (radiusY * sinOval[(i + (edgesPerOval >> 2)) & (edgesPerOval - 1)]));
         }
-
         gl.glEnd();
 
         gl.glEnable(GL2.GL_TEXTURE_2D);
@@ -170,15 +168,11 @@ public class GLScreenRenderGraphics extends AbstractScreenRenderGraphics {
             gl.glEnd();
         } else {
             gl.glBegin(GL2.GL_TRIANGLE_FAN);
-
             gl.glVertex2i(centerX, centerY);
-
             for (int i = 0; i < edgesPerOval; i++) {
                 gl.glVertex2f(centerX + (radiusX * sinOval[i]), centerY + (radiusY * sinOval[(i + (edgesPerOval >> 2)) & (edgesPerOval - 1)]));
             }
-
             gl.glVertex2f(centerX, centerY + radiusY);
-
             gl.glEnd();
         }
     }
@@ -191,11 +185,9 @@ public class GLScreenRenderGraphics extends AbstractScreenRenderGraphics {
         gl.glDisable(GL2.GL_TEXTURE_2D);
 
         gl.glBegin(GL2.GL_LINE_LOOP);
-
         for (int i = 0; i < xCoords.length; i++) {
             gl.glVertex2i(xCoords[i], yCoords[i]);
         }
-
         gl.glEnd();
 
         gl.glEnable(GL2.GL_TEXTURE_2D);
@@ -209,11 +201,9 @@ public class GLScreenRenderGraphics extends AbstractScreenRenderGraphics {
         gl.glDisable(GL2.GL_TEXTURE_2D);
 
         gl.glBegin(GL2.GL_LINE_LOOP);
-
         for (int i = 0; i < points.length; i++) {
             gl.glVertex2i(points[i].getX(), points[i].getY());
         }
-
         gl.glEnd();
 
         gl.glEnable(GL2.GL_TEXTURE_2D);
@@ -227,11 +217,9 @@ public class GLScreenRenderGraphics extends AbstractScreenRenderGraphics {
         gl.glBindTexture(GL2.GL_TEXTURE_2D, 0);
 
         gl.glBegin(GL2.GL_POLYGON);
-
         for (int i = 0; i < xCoords.length; i++) {
             gl.glVertex2i(xCoords[i], yCoords[i]);
         }
-
         gl.glEnd();
     }
 
@@ -243,11 +231,9 @@ public class GLScreenRenderGraphics extends AbstractScreenRenderGraphics {
         gl.glBindTexture(GL2.GL_TEXTURE_2D, 0);
 
         gl.glBegin(GL2.GL_POLYGON);
-
         for (int i = 0; i < points.length; i++) {
             gl.glVertex2i(points[i].getX(), points[i].getY());
         }
-
         gl.glEnd();
     }
 
