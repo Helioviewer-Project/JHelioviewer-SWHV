@@ -1,7 +1,5 @@
 package org.helioviewer.plugins.eveplugin.view;
 
-import java.awt.GridBagConstraints;
-
 import javax.swing.BoxLayout;
 import javax.swing.JPanel;
 import javax.swing.JTabbedPane;
@@ -22,10 +20,6 @@ public class TimelinePluginPanel extends JPanel {
         tabs.addTab("Radio Options", new RadioOptionsPanel());
 
         setLayout(new BoxLayout(this, BoxLayout.PAGE_AXIS));
-        GridBagConstraints gc = new GridBagConstraints();
-        gc.gridx = 0;
-        gc.gridy = 0;
-        gc.fill = GridBagConstraints.BOTH;
-        add(tabs, gc);
+        add(tabs);
     }
 }
