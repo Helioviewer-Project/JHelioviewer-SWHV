@@ -1,5 +1,7 @@
 package org.helioviewer.viewmodel.view.opengl;
 
+import java.util.Locale;
+
 import javax.media.opengl.GL2;
 
 import org.helioviewer.base.physics.Constants;
@@ -158,9 +160,9 @@ public class GLHelioviewerGeometryView extends AbstractGLView implements Heliovi
                     program = program.replace("output", shaderBuilder.useOutputValue("float4", "COLOR"));
                     program = program.replace("physicalPosition", shaderBuilder.useStandardParameter("float4", "TEXCOORD0"));
                     program = program.replace("maskRotation", rotationParam.getIdentifier());
-                    program = program.replace("innerRadius", Double.toString(hvMetaData.getInnerPhysicalOcculterRadius() * roccInnerFactor).replace(',', '.'));
-                    program = program.replace("outerRadius", Double.toString(hvMetaData.getOuterPhysicalOcculterRadius() * roccOuterFactor).replace(',', '.'));
-                    program = program.replace("flatDist", Double.toString(hvMetaData.getPhysicalFlatOcculterSize()).replace(',', '.'));
+                    program = program.replace("innerRadius", String.format(Locale.US, "%f", hvMetaData.getInnerPhysicalOcculterRadius() * roccInnerFactor));
+                    program = program.replace("outerRadius", String.format(Locale.US, "%f", hvMetaData.getOuterPhysicalOcculterRadius() * roccOuterFactor));
+                    program = program.replace("flatDist", String.format(Locale.US, "%f", hvMetaData.getPhysicalFlatOcculterSize()));
                     if (Displayer.getSingletonInstance().getState() == Displayer.STATE2D) {
                         shaderBuilder.addMainFragment(program);
                     }
@@ -180,7 +182,7 @@ public class GLHelioviewerGeometryView extends AbstractGLView implements Heliovi
 
                         program = program.replace("output", shaderBuilder.useOutputValue("float4", "COLOR"));
                         program = program.replace("physicalPosition", shaderBuilder.useStandardParameter("float4", "TEXCOORD0"));
-                        program = program.replace("sunRadius", Double.toString(Constants.SunRadius * discFactor).replace(',', '.'));
+                        program = program.replace("sunRadius", String.format(Locale.US, "%f", Constants.SunRadius * discFactor));
 
                         if (Displayer.getSingletonInstance().getState() == Displayer.STATE2D) {
                             shaderBuilder.addMainFragment(program);
@@ -199,8 +201,8 @@ public class GLHelioviewerGeometryView extends AbstractGLView implements Heliovi
 
                         program = program.replace("output", shaderBuilder.useOutputValue("float4", "COLOR"));
                         program = program.replace("physicalPosition", shaderBuilder.useStandardParameter("float4", "TEXCOORD0"));
-                        program = program.replace("sunRadius", Double.toString(Constants.SunRadius).replace(',', '.'));
-                        program = program.replace("fadedSunRadius", Double.toString(Constants.SunRadius * discFadingFactor).replace(',', '.'));
+                        program = program.replace("sunRadius", String.format(Locale.US, "%f", Constants.SunRadius));
+                        program = program.replace("fadedSunRadius", String.format(Locale.US, "%f", Constants.SunRadius * discFadingFactor));
 
                         if (Displayer.getSingletonInstance().getState() == Displayer.STATE2D) {
                             shaderBuilder.addMainFragment(program);
