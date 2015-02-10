@@ -46,6 +46,7 @@ public class SOHOLUTFilter extends AbstractFilter implements FrameFilter, Standa
      * Used lut
      */
     private LUT lut;
+    private final LUT gray;
     private boolean invertLUT = false;
     private boolean changed;
 
@@ -64,7 +65,8 @@ public class SOHOLUTFilter extends AbstractFilter implements FrameFilter, Standa
      * LUT is set to Gray as default table.
      */
     public SOHOLUTFilter() {
-        lut = LUT.getStandardList().get("Gray");
+        gray = LUT.getStandardList().get("Gray");
+        lut = gray;
     }
 
     /**
@@ -74,6 +76,7 @@ public class SOHOLUTFilter extends AbstractFilter implements FrameFilter, Standa
      *            Color table to apply to the image
      */
     public SOHOLUTFilter(LUT startWithLut) {
+        gray = LUT.getStandardList().get("Gray");
         lut = startWithLut;
     }
 
@@ -114,7 +117,7 @@ public class SOHOLUTFilter extends AbstractFilter implements FrameFilter, Standa
      */
     @Override
     public ImageData apply(ImageData data) {
-        // Ship over gray for performance as before
+        // Skip over gray for performance as before
         if (data == null || !(data.getImageFormat() instanceof SingleChannelImageFormat) || (lut.getName() == "Gray" && !invertLUT)) {
             return data;
         }
@@ -171,7 +174,7 @@ public class SOHOLUTFilter extends AbstractFilter implements FrameFilter, Standa
         boolean b = (jp2View instanceof JHVJPXView);
         JHVJPXView jpxView = (JHVJPXView) jp2View;
         if (b && jpxView.getDifferenceMode()) {
-            currlut = LUT.getStandardList().get("Gray");
+            currlut = gray;
         } else {
             currlut = lut;
         }
