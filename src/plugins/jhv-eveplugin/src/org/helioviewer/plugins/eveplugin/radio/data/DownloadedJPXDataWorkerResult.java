@@ -7,6 +7,8 @@ public class DownloadedJPXDataWorkerResult {
     private final long imageID;
     private final long downloadID;
     private final Rectangle dataSize;
+    private final boolean isByteData;
+    private final byte[] byteData;
 
     public DownloadedJPXDataWorkerResult(int[] data, long imageID, long downloadID, Rectangle dataSize) {
         super();
@@ -14,6 +16,18 @@ public class DownloadedJPXDataWorkerResult {
         this.imageID = imageID;
         this.downloadID = downloadID;
         this.dataSize = dataSize;
+        isByteData = false;
+        byteData = new byte[0];
+    }
+
+    public DownloadedJPXDataWorkerResult(byte[] data, Long imageID, Long downloadID, Rectangle dataSize) {
+        super();
+        this.data = new int[0];
+        this.imageID = imageID;
+        this.downloadID = downloadID;
+        this.dataSize = dataSize;
+        isByteData = true;
+        byteData = data;
     }
 
     /**
@@ -44,4 +58,21 @@ public class DownloadedJPXDataWorkerResult {
         return dataSize;
     }
 
+    /**
+     * Is the data byte data or int data
+     * 
+     * @return true in the case of byte data, false if integer data
+     */
+    public boolean isByteData() {
+        return isByteData;
+    }
+
+    /**
+     * Gets the byte data.
+     * 
+     * @return The byte data.
+     */
+    public byte[] getByteData() {
+        return byteData;
+    }
 }

@@ -151,6 +151,10 @@ public class RadioDataManager implements RadioDownloaderListener {
         fireDataforIDReceived(data, imageID, downloadID, dataSize);
     }
 
+    public void dataForIDReceived(byte[] byteData, long imageID, long downloadID, Rectangle dataSize) {
+        fireDataforIDReceived(byteData, imageID, downloadID, dataSize);
+    }
+
     /**
      * Removes the given download request data. The data is removed from the
      * line selector model. The images are removed from the cache.
@@ -412,6 +416,29 @@ public class RadioDataManager implements RadioDownloaderListener {
                         if (image.getVisibleImageFreqInterval() != null && image.getVisibleImageTimeInterval() != null) {
                             for (RadioDataManagerListener l : listeners) {
                                 l.newDataForIDReceived(data, image.getVisibleImageTimeInterval(), image.getVisibleImageFreqInterval(), dataSize, downloadID, drd.getPlotIdentifier(), imageID);
+                            }
+                        }
+                    }
+                } else {
+                    // Log.debug("The image was null");
+                }
+            } else {
+                // Log.debug("Download request data was null");
+            }
+        }
+    }
+
+    private void fireDataforIDReceived(byte[] byteData, long imageID, long downloadID, Rectangle dataSize) {
+        synchronized (downloadRequestData) {
+            DownloadRequestData drd = downloadRequestData.get(downloadID);
+            if (drd != null) {
+                RadioImage image = drd.getRadioImages().get(imageID);
+                if (image != null) {
+                    synchronized (image) {
+                        image.setLastDataSize(dataSize);
+                        if (image.getVisibleImageFreqInterval() != null && image.getVisibleImageTimeInterval() != null) {
+                            for (RadioDataManagerListener l : listeners) {
+                                l.newDataForIDReceived(byteData, image.getVisibleImageTimeInterval(), image.getVisibleImageFreqInterval(), dataSize, downloadID, drd.getPlotIdentifier(), imageID);
                             }
                         }
                     }
@@ -839,4 +866,5 @@ public class RadioDataManager implements RadioDownloaderListener {
         fireDownloadRequestAnswered(requestInterval, downloadID, identifier);
 
     }
+
 }
