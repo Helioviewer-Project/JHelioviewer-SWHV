@@ -17,7 +17,6 @@ import org.helioviewer.viewmodel.view.opengl.shader.GLFragmentShaderProgram;
 import org.helioviewer.viewmodel.view.opengl.shader.GLFragmentShaderView;
 import org.helioviewer.viewmodel.view.opengl.shader.GLShaderBuilder;
 import org.helioviewer.viewmodel.view.opengl.shader.GLShaderBuilder.GLBuildShaderException;
-import org.helioviewer.viewmodel.view.opengl.shader.GLTextureCoordinate;
 import org.helioviewer.viewmodel.view.opengl.shader.GLVertexShaderProgram;
 import org.helioviewer.viewmodel.view.opengl.shader.GLVertexShaderView;
 
@@ -67,11 +66,6 @@ public class GLHelioviewerGeometryView extends AbstractGLView implements Heliovi
 
         vertexShader.bind(gl);
         fragmentShader.bind(gl);
-
-        MetaData metaData = getAdapter(MetaDataView.class).getMetaData();
-        if (metaData instanceof HelioviewerOcculterMetaData) {
-            fragmentShader.setMaskRotation(gl, (float) ((HelioviewerOcculterMetaData) metaData).getMaskRotation());
-        }
 
         renderChild(gl);
 
@@ -129,14 +123,6 @@ public class GLHelioviewerGeometryView extends AbstractGLView implements Heliovi
      * well as the Cg User Manual.
      */
     private class GeometryFragmentShaderProgram extends GLFragmentShaderProgram {
-        private GLTextureCoordinate rotationParam;
-
-        private void setMaskRotation(GL2 gl, float maskRotation) {
-            if (rotationParam != null) {
-                rotationParam.setValue(gl, maskRotation);
-            }
-        }
-
         /**
          * {@inheritDoc}
          */
@@ -151,18 +137,13 @@ public class GLHelioviewerGeometryView extends AbstractGLView implements Heliovi
                 HelioviewerOcculterMetaData hvMetaData = (HelioviewerOcculterMetaData) metaData;
 
                 try {
-                    rotationParam = shaderBuilder.addTexCoordParameter(1);
                     String program = "\tfloat geometryRadius = length(physicalPosition.zw);" + GLShaderBuilder.LINE_SEP;
-                    program += "\tfloat2x2 geometryFlatDistRotationMatrix = float2x2(cos(maskRotation), sin(maskRotation), -sin(maskRotation), cos(maskRotation));" + GLShaderBuilder.LINE_SEP;
-                    program += "\tfloat2 geometryFlatDist = abs(mul(geometryFlatDistRotationMatrix, physicalPosition.zw));" + GLShaderBuilder.LINE_SEP;
-                    program += "\toutput.a = output.a * step(innerRadius, geometryRadius) * step(-outerRadius, -geometryRadius) * step(-flatDist, -geometryFlatDist.x) * step(-flatDist, -geometryFlatDist.y);";
+                    program += "\toutput.a = output.a * step(innerRadius, geometryRadius) * step(-outerRadius, -geometryRadius);";
 
                     program = program.replace("output", shaderBuilder.useOutputValue("float4", "COLOR"));
                     program = program.replace("physicalPosition", shaderBuilder.useStandardParameter("float4", "TEXCOORD0"));
-                    program = program.replace("maskRotation", rotationParam.getIdentifier());
                     program = program.replace("innerRadius", String.format(Locale.US, "%f", hvMetaData.getInnerPhysicalOcculterRadius() * roccInnerFactor));
                     program = program.replace("outerRadius", String.format(Locale.US, "%f", hvMetaData.getOuterPhysicalOcculterRadius() * roccOuterFactor));
-                    program = program.replace("flatDist", String.format(Locale.US, "%f", hvMetaData.getPhysicalFlatOcculterSize()));
                     if (Displayer.getSingletonInstance().getState() == Displayer.STATE2D) {
                         shaderBuilder.addMainFragment(program);
                     }

@@ -18,8 +18,7 @@ public class HelioviewerOcculterMetaData extends HelioviewerMetaData implements 
 
     private double innerRadius;
     private double outerRadius;
-    private double flatDistance;
-    private double maskRotation;
+    // private double flatDistance;
 
     /**
      * Default constructor.
@@ -45,13 +44,13 @@ public class HelioviewerOcculterMetaData extends HelioviewerMetaData implements 
             }
         }
 
+        /*
         if (getDetector().equals("C2")) {
             flatDistance = 6.2 * Constants.SunRadius;
         } else if (getDetector().equals("C3")) {
             flatDistance = 38 * Constants.SunRadius;
         }
-
-        maskRotation = Math.toRadians(m.tryGetDouble("CROTA"));
+        */
     }
 
     /**
@@ -71,31 +70,8 @@ public class HelioviewerOcculterMetaData extends HelioviewerMetaData implements 
     /**
      * {@inheritDoc}
      */
-    public double getPhysicalFlatOcculterSize() {
+    /* public double getPhysicalFlatOcculterSize() {
         return flatDistance;
-    }
+    } */
 
-    /**
-     * {@inheritDoc}
-     */
-    public double getMaskRotation() {
-        return maskRotation;
-    }
-
-    /**
-     * {@inheritDoc}
-     * 
-     * In this case, also the mask rotation is checked.
-     */
-    public boolean checkForModifications() {
-        boolean changed = super.checkForModifications();
-
-        double currentMaskRotation = Math.toRadians(metaDataContainer.tryGetDouble("CROTA"));
-        if (changed || Math.abs(maskRotation - currentMaskRotation) > Math.toRadians(1)) {
-            maskRotation = currentMaskRotation;
-            changed = true;
-        }
-
-        return changed;
-    }
 }
