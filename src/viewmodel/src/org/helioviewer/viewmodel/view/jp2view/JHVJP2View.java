@@ -149,7 +149,8 @@ public class JHVJP2View extends AbstractView implements JP2View, ViewportView, R
      * @param newJP2Image
      */
     public void setJP2Image(JP2Image newJP2Image) {
-        /* synchronized (Displayer.displaylock) */ {
+        /* workaround for out-of-sync metadata */
+        synchronized (Displayer.displaylock) {
             if (jp2Image != null && reader != null) {
                 abolish();
             }
