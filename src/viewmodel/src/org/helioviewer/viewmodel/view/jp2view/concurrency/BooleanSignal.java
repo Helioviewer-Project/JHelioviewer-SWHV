@@ -12,16 +12,18 @@ package org.helioviewer.viewmodel.view.jp2view.concurrency;
  */
 public class BooleanSignal {
 
+    private final Object lock = new Object();
+
     /** Signal flag */
-    private volatile boolean isSignaled;
+    private boolean isSignaled;
 
     /**
      * Default constructor. Assigns the initial value of the isSignaled flag.
      * 
      * @param _intitialVal
      */
-    public BooleanSignal(boolean _intitialVal) {
-        isSignaled = _intitialVal;
+    public BooleanSignal(boolean _initialVal) {
+        isSignaled = _initialVal;
     }
 
     /**
@@ -31,28 +33,33 @@ public class BooleanSignal {
      * 
      * @throws InterruptedException
      */
-    public synchronized void waitForSignal() throws InterruptedException {
-        while (!isSignaled)
-            this.wait();
-        isSignaled = false;
+    public void waitForSignal() throws InterruptedException {
+        synchronized (lock) {
+            while (!isSignaled) {
+                lock.wait();
+            }
+            isSignaled = false;
+        }
     }
 
-    public synchronized void waitForSignal(long timeout) throws InterruptedException {
-        while (!isSignaled) {
-            this.wait(timeout);
-            isSignaled = true;
+    public void waitForSignal(long timeout) throws InterruptedException {
+        synchronized (lock) {
+            while (!isSignaled) {
+                lock.wait(timeout);
+            }
+            isSignaled = false;
         }
-
-        isSignaled = false;
     }
 
     /**
      * Sets the isSignaled flag and wakes up one waiting thread. Doesn't bother
      * to notifyAll since the first thread woken up resets the flag anyway.
      */
-    public synchronized void signal() {
-        isSignaled = true;
-        this.notify();
+    public void signal() {
+        synchronized (lock) {
+            isSignaled = true;
+            lock.notify();
+        }
     }
 
     /**
@@ -60,10 +67,8 @@ public class BooleanSignal {
      * 
      * @return Current signal state
      */
-    public synchronized boolean isSignaled() /* throws InterruptedException */{
-        /*
-         * if(Thread.interrupted()) throw new InterruptedException();
-         */
+    public boolean isSignaled() {
         return isSignaled;
     }
-};
+
+}
