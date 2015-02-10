@@ -18,6 +18,7 @@ import org.helioviewer.plugins.eveplugin.view.ControlsPanel;
 import org.helioviewer.plugins.eveplugin.view.MainPanel;
 import org.helioviewer.plugins.eveplugin.view.ObservationDialogUIPanel;
 import org.helioviewer.plugins.eveplugin.view.RadioObservationDialogUIPanel;
+import org.helioviewer.plugins.eveplugin.view.TimelinePluginPanel;
 import org.helioviewer.viewmodelplugin.interfaces.Plugin;
 
 /**
@@ -46,7 +47,7 @@ public class EVEPlugin implements Plugin, MainContentPanelPlugin {
 
                 pluginPanes.add(mainPanel);
 
-                ImageViewerGui.getSingletonInstance().getLeftContentPane().add("Timeline Layers", ControlsPanel.getSingletonInstance(), true);
+                ImageViewerGui.getSingletonInstance().getLeftContentPane().add("Timeline Layers", new TimelinePluginPanel(), true);
 
                 ImageViewerGui.getSingletonInstance().getMainContentPanel().addPlugin(EVEPlugin.this);
                 ImageViewerGui.getSingletonInstance().getObservationDialog().addUserInterface(EVESettings.OBSERVATION_UI_NAME, new ObservationDialogUIPanel(mainPanel.getPlotContainerPanel()));
