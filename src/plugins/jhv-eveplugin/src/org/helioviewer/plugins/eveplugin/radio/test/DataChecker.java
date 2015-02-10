@@ -136,4 +136,10 @@ public class DataChecker implements RadioDataManagerListener {
 
     }
 
+    @Override
+    public void newDataForIDReceived(byte[] byteData, Interval<Date> visibleImageTimeInterval, FrequencyInterval visibleImageFreqInterval, Rectangle dataSize, long downloadID, String plotIdentifier, long imageID) {
+        // TODO Auto-generated method stub
+
+    }
+
 }

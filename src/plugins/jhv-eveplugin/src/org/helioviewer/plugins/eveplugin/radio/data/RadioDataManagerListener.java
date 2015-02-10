@@ -45,4 +45,6 @@ public interface RadioDataManagerListener {
      *            The new maximum frequency interval
      */
     public abstract void frequencyIntervalUpdated(String plotIdentifier, FrequencyInterval maxFrequencyInterval);
+
+    public abstract void newDataForIDReceived(byte[] byteData, Interval<Date> visibleImageTimeInterval, FrequencyInterval visibleImageFreqInterval, Rectangle dataSize, long downloadID, String plotIdentifier, long imageID);
 }

@@ -4,6 +4,7 @@ import java.awt.EventQueue;
 import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.image.BufferedImage;
+import java.awt.image.DataBufferByte;
 import java.awt.image.DataBufferInt;
 import java.awt.image.Raster;
 import java.util.ArrayList;
@@ -241,6 +242,40 @@ public class RadioPlotModel implements RadioDataManagerListener, ZoomDataConfigL
     }
 
     @Override
+    public void newDataForIDReceived(byte[] byteData, Interval<Date> timeInterval, FrequencyInterval freqInterval, Rectangle area, long downloadID, String identifier, long radioImageID) {
+        synchronized (this) {
+            RadioPlotModelData rpmd = getRadioPlotModelData(identifier);
+            Map<Long, DownloadRequestData> downloadRequestData = rpmd.getDownloadRequestData();
+            Map<Long, Map<Long, PlotConfig>> plotConfigList = rpmd.getPlotConfigList();
+            BufferedImage newImage = createBufferedImage(area.width, area.height, byteData);
+            bufferedImages.put(radioImageID, newImage);
+            rpmd.getRadioImagePane().setIntervalTooBig(false);
+            // Log.trace("+===============================================================+");
+            // Log.trace("buffered images size : " + bufferedImages.size());
+            // Log.trace("Size of the data : " + data.length);
+            // Log.trace("timeinterval start : " + timeInterval.getStart());
+            // Log.trace("timeinterval end : " + timeInterval.getEnd());
+            // Log.trace("freqinterval start : " + freqInterval.getStart());
+            // Log.trace("freqinterval end : " + freqInterval.getEnd());
+            // Log.trace("Area : " + area);
+            // Log.trace("DownloadID : " + downloadID);
+            // Log.trace("Identifier : " + identifier);
+            DrawableAreaMap dam = zoomManager.getDrawableAreaMap(timeInterval.getStart(), timeInterval.getEnd(), freqInterval.getStart(), freqInterval.getEnd(), area, downloadID, identifier);
+            // Log.trace("Drawable Area Map : " + dam);
+            // Log.trace("-===============================================================-");
+            PlotConfig pc = new PlotConfig(newImage, dam, downloadRequestData.get(downloadID).isVisible(), downloadID, radioImageID);
+            if (plotConfigList.containsKey(downloadID)) {
+                plotConfigList.get(downloadID).put(radioImageID, pc);
+            } else {
+                Map<Long, PlotConfig> tempList = new HashMap<Long, PlotConfig>();
+                tempList.put(radioImageID, pc);
+                plotConfigList.put(downloadID, tempList);
+            }
+        }
+        fireDrawNewBufferedImage(identifier);
+    }
+
+    @Override
     public void clearAllSavedImagesForID(Long downloadID, Long imageID, String plotIdentifer) {
         synchronized (this) {
             Map<Long, Map<Long, PlotConfig>> plotConfigList = radioPlotModelData.get(plotIdentifer).getPlotConfigList();
@@ -353,6 +388,22 @@ public class RadioPlotModel implements RadioDataManagerListener, ZoomDataConfigL
         DataBufferInt dataBuffer = new DataBufferInt(useData, width * height);
         useData = new int[0];
         Raster raster = Raster.createPackedRaster(dataBuffer, width, height, width, new int[] { 0xFF0000, 0xFF00, 0xFF, 0xFF000000 }, new Point(0, 0));
+        newImage.setData(raster);
+        return newImage;
+    }
+
+    private BufferedImage createBufferedImage(int width, int height, byte[] data) {
+        byte[] useData = new byte[0];
+        if (width * height == data.length) {
+            useData = data;
+        } else {
+            Log.error("Data array was to small created white image");
+            useData = new byte[width * height];
+        }
+        BufferedImage newImage = new BufferedImage(width, height, BufferedImage.TYPE_BYTE_GRAY);
+        DataBufferByte dataBuffer = new DataBufferByte(useData, width * height);
+        useData = new byte[0];
+        Raster raster = Raster.createPackedRaster(dataBuffer, width, height, width, new int[] { 0xff }, new Point(0, 0));
         newImage.setData(raster);
         return newImage;
     }
