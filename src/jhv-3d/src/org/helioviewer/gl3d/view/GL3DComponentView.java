@@ -1,6 +1,7 @@
 package org.helioviewer.gl3d.view;
 
 import java.awt.Color;
+import java.awt.Dimension;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
@@ -90,15 +91,15 @@ public class GL3DComponentView extends AbstractComponentView implements GLEventL
     private File outputFile;
 
     public GL3DComponentView() {
-        Log.debug("GL3DComponentView()");
         GLSharedDrawable shared = GLSharedDrawable.getSingletonInstance();
-        GLCanvas glCanvas = new GLCanvas(shared.caps);
-        glCanvas.setSharedAutoDrawable(shared.sharedDrawable);
-        this.setCanvas(glCanvas);
+
+        canvas = new GLCanvas(shared.caps);
+        canvas.setSharedAutoDrawable(shared.sharedDrawable);
+        canvas.setMinimumSize(new Dimension(0, 0));
+        canvas.addGLEventListener(this);
 
         Displayer.getSingletonInstance().register(this);
         Displayer.getSingletonInstance().addListener(this);
-        this.getCanvas().addGLEventListener(this);
     }
 
     @Override
@@ -111,7 +112,7 @@ public class GL3DComponentView extends AbstractComponentView implements GLEventL
 
     @Override
     public GLCanvas getComponent() {
-        return this.getCanvas();
+        return canvas;
     }
 
     public void displayChanged(GLAutoDrawable arg0, boolean arg1, boolean arg2) {
@@ -447,14 +448,6 @@ public class GL3DComponentView extends AbstractComponentView implements GLEventL
             // fill with other filters and compile
             vertexView.buildVertexShader(newShaderBuilder).compile();
         }
-    }
-
-    public GLCanvas getCanvas() {
-        return canvas;
-    }
-
-    public void setCanvas(GLCanvas canvas) {
-        this.canvas = canvas;
     }
 
     @Override
