@@ -89,10 +89,10 @@ public class GLPhysicalRenderGraphics extends AbstractPhysicalRenderGraphics {
         gl.glDisable(GL2.GL_TEXTURE_2D);
 
         gl.glBegin(GL2.GL_LINES);
-
-        gl.glVertex2d(x0, -y0);
-        gl.glVertex2d(x1, -y1);
-
+        {
+            gl.glVertex2d(x0, -y0);
+            gl.glVertex2d(x1, -y1);
+        }
         gl.glEnd();
 
         gl.glEnable(GL2.GL_TEXTURE_2D);
@@ -110,12 +110,13 @@ public class GLPhysicalRenderGraphics extends AbstractPhysicalRenderGraphics {
         double height2 = height * 0.5;
 
         gl.glBegin(GL2.GL_LINE_LOOP);
+        {
 
-        gl.glVertex2d(x - width2, y - height2);
-        gl.glVertex2d(x - width2, y + height2);
-        gl.glVertex2d(x + width2, y + height2);
-        gl.glVertex2d(x + width2, y - height2);
-
+            gl.glVertex2d(x - width2, y - height2);
+            gl.glVertex2d(x - width2, y + height2);
+            gl.glVertex2d(x + width2, y + height2);
+            gl.glVertex2d(x + width2, y - height2);
+        }
         gl.glEnd();
 
         gl.glEnable(GL2.GL_TEXTURE_2D);
@@ -134,12 +135,12 @@ public class GLPhysicalRenderGraphics extends AbstractPhysicalRenderGraphics {
         double height2 = height * 0.5;
 
         gl.glBegin(GL2.GL_QUADS);
-
-        gl.glVertex2d(x - width2, y - height2);
-        gl.glVertex2d(x - width2, y + height2);
-        gl.glVertex2d(x + width2, y + height2);
-        gl.glVertex2d(x + width2, y - height2);
-
+        {
+            gl.glVertex2d(x - width2, y - height2);
+            gl.glVertex2d(x - width2, y + height2);
+            gl.glVertex2d(x + width2, y + height2);
+            gl.glVertex2d(x + width2, y - height2);
+        }
         gl.glEnd();
     }
 
@@ -155,11 +156,9 @@ public class GLPhysicalRenderGraphics extends AbstractPhysicalRenderGraphics {
         double radiusY = height * 0.5;
 
         gl.glBegin(GL2.GL_LINE_LOOP);
-
         for (int i = 0; i < edgesPerOval; i++) {
             gl.glVertex2d(x + (int) (radiusX * sinOval[i]), y + (int) (radiusY * sinOval[(i + (edgesPerOval >> 2)) & (edgesPerOval - 1)]));
         }
-
         gl.glEnd();
 
         gl.glEnable(GL2.GL_TEXTURE_2D);
@@ -184,15 +183,11 @@ public class GLPhysicalRenderGraphics extends AbstractPhysicalRenderGraphics {
             gl.glEnd();
         } else {
             gl.glBegin(GL2.GL_TRIANGLE_FAN);
-
             gl.glVertex2d(x, y);
-
             for (int i = 0; i < edgesPerOval; i++) {
                 gl.glVertex2d(x + (radiusX * sinOval[i]), y + (radiusY * sinOval[(i + (edgesPerOval >> 2)) & (edgesPerOval - 1)]));
             }
-
             gl.glVertex2d(x, y + radiusY);
-
             gl.glEnd();
         }
     }
@@ -223,11 +218,9 @@ public class GLPhysicalRenderGraphics extends AbstractPhysicalRenderGraphics {
         gl.glDisable(GL2.GL_TEXTURE_2D);
 
         gl.glBegin(GL2.GL_LINE_LOOP);
-
         for (int i = 0; i < points.length; i++) {
             gl.glVertex2d(points[i].getX(), -points[i].getY());
         }
-
         gl.glEnd();
 
         gl.glEnable(GL2.GL_TEXTURE_2D);
@@ -241,11 +234,9 @@ public class GLPhysicalRenderGraphics extends AbstractPhysicalRenderGraphics {
         gl.glBindTexture(GL2.GL_TEXTURE_2D, 0);
 
         gl.glBegin(GL2.GL_POLYGON);
-
         for (int i = 0; i < xCoords.length; i++) {
             gl.glVertex2d(xCoords[i], -yCoords[i]);
         }
-
         gl.glEnd();
     }
 
@@ -257,11 +248,9 @@ public class GLPhysicalRenderGraphics extends AbstractPhysicalRenderGraphics {
         gl.glBindTexture(GL2.GL_TEXTURE_2D, 0);
 
         gl.glBegin(GL2.GL_POLYGON);
-
         for (int i = 0; i < points.length; i++) {
             gl.glVertex2d(points[i].getX(), -points[i].getY());
         }
-
         gl.glEnd();
     }
 
@@ -418,7 +407,6 @@ public class GLPhysicalRenderGraphics extends AbstractPhysicalRenderGraphics {
         }
         gl.glEnd();
 
-        gl.glDisable(GL2.GL_TEXTURE_2D);
         gl.glEnable(GL2.GL_LIGHTING);
         gl.glDisable(GL2.GL_BLEND);
         gl.glEnable(GL2.GL_DEPTH_TEST);
@@ -428,7 +416,6 @@ public class GLPhysicalRenderGraphics extends AbstractPhysicalRenderGraphics {
 
     @Override
     public void fillPolygon(Vector3dDouble[] points) {
-
         gl.glBindTexture(GL2.GL_TEXTURE_2D, 0);
 
         gl.glDisable(GL2.GL_DEPTH_TEST);
@@ -449,12 +436,10 @@ public class GLPhysicalRenderGraphics extends AbstractPhysicalRenderGraphics {
         gl.glEnable(GL2.GL_DEPTH_TEST);
         gl.glDisable(GL2.GL_CULL_FACE);
         gl.glDisable(GL2.GL_LIGHTING);
-
     }
 
     @Override
     public void drawLine3d(Double x0, Double y0, Double z0, Double x1, Double y1, Double z1) {
-
         gl.glDisable(GL2.GL_TEXTURE_2D);
         gl.glEnable(GL2.GL_LINE_SMOOTH);
         gl.glEnable(GL2.GL_BLEND);
@@ -464,44 +449,15 @@ public class GLPhysicalRenderGraphics extends AbstractPhysicalRenderGraphics {
         gl.glBlendFunc(GL2.GL_ONE, GL2.GL_ONE);
 
         gl.glBegin(GL2.GL_LINES);
-
-        gl.glVertex3d(x0, -y0, z0);
-        gl.glVertex3d(x1, -y1, z1);
-
+        {
+            gl.glVertex3d(x0, -y0, z0);
+            gl.glVertex3d(x1, -y1, z1);
+        }
         gl.glEnd();
 
         gl.glDisable(GL2.GL_LINE_SMOOTH);
         gl.glDisable(GL2.GL_BLEND);
-        gl.glDisable(GL2.GL_TEXTURE_2D);
-
-        gl.glDisable(GL2.GL_LINE_SMOOTH);
-
-    }
-
-    @Override
-    public void drawLine3d(Vector3dDouble p0, Vector3dDouble p1) {
-        drawLine3d(p0.getX(), p0.getY(), p0.getZ(), p1.getX(), p1.getY(), p1.getZ());
-        // TODO Auto-generated method stub
-
-    }
-
-    public void startDrawLines() {
-        gl.glDisable(GL2.GL_TEXTURE_2D);
-        gl.glEnable(GL2.GL_LINE_SMOOTH);
-        // gl.glBlendFunc(GL2.GL_SRC_ALPHA, GL2.GL_ONE_MINUS_SRC_ALPHA);
-        gl.glBegin(GL2.GL_LINES);
-    }
-
-    public void stopDrawLines() {
-        gl.glEnd();
-        gl.glDisable(GL2.GL_LINE_SMOOTH);
-
-    }
-
-    public void drawLines3d(Double x0, Double y0, Double z0, Double x1, Double y1, Double z1) {
-        gl.glVertex3d(x0, y0, z0);
-        gl.glVertex3d(x1, y1, z1);
-
+        gl.glEnable(GL2.GL_TEXTURE_2D);
     }
 
     @Override

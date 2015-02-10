@@ -216,7 +216,7 @@ public class GL3DComponentView extends AbstractComponentView implements GLEventL
     }
 
     @Override
-    public synchronized void display(GLAutoDrawable glAD) {
+    public void display(GLAutoDrawable glAD) {
         JHVJP2View mv = null;
 
         if (exportMode || screenshotMode) {
@@ -307,10 +307,9 @@ public class GL3DComponentView extends AbstractComponentView implements GLEventL
                     r.render(glRenderer);
                 }
             }
-            gl.glDisable(GL2.GL_TEXTURE_2D);
-
         }
         gl.glPopMatrix();
+
         if (exportMode && mv != null) {
             int currentScreenshot = 1;
             int maxframeno = 1;
