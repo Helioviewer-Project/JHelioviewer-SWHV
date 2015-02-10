@@ -10,11 +10,12 @@ package org.helioviewer.viewmodel.view.jp2view.concurrency;
  */
 public class ReasonSignal<T extends Enum<?>> {
 
-    /** Signal flag */
-    private volatile boolean isSignaled;
+    private final Object lock = new Object();
 
+    /** Signal flag */
+    private boolean isSignaled;
     /** The reason the signal was signaled */
-    private volatile T reason = null;
+    private T reason = null;
 
     /**
      * Default constructor. Assigns false to the isSignaled flag.
@@ -30,13 +31,15 @@ public class ReasonSignal<T extends Enum<?>> {
      * 
      * @throws InterruptedException
      */
-    public synchronized T waitForSignal() throws InterruptedException {
-        while (!isSignaled)
-            this.wait();
-        isSignaled = false;
-        T ret = reason;
-        reason = null;
-        return ret;
+    public T waitForSignal() throws InterruptedException {
+        synchronized (lock) {
+            while (!isSignaled)
+                lock.wait();
+            isSignaled = false;
+            T ret = reason;
+            reason = null;
+            return ret;
+        }
     }
 
     /**
@@ -44,9 +47,11 @@ public class ReasonSignal<T extends Enum<?>> {
      * to notifyAll since the first thread woken up resets the flag anyway.
      */
     public synchronized void signal(T _reason) {
-        isSignaled = true;
-        reason = _reason;
-        this.notify();
+        synchronized (lock) {
+            isSignaled = true;
+            reason = _reason;
+            lock.notify();
+        }
     }
 
     /**
@@ -54,8 +59,8 @@ public class ReasonSignal<T extends Enum<?>> {
      * 
      * @return Current signal state
      */
-    public synchronized boolean isSignaled() {
-        return isSignaled;
+    public boolean isSignaled() {
+            return isSignaled;
     }
 
-};
+}
