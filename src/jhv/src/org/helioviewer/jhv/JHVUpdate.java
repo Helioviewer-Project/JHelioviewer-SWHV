@@ -51,7 +51,7 @@ public class JHVUpdate implements Runnable {
      *             Error while parsing the internal update URL
      */
     public JHVUpdate() throws MalformedURLException {
-        updateURL = new URL("http://jhelioviewer.org/updateJHV.txt");
+        updateURL = new URL("http://www.jhelioviewer.org/updateJHV.txt");
         verbose = false;
     }
 
