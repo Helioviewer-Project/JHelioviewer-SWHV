@@ -184,8 +184,8 @@ public class RadioPlotModel implements RadioDataManagerListener, ZoomDataConfigL
             for (Long imageID : drd.getRadioImages().keySet()) {
                 bufferedImages.remove(imageID);
             }
-            fireRemoveRadioImage(ID, drd.getPlotIdentifier());
         }
+        fireRemoveRadioImage(ID, drd.getPlotIdentifier());
     }
 
     @Override
