@@ -302,7 +302,12 @@ public class DownloadedJPXData implements ViewListener, FilterModelListener {
         }
         if (view != null) {
             view.removeViewListener(this);
+            JHVJP2CallistoView calView = view.getAdapter(JHVJP2CallistoView.class);
+            if (calView != null) {
+                calView.abolish();
+            }
         }
+        FilterModel.getInstance().removeFilterModelListener(this);
         view = null;
     }
 }
