@@ -10,23 +10,23 @@ import org.helioviewer.base.logging.Log;
 import org.helioviewer.base.math.Interval;
 
 public class RadioImageCache {
-    private Map<String, RadioImageCacheData> radioImageCacheData;
+    private final Map<String, RadioImageCacheData> radioImageCacheData;
 
-    private List<RadioImageCacheListener> listeners;
+    private final List<RadioImageCacheListener> listeners;
 
     private static RadioImageCache instance;
 
     private RadioImageCache() {
-        this.listeners = new ArrayList<RadioImageCacheListener>();
+        listeners = new ArrayList<RadioImageCacheListener>();
         radioImageCacheData = new HashMap<String, RadioImageCacheData>();
     }
 
     public void addRadioImageCacheListener(RadioImageCacheListener listener) {
-        this.listeners.add(listener);
+        listeners.add(listener);
     }
 
     public void removeRadioImageListener(RadioImageCacheListener listener) {
-        this.listeners.remove(listener);
+        listeners.remove(listener);
     }
 
     public static RadioImageCache getInstance() {
@@ -59,6 +59,7 @@ public class RadioImageCache {
                 cacheData.getDataCache().remove(ID);
                 cacheData.getUseCache().remove(ID);
                 cacheData.getStartDates().remove(data.getStartDate());
+                data.remove();
             }
         }
     }
@@ -97,7 +98,7 @@ public class RadioImageCache {
                 }
                 localStart = new Date(localStart.getTime() + stepsize);
             }
-            return new RadioImageCacheResult(dataList, intervalList, new ArrayList<Long>(toRemove),noDataInterval);
+            return new RadioImageCacheResult(dataList, intervalList, new ArrayList<Long>(toRemove), noDataInterval);
         } else {
             Date localStart = findStartDate(start, stepsize);
             List<Interval<Date>> intervalList = new ArrayList<Interval<Date>>();
@@ -119,19 +120,17 @@ public class RadioImageCache {
             return false;
         }
     }
-    
+
     public boolean addNoDataInterval(Interval<Date> interval, String plotIdentifier) {
-        synchronized (instance) {       
+        synchronized (instance) {
             RadioImageCacheData data = getRadioImageCache(plotIdentifier);
             boolean added = data.getNoDataCache().containsKey(interval.getStart());
             data.getNoDataCache().put(interval.getStart(), interval);
-            Log.trace("Added : " + !added + ". Size of noDataCache : "+ data.getNoDataCache().size());
+            Log.trace("Added : " + !added + ". Size of noDataCache : " + data.getNoDataCache().size());
             return !added;
         }
     }
-    
-    
-    
+
     private RadioImageCacheData getRadioImageCache(String plotIdentifier) {
         RadioImageCacheData data = new RadioImageCacheData();
         if (radioImageCacheData.containsKey(plotIdentifier)) {
@@ -141,6 +140,5 @@ public class RadioImageCache {
         }
         return data;
     }
-    
-    
+
 }
