@@ -292,4 +292,17 @@ public class DownloadedJPXData implements ViewListener, FilterModelListener {
         }
         return null;
     }
+
+    public void remove() {
+        if (worker != null && !worker.isDone()) {
+            worker.cancel(true);
+            worker = null;
+        } else {
+            worker = null;
+        }
+        if (view != null) {
+            view.removeViewListener(this);
+        }
+        view = null;
+    }
 }
