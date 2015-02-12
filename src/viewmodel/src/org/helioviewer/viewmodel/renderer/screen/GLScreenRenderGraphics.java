@@ -25,7 +25,7 @@ public class GLScreenRenderGraphics extends AbstractScreenRenderGraphics {
     private static float[] sinOval;
 
     private final GL2 gl;
-    private final GLCommonRenderGraphics commonRenderGraphics;
+    private final GLCommonRenderGraphics commonRenderGraphics = GLCommonRenderGraphics.getSingletonInstance();
     private Font font;
 
     /**
@@ -40,7 +40,6 @@ public class GLScreenRenderGraphics extends AbstractScreenRenderGraphics {
      */
     public GLScreenRenderGraphics(GL2 _gl) {
         gl = _gl;
-        commonRenderGraphics = new GLCommonRenderGraphics(_gl);
 
         if (sinOval == null) {
             sinOval = new float[edgesPerOval];
@@ -247,7 +246,7 @@ public class GLScreenRenderGraphics extends AbstractScreenRenderGraphics {
      */
     @Override
     public void drawImage(BufferedImage image, Integer x, Integer y, Integer width, Integer height) {
-        commonRenderGraphics.bindImage(image);
+        commonRenderGraphics.bindImage(gl, image);
 
         gl.glColor3f(1.0f, 1.0f, 1.0f);
 
@@ -270,7 +269,7 @@ public class GLScreenRenderGraphics extends AbstractScreenRenderGraphics {
      */
     @Override
     public void drawText(String text, Integer x, Integer y) {
-        commonRenderGraphics.bindString(text, font);
+        commonRenderGraphics.bindString(gl, text, font);
 
         Vector2dInt size = commonRenderGraphics.getStringDisplaySize(text, font);
 

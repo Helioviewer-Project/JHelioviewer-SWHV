@@ -28,7 +28,7 @@ public class GLPhysicalRenderGraphics extends AbstractPhysicalRenderGraphics {
     private static double[] sinOval;
 
     private final GL2 gl;
-    private final GLCommonRenderGraphics commonRenderGraphics;
+    private final GLCommonRenderGraphics commonRenderGraphics = GLCommonRenderGraphics.getSingletonInstance();
     private Font font;
 
     /**
@@ -47,7 +47,6 @@ public class GLPhysicalRenderGraphics extends AbstractPhysicalRenderGraphics {
     public GLPhysicalRenderGraphics(GL2 _gl, View view) {
         super(view);
         gl = _gl;
-        commonRenderGraphics = new GLCommonRenderGraphics(_gl);
 
         if (sinOval == null) {
             sinOval = new double[edgesPerOval];
@@ -293,7 +292,7 @@ public class GLPhysicalRenderGraphics extends AbstractPhysicalRenderGraphics {
     public void drawImage(BufferedImage image, Double x, Double y, Double width, Double height) {
         y = -y;
 
-        commonRenderGraphics.bindImage(image);
+        commonRenderGraphics.bindImage(gl, image);
 
         gl.glColor3f(1.0f, 1.0f, 1.0f);
         double width2 = width * 0.5;
@@ -320,7 +319,7 @@ public class GLPhysicalRenderGraphics extends AbstractPhysicalRenderGraphics {
     public void drawText(String text, Double x, Double y) {
         y = -y;
 
-        commonRenderGraphics.bindString(text, font);
+        commonRenderGraphics.bindString(gl, text, font);
 
         Vector2dDouble size = convertScreenToPhysical(commonRenderGraphics.getStringDisplaySize(text, font));
 
@@ -358,7 +357,7 @@ public class GLPhysicalRenderGraphics extends AbstractPhysicalRenderGraphics {
     public void drawImage3d(BufferedImage image, Double x, Double y, Double z, Double width, Double height) {
         y = -y;
 
-        commonRenderGraphics.bindImage(image);
+        commonRenderGraphics.bindImage(gl, image);
         gl.glTexParameteri(GL2.GL_TEXTURE_2D, GL2.GL_TEXTURE_MAG_FILTER, GL2.GL_LINEAR);
 
         gl.glColor3f(1.0f, 1.0f, 1.0f);
