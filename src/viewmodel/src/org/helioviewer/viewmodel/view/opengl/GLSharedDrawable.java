@@ -1,16 +1,14 @@
 package org.helioviewer.viewmodel.view.opengl;
 
-import java.awt.Dimension;
-
 import javax.media.opengl.GLAutoDrawable;
-import javax.media.opengl.awt.GLCanvas;
 import javax.media.opengl.GLCapabilities;
+import javax.media.opengl.GLCapabilitiesImmutable;
+import javax.media.opengl.GLDrawableFactory;
 import javax.media.opengl.GLProfile;
 
 public class GLSharedDrawable {
 
     private static GLSharedDrawable instance = new GLSharedDrawable();
-    private final GLCanvas canvas;
 
     public static GLSharedDrawable getSingletonInstance() {
         if (instance == null) {
@@ -19,16 +17,15 @@ public class GLSharedDrawable {
         return instance;
     }
 
+    public final GLAutoDrawable sharedDrawable;
+    public final GLCapabilitiesImmutable caps;
+
     public GLSharedDrawable() {
         final GLProfile glp = GLProfile.getDefault();
-        final GLCapabilities caps = new GLCapabilities(glp);
+        caps = new GLCapabilities(glp);
 
-        canvas = new GLCanvas(caps);
-        canvas.setMinimumSize(new Dimension(0, 0));
-    }
-
-    public GLCanvas getCanvas() {
-        return canvas;
+        sharedDrawable = GLDrawableFactory.getFactory(glp).createDummyAutoDrawable(null, true, caps, null);
+        sharedDrawable.display();
     }
 
 }
