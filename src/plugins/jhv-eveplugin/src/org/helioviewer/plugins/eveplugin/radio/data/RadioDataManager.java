@@ -231,9 +231,7 @@ public class RadioDataManager implements RadioDownloaderListener {
                     // Log.debug("Get data out of request buffer : thread " +
                     // Thread.currentThread().getName());
                     RequestConfig requestConfig = requestBuffer.getData();
-                    synchronized (downloadRequestData) {
-                        handleRequestConfig(requestConfig, xStart, xEnd, yStart, yEnd, plotIdentifier);
-                    }
+                    handleRequestConfig(requestConfig, xStart, xEnd, yStart, yEnd, plotIdentifier);
                 }
                 requestForDataBusy = false;
             } else {
@@ -538,7 +536,7 @@ public class RadioDataManager implements RadioDownloaderListener {
             for (Long id : requestConfig.getIDs()) {
                 DownloadRequestData drd = downloadRequestData.get(id);
                 if (drd != null) {
-                    downloader.requestAndOpenIntervals(result.getMissingInterval(), id, drd.getPlotIdentifier(), requestConfig.getxRatio(), requestConfig.getyRatio());
+                    downloader.requestAndOpenIntervals(result.getMissingInterval(), id, plotIdentifier, requestConfig.getxRatio(), requestConfig.getyRatio());
                 } else {
                     Log.trace("drd is null");
                 }
