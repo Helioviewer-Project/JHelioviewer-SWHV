@@ -38,6 +38,11 @@ public class GLCommonRenderGraphics {
     private static BufferedImage stringSizeImage = new BufferedImage(1, 1, BufferedImage.TYPE_BYTE_GRAY);
     private static Graphics2D stringSizeGraphics = stringSizeImage.createGraphics();
 
+    public void clearTextureCaches() {
+        mapImageToTexture.clear();
+        mapStringToTexture.clear();
+    }
+
     /**
      * Returns the display size of the given string with the given font.
      * 

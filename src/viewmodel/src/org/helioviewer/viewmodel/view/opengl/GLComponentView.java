@@ -2,7 +2,6 @@ package org.helioviewer.viewmodel.view.opengl;
 
 import java.awt.Color;
 import java.awt.Component;
-import java.awt.Dimension;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
@@ -35,6 +34,7 @@ import org.helioviewer.viewmodel.changeevent.SubImageDataChangedReason;
 import org.helioviewer.viewmodel.changeevent.TimestampChangedReason;
 import org.helioviewer.viewmodel.changeevent.ViewChainChangedReason;
 import org.helioviewer.viewmodel.region.Region;
+import org.helioviewer.viewmodel.renderer.GLCommonRenderGraphics;
 import org.helioviewer.viewmodel.renderer.screen.GLScreenRenderGraphics;
 import org.helioviewer.viewmodel.renderer.screen.ScreenRenderer;
 import org.helioviewer.viewmodel.view.AbstractComponentView;
@@ -117,13 +117,7 @@ public class GLComponentView extends AbstractComponentView implements GLEventLis
      * Also initializes all OpenGL Helper classes.
      */
     public GLComponentView() {
-        GLSharedDrawable shared = GLSharedDrawable.getSingletonInstance();
-
-        // canvas = GLSharedDrawable.getSingletonInstance().getCanvas();
-        canvas = new GLCanvas(shared.caps);
-        canvas.setSharedAutoDrawable(shared.sharedDrawable);
-        canvas.setMinimumSize(new Dimension(0, 0));
-
+        canvas = GLSharedDrawable.getSingletonInstance().getCanvas();
         canvas.addGLEventListener(this);
 
         Displayer.getSingletonInstance().register(this);
@@ -239,6 +233,9 @@ public class GLComponentView extends AbstractComponentView implements GLEventLis
     @Override
     public void init(GLAutoDrawable drawable) {
         Log.debug("GLComponentView.Init");
+
+        GLCommonRenderGraphics.getSingletonInstance().clearTextureCaches();
+
         GL2 gl = drawable.getGL().getGL2();
         //gl.getContext().setGL(GLPipelineFactory.create("javax.media.opengl.Trace", null, gl, new Object[] { System.err }));
 
@@ -338,14 +335,16 @@ public class GLComponentView extends AbstractComponentView implements GLEventLis
         }
 
         if (viewport != null) {
-            // Draw post renderer
-            gl.glTranslatef(0.0f, viewport.getHeight(), 0.0f);
-            gl.glScalef(1.0f, -1.0f, 1.0f);
+            if (!this.postRenderers.isEmpty()) {
+                // Draw post renderer
+                gl.glTranslatef(0.0f, viewport.getHeight(), 0.0f);
+                gl.glScalef(1.0f, -1.0f, 1.0f);
 
-            GLScreenRenderGraphics glRenderer = new GLScreenRenderGraphics(gl);
-            synchronized (postRenderers) {
-                for (ScreenRenderer r : postRenderers) {
-                    r.render(glRenderer);
+                GLScreenRenderGraphics glRenderer = new GLScreenRenderGraphics(gl);
+                synchronized (postRenderers) {
+                    for (ScreenRenderer r : postRenderers) {
+                        r.render(glRenderer);
+                    }
                 }
             }
         }

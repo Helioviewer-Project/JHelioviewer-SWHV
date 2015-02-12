@@ -46,7 +46,7 @@ public class SOHOLUTFilter extends AbstractFilter implements FrameFilter, Standa
      * Used lut
      */
     private LUT lut;
-    private final LUT gray;
+    private final LUT gray = LUT.getStandardList().get("Gray");
     private boolean invertLUT = false;
     private boolean changed;
 
@@ -65,7 +65,6 @@ public class SOHOLUTFilter extends AbstractFilter implements FrameFilter, Standa
      * LUT is set to Gray as default table.
      */
     public SOHOLUTFilter() {
-        gray = LUT.getStandardList().get("Gray");
         lut = gray;
     }
 
@@ -76,7 +75,6 @@ public class SOHOLUTFilter extends AbstractFilter implements FrameFilter, Standa
      *            Color table to apply to the image
      */
     public SOHOLUTFilter(LUT startWithLut) {
-        gray = LUT.getStandardList().get("Gray");
         lut = startWithLut;
     }
 
