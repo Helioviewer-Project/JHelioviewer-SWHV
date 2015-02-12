@@ -25,26 +25,18 @@ import org.helioviewer.viewmodel.view.opengl.GLTextureHelper;
  */
 public class GLCommonRenderGraphics {
 
-    private final GL2 gl;
+    private final static GLCommonRenderGraphics instance = new GLCommonRenderGraphics();
+    private GLCommonRenderGraphics() {}
+
+    public static GLCommonRenderGraphics getSingletonInstance() {
+        return instance;
+    }
+
     private static HashMap<BufferedImage, GLTextureHelper.GLTexture> mapImageToTexture = new HashMap<BufferedImage, GLTextureHelper.GLTexture>();
     private static HashMap<StringFontPair, GLTextureHelper.GLTexture> mapStringToTexture = new HashMap<StringFontPair, GLTextureHelper.GLTexture>();
 
     private static BufferedImage stringSizeImage = new BufferedImage(1, 1, BufferedImage.TYPE_BYTE_GRAY);
     private static Graphics2D stringSizeGraphics = stringSizeImage.createGraphics();
-
-    /**
-     * Default constructor.
-     *
-     * <p>
-     * The caller has to provide a gl object, which can be used by this
-     * renderer.
-     *
-     * @param _gl
-     *            gl object, that should be used for drawing.
-     */
-    public GLCommonRenderGraphics(GL2 _gl) {
-        gl = _gl;
-    }
 
     /**
      * Returns the display size of the given string with the given font.
@@ -70,7 +62,7 @@ public class GLCommonRenderGraphics {
      * @param image
      *            Image corresponding to the texture to bind
      */
-    public void bindImage(BufferedImage image) {
+    public void bindImage(GL2 gl, BufferedImage image) {
         GLTextureHelper.GLTexture tex = mapImageToTexture.get(image);
         if (tex == null) {
             if (mapImageToTexture.size() > 256) {
@@ -95,8 +87,9 @@ public class GLCommonRenderGraphics {
      * @param textLayout
      *            String and font corresponding to the texture to bind
      */
-    public void bindString(String string, Font font) {
+    public void bindString(GL2 gl, String string, Font font) {
         StringFontPair stringFontPair = new StringFontPair(string, font);
+
         GLTextureHelper.GLTexture tex = mapStringToTexture.get(stringFontPair);
         if (tex == null) {
             if (mapStringToTexture.size() > 256) {
