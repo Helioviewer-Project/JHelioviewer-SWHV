@@ -1,6 +1,5 @@
 package org.helioviewer.jhv.layers;
 
-import java.awt.EventQueue;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -152,13 +151,11 @@ public class LayersModel implements ViewListener {
     public View getLayer(int idx) {
         idx = invertIndex(idx);
         LayeredView lv = getLayeredView();
-
         if (lv != null && idx >= 0 && idx < getNumLayers()) {
             return lv.getLayer(idx);
         }
 
         return null;
-
     }
 
     /**
@@ -179,9 +176,7 @@ public class LayersModel implements ViewListener {
      *            - index of the layer to be set as active Layer
      */
     public void setActiveLayer(int idx) {
-
         View view = getLayer(idx);
-
         if (view == null && idx != -1) {
             return;
         }
@@ -221,7 +216,6 @@ public class LayersModel implements ViewListener {
         }
 
         MetaData md = view.getAdapter(MetaDataView.class).getMetaData();
-
         if (md instanceof ObserverMetaData) {
             ImmutableDateTime dt = getCurrentFrameTimestamp(view);
             return dt.getCachedDate();
@@ -257,12 +251,9 @@ public class LayersModel implements ViewListener {
         }
 
         MetaData md = view.getAdapter(MetaDataView.class).getMetaData();
-
         if (md instanceof ObserverMetaData) {
-
             ObserverMetaData obsMetaData = (ObserverMetaData) md;
             return obsMetaData.getDateTime();
-
         } else {
             return null;
         }
@@ -278,14 +269,13 @@ public class LayersModel implements ViewListener {
      *         information available
      */
     public ImmutableDateTime getStartDate(View view) {
-
         ImmutableDateTime result = null;
+
         if (view == null) {
             return result;
         }
 
         TimedMovieView tmv = view.getAdapter(TimedMovieView.class);
-
         if (tmv != null) {
             result = tmv.getFrameDateTime(0);
         } else {
@@ -312,26 +302,21 @@ public class LayersModel implements ViewListener {
         MetaDataView mdv = view.getAdapter(MetaDataView.class);
 
         if (mdv != null) {
-
             MetaData md = mdv.getMetaData();
-
             if (md instanceof ObserverMetaData) {
-
                 ObserverMetaData omd = (ObserverMetaData) md;
                 result = omd.getDateTime();
-
             }
-
         }
 
         return result;
-
     }
 
     public String getObservatory(View view) {
         if (view == null) {
             return null;
         }
+
         ImageInfoView imageInfoView = view.getAdapter(ImageInfoView.class);
         if (imageInfoView != null && imageInfoView.getMetadata() instanceof HelioviewerMetaData) {
             HelioviewerMetaData metaData = (HelioviewerMetaData) imageInfoView.getMetadata();
@@ -370,7 +355,6 @@ public class LayersModel implements ViewListener {
 
         for (int idx = 0; idx < getNumLayers(); idx++) {
             ImmutableDateTime start = getStartDate(idx);
-
             if (start == null)
                 continue;
 
@@ -378,7 +362,6 @@ public class LayersModel implements ViewListener {
                 earliest = start;
             }
         }
-
         return earliest == null ? null : earliest.getTime();
     }
 
@@ -392,7 +375,6 @@ public class LayersModel implements ViewListener {
      *         information available
      */
     public ImmutableDateTime getEndDate(View view) {
-
         ImmutableDateTime result = null;
 
         if (view == null) {
@@ -400,7 +382,6 @@ public class LayersModel implements ViewListener {
         }
 
         TimedMovieView tmv = view.getAdapter(TimedMovieView.class);
-
         if (tmv != null) {
             int lastFrame = tmv.getMaximumFrameNumber();
             // the following call will block if the meta is not yet available -
@@ -422,17 +403,15 @@ public class LayersModel implements ViewListener {
      */
     public Date getLastDate() {
         ImmutableDateTime latest = null;
+
         for (int idx = 0; idx < getNumLayers(); idx++) {
-
             ImmutableDateTime end = getEndDate(idx);
-
             if (end == null)
                 continue;
 
             if (latest == null || end.compareTo(latest) > 0) {
                 latest = end;
             }
-
         }
         return latest == null ? null : latest.getTime();
     }
@@ -491,7 +470,6 @@ public class LayersModel implements ViewListener {
         if (idx >= 0 && this.getNumLayers() > 0) {
             idx = this.getNumLayers() - 1 - idx;
         }
-
         return idx;
     }
 
@@ -513,7 +491,6 @@ public class LayersModel implements ViewListener {
         if (idx >= 0 && this.getNumLayers() >= 0) {
             idx = this.getNumLayers() - idx;
         }
-
         return idx;
     }
 
@@ -548,7 +525,6 @@ public class LayersModel implements ViewListener {
         if (!visible) {
             this.setPlaying(view, false);
         }
-
     }
 
     /**
@@ -644,6 +620,7 @@ public class LayersModel implements ViewListener {
         if (view == null) {
             return null;
         }
+
         ImageInfoView imageInfoView = view.getAdapter(ImageInfoView.class);
         if (imageInfoView != null) {
             return imageInfoView.getName();
@@ -712,7 +689,6 @@ public class LayersModel implements ViewListener {
         if (reason != null || reason2 != null || reason3 != null) {
             this.fireViewportGeometryChanged();
         }
-
     }
 
     private void handleTimestampChanges(View sender, ChangeEvent aEvent) {
@@ -735,7 +711,6 @@ public class LayersModel implements ViewListener {
                         currentFrameTimestamp = null;
                     }
                 }
-
             }
         }
     }
@@ -760,7 +735,6 @@ public class LayersModel implements ViewListener {
      */
     @Override
     public void viewChanged(View sender, ChangeEvent aEvent) {
-
         handleSubImageDataChanges(sender, aEvent);
         handleTimestampChanges(sender, aEvent);
         handleViewportPositionChanges(sender, aEvent);
@@ -780,7 +754,6 @@ public class LayersModel implements ViewListener {
         if (idx >= 0 && idx < this.getNumLayers()) {
             return true;
         }
-
         return false;
     }
 
@@ -793,15 +766,12 @@ public class LayersModel implements ViewListener {
      *         new layer can be found
      */
     private int determineNewActiveLayer(int oldActiveLayerIdx) {
-
         int candidate = oldActiveLayerIdx;
-
         if (!isValidIndex(candidate)) {
             candidate = this.getNumLayers() - 1;
         }
 
         return candidate;
-
     }
 
     /**
@@ -825,6 +795,7 @@ public class LayersModel implements ViewListener {
         if (view == null) {
             return;
         }
+
         final ImageInfoView infoView = view.getAdapter(ImageInfoView.class);
 
         Thread downloadThread = new Thread(new Runnable() {
@@ -853,7 +824,6 @@ public class LayersModel implements ViewListener {
 
         // the http server to download the file from is unknown
         if (view.getAdapter(ImageInfoView.class).getDownloadURI().equals(view.getAdapter(ImageInfoView.class).getUri()) && !view.getAdapter(ImageInfoView.class).getDownloadURI().toString().contains("delphi.nascom.nasa.gov")) {
-
             String inputValue = JOptionPane.showInputDialog("To download this file, please specify a concurrent HTTP server address to the JPIP server: ", view.getAdapter(ImageInfoView.class).getUri());
             if (inputValue != null) {
                 try {
@@ -867,11 +837,9 @@ public class LayersModel implements ViewListener {
         JHVJP2View mainView = view.getAdapter(JHVJP2View.class);
         JHVJP2View overviewView = (JHVJP2View) ImageViewerGui.getSingletonInstance().getOverviewView().getAdapter(SynchronizeView.class).getCorrespondingView(mainView);
         try {
-
             if (!fileDownloader.get(source, downloadDestination, "Downloading " + view.getAdapter(ImageInfoView.class).getName())) {
                 return;
             }
-
         } catch (IOException e) {
             e.printStackTrace();
             return;
@@ -882,7 +850,6 @@ public class LayersModel implements ViewListener {
             JP2Image localImage = new JP2Image(downloadDestination.toURI());
             //mainView.setJP2Image(localImage);
             //overviewView.setJP2Image(localImage);
-
         } catch (IOException e) {
             e.printStackTrace();
         } catch (JHV_KduException e) {
@@ -922,6 +889,7 @@ public class LayersModel implements ViewListener {
         if (view == null) {
             return;
         }
+
         MetaDataDialog dialog = new MetaDataDialog();
         dialog.setMetaData(view.getAdapter(MetaDataView.class));
         dialog.showDialog();
@@ -968,7 +936,6 @@ public class LayersModel implements ViewListener {
             return;
 
         MovieView view2 = view.getAdapter(MovieView.class);
-
         if (view2 != null) {
             MoviePanel moviePanel = MoviePanel.getMoviePanel(view2);
             if (moviePanel != null) {
@@ -977,7 +944,6 @@ public class LayersModel implements ViewListener {
         }
 
         this.fireAllLayersChanged();
-
     }
 
     /**
@@ -1020,7 +986,6 @@ public class LayersModel implements ViewListener {
         }
 
         TimedMovieView timedMovieView = view.getAdapter(TimedMovieView.class);
-
         if (timedMovieView != null) {
             if (play) {
                 timedMovieView.playMovie();
@@ -1054,6 +1019,7 @@ public class LayersModel implements ViewListener {
         if (view == null) {
             return false;
         }
+
         MovieView view2 = view.getAdapter(MovieView.class);
         return (view2 != null);
     }
@@ -1080,8 +1046,8 @@ public class LayersModel implements ViewListener {
         if (view == null) {
             return false;
         }
-        MetaDataView metaDataView = view.getAdapter(MetaDataView.class);
 
+        MetaDataView metaDataView = view.getAdapter(MetaDataView.class);
         if (metaDataView != null) {
             MetaData md = view.getAdapter(MetaDataView.class).getMetaData();
             return (md instanceof ObserverMetaData);
@@ -1104,14 +1070,12 @@ public class LayersModel implements ViewListener {
         LayeredView lv = this.getLayeredView();
 
         int level = lv.getLayerLevel(view);
-
         if (level < lv.getNumLayers() - 1) {
             level++;
         }
 
         lv.moveView(view, level);
         this.setActiveLayer(invertIndex(level));
-
     }
 
     /**
@@ -1128,7 +1092,6 @@ public class LayersModel implements ViewListener {
         LayeredView lv = this.getLayeredView();
 
         int level = lv.getLayerLevel(view);
-
         if (level > 0) {
             level--;
         }
@@ -1204,7 +1167,6 @@ public class LayersModel implements ViewListener {
         }
 
         return result;
-
     }
 
     /**
@@ -1351,204 +1313,128 @@ public class LayersModel implements ViewListener {
     }
 
     private void fireLayerDownloaded(final int index) {
-        Thread thread = new Thread(new Runnable() {
-
-            @Override
-            public void run() {
-                rwl.readLock().lock();
-                try {
-                    for (LayersListener ll : layerListeners) {
-                        ll.layerDownloaded(index);
-                    }
-                } finally {
-                    rwl.readLock().unlock();
-                }
+        rwl.readLock().lock();
+        try {
+            for (LayersListener ll : layerListeners) {
+                ll.layerDownloaded(index);
             }
-        }, "LayersModelThread (layer removed)");
-
-        thread.start();
+        } finally {
+            rwl.readLock().unlock();
+        }
     }
 
     /**
      * Notify all LayersListeners
      */
     private void fireLayerRemoved(final View oldView, final int oldIndex) {
-        Thread thread = new Thread(new Runnable() {
-
-            @Override
-            public void run() {
-                rwl.readLock().lock();
-                try {
-                    for (LayersListener ll : layerListeners) {
-                        ll.layerRemoved(oldView, oldIndex);
-                    }
-                } finally {
-                    rwl.readLock().unlock();
-                }
+        rwl.readLock().lock();
+        try {
+            for (LayersListener ll : layerListeners) {
+                ll.layerRemoved(oldView, oldIndex);
             }
-        }, "LayersModelThread (layer removed)");
-
-        thread.start();
-
+        } finally {
+            rwl.readLock().unlock();
+        }
     }
 
     /**
      * Notify all LayersListeners
      */
     private void fireLayerAdded(final int newIndex) {
-
-        Thread thread = new Thread(new Runnable() {
-
-            @Override
-            public void run() {
-                rwl.readLock().lock();
-                try {
-                    for (LayersListener ll : layerListeners) {
-                        ll.layerAdded(newIndex);
-                    }
-                } finally {
-                    rwl.readLock().unlock();
-                }
+        rwl.readLock().lock();
+        try {
+            for (LayersListener ll : layerListeners) {
+                ll.layerAdded(newIndex);
             }
-        }, "LayersModelThread (layer added)");
-
-        thread.start();
+        } finally {
+            rwl.readLock().unlock();
+        }
     }
 
     /**
      * Notify all LayersListeners
      */
     private void fireLayerChanged(final int index) {
-
-        Thread thread = new Thread(new Runnable() {
-
-            @Override
-            public void run() {
-                rwl.readLock().lock();
-                try {
-                    for (LayersListener ll : layerListeners) {
-                        ll.layerChanged(index);
-                    }
-                } finally {
-                    rwl.readLock().unlock();
-                }
+        rwl.readLock().lock();
+        try {
+            for (LayersListener ll : layerListeners) {
+                ll.layerChanged(index);
             }
-        }, "LayersModelThread (single layer changed)");
-
-        thread.start();
-
+        } finally {
+            rwl.readLock().unlock();
+        }
     }
 
     /**
      * Notify all LayersListeners
      */
     private void fireAllLayersChanged() {
-
-        Thread thread = new Thread(new Runnable() {
-
-            @Override
-            public void run() {
-                rwl.readLock().lock();
-                try {
-                    for (LayersListener ll : layerListeners) {
-                        for (int index = 0; index < getNumLayers(); index++) {
-                            ll.layerChanged(index);
-                        }
-                    }
-                } finally {
-                    rwl.readLock().unlock();
+        rwl.readLock().lock();
+        try {
+            for (LayersListener ll : layerListeners) {
+                for (int index = 0; index < getNumLayers(); index++) {
+                    ll.layerChanged(index);
                 }
             }
-        }, "LayersModelThread (all layers changed)");
-
-        thread.start();
-
+        } finally {
+            rwl.readLock().unlock();
+        }
     }
 
     /**
      * Notify all LayersListeners
      */
     private void fireActiveLayerChanged(final int index) {
-        Thread thread = new Thread(new Runnable() {
-
-            @Override
-            public void run() {
-                rwl.readLock().lock();
-                try {
-                    for (LayersListener ll : layerListeners) {
-                        ll.activeLayerChanged(index);
-                    }
-                } finally {
-                    rwl.readLock().unlock();
-                }
+        rwl.readLock().lock();
+        try {
+            for (LayersListener ll : layerListeners) {
+                ll.activeLayerChanged(index);
             }
-        }, "LayersModelThread (active layer changed)");
-
-        thread.start();
+        } finally {
+            rwl.readLock().unlock();
+        }
     }
 
     /**
      * Notify all LayersListeners
      */
     private void fireViewportGeometryChanged() {
-        Thread thread = new Thread(new Runnable() {
-
-            @Override
-            public void run() {
-                rwl.readLock().lock();
-                try {
-                    for (LayersListener ll : layerListeners) {
-                        ll.viewportGeometryChanged();
-                    }
-                } finally {
-                    rwl.readLock().unlock();
-                }
+        rwl.readLock().lock();
+        try {
+            for (LayersListener ll : layerListeners) {
+                ll.viewportGeometryChanged();
             }
-        }, "LayersModelThread (viewport geometry changed)");
-
-        thread.start();
-
+        } finally {
+            rwl.readLock().unlock();
+        }
     }
 
     /**
      * Notify all LayersListeners
      */
     private void fireTimestampChanged(final int idx) {
-        EventQueue.invokeLater(new Runnable() {
-            @Override
-            public void run() {
-                rwl.readLock().lock();
-                try {
-                    for (LayersListener ll : layerListeners) {
-                        ll.timestampChanged(idx);
-                    }
-                } finally {
-                    rwl.readLock().unlock();
-                }
+        rwl.readLock().lock();
+        try {
+            for (LayersListener ll : layerListeners) {
+                ll.timestampChanged(idx);
             }
-        });
+        } finally {
+            rwl.readLock().unlock();
+        }
     }
 
     /**
      * Notify all LayersListeners
      */
     private void fireSubImageDataChanged() {
-        Thread thread = new Thread(new Runnable() {
-
-            @Override
-            public void run() {
-                rwl.readLock().lock();
-                try {
-                    for (LayersListener ll : layerListeners) {
-                        ll.subImageDataChanged();
-                    }
-                } finally {
-                    rwl.readLock().unlock();
-                }
+        rwl.readLock().lock();
+        try {
+            for (LayersListener ll : layerListeners) {
+                ll.subImageDataChanged();
             }
-        }, "LayersModelThread (subimage data changed)");
-
-        thread.start();
+        } finally {
+            rwl.readLock().unlock();
+        }
     }
 
     /**
@@ -1608,14 +1494,12 @@ public class LayersModel implements ViewListener {
     public String getXMLRepresentation(String tab) {
         rwl.readLock().lock();
         try {
-            StringBuffer xml = new StringBuffer();
-
             int layers = LayersModel.getSingletonInstance().getNumLayers();
-
             if (layers == 0) {
                 return "";
             }
 
+            StringBuffer xml = new StringBuffer();
             xml.append(tab).append("<layers>\n");
             // add tab
             tab = tab + "\t";
@@ -1629,7 +1513,6 @@ public class LayersModel implements ViewListener {
             // store layers
             for (int i = 0; i < layers; i++) {
                 View currentView = LayersModel.getSingletonInstance().getLayer(i);
-
                 if (currentView != null) {
                     xml.append(tab).append("<layer id=\"").append(i).append("\">\n");
 
@@ -1638,7 +1521,6 @@ public class LayersModel implements ViewListener {
 
                     // add tab
                     tab = tab + "\t";
-
                     // TODO Use a proper encoding function - not "replace X->Y"
                     xml.append(tab).append("<uri>").append(currentImageInfoView.getUri().toString().replaceAll("&", "&amp;")).append("</uri>\n");
                     xml.append(tab).append("<downloaduri>").append(currentImageInfoView.getDownloadURI().toString().replaceAll("&", "&amp;")).append("</downloaduri>\n");
@@ -1673,11 +1555,9 @@ public class LayersModel implements ViewListener {
 
             // remove last tab
             tab = tab.substring(0, tab.length() - 1);
-
             xml.append(tab).append("</layers>");
 
             return xml.toString();
-
         } finally {
             rwl.readLock().unlock();
         }
@@ -1691,16 +1571,12 @@ public class LayersModel implements ViewListener {
      *            - URL to read the JHV state from
      */
     public void loadState(URL stateURL) {
-
         try {
             InputSource stateInputSource = new InputSource(new InputStreamReader(stateURL.openStream()));
-
             // create new parser for this inputsource
             StateParser stateParser = new StateParser(stateInputSource);
-
             // finally tell the parser to setup the viewchain
             stateParser.setupLayers();
-
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -1751,7 +1627,6 @@ public class LayersModel implements ViewListener {
             } catch (IOException e) {
                 e.printStackTrace();
             }
-
         }
 
         /**
@@ -1812,7 +1687,6 @@ public class LayersModel implements ViewListener {
                     String str_layer_id = atts.getValue(idx_layer_id);
                     tmpLayerSetting.id = Integer.parseInt(str_layer_id);
                 }
-
             } else if (tagName.equals("filter")) {
                 tmpFilterSetting = new FilterState();
                 int idx_filter_name = atts.getIndex("name");
@@ -1862,7 +1736,6 @@ public class LayersModel implements ViewListener {
             } else if (tagName.equals("layer")) {
                 fullSetting.layerSettings.add(tmpLayerSetting);
             }
-
             stringBuffer = new StringBuffer();
         }
 
@@ -1887,13 +1760,11 @@ public class LayersModel implements ViewListener {
 
                 // Loop over all available filter states
                 for (FilterState curFilterState : filterStates) {
-
                     // if we found a suitable filter state, apply it
                     if (curFilterState.name.equals(curFilterName)) {
                         currentFilterView.getFilter().setState(curFilterState.stateString.toString());
                     }
                 }
-
                 currentFilterView = currentFilterView.getView().getAdapter(FilterView.class);
             }
         }
@@ -1920,7 +1791,6 @@ public class LayersModel implements ViewListener {
                 // If scheme is jpip, check if source was API call and file
                 // still exists
                 if (directURI.getScheme().equalsIgnoreCase("jpip") && (layerSetting.downloadURI.contains(Settings.getSingletonInstance().getProperty("API.jp2series.path")) || layerSetting.downloadURI.contains(Settings.getSingletonInstance().getProperty("API.jp2images.path")))) {
-
                     Log.info(">> LayersModel.StateParser.setupLayer() > Check if API-generated file \"" + layerSetting.directURI + "\" still exists... ");
 
                     URL testURL = new URL(layerSetting.directURI.replaceFirst("jpip", "http").replaceFirst(":8090", "/jp2"));
@@ -1942,7 +1812,6 @@ public class LayersModel implements ViewListener {
                         Log.info(">> LayersModel.StateParser.setupLayer() > Requesting \"" + jpipRequest + "\" instead.");
 
                         newView = APIRequestManager.requestData(true, new URL(jpipRequest), new URI(layerSetting.downloadURI), range, true);
-
                     } else { // If file exists -> Open file
                         Log.info(">> LayersModel.StateParser.setupLayer() > \"" + layerSetting.directURI + "\" still exists, load it.");
                         newView = APIRequestManager.newLoad(directURI, new URI(layerSetting.downloadURI), true, range);
@@ -1957,7 +1826,6 @@ public class LayersModel implements ViewListener {
                 // This should never happen
                 e.printStackTrace();
             } finally {
-
                 // go through all sub view chains of the layered
                 // view and try to find the
                 // view chain of the corresponding image info view
@@ -1968,7 +1836,6 @@ public class LayersModel implements ViewListener {
 
                 // check if we could load add a new layer/view
                 if (newView != null) {
-
                     LayeredView layeredView = LayersModel.getSingletonInstance().getLayeredView();
                     for (int i = 0; i < layeredView.getNumLayers(); i++) {
                         View subView = layeredView.getLayer(i);
@@ -1984,13 +1851,11 @@ public class LayersModel implements ViewListener {
                     if (newView != null) {
                         setupFilters(newView, layerSetting.filterSettings);
                     }
-
                 } else {
                     // this case is executed, if an error occured while adding
                     // the layer
                 }
             }
-
         }
 
         /**
@@ -2000,7 +1865,6 @@ public class LayersModel implements ViewListener {
          * @see FullState
          */
         public void setupLayers() {
-
             // First clear all Layers
             Log.info(">> LayersModel.StateParser.setupLayers() > Removing previously existing layers");
             int removedLayers = 0;
@@ -2011,12 +1875,10 @@ public class LayersModel implements ViewListener {
 
             // Sort the list of layers by id
             Collections.sort(fullSetting.layerSettings);
-
             // reverse the list, since the layers get stacked up
             Collections.reverse(fullSetting.layerSettings);
 
             boolean regionIsInitialized = false;
-
             for (LayerState currentLayerSetting : fullSetting.layerSettings) {
                 setupLayer(currentLayerSetting, null);
 
@@ -2026,7 +1888,6 @@ public class LayersModel implements ViewListener {
                     regionIsInitialized = false;
                 }
             }
-
         }
 
         /**
@@ -2041,7 +1902,6 @@ public class LayersModel implements ViewListener {
                 regionView.setRegion(region, new ChangeEvent());
             } else {
                 Log.info(">> LayersModel.StateParser.setupLayers() > Skipping RegionView setup.");
-
             }
         }
 
