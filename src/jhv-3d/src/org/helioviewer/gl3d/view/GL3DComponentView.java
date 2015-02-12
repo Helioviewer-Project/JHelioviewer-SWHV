@@ -1,7 +1,6 @@
 package org.helioviewer.gl3d.view;
 
 import java.awt.Color;
-import java.awt.Dimension;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
@@ -30,6 +29,7 @@ import org.helioviewer.viewmodel.changeevent.LayerChangedReason.LayerChangeType;
 import org.helioviewer.viewmodel.changeevent.SubImageDataChangedReason;
 import org.helioviewer.viewmodel.changeevent.TimestampChangedReason;
 import org.helioviewer.viewmodel.changeevent.ViewChainChangedReason;
+import org.helioviewer.viewmodel.renderer.GLCommonRenderGraphics;
 import org.helioviewer.viewmodel.renderer.screen.GLScreenRenderGraphics;
 import org.helioviewer.viewmodel.renderer.screen.ScreenRenderer;
 import org.helioviewer.viewmodel.view.AbstractComponentView;
@@ -93,13 +93,7 @@ public class GL3DComponentView extends AbstractComponentView implements GLEventL
     private File outputFile;
 
     public GL3DComponentView() {
-        GLSharedDrawable shared = GLSharedDrawable.getSingletonInstance();
-
-        //canvas = GLSharedDrawable.getSingletonInstance().getCanvas();
-        canvas = new GLCanvas(shared.caps);
-        canvas.setSharedAutoDrawable(shared.sharedDrawable);
-        canvas.setMinimumSize(new Dimension(0, 0));
-
+        canvas = GLSharedDrawable.getSingletonInstance().getCanvas();
         canvas.addGLEventListener(this);
 
         Displayer.getSingletonInstance().register(this);
@@ -203,6 +197,8 @@ public class GL3DComponentView extends AbstractComponentView implements GLEventL
     @Override
     public void init(GLAutoDrawable drawable) {
         Log.debug("GL3DComponentView.Init");
+
+        GLCommonRenderGraphics.getSingletonInstance().clearTextureCaches();
 
         GL2 gl = drawable.getGL().getGL2();
         GL3DState.create(gl);
