@@ -65,6 +65,7 @@ import com.jogamp.opengl.util.awt.ImageUtil;
  *
  */
 public class GL3DComponentView extends AbstractComponentView implements GLEventListener, ComponentView, DisplayListener, GL3DComponentFakeInterface {
+    // general
     private final GLCanvas canvas;
     private final AWTGLPixelBuffer.SingleAWTGLPixelBufferProvider pixelBufferProvider = new AWTGLPixelBuffer.SingleAWTGLPixelBufferProvider(true);
 
@@ -80,13 +81,14 @@ public class GL3DComponentView extends AbstractComponentView implements GLEventL
 
     private Vector2dInt viewportSize;
 
+    // screenshot & movie
     private TileRenderer tileRenderer;
     private BufferedImage screenshot;
     private int previousScreenshot = -1;
 
+    private ExportMovieDialog exportMovieDialog;
     private MovieExport export;
     private boolean exportMode = false;
-    private ExportMovieDialog exportMovieDialog;
     private boolean screenshotMode = false;
     private File outputFile;
 
@@ -132,7 +134,7 @@ public class GL3DComponentView extends AbstractComponentView implements GLEventL
     }
 
     public void displayChanged(GLAutoDrawable arg0, boolean arg1, boolean arg2) {
-        Log.debug("GL3DComponentView.DisplayChanged");
+        // Log.debug("GL3DComponentView.DisplayChanged");
     }
 
     @Override
@@ -146,9 +148,11 @@ public class GL3DComponentView extends AbstractComponentView implements GLEventL
                 movieView.pauseMovie();
                 movieView.setCurrentFrame(0, new ChangeEvent());
             }
+
             export = new MovieExport(canvas.getWidth(), canvas.getHeight());
             export.createProcess();
             exportMode = true;
+
             if (movieView != null) {
                 movieView.playMovie();
             } else {
@@ -163,9 +167,11 @@ public class GL3DComponentView extends AbstractComponentView implements GLEventL
     public void stopExport() {
         View v = LayersModel.getSingletonInstance().getActiveView();
         JHVJPXView movieView = v.getAdapter(JHVJPXView.class);
+
         exportMode = false;
         previousScreenshot = -1;
         export.finishProcess();
+
         JTextArea text = new JTextArea("Exported movie at: " + export.getFileName());
         text.setBackground(null);
         JOptionPane.showMessageDialog(ImageViewerGui.getSingletonInstance().getMainImagePanel(), text);
@@ -185,6 +191,13 @@ public class GL3DComponentView extends AbstractComponentView implements GLEventL
 
     public void stopScreenshot() {
         this.screenshotMode = false;
+    }
+
+    @Override
+    public boolean saveScreenshot(String imageFormat, File outputFile) throws IOException {
+        this.outputFile = outputFile;
+        this.startScreenshot();
+        return true;
     }
 
     @Override
@@ -233,9 +246,9 @@ public class GL3DComponentView extends AbstractComponentView implements GLEventL
     }
 
     @Override
-    public void display(GLAutoDrawable glAD) {
-        JHVJP2View mv = null;
+    public void display(GLAutoDrawable drawable) {
 
+        JHVJP2View mv = null;
         if (exportMode || screenshotMode) {
             View v = LayersModel.getSingletonInstance().getActiveView();
             if (v != null) {
@@ -251,7 +264,11 @@ public class GL3DComponentView extends AbstractComponentView implements GLEventL
             }
         }
 
-        GL2 gl = glAD.getGL().getGL2();
+        if (view == null) {
+            return;
+        }
+
+        GL2 gl = drawable.getGL().getGL2();
 
         int width = this.viewportSize.getX();
         int height = this.viewportSize.getY();
@@ -345,8 +362,8 @@ public class GL3DComponentView extends AbstractComponentView implements GLEventL
                 this.stopExport();
             }
             previousScreenshot = currentScreenshot;
-
         }
+
         if (screenshotMode && mv != null) {
             tileRenderer.endTile(gl);
             screenshot = pixelBuffer.image;
@@ -361,14 +378,6 @@ public class GL3DComponentView extends AbstractComponentView implements GLEventL
         GL3DState.get().checkGLErrors();
     }
 
-    @Override
-    public boolean saveScreenshot(String imageFormat, File outputFile) throws IOException {
-        //Message.warnTitle("Screenshot 3D", "Cannot Save screenshots in 3D mode yet!");
-        this.outputFile = outputFile;
-        this.startScreenshot();
-        //throw new UnsupportedOperationException("Cannot Save screenshots in 3D mode yet!");
-        return true;
-    }
 
     @Override
     public void setBackgroundColor(Color background) {
@@ -415,7 +424,10 @@ public class GL3DComponentView extends AbstractComponentView implements GLEventL
     @Override
     public void viewChanged(View sender, ChangeEvent aEvent) {
 
-        if (aEvent != null && aEvent.reasonOccurred(ViewChainChangedReason.class) || (aEvent.reasonOccurred(LayerChangedReason.class) && aEvent.getLastChangedReasonByType(LayerChangedReason.class) != null && aEvent.getLastChangedReasonByType(LayerChangedReason.class).getLayerChangeType() == LayerChangeType.LAYER_ADDED)) {
+        if (aEvent != null && aEvent.reasonOccurred(ViewChainChangedReason.class) ||
+            (aEvent.reasonOccurred(LayerChangedReason.class) &&
+             aEvent.getLastChangedReasonByType(LayerChangedReason.class) != null &&
+             aEvent.getLastChangedReasonByType(LayerChangedReason.class).getLayerChangeType() == LayerChangeType.LAYER_ADDED)) {
             rebuildShadersRequest = true;
             this.viewportView = getAdapter(ViewportView.class);
         }
@@ -423,12 +435,10 @@ public class GL3DComponentView extends AbstractComponentView implements GLEventL
         TimestampChangedReason timestampReason = aEvent.getLastChangedReasonByType(TimestampChangedReason.class);
         SubImageDataChangedReason sidReason = aEvent.getLastChangedReasonByType(SubImageDataChangedReason.class);
 
-        if (sidReason != null || ((timestampReason != null) && (timestampReason.getView() instanceof TimedMovieView) && LinkedMovieManager.getActiveInstance().isMaster((TimedMovieView) timestampReason.getView()))) {
-            try {
-                Displayer.getSingletonInstance().display();
-            } catch (Exception e) {
-
-            }
+        if (sidReason != null ||
+            ((timestampReason != null) && (timestampReason.getView() instanceof TimedMovieView) &&
+              LinkedMovieManager.getActiveInstance().isMaster((TimedMovieView) timestampReason.getView()))) {
+            Displayer.getSingletonInstance().display();
         }
 
         notifyViewListeners(aEvent);

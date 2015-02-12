@@ -24,6 +24,7 @@ import org.helioviewer.base.math.Vector2dInt;
 import org.helioviewer.gl3d.movie.MovieExport;
 import org.helioviewer.jhv.display.DisplayListener;
 import org.helioviewer.jhv.display.Displayer;
+import org.helioviewer.jhv.display.GL3DComponentFakeInterface;
 import org.helioviewer.jhv.gui.ImageViewerGui;
 import org.helioviewer.jhv.gui.dialogs.ExportMovieDialog;
 import org.helioviewer.jhv.layers.LayersModel;
@@ -57,7 +58,6 @@ import org.helioviewer.viewmodel.view.opengl.shader.GLVertexShaderView;
 import org.helioviewer.viewmodel.viewport.Viewport;
 import org.helioviewer.viewmodel.viewportimagesize.ViewportImageSize;
 
-import com.jogamp.opengl.util.FPSAnimator;
 import com.jogamp.opengl.util.TileRenderer;
 import com.jogamp.opengl.util.awt.AWTGLPixelBuffer;
 import com.jogamp.opengl.util.awt.ImageUtil;
@@ -80,26 +80,18 @@ import com.jogamp.opengl.util.awt.ImageUtil;
  *
  * @author Markus Langenberg
  */
-public class GLComponentView extends AbstractComponentView implements ViewListener, GLEventListener, DisplayListener {
-    public static final String SETTING_TILE_WIDTH = "gl.screenshot.tile.width";
-    public static final String SETTING_TILE_HEIGHT = "gl.screenshot.tile.height";
-
-    private static final boolean DEBUG = true;
-
+public class GLComponentView extends AbstractComponentView implements GLEventListener, ComponentView, DisplayListener, GL3DComponentFakeInterface {
     // general
     private final GLCanvas canvas;
-    private RegionView regionView;
-    private FPSAnimator animator;
-
-    private int previousScreenshot = -1;
-
-    private MovieExport export;
-    private ExportMovieDialog exportMovieDialog;
-    private File outputFile;
+    private final AWTGLPixelBuffer.SingleAWTGLPixelBufferProvider pixelBufferProvider = new AWTGLPixelBuffer.SingleAWTGLPixelBufferProvider(true);
 
     // render options
     private Color backgroundColor = Color.BLACK;
     private final Color outsideViewportColor = Color.BLACK;
+
+    private RegionView regionView;
+
+    private Vector2dInt viewportSize;
     private float xOffset = 0.0f;
     private float yOffset = 0.0f;
     private final AbstractList<ScreenRenderer> postRenderers = new LinkedList<ScreenRenderer>();
@@ -108,25 +100,16 @@ public class GLComponentView extends AbstractComponentView implements ViewListen
     private boolean rebuildShadersRequest = false;
     private final GLShaderHelper shaderHelper = new GLShaderHelper();
 
-    // screenshot
-    private boolean saveScreenshotRequest = false;
-    private boolean saveBufferedImage = false;
-    private String saveScreenshotFormat;
-    private File saveScreenshotFile;
-
-    private BufferedImage screenshot;
-
+    // screenshot & movie
     private TileRenderer tileRenderer;
-    private final AWTGLPixelBuffer.SingleAWTGLPixelBufferProvider pixelBufferProvider = new AWTGLPixelBuffer.SingleAWTGLPixelBufferProvider(true);
+    private BufferedImage screenshot;
+    private int previousScreenshot = -1;
 
-    private static int defaultTileWidth = 640;
-    private static int defaultTileHeight = 640;
-    private int tileWidth;
-    private int tileHeight;
-    private final boolean sharedObjectCreate = false;
-    private Vector2dInt viewportSize;
-    private boolean exportMode;
-    private boolean screenshotMode;
+    private ExportMovieDialog exportMovieDialog;
+    private MovieExport export;
+    private boolean exportMode = false;
+    private boolean screenshotMode = false;
+    private File outputFile;
 
     /**
      * Default constructor.
@@ -143,8 +126,8 @@ public class GLComponentView extends AbstractComponentView implements ViewListen
 
         canvas.addGLEventListener(this);
 
-        animator = new FPSAnimator(canvas, 30);
-        animator.start();
+        Displayer.getSingletonInstance().register(this);
+        Displayer.getSingletonInstance().addListener(this);
     }
 
     @Override
@@ -155,180 +138,86 @@ public class GLComponentView extends AbstractComponentView implements ViewListen
         }
         tileRenderer = null;
 
-        if (animator != null) {
-            animator.remove(drawable);
-            animator = null;
-        }
+        Displayer.getSingletonInstance().removeListener(this);
 
         drawable.getGL().getGL2().glFinish();
         drawable.removeGLEventListener(this);
     }
 
-    /**
-     * Stop the animation of the canvas. Useful if one wants to display frame
-     * per frame (such as in movie export).
-     */
-    private void stopAnimation() {
-        if (animator != null && animator.isAnimating())
-            animator.stop();
+    @Override
+    public void deactivate() {
     }
 
-    /**
-     * (Re-)start the animation of the canvas.
-     */
-    private void startAnimation() {
-        if (animator == null)
-            animator = new FPSAnimator(canvas, 30);
-        if (!animator.isAnimating())
-            animator.start();
+    @Override
+    public void activate() {
     }
 
-    /**
-     * Save the next rendered frame in a buffered image and return this image.
-     *
-     * WARNING: The returned image is a reference to the internal buffered image
-     * of this class. A subsequent call to this function might change the data
-     * of this returned buffered image. If this is not desired, one has to make
-     * a copy of the returned image, before calling getBufferedImage() again.
-     * This choice was made with the movie export application in mind in order
-     * to save main memory.
-     *
-     * @return BufferedImage of the next rendered frame
-     */
-    public BufferedImage getBufferedImage() {
-        saveBufferedImage = true;
-        canvas.display();
-        return screenshot;
-    }
-
-    public static void setTileSize(int width, int height) {
-        defaultTileWidth = width;
-        defaultTileHeight = height;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public Component getComponent() {
         return canvas;
     }
 
-    /**
-     * {@inheritDoc}
-     *
-     * Since the screenshot is saved after the next rendering cycle, the result
-     * is not available directly after calling this function. It only places a
-     * request to save the screenshot.
-     */
+    @Override
+    public void startExport(ExportMovieDialog exportMovieDialog) {
+        this.exportMovieDialog = exportMovieDialog;
+        ImageViewerGui.getSingletonInstance().getLeftContentPane().setEnabled(false);
+        View v = LayersModel.getSingletonInstance().getActiveView();
+        if (v != null) {
+            JHVJPXView movieView = v.getAdapter(JHVJPXView.class);
+            if (movieView != null) {
+                movieView.pauseMovie();
+                movieView.setCurrentFrame(0, new ChangeEvent());
+            }
+
+            export = new MovieExport(canvas.getWidth(), canvas.getHeight());
+            export.createProcess();
+            exportMode = true;
+
+            if (movieView != null) {
+                movieView.playMovie();
+            } else {
+                Displayer.getSingletonInstance().render();
+            }
+        } else {
+            exportMovieDialog.fail();
+            exportMovieDialog = null;
+        }
+    }
+
+    public void stopExport() {
+        View v = LayersModel.getSingletonInstance().getActiveView();
+        JHVJPXView movieView = v.getAdapter(JHVJPXView.class);
+
+        exportMode = false;
+        previousScreenshot = -1;
+        export.finishProcess();
+
+        JTextArea text = new JTextArea("Exported movie at: " + export.getFileName());
+        text.setBackground(null);
+        JOptionPane.showMessageDialog(ImageViewerGui.getSingletonInstance().getMainImagePanel(), text);
+
+        ImageViewerGui.getSingletonInstance().getLeftContentPane().setEnabled(true);
+        if (movieView != null) {
+            movieView.pauseMovie();
+        }
+        exportMovieDialog.reset3D();
+        exportMovieDialog = null;
+    }
+
+    public void startScreenshot() {
+        this.screenshotMode = true;
+        Displayer.getSingletonInstance().render();
+    }
+
+    public void stopScreenshot() {
+        this.screenshotMode = false;
+    }
+
     @Override
     public boolean saveScreenshot(String imageFormat, File outputFile) throws IOException {
-        saveScreenshotRequest = true;
-        saveScreenshotFormat = imageFormat;
-        saveScreenshotFile = outputFile;
+        this.outputFile = outputFile;
+        this.startScreenshot();
         return true;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void setOffset(Vector2dInt offset) {
-        xOffset = offset.getX();
-        yOffset = offset.getY();
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void addPostRenderer(ScreenRenderer postRenderer) {
-        if (postRenderer != null) {
-            synchronized (postRenderers) {
-                postRenderers.add(postRenderer);
-                if (postRenderer instanceof ViewListener) {
-                    addViewListener((ViewListener) postRenderer);
-                }
-            }
-        }
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void removePostRenderer(ScreenRenderer postRenderer) {
-        if (postRenderer != null) {
-            synchronized (postRenderers) {
-                do {
-                    postRenderers.remove(postRenderer);
-                    if (postRenderer instanceof ViewListener) {
-                        removeViewListener((ViewListener) postRenderer);
-                    }
-                } while (postRenderers.contains(postRenderer));
-            }
-        }
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public AbstractList<ScreenRenderer> getAllPostRenderer() {
-        return postRenderers;
-    }
-
-    /**
-     * {@inheritDoc}
-     *
-     * In this case, the canvas is repainted.
-     */
-    @Override
-    protected synchronized void setViewSpecificImplementation(View newView, ChangeEvent changeEvent) {
-        if (newView != null) {
-            regionView = newView.getAdapter(RegionView.class);
-        }
-
-        canvas.repaint();
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void viewChanged(View sender, ChangeEvent aEvent) {
-
-        if (aEvent.reasonOccurred(ViewChainChangedReason.class)) {
-            regionView = view.getAdapter(RegionView.class);
-        }
-
-        // rebuild shaders, if necessary
-        if (aEvent.reasonOccurred(ViewChainChangedReason.class) || (aEvent.reasonOccurred(LayerChangedReason.class) && aEvent.getLastChangedReasonByType(LayerChangedReason.class).getLayerChangeType() == LayerChangeType.LAYER_ADDED)) {
-            rebuildShadersRequest = true;
-        }
-
-        // inform all listener of the latest change reason
-        // frameUpdated++;
-        notifyViewListeners(aEvent);
-        if (this.exportMode) {
-            TimestampChangedReason timestampReason = aEvent.getLastChangedReasonByType(TimestampChangedReason.class);
-            SubImageDataChangedReason sidReason = aEvent.getLastChangedReasonByType(SubImageDataChangedReason.class);
-
-            if (sidReason != null || ((timestampReason != null) && (timestampReason.getView() instanceof TimedMovieView) && LinkedMovieManager.getActiveInstance().isMaster((TimedMovieView) timestampReason.getView()))) {
-                Displayer.getSingletonInstance().display();
-            }
-        }
-    }
-
-    @Override
-    public void setBackgroundColor(Color color) {
-        backgroundColor = color;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public void displayChanged(GLAutoDrawable drawable, boolean modeChanged, boolean deviceChanged) {
     }
 
     /**
@@ -340,7 +229,7 @@ public class GLComponentView extends AbstractComponentView implements ViewListen
      * {@link GLTextureHelper#initHelper(GL2)}.
      *
      * <p>
-     * Note, that this function should not be called by any user defined
+     * Note that this function should not be called by any user defined
      * function. It is part of the GLEventListener and invoked by the OpenGL
      * thread.
      *
@@ -370,11 +259,11 @@ public class GLComponentView extends AbstractComponentView implements ViewListen
     /**
      * Reshapes the viewport.
      *
-     * This function is called, whenever the canvas is resized. It ensures, that
+     * This function is called whenever the canvas is resized. It ensures that
      * the perspective never gets corrupted.
      *
      * <p>
-     * Note, that this function should not be called by any user defined
+     * Note that this function should not be called by any user defined
      * function. It is part of the GLEventListener and invoked by the OpenGL
      * thread.
      *
@@ -450,7 +339,6 @@ public class GLComponentView extends AbstractComponentView implements ViewListen
 
         if (viewport != null) {
             // Draw post renderer
-
             gl.glTranslatef(0.0f, viewport.getHeight(), 0.0f);
             gl.glScalef(1.0f, -1.0f, 1.0f);
 
@@ -501,20 +389,9 @@ public class GLComponentView extends AbstractComponentView implements ViewListen
         if (view == null) {
             return;
         }
-        if (!saveBufferedImage && (canvas.getSize().width <= 0 || canvas.getSize().height <= 0)) {
-            return;
-        }
 
-        final GL2 gl;
-        if (DEBUG) {
-            gl = new DebugGL2(drawable.getGL().getGL2());
-        } else {
-            gl = drawable.getGL().getGL2();
-        }
+        GL2 gl = drawable.getGL().getGL2();
 
-        while (rebuildShadersRequest) {
-            rebuildShaders(gl);
-        }
         int width = this.viewportSize.getX();
         int height = this.viewportSize.getY();
         AWTGLPixelBuffer pixelBuffer = null;
@@ -533,6 +410,10 @@ public class GLComponentView extends AbstractComponentView implements ViewListen
             }
         }
 
+        while (rebuildShadersRequest) {
+            rebuildShaders(gl);
+        }
+
         float xOffsetFinal = xOffset;
         float yOffsetFinal = yOffset;
         gl.glClearColor(outsideViewportColor.getRed() / 255.0f, outsideViewportColor.getGreen() / 255.0f, outsideViewportColor.getBlue() / 255.0f, outsideViewportColor.getAlpha() / 255.0f);
@@ -546,6 +427,7 @@ public class GLComponentView extends AbstractComponentView implements ViewListen
                 yOffsetFinal += canvas.getHeight() - viewportImageSize.getHeight() - yOffsetFinal - (canvas.getHeight() - viewportImageSize.getHeight()) / 2;
             }
         }
+
         displayBody(gl, xOffsetFinal, yOffsetFinal);
 
         // check for errors
@@ -554,6 +436,7 @@ public class GLComponentView extends AbstractComponentView implements ViewListen
             GLU glu = new GLU();
             Log.error("OpenGL Error (" + errorCode + ") : " + glu.gluErrorString(errorCode));
         }
+
         if (exportMode && mv != null) {
             int currentScreenshot = 1;
             int maxframeno = 1;
@@ -573,8 +456,8 @@ public class GLComponentView extends AbstractComponentView implements ViewListen
                 this.stopExport();
             }
             previousScreenshot = currentScreenshot;
-
         }
+
         if (screenshotMode && mv != null) {
             tileRenderer.endTile(gl);
             screenshot = pixelBuffer.image;
@@ -589,19 +472,65 @@ public class GLComponentView extends AbstractComponentView implements ViewListen
     }
 
     @Override
+    public void setBackgroundColor(Color color) {
+        backgroundColor = color;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void setOffset(Vector2dInt offset) {
+        xOffset = offset.getX();
+        yOffset = offset.getY();
+    }
+
+    /**
+     * {@inheritDoc}
+     *
+     * In this case, the canvas is repainted.
+     */
+    @Override
+    protected void setViewSpecificImplementation(View newView, ChangeEvent changeEvent) {
+        // this.viewportView = getAdapter(ViewportView.class);
+    }
+
+    @Override
     public void display() {
         try {
             this.canvas.display();
         } catch (Exception e) {
-            Log.warn("Display of GL3DComponentView canvas failed", e);
+            Log.warn("Display of GLComponentView canvas failed", e);
         }
     }
 
     /**
-     * Force rebuilding the shaders during the next rendering iteration.
+     * {@inheritDoc}
      */
-    public void requestRebuildShaders() {
-        rebuildShadersRequest = true;
+    @Override
+    public void viewChanged(View sender, ChangeEvent aEvent) {
+
+        if (aEvent != null && aEvent.reasonOccurred(ViewChainChangedReason.class)) {
+            regionView = view.getAdapter(RegionView.class);
+        }
+
+        if (aEvent != null && aEvent.reasonOccurred(ViewChainChangedReason.class) ||
+            (aEvent.reasonOccurred(LayerChangedReason.class) &&
+             aEvent.getLastChangedReasonByType(LayerChangedReason.class) != null &&
+             aEvent.getLastChangedReasonByType(LayerChangedReason.class).getLayerChangeType() == LayerChangeType.LAYER_ADDED)) {
+            rebuildShadersRequest = true;
+        }
+
+        TimestampChangedReason timestampReason = aEvent.getLastChangedReasonByType(TimestampChangedReason.class);
+        SubImageDataChangedReason sidReason = aEvent.getLastChangedReasonByType(SubImageDataChangedReason.class);
+
+        if (sidReason != null ||
+            ((timestampReason != null) && (timestampReason.getView() instanceof TimedMovieView) &&
+              LinkedMovieManager.getActiveInstance().isMaster((TimedMovieView) timestampReason.getView()))) {
+            Displayer.getSingletonInstance().display();
+        }
+
+        notifyViewListeners(aEvent);
     }
 
     /**
@@ -652,66 +581,44 @@ public class GLComponentView extends AbstractComponentView implements ViewListen
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
-    public void deactivate() {
-        // TODO Auto-generated method stub
-
-    }
-
-    @Override
-    public void activate() {
-        // TODO Auto-generated method stub
-
-    }
-
-    @Override
-    public void startExport(ExportMovieDialog exportMovieDialog) {
-        animator.stop();
-        Displayer.getSingletonInstance().addListener(this);
-        this.exportMovieDialog = exportMovieDialog;
-        ImageViewerGui.getSingletonInstance().getLeftContentPane().setEnabled(false);
-
-        View v = LayersModel.getSingletonInstance().getActiveView();
-        if (v != null) {
-            JHVJPXView movieView = v.getAdapter(JHVJPXView.class);
-            if (movieView != null) {
-                movieView.pauseMovie();
-                movieView.setCurrentFrame(0, new ChangeEvent());
+    public void addPostRenderer(ScreenRenderer postRenderer) {
+        if (postRenderer != null) {
+            synchronized (postRenderers) {
+                postRenderers.add(postRenderer);
+                if (postRenderer instanceof ViewListener) {
+                    addViewListener((ViewListener) postRenderer);
+                }
             }
-            export = new MovieExport(canvas.getWidth(), canvas.getHeight());
-            export.createProcess();
-            exportMode = true;
-
-            if (movieView != null) {
-                movieView.playMovie();
-            }
-        } else {
-            exportMovieDialog.fail();
-            exportMovieDialog = null;
         }
     }
 
-    public void stopExport() {
-        Displayer.getSingletonInstance().removeListener(this);
-        View v = LayersModel.getSingletonInstance().getActiveView();
-        JHVJPXView movieView = v.getAdapter(JHVJPXView.class);
-        exportMode = false;
-        previousScreenshot = -1;
-        export.finishProcess();
-        JTextArea text = new JTextArea("Exported movie at: " + export.getFileName());
-        text.setBackground(null);
-        JOptionPane.showMessageDialog(ImageViewerGui.getSingletonInstance().getMainImagePanel(), text);
-
-        ImageViewerGui.getSingletonInstance().getLeftContentPane().setEnabled(true);
-        if (movieView != null) {
-            movieView.pauseMovie();
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void removePostRenderer(ScreenRenderer postRenderer) {
+        if (postRenderer != null) {
+            synchronized (postRenderers) {
+                do {
+                    postRenderers.remove(postRenderer);
+                    if (postRenderer instanceof ViewListener) {
+                        removeViewListener((ViewListener) postRenderer);
+                    }
+                } while (postRenderers.contains(postRenderer));
+            }
         }
-        exportMovieDialog.reset3D();
-        exportMovieDialog = null;
-        animator.start();
     }
 
-    public void stopScreenshot() {
-        this.screenshotMode = false;
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public AbstractList<ScreenRenderer> getAllPostRenderer() {
+        return postRenderers;
     }
+
 }
