@@ -1,7 +1,6 @@
 package org.helioviewer.gl3d.view;
 
 import java.awt.Color;
-import java.awt.Dimension;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
@@ -65,7 +64,7 @@ import com.jogamp.opengl.util.awt.ImageUtil;
  *
  */
 public class GL3DComponentView extends AbstractComponentView implements GLEventListener, ComponentView, DisplayListener, GL3DComponentFakeInterface {
-    private GLCanvas canvas;
+    private final GLCanvas canvas;
     private final AWTGLPixelBuffer.SingleAWTGLPixelBufferProvider pixelBufferProvider = new AWTGLPixelBuffer.SingleAWTGLPixelBufferProvider(true);
 
     private Color backgroundColor = Color.BLACK;
@@ -91,15 +90,25 @@ public class GL3DComponentView extends AbstractComponentView implements GLEventL
     private File outputFile;
 
     public GL3DComponentView() {
-        GLSharedDrawable shared = GLSharedDrawable.getSingletonInstance();
-
-        canvas = new GLCanvas(shared.caps);
-        canvas.setSharedAutoDrawable(shared.sharedDrawable);
-        canvas.setMinimumSize(new Dimension(0, 0));
+        canvas = GLSharedDrawable.getSingletonInstance().getCanvas();
         canvas.addGLEventListener(this);
 
         Displayer.getSingletonInstance().register(this);
         Displayer.getSingletonInstance().addListener(this);
+    }
+
+    @Override
+    public void dispose(GLAutoDrawable drawable) {
+        if (screenshot != null) {
+            screenshot.flush();
+            screenshot = null;
+        }
+        tileRenderer = null;
+
+        Displayer.getSingletonInstance().removeListener(this);
+
+        drawable.getGL().getGL2().glFinish();
+        drawable.removeGLEventListener(this);
     }
 
     @Override
@@ -287,7 +296,6 @@ public class GL3DComponentView extends AbstractComponentView implements GLEventL
 
         gl.glPushMatrix();
         if (!this.postRenderers.isEmpty()) {
-
             gl.glMatrixMode(GL2.GL_PROJECTION);
             gl.glLoadIdentity();
 
@@ -448,11 +456,6 @@ public class GL3DComponentView extends AbstractComponentView implements GLEventL
             // fill with other filters and compile
             vertexView.buildVertexShader(newShaderBuilder).compile();
         }
-    }
-
-    @Override
-    public void dispose(GLAutoDrawable arg0) {
-
     }
 
 }
