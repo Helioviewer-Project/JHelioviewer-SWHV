@@ -2,7 +2,6 @@ package org.helioviewer.viewmodel.view.opengl;
 
 import java.awt.Color;
 import java.awt.Component;
-import java.awt.Dimension;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
@@ -134,35 +133,35 @@ public class GLComponentView extends AbstractComponentView implements ViewListen
      * Also initializes all OpenGL Helper classes.
      */
     public GLComponentView() {
-        GLSharedDrawable shared = GLSharedDrawable.getSingletonInstance();
-
-        canvas = new GLCanvas(shared.caps);
-        canvas.setSharedAutoDrawable(shared.sharedDrawable);
-        canvas.setMinimumSize(new Dimension(0, 0));
+        canvas = GLSharedDrawable.getSingletonInstance().getCanvas();
         canvas.addGLEventListener(this);
 
         animator = new FPSAnimator(canvas, 30);
         animator.start();
     }
 
-    public void dispose() {
+    @Override
+    public void dispose(GLAutoDrawable drawable) {
         if (screenshot != null) {
             screenshot.flush();
             screenshot = null;
         }
         tileRenderer = null;
-    }
 
-    @Override
-    public void dispose(GLAutoDrawable drawable) {
-        dispose();
+        if (animator != null) {
+            animator.remove(drawable);
+            animator = null;
+        }
+
+        drawable.getGL().getGL2().glFinish();
+        drawable.removeGLEventListener(this);
     }
 
     /**
      * Stop the animation of the canvas. Useful if one wants to display frame
      * per frame (such as in movie export).
      */
-    public void stopAnimation() {
+    private void stopAnimation() {
         if (animator != null && animator.isAnimating())
             animator.stop();
     }
@@ -170,7 +169,7 @@ public class GLComponentView extends AbstractComponentView implements ViewListen
     /**
      * (Re-)start the animation of the canvas.
      */
-    public void startAnimation() {
+    private void startAnimation() {
         if (animator == null)
             animator = new FPSAnimator(canvas, 30);
         if (!animator.isAnimating())
@@ -344,7 +343,7 @@ public class GLComponentView extends AbstractComponentView implements ViewListen
     @Override
     public void init(GLAutoDrawable drawable) {
         Log.debug("GLComponentView.Init");
-        final GL2 gl = drawable.getGL().getGL2();
+        GL2 gl = drawable.getGL().getGL2();
         //gl.getContext().setGL(GLPipelineFactory.create("javax.media.opengl.Trace", null, gl, new Object[] { System.err }));
 
         GLTextureHelper.initHelper(gl);
@@ -385,7 +384,7 @@ public class GLComponentView extends AbstractComponentView implements ViewListen
      */
     @Override
     public void reshape(GLAutoDrawable drawable, int x, int y, int width, int height) {
-        final GL2 gl = drawable.getGL().getGL2();
+        GL2 gl = drawable.getGL().getGL2();
         this.viewportSize = new Vector2dInt(width, height);
 
         gl.setSwapInterval(1);
