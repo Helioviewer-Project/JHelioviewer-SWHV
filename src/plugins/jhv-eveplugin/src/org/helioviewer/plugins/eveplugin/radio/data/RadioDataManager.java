@@ -166,11 +166,11 @@ public class RadioDataManager implements RadioDownloaderListener {
      *            The download request data that should be removed
      */
     public void removeDownloadRequestData(DownloadRequestData drd) {
-        downloadRequestData.remove(drd.getDownloadID());
         lineDataSelectorModel.removeLineData(drd);
         for (Long imageID : drd.getRadioImages().keySet()) {
             cache.remove(imageID, drd.getPlotIdentifier());
         }
+        downloadRequestData.remove(drd.getDownloadID());
         fireDownloadRequestDataRemoved(drd);
     }
 
