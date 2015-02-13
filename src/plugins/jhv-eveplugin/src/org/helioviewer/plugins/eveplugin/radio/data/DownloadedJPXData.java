@@ -90,16 +90,10 @@ public class DownloadedJPXData implements ViewListener, FilterModelListener {
 
     @Override
     public synchronized void viewChanged(final View sender, final ChangeEvent aEvent) {
-
-        // Log.trace("View changed for image ID : " + imageID);
-        // Log.debug("Event type: " + aEvent);
-        // Log.debug("dworker dowloadedjpxdata : " + this);
         while (worker != null && !worker.isDone()) {
             try {
-                // Log.debug("dworker is busy sleep 10ms");
                 Thread.sleep(10);
             } catch (InterruptedException e) {
-                // TODO Auto-generated catch block
                 e.printStackTrace();
             }
         }
@@ -111,25 +105,6 @@ public class DownloadedJPXData implements ViewListener, FilterModelListener {
             @Override
             protected DownloadedJPXDataWorkerResult doInBackground() {
                 Thread.currentThread().setName("DownloadedJPXDataWorkerResult1--EVE");
-
-                // Log.trace("dworker " + nr + " View changed for image ID : " +
-                // imageID);
-                // Log.debug("dworker " + nr + " Event type: " + aEvent);
-                // for (ViewportChangedReason cr :
-                // aEvent.getAllChangedReasonsByType(ViewportChangedReason.class))
-                // {
-                // radioDataManager.finishedDownloadingID(imageID, downloadID);
-                // }
-                /*
-                 * CacheStatusChangedReason cacheReason =
-                 * aEvent.getLastChangedReasonByType
-                 * (CacheStatusChangedReason.class); if (cacheReason != null &&
-                 * cacheReason.getView() == view) { switch
-                 * (cacheReason.getType()) { case PARTIAL: break; case COMPLETE:
-                 * radioDataManager.finishedDownloadingID(imageID, downloadID);
-                 * break; } }
-                 */
-
                 return getJPXData(sender);
             }
 
@@ -145,16 +120,11 @@ public class DownloadedJPXData implements ViewListener, FilterModelListener {
                         DownloadedJPXDataWorkerResult result = get();
                         if (result != null) {
                             radioDataManager.dataForIDReceived(result.getData(), result.getImageID(), result.getDownloadID(), result.getDataSize());
-                        } else {
-                            // Log.debug("dWorker" + nr + " : Result is null");
                         }
 
-                    } else {
-                        // Log.debug("dWorker" + nr + " was cancelled");
                     }
                     radioDataManager.finishedDownloadingID(imageID, downloadID);
                 } catch (InterruptedException e) {
-                    // TODO Auto-generated catch block
                     Log.error("dWorker" + nr + " interrupted " + e.getMessage());
                     e.printStackTrace();
                 } catch (ExecutionException e) {
@@ -167,45 +137,6 @@ public class DownloadedJPXData implements ViewListener, FilterModelListener {
         }.init(workernumber++);
 
         worker.execute();
-        /*
-         * Log.trace("View changed for image ID : " + imageID);
-         * Log.debug("Event type: " + aEvent); for (ViewportChangedReason cr :
-         * aEvent.getAllChangedReasonsByType(ViewportChangedReason.class)) {
-         * radioDataManager.finishedDownloadingID(imageID, downloadID); }
-         * JHVJPXView jpxView = sender.getAdapter(JHVJPXView.class); if (jpxView
-         * != null) { ImageCacheStatus status = jpxView.getImageCacheStatus();
-         * if (status.getImageStatus(0) == CacheStatus.COMPLETE) { byte[] data =
-         * new byte[0]; SingleChannelByte8ImageData imageData =
-         * (SingleChannelByte8ImageData) (jpxView.getSubimageData()); if
-         * (imageData != null) { MetaDataView metaDataView =
-         * sender.getAdapter(MetaDataView.class); Byte8ImageTransport bytetrs =
-         * (Byte8ImageTransport) imageData.getImageTransport(); data =
-         * bytetrs.getByte8PixelData();
-         * 
-         * HelioviewerMetaData md = (HelioviewerMetaData)
-         * metaDataView.getMetaData(); Double mpp = md.getUnitsPerPixel();
-         * byte[] copyData = Arrays.copyOf(data, data.length); data = new
-         * byte[0]; radioDataManager.dataForIDReceived(copyData, imageID,
-         * downloadID, new Rectangle(imageData.getWidth(),
-         * imageData.getHeight())); } } else {
-         * Log.debug("Download not complete"); } } else { JHVJP2View jp2View =
-         * sender.getAdapter(JHVJP2View.class); MetaDataView metaDataView =
-         * sender.getAdapter(MetaDataView.class); byte[] data = new byte[0];
-         * SingleChannelByte8ImageData imageData = (SingleChannelByte8ImageData)
-         * (jp2View.getSubimageData()); if (imageData != null) {
-         * Byte8ImageTransport bytetrs = (Byte8ImageTransport)
-         * imageData.getImageTransport(); data = bytetrs.getByte8PixelData();
-         * List<Byte> dataList = new ArrayList<Byte>(); for (Byte b : data) {
-         * dataList.add(b); } if (Collections.min(dataList) !=
-         * Collections.max(dataList)) {
-         * 
-         * HelioviewerMetaData md = (HelioviewerMetaData)
-         * metaDataView.getMetaData(); Double mpp = md.getUnitsPerPixel();
-         * byte[] copyData = Arrays.copyOf(data, data.length); data = new
-         * byte[0]; radioDataManager.dataForIDReceived(copyData, imageID,
-         * downloadID, new Rectangle(imageData.getWidth(),
-         * imageData.getHeight())); } } }
-         */
     }
 
     @Override
@@ -227,11 +158,6 @@ public class DownloadedJPXData implements ViewListener, FilterModelListener {
             @Override
             protected DownloadedJPXDataWorkerResult doInBackground() {
                 Thread.currentThread().setName("DownloadedJPXDataWorkerResult2--EVE");
-
-                // Log.trace("dworker " + nr + " View changed for image ID : " +
-                // imageID);
-                // Log.debug("dworker " + nr + " Event type: " + aEvent);
-
                 return getJPXData(view);
             }
 
@@ -252,12 +178,7 @@ public class DownloadedJPXData implements ViewListener, FilterModelListener {
                                 radioDataManager.dataForIDReceived(result.getByteData(), result.getImageID(), result.getDownloadID(), result.getDataSize());
                             }
                             radioDataManager.finishedDownloadingID(imageID, downloadID);
-
-                        } else {
-                            // Log.debug("dWorker" + nr + " : Result is null");
                         }
-                    } else {
-                        // Log.debug("dWorker" + nr + " was cancelled");
                     }
                 } catch (InterruptedException e) {
                     // TODO Auto-generated catch block
