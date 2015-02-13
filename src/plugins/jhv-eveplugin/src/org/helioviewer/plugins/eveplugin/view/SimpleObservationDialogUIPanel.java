@@ -71,7 +71,7 @@ public abstract class SimpleObservationDialogUIPanel extends ObservationDialogPa
     public SimpleObservationDialogUIPanel(final PlotsContainerPanel plotsContainerPanel) {
         this.plotsContainerPanel = plotsContainerPanel;
         ObservationDialogDateModel.getInstance().addListener(this);
-        LayersModel.getSingletonInstance().addLayersListener(this);
+
         EventQueue.invokeLater(new Runnable() {
             @Override
             public void run() {
@@ -91,6 +91,7 @@ public abstract class SimpleObservationDialogUIPanel extends ObservationDialogPa
                 initVisualComponents();
                 // Log.debug("SimpleObservationDialogUIPanel time : " +
                 // (System.currentTimeMillis() - start));
+                LayersModel.getSingletonInstance().addLayersListener(SimpleObservationDialogUIPanel.this);
             }
         });
 
