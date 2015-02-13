@@ -6,7 +6,7 @@ import java.awt.FontMetrics;
 import java.awt.Graphics2D;
 import java.awt.RenderingHints;
 import java.awt.image.BufferedImage;
-import java.util.HashMap;
+import java.util.Hashtable;
 
 import javax.media.opengl.GL2;
 
@@ -32,8 +32,8 @@ public class GLCommonRenderGraphics {
         return instance;
     }
 
-    private static HashMap<BufferedImage, GLTextureHelper.GLTexture> mapImageToTexture = new HashMap<BufferedImage, GLTextureHelper.GLTexture>();
-    private static HashMap<StringFontPair, GLTextureHelper.GLTexture> mapStringToTexture = new HashMap<StringFontPair, GLTextureHelper.GLTexture>();
+    private static Hashtable<BufferedImage, GLTextureHelper.GLTexture> mapImageToTexture = new Hashtable<BufferedImage, GLTextureHelper.GLTexture>();
+    private static Hashtable<StringFontPair, GLTextureHelper.GLTexture> mapStringToTexture = new Hashtable<StringFontPair, GLTextureHelper.GLTexture>();
 
     private static BufferedImage stringSizeImage = new BufferedImage(1, 1, BufferedImage.TYPE_BYTE_GRAY);
     private static Graphics2D stringSizeGraphics = stringSizeImage.createGraphics();

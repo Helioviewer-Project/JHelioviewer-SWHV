@@ -86,7 +86,7 @@ public class JPIPConstants {
     /**
      * The maximum length in bytes of a JPIP request.
      */
-    public static final int MAX_REQUEST_LEN = 8000000;
+    public static final int MAX_REQUEST_LEN = 4000000;
 
     /**
      * The minimum length in bytes of a JPIP request.

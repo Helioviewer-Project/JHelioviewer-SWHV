@@ -144,7 +144,7 @@ public class GLTextureHelper {
             moveImageDataToGLTexture(gl, source, 0, 0, width, height, jpxView.tex.get(gl));
             renderTextureToScreen(gl, region);
         } else {
-            Log.debug(">> GLTextureHelper.renderImageDataToScreen(GL) > Image data too big: [" + width + "," + height + "]");
+            Log.error(">> GLTextureHelper.renderImageDataToScreen(GL) > Image data too big: [" + width + "," + height + "]");
         }
     }
 
