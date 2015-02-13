@@ -153,6 +153,7 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
         currentSwingWorker = new SwingWorker<Integer, Integer>() {
             @Override
             public Integer doInBackground() {
+                Thread.currentThread().setName("ChartdrawGraph--EVE");
                 updateDrawInformation();
                 redrawGraph();
                 return 1;

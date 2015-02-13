@@ -66,12 +66,14 @@ public class GL3DPositionLoading {
             worker.cancel(false);
         }
         fireLoaded("Loading...");
+
         worker = new SwingWorker<Integer, Integer>() {
             private String report = null;
             public boolean affect = true;
 
             @Override
             protected Integer doInBackground() throws Exception {
+                Thread.currentThread().setName("GL3DPositionLoading--Main");
                 running = true;
                 try {
                     if (endDatems.getTime() - beginDatems.getTime() < 1000 * 60 * 60 * 24 * 20) {
@@ -104,6 +106,7 @@ public class GL3DPositionLoading {
                 } catch (URISyntaxException e) {
                     report = FAILEDSTATE + ": wrong URI";
                 }
+
                 return 1;
             }
 
@@ -113,6 +116,7 @@ public class GL3DPositionLoading {
 
             @Override
             public void done() {
+
                 if (!this.isCancelled()) {
                     if (report == null && jsonResult != null) {
                         parseData();

@@ -57,6 +57,7 @@ public class RadioDownloader {
 
             @Override
             protected ImageDownloadWorkerResult doInBackground() {
+                Thread.currentThread().setName("RadioDownloader1--EVE");
                 try {
                     List<Interval<Date>> noDataInterval = new ArrayList<Interval<Date>>();
                     List<DownloadedJPXData> jpxList = new ArrayList<DownloadedJPXData>();
@@ -158,7 +159,7 @@ public class RadioDownloader {
     /**
      * Instructs the radio downloader listeners to remove the spectrograms from
      * the plot identified by the plot identifier
-     * 
+     *
      * @param identifier
      *            The identifier of the plot from which the radio spectrograms
      *            should be removed.
@@ -186,6 +187,7 @@ public class RadioDownloader {
 
                 @Override
                 protected ImageDownloadWorkerResult doInBackground() {
+                    Thread.currentThread().setName("RadioDownloader2--EVE");
                     try {
                         Date startDate = interval.getStart();
                         Date requestedStartDate = new Date(startDate.getTime());

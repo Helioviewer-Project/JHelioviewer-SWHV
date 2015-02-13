@@ -111,6 +111,8 @@ public class DownloadedJPXData implements ViewListener, FilterModelListener {
 
             @Override
             protected DownloadedJPXDataWorkerResult doInBackground() {
+                Thread.currentThread().setName("DownloadedJPXDataWorkerResult1--EVE");
+
                 // Log.trace("dworker " + nr + " View changed for image ID : " +
                 // imageID);
                 // Log.debug("dworker " + nr + " Event type: " + aEvent);
@@ -224,6 +226,8 @@ public class DownloadedJPXData implements ViewListener, FilterModelListener {
 
             @Override
             protected DownloadedJPXDataWorkerResult doInBackground() {
+                Thread.currentThread().setName("DownloadedJPXDataWorkerResult2--EVE");
+
                 // Log.trace("dworker " + nr + " View changed for image ID : " +
                 // imageID);
                 // Log.debug("dworker " + nr + " Event type: " + aEvent);
