@@ -292,7 +292,6 @@ public class GL3DComponentView extends AbstractComponentView implements GLEventL
         }
         //if (backGroundColorHasChanged) {
         gl.glClearColor(backgroundColor.getRed() / 255.0f, backgroundColor.getGreen() / 255.0f, backgroundColor.getBlue() / 255.0f, backgroundColor.getAlpha() / 255.0f);
-
         backGroundColorHasChanged = false;
         //}
 
@@ -314,7 +313,6 @@ public class GL3DComponentView extends AbstractComponentView implements GLEventL
         // gl.glLoadIdentity();
 
         gl.glPushMatrix();
-
         if (this.getView() instanceof GLView) {
             ((GLView) this.getView()).renderGL(gl, true);
         }
@@ -411,7 +409,7 @@ public class GL3DComponentView extends AbstractComponentView implements GLEventL
     @Override
     protected void setViewSpecificImplementation(View newView, ChangeEvent changeEvent) {
         // this.orthoView = getAdapter(GL3DOrthoView.class);
-        this.viewportView = getAdapter(ViewportView.class);
+        this.viewportView = view.getAdapter(ViewportView.class);
     }
 
     @Override
@@ -426,12 +424,16 @@ public class GL3DComponentView extends AbstractComponentView implements GLEventL
     @Override
     public void viewChanged(View sender, ChangeEvent aEvent) {
 
-        if (aEvent != null && aEvent.reasonOccurred(ViewChainChangedReason.class) ||
-            (aEvent.reasonOccurred(LayerChangedReason.class) &&
-             aEvent.getLastChangedReasonByType(LayerChangedReason.class) != null &&
-             aEvent.getLastChangedReasonByType(LayerChangedReason.class).getLayerChangeType() == LayerChangeType.LAYER_ADDED)) {
-            rebuildShadersRequest = true;
-            this.viewportView = getAdapter(ViewportView.class);
+        if (aEvent != null) {
+            LayerChangedReason layerChanged;
+
+            if ((aEvent.reasonOccurred(LayerChangedReason.class) &&
+                 (layerChanged = aEvent.getLastChangedReasonByType(LayerChangedReason.class)) != null &&
+                  layerChanged.getLayerChangeType() == LayerChangeType.LAYER_ADDED) ||
+                aEvent.reasonOccurred(ViewChainChangedReason.class)) {
+                rebuildShadersRequest = true;
+                this.viewportView = getAdapter(ViewportView.class);
+            }
         }
 
         TimestampChangedReason timestampReason = aEvent.getLastChangedReasonByType(TimestampChangedReason.class);
