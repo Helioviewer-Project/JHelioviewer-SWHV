@@ -15,6 +15,7 @@ import org.helioviewer.base.math.Interval;
 import org.helioviewer.base.math.Vector2dDouble;
 import org.helioviewer.base.math.Vector2dInt;
 import org.helioviewer.plugins.eveplugin.EVEState;
+import org.helioviewer.plugins.eveplugin.model.PlotAreaSpaceManager;
 import org.helioviewer.plugins.eveplugin.radio.model.ResolutionSetting;
 import org.helioviewer.plugins.eveplugin.radio.model.YValueModel;
 import org.helioviewer.plugins.eveplugin.radio.model.YValueModelManager;
@@ -172,6 +173,7 @@ public class RadioDataManager implements RadioDownloaderListener {
         }
         downloadRequestData.remove(drd.getDownloadID());
         fireDownloadRequestDataRemoved(drd);
+        PlotAreaSpaceManager.getInstance().getPlotAreaSpace(drd.getPlotIdentifier()).resetSelectedValueAndTimeInterval();
     }
 
     /**

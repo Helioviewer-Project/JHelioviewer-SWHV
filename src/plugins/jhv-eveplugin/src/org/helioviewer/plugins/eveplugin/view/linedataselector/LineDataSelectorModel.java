@@ -6,8 +6,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.helioviewer.plugins.eveplugin.model.PlotAreaSpaceManager;
-
 public class LineDataSelectorModel {
     private final List<LineDataSelectorModelListener> listeners;
     private final Map<String, List<LineDataSelectorElement>> elementMap;
@@ -75,7 +73,6 @@ public class LineDataSelectorModel {
                 elements.remove(element);
                 if (elements.size() == 0) {
                     elementMap.remove(element.getPlotIdentifier());
-                    PlotAreaSpaceManager.getInstance().getPlotAreaSpace(element.getPlotIdentifier()).resetSelectedValueAndTimeInterval();
                 }
             }
 
