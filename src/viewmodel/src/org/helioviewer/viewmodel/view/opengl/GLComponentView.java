@@ -321,21 +321,19 @@ public class GLComponentView extends AbstractComponentView implements GLEventLis
         ViewportImageSize viewportImageSize = ViewHelper.calculateViewportImageSize(view);
 
         if (viewportImageSize != null) {
-            // Draw image
-
             gl.glPushMatrix();
 
             Region region = regionView.getRegion();
-
             gl.glTranslatef(xOffsetFinal, yOffsetFinal, 0.0f);
             gl.glScalef(viewportImageSize.getWidth() / (float) region.getWidth(), viewportImageSize.getHeight() / (float) region.getHeight(), 1.0f);
-            gl.glTranslated(-region.getCornerX(), -region.getCornerY(), 0.0);
+            gl.glTranslatef((float) -region.getCornerX(), (float) -region.getCornerY(), 0.0f);
 
             if (view instanceof GLView) {
                 ((GLView) view).renderGL(gl, true);
             } else {
                 GLTextureHelper.renderImageDataToScreen(gl, view.getAdapter(RegionView.class).getRegion(), view.getAdapter(SubimageDataView.class).getSubimageData(), view.getAdapter(JHVJP2View.class));
             }
+
             gl.glPopMatrix();
         }
 
@@ -496,7 +494,7 @@ public class GLComponentView extends AbstractComponentView implements GLEventLis
      */
     @Override
     protected void setViewSpecificImplementation(View newView, ChangeEvent changeEvent) {
-        // this.viewportView = getAdapter(ViewportView.class);
+        this.regionView = view.getAdapter(RegionView.class);
     }
 
     @Override
@@ -514,15 +512,16 @@ public class GLComponentView extends AbstractComponentView implements GLEventLis
     @Override
     public void viewChanged(View sender, ChangeEvent aEvent) {
 
-        if (aEvent != null && aEvent.reasonOccurred(ViewChainChangedReason.class)) {
-            regionView = view.getAdapter(RegionView.class);
-        }
+        if (aEvent != null) {
+            LayerChangedReason layerChanged;
 
-        if (aEvent != null && aEvent.reasonOccurred(ViewChainChangedReason.class) ||
-            (aEvent.reasonOccurred(LayerChangedReason.class) &&
-             aEvent.getLastChangedReasonByType(LayerChangedReason.class) != null &&
-             aEvent.getLastChangedReasonByType(LayerChangedReason.class).getLayerChangeType() == LayerChangeType.LAYER_ADDED)) {
-            rebuildShadersRequest = true;
+            if ((aEvent.reasonOccurred(LayerChangedReason.class) &&
+                 (layerChanged = aEvent.getLastChangedReasonByType(LayerChangedReason.class)) != null &&
+                  layerChanged.getLayerChangeType() == LayerChangeType.LAYER_ADDED) ||
+                aEvent.reasonOccurred(ViewChainChangedReason.class)) {
+                rebuildShadersRequest = true;
+                this.regionView = view.getAdapter(RegionView.class);
+            }
         }
 
         TimestampChangedReason timestampReason = aEvent.getLastChangedReasonByType(TimestampChangedReason.class);
