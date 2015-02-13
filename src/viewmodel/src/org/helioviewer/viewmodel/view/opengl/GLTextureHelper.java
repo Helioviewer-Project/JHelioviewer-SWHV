@@ -151,37 +151,18 @@ public class GLTextureHelper {
      *            Image data to draw to the screen
      */
     public static void renderImageDataToScreen(GL2 gl, Region region, ImageData source, JHVJP2View jpxView) {
-        if (source == null)
+        if (source == null || jpxView == null)
             return;
-        if (source.getWidth() <= maxTextureSize && source.getHeight() <= maxTextureSize) {
-            if (jpxView != null) {
-                moveImageDataToGLTexture(gl, source, 0, 0, source.getWidth(), source.getHeight(), jpxView.tex.get(gl));
-            }
+
+        int texID = jpxView.tex.get(gl);
+        int width = source.getWidth();
+        int height = source.getHeight();
+
+        if (width <= maxTextureSize && height <= maxTextureSize) {
+            moveImageDataToGLTexture(gl, source, 0, 0, width, height, texID);
             renderTextureToScreen(gl, region);
-
         } else {
-            ColorMask colorMask = source.getColorMask();
-            if (colorMask.getMask() != 0xFFFFFFFF) {
-                gl.glColorMask(colorMask.showRed(), colorMask.showGreen(), colorMask.showBlue(), true);
-            }
-
-            Vector2dDouble lowerleftCorner = region.getLowerLeftCorner();
-            Vector2dDouble size = region.getSize();
-
-            for (int x = 0; x < source.getWidth(); x += maxTextureSize) {
-                for (int y = 0; y < source.getHeight(); y += maxTextureSize) {
-
-                    int width = Math.min(source.getWidth() - x, maxTextureSize);
-                    int height = Math.min(source.getHeight() - y, maxTextureSize);
-                    if (jpxView != null) {
-                        moveImageDataToGLTexture(gl, source, x, y, width, height, jpxView.tex.get(gl));
-                    }
-                    float x0 = (float) lowerleftCorner.getX() + (float) size.getX() * x / source.getWidth();
-                    float y1 = (float) lowerleftCorner.getY() + (float) size.getY() * (source.getHeight() - y) / source.getHeight();
-                    renderTextureToScreen(gl, x0, y1 - ((float) size.getY()) * (height + 1.5f) / source.getHeight(), x0 + ((float) size.getX()) * (width + 1.5f) / source.getWidth(), y1);
-                }
-            }
-            gl.glColorMask(true, true, true, true);
+            Log.debug(">> GLTextureHelper.renderImageDataToScreen(GL) > Image data too big: [" + width + "," + height + "]");
         }
     }
 
