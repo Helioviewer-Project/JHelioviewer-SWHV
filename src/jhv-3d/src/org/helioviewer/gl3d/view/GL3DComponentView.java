@@ -1,6 +1,7 @@
 package org.helioviewer.gl3d.view;
 
 import java.awt.Color;
+import java.awt.Dimension;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
@@ -93,7 +94,13 @@ public class GL3DComponentView extends AbstractComponentView implements GLEventL
     private File outputFile;
 
     public GL3DComponentView() {
-        canvas = GLSharedDrawable.getSingletonInstance().getCanvas();
+        GLSharedDrawable shared = GLSharedDrawable.getSingletonInstance();
+
+        //canvas = GLSharedDrawable.getSingletonInstance().getCanvas();
+        canvas = new GLCanvas(shared.caps);
+        canvas.setSharedAutoDrawable(shared.sharedDrawable);
+        canvas.setMinimumSize(new Dimension(0, 0));
+
         canvas.addGLEventListener(this);
 
         Displayer.getSingletonInstance().register(this);
@@ -198,8 +205,6 @@ public class GL3DComponentView extends AbstractComponentView implements GLEventL
     public void init(GLAutoDrawable drawable) {
         Log.debug("GL3DComponentView.Init");
 
-        GLCommonRenderGraphics.getSingletonInstance().clearTextureCaches();
-
         GL2 gl = drawable.getGL().getGL2();
         GL3DState.create(gl);
 
@@ -235,9 +240,9 @@ public class GL3DComponentView extends AbstractComponentView implements GLEventL
     }
 
     @Override
-    public void reshape(GLAutoDrawable glAD, int x, int y, int width, int height) {
+    public void reshape(GLAutoDrawable drawable, int x, int y, int width, int height) {
         viewportSize = new Vector2dInt(width, height);
-        GL2 gl = glAD.getGL().getGL2();
+        GL2 gl = drawable.getGL().getGL2();
         gl.setSwapInterval(1);
     }
 
@@ -268,6 +273,8 @@ public class GL3DComponentView extends AbstractComponentView implements GLEventL
 
         int width = this.viewportSize.getX();
         int height = this.viewportSize.getY();
+        GL3DState.getUpdated(gl, width, height);
+
         AWTGLPixelBuffer pixelBuffer = null;
         if ((screenshotMode || exportMode) && mv != null) {
             tileRenderer.setTileSize(width, height, 0);
@@ -281,7 +288,6 @@ public class GL3DComponentView extends AbstractComponentView implements GLEventL
                     break;
                 }
                 tileRenderer.beginTile(gl);
-                GL3DState.getUpdated(gl, width, height);
             }
         }
         //if (backGroundColorHasChanged) {
