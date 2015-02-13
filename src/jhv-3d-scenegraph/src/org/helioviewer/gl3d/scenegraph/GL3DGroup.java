@@ -13,9 +13,9 @@ import org.helioviewer.gl3d.scenegraph.visuals.GL3DPolyLine;
  * group is also a {@link GL3DShape} thus can be moved around in the world
  * space, has its own {@link GL3DDrawBits} and wraps its {@link GL3DAABBox}
  * around its child nodes.
- * 
+ *
  * @author Simon Spoerri (simon.spoerri@fhnw.ch)
- * 
+ *
  */
 public class GL3DGroup extends GL3DShape {
     protected GL3DNode first;
@@ -23,8 +23,8 @@ public class GL3DGroup extends GL3DShape {
 
     private int numberOfNodes;
 
-    private List<GL3DPolyLine> nodesToAdd;
-    private List<GL3DPolyLine> nodesToDelete;
+    private final List<GL3DPolyLine> nodesToAdd;
+    private final List<GL3DPolyLine> nodesToDelete;
 
     public GL3DGroup(String name) {
         super(name);
@@ -48,12 +48,6 @@ public class GL3DGroup extends GL3DShape {
     public void shapeDraw(GL3DState state) {
         GL3DNode node = this.first;
         while (node != null) {
-            if (node.parent != null) {
-                if (node.parent.getName() == "HEK" && nodesToAdd.size() > 0) {
-                    node.delete(state);
-                }
-            }
-
             node.draw(state);
             node = node.next;
         }
@@ -81,6 +75,7 @@ public class GL3DGroup extends GL3DShape {
         return wasHit;
     }
 
+    @Override
     public void shapeUpdate(GL3DState state) {
         GL3DNode node = this.first;
         while (node != null) {
@@ -290,6 +285,7 @@ public class GL3DGroup extends GL3DShape {
         return numberOfChilds;
     }
 
+    @Override
     public GL3DAABBox buildAABB() {
         GL3DNode current = this.first;
         this.aabb = new GL3DAABBox();
