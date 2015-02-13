@@ -285,7 +285,7 @@ public class GLComponentView extends AbstractComponentView implements GLEventLis
         GL2 gl = drawable.getGL().getGL2();
         this.viewportSize = new Vector2dInt(width, height);
 
-        gl.setSwapInterval(1);
+        // gl.setSwapInterval(1);
 
         gl.glViewport(0, 0, width, height);
         gl.glMatrixMode(GL2.GL_PROJECTION);

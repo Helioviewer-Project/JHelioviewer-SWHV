@@ -242,8 +242,8 @@ public class GL3DComponentView extends AbstractComponentView implements GLEventL
     @Override
     public void reshape(GLAutoDrawable drawable, int x, int y, int width, int height) {
         viewportSize = new Vector2dInt(width, height);
-        GL2 gl = drawable.getGL().getGL2();
-        gl.setSwapInterval(1);
+        // GL2 gl = drawable.getGL().getGL2();
+        // gl.setSwapInterval(1);
     }
 
     @Override
