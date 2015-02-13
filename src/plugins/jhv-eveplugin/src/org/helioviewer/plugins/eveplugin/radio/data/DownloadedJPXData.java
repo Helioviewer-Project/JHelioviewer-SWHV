@@ -10,8 +10,8 @@ import javax.swing.SwingWorker;
 import org.helioviewer.base.logging.Log;
 import org.helioviewer.plugins.eveplugin.radio.filter.FilterModel;
 import org.helioviewer.plugins.eveplugin.radio.filter.FilterModelListener;
+import org.helioviewer.viewmodel.changeevent.CacheStatusChangedReason;
 import org.helioviewer.viewmodel.changeevent.ChangeEvent;
-import org.helioviewer.viewmodel.changeevent.ViewportChangedReason;
 import org.helioviewer.viewmodel.imagedata.ARGBInt32ImageData;
 import org.helioviewer.viewmodel.imagedata.ImageData;
 import org.helioviewer.viewmodel.imagedata.SingleChannelByte8ImageData;
@@ -114,8 +114,20 @@ public class DownloadedJPXData implements ViewListener, FilterModelListener {
                 // Log.trace("dworker " + nr + " View changed for image ID : " +
                 // imageID);
                 // Log.debug("dworker " + nr + " Event type: " + aEvent);
-                for (ViewportChangedReason cr : aEvent.getAllChangedReasonsByType(ViewportChangedReason.class)) {
-                    radioDataManager.finishedDownloadingID(imageID, downloadID);
+                // for (ViewportChangedReason cr :
+                // aEvent.getAllChangedReasonsByType(ViewportChangedReason.class))
+                // {
+                // radioDataManager.finishedDownloadingID(imageID, downloadID);
+                // }
+                CacheStatusChangedReason cacheReason = aEvent.getLastChangedReasonByType(CacheStatusChangedReason.class);
+                if (cacheReason != null && cacheReason.getView() == view) {
+                    switch (cacheReason.getType()) {
+                    case PARTIAL:
+                        break;
+                    case COMPLETE:
+                        radioDataManager.finishedDownloadingID(imageID, downloadID);
+                        break;
+                    }
                 }
 
                 return getJPXData(sender);
@@ -294,6 +306,7 @@ public class DownloadedJPXData implements ViewListener, FilterModelListener {
     }
 
     public void remove() {
+        radioDataManager.finishedDownloadingID(imageID, downloadID);
         if (worker != null && !worker.isDone()) {
             worker.cancel(true);
             worker = null;
