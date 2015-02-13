@@ -29,7 +29,7 @@ public class GL3DFollowObjectCamera extends GL3DSolarRotationTrackingTrackballCa
     private double currentRotation = 0.0;
     private long timediff;
     private final ArrayList<GL3DFollowObjectCameraListener> followObjectCameraListeners = new ArrayList<GL3DFollowObjectCameraListener>();
-    GL3DCameraFOV cameraFOV;
+    GL3DCameraFOV cameraFOVDraw;
     private final GL3DPositionLoading positionLoading;
     private double FOVangle;
     private double currentL = 0.;
@@ -45,8 +45,9 @@ public class GL3DFollowObjectCamera extends GL3DSolarRotationTrackingTrackballCa
         super(sceneGraphView);
         positionLoading = new GL3DPositionLoading();
         positionLoading.addListener(this);
-        cameraFOV = new GL3DCameraFOV(1., 1.);
-        sceneGraphView.getRoot().addNode(cameraFOV);
+        this.cameraFOVDraw = new GL3DCameraFOV(1., 1.);
+        this.sceneGraphView.getRoot().addNode(this.cameraFOVDraw);
+        this.cameraFOVDraw.getDrawBits().set(Bit.Hidden, fovhidden);
         LayersModel.getSingletonInstance().addLayersListener(this);
     }
 
@@ -63,17 +64,27 @@ public class GL3DFollowObjectCamera extends GL3DSolarRotationTrackingTrackballCa
     @Override
     public void activate() {
         super.activate();
-        this.cameraFOV.getDrawBits().set(Bit.Hidden, this.fovhidden);
+        this.cameraFOVDraw.getDrawBits().set(Bit.Hidden, this.fovhidden);
         getSceneGraphView().addViewListener(this);
     };
 
     @Override
     public void deactivate() {
         super.deactivate();
-        this.fovhidden = this.cameraFOV.getDrawBits().get(Bit.Hidden);
-        this.cameraFOV.getDrawBits().on(Bit.Hidden);
+        this.fovhidden = this.cameraFOVDraw.getDrawBits().get(Bit.Hidden);
+        this.cameraFOVDraw.getDrawBits().on(Bit.Hidden);
         getSceneGraphView().removeViewListener(this);
+        this.cameraFOVDraw.getDrawBits().set(Bit.Hidden, true);
     };
+
+    public void createNewFOV(GL3DSceneGraphView gv) {
+        boolean hidden = this.cameraFOVDraw.getDrawBits().get(Bit.Hidden);
+        this.sceneGraphView.getRoot().removeNode(this.cameraFOVDraw);
+        GL3DCameraFOV newFOVDraw = new GL3DCameraFOV(1., 1.);
+        newFOVDraw.getDrawBits().set(Bit.Hidden, hidden);
+        gv.getRoot().addNode(newFOVDraw);
+        this.cameraFOVDraw = newFOVDraw;
+    }
 
     @Override
     public String getName() {
@@ -125,8 +136,8 @@ public class GL3DFollowObjectCamera extends GL3DSolarRotationTrackingTrackballCa
     }
 
     private void setFOV(double scale) {
-        this.cameraFOV.scale(scale);
-        this.cameraFOV.setAngles(this.currentB, this.currentRotation);
+        this.cameraFOVDraw.scale(scale);
+        this.cameraFOVDraw.setAngles(this.currentB, this.currentRotation);
     }
 
     private void fireCameratTime(Date currentCameraTime) {

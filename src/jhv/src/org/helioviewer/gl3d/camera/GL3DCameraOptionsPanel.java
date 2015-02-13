@@ -78,10 +78,12 @@ public class GL3DCameraOptionsPanel extends JPanel implements GL3DCameraSelectio
     }
 
     private void initCamera(GL3DCamera newCamera) {
+        changeCamera(newCamera);
         cameraSelectorModel.setCurrentCamera(newCamera);
         optionsPanel = cameraOptionsAttributeManager.getCameraOptionAttributePanel(newCamera);
         Displayer.getSingletonInstance().display();
         tab.setComponentAt(0, optionsPanel);
+        tab.setSelectedIndex(0);
     }
 
     private void changeCamera(GL3DCamera newCamera) {
