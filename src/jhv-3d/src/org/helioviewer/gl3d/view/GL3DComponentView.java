@@ -1,7 +1,6 @@
 package org.helioviewer.gl3d.view;
 
 import java.awt.Color;
-import java.awt.Dimension;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
@@ -94,13 +93,7 @@ public class GL3DComponentView extends AbstractComponentView implements GLEventL
     private File outputFile;
 
     public GL3DComponentView() {
-        GLSharedDrawable shared = GLSharedDrawable.getSingletonInstance();
-
-        //canvas = GLSharedDrawable.getSingletonInstance().getCanvas();
-        canvas = new GLCanvas(shared.caps);
-        canvas.setSharedAutoDrawable(shared.sharedDrawable);
-        canvas.setMinimumSize(new Dimension(0, 0));
-
+        canvas = GLSharedDrawable.getSingletonInstance().getCanvas();
         canvas.addGLEventListener(this);
 
         Displayer.getSingletonInstance().register(this);
