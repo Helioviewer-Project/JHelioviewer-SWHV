@@ -9,6 +9,7 @@ import javax.media.opengl.glu.GLU;
 import org.helioviewer.base.logging.Log;
 import org.helioviewer.base.physics.Constants;
 import org.helioviewer.gl3d.scenegraph.GL3DDrawBits.Bit;
+import org.helioviewer.gl3d.scenegraph.GL3DNode;
 import org.helioviewer.gl3d.scenegraph.GL3DState;
 import org.helioviewer.gl3d.scenegraph.math.GL3DMat4d;
 import org.helioviewer.gl3d.scenegraph.math.GL3DQuatd;
@@ -16,6 +17,7 @@ import org.helioviewer.gl3d.scenegraph.math.GL3DVec3d;
 import org.helioviewer.gl3d.scenegraph.math.GL3DVec4d;
 import org.helioviewer.gl3d.scenegraph.math.GL3DVec4f;
 import org.helioviewer.gl3d.scenegraph.visuals.GL3DGrid;
+import org.helioviewer.gl3d.view.GL3DSceneGraphView;
 import org.helioviewer.gl3d.wcs.CoordinateSystem;
 
 /**
@@ -40,8 +42,8 @@ public abstract class GL3DCamera {
 
     public static final double MIN_FOV = INITFOV * 0.05;
     public static final double MAX_FOV = INITFOV * 100;
-    private double clipNear = Constants.SunRadius * 3;
-    private double clipFar = Constants.SunRadius * 10000.;
+    private final double clipNear = Constants.SunRadius * 3;
+    private final double clipFar = Constants.SunRadius * 10000.;
     private double fov = INITFOV;
     private double aspect = 0.0;
     private double width = 0.0;
@@ -68,45 +70,40 @@ public abstract class GL3DCamera {
 
     private double gridResolutionX = 20;
     private double gridResolutionY = 20;
-    private GL3DGrid grid;
+    protected GL3DGrid grid;
+    private GL3DGrid followGrid;
 
     private long time;
 
-    private GL3DGrid followGrid;
-
     private boolean trackingMode;
 
-    public GL3DCamera(double clipNear, double clipFar) {
-        this();
-        this.clipNear = clipNear;
-        this.clipFar = clipFar;
-    }
+    protected GL3DSceneGraphView sceneGraphView;
 
-    public GL3DCamera() {
+    public GL3DCamera(GL3DSceneGraphView sceneGraphView) {
+        this.sceneGraphView = sceneGraphView;
         this.cameraTransformation = GL3DMat4d.identity();
         this.rotation = GL3DQuatd.createRotation(0.0, new GL3DVec3d(0, 1, 0));
         this.currentDragRotation = GL3DQuatd.createRotation(0.0, new GL3DVec3d(0, 1, 0));
         this.localRotation = GL3DQuatd.createRotation(0.0, new GL3DVec3d(0, 1, 0));
         this.translation = new GL3DVec3d();
-        this.grid = new GL3DGrid("grid", getGridResolutionX(), getGridResolutionY(), new GL3DVec4f(1.0f, 0.0f, 0.0f, 1.0f), new GL3DVec4d(0.0, 1.0, 0.0, 1.0), false);
-        this.followGrid = new GL3DGrid("grid", 90., 90., new GL3DVec4f(1.0f, 0.0f, 0.0f, 1.0f), new GL3DVec4d(0.0, 1.0, 0.0, 1.0), true);
-
-        this.getGrid().getDrawBits().on(Bit.Hidden);
-        this.getFollowGrid().getDrawBits().on(Bit.Hidden);
-
+        GL3DGrid grid = new GL3DGrid("grid", getGridResolutionX(), getGridResolutionY(), new GL3DVec4f(1.0f, 0.0f, 0.0f, 1.0f), new GL3DVec4d(0.0, 1.0, 0.0, 1.0), false);
+        GL3DGrid followGrid = new GL3DGrid("grid", 90., 90., new GL3DVec4f(1.0f, 0.0f, 0.0f, 1.0f), new GL3DVec4d(0.0, 1.0, 0.0, 1.0), true);
+        this.sceneGraphView.getRoot().addNode(grid);
+        this.sceneGraphView.getRoot().addNode(followGrid);
+        this.grid = grid;
+        this.followGrid = followGrid;
+        this.grid.getDrawBits().on(Bit.Hidden);
+        this.followGrid.getDrawBits().on(Bit.Hidden);
     }
 
     public GL3DGrid getGrid() {
         return this.grid;
-
     }
 
     public GL3DGrid setFollowGrid(GL3DGrid followgrid) {
         return this.followGrid = followgrid;
 
     }
-
-    public abstract void createNewGrid();
 
     public void setGridResolution(int resolution) {
         this.setGridResolutionX(resolution);
@@ -124,11 +121,9 @@ public abstract class GL3DCamera {
         createNewGrid();
     }
 
-    public void setGrid(GL3DGrid grid, GL3DGrid followGrid) {
-
-        this.grid = grid;
-        this.followGrid = followGrid;
-    };
+    protected GL3DSceneGraphView getSceneGraphView() {
+        return this.sceneGraphView;
+    }
 
     public void reset() {
         this.resetFOV();
@@ -225,8 +220,29 @@ public abstract class GL3DCamera {
         this.updateCameraTransformation();
     }
 
+    public void setSceneGraphView(GL3DSceneGraphView sgv) {
+        this.sceneGraphView = sgv;
+    }
+
     public void activate() {
         //this.getGrid().getDrawBits().off(Bit.Hidden);
+    }
+
+    public void createNewGrid() {
+        this.createNewGrid(this.sceneGraphView);
+    }
+
+    public void createNewGrid(GL3DSceneGraphView gv) {
+        boolean hidden = getGrid().getDrawBits().get(Bit.Hidden);
+        this.sceneGraphView.getRoot().removeNode(this.grid);
+        this.sceneGraphView.getRoot().removeNode(this.followGrid);
+
+        GL3DGrid newGrid = new GL3DGrid("grid", getGridResolutionX(), getGridResolutionY(), new GL3DVec4f(1.0f, 0.0f, 0.0f, 1.0f), new GL3DVec4d(0.0, 1.0, 0.0, 1.0), false);
+        newGrid.getDrawBits().set(Bit.Hidden, hidden);
+        GL3DGrid followCameraGrid = new GL3DGrid("grid", 90., 90., new GL3DVec4f(1.0f, 0.0f, 0.0f, 1.0f), new GL3DVec4d(0.0, 1.0, 0.0, 1.0), true);
+        followCameraGrid.getDrawBits().set(Bit.Hidden, hidden);
+        gv.getRoot().addNode(this.grid);
+        gv.getRoot().addNode(this.followGrid);
     }
 
     public void applyPerspective(GL3DState state) {
@@ -403,10 +419,6 @@ public abstract class GL3DCamera {
         return time;
     }
 
-    public GL3DGrid getFollowGrid() {
-        return this.followGrid;
-    }
-
     public void setTrackingMode(boolean trackingMode) {
         this.trackingMode = trackingMode;
     }
@@ -420,5 +432,9 @@ public abstract class GL3DCamera {
 
     public void setDefaultFOV() {
         this.fov = INITFOV;
+    }
+
+    public GL3DNode getFollowGrid() {
+        return this.followGrid;
     }
 }

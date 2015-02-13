@@ -159,10 +159,10 @@ public class GL3DFollowObjectCameraOptionPanel extends GL3DCameraOptionPanel imp
             @Override
             public void actionPerformed(ActionEvent evt) {
                 if (fovVisible) {
-                    camera.cameraFOV.getDrawBits().on(Bit.Hidden);
+                    camera.cameraFOVDraw.getDrawBits().on(Bit.Hidden);
                     visibleFovButton.setIcon(IconBank.getIcon(JHVIcon.HIDDEN));
                 } else {
-                    camera.cameraFOV.getDrawBits().off(Bit.Hidden);
+                    camera.cameraFOVDraw.getDrawBits().off(Bit.Hidden);
                     visibleFovButton.setIcon(IconBank.getIcon(JHVIcon.VISIBLE));
                 }
                 fovVisible = !fovVisible;

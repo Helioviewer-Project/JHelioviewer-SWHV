@@ -8,6 +8,7 @@
 	<classpathentry combineaccessrules="false" kind="src" path="/base"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/viewmodel"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/jhv-display"/>
-        <classpathentry kind="lib" path="../lib/jogl.jar"/>
+	<classpathentry kind="lib" path="../lib/jogl.jar"/>
+	<classpathentry kind="src" path="/jhv-3d"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

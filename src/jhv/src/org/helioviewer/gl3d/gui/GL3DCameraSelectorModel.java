@@ -13,6 +13,7 @@ import org.helioviewer.gl3d.camera.GL3DEarthCamera;
 import org.helioviewer.gl3d.camera.GL3DFollowObjectCamera;
 import org.helioviewer.gl3d.camera.GL3DObserverCamera;
 import org.helioviewer.gl3d.camera.GL3DSolarRotationTrackingTrackballCamera;
+import org.helioviewer.gl3d.scenegraph.GL3DDrawBits.Bit;
 import org.helioviewer.gl3d.view.GL3DCameraView;
 import org.helioviewer.gl3d.view.GL3DSceneGraphView;
 import org.helioviewer.jhv.gui.ImageViewerGui;
@@ -56,8 +57,7 @@ public class GL3DCameraSelectorModel extends AbstractListModel implements ComboB
     private GL3DCameraSelectorModel() {
     }
 
-    public void activate(GL3DSceneGraphView sceneGraphView) {
-
+    public synchronized void activate(GL3DSceneGraphView sceneGraphView) {
         if (sceneGraphView != null) {
             if (earthCamera == null) {
                 earthCamera = new GL3DEarthCamera(sceneGraphView);
@@ -71,17 +71,28 @@ public class GL3DCameraSelectorModel extends AbstractListModel implements ComboB
 
                 defaultCamera = observerCamera;
             } else {
+                earthCamera.createNewGrid(sceneGraphView);
                 earthCamera.setSceneGraphView(sceneGraphView);
-                earthCamera.createNewGrid();
+                observerCamera.createNewGrid(sceneGraphView);
                 observerCamera.setSceneGraphView(sceneGraphView);
-                observerCamera.createNewGrid();
+
+                followObjectCamera.createNewGrid(sceneGraphView);
+                followObjectCamera.createNewFOV(sceneGraphView);
                 followObjectCamera.setSceneGraphView(sceneGraphView);
-                followObjectCamera.createNewGrid();
+
+                earthCamera.getGrid().getDrawBits().set(Bit.Hidden, true);
+                earthCamera.getFollowGrid().getDrawBits().set(Bit.Hidden, true);
+                observerCamera.getGrid().getDrawBits().set(Bit.Hidden, true);
+                observerCamera.getFollowGrid().getDrawBits().set(Bit.Hidden, true);
+                followObjectCamera.getGrid().getDrawBits().set(Bit.Hidden, true);
+                followObjectCamera.getFollowGrid().getDrawBits().set(Bit.Hidden, true);
+
+                setCurrentCamera(observerCamera);
             }
             if (lastCamera != null) {
                 setCurrentCamera(lastCamera);
             } else if (getCameraView() != null) {
-                getCameraView().setCurrentCamera(defaultCamera);
+                setCurrentCamera(defaultCamera);
             } else {
                 Log.warn("Cannot set Current Camera, no GL3DCameraView yet!");
             }
