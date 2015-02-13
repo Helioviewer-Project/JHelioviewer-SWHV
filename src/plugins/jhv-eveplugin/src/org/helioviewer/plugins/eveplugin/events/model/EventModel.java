@@ -142,7 +142,11 @@ public class EventModel implements ZoomControllerListener, EventRequesterListene
 
     public EventTypePlotConfiguration getEventTypePlotConfiguration() {
         synchronized (intervalLock) {
-            return eventPlotConfiguration;
+            if (eventPlotConfiguration != null) {
+                return eventPlotConfiguration;
+            } else {
+                return new EventTypePlotConfiguration();
+            }
         }
     }
 
