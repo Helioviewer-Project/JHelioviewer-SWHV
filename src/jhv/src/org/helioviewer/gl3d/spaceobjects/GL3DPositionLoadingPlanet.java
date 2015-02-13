@@ -88,6 +88,8 @@ public class GL3DPositionLoadingPlanet {
 
             @Override
             protected Integer doInBackground() throws Exception {
+                Thread.currentThread().setName("GL3DPositionLoadingPlanet--Main");
+
                 running = true;
                 try {
                     setLoaded(false);
