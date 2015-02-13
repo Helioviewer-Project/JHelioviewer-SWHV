@@ -1,7 +1,6 @@
 package org.helioviewer.viewmodel.view.opengl;
 
 import java.awt.Color;
-import java.awt.Dimension;
 import java.awt.Component;
 import java.awt.image.BufferedImage;
 import java.io.File;
@@ -118,13 +117,7 @@ public class GLComponentView extends AbstractComponentView implements GLEventLis
      * Also initializes all OpenGL Helper classes.
      */
     public GLComponentView() {
-        GLSharedDrawable shared = GLSharedDrawable.getSingletonInstance();
-
-        //canvas = GLSharedDrawable.getSingletonInstance().getCanvas();
-        canvas = new GLCanvas(shared.caps);
-        canvas.setSharedAutoDrawable(shared.sharedDrawable);
-        canvas.setMinimumSize(new Dimension(0, 0));
-
+        canvas = GLSharedDrawable.getSingletonInstance().getCanvas();
         canvas.addGLEventListener(this);
 
         Displayer.getSingletonInstance().register(this);

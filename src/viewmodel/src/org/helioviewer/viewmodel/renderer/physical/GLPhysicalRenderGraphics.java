@@ -14,7 +14,7 @@ import org.helioviewer.viewmodel.renderer.GLCommonRenderGraphics;
 import org.helioviewer.viewmodel.view.View;
 
 /**
- * Implementation of PhyscialRenderGraphics, using OpenGL for drawing.
+ * Implementation of PhysicalRenderGraphics, using OpenGL for drawing.
  *
  * <p>
  * Maps all methods to corresponding OpenGL methods.
