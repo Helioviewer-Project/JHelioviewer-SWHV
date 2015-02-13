@@ -761,6 +761,8 @@ public class RadioDataManager implements RadioDownloaderListener {
                         jp2CallistoView.setViewport(new ViewportAdapter(new StaticViewport(lastUsedResolutionSetting.getVec2dIntRepresentation())), new ChangeEvent());
                         RadioImage tempRs = new RadioImage(djd, downloadID, djd.getImageID(), dateInterval, fi, i, rs, resolutionSettings, plotIdentifier, true);
                         tempRs.setLastUsedResolutionSetting(lastUsedResolutionSetting);
+                        Rectangle roi = tempRs.getROI();
+                        jp2CallistoView.setRegion(new RegionAdapter(new StaticRegion(roi.getX(), roi.getY(), new Vector2dDouble(roi.getWidth(), roi.getHeight()))), new ChangeEvent());
                         drd.addRadioImage(tempRs);
                     } else {
                         Log.error("Start and/or stop is null");
@@ -827,6 +829,8 @@ public class RadioDataManager implements RadioDownloaderListener {
                         ResolutionSetting lastUsedResolutionSetting = tempRs.defineBestResolutionSetting(ratioX, ratioY);
                         jpxCallistoView.setViewport(new ViewportAdapter(new StaticViewport(lastUsedResolutionSetting.getVec2dIntRepresentation())), new ChangeEvent());
                         tempRs.setLastUsedResolutionSetting(lastUsedResolutionSetting);
+                        Rectangle roi = tempRs.getROI();
+                        jpxCallistoView.setRegion(new RegionAdapter(new StaticRegion(roi.getX(), roi.getY(), new Vector2dDouble(roi.getWidth(), roi.getHeight()))), new ChangeEvent());
                         drd.addRadioImage(tempRs);
                     } else {
                         Log.error("Start and/or stop is null");
