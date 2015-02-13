@@ -536,29 +536,11 @@ public class GLComponentView extends AbstractComponentView implements GLEventLis
         notifyViewListeners(aEvent);
     }
 
-    /**
-     * Start rebuilding all shaders.
-     *
-     * This function is called, whenever the shader structure of the whole view
-     * chain may have changed, e.g. when new views are added.
-     *
-     * @param gl
-     *            Valid reference to the current gl object
-     */
     private void rebuildShaders(GL2 gl) {
         rebuildShadersRequest = false;
         shaderHelper.delAllShaderIDs(gl);
 
         GLFragmentShaderView fragmentView = view.getAdapter(GLFragmentShaderView.class);
-        GLVertexShaderView vertexView = view.getAdapter(GLVertexShaderView.class);
-        GLVertexShaderView vertexHelperView = null;
-        GLFragmentShaderView fragmentHelperView = null;
-        while (vertexView != vertexHelperView && fragmentView != fragmentHelperView) {
-            fragmentView = fragmentHelperView;
-            vertexView = vertexHelperView;
-            fragmentHelperView = view.getAdapter(GLFragmentShaderView.class);
-            vertexHelperView = view.getAdapter(GLVertexShaderView.class);
-        }
         if (fragmentView != null) {
             // create new shader builder
             GLShaderBuilder newShaderBuilder = new GLShaderBuilder(gl, GL2.GL_FRAGMENT_PROGRAM_ARB);
@@ -571,6 +553,7 @@ public class GLComponentView extends AbstractComponentView implements GLEventLis
             fragmentView.buildFragmentShader(newShaderBuilder).compile();
         }
 
+        GLVertexShaderView vertexView = view.getAdapter(GLVertexShaderView.class);
         if (vertexView != null) {
             // create new shader builder
             GLShaderBuilder newShaderBuilder = new GLShaderBuilder(gl, GL2.GL_VERTEX_PROGRAM_ARB);
