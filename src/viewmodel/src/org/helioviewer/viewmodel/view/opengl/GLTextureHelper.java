@@ -89,6 +89,9 @@ public class GLTextureHelper {
      *            Position and size to draw the texture
      */
     private static void renderTextureToScreen(GL2 gl, Region region) {
+        if (!is2DState)
+            return;
+
         Vector2dDouble lowerleftCorner = region.getLowerLeftCorner();
         Vector2dDouble size = region.getSize();
 
@@ -96,40 +99,20 @@ public class GLTextureHelper {
         float y0 = (float) lowerleftCorner.getY();
         float x1 = x0 + (float) size.getX();
         float y1 = y0 + (float) size.getY();
-        renderTextureToScreen(gl, x0, y0, x1, y1);
-    }
 
-    /**
-     * Renders the texture currently loaded to given rectangle.
-     *
-     * The rectangle is specified by its lower left and upper right corner.
-     *
-     * <p>
-     * The texture has to be smaller than the maximum texture size
-     * (GL_MAX_TEXTURE_SIZE).
-     *
-     * @param gl
-     *            Valid reference to the current gl object
-     * @param x0
-     *            , y0 , x1 , y1 - Position and size to draw the texture
-     */
-    private static void renderTextureToScreen(GL2 gl, float x0, float y0, float x1, float y1) {
-        if (is2DState) {
-            gl.glBegin(GL2.GL_QUADS);
-            {
-                gl.glTexCoord2f(0.0f, 1.0f);
-                gl.glVertex2f(x0, y0);
-                gl.glTexCoord2f(1.0f, 1.0f);
-                gl.glVertex2f(x1, y0);
-                gl.glTexCoord2f(1.0f, 0.0f);
-                gl.glVertex2f(x1, y1);
-                gl.glTexCoord2f(0.0f, 0.0f);
-                gl.glVertex2f(x0, y1);
-            }
-            gl.glEnd();
-
-            gl.glColorMask(true, true, true, true);
+        gl.glBegin(GL2.GL_QUADS);
+        {
+            gl.glTexCoord2f(0.0f, 1.0f);
+            gl.glVertex2f(x0, y0);
+            gl.glTexCoord2f(1.0f, 1.0f);
+            gl.glVertex2f(x1, y0);
+            gl.glTexCoord2f(1.0f, 0.0f);
+            gl.glVertex2f(x1, y1);
+            gl.glTexCoord2f(0.0f, 0.0f);
+            gl.glVertex2f(x0, y1);
         }
+        gl.glEnd();
+        gl.glColorMask(true, true, true, true);
     }
 
     /**
@@ -154,12 +137,11 @@ public class GLTextureHelper {
         if (source == null || jpxView == null)
             return;
 
-        int texID = jpxView.tex.get(gl);
         int width = source.getWidth();
         int height = source.getHeight();
 
         if (width <= maxTextureSize && height <= maxTextureSize) {
-            moveImageDataToGLTexture(gl, source, 0, 0, width, height, texID);
+            moveImageDataToGLTexture(gl, source, 0, 0, width, height, jpxView.tex.get(gl));
             renderTextureToScreen(gl, region);
         } else {
             Log.debug(">> GLTextureHelper.renderImageDataToScreen(GL) > Image data too big: [" + width + "," + height + "]");
