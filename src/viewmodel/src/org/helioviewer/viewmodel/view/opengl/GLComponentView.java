@@ -241,8 +241,6 @@ public class GLComponentView extends AbstractComponentView implements GLEventLis
     public void init(GLAutoDrawable drawable) {
         Log.debug("GLComponentView.Init");
 
-        GLCommonRenderGraphics.getSingletonInstance().clearTextureCaches();
-
         GL2 gl = drawable.getGL().getGL2();
         //gl.getContext().setGL(GLPipelineFactory.create("javax.media.opengl.Trace", null, gl, new Object[] { System.err }));
 
