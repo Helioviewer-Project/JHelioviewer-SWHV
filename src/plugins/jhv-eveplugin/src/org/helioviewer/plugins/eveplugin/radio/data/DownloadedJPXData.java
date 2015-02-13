@@ -10,7 +10,6 @@ import javax.swing.SwingWorker;
 import org.helioviewer.base.logging.Log;
 import org.helioviewer.plugins.eveplugin.radio.filter.FilterModel;
 import org.helioviewer.plugins.eveplugin.radio.filter.FilterModelListener;
-import org.helioviewer.viewmodel.changeevent.CacheStatusChangedReason;
 import org.helioviewer.viewmodel.changeevent.ChangeEvent;
 import org.helioviewer.viewmodel.imagedata.ARGBInt32ImageData;
 import org.helioviewer.viewmodel.imagedata.ImageData;
@@ -121,16 +120,15 @@ public class DownloadedJPXData implements ViewListener, FilterModelListener {
                 // {
                 // radioDataManager.finishedDownloadingID(imageID, downloadID);
                 // }
-                CacheStatusChangedReason cacheReason = aEvent.getLastChangedReasonByType(CacheStatusChangedReason.class);
-                if (cacheReason != null && cacheReason.getView() == view) {
-                    switch (cacheReason.getType()) {
-                    case PARTIAL:
-                        break;
-                    case COMPLETE:
-                        radioDataManager.finishedDownloadingID(imageID, downloadID);
-                        break;
-                    }
-                }
+                /*
+                 * CacheStatusChangedReason cacheReason =
+                 * aEvent.getLastChangedReasonByType
+                 * (CacheStatusChangedReason.class); if (cacheReason != null &&
+                 * cacheReason.getView() == view) { switch
+                 * (cacheReason.getType()) { case PARTIAL: break; case COMPLETE:
+                 * radioDataManager.finishedDownloadingID(imageID, downloadID);
+                 * break; } }
+                 */
 
                 return getJPXData(sender);
             }
@@ -150,9 +148,11 @@ public class DownloadedJPXData implements ViewListener, FilterModelListener {
                         } else {
                             // Log.debug("dWorker" + nr + " : Result is null");
                         }
+
                     } else {
                         // Log.debug("dWorker" + nr + " was cancelled");
                     }
+                    radioDataManager.finishedDownloadingID(imageID, downloadID);
                 } catch (InterruptedException e) {
                     // TODO Auto-generated catch block
                     Log.error("dWorker" + nr + " interrupted " + e.getMessage());
@@ -251,6 +251,8 @@ public class DownloadedJPXData implements ViewListener, FilterModelListener {
                             } else {
                                 radioDataManager.dataForIDReceived(result.getByteData(), result.getImageID(), result.getDownloadID(), result.getDataSize());
                             }
+                            radioDataManager.finishedDownloadingID(imageID, downloadID);
+
                         } else {
                             // Log.debug("dWorker" + nr + " : Result is null");
                         }
@@ -286,7 +288,6 @@ public class DownloadedJPXData implements ViewListener, FilterModelListener {
                     if (imageData != null) {
                         Int32ImageTransport bytetrs = (Int32ImageTransport) imageData.getImageTransport();
                         data = bytetrs.getInt32PixelData();
-                        HelioviewerMetaData md = (HelioviewerMetaData) metaDataView.getMetaData();
                         int[] copyData = Arrays.copyOf(data, data.length);
                         data = new int[0];
                         return new DownloadedJPXDataWorkerResult(copyData, imageID, downloadID, new Rectangle(imageData.getWidth(), imageData.getHeight()));
