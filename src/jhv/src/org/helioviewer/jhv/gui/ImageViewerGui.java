@@ -23,7 +23,6 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
 import javax.swing.JTabbedPane;
-import javax.swing.SwingUtilities;
 
 import org.helioviewer.base.message.Message;
 import org.helioviewer.gl3d.camera.GL3DCameraOptionsPanel;
@@ -455,18 +454,10 @@ public class ImageViewerGui {
     }
 
     public MainImagePanel getMainImagePanel() {
-        // ////////////////////////////////////////////////////////////////////////////////
-        // MAIN IMAGE PANEL
-        // ////////////////////////////////////////////////////////////////////////////////
         if (mainImagePanel == null) {
-
-            // set up main image panel
             mainImagePanel = new MainImagePanel();
             mainImagePanel.setAutoscrolls(true);
             mainImagePanel.setFocusable(false);
-
-            // TODO HEK mainImagePanel.addPlugin(new
-            // ImagePanelEventPopupController());
         }
 
         return mainImagePanel;
@@ -494,21 +485,11 @@ public class ImageViewerGui {
             mainImagePanel.removeAll();// (this.getMainView().getComponent());
 
         }
+
         newState.recreateViewChains(oldState);
-
-        SwingUtilities.invokeLater(new Runnable() {
-            @Override
-            public void run() {
-                TopToolBar toolBar = newState.getTopToolBar();
-                toolBar.updateStateButtons();
-                toolBar.setDisplayMode(null);
-                contentPanel.add(toolBar, BorderLayout.PAGE_START);
-
-            }
-        });
-
         renderModeStatus.updateStatus();
         newState.addStateSpecificComponents(getLeftContentPane());
+
         // prepare gui again
         updateComponentPanels();
         mainImagePanel.setInputController(newState.getDefaultInputController());
@@ -527,10 +508,14 @@ public class ImageViewerGui {
             leftPane.remove(GL3DCameraOptionsPanel.class);
         }
         newState.activate();
+
+        TopToolBar toolBar = newState.getTopToolBar();
+        toolBar.updateStateButtons();
+        toolBar.setDisplayMode(null);
+        contentPanel.add(toolBar, BorderLayout.PAGE_START);
     }
 
     private void updateComponentPanels() {
-
         if (getMainView() != null) {
             getMainImagePanel().setView(getMainView());
         }
