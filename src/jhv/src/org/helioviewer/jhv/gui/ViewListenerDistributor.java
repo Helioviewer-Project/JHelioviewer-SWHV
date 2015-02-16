@@ -1,6 +1,5 @@
 package org.helioviewer.jhv.gui;
 
-import java.util.AbstractList;
 import java.util.LinkedList;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
@@ -31,7 +30,7 @@ public class ViewListenerDistributor implements ViewListener {
     private View view;
 
     private final ReentrantReadWriteLock rwl = new ReentrantReadWriteLock();
-    private final AbstractList<ViewListener> listeners = new LinkedList<ViewListener>();
+    private final LinkedList<ViewListener> listeners = new LinkedList<ViewListener>();
 
     /**
      * Private default constructor to implement the singleton pattern.
@@ -81,11 +80,8 @@ public class ViewListenerDistributor implements ViewListener {
      */
     public void addViewListener(ViewListener l) {
         rwl.writeLock().lock();
-        try {
-            listeners.add(l);
-        } finally {
-            rwl.writeLock().unlock();
-        }
+        listeners.add(l);
+        rwl.writeLock().unlock();
     }
 
     /**
@@ -100,20 +96,13 @@ public class ViewListenerDistributor implements ViewListener {
      */
     public void removeViewListener(ViewListener l) {
         rwl.writeLock().lock();
-        try {
-            listeners.remove(l);
-        } finally {
-            rwl.writeLock().unlock();
-        }
+        listeners.remove(l);
+        rwl.writeLock().unlock();
     }
 
     /**
      * {@inheritDoc}
      */
-    public void viewChanged(View sender, ChangeEvent aEvent) {
-        notifyViewListener(sender, aEvent);
-    }
-
     /**
      * Informs all listeners of changes made to previous views.
      * 
@@ -125,15 +114,12 @@ public class ViewListenerDistributor implements ViewListener {
      * @param event
      *            event which contains the associated reasons.
      */
-    private void notifyViewListener(View sender, ChangeEvent event) {
+    public void viewChanged(View sender, ChangeEvent aEvent) {
         rwl.readLock().lock();
-        try {
-            for (ViewListener listener : listeners) {
-                listener.viewChanged(sender, event);
-            }
-        } finally {
-            rwl.readLock().unlock();
+        for (ViewListener listener : listeners) {
+            listener.viewChanged(sender, aEvent);
         }
+        rwl.readLock().unlock();
     }
 
 }
