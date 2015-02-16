@@ -1,6 +1,6 @@
 package org.helioviewer.jhv.gui;
 
-import java.util.LinkedList;
+import java.util.ArrayList;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 import org.helioviewer.base.logging.Log;
@@ -30,7 +30,7 @@ public class ViewListenerDistributor implements ViewListener {
     private View view;
 
     private final ReentrantReadWriteLock rwl = new ReentrantReadWriteLock();
-    private final LinkedList<ViewListener> listeners = new LinkedList<ViewListener>();
+    private final ArrayList<ViewListener> listeners = new ArrayList<ViewListener>();
 
     /**
      * Private default constructor to implement the singleton pattern.
