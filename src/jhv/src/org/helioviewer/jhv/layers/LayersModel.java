@@ -7,7 +7,6 @@ import java.net.HttpURLConnection;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
-import java.util.AbstractList;
 import java.util.Collections;
 import java.util.Date;
 import java.util.LinkedList;
@@ -92,7 +91,7 @@ public class LayersModel implements ViewListener {
     private static final LayersModel layersModel = new LayersModel();
     private final ReentrantReadWriteLock rwl = new ReentrantReadWriteLock();
 
-    private final AbstractList<LayersListener> layerListeners = new LinkedList<LayersListener>();
+    private final LinkedList<LayersListener> layerListeners = new LinkedList<LayersListener>();
 
     // store the last updated timestamp
     private Date lastTimestamp;
@@ -1314,13 +1313,10 @@ public class LayersModel implements ViewListener {
 
     private void fireLayerDownloaded(final int index) {
         rwl.readLock().lock();
-        try {
-            for (LayersListener ll : layerListeners) {
-                ll.layerDownloaded(index);
-            }
-        } finally {
-            rwl.readLock().unlock();
+        for (LayersListener ll : layerListeners) {
+            ll.layerDownloaded(index);
         }
+        rwl.readLock().unlock();
     }
 
     /**
@@ -1328,13 +1324,10 @@ public class LayersModel implements ViewListener {
      */
     private void fireLayerRemoved(final View oldView, final int oldIndex) {
         rwl.readLock().lock();
-        try {
-            for (LayersListener ll : layerListeners) {
-                ll.layerRemoved(oldView, oldIndex);
-            }
-        } finally {
-            rwl.readLock().unlock();
+        for (LayersListener ll : layerListeners) {
+            ll.layerRemoved(oldView, oldIndex);
         }
+        rwl.readLock().unlock();
     }
 
     /**
@@ -1342,13 +1335,10 @@ public class LayersModel implements ViewListener {
      */
     private void fireLayerAdded(final int newIndex) {
         rwl.readLock().lock();
-        try {
-            for (LayersListener ll : layerListeners) {
-                ll.layerAdded(newIndex);
-            }
-        } finally {
-            rwl.readLock().unlock();
+        for (LayersListener ll : layerListeners) {
+            ll.layerAdded(newIndex);
         }
+        rwl.readLock().unlock();
     }
 
     /**
@@ -1356,13 +1346,10 @@ public class LayersModel implements ViewListener {
      */
     private void fireLayerChanged(final int index) {
         rwl.readLock().lock();
-        try {
-            for (LayersListener ll : layerListeners) {
-                ll.layerChanged(index);
-            }
-        } finally {
-            rwl.readLock().unlock();
+        for (LayersListener ll : layerListeners) {
+            ll.layerChanged(index);
         }
+        rwl.readLock().unlock();
     }
 
     /**
@@ -1370,15 +1357,12 @@ public class LayersModel implements ViewListener {
      */
     private void fireAllLayersChanged() {
         rwl.readLock().lock();
-        try {
-            for (LayersListener ll : layerListeners) {
-                for (int index = 0; index < getNumLayers(); index++) {
-                    ll.layerChanged(index);
-                }
+        for (LayersListener ll : layerListeners) {
+            for (int index = 0; index < getNumLayers(); index++) {
+                ll.layerChanged(index);
             }
-        } finally {
-            rwl.readLock().unlock();
         }
+        rwl.readLock().unlock();
     }
 
     /**
@@ -1386,13 +1370,10 @@ public class LayersModel implements ViewListener {
      */
     private void fireActiveLayerChanged(final int index) {
         rwl.readLock().lock();
-        try {
-            for (LayersListener ll : layerListeners) {
-                ll.activeLayerChanged(index);
-            }
-        } finally {
-            rwl.readLock().unlock();
+        for (LayersListener ll : layerListeners) {
+            ll.activeLayerChanged(index);
         }
+        rwl.readLock().unlock();
     }
 
     /**
@@ -1400,13 +1381,10 @@ public class LayersModel implements ViewListener {
      */
     private void fireViewportGeometryChanged() {
         rwl.readLock().lock();
-        try {
-            for (LayersListener ll : layerListeners) {
-                ll.viewportGeometryChanged();
-            }
-        } finally {
-            rwl.readLock().unlock();
+        for (LayersListener ll : layerListeners) {
+            ll.viewportGeometryChanged();
         }
+        rwl.readLock().unlock();
     }
 
     /**
@@ -1414,13 +1392,10 @@ public class LayersModel implements ViewListener {
      */
     private void fireTimestampChanged(final int idx) {
         rwl.readLock().lock();
-        try {
-            for (LayersListener ll : layerListeners) {
-                ll.timestampChanged(idx);
-            }
-        } finally {
-            rwl.readLock().unlock();
+        for (LayersListener ll : layerListeners) {
+            ll.timestampChanged(idx);
         }
+        rwl.readLock().unlock();
     }
 
     /**
@@ -1428,13 +1403,10 @@ public class LayersModel implements ViewListener {
      */
     private void fireSubImageDataChanged() {
         rwl.readLock().lock();
-        try {
-            for (LayersListener ll : layerListeners) {
-                ll.subImageDataChanged();
-            }
-        } finally {
-            rwl.readLock().unlock();
+        for (LayersListener ll : layerListeners) {
+            ll.subImageDataChanged();
         }
+        rwl.readLock().unlock();
     }
 
     /**
@@ -1442,11 +1414,8 @@ public class LayersModel implements ViewListener {
      */
     public void addLayersListener(LayersListener layerListener) {
         rwl.writeLock().lock();
-        try {
-            layerListeners.add(layerListener);
-        } finally {
-            rwl.writeLock().unlock();
-        }
+        layerListeners.add(layerListener);
+        rwl.writeLock().unlock();
     }
 
     /**
@@ -1456,11 +1425,8 @@ public class LayersModel implements ViewListener {
      */
     public void removeLayersListener(LayersListener layerListener) {
         rwl.writeLock().lock();
-        try {
-            layerListeners.remove(layerListener);
-        } finally {
-            rwl.writeLock().unlock();
-        }
+        layerListeners.remove(layerListener);
+        rwl.writeLock().unlock();
     }
 
     /**
