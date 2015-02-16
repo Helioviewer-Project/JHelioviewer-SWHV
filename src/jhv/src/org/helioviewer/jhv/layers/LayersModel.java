@@ -9,7 +9,7 @@ import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.Collections;
 import java.util.Date;
-import java.util.LinkedList;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 import java.util.Vector;
@@ -91,7 +91,7 @@ public class LayersModel implements ViewListener {
     private static final LayersModel layersModel = new LayersModel();
     private final ReentrantReadWriteLock rwl = new ReentrantReadWriteLock();
 
-    private final LinkedList<LayersListener> layerListeners = new LinkedList<LayersListener>();
+    private final ArrayList<LayersListener> layerListeners = new ArrayList<LayersListener>();
 
     // store the last updated timestamp
     private Date lastTimestamp;

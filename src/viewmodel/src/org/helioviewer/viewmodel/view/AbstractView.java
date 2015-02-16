@@ -2,8 +2,6 @@ package org.helioviewer.viewmodel.view;
 
 import java.util.AbstractList;
 import java.util.ArrayList;
-import java.util.LinkedList;
-import java.util.List;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
@@ -23,16 +21,16 @@ import org.helioviewer.viewmodel.changeevent.ChangeEvent;
  */
 public abstract class AbstractView implements View {
 
-    private AbstractList<ViewListener> listeners = new LinkedList<ViewListener>();
-    private ReadWriteLock lock = new ReentrantReadWriteLock();
+    private final AbstractList<ViewListener> listeners = new ArrayList<ViewListener>();
+    private final ReentrantReadWriteLock rwl = new ReentrantReadWriteLock();
 
     /**
      * {@inheritDoc}
      */
     public void addViewListener(ViewListener l) {
-        lock.writeLock().lock();
+        rwl.writeLock().lock();
         listeners.add(l);
-        lock.writeLock().unlock();
+        rwl.writeLock().unlock();
     }
 
     /**
@@ -46,9 +44,9 @@ public abstract class AbstractView implements View {
      * {@inheritDoc}
      */
     public void removeViewListener(ViewListener l) {
-        lock.writeLock().lock();
+        rwl.writeLock().lock();
         listeners.remove(l);
-        lock.writeLock().unlock();
+        rwl.writeLock().unlock();
     }
 
     /**
@@ -58,18 +56,11 @@ public abstract class AbstractView implements View {
      *            ChangeEvent to send
      */
     protected void notifyViewListeners(ChangeEvent aEvent) {
-        lock.readLock().lock();
-        List<ViewListener> listenersCopy = null;
-        try {
-            listenersCopy = new ArrayList<ViewListener>(listeners);
-        } finally {
-            lock.readLock().unlock();
+        rwl.readLock().lock();
+        for (ViewListener v : listeners) {
+            v.viewChanged(this, aEvent);
         }
-        if (listenersCopy != null) {
-            for (ViewListener v : listenersCopy) {
-                v.viewChanged(this, aEvent);
-            }
-        }
+        rwl.readLock().unlock();
     }
 
 }
