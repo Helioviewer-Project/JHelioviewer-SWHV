@@ -1,8 +1,8 @@
 package org.helioviewer.jhv.gui;
 
 import java.util.AbstractList;
-import java.util.ConcurrentModificationException;
 import java.util.LinkedList;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 import org.helioviewer.base.logging.Log;
 import org.helioviewer.viewmodel.changeevent.ChangeEvent;
@@ -29,7 +29,9 @@ public class ViewListenerDistributor implements ViewListener {
 
     private static ViewListenerDistributor singletonObject = new ViewListenerDistributor();
     private View view;
-    private AbstractList<ViewListener> listeners = new LinkedList<ViewListener>();
+
+    private final ReentrantReadWriteLock rwl = new ReentrantReadWriteLock();
+    private final AbstractList<ViewListener> listeners = new LinkedList<ViewListener>();
 
     /**
      * Private default constructor to implement the singleton pattern.
@@ -60,7 +62,6 @@ public class ViewListenerDistributor implements ViewListener {
         }
 
         view = newView;
-
         if (newView != null) {
             view.addViewListener(this);
         }
@@ -79,8 +80,11 @@ public class ViewListenerDistributor implements ViewListener {
      * @see #removeViewListener(ViewListener)
      */
     public void addViewListener(ViewListener l) {
-        synchronized (listeners) {
+        rwl.writeLock().lock();
+        try {
             listeners.add(l);
+        } finally {
+            rwl.writeLock().unlock();
         }
     }
 
@@ -95,9 +99,11 @@ public class ViewListenerDistributor implements ViewListener {
      * @see #addViewListener(ViewListener)
      */
     public void removeViewListener(ViewListener l) {
-
-        synchronized (listeners) {
+        rwl.writeLock().lock();
+        try {
             listeners.remove(l);
+        } finally {
+            rwl.writeLock().unlock();
         }
     }
 
@@ -120,37 +126,14 @@ public class ViewListenerDistributor implements ViewListener {
      *            event which contains the associated reasons.
      */
     private void notifyViewListener(View sender, ChangeEvent event) {
+        rwl.readLock().lock();
         try {
-            synchronized (listeners) {
-                for (ViewListener listener : listeners) {
-                    listener.viewChanged(sender, event);
-                }
+            for (ViewListener listener : listeners) {
+                listener.viewChanged(sender, event);
             }
-        } catch (ConcurrentModificationException e) {
-            e.printStackTrace();
+        } finally {
+            rwl.readLock().unlock();
         }
-    }
-
-    class ViewChangedNotifier implements Runnable {
-        private boolean interrupted = false;
-
-        public void interrupt() {
-            interrupted = true;
-        }
-
-        public void run() {
-            synchronized (this) {
-                if (interrupted)
-                    return;
-                this.notify();
-                try {
-                    this.wait();
-                } catch (InterruptedException e) {
-                    Log.error("", e);
-                }
-            }
-        }
-
     }
 
 }
