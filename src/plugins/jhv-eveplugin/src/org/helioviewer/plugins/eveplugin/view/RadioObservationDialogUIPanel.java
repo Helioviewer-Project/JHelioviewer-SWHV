@@ -26,6 +26,8 @@ public class RadioObservationDialogUIPanel extends SimpleObservationDialogUIPane
         super(plotsContainerPanel);
         serverList = DataSourceServers.getSingletonInstance().getServerList();
         comboServer = new JComboBox(serverList);
+        setFromOutside = true;
+        comboServer.setSelectedItem(DataSourceServers.getSingletonInstance().getSelectedServer());
         setFromOutside = false;
         DataSourceServers.getSingletonInstance().addListener(this);
         initVisualComponents();
