@@ -40,7 +40,7 @@ public class ZoomStatusPanel extends ViewStatusPanelPlugin {
     /**
      * Updates the displayed zoom.
      */
-    private synchronized void updateZoomLevel() {
+    private void updateZoomLevel() {
         View view = LayersModel.getSingletonInstance().getActiveView();
 
         if (view != null) {
