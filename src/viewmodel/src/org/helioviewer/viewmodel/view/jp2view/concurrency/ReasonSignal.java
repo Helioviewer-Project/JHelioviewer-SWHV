@@ -46,7 +46,7 @@ public class ReasonSignal<T extends Enum<?>> {
      * Sets the isSignaled flag and wakes up one waiting thread. Doesn't bother
      * to notifyAll since the first thread woken up resets the flag anyway.
      */
-    public synchronized void signal(T _reason) {
+    public void signal(T _reason) {
         synchronized (lock) {
             isSignaled = true;
             reason = _reason;
@@ -60,7 +60,7 @@ public class ReasonSignal<T extends Enum<?>> {
      * @return Current signal state
      */
     public boolean isSignaled() {
-            return isSignaled;
+        return isSignaled;
     }
 
 }
