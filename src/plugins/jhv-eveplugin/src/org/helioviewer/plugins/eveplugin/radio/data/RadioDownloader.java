@@ -159,7 +159,7 @@ public class RadioDownloader {
     /**
      * Instructs the radio downloader listeners to remove the spectrograms from
      * the plot identified by the plot identifier
-     *
+     * 
      * @param identifier
      *            The identifier of the plot from which the radio spectrograms
      *            should be removed.
@@ -171,8 +171,6 @@ public class RadioDownloader {
     }
 
     public void requestAndOpenIntervals(List<Interval<Date>> intervals, final Long downloadId, final String plotIdentifier, final double ratioX, final double ratioY) {
-        Log.debug(intervals.size());
-
         for (final Interval<Date> interval : intervals) {
             final String startDataString = createDateString(interval.getStart());
             while (imageDownloadWorker != null && !imageDownloadWorker.isDone()) {
@@ -197,7 +195,6 @@ public class RadioDownloader {
                         if (endDate != null && startDate != null) {
                             endDate.setTime(endDate.getTime());
                             // case there were not more than three days
-
                             while (startDate.before(endDate) || startDate.equals(endDate)) {
                                 boolean inRequestCache = true;
                                 synchronized (requestDateCache) {
