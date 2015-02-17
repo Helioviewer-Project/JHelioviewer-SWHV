@@ -3,7 +3,6 @@ package org.helioviewer.viewmodel.view.jp2view;
 import java.awt.Dimension;
 import java.util.Date;
 
-import org.helioviewer.base.logging.Log;
 import org.helioviewer.base.math.Interval;
 import org.helioviewer.viewmodel.changeevent.ChangeEvent;
 import org.helioviewer.viewmodel.changeevent.ViewportChangedReason;
@@ -63,11 +62,7 @@ public class JHVJP2CallistoView extends JHVJP2View {
         ResolutionLevel res = jp2Image.getResolutionSet().getNextResolutionLevel(new Dimension(viewport.getWidth(), viewport.getHeight()));
         int maxHeight = jp2Image.getResolutionSet().getResolutionLevel(0).getResolutionBounds().height;
         int maxWidth = jp2Image.getResolutionSet().getResolutionLevel(0).getResolutionBounds().width;
-        SubImage subImage = new SubImage((int) (1.0 * region.getCornerX() / maxWidth * res.getResolutionBounds().width), (int) (1.0
-                * region.getCornerY() / maxHeight * res.getResolutionBounds().height),
-                (int) (1.0 * region.getWidth() / maxWidth * res.getResolutionBounds().width),
-                (int) (1.0 * region.getHeight() / maxHeight * res.getResolutionBounds().height));
-        Log.debug("New subImage : " + subImage);
+        SubImage subImage = new SubImage((int) (1.0 * region.getCornerX() / maxWidth * res.getResolutionBounds().width), (int) (1.0 * region.getCornerY() / maxHeight * res.getResolutionBounds().height), (int) (1.0 * region.getWidth() / maxWidth * res.getResolutionBounds().width), (int) (1.0 * region.getHeight() / maxHeight * res.getResolutionBounds().height));
         // subImageBuffer.putSubImage(subImage, region);
 
         return new JP2ImageParameter(subImage, res, getCurrentNumQualityLayers(), 0);
