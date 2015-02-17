@@ -227,17 +227,12 @@ public class RadioDataManager implements RadioDownloaderListener {
             if (!requestBuffer.hasData() && !requestForDataBusy) {
                 requestForDataBusy = true;
                 requestBuffer.addRequestConfig(new RequestConfig(xStart, xEnd, yStart, yEnd, xRatio, yRatio, iDs));
-                // Log.debug("Nope it was : thread " +
-                // Thread.currentThread().getName());
                 while (requestBuffer.hasData()) {
-                    // Log.debug("Get data out of request buffer : thread " +
-                    // Thread.currentThread().getName());
                     RequestConfig requestConfig = requestBuffer.getData();
                     handleRequestConfig(requestConfig, xStart, xEnd, yStart, yEnd, plotIdentifier);
                 }
                 requestForDataBusy = false;
             } else {
-                // Log.debug("Add request to buffer");
                 requestBuffer.addRequestConfig(new RequestConfig(xStart, xEnd, yStart, yEnd, xRatio, yRatio, iDs));
             }
         } else {
