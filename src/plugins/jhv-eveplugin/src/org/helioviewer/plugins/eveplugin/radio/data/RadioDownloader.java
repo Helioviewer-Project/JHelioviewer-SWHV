@@ -200,7 +200,6 @@ public class RadioDownloader {
                                 synchronized (requestDateCache) {
                                     if (!requestDateCache.contains(startDate)) {
                                         inRequestCache = false;
-                                        Log.trace("Add date " + startDate + " to request cache");
                                         requestDateCache.add(startDate);
                                     }
                                 }
@@ -212,21 +211,13 @@ public class RadioDownloader {
                                         jpxList.add(newJPXData);
                                         cache.add(newJPXData);
                                     } else {
-                                        Log.error("Received null view in request intervals for date " + startDate + " and " + endDate);
                                         if (cache.addNoDataInterval(new Interval<Date>(startDate, calculateOneDayFurtherAsDate(startDate)), plotIdentifier)) {
                                             noDataList.add(new Interval<Date>(startDate, calculateOneDayFurtherAsDate(startDate)));
                                         }
                                     }
-                                } else {
-                                    if (inRequestCache) {
-                                        Log.trace("Date was already in the request cache. Do nothing.");
-                                    } else {
-                                        Log.trace("Date was already in the radio image cache. Do nothing.");
-                                    }
                                 }
                                 synchronized (requestDateCache) {
                                     requestDateCache.remove(startDate);
-                                    Log.trace("remove " + startDate + " from request cache");
                                 }
                                 startDate = calculateOneDayFurtherAsDate(startDate);
                             }

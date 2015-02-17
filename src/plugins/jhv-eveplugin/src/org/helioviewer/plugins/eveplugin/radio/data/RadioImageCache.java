@@ -6,7 +6,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.helioviewer.base.logging.Log;
 import org.helioviewer.base.math.Interval;
 
 public class RadioImageCache {
@@ -37,7 +36,6 @@ public class RadioImageCache {
     }
 
     public void add(DownloadedJPXData jpxData) {
-        Log.trace("Try to add data in cache");
         synchronized (instance) {
             RadioImageCacheData data = getRadioImageCache(jpxData.getPlotIdentifier());
             data.getDataCache().put(jpxData.getImageID(), jpxData);
@@ -128,7 +126,6 @@ public class RadioImageCache {
             RadioImageCacheData data = getRadioImageCache(plotIdentifier);
             boolean added = data.getNoDataCache().containsKey(interval.getStart());
             data.getNoDataCache().put(interval.getStart(), interval);
-            Log.trace("Added : " + !added + ". Size of noDataCache : " + data.getNoDataCache().size());
             return !added;
         }
     }
