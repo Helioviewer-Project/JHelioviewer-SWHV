@@ -87,11 +87,13 @@ public class RadioImageCache {
             List<Long> toRemove = new ArrayList<Long>(cacheData.getDataCache().keySet());
             List<Interval<Date>> noDataInterval = new ArrayList<Interval<Date>>();
             while (localStart.before(end) || localStart.equals(end)) {
-                if (!cacheData.getStartDates().containsKey(localStart)) {
+                if (!cacheData.getStartDates().containsKey(localStart) && !cacheData.getNoDataCache().containsKey(localStart)) {
                     intervalList.add(new Interval<Date>(localStart, new Date(localStart.getTime() + stepsize)));
                 } else {
-                    dataList.add(cacheData.getStartDates().get(localStart));
-                    toRemove.remove(cacheData.getStartDates().get(localStart).getImageID());
+                    if (cacheData.getStartDates().containsKey(localStart)) {
+                        dataList.add(cacheData.getStartDates().get(localStart));
+                        toRemove.remove(cacheData.getStartDates().get(localStart).getImageID());
+                    }
                 }
                 if (cacheData.getNoDataCache().containsKey(localStart)) {
                     noDataInterval.add(cacheData.getNoDataCache().get(localStart));
