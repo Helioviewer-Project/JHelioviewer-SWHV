@@ -6,7 +6,6 @@ import java.util.HashMap;
 
 import javax.media.opengl.GL2;
 
-import org.helioviewer.base.logging.Log;
 import org.helioviewer.gl3d.camera.GL3DCamera;
 import org.helioviewer.gl3d.scenegraph.GL3DDrawBits.Bit;
 import org.helioviewer.gl3d.scenegraph.GL3DGroup;
@@ -20,9 +19,9 @@ import org.helioviewer.gl3d.view.GL3DImageTextureView;
  * The {@link GL3DImageLayers} node offers special capabilities for grouping
  * {@link GL3DImageLayer} nodes, because image nodes require special ordering
  * for the blending of different image layers.
- *
+ * 
  * @author Simon Spoerri (simon.spoerri@fhnw.ch)
- *
+ * 
  */
 public class GL3DImageLayers extends GL3DGroup {
 
@@ -32,7 +31,7 @@ public class GL3DImageLayers extends GL3DGroup {
 
     public GL3DImageLayers() {
         super("Images");
-        this.imageLayerMap = new HashMap<GL3DImageTextureView, GL3DImageLayer>();
+        imageLayerMap = new HashMap<GL3DImageTextureView, GL3DImageLayer>();
     }
 
     @Override
@@ -63,8 +62,9 @@ public class GL3DImageLayers extends GL3DGroup {
 
         ArrayList<GL3DImageLayer> layers = new ArrayList<GL3DImageLayer>();
         while (node != null) {
-            if (!node.isDrawBitOn(Bit.Hidden) && node instanceof GL3DImageLayer)
+            if (!node.isDrawBitOn(Bit.Hidden) && node instanceof GL3DImageLayer) {
                 layers.add((GL3DImageLayer) node);
+            }
             node = node.getNext();
         }
 
@@ -109,7 +109,7 @@ public class GL3DImageLayers extends GL3DGroup {
     }
 
     public void setCoronaVisibility(boolean visible) {
-        GL3DNode node = this.first;
+        GL3DNode node = first;
         while (node != null) {
             if (node instanceof GL3DImageLayer) {
                 ((GL3DImageLayer) node).setCoronaVisibility(visible);
@@ -117,15 +117,15 @@ public class GL3DImageLayers extends GL3DGroup {
 
             node = node.getNext();
         }
-        this.coronaVisibility = visible;
+        coronaVisibility = visible;
     }
 
     public boolean getCoronaVisibility() {
-        return this.coronaVisibility;
+        return coronaVisibility;
     }
 
     public void insertLayer(GL3DImageLayer layer) {
-        this.imageLayerMap.put(layer.getImageTextureView(), layer);
+        imageLayerMap.put(layer.getImageTextureView(), layer);
         this.addNode(layer);
         layer.setLayerGroup(this);
     }
@@ -133,8 +133,7 @@ public class GL3DImageLayers extends GL3DGroup {
     public void removeLayer(GL3DState state, GL3DImageTextureView view) {
         GL3DImageLayer layer = getImageLayerForView(view);
         layer.delete(state);
-        Log.debug("GL3DImageLayers: Removed Layer " + layer.getName());
-        this.imageLayerMap.remove(view);
+        imageLayerMap.remove(view);
     }
 
     public void moveImages(GL3DImageTextureView view, int index) {
@@ -146,15 +145,16 @@ public class GL3DImageLayers extends GL3DGroup {
     }
 
     public GL3DImageLayer getImageLayerForView(GL3DImageTextureView view) {
-        return this.imageLayerMap.get(view);
+        return imageLayerMap.get(view);
     }
 
     public Collection<GL3DImageLayer> getLayers() {
         GL3DNode node = this.getFirst();
         ArrayList<GL3DImageLayer> layers = new ArrayList<GL3DImageLayer>();
         for (; node != null; node = node.getNext()) {
-            if (node instanceof GL3DImageLayer)
+            if (node instanceof GL3DImageLayer) {
                 layers.add((GL3DImageLayer) node);
+            }
         }
         return layers;
     }
