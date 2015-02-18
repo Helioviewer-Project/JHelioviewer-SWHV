@@ -1,10 +1,14 @@
 package org.helioviewer.jhv.gui.components.layerTable;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import javax.swing.SwingUtilities;
 import javax.swing.table.AbstractTableModel;
 
 import org.helioviewer.jhv.layers.LayersListener;
 import org.helioviewer.jhv.layers.LayersModel;
+import org.helioviewer.viewmodel.view.LayeredView;
 import org.helioviewer.viewmodel.view.View;
 
 /**
@@ -26,6 +30,8 @@ public class LayerTableModel extends AbstractTableModel implements LayersListene
     /** The sole instance of this class. */
     private static final LayerTableModel layerTableModel = new LayerTableModel();
 
+    private final List<View> views;
+
     /**
      * Returns the only instance of this class.
      * 
@@ -36,12 +42,76 @@ public class LayerTableModel extends AbstractTableModel implements LayersListene
     }
 
     private LayerTableModel() {
+        views = new ArrayList<View>();
         LayersModel.getSingletonInstance().addLayersListener(this);
+    }
+
+    public void setVisible(int index, boolean visible) {
+        if (index >= 0 && index < views.size()) {
+            LayersModel.getSingletonInstance().setVisibleLink(views.get(index), visible);
+        }
+    }
+
+    public boolean isVisible(int index) {
+        if (index >= 0 && index < views.size()) {
+            return LayersModel.getSingletonInstance().isVisible(views.get(index));
+        }
+        return false;
+    }
+
+    public void removeLayer(int index) {
+        if (index >= 0 && index < views.size()) {
+            LayersModel.getSingletonInstance().removeLayer(views.get(index));
+        }
+    }
+
+    public View getViewAt(int index) {
+        if (index >= 0 && index < views.size()) {
+            return views.get(index);
+        }
+        return null;
+    }
+
+    public void moveLayerUp(int index) {
+        if (index >= 0 && index < views.size()) {
+            int newLevel = index;
+            if (newLevel < views.size() - 1) {
+                newLevel++;
+            }
+            LayeredView lv = LayersModel.getSingletonInstance().getLayeredView();
+            if (lv != null) {
+                lv.moveView(views.get(index), newLevel);
+                LayersModel.getSingletonInstance().setActiveLayer(invertIndex(newLevel));
+            }
+        }
+    }
+
+    public void moveLayerDown(int index) {
+        if (index >= 0 && index < views.size()) {
+            int newLevel = index;
+            if (newLevel > 0) {
+                newLevel--;
+            }
+            LayeredView lv = LayersModel.getSingletonInstance().getLayeredView();
+            if (lv != null) {
+                lv.moveView(views.get(index), newLevel);
+                LayersModel.getSingletonInstance().setActiveLayer(invertIndex(newLevel));
+            }
+        }
+    }
+
+    private int invertIndex(int idx) {
+        // invert indices
+        if (idx >= 0 && views.size() > 0) {
+            idx = views.size() - 1 - idx;
+        }
+        return idx;
     }
 
     /**
      * {@inheritDoc}
      */
+    @Override
     public int getRowCount() {
         return LayersModel.getSingletonInstance().getNumLayers();
     }
@@ -50,6 +120,7 @@ public class LayerTableModel extends AbstractTableModel implements LayersListene
      * {@inheritDoc} Hardcoded value of columns. This value is dependent on the
      * actual design of the LayerTable
      */
+    @Override
     public int getColumnCount() {
         return 4;
     }
@@ -58,11 +129,15 @@ public class LayerTableModel extends AbstractTableModel implements LayersListene
      * Return the LayerDescriptor for the given row of the table, regardless
      * which column is requested.
      */
+    @Override
     public Object getValueAt(int row, int col) {
 
         int idx = row;
-
-        return LayersModel.getSingletonInstance().getDescriptor(idx);
+        if (idx >= 0 && idx < views.size()) {
+            return LayersModel.getSingletonInstance().getDescriptor(views.get(idx));
+        } else {
+            return null;
+        }
 
     }
 
@@ -70,8 +145,11 @@ public class LayerTableModel extends AbstractTableModel implements LayersListene
      * Method part of the LayersListener interface, itself calling the
      * appropriate TableModel notification methods
      */
+    @Override
     public void layerAdded(final int newIndex) {
+        updateData();
         SwingUtilities.invokeLater(new Runnable() {
+            @Override
             public void run() {
                 fireTableRowsInserted(newIndex, newIndex);
             }
@@ -82,8 +160,11 @@ public class LayerTableModel extends AbstractTableModel implements LayersListene
      * Method part of the LayersListener interface, itself calling the
      * appropriate TableModel notification methods
      */
+    @Override
     public void layerChanged(final int idx) {
+        updateData();
         SwingUtilities.invokeLater(new Runnable() {
+            @Override
             public void run() {
                 fireTableRowsUpdated(idx, idx);
             }
@@ -94,8 +175,11 @@ public class LayerTableModel extends AbstractTableModel implements LayersListene
      * Method part of the LayersListener interface, itself calling the
      * appropriate TableModel notification methods
      */
+    @Override
     public void layerRemoved(View oldView, final int oldIndex) {
+        updateData();
         SwingUtilities.invokeLater(new Runnable() {
+            @Override
             public void run() {
                 fireTableRowsDeleted(oldIndex, oldIndex);
             }
@@ -106,8 +190,11 @@ public class LayerTableModel extends AbstractTableModel implements LayersListene
      * Method part of the LayersListener interface, itself calling the
      * appropriate TableModel notification methods
      */
+    @Override
     public void timestampChanged(final int idx) {
+        updateData();
         SwingUtilities.invokeLater(new Runnable() {
+            @Override
             public void run() {
                 fireTableRowsUpdated(idx, idx);
             }
@@ -117,24 +204,39 @@ public class LayerTableModel extends AbstractTableModel implements LayersListene
     /**
      * {@inheritDoc}
      */
+    @Override
     public void activeLayerChanged(final int index) {
     }
 
     /**
      * {@inheritDoc}
      */
+    @Override
     public void viewportGeometryChanged() {
     }
 
     /**
      * {@inheritDoc}
      */
+    @Override
     public void subImageDataChanged() {
     }
 
     /**
      * {@inheritDoc}
      */
+    @Override
     public void layerDownloaded(int idx) {
     }
+
+    private void updateData() {
+        LayeredView lv = LayersModel.getSingletonInstance().getLayeredView();
+        views.clear();
+        if (lv != null) {
+            for (int i = lv.getNumLayers() - 1; i >= 0; i--) {
+                views.add(lv.getLayer(i));
+            }
+        }
+    }
+
 }
