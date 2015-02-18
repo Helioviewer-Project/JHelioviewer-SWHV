@@ -3,21 +3,25 @@ package org.helioviewer.plugins.eveplugin.radio.data;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.NavigableMap;
+import java.util.TreeMap;
 
 import org.helioviewer.base.math.Interval;
 
 public class RadioImageCacheData {
 
     private Map<Long, DownloadedJPXData> dataCache;
-    private Map<Long, Long> useCache;
+    private NavigableMap<Long, DownloadedJPXData> useCache;
+    private Map<DownloadedJPXData, Long> reverseUseCache;
     private Map<Date, DownloadedJPXData> startDates;
     private Map<Date, Interval<Date>> noDataCache;
 
     public RadioImageCacheData() {
-        this.dataCache = new HashMap<Long, DownloadedJPXData>();
-        this.useCache = new HashMap<Long, Long>();
-        this.startDates = new HashMap<Date, DownloadedJPXData>();
-        this.noDataCache = new HashMap<Date, Interval<Date>>();
+        dataCache = new HashMap<Long, DownloadedJPXData>();
+        useCache = new TreeMap<Long, DownloadedJPXData>();
+        startDates = new HashMap<Date, DownloadedJPXData>();
+        noDataCache = new HashMap<Date, Interval<Date>>();
+        reverseUseCache = new HashMap<DownloadedJPXData, Long>();
     }
 
     public Map<Long, DownloadedJPXData> getDataCache() {
@@ -28,11 +32,11 @@ public class RadioImageCacheData {
         this.dataCache = dataCache;
     }
 
-    public Map<Long, Long> getUseCache() {
+    public NavigableMap<Long, DownloadedJPXData> getUseCache() {
         return useCache;
     }
 
-    public void setUseCache(Map<Long, Long> useCache) {
+    public void setUseCache(TreeMap<Long, DownloadedJPXData> useCache) {
         this.useCache = useCache;
     }
 
@@ -50,5 +54,14 @@ public class RadioImageCacheData {
 
     public void setNoDataCache(Map<Date, Interval<Date>> noDataCache) {
         this.noDataCache = noDataCache;
-    }    
+    }
+
+    public Map<DownloadedJPXData, Long> getReverseUseCache() {
+        return reverseUseCache;
+    }
+
+    public void setReverseUseCache(Map<DownloadedJPXData, Long> reverseUseCache) {
+        this.reverseUseCache = reverseUseCache;
+    }
+
 }
