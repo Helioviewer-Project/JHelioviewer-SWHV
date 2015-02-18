@@ -340,10 +340,8 @@ public abstract class SimpleObservationDialogUIPanel extends ObservationDialogPa
                     }
                 }
                 if (beginDate != null && endDate != null) {
-                    Date startDate = new Date(beginDate.getTime() + (endDate.getTime() - beginDate.getTime()));
-                    calendarStartDate.setDate(startDate);
-                    ObservationDialogDateModel.getInstance().setStartDate(startDate, false);
-                    // calendarEndDate.setDate(endDate);
+                    calendarStartDate.setDate(beginDate);
+                    ObservationDialogDateModel.getInstance().setStartDate(beginDate, false);
                 }
             }
         }
