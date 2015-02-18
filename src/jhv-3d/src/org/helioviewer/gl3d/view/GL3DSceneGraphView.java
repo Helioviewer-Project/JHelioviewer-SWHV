@@ -59,10 +59,9 @@ public class GL3DSceneGraphView extends AbstractGL3DView implements GL3DView {
     private GL3DHitReferenceShape hitReferenceShape;
     private GL3DGroup artificialObjects;
 
-    private final List<GL3DImageTextureView> layersToAdd = new ArrayList<GL3DImageTextureView>();
-    private final List<GL3DImageTextureView> layersToRemove = new ArrayList<GL3DImageTextureView>();
-
-    private final List<GL3DNode> nodesToDelete = new ArrayList<GL3DNode>();
+    private final ArrayList<GL3DImageTextureView> layersToAdd = new ArrayList<GL3DImageTextureView>();
+    private final ArrayList<GL3DImageTextureView> layersToRemove = new ArrayList<GL3DImageTextureView>();
+    private final ArrayList<GL3DNode> nodesToDelete = new ArrayList<GL3DNode>();
 
     public GL3DSceneGraphView() {
         this.root = createRoot();
@@ -237,7 +236,10 @@ public class GL3DSceneGraphView extends AbstractGL3DView implements GL3DView {
 
     private void toggleLayerVisibility(GL3DImageTextureView view) {
         GL3DNode node = this.imageLayers.getImageLayerForView(view);
-        node.getDrawBits().toggle(Bit.Hidden);
+        /* workaround for view still on layerToAdd */
+        if (node != null) {
+            node.getDrawBits().toggle(Bit.Hidden);
+        }
     }
 
     private void removeLayersFromSceneGraph(GL3DState state) {
@@ -245,7 +247,7 @@ public class GL3DSceneGraphView extends AbstractGL3DView implements GL3DView {
             getAdapter(GL3DCameraView.class).removeCameraListener(this.imageLayers.getImageLayerForView(imageTextureView));
             this.imageLayers.removeLayer(state, imageTextureView);
         }
-    this.layersToRemove.clear();
+        this.layersToRemove.clear();
     }
 
     private void addLayersToSceneGraph(GL3DState state) {
@@ -277,7 +279,8 @@ public class GL3DSceneGraphView extends AbstractGL3DView implements GL3DView {
     }
 
     private void removeLayer(GL3DImageTextureView imageTextureView) {
-        if (!this.layersToRemove.contains(imageTextureView) && this.imageLayers.getImageLayerForView(imageTextureView) != null) {
+        if (!this.layersToRemove.contains(imageTextureView) &&
+             this.imageLayers.getImageLayerForView(imageTextureView) != null) {
             this.layersToRemove.add(imageTextureView);
         }
     }

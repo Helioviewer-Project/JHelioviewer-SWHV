@@ -127,7 +127,6 @@ public class GL3DImageLayers extends GL3DGroup {
     public void insertLayer(GL3DImageLayer layer) {
         this.imageLayerMap.put(layer.getImageTextureView(), layer);
         this.addNode(layer);
-
         layer.setLayerGroup(this);
     }
 
@@ -140,7 +139,10 @@ public class GL3DImageLayers extends GL3DGroup {
 
     public void moveImages(GL3DImageTextureView view, int index) {
         GL3DImageLayer layer = getImageLayerForView(view);
-        layer.getParent().moveNode(layer, index);
+        /* workaround for view still on layerToAdd */
+        if (layer != null) {
+            layer.getParent().moveNode(layer, index);
+        }
     }
 
     public GL3DImageLayer getImageLayerForView(GL3DImageTextureView view) {
