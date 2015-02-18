@@ -30,7 +30,7 @@ import org.helioviewer.viewmodel.view.View;
 
 /**
  * Extended JTable, showing the Layers currently being used
- *
+ * 
  * @author Malte Nuhn
  * @author Helge Dietert
  */
@@ -73,7 +73,7 @@ public class LayerTable extends JTable {
 
             /**
              * Handle with right-click menus
-             *
+             * 
              * @param e
              */
             public void handlePopup(MouseEvent e) {
@@ -83,8 +83,9 @@ public class LayerTable extends JTable {
                 int row = source.rowAtPoint(e.getPoint());
                 int column = source.columnAtPoint(e.getPoint());
 
-                if (!source.isRowSelected(row))
+                if (!source.isRowSelected(row)) {
                     source.changeSelection(row, column, false, false);
+                }
 
                 View view = LayersModel.getSingletonInstance().getLayer(row);
 
@@ -121,24 +122,24 @@ public class LayerTable extends JTable {
              */
             @Override
             public void mouseClicked(MouseEvent e) {
-
                 LayersModel layersModel = LayersModel.getSingletonInstance();
 
                 int row = rowAtPoint(new Point(e.getX(), e.getY()));
                 int col = columnAtPoint(new Point(e.getX(), e.getY()));
 
-                if (col < 0 || row < 0)
+                if (col < 0 || row < 0) {
                     return;
+                }
 
                 int index = row;
 
                 if (col == LayerTableModel.COLUMN_VISIBILITY) {
 
-                    layersModel.setVisibleLink(row, !layersModel.isVisible(index));
+                    LayerTableModel.getSingletonInstance().setVisible(index, !layersModel.isVisible(index));
 
                 } else if (col == LayerTableModel.COLUMN_BUTTON_REMOVE) {
 
-                    layersModel.removeLayer(index);
+                    LayerTableModel.getSingletonInstance().removeLayer(index);
 
                 }
 
@@ -162,10 +163,10 @@ public class LayerTable extends JTable {
 
         getColumnModel().getColumn(LayerTableModel.COLUMN_TITLE).setCellRenderer(new DescriptorTitleRenderer(true));
         getColumnModel().getColumn(LayerTableModel.COLUMN_TITLE).setPreferredWidth(38);
-        //getColumnModel().getColumn(LayerTableModel.COLUMN_TITLE).setWidth(5);
+        // getColumnModel().getColumn(LayerTableModel.COLUMN_TITLE).setWidth(5);
 
         getColumnModel().getColumn(LayerTableModel.COLUMN_TIMESTAMP).setCellRenderer(new DescriptorTimestampRenderer(true));
-        //getColumnModel().getColumn(LayerTableModel.COLUMN_TIMESTAMP).setPreferredWidth(15);
+        // getColumnModel().getColumn(LayerTableModel.COLUMN_TIMESTAMP).setPreferredWidth(15);
         Border removeIconBorder = border;
         IconRenderer iconRenderer = new IconRenderer("Remove Layer", IconBank.getIcon(JHVIcon.REMOVE_LAYER), removeIconBorder);
         iconRenderer.setFixedWidth(this, LayerTableModel.COLUMN_BUTTON_REMOVE);
