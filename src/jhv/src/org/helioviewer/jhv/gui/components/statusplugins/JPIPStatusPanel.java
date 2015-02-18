@@ -129,34 +129,6 @@ public class JPIPStatusPanel extends ViewStatusPanelPlugin {
         }
     }
 
-    /**
-     * In case the layer itself changed and the JPIP Panel is still visible:
-     * update the Panel
-     * <p>
-     * If the layer is not valid : hide the Panel.
-     */
-
-    public void layerChanged(int idx) {
-
-        if (isVisible()) {
-
-            if (LayersModel.getSingletonInstance().isValidIndex(idx)) {
-                updateStatus(idx);
-            } else {
-                setVisible(false);
-
-            }
-
-        }
-    }
-
-    /**
-     * As long as the new active layer is valid, update the connection panel
-     */
-
-    public void activeLayerChanged(int idx) {
-        updateStatus(idx);
-    }
 
     private void updateStatus(int layer) {
     /*
@@ -176,10 +148,37 @@ public class JPIPStatusPanel extends ViewStatusPanelPlugin {
     }
 
     /**
+     * In case the layer itself changed and the JPIP Panel is still visible:
+     * update the Panel
+     * <p>
+     * If the layer is not valid : hide the Panel.
+     */
+
+    public void layerChanged(int idx) {
+    /*
+        if (isVisible()) {
+            if (LayersModel.getSingletonInstance().isValidIndex(idx)) {
+                updateStatus(idx);
+            } else {
+                setVisible(false);
+            }
+        }
+    */
+    }
+
+    /**
+     * As long as the new active layer is valid, update the connection panel
+     */
+
+    public void activeLayerChanged(int idx) {
+    //    updateStatus(idx);
+    }
+
+    /**
      * {@inheritDoc}
      */
     public void layerDownloaded(int idx) {
-        updateStatus(idx);
+    //    updateStatus(idx);
     }
 
 }
