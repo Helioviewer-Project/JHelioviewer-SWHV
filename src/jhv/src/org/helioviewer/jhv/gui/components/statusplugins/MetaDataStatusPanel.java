@@ -1,5 +1,7 @@
 package org.helioviewer.jhv.gui.components.statusplugins;
 
+import java.awt.EventQueue;
+
 import javax.swing.BorderFactory;
 import javax.swing.Icon;
 import javax.swing.JLabel;
@@ -41,8 +43,8 @@ public class MetaDataStatusPanel extends ViewStatusPanelPlugin {
         setIcon(exIcon);
         setVerticalTextPosition(JLabel.CENTER);
         setHorizontalTextPosition(JLabel.LEFT);
-        validate();
-        setPreferredSize(null);
+        //validate();
+        //setPreferredSize(null);
 
         LayersModel.getSingletonInstance().addLayersListener(this);
 
@@ -51,30 +53,39 @@ public class MetaDataStatusPanel extends ViewStatusPanelPlugin {
     /**
      * {@inheritDoc}
      */
-    public void activeLayerChanged(int idx) {
-
+    private void activeLayerChanged_raw(int idx) {
         if (LayersModel.getSingletonInstance().isValidIndex(idx)) {
             View view = LayersModel.getSingletonInstance().getLayer(idx);
+
             setVisible(true);
 
             MetaDataView metaDataView = view.getAdapter(MetaDataView.class);
-
             // this operates on the raw viewchain...
             // it might be a good idea to push that functionality to LayersModel
             if (metaDataView != null) {
                 MetaData m = metaDataView.getMetaData();
-
                 if (m instanceof HelioviewerMetaData)
                     setIcon(checkIcon);
                 else
                     setIcon(exIcon);
             }
-
-            validate();
-            setPreferredSize(null);
-
+            //validate();
+            //setPreferredSize(null);
         } else {
             setVisible(false);
+        }
+    }
+
+    public void activeLayerChanged(final int idx) {
+        if (EventQueue.isDispatchThread()) {
+            activeLayerChanged_raw(idx);
+        } else {
+            EventQueue.invokeLater(new Runnable() {
+                @Override
+                public void run() {
+                    activeLayerChanged_raw(idx);
+                }
+            });
         }
     }
 
