@@ -241,54 +241,44 @@ public class GL3DSceneGraphView extends AbstractGL3DView implements GL3DView {
     }
 
     private void removeLayersFromSceneGraph(GL3DState state) {
-        synchronized (this.layersToRemove) {
-            for (GL3DImageTextureView imageTextureView : this.layersToRemove) {
-                getAdapter(GL3DCameraView.class).removeCameraListener(this.imageLayers.getImageLayerForView(imageTextureView));
-                this.imageLayers.removeLayer(state, imageTextureView);
-            }
-            this.layersToRemove.clear();
+        for (GL3DImageTextureView imageTextureView : this.layersToRemove) {
+            getAdapter(GL3DCameraView.class).removeCameraListener(this.imageLayers.getImageLayerForView(imageTextureView));
+            this.imageLayers.removeLayer(state, imageTextureView);
         }
+    this.layersToRemove.clear();
     }
 
     private void addLayersToSceneGraph(GL3DState state) {
         GL3DCamera camera = state.getActiveCamera();
 
-        synchronized (this.layersToAdd) {
-            for (GL3DImageTextureView imageTextureView : this.layersToAdd) {
-                GL3DImageLayer imageLayer = GL3DImageLayerFactory.createImageLayer(state, imageTextureView);
-
-                getAdapter(GL3DCameraView.class).addCameraListener(imageLayer);
-
-                this.imageLayers.insertLayer(imageLayer);
-
-            }
-            if (!this.layersToAdd.isEmpty()) {
-                // If there is data, zoom to fit
-                MetaDataView metaDataView = getAdapter(MetaDataView.class);
-                if (metaDataView != null && metaDataView.getMetaData() != null) {
-                    Region region = metaDataView.getMetaData().getPhysicalRegion();
-                    double halfWidth = region.getWidth() / 2;
-                    double halfFOVRad = Math.toRadians(camera.getCameraFOV() / 2);
-                    double distance = halfWidth * Math.sin(Math.PI / 2 - halfFOVRad) / Math.sin(halfFOVRad);
-                    distance = -distance - camera.getZTranslation();
-                    // Log.debug("GL3DZoomFitAction: Distance = "+distance+" Existing Distance: "+camera.getZTranslation());
-                }
-            }
-            this.layersToAdd.clear();
+        for (GL3DImageTextureView imageTextureView : this.layersToAdd) {
+            GL3DImageLayer imageLayer = GL3DImageLayerFactory.createImageLayer(state, imageTextureView);
+            getAdapter(GL3DCameraView.class).addCameraListener(imageLayer);
+            this.imageLayers.insertLayer(imageLayer);
         }
+
+        if (!this.layersToAdd.isEmpty()) {
+            // If there is data, zoom to fit
+            MetaDataView metaDataView = getAdapter(MetaDataView.class);
+            if (metaDataView != null && metaDataView.getMetaData() != null) {
+                Region region = metaDataView.getMetaData().getPhysicalRegion();
+                double halfWidth = region.getWidth() / 2;
+                double halfFOVRad = Math.toRadians(camera.getCameraFOV() / 2);
+                double distance = halfWidth * Math.sin(Math.PI / 2 - halfFOVRad) / Math.sin(halfFOVRad);
+                distance = -distance - camera.getZTranslation();
+                // Log.debug("GL3DZoomFitAction: Distance = "+distance+" Existing Distance: "+camera.getZTranslation());
+            }
+        }
+        this.layersToAdd.clear();
     }
 
     private void addNewLayer(GL3DImageTextureView imageTextureView) {
-        synchronized (this.layersToAdd) {
-            this.layersToAdd.add(imageTextureView);
-        }
+        this.layersToAdd.add(imageTextureView);
     }
 
     private void removeLayer(GL3DImageTextureView imageTextureView) {
-        synchronized (this.layersToRemove) {
-            if (!this.layersToRemove.contains(imageTextureView) && this.imageLayers.getImageLayerForView(imageTextureView) != null) {
-                this.layersToRemove.add(imageTextureView);
-            }
+        if (!this.layersToRemove.contains(imageTextureView) && this.imageLayers.getImageLayerForView(imageTextureView) != null) {
+            this.layersToRemove.add(imageTextureView);
         }
     }
 
