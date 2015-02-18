@@ -159,6 +159,7 @@ public class JPIPStatusPanel extends ViewStatusPanelPlugin {
     }
 
     private void updateStatus(int layer) {
+    /*
         if (LayersModel.getSingletonInstance().isValidIndex(layer)) {
             View view = LayersModel.getSingletonInstance().getLayer(layer);
             boolean connected = LayersModel.getSingletonInstance().isConnectedToJPIP(view);
@@ -171,6 +172,7 @@ public class JPIPStatusPanel extends ViewStatusPanelPlugin {
                 // updateStatus(ConnectionStatus.LOCAL);
             }
         }
+    */
     }
 
     /**
