@@ -14,7 +14,6 @@ import javax.media.opengl.GL2;
 import javax.media.opengl.GLAutoDrawable;
 import javax.media.opengl.GLEventListener;
 import javax.media.opengl.awt.GLCanvas;
-import javax.media.opengl.glu.GLU;
 import javax.swing.JOptionPane;
 import javax.swing.JTextArea;
 
@@ -89,10 +88,6 @@ public class GLComponentView extends AbstractComponentView implements GLEventLis
     private Color backgroundColor = Color.BLACK;
     private boolean backGroundColorHasChanged = false;
 
-    private RegionView regionView;
-
-    private float xOffset = 0.0f;
-    private float yOffset = 0.0f;
     private final AbstractList<ScreenRenderer> postRenderers = new LinkedList<ScreenRenderer>();
 
     // Helper
@@ -303,19 +298,15 @@ public class GLComponentView extends AbstractComponentView implements GLEventLis
      * @param yOffsetFinal
      *            y-offset in pixels
      */
-    protected void displayBody(GL2 gl, float xOffsetFinal, float yOffsetFinal) {
+    protected void displayBody(GL2 gl) {
         // Set up screen
-
         gl.glClear(GL2.GL_COLOR_BUFFER_BIT);
 
-        Viewport viewport = view.getAdapter(ViewportView.class).getViewport();
         ViewportImageSize viewportImageSize = ViewHelper.calculateViewportImageSize(view);
-
         if (viewportImageSize != null) {
             gl.glPushMatrix();
 
-            Region region = regionView.getRegion();
-            gl.glTranslatef(xOffsetFinal, yOffsetFinal, 0.0f);
+            Region region = view.getAdapter(RegionView.class).getRegion();
             gl.glScalef(viewportImageSize.getWidth() / (float) region.getWidth(), viewportImageSize.getHeight() / (float) region.getHeight(), 1.0f);
             gl.glTranslatef((float) -region.getCornerX(), (float) -region.getCornerY(), 0.0f);
 
@@ -328,11 +319,12 @@ public class GLComponentView extends AbstractComponentView implements GLEventLis
             gl.glPopMatrix();
         }
 
+        Viewport viewport = view.getAdapter(ViewportView.class).getViewport();
         if (viewport != null) {
             if (!this.postRenderers.isEmpty()) {
                 // Draw post renderer
                 gl.glTranslatef(0.0f, viewport.getHeight(), 0.0f);
-                gl.glScalef(1.0f, -1.0f, 1.0f);
+                gl.glScalef(1.0f, -11.0f, 1.0f);
 
                 GLScreenRenderGraphics glRenderer = new GLScreenRenderGraphics(gl);
                 synchronized (postRenderers) {
@@ -379,10 +371,6 @@ public class GLComponentView extends AbstractComponentView implements GLEventLis
             }
         }
 
-        if (view == null) {
-            return;
-        }
-
         GL2 gl = drawable.getGL().getGL2();
         int width = drawable.getSurfaceWidth();
         int height = drawable.getSurfaceHeight();
@@ -407,34 +395,12 @@ public class GLComponentView extends AbstractComponentView implements GLEventLis
             rebuildShaders(gl);
         }
 
-        float xOffsetFinal = xOffset;
-        float yOffsetFinal = yOffset;
-
         if (backGroundColorHasChanged) {
             gl.glClearColor(backgroundColor.getRed() / 255.0f, backgroundColor.getGreen() / 255.0f, backgroundColor.getBlue() / 255.0f, backgroundColor.getAlpha() / 255.0f);
             backGroundColorHasChanged = false;
         }
 
-        ViewportImageSize viewportImageSize = ViewHelper.calculateViewportImageSize(view);
-        if (viewportImageSize != null && canvas != null) {
-            if (viewportImageSize.getWidth() < canvas.getWidth()) {
-                xOffsetFinal += (canvas.getWidth() - viewportImageSize.getWidth()) / 2;
-            }
-            if (viewportImageSize.getHeight() < canvas.getHeight()) {
-                yOffsetFinal += canvas.getHeight() - viewportImageSize.getHeight() - yOffsetFinal - (canvas.getHeight() - viewportImageSize.getHeight()) / 2;
-            }
-        }
-
-        displayBody(gl, xOffsetFinal, yOffsetFinal);
-
-        /*
-        // check for errors
-        int errorCode = gl.glGetError();
-        if (errorCode != GL2.GL_NO_ERROR) {
-            GLU glu = new GLU();
-            Log.error("OpenGL Error (" + errorCode + ") : " + glu.gluErrorString(errorCode));
-        }
-        */
+        displayBody(gl);
 
         if (exportMode && mv != null) {
             int currentScreenshot = 1;
@@ -481,8 +447,6 @@ public class GLComponentView extends AbstractComponentView implements GLEventLis
      */
     @Override
     public void setOffset(Vector2dInt offset) {
-        xOffset = offset.getX();
-        yOffset = offset.getY();
     }
 
     /**
@@ -492,7 +456,6 @@ public class GLComponentView extends AbstractComponentView implements GLEventLis
      */
     @Override
     protected void setViewSpecificImplementation(View newView, ChangeEvent changeEvent) {
-        this.regionView = view.getAdapter(RegionView.class);
     }
 
     @Override
@@ -517,7 +480,6 @@ public class GLComponentView extends AbstractComponentView implements GLEventLis
                   layerChanged.getLayerChangeType() == LayerChangeType.LAYER_ADDED) ||
                 aEvent.reasonOccurred(ViewChainChangedReason.class)) {
                 rebuildShadersRequest = true;
-                this.regionView = view.getAdapter(RegionView.class);
             }
         }
 

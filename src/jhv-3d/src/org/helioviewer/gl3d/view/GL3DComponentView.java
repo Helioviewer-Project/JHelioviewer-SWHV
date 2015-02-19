@@ -77,7 +77,6 @@ public class GL3DComponentView extends AbstractComponentView implements GLEventL
     private final GLShaderHelper shaderHelper = new GLShaderHelper();
 
     // private GL3DOrthoView orthoView;
-    private ViewportView viewportView;
 
     // screenshot & movie
     private TileRenderer tileRenderer;
@@ -123,10 +122,6 @@ public class GL3DComponentView extends AbstractComponentView implements GLEventL
     @Override
     public GLCanvas getComponent() {
         return canvas;
-    }
-
-    public void displayChanged(GLAutoDrawable arg0, boolean arg1, boolean arg2) {
-        // Log.debug("GL3DComponentView.DisplayChanged");
     }
 
     @Override
@@ -233,6 +228,19 @@ public class GL3DComponentView extends AbstractComponentView implements GLEventL
     public void reshape(GLAutoDrawable drawable, int x, int y, int width, int height) {
     }
 
+    private void displayBody(GL2 gl) {
+        gl.glClear(GL2.GL_COLOR_BUFFER_BIT | GL2.GL_DEPTH_BUFFER_BIT);
+        gl.glColor4f(1, 1, 1, 1);
+        gl.glEnable(GL2.GL_LIGHTING);
+        gl.glEnable(GL2.GL_DEPTH_TEST);
+
+        gl.glPushMatrix();
+        if (this.getView() instanceof GLView) {
+            ((GLView) this.getView()).renderGL(gl, true);
+        }
+        gl.glPopMatrix();
+    }
+
     @Override
     public void display(GLAutoDrawable drawable) {
 
@@ -250,10 +258,6 @@ public class GL3DComponentView extends AbstractComponentView implements GLEventL
                 this.stopExport();
                 Log.warn("Premature stopping the video export: no active layer found");
             }
-        }
-
-        if (view == null) {
-            return;
         }
 
         GL2 gl = drawable.getGL().getGL2();
@@ -288,21 +292,7 @@ public class GL3DComponentView extends AbstractComponentView implements GLEventL
             rebuildShaders(gl);
         }
 
-        // Viewport viewport =
-        // view.getAdapter(ViewportView.class).getViewport();
-        // int width = viewport.getWidth();
-        // int height = viewport.getHeight();
-
-        gl.glClear(GL2.GL_COLOR_BUFFER_BIT | GL2.GL_DEPTH_BUFFER_BIT);
-        gl.glColor4f(1, 1, 1, 1);
-        gl.glEnable(GL2.GL_LIGHTING);
-        gl.glEnable(GL2.GL_DEPTH_TEST);
-
-        gl.glPushMatrix();
-        if (this.getView() instanceof GLView) {
-            ((GLView) this.getView()).renderGL(gl, true);
-        }
-        gl.glPopMatrix();
+        displayBody(gl);
 
         gl.glPushMatrix();
         if (!this.postRenderers.isEmpty()) {
@@ -373,18 +363,13 @@ public class GL3DComponentView extends AbstractComponentView implements GLEventL
 
     @Override
     public void setOffset(Vector2dInt offset) {
-        // if(this.orthoView!=null) {
-        // orthoView.setOffset(offset);
-        // }
     }
+
 /*
     @Override
     public void updateMainImagePanelSize(Vector2dInt size) {
         super.updateMainImagePanelSize(size);
 
-        // if(this.orthoView!=null) {
-        // this.orthoView.updateMainImagePanelSize(size);
-        // }
         if (this.viewportView != null) {
             Viewport viewport = StaticViewport.createAdaptedViewport(Math.max(1, size.getX()), Math.max(1, size.getY()));
             this.viewportView.setViewport(viewport, null);
@@ -394,8 +379,6 @@ public class GL3DComponentView extends AbstractComponentView implements GLEventL
 
     @Override
     protected void setViewSpecificImplementation(View newView, ChangeEvent changeEvent) {
-        // this.orthoView = getAdapter(GL3DOrthoView.class);
-        this.viewportView = view.getAdapter(ViewportView.class);
     }
 
     @Override
@@ -417,7 +400,6 @@ public class GL3DComponentView extends AbstractComponentView implements GLEventL
                   layerChanged.getLayerChangeType() == LayerChangeType.LAYER_ADDED) ||
                 aEvent.reasonOccurred(ViewChainChangedReason.class)) {
                 rebuildShadersRequest = true;
-                this.viewportView = getAdapter(ViewportView.class);
             }
         }
 
