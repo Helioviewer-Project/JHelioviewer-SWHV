@@ -493,7 +493,7 @@ public class GLComponentView extends AbstractComponentView implements GLEventLis
     @Override
     public void display() {
         try {
-            this.canvas.display();
+            this.canvas.repaint();
         } catch (Exception e) {
             Log.warn("Display of GLComponentView canvas failed", e);
         }
