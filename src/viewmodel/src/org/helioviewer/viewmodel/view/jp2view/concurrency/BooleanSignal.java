@@ -42,15 +42,6 @@ public class BooleanSignal {
         }
     }
 
-    public void waitForSignal(long timeout) throws InterruptedException {
-        synchronized (lock) {
-            while (!isSignaled) {
-                lock.wait(timeout);
-            }
-            isSignaled = false;
-        }
-    }
-
     /**
      * Sets the isSignaled flag and wakes up one waiting thread. Doesn't bother
      * to notifyAll since the first thread woken up resets the flag anyway.
