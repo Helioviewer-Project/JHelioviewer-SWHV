@@ -110,7 +110,7 @@ public class GL3DCanvas extends GLCanvas implements GLEventListener {
         this.rectangle.draw(state);
         //
         // this.renderVBO(state);
-        state.checkGLErrors();
+        // state.checkGLErrors();
     }
 
     public void displayChanged(GLAutoDrawable arg0, boolean arg1, boolean arg2) {

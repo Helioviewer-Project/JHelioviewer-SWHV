@@ -141,8 +141,7 @@ public abstract class GL3DMesh extends GL3DShape {
             // GL3DState.get().checkGLErrors("GL3DImageMesh.beforeDrawCall "+getName());
 
             state.gl.glDrawElements(primitive.id, this.indexVBO.numberOfElements, this.indexVBO.dataType.id, 0);
-            // state.gl.glFinish();
-            GL3DState.get().checkGLErrors("GL3DImageMesh.afterDrawCall " + getName() + " IndexVBO: " + this.indexVBO.id);
+            // GL3DState.get().checkGLErrors("GL3DImageMesh.afterDrawCall " + getName() + " IndexVBO: " + this.indexVBO.id);
             this.positionVBO.disable(state);
             this.colorVBO.disable(state);
             this.normalVBO.disable(state);

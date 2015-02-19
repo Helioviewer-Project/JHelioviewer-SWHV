@@ -368,7 +368,7 @@ public class GL3DComponentView extends AbstractComponentView implements GLEventL
             }
             this.stopScreenshot();
         }
-        GL3DState.get().checkGLErrors();
+        // GL3DState.get().checkGLErrors();
     }
 
 

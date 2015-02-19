@@ -113,6 +113,13 @@ public class GL3DState {
             Log.warn("OpenGL not yet Initialised!");
             return true;
         }
+        /*
+        To allow for distributed implementations, there may be several error flags.
+        If any single error flag has recorded an error, the value of that flag is returned
+        and that flag is reset to GL_NO_ERROR when glGetError is called. If more than one flag
+        has recorded an error, glGetError returns and clears an arbitrary error flag value. Thus,
+        glGetError should always be called in a loop, until it returns GL_NO_ERROR, if all error flags are to be reset.
+        */
         int glErrorCode = gl.glGetError();
 
         if (glErrorCode != GL2.GL_NO_ERROR) {

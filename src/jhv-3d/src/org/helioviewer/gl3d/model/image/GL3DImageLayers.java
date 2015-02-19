@@ -43,7 +43,7 @@ public class GL3DImageLayers extends GL3DGroup {
     public void shapeDraw(GL3DState state) {
 
         if (!this.isDrawBitOn(Bit.Wireframe)) {
-            GL3DState.get().checkGLErrors("GL3DImageLayers.beforeEnable");
+            // GL3DState.get().checkGLErrors("GL3DImageLayers.beforeEnable");
             state.gl.glEnable(GL2.GL_FRAGMENT_PROGRAM_ARB);
             state.gl.glEnable(GL2.GL_VERTEX_PROGRAM_ARB);
         }
@@ -51,7 +51,7 @@ public class GL3DImageLayers extends GL3DGroup {
         this.drawImageLayers(state);
         state.gl.glDisable(GL2.GL_FRAGMENT_PROGRAM_ARB);
         state.gl.glDisable(GL2.GL_VERTEX_PROGRAM_ARB);
-        GL3DState.get().checkGLErrors("GL3DImageLayers.afterDisable");
+        // GL3DState.get().checkGLErrors("GL3DImageLayers.afterDisable");
 
         state.gl.glDisable(GL2.GL_BLEND);
         state.gl.glEnable(GL2.GL_LIGHTING);
