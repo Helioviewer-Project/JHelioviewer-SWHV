@@ -19,7 +19,6 @@ import org.helioviewer.gl3d.movie.MovieExport;
 import org.helioviewer.gl3d.scenegraph.GL3DState;
 import org.helioviewer.jhv.display.DisplayListener;
 import org.helioviewer.jhv.display.Displayer;
-import org.helioviewer.jhv.display.GL3DComponentFakeInterface;
 import org.helioviewer.jhv.gui.ImageViewerGui;
 import org.helioviewer.jhv.gui.dialogs.ExportMovieDialog;
 import org.helioviewer.jhv.layers.LayersModel;
@@ -68,7 +67,7 @@ import com.jogamp.opengl.util.awt.ImageUtil;
  * @author Simon Spoerri (simon.spoerri@fhnw.ch)
  *
  */
-public class GL3DComponentView extends AbstractComponentView implements GLEventListener, ComponentView, DisplayListener, GL3DComponentFakeInterface {
+public class GL3DComponentView extends AbstractComponentView implements GLEventListener, ComponentView, DisplayListener {
     private static DrawImplementation draw;
 
     // general
@@ -102,7 +101,6 @@ public class GL3DComponentView extends AbstractComponentView implements GLEventL
         canvas = GLSharedDrawable.getSingletonInstance().getCanvas();
         canvas.addGLEventListener(this);
 
-        Displayer.getSingletonInstance().register(this);
         Displayer.getSingletonInstance().addListener(this);
     }
 
@@ -121,11 +119,11 @@ public class GL3DComponentView extends AbstractComponentView implements GLEventL
     }
 
     @Override
-    public void deactivate() {
+    public void activate() {
     }
 
     @Override
-    public void activate() {
+    public void deactivate() {
     }
 
     @Override
@@ -283,7 +281,8 @@ public class GL3DComponentView extends AbstractComponentView implements GLEventL
             ViewportImageSize viewportImageSize = ViewHelper.calculateViewportImageSize(view);
             if (viewportImageSize != null) {
                 Region region = view.getAdapter(RegionView.class).getRegion();
-                gl.glScalef(viewportImageSize.getWidth() / (float) region.getWidth(), viewportImageSize.getHeight() / (float) region.getHeight(), 1.0f);
+                gl.glScalef(viewportImageSize.getWidth() / (float) region.getWidth(),
+                            viewportImageSize.getHeight() / (float) region.getHeight(), 1.0f);
                 gl.glTranslatef((float) -region.getCornerX(), (float) -region.getCornerY(), 0.0f);
 
                 view.renderGL(gl, true);
@@ -322,7 +321,7 @@ public class GL3DComponentView extends AbstractComponentView implements GLEventL
                 }
             } else {
                 this.stopExport();
-                Log.warn("Premature stopping the video export: no active layer found");
+                Log.warn("Premature stop of video export: no active layer found");
             }
         }
 
@@ -349,7 +348,8 @@ public class GL3DComponentView extends AbstractComponentView implements GLEventL
         }
 
         if (backGroundColorHasChanged) {
-            gl.glClearColor(backgroundColor.getRed() / 255.0f, backgroundColor.getGreen() / 255.0f, backgroundColor.getBlue() / 255.0f, backgroundColor.getAlpha() / 255.0f);
+            gl.glClearColor(backgroundColor.getRed() / 255.0f, backgroundColor.getGreen() / 255.0f,
+                            backgroundColor.getBlue() / 255.0f, backgroundColor.getAlpha() / 255.0f);
             backGroundColorHasChanged = false;
         }
 
@@ -436,18 +436,6 @@ public class GL3DComponentView extends AbstractComponentView implements GLEventL
     @Override
     public void setOffset(Vector2dInt offset) {
     }
-
-/*
-    @Override
-    public void updateMainImagePanelSize(Vector2dInt size) {
-        super.updateMainImagePanelSize(size);
-
-        if (this.viewportView != null) {
-            Viewport viewport = StaticViewport.createAdaptedViewport(Math.max(1, size.getX()), Math.max(1, size.getY()));
-            this.viewportView.setViewport(viewport, null);
-        }
-    }
-*/
 
     @Override
     protected void setViewSpecificImplementation(View newView, ChangeEvent changeEvent) {
