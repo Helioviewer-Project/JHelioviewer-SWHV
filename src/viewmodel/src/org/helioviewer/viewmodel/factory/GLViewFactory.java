@@ -1,5 +1,6 @@
 package org.helioviewer.viewmodel.factory;
 
+import org.helioviewer.gl3d.view.GL3DComponentView;
 import org.helioviewer.viewmodel.view.ComponentView;
 import org.helioviewer.viewmodel.view.FilterView;
 import org.helioviewer.viewmodel.view.HelioviewerGeometryView;
@@ -8,7 +9,6 @@ import org.helioviewer.viewmodel.view.OverlayView;
 import org.helioviewer.viewmodel.view.StandardSolarRotationTrackingView;
 import org.helioviewer.viewmodel.view.SynchronizeView;
 import org.helioviewer.viewmodel.view.View;
-import org.helioviewer.viewmodel.view.opengl.GLComponentView;
 import org.helioviewer.viewmodel.view.opengl.GLFilterView;
 import org.helioviewer.viewmodel.view.opengl.GLHelioviewerGeometryView;
 import org.helioviewer.viewmodel.view.opengl.GLLayeredView;
@@ -39,7 +39,7 @@ public class GLViewFactory extends StandardViewFactory {
 
         // ComponentView
         if (pattern.isAssignableFrom(ComponentView.class)) {
-            return (T) new GLComponentView();
+            return (T) new GL3DComponentView();
             // EventView
         } else if (pattern.isAssignableFrom(GLOverlayView.class)) {
             return (T) new GLOverlayView();
@@ -71,7 +71,7 @@ public class GLViewFactory extends StandardViewFactory {
 
         // ComponentView
         if (source instanceof ComponentView) {
-            return (T) new GLComponentView();
+            return (T) new GL3DComponentView();
             // OverlayView
         } else if (source instanceof OverlayView) {
             return (T) new GLOverlayView();
