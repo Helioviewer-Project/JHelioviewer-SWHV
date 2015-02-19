@@ -562,44 +562,4 @@ public class GLComponentView extends AbstractComponentView implements GLEventLis
         }
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void addPostRenderer(ScreenRenderer postRenderer) {
-        if (postRenderer != null) {
-            synchronized (postRenderers) {
-                postRenderers.add(postRenderer);
-                if (postRenderer instanceof ViewListener) {
-                    addViewListener((ViewListener) postRenderer);
-                }
-            }
-        }
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void removePostRenderer(ScreenRenderer postRenderer) {
-        if (postRenderer != null) {
-            synchronized (postRenderers) {
-                do {
-                    postRenderers.remove(postRenderer);
-                    if (postRenderer instanceof ViewListener) {
-                        removeViewListener((ViewListener) postRenderer);
-                    }
-                } while (postRenderers.contains(postRenderer));
-            }
-        }
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public AbstractList<ScreenRenderer> getAllPostRenderer() {
-        return postRenderers;
-    }
-
 }
