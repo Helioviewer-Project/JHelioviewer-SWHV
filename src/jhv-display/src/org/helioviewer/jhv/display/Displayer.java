@@ -1,8 +1,7 @@
 package org.helioviewer.jhv.display;
 
+// import java.awt.EventQueue;
 import java.util.ArrayList;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ThreadPoolExecutor;
 
 import org.helioviewer.gl3d.scenegraph.math.GL3DVec3d;
 import org.helioviewer.jhv.data.datatype.event.JHVEvent;
@@ -15,7 +14,6 @@ public class Displayer implements JHVEventHighlightListener {
     private static Displayer instance = new Displayer();
     private ArrayList<DisplayListener> listeners = new ArrayList<DisplayListener>();
     private final ArrayList<RenderListener> renderListeners = new ArrayList<RenderListener>();
-    private final ThreadPoolExecutor displayPool = (ThreadPoolExecutor) Executors.newFixedThreadPool(1);//Executors.newSingleThreadExecutor();
 
     private boolean displaying = false;
     private int state = 2;
@@ -67,26 +65,16 @@ public class Displayer implements JHVEventHighlightListener {
 
     }
 
-    private void tdisplay() {
-        /*synchronized (displaylock)*/ {
-            for (final DisplayListener listener : listeners) {
-                listener.display();
-            }
-        }
-    }
-
-    private final class DisplayTask implements Runnable {
-        @Override
-        public void run() {
-            tdisplay();
-        }
-    }
-
     public void display() {
-        if (displayPool.getActiveCount() == 0) {
-            displayPool.submit(new DisplayTask());
-        }
-    }
+/*        EventQueue.invokeLater(new Runnable() {
+            @Override
+            public void run() { */
+                for (final DisplayListener listener : listeners) {
+                    listener.display();
+                }
+/*            }
+        });
+*/    }
 
     public void removeListeners() {
         this.listeners = new ArrayList<DisplayListener>();
