@@ -28,7 +28,6 @@ import org.helioviewer.viewmodel.changeevent.LayerChangedReason.LayerChangeType;
 import org.helioviewer.viewmodel.changeevent.SubImageDataChangedReason;
 import org.helioviewer.viewmodel.changeevent.TimestampChangedReason;
 import org.helioviewer.viewmodel.changeevent.ViewChainChangedReason;
-import org.helioviewer.viewmodel.renderer.GLCommonRenderGraphics;
 import org.helioviewer.viewmodel.renderer.screen.GLScreenRenderGraphics;
 import org.helioviewer.viewmodel.renderer.screen.ScreenRenderer;
 import org.helioviewer.viewmodel.view.AbstractComponentView;
@@ -36,7 +35,6 @@ import org.helioviewer.viewmodel.view.ComponentView;
 import org.helioviewer.viewmodel.view.LinkedMovieManager;
 import org.helioviewer.viewmodel.view.TimedMovieView;
 import org.helioviewer.viewmodel.view.View;
-import org.helioviewer.viewmodel.view.ViewportView;
 import org.helioviewer.viewmodel.view.jp2view.JHVJP2View;
 import org.helioviewer.viewmodel.view.jp2view.JHVJPXView;
 import org.helioviewer.viewmodel.view.opengl.GLSharedDrawable;
@@ -93,7 +91,6 @@ public class GL3DComponentView extends AbstractComponentView implements GLEventL
 
         canvas = GLSharedDrawable.getSingletonInstance().getCanvas();
         canvas.addGLEventListener(this);
-
         Displayer.getSingletonInstance().addListener(this);
     }
 
@@ -106,8 +103,6 @@ public class GL3DComponentView extends AbstractComponentView implements GLEventL
         tileRenderer = null;
 
         Displayer.getSingletonInstance().removeListener(this);
-
-        drawable.getGL().getGL2().glFinish();
         drawable.removeGLEventListener(this);
     }
 
@@ -172,18 +167,18 @@ public class GL3DComponentView extends AbstractComponentView implements GLEventL
     }
 
     public void startScreenshot() {
-        this.screenshotMode = true;
+        screenshotMode = true;
         Displayer.getSingletonInstance().render();
     }
 
     public void stopScreenshot() {
-        this.screenshotMode = false;
+        screenshotMode = false;
     }
 
     @Override
     public boolean saveScreenshot(String imageFormat, File outputFile) throws IOException {
         this.outputFile = outputFile;
-        this.startScreenshot();
+        startScreenshot();
         return true;
     }
 
@@ -289,12 +284,12 @@ public class GL3DComponentView extends AbstractComponentView implements GLEventL
             throw new NullPointerException("View is not an instance of GLView");
 
         GL2 gl = drawable.getGL().getGL2();
+
         GLTextureHelper.initHelper(gl);
         GL3DState.create(gl);
+        rebuildShadersRequest = true;
 
         draw.init(gl);
-
-        this.rebuildShadersRequest = true;
     }
 
     @Override
@@ -316,7 +311,7 @@ public class GL3DComponentView extends AbstractComponentView implements GLEventL
                     tileRenderer.reset();
                 }
             } else {
-                this.stopExport();
+                stopExport();
                 Log.warn("Premature stop of video export: no active layer found");
             }
         }
@@ -400,7 +395,7 @@ public class GL3DComponentView extends AbstractComponentView implements GLEventL
             exportMovieDialog.setLabelText("Exporting frame " + (currentScreenshot + 1) + " / " + (maxframeno + 1));
 
             if ((!(mv instanceof JHVJPXView)) || (mv instanceof JHVJPXView && currentScreenshot < previousScreenshot)) {
-                this.stopExport();
+                stopExport();
             }
             previousScreenshot = currentScreenshot;
         }
@@ -414,7 +409,7 @@ public class GL3DComponentView extends AbstractComponentView implements GLEventL
             } catch (IOException e) {
                 e.printStackTrace();
             }
-            this.stopScreenshot();
+            stopScreenshot();
         }
         // GL3DState.get().checkGLErrors();
     }
@@ -437,7 +432,7 @@ public class GL3DComponentView extends AbstractComponentView implements GLEventL
     @Override
     public void display() {
         try {
-            this.canvas.repaint();
+            canvas.repaint();
         } catch (Exception e) {
             Log.warn("Display of GL3DComponentView canvas failed", e);
         }

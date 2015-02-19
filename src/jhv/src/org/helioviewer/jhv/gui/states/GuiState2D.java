@@ -62,7 +62,6 @@ public class GuiState2D implements State {
 
         // create overview view chain
         if (firstTime) {
-
             ViewchainFactory overviewFactory = new ViewchainFactory(true);
             overviewComponentView = overviewFactory.createViewchainOverview(mainComponentView, overviewComponentView, false);
         } else {
@@ -141,4 +140,5 @@ public class GuiState2D implements State {
     public boolean isOverviewPanelInteractionEnabled() {
         return true;
     }
+
 }
