@@ -42,12 +42,7 @@ import org.helioviewer.viewmodel.view.jp2view.JHVJPXView;
 import org.helioviewer.viewmodel.view.opengl.GLSharedDrawable;
 import org.helioviewer.viewmodel.view.opengl.GLTextureHelper;
 import org.helioviewer.viewmodel.view.opengl.GLView;
-import org.helioviewer.viewmodel.view.opengl.shader.GLFragmentShaderView;
-import org.helioviewer.viewmodel.view.opengl.shader.GLMinimalFragmentShaderProgram;
-import org.helioviewer.viewmodel.view.opengl.shader.GLMinimalVertexShaderProgram;
 import org.helioviewer.viewmodel.view.opengl.shader.GLShaderBuilder;
-import org.helioviewer.viewmodel.view.opengl.shader.GLShaderHelper;
-import org.helioviewer.viewmodel.view.opengl.shader.GLVertexShaderView;
 import org.helioviewer.viewmodel.viewport.Viewport;
 
 import org.helioviewer.viewmodel.region.Region;
@@ -78,8 +73,6 @@ public class GL3DComponentView extends AbstractComponentView implements GLEventL
     private boolean backGroundColorHasChanged = false;
 
     private boolean rebuildShadersRequest = false;
-
-    private final GLShaderHelper shaderHelper = new GLShaderHelper();
 
     // screenshot & movie
     private TileRenderer tileRenderer;
@@ -292,6 +285,9 @@ public class GL3DComponentView extends AbstractComponentView implements GLEventL
 
     @Override
     public void init(GLAutoDrawable drawable) {
+        if ((view instanceof GLView) == false)
+            throw new NullPointerException("View is not an instance of GLView");
+
         GL2 gl = drawable.getGL().getGL2();
         GLTextureHelper.initHelper(gl);
         GL3DState.create(gl);
@@ -353,17 +349,14 @@ public class GL3DComponentView extends AbstractComponentView implements GLEventL
             backGroundColorHasChanged = false;
         }
 
-        // Rebuild all shaders, if necessary
         if (rebuildShadersRequest) {
-            rebuildShaders(gl);
+            GLShaderBuilder.rebuildShaders(gl, (GLView) view);
+            rebuildShadersRequest = false;
         }
 
-        View view = this.getView();
-        if (view instanceof GLView) {
-            gl.glPushMatrix();
-            draw.displayBody(gl, (GLView) view);
-            gl.glPopMatrix();
-        }
+        gl.glPushMatrix();
+        draw.displayBody(gl, (GLView) view);
+        gl.glPopMatrix();
 
         if (!this.postRenderers.isEmpty()) {
             gl.glPushMatrix();
@@ -473,37 +466,6 @@ public class GL3DComponentView extends AbstractComponentView implements GLEventL
         }
 
         notifyViewListeners(aEvent);
-    }
-
-    private void rebuildShaders(GL2 gl) {
-        rebuildShadersRequest = false;
-        shaderHelper.delAllShaderIDs(gl);
-
-        GLFragmentShaderView fragmentView = view.getAdapter(GLFragmentShaderView.class);
-        if (fragmentView != null) {
-            // create new shader builder
-            GLShaderBuilder newShaderBuilder = new GLShaderBuilder(gl, GL2.GL_FRAGMENT_PROGRAM_ARB);
-
-            // fill with standard values
-            GLMinimalFragmentShaderProgram minimalProgram = new GLMinimalFragmentShaderProgram();
-            minimalProgram.build(newShaderBuilder);
-
-            // fill with other filters and compile
-            fragmentView.buildFragmentShader(newShaderBuilder).compile();
-        }
-
-        GLVertexShaderView vertexView = view.getAdapter(GLVertexShaderView.class);
-        if (vertexView != null) {
-            // create new shader builder
-            GLShaderBuilder newShaderBuilder = new GLShaderBuilder(gl, GL2.GL_VERTEX_PROGRAM_ARB);
-
-            // fill with standard values
-            GLMinimalVertexShaderProgram minimalProgram = new GLMinimalVertexShaderProgram();
-            minimalProgram.build(newShaderBuilder);
-
-            // fill with other filters and compile
-            vertexView.buildVertexShader(newShaderBuilder).compile();
-        }
     }
 
 }
