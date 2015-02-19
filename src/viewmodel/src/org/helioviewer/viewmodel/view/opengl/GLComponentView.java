@@ -91,7 +91,6 @@ public class GLComponentView extends AbstractComponentView implements GLEventLis
 
     private RegionView regionView;
 
-    private Vector2dInt viewportSize;
     private float xOffset = 0.0f;
     private float yOffset = 0.0f;
     private final AbstractList<ScreenRenderer> postRenderers = new LinkedList<ScreenRenderer>();
@@ -276,7 +275,6 @@ public class GLComponentView extends AbstractComponentView implements GLEventLis
     @Override
     public void reshape(GLAutoDrawable drawable, int x, int y, int width, int height) {
         GL2 gl = drawable.getGL().getGL2();
-        this.viewportSize = new Vector2dInt(width, height);
 
         // gl.setSwapInterval(1);
 
@@ -386,9 +384,9 @@ public class GLComponentView extends AbstractComponentView implements GLEventLis
         }
 
         GL2 gl = drawable.getGL().getGL2();
+        int width = drawable.getSurfaceWidth();
+        int height = drawable.getSurfaceHeight();
 
-        int width = this.viewportSize.getX();
-        int height = this.viewportSize.getY();
         AWTGLPixelBuffer pixelBuffer = null;
         if ((screenshotMode || exportMode) && mv != null) {
             tileRenderer.setTileSize(width, height, 0);
@@ -506,7 +504,6 @@ public class GLComponentView extends AbstractComponentView implements GLEventLis
      */
     @Override
     public void viewChanged(View sender, ChangeEvent aEvent) {
-
         if (aEvent != null) {
             LayerChangedReason layerChanged;
 
