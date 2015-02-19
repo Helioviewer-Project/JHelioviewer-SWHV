@@ -408,7 +408,7 @@ public class GL3DComponentView extends AbstractComponentView implements GLEventL
     @Override
     public void display() {
         try {
-            this.canvas.display();
+            this.canvas.repaint();
         } catch (Exception e) {
             Log.warn("Display of GL3DComponentView canvas failed", e);
         }
