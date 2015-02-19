@@ -79,8 +79,6 @@ public class GL3DComponentView extends AbstractComponentView implements GLEventL
     // private GL3DOrthoView orthoView;
     private ViewportView viewportView;
 
-    private Vector2dInt viewportSize;
-
     // screenshot & movie
     private TileRenderer tileRenderer;
     private BufferedImage screenshot;
@@ -227,16 +225,12 @@ public class GL3DComponentView extends AbstractComponentView implements GLEventL
 
         gl.glEnable(GL2.GL_LIGHT0);
 
-        viewportSize = new Vector2dInt(0, 0);
         this.rebuildShadersRequest = true;
         // gl.glColor3f(1.0f, 1.0f, 0.0f);
     }
 
     @Override
     public void reshape(GLAutoDrawable drawable, int x, int y, int width, int height) {
-        viewportSize = new Vector2dInt(width, height);
-        // GL2 gl = drawable.getGL().getGL2();
-        // gl.setSwapInterval(1);
     }
 
     @Override
@@ -263,9 +257,9 @@ public class GL3DComponentView extends AbstractComponentView implements GLEventL
         }
 
         GL2 gl = drawable.getGL().getGL2();
+        int width = drawable.getSurfaceWidth();
+        int height = drawable.getSurfaceHeight();
 
-        int width = this.viewportSize.getX();
-        int height = this.viewportSize.getY();
         GL3DState.getUpdated(gl, width, height);
 
         AWTGLPixelBuffer pixelBuffer = null;
@@ -384,11 +378,10 @@ public class GL3DComponentView extends AbstractComponentView implements GLEventL
         // orthoView.setOffset(offset);
         // }
     }
-
+/*
     @Override
     public void updateMainImagePanelSize(Vector2dInt size) {
         super.updateMainImagePanelSize(size);
-        this.viewportSize = size;
 
         // if(this.orthoView!=null) {
         // this.orthoView.updateMainImagePanelSize(size);
@@ -398,6 +391,7 @@ public class GL3DComponentView extends AbstractComponentView implements GLEventL
             this.viewportView.setViewport(viewport, null);
         }
     }
+*/
 
     @Override
     protected void setViewSpecificImplementation(View newView, ChangeEvent changeEvent) {
@@ -416,7 +410,6 @@ public class GL3DComponentView extends AbstractComponentView implements GLEventL
 
     @Override
     public void viewChanged(View sender, ChangeEvent aEvent) {
-
         if (aEvent != null) {
             LayerChangedReason layerChanged;
 
