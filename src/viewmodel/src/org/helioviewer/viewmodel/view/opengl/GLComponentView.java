@@ -425,12 +425,14 @@ public class GLComponentView extends AbstractComponentView implements GLEventLis
 
         displayBody(gl, xOffsetFinal, yOffsetFinal);
 
+        /*
         // check for errors
         int errorCode = gl.glGetError();
         if (errorCode != GL2.GL_NO_ERROR) {
             GLU glu = new GLU();
             Log.error("OpenGL Error (" + errorCode + ") : " + glu.gluErrorString(errorCode));
         }
+        */
 
         if (exportMode && mv != null) {
             int currentScreenshot = 1;
