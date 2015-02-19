@@ -1,7 +1,5 @@
 package org.helioviewer.gl3d.model.image;
 
-import javax.media.opengl.GL2;
-
 import org.helioviewer.gl3d.changeevent.ImageTextureRecapturedReason;
 import org.helioviewer.gl3d.scenegraph.GL3DMesh;
 import org.helioviewer.gl3d.scenegraph.GL3DState;
@@ -79,7 +77,7 @@ public abstract class GL3DImageMesh extends GL3DMesh {
     public void shapeUpdate(GL3DState state) {
         if (this.reshapeRequested) {
             // Reshape Mesh
-            recreateMesh(state);
+            //recreateMesh(state);
             // Log.debug("GL3DImageMesh.reshape: "+getName()+" Recreated Mesh!");
             this.reshapeRequested = false;
         }
