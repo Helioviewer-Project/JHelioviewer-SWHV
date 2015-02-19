@@ -277,10 +277,11 @@ public class GL3DComponentView extends AbstractComponentView implements GLEventL
                 tileRenderer.beginTile(gl);
             }
         }
-        //if (backGroundColorHasChanged) {
-        gl.glClearColor(backgroundColor.getRed() / 255.0f, backgroundColor.getGreen() / 255.0f, backgroundColor.getBlue() / 255.0f, backgroundColor.getAlpha() / 255.0f);
-        backGroundColorHasChanged = false;
-        //}
+
+        if (backGroundColorHasChanged) {
+            gl.glClearColor(backgroundColor.getRed() / 255.0f, backgroundColor.getGreen() / 255.0f, backgroundColor.getBlue() / 255.0f, backgroundColor.getAlpha() / 255.0f);
+            backGroundColorHasChanged = false;
+        }
 
         // Rebuild all shaders, if necessary
         if (rebuildShadersRequest) {
@@ -296,8 +297,6 @@ public class GL3DComponentView extends AbstractComponentView implements GLEventL
         gl.glColor4f(1, 1, 1, 1);
         gl.glEnable(GL2.GL_LIGHTING);
         gl.glEnable(GL2.GL_DEPTH_TEST);
-
-        // gl.glLoadIdentity();
 
         gl.glPushMatrix();
         if (this.getView() instanceof GLView) {

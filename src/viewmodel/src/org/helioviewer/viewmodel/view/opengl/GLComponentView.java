@@ -87,7 +87,7 @@ public class GLComponentView extends AbstractComponentView implements GLEventLis
 
     // render options
     private Color backgroundColor = Color.BLACK;
-    private final Color outsideViewportColor = Color.BLACK;
+    private boolean backGroundColorHasChanged = false;
 
     private RegionView regionView;
 
@@ -250,6 +250,18 @@ public class GLComponentView extends AbstractComponentView implements GLEventLis
         gl.glColor3f(1.0f, 1.0f, 1.0f);
     }
 
+    private final void setup2D(GL2 gl, int width, int height) {
+        gl.glMatrixMode(GL2.GL_PROJECTION);
+        gl.glLoadIdentity();
+
+        gl.glOrtho(0, width, 0, height, -1, 1);
+
+        gl.glMatrixMode(GL2.GL_MODELVIEW);
+        gl.glLoadIdentity();
+
+        gl.glViewport(0, 0, width, height);
+    }
+
     /**
      * Reshapes the viewport.
      *
@@ -274,18 +286,7 @@ public class GLComponentView extends AbstractComponentView implements GLEventLis
      */
     @Override
     public void reshape(GLAutoDrawable drawable, int x, int y, int width, int height) {
-        GL2 gl = drawable.getGL().getGL2();
-
-        // gl.setSwapInterval(1);
-
-        gl.glViewport(0, 0, width, height);
-        gl.glMatrixMode(GL2.GL_PROJECTION);
-        gl.glLoadIdentity();
-
-        gl.glOrtho(0, width, 0, height, -1, 1);
-
-        gl.glMatrixMode(GL2.GL_MODELVIEW);
-        gl.glLoadIdentity();
+        setup2D(drawable.getGL().getGL2(), width, height);
     }
 
     /**
@@ -306,7 +307,6 @@ public class GLComponentView extends AbstractComponentView implements GLEventLis
         // Set up screen
 
         gl.glClear(GL2.GL_COLOR_BUFFER_BIT);
-        gl.glLoadIdentity();
 
         Viewport viewport = view.getAdapter(ViewportView.class).getViewport();
         ViewportImageSize viewportImageSize = ViewHelper.calculateViewportImageSize(view);
@@ -409,7 +409,11 @@ public class GLComponentView extends AbstractComponentView implements GLEventLis
 
         float xOffsetFinal = xOffset;
         float yOffsetFinal = yOffset;
-        gl.glClearColor(outsideViewportColor.getRed() / 255.0f, outsideViewportColor.getGreen() / 255.0f, outsideViewportColor.getBlue() / 255.0f, outsideViewportColor.getAlpha() / 255.0f);
+
+        if (backGroundColorHasChanged) {
+            gl.glClearColor(backgroundColor.getRed() / 255.0f, backgroundColor.getGreen() / 255.0f, backgroundColor.getBlue() / 255.0f, backgroundColor.getAlpha() / 255.0f);
+            backGroundColorHasChanged = false;
+        }
 
         ViewportImageSize viewportImageSize = ViewHelper.calculateViewportImageSize(view);
         if (viewportImageSize != null && canvas != null) {
@@ -469,6 +473,7 @@ public class GLComponentView extends AbstractComponentView implements GLEventLis
     @Override
     public void setBackgroundColor(Color color) {
         backgroundColor = color;
+        backGroundColorHasChanged = true;
     }
 
     /**
