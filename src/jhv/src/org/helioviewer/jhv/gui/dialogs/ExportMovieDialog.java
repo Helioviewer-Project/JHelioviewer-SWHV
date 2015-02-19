@@ -19,7 +19,6 @@ import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.gui.ImageViewerGui;
 import org.helioviewer.jhv.gui.interfaces.ShowableDialog;
 import org.helioviewer.viewmodel.view.AbstractComponentView;
-import org.helioviewer.viewmodel.view.opengl.GLComponentView;
 
 /**
  * Dialog o export movies to standard video formats.
@@ -70,19 +69,16 @@ public class ExportMovieDialog extends JDialog implements ActionListener, Showab
     public ExportMovieDialog() {
         super(ImageViewerGui.getMainFrame(), "Export Movie", true);
         ImageViewerGui.getSingletonInstance().getLeftContentPane().setEnabled(false);
-        final AbstractComponentView gl3dc;
-        if (Displayer.getSingletonInstance().getState() == Displayer.STATE3D) {
-            gl3dc = ImageViewerGui.getSingletonInstance().getMainView().getAdapter(GL3DComponentView.class);
-        } else {
-            gl3dc = ImageViewerGui.getSingletonInstance().getMainView().getAdapter(GLComponentView.class);
-        }
+
+        final AbstractComponentView component = ImageViewerGui.getSingletonInstance().getMainView().getAdapter(GL3DComponentView.class);
         final ExportMovieDialog exportMovieDialog = this;
+
         exportButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 add(movieLabel);
                 movieLabel.setText("Export started...");
-                gl3dc.startExport(exportMovieDialog);
+                component.startExport(exportMovieDialog);
                 exportButton.setEnabled(false);
                 exportButton.setVisible(false);
             }
@@ -126,7 +122,6 @@ public class ExportMovieDialog extends JDialog implements ActionListener, Showab
     @Override
     public void actionPerformed(ActionEvent e) {
         // TODO Auto-generated method stub
-
     }
 
 }
