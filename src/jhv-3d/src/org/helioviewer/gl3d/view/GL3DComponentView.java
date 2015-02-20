@@ -45,15 +45,13 @@ import org.helioviewer.viewmodel.viewport.Viewport;
 
 import org.helioviewer.viewmodel.region.Region;
 import org.helioviewer.viewmodel.view.RegionView;
-import org.helioviewer.viewmodel.view.ViewHelper;
-import org.helioviewer.viewmodel.viewportimagesize.ViewportImageSize;
 
 import com.jogamp.opengl.util.TileRenderer;
 import com.jogamp.opengl.util.awt.AWTGLPixelBuffer;
 import com.jogamp.opengl.util.awt.ImageUtil;
 
 /**
- * The top-most View in the 3D View Chain. Let's the viewchain render to its
+ * The top-most View in the 3D View Chain. Lets the viewchain render to its
  * {@link GLCanvas}.
  *
  *
@@ -176,7 +174,7 @@ public class GL3DComponentView extends AbstractComponentView implements GLEventL
 
         public void reshapeView(GL2 gl, int width, int height);
 
-        public void displayBody(GL2 gl, GLView view);
+        public void displayBody(GL2 gl, GLView view, int width, int height);
 
     }
 
@@ -213,7 +211,7 @@ public class GL3DComponentView extends AbstractComponentView implements GLEventL
         }
 
         @Override
-        public final void displayBody(GL2 gl, GLView view) {
+        public final void displayBody(GL2 gl, GLView view, int width, int height) {
             gl.glClear(GL2.GL_COLOR_BUFFER_BIT | GL2.GL_DEPTH_BUFFER_BIT);
             gl.glColor4f(1, 1, 1, 1);
             gl.glEnable(GL2.GL_LIGHTING);
@@ -251,18 +249,14 @@ public class GL3DComponentView extends AbstractComponentView implements GLEventL
         }
 
         @Override
-        public final void displayBody(GL2 gl, GLView view) {
+        public final void displayBody(GL2 gl, GLView view, int width, int height) {
             gl.glClear(GL2.GL_COLOR_BUFFER_BIT);
 
-            ViewportImageSize viewportImageSize = ViewHelper.calculateViewportImageSize(view);
-            if (viewportImageSize != null) {
-                Region region = view.getAdapter(RegionView.class).getRegion();
-                gl.glScalef(viewportImageSize.getWidth() / (float) region.getWidth(),
-                            viewportImageSize.getHeight() / (float) region.getHeight(), 1.0f);
-                gl.glTranslatef((float) -region.getCornerX(), (float) -region.getCornerY(), 0.0f);
+            Region region = view.getAdapter(RegionView.class).getRegion();
+            gl.glScalef(width / (float) region.getWidth(), height / (float) region.getHeight(), 1.0f);
+            gl.glTranslatef((float) -region.getCornerX(), (float) -region.getCornerY(), 0.0f);
 
-                view.renderGL(gl, true);
-            }
+            view.renderGL(gl, true);
         }
     }
 
@@ -338,7 +332,7 @@ public class GL3DComponentView extends AbstractComponentView implements GLEventL
         }
 
         gl.glPushMatrix();
-        draw.displayBody(gl, (GLView) view);
+        draw.displayBody(gl, (GLView) view, width, height);
         gl.glPopMatrix();
 
         if (!this.postRenderers.isEmpty()) {
@@ -418,7 +412,6 @@ public class GL3DComponentView extends AbstractComponentView implements GLEventL
     public void viewChanged(View sender, ChangeEvent aEvent) {
         if (aEvent != null) {
             LayerChangedReason lcReason = aEvent.getLastChangedReasonByType(LayerChangedReason.class);
-
             if ((lcReason != null && lcReason.getLayerChangeType() == LayerChangeType.LAYER_ADDED) ||
                 aEvent.reasonOccurred(ViewChainChangedReason.class)) {
                 rebuildShaders = true;
@@ -426,7 +419,6 @@ public class GL3DComponentView extends AbstractComponentView implements GLEventL
 
             TimestampChangedReason tsReason = aEvent.getLastChangedReasonByType(TimestampChangedReason.class);
             SubImageDataChangedReason sidReason = aEvent.getLastChangedReasonByType(SubImageDataChangedReason.class);
-
             if (sidReason != null ||
                 (tsReason != null && (tsReason.getView() instanceof TimedMovieView) &&
                 LinkedMovieManager.getActiveInstance().isMaster((TimedMovieView) tsReason.getView()))) {
