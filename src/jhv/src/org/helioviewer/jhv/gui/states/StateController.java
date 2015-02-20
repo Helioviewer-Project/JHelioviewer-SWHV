@@ -14,7 +14,11 @@ import org.helioviewer.jhv.opengl.GLInfo;
  *
  */
 public class StateController {
-    private static StateController instance = new StateController();
+    private final static StateController instance = new StateController();
+
+    public static StateController getInstance() {
+        return instance;
+    }
 
     private final List<StateChangeListener> stateChangeListeners = new ArrayList<StateChangeListener>();
 
@@ -30,45 +34,41 @@ public class StateController {
         }
     }
 
-    public static StateController getInstance() {
-        return StateController.instance;
-    }
-
     public void set2DState() {
-        this.setState(ViewStateEnum.View2D.getState());
+        setState(ViewStateEnum.View2D.getState());
     }
 
     public void set3DState() {
-        this.setState(ViewStateEnum.View3D.getState());
+        setState(ViewStateEnum.View3D.getState());
     }
 
     private void setState(State newState) {
-        State oldState = this.currentState;
+        State oldState = currentState;
         if (newState != oldState) {
-            this.currentState = newState;
+            currentState = newState;
             fireStateChange(newState, oldState);
         }
     }
 
     public State getCurrentState() {
-        return this.currentState;
+        return currentState;
     }
 
     public void addStateChangeListener(StateChangeListener listener) {
-        synchronized (this.stateChangeListeners) {
+        synchronized (stateChangeListeners) {
             this.stateChangeListeners.add(listener);
         }
     }
 
     public void removeStateChangeListener(StateChangeListener listener) {
-        synchronized (this.stateChangeListeners) {
-            this.stateChangeListeners.remove(listener);
+        synchronized (stateChangeListeners) {
+            stateChangeListeners.remove(listener);
         }
     }
 
     protected void fireStateChange(State newState, State oldState) {
-        synchronized (this.stateChangeListeners) {
-            for (StateChangeListener listener : this.stateChangeListeners) {
+        synchronized (stateChangeListeners) {
+            for (StateChangeListener listener : stateChangeListeners) {
                 listener.stateChanged(newState, oldState, this);
             }
         }

@@ -14,6 +14,9 @@ import java.nio.ShortBuffer;
 
 import javax.media.opengl.GL2;
 
+import org.helioviewer.jhv.gui.states.StateController;
+import org.helioviewer.jhv.gui.states.ViewStateEnum;
+
 import org.helioviewer.base.logging.Log;
 import org.helioviewer.base.math.Vector2dDouble;
 import org.helioviewer.viewmodel.imagedata.ColorMask;
@@ -38,7 +41,6 @@ import org.helioviewer.viewmodel.view.jp2view.JHVJP2View;
  * @author Markus Langenberg
  */
 public class GLTextureHelper {
-    public static boolean is2DState = false;
     private static int maxTextureSize = 2048;
 
     private final static int[] formatMap = { GL2.GL_LUMINANCE4, GL2.GL_LUMINANCE4, GL2.GL_LUMINANCE4, GL2.GL_LUMINANCE4, GL2.GL_LUMINANCE8, GL2.GL_LUMINANCE8, GL2.GL_LUMINANCE8, GL2.GL_LUMINANCE8, GL2.GL_LUMINANCE12, GL2.GL_LUMINANCE12, GL2.GL_LUMINANCE12, GL2.GL_LUMINANCE12, GL2.GL_LUMINANCE16, GL2.GL_LUMINANCE16, GL2.GL_LUMINANCE16, GL2.GL_LUMINANCE16 };
@@ -89,7 +91,7 @@ public class GLTextureHelper {
      *            Position and size to draw the texture
      */
     private static void renderTextureToScreen(GL2 gl, Region region) {
-        if (!is2DState)
+        if (StateController.getInstance().getCurrentState().getType() == ViewStateEnum.View3D)
             return;
 
         Vector2dDouble lowerleftCorner = region.getLowerLeftCorner();
