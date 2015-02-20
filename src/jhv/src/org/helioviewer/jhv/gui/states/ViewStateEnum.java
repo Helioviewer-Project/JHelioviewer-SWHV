@@ -1,5 +1,8 @@
 package org.helioviewer.jhv.gui.states;
 
+import org.helioviewer.jhv.gui.GL3DViewchainFactory;
+import org.helioviewer.jhv.gui.ViewchainFactory;
+
 /**
  * Contains the existing Gui States (2D, 3D)
  * 
@@ -8,8 +11,8 @@ package org.helioviewer.jhv.gui.states;
  */
 public enum ViewStateEnum {
 
-    View2D(new GuiState2D()),
-    View3D(new GuiState3DWCS());
+    View2D(new GuiState(new ViewchainFactory())),
+    View3D(new GuiState(new GL3DViewchainFactory()));
 
     private final State state;
 

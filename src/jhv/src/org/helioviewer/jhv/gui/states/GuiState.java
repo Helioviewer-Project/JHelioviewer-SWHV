@@ -1,7 +1,14 @@
 package org.helioviewer.jhv.gui.states;
 
 import org.helioviewer.base.logging.Log;
+import org.helioviewer.gl3d.gui.GL3DCameraMouseController;
+import org.helioviewer.gl3d.gui.GL3DCameraSelectorModel;
+import org.helioviewer.gl3d.gui.GL3DTopToolBar;
+import org.helioviewer.gl3d.model.GL3DInternalPluginConfiguration;
+import org.helioviewer.gl3d.plugin.GL3DPluginController;
+import org.helioviewer.gl3d.view.GL3DSceneGraphView;
 import org.helioviewer.jhv.display.Displayer;
+import org.helioviewer.jhv.gui.GL3DViewchainFactory;
 import org.helioviewer.jhv.gui.ViewListenerDistributor;
 import org.helioviewer.jhv.gui.ViewchainFactory;
 import org.helioviewer.jhv.gui.components.SideContentPane;
@@ -12,7 +19,8 @@ import org.helioviewer.jhv.gui.interfaces.ImagePanelInputController;
 import org.helioviewer.viewmodel.view.ComponentView;
 import org.helioviewer.viewmodel.view.SynchronizeView;
 
-public class GuiState2D implements State {
+
+public class GuiState implements State {
 
     protected TopToolBar topToolBar;
 
@@ -23,26 +31,28 @@ public class GuiState2D implements State {
 
     private final ViewchainFactory viewchainFactory;
 
-    public GuiState2D() {
-        this(new ViewchainFactory());
-    }
-
-    public GuiState2D(ViewchainFactory viewchainFactory) {
+    public GuiState(ViewchainFactory viewchainFactory) {
         this.viewchainFactory = viewchainFactory;
     }
 
     @Override
     public void addStateSpecificComponents(SideContentPane sideContentPane) {
-
+        if (this.viewchainFactory instanceof GL3DViewchainFactory) {
+            GL3DCameraSelectorModel.getInstance();
+        }
     }
 
     @Override
     public void removeStateSpecificComponents(SideContentPane sideContentPane) {
-
     }
 
     @Override
     public void activate() {
+        if (this.viewchainFactory instanceof GL3DViewchainFactory) {
+            GL3DCameraSelectorModel.getInstance().activate(this.mainComponentView.getAdapter(GL3DSceneGraphView.class));
+            GL3DPluginController.getInstance().setPluginConfiguration(new GL3DInternalPluginConfiguration());
+            GL3DPluginController.getInstance().loadPlugins();
+        }
     }
 
     @Override
@@ -98,13 +108,22 @@ public class GuiState2D implements State {
 
     @Override
     public ViewStateEnum getType() {
-        return ViewStateEnum.View2D;
+        if (this.viewchainFactory instanceof GL3DViewchainFactory) {
+            return ViewStateEnum.View3D;
+        } else {
+            return ViewStateEnum.View2D;
+        }
     }
 
     @Override
     public TopToolBar getTopToolBar() {
-        if (topToolBar == null)
-            topToolBar = new TopToolBar();
+        if (topToolBar == null) {
+            if (this.viewchainFactory instanceof GL3DViewchainFactory) {
+                topToolBar = new GL3DTopToolBar();
+            } else {
+                topToolBar = new TopToolBar();
+            }
+        }
 
         return topToolBar;
     }
@@ -130,12 +149,20 @@ public class GuiState2D implements State {
 
     @Override
     public ImagePanelInputController getDefaultInputController() {
-        return new MainImagePanelMousePanController();
+        if (this.viewchainFactory instanceof GL3DViewchainFactory) {
+            return new GL3DCameraMouseController();
+        } else {
+            return new MainImagePanelMousePanController();
+        }
     }
 
     @Override
     public boolean isOverviewPanelInteractionEnabled() {
-        return true;
+        if (this.viewchainFactory instanceof GL3DViewchainFactory) {
+            return false;
+        } else {
+            return true;
+        }
     }
 
 }
