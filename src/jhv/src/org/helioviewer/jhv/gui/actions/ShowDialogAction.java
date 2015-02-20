@@ -6,6 +6,9 @@ import java.awt.event.KeyEvent;
 import javax.swing.AbstractAction;
 import javax.swing.KeyStroke;
 
+import org.helioviewer.jhv.gui.states.StateController;
+import org.helioviewer.jhv.gui.states.ViewStateEnum;
+
 import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.gui.dialogs.HelpDialog;
 import org.helioviewer.jhv.gui.interfaces.ShowableDialog;
@@ -61,7 +64,8 @@ public class ShowDialogAction extends AbstractAction {
     @Override
     public void actionPerformed(ActionEvent e) {
         try {
-            if (!differentiated || Displayer.getSingletonInstance().getState() == Displayer.STATE2D) {
+            if (!differentiated ||
+                StateController.getInstance().getCurrentState().getType() == ViewStateEnum.View2D) {
                 if (dialog == null)
                     dialog = dialogToShow.newInstance();
                 dialog.init();

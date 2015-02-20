@@ -4,8 +4,10 @@ import java.util.Locale;
 
 import javax.media.opengl.GL2;
 
+import org.helioviewer.jhv.gui.states.StateController;
+import org.helioviewer.jhv.gui.states.ViewStateEnum;
+
 import org.helioviewer.base.physics.Constants;
-import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.viewmodel.changeevent.ChangeEvent;
 import org.helioviewer.viewmodel.metadata.HelioviewerMetaData;
 import org.helioviewer.viewmodel.metadata.HelioviewerOcculterMetaData;
@@ -123,60 +125,40 @@ public class GLHelioviewerGeometryView extends AbstractGLView implements Heliovi
      * well as the Cg User Manual.
      */
     private class GeometryFragmentShaderProgram extends GLFragmentShaderProgram {
+
         /**
          * {@inheritDoc}
          */
         @Override
         protected void buildImpl(GLShaderBuilder shaderBuilder) {
-
+            String program = null;
             MetaData metaData = view.getAdapter(MetaDataView.class).getMetaData();
 
-            if (metaData instanceof HelioviewerOcculterMetaData) {
-                // LASCO
+            try {
+                if (metaData instanceof HelioviewerOcculterMetaData) {
+                    // LASCO
+                    HelioviewerOcculterMetaData hvMetaData = (HelioviewerOcculterMetaData) metaData;
 
-                HelioviewerOcculterMetaData hvMetaData = (HelioviewerOcculterMetaData) metaData;
-
-                try {
-                    String program = "\tfloat geometryRadius = length(physicalPosition.zw);" + GLShaderBuilder.LINE_SEP;
+                    program = "\tfloat geometryRadius = length(physicalPosition.zw);" + GLShaderBuilder.LINE_SEP;
                     program += "\toutput.a = output.a * step(innerRadius, geometryRadius) * step(-outerRadius, -geometryRadius);";
 
                     program = program.replace("output", shaderBuilder.useOutputValue("float4", "COLOR"));
                     program = program.replace("physicalPosition", shaderBuilder.useStandardParameter("float4", "TEXCOORD0"));
                     program = program.replace("innerRadius", String.format(Locale.US, "%f", hvMetaData.getInnerPhysicalOcculterRadius() * roccInnerFactor));
                     program = program.replace("outerRadius", String.format(Locale.US, "%f", hvMetaData.getOuterPhysicalOcculterRadius() * roccOuterFactor));
-
-                    if (Displayer.getSingletonInstance().getState() == Displayer.STATE2D) {
-                        shaderBuilder.addMainFragment(program);
-                    }
-                } catch (GLBuildShaderException e) {
-                    e.printStackTrace();
-                }
-            } else if (metaData instanceof HelioviewerMetaData) {
-
-                HelioviewerMetaData hvMetaData = (HelioviewerMetaData) metaData;
-
-                // MDI and HMI
-                if (hvMetaData.getInstrument().equalsIgnoreCase("MDI") || hvMetaData.getInstrument().equalsIgnoreCase("HMI")) {
-
-                    try {
-                        String program = "\tfloat geometryRadius = -length(physicalPosition.zw);" + GLShaderBuilder.LINE_SEP;
+                } else if (metaData instanceof HelioviewerMetaData) {
+                    HelioviewerMetaData hvMetaData = (HelioviewerMetaData) metaData;
+                    // MDI and HMI
+                    if (hvMetaData.getInstrument().equalsIgnoreCase("MDI") || hvMetaData.getInstrument().equalsIgnoreCase("HMI")) {
+                        program = "\tfloat geometryRadius = -length(physicalPosition.zw);" + GLShaderBuilder.LINE_SEP;
                         program += "\toutput.a  = output.a * step(-sunRadius, geometryRadius);";
 
                         program = program.replace("output", shaderBuilder.useOutputValue("float4", "COLOR"));
                         program = program.replace("physicalPosition", shaderBuilder.useStandardParameter("float4", "TEXCOORD0"));
                         program = program.replace("sunRadius", String.format(Locale.US, "%f", Constants.SunRadius * discFactor));
-
-                        if (Displayer.getSingletonInstance().getState() == Displayer.STATE2D) {
-                            shaderBuilder.addMainFragment(program);
-                        }
-                    } catch (GLBuildShaderException e) {
-                        e.printStackTrace();
-                    }
-                } else {
-                    // EIT and AIA
-
-                    try {
-                        String program = "\tfloat geometryRadius = -length(physicalPosition.zw);" + GLShaderBuilder.LINE_SEP;
+                    } else {
+                        // EIT and AIA
+                        program = "\tfloat geometryRadius = -length(physicalPosition.zw);" + GLShaderBuilder.LINE_SEP;
                         program += "\tfloat fadeDisc = smoothstep(-fadedSunRadius, -sunRadius, geometryRadius);" + GLShaderBuilder.LINE_SEP;
                         program += "\tfloat maxPixelValue = max(max(output.r, output.g), max(output.b, 0.001));" + GLShaderBuilder.LINE_SEP;
                         program += "\toutput.a = output.a * (fadeDisc + (1-fadeDisc) * pow(maxPixelValue, 1-output.a));";
@@ -185,14 +167,14 @@ public class GLHelioviewerGeometryView extends AbstractGLView implements Heliovi
                         program = program.replace("physicalPosition", shaderBuilder.useStandardParameter("float4", "TEXCOORD0"));
                         program = program.replace("sunRadius", String.format(Locale.US, "%f", Constants.SunRadius));
                         program = program.replace("fadedSunRadius", String.format(Locale.US, "%f", Constants.SunRadius * discFadingFactor));
-
-                        if (Displayer.getSingletonInstance().getState() == Displayer.STATE2D) {
-                            shaderBuilder.addMainFragment(program);
-                        }
-                    } catch (GLBuildShaderException e) {
-                        e.printStackTrace();
                     }
                 }
+
+                if (program != null && StateController.getInstance().getCurrentState().getType() == ViewStateEnum.View2D) {
+                    shaderBuilder.addMainFragment(program);
+                }
+            } catch (GLBuildShaderException e) {
+                e.printStackTrace();
             }
         }
     }
