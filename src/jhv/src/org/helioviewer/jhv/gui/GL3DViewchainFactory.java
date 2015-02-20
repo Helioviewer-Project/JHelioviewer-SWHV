@@ -78,7 +78,7 @@ public class GL3DViewchainFactory extends ViewchainFactory {
     @Override
     protected void createViewchainFromExistingViewchain(View sourceView, View targetView, ComponentView mainImagePanelView, boolean keepSource) {
 
-        if (targetView != null && targetView.getClass().isAssignableFrom(GL3DComponentView.class)) {
+        if (targetView != null) {
             //View overlayView = sourceView.getAdapter(OverlayView.class);
             View layeredView = sourceView.getAdapter(LayeredView.class);
 
@@ -113,7 +113,7 @@ public class GL3DViewchainFactory extends ViewchainFactory {
             ((GL3DComponentView) targetView).setView(sceneGraph);
 
             // do this recursively and proper (call for every view in the 3d
-            // view chain, maybee...)
+            // view chain, maybe...)
         } else {
             super.createViewchainFromExistingViewchain(sourceView, targetView, mainImagePanelView, keepSource);
         }

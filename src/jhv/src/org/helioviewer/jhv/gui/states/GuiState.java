@@ -22,22 +22,27 @@ import org.helioviewer.viewmodel.view.SynchronizeView;
 
 public class GuiState implements State {
 
-    protected TopToolBar topToolBar;
-
-    protected ComponentView mainComponentView;
-    protected ComponentView overviewComponentView;
-
-    protected RenderModeStatusPanel renderModeStatus;
-
+    private final boolean is3d;
     private final ViewchainFactory viewchainFactory;
+
+    private TopToolBar topToolBar;
+    private ComponentView mainComponentView;
+    private ComponentView overviewComponentView;
+    private RenderModeStatusPanel renderModeStatus;
 
     public GuiState(ViewchainFactory viewchainFactory) {
         this.viewchainFactory = viewchainFactory;
+
+        if (viewchainFactory instanceof GL3DViewchainFactory) {
+            is3d = true;
+        } else {
+            is3d = false;
+        }
     }
 
     @Override
     public void addStateSpecificComponents(SideContentPane sideContentPane) {
-        if (this.viewchainFactory instanceof GL3DViewchainFactory) {
+        if (is3d) {
             GL3DCameraSelectorModel.getInstance();
         }
     }
@@ -48,7 +53,7 @@ public class GuiState implements State {
 
     @Override
     public void activate() {
-        if (this.viewchainFactory instanceof GL3DViewchainFactory) {
+        if (is3d) {
             GL3DCameraSelectorModel.getInstance().activate(this.mainComponentView.getAdapter(GL3DSceneGraphView.class));
             GL3DPluginController.getInstance().setPluginConfiguration(new GL3DInternalPluginConfiguration());
             GL3DPluginController.getInstance().loadPlugins();
@@ -108,7 +113,7 @@ public class GuiState implements State {
 
     @Override
     public ViewStateEnum getType() {
-        if (this.viewchainFactory instanceof GL3DViewchainFactory) {
+        if (is3d) {
             return ViewStateEnum.View3D;
         } else {
             return ViewStateEnum.View2D;
@@ -118,7 +123,7 @@ public class GuiState implements State {
     @Override
     public TopToolBar getTopToolBar() {
         if (topToolBar == null) {
-            if (this.viewchainFactory instanceof GL3DViewchainFactory) {
+            if (is3d) {
                 topToolBar = new GL3DTopToolBar();
             } else {
                 topToolBar = new TopToolBar();
@@ -149,7 +154,7 @@ public class GuiState implements State {
 
     @Override
     public ImagePanelInputController getDefaultInputController() {
-        if (this.viewchainFactory instanceof GL3DViewchainFactory) {
+        if (is3d) {
             return new GL3DCameraMouseController();
         } else {
             return new MainImagePanelMousePanController();
@@ -158,7 +163,7 @@ public class GuiState implements State {
 
     @Override
     public boolean isOverviewPanelInteractionEnabled() {
-        if (this.viewchainFactory instanceof GL3DViewchainFactory) {
+        if (is3d) {
             return false;
         } else {
             return true;
