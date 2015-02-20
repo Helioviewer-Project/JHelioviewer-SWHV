@@ -10,8 +10,8 @@ import org.helioviewer.gl3d.view.GL3DViewportView;
 import org.helioviewer.viewmodel.factory.GLViewFactory;
 import org.helioviewer.viewmodel.view.ComponentView;
 import org.helioviewer.viewmodel.view.LayeredView;
+import org.helioviewer.viewmodel.view.OverlayView;
 import org.helioviewer.viewmodel.view.View;
-import org.helioviewer.viewmodel.view.opengl.GLLayeredView;
 import org.helioviewer.viewmodel.view.opengl.GLOverlayView;
 
 /**
@@ -39,11 +39,11 @@ public class GL3DViewFactory extends GLViewFactory {
             return (T) new GL3DViewportView();
         } else if (pattern.isAssignableFrom(GL3DImageTextureView.class)) {
             return (T) new GL3DImageTextureView();
-        } else if (pattern.isAssignableFrom(GL3DComponentView.class) || pattern.isAssignableFrom(ComponentView.class)) {
+        } else if (pattern.isAssignableFrom(ComponentView.class)) {
             return (T) new GL3DComponentView();
-        } else if (pattern.isAssignableFrom(GLLayeredView.class)) {
+        } else if (pattern.isAssignableFrom(LayeredView.class)) {
             return (T) new GL3DLayeredView();
-        } else if (pattern.isAssignableFrom(GLOverlayView.class)) {
+        } else if (pattern.isAssignableFrom(OverlayView.class)) {
             return (T) new GLOverlayView();
         } else {
             return super.createNewView(pattern);
