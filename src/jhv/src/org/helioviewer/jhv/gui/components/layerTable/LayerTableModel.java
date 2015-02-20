@@ -113,7 +113,7 @@ public class LayerTableModel extends AbstractTableModel implements LayersListene
      */
     @Override
     public int getRowCount() {
-        return LayersModel.getSingletonInstance().getNumLayers();
+        return views.size();
     }
 
     /**
@@ -162,10 +162,11 @@ public class LayerTableModel extends AbstractTableModel implements LayersListene
      */
     @Override
     public void layerChanged(final int idx) {
-        updateData();
+
         SwingUtilities.invokeLater(new Runnable() {
             @Override
             public void run() {
+                updateData();
                 fireTableRowsUpdated(idx, idx);
             }
         });
@@ -177,10 +178,10 @@ public class LayerTableModel extends AbstractTableModel implements LayersListene
      */
     @Override
     public void layerRemoved(View oldView, final int oldIndex) {
-        updateData();
         SwingUtilities.invokeLater(new Runnable() {
             @Override
             public void run() {
+                updateData();
                 fireTableRowsDeleted(oldIndex, oldIndex);
             }
         });
@@ -192,10 +193,10 @@ public class LayerTableModel extends AbstractTableModel implements LayersListene
      */
     @Override
     public void timestampChanged(final int idx) {
-        updateData();
         SwingUtilities.invokeLater(new Runnable() {
             @Override
             public void run() {
+                updateData();
                 fireTableRowsUpdated(idx, idx);
             }
         });
