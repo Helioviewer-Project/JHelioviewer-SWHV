@@ -5,6 +5,9 @@ import java.util.ArrayList;
 
 import javax.media.opengl.GL2;
 
+import org.helioviewer.jhv.gui.states.StateController;
+import org.helioviewer.jhv.gui.states.ViewStateEnum;
+
 import org.helioviewer.base.physics.Constants;
 import org.helioviewer.gl3d.camera.GL3DCamera;
 import org.helioviewer.gl3d.camera.GL3DCameraListener;
@@ -281,7 +284,7 @@ public abstract class GL3DImageLayer extends GL3DGroup implements GL3DCameraList
 
     @Override
     public void viewChanged(View sender, ChangeEvent aEvent) {
-        if (Displayer.getSingletonInstance().getState() == Displayer.STATE3D) {
+        if (StateController.getInstance().getCurrentState().getType() == ViewStateEnum.View3D) {
             this.updateROI(GL3DState.get().getActiveCamera());
         }
     }

@@ -21,10 +21,6 @@ public class Displayer implements JHVEventHighlightListener {
 
     private boolean displaying = false;
 
-    public static int STATE2D = 1;
-    public static int STATE3D = 2;
-    private int state = STATE3D;
-
     public static ArrayList<GL3DVec3d> pointList = new ArrayList<GL3DVec3d>();
     public static int screenScale = 1;
 
@@ -60,7 +56,6 @@ public class Displayer implements JHVEventHighlightListener {
             }
             displaying = false;
         }
-
     }
 
     public void display() {
@@ -76,14 +71,6 @@ public class Displayer implements JHVEventHighlightListener {
 
     public void removeListeners() {
         this.listeners = new ArrayList<DisplayListener>();
-    }
-
-    public void setState(int state) {
-        this.state = state;
-    }
-
-    public int getState() {
-        return state;
     }
 
     @Override

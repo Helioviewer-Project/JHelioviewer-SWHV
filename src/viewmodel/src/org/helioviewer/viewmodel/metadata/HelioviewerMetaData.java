@@ -5,7 +5,6 @@ import org.helioviewer.base.math.MathUtils;
 import org.helioviewer.base.math.Vector2dDouble;
 import org.helioviewer.base.math.Vector2dInt;
 import org.helioviewer.base.physics.Constants;
-import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.viewmodel.region.Region;
 import org.helioviewer.viewmodel.region.StaticRegion;
 import org.helioviewer.viewmodel.view.cache.HelioviewerDateTimeCache;
@@ -232,13 +231,10 @@ public class HelioviewerMetaData extends AbstractMetaData implements SunMetaData
             if (Math.abs(solarPixelRadius - newSolarPixelRadius) > allowedAbsoluteDifference) {
                 changed = true;
             }
+
             double sunX = metaDataContainer.tryGetDouble("CRPIX1") - 1;
-            double sunY;
-            if (Displayer.getSingletonInstance().getState() == Displayer.STATE3D) {
-                sunY = (metaDataContainer.tryGetDouble("CRPIX2") - 1);
-            } else {
-                sunY = (metaDataContainer.tryGetDouble("CRPIX2") - 1);
-            }
+            double sunY = metaDataContainer.tryGetDouble("CRPIX2") - 1;
+
             sunPixelPositionAlt = new Vector2dDouble(sunX, metaDataContainer.tryGetDouble("NAXIS2") - sunY);
 
             if (changed || Math.abs(sunPixelPosition.getX() - sunX) > allowedAbsoluteDifference || Math.abs(sunPixelPosition.getY() - sunY) > allowedAbsoluteDifference) {

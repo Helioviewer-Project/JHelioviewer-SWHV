@@ -13,6 +13,9 @@ import javax.media.opengl.awt.GLCanvas;
 import javax.swing.JOptionPane;
 import javax.swing.JTextArea;
 
+import org.helioviewer.jhv.gui.states.StateController;
+import org.helioviewer.jhv.gui.states.ViewStateEnum;
+
 import org.helioviewer.base.logging.Log;
 import org.helioviewer.base.math.Vector2dInt;
 import org.helioviewer.gl3d.movie.MovieExport;
@@ -82,7 +85,7 @@ public class GL3DComponentView extends AbstractComponentView implements GLEventL
     private File outputFile;
 
     public GL3DComponentView() {
-        if (Displayer.getSingletonInstance().getState() == Displayer.STATE3D)
+        if (StateController.getInstance().getCurrentState().getType() == ViewStateEnum.View3D)
             draw = new Draw3DInterface();
         else
             draw = new Draw2DInterface();
@@ -244,8 +247,6 @@ public class GL3DComponentView extends AbstractComponentView implements GLEventL
 
             gl.glMatrixMode(GL2.GL_MODELVIEW);
             gl.glLoadIdentity();
-
-            gl.glViewport(0, 0, width, height);
         }
 
         @Override
@@ -341,7 +342,7 @@ public class GL3DComponentView extends AbstractComponentView implements GLEventL
             gl.glMatrixMode(GL2.GL_PROJECTION);
             gl.glLoadIdentity();
 
-            gl.glOrtho(0, width, 0, height, -1, 10000);
+            gl.glOrtho(0, width, 0, height, -1, 1);
 
             gl.glMatrixMode(GL2.GL_MODELVIEW);
             gl.glLoadIdentity();

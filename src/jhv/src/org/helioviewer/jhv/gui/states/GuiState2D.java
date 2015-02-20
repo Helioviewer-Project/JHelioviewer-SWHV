@@ -79,11 +79,8 @@ public class GuiState2D implements State {
         // Inhibit Event distribution during recreation
         ViewListenerDistributor.getSingletonInstance().setView(null);
 
-        Displayer.getSingletonInstance().setState(Displayer.STATE3D);
-        if (previousState instanceof GuiState3DWCS) {
-            Displayer.getSingletonInstance().removeListeners();
-            Displayer.getSingletonInstance().setState(Displayer.STATE2D);
-        }
+        Displayer.getSingletonInstance().removeListeners();
+
         if (previousState == null || previousState.getMainComponentView() == null) {
             return this.createViewChains();
         } else {
