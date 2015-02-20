@@ -61,16 +61,16 @@ import com.jogamp.opengl.util.awt.ImageUtil;
  *
  */
 public class GL3DComponentView extends AbstractComponentView implements GLEventListener, ComponentView, DisplayListener {
-    private static DrawImplementation draw;
+    private static DrawInterface draw;
 
     // general
     private final GLCanvas canvas;
     private final AWTGLPixelBuffer.SingleAWTGLPixelBufferProvider pixelBufferProvider = new AWTGLPixelBuffer.SingleAWTGLPixelBufferProvider(true);
 
     private Color backgroundColor = Color.BLACK;
-    private boolean backGroundColorHasChanged = false;
+    private boolean backGroundColorChanged = false;
 
-    private boolean rebuildShadersRequest = false;
+    private boolean rebuildShaders = false;
 
     // screenshot & movie
     private TileRenderer tileRenderer;
@@ -85,9 +85,9 @@ public class GL3DComponentView extends AbstractComponentView implements GLEventL
 
     public GL3DComponentView() {
         if (Displayer.getSingletonInstance().getState() == Displayer.STATE3D)
-            draw = new Draw3DImplementation();
+            draw = new Draw3DInterface();
         else
-            draw = new Draw2DImplementation();
+            draw = new Draw2DInterface();
 
         canvas = GLSharedDrawable.getSingletonInstance().getCanvas();
         canvas.addGLEventListener(this);
@@ -106,18 +106,6 @@ public class GL3DComponentView extends AbstractComponentView implements GLEventL
         drawable.removeGLEventListener(this);
     }
 
-    @Override
-    public void activate() {
-    }
-
-    @Override
-    public void deactivate() {
-    }
-
-    @Override
-    public GLCanvas getComponent() {
-        return canvas;
-    }
 
     @Override
     public void startExport(ExportMovieDialog exportMovieDialog) {
@@ -182,7 +170,7 @@ public class GL3DComponentView extends AbstractComponentView implements GLEventL
         return true;
     }
 
-    private static interface DrawImplementation {
+    private static interface DrawInterface {
 
         public void init(GL2 gl);
 
@@ -192,10 +180,10 @@ public class GL3DComponentView extends AbstractComponentView implements GLEventL
 
     }
 
-    private static class Draw3DImplementation implements DrawImplementation {
+    private static class Draw3DInterface implements DrawInterface {
 
         @Override
-        public void init(GL2 gl) {
+        public final void init(GL2 gl) {
             // gl.glEnable(GL2.GL_LINE_SMOOTH);
             gl.glHint(GL2.GL_LINE_SMOOTH_HINT, GL2.GL_NICEST);
             // gl.glShadeModel(GL2.GL_FLAT);
@@ -221,11 +209,11 @@ public class GL3DComponentView extends AbstractComponentView implements GLEventL
         }
 
         @Override
-        public void reshapeView(GL2 gl, int width, int height) {
+        public final void reshapeView(GL2 gl, int width, int height) {
         }
 
         @Override
-        public void displayBody(GL2 gl, GLView view) {
+        public final void displayBody(GL2 gl, GLView view) {
             gl.glClear(GL2.GL_COLOR_BUFFER_BIT | GL2.GL_DEPTH_BUFFER_BIT);
             gl.glColor4f(1, 1, 1, 1);
             gl.glEnable(GL2.GL_LIGHTING);
@@ -236,10 +224,10 @@ public class GL3DComponentView extends AbstractComponentView implements GLEventL
 
     }
 
-    private static class Draw2DImplementation implements DrawImplementation {
+    private static class Draw2DInterface implements DrawInterface {
 
         @Override
-        public void init(GL2 gl) {
+        public final void init(GL2 gl) {
             gl.glShadeModel(GL2.GL_FLAT);
             gl.glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
             gl.glEnable(GL2.GL_TEXTURE_1D);
@@ -250,7 +238,7 @@ public class GL3DComponentView extends AbstractComponentView implements GLEventL
         }
 
         @Override
-        public void reshapeView(GL2 gl, int width, int height) {
+        public final void reshapeView(GL2 gl, int width, int height) {
             gl.glMatrixMode(GL2.GL_PROJECTION);
             gl.glLoadIdentity();
 
@@ -263,7 +251,7 @@ public class GL3DComponentView extends AbstractComponentView implements GLEventL
         }
 
         @Override
-        public void displayBody(GL2 gl, GLView view) {
+        public final void displayBody(GL2 gl, GLView view) {
             gl.glClear(GL2.GL_COLOR_BUFFER_BIT);
 
             ViewportImageSize viewportImageSize = ViewHelper.calculateViewportImageSize(view);
@@ -287,7 +275,7 @@ public class GL3DComponentView extends AbstractComponentView implements GLEventL
 
         GLTextureHelper.initHelper(gl);
         GL3DState.create(gl);
-        rebuildShadersRequest = true;
+        rebuildShaders = true;
 
         draw.init(gl);
     }
@@ -338,15 +326,15 @@ public class GL3DComponentView extends AbstractComponentView implements GLEventL
             }
         }
 
-        if (backGroundColorHasChanged) {
+        if (backGroundColorChanged) {
             gl.glClearColor(backgroundColor.getRed() / 255.0f, backgroundColor.getGreen() / 255.0f,
                             backgroundColor.getBlue() / 255.0f, backgroundColor.getAlpha() / 255.0f);
-            backGroundColorHasChanged = false;
+            backGroundColorChanged = false;
         }
 
-        if (rebuildShadersRequest) {
+        if (rebuildShaders) {
             GLShaderBuilder.rebuildShaders(gl, (GLView) view);
-            rebuildShadersRequest = false;
+            rebuildShaders = false;
         }
 
         gl.glPushMatrix();
@@ -418,7 +406,40 @@ public class GL3DComponentView extends AbstractComponentView implements GLEventL
     @Override
     public void setBackgroundColor(Color background) {
         backgroundColor = background;
-        backGroundColorHasChanged = true;
+        backGroundColorChanged = true;
+    }
+
+    @Override
+    public void display() {
+        canvas.repaint();
+    }
+
+    @Override
+    public void viewChanged(View sender, ChangeEvent aEvent) {
+        if (aEvent != null) {
+            LayerChangedReason lcReason = aEvent.getLastChangedReasonByType(LayerChangedReason.class);
+
+            if ((lcReason != null && lcReason.getLayerChangeType() == LayerChangeType.LAYER_ADDED) ||
+                aEvent.reasonOccurred(ViewChainChangedReason.class)) {
+                rebuildShaders = true;
+            }
+
+            TimestampChangedReason tsReason = aEvent.getLastChangedReasonByType(TimestampChangedReason.class);
+            SubImageDataChangedReason sidReason = aEvent.getLastChangedReasonByType(SubImageDataChangedReason.class);
+
+            if (sidReason != null ||
+                (tsReason != null && (tsReason.getView() instanceof TimedMovieView) &&
+                LinkedMovieManager.getActiveInstance().isMaster((TimedMovieView) tsReason.getView()))) {
+                Displayer.getSingletonInstance().display();
+            }
+
+            notifyViewListeners(aEvent);
+        }
+    }
+
+    @Override
+    public GLCanvas getComponent() {
+        return canvas;
     }
 
     @Override
@@ -430,37 +451,11 @@ public class GL3DComponentView extends AbstractComponentView implements GLEventL
     }
 
     @Override
-    public void display() {
-        try {
-            canvas.repaint();
-        } catch (Exception e) {
-            Log.warn("Display of GL3DComponentView canvas failed", e);
-        }
+    public void activate() {
     }
 
     @Override
-    public void viewChanged(View sender, ChangeEvent aEvent) {
-        if (aEvent != null) {
-            LayerChangedReason layerChanged;
-
-            if ((aEvent.reasonOccurred(LayerChangedReason.class) &&
-                 (layerChanged = aEvent.getLastChangedReasonByType(LayerChangedReason.class)) != null &&
-                  layerChanged.getLayerChangeType() == LayerChangeType.LAYER_ADDED) ||
-                aEvent.reasonOccurred(ViewChainChangedReason.class)) {
-                rebuildShadersRequest = true;
-            }
-        }
-
-        TimestampChangedReason timestampReason = aEvent.getLastChangedReasonByType(TimestampChangedReason.class);
-        SubImageDataChangedReason sidReason = aEvent.getLastChangedReasonByType(SubImageDataChangedReason.class);
-
-        if (sidReason != null ||
-            ((timestampReason != null) && (timestampReason.getView() instanceof TimedMovieView) &&
-              LinkedMovieManager.getActiveInstance().isMaster((TimedMovieView) timestampReason.getView()))) {
-            Displayer.getSingletonInstance().display();
-        }
-
-        notifyViewListeners(aEvent);
+    public void deactivate() {
     }
 
 }
