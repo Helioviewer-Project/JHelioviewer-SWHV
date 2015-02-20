@@ -2,7 +2,6 @@ package org.helioviewer.jhv.gui;
 
 import org.helioviewer.gl3d.factory.GL3DViewFactory;
 import org.helioviewer.gl3d.view.GL3DCameraView;
-import org.helioviewer.gl3d.view.GL3DComponentView;
 import org.helioviewer.gl3d.view.GL3DLayeredView;
 import org.helioviewer.gl3d.view.GL3DSceneGraphView;
 import org.helioviewer.gl3d.view.GL3DViewportView;
@@ -10,6 +9,7 @@ import org.helioviewer.viewmodel.factory.ViewFactory;
 import org.helioviewer.viewmodel.view.ComponentView;
 import org.helioviewer.viewmodel.view.LayeredView;
 import org.helioviewer.viewmodel.view.ModifiableInnerViewView;
+import org.helioviewer.viewmodel.view.OverlayView;
 import org.helioviewer.viewmodel.view.StandardSolarRotationTrackingView;
 import org.helioviewer.viewmodel.view.View;
 import org.helioviewer.viewmodel.view.opengl.GLOverlayView;
@@ -31,14 +31,10 @@ public class GL3DViewchainFactory extends ViewchainFactory {
     @Override
     protected ComponentView createNewViewchainMain() {
         ViewFactory viewFactory = getUsedViewFactory();
-        // Layered View
+
         LayeredView layeredView = viewFactory.createNewView(LayeredView.class);
 
-        // This is where the 2D Viewchain is connected to the 3D part!
-        // GL3DOrthoView orthoView =
-        // viewFactory.createNewView(GL3DOrthoView.class);
-        // orthoView.setView(layeredView);
-        GLOverlayView overlayView = viewFactory.createNewView(GLOverlayView.class);
+        OverlayView overlayView = viewFactory.createNewView(OverlayView.class);
         overlayView.setView(layeredView);
 
         GL3DCameraView cameraView = viewFactory.createNewView(GL3DCameraView.class);
@@ -50,14 +46,13 @@ public class GL3DViewchainFactory extends ViewchainFactory {
         GL3DSceneGraphView sceneGraph = new GL3DSceneGraphView();
         currentSceneGraph = sceneGraph;
         sceneGraph.setView(viewportView);
-        sceneGraph.setGLOverlayView(overlayView);
+        sceneGraph.setGLOverlayView((GLOverlayView) overlayView);
 
-        GL3DComponentView componentView = viewFactory.createNewView(GL3DComponentView.class);
+        ComponentView componentView = viewFactory.createNewView(ComponentView.class);
         componentView.setView(sceneGraph);
 
-        // add Overlays (OvwelayView added before LayeredView and after
-        // GL3DCameraView)
-        updateOverlayViewsInViewchainMain(overlayView);
+        // add Overlays (OverlayView added before LayeredView and after GL3DCameraView)
+        updateOverlayViewsInViewchainMain((GLOverlayView) overlayView);
 
         return componentView;
     }
@@ -79,7 +74,6 @@ public class GL3DViewchainFactory extends ViewchainFactory {
     protected void createViewchainFromExistingViewchain(View sourceView, View targetView, ComponentView mainImagePanelView, boolean keepSource) {
 
         if (targetView != null) {
-            //View overlayView = sourceView.getAdapter(OverlayView.class);
             View layeredView = sourceView.getAdapter(LayeredView.class);
 
             ViewFactory viewFactory = getUsedViewFactory();
@@ -91,11 +85,7 @@ public class GL3DViewchainFactory extends ViewchainFactory {
                 }
             }
 
-            // GL3DOrthoView orthoView =
-            // viewFactory.createNewView(GL3DOrthoView.class);
-            // orthoView.setView(gl3dLayeredView);
-
-            GLOverlayView oldOverlayView = sourceView.getAdapter(GLOverlayView.class);
+            OverlayView oldOverlayView = sourceView.getAdapter(OverlayView.class);
             GLOverlayView overlayView = new GLOverlayView();
             overlayView.setOverlays(oldOverlayView.getOverlays());
             overlayView.setView(gl3dLayeredView);
@@ -110,7 +100,7 @@ public class GL3DViewchainFactory extends ViewchainFactory {
             sceneGraph.setView(viewportView);
             sceneGraph.setGLOverlayView(overlayView);
 
-            ((GL3DComponentView) targetView).setView(sceneGraph);
+            ((ComponentView) targetView).setView(sceneGraph);
 
             // do this recursively and proper (call for every view in the 3d
             // view chain, maybe...)
