@@ -185,7 +185,6 @@ public class SWHVHEKImagePanelEventPopupController implements KeyEventDispatcher
                     aPressed = true;
                 }
                 if (ke.getKeyCode() == KeyEvent.VK_R) {
-                    Displayer.pointList = new ArrayList<GL3DVec3d>();
                     Displayer.getSingletonInstance().display();
                 }
                 break;
