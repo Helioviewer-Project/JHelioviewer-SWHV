@@ -5,9 +5,6 @@ import java.util.ArrayList;
 
 import javax.media.opengl.GL2;
 
-import org.helioviewer.jhv.gui.states.StateController;
-import org.helioviewer.jhv.gui.states.ViewStateEnum;
-
 import org.helioviewer.base.physics.Constants;
 import org.helioviewer.gl3d.camera.GL3DCamera;
 import org.helioviewer.gl3d.camera.GL3DCameraListener;
@@ -24,13 +21,13 @@ import org.helioviewer.gl3d.scenegraph.rt.GL3DRayTracer;
 import org.helioviewer.gl3d.shader.GL3DImageFragmentShaderProgram;
 import org.helioviewer.gl3d.view.GL3DImageTextureView;
 import org.helioviewer.gl3d.view.GL3DView;
-import org.helioviewer.jhv.display.Displayer;
+import org.helioviewer.jhv.gui.states.StateController;
+import org.helioviewer.jhv.gui.states.ViewStateEnum;
 import org.helioviewer.viewmodel.changeevent.ChangeEvent;
 import org.helioviewer.viewmodel.metadata.HelioviewerMetaData;
 import org.helioviewer.viewmodel.metadata.MetaData;
 import org.helioviewer.viewmodel.region.Region;
 import org.helioviewer.viewmodel.region.StaticRegion;
-import org.helioviewer.viewmodel.view.ImageInfoView;
 import org.helioviewer.viewmodel.view.MetaDataView;
 import org.helioviewer.viewmodel.view.RegionView;
 import org.helioviewer.viewmodel.view.View;
@@ -71,11 +68,9 @@ public abstract class GL3DImageLayer extends GL3DGroup implements GL3DCameraList
 
     protected GL2 gl;
     protected GL3DImageFragmentShaderProgram sphereFragmentShader = null;
-    private final ImageInfoView jpxView;
 
     public GL3DImageLayer(String name, GL3DView mainLayerView) {
         super(name);
-
         layerId = nextLayerId++;
 
         this.mainLayerView = mainLayerView;
@@ -98,11 +93,6 @@ public abstract class GL3DImageLayer extends GL3DGroup implements GL3DCameraList
         }
 
         this.accellerationShape = new GL3DHitReferenceShape(false);
-        this.jpxView = this.mainLayerView.getAdapter(ImageInfoView.class);
-        if (this.jpxView != null) {
-            this.jpxView.addViewListener(this.accellerationShape);
-            this.jpxView.addViewListener(this);
-        }
 
         this.doUpdateROI = true;
         this.markAsChanged();
@@ -191,9 +181,7 @@ public abstract class GL3DImageLayer extends GL3DGroup implements GL3DCameraList
 
         double res = 10.;
         boolean addpoints = false;
-        if (Displayer.pointList.size() == 0) {
-            //addpoints = true;//Uncomment to debug ROI problems, press "R" to capture region
-        }
+
         for (int i = 0; i <= res; i++) {
             for (int j = 0; j <= 1; j++) {
                 for (final boolean on : new boolean[] { false, true }) {
@@ -202,9 +190,6 @@ public abstract class GL3DImageLayer extends GL3DGroup implements GL3DCameraList
                     GL3DVec3d hitPoint = ray.getHitPoint();
                     if (hitPoint != null) {
                         hitPoint = ray.getHitPoint();
-                        if (addpoints && hitPoint != null) {
-                            Displayer.pointList.add(new GL3DVec3d(hitPoint.x, -hitPoint.y, hitPoint.z));
-                        }
                         hitPoint = rt.multiply(hitPoint);
                         minPhysicalX = Math.min(minPhysicalX, hitPoint.x);
                         minPhysicalY = Math.min(minPhysicalY, hitPoint.y);
@@ -222,9 +207,6 @@ public abstract class GL3DImageLayer extends GL3DGroup implements GL3DCameraList
                     GL3DVec3d hitPoint = ray.getHitPoint();
                     if (hitPoint != null) {
                         hitPoint = ray.getHitPoint();
-                        if (addpoints && hitPoint != null) {
-                            Displayer.pointList.add(new GL3DVec3d(hitPoint.x, -hitPoint.y, hitPoint.z));
-                        }
                         hitPoint = rt.multiply(hitPoint);
 
                         minPhysicalX = Math.min(minPhysicalX, hitPoint.x);
@@ -254,15 +236,14 @@ public abstract class GL3DImageLayer extends GL3DGroup implements GL3DCameraList
 
         double regionWidth = maxPhysicalX - minPhysicalX;
         double regionHeight = maxPhysicalY - minPhysicalY;
-        //if (addpoints) {//Uncomment to debug ROI problems,
+        Region newRegion;
         if (regionWidth > 0 && regionHeight > 0) {
-            Region newRegion = StaticRegion.createAdaptedRegion(minPhysicalX, minPhysicalY, regionWidth, regionHeight);
-            this.regionView.setRegion(newRegion, new ChangeEvent());
+            newRegion = StaticRegion.createAdaptedRegion(minPhysicalX, minPhysicalY, regionWidth, regionHeight);
         } else {
-            Region newRegion = StaticRegion.createAdaptedRegion(metaData.getPhysicalLowerLeft().getX(), metaData.getPhysicalLowerLeft().getY(), metaData.getPhysicalUpperRight().getX() - metaData.getPhysicalLowerLeft().getX(), metaData.getPhysicalUpperRight().getY() - metaData.getPhysicalLowerLeft().getY());
-            this.regionView.setRegion(newRegion, new ChangeEvent());
+            newRegion = StaticRegion.createAdaptedRegion(metaData.getPhysicalLowerLeft().getX(), metaData.getPhysicalLowerLeft().getY(), metaData.getPhysicalUpperRight().getX() - metaData.getPhysicalLowerLeft().getX(), metaData.getPhysicalUpperRight().getY() - metaData.getPhysicalLowerLeft().getY());
         }
-        //}
+        this.regionView.setRegion(newRegion, new ChangeEvent());
+
         this.markAsChanged();
     }
 
