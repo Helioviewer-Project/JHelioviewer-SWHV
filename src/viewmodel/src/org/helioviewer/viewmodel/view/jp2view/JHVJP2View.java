@@ -34,7 +34,6 @@ import org.helioviewer.viewmodel.view.View;
 import org.helioviewer.viewmodel.view.ViewHelper;
 import org.helioviewer.viewmodel.view.ViewportView;
 import org.helioviewer.viewmodel.view.cache.DateTimeCache;
-import org.helioviewer.viewmodel.view.opengl.GLTextureHelper;
 import org.helioviewer.viewmodel.view.jp2view.J2KRender.RenderReasons;
 import org.helioviewer.viewmodel.view.jp2view.concurrency.BooleanSignal;
 import org.helioviewer.viewmodel.view.jp2view.concurrency.ReasonSignal;
@@ -42,6 +41,7 @@ import org.helioviewer.viewmodel.view.jp2view.datetime.ImmutableDateTime;
 import org.helioviewer.viewmodel.view.jp2view.image.JP2ImageParameter;
 import org.helioviewer.viewmodel.view.jp2view.image.ResolutionSet.ResolutionLevel;
 import org.helioviewer.viewmodel.view.jp2view.image.SubImage;
+import org.helioviewer.viewmodel.view.opengl.GLTextureHelper;
 import org.helioviewer.viewmodel.viewport.StaticViewport;
 import org.helioviewer.viewmodel.viewport.Viewport;
 import org.helioviewer.viewmodel.viewportimagesize.StaticViewportImageSize;
@@ -149,44 +149,41 @@ public class JHVJP2View extends AbstractView implements JP2View, ViewportView, R
      * @param newJP2Image
      */
     public void setJP2Image(JP2Image newJP2Image) {
-        /* workaround for out-of-sync metadata */
-        synchronized (Displayer.displaylock) {
-            if (jp2Image != null && reader != null) {
-                abolish();
+        if (jp2Image != null && reader != null) {
+            abolish();
+        }
+
+        metaData = MetaDataConstructor.getMetaData(newJP2Image);
+        if (region == null) {
+            if (!(metaData instanceof PixelBasedMetaData)) {
+                region = StaticRegion.createAdaptedRegion(getMetaData().getPhysicalLowerLeft(), getMetaData().getPhysicalImageSize());
             }
 
-            metaData = MetaDataConstructor.getMetaData(newJP2Image);
-            if (region == null) {
-                if (!(metaData instanceof PixelBasedMetaData)) {
-                    region = StaticRegion.createAdaptedRegion(getMetaData().getPhysicalLowerLeft(), getMetaData().getPhysicalImageSize());
-                }
+            if (viewport == null) {
+                viewport = StaticViewport.createAdaptedViewport(100, 100);
+            }
 
-                if (viewport == null) {
-                    viewport = StaticViewport.createAdaptedViewport(100, 100);
-                }
+            if (metaData instanceof ObserverMetaData) {
+                event.addReason(new TimestampChangedReason(this, ((ObserverMetaData) metaData).getDateTime()));
+            }
 
-                if (metaData instanceof ObserverMetaData) {
-                    event.addReason(new TimestampChangedReason(this, ((ObserverMetaData) metaData).getDateTime()));
-                }
+            jp2Image = newJP2Image;
 
-                jp2Image = newJP2Image;
+            imageViewParams = calculateParameter(newJP2Image.getQualityLayerRange().getEnd(), 0);
 
-                imageViewParams = calculateParameter(newJP2Image.getQualityLayerRange().getEnd(), 0);
+            if (isMainView) {
+                jp2Image.setParentView(this);
 
-                if (isMainView) {
-                    jp2Image.setParentView(this);
+            }
 
-                }
+            jp2Image.addReference();
 
-                jp2Image.addReference();
-
-                try {
-                    reader = new J2KReader(this);
-                    render = new J2KRender(this);
-                    startDecoding();
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
+            try {
+                reader = new J2KReader(this);
+                render = new J2KRender(this);
+                startDecoding();
+            } catch (Exception e) {
+                e.printStackTrace();
             }
         }
     }

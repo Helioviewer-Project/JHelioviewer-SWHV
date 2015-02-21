@@ -14,7 +14,6 @@ public class Displayer implements JHVEventHighlightListener {
         return instance;
     }
 
-    public static Object displaylock = new Object();
     private ArrayList<DisplayListener> listeners = new ArrayList<DisplayListener>();
     private final ArrayList<RenderListener> renderListeners = new ArrayList<RenderListener>();
 
@@ -59,7 +58,7 @@ public class Displayer implements JHVEventHighlightListener {
     public void display() {
         /*
          * EventQueue.invokeLater(new Runnable() {
-         * 
+         *
          * @Override public void run() {
          */
         for (final DisplayListener listener : listeners) {
