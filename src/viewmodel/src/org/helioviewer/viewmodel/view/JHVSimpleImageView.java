@@ -105,7 +105,6 @@ public class JHVSimpleImageView extends AbstractView implements ViewportView, Re
     }
 
     public BufferedImage getSimpleImage() {
-
         return bufferedImage;
     }
 
@@ -122,7 +121,6 @@ public class JHVSimpleImageView extends AbstractView implements ViewportView, Re
      */
     @Override
     public boolean setViewport(Viewport v, ChangeEvent event) {
-
         // check if viewport has changed
         if (viewport != null && v != null && viewport.getWidth() == v.getWidth() && viewport.getHeight() == v.getHeight())
             return false;
@@ -142,7 +140,6 @@ public class JHVSimpleImageView extends AbstractView implements ViewportView, Re
      *            ChangeEvent to fire after the new data is available
      */
     protected void updateImageData(ChangeEvent event) {
-
         int width = (int) (bufferedImage.getWidth() * region.getWidth() / pixelBasedMetaData.getPhysicalImageSize().getX());
         int height = (int) (bufferedImage.getHeight() * region.getHeight() / pixelBasedMetaData.getPhysicalImageSize().getY());
         int x = (int) ((region.getCornerX() - pixelBasedMetaData.getPhysicalLowerLeft().getX()) / pixelBasedMetaData.getPhysicalImageWidth() * bufferedImage.getWidth());
@@ -266,6 +263,6 @@ public class JHVSimpleImageView extends AbstractView implements ViewportView, Re
     @Override
     public void setDateRange(Interval<Date> range) {
         // TODO Auto-generated method stub
-
     }
+
 }

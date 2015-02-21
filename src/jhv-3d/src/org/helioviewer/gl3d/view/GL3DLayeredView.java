@@ -3,14 +3,9 @@ package org.helioviewer.gl3d.view;
 import javax.media.opengl.GL2;
 
 import org.helioviewer.gl3d.scenegraph.GL3DState;
-import org.helioviewer.viewmodel.changeevent.ChangeEvent;
-import org.helioviewer.viewmodel.view.LayeredView;
 import org.helioviewer.viewmodel.view.MovieView;
-import org.helioviewer.viewmodel.view.RegionView;
 import org.helioviewer.viewmodel.view.View;
-import org.helioviewer.viewmodel.view.ViewportView;
 import org.helioviewer.viewmodel.view.opengl.GLLayeredView;
-import org.helioviewer.viewmodel.view.opengl.GLTextureHelper;
 import org.helioviewer.viewmodel.view.opengl.GLView;
 
 /**
@@ -19,7 +14,7 @@ import org.helioviewer.viewmodel.view.opengl.GLView;
  * @author Simon Spoerri (simon.spoerri@fhnw.ch)
  *
  */
-public class GL3DLayeredView extends GLLayeredView implements GL3DView, LayeredView, RegionView, ViewportView {
+public class GL3DLayeredView extends GLLayeredView implements GL3DView {
 
     @Override
     public void addLayer(View newLayer, int newIndex) {
@@ -59,27 +54,6 @@ public class GL3DLayeredView extends GLLayeredView implements GL3DView, LayeredV
                 getLayer(i).getAdapter(GL3DView.class).deactivate(state);
             }
         }
-    }
-
-    @Override
-    protected boolean recalculateRegionsAndViewports(ChangeEvent event) {
-
-        boolean changed = false;
-
-        if (viewport != null) {
-            for (Layer layer : viewLookup.values()) {
-                changed |= layer.viewportView.setViewport(getViewport(), event);
-            }
-        }
-        if (changed) {
-            notifyViewListeners(event);
-        }
-        return changed;
-    }
-
-    @Override
-    protected boolean recalculateRegionsAndViewports(ChangeEvent event, boolean includePixelBasedImages) {
-        return this.recalculateRegionsAndViewports(event);
     }
 
     @Override
