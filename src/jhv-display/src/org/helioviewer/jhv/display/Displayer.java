@@ -3,7 +3,6 @@ package org.helioviewer.jhv.display;
 // import java.awt.EventQueue;
 import java.util.ArrayList;
 
-import org.helioviewer.gl3d.scenegraph.math.GL3DVec3d;
 import org.helioviewer.jhv.data.datatype.event.JHVEvent;
 import org.helioviewer.jhv.data.datatype.event.JHVEventHighlightListener;
 
@@ -21,7 +20,6 @@ public class Displayer implements JHVEventHighlightListener {
 
     private boolean displaying = false;
 
-    public static ArrayList<GL3DVec3d> pointList = new ArrayList<GL3DVec3d>();
     public static int screenScale = 1;
 
     public void addListener(final DisplayListener listener) {
@@ -59,15 +57,17 @@ public class Displayer implements JHVEventHighlightListener {
     }
 
     public void display() {
-/*        EventQueue.invokeLater(new Runnable() {
-            @Override
-            public void run() { */
-                for (final DisplayListener listener : listeners) {
-                    listener.display();
-                }
-/*            }
-        });
-*/    }
+        /*
+         * EventQueue.invokeLater(new Runnable() {
+         * 
+         * @Override public void run() {
+         */
+        for (final DisplayListener listener : listeners) {
+            listener.display();
+        }
+        /*
+         * } });
+         */}
 
     public void removeListeners() {
         this.listeners = new ArrayList<DisplayListener>();
