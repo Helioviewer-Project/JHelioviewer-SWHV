@@ -9,7 +9,6 @@ import javax.swing.KeyStroke;
 import org.helioviewer.jhv.gui.states.StateController;
 import org.helioviewer.jhv.gui.states.ViewStateEnum;
 
-import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.gui.dialogs.HelpDialog;
 import org.helioviewer.jhv.gui.interfaces.ShowableDialog;
 

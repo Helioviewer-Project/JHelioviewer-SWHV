@@ -83,7 +83,6 @@ public class GLInitPanel extends GLJPanel {
         GLListener(GLInitPanel _parent) {
             super();
             parent = _parent;
-
         }
 
         @Override
@@ -98,17 +97,12 @@ public class GLInitPanel extends GLJPanel {
             isInit = true;
 
             Log.debug(">> GLInitPanel.init(GLAutoDrawable) > Dispose GLInitPanel: Stop the animator and make it invisible");
-
             Log.debug(">> GLInitPanel.init(GLAutoDrawable) > Set GL properties");
             final GL2 gl = (GL2) drawable.getGL();
             Log.debug(">> GLInitPanel.init(GLAutoDrawable) > Shade model: flat");
             gl.glShadeModel(GL2.GL_FLAT);
             Log.debug(">> GLInitPanel.init(GLAutoDrawable) > Clear color: black");
             gl.glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
-            Log.debug(">> GLInitPanel.init(GLAutoDrawable) > Enable 1D texture");
-            // gl.glEnable(GL2.GL_TEXTURE_1D);
-            Log.debug(">> GLInitPanel.init(GLAutoDrawable) > Enable 2D texture");
-            // gl.glEnable(GL2.GL_TEXTURE_2D);
 
             GLInfo.update(gl);
 
@@ -116,28 +110,25 @@ public class GLInitPanel extends GLJPanel {
                 GLShaderHelper.initHelper(gl, JHVDirectory.TEMP.getPath());
                 GLShaderBuilder.initShaderBuilder(gl);
 
-                //Fix for retina displays
-                GLTextureHelper.setPixelHIFactorWidth(parent.getCurrentSurfaceScale(new int[2])[0]);
-                GLTextureHelper.setPixelHIFactorHeight(parent.getCurrentSurfaceScale(new int[2])[1]);
-                int scale = parent.getCurrentSurfaceScale(new int[2])[0];
+                // Retina displays
+                int[] scale = parent.getCurrentSurfaceScale(new int[2]);
+                GLTextureHelper.setPixelHIFactorWidth(scale[0]);
+                GLTextureHelper.setPixelHIFactorHeight(scale[1]);
 
                 Object obj = Toolkit.getDefaultToolkit().getDesktopProperty("apple.awt.contentScaleFactor");
-
                 if (obj instanceof Float) {
                     Float f = (Float) obj;
-                    if (f > scale) {
+                    if (f > scale[0]) {
                         //scale = f.intValue();
                     }
                 }
-                Displayer.screenScale = scale;
-
+                Displayer.screenScale = scale[0];
             } else {
                 Message.err("Could not initialize OpenGL", "OpenGL could not be initialized properly during startup. JHelioviewer will start in software mode. OpenGL is not available on the system or incompatible.", false);
             }
             Log.debug(">> GLInitPanel.init(GLAutoDrawable) > Start viewchain creation");
             isInit = true;
             parent.postInit();
-
         }
 
         @Override
@@ -202,4 +193,5 @@ public class GLInitPanel extends GLJPanel {
             }
         }
     }
+
 }
