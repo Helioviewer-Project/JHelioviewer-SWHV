@@ -386,7 +386,6 @@ public abstract class AbstractLayeredView extends AbstractView implements Layere
      */
     @Override
     public boolean setViewport(Viewport v, ChangeEvent event) {
-
         // check if viewport has changed
         if (viewport != null && v != null && viewport.getWidth() == v.getWidth() && viewport.getHeight() == v.getHeight())
             return false;
@@ -437,7 +436,6 @@ public abstract class AbstractLayeredView extends AbstractView implements Layere
      * @return true, if at least one region or viewport changed
      */
     protected boolean recalculateRegionsAndViewports(ChangeEvent event, boolean includePixelBasedImages) {
-
         boolean changed = false;
         // check region and viewport
         if (region == null && metaData != null) {
@@ -456,7 +454,6 @@ public abstract class AbstractLayeredView extends AbstractView implements Layere
                 for (Layer layer : viewLookup.values()) {
                     MetaData m = layer.metaDataView.getMetaData();
                     if (includePixelBasedImages || !(m instanceof PixelBasedMetaData)) {
-
                         Region layerRegion = ViewHelper.cropInnerRegionToOuterRegion(m.getPhysicalRegion(), region);
                         Viewport layerViewport = ViewHelper.calculateInnerViewport(layerRegion, region, viewportImageSize);
                         layer.renderOffset = ViewHelper.calculateInnerViewportOffset(layerRegion, region, viewportImageSize);

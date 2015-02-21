@@ -2,14 +2,9 @@ package org.helioviewer.viewmodel.view.opengl;
 
 import javax.media.opengl.GL2;
 
-import org.helioviewer.viewmodel.changeevent.ChangeEvent;
-import org.helioviewer.viewmodel.metadata.MetaData;
-import org.helioviewer.viewmodel.region.Region;
-import org.helioviewer.viewmodel.region.StaticRegion;
 import org.helioviewer.viewmodel.view.AbstractLayeredView;
 import org.helioviewer.viewmodel.view.SubimageDataView;
 import org.helioviewer.viewmodel.view.View;
-import org.helioviewer.viewmodel.view.ViewHelper;
 import org.helioviewer.viewmodel.view.jp2view.JHVJP2View;
 import org.helioviewer.viewmodel.view.opengl.shader.GLFragmentShaderView;
 import org.helioviewer.viewmodel.view.opengl.shader.GLMinimalFragmentShaderProgram;
@@ -37,73 +32,11 @@ public class GLLayeredView extends AbstractLayeredView implements GLFragmentShad
      * {@inheritDoc}
      */
     @Override
-    public void addLayer(View newLayer, int newIndex) {
-        if (newLayer == null) {
-            return;
-        }
-
-        super.addLayer(newLayer, newIndex);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    protected boolean recalculateRegionsAndViewports(ChangeEvent event) {
-
-        boolean changed = false;
-
-        // check region and viewport
-        if (region == null && metaData != null)
-            region = StaticRegion.createAdaptedRegion(metaData.getPhysicalRectangle());
-
-        if (viewport != null && region != null) {
-            viewportImageSize = ViewHelper.calculateViewportImageSize(viewport, region);
-
-            for (Layer layer : viewLookup.values()) {
-                MetaData m = layer.metaDataView.getMetaData();
-
-                Region layerRegion = ViewHelper.cropInnerRegionToOuterRegion(m.getPhysicalRegion(), region);
-                changed |= layer.regionView.setRegion(layerRegion, event);
-                changed |= layer.viewportView.setViewport(ViewHelper.calculateInnerViewport(layerRegion, region, viewportImageSize), event);
-            }
-        }
-
-        return changed;
-    }
-
-    protected void changeAngles() {
-        /*
-         * Layer[] viewArray = viewLookup.values().toArray(new
-         * Layer[viewLookup.values().size()]); if (viewArray.length > 0) { long
-         * d1 = viewArray[viewArray.length -
-         * 1].regionView.getAdapter(JHVJP2View.
-         * class).getImageData().getDateMillis();
-         * 
-         * for (int j = viewArray.length - 1; j >= 0; j--) { long d2 =
-         * viewArray[
-         * j].regionView.getAdapter(JHVJP2View.class).getImageData().getDateMillis
-         * (); if (d1 - d2 < 45 * 60 * 1000) {
-         * viewArray[j].regionView.getAdapter
-         * (JHVJP2View.class).getImageData().setDateMillis(d1); } }
-         * 
-         * }
-         */
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
     public void renderGL(GL2 gl, boolean nextView) {
-        changeAngles();
         layerLock.lock();
-
         try {
             gl.glPushMatrix();
-
             for (View v : layers) {
-
                 Layer layer = viewLookup.get(v);
                 if (layer != null) {
                     // If invisible, skip layer
@@ -112,7 +45,6 @@ public class GLLayeredView extends AbstractLayeredView implements GLFragmentShad
                     }
 
                     gl.glColor3f(1.0f, 1.0f, 1.0f);
-
                     // if layer is GLView, go on, otherwise render now
                     if (v instanceof GLView) {
                         ((GLView) v).renderGL(gl, true);
@@ -121,9 +53,7 @@ public class GLLayeredView extends AbstractLayeredView implements GLFragmentShad
                     }
                 }
             }
-
             gl.glPopMatrix();
-
         } finally {
             layerLock.unlock();
         }
@@ -149,12 +79,9 @@ public class GLLayeredView extends AbstractLayeredView implements GLFragmentShad
      */
     @Override
     public GLShaderBuilder buildFragmentShader(GLShaderBuilder shaderBuilder) {
-
         layerLock.lock();
-
         try {
             for (View v : layers) {
-
                 GLFragmentShaderView fragmentView = v.getAdapter(GLFragmentShaderView.class);
                 if (fragmentView != null) {
                     // create new shader builder
@@ -184,9 +111,7 @@ public class GLLayeredView extends AbstractLayeredView implements GLFragmentShad
      */
     @Override
     public GLShaderBuilder buildVertexShader(GLShaderBuilder shaderBuilder) {
-
         layerLock.lock();
-
         try {
             for (View v : layers) {
                 GLVertexShaderView vertexView = v.getAdapter(GLVertexShaderView.class);
