@@ -20,7 +20,6 @@ import org.helioviewer.gl3d.scenegraph.math.GL3DQuatd;
 import org.helioviewer.gl3d.scenegraph.math.GL3DVec3d;
 import org.helioviewer.gl3d.scenegraph.math.GL3DVec4d;
 import org.helioviewer.gl3d.scenegraph.math.GL3DVec4f;
-import org.helioviewer.jhv.display.Displayer;
 
 import com.jogamp.opengl.util.awt.TextRenderer;
 
@@ -291,16 +290,14 @@ public class GL3DGrid extends GL3DGroup {
 
     public void setFirstColor(Color color) {
         this.firstColor = color;
-        Displayer.getSingletonInstance().display();
     }
 
     public void setSecondColor(Color color) {
         this.secondColor = color;
-        Displayer.getSingletonInstance().display();
     }
 
     public void setThirdColor(Color color) {
         this.thirdColor = color;
-        Displayer.getSingletonInstance().display();
     }
+
 }
