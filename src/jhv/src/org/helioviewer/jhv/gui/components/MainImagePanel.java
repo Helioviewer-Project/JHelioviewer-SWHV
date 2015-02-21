@@ -61,7 +61,6 @@ public class MainImagePanel extends BasicImagePanel {
      * The public constructor
      * */
     public MainImagePanel() {
-
         // call constructor of super class
         super();
 
@@ -105,7 +104,6 @@ public class MainImagePanel extends BasicImagePanel {
                     noImagePostRendererSet = true;
                 }
             }
-            Displayer.getSingletonInstance().render();
         }
         repaint();
     }
@@ -383,7 +381,7 @@ public class MainImagePanel extends BasicImagePanel {
                         repaint();
                         Displayer.getSingletonInstance().display();
                     }
-                }, 0, 100);
+                }, 0, 200);
             }
         }
 
@@ -527,7 +525,6 @@ public class MainImagePanel extends BasicImagePanel {
         @Override
         public void stopAnimation() {
             currentRenderer.stopAnimation();
-            Displayer.getSingletonInstance().display();
         }
 
         /**
@@ -552,17 +549,15 @@ public class MainImagePanel extends BasicImagePanel {
                     cornerRenderer.stopAnimation();
                     centerRenderer.startAnimation();
                 }
-
                 currentRenderer = centerRenderer;
             } else {
-
                 if (centerRenderer.isAnimating()) {
                     centerRenderer.stopAnimation();
                     cornerRenderer.startAnimation();
                 }
-
                 currentRenderer = cornerRenderer;
             }
         }
     }
+
 }
