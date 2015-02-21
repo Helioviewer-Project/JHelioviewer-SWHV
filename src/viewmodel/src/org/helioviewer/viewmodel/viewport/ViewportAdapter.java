@@ -50,6 +50,10 @@ public class ViewportAdapter implements Viewport {
     }
 
     public boolean equals(Viewport v) {
+        if (!(v instanceof Viewport)) {
+            return false;
+        }
+
         return v.getHeight() == getHeight() && v.getWidth() == getWidth();
     }
 
