@@ -84,10 +84,8 @@ public class OpacityFilter extends AbstractFilter implements StandardFilter, GLF
         if (opacity == newOpacity) {
             return;
         }
-
         opacity = newOpacity;
         notifyAllListeners();
-        Displayer.getSingletonInstance().display();
     }
 
     /**
@@ -98,7 +96,6 @@ public class OpacityFilter extends AbstractFilter implements StandardFilter, GLF
         if (data == null) {
             return null;
         }
-
         if (opacity > 0.999f) {
             return data;
         }
@@ -183,7 +180,6 @@ public class OpacityFilter extends AbstractFilter implements StandardFilter, GLF
      */
     @Override
     public void forceRefilter() {
-
     }
 
     /**
@@ -202,4 +198,5 @@ public class OpacityFilter extends AbstractFilter implements StandardFilter, GLF
     public String getState() {
         return Float.toString(opacity);
     }
+
 }
