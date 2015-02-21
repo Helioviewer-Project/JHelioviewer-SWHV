@@ -24,9 +24,6 @@ public class GL3DImageFragmentShaderProgram extends GLFragmentShaderProgram {
     private int differenceThetaParamRef;
     private final double[] differenceThetaParamFloat = new double[4];
 
-    public GL3DImageFragmentShaderProgram() {
-    }
-
     /**
      * Binds (= activates it) the shader, if it is not active so far.
      *

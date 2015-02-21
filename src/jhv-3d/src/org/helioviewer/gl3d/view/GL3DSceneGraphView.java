@@ -344,10 +344,8 @@ public class GL3DSceneGraphView extends AbstractGL3DView implements GL3DView {
     }
 
     public void printScenegraph() {
-        System.out.println("PRINTING SCENEGRAPH =======================>");
-
-        //printNode(root, 0);
-
+        // System.out.println("PRINTING SCENEGRAPH =======================>");
+        // printNode(root, 0);
     }
 
     public void setGLOverlayView(GLOverlayView overlayView) {
@@ -359,7 +357,6 @@ public class GL3DSceneGraphView extends AbstractGL3DView implements GL3DView {
             System.out.print("   ");
 
         if (node == null) {
-            //System.out.println("NULL");
             return;
         }
 
