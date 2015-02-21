@@ -151,4 +151,5 @@ public class GL3DImageVertexShaderProgram extends GLVertexShaderProgram {
         this.differenceXScale = differenceXScale;
         this.differenceYScale = differenceYScale;
     }
+
 }
