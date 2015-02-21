@@ -10,7 +10,6 @@ import kdu_jni.Kdu_region_compositor;
 
 import org.helioviewer.base.logging.Log;
 import org.helioviewer.base.math.Interval;
-import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.viewmodel.changeevent.ChangeEvent;
 import org.helioviewer.viewmodel.changeevent.NonConstantMetaDataChangedReason;
 import org.helioviewer.viewmodel.imagedata.ARGBInt32ImageData;
@@ -465,34 +464,34 @@ class J2KRender implements Runnable {
                         movieManager.updateCurrentFrameToMaster(new ChangeEvent());
                     }
                 }
-                synchronized (Displayer.displaylock) {
-                    renderLayer(curLayer);
 
-                    SubImage roi = currParams.subImage;
-                    int width = roi.width;
-                    int height = roi.height;
+                renderLayer(curLayer);
 
-                    if (parentImageRef.getNumComponents() < 2) {
-                        if (roi.getNumPixels() == byteBuffer[currentByteBuffer].length) {
-                            SingleChannelByte8ImageData imdata = new SingleChannelByte8ImageData(width, height, byteBuffer[currentByteBuffer], new ColorMask());
-                            parentViewRef.setSubimageData(imdata, roi, curLayer, currParams.resolution.getZoomPercent(), false);
-                        } else {
-                            Log.warn("J2KRender: Params out of sync, skip frame");
-                        }
+                SubImage roi = currParams.subImage;
+                int width = roi.width;
+                int height = roi.height;
+
+                if (parentImageRef.getNumComponents() < 2) {
+                    if (roi.getNumPixels() == byteBuffer[currentByteBuffer].length) {
+                        SingleChannelByte8ImageData imdata = new SingleChannelByte8ImageData(width, height, byteBuffer[currentByteBuffer], new ColorMask());
+                        parentViewRef.setSubimageData(imdata, roi, curLayer, currParams.resolution.getZoomPercent(), false);
                     } else {
-                        if (roi.getNumPixels() == intBuffer[currentIntBuffer].length) {
-                            boolean singleChannel = false;
-                            if (parentImageRef.getNumComponents() == 2) {
-                                singleChannel = true;
-                            }
-
-                            ARGBInt32ImageData imdata = new ARGBInt32ImageData(singleChannel, width, height, intBuffer[currentIntBuffer], new ColorMask());
-                            parentViewRef.setSubimageData(imdata, roi, curLayer, currParams.resolution.getZoomPercent(), false);
-                        } else {
-                            Log.warn("J2KRender: Params out of sync, skip frame");
+                        Log.warn("J2KRender: Params out of sync, skip frame");
+                    }
+                } else {
+                    if (roi.getNumPixels() == intBuffer[currentIntBuffer].length) {
+                        boolean singleChannel = false;
+                        if (parentImageRef.getNumComponents() == 2) {
+                            singleChannel = true;
                         }
+
+                        ARGBInt32ImageData imdata = new ARGBInt32ImageData(singleChannel, width, height, intBuffer[currentIntBuffer], new ColorMask());
+                        parentViewRef.setSubimageData(imdata, roi, curLayer, currParams.resolution.getZoomPercent(), false);
+                    } else {
+                        Log.warn("J2KRender: Params out of sync, skip frame");
                     }
                 }
+
                 if (!movieMode) {
                     break;
                 } else {
