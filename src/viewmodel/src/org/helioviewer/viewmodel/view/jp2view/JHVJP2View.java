@@ -289,20 +289,16 @@ public class JHVJP2View extends AbstractView implements JP2View, ViewportView, R
     public boolean setViewport(Viewport v, ChangeEvent event) {
         boolean viewportChanged = (viewport == null ? v == null : !viewport.equals(v));
         viewport = v;
+
         if (setImageViewParams(calculateParameter())) {
             // sub image data will change because resolution level changed
             // -> memorize change event till sub image data has changed
-
             this.event.copyFrom(event);
-
             this.event.addReason(new ViewportChangedReason(this, v));
 
             return true;
-
         } else if (viewportChanged && imageViewParams.resolution.getZoomLevel() == jp2Image.getResolutionSet().getMaxResolutionLevels()) {
-
             this.event.copyFrom(event);
-
             this.event.addReason(new ViewportChangedReason(this, v));
             renderRequestedSignal.signal(RenderReasons.OTHER);
 
@@ -375,7 +371,6 @@ public class JHVJP2View extends AbstractView implements JP2View, ViewportView, R
      */
     @Override
     public boolean setRegion(Region r, ChangeEvent event) {
-
         boolean changed = region == null ? r == null : !region.equals(r);
         region = r;
         changed |= setImageViewParams(calculateParameter());
@@ -562,7 +557,6 @@ public class JHVJP2View extends AbstractView implements JP2View, ViewportView, R
         subImageBuffer.putSubImage(subImage, r);
 
         return new JP2ImageParameter(subImage, res, numQualityLayers, frameNumber);
-
     }
 
     /**
