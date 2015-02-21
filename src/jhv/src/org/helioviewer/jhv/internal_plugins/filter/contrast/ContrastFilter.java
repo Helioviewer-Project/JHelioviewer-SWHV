@@ -2,7 +2,6 @@ package org.helioviewer.jhv.internal_plugins.filter.contrast;
 
 import javax.media.opengl.GL2;
 
-import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.viewmodel.filter.AbstractFilter;
 import org.helioviewer.viewmodel.filter.GLFragmentShaderFilter;
 import org.helioviewer.viewmodel.filter.StandardFilter;
@@ -74,10 +73,12 @@ public class ContrastFilter extends AbstractFilter implements StandardFilter, GL
      *            New contrast parameter.
      */
     void setContrast(float newContrast) {
+        if (contrast == newContrast) {
+            return;
+        }
         contrast = newContrast;
         rebuildTable = true;
         notifyAllListeners();
-        Displayer.getSingletonInstance().display();
     }
 
     /**
@@ -89,7 +90,6 @@ public class ContrastFilter extends AbstractFilter implements StandardFilter, GL
         }
 
         float N = 0xFF;
-
         for (int i = 0; i < 0x100; i++) {
             int v = (int) (N * (0.5f * Math.signum(2 * i / N - 1) * Math.pow(Math.abs(2 * i / N - 1), Math.pow(1.5, -contrast)) + 0.5f));
             contrastTable8[i] = (byte) v;
@@ -109,7 +109,6 @@ public class ContrastFilter extends AbstractFilter implements StandardFilter, GL
         }
 
         float N = maxValue - 1;
-
         for (int i = 0; i < maxValue; i++) {
             int v = (int) (N * (0.5f * Math.signum(2 * i / N - 1) * Math.pow(Math.abs(2 * i / N - 1), Math.pow(1.5, -contrast)) + 0.5f));
             contrastTable16[i] = (short) v;
@@ -126,7 +125,6 @@ public class ContrastFilter extends AbstractFilter implements StandardFilter, GL
         if (data == null) {
             return null;
         }
-
         if (Math.abs(contrast) <= 0.01f) {
             return data;
         }
@@ -137,14 +135,14 @@ public class ContrastFilter extends AbstractFilter implements StandardFilter, GL
                 if (forceRefilter || rebuildTable) {
                     buildTable8();
                 }
+
                 byte[] pixelData = ((Byte8ImageTransport) data.getImageTransport()).getByte8PixelData();
                 byte[] resultPixelData = new byte[pixelData.length];
                 for (int i = 0; i < pixelData.length; i++) {
                     resultPixelData[i] = contrastTable8[pixelData[i] & 0xFF];
                 }
                 return new SingleChannelByte8ImageData(data, resultPixelData);
-
-                // Single channel short image
+            // Single channel short image
             } else if (data.getImageTransport() instanceof Short16ImageTransport) {
                 if (forceRefilter || rebuildTable) {
                     buildTable16(data.getImageTransport().getNumBitsPerPixel());
@@ -156,27 +154,25 @@ public class ContrastFilter extends AbstractFilter implements StandardFilter, GL
                     resultPixelData[i] = contrastTable16[pixelData[i] & 0xFFFF];
                 }
                 return new SingleChannelShortImageData(data, resultPixelData);
-
-                // (A)RGB image: Filter each channel separate
+            // (A)RGB image: Filter each channel separate
             } else if (data.getImageTransport() instanceof Int32ImageTransport) {
                 if (forceRefilter || rebuildTable) {
                     buildTable8();
                 }
+
                 int[] pixelData = ((Int32ImageTransport) data.getImageTransport()).getInt32PixelData();
                 int[] resultPixelData = new int[pixelData.length];
                 for (int i = 0; i < pixelData.length; i++) {
-
                     int rgb = pixelData[i];
                     int a = rgb >>> 24;
-                int r = (rgb >>> 16) & 0xFF;
-                int g = (rgb >>> 8) & 0xFF;
-                int b = rgb & 0xff;
+                    int r = (rgb >>> 16) & 0xFF;
+                    int g = (rgb >>> 8) & 0xFF;
+                    int b = rgb & 0xff;
 
-                r = contrastTable8[r] & 0xFF;
-                g = contrastTable8[g] & 0xFF;
-                b = contrastTable8[b] & 0xFF;
-
-                resultPixelData[i] = (a << 24) | (r << 16) | (g << 8) | b;
+                    r = contrastTable8[r] & 0xFF;
+                    g = contrastTable8[g] & 0xFF;
+                    b = contrastTable8[b] & 0xFF;
+                    resultPixelData[i] = (a << 24) | (r << 16) | (g << 8) | b;
                 }
                 return new ARGBInt32ImageData(data, resultPixelData);
             }
@@ -284,4 +280,5 @@ public class ContrastFilter extends AbstractFilter implements StandardFilter, GL
     public String getState() {
         return Float.toString(contrast);
     }
+
 }

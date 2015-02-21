@@ -2,7 +2,6 @@ package org.helioviewer.jhv.internal_plugins.filter.channelMixer;
 
 import javax.media.opengl.GL2;
 
-import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.viewmodel.filter.AbstractFilter;
 import org.helioviewer.viewmodel.filter.GLFilter;
 import org.helioviewer.viewmodel.filter.StandardFilter;
@@ -38,9 +37,6 @@ public class ChannelMixerFilter extends AbstractFilter implements StandardFilter
     private ChannelMixerPanel panel;
     private boolean forceRefilter = false;
 
-    public ChannelMixerFilter() {
-    }
-
     /**
      * Sets the corresponding channel mixer panel.
      *
@@ -64,14 +60,11 @@ public class ChannelMixerFilter extends AbstractFilter implements StandardFilter
      */
     void setColorMask(boolean showRed, boolean showGreen, boolean showBlue) {
         ColorMask newColorMask = new ColorMask(showRed, showGreen, showBlue);
-
         if (colorMask == newColorMask) {
             return;
         }
-
         colorMask = newColorMask;
         notifyAllListeners();
-        Displayer.getSingletonInstance().display();
     }
 
     /**
@@ -79,11 +72,9 @@ public class ChannelMixerFilter extends AbstractFilter implements StandardFilter
      */
     @Override
     public ImageData apply(ImageData data) {
-
         if (data == null) {
             return null;
         }
-
         if (data.getColorMask() == colorMask && !forceRefilter) {
             return data;
         }

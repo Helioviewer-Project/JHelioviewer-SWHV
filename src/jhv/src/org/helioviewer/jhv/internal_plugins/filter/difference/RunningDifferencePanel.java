@@ -76,7 +76,6 @@ public class RunningDifferencePanel extends FilterPanel implements ChangeListene
         add(truncationLine);
         add(Box.createVerticalGlue());
         truncateSpinner.setEnabled(false);
-
     }
 
     private void addRadioButtons() {
@@ -173,7 +172,6 @@ public class RunningDifferencePanel extends FilterPanel implements ChangeListene
             float value = ((SpinnerNumberModel) truncateSpinner.getModel()).getNumber().floatValue();
             filter.setTruncationvalue(1 - value);
             Displayer.getSingletonInstance().display();
-
         }
     }
 
@@ -215,4 +213,5 @@ public class RunningDifferencePanel extends FilterPanel implements ChangeListene
             diffRot.setVisible(false);
         }
     }
+
 }

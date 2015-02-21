@@ -4,7 +4,6 @@ import java.nio.IntBuffer;
 
 import javax.media.opengl.GL2;
 
-import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.viewmodel.filter.AbstractFilter;
 import org.helioviewer.viewmodel.filter.FrameFilter;
 import org.helioviewer.viewmodel.filter.GLFragmentShaderFilter;
@@ -103,7 +102,6 @@ public class SOHOLUTFilter extends AbstractFilter implements FrameFilter, Standa
         invertLUT = invert;
         this.changed = true;
         notifyAllListeners();
-        Displayer.getSingletonInstance().display();
     }
 
     // /////////////////////////
@@ -152,7 +150,6 @@ public class SOHOLUTFilter extends AbstractFilter implements FrameFilter, Standa
     public GLShaderBuilder buildFragmentShader(GLShaderBuilder shaderBuilder) {
         shader.build(shaderBuilder);
         this.changed = true;
-
         return shaderBuilder;
     }
 
@@ -169,9 +166,7 @@ public class SOHOLUTFilter extends AbstractFilter implements FrameFilter, Standa
         LUT currlut;
         // Note: The lookup table will always be power of two,
         // so we won't get any problems here.
-        boolean b = (jp2View instanceof JHVJPXView);
-        JHVJPXView jpxView = (JHVJPXView) jp2View;
-        if (b && jpxView.getDifferenceMode()) {
+        if ((jp2View instanceof JHVJPXView) && ((JHVJPXView) jp2View).getDifferenceMode()) {
             currlut = gray;
         } else {
             currlut = lut;
@@ -249,4 +244,5 @@ public class SOHOLUTFilter extends AbstractFilter implements FrameFilter, Standa
     public void setJP2View(JHVJP2View jp2View) {
         this.jp2View = jp2View;
     }
+
 }

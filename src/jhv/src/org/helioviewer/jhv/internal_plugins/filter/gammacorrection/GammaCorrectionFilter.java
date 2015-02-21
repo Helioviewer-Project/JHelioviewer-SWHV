@@ -2,7 +2,6 @@ package org.helioviewer.jhv.internal_plugins.filter.gammacorrection;
 
 import javax.media.opengl.GL2;
 
-import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.viewmodel.filter.AbstractFilter;
 import org.helioviewer.viewmodel.filter.GLFragmentShaderFilter;
 import org.helioviewer.viewmodel.filter.StandardFilter;
@@ -74,10 +73,12 @@ public class GammaCorrectionFilter extends AbstractFilter implements StandardFil
      *            New gamma value.
      */
     void setGamma(float newGamma) {
+        if (gamma == newGamma) {
+            return;
+        }
         gamma = newGamma;
         rebuildTable = true;
         notifyAllListeners();
-        Displayer.getSingletonInstance().display();
     }
 
     /**
@@ -89,12 +90,10 @@ public class GammaCorrectionFilter extends AbstractFilter implements StandardFil
         }
 
         float N = 0xFF;
-
         for (int i = 0; i < 0x100; i++) {
             int v = (int) Math.round(N * Math.pow(i / N, gamma));
             gammaTable8[i] = (byte) v;
         }
-
         rebuildTable = false;
     }
 
@@ -109,12 +108,10 @@ public class GammaCorrectionFilter extends AbstractFilter implements StandardFil
         }
 
         float N = maxValue - 1;
-
         for (int i = 0; i < maxValue; i++) {
             int v = (int) Math.round(N * Math.pow(i / N, gamma));
             gammaTable16[i] = (short) v;
         }
-
         rebuildTable = false;
     }
 
@@ -126,7 +123,6 @@ public class GammaCorrectionFilter extends AbstractFilter implements StandardFil
         if (data == null) {
             return null;
         }
-
         if (Math.abs(gamma - 1.0f) <= 0.01f) {
             return data;
         }
@@ -137,6 +133,7 @@ public class GammaCorrectionFilter extends AbstractFilter implements StandardFil
                 if (forceRefilter || rebuildTable) {
                     buildTable8();
                 }
+
                 byte[] pixelData = ((Byte8ImageTransport) data.getImageTransport()).getByte8PixelData();
                 byte[] resultPixelData = new byte[pixelData.length];
                 for (int i = 0; i < pixelData.length; i++) {
@@ -144,7 +141,7 @@ public class GammaCorrectionFilter extends AbstractFilter implements StandardFil
                 }
                 return new SingleChannelByte8ImageData(data, resultPixelData);
 
-                // Single channel short image
+            // Single channel short image
             } else if (data.getImageTransport() instanceof Short16ImageTransport) {
                 if (forceRefilter || rebuildTable) {
                     buildTable16(data.getImageTransport().getNumBitsPerPixel());
@@ -165,7 +162,6 @@ public class GammaCorrectionFilter extends AbstractFilter implements StandardFil
 
                 int[] pixelData = ((Int32ImageTransport) data.getImageTransport()).getInt32PixelData();
                 int[] resultPixelData = new int[pixelData.length];
-
                 for (int i = 0; i < pixelData.length; i++) {
                     int rgb = pixelData[i];
                     int a = rgb >>> 24;
@@ -176,7 +172,6 @@ public class GammaCorrectionFilter extends AbstractFilter implements StandardFil
                     r = gammaTable8[r] & 0xFF;
                     g = gammaTable8[g] & 0xFF;
                     b = gammaTable8[b] & 0xFF;
-
                     resultPixelData[i] = (a << 24) | (r << 16) | (g << 8) | b;
                 }
                 return new ARGBInt32ImageData(data, resultPixelData);
@@ -282,4 +277,5 @@ public class GammaCorrectionFilter extends AbstractFilter implements StandardFil
     public String getState() {
         return Float.toString(gamma);
     }
+
 }

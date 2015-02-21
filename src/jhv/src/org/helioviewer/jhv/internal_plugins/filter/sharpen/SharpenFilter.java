@@ -1,6 +1,5 @@
 package org.helioviewer.jhv.internal_plugins.filter.sharpen;
 
-import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.viewmodel.filter.AbstractFilter;
 import org.helioviewer.viewmodel.filter.StandardFilter;
 import org.helioviewer.viewmodel.imagedata.ARGBInt32ImageData;
@@ -80,9 +79,11 @@ public class SharpenFilter extends AbstractFilter implements StandardFilter {
      *            Weighting of the sharpening
      */
     void setWeighting(float newWeighting) {
+        if (weighting == newWeighting) {
+            return;
+        }
         weighting = newWeighting;
         notifyAllListeners();
-        Displayer.getSingletonInstance().display();
     }
 
     /**
@@ -125,7 +126,6 @@ public class SharpenFilter extends AbstractFilter implements StandardFilter {
         for (int i = 0; i < width * height; i++) {
             convolveY[i] = input[i] & 0xFF;
         }
-
         return blur(width, height, convolveY);
     }
 
@@ -156,7 +156,6 @@ public class SharpenFilter extends AbstractFilter implements StandardFilter {
         for (int i = 0; i < width * height; i++) {
             convolveY[i] = input[i] & mask;
         }
-
         return blur(width, height, convolveY);
     }
 
@@ -193,7 +192,6 @@ public class SharpenFilter extends AbstractFilter implements StandardFilter {
         for (int i = 0; i < height; i++) {
             for (int j = 0; j < span; j++) {
                 tmpIndex = i * width + j;
-
                 convolveX[tmpIndex] = ((input[tmpIndex - j] + (input[tmpIndex] << 1) + input[tmpIndex + span]) >> 2);
 
                 tmpIndex = (i + 1) * width - 1 - j;
@@ -241,13 +239,12 @@ public class SharpenFilter extends AbstractFilter implements StandardFilter {
         if (data == null) {
             return null;
         }
-
         if (weighting <= 0.01f) {
             return data;
         }
 
-        // Single channel byte image
         try {
+            // Single channel byte image
             if (data.getImageTransport() instanceof Byte8ImageTransport) {
                 byte[] pixelData = ((Byte8ImageTransport) data.getImageTransport()).getByte8PixelData();
 
@@ -261,12 +258,10 @@ public class SharpenFilter extends AbstractFilter implements StandardFilter {
                 for (int i = 0; i < pixelData.length; i++) {
                     resultPixelData[i] = (byte) Math.min(Math.max((1.0f + weighting) * (pixelData[i] & 0xFF) - weighting * convolveY[i], 0), 0xFF);
                 }
-
                 lastImageData = data;
 
                 return new SingleChannelByte8ImageData(data, resultPixelData);
-
-                // Single channel short image
+            // Single channel short image
             } else if (data.getImageTransport() instanceof Short16ImageTransport) {
                 short[] pixelData = ((Short16ImageTransport) data.getImageTransport()).getShort16PixelData();
 
@@ -283,17 +278,13 @@ public class SharpenFilter extends AbstractFilter implements StandardFilter {
                 for (int i = 0; i < pixelData.length; i++) {
                     resultPixelData[i] = (short) Math.min(Math.max((1.0f + weighting) * (pixelData[i] & mask) - weighting * convolveY[i], 0), 0xFFFF);
                 }
-
                 lastImageData = data;
 
                 return new SingleChannelShortImageData(data, resultPixelData);
-
-                // (A)RGB image: Filter each channel separate
+            // (A)RGB image: Filter each channel separate
             } else if (data.getImageTransport() instanceof Int32ImageTransport) {
-
                 int[] pixelData = ((Int32ImageTransport) data.getImageTransport()).getInt32PixelData();
                 int[] resultPixelData = new int[pixelData.length];
-
                 int[] channel = new int[pixelData.length];
 
                 // copy alpha channel unfiltered
@@ -315,11 +306,9 @@ public class SharpenFilter extends AbstractFilter implements StandardFilter {
                         resultPixelData[i] |= (((int) Math.min(Math.max((1.0f + weighting) * (channel[i] & 0xFF) - weighting * convolveY[i], 0), 0xFF)) << (c * 8));
                     }
                 }
-
                 lastImageData = data;
 
                 return new ARGBInt32ImageData(data, resultPixelData);
-
             }
         } finally {
             forceRefilter = false;
@@ -334,7 +323,6 @@ public class SharpenFilter extends AbstractFilter implements StandardFilter {
     @Override
     public void forceRefilter() {
         forceRefilter = true;
-
     }
 
     /**
@@ -353,4 +341,5 @@ public class SharpenFilter extends AbstractFilter implements StandardFilter {
     public String getState() {
         return Float.toString(weighting);
     }
+
 }
