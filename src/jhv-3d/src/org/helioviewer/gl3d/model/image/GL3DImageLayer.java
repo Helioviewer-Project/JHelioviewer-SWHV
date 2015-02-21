@@ -1,8 +1,5 @@
 package org.helioviewer.gl3d.model.image;
 
-import java.awt.Point;
-import java.util.ArrayList;
-
 import javax.media.opengl.GL2;
 
 import org.helioviewer.base.physics.Constants;
@@ -62,11 +59,8 @@ public abstract class GL3DImageLayer extends GL3DGroup implements GL3DCameraList
 
     protected boolean doUpdateROI = true;
 
-    private final ArrayList<Point> points = new ArrayList<Point>();
-
     private final double lastViewAngle = 0.0;
 
-    protected GL2 gl;
     protected GL3DImageFragmentShaderProgram sphereFragmentShader = null;
 
     public GL3DImageLayer(String name, GL3DView mainLayerView) {
@@ -164,8 +158,6 @@ public abstract class GL3DImageLayer extends GL3DGroup implements GL3DCameraList
         theta = hvmd.getTheta();
         this.accellerationShape.setPhi(phi);
         this.accellerationShape.setTheta(theta);
-        //GL3DQuatd rth = GL3DQuatd.createRotation(phi, new GL3DVec3d(0, 1, 0));
-        //rth.rotate(GL3DQuatd.createRotation(theta, new GL3DVec3d(1, 0, 0)));
 
         GL3DQuatd rth = GL3DQuatd.createRotation(theta, new GL3DVec3d(1, 0, 0));
         rth.rotate(GL3DQuatd.createRotation(phi, new GL3DVec3d(0, 1, 0)));
@@ -180,7 +172,6 @@ public abstract class GL3DImageLayer extends GL3DGroup implements GL3DCameraList
         double maxPhysicalY = -Double.MAX_VALUE;
 
         double res = 10.;
-        boolean addpoints = false;
 
         for (int i = 0; i <= res; i++) {
             for (int j = 0; j <= 1; j++) {
@@ -276,4 +267,5 @@ public abstract class GL3DImageLayer extends GL3DGroup implements GL3DCameraList
 
     public void setCoronaVisibility(boolean visible) {
     }
+
 }
