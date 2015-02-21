@@ -21,7 +21,6 @@ import org.helioviewer.base.logging.Log;
 import org.helioviewer.base.math.Interval;
 import org.helioviewer.base.message.Message;
 import org.helioviewer.jhv.Settings;
-import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.gui.ImageViewerGui;
 import org.helioviewer.jhv.gui.ViewListenerDistributor;
 import org.helioviewer.jhv.gui.components.MoviePanel;
@@ -181,9 +180,7 @@ public class LayersModel implements ViewListener {
         }
 
         activeLayer = idx;
-
-        this.fireActiveLayerChanged(idx);
-        Displayer.getSingletonInstance().render();
+        fireActiveLayerChanged(idx);
     }
 
     /**

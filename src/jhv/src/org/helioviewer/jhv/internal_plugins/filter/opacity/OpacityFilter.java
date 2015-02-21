@@ -6,7 +6,6 @@ import java.awt.image.BufferedImage;
 
 import javax.media.opengl.GL2;
 
-import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.viewmodel.filter.AbstractFilter;
 import org.helioviewer.viewmodel.filter.GLFragmentShaderFilter;
 import org.helioviewer.viewmodel.filter.StandardFilter;
