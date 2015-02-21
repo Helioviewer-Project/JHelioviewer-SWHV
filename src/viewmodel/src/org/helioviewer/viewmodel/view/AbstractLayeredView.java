@@ -7,7 +7,6 @@ import java.util.concurrent.locks.ReentrantLock;
 
 import org.helioviewer.base.math.RectangleDouble;
 import org.helioviewer.base.math.Vector2dInt;
-import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.viewmodel.changeevent.ChangeEvent;
 import org.helioviewer.viewmodel.changeevent.LayerChangedReason;
 import org.helioviewer.viewmodel.changeevent.LayerChangedReason.LayerChangeType;
@@ -144,13 +143,10 @@ public abstract class AbstractLayeredView extends AbstractView implements Layere
         LinkedMovieManager.getActiveInstance().pauseLinkedMovies();
 
         Layer layer = viewLookup.get(view);
-
         if (layer != null) {
             layer.visibility = !layer.visibility;
-
             redrawBuffer(new ChangeEvent(new LayerChangedReason(this, LayerChangeType.LAYER_VISIBILITY, view)));
         }
-        Displayer.getSingletonInstance().display();
     }
 
     /**
@@ -195,7 +191,6 @@ public abstract class AbstractLayeredView extends AbstractView implements Layere
         if (region != null)
             region = new RegionAdapter(new StaticRegion(-0.5 * region.getWidth(), -0.5 * region.getHeight(), region.getSize()));
         recalculateRegionsAndViewports(new ChangeEvent());
-
         redrawBuffer(changeEvent);
     }
 
@@ -286,7 +281,6 @@ public abstract class AbstractLayeredView extends AbstractView implements Layere
             recalculateRegionsAndViewports(event);
         }
         redrawBuffer(event);
-        Displayer.getSingletonInstance().display();
     }
 
     /**
@@ -302,7 +296,6 @@ public abstract class AbstractLayeredView extends AbstractView implements Layere
      */
     @Override
     public void removeAllLayers() {
-
         ChangeEvent event = new ChangeEvent();
         LinkedMovieManager.getActiveInstance().pauseLinkedMovies();
         layerLock.lock();
@@ -494,7 +487,9 @@ public abstract class AbstractLayeredView extends AbstractView implements Layere
             recalculateRegionsAndViewports(new ChangeEvent(aEvent));
         }
 
-        if ((aEvent.reasonOccurred(RegionChangedReason.class) || aEvent.reasonOccurred(SubImageDataChangedReason.class) || aEvent.reasonOccurred(ViewChainChangedReason.class)) && sender != null) {
+        if ((aEvent.reasonOccurred(RegionChangedReason.class) ||
+             aEvent.reasonOccurred(SubImageDataChangedReason.class) ||
+             aEvent.reasonOccurred(ViewChainChangedReason.class)) && sender != null) {
             redrawBuffer(aEvent);
         } else {
             notifyViewListeners(aEvent);
@@ -568,7 +563,6 @@ public abstract class AbstractLayeredView extends AbstractView implements Layere
             aEvent = new ChangeEvent();
 
         aEvent.addReason(new SubImageDataChangedReason(this));
-
         notifyViewListeners(aEvent);
     }
 
