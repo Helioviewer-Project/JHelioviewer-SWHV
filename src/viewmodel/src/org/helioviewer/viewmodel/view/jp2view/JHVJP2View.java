@@ -173,7 +173,6 @@ public class JHVJP2View extends AbstractView implements JP2View, ViewportView, R
 
             if (isMainView) {
                 jp2Image.setParentView(this);
-
             }
 
             jp2Image.addReference();
@@ -537,19 +536,38 @@ public class JHVJP2View extends AbstractView implements JP2View, ViewportView, R
 
         // calculate total resolution of the image necessary to
         // have the requested resolution in the subimage
-        int totalWidth = (int) Math.round(imageViewportDimension.getWidth() * metaData.getPhysicalImageWidth() / r.getWidth());
-        int totalHeight = (int) Math.round(imageViewportDimension.getHeight() * metaData.getPhysicalImageHeight() / r.getHeight());
+        double rWidth, rHeight;
+        if (r == null) {
+            rWidth = metaData.getPhysicalImageWidth();
+            rHeight = metaData.getPhysicalImageHeight();
+            r = StaticRegion.createAdaptedRegion(0, 0, rWidth, rHeight);
+        } else {
+            rWidth = r.getWidth();
+            rHeight = r.getHeight();
+        }
+
+        double iWidth, iHeight;
+        if (imageViewportDimension == null) {
+            iWidth = rWidth;
+            iHeight = rHeight;
+        } else {
+            iWidth = imageViewportDimension.getWidth();
+            iHeight = imageViewportDimension.getHeight();
+        }
+
+        int totalWidth = (int) Math.round(iWidth * metaData.getPhysicalImageWidth() / rWidth);
+        int totalHeight = (int) Math.round(iHeight * metaData.getPhysicalImageHeight() / rHeight);
 
         // get corresponding resolution level
         ResolutionLevel res = jp2Image.getResolutionSet().getNextResolutionLevel(new Dimension(totalWidth, totalHeight));
 
         double imageMeterPerPixel = metaData.getPhysicalImageWidth() / res.getResolutionBounds().getWidth();
-        int imageWidth = (int) Math.round(r.getWidth() / imageMeterPerPixel);
-        int imageHeight = (int) Math.round(r.getHeight() / imageMeterPerPixel);
+        int imageWidth = (int) Math.round(rWidth / imageMeterPerPixel);
+        int imageHeight = (int) Math.round(rHeight / imageMeterPerPixel);
 
-        Vector2dInt imagePostion = ViewHelper.calculateInnerViewportOffset(r, metaData.getPhysicalRegion(), new ViewportImageSizeAdapter(new StaticViewportImageSize(res.getResolutionBounds().width, res.getResolutionBounds().height)));
+        Vector2dInt imagePosition = ViewHelper.calculateInnerViewportOffset(r, metaData.getPhysicalRegion(), new ViewportImageSizeAdapter(new StaticViewportImageSize(res.getResolutionBounds().width, res.getResolutionBounds().height)));
 
-        SubImage subImage = new SubImage(imagePostion.getX(), imagePostion.getY(), imageWidth, imageHeight);
+        SubImage subImage = new SubImage(imagePosition.getX(), imagePosition.getY(), imageWidth, imageHeight);
 
         subImageBuffer.putSubImage(subImage, r);
 
@@ -865,4 +883,5 @@ public class JHVJP2View extends AbstractView implements JP2View, ViewportView, R
     public void removeRenderListener() {
         Displayer.getSingletonInstance().removeRenderListener(this);
     }
+
 }
