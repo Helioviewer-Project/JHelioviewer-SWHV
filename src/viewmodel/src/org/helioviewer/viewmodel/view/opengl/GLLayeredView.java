@@ -3,6 +3,7 @@ package org.helioviewer.viewmodel.view.opengl;
 import javax.media.opengl.GL2;
 
 import org.helioviewer.viewmodel.view.AbstractLayeredView;
+import org.helioviewer.viewmodel.view.RegionView;
 import org.helioviewer.viewmodel.view.SubimageDataView;
 import org.helioviewer.viewmodel.view.View;
 import org.helioviewer.viewmodel.view.jp2view.JHVJP2View;
@@ -37,20 +38,16 @@ public class GLLayeredView extends AbstractLayeredView implements GLFragmentShad
         try {
             gl.glPushMatrix();
             for (View v : layers) {
-                Layer layer = viewLookup.get(v);
-                if (layer != null) {
-                    // If invisible, skip layer
-                    if (!layer.visibility) {
-                        continue;
-                    }
+                if (!isVisible(v)) {
+                    continue;
+                }
 
-                    gl.glColor3f(1.0f, 1.0f, 1.0f);
-                    // if layer is GLView, go on, otherwise render now
-                    if (v instanceof GLView) {
-                        ((GLView) v).renderGL(gl, true);
-                    } else {
-                        GLTextureHelper.renderImageDataToScreen(gl, layer.regionView.getRegion(), v.getAdapter(SubimageDataView.class).getSubimageData(), v.getAdapter(JHVJP2View.class));
-                    }
+                gl.glColor3f(1.0f, 1.0f, 1.0f);
+                // if layer is GLView, go on, otherwise render now
+                if (v instanceof GLView) {
+                    ((GLView) v).renderGL(gl, true);
+                } else {
+                    GLTextureHelper.renderImageDataToScreen(gl, v.getAdapter(RegionView.class).getRegion(), v.getAdapter(SubimageDataView.class).getSubimageData(), v.getAdapter(JHVJP2View.class));
                 }
             }
             gl.glPopMatrix();
@@ -133,4 +130,5 @@ public class GLLayeredView extends AbstractLayeredView implements GLFragmentShad
 
         return shaderBuilder;
     }
+
 }
