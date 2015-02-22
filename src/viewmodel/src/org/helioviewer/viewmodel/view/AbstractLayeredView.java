@@ -47,11 +47,14 @@ public abstract class AbstractLayeredView extends AbstractView implements Layere
     protected CopyOnWriteArrayList<View> layers = new CopyOnWriteArrayList<View>();
     protected ReentrantLock layerLock = new ReentrantLock();
     protected HashMap<View, Layer> viewLookup = new HashMap<View, Layer>();
-    protected Viewport viewport;
-    protected Region region;
-    protected MetaData metaData;
+
     protected ViewportImageSize viewportImageSize;
-    protected double minimalRegionSize;
+
+    private Viewport viewport;
+    private Region region;
+    private MetaData metaData;
+
+    private double minimalRegionSize;
 
     /**
      * Buffer for precomputed values for each layer.
@@ -61,7 +64,7 @@ public abstract class AbstractLayeredView extends AbstractView implements Layere
      * precomputed view adapters.
      *
      */
-    public class Layer {
+    protected class Layer {
         public View view;
 
         public RegionView regionView;
