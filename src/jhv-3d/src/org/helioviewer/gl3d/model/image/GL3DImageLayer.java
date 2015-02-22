@@ -152,10 +152,9 @@ public abstract class GL3DImageLayer extends GL3DGroup implements GL3DCameraList
         if (metaData == null || activeCamera == null) {
             return;
         }
-        double phi = 0;
-        double theta = 0;
-        phi = hvmd.getPhi();
-        theta = hvmd.getTheta();
+
+        double phi = hvmd.getPhi();
+        double theta = hvmd.getTheta();
         this.accellerationShape.setPhi(phi);
         this.accellerationShape.setTheta(theta);
 

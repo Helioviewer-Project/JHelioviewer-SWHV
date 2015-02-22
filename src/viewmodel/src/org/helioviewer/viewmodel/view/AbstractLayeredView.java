@@ -44,10 +44,6 @@ import org.helioviewer.viewmodel.viewportimagesize.ViewportImageSize;
  */
 public abstract class AbstractLayeredView extends AbstractView implements LayeredView, RegionView, ViewportView, MetaDataView, ViewListener {
 
-    // /////////////////////////////////////////////////////////////////////////
-    // Definitions
-    // /////////////////////////////////////////////////////////////////////////
-
     protected CopyOnWriteArrayList<View> layers = new CopyOnWriteArrayList<View>();
     protected ReentrantLock layerLock = new ReentrantLock();
     protected HashMap<View, Layer> viewLookup = new HashMap<View, Layer>();
@@ -56,10 +52,6 @@ public abstract class AbstractLayeredView extends AbstractView implements Layere
     protected MetaData metaData;
     protected ViewportImageSize viewportImageSize;
     protected double minimalRegionSize;
-
-    // /////////////////////////////////////////////////////////////////////////
-    // Methods
-    // /////////////////////////////////////////////////////////////////////////
 
     /**
      * Buffer for precomputed values for each layer.
@@ -442,9 +434,6 @@ public abstract class AbstractLayeredView extends AbstractView implements Layere
             region = StaticRegion.createAdaptedRegion(metaData.getPhysicalRectangle());
         }
 
-        // if (viewport == null)
-        // viewport = StaticViewport.createAdaptedViewport(100, 100);
-
         if (viewport != null && region != null) {
             ViewportImageSize oldViewportImageSize = viewportImageSize;
             viewportImageSize = ViewHelper.calculateViewportImageSize(viewport, region);
@@ -457,7 +446,7 @@ public abstract class AbstractLayeredView extends AbstractView implements Layere
                         Region layerRegion = ViewHelper.cropInnerRegionToOuterRegion(m.getPhysicalRegion(), region);
                         Viewport layerViewport = ViewHelper.calculateInnerViewport(layerRegion, region, viewportImageSize);
                         layer.renderOffset = ViewHelper.calculateInnerViewportOffset(layerRegion, region, viewportImageSize);
-                        // Log.debug("AbstractLayeredView: RenderOffset:"+layer.renderOffset);
+
                         changed |= layer.regionView.setRegion(layerRegion, event);
                         changed |= layer.viewportView.setViewport(layerViewport, event);
                     }
@@ -587,4 +576,5 @@ public abstract class AbstractLayeredView extends AbstractView implements Layere
             layerLock.unlock();
         }
     }
+
 }
