@@ -462,9 +462,10 @@ public class LayersModel implements ViewListener {
      * @return the inverted index
      */
     private int invertIndex(int idx) {
+        int num = this.getNumLayers();
         // invert indices
-        if (idx >= 0 && this.getNumLayers() > 0) {
-            idx = this.getNumLayers() - 1 - idx;
+        if (idx >= 0 && num > 0) {
+            idx = num - 1 - idx;
         }
         return idx;
     }
@@ -483,9 +484,10 @@ public class LayersModel implements ViewListener {
      * @return inverted index
      */
     private int invertIndexDeleted(int idx) {
+        int num = this.getNumLayers();
         // invert indices, based on the indices before one layer was removed
-        if (idx >= 0 && this.getNumLayers() >= 0) {
-            idx = this.getNumLayers() - idx;
+        if (idx >= 0 && num >= 0) {
+            idx = num - idx;
         }
         return idx;
     }
