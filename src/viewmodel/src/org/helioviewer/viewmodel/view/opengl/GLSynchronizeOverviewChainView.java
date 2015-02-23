@@ -2,7 +2,6 @@ package org.helioviewer.viewmodel.view.opengl;
 
 import javax.media.opengl.GL2;
 
-import org.helioviewer.viewmodel.view.RegionView;
 import org.helioviewer.viewmodel.view.SubimageDataView;
 import org.helioviewer.viewmodel.view.SynchronizeOverviewChainView;
 import org.helioviewer.viewmodel.view.jp2view.JHVJP2View;
@@ -28,7 +27,7 @@ public class GLSynchronizeOverviewChainView extends SynchronizeOverviewChainView
         if (view instanceof GLView) {
             ((GLView) view).renderGL(gl, true);
         } else {
-            GLTextureHelper.renderImageDataToScreen(gl, view.getAdapter(RegionView.class).getRegion(), view.getAdapter(SubimageDataView.class).getSubimageData(), view.getAdapter(JHVJP2View.class));
+            GLTextureHelper.renderImageDataToScreen(gl, view.getAdapter(SubimageDataView.class).getSubimageData(), view.getAdapter(JHVJP2View.class));
         }
     }
 

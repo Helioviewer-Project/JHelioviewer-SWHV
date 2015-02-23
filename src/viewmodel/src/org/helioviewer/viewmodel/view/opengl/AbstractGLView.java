@@ -5,7 +5,6 @@ import javax.media.opengl.GL2;
 import org.helioviewer.viewmodel.changeevent.ChangeEvent;
 import org.helioviewer.viewmodel.view.AbstractBasicView;
 import org.helioviewer.viewmodel.view.ModifiableInnerViewView;
-import org.helioviewer.viewmodel.view.RegionView;
 import org.helioviewer.viewmodel.view.SubimageDataView;
 import org.helioviewer.viewmodel.view.View;
 import org.helioviewer.viewmodel.view.ViewListener;
@@ -48,7 +47,7 @@ public abstract class AbstractGLView extends AbstractBasicView implements GLView
         if (view instanceof GLView) {
             ((GLView) view).renderGL(gl, true);
         } else {
-            GLTextureHelper.renderImageDataToScreen(gl, view.getAdapter(RegionView.class).getRegion(), view.getAdapter(SubimageDataView.class).getSubimageData(), view.getAdapter(JHVJP2View.class));
+            GLTextureHelper.renderImageDataToScreen(gl, view.getAdapter(SubimageDataView.class).getSubimageData(), view.getAdapter(JHVJP2View.class));
         }
     }
 

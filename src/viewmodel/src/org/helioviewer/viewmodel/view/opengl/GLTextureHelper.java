@@ -135,7 +135,7 @@ public class GLTextureHelper {
      * @param source
      *            Image data to draw to the screen
      */
-    public static void renderImageDataToScreen(GL2 gl, Region region, ImageData source, JHVJP2View jpxView) {
+    public static void renderImageDataToScreen(GL2 gl, ImageData source, JHVJP2View jpxView) {
         if (source == null || jpxView == null)
             return;
 
@@ -144,7 +144,7 @@ public class GLTextureHelper {
 
         if (width <= maxTextureSize && height <= maxTextureSize) {
             moveImageDataToGLTexture(gl, source, 0, 0, width, height, jpxView.tex.get(gl));
-            renderTextureToScreen(gl, region);
+            renderTextureToScreen(gl, source.getRegion());
         } else {
             Log.error(">> GLTextureHelper.renderImageDataToScreen(GL) > Image data too big: [" + width + "," + height + "]");
         }
