@@ -2,7 +2,6 @@ package org.helioviewer.viewmodel.view;
 
 import java.util.AbstractList;
 import java.util.ArrayList;
-import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 import org.helioviewer.viewmodel.changeevent.ChangeEvent;

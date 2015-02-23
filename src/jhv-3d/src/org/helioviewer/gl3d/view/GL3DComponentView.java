@@ -216,7 +216,6 @@ public class GL3DComponentView extends AbstractComponentView implements GLEventL
         @Override
         public final void displayBody(GL2 gl, GLView view, int width, int height) {
             gl.glClear(GL2.GL_COLOR_BUFFER_BIT | GL2.GL_DEPTH_BUFFER_BIT);
-            gl.glColor4f(1, 1, 1, 1);
             gl.glEnable(GL2.GL_LIGHTING);
             gl.glEnable(GL2.GL_DEPTH_TEST);
 
@@ -254,10 +253,13 @@ public class GL3DComponentView extends AbstractComponentView implements GLEventL
             gl.glClear(GL2.GL_COLOR_BUFFER_BIT);
 
             Region region = view.getAdapter(RegionView.class).getRegion();
-            gl.glScalef(width / (float) region.getWidth(), height / (float) region.getHeight(), 1.0f);
-            gl.glTranslatef((float) -region.getCornerX(), (float) -region.getCornerY(), 0.0f);
 
-            view.renderGL(gl, true);
+            if (region != null) {
+                gl.glScalef(width / (float) region.getWidth(), height / (float) region.getHeight(), 1.0f);
+                gl.glTranslatef((float) -region.getCornerX(), (float) -region.getCornerY(), 0.0f);
+
+                view.renderGL(gl, true);
+            }
         }
     }
 
