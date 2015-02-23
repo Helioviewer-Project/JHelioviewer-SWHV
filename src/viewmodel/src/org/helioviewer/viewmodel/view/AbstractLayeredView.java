@@ -65,7 +65,7 @@ public abstract class AbstractLayeredView extends AbstractView implements Layere
      *
      */
     protected class Layer {
-        public View view;
+        private View view;
 
         public RegionView regionView;
         public ViewportView viewportView;
@@ -194,7 +194,7 @@ public abstract class AbstractLayeredView extends AbstractView implements Layere
      */
     @Override
     public View getLayer(int index) {
-        if (index < layers.size()) {
+        if (index >= 0 && index < layers.size()) {
             return layers.get(index);
         }
         return null;
@@ -283,7 +283,9 @@ public abstract class AbstractLayeredView extends AbstractView implements Layere
      */
     @Override
     public void removeLayer(int index) {
-        removeLayer(layers.get(index));
+        if (index >= 0 && index < layers.size()) {
+            removeLayer(layers.get(index));
+        }
     }
 
     /**
