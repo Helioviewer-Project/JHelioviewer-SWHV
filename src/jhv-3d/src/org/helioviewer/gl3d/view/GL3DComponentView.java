@@ -177,7 +177,7 @@ public class GL3DComponentView extends AbstractComponentView implements GLEventL
 
         public void reshapeView(GL2 gl, int width, int height);
 
-        public void displayBody(GL2 gl, GLView view, int width, int height);
+        public void displayBody(GL2 gl, View view, int width, int height);
 
     }
 
@@ -214,12 +214,12 @@ public class GL3DComponentView extends AbstractComponentView implements GLEventL
         }
 
         @Override
-        public final void displayBody(GL2 gl, GLView view, int width, int height) {
+        public final void displayBody(GL2 gl, View view, int width, int height) {
             gl.glClear(GL2.GL_COLOR_BUFFER_BIT | GL2.GL_DEPTH_BUFFER_BIT);
             gl.glEnable(GL2.GL_LIGHTING);
             gl.glEnable(GL2.GL_DEPTH_TEST);
 
-            view.renderGL(gl, true);
+            ((GL3DView) view).renderGL(gl, true);
         }
 
     }
@@ -249,7 +249,7 @@ public class GL3DComponentView extends AbstractComponentView implements GLEventL
         }
 
         @Override
-        public final void displayBody(GL2 gl, GLView view, int width, int height) {
+        public final void displayBody(GL2 gl, View view, int width, int height) {
             gl.glClear(GL2.GL_COLOR_BUFFER_BIT);
 
             Region region = view.getAdapter(RegionView.class).getRegion();
@@ -258,7 +258,7 @@ public class GL3DComponentView extends AbstractComponentView implements GLEventL
                 gl.glScalef(width / (float) region.getWidth(), height / (float) region.getHeight(), 1.0f);
                 gl.glTranslatef((float) -region.getCornerX(), (float) -region.getCornerY(), 0.0f);
 
-                view.renderGL(gl, true);
+                ((GLView) view).renderGL(gl, true);
             }
         }
     }

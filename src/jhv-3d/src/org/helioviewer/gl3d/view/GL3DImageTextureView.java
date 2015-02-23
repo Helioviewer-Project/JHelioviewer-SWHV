@@ -78,7 +78,7 @@ public class GL3DImageTextureView extends AbstractGL3DView implements GL3DView, 
         }
     }
 
-    public Region copyScreenToTexture(GL3DState state) {
+    private Region copyScreenToTexture(GL3DState state) {
         ImageData image = this.getAdapter(ImageInfoView.class).getAdapter(SubimageDataView.class).getSubimageData();
         MetaData metadata = this.getAdapter(MetaDataView.class).getMetaData();
 
