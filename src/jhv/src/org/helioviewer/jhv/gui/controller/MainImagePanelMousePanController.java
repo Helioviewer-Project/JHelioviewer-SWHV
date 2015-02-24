@@ -19,15 +19,15 @@ import org.helioviewer.viewmodel.viewport.Viewport;
 /**
  * Implementation of ImagePanelInputController for the main image panel using
  * pan selection mode.
- * 
+ *
  * <p>
  * By using this controller, the user can move the region of interest of the
  * main image panel by dragging the image around. Also, by using the mouse wheel
  * or double-clicking into the image, zooming is possible.
- * 
+ *
  * <p>
  * Also, see {@link org.helioviewer.jhv.gui.components.MainImagePanel}.
- * 
+ *
  */
 public class MainImagePanelMousePanController extends MainImagePanelMouseController {
 
@@ -43,8 +43,8 @@ public class MainImagePanelMousePanController extends MainImagePanelMouseControl
     // Class variables
     // ///////////////////////////////////////////////////////////////////////////
 
-    private volatile int lastX = -1, lastY = -1;
-    private volatile long lastTime = System.currentTimeMillis();
+    private int lastX = -1, lastY = -1;
+    private long lastTime = System.currentTimeMillis();
 
     // ///////////////////////////////////////////////////////////////////////////
     // Mouse events
@@ -53,6 +53,7 @@ public class MainImagePanelMousePanController extends MainImagePanelMouseControl
     /**
      * {@inheritDoc}
      */
+    @Override
     public void mouseEntered(MouseEvent e) {
         if (imagePanel != null) {
             imagePanel.setCursor(lastX != -1 ? closedHandCursor : openHandCursor);
@@ -62,6 +63,7 @@ public class MainImagePanelMousePanController extends MainImagePanelMouseControl
     /**
      * {@inheritDoc}
      */
+    @Override
     public void mouseExited(MouseEvent e) {
         if (imagePanel != null) {
             imagePanel.setCursor(Cursor.getDefaultCursor());
@@ -72,6 +74,7 @@ public class MainImagePanelMousePanController extends MainImagePanelMouseControl
     /**
      * {@inheritDoc}
      */
+    @Override
     public void mousePressed(MouseEvent e) {
         if (e.getButton() == MouseEvent.BUTTON1) {
             imagePanel.setCursor(closedHandCursor);
@@ -83,6 +86,7 @@ public class MainImagePanelMousePanController extends MainImagePanelMouseControl
     /**
      * {@inheritDoc}
      */
+    @Override
     public void mouseReleased(MouseEvent e) {
         if (e.getButton() == MouseEvent.BUTTON1) {
             imagePanel.setCursor(openHandCursor);
@@ -93,6 +97,7 @@ public class MainImagePanelMousePanController extends MainImagePanelMouseControl
     /**
      * {@inheritDoc}
      */
+    @Override
     public void mouseDragged(MouseEvent e) {
         long currentTime = System.currentTimeMillis();
         if (lastX != -1 && currentTime - lastTime > 30) {
