@@ -31,10 +31,10 @@ public class RunningDifferenceFilter implements FrameFilter, StandardFilter, Obs
     /**
      * Flag to indicate whether this filter should be considered active
      */
-    private volatile boolean isActive = true;
-    private volatile boolean baseDifference = false;
-    private volatile boolean baseDifferenceNoRot = false;
-    private volatile boolean runDiffNoRot = false;
+    private boolean isActive = true;
+    private boolean baseDifference = false;
+    private boolean baseDifferenceNoRot = false;
+    private boolean runDiffNoRot = false;
 
     /**
      * Observer listener
@@ -45,7 +45,7 @@ public class RunningDifferenceFilter implements FrameFilter, StandardFilter, Obs
      */
     // private TimeMachineData timeMachineData;
     private final DifferenceShader shader = new DifferenceShader();
-    private GLTextureHelper.GLTexture tex = new GLTextureHelper.GLTexture();
+    private final GLTextureHelper.GLTexture tex = new GLTextureHelper.GLTexture();
     private ImageData currentFrame;
     private float truncationValue = 0.2f;
     private JHVJPXView jpxView;
