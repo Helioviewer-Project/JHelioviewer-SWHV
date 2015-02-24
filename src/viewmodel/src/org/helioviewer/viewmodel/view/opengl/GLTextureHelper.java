@@ -199,11 +199,7 @@ public class GLTextureHelper {
         gl.glPixelStorei(GL2.GL_UNPACK_ALIGNMENT, bitsPerPixel >> 3);
 
         ImageFormat imageFormat = source.getImageFormat();
-
-        if (source.getHeight() > 1) {
-            genTexture2D(gl, target, mapImageFormatToInternalGLFormat(imageFormat), width, height, mapImageFormatToInputGLFormat(imageFormat), mapBitsPerPixelToGLType(bitsPerPixel), buffer);
-        } else
-            throw new IllegalArgumentException("Format is not supported");
+        genTexture2D(gl, target, mapImageFormatToInternalGLFormat(imageFormat), width, height, mapImageFormatToInputGLFormat(imageFormat), mapBitsPerPixelToGLType(bitsPerPixel), buffer);
     }
 
     /**
@@ -251,10 +247,7 @@ public class GLTextureHelper {
         gl.glPixelStorei(GL2.GL_UNPACK_ROW_LENGTH, 0);
         gl.glPixelStorei(GL2.GL_UNPACK_ALIGNMENT, mapDataBufferTypeToGLAlign(rawBuffer.getDataType()));
 
-        if (source.getHeight() > 1) {
-            genTexture2D(gl, target, mapTypeToInternalGLFormat(source.getType()), source.getWidth(), source.getHeight(), mapTypeToInputGLFormat(source.getType()), mapDataBufferTypeToGLType(rawBuffer.getDataType()), buffer);
-        } else
-            throw new IllegalArgumentException("Format is not supported");
+        genTexture2D(gl, target, mapTypeToInternalGLFormat(source.getType()), source.getWidth(), source.getHeight(), mapTypeToInputGLFormat(source.getType()), mapDataBufferTypeToGLType(rawBuffer.getDataType()), buffer);
     }
 
     /**

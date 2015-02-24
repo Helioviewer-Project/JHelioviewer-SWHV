@@ -27,11 +27,9 @@ import org.helioviewer.viewmodel.view.MetaDataView;
 import org.helioviewer.viewmodel.view.SubimageDataView;
 import org.helioviewer.viewmodel.view.View;
 import org.helioviewer.viewmodel.view.ViewListener;
-import org.helioviewer.viewmodel.view.ViewportView;
 import org.helioviewer.viewmodel.view.jp2view.JHVJPXView;
 import org.helioviewer.viewmodel.view.opengl.shader.GLFragmentShaderView;
 import org.helioviewer.viewmodel.view.opengl.shader.GLShaderBuilder;
-import org.helioviewer.viewmodel.viewport.Viewport;
 
 /**
  * Connects the 3D viewchain to the 2D viewchain. The underlying 2D viewchain
@@ -79,14 +77,11 @@ public class GL3DImageTextureView extends AbstractGL3DView implements GL3DView, 
     }
 
     private Region copyScreenToTexture(GL3DState state) {
-        ImageData image = this.getAdapter(ImageInfoView.class).getAdapter(SubimageDataView.class).getSubimageData();
-        MetaData metadata = this.getAdapter(MetaDataView.class).getMetaData();
-
+        ImageInfoView imageView = this.getAdapter(ImageInfoView.class);
+        ImageData image = imageView.getAdapter(SubimageDataView.class).getSubimageData();
         Region region = image.getRegion();
-        // System.out.println(">>> copyScreenToTexture " + region.getWidth() + " " + region.getHeight());
-        Viewport viewport = getAdapter(ViewportView.class).getViewport();
 
-        if (viewport == null || region == null) {
+        if (region == null) {
             regionChanged = false;
             return null;
         }
@@ -100,6 +95,7 @@ public class GL3DImageTextureView extends AbstractGL3DView implements GL3DView, 
 
             double theta = -Astronomy.getB0InRadians(dt);
             double phi = Astronomy.getL0Radians(dt);
+            MetaData metadata = imageView.getMetadata();
             if (metadata instanceof HelioviewerPositionedMetaData) {
                 HelioviewerPositionedMetaData md = (HelioviewerPositionedMetaData) metadata;
                 phi -= md.getStonyhurstLongitude() / MathUtils.radeg;
