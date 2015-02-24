@@ -44,10 +44,10 @@ import org.helioviewer.viewmodel.view.View;
 import org.helioviewer.viewmodel.view.jp2view.JHVJPXView;
 
 /**
- *
- *
+ * 
+ * 
  * @author Bram Bourgoignie (Bram.Bourgoignie@oma.be)
- *
+ * 
  */
 public class ControlsPanel extends JPanel implements ActionListener, LayersListener, EventModelListener, ZoomControllerListener, LineDataSelectorModelListener {
 
@@ -197,48 +197,13 @@ public class ControlsPanel extends JPanel implements ActionListener, LayersListe
     @Override
     public void layerAdded(int idx) {
         if (EventQueue.isDispatchThread()) {
-            setEnabledStateOfPeriodMovieButton();
-            if (setDefaultPeriod || TimeIntervalLockModel.getInstance().isLocked()) {
-                setDefaultPeriod = false;
-                View activeView = LayersModel.getSingletonInstance().getActiveView();
-                JHVJPXView jpxView = activeView.getAdapter(JHVJPXView.class);
-                if (jpxView != null) {
-                    Date start = jpxView.getDateRange().getStart();
-                    Date end = jpxView.getDateRange().getEnd();
-                    // Log.debug("start " + start + " end " + end);
-                    final Interval<Date> interval = new Interval<Date>(start, end);
-                    ZoomController.getSingletonInstance().setAvailableInterval(interval);
-                    if (TimeIntervalLockModel.getInstance().isLocked()) {
-                        ZoomController.getSingletonInstance().setSelectedInterval(interval, false);
-                    }
-
-                }
-                // PlotTimeSpace.getInstance().setSelectedMinAndMaxTime(interval.getStart(),
-                // interval.getEnd());
-            }
+            setSelectedIntervalOnLayerNotification();
         } else {
             EventQueue.invokeLater(new Runnable() {
 
                 @Override
                 public void run() {
-                    setEnabledStateOfPeriodMovieButton();
-                    if (setDefaultPeriod || TimeIntervalLockModel.getInstance().isLocked()) {
-                        setDefaultPeriod = false;
-                        final Interval<Date> availableInterval = new Interval<Date>(LayersModel.getSingletonInstance().getFirstDate(), LayersModel.getSingletonInstance().getLastDate());
-                        View activeView = LayersModel.getSingletonInstance().getActiveView();
-                        JHVJPXView jpxView = activeView.getAdapter(JHVJPXView.class);
-                        if (jpxView != null) {
-                            Date start = jpxView.getDateRange().getStart();
-                            Date end = jpxView.getDateRange().getEnd();
-                            // Log.debug("start " + start + " end " + end);
-                            final Interval<Date> interval = new Interval<Date>(start, end);
-                            ZoomController.getSingletonInstance().setAvailableInterval(availableInterval);
-                            if (TimeIntervalLockModel.getInstance().isLocked()) {
-                                ZoomController.getSingletonInstance().setSelectedInterval(interval, false);
-                            }
-
-                        }
-                    }
+                    setSelectedIntervalOnLayerNotification();
                 }
 
             });
@@ -272,10 +237,26 @@ public class ControlsPanel extends JPanel implements ActionListener, LayersListe
     @Override
     public void activeLayerChanged(int idx) {
         if (EventQueue.isDispatchThread()) {
-            setEnabledStateOfPeriodMovieButton();
-            if (setDefaultPeriod || TimeIntervalLockModel.getInstance().isLocked()) {
-                setDefaultPeriod = false;
-                View activeView = LayersModel.getSingletonInstance().getActiveView();
+            setSelectedIntervalOnLayerNotification();
+        } else {
+            EventQueue.invokeLater(new Runnable() {
+
+                @Override
+                public void run() {
+                    setSelectedIntervalOnLayerNotification();
+                }
+
+            });
+
+        }
+    }
+
+    private void setSelectedIntervalOnLayerNotification() {
+        setEnabledStateOfPeriodMovieButton();
+        if (setDefaultPeriod || TimeIntervalLockModel.getInstance().isLocked()) {
+            setDefaultPeriod = false;
+            View activeView = LayersModel.getSingletonInstance().getActiveView();
+            if (activeView != null) {
                 JHVJPXView jpxView = activeView.getAdapter(JHVJPXView.class);
                 if (jpxView != null) {
                     Date start = jpxView.getDateRange().getStart();
@@ -286,36 +267,8 @@ public class ControlsPanel extends JPanel implements ActionListener, LayersListe
                     if (TimeIntervalLockModel.getInstance().isLocked()) {
                         ZoomController.getSingletonInstance().setSelectedInterval(interval, false);
                     }
-
                 }
             }
-        } else {
-            EventQueue.invokeLater(new Runnable() {
-
-                @Override
-                public void run() {
-                    setEnabledStateOfPeriodMovieButton();
-                    if (setDefaultPeriod || TimeIntervalLockModel.getInstance().isLocked()) {
-                        setDefaultPeriod = false;
-                        View activeView = LayersModel.getSingletonInstance().getActiveView();
-                        if (activeView != null) {
-                            JHVJPXView jpxView = activeView.getAdapter(JHVJPXView.class);
-                            if (jpxView != null) {
-                                Date start = jpxView.getDateRange().getStart();
-                                Date end = jpxView.getDateRange().getEnd();
-                                // Log.debug("start " + start + " end " + end);
-                                final Interval<Date> interval = new Interval<Date>(start, end);
-                                // ZoomController.getSingletonInstance().setAvailableInterval(interval);
-                                if (TimeIntervalLockModel.getInstance().isLocked()) {
-                                    ZoomController.getSingletonInstance().setSelectedInterval(interval, false);
-                                }
-                            }
-                        }
-                    }
-                }
-
-            });
-
         }
     }
 
