@@ -23,7 +23,7 @@ import org.helioviewer.viewmodel.view.opengl.GLTextureHelper;
 public class GL3DTrackballRotationInteraction extends GL3DDefaultInteraction {
     private GL3DVec3d currentRotationStartPoint;
     private GL3DVec3d currentRotationEndPoint;
-    private volatile GL3DQuatd currentDragRotation;
+    private GL3DQuatd currentDragRotation;
 
     protected GL3DTrackballRotationInteraction(GL3DSolarRotationTrackingTrackballCamera camera, GL3DSceneGraphView sceneGraph) {
         super(camera, sceneGraph);
