@@ -23,30 +23,31 @@ import org.helioviewer.viewmodel.viewportimagesize.ViewportImageSize;
 /**
  * Implementation of ImagePanelInputController for the main image panel using
  * zoom box selection mode.
- * 
+ *
  * <p>
  * By using this controller, the user can zoom in the region of interest of the
  * main image panel by selecting the desired area with a rubber band. Zooming is
  * also possible by using the mouse wheel or double-clicking into the image.
  * After selecting an area, the selection mode switches back to pan selection
  * mode.
- * 
+ *
  * <p>
  * Also, see {@link org.helioviewer.jhv.gui.components.MainImagePanel} and
  * {@link MainImagePanelMousePanController}.
- * 
+ *
  */
 public class MainImagePanelMouseZoomBoxController extends MainImagePanelMouseController {
 
-    private volatile Vector2dInt lastMouseCoordinates;
-    private volatile Vector2dInt draggedToCoordinates;
-    private volatile Rectangle rectangle = new Rectangle();
+    private Vector2dInt lastMouseCoordinates;
+    private Vector2dInt draggedToCoordinates;
+    private final Rectangle rectangle = new Rectangle();
 
-    private volatile Rubberband rubberband = new Rubberband();
+    private final Rubberband rubberband = new Rubberband();
 
     /**
      * {@inheritDoc}
      */
+    @Override
     public void setView(View newView) {
         super.setView(newView);
 
@@ -57,6 +58,7 @@ public class MainImagePanelMouseZoomBoxController extends MainImagePanelMouseCon
     /**
      * {@inheritDoc}
      */
+    @Override
     public void mouseEntered(MouseEvent e) {
         if (imagePanel != null) {
             imagePanel.setCursor(Cursor.getDefaultCursor());
@@ -66,6 +68,7 @@ public class MainImagePanelMouseZoomBoxController extends MainImagePanelMouseCon
     /**
      * {@inheritDoc}
      */
+    @Override
     public void mouseExited(MouseEvent e) {
         if (imagePanel != null) {
             imagePanel.setCursor(Cursor.getDefaultCursor());
@@ -76,6 +79,7 @@ public class MainImagePanelMouseZoomBoxController extends MainImagePanelMouseCon
     /**
      * {@inheritDoc}
      */
+    @Override
     public void mousePressed(MouseEvent e) {
         if (e.getButton() == MouseEvent.BUTTON1) {
             lastMouseCoordinates = new Vector2dInt(e.getX(), e.getY());
@@ -89,6 +93,7 @@ public class MainImagePanelMouseZoomBoxController extends MainImagePanelMouseCon
     /**
      * {@inheritDoc}
      */
+    @Override
     public void mouseReleased(MouseEvent e) {
         if (e.getButton() == MouseEvent.BUTTON1) {
             draggedToCoordinates = new Vector2dInt(e.getX(), e.getY());
@@ -126,6 +131,7 @@ public class MainImagePanelMouseZoomBoxController extends MainImagePanelMouseCon
     /**
      * {@inheritDoc}
      */
+    @Override
     public void mouseDragged(MouseEvent e) {
         if (lastMouseCoordinates != null) {
             draggedToCoordinates = new Vector2dInt(e.getX(), e.getY());
@@ -137,7 +143,7 @@ public class MainImagePanelMouseZoomBoxController extends MainImagePanelMouseCon
 
     /**
      * Get method that calculates and returns the rectangle of the rubber band.
-     * 
+     *
      */
     private void recalculateRectangle() {
 
@@ -161,7 +167,7 @@ public class MainImagePanelMouseZoomBoxController extends MainImagePanelMouseCon
     /**
      * Private class implementing ScreenRenderer to draw the rubber band onto
      * the image.
-     * 
+     *
      * <p>
      * For further informations about drawing into the image, see
      * {@link org.helioviewer.viewmodel.renderer.screen.ScreenRenderer}.
@@ -171,6 +177,7 @@ public class MainImagePanelMouseZoomBoxController extends MainImagePanelMouseCon
         /**
          * {@inheritDoc}
          */
+        @Override
         public void render(ScreenRenderGraphics g) {
             if (lastMouseCoordinates != null) {
                 g.setColor(Color.YELLOW);
