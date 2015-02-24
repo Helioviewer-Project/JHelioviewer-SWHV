@@ -19,9 +19,9 @@ import org.helioviewer.gl3d.view.GL3DImageTextureView;
  * The {@link GL3DImageLayers} node offers special capabilities for grouping
  * {@link GL3DImageLayer} nodes, because image nodes require special ordering
  * for the blending of different image layers.
- * 
+ *
  * @author Simon Spoerri (simon.spoerri@fhnw.ch)
- * 
+ *
  */
 public class GL3DImageLayers extends GL3DGroup {
 
@@ -60,31 +60,22 @@ public class GL3DImageLayers extends GL3DGroup {
     private void drawImageLayers(GL3DState state) {
         GL3DNode node = this.getFirst();
 
-        ArrayList<GL3DImageLayer> layers = new ArrayList<GL3DImageLayer>();
-        while (node != null) {
-            if (!node.isDrawBitOn(Bit.Hidden) && node instanceof GL3DImageLayer) {
-                layers.add((GL3DImageLayer) node);
-            }
-            node = node.getNext();
-        }
-
         state.gl.glEnable(GL2.GL_BLEND);
         state.gl.glBlendFunc(GL2.GL_SRC_ALPHA, GL2.GL_ONE_MINUS_SRC_ALPHA);
 
         state.gl.glEnable(GL2.GL_FRAGMENT_PROGRAM_ARB);
         state.gl.glEnable(GL2.GL_VERTEX_PROGRAM_ARB);
         state.gl.glEnable(GL2.GL_DEPTH_TEST);
-
-        for (GL3DImageLayer layer : layers) {
+        while (node != null) {
+            GL3DImageLayer layer = (GL3DImageLayer) node;
             if (layer.getImageSphere() != null) {
                 layer.getImageSphere().draw(state);
                 state.gl.glDepthRange(1.f, 1.f);
                 layer.getImageCorona().draw(state);
                 state.gl.glDepthRange(0.f, 1.f);
             }
+            node = node.getNext();
         }
-
-        // state.gl.glDepthMask(true);
         state.gl.glDisable(GL2.GL_BLEND);
     }
 
@@ -114,7 +105,6 @@ public class GL3DImageLayers extends GL3DGroup {
             if (node instanceof GL3DImageLayer) {
                 ((GL3DImageLayer) node).setCoronaVisibility(visible);
             }
-
             node = node.getNext();
         }
         coronaVisibility = visible;
