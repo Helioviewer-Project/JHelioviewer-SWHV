@@ -67,11 +67,15 @@ public class ZoomController implements PlotAreaSpaceListener, LayersListener {
     }
 
     public boolean addZoomControllerListener(final ZoomControllerListener listener) {
-        return listeners.add(listener);
+        synchronized (listeners) {
+            return listeners.add(listener);
+        }
     }
 
     public boolean removeControllerListener(final ZoomControllerListener listener) {
-        return listeners.remove(listener);
+        synchronized (listeners) {
+            return listeners.remove(listener);
+        }
     }
 
     public void setAvailableInterval(final Interval<Date> interval) {
@@ -142,8 +146,10 @@ public class ZoomController implements PlotAreaSpaceListener, LayersListener {
     }
 
     private void fireAvailableIntervalChanged(final Interval<Date> newInterval) {
-        for (ZoomControllerListener listener : listeners) {
-            listener.availableIntervalChanged(newInterval);
+        synchronized (listeners) {
+            for (ZoomControllerListener listener : listeners) {
+                listener.availableIntervalChanged(newInterval);
+            }
         }
     }
 
@@ -294,8 +300,10 @@ public class ZoomController implements PlotAreaSpaceListener, LayersListener {
     }
 
     private void fireSelectedIntervalChanged(final Interval<Date> newInterval, boolean keepFullValueSpace) {
-        for (ZoomControllerListener listener : listeners) {
-            listener.selectedIntervalChanged(newInterval, keepFullValueSpace);
+        synchronized (listeners) {
+            for (ZoomControllerListener listener : listeners) {
+                listener.selectedIntervalChanged(newInterval, keepFullValueSpace);
+            }
         }
     }
 
@@ -310,8 +318,10 @@ public class ZoomController implements PlotAreaSpaceListener, LayersListener {
     }
 
     private void fireSelectedResolutionChanged(final API_RESOLUTION_AVERAGES reolution) {
-        for (ZoomControllerListener listener : listeners) {
-            listener.selectedResolutionChanged(reolution);
+        synchronized (listeners) {
+            for (ZoomControllerListener listener : listeners) {
+                listener.selectedResolutionChanged(reolution);
+            }
         }
     }
 
