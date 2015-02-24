@@ -165,6 +165,8 @@ public class HelioviewerMetaData extends AbstractMetaData implements SunMetaData
             changed = true;
         }
 
+        int pixelImageWidth = pixelImageSize.getX();
+        int pixelImageHeight = pixelImageSize.getY();
         double newSolarPixelRadius = -1.0;
         double allowedRelativeDifference = 0.01;
 
@@ -192,9 +194,9 @@ public class HelioviewerMetaData extends AbstractMetaData implements SunMetaData
             newSolarPixelRadius = metaDataContainer.tryGetDouble("SOLAR_R");
 
             if (newSolarPixelRadius == 0) {
-                if (pixelImageSize.getX() == 1024) {
+                if (pixelImageWidth == 1024) {
                     newSolarPixelRadius = 360;
-                } else if (pixelImageSize.getX() == 512) {
+                } else if (pixelImageWidth == 512) {
                     newSolarPixelRadius = 180;
                 }
             }
@@ -235,7 +237,7 @@ public class HelioviewerMetaData extends AbstractMetaData implements SunMetaData
             double sunX = metaDataContainer.tryGetDouble("CRPIX1") - 1;
             double sunY = metaDataContainer.tryGetDouble("CRPIX2") - 1;
 
-            sunPixelPositionAlt = new Vector2dDouble(sunX, metaDataContainer.tryGetDouble("NAXIS2") - sunY);
+            sunPixelPositionAlt = new Vector2dDouble(sunX, pixelImageHeight - 1 - sunY);
 
             if (changed || Math.abs(sunPixelPosition.getX() - sunX) > allowedAbsoluteDifference || Math.abs(sunPixelPosition.getY() - sunY) > allowedAbsoluteDifference) {
                 sunPixelPosition = new Vector2dDouble(sunX, sunY);
@@ -247,7 +249,7 @@ public class HelioviewerMetaData extends AbstractMetaData implements SunMetaData
             solarPixelRadius = newSolarPixelRadius;
             meterPerPixel = Constants.SunRadius / solarPixelRadius;
             setPhysicalLowerLeftCorner(sunPixelPosition.scale(-meterPerPixel));
-            setPhysicalImageSize(new Vector2dDouble(pixelImageSize.getX() * meterPerPixel, pixelImageSize.getY() * meterPerPixel));
+            setPhysicalImageSize(new Vector2dDouble(pixelImageWidth * meterPerPixel, pixelImageHeight * meterPerPixel));
         }
         return changed;
     }
