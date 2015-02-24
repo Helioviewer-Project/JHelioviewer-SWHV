@@ -21,9 +21,9 @@ import org.helioviewer.viewmodel.view.ViewHelper;
  * Acts as the global Delegate for Mouse and KeyEvents. Mouse Events are
  * delegated to the {@link GL3DCamera} and Key Events to the singleton
  * {@link GL3DKeyController}.
- * 
+ *
  * @author Simon Spoerri (simon.spoerri@fhnw.ch)
- * 
+ *
  */
 public class GL3DCameraMouseController extends AbstractImagePanelMouseController implements KeyListener {
 
@@ -31,10 +31,11 @@ public class GL3DCameraMouseController extends AbstractImagePanelMouseController
     private static final Cursor openHandCursor = Toolkit.getDefaultToolkit().createCustomCursor(IconBank.getIcon(JHVIcon.OPEN_HAND).getImage(), new Point(9, 9), IconBank.getIcon(JHVIcon.OPEN_HAND).toString());
 
     private boolean buttonDown = false;
-    private volatile long lastTime = System.currentTimeMillis();
+    private long lastTime = System.currentTimeMillis();
 
     private GL3DCameraView cameraView;
 
+    @Override
     public void setView(View newView) {
         cameraView = ViewHelper.getViewAdapter(newView, GL3DCameraView.class);
         super.setView(newView);
@@ -50,6 +51,7 @@ public class GL3DCameraMouseController extends AbstractImagePanelMouseController
     /**
      * {@inheritDoc}
      */
+    @Override
     public void mouseEntered(MouseEvent e) {
         if (imagePanel != null) {
             if (cameraView != null && cameraView.getCurrentCamera().getCurrentInteraction() == cameraView.getCurrentCamera().getZoomInteraction()) {
@@ -62,6 +64,7 @@ public class GL3DCameraMouseController extends AbstractImagePanelMouseController
     /**
      * {@inheritDoc}
      */
+    @Override
     public void mouseExited(MouseEvent e) {
         if (imagePanel != null) {
             imagePanel.setCursor(Cursor.getDefaultCursor());
@@ -72,6 +75,7 @@ public class GL3DCameraMouseController extends AbstractImagePanelMouseController
     /**
      * {@inheritDoc}
      */
+    @Override
     public void mousePressed(MouseEvent e) {
         if (e.getButton() == MouseEvent.BUTTON1) {
             if (cameraView != null && cameraView.getCurrentCamera().getCurrentInteraction() == cameraView.getCurrentCamera().getZoomInteraction()) {
@@ -89,6 +93,7 @@ public class GL3DCameraMouseController extends AbstractImagePanelMouseController
     /**
      * {@inheritDoc}
      */
+    @Override
     public void mouseReleased(MouseEvent e) {
         if (e.getButton() == MouseEvent.BUTTON1) {
             imagePanel.setCursor(openHandCursor);
@@ -103,6 +108,7 @@ public class GL3DCameraMouseController extends AbstractImagePanelMouseController
     /**
      * {@inheritDoc}
      */
+    @Override
     public void mouseDragged(MouseEvent e) {
         long currentTime = System.currentTimeMillis();
         if (buttonDown && currentTime - lastTime > 30) {
@@ -115,6 +121,7 @@ public class GL3DCameraMouseController extends AbstractImagePanelMouseController
         }
     }
 
+    @Override
     public void mouseClicked(MouseEvent e) {
         GL3DCamera currentCamera = getCamera();
         if (currentCamera != null) {
@@ -122,6 +129,7 @@ public class GL3DCameraMouseController extends AbstractImagePanelMouseController
         }
     }
 
+    @Override
     public void mouseWheelMoved(MouseWheelEvent e) {
         GL3DCamera currentCamera = getCamera();
         if (currentCamera != null) {
@@ -129,6 +137,7 @@ public class GL3DCameraMouseController extends AbstractImagePanelMouseController
         }
     }
 
+    @Override
     public void mouseMoved(MouseEvent e) {
         GL3DCamera currentCamera = getCamera();
         if (currentCamera != null) {
@@ -136,14 +145,17 @@ public class GL3DCameraMouseController extends AbstractImagePanelMouseController
         }
     }
 
+    @Override
     public void keyPressed(KeyEvent arg0) {
         GL3DKeyController.getInstance().keyPressed(arg0);
     }
 
+    @Override
     public void keyTyped(KeyEvent arg0) {
         GL3DKeyController.getInstance().keyTyped(arg0);
     }
 
+    @Override
     public void keyReleased(KeyEvent arg0) {
         GL3DKeyController.getInstance().keyReleased(arg0);
     }
