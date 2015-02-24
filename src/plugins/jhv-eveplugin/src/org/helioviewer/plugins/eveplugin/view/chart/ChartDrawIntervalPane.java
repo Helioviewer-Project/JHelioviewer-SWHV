@@ -744,7 +744,7 @@ public class ChartDrawIntervalPane extends JComponent implements ZoomControllerL
         View activeView = LayersModel.getSingletonInstance().getActiveView();
         if (activeView != null) {
             JHVJPXView jpxView = activeView.getAdapter(JHVJPXView.class);
-            if (jpxView != null) {
+            if (jpxView != null && jpxView.getDateRange() != null && jpxView.getDateRange().getStart() != null && jpxView.getDateRange().getEnd() != null) {
                 Date start = jpxView.getDateRange().getStart();
                 Date end = jpxView.getDateRange().getEnd();
                 movieInterval = new Interval<Date>(start, end);
