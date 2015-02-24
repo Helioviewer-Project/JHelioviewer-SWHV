@@ -44,10 +44,10 @@ import org.helioviewer.viewmodel.view.View;
 import org.helioviewer.viewmodel.view.jp2view.JHVJPXView;
 
 /**
- * 
- * 
+ *
+ *
  * @author Bram Bourgoignie (Bram.Bourgoignie@oma.be)
- * 
+ *
  */
 public class ControlsPanel extends JPanel implements ActionListener, LayersListener, EventModelListener, ZoomControllerListener, LineDataSelectorModelListener {
 
@@ -358,13 +358,11 @@ public class ControlsPanel extends JPanel implements ActionListener, LayersListe
         calendar.setTime(startDate);
         calendar.add(Calendar.YEAR, 1);
         calendar.add(Calendar.HOUR, 1);
-        final boolean years = interval.containsPointInclusive(calendar.getTime());
 
         calendar.clear();
         calendar.setTime(startDate);
         calendar.add(Calendar.MONTH, 3);
         ;
-        final boolean months = interval.containsPointInclusive(calendar.getTime());
 
         final DefaultComboBoxModel model = (DefaultComboBoxModel) zoomComboBox.getModel();
         model.removeAllElements();
