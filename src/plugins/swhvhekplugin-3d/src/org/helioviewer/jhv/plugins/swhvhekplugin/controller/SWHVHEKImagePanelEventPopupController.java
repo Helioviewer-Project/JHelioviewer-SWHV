@@ -29,14 +29,9 @@ import org.helioviewer.jhv.gui.components.BasicImagePanel;
 import org.helioviewer.jhv.gui.interfaces.ImagePanelPlugin;
 import org.helioviewer.jhv.layers.LayersModel;
 import org.helioviewer.jhv.plugins.swhvhekplugin.cache.SWHVHEKData;
-import org.helioviewer.viewmodel.changeevent.ChangeEvent;
-import org.helioviewer.viewmodel.changeevent.RegionChangedReason;
-import org.helioviewer.viewmodel.changeevent.TimestampChangedReason;
-import org.helioviewer.viewmodel.changeevent.ViewportChangedReason;
 import org.helioviewer.viewmodel.view.RegionView;
 import org.helioviewer.viewmodel.view.View;
 import org.helioviewer.viewmodel.view.ViewHelper;
-import org.helioviewer.viewmodel.view.ViewListener;
 import org.helioviewer.viewmodel.view.ViewportView;
 import org.helioviewer.viewmodel.viewportimagesize.ViewportImageSize;
 
@@ -52,7 +47,7 @@ import org.helioviewer.viewmodel.viewportimagesize.ViewportImageSize;
  * @author Malte Nuhn
  *
  */
-public class SWHVHEKImagePanelEventPopupController implements KeyEventDispatcher, ImagePanelPlugin, MouseListener, MouseMotionListener, ViewListener {
+public class SWHVHEKImagePanelEventPopupController implements KeyEventDispatcher, ImagePanelPlugin, MouseListener, MouseMotionListener {
 
     // ///////////////////////////////////////////////////////////////////////////
     // Definitions
@@ -110,10 +105,6 @@ public class SWHVHEKImagePanelEventPopupController implements KeyEventDispatcher
         imagePanel = newImagePanel;
         imagePanel.addMouseListener(this);
         imagePanel.addMouseMotionListener(this);
-
-        if (imagePanel.getView() != null) {
-            imagePanel.getView().addViewListener(this);
-        }
     }
 
     /**
@@ -354,26 +345,6 @@ public class SWHVHEKImagePanelEventPopupController implements KeyEventDispatcher
                 imagePanel.setCursor(helpCursor);
             } else if (lastJHVEvent != null && mouseOverJHVEvent == null) {
                 imagePanel.setCursor(lastCursor);
-            }
-        }
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void viewChanged(View sender, ChangeEvent aEvent) {
-        if (hekPopUp != null) {
-            if (aEvent.reasonOccurred(RegionChangedReason.class) || aEvent.reasonOccurred(ViewportChangedReason.class) || aEvent.reasonOccurred(TimestampChangedReason.class)) {
-                // remove as soon as event is not visible anymore
-                if (hekPopUp != null && hekPopUp.isVisible()) {
-                    Date currentDate = LayersModel.getSingletonInstance().getLastUpdatedTimestamp();
-                    if (currentDate == null) {
-                        hekPopUp.setVisible(false);
-                        return;
-                    }
-
-                }
             }
         }
     }
