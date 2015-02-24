@@ -13,14 +13,14 @@ import org.helioviewer.viewmodel.view.ViewportView;
 
 /**
  * Abstract base class implementing ImagePanelInputController.
- * 
+ *
  * <p>
  * This class provides some very basic function for every input input
  * controller. It covers all functions dealing with managing the associated view
  * and image panel.
- * 
+ *
  * @author Stephan Pagel
- * 
+ *
  * */
 public abstract class AbstractImagePanelMouseController implements ImagePanelInputController {
 
@@ -28,12 +28,12 @@ public abstract class AbstractImagePanelMouseController implements ImagePanelInp
     // Class variables
     // ///////////////////////////////////////////////////////////////////////////
 
-    protected volatile View view;
-    protected volatile RegionView regionView;
-    protected volatile ViewportView viewportView;
-    protected volatile MetaDataView metaDataView;
-    protected volatile BasicImagePanel imagePanel;
-    protected volatile Vector2dInt mousePosition = null;
+    protected View view;
+    protected RegionView regionView;
+    protected ViewportView viewportView;
+    protected MetaDataView metaDataView;
+    protected BasicImagePanel imagePanel;
+    protected Vector2dInt mousePosition = null;
 
     // ///////////////////////////////////////////////////////////////////////////
     // Methods
@@ -41,38 +41,42 @@ public abstract class AbstractImagePanelMouseController implements ImagePanelInp
 
     /**
      * Get the assigned image panel of this pan controller instance
-     * 
+     *
      * @return Reference to the assigned image panel.
      * */
+    @Override
     public BasicImagePanel getImagePanel() {
         return imagePanel;
     }
 
     /**
      * Get the assigned view of this pan controller instance.
-     * 
+     *
      * @return Reference to the assigned view.
      * */
+    @Override
     public View getView() {
         return view;
     }
 
     /**
      * Assigns a image panel to this pan controller instance.
-     * 
+     *
      * @param newImagePanel
      *            Image panel
      * */
+    @Override
     public void setImagePanel(BasicImagePanel newImagePanel) {
         imagePanel = newImagePanel;
     }
 
     /**
      * Assigns a view to this pan controller instance.
-     * 
+     *
      * @param newView
      *            View
      * */
+    @Override
     public void setView(View newView) {
         view = newView;
         regionView = ViewHelper.getViewAdapter(view, RegionView.class);
@@ -83,12 +87,14 @@ public abstract class AbstractImagePanelMouseController implements ImagePanelInp
     /**
      * {@inheritDoc}
      */
+    @Override
     public void detach() {
     }
 
     /**
      * Updates the mouse position {@inheritDoc}
      */
+    @Override
     public void mouseMoved(MouseEvent e) {
         mousePosition = new Vector2dInt(e.getX(), e.getY());
     }
@@ -96,6 +102,7 @@ public abstract class AbstractImagePanelMouseController implements ImagePanelInp
     /**
      * Updates the mouse position {@inheritDoc}
      */
+    @Override
     public void mouseExited(MouseEvent e) {
         mousePosition = null;
     }
@@ -103,6 +110,7 @@ public abstract class AbstractImagePanelMouseController implements ImagePanelInp
     /**
      * {@inheritDoc}
      */
+    @Override
     public Vector2dInt getMousePosition() {
         return mousePosition;
     }
