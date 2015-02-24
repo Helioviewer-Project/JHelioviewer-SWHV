@@ -180,11 +180,13 @@ public class ControlsPanel extends JPanel implements ActionListener, LayersListe
         View activeView = LayersModel.getSingletonInstance().getActiveView();
         JHVJPXView jpxView = activeView.getAdapter(JHVJPXView.class);
         if (jpxView != null) {
-            Date start = jpxView.getDateRange().getStart();
-            Date end = jpxView.getDateRange().getEnd();
-            // Log.debug("start " + start + " end " + end);
-            final Interval<Date> interval = new Interval<Date>(start, end);
-            ZoomController.getSingletonInstance().setSelectedInterval(interval, true);
+            Date start, end;
+            Interval<Date> range = jpxView.getDateRange();
+            if (range != null && (start = range.getStart()) != null && (end = range.getEnd()) != null) {
+                // Log.debug("start " + start + " end " + end);
+                final Interval<Date> interval = new Interval<Date>(start, end);
+                ZoomController.getSingletonInstance().setSelectedInterval(interval, true);
+            }
         }
     }
 
@@ -259,13 +261,15 @@ public class ControlsPanel extends JPanel implements ActionListener, LayersListe
             if (activeView != null) {
                 JHVJPXView jpxView = activeView.getAdapter(JHVJPXView.class);
                 if (jpxView != null) {
-                    Date start = jpxView.getDateRange().getStart();
-                    Date end = jpxView.getDateRange().getEnd();
-                    // Log.debug("start " + start + " end " + end);
-                    final Interval<Date> interval = new Interval<Date>(start, end);
-                    // ZoomController.getSingletonInstance().setAvailableInterval(interval);
-                    if (TimeIntervalLockModel.getInstance().isLocked()) {
-                        ZoomController.getSingletonInstance().setSelectedInterval(interval, false);
+                    Date start, end;
+                    Interval<Date> range = jpxView.getDateRange();
+                    if (range != null && (start = range.getStart()) != null && (end = range.getEnd()) != null) {
+                        // Log.debug("start " + start + " end " + end);
+                        final Interval<Date> interval = new Interval<Date>(start, end);
+                        // ZoomController.getSingletonInstance().setAvailableInterval(interval);
+                        if (TimeIntervalLockModel.getInstance().isLocked()) {
+                            ZoomController.getSingletonInstance().setSelectedInterval(interval, false);
+                        }
                     }
                 }
             }
