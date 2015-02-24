@@ -39,7 +39,7 @@ import org.helioviewer.viewmodel.view.View;
 import org.helioviewer.viewmodel.view.jp2view.JHVJPXView;
 
 /**
- *
+ * 
  * @author Stephan Pagel
  * */
 public class ChartDrawIntervalPane extends JComponent implements ZoomControllerListener, MouseInputListener, LayersListener {
@@ -294,7 +294,9 @@ public class ChartDrawIntervalPane extends JComponent implements ZoomControllerL
         String tickText;
         for (int i = 0; i < maxTicks; ++i) {
             final Date tickValue = new Date(availableInterval.getStart().getTime() + (long) (i * ratioTime));
-            int currentday = tickValue.getDay();
+            GregorianCalendar tickGreg = new GregorianCalendar();
+            tickGreg.setTime(tickValue);
+            int currentday = tickGreg.get(GregorianCalendar.DAY_OF_MONTH);
             if (day != currentday) {
                 tickText = ChartConstants.FULL_DATE_TIME_FORMAT_NO_SEC.format(tickValue);
                 day = currentday;

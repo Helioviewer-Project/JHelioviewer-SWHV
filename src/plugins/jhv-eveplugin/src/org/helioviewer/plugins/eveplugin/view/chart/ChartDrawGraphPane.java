@@ -24,6 +24,7 @@ import java.awt.image.BufferedImage;
 import java.net.URL;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -270,7 +271,11 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
             if (previousDate == null) {
                 tickText = ChartConstants.FULL_DATE_TIME_FORMAT_REVERSE.format(tickValue);
             } else {
-                if (tickValue.getDay() == previousDate.getDay()) {
+                GregorianCalendar tickGreg = new GregorianCalendar();
+                tickGreg.setTime(tickValue);
+                GregorianCalendar previousGreg = new GregorianCalendar();
+                previousGreg.setTime(previousDate);
+                if (tickGreg.get(GregorianCalendar.DAY_OF_MONTH) == previousGreg.get(GregorianCalendar.DAY_OF_MONTH)) {
                     tickText = ChartConstants.HOUR_TIME_FORMAT.format(tickValue);
                 } else {
                     tickText = ChartConstants.FULL_DATE_TIME_FORMAT_REVERSE.format(tickValue);
