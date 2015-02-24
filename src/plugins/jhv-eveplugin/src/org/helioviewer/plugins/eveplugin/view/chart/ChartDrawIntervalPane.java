@@ -695,17 +695,26 @@ public class ChartDrawIntervalPane extends JComponent implements ZoomControllerL
     // Layers Listener
     // //////////////////////////////////////////////////////////////////////////////
 
+    private void repaintOnLayerNotification() {
+        View activeView = LayersModel.getSingletonInstance().getActiveView();
+        if (activeView != null) {
+            JHVJPXView jpxView = activeView.getAdapter(JHVJPXView.class);
+            if (jpxView != null) {
+                Date start, end;
+                Interval<Date> range = jpxView.getDateRange();
+
+                if (range != null && (start = range.getStart()) != null && (end = range.getEnd()) != null) {
+                    movieInterval = new Interval<Date>(start, end);
+                    repaint();
+                }
+            }
+        }
+    }
+
     @Override
     public void layerAdded(int idx) {
         movieInterval = LayersModel.getSingletonInstance().getFrameInterval();
-        View activeView = LayersModel.getSingletonInstance().getActiveView();
-        JHVJPXView jpxView = activeView.getAdapter(JHVJPXView.class);
-        if (jpxView != null) {
-            Date start = jpxView.getDateRange().getStart();
-            Date end = jpxView.getDateRange().getEnd();
-            movieInterval = new Interval<Date>(start, end);
-            repaint();
-        }
+        repaintOnLayerNotification();
     }
 
     @Override
@@ -713,13 +722,6 @@ public class ChartDrawIntervalPane extends JComponent implements ZoomControllerL
         movieInterval = LayersModel.getSingletonInstance().getFrameInterval();
         View activeView = LayersModel.getSingletonInstance().getActiveView();
         if (activeView != null) {
-            JHVJPXView jpxView = activeView.getAdapter(JHVJPXView.class);
-            if (jpxView != null) {
-                Date start = jpxView.getDateRange().getStart();
-                Date end = jpxView.getDateRange().getEnd();
-                movieInterval = new Interval<Date>(start, end);
-                repaint();
-            }
             movieInterval = null;
             repaint();
         }
@@ -727,16 +729,7 @@ public class ChartDrawIntervalPane extends JComponent implements ZoomControllerL
 
     @Override
     public void layerChanged(int idx) {
-        View activeView = LayersModel.getSingletonInstance().getActiveView();
-        if (activeView != null) {
-            JHVJPXView jpxView = activeView.getAdapter(JHVJPXView.class);
-            if (jpxView != null) {
-                Date start = jpxView.getDateRange().getStart();
-                Date end = jpxView.getDateRange().getEnd();
-                movieInterval = new Interval<Date>(start, end);
-                repaint();
-            }
-        }
+        repaintOnLayerNotification();
     }
 
     @Override
@@ -745,10 +738,13 @@ public class ChartDrawIntervalPane extends JComponent implements ZoomControllerL
         if (activeView != null) {
             JHVJPXView jpxView = activeView.getAdapter(JHVJPXView.class);
             if (jpxView != null) {
-                Date start = jpxView.getDateRange().getStart();
-                Date end = jpxView.getDateRange().getEnd();
-                movieInterval = new Interval<Date>(start, end);
-                repaint();
+                Date start, end;
+                Interval<Date> range = jpxView.getDateRange();
+
+                if (range != null && (start = range.getStart()) != null && (end = range.getEnd()) != null) {
+                    movieInterval = new Interval<Date>(start, end);
+                    repaint();
+                }
             }
         }
     }
