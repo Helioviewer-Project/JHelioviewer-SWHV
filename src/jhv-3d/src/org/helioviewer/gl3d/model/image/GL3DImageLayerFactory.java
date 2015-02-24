@@ -22,24 +22,8 @@ public class GL3DImageLayerFactory {
 
         GL3DImageLayer imageLayer = null;
 
-        if (metaData instanceof HelioviewerOcculterMetaData) {
-            // LASCO
-            Log.debug("GL3DImageLayerFactory: Creating LASCO Image Layer");
-            return new GL3DAIAImageLayer(mainView);
-        } else if (metaData instanceof HelioviewerMetaData) {
-
-            HelioviewerMetaData hvMetaData = (HelioviewerMetaData) metaData;
-            if (hvMetaData.getInstrument().equalsIgnoreCase("HMI")) {
-                // HMI
-                Log.debug("GL3DImageLayerFactory: Creating HMI Image Layer!");
-                return new GL3DAIAImageLayer(mainView);
-            } else if (hvMetaData.getInstrument().equalsIgnoreCase("AIA")) {
-                // AIA
-                return new GL3DAIAImageLayer(mainView);
-            } else {
-                // GENERIC
-                return new GL3DAIAImageLayer(mainView);
-            }
+        if (metaData instanceof HelioviewerOcculterMetaData || metaData instanceof HelioviewerMetaData) {
+            imageLayer = new GL3DAIAImageLayer(mainView);
         } else {
             Log.error("GL3DShaderFactory: Cannot create ImageMesh for given ImageTextureView, not recognized underlying data " + metaData);
         }
