@@ -3,9 +3,7 @@ package org.helioviewer.jhv.gui.controller;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseWheelEvent;
 
-import org.helioviewer.base.physics.Constants;
 import org.helioviewer.jhv.gui.ImageViewerGui;
-import org.helioviewer.jhv.gui.states.StateController;
 import org.helioviewer.viewmodel.view.View;
 
 /**
@@ -30,7 +28,7 @@ public abstract class MainImagePanelMouseController extends AbstractImagePanelMo
     // Definitions
     // ///////////////////////////////////////////////////////////////////////////
 
-    private volatile ZoomController zoomController = new ZoomController();
+    private final ZoomController zoomController = new ZoomController();
 
     // ///////////////////////////////////////////////////////////////////////////
     // Methods
@@ -68,12 +66,6 @@ public abstract class MainImagePanelMouseController extends AbstractImagePanelMo
     public void mouseWheelMoved(MouseWheelEvent e) {
         if (zoomController != null) {
             zoomController.zoomSteps(getView(), (int) (-Math.max(1, e.getUnitsToScroll() / 3) * Math.signum(e.getUnitsToScroll())));
-            double zoom = ZoomController.getZoom(getView());
-
-            if (zoom < 1 / (Constants.SunRadius * 1.5)) {
-                StateController.getInstance().set3DState();
-            }
-
         }
     }
 }
