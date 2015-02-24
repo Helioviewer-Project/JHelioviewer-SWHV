@@ -7,9 +7,7 @@ import org.helioviewer.viewmodel.changeevent.SubImageDataChangedReason;
 import org.helioviewer.viewmodel.changeevent.ViewChainChangedReason;
 import org.helioviewer.viewmodel.filter.Filter;
 import org.helioviewer.viewmodel.filter.FilterListener;
-import org.helioviewer.viewmodel.filter.MetaDataFilter;
 import org.helioviewer.viewmodel.filter.ObservableFilter;
-import org.helioviewer.viewmodel.filter.RegionFilter;
 import org.helioviewer.viewmodel.filter.StandardFilter;
 import org.helioviewer.viewmodel.imagedata.ImageData;
 
@@ -36,8 +34,6 @@ public class StandardFilterView extends AbstractBasicView implements FilterView,
     protected Filter filter;
 
     protected ImageData filteredData;
-    protected RegionView regionView;
-    protected MetaDataView metaDataView;
     protected SubimageDataView subimageDataView;
 
     /**
@@ -67,7 +63,6 @@ public class StandardFilterView extends AbstractBasicView implements FilterView,
 
         // join change reasons to a change event
         ChangeEvent event = new ChangeEvent();
-
         event.addReason(new FilterChangedReason(this, filter));
         event.addReason(new SubImageDataChangedReason(this));
 
@@ -94,12 +89,6 @@ public class StandardFilterView extends AbstractBasicView implements FilterView,
      * needs to do its job, such as the region, meta data and the full image.
      */
     protected void refilterPrepare() {
-        if (filter instanceof RegionFilter && regionView != null) {
-            ((RegionFilter) filter).setRegion(regionView.getRegion());
-        }
-        if (filter instanceof MetaDataFilter && metaDataView != null) {
-            ((MetaDataFilter) filter).setMetaData(metaDataView.getMetaData());
-        }
     }
 
     /**
@@ -121,7 +110,7 @@ public class StandardFilterView extends AbstractBasicView implements FilterView,
     protected void refilter() {
         updatePrecomputedViews();
         if (filter != null && view != null) {
-            synchronized (filter) {
+            /*synchronized (filter)*/ {
                 refilterPrepare();
 
                 if (subimageDataView != null) {
@@ -159,7 +148,6 @@ public class StandardFilterView extends AbstractBasicView implements FilterView,
      */
     @Override
     public void viewChanged(View sender, ChangeEvent aEvent) {
-
         if (aEvent.reasonOccurred(ViewChainChangedReason.class)) {
             updatePrecomputedViews();
             refilter();
@@ -178,7 +166,6 @@ public class StandardFilterView extends AbstractBasicView implements FilterView,
         refilter();
 
         ChangeEvent event = new ChangeEvent();
-
         event.addReason(new FilterChangedReason(this, filter));
         event.addReason(new SubImageDataChangedReason(this));
 
@@ -192,8 +179,7 @@ public class StandardFilterView extends AbstractBasicView implements FilterView,
      * when doing this every frame.
      */
     protected void updatePrecomputedViews() {
-        regionView = ViewHelper.getViewAdapter(view, RegionView.class);
-        metaDataView = ViewHelper.getViewAdapter(view, MetaDataView.class);
         subimageDataView = ViewHelper.getViewAdapter(view, SubimageDataView.class);
     }
+
 }
