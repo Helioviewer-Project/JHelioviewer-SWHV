@@ -50,9 +50,9 @@ public abstract class AbstractLayeredView extends AbstractView implements Layere
 
     protected ViewportImageSize viewportImageSize;
 
-    private Viewport viewport;
-    private Region region;
-    private MetaData metaData;
+    protected Viewport viewport;
+    protected Region region;
+    protected MetaData metaData;
 
     private double minimalRegionSize;
 
@@ -65,7 +65,7 @@ public abstract class AbstractLayeredView extends AbstractView implements Layere
      *
      */
     protected class Layer {
-        private View view;
+        private final View view;
 
         public RegionView regionView;
         public ViewportView viewportView;
@@ -434,7 +434,6 @@ public abstract class AbstractLayeredView extends AbstractView implements Layere
      */
     protected boolean recalculateRegionsAndViewports(ChangeEvent event, boolean includePixelBasedImages) {
         boolean changed = false;
-        // check region and viewport
         if (region == null && metaData != null) {
             region = StaticRegion.createAdaptedRegion(metaData.getPhysicalRectangle());
         }
@@ -444,7 +443,7 @@ public abstract class AbstractLayeredView extends AbstractView implements Layere
             viewportImageSize = ViewHelper.calculateViewportImageSize(viewport, region);
             changed |= viewportImageSize == null ? oldViewportImageSize == null : viewportImageSize.equals(oldViewportImageSize);
             layerLock.lock();
-            try {
+            {
                 for (Layer layer : viewLookup.values()) {
                     MetaData m = layer.metaDataView.getMetaData();
                     if (includePixelBasedImages || !(m instanceof PixelBasedMetaData)) {
@@ -456,9 +455,9 @@ public abstract class AbstractLayeredView extends AbstractView implements Layere
                         changed |= layer.viewportView.setViewport(layerViewport, event);
                     }
                 }
-            } finally {
-                layerLock.unlock();
             }
+            layerLock.unlock();
+
         }
         return changed;
     }
@@ -478,9 +477,7 @@ public abstract class AbstractLayeredView extends AbstractView implements Layere
             recalculateRegionsAndViewports(new ChangeEvent(aEvent));
         }
 
-        if ((aEvent.reasonOccurred(RegionChangedReason.class) ||
-             aEvent.reasonOccurred(SubImageDataChangedReason.class) ||
-             aEvent.reasonOccurred(ViewChainChangedReason.class)) && sender != null) {
+        if ((aEvent.reasonOccurred(RegionChangedReason.class) || aEvent.reasonOccurred(SubImageDataChangedReason.class) || aEvent.reasonOccurred(ViewChainChangedReason.class)) && sender != null) {
             redrawBuffer(aEvent);
         } else {
             notifyViewListeners(aEvent);
