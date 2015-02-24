@@ -12,8 +12,6 @@ import javax.media.opengl.GL2;
 import javax.swing.ImageIcon;
 
 import org.helioviewer.base.physics.Astronomy;
-import org.helioviewer.gl3d.view.GL3DImageTextureView;
-import org.helioviewer.gl3d.view.GL3DLayeredView;
 import org.helioviewer.gl3d.wcs.conversion.SphericalToSolarSphereConversion;
 import org.helioviewer.gl3d.wcs.impl.SolarSphereCoordinateSystem;
 import org.helioviewer.gl3d.wcs.impl.SphericalCoordinateSystem;
@@ -24,14 +22,10 @@ import org.helioviewer.jhv.data.datatype.event.JHVPoint;
 import org.helioviewer.jhv.data.datatype.event.JHVPositionInformation;
 import org.helioviewer.jhv.plugins.swhvhekplugin.cache.SWHVHEKData;
 import org.helioviewer.jhv.plugins.swhvhekplugin.settings.SWHVHEKSettings;
-import org.helioviewer.viewmodel.region.Region;
 import org.helioviewer.viewmodel.renderer.physical.PhysicalRenderGraphics;
 import org.helioviewer.viewmodel.renderer.physical.PhysicalRenderer3d;
 import org.helioviewer.viewmodel.view.LinkedMovieManager;
-import org.helioviewer.viewmodel.view.RegionView;
 import org.helioviewer.viewmodel.view.TimedMovieView;
-import org.helioviewer.viewmodel.view.View;
-import org.helioviewer.viewmodel.view.ViewHelper;
 
 /**
  * The solar event renderer provides a possibility to draw solar events with
@@ -42,8 +36,7 @@ import org.helioviewer.viewmodel.view.ViewHelper;
 public class SWHVHEKPlugin3dRenderer extends PhysicalRenderer3d {
     private final SphericalCoordinateSystem sphericalCS = new SphericalCoordinateSystem();
     private final SolarSphereCoordinateSystem solarSphereCS = new SolarSphereCoordinateSystem();
-    private float scale = 1;
-    private double height = -1000;
+
     SphericalToSolarSphereConversion conversion = (SphericalToSolarSphereConversion) sphericalCS.getConversion(solarSphereCS);
 
     /**
@@ -270,22 +263,6 @@ public class SWHVHEKPlugin3dRenderer extends PhysicalRenderer3d {
             }
         }
         SWHVHEKSettings.resetCactusColor();
-    }
-
-    @Override
-    public void viewChanged(View view) {
-        GL3DLayeredView layeredView = ViewHelper.getViewAdapter(view, GL3DLayeredView.class);
-        if (layeredView != null && layeredView.getNumLayers() != 0) {
-            GL3DImageTextureView imageTextureView = (GL3DImageTextureView) layeredView.getLayer(0);
-            Region region = imageTextureView.getAdapter(RegionView.class).getRegion();
-            if (region != null) {
-                if (height < 0) {
-                    height = region.getHeight();
-                } else {
-                    scale = (float) (region.getHeight() / height);
-                }
-            }
-        }
     }
 
 }
