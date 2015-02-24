@@ -70,7 +70,7 @@ public class JHVJP2View extends AbstractView implements JP2View, ViewportView, R
         NEVERFIRE, ONLYFIREONCOMPLETE, ALWAYSFIREONNEWDATA, SIGNAL_RENDER_ONCE
     };
 
-    private Interval<Date> range;
+    private final Interval<Date> range;
 
     public GLTextureHelper.GLTexture tex = new GLTextureHelper.GLTexture();
 
@@ -841,12 +841,6 @@ public class JHVJP2View extends AbstractView implements JP2View, ViewportView, R
     @Override
     public Interval<Date> getDateRange() {
         return this.range;
-    }
-
-    @Override
-    public void setDateRange(Interval<Date> range) {
-        // TODO Auto-generated method stub
-        this.range = range;
     }
 
     @Override

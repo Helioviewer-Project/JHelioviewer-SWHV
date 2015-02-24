@@ -37,11 +37,11 @@ import org.helioviewer.viewmodel.viewportimagesize.ViewportImageSizeAdapter;
 
 /**
  * Implementation of ImageInfoView for FITS images.
- * 
+ *
  * <p>
  * For further informations about the behavior of this view,
  * {@link ImageInfoView} is a good start to get into the concept.
- * 
+ *
  * @author Andreas Hoelzl
  * */
 public class JHVFITSView extends AbstractView implements ViewportView, RegionView, SubimageDataView, ImageInfoView, MetaDataView {
@@ -51,12 +51,12 @@ public class JHVFITSView extends AbstractView implements ViewportView, RegionVie
     protected FITSImage fits;
     protected ImageData subImageData;
     protected MetaData m;
-    private URI uri;
+    private final URI uri;
     private Interval<Date> range;
 
     /**
      * Constructor which loads a fits image from a given URI.
-     * 
+     *
      * @param uri
      *            Specifies the location of the FITS file.
      * @throws IOException
@@ -80,7 +80,7 @@ public class JHVFITSView extends AbstractView implements ViewportView, RegionVie
 
     /**
      * Constructor which uses a given fits image.
-     * 
+     *
      * @param fits
      *            FITSImage object which contains the image data
      * @param uri
@@ -120,7 +120,7 @@ public class JHVFITSView extends AbstractView implements ViewportView, RegionVie
 
     /**
      * Updates the sub image depending on the current region.
-     * 
+     *
      * @param event
      *            Event that belongs to the request.
      * */
@@ -157,6 +157,7 @@ public class JHVFITSView extends AbstractView implements ViewportView, RegionVie
     /**
      * {@inheritDoc}
      * */
+    @Override
     public Viewport getViewport() {
         return viewport;
     }
@@ -164,6 +165,7 @@ public class JHVFITSView extends AbstractView implements ViewportView, RegionVie
     /**
      * {@inheritDoc}
      * */
+    @Override
     public boolean setViewport(Viewport v, ChangeEvent event) {
 
         // check if viewport has changed
@@ -180,6 +182,7 @@ public class JHVFITSView extends AbstractView implements ViewportView, RegionVie
     /**
      * {@inheritDoc}
      * */
+    @Override
     @SuppressWarnings("unchecked")
     public <T extends View> T getAdapter(Class<T> c) {
         if (c.isInstance(this)) {
@@ -192,6 +195,7 @@ public class JHVFITSView extends AbstractView implements ViewportView, RegionVie
     /**
      * {@inheritDoc}
      * */
+    @Override
     public Region getRegion() {
 
         return region;
@@ -200,6 +204,7 @@ public class JHVFITSView extends AbstractView implements ViewportView, RegionVie
     /**
      * {@inheritDoc}
      * */
+    @Override
     public boolean setRegion(Region r, ChangeEvent event) {
 
         event.addReason(new RegionUpdatedReason(this, r));
@@ -217,7 +222,7 @@ public class JHVFITSView extends AbstractView implements ViewportView, RegionVie
 
     /**
      * Returns the header information as XML string.
-     * 
+     *
      * @return XML string including all header information.
      * */
     public String getHeaderAsXML() {
@@ -227,6 +232,7 @@ public class JHVFITSView extends AbstractView implements ViewportView, RegionVie
     /**
      * {@inheritDoc}
      * */
+    @Override
     public MetaData getMetaData() {
         return m;
     }
@@ -234,13 +240,14 @@ public class JHVFITSView extends AbstractView implements ViewportView, RegionVie
     /**
      * {@inheritDoc}
      * */
+    @Override
     public ImageData getSubimageData() {
         return subImageData;
     }
 
     /**
      * Returns the FITS image managed by this class.
-     * 
+     *
      * @return FITS image.
      */
     public FITSImage getFITSImage() {
@@ -250,6 +257,7 @@ public class JHVFITSView extends AbstractView implements ViewportView, RegionVie
     /**
      * {@inheritDoc}
      * */
+    @Override
     public String getName() {
         if (m instanceof ObserverMetaData) {
             ObserverMetaData observerMetaData = (ObserverMetaData) m;
@@ -263,6 +271,7 @@ public class JHVFITSView extends AbstractView implements ViewportView, RegionVie
     /**
      * {@inheritDoc}
      * */
+    @Override
     public URI getUri() {
         return uri;
     }
@@ -270,10 +279,12 @@ public class JHVFITSView extends AbstractView implements ViewportView, RegionVie
     /**
      * {@inheritDoc}
      * */
+    @Override
     public boolean isRemote() {
         return false;
     }
 
+    @Override
     public URI getDownloadURI() {
         return uri;
     }
@@ -283,7 +294,6 @@ public class JHVFITSView extends AbstractView implements ViewportView, RegionVie
         return this.range;
     }
 
-    @Override
     public void setDateRange(Interval<Date> range) {
         // TODO Auto-generated method stub
         this.range = range;

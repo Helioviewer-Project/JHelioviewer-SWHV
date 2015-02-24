@@ -39,7 +39,7 @@ import org.helioviewer.viewmodel.view.View;
 import org.helioviewer.viewmodel.view.jp2view.JHVJPXView;
 
 /**
- * 
+ *
  * @author Stephan Pagel
  * */
 public class ChartDrawIntervalPane extends JComponent implements ZoomControllerListener, MouseInputListener, LayersListener {
@@ -745,13 +745,10 @@ public class ChartDrawIntervalPane extends JComponent implements ZoomControllerL
         if (activeView != null) {
             JHVJPXView jpxView = activeView.getAdapter(JHVJPXView.class);
             if (jpxView != null) {
-                Date start, end;
-                Interval<Date> range = jpxView.getDateRange();
-
-                if (range != null && (start = range.getStart()) != null && (end = range.getEnd()) != null) {
-                    movieInterval = new Interval<Date>(start, end);
-                    repaint();
-                }
+                Date start = jpxView.getDateRange().getStart();
+                Date end = jpxView.getDateRange().getEnd();
+                movieInterval = new Interval<Date>(start, end);
+                repaint();
             }
         }
     }
