@@ -37,7 +37,7 @@ public class OpacityPanel extends FilterPanel implements ChangeListener, FilterA
         // add(title);
 
         opacitySpinner = new JSpinner();
-        opacitySpinner.setModel(new SpinnerNumberModel(new Float(1), new Float(0), new Float(1), new Float(0.05f)));
+        opacitySpinner.setModel(new ClippingNumberModel(new Float(1), new Float(0), new Float(1), new Float(0.05f)));
         opacitySpinner.addChangeListener(this);
 
         JSpinner.NumberEditor editor = new JSpinner.NumberEditor(opacitySpinner, "0%");
@@ -50,6 +50,34 @@ public class OpacityPanel extends FilterPanel implements ChangeListener, FilterA
 
         setEnabled(false);
     }
+
+    private class ClippingNumberModel extends SpinnerNumberModel {
+        Object min, max;
+
+        public ClippingNumberModel(Number value, Comparable minimum, Comparable maximum, Number stepSize) {
+            super(value, minimum, maximum, stepSize);
+            min = minimum;
+            max = maximum;
+        }
+
+        public Object getNextValue() {
+            Object value = super.getNextValue();
+            if (value == null) {
+                value = max;
+            }
+            return value;
+        }
+
+        public Object getPreviousValue() {
+            Object value = super.getPreviousValue();
+            if (value == null) {
+                value = min;
+            }
+            return value;
+        }
+
+    }
+
 
     /**
      * Override the setEnabled method in order to keep the containing
