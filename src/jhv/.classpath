@@ -14,7 +14,6 @@
 			<attribute name="org.eclipse.jdt.launching.CLASSPATH_ATTR_LIBRARY_PATH_ENTRY" value="/Users/bramb/Documents/OMA/jhelioviewer/git/client/jhv-3d-wcs/resources/jogl/lib/macosx-universal"/>
 		</attributes>
 	</classpathentry>
-	<classpathentry combineaccessrules="false" kind="src" path="/jhv-3d"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/jhv-3d-scenegraph"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/jhv-3d-plugin"/>
 	<classpathentry kind="lib" path="../resources"/>
