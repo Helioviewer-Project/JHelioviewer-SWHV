@@ -1,6 +1,5 @@
-package org.helioviewer.gl3d.factory;
+package org.helioviewer.viewmodel.factory;
 
-import org.helioviewer.viewmodel.factory.GLViewFactory;
 import org.helioviewer.viewmodel.view.ComponentView;
 import org.helioviewer.viewmodel.view.LayeredView;
 import org.helioviewer.viewmodel.view.OverlayView;

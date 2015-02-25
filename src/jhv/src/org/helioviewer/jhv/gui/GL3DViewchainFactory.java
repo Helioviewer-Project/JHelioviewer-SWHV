@@ -2,7 +2,7 @@ package org.helioviewer.jhv.gui;
 
 import java.util.AbstractList;
 
-import org.helioviewer.gl3d.factory.GL3DViewFactory;
+import org.helioviewer.viewmodel.factory.GL3DViewFactory;
 import org.helioviewer.viewmodel.factory.ViewFactory;
 import org.helioviewer.viewmodel.view.ComponentView;
 import org.helioviewer.viewmodel.view.LayeredView;
