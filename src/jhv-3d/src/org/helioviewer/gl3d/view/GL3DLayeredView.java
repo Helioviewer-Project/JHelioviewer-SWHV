@@ -88,7 +88,7 @@ public class GL3DLayeredView extends GLLayeredView implements GL3DView {
      * @return true, if at least one region or viewport changed
      */
     @Override
-    protected boolean recalculateRegionsAndViewports(ChangeEvent event, boolean includePixelBasedImages) {
+    protected boolean recalculateRegionsAndViewports(ChangeEvent event) {
         boolean changed = false;
         if (region == null && metaData != null) {
             region = StaticRegion.createAdaptedRegion(metaData.getPhysicalRectangle());
@@ -96,16 +96,16 @@ public class GL3DLayeredView extends GLLayeredView implements GL3DView {
 
         if (viewport != null && region != null) {
             viewportImageSize = ViewHelper.calculateViewportImageSize(viewport, region);
+
             layerLock.lock();
-            {
-                for (Layer layer : viewLookup.values()) {
-                    Viewport layerViewport = new ViewportAdapter(new StaticViewport(viewportImageSize.getWidth(), viewportImageSize.getHeight()));
-                    changed |= layer.viewportView.setViewport(layerViewport, event);
-                }
+            for (Layer layer : viewLookup.values()) {
+                Viewport layerViewport = new ViewportAdapter(new StaticViewport(viewportImageSize.getWidth(), viewportImageSize.getHeight()));
+                changed |= layer.viewportView.setViewport(layerViewport, event);
             }
             layerLock.unlock();
         }
 
         return changed;
     }
+
 }

@@ -432,7 +432,7 @@ public abstract class AbstractLayeredView extends AbstractView implements Layere
      *            ChangeEvent to collect history of all following changes
      * @return true, if at least one region or viewport changed
      */
-    protected boolean recalculateRegionsAndViewports(ChangeEvent event, boolean includePixelBasedImages) {
+    private boolean recalculateRegionsAndViewports(ChangeEvent event, boolean includePixelBasedImages) {
         boolean changed = false;
         if (region == null && metaData != null) {
             region = StaticRegion.createAdaptedRegion(metaData.getPhysicalRectangle());
@@ -442,23 +442,22 @@ public abstract class AbstractLayeredView extends AbstractView implements Layere
             ViewportImageSize oldViewportImageSize = viewportImageSize;
             viewportImageSize = ViewHelper.calculateViewportImageSize(viewport, region);
             changed |= viewportImageSize == null ? oldViewportImageSize == null : viewportImageSize.equals(oldViewportImageSize);
-            layerLock.lock();
-            {
-                for (Layer layer : viewLookup.values()) {
-                    MetaData m = layer.metaDataView.getMetaData();
-                    if (includePixelBasedImages || !(m instanceof PixelBasedMetaData)) {
-                        Region layerRegion = ViewHelper.cropInnerRegionToOuterRegion(m.getPhysicalRegion(), region);
-                        Viewport layerViewport = ViewHelper.calculateInnerViewport(layerRegion, region, viewportImageSize);
-                        layer.renderOffset = ViewHelper.calculateInnerViewportOffset(layerRegion, region, viewportImageSize);
 
-                        changed |= layer.regionView.setRegion(layerRegion, event);
-                        changed |= layer.viewportView.setViewport(layerViewport, event);
-                    }
+            layerLock.lock();
+            for (Layer layer : viewLookup.values()) {
+                MetaData m = layer.metaDataView.getMetaData();
+                if (includePixelBasedImages || !(m instanceof PixelBasedMetaData)) {
+                    Region layerRegion = ViewHelper.cropInnerRegionToOuterRegion(m.getPhysicalRegion(), region);
+                    Viewport layerViewport = ViewHelper.calculateInnerViewport(layerRegion, region, viewportImageSize);
+                    layer.renderOffset = ViewHelper.calculateInnerViewportOffset(layerRegion, region, viewportImageSize);
+
+                    changed |= layer.regionView.setRegion(layerRegion, event);
+                    changed |= layer.viewportView.setViewport(layerViewport, event);
                 }
             }
             layerLock.unlock();
-
         }
+
         return changed;
     }
 
