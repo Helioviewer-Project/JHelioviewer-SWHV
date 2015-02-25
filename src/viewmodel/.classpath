@@ -14,7 +14,6 @@
 	<classpathentry kind="lib" path="../lib/bzip2.jar"/>
 	<classpathentry kind="lib" path="../lib/jogl.jar"/>
 	<classpathentry kind="src" path="/jhv-3d-scenegraph"/>
-	<classpathentry kind="src" path="/jhv-3d"/>
 	<classpathentry kind="src" path="/jhv"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
