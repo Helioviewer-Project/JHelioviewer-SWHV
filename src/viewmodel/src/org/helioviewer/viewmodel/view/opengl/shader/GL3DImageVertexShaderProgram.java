@@ -1,4 +1,4 @@
-package org.helioviewer.gl3d.shader;
+package org.helioviewer.viewmodel.view.opengl.shader;
 
 import javax.media.opengl.GL2;
 
