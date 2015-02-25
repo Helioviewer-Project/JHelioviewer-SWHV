@@ -1,7 +1,6 @@
-package org.helioviewer.gl3d.changeevent;
+package org.helioviewer.viewmodel.changeevent;
 
 import org.helioviewer.gl3d.camera.GL3DCamera;
-import org.helioviewer.viewmodel.changeevent.ChangedReason;
 import org.helioviewer.viewmodel.view.View;
 
 /**

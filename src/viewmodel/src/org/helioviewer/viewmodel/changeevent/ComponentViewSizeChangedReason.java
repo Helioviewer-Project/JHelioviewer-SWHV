@@ -1,7 +1,6 @@
-package org.helioviewer.gl3d.changeevent;
+package org.helioviewer.viewmodel.changeevent;
 
 import org.helioviewer.base.math.Vector2dInt;
-import org.helioviewer.viewmodel.changeevent.ChangedReason;
 import org.helioviewer.viewmodel.view.View;
 
 /**

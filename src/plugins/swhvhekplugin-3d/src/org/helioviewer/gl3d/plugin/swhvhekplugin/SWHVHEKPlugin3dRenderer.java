@@ -12,9 +12,6 @@ import javax.media.opengl.GL2;
 import javax.swing.ImageIcon;
 
 import org.helioviewer.base.physics.Astronomy;
-import org.helioviewer.gl3d.wcs.conversion.SphericalToSolarSphereConversion;
-import org.helioviewer.gl3d.wcs.impl.SolarSphereCoordinateSystem;
-import org.helioviewer.gl3d.wcs.impl.SphericalCoordinateSystem;
 import org.helioviewer.jhv.data.datatype.event.JHVCoordinateSystem;
 import org.helioviewer.jhv.data.datatype.event.JHVEvent;
 import org.helioviewer.jhv.data.datatype.event.JHVEventParameter;
@@ -34,10 +31,6 @@ import org.helioviewer.viewmodel.view.TimedMovieView;
  * @author Malte Nuhn
  */
 public class SWHVHEKPlugin3dRenderer extends PhysicalRenderer3d {
-    private final SphericalCoordinateSystem sphericalCS = new SphericalCoordinateSystem();
-    private final SolarSphereCoordinateSystem solarSphereCS = new SolarSphereCoordinateSystem();
-
-    SphericalToSolarSphereConversion conversion = (SphericalToSolarSphereConversion) sphericalCS.getConversion(solarSphereCS);
 
     /**
      * Default constructor.

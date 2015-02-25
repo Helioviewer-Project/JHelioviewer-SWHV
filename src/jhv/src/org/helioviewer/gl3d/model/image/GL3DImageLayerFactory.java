@@ -2,11 +2,11 @@ package org.helioviewer.gl3d.model.image;
 
 import org.helioviewer.base.logging.Log;
 import org.helioviewer.gl3d.scenegraph.GL3DState;
-import org.helioviewer.gl3d.view.GL3DView;
 import org.helioviewer.viewmodel.metadata.HelioviewerMetaData;
 import org.helioviewer.viewmodel.metadata.HelioviewerOcculterMetaData;
 import org.helioviewer.viewmodel.metadata.MetaData;
 import org.helioviewer.viewmodel.view.MetaDataView;
+import org.helioviewer.viewmodel.view.opengl.GL3DView;
 
 /**
  * Factory to be used for creating GL3DImageLayer Objects. This class is used by

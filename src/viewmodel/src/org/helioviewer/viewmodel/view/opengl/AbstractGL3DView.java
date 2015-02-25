@@ -1,9 +1,8 @@
-package org.helioviewer.gl3d.view;
+package org.helioviewer.viewmodel.view.opengl;
 
 import javax.media.opengl.GL2;
 
 import org.helioviewer.gl3d.scenegraph.GL3DState;
-import org.helioviewer.viewmodel.view.opengl.AbstractGLView;
 
 /**
  * Default super class for all {@link GL3DView}s. Provides default behavior like

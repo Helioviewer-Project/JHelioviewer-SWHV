@@ -16,8 +16,6 @@ import org.helioviewer.gl3d.scenegraph.math.GL3DVec4d;
 import org.helioviewer.gl3d.scenegraph.rt.GL3DRay;
 import org.helioviewer.gl3d.scenegraph.rt.GL3DRayTracer;
 import org.helioviewer.gl3d.shader.GL3DImageFragmentShaderProgram;
-import org.helioviewer.gl3d.view.GL3DImageTextureView;
-import org.helioviewer.gl3d.view.GL3DView;
 import org.helioviewer.jhv.gui.states.StateController;
 import org.helioviewer.jhv.gui.states.ViewStateEnum;
 import org.helioviewer.viewmodel.changeevent.ChangeEvent;
@@ -29,6 +27,8 @@ import org.helioviewer.viewmodel.view.MetaDataView;
 import org.helioviewer.viewmodel.view.RegionView;
 import org.helioviewer.viewmodel.view.View;
 import org.helioviewer.viewmodel.view.ViewListener;
+import org.helioviewer.viewmodel.view.opengl.GL3DImageTextureView;
+import org.helioviewer.viewmodel.view.opengl.GL3DView;
 
 /**
  * This is the scene graph equivalent of an image layer sub view chain attached

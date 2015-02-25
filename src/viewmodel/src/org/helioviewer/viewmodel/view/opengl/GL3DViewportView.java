@@ -1,4 +1,4 @@
-package org.helioviewer.gl3d.view;
+package org.helioviewer.viewmodel.view.opengl;
 
 import javax.media.opengl.GL2;
 

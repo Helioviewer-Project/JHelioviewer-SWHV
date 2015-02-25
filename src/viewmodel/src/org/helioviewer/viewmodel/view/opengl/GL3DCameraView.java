@@ -1,4 +1,4 @@
-package org.helioviewer.gl3d.view;
+package org.helioviewer.viewmodel.view.opengl;
 
 import java.awt.event.KeyEvent;
 import java.util.ArrayList;
@@ -11,11 +11,10 @@ import org.helioviewer.gl3d.GL3DKeyController;
 import org.helioviewer.gl3d.GL3DKeyController.GL3DKeyListener;
 import org.helioviewer.gl3d.camera.GL3DCamera;
 import org.helioviewer.gl3d.camera.GL3DCameraListener;
-import org.helioviewer.gl3d.changeevent.CameraChangeChangedReason;
 import org.helioviewer.gl3d.scenegraph.GL3DState;
+import org.helioviewer.viewmodel.changeevent.CameraChangeChangedReason;
 import org.helioviewer.viewmodel.changeevent.ChangeEvent;
 import org.helioviewer.viewmodel.view.View;
-import org.helioviewer.viewmodel.view.opengl.GLView;
 
 /**
  * The {@link GL3DCameraView} is responsible for applying the currently active
