@@ -1,9 +1,8 @@
-package org.helioviewer.gl3d.changeevent;
+package org.helioviewer.viewmodel.changeevent;
 
-import org.helioviewer.gl3d.view.GL3DImageTextureView;
-import org.helioviewer.viewmodel.changeevent.ChangedReason;
 import org.helioviewer.viewmodel.region.Region;
 import org.helioviewer.viewmodel.view.View;
+import org.helioviewer.viewmodel.view.opengl.GL3DImageTextureView;
 
 /**
  * The ChangedReason that is emitted when the {@link GL3DImageTextureView}

@@ -10,12 +10,12 @@ import java.awt.event.MouseWheelEvent;
 
 import org.helioviewer.gl3d.GL3DKeyController;
 import org.helioviewer.gl3d.camera.GL3DCamera;
-import org.helioviewer.gl3d.view.GL3DCameraView;
 import org.helioviewer.jhv.gui.IconBank;
 import org.helioviewer.jhv.gui.IconBank.JHVIcon;
 import org.helioviewer.jhv.gui.controller.AbstractImagePanelMouseController;
 import org.helioviewer.viewmodel.view.View;
 import org.helioviewer.viewmodel.view.ViewHelper;
+import org.helioviewer.viewmodel.view.opengl.GL3DCameraView;
 
 /**
  * Acts as the global Delegate for Mouse and KeyEvents. Mouse Events are

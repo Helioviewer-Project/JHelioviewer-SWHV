@@ -9,9 +9,9 @@ import javax.swing.tree.TreeModel;
 import javax.swing.tree.TreePath;
 
 import org.helioviewer.gl3d.scenegraph.GL3DGroup;
-import org.helioviewer.gl3d.view.GL3DSceneGraphView;
 import org.helioviewer.jhv.gui.ImageViewerGui;
 import org.helioviewer.viewmodel.view.ComponentView;
+import org.helioviewer.viewmodel.view.opengl.GL3DSceneGraphView;
 
 /**
  * Currently not in use!

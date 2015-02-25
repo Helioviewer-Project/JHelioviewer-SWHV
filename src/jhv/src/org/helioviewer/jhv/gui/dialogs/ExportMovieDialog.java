@@ -14,11 +14,11 @@ import javax.swing.SwingConstants;
 import org.helioviewer.base.FileUtils;
 import org.helioviewer.base.logging.Log;
 import org.helioviewer.base.message.Message;
-import org.helioviewer.gl3d.view.GL3DComponentView;
 import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.gui.ImageViewerGui;
 import org.helioviewer.jhv.gui.interfaces.ShowableDialog;
 import org.helioviewer.viewmodel.view.AbstractComponentView;
+import org.helioviewer.viewmodel.view.opengl.GL3DComponentView;
 
 /**
  * Dialog o export movies to standard video formats.

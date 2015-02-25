@@ -3,8 +3,8 @@ package org.helioviewer.gl3d.camera;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseWheelEvent;
 
-import org.helioviewer.gl3d.view.GL3DSceneGraphView;
 import org.helioviewer.jhv.display.Displayer;
+import org.helioviewer.viewmodel.view.opengl.GL3DSceneGraphView;
 
 /**
  * Default {@link GL3DInteraction} class that provides a reference to the

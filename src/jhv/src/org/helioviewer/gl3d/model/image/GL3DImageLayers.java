@@ -13,7 +13,7 @@ import org.helioviewer.gl3d.scenegraph.GL3DNode;
 import org.helioviewer.gl3d.scenegraph.GL3DState;
 import org.helioviewer.gl3d.scenegraph.math.GL3DMat4d;
 import org.helioviewer.gl3d.scenegraph.math.GL3DVec3d;
-import org.helioviewer.gl3d.view.GL3DImageTextureView;
+import org.helioviewer.viewmodel.view.opengl.GL3DImageTextureView;
 
 /**
  * The {@link GL3DImageLayers} node offers special capabilities for grouping

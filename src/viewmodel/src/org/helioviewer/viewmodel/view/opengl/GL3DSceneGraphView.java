@@ -1,4 +1,4 @@
-package org.helioviewer.gl3d.view;
+package org.helioviewer.viewmodel.view.opengl;
 
 import java.awt.event.KeyEvent;
 import java.util.ArrayList;
@@ -35,8 +35,6 @@ import org.helioviewer.viewmodel.view.LayeredView;
 import org.helioviewer.viewmodel.view.MetaDataView;
 import org.helioviewer.viewmodel.view.View;
 import org.helioviewer.viewmodel.view.ViewListener;
-import org.helioviewer.viewmodel.view.opengl.GLOverlayView;
-import org.helioviewer.viewmodel.view.opengl.GLView;
 
 /**
  * This is the most important view in the 3D viewchain. It assembles all 3D

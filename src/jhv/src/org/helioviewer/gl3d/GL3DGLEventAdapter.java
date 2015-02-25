@@ -3,7 +3,7 @@ package org.helioviewer.gl3d;
 import javax.media.opengl.GLAutoDrawable;
 import javax.media.opengl.GLEventListener;
 
-import org.helioviewer.gl3d.view.GL3DComponentView;
+import org.helioviewer.viewmodel.view.opengl.GL3DComponentView;
 
 /**
  * Adapter for a {@link GLEventListener}. Add an adapter to the

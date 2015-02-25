@@ -1,7 +1,6 @@
-package org.helioviewer.gl3d.view;
+package org.helioviewer.viewmodel.view.opengl;
 
 import org.helioviewer.gl3d.scenegraph.GL3DState;
-import org.helioviewer.viewmodel.view.opengl.GLView;
 
 /**
  * The top-level Interface for 3D image Views. 3D views will only be handled

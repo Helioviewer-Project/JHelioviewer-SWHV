@@ -3,10 +3,6 @@ package org.helioviewer.jhv.gui;
 import java.util.AbstractList;
 
 import org.helioviewer.gl3d.factory.GL3DViewFactory;
-import org.helioviewer.gl3d.view.GL3DCameraView;
-import org.helioviewer.gl3d.view.GL3DLayeredView;
-import org.helioviewer.gl3d.view.GL3DSceneGraphView;
-import org.helioviewer.gl3d.view.GL3DViewportView;
 import org.helioviewer.viewmodel.factory.ViewFactory;
 import org.helioviewer.viewmodel.view.ComponentView;
 import org.helioviewer.viewmodel.view.LayeredView;
@@ -15,6 +11,10 @@ import org.helioviewer.viewmodel.view.OverlayView;
 import org.helioviewer.viewmodel.view.StandardSolarRotationTrackingView;
 import org.helioviewer.viewmodel.view.View;
 import org.helioviewer.viewmodel.view.ViewListener;
+import org.helioviewer.viewmodel.view.opengl.GL3DCameraView;
+import org.helioviewer.viewmodel.view.opengl.GL3DLayeredView;
+import org.helioviewer.viewmodel.view.opengl.GL3DSceneGraphView;
+import org.helioviewer.viewmodel.view.opengl.GL3DViewportView;
 import org.helioviewer.viewmodel.view.opengl.GLLayeredView;
 import org.helioviewer.viewmodel.view.opengl.GLOverlayView;
 

@@ -1,4 +1,4 @@
-package org.helioviewer.gl3d.view;
+package org.helioviewer.viewmodel.view.opengl;
 
 import javax.media.opengl.GL2;
 
@@ -8,8 +8,6 @@ import org.helioviewer.viewmodel.region.StaticRegion;
 import org.helioviewer.viewmodel.view.MovieView;
 import org.helioviewer.viewmodel.view.View;
 import org.helioviewer.viewmodel.view.ViewHelper;
-import org.helioviewer.viewmodel.view.opengl.GLLayeredView;
-import org.helioviewer.viewmodel.view.opengl.GLView;
 import org.helioviewer.viewmodel.viewport.StaticViewport;
 import org.helioviewer.viewmodel.viewport.Viewport;
 import org.helioviewer.viewmodel.viewport.ViewportAdapter;

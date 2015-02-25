@@ -9,10 +9,9 @@ import org.helioviewer.gl3d.scenegraph.GL3DState;
 import org.helioviewer.gl3d.scenegraph.math.GL3DVec3d;
 import org.helioviewer.gl3d.scenegraph.rt.GL3DRay;
 import org.helioviewer.gl3d.scenegraph.rt.GL3DRayTracer;
-import org.helioviewer.gl3d.view.GL3DSceneGraphView;
 import org.helioviewer.gl3d.wcs.CoordinateVector;
-import org.helioviewer.gl3d.wcs.impl.SolarImageCoordinateSystem;
 import org.helioviewer.jhv.display.Displayer;
+import org.helioviewer.viewmodel.view.opengl.GL3DSceneGraphView;
 
 /**
  * The zoom box interaction allows the user to select a region of interest in
@@ -30,11 +29,8 @@ public class GL3DZoomBoxInteraction extends GL3DDefaultInteraction {
     private GL3DVec3d zoomBoxStartPoint;
     private GL3DVec3d zoomBoxEndPoint;
 
-    private final SolarImageCoordinateSystem solarDiskCS;
-
     public GL3DZoomBoxInteraction(GL3DSolarRotationTrackingTrackballCamera camera, GL3DSceneGraphView sceneGraph) {
         super(camera, sceneGraph);
-        this.solarDiskCS = new SolarImageCoordinateSystem();
     }
 
     @Override
@@ -102,9 +98,7 @@ public class GL3DZoomBoxInteraction extends GL3DDefaultInteraction {
     }
 
     private boolean isCompletelyOnSphere() {
-        CoordinateVector startCoord = solarDiskCS.createCoordinateVector(this.zoomBoxStartPoint.x, this.zoomBoxStartPoint.y);
-        CoordinateVector endCoord = solarDiskCS.createCoordinateVector(this.zoomBoxEndPoint.x, this.zoomBoxEndPoint.y);
-        return (solarDiskCS.isInsideDisc(startCoord) && solarDiskCS.isInsideDisc(endCoord));
+        return true;
     }
 
     private boolean isValidZoomBox() {

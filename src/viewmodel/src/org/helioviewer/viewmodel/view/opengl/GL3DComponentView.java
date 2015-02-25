@@ -1,4 +1,4 @@
-package org.helioviewer.gl3d.view;
+package org.helioviewer.viewmodel.view.opengl;
 
 import java.awt.Color;
 import java.awt.image.BufferedImage;
@@ -15,7 +15,6 @@ import javax.swing.JTextArea;
 
 import org.helioviewer.jhv.gui.states.StateController;
 import org.helioviewer.jhv.gui.states.ViewStateEnum;
-
 import org.helioviewer.base.logging.Log;
 import org.helioviewer.base.math.Vector2dInt;
 import org.helioviewer.gl3d.movie.MovieExport;
@@ -40,12 +39,8 @@ import org.helioviewer.viewmodel.view.TimedMovieView;
 import org.helioviewer.viewmodel.view.View;
 import org.helioviewer.viewmodel.view.jp2view.JHVJP2View;
 import org.helioviewer.viewmodel.view.jp2view.JHVJPXView;
-import org.helioviewer.viewmodel.view.opengl.GLSharedDrawable;
-import org.helioviewer.viewmodel.view.opengl.GLTextureHelper;
-import org.helioviewer.viewmodel.view.opengl.GLView;
 import org.helioviewer.viewmodel.view.opengl.shader.GLShaderBuilder;
 import org.helioviewer.viewmodel.viewport.Viewport;
-
 import org.helioviewer.viewmodel.region.Region;
 import org.helioviewer.viewmodel.view.RegionView;
 
