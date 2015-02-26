@@ -60,21 +60,28 @@ public class GL3DImageLayers extends GL3DGroup {
     private void drawImageLayers(GL3DState state) {
         GL3DNode node = this.getFirst();
 
+        ArrayList<GL3DImageLayer> layers = new ArrayList<GL3DImageLayer>();
+        while (node != null) {
+            if (!node.isDrawBitOn(Bit.Hidden) && node instanceof GL3DImageLayer) {
+                layers.add((GL3DImageLayer) node);
+            }
+            node = node.getNext();
+        }
+
         state.gl.glEnable(GL2.GL_BLEND);
         state.gl.glBlendFunc(GL2.GL_SRC_ALPHA, GL2.GL_ONE_MINUS_SRC_ALPHA);
 
         state.gl.glEnable(GL2.GL_FRAGMENT_PROGRAM_ARB);
         state.gl.glEnable(GL2.GL_VERTEX_PROGRAM_ARB);
         state.gl.glEnable(GL2.GL_DEPTH_TEST);
-        while (node != null) {
-            GL3DImageLayer layer = (GL3DImageLayer) node;
+
+        for (GL3DImageLayer layer : layers) {
             if (layer.getImageSphere() != null) {
                 layer.getImageSphere().draw(state);
                 state.gl.glDepthRange(1.f, 1.f);
                 layer.getImageCorona().draw(state);
                 state.gl.glDepthRange(0.f, 1.f);
             }
-            node = node.getNext();
         }
         state.gl.glDisable(GL2.GL_BLEND);
     }
