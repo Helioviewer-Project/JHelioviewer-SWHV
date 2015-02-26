@@ -45,7 +45,7 @@ public class JPIPDataInputStream {
      * 
      * @throws java.io.IOException
      */
-    private long readVBAS() throws IOException {
+    private final long readVBAS() throws IOException {
         int c;
         long value = 0;
 
@@ -83,7 +83,7 @@ public class JPIPDataInputStream {
      * @return Returns <code>true</code> if a new data segment was read, or
      *         <code>false</code> if the end of stream was reached.
      */
-    public JPIPDataSegment readSegment() throws IOException {
+    public final JPIPDataSegment readSegment() throws IOException {
         int m;
         long id;
         if ((id = readVBAS()) < 0)

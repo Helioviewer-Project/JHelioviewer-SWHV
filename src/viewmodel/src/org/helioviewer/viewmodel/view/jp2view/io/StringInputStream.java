@@ -48,7 +48,7 @@ public class StringInputStream extends InputStream {
      * 
      * @return <code>False</code>.
      */
-    public boolean markSupported() {
+    public final boolean markSupported() {
         return false;
     }
 
@@ -58,7 +58,7 @@ public class StringInputStream extends InputStream {
      * @return The next byte read, or -1 is there is no more data.
      * @throws java.io.IOException
      */
-    public int read() throws IOException {
+    public final int read() throws IOException {
         if (!back)
             lastByte = in.read();
         back = false;
@@ -76,7 +76,7 @@ public class StringInputStream extends InputStream {
      * @return The new line read or <code>null</code> if there is not more data.
      * @throws java.io.IOException
      */
-    public String readLine() throws IOException {
+    public final String readLine() throws IOException {
         int c;
         boolean ns = true;
         boolean end = false;
@@ -101,4 +101,5 @@ public class StringInputStream extends InputStream {
 
         return res.toString();
     }
+
 }

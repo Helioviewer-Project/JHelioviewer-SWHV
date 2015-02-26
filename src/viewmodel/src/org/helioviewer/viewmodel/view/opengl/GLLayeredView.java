@@ -109,11 +109,9 @@ public class GLLayeredView extends AbstractLayeredView implements GLFragmentShad
                 if (fragmentView != null) {
                     // create new shader builder
                     GLShaderBuilder newShaderBuilder = new GLShaderBuilder(shaderBuilder.getGL(), GL2.GL_FRAGMENT_PROGRAM_ARB);
-
                     // fill with standard values
                     GLMinimalFragmentShaderProgram minimalProgram = new GLMinimalFragmentShaderProgram();
                     minimalProgram.build(newShaderBuilder);
-
                     // fill with other filters and compile
                     fragmentView.buildFragmentShader(newShaderBuilder).compile();
                 }
@@ -141,11 +139,9 @@ public class GLLayeredView extends AbstractLayeredView implements GLFragmentShad
                 if (vertexView != null) {
                     // create new shader builder
                     GLShaderBuilder newShaderBuilder = new GLShaderBuilder(shaderBuilder.getGL(), GL2.GL_VERTEX_PROGRAM_ARB);
-
                     // fill with standard values
                     GLMinimalVertexShaderProgram minimalProgram = new GLMinimalVertexShaderProgram();
                     minimalProgram.build(newShaderBuilder);
-
                     // fill with other filters and compile
                     vertexView.buildVertexShader(newShaderBuilder).compile();
                 }

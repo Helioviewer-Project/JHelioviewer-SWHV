@@ -330,7 +330,7 @@ public class GL3DComponentView extends AbstractComponentView implements GLEventL
         }
 
         gl.glPushMatrix();
-        draw.displayBody(gl, (GLView) view, width, height);
+        draw.displayBody(gl, view, width, height);
         gl.glPopMatrix();
 
         if (!this.postRenderers.isEmpty()) {

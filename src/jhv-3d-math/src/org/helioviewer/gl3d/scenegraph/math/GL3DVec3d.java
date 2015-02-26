@@ -49,72 +49,72 @@ public class GL3DVec3d {
         this.z = coordinates[2];
     }
 
-    public void set(double x, double y, double z) {
+    public final void set(double x, double y, double z) {
         this.x = x;
         this.y = y;
         this.z = z;
     }
 
-    public void set(GL3DVec3d vector) {
+    public final void set(GL3DVec3d vector) {
         this.x = vector.x;
         this.y = vector.y;
         this.z = vector.z;
     }
 
-    public void setMax(GL3DVec3d vector) {
+    public final void setMax(GL3DVec3d vector) {
         this.x = this.x > vector.x ? this.x : vector.x;
         this.y = this.y > vector.y ? this.y : vector.y;
         this.z = this.z > vector.z ? this.z : vector.z;
     }
 
-    public void setMin(GL3DVec3d vector) {
+    public final void setMin(GL3DVec3d vector) {
         this.x = this.x < vector.x ? this.x : vector.x;
         this.y = this.y < vector.y ? this.y : vector.y;
         this.z = this.z < vector.z ? this.z : vector.z;
     }
 
-    public void add(GL3DVec3d vec) {
+    public final void add(GL3DVec3d vec) {
         this.x += vec.x;
         this.y += vec.y;
         this.z += vec.z;
     }
 
-    public void add(double s) {
+    public final void add(double s) {
         this.x += s;
         this.y += s;
         this.z += s;
     }
 
-    public static GL3DVec3d add(GL3DVec3d vec1, GL3DVec3d vec2) {
+    public final static GL3DVec3d add(GL3DVec3d vec1, GL3DVec3d vec2) {
         return new GL3DVec3d(vec1.x + vec2.x, vec1.y + vec2.y, vec1.z + vec2.z);
     }
 
-    public static GL3DVec3d add(GL3DVec3d vec1, double s) {
+    public final static GL3DVec3d add(GL3DVec3d vec1, double s) {
         return new GL3DVec3d(vec1.x + s, vec1.y + s, vec1.z + s);
     }
 
-    public GL3DVec3d subtract(GL3DVec3d vec) {
+    public final GL3DVec3d subtract(GL3DVec3d vec) {
         this.x -= vec.x;
         this.y -= vec.y;
         this.z -= vec.z;
         return this;
     }
 
-    public void subtract(double s) {
+    public final void subtract(double s) {
         this.x -= s;
         this.y -= s;
         this.z -= s;
     }
 
-    public static GL3DVec3d subtract(GL3DVec3d vec1, GL3DVec3d vec2) {
+    public final static GL3DVec3d subtract(GL3DVec3d vec1, GL3DVec3d vec2) {
         return new GL3DVec3d(vec1.x - vec2.x, vec1.y - vec2.y, vec1.z - vec2.z);
     }
 
-    public static GL3DVec3d subtract(GL3DVec3d vec1, double s) {
+    public final static GL3DVec3d subtract(GL3DVec3d vec1, double s) {
         return new GL3DVec3d(vec1.x - s, vec1.y - s, vec1.z - s);
     }
 
-    public void divide(GL3DVec3d vec) {
+    public final void divide(GL3DVec3d vec) {
         if (vec.x == 0.0 || vec.y == 0.0 || vec.z == 0.0)
             throw new IllegalArgumentException("Division by 0 not allowed!");
         this.x /= vec.x;
@@ -122,7 +122,7 @@ public class GL3DVec3d {
         this.z /= vec.z;
     }
 
-    public void divide(double s) {
+    public final void divide(double s) {
         if (s == 0.0)
             throw new IllegalArgumentException("Division by 0 not allowed!");
         this.x /= s;
@@ -130,71 +130,71 @@ public class GL3DVec3d {
         this.z /= s;
     }
 
-    public static GL3DVec3d divide(GL3DVec3d vec1, GL3DVec3d vec2) {
+    public final static GL3DVec3d divide(GL3DVec3d vec1, GL3DVec3d vec2) {
         if (vec2.x == 0.0 || vec2.y == 0.0 || vec2.z == 0.0)
             throw new IllegalArgumentException("Division by 0 not allowed!");
         return new GL3DVec3d(vec1.x / vec2.x, vec1.y / vec2.y, vec1.z / vec2.z);
     }
 
-    public static GL3DVec3d divide(GL3DVec3d vec1, double s) {
+    public final static GL3DVec3d divide(GL3DVec3d vec1, double s) {
         if (s == 0.0)
             throw new IllegalArgumentException("Division by 0 not allowed!");
         return new GL3DVec3d(vec1.x / s, vec1.y / s, vec1.z / s);
     }
 
-    public void multiply(GL3DVec3d vec) {
+    public final void multiply(GL3DVec3d vec) {
         this.x *= vec.x;
         this.y *= vec.y;
         this.z *= vec.z;
     }
 
-    public void multiply(double s) {
+    public final void multiply(double s) {
         this.x *= s;
         this.y *= s;
         this.z *= s;
     }
 
-    public static GL3DVec3d multiply(GL3DVec3d vec1, GL3DVec3d vec2) {
+    public final static GL3DVec3d multiply(GL3DVec3d vec1, GL3DVec3d vec2) {
         return new GL3DVec3d(vec1.x * vec2.x, vec1.y * vec2.y, vec1.z * vec2.z);
     }
 
-    public static GL3DVec3d multiply(GL3DVec3d vec1, double s) {
+    public final static GL3DVec3d multiply(GL3DVec3d vec1, double s) {
         return new GL3DVec3d(vec1.x * s, vec1.y * s, vec1.z * s);
     }
 
-    public double dot(GL3DVec3d vec) {
+    public final double dot(GL3DVec3d vec) {
         return GL3DVec3d.dot(this, vec);
     }
 
-    public static double dot(GL3DVec3d u, GL3DVec3d v) {
+    public final static double dot(GL3DVec3d u, GL3DVec3d v) {
         return (u.x * v.x) + (u.y * v.y) + (u.z * v.z);
     }
 
-    public GL3DVec3d cross(GL3DVec3d vec) {
+    public final GL3DVec3d cross(GL3DVec3d vec) {
         return GL3DVec3d.cross(this, vec);
     }
 
-    public static GL3DVec3d cross(GL3DVec3d u, GL3DVec3d v) {
+    public final static GL3DVec3d cross(GL3DVec3d u, GL3DVec3d v) {
         return new GL3DVec3d(u.y * v.z - u.z * v.y, u.z * v.x - u.x * v.z, u.x * v.y - u.y * v.x);
     }
 
-    public void negate() {
+    public final void negate() {
         this.x = -this.x;
         this.y = -this.y;
         this.z = -this.z;
     }
 
-    public static GL3DVec3d negate(GL3DVec3d vec) {
+    public final static GL3DVec3d negate(GL3DVec3d vec) {
         GL3DVec3d vecCopy = vec.copy();
         vecCopy.negate();
         return vecCopy;
     }
 
-    public boolean isApproxEqual(GL3DVec3d vec, double tolerance) {
+    public final boolean isApproxEqual(GL3DVec3d vec, double tolerance) {
         return Math.abs(this.x - vec.x) <= tolerance && Math.abs(this.y - vec.y) <= tolerance && Math.abs(this.z - vec.z) <= tolerance;
     }
 
-    public double length() {
+    public final double length() {
         double absmax = Math.max(Math.max(Math.abs(this.x), Math.abs(this.y)), Math.abs(this.z));
         if (absmax == 0.0)
             return 0.0;
@@ -205,12 +205,12 @@ public class GL3DVec3d {
         return absmax * Math.sqrt(tmpx * tmpx + tmpy * tmpy + tmpz * tmpz);
     }
 
-    public double length2() {
+    public final double length2() {
         double len = length();
         return len * len;
     }
 
-    public void normalize() {
+    public final void normalize() {
         double len = length();
         if (len == 0.0)
             return;
@@ -242,26 +242,26 @@ public class GL3DVec3d {
         this.z = Double.NaN;
     }
 
-    public double[] toArray() {
+    public final double[] toArray() {
         return new double[] { x, y, z };
     }
 
-    public GL3DVec2d toVec2() {
+    public final GL3DVec2d toVec2() {
         return new GL3DVec2d(x, y);
     }
 
     @Override
-    public boolean equals(Object o) {
+    public final boolean equals(Object o) {
         if (o instanceof GL3DVec3d)
             return isApproxEqual((GL3DVec3d) o, 0.0);
         return false;
     }
 
-    public GL3DVec3d copy() {
+    public final GL3DVec3d copy() {
         return new GL3DVec3d(this);
     }
 
-    public static double[] toArray(GL3DVec3d[] vecs) {
+    public final static double[] toArray(GL3DVec3d[] vecs) {
         double[] arr = new double[vecs.length * 3];
         for (int i = 0; i < vecs.length; i++) {
             GL3DVec3d v = vecs[i];
@@ -273,7 +273,7 @@ public class GL3DVec3d {
     }
 
     @Override
-    public String toString() {
+    public final String toString() {
         return "(" + x + ", " + y + ", " + z + ")";
     }
 }

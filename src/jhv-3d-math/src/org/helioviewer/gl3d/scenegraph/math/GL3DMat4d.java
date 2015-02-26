@@ -4,7 +4,7 @@ public class GL3DMat4d {
     /**
      * 0 4 8 12 1 5 9 13 2 6 10 14 3 7 11 15
      */
-    public double[] m = new double[16];
+    public final double[] m = new double[16];
 
     public GL3DMat4d(double M0, double M4, double M8, double M12, double M1, double M5, double M9, double M13, double M2, double M6, double M10, double M14, double M3, double M7, double M11, double M15) {
         m[0] = M0;
@@ -32,15 +32,15 @@ public class GL3DMat4d {
         set(mat);
     }
 
-    public void setIdentity() {
+    public final void setIdentity() {
         this.set(GL3DMat4d.identity());
     }
 
-    public static GL3DMat4d identity() {
+    public final static GL3DMat4d identity() {
         return new GL3DMat4d(1f, 0f, 0f, 0f, 0f, 1f, 0f, 0f, 0f, 0f, 1f, 0f, 0f, 0f, 0f, 1f);
     }
 
-    public GL3DMat4d set(GL3DMat4d A) {
+    public final GL3DMat4d set(GL3DMat4d A) {
         m[0] = A.m[0];
         m[4] = A.m[4];
         m[8] = A.m[8];
@@ -61,7 +61,7 @@ public class GL3DMat4d {
         return this;
     }
 
-    public GL3DMat4d set(double M0, double M4, double M8, double M12, double M1, double M5, double M9, double M13, double M2, double M6, double M10, double M14, double M3, double M7, double M11, double M15) {
+    public final GL3DMat4d set(double M0, double M4, double M8, double M12, double M1, double M5, double M9, double M13, double M2, double M6, double M10, double M14, double M3, double M7, double M11, double M15) {
         m[0] = M0;
         m[4] = M4;
         m[8] = M8;
@@ -82,7 +82,7 @@ public class GL3DMat4d {
         return this;
     }
 
-    public GL3DMat4d set(int index, double f) {
+    public final GL3DMat4d set(int index, double f) {
         if (index < 0 || index > 15)
             throw new IndexOutOfBoundsException("Mat4 has 16 fields");
 
@@ -90,14 +90,14 @@ public class GL3DMat4d {
         return this;
     }
 
-    public double get(int index) {
+    public final double get(int index) {
         if (index < 0 || index > 15)
             throw new IndexOutOfBoundsException("Mat4 has 16 fields");
 
         return m[index];
     }
 
-    public GL3DMat4d multiply(GL3DMat4d A) {
+    public final GL3DMat4d multiply(GL3DMat4d A) {
         set(m[0] * A.m[0] + m[4] * A.m[1] + m[8] * A.m[2] + m[12] * A.m[3], // row
                                                                             // 1
                 m[0] * A.m[4] + m[4] * A.m[5] + m[8] * A.m[6] + m[12] * A.m[7], m[0] * A.m[8] + m[4] * A.m[9] + m[8] * A.m[10] + m[12] * A.m[11], m[0] * A.m[12] + m[4] * A.m[13] + m[8] * A.m[14] + m[12] * A.m[15],
@@ -116,27 +116,26 @@ public class GL3DMat4d {
         return this;
     }
 
-    public GL3DVec3d multiply(GL3DVec3d v) {
+    public final GL3DVec3d multiply(GL3DVec3d v) {
         double W = m[3] * v.x + m[7] * v.y + m[11] * v.z + m[15];
         return new GL3DVec3d((m[0] * v.x + m[4] * v.y + m[8] * v.z + m[12]) / W, (m[1] * v.x + m[5] * v.y + m[9] * v.z + m[13]) / W, (m[2] * v.x + m[6] * v.y + m[10] * v.z + m[14]) / W);
     }
 
-    public GL3DVec4d multiply(GL3DVec4d v) {
-        GL3DVec4d newV = new GL3DVec4d(m[0] * v.x + m[4] * v.y + m[8] * v.z + m[12] * v.w, m[1] * v.x + m[5] * v.y + m[9] * v.z + m[13] * v.w, m[2] * v.x + m[6] * v.y + m[10] * v.z + m[14] * v.w, m[3] * v.x + m[7] * v.y + m[11] * v.z + m[15] * v.w);
-        return newV;
+    public final GL3DVec4d multiply(GL3DVec4d v) {
+        return new GL3DVec4d(m[0] * v.x + m[4] * v.y + m[8] * v.z + m[12] * v.w, m[1] * v.x + m[5] * v.y + m[9] * v.z + m[13] * v.w, m[2] * v.x + m[6] * v.y + m[10] * v.z + m[14] * v.w, m[3] * v.x + m[7] * v.y + m[11] * v.z + m[15] * v.w);
     }
 
-    public GL3DVec3d translation() {
+    public final GL3DVec3d translation() {
         return new GL3DVec3d(m[12], m[13], m[14]);
     }
 
-    public void setTranslation(double x, double y, double z) {
+    public final void setTranslation(double x, double y, double z) {
         m[12] = x;
         m[13] = y;
         m[14] = z;
     }
 
-    public GL3DMat4d inverse() {
+    public final GL3DMat4d inverse() {
         GL3DMat4d inverse = new GL3DMat4d();
         // Cache the matrix values (makes for huge speed increases!)
         double a00 = this.m[0], a01 = this.m[1], a02 = this.m[2], a03 = this.m[3];
@@ -181,7 +180,7 @@ public class GL3DMat4d {
     }
 
     //
-    // public GL3DMat4d inverse() {
+    // public final GL3DMat4d inverse() {
     // GL3DMat4d I = new GL3DMat4d();
     //
     // // Code from Mesa-2.2\src\glu\project.c
@@ -244,35 +243,35 @@ public class GL3DMat4d {
     // return I;
     // }
 
-    public GL3DMat4d translate(GL3DVec3d t) {
+    public final GL3DMat4d translate(GL3DVec3d t) {
         return this.multiply(GL3DMat4d.translation(t));
     }
 
-    public GL3DMat4d translate(double x, double y, double z) {
+    public final GL3DMat4d translate(double x, double y, double z) {
         return this.multiply(GL3DMat4d.translation(new GL3DVec3d(x, y, z)));
     }
 
-    public GL3DMat4d rotate(double angle, GL3DVec3d axis) {
+    public final GL3DMat4d rotate(double angle, GL3DVec3d axis) {
         return this.rotate(angle, axis.x, axis.y, axis.z);
     }
 
-    public GL3DMat4d rotate(double angle, double axisx, double axisy, double axisz) {
+    public final GL3DMat4d rotate(double angle, double axisx, double axisy, double axisz) {
         return this.multiply(GL3DMat4d.rotation(angle, axisx, axisy, axisz));
     }
 
-    public GL3DMat4d scale(GL3DVec3d s) {
+    public final GL3DMat4d scale(GL3DVec3d s) {
         return this.scale(s.x, s.y, s.z);
     }
 
-    public GL3DMat4d scale(double sx, double sy, double sz) {
+    public final GL3DMat4d scale(double sx, double sy, double sz) {
         return this.multiply(GL3DMat4d.scaling(sx, sy, sz));
     }
 
-    public GL3DMat4d invert() {
+    public final GL3DMat4d invert() {
         return this.set(this.inverse());
     }
 
-    public GL3DMat4d transpose() {
+    public final GL3DMat4d transpose() {
         double temp;
         temp = m[1];
         m[1] = m[4];
@@ -295,14 +294,14 @@ public class GL3DMat4d {
         return this;
     }
 
-    public GL3DMat4d swap(int i1, int i2) {
+    public final GL3DMat4d swap(int i1, int i2) {
         double temp = get(i1);
         set(i1, get(i2));
         set(i2, temp);
         return this;
     }
 
-    public void readLookAt(GL3DVec3d eye, GL3DVec3d at, GL3DVec3d up, GL3DVec3d right) {
+    public final void readLookAt(GL3DVec3d eye, GL3DVec3d at, GL3DVec3d up, GL3DVec3d right) {
         GL3DMat4d invRot = new GL3DMat4d(this);
         invRot.setTranslation(0, 0, 0); // remove the translation
         invRot.transpose(); // transpose it to get inverse rot.
@@ -314,15 +313,15 @@ public class GL3DMat4d {
         at.set(-m[2], -m[6], -m[10]); // normalized look at vector
     }
 
-    public void posAtUp(GL3DVec3d pos) {
+    public final void posAtUp(GL3DVec3d pos) {
         this.posAtUp(pos, new GL3DVec3d(), new GL3DVec3d());
     }
 
-    public void posAtUp(GL3DVec3d pos, GL3DVec3d dirAt, GL3DVec3d dirUp) {
+    public final void posAtUp(GL3DVec3d pos, GL3DVec3d dirAt, GL3DVec3d dirUp) {
         lightAt(pos, dirAt, dirUp);
     }
 
-    public void lightAt(GL3DVec3d pos, GL3DVec3d dirAt, GL3DVec3d dirUp) {
+    public final void lightAt(GL3DVec3d pos, GL3DVec3d dirAt, GL3DVec3d dirUp) {
         GL3DVec3d VX = new GL3DVec3d();
         GL3DVec3d VY = new GL3DVec3d();
         GL3DVec3d VZ;
@@ -346,7 +345,7 @@ public class GL3DMat4d {
         set(VX.x, VY.x, VZ.x, pos.x, VX.y, VY.y, VZ.y, pos.y, VX.z, VY.z, VZ.z, pos.z, 0f, 0f, 0f, 1f);
     }
 
-    public static GL3DMat4d translation(GL3DVec3d t) {
+    public final static GL3DMat4d translation(GL3DVec3d t) {
         GL3DMat4d tr = GL3DMat4d.identity();
         tr.set(12, t.x);
         tr.set(13, t.y);
@@ -354,7 +353,7 @@ public class GL3DMat4d {
         return tr;
     }
 
-    public static GL3DMat4d scaling(double sx, double sy, double sz) {
+    public final static GL3DMat4d scaling(double sx, double sy, double sz) {
         GL3DMat4d s = GL3DMat4d.identity();
         s.set(0, sx);
         s.set(5, sy);
@@ -362,15 +361,15 @@ public class GL3DMat4d {
         return s;
     }
 
-    private static GL3DMat4d rotation(GL3DQuatd q) {
+    private final static GL3DMat4d rotation(GL3DQuatd q) {
         return GL3DMat4d.rotation(q.getAngle(), q.getRotationAxis());
     }
 
-    public static GL3DMat4d rotation(double angle, GL3DVec3d axis) {
+    public final static GL3DMat4d rotation(double angle, GL3DVec3d axis) {
         return GL3DMat4d.rotation(angle, axis.x, axis.y, axis.z);
     }
 
-    public static GL3DMat4d rotation(double angle, double axisx, double axisy, double axisz) {
+    public final static GL3DMat4d rotation(double angle, double axisx, double axisy, double axisz) {
         // Quaterniond quat = new Quaterniond(degAng, axisx, axisy, axisz);
         // return buildRotationMatrix(quat);
         GL3DMat4d r = GL3DMat4d.identity();
@@ -442,11 +441,11 @@ public class GL3DMat4d {
         return r;
     }
 
-    public static GL3DMat4d frustum(double l, double r, double b, double t, double n, double f) {
+    public final static GL3DMat4d frustum(double l, double r, double b, double t, double n, double f) {
         return new GL3DMat4d((2 * n) / (r - l), 0f, (r + l) / (r - l), 0f, 0f, (2 * n) / (t - b), (t + b) / (t - b), 0f, 0f, 0f, -(f + n) / (f - n), (-2 * f * n) / (f - n), 0f, 0f, -1f, 0f);
     }
 
-    public static GL3DMat4d perspective(double fov, double aspect, double n, double f) {
+    public final static GL3DMat4d perspective(double fov, double aspect, double n, double f) {
         double t = Math.tan(Math.toRadians(fov * 0.5)) * n;
         double b = -t;
         double r = t * aspect;
@@ -454,24 +453,23 @@ public class GL3DMat4d {
         return frustum(l, r, b, t, n, f);
     }
 
-    public static GL3DMat4d viewport(double x, double y, double ww, double wh, double n, double f) {
+    public final static GL3DMat4d viewport(double x, double y, double ww, double wh, double n, double f) {
         double ww2 = ww * 0.5f;
         double wh2 = wh * 0.5f;
         // negate the first wh because windows has topdown window coords
         return new GL3DMat4d(ww2, 0f, 0f, ww2 + x, 0f, -wh2, 0f, wh2 + y, 0f, 0f, (f - n) * 0.5f, (f + n) * 0.5f, 0f, 0f, 0f, 1f);
     }
 
-    public GL3DMat3d mat3() {
-        GL3DMat3d mat3 = new GL3DMat3d(m[0], m[4], m[8], m[1], m[5], m[9], m[2], m[6], m[10]);
-        return mat3;
+    public final GL3DMat3d mat3() {
+        return new GL3DMat3d(m[0], m[4], m[8], m[1], m[5], m[9], m[2], m[6], m[10]);
     }
 
-    public GL3DMat4d copy() {
+    public final GL3DMat4d copy() {
         return new GL3DMat4d(this);
     }
 
     @Override
-    public String toString() {
+    public final String toString() {
         StringBuffer sb = new StringBuffer();
         String format = "%01.02f";
         sb.append(String.format(format, m[0]) + ", ");
