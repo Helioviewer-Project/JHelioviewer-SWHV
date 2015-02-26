@@ -68,7 +68,7 @@ public abstract class AbstractBasicView extends AbstractView implements Modifiab
      * {@inheritDoc}
      */
     @SuppressWarnings("unchecked")
-    public <T extends View> T getAdapter(Class<T> c) {
+    public final <T extends View> T getAdapter(Class<T> c) {
         if (c.isInstance(this))
             return (T) this;
         else if (view != null)

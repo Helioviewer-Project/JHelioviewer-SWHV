@@ -45,7 +45,7 @@ public class ChunkedInputStream extends InputStream {
     /**
      * Returns the total length of the read data.
      */
-    public int getTotalLength() {
+    public final int getTotalLength() {
         return totalLength;
     }
 
@@ -54,7 +54,7 @@ public class ChunkedInputStream extends InputStream {
      * 
      * @return <code>False</code>
      */
-    public boolean markSupported() {
+    public final boolean markSupported() {
         return false;
     }
 
@@ -66,7 +66,7 @@ public class ChunkedInputStream extends InputStream {
      * @throws java.io.IOException
      * 
      */
-    private String readLine() throws IOException {
+    private final String readLine() throws IOException {
         String res = in.readLine();
         if (res != null)
             return res;
@@ -82,7 +82,7 @@ public class ChunkedInputStream extends InputStream {
      * @return The next byte read, or -1 is there is no more data.
      * @throws java.io.IOException
      */
-    public int read() throws IOException {
+    public final int read() throws IOException {
         if (!moreChunks)
             return -1;
 
@@ -117,4 +117,5 @@ public class ChunkedInputStream extends InputStream {
             return read();
         }
     }
-};
+
+}
