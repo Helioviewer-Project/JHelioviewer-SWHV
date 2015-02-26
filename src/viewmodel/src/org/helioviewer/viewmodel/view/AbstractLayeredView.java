@@ -65,11 +65,12 @@ public abstract class AbstractLayeredView extends AbstractView implements Layere
      *
      */
     protected class Layer {
-        private final View view;
+        public final View view;
 
         public RegionView regionView;
         public ViewportView viewportView;
         public MetaDataView metaDataView;
+        public SubimageDataView subimageDataView;
 
         public Vector2dInt renderOffset;
         public boolean visibility = true;
@@ -95,6 +96,7 @@ public abstract class AbstractLayeredView extends AbstractView implements Layere
                 regionView = view.getAdapter(RegionView.class);
                 viewportView = view.getAdapter(ViewportView.class);
                 metaDataView = view.getAdapter(MetaDataView.class);
+                subimageDataView = view.getAdapter(SubimageDataView.class);
             }
         }
     }
@@ -103,9 +105,11 @@ public abstract class AbstractLayeredView extends AbstractView implements Layere
      * {@inheritDoc}
      */
     @Override
-    public boolean isVisible(View _view) {
-        if (viewLookup.get(_view) != null)
-            return viewLookup.get(_view).visibility;
+    public boolean isVisible(View view) {
+        Layer layer = viewLookup.get(view);
+
+        if (layer != null)
+            return layer.visibility;
         else
             return false;
     }

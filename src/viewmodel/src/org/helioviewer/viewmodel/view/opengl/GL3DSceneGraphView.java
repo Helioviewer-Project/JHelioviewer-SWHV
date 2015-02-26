@@ -197,7 +197,7 @@ public class GL3DSceneGraphView extends AbstractGL3DView implements GL3DView {
                 View layer = layeredView.getLayer(i);
                 if (layer != null)
                     this.addNewLayer(layer.getAdapter(GL3DImageTextureView.class));
-                Log.debug("GL3DSceneGraphView: Adding Layer to Scene form LayeredView " + layer);
+                Log.debug("GL3DSceneGraphView: Adding Layer to Scene from LayeredView " + layer);
             }
         }
     }

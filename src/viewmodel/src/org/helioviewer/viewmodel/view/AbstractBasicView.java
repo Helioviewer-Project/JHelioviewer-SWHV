@@ -39,9 +39,7 @@ public abstract class AbstractBasicView extends AbstractView implements Modifiab
         view = newView;
 
         ChangeEvent changeEvent = new ChangeEvent(new ViewChainChangedReason(this));
-
         setViewSpecificImplementation(newView, changeEvent);
-
         notifyViewListeners(changeEvent);
 
         if (view != null) {

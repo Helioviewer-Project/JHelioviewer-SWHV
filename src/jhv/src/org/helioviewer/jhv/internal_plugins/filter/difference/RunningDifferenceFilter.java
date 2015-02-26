@@ -214,7 +214,7 @@ public class RunningDifferenceFilter implements FrameFilter, StandardFilter, Obs
                 shader.setTruncationValue(gl, this.truncationValue);
 
                 gl.glActiveTexture(GL2.GL_TEXTURE2);
-                GLTextureHelper.moveImageDataToGLTexture(gl, previousFrame, 0, 0, previousFrame.getWidth(), previousFrame.getHeight(), tex.get(gl));
+                GLTextureHelper.moveImageDataToGLTexture(gl, previousFrame, 0, 0, previousFrame.getWidth(), previousFrame.getHeight(), tex);
                 gl.glActiveTexture(GL2.GL_TEXTURE0);
             }
         } else {

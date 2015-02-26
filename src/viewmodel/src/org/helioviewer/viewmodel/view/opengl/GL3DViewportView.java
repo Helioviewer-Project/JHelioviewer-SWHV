@@ -21,13 +21,11 @@ public class GL3DViewportView extends AbstractGL3DView implements GL3DView {
     private ViewportView viewportView;
 
     public void render3D(GL3DState state) {
-
         GL2 gl = state.gl;
+
         if (viewportView != null) {
             gl.glViewport(0, 0, viewportView.getViewport().getWidth(), viewportView.getViewport().getHeight());
-            // Log.debug("GL3DViewportView.viewport (width="+viewportView.getViewport().getWidth()+", height="+viewportView.getViewport().getHeight()+")");
         }
-
         if (this.getView() != null) {
             this.renderChild(gl);
         }
