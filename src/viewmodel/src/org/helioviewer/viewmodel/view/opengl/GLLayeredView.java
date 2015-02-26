@@ -38,23 +38,24 @@ public class GLLayeredView extends AbstractLayeredView implements GLFragmentShad
      */
     @Override
     public void renderGL(GL2 gl, boolean nextView) {
-        // layerLock.lock();
+        layerLock.lock();
         {
             gl.glPushMatrix();
             for (View v : layers) {
-                if (!isVisible(v)) {
+                Layer layer = viewLookup.get(v);
+                if (!layer.visibility) {
                     continue;
                 }
                 // if layer is GLView, go on, otherwise render now
                 if (v instanceof GLView) {
                     ((GLView) v).renderGL(gl, true);
                 } else {
-                    GLTextureHelper.renderImageDataToScreen(gl, v.getAdapter(SubimageDataView.class).getSubimageData(), v.getAdapter(JHVJP2View.class));
+                    GLTextureHelper.renderImageDataToScreen(gl, layer.subimageDataView.getSubimageData(), v.getAdapter(JHVJP2View.class).tex);
                 }
             }
             gl.glPopMatrix();
         }
-        // layerLock.unlock();
+        layerLock.unlock();
     }
 
     /**

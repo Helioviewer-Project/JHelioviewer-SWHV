@@ -47,7 +47,7 @@ public abstract class AbstractGLView extends AbstractBasicView implements GLView
         if (view instanceof GLView) {
             ((GLView) view).renderGL(gl, true);
         } else {
-            GLTextureHelper.renderImageDataToScreen(gl, view.getAdapter(SubimageDataView.class).getSubimageData(), view.getAdapter(JHVJP2View.class));
+            GLTextureHelper.renderImageDataToScreen(gl, view.getAdapter(SubimageDataView.class).getSubimageData(), view.getAdapter(JHVJP2View.class).tex);
         }
     }
 

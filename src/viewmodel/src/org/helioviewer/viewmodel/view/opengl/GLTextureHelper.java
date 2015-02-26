@@ -29,7 +29,6 @@ import org.helioviewer.viewmodel.imagetransport.Byte8ImageTransport;
 import org.helioviewer.viewmodel.imagetransport.Int32ImageTransport;
 import org.helioviewer.viewmodel.imagetransport.Short16ImageTransport;
 import org.helioviewer.viewmodel.region.Region;
-import org.helioviewer.viewmodel.view.jp2view.JHVJP2View;
 
 /**
  * Helper class to handle OpenGL textures.
@@ -135,15 +134,15 @@ public class GLTextureHelper {
      * @param source
      *            Image data to draw to the screen
      */
-    public static void renderImageDataToScreen(GL2 gl, ImageData source, JHVJP2View jpxView) {
-        if (source == null || jpxView == null)
+    public static void renderImageDataToScreen(GL2 gl, ImageData source, GLTexture tex) {
+        if (source == null)
             return;
 
         int width = source.getWidth();
         int height = source.getHeight();
 
         if (width <= maxTextureSize && height <= maxTextureSize) {
-            moveImageDataToGLTexture(gl, source, 0, 0, width, height, jpxView.tex.get(gl));
+            moveImageDataToGLTexture(gl, source, 0, 0, width, height, tex);
             renderTextureToScreen(gl, source.getRegion());
         } else {
             Log.error(">> GLTextureHelper.renderImageDataToScreen(GL) > Image data too big: [" + width + "," + height + "]");
@@ -171,8 +170,7 @@ public class GLTextureHelper {
      * @param target
      *            Valid texture id
      */
-    public static void moveImageDataToGLTexture(GL2 gl, ImageData source, int x, int y, int width, int height, int target) {
-
+    public static void moveImageDataToGLTexture(GL2 gl, ImageData source, int x, int y, int width, int height, GLTexture tex) {
         if (source == null)
             return;
 
@@ -199,7 +197,7 @@ public class GLTextureHelper {
         gl.glPixelStorei(GL2.GL_UNPACK_ALIGNMENT, bitsPerPixel >> 3);
 
         ImageFormat imageFormat = source.getImageFormat();
-        genTexture2D(gl, target, mapImageFormatToInternalGLFormat(imageFormat), width, height, mapImageFormatToInputGLFormat(imageFormat), mapBitsPerPixelToGLType(bitsPerPixel), buffer);
+        genTexture2D(gl, tex.get(gl), mapImageFormatToInternalGLFormat(imageFormat), width, height, mapImageFormatToInputGLFormat(imageFormat), mapBitsPerPixelToGLType(bitsPerPixel), buffer);
     }
 
     /**
@@ -217,8 +215,7 @@ public class GLTextureHelper {
      *            Valid texture id
      * @see #moveImageDataToGLTexture(GL2, ImageData, int)
      */
-    public static void moveBufferedImageToGLTexture(GL2 gl, BufferedImage source, int target) {
-
+    public static void moveBufferedImageToGLTexture(GL2 gl, BufferedImage source, GLTexture tex) {
         if (source == null)
             return;
 
@@ -247,7 +244,7 @@ public class GLTextureHelper {
         gl.glPixelStorei(GL2.GL_UNPACK_ROW_LENGTH, 0);
         gl.glPixelStorei(GL2.GL_UNPACK_ALIGNMENT, mapDataBufferTypeToGLAlign(rawBuffer.getDataType()));
 
-        genTexture2D(gl, target, mapTypeToInternalGLFormat(source.getType()), source.getWidth(), source.getHeight(), mapTypeToInputGLFormat(source.getType()), mapDataBufferTypeToGLType(rawBuffer.getDataType()), buffer);
+        genTexture2D(gl, tex.get(gl), mapTypeToInternalGLFormat(source.getType()), source.getWidth(), source.getHeight(), mapTypeToInputGLFormat(source.getType()), mapDataBufferTypeToGLType(rawBuffer.getDataType()), buffer);
     }
 
     /**

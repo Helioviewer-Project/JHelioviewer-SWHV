@@ -70,7 +70,7 @@ public class GLCommonRenderGraphics {
             }
 
             tex = new GLTextureHelper.GLTexture();
-            GLTextureHelper.moveBufferedImageToGLTexture(gl, image, tex.get(gl));
+            GLTextureHelper.moveBufferedImageToGLTexture(gl, image, tex);
             mapImageToTexture.put(image, tex);
         }
 
@@ -111,7 +111,7 @@ public class GLCommonRenderGraphics {
             graphics.drawString(string, 0, metrics.getAscent());
 
             tex = new GLTextureHelper.GLTexture();
-            GLTextureHelper.moveBufferedImageToGLTexture(gl, image, tex.get(gl));
+            GLTextureHelper.moveBufferedImageToGLTexture(gl, image, tex);
             mapStringToTexture.put(stringFontPair, tex);
         }
 

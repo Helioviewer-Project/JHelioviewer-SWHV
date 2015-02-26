@@ -4,7 +4,7 @@ import javax.media.opengl.GL2;
 
 import org.helioviewer.viewmodel.view.StandardSolarRotationTrackingView;
 import org.helioviewer.viewmodel.view.SubimageDataView;
-import org.helioviewer.viewmodel.view.jp2view.JHVJPXView;
+import org.helioviewer.viewmodel.view.jp2view.JHVJP2View;
 
 /**
  * Extension of StandardSolarRotationTrackingView to enable tracking in OpenGL
@@ -21,7 +21,7 @@ public class GLSolarRotationTrackingView extends StandardSolarRotationTrackingVi
         if (view instanceof GLView) {
             ((GLView) view).renderGL(gl, true);
         } else {
-            GLTextureHelper.renderImageDataToScreen(gl, view.getAdapter(SubimageDataView.class).getSubimageData(), view.getAdapter(JHVJPXView.class));
+            GLTextureHelper.renderImageDataToScreen(gl, view.getAdapter(SubimageDataView.class).getSubimageData(), view.getAdapter(JHVJP2View.class).tex);
         }
     }
 }
