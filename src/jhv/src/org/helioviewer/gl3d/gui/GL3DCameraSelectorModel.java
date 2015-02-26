@@ -7,7 +7,6 @@ import javax.swing.AbstractListModel;
 import javax.swing.ComboBoxModel;
 import javax.swing.ListModel;
 
-import org.helioviewer.base.logging.Log;
 import org.helioviewer.gl3d.camera.GL3DCamera;
 import org.helioviewer.gl3d.camera.GL3DEarthCamera;
 import org.helioviewer.gl3d.camera.GL3DFollowObjectCamera;
@@ -91,10 +90,8 @@ public class GL3DCameraSelectorModel extends AbstractListModel implements ComboB
             }
             if (lastCamera != null) {
                 setCurrentCamera(lastCamera);
-            } else if (getCameraView() != null) {
-                setCurrentCamera(defaultCamera);
             } else {
-                Log.warn("Cannot set Current Camera, no GL3DCameraView yet!");
+                setCurrentCamera(defaultCamera);
             }
         }
 
@@ -110,7 +107,10 @@ public class GL3DCameraSelectorModel extends AbstractListModel implements ComboB
     }
 
     public GL3DCamera getCurrentCamera() {
-        return getCameraView().getCurrentCamera();
+        GL3DCameraView cameraView = getCameraView();
+        if (cameraView != null)
+            return cameraView.getCurrentCamera();
+        return null;
     }
 
     @Override
@@ -125,15 +125,19 @@ public class GL3DCameraSelectorModel extends AbstractListModel implements ComboB
 
     @Override
     public GL3DCamera getSelectedItem() {
-        if (getCameraView() != null) {
-            return getCameraView().getCurrentCamera();
+        GL3DCameraView cameraView = getCameraView();
+        if (cameraView != null) {
+            return cameraView.getCurrentCamera();
         }
         return null;
     }
 
     public void setCurrentCamera(GL3DCamera camera) {
-        lastCamera = camera;
-        getCameraView().setCurrentCamera(camera);
+        GL3DCameraView cameraView = getCameraView();
+        if (cameraView != null) {
+            lastCamera = camera;
+            cameraView.setCurrentCamera(camera);
+        }
     }
 
     @Override
@@ -145,18 +149,16 @@ public class GL3DCameraSelectorModel extends AbstractListModel implements ComboB
         }
     }
 
-    private ComponentView getMainView() {
+    private GL3DCameraView getCameraView() {
         ImageViewerGui imageViewer = ImageViewerGui.getSingletonInstance();
         if (imageViewer == null)
             return null;
-        return imageViewer.getMainView();
-    }
 
-    private GL3DCameraView getCameraView() {
-        ComponentView mainView = getMainView();
+        ComponentView mainView = imageViewer.getMainView();
         if (mainView != null) {
             return mainView.getAdapter(GL3DCameraView.class);
         }
+
         return null;
     }
 
