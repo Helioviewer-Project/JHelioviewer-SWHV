@@ -10,7 +10,7 @@ import org.helioviewer.viewmodel.view.opengl.GL3DImageTextureView;
 import org.helioviewer.viewmodel.view.opengl.GL3DLayeredView;
 import org.helioviewer.viewmodel.view.opengl.GL3DSceneGraphView;
 import org.helioviewer.viewmodel.view.opengl.GL3DView;
-import org.helioviewer.viewmodel.view.opengl.GL3DViewportView;
+//import org.helioviewer.viewmodel.view.opengl.GL3DViewportView;
 import org.helioviewer.viewmodel.view.opengl.GLOverlayView;
 
 /**
@@ -34,8 +34,8 @@ public class GL3DViewFactory extends GLViewFactory {
             return (T) new GL3DSceneGraphView();
         } else if (pattern.isAssignableFrom(GL3DCameraView.class)) {
             return (T) new GL3DCameraView();
-        } else if (pattern.isAssignableFrom(GL3DViewportView.class)) {
-            return (T) new GL3DViewportView();
+        /* } else if (pattern.isAssignableFrom(GL3DViewportView.class)) {
+            return (T) new GL3DViewportView(); */
         } else if (pattern.isAssignableFrom(GL3DImageTextureView.class)) {
             return (T) new GL3DImageTextureView();
         } else if (pattern.isAssignableFrom(ComponentView.class)) {
@@ -63,8 +63,8 @@ public class GL3DViewFactory extends GLViewFactory {
                 return (T) new GL3DSceneGraphView();
             } else if (source instanceof GL3DCameraView) {
                 return (T) new GL3DCameraView();
-            } else if (source instanceof GL3DViewportView) {
-                return (T) new GL3DViewportView();
+            /* } else if (source instanceof GL3DViewportView) {
+                return (T) new GL3DViewportView(); */
             } else if (source instanceof GL3DImageTextureView) {
                 return (T) new GL3DImageTextureView();
             } else {
