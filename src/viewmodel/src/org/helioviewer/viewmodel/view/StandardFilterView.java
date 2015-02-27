@@ -34,6 +34,7 @@ public class StandardFilterView extends AbstractBasicView implements FilterView,
     protected Filter filter;
 
     protected ImageData filteredData;
+    protected RegionView regionView;
     protected SubimageDataView subimageDataView;
 
     /**
@@ -179,6 +180,7 @@ public class StandardFilterView extends AbstractBasicView implements FilterView,
      * when doing this every frame.
      */
     protected void updatePrecomputedViews() {
+        regionView = ViewHelper.getViewAdapter(view, RegionView.class);
         subimageDataView = ViewHelper.getViewAdapter(view, SubimageDataView.class);
     }
 

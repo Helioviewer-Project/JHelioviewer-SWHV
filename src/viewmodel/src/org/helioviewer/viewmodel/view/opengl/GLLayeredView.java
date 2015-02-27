@@ -49,7 +49,9 @@ public class GLLayeredView extends AbstractLayeredView implements GLFragmentShad
                 if (v instanceof GLView) {
                     ((GLView) v).renderGL(gl, true);
                 } else {
-                    GLTextureHelper.renderImageDataToScreen(gl, layer.subimageDataView.getSubimageData(), v.getAdapter(JHVJP2View.class).tex);
+                    GLTextureHelper.renderImageDataToScreen(gl, layer.regionView.getRegion(),
+                                                                layer.subimageDataView.getSubimageData(),
+                                                                v.getAdapter(JHVJP2View.class).tex);
                 }
             }
         }
