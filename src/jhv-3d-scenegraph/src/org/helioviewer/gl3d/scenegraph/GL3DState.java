@@ -45,10 +45,6 @@ public class GL3DState {
         return instance;
     }
 
-    public static void destroy() {
-        instance = null;
-    }
-
     public static GL3DState get() {
         return instance;
     }

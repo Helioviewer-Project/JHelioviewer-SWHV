@@ -187,8 +187,6 @@ public class GL3DComponentView extends AbstractComponentView implements GLEventL
 
         @Override
         public final void init(GL2 gl) {
-            GL3DState.create(gl);
-
             gl.glHint(GL2.GL_LINE_SMOOTH_HINT, GL2.GL_NICEST);
             gl.glShadeModel(GL2.GL_SMOOTH);
 
@@ -199,12 +197,10 @@ public class GL3DComponentView extends AbstractComponentView implements GLEventL
             gl.glEnable(GL2.GL_POINT_SMOOTH);
             gl.glEnable(GL2.GL_COLOR_MATERIAL);
 
-            gl.glEnable(GL2.GL_LIGHTING);
             gl.glEnable(GL2.GL_NORMALIZE);
             // gl.glEnable(GL2.GL_CULL_FACE);
             gl.glCullFace(GL2.GL_BACK);
             gl.glFrontFace(GL2.GL_CCW);
-            gl.glEnable(GL2.GL_DEPTH_TEST);
             // gl.glDepthFunc(GL2.GL_LESS);
             gl.glDepthFunc(GL2.GL_LEQUAL);
 
@@ -230,8 +226,6 @@ public class GL3DComponentView extends AbstractComponentView implements GLEventL
 
         @Override
         public final void init(GL2 gl) {
-            // GL3DState.destroy(); -- can't be done
-
             gl.glDisable(GL2.GL_DEPTH_TEST);
             gl.glShadeModel(GL2.GL_FLAT);
             gl.glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
@@ -272,7 +266,9 @@ public class GL3DComponentView extends AbstractComponentView implements GLEventL
     public void init(GLAutoDrawable drawable) {
         GL2 gl = drawable.getGL().getGL2();
 
+        GL3DState.create(gl);
         GLTextureHelper.initHelper(gl);
+
         draw.init(gl);
     }
 

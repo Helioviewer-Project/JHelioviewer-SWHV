@@ -44,6 +44,8 @@ public class GLTextureHelper {
 
     private final static int[] formatMap = { GL2.GL_LUMINANCE4, GL2.GL_LUMINANCE4, GL2.GL_LUMINANCE4, GL2.GL_LUMINANCE4, GL2.GL_LUMINANCE8, GL2.GL_LUMINANCE8, GL2.GL_LUMINANCE8, GL2.GL_LUMINANCE8, GL2.GL_LUMINANCE12, GL2.GL_LUMINANCE12, GL2.GL_LUMINANCE12, GL2.GL_LUMINANCE12, GL2.GL_LUMINANCE16, GL2.GL_LUMINANCE16, GL2.GL_LUMINANCE16, GL2.GL_LUMINANCE16 };
 
+    private static boolean is3D = true;
+
     /**
      * Initializes the helper.
      *
@@ -61,7 +63,12 @@ public class GLTextureHelper {
         gl.glGetIntegerv(GL2.GL_MAX_TEXTURE_SIZE, tmp, 0);
         maxTextureSize = tmp[0];
         Log.debug(">> GLTextureHelper.initHelper(GL) > max texture size: " + maxTextureSize);
+
+        if (StateController.getInstance().getCurrentState().getType() == ViewStateEnum.View2D) {
+            is3D = false;
+        }
     }
+
 
     private static void genTexture2D(GL2 gl, int texID, int internalFormat, int width, int height, int inputFormat, int inputType, Buffer buffer) {
         gl.glBindTexture(GL2.GL_TEXTURE_2D, texID);
@@ -90,8 +97,9 @@ public class GLTextureHelper {
      *            Position and size to draw the texture
      */
     private static void renderTextureToScreen(GL2 gl, Region region) {
-        if (StateController.getInstance().getCurrentState().getType() == ViewStateEnum.View3D)
+        if (is3D) {
             return;
+        }
 
         Vector2dDouble lowerleftCorner = region.getLowerLeftCorner();
         Vector2dDouble size = region.getSize();
