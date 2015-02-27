@@ -12,6 +12,9 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 
+import org.helioviewer.jhv.gui.states.StateController;
+import org.helioviewer.jhv.gui.states.ViewStateEnum;
+
 import org.helioviewer.base.math.Vector2dInt;
 import org.helioviewer.gl3d.scenegraph.GL3DState;
 import org.helioviewer.gl3d.scenegraph.math.GL3DVec3d;
@@ -69,8 +72,6 @@ public class SWHVHEKImagePanelEventPopupController implements KeyEventDispatcher
     private Cursor lastCursor;
     private SWEKEventInformationDialog hekPopUp;
 
-    private boolean state3D = false;
-
     // ///////////////////////////////////////////////////////////////////////////
     // Methods
     // ///////////////////////////////////////////////////////////////////////////
@@ -92,7 +93,6 @@ public class SWHVHEKImagePanelEventPopupController implements KeyEventDispatcher
     @Override
     public void setView(View newView) {
         view = newView;
-
         viewportView = view.getAdapter(ViewportView.class);
         regionView = view.getAdapter(RegionView.class);
     }
@@ -129,7 +129,6 @@ public class SWHVHEKImagePanelEventPopupController implements KeyEventDispatcher
             return null;
         }
         ViewportImageSize viewportImageSize = ViewHelper.calculateViewportImageSize(viewportView.getViewport(), regionView.getRegion());
-
         Vector2dInt offset = ViewHelper.convertImageToScreenDisplacement(-regionView.getRegion().getUpperLeftCorner().getX(), regionView.getRegion().getUpperLeftCorner().getY(), regionView.getRegion(), viewportImageSize);
 
         return ViewHelper.convertImageToScreenDisplacement(x, y, regionView.getRegion(), viewportImageSize).add(offset);
@@ -144,11 +143,9 @@ public class SWHVHEKImagePanelEventPopupController implements KeyEventDispatcher
             yCoord = p.y + imagePanel.getLocationOnScreen().y - hekPopUp.getSize().height - yOffset;
             if (yCoord < imagePanel.getLocationOnScreen().y) {
                 yCoord = imagePanel.getLocationOnScreen().y + imagePanel.getSize().height - hekPopUp.getSize().height;
-
                 if (yCoord < imagePanel.getLocationOnScreen().y) {
                     yCoord = imagePanel.getLocationOnScreen().y;
                 }
-
                 yCoordInMiddle = true;
             }
         }
@@ -164,7 +161,6 @@ public class SWHVHEKImagePanelEventPopupController implements KeyEventDispatcher
         }
 
         return new Point(xCoord, yCoord);
-
     }
 
     @Override
@@ -209,12 +205,10 @@ public class SWHVHEKImagePanelEventPopupController implements KeyEventDispatcher
          */
         //Uncomment to enable point and click
         if (mouseOverJHVEvent != null) {
-
             // should never be the case
             // if (hekPopUp == null) {
             hekPopUp = new SWEKEventInformationDialog(mouseOverJHVEvent);
             // }
-
             // hekPopUp.setVisible(false);
 
             Point windowPosition = calcWindowPosition(mouseOverPosition);
@@ -222,9 +216,7 @@ public class SWHVHEKImagePanelEventPopupController implements KeyEventDispatcher
             hekPopUp.setVisible(true);
             hekPopUp.pack();
             imagePanel.setCursor(helpCursor);
-
         }
-
     }
 
     /**
@@ -267,32 +259,27 @@ public class SWHVHEKImagePanelEventPopupController implements KeyEventDispatcher
      */
     @Override
     public void mouseMoved(MouseEvent e) {
-
         JHVEvent lastJHVEvent = mouseOverJHVEvent;
-
         Date currentDate = LayersModel.getSingletonInstance().getLastUpdatedTimestamp();
 
-        state3D = false;
         GL3DVec3d hitpoint = null;
         mouseOverJHVEvent = null;
         mouseOverPosition = null;
-        if (view instanceof GL3DComponentView && GL3DState.get() != null && GL3DState.get().getActiveCamera() != null) {
+
+        boolean state3D = false;
+        if (StateController.getInstance().getCurrentState().getType() == ViewStateEnum.View3D) {
             state3D = true;
 
             GL3DComponentView gl3dview = (GL3DComponentView) view;
             GL3DSceneGraphView scenegraphview = (GL3DSceneGraphView) gl3dview.getView();
+
             GL3DRayTracer rayTracer = new GL3DRayTracer(scenegraphview.getHitReferenceShape(), GL3DState.get().getActiveCamera());
-            GL3DRay ray = null;
-
-            ray = rayTracer.cast(e.getX() * Displayer.screenScale, e.getY() * Displayer.screenScale);
-
-            if (ray != null) {
-                if (ray.getHitPoint() != null) {
-
-                    hitpoint = ray.getHitPoint();
-                }
+            GL3DRay ray = rayTracer.cast(e.getX() * Displayer.screenScale, e.getY() * Displayer.screenScale);
+            if (ray != null && ray.getHitPoint() != null) {
+                hitpoint = ray.getHitPoint();
             }
         }
+
         if (currentDate != null) {
             ArrayList<JHVEvent> toDraw = SWHVHEKData.getSingletonInstance().getActiveEvents(currentDate);
 
@@ -334,6 +321,7 @@ public class SWHVHEKImagePanelEventPopupController implements KeyEventDispatcher
 
                 }
             }
+
             if (mouseOverJHVEvent != null) {
                 mouseOverJHVEvent.highlight(true, this);
             }
@@ -356,28 +344,21 @@ public class SWHVHEKImagePanelEventPopupController implements KeyEventDispatcher
     public GL3DVec3d getHitPoint(MouseEvent e) {
         GL3DVec3d hitpoint = null;
 
-        if (view instanceof GL3DComponentView && GL3DState.get() != null && GL3DState.get().getActiveCamera() != null) {
-            state3D = true;
-
+        if (StateController.getInstance().getCurrentState().getType() == ViewStateEnum.View3D) {
             GL3DComponentView gl3dview = (GL3DComponentView) view;
             GL3DSceneGraphView scenegraphview = (GL3DSceneGraphView) gl3dview.getView();
             scenegraphview.getHitReferenceShape().setHitCoronaPlane(true);
             scenegraphview.getHitReferenceShape().setUseEarthPlane(true);
+
             GL3DRayTracer rayTracer = new GL3DRayTracer(scenegraphview.getHitReferenceShape(), GL3DState.get().getActiveCamera());
-
-            GL3DRay ray = null;
-
-            ray = rayTracer.cast(e.getX(), e.getY());
-
-            if (ray != null) {
-                if (ray.getHitPoint() != null) {
-
-                    hitpoint = ray.getHitPoint();
-                }
+            GL3DRay ray = rayTracer.cast(e.getX(), e.getY());
+            if (ray != null && ray.getHitPoint() != null) {
+                hitpoint = ray.getHitPoint();
             }
             scenegraphview.getHitReferenceShape().setHitCoronaPlane(false);
-
         }
+
         return hitpoint;
     }
+
 }

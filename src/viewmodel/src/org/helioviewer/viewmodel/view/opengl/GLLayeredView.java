@@ -40,7 +40,6 @@ public class GLLayeredView extends AbstractLayeredView implements GLFragmentShad
     public void renderGL(GL2 gl, boolean nextView) {
         layerLock.lock();
         {
-            gl.glPushMatrix();
             for (View v : layers) {
                 Layer layer = viewLookup.get(v);
                 if (!layer.visibility) {
@@ -53,7 +52,6 @@ public class GLLayeredView extends AbstractLayeredView implements GLFragmentShad
                     GLTextureHelper.renderImageDataToScreen(gl, layer.subimageDataView.getSubimageData(), v.getAdapter(JHVJP2View.class).tex);
                 }
             }
-            gl.glPopMatrix();
         }
         layerLock.unlock();
     }
