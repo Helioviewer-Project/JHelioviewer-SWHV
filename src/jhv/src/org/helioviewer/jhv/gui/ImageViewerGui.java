@@ -482,7 +482,6 @@ public class ImageViewerGui {
             oldState.deactivate();
             oldState.removeStateSpecificComponents(getLeftContentPane());
             contentPanel.remove(oldState.getTopToolBar());
-            mainImagePanel.removeAll();// (this.getMainView().getComponent());
         }
 
         newState.recreateViewChains(oldState);

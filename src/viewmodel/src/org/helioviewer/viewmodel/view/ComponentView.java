@@ -6,7 +6,6 @@ import java.io.File;
 import java.io.IOException;
 import java.util.AbstractList;
 
-import org.helioviewer.base.math.Vector2dInt;
 import org.helioviewer.viewmodel.renderer.screen.ScreenRenderer;
 
 /**
@@ -48,17 +47,14 @@ public interface ComponentView extends ModifiableInnerViewView, ViewListener {
     public void activate();
 
     /**
-     * Returns the component where the image will be displayed.
+     * Sets the component where the image will be displayed.
      *
      * To see the result of the view chain, this component has to be build in
      * the graphical user interface somewhere. Apart from that, it is
      * recommended to connect some listeners to the component, if input feedback
      * is required.
      *
-     * @return Component which contains the final image
      */
-    public Component getComponent();
-
     public void setComponent(Component component);
 
     /**
@@ -84,17 +80,6 @@ public interface ComponentView extends ModifiableInnerViewView, ViewListener {
      *            new background color
      */
     public void setBackgroundColor(Color background);
-
-    /**
-     * Sets the displacement of the upper left corner of the image relative to
-     * the component.
-     *
-     * For example, this function can be used to manually center the image.
-     *
-     * @param offset
-     *            new offset
-     */
-    public void setOffset(Vector2dInt offset);
 
     /**
      * Adds a post renderer, which can draw simple geometric forms on a drawn

@@ -52,6 +52,14 @@ public class BufferedImageComponentView extends AbstractComponentView {
     // Methods
     // //////////////////////////////////////////////////////////////////
 
+    public void updateMainImagePanelSize(Vector2dInt size) {
+        javaImagePanel.updateMainImagePanelSize(size);
+    }
+
+    public void setOffset(Vector2dInt offset) {
+        javaImagePanel.setOffset(offset);
+    }
+
     /**
      * {@inheritDoc}
      */
@@ -60,10 +68,6 @@ public class BufferedImageComponentView extends AbstractComponentView {
         javaImagePanel = (JavaImagePanel) component;
     }
 
-    @Override
-    public Component getComponent() {
-        return javaImagePanel;
-    }
     /**
      * {@inheritDoc}
      */
@@ -88,13 +92,6 @@ public class BufferedImageComponentView extends AbstractComponentView {
         javaImagePanel.setBackgroundColor(background);
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void setOffset(Vector2dInt offset) {
-        javaImagePanel.setOffset(offset);
-    }
 
     /**
      * {@inheritDoc}
@@ -170,7 +167,7 @@ public class BufferedImageComponentView extends AbstractComponentView {
 
     @Override
     public void deactivate() {
-    };
+    }
 
     @Override
     public void activate() {

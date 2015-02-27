@@ -17,7 +17,6 @@ import org.helioviewer.viewmodel.renderer.screen.ScreenRenderer;
  * Panel which displays the via software created image.
  */
 public class JavaImagePanel extends JPanel {
-    protected Vector2dInt mainImagePanelSize;
 
     // //////////////////////////////////////////////////////////////
     // Definitions
@@ -27,7 +26,10 @@ public class JavaImagePanel extends JPanel {
 
     private BufferedImage image;
     private Color backgroundColor = Color.BLACK;
+
     private Vector2dInt offset = new Vector2dInt();
+    private Vector2dInt mainImagePanelSize = new Vector2dInt();
+
     private final LinkedList<ScreenRenderer> postRenderers = new LinkedList<ScreenRenderer>();
 
     // //////////////////////////////////////////////////////////////

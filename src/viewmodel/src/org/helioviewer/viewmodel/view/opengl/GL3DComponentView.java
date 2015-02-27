@@ -17,7 +17,6 @@ import javax.swing.JTextArea;
 import org.helioviewer.jhv.gui.states.StateController;
 import org.helioviewer.jhv.gui.states.ViewStateEnum;
 import org.helioviewer.base.logging.Log;
-import org.helioviewer.base.math.Vector2dInt;
 import org.helioviewer.gl3d.movie.MovieExport;
 import org.helioviewer.gl3d.scenegraph.GL3DState;
 import org.helioviewer.jhv.display.DisplayListener;
@@ -435,15 +434,6 @@ public class GL3DComponentView extends AbstractComponentView implements GLEventL
     @Override
     public void setComponent(Component component) {
         canvas = (GLCanvas) component;
-    }
-
-    @Override
-    public Component getComponent() {
-        return canvas;
-    }
-
-    @Override
-    public void setOffset(Vector2dInt offset) {
     }
 
     @Override
