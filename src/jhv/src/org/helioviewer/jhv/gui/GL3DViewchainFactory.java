@@ -14,7 +14,7 @@ import org.helioviewer.viewmodel.view.ViewListener;
 import org.helioviewer.viewmodel.view.opengl.GL3DCameraView;
 import org.helioviewer.viewmodel.view.opengl.GL3DLayeredView;
 import org.helioviewer.viewmodel.view.opengl.GL3DSceneGraphView;
-import org.helioviewer.viewmodel.view.opengl.GL3DViewportView;
+//import org.helioviewer.viewmodel.view.opengl.GL3DViewportView;
 import org.helioviewer.viewmodel.view.opengl.GLLayeredView;
 import org.helioviewer.viewmodel.view.opengl.GLOverlayView;
 
@@ -44,12 +44,12 @@ public class GL3DViewchainFactory extends ViewchainFactory {
         GL3DCameraView cameraView = viewFactory.createNewView(GL3DCameraView.class);
         cameraView.setView(overlayView);
 
-        GL3DViewportView viewportView = viewFactory.createNewView(GL3DViewportView.class);
-        viewportView.setView(cameraView);
+        //GL3DViewportView viewportView = viewFactory.createNewView(GL3DViewportView.class);
+        //viewportView.setView(cameraView);
 
         GL3DSceneGraphView sceneGraph = new GL3DSceneGraphView();
         currentSceneGraph = sceneGraph;
-        sceneGraph.setView(viewportView);
+        sceneGraph.setView(/*viewportView*/ cameraView);
         sceneGraph.setGLOverlayView((GLOverlayView) overlayView);
 
         ComponentView componentView = viewFactory.createNewView(ComponentView.class);
@@ -121,11 +121,11 @@ public class GL3DViewchainFactory extends ViewchainFactory {
             GL3DCameraView cameraView = viewFactory.createNewView(GL3DCameraView.class);
             cameraView.setView(overlayView);
 
-            GL3DViewportView viewportView = viewFactory.createNewView(GL3DViewportView.class);
-            viewportView.setView(cameraView);
+            //GL3DViewportView viewportView = viewFactory.createNewView(GL3DViewportView.class);
+            //viewportView.setView(cameraView);
 
             GL3DSceneGraphView sceneGraph = new GL3DSceneGraphView();
-            sceneGraph.setView(viewportView);
+            sceneGraph.setView(/*viewportView*/ cameraView);
             sceneGraph.setGLOverlayView(overlayView);
 
             ((ComponentView) targetView).setView(sceneGraph);
