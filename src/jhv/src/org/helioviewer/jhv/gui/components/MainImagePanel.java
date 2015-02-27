@@ -25,7 +25,6 @@ import org.helioviewer.viewmodel.view.LayeredView;
 import org.helioviewer.viewmodel.view.View;
 import org.helioviewer.viewmodel.view.ViewHelper;
 import org.helioviewer.viewmodel.view.bufferedimage.BufferedImageComponentView;
-import org.helioviewer.viewmodel.view.bufferedimage.JavaImagePanel;
 import org.helioviewer.viewmodel.view.opengl.GLSharedDrawable;
 import org.helioviewer.viewmodel.view.opengl.GLTextureHelper;
 
@@ -133,7 +132,7 @@ public class MainImagePanel extends BasicImagePanel {
                     renderedImageComponent.addMouseMotionListener(l);
 
             if (getView() instanceof BufferedImageComponentView) {
-                ((JavaImagePanel) getView().getComponent()).updateMainImagePanelSize(new Vector2dInt(getWidth(), getHeight()));
+                ((BufferedImageComponentView) getView()).updateMainImagePanelSize(new Vector2dInt(getWidth(), getHeight()));
             }
 
             LayeredView layeredView = ViewHelper.getViewAdapter(newView, LayeredView.class);
@@ -222,7 +221,7 @@ public class MainImagePanel extends BasicImagePanel {
         loadingPostRenderer.setContainerSize(getWidth(), getHeight());
         synchronized (this) {
             if (getView() instanceof BufferedImageComponentView) {
-                ((JavaImagePanel) getView().getComponent()).updateMainImagePanelSize(new Vector2dInt(getWidth(), getHeight()));
+                ((BufferedImageComponentView) getView()).updateMainImagePanelSize(new Vector2dInt(getWidth(), getHeight()));
             }
         }
         repaint();

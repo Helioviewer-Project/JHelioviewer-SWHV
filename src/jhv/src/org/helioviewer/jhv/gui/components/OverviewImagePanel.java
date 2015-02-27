@@ -121,7 +121,7 @@ public class OverviewImagePanel extends BasicImagePanel {
                     // compute offset, so image will be displayed centered
                     offset = computeOffset(viewportImageSize);
 
-                    componentView.setOffset(offset);
+                    ((JavaImagePanel) renderedImageComponent).setOffset(offset);
 
                     inputControllerPanning.setImageArea(new Rectangle(offset.getX(), offset.getY(), viewportImageSize.getWidth(), viewportImageSize.getHeight()));
 
