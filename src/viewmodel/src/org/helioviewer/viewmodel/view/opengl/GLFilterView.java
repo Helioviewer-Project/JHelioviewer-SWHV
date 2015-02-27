@@ -95,7 +95,9 @@ public class GLFilterView extends StandardFilterView implements GLFragmentShader
                 ((GLView) view).renderGL(gl, true);
             } else {
                 if (subimageDataView != null) {
-                    GLTextureHelper.renderImageDataToScreen(gl, subimageDataView.getSubimageData(), ((JHVJP2View) jpxView).tex);
+                    GLTextureHelper.renderImageDataToScreen(gl, regionView.getRegion(),
+                                                                subimageDataView.getSubimageData(),
+                                                                ((JHVJP2View) jpxView).tex);
                 }
             }
 
