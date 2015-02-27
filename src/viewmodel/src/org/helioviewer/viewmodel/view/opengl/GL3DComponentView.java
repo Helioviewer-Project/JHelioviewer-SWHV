@@ -80,18 +80,26 @@ public class GL3DComponentView extends AbstractComponentView implements GLEventL
     private File outputFile;
 
     public GL3DComponentView() {
+        canvas = GLSharedDrawable.getSingletonInstance().getCanvas();
+    }
+
+    @Override
+    public void activate() {
+        if ((view instanceof GLView) == false)
+            throw new NullPointerException("View is not an instance of GLView");
+
+        rebuildShaders = true;
         if (StateController.getInstance().getCurrentState().getType() == ViewStateEnum.View3D)
             draw = new Draw3DInterface();
         else
             draw = new Draw2DInterface();
 
-        canvas = GLSharedDrawable.getSingletonInstance().getCanvas();
         canvas.addGLEventListener(this);
         Displayer.getSingletonInstance().addListener(this);
     }
 
     @Override
-    public void dispose(GLAutoDrawable drawable) {
+    public void deactivate() {
         if (screenshot != null) {
             screenshot.flush();
             screenshot = null;
@@ -99,9 +107,12 @@ public class GL3DComponentView extends AbstractComponentView implements GLEventL
         tileRenderer = null;
 
         Displayer.getSingletonInstance().removeListener(this);
-        drawable.removeGLEventListener(this);
+        canvas.removeGLEventListener(this);
     }
 
+    @Override
+    public void dispose(GLAutoDrawable drawable) {
+    }
 
     @Override
     public void startExport(ExportMovieDialog exportMovieDialog) {
@@ -180,9 +191,9 @@ public class GL3DComponentView extends AbstractComponentView implements GLEventL
 
         @Override
         public final void init(GL2 gl) {
-            // gl.glEnable(GL2.GL_LINE_SMOOTH);
+            GL3DState.create(gl);
+
             gl.glHint(GL2.GL_LINE_SMOOTH_HINT, GL2.GL_NICEST);
-            // gl.glShadeModel(GL2.GL_FLAT);
             gl.glShadeModel(GL2.GL_SMOOTH);
 
             gl.glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
@@ -223,6 +234,9 @@ public class GL3DComponentView extends AbstractComponentView implements GLEventL
 
         @Override
         public final void init(GL2 gl) {
+            // GL3DState.destroy(); -- can't be done
+
+            gl.glDisable(GL2.GL_DEPTH_TEST);
             gl.glShadeModel(GL2.GL_FLAT);
             gl.glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
             gl.glEnable(GL2.GL_TEXTURE_1D);
@@ -260,15 +274,9 @@ public class GL3DComponentView extends AbstractComponentView implements GLEventL
 
     @Override
     public void init(GLAutoDrawable drawable) {
-        if ((view instanceof GLView) == false)
-            throw new NullPointerException("View is not an instance of GLView");
-
         GL2 gl = drawable.getGL().getGL2();
 
         GLTextureHelper.initHelper(gl);
-        GL3DState.create(gl);
-        rebuildShaders = true;
-
         draw.init(gl);
     }
 
@@ -438,14 +446,6 @@ public class GL3DComponentView extends AbstractComponentView implements GLEventL
 
     @Override
     protected void setViewSpecificImplementation(View newView, ChangeEvent changeEvent) {
-    }
-
-    @Override
-    public void activate() {
-    }
-
-    @Override
-    public void deactivate() {
     }
 
 }
