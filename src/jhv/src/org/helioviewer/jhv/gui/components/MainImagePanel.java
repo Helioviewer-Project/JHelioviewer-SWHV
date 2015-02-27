@@ -219,7 +219,7 @@ public class MainImagePanel extends BasicImagePanel {
     public void componentResized(ComponentEvent e) {
         noImagePostRenderer.setContainerSize(getWidth(), getHeight());
         loadingPostRenderer.setContainerSize(getWidth(), getHeight());
-        synchronized (this) {
+        /* synchronized (this) */ {
             if (getView() instanceof BufferedImageComponentView) {
                 ((BufferedImageComponentView) getView()).updateMainImagePanelSize(new Vector2dInt(getWidth(), getHeight()));
             }
