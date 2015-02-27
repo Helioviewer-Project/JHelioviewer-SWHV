@@ -48,19 +48,19 @@ public class OverviewImagePanelMousePanController extends AbstractImagePanelMous
     private static final Cursor openHandCursor = Toolkit.getDefaultToolkit().createCustomCursor(IconBank.getIcon(JHVIcon.OPEN_HAND).getImage(), new Point(9, 9), IconBank.getIcon(JHVIcon.OPEN_HAND).toString());
 
     // position and size of ROI rectangle
-    private volatile Rectangle roiArea = new Rectangle();
+    private Rectangle roiArea = new Rectangle();
     // position and size of available image data in overview image area
-    private volatile Rectangle imageArea = new Rectangle();
+    private Rectangle imageArea = new Rectangle();
 
     // flag if mouse cursor is inside ROI area
-    private volatile boolean insideROI = false;
+    private boolean insideROI = false;
     // flag if rectangle for ROI was dragged
-    private volatile boolean insideROIDragged = false;
+    private boolean insideROIDragged = false;
     // point where the mouse was last
-    private volatile Point lastMouseLocation = new Point(0, 0);
+    private Point lastMouseLocation = new Point(0, 0);
 
     // Zoom controller
-    private volatile ZoomController zoomController = new ZoomController();
+    private ZoomController zoomController = new ZoomController();
     private View observedView;
 
     private boolean interactionEnabled = false;

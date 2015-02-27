@@ -31,7 +31,7 @@ import org.helioviewer.viewmodel.viewportimagesize.ViewportImageSize;
  */
 public class ZoomController {
 
-    private volatile BasicImagePanel panel = null;
+    private BasicImagePanel panel = null;
 
     public static final double zoomFactorStep = Math.pow(2, 1.0 / (4.0));
 
