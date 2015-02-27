@@ -1,6 +1,7 @@
 package org.helioviewer.viewmodel.view.opengl;
 
 import java.awt.Color;
+import java.awt.Component;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
@@ -60,7 +61,7 @@ public class GL3DComponentView extends AbstractComponentView implements GLEventL
     private static DrawInterface draw;
 
     // general
-    private final GLCanvas canvas;
+    private GLCanvas canvas;
     private final AWTGLPixelBuffer.SingleAWTGLPixelBufferProvider pixelBufferProvider = new AWTGLPixelBuffer.SingleAWTGLPixelBufferProvider(true);
 
     private Color backgroundColor = Color.BLACK;
@@ -78,10 +79,6 @@ public class GL3DComponentView extends AbstractComponentView implements GLEventL
     private boolean exportMode = false;
     private boolean screenshotMode = false;
     private File outputFile;
-
-    public GL3DComponentView() {
-        canvas = GLSharedDrawable.getSingletonInstance().getCanvas();
-    }
 
     @Override
     public void activate() {
@@ -436,7 +433,12 @@ public class GL3DComponentView extends AbstractComponentView implements GLEventL
     }
 
     @Override
-    public GLCanvas getComponent() {
+    public void setComponent(Component component) {
+        canvas = (GLCanvas) component;
+    }
+
+    @Override
+    public Component getComponent() {
         return canvas;
     }
 

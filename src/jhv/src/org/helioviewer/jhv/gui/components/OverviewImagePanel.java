@@ -19,6 +19,7 @@ import org.helioviewer.viewmodel.renderer.screen.ScreenRenderer;
 import org.helioviewer.viewmodel.view.LayeredView;
 import org.helioviewer.viewmodel.view.View;
 import org.helioviewer.viewmodel.view.ViewHelper;
+import org.helioviewer.viewmodel.view.bufferedimage.JavaImagePanel;
 import org.helioviewer.viewmodel.viewport.StaticViewport;
 import org.helioviewer.viewmodel.viewport.Viewport;
 import org.helioviewer.viewmodel.viewportimagesize.ViewportImageSize;
@@ -59,6 +60,9 @@ public class OverviewImagePanel extends BasicImagePanel {
 
         // call constructor of super class
         super();
+
+        renderedImageComponent = new JavaImagePanel();
+        add(renderedImageComponent);
 
         // add post renderer
         addPostRenderer(postRenderer);
@@ -159,9 +163,6 @@ public class OverviewImagePanel extends BasicImagePanel {
                 inputControllerPanning.setImageArea(rect);
             }
         }
-
-        // repaint the image
-        // getView().getComponent().repaint();
     }
 
     /**
