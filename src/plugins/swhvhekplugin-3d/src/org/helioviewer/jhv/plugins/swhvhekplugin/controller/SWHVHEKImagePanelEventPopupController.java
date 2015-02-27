@@ -284,13 +284,13 @@ public class SWHVHEKImagePanelEventPopupController implements KeyEventDispatcher
             ArrayList<JHVEvent> toDraw = SWHVHEKData.getSingletonInstance().getActiveEvents(currentDate);
 
             for (JHVEvent evt : toDraw) {
-                if (state3D) {
-                    HashMap<JHVCoordinateSystem, JHVPositionInformation> pi = evt.getPositioningInformation();
+                HashMap<JHVCoordinateSystem, JHVPositionInformation> pi = evt.getPositioningInformation();
 
-                    if (pi.containsKey(JHVCoordinateSystem.JHV)) {
-                        JHVPositionInformation el = pi.get(JHVCoordinateSystem.JHV);
-                        if (el.centralPoint() != null) {
-                            JHVPoint pt = el.centralPoint();
+                if (pi.containsKey(JHVCoordinateSystem.JHV)) {
+                    JHVPoint pt = pi.get(JHVCoordinateSystem.JHV).centralPoint();
+
+                    if (pt != null) {
+                        if (state3D) {
                             if (hitpoint != null) {
                                 double deltaX = Math.abs(hitpoint.x - pt.getCoordinate1());
                                 double deltaY = Math.abs(hitpoint.y + pt.getCoordinate2());
@@ -300,15 +300,8 @@ public class SWHVHEKImagePanelEventPopupController implements KeyEventDispatcher
                                     mouseOverPosition = new Point(e.getX(), e.getY());
                                 }
                             }
-                        }
-                    }
-                } else {
-                    HashMap<JHVCoordinateSystem, JHVPositionInformation> pi = evt.getPositioningInformation();
-
-                    if (pi.containsKey(JHVCoordinateSystem.JHV2D)) {
-                        JHVPositionInformation el = pi.get(JHVCoordinateSystem.JHV2D);
-                        if (el.centralPoint() != null) {
-                            Vector2dInt screenPos = convertPhysicalToScreen(el.centralPoint().getCoordinate1(), el.centralPoint().getCoordinate2());
+                        } else {
+                            Vector2dInt screenPos = convertPhysicalToScreen(pt.getCoordinate1(), pt.getCoordinate2());
                             double x = e.getX() * Displayer.screenScale;
                             double y = e.getY() * Displayer.screenScale;
 
@@ -318,7 +311,6 @@ public class SWHVHEKImagePanelEventPopupController implements KeyEventDispatcher
                             }
                         }
                     }
-
                 }
             }
 
