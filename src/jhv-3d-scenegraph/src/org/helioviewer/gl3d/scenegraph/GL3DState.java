@@ -45,6 +45,10 @@ public class GL3DState {
         return instance;
     }
 
+    public static void destroy() {
+        instance = null;
+    }
+
     public static GL3DState get() {
         return instance;
     }
@@ -192,4 +196,5 @@ public class GL3DState {
     public void setCurrentObservationDate(Date currentObservationDate) {
         this.currentObservationDate = currentObservationDate;
     }
+
 }
