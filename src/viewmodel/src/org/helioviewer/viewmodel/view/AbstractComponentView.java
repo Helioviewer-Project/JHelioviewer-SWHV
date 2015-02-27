@@ -3,20 +3,12 @@ package org.helioviewer.viewmodel.view;
 import java.util.AbstractList;
 import java.util.LinkedList;
 
-import org.helioviewer.base.math.Vector2dInt;
 import org.helioviewer.jhv.gui.dialogs.ExportMovieDialog;
 import org.helioviewer.viewmodel.renderer.screen.ScreenRenderer;
 
 public abstract class AbstractComponentView extends AbstractBasicView implements ComponentView {
 
-    protected volatile Vector2dInt mainImagePanelSize;
-
     protected AbstractList<ScreenRenderer> postRenderers = new LinkedList<ScreenRenderer>();
-
-    @Override
-    public void updateMainImagePanelSize(Vector2dInt size) {
-        mainImagePanelSize = size;
-    }
 
     /**
      * {@inheritDoc}

@@ -24,6 +24,9 @@ import org.helioviewer.viewmodel.view.ComponentView;
 import org.helioviewer.viewmodel.view.LayeredView;
 import org.helioviewer.viewmodel.view.View;
 import org.helioviewer.viewmodel.view.ViewHelper;
+import org.helioviewer.viewmodel.view.bufferedimage.BufferedImageComponentView;
+import org.helioviewer.viewmodel.view.bufferedimage.JavaImagePanel;
+import org.helioviewer.viewmodel.view.opengl.GLSharedDrawable;
 import org.helioviewer.viewmodel.view.opengl.GLTextureHelper;
 
 /**
@@ -63,6 +66,10 @@ public class MainImagePanel extends BasicImagePanel {
     public MainImagePanel() {
         // call constructor of super class
         super();
+
+        // the one GLCanvas
+        renderedImageComponent = GLSharedDrawable.getSingletonInstance().getCanvas();
+        add(renderedImageComponent);
 
         // add post render that no image is loaded
         noImagePostRenderer.setContainerSize(getWidth(), getHeight());
@@ -114,7 +121,6 @@ public class MainImagePanel extends BasicImagePanel {
 
     @Override
     public synchronized void setView(ComponentView newView) {
-
         if (renderedImageComponent != null)
             for (MouseMotionListener l : mouseMotionListeners)
                 renderedImageComponent.removeMouseMotionListener(l);
@@ -122,11 +128,14 @@ public class MainImagePanel extends BasicImagePanel {
         super.setView(newView);
 
         if (newView != null) {
-
             if (renderedImageComponent != null)
                 for (MouseMotionListener l : mouseMotionListeners)
                     renderedImageComponent.addMouseMotionListener(l);
-            getView().updateMainImagePanelSize(new Vector2dInt(getWidth(), getHeight()));
+
+            if (getView() instanceof BufferedImageComponentView) {
+                ((JavaImagePanel) getView().getComponent()).updateMainImagePanelSize(new Vector2dInt(getWidth(), getHeight()));
+            }
+
             LayeredView layeredView = ViewHelper.getViewAdapter(newView, LayeredView.class);
             if (layeredView != null) {
                 if (layeredView.getNumLayers() > 0 || loadingTasks > 0) {
@@ -209,12 +218,11 @@ public class MainImagePanel extends BasicImagePanel {
 
     @Override
     public void componentResized(ComponentEvent e) {
-
         noImagePostRenderer.setContainerSize(getWidth(), getHeight());
         loadingPostRenderer.setContainerSize(getWidth(), getHeight());
         synchronized (this) {
-            if (getView() != null) {
-                getView().updateMainImagePanelSize(new Vector2dInt(getWidth(), getHeight()));
+            if (getView() instanceof BufferedImageComponentView) {
+                ((JavaImagePanel) getView().getComponent()).updateMainImagePanelSize(new Vector2dInt(getWidth(), getHeight()));
             }
         }
         repaint();

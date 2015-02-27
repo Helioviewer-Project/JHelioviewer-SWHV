@@ -58,7 +58,7 @@ public class BasicImagePanel extends JPanel implements ComponentListener, ViewLi
 
     protected AbstractList<ImagePanelPlugin> plugins;
 
-    protected Component renderedImageComponent;
+    protected Component renderedImageComponent; // don't touch this
 
     protected AbstractList<ScreenRenderer> postRenderers;
 
@@ -175,12 +175,12 @@ public class BasicImagePanel extends JPanel implements ComponentListener, ViewLi
      */
     public void setView(ComponentView newView) {
         if (renderedImageComponent != null) {
-            componentView.removeViewListener(this);
+            if (componentView != null) // on first invocation
+                componentView.removeViewListener(this);
+
             renderedImageComponent.removeMouseListener(inputController);
             renderedImageComponent.removeMouseMotionListener(inputController);
             renderedImageComponent.removeMouseWheelListener(inputController);
-
-            remove(renderedImageComponent);
         }
 
         componentView = newView;
@@ -190,16 +190,14 @@ public class BasicImagePanel extends JPanel implements ComponentListener, ViewLi
         metaDataView = ViewHelper.getViewAdapter(componentView, MetaDataView.class);
 
         if (componentView != null) {
-            renderedImageComponent = componentView.getComponent();
-            add(renderedImageComponent);
+            componentView.setComponent(renderedImageComponent);
 
             componentView.addViewListener(this);
             setInputController(inputController);
             setPostRenderers();
 
             componentView.getAdapter(ViewportView.class).setViewport(getViewport(), new ChangeEvent());
-        } else
-            renderedImageComponent = null;
+        }
 
         for (ImagePanelPlugin p : plugins) {
             p.setImagePanel(this);
@@ -434,4 +432,5 @@ public class BasicImagePanel extends JPanel implements ComponentListener, ViewLi
     @Override
     public void componentShown(ComponentEvent e) {
     }
+
 }

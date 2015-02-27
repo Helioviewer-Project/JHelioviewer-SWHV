@@ -48,16 +48,6 @@ public interface ComponentView extends ModifiableInnerViewView, ViewListener {
     public void activate();
 
     /**
-     * Informs the view of the size of the area where the image will be
-     * displayed (in pixel). At the moment this class is used to center the
-     * image in the main image panel.
-     *
-     * @param size
-     *            The size of the display area in pixel
-     */
-    public void updateMainImagePanelSize(Vector2dInt size);
-
-    /**
      * Returns the component where the image will be displayed.
      *
      * To see the result of the view chain, this component has to be build in
@@ -68,6 +58,8 @@ public interface ComponentView extends ModifiableInnerViewView, ViewListener {
      * @return Component which contains the final image
      */
     public Component getComponent();
+
+    public void setComponent(Component component);
 
     /**
      * Saves the current screen content to the given file in the given format.
