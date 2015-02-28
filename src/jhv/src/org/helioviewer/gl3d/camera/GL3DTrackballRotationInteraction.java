@@ -40,7 +40,6 @@ public class GL3DTrackballRotationInteraction extends GL3DDefaultInteraction {
 
         camera.fireCameraMoving();
         Displayer.getSingletonInstance().display();
-
     }
 
     @Override
@@ -50,7 +49,6 @@ public class GL3DTrackballRotationInteraction extends GL3DDefaultInteraction {
 
         camera.fireCameraMoved();
         Displayer.getSingletonInstance().display();
-
     }
 
     @Override
@@ -81,7 +79,6 @@ public class GL3DTrackballRotationInteraction extends GL3DDefaultInteraction {
             hitPoint = ray.getHitPoint();
             hitPoint.normalize();
             hitPoint = camera.getLocalRotation().toMatrix().multiply(hitPoint);
-
         } else {
             double y = (camera.getHeight() / 2 - pp.y) / camera.getHeight();
             double x = (pp.x - camera.getWidth() / 2) / camera.getWidth();

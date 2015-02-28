@@ -95,4 +95,5 @@ public class GL3DCameraFOV extends GL3DMesh {
         this.m.rotate(-currentL, 0., 1., 0.);
         this.m.rotate(currentB, 1., 0., 0.);
     }
+
 }
