@@ -233,8 +233,7 @@ public class GL3DPositionLoadingPlanet {
             double x = this.positionDateTime[0].getPosition().x * 1000 / Constants.SunRadiusInMeter;
             double y = this.positionDateTime[0].getPosition().y * 1000 / Constants.SunRadiusInMeter;
             double z = this.positionDateTime[0].getPosition().z * 1000 / Constants.SunRadiusInMeter;
-            GL3DVec3d vec = new GL3DVec3d(-y, -z, -x);
-            return vec;
+            return new GL3DVec3d(-y, -z, -x);
         } else {
             double interpolatedIndex = (1. * (currentCameraTime - t3) / (t4 - t3) * this.positionDateTime.length);
             int i = (int) interpolatedIndex;
@@ -248,8 +247,7 @@ public class GL3DPositionLoadingPlanet {
             double x = (alpha * this.positionDateTime[i].getPosition().x + (1 - alpha) * this.positionDateTime[inext].getPosition().x) * 1000 / Constants.SunRadiusInMeter;
             double y = (alpha * this.positionDateTime[i].getPosition().y + (1 - alpha) * this.positionDateTime[inext].getPosition().y) * 1000 / Constants.SunRadiusInMeter;
             double z = (alpha * this.positionDateTime[i].getPosition().z + (1 - alpha) * this.positionDateTime[inext].getPosition().z) * 1000 / Constants.SunRadiusInMeter;
-            GL3DVec3d vec = new GL3DVec3d(-y, -z, -x);
-            return vec;
+            return new GL3DVec3d(-y, -z, -x);
         }
     }
 
@@ -260,4 +258,5 @@ public class GL3DPositionLoadingPlanet {
     public void setObserver(String object) {
         this.observer = object;
     }
+
 }
