@@ -102,7 +102,6 @@ public class GL3DImageLayers extends GL3DGroup {
         GL3DVec3d EYE = new GL3DVec3d();
 
         VM.readLookAt(EYE, LA, LU, LR);
-
         LA.negate();
     }
 
@@ -155,4 +154,5 @@ public class GL3DImageLayers extends GL3DGroup {
         }
         return layers;
     }
+
 }

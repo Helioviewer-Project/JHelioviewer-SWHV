@@ -60,7 +60,7 @@ public class GL3DObserverCamera extends GL3DSolarRotationTrackingTrackballCamera
 
     @Override
     public String getName() {
-        return "View from observer";
+        return "View from Observer";
     }
 
     @Override
@@ -103,10 +103,10 @@ public class GL3DObserverCamera extends GL3DSolarRotationTrackingTrackballCamera
             this.setTime(currentDate.getTime());
             this.currentRotation = Astronomy.getL0Radians(currentDate);
             this.getLocalRotation().clear();
-            this.getLocalRotation().rotate(GL3DQuatd.createRotation(addb0, new GL3DVec3d(1, 0, 0)));
-
-            this.getLocalRotation().rotate(GL3DQuatd.createRotation(this.currentRotation - addl0, new GL3DVec3d(0, 1, 0)));
+            this.getLocalRotation().rotate(GL3DQuatd.createRotation(addb0, GL3DVec3d.XAxis));
+            this.getLocalRotation().rotate(GL3DQuatd.createRotation(this.currentRotation - addl0, GL3DVec3d.YAxis));
             this.updateCameraTransformation();
         }
     }
+
 }

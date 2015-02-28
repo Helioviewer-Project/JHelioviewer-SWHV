@@ -158,8 +158,8 @@ public abstract class GL3DImageLayer extends GL3DGroup implements GL3DCameraList
         this.accellerationShape.setPhi(phi);
         this.accellerationShape.setTheta(theta);
 
-        GL3DQuatd rth = GL3DQuatd.createRotation(theta, new GL3DVec3d(1, 0, 0));
-        rth.rotate(GL3DQuatd.createRotation(phi, new GL3DVec3d(0, 1, 0)));
+        GL3DQuatd rth = GL3DQuatd.createRotation(theta, GL3DVec3d.XAxis);
+        rth.rotate(GL3DQuatd.createRotation(phi, GL3DVec3d.YAxis));
         GL3DMat4d rt = rth.toMatrix();
         GL3DRayTracer rayTracer = new GL3DRayTracer(this.accellerationShape, activeCamera);
 
@@ -215,14 +215,19 @@ public abstract class GL3DImageLayer extends GL3DGroup implements GL3DCameraList
         minPhysicalY = minPhysicalY - widthyAdd;
         maxPhysicalY = maxPhysicalY + widthyAdd;
 
-        if (minPhysicalX < metaData.getPhysicalLowerLeft().getX())
-            minPhysicalX = metaData.getPhysicalLowerLeft().getX();
-        if (minPhysicalY < metaData.getPhysicalLowerLeft().getY())
-            minPhysicalY = metaData.getPhysicalLowerLeft().getY();
-        if (maxPhysicalX > metaData.getPhysicalUpperRight().getX())
-            maxPhysicalX = metaData.getPhysicalUpperRight().getX();
-        if (maxPhysicalY > metaData.getPhysicalUpperRight().getY())
-            maxPhysicalY = metaData.getPhysicalUpperRight().getY();
+        double metLLX = metaData.getPhysicalLowerLeft().getX();
+        double metLLY = metaData.getPhysicalLowerLeft().getY();
+        double metURX = metaData.getPhysicalUpperRight().getX();
+        double metURY = metaData.getPhysicalUpperRight().getY();
+
+        if (minPhysicalX < metLLX)
+            minPhysicalX = metLLX;
+        if (minPhysicalY < metLLY)
+            minPhysicalY = metLLY;
+        if (maxPhysicalX > metURX)
+            maxPhysicalX = metURX;
+        if (maxPhysicalY > metURY)
+            maxPhysicalY = metURY;
 
         double regionWidth = maxPhysicalX - minPhysicalX;
         double regionHeight = maxPhysicalY - minPhysicalY;
@@ -230,10 +235,9 @@ public abstract class GL3DImageLayer extends GL3DGroup implements GL3DCameraList
         if (regionWidth > 0 && regionHeight > 0) {
             newRegion = StaticRegion.createAdaptedRegion(minPhysicalX, minPhysicalY, regionWidth, regionHeight);
         } else {
-            newRegion = StaticRegion.createAdaptedRegion(metaData.getPhysicalLowerLeft().getX(), metaData.getPhysicalLowerLeft().getY(), metaData.getPhysicalUpperRight().getX() - metaData.getPhysicalLowerLeft().getX(), metaData.getPhysicalUpperRight().getY() - metaData.getPhysicalLowerLeft().getY());
+            newRegion = StaticRegion.createAdaptedRegion(metLLX, metLLY, metURX - metLLX, metURY - metLLY);
         }
         this.regionView.setRegion(newRegion, new ChangeEvent());
-
         this.markAsChanged();
     }
 

@@ -252,8 +252,7 @@ public class GL3DPositionLoading {
                 double hglt = this.positionDateTime[0].getPosition().z;
                 double dist = this.positionDateTime[0].getPosition().x;
                 dist = dist * 1000 / Constants.SunRadiusInMeter;
-                GL3DVec3d vec = new GL3DVec3d(dist, hgln, hglt);
-                return vec;
+                return new GL3DVec3d(dist, hgln, hglt);
             } else {
                 double interpolatedIndex = (1. * (currentCameraTime - t3) / (t4 - t3) * this.positionDateTime.length);
                 int i = (int) interpolatedIndex;
@@ -268,8 +267,7 @@ public class GL3DPositionLoading {
                 double hglt = alpha * this.positionDateTime[i].getPosition().z + (1 - alpha) * this.positionDateTime[inext].getPosition().z;
                 double dist = alpha * this.positionDateTime[i].getPosition().x + (1 - alpha) * this.positionDateTime[inext].getPosition().x;
                 dist = dist * 1000 / Constants.SunRadiusInMeter;
-                GL3DVec3d vec = new GL3DVec3d(dist, hgln, hglt);
-                return vec;
+                return new GL3DVec3d(dist, hgln, hglt);
             }
         } else {
             return null;
