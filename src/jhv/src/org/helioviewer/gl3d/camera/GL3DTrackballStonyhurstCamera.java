@@ -72,10 +72,11 @@ public class GL3DTrackballStonyhurstCamera extends GL3DSolarRotationTrackingTrac
         Calendar cal = new GregorianCalendar();
         cal.setTime(new Date(currentDate.getTime()));
         this.getLocalRotation().clear();
-        this.getLocalRotation().rotate(GL3DQuatd.createRotation(this.currentRotation, new GL3DVec3d(0, 1, 0)));
+        this.getLocalRotation().rotate(GL3DQuatd.createRotation(this.currentRotation, GL3DVec3d.YAxis));
         this.updateCameraTransformation();
     }
 
     private void resetStartPosition() {
     }
+
 }

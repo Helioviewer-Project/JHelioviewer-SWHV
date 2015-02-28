@@ -120,4 +120,5 @@ public class GL3DImageSphere extends GL3DImageMesh {
 
         return GL3DMeshPrimitive.TRIANGLES;
     }
+
 }

@@ -61,7 +61,7 @@ public class GL3DHitReferenceShape extends GL3DMesh implements ViewListener {
         this.hitCoronaPlane = hitCoronaPlane;
         this.hitRotation = new GL3DMat4d();
         this.hitRotation.setIdentity();
-        this.localRotation = GL3DQuatd.createRotation(0., new GL3DVec3d(0., 1., 0.));
+        this.localRotation = GL3DQuatd.createRotation(0., GL3DVec3d.YAxis);
     }
 
     public boolean isHitCoronaPlane() {
@@ -216,12 +216,12 @@ public class GL3DHitReferenceShape extends GL3DMesh implements ViewListener {
                     b0 = -Astronomy.getB0InRadians(cal);
                     cr = -Astronomy.getL0Radians(hvmd.getDateTime().getTime());
                 }
-                GL3DQuatd rt = GL3DQuatd.createRotation(cr, new GL3DVec3d(0, 1, 0));
-                rt.rotate(GL3DQuatd.createRotation(b0, new GL3DVec3d(1, 0, 0)));
+                GL3DQuatd rt = GL3DQuatd.createRotation(cr, GL3DVec3d.YAxis);
+                rt.rotate(GL3DQuatd.createRotation(b0, GL3DVec3d.XAxis));
                 return rt.toMatrix();
             } else {
-                GL3DQuatd rt = GL3DQuatd.createRotation(-phi, new GL3DVec3d(0, 1, 0));
-                rt.rotate(GL3DQuatd.createRotation(-theta, new GL3DVec3d(1, 0, 0)));
+                GL3DQuatd rt = GL3DQuatd.createRotation(-phi, GL3DVec3d.YAxis);
+                rt.rotate(GL3DQuatd.createRotation(-theta, GL3DVec3d.XAxis));
                 return rt.toMatrix();
             }
         }
@@ -235,4 +235,5 @@ public class GL3DHitReferenceShape extends GL3DMesh implements ViewListener {
     public void setTheta(double theta) {
         this.theta = theta;
     }
+
 }

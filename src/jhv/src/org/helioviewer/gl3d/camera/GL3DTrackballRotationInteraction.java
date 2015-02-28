@@ -93,4 +93,5 @@ public class GL3DTrackballRotationInteraction extends GL3DDefaultInteraction {
         }
         return hitPoint;
     }
+
 }
