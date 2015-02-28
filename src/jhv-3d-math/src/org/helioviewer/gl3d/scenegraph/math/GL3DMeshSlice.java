@@ -259,4 +259,5 @@ public class GL3DMeshSlice {
         result.add(new GL3DVec3d(b));
         result.add(new GL3DVec3d(c));
     }
+
 }

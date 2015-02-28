@@ -211,4 +211,5 @@ public class GL3DRay {
     public void setHitPointOS(GL3DVec3d hitPointOS) {
         this.hitPointOS = hitPointOS;
     }
+
 }

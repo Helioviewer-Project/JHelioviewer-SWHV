@@ -17,10 +17,10 @@ public class GL3DSunGrid extends GL3DGroup {
         GL3DShape yAxis = new GL3DCircle(radius * 0.98, color, "yAxis");
 
         GL3DShape xAxis = new GL3DCircle(radius * 0.98, color, "xAxis");
-        xAxis.modelView().rotate(Math.PI / 2, new GL3DVec3d(0, 0, 1));
+        xAxis.modelView().rotate(Math.PI / 2, GL3DVec3d.ZAxis);
 
         GL3DShape zAxis = new GL3DCircle(radius * 0.98, color, "zAxis");
-        zAxis.modelView().rotate(Math.PI / 2, new GL3DVec3d(1, 0, 0));
+        zAxis.modelView().rotate(Math.PI / 2, GL3DVec3d.XAxis);
         xAxis.getDrawBits().on(Bit.Wireframe);
         // addNode(xAxis);
         yAxis.getDrawBits().on(Bit.Wireframe);
@@ -38,4 +38,5 @@ public class GL3DSunGrid extends GL3DGroup {
         super.shapeDraw(state);
         state.gl.glLineWidth(1.0f);
     }
+
 }

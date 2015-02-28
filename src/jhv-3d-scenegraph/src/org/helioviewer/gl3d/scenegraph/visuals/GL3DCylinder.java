@@ -41,7 +41,6 @@ public class GL3DCylinder extends GL3DMesh {
             double nz = 0;
 
             double x = nx * radius;
-            ;
             double y = ny * radius;
             double z = this.height / 2;
 
@@ -61,4 +60,5 @@ public class GL3DCylinder extends GL3DMesh {
 
         return GL3DMeshPrimitive.TRIANGLE_STRIP;
     }
+
 }

@@ -21,11 +21,7 @@ public class GL3DHelper {
         if (coordinate.getCoordinateSystem().getDimensions() != 3) {
             throw new IllegalCoordinateVectorException("Cannot Create GL3DVec3d from CoordinateVector with " + coordinate.getCoordinateSystem().getDimensions() + " dimensions");
         }
-        GL3DVec3d vec = new GL3DVec3d();
-        vec.x = coordinate.getValue(0);
-        vec.y = coordinate.getValue(1);
-        vec.z = coordinate.getValue(2);
-        return vec;
+        return new GL3DVec3d(coordinate.getValue(0), coordinate.getValue(1), coordinate.getValue(2));
     }
 
     public static CoordinateVector createCoordinate(GL3DVec3d vec, CoordinateSystem coordinateSystem) {
@@ -34,4 +30,5 @@ public class GL3DHelper {
         }
         return coordinateSystem.createCoordinateVector(vec.x, vec.y, vec.z);
     }
+
 }

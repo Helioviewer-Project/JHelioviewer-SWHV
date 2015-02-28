@@ -92,8 +92,8 @@ public class GL3DRayTracer {
         LRcopy2.subtract(LUcopy2);
         LRcopy2.multiply(pixelSize);
         dir.add(LRcopy2);
-        GL3DRay ray = GL3DRay.createPrimaryRay(EYE, dir);
-        return ray;
+
+        return GL3DRay.createPrimaryRay(EYE, dir);
     }
 
 }

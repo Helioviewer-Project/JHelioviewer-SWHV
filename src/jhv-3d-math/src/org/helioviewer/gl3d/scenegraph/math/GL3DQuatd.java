@@ -25,7 +25,7 @@ public class GL3DQuatd {
     }
 
     public void clear() {
-        GL3DQuatd q = GL3DQuatd.createRotation(0.0, new GL3DVec3d(0, 1, 0));
+        GL3DQuatd q = GL3DQuatd.createRotation(0.0, GL3DVec3d.YAxis);
         this.a = q.a;
         this.u = q.u;
     }
@@ -184,4 +184,5 @@ public class GL3DQuatd {
     public String toString() {
         return "[" + a + ", " + u.x + ", " + u.y + ", " + u.z + "]";
     }
+
 }
