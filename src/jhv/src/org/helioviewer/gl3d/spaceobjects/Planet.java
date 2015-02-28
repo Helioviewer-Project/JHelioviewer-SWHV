@@ -170,7 +170,7 @@ public class Planet extends GL3DSphere implements LayersListener, ViewListener, 
             GL3DFollowObjectCamera foc = (GL3DFollowObjectCamera) (GL3DState.get().getActiveCamera());
             double currentRotation = Astronomy.getL0Radians(new Date(foc.getTime()));
 
-            this.m.rotate(-currentRotation, new GL3DVec3d(0, 1, 0));
+            this.m.rotate(-currentRotation, GL3DVec3d.YAxis);
             this.m.translate(position);
 
             this.wm = (this.m);
@@ -193,4 +193,5 @@ public class Planet extends GL3DSphere implements LayersListener, ViewListener, 
     public String toString() {
         return spaceObject.toString() + " as seen from " + viewPoint.toString();
     }
+
 }
