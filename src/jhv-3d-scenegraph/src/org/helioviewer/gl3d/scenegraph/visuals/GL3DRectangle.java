@@ -56,4 +56,5 @@ public class GL3DRectangle extends GL3DMesh {
 
         return GL3DMeshPrimitive.TRIANGLES;
     }
+
 }

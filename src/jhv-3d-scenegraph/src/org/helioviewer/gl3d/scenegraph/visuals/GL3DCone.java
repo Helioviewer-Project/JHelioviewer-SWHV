@@ -59,4 +59,5 @@ public class GL3DCone extends GL3DMesh {
 
         return GL3DMeshPrimitive.TRIANGLE_FAN;
     }
+
 }

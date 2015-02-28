@@ -41,21 +41,15 @@ public class GL3DMat3d {
 
     public GL3DMat3d multiply(GL3DMat3d A) {
         set(m[0] * A.m[0] + m[3] * A.m[1] + m[6] * A.m[2], // ROW 1
-                m[0] * A.m[3] + m[3] * A.m[4] + m[6] * A.m[5], m[0] * A.m[6] + m[3] * A.m[7] + m[6] * A.m[8], m[1] * A.m[0] + m[4] * A.m[1] + m[7] * A.m[2], // ROW
-                                                                                                                                                             // 2
-                m[1] * A.m[3] + m[4] * A.m[4] + m[7] * A.m[5], m[1] * A.m[6] + m[4] * A.m[7] + m[7] * A.m[8], m[2] * A.m[0] + m[5] * A.m[1] + m[8] * A.m[2], // ROW
-                                                                                                                                                             // 3
-                m[2] * A.m[3] + m[5] * A.m[4] + m[8] * A.m[5], m[2] * A.m[6] + m[5] * A.m[7] + m[8] * A.m[8]);
+            m[0] * A.m[3] + m[3] * A.m[4] + m[6] * A.m[5], m[0] * A.m[6] + m[3] * A.m[7] + m[6] * A.m[8], m[1] * A.m[0] + m[4] * A.m[1] + m[7] * A.m[2], // ROW2
+            m[1] * A.m[3] + m[4] * A.m[4] + m[7] * A.m[5], m[1] * A.m[6] + m[4] * A.m[7] + m[7] * A.m[8], m[2] * A.m[0] + m[5] * A.m[1] + m[8] * A.m[2], // ROW3
+            m[2] * A.m[3] + m[5] * A.m[4] + m[8] * A.m[5], m[2] * A.m[6] + m[5] * A.m[7] + m[8] * A.m[8]);
         return this;
     }
 
     // -----------------------------------------------------------------------------
     public GL3DVec3d multiply(GL3DVec3d v) {
-        GL3DVec3d vec = new GL3DVec3d();
-        vec.x = m[0] * v.x + m[3] * v.y + m[6] * v.z;
-        vec.y = m[1] * v.x + m[4] * v.y + m[7] * v.z;
-        vec.z = m[2] * v.x + m[5] * v.y + m[8] * v.z;
-        return vec;
+        return new GL3DVec3d(m[0] * v.x + m[3] * v.y + m[6] * v.z, m[1] * v.x + m[4] * v.y + m[7] * v.z, m[2] * v.x + m[5] * v.y + m[8] * v.z);
     }
 
     public GL3DMat3d multiply(double f) {
@@ -221,4 +215,5 @@ public class GL3DMat3d {
     public double[] toArray() {
         return this.m;
     }
+
 }

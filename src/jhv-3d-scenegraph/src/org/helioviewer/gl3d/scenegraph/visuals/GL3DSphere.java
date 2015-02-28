@@ -127,4 +127,5 @@ public class GL3DSphere extends GL3DMesh {
     public GL3DVec3d getCenter() {
         return center;
     }
+
 }

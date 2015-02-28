@@ -40,4 +40,5 @@ public class GL3DCircle extends GL3DMesh {
     public void shapeDraw(GL3DState state) {
         super.shapeDraw(state);
     }
+
 }

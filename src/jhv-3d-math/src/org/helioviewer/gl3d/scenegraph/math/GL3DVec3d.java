@@ -276,4 +276,5 @@ public class GL3DVec3d {
     public final String toString() {
         return "(" + x + ", " + y + ", " + z + ")";
     }
+
 }

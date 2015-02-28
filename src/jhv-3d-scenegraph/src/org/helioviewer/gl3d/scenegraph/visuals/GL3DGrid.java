@@ -74,7 +74,7 @@ public class GL3DGrid extends GL3DGroup {
             this.m = differentialRotation.toMatrix().inverse();
         } else {
             long currentTime = state.getActiveCamera().getTime();
-            GL3DQuatd rotation = GL3DQuatd.createRotation(-Astronomy.getL0Radians(new Date(currentTime)), new GL3DVec3d(0., 1., 0.));
+            GL3DQuatd rotation = GL3DQuatd.createRotation(-Astronomy.getL0Radians(new Date(currentTime)), GL3DVec3d.YAxis);
             this.m = rotation.toMatrix();
         }
         this.wm = (this.m);
