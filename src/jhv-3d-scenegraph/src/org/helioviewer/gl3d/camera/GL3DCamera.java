@@ -82,9 +82,9 @@ public abstract class GL3DCamera {
     public GL3DCamera(GL3DSceneGraphView sceneGraphView) {
         this.sceneGraphView = sceneGraphView;
         this.cameraTransformation = GL3DMat4d.identity();
-        this.rotation = GL3DQuatd.createRotation(0, GL3DVec3d.YAxis);
-        this.currentDragRotation = GL3DQuatd.createRotation(0, GL3DVec3d.YAxis);
-        this.localRotation = GL3DQuatd.createRotation(0, GL3DVec3d.YAxis);
+        this.rotation = new GL3DQuatd();
+        this.currentDragRotation = new GL3DQuatd();
+        this.localRotation = new GL3DQuatd();
         this.translation = new GL3DVec3d();
         GL3DGrid grid = new GL3DGrid("grid", getGridResolutionX(), getGridResolutionY(), new GL3DVec4f(1.0f, 0.0f, 0.0f, 1.0f), new GL3DVec4d(0.0, 1.0, 0.0, 1.0), false);
         GL3DGrid followGrid = new GL3DGrid("grid", 90., 90., new GL3DVec4f(1.0f, 0.0f, 0.0f, 1.0f), new GL3DVec4d(0.0, 1.0, 0.0, 1.0), true);
