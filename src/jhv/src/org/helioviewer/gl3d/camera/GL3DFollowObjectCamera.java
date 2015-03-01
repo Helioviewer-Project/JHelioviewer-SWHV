@@ -151,9 +151,10 @@ public class GL3DFollowObjectCamera extends GL3DSolarRotationTrackingTrackballCa
     public void updateRotation() {
         if (this.positionLoading.isLoaded() && currentDate != null) {
             this.currentRotation = (-currentL + Astronomy.getL0Radians(new Date(currentCameraTime))) % (Math.PI * 2.0);
-            GL3DQuatd newRotation = GL3DQuatd.createRotation(0., GL3DVec3d.YAxis);
-            newRotation.rotate(GL3DQuatd.createRotation(-currentB, GL3DVec3d.XAxis));
+
+            GL3DQuatd newRotation = GL3DQuatd.createRotation(-currentB, GL3DVec3d.XAxis);
             newRotation.rotate(GL3DQuatd.createRotation(this.currentRotation, GL3DVec3d.YAxis));
+
             this.setLocalRotation(newRotation);
             this.setZTranslation(-currentDistance);
             this.updateCameraTransformation();

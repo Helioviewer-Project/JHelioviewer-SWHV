@@ -61,7 +61,7 @@ public class GL3DHitReferenceShape extends GL3DMesh implements ViewListener {
         this.hitCoronaPlane = hitCoronaPlane;
         this.hitRotation = new GL3DMat4d();
         this.hitRotation.setIdentity();
-        this.localRotation = GL3DQuatd.createRotation(0., GL3DVec3d.YAxis);
+        this.localRotation = new GL3DQuatd();
     }
 
     public boolean isHitCoronaPlane() {
