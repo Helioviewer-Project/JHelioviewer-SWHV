@@ -420,7 +420,8 @@ public class GL3DComponentView extends AbstractComponentView implements GLEventL
             if (sidReason != null ||
                 (tsReason != null && (tsReason.getView() instanceof TimedMovieView) &&
                 LinkedMovieManager.getActiveInstance().isMaster((TimedMovieView) tsReason.getView()))) {
-                Displayer.getSingletonInstance().display();
+                // shortcut for Displayer.getSingletonInstance().display();
+                canvas.repaint();
             }
 
             notifyViewListeners(aEvent);

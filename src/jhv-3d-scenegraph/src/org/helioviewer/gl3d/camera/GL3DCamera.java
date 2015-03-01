@@ -332,11 +332,11 @@ public abstract class GL3DCamera {
         return this.fov;
     }
 
-    public double getClipNear() {
+    public final double getClipNear() {
         return clipNear;
     }
 
-    public double getClipFar() {
+    public final double getClipFar() {
         return clipFar;
     }
 

@@ -215,7 +215,9 @@ public class GL3DVec3d {
         if (len == 0.0)
             return;
 
-        this.divide(len);
+        this.x /= len;
+        this.y /= len;
+        this.z /= len;
 
         // take shortcut, reasonably close to 1
         len = Math.sqrt(this.x * this.x + this.y * this.y + this.z * this.z);
