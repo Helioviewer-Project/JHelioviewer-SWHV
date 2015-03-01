@@ -4,10 +4,12 @@ public class GL3DQuatd {
     public static final double EPSILON = 0.000001;
 
     protected double a;
-
     protected GL3DVec3d u;
 
     public static GL3DQuatd createRotation(double angle, GL3DVec3d axis) {
+        if (angle == 0.)
+            return new GL3DQuatd(1, new GL3DVec3d());
+
         double halfAngle = angle / 2.0;
         GL3DVec3d axisCopy = axis.copy();
         axisCopy.normalize();
@@ -25,9 +27,9 @@ public class GL3DQuatd {
     }
 
     public void clear() {
-        GL3DQuatd q = GL3DQuatd.createRotation(0.0, GL3DVec3d.YAxis);
-        this.a = q.a;
-        this.u = q.u;
+        // GL3DQuatd q = GL3DQuatd.createRotation(0.0, GL3DVec3d.YAxis);
+        this.a = 1;
+        this.u = new GL3DVec3d();
     }
 
     public GL3DQuatd multiply(GL3DQuatd q) {
@@ -56,11 +58,8 @@ public class GL3DQuatd {
         double z = u.z, z2 = z * z;
 
         return new GL3DMat4d(w2 + x2 - y2 - z2, 2 * x * y - 2 * w * z, 2 * x * z + 2 * w * y, 0,
-
         2 * x * y + 2 * w * z, w2 - x2 + y2 - z2, 2 * y * z - 2 * w * x, 0,
-
         2 * x * z - 2 * w * y, 2 * y * z + 2 * w * x, w2 - x2 - y2 + z2, 0,
-
         0, 0, 0, w2 + x2 + y2 + z2);
         /*
          * return new GL3DMat4d( w2+x2-y2-z2, 2*x*y+2*w*z, 2*x*z-2*w*y, 0,
@@ -174,7 +173,7 @@ public class GL3DQuatd {
         GL3DVec3d rotationAxis = GL3DVec3d.cross(startPoint, endPoint);
         double rotationAngle = Math.atan2(rotationAxis.length(), GL3DVec3d.dot(startPoint, endPoint));
 
-        return GL3DQuatd.createRotation(rotationAngle, rotationAxis.copy());
+        return GL3DQuatd.createRotation(rotationAngle, rotationAxis);
     }
 
     public GL3DQuatd copy() {

@@ -37,7 +37,7 @@ public class GL3DMat4d {
     }
 
     public final static GL3DMat4d identity() {
-        return new GL3DMat4d(1f, 0f, 0f, 0f, 0f, 1f, 0f, 0f, 0f, 0f, 1f, 0f, 0f, 0f, 0f, 1f);
+        return new GL3DMat4d(1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1);
     }
 
     public final GL3DMat4d set(GL3DMat4d A) {
@@ -320,10 +320,10 @@ public class GL3DMat4d {
         GL3DVec3d VZ;
         // GL3DVec3d VT = new GL3DVec3d();
 
-        GL3DMat3d xz = new GL3DMat3d(0f, 0f, 1f, 0f, 0f, 0f, -1f, 0f, 0f);
+        GL3DMat3d xz = new GL3DMat3d(0, 0, 1, 0, 0, 0, -1, 0, 0);
 
         VZ = GL3DVec3d.subtract(pos, dirAt);
-        if (dirUp.isApproxEqual(GL3DVec3d.ZERO, 0f)) {
+        if (dirUp.isApproxEqual(GL3DVec3d.ZERO, 0)) {
             VX = xz.multiply(VZ);
             VX.normalize();
             VY = GL3DVec3d.cross(VZ, VX);
@@ -335,7 +335,7 @@ public class GL3DMat4d {
             VY.normalize();
         }
 
-        set(VX.x, VY.x, VZ.x, pos.x, VX.y, VY.y, VZ.y, pos.y, VX.z, VY.z, VZ.z, pos.z, 0f, 0f, 0f, 1f);
+        set(VX.x, VY.x, VZ.x, pos.x, VX.y, VY.y, VZ.y, pos.y, VX.z, VY.z, VZ.z, pos.z, 0, 0, 0, 1);
     }
 
     public final static GL3DMat4d translation(GL3DVec3d t) {
@@ -435,7 +435,7 @@ public class GL3DMat4d {
     }
 
     public final static GL3DMat4d frustum(double l, double r, double b, double t, double n, double f) {
-        return new GL3DMat4d((2 * n) / (r - l), 0f, (r + l) / (r - l), 0f, 0f, (2 * n) / (t - b), (t + b) / (t - b), 0f, 0f, 0f, -(f + n) / (f - n), (-2 * f * n) / (f - n), 0f, 0f, -1f, 0f);
+        return new GL3DMat4d((2 * n) / (r - l), 0, (r + l) / (r - l), 0, 0, (2 * n) / (t - b), (t + b) / (t - b), 0, 0, 0, -(f + n) / (f - n), (-2 * f * n) / (f - n), 0, 0, -1, 0);
     }
 
     public final static GL3DMat4d perspective(double fov, double aspect, double n, double f) {
@@ -447,10 +447,10 @@ public class GL3DMat4d {
     }
 
     public final static GL3DMat4d viewport(double x, double y, double ww, double wh, double n, double f) {
-        double ww2 = ww * 0.5f;
-        double wh2 = wh * 0.5f;
+        double ww2 = ww * 0.5;
+        double wh2 = wh * 0.5;
         // negate the first wh because windows has topdown window coords
-        return new GL3DMat4d(ww2, 0f, 0f, ww2 + x, 0f, -wh2, 0f, wh2 + y, 0f, 0f, (f - n) * 0.5f, (f + n) * 0.5f, 0f, 0f, 0f, 1f);
+        return new GL3DMat4d(ww2, 0, 0, ww2 + x, 0, -wh2, 0, wh2 + y, 0, 0, (f - n) * 0.5, (f + n) * 0.5, 0, 0, 0, 1);
     }
 
     public final GL3DMat3d mat3() {

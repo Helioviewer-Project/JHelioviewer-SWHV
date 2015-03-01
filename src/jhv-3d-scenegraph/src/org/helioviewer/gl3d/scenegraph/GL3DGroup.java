@@ -320,4 +320,5 @@ public class GL3DGroup extends GL3DShape {
     public void addNodeToRemoveList(GL3DPolyLine node) {
         nodesToDelete.add(node);
     }
+
 }
