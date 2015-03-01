@@ -19,9 +19,9 @@ public class GL3DRayTracer {
     private final GL3DNode sceneRoot;
     private final GL3DCamera camera;
 
-    double hh;
-    double hw;
-    double pixelSize;
+    private final double hh;
+    private final double hw;
+    private final double pixelSize;
 
     public GL3DRayTracer(GL3DNode sceneRoot, GL3DCamera camera) {
         this.sceneRoot = sceneRoot;
