@@ -90,4 +90,5 @@ public abstract class GL3DInteraction implements MouseWheelListener, MouseMotion
     public final void mousePressed(MouseEvent e) {
         this.mousePressed(e, camera);
     }
+
 }

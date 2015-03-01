@@ -77,8 +77,7 @@ public class GL3DEarthCamera extends GL3DSolarRotationTrackingTrackballCamera im
         double b0 = Astronomy.getB0InRadians(currentDate);
         this.currentRotation = Astronomy.getL0Radians(currentDate);
 
-        this.localRotation.clear();
-        this.localRotation.rotate(GL3DQuatd.createRotation(b0, GL3DVec3d.XAxis));
+        this.localRotation = GL3DQuatd.createRotation(b0, GL3DVec3d.XAxis);
         this.localRotation.rotate(GL3DQuatd.createRotation(this.currentRotation, GL3DVec3d.YAxis));
 
         this.updateCameraTransformation();
