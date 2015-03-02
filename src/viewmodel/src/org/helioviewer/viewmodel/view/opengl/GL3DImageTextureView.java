@@ -148,8 +148,7 @@ public class GL3DImageTextureView extends AbstractGL3DView implements GL3DView, 
                 outerCutOff = md.getOuterPhysicalOcculterRadius();
             }
 
-            this.fragmentShader.setCutOffRadius(innerCutOff);
-            this.fragmentShader.setOuterCutOffRadius(outerCutOff);
+            this.fragmentShader.setCutOffRadius(innerCutOff, outerCutOff);
         }
 
         this.recaptureRequested = false;
