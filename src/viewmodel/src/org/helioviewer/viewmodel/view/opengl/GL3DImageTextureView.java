@@ -139,11 +139,17 @@ public class GL3DImageTextureView extends AbstractGL3DView implements GL3DView, 
             }
 
             this.fragmentShader.changeAngles(theta, phi);
+
+            double innerCutOff = 0;
+            double outerCutOff = 40;
             if (metadata instanceof HelioviewerOcculterMetaData) {
                 HelioviewerOcculterMetaData md = (HelioviewerOcculterMetaData) metadata;
-                this.fragmentShader.setCutOffRadius(md.getInnerPhysicalOcculterRadius());
-                this.fragmentShader.setOuterCutOffRadius(md.getOuterPhysicalOcculterRadius());
+                innerCutOff = md.getInnerPhysicalOcculterRadius();
+                outerCutOff = md.getOuterPhysicalOcculterRadius();
             }
+
+            this.fragmentShader.setCutOffRadius(innerCutOff);
+            this.fragmentShader.setOuterCutOffRadius(outerCutOff);
         }
 
         this.recaptureRequested = false;

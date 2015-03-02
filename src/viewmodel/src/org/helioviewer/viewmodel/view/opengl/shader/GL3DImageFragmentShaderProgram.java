@@ -8,13 +8,8 @@ import org.helioviewer.viewmodel.view.opengl.shader.GLShaderBuilder.GLBuildShade
 
 public class GL3DImageFragmentShaderProgram extends GLFragmentShaderProgram {
 
-    private double cutOffRadius = 0.0f;
-    private double outerCutOffRadius = 40.f;
-
-    private int cutOffRadiusRef;
-    private int outerCutOffRadiusRef;
-
     private GLShaderBuilder builder;
+
     private int phiParamRef;
     private final double[] phiParamFloat = new double[4];
     private int thetaParamRef;
@@ -24,6 +19,11 @@ public class GL3DImageFragmentShaderProgram extends GLFragmentShaderProgram {
     private int differenceThetaParamRef;
     private final double[] differenceThetaParamFloat = new double[4];
 
+    private int cutOffRadiusRef;
+    private final double[] cutOffRadiusFloat = new double[4];
+    private int outerCutOffRadiusRef;
+    private final double[] outerCutOffRadiusFloat = new double[4];
+
     /**
      * Binds (= activates it) the shader, if it is not active so far.
      *
@@ -32,23 +32,15 @@ public class GL3DImageFragmentShaderProgram extends GLFragmentShaderProgram {
      */
     @Override
     public final void bind(GL2 gl) {
-        bind(gl, shaderID, outerCutOffRadius, cutOffRadius);
-    }
-
-    private void bind(GL2 gl, int shader, double outerCutOffRadius, double cutOffRadius) {
         super.bind(gl);
 
-        double[] cutOffRadiusFloat = this.builder.getEnvParameter(this.cutOffRadiusRef);
-        double[] outerCutOffRadiusFloat = this.builder.getEnvParameter(this.outerCutOffRadiusRef);
-        cutOffRadiusFloat[0] = (float) cutOffRadius;
-        outerCutOffRadiusFloat[0] = (float) outerCutOffRadius;
-        this.bindEnvVars(gl, this.cutOffRadiusRef, cutOffRadiusFloat);
-        this.bindEnvVars(gl, this.outerCutOffRadiusRef, outerCutOffRadiusFloat);
+        this.bindEnvVars(gl, cutOffRadiusRef, cutOffRadiusFloat);
+        this.bindEnvVars(gl, outerCutOffRadiusRef, outerCutOffRadiusFloat);
 
-        this.bindEnvVars(gl, this.phiParamRef, this.phiParamFloat);
-        this.bindEnvVars(gl, this.thetaParamRef, this.thetaParamFloat);
-        this.bindEnvVars(gl, this.differencePhiParamRef, this.differencePhiParamFloat);
-        this.bindEnvVars(gl, this.differenceThetaParamRef, this.differenceThetaParamFloat);
+        this.bindEnvVars(gl, phiParamRef, phiParamFloat);
+        this.bindEnvVars(gl, thetaParamRef, thetaParamFloat);
+        this.bindEnvVars(gl, differencePhiParamRef, differencePhiParamFloat);
+        this.bindEnvVars(gl, differenceThetaParamRef, differenceThetaParamFloat);
     }
 
     /**
@@ -99,8 +91,8 @@ public class GL3DImageFragmentShaderProgram extends GLFragmentShaderProgram {
             program += "\tfloat projectionn = dot(position.xyz,zaxisrot);" + GLShaderBuilder.LINE_SEP;
             program += "\tif((position.z!=0.0 && projectionn<-0.0)){" + "\t\tdiscard;" + GLShaderBuilder.LINE_SEP + "\t}" + GLShaderBuilder.LINE_SEP;
 
-            this.cutOffRadiusRef = shaderBuilder.addEnvParameter("float4 cutOffRadius");
-            this.outerCutOffRadiusRef = shaderBuilder.addEnvParameter("float4 outerCutOffRadius");
+            cutOffRadiusRef = shaderBuilder.addEnvParameter("float cutOffRadius");
+            outerCutOffRadiusRef = shaderBuilder.addEnvParameter("float outerCutOffRadius");
 
             phiParamRef = shaderBuilder.addEnvParameter("float phi");
             thetaParamRef = shaderBuilder.addEnvParameter("float theta");
@@ -108,11 +100,9 @@ public class GL3DImageFragmentShaderProgram extends GLFragmentShaderProgram {
             differenceThetaParamRef = shaderBuilder.addEnvParameter("float differenceTheta");
 
             program = program.replace("position", shaderBuilder.useStandardParameter("float4", "TEXCOORD3"));
-
             program = program.replace("output", shaderBuilder.useOutputValue("float4", "COLOR"));
 
             shaderBuilder.addMainFragment(program);
-            //System.out.println("GL3D Image Fragment Shader:\n" + shaderBuilder.getCode());
         } catch (GLBuildShaderException e) {
             e.printStackTrace();
         }
@@ -120,21 +110,21 @@ public class GL3DImageFragmentShaderProgram extends GLFragmentShaderProgram {
     }
 
     public void setCutOffRadius(double cutOffRadius) {
-        this.cutOffRadius = cutOffRadius;
+        cutOffRadiusFloat[0] = cutOffRadius;
     }
 
     public void setOuterCutOffRadius(double outerCutOffRadius) {
-        this.outerCutOffRadius = outerCutOffRadius;
+        outerCutOffRadiusFloat[0] = outerCutOffRadius;
     }
 
     public void changeAngles(double theta, double phi) {
-        this.thetaParamFloat[0] = theta;
-        this.phiParamFloat[0] = phi;
+        thetaParamFloat[0] = theta;
+        phiParamFloat[0] = phi;
     }
 
     public void changeDifferenceAngles(double theta, double phi) {
-        this.differenceThetaParamFloat[0] = theta;
-        this.differencePhiParamFloat[0] = phi;
+        differenceThetaParamFloat[0] = theta;
+        differencePhiParamFloat[0] = phi;
     }
 
 }
