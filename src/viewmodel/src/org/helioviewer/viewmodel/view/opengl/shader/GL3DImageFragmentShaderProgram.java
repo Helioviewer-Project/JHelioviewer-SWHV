@@ -10,17 +10,12 @@ public class GL3DImageFragmentShaderProgram extends GLFragmentShaderProgram {
 
     private GLShaderBuilder builder;
 
+    private int cutOffRadiusRef;
+    private final double[] cutOffRadius = new double[4];
     private int phiParamRef;
     private final double[] phiParamFloat = new double[4];
     private int thetaParamRef;
     private final double[] thetaParamFloat = new double[4];
-    private int differencePhiParamRef;
-    private final double[] differencePhiParamFloat = new double[4];
-    private int differenceThetaParamRef;
-    private final double[] differenceThetaParamFloat = new double[4];
-
-    private int cutOffRadiusRef;
-    private final double[] cutOffRadius = new double[4];
 
     /**
      * Binds (= activates it) the shader, if it is not active so far.
@@ -35,8 +30,6 @@ public class GL3DImageFragmentShaderProgram extends GLFragmentShaderProgram {
         this.bindEnvVars(gl, cutOffRadiusRef, cutOffRadius);
         this.bindEnvVars(gl, phiParamRef, phiParamFloat);
         this.bindEnvVars(gl, thetaParamRef, thetaParamFloat);
-        this.bindEnvVars(gl, differencePhiParamRef, differencePhiParamFloat);
-        this.bindEnvVars(gl, differenceThetaParamRef, differenceThetaParamFloat);
     }
 
     /**
@@ -91,8 +84,6 @@ public class GL3DImageFragmentShaderProgram extends GLFragmentShaderProgram {
 
             phiParamRef = shaderBuilder.addEnvParameter("float phi");
             thetaParamRef = shaderBuilder.addEnvParameter("float theta");
-            differencePhiParamRef = shaderBuilder.addEnvParameter("float differencePhi");
-            differenceThetaParamRef = shaderBuilder.addEnvParameter("float differenceTheta");
 
             program = program.replace("position", shaderBuilder.useStandardParameter("float4", "TEXCOORD3"));
             program = program.replace("output", shaderBuilder.useOutputValue("float4", "COLOR"));
@@ -101,7 +92,6 @@ public class GL3DImageFragmentShaderProgram extends GLFragmentShaderProgram {
         } catch (GLBuildShaderException e) {
             e.printStackTrace();
         }
-
     }
 
     public void setCutOffRadius(double innerCutOff, double outerCutOff) {
@@ -112,11 +102,6 @@ public class GL3DImageFragmentShaderProgram extends GLFragmentShaderProgram {
     public void changeAngles(double theta, double phi) {
         thetaParamFloat[0] = theta;
         phiParamFloat[0] = phi;
-    }
-
-    public void changeDifferenceAngles(double theta, double phi) {
-        differenceThetaParamFloat[0] = theta;
-        differencePhiParamFloat[0] = phi;
     }
 
 }
