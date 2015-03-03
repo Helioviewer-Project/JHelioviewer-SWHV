@@ -13,7 +13,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 import java.util.Vector;
-import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 import javax.swing.JOptionPane;
 
@@ -84,12 +83,9 @@ import org.xml.sax.helpers.XMLReaderFactory;
  */
 public class LayersModel implements ViewListener {
 
-    private int activeLayer = -1;
-
-    /** The sole instance of this class. */
     private static final LayersModel layersModel = new LayersModel();
-    private final ReentrantReadWriteLock rwl = new ReentrantReadWriteLock();
 
+    private int activeLayer = -1;
     private final ArrayList<LayersListener> layerListeners = new ArrayList<LayersListener>();
 
     // store the last updated timestamp
@@ -104,7 +100,7 @@ public class LayersModel implements ViewListener {
         return layersModel;
     }
 
-    public LayersModel() {
+    private LayersModel() {
         ViewListenerDistributor.getSingletonInstance().addViewListener(this);
     }
 
@@ -800,7 +796,7 @@ public class LayersModel implements ViewListener {
             @Override
             public void run() {
                 downloadFromJPIP(infoView);
-                LayersModel.getSingletonInstance().viewChanged(infoView, new ChangeEvent(new LayerChangedReason(infoView, LayerChangeType.LAYER_DOWNLOADED, view)));
+                ViewListenerDistributor.getSingletonInstance().viewChanged(infoView, new ChangeEvent(new LayerChangedReason(infoView, LayerChangeType.LAYER_DOWNLOADED, view)));
             }
         }, "DownloadFromJPIPThread");
         downloadThread.start();
@@ -1311,110 +1307,90 @@ public class LayersModel implements ViewListener {
     }
 
     private void fireLayerDownloaded(final int index) {
-        rwl.readLock().lock();
         for (LayersListener ll : layerListeners) {
             ll.layerDownloaded(index);
         }
-        rwl.readLock().unlock();
     }
 
     /**
      * Notify all LayersListeners
      */
     private void fireLayerRemoved(final View oldView, final int oldIndex) {
-        rwl.readLock().lock();
         for (LayersListener ll : layerListeners) {
             ll.layerRemoved(oldView, oldIndex);
         }
-        rwl.readLock().unlock();
     }
 
     /**
      * Notify all LayersListeners
      */
     private void fireLayerAdded(final int newIndex) {
-        rwl.readLock().lock();
         for (LayersListener ll : layerListeners) {
             ll.layerAdded(newIndex);
         }
-        rwl.readLock().unlock();
     }
 
     /**
      * Notify all LayersListeners
      */
     private void fireLayerChanged(final int index) {
-        rwl.readLock().lock();
         for (LayersListener ll : layerListeners) {
             ll.layerChanged(index);
         }
-        rwl.readLock().unlock();
     }
 
     /**
      * Notify all LayersListeners
      */
     private void fireAllLayersChanged() {
-        rwl.readLock().lock();
         for (LayersListener ll : layerListeners) {
             for (int index = 0; index < getNumLayers(); index++) {
                 ll.layerChanged(index);
             }
         }
-        rwl.readLock().unlock();
     }
 
     /**
      * Notify all LayersListeners
      */
     private void fireActiveLayerChanged(final int index) {
-        rwl.readLock().lock();
         for (LayersListener ll : layerListeners) {
             ll.activeLayerChanged(index);
         }
-        rwl.readLock().unlock();
     }
 
     /**
      * Notify all LayersListeners
      */
     private void fireViewportGeometryChanged() {
-        rwl.readLock().lock();
         for (LayersListener ll : layerListeners) {
             ll.viewportGeometryChanged();
         }
-        rwl.readLock().unlock();
     }
 
     /**
      * Notify all LayersListeners
      */
     private void fireTimestampChanged(final int idx) {
-        rwl.readLock().lock();
         for (LayersListener ll : layerListeners) {
             ll.timestampChanged(idx);
         }
-        rwl.readLock().unlock();
     }
 
     /**
      * Notify all LayersListeners
      */
     private void fireSubImageDataChanged() {
-        rwl.readLock().lock();
         for (LayersListener ll : layerListeners) {
             ll.subImageDataChanged();
         }
-        rwl.readLock().unlock();
     }
 
     /**
      * Notify all LayersListeners
      */
     public void addLayersListener(LayersListener layerListener) {
-        rwl.writeLock().lock();
         layerListeners.add(layerListener);
-        rwl.writeLock().unlock();
     }
 
     /**
@@ -1423,9 +1399,7 @@ public class LayersModel implements ViewListener {
      * * @author Carlos Martin
      */
     public void removeLayersListener(LayersListener layerListener) {
-        rwl.writeLock().lock();
         layerListeners.remove(layerListener);
-        rwl.writeLock().unlock();
     }
 
     /**
@@ -1457,75 +1431,70 @@ public class LayersModel implements ViewListener {
      * @return the layers' xml representation as string
      */
     public String getXMLRepresentation(String tab) {
-        rwl.readLock().lock();
-        try {
-            int layers = LayersModel.getSingletonInstance().getNumLayers();
-            if (layers == 0) {
-                return "";
-            }
-
-            StringBuffer xml = new StringBuffer();
-            xml.append(tab).append("<layers>\n");
-            // add tab
-            tab = tab + "\t";
-
-            // store region
-            RegionView regionView = ImageViewerGui.getSingletonInstance().getMainView().getAdapter(RegionView.class);
-            Region region = regionView.getRegion();
-            String regionStr = String.format(Locale.ENGLISH, "<region x=\"%.4f\" y=\"%.4f\" width=\"%.4f\" height=\"%.4f\"/>\n", region.getCornerX(), region.getCornerY(), region.getWidth(), region.getHeight());
-            xml.append(tab).append(regionStr);
-
-            // store layers
-            for (int i = 0; i < layers; i++) {
-                View currentView = LayersModel.getSingletonInstance().getLayer(i);
-                if (currentView != null) {
-                    xml.append(tab).append("<layer id=\"").append(i).append("\">\n");
-
-                    ImageInfoView currentImageInfoView = currentView.getAdapter(ImageInfoView.class);
-                    FilterView currentFilterView = currentView.getAdapter(FilterView.class);
-
-                    // add tab
-                    tab = tab + "\t";
-                    // TODO Use a proper encoding function - not "replace X->Y"
-                    xml.append(tab).append("<uri>").append(currentImageInfoView.getUri().toString().replaceAll("&", "&amp;")).append("</uri>\n");
-                    xml.append(tab).append("<downloaduri>").append(currentImageInfoView.getDownloadURI().toString().replaceAll("&", "&amp;")).append("</downloaduri>\n");
-
-                    // check if we got any api response
-                    APIResponse apiResponse = APIResponseDump.getSingletonInstance().getResponse(currentImageInfoView.getUri(), true);
-                    if (apiResponse != null) {
-                        String xmlApiResponse = apiResponse.getXMLRepresentation();
-                        xml.append(tab).append("<apiresponse>\n").append(tab).append("\t").append(xmlApiResponse).append("\n").append(tab).append("</apiresponse>\n");
-                    }
-
-                    xml.append(tab).append("<filters>\n");
-
-                    // add tab
-                    tab = tab + "\t";
-                    while (currentFilterView != null) {
-                        String filterName = currentFilterView.getFilter().getClass().getName();
-                        String filterState = currentFilterView.getFilter().getState();
-                        xml.append(tab).append("<filter name=\"").append(filterName).append("\">").append(filterState).append("</filter>\n");
-                        currentFilterView = currentFilterView.getView().getAdapter(FilterView.class);
-                    }
-
-                    // remove last tab
-                    tab = tab.substring(0, tab.length() - 1);
-                    xml.append(tab).append("</filters>\n");
-
-                    // remove last tab
-                    tab = tab.substring(0, tab.length() - 1);
-                    xml.append(tab).append("</layer>\n");
-                }
-            }
-
-            // remove last tab
-            tab = tab.substring(0, tab.length() - 1);
-            xml.append(tab).append("</layers>");
-
-            return xml.toString();
-        } finally {
-            rwl.readLock().unlock();
+        int layers = getNumLayers();
+        if (layers == 0) {
+            return "";
         }
+
+        StringBuffer xml = new StringBuffer();
+        xml.append(tab).append("<layers>\n");
+        // add tab
+        tab = tab + "\t";
+
+        // store region
+        RegionView regionView = ImageViewerGui.getSingletonInstance().getMainView().getAdapter(RegionView.class);
+        Region region = regionView.getRegion();
+        String regionStr = String.format(Locale.ENGLISH, "<region x=\"%.4f\" y=\"%.4f\" width=\"%.4f\" height=\"%.4f\"/>\n", region.getCornerX(), region.getCornerY(), region.getWidth(), region.getHeight());
+        xml.append(tab).append(regionStr);
+
+        // store layers
+        for (int i = 0; i < layers; i++) {
+            View currentView = LayersModel.getSingletonInstance().getLayer(i);
+            if (currentView != null) {
+                xml.append(tab).append("<layer id=\"").append(i).append("\">\n");
+
+                ImageInfoView currentImageInfoView = currentView.getAdapter(ImageInfoView.class);
+                FilterView currentFilterView = currentView.getAdapter(FilterView.class);
+
+                // add tab
+                tab = tab + "\t";
+                // TODO Use a proper encoding function - not "replace X->Y"
+                xml.append(tab).append("<uri>").append(currentImageInfoView.getUri().toString().replaceAll("&", "&amp;")).append("</uri>\n");
+                xml.append(tab).append("<downloaduri>").append(currentImageInfoView.getDownloadURI().toString().replaceAll("&", "&amp;")).append("</downloaduri>\n");
+
+                // check if we got any api response
+                APIResponse apiResponse = APIResponseDump.getSingletonInstance().getResponse(currentImageInfoView.getUri(), true);
+                if (apiResponse != null) {
+                    String xmlApiResponse = apiResponse.getXMLRepresentation();
+                    xml.append(tab).append("<apiresponse>\n").append(tab).append("\t").append(xmlApiResponse).append("\n").append(tab).append("</apiresponse>\n");
+                }
+
+                xml.append(tab).append("<filters>\n");
+
+                // add tab
+                tab = tab + "\t";
+                while (currentFilterView != null) {
+                    String filterName = currentFilterView.getFilter().getClass().getName();
+                    String filterState = currentFilterView.getFilter().getState();
+                    xml.append(tab).append("<filter name=\"").append(filterName).append("\">").append(filterState).append("</filter>\n");
+                    currentFilterView = currentFilterView.getView().getAdapter(FilterView.class);
+                }
+
+                // remove last tab
+                tab = tab.substring(0, tab.length() - 1);
+                xml.append(tab).append("</filters>\n");
+
+                // remove last tab
+                tab = tab.substring(0, tab.length() - 1);
+                xml.append(tab).append("</layer>\n");
+            }
+        }
+
+        // remove last tab
+        tab = tab.substring(0, tab.length() - 1);
+        xml.append(tab).append("</layers>");
+
+        return xml.toString();
     }
 
     /**
@@ -1976,4 +1945,5 @@ public class LayersModel implements ViewListener {
             }
         }
     }
+
 }
