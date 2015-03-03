@@ -16,6 +16,7 @@ import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.gui.IconBank;
 import org.helioviewer.jhv.gui.IconBank.JHVIcon;
 import org.helioviewer.jhv.gui.ImageViewerGui;
+import org.helioviewer.jhv.gui.ViewListenerDistributor;
 import org.helioviewer.viewmodel.changeevent.ChangeEvent;
 import org.helioviewer.viewmodel.changeevent.LayerChangedReason;
 import org.helioviewer.viewmodel.renderer.screen.ScreenRenderGraphics;
@@ -24,6 +25,8 @@ import org.helioviewer.viewmodel.view.ComponentView;
 import org.helioviewer.viewmodel.view.LayeredView;
 import org.helioviewer.viewmodel.view.View;
 import org.helioviewer.viewmodel.view.ViewHelper;
+import org.helioviewer.viewmodel.view.ViewListener;
+
 import org.helioviewer.viewmodel.view.bufferedimage.BufferedImageComponentView;
 import org.helioviewer.viewmodel.view.opengl.GLSharedDrawable;
 import org.helioviewer.viewmodel.view.opengl.GLTextureHelper;
@@ -38,7 +41,7 @@ import org.helioviewer.viewmodel.view.opengl.GLTextureHelper;
  * @author Stephan Pagel
  * @author Markus Langenberg
  */
-public class MainImagePanel extends BasicImagePanel {
+public class MainImagePanel extends BasicImagePanel implements ViewListener {
 
     // ///////////////////////////////////////////////////////////////////////////
     // Definitions
@@ -76,6 +79,7 @@ public class MainImagePanel extends BasicImagePanel {
         noImagePostRendererSet = true;
 
         loadingPostRenderer.setContainerSize(getWidth(), getHeight());
+        ViewListenerDistributor.getSingletonInstance().addViewListener(this);
     }
 
     /**
@@ -201,12 +205,9 @@ public class MainImagePanel extends BasicImagePanel {
                         noImagePostRendererSet = true;
                     }
                 }
-
                 loadingPostRenderer.useCenterRenderer(layeredView.getNumLayers() == 0);
             }
         }
-        // call this method in super class
-        super.viewChanged(sender, aEvent);
     }
 
     /**

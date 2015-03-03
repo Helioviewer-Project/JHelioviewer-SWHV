@@ -7,6 +7,7 @@ import java.awt.event.ComponentEvent;
 import org.helioviewer.base.logging.Log;
 import org.helioviewer.base.math.Vector2dDouble;
 import org.helioviewer.base.math.Vector2dInt;
+import org.helioviewer.jhv.gui.ViewListenerDistributor;
 import org.helioviewer.jhv.gui.controller.OverviewImagePanelMousePanController;
 import org.helioviewer.jhv.gui.interfaces.ImagePanelInputController;
 import org.helioviewer.viewmodel.changeevent.ChangeEvent;
@@ -19,6 +20,7 @@ import org.helioviewer.viewmodel.renderer.screen.ScreenRenderer;
 import org.helioviewer.viewmodel.view.LayeredView;
 import org.helioviewer.viewmodel.view.View;
 import org.helioviewer.viewmodel.view.ViewHelper;
+import org.helioviewer.viewmodel.view.ViewListener;
 import org.helioviewer.viewmodel.view.bufferedimage.JavaImagePanel;
 import org.helioviewer.viewmodel.viewport.StaticViewport;
 import org.helioviewer.viewmodel.viewport.Viewport;
@@ -31,7 +33,7 @@ import org.helioviewer.viewmodel.viewportimagesize.ViewportImageSize;
  * @author Stephan Pagel
  *
  */
-public class OverviewImagePanel extends BasicImagePanel {
+public class OverviewImagePanel extends BasicImagePanel implements ViewListener {
 
     // ///////////////////////////////////////////////////////////////////////////
     // Definitions
@@ -69,6 +71,9 @@ public class OverviewImagePanel extends BasicImagePanel {
 
         // add a mouse input controller to the panel
         setInputController(inputControllerPanning);
+
+        // doesn't work now
+        // ViewListenerDistributor.getSingletonInstance().addViewListener(this);
     }
 
     public void enableInteraction() {
