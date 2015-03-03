@@ -108,7 +108,7 @@ public class SynchronizeOverviewChainView extends AbstractSynchronizeChainView {
             ImageInfoView imageInfoView = ViewHelper.getViewAdapter(aLayerChangedReason.getSubView(), ImageInfoView.class);
             View overviewImageView = viewRelations.get(imageInfoView);
             if (overviewImageView != null) {
-                View subView = findLayerSubView(overviewImageView);
+                View subView = ViewHelper.findLastViewBeforeLayeredView(overviewImageView);
                 removeLayer(imageInfoView, subView);
             }
         } else if (aLayerChangedReason.getLayerChangeType() == LayerChangeType.LAYER_VISIBILITY) {
@@ -257,38 +257,8 @@ public class SynchronizeOverviewChainView extends AbstractSynchronizeChainView {
      *            related image will be toggled.
      */
     private void changeLayerVisibility(View aView) {
-        View subView = findLayerSubView(aView);
+        View subView = ViewHelper.findLastViewBeforeLayeredView(aView);
         getAdapter(LayeredView.class).toggleVisibility(subView);
     }
 
-    /**
-     * Searches for the layered view in a sub tree chain by checking the
-     * listening views. The method returns the first sub view of the layered
-     * view which belongs to the passed view.
-     * 
-     * @param aView
-     *            View from where to search for a layered view.
-     * @return The first sub view of the layered view which belongs to the
-     *         passed view or null if no layered view could be found.
-     * */
-    private View findLayerSubView(View aView) {
-
-        AbstractList<ViewListener> viewListeners = aView.getAllViewListener();
-
-        for (ViewListener v : viewListeners) {
-
-            if (v instanceof LayeredView)
-                return aView;
-            else {
-                if (v instanceof View) {
-                    View result = findLayerSubView((View) v);
-
-                    if (result != null)
-                        return result;
-                }
-            }
-        }
-
-        return null;
-    }
 }
