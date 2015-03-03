@@ -132,9 +132,6 @@ public class GL3DImageTextureView extends AbstractGL3DView implements GL3DView, 
 
                     this.vertexShader.setDifferenceRect(diffXOffset, diffYOffset, diffXScale, diffYScale);
                     this.vertexShader.changeDifferenceAngles(diffTheta, diffPhi);
-                    this.fragmentShader.changeDifferenceAngles(diffTheta, diffPhi);
-                } else {
-                    this.fragmentShader.changeDifferenceAngles(theta, phi);
                 }
             }
 
