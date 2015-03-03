@@ -8,7 +8,6 @@ import org.helioviewer.gl3d.model.GL3DInternalPluginConfiguration;
 import org.helioviewer.gl3d.plugin.GL3DPluginController;
 import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.gui.GL3DViewchainFactory;
-import org.helioviewer.jhv.gui.ViewListenerDistributor;
 import org.helioviewer.jhv.gui.ViewchainFactory;
 import org.helioviewer.jhv.gui.components.SideContentPane;
 import org.helioviewer.jhv.gui.components.TopToolBar;
@@ -83,17 +82,11 @@ public class GuiState implements State {
             overviewComponentView.getAdapter(SynchronizeView.class).setObservedView(mainComponentView);
         }
 
-        ViewListenerDistributor.getSingletonInstance().setView(mainComponentView);
-        // imageSelectorPanel.setLayeredView(mainComponentView.getAdapter(LayeredView.class));
-
         return firstTime;
     }
 
     @Override
     public boolean recreateViewChains(State previousState) {
-        // Inhibit Event distribution during recreation
-        ViewListenerDistributor.getSingletonInstance().setView(null);
-
         Displayer.getSingletonInstance().removeListeners();
 
         if (previousState == null || previousState.getMainComponentView() == null) {
@@ -101,11 +94,8 @@ public class GuiState implements State {
         } else {
             mainComponentView = getViewchainFactory().createViewchainFromExistingViewchain(previousState.getMainComponentView(), this.mainComponentView, false);
             overviewComponentView = previousState.getOverviewComponentView();
-            if (mainComponentView != null) {
-                if (overviewComponentView != null) {
-                    overviewComponentView.getAdapter(SynchronizeView.class).setObservedView(mainComponentView);
-                }
-                ViewListenerDistributor.getSingletonInstance().setView(mainComponentView);
+            if (mainComponentView != null && overviewComponentView != null) {
+                overviewComponentView.getAdapter(SynchronizeView.class).setObservedView(mainComponentView);
             }
             return false;
         }
