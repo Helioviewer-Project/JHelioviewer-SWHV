@@ -75,32 +75,7 @@ public class GL3DSceneGraphView extends AbstractGL3DView implements GL3DView {
                 Log.debug("Toggling BoundingBox");
             }
         }, KeyEvent.VK_B);
-        /*
-         * GL3DKeyController.getInstance().addListener(new GL3DKeyListener() {
-         *
-         * @Override public void keyHit(KeyEvent e) {
-         * root.getDrawBits().toggle(Bit.Wireframe);
-         * Displayer.getSingletonInstance().display();
-         * Log.debug("Toggling Wireframe"); } }, KeyEvent.VK_W);
-         *
-         * GL3DKeyController.getInstance().addListener(new GL3DKeyListener() {
-         *
-         * @Override public void keyHit(KeyEvent e) {
-         * root.getDrawBits().toggle(Bit.Normals);
-         * Displayer.getSingletonInstance().display();
-         * Log.debug("Toggling Normals"); } }, KeyEvent.VK_N);
-         * GL3DKeyController.getInstance().addListener(new GL3DKeyListener() {
-         *
-         * @Override public void keyHit(KeyEvent e) {
-         * Displayer.getSingletonInstance().display();
-         * Log.debug("Toggling Framebuffer"); } }, KeyEvent.VK_F);
-         * GL3DKeyController.getInstance().addListener(new GL3DKeyListener() {
-         *
-         * @Override public void keyHit(KeyEvent e) {
-         * imageLayers.getDrawBits().toggle(Bit.Hidden);
-         * Displayer.getSingletonInstance().display();
-         * Log.debug("Toggling Images"); } }, KeyEvent.VK_I);
-         */
+
         GL3DKeyController.getInstance().addListener(new GL3DKeyListener() {
             @Override
             public void keyHit(KeyEvent e) {
@@ -113,12 +88,11 @@ public class GL3DSceneGraphView extends AbstractGL3DView implements GL3DView {
 
     @Override
     public void render3D(GL3DState state) {
-
         GL2 gl = state.gl;
 
         gl.glBlendFunc(GL2.GL_SRC_ALPHA, GL2.GL_ONE_MINUS_SRC_ALPHA);
-
         gl.glBlendEquation(GL2.GL_FUNC_ADD);
+
         deleteNodes(state);
 
         if (this.getView() != null) {
@@ -126,7 +100,6 @@ public class GL3DSceneGraphView extends AbstractGL3DView implements GL3DView {
             this.renderChild(gl);
             this.addLayersToSceneGraph(state);
             this.removeLayersFromSceneGraph(state);
-
             state.popMV();
         }
 
@@ -180,9 +153,9 @@ public class GL3DSceneGraphView extends AbstractGL3DView implements GL3DView {
         // Add Handler of Layer Events. Automatically add new Meshes for each
         // Layer
         if (newView.getAdapter(LayeredView.class) != null) {
-            LayeredView layeredView = (newView.getAdapter(LayeredView.class));
-            layeredView.addViewListener(new ViewListener() {
+            LayeredView layeredView = newView.getAdapter(LayeredView.class);
 
+            layeredView.addViewListener(new ViewListener() {
                 @Override
                 public void viewChanged(View sender, ChangeEvent aEvent) {
                     // Log.debug("viewChange: sender : " + sender);
@@ -204,8 +177,8 @@ public class GL3DSceneGraphView extends AbstractGL3DView implements GL3DView {
 
     private void handleLayerChange(LayerChangedReason reason) {
         GL3DImageTextureView imageTextureView = reason.getSubView().getAdapter(GL3DImageTextureView.class);
-        if (imageTextureView != null) {
 
+        if (imageTextureView != null) {
             switch (reason.getLayerChangeType()) {
             case LAYER_ADDED:
                 addNewLayer(imageTextureView);

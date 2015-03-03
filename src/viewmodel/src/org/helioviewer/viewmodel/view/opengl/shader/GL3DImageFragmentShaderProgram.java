@@ -73,7 +73,7 @@ public class GL3DImageFragmentShaderProgram extends GLFragmentShaderProgram {
         try {
             String program = "\tif(texcoord0.x<0.0||texcoord0.y<0.0||texcoord0.x>1.0||texcoord0.y>1.0) {" + "discard;" + GLShaderBuilder.LINE_SEP + "\t}" + GLShaderBuilder.LINE_SEP;
             program += "float dotpos = dot(position.xyz, position.xyz);" + GLShaderBuilder.LINE_SEP;
-            program += "\tif(dotpos<cutOffRadius.x*cutOffRadius.x ||dotpos>cutOffRadius.y*cutOffRadius.y ){discard;}" + GLShaderBuilder.LINE_SEP;
+            program += "\tif(dotpos<cutOffRadius[0]*cutOffRadius[0] ||dotpos>cutOffRadius[1]*cutOffRadius[1] ){discard;}" + GLShaderBuilder.LINE_SEP;
             program += "\tif((position.z==0.0 && dotpos<0.99)){" + "\t\tdiscard;" + GLShaderBuilder.LINE_SEP + "\t}" + GLShaderBuilder.LINE_SEP;
             program += "\tfloat3x3 mat = float3x3( cos(phi), -sin(theta)*sin(phi), -cos(theta)*sin(phi), 0., cos(theta), -sin(theta), sin(phi), cos(phi)*sin(theta), cos(theta)*cos(phi));" + GLShaderBuilder.LINE_SEP;
             program += "\tfloat3 zaxisrot = mul(mat,float3(0.,0.,1.));" + GLShaderBuilder.LINE_SEP;
