@@ -270,13 +270,13 @@ public class SWHVHEKImagePanelEventPopupController implements KeyEventDispatcher
         if (StateController.getInstance().getCurrentState().getType() == ViewStateEnum.View3D) {
             state3D = true;
 
-            GL3DComponentView gl3dview = (GL3DComponentView) view;
-            GL3DSceneGraphView scenegraphview = (GL3DSceneGraphView) gl3dview.getView();
-
-            GL3DRayTracer rayTracer = new GL3DRayTracer(scenegraphview.getHitReferenceShape(), GL3DState.get().getActiveCamera());
-            GL3DRay ray = rayTracer.cast(e.getX() * Displayer.screenScale, e.getY() * Displayer.screenScale);
-            if (ray != null && ray.getHitPoint() != null) {
-                hitpoint = ray.getHitPoint();
+            GL3DSceneGraphView scenegraphview = view.getAdapter(GL3DSceneGraphView.class);
+            if (scenegraphview != null) {
+                GL3DRayTracer rayTracer = new GL3DRayTracer(scenegraphview.getHitReferenceShape(), GL3DState.get().getActiveCamera());
+                GL3DRay ray = rayTracer.cast(e.getX() * Displayer.screenScale, e.getY() * Displayer.screenScale);
+                if (ray != null && ray.getHitPoint() != null) {
+                    hitpoint = ray.getHitPoint();
+                }
             }
         }
 
@@ -337,17 +337,18 @@ public class SWHVHEKImagePanelEventPopupController implements KeyEventDispatcher
         GL3DVec3d hitpoint = null;
 
         if (StateController.getInstance().getCurrentState().getType() == ViewStateEnum.View3D) {
-            GL3DComponentView gl3dview = (GL3DComponentView) view;
-            GL3DSceneGraphView scenegraphview = (GL3DSceneGraphView) gl3dview.getView();
-            scenegraphview.getHitReferenceShape().setHitCoronaPlane(true);
-            scenegraphview.getHitReferenceShape().setUseEarthPlane(true);
+            GL3DSceneGraphView scenegraphview = view.getAdapter(GL3DSceneGraphView.class);
+            if (scenegraphview != null) {
+                scenegraphview.getHitReferenceShape().setHitCoronaPlane(true);
+                scenegraphview.getHitReferenceShape().setUseEarthPlane(true);
 
-            GL3DRayTracer rayTracer = new GL3DRayTracer(scenegraphview.getHitReferenceShape(), GL3DState.get().getActiveCamera());
-            GL3DRay ray = rayTracer.cast(e.getX(), e.getY());
-            if (ray != null && ray.getHitPoint() != null) {
-                hitpoint = ray.getHitPoint();
+                GL3DRayTracer rayTracer = new GL3DRayTracer(scenegraphview.getHitReferenceShape(), GL3DState.get().getActiveCamera());
+                GL3DRay ray = rayTracer.cast(e.getX(), e.getY());
+                if (ray != null && ray.getHitPoint() != null) {
+                    hitpoint = ray.getHitPoint();
+                }
+                scenegraphview.getHitReferenceShape().setHitCoronaPlane(false);
             }
-            scenegraphview.getHitReferenceShape().setHitCoronaPlane(false);
         }
 
         return hitpoint;
