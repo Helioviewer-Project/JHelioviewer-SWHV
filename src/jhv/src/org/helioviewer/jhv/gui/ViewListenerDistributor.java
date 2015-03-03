@@ -24,19 +24,12 @@ import org.helioviewer.viewmodel.view.ViewListener;
  * 
  * @author Markus Langenberg
  */
-public class ViewListenerDistributor implements ViewListener {
+public class ViewListenerDistributor {
 
-    private static ViewListenerDistributor singletonObject = new ViewListenerDistributor();
-    private View view;
+    private final static ViewListenerDistributor singletonObject = new ViewListenerDistributor();
 
     private final ReentrantReadWriteLock rwl = new ReentrantReadWriteLock();
     private final ArrayList<ViewListener> listeners = new ArrayList<ViewListener>();
-
-    /**
-     * Private default constructor to implement the singleton pattern.
-     */
-    private ViewListenerDistributor() {
-    }
 
     /**
      * Returns the only instance of this class.
@@ -45,27 +38,6 @@ public class ViewListenerDistributor implements ViewListener {
      */
     public static ViewListenerDistributor getSingletonInstance() {
         return singletonObject;
-    }
-
-    /**
-     * Sets the view where to listen for changes.
-     * 
-     * This changes will be distributed to all listeners of the distributer.
-     * 
-     * @param newView
-     *            view where to listen for changes.
-     */
-    public void setView(View newView) {
-        if (view != null) {
-            view.removeViewListener(this);
-        }
-
-        view = newView;
-        if (newView != null) {
-            view.addViewListener(this);
-        }
-
-        viewChanged(null, new ChangeEvent(new ViewChainChangedReason(null)));
     }
 
     /**
