@@ -408,23 +408,18 @@ public class GL3DComponentView extends AbstractComponentView implements GLEventL
 
     @Override
     public void viewChanged(View sender, ChangeEvent aEvent) {
-        if (aEvent != null) {
-            LayerChangedReason lcReason = aEvent.getLastChangedReasonByType(LayerChangedReason.class);
-            if ((lcReason != null && lcReason.getLayerChangeType() == LayerChangeType.LAYER_ADDED) ||
-                aEvent.reasonOccurred(ViewChainChangedReason.class)) {
-                rebuildShaders = true;
-            }
-
-            TimestampChangedReason tsReason = aEvent.getLastChangedReasonByType(TimestampChangedReason.class);
-            SubImageDataChangedReason sidReason = aEvent.getLastChangedReasonByType(SubImageDataChangedReason.class);
-            if (sidReason != null ||
-                (tsReason != null && (tsReason.getView() instanceof TimedMovieView) &&
-                LinkedMovieManager.getActiveInstance().isMaster((TimedMovieView) tsReason.getView()))) {
-                Displayer.getSingletonInstance().display();
-            }
-
-            notifyViewListeners(aEvent);
+        LayerChangedReason lcReason = aEvent.getLastChangedReasonByType(LayerChangedReason.class);
+        if ((lcReason != null && lcReason.getLayerChangeType() == LayerChangeType.LAYER_ADDED) ||
+             aEvent.reasonOccurred(ViewChainChangedReason.class)) {
+            rebuildShaders = true;
         }
+
+        SubImageDataChangedReason sidReason = aEvent.getLastChangedReasonByType(SubImageDataChangedReason.class);
+        if (sidReason != null) {
+            Displayer.getSingletonInstance().display();
+        }
+
+        notifyViewListeners(aEvent);
     }
 
     @Override
