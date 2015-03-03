@@ -476,7 +476,7 @@ public class ViewchainFactory {
         // ViewListeners from the
         // old view chain and use the sourceView as input for the new view chain
         if (sourceView instanceof ImageInfoView && !keepSource) {
-            AbstractList<ViewListener> listeners = sourceView.getAllViewListener();
+            AbstractList<ViewListener> listeners = sourceView.getAllViewListeners();
             for (int i = listeners.size() - 1; i >= 0; i--) {
                 if (listeners.get(i) instanceof View) {
                     sourceView.removeViewListener(listeners.get(i));

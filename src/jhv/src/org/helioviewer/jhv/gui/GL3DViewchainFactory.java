@@ -76,14 +76,15 @@ public class GL3DViewchainFactory extends ViewchainFactory {
 
     @Override
     protected void createViewchainFromExistingViewchain(View sourceView, View targetView, ComponentView mainImagePanelView, boolean keepSource) {
-        AbstractList<ViewListener> listeners = sourceView.getAllViewListener();
+        AbstractList<ViewListener> listeners = sourceView.getAllViewListeners();
         for (int i = listeners.size() - 1; i >= 0; i--) {
             if (listeners.get(i) instanceof View) {
                 sourceView.removeViewListener(listeners.get(i));
             }
         }
+
         StandardSolarRotationTrackingView solv = (StandardSolarRotationTrackingView) (((GLOverlayView) sourceView).getView());
-        listeners = solv.getAllViewListener();
+        listeners = solv.getAllViewListeners();
         for (int i = listeners.size() - 1; i >= 0; i--) {
             if (listeners.get(i) instanceof View) {
                 solv.removeViewListener(listeners.get(i));
@@ -92,8 +93,7 @@ public class GL3DViewchainFactory extends ViewchainFactory {
         solv.setRegion(null, null);
 
         GLLayeredView layeredView = sourceView.getAdapter(GLLayeredView.class);
-        listeners = layeredView.getAllViewListener();
-
+        listeners = layeredView.getAllViewListeners();
         for (int i = listeners.size() - 1; i >= 0; i--) {
             if (listeners.get(i) instanceof View) {
                 layeredView.removeViewListener(listeners.get(i));

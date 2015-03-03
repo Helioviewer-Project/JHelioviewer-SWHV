@@ -570,7 +570,7 @@ public final class ViewHelper {
      */
     public static View findLastViewBeforeLayeredView(View aView) {
 
-        AbstractList<ViewListener> viewListeners = aView.getAllViewListener();
+        AbstractList<ViewListener> viewListeners = aView.getAllViewListeners();
 
         for (ViewListener v : viewListeners) {
 
