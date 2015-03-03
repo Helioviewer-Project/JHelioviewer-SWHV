@@ -63,7 +63,7 @@ public interface View {
      * 
      * @return List which contains references to all view listeners
      */
-    public AbstractList<ViewListener> getAllViewListener();
+    public AbstractList<ViewListener> getAllViewListeners();
 
     /**
      * Returns a View of given interface or class.

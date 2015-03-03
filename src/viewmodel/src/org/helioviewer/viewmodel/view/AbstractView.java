@@ -35,8 +35,12 @@ public abstract class AbstractView implements View {
     /**
      * {@inheritDoc}
      */
-    public AbstractList<ViewListener> getAllViewListener() {
-        return listeners;
+    public AbstractList<ViewListener> getAllViewListeners() {
+        rwl.readLock().lock();
+        AbstractList<ViewListener> listenersCopy = new ArrayList<ViewListener>(listeners);
+        rwl.readLock().unlock();
+
+        return listenersCopy;
     }
 
     /**
