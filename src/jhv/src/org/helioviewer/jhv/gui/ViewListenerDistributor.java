@@ -1,5 +1,7 @@
 package org.helioviewer.jhv.gui;
 
+import java.awt.EventQueue;
+
 import java.util.ArrayList;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
@@ -88,10 +90,28 @@ public class ViewListenerDistributor {
      */
     public void viewChanged(View sender, ChangeEvent aEvent) {
         rwl.readLock().lock();
-        for (ViewListener listener : listeners) {
-            listener.viewChanged(sender, aEvent);
-        }
+        ArrayList<ViewListener> listenersCopy = new ArrayList<ViewListener>(listeners);
         rwl.readLock().unlock();
+
+        EventQueue.invokeLater(new Runnable() {
+            private ArrayList<ViewListener> theListeners;
+            private View theSender;
+            private ChangeEvent theEvent;
+
+            @Override
+            public void run() {
+                for (ViewListener listener : theListeners) {
+                    listener.viewChanged(theSender, theEvent);
+                }
+            }
+
+            public Runnable init(ArrayList<ViewListener> theListeners, View theSender, ChangeEvent theEvent) {
+                this.theListeners = theListeners;
+                this.theSender = theSender;
+                this.theEvent = theEvent;
+                return this;
+            }
+        }.init(listenersCopy, sender, aEvent));
     }
 
 }

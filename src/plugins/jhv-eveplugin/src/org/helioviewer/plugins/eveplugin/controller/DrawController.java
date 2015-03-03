@@ -1,6 +1,5 @@
 package org.helioviewer.plugins.eveplugin.controller;
 
-import java.awt.EventQueue;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -294,29 +293,16 @@ public class DrawController implements ZoomControllerListener, LineDataSelectorM
      * org.helioviewer.viewmodel.view.ViewListener#viewChanged(org.helioviewer
      * .viewmodel.view.View, org.helioviewer.viewmodel.changeevent.ChangeEvent)
      */
+
+    // this notification comes on AWT-EventQueue thread
+
     @Override
     public void viewChanged(View sender, ChangeEvent aEvent) {
         TimestampChangedReason timestampReason = aEvent.getLastChangedReasonByType(TimestampChangedReason.class);
         if ((timestampReason != null) && (timestampReason.getView() instanceof TimedMovieView) && LinkedMovieManager.getActiveInstance().isMaster((TimedMovieView) timestampReason.getView())) {
             Date date = timestampReason.getNewDateTime().getTime();
             if ((previousTimestamp == null || date == null) || previousTimestamp.getTime() != date.getTime()) {
-                if (!EventQueue.isDispatchThread()) {
-                    EventQueue.invokeLater(new Runnable() {
-                        private Date date;
-
-                        @Override
-                        public void run() {
-                            fireRedrawRequestMovieFrameChanged(date);
-                        }
-
-                        public Runnable init(Date date) {
-                            this.date = date;
-                            return this;
-                        }
-                    }.init(date));
-                } else {
-                    fireRedrawRequestMovieFrameChanged(date);
-                }
+                fireRedrawRequestMovieFrameChanged(date);
                 previousTimestamp = date;
             }
         }
@@ -390,4 +376,5 @@ public class DrawController implements ZoomControllerListener, LineDataSelectorM
         // TODO Auto-generated method stub
 
     }
+
 }
