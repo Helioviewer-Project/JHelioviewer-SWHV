@@ -301,10 +301,8 @@ public class MoviePanel extends JPanel implements ActionListener, ChangeListener
         modePanel.add(animationModeComboBox, BorderLayout.EAST);
 
         mainPanel.add(modePanel);
+        panelList.add(this);
 
-        synchronized (panelList) {
-            panelList.add(this);
-        }
         this.setEnabled(false);
         this.setAdvanced(MoviePanel.isAdvanced);
     }
@@ -348,13 +346,10 @@ public class MoviePanel extends JPanel implements ActionListener, ChangeListener
             return null;
         }
 
-        synchronized (panelList) {
-            for (MoviePanel moviePanel : panelList) {
-                if (moviePanel.view != null && moviePanel.view.equals(view)) {
-                    return moviePanel;
-                }
+        for (MoviePanel moviePanel : panelList) {
+            if (moviePanel.view != null && moviePanel.view.equals(view)) {
+                return moviePanel;
             }
-
         }
         return null;
     }
@@ -594,9 +589,7 @@ public class MoviePanel extends JPanel implements ActionListener, ChangeListener
 
         if (layerReason != null && layerReason.getSubView().getAdapter(MovieView.class) == view && layerReason.getLayerChangeType() == LayerChangeType.LAYER_REMOVED) {
             linkedMovieManager.unlinkMoviePanel(this);
-            synchronized (panelList) {
-                panelList.remove(this);
-            }
+            panelList.remove(this);
             return;
         }
 
@@ -746,12 +739,11 @@ public class MoviePanel extends JPanel implements ActionListener, ChangeListener
                 MovieView movieView = view.getAdapter(MovieView.class);
                 if (movieView != null) {
                     setEnabled(true);
-                    synchronized (panelList) {
-                        for (MoviePanel panel : panelList) {
-                            if (panel.view == movieView) {
-                                activePanel = panel;
-                                return;
-                            }
+
+                    for (MoviePanel panel : panelList) {
+                        if (panel.view == movieView) {
+                            activePanel = panel;
+                            return;
                         }
                     }
                 }
