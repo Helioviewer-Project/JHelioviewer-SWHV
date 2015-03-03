@@ -28,7 +28,6 @@ import org.helioviewer.viewmodel.view.MetaDataView;
 import org.helioviewer.viewmodel.view.RegionView;
 import org.helioviewer.viewmodel.view.View;
 import org.helioviewer.viewmodel.view.ViewHelper;
-import org.helioviewer.viewmodel.view.ViewListener;
 import org.helioviewer.viewmodel.view.ViewportView;
 import org.helioviewer.viewmodel.view.opengl.GLTextureHelper;
 import org.helioviewer.viewmodel.viewport.StaticViewport;
@@ -41,7 +40,7 @@ import org.helioviewer.viewmodel.viewport.Viewport;
  * @author Stephan Pagel
  *
  * */
-public class BasicImagePanel extends JPanel implements ComponentListener, ViewListener {
+public class BasicImagePanel extends JPanel implements ComponentListener {
 
     // ////////////////////////////////////////////////////////////////
     // Definitions
@@ -175,9 +174,6 @@ public class BasicImagePanel extends JPanel implements ComponentListener, ViewLi
      */
     public void setView(ComponentView newView) {
         if (renderedImageComponent != null) {
-            if (componentView != null) // on first invocation
-                componentView.removeViewListener(this);
-
             renderedImageComponent.removeMouseListener(inputController);
             renderedImageComponent.removeMouseMotionListener(inputController);
             renderedImageComponent.removeMouseWheelListener(inputController);
@@ -191,11 +187,8 @@ public class BasicImagePanel extends JPanel implements ComponentListener, ViewLi
 
         if (componentView != null) {
             componentView.setComponent(renderedImageComponent);
-
-            componentView.addViewListener(this);
             setInputController(inputController);
             setPostRenderers();
-
             componentView.getAdapter(ViewportView.class).setViewport(getViewport(), new ChangeEvent());
         }
 
@@ -331,7 +324,6 @@ public class BasicImagePanel extends JPanel implements ComponentListener, ViewLi
      *            new post renderer for the image component.
      */
     public void addPostRenderer(ScreenRenderer postRenderer) {
-
         if (postRenderer != null) {
             postRenderers.add(postRenderer);
 
@@ -353,37 +345,6 @@ public class BasicImagePanel extends JPanel implements ComponentListener, ViewLi
             if (componentView != null)
                 componentView.removePostRenderer(postRenderer);
         }
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void viewChanged(View sender, ChangeEvent aEvent) {
-
-        if (aEvent.reasonOccurred(ViewChainChangedReason.class)) {
-
-            viewportView = ViewHelper.getViewAdapter(componentView, ViewportView.class);
-            regionView = ViewHelper.getViewAdapter(componentView, RegionView.class);
-            metaDataView = ViewHelper.getViewAdapter(componentView, MetaDataView.class);
-            if (viewportView != null && regionView != null && metaDataView != null) {
-                if (updateViewportView)
-                    viewportView.setViewport(getViewport(), new ChangeEvent());
-
-                Viewport v = viewportView.getViewport();
-                Region r = regionView.getRegion();
-                MetaData m = metaDataView.getMetaData();
-
-                if (v != null && r != null && m != null)
-                    regionView.setRegion(ViewHelper.expandRegionToViewportAspectRatio(v, r, m), new ChangeEvent());
-            }
-            repaint();
-            return;
-        }
-
-        // if (aEvent.reasonOccurred(SubImageDataChangedReason.class) ||
-        // aEvent.reasonOccurred(RegionChangedReason.class))
-        // repaint();
     }
 
     // ////////////////////////////////////////////////////////////////
@@ -410,7 +371,6 @@ public class BasicImagePanel extends JPanel implements ComponentListener, ViewLi
      */
     @Override
     public void componentResized(ComponentEvent e) {
-
         if (viewportView != null && regionView != null && metaDataView != null) {
             if (updateViewportView)
                 viewportView.setViewport(getViewport(), new ChangeEvent());
@@ -419,8 +379,9 @@ public class BasicImagePanel extends JPanel implements ComponentListener, ViewLi
             Region r = regionView.getRegion();
             MetaData m = metaDataView.getMetaData();
 
-            if (v != null && r != null && m != null)
+            if (v != null && r != null && m != null) {
                 regionView.setRegion(ViewHelper.expandRegionToViewportAspectRatio(v, r, m), new ChangeEvent());
+            }
         } else {
             repaint();
         }
