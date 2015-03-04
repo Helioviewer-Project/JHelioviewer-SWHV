@@ -91,15 +91,14 @@ public abstract class GL3DImageMesh extends GL3DMesh {
         }
 
         GLVertexShaderProgram.pushShader(state.gl);
-        GLFragmentShaderProgram.pushShader(state.gl);
 
         this.vertexShaderProgram.bind(state.gl);
         this.fragmentShaderProgram.bind(state.gl);
+        //state.gl.glBindProgramARB(GL2.GL_FRAGMENT_PROGRAM_ARB, ShaderFactory.getFragmentId());
 
         super.shapeDraw(state);
 
         GLVertexShaderProgram.popShader(state.gl);
-        GLFragmentShaderProgram.popShader(state.gl);
     }
 
     public GL3DImageTextureView getImageTextureView() {
