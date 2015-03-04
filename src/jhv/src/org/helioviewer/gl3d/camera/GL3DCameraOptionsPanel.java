@@ -2,7 +2,6 @@ package org.helioviewer.gl3d.camera;
 
 import java.awt.Component;
 import java.awt.Container;
-import java.awt.EventQueue;
 
 import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
@@ -33,13 +32,8 @@ public class GL3DCameraOptionsPanel extends JPanel implements GL3DCameraSelectio
     public GL3DCameraOptionsPanel() {
         LayersModel.getSingletonInstance().addLayersListener(this);
         setLayout(new BoxLayout(this, BoxLayout.PAGE_AXIS));
-        EventQueue.invokeLater(new Runnable() {
-            @Override
-            public void run() {
-                setModel();
-                addCameraTabs();
-            }
-        });
+        setModel();
+        addCameraTabs();
     }
 
     protected void setModel() {
@@ -195,36 +189,31 @@ public class GL3DCameraOptionsPanel extends JPanel implements GL3DCameraSelectio
     @Override
     public void layerChanged(int idx) {
         // TODO Auto-generated method stub
-
     }
 
     @Override
     public void activeLayerChanged(int idx) {
         // TODO Auto-generated method stub
-
     }
 
     @Override
     public void viewportGeometryChanged() {
         // TODO Auto-generated method stub
-
     }
 
     @Override
     public void timestampChanged(int idx) {
         // TODO Auto-generated method stub
-
     }
 
     @Override
     public void subImageDataChanged() {
         // TODO Auto-generated method stub
-
     }
 
     @Override
     public void layerDownloaded(int idx) {
         // TODO Auto-generated method stub
-
     }
+
 }
