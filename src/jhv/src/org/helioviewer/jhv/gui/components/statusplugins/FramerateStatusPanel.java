@@ -1,7 +1,6 @@
 package org.helioviewer.jhv.gui.components.statusplugins;
 
 import java.awt.Dimension;
-import java.awt.EventQueue;
 
 import javax.swing.BorderFactory;
 
@@ -48,25 +47,12 @@ public class FramerateStatusPanel extends ViewStatusPanelPlugin {
         }
     }
 
-    private void updateFramerate_eq() {
-        if (EventQueue.isDispatchThread()) {
-            updateFramerate();
-        } else {
-            EventQueue.invokeLater(new Runnable() {
-                @Override
-                public void run() {
-                    updateFramerate();
-                }
-            });
-        }
-    }
-
     public void activeLayerChanged(int idx) {
-        updateFramerate_eq();
+        updateFramerate();
     }
 
     public void subImageDataChanged() {
-        updateFramerate_eq();
+        updateFramerate();
     }
 
 }
