@@ -444,7 +444,7 @@ public class JHVJP2View extends AbstractView implements JP2View, ViewportView, R
      *            ChangeEvent to fire
      */
     public void fireChangeEvent(ChangeEvent aEvent) {
-        super.notifyViewListeners(aEvent);
+        notifyViewListeners(aEvent);
     }
 
     /**

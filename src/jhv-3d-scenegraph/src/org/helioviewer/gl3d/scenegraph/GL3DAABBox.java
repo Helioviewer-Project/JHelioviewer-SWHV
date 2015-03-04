@@ -86,7 +86,6 @@ public class GL3DAABBox {
 
     private void draw(GL3DState state, GL3DVec3d minV, GL3DVec3d maxV, GL3DVec4d color) {
         if (this.indexBuffer == null) {
-
             GL3DVec3d[] corners = new GL3DVec3d[8];
             corners[0] = new GL3DVec3d(minV);
             corners[1] = new GL3DVec3d(maxV.x, minV.y, minV.z);
@@ -137,14 +136,9 @@ public class GL3DAABBox {
         this.indexBuffer.enable(state);
         this.colorBuffer.enable(state);
 
-        // state.gl.glMaterialfv(GL2.GL_FRONT, GL2.GL_DIFFUSE,
-        // this.diffuseMaterial, 0);
-
         // state.gl.glColor4d(color.x, color.y, color.z, color.w);
         GL3DMeshPrimitive primitive = GL3DMeshPrimitive.LINES;
-        state.gl.glDisable(GL2.GL_LIGHTING);
         state.gl.glDrawElements(primitive.id, this.indexBuffer.numberOfElements, this.indexBuffer.dataType.id, 0);
-        state.gl.glEnable(GL2.GL_LIGHTING);
 
         this.vertexBuffer.disable(state);
         this.colorBuffer.disable(state);

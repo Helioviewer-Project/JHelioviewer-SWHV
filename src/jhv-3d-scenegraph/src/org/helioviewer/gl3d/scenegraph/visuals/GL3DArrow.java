@@ -26,9 +26,7 @@ public class GL3DArrow extends GL3DGroup {
 
     @Override
     public void shapeDraw(GL3DState state) {
-        GL2 gl = state.get().gl;
-        gl.glDisable(GL2.GL_LIGHTING);
         super.shapeDraw(state);
-        gl.glEnable(GL2.GL_LIGHTING);
     }
+
 }

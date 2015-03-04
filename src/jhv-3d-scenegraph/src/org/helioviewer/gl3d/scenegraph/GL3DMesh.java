@@ -123,8 +123,8 @@ public abstract class GL3DMesh extends GL3DShape {
             } else {
                 // state.gl.glColor4d(1, 1, 1, 1);
                 // Log.debug("GL3DMesh: "+getName()+" Using VBO AND diffuseMaterial as Color");
-                state.gl.glMaterialfv(GL2.GL_FRONT, GL2.GL_AMBIENT_AND_DIFFUSE, this.diffuseMaterial, 0);
-                state.gl.glMaterialfv(GL2.GL_FRONT, GL2.GL_SPECULAR, this.specularMaterial, 0);
+                //state.gl.glMaterialfv(GL2.GL_FRONT, GL2.GL_AMBIENT_AND_DIFFUSE, this.diffuseMaterial, 0);
+                //state.gl.glMaterialfv(GL2.GL_FRONT, GL2.GL_SPECULAR, this.specularMaterial, 0);
                 this.colorVBO.enable(state);
             }
 
@@ -157,8 +157,8 @@ public abstract class GL3DMesh extends GL3DShape {
 
     private void renderWireframe(GL3DState state, GL3DMeshPrimitive primitive) {
         GL2 gl = state.gl;
-        gl.glDisable(GL2.GL_LIGHTING);
         gl.glDisable(GL2.GL_TEXTURE_2D);
+
         if (primitive == GL3DMeshPrimitive.QUADS) {
 
             for (int i = 0; i < this.indices.size(); i++) {
@@ -207,15 +207,14 @@ public abstract class GL3DMesh extends GL3DShape {
             gl.glEnd();
         }
 
-        gl.glEnable(GL2.GL_LIGHTING);
         gl.glEnable(GL2.GL_TEXTURE_2D);
     }
 
     private void renderNormals(GL3DState state) {
         GL2 gl = state.gl;
         gl.glColor3d(1, 0.5, 0);
-        gl.glDisable(GL2.GL_LIGHTING);
         gl.glDisable(GL2.GL_TEXTURE_2D);
+
         gl.glBegin(GL2.GL_LINES);
         for (int i = 0; i < this.normals.size(); i++) {
             GL3DVec3d position = this.positions.get(i);
@@ -225,7 +224,7 @@ public abstract class GL3DMesh extends GL3DShape {
             gl.glVertex3d(position.x + normal.x * Constants.SunRadius / 10, position.y + normal.y * Constants.SunRadius / 10, position.z + normal.z * Constants.SunRadius / 10);
         }
         gl.glEnd();
-        gl.glEnable(GL2.GL_LIGHTING);
+
         gl.glEnable(GL2.GL_TEXTURE_2D);
     }
 

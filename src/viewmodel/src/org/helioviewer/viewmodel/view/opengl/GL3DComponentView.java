@@ -201,8 +201,6 @@ public class GL3DComponentView extends AbstractComponentView implements GLEventL
             gl.glFrontFace(GL2.GL_CCW);
             // gl.glDepthFunc(GL2.GL_LESS);
             gl.glDepthFunc(GL2.GL_LEQUAL);
-
-            gl.glEnable(GL2.GL_LIGHT0);
         }
 
         @Override
@@ -212,7 +210,6 @@ public class GL3DComponentView extends AbstractComponentView implements GLEventL
         @Override
         public final void displayBody(GL2 gl, View v, int width, int height) {
             gl.glClear(GL2.GL_COLOR_BUFFER_BIT | GL2.GL_DEPTH_BUFFER_BIT);
-            gl.glEnable(GL2.GL_LIGHTING);
             gl.glEnable(GL2.GL_DEPTH_TEST);
 
             ((GL3DView) v).renderGL(gl, true);
@@ -344,7 +341,6 @@ public class GL3DComponentView extends AbstractComponentView implements GLEventL
             gl.glLoadIdentity();
             gl.glTranslatef(0.0f, height, 0.0f);
             gl.glScalef(1.0f, -1.0f, 1.0f);
-            gl.glDisable(GL2.GL_LIGHTING);
             gl.glColor4f(1, 1, 1, 0);
             gl.glDisable(GL2.GL_DEPTH_TEST);
             gl.glEnable(GL2.GL_TEXTURE_2D);

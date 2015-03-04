@@ -240,7 +240,6 @@ public class PfssData {
 
         gl.glDisable(GL2.GL_FRAGMENT_PROGRAM_ARB);
         gl.glDisable(GL2.GL_VERTEX_PROGRAM_ARB);
-        gl.glDisable(GL2.GL_LIGHTING);
 
         gl.glDisable(GL2.GL_TEXTURE_2D);
         gl.glDisable(GL2.GL_TEXTURE_1D);
@@ -272,7 +271,6 @@ public class PfssData {
 
     public void setInit(boolean init) {
         this.init = init;
-
     }
 
 }

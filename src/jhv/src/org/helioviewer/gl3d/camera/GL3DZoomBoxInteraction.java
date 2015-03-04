@@ -54,7 +54,6 @@ public class GL3DZoomBoxInteraction extends GL3DDefaultInteraction {
             GL2 gl = state.gl;
             gl.glColor3d(1, 1, 0);
             gl.glDisable(GL2.GL_DEPTH_TEST);
-            gl.glDisable(GL2.GL_LIGHTING);
             gl.glDisable(GL2.GL_TEXTURE_2D);
 
             gl.glLineWidth(2.0f);
@@ -68,7 +67,7 @@ public class GL3DZoomBoxInteraction extends GL3DDefaultInteraction {
             gl.glEnd();
 
             gl.glLineWidth(1.0f);
-            gl.glEnable(GL2.GL_LIGHTING);
+
             gl.glEnable(GL2.GL_DEPTH_TEST);
             gl.glEnable(GL2.GL_TEXTURE_2D);
         }

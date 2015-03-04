@@ -54,7 +54,6 @@ public class GL3DImageLayers extends GL3DGroup {
         // GL3DState.get().checkGLErrors("GL3DImageLayers.afterDisable");
 
         state.gl.glDisable(GL2.GL_BLEND);
-        state.gl.glEnable(GL2.GL_LIGHTING);
     }
 
     private void drawImageLayers(GL3DState state) {
