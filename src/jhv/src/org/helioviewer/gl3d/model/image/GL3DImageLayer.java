@@ -177,7 +177,7 @@ public abstract class GL3DImageLayer extends GL3DGroup implements GL3DCameraList
                     if (on) {
                         hitPoint = activeCamera.getVectorFromSphere(new Point((int) (i * width / res), (int) (j * height / 1.)));
                     } else {
-                        hitPoint = activeCamera.getVectorFromSphere(new Point((int) (i * width / res), (int) (j * height / 1.)));
+                        hitPoint = activeCamera.getVectorFromPlane(new Point((int) (i * width / res), (int) (j * height / 1.)));
 
                     }
                     if (hitPoint != null) {
