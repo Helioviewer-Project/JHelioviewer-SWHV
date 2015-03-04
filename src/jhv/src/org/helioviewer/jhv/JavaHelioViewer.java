@@ -274,6 +274,13 @@ public class JavaHelioViewer {
             Log.error("Error retrieving internal update URL", e);
         }
 
+        splash.initializeGLInitPanel();
+
+        splash.setProgressText("Start main window...");
+        splash.nextStep();
+        // Create main view chain and display main window
+        Log.info("Start main window");
+
         try {
             EventQueue.invokeAndWait(new Runnable() {
                 @Override
@@ -282,7 +289,6 @@ public class JavaHelioViewer {
                     ImageViewerGui.getSingletonInstance().updateComponents();
                     ImageViewerGui.getSingletonInstance().createViewchains();
 
-                    Log.debug("Installing Overlap Watcher");
                     LayerTableOverlapWatcher overlapWatcher = new LayerTableOverlapWatcher();
                     LayersModel.getSingletonInstance().addLayersListener(overlapWatcher);
                 }
@@ -364,11 +370,6 @@ public class JavaHelioViewer {
             Message.warn(title, message);
         }
 
-        splash.setProgressText("Start main window...");
-        splash.nextStep();
-        // Create main view chain and display main window
-        Log.info("Start main window");
-        splash.initializeGLInitPanel();
     }
 
 }
