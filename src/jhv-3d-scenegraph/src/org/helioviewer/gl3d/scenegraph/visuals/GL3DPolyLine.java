@@ -49,8 +49,7 @@ public class GL3DPolyLine extends GL3DMesh {
 
     @Override
     public void shapeDraw(GL3DState state) {
-        state.gl.glDisable(GL2.GL_LIGHTING);
         super.shapeDraw(state);
-        state.gl.glEnable(GL2.GL_LIGHTING);
     }
+
 }

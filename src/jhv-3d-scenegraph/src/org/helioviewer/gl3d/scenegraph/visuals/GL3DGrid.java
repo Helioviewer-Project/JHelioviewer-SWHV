@@ -86,7 +86,7 @@ public class GL3DGrid extends GL3DGroup {
         this.markAsChanged();
         state.gl.glColor3d(1., 1., 0.);
         GL2 gl = state.gl;
-        gl.glDisable(GL2.GL_LIGHTING);
+
         super.shapeDraw(state);
         float relhi = (float) (state.getActiveCamera().INITFOV / (state.getActiveCamera().getCameraFOV())) * scale;
         float cfontsize = this.fontsize * relhi;
@@ -100,7 +100,6 @@ public class GL3DGrid extends GL3DGroup {
             drawText(gl);
         }
         drawCircles(gl);
-        gl.glEnable(GL2.GL_LIGHTING);
     }
 
     private void drawCircles(GL2 gl) {
@@ -108,7 +107,7 @@ public class GL3DGrid extends GL3DGroup {
         gl.glLineWidth(lineWidth);
         gl.glBlendFunc(GL2.GL_SRC_ALPHA, GL2.GL_ONE_MINUS_SRC_ALPHA);
         gl.glColor3f((float) (firstColor.getRed() / 255.), (float) (firstColor.getGreen() / 255.), (float) (firstColor.getBlue() / 255.));
-        gl.glDisable(GL2.GL_LIGHTING);
+
         double phi = Math.PI / 2.;
         double latstep = latstepDegrees / 180. * Math.PI;
         for (; phi < Math.PI; phi = phi + latstep) {

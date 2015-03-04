@@ -372,7 +372,6 @@ public class GLPhysicalRenderGraphics extends AbstractPhysicalRenderGraphics {
         axis.normalize();
         GL3DMat4d r = GL3DMat4d.rotation(Math.atan2(x, z), GL3DVec3d.YAxis);
         r.rotate(-Math.asin(y / targetDir.length()), GL3DVec3d.XAxis);
-        gl.glDisable(GL2.GL_LIGHTING);
         gl.glEnable(GL2.GL_BLEND);
         gl.glBlendFunc(GL2.GL_SRC_ALPHA, GL2.GL_ONE_MINUS_SRC_ALPHA);
         gl.glDisable(GL2.GL_DEPTH_TEST);
@@ -406,7 +405,6 @@ public class GLPhysicalRenderGraphics extends AbstractPhysicalRenderGraphics {
         }
         gl.glEnd();
 
-        gl.glEnable(GL2.GL_LIGHTING);
         gl.glDisable(GL2.GL_BLEND);
         gl.glEnable(GL2.GL_DEPTH_TEST);
         gl.glDisable(GL2.GL_CULL_FACE);
@@ -418,7 +416,6 @@ public class GLPhysicalRenderGraphics extends AbstractPhysicalRenderGraphics {
         gl.glBindTexture(GL2.GL_TEXTURE_2D, 0);
 
         gl.glDisable(GL2.GL_DEPTH_TEST);
-        gl.glEnable(GL2.GL_LIGHTING);
         gl.glEnable(GL2.GL_BLEND);
         gl.glBlendFunc(GL2.GL_SRC_ALPHA, GL2.GL_ONE_MINUS_SRC_ALPHA);
         gl.glEnable(GL2.GL_CULL_FACE);
@@ -434,7 +431,6 @@ public class GLPhysicalRenderGraphics extends AbstractPhysicalRenderGraphics {
         gl.glDisable(GL2.GL_BLEND);
         gl.glEnable(GL2.GL_DEPTH_TEST);
         gl.glDisable(GL2.GL_CULL_FACE);
-        gl.glDisable(GL2.GL_LIGHTING);
     }
 
     @Override
@@ -442,7 +438,6 @@ public class GLPhysicalRenderGraphics extends AbstractPhysicalRenderGraphics {
         gl.glDisable(GL2.GL_TEXTURE_2D);
         gl.glEnable(GL2.GL_LINE_SMOOTH);
         gl.glEnable(GL2.GL_BLEND);
-        gl.glDisable(GL2.GL_LIGHTING);
         gl.glLineWidth(0.5f);
         gl.glDepthRangef(0.f, 0.f);
         gl.glBlendFunc(GL2.GL_ONE, GL2.GL_ONE);
