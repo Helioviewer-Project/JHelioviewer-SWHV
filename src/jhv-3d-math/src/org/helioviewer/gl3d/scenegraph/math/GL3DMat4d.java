@@ -406,7 +406,7 @@ public class GL3DMat4d {
         } else // arbitrary axis
         {
             double len = axisx * axisx + axisy * axisy + axisz * axisz; // length
-                                                                        // squared
+            // squared
             double x, y, z;
             x = axisx;
             y = axisy;
@@ -436,6 +436,10 @@ public class GL3DMat4d {
 
     public final static GL3DMat4d frustum(double l, double r, double b, double t, double n, double f) {
         return new GL3DMat4d((2 * n) / (r - l), 0, (r + l) / (r - l), 0, 0, (2 * n) / (t - b), (t + b) / (t - b), 0, 0, 0, -(f + n) / (f - n), (-2 * f * n) / (f - n), 0, 0, -1, 0);
+    }
+
+    public final static GL3DMat4d ortho(double l, double r, double b, double t, double n, double f) {
+        return new GL3DMat4d(2. / (r - l), 0., 0., -(r + l) / (r - l), 0., 2 / (t - b), 0., -(t + b) / (t - b), 0., 0., -2. / (f - n), -(f + n) / (f - n), 0., 0., 0., 1.);
     }
 
     public final static GL3DMat4d perspective(double fov, double aspect, double n, double f) {
