@@ -5,6 +5,5 @@
 	<classpathentry combineaccessrules="false" kind="src" path="/base"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/jhv-3d-math"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/jhv-3d-scenegraph"/>
-	<classpathentry combineaccessrules="false" kind="src" path="/jhv-3d-wcs"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

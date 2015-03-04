@@ -9,7 +9,6 @@ import org.helioviewer.gl3d.scenegraph.GL3DState;
 import org.helioviewer.gl3d.scenegraph.math.GL3DVec3d;
 import org.helioviewer.gl3d.scenegraph.rt.GL3DRay;
 import org.helioviewer.gl3d.scenegraph.rt.GL3DRayTracer;
-import org.helioviewer.gl3d.wcs.CoordinateVector;
 import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.viewmodel.view.opengl.GL3DSceneGraphView;
 

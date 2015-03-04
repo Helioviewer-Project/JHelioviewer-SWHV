@@ -17,7 +17,6 @@ import org.helioviewer.gl3d.scenegraph.math.GL3DVec3d;
 import org.helioviewer.gl3d.scenegraph.math.GL3DVec4d;
 import org.helioviewer.gl3d.scenegraph.math.GL3DVec4f;
 import org.helioviewer.gl3d.scenegraph.visuals.GL3DGrid;
-import org.helioviewer.gl3d.wcs.CoordinateSystem;
 import org.helioviewer.viewmodel.view.opengl.GL3DSceneGraphView;
 
 /**
@@ -381,8 +380,6 @@ public abstract class GL3DCamera {
             l.cameraMoving(this);
         }
     }
-
-    public abstract CoordinateSystem getViewSpaceCoordinateSystem();
 
     public void updateRotation(long dateMillis) {
 
