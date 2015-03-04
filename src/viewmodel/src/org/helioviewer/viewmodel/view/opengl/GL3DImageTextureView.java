@@ -29,7 +29,7 @@ import org.helioviewer.viewmodel.view.jp2view.JHVJPXView;
 import org.helioviewer.viewmodel.view.opengl.shader.GL3DImageFragmentShaderProgram;
 import org.helioviewer.viewmodel.view.opengl.shader.GL3DImageVertexShaderProgram;
 import org.helioviewer.viewmodel.view.opengl.shader.GLFragmentShaderView;
-import org.helioviewer.viewmodel.view.opengl.shader.GLShaderBuilder;
+import org.helioviewer.viewmodel.viewport.Viewport;
 
 /**
  * Connects the 3D viewchain to the 2D viewchain. The underlying 2D viewchain
@@ -181,15 +181,6 @@ public class GL3DImageTextureView extends AbstractGL3DView implements GL3DView, 
 
     public void setVertexShader(GL3DImageVertexShaderProgram vertexShader) {
         this.vertexShader = vertexShader;
-    }
-
-    @Override
-    public GLShaderBuilder buildFragmentShader(GLShaderBuilder shaderBuilder) {
-        GLFragmentShaderView nextView = view.getAdapter(GLFragmentShaderView.class);
-        if (nextView != null) {
-            shaderBuilder = nextView.buildFragmentShader(shaderBuilder);
-        }
-        return shaderBuilder;
     }
 
     public GL3DImageFragmentShaderProgram getFragmentShader() {

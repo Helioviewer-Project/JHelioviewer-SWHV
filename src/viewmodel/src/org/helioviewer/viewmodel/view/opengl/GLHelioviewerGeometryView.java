@@ -73,19 +73,6 @@ public class GLHelioviewerGeometryView extends AbstractGLView implements Heliovi
      * {@inheritDoc}
      */
     @Override
-    public GLShaderBuilder buildFragmentShader(GLShaderBuilder shaderBuilder) {
-        GLFragmentShaderView nextView = view.getAdapter(GLFragmentShaderView.class);
-        if (nextView != null) {
-            shaderBuilder = nextView.buildFragmentShader(shaderBuilder);
-        }
-
-        return shaderBuilder;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
     public GLShaderBuilder buildVertexShader(GLShaderBuilder shaderBuilder) {
         GLVertexShaderView nextView = view.getAdapter(GLVertexShaderView.class);
         if (nextView != null) {
