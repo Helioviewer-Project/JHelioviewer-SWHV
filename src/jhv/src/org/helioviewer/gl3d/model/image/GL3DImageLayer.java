@@ -232,7 +232,7 @@ public abstract class GL3DImageLayer extends GL3DGroup implements GL3DCameraList
         double regionWidth = maxPhysicalX - minPhysicalX;
         double regionHeight = maxPhysicalY - minPhysicalY;
         Region newRegion;
-        if (regionWidth > 0 && regionHeight > 0) {
+        if (false && regionWidth > 0 && regionHeight > 0) {
             newRegion = StaticRegion.createAdaptedRegion(minPhysicalX, minPhysicalY, regionWidth, regionHeight);
         } else {
             newRegion = StaticRegion.createAdaptedRegion(metLLX, metLLY, metURX - metLLX, metURY - metLLY);
@@ -271,4 +271,45 @@ public abstract class GL3DImageLayer extends GL3DGroup implements GL3DCameraList
     public void setCoronaVisibility(boolean visible) {
     }
 
+    public void updateROIalt(GL3DCamera activeCamera) {
+        MetaData metaData = metaDataView.getMetaData();
+        HelioviewerMetaData hvmd = null;
+        if (metaData instanceof HelioviewerMetaData) {
+            hvmd = (HelioviewerMetaData) metaData;
+        }
+        if (metaData == null || activeCamera == null) {
+            return;
+        }
+
+        double phi = hvmd.getPhi();
+        double theta = hvmd.getTheta();
+        this.accellerationShape.setPhi(phi);
+        this.accellerationShape.setTheta(theta);
+        Region newRegion;
+
+    }
+
+    public GL3DVec3d convertViewportToPlane(GL3DVec3d viewportCoordinates, GL3DMat4d projectionMatrix) {
+        GL3DMat4d vpm = projectionMatrix.inverse();
+        GL3DVec3d planeCoordinates = vpm.multiply(viewportCoordinates);
+        return planeCoordinates;
+    }
+
+    public GL3DVec3d convertViewportToView(GL3DVec3d viewportCoordinates, GL3DMat4d projectionMatrix, GL3DMat4d translationMatrix, GL3DState state) {
+        GL3DMat4d vpm = projectionMatrix.inverse();
+        GL3DMat4d tli = translationMatrix.inverse();
+
+        GL3DVec4d centeredViewportCoordinates = new GL3DVec4d(2. * (viewportCoordinates.x / state.getViewportWidth()), 2. * (viewportCoordinates.y / state.getViewportHeight()), 0., 0.);
+        GL3DVec4d solarCoordinates = vpm.multiply(centeredViewportCoordinates);
+        solarCoordinates.w = 1.;
+        solarCoordinates = tli.multiply(solarCoordinates);
+        solarCoordinates.w = 0.;
+
+        double solarCoordinates3Dz = Math.sqrt(1 - solarCoordinates.dot(solarCoordinates));
+        if (solarCoordinates3Dz == Double.NaN) {
+            solarCoordinates3Dz = 0.;
+        }
+        GL3DVec3d solarCoordinates3D = new GL3DVec3d(solarCoordinates.x, solarCoordinates.y, solarCoordinates3Dz);
+        return solarCoordinates3D;
+    }
 }

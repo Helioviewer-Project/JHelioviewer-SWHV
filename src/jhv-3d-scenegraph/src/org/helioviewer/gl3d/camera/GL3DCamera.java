@@ -38,8 +38,8 @@ public abstract class GL3DCamera {
     public static final double MAX_DISTANCE = -Constants.SunMeanDistanceToEarth * 1.8;
     public static final double MIN_DISTANCE = -Constants.SunRadius * 1.2;
 
-    public static final double INITFOV = 0.6 * 4096. / 3600.;
-
+    //public static final double INITFOV = 0.6 * 4096. / 3600.;
+    public static final double INITFOV = (32. / 60.) * Math.PI / 180.;
     public static final double MIN_FOV = INITFOV * 0.05;
     public static final double MAX_FOV = INITFOV * 100;
     private final double clipNear = Constants.SunRadius * 3;
@@ -257,7 +257,12 @@ public abstract class GL3DCamera {
 
         gl.glPushMatrix();
         gl.glLoadIdentity();
-        glu.gluPerspective(this.fov, this.aspect, this.clipNear, this.clipFar);
+        //glu.gluPerspective(this.fov, this.aspect, this.clipNear, this.clipFar);
+        double w = -translation.z * Math.tan(fov / 2.);
+        //System.out.println(w + "," + this.aspect);
+        gl.glOrtho(-this.aspect * w, this.aspect * w, -w, w, this.clipNear, this.clipFar);
+        //gl.glOrtho(-1., 1., -1., 1., this.clipNear, this.clipFar);
+
         gl.glMatrixMode(GL2.GL_MODELVIEW);
     }
 
