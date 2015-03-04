@@ -1,6 +1,5 @@
 package org.helioviewer.jhv.display;
 
-// import java.awt.EventQueue;
 import java.util.ArrayList;
 
 import org.helioviewer.jhv.data.datatype.event.JHVEvent;
@@ -55,17 +54,10 @@ public class Displayer implements JHVEventHighlightListener {
     }
 
     public void display() {
-        /*
-         * EventQueue.invokeLater(new Runnable() {
-         *
-         * @Override public void run() {
-         */
         for (final DisplayListener listener : listeners) {
             listener.display();
         }
-        /*
-         * } });
-         */}
+    }
 
     public void removeListeners() {
         this.listeners = new ArrayList<DisplayListener>();
