@@ -39,7 +39,7 @@ public class GL3DImageFragmentShaderProgram extends GLFragmentShaderProgram {
     }
 
     private void bind(GL2 gl, int shader, double outerCutOffRadius, double cutOffRadius) {
-        gl.glBindProgramARB(GL2.GL_FRAGMENT_PROGRAM_ARB, ShaderFactory.getFragment3dCGId());
+        gl.glBindProgramARB(GL2.GL_FRAGMENT_PROGRAM_ARB, ShaderFactory.getFragmentId());
         double[] cutOffRadiusFloat = this.builder.getEnvParameter(this.cutOffRadiusRef);
         double[] outerCutOffRadiusFloat = this.builder.getEnvParameter(this.outerCutOffRadiusRef);
         cutOffRadiusFloat[0] = (float) cutOffRadius;

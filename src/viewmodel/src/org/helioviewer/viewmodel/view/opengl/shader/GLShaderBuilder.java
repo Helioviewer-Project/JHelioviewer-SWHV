@@ -398,7 +398,7 @@ public class GLShaderBuilder {
 
         // main function body
         finalCode += LINE_SEP + mainBody + "\treturn OUT;" + LINE_SEP + '}';
-
+        System.out.println(finalCode);
         shaderHelper.compileProgram(gl, type, finalCode, shaderID);
     }
 

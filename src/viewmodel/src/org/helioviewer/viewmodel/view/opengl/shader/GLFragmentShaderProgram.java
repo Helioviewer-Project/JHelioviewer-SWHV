@@ -125,7 +125,7 @@ public abstract class GLFragmentShaderProgram {
     private static void bind(GL2 gl, int shader) {
         if (shader != shaderCurrentlyUsed) {
             shaderCurrentlyUsed = shader;
-            gl.glBindProgramARB(target, ShaderFactory.getFragment3dCGId());
+            gl.glBindProgramARB(target, ShaderFactory.getFragmentId());
         }
     }
 

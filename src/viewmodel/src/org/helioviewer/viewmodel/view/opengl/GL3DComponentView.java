@@ -76,7 +76,6 @@ public class GL3DComponentView extends AbstractComponentView implements GLEventL
     private boolean exportMode = false;
     private boolean screenshotMode = false;
     private File outputFile;
-    private final ShaderFactory shaderFactory;
 
     @Override
     public void activate() {
@@ -264,7 +263,8 @@ public class GL3DComponentView extends AbstractComponentView implements GLEventL
     @Override
     public void init(GLAutoDrawable drawable) {
         GL2 gl = drawable.getGL().getGL2();
-        shaderFactory.initFragment3dCG(gl);
+        ShaderFactory.initShader(gl);
+        GL3DState.create(gl);
 
         GL3DState.create(gl);
         GLTextureHelper.initHelper(gl);
