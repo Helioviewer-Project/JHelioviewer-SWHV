@@ -3,13 +3,14 @@ package org.helioviewer.gl3d.camera;
 import java.awt.Point;
 import java.awt.event.MouseEvent;
 
+import org.helioviewer.gl3d.scenegraph.GL3DState;
+import org.helioviewer.gl3d.scenegraph.math.GL3DMat4d;
 import org.helioviewer.gl3d.scenegraph.math.GL3DQuatd;
 import org.helioviewer.gl3d.scenegraph.math.GL3DVec3d;
-import org.helioviewer.gl3d.scenegraph.rt.GL3DRay;
+import org.helioviewer.gl3d.scenegraph.math.GL3DVec4d;
 import org.helioviewer.gl3d.scenegraph.rt.GL3DRayTracer;
 import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.viewmodel.view.opengl.GL3DSceneGraphView;
-import org.helioviewer.viewmodel.view.opengl.GLTextureHelper;
 
 /**
  * This interaction is used by the {@link GL3DEarthCamera} as its rotation
@@ -68,27 +69,28 @@ public class GL3DTrackballRotationInteraction extends GL3DDefaultInteraction {
         this.currentRotationStartPoint = getVectorFromSphere(e.getPoint(), camera);
     }
 
-    protected GL3DVec3d getVectorFromSphere(Point p, GL3DCamera camera) {
-        Point pp = new Point(p.x * GLTextureHelper.getPixelHIFactorWidth(), p.y * GLTextureHelper.getPixelHIFactorHeight());
-        GL3DRayTracer sunTracer = new GL3DRayTracer(sceneGraphView.getHitReferenceShape(), camera);
-        GL3DRay ray = sunTracer.cast(pp.x, pp.y);
+    protected GL3DVec3d getVectorFromSphere(Point viewportCoordinates, GL3DCamera camera) {
+        GL3DState state = GL3DState.get();
+        GL3DMat4d vpm = camera.getLocalRotation().toMatrix().inverse();
+        GL3DMat4d tli = GL3DMat4d.identity();
+        System.out.println("viewportCoordinates" + viewportCoordinates);
+        System.out.println("viewport" + state.getViewportWidth() + " " + state.getViewportHeight());
 
-        GL3DVec3d hitPoint;
+        GL3DVec4d centeredViewportCoordinates = new GL3DVec4d(2. * (2. * viewportCoordinates.getX() / state.getViewportWidth() - 0.5) * state.getViewportWidth() / state.getViewportHeight(), 2. * (2. * viewportCoordinates.getY() / state.getViewportHeight() - 0.5), 0., 0.);
+        System.out.println(centeredViewportCoordinates);
+        GL3DVec4d solarCoordinates = vpm.multiply(centeredViewportCoordinates);
+        solarCoordinates.w = 1.;
+        solarCoordinates = tli.multiply(solarCoordinates);
+        solarCoordinates.w = 0.;
 
-        if (ray.isOnSun) {
-            hitPoint = ray.getHitPoint();
-            hitPoint.normalize();
-            hitPoint = camera.getLocalRotation().toMatrix().multiply(hitPoint);
-        } else {
-            double y = (camera.getHeight() / 2 - pp.y) / camera.getHeight();
-            double x = (pp.x - camera.getWidth() / 2) / camera.getWidth();
-
-            GL3DVec3d nv = new GL3DVec3d(x, y, 0);
-            nv.normalize();
-            hitPoint = camera.getRotation().toMatrix().inverse().multiply(nv);
-            hitPoint = camera.getLocalRotation().toMatrix().multiply(hitPoint);
+        double solarCoordinates3Dz = Math.sqrt(1 - solarCoordinates.dot(solarCoordinates));
+        if (solarCoordinates3Dz == Double.NaN) {
+            solarCoordinates3Dz = 0.;
         }
-        return hitPoint;
+        GL3DVec3d solarCoordinates3D = new GL3DVec3d(solarCoordinates.y, solarCoordinates.x, solarCoordinates3Dz);
+        System.out.println(solarCoordinates3D);
+
+        return solarCoordinates3D;
     }
 
 }
