@@ -10,9 +10,9 @@ import org.helioviewer.gl3d.scenegraph.math.GL3DVec3d;
  * scene graph. To be able to create a Ray a reference to a camera is required.
  * Also, the rayTracer does necessarily need to traverse the whole scene graph,
  * also subnodes can be used as root nodes for the Ray Tracer.
- * 
+ *
  * @author Simon Spoerri (simon.spoerri@fhnw.ch)
- * 
+ *
  */
 public class GL3DRayTracer {
 
@@ -28,7 +28,7 @@ public class GL3DRayTracer {
         this.camera = camera;
         hh = Math.tan(Math.toRadians(camera.getCameraFOV() / 2)) * camera.getClipNear();
         hw = hh * camera.getAspect();
-        pixelSize = hw / camera.getWidth() * 2;
+        pixelSize = 0.;
     }
 
     public synchronized GL3DRay castCenter() {
@@ -39,8 +39,6 @@ public class GL3DRayTracer {
 
     public synchronized GL3DRay cast(int pixelX, int pixelY) {
         GL3DRay ray = createPrimaryRay(this.camera, pixelX, pixelY);
-
-        // isOutside flag set to true if the ray hit no object in the scene
         ray.isOutside = !this.sceneRoot.hit(ray);
         return ray;
     }

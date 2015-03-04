@@ -46,8 +46,7 @@ public abstract class GL3DCamera {
     private final double clipFar = Constants.SunRadius * 10000.;
     private double fov = INITFOV;
     private double aspect = 0.0;
-    private double width = 0.0;
-    private double height = 0.0;
+
     public int currentMouseX = 0;
     public int currentMouseY = 0;
 
@@ -146,8 +145,6 @@ public abstract class GL3DCamera {
         if (precedingCamera != null) {
             this.rotation = precedingCamera.getRotation().copy();
             this.translation = precedingCamera.translation.copy();
-            this.width = precedingCamera.width;
-            this.height = precedingCamera.height;
             this.updateCameraTransformation();
 
             // Also set the correct interaction
@@ -249,22 +246,16 @@ public abstract class GL3DCamera {
 
     public void applyPerspective(GL3DState state) {
         GL2 gl = state.gl;
-        int viewport[] = new int[4];
-        gl.glGetIntegerv(GL2.GL_VIEWPORT, viewport, 0);
-        this.width = viewport[2];
-        this.height = viewport[3];
-        this.aspect = width / height;
+
+        this.aspect = state.getViewportWidth() / (double) state.getViewportHeight();
 
         gl.glMatrixMode(GL2.GL_PROJECTION);
 
         gl.glPushMatrix();
         gl.glLoadIdentity();
-        //glu.gluPerspective(this.fov, this.aspect, this.clipNear, this.clipFar);
         double w = -translation.z * Math.tan(fov / 2.);
-        //System.out.println(w + "," + this.aspect);
         gl.glOrtho(-this.aspect * w, this.aspect * w, -w, w, this.clipNear, this.clipFar);
         this.orthoMatrix = GL3DMat4d.ortho(-w, w, -w, w, this.clipNear, this.clipFar);
-        //gl.glOrtho(-1., 1., -1., 1., this.clipNear, this.clipFar);
 
         gl.glMatrixMode(GL2.GL_MODELVIEW);
     }
@@ -396,14 +387,6 @@ public abstract class GL3DCamera {
 
     public double getAspect() {
         return aspect;
-    }
-
-    public double getWidth() {
-        return width;
-    }
-
-    public double getHeight() {
-        return height;
     }
 
     @Override

@@ -10,6 +10,7 @@ import org.helioviewer.base.logging.Log;
 import org.helioviewer.gl3d.camera.GL3DCamera;
 import org.helioviewer.gl3d.scenegraph.math.GL3DMat3d;
 import org.helioviewer.gl3d.scenegraph.math.GL3DMat4d;
+import org.helioviewer.viewmodel.view.opengl.GL3DComponentView;
 
 /**
  * The {@link GL3DState} is recreated every render pass by the
@@ -49,7 +50,7 @@ public class GL3DState {
         return instance;
     }
 
-    public static GL3DState getUpdated(GL2 gl, int width, int height) {
+    public static GL3DState setUpdated(GL2 gl, int width, int height) {
         instance.gl = gl;
         instance.viewportWidth = width;
         instance.viewportHeight = height;
@@ -114,12 +115,14 @@ public class GL3DState {
             return true;
         }
         /*
-        To allow for distributed implementations, there may be several error flags.
-        If any single error flag has recorded an error, the value of that flag is returned
-        and that flag is reset to GL_NO_ERROR when glGetError is called. If more than one flag
-        has recorded an error, glGetError returns and clears an arbitrary error flag value. Thus,
-        glGetError should always be called in a loop, until it returns GL_NO_ERROR, if all error flags are to be reset.
-        */
+         * To allow for distributed implementations, there may be several error
+         * flags. If any single error flag has recorded an error, the value of
+         * that flag is returned and that flag is reset to GL_NO_ERROR when
+         * glGetError is called. If more than one flag has recorded an error,
+         * glGetError returns and clears an arbitrary error flag value. Thus,
+         * glGetError should always be called in a loop, until it returns
+         * GL_NO_ERROR, if all error flags are to be reset.
+         */
         int glErrorCode = gl.glGetError();
 
         if (glErrorCode != GL2.GL_NO_ERROR) {
