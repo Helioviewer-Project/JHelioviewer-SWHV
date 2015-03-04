@@ -188,7 +188,7 @@ public class ContrastFilter extends AbstractFilter implements StandardFilter, GL
      */
     private class ContrastShader extends GLFragmentShaderProgram {
 
-        private int contrastParamRef;
+        private final int contrastParamRef = 4;
         private final double[] contrastParamFloat = new double[4];
 
         /**
@@ -217,7 +217,7 @@ public class ContrastFilter extends AbstractFilter implements StandardFilter, GL
         @Override
         protected void buildImpl(GLShaderBuilder shaderBuilder) {
             try {
-                contrastParamRef = shaderBuilder.addEnvParameter("float contrast");
+                shaderBuilder.addEnvParameter("float contrast");
                 String program = "\toutput.rgb = 0.5f * sign(2.0f * output.rgb - 1.0f) * pow(abs(2.0f * output.rgb - 1.0f), pow(1.5f, -contrast)) + 0.5f;";
                 program = program.replace("output", shaderBuilder.useOutputValue("float4", "COLOR"));
                 shaderBuilder.addMainFragment(program);

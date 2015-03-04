@@ -25,7 +25,7 @@ public class SharpenGLFilter extends SharpenFilter implements GLFragmentShaderFi
      * Fragment shader performing the unsharp mask algorithm.
      */
     private class UnsharpMaskingShader extends GLFragmentShaderProgram {
-        private int sharpenParamRef;
+        private final int sharpenParamRef = 2;
         private final double[] sharpenParamFloat = new double[4];
 
         /**
@@ -59,17 +59,9 @@ public class SharpenGLFilter extends SharpenFilter implements GLFragmentShaderFi
         protected void buildImpl(GLShaderBuilder shaderBuilder) {
 
             try {
-                sharpenParamRef = shaderBuilder.addEnvParameter("float4 pixelSizeWeighting");
-                String program = "\tfloat unsharpMaskingKernel[3][3] = {" + GLShaderBuilder.LINE_SEP
-                        + "\t\t{1, 2, 1}," + GLShaderBuilder.LINE_SEP + "\t\t{2, 4, 2}," + GLShaderBuilder.LINE_SEP + "\t\t{1, 2, 1}" + GLShaderBuilder.LINE_SEP + "\t};" + GLShaderBuilder.LINE_SEP
-                        + "\tfloat3 tmpConvolutionSum = float3(0, 0, 0);" + GLShaderBuilder.LINE_SEP
-                        + "\tfor(int i=0; i<3; i++)" + GLShaderBuilder.LINE_SEP + "\t{" + GLShaderBuilder.LINE_SEP
-                        + "\t\tfor(int j=0; j<3; j++)" + GLShaderBuilder.LINE_SEP + "\t\t{" + GLShaderBuilder.LINE_SEP
-                        + "\t\t\ttmpConvolutionSum += tex2D(source, texCoord.xy + float2(i-1, j-1) * pixelSizeWeighting.x).rgb" + GLShaderBuilder.LINE_SEP
-                        + "\t\t\t\t* unsharpMaskingKernel[i][j];" + GLShaderBuilder.LINE_SEP + "\t\t}" + GLShaderBuilder.LINE_SEP + "\t}" + GLShaderBuilder.LINE_SEP
-                        + "\ttmpConvolutionSum = (1 + pixelSizeWeighting.z) * output.rgb" + GLShaderBuilder.LINE_SEP
-                        + "\t\t- pixelSizeWeighting.z * tmpConvolutionSum / 16.0f;" + GLShaderBuilder.LINE_SEP
-                        + "\toutput.rgb = saturate(tmpConvolutionSum);";
+                shaderBuilder.addEnvParameter("float4 pixelSizeWeighting");
+
+                String program = "\tfloat unsharpMaskingKernel[3][3] = {" + GLShaderBuilder.LINE_SEP + "\t\t{1, 2, 1}," + GLShaderBuilder.LINE_SEP + "\t\t{2, 4, 2}," + GLShaderBuilder.LINE_SEP + "\t\t{1, 2, 1}" + GLShaderBuilder.LINE_SEP + "\t};" + GLShaderBuilder.LINE_SEP + "\tfloat3 tmpConvolutionSum = float3(0, 0, 0);" + GLShaderBuilder.LINE_SEP + "\tfor(int i=0; i<3; i++)" + GLShaderBuilder.LINE_SEP + "\t{" + GLShaderBuilder.LINE_SEP + "\t\tfor(int j=0; j<3; j++)" + GLShaderBuilder.LINE_SEP + "\t\t{" + GLShaderBuilder.LINE_SEP + "\t\t\ttmpConvolutionSum += tex2D(source, texCoord.xy + float2(i-1, j-1) * pixelSizeWeighting.x).rgb" + GLShaderBuilder.LINE_SEP + "\t\t\t\t* unsharpMaskingKernel[i][j];" + GLShaderBuilder.LINE_SEP + "\t\t}" + GLShaderBuilder.LINE_SEP + "\t}" + GLShaderBuilder.LINE_SEP + "\ttmpConvolutionSum = (1 + pixelSizeWeighting.z) * output.rgb" + GLShaderBuilder.LINE_SEP + "\t\t- pixelSizeWeighting.z * tmpConvolutionSum / 16.0f;" + GLShaderBuilder.LINE_SEP + "\toutput.rgb = saturate(tmpConvolutionSum);";
 
                 program = program.replaceAll("source", shaderBuilder.useStandardParameter("sampler2D", "TEXUNIT0"));
                 program = program.replaceAll("texCoord", shaderBuilder.useStandardParameter("float4", "TEXCOORD0"));
