@@ -1,6 +1,5 @@
 package org.helioviewer.gl3d.camera;
 
-import java.awt.EventQueue;
 import java.util.ArrayList;
 import java.util.Date;
 
@@ -227,34 +226,29 @@ public class GL3DFollowObjectCamera extends GL3DSolarRotationTrackingTrackballCa
 
     @Override
     public void activeLayerChanged(final int idx) {
-        EventQueue.invokeLater(new Runnable() {
-            @Override
-            public void run() {
-                if (!interpolation) {
-                    View nextView = LayersModel.getSingletonInstance().getLayer(idx);
-                    if (nextView != null) {
+        if (!interpolation) {
+            View nextView = LayersModel.getSingletonInstance().getLayer(idx);
+            if (nextView != null) {
 
-                        JHVJPXView jpxView = nextView.getAdapter(JHVJPXView.class);
-                        if (jpxView != null) {
-                            DateTimeCache dtc = jpxView.getDateTimeCache();
-                            Date beginDate = null;
-                            Date endDate = null;
-                            for (int frame = 0; frame < jpxView.getMaximumFrameNumber(); frame++) {
-                                ImmutableDateTime date = dtc.getDateTime(frame);
-                                if (beginDate == null || date.getTime().getTime() < beginDate.getTime()) {
-                                    beginDate = date.getTime();
-                                }
-                                if (endDate == null || date.getTime().getTime() > endDate.getTime()) {
-                                    endDate = date.getTime();
-                                }
-                            }
-                            positionLoading.setBeginDate(beginDate, false);
-                            positionLoading.setEndDate(endDate, true);
+                JHVJPXView jpxView = nextView.getAdapter(JHVJPXView.class);
+                if (jpxView != null) {
+                    DateTimeCache dtc = jpxView.getDateTimeCache();
+                    Date beginDate = null;
+                    Date endDate = null;
+                    for (int frame = 0; frame < jpxView.getMaximumFrameNumber(); frame++) {
+                        ImmutableDateTime date = dtc.getDateTime(frame);
+                        if (beginDate == null || date.getTime().getTime() < beginDate.getTime()) {
+                            beginDate = date.getTime();
+                        }
+                        if (endDate == null || date.getTime().getTime() > endDate.getTime()) {
+                            endDate = date.getTime();
                         }
                     }
+                    positionLoading.setBeginDate(beginDate, false);
+                    positionLoading.setEndDate(endDate, true);
                 }
             }
-        });
+        }
     }
 
     @Override
