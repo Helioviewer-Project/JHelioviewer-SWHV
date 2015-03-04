@@ -15,8 +15,6 @@ import org.helioviewer.gl3d.scenegraph.math.GL3DMat4d;
 import org.helioviewer.gl3d.scenegraph.math.GL3DQuatd;
 import org.helioviewer.gl3d.scenegraph.math.GL3DVec3d;
 import org.helioviewer.gl3d.scenegraph.math.GL3DVec4d;
-import org.helioviewer.jhv.gui.states.StateController;
-import org.helioviewer.jhv.gui.states.ViewStateEnum;
 import org.helioviewer.viewmodel.changeevent.ChangeEvent;
 import org.helioviewer.viewmodel.metadata.HelioviewerMetaData;
 import org.helioviewer.viewmodel.metadata.MetaData;
@@ -24,8 +22,6 @@ import org.helioviewer.viewmodel.region.Region;
 import org.helioviewer.viewmodel.region.StaticRegion;
 import org.helioviewer.viewmodel.view.MetaDataView;
 import org.helioviewer.viewmodel.view.RegionView;
-import org.helioviewer.viewmodel.view.View;
-import org.helioviewer.viewmodel.view.ViewListener;
 import org.helioviewer.viewmodel.view.opengl.GL3DImageTextureView;
 import org.helioviewer.viewmodel.view.opengl.GL3DView;
 import org.helioviewer.viewmodel.view.opengl.shader.GL3DImageFragmentShaderProgram;
@@ -38,7 +34,7 @@ import org.helioviewer.viewmodel.view.opengl.shader.GL3DImageFragmentShaderProgr
  * @author Simon Spoerri (simon.spoerri@fhnw.ch)
  *
  */
-public abstract class GL3DImageLayer extends GL3DGroup implements GL3DCameraListener, ViewListener {
+public abstract class GL3DImageLayer extends GL3DGroup implements GL3DCameraListener {
     private static int nextLayerId = 0;
     private final int layerId;
     private GL3DVec4d direction = new GL3DVec4d(0, 0, 1, 0);
@@ -255,14 +251,6 @@ public abstract class GL3DImageLayer extends GL3DGroup implements GL3DCameraList
 
     public GL3DImageFragmentShaderProgram getSphereFragmentShader() {
         return sphereFragmentShader;
-    }
-
-    @Override
-    public void viewChanged(View sender, ChangeEvent aEvent) {
-        Thread.dumpStack();
-        if (StateController.getInstance().getCurrentState().getType() == ViewStateEnum.View3D) {
-            //this.updateROI(GL3DState.get().getActiveCamera());
-        }
     }
 
     protected GL3DShape getImageCorona() {
