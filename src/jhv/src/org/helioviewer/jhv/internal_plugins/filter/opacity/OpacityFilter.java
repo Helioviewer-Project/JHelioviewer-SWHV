@@ -14,7 +14,6 @@ import org.helioviewer.viewmodel.imagedata.ImageData;
 import org.helioviewer.viewmodel.imagedata.JavaBufferedImageData;
 import org.helioviewer.viewmodel.view.opengl.shader.GLFragmentShaderProgram;
 import org.helioviewer.viewmodel.view.opengl.shader.GLShaderBuilder;
-import org.helioviewer.viewmodel.view.opengl.shader.GLShaderBuilder.GLBuildShaderException;
 
 /**
  * Filter for changing the opacity of an image.
@@ -140,19 +139,6 @@ public class OpacityFilter extends AbstractFilter implements StandardFilter, GLF
             this.bindEnvVars(gl, alphaParamRef, alphaParamFloat);
         }
 
-        /**
-         * {@inheritDoc}
-         */
-        @Override
-        protected void buildImpl(GLShaderBuilder shaderBuilder) {
-            try {
-                String program = "\toutput.a = output.a * alpha;";
-                program = program.replace("output", shaderBuilder.useOutputValue("float4", "COLOR"));
-                shaderBuilder.addMainFragment(program);
-            } catch (GLBuildShaderException e) {
-                e.printStackTrace();
-            }
-        }
     }
 
     /**
@@ -160,7 +146,6 @@ public class OpacityFilter extends AbstractFilter implements StandardFilter, GLF
      */
     @Override
     public GLShaderBuilder buildFragmentShader(GLShaderBuilder shaderBuilder) {
-        shader.build(shaderBuilder);
         return shaderBuilder;
     }
 

@@ -113,7 +113,6 @@ public class GLLayeredView extends AbstractLayeredView implements GLFragmentShad
                     GLShaderBuilder newShaderBuilder = new GLShaderBuilder(shaderBuilder.getGL(), GL2.GL_FRAGMENT_PROGRAM_ARB);
                     // fill with standard values
                     GLMinimalFragmentShaderProgram minimalProgram = new GLMinimalFragmentShaderProgram();
-                    minimalProgram.build(newShaderBuilder);
                     // fill with other filters and compile
                     fragmentView.buildFragmentShader(newShaderBuilder).compile();
 

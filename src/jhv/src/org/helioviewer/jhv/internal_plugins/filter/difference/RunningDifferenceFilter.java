@@ -225,7 +225,6 @@ public class RunningDifferenceFilter implements FrameFilter, StandardFilter, Obs
 
     @Override
     public GLShaderBuilder buildFragmentShader(GLShaderBuilder shaderBuilder) {
-        shader.build(shaderBuilder);
 
         return shaderBuilder;
     }

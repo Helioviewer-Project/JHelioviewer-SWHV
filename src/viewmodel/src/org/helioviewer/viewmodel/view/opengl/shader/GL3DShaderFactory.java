@@ -13,9 +13,9 @@ import org.helioviewer.viewmodel.view.opengl.shader.GLVertexShaderProgram;
  * A Factory pattern is used, because the underlying image layer determines what
  * image meshes need to be created. Depending on the image, several image meshes
  * are grouped created.
- * 
+ *
  * @author Simon Spoerri (simon.spoerri@fhnw.ch)
- * 
+ *
  */
 public class GL3DShaderFactory {
 
@@ -25,8 +25,6 @@ public class GL3DShaderFactory {
 
         // fill with standard values
         GLMinimalFragmentShaderProgram minimalProgram = new GLMinimalFragmentShaderProgram();
-        minimalProgram.build(newShaderBuilder);
-        fragmentShaderProgram.build(newShaderBuilder);
 
         // fill with other filters and compile
         newShaderBuilder.compile();

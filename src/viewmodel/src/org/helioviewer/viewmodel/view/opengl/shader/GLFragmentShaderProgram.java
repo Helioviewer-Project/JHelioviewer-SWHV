@@ -33,37 +33,6 @@ public abstract class GLFragmentShaderProgram {
     protected int shaderID;
 
     /**
-     * Build the shader.
-     *
-     * This function is called during the building process of all shaders,
-     * providing a shader builder object. That object may already contain code
-     * from other shader blocks. This functions calls
-     * {@link #buildImpl(GLShaderBuilder)} and remembers the shader if the
-     * shader, to be able to bind it later.
-     *
-     * @param shaderBuilder
-     *            ShaderBuilder to append customized code
-     */
-    public final void build(GLShaderBuilder shaderBuilder) {
-        buildImpl(shaderBuilder);
-        shaderID = shaderBuilder.getShaderID();
-        shaderCurrentlyUsed = -1;
-    }
-
-    /**
-     * Build customized part of the shader.
-     *
-     * This function is called during the building process of all shaders,
-     * providing a shader builder object. That object may already contain code
-     * from other shader blocks. Just append the additional code within this
-     * function.
-     *
-     * @param shaderBuilder
-     *            ShaderBuilder to append customized code
-     */
-    protected abstract void buildImpl(GLShaderBuilder shaderBuilder);
-
-    /**
      * Binds (= activates it) the shader, if it is not active so far.
      *
      * @param gl

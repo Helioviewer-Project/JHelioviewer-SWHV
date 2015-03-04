@@ -189,7 +189,6 @@ public class GL3DImageTextureView extends AbstractGL3DView implements GL3DView, 
         if (nextView != null) {
             shaderBuilder = nextView.buildFragmentShader(shaderBuilder);
         }
-        fragmentShader.build(shaderBuilder);
         return shaderBuilder;
     }
 

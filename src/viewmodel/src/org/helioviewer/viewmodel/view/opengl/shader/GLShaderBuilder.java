@@ -395,7 +395,6 @@ public class GLShaderBuilder {
         if (shaderBuilder.type == GL2.GL_FRAGMENT_PROGRAM_ARB) {
             shaderBuilder = new GLShaderBuilder(shaderBuilder.getGL(), GL2.GL_FRAGMENT_PROGRAM_ARB);
             GLMinimalFragmentShaderProgram minimalFragmentShaderProgram = new GLMinimalFragmentShaderProgram();
-            minimalFragmentShaderProgram.build(shaderBuilder);
         } else {
             shaderBuilder = new GLShaderBuilder(shaderBuilder.getGL(), GL2.GL_VERTEX_PROGRAM_ARB);
             GLMinimalVertexShaderProgram minimalVertexShaderProgram = new GLMinimalVertexShaderProgram();

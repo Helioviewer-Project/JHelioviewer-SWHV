@@ -14,7 +14,6 @@ import org.helioviewer.viewmodel.imagetransport.Int32ImageTransport;
 import org.helioviewer.viewmodel.imagetransport.Short16ImageTransport;
 import org.helioviewer.viewmodel.view.opengl.shader.GLFragmentShaderProgram;
 import org.helioviewer.viewmodel.view.opengl.shader.GLShaderBuilder;
-import org.helioviewer.viewmodel.view.opengl.shader.GLShaderBuilder.GLBuildShaderException;
 
 /**
  * Filter for applying gamma correction.
@@ -208,19 +207,6 @@ public class GammaCorrectionFilter extends AbstractFilter implements StandardFil
             this.bindEnvVars(gl, this.gammaParamRef, gammaParamFloat);
         }
 
-        /**
-         * {@inheritDoc}
-         */
-        @Override
-        protected void buildImpl(GLShaderBuilder shaderBuilder) {
-            try {
-                String program = "\toutput.rgb = pow(output.rgb, gamma);";
-                program = program.replace("output", shaderBuilder.useOutputValue("float4", "COLOR"));
-                shaderBuilder.addMainFragment(program);
-            } catch (GLBuildShaderException e) {
-                e.printStackTrace();
-            }
-        }
     }
 
     /**
@@ -228,7 +214,6 @@ public class GammaCorrectionFilter extends AbstractFilter implements StandardFil
      */
     @Override
     public GLShaderBuilder buildFragmentShader(GLShaderBuilder shaderBuilder) {
-        shader.build(shaderBuilder);
         return shaderBuilder;
     }
 
