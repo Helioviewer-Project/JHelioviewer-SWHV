@@ -1,6 +1,7 @@
 package org.helioviewer.viewmodel.view.jp2view;
 
 import java.awt.Dimension;
+import java.awt.EventQueue;
 import java.net.URI;
 import java.util.Date;
 
@@ -444,7 +445,19 @@ public class JHVJP2View extends AbstractView implements JP2View, ViewportView, R
      *            ChangeEvent to fire
      */
     public void fireChangeEvent(ChangeEvent aEvent) {
-        notifyViewListeners(aEvent);
+        EventQueue.invokeLater(new Runnable() {
+            private ChangeEvent theEvent;
+
+            @Override
+            public void run() {
+                notifyViewListeners(theEvent);
+            }
+
+            public Runnable init(ChangeEvent theEvent) {
+                this.theEvent = theEvent;
+                return this;
+            }
+        }.init(aEvent));
     }
 
     /**
@@ -736,7 +749,7 @@ public class JHVJP2View extends AbstractView implements JP2View, ViewportView, R
             fireEvent = event.clone();
             event.reinitialize();
         }
-        notifyViewListeners(fireEvent);
+        fireChangeEvent(fireEvent);
     }
 
     /**
