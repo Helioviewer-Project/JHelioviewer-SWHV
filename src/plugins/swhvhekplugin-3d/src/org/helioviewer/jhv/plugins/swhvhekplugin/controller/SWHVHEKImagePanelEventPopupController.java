@@ -168,8 +168,6 @@ public class SWHVHEKImagePanelEventPopupController implements KeyEventDispatcher
                     aPressed = true;
                 }
                 if (ke.getKeyCode() == KeyEvent.VK_R) {
-                    Displayer.pointList = new ArrayList<GL3DVec3d>();
-
                     Displayer.getSingletonInstance().display();
                 }
                 break;
@@ -198,9 +196,9 @@ public class SWHVHEKImagePanelEventPopupController implements KeyEventDispatcher
     public void mouseClicked(final MouseEvent e) {
 
         GL3DVec3d hitpoint = getHitPoint(e);
-        if (hitpoint != null && isAPressed()) {
-            Displayer.pointList.add(new GL3DVec3d(hitpoint.x, hitpoint.y, hitpoint.z));
-        }
+        //if (hitpoint != null && isAPressed()) {
+        //    Displayer.pointList.add(new GL3DVec3d(hitpoint.x, hitpoint.y, hitpoint.z));
+        //}
 
         //Uncomment to enable point and click
         if (mouseOverJHVEvent != null) {
