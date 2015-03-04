@@ -2,6 +2,7 @@ package org.helioviewer.viewmodel.view.opengl.shader;
 
 import javax.media.opengl.GL2;
 
+import org.helioviewer.jhv.shaderfactory.ShaderFactory;
 import org.helioviewer.viewmodel.view.opengl.shader.GLShaderBuilder;
 import org.helioviewer.viewmodel.view.opengl.shader.GLShaderBuilder.GLBuildShaderException;
 import org.helioviewer.viewmodel.view.opengl.shader.GLVertexShaderProgram;
@@ -33,7 +34,7 @@ public class GL3DImageVertexShaderProgram extends GLVertexShaderProgram {
     public final void bind(GL2 gl) {
         if (shaderID != shaderCurrentlyUsed) {
             shaderCurrentlyUsed = shaderID;
-            gl.glBindProgramARB(target, shaderID);
+            gl.glBindProgramARB(target, ShaderFactory.getVertexId());
             gl.glProgramLocalParameter4dARB(target, this.rectRef, xOffset, yOffset, xScale, yScale);
             gl.glProgramLocalParameter4dARB(target, this.offsetRef, defaultXOffset, defaultYOffset, 0, 0);
             gl.glProgramLocalParameter4dARB(target, this.differenceRectRef, differenceXOffset, differenceYOffset, differenceXScale, differenceYScale);

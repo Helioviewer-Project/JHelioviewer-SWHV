@@ -1,0 +1,19 @@
+struct outputStruct {
+    float4 color : COLOR;
+    float4 texcoord0 : TEXCOORD0;
+    float4 position : POSITION;
+};
+
+outputStruct main(
+    float4 color : COLOR,
+    float4 texcoord0 : TEXCOORD0,
+    float4 position : POSITION,
+    uniform float4x4 state_matrix_mvp : state.matrix.mvp)
+{
+    outputStruct OUT;
+    OUT.color = color;
+    OUT.texcoord0 = float4(texcoord0.xy, 0, 1);
+    OUT.position = mul(state_matrix_mvp, position);
+
+    return OUT;
+}
