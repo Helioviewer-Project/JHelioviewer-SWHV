@@ -347,12 +347,6 @@ public class JavaHelioViewer {
         }
 
         Log.info("Download default plugins");
-        if (null == ResourceLoader.getSingletonInstance().loadResource("sdo-cutout", libsRemote, defaultPlugins, defaultPlugins, defaultPluginsBackup, System.getProperties())) {
-            Log.error("Error fetching SDO-Cutout plugin. Maybe JHelioviewer version not recent enough. Try updating JHV to the newest version.");
-        } else {
-            Log.info("Successfully downloaded SDO-Cutout plugin.");
-        }
-
         if (null == ResourceLoader.getSingletonInstance().loadResource("default-plugins", libsRemote, defaultPlugins, defaultPlugins, defaultPluginsBackup, System.getProperties())) {
             Log.error("Error fetching default plugins");
             Message.err("Error fetching default plugins", "Could not download default plugins. You can try to download them from their respective website.", false);
@@ -375,7 +369,6 @@ public class JavaHelioViewer {
         // Create main view chain and display main window
         Log.info("Start main window");
         splash.initializeGLInitPanel();
-
     }
 
 }
