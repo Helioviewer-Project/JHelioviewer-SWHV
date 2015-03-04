@@ -12,14 +12,10 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 
-import org.helioviewer.jhv.gui.states.StateController;
-import org.helioviewer.jhv.gui.states.ViewStateEnum;
-
 import org.helioviewer.base.math.Vector2dInt;
+import org.helioviewer.gl3d.camera.GL3DCamera;
 import org.helioviewer.gl3d.scenegraph.GL3DState;
 import org.helioviewer.gl3d.scenegraph.math.GL3DVec3d;
-import org.helioviewer.gl3d.scenegraph.rt.GL3DRay;
-import org.helioviewer.gl3d.scenegraph.rt.GL3DRayTracer;
 import org.helioviewer.jhv.data.datatype.event.JHVCoordinateSystem;
 import org.helioviewer.jhv.data.datatype.event.JHVEvent;
 import org.helioviewer.jhv.data.datatype.event.JHVPoint;
@@ -28,14 +24,14 @@ import org.helioviewer.jhv.data.guielements.SWEKEventInformationDialog;
 import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.gui.components.BasicImagePanel;
 import org.helioviewer.jhv.gui.interfaces.ImagePanelPlugin;
+import org.helioviewer.jhv.gui.states.StateController;
+import org.helioviewer.jhv.gui.states.ViewStateEnum;
 import org.helioviewer.jhv.layers.LayersModel;
 import org.helioviewer.jhv.plugins.swhvhekplugin.cache.SWHVHEKData;
 import org.helioviewer.viewmodel.view.RegionView;
 import org.helioviewer.viewmodel.view.View;
 import org.helioviewer.viewmodel.view.ViewHelper;
 import org.helioviewer.viewmodel.view.ViewportView;
-import org.helioviewer.viewmodel.view.opengl.GL3DComponentView;
-import org.helioviewer.viewmodel.view.opengl.GL3DSceneGraphView;
 import org.helioviewer.viewmodel.viewportimagesize.ViewportImageSize;
 
 /**
@@ -172,6 +168,8 @@ public class SWHVHEKImagePanelEventPopupController implements KeyEventDispatcher
                     aPressed = true;
                 }
                 if (ke.getKeyCode() == KeyEvent.VK_R) {
+                    Displayer.pointList = new ArrayList<GL3DVec3d>();
+
                     Displayer.getSingletonInstance().display();
                 }
                 break;
@@ -198,11 +196,12 @@ public class SWHVHEKImagePanelEventPopupController implements KeyEventDispatcher
      */
     @Override
     public void mouseClicked(final MouseEvent e) {
-        /*
-         * GL3DVec3d hitpoint = getHitPoint(e); if (hitpoint != null &&
-         * isAPressed()) { Displayer.pointList.add(new GL3DVec3d(hitpoint.x,
-         * -hitpoint.y, hitpoint.z)); }
-         */
+
+        GL3DVec3d hitpoint = getHitPoint(e);
+        if (hitpoint != null && isAPressed()) {
+            Displayer.pointList.add(new GL3DVec3d(hitpoint.x, hitpoint.y, hitpoint.z));
+        }
+
         //Uncomment to enable point and click
         if (mouseOverJHVEvent != null) {
             // should never be the case
@@ -269,15 +268,7 @@ public class SWHVHEKImagePanelEventPopupController implements KeyEventDispatcher
         boolean state3D = false;
         if (StateController.getInstance().getCurrentState().getType() == ViewStateEnum.View3D) {
             state3D = true;
-
-            GL3DSceneGraphView scenegraphview = view.getAdapter(GL3DSceneGraphView.class);
-            if (scenegraphview != null) {
-                GL3DRayTracer rayTracer = new GL3DRayTracer(scenegraphview.getHitReferenceShape(), GL3DState.get().getActiveCamera());
-                GL3DRay ray = rayTracer.cast(e.getX() * Displayer.screenScale, e.getY() * Displayer.screenScale);
-                if (ray != null && ray.getHitPoint() != null) {
-                    hitpoint = ray.getHitPoint();
-                }
-            }
+            hitpoint = this.getHitPoint(e);
         }
 
         if (currentDate != null) {
@@ -334,24 +325,9 @@ public class SWHVHEKImagePanelEventPopupController implements KeyEventDispatcher
     }
 
     public GL3DVec3d getHitPoint(MouseEvent e) {
-        GL3DVec3d hitpoint = null;
-
-        if (StateController.getInstance().getCurrentState().getType() == ViewStateEnum.View3D) {
-            GL3DSceneGraphView scenegraphview = view.getAdapter(GL3DSceneGraphView.class);
-            if (scenegraphview != null) {
-                scenegraphview.getHitReferenceShape().setHitCoronaPlane(true);
-                scenegraphview.getHitReferenceShape().setUseEarthPlane(true);
-
-                GL3DRayTracer rayTracer = new GL3DRayTracer(scenegraphview.getHitReferenceShape(), GL3DState.get().getActiveCamera());
-                GL3DRay ray = rayTracer.cast(e.getX(), e.getY());
-                if (ray != null && ray.getHitPoint() != null) {
-                    hitpoint = ray.getHitPoint();
-                }
-                scenegraphview.getHitReferenceShape().setHitCoronaPlane(false);
-            }
-        }
-
-        return hitpoint;
+        GL3DCamera activeCamera = GL3DState.get().getActiveCamera();
+        GL3DVec3d pt = activeCamera.getVectorFromSphere(e.getPoint());
+        return pt;
     }
 
 }

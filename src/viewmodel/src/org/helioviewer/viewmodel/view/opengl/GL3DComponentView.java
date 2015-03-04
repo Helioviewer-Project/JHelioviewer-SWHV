@@ -14,8 +14,6 @@ import javax.media.opengl.awt.GLCanvas;
 import javax.swing.JOptionPane;
 import javax.swing.JTextArea;
 
-import org.helioviewer.jhv.gui.states.StateController;
-import org.helioviewer.jhv.gui.states.ViewStateEnum;
 import org.helioviewer.base.logging.Log;
 import org.helioviewer.gl3d.movie.MovieExport;
 import org.helioviewer.gl3d.scenegraph.GL3DState;
@@ -24,25 +22,24 @@ import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.gui.ImageViewerGui;
 import org.helioviewer.jhv.gui.ViewListenerDistributor;
 import org.helioviewer.jhv.gui.dialogs.ExportMovieDialog;
+import org.helioviewer.jhv.gui.states.StateController;
+import org.helioviewer.jhv.gui.states.ViewStateEnum;
 import org.helioviewer.jhv.layers.LayersModel;
 import org.helioviewer.viewmodel.changeevent.ChangeEvent;
 import org.helioviewer.viewmodel.changeevent.LayerChangedReason;
 import org.helioviewer.viewmodel.changeevent.LayerChangedReason.LayerChangeType;
 import org.helioviewer.viewmodel.changeevent.SubImageDataChangedReason;
 import org.helioviewer.viewmodel.changeevent.ViewChainChangedReason;
+import org.helioviewer.viewmodel.region.Region;
 import org.helioviewer.viewmodel.renderer.screen.GLScreenRenderGraphics;
 import org.helioviewer.viewmodel.renderer.screen.ScreenRenderer;
 import org.helioviewer.viewmodel.view.AbstractComponentView;
 import org.helioviewer.viewmodel.view.ComponentView;
-import org.helioviewer.viewmodel.view.LinkedMovieManager;
-import org.helioviewer.viewmodel.view.TimedMovieView;
+import org.helioviewer.viewmodel.view.RegionView;
 import org.helioviewer.viewmodel.view.View;
 import org.helioviewer.viewmodel.view.jp2view.JHVJP2View;
 import org.helioviewer.viewmodel.view.jp2view.JHVJPXView;
 import org.helioviewer.viewmodel.view.opengl.shader.GLShaderBuilder;
-import org.helioviewer.viewmodel.viewport.Viewport;
-import org.helioviewer.viewmodel.region.Region;
-import org.helioviewer.viewmodel.view.RegionView;
 
 import com.jogamp.opengl.util.TileRenderer;
 import com.jogamp.opengl.util.awt.AWTGLPixelBuffer;
@@ -319,8 +316,7 @@ public class GL3DComponentView extends AbstractComponentView implements GLEventL
         }
 
         if (backGroundColorChanged) {
-            gl.glClearColor(backgroundColor.getRed() / 255.0f, backgroundColor.getGreen() / 255.0f,
-                            backgroundColor.getBlue() / 255.0f, backgroundColor.getAlpha() / 255.0f);
+            gl.glClearColor(backgroundColor.getRed() / 255.0f, backgroundColor.getGreen() / 255.0f, backgroundColor.getBlue() / 255.0f, backgroundColor.getAlpha() / 255.0f);
             backGroundColorChanged = false;
         }
 
@@ -391,9 +387,8 @@ public class GL3DComponentView extends AbstractComponentView implements GLEventL
             }
             stopScreenshot();
         }
-        // GL3DState.get().checkGLErrors();
-    }
 
+    }
 
     @Override
     public void setBackgroundColor(Color background) {
@@ -409,8 +404,7 @@ public class GL3DComponentView extends AbstractComponentView implements GLEventL
     @Override
     public void viewChanged(View sender, ChangeEvent aEvent) {
         LayerChangedReason lcReason = aEvent.getLastChangedReasonByType(LayerChangedReason.class);
-        if ((lcReason != null && lcReason.getLayerChangeType() == LayerChangeType.LAYER_ADDED) ||
-             aEvent.reasonOccurred(ViewChainChangedReason.class)) {
+        if ((lcReason != null && lcReason.getLayerChangeType() == LayerChangeType.LAYER_ADDED) || aEvent.reasonOccurred(ViewChainChangedReason.class)) {
             rebuildShaders = true;
         }
 

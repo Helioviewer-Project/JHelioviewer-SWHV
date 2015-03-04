@@ -25,9 +25,8 @@ public class GL3DZoomInAction extends ZoomInAction {
     @Override
     public void actionPerformed(ActionEvent e) {
         GL3DCamera camera = GL3DState.get().getActiveCamera();
-        camera.setCameraFOV(camera.getCameraFOV() - 0.04);
+        camera.setCameraFOV(camera.getCameraFOV() * 0.95);
         camera.updateCameraTransformation(true);
-        Displayer.getSingletonInstance().display();
+        Displayer.getSingletonInstance().render();
     }
-
 }

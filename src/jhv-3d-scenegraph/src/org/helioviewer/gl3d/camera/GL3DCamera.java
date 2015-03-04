@@ -1,5 +1,6 @@
 package org.helioviewer.gl3d.camera;
 
+import java.awt.Point;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -38,7 +39,7 @@ public abstract class GL3DCamera {
     public static final double MIN_DISTANCE = -Constants.SunRadius * 1.2;
 
     //public static final double INITFOV = 0.6 * 4096. / 3600.;
-    public static final double INITFOV = (32. / 60.) * Math.PI / 180.;
+    public static final double INITFOV = (48. / 60.) * Math.PI / 180.;
     public static final double MIN_FOV = INITFOV * 0.05;
     public static final double MAX_FOV = INITFOV * 100;
     private final double clipNear = Constants.SunRadius * 3;
@@ -77,6 +78,8 @@ public abstract class GL3DCamera {
     private boolean trackingMode;
 
     protected GL3DSceneGraphView sceneGraphView;
+
+    private GL3DMat4d orthoMatrix = GL3DMat4d.identity();
 
     public GL3DCamera(GL3DSceneGraphView sceneGraphView) {
         this.sceneGraphView = sceneGraphView;
@@ -260,9 +263,56 @@ public abstract class GL3DCamera {
         double w = -translation.z * Math.tan(fov / 2.);
         //System.out.println(w + "," + this.aspect);
         gl.glOrtho(-this.aspect * w, this.aspect * w, -w, w, this.clipNear, this.clipFar);
+        this.orthoMatrix = GL3DMat4d.ortho(-w, w, -w, w, this.clipNear, this.clipFar);
         //gl.glOrtho(-1., 1., -1., 1., this.clipNear, this.clipFar);
 
         gl.glMatrixMode(GL2.GL_MODELVIEW);
+    }
+
+    public GL3DVec3d getVectorFromSphere(Point viewportCoordinates) {
+        GL3DState state = GL3DState.get();
+        GL3DMat4d vpmi = this.orthoMatrix.inverse();
+        GL3DMat4d tli = GL3DMat4d.identity();
+
+        GL3DVec4d centeredViewportCoordinates = new GL3DVec4d(2. * (2. * viewportCoordinates.getX() / state.getViewportWidth() - 0.5) * state.getViewportWidth() / state.getViewportHeight(), -2. * (2. * viewportCoordinates.getY() / state.getViewportHeight() - 0.5), 0., 0.);
+
+        GL3DVec4d solarCoordinates = vpmi.multiply(centeredViewportCoordinates);
+        solarCoordinates.w = 1.;
+        solarCoordinates = tli.multiply(solarCoordinates);
+        solarCoordinates.w = 0.;
+        GL3DMat4d roti = this.getRotation().toMatrix().inverse();
+
+        double solarCoordinates3Dz = Math.sqrt(1 - solarCoordinates.dot(solarCoordinates));
+
+        solarCoordinates.z = solarCoordinates3Dz;
+        GL3DVec4d notRotated = roti.multiply(solarCoordinates);
+
+        if (Double.isNaN(notRotated.z)) {
+            return null;
+        }
+        GL3DVec3d solarCoordinates3D = new GL3DVec3d(notRotated.x, notRotated.y, notRotated.z);
+
+        return solarCoordinates3D;
+    }
+
+    public GL3DVec3d getVectorFromPlane(Point viewportCoordinates) {
+        GL3DState state = GL3DState.get();
+        GL3DMat4d roti = this.getRotation().toMatrix().inverse();
+        GL3DMat4d vpmi = this.orthoMatrix.inverse();
+
+        GL3DVec4d centeredViewportCoordinates1 = new GL3DVec4d(2. * (2. * viewportCoordinates.getX() / state.getViewportWidth() - 0.5) * state.getViewportWidth() / state.getViewportHeight(), -2. * (2. * viewportCoordinates.getY() / state.getViewportHeight() - 0.5), -1., 1.);
+        GL3DVec4d centeredViewportCoordinates2 = new GL3DVec4d(2. * (2. * viewportCoordinates.getX() / state.getViewportWidth() - 0.5) * state.getViewportWidth() / state.getViewportHeight(), -2. * (2. * viewportCoordinates.getY() / state.getViewportHeight() - 0.5), 1., 1.);
+
+        GL3DVec4d up1 = roti.multiply(vpmi.multiply(centeredViewportCoordinates1));
+        GL3DVec4d up2 = roti.multiply(vpmi.multiply(centeredViewportCoordinates2));
+        GL3DVec4d linevec = GL3DVec4d.subtract(up2, up1);
+        GL3DVec4d normal = this.getLocalRotation().toMatrix().inverse().multiply(new GL3DVec4d(0., 0., 1., 1.));
+        double fact = -GL3DVec4d.dot3d(up1, normal) / GL3DVec4d.dot3d(linevec, normal);
+        GL3DVec4d notRotated = GL3DVec4d.add(up1, GL3DVec4d.multiply(linevec, fact));
+
+        GL3DVec3d solarCoordinates3D = new GL3DVec3d(notRotated.x, notRotated.y, notRotated.z);
+
+        return solarCoordinates3D;
     }
 
     public void resumePerspective(GL3DState state) {
