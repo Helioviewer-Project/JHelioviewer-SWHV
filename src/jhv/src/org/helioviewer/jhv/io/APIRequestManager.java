@@ -1,5 +1,7 @@
 package org.helioviewer.jhv.io;
 
+import java.awt.EventQueue;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -313,8 +315,7 @@ public class APIRequestManager {
         ImageInfoView view = ViewHelper.loadView(uri, range);
 
         if (addToViewChain) {
-            ViewchainFactory factory = StateController.getInstance().getCurrentState().getViewchainFactory();
-            factory.addLayerToViewchainMain(view, ImageViewerGui.getSingletonInstance().getMainView());
+            addToViewchain(view);
         }
         return view;
     }
@@ -344,12 +345,26 @@ public class APIRequestManager {
         ImageInfoView view = ViewHelper.loadView(uri, downloadURI, range);
 
         if (addToViewChain) {
-            // ViewchainFactory factory = new ViewchainFactory();
-            ViewchainFactory factory = StateController.getInstance().getCurrentState().getViewchainFactory();
-            // FIXME: Simon Spoerri, properly resolve State dependencies
-            factory.addLayerToViewchainMain(view, ImageViewerGui.getSingletonInstance().getMainView());
+            addToViewchain(view);
         }
         return view;
+    }
+
+    private static void addToViewchain(ImageInfoView view) {
+        EventQueue.invokeLater(new Runnable() {
+            private ImageInfoView theView;
+
+            @Override
+            public void run() {
+                ViewchainFactory factory = StateController.getInstance().getCurrentState().getViewchainFactory();
+                factory.addLayerToViewchainMain(theView, ImageViewerGui.getSingletonInstance().getMainView());
+            }
+
+            public Runnable init(ImageInfoView theView) {
+                this.theView = theView;
+                return this;
+            }
+        }.init(view));
     }
 
     /**
