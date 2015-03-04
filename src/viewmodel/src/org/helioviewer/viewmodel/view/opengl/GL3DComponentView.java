@@ -27,10 +27,7 @@ import org.helioviewer.jhv.gui.states.ViewStateEnum;
 import org.helioviewer.jhv.layers.LayersModel;
 import org.helioviewer.jhv.shaderfactory.ShaderFactory;
 import org.helioviewer.viewmodel.changeevent.ChangeEvent;
-import org.helioviewer.viewmodel.changeevent.LayerChangedReason;
-import org.helioviewer.viewmodel.changeevent.LayerChangedReason.LayerChangeType;
 import org.helioviewer.viewmodel.changeevent.SubImageDataChangedReason;
-import org.helioviewer.viewmodel.changeevent.ViewChainChangedReason;
 import org.helioviewer.viewmodel.region.Region;
 import org.helioviewer.viewmodel.renderer.screen.GLScreenRenderGraphics;
 import org.helioviewer.viewmodel.renderer.screen.ScreenRenderer;
@@ -40,7 +37,6 @@ import org.helioviewer.viewmodel.view.RegionView;
 import org.helioviewer.viewmodel.view.View;
 import org.helioviewer.viewmodel.view.jp2view.JHVJP2View;
 import org.helioviewer.viewmodel.view.jp2view.JHVJPXView;
-import org.helioviewer.viewmodel.view.opengl.shader.GLShaderBuilder;
 
 import com.jogamp.opengl.util.TileRenderer;
 import com.jogamp.opengl.util.awt.AWTGLPixelBuffer;
@@ -64,8 +60,6 @@ public class GL3DComponentView extends AbstractComponentView implements GLEventL
     private Color backgroundColor = Color.BLACK;
     private boolean backGroundColorChanged = false;
 
-    private boolean rebuildShaders = false;
-
     // screenshot & movie
     private TileRenderer tileRenderer;
     private BufferedImage screenshot;
@@ -82,7 +76,6 @@ public class GL3DComponentView extends AbstractComponentView implements GLEventL
         if ((view instanceof GLView) == false)
             throw new NullPointerException("View is not an instance of GLView");
 
-        rebuildShaders = true;
         if (StateController.getInstance().getCurrentState().getType() == ViewStateEnum.View3D)
             draw = new Draw3DInterface();
         else
@@ -320,11 +313,6 @@ public class GL3DComponentView extends AbstractComponentView implements GLEventL
             backGroundColorChanged = false;
         }
 
-        if (rebuildShaders) {
-            GLShaderBuilder.rebuildShaders(gl, (GLView) view);
-            rebuildShaders = false;
-        }
-
         gl.glPushMatrix();
         draw.displayBody(gl, view, width, height);
         gl.glPopMatrix();
@@ -402,11 +390,6 @@ public class GL3DComponentView extends AbstractComponentView implements GLEventL
 
     @Override
     public void viewChanged(View sender, ChangeEvent aEvent) {
-        LayerChangedReason lcReason = aEvent.getLastChangedReasonByType(LayerChangedReason.class);
-        if ((lcReason != null && lcReason.getLayerChangeType() == LayerChangeType.LAYER_ADDED) || aEvent.reasonOccurred(ViewChainChangedReason.class)) {
-            rebuildShaders = true;
-        }
-
         SubImageDataChangedReason sidReason = aEvent.getLastChangedReasonByType(SubImageDataChangedReason.class);
         if (sidReason != null) {
             Displayer.getSingletonInstance().display();

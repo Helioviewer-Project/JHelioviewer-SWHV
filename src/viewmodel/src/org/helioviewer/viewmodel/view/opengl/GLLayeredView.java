@@ -11,9 +11,6 @@ import org.helioviewer.viewmodel.view.SubimageDataView;
 import org.helioviewer.viewmodel.view.View;
 import org.helioviewer.viewmodel.view.ViewHelper;
 import org.helioviewer.viewmodel.view.jp2view.JHVJP2View;
-import org.helioviewer.viewmodel.view.opengl.shader.GLMinimalVertexShaderProgram;
-import org.helioviewer.viewmodel.view.opengl.shader.GLShaderBuilder;
-import org.helioviewer.viewmodel.view.opengl.shader.GLVertexShaderView;
 
 /**
  * Implementation of LayeredView for rendering in OpenGL mode.
@@ -29,7 +26,7 @@ import org.helioviewer.viewmodel.view.opengl.shader.GLVertexShaderView;
  * @author Markus Langenberg
  *
  */
-public class GLLayeredView extends AbstractLayeredView implements GLVertexShaderView {
+public class GLLayeredView extends AbstractLayeredView implements GLView {
     private final int shaderID = -1;
 
     /**
@@ -91,28 +88,6 @@ public class GLLayeredView extends AbstractLayeredView implements GLVertexShader
         }
 
         return changed;
-    }
-
-    public GLShaderBuilder buildVertexShader(GLShaderBuilder shaderBuilder) {
-        layerLock.lock();
-        try {
-            for (View v : layers) {
-                GLVertexShaderView vertexView = v.getAdapter(GLVertexShaderView.class);
-                if (vertexView != null) {
-                    // create new shader builder
-                    GLShaderBuilder newShaderBuilder = new GLShaderBuilder(shaderBuilder.getGL(), GL2.GL_VERTEX_PROGRAM_ARB);
-                    // fill with standard values
-                    GLMinimalVertexShaderProgram minimalProgram = new GLMinimalVertexShaderProgram();
-                    minimalProgram.build(newShaderBuilder);
-                    // fill with other filters and compile
-                    vertexView.buildVertexShader(newShaderBuilder).compile();
-                }
-            }
-        } finally {
-            layerLock.unlock();
-        }
-
-        return shaderBuilder;
     }
 
 }

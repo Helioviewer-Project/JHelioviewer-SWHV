@@ -7,7 +7,6 @@ import java.util.LinkedList;
 import javax.media.opengl.GL2;
 
 import org.helioviewer.base.logging.Log;
-import org.helioviewer.viewmodel.view.opengl.GLView;
 
 /**
  * Class to build new OpenGL shader build in Cg.
@@ -401,21 +400,6 @@ public class GLShaderBuilder {
             minimalVertexShaderProgram.build(shaderBuilder);
         }
         return shaderBuilder;
-    }
-
-    public static void rebuildShaders(GL2 gl, GLView view) {
-        shaderHelper.delAllShaderIDs(gl);
-
-        GLVertexShaderView vertexView = view.getAdapter(GLVertexShaderView.class);
-        if (vertexView != null) {
-            // create new shader builder
-            GLShaderBuilder newShaderBuilder = new GLShaderBuilder(gl, GL2.GL_VERTEX_PROGRAM_ARB);
-            // fill with standard values
-            GLMinimalVertexShaderProgram minimalProgram = new GLMinimalVertexShaderProgram();
-            minimalProgram.build(newShaderBuilder);
-            // fill with other filters and compile
-            vertexView.buildVertexShader(newShaderBuilder).compile();
-        }
     }
 
     /**
