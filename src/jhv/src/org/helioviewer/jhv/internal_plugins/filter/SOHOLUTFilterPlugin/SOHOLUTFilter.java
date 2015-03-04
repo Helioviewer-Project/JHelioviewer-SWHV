@@ -4,6 +4,7 @@ import java.nio.IntBuffer;
 
 import javax.media.opengl.GL2;
 
+import org.helioviewer.jhv.shaderfactory.ShaderFactory;
 import org.helioviewer.viewmodel.filter.AbstractFilter;
 import org.helioviewer.viewmodel.filter.FrameFilter;
 import org.helioviewer.viewmodel.filter.GLFragmentShaderFilter;
@@ -160,8 +161,8 @@ public class SOHOLUTFilter extends AbstractFilter implements FrameFilter, Standa
     @Override
     public void applyGL(GL2 gl) {
         gl.glActiveTexture(GL2.GL_TEXTURE1);
+        gl.glBindProgramARB(GL2.GL_FRAGMENT_PROGRAM_ARB, ShaderFactory.getFragmentId());
 
-        shader.bind(gl);
         LUT currlut;
         // Note: The lookup table will always be power of two,
         // so we won't get any problems here.

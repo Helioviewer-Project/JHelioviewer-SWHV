@@ -2,6 +2,7 @@ package org.helioviewer.viewmodel.view.opengl;
 
 import javax.media.opengl.GL2;
 
+import org.helioviewer.jhv.shaderfactory.ShaderFactory;
 import org.helioviewer.viewmodel.changeevent.ChangeEvent;
 import org.helioviewer.viewmodel.metadata.HelioviewerOcculterMetaData;
 import org.helioviewer.viewmodel.metadata.MetaData;
@@ -60,7 +61,7 @@ public class GLHelioviewerGeometryView extends AbstractGLView implements Heliovi
         gl.glEnable(GL2.GL_VERTEX_PROGRAM_ARB);
 
         vertexShader.bind(gl);
-        fragmentShader.bind(gl);
+        gl.glBindProgramARB(GL2.GL_FRAGMENT_PROGRAM_ARB, ShaderFactory.getFragmentId());
 
         renderChild(gl);
 

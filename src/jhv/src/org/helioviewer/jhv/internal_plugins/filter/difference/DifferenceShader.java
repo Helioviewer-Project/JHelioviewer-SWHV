@@ -2,6 +2,7 @@ package org.helioviewer.jhv.internal_plugins.filter.difference;
 
 import javax.media.opengl.GL2;
 
+import org.helioviewer.jhv.shaderfactory.ShaderFactory;
 import org.helioviewer.viewmodel.view.opengl.shader.GLFragmentShaderProgram;
 import org.helioviewer.viewmodel.view.opengl.shader.GLShaderBuilder;
 
@@ -28,7 +29,7 @@ public class DifferenceShader extends GLFragmentShaderProgram {
 
     @Override
     public void bind(GL2 gl) {
-        super.bind(gl);
+        gl.glBindProgramARB(GL2.GL_FRAGMENT_PROGRAM_ARB, ShaderFactory.getFragmentId());
         this.bindEnvVars(gl, this.truncationValueRef, truncationValueFloat);
         this.bindEnvVars(gl, this.isDifferenceValueRef, isDifferenceValueFloat);
     }

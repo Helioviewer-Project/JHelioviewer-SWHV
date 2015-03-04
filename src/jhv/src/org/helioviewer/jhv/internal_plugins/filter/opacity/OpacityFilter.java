@@ -6,6 +6,7 @@ import java.awt.image.BufferedImage;
 
 import javax.media.opengl.GL2;
 
+import org.helioviewer.jhv.shaderfactory.ShaderFactory;
 import org.helioviewer.viewmodel.filter.AbstractFilter;
 import org.helioviewer.viewmodel.filter.GLFragmentShaderFilter;
 import org.helioviewer.viewmodel.filter.StandardFilter;
@@ -135,7 +136,7 @@ public class OpacityFilter extends AbstractFilter implements StandardFilter, GLF
 
         @Override
         public void bind(GL2 gl) {
-            super.bind(gl);
+            gl.glBindProgramARB(GL2.GL_FRAGMENT_PROGRAM_ARB, ShaderFactory.getFragmentId());
             this.bindEnvVars(gl, alphaParamRef, alphaParamFloat);
         }
 
