@@ -131,24 +131,6 @@ public class GLShaderHelper {
     }
 
     /**
-     * Activates a shader.
-     *
-     * @param gl
-     *            Valid reference to the current gl object
-     * @param target
-     *            Shader type, has to be GL_VERTEX_PROGRAM_ARB or
-     *            GL_FRAGMENT_PROGRAM_ARB
-     * @param shader
-     *            Shader id
-     */
-    public void bindShader(GL2 gl, int target, int shader) {
-        if (shader != shaderCurrentlyBound) {
-            shaderCurrentlyBound = shader;
-            gl.glBindProgramARB(target, shader);
-        }
-    }
-
-    /**
      * Compiles a program and loads the result to a given shader.
      *
      * <p>

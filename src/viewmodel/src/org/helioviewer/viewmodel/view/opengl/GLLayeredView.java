@@ -1,13 +1,7 @@
 package org.helioviewer.viewmodel.view.opengl;
 
-import java.io.IOException;
-import java.io.InputStream;
-
 import javax.media.opengl.GL2;
-import javax.media.opengl.glu.GLU;
 
-import org.helioviewer.base.FileUtils;
-import org.helioviewer.base.logging.Log;
 import org.helioviewer.viewmodel.changeevent.ChangeEvent;
 import org.helioviewer.viewmodel.metadata.MetaData;
 import org.helioviewer.viewmodel.region.Region;
@@ -21,7 +15,6 @@ import org.helioviewer.viewmodel.view.opengl.shader.GLFragmentShaderView;
 import org.helioviewer.viewmodel.view.opengl.shader.GLMinimalFragmentShaderProgram;
 import org.helioviewer.viewmodel.view.opengl.shader.GLMinimalVertexShaderProgram;
 import org.helioviewer.viewmodel.view.opengl.shader.GLShaderBuilder;
-import org.helioviewer.viewmodel.view.opengl.shader.GLShaderHelper;
 import org.helioviewer.viewmodel.view.opengl.shader.GLVertexShaderView;
 
 /**
@@ -39,7 +32,7 @@ import org.helioviewer.viewmodel.view.opengl.shader.GLVertexShaderView;
  *
  */
 public class GLLayeredView extends AbstractLayeredView implements GLFragmentShaderView, GLVertexShaderView {
-    private int shaderID = -1;
+    private final int shaderID = -1;
 
     /**
      * {@inheritDoc}
@@ -121,24 +114,8 @@ public class GLLayeredView extends AbstractLayeredView implements GLFragmentShad
                     // fill with standard values
                     GLMinimalFragmentShaderProgram minimalProgram = new GLMinimalFragmentShaderProgram();
                     minimalProgram.build(newShaderBuilder);
-                    InputStream fragmentStream = FileUtils.getResourceInputStream("/data/fragment3d.cg");
-                    String fragmentText = FileUtils.convertStreamToString(fragmentStream);
-                    try {
-                        fragmentStream.close();
-                    } catch (IOException e) {
-                        Log.debug("Stream refuses to close" + e);
-                    }
                     // fill with other filters and compile
                     fragmentView.buildFragmentShader(newShaderBuilder).compile();
-
-                    GL2 gl = (GL2) GLU.getCurrentGL();
-                    if (shaderID == -1) {
-                        int[] tmp = new int[1];
-                        gl.glGenProgramsARB(1, tmp, 0);
-                        shaderID = tmp[0];
-                    }
-                    GLShaderHelper shaderHelper = new GLShaderHelper();
-                    shaderHelper.compileProgram(gl, GL2.GL_FRAGMENT_PROGRAM_ARB, fragmentText, shaderID);
 
                 }
             }

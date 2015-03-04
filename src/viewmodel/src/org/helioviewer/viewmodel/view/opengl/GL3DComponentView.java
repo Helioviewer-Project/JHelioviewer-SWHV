@@ -25,6 +25,7 @@ import org.helioviewer.jhv.gui.dialogs.ExportMovieDialog;
 import org.helioviewer.jhv.gui.states.StateController;
 import org.helioviewer.jhv.gui.states.ViewStateEnum;
 import org.helioviewer.jhv.layers.LayersModel;
+import org.helioviewer.jhv.shaderfactory.ShaderFactory;
 import org.helioviewer.viewmodel.changeevent.ChangeEvent;
 import org.helioviewer.viewmodel.changeevent.LayerChangedReason;
 import org.helioviewer.viewmodel.changeevent.LayerChangedReason.LayerChangeType;
@@ -75,6 +76,7 @@ public class GL3DComponentView extends AbstractComponentView implements GLEventL
     private boolean exportMode = false;
     private boolean screenshotMode = false;
     private File outputFile;
+    private final ShaderFactory shaderFactory;
 
     @Override
     public void activate() {
@@ -262,6 +264,7 @@ public class GL3DComponentView extends AbstractComponentView implements GLEventL
     @Override
     public void init(GLAutoDrawable drawable) {
         GL2 gl = drawable.getGL().getGL2();
+        shaderFactory.initFragment3dCG(gl);
 
         GL3DState.create(gl);
         GLTextureHelper.initHelper(gl);
