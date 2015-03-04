@@ -63,8 +63,6 @@ public abstract class GL3DNode {
         }
     }
 
-    public abstract GL3DAABBox buildAABB();
-
     public boolean hasChanged() {
         return this.hasChanged;
     }

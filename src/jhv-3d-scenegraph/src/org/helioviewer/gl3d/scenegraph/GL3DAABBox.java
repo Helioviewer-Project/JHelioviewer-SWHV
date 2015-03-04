@@ -64,33 +64,6 @@ public class GL3DAABBox {
         setCenterAndRadius();
     }
 
-    public void fromWStoOS(GL3DVec3d minWS, GL3DVec3d maxWS, GL3DMat4d wmI) {
-        this.minOS.set(new GL3DVec3d(Double.MAX_VALUE, Double.MAX_VALUE, Double.MAX_VALUE));
-        this.maxOS.set(new GL3DVec3d(-Double.MAX_VALUE, -Double.MAX_VALUE, -Double.MAX_VALUE));
-        this.minWS.set(minWS);
-        this.maxWS.set(maxWS);
-
-        GL3DVec3d[] corners = new GL3DVec3d[8];
-        corners[0] = new GL3DVec3d(minWS);
-        corners[1] = new GL3DVec3d(maxWS.x, minWS.y, minWS.z);
-        corners[2] = new GL3DVec3d(maxWS.x, minWS.y, maxWS.z);
-        corners[3] = new GL3DVec3d(minWS.x, minWS.y, maxWS.z);
-        corners[4] = new GL3DVec3d(maxWS.x, maxWS.y, minWS.z);
-        corners[5] = new GL3DVec3d(minWS.x, maxWS.y, minWS.z);
-        corners[6] = new GL3DVec3d(minWS.x, maxWS.y, maxWS.z);
-        corners[7] = new GL3DVec3d(maxWS);
-
-        for (GL3DVec3d corner : corners) {
-            corner.set(wmI.multiply(corner));
-        }
-
-        for (GL3DVec3d corner : corners) {
-            this.minOS.setMin(corner);
-            this.maxOS.setMax(corner);
-        }
-        setCenterAndRadius();
-    }
-
     public void setCenterAndRadius() {
         this.centerWS = GL3DVec3d.add(this.minWS, this.maxWS);
         this.centerWS.multiply(0.5);

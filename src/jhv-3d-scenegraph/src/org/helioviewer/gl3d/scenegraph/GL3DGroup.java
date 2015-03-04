@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.helioviewer.gl3d.scenegraph.GL3DDrawBits.Bit;
-import org.helioviewer.gl3d.scenegraph.math.GL3DVec3d;
 import org.helioviewer.gl3d.scenegraph.visuals.GL3DPolyLine;
 
 /**
@@ -266,20 +265,6 @@ public class GL3DGroup extends GL3DShape {
             node = node.next;
         }
         return numberOfChilds;
-    }
-
-    @Override
-    public GL3DAABBox buildAABB() {
-        GL3DNode current = this.first;
-        this.aabb = new GL3DAABBox();
-        aabb.minWS = new GL3DVec3d(Double.MAX_VALUE, Double.MAX_VALUE, Double.MAX_VALUE);
-        aabb.maxWS = new GL3DVec3d(-Double.MAX_VALUE, -Double.MAX_VALUE, -Double.MAX_VALUE);
-        while (current != null) {
-            this.aabb.merge(current.buildAABB());
-            current = current.next;
-        }
-        this.aabb.fromWStoOS(aabb.minWS, aabb.maxWS, wmI);
-        return aabb;
     }
 
     @Override

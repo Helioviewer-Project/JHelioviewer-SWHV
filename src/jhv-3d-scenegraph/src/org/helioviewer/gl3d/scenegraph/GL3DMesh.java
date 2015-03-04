@@ -303,22 +303,6 @@ public abstract class GL3DMesh extends GL3DShape {
         return triangles;
     }
 
-    @Override
-    public GL3DAABBox buildAABB() {
-        GL3DVec3d minOS = new GL3DVec3d();
-        GL3DVec3d maxOS = new GL3DVec3d();
-
-        if (!isDrawBitOn(Bit.Hidden)) {
-            calcMinMax(minOS, maxOS);
-        }
-        // minOS.subtract(0.01);
-        // maxOS.add(0.01);
-
-        this.aabb.fromOStoWS(minOS, maxOS, this.wm);
-
-        return this.aabb;
-    }
-
     private void calcMinMax(GL3DVec3d minV, GL3DVec3d maxV) {
         minV.set(Double.MAX_VALUE, Double.MAX_VALUE, Double.MAX_VALUE);
         maxV.set(-Double.MAX_VALUE, -Double.MAX_VALUE, -Double.MAX_VALUE);
