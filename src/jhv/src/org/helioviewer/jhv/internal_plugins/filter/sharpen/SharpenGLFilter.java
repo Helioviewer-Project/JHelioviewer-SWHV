@@ -3,7 +3,6 @@ package org.helioviewer.jhv.internal_plugins.filter.sharpen;
 import javax.media.opengl.GL2;
 
 import org.helioviewer.jhv.shaderfactory.ShaderFactory;
-import org.helioviewer.viewmodel.filter.GLFragmentShaderFilter;
 import org.helioviewer.viewmodel.filter.GLImageSizeFilter;
 import org.helioviewer.viewmodel.view.opengl.shader.GLFragmentShaderProgram;
 import org.helioviewer.viewmodel.view.opengl.shader.GLShaderBuilder;
@@ -16,7 +15,7 @@ import org.helioviewer.viewmodel.view.opengl.shader.GLShaderBuilder;
  *
  * @author Markus Langenberg
  */
-public class SharpenGLFilter extends SharpenFilter implements GLFragmentShaderFilter, GLImageSizeFilter {
+public class SharpenGLFilter extends SharpenFilter implements GLImageSizeFilter {
 
     private final UnsharpMaskingShader shader = new UnsharpMaskingShader();
     private float pixelWidth, pixelHeight;

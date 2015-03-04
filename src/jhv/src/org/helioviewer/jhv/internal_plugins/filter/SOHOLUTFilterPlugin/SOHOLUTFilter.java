@@ -7,7 +7,7 @@ import javax.media.opengl.GL2;
 import org.helioviewer.jhv.shaderfactory.ShaderFactory;
 import org.helioviewer.viewmodel.filter.AbstractFilter;
 import org.helioviewer.viewmodel.filter.FrameFilter;
-import org.helioviewer.viewmodel.filter.GLFragmentShaderFilter;
+import org.helioviewer.viewmodel.filter.GLFilter;
 import org.helioviewer.viewmodel.filter.StandardFilter;
 import org.helioviewer.viewmodel.imagedata.ARGBInt32ImageData;
 import org.helioviewer.viewmodel.imagedata.ImageData;
@@ -34,7 +34,7 @@ import org.helioviewer.viewmodel.view.opengl.shader.GLSingleChannelLookupFragmen
  *
  * @author Helge Dietert
  */
-public class SOHOLUTFilter extends AbstractFilter implements FrameFilter, StandardFilter, GLFragmentShaderFilter {
+public class SOHOLUTFilter extends AbstractFilter implements FrameFilter, StandardFilter, GLFilter {
     // /////////////////////////
     // GENERAL //
     // /////////////////////////

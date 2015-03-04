@@ -10,7 +10,6 @@ import org.helioviewer.viewmodel.changeevent.ViewChainChangedReason;
 import org.helioviewer.viewmodel.filter.Filter;
 import org.helioviewer.viewmodel.filter.FrameFilter;
 import org.helioviewer.viewmodel.filter.GLFilter;
-import org.helioviewer.viewmodel.filter.GLFragmentShaderFilter;
 import org.helioviewer.viewmodel.filter.GLImageSizeFilter;
 import org.helioviewer.viewmodel.filter.GLPostFilter;
 import org.helioviewer.viewmodel.imagedata.ImageData;
@@ -85,9 +84,7 @@ public class GLFilterView extends StandardFilterView implements GLFragmentShader
         if (filter instanceof GLFilter) {
             refilterPrepare();
 
-            if (filter instanceof GLFragmentShaderFilter) {
-                gl.glEnable(GL2.GL_FRAGMENT_PROGRAM_ARB);
-            }
+            gl.glEnable(GL2.GL_FRAGMENT_PROGRAM_ARB);
 
             ((GLFilter) filter).applyGL(gl);
             if (view instanceof GLView) {
