@@ -26,7 +26,7 @@ public class GLSingleChannelLookupFragmentShaderProgram extends GLFragmentShader
     @Override
     public void bind(GL2 gl) {
         super.bind(gl);
-        gl.glBindProgramARB(target, ShaderFactory.getFragment3dCGId());
+        gl.glBindProgramARB(target, ShaderFactory.getFragmentId());
     }
 
     /**

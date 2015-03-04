@@ -146,30 +146,6 @@ public class GLShaderHelper {
      *            Shader type, has to be GL_VERTEX_PROGRAM_ARB or
      *            GL_FRAGMENT_PROGRAM_ARB
      * @param source
-     *            Location of the source file.
-     * @param target
-     *            Shader id to put the compiled program
-     */
-    public void compileProgram(GL2 gl, int programType, URL source, int target) {
-        compileProgram(gl, programType, getContents(source), target);
-    }
-
-    /**
-     * Compiles a program and loads the result to a given shader.
-     *
-     * <p>
-     * Note, that the only mechanism to display errors is the general check for
-     * OpenGL errors during the rendering process. If the given program contains
-     * errors, "invalid operation" should be displayed on the console. To verify
-     * the exact error, try calling the Cg stand- alone compiler from the
-     * console.
-     *
-     * @param gl
-     *            Valid reference to the current gl object
-     * @param programType
-     *            Shader type, has to be GL_VERTEX_PROGRAM_ARB or
-     *            GL_FRAGMENT_PROGRAM_ARB
-     * @param source
      *            Complete program code, given in Cg.
      * @param target
      *            Shader id to put the compiled program
