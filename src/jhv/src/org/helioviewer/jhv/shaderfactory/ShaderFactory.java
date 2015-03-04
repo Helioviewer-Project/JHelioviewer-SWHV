@@ -22,7 +22,6 @@ public class ShaderFactory {
 
     public static int getFragmentId() {
         if (Displayer.getSingletonInstance().getState() == Displayer.STATE3D) {
-            System.out.println("fid " + fragment3dCGID);
             return fragment3dCGID;
         } else {
             return fragment2dCGID;
