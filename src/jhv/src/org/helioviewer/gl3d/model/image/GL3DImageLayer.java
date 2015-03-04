@@ -56,7 +56,7 @@ public abstract class GL3DImageLayer extends GL3DGroup implements GL3DCameraList
 
     protected GL3DImageFragmentShaderProgram sphereFragmentShader = null;
 
-    private int resolution;
+    private final int resolution = 6;
     private final double[][] pointlist = new double[(resolution + 1) * 2 * 2][2];
 
     public GL3DImageLayer(String name, GL3DView mainLayerView) {
@@ -97,7 +97,6 @@ public abstract class GL3DImageLayer extends GL3DGroup implements GL3DCameraList
                 this.pointlist[count][0] = i / 1.;
                 this.pointlist[count][1] = 1. * j / this.resolution;
                 count++;
-                System.out.println(count);
             }
         }
     }
