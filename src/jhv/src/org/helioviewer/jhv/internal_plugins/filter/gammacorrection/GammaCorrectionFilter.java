@@ -2,6 +2,7 @@ package org.helioviewer.jhv.internal_plugins.filter.gammacorrection;
 
 import javax.media.opengl.GL2;
 
+import org.helioviewer.jhv.shaderfactory.ShaderFactory;
 import org.helioviewer.viewmodel.filter.AbstractFilter;
 import org.helioviewer.viewmodel.filter.GLFragmentShaderFilter;
 import org.helioviewer.viewmodel.filter.StandardFilter;
@@ -164,14 +165,22 @@ public class GammaCorrectionFilter extends AbstractFilter implements StandardFil
                 for (int i = 0; i < pixelData.length; i++) {
                     int rgb = pixelData[i];
                     int a = rgb >>> 24;
-                    int r = (rgb >>> 16) & 0xFF;
-                    int g = (rgb >>> 8) & 0xFF;
-                    int b = rgb & 0xff;
+                int r = (rgb >>> 16) & 0xFF;
+                int g = (rgb >>> 8) & 0xFF;
+                int b = rgb & 0xff;
 
+<<<<<<< HEAD
                     r = gammaTable8[r] & 0xFF;
                     g = gammaTable8[g] & 0xFF;
                     b = gammaTable8[b] & 0xFF;
                     resultPixelData[i] = (a << 24) | (r << 16) | (g << 8) | b;
+=======
+                r = gammaTable8[r] & 0xFF;
+                g = gammaTable8[g] & 0xFF;
+                b = gammaTable8[b] & 0xFF;
+
+                resultPixelData[i] = (a << 24) | (r << 16) | (g << 8) | b;
+>>>>>>> bind locally
                 }
                 return new ARGBInt32ImageData(data, resultPixelData);
             }
@@ -203,7 +212,7 @@ public class GammaCorrectionFilter extends AbstractFilter implements StandardFil
 
         @Override
         public void bind(GL2 gl) {
-            super.bind(gl);
+            gl.glBindProgramARB(GL2.GL_FRAGMENT_PROGRAM_ARB, ShaderFactory.getFragmentId());
             this.bindEnvVars(gl, this.gammaParamRef, gammaParamFloat);
         }
 

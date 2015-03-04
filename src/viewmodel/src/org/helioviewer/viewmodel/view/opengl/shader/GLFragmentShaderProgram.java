@@ -92,10 +92,7 @@ public abstract class GLFragmentShaderProgram {
      *            Valid reference to the current gl object
      */
     private static void bind(GL2 gl, int shader) {
-        if (shader != shaderCurrentlyUsed) {
-            shaderCurrentlyUsed = shader;
-            gl.glBindProgramARB(target, ShaderFactory.getFragmentId());
-        }
+        gl.glBindProgramARB(target, ShaderFactory.getFragmentId());
     }
 
     public int getId() {

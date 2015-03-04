@@ -2,6 +2,7 @@ package org.helioviewer.jhv.internal_plugins.filter.contrast;
 
 import javax.media.opengl.GL2;
 
+import org.helioviewer.jhv.shaderfactory.ShaderFactory;
 import org.helioviewer.viewmodel.filter.AbstractFilter;
 import org.helioviewer.viewmodel.filter.GLFragmentShaderFilter;
 import org.helioviewer.viewmodel.filter.StandardFilter;
@@ -206,7 +207,7 @@ public class ContrastFilter extends AbstractFilter implements StandardFilter, GL
 
         @Override
         public void bind(GL2 gl) {
-            super.bind(gl);
+            gl.glBindProgramARB(GL2.GL_FRAGMENT_PROGRAM_ARB, ShaderFactory.getFragmentId());
             this.bindEnvVars(gl, this.contrastParamRef, contrastParamFloat);
         }
 
