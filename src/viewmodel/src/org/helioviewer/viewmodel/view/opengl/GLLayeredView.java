@@ -12,7 +12,6 @@ import org.helioviewer.viewmodel.view.View;
 import org.helioviewer.viewmodel.view.ViewHelper;
 import org.helioviewer.viewmodel.view.jp2view.JHVJP2View;
 import org.helioviewer.viewmodel.view.opengl.shader.GLFragmentShaderView;
-import org.helioviewer.viewmodel.view.opengl.shader.GLMinimalFragmentShaderProgram;
 import org.helioviewer.viewmodel.view.opengl.shader.GLMinimalVertexShaderProgram;
 import org.helioviewer.viewmodel.view.opengl.shader.GLShaderBuilder;
 import org.helioviewer.viewmodel.view.opengl.shader.GLVertexShaderView;
@@ -95,44 +94,6 @@ public class GLLayeredView extends AbstractLayeredView implements GLFragmentShad
         return changed;
     }
 
-    /**
-     * {@inheritDoc}
-     *
-     * <p>
-     * In this case, creates a new shader for every layer and initializes it
-     * with the least necessary commands.
-     */
-    @Override
-    public GLShaderBuilder buildFragmentShader(GLShaderBuilder shaderBuilder) {
-        layerLock.lock();
-        try {
-            for (View v : layers) {
-                GLFragmentShaderView fragmentView = v.getAdapter(GLFragmentShaderView.class);
-                if (fragmentView != null) {
-                    // create new shader builder
-                    GLShaderBuilder newShaderBuilder = new GLShaderBuilder(shaderBuilder.getGL(), GL2.GL_FRAGMENT_PROGRAM_ARB);
-                    // fill with standard values
-                    GLMinimalFragmentShaderProgram minimalProgram = new GLMinimalFragmentShaderProgram();
-                    // fill with other filters and compile
-                    fragmentView.buildFragmentShader(newShaderBuilder).compile();
-
-                }
-            }
-        } finally {
-            layerLock.unlock();
-        }
-
-        return shaderBuilder;
-    }
-
-    /**
-     * {@inheritDoc}
-     *
-     * <p>
-     * In this case, creates a new shader for every layer and initializes it
-     * with the least necessary commands.
-     */
-    @Override
     public GLShaderBuilder buildVertexShader(GLShaderBuilder shaderBuilder) {
         layerLock.lock();
         try {

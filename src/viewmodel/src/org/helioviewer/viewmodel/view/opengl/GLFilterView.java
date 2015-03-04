@@ -21,7 +21,6 @@ import org.helioviewer.viewmodel.view.ViewportView;
 import org.helioviewer.viewmodel.view.jp2view.JHVJP2View;
 import org.helioviewer.viewmodel.view.jp2view.JHVJPXView;
 import org.helioviewer.viewmodel.view.opengl.shader.GLFragmentShaderView;
-import org.helioviewer.viewmodel.view.opengl.shader.GLShaderBuilder;
 import org.helioviewer.viewmodel.viewport.Viewport;
 
 /**
@@ -155,27 +154,6 @@ public class GLFilterView extends StandardFilterView implements GLFragmentShader
 
             notifyViewListeners(event);
         }
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public GLShaderBuilder buildFragmentShader(GLShaderBuilder shaderBuilder) {
-        if (!(filter instanceof GLFilter)) {
-            return shaderBuilder;
-        }
-
-        GLFragmentShaderView nextView = view.getAdapter(GLFragmentShaderView.class);
-        if (nextView != null) {
-            shaderBuilder = nextView.buildFragmentShader(shaderBuilder);
-        }
-
-        if (filter instanceof GLFragmentShaderFilter) {
-            shaderBuilder = ((GLFragmentShaderFilter) filter).buildFragmentShader(shaderBuilder);
-        }
-
-        return shaderBuilder;
     }
 
     /**
