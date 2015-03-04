@@ -10,7 +10,6 @@ import org.helioviewer.viewmodel.view.HelioviewerGeometryView;
 import org.helioviewer.viewmodel.view.MetaDataView;
 import org.helioviewer.viewmodel.view.View;
 import org.helioviewer.viewmodel.view.opengl.shader.GLFragmentShaderProgram;
-import org.helioviewer.viewmodel.view.opengl.shader.GLFragmentShaderView;
 import org.helioviewer.viewmodel.view.opengl.shader.GLShaderBuilder;
 import org.helioviewer.viewmodel.view.opengl.shader.GLShaderBuilder.GLBuildShaderException;
 import org.helioviewer.viewmodel.view.opengl.shader.GLVertexShaderProgram;
@@ -33,7 +32,7 @@ import org.helioviewer.viewmodel.view.opengl.shader.GLVertexShaderView;
  *
  * @author Markus Langenberg
  */
-public class GLHelioviewerGeometryView extends AbstractGLView implements HelioviewerGeometryView, GLFragmentShaderView, GLVertexShaderView {
+public class GLHelioviewerGeometryView extends AbstractGLView implements HelioviewerGeometryView, GLVertexShaderView {
 
     GeometryVertexShaderProgram vertexShader = new GeometryVertexShaderProgram();
     GeometryFragmentShaderProgram fragmentShader = new GeometryFragmentShaderProgram();

@@ -19,7 +19,6 @@ import org.helioviewer.viewmodel.view.ViewHelper;
 import org.helioviewer.viewmodel.view.ViewportView;
 import org.helioviewer.viewmodel.view.jp2view.JHVJP2View;
 import org.helioviewer.viewmodel.view.jp2view.JHVJPXView;
-import org.helioviewer.viewmodel.view.opengl.shader.GLFragmentShaderView;
 import org.helioviewer.viewmodel.viewport.Viewport;
 
 /**
@@ -50,7 +49,7 @@ import org.helioviewer.viewmodel.viewport.Viewport;
  * @author Markus Langenberg
  *
  */
-public class GLFilterView extends StandardFilterView implements GLFragmentShaderView {
+public class GLFilterView extends StandardFilterView implements GLView {
 
     protected ViewportView viewportView;
 

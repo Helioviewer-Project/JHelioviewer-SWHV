@@ -28,7 +28,6 @@ import org.helioviewer.viewmodel.view.ViewListener;
 import org.helioviewer.viewmodel.view.jp2view.JHVJPXView;
 import org.helioviewer.viewmodel.view.opengl.shader.GL3DImageFragmentShaderProgram;
 import org.helioviewer.viewmodel.view.opengl.shader.GL3DImageVertexShaderProgram;
-import org.helioviewer.viewmodel.view.opengl.shader.GLFragmentShaderView;
 import org.helioviewer.viewmodel.viewport.Viewport;
 
 /**
@@ -41,7 +40,7 @@ import org.helioviewer.viewmodel.viewport.Viewport;
  * @author Simon Spoerri (simon.spoerri@fhnw.ch)
  *
  */
-public class GL3DImageTextureView extends AbstractGL3DView implements GL3DView, GLFragmentShaderView {
+public class GL3DImageTextureView extends AbstractGL3DView implements GL3DView {
 
     public GL3DImageTextureView() {
         super();
