@@ -333,7 +333,7 @@ public class JHVJPXView extends JHVJP2View implements TimedMovieView, CachedMovi
             event.reinitialize();
         }
         fireEvent.addReason(new PlayStateChangedReason(this, this.linkedMovieManager, false));
-        notifyViewListeners(fireEvent);
+        fireChangeEvent(fireEvent);
 
     }
 
@@ -360,7 +360,7 @@ public class JHVJPXView extends JHVJP2View implements TimedMovieView, CachedMovi
                     event.reinitialize();
                 }
                 fireEvent.addReason(new PlayStateChangedReason(this, this.linkedMovieManager, true));
-                notifyViewListeners(fireEvent);
+                fireChangeEvent(fireEvent);
             }
         }
 
