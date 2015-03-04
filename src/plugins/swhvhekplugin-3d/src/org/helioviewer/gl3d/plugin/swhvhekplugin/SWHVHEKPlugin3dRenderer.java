@@ -12,13 +12,11 @@ import javax.media.opengl.GL2;
 import javax.swing.ImageIcon;
 
 import org.helioviewer.base.physics.Astronomy;
-import org.helioviewer.gl3d.scenegraph.math.GL3DVec3d;
 import org.helioviewer.jhv.data.datatype.event.JHVCoordinateSystem;
 import org.helioviewer.jhv.data.datatype.event.JHVEvent;
 import org.helioviewer.jhv.data.datatype.event.JHVEventParameter;
 import org.helioviewer.jhv.data.datatype.event.JHVPoint;
 import org.helioviewer.jhv.data.datatype.event.JHVPositionInformation;
-import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.plugins.swhvhekplugin.cache.SWHVHEKData;
 import org.helioviewer.jhv.plugins.swhvhekplugin.settings.SWHVHEKSettings;
 import org.helioviewer.viewmodel.renderer.physical.PhysicalRenderGraphics;
@@ -258,45 +256,6 @@ public class SWHVHEKPlugin3dRenderer extends PhysicalRenderer3d {
             }
         }
         SWHVHEKSettings.resetCactusColor();
-        drawPoints(g);
     }
 
-    private void drawPoints(PhysicalRenderGraphics g) {
-        GL2 gl = g.getGL();
-        ArrayList<GL3DVec3d> pl = Displayer.pointList;
-        gl.glColor3d(1., 0., 0.);
-        GL3DVec3d oldBoundaryPoint3d = null;
-        for (int i = 0; i < pl.size(); i++) {
-            GL3DVec3d boundaryPoint3d = pl.get(i);
-            int divpoints = 10;
-            gl.glColor3d(1., 0., 0.);
-            gl.glDisable(GL2.GL_TEXTURE_2D);
-            gl.glEnable(GL2.GL_LINE_SMOOTH);
-            gl.glLineWidth(0.5f);
-            gl.glBegin(GL2.GL_LINE_STRIP);
-            if (oldBoundaryPoint3d != null) {
-                for (int j = 0; j <= divpoints; j++) {
-                    double alpha = 1. - 1. * j / divpoints;
-                    double xnew = alpha * oldBoundaryPoint3d.x + (1 - alpha) * boundaryPoint3d.x;
-                    double ynew = alpha * oldBoundaryPoint3d.y + (1 - alpha) * boundaryPoint3d.y;
-                    double znew = alpha * oldBoundaryPoint3d.z + (1 - alpha) * boundaryPoint3d.z;
-                    double r = Math.sqrt(xnew * xnew + ynew * ynew + znew * znew);
-                    xnew = xnew / r;
-                    ynew = ynew / r;
-                    znew = znew / r;
-                    gl.glVertex3d(xnew, ynew, znew);
-                }
-            }
-            gl.glEnd();
-            gl.glDisable(GL2.GL_LINE_SMOOTH);
-            oldBoundaryPoint3d = boundaryPoint3d;
-        }
-        gl.glColor3d(0., 1., 0.);
-        for (int i = 0; i < pl.size(); i++) {
-            GL3DVec3d pt = pl.get(i);
-            gl.glBegin(GL2.GL_POINTS);
-            gl.glVertex3d(pt.x, pt.y, pt.z);
-            gl.glEnd();
-        }
-    }
 }
