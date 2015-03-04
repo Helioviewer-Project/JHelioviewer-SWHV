@@ -7,8 +7,8 @@ import javax.media.opengl.GL2;
 import org.helioviewer.base.physics.Constants;
 import org.helioviewer.gl3d.camera.GL3DCamera;
 import org.helioviewer.gl3d.camera.GL3DCameraListener;
+import org.helioviewer.gl3d.scenegraph.GL3DDrawBits.Bit;
 import org.helioviewer.gl3d.scenegraph.GL3DGroup;
-import org.helioviewer.gl3d.scenegraph.GL3DShape;
 import org.helioviewer.gl3d.scenegraph.GL3DState;
 import org.helioviewer.gl3d.scenegraph.math.GL3DMat4d;
 import org.helioviewer.gl3d.scenegraph.math.GL3DQuatd;
@@ -24,6 +24,9 @@ import org.helioviewer.viewmodel.view.RegionView;
 import org.helioviewer.viewmodel.view.opengl.GL3DImageTextureView;
 import org.helioviewer.viewmodel.view.opengl.GL3DView;
 import org.helioviewer.viewmodel.view.opengl.shader.GL3DImageFragmentShaderProgram;
+import org.helioviewer.viewmodel.view.opengl.shader.GL3DImageVertexShaderProgram;
+import org.helioviewer.viewmodel.view.opengl.shader.GL3DShaderFactory;
+import org.helioviewer.viewmodel.view.opengl.shader.GLVertexShaderProgram;
 
 /**
  * This is the scene graph equivalent of an image layer sub view chain attached
@@ -33,7 +36,9 @@ import org.helioviewer.viewmodel.view.opengl.shader.GL3DImageFragmentShaderProgr
  * @author Simon Spoerri (simon.spoerri@fhnw.ch)
  *
  */
-public abstract class GL3DImageLayer extends GL3DGroup implements GL3DCameraListener {
+public class GL3DImageLayer extends GL3DGroup implements GL3DCameraListener {
+    private GL3DImageSphere sphere;
+    private GL3DImageSphere corona;
     private static int nextLayerId = 0;
     private final int layerId;
     private GL3DVec4d direction = new GL3DVec4d(0, 0, 1, 0);
@@ -101,6 +106,33 @@ public abstract class GL3DImageLayer extends GL3DGroup implements GL3DCameraList
         }
     }
 
+    private void createImageMeshNodes(GL2 gl) {
+        this.sphereFragmentShader = imageTextureView.getFragmentShader();
+        GL3DImageVertexShaderProgram vertexShaderProgram = new GL3DImageVertexShaderProgram();
+        GLVertexShaderProgram vertexShader = GL3DShaderFactory.createVertexShaderProgram(gl, vertexShaderProgram);
+        this.imageTextureView.setVertexShader(vertexShaderProgram);
+        sphere = new GL3DImageSphere(imageTextureView, vertexShader, sphereFragmentShader, this, true, false, false);
+        corona = new GL3DImageSphere(imageTextureView, vertexShader, sphereFragmentShader, this, false, true, true);
+        this.addNode(sphere);
+        this.addNode(corona);
+    }
+
+    protected GL3DImageMesh getImageSphere() {
+        return this.sphere;
+    }
+
+    public GL3DImageMesh getImageCorona() {
+        return this.corona;
+    }
+
+    public void setCoronaVisibility(boolean visible) {
+        if (!visible) {
+            this.corona.getDrawBits().on(Bit.Hidden);
+        } else {
+            this.corona.getDrawBits().off(Bit.Hidden);
+        }
+    }
+
     @Override
     public void shapeInit(GL3DState state) {
         this.createImageMeshNodes(state.gl);
@@ -114,14 +146,9 @@ public abstract class GL3DImageLayer extends GL3DGroup implements GL3DCameraList
         state.getActiveCamera().updateCameraTransformation();
     }
 
-    protected abstract void createImageMeshNodes(GL2 gl);
-
-    protected abstract GL3DImageMesh getImageSphere();
-
     @Override
     public void shapeUpdate(GL3DState state) {
         super.shapeUpdate(state);
-        // Log.debug("GL3DImageLayer: '"+getName()+" is updating its ROI");
         this.updateROI(state);
         doUpdateROI = false;
     }
@@ -241,13 +268,6 @@ public abstract class GL3DImageLayer extends GL3DGroup implements GL3DCameraList
 
     public GL3DImageFragmentShaderProgram getSphereFragmentShader() {
         return sphereFragmentShader;
-    }
-
-    protected GL3DShape getImageCorona() {
-        return null;
-    }
-
-    public void setCoronaVisibility(boolean visible) {
     }
 
     public GL3DVec3d convertViewportToPlane(GL3DVec3d viewportCoordinates, GL3DMat4d projectionMatrix) {
