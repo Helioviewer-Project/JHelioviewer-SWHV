@@ -88,19 +88,6 @@ public class GL3DState {
         return mv;
     }
 
-    public void buildInverseAndNormalMatrix() {
-        try {
-            this.mvInverse = this.mv.inverse();
-            this.normalMatrix = this.mvInverse.mat3().transpose();
-        } catch (IllegalArgumentException e) {
-            // TODO: What to do when matrix cannot be inverted?
-            Log.error("Cannot Invert ModelView Matrix! Singularity occurred!", e);
-            this.mvInverse = GL3DMat4d.identity();
-            this.normalMatrix = new GL3DMat3d();
-            this.mv = GL3DMat4d.identity();
-        }
-    }
-
     public GL3DMat4d getMVInverse() {
         return new GL3DMat4d(this.mvInverse);
     }

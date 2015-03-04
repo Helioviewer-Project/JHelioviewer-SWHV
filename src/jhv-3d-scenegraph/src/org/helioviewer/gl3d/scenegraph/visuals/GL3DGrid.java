@@ -15,7 +15,6 @@ import org.helioviewer.base.physics.Astronomy;
 import org.helioviewer.base.physics.Constants;
 import org.helioviewer.gl3d.scenegraph.GL3DGroup;
 import org.helioviewer.gl3d.scenegraph.GL3DState;
-import org.helioviewer.gl3d.scenegraph.math.GL3DMat4d;
 import org.helioviewer.gl3d.scenegraph.math.GL3DQuatd;
 import org.helioviewer.gl3d.scenegraph.math.GL3DVec3d;
 import org.helioviewer.gl3d.scenegraph.math.GL3DVec4d;
@@ -78,8 +77,6 @@ public class GL3DGrid extends GL3DGroup {
             this.m = rotation.toMatrix();
         }
         this.wm = (this.m);
-        state.buildInverseAndNormalMatrix();
-        this.wmI = new GL3DMat4d(state.getMVInverse());
         this.shapeUpdate(state);
         state.popMV();
     }

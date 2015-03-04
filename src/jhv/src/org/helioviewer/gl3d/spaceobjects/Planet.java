@@ -14,7 +14,6 @@ import org.helioviewer.gl3d.camera.GL3DPositionLoadingListener;
 import org.helioviewer.gl3d.camera.GL3DSpaceObject;
 import org.helioviewer.gl3d.scenegraph.GL3DDrawBits.Bit;
 import org.helioviewer.gl3d.scenegraph.GL3DState;
-import org.helioviewer.gl3d.scenegraph.math.GL3DMat4d;
 import org.helioviewer.gl3d.scenegraph.math.GL3DVec3d;
 import org.helioviewer.gl3d.scenegraph.math.GL3DVec4f;
 import org.helioviewer.gl3d.scenegraph.visuals.GL3DSphere;
@@ -174,8 +173,6 @@ public class Planet extends GL3DSphere implements LayersListener, ViewListener, 
             this.m.translate(position);
 
             this.wm = (this.m);
-            state.buildInverseAndNormalMatrix();
-            this.wmI = new GL3DMat4d(state.getMVInverse());
             state.popMV();
         }
     }

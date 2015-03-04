@@ -1,9 +1,7 @@
 package org.helioviewer.gl3d.scenegraph;
 
 import org.helioviewer.gl3d.scenegraph.GL3DDrawBits.Bit;
-import org.helioviewer.gl3d.scenegraph.math.GL3DMat3d;
 import org.helioviewer.gl3d.scenegraph.math.GL3DMat4d;
-import org.helioviewer.gl3d.scenegraph.math.GL3DVec4d;
 
 /**
  * A {@link GL3DShape} is a {@link GL3DNode} that does have a position and a
@@ -19,10 +17,6 @@ public abstract class GL3DShape extends GL3DNode {
 
     // World Matrix
     protected GL3DMat4d wm;
-    protected GL3DMat4d wmI;
-    protected GL3DMat3d wmN;
-
-    protected GL3DAABBox aabb;
 
     public GL3DShape(String name) {
 
@@ -30,19 +24,14 @@ public abstract class GL3DShape extends GL3DNode {
 
         this.m = GL3DMat4d.identity();
         this.wm = GL3DMat4d.identity();
-        this.aabb = new GL3DAABBox();
     }
 
     @Override
     public void init(GL3DState state) {
         state.pushMV();
         this.wm = state.multiplyMV(this.m);
-        state.buildInverseAndNormalMatrix();
-        this.wmI = new GL3DMat4d(state.getMVInverse());
-        this.wmN = new GL3DMat3d(state.normalMatrix);
 
         this.shapeInit(state);
-        this.buildAABB();
         this.isInitialised = true;
         state.popMV();
     }
@@ -56,9 +45,6 @@ public abstract class GL3DShape extends GL3DNode {
             state.pushMV();
             // this.updateMatrix(state);
             this.wm = state.multiplyMV(this.m);
-            state.buildInverseAndNormalMatrix();
-            this.wmI = new GL3DMat4d(state.getMVInverse());
-            this.wmN = new GL3DMat3d(state.normalMatrix);
             this.shapeUpdate(state);
             this.setUnchanged();
             //this.buildAABB();
@@ -73,33 +59,9 @@ public abstract class GL3DShape extends GL3DNode {
     @Override
     public void draw(GL3DState state) {
         if (!isDrawBitOn(Bit.Hidden)) {
-            // Log.debug("GL3DShape: Drawing '"+getName()+"'");
             state.pushMV();
             state.multiplyMV(this.m);
-            state.buildInverseAndNormalMatrix();
-            // this.wmI = new GL3DMat4d(state.getMVInverse());
-            // this.wmN = new GL3DMat3d(state.normalMatrix);
             this.shapeDraw(state);
-
-            if (isDrawBitOn(Bit.BoundingBox)) {
-                if (GL3DGroup.class.isAssignableFrom(this.getClass())) {
-                    // Is it the root?
-                    if (this.parent == null) {
-                        state.gl.glLineWidth(4.0f);
-                        this.aabb.drawOS(state, new GL3DVec4d(0, 1, 0, 1));
-                        state.gl.glLineWidth(1.0f);
-                    } else {
-                        this.aabb.drawOS(state, new GL3DVec4d(0, 1, 1, 1));
-                    }
-                } else {
-                    this.aabb.drawOS(state, new GL3DVec4d(1, 0, 0, 1));
-                }
-            } else if (isDrawBitOn(Bit.Selected)) {
-                state.gl.glLineWidth(2.0f);
-                this.aabb.drawOS(state, new GL3DVec4d(0, 0.0, 1, 1));
-                state.gl.glLineWidth(1.0f);
-            }
-
             state.popMV();
         }
     }
@@ -123,10 +85,6 @@ public abstract class GL3DShape extends GL3DNode {
 
     public GL3DMat4d modelView() {
         return this.m;
-    }
-
-    public GL3DAABBox getAABBox() {
-        return this.aabb;
     }
 
 }
