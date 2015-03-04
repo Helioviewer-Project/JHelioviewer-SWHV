@@ -1,9 +1,6 @@
 package org.helioviewer.jhv.gui;
 
-import java.awt.EventQueue;
-
 import java.util.ArrayList;
-import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 import org.helioviewer.base.logging.Log;
 import org.helioviewer.viewmodel.changeevent.ChangeEvent;
@@ -18,19 +15,12 @@ import org.helioviewer.viewmodel.view.ViewListener;
  * Sometime components or parts of the GUI have to react on changes which
  * belongs to the view chain. The view listener distributer acts as a
  * registration point for these components.
- * <p>
- * It is guaranteed when something changed to the topmost view of the view chain
- * the view listener distributer will recognize it. There is no guaranteed for
- * that a component which registers it as view listener at a view itself
- * recognize changes to the view chain.
  * 
  * @author Markus Langenberg
  */
 public class ViewListenerDistributor {
 
     private final static ViewListenerDistributor singletonObject = new ViewListenerDistributor();
-
-    private final ReentrantReadWriteLock rwl = new ReentrantReadWriteLock();
     private final ArrayList<ViewListener> listeners = new ArrayList<ViewListener>();
 
     /**
@@ -53,9 +43,7 @@ public class ViewListenerDistributor {
      * @see #removeViewListener(ViewListener)
      */
     public void addViewListener(ViewListener l) {
-        rwl.writeLock().lock();
         listeners.add(l);
-        rwl.writeLock().unlock();
     }
 
     /**
@@ -69,9 +57,7 @@ public class ViewListenerDistributor {
      * @see #addViewListener(ViewListener)
      */
     public void removeViewListener(ViewListener l) {
-        rwl.writeLock().lock();
         listeners.remove(l);
-        rwl.writeLock().unlock();
     }
 
     /**
@@ -89,29 +75,9 @@ public class ViewListenerDistributor {
      *            event which contains the associated reasons.
      */
     public void viewChanged(View sender, ChangeEvent aEvent) {
-        rwl.readLock().lock();
-        ArrayList<ViewListener> listenersCopy = new ArrayList<ViewListener>(listeners);
-        rwl.readLock().unlock();
-
-        EventQueue.invokeLater(new Runnable() {
-            private ArrayList<ViewListener> theListeners;
-            private View theSender;
-            private ChangeEvent theEvent;
-
-            @Override
-            public void run() {
-                for (ViewListener listener : theListeners) {
-                    listener.viewChanged(theSender, theEvent);
-                }
-            }
-
-            public Runnable init(ArrayList<ViewListener> theListeners, View theSender, ChangeEvent theEvent) {
-                this.theListeners = theListeners;
-                this.theSender = theSender;
-                this.theEvent = theEvent;
-                return this;
-            }
-        }.init(listenersCopy, sender, aEvent));
+        for (ViewListener listener : listeners) {
+            listener.viewChanged(sender, aEvent);
+        }
     }
 
 }
