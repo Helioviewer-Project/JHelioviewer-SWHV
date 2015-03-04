@@ -1,5 +1,9 @@
 package org.helioviewer.viewmodelplugin.controller;
 
+import java.awt.EventQueue;
+import java.util.concurrent.Callable;
+import java.util.concurrent.atomic.AtomicReference;
+
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -98,7 +102,6 @@ public class PluginManager {
      *             exception message.
      */
     public void searchForPlugins(File file, boolean recursively, Set<String> deactivatedPlugins) throws IOException {
-
         // search and load plug-ins
         LinkedList<String> list = searchAndLoadPlugins(file, recursively, deactivatedPlugins);
 
@@ -130,7 +133,6 @@ public class PluginManager {
      * @return list with file names where the plug-in could not be loaded.
      */
     private LinkedList<String> searchAndLoadPlugins(File file, boolean recursivly, Set<String> deactivedPlugins) {
-
         LinkedList<String> result = new LinkedList<String>();
         File[] files = file.listFiles();
 
@@ -181,7 +183,6 @@ public class PluginManager {
      * @return list with all plug-ins which have the passed active status.
      */
     public AbstractList<PluginContainer> getPlugins(boolean activated) {
-
         AbstractList<PluginContainer> result = new LinkedList<PluginContainer>();
 
         for (PluginContainer container : plugins.values()) {
@@ -199,7 +200,6 @@ public class PluginManager {
      *            Filter container to add to the list.
      */
     public void addFilterContainer(FilterContainer container) {
-
         pluginFilters.add(container);
     }
 
@@ -210,7 +210,6 @@ public class PluginManager {
      *            Filter container to remove from the list.
      */
     public void removeFilterContainer(FilterContainer container) {
-
         container.setActive(false);
         container.setPosition(-1);
         container.changeSettings();
@@ -241,7 +240,6 @@ public class PluginManager {
      * @return list with all filters which have the passed active status.
      */
     public AbstractList<FilterContainer> getFilterContainers(boolean activated) {
-
         AbstractList<FilterContainer> result = new LinkedList<FilterContainer>();
 
         for (FilterContainer fc : pluginFilters) {
@@ -283,7 +281,6 @@ public class PluginManager {
      *            Overlay container to add to the list.
      */
     public void addOverlayContainer(OverlayContainer container) {
-
         pluginOverlays.add(container);
     }
 
@@ -294,7 +291,6 @@ public class PluginManager {
      *            Overlay container to remove from the list.
      */
     public void removeOverlayContainer(OverlayContainer container) {
-
         container.setActive(false);
         container.changeSettings();
 
@@ -321,7 +317,6 @@ public class PluginManager {
      * @return list with all overlays which have the passed active status.
      */
     public AbstractList<OverlayContainer> getOverlayContainers(boolean activated) {
-
         AbstractList<OverlayContainer> result = new LinkedList<OverlayContainer>();
 
         for (OverlayContainer oc : pluginOverlays) {
@@ -369,7 +364,7 @@ public class PluginManager {
      * @return true if the plug-in could be loaded successfully; false
      *         otherwise.
      */
-    public boolean loadPlugin(URI pluginLocation) {
+    private boolean loadPlugin_raw(URI pluginLocation) {
         URL[] urls = new URL[1];
         try {
             urls[0] = pluginLocation.toURL();
@@ -416,6 +411,48 @@ public class PluginManager {
 
         return false;
     }
+
+    private static <E> E invokeAndWait(final Callable<E> r) {
+        final AtomicReference<E> ref = new AtomicReference<E>();
+        final AtomicReference<Exception> except = new AtomicReference<Exception>();
+
+        try {
+            EventQueue.invokeAndWait(new Runnable() {
+                public void run() {
+                    try {
+                        ref.set(r.call());
+                    } catch (Exception e) {
+                        //pass exception to original thread
+                        except.set(e);
+                    }
+                }});
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
+
+        if (except.get() != null)
+            //there was an exception in EDT thread, rethrow it
+            throw new RuntimeException(except.get());
+        else
+            return ref.get();
+    }
+
+    private class LoadPluginCall implements Callable<Boolean> {
+        final AtomicReference<URI> theURI = new AtomicReference<URI>();
+
+        public LoadPluginCall(URI location) {
+            this.theURI.set(location);
+        }
+
+        public Boolean call() {
+            return loadPlugin_raw(this.theURI.get());
+        }
+    }
+
+    public boolean loadPlugin(URI pluginLocation) {
+        return invokeAndWait(new LoadPluginCall(pluginLocation));
+    }
+
 
     /**
      * Adds an internal plug-in to the list of all loaded plug-ins. Internal
@@ -497,4 +534,5 @@ public class PluginManager {
 
         return true;
     }
+
 }
