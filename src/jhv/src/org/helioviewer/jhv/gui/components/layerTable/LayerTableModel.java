@@ -3,7 +3,6 @@ package org.helioviewer.jhv.gui.components.layerTable;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.swing.SwingUtilities;
 import javax.swing.table.AbstractTableModel;
 
 import org.helioviewer.jhv.layers.LayersListener;
@@ -131,7 +130,6 @@ public class LayerTableModel extends AbstractTableModel implements LayersListene
      */
     @Override
     public Object getValueAt(int row, int col) {
-
         int idx = row;
         if (idx >= 0 && idx < views.size()) {
             return LayersModel.getSingletonInstance().getDescriptor(views.get(idx));
@@ -148,12 +146,7 @@ public class LayerTableModel extends AbstractTableModel implements LayersListene
     @Override
     public void layerAdded(final int newIndex) {
         updateData();
-        SwingUtilities.invokeLater(new Runnable() {
-            @Override
-            public void run() {
-                fireTableRowsInserted(newIndex, newIndex);
-            }
-        });
+        fireTableRowsInserted(newIndex, newIndex);
     }
 
     /**
@@ -162,14 +155,8 @@ public class LayerTableModel extends AbstractTableModel implements LayersListene
      */
     @Override
     public void layerChanged(final int idx) {
-
-        SwingUtilities.invokeLater(new Runnable() {
-            @Override
-            public void run() {
-                updateData();
-                fireTableRowsUpdated(idx, idx);
-            }
-        });
+        updateData();
+        fireTableRowsUpdated(idx, idx);
     }
 
     /**
@@ -178,13 +165,8 @@ public class LayerTableModel extends AbstractTableModel implements LayersListene
      */
     @Override
     public void layerRemoved(View oldView, final int oldIndex) {
-        SwingUtilities.invokeLater(new Runnable() {
-            @Override
-            public void run() {
-                updateData();
-                fireTableRowsDeleted(oldIndex, oldIndex);
-            }
-        });
+        updateData();
+        fireTableRowsDeleted(oldIndex, oldIndex);
     }
 
     /**
@@ -193,13 +175,8 @@ public class LayerTableModel extends AbstractTableModel implements LayersListene
      */
     @Override
     public void timestampChanged(final int idx) {
-        SwingUtilities.invokeLater(new Runnable() {
-            @Override
-            public void run() {
-                updateData();
-                fireTableRowsUpdated(idx, idx);
-            }
-        });
+        updateData();
+        fireTableRowsUpdated(idx, idx);
     }
 
     /**
