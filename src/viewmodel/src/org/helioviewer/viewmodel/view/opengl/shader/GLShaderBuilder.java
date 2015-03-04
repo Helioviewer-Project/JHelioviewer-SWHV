@@ -379,30 +379,6 @@ public class GLShaderBuilder {
     }
 
     /**
-     * Compiles the given shaders and creates a new shader builder to continue.
-     *
-     * The new shader builder is initialized with a GLMinimalXShaderProgram.
-     * This function might be useful, if multiple shaders should be used on path
-     * path through the view chain.
-     *
-     * @param shaderBuilder
-     * @return new shader builder
-     */
-    public static GLShaderBuilder compileAndCreateNew(GLShaderBuilder shaderBuilder) {
-        shaderBuilder.compile();
-
-        if (shaderBuilder.type == GL2.GL_FRAGMENT_PROGRAM_ARB) {
-            shaderBuilder = new GLShaderBuilder(shaderBuilder.getGL(), GL2.GL_FRAGMENT_PROGRAM_ARB);
-            GLMinimalFragmentShaderProgram minimalFragmentShaderProgram = new GLMinimalFragmentShaderProgram();
-        } else {
-            shaderBuilder = new GLShaderBuilder(shaderBuilder.getGL(), GL2.GL_VERTEX_PROGRAM_ARB);
-            GLMinimalVertexShaderProgram minimalVertexShaderProgram = new GLMinimalVertexShaderProgram();
-            minimalVertexShaderProgram.build(shaderBuilder);
-        }
-        return shaderBuilder;
-    }
-
-    /**
      * Class representing exception during the build process.
      */
     public class GLBuildShaderException extends Exception {
