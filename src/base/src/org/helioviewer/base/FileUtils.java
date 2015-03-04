@@ -302,6 +302,11 @@ public class FileUtils {
         return FileUtils.class.getResourceAsStream(resourcePath);
     }
 
+    public static String convertStreamToString(java.io.InputStream is) {
+        java.util.Scanner s = new java.util.Scanner(is).useDelimiter("\\A");
+        return s.hasNext() ? s.next() : "";
+    }
+
     /**
      * Returns an URL to a resource. This function can be used even if the whole
      * program and resources are within a JAR file.\n The path must begin with a
