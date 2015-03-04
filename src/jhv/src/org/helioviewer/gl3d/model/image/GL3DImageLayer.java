@@ -1,5 +1,7 @@
 package org.helioviewer.gl3d.model.image;
 
+import java.awt.Point;
+
 import javax.media.opengl.GL2;
 
 import org.helioviewer.base.physics.Constants;
@@ -13,8 +15,6 @@ import org.helioviewer.gl3d.scenegraph.math.GL3DMat4d;
 import org.helioviewer.gl3d.scenegraph.math.GL3DQuatd;
 import org.helioviewer.gl3d.scenegraph.math.GL3DVec3d;
 import org.helioviewer.gl3d.scenegraph.math.GL3DVec4d;
-import org.helioviewer.gl3d.scenegraph.rt.GL3DRay;
-import org.helioviewer.gl3d.scenegraph.rt.GL3DRayTracer;
 import org.helioviewer.jhv.gui.states.StateController;
 import org.helioviewer.jhv.gui.states.ViewStateEnum;
 import org.helioviewer.viewmodel.changeevent.ChangeEvent;
@@ -155,32 +155,34 @@ public abstract class GL3DImageLayer extends GL3DGroup implements GL3DCameraList
 
         double phi = hvmd.getPhi();
         double theta = hvmd.getTheta();
-        this.accellerationShape.setPhi(phi);
-        this.accellerationShape.setTheta(theta);
+        //this.accellerationShape.setPhi(phi);
+        //this.accellerationShape.setTheta(theta);
 
         GL3DQuatd rth = GL3DQuatd.createRotation(theta, GL3DVec3d.XAxis);
         rth.rotate(GL3DQuatd.createRotation(phi, GL3DVec3d.YAxis));
         GL3DMat4d rt = rth.toMatrix();
-        GL3DRayTracer rayTracer = new GL3DRayTracer(this.accellerationShape, activeCamera);
 
-        int width = (int) activeCamera.getWidth();
-        int height = (int) activeCamera.getHeight();
+        int width = (int) activeCamera.getWidth() / 2;
+        int height = (int) activeCamera.getHeight() / 2;
         double minPhysicalX = Double.MAX_VALUE;
         double minPhysicalY = Double.MAX_VALUE;
         double maxPhysicalX = -Double.MAX_VALUE;
         double maxPhysicalY = -Double.MAX_VALUE;
 
         double res = 10.;
-
         for (int i = 0; i <= res; i++) {
             for (int j = 0; j <= 1; j++) {
                 for (final boolean on : new boolean[] { false, true }) {
-                    this.accellerationShape.setHitCoronaPlane(on);
-                    GL3DRay ray = rayTracer.cast((int) (i * width / res), (int) (j * height / 1.));
-                    GL3DVec3d hitPoint = ray.getHitPoint();
+                    GL3DVec3d hitPoint;
+                    if (on) {
+                        hitPoint = activeCamera.getVectorFromSphere(new Point((int) (i * width / res), (int) (j * height / 1.)));
+                    } else {
+                        hitPoint = activeCamera.getVectorFromSphere(new Point((int) (i * width / res), (int) (j * height / 1.)));
+
+                    }
                     if (hitPoint != null) {
-                        hitPoint = ray.getHitPoint();
                         hitPoint = rt.multiply(hitPoint);
+
                         minPhysicalX = Math.min(minPhysicalX, hitPoint.x);
                         minPhysicalY = Math.min(minPhysicalY, hitPoint.y);
                         maxPhysicalX = Math.max(maxPhysicalX, hitPoint.x);
@@ -192,11 +194,13 @@ public abstract class GL3DImageLayer extends GL3DGroup implements GL3DCameraList
         for (int i = 0; i <= 1; i++) {
             for (int j = 0; j <= res; j++) {
                 for (final boolean on : new boolean[] { false, true }) {
-                    this.accellerationShape.setHitCoronaPlane(on);
-                    GL3DRay ray = rayTracer.cast((int) (i * width / 1.), (int) (j * height / res));
-                    GL3DVec3d hitPoint = ray.getHitPoint();
+                    GL3DVec3d hitPoint;
+                    if (on) {
+                        hitPoint = activeCamera.getVectorFromSphere(new Point((int) (i * width / 1.), (int) (j * height / res)));
+                    } else {
+                        hitPoint = activeCamera.getVectorFromPlane(new Point((int) (i * width / 1.), (int) (j * height / res)));
+                    }
                     if (hitPoint != null) {
-                        hitPoint = ray.getHitPoint();
                         hitPoint = rt.multiply(hitPoint);
 
                         minPhysicalX = Math.min(minPhysicalX, hitPoint.x);
@@ -215,30 +219,27 @@ public abstract class GL3DImageLayer extends GL3DGroup implements GL3DCameraList
         minPhysicalY = minPhysicalY - widthyAdd;
         maxPhysicalY = maxPhysicalY + widthyAdd;
 
-        double metLLX = metaData.getPhysicalLowerLeft().getX();
-        double metLLY = metaData.getPhysicalLowerLeft().getY();
-        double metURX = metaData.getPhysicalUpperRight().getX();
-        double metURY = metaData.getPhysicalUpperRight().getY();
-
-        if (minPhysicalX < metLLX)
-            minPhysicalX = metLLX;
-        if (minPhysicalY < metLLY)
-            minPhysicalY = metLLY;
-        if (maxPhysicalX > metURX)
-            maxPhysicalX = metURX;
-        if (maxPhysicalY > metURY)
-            maxPhysicalY = metURY;
+        if (minPhysicalX < metaData.getPhysicalLowerLeft().getX())
+            minPhysicalX = metaData.getPhysicalLowerLeft().getX();
+        if (minPhysicalY < metaData.getPhysicalLowerLeft().getY())
+            minPhysicalY = metaData.getPhysicalLowerLeft().getY();
+        if (maxPhysicalX > metaData.getPhysicalUpperRight().getX())
+            maxPhysicalX = metaData.getPhysicalUpperRight().getX();
+        if (maxPhysicalY > metaData.getPhysicalUpperRight().getY())
+            maxPhysicalY = metaData.getPhysicalUpperRight().getY();
 
         double regionWidth = maxPhysicalX - minPhysicalX;
         double regionHeight = maxPhysicalY - minPhysicalY;
         Region newRegion;
-        if (false && regionWidth > 0 && regionHeight > 0) {
+        if (regionWidth > 0 && regionHeight > 0) {
             newRegion = StaticRegion.createAdaptedRegion(minPhysicalX, minPhysicalY, regionWidth, regionHeight);
         } else {
-            newRegion = StaticRegion.createAdaptedRegion(metLLX, metLLY, metURX - metLLX, metURY - metLLY);
+            newRegion = StaticRegion.createAdaptedRegion(metaData.getPhysicalLowerLeft().getX(), metaData.getPhysicalLowerLeft().getY(), metaData.getPhysicalUpperRight().getX() - metaData.getPhysicalLowerLeft().getX(), metaData.getPhysicalUpperRight().getY() - metaData.getPhysicalLowerLeft().getY());
         }
         this.regionView.setRegion(newRegion, new ChangeEvent());
+
         this.markAsChanged();
+
     }
 
     protected GL3DImageTextureView getImageTextureView() {
@@ -269,24 +270,6 @@ public abstract class GL3DImageLayer extends GL3DGroup implements GL3DCameraList
     }
 
     public void setCoronaVisibility(boolean visible) {
-    }
-
-    public void updateROIalt(GL3DCamera activeCamera) {
-        MetaData metaData = metaDataView.getMetaData();
-        HelioviewerMetaData hvmd = null;
-        if (metaData instanceof HelioviewerMetaData) {
-            hvmd = (HelioviewerMetaData) metaData;
-        }
-        if (metaData == null || activeCamera == null) {
-            return;
-        }
-
-        double phi = hvmd.getPhi();
-        double theta = hvmd.getTheta();
-        this.accellerationShape.setPhi(phi);
-        this.accellerationShape.setTheta(theta);
-        Region newRegion;
-
     }
 
     public GL3DVec3d convertViewportToPlane(GL3DVec3d viewportCoordinates, GL3DMat4d projectionMatrix) {
