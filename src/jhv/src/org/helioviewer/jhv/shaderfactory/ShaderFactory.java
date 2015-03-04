@@ -69,4 +69,8 @@ public class ShaderFactory {
         shaderHelper.compileProgram(gl, type, fragmentText, target);
     }
 
+    public static void bindEnvVars(GL2 gl, int target, int id, double[] param) {
+        gl.glProgramLocalParameter4dARB(target, id, param[0], param[1], param[2], param[3]);
+    }
+
 }

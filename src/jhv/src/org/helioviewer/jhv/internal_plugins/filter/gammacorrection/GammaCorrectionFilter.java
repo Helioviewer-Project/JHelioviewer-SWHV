@@ -213,7 +213,7 @@ public class GammaCorrectionFilter extends AbstractFilter implements StandardFil
         @Override
         public void bind(GL2 gl) {
             gl.glBindProgramARB(GL2.GL_FRAGMENT_PROGRAM_ARB, ShaderFactory.getFragmentId());
-            this.bindEnvVars(gl, this.gammaParamRef, gammaParamFloat);
+            ShaderFactory.bindEnvVars(gl, GL2.GL_FRAGMENT_PROGRAM_ARB, this.gammaParamRef, gammaParamFloat);
         }
 
     }

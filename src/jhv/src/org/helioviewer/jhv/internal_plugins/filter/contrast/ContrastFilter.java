@@ -165,9 +165,9 @@ public class ContrastFilter extends AbstractFilter implements StandardFilter, GL
                 for (int i = 0; i < pixelData.length; i++) {
                     int rgb = pixelData[i];
                     int a = rgb >>> 24;
-                    int r = (rgb >>> 16) & 0xFF;
-                    int g = (rgb >>> 8) & 0xFF;
-                    int b = rgb & 0xff;
+                int r = (rgb >>> 16) & 0xFF;
+                int g = (rgb >>> 8) & 0xFF;
+                int b = rgb & 0xff;
 
                     r = contrastTable8[r] & 0xFF;
                     g = contrastTable8[g] & 0xFF;
@@ -208,7 +208,7 @@ public class ContrastFilter extends AbstractFilter implements StandardFilter, GL
         @Override
         public void bind(GL2 gl) {
             gl.glBindProgramARB(GL2.GL_FRAGMENT_PROGRAM_ARB, ShaderFactory.getFragmentId());
-            this.bindEnvVars(gl, this.contrastParamRef, contrastParamFloat);
+            ShaderFactory.bindEnvVars(gl, GL2.GL_FRAGMENT_PROGRAM_ARB, this.contrastParamRef, contrastParamFloat);
         }
 
     }

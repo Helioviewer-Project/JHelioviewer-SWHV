@@ -49,7 +49,7 @@ public class SharpenGLFilter extends SharpenFilter implements GLFragmentShaderFi
         @Override
         public void bind(GL2 gl) {
             gl.glBindProgramARB(GL2.GL_FRAGMENT_PROGRAM_ARB, ShaderFactory.getFragmentId());
-            this.bindEnvVars(gl, this.sharpenParamRef, sharpenParamFloat);
+            ShaderFactory.bindEnvVars(gl, GL2.GL_FRAGMENT_PROGRAM_ARB, this.sharpenParamRef, sharpenParamFloat);
         }
 
     }
