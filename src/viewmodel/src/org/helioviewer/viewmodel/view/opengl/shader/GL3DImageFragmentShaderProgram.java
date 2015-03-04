@@ -45,14 +45,13 @@ public class GL3DImageFragmentShaderProgram extends GLFragmentShaderProgram {
         gl.glBindProgramARB(GL2.GL_FRAGMENT_PROGRAM_ARB, ShaderFactory.getFragmentId());
         cutOffRadiusFloat[0] = cutOffRadius;
         outerCutOffRadiusFloat[0] = outerCutOffRadius;
-        this.bindEnvVars(gl, this.cutOffRadiusRef, cutOffRadiusFloat);
-        this.bindEnvVars(gl, this.outerCutOffRadiusRef, outerCutOffRadiusFloat);
+        ShaderFactory.bindEnvVars(gl, GL2.GL_FRAGMENT_PROGRAM_ARB, this.cutOffRadiusRef, cutOffRadiusFloat);
+        ShaderFactory.bindEnvVars(gl, GL2.GL_FRAGMENT_PROGRAM_ARB, this.outerCutOffRadiusRef, outerCutOffRadiusFloat);
 
-        this.bindEnvVars(gl, this.phiParamRef, this.phiParamFloat);
-        this.bindEnvVars(gl, this.thetaParamRef, this.thetaParamFloat);
-        this.bindEnvVars(gl, this.differencePhiParamRef, this.differencePhiParamFloat);
-        this.bindEnvVars(gl, this.differenceThetaParamRef, this.differenceThetaParamFloat);
->>>>>>> use shader from file:jhv-3d-wcs/src/jhv-3d/src/org/helioviewer/gl3d/shader/GL3DImageFragmentShaderProgram.java
+        ShaderFactory.bindEnvVars(gl, GL2.GL_FRAGMENT_PROGRAM_ARB, this.phiParamRef, this.phiParamFloat);
+        ShaderFactory.bindEnvVars(gl, GL2.GL_FRAGMENT_PROGRAM_ARB, this.thetaParamRef, this.thetaParamFloat);
+        ShaderFactory.bindEnvVars(gl, GL2.GL_FRAGMENT_PROGRAM_ARB, this.differencePhiParamRef, this.differencePhiParamFloat);
+        ShaderFactory.bindEnvVars(gl, GL2.GL_FRAGMENT_PROGRAM_ARB, this.differenceThetaParamRef, this.differenceThetaParamFloat);
     }
 
     public void setCutOffRadius(double cutOffRadius) {

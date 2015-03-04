@@ -137,7 +137,7 @@ public class OpacityFilter extends AbstractFilter implements StandardFilter, GLF
         @Override
         public void bind(GL2 gl) {
             gl.glBindProgramARB(GL2.GL_FRAGMENT_PROGRAM_ARB, ShaderFactory.getFragmentId());
-            this.bindEnvVars(gl, alphaParamRef, alphaParamFloat);
+            ShaderFactory.bindEnvVars(gl, GL2.GL_FRAGMENT_PROGRAM_ARB, alphaParamRef, alphaParamFloat);
         }
 
     }

@@ -24,7 +24,6 @@ public abstract class GLFragmentShaderProgram {
 
     protected static final int target = GL2.GL_FRAGMENT_PROGRAM_ARB;
 
-
     /**
      * Binds (= activates it) the shader, if it is not active so far.
      *
@@ -32,10 +31,6 @@ public abstract class GLFragmentShaderProgram {
      *            Valid reference to the current gl object
      */
     public void bind(GL2 gl) {
-    }
-
-    public void bindEnvVars(GL2 gl, int id, double[] param) {
-        gl.glProgramLocalParameter4dARB(target, id, param[0], param[1], param[2], param[3]);
     }
 
     public void bindEnvVarsFloat(GL2 gl, int id, float[] param) {
