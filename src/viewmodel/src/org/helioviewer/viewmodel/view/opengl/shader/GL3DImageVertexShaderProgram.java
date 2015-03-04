@@ -32,17 +32,14 @@ public class GL3DImageVertexShaderProgram extends GLVertexShaderProgram {
      */
     @Override
     public final void bind(GL2 gl) {
-        if (shaderID != shaderCurrentlyUsed) {
-            shaderCurrentlyUsed = shaderID;
-            gl.glBindProgramARB(target, ShaderFactory.getVertexId());
-            gl.glProgramLocalParameter4dARB(target, this.rectRef, xOffset, yOffset, xScale, yScale);
-            gl.glProgramLocalParameter4dARB(target, this.offsetRef, defaultXOffset, defaultYOffset, 0, 0);
-            gl.glProgramLocalParameter4dARB(target, this.differenceRectRef, differenceXOffset, differenceYOffset, differenceXScale, differenceYScale);
-            this.bindEnvVars(gl, this.thetaRef, thetaValue);
-            this.bindEnvVars(gl, this.phiRef, phiValue);
-            this.bindEnvVars(gl, this.differenceThetaRef, differenceThetaValue);
-            this.bindEnvVars(gl, this.differencePhiRef, differencePhiValue);
-        }
+        gl.glBindProgramARB(target, ShaderFactory.getVertexId());
+        gl.glProgramLocalParameter4dARB(target, this.rectRef, xOffset, yOffset, xScale, yScale);
+        gl.glProgramLocalParameter4dARB(target, this.offsetRef, defaultXOffset, defaultYOffset, 0, 0);
+        gl.glProgramLocalParameter4dARB(target, this.differenceRectRef, differenceXOffset, differenceYOffset, differenceXScale, differenceYScale);
+        this.bindEnvVars(gl, this.thetaRef, thetaValue);
+        this.bindEnvVars(gl, this.phiRef, phiValue);
+        this.bindEnvVars(gl, this.differenceThetaRef, differenceThetaValue);
+        this.bindEnvVars(gl, this.differencePhiRef, differencePhiValue);
     }
 
     private void bindEnvVars(GL2 gl, int id, double[] param) {
