@@ -55,41 +55,6 @@ public class GL3DImageFragmentShaderProgram extends GLFragmentShaderProgram {
 >>>>>>> use shader from file:jhv-3d-wcs/src/jhv-3d/src/org/helioviewer/gl3d/shader/GL3DImageFragmentShaderProgram.java
     }
 
-    /**
-     * Pushes the shader currently in use onto a stack.
-     *
-     * This is useful to load another shader but still being able to restore the
-     * old one, similar to the very common pushMatrix() in OpenGL2.
-     *
-     * @param gl
-     *            Valid reference to the current gl object
-     * @see #popShader(GL2)
-     */
-    public static void pushShader(GL2 gl) {
-        shaderStack.push(shaderCurrentlyUsed);
-        gl.glPushAttrib(GL2.GL_CURRENT_BIT);
-        // Log.debug("GL3DFragmentShaderProgram: pushShader, current="+shaderCurrentlyUsed);
-    }
-
-    /**
-     * Takes the top of from the shader stack and binds it.
-     *
-     * This restores a shader pushed onto the stack earlier, similar to the very
-     * common popMatrix() in OpenGL2.
-     *
-     * @param gl
-     *            Valid reference to the current gl object
-     * @see #pushShader(GL2)
-     */
-    public static void popShader(GL2 gl) {
-        gl.glPopAttrib();
-        Integer restoreShaderObject = shaderStack.pop();
-        int restoreShader = restoreShaderObject == null ? 0 : restoreShaderObject.intValue();
-        if (restoreShader >= 0) {
-            // bind(gl, restoreShader, 0.0f, 0.0, 0.0, 0.0, 0.0);
-        }
-    }
-
     public void setCutOffRadius(double cutOffRadius) {
         this.cutOffRadius = cutOffRadius;
     }

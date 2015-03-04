@@ -30,7 +30,6 @@ public class ShaderFactory {
 
     public static int getVertexId() {
         if (Displayer.getSingletonInstance().getState() == Displayer.STATE3D) {
-            System.out.println("fid " + vertex3dCGID);
             return vertex3dCGID;
         } else {
             return vertex2dCGID;
