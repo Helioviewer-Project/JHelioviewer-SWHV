@@ -406,12 +406,6 @@ public class GLShaderBuilder {
     public static void rebuildShaders(GL2 gl, GLView view) {
         shaderHelper.delAllShaderIDs(gl);
 
-        GLFragmentShaderView fragmentView = view.getAdapter(GLFragmentShaderView.class);
-        if (fragmentView != null) {
-            // create new shader builder
-            // fill with standard values
-        }
-
         GLVertexShaderView vertexView = view.getAdapter(GLVertexShaderView.class);
         if (vertexView != null) {
             // create new shader builder

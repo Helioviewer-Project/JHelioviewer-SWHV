@@ -11,7 +11,6 @@ import org.helioviewer.viewmodel.view.SubimageDataView;
 import org.helioviewer.viewmodel.view.View;
 import org.helioviewer.viewmodel.view.ViewHelper;
 import org.helioviewer.viewmodel.view.jp2view.JHVJP2View;
-import org.helioviewer.viewmodel.view.opengl.shader.GLFragmentShaderView;
 import org.helioviewer.viewmodel.view.opengl.shader.GLMinimalVertexShaderProgram;
 import org.helioviewer.viewmodel.view.opengl.shader.GLShaderBuilder;
 import org.helioviewer.viewmodel.view.opengl.shader.GLVertexShaderView;
@@ -30,7 +29,7 @@ import org.helioviewer.viewmodel.view.opengl.shader.GLVertexShaderView;
  * @author Markus Langenberg
  *
  */
-public class GLLayeredView extends AbstractLayeredView implements GLFragmentShaderView, GLVertexShaderView {
+public class GLLayeredView extends AbstractLayeredView implements GLVertexShaderView {
     private final int shaderID = -1;
 
     /**
