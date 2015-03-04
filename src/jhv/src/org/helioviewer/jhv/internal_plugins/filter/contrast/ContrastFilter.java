@@ -14,7 +14,6 @@ import org.helioviewer.viewmodel.imagetransport.Int32ImageTransport;
 import org.helioviewer.viewmodel.imagetransport.Short16ImageTransport;
 import org.helioviewer.viewmodel.view.opengl.shader.GLFragmentShaderProgram;
 import org.helioviewer.viewmodel.view.opengl.shader.GLShaderBuilder;
-import org.helioviewer.viewmodel.view.opengl.shader.GLShaderBuilder.GLBuildShaderException;
 
 /**
  * Filter for enhancing the contrast of the image.
@@ -211,19 +210,6 @@ public class ContrastFilter extends AbstractFilter implements StandardFilter, GL
             this.bindEnvVars(gl, this.contrastParamRef, contrastParamFloat);
         }
 
-        /**
-         * {@inheritDoc}
-         */
-        @Override
-        protected void buildImpl(GLShaderBuilder shaderBuilder) {
-            try {
-                String program = "\toutput.rgb = 0.5f * sign(2.0f * output.rgb - 1.0f) * pow(abs(2.0f * output.rgb - 1.0f), pow(1.5f, -contrast)) + 0.5f;";
-                program = program.replace("output", shaderBuilder.useOutputValue("float4", "COLOR"));
-                shaderBuilder.addMainFragment(program);
-            } catch (GLBuildShaderException e) {
-                e.printStackTrace();
-            }
-        }
     }
 
     /**
@@ -231,7 +217,6 @@ public class ContrastFilter extends AbstractFilter implements StandardFilter, GL
      */
     @Override
     public GLShaderBuilder buildFragmentShader(GLShaderBuilder shaderBuilder) {
-        shader.build(shaderBuilder);
         return shaderBuilder;
     }
 

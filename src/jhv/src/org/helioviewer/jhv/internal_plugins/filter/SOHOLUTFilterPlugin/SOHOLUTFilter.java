@@ -138,7 +138,7 @@ public class SOHOLUTFilter extends AbstractFilter implements FrameFilter, Standa
     // OPENGL //
     // /////////////////////////
     private final GLSingleChannelLookupFragmentShaderProgram shader = new GLSingleChannelLookupFragmentShaderProgram();
-    private GLTextureHelper.GLTexture tex = new GLTextureHelper.GLTexture();
+    private final GLTextureHelper.GLTexture tex = new GLTextureHelper.GLTexture();
     private LUT lastLut = null;
     private boolean lastInverted = false;
     private JHVJP2View jp2View;
@@ -148,7 +148,6 @@ public class SOHOLUTFilter extends AbstractFilter implements FrameFilter, Standa
      */
     @Override
     public GLShaderBuilder buildFragmentShader(GLShaderBuilder shaderBuilder) {
-        shader.build(shaderBuilder);
         this.changed = true;
         return shaderBuilder;
     }

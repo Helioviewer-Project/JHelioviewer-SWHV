@@ -3,7 +3,6 @@ package org.helioviewer.viewmodel.view.opengl.shader;
 import javax.media.opengl.GL2;
 
 import org.helioviewer.jhv.shaderfactory.ShaderFactory;
-import org.helioviewer.viewmodel.view.opengl.shader.GLShaderBuilder.GLBuildShaderException;
 
 /**
  * Specialized implementation of GLFragmentShaderProgram for filters based on
@@ -29,25 +28,4 @@ public class GLSingleChannelLookupFragmentShaderProgram extends GLFragmentShader
         gl.glBindProgramARB(target, ShaderFactory.getFragmentId());
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    protected void buildImpl(GLShaderBuilder shaderBuilder) {
-        this.builder = shaderBuilder;
-        try {
-            String program = "\toutput.rgb = tex1D(lut, output.r).rgb;";
-
-            program = program.replaceAll("output", shaderBuilder.useOutputValue("float4", "COLOR"));
-            shaderBuilder.getParameterList().add("uniform sampler1D lut" + lutID + " : TEXUNIT1");
-
-            program = program.replaceAll("lut", "lut" + lutID);
-            lutID = (lutID + 1) & 15;
-
-            shaderBuilder.addMainFragment(program);
-
-        } catch (GLBuildShaderException e) {
-            e.printStackTrace();
-        }
-    }
 }

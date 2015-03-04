@@ -5,7 +5,6 @@ import javax.media.opengl.GL2;
 import org.helioviewer.jhv.shaderfactory.ShaderFactory;
 import org.helioviewer.viewmodel.view.opengl.shader.GLFragmentShaderProgram;
 import org.helioviewer.viewmodel.view.opengl.shader.GLShaderBuilder;
-import org.helioviewer.viewmodel.view.opengl.shader.GLShaderBuilder.GLBuildShaderException;
 
 public class GL3DImageFragmentShaderProgram extends GLFragmentShaderProgram {
 
@@ -91,31 +90,12 @@ public class GL3DImageFragmentShaderProgram extends GLFragmentShaderProgram {
         }
     }
 
-    @Override
-    protected void buildImpl(GLShaderBuilder shaderBuilder) {
-        this.builder = shaderBuilder;
-        try {
-            String program = "\tif(texcoord0.x<0.0||texcoord0.y<0.0||texcoord0.x>1.0||texcoord0.y>1.0) {" + "discard;" + GLShaderBuilder.LINE_SEP + "\t}" + GLShaderBuilder.LINE_SEP;
-            program += "float dotpos = dot(position.xyz, position.xyz);" + GLShaderBuilder.LINE_SEP;
-            program += "\tif(dotpos<cutOffRadius[0]*cutOffRadius[0] ||dotpos>cutOffRadius[1]*cutOffRadius[1] ){discard;}" + GLShaderBuilder.LINE_SEP;
-            program += "\tif((position.z==0.0 && dotpos<0.99)){" + "\t\tdiscard;" + GLShaderBuilder.LINE_SEP + "\t}" + GLShaderBuilder.LINE_SEP;
-            program += "\tfloat3x3 mat = float3x3( cos(phi), -sin(theta)*sin(phi), -cos(theta)*sin(phi), 0., cos(theta), -sin(theta), sin(phi), cos(phi)*sin(theta), cos(theta)*cos(phi));" + GLShaderBuilder.LINE_SEP;
-            program += "\tfloat3 zaxisrot = mul(mat,float3(0.,0.,1.));" + GLShaderBuilder.LINE_SEP;
-            program += "\tfloat projectionn = dot(position.xyz,zaxisrot);" + GLShaderBuilder.LINE_SEP;
-            program += "\tif((position.z!=0.0 && projectionn<-0.0)){" + "\t\tdiscard;" + GLShaderBuilder.LINE_SEP + "\t}" + GLShaderBuilder.LINE_SEP;
-
-            program = program.replace("position", shaderBuilder.useStandardParameter("float4", "TEXCOORD3"));
-            program = program.replace("output", shaderBuilder.useOutputValue("float4", "COLOR"));
-
-            shaderBuilder.addMainFragment(program);
-        } catch (GLBuildShaderException e) {
-            e.printStackTrace();
-        }
+    public void setCutOffRadius(double cutOffRadius) {
+        this.cutOffRadius = cutOffRadius;
     }
 
-    public void setCutOffRadius(double innerCutOff, double outerCutOff) {
-        cutOffRadius[0] = innerCutOff;
-        cutOffRadius[1] = outerCutOff;
+    public void setOuterCutOffRadius(double outerCutOffRadius) {
+        this.outerCutOffRadius = outerCutOffRadius;
     }
 
     public void changeAngles(double theta, double phi) {
