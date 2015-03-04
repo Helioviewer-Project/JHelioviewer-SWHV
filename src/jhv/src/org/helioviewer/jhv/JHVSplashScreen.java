@@ -112,7 +112,7 @@ public class JHVSplashScreen extends JFrame implements StatusTextListener {
      * Adds a OpenGL component to the form to get information about the OpenGL
      * version on the machine and creates the main view chain
      * */
-    public void initializeViewchain() {
+    public void initializeGLInitPanel() {
         imagePanel.setText("Starting OpenGL...");
         nextStep();
         StatusPanel.addStatusTextListener(this);
@@ -146,7 +146,6 @@ public class JHVSplashScreen extends JFrame implements StatusTextListener {
                 e.printStackTrace();
             }
         }
-        GLInitPanel.startViewChainThread();
 
         if (!GLInfo.glIsUsable()) {
             Message.err("Could not initialize OpenGL", "OpenGL could not be initialized properly during startup. JHelioviewer will start in Software Mode. For detailed information please read the log output. ", false);
@@ -161,7 +160,6 @@ public class JHVSplashScreen extends JFrame implements StatusTextListener {
      *            number of steps.
      */
     public void setProgressSteps(int steps) {
-
         if (steps >= 1) {
             this.steps = steps;
             progressBar.setMaximum(steps * 100);
@@ -177,7 +175,6 @@ public class JHVSplashScreen extends JFrame implements StatusTextListener {
      *            current main progress step.
      */
     public void setCurrentStep(int step) {
-
         if (step >= 1 && step <= steps) {
             this.currentStep = step - 1;
 
@@ -198,10 +195,8 @@ public class JHVSplashScreen extends JFrame implements StatusTextListener {
      * Increments the current main progress step by one.
      */
     public void nextStep() {
-
         if (currentStep + 1 < steps) {
             currentStep++;
-
             progressBar.setValue(currentStep * 100);
         }
     }
@@ -214,7 +209,6 @@ public class JHVSplashScreen extends JFrame implements StatusTextListener {
      *            new value for the progress bar.
      * */
     public void setProgressValue(int value) {
-
         if (value >= 0 && value <= 100)
             progressBar.setValue(currentStep * 100 + value);
     }
@@ -354,9 +348,9 @@ public class JHVSplashScreen extends JFrame implements StatusTextListener {
          */
         @Override
         protected void paintComponent(Graphics g) {
-
             if (image != null)
                 g.drawImage(image, 0, 0, null);
         }
     }
+
 }
