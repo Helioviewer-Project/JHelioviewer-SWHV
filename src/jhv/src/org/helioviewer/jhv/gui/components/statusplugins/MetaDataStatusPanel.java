@@ -1,7 +1,5 @@
 package org.helioviewer.jhv.gui.components.statusplugins;
 
-import java.awt.EventQueue;
-
 import javax.swing.BorderFactory;
 import javax.swing.Icon;
 import javax.swing.JLabel;
@@ -53,7 +51,7 @@ public class MetaDataStatusPanel extends ViewStatusPanelPlugin {
     /**
      * {@inheritDoc}
      */
-    private void activeLayerChanged_raw(int idx) {
+    public void activeLayerChanged(int idx) {
         if (LayersModel.getSingletonInstance().isValidIndex(idx)) {
             View view = LayersModel.getSingletonInstance().getLayer(idx);
 
@@ -73,19 +71,6 @@ public class MetaDataStatusPanel extends ViewStatusPanelPlugin {
             //setPreferredSize(null);
         } else {
             setVisible(false);
-        }
-    }
-
-    public void activeLayerChanged(final int idx) {
-        if (EventQueue.isDispatchThread()) {
-            activeLayerChanged_raw(idx);
-        } else {
-            EventQueue.invokeLater(new Runnable() {
-                @Override
-                public void run() {
-                    activeLayerChanged_raw(idx);
-                }
-            });
         }
     }
 
