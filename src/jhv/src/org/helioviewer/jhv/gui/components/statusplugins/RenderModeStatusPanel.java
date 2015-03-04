@@ -1,7 +1,5 @@
 package org.helioviewer.jhv.gui.components.statusplugins;
 
-import java.awt.EventQueue;
-
 import javax.swing.BorderFactory;
 import javax.swing.JLabel;
 
@@ -39,7 +37,7 @@ public class RenderModeStatusPanel extends JLabel implements StatusPanelPlugin {
      * It reads the current render mode from
      * {@link org.helioviewer.jhv.opengl.GLInfo}.
      */
-    private void updateStatus_raw() {
+    public void updateStatus() {
         if (GLInfo.glIsEnabled()) {
             setText("OpenGL " + GLInfo.getVersion());
             //validate();
@@ -48,19 +46,6 @@ public class RenderModeStatusPanel extends JLabel implements StatusPanelPlugin {
             setText("Software");
             //validate();
             //setPreferredSize(null);
-        }
-    }
-
-    public void updateStatus() {
-        if (EventQueue.isDispatchThread()) {
-            updateStatus_raw();
-        } else {
-            EventQueue.invokeLater(new Runnable() {
-                @Override
-                public void run() {
-                    updateStatus_raw();
-                }
-            });
         }
     }
 
