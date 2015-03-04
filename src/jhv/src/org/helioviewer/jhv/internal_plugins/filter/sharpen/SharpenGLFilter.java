@@ -5,7 +5,6 @@ import javax.media.opengl.GL2;
 import org.helioviewer.jhv.shaderfactory.ShaderFactory;
 import org.helioviewer.viewmodel.filter.GLImageSizeFilter;
 import org.helioviewer.viewmodel.view.opengl.shader.GLFragmentShaderProgram;
-import org.helioviewer.viewmodel.view.opengl.shader.GLShaderBuilder;
 
 /**
  * Extension of SharpenFilter, also providing an OpenGL implementation.
@@ -51,14 +50,6 @@ public class SharpenGLFilter extends SharpenFilter implements GLImageSizeFilter 
             ShaderFactory.bindEnvVars(gl, GL2.GL_FRAGMENT_PROGRAM_ARB, this.sharpenParamRef, sharpenParamFloat);
         }
 
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public GLShaderBuilder buildFragmentShader(GLShaderBuilder shaderBuilder) {
-        return shaderBuilder;
     }
 
     /**

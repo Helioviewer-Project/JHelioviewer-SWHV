@@ -17,7 +17,6 @@ import org.helioviewer.viewmodel.imagetransport.Short16ImageTransport;
 import org.helioviewer.viewmodel.view.jp2view.JHVJP2View;
 import org.helioviewer.viewmodel.view.jp2view.JHVJPXView;
 import org.helioviewer.viewmodel.view.opengl.GLTextureHelper;
-import org.helioviewer.viewmodel.view.opengl.shader.GLShaderBuilder;
 import org.helioviewer.viewmodel.view.opengl.shader.GLSingleChannelLookupFragmentShaderProgram;
 
 /**
@@ -143,15 +142,6 @@ public class SOHOLUTFilter extends AbstractFilter implements FrameFilter, Standa
     private LUT lastLut = null;
     private boolean lastInverted = false;
     private JHVJP2View jp2View;
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public GLShaderBuilder buildFragmentShader(GLShaderBuilder shaderBuilder) {
-        this.changed = true;
-        return shaderBuilder;
-    }
 
     /**
      * {@inheritDoc}

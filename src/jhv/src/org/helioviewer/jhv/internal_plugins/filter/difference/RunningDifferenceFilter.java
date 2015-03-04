@@ -20,7 +20,6 @@ import org.helioviewer.viewmodel.imagetransport.Byte8ImageTransport;
 import org.helioviewer.viewmodel.view.jp2view.JHVJP2View;
 import org.helioviewer.viewmodel.view.jp2view.JHVJPXView;
 import org.helioviewer.viewmodel.view.opengl.GLTextureHelper;
-import org.helioviewer.viewmodel.view.opengl.shader.GLShaderBuilder;
 
 /**
  * Filter applying running difference to some movie
@@ -221,12 +220,6 @@ public class RunningDifferenceFilter implements FrameFilter, StandardFilter, Obs
             shader.setIsDifference(gl, 0.0f);
             shader.bind(gl);
         }
-    }
-
-    @Override
-    public GLShaderBuilder buildFragmentShader(GLShaderBuilder shaderBuilder) {
-
-        return shaderBuilder;
     }
 
     public void setTruncationvalue(float truncationValue) {

@@ -7,7 +7,8 @@ import javax.media.opengl.GL2;
 
 import org.helioviewer.base.FileUtils;
 import org.helioviewer.base.logging.Log;
-import org.helioviewer.jhv.display.Displayer;
+import org.helioviewer.jhv.gui.states.StateController;
+import org.helioviewer.jhv.gui.states.ViewStateEnum;
 import org.helioviewer.viewmodel.view.opengl.shader.GLShaderHelper;
 
 public class ShaderFactory {
@@ -21,7 +22,7 @@ public class ShaderFactory {
     }
 
     public static int getFragmentId() {
-        if (Displayer.getSingletonInstance().getState() == Displayer.STATE3D) {
+        if (StateController.getInstance().getCurrentState().getType() == ViewStateEnum.View3D) {
             return fragment3dCGID;
         } else {
             return fragment2dCGID;
@@ -29,7 +30,7 @@ public class ShaderFactory {
     }
 
     public static int getVertexId() {
-        if (Displayer.getSingletonInstance().getState() == Displayer.STATE3D) {
+        if (StateController.getInstance().getCurrentState().getType() == ViewStateEnum.View3D) {
             return vertex3dCGID;
         } else {
             return vertex2dCGID;
