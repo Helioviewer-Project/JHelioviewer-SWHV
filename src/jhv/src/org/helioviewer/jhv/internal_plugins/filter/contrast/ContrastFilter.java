@@ -4,7 +4,7 @@ import javax.media.opengl.GL2;
 
 import org.helioviewer.jhv.shaderfactory.ShaderFactory;
 import org.helioviewer.viewmodel.filter.AbstractFilter;
-import org.helioviewer.viewmodel.filter.GLFragmentShaderFilter;
+import org.helioviewer.viewmodel.filter.GLFilter;
 import org.helioviewer.viewmodel.filter.StandardFilter;
 import org.helioviewer.viewmodel.imagedata.ARGBInt32ImageData;
 import org.helioviewer.viewmodel.imagedata.ImageData;
@@ -42,7 +42,7 @@ import org.helioviewer.viewmodel.view.opengl.shader.GLShaderBuilder;
  *
  * @author Markus Langenberg
  */
-public class ContrastFilter extends AbstractFilter implements StandardFilter, GLFragmentShaderFilter {
+public class ContrastFilter extends AbstractFilter implements StandardFilter, GLFilter {
 
     private ContrastPanel panel;
 
@@ -216,15 +216,6 @@ public class ContrastFilter extends AbstractFilter implements StandardFilter, GL
     /**
      * {@inheritDoc}
      */
-    @Override
-    public GLShaderBuilder buildFragmentShader(GLShaderBuilder shaderBuilder) {
-        return shaderBuilder;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
     public void applyGL(GL2 gl) {
         shader.setContrast(gl, contrast);
         shader.bind(gl);

@@ -10,7 +10,7 @@ import org.helioviewer.jhv.gui.states.StateController;
 import org.helioviewer.jhv.gui.states.ViewStateEnum;
 import org.helioviewer.viewmodel.filter.FilterListener;
 import org.helioviewer.viewmodel.filter.FrameFilter;
-import org.helioviewer.viewmodel.filter.GLFragmentShaderFilter;
+import org.helioviewer.viewmodel.filter.GLFilter;
 import org.helioviewer.viewmodel.filter.ObservableFilter;
 import org.helioviewer.viewmodel.filter.StandardFilter;
 import org.helioviewer.viewmodel.imagedata.ColorMask;
@@ -27,7 +27,7 @@ import org.helioviewer.viewmodel.view.opengl.shader.GLShaderBuilder;
  *
  * @author Helge Dietert
  */
-public class RunningDifferenceFilter implements FrameFilter, StandardFilter, ObservableFilter, GLFragmentShaderFilter {
+public class RunningDifferenceFilter implements FrameFilter, StandardFilter, ObservableFilter, GLFilter {
     /**
      * Flag to indicate whether this filter should be considered active
      */

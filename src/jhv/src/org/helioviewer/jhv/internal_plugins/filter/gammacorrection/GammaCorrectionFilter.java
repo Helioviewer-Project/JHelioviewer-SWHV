@@ -4,7 +4,7 @@ import javax.media.opengl.GL2;
 
 import org.helioviewer.jhv.shaderfactory.ShaderFactory;
 import org.helioviewer.viewmodel.filter.AbstractFilter;
-import org.helioviewer.viewmodel.filter.GLFragmentShaderFilter;
+import org.helioviewer.viewmodel.filter.GLFilter;
 import org.helioviewer.viewmodel.filter.StandardFilter;
 import org.helioviewer.viewmodel.imagedata.ARGBInt32ImageData;
 import org.helioviewer.viewmodel.imagedata.ImageData;
@@ -42,7 +42,7 @@ import org.helioviewer.viewmodel.view.opengl.shader.GLShaderBuilder;
  *
  * @author Markus Langenberg
  */
-public class GammaCorrectionFilter extends AbstractFilter implements StandardFilter, GLFragmentShaderFilter {
+public class GammaCorrectionFilter extends AbstractFilter implements StandardFilter, GLFilter {
 
     private GammaCorrectionPanel panel;
 
