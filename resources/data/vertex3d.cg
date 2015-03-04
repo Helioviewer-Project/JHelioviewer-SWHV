@@ -1,0 +1,59 @@
+struct outputStruct {
+        float4 color : COLOR;
+        float4 texcoord0 : TEXCOORD0;
+        float4 position : POSITION;
+        float4 texcoord4 : TEXCOORD4;
+        float4 texcoord3 : TEXCOORD3;
+};
+
+outputStruct main(
+        float4 color : COLOR,
+        float4 texcoord0 : TEXCOORD0,
+        float4 position : POSITION,
+        uniform float4x4 state_matrix_mvp : state.matrix.mvp,
+        uniform float4 rect : C0,
+        uniform float theta : C1,
+        uniform float phi : C2,
+        uniform float differencetheta : C3,
+        uniform float differencephi : C4,
+        uniform float4 offset : C5,
+        uniform float4 differenceRect : C6)
+{
+        outputStruct OUT;
+        OUT.color = color;
+        OUT.texcoord0 = float4(texcoord0.xy, 0, 1);
+        OUT.position = mul(state_matrix_mvp, position);
+
+        if(abs(position.x)>1.1){
+        OUT.texcoord0.x = position.x - rect.x;
+        OUT.texcoord0.y = -position.y - rect.y;
+        OUT.texcoord0.x *= rect.z;
+        OUT.texcoord0.y *= rect.w;
+        OUT.texcoord4.x = position.x - differenceRect.x;
+        OUT.texcoord4.y = -position.y - differenceRect.y;
+        OUT.texcoord4.x *= differenceRect.z;
+        OUT.texcoord4.y *= differenceRect.w;
+        OUT.texcoord3 = position;
+        float3x3 mat = float3x3(cos(phi), -sin(theta)*sin(phi), -sin(phi)*cos(theta), 0, cos(theta), -sin(theta), sin(phi), cos(phi)*sin(theta), cos(theta)*cos(phi));
+        position.xyz = mul(mat, position.xyz);
+         OUT.position = mul(state_matrix_mvp, position);
+        }
+        else{
+        OUT.texcoord3 = position;
+        float3x3 mat = float3x3(cos(phi), 0, sin(phi), -sin(theta)*sin(phi), cos(theta), sin(theta)*cos(phi), -cos(theta)*sin(phi), -sin(theta), cos(theta)*cos(phi));
+        float3 rot = mul(mat, position.xyz);
+        OUT.texcoord0.x = rot.x - rect.x;
+        OUT.texcoord0.y = -rot.y - rect.y;
+        OUT.texcoord0.x *= rect.z;
+        OUT.texcoord0.y *= rect.w;
+        mat = float3x3(cos(differencephi), 0, sin(differencephi), -sin(differencetheta)*sin(differencephi), cos(differencetheta), sin(differencetheta)*cos(differencephi), -cos(differencetheta)*sin(differencephi), -sin(differencetheta), cos(differencetheta)*cos(differencephi));
+        rot = mul(mat, position.xyz);
+        OUT.texcoord4.x = rot.x - differenceRect.x;
+        OUT.texcoord4.y = -rot.y - differenceRect.y;
+        OUT.texcoord4.x *= differenceRect.z;
+        OUT.texcoord4.y *= differenceRect.w;
+}
+
+
+        return OUT;
+}
