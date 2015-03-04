@@ -6,7 +6,6 @@ import java.util.List;
 import javax.swing.JPanel;
 import javax.swing.JSplitPane;
 
-import org.helioviewer.jhv.gui.ImageViewerGui;
 import org.helioviewer.plugins.eveplugin.lines.data.Band;
 import org.helioviewer.plugins.eveplugin.lines.data.BandController;
 import org.helioviewer.plugins.eveplugin.view.ControlsPanel;
@@ -102,10 +101,6 @@ public class PlotsContainerPanel extends JPanel implements LineDataSelectorModel
             ControlsPanel.getSingletonInstance().addLineDataSelector(lineDataSelectorPanelOne);
             add(plotOne, BorderLayout.CENTER);
         }
-        revalidate();
-        repaint();
-        ImageViewerGui.getSingletonInstance().getContentPane().revalidate();
-        ImageViewerGui.getSingletonInstance().getContentPane().repaint();
     }
 
     public boolean isPlot2Visible() {
