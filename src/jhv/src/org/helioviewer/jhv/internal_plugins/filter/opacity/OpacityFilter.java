@@ -146,7 +146,6 @@ public class OpacityFilter extends AbstractFilter implements StandardFilter, GLF
         @Override
         protected void buildImpl(GLShaderBuilder shaderBuilder) {
             try {
-                shaderBuilder.addEnvParameter("float alpha");
                 String program = "\toutput.a = output.a * alpha;";
                 program = program.replace("output", shaderBuilder.useOutputValue("float4", "COLOR"));
                 shaderBuilder.addMainFragment(program);

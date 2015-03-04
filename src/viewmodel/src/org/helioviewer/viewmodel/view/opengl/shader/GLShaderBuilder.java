@@ -57,7 +57,7 @@ public class GLShaderBuilder {
     //0 for images
     //1 for lookuptables
     private int nextTexUnit = 2;
-    private int nextConstantRegister = 0;
+    private final int nextConstantRegister = 0;
     private int nextVertexAttribute = 0;
 
     private final GL2 gl;
@@ -267,29 +267,6 @@ public class GLShaderBuilder {
             return GL2.GL_TEXTURE0 + nextTexUnit++;
         } else {
             throw new GLBuildShaderException("Number of available texture units exceeded (Max: " + maxTexUnits + ")");
-        }
-    }
-
-    /**
-     * Adds a new environment parameter to the parameter list. It returns the
-     * index, which has to be used by glProgramEnvParameter*ARB to access this
-     * parameter.
-     *
-     * @param declaration
-     *            declaration of the new parameter, including type and name. for
-     *            example "float2 myParam".
-     * @return index to use with glProgramEnvParameter*ARB, to access correct
-     *         parameter.
-     * @throws GLBuildShaderException
-     *             if there is no free environment parameter left
-     */
-    public int addEnvParameter(String declaration) throws GLBuildShaderException {
-        if (nextConstantRegister < maxConstantRegisters) {
-            getParameterList().add("uniform " + declaration.trim() + " : C" + nextConstantRegister);
-            this.glEnvParameters.add(nextConstantRegister, new double[4]);
-            return nextConstantRegister++;
-        } else {
-            throw new GLBuildShaderException("Number of available enviroment parameters exceeded (Max: " + maxConstantRegisters + ")");
         }
     }
 

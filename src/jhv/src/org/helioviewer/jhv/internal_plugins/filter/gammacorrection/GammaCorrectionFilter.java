@@ -165,9 +165,9 @@ public class GammaCorrectionFilter extends AbstractFilter implements StandardFil
                 for (int i = 0; i < pixelData.length; i++) {
                     int rgb = pixelData[i];
                     int a = rgb >>> 24;
-                int r = (rgb >>> 16) & 0xFF;
-                int g = (rgb >>> 8) & 0xFF;
-                int b = rgb & 0xff;
+                    int r = (rgb >>> 16) & 0xFF;
+                    int g = (rgb >>> 8) & 0xFF;
+                    int b = rgb & 0xff;
 
                     r = gammaTable8[r] & 0xFF;
                     g = gammaTable8[g] & 0xFF;
@@ -214,7 +214,6 @@ public class GammaCorrectionFilter extends AbstractFilter implements StandardFil
         @Override
         protected void buildImpl(GLShaderBuilder shaderBuilder) {
             try {
-                shaderBuilder.addEnvParameter("float gamma");
                 String program = "\toutput.rgb = pow(output.rgb, gamma);";
                 program = program.replace("output", shaderBuilder.useOutputValue("float4", "COLOR"));
                 shaderBuilder.addMainFragment(program);

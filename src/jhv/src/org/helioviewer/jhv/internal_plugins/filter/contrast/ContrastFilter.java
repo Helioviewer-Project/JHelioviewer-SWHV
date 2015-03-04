@@ -217,7 +217,6 @@ public class ContrastFilter extends AbstractFilter implements StandardFilter, GL
         @Override
         protected void buildImpl(GLShaderBuilder shaderBuilder) {
             try {
-                shaderBuilder.addEnvParameter("float contrast");
                 String program = "\toutput.rgb = 0.5f * sign(2.0f * output.rgb - 1.0f) * pow(abs(2.0f * output.rgb - 1.0f), pow(1.5f, -contrast)) + 0.5f;";
                 program = program.replace("output", shaderBuilder.useOutputValue("float4", "COLOR"));
                 shaderBuilder.addMainFragment(program);

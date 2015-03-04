@@ -24,6 +24,8 @@ public class GL3DImageFragmentShaderProgram extends GLFragmentShaderProgram {
     private final int differenceThetaParamRef = 11;
     private final double[] differenceThetaParamFloat = new double[4];
     private final int localShaderID = 0;
+    private final double[] cutOffRadiusFloat = new double[4];
+    private final double[] outerCutOffRadiusFloat = new double[4];
 
     public GL3DImageFragmentShaderProgram() {
 
@@ -42,10 +44,8 @@ public class GL3DImageFragmentShaderProgram extends GLFragmentShaderProgram {
 
     private void bind(GL2 gl, int shader, double outerCutOffRadius, double cutOffRadius) {
         gl.glBindProgramARB(GL2.GL_FRAGMENT_PROGRAM_ARB, ShaderFactory.getFragmentId());
-        double[] cutOffRadiusFloat = this.builder.getEnvParameter(this.cutOffRadiusRef);
-        double[] outerCutOffRadiusFloat = this.builder.getEnvParameter(this.outerCutOffRadiusRef);
-        cutOffRadiusFloat[0] = (float) cutOffRadius;
-        outerCutOffRadiusFloat[0] = (float) outerCutOffRadius;
+        cutOffRadiusFloat[0] = cutOffRadius;
+        outerCutOffRadiusFloat[0] = outerCutOffRadius;
         this.bindEnvVars(gl, this.cutOffRadiusRef, cutOffRadiusFloat);
         this.bindEnvVars(gl, this.outerCutOffRadiusRef, outerCutOffRadiusFloat);
 
@@ -103,14 +103,6 @@ public class GL3DImageFragmentShaderProgram extends GLFragmentShaderProgram {
             program += "\tfloat3 zaxisrot = mul(mat,float3(0.,0.,1.));" + GLShaderBuilder.LINE_SEP;
             program += "\tfloat projectionn = dot(position.xyz,zaxisrot);" + GLShaderBuilder.LINE_SEP;
             program += "\tif((position.z!=0.0 && projectionn<-0.0)){" + "\t\tdiscard;" + GLShaderBuilder.LINE_SEP + "\t}" + GLShaderBuilder.LINE_SEP;
-
-            shaderBuilder.addEnvParameter("float4 cutOffRadius");
-            shaderBuilder.addEnvParameter("float4 outerCutOffRadius");
-
-            shaderBuilder.addEnvParameter("float phi");
-            shaderBuilder.addEnvParameter("float theta");
-            shaderBuilder.addEnvParameter("float differencePhi");
-            shaderBuilder.addEnvParameter("float differenceTheta");
 
             program = program.replace("position", shaderBuilder.useStandardParameter("float4", "TEXCOORD3"));
             program = program.replace("output", shaderBuilder.useOutputValue("float4", "COLOR"));
