@@ -14,16 +14,16 @@ public class GL3DImageVertexShaderProgram extends GLVertexShaderProgram {
 
     private double differenceXScale;
     private double differenceYScale;
-    private int rectRef;
-    private int differenceRectRef;
-    private int offsetRef;
+    private final int rectRef = 0;
+    private final int differenceRectRef = 6;
+    private final int offsetRef = 5;
 
-    private int thetaRef;
-    private int phiRef;
+    private final int thetaRef = 1;
+    private final int phiRef = 2;
     private final double[] thetaValue = new double[4];
     private final double[] phiValue = new double[4];
-    private int differenceThetaRef;
-    private int differencePhiRef;
+    private final int differenceThetaRef = 3;
+    private final int differencePhiRef = 4;
     private final double[] differenceThetaValue = new double[4];
     private final double[] differencePhiValue = new double[4];
 
@@ -105,15 +105,6 @@ public class GL3DImageVertexShaderProgram extends GLVertexShaderProgram {
             program += "\tdifferenceOutput.y *= differenceRect.w;" + GLShaderBuilder.LINE_SEP;
 
             program += "}" + GLShaderBuilder.LINE_SEP;
-
-            this.rectRef = shaderBuilder.addEnvParameter("float4 rect");
-            this.thetaRef = shaderBuilder.addEnvParameter("float theta");
-            this.phiRef = shaderBuilder.addEnvParameter("float phi");
-            this.differenceThetaRef = shaderBuilder.addEnvParameter("float differencetheta");
-            this.differencePhiRef = shaderBuilder.addEnvParameter("float differencephi");
-
-            this.offsetRef = shaderBuilder.addEnvParameter("float4 offset");
-            this.differenceRectRef = shaderBuilder.addEnvParameter("float4 differenceRect");
 
             program = program.replace("output", shaderBuilder.useOutputValue("float4", "TEXCOORD0"));
             program = program.replace("physicalPosition", shaderBuilder.useStandardParameter("float4", "POSITION"));
