@@ -4,8 +4,6 @@ import org.helioviewer.base.physics.Constants;
 import org.helioviewer.gl3d.scenegraph.GL3DState;
 import org.helioviewer.gl3d.scenegraph.math.GL3DMat4d;
 import org.helioviewer.gl3d.scenegraph.rt.GL3DRay;
-import org.helioviewer.gl3d.wcs.CoordinateSystem;
-import org.helioviewer.gl3d.wcs.HeliocentricCartesian2000CoordinateSystem;
 import org.helioviewer.viewmodel.view.opengl.GL3DSceneGraphView;
 
 /**
@@ -20,8 +18,6 @@ public class GL3DSolarRotationTrackingTrackballCamera extends GL3DCamera {
     public static final double DEFAULT_CAMERA_DISTANCE = Constants.SunMeanDistanceToEarth / Constants.SunRadiusInMeter;
 
     private GL3DRay lastMouseRay;
-
-    protected CoordinateSystem viewSpaceCoordinateSystem = new HeliocentricCartesian2000CoordinateSystem();
 
     private final GL3DTrackballRotationInteraction rotationInteraction;
     private final GL3DPanInteraction panInteraction;
@@ -83,11 +79,6 @@ public class GL3DSolarRotationTrackingTrackballCamera extends GL3DCamera {
 
     public GL3DRay getLastMouseRay() {
         return lastMouseRay;
-    }
-
-    @Override
-    public CoordinateSystem getViewSpaceCoordinateSystem() {
-        return this.viewSpaceCoordinateSystem;
     }
 
     @Override

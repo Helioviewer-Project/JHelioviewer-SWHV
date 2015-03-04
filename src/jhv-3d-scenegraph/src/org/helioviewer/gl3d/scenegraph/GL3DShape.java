@@ -5,7 +5,6 @@ import org.helioviewer.gl3d.scenegraph.math.GL3DMat3d;
 import org.helioviewer.gl3d.scenegraph.math.GL3DMat4d;
 import org.helioviewer.gl3d.scenegraph.math.GL3DVec4d;
 import org.helioviewer.gl3d.scenegraph.rt.GL3DRay;
-import org.helioviewer.gl3d.wcs.CoordinateSystem;
 
 /**
  * A {@link GL3DShape} is a {@link GL3DNode} that does have a position and a
@@ -26,16 +25,9 @@ public abstract class GL3DShape extends GL3DNode {
 
     protected GL3DAABBox aabb;
 
-    // The coordinate system in which this Shape is defined in
-    protected CoordinateSystem coordinateSystem;
-
     public GL3DShape(String name) {
-        this(name, null);
-    }
 
-    public GL3DShape(String name, CoordinateSystem coordinateSystem) {
         super(name);
-        this.coordinateSystem = coordinateSystem;
 
         this.m = GL3DMat4d.identity();
         this.wm = GL3DMat4d.identity();
