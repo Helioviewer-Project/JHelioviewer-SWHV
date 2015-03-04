@@ -242,7 +242,7 @@ public abstract class AbstractPluginDialog extends JDialog implements ShowableDi
 
         if (changed) {
             // save plug-in settings to XML file
-            PluginManager.getSingeltonInstance().saveSettings();
+            PluginManager.getSingletonInstance().saveSettings();
 
             // rebuild the view chains
             recreateViewChains();

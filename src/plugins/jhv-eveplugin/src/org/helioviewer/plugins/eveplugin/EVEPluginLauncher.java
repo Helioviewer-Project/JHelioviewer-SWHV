@@ -25,6 +25,6 @@ public class EVEPluginLauncher {
         args2[args2.length - 1] = "EVEPlugin.jar";
 
         JavaHelioViewer.main(args2);
-        PluginManager.getSingeltonInstance().addPlugin(EVEPluginLauncher.class.getClassLoader(), new EVEPlugin(), null);
+        PluginManager.getSingletonInstance().addPlugin(EVEPluginLauncher.class.getClassLoader(), new EVEPlugin(), null);
     }
 }

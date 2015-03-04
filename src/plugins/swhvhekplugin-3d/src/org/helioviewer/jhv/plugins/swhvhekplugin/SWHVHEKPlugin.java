@@ -63,9 +63,9 @@ public class SWHVHEKPlugin extends OverlayPlugin implements Plugin {
     @Override
     public void installPlugin() {
         for (OverlayContainer overlay : overlayContainerList) {
-            overlay.setActive(PluginSettings.getSingeltonInstance().isOverlayInPluginActivated(pluginLocation, overlay.getOverlayClass(), true));
-            overlay.setPosition(PluginSettings.getSingeltonInstance().getOverlayPosition(pluginLocation, overlay.getOverlayClass()));
-            PluginManager.getSingeltonInstance().addOverlayContainer(overlay);
+            overlay.setActive(PluginSettings.getSingletonInstance().isOverlayInPluginActivated(pluginLocation, overlay.getOverlayClass(), true));
+            overlay.setPosition(PluginSettings.getSingletonInstance().getOverlayPosition(pluginLocation, overlay.getOverlayClass()));
+            PluginManager.getSingletonInstance().addOverlayContainer(overlay);
             ImageViewerGui.getSingletonInstance().getMainImagePanel().addPlugin(new SWHVHEKImagePanelEventPopupController());
         }
     }

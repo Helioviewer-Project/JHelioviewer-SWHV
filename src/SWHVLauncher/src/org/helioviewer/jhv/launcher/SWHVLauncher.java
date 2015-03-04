@@ -32,8 +32,8 @@ public class SWHVLauncher {
 
         JavaHelioViewer.main(args2, new SWEKPlugin(false));
 
-        PluginManager.getSingeltonInstance().addPlugin(EVEPluginLauncher.class.getClassLoader(), new EVEPlugin(), null);
-        PluginManager.getSingeltonInstance().addPlugin(SWHVHEKPlugin.class.getClassLoader(), new SWHVHEKPlugin(), null);
+        PluginManager.getSingletonInstance().addPlugin(EVEPluginLauncher.class.getClassLoader(), new EVEPlugin(), null);
+        PluginManager.getSingletonInstance().addPlugin(SWHVHEKPlugin.class.getClassLoader(), new SWHVHEKPlugin(), null);
     }
 
 }

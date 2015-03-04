@@ -229,7 +229,7 @@ public class ViewchainFactory {
             compactPanelManager.add(new SelectedLayerPanel(newLayer));
 
             // Add filter to view chain
-            AbstractList<FilterContainer> filterContainerList = PluginManager.getSingeltonInstance().getFilterContainers(true);
+            AbstractList<FilterContainer> filterContainerList = PluginManager.getSingletonInstance().getFilterContainers(true);
             View nextView = newLayer;
 
             for (int i = filterContainerList.size() - 1; i >= 0; i--) {
@@ -335,7 +335,7 @@ public class ViewchainFactory {
         // add overlay view to view chain
         // S. Meier, must be fixed, use just one overlayView with more then one
         // overlaysPlugin
-        AbstractList<OverlayContainer> overlayContainerList = PluginManager.getSingeltonInstance().getOverlayContainers(true);
+        AbstractList<OverlayContainer> overlayContainerList = PluginManager.getSingletonInstance().getOverlayContainers(true);
         OverlayControlComponentManager manager = new OverlayControlComponentManager();
 
         // View nextView = componentView.getView();

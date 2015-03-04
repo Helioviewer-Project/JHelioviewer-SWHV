@@ -63,14 +63,14 @@ public class OverlayPluginDialog extends AbstractPluginDialog {
      */
     private void initData() {
         // show activated overlays in corresponding list
-        AbstractList<OverlayContainer> activatedOverlays = PluginManager.getSingeltonInstance().getOverlayContainers(true);
+        AbstractList<OverlayContainer> activatedOverlays = PluginManager.getSingletonInstance().getOverlayContainers(true);
 
         for (OverlayContainer container : activatedOverlays) {
             activatedPluginsListModel.addElement(container);
         }
 
         // show available filter in corresponding list
-        AbstractList<OverlayContainer> availableOverlays = PluginManager.getSingeltonInstance().getOverlayContainers(false);
+        AbstractList<OverlayContainer> availableOverlays = PluginManager.getSingletonInstance().getOverlayContainers(false);
 
         for (OverlayContainer container : availableOverlays)
             availablePluginsListModel.addElement(container);

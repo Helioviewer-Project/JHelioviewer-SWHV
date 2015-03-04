@@ -223,8 +223,8 @@ public class PluginsDialog extends JDialog implements ShowableDialog, ActionList
             listLayout.show(listContainerPane, "empty");
         }
 
-        filterButton.setEnabled(PluginManager.getSingeltonInstance().getNumberOfFilter() > 0);
-        overlayButton.setEnabled(PluginManager.getSingeltonInstance().getNumberOfOverlays() > 0);
+        filterButton.setEnabled(PluginManager.getSingletonInstance().getNumberOfFilter() > 0);
+        overlayButton.setEnabled(PluginManager.getSingletonInstance().getNumberOfOverlays() > 0);
     }
 
     /**
@@ -238,7 +238,7 @@ public class PluginsDialog extends JDialog implements ShowableDialog, ActionList
             recreateViewChains();
 
             // save plug-in settings to XML file
-            PluginManager.getSingeltonInstance().saveSettings();
+            PluginManager.getSingletonInstance().saveSettings();
         }
 
         // close dialog
@@ -279,7 +279,7 @@ public class PluginsDialog extends JDialog implements ShowableDialog, ActionList
      * to the list again.
      * */
     private void updatePluginList() {
-        final PluginContainer[] plugins = PluginManager.getSingeltonInstance().getAllPlugins();
+        final PluginContainer[] plugins = PluginManager.getSingletonInstance().getAllPlugins();
         final int filterIndex = filterComboBox.getSelectedIndex();
 
         final PluginListEntry entry = (PluginListEntry) pluginList.getSelectedEntry();
@@ -334,7 +334,7 @@ public class PluginsDialog extends JDialog implements ShowableDialog, ActionList
                         return;
                     }
 
-                    if (!PluginManager.getSingeltonInstance().loadPlugin(dstFile.toURI())) {
+                    if (!PluginManager.getSingletonInstance().loadPlugin(dstFile.toURI())) {
                         Message.err("An error occured while loading the plugin.", "The plugin file is corrupt!", false);
                         return;
                     }

@@ -135,6 +135,6 @@ public abstract class OverlayContainer implements Container {
      * {@link org.helioviewer.viewmodelplugin.controller.PluginManager}.
      */
     private void saveOverlaySettings() {
-        PluginSettings.getSingeltonInstance().overlaySettingsToXML(pluginLocation, this);
+        PluginSettings.getSingletonInstance().overlaySettingsToXML(pluginLocation, this);
     }
 }

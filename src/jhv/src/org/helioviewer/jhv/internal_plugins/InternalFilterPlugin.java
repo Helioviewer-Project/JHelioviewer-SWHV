@@ -53,9 +53,9 @@ public class InternalFilterPlugin extends FilterPlugin implements InternalPlugin
     @Override
     public void installPlugin() {
         for (FilterContainer filter : filterContainerList) {
-            filter.setActive(PluginSettings.getSingeltonInstance().isFilterInPluginActivated(pluginLocation, filter.getFilterClass(), true));
-            filter.setPosition(PluginSettings.getSingeltonInstance().getFilterPosition(pluginLocation, filter.getFilterClass()));
-            PluginManager.getSingeltonInstance().addFilterContainer(filter);
+            filter.setActive(PluginSettings.getSingletonInstance().isFilterInPluginActivated(pluginLocation, filter.getFilterClass(), true));
+            filter.setPosition(PluginSettings.getSingletonInstance().getFilterPosition(pluginLocation, filter.getFilterClass()));
+            PluginManager.getSingletonInstance().addFilterContainer(filter);
         }
     }
 
