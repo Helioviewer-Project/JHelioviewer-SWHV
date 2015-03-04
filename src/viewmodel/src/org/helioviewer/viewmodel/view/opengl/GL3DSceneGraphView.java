@@ -2,7 +2,6 @@ package org.helioviewer.viewmodel.view.opengl;
 
 import java.awt.event.KeyEvent;
 import java.util.ArrayList;
-import java.util.List;
 
 import javax.media.opengl.GL2;
 
@@ -12,7 +11,6 @@ import org.helioviewer.gl3d.GL3DKeyController;
 import org.helioviewer.gl3d.GL3DKeyController.GL3DKeyListener;
 import org.helioviewer.gl3d.camera.GL3DCamera;
 import org.helioviewer.gl3d.model.GL3DArtificialObjects;
-import org.helioviewer.gl3d.model.GL3DHitReferenceShape;
 import org.helioviewer.gl3d.model.image.GL3DImageLayer;
 import org.helioviewer.gl3d.model.image.GL3DImageLayerFactory;
 import org.helioviewer.gl3d.model.image.GL3DImageLayers;
@@ -25,7 +23,6 @@ import org.helioviewer.gl3d.scenegraph.GL3DShape;
 import org.helioviewer.gl3d.scenegraph.GL3DState;
 import org.helioviewer.gl3d.scenegraph.math.GL3DVec3d;
 import org.helioviewer.gl3d.scenegraph.math.GL3DVec4f;
-import org.helioviewer.gl3d.scenegraph.rt.GL3DRayTracer;
 import org.helioviewer.gl3d.scenegraph.visuals.GL3DArrow;
 import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.viewmodel.changeevent.ChangeEvent;
@@ -54,7 +51,6 @@ public class GL3DSceneGraphView extends AbstractGL3DView implements GL3DView {
     // private GL3DImageGroup imageMeshes;
     private GLOverlayView overlayView = null;
     private GL3DImageLayers imageLayers;
-    private GL3DHitReferenceShape hitReferenceShape;
     private GL3DGroup artificialObjects;
 
     private final ArrayList<GL3DImageTextureView> layersToAdd = new ArrayList<GL3DImageTextureView>();
@@ -250,8 +246,7 @@ public class GL3DSceneGraphView extends AbstractGL3DView implements GL3DView {
     }
 
     private void removeLayer(GL3DImageTextureView imageTextureView) {
-        if (!this.layersToRemove.contains(imageTextureView) &&
-             this.imageLayers.getImageLayerForView(imageTextureView) != null) {
+        if (!this.layersToRemove.contains(imageTextureView) && this.imageLayers.getImageLayerForView(imageTextureView) != null) {
             this.layersToRemove.add(imageTextureView);
         }
     }
@@ -289,9 +284,6 @@ public class GL3DSceneGraphView extends AbstractGL3DView implements GL3DView {
         root.addNode(this.imageLayers);
         root.addNode(artificialObjects);
 
-        this.hitReferenceShape = new GL3DHitReferenceShape(false);
-        root.addNode(this.hitReferenceShape);
-
         GL3DGroup indicatorArrows = new GL3DModel("Arrows", "Arrows indicating the viewspace axes");
         artificialObjects.addNode(indicatorArrows);
 
@@ -304,10 +296,6 @@ public class GL3DSceneGraphView extends AbstractGL3DView implements GL3DView {
         indicatorArrows.addNode(south);
 
         return root;
-    }
-
-    public GL3DHitReferenceShape getHitReferenceShape() {
-        return hitReferenceShape;
     }
 
     public void toggleCoronaVisibility() {
@@ -336,7 +324,7 @@ public class GL3DSceneGraphView extends AbstractGL3DView implements GL3DView {
         /*
          * GL3DNode sibling = node; while((sibling = sibling.getNext()) != null)
          * { for(int i=0; i<level; ++i) System.out.print("   ");
-         * 
+         *
          * System.out.println("Sibling: " + sibling.getClass().getName() + " ("
          * + node.getName() + ")"); }
          */

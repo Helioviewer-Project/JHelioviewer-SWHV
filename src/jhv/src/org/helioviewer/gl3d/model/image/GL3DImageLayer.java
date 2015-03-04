@@ -7,7 +7,6 @@ import javax.media.opengl.GL2;
 import org.helioviewer.base.physics.Constants;
 import org.helioviewer.gl3d.camera.GL3DCamera;
 import org.helioviewer.gl3d.camera.GL3DCameraListener;
-import org.helioviewer.gl3d.model.GL3DHitReferenceShape;
 import org.helioviewer.gl3d.scenegraph.GL3DGroup;
 import org.helioviewer.gl3d.scenegraph.GL3DShape;
 import org.helioviewer.gl3d.scenegraph.GL3DState;
@@ -51,8 +50,6 @@ public abstract class GL3DImageLayer extends GL3DGroup implements GL3DCameraList
     public double minZ = -Constants.SunRadius;
     public double maxZ = Constants.SunRadius;
 
-    protected GL3DHitReferenceShape accellerationShape;
-
     protected boolean doUpdateROI = true;
 
     private final double lastViewAngle = 0.0;
@@ -85,8 +82,6 @@ public abstract class GL3DImageLayer extends GL3DGroup implements GL3DCameraList
             throw new IllegalStateException("Cannot create GL3DImageLayer when no RegionView is present in Layer");
         }
 
-        this.accellerationShape = new GL3DHitReferenceShape(false);
-
         this.doUpdateROI = true;
         this.markAsChanged();
         int count = 0;
@@ -111,8 +106,6 @@ public abstract class GL3DImageLayer extends GL3DGroup implements GL3DCameraList
     public void shapeInit(GL3DState state) {
         this.createImageMeshNodes(state.gl);
 
-        this.addNode(this.accellerationShape);
-
         super.shapeInit(state);
 
         this.doUpdateROI = true;
@@ -132,13 +125,11 @@ public abstract class GL3DImageLayer extends GL3DGroup implements GL3DCameraList
         // Log.debug("GL3DImageLayer: '"+getName()+" is updating its ROI");
         this.updateROI(state);
         doUpdateROI = false;
-        this.accellerationShape.setUnchanged();
     }
 
     @Override
     public void cameraMoved(GL3DCamera camera) {
         doUpdateROI = true;
-        this.accellerationShape.markAsChanged();
     }
 
     public double getLastViewAngle() {

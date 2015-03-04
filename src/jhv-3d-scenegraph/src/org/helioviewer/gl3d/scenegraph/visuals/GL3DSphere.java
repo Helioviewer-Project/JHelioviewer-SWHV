@@ -8,7 +8,6 @@ import org.helioviewer.gl3d.scenegraph.math.GL3DVec2d;
 import org.helioviewer.gl3d.scenegraph.math.GL3DVec3d;
 import org.helioviewer.gl3d.scenegraph.math.GL3DVec4d;
 import org.helioviewer.gl3d.scenegraph.math.GL3DVec4f;
-import org.helioviewer.gl3d.scenegraph.rt.GL3DRay;
 
 public class GL3DSphere extends GL3DMesh {
     private final int resolutionX;
@@ -76,52 +75,6 @@ public class GL3DSphere extends GL3DMesh {
     @Override
     public void shapeUpdate(GL3DState state) {
         this.center = this.wm.multiply(this.centerOS);
-    }
-
-    @Override
-    public boolean shapeHit(GL3DRay ray) {
-        // if(super.shapeHit(ray)) {
-        // this.lastHitPoint = this.wmI.multiply(ray.getHitPoint());
-        // // Log.debug("GL3DShape.shapeHit: LastHitPoint="+this.lastHitPoint);
-        // return true;
-        // }
-        // return false;
-        // Log.debug("GL3DSphere.shapeHit: Dir="+ray.getDirection()+" Origin="+ray.getOrigin()+" Center="+this.center);
-        GL3DVec3d l = this.center.copy().subtract(ray.getOrigin());
-        GL3DVec3d rayDirCopy = ray.getDirection().copy();
-        rayDirCopy.normalize();
-        double s = l.dot(rayDirCopy);
-        double l2 = l.length2();
-        double r2 = this.radius * this.radius;
-        if (s < 0 && l2 > r2) {
-            return false;
-        }
-
-        double s2 = s * s;
-        double m2 = l2 - s2;
-        if (m2 > r2) {
-            return false;
-        }
-
-        double q = Math.sqrt(r2 - m2);
-        double t;
-        if (l2 > r2) {
-            t = s - q;
-        } else {
-            t = s + q;
-        }
-        ray.setLength(t);
-        GL3DVec3d rayCopy2 = ray.getDirection().copy();
-        rayCopy2.normalize();
-        rayCopy2.multiply(t);
-        GL3DVec3d rayCopy = ray.getOrigin().copy();
-        rayCopy.add(rayCopy2);
-        ray.setHitPoint(rayCopy);
-        // ray.setHitPoint(this.wmI.multiply(ray.getHitPoint()));
-        ray.isOutside = false;
-        ray.setOriginShape(this);
-        // Log.debug("GL3DShape.shapeHit: Hit at Distance: "+t+" HitPoint: "+ray.getHitPoint());
-        return true;
     }
 
     public GL3DVec3d getCenter() {

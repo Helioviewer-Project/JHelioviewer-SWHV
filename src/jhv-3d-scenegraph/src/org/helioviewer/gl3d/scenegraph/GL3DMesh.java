@@ -8,12 +8,10 @@ import javax.media.opengl.GL2;
 
 import org.helioviewer.base.physics.Constants;
 import org.helioviewer.gl3d.scenegraph.GL3DDrawBits.Bit;
-import org.helioviewer.gl3d.scenegraph.math.GL3DMat4d;
 import org.helioviewer.gl3d.scenegraph.math.GL3DVec2d;
 import org.helioviewer.gl3d.scenegraph.math.GL3DVec3d;
 import org.helioviewer.gl3d.scenegraph.math.GL3DVec4d;
 import org.helioviewer.gl3d.scenegraph.math.GL3DVec4f;
-import org.helioviewer.gl3d.scenegraph.rt.GL3DRay;
 
 /**
  * A {@link GL3DMesh} represents a Mesh object within the scene graph. A Mesh
@@ -229,48 +227,6 @@ public abstract class GL3DMesh extends GL3DShape {
         gl.glEnd();
         gl.glEnable(GL2.GL_LIGHTING);
         gl.glEnable(GL2.GL_TEXTURE_2D);
-    }
-
-    /**
-     * Provides the default implementation for a Mesh, provide optimized
-     * Implementations of this method for default shapes, such as a Sphere!
-     */
-
-    @Override
-    public boolean shapeHit(GL3DRay ray) {
-        if (this.getTriangles() != null) {
-            for (GL3DTriangle t : this.getTriangles()) {
-                if (t.intersects(ray)) {
-                    ray.setOriginShape(this);
-
-                    GL3DVec3d rayCopy2 = ray.getDirection().copy();
-                    rayCopy2.multiply(ray.getLength());
-                    GL3DVec3d rayCopy = ray.getOrigin().copy();
-                    rayCopy.add(rayCopy2);
-                    ray.setHitPoint(rayCopy);
-                    return true;
-                }
-            }
-        }
-        return false;
-    }
-
-    public boolean shapeHit(GL3DRay ray, GL3DMat4d extraRot) {
-        if (this.getTriangles() != null) {
-            for (GL3DTriangle t : this.getTriangles()) {
-                if (t.intersects(ray, extraRot)) {
-                    ray.setOriginShape(this);
-
-                    GL3DVec3d rayCopy2 = ray.getDirection().copy();
-                    rayCopy2.multiply(ray.getLength());
-                    GL3DVec3d rayCopy = ray.getOrigin().copy();
-                    rayCopy.add(rayCopy2);
-                    ray.setHitPoint(rayCopy);
-                    return true;
-                }
-            }
-        }
-        return false;
     }
 
     @Override
