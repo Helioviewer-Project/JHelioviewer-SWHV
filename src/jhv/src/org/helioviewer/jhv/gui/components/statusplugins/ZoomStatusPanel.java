@@ -1,7 +1,6 @@
 package org.helioviewer.jhv.gui.components.statusplugins;
 
 import java.awt.Dimension;
-import java.awt.EventQueue;
 
 import javax.swing.BorderFactory;
 
@@ -57,25 +56,12 @@ public class ZoomStatusPanel extends ViewStatusPanelPlugin {
         }
     }
 
-    private void updateZoomLevel_eq() {
-        if (EventQueue.isDispatchThread()) {
-            updateZoomLevel();
-        } else {
-            EventQueue.invokeLater(new Runnable() {
-                @Override
-                public void run() {
-                    updateZoomLevel();
-                }
-            });
-        }
-    }
-
     public void activeLayerChanged(int idx) {
-        updateZoomLevel_eq();
+        updateZoomLevel();
     }
 
     public void viewportGeometryChanged() {
-        updateZoomLevel_eq();
+        updateZoomLevel();
     }
 
 }
