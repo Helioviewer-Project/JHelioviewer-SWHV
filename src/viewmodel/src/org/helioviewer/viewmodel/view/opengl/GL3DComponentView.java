@@ -297,7 +297,7 @@ public class GL3DComponentView extends AbstractComponentView implements GLEventL
         int width = drawable.getSurfaceWidth();
         int height = drawable.getSurfaceHeight();
 
-        GL3DState.getUpdated(gl, width, height);
+        GL3DState.setUpdated(gl, width, height);
 
         AWTGLPixelBuffer pixelBuffer = null;
         if ((screenshotMode || exportMode) && mv != null) {
