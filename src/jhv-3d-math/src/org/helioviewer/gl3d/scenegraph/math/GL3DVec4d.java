@@ -154,6 +154,10 @@ public class GL3DVec4d {
         return (u.x * v.x) + (u.y * v.y) + (u.z * v.z) + (u.w * v.w);
     }
 
+    public static double dot3d(GL3DVec4d u, GL3DVec4d v) {
+        return (u.x * v.x) + (u.y * v.y) + (u.z * v.z);
+    }
+
     public GL3DVec4d cross(GL3DVec4d vec) {
         return GL3DVec4d.cross(this, vec);
     }
@@ -199,12 +203,14 @@ public class GL3DVec4d {
         return new double[] { x, y, z, w };
     }
 
+    @Override
     public boolean equals(Object o) {
         if (o instanceof GL3DVec4d)
             return isApproxEqual((GL3DVec4d) o, 0);
         return false;
     }
 
+    @Override
     public Object clone() {
         return new GL3DVec4d(this);
     }
@@ -221,6 +227,7 @@ public class GL3DVec4d {
         return arr;
     }
 
+    @Override
     public String toString() {
         return "[" + x + ", " + y + ", " + z + ", " + w + "]";
     }
