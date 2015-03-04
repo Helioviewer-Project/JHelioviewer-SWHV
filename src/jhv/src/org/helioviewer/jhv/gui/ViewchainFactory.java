@@ -14,11 +14,8 @@ import org.helioviewer.jhv.opengl.GLInfo;
 import org.helioviewer.viewmodel.factory.BufferedImageViewFactory;
 import org.helioviewer.viewmodel.factory.GLViewFactory;
 import org.helioviewer.viewmodel.factory.ViewFactory;
-import org.helioviewer.viewmodel.metadata.HelioviewerMetaData;
-import org.helioviewer.viewmodel.metadata.MetaData;
 import org.helioviewer.viewmodel.view.ComponentView;
 import org.helioviewer.viewmodel.view.FilterView;
-import org.helioviewer.viewmodel.view.HelioviewerGeometryView;
 import org.helioviewer.viewmodel.view.ImageInfoView;
 import org.helioviewer.viewmodel.view.LayeredView;
 import org.helioviewer.viewmodel.view.MetaDataView;
@@ -203,14 +200,6 @@ public class ViewchainFactory {
 
             }
 
-            // Get meta data
-            MetaData metaData = null;
-            HelioviewerMetaData hvMetaData = null;
-            if (newLayer.getAdapter(MetaDataView.class) != null)
-                metaData = newLayer.getAdapter(MetaDataView.class).getMetaData();
-            if (metaData instanceof HelioviewerMetaData)
-                hvMetaData = (HelioviewerMetaData) metaData;
-
             // Create list which manages all filter tabs
             FilterTabList tabList = new FilterTabList();
 
@@ -245,13 +234,6 @@ public class ViewchainFactory {
                 } else {
                     filterView.setView(null);
                 }
-            }
-
-            // Geometry
-            if (hvMetaData != null) {
-                HelioviewerGeometryView geometryView = viewFactory.createNewView(HelioviewerGeometryView.class);
-                geometryView.setView(nextView);
-                nextView = geometryView;
             }
 
             // Add layer

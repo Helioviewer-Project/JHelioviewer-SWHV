@@ -197,16 +197,6 @@ public class SynchronizeOverviewChainView extends AbstractSynchronizeChainView {
                     last.setView(newFilterView);
                     last = newFilterView;
                 }
-            } else if (view instanceof HelioviewerGeometryView) {
-                HelioviewerGeometryView geometryView = (HelioviewerGeometryView) viewFactory.createViewFromSource(view, true);
-
-                if (first == null) {
-                    first = geometryView;
-                    last = geometryView;
-                } else {
-                    last.setView(geometryView);
-                    last = geometryView;
-                }
             }
 
             // get next sub view
