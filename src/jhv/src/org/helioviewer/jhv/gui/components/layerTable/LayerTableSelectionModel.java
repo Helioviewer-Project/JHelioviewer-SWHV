@@ -1,7 +1,6 @@
 package org.helioviewer.jhv.gui.components.layerTable;
 
 import javax.swing.DefaultListSelectionModel;
-import javax.swing.SwingUtilities;
 
 import org.helioviewer.jhv.layers.LayersListener;
 import org.helioviewer.jhv.layers.LayersModel;
@@ -47,24 +46,9 @@ public class LayerTableSelectionModel extends DefaultListSelectionModel implemen
         LayersModel.getSingletonInstance().setActiveLayer(index0);
     }
 
-    /**
-     * Helper needed to call the super.setSelectionInterval method from within
-     * another thread
-     * <p>
-     * 
-     * @see javax.swing.DefaultListSelectionModel#setSelectionInterval(int,int)
-     *      setSelectionInterval
-     */
-    public void superSetSelectionInterval(int index0, int index1) {
-        super.setSelectionInterval(index0, index1);
-    }
-
     public void activeLayerChanged(int index) {
-        SwingUtilities.invokeLater(new Runnable() {
-            public void run() {
-                superSetSelectionInterval(LayersModel.getSingletonInstance().getActiveLayer(), LayersModel.getSingletonInstance().getActiveLayer());
-            }
-        });
+        super.setSelectionInterval(LayersModel.getSingletonInstance().getActiveLayer(),
+                                   LayersModel.getSingletonInstance().getActiveLayer());
     }
 
     /**
@@ -111,4 +95,5 @@ public class LayerTableSelectionModel extends DefaultListSelectionModel implemen
      */
     public void layerDownloaded(int idx) {
     }
+
 }

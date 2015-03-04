@@ -172,4 +172,5 @@ public class LayerTable extends JTable {
         iconRenderer.setFixedWidth(this, LayerTableModel.COLUMN_BUTTON_REMOVE);
         getColumnModel().getColumn(LayerTableModel.COLUMN_BUTTON_REMOVE).setCellRenderer(iconRenderer);
     }
+
 }
