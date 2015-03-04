@@ -1,7 +1,6 @@
 package org.helioviewer.jhv.gui.components.statusplugins;
 
 import java.awt.Dimension;
-import java.awt.EventQueue;
 
 import javax.swing.BorderFactory;
 
@@ -59,25 +58,12 @@ public class QualityStatusPanel extends ViewStatusPanelPlugin {
         }
     }
 
-    private void updateQualityLayers_eq() {
-        if (EventQueue.isDispatchThread()) {
-            updateQualityLayers();
-        } else {
-            EventQueue.invokeLater(new Runnable() {
-                @Override
-                public void run() {
-                    updateQualityLayers();
-                }
-            });
-        }
-    }
-
     /**
      * {@inheritDoc}
      */
 
     public void activeLayerChanged(int idx) {
-        updateQualityLayers_eq();
+        updateQualityLayers();
     }
 
     /**
@@ -85,7 +71,7 @@ public class QualityStatusPanel extends ViewStatusPanelPlugin {
      */
 
     public void subImageDataChanged() {
-        updateQualityLayers_eq();
+        updateQualityLayers();
     }
 
 }
