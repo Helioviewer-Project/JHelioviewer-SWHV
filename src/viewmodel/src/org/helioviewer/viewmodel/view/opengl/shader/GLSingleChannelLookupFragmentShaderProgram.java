@@ -2,6 +2,7 @@ package org.helioviewer.viewmodel.view.opengl.shader;
 
 import javax.media.opengl.GL2;
 
+import org.helioviewer.jhv.shaderfactory.ShaderFactory;
 import org.helioviewer.viewmodel.view.opengl.shader.GLShaderBuilder.GLBuildShaderException;
 
 /**
@@ -25,7 +26,7 @@ public class GLSingleChannelLookupFragmentShaderProgram extends GLFragmentShader
     @Override
     public void bind(GL2 gl) {
         super.bind(gl);
-        gl.glBindProgramARB(target, shaderID);
+        gl.glBindProgramARB(target, ShaderFactory.getFragment3dCGId());
     }
 
     /**

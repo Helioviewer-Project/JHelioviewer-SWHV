@@ -4,6 +4,8 @@ import java.util.Stack;
 
 import javax.media.opengl.GL2;
 
+import org.helioviewer.jhv.shaderfactory.ShaderFactory;
+
 /**
  * Abstract class to build customized fragment shaders.
  *
@@ -123,7 +125,7 @@ public abstract class GLFragmentShaderProgram {
     private static void bind(GL2 gl, int shader) {
         if (shader != shaderCurrentlyUsed) {
             shaderCurrentlyUsed = shader;
-            gl.glBindProgramARB(target, shader);
+            gl.glBindProgramARB(target, ShaderFactory.getFragment3dCGId());
         }
     }
 
