@@ -34,4 +34,5 @@ public class GLMinimalVertexShaderProgram extends GLVertexShaderProgram {
             e.printStackTrace();
         }
     }
+
 }

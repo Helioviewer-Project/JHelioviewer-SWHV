@@ -412,15 +412,16 @@ public class PluginManager {
         return false;
     }
 
+    // http://kotek.net/blog/swingutilities.invokeandwait_with_return_value
     private static <E> E invokeAndWait(final Callable<E> r) {
-        final AtomicReference<E> ref = new AtomicReference<E>();
+        final AtomicReference<E> ret = new AtomicReference<E>();
         final AtomicReference<Exception> except = new AtomicReference<Exception>();
 
         try {
             EventQueue.invokeAndWait(new Runnable() {
                 public void run() {
                     try {
-                        ref.set(r.call());
+                        ret.set(r.call());
                     } catch (Exception e) {
                         //pass exception to original thread
                         except.set(e);
@@ -434,7 +435,7 @@ public class PluginManager {
             //there was an exception in EDT thread, rethrow it
             throw new RuntimeException(except.get());
         else
-            return ref.get();
+            return ret.get();
     }
 
     private class LoadPluginCall implements Callable<Boolean> {

@@ -27,4 +27,5 @@ public class GLMinimalFragmentShaderProgram extends GLFragmentShaderProgram {
             e.printStackTrace();
         }
     }
+
 }
