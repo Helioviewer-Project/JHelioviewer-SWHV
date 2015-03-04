@@ -14,7 +14,6 @@ import org.helioviewer.viewmodel.imagetransport.Byte8ImageTransport;
 import org.helioviewer.viewmodel.imagetransport.Int32ImageTransport;
 import org.helioviewer.viewmodel.imagetransport.Short16ImageTransport;
 import org.helioviewer.viewmodel.view.opengl.shader.GLFragmentShaderProgram;
-import org.helioviewer.viewmodel.view.opengl.shader.GLShaderBuilder;
 
 /**
  * Filter for applying gamma correction.
@@ -141,7 +140,7 @@ public class GammaCorrectionFilter extends AbstractFilter implements StandardFil
                 }
                 return new SingleChannelByte8ImageData(data, resultPixelData);
 
-            // Single channel short image
+                // Single channel short image
             } else if (data.getImageTransport() instanceof Short16ImageTransport) {
                 if (forceRefilter || rebuildTable) {
                     buildTable16(data.getImageTransport().getNumBitsPerPixel());
@@ -169,18 +168,10 @@ public class GammaCorrectionFilter extends AbstractFilter implements StandardFil
                 int g = (rgb >>> 8) & 0xFF;
                 int b = rgb & 0xff;
 
-<<<<<<< HEAD
-                    r = gammaTable8[r] & 0xFF;
-                    g = gammaTable8[g] & 0xFF;
-                    b = gammaTable8[b] & 0xFF;
-                    resultPixelData[i] = (a << 24) | (r << 16) | (g << 8) | b;
-=======
                 r = gammaTable8[r] & 0xFF;
                 g = gammaTable8[g] & 0xFF;
                 b = gammaTable8[b] & 0xFF;
-
                 resultPixelData[i] = (a << 24) | (r << 16) | (g << 8) | b;
->>>>>>> bind locally
                 }
                 return new ARGBInt32ImageData(data, resultPixelData);
             }
@@ -216,14 +207,6 @@ public class GammaCorrectionFilter extends AbstractFilter implements StandardFil
             ShaderFactory.bindEnvVars(gl, GL2.GL_FRAGMENT_PROGRAM_ARB, this.gammaParamRef, gammaParamFloat);
         }
 
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public GLShaderBuilder buildFragmentShader(GLShaderBuilder shaderBuilder) {
-        return shaderBuilder;
     }
 
     /**

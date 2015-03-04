@@ -409,12 +409,7 @@ public class GLShaderBuilder {
         GLFragmentShaderView fragmentView = view.getAdapter(GLFragmentShaderView.class);
         if (fragmentView != null) {
             // create new shader builder
-            GLShaderBuilder newShaderBuilder = new GLShaderBuilder(gl, GL2.GL_FRAGMENT_PROGRAM_ARB);
             // fill with standard values
-            GLMinimalFragmentShaderProgram minimalProgram = new GLMinimalFragmentShaderProgram();
-            minimalProgram.build(newShaderBuilder);
-            // fill with other filters and compile
-            fragmentView.buildFragmentShader(newShaderBuilder).compile();
         }
 
         GLVertexShaderView vertexView = view.getAdapter(GLVertexShaderView.class);
