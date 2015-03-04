@@ -89,7 +89,7 @@ public class PluginContainer implements Container {
      * {@inheritDoc}
      */
     public void changeSettings() {
-        PluginSettings.getSingeltonInstance().pluginSettingsToXML(this);
+        PluginSettings.getSingletonInstance().pluginSettingsToXML(this);
     }
 
     /**

@@ -67,14 +67,14 @@ public class FilterPluginDialog extends AbstractPluginDialog {
     private void initData() {
 
         // show activated filter in corresponding list
-        AbstractList<FilterContainer> activatedFilters = PluginManager.getSingeltonInstance().getFilterContainers(true);
+        AbstractList<FilterContainer> activatedFilters = PluginManager.getSingletonInstance().getFilterContainers(true);
 
         for (FilterContainer container : activatedFilters) {
             activatedPluginsListModel.addElement(container);
         }
 
         // show available filter in corresponding list
-        AbstractList<FilterContainer> availableFilters = PluginManager.getSingeltonInstance().getFilterContainers(false);
+        AbstractList<FilterContainer> availableFilters = PluginManager.getSingletonInstance().getFilterContainers(false);
 
         for (FilterContainer container : availableFilters)
             availablePluginsListModel.addElement(container);

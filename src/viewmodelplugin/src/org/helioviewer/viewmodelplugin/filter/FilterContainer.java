@@ -65,7 +65,7 @@ public abstract class FilterContainer implements Container {
      * {@link org.helioviewer.viewmodelplugin.controller.PluginManager}.
      */
     private void saveFilterSettings() {
-        PluginSettings.getSingeltonInstance().filterSettingsToXML(pluginLocation, this);
+        PluginSettings.getSingletonInstance().filterSettingsToXML(pluginLocation, this);
     }
 
     /**

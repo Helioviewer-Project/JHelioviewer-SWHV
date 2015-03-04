@@ -36,7 +36,7 @@ public class PluginManager {
 
     private static PluginManager singeltonInstance = new PluginManager();
 
-    private PluginSettings pluginSettings = PluginSettings.getSingeltonInstance();
+    private PluginSettings pluginSettings = PluginSettings.getSingletonInstance();
     private Map<Plugin, PluginContainer> plugins = new HashMap<Plugin, PluginContainer>();
     private AbstractList<FilterContainer> pluginFilters = new LinkedList<FilterContainer>();
     private AbstractList<OverlayContainer> pluginOverlays = new LinkedList<OverlayContainer>();
@@ -56,7 +56,7 @@ public class PluginManager {
      * 
      * @return the only instance of this class.
      * */
-    public static PluginManager getSingeltonInstance() {
+    public static PluginManager getSingletonInstance() {
         return singeltonInstance;
     }
 
@@ -430,7 +430,7 @@ public class PluginManager {
         try {
             PluginContainer pluginContainer = new PluginContainer(classLoader, plugin, new URI("internal"), true);
             plugins.put(plugin, pluginContainer);
-            PluginSettings.getSingeltonInstance().pluginSettingsToXML(pluginContainer);
+            PluginSettings.getSingletonInstance().pluginSettingsToXML(pluginContainer);
             plugin.installPlugin();
         } catch (URISyntaxException e) {
             e.printStackTrace();
@@ -476,7 +476,7 @@ public class PluginManager {
         }
 
         // remove plug-in
-        PluginManager.getSingeltonInstance().removePluginContainer(container);
+        PluginManager.getSingletonInstance().removePluginContainer(container);
 
         // delete corresponding JAR file
         final File file = new File(container.getPluginLocation());

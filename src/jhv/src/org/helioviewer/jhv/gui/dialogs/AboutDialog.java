@@ -96,7 +96,7 @@ public final class AboutDialog extends JDialog implements ActionListener, Showab
 
         "<p>This software uses the <a href=\"http://www.davekoelle.com/alphanum.html\">Alphanum Algorithm</a>, licensed under the LGPLv2.1.<br> Its source code can be downloaded <a href=\"http://jhelioviewer.org/libjhv/external/AlphanumComparator.java\">here</a>.<br>";
 
-        for (PluginContainer pluginContainer : PluginManager.getSingeltonInstance().getAllPlugins()) {
+        for (PluginContainer pluginContainer : PluginManager.getSingletonInstance().getAllPlugins()) {
             Plugin plugin = pluginContainer.getPlugin();
             if (!(plugin instanceof InternalPlugin)) {
                 String pluginName = plugin.getName();

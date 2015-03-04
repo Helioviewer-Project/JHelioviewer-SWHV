@@ -326,15 +326,15 @@ public class JavaHelioViewer {
 
         // Load Plug ins at the very last point
         Log.info("Load plugin settings");
-        PluginManager.getSingeltonInstance().loadSettings(JHVDirectory.PLUGINS.getPath());
+        PluginManager.getSingletonInstance().loadSettings(JHVDirectory.PLUGINS.getPath());
 
         Log.info("Add internal plugin: " + "FilterPlugin");
         Plugin internalPlugin = new InternalFilterPlugin();
-        PluginManager.getSingeltonInstance().addInternalPlugin(internalPlugin.getClass().getClassLoader(), internalPlugin);
+        PluginManager.getSingletonInstance().addInternalPlugin(internalPlugin.getClass().getClassLoader(), internalPlugin);
 
         if (builtinPlugins != null) {
             for (int i = 0; i < builtinPlugins.length; ++i) {
-                PluginManager.getSingeltonInstance().addPlugin(builtinPlugins[i].getClass().getClassLoader(), builtinPlugins[i], null);
+                PluginManager.getSingletonInstance().addPlugin(builtinPlugins[i].getClass().getClassLoader(), builtinPlugins[i], null);
             }
         }
 
@@ -356,7 +356,7 @@ public class JavaHelioViewer {
 
         try {
             Log.info("Search for plugins in " + JHVDirectory.PLUGINS.getPath());
-            PluginManager.getSingeltonInstance().searchForPlugins(JHVDirectory.PLUGINS.getFile(), true, deactivedPlugins);
+            PluginManager.getSingletonInstance().searchForPlugins(JHVDirectory.PLUGINS.getFile(), true, deactivedPlugins);
         } catch (IOException e) {
             String title = "An error occured while loading the plugin files. At least one plugin file is corrupt!";
             String message = "The following files are affected:\n" + e.getMessage();

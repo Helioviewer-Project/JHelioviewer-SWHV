@@ -229,7 +229,7 @@ public class PluginListEntry extends AbstractListEntry implements MouseListener,
      */
     private void deletePlugin() {
         if (JOptionPane.showConfirmDialog(this, "Are you sure to delete the selected plug-in permanently from your system?", "Confirmation", JOptionPane.YES_NO_OPTION) == JOptionPane.YES_OPTION) {
-            if (!PluginManager.getSingeltonInstance().deletePlugin(plugin, new File(JHVDirectory.PLUGINS.getPath() + JHVGlobals.TEMP_FILENAME_DELETE_PLUGIN_FILES))) {
+            if (!PluginManager.getSingletonInstance().deletePlugin(plugin, new File(JHVDirectory.PLUGINS.getPath() + JHVGlobals.TEMP_FILENAME_DELETE_PLUGIN_FILES))) {
                 Message.err("An error occured while deleting the plugin file!", "Please check manually!", false);
             }
 

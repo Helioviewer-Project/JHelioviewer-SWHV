@@ -46,9 +46,9 @@ public abstract class FilterPlugin implements Plugin {
      */
     public void installPlugin() {
         for (FilterContainer filter : filterContainerList) {
-            filter.setActive(PluginSettings.getSingeltonInstance().isFilterInPluginActivated(pluginLocation, filter.getFilterClass(), false));
-            filter.setPosition(PluginSettings.getSingeltonInstance().getFilterPosition(pluginLocation, filter.getFilterClass()));
-            PluginManager.getSingeltonInstance().addFilterContainer(filter);
+            filter.setActive(PluginSettings.getSingletonInstance().isFilterInPluginActivated(pluginLocation, filter.getFilterClass(), false));
+            filter.setPosition(PluginSettings.getSingletonInstance().getFilterPosition(pluginLocation, filter.getFilterClass()));
+            PluginManager.getSingletonInstance().addFilterContainer(filter);
         }
     }
 
@@ -61,7 +61,7 @@ public abstract class FilterPlugin implements Plugin {
     public void uninstallPlugin() {
 
         for (FilterContainer filter : filterContainerList) {
-            PluginManager.getSingeltonInstance().removeFilterContainer(filter);
+            PluginManager.getSingletonInstance().removeFilterContainer(filter);
         }
     }
 

@@ -84,7 +84,7 @@ public class PluginSettings {
      * 
      * @return the only instance of this class.
      * */
-    public static PluginSettings getSingeltonInstance() {
+    public static PluginSettings getSingletonInstance() {
         return singeltonInstance;
     }
 

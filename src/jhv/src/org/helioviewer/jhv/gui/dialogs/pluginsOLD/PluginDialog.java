@@ -79,7 +79,7 @@ public class PluginDialog extends AbstractPluginDialog implements ListSelectionL
     private void displayData() {
         // show activated plug-ins in corresponding list
         activatedPluginsListModel.clear();
-        AbstractList<PluginContainer> activatedPlugins = PluginManager.getSingeltonInstance().getPlugins(true);
+        AbstractList<PluginContainer> activatedPlugins = PluginManager.getSingletonInstance().getPlugins(true);
 
         for (PluginContainer container : activatedPlugins) {
             if (!(container.getPlugin() instanceof InternalPlugin)) {
@@ -89,7 +89,7 @@ public class PluginDialog extends AbstractPluginDialog implements ListSelectionL
 
         // show available plug-ins in corresponding list
         availablePluginsListModel.clear();
-        AbstractList<PluginContainer> availablePlugins = PluginManager.getSingeltonInstance().getPlugins(false);
+        AbstractList<PluginContainer> availablePlugins = PluginManager.getSingletonInstance().getPlugins(false);
 
         for (PluginContainer container : availablePlugins) {
             if (!(container.getPlugin() instanceof InternalPlugin)) {
@@ -134,7 +134,7 @@ public class PluginDialog extends AbstractPluginDialog implements ListSelectionL
                     }
                     setChanged(true);
 
-                    if (!PluginManager.getSingeltonInstance().loadPlugin(dstFile.toURI())) {
+                    if (!PluginManager.getSingletonInstance().loadPlugin(dstFile.toURI())) {
                         Message.err("An error occured while loading the plugin.", "The plugin file is corrupt!", false);
                         return;
                     }
@@ -156,7 +156,7 @@ public class PluginDialog extends AbstractPluginDialog implements ListSelectionL
 
             if (selected != null && selected instanceof PluginContainer) {
                 final URI pluginLocation = ((PluginContainer) selected).getPluginLocation();
-                PluginManager.getSingeltonInstance().removePluginContainer((PluginContainer) selected);
+                PluginManager.getSingletonInstance().removePluginContainer((PluginContainer) selected);
                 availablePluginsListModel.removeElement(selected);
 
                 final File file = new File(pluginLocation);

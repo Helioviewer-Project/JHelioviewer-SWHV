@@ -46,9 +46,9 @@ public abstract class OverlayPlugin implements Plugin {
      */
     public void installPlugin() {
         for (OverlayContainer overlay : overlayContainerList) {
-            overlay.setActive(PluginSettings.getSingeltonInstance().isOverlayInPluginActivated(pluginLocation, overlay.getOverlayClass(), false));
-            overlay.setPosition(PluginSettings.getSingeltonInstance().getOverlayPosition(pluginLocation, overlay.getOverlayClass()));
-            PluginManager.getSingeltonInstance().addOverlayContainer(overlay);
+            overlay.setActive(PluginSettings.getSingletonInstance().isOverlayInPluginActivated(pluginLocation, overlay.getOverlayClass(), false));
+            overlay.setPosition(PluginSettings.getSingletonInstance().getOverlayPosition(pluginLocation, overlay.getOverlayClass()));
+            PluginManager.getSingletonInstance().addOverlayContainer(overlay);
         }
     }
 
@@ -60,7 +60,7 @@ public abstract class OverlayPlugin implements Plugin {
      */
     public void uninstallPlugin() {
         for (OverlayContainer overlay : overlayContainerList) {
-            PluginManager.getSingeltonInstance().removeOverlayContainer(overlay);
+            PluginManager.getSingletonInstance().removeOverlayContainer(overlay);
         }
     }
 

@@ -270,7 +270,7 @@ public class SWEKSourceManager {
     private boolean prepareDownloadersClassLoader() {
         URL[] urls = jarURLList.toArray(new URL[0]);
         if (loadExternalJars) {
-            urlClassLoader = URLClassLoader.newInstance(urls, PluginManager.getSingeltonInstance().getPluginContainer(swekplugin)
+            urlClassLoader = URLClassLoader.newInstance(urls, PluginManager.getSingletonInstance().getPluginContainer(swekplugin)
                     .getClassLoader());
         } else {
             urlClassLoader = URLClassLoader.newInstance(urls, Thread.currentThread().getContextClassLoader());
