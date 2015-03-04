@@ -1,7 +1,6 @@
 package org.helioviewer.gl3d.scenegraph;
 
 import org.helioviewer.gl3d.scenegraph.GL3DDrawBits.Bit;
-import org.helioviewer.gl3d.scenegraph.rt.GL3DRay;
 
 /**
  * A {@link GL3DNode} is the base class for all nodes within the scene graph. It
@@ -35,8 +34,6 @@ public abstract class GL3DNode {
     public abstract void init(GL3DState state);
 
     public abstract void draw(GL3DState state);
-
-    public abstract boolean hit(GL3DRay ray);
 
     public abstract void update(GL3DState state);
 

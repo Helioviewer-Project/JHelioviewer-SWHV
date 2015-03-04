@@ -4,7 +4,6 @@ import org.helioviewer.gl3d.scenegraph.GL3DDrawBits.Bit;
 import org.helioviewer.gl3d.scenegraph.math.GL3DMat3d;
 import org.helioviewer.gl3d.scenegraph.math.GL3DMat4d;
 import org.helioviewer.gl3d.scenegraph.math.GL3DVec4d;
-import org.helioviewer.gl3d.scenegraph.rt.GL3DRay;
 
 /**
  * A {@link GL3DShape} is a {@link GL3DNode} that does have a position and a
@@ -106,27 +105,6 @@ public abstract class GL3DShape extends GL3DNode {
     }
 
     @Override
-    public boolean hit(GL3DRay ray) {
-        // if its hidden, it can't be hit
-        if (isDrawBitOn(Bit.Hidden)) {
-            return false;
-        }
-
-        // First check if bounding Box is hit
-        if (!this.aabb.isHitInWS(ray)) {
-            return false;
-        }
-        // Log.debug("GL3DShape.hit: AABB is Hit!");
-
-        // Transform ray to object space for non-groups
-        if (!getClass().isAssignableFrom(GL3DGroup.class)) {
-            ray.setOriginOS(this.wmI.multiply(ray.getOrigin()));
-            ray.setDirOS(this.wmI.mat3().multiply(ray.getDirection()));
-        }
-        return this.shapeHit(ray);
-    }
-
-    @Override
     public void delete(GL3DState state) {
         if (parent != null && (parent instanceof GL3DGroup)) {
             parent.removeNode(this);
@@ -136,8 +114,6 @@ public abstract class GL3DShape extends GL3DNode {
     }
 
     public abstract void shapeDelete(GL3DState state);
-
-    public abstract boolean shapeHit(GL3DRay ray);
 
     public abstract void shapeInit(GL3DState state);
 

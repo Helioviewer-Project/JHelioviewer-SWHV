@@ -9,15 +9,14 @@ import org.helioviewer.gl3d.scenegraph.GL3DMesh.GL3DMeshPrimitive;
 import org.helioviewer.gl3d.scenegraph.math.GL3DMat4d;
 import org.helioviewer.gl3d.scenegraph.math.GL3DVec3d;
 import org.helioviewer.gl3d.scenegraph.math.GL3DVec4d;
-import org.helioviewer.gl3d.scenegraph.rt.GL3DRay;
 
 /**
  * The axis aligned bounding box is used as an acceleration structure for
  * intersection tests with Graph nodes. The Box is built by using the maximal
  * coordinates in each dimensions
- * 
+ *
  * @author Simon Spoerri (simon.spoerri@fhnw.ch)
- * 
+ *
  */
 public class GL3DAABBox {
     GL3DVec3d minWS = new GL3DVec3d();
@@ -177,113 +176,6 @@ public class GL3DAABBox {
         this.vertexBuffer.disable(state);
         this.colorBuffer.disable(state);
         this.indexBuffer.disable(state);
-    }
-
-    public boolean isHitInOS(GL3DRay ray) {
-        GL3DVec3d[] params = { this.minOS, this.maxOS };
-        double tymin, tymax, tzmin, tzmax;
-        ray.setTmin((params[ray.getSignOS()[0]].x - ray.getOriginOS().x) * ray.getInvDirectionOS().x);
-        ray.setTmax((params[1 - ray.getSignOS()[0]].x - ray.getOriginOS().x) * ray.getInvDirectionOS().x);
-        tymin = (params[ray.getSignOS()[1]].y - ray.getOriginOS().y) * ray.getInvDirectionOS().y;
-        tymax = (params[1 - ray.getSignOS()[1]].y - ray.getOriginOS().y) * ray.getInvDirectionOS().y;
-
-        if ((ray.getTmin() > tymax) || (tymin > ray.getTmax()))
-            return false;
-        if (tymin > ray.getTmin())
-            ray.setTmin(tymin);
-        if (tymax < ray.getTmax())
-            ray.setTmax(tymax);
-
-        tzmin = (params[ray.getSignOS()[2]].z - ray.getOriginOS().z) * ray.getInvDirectionOS().z;
-        tzmax = (params[1 - ray.getSignOS()[2]].z - ray.getOriginOS().z) * ray.getInvDirectionOS().z;
-
-        if ((ray.getTmin() > tzmax) || (tzmin > ray.getTmax()))
-            return false;
-        if (tzmin > ray.getTmin())
-            ray.setTmin(tzmin);
-        if (tzmax < ray.getTmax())
-            ray.setTmax(tzmax);
-
-        return ((ray.getTmin() < ray.getLength()) && (ray.getTmax() > 0));
-    }
-
-    public boolean isHit(GL3DRay ray) {
-        double t0 = 0;
-        double t1 = Double.MAX_VALUE;
-
-        double invDir, tNear, tFar;
-
-        // X-Slab
-        invDir = 1 / ray.getDirection().x;
-        tNear = (minWS.x - ray.getOrigin().x) * invDir;
-        tFar = (maxWS.x - ray.getOrigin().x) * invDir;
-        if (tNear > tFar) {
-            double temp = tNear;
-            tNear = tFar;
-            tFar = temp;
-        }
-        t0 = tNear > t0 ? tNear : t0;
-        t1 = tFar > t1 ? tFar : t1;
-        if (t0 > t1)
-            return false;
-
-        // Y-Slab
-        invDir = 1 / ray.getDirection().y;
-        tNear = (minWS.y - ray.getOrigin().y) * invDir;
-        tFar = (maxWS.y - ray.getOrigin().y) * invDir;
-        if (tNear > tFar) {
-            double temp = tNear;
-            tNear = tFar;
-            tFar = temp;
-        }
-        t0 = tNear > t0 ? tNear : t0;
-        t1 = tFar > t1 ? tFar : t1;
-        if (t0 > t1)
-            return false;
-
-        // Z-Slab
-        invDir = 1 / ray.getDirection().z;
-        tNear = (minWS.z - ray.getOrigin().z) * invDir;
-        tFar = (maxWS.z - ray.getOrigin().z) * invDir;
-        if (tNear > tFar) {
-            double temp = tNear;
-            tNear = tFar;
-            tFar = temp;
-        }
-        t0 = tNear > t0 ? tNear : t0;
-        t1 = tFar > t1 ? tFar : t1;
-        if (t0 > t1)
-            return false;
-
-        return true;
-    }
-
-    public boolean isHitInWS(GL3DRay ray) {
-        GL3DVec3d[] params = { this.minWS, this.maxWS };
-        double tymin, tymax, tzmin, tzmax;
-        ray.setTmin((params[ray.getSign()[0]].x - ray.getOrigin().x) * ray.getInvDirection().x);
-        ray.setTmax((params[1 - ray.getSign()[0]].x - ray.getOrigin().x) * ray.getInvDirection().x);
-        tymin = (params[ray.getSign()[1]].y - ray.getOrigin().y) * ray.getInvDirection().y;
-        tymax = (params[1 - ray.getSign()[1]].y - ray.getOrigin().y) * ray.getInvDirection().y;
-
-        if ((ray.getTmin() > tymax) || (tymin > ray.getTmax()))
-            return false;
-        if (tymin > ray.getTmin())
-            ray.setTmin(tymin);
-        if (tymax < ray.getTmax())
-            ray.setTmax(tymax);
-
-        tzmin = (params[ray.getSign()[2]].z - ray.getOrigin().z) * ray.getInvDirection().z;
-        tzmax = (params[1 - ray.getSign()[2]].z - ray.getOrigin().z) * ray.getInvDirection().z;
-
-        if ((ray.getTmin() > tzmax) || (tzmin > ray.getTmax()))
-            return false;
-        if (tzmin > ray.getTmin())
-            ray.setTmin(tzmin);
-        if (tzmax < ray.getTmax())
-            ray.setTmax(tzmax);
-
-        return ((ray.getTmin() < ray.getLength()) && (ray.getTmax() > 0));
     }
 
     public void merge(GL3DAABBox bb) {

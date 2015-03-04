@@ -1,14 +1,11 @@
 package org.helioviewer.gl3d.camera;
 
-import java.awt.Point;
 import java.awt.event.MouseEvent;
 
 import javax.media.opengl.GL2;
 
 import org.helioviewer.gl3d.scenegraph.GL3DState;
 import org.helioviewer.gl3d.scenegraph.math.GL3DVec3d;
-import org.helioviewer.gl3d.scenegraph.rt.GL3DRay;
-import org.helioviewer.gl3d.scenegraph.rt.GL3DRayTracer;
 import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.viewmodel.view.opengl.GL3DSceneGraphView;
 
@@ -24,7 +21,6 @@ import org.helioviewer.viewmodel.view.opengl.GL3DSceneGraphView;
  *
  */
 public class GL3DZoomBoxInteraction extends GL3DDefaultInteraction {
-    private GL3DRayTracer rayTracer;
     private GL3DVec3d zoomBoxStartPoint;
     private GL3DVec3d zoomBoxEndPoint;
 
@@ -80,12 +76,12 @@ public class GL3DZoomBoxInteraction extends GL3DDefaultInteraction {
 
     @Override
     public void mousePressed(MouseEvent e, GL3DCamera camera) {
-        this.zoomBoxStartPoint = getHitPoint(e.getPoint());
+        this.zoomBoxStartPoint = camera.getVectorFromSphere(e.getPoint());
     }
 
     @Override
     public void mouseDragged(MouseEvent e, GL3DCamera camera) {
-        this.zoomBoxEndPoint = getHitPoint(e.getPoint());
+        this.zoomBoxEndPoint = camera.getVectorFromSphere(e.getPoint());
         Displayer.getSingletonInstance().display();
     }
 
@@ -104,10 +100,4 @@ public class GL3DZoomBoxInteraction extends GL3DDefaultInteraction {
         return this.zoomBoxEndPoint != null && this.zoomBoxStartPoint != null;
     }
 
-    protected GL3DVec3d getHitPoint(Point p) {
-        this.rayTracer = new GL3DRayTracer(sceneGraphView.getHitReferenceShape(), this.camera);
-        GL3DRay ray = this.rayTracer.cast(p.x, p.y);
-        GL3DVec3d hitPoint = ray.getHitPoint();
-        return hitPoint;
-    }
 }

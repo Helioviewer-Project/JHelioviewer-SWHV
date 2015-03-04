@@ -4,7 +4,6 @@ import java.awt.event.MouseEvent;
 
 import org.helioviewer.gl3d.scenegraph.math.GL3DQuatd;
 import org.helioviewer.gl3d.scenegraph.math.GL3DVec3d;
-import org.helioviewer.gl3d.scenegraph.rt.GL3DRayTracer;
 import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.viewmodel.view.opengl.GL3DSceneGraphView;
 

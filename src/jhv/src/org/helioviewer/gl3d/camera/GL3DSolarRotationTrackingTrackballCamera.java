@@ -3,7 +3,6 @@ package org.helioviewer.gl3d.camera;
 import org.helioviewer.base.physics.Constants;
 import org.helioviewer.gl3d.scenegraph.GL3DState;
 import org.helioviewer.gl3d.scenegraph.math.GL3DMat4d;
-import org.helioviewer.gl3d.scenegraph.rt.GL3DRay;
 import org.helioviewer.viewmodel.view.opengl.GL3DSceneGraphView;
 
 /**
@@ -16,8 +15,6 @@ import org.helioviewer.viewmodel.view.opengl.GL3DSceneGraphView;
  */
 public class GL3DSolarRotationTrackingTrackballCamera extends GL3DCamera {
     public static final double DEFAULT_CAMERA_DISTANCE = Constants.SunMeanDistanceToEarth / Constants.SunRadiusInMeter;
-
-    private GL3DRay lastMouseRay;
 
     private final GL3DTrackballRotationInteraction rotationInteraction;
     private final GL3DPanInteraction panInteraction;
@@ -75,10 +72,6 @@ public class GL3DSolarRotationTrackingTrackballCamera extends GL3DCamera {
     @Override
     public GL3DInteraction getZoomInteraction() {
         return this.zoomBoxInteraction;
-    }
-
-    public GL3DRay getLastMouseRay() {
-        return lastMouseRay;
     }
 
     @Override

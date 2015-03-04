@@ -5,7 +5,6 @@ import java.util.List;
 
 import org.helioviewer.gl3d.scenegraph.GL3DDrawBits.Bit;
 import org.helioviewer.gl3d.scenegraph.math.GL3DVec3d;
-import org.helioviewer.gl3d.scenegraph.rt.GL3DRay;
 import org.helioviewer.gl3d.scenegraph.visuals.GL3DPolyLine;
 
 /**
@@ -57,22 +56,6 @@ public class GL3DGroup extends GL3DShape {
         }
 
         nodesToAdd.clear();
-    }
-
-    @Override
-    public boolean shapeHit(GL3DRay ray) {
-        GL3DNode current = this.first;
-        boolean wasHit = false;
-        while (current != null) {
-            if (!(current == ray.getOriginShape())) {
-                if (current.hit(ray) && !wasHit) {
-                    wasHit = true;
-                    // Log.debug("GL3DGroup.shapeHit: Ray hit Group "+this);
-                }
-            }
-            current = current.next;
-        }
-        return wasHit;
     }
 
     @Override
