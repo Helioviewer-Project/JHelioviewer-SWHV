@@ -2,7 +2,6 @@ package org.helioviewer.viewmodel.factory;
 
 import org.helioviewer.viewmodel.view.ComponentView;
 import org.helioviewer.viewmodel.view.FilterView;
-import org.helioviewer.viewmodel.view.HelioviewerGeometryView;
 import org.helioviewer.viewmodel.view.LayeredView;
 import org.helioviewer.viewmodel.view.OverlayView;
 import org.helioviewer.viewmodel.view.StandardSolarRotationTrackingView;
@@ -10,7 +9,6 @@ import org.helioviewer.viewmodel.view.SynchronizeView;
 import org.helioviewer.viewmodel.view.View;
 import org.helioviewer.viewmodel.view.opengl.GL3DComponentView;
 import org.helioviewer.viewmodel.view.opengl.GLFilterView;
-import org.helioviewer.viewmodel.view.opengl.GLHelioviewerGeometryView;
 import org.helioviewer.viewmodel.view.opengl.GLLayeredView;
 import org.helioviewer.viewmodel.view.opengl.GLOverlayView;
 import org.helioviewer.viewmodel.view.opengl.GLSolarRotationTrackingView;
@@ -52,9 +50,6 @@ public class GLViewFactory extends StandardViewFactory {
             // SynchronizedView
         } else if (pattern.isAssignableFrom(SynchronizeView.class)) {
             return (T) new GLSynchronizeOverviewChainView();
-            // HelioviewerGeometryView
-        } else if (pattern.isAssignableFrom(HelioviewerGeometryView.class)) {
-            return (T) new GLHelioviewerGeometryView();
             // SolarRotationTrackingView
         } else if (pattern.isAssignableFrom(StandardSolarRotationTrackingView.class)) {
             return (T) new GLSolarRotationTrackingView();
@@ -84,9 +79,6 @@ public class GLViewFactory extends StandardViewFactory {
             // SynchronizedView
         } else if (source instanceof SynchronizeView) {
             return (T) new GLSynchronizeOverviewChainView();
-            // HelioviewerGeometryView
-        } else if (source instanceof HelioviewerGeometryView) {
-            return (T) new GLHelioviewerGeometryView();
             // SolarRotationTrackingView
         } else if (source instanceof StandardSolarRotationTrackingView) {
             return (T) new GLSolarRotationTrackingView();

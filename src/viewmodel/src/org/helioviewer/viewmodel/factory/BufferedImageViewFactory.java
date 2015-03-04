@@ -1,13 +1,11 @@
 package org.helioviewer.viewmodel.factory;
 
 import org.helioviewer.viewmodel.view.ComponentView;
-import org.helioviewer.viewmodel.view.HelioviewerGeometryView;
 import org.helioviewer.viewmodel.view.LayeredView;
 import org.helioviewer.viewmodel.view.OverlayView;
 import org.helioviewer.viewmodel.view.ScaleToViewportImageSizeView;
 import org.helioviewer.viewmodel.view.View;
 import org.helioviewer.viewmodel.view.bufferedimage.BufferedImageComponentView;
-import org.helioviewer.viewmodel.view.bufferedimage.BufferedImageHelioviewerGeometryView;
 import org.helioviewer.viewmodel.view.bufferedimage.BufferedImageLayeredView;
 import org.helioviewer.viewmodel.view.bufferedimage.BufferedImageOverlayView;
 import org.helioviewer.viewmodel.view.bufferedimage.BufferedImageScaleToViewportImageSizeView;
@@ -45,9 +43,6 @@ public class BufferedImageViewFactory extends StandardViewFactory {
             // ScaleToViewportImageSizeView
         } else if (pattern.isAssignableFrom(ScaleToViewportImageSizeView.class)) {
             return (T) new BufferedImageScaleToViewportImageSizeView();
-            // HelioviewerGeometryView
-        } else if (pattern.isAssignableFrom(HelioviewerGeometryView.class)) {
-            return (T) new BufferedImageHelioviewerGeometryView();
         } else {
             return super.createNewView(pattern);
         }
@@ -71,9 +66,6 @@ public class BufferedImageViewFactory extends StandardViewFactory {
             // ScaleToViewportImageSizeView
         } else if (source instanceof ScaleToViewportImageSizeView) {
             return (T) new BufferedImageScaleToViewportImageSizeView();
-            // HelioviewerGeometryView
-        } else if (source instanceof HelioviewerGeometryView) {
-            return (T) new BufferedImageHelioviewerGeometryView();
         } else {
             return createStandardViewFromSource(source);
         }
