@@ -18,23 +18,20 @@ outputStruct main(
     uniform float4 cutOffRadius : C6,
     uniform float4 outerCutOffRadius : C7,
     uniform float phi : C8,
-    uniform float theta : C9,
-    uniform float differencePhi : C10,
-    uniform float differenceTheta : C11)
+    uniform float theta : C9)
 {
     outputStruct OUT;
     OUT.color = tex2D(texunit0, texcoord0.xy);
 
-if(isdifference>0.24 && isdifference<0.27){
-    OUT.color.r = OUT.color.r - tex2D(differenceImage, texcoord0.xy).r;
-    OUT.color.r = clamp(OUT.color.r,-truncationValue,truncationValue)/truncationValue;
-    OUT.color.r = (OUT.color.r + 1.0f)/2.0f;
-} else
-if(isdifference>0.98 && isdifference<1.01){
-    OUT.color.r = OUT.color.r - tex2D(differenceImage, texcoord4.xy).r;
-    OUT.color.r = clamp(OUT.color.r,-truncationValue,truncationValue)/truncationValue;
-    OUT.color.r = (OUT.color.r + 1.0f)/2.0f;
-}
+    if(isdifference>0.24 && isdifference<0.27){
+        OUT.color.r = OUT.color.r - tex2D(differenceImage, texcoord0.xy).r;
+        OUT.color.r = clamp(OUT.color.r,-truncationValue,truncationValue)/truncationValue;
+        OUT.color.r = (OUT.color.r + 1.0f)/2.0f;
+    } else if(isdifference>0.98 && isdifference<1.01){
+        OUT.color.r = OUT.color.r - tex2D(differenceImage, texcoord4.xy).r;
+        OUT.color.r = clamp(OUT.color.r,-truncationValue,truncationValue)/truncationValue;
+        OUT.color.r = (OUT.color.r + 1.0f)/2.0f;
+    }
 
 
     float unsharpMaskingKernel[3][3] = {
@@ -65,16 +62,15 @@ if(isdifference>0.98 && isdifference<1.01){
 
     if(texcoord0.x<0.0||texcoord0.y<0.0||texcoord0.x>1.0||texcoord0.y>1.0) {discard;
     }
-float dotpos = dot(texcoord3.xyz, texcoord3.xyz);
+    float dotpos = dot(texcoord3.xyz, texcoord3.xyz);
     if(dotpos<cutOffRadius.x*cutOffRadius.x ||dotpos>outerCutOffRadius.x*outerCutOffRadius.x ){discard;}
-    if((texcoord3.z==0.0 && dotpos<0.99)){      discard;
-    }
-    float3x3 mat = float3x3( cos(phi), -sin(theta)*sin(phi), -cos(theta)*sin(phi), 0., cos(theta), -sin(theta), sin(phi), cos(phi)*sin(theta), cos(theta)*cos(phi));
+
+    float3x3 mat = float3x3( cos(phi), -sin(theta)*sin(phi), -cos(theta)*sin(phi), 
+                             0.,       cos(theta),           -sin(theta), 
+                             sin(phi), cos(phi)*sin(theta),  cos(theta)*cos(phi));
     float3 zaxisrot = mul(mat,float3(0.,0.,1.));
     float projectionn = dot(texcoord3.xyz,zaxisrot);
     if((texcoord3.z!=0.0 && projectionn<-0.0)){     discard;
     }
-
-
     return OUT;
 }

@@ -14,20 +14,20 @@ outputStruct main(
         uniform float contrast : C4,
         uniform sampler1D lut1 : TEXUNIT1,
         uniform float alpha : C5)
-{
+    {
         outputStruct OUT;
         OUT.color = tex2D(texunit0, texcoord0.xy);
 
-if(isdifference>0.24 && isdifference<0.27){
-        OUT.color.r = OUT.color.r - tex2D(differenceImage, texcoord0.xy).r;
-        OUT.color.r = clamp(OUT.color.r,-truncationValue,truncationValue)/truncationValue;
-        OUT.color.r = (OUT.color.r + 1.0f)/2.0f;
-} else
-if(isdifference>0.98 && isdifference<1.01){
-        OUT.color.r = OUT.color.r - tex2D(differenceImage, texcoord4.xy).r;
-        OUT.color.r = clamp(OUT.color.r,-truncationValue,truncationValue)/truncationValue;
-        OUT.color.r = (OUT.color.r + 1.0f)/2.0f;
-}
+        if(isdifference>0.24 && isdifference<0.27){
+                OUT.color.r = OUT.color.r - tex2D(differenceImage, texcoord0.xy).r;
+                OUT.color.r = clamp(OUT.color.r,-truncationValue,truncationValue)/truncationValue;
+                OUT.color.r = (OUT.color.r + 1.0f)/2.0f;
+        } else
+        if(isdifference>0.98 && isdifference<1.01){
+                OUT.color.r = OUT.color.r - tex2D(differenceImage, texcoord4.xy).r;
+                OUT.color.r = clamp(OUT.color.r,-truncationValue,truncationValue)/truncationValue;
+                OUT.color.r = (OUT.color.r + 1.0f)/2.0f;
+        }
 
 
         float unsharpMaskingKernel[3][3] = {
