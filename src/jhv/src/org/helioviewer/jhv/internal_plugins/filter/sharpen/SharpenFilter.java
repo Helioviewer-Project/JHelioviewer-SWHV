@@ -261,7 +261,7 @@ public class SharpenFilter extends AbstractFilter implements StandardFilter {
                 lastImageData = data;
 
                 return new SingleChannelByte8ImageData(data, resultPixelData);
-            // Single channel short image
+                // Single channel short image
             } else if (data.getImageTransport() instanceof Short16ImageTransport) {
                 short[] pixelData = ((Short16ImageTransport) data.getImageTransport()).getShort16PixelData();
 
@@ -281,7 +281,7 @@ public class SharpenFilter extends AbstractFilter implements StandardFilter {
                 lastImageData = data;
 
                 return new SingleChannelShortImageData(data, resultPixelData);
-            // (A)RGB image: Filter each channel separate
+                // (A)RGB image: Filter each channel separate
             } else if (data.getImageTransport() instanceof Int32ImageTransport) {
                 int[] pixelData = ((Int32ImageTransport) data.getImageTransport()).getInt32PixelData();
                 int[] resultPixelData = new int[pixelData.length];

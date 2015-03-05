@@ -27,8 +27,57 @@ public class ShaderFactory {
     public static final int outerCutOffRadiusRef = 7;
     public static final int phiParamRef = 8;
     public static final int thetaParamRef = 9;
-    public static final int differencePhiParamRef = 10;
-    public static final int differenceThetaParamRef = 11;
+
+    public static final double[] truncationValueFloat = new double[4];
+    public static final double[] isDifferenceValueFloat = new double[4];
+    public static final double[] sharpenParamFloat = new double[4];
+    public static final double[] gammaParamFloat = new double[4];
+    public static final double[] contrastParamFloat = new double[4];
+    public static final double[] alphaParamFloat = new double[4];
+    public static final double[] phiParamFloat = new double[4];
+    public static final double[] thetaParamFloat = new double[4];
+    public static final double[] cutOffRadiusFloat = new double[4];
+    public static final double[] outerCutOffRadiusFloat = new double[4];
+
+    public ShaderFactory() {
+    }
+
+    public static void setCutOffRadius(double cutOffRadius, double outerCutOffRadius) {
+        cutOffRadiusFloat[0] = cutOffRadius;
+        outerCutOffRadiusFloat[0] = outerCutOffRadius;
+
+    }
+
+    public static void changeAngles(double theta, double phi) {
+        thetaParamFloat[0] = theta;
+        phiParamFloat[0] = phi;
+    }
+
+    public static void setAlpha(float alpha) {
+        alphaParamFloat[0] = alpha;
+    }
+
+    public static void setContrast(float contrast) {
+        contrastParamFloat[0] = contrast;
+    }
+
+    public static void setGamma(float gamma) {
+        gammaParamFloat[0] = gamma;
+    }
+
+    public static void setFactors(float weighting, float pixelWidth, float pixelHeight, float span) {
+        sharpenParamFloat[0] = pixelWidth * span;
+        sharpenParamFloat[1] = pixelHeight * span;
+        sharpenParamFloat[2] = weighting;
+    }
+
+    public static void setIsDifference(float isDifference) {
+        isDifferenceValueFloat[0] = isDifference;
+    }
+
+    public static void setTruncationValue(float truncationValue) {
+        truncationValueFloat[0] = truncationValue;
+    }
 
     public static int getFragmentId() {
         if (StateController.getInstance().getCurrentState().getType() == ViewStateEnum.View3D) {
