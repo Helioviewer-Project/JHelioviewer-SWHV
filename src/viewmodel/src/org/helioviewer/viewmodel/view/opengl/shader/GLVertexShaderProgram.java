@@ -5,8 +5,6 @@ import java.util.Stack;
 import javax.media.opengl.GL;
 import javax.media.opengl.GL2;
 
-import org.helioviewer.jhv.shaderfactory.ShaderFactory;
-
 /**
  * Abstract class to build customized vertex shaders.
  *

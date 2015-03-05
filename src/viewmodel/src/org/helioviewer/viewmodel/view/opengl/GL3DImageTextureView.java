@@ -42,10 +42,6 @@ import org.helioviewer.viewmodel.viewport.Viewport;
  */
 public class GL3DImageTextureView extends AbstractGL3DView implements GL3DView {
 
-    public GL3DImageTextureView() {
-        super();
-    }
-
     private boolean recaptureRequested = true;
     private boolean regionChanged = true;
     private boolean forceUpdate = false;

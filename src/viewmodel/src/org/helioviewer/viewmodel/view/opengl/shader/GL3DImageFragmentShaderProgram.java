@@ -2,8 +2,6 @@ package org.helioviewer.viewmodel.view.opengl.shader;
 
 import javax.media.opengl.GL2;
 
-import org.helioviewer.jhv.shaderfactory.ShaderFactory;
-
 public class GL3DImageFragmentShaderProgram extends GLFragmentShaderProgram {
 
     private final int cutOffRadiusRef = 6;
@@ -19,10 +17,6 @@ public class GL3DImageFragmentShaderProgram extends GLFragmentShaderProgram {
     private final double[] differenceThetaParamFloat = new double[4];
     private final double[] cutOffRadiusFloat = new double[4];
     private final double[] outerCutOffRadiusFloat = new double[4];
-
-    public GL3DImageFragmentShaderProgram() {
-
-    }
 
     /**
      * Binds (= activates it) the shader, if it is not active so far.

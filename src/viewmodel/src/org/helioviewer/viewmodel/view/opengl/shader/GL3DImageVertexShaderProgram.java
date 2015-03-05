@@ -2,7 +2,6 @@ package org.helioviewer.viewmodel.view.opengl.shader;
 
 import javax.media.opengl.GL2;
 
-import org.helioviewer.jhv.shaderfactory.ShaderFactory;
 import org.helioviewer.viewmodel.view.opengl.shader.GLShaderBuilder;
 import org.helioviewer.viewmodel.view.opengl.shader.GLShaderBuilder.GLBuildShaderException;
 import org.helioviewer.viewmodel.view.opengl.shader.GLVertexShaderProgram;

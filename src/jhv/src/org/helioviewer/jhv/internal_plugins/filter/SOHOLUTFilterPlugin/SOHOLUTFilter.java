@@ -16,7 +16,6 @@ import org.helioviewer.viewmodel.imagetransport.Short16ImageTransport;
 import org.helioviewer.viewmodel.view.jp2view.JHVJP2View;
 import org.helioviewer.viewmodel.view.jp2view.JHVJPXView;
 import org.helioviewer.viewmodel.view.opengl.GLTextureHelper;
-import org.helioviewer.viewmodel.view.opengl.shader.GLSingleChannelLookupFragmentShaderProgram;
 import org.helioviewer.viewmodel.view.opengl.shader.ShaderFactory;
 
 /**
@@ -137,7 +136,6 @@ public class SOHOLUTFilter extends AbstractFilter implements FrameFilter, Standa
     // /////////////////////////
     // OPENGL //
     // /////////////////////////
-    private final GLSingleChannelLookupFragmentShaderProgram shader = new GLSingleChannelLookupFragmentShaderProgram();
     private final GLTextureHelper.GLTexture tex = new GLTextureHelper.GLTexture();
     private LUT lastLut = null;
     private boolean lastInverted = false;
