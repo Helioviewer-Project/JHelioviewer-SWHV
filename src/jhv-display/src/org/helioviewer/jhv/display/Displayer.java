@@ -17,7 +17,6 @@ public class Displayer implements JHVEventHighlightListener {
 
     private boolean displaying = false;
 
-    public static int screenScale = 1;
 
     public void addListener(final DisplayListener listener) {
         listeners.add(listener);

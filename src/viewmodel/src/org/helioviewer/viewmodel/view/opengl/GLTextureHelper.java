@@ -61,7 +61,6 @@ public class GLTextureHelper {
         }
     }
 
-
     private static void genTexture2D(GL2 gl, int texID, int internalFormat, int width, int height, int inputFormat, int inputType, Buffer buffer) {
         gl.glBindTexture(GL2.GL_TEXTURE_2D, texID);
         gl.glTexImage2D(GL2.GL_TEXTURE_2D, 0, internalFormat, width, height, 0, inputFormat, inputType, buffer);
@@ -402,23 +401,4 @@ public class GLTextureHelper {
         }
     }
 
-    private static int pixelHIFactorWidth = 1;
-
-    public static void setPixelHIFactorWidth(int i) {
-        pixelHIFactorWidth = i;
-    }
-
-    public static int getPixelHIFactorWidth() {
-        return pixelHIFactorWidth;
-    }
-
-    private static int pixelHIFactorHeight = 1;
-
-    public static void setPixelHIFactorHeight(int i) {
-        pixelHIFactorHeight = i;
-    }
-
-    public static int getPixelHIFactorHeight() {
-        return pixelHIFactorHeight;
-    }
 }

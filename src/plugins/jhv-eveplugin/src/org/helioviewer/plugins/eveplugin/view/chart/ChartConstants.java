@@ -9,7 +9,7 @@ import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 
 import org.helioviewer.base.FileUtils;
-import org.helioviewer.jhv.display.Displayer;
+import org.helioviewer.viewmodel.view.opengl.GLInfo;
 
 /**
  * @author Stephan Pagel
@@ -92,7 +92,7 @@ public class ChartConstants {
     private static int scale = -1;
 
     public static int getScreenfactor() {
-        return Displayer.screenScale;
+        return GLInfo.pixelScale[0];
     }
 
     private static Font font = new Font("SansSerif", Font.PLAIN, 10);

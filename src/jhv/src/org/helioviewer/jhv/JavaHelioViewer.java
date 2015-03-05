@@ -30,7 +30,6 @@ import org.helioviewer.jhv.resourceloader.ResourceLoader;
 import org.helioviewer.jhv.resourceloader.SystemProperties;
 import org.helioviewer.viewmodel.view.jp2view.JP2Image;
 import org.helioviewer.viewmodel.view.jp2view.kakadu.JHV_KduException;
-import org.helioviewer.viewmodel.view.opengl.GLInfo;
 import org.helioviewer.viewmodelplugin.controller.PluginManager;
 import org.helioviewer.viewmodelplugin.interfaces.Plugin;
 
@@ -233,8 +232,7 @@ public class JavaHelioViewer {
         Log.info("Try to install CG Compiler");
         if (null == ResourceLoader.getSingletonInstance().loadResource("cgc", libsRemote, libs, libs, libsBackup, System.getProperties())) {
             Log.error("Could not install CG Compiler");
-            Message.err("Error installing CG Compiler", "The CG Compiler could not be installed. JHelioviewer will run in software mode.", false);
-            GLInfo.glUnusable();
+            Message.err("Error installing CG Compiler", "The CG Compiler could not be installed. JHelioviewer will not work.", false);
         } else {
             Log.info("Successfully installed CG Compiler");
         }
@@ -263,7 +261,6 @@ public class JavaHelioViewer {
             Log.info("Successfully installed MP4Box tool");
         }
 
-
         // Check for updates in parallel, if newer version is available a small
         // message is displayed
         try {
@@ -273,8 +270,6 @@ public class JavaHelioViewer {
             // Should never happen
             Log.error("Error retrieving internal update URL", e);
         }
-
-        splash.initializeGLInitPanel();
 
         splash.setProgressText("Start main window...");
         splash.nextStep();
@@ -287,7 +282,7 @@ public class JavaHelioViewer {
                 public void run() {
                     ImageViewerGui.getSingletonInstance().prepareGui();
                     ImageViewerGui.getSingletonInstance().updateComponents();
-                    ImageViewerGui.getSingletonInstance().createViewchains();
+                    // ImageViewerGui.getSingletonInstance().createViewchains();
 
                     LayerTableOverlapWatcher overlapWatcher = new LayerTableOverlapWatcher();
                     LayersModel.getSingletonInstance().addLayersListener(overlapWatcher);
@@ -368,6 +363,18 @@ public class JavaHelioViewer {
             String message = "The following files are affected:\n" + e.getMessage();
             Log.error(title + " " + message, e);
             Message.warn(title, message);
+        }
+
+        // PFSS & SWHEK-3D plugins don't like to be loaded after view chain creation, TBD
+        try {
+            EventQueue.invokeAndWait(new Runnable() {
+                @Override
+                public void run() {
+                    ImageViewerGui.getSingletonInstance().createViewchains();
+                }
+            });
+        } catch (Exception ex) {
+            ex.printStackTrace();
         }
 
     }

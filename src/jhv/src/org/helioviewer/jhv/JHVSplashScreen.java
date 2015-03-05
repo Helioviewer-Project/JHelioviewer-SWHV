@@ -5,8 +5,6 @@ import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.image.BufferedImage;
 
-import javax.media.opengl.GLCapabilities;
-import javax.media.opengl.GLProfile;
 import javax.swing.BoxLayout;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -21,9 +19,7 @@ import org.helioviewer.jhv.gui.IconBank;
 import org.helioviewer.jhv.gui.IconBank.JHVIcon;
 import org.helioviewer.jhv.gui.components.StatusPanel;
 import org.helioviewer.jhv.gui.components.StatusPanel.StatusTextListener;
-import org.helioviewer.jhv.opengl.GLInitPanel;
 import org.helioviewer.viewmodel.view.opengl.GLInfo;
-
 
 /**
  * Represents the splash screen which will be displayed when program is
@@ -107,51 +103,6 @@ public class JHVSplashScreen extends JFrame implements StatusTextListener {
 
         add(imagePanel);
         add(progressBar);
-    }
-
-    /**
-     * Adds a OpenGL component to the form to get information about the OpenGL
-     * version on the machine and creates the main view chain
-     * */
-    public void initializeGLInitPanel() {
-        imagePanel.setText("Starting OpenGL...");
-        nextStep();
-        StatusPanel.addStatusTextListener(this);
-        GLInitPanel ip = null;
-        if (GLInfo.glIsUsable()) {
-            try {
-                GLProfile profile = GLProfile.getDefault();
-                final GLCapabilities capabilities = new GLCapabilities(profile);
-                ip = new GLInitPanel(capabilities);
-
-                JLabel label = new JLabel("sdfsdfsdf");
-                label.setMinimumSize(new Dimension(1, 1));
-                label.setPreferredSize(new Dimension(1, 1));
-
-                add(ip);
-                this.pack();
-                while (ip == null || !ip.isInit) {
-                    Thread.sleep(10);
-                }
-                remove(ip);
-            } catch (Throwable t) {
-                Log.error("Could not load OpenGL", t);
-                GLInfo.glUnusable();
-            }
-        }
-
-        while (!ip.isDisposed) {
-            try {
-                Thread.sleep(10);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-        }
-
-        if (!GLInfo.glIsUsable()) {
-            Message.err("Could not initialize OpenGL", "OpenGL could not be initialized properly during startup. JHelioviewer will start in Software Mode. For detailed information please read the log output. ", false);
-        }
-        validate();
     }
 
     /**

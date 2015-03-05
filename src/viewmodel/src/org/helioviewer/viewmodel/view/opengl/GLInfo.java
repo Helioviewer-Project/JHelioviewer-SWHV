@@ -4,9 +4,10 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import javax.media.opengl.GL2;
+import javax.media.opengl.awt.GLCanvas;
 
 import org.helioviewer.base.logging.Log;
-import org.helioviewer.jhv.gui.ImageViewerGui;
+import org.helioviewer.jhv.JHVDirectory;
 import org.helioviewer.viewmodel.view.jp2view.J2KRenderGlobalOptions;
 
 /**
@@ -18,6 +19,18 @@ import org.helioviewer.viewmodel.view.jp2view.J2KRenderGlobalOptions;
  */
 public class GLInfo {
 
+/*
+        TBD
+
+        - pixel scale at startup
+        - fix render mode status
+
+        if (!GLInfo.glIsUsable()) {
+            Message.err("Could not initialize OpenGL", "OpenGL could not be initialized properly during startup.
+            JHelioviewer will start in Software Mode. For detailed information please read the log output. ", false);
+        }
+*/
+
     // data
     private static boolean glUsable = true;
     private static boolean glActivated = true;
@@ -28,6 +41,11 @@ public class GLInfo {
     public static int maxTexUnits;
     public static int maxConstantRegisters;
     public static int maxVertexAttributes;
+    public static int maxTextureIndirections;
+
+    public static String shaderTmpPath;
+
+    public static int[] pixelScale = new int[] {1,1};
 
     /**
      * Updates the OpenGL settings by reading the OpenGL properties.
@@ -38,12 +56,14 @@ public class GLInfo {
      *            Valid reference to the current gl object
      * @see #setGlEnabled(boolean)
      */
-    public static void update(GL2 gl) {
+    public static void update(GLCanvas canvas) {
+        final GL2 gl = canvas.getGL().getGL2();
+
         version = gl.glGetString(GL2.GL_VERSION);
-        Log.debug(">> GLInfo.update(GL) > Version string: " + version);
+        Log.debug(">> GLInfo > Version string: " + version);
         Matcher versionMatcher = Pattern.compile("\\d+(\\.(\\d+))*").matcher(version);
         if (!versionMatcher.find()) {
-            Log.error(">> GLInfo.update(GL) > Could not strip version from version string. Display complete version in status bar");
+            Log.error(">> GLInfo > Could not strip version from version string. Display complete version in status bar");
         } else {
             version = versionMatcher.group();
         }
@@ -65,7 +85,9 @@ public class GLInfo {
         if (!gl.isExtensionAvailable("GL_ARB_fragment_program")) {
             Log.error(">> GLInfo.update(GL) > GL_ARB_fragment_program extension not supported. JHelioviewer will run in software mode.");
             glUsable = false;
-        } else {
+        }
+
+        if (glUsable == true) {
             int[] out = new int[1];
 
             gl.glGetProgramivARB(GL2.GL_VERTEX_PROGRAM_ARB, GL2.GL_MAX_PROGRAM_INSTRUCTIONS_ARB, out, 0);
@@ -98,77 +120,23 @@ public class GLInfo {
             gl.glGetIntegerv(GL2.GL_MAX_VERTEX_ATTRIBS_ARB, out, 0);
             maxVertexAttributes = out[0];
             Log.debug(">> GLInfo > max vertex attributes arb: " + out[0]);
+
+            out[0] = 0;
+            gl.glGetProgramivARB(GL2.GL_FRAGMENT_PROGRAM_ARB, GL2.GL_MAX_PROGRAM_TEX_INDIRECTIONS_ARB, out, 0);
+            maxTextureIndirections = out[0];
+            Log.debug(">> GLInfo > max texture indirections: " + out[0]);
+
+            shaderTmpPath = JHVDirectory.TEMP.getPath();
+            Log.debug(">> GLInfo > shader temp path: " + shaderTmpPath);
+
+            pixelScale = canvas.getCurrentSurfaceScale(pixelScale);
+
+            J2KRenderGlobalOptions.setDoubleBufferingOption(true);
         }
-
-        if (!glUsable && glActivated)
-            glActivated = false;
-
-        J2KRenderGlobalOptions.setDoubleBufferingOption(glActivated);
-
-        Log.debug(">> GLInfo.update(GL) > GL usable: " + glUsable + " - GL activated: " + glActivated);
-        glInitiated = true;
     }
 
-    /**
-     * Returns, whether OpenGL is activated.
-     * 
-     * OpenGL can be deactivated for two reasons: The machine satisfies the
-     * minimal requirements of the user switched it of manually.
-     * 
-     * @return true, if OpenGL is activated, false otherwise
-     * @see #setGlEnabled(boolean)
-     */
     public static boolean glIsEnabled() {
-        return glActivated;
-    }
-
-    /**
-     * Returns, whether OpenGL is usable.
-     * 
-     * OpenGL may not be usable if the machine does not satisfy the minimal
-     * requirements.
-     * 
-     * @return true, if OpenGL is usable, false otherwise
-     * @see #glIsUsable
-     */
-    public static boolean glIsUsable() {
-        return glUsable;
-    }
-
-    /**
-     * Sets openGL unusable after reporting some error
-     * 
-     * @see #glIsUsable
-     */
-    public static void glUnusable() {
-        glUsable = false;
-        setGlEnabled(false);
-    }
-
-    /**
-     * Manually switches OpenGL on or off.
-     * 
-     * If the machine does not satisfy the minimal requirements for using
-     * OpenGL, this functions does nothing.
-     * 
-     * @param enabled
-     *            true to use OpenGL, false otherwise
-     */
-    public static void setGlEnabled(boolean enabled) {
-        boolean before = glActivated;
-
-        if (glUsable) {
-            glActivated = enabled;
-        } else {
-            glActivated = false;
-        }
-        J2KRenderGlobalOptions.setDoubleBufferingOption(glActivated);
-
-        if (before != glActivated && (!glActivated || glInitiated)) {
-            if (ImageViewerGui.getSingletonInstance().viewchainCreated()) {
-                ImageViewerGui.getSingletonInstance().createViewchains();
-            }
-        }
+        return true;
     }
 
     /**

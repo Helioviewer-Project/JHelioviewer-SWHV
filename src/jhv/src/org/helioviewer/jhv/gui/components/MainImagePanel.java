@@ -27,8 +27,8 @@ import org.helioviewer.viewmodel.view.View;
 import org.helioviewer.viewmodel.view.ViewHelper;
 import org.helioviewer.viewmodel.view.ViewListener;
 
+import org.helioviewer.viewmodel.view.opengl.GLInfo;
 import org.helioviewer.viewmodel.view.opengl.GLSharedDrawable;
-import org.helioviewer.viewmodel.view.opengl.GLTextureHelper;
 
 /**
  * This class represents an image component that is used to display the image of
@@ -261,7 +261,7 @@ public class MainImagePanel extends BasicImagePanel implements ViewListener {
         @Override
         public void render(ScreenRenderGraphics g) {
             if (image != null) {
-                g.drawImage(image, (GLTextureHelper.getPixelHIFactorWidth() * size.width - image.getWidth()) / 2, (GLTextureHelper.getPixelHIFactorHeight() * size.height - image.getHeight()) / 2);
+                g.drawImage(image, (GLInfo.pixelScale[0] * size.width - image.getWidth()) / 2, (GLInfo.pixelScale[1] * size.height - image.getHeight()) / 2);
             }
         }
     }
@@ -409,8 +409,8 @@ public class MainImagePanel extends BasicImagePanel implements ViewListener {
          */
         @Override
         public void render(ScreenRenderGraphics g) {
-            int wf = GLTextureHelper.getPixelHIFactorWidth();
-            int hf = GLTextureHelper.getPixelHIFactorHeight();
+            int wf = GLInfo.pixelScale[0];
+            int hf = GLInfo.pixelScale[1];
 
             if (image != null) {
                 g.drawImage(image, wf * position.x - (radiusPearl - offsetX) * (wf - 1), hf * position.y - (radiusPearl - offsetY) * (hf - 1));

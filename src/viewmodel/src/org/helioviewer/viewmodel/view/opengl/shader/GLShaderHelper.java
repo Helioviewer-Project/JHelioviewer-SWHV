@@ -18,6 +18,7 @@ import javax.media.opengl.glu.GLU;
 import org.apache.log4j.Level;
 import org.helioviewer.base.FileUtils;
 import org.helioviewer.base.logging.Log;
+import org.helioviewer.viewmodel.view.opengl.GLInfo;
 
 /**
  * Helper class to handle OpenGL shaders.
@@ -34,42 +35,8 @@ import org.helioviewer.base.logging.Log;
  */
 public class GLShaderHelper {
 
-    private static String tmpPath;
-
-    private static int maxTextureIndirections = 0;
-
     private static LinkedList<Integer> allShaders = new LinkedList<Integer>();
     private static int shaderCurrentlyBound = 0;
-
-    /**
-     * Initializes the helper.
-     *
-     * This function has to be called before using any other helper function.
-     *
-     * @param _tmpPath
-     *            Location where to put temporary files.
-     */
-    public static void initHelper(GL2 gl, String _tmpPath) {
-        Log.debug(">> GLShaderHelper.initHelper(GL2 gl, String _tmpPath) > Initialize helper functions");
-        tmpPath = _tmpPath;
-
-        Log.debug(">> GLShaderHelper.initHelper(GL2 gl, String _tmpPath) > temp path: " + tmpPath);
-        int tmp[] = new int[1];
-        gl.glGetProgramivARB(GL2.GL_FRAGMENT_PROGRAM_ARB, GL2.GL_MAX_PROGRAM_TEX_INDIRECTIONS_ARB, tmp, 0);
-        maxTextureIndirections = tmp[0];
-        Log.debug(">> GLShaderHelper.initHelper(GL2 gl, String _tmpPath) > max texture indirections: " + maxTextureIndirections);
-    }
-
-    /**
-     * Returns maximum number of texture indirections supported by OpenGL
-     * shaders.
-     *
-     * @return Maximum number of texture indirections supported by OpenGL
-     *         shaders
-     */
-    public static int getMaxTextureIndirections() {
-        return maxTextureIndirections;
-    }
 
     /**
      * Generates a new shader.
@@ -151,8 +118,8 @@ public class GLShaderHelper {
      *            Shader id to put the compiled program
      */
     public void compileProgram(GL2 gl, int programType, String source, int target) {
-        File tmpOut = new File(tmpPath + "tmp.cg");
-        File tmpIn = new File(tmpPath + "tmp.asm");
+        File tmpOut = new File(GLInfo.shaderTmpPath + "tmp.cg");
+        File tmpIn = new File(GLInfo.shaderTmpPath + "tmp.asm");
         if (tmpIn.exists()) {
             tmpIn.delete();
         }
@@ -166,8 +133,8 @@ public class GLShaderHelper {
         args.add("-profile");
         args.add(profile);
         args.add("-o");
-        args.add(tmpPath + "tmp.asm");
-        args.add(tmpPath + "tmp.cg");
+        args.add(GLInfo.shaderTmpPath + "tmp.asm");
+        args.add(GLInfo.shaderTmpPath + "tmp.cg");
 
         try {
             Process p = FileUtils.invokeExecutable("cgc", args);
@@ -178,7 +145,7 @@ public class GLShaderHelper {
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
-        tmpIn = new File(tmpPath + "tmp.asm");
+        tmpIn = new File(GLInfo.shaderTmpPath + "tmp.asm");
 
         if (!tmpIn.exists()) {
             Log.error("Error while compiling shader program:");
@@ -193,7 +160,6 @@ public class GLShaderHelper {
 
         CharBuffer programBuffer = CharBuffer.wrap(compiledProgram);
         gl.glProgramStringARB(programType, GL2.GL_PROGRAM_FORMAT_ASCII_ARB, compiledProgram.length(), programBuffer.toString());
-
     }
 
     /**
@@ -204,7 +170,6 @@ public class GLShaderHelper {
      * @return contents of the file
      */
     private String getContents(URL aFile) {
-
         StringBuilder contents = new StringBuilder();
 
         try {
@@ -234,7 +199,6 @@ public class GLShaderHelper {
      * @return contents of the file
      */
     private String getContents(File aFile) {
-
         StringBuilder contents = new StringBuilder();
 
         try {
