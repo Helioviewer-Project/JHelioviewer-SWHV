@@ -131,13 +131,4 @@ public class GuiState implements State {
         }
     }
 
-    @Override
-    public boolean isOverviewPanelInteractionEnabled() {
-        if (is3d) {
-            return false;
-        } else {
-            return true;
-        }
-    }
-
 }

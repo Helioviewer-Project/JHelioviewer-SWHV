@@ -91,7 +91,6 @@ public class ImageViewerGui {
     private static final ImageViewerGui singletonImageViewer = new ImageViewerGui();
 
     // private ComponentView mainComponentView;
-    // private ComponentView overviewComponentView;
 
     private static JFrame mainFrame;
     private JPanel contentPanel;
@@ -261,12 +260,8 @@ public class ImageViewerGui {
         thread.start();
     }
 
-    /*
-     * public boolean viewchainCreated() { return mainComponentView != null; }
-     */
-
     /**
-     * Initializes the main and overview view chain.
+     * Initializes the main view chain.
      */
     public void createViewchains() {
         this.activateState(StateController.getInstance().getCurrentState(), null);
