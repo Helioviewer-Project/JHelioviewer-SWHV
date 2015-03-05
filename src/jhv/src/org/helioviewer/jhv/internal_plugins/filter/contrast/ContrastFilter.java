@@ -13,6 +13,7 @@ import org.helioviewer.viewmodel.imagetransport.Byte8ImageTransport;
 import org.helioviewer.viewmodel.imagetransport.Int32ImageTransport;
 import org.helioviewer.viewmodel.imagetransport.Short16ImageTransport;
 import org.helioviewer.viewmodel.view.opengl.shader.GLFragmentShaderProgram;
+import org.helioviewer.viewmodel.view.opengl.shader.ShaderFactory;
 
 /**
  * Filter for enhancing the contrast of the image.
@@ -163,14 +164,14 @@ public class ContrastFilter extends AbstractFilter implements StandardFilter, GL
                 for (int i = 0; i < pixelData.length; i++) {
                     int rgb = pixelData[i];
                     int a = rgb >>> 24;
-                    int r = (rgb >>> 16) & 0xFF;
-                    int g = (rgb >>> 8) & 0xFF;
-                    int b = rgb & 0xff;
+                int r = (rgb >>> 16) & 0xFF;
+                int g = (rgb >>> 8) & 0xFF;
+                int b = rgb & 0xff;
 
-                r = contrastTable8[r] & 0xFF;
-                g = contrastTable8[g] & 0xFF;
-                b = contrastTable8[b] & 0xFF;
-                resultPixelData[i] = (a << 24) | (r << 16) | (g << 8) | b;
+                    r = contrastTable8[r] & 0xFF;
+                    g = contrastTable8[g] & 0xFF;
+                    b = contrastTable8[b] & 0xFF;
+                    resultPixelData[i] = (a << 24) | (r << 16) | (g << 8) | b;
                 }
                 return new ARGBInt32ImageData(data, resultPixelData);
             }
