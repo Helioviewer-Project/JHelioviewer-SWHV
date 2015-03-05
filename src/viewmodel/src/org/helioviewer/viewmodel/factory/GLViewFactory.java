@@ -5,14 +5,12 @@ import org.helioviewer.viewmodel.view.FilterView;
 import org.helioviewer.viewmodel.view.LayeredView;
 import org.helioviewer.viewmodel.view.OverlayView;
 import org.helioviewer.viewmodel.view.StandardSolarRotationTrackingView;
-import org.helioviewer.viewmodel.view.SynchronizeView;
 import org.helioviewer.viewmodel.view.View;
 import org.helioviewer.viewmodel.view.opengl.GL3DComponentView;
 import org.helioviewer.viewmodel.view.opengl.GLFilterView;
 import org.helioviewer.viewmodel.view.opengl.GLLayeredView;
 import org.helioviewer.viewmodel.view.opengl.GLOverlayView;
 import org.helioviewer.viewmodel.view.opengl.GLSolarRotationTrackingView;
-import org.helioviewer.viewmodel.view.opengl.GLSynchronizeOverviewChainView;
 
 /**
  * Implementation of interface ViewFactory for OpenGL views.
@@ -47,9 +45,6 @@ public class GLViewFactory extends StandardViewFactory {
             // FilterView
         } else if (pattern.isAssignableFrom(FilterView.class)) {
             return (T) new GLFilterView();
-            // SynchronizedView
-        } else if (pattern.isAssignableFrom(SynchronizeView.class)) {
-            return (T) new GLSynchronizeOverviewChainView();
             // SolarRotationTrackingView
         } else if (pattern.isAssignableFrom(StandardSolarRotationTrackingView.class)) {
             return (T) new GLSolarRotationTrackingView();
@@ -76,9 +71,6 @@ public class GLViewFactory extends StandardViewFactory {
             // FilterView
         } else if (source instanceof FilterView) {
             return (T) new GLFilterView();
-            // SynchronizedView
-        } else if (source instanceof SynchronizeView) {
-            return (T) new GLSynchronizeOverviewChainView();
             // SolarRotationTrackingView
         } else if (source instanceof StandardSolarRotationTrackingView) {
             return (T) new GLSolarRotationTrackingView();

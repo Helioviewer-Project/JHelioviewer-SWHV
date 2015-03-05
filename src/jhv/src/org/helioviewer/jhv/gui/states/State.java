@@ -48,8 +48,6 @@ public interface State {
 
     public ComponentView getMainComponentView();
 
-    public ComponentView getOverviewComponentView();
-
     public ImagePanelInputController getDefaultInputController();
 
     public TopToolBar getTopToolBar();

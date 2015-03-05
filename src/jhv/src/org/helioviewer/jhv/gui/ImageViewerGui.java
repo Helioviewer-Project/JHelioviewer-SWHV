@@ -35,7 +35,6 @@ import org.helioviewer.jhv.gui.components.MainContentPanel;
 import org.helioviewer.jhv.gui.components.MainImagePanel;
 import org.helioviewer.jhv.gui.components.MenuBar;
 import org.helioviewer.jhv.gui.components.MoviePanel;
-import org.helioviewer.jhv.gui.components.OverviewImagePanel;
 import org.helioviewer.jhv.gui.components.QualitySpinner;
 import org.helioviewer.jhv.gui.components.SideContentPane;
 import org.helioviewer.jhv.gui.components.StatusPanel;
@@ -102,15 +101,6 @@ public class ImageViewerGui {
     private MainContentPanel mainContentPanel;
     protected MainImagePanel mainImagePanel;
 
-    // private GL3DTopToolBar topToolBar;
-    // private JPanel mainImagePanel;
-    // private OverviewImagePanel overviewImagePanel;
-    // private SideContentPane leftPane;
-    // private ImageSelectorPanel imageSelectorPanel;
-    // private ControlPanelContainer moviePanelContainer;
-    // private ControlPanelContainer filterPanelContainer;
-
-    private OverviewImagePanel overviewImagePanel;
     private SideContentPane leftPane;
     private RenderModeStatusPanel renderModeStatus;
     private ImageSelectorPanel imageSelectorPanel;
@@ -120,8 +110,6 @@ public class ImageViewerGui {
     private final JMenuBar menuBar;
 
     private GL3DCameraOptionsPanel cameraOptionsPanel;
-
-    // private SolarEventCatalogsPanel solarEventCatalogsPanel;
 
     public static final int SIDE_PANEL_WIDTH = 320;
     public static final int SIDE_PADDING = 10;
@@ -338,15 +326,6 @@ public class ImageViewerGui {
     }
 
     /**
-     * Returns instance of the overview ComponentView.
-     *
-     * @return instance of the overview ComponentView.
-     */
-    public ComponentView getOverviewView() {
-        return StateController.getInstance().getCurrentState().getOverviewComponentView();
-    }
-
-    /**
      * Returns the scrollpane containing the left content pane.
      *
      * @return instance of the scrollpane containing the left content pane.
@@ -360,20 +339,6 @@ public class ImageViewerGui {
             return leftPane;
         } else {
             leftPane = new SideContentPane();
-
-            // create overview image panel instance
-            overviewImagePanel = new OverviewImagePanel();
-
-            // set up the overview image panel
-            overviewImagePanel.setAutoscrolls(true);
-            overviewImagePanel.setPreferredSize(new Dimension(175, 175));
-            overviewImagePanel.setFocusable(false);
-
-            JPanel overviewImagePanelContainer = new JPanel();
-            overviewImagePanelContainer.setLayout(new BoxLayout(overviewImagePanelContainer, BoxLayout.Y_AXIS));
-            overviewImagePanelContainer.add(overviewImagePanel);
-
-            leftPane.add("Overview", overviewImagePanelContainer, false);
 
             // Movie control
             moviePanelContainer = new ControlPanelContainer();
@@ -495,11 +460,6 @@ public class ImageViewerGui {
 
         mainFrame.validate();
 
-        if (newState.isOverviewPanelInteractionEnabled()) {
-            overviewImagePanel.enableInteraction();
-        } else {
-            overviewImagePanel.disableInteraction();
-        }
         if (newState.getType() == ViewStateEnum.View3D) {
             leftPane.add("Camera Adjustments", cameraOptionsPanel, false);
         } else {
@@ -516,9 +476,6 @@ public class ImageViewerGui {
     private void updateComponentPanels() {
         if (getMainView() != null) {
             getMainImagePanel().setView(getMainView());
-        }
-        if (getOverviewView() != null) {
-            overviewImagePanel.setView(getOverviewView());
         }
         mainFrame.validate();
     }
@@ -768,4 +725,5 @@ public class ImageViewerGui {
     public ObservationDialog getObservationDialog() {
         return this.observationDialog;
     }
+
 }

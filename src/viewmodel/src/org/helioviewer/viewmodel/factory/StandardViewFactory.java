@@ -13,8 +13,6 @@ import org.helioviewer.viewmodel.view.OverlayView;
 import org.helioviewer.viewmodel.view.ScalingView;
 import org.helioviewer.viewmodel.view.StandardFilterView;
 import org.helioviewer.viewmodel.view.StandardSolarRotationTrackingView;
-import org.helioviewer.viewmodel.view.SynchronizeOverviewChainView;
-import org.helioviewer.viewmodel.view.SynchronizeView;
 import org.helioviewer.viewmodel.view.View;
 import org.helioviewer.viewmodel.view.fitsview.JHVFITSView;
 import org.helioviewer.viewmodel.view.jp2view.JHVJP2View;
@@ -46,9 +44,6 @@ public abstract class StandardViewFactory implements ViewFactory {
         // FilterView
         if (pattern.isAssignableFrom(FilterView.class)) {
             return (T) new StandardFilterView();
-            // SynchronizeView
-        } else if (pattern.isAssignableFrom(SynchronizeView.class)) {
-            return (T) new SynchronizeOverviewChainView();
             // SolarRotationTrackingView
         } else if (pattern.isAssignableFrom(StandardSolarRotationTrackingView.class)) {
             return (T) new StandardSolarRotationTrackingView();
@@ -187,9 +182,6 @@ public abstract class StandardViewFactory implements ViewFactory {
         // FilterView
         if (source instanceof FilterView) {
             return (T) new StandardFilterView();
-            // SynchronizeView
-        } else if (source instanceof SynchronizeView) {
-            return (T) new SynchronizeOverviewChainView();
             // SolarRotationTrackingView
         } else if (source instanceof StandardSolarRotationTrackingView) {
             return (T) new StandardSolarRotationTrackingView();
