@@ -6,7 +6,6 @@ import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.locks.ReentrantLock;
 
 import org.helioviewer.base.math.RectangleDouble;
-import org.helioviewer.base.math.Vector2dInt;
 import org.helioviewer.viewmodel.changeevent.ChangeEvent;
 import org.helioviewer.viewmodel.changeevent.LayerChangedReason;
 import org.helioviewer.viewmodel.changeevent.LayerChangedReason.LayerChangeType;
@@ -72,7 +71,6 @@ public abstract class AbstractLayeredView extends AbstractView implements Layere
         public MetaDataView metaDataView;
         public SubimageDataView subimageDataView;
 
-        public Vector2dInt renderOffset;
         public boolean visibility = true;
 
         /**
@@ -453,7 +451,6 @@ public abstract class AbstractLayeredView extends AbstractView implements Layere
                 if (includePixelBasedImages || !(m instanceof PixelBasedMetaData)) {
                     Region layerRegion = ViewHelper.cropInnerRegionToOuterRegion(m.getPhysicalRegion(), region);
                     Viewport layerViewport = ViewHelper.calculateInnerViewport(layerRegion, region, viewportImageSize);
-                    layer.renderOffset = ViewHelper.calculateInnerViewportOffset(layerRegion, region, viewportImageSize);
 
                     changed |= layer.regionView.setRegion(layerRegion, event);
                     changed |= layer.viewportView.setViewport(layerViewport, event);
