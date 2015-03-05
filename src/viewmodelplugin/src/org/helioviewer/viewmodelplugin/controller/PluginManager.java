@@ -1,6 +1,7 @@
 package org.helioviewer.viewmodelplugin.controller;
 
 import java.awt.EventQueue;
+import java.lang.reflect.InvocationTargetException;
 import java.util.concurrent.Callable;
 import java.util.concurrent.atomic.AtomicReference;
 
@@ -143,8 +144,12 @@ public class PluginManager {
 
                 Log.debug("Found Plugin Jar File: " + f.toURI());
 
-                if (!loadPlugin(f.toURI())) {
-                    result.add(f.getPath());
+                try {
+                    if (!loadPlugin(f.toURI())) {
+                        result.add(f.getPath());
+                    }
+                } catch (Exception ex) {
+                    ex.printStackTrace();
                 }
             }
         }
@@ -413,23 +418,20 @@ public class PluginManager {
     }
 
     // http://kotek.net/blog/swingutilities.invokeandwait_with_return_value
-    private static <E> E invokeAndWait(final Callable<E> r) {
+    private static <E> E invokeAndWait(final Callable<E> r) throws InterruptedException, InvocationTargetException {
         final AtomicReference<E> ret = new AtomicReference<E>();
         final AtomicReference<Exception> except = new AtomicReference<Exception>();
 
-        try {
-            EventQueue.invokeAndWait(new Runnable() {
-                public void run() {
-                    try {
-                        ret.set(r.call());
-                    } catch (Exception e) {
-                        //pass exception to original thread
-                        except.set(e);
-                    }
-                }});
-        } catch (Exception ex) {
-            ex.printStackTrace();
-        }
+        EventQueue.invokeAndWait(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    ret.set(r.call());
+                } catch (Exception e) {
+                    //pass exception to original thread
+                    except.set(e);
+                }
+            }});
 
         if (except.get() != null)
             //there was an exception in EDT thread, rethrow it
@@ -450,8 +452,8 @@ public class PluginManager {
         }
     }
 
-    public boolean loadPlugin(URI pluginLocation) {
-        return invokeAndWait(new LoadPluginCall(pluginLocation));
+    public boolean loadPlugin(URI location) throws InterruptedException, InvocationTargetException {
+        return invokeAndWait(new LoadPluginCall(location));
     }
 
 
