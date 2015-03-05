@@ -13,8 +13,6 @@ import org.helioviewer.viewmodel.imagetransport.Byte8ImageTransport;
 import org.helioviewer.viewmodel.imagetransport.Int32ImageTransport;
 import org.helioviewer.viewmodel.imagetransport.Short16ImageTransport;
 import org.helioviewer.viewmodel.view.opengl.shader.GLFragmentShaderProgram;
-import org.helioviewer.viewmodel.view.opengl.shader.GLShaderBuilder;
-import org.helioviewer.viewmodel.view.opengl.shader.ShaderFactory;
 
 /**
  * Filter for enhancing the contrast of the image.
@@ -142,7 +140,7 @@ public class ContrastFilter extends AbstractFilter implements StandardFilter, GL
                     resultPixelData[i] = contrastTable8[pixelData[i] & 0xFF];
                 }
                 return new SingleChannelByte8ImageData(data, resultPixelData);
-            // Single channel short image
+                // Single channel short image
             } else if (data.getImageTransport() instanceof Short16ImageTransport) {
                 if (forceRefilter || rebuildTable) {
                     buildTable16(data.getImageTransport().getNumBitsPerPixel());
@@ -154,7 +152,7 @@ public class ContrastFilter extends AbstractFilter implements StandardFilter, GL
                     resultPixelData[i] = contrastTable16[pixelData[i] & 0xFFFF];
                 }
                 return new SingleChannelShortImageData(data, resultPixelData);
-            // (A)RGB image: Filter each channel separate
+                // (A)RGB image: Filter each channel separate
             } else if (data.getImageTransport() instanceof Int32ImageTransport) {
                 if (forceRefilter || rebuildTable) {
                     buildTable8();
@@ -165,14 +163,14 @@ public class ContrastFilter extends AbstractFilter implements StandardFilter, GL
                 for (int i = 0; i < pixelData.length; i++) {
                     int rgb = pixelData[i];
                     int a = rgb >>> 24;
-                int r = (rgb >>> 16) & 0xFF;
-                int g = (rgb >>> 8) & 0xFF;
-                int b = rgb & 0xff;
+                    int r = (rgb >>> 16) & 0xFF;
+                    int g = (rgb >>> 8) & 0xFF;
+                    int b = rgb & 0xff;
 
-                    r = contrastTable8[r] & 0xFF;
-                    g = contrastTable8[g] & 0xFF;
-                    b = contrastTable8[b] & 0xFF;
-                    resultPixelData[i] = (a << 24) | (r << 16) | (g << 8) | b;
+                r = contrastTable8[r] & 0xFF;
+                g = contrastTable8[g] & 0xFF;
+                b = contrastTable8[b] & 0xFF;
+                resultPixelData[i] = (a << 24) | (r << 16) | (g << 8) | b;
                 }
                 return new ARGBInt32ImageData(data, resultPixelData);
             }
@@ -188,7 +186,6 @@ public class ContrastFilter extends AbstractFilter implements StandardFilter, GL
      */
     private class ContrastShader extends GLFragmentShaderProgram {
 
-        private final int contrastParamRef = 4;
         private final double[] contrastParamFloat = new double[4];
 
         /**
@@ -205,10 +202,9 @@ public class ContrastFilter extends AbstractFilter implements StandardFilter, GL
             }
         }
 
-        @Override
         public void bind(GL2 gl) {
             gl.glBindProgramARB(GL2.GL_FRAGMENT_PROGRAM_ARB, ShaderFactory.getFragmentId());
-            ShaderFactory.bindEnvVars(gl, GL2.GL_FRAGMENT_PROGRAM_ARB, this.contrastParamRef, contrastParamFloat);
+            ShaderFactory.bindEnvVars(gl, GL2.GL_FRAGMENT_PROGRAM_ARB, ShaderFactory.contrastParamRef, contrastParamFloat);
         }
 
     }
@@ -216,6 +212,7 @@ public class ContrastFilter extends AbstractFilter implements StandardFilter, GL
     /**
      * {@inheritDoc}
      */
+    @Override
     public void applyGL(GL2 gl) {
         shader.setContrast(gl, contrast);
         shader.bind(gl);
