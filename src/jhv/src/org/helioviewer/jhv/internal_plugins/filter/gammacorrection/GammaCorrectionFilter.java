@@ -164,14 +164,14 @@ public class GammaCorrectionFilter extends AbstractFilter implements StandardFil
                 for (int i = 0; i < pixelData.length; i++) {
                     int rgb = pixelData[i];
                     int a = rgb >>> 24;
-                    int r = (rgb >>> 16) & 0xFF;
-                    int g = (rgb >>> 8) & 0xFF;
-                    int b = rgb & 0xff;
+                int r = (rgb >>> 16) & 0xFF;
+                int g = (rgb >>> 8) & 0xFF;
+                int b = rgb & 0xff;
 
-                    r = gammaTable8[r] & 0xFF;
-                    g = gammaTable8[g] & 0xFF;
-                    b = gammaTable8[b] & 0xFF;
-                    resultPixelData[i] = (a << 24) | (r << 16) | (g << 8) | b;
+                r = gammaTable8[r] & 0xFF;
+                g = gammaTable8[g] & 0xFF;
+                b = gammaTable8[b] & 0xFF;
+                resultPixelData[i] = (a << 24) | (r << 16) | (g << 8) | b;
                 }
                 return new ARGBInt32ImageData(data, resultPixelData);
             }
@@ -186,24 +186,15 @@ public class GammaCorrectionFilter extends AbstractFilter implements StandardFil
      * Fragment shader for applying the gamma correction.
      */
     private class GammaCorrectionShader extends GLFragmentShaderProgram {
-        private final double[] gammaParamFloat = new double[4];
 
-        /**
-         * Sets the gamma value
-         *
-         * @param gl
-         *            Valid reference to the current gl object
-         * @param gamma
-         *            Gamma value
-         */
         private void setGamma(GL2 gl, float gamma) {
-            gammaParamFloat[0] = gamma;
+            ShaderFactory.setGamma(gamma);
         }
 
         @Override
         public void bind(GL2 gl) {
             gl.glBindProgramARB(GL2.GL_FRAGMENT_PROGRAM_ARB, ShaderFactory.getFragmentId());
-            ShaderFactory.bindEnvVars(gl, GL2.GL_FRAGMENT_PROGRAM_ARB, ShaderFactory.gammaParamRef, gammaParamFloat);
+            ShaderFactory.bindEnvVars(gl, GL2.GL_FRAGMENT_PROGRAM_ARB, ShaderFactory.gammaParamRef, ShaderFactory.gammaParamFloat);
         }
 
     }

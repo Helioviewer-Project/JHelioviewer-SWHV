@@ -186,25 +186,14 @@ public class ContrastFilter extends AbstractFilter implements StandardFilter, GL
      */
     private class ContrastShader extends GLFragmentShaderProgram {
 
-        private final double[] contrastParamFloat = new double[4];
-
-        /**
-         * Sets the contrast parameter
-         *
-         * @param gl
-         *            Valid reference to the current gl object
-         * @param contrast
-         *            Contrast parameter
-         */
         private void setContrast(GL2 gl, float contrast) {
-            if (contrastParamFloat != null) {
-                contrastParamFloat[0] = contrast;
-            }
+            ShaderFactory.setContrast(contrast);
         }
 
+        @Override
         public void bind(GL2 gl) {
             gl.glBindProgramARB(GL2.GL_FRAGMENT_PROGRAM_ARB, ShaderFactory.getFragmentId());
-            ShaderFactory.bindEnvVars(gl, GL2.GL_FRAGMENT_PROGRAM_ARB, ShaderFactory.contrastParamRef, contrastParamFloat);
+            ShaderFactory.bindEnvVars(gl, GL2.GL_FRAGMENT_PROGRAM_ARB, ShaderFactory.contrastParamRef, ShaderFactory.contrastParamFloat);
         }
 
     }

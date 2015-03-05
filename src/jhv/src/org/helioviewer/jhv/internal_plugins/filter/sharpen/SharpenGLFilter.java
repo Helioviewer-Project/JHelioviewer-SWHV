@@ -23,30 +23,15 @@ public class SharpenGLFilter extends SharpenFilter implements GLImageSizeFilter 
      * Fragment shader performing the unsharp mask algorithm.
      */
     private class UnsharpMaskingShader extends GLFragmentShaderProgram {
-        private final double[] sharpenParamFloat = new double[4];
 
-        /**
-         * Sets all necessary parameters: The size of a pixel and the weighting.
-         *
-         * @param gl
-         *            Valid reference to the current gl object
-         * @param weighting
-         *            Weighting of the sharpening
-         * @param pixelWidth
-         *            Width of a pixel = 1/imageWidth
-         * @param pixelHeight
-         *            Height of a pixel = 1/imageHeight
-         */
         public void setFactors(GL2 gl, float weighting, float pixelWidth, float pixelHeight) {
-            sharpenParamFloat[0] = pixelWidth * span;
-            sharpenParamFloat[1] = pixelHeight * span;
-            sharpenParamFloat[2] = weighting;
+            ShaderFactory.setFactors(weighting, pixelWidth, pixelHeight, span);
         }
 
         @Override
         public void bind(GL2 gl) {
             gl.glBindProgramARB(GL2.GL_FRAGMENT_PROGRAM_ARB, ShaderFactory.getFragmentId());
-            ShaderFactory.bindEnvVars(gl, GL2.GL_FRAGMENT_PROGRAM_ARB, ShaderFactory.sharpenParamRef, sharpenParamFloat);
+            ShaderFactory.bindEnvVars(gl, GL2.GL_FRAGMENT_PROGRAM_ARB, ShaderFactory.sharpenParamRef, ShaderFactory.sharpenParamFloat);
         }
 
     }
