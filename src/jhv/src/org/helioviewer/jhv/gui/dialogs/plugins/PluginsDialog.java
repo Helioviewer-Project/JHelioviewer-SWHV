@@ -334,7 +334,10 @@ public class PluginsDialog extends JDialog implements ShowableDialog, ActionList
                         return;
                     }
 
-                    if (!PluginManager.getSingletonInstance().loadPlugin(dstFile.toURI())) {
+                    try {
+                        PluginManager.getSingletonInstance().loadPlugin(dstFile.toURI());
+                    } catch (Exception ex) {
+                        ex.printStackTrace();
                         Message.err("An error occured while loading the plugin.", "The plugin file is corrupt!", false);
                         return;
                     }
