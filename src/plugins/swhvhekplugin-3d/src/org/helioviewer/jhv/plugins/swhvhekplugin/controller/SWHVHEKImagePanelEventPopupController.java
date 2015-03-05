@@ -32,6 +32,7 @@ import org.helioviewer.viewmodel.view.RegionView;
 import org.helioviewer.viewmodel.view.View;
 import org.helioviewer.viewmodel.view.ViewHelper;
 import org.helioviewer.viewmodel.view.ViewportView;
+import org.helioviewer.viewmodel.view.opengl.GLInfo;
 import org.helioviewer.viewmodel.viewportimagesize.ViewportImageSize;
 
 /**
@@ -291,8 +292,8 @@ public class SWHVHEKImagePanelEventPopupController implements KeyEventDispatcher
                             }
                         } else {
                             Vector2dInt screenPos = convertPhysicalToScreen(pt.getCoordinate1(), pt.getCoordinate2());
-                            double x = e.getX() * Displayer.screenScale;
-                            double y = e.getY() * Displayer.screenScale;
+                            double x = e.getX() * GLInfo.pixelScale[0];
+                            double y = e.getY() * GLInfo.pixelScale[1];
 
                             if (screenPos != null && x >= screenPos.getX() - 8 && x <= screenPos.getX() + 8 && y >= screenPos.getY() - 8 && y <= screenPos.getY() + 8) {
                                 mouseOverJHVEvent = evt;

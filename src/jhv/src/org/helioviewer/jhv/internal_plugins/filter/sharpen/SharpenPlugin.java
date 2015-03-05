@@ -2,6 +2,7 @@ package org.helioviewer.jhv.internal_plugins.filter.sharpen;
 
 import org.helioviewer.viewmodel.filter.Filter;
 import org.helioviewer.viewmodel.view.FilterView;
+import org.helioviewer.viewmodel.view.opengl.GLInfo;
 import org.helioviewer.viewmodel.view.opengl.shader.GLShaderHelper;
 import org.helioviewer.viewmodelplugin.filter.FilterPanel;
 import org.helioviewer.viewmodelplugin.filter.FilterTabDescriptor;
@@ -26,11 +27,9 @@ public class SharpenPlugin extends SimpleFilterContainer {
      * {@inheritDoc}
      */
     protected Filter getFilter() {
-
-        if (GLShaderHelper.getMaxTextureIndirections() < 10) {
+        if (GLInfo.maxTextureIndirections < 10) {
             return new SharpenFilter();
         }
-
         return new SharpenGLFilter();
     }
 

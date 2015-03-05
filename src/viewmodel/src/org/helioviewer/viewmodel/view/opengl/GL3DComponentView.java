@@ -250,7 +250,10 @@ public class GL3DComponentView extends AbstractComponentView implements GLEventL
 
     @Override
     public void init(GLAutoDrawable drawable) {
-        GL2 gl = drawable.getGL().getGL2();
+        final GL2 gl = drawable.getGL().getGL2();
+
+        GLInfo.update((GLCanvas) drawable);
+
         ShaderFactory.initShader(gl);
         GL3DState.create(gl);
 
