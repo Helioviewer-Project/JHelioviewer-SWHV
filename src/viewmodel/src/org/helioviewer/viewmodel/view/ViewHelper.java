@@ -1,6 +1,5 @@
 package org.helioviewer.viewmodel.view;
 
-import java.awt.RenderingHints;
 import java.io.IOException;
 import java.net.URI;
 import java.util.AbstractList;
@@ -15,7 +14,6 @@ import org.helioviewer.viewmodel.imagedata.ImageData;
 import org.helioviewer.viewmodel.metadata.MetaData;
 import org.helioviewer.viewmodel.region.Region;
 import org.helioviewer.viewmodel.region.StaticRegion;
-import org.helioviewer.viewmodel.view.ScalingView.InterpolationMode;
 import org.helioviewer.viewmodel.view.fitsview.JHVFITSView;
 import org.helioviewer.viewmodel.view.jp2view.JHVJP2CallistoView;
 import org.helioviewer.viewmodel.view.jp2view.JHVJP2View;
@@ -392,28 +390,6 @@ public final class ViewHelper {
     public static Vector2dInt calculateInnerViewportOffset(Region innerRegion, Region outerRegion, ViewportImageSize outerViewportImageSize) {
         return ViewHelper.convertImageToScreenDisplacement(innerRegion.getUpperLeftCorner().subtract(outerRegion.getUpperLeftCorner()),
                 outerRegion, outerViewportImageSize).negateY();
-    }
-
-    /**
-     * Converts the internal values for different interpolation modes into java
-     * rendering hints.
-     * 
-     * @param interpolationMode
-     *            Interpolation mode to convert
-     * @return equivalent java rendering hint
-     */
-    public static Object ConvertScaleInterpolationModeToRenderingHint(InterpolationMode interpolationMode) {
-        switch (interpolationMode) {
-        case NEAREST_NEIGHBOR:
-            return RenderingHints.VALUE_INTERPOLATION_NEAREST_NEIGHBOR;
-        case BILINEAR:
-            return RenderingHints.VALUE_INTERPOLATION_BILINEAR;
-        case BICUBIC:
-            return RenderingHints.VALUE_INTERPOLATION_BICUBIC;
-        default:
-            break;
-        }
-        return null;
     }
 
     /**

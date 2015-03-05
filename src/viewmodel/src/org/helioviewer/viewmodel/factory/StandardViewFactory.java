@@ -10,7 +10,6 @@ import org.helioviewer.viewmodel.view.FilterView;
 import org.helioviewer.viewmodel.view.ImageInfoView;
 import org.helioviewer.viewmodel.view.JHVSimpleImageView;
 import org.helioviewer.viewmodel.view.OverlayView;
-import org.helioviewer.viewmodel.view.ScalingView;
 import org.helioviewer.viewmodel.view.StandardFilterView;
 import org.helioviewer.viewmodel.view.StandardSolarRotationTrackingView;
 import org.helioviewer.viewmodel.view.View;
@@ -94,19 +93,6 @@ public abstract class StandardViewFactory implements ViewFactory {
             newFilter.setFilter(filter);
 
             return (T) newFilter;
-
-            // ScalingView
-        } else if (source instanceof ScalingView) {
-            ScalingView sourceScaling = (ScalingView) source;
-            ScalingView newScaling = (ScalingView) createViewFromSourceImpl(source);
-
-            if (newScaling == null) {
-                return null;
-            }
-
-            newScaling.setInterpolationMode(sourceScaling.getInterpolationMode());
-
-            return (T) newScaling;
 
             // ImageInfoView
         } else if (source instanceof ImageInfoView) {
