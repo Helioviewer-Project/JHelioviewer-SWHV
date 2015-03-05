@@ -10,7 +10,6 @@ import org.helioviewer.jhv.gui.components.MoviePanel;
 import org.helioviewer.jhv.gui.components.QualitySpinner;
 import org.helioviewer.jhv.internal_plugins.selectedLayer.SelectedLayerPanel;
 import org.helioviewer.jhv.layers.LayersModel;
-import org.helioviewer.jhv.opengl.GLInfo;
 import org.helioviewer.viewmodel.factory.GLViewFactory;
 import org.helioviewer.viewmodel.factory.ViewFactory;
 import org.helioviewer.viewmodel.view.ComponentView;

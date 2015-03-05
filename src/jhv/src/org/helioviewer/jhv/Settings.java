@@ -13,7 +13,6 @@ import javax.swing.UIManager;
 import org.helioviewer.base.FileUtils;
 import org.helioviewer.base.logging.Log;
 import org.helioviewer.jhv.gui.ImageViewerGui;
-import org.helioviewer.jhv.opengl.GLInfo;
 import org.helioviewer.viewmodel.view.jp2view.kakadu.JHV_Kdu_cache;
 
 /**
@@ -37,12 +36,6 @@ public class Settings {
 
     /** The properties file */
     private final File propFile = new File(JHVDirectory.SETTINGS.getPath() + "user.properties");
-
-    /**
-     * The private constructor of this class.
-     * */
-    private Settings() {
-    }
 
     public void load() {
         load(true);
@@ -92,7 +85,6 @@ public class Settings {
             FileOutputStream fileOutput = new FileOutputStream(propFile);
             userProperties.store(fileOutput, null);
             fileOutput.close();
-
         } catch (IOException ex) {
             ex.printStackTrace();
         }
@@ -103,13 +95,7 @@ public class Settings {
      */
     public void update() {
         try {
-            String val;
-
-            val = getProperty("opengl.enabled");
-            GLInfo.setGlEnabled(Boolean.parseBoolean(val));
-
-            val = getProperty("display.laf");
-
+            String val = getProperty("display.laf");
             setLookAndFeelEverywhere(val);
 
             double size = 0;
@@ -175,14 +161,10 @@ public class Settings {
      *            name of the lookandfeel.
      */
     public void setLookAndFeelEverywhere(String lookAndFeel) {
-
         if (!UIManager.getLookAndFeel().getClass().getName().equals(lookAndFeel)) {
             try {
                 UIManager.setLookAndFeel(lookAndFeel);
-
-                ImageViewerGui.getSingletonInstance();
-                SwingUtilities.updateComponentTreeUI(ImageViewerGui.getMainFrame());
-
+                SwingUtilities.updateComponentTreeUI(ImageViewerGui.getSingletonInstance().getMainFrame());
             } catch (Exception ex) {
                 ex.printStackTrace();
             }
@@ -197,4 +179,5 @@ public class Settings {
     protected void finalize() {
         save();
     }
+
 }

@@ -16,8 +16,8 @@ import org.helioviewer.base.message.Message;
 import org.helioviewer.jhv.JHVDirectory;
 import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.gui.ImageViewerGui;
+import org.helioviewer.viewmodel.view.opengl.GLInfo;
 import org.helioviewer.viewmodel.view.opengl.GLTextureHelper;
-import org.helioviewer.viewmodel.view.opengl.shader.GLShaderBuilder;
 import org.helioviewer.viewmodel.view.opengl.shader.GLShaderHelper;
 
 /**
@@ -83,19 +83,13 @@ public class GLInitPanel extends GLJPanel {
         public void init(GLAutoDrawable drawable) {
             isInit = true;
 
-            Log.debug(">> GLInitPanel.init(GLAutoDrawable) > Dispose GLInitPanel: Stop the animator and make it invisible");
-            Log.debug(">> GLInitPanel.init(GLAutoDrawable) > Set GL properties");
             final GL2 gl = (GL2) drawable.getGL();
-            Log.debug(">> GLInitPanel.init(GLAutoDrawable) > Shade model: flat");
-            gl.glShadeModel(GL2.GL_FLAT);
-            Log.debug(">> GLInitPanel.init(GLAutoDrawable) > Clear color: black");
             gl.glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
 
             GLInfo.update(gl);
 
             if (GLInfo.glIsUsable()) {
                 GLShaderHelper.initHelper(gl, JHVDirectory.TEMP.getPath());
-                GLShaderBuilder.initShaderBuilder(gl);
 
                 // Retina displays
                 int[] scale = parent.getCurrentSurfaceScale(new int[2]);

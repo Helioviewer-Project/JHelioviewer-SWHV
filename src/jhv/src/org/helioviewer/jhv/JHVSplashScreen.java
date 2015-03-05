@@ -21,8 +21,9 @@ import org.helioviewer.jhv.gui.IconBank;
 import org.helioviewer.jhv.gui.IconBank.JHVIcon;
 import org.helioviewer.jhv.gui.components.StatusPanel;
 import org.helioviewer.jhv.gui.components.StatusPanel.StatusTextListener;
-import org.helioviewer.jhv.opengl.GLInfo;
 import org.helioviewer.jhv.opengl.GLInitPanel;
+import org.helioviewer.viewmodel.view.opengl.GLInfo;
+
 
 /**
  * Represents the splash screen which will be displayed when program is

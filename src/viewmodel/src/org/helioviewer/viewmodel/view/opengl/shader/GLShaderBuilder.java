@@ -7,6 +7,7 @@ import java.util.LinkedList;
 import javax.media.opengl.GL2;
 
 import org.helioviewer.base.logging.Log;
+import org.helioviewer.viewmodel.view.opengl.GLInfo;
 
 /**
  * Class to build new OpenGL shader build in Cg.
@@ -39,11 +40,6 @@ public class GLShaderBuilder {
     public static final String LINE_SEP = System.getProperty("line.separator");
 
     private static GLShaderHelper shaderHelper = new GLShaderHelper();
-    private static int maxTexUnits = 32;
-    private static int maxConstantRegisters = Integer.MAX_VALUE;
-    private static int maxVertexAttributes = Integer.MAX_VALUE;
-
-    private static char[] coordinateDimension = { 'x', 'y', 'z', 'w' };
 
     private final LinkedList<String> outputStruct = new LinkedList<String>();
     private final LinkedList<String> standardParameterList = new LinkedList<String>();
@@ -65,33 +61,6 @@ public class GLShaderBuilder {
 
     private String functions = "";
     private String mainBody = "";
-
-    /**
-     * Initializes the static members of the shader builder. This has to happen
-     * during runtime, since many of this values are driver dependent.
-     *
-     * @param gl
-     *            current GL object
-     */
-    public static void initShaderBuilder(GL2 gl) {
-        Log.debug(">> GLShaderBuilder.initShaderBuilder(GL) > Initialize shader builder");
-        int tmp[] = new int[1];
-
-        tmp[0] = 0;
-        gl.glGetIntegerv(GL2.GL_MAX_TEXTURE_IMAGE_UNITS, tmp, 0);
-        maxTexUnits = tmp[0];
-        Log.debug(">> GLShaderBuilder.initShaderBuilder(GL) > max texture image units: " + maxTexUnits);
-
-        tmp[0] = 0;
-        gl.glGetIntegerv(GL2.GL_MAX_FRAGMENT_UNIFORM_COMPONENTS, tmp, 0);
-        maxConstantRegisters = tmp[0];
-        Log.debug(">> GLShaderBuilder.initShaderBuilder(GL) > max fragment uniform components arb: " + maxConstantRegisters);
-
-        tmp[0] = 0;
-        gl.glGetIntegerv(GL2.GL_MAX_VERTEX_ATTRIBS_ARB, tmp, 0);
-        maxVertexAttributes = tmp[0];
-        Log.debug(">> GLShaderBuilder.initShaderBuilder(GL) > max vertex attributes arb: " + maxVertexAttributes);
-    }
 
     /**
      * Generates a new GLShaderBuilder.
@@ -250,11 +219,11 @@ public class GLShaderBuilder {
      *             if there is no free texture unit available
      */
     public int addTextureParameter(String declaration) throws GLBuildShaderException {
-        if (nextTexUnit < maxTexUnits) {
+        if (nextTexUnit < GLInfo.maxTexUnits) {
             getParameterList().add("uniform " + declaration.trim() + " : TEXUNIT" + nextTexUnit);
             return GL2.GL_TEXTURE0 + nextTexUnit++;
         } else {
-            throw new GLBuildShaderException("Number of available texture units exceeded (Max: " + maxTexUnits + ")");
+            throw new GLBuildShaderException("Number of available texture units exceeded (Max: " + GLInfo.maxTexUnits + ")");
         }
     }
 
@@ -280,26 +249,12 @@ public class GLShaderBuilder {
      *             if there is no free vertex attribute left
      */
     public int addVertexAttribute(String declaration) throws GLBuildShaderException {
-        if (nextVertexAttribute < maxVertexAttributes) {
+        if (nextVertexAttribute < GLInfo.maxVertexAttributes) {
             getParameterList().add(declaration.trim() + " : ATTR" + nextVertexAttribute);
             return nextVertexAttribute++;
         } else {
-            throw new GLBuildShaderException("Number of available vertex attributes exceeded (Max: " + maxVertexAttributes + ")");
+            throw new GLBuildShaderException("Number of available vertex attributes exceeded (Max: " + GLInfo.maxVertexAttributes + ")");
         }
-    }
-
-    /**
-     * Adds a new function to the program code. This function adds a single
-     * stand-alone function to the code, including return value, name,
-     * parameters and body. Make sure to add a code fragment to the main
-     * function by calling addMainFragment(), where the new function is called
-     * in some way.
-     *
-     * @param code
-     *            new code fragment
-     */
-    public void addSingleFunction(String code) {
-        functions += code + LINE_SEP + LINE_SEP;
     }
 
     /**

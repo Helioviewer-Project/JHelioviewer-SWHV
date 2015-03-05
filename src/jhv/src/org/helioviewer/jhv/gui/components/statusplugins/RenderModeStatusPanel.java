@@ -4,7 +4,7 @@ import javax.swing.BorderFactory;
 import javax.swing.JLabel;
 
 import org.helioviewer.jhv.gui.interfaces.StatusPanelPlugin;
-import org.helioviewer.jhv.opengl.GLInfo;
+import org.helioviewer.viewmodel.view.opengl.GLInfo;
 
 /**
  * Status Panel for displaying the render mode currently used.
