@@ -11,7 +11,6 @@ import org.helioviewer.jhv.gui.components.QualitySpinner;
 import org.helioviewer.jhv.internal_plugins.selectedLayer.SelectedLayerPanel;
 import org.helioviewer.jhv.layers.LayersModel;
 import org.helioviewer.jhv.opengl.GLInfo;
-import org.helioviewer.viewmodel.factory.BufferedImageViewFactory;
 import org.helioviewer.viewmodel.factory.GLViewFactory;
 import org.helioviewer.viewmodel.factory.ViewFactory;
 import org.helioviewer.viewmodel.view.ComponentView;
@@ -79,12 +78,7 @@ public class ViewchainFactory {
      *            indicates if the software mode has to be used.
      */
     public ViewchainFactory(boolean useBufferedImageViewChain) {
-        if (!useBufferedImageViewChain && GLInfo.glIsEnabled()) {
-            viewFactory = new GLViewFactory();
-        } else {
-            viewFactory = new BufferedImageViewFactory();
-        }
-
+        viewFactory = new GLViewFactory();
     }
 
     public ViewchainFactory(ViewFactory viewFactory) {
@@ -322,9 +316,6 @@ public class ViewchainFactory {
         // Component View
         ComponentView componentView = viewFactory.createNewView(ComponentView.class);
         componentView.setView(trackingView);
-
-        // add Overlays
-        // updateOverlayViewsInViewchainMain(componentView);
 
         return componentView;
     }
