@@ -1,4 +1,4 @@
-package org.helioviewer.jhv.opengl;
+package org.helioviewer.viewmodel.view.opengl;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -24,8 +24,10 @@ public class GLInfo {
     private static boolean glInitiated = false;
     private static String version;
 
-    private GLInfo() {
-    }
+    public static int maxTextureSize;
+    public static int maxTexUnits;
+    public static int maxConstantRegisters;
+    public static int maxVertexAttributes;
 
     /**
      * Updates the OpenGL settings by reading the OpenGL properties.
@@ -65,16 +67,37 @@ public class GLInfo {
             glUsable = false;
         } else {
             int[] out = new int[1];
+
             gl.glGetProgramivARB(GL2.GL_VERTEX_PROGRAM_ARB, GL2.GL_MAX_PROGRAM_INSTRUCTIONS_ARB, out, 0);
-            Log.debug(">> GLInfo.update(GL) > GL_MAX_PROGRAM_INSTRUCTIONS = " + out[0]);
+            Log.debug(">> GLInfo > GL_MAX_PROGRAM_INSTRUCTIONS = " + out[0]);
             gl.glGetProgramivARB(GL2.GL_VERTEX_PROGRAM_ARB, GL2.GL_MAX_PROGRAM_PARAMETERS_ARB, out, 0);
-            Log.debug(">> GLInfo.update(GL) > GL_MAX_PROGRAM_PARAMETERS   = " + out[0]);
+            Log.debug(">> GLInfo > GL_MAX_PROGRAM_PARAMETERS   = " + out[0]);
             gl.glGetProgramivARB(GL2.GL_VERTEX_PROGRAM_ARB, GL2.GL_MAX_PROGRAM_TEMPORARIES_ARB, out, 0);
-            Log.debug(">> GLInfo.update(GL) > GL_MAX_PROGRAM_TEMPORARIES   = " + out[0]);
+            Log.debug(">> GLInfo > GL_MAX_PROGRAM_TEMPORARIES   = " + out[0]);
 
+            out[0] = 0;
             gl.glGetIntegerv(GL2.GL_MAX_DRAW_BUFFERS, out, 0);
-            Log.debug(">> GLInfo.update(GL) > GL_MAX_DRAW_BUFFERS = " + out[0]);
+            Log.debug(">> GLInfo > GL_MAX_DRAW_BUFFERS = " + out[0]);
 
+            out[0] = 0;
+            gl.glGetIntegerv(GL2.GL_MAX_TEXTURE_SIZE, out, 0);
+            maxTextureSize = out[0];
+            Log.debug(">> GLInfo > max texture size: " + out[0]);
+
+            out[0] = 0;
+            gl.glGetIntegerv(GL2.GL_MAX_TEXTURE_IMAGE_UNITS, out, 0);
+            maxTexUnits = out[0];
+            Log.debug(">> GLInfo > max texture image units: " + out[0]);
+
+            out[0] = 0;
+            gl.glGetIntegerv(GL2.GL_MAX_FRAGMENT_UNIFORM_COMPONENTS, out, 0);
+            maxConstantRegisters = out[0];
+            Log.debug(">> GLInfo > max fragment uniform components arb: " + out[0]);
+
+            out[0] = 0;
+            gl.glGetIntegerv(GL2.GL_MAX_VERTEX_ATTRIBS_ARB, out, 0);
+            maxVertexAttributes = out[0];
+            Log.debug(">> GLInfo > max vertex attributes arb: " + out[0]);
         }
 
         if (!glUsable && glActivated)
@@ -156,4 +179,5 @@ public class GLInfo {
     public static String getVersion() {
         return version;
     }
+
 }

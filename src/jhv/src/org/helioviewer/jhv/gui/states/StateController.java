@@ -3,8 +3,6 @@ package org.helioviewer.jhv.gui.states;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.helioviewer.jhv.opengl.GLInfo;
-
 /**
  * Singleton that controls the current state, i.e. 2D or 3D.
  * {@link StateChangeListener}s can be added for notifications about the current
@@ -25,13 +23,7 @@ public class StateController {
     private State currentState;
 
     private StateController() {
-        if (!GLInfo.glIsEnabled()) {
-            // throw new
-            // IllegalStateException("Cannot create GL3DViewchainFactory when OpenGL is not available!");
-            set2DState();
-        } else {
-            set3DState();
-        }
+        set3DState();
     }
 
     public void set2DState() {

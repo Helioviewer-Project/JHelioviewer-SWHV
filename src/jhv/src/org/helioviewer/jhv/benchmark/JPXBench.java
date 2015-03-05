@@ -22,7 +22,6 @@ import org.helioviewer.jhv.KakaduEngine;
 import org.helioviewer.jhv.Settings;
 import org.helioviewer.jhv.io.APIRequestManager;
 import org.helioviewer.jhv.io.CommandLineProcessor;
-import org.helioviewer.jhv.opengl.GLInfo;
 import org.helioviewer.jhv.resourceloader.ResourceLoader;
 import org.helioviewer.jhv.resourceloader.SystemProperties;
 import org.helioviewer.viewmodel.changeevent.ChangeEvent;
@@ -295,7 +294,6 @@ public class JPXBench implements ViewListener {
                     if (null == ResourceLoader.getSingletonInstance().loadResource("jogl", finalLibsRemote, finalLibs, finalLibs, finalLibsBackup, System.getProperties())) {
                         Log.error("Could not load OpenGL libraries");
                         Message.err("Error loading OpenGL libraries", "The OpenGL libraries could not be loaded. JHelioviewer will run in software mode.", false);
-                        GLInfo.glUnusable();
                     } else {
                         // com.sun.opengl.impl.NativeLibLoader.disableLoading();
                         // com.sun.gluegen.runtime.NativeLibLoader.disableLoading();

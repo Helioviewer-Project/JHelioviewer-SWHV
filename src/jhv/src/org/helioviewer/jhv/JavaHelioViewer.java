@@ -26,11 +26,11 @@ import org.helioviewer.jhv.gui.components.layerTable.LayerTableOverlapWatcher;
 import org.helioviewer.jhv.internal_plugins.InternalFilterPlugin;
 import org.helioviewer.jhv.io.CommandLineProcessor;
 import org.helioviewer.jhv.layers.LayersModel;
-import org.helioviewer.jhv.opengl.GLInfo;
 import org.helioviewer.jhv.resourceloader.ResourceLoader;
 import org.helioviewer.jhv.resourceloader.SystemProperties;
 import org.helioviewer.viewmodel.view.jp2view.JP2Image;
 import org.helioviewer.viewmodel.view.jp2view.kakadu.JHV_KduException;
+import org.helioviewer.viewmodel.view.opengl.GLInfo;
 import org.helioviewer.viewmodelplugin.controller.PluginManager;
 import org.helioviewer.viewmodelplugin.interfaces.Plugin;
 

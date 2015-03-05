@@ -40,7 +40,6 @@ import org.helioviewer.viewmodel.region.Region;
  * @author Markus Langenberg
  */
 public class GLTextureHelper {
-    private static int maxTextureSize = 2048;
 
     private final static int[] formatMap = { GL2.GL_LUMINANCE4, GL2.GL_LUMINANCE4, GL2.GL_LUMINANCE4, GL2.GL_LUMINANCE4, GL2.GL_LUMINANCE8, GL2.GL_LUMINANCE8, GL2.GL_LUMINANCE8, GL2.GL_LUMINANCE8, GL2.GL_LUMINANCE12, GL2.GL_LUMINANCE12, GL2.GL_LUMINANCE12, GL2.GL_LUMINANCE12, GL2.GL_LUMINANCE16, GL2.GL_LUMINANCE16, GL2.GL_LUMINANCE16, GL2.GL_LUMINANCE16 };
 
@@ -57,13 +56,6 @@ public class GLTextureHelper {
      *            Valid reference to the current gl object
      */
     public static void initHelper(GL2 gl) {
-        Log.debug(">> GLTextureHelper.initHelper(GL) > Initialize helper functions");
-
-        int tmp[] = new int[1];
-        gl.glGetIntegerv(GL2.GL_MAX_TEXTURE_SIZE, tmp, 0);
-        maxTextureSize = tmp[0];
-        Log.debug(">> GLTextureHelper.initHelper(GL) > max texture size: " + maxTextureSize);
-
         if (StateController.getInstance().getCurrentState().getType() == ViewStateEnum.View2D) {
             is3D = false;
         }
@@ -149,7 +141,7 @@ public class GLTextureHelper {
         int width = source.getWidth();
         int height = source.getHeight();
 
-        if (width <= maxTextureSize && height <= maxTextureSize) {
+        if (width <= GLInfo.maxTextureSize && height <= GLInfo.maxTextureSize) {
             moveImageDataToGLTexture(gl, source, 0, 0, width, height, tex);
             renderTextureToScreen(gl, region);
         } else {

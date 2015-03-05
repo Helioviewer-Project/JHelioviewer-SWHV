@@ -179,7 +179,6 @@ public class GL3DComponentView extends AbstractComponentView implements GLEventL
         @Override
         public final void init(GL2 gl) {
             gl.glHint(GL2.GL_LINE_SMOOTH_HINT, GL2.GL_NICEST);
-            gl.glShadeModel(GL2.GL_SMOOTH);
 
             gl.glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
             gl.glClear(GL2.GL_COLOR_BUFFER_BIT | GL2.GL_DEPTH_BUFFER_BIT);
@@ -215,7 +214,6 @@ public class GL3DComponentView extends AbstractComponentView implements GLEventL
         @Override
         public final void init(GL2 gl) {
             gl.glDisable(GL2.GL_DEPTH_TEST);
-            gl.glShadeModel(GL2.GL_FLAT);
             gl.glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
             gl.glEnable(GL2.GL_TEXTURE_1D);
             gl.glEnable(GL2.GL_TEXTURE_2D);
