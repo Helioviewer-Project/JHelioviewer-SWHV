@@ -17,6 +17,18 @@ public class ShaderFactory {
     private static int fragment2dCGID = -1;
     private static int vertex2dCGID = -1;
     private static int vertex3dCGID = -1;
+    public static final int truncationValueRef = 0;
+    public static final int isDifferenceValueRef = 1;
+    public static final int sharpenParamRef = 2;
+    public static final int gammaParamRef = 3;
+    public static final int contrastParamRef = 4;
+    public static final int alphaParamRef = 5;
+    public static final int cutOffRadiusRef = 6;
+    public static final int outerCutOffRadiusRef = 7;
+    public static final int phiParamRef = 8;
+    public static final int thetaParamRef = 9;
+    public static final int differencePhiParamRef = 10;
+    public static final int differenceThetaParamRef = 11;
 
     public static int getFragmentId() {
         if (StateController.getInstance().getCurrentState().getType() == ViewStateEnum.View3D) {

@@ -12,10 +12,8 @@ public class DifferenceShader extends GLFragmentShaderProgram {
     int mode = -1;
 
     private final double[] truncationValueFloat = new double[4];
-    private final int truncationValueRef = 0;
 
     private final double[] isDifferenceValueFloat = new double[4];
-    private final int isDifferenceValueRef = 1;
 
     private GLShaderBuilder builder;
 
@@ -27,11 +25,10 @@ public class DifferenceShader extends GLFragmentShaderProgram {
         this.truncationValueFloat[0] = truncationValue;
     }
 
-    @Override
     public void bind(GL2 gl) {
         gl.glBindProgramARB(GL2.GL_FRAGMENT_PROGRAM_ARB, ShaderFactory.getFragmentId());
-        ShaderFactory.bindEnvVars(gl, GL2.GL_FRAGMENT_PROGRAM_ARB, this.truncationValueRef, truncationValueFloat);
-        ShaderFactory.bindEnvVars(gl, GL2.GL_FRAGMENT_PROGRAM_ARB, this.isDifferenceValueRef, isDifferenceValueFloat);
+        ShaderFactory.bindEnvVars(gl, GL2.GL_FRAGMENT_PROGRAM_ARB, ShaderFactory.truncationValueRef, truncationValueFloat);
+        ShaderFactory.bindEnvVars(gl, GL2.GL_FRAGMENT_PROGRAM_ARB, ShaderFactory.isDifferenceValueRef, isDifferenceValueFloat);
     }
 
 }

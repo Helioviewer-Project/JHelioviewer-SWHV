@@ -118,7 +118,6 @@ public class OpacityFilter extends AbstractFilter implements StandardFilter, GLF
      * Fragment shader setting the opacity.
      */
     private class OpacityShader extends GLFragmentShaderProgram {
-        private final int alphaParamRef = 5;
         private final double[] alphaParamFloat = new double[4];
 
         /**
@@ -136,7 +135,7 @@ public class OpacityFilter extends AbstractFilter implements StandardFilter, GLF
         @Override
         public void bind(GL2 gl) {
             gl.glBindProgramARB(GL2.GL_FRAGMENT_PROGRAM_ARB, ShaderFactory.getFragmentId());
-            ShaderFactory.bindEnvVars(gl, GL2.GL_FRAGMENT_PROGRAM_ARB, alphaParamRef, alphaParamFloat);
+            ShaderFactory.bindEnvVars(gl, GL2.GL_FRAGMENT_PROGRAM_ARB, ShaderFactory.alphaParamRef, alphaParamFloat);
         }
 
     }

@@ -21,9 +21,6 @@ import javax.media.opengl.GL2;
  * @author Markus Langenberg
  */
 public abstract class GLFragmentShaderProgram {
-
-    protected static final int target = GL2.GL_FRAGMENT_PROGRAM_ARB;
-
     /**
      * Binds (= activates it) the shader, if it is not active so far.
      *
