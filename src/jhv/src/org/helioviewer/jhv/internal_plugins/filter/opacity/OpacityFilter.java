@@ -6,7 +6,6 @@ import java.awt.image.BufferedImage;
 
 import javax.media.opengl.GL2;
 
-import org.helioviewer.jhv.shaderfactory.ShaderFactory;
 import org.helioviewer.viewmodel.filter.AbstractFilter;
 import org.helioviewer.viewmodel.filter.GLFilter;
 import org.helioviewer.viewmodel.filter.StandardFilter;
@@ -14,6 +13,7 @@ import org.helioviewer.viewmodel.imagedata.ARGBInt32ImageData;
 import org.helioviewer.viewmodel.imagedata.ImageData;
 import org.helioviewer.viewmodel.imagedata.JavaBufferedImageData;
 import org.helioviewer.viewmodel.view.opengl.shader.GLFragmentShaderProgram;
+import org.helioviewer.viewmodel.view.opengl.shader.ShaderFactory;
 
 /**
  * Filter for changing the opacity of an image.

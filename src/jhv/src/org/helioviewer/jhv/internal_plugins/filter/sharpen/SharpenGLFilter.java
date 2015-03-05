@@ -2,9 +2,9 @@ package org.helioviewer.jhv.internal_plugins.filter.sharpen;
 
 import javax.media.opengl.GL2;
 
-import org.helioviewer.jhv.shaderfactory.ShaderFactory;
 import org.helioviewer.viewmodel.filter.GLImageSizeFilter;
 import org.helioviewer.viewmodel.view.opengl.shader.GLFragmentShaderProgram;
+import org.helioviewer.viewmodel.view.opengl.shader.ShaderFactory;
 
 /**
  * Extension of SharpenFilter, also providing an OpenGL implementation.

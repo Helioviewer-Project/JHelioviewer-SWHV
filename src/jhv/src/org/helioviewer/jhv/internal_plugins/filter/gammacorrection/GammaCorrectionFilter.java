@@ -2,7 +2,6 @@ package org.helioviewer.jhv.internal_plugins.filter.gammacorrection;
 
 import javax.media.opengl.GL2;
 
-import org.helioviewer.jhv.shaderfactory.ShaderFactory;
 import org.helioviewer.viewmodel.filter.AbstractFilter;
 import org.helioviewer.viewmodel.filter.GLFilter;
 import org.helioviewer.viewmodel.filter.StandardFilter;
@@ -14,6 +13,7 @@ import org.helioviewer.viewmodel.imagetransport.Byte8ImageTransport;
 import org.helioviewer.viewmodel.imagetransport.Int32ImageTransport;
 import org.helioviewer.viewmodel.imagetransport.Short16ImageTransport;
 import org.helioviewer.viewmodel.view.opengl.shader.GLFragmentShaderProgram;
+import org.helioviewer.viewmodel.view.opengl.shader.ShaderFactory;
 
 /**
  * Filter for applying gamma correction.

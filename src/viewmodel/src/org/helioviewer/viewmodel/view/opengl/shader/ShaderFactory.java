@@ -1,4 +1,4 @@
-package org.helioviewer.jhv.shaderfactory;
+package org.helioviewer.viewmodel.view.opengl.shader;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -17,9 +17,6 @@ public class ShaderFactory {
     private static int fragment2dCGID = -1;
     private static int vertex2dCGID = -1;
     private static int vertex3dCGID = -1;
-
-    public ShaderFactory() {
-    }
 
     public static int getFragmentId() {
         if (StateController.getInstance().getCurrentState().getType() == ViewStateEnum.View3D) {
