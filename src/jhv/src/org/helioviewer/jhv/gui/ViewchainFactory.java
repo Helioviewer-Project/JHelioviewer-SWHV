@@ -23,7 +23,6 @@ import org.helioviewer.viewmodel.view.ModifiableInnerViewView;
 import org.helioviewer.viewmodel.view.MovieView;
 import org.helioviewer.viewmodel.view.StandardSolarRotationTrackingView;
 import org.helioviewer.viewmodel.view.SubimageDataView;
-import org.helioviewer.viewmodel.view.SynchronizeView;
 import org.helioviewer.viewmodel.view.View;
 import org.helioviewer.viewmodel.view.ViewListener;
 import org.helioviewer.viewmodel.view.jp2view.JP2View;
@@ -382,14 +381,9 @@ public class ViewchainFactory {
         // Layered View
         LayeredView layeredView = viewFactory.createNewView(LayeredView.class);
 
-        // Synchronize View
-        SynchronizeView synchronizeView = viewFactory.createNewView(SynchronizeView.class);
-        synchronizeView.setView(layeredView);
-        synchronizeView.setObservedView(mainImagePanelView);
-
         // Component View
         ComponentView componentView = viewFactory.createNewView(ComponentView.class);
-        componentView.setView(synchronizeView);
+        componentView.setView(layeredView);
 
         return componentView;
     }
@@ -478,13 +472,6 @@ public class ViewchainFactory {
                 }
                 return;
             }
-        }
-
-        // if newView is a SynchronizeView, connect it to the main view chain
-        // and copy the mapping
-        if (newView instanceof SynchronizeView) {
-            ((SynchronizeView) newView).setObservedView(mainImagePanelView);
-            ((SynchronizeView) newView).setViewMapping(((SynchronizeView) sourceView).getViewMapping());
         }
 
         // insert newView in new view chain

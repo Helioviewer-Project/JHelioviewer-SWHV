@@ -51,7 +51,6 @@ import org.helioviewer.viewmodel.view.LinkedMovieManager;
 import org.helioviewer.viewmodel.view.MetaDataView;
 import org.helioviewer.viewmodel.view.MovieView;
 import org.helioviewer.viewmodel.view.RegionView;
-import org.helioviewer.viewmodel.view.SynchronizeView;
 import org.helioviewer.viewmodel.view.TimedMovieView;
 import org.helioviewer.viewmodel.view.View;
 import org.helioviewer.viewmodel.view.ViewHelper;
@@ -829,7 +828,6 @@ public class LayersModel implements ViewListener {
 
         File downloadDestination = fileDownloader.getDefaultDownloadLocation(view.getAdapter(ImageInfoView.class).getUri());
         JHVJP2View mainView = view.getAdapter(JHVJP2View.class);
-        JHVJP2View overviewView = (JHVJP2View) ImageViewerGui.getSingletonInstance().getOverviewView().getAdapter(SynchronizeView.class).getCorrespondingView(mainView);
         try {
             if (!fileDownloader.get(source, downloadDestination, "Downloading " + view.getAdapter(ImageInfoView.class).getName())) {
                 return;
@@ -842,8 +840,6 @@ public class LayersModel implements ViewListener {
         try {
             ImageViewerGui.getSingletonInstance().getMainImagePanel().setLoading(true);
             JP2Image localImage = new JP2Image(downloadDestination.toURI());
-            //mainView.setJP2Image(localImage);
-            //overviewView.setJP2Image(localImage);
         } catch (IOException e) {
             e.printStackTrace();
         } catch (JHV_KduException e) {

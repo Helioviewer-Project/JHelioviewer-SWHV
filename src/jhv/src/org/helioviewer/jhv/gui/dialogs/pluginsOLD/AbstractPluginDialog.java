@@ -30,7 +30,6 @@ import org.helioviewer.viewmodel.view.ComponentView;
 import org.helioviewer.viewmodel.view.ImageInfoView;
 import org.helioviewer.viewmodel.view.LayeredView;
 import org.helioviewer.viewmodel.view.ModifiableInnerViewView;
-import org.helioviewer.viewmodel.view.SynchronizeView;
 import org.helioviewer.viewmodel.view.View;
 import org.helioviewer.viewmodel.view.opengl.GLOverlayView;
 import org.helioviewer.viewmodelplugin.controller.PluginManager;
@@ -274,35 +273,12 @@ public abstract class AbstractPluginDialog extends JDialog implements ShowableDi
         LayeredView mainLayeredView = ImageViewerGui.getSingletonInstance().getMainView().getAdapter(LayeredView.class);
         LinkedList<ImageInfoView> newImageInfoViews = new LinkedList<ImageInfoView>();
         List<ImageInfoView> synchronizedInfoViews = new ArrayList<ImageInfoView>();
-        LayeredView synchronizedLayeredView = ImageViewerGui.getSingletonInstance().getOverviewView().getAdapter(LayeredView.class);
-
-        // detach synchronized view to prevent layers to be added and removed
-        // automatically in the synchronized view
-        SynchronizeView synchronizeView = ImageViewerGui.getSingletonInstance().getOverviewView().getAdapter(SynchronizeView.class);
-        synchronizeView.setObservedView(null);
 
         while (mainLayeredView.getNumLayers() > 0) {
-            // detach image info views from synchronized view chain in order to
-            // reuse them
-            View curView = synchronizedLayeredView.getLayer(0);
-            View lastView = null;
-            while (curView != null && !(curView instanceof ImageInfoView) && curView instanceof ModifiableInnerViewView) {
-                lastView = curView;
-                curView = ((ModifiableInnerViewView) curView).getView();
-            }
-            if (curView != null && curView instanceof ImageInfoView) {
-                ImageInfoView imageInfoView = (ImageInfoView) curView;
-                synchronizedInfoViews.add(imageInfoView);
-                if (lastView != null && lastView instanceof ModifiableInnerViewView) {
-                    ((ModifiableInnerViewView) lastView).setView(null);
-                }
-            }
-            synchronizeView.removeLayer(mainLayeredView.getLayer(0).getAdapter(ImageInfoView.class), synchronizedLayeredView.getLayer(0));
-
             // detach image info views from main view chain in order to reuse
             // them
-            curView = mainLayeredView.getLayer(0);
-            lastView = null;
+            View curView = mainLayeredView.getLayer(0);
+            View lastView = null;
             while (curView != null && !(curView instanceof ImageInfoView) && curView instanceof ModifiableInnerViewView) {
                 lastView = curView;
                 curView = ((ModifiableInnerViewView) curView).getView();
@@ -320,13 +296,9 @@ public abstract class AbstractPluginDialog extends JDialog implements ShowableDi
         }
 
         // re-add layers in order to rebuild viewchain
-        int i = 0;
         for (ImageInfoView imageView : newImageInfoViews) {
             chainFactory.addLayerToViewchainMain(imageView, mainLayeredView);
-            synchronizeView.addLayer(mainLayeredView.getLayer(i), synchronizedInfoViews.get(i++));
         }
-        ComponentView mainView = ImageViewerGui.getSingletonInstance().getMainView();
-        synchronizeView.setObservedView(mainView);
 
         // Update all OverlayViews which are included in the view chain above
         // the layered view

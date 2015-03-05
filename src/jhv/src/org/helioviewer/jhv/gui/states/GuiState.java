@@ -15,7 +15,6 @@ import org.helioviewer.jhv.gui.components.statusplugins.RenderModeStatusPanel;
 import org.helioviewer.jhv.gui.controller.MainImagePanelMousePanController;
 import org.helioviewer.jhv.gui.interfaces.ImagePanelInputController;
 import org.helioviewer.viewmodel.view.ComponentView;
-import org.helioviewer.viewmodel.view.SynchronizeView;
 import org.helioviewer.viewmodel.view.opengl.GL3DSceneGraphView;
 
 
@@ -26,7 +25,6 @@ public class GuiState implements State {
 
     private TopToolBar topToolBar;
     private ComponentView mainComponentView;
-    private ComponentView overviewComponentView;
     private RenderModeStatusPanel renderModeStatus;
 
     public GuiState(ViewchainFactory viewchainFactory) {
@@ -69,18 +67,9 @@ public class GuiState implements State {
         Log.info("Start creating view chains");
 
         boolean firstTime = (mainComponentView == null);
-
         // Create main view chain
         ViewchainFactory mainFactory = this.viewchainFactory;
         mainComponentView = mainFactory.createViewchainMain(mainComponentView, false);
-
-        // create overview view chain
-        if (firstTime) {
-            ViewchainFactory overviewFactory = new ViewchainFactory(true);
-            overviewComponentView = overviewFactory.createViewchainOverview(mainComponentView, overviewComponentView, false);
-        } else {
-            overviewComponentView.getAdapter(SynchronizeView.class).setObservedView(mainComponentView);
-        }
 
         return firstTime;
     }
@@ -93,10 +82,6 @@ public class GuiState implements State {
             return this.createViewChains();
         } else {
             mainComponentView = getViewchainFactory().createViewchainFromExistingViewchain(previousState.getMainComponentView(), this.mainComponentView, false);
-            overviewComponentView = previousState.getOverviewComponentView();
-            if (mainComponentView != null && overviewComponentView != null) {
-                overviewComponentView.getAdapter(SynchronizeView.class).setObservedView(mainComponentView);
-            }
             return false;
         }
     }
@@ -126,11 +111,6 @@ public class GuiState implements State {
     @Override
     public ComponentView getMainComponentView() {
         return mainComponentView;
-    }
-
-    @Override
-    public ComponentView getOverviewComponentView() {
-        return overviewComponentView;
     }
 
     public RenderModeStatusPanel getRenderModeStatus() {
