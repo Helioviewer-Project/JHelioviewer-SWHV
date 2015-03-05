@@ -25,7 +25,7 @@ public class GL3DImageLayerFactory {
         if (metaData instanceof HelioviewerOcculterMetaData || metaData instanceof HelioviewerMetaData) {
             imageLayer = new GL3DImageLayer(metaData.toString(), mainView);
         } else {
-            Log.error("GL3DShaderFactory: Cannot create ImageMesh for given ImageTextureView, not recognized underlying data " + metaData);
+            Log.error("GL3DImageLayerFactory: Cannot create ImageMesh for given ImageTextureView, not recognized underlying data " + metaData);
         }
 
         return imageLayer;

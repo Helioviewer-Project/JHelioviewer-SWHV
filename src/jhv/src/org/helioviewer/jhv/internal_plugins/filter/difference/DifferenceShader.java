@@ -2,9 +2,9 @@ package org.helioviewer.jhv.internal_plugins.filter.difference;
 
 import javax.media.opengl.GL2;
 
-import org.helioviewer.jhv.shaderfactory.ShaderFactory;
 import org.helioviewer.viewmodel.view.opengl.shader.GLFragmentShaderProgram;
 import org.helioviewer.viewmodel.view.opengl.shader.GLShaderBuilder;
+import org.helioviewer.viewmodel.view.opengl.shader.ShaderFactory;
 
 public class DifferenceShader extends GLFragmentShaderProgram {
 
