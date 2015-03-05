@@ -33,8 +33,4 @@ public abstract class GLFragmentShaderProgram {
     public void bind(GL2 gl) {
     }
 
-    public void bindEnvVarsFloat(GL2 gl, int id, float[] param) {
-        gl.glProgramLocalParameter4fARB(target, id, param[0], param[1], param[2], param[3]);
-    }
-
 }

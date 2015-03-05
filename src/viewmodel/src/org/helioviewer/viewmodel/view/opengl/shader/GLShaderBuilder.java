@@ -114,17 +114,6 @@ public class GLShaderBuilder {
     }
 
     /**
-     * Returns the GL object assigned to this ShaderBuilder. Warning: Only use
-     * this function within a build*Shader-method, otherwise the object might
-     * not be valid.
-     *
-     * @return Reference to the current gl object
-     */
-    public GL2 getGL() {
-        return gl;
-    }
-
-    /**
      * Returns OpenGL shader id assigned to this shader. To use this shader,
      * bind shader id.
      *
