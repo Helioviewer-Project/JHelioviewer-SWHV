@@ -56,6 +56,4 @@ public interface State {
 
     public void deactivate();
 
-    public boolean isOverviewPanelInteractionEnabled();
-
 }

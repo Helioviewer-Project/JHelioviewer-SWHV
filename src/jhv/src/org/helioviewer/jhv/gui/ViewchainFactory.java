@@ -128,42 +128,6 @@ public class ViewchainFactory {
     }
 
     /**
-     * This method creates the overview view chain always in software mode and
-     * if a main view chain already exists.
-     *
-     * If there is no main view chain (represented by there topmost view, the
-     * ComponentView) than the method did nothing and returns a null value. The
-     * instance is needed to make synchronization available.
-     * <p>
-     * If a ComponentView of an existing view chain was passed to the method the
-     * whole view chain will be transfered with all its settings to a new view
-     * chain. If no ComponentView instance was passed the method creates a new
-     * overview view chain.
-     *
-     * @param mainImagePanelView
-     *            the ComponentView instance of the main view chain which acts
-     *            as the observed view chain.
-     * @param currentOverviewImagePanelView
-     *            the ComponentView instance (or null) of an existing overview
-     *            view chain.
-     * @param keepSource
-     *            If true, the source view chain stays untouched, otherwise it
-     *            will be unusable afterwards
-     * @return the ComponentView of the new overview view chain or null if it
-     *         could not be created.
-     */
-    public ComponentView createViewchainOverview(ComponentView mainImagePanelView, ComponentView currentOverviewImagePanelView, boolean keepSource) {
-        if (mainImagePanelView == null)
-            return null;
-
-        if (currentOverviewImagePanelView == null) {
-            return createNewViewchainOverview(mainImagePanelView);
-        } else {
-            return createViewchainFromExistingViewchain(currentOverviewImagePanelView, mainImagePanelView, keepSource);
-        }
-    }
-
-    /**
      * Adds a new ImageInfoView to the main view chain and creates the
      * corresponding user interface components.
      *
@@ -361,29 +325,6 @@ public class ViewchainFactory {
 
         // add Overlays
         // updateOverlayViewsInViewchainMain(componentView);
-
-        return componentView;
-    }
-
-    /**
-     * Creates a new overview view chain with the minimum needed views.
-     *
-     * @param mainImagePanelView
-     *            the topmost view of the view chain which is the observed view
-     *            chain.
-     * @return a instance of a ComponentView which is the topmost view of the
-     *         new chain.
-     */
-    protected ComponentView createNewViewchainOverview(ComponentView mainImagePanelView) {
-        // Always use BufferedImageViewFactory
-        ViewFactory viewFactory = new BufferedImageViewFactory();
-
-        // Layered View
-        LayeredView layeredView = viewFactory.createNewView(LayeredView.class);
-
-        // Component View
-        ComponentView componentView = viewFactory.createNewView(ComponentView.class);
-        componentView.setView(layeredView);
 
         return componentView;
     }

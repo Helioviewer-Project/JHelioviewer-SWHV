@@ -13,18 +13,13 @@ package org.helioviewer.viewmodel.filter;
  * passed to a {@link org.helioviewer.viewmodel.view.FilterView}. Every time a
  * new image passes the FilterView, it will call the filter.
  *
- * <p>
- * If the view chain gets copied like for the overview chain, the same filter
- * will be used for both FilterViews!
- *
  * @author Ludwig Schmidt
  */
 public interface Filter {
 
     /**
      * Returns if the filter is a major filter or not. Major filter means that
-     * it is a basic filter which will be supported in the whole program (e.g.
-     * filter result will be visible in overview). If a filter is not a major
+     * it is a basic filter which will be supported in the whole program. If a filter is not a major
      * filter the program will not apply it in certain circumstances.
      *
      * @return if it is a major filter
