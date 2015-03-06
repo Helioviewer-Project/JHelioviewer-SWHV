@@ -6,9 +6,8 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.io.InputStreamReader;
-import java.net.URL;
 import java.nio.CharBuffer;
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -35,8 +34,7 @@ import org.helioviewer.viewmodel.view.opengl.GLInfo;
  */
 public class GLShaderHelper {
 
-    private static LinkedList<Integer> allShaders = new LinkedList<Integer>();
-    private static int shaderCurrentlyBound = 0;
+    private static ArrayList<Integer> allShaders = new ArrayList<Integer>();
 
     /**
      * Generates a new shader.
@@ -117,9 +115,15 @@ public class GLShaderHelper {
      * @param target
      *            Shader id to put the compiled program
      */
+    private static int next = 0;
+
     public void compileProgram(GL2 gl, int programType, String source, int target) {
-        File tmpOut = new File(GLInfo.shaderTmpPath + "tmp.cg");
-        File tmpIn = new File(GLInfo.shaderTmpPath + "tmp.asm");
+        int currentindex = next++;
+        String asmpath = GLInfo.shaderTmpPath + currentindex + "tmp.asm";
+        String cgpath = GLInfo.shaderTmpPath + currentindex + "tmp.cg";
+
+        File tmpOut = new File(cgpath);
+        File tmpIn = new File(asmpath);
         if (tmpIn.exists()) {
             tmpIn.delete();
         }
@@ -133,8 +137,8 @@ public class GLShaderHelper {
         args.add("-profile");
         args.add(profile);
         args.add("-o");
-        args.add(GLInfo.shaderTmpPath + "tmp.asm");
-        args.add(GLInfo.shaderTmpPath + "tmp.cg");
+        args.add(asmpath);
+        args.add(cgpath);
 
         try {
             Process p = FileUtils.invokeExecutable("cgc", args);
@@ -145,7 +149,7 @@ public class GLShaderHelper {
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
-        tmpIn = new File(GLInfo.shaderTmpPath + "tmp.asm");
+        tmpIn = new File(asmpath);
 
         if (!tmpIn.exists()) {
             Log.error("Error while compiling shader program:");
@@ -160,35 +164,6 @@ public class GLShaderHelper {
 
         CharBuffer programBuffer = CharBuffer.wrap(compiledProgram);
         gl.glProgramStringARB(programType, GL2.GL_PROGRAM_FORMAT_ASCII_ARB, compiledProgram.length(), programBuffer.toString());
-    }
-
-    /**
-     * Reads the contents of a file and puts them to a String.
-     *
-     * @param aFile
-     *            Location of the file to read
-     * @return contents of the file
-     */
-    private String getContents(URL aFile) {
-        StringBuilder contents = new StringBuilder();
-
-        try {
-            BufferedReader input = new BufferedReader(new InputStreamReader(aFile.openStream()));
-            try {
-                String line = null; // not declared within while loop
-
-                while ((line = input.readLine()) != null) {
-                    contents.append(line);
-                    contents.append(System.getProperty("line.separator"));
-                }
-            } finally {
-                input.close();
-            }
-        } catch (IOException ex) {
-            ex.printStackTrace();
-        }
-
-        return contents.toString();
     }
 
     /**
