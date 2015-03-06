@@ -69,6 +69,7 @@ public class ContrastFilter extends AbstractFilter implements Filter {
      */
     @Override
     public void applyGL(GL2 gl) {
+        ShaderFactory.setContrast(contrast);
     }
 
     /**
