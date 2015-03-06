@@ -34,7 +34,6 @@ public class PfssPluginContainer extends OverlayContainer {
         overlayPluginContainer.setRenderer3d(new PfssPlugin3dRenderer(pfssCache));
         overlayView.addOverlay(overlayPluginContainer);
         controlList.add(new OverlayControlComponent(pfssPluginPanel, getName()));
-
     }
 
     /**

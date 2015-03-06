@@ -23,7 +23,6 @@ public class PfssPlugin extends GL3DAbstractModelPlugin {
     }
 
     public void unload() {
-
     }
 
     public String getPluginDescription() {
@@ -39,6 +38,6 @@ public class PfssPlugin extends GL3DAbstractModelPlugin {
     }
 
     public static void main(String[] args) {
-        // nothing
     }
+
 }

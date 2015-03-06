@@ -202,7 +202,6 @@ public class PfssPluginPanel extends OverlayPanel implements ActionListener, Lay
         if (act.getSource().equals(reloadButton)) {
             layerAdded(0);
         }
-
     }
 
     @Override
@@ -257,7 +256,6 @@ public class PfssPluginPanel extends OverlayPanel implements ActionListener, Lay
                     String[] date;
                     String[] time;
                     while ((inputLine = in.readLine()) != null) {
-
                         splitted = inputLine.split(" ");
                         url = splitted[1];
                         splitted = splitted[0].split("T");

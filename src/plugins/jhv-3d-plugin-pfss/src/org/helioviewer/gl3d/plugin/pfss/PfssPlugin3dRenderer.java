@@ -14,6 +14,7 @@ import org.helioviewer.viewmodel.view.View;
  * @author Stefan Meier (stefan.meier@fhnw.ch)
  * */
 public class PfssPlugin3dRenderer extends PhysicalRenderer3d {
+
     private PfssCache pfssCache = null;
     private GL2 lastGl = null;
 
@@ -52,12 +53,10 @@ public class PfssPlugin3dRenderer extends PhysicalRenderer3d {
     }
 
     public void setVisible() {
-
     }
 
     @Override
     public void viewChanged(View view) {
-
     }
 
 }

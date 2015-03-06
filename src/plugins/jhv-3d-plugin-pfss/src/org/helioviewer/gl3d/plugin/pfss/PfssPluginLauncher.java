@@ -18,7 +18,6 @@ public class PfssPluginLauncher {
      * @param args
      */
     public static void main(String[] args) {
-
         System.out.println("================================================================");
         System.out.println("JHelioviewer developer version with external plugin compiled-in.");
         System.out.println("================================================================\n\n");
@@ -36,4 +35,5 @@ public class PfssPluginLauncher {
         JavaHelioViewerLauncher.loadLibs();
         JavaHelioViewer.main(args2, new PfssPlugin(true));
     }
+
 }
