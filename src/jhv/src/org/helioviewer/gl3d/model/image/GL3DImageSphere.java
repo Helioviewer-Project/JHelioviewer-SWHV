@@ -13,8 +13,6 @@ import org.helioviewer.viewmodel.metadata.HelioviewerOcculterMetaData;
 import org.helioviewer.viewmodel.metadata.HelioviewerPositionedMetaData;
 import org.helioviewer.viewmodel.metadata.MetaData;
 import org.helioviewer.viewmodel.view.opengl.GL3DImageTextureView;
-import org.helioviewer.viewmodel.view.opengl.shader.GLFragmentShaderProgram;
-import org.helioviewer.viewmodel.view.opengl.shader.GLVertexShaderProgram;
 
 /**
  * Maps the solar disc part of an image layer onto an adaptive mesh that either
@@ -31,8 +29,8 @@ public class GL3DImageSphere extends GL3DImageMesh {
     private boolean showCorona;
     private final boolean restoreColorMask;
 
-    public GL3DImageSphere(GL3DImageTextureView imageTextureView, GLVertexShaderProgram vertexShaderProgram, GLFragmentShaderProgram fragmentShaderProgram, GL3DImageLayer imageLayer, boolean showSphere, boolean showCorona, boolean restoreColorMask) {
-        super("Sphere", imageTextureView, vertexShaderProgram, fragmentShaderProgram);
+    public GL3DImageSphere(GL3DImageTextureView imageTextureView, GL3DImageLayer imageLayer, boolean showSphere, boolean showCorona, boolean restoreColorMask) {
+        super("Sphere", imageTextureView);
         this.restoreColorMask = restoreColorMask;
         layer = imageLayer;
         this.showSphere = showSphere;

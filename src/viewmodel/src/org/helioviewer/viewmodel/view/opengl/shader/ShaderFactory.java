@@ -14,6 +14,7 @@ public class ShaderFactory {
     private static int fragment2dCGID = -1;
     private static int vertex2dCGID = -1;
     private static int vertex3dCGID = -1;
+    /* Fragment */
     public static final int truncationValueRef = 0;
     public static final int isDifferenceValueRef = 1;
     public static final int sharpenParamRef = 2;
@@ -36,6 +37,22 @@ public class ShaderFactory {
     public static final double[] cutOffRadiusFloat = new double[4];
     public static final double[] outerCutOffRadiusFloat = new double[4];
 
+    /* Vertex */
+    public static final int rectRef = 0;
+    public static final int thetaRef = 1;
+    public static final int phiRef = 2;
+    public static final int differenceThetaRef = 3;
+    public static final int differencePhiRef = 4;
+    public static final int offsetRef = 5;
+    public static final int differenceRectRef = 6;
+    public static final double[] rectVertex = new double[4];
+    public static final double[] thetaVertex = new double[4];
+    public static final double[] phiVertex = new double[4];
+    public static final double[] differenceThetaVertex = new double[4];
+    public static final double[] differencePhiVertex = new double[4];
+    public static final double[] offsetVertex = new double[4];
+    public static final double[] differenceRectVertex = new double[4];
+
     public ShaderFactory() {
     }
 
@@ -48,6 +65,8 @@ public class ShaderFactory {
     public static void changeAngles(double theta, double phi) {
         thetaParamFloat[0] = theta;
         phiParamFloat[0] = phi;
+        thetaVertex[0] = theta;
+        phiVertex[0] = phi;
     }
 
     public static void setAlpha(float alpha) {
@@ -125,4 +144,41 @@ public class ShaderFactory {
         gl.glProgramLocalParameter4dARB(target, id, param[0], param[1], param[2], param[3]);
     }
 
+    public static void changeRect(double xOffset, double yOffset, double xScale, double yScale) {
+        rectVertex[0] = xOffset;
+        rectVertex[1] = yOffset;
+        rectVertex[2] = xScale;
+        rectVertex[3] = yScale;
+    }
+
+    public static void changeDifferenceAngles(double theta, double phi) {
+        differenceThetaVertex[0] = theta;
+        differencePhiVertex[0] = phi;
+    }
+
+    public static void setDifferenceRect(double differenceXOffset, double differenceYOffset, double differenceXScale, double differenceYScale) {
+        offsetVertex[0] = differenceXOffset;
+        offsetVertex[1] = differenceYOffset;
+        offsetVertex[2] = differenceXScale;
+        offsetVertex[3] = differenceYScale;
+    }
+
+    public static void bindVertexShader(GL2 gl) {
+        gl.glBindProgramARB(GL2.GL_VERTEX_PROGRAM_ARB, ShaderFactory.getVertexId());
+        ShaderFactory.bindEnvVars(gl, GL2.GL_VERTEX_PROGRAM_ARB, ShaderFactory.rectRef, ShaderFactory.rectVertex);
+        ShaderFactory.bindEnvVars(gl, GL2.GL_VERTEX_PROGRAM_ARB, ShaderFactory.offsetRef, ShaderFactory.offsetVertex);
+        ShaderFactory.bindEnvVars(gl, GL2.GL_VERTEX_PROGRAM_ARB, ShaderFactory.differenceRectRef, ShaderFactory.differenceRectVertex);
+        ShaderFactory.bindEnvVars(gl, GL2.GL_VERTEX_PROGRAM_ARB, ShaderFactory.thetaRef, ShaderFactory.thetaVertex);
+        ShaderFactory.bindEnvVars(gl, GL2.GL_VERTEX_PROGRAM_ARB, ShaderFactory.phiRef, ShaderFactory.phiVertex);
+        ShaderFactory.bindEnvVars(gl, GL2.GL_VERTEX_PROGRAM_ARB, ShaderFactory.differenceThetaRef, ShaderFactory.differenceThetaVertex);
+        ShaderFactory.bindEnvVars(gl, GL2.GL_VERTEX_PROGRAM_ARB, ShaderFactory.differencePhiRef, ShaderFactory.differencePhiVertex);
+    }
+
+    public static void bindFragmentShader(GL2 gl) {
+        gl.glBindProgramARB(GL2.GL_FRAGMENT_PROGRAM_ARB, ShaderFactory.getFragmentId());
+        ShaderFactory.bindEnvVars(gl, GL2.GL_FRAGMENT_PROGRAM_ARB, ShaderFactory.cutOffRadiusRef, ShaderFactory.cutOffRadiusFloat);
+        ShaderFactory.bindEnvVars(gl, GL2.GL_FRAGMENT_PROGRAM_ARB, ShaderFactory.outerCutOffRadiusRef, ShaderFactory.outerCutOffRadiusFloat);
+        ShaderFactory.bindEnvVars(gl, GL2.GL_FRAGMENT_PROGRAM_ARB, ShaderFactory.phiParamRef, ShaderFactory.phiParamFloat);
+        ShaderFactory.bindEnvVars(gl, GL2.GL_FRAGMENT_PROGRAM_ARB, ShaderFactory.thetaParamRef, ShaderFactory.thetaParamFloat);
+    }
 }

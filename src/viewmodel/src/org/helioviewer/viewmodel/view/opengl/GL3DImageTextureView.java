@@ -6,7 +6,7 @@ import javax.media.opengl.GL2;
 
 import org.helioviewer.base.math.MathUtils;
 import org.helioviewer.base.physics.Astronomy;
-import org.helioviewer.base.physics.Constants;
+import org.helioviewer.gl3d.model.image.GL3DImageMesh;
 import org.helioviewer.gl3d.scenegraph.GL3DState;
 import org.helioviewer.viewmodel.changeevent.CacheStatusChangedReason;
 import org.helioviewer.viewmodel.changeevent.ChangeEvent;
@@ -21,14 +21,12 @@ import org.helioviewer.viewmodel.metadata.MetaData;
 import org.helioviewer.viewmodel.region.Region;
 import org.helioviewer.viewmodel.region.StaticRegion;
 import org.helioviewer.viewmodel.view.ImageInfoView;
-import org.helioviewer.viewmodel.view.MetaDataView;
 import org.helioviewer.viewmodel.view.SubimageDataView;
 import org.helioviewer.viewmodel.view.View;
 import org.helioviewer.viewmodel.view.ViewListener;
 import org.helioviewer.viewmodel.view.jp2view.JHVJPXView;
-import org.helioviewer.viewmodel.view.opengl.shader.GL3DImageFragmentShaderProgram;
-import org.helioviewer.viewmodel.view.opengl.shader.GL3DImageVertexShaderProgram;
-import org.helioviewer.viewmodel.viewport.Viewport;
+import org.helioviewer.viewmodel.view.opengl.shader.GL3DShaderFactory;
+import org.helioviewer.viewmodel.view.opengl.shader.ShaderFactory;
 
 /**
  * Connects the 3D viewchain to the 2D viewchain. The underlying 2D viewchain
@@ -46,9 +44,6 @@ public class GL3DImageTextureView extends AbstractGL3DView implements GL3DView {
     private boolean regionChanged = true;
     private boolean forceUpdate = false;
     private Region capturedRegion = null;
-
-    private final GL3DImageFragmentShaderProgram fragmentShader = new GL3DImageFragmentShaderProgram();
-    private GL3DImageVertexShaderProgram vertexShader = null;
 
     @Override
     public void renderGL(GL2 gl, boolean nextView) {
@@ -81,67 +76,63 @@ public class GL3DImageTextureView extends AbstractGL3DView implements GL3DView {
             return null;
         }
 
-        if (vertexShader != null) {
-            double xOffset = region.getLowerLeftCorner().getX();
-            double yOffset = region.getLowerLeftCorner().getY();
-            double xScale = 1. / region.getWidth();
-            double yScale = 1. / region.getHeight();
-            Date dt = new Date(image.getDateMillis());
+        double xOffset = region.getLowerLeftCorner().getX();
+        double yOffset = region.getLowerLeftCorner().getY();
+        double xScale = 1. / region.getWidth();
+        double yScale = 1. / region.getHeight();
+        Date dt = new Date(image.getDateMillis());
 
-            double theta = -Astronomy.getB0InRadians(dt);
-            double phi = Astronomy.getL0Radians(dt);
-            MetaData metadata = imageView.getMetadata();
-            if (metadata instanceof HelioviewerPositionedMetaData) {
-                HelioviewerPositionedMetaData md = (HelioviewerPositionedMetaData) metadata;
-                phi -= md.getStonyhurstLongitude() / MathUtils.radeg;
-                theta = - md.getStonyhurstLatitude() / MathUtils.radeg;
-            }
-
-            this.vertexShader.changeRect(xOffset, yOffset, xScale, yScale);
-            this.vertexShader.changeAngles(theta, phi);
-
-            JHVJPXView jhvjpx = this.getAdapter(JHVJPXView.class);
-            if (jhvjpx != null) {
-                boolean diffMode = false;
-                Region diffRegion = null;
-                Date diffDate = null;
-
-                if (!jhvjpx.getBaseDifferenceMode() && jhvjpx.getPreviousImageData() != null) {
-                    diffMode = true;
-                    diffRegion = jhvjpx.getPreviousImageData().getRegion();
-                    diffDate = new Date(jhvjpx.getPreviousImageData().getDateMillis());
-                } else if (jhvjpx.getBaseDifferenceMode() && jhvjpx.getBaseDifferenceImageData() != null) {
-                    diffMode = true;
-                    diffRegion = jhvjpx.getBaseDifferenceImageData().getRegion();
-                    diffDate = new Date(jhvjpx.getBaseDifferenceImageData().getDateMillis());
-                }
-
-                if (diffMode) {
-                    double diffXOffset = diffRegion.getLowerLeftCorner().getX();
-                    double diffYOffset = diffRegion.getLowerLeftCorner().getY();
-                    double diffXScale = 1. / diffRegion.getWidth();
-                    double diffYScale = 1. / diffRegion.getHeight();
-
-                    double diffTheta = -Astronomy.getB0InRadians(diffDate);
-                    double diffPhi = Astronomy.getL0Radians(diffDate);
-
-                    this.vertexShader.setDifferenceRect(diffXOffset, diffYOffset, diffXScale, diffYScale);
-                    this.vertexShader.changeDifferenceAngles(diffTheta, diffPhi);
-                }
-            }
-
-            this.fragmentShader.changeAngles(theta, phi);
-
-            double innerCutOff = 0;
-            double outerCutOff = 40;
-            if (metadata instanceof HelioviewerOcculterMetaData) {
-                HelioviewerOcculterMetaData md = (HelioviewerOcculterMetaData) metadata;
-                innerCutOff = md.getInnerPhysicalOcculterRadius();
-                outerCutOff = md.getOuterPhysicalOcculterRadius();
-            }
-
-            this.fragmentShader.setCutOffRadius(innerCutOff, outerCutOff);
+        double theta = -Astronomy.getB0InRadians(dt);
+        double phi = Astronomy.getL0Radians(dt);
+        MetaData metadata = imageView.getMetadata();
+        if (metadata instanceof HelioviewerPositionedMetaData) {
+            HelioviewerPositionedMetaData md = (HelioviewerPositionedMetaData) metadata;
+            phi -= md.getStonyhurstLongitude() / MathUtils.radeg;
+            theta = -md.getStonyhurstLatitude() / MathUtils.radeg;
         }
+
+        ShaderFactory.changeRect(xOffset, yOffset, xScale, yScale);
+        ShaderFactory.changeAngles(theta, phi);
+
+        JHVJPXView jhvjpx = this.getAdapter(JHVJPXView.class);
+        if (jhvjpx != null) {
+            boolean diffMode = false;
+            Region diffRegion = null;
+            Date diffDate = null;
+
+            if (!jhvjpx.getBaseDifferenceMode() && jhvjpx.getPreviousImageData() != null) {
+                diffMode = true;
+                diffRegion = jhvjpx.getPreviousImageData().getRegion();
+                diffDate = new Date(jhvjpx.getPreviousImageData().getDateMillis());
+            } else if (jhvjpx.getBaseDifferenceMode() && jhvjpx.getBaseDifferenceImageData() != null) {
+                diffMode = true;
+                diffRegion = jhvjpx.getBaseDifferenceImageData().getRegion();
+                diffDate = new Date(jhvjpx.getBaseDifferenceImageData().getDateMillis());
+            }
+
+            if (diffMode) {
+                double diffXOffset = diffRegion.getLowerLeftCorner().getX();
+                double diffYOffset = diffRegion.getLowerLeftCorner().getY();
+                double diffXScale = 1. / diffRegion.getWidth();
+                double diffYScale = 1. / diffRegion.getHeight();
+
+                double diffTheta = -Astronomy.getB0InRadians(diffDate);
+                double diffPhi = Astronomy.getL0Radians(diffDate);
+
+                ShaderFactory.setDifferenceRect(diffXOffset, diffYOffset, diffXScale, diffYScale);
+                ShaderFactory.changeDifferenceAngles(diffTheta, diffPhi);
+            }
+        }
+
+        double innerCutOff = 0;
+        double outerCutOff = 40;
+        if (metadata instanceof HelioviewerOcculterMetaData) {
+            HelioviewerOcculterMetaData md = (HelioviewerOcculterMetaData) metadata;
+            innerCutOff = md.getInnerPhysicalOcculterRadius();
+            outerCutOff = md.getOuterPhysicalOcculterRadius();
+        }
+
+        ShaderFactory.setCutOffRadius(innerCutOff, outerCutOff);
 
         this.recaptureRequested = false;
         return region;
@@ -172,14 +163,6 @@ public class GL3DImageTextureView extends AbstractGL3DView implements GL3DView {
 
     public void forceUpdate() {
         this.forceUpdate = true;
-    }
-
-    public void setVertexShader(GL3DImageVertexShaderProgram vertexShader) {
-        this.vertexShader = vertexShader;
-    }
-
-    public GL3DImageFragmentShaderProgram getFragmentShader() {
-        return this.fragmentShader;
     }
 
 }

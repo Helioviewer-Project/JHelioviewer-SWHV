@@ -12,6 +12,7 @@ import org.helioviewer.viewmodel.view.opengl.GL3DImageTextureView;
 import org.helioviewer.viewmodel.view.opengl.GLFilterView;
 import org.helioviewer.viewmodel.view.opengl.shader.GLFragmentShaderProgram;
 import org.helioviewer.viewmodel.view.opengl.shader.GLVertexShaderProgram;
+import org.helioviewer.viewmodel.view.opengl.shader.ShaderFactory;
 
 /**
  * A {@link GL3DImageMesh} is used to map a image that was rendered in the 2D
@@ -25,19 +26,13 @@ public abstract class GL3DImageMesh extends GL3DMesh {
 
     protected GL3DImageTextureView imageTextureView;
 
-    private final GLVertexShaderProgram vertexShaderProgram;
-    private final GLFragmentShaderProgram fragmentShaderProgram;
-
     protected Region capturedRegion;
 
     private boolean reshapeRequested = false;
 
-    public GL3DImageMesh(String name, GL3DImageTextureView _imageTextureView, GLVertexShaderProgram vertexShaderProgram, GLFragmentShaderProgram fragmentShaderProgram) {
+    public GL3DImageMesh(String name, GL3DImageTextureView _imageTextureView) {
         super(name, new GL3DVec4f(0, 1, 0, 0.5f), new GL3DVec4f(0, 0, 0, 0));
         this.imageTextureView = _imageTextureView;
-
-        this.vertexShaderProgram = vertexShaderProgram;
-        this.fragmentShaderProgram = fragmentShaderProgram;
 
         imageTextureView.addViewListener(new ViewListener() {
             @Override
@@ -58,9 +53,6 @@ public abstract class GL3DImageMesh extends GL3DMesh {
     public GL3DImageMesh(String name, GL3DImageTextureView _imageTextureView, GLVertexShaderProgram vertexShaderProgram, GLFragmentShaderProgram fragmentShaderProgram, boolean viewListener) {
         super(name, new GL3DVec4f(0, 1, 0, 0.5f), new GL3DVec4f(0, 0, 0, 0));
         this.imageTextureView = _imageTextureView;
-
-        this.vertexShaderProgram = vertexShaderProgram;
-        this.fragmentShaderProgram = fragmentShaderProgram;
 
         this.reshapeRequested = true;
         this.markAsChanged();
@@ -92,9 +84,8 @@ public abstract class GL3DImageMesh extends GL3DMesh {
 
         GLVertexShaderProgram.pushShader(state.gl);
 
-        this.vertexShaderProgram.bind(state.gl);
-        this.fragmentShaderProgram.bind(state.gl);
-        //state.gl.glBindProgramARB(GL2.GL_FRAGMENT_PROGRAM_ARB, ShaderFactory.getFragmentId());
+        ShaderFactory.bindVertexShader(state.gl);
+        ShaderFactory.bindFragmentShader(state.gl);
 
         super.shapeDraw(state);
 
@@ -103,13 +94,5 @@ public abstract class GL3DImageMesh extends GL3DMesh {
 
     public GL3DImageTextureView getImageTextureView() {
         return imageTextureView;
-    }
-
-    protected GLVertexShaderProgram getVertexShader() {
-        return vertexShaderProgram;
-    }
-
-    protected GLFragmentShaderProgram getFragmentShader() {
-        return fragmentShaderProgram;
     }
 }
