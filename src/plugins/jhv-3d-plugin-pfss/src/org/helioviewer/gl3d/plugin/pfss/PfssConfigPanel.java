@@ -27,9 +27,6 @@ import org.helioviewer.base.logging.Log;
  */
 public class PfssConfigPanel extends JPanel {
 
-    /**
-     * 
-     */
     private static final long serialVersionUID = 8535729209025947878L;
 
     private final PfssPlugin plugin;
@@ -44,12 +41,10 @@ public class PfssConfigPanel extends JPanel {
 
     protected void init() {
         final JPanel that = this;
-
         this.setLayout(new BorderLayout());
-
         this.add(new JLabel("Loaded PFSS Models:"), BorderLayout.NORTH);
-
         this.fileModel = new PfssFileListModel();
+
         final JList fileList = new JList(this.fileModel);
         JScrollPane scroll = new JScrollPane(fileList);
         this.add(scroll, BorderLayout.CENTER);
@@ -79,6 +74,7 @@ public class PfssConfigPanel extends JPanel {
                 }
             }
         });
+
         final JButton removeButton = new JButton("Remove");
         removeButton.addActionListener(new ActionListener() {
             @Override
@@ -89,7 +85,6 @@ public class PfssConfigPanel extends JPanel {
         });
 
         fileList.addListSelectionListener(new ListSelectionListener() {
-
             @Override
             public void valueChanged(ListSelectionEvent e) {
                 if (fileList.isSelectionEmpty()) {
@@ -103,23 +98,17 @@ public class PfssConfigPanel extends JPanel {
         controls.add(this.qualitySpinner);
         controls.add(addButton);
         controls.add(removeButton);
-
         this.add(controls, BorderLayout.SOUTH);
     }
 
     private class PfssFileListModel extends DefaultListModel {
 
-        /**
-         * 
-         */
         private static final long serialVersionUID = -2994377168813184873L;
-
-        public PfssFileListModel() {
-        }
 
         public void removeModel(int index) {
             this.fireIntervalRemoved(this, index, index);
         }
 
     }
+
 }
