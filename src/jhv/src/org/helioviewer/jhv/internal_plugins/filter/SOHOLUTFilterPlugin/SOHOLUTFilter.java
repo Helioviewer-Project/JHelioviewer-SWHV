@@ -48,17 +48,6 @@ public class SOHOLUTFilter extends AbstractFilter implements FrameFilter, GLFilt
     private boolean changed;
 
     /**
-     * {@inheritDoc}
-     *
-     * <p>
-     * This filter is a major filter.
-     */
-    @Override
-    public boolean isMajorFilter() {
-        return true;
-    }
-
-    /**
      * LUT is set to Gray as default table.
      */
     public SOHOLUTFilter() {

@@ -81,17 +81,6 @@ public class SharpenFilter extends AbstractFilter implements GLImageSizeFilter {
 
     /**
      * {@inheritDoc}
-     *
-     * <p>
-     * This filter is not a major filter.
-     */
-    @Override
-    public boolean isMajorFilter() {
-        return false;
-    }
-
-    /**
-     * {@inheritDoc}
      */
     @Override
     public void setState(String state) {

@@ -17,16 +17,6 @@ package org.helioviewer.viewmodel.filter;
 public interface Filter {
 
     /**
-     * Returns if the filter is a major filter or not. Major filter means that
-     * it is a basic filter which will be supported in the whole program. If a
-     * filter is not a major filter the program will not apply it in certain
-     * circumstances.
-     *
-     * @return if it is a major filter
-     * */
-    public boolean isMajorFilter();
-
-    /**
      * Sets the filter state.
      *
      * The format of the state is determined by the filter itself. It should

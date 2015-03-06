@@ -61,14 +61,6 @@ public class RunningDifferenceFilter implements FrameFilter, ObservableFilter, G
     }
 
     /**
-     * @see org.helioviewer.viewmodel.filter.Filter#isMajorFilter()
-     */
-    @Override
-    public boolean isMajorFilter() {
-        return true;
-    }
-
-    /**
      * Inform all listener about a change of the state
      */
     protected void notifyAllListeners() {
