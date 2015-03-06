@@ -108,11 +108,11 @@ public class GL3DImageLayer extends GL3DGroup implements GL3DCameraListener {
         this.addNode(corona);
     }
 
-    protected GL3DImageMesh getImageSphere() {
+    protected GL3DImageSphere getImageSphere() {
         return this.sphere;
     }
 
-    public GL3DImageMesh getImageCorona() {
+    public GL3DImageSphere getImageCorona() {
         return this.corona;
     }
 

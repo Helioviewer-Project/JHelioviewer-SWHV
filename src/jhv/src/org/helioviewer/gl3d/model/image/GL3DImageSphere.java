@@ -8,11 +8,20 @@ import org.helioviewer.base.physics.Constants;
 import org.helioviewer.gl3d.math.GL3DVec2d;
 import org.helioviewer.gl3d.math.GL3DVec3d;
 import org.helioviewer.gl3d.math.GL3DVec4d;
+import org.helioviewer.gl3d.math.GL3DVec4f;
+import org.helioviewer.gl3d.scenegraph.GL3DMesh;
 import org.helioviewer.gl3d.scenegraph.GL3DState;
+import org.helioviewer.viewmodel.changeevent.ChangeEvent;
+import org.helioviewer.viewmodel.changeevent.ImageTextureRecapturedReason;
 import org.helioviewer.viewmodel.metadata.HelioviewerOcculterMetaData;
 import org.helioviewer.viewmodel.metadata.HelioviewerPositionedMetaData;
 import org.helioviewer.viewmodel.metadata.MetaData;
+import org.helioviewer.viewmodel.region.Region;
+import org.helioviewer.viewmodel.view.View;
+import org.helioviewer.viewmodel.view.ViewListener;
 import org.helioviewer.viewmodel.view.opengl.GL3DImageTextureView;
+import org.helioviewer.viewmodel.view.opengl.GLFilterView;
+import org.helioviewer.viewmodel.view.opengl.shader.ShaderFactory;
 
 /**
  * Maps the solar disc part of an image layer onto an adaptive mesh that either
@@ -22,15 +31,34 @@ import org.helioviewer.viewmodel.view.opengl.GL3DImageTextureView;
  * @author Simon Spoerri (simon.spoerri@fhnw.ch)
  *
  */
-public class GL3DImageSphere extends GL3DImageMesh {
+public class GL3DImageSphere extends GL3DMesh {
 
     private final GL3DImageLayer layer;
     private boolean showSphere;
     private boolean showCorona;
     private final boolean restoreColorMask;
+    private final GL3DImageTextureView imageTextureView;
+    private Region capturedRegion;
+    private boolean reshapeRequested = false;
 
     public GL3DImageSphere(GL3DImageTextureView imageTextureView, GL3DImageLayer imageLayer, boolean showSphere, boolean showCorona, boolean restoreColorMask) {
-        super("Sphere", imageTextureView);
+        super("Sphere", new GL3DVec4f(0, 1, 0, 0.5f), new GL3DVec4f(0, 0, 0, 0));
+        this.imageTextureView = imageTextureView;
+
+        imageTextureView.addViewListener(new ViewListener() {
+            @Override
+            public void viewChanged(View sender, ChangeEvent aEvent) {
+                ImageTextureRecapturedReason reason = aEvent.getLastChangedReasonByType(ImageTextureRecapturedReason.class);
+                if (reason != null) {
+                    reshapeRequested = true;
+                    capturedRegion = reason.getCapturedRegion();
+                    markAsChanged();
+                    // Log.debug("GL3DImageMesh.reshape: "+getName()+" Reason="+reason+", Event="+aEvent);
+                }
+            }
+        });
+        this.reshapeRequested = true;
+        this.markAsChanged();
         this.restoreColorMask = restoreColorMask;
         layer = imageLayer;
         this.showSphere = showSphere;
@@ -42,6 +70,13 @@ public class GL3DImageSphere extends GL3DImageMesh {
         state.gl.glEnable(GL2.GL_CULL_FACE);
         state.gl.glEnable(GL2.GL_DEPTH_TEST);
         state.gl.glEnable(GL2.GL_BLEND);
+        GLFilterView glfilter = this.imageTextureView.getAdapter(GLFilterView.class);
+        if (glfilter != null) {
+            glfilter.renderGL(state.gl, true);
+        }
+
+        ShaderFactory.bindVertexShader(state.gl);
+        ShaderFactory.bindFragmentShader(state.gl);
 
         super.shapeDraw(state);
         if (restoreColorMask) {
@@ -119,4 +154,20 @@ public class GL3DImageSphere extends GL3DImageMesh {
         return GL3DMeshPrimitive.TRIANGLES;
     }
 
+    @Override
+    public void shapeInit(GL3DState state) {
+        super.shapeInit(state);
+        this.imageTextureView.forceUpdate();
+    }
+
+    @Override
+    public void shapeUpdate(GL3DState state) {
+        if (this.reshapeRequested) {
+            this.reshapeRequested = false;
+        }
+    }
+
+    public GL3DImageTextureView getImageTextureView() {
+        return imageTextureView;
+    }
 }
