@@ -264,9 +264,11 @@ public abstract class GL3DCamera {
 
     public GL3DVec3d getVectorFromSphere(Point viewportCoordinates) {
         GL3DState state = GL3DState.get();
+        /* workaround for null GL3DState on startup */
         if (state == null) {
             return null;
         }
+
         GL3DMat4d vpmi = this.orthoMatrix.inverse();
         GL3DMat4d tli = GL3DMat4d.identity();
 
