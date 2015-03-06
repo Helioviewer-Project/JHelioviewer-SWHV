@@ -24,6 +24,7 @@ import org.helioviewer.gl3d.scenegraph.GL3DDrawBits.Bit;
  *
  */
 public abstract class GL3DMesh extends GL3DShape {
+
     private GL3DBuffer positionVBO;
     private GL3DBuffer normalVBO;
     private GL3DBuffer colorVBO;

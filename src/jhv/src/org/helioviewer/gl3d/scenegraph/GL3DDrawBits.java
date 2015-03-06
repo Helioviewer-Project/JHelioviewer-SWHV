@@ -9,6 +9,7 @@ package org.helioviewer.gl3d.scenegraph;
  * 
  */
 public class GL3DDrawBits {
+
     private boolean[] drawBits;
 
     public GL3DDrawBits() {

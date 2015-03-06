@@ -23,6 +23,7 @@ import org.helioviewer.gl3d.scenegraph.GL3DState;
 import com.jogamp.opengl.util.awt.TextRenderer;
 
 public class GL3DGrid extends GL3DGroup {
+
     private final double lonstepDegrees;
     private final double latstepDegrees;
     private final GL3DVec4f color;

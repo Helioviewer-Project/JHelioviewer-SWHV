@@ -217,4 +217,5 @@ public class GL3DVec2d {
     public String toString() {
         return "(" + x + ", " + y + ")";
     }
+
 }

@@ -16,6 +16,7 @@ import org.helioviewer.gl3d.scenegraph.visuals.GL3DPolyLine;
  *
  */
 public class GL3DGroup extends GL3DShape {
+
     protected GL3DNode first;
     protected GL3DNode last;
 

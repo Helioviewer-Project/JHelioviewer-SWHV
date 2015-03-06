@@ -23,6 +23,7 @@ import org.helioviewer.viewmodel.view.opengl.GL3DComponentView;
  *
  */
 public class GL3DState {
+
     private static GL3DState instance;
 
     public GL2 gl;
