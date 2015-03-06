@@ -27,6 +27,7 @@ import org.helioviewer.viewmodel.view.opengl.GL3DSceneGraphView;
  *
  */
 public class GL3DCameraSelectorModel extends AbstractListModel implements ComboBoxModel {
+
     private static final long serialVersionUID = 1L;
 
     private static GL3DCameraSelectorModel instance;
@@ -44,7 +45,7 @@ public class GL3DCameraSelectorModel extends AbstractListModel implements ComboB
     private GL3DObserverCamera observerCamera;
 
     private GL3DFollowObjectCamera followObjectCamera;
-    ArrayList<GL3DCameraSelectionModelListener> listeners = new ArrayList<GL3DCameraSelectionModelListener>();
+    private ArrayList<GL3DCameraSelectionModelListener> listeners = new ArrayList<GL3DCameraSelectionModelListener>();
 
     public static GL3DCameraSelectorModel getInstance() {
         if (instance == null) {
@@ -53,10 +54,7 @@ public class GL3DCameraSelectorModel extends AbstractListModel implements ComboB
         return instance;
     }
 
-    private GL3DCameraSelectorModel() {
-    }
-
-    public synchronized void activate(GL3DSceneGraphView sceneGraphView) {
+    public void activate(GL3DSceneGraphView sceneGraphView) {
         if (sceneGraphView != null) {
             if (earthCamera == null) {
                 earthCamera = new GL3DEarthCamera(sceneGraphView);
@@ -183,15 +181,11 @@ public class GL3DCameraSelectorModel extends AbstractListModel implements ComboB
     }
 
     public void addListener(GL3DCameraSelectionModelListener listener) {
-        synchronized (listeners) {
-            listeners.add(listener);
-        }
+        listeners.add(listener);
     }
 
     public void removeListener(GL3DCameraSelectionModelListener listener) {
-        synchronized (listeners) {
-            listeners.remove(listener);
-        }
+        listeners.remove(listener);
     }
 
 }

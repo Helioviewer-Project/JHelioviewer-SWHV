@@ -9,6 +9,7 @@ import org.helioviewer.gl3d.plugin.pfss.settings.PfssSettings;
  * @author Stefan Meier (stefan.meier@fhnw.ch)
  * */
 public class PfssDataLoader implements Runnable {
+
     private final PfssDayAndTime dayAndTime;
     private final PfssFitsFile fitsFile;
 

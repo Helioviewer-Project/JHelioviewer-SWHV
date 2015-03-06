@@ -6,6 +6,7 @@ package org.helioviewer.gl3d.plugin.pfss.data.dataStructure;
  * @author Stefan Meier (stefan.meier@fhnw.ch)
  * */
 public class PfssDayAndTime {
+
     public int getYear() {
         return year;
     }
@@ -42,4 +43,5 @@ public class PfssDayAndTime {
     public int getDayAndTime() {
         return dayAndTime;
     }
+
 }

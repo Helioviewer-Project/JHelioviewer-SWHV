@@ -28,7 +28,6 @@ public class GL3DFollowObjectCamera extends GL3DSolarRotationTrackingTrackballCa
     private double currentRotation = 0.0;
     private long timediff;
     private final ArrayList<GL3DFollowObjectCameraListener> followObjectCameraListeners = new ArrayList<GL3DFollowObjectCameraListener>();
-    GL3DCameraFOV cameraFOVDraw;
     private final GL3DPositionLoading positionLoading;
     private double FOVangle;
     private double currentL = 0.;
@@ -39,6 +38,8 @@ public class GL3DFollowObjectCamera extends GL3DSolarRotationTrackingTrackballCa
     private double lratio;
     private boolean interpolation;
     private boolean fovhidden = false;
+
+    protected GL3DCameraFOV cameraFOVDraw;
 
     public GL3DFollowObjectCamera(GL3DSceneGraphView sceneGraphView) {
         super(sceneGraphView);
@@ -140,10 +141,8 @@ public class GL3DFollowObjectCamera extends GL3DSolarRotationTrackingTrackballCa
     }
 
     private void fireCameratTime(Date currentCameraTime) {
-        synchronized (followObjectCameraListeners) {
-            for (GL3DFollowObjectCameraListener listener : followObjectCameraListeners) {
-                listener.fireCameraTime(currentCameraTime);
-            }
+        for (GL3DFollowObjectCameraListener listener : followObjectCameraListeners) {
+            listener.fireCameraTime(currentCameraTime);
         }
     }
 
@@ -161,32 +160,24 @@ public class GL3DFollowObjectCamera extends GL3DSolarRotationTrackingTrackballCa
     }
 
     public void addFollowObjectCameraListener(GL3DFollowObjectCameraListener listener) {
-        synchronized (followObjectCameraListeners) {
-            this.followObjectCameraListeners.add(listener);
-        }
+        this.followObjectCameraListeners.add(listener);
     }
 
     public void removeFollowObjectCameraListener(GL3DFollowObjectCameraListener listener) {
-        synchronized (followObjectCameraListeners) {
-            this.followObjectCameraListeners.remove(listener);
-        }
+        this.followObjectCameraListeners.remove(listener);
     }
 
     @Override
     public void fireNewLoaded(String state) {
-        synchronized (followObjectCameraListeners) {
-            for (GL3DFollowObjectCameraListener listener : followObjectCameraListeners) {
-                listener.fireLoaded(state);
-            }
+        for (GL3DFollowObjectCameraListener listener : followObjectCameraListeners) {
+            listener.fireLoaded(state);
         }
     }
 
     @Override
     public void fireNewDate() {
-        synchronized (followObjectCameraListeners) {
-            for (GL3DFollowObjectCameraListener listener : followObjectCameraListeners) {
-                listener.fireNewDate(new Date(this.currentCameraTime));
-            }
+        for (GL3DFollowObjectCameraListener listener : followObjectCameraListeners) {
+            listener.fireNewDate(new Date(this.currentCameraTime));
         }
     }
 
@@ -204,7 +195,6 @@ public class GL3DFollowObjectCamera extends GL3DSolarRotationTrackingTrackballCa
 
     public void setFOVangleDegrees(double fovAngle) {
         this.FOVangle = fovAngle * Math.PI / 180.0;
-
     }
 
     public void setInterpolation(boolean interpolation) {
@@ -213,7 +203,6 @@ public class GL3DFollowObjectCamera extends GL3DSolarRotationTrackingTrackballCa
 
     @Override
     public void layerAdded(int idx) {
-
     }
 
     @Override

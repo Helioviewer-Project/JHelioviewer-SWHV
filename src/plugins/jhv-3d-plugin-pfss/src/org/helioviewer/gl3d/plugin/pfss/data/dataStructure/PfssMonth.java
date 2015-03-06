@@ -8,6 +8,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
  * @author Stefan Meier (stefan.meier@fhnw.ch)
  * */
 public class PfssMonth {
+
     private final int month;
     private final CopyOnWriteArrayList<PfssDayAndTime> dayAndTimes;
 
@@ -23,7 +24,6 @@ public class PfssMonth {
     }
 
     public PfssDayAndTime findData(int dayAndTime) {
-
         PfssDayAndTime last = null;
         PfssDayAndTime entry = null;
         for (PfssDayAndTime data : dayAndTimes) {
@@ -43,4 +43,5 @@ public class PfssMonth {
     public String toString() {
         return month + "";
     }
+
 }
