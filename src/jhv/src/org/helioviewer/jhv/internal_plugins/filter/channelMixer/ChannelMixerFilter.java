@@ -5,6 +5,7 @@ import javax.media.opengl.GL2;
 import org.helioviewer.viewmodel.filter.AbstractFilter;
 import org.helioviewer.viewmodel.filter.GLFilter;
 import org.helioviewer.viewmodel.imagedata.ColorMask;
+import org.helioviewer.viewmodel.view.opengl.shader.ShaderFactory;
 
 /**
  * Filter for modifying the color mask of an image.
@@ -23,7 +24,6 @@ import org.helioviewer.viewmodel.imagedata.ColorMask;
  */
 public class ChannelMixerFilter extends AbstractFilter implements GLFilter {
 
-    private ColorMask colorMask = new ColorMask();
     private ChannelMixerPanel panel;
 
     /**
@@ -34,7 +34,7 @@ public class ChannelMixerFilter extends AbstractFilter implements GLFilter {
      */
     void setPanel(ChannelMixerPanel panel) {
         this.panel = panel;
-        panel.setValue(colorMask);
+        panel.setValue(ShaderFactory.colorMask);
     }
 
     /**
@@ -49,10 +49,10 @@ public class ChannelMixerFilter extends AbstractFilter implements GLFilter {
      */
     void setColorMask(boolean showRed, boolean showGreen, boolean showBlue) {
         ColorMask newColorMask = new ColorMask(showRed, showGreen, showBlue);
-        if (colorMask == newColorMask) {
+        if (ShaderFactory.colorMask == newColorMask) {
             return;
         }
-        colorMask = newColorMask;
+        ShaderFactory.colorMask = newColorMask;
         notifyAllListeners();
     }
 
@@ -65,7 +65,6 @@ public class ChannelMixerFilter extends AbstractFilter implements GLFilter {
      */
     @Override
     public void applyGL(GL2 gl) {
-        gl.glColorMask(colorMask.showRed(), colorMask.showGreen(), colorMask.showBlue(), true);
     }
 
     /**
@@ -90,7 +89,7 @@ public class ChannelMixerFilter extends AbstractFilter implements GLFilter {
         }
 
         setColorMask(Boolean.parseBoolean(values[0]), Boolean.parseBoolean(values[1]), Boolean.parseBoolean(values[2]));
-        panel.setValue(colorMask);
+        panel.setValue(ShaderFactory.colorMask);
     }
 
     /**
@@ -98,7 +97,7 @@ public class ChannelMixerFilter extends AbstractFilter implements GLFilter {
      */
     @Override
     public String getState() {
-        return colorMask.showRed() + " " + colorMask.showGreen() + " " + colorMask.showBlue();
+        return ShaderFactory.colorMask.showRed() + " " + ShaderFactory.colorMask.showGreen() + " " + ShaderFactory.colorMask.showBlue();
     }
 
 }
