@@ -7,6 +7,7 @@ import javax.media.opengl.GL2;
 import org.helioviewer.base.FileUtils;
 import org.helioviewer.jhv.gui.states.StateController;
 import org.helioviewer.jhv.gui.states.ViewStateEnum;
+import org.helioviewer.viewmodel.imagedata.ColorMask;
 
 public class ShaderFactory {
     private static boolean init = false;
@@ -52,6 +53,8 @@ public class ShaderFactory {
     public static final double[] differencePhiVertex = new double[4];
     public static final double[] offsetVertex = new double[4];
     public static final double[] differenceRectVertex = new double[4];
+
+    public static ColorMask colorMask = new ColorMask();
 
     public ShaderFactory() {
     }
@@ -181,4 +184,16 @@ public class ShaderFactory {
         ShaderFactory.bindEnvVars(gl, GL2.GL_FRAGMENT_PROGRAM_ARB, ShaderFactory.phiParamRef, ShaderFactory.phiParamFloat);
         ShaderFactory.bindEnvVars(gl, GL2.GL_FRAGMENT_PROGRAM_ARB, ShaderFactory.thetaParamRef, ShaderFactory.thetaParamFloat);
     }
+
+    public static void filter(GL2 gl) {
+        gl.glBindProgramARB(GL2.GL_FRAGMENT_PROGRAM_ARB, ShaderFactory.getFragmentId());
+        ShaderFactory.bindEnvVars(gl, GL2.GL_FRAGMENT_PROGRAM_ARB, ShaderFactory.contrastParamRef, ShaderFactory.contrastParamFloat);
+        gl.glColorMask(colorMask.showRed(), colorMask.showGreen(), colorMask.showBlue(), true);
+    }
+
+    public static void filterDifference(GL2 gl) {
+        ShaderFactory.bindEnvVars(gl, GL2.GL_FRAGMENT_PROGRAM_ARB, ShaderFactory.truncationValueRef, ShaderFactory.truncationValueFloat);
+        ShaderFactory.bindEnvVars(gl, GL2.GL_FRAGMENT_PROGRAM_ARB, ShaderFactory.isDifferenceValueRef, ShaderFactory.isDifferenceValueFloat);
+    }
+
 }

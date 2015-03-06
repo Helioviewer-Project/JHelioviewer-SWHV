@@ -73,8 +73,6 @@ public class ContrastFilter extends AbstractFilter implements GLFilter {
 
         @Override
         public void bind(GL2 gl) {
-            gl.glBindProgramARB(GL2.GL_FRAGMENT_PROGRAM_ARB, ShaderFactory.getFragmentId());
-            ShaderFactory.bindEnvVars(gl, GL2.GL_FRAGMENT_PROGRAM_ARB, ShaderFactory.contrastParamRef, ShaderFactory.contrastParamFloat);
         }
 
     }

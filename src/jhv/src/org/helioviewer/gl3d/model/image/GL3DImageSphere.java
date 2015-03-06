@@ -67,20 +67,23 @@ public class GL3DImageSphere extends GL3DMesh {
 
     @Override
     public void shapeDraw(GL3DState state) {
-        state.gl.glEnable(GL2.GL_CULL_FACE);
-        state.gl.glEnable(GL2.GL_DEPTH_TEST);
-        state.gl.glEnable(GL2.GL_BLEND);
+        GL2 gl = state.gl;
+        gl.glEnable(GL2.GL_CULL_FACE);
+        gl.glEnable(GL2.GL_DEPTH_TEST);
+        gl.glEnable(GL2.GL_BLEND);
         GLFilterView glfilter = this.imageTextureView.getAdapter(GLFilterView.class);
+
+        ShaderFactory.filter(gl);
         if (glfilter != null) {
-            glfilter.renderGL(state.gl, true);
+            glfilter.renderGL(gl, true);
         }
 
-        ShaderFactory.bindVertexShader(state.gl);
-        ShaderFactory.bindFragmentShader(state.gl);
+        ShaderFactory.bindVertexShader(gl);
+        ShaderFactory.bindFragmentShader(gl);
 
         super.shapeDraw(state);
         if (restoreColorMask) {
-            state.gl.glColorMask(true, true, true, true);
+            gl.glColorMask(true, true, true, true);
         }
     }
 

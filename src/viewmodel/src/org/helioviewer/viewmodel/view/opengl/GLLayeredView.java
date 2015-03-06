@@ -3,14 +3,13 @@ package org.helioviewer.viewmodel.view.opengl;
 import javax.media.opengl.GL2;
 
 import org.helioviewer.viewmodel.changeevent.ChangeEvent;
-import org.helioviewer.viewmodel.metadata.MetaData;
 import org.helioviewer.viewmodel.region.Region;
 import org.helioviewer.viewmodel.region.StaticRegion;
 import org.helioviewer.viewmodel.view.AbstractLayeredView;
-import org.helioviewer.viewmodel.view.SubimageDataView;
 import org.helioviewer.viewmodel.view.View;
 import org.helioviewer.viewmodel.view.ViewHelper;
 import org.helioviewer.viewmodel.view.jp2view.JHVJP2View;
+import org.helioviewer.viewmodel.view.opengl.shader.ShaderFactory;
 
 /**
  * Implementation of LayeredView for rendering in OpenGL mode.
@@ -43,11 +42,10 @@ public class GLLayeredView extends AbstractLayeredView implements GLView {
                 }
                 // if layer is GLView, go on, otherwise render now
                 if (v instanceof GLView) {
+                    ShaderFactory.filter(gl);
                     ((GLView) v).renderGL(gl, true);
                 } else {
-                    GLTextureHelper.renderImageDataToScreen(gl, layer.regionView.getRegion(),
-                                                                layer.subimageDataView.getSubimageData(),
-                                                                v.getAdapter(JHVJP2View.class).tex);
+                    GLTextureHelper.renderImageDataToScreen(gl, layer.regionView.getRegion(), layer.subimageDataView.getSubimageData(), v.getAdapter(JHVJP2View.class).tex);
                 }
             }
         }
