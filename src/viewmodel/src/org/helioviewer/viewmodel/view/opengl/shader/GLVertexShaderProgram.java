@@ -25,8 +25,6 @@ import javax.media.opengl.GL2;
  */
 public abstract class GLVertexShaderProgram {
 
-    protected static final int target = GL2.GL_VERTEX_PROGRAM_ARB;
-
     private static Stack<Integer> shaderStack = new Stack<Integer>();
     protected static int shaderCurrentlyUsed = -1;
     protected int shaderID;
@@ -122,10 +120,10 @@ public abstract class GLVertexShaderProgram {
         if (shader != shaderCurrentlyUsed) {
             shaderCurrentlyUsed = shader;
             // Log.debug("GLVertexShaderProgram.bind shader="+shader);
-            gl.glBindProgramARB(target, ShaderFactory.getVertexId());
-            gl.glProgramLocalParameter4dARB(target, 0, xOffset, yOffset, xScale, yScale);
-            gl.glProgramLocalParameter4dARB(target, 1, xTextureScale, yTextureScale, 0, 0);
-            gl.glProgramLocalParameter4dARB(target, 2, defaultXOffset, defaultYOffset, 0, 0);
+            //gl.glBindProgramARB(target, ShaderFactory.getVertexId());
+            //gl.glProgramLocalParameter4dARB(target, 0, xOffset, yOffset, xScale, yScale);
+            //gl.glProgramLocalParameter4dARB(target, 1, xTextureScale, yTextureScale, 0, 0);
+            //gl.glProgramLocalParameter4dARB(target, 2, defaultXOffset, defaultYOffset, 0, 0);
 
         }
     }

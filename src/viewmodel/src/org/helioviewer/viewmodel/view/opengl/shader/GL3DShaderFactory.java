@@ -16,16 +16,11 @@ import org.helioviewer.gl3d.model.image.GL3DImageMesh;
 public class GL3DShaderFactory {
 
     public static GLVertexShaderProgram createVertexShaderProgram(GL2 gl, GLVertexShaderProgram vertexShaderProgram) {
-        // create new shader builder
         GLShaderBuilder newShaderBuilder = new GLShaderBuilder(gl, GL2.GL_VERTEX_PROGRAM_ARB, true);
 
-        // fill with standard values
         GLMinimalVertexShaderProgram minimalProgram = new GLMinimalVertexShaderProgram();
         minimalProgram.build(newShaderBuilder);
         vertexShaderProgram.build(newShaderBuilder);
-
-        // fill with other filters and compile
-        //newShaderBuilder.compile();
 
         return vertexShaderProgram;
     }

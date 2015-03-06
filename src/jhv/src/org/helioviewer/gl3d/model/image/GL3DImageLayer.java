@@ -23,10 +23,6 @@ import org.helioviewer.viewmodel.view.MetaDataView;
 import org.helioviewer.viewmodel.view.RegionView;
 import org.helioviewer.viewmodel.view.opengl.GL3DImageTextureView;
 import org.helioviewer.viewmodel.view.opengl.GL3DView;
-import org.helioviewer.viewmodel.view.opengl.shader.GL3DImageFragmentShaderProgram;
-import org.helioviewer.viewmodel.view.opengl.shader.GL3DImageVertexShaderProgram;
-import org.helioviewer.viewmodel.view.opengl.shader.GL3DShaderFactory;
-import org.helioviewer.viewmodel.view.opengl.shader.GLVertexShaderProgram;
 
 /**
  * This is the scene graph equivalent of an image layer sub view chain attached
@@ -59,8 +55,6 @@ public class GL3DImageLayer extends GL3DGroup implements GL3DCameraListener {
     protected boolean doUpdateROI = true;
 
     private final double lastViewAngle = 0.0;
-
-    protected GL3DImageFragmentShaderProgram sphereFragmentShader = null;
 
     private final int resolution = 6;
     private final double[][] pointlist = new double[(resolution + 1) * 2 * 2][2];
@@ -108,12 +102,8 @@ public class GL3DImageLayer extends GL3DGroup implements GL3DCameraListener {
     }
 
     private void createImageMeshNodes(GL2 gl) {
-        this.sphereFragmentShader = imageTextureView.getFragmentShader();
-        GL3DImageVertexShaderProgram vertexShaderProgram = new GL3DImageVertexShaderProgram();
-        GLVertexShaderProgram vertexShader = GL3DShaderFactory.createVertexShaderProgram(gl, vertexShaderProgram);
-        this.imageTextureView.setVertexShader(vertexShaderProgram);
-        sphere = new GL3DImageSphere(imageTextureView, vertexShader, sphereFragmentShader, this, true, false, false);
-        corona = new GL3DImageSphere(imageTextureView, vertexShader, sphereFragmentShader, this, false, true, true);
+        sphere = new GL3DImageSphere(imageTextureView, this, true, false, false);
+        corona = new GL3DImageSphere(imageTextureView, this, false, true, true);
         this.addNode(sphere);
         this.addNode(corona);
     }
@@ -265,10 +255,6 @@ public class GL3DImageLayer extends GL3DGroup implements GL3DCameraListener {
 
     public GL3DImageLayers getLayerGroup() {
         return layerGroup;
-    }
-
-    public GL3DImageFragmentShaderProgram getSphereFragmentShader() {
-        return sphereFragmentShader;
     }
 
     public GL3DVec3d convertViewportToPlane(GL3DVec3d viewportCoordinates, GL3DMat4d projectionMatrix) {
