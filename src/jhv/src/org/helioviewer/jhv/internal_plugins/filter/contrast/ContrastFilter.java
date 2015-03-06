@@ -38,13 +38,7 @@ public class ContrastFilter extends AbstractFilter implements GLFilter {
     private ContrastPanel panel;
 
     private float contrast = 0.0f;
-    private boolean rebuildTable = true;
     private final ContrastShader shader = new ContrastShader();
-
-    private final byte[] contrastTable8 = null;
-    private final short[] contrastTable16 = null;
-
-    private final boolean forceRefilter = false;
 
     /**
      * Sets the corresponding contrast panel.
@@ -68,7 +62,6 @@ public class ContrastFilter extends AbstractFilter implements GLFilter {
             return;
         }
         contrast = newContrast;
-        rebuildTable = true;
         ShaderFactory.setContrast(contrast);
         notifyAllListeners();
     }
