@@ -187,13 +187,20 @@ public class ShaderFactory {
 
     public static void filter(GL2 gl) {
         gl.glBindProgramARB(GL2.GL_FRAGMENT_PROGRAM_ARB, ShaderFactory.getFragmentId());
+        //contrast
         ShaderFactory.bindEnvVars(gl, GL2.GL_FRAGMENT_PROGRAM_ARB, ShaderFactory.contrastParamRef, ShaderFactory.contrastParamFloat);
+        //channelmixer
         gl.glColorMask(colorMask.showRed(), colorMask.showGreen(), colorMask.showBlue(), true);
-    }
-
-    public static void filterDifference(GL2 gl) {
+        //difference
         ShaderFactory.bindEnvVars(gl, GL2.GL_FRAGMENT_PROGRAM_ARB, ShaderFactory.truncationValueRef, ShaderFactory.truncationValueFloat);
         ShaderFactory.bindEnvVars(gl, GL2.GL_FRAGMENT_PROGRAM_ARB, ShaderFactory.isDifferenceValueRef, ShaderFactory.isDifferenceValueFloat);
+        //gamma
+        ShaderFactory.bindEnvVars(gl, GL2.GL_FRAGMENT_PROGRAM_ARB, ShaderFactory.gammaParamRef, ShaderFactory.gammaParamFloat);
+        //opacity
+        ShaderFactory.bindEnvVars(gl, GL2.GL_FRAGMENT_PROGRAM_ARB, ShaderFactory.alphaParamRef, ShaderFactory.alphaParamFloat);
+        //sharpen
+        ShaderFactory.bindEnvVars(gl, GL2.GL_FRAGMENT_PROGRAM_ARB, ShaderFactory.sharpenParamRef, ShaderFactory.sharpenParamFloat);
+
     }
 
 }
