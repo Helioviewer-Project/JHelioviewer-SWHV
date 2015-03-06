@@ -7,6 +7,7 @@ import java.util.Date;
 
 import org.helioviewer.base.math.Interval;
 import org.helioviewer.jhv.gui.ImageViewerGui;
+import org.helioviewer.jhv.plugins.swhvhekplugin.cache.SWHVHEKData;
 import org.helioviewer.jhv.plugins.swhvhekplugin.controller.SWHVHEKImagePanelEventPopupController;
 import org.helioviewer.jhv.plugins.swhvhekplugin.settings.SWHVHEKSettings;
 import org.helioviewer.viewmodelplugin.controller.PluginManager;
@@ -52,6 +53,8 @@ public class SWHVHEKPlugin extends OverlayPlugin implements Plugin {
 
         eventPlugin = new SWHVHEKPluginContainer(builtin_mode);
         addOverlayContainer(eventPlugin);
+
+        SWHVHEKData.getSingletonInstance();
     }
 
     /**
@@ -90,32 +93,6 @@ public class SWHVHEKPlugin extends OverlayPlugin implements Plugin {
     }
 
     /**
-     * Wrapper around HEKEventPlugins functions.
-     *
-     * @see org.helioviewer.jhv.plugins.overlay.hek.plugin.HEKEventPlugin
-     * @see org.helioviewer.jhv.plugins.overlay.hek.plugin.HEKEventPlugin#setCurInterval
-     * @param newInterval
-     */
-    public void setCurInterval(Interval<Date> newInterval) {
-        eventPlugin.setCurInterval(newInterval);
-    }
-
-    /**
-     * Wrapper around HEKEventPlugins functions.
-     *
-     * @see org.helioviewer.jhv.plugins.overlay.hek.plugin.HEKEventPlugin
-     * @see org.helioviewer.jhv.plugins.overlay.hek.plugin.HEKEventPlugin#getStructure
-     * @param newInterval
-     */
-    public void getStructure() {
-        eventPlugin.getStructure();
-    }
-
-    public void setEnabled(boolean b) {
-        eventPlugin.setEnabled(b);
-    }
-
-    /**
      * {@inheritDoc}
      *
      * null because this is an internal plugin
@@ -150,4 +127,5 @@ public class SWHVHEKPlugin extends OverlayPlugin implements Plugin {
         // TODO Implement getState for HEKPlugin
         return "";
     }
+
 }

@@ -1,8 +1,5 @@
 package org.helioviewer.jhv.plugins.swhvhekplugin;
 
-import java.util.Date;
-
-import org.helioviewer.base.math.Interval;
 import org.helioviewer.gl3d.plugin.swhvhekplugin.SWHVHEKPlugin3dRenderer;
 import org.helioviewer.viewmodel.renderer.physical.PhysicalRenderer;
 import org.helioviewer.viewmodel.view.OverlayView;
@@ -35,7 +32,6 @@ public class SWHVHEKPluginContainer extends OverlayContainer {
     // TODO: Malte Nuhn - Does storing the panel connected with this plugin fit
     // the architecture?
 
-    private SWHVHEKPluginPanel hekPanel;
     private boolean builtin_mode = false;
 
     public SWHVHEKPluginContainer(boolean builtin_mode) {
@@ -55,19 +51,10 @@ public class SWHVHEKPluginContainer extends OverlayContainer {
      */
     @Override
     protected void installOverlayImpl(OverlayView overlayView, OverlayControlComponentManager controlList) {
-
-        hekPanel = new SWHVHEKPluginPanel();
         OverlayPluginContainer overlayPluginContainer = new OverlayPluginContainer();
         overlayPluginContainer.setRenderer(new SWHVHEKPluginRenderer());
         overlayPluginContainer.setRenderer3d(new SWHVHEKPlugin3dRenderer());
         overlayView.addOverlay(overlayPluginContainer);
-        //controlList.add(new OverlayControlComponent(hekPanel, getName()));
-
-        /*
-         * hekPanel = new HEKPluginPanel(HEKCache.getSingletonInstance());
-         * overlayView.setRenderer(new HEKPluginRenderer()); controlList.add(new
-         * OverlayControlComponent(hekPanel, getName()));
-         */
     }
 
     /**
@@ -84,24 +71,6 @@ public class SWHVHEKPluginContainer extends OverlayContainer {
     @Override
     public String getName() {
         return "HEK Events " + (builtin_mode ? "Built-In Version" : "");
-    }
-
-    /**
-     * @see HEKPanel#setCurInterval()
-     */
-    public void setCurInterval(Interval<Date> newInterval) {
-        hekPanel.setCurInterval(newInterval);
-    }
-
-    /**
-     * @see HEKPanel#getStructure()
-     */
-    public void getStructure() {
-        hekPanel.getStructure();
-    }
-
-    public void setEnabled(boolean b) {
-        hekPanel.setEnabled(b);
     }
 
 }
