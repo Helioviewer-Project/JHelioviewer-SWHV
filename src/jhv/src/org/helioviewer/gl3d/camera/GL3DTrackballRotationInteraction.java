@@ -2,8 +2,8 @@ package org.helioviewer.gl3d.camera;
 
 import java.awt.event.MouseEvent;
 
-import org.helioviewer.gl3d.scenegraph.math.GL3DQuatd;
-import org.helioviewer.gl3d.scenegraph.math.GL3DVec3d;
+import org.helioviewer.gl3d.math.GL3DQuatd;
+import org.helioviewer.gl3d.math.GL3DVec3d;
 import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.viewmodel.view.opengl.GL3DSceneGraphView;
 
@@ -17,6 +17,7 @@ import org.helioviewer.viewmodel.view.opengl.GL3DSceneGraphView;
  *
  */
 public class GL3DTrackballRotationInteraction extends GL3DDefaultInteraction {
+
     private GL3DVec3d currentRotationStartPoint;
     private GL3DVec3d currentRotationEndPoint;
     private GL3DQuatd currentDragRotation;

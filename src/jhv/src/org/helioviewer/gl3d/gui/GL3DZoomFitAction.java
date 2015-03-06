@@ -3,7 +3,7 @@ package org.helioviewer.gl3d.gui;
 import java.awt.event.ActionEvent;
 
 import org.helioviewer.gl3d.camera.GL3DCamera;
-import org.helioviewer.gl3d.scenegraph.math.GL3DVec3d;
+import org.helioviewer.gl3d.math.GL3DVec3d;
 import org.helioviewer.jhv.gui.actions.ZoomFitAction;
 import org.helioviewer.jhv.layers.LayersModel;
 import org.helioviewer.viewmodel.region.Region;

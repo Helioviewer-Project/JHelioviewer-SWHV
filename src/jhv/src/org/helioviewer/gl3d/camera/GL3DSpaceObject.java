@@ -1,6 +1,7 @@
 package org.helioviewer.gl3d.camera;
 
 public class GL3DSpaceObject {
+
     private final String urlName;
     private final String labelName;
     private final double sizeInMeters;
@@ -64,4 +65,5 @@ public class GL3DSpaceObject {
     public double getSize() {
         return this.sizeInMeters;
     }
+
 }

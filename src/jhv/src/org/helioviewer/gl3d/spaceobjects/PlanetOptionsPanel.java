@@ -17,6 +17,7 @@ import org.helioviewer.jhv.gui.GL3DViewchainFactory;
 import org.helioviewer.jhv.layers.LayersModel;
 
 public class PlanetOptionsPanel extends JPanel {
+
     private static final long serialVersionUID = 6010321601319560240L;
     private final JList planetList;
     private final DefaultListModel planetListModel;
@@ -98,4 +99,5 @@ public class PlanetOptionsPanel extends JPanel {
         }
         viewPointCombobox.setSelectedItem(GL3DSpaceObject.earth);
     }
+
 }

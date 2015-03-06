@@ -4,14 +4,15 @@ import java.util.List;
 
 import javax.media.opengl.GL2;
 
+import org.helioviewer.gl3d.math.GL3DMat4d;
+import org.helioviewer.gl3d.math.GL3DVec2d;
+import org.helioviewer.gl3d.math.GL3DVec3d;
+import org.helioviewer.gl3d.math.GL3DVec4d;
 import org.helioviewer.gl3d.scenegraph.GL3DMesh;
 import org.helioviewer.gl3d.scenegraph.GL3DState;
-import org.helioviewer.gl3d.scenegraph.math.GL3DMat4d;
-import org.helioviewer.gl3d.scenegraph.math.GL3DVec2d;
-import org.helioviewer.gl3d.scenegraph.math.GL3DVec3d;
-import org.helioviewer.gl3d.scenegraph.math.GL3DVec4d;
 
 public class GL3DCameraFOV extends GL3DMesh {
+
     private final double width;
     private final double height;
 

@@ -23,8 +23,8 @@ import org.helioviewer.base.physics.Constants;
 import org.helioviewer.gl3d.camera.GL3DFollowObjectCamera;
 import org.helioviewer.gl3d.camera.GL3DPositionDateTime;
 import org.helioviewer.gl3d.camera.GL3DPositionLoadingListener;
+import org.helioviewer.gl3d.math.GL3DVec3d;
 import org.helioviewer.gl3d.scenegraph.GL3DState;
-import org.helioviewer.gl3d.scenegraph.math.GL3DVec3d;
 import org.helioviewer.jhv.display.Displayer;
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -32,6 +32,7 @@ import org.json.JSONObject;
 import org.json.JSONTokener;
 
 public class GL3DPositionLoadingPlanet {
+
     private final String LOADEDSTATE = "Loaded";
     private final String FAILEDSTATE = "Failed";
     private final String PARTIALSTATE = "Partial";

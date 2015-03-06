@@ -4,8 +4,8 @@ import java.util.Date;
 
 import org.helioviewer.base.physics.Astronomy;
 import org.helioviewer.base.physics.DifferentialRotation;
-import org.helioviewer.gl3d.scenegraph.math.GL3DQuatd;
-import org.helioviewer.gl3d.scenegraph.math.GL3DVec3d;
+import org.helioviewer.gl3d.math.GL3DQuatd;
+import org.helioviewer.gl3d.math.GL3DVec3d;
 import org.helioviewer.jhv.layers.LayersModel;
 import org.helioviewer.viewmodel.changeevent.ChangeEvent;
 import org.helioviewer.viewmodel.changeevent.TimestampChangedReason;

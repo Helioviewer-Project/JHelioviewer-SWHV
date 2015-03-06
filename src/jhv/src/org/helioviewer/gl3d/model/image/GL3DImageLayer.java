@@ -7,13 +7,13 @@ import javax.media.opengl.GL2;
 import org.helioviewer.base.physics.Constants;
 import org.helioviewer.gl3d.camera.GL3DCamera;
 import org.helioviewer.gl3d.camera.GL3DCameraListener;
+import org.helioviewer.gl3d.math.GL3DMat4d;
+import org.helioviewer.gl3d.math.GL3DQuatd;
+import org.helioviewer.gl3d.math.GL3DVec3d;
+import org.helioviewer.gl3d.math.GL3DVec4d;
 import org.helioviewer.gl3d.scenegraph.GL3DDrawBits.Bit;
 import org.helioviewer.gl3d.scenegraph.GL3DGroup;
 import org.helioviewer.gl3d.scenegraph.GL3DState;
-import org.helioviewer.gl3d.scenegraph.math.GL3DMat4d;
-import org.helioviewer.gl3d.scenegraph.math.GL3DQuatd;
-import org.helioviewer.gl3d.scenegraph.math.GL3DVec3d;
-import org.helioviewer.gl3d.scenegraph.math.GL3DVec4d;
 import org.helioviewer.viewmodel.changeevent.ChangeEvent;
 import org.helioviewer.viewmodel.metadata.HelioviewerMetaData;
 import org.helioviewer.viewmodel.metadata.MetaData;
@@ -37,6 +37,7 @@ import org.helioviewer.viewmodel.view.opengl.shader.GLVertexShaderProgram;
  *
  */
 public class GL3DImageLayer extends GL3DGroup implements GL3DCameraListener {
+
     private GL3DImageSphere sphere;
     private GL3DImageSphere corona;
     private static int nextLayerId = 0;
@@ -293,4 +294,5 @@ public class GL3DImageLayer extends GL3DGroup implements GL3DCameraListener {
         GL3DVec3d solarCoordinates3D = new GL3DVec3d(solarCoordinates.x, solarCoordinates.y, solarCoordinates3Dz);
         return solarCoordinates3D;
     }
+
 }

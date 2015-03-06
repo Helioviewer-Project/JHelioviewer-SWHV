@@ -18,6 +18,7 @@ import org.helioviewer.viewmodel.view.opengl.GL3DSceneGraphView;
  * 
  */
 public class GL3DPanInteraction extends GL3DDefaultInteraction {
+
     private Point lastMousePoint;
 
     protected GL3DPanInteraction(GL3DSolarRotationTrackingTrackballCamera camera, GL3DSceneGraphView sceneGraph) {
@@ -51,4 +52,5 @@ public class GL3DPanInteraction extends GL3DDefaultInteraction {
         camera.fireCameraMoved();
         Displayer.getSingletonInstance().display();
     }
+
 }

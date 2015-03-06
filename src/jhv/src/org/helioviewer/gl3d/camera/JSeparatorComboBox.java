@@ -20,10 +20,10 @@ import javax.swing.plaf.basic.BasicComboBoxRenderer;
  * drop down will remain open.
  */
 public class JSeparatorComboBox extends JComboBox implements KeyListener {
-    //  Track key presses and releases
 
     private static final long serialVersionUID = -13987864729937697L;
 
+    //  Track key presses and releases
     private boolean released = true;
 
     //  Track when the separator has been selected
@@ -145,4 +145,5 @@ public class JSeparatorComboBox extends JComboBox implements KeyListener {
             return this;
         }
     }
+
 }

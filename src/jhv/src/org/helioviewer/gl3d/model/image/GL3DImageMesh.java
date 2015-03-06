@@ -1,8 +1,8 @@
 package org.helioviewer.gl3d.model.image;
 
+import org.helioviewer.gl3d.math.GL3DVec4f;
 import org.helioviewer.gl3d.scenegraph.GL3DMesh;
 import org.helioviewer.gl3d.scenegraph.GL3DState;
-import org.helioviewer.gl3d.scenegraph.math.GL3DVec4f;
 import org.helioviewer.viewmodel.changeevent.ChangeEvent;
 import org.helioviewer.viewmodel.changeevent.ImageTextureRecapturedReason;
 import org.helioviewer.viewmodel.region.Region;

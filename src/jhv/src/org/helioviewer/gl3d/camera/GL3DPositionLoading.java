@@ -21,7 +21,7 @@ import javax.swing.SwingWorker;
 import org.helioviewer.base.DownloadStream;
 import org.helioviewer.base.logging.Log;
 import org.helioviewer.base.physics.Constants;
-import org.helioviewer.gl3d.scenegraph.math.GL3DVec3d;
+import org.helioviewer.gl3d.math.GL3DVec3d;
 import org.helioviewer.jhv.display.Displayer;
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -29,6 +29,7 @@ import org.json.JSONObject;
 import org.json.JSONTokener;
 
 public class GL3DPositionLoading {
+
     private final String LOADEDSTATE = "Loaded";
     private final String FAILEDSTATE = "Failed";
     private final String PARTIALSTATE = "Partial";

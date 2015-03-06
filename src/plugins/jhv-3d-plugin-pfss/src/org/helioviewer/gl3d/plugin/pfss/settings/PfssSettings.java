@@ -1,6 +1,6 @@
 package org.helioviewer.gl3d.plugin.pfss.settings;
 
-import org.helioviewer.gl3d.scenegraph.math.GL3DVec3f;
+import org.helioviewer.gl3d.math.GL3DVec3f;
 
 /**
  * Important settings
@@ -66,4 +66,5 @@ public class PfssSettings {
     public static int qualityReduction = 8;
 
     public static boolean fixedColor = false;
+
 }

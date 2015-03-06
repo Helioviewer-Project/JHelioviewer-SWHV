@@ -23,6 +23,7 @@ import org.helioviewer.jhv.layers.LayersModel;
 import org.helioviewer.viewmodel.view.View;
 
 public class GL3DCameraOptionsPanel extends JPanel implements GL3DCameraSelectionModelListener, LayersListener {
+
     private static final long serialVersionUID = 3942154069677445408L;
     private GL3DCameraSelectorModel cameraSelectorModel;
     private JPanel optionsPanel;

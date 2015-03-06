@@ -20,4 +20,5 @@ public class GL3DArtificialObjects extends GL3DGroup {
     public void shapeDraw(GL3DState state) {
         super.shapeDraw(state);
     }
+
 }

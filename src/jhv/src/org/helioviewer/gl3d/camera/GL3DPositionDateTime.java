@@ -1,8 +1,9 @@
 package org.helioviewer.gl3d.camera;
 
-import org.helioviewer.gl3d.scenegraph.math.GL3DVec3d;
+import org.helioviewer.gl3d.math.GL3DVec3d;
 
 public class GL3DPositionDateTime {
+
     private final GL3DVec3d position;
     private final long timestamp;
 
@@ -23,4 +24,5 @@ public class GL3DPositionDateTime {
     public String toString() {
         return timestamp + " " + this.position;
     }
+
 }
