@@ -1,7 +1,10 @@
 package org.helioviewer.jhv.internal_plugins.filter.sharpen;
 
+import javax.media.opengl.GL2;
+
 import org.helioviewer.viewmodel.filter.AbstractFilter;
-import org.helioviewer.viewmodel.imagedata.ImageData;
+import org.helioviewer.viewmodel.filter.GLImageSizeFilter;
+import org.helioviewer.viewmodel.view.opengl.shader.ShaderFactory;
 
 /**
  * Filter for sharpen an image.
@@ -35,7 +38,7 @@ import org.helioviewer.viewmodel.imagedata.ImageData;
  * @author Markus Langenberg
  *
  */
-public class SharpenFilter extends AbstractFilter {
+public class SharpenFilter extends AbstractFilter implements GLImageSizeFilter {
 
     // /////////////////////////
     // GENERAL //
@@ -47,12 +50,9 @@ public class SharpenFilter extends AbstractFilter {
 
     private SharpenPanel panel;
 
-    private int convolveX[] = null;
-    private int convolveY[] = null;
-
-    private ImageData lastImageData;
-
-    private final boolean forceRefilter = false;
+    private final int convolveX[] = null;
+    private final int convolveY[] = null;
+    private float pixelWidth, pixelHeight;
 
     /**
      * Sets the corresponding sharpen panel.
@@ -90,140 +90,6 @@ public class SharpenFilter extends AbstractFilter {
         return false;
     }
 
-    // /////////////////////////
-    // STANDARD //
-    // /////////////////////////
-
-    /**
-     * Blurs a single channel image by applying a 3x3 Gauss lowpass filter.
-     *
-     * Since a convolution with a Gauss kernel is separable, this function is
-     * optimized by doing so.
-     *
-     * <p>
-     * If the image has more than one channel, this function has to be called
-     * multiple times.
-     *
-     * @param width
-     *            Width of the image
-     * @param height
-     *            Height of the image
-     * @param input
-     *            Pixel data of the image, given as an integer
-     * @return Blurred single channel image
-     */
-    private int[] blur(int width, int height, byte input[]) {
-        if (convolveY == null || convolveY.length < width * height)
-            convolveY = new int[width * height];
-
-        for (int i = 0; i < width * height; i++) {
-            convolveY[i] = input[i] & 0xFF;
-        }
-        return blur(width, height, convolveY);
-    }
-
-    /**
-     * Blurs a single channel image by applying a 3x3 Gauss lowpass filter.
-     *
-     * Since a convolution with a Gauss kernel is separable, this function is
-     * optimized by doing so.
-     *
-     * <p>
-     * If the image has more than one channel, this function has to be called
-     * multiple times.
-     *
-     * @param width
-     *            Width of the image
-     * @param height
-     *            Height of the image
-     * @param input
-     *            Pixel data of the image, given as an integer
-     * @param mask
-     *            to apply on the input data
-     * @return Blurred single channel image
-     */
-    private int[] blur(int width, int height, short input[], int mask) {
-        if (convolveY == null || convolveY.length < width * height)
-            convolveY = new int[width * height];
-
-        for (int i = 0; i < width * height; i++) {
-            convolveY[i] = input[i] & mask;
-        }
-        return blur(width, height, convolveY);
-    }
-
-    /**
-     * Blurs a single channel image by applying a 3x3 Gauss lowpass filter.
-     *
-     * Since a convolution with a Gauss kernel is separable, this function is
-     * optimized by doing so.
-     *
-     * <p>
-     * If the image has more than one channel, this function has to be called
-     * multiple times.
-     *
-     * @param width
-     *            Width of the image
-     * @param height
-     *            Height of the image
-     * @param input
-     *            Pixel data of the image, given as an integer
-     * @return Blurred single channel image
-     */
-    private int[] blur(int width, int height, int[] input) {
-        if (width < 2 * span || height < 2 * span) {
-            return input;
-        }
-        if (convolveX == null || convolveX.length < width * height)
-            convolveX = new int[width * height];
-        if (convolveY == null || convolveY.length < width * height)
-            convolveY = new int[width * height];
-
-        int tmpIndex;
-
-        // convolve borders in x direction
-        for (int i = 0; i < height; i++) {
-            for (int j = 0; j < span; j++) {
-                tmpIndex = i * width + j;
-                convolveX[tmpIndex] = ((input[tmpIndex - j] + (input[tmpIndex] << 1) + input[tmpIndex + span]) >> 2);
-
-                tmpIndex = (i + 1) * width - 1 - j;
-                convolveX[tmpIndex] = ((input[tmpIndex + j] + (input[tmpIndex] << 1) + input[tmpIndex - span]) >> 2);
-            }
-        }
-
-        // convolve inner region in x direction
-        for (int i = 0; i < height; i++) {
-            for (int j = span; j < width - span; j++) {
-                tmpIndex = i * width + j;
-                convolveX[tmpIndex] = ((input[tmpIndex - span] + (input[tmpIndex] << 1) + input[tmpIndex + span]) >> 2);
-            }
-        }
-
-        int spanTimesWidth = span * width;
-
-        // convolve borders in y direction
-        for (int i = 0; i < span; i++) {
-            for (int j = 0; j < width; j++) {
-                tmpIndex = i * width + j;
-                convolveY[tmpIndex] = ((convolveX[tmpIndex - i * width] + (convolveX[tmpIndex] << 1) + convolveX[tmpIndex + spanTimesWidth]) >> 2);
-
-                tmpIndex = (height - i) * width - 1 - j;
-                convolveY[tmpIndex] = ((convolveX[tmpIndex + i * width] + (convolveX[tmpIndex] << 1) + convolveX[tmpIndex - spanTimesWidth]) >> 2);
-            }
-        }
-
-        // convolve inner region in y direction
-        for (int i = span; i < height - span; i++) {
-            for (int j = 0; j < width; j++) {
-                tmpIndex = i * width + j;
-                convolveY[tmpIndex] = ((convolveX[tmpIndex - spanTimesWidth] + (convolveX[tmpIndex] << 1) + convolveX[tmpIndex + spanTimesWidth]) >> 2);
-            }
-        }
-
-        return convolveY;
-    }
-
     /**
      * {@inheritDoc}
      */
@@ -241,4 +107,17 @@ public class SharpenFilter extends AbstractFilter {
         return Float.toString(weighting);
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void applyGL(GL2 gl) {
+    }
+
+    @Override
+    public void setImageSize(int width, int height) {
+        pixelWidth = 1.0f / width;
+        pixelHeight = 1.0f / height;
+        ShaderFactory.setFactors(weighting, pixelWidth, pixelHeight, span);
+    }
 }
