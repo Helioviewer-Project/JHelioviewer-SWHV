@@ -15,6 +15,7 @@ import org.helioviewer.viewmodel.imagedata.ImageData;
 import org.helioviewer.viewmodel.view.jp2view.JHVJP2View;
 import org.helioviewer.viewmodel.view.jp2view.JHVJPXView;
 import org.helioviewer.viewmodel.view.opengl.GLTextureHelper;
+import org.helioviewer.viewmodel.view.opengl.shader.ShaderFactory;
 
 /**
  * Filter applying running difference to some movie
@@ -38,7 +39,6 @@ public class RunningDifferenceFilter implements FrameFilter, ObservableFilter, G
      * Given time machine to access the previous frame
      */
     // private TimeMachineData timeMachineData;
-    private final DifferenceShader shader = new DifferenceShader();
     private final GLTextureHelper.GLTexture tex = new GLTextureHelper.GLTexture();
     private ImageData currentFrame;
     private float truncationValue = 0.2f;
@@ -115,25 +115,24 @@ public class RunningDifferenceFilter implements FrameFilter, ObservableFilter, G
             if (StateController.getInstance().getCurrentState().getType() == ViewStateEnum.View3D) {
                 if (jpxView.getBaseDifferenceMode()) {
                     if (this.baseDifferenceNoRot) {
-                        shader.setIsDifference(gl, 0.26f);
+                        ShaderFactory.setIsDifference(0.26f);
                     } else {
-                        shader.setIsDifference(gl, 0.99f);
+                        ShaderFactory.setIsDifference(0.99f);
                     }
                 } else {
                     if (this.runDiffNoRot) {
-                        shader.setIsDifference(gl, 0.25f);
+                        ShaderFactory.setIsDifference(0.25f);
                     } else {
-                        shader.setIsDifference(gl, 1.0f);
+                        ShaderFactory.setIsDifference(1.0f);
                     }
                 }
             } else {
                 if (jpxView.getBaseDifferenceMode()) {
-                    shader.setIsDifference(gl, 0.26f);
+                    ShaderFactory.setIsDifference(0.26f);
                 } else {
-                    shader.setIsDifference(gl, 0.25f);
+                    ShaderFactory.setIsDifference(0.25f);
                 }
             }
-            shader.bind(gl);
             ImageData previousFrame;
             if (!baseDifference) {
                 previousFrame = jpxView.getPreviousImageData();
@@ -141,15 +140,14 @@ public class RunningDifferenceFilter implements FrameFilter, ObservableFilter, G
                 previousFrame = jpxView.getBaseDifferenceImageData();
             }
             if (this.currentFrame != previousFrame) {
-                shader.setTruncationValue(gl, this.truncationValue);
+                ShaderFactory.setTruncationValue(this.truncationValue);
 
                 gl.glActiveTexture(GL2.GL_TEXTURE2);
                 GLTextureHelper.moveImageDataToGLTexture(gl, previousFrame, 0, 0, previousFrame.getWidth(), previousFrame.getHeight(), tex);
                 gl.glActiveTexture(GL2.GL_TEXTURE0);
             }
         } else {
-            shader.setIsDifference(gl, 0.0f);
-            shader.bind(gl);
+            ShaderFactory.setIsDifference(0.0f);
         }
     }
 

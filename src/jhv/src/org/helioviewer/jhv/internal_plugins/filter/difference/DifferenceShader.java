@@ -23,9 +23,6 @@ public class DifferenceShader extends GLFragmentShaderProgram {
 
     @Override
     public void bind(GL2 gl) {
-        gl.glBindProgramARB(GL2.GL_FRAGMENT_PROGRAM_ARB, ShaderFactory.getFragmentId());
-        ShaderFactory.bindEnvVars(gl, GL2.GL_FRAGMENT_PROGRAM_ARB, ShaderFactory.truncationValueRef, ShaderFactory.truncationValueFloat);
-        ShaderFactory.bindEnvVars(gl, GL2.GL_FRAGMENT_PROGRAM_ARB, ShaderFactory.isDifferenceValueRef, ShaderFactory.isDifferenceValueFloat);
     }
 
 }

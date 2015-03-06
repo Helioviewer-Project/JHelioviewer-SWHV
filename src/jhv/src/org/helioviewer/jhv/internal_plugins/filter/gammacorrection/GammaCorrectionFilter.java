@@ -41,8 +41,8 @@ public class GammaCorrectionFilter extends AbstractFilter implements GLFilter {
     private boolean rebuildTable = true;
     private final GammaCorrectionShader shader = new GammaCorrectionShader();
 
-    private byte[] gammaTable8 = null;
-    private short[] gammaTable16 = null;
+    private final byte[] gammaTable8 = null;
+    private final short[] gammaTable16 = null;
 
     private final boolean forceRefilter = false;
 
@@ -73,40 +73,6 @@ public class GammaCorrectionFilter extends AbstractFilter implements GLFilter {
     }
 
     /**
-     * Internal function for building the lookup table for 8-bit input data.
-     */
-    private void buildTable8() {
-        if (gammaTable8 == null) {
-            gammaTable8 = new byte[0x100];
-        }
-
-        float N = 0xFF;
-        for (int i = 0; i < 0x100; i++) {
-            int v = (int) Math.round(N * Math.pow(i / N, gamma));
-            gammaTable8[i] = (byte) v;
-        }
-        rebuildTable = false;
-    }
-
-    /**
-     * Internal function for building the lookup table for 16-bit input data.
-     */
-    private void buildTable16(int bitDepth) {
-        int maxValue = 1 << bitDepth;
-
-        if (gammaTable16 == null) {
-            gammaTable16 = new short[maxValue];
-        }
-
-        float N = maxValue - 1;
-        for (int i = 0; i < maxValue; i++) {
-            int v = (int) Math.round(N * Math.pow(i / N, gamma));
-            gammaTable16[i] = (short) v;
-        }
-        rebuildTable = false;
-    }
-
-    /**
      * Fragment shader for applying the gamma correction.
      */
     private class GammaCorrectionShader extends GLFragmentShaderProgram {
@@ -117,8 +83,6 @@ public class GammaCorrectionFilter extends AbstractFilter implements GLFilter {
 
         @Override
         public void bind(GL2 gl) {
-            gl.glBindProgramARB(GL2.GL_FRAGMENT_PROGRAM_ARB, ShaderFactory.getFragmentId());
-            ShaderFactory.bindEnvVars(gl, GL2.GL_FRAGMENT_PROGRAM_ARB, ShaderFactory.gammaParamRef, ShaderFactory.gammaParamFloat);
         }
 
     }

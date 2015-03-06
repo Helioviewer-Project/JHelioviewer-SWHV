@@ -24,14 +24,8 @@ public class SharpenGLFilter extends SharpenFilter implements GLImageSizeFilter 
      */
     private class UnsharpMaskingShader extends GLFragmentShaderProgram {
 
-        public void setFactors(GL2 gl, float weighting, float pixelWidth, float pixelHeight) {
-            ShaderFactory.setFactors(weighting, pixelWidth, pixelHeight, span);
-        }
-
         @Override
         public void bind(GL2 gl) {
-            gl.glBindProgramARB(GL2.GL_FRAGMENT_PROGRAM_ARB, ShaderFactory.getFragmentId());
-            ShaderFactory.bindEnvVars(gl, GL2.GL_FRAGMENT_PROGRAM_ARB, ShaderFactory.sharpenParamRef, ShaderFactory.sharpenParamFloat);
         }
 
     }
@@ -41,8 +35,6 @@ public class SharpenGLFilter extends SharpenFilter implements GLImageSizeFilter 
      */
     @Override
     public void applyGL(GL2 gl) {
-        shader.setFactors(gl, weighting, pixelWidth, pixelHeight);
-        shader.bind(gl);
     }
 
     /**
@@ -52,6 +44,7 @@ public class SharpenGLFilter extends SharpenFilter implements GLImageSizeFilter 
     public void setImageSize(int width, int height) {
         pixelWidth = 1.0f / width;
         pixelHeight = 1.0f / height;
+        ShaderFactory.setFactors(weighting, pixelWidth, pixelHeight, span);
     }
 
 }
