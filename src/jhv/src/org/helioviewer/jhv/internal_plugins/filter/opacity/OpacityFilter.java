@@ -4,7 +4,6 @@ import javax.media.opengl.GL2;
 
 import org.helioviewer.viewmodel.filter.AbstractFilter;
 import org.helioviewer.viewmodel.filter.GLFilter;
-import org.helioviewer.viewmodel.view.opengl.shader.GLFragmentShaderProgram;
 import org.helioviewer.viewmodel.view.opengl.shader.ShaderFactory;
 
 /**
@@ -28,7 +27,6 @@ public class OpacityFilter extends AbstractFilter implements GLFilter {
     // ////////////////////////////////////////////////////////////////
 
     private float opacity;
-    private final OpacityShader shader = new OpacityShader();
     private OpacityPanel panel;
 
     // ////////////////////////////////////////////////////////////////
@@ -79,35 +77,11 @@ public class OpacityFilter extends AbstractFilter implements GLFilter {
     }
 
     /**
-     * Fragment shader setting the opacity.
-     */
-    private class OpacityShader extends GLFragmentShaderProgram {
-
-        /**
-         * Sets the new alpha value.
-         *
-         * @param gl
-         *            Valid reference to the current gl object
-         * @param alpha
-         *            Alpha value
-         */
-        private void setAlpha(GL2 gl, float alpha) {
-            ShaderFactory.setAlpha(alpha);
-        }
-
-        @Override
-        public void bind(GL2 gl) {
-        }
-
-    }
-
-    /**
      * {@inheritDoc}
      */
     @Override
     public void applyGL(GL2 gl) {
-        shader.setAlpha(gl, opacity);
-        shader.bind(gl);
+        ShaderFactory.setAlpha(opacity);
     }
 
     /**
