@@ -47,26 +47,21 @@ public class StateController {
     }
 
     public void addStateChangeListener(StateChangeListener listener) {
-        synchronized (stateChangeListeners) {
-            this.stateChangeListeners.add(listener);
-        }
+        this.stateChangeListeners.add(listener);
     }
 
     public void removeStateChangeListener(StateChangeListener listener) {
-        synchronized (stateChangeListeners) {
-            stateChangeListeners.remove(listener);
-        }
+        stateChangeListeners.remove(listener);
     }
 
     protected void fireStateChange(State newState, State oldState) {
-        synchronized (stateChangeListeners) {
-            for (StateChangeListener listener : stateChangeListeners) {
-                listener.stateChanged(newState, oldState, this);
-            }
+        for (StateChangeListener listener : stateChangeListeners) {
+            listener.stateChanged(newState, oldState, this);
         }
     }
 
     public static interface StateChangeListener {
         public void stateChanged(State newState, State oldState, StateController stateController);
     }
+
 }

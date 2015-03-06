@@ -122,7 +122,7 @@ public class MainImagePanel extends BasicImagePanel implements ViewListener {
      */
 
     @Override
-    public synchronized void setView(ComponentView newView) {
+    public void setView(ComponentView newView) {
         if (renderedImageComponent != null)
             for (MouseMotionListener l : mouseMotionListeners)
                 renderedImageComponent.removeMouseMotionListener(l);
