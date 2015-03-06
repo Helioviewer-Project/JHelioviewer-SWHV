@@ -126,4 +126,5 @@ public class CollapsiblePaneWithButton extends CollapsiblePane {
             }
         };
     }
+
 }

@@ -119,4 +119,5 @@ public class MenuBar extends JMenuBar {
         helpMenu.add(new OpenURLinBrowserAction("Open Website", "http://www.jhelioviewer.org"));
         add(helpMenu);
     }
+
 }

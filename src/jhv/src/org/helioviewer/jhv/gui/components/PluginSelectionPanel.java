@@ -101,4 +101,5 @@ public class PluginSelectionPanel extends JPanel {
 
         return button;
     }
+
 }

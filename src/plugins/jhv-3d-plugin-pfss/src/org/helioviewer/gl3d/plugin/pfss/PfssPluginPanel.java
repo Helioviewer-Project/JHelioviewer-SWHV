@@ -29,7 +29,6 @@ import javax.swing.SpinnerNumberModel;
 import javax.swing.event.ChangeListener;
 
 import org.helioviewer.base.logging.Log;
-import org.helioviewer.basegui.components.WheelSupport;
 import org.helioviewer.gl3d.plugin.pfss.data.PfssCache;
 import org.helioviewer.gl3d.plugin.pfss.settings.PfssSettings;
 import org.helioviewer.jhv.JHVGlobals;
@@ -37,6 +36,7 @@ import org.helioviewer.jhv.Settings;
 import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.layers.LayersListener;
 import org.helioviewer.jhv.layers.LayersModel;
+import org.helioviewer.jhv.gui.components.base.WheelSupport;
 import org.helioviewer.jhv.plugins.pfssplugin.PfssPlugin;
 import org.helioviewer.viewmodel.changeevent.ChangeEvent;
 import org.helioviewer.viewmodel.changeevent.SubImageDataChangedReason;
@@ -363,4 +363,5 @@ public class PfssPluginPanel extends OverlayPanel implements ActionListener, Lay
             this.dateLabel.setText("Model time: " + date);
         }
     }
+
 }

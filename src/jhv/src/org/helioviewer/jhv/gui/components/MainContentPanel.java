@@ -193,4 +193,5 @@ public class MainContentPanel extends JPanel implements ActionListener {
         updateLayout();
         Log.warn("Event " + e);
     }
+
 }
