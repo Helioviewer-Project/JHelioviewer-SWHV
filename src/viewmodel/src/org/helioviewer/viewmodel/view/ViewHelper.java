@@ -545,17 +545,14 @@ public final class ViewHelper {
      *         predecessor of the given view
      */
     public static View findLastViewBeforeLayeredView(View aView) {
-
         AbstractList<ViewListener> viewListeners = aView.getAllViewListeners();
 
         for (ViewListener v : viewListeners) {
-
             if (v instanceof LayeredView) {
                 return aView;
             } else {
                 if (v instanceof View) {
                     View result = findLastViewBeforeLayeredView((View) v);
-
                     if (result != null) {
                         return result;
                     }

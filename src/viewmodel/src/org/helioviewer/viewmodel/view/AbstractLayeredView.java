@@ -1,9 +1,7 @@
 package org.helioviewer.viewmodel.view;
 
-import java.util.Collection;
 import java.util.HashMap;
-import java.util.concurrent.CopyOnWriteArrayList;
-import java.util.concurrent.locks.ReentrantLock;
+import java.util.ArrayList;
 
 import org.helioviewer.base.math.RectangleDouble;
 import org.helioviewer.viewmodel.changeevent.ChangeEvent;
@@ -43,8 +41,7 @@ import org.helioviewer.viewmodel.viewportimagesize.ViewportImageSize;
  */
 public abstract class AbstractLayeredView extends AbstractView implements LayeredView, RegionView, ViewportView, MetaDataView, ViewListener {
 
-    protected CopyOnWriteArrayList<View> layers = new CopyOnWriteArrayList<View>();
-    protected ReentrantLock layerLock = new ReentrantLock();
+    protected ArrayList<View> layers = new ArrayList<View>();
     protected HashMap<View, Layer> viewLookup = new HashMap<View, Layer>();
 
     protected ViewportImageSize viewportImageSize;
@@ -118,15 +115,10 @@ public abstract class AbstractLayeredView extends AbstractView implements Layere
     @Override
     public int getNumberOfVisibleLayer() {
         int result = 0;
-        layerLock.lock();
-        try {
-            Collection<Layer> values = viewLookup.values();
-            for (Layer l : values) {
-                if (l.visibility)
-                    result++;
+        for (Layer layer : viewLookup.values()) {
+            if (layer.visibility) {
+                result++;
             }
-        } finally {
-            layerLock.unlock();
         }
 
         return result;
@@ -228,7 +220,6 @@ public abstract class AbstractLayeredView extends AbstractView implements Layere
 
     @Override
     public void removeLayer(View view, boolean needAbolish) {
-
         if (view == null) {
             return;
         }
@@ -238,14 +229,10 @@ public abstract class AbstractLayeredView extends AbstractView implements Layere
             return;
         }
         LinkedMovieManager.getActiveInstance().pauseLinkedMovies();
-        layerLock.lock();
-        try {
-            layers.remove(view);
-            viewLookup.remove(view);
-            view.removeViewListener(this);
-        } finally {
-            layerLock.unlock();
-        }
+
+        layers.remove(view);
+        viewLookup.remove(view);
+        view.removeViewListener(this);
 
         JHVJP2View jhvjp2 = view.getAdapter(JHVJP2View.class);
         if (jhvjp2 != null) {
@@ -296,22 +283,20 @@ public abstract class AbstractLayeredView extends AbstractView implements Layere
     @Override
     public void removeAllLayers() {
         ChangeEvent event = new ChangeEvent();
+
         LinkedMovieManager.getActiveInstance().pauseLinkedMovies();
-        layerLock.lock();
-        try {
-            for (View view : layers) {
-                int index = layers.indexOf(view);
-                view.removeViewListener(this);
-                if (view.getAdapter(JHVJP2View.class) != null) {
-                    view.getAdapter(JHVJP2View.class).abolish();
-                }
-                event.addReason(new LayerChangedReason(this, LayerChangeType.LAYER_REMOVED, view, index));
+        for (View view : layers) {
+            int index = layers.indexOf(view);
+            view.removeViewListener(this);
+            if (view.getAdapter(JHVJP2View.class) != null) {
+                view.getAdapter(JHVJP2View.class).abolish();
             }
-            layers.clear();
-            viewLookup.clear();
-        } finally {
-            layerLock.unlock();
+            event.addReason(new LayerChangedReason(this, LayerChangeType.LAYER_REMOVED, view, index));
         }
+
+        layers.clear();
+        viewLookup.clear();
+
         recalculateMetaData();
         recalculateRegionsAndViewports(event);
         redrawBuffer(event);
@@ -343,7 +328,6 @@ public abstract class AbstractLayeredView extends AbstractView implements Layere
      */
     @Override
     public boolean setRegion(Region r, ChangeEvent event) {
-
         if (event == null) {
             event = new ChangeEvent(new RegionUpdatedReason(this, r));
         } else {
@@ -445,7 +429,6 @@ public abstract class AbstractLayeredView extends AbstractView implements Layere
             viewportImageSize = ViewHelper.calculateViewportImageSize(viewport, region);
             changed |= viewportImageSize == null ? oldViewportImageSize == null : viewportImageSize.equals(oldViewportImageSize);
 
-            layerLock.lock();
             for (Layer layer : viewLookup.values()) {
                 MetaData m = layer.metaDataView.getMetaData();
                 if (includePixelBasedImages || !(m instanceof PixelBasedMetaData)) {
@@ -456,7 +439,6 @@ public abstract class AbstractLayeredView extends AbstractView implements Layere
                     changed |= layer.viewportView.setViewport(layerViewport, event);
                 }
             }
-            layerLock.unlock();
         }
 
         return changed;
@@ -506,28 +488,25 @@ public abstract class AbstractLayeredView extends AbstractView implements Layere
 
         RectangleDouble bounds = null;
         minimalRegionSize = 0.0f;
-        layerLock.lock();
-        try {
-            for (Layer layer : viewLookup.values()) {
-                if (layer.metaDataView != null) {
-                    if (includePixelBasedImages || !(layer.metaDataView.getMetaData() instanceof PixelBasedMetaData)) {
-                        RectangleDouble metaDataRectangle = layer.metaDataView.getMetaData().getPhysicalRectangle();
-                        if (bounds == null) {
-                            bounds = metaDataRectangle;
-                        } else {
-                            bounds = bounds.getBoundingRectangle(metaDataRectangle);
-                        }
 
-                        double unitsPerPixel = ((ImageSizeMetaData) layer.metaDataView.getMetaData()).getUnitsPerPixel();
-                        if (unitsPerPixel > minimalRegionSize) {
-                            minimalRegionSize = unitsPerPixel;
-                        }
+        for (Layer layer : viewLookup.values()) {
+            if (layer.metaDataView != null) {
+                if (includePixelBasedImages || !(layer.metaDataView.getMetaData() instanceof PixelBasedMetaData)) {
+                    RectangleDouble metaDataRectangle = layer.metaDataView.getMetaData().getPhysicalRectangle();
+                    if (bounds == null) {
+                        bounds = metaDataRectangle;
+                    } else {
+                        bounds = bounds.getBoundingRectangle(metaDataRectangle);
+                    }
+
+                    double unitsPerPixel = ((ImageSizeMetaData) layer.metaDataView.getMetaData()).getUnitsPerPixel();
+                    if (unitsPerPixel > minimalRegionSize) {
+                        minimalRegionSize = unitsPerPixel;
                     }
                 }
             }
-        } finally {
-            layerLock.unlock();
         }
+
         if (bounds != null)
             metaData = new PixelBasedMetaData(bounds);
 
@@ -544,8 +523,6 @@ public abstract class AbstractLayeredView extends AbstractView implements Layere
      *            ChangeEvent to collect history
      */
     protected void redrawBuffer(ChangeEvent aEvent) {
-        redrawBufferImpl();
-
         // add reason to change event
         if (aEvent == null)
             aEvent = new ChangeEvent();
@@ -555,27 +532,16 @@ public abstract class AbstractLayeredView extends AbstractView implements Layere
     }
 
     /**
-     * Implementation specific part of redrawing the scene.
-     *
-     * Will be called from redrawBuffer.
-     */
-    protected abstract void redrawBufferImpl();
-
-    /**
      * {@inheritDoc}
      */
     @Override
     public void moveView(View view, int newLevel) {
         ChangeEvent changeEvent = new ChangeEvent(new LayerChangedReason(this, LayerChangeType.LAYER_MOVED, view, newLevel));
-        layerLock.lock();
-        try {
-            if (layers.contains(view)) {
-                layers.remove(view);
-                layers.add(newLevel, view);
-                redrawBuffer(changeEvent);
-            }
-        } finally {
-            layerLock.unlock();
+
+        if (layers.contains(view)) {
+            layers.remove(view);
+            layers.add(newLevel, view);
+            redrawBuffer(changeEvent);
         }
     }
 

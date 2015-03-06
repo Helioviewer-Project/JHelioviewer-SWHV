@@ -60,10 +60,6 @@ public class GL3DLayeredView extends GLLayeredView implements GL3DView {
         }
     }
 
-    @Override
-    protected void redrawBufferImpl() {
-    }
-
     public void renderGL(GL2 gl) {
         for (int i = 0; i < this.getNumLayers(); i++) {
             View layerView = this.getLayer(i);
@@ -95,14 +91,11 @@ public class GL3DLayeredView extends GLLayeredView implements GL3DView {
         if (viewport != null && region != null) {
             viewportImageSize = ViewHelper.calculateViewportImageSize(viewport, region);
 
-            layerLock.lock();
             for (Layer layer : viewLookup.values()) {
                 Viewport layerViewport = new ViewportAdapter(new StaticViewport(viewportImageSize.getWidth(), viewportImageSize.getHeight()));
                 changed |= layer.viewportView.setViewport(layerViewport, event);
             }
-            layerLock.unlock();
         }
-
         return changed;
     }
 
