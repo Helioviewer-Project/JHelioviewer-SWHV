@@ -1,17 +1,9 @@
 package org.helioviewer.jhv.internal_plugins.filter.opacity;
 
-import java.awt.AlphaComposite;
-import java.awt.Graphics2D;
-import java.awt.image.BufferedImage;
-
 import javax.media.opengl.GL2;
 
 import org.helioviewer.viewmodel.filter.AbstractFilter;
 import org.helioviewer.viewmodel.filter.GLFilter;
-import org.helioviewer.viewmodel.filter.StandardFilter;
-import org.helioviewer.viewmodel.imagedata.ARGBInt32ImageData;
-import org.helioviewer.viewmodel.imagedata.ImageData;
-import org.helioviewer.viewmodel.imagedata.JavaBufferedImageData;
 import org.helioviewer.viewmodel.view.opengl.shader.GLFragmentShaderProgram;
 import org.helioviewer.viewmodel.view.opengl.shader.ShaderFactory;
 
@@ -29,7 +21,7 @@ import org.helioviewer.viewmodel.view.opengl.shader.ShaderFactory;
  * @author Markus Langenberg
  *
  */
-public class OpacityFilter extends AbstractFilter implements StandardFilter, GLFilter {
+public class OpacityFilter extends AbstractFilter implements GLFilter {
 
     // ////////////////////////////////////////////////////////////////
     // Definitions
@@ -84,34 +76,6 @@ public class OpacityFilter extends AbstractFilter implements StandardFilter, GLF
         }
         opacity = newOpacity;
         notifyAllListeners();
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public ImageData apply(ImageData data) {
-        if (data == null) {
-            return null;
-        }
-        if (opacity > 0.999f) {
-            return data;
-        }
-
-        if (data instanceof JavaBufferedImageData) {
-            BufferedImage source = ((JavaBufferedImageData) data).getBufferedImage();
-            BufferedImage target = new BufferedImage(source.getWidth(), source.getHeight(), BufferedImage.TYPE_INT_ARGB);
-
-            Graphics2D g = target.createGraphics();
-            g.setComposite(AlphaComposite.Clear);
-            g.fillRect(0, 0, data.getWidth(), data.getHeight());
-            g.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC, opacity));
-            g.drawImage(source, 0, 0, null);
-            g.dispose();
-
-            return new ARGBInt32ImageData(data, target);
-        }
-        return null;
     }
 
     /**

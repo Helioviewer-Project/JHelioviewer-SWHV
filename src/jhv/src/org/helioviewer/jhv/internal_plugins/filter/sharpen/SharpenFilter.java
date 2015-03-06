@@ -1,14 +1,7 @@
 package org.helioviewer.jhv.internal_plugins.filter.sharpen;
 
 import org.helioviewer.viewmodel.filter.AbstractFilter;
-import org.helioviewer.viewmodel.filter.StandardFilter;
-import org.helioviewer.viewmodel.imagedata.ARGBInt32ImageData;
 import org.helioviewer.viewmodel.imagedata.ImageData;
-import org.helioviewer.viewmodel.imagedata.SingleChannelByte8ImageData;
-import org.helioviewer.viewmodel.imagedata.SingleChannelShortImageData;
-import org.helioviewer.viewmodel.imagetransport.Byte8ImageTransport;
-import org.helioviewer.viewmodel.imagetransport.Int32ImageTransport;
-import org.helioviewer.viewmodel.imagetransport.Short16ImageTransport;
 
 /**
  * Filter for sharpen an image.
@@ -42,7 +35,7 @@ import org.helioviewer.viewmodel.imagetransport.Short16ImageTransport;
  * @author Markus Langenberg
  *
  */
-public class SharpenFilter extends AbstractFilter implements StandardFilter {
+public class SharpenFilter extends AbstractFilter {
 
     // /////////////////////////
     // GENERAL //
@@ -229,92 +222,6 @@ public class SharpenFilter extends AbstractFilter implements StandardFilter {
         }
 
         return convolveY;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public ImageData apply(ImageData data) {
-        if (data == null) {
-            return null;
-        }
-        if (weighting <= 0.01f) {
-            return data;
-        }
-
-        try {
-            // Single channel byte image
-            if (data.getImageTransport() instanceof Byte8ImageTransport) {
-                byte[] pixelData = ((Byte8ImageTransport) data.getImageTransport()).getByte8PixelData();
-
-                // lowpass
-                if (forceRefilter || lastImageData != data) {
-                    blur(data.getWidth(), data.getHeight(), pixelData);
-                }
-
-                // unsharp masking
-                byte[] resultPixelData = new byte[pixelData.length];
-                for (int i = 0; i < pixelData.length; i++) {
-                    resultPixelData[i] = (byte) Math.min(Math.max((1.0f + weighting) * (pixelData[i] & 0xFF) - weighting * convolveY[i], 0), 0xFF);
-                }
-                lastImageData = data;
-
-                return new SingleChannelByte8ImageData(data, resultPixelData);
-                // Single channel short image
-            } else if (data.getImageTransport() instanceof Short16ImageTransport) {
-                short[] pixelData = ((Short16ImageTransport) data.getImageTransport()).getShort16PixelData();
-
-                // calculate mask
-                int mask = (1 << data.getImageTransport().getNumBitsPerPixel()) - 1;
-
-                // lowpass
-                if (forceRefilter || lastImageData != data) {
-                    blur(data.getWidth(), data.getHeight(), pixelData, mask);
-                }
-
-                // unsharp masking
-                short[] resultPixelData = new short[pixelData.length];
-                for (int i = 0; i < pixelData.length; i++) {
-                    resultPixelData[i] = (short) Math.min(Math.max((1.0f + weighting) * (pixelData[i] & mask) - weighting * convolveY[i], 0), 0xFFFF);
-                }
-                lastImageData = data;
-
-                return new SingleChannelShortImageData(data, resultPixelData);
-                // (A)RGB image: Filter each channel separate
-            } else if (data.getImageTransport() instanceof Int32ImageTransport) {
-                int[] pixelData = ((Int32ImageTransport) data.getImageTransport()).getInt32PixelData();
-                int[] resultPixelData = new int[pixelData.length];
-                int[] channel = new int[pixelData.length];
-
-                // copy alpha channel unfiltered
-                for (int i = 0; i < pixelData.length; i++) {
-                    resultPixelData[i] = pixelData[i] & 0xFF000000;
-                }
-
-                // perform for each color channel
-                for (int c = 0; c < 3; c++) {
-                    for (int i = 0; i < pixelData.length; i++) {
-                        channel[i] = (pixelData[i] >>> c * 8) & 0xFF;
-                    }
-
-                    // blur
-                    blur(data.getWidth(), data.getHeight(), channel);
-
-                    // unsharp masking
-                    for (int i = 0; i < pixelData.length; i++) {
-                        resultPixelData[i] |= (((int) Math.min(Math.max((1.0f + weighting) * (channel[i] & 0xFF) - weighting * convolveY[i], 0), 0xFF)) << (c * 8));
-                    }
-                }
-                lastImageData = data;
-
-                return new ARGBInt32ImageData(data, resultPixelData);
-            }
-        } finally {
-            forceRefilter = false;
-        }
-
-        return null;
     }
 
     /**

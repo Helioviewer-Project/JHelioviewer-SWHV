@@ -8,7 +8,6 @@ import org.helioviewer.viewmodel.changeevent.ViewChainChangedReason;
 import org.helioviewer.viewmodel.filter.Filter;
 import org.helioviewer.viewmodel.filter.FilterListener;
 import org.helioviewer.viewmodel.filter.ObservableFilter;
-import org.helioviewer.viewmodel.filter.StandardFilter;
 import org.helioviewer.viewmodel.imagedata.ImageData;
 
 /**
@@ -75,9 +74,7 @@ public class StandardFilterView extends AbstractBasicView implements FilterView,
      */
     @Override
     public ImageData getSubimageData() {
-        if (filter instanceof StandardFilter && filteredData != null) {
-            return filteredData;
-        } else if (subimageDataView != null) {
+        if (subimageDataView != null) {
             return subimageDataView.getSubimageData();
         } else
             return null;
@@ -111,15 +108,12 @@ public class StandardFilterView extends AbstractBasicView implements FilterView,
     protected void refilter() {
         updatePrecomputedViews();
         if (filter != null && view != null) {
-            /*synchronized (filter)*/ {
+            /* synchronized (filter) */{
                 refilterPrepare();
 
                 if (subimageDataView != null) {
-                    if (filter instanceof StandardFilter) {
-                        filteredData = ((StandardFilter) filter).apply(subimageDataView.getSubimageData());
-                    } else {
-                        filteredData = subimageDataView.getSubimageData();
-                    }
+                    filteredData = subimageDataView.getSubimageData();
+
                 }
             }
         } else {

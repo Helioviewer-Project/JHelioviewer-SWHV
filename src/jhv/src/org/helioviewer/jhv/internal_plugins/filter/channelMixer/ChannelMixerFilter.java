@@ -4,17 +4,7 @@ import javax.media.opengl.GL2;
 
 import org.helioviewer.viewmodel.filter.AbstractFilter;
 import org.helioviewer.viewmodel.filter.GLFilter;
-import org.helioviewer.viewmodel.filter.StandardFilter;
-import org.helioviewer.viewmodel.imagedata.ARGBInt32ImageData;
 import org.helioviewer.viewmodel.imagedata.ColorMask;
-import org.helioviewer.viewmodel.imagedata.ImageData;
-import org.helioviewer.viewmodel.imagedata.RGBInt24ImageData;
-import org.helioviewer.viewmodel.imagedata.SingleChannelByte8ImageData;
-import org.helioviewer.viewmodel.imagedata.SingleChannelShortImageData;
-import org.helioviewer.viewmodel.imageformat.SingleChannelImageFormat;
-import org.helioviewer.viewmodel.imagetransport.Byte8ImageTransport;
-import org.helioviewer.viewmodel.imagetransport.Int32ImageTransport;
-import org.helioviewer.viewmodel.imagetransport.Short16ImageTransport;
 
 /**
  * Filter for modifying the color mask of an image.
@@ -31,7 +21,7 @@ import org.helioviewer.viewmodel.imagetransport.Short16ImageTransport;
  *
  * @author Markus Langenberg
  */
-public class ChannelMixerFilter extends AbstractFilter implements StandardFilter, GLFilter {
+public class ChannelMixerFilter extends AbstractFilter implements GLFilter {
 
     private ColorMask colorMask = new ColorMask();
     private ChannelMixerPanel panel;
@@ -65,30 +55,6 @@ public class ChannelMixerFilter extends AbstractFilter implements StandardFilter
         }
         colorMask = newColorMask;
         notifyAllListeners();
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public ImageData apply(ImageData data) {
-        if (data == null) {
-            return null;
-        }
-        if (data.getColorMask() == colorMask && !forceRefilter) {
-            return data;
-        }
-
-        if (data instanceof SingleChannelByte8ImageData)
-            return new SingleChannelByte8ImageData(data.getWidth(), data.getHeight(), ((Byte8ImageTransport) data.getImageTransport()).getByte8PixelData(), colorMask);
-        else if (data instanceof ARGBInt32ImageData)
-            return new ARGBInt32ImageData(false, data.getWidth(), data.getHeight(), ((Int32ImageTransport) data.getImageTransport()).getInt32PixelData(), colorMask);
-        else if (data instanceof RGBInt24ImageData)
-            return new RGBInt24ImageData(data.getWidth(), data.getHeight(), ((Int32ImageTransport) data.getImageTransport()).getInt32PixelData(), colorMask);
-        else if (data instanceof SingleChannelShortImageData)
-            return new SingleChannelShortImageData(data.getWidth(), data.getHeight(), ((SingleChannelImageFormat) data.getImageFormat()).getBitDepth(), ((Short16ImageTransport) data.getImageTransport()).getShort16PixelData(), colorMask);
-
-        return null;
     }
 
     /**

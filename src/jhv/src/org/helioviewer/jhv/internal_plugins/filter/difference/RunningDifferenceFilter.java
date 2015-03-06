@@ -5,18 +5,13 @@ import java.util.List;
 
 import javax.media.opengl.GL2;
 
-import org.helioviewer.base.logging.Log;
 import org.helioviewer.jhv.gui.states.StateController;
 import org.helioviewer.jhv.gui.states.ViewStateEnum;
 import org.helioviewer.viewmodel.filter.FilterListener;
 import org.helioviewer.viewmodel.filter.FrameFilter;
 import org.helioviewer.viewmodel.filter.GLFilter;
 import org.helioviewer.viewmodel.filter.ObservableFilter;
-import org.helioviewer.viewmodel.filter.StandardFilter;
-import org.helioviewer.viewmodel.imagedata.ColorMask;
 import org.helioviewer.viewmodel.imagedata.ImageData;
-import org.helioviewer.viewmodel.imagedata.SingleChannelByte8ImageData;
-import org.helioviewer.viewmodel.imagetransport.Byte8ImageTransport;
 import org.helioviewer.viewmodel.view.jp2view.JHVJP2View;
 import org.helioviewer.viewmodel.view.jp2view.JHVJPXView;
 import org.helioviewer.viewmodel.view.opengl.GLTextureHelper;
@@ -26,7 +21,7 @@ import org.helioviewer.viewmodel.view.opengl.GLTextureHelper;
  *
  * @author Helge Dietert
  */
-public class RunningDifferenceFilter implements FrameFilter, StandardFilter, ObservableFilter, GLFilter {
+public class RunningDifferenceFilter implements FrameFilter, ObservableFilter, GLFilter {
     /**
      * Flag to indicate whether this filter should be considered active
      */
@@ -56,62 +51,6 @@ public class RunningDifferenceFilter implements FrameFilter, StandardFilter, Obs
     @Override
     public void addFilterListener(FilterListener l) {
         listeners.add(l);
-    }
-
-    /**
-     * @see org.helioviewer.viewmodel.filter.StandardFilter#apply(org.helioviewer.viewmodel.imagedata.ImageData)
-     */
-    @Override
-    public ImageData apply(ImageData data) {
-        // If its not active we don't filter at all
-        if (!isActive)
-            return data;
-
-        if (data == null)
-            return null;
-
-        if (jpxView == null)
-            return data;
-        ImageData previousFrame;
-        if (!baseDifference) {
-            previousFrame = jpxView.getPreviousImageData();
-        } else {
-            previousFrame = jpxView.getBaseDifferenceImageData();
-        }
-        if (previousFrame != null) {
-            // Filter according to the data type
-            if (data.getImageTransport() instanceof Byte8ImageTransport) {
-                // Just one channel
-                byte[] newPixelData = ((Byte8ImageTransport) data.getImageTransport()).getByte8PixelData();
-                byte[] prevPixelData = ((Byte8ImageTransport) previousFrame.getImageTransport()).getByte8PixelData();
-                if (newPixelData.length != prevPixelData.length) {
-                    Log.warn("Pixel data has not the same size!! New size " + newPixelData.length + " old size " + prevPixelData.length);
-                    return null;
-                }
-                byte[] pixelData = new byte[newPixelData.length];
-                double tr = 16;
-                for (int i = 0; i < newPixelData.length; i++) {
-
-                    // pixelData[i] = (byte) ((((newPixelData[i] << 4>>>1) -
-                    // (prevPixelData[i] << 4>>>1))) + 0x80);
-                    int h1 = newPixelData[i];
-                    int h2 = prevPixelData[i];
-                    int diff = h1 - h2;
-                    if (diff < -tr) {
-                        diff = (int) (-tr);
-                    } else if (diff > tr) {
-                        diff = (int) tr;
-                    }
-
-                    pixelData[i] = (byte) ((int) ((((diff) / tr + 1) * (255. / 2.))));
-
-                }
-                final ColorMask colorMask = new ColorMask();
-
-                return new SingleChannelByte8ImageData(data.getWidth(), data.getHeight(), pixelData, colorMask);
-            }
-        }
-        return data;
     }
 
     /**

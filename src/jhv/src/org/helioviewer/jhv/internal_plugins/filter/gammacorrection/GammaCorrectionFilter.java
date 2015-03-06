@@ -4,14 +4,6 @@ import javax.media.opengl.GL2;
 
 import org.helioviewer.viewmodel.filter.AbstractFilter;
 import org.helioviewer.viewmodel.filter.GLFilter;
-import org.helioviewer.viewmodel.filter.StandardFilter;
-import org.helioviewer.viewmodel.imagedata.ARGBInt32ImageData;
-import org.helioviewer.viewmodel.imagedata.ImageData;
-import org.helioviewer.viewmodel.imagedata.SingleChannelByte8ImageData;
-import org.helioviewer.viewmodel.imagedata.SingleChannelShortImageData;
-import org.helioviewer.viewmodel.imagetransport.Byte8ImageTransport;
-import org.helioviewer.viewmodel.imagetransport.Int32ImageTransport;
-import org.helioviewer.viewmodel.imagetransport.Short16ImageTransport;
 import org.helioviewer.viewmodel.view.opengl.shader.GLFragmentShaderProgram;
 import org.helioviewer.viewmodel.view.opengl.shader.ShaderFactory;
 
@@ -41,7 +33,7 @@ import org.helioviewer.viewmodel.view.opengl.shader.ShaderFactory;
  *
  * @author Markus Langenberg
  */
-public class GammaCorrectionFilter extends AbstractFilter implements StandardFilter, GLFilter {
+public class GammaCorrectionFilter extends AbstractFilter implements GLFilter {
 
     private GammaCorrectionPanel panel;
 
@@ -112,74 +104,6 @@ public class GammaCorrectionFilter extends AbstractFilter implements StandardFil
             gammaTable16[i] = (short) v;
         }
         rebuildTable = false;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public ImageData apply(ImageData data) {
-        if (data == null) {
-            return null;
-        }
-        if (Math.abs(gamma - 1.0f) <= 0.01f) {
-            return data;
-        }
-
-        try {
-            // Single channel byte image
-            if (data.getImageTransport() instanceof Byte8ImageTransport) {
-                if (forceRefilter || rebuildTable) {
-                    buildTable8();
-                }
-
-                byte[] pixelData = ((Byte8ImageTransport) data.getImageTransport()).getByte8PixelData();
-                byte[] resultPixelData = new byte[pixelData.length];
-                for (int i = 0; i < pixelData.length; i++) {
-                    resultPixelData[i] = gammaTable8[pixelData[i] & 0xFF];
-                }
-                return new SingleChannelByte8ImageData(data, resultPixelData);
-
-                // Single channel short image
-            } else if (data.getImageTransport() instanceof Short16ImageTransport) {
-                if (forceRefilter || rebuildTable) {
-                    buildTable16(data.getImageTransport().getNumBitsPerPixel());
-                }
-
-                short[] pixelData = ((Short16ImageTransport) data.getImageTransport()).getShort16PixelData();
-                short[] resultPixelData = new short[pixelData.length];
-                for (int i = 0; i < pixelData.length; i++) {
-                    resultPixelData[i] = gammaTable16[pixelData[i] & 0xFFFF];
-                }
-                return new SingleChannelShortImageData(data, resultPixelData);
-
-                // (A)RGB image: Filter each channel separate
-            } else if (data.getImageTransport() instanceof Int32ImageTransport) {
-                if (forceRefilter || rebuildTable) {
-                    buildTable8();
-                }
-
-                int[] pixelData = ((Int32ImageTransport) data.getImageTransport()).getInt32PixelData();
-                int[] resultPixelData = new int[pixelData.length];
-                for (int i = 0; i < pixelData.length; i++) {
-                    int rgb = pixelData[i];
-                    int a = rgb >>> 24;
-                int r = (rgb >>> 16) & 0xFF;
-                int g = (rgb >>> 8) & 0xFF;
-                int b = rgb & 0xff;
-
-                r = gammaTable8[r] & 0xFF;
-                g = gammaTable8[g] & 0xFF;
-                b = gammaTable8[b] & 0xFF;
-                resultPixelData[i] = (a << 24) | (r << 16) | (g << 8) | b;
-                }
-                return new ARGBInt32ImageData(data, resultPixelData);
-            }
-        } finally {
-            forceRefilter = false;
-        }
-
-        return null;
     }
 
     /**
