@@ -7,7 +7,6 @@
 	<classpathentry combineaccessrules="false" kind="src" path="/basegui"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/viewmodel"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/viewmodelplugin"/>
-	<classpathentry combineaccessrules="false" kind="src" path="/jhv-3d-plugin"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/jhv"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/jhv-display"/>
 	<classpathentry kind="lib" path="../lib/gluegen-rt.jar"/>
