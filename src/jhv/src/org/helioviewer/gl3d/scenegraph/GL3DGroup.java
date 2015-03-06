@@ -232,7 +232,7 @@ public class GL3DGroup extends GL3DShape {
 
     private static int modelCounter = 0;
 
-    public synchronized GL3DModel getModelAt(int index) {
+    public GL3DModel getModelAt(int index) {
         modelCounter = index;
         GL3DNode node = this.first;
         while (node != null) {
