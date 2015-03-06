@@ -7,7 +7,6 @@ import org.helioviewer.viewmodel.changeevent.SubImageDataChangedReason;
 import org.helioviewer.viewmodel.changeevent.ViewChainChangedReason;
 import org.helioviewer.viewmodel.filter.Filter;
 import org.helioviewer.viewmodel.filter.FilterListener;
-import org.helioviewer.viewmodel.filter.ObservableFilter;
 import org.helioviewer.viewmodel.imagedata.ImageData;
 
 /**
@@ -49,14 +48,14 @@ public class StandardFilterView extends AbstractBasicView implements FilterView,
      */
     @Override
     public void setFilter(Filter f) {
-        if (filter != null && (filter instanceof ObservableFilter)) {
-            ((ObservableFilter) filter).removeFilterListener(this);
+        if (filter != null) {
+            filter.removeFilterListener(this);
         }
 
         filter = f;
 
-        if (filter != null && (filter instanceof ObservableFilter)) {
-            ((ObservableFilter) filter).addFilterListener(this);
+        if (filter != null) {
+            filter.addFilterListener(this);
         }
 
         refilter();
