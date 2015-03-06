@@ -8,6 +8,7 @@ import java.util.HashMap;
  * @author Stefan Meier (stefan.meier@fhnw.ch)
  * */
 public class PfssYear {
+
     private final int year;
     private final HashMap<Integer, PfssMonth> months;
 
@@ -23,7 +24,6 @@ public class PfssYear {
     }
 
     public PfssDayAndTime findData(int month, int dayAndTime) {
-
         if (months.containsKey(month)) {
             return months.get(month).findData(dayAndTime);
         }
@@ -34,4 +34,5 @@ public class PfssYear {
     public String toString() {
         return year + "";
     }
+
 }

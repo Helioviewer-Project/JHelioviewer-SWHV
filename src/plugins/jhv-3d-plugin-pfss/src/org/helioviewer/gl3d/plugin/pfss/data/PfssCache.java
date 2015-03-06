@@ -78,7 +78,6 @@ public class PfssCache {
         }
 
         this.load = false;
-
     }
 
     public PfssFitsFile getFitsToDelete() {

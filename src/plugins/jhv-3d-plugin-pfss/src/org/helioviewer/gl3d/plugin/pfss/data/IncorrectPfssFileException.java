@@ -8,9 +8,6 @@ package org.helioviewer.gl3d.plugin.pfss.data;
  */
 public class IncorrectPfssFileException extends Exception {
 
-    /**
-     * 
-     */
     private static final long serialVersionUID = -3816779713324720599L;
 
     public IncorrectPfssFileException(final Throwable cause) {

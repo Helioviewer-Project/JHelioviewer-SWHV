@@ -28,7 +28,7 @@ public class GL3DCameraOptionsPanel extends JPanel implements GL3DCameraSelectio
     private GL3DCameraSelectorModel cameraSelectorModel;
     private JPanel optionsPanel;
     private final GL3DCameraOptionsAttributeManager cameraOptionsAttributeManager = GL3DCameraOptionsAttributeManager.getSingletonInstance();
-    JTabbedPane tab;
+    private JTabbedPane tab;
 
     public GL3DCameraOptionsPanel() {
         LayersModel.getSingletonInstance().addLayersListener(this);
@@ -68,7 +68,6 @@ public class GL3DCameraOptionsPanel extends JPanel implements GL3DCameraSelectio
                 }
                 tab.setComponentAt(index, optionsPanel);
             }
-
         });
     }
 
@@ -104,7 +103,6 @@ public class GL3DCameraOptionsPanel extends JPanel implements GL3DCameraSelectio
     }
 
     private JPanel infoPanel() {
-
         JPanel infoExplainPanel = new JPanel();
         infoExplainPanel.setLayout(new BoxLayout(infoExplainPanel, BoxLayout.PAGE_AXIS));
         infoExplainPanel.setBorder(BorderFactory.createEmptyBorder(0, 4, 0, 4));
@@ -128,8 +126,7 @@ public class GL3DCameraOptionsPanel extends JPanel implements GL3DCameraSelectio
     }
 
     public JPanel createFollowObjectCamera() {
-        JPanel panel1 = new JPanel();
-        return panel1;
+        return new JPanel();
     }
 
     @Override

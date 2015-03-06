@@ -15,6 +15,7 @@ import nom.tam.fits.FitsException;
 import nom.tam.fits.Header;
 
 public class TestOpenFits {
+
     public static void main(String[] args) {
         FileInputStream is;
         try {
@@ -57,4 +58,5 @@ public class TestOpenFits {
             e.printStackTrace();
         }
     }
+
 }
