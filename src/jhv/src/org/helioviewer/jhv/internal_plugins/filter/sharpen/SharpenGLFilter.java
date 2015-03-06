@@ -3,7 +3,6 @@ package org.helioviewer.jhv.internal_plugins.filter.sharpen;
 import javax.media.opengl.GL2;
 
 import org.helioviewer.viewmodel.filter.GLImageSizeFilter;
-import org.helioviewer.viewmodel.view.opengl.shader.GLFragmentShaderProgram;
 import org.helioviewer.viewmodel.view.opengl.shader.ShaderFactory;
 
 /**
@@ -16,19 +15,7 @@ import org.helioviewer.viewmodel.view.opengl.shader.ShaderFactory;
  */
 public class SharpenGLFilter extends SharpenFilter implements GLImageSizeFilter {
 
-    private final UnsharpMaskingShader shader = new UnsharpMaskingShader();
     private float pixelWidth, pixelHeight;
-
-    /**
-     * Fragment shader performing the unsharp mask algorithm.
-     */
-    private class UnsharpMaskingShader extends GLFragmentShaderProgram {
-
-        @Override
-        public void bind(GL2 gl) {
-        }
-
-    }
 
     /**
      * {@inheritDoc}

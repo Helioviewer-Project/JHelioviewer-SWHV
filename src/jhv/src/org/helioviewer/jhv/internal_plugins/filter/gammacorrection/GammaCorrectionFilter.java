@@ -4,7 +4,6 @@ import javax.media.opengl.GL2;
 
 import org.helioviewer.viewmodel.filter.AbstractFilter;
 import org.helioviewer.viewmodel.filter.GLFilter;
-import org.helioviewer.viewmodel.view.opengl.shader.GLFragmentShaderProgram;
 import org.helioviewer.viewmodel.view.opengl.shader.ShaderFactory;
 
 /**
@@ -38,13 +37,6 @@ public class GammaCorrectionFilter extends AbstractFilter implements GLFilter {
     private GammaCorrectionPanel panel;
 
     private float gamma = 1.0f;
-    private boolean rebuildTable = true;
-    private final GammaCorrectionShader shader = new GammaCorrectionShader();
-
-    private final byte[] gammaTable8 = null;
-    private final short[] gammaTable16 = null;
-
-    private final boolean forceRefilter = false;
 
     /**
      * Sets the corresponding gamma correction panel.
@@ -68,23 +60,7 @@ public class GammaCorrectionFilter extends AbstractFilter implements GLFilter {
             return;
         }
         gamma = newGamma;
-        rebuildTable = true;
         notifyAllListeners();
-    }
-
-    /**
-     * Fragment shader for applying the gamma correction.
-     */
-    private class GammaCorrectionShader extends GLFragmentShaderProgram {
-
-        private void setGamma(GL2 gl, float gamma) {
-            ShaderFactory.setGamma(gamma);
-        }
-
-        @Override
-        public void bind(GL2 gl) {
-        }
-
     }
 
     /**
@@ -92,8 +68,7 @@ public class GammaCorrectionFilter extends AbstractFilter implements GLFilter {
      */
     @Override
     public void applyGL(GL2 gl) {
-        shader.setGamma(gl, gamma);
-        shader.bind(gl);
+        ShaderFactory.setGamma(gamma);
     }
 
     /**
