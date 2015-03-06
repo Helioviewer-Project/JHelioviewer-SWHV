@@ -3,7 +3,7 @@ package org.helioviewer.jhv.internal_plugins.filter.channelMixer;
 import javax.media.opengl.GL2;
 
 import org.helioviewer.viewmodel.filter.AbstractFilter;
-import org.helioviewer.viewmodel.filter.GLFilter;
+import org.helioviewer.viewmodel.filter.Filter;
 import org.helioviewer.viewmodel.imagedata.ColorMask;
 import org.helioviewer.viewmodel.view.opengl.shader.ShaderFactory;
 
@@ -22,7 +22,7 @@ import org.helioviewer.viewmodel.view.opengl.shader.ShaderFactory;
  *
  * @author Markus Langenberg
  */
-public class ChannelMixerFilter extends AbstractFilter implements GLFilter {
+public class ChannelMixerFilter extends AbstractFilter implements Filter {
 
     private ChannelMixerPanel panel;
 

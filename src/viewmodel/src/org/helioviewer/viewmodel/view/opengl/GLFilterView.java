@@ -4,12 +4,9 @@ import javax.media.opengl.GL2;
 
 import org.helioviewer.viewmodel.changeevent.ChangeEvent;
 import org.helioviewer.viewmodel.changeevent.FilterChangedReason;
-import org.helioviewer.viewmodel.changeevent.RegionChangedReason;
 import org.helioviewer.viewmodel.changeevent.SubImageDataChangedReason;
-import org.helioviewer.viewmodel.changeevent.ViewChainChangedReason;
 import org.helioviewer.viewmodel.filter.Filter;
 import org.helioviewer.viewmodel.filter.FrameFilter;
-import org.helioviewer.viewmodel.filter.GLFilter;
 import org.helioviewer.viewmodel.filter.GLImageSizeFilter;
 import org.helioviewer.viewmodel.filter.GLPostFilter;
 import org.helioviewer.viewmodel.imagedata.ImageData;
@@ -80,25 +77,21 @@ public class GLFilterView extends StandardFilterView implements GLView {
     @Override
     public void renderGL(GL2 gl, boolean nextView) {
         updatePrecomputedViews();
-        if (filter instanceof GLFilter) {
-            refilterPrepare();
+        refilterPrepare();
 
-            gl.glEnable(GL2.GL_FRAGMENT_PROGRAM_ARB);
+        gl.glEnable(GL2.GL_FRAGMENT_PROGRAM_ARB);
 
-            ((GLFilter) filter).applyGL(gl);
-            if (view instanceof GLView) {
-                ((GLView) view).renderGL(gl, true);
-            } else {
-                if (subimageDataView != null) {
-                    GLTextureHelper.renderImageDataToScreen(gl, regionView.getRegion(),
-                                                                subimageDataView.getSubimageData(),
-                                                                ((JHVJP2View) jpxView).tex);
-                }
+        filter.applyGL(gl);
+        if (view instanceof GLView) {
+            ((GLView) view).renderGL(gl, true);
+        } else {
+            if (subimageDataView != null) {
+                GLTextureHelper.renderImageDataToScreen(gl, regionView.getRegion(), subimageDataView.getSubimageData(), ((JHVJP2View) jpxView).tex);
             }
+        }
 
-            if (filter instanceof GLPostFilter) {
-                ((GLPostFilter) filter).postApplyGL(gl);
-            }
+        if (filter instanceof GLPostFilter) {
+            ((GLPostFilter) filter).postApplyGL(gl);
         }
     }
 
@@ -118,19 +111,7 @@ public class GLFilterView extends StandardFilterView implements GLView {
      */
     @Override
     public void viewChanged(View sender, ChangeEvent aEvent) {
-        if (!(filter instanceof GLFilter)) {
-            super.viewChanged(sender, aEvent);
-        } else {
-            if (aEvent.reasonOccurred(ViewChainChangedReason.class)) {
-                updatePrecomputedViews();
-                refilter();
-            }
-            if (aEvent.reasonOccurred(RegionChangedReason.class) || aEvent.reasonOccurred(SubImageDataChangedReason.class)) {
-                filteredDataIsUpToDate = false;
-            }
-
-            notifyViewListeners(aEvent);
-        }
+        super.viewChanged(sender, aEvent);
     }
 
     /**
@@ -138,18 +119,16 @@ public class GLFilterView extends StandardFilterView implements GLView {
      */
     @Override
     public void filterChanged(Filter f) {
-        if (!(filter instanceof GLFilter)) {
-            super.filterChanged(f);
-        } else {
-            filteredDataIsUpToDate = false;
 
-            ChangeEvent event = new ChangeEvent();
+        filteredDataIsUpToDate = false;
 
-            event.addReason(new FilterChangedReason(this, filter));
-            event.addReason(new SubImageDataChangedReason(this));
+        ChangeEvent event = new ChangeEvent();
 
-            notifyViewListeners(event);
-        }
+        event.addReason(new FilterChangedReason(this, filter));
+        event.addReason(new SubImageDataChangedReason(this));
+
+        notifyViewListeners(event);
+
     }
 
     /**
