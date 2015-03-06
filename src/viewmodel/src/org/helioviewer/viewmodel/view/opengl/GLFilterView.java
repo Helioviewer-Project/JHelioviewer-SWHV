@@ -15,7 +15,6 @@ import org.helioviewer.viewmodel.view.View;
 import org.helioviewer.viewmodel.view.ViewHelper;
 import org.helioviewer.viewmodel.view.ViewportView;
 import org.helioviewer.viewmodel.view.jp2view.JHVJP2View;
-import org.helioviewer.viewmodel.view.jp2view.JHVJPXView;
 import org.helioviewer.viewmodel.viewport.Viewport;
 
 /**
@@ -51,7 +50,7 @@ public class GLFilterView extends StandardFilterView implements GLView {
     protected ViewportView viewportView;
 
     protected boolean filteredDataIsUpToDate = false;
-    private JHVJPXView jpxView;
+    private JHVJP2View jp2View;
 
     /**
      * {@inheritDoc} This function also sets the image size.
@@ -60,7 +59,7 @@ public class GLFilterView extends StandardFilterView implements GLView {
     protected void refilterPrepare() {
         if (filter instanceof FrameFilter) {
             updatePrecomputedViews();
-            ((FrameFilter) filter).setJP2View(jpxView);
+            ((FrameFilter) filter).setJP2View(jp2View);
         }
         super.refilterPrepare();
         if (filter instanceof GLImageSizeFilter && viewportView != null) {
@@ -86,7 +85,7 @@ public class GLFilterView extends StandardFilterView implements GLView {
             ((GLView) view).renderGL(gl, true);
         } else {
             if (subimageDataView != null) {
-                GLTextureHelper.renderImageDataToScreen(gl, regionView.getRegion(), subimageDataView.getSubimageData(), ((JHVJP2View) jpxView).tex);
+                GLTextureHelper.renderImageDataToScreen(gl, regionView.getRegion(), subimageDataView.getSubimageData(), jp2View.tex);
             }
         }
 
@@ -119,16 +118,13 @@ public class GLFilterView extends StandardFilterView implements GLView {
      */
     @Override
     public void filterChanged(Filter f) {
-
         filteredDataIsUpToDate = false;
 
         ChangeEvent event = new ChangeEvent();
-
         event.addReason(new FilterChangedReason(this, filter));
         event.addReason(new SubImageDataChangedReason(this));
 
         notifyViewListeners(event);
-
     }
 
     /**
@@ -138,7 +134,7 @@ public class GLFilterView extends StandardFilterView implements GLView {
     protected void updatePrecomputedViews() {
         super.updatePrecomputedViews();
         viewportView = ViewHelper.getViewAdapter(view, ViewportView.class);
-        jpxView = ViewHelper.getViewAdapter(view, JHVJPXView.class);
+        jp2View = ViewHelper.getViewAdapter(view, JHVJP2View.class);
     }
 
     /**
