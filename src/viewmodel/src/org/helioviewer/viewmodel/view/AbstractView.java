@@ -2,7 +2,6 @@ package org.helioviewer.viewmodel.view;
 
 import java.util.AbstractList;
 import java.util.ArrayList;
-import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 import org.helioviewer.viewmodel.changeevent.ChangeEvent;
 
@@ -21,25 +20,19 @@ import org.helioviewer.viewmodel.changeevent.ChangeEvent;
 public abstract class AbstractView implements View {
 
     private final AbstractList<ViewListener> listeners = new ArrayList<ViewListener>();
-    private final ReentrantReadWriteLock rwl = new ReentrantReadWriteLock();
 
     /**
      * {@inheritDoc}
      */
     public void addViewListener(ViewListener l) {
-        rwl.writeLock().lock();
         listeners.add(l);
-        rwl.writeLock().unlock();
     }
 
     /**
      * {@inheritDoc}
      */
     public AbstractList<ViewListener> getAllViewListeners() {
-        rwl.readLock().lock();
         AbstractList<ViewListener> listenersCopy = new ArrayList<ViewListener>(listeners);
-        rwl.readLock().unlock();
-
         return listenersCopy;
     }
 
@@ -47,9 +40,7 @@ public abstract class AbstractView implements View {
      * {@inheritDoc}
      */
     public void removeViewListener(ViewListener l) {
-        rwl.writeLock().lock();
         listeners.remove(l);
-        rwl.writeLock().unlock();
     }
 
     /**
@@ -59,11 +50,9 @@ public abstract class AbstractView implements View {
      *            ChangeEvent to send
      */
     protected void notifyViewListeners(ChangeEvent aEvent) {
-        rwl.readLock().lock();
         for (ViewListener v : listeners) {
             v.viewChanged(this, aEvent);
         }
-        rwl.readLock().unlock();
     }
 
 }
