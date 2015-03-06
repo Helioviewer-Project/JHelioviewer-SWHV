@@ -25,7 +25,6 @@ import org.helioviewer.viewmodel.view.SubimageDataView;
 import org.helioviewer.viewmodel.view.View;
 import org.helioviewer.viewmodel.view.ViewListener;
 import org.helioviewer.viewmodel.view.jp2view.JHVJPXView;
-import org.helioviewer.viewmodel.view.opengl.shader.GL3DShaderFactory;
 import org.helioviewer.viewmodel.view.opengl.shader.ShaderFactory;
 
 /**
