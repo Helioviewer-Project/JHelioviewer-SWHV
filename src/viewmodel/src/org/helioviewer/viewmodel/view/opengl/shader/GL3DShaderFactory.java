@@ -2,10 +2,7 @@ package org.helioviewer.viewmodel.view.opengl.shader;
 
 import javax.media.opengl.GL2;
 
-import org.helioviewer.viewmodel.view.opengl.shader.GLFragmentShaderProgram;
-import org.helioviewer.viewmodel.view.opengl.shader.GLMinimalVertexShaderProgram;
-import org.helioviewer.viewmodel.view.opengl.shader.GLShaderBuilder;
-import org.helioviewer.viewmodel.view.opengl.shader.GLVertexShaderProgram;
+import org.helioviewer.gl3d.model.image.GL3DImageMesh;
 
 /**
  * The {@link GL3DShaderFactory} is used to create {@link GL3DImageMesh} nodes.
@@ -28,7 +25,7 @@ public class GL3DShaderFactory {
         vertexShaderProgram.build(newShaderBuilder);
 
         // fill with other filters and compile
-        newShaderBuilder.compile();
+        //newShaderBuilder.compile();
 
         return vertexShaderProgram;
     }
