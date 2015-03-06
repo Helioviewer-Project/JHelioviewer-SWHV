@@ -10,7 +10,6 @@ import org.helioviewer.jhv.gui.states.ViewStateEnum;
 import org.helioviewer.viewmodel.filter.Filter;
 import org.helioviewer.viewmodel.filter.FilterListener;
 import org.helioviewer.viewmodel.filter.FrameFilter;
-import org.helioviewer.viewmodel.filter.GLFilter;
 import org.helioviewer.viewmodel.imagedata.ImageData;
 import org.helioviewer.viewmodel.view.jp2view.JHVJP2View;
 import org.helioviewer.viewmodel.view.jp2view.JHVJPXView;
@@ -22,7 +21,7 @@ import org.helioviewer.viewmodel.view.opengl.shader.ShaderFactory;
  *
  * @author Helge Dietert
  */
-public class RunningDifferenceFilter implements FrameFilter, Filter, GLFilter {
+public class RunningDifferenceFilter implements FrameFilter, Filter {
     /**
      * Flag to indicate whether this filter should be considered active
      */

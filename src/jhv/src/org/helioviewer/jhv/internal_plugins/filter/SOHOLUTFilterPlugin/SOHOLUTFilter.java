@@ -5,8 +5,8 @@ import java.nio.IntBuffer;
 import javax.media.opengl.GL2;
 
 import org.helioviewer.viewmodel.filter.AbstractFilter;
+import org.helioviewer.viewmodel.filter.Filter;
 import org.helioviewer.viewmodel.filter.FrameFilter;
-import org.helioviewer.viewmodel.filter.GLFilter;
 import org.helioviewer.viewmodel.imagedata.ARGBInt32ImageData;
 import org.helioviewer.viewmodel.imagedata.ImageData;
 import org.helioviewer.viewmodel.imageformat.SingleChannelImageFormat;
@@ -31,7 +31,7 @@ import org.helioviewer.viewmodel.view.opengl.shader.ShaderFactory;
  *
  * @author Helge Dietert
  */
-public class SOHOLUTFilter extends AbstractFilter implements FrameFilter, GLFilter {
+public class SOHOLUTFilter extends AbstractFilter implements FrameFilter, Filter {
     // /////////////////////////
     // GENERAL //
     // /////////////////////////

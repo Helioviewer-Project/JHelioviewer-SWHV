@@ -1,5 +1,7 @@
 package org.helioviewer.viewmodel.filter;
 
+import javax.media.opengl.GL2;
+
 /**
  * Interface common for all filters.
  *
@@ -63,4 +65,6 @@ public interface Filter {
      * @see #addFilterListener(FilterListener)
      */
     public void removeFilterListener(FilterListener l);
+
+    public void applyGL(GL2 gl);
 }
