@@ -54,10 +54,4 @@ public class SharpenGLFilter extends SharpenFilter implements GLImageSizeFilter 
         pixelHeight = 1.0f / height;
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void forceRefilter() {
-    }
 }

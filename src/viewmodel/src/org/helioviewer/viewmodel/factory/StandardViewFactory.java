@@ -19,7 +19,7 @@ import org.helioviewer.viewmodel.view.jp2view.JHVJPXView;
 
 /**
  * Abstract implementation of interface ViewFactory for independent views.
- * 
+ *
  * <p>
  * This class produced views, which are independent from the type of the used
  * view chain and which can be used in every type. Since the set of views
@@ -29,7 +29,7 @@ import org.helioviewer.viewmodel.view.jp2view.JHVJPXView;
  * Apart from that, it provides some basic internal functionality.
  * <p>
  * For further details on how to use view factories, see {@link ViewFactory}.
- * 
+ *
  * @author Markus Langenberg
  */
 public abstract class StandardViewFactory implements ViewFactory {
@@ -37,6 +37,7 @@ public abstract class StandardViewFactory implements ViewFactory {
     /**
      * {@inheritDoc}
      */
+    @Override
     @SuppressWarnings("unchecked")
     public <T extends View> T createNewView(Class<T> pattern) {
 
@@ -54,6 +55,7 @@ public abstract class StandardViewFactory implements ViewFactory {
     /**
      * {@inheritDoc}
      */
+    @Override
     @SuppressWarnings("unchecked")
     public <T extends View> T createViewFromSource(T source, boolean keepSource) {
 
@@ -85,8 +87,6 @@ public abstract class StandardViewFactory implements ViewFactory {
             FilterView newFilter = (FilterView) createViewFromSourceImpl(source);
 
             Filter filter = sourceFilter.getFilter();
-            if (filter != null)
-                filter.forceRefilter();
             if (!keepSource) {
                 sourceFilter.setFilter(null);
             }
@@ -136,12 +136,12 @@ public abstract class StandardViewFactory implements ViewFactory {
 
     /**
      * Internal function to create views based on pattern implementation.
-     * 
+     *
      * This function returns creates view from a pattern. The only task it has
      * to fulfill is to return a blank class, fitting to the pattern. Copying
      * the functional members takes place in the caller, which is
      * createViewFromSource.
-     * 
+     *
      * @param <T>
      *            interface type of new view
      * @param source
@@ -153,10 +153,10 @@ public abstract class StandardViewFactory implements ViewFactory {
     /**
      * Internal function to create independent views based on a pattern
      * implementation.
-     * 
+     *
      * This function may be called by subclasses of StandardFactory, when they
      * do not support the given pattern.
-     * 
+     *
      * @param <T>
      *            interface type of new view
      * @param source

@@ -116,13 +116,6 @@ public class OpacityFilter extends AbstractFilter implements GLFilter {
      * {@inheritDoc}
      */
     @Override
-    public void forceRefilter() {
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
     public void setState(String state) {
         setOpacity(Float.parseFloat(state));
         panel.setValue(opacity);
