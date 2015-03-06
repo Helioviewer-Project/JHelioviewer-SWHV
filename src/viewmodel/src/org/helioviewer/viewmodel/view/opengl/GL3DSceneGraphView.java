@@ -16,7 +16,6 @@ import org.helioviewer.gl3d.model.GL3DArtificialObjects;
 import org.helioviewer.gl3d.model.image.GL3DImageLayer;
 import org.helioviewer.gl3d.model.image.GL3DImageLayerFactory;
 import org.helioviewer.gl3d.model.image.GL3DImageLayers;
-import org.helioviewer.gl3d.model.image.GL3DImageMesh;
 import org.helioviewer.gl3d.scenegraph.GL3DDrawBits.Bit;
 import org.helioviewer.gl3d.scenegraph.GL3DGroup;
 import org.helioviewer.gl3d.scenegraph.GL3DModel;
@@ -324,7 +323,7 @@ public class GL3DSceneGraphView extends AbstractGL3DView implements GL3DView {
         /*
          * GL3DNode sibling = node; while((sibling = sibling.getNext()) != null)
          * { for(int i=0; i<level; ++i) System.out.print("   ");
-         *
+         * 
          * System.out.println("Sibling: " + sibling.getClass().getName() + " ("
          * + node.getName() + ")"); }
          */
