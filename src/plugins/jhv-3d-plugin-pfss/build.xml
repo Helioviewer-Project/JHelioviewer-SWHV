@@ -1,167 +1,155 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
-
 <project name="build" default="all">
-    <property name="plugin.name" value="PfssPlugin" />
+
+    <property name="plugin.name" value="PfssPlugin"/>
     <!-- FIXED "lowercase" -->
-    <property name="plugin.name.lowercase" value="pfssplugin" />
-        
-        <property name="jhv.root" value="${basedir}/../../.." />
-    <!--
-        <property name="jhv.root" value="${basedir}/../../" />
-        -->
-        <property name="jhv.bin" value="${jhv.root}/bin/jhv/" />
-        <property name="jhv.build.resources" value="${jhv.root}/build-resources/" />
-    <property name="jhv.lib" value="${jhv.root}/lib/" />
-    <property name="jhv.build" value="${jhv.root}/build/" />
-    <property name="src" value="${basedir}/src/" />
-    <property name="doc" value="${basedir}/doc/" />
-    <property name="bin.eclipse" value="${basedir}/bin/" />
-    <property name="resources" value="${basedir}/resources/" />
-    <property name="lib" value="${basedir}/lib/" />
-    <property name="build" value="${basedir}/build/" />
-    <property name="build.resources" value="${basedir}/build-resources/" />
-    <property name="bin" value="${basedir}/build-bin/" />
-    <property name="temp" value="${basedir}/temp/" />
-    <property name="bzrpath" value="bzr" />
-    <property name="plugins.dir" value="${user.home}/JHelioviewer-SWHV/Plugins/" />
+    <property name="plugin.name.lowercase" value="pfssplugin"/>
+    <property name="jhv.root" value="${basedir}/../../.."/>
+    <property name="jhv.bin" value="${jhv.root}/bin/jhv/"/>
+    <property name="jhv.build.resources" value="${jhv.root}/build-resources/"/>
+    <property name="jhv.lib" value="${jhv.root}/lib/"/>
+    <property name="jhv.build" value="${jhv.root}/build/"/>
+    <property name="src" value="${basedir}/src/"/>
+    <property name="doc" value="${basedir}/doc/"/>
+    <property name="bin.eclipse" value="${basedir}/bin/"/>
+    <property name="resources" value="${basedir}/resources/"/>
+    <property name="lib" value="${basedir}/lib/"/>
+    <property name="build" value="${basedir}/build/"/>
+    <property name="build.resources" value="${basedir}/build-resources/"/>
+    <property name="bin" value="${basedir}/build-bin/"/>
+    <property name="temp" value="${basedir}/temp/"/>
+    <property name="bzrpath" value="bzr"/>
+    <property name="plugins.dir" value="${user.home}/JHelioviewer-SWHV/Plugins/"/>
 
-        <!-- Include ant-contrib -->
+    <!-- Include ant-contrib -->
     <taskdef resource="net/sf/antcontrib/antcontrib.properties">
-      <classpath>
-        <pathelement location="${jhv.build.resources}/shared/ant-contrib-1.0b3.jar"/>
-      </classpath>
+        <classpath>
+            <pathelement location="${jhv.build.resources}/shared/ant-contrib-1.0b3.jar"/>
+        </classpath>
     </taskdef>
-
-
-        <target name="all" depends="jar-bundle, bundle-src" />
+    <target name="all" depends="jar-bundle, bundle-src"/>
 
     <!-- build classes of main jhv project -->
     <target name="jhv.compile">
-        <ant inheritAll="false" target="compile" antfile="${jhv.root}/build.xml" />
+        <ant inheritAll="false" target="compile" antfile="${jhv.root}/build.xml"/>
     </target>
 
-        <!-- Create directory structure -->
-        <target name="mkdir">
-        <mkdir dir="${build}" /> 
-        <mkdir dir="${build.resources}" /> 
-        <mkdir dir="${bin}" /> 
-        <mkdir dir="${bin.eclipse}" /> 
-        <mkdir dir="${resources}" /> 
-        <mkdir dir="${lib}" /> 
-        <mkdir dir="${src}" /> 
-        <mkdir dir="${doc}" /> 
-        </target>
-        
-        <!-- Delete generated files -->
-        <target name="clean">
+    <!-- Create directory structure -->
+    <target name="mkdir">
+        <mkdir dir="${build}"/>
+        <mkdir dir="${build.resources}"/>
+        <mkdir dir="${bin}"/>
+        <mkdir dir="${bin.eclipse}"/>
+        <mkdir dir="${resources}"/>
+        <mkdir dir="${lib}"/>
+        <mkdir dir="${src}"/>
+        <mkdir dir="${doc}"/>
+    </target>
+
+    <!-- Delete generated files -->
+    <target name="clean">
         <delete includeemptydirs="true" verbose="true">
-                <fileset dir="${bin}" followsymlinks="false" defaultexcludes="no"/>
-        </delete> 
+            <fileset dir="${bin}" followsymlinks="false" defaultexcludes="no"/>
+        </delete>
         <delete includeemptydirs="true" verbose="true">
-                <fileset dir="${build}" followsymlinks="false" defaultexcludes="no"/>
-        </delete> 
+            <fileset dir="${build}" followsymlinks="false" defaultexcludes="no"/>
+        </delete>
         <delete includeemptydirs="true" verbose="true">
-                <fileset dir="${doc}" followsymlinks="false" defaultexcludes="no"/>
-        </delete> 
+            <fileset dir="${doc}" followsymlinks="false" defaultexcludes="no"/>
+        </delete>
         <delete includeemptydirs="true" verbose="true">
-                <fileset dir="${bin.eclipse}" followsymlinks="false" defaultexcludes="no"/>
-        </delete> 
-        <antcall target="mkdir" />
-        </target>
-        
-        <!-- Determine revision and version -->
-        <target name="init" depends="mkdir">
-        <echo message="Trying to determine revision" />
-        <!-- <exec 
-            executable="${bzrpath}" 
-            outputproperty="revision.tmp" 
-            resolveexecutable="true" 
-            searchpath="true" 
+            <fileset dir="${bin.eclipse}" followsymlinks="false" defaultexcludes="no"/>
+        </delete>
+        <antcall target="mkdir"/>
+    </target>
+
+    <!-- Determine revision and version -->
+    <target name="init" depends="mkdir">
+        <echo message="Trying to determine revision"/>
+        <!-- <exec
+            executable="${bzrpath}"
+            outputproperty="revision.tmp"
+            resolveexecutable="true"
+            searchpath="true"
             resultproperty="revision.retcode"
             failifexecutionfails="false">
                 <arg value="revno"/>
         </exec> -->
-        <loadfile property="version" srcFile="VERSION" />
-        <property name="version" value="1.0.0" />
+        <loadfile property="version" srcFile="VERSION"/>
+        <property name="version" value="1.0.0"/>
         <if>
             <equals arg1="${revision.retcode}" arg2="0"/>
             <then>
-                <property name="revision" value="${revision.tmp}" />
+                <property name="revision" value="${revision.tmp}"/>
             </then>
             <else>
-                <property name="revision" value="0" />
+                <property name="revision" value="0"/>
             </else>
         </if>
     </target>
 
-        
-        <!-- Compile sources -->
+    <!-- Compile sources -->
+    <target name="compile" depends="jhv.compile, init">
+        <javac srcdir="${src}" destdir="${bin}" target="1.6" source="1.6" debug="on" debuglevel="lines,vars,source" encoding="utf-8">
+            <classpath>
+                <fileset dir="${lib}">
+                    <include name="**/*.jar"/>
+                </fileset>
+                <fileset dir="${jhv.lib}">
+                    <include name="**/*.jar"/>
+                </fileset>
+                <pathelement location="${jhv.bin}"/>
+            </classpath>
+        </javac>
+    </target>
 
-        <target name="compile" depends="jhv.compile, init">
-                <javac srcdir="${src}" destdir="${bin}" target="1.6" source="1.6" debug="on" debuglevel="lines,vars,source" encoding="utf-8">
-                        <classpath>
-                                <fileset dir="${lib}">
-                                        <include name="**/*.jar" />
-                                </fileset>
-                                <fileset dir="${jhv.lib}">
-                                        <include name="**/*.jar"/>
-                                </fileset>
-                                <pathelement location="${jhv.bin}" />
-                        </classpath>
-                </javac>
-        </target>
-        
-        <!-- Jar bundle -->
-
-        
-        <target name="jar-bundle" depends="compile">
-                <!-- JAR File -->
-                <jar destfile="${build}/${plugin.name}.jar">
+    <!-- Jar bundle -->
+    <target name="jar-bundle" depends="compile">
+        <!-- JAR File -->
+        <jar destfile="${build}/${plugin.name}.jar">
             <manifest>
                 <!-- FIXED ".jhv." -->
                 <!-- FIXED "lowercase" -->
-                                <attribute name="Main-Class" value="org.helioviewer.jhv.plugins.${plugin.name.lowercase}.${plugin.name}" />
-                                <attribute name="Class-Path" value="." />
-                <attribute name="Implementation-Version" value="v${version}r${revision}" />
-                <attribute name="version" value="${version}" />
-                <attribute name="revision" value="${revision}" />
-                        </manifest>
-            <fileset dir="${bin}" />
-            <fileset dir="${resources}" />
-            <fileset file="README" />
-            <fileset file="COPYING" />
-                <zipgroupfileset dir="${lib}" includes="**/*.jar"/>
-                </jar>
-        </target>
-        
-        <!-- Source bundle -->
-
-    <target name="bundle-src" depends ="bundle-src-zip, bundle-src-tar" />
-
-    <target name="build-init" depends="init">
-        <property name="pkg.name" value="${plugin.name}-${version}.${revision}" />
+                <attribute name="Main-Class" value="org.helioviewer.jhv.plugins.${plugin.name.lowercase}.${plugin.name}"/>
+                <attribute name="Class-Path" value="."/>
+                <attribute name="Implementation-Version" value="v${version}r${revision}"/>
+                <attribute name="version" value="${version}"/>
+                <attribute name="revision" value="${revision}"/>
+            </manifest>
+            <fileset dir="${bin}"/>
+            <fileset dir="${resources}"/>
+            <fileset file="README"/>
+            <fileset file="COPYING"/>
+            <zipgroupfileset dir="${lib}" includes="**/*.jar"/>
+        </jar>
     </target>
 
+    <!-- Source bundle -->
+    <target name="bundle-src" depends="bundle-src-zip, bundle-src-tar"/>
+
+    <target name="build-init" depends="init">
+        <property name="pkg.name" value="${plugin.name}-${version}.${revision}"/>
+    </target>
 
     <target name="bundle-src-prepare" depends="build-init">
-        <mkdir dir="${jhv.bin}/build" />
+        <mkdir dir="${jhv.bin}/build"/>
         <javac destdir="${jhv.bin}/build/" srcdir="${jhv.build.resources}/shared/" includes="**/ManifestGenerator.java" debug="true" debuglevel="lines,vars,source"/>
         <taskdef name="generateManifest" classname="ManifestGenerator">
             <classpath location="${jhv.bin}/build/"/>
         </taskdef>
-        <mkdir dir="${temp}/build/src" />
-        <delete file="${temp}/build/src/bzrstatus" />
+        <mkdir dir="${temp}/build/src"/>
+        <delete file="${temp}/build/src/bzrstatus"/>
         <exec executable="${bzrpath}" output="${temp}/build/src/bzrstatus" resolveexecutable="true" searchpath="true">
             <arg value="status"/>
             <arg value="-S"/>
             <arg value="-r"/>
             <arg value="0"/>
         </exec>
-        <delete file="${temp}/build/src/bzrfiles" />
-        <generateManifest input="${temp}/build/src/bzrstatus" output="${temp}/build/src/bzrfiles" />
-        <loadfile property="files" srcFile="${temp}/build/src/bzrfiles" />
+        <delete file="${temp}/build/src/bzrfiles"/>
+        <generateManifest input="${temp}/build/src/bzrstatus" output="${temp}/build/src/bzrfiles"/>
+        <loadfile property="files" srcFile="${temp}/build/src/bzrfiles"/>
     </target>
-    
+
     <target name="bundle-src-tar" depends="bundle-src-prepare">
         <tar destfile="${build}/${pkg.name}.src.tar.gz" compression="gzip" defaultexcludes="no" longfile="gnu">
             <zipfileset dir="." includes="${files}" prefix="${pkg.name}-src/" defaultexcludes="no"/>
@@ -169,44 +157,35 @@
     </target>
 
     <target name="bundle-src-zip" depends="bundle-src-prepare">
-        <zip destfile="${build}/${pkg.name}.src.zip" defaultexcludes="no" >
+        <zip destfile="${build}/${pkg.name}.src.zip" defaultexcludes="no">
             <zipfileset dir="." includes="${files}" defaultexcludes="no" prefix="${pkg.name}-src/"/>
         </zip>
     </target>
-    
+
     <!-- documentation -->
-    
     <target name="doc" depends="jhv.compile">
-        <javadoc 
-            access="private"
-            destdir="${doc}"
-            author="true"
-            version="true"
-            use="true"
-            windowtitle="JHelioviewer API"
-            sourcepath="${src}"
-            linksource="true"
-        >
+        <javadoc access="private" destdir="${doc}" author="true" version="true" use="true" windowtitle="JHelioviewer API" sourcepath="${src}" linksource="true">
             <classpath>
                 <fileset dir="${lib}">
                     <include name="**/*.jar"/>
                 </fileset>
-                                <fileset dir="${jhv.lib}">
-                                        <include name="**/*.jar"/>
-                                </fileset>
-                                <pathelement location="${jhv.bin}" />
-                        </classpath>
+                <fileset dir="${jhv.lib}">
+                    <include name="**/*.jar"/>
+                </fileset>
+                <pathelement location="${jhv.bin}"/>
+            </classpath>
         </javadoc>
     </target>
-    
+
     <!-- install/release plugin -->
-        <target name="copy-to-root-build" depends="jar-bundle, bundle-src">
-                <copy todir="${jhv.build}">
-                        <fileset dir="${build}" />
-                </copy>
-        </target>
-        <target name="install-plugin" depends="jar-bundle">
-                <copy file="${build}/${plugin.name}.jar" todir="${plugins.dir}" />
-        </target>
+    <target name="copy-to-root-build" depends="jar-bundle, bundle-src">
+        <copy todir="${jhv.build}">
+            <fileset dir="${build}"/>
+        </copy>
+    </target>
+
+    <target name="install-plugin" depends="jar-bundle">
+        <copy file="${build}/${plugin.name}.jar" todir="${plugins.dir}"/>
+    </target>
 
 </project>
