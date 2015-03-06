@@ -179,8 +179,6 @@ public class GL3DImageLayer extends GL3DGroup implements GL3DCameraListener {
 
         double phi = hvmd.getPhi();
         double theta = hvmd.getTheta();
-        //this.accellerationShape.setPhi(phi);
-        //this.accellerationShape.setTheta(theta);
 
         GL3DQuatd rth = GL3DQuatd.createRotation(theta, GL3DVec3d.XAxis);
         rth.rotate(GL3DQuatd.createRotation(phi, GL3DVec3d.YAxis));
