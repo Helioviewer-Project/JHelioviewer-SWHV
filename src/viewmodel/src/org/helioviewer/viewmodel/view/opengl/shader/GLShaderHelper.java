@@ -25,11 +25,7 @@ import org.helioviewer.viewmodel.view.opengl.GLInfo;
  * <p>
  * This class provides a lot of useful functions to handle shaders in OpenGL,
  * including compiling them. Therefore, it uses the Cg stand-alone compiler.
- *
- * <p>
- * For further information about how to build shaders, see
- * {@link GLShaderBuilder} as well as the Cg User Manual.
- *
+ * 
  * @author Markus Langenberg
  */
 public class GLShaderHelper {
