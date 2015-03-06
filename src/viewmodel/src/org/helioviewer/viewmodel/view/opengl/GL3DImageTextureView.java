@@ -6,7 +6,6 @@ import javax.media.opengl.GL2;
 
 import org.helioviewer.base.math.MathUtils;
 import org.helioviewer.base.physics.Astronomy;
-import org.helioviewer.gl3d.model.image.GL3DImageMesh;
 import org.helioviewer.gl3d.scenegraph.GL3DState;
 import org.helioviewer.viewmodel.changeevent.CacheStatusChangedReason;
 import org.helioviewer.viewmodel.changeevent.ChangeEvent;
@@ -27,16 +26,6 @@ import org.helioviewer.viewmodel.view.ViewListener;
 import org.helioviewer.viewmodel.view.jp2view.JHVJPXView;
 import org.helioviewer.viewmodel.view.opengl.shader.ShaderFactory;
 
-/**
- * Connects the 3D viewchain to the 2D viewchain. The underlying 2D viewchain
- * renders it's image to the framebuffer. This view then copies that framebuffer
- * to a texture object which can then be used to be mapped onto a 3D mesh. Use a
- * {@link GL3DImageMesh} to connect the resulting texture to a mesh, or directly
- * use the {@link GL3DShaderFactory} to create standard Image Meshes.
- *
- * @author Simon Spoerri (simon.spoerri@fhnw.ch)
- *
- */
 public class GL3DImageTextureView extends AbstractGL3DView implements GL3DView {
 
     private boolean recaptureRequested = true;
