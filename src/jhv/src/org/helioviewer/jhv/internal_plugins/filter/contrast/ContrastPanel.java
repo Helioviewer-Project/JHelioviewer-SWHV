@@ -10,7 +10,7 @@ import javax.swing.JSlider;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
-import org.helioviewer.basegui.components.WheelSupport;
+import org.helioviewer.jhv.gui.components.base.WheelSupport;
 import org.helioviewer.viewmodel.filter.Filter;
 import org.helioviewer.viewmodelplugin.filter.FilterAlignmentDetails;
 import org.helioviewer.viewmodelplugin.filter.FilterPanel;

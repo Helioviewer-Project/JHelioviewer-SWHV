@@ -1125,4 +1125,5 @@ public class MoviePanel extends JPanel implements ActionListener, ChangeListener
         }
 
     }
+
 }

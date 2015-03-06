@@ -395,4 +395,5 @@ public class ImageSelectorPanel extends JPanel implements LayersListener {
     public ImageDataPanel getObservationImagePane() {
         return observationImagePane;
     }
+
 }

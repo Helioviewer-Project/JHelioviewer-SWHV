@@ -1,4 +1,4 @@
-package org.helioviewer.basegui.components;
+package org.helioviewer.jhv.gui.components.base;
 
 import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;

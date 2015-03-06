@@ -174,4 +174,5 @@ public class StatusPanel extends JPanel {
          */
         public void statusTextChanged(String newStatusText);
     }
+
 }

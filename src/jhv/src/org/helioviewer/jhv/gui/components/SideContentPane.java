@@ -228,4 +228,5 @@ public class SideContentPane extends JComponent {
             super.remove(component);
         }
     }
+
 }

@@ -9,7 +9,7 @@ import javax.swing.JSpinner;
 import javax.swing.SpinnerListModel;
 import javax.swing.event.ChangeListener;
 
-import org.helioviewer.basegui.components.WheelSupport;
+import org.helioviewer.jhv.gui.components.base.WheelSupport;
 import org.helioviewer.viewmodel.view.View;
 import org.helioviewer.viewmodel.view.ViewListener;
 import org.helioviewer.viewmodel.view.jp2view.JP2View;
@@ -142,4 +142,5 @@ public class QualitySpinner extends JPanel implements ChangeListener, ViewListen
         super.setEnabled(enabled);
         this.qualitySpinner.setEnabled(enabled);
     }
+
 }
