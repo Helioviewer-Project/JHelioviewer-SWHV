@@ -10,6 +10,7 @@ import org.helioviewer.gl3d.scenegraph.GL3DMesh;
 import org.helioviewer.gl3d.scenegraph.GL3DState;
 
 public class GL3DSphere extends GL3DMesh {
+
     private final int resolutionX;
     private final int resolutionY;
     private final double radius;

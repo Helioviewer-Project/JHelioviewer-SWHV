@@ -10,6 +10,7 @@ import org.helioviewer.gl3d.scenegraph.GL3DDrawBits.Bit;
  *
  */
 public abstract class GL3DNode {
+
     private final String name;
 
     protected GL3DNode next;
@@ -82,4 +83,5 @@ public abstract class GL3DNode {
     public void clearDrawBit(Bit bit) {
         this.drawBits.off(bit);
     }
+
 }

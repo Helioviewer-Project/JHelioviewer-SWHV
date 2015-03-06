@@ -9,6 +9,7 @@ import org.helioviewer.gl3d.scenegraph.GL3DMesh;
 import org.helioviewer.gl3d.scenegraph.GL3DState;
 
 public class GL3DRectangle extends GL3DMesh {
+
     private double width;
     private double height;
     private int resX;

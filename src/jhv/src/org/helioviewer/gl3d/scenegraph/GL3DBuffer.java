@@ -23,6 +23,7 @@ import com.jogamp.common.nio.Buffers;
  * 
  */
 public class GL3DBuffer {
+
     private final static int drawType = GL2.GL_DYNAMIC_DRAW;
 
     protected int id = -1;

@@ -10,6 +10,7 @@ import org.helioviewer.gl3d.scenegraph.GL3DDrawBits.Bit;
  * 
  */
 public class GL3DModel extends GL3DGroup {
+
     private String description;
 
     public GL3DModel(String name, String description) {
@@ -28,4 +29,5 @@ public class GL3DModel extends GL3DGroup {
     public String getDescription() {
         return this.description;
     }
+
 }

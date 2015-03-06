@@ -11,6 +11,7 @@ import org.helioviewer.gl3d.math.GL3DVec3d;
  *
  */
 public class GL3DTriangle {
+
     protected GL3DVec3d a;
     protected GL3DVec3d b;
     protected GL3DVec3d c;

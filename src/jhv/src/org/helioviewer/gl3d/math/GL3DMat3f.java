@@ -215,4 +215,5 @@ public class GL3DMat3f {
     public float[] toArray() {
         return this.m;
     }
+
 }
