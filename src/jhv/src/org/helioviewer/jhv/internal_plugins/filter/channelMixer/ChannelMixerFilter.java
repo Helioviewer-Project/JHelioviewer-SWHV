@@ -69,17 +69,6 @@ public class ChannelMixerFilter extends AbstractFilter implements GLFilter {
 
     /**
      * {@inheritDoc}
-     *
-     * <p>
-     * This filter is a major filter.
-     */
-    @Override
-    public boolean isMajorFilter() {
-        return true;
-    }
-
-    /**
-     * {@inheritDoc}
      */
     @Override
     public void setState(String state) {

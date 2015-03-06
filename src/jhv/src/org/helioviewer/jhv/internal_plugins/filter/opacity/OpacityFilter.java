@@ -38,17 +38,6 @@ public class OpacityFilter extends AbstractFilter implements GLFilter {
     }
 
     /**
-     * {@inheritDoc}
-     *
-     * <p>
-     * This filter is a major filter.
-     */
-    @Override
-    public boolean isMajorFilter() {
-        return true;
-    }
-
-    /**
      * Sets the corresponding opacity panel.
      *
      * @param panel
