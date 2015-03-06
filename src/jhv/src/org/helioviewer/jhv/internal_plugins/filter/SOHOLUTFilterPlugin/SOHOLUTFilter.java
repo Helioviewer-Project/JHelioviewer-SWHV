@@ -7,7 +7,6 @@ import javax.media.opengl.GL2;
 import org.helioviewer.viewmodel.filter.AbstractFilter;
 import org.helioviewer.viewmodel.filter.FrameFilter;
 import org.helioviewer.viewmodel.filter.GLFilter;
-import org.helioviewer.viewmodel.filter.StandardFilter;
 import org.helioviewer.viewmodel.imagedata.ARGBInt32ImageData;
 import org.helioviewer.viewmodel.imagedata.ImageData;
 import org.helioviewer.viewmodel.imageformat.SingleChannelImageFormat;
@@ -32,7 +31,7 @@ import org.helioviewer.viewmodel.view.opengl.shader.ShaderFactory;
  *
  * @author Helge Dietert
  */
-public class SOHOLUTFilter extends AbstractFilter implements FrameFilter, StandardFilter, GLFilter {
+public class SOHOLUTFilter extends AbstractFilter implements FrameFilter, GLFilter {
     // /////////////////////////
     // GENERAL //
     // /////////////////////////
@@ -110,7 +109,6 @@ public class SOHOLUTFilter extends AbstractFilter implements FrameFilter, Standa
     /**
      * {@inheritDoc}
      */
-    @Override
     public ImageData apply(ImageData data) {
         // Skip over gray for performance as before
         if (data == null || !(data.getImageFormat() instanceof SingleChannelImageFormat) || (lut.getName() == "Gray" && !invertLUT)) {

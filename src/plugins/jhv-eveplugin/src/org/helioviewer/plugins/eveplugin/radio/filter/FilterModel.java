@@ -39,9 +39,6 @@ public class FilterModel {
         fireLUTChanged();
     }
 
-    public ImageData colorFilter(ImageData data) {
-        return lutFilter.apply(data);
-    }
 
     private void fireLUTChanged() {
         for (FilterModelListener l : listeners) {
