@@ -119,14 +119,12 @@ public class GLOverlayView extends AbstractGLView implements OverlayView {
     @Override
     public void removeOverlay(int index) {
         // TODO Auto-generated method stub
-
     }
 
     @Override
     // Just implemented for exist plugin, for new one, pls don't use this
     // function
     public void setRenderer(PhysicalRenderer renderer) {
-        // TODO Auto-generated method stub
         OverlayPluginContainer overlayPluginContainer = new OverlayPluginContainer();
         overlayPluginContainer.setRenderer(renderer);
         this.overlays.add(overlayPluginContainer);
