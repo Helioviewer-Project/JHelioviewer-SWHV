@@ -2,7 +2,6 @@ package org.helioviewer.gl3d.scenegraph;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.locks.ReentrantLock;
 
 import javax.media.opengl.GL2;
 
@@ -41,37 +40,20 @@ public abstract class GL3DMesh extends GL3DShape {
 
     private List<GL3DTriangle> triangles;
 
-    private final float[] diffuseMaterial;
-
-    private final float[] specularMaterial;
-
-    private final ReentrantLock meshLock = new ReentrantLock();
-
     public GL3DMesh(String name) {
         this(name, new GL3DVec4f(1, 1, 1, 1));
     }
 
     public GL3DMesh(String name, GL3DVec4f diffuseMaterial) {
-        this(name, diffuseMaterial, new GL3DVec4f(0.1f, 0.1f, 0.1f, 1.0f));
-
+        this(name, null, null);
     }
 
     public GL3DMesh(String name, GL3DVec4f diffuseMaterial, GL3DVec4f specularMaterial) {
         super(name);
-
-        this.diffuseMaterial = new float[] { diffuseMaterial.x, diffuseMaterial.y, diffuseMaterial.z, diffuseMaterial.w };
-        this.specularMaterial = new float[] { specularMaterial.x, specularMaterial.y, specularMaterial.z, specularMaterial.w };
-    }
-
-    public void setMaterialAlpha(float alpha) {
-        this.diffuseMaterial[3] = alpha;
-        this.specularMaterial[3] = alpha;
     }
 
     @Override
     public void shapeInit(GL3DState state) {
-        meshLock.lock();
-
         positions = new ArrayList<GL3DVec3d>();
         normals = new ArrayList<GL3DVec3d>();
         colors = new ArrayList<GL3DVec4d>();
@@ -87,7 +69,6 @@ public abstract class GL3DMesh extends GL3DShape {
         this.indexVBO = GL3DBuffer.createIndexBuffer(state, indices);
 
         this.setTriangles(buildTriangles());
-        meshLock.unlock();
     }
 
     protected void recreateMesh(GL3DState state) {
@@ -97,12 +78,10 @@ public abstract class GL3DMesh extends GL3DShape {
 
     @Override
     public void shapeDraw(GL3DState state) {
-        meshLock.lock();
+        GL2 gl = state.gl;
 
         // If Mesh does not have any data, do not draw!
         if (this.positions.size() < 1) {
-            meshLock.unlock();
-            // Log.debug("Mesh '"+this+"' is not initialised, abortingDraw");
             return;
         }
 
@@ -119,27 +98,20 @@ public abstract class GL3DMesh extends GL3DShape {
 
             if (this.colors.size() < 1) {
                 this.colorVBO.disable(state);
-                state.gl.glColor4fv(this.diffuseMaterial, 0);
-                // Log.debug("GL3DMesh: "+getName()+" Using diffuseMaterial as Color "+this.diffuseMaterial[3]);
             } else {
-                // state.gl.glColor4d(1, 1, 1, 1);
-                // Log.debug("GL3DMesh: "+getName()+" Using VBO AND diffuseMaterial as Color");
-                //state.gl.glMaterialfv(GL2.GL_FRONT, GL2.GL_AMBIENT_AND_DIFFUSE, this.diffuseMaterial, 0);
-                //state.gl.glMaterialfv(GL2.GL_FRONT, GL2.GL_SPECULAR, this.specularMaterial, 0);
                 this.colorVBO.enable(state);
             }
 
             GL3DMeshPrimitive primitive = this.primitive;
             if (textCoords.size() > 0) {
-                // state.gl.glColor4d(1, 1, 1, 1);
                 this.texcoordVBO.enable(state);
-                state.gl.glEnable(GL2.GL_TEXTURE_2D);
+                gl.glEnable(GL2.GL_TEXTURE_2D);
             } else {
-                state.gl.glDisable(GL2.GL_TEXTURE_2D);
+                gl.glDisable(GL2.GL_TEXTURE_2D);
             }
             // GL3DState.get().checkGLErrors("GL3DImageMesh.beforeDrawCall "+getName());
 
-            state.gl.glDrawElements(primitive.id, this.indexVBO.numberOfElements, this.indexVBO.dataType.id, 0);
+            gl.glDrawElements(primitive.id, this.indexVBO.numberOfElements, this.indexVBO.dataType.id, 0);
             // GL3DState.get().checkGLErrors("GL3DImageMesh.afterDrawCall " + getName() + " IndexVBO: " + this.indexVBO.id);
             this.positionVBO.disable(state);
             this.colorVBO.disable(state);
@@ -152,8 +124,6 @@ public abstract class GL3DMesh extends GL3DShape {
         if (isDrawBitOn(Bit.Normals)) {
             renderNormals(state);
         }
-
-        meshLock.unlock();
     }
 
     private void renderWireframe(GL3DState state, GL3DMeshPrimitive primitive) {
@@ -161,7 +131,6 @@ public abstract class GL3DMesh extends GL3DShape {
         gl.glDisable(GL2.GL_TEXTURE_2D);
 
         if (primitive == GL3DMeshPrimitive.QUADS) {
-
             for (int i = 0; i < this.indices.size(); i++) {
                 if (i % 4 == 0)
                     gl.glBegin(GL2.GL_LINE_LOOP);
@@ -173,7 +142,6 @@ public abstract class GL3DMesh extends GL3DShape {
             }
 
         } else if (primitive == GL3DMeshPrimitive.TRIANGLES) {
-
             for (int i = 0; i < this.indices.size(); i++) {
                 if (i % 3 == 0)
                     gl.glBegin(GL2.GL_LINE_LOOP);
@@ -183,9 +151,9 @@ public abstract class GL3DMesh extends GL3DShape {
                 if ((i) % 3 == 2)
                     gl.glEnd();
             }
+
         } else if (primitive == GL3DMeshPrimitive.LINES) {
             gl.glBegin(GL2.GL_LINES);
-
             GL3DVec3d lastPosition = null;
             for (int i = 0; i < this.indices.size(); i++) {
                 int index = this.indices.get(i);
@@ -197,9 +165,9 @@ public abstract class GL3DMesh extends GL3DShape {
                 lastPosition = position;
             }
             gl.glEnd();
+
         } else {
             gl.glBegin(GL2.GL_LINE_LOOP);
-
             for (int i = 0; i < this.indices.size(); i++) {
                 int index = this.indices.get(i);
                 GL3DVec3d position = this.positions.get(index);
@@ -235,8 +203,6 @@ public abstract class GL3DMesh extends GL3DShape {
 
     @Override
     public void shapeDelete(GL3DState state) {
-        meshLock.lock();
-
         this.positionVBO.disable(state);
         this.colorVBO.disable(state);
         this.normalVBO.disable(state);
@@ -254,8 +220,6 @@ public abstract class GL3DMesh extends GL3DShape {
         colors.clear();
         textCoords.clear();
         indices.clear();
-
-        meshLock.unlock();
     }
 
     private List<GL3DTriangle> buildTriangles() {
