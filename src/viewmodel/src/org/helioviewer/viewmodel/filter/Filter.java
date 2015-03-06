@@ -1,6 +1,5 @@
 package org.helioviewer.viewmodel.filter;
 
-
 /**
  * Interface common for all filters.
  *
@@ -19,18 +18,13 @@ public interface Filter {
 
     /**
      * Returns if the filter is a major filter or not. Major filter means that
-     * it is a basic filter which will be supported in the whole program. If a filter is not a major
-     * filter the program will not apply it in certain circumstances.
+     * it is a basic filter which will be supported in the whole program. If a
+     * filter is not a major filter the program will not apply it in certain
+     * circumstances.
      *
      * @return if it is a major filter
      * */
     public boolean isMajorFilter();
-
-    /**
-     * This method forces a refiltering of the image data the next time the
-     * image is rendered regardless if the internal state of the filter.
-     */
-    public void forceRefilter();
 
     /**
      * Sets the filter state.

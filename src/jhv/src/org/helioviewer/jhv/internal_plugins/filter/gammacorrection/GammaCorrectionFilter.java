@@ -44,7 +44,7 @@ public class GammaCorrectionFilter extends AbstractFilter implements GLFilter {
     private byte[] gammaTable8 = null;
     private short[] gammaTable16 = null;
 
-    private boolean forceRefilter = false;
+    private final boolean forceRefilter = false;
 
     /**
      * Sets the corresponding gamma correction panel.
@@ -141,14 +141,6 @@ public class GammaCorrectionFilter extends AbstractFilter implements GLFilter {
     @Override
     public boolean isMajorFilter() {
         return true;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void forceRefilter() {
-        forceRefilter = true;
     }
 
     /**

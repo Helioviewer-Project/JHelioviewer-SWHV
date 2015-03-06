@@ -52,7 +52,7 @@ public class SharpenFilter extends AbstractFilter {
 
     private ImageData lastImageData;
 
-    private boolean forceRefilter = false;
+    private final boolean forceRefilter = false;
 
     /**
      * Sets the corresponding sharpen panel.
@@ -222,14 +222,6 @@ public class SharpenFilter extends AbstractFilter {
         }
 
         return convolveY;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void forceRefilter() {
-        forceRefilter = true;
     }
 
     /**

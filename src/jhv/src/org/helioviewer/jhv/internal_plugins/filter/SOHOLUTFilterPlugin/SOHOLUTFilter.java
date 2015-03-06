@@ -199,14 +199,6 @@ public class SOHOLUTFilter extends AbstractFilter implements FrameFilter, GLFilt
      * {@inheritDoc}
      */
     @Override
-    public void forceRefilter() {
-        lastLut = null;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
     public void setState(String state) {
         String[] values = state.trim().split(" ");
         String tableString = values[0];

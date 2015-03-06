@@ -41,10 +41,10 @@ public class ContrastFilter extends AbstractFilter implements GLFilter {
     private boolean rebuildTable = true;
     private final ContrastShader shader = new ContrastShader();
 
-    private byte[] contrastTable8 = null;
-    private short[] contrastTable16 = null;
+    private final byte[] contrastTable8 = null;
+    private final short[] contrastTable16 = null;
 
-    private boolean forceRefilter = false;
+    private final boolean forceRefilter = false;
 
     /**
      * Sets the corresponding contrast panel.
@@ -69,53 +69,14 @@ public class ContrastFilter extends AbstractFilter implements GLFilter {
         }
         contrast = newContrast;
         rebuildTable = true;
+        ShaderFactory.setContrast(contrast);
         notifyAllListeners();
-    }
-
-    /**
-     * Internal function for building the lookup table for 8-bit input data.
-     */
-    private void buildTable8() {
-        if (contrastTable8 == null) {
-            contrastTable8 = new byte[0x100];
-        }
-
-        float N = 0xFF;
-        for (int i = 0; i < 0x100; i++) {
-            int v = (int) (N * (0.5f * Math.signum(2 * i / N - 1) * Math.pow(Math.abs(2 * i / N - 1), Math.pow(1.5, -contrast)) + 0.5f));
-            contrastTable8[i] = (byte) v;
-        }
-
-        rebuildTable = false;
-    }
-
-    /**
-     * Internal function for building the lookup table for 16-bit input data.
-     */
-    private void buildTable16(int bitDepth) {
-        int maxValue = 1 << bitDepth;
-
-        if (contrastTable16 == null) {
-            contrastTable16 = new short[maxValue];
-        }
-
-        float N = maxValue - 1;
-        for (int i = 0; i < maxValue; i++) {
-            int v = (int) (N * (0.5f * Math.signum(2 * i / N - 1) * Math.pow(Math.abs(2 * i / N - 1), Math.pow(1.5, -contrast)) + 0.5f));
-            contrastTable16[i] = (short) v;
-        }
-
-        rebuildTable = false;
     }
 
     /**
      * Fragment shader for enhancing the contrast.
      */
     private class ContrastShader extends GLFragmentShaderProgram {
-
-        private void setContrast(GL2 gl, float contrast) {
-            ShaderFactory.setContrast(contrast);
-        }
 
         @Override
         public void bind(GL2 gl) {
@@ -130,7 +91,6 @@ public class ContrastFilter extends AbstractFilter implements GLFilter {
      */
     @Override
     public void applyGL(GL2 gl) {
-        shader.setContrast(gl, contrast);
         shader.bind(gl);
     }
 
@@ -143,14 +103,6 @@ public class ContrastFilter extends AbstractFilter implements GLFilter {
     @Override
     public boolean isMajorFilter() {
         return true;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void forceRefilter() {
-        forceRefilter = true;
     }
 
     /**

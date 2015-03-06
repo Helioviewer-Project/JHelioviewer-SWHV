@@ -25,7 +25,6 @@ public class ChannelMixerFilter extends AbstractFilter implements GLFilter {
 
     private ColorMask colorMask = new ColorMask();
     private ChannelMixerPanel panel;
-    private boolean forceRefilter = false;
 
     /**
      * Sets the corresponding channel mixer panel.
@@ -78,14 +77,6 @@ public class ChannelMixerFilter extends AbstractFilter implements GLFilter {
     @Override
     public boolean isMajorFilter() {
         return true;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void forceRefilter() {
-        forceRefilter = true;
     }
 
     /**

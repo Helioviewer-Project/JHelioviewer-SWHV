@@ -54,14 +54,6 @@ public class RunningDifferenceFilter implements FrameFilter, ObservableFilter, G
     }
 
     /**
-     * @see org.helioviewer.viewmodel.filter.Filter#forceRefilter()
-     */
-    @Override
-    public void forceRefilter() {
-        // This plugin always filter the data
-    }
-
-    /**
      * @return the isActive
      */
     public boolean isActive() {

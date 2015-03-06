@@ -82,9 +82,6 @@ public class ContrastPanel extends FilterPanel implements ChangeListener, MouseL
         return Area.TOP;
     }
 
-    /**
-     * Sets the gamma value of the image.
-     */
     @Override
     public void stateChanged(ChangeEvent e) {
         filter.setContrast(contrastSlider.getValue() / sliderToContrastScale);
