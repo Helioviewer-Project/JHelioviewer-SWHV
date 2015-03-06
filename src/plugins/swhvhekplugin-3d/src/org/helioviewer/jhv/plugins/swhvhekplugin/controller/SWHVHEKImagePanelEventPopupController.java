@@ -195,12 +195,6 @@ public class SWHVHEKImagePanelEventPopupController implements KeyEventDispatcher
      */
     @Override
     public void mouseClicked(final MouseEvent e) {
-
-        GL3DVec3d hitpoint = getHitPoint(e);
-        //if (hitpoint != null && isAPressed()) {
-        //    Displayer.pointList.add(new GL3DVec3d(hitpoint.x, hitpoint.y, hitpoint.z));
-        //}
-
         //Uncomment to enable point and click
         if (mouseOverJHVEvent != null) {
             // should never be the case
@@ -323,10 +317,15 @@ public class SWHVHEKImagePanelEventPopupController implements KeyEventDispatcher
     public void detach() {
     }
 
-    public GL3DVec3d getHitPoint(MouseEvent e) {
-        GL3DCamera activeCamera = GL3DState.get().getActiveCamera();
-        GL3DVec3d pt = activeCamera.getVectorFromSphere(e.getPoint());
-        return pt;
+    private GL3DVec3d getHitPoint(MouseEvent e) {
+        GL3DState state = GL3DState.get();
+        /* workaround for null GL3DState on startup */
+        if (state != null) {
+            GL3DCamera activeCamera = state.getActiveCamera();
+            GL3DVec3d pt = activeCamera.getVectorFromSphere(e.getPoint());
+            return pt;
+        } else
+            return null;
     }
 
 }
