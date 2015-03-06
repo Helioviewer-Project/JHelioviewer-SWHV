@@ -2,13 +2,14 @@ package org.helioviewer.viewmodel.filter;
 
 import java.util.LinkedList;
 
-public abstract class AbstractFilter implements ObservableFilter {
+public abstract class AbstractFilter implements Filter {
 
-    private LinkedList<FilterListener> listeners = new LinkedList<FilterListener>();
+    private final LinkedList<FilterListener> listeners = new LinkedList<FilterListener>();
 
     /**
      * {@inheritDoc}
      */
+    @Override
     public void addFilterListener(FilterListener l) {
         synchronized (listeners) {
             listeners.add(l);
@@ -18,6 +19,7 @@ public abstract class AbstractFilter implements ObservableFilter {
     /**
      * {@inheritDoc}
      */
+    @Override
     public void removeFilterListener(FilterListener l) {
         synchronized (listeners) {
             listeners.remove(l);
