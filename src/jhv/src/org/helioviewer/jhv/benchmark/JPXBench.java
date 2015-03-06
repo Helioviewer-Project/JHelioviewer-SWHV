@@ -65,7 +65,6 @@ public class JPXBench implements ViewListener {
 
     @Override
     public void viewChanged(View sender, ChangeEvent aEvent) {
-        System.out.println("HERE");
 
         if (aEvent.reasonOccurred(SubImageDataChangedReason.class)) {
             long time = System.currentTimeMillis();

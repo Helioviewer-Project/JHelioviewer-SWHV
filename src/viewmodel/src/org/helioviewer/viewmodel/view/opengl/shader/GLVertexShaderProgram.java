@@ -2,7 +2,6 @@ package org.helioviewer.viewmodel.view.opengl.shader;
 
 import java.util.Stack;
 
-import javax.media.opengl.GL;
 import javax.media.opengl.GL2;
 
 /**
@@ -76,38 +75,6 @@ public abstract class GLVertexShaderProgram {
      */
     public void bind(GL2 gl) {
         bind(gl, shaderID, xOffset, yOffset, xScale, yScale, xTextureScale, yTextureScale, defaultXOffset, defaultYOffset);
-    }
-
-    /**
-     * Pushes the shader currently in use onto a stack.
-     *
-     * This is useful to load another shader but still being able to restore the
-     * old one, similar to the very common pushMatrix() in OpenGL2.
-     *
-     * @param gl
-     *            Valid reference to the current gl object
-     * @see #popShader(GL)
-     */
-    public static void pushShader(GL2 gl) {
-        shaderStack.push(shaderCurrentlyUsed);
-        // Log.debug("GL3DVertexShaderProgram: pushShader, current="+shaderCurrentlyUsed);
-    }
-
-    /**
-     * Takes the top of from the shader stack and binds it.
-     *
-     * This restores a shader pushed onto the stack earlier, similar to the very
-     * common popMatrix() in OpenGL2.
-     *
-     * @param gl
-     *            Valid reference to the current gl object
-     * @see #pushShader(GL)
-     */
-    public static void popShader(GL2 gl) {
-        Integer restoreShaderObject = shaderStack.pop();
-        int restoreShader = restoreShaderObject == 0 ? 0 : restoreShaderObject.intValue();
-        bind(gl, restoreShader, 0.0f, 0.0f, 1.0f, 1.0f, 1.0f, 1.0f, 0.0f, 0.0f);
-        // Log.debug("GL3DVertexShaderProgram:  popShader, current="+shaderCurrentlyUsed);
     }
 
     /**
