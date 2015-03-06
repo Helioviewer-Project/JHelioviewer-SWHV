@@ -75,10 +75,11 @@ public class GL3DImageSphere extends GL3DMesh {
 
         ShaderFactory.bindVertexShader(gl);
         ShaderFactory.bindFragmentShader(gl);
-        ShaderFactory.filter(gl);
         if (glfilter != null) {
             glfilter.renderGL(gl, true);
         }
+        ShaderFactory.filter(gl);
+
         super.shapeDraw(state);
         if (restoreColorMask) {
             gl.glColorMask(true, true, true, true);
