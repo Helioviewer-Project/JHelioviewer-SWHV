@@ -6,6 +6,7 @@ import javax.swing.BoxLayout;
 import javax.swing.JPanel;
 
 public class GL3DObserverCameraOptionPanel extends GL3DCameraOptionPanel {
+
     private static final long serialVersionUID = 1L;
 
     private final GL3DObserverCamera camera;

@@ -163,4 +163,5 @@ public abstract class AbstractPhysicalRenderGraphics implements PhysicalRenderGr
     protected Vector2dDouble convertScreenToPhysical(Vector2dInt vector) {
         return ViewHelper.convertScreenToImageDisplacement(vector, regionView.getRegion(), ViewHelper.calculateViewportImageSize(viewportView.getViewport(), regionView.getRegion()));
     }
+
 }

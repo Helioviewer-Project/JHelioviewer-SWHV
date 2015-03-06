@@ -2,8 +2,8 @@
 <project name="build" default="all">
 
     <property name="src.base" value="${basedir}/src/"/>
-    <property name="src.path" value="${src.base}/jhv/src/:${src.base}/base/src/:${src.base}/basegui/src/:${src.base}/viewmodel/src/:${src.base}/viewmodelplugin/src/:${src.base}/jhv-3d-scenegraph/src/:${src.base}/jhv-3d-math/src/:${src.base}/jhv-display/src/:${src.base}/jhv-data/src"/>
-    <property name="bin.eclipse" value="${src.base}/jhv/bin/ ${src.base}/base/bin/ ${src.base}/viewmodel/bin/ ${src.base}/viewmodelplugin/bin/ ${src.base}/JHVVectors/bin/ ${src.base}/jhv-3d-scenegraph/bin/ ${src.base}/jhv-3d-math/bin/ ${src.base}/jhv-display/bin/"/>
+    <property name="src.path" value="${src.base}/jhv/src/:${src.base}/base/src/:${src.base}/basegui/src/:${src.base}/viewmodel/src/:${src.base}/viewmodelplugin/src/:${src.base}/jhv-display/src/:${src.base}/jhv-data/src"/>
+    <property name="bin.eclipse" value="${src.base}/jhv/bin/ ${src.base}/base/bin/ ${src.base}/viewmodel/bin/ ${src.base}/viewmodelplugin/bin/ ${src.base}/jhv-display/bin/"/>
     <property name="doc" value="${basedir}/doc/"/>
     <property name="bin" value="${basedir}/bin/"/>
     <property name="bin.jhv" value="${bin}/jhv"/>

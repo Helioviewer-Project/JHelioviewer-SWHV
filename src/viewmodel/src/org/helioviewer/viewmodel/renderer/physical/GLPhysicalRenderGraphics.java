@@ -8,8 +8,8 @@ import javax.media.opengl.GL2;
 
 import org.helioviewer.base.math.Vector2dDouble;
 import org.helioviewer.base.math.Vector3dDouble;
-import org.helioviewer.gl3d.scenegraph.math.GL3DMat4d;
-import org.helioviewer.gl3d.scenegraph.math.GL3DVec3d;
+import org.helioviewer.gl3d.math.GL3DMat4d;
+import org.helioviewer.gl3d.math.GL3DVec3d;
 import org.helioviewer.viewmodel.renderer.GLCommonRenderGraphics;
 import org.helioviewer.viewmodel.view.View;
 

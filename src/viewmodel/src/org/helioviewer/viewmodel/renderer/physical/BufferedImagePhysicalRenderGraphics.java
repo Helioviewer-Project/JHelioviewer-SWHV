@@ -283,4 +283,5 @@ public class BufferedImagePhysicalRenderGraphics extends AbstractPhysicalRenderG
         // TODO Auto-generated method stub
         return null;
     }
+
 }

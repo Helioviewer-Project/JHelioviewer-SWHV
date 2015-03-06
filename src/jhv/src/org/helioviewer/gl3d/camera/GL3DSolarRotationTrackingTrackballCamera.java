@@ -1,8 +1,8 @@
 package org.helioviewer.gl3d.camera;
 
 import org.helioviewer.base.physics.Constants;
+import org.helioviewer.gl3d.math.GL3DMat4d;
 import org.helioviewer.gl3d.scenegraph.GL3DState;
-import org.helioviewer.gl3d.scenegraph.math.GL3DMat4d;
 import org.helioviewer.viewmodel.view.opengl.GL3DSceneGraphView;
 
 /**
@@ -14,6 +14,7 @@ import org.helioviewer.viewmodel.view.opengl.GL3DSceneGraphView;
  *
  */
 public class GL3DSolarRotationTrackingTrackballCamera extends GL3DCamera {
+
     public static final double DEFAULT_CAMERA_DISTANCE = Constants.SunMeanDistanceToEarth / Constants.SunRadiusInMeter;
 
     private final GL3DTrackballRotationInteraction rotationInteraction;

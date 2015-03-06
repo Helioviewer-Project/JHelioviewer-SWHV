@@ -7,12 +7,12 @@ import java.util.HashMap;
 import javax.media.opengl.GL2;
 
 import org.helioviewer.gl3d.camera.GL3DCamera;
+import org.helioviewer.gl3d.math.GL3DMat4d;
+import org.helioviewer.gl3d.math.GL3DVec3d;
 import org.helioviewer.gl3d.scenegraph.GL3DDrawBits.Bit;
 import org.helioviewer.gl3d.scenegraph.GL3DGroup;
 import org.helioviewer.gl3d.scenegraph.GL3DNode;
 import org.helioviewer.gl3d.scenegraph.GL3DState;
-import org.helioviewer.gl3d.scenegraph.math.GL3DMat4d;
-import org.helioviewer.gl3d.scenegraph.math.GL3DVec3d;
 import org.helioviewer.viewmodel.view.opengl.GL3DImageTextureView;
 
 /**

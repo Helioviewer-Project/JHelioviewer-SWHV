@@ -12,10 +12,10 @@ import org.helioviewer.base.physics.Constants;
 import org.helioviewer.gl3d.camera.GL3DFollowObjectCamera;
 import org.helioviewer.gl3d.camera.GL3DPositionLoadingListener;
 import org.helioviewer.gl3d.camera.GL3DSpaceObject;
+import org.helioviewer.gl3d.math.GL3DVec3d;
+import org.helioviewer.gl3d.math.GL3DVec4f;
 import org.helioviewer.gl3d.scenegraph.GL3DDrawBits.Bit;
 import org.helioviewer.gl3d.scenegraph.GL3DState;
-import org.helioviewer.gl3d.scenegraph.math.GL3DVec3d;
-import org.helioviewer.gl3d.scenegraph.math.GL3DVec4f;
 import org.helioviewer.gl3d.scenegraph.visuals.GL3DSphere;
 import org.helioviewer.jhv.layers.LayersListener;
 import org.helioviewer.jhv.layers.LayersModel;
@@ -29,6 +29,7 @@ import org.helioviewer.viewmodel.view.jp2view.JHVJPXView;
 import org.helioviewer.viewmodel.view.jp2view.kakadu.JHV_KduException;
 
 public class Planet extends GL3DSphere implements LayersListener, ViewListener, GL3DPositionLoadingListener {
+
     private final GL3DPositionLoadingPlanet positionLoading;
     private final GL3DPositionLoadingPlanet positionLoadingalt;
 

@@ -22,6 +22,7 @@ import org.helioviewer.jhv.gui.IconBank;
 import org.helioviewer.jhv.gui.IconBank.JHVIcon;
 
 public abstract class GL3DCameraOptionPanel extends JPanel implements ActionListener {
+
     private static final long serialVersionUID = 1L;
 
     abstract public void deactivate();
@@ -159,4 +160,5 @@ public abstract class GL3DCameraOptionPanel extends JPanel implements ActionList
             visibleButton.setIcon(IconBank.getIcon(JHVIcon.HIDDEN));
         }
     }
+
 }

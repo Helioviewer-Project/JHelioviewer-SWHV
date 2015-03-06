@@ -15,6 +15,7 @@ import org.helioviewer.viewmodel.view.opengl.GL3DSceneGraphView;
  *
  */
 public abstract class GL3DDefaultInteraction extends GL3DInteraction {
+
     private static final double ZOOM_WHEEL_FACTOR = 0.002;
 
     protected GL3DSceneGraphView sceneGraphView;
@@ -48,4 +49,5 @@ public abstract class GL3DDefaultInteraction extends GL3DInteraction {
             Displayer.getSingletonInstance().display();
         }
     }
+
 }
