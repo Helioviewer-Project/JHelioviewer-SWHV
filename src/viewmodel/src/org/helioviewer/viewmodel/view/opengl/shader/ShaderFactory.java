@@ -157,10 +157,10 @@ public class ShaderFactory {
     }
 
     public static void setDifferenceRect(double differenceXOffset, double differenceYOffset, double differenceXScale, double differenceYScale) {
-        offsetVertex[0] = differenceXOffset;
-        offsetVertex[1] = differenceYOffset;
-        offsetVertex[2] = differenceXScale;
-        offsetVertex[3] = differenceYScale;
+        differenceRectVertex[0] = differenceXOffset;
+        differenceRectVertex[1] = differenceYOffset;
+        differenceRectVertex[2] = differenceXScale;
+        differenceRectVertex[3] = differenceYScale;
     }
 
     public static void bindVertexShader(GL2 gl) {
