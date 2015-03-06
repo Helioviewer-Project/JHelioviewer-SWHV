@@ -445,19 +445,24 @@ public class JHVJP2View extends AbstractView implements JP2View, ViewportView, R
      *            ChangeEvent to fire
      */
     public void fireChangeEvent(ChangeEvent aEvent) {
-        EventQueue.invokeLater(new Runnable() {
-            private ChangeEvent theEvent;
+        /* LinkedMovieManager events come on EDT, dispatch them asap */
+        if (EventQueue.isDispatchThread()) {
+            notifyViewListeners(aEvent);
+        } else {
+            EventQueue.invokeLater(new Runnable() {
+                private ChangeEvent theEvent;
 
-            @Override
-            public void run() {
-                notifyViewListeners(theEvent);
-            }
+                @Override
+                public void run() {
+                    notifyViewListeners(theEvent);
+                }
 
-            public Runnable init(ChangeEvent theEvent) {
-                this.theEvent = theEvent;
-                return this;
-            }
-        }.init(aEvent));
+                public Runnable init(ChangeEvent theEvent) {
+                    this.theEvent = theEvent;
+                    return this;
+                }
+            }.init(aEvent));
+        }
     }
 
     /**
