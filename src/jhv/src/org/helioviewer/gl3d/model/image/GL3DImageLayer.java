@@ -10,7 +10,6 @@ import org.helioviewer.gl3d.camera.GL3DCameraListener;
 import org.helioviewer.gl3d.math.GL3DMat4d;
 import org.helioviewer.gl3d.math.GL3DQuatd;
 import org.helioviewer.gl3d.math.GL3DVec3d;
-import org.helioviewer.gl3d.math.GL3DVec4d;
 import org.helioviewer.gl3d.scenegraph.GL3DGroup;
 import org.helioviewer.gl3d.scenegraph.GL3DState;
 import org.helioviewer.viewmodel.changeevent.ChangeEvent;
@@ -36,7 +35,6 @@ public class GL3DImageLayer extends GL3DGroup implements GL3DCameraListener {
     private GL3DImageSphere sphere;
     private static int nextLayerId = 0;
     private final int layerId;
-    private GL3DVec4d direction = new GL3DVec4d(0, 0, 1, 0);
 
     public int getLayerId() {
         return layerId;
@@ -140,14 +138,6 @@ public class GL3DImageLayer extends GL3DGroup implements GL3DCameraListener {
     @Override
     public void cameraMoving(GL3DCamera camera) {
 
-    }
-
-    public GL3DVec4d getLayerDirection() {
-        return direction;
-    }
-
-    public void setLayerDirection(GL3DVec4d direction) {
-        this.direction = direction;
     }
 
     public void updateROI(GL3DState state) {
