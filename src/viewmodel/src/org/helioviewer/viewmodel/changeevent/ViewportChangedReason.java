@@ -10,19 +10,11 @@ import org.helioviewer.viewmodel.viewport.Viewport;
  * */
 public class ViewportChangedReason implements ChangedReason {
 
-    // ///////////////////////////////////////////////////////////////
-    // Definitions
-    // ///////////////////////////////////////////////////////////////
-
     // memorizes the associated view
     private View view;
 
     // memorizes the viewport
     private Viewport viewport;
-
-    // ///////////////////////////////////////////////////////////////
-    // Definitions
-    // ///////////////////////////////////////////////////////////////
 
     /**
      * Default constructor.
@@ -33,7 +25,6 @@ public class ViewportChangedReason implements ChangedReason {
      *            The new viewport.
      * */
     public ViewportChangedReason(View aView, Viewport aViewport) {
-
         // memorize parameter values
         view = aView;
         viewport = aViewport;
@@ -55,4 +46,5 @@ public class ViewportChangedReason implements ChangedReason {
     public Viewport getViewport() {
         return viewport;
     }
+
 }

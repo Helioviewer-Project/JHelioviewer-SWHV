@@ -10,19 +10,11 @@ import org.helioviewer.viewmodel.view.View;
  * */
 public final class RegionChangedReason implements ChangedReason {
 
-    // ///////////////////////////////////////////////////////////////
-    // Definitions
-    // ///////////////////////////////////////////////////////////////
-
     // memorizes the associated view
     private View view;
 
     // memorizes the new region
     private Region region;
-
-    // ///////////////////////////////////////////////////////////////
-    // Methods
-    // ///////////////////////////////////////////////////////////////
 
     /**
      * Default constructor
@@ -33,7 +25,6 @@ public final class RegionChangedReason implements ChangedReason {
      *            New defined region.
      * */
     public RegionChangedReason(View aView, Region aNewRegion) {
-
         // memorize view
         view = aView;
         region = aNewRegion;
@@ -55,4 +46,5 @@ public final class RegionChangedReason implements ChangedReason {
     public Region getNewRegion() {
         return region;
     }
+
 }

@@ -27,10 +27,8 @@ public class NonConstantMetaDataChangedReason implements ChangedReason {
      *            View which caused the change reason.
      */
     public NonConstantMetaDataChangedReason(View aView, MetaData aNewMetaData) {
-
         // memorize view
         view = aView;
-
         metaData = aNewMetaData;
     }
 
@@ -50,4 +48,5 @@ public class NonConstantMetaDataChangedReason implements ChangedReason {
     public MetaData getNewMetaData() {
         return metaData;
     }
+
 }
