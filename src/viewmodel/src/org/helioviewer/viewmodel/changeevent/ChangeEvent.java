@@ -18,10 +18,6 @@ import org.helioviewer.viewmodel.view.View;
  * */
 public class ChangeEvent {
 
-    // ///////////////////////////////////////////////////////////////
-    // Definitions
-    // ///////////////////////////////////////////////////////////////
-
     // History (stack) of all change reasons
     protected LinkedList<ChangedReason> history;
 
@@ -33,10 +29,6 @@ public class ChangeEvent {
 
     // Memorizes the change event id of the object
     private long changeEventID;
-
-    // ///////////////////////////////////////////////////////////////
-    // Methods
-    // ///////////////////////////////////////////////////////////////
 
     /**
      * Default constructor
@@ -63,7 +55,6 @@ public class ChangeEvent {
      * */
     public ChangeEvent(ChangedReason aReason) {
         this();
-
         // add reason to history
         addReason(aReason);
     }
@@ -141,7 +132,6 @@ public class ChangeEvent {
      *            container.
      * */
     synchronized public void addReason(ChangedReason aReason) {
-
         if (aReason != null) {
             // add reason type to hash
             availableChangeReasons.add(aReason.getClass());
@@ -191,7 +181,6 @@ public class ChangeEvent {
      */
     @SuppressWarnings(value = { "unchecked" })
     synchronized public <T extends ChangedReason> T getLastChangedReasonByType(Class<T> aReasonClass) {
-
         // go through history from latest to eldest entry
         for (ChangedReason r : history) {
             if (aReasonClass.isInstance(r))
@@ -216,7 +205,6 @@ public class ChangeEvent {
      */
     @SuppressWarnings(value = { "unchecked" })
     synchronized public <T extends ChangedReason> T getLastChangedReasonByTypeAndView(Class<T> aReasonClass, View view) {
-
         // go through history from latest to eldest entry
         for (ChangedReason r : history) {
             if (aReasonClass.isInstance(r) && r.getView() == view)
@@ -258,7 +246,6 @@ public class ChangeEvent {
 
     public synchronized boolean isEmpty() {
         return history.isEmpty() && availableChangeReasons.isEmpty();
-
     }
 
     public synchronized ChangeEvent clone() {

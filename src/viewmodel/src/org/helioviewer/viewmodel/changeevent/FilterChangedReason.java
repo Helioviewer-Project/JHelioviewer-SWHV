@@ -10,19 +10,12 @@ import org.helioviewer.viewmodel.view.View;
  * @author Markus Langenberg
  * */
 public class FilterChangedReason implements ChangedReason {
-    // ///////////////////////////////////////////////////////////////
-    // Definitions
-    // ///////////////////////////////////////////////////////////////
 
     // memorizes the associated view
     private View view;
 
     // memorizes the new region
     private Filter filter;
-
-    // ///////////////////////////////////////////////////////////////
-    // Methods
-    // ///////////////////////////////////////////////////////////////
 
     /**
      * Default constructor.
@@ -33,7 +26,6 @@ public class FilterChangedReason implements ChangedReason {
      *            New defined filter.
      * */
     public FilterChangedReason(View aView, Filter aFilter) {
-
         // memorize view
         view = aView;
         filter = aFilter;

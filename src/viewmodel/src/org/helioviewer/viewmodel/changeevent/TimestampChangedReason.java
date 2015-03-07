@@ -29,7 +29,6 @@ public class TimestampChangedReason implements ChangedReason {
      *            New time stamp object, which was changed.
      */
     public TimestampChangedReason(View aView, ImmutableDateTime newDateTime) {
-
         // memorize view
         view = aView;
         id = idCount++;
@@ -61,4 +60,5 @@ public class TimestampChangedReason implements ChangedReason {
     public long getId() {
         return id;
     }
+
 }

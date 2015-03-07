@@ -10,10 +10,6 @@ import org.helioviewer.viewmodel.view.View;
  * */
 public class LayerChangedReason implements ChangedReason {
 
-    // ///////////////////////////////////////////////////////////////
-    // Definitions
-    // ///////////////////////////////////////////////////////////////
-
     public enum LayerChangeType {
         LAYER_ADDED, LAYER_REMOVED, LAYER_VISIBILITY, LAYER_MOVED, LAYER_DOWNLOADED
     }
@@ -29,10 +25,6 @@ public class LayerChangedReason implements ChangedReason {
 
     private int layerIndex;
     private boolean processed;
-
-    // ///////////////////////////////////////////////////////////////
-    // Definitions
-    // ///////////////////////////////////////////////////////////////
 
     /**
      * Default constructor.
@@ -66,7 +58,6 @@ public class LayerChangedReason implements ChangedReason {
      *            Internal index of the layer which has changed
      * */
     public LayerChangedReason(View aView, LayerChangeType aType, View aSubView, int index) {
-
         // memorize passed values
         view = aView;
         type = aType;
@@ -114,4 +105,5 @@ public class LayerChangedReason implements ChangedReason {
     public void setProcessed(boolean processed) {
         this.processed = processed;
     }
+
 }

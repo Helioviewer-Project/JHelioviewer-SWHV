@@ -4,6 +4,7 @@ import org.helioviewer.viewmodel.view.View;
 import org.helioviewer.viewmodel.view.jp2view.JHVJP2View;
 
 public class ReaderErrorReason implements ChangedReason {
+
     private JHVJP2View view;
     private Throwable exception;
 

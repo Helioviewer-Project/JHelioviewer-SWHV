@@ -12,16 +12,8 @@ import org.helioviewer.viewmodel.view.View;
  * */
 public class ViewChainChangedReason implements ChangedReason {
 
-    // ///////////////////////////////////////////////////////////////
-    // Definitions
-    // ///////////////////////////////////////////////////////////////
-
     // memorizes the associated view
     private View view;
-
-    // ///////////////////////////////////////////////////////////////
-    // Definitions
-    // ///////////////////////////////////////////////////////////////
 
     /**
      * Default constructor.
@@ -30,7 +22,6 @@ public class ViewChainChangedReason implements ChangedReason {
      *            View which caused the change reason.
      * */
     public ViewChainChangedReason(View aView) {
-
         // memorize parameter values
         view = aView;
     }
@@ -41,4 +32,5 @@ public class ViewChainChangedReason implements ChangedReason {
     public View getView() {
         return view;
     }
+
 }

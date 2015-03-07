@@ -29,7 +29,6 @@ public class PlayStateChangedReason implements ChangedReason {
      *            The new play-state
      */
     public PlayStateChangedReason(View aView, LinkedMovieManager linkedMovieManager, boolean isPlaying) {
-
         // memorize view
         this.view = aView;
         this.linkedMovieManager = linkedMovieManager;
@@ -73,4 +72,5 @@ public class PlayStateChangedReason implements ChangedReason {
     public LinkedMovieManager getLinkedMovieManager() {
         return this.linkedMovieManager;
     }
+
 }
