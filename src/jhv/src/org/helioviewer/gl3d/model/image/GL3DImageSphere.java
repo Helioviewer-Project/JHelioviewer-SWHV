@@ -15,7 +15,6 @@ import org.helioviewer.viewmodel.changeevent.ImageTextureRecapturedReason;
 import org.helioviewer.viewmodel.metadata.HelioviewerOcculterMetaData;
 import org.helioviewer.viewmodel.metadata.HelioviewerPositionedMetaData;
 import org.helioviewer.viewmodel.metadata.MetaData;
-import org.helioviewer.viewmodel.region.Region;
 import org.helioviewer.viewmodel.view.View;
 import org.helioviewer.viewmodel.view.ViewListener;
 import org.helioviewer.viewmodel.view.opengl.GL3DImageTextureView;
@@ -37,11 +36,8 @@ public class GL3DImageSphere extends GL3DShape {
     private boolean showCorona;
     private final boolean restoreColorMask;
     private final GL3DImageTextureView imageTextureView;
-    private Region capturedRegion;
-    private boolean reshapeRequested = false;
     private GL3DBuffer positionVBO;
     private GL3DBuffer indexVBO;
-    private GL3DMeshPrimitive primitive;
     private List<GL3DVec3d> positions;
     private List<Integer> indices;
 
@@ -54,14 +50,10 @@ public class GL3DImageSphere extends GL3DShape {
             public void viewChanged(View sender, ChangeEvent aEvent) {
                 ImageTextureRecapturedReason reason = aEvent.getLastChangedReasonByType(ImageTextureRecapturedReason.class);
                 if (reason != null) {
-                    reshapeRequested = true;
-                    capturedRegion = reason.getCapturedRegion();
                     markAsChanged();
-                    // Log.debug("GL3DImageMesh.reshape: "+getName()+" Reason="+reason+", Event="+aEvent);
                 }
             }
         });
-        this.reshapeRequested = true;
         this.markAsChanged();
         this.restoreColorMask = restoreColorMask;
         layer = imageLayer;
@@ -92,8 +84,7 @@ public class GL3DImageSphere extends GL3DShape {
         this.positionVBO.enable(state);
         this.indexVBO.enable(state);
 
-        GL3DMeshPrimitive primitive = this.primitive;
-        gl.glDrawElements(primitive.id, this.indexVBO.numberOfElements, this.indexVBO.dataType.id, 0);
+        gl.glDrawElements(GL2.GL_TRIANGLES, this.indexVBO.numberOfElements, this.indexVBO.dataType.id, 0);
         this.positionVBO.disable(state);
 
         this.indexVBO.disable(state);
@@ -102,7 +93,43 @@ public class GL3DImageSphere extends GL3DShape {
         }
     }
 
-    public GL3DMeshPrimitive createMesh(GL3DState state, List<GL3DVec3d> positions, List<Integer> indices) {
+    @Override
+    public void shapeUpdate(GL3DState state) {
+    }
+
+    @Override
+    public void shapeDelete(GL3DState state) {
+        this.positionVBO.disable(state);
+        this.indexVBO.disable(state);
+
+        this.positionVBO.delete(state);
+        this.indexVBO.delete(state);
+
+        positions.clear();
+        indices.clear();
+    }
+
+    public GL3DImageTextureView getImageTextureView() {
+        return imageTextureView;
+    }
+
+    @Override
+    public void shapeInit(GL3DState state) {
+        positions = new ArrayList<GL3DVec3d>();
+
+        indices = new ArrayList<Integer>();
+
+        this.createMesh(state, positions, indices);
+
+        this.positionVBO = GL3DBuffer.createPositionBuffer(state, positions);
+
+        this.indexVBO = GL3DBuffer.createIndexBuffer(state, indices);
+
+        this.imageTextureView.forceUpdate();
+
+    }
+
+    public void createMesh(GL3DState state, List<GL3DVec3d> positions, List<Integer> indices) {
         int resolutionX = 50;
         int resolutionY = 50;
         int numberOfPositions = 0;
@@ -166,111 +193,6 @@ public class GL3DImageSphere extends GL3DShape {
             indices.add(beginPositionNumberCorona + 2);
             indices.add(beginPositionNumberCorona + 0);
             indices.add(beginPositionNumberCorona + 3);
-        }
-
-        return GL3DMeshPrimitive.TRIANGLES;
-    }
-
-    public GL3DImageTextureView getImageTextureView() {
-        return imageTextureView;
-    }
-
-    @Override
-    public void shapeInit(GL3DState state) {
-        positions = new ArrayList<GL3DVec3d>();
-
-        indices = new ArrayList<Integer>();
-
-        this.primitive = this.createMesh(state, positions, indices);
-
-        this.positionVBO = GL3DBuffer.createPositionBuffer(state, positions);
-
-        this.indexVBO = GL3DBuffer.createIndexBuffer(state, indices);
-
-        this.imageTextureView.forceUpdate();
-
-    }
-
-    protected void recreateMesh(GL3DState state) {
-        this.shapeDelete(state);
-        this.shapeInit(state);
-    }
-
-    private void renderWireframe(GL3DState state, GL3DMeshPrimitive primitive) {
-        GL2 gl = state.gl;
-        gl.glDisable(GL2.GL_TEXTURE_2D);
-
-        if (primitive == GL3DMeshPrimitive.QUADS) {
-            for (int i = 0; i < this.indices.size(); i++) {
-                if (i % 4 == 0)
-                    gl.glBegin(GL2.GL_LINE_LOOP);
-                int index = this.indices.get(i);
-                GL3DVec3d position = this.positions.get(index);
-                gl.glVertex3d(position.x, position.y, position.z);
-                if ((i) % 4 == 3)
-                    gl.glEnd();
-            }
-
-        } else if (primitive == GL3DMeshPrimitive.TRIANGLES) {
-            for (int i = 0; i < this.indices.size(); i++) {
-                if (i % 3 == 0)
-                    gl.glBegin(GL2.GL_LINE_LOOP);
-                int index = this.indices.get(i);
-                GL3DVec3d position = this.positions.get(index);
-                gl.glVertex3d(position.x, position.y, position.z);
-                if ((i) % 3 == 2)
-                    gl.glEnd();
-            }
-
-        } else if (primitive == GL3DMeshPrimitive.LINES) {
-            gl.glBegin(GL2.GL_LINES);
-            GL3DVec3d lastPosition = null;
-            for (int i = 0; i < this.indices.size(); i++) {
-                int index = this.indices.get(i);
-                GL3DVec3d position = this.positions.get(index);
-                if (lastPosition != null) {
-                    gl.glVertex3d(lastPosition.x, lastPosition.y, lastPosition.z);
-                    gl.glVertex3d(position.x, position.y, position.z);
-                }
-                lastPosition = position;
-            }
-            gl.glEnd();
-
-        } else {
-            gl.glBegin(GL2.GL_LINE_LOOP);
-            for (int i = 0; i < this.indices.size(); i++) {
-                int index = this.indices.get(i);
-                GL3DVec3d position = this.positions.get(index);
-                gl.glVertex3d(position.x, position.y, position.z);
-            }
-            gl.glEnd();
-        }
-
-        gl.glEnable(GL2.GL_TEXTURE_2D);
-    }
-
-    @Override
-    public void shapeUpdate(GL3DState state) {
-    }
-
-    @Override
-    public void shapeDelete(GL3DState state) {
-        this.positionVBO.disable(state);
-        this.indexVBO.disable(state);
-
-        this.positionVBO.delete(state);
-        this.indexVBO.delete(state);
-
-        positions.clear();
-        indices.clear();
-    }
-
-    public enum GL3DMeshPrimitive {
-        TRIANGLES(GL2.GL_TRIANGLES), TRIANGLE_STRIP(GL2.GL_TRIANGLE_STRIP), TRIANGLE_FAN(GL2.GL_TRIANGLE_FAN), POINTS(GL2.GL_POINTS), QUADS(GL2.GL_QUADS), LINES(GL2.GL_LINES), LINE_LOOP(GL2.GL_LINE_LOOP), LINE_STRIP(GL2.GL_LINE_STRIP);
-        protected int id;
-
-        private GL3DMeshPrimitive(int id) {
-            this.id = id;
         }
     }
 }
