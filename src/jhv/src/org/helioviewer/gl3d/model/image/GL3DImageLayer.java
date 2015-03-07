@@ -44,7 +44,6 @@ public class GL3DImageLayer extends GL3DGroup implements GL3DCameraListener {
     protected GL3DImageTextureView imageTextureView;
     protected MetaDataView metaDataView;
     protected RegionView regionView;
-    protected GL3DImageLayers layerGroup;
     public double minZ = -Constants.SunRadius;
     public double maxZ = Constants.SunRadius;
 
@@ -199,14 +198,6 @@ public class GL3DImageLayer extends GL3DGroup implements GL3DCameraListener {
 
     protected GL3DImageTextureView getImageTextureView() {
         return this.imageTextureView;
-    }
-
-    public void setLayerGroup(GL3DImageLayers layers) {
-        layerGroup = layers;
-    }
-
-    public GL3DImageLayers getLayerGroup() {
-        return layerGroup;
     }
 
     public void setCoronaVisibility(boolean visible) {

@@ -103,7 +103,6 @@ public class GL3DImageLayers extends GL3DGroup {
     public void insertLayer(GL3DImageLayer layer) {
         imageLayerMap.put(layer.getImageTextureView(), layer);
         this.addNode(layer);
-        layer.setLayerGroup(this);
     }
 
     public void removeLayer(GL3DState state, GL3DImageTextureView view) {
