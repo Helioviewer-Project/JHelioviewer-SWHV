@@ -29,12 +29,12 @@ public class GL3DBuffer {
     protected int id = -1;
     protected GL3DBufferType type;
     protected GL3DBufferAttribute attribute;
-    protected GL3DBufferDataType dataType;
+    public GL3DBufferDataType dataType;
 
     // Number of coordinates per element;
     protected int elementSize;
 
-    protected int numberOfElements;
+    public int numberOfElements;
 
     // Offset between 2 elements within the array
     private int stride = 0;
