@@ -18,13 +18,13 @@ import com.jogamp.common.nio.Buffers;
  * A {@link GL3DBuffer} is a buffer object on the graphic card. Buffer objects
  * are used to store vertex positions, colors, normals, texture coordinates and
  * indices. The factory methods should be used to create a buffer object.
- * 
+ *
  * @author Simon Spoerri (simon.spoerri@fhnw.ch)
- * 
+ *
  */
 public class GL3DBuffer {
 
-    private final static int drawType = GL2.GL_DYNAMIC_DRAW;
+    private final static int drawType = GL2.GL_STATIC_DRAW;
 
     protected int id = -1;
     protected GL3DBufferType type;
