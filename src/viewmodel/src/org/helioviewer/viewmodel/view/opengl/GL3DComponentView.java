@@ -333,7 +333,7 @@ public class GL3DComponentView extends AbstractComponentView implements GLEventL
             gl.glEnable(GL2.GL_TEXTURE_2D);
 
             GLScreenRenderGraphics glRenderer = new GLScreenRenderGraphics(gl);
-            synchronized (postRenderers) {
+            /*synchronized (postRenderers)*/ {
                 for (ScreenRenderer r : postRenderers) {
                     r.render(glRenderer);
                 }
