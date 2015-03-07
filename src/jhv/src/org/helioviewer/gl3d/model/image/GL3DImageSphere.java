@@ -107,7 +107,7 @@ public class GL3DImageSphere extends GL3DShape {
 
         this.createMesh(state, positions, indices);
 
-        positionBuffer = DoubleBuffer.allocate(positions.size() * 3);
+        DoubleBuffer positionBuffer = DoubleBuffer.allocate(positions.size() * 3);
         for (GL3DVec3d vertex : positions) {
             positionBuffer.put(vertex.x);
             positionBuffer.put(vertex.y);
@@ -115,17 +115,13 @@ public class GL3DImageSphere extends GL3DShape {
         }
         positionBuffer.flip();
         positionBufferID = generate(state);
-        bufferPositionData(state);
 
+        state.gl.glBindBuffer(GL2.GL_ARRAY_BUFFER, positionBufferID);
+        state.gl.glBufferData(GL2.GL_ARRAY_BUFFER, positionBuffer.capacity() * Buffers.SIZEOF_DOUBLE, positionBuffer, GL2.GL_DYNAMIC_DRAW);
         this.indexVBO = GL3DBuffer.createIndexBuffer(state, indices);
 
         this.imageTextureView.forceUpdate();
 
-    }
-
-    private void bufferPositionData(GL3DState state) {
-        state.gl.glBindBuffer(GL2.GL_ARRAY_BUFFER, positionBufferID);
-        state.gl.glBufferData(GL2.GL_ARRAY_BUFFER, positionBuffer.capacity() * Buffers.SIZEOF_DOUBLE, positionBuffer, GL2.GL_DYNAMIC_DRAW);
     }
 
     private void enablePositionVBO(GL3DState state) {
@@ -139,16 +135,12 @@ public class GL3DImageSphere extends GL3DShape {
     }
 
     private void deletePositionVBO(GL3DState state) {
-        this.positionBuffer.clear();
-        this.positionBuffer = null;
         state.gl.glDeleteBuffers(1, new int[] { this.positionBufferID }, 0);
     }
 
     public GL3DImageTextureView getImageTextureView() {
         return imageTextureView;
     }
-
-    DoubleBuffer positionBuffer;
 
     protected void recreateMesh(GL3DState state) {
         this.shapeDelete(state);
