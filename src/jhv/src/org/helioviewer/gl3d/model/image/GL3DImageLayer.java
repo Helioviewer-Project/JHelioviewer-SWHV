@@ -48,8 +48,6 @@ public class GL3DImageLayer extends GL3DGroup implements GL3DCameraListener {
     public double minZ = -Constants.SunRadius;
     public double maxZ = Constants.SunRadius;
 
-    protected boolean doUpdateROI = true;
-
     private final double lastViewAngle = 0.0;
 
     private final int resolution = 6;
@@ -64,7 +62,6 @@ public class GL3DImageLayer extends GL3DGroup implements GL3DCameraListener {
         this.metaDataView = this.mainLayerView.getAdapter(MetaDataView.class);
         this.regionView = this.mainLayerView.getAdapter(RegionView.class);
 
-        this.doUpdateROI = true;
         this.markAsChanged();
         int count = 0;
         for (int i = 0; i <= this.resolution; i++) {
@@ -98,7 +95,6 @@ public class GL3DImageLayer extends GL3DGroup implements GL3DCameraListener {
 
         super.shapeInit(state);
 
-        this.doUpdateROI = true;
         this.markAsChanged();
         updateROI(state);
 
@@ -109,12 +105,10 @@ public class GL3DImageLayer extends GL3DGroup implements GL3DCameraListener {
     public void shapeUpdate(GL3DState state) {
         super.shapeUpdate(state);
         this.updateROI(state);
-        doUpdateROI = false;
     }
 
     @Override
     public void cameraMoved(GL3DCamera camera) {
-        doUpdateROI = true;
     }
 
     public double getLastViewAngle() {
