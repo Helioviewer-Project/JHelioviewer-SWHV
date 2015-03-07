@@ -158,7 +158,7 @@ public class MainImagePanel extends BasicImagePanel implements ViewListener {
      */
 
     @Override
-    public synchronized void addMouseMotionListener(MouseMotionListener l) {
+    public void addMouseMotionListener(MouseMotionListener l) {
         if (l != null)
             mouseMotionListeners.add(l);
     }
@@ -168,7 +168,7 @@ public class MainImagePanel extends BasicImagePanel implements ViewListener {
      */
 
     @Override
-    public synchronized void removeMouseMotionListener(MouseMotionListener l) {
+    public void removeMouseMotionListener(MouseMotionListener l) {
         if (l != null)
             mouseMotionListeners.remove(l);
     }

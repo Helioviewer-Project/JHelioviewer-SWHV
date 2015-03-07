@@ -163,7 +163,7 @@ public abstract class AbstractMetaData implements MetaData {
     /**
      * {@inheritDoc}
      */
-    public synchronized RectangleDouble getPhysicalRectangle() {
+    public RectangleDouble getPhysicalRectangle() {
         return new RectangleDouble(lowerLeftCorner, sizeVector);
     }
 
