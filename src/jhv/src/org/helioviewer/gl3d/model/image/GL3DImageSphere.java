@@ -1,21 +1,16 @@
 package org.helioviewer.gl3d.model.image;
 
-import java.nio.DoubleBuffer;
+import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
 import java.util.ArrayList;
-import java.util.List;
 
 import javax.media.opengl.GL2;
 
-import org.helioviewer.base.physics.Constants;
-import org.helioviewer.gl3d.math.GL3DVec3d;
+import org.helioviewer.base.math.Pair;
 import org.helioviewer.gl3d.scenegraph.GL3DShape;
 import org.helioviewer.gl3d.scenegraph.GL3DState;
 import org.helioviewer.viewmodel.changeevent.ChangeEvent;
 import org.helioviewer.viewmodel.changeevent.ImageTextureRecapturedReason;
-import org.helioviewer.viewmodel.metadata.HelioviewerOcculterMetaData;
-import org.helioviewer.viewmodel.metadata.HelioviewerPositionedMetaData;
-import org.helioviewer.viewmodel.metadata.MetaData;
 import org.helioviewer.viewmodel.view.View;
 import org.helioviewer.viewmodel.view.ViewListener;
 import org.helioviewer.viewmodel.view.opengl.GL3DImageTextureView;
@@ -35,7 +30,7 @@ import com.jogamp.common.nio.Buffers;
 public class GL3DImageSphere extends GL3DShape {
 
     private final GL3DImageLayer layer;
-    private boolean showSphere;
+    private final boolean showSphere;
     private boolean showCorona;
     private final boolean restoreColorMask;
     private final GL3DImageTextureView imageTextureView;
@@ -43,7 +38,6 @@ public class GL3DImageSphere extends GL3DShape {
     private int indexBufferID;
     private int indexBufferSize;
 
-    private List<Integer> indices;
     private int positionBufferSize;
 
     public GL3DImageSphere(GL3DImageTextureView imageTextureView, GL3DImageLayer imageLayer, boolean showSphere, boolean showCorona, boolean restoreColorMask) {
@@ -83,16 +77,17 @@ public class GL3DImageSphere extends GL3DShape {
 
         enablePositionVBO(state);
         enableIndexVBO(state);
-        state.gl.glVertexPointer(3, GL2.GL_DOUBLE, 3 * Buffers.SIZEOF_DOUBLE, 0);
-        if (this.showCorona) {
-            state.gl.glDepthRange(1.f, 1.f);
-            gl.glDrawElements(GL2.GL_TRIANGLES, 6, GL2.GL_UNSIGNED_INT, (this.indexBufferSize - 6) * Buffers.SIZEOF_INT);
-            state.gl.glDepthRange(0.f, 1.f);
+        {
+            state.gl.glVertexPointer(3, GL2.GL_FLOAT, 3 * Buffers.SIZEOF_FLOAT, 0);
+            if (this.showCorona) {
+                state.gl.glDepthRange(1.f, 1.f);
+                gl.glDrawElements(GL2.GL_TRIANGLES, 6, GL2.GL_UNSIGNED_INT, (this.indexBufferSize - 6) * Buffers.SIZEOF_INT);
+                state.gl.glDepthRange(0.f, 1.f);
+            }
+            if (this.showSphere) {
+                gl.glDrawElements(GL2.GL_TRIANGLES, this.indexBufferSize - 6, GL2.GL_UNSIGNED_INT, 0);
+            }
         }
-        if (this.showSphere) {
-            gl.glDrawElements(GL2.GL_TRIANGLES, this.indexBufferSize - 6, GL2.GL_UNSIGNED_INT, 0);
-        }
-
         disableIndexVBO(state);
         disablePositionVBO(state);
 
@@ -109,36 +104,21 @@ public class GL3DImageSphere extends GL3DShape {
 
     @Override
     public void shapeInit(GL3DState state) {
-        ArrayList<GL3DVec3d> positions = new ArrayList<GL3DVec3d>();
+        Pair<FloatBuffer, IntBuffer> bufferPair = this.makeIcosphere(3);
+        FloatBuffer positionBuffer = bufferPair.a;
+        IntBuffer indexBuffer = bufferPair.b;
 
-        indices = new ArrayList<Integer>();
-
-        this.createMesh(state, positions, indices);
-
-        DoubleBuffer positionBuffer = DoubleBuffer.allocate(positions.size() * 3);
-        for (GL3DVec3d vertex : positions) {
-            positionBuffer.put(vertex.x);
-            positionBuffer.put(vertex.y);
-            positionBuffer.put(vertex.z);
-        }
-        positionBuffer.flip();
         this.positionBufferSize = positionBuffer.capacity();
         positionBufferID = generate(state);
 
         state.gl.glBindBuffer(GL2.GL_ARRAY_BUFFER, positionBufferID);
-        state.gl.glBufferData(GL2.GL_ARRAY_BUFFER, this.positionBufferSize * Buffers.SIZEOF_DOUBLE, positionBuffer, GL2.GL_STATIC_DRAW);
+        state.gl.glBufferData(GL2.GL_ARRAY_BUFFER, this.positionBufferSize * Buffers.SIZEOF_FLOAT, positionBuffer, GL2.GL_STATIC_DRAW);
 
-        IntBuffer indexBuffer = IntBuffer.allocate(indices.size());
-        for (Integer i : indices) {
-            indexBuffer.put(i);
-        }
-        indexBuffer.flip();
         indexBufferID = generate(state);
         indexBufferSize = indexBuffer.capacity();
         state.gl.glBindBuffer(GL2.GL_ELEMENT_ARRAY_BUFFER, indexBufferID);
         state.gl.glBufferData(GL2.GL_ELEMENT_ARRAY_BUFFER, indexBuffer.capacity() * Buffers.SIZEOF_INT, indexBuffer, GL2.GL_STATIC_DRAW);
         this.imageTextureView.forceUpdate();
-
     }
 
     private void enableIndexVBO(GL3DState state) {
@@ -171,11 +151,6 @@ public class GL3DImageSphere extends GL3DShape {
         return imageTextureView;
     }
 
-    protected void recreateMesh(GL3DState state) {
-        this.shapeDelete(state);
-        this.shapeInit(state);
-    }
-
     @Override
     public void shapeUpdate(GL3DState state) {
     }
@@ -186,72 +161,114 @@ public class GL3DImageSphere extends GL3DShape {
         disableIndexVBO(state);
         deletePositionVBO(state);
         deleteIndexVBO(state);
-        indices.clear();
     }
 
-    public void createMesh(GL3DState state, List<GL3DVec3d> positions, List<Integer> indices) {
-        int resolutionX = 50;
-        int resolutionY = 50;
-        int numberOfPositions = 0;
-        MetaData metaData = this.layer.metaDataView.getMetaData();
-        if (metaData instanceof HelioviewerOcculterMetaData) {
-            HelioviewerOcculterMetaData md = (HelioviewerOcculterMetaData) metaData;
-            showSphere = false;
+    private Pair<FloatBuffer, IntBuffer> makeIcosphere(int level) {
+        float t = (float) ((Math.sqrt(5) - 1) / 2);
+        float[][] icosahedronVertexList = new float[][] { new float[] { -1, -t, 0 }, new float[] { 0, 1, t }, new float[] { 0, 1, -t }, new float[] { 1, t, 0 }, new float[] { 1, -t, 0 }, new float[] { 0, -1, -t }, new float[] { 0, -1, t }, new float[] { t, 0, 1 }, new float[] { -t, 0, 1 }, new float[] { t, 0, -1 }, new float[] { -t, 0, -1 }, new float[] { -1, t, 0 }, };
+        for (float[] v : icosahedronVertexList) {
+            float length = (float) Math.sqrt(v[0] * v[0] + v[1] * v[1] + v[2] * v[2]);
+            v[0] /= length;
+            v[1] /= length;
+            v[2] /= length;
         }
-        for (int latNumber = 0; latNumber <= resolutionX; latNumber++) {
-            double theta = latNumber * Math.PI / resolutionX;
-            double sinTheta = Math.sin(theta);
-            double cosTheta = Math.cos(theta);
-            for (int longNumber = 0; longNumber <= resolutionY; longNumber++) {
-                double phi = longNumber * 2 * Math.PI / resolutionY;
-                double sinPhi = Math.sin(phi);
-                double cosPhi = Math.cos(phi);
-
-                double x = cosPhi * sinTheta;
-                double y = cosTheta;
-                double z = sinPhi * sinTheta;
-                positions.add(new GL3DVec3d(Constants.SunRadius * x, Constants.SunRadius * y, Constants.SunRadius * z));
-                numberOfPositions++;
-            }
+        int[][] icosahedronFaceList = new int[][] { { 3, 7, 1 }, { 4, 7, 3 }, { 6, 7, 4 }, { 8, 7, 6 }, { 7, 8, 1 }, { 9, 4, 3 }, { 2, 9, 3 }, { 2, 3, 1 }, { 11, 2, 1 }, { 10, 2, 11 }, { 10, 9, 2 }, { 9, 5, 4 }, { 6, 4, 5 }, { 0, 6, 5 }, { 0, 11, 8 }, { 11, 1, 8 }, { 10, 0, 5 }, { 10, 5, 9 }, { 0, 8, 6 }, { 0, 10, 11 }, };
+        ArrayList<Float> vertices = new ArrayList<Float>();
+        ArrayList<Integer> faceIndices = new ArrayList<Integer>();
+        for (float[] v : icosahedronVertexList) {
+            vertices.add(v[0]);
+            vertices.add(v[2]);
+            vertices.add(v[1]);
         }
-
-        for (int latNumber = 0; latNumber < resolutionX; latNumber++) {
-            for (int longNumber = 0; longNumber < resolutionY; longNumber++) {
-                int first = (latNumber * (resolutionY + 1)) + longNumber;
-                int second = first + resolutionY + 1;
-                indices.add(first);
-                indices.add(first + 1);
-                indices.add(second + 1);
-                indices.add(first);
-                indices.add(second + 1);
-                indices.add(second);
-            }
+        for (int[] f : icosahedronFaceList) {
+            subdivide(f[0], f[1], f[2], vertices, faceIndices, level);
         }
+        int beginPositionNumberCorona = vertices.size() / 3;
+        vertices.add(-40f);
+        vertices.add(40f);
+        vertices.add(0f);
 
-        if (metaData instanceof HelioviewerPositionedMetaData) {
-            HelioviewerPositionedMetaData md = (HelioviewerPositionedMetaData) metaData;
-            if (md.getInstrument().contains("HMI")) {
-                showCorona = false;
-            }
+        vertices.add(40f);
+        vertices.add(40f);
+        vertices.add(0f);
+
+        vertices.add(40f);
+        vertices.add(-40f);
+        vertices.add(0f);
+
+        vertices.add(-40f);
+        vertices.add(-40f);
+        vertices.add(0f);
+
+        faceIndices.add(beginPositionNumberCorona + 0);
+        faceIndices.add(beginPositionNumberCorona + 2);
+        faceIndices.add(beginPositionNumberCorona + 1);
+
+        faceIndices.add(beginPositionNumberCorona + 2);
+        faceIndices.add(beginPositionNumberCorona + 0);
+        faceIndices.add(beginPositionNumberCorona + 3);
+        FloatBuffer positionBuffer = FloatBuffer.allocate(vertices.size());
+        for (Float vert : vertices) {
+            positionBuffer.put(vert);
         }
-        int beginPositionNumberCorona = numberOfPositions;
-        positions.add(new GL3DVec3d(-40., 40., 0.));
-        numberOfPositions++;
-        positions.add(new GL3DVec3d(40., 40., 0.));
-        numberOfPositions++;
-        positions.add(new GL3DVec3d(40., -40., 0.));
-        numberOfPositions++;
-        positions.add(new GL3DVec3d(-40., -40., 0.));
-        numberOfPositions++;
+        positionBuffer.flip();
+        IntBuffer indexBuffer = IntBuffer.allocate(faceIndices.size());
 
-        indices.add(beginPositionNumberCorona + 0);
-        indices.add(beginPositionNumberCorona + 2);
-        indices.add(beginPositionNumberCorona + 1);
+        for (int i : faceIndices) {
+            indexBuffer.put(i);
+        }
+        indexBuffer.flip();
 
-        indices.add(beginPositionNumberCorona + 2);
-        indices.add(beginPositionNumberCorona + 0);
-        indices.add(beginPositionNumberCorona + 3);
+        return new Pair<FloatBuffer, IntBuffer>(positionBuffer, indexBuffer);
+    }
 
+    private void subdivide(int vx, int vy, int vz, ArrayList<Float> vertexList, ArrayList<Integer> faceList, int level) {
+        if (level != 0) {
+            float x1 = (vertexList.get(3 * vx) + vertexList.get(3 * vy));
+            float y1 = (vertexList.get(3 * vx + 1) + vertexList.get(3 * vy + 1));
+            float z1 = (vertexList.get(3 * vx + 2) + vertexList.get(3 * vy + 2));
+            float length = (float) Math.sqrt(x1 * x1 + y1 * y1 + z1 * z1);
+            x1 /= length;
+            y1 /= length;
+            z1 /= length;
+            int firstIndex = vertexList.size() / 3;
+            vertexList.add(x1);
+            vertexList.add(y1);
+            vertexList.add(z1);
+
+            float x2 = (vertexList.get(3 * vz) + vertexList.get(3 * vy));
+            float y2 = (vertexList.get(3 * vz + 1) + vertexList.get(3 * vy + 1));
+            float z2 = (vertexList.get(3 * vz + 2) + vertexList.get(3 * vy + 2));
+            length = (float) Math.sqrt(x2 * x2 + y2 * y2 + z2 * z2);
+            x2 /= length;
+            y2 /= length;
+            z2 /= length;
+            int secondIndex = vertexList.size() / 3;
+            vertexList.add(x2);
+            vertexList.add(y2);
+            vertexList.add(z2);
+
+            float x3 = (vertexList.get(3 * vx) + vertexList.get(3 * vz));
+            float y3 = (vertexList.get(3 * vx + 1) + vertexList.get(3 * vz + 1));
+            float z3 = (vertexList.get(3 * vx + 2) + vertexList.get(3 * vz + 2));
+            length = (float) Math.sqrt(x3 * x3 + y3 * y3 + z3 * z3);
+            x3 /= length;
+            y3 /= length;
+            z3 /= length;
+            int thirdIndex = vertexList.size() / 3;
+            vertexList.add(x3);
+            vertexList.add(y3);
+            vertexList.add(z3);
+
+            subdivide(vx, firstIndex, thirdIndex, vertexList, faceList, level - 1);
+            subdivide(firstIndex, vy, secondIndex, vertexList, faceList, level - 1);
+            subdivide(thirdIndex, secondIndex, vz, vertexList, faceList, level - 1);
+            subdivide(firstIndex, secondIndex, thirdIndex, vertexList, faceList, level - 1);
+        } else {
+            faceList.add(vx);
+            faceList.add(vy);
+            faceList.add(vz);
+        }
     }
 
     public void setCoronaVisiblity(boolean visible) {
