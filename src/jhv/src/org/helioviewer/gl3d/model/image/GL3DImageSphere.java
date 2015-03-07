@@ -1,6 +1,7 @@
 package org.helioviewer.gl3d.model.image;
 
 import java.nio.DoubleBuffer;
+import java.nio.IntBuffer;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -8,7 +9,6 @@ import javax.media.opengl.GL2;
 
 import org.helioviewer.base.physics.Constants;
 import org.helioviewer.gl3d.math.GL3DVec3d;
-import org.helioviewer.gl3d.scenegraph.GL3DBuffer;
 import org.helioviewer.gl3d.scenegraph.GL3DShape;
 import org.helioviewer.gl3d.scenegraph.GL3DState;
 import org.helioviewer.viewmodel.changeevent.ChangeEvent;
@@ -40,7 +40,9 @@ public class GL3DImageSphere extends GL3DShape {
     private final boolean restoreColorMask;
     private final GL3DImageTextureView imageTextureView;
     private int positionBufferID;
-    private GL3DBuffer indexVBO;
+    private int indexBufferID;
+    private int indexBufferSize;
+
     private List<Integer> indices;
 
     public GL3DImageSphere(GL3DImageTextureView imageTextureView, GL3DImageLayer imageLayer, boolean showSphere, boolean showCorona, boolean restoreColorMask) {
@@ -53,7 +55,6 @@ public class GL3DImageSphere extends GL3DShape {
                 ImageTextureRecapturedReason reason = aEvent.getLastChangedReasonByType(ImageTextureRecapturedReason.class);
                 if (reason != null) {
                     markAsChanged();
-                    // Log.debug("GL3DImageMesh.reshape: "+getName()+" Reason="+reason+", Event="+aEvent);
                 }
             }
         });
@@ -79,15 +80,12 @@ public class GL3DImageSphere extends GL3DShape {
         }
         ShaderFactory.filter(gl);
 
-        //Enable position VBO
         enablePositionVBO(state);
-        this.indexVBO.enable(state);
-
-        gl.glDrawElements(GL2.GL_TRIANGLES, this.indexVBO.numberOfElements, this.indexVBO.dataType.id, 0);
-
+        enableIndexVBO(state);
+        gl.glDrawElements(GL2.GL_TRIANGLES, this.indexBufferSize, GL2.GL_UNSIGNED_INT, 0);
+        disableIndexVBO(state);
         disablePositionVBO(state);
 
-        this.indexVBO.disable(state);
         if (restoreColorMask) {
             gl.glColorMask(true, true, true, true);
         }
@@ -117,11 +115,27 @@ public class GL3DImageSphere extends GL3DShape {
         positionBufferID = generate(state);
 
         state.gl.glBindBuffer(GL2.GL_ARRAY_BUFFER, positionBufferID);
-        state.gl.glBufferData(GL2.GL_ARRAY_BUFFER, positionBuffer.capacity() * Buffers.SIZEOF_DOUBLE, positionBuffer, GL2.GL_DYNAMIC_DRAW);
-        this.indexVBO = GL3DBuffer.createIndexBuffer(state, indices);
+        state.gl.glBufferData(GL2.GL_ARRAY_BUFFER, positionBuffer.capacity() * Buffers.SIZEOF_DOUBLE, positionBuffer, GL2.GL_STATIC_DRAW);
 
+        IntBuffer indexBuffer = IntBuffer.allocate(indices.size());
+        for (Integer i : indices) {
+            indexBuffer.put(i);
+        }
+        indexBuffer.flip();
+        indexBufferID = generate(state);
+        indexBufferSize = indexBuffer.capacity();
+        state.gl.glBindBuffer(GL2.GL_ELEMENT_ARRAY_BUFFER, indexBufferID);
+        state.gl.glBufferData(GL2.GL_ELEMENT_ARRAY_BUFFER, indexBuffer.capacity() * Buffers.SIZEOF_INT, indexBuffer, GL2.GL_STATIC_DRAW);
         this.imageTextureView.forceUpdate();
 
+    }
+
+    private void enableIndexVBO(GL3DState state) {
+        state.gl.glBindBuffer(GL2.GL_ELEMENT_ARRAY_BUFFER, indexBufferID);
+    }
+
+    private void disableIndexVBO(GL3DState state) {
+        state.gl.glBindBuffer(GL2.GL_ELEMENT_ARRAY_BUFFER, 0);
     }
 
     private void enablePositionVBO(GL3DState state) {
@@ -132,10 +146,15 @@ public class GL3DImageSphere extends GL3DShape {
 
     private void disablePositionVBO(GL3DState state) {
         state.gl.glDisableClientState(GL2.GL_VERTEX_ARRAY);
+        state.gl.glBindBuffer(GL2.GL_ARRAY_BUFFER, 0);
     }
 
     private void deletePositionVBO(GL3DState state) {
         state.gl.glDeleteBuffers(1, new int[] { this.positionBufferID }, 0);
+    }
+
+    private void deleteIndexVBO(GL3DState state) {
+        state.gl.glDeleteBuffers(1, new int[] { this.indexBufferID }, 0);
     }
 
     public GL3DImageTextureView getImageTextureView() {
@@ -154,9 +173,9 @@ public class GL3DImageSphere extends GL3DShape {
     @Override
     public void shapeDelete(GL3DState state) {
         disablePositionVBO(state);
-        this.indexVBO.disable(state);
+        disableIndexVBO(state);
         deletePositionVBO(state);
-        this.indexVBO.delete(state);
+        deleteIndexVBO(state);
         indices.clear();
     }
 
