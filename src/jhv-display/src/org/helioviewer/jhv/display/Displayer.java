@@ -1,9 +1,9 @@
 package org.helioviewer.jhv.display;
 
-import java.util.ArrayList;
-
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.ArrayList;
+
 import javax.swing.Timer;
 
 import org.helioviewer.jhv.data.datatype.event.JHVEvent;
@@ -19,8 +19,6 @@ public class Displayer implements JHVEventHighlightListener {
 
     private final ArrayList<DisplayListener> listeners = new ArrayList<DisplayListener>();
     private final ArrayList<RenderListener> renderListeners = new ArrayList<RenderListener>();
-
-    private boolean displaying = false;
 
     private static boolean torender = false;
     private static boolean todisplay = false;
@@ -40,6 +38,7 @@ public class Displayer implements JHVEventHighlightListener {
     }
 
     private class MyListener implements ActionListener {
+        @Override
         public void actionPerformed(ActionEvent e) {
             if (todisplay == true) {
                 todisplay = false;
