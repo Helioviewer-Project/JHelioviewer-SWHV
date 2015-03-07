@@ -1,5 +1,6 @@
 package org.helioviewer.gl3d.model.image;
 
+import java.nio.DoubleBuffer;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -21,6 +22,8 @@ import org.helioviewer.viewmodel.view.opengl.GL3DImageTextureView;
 import org.helioviewer.viewmodel.view.opengl.GLFilterView;
 import org.helioviewer.viewmodel.view.opengl.shader.ShaderFactory;
 
+import com.jogamp.common.nio.Buffers;
+
 /**
  * Maps the solar disc part of an image layer onto an adaptive mesh that either
  * covers the entire solar disc or the just the part that is visible in the view
@@ -36,9 +39,8 @@ public class GL3DImageSphere extends GL3DShape {
     private boolean showCorona;
     private final boolean restoreColorMask;
     private final GL3DImageTextureView imageTextureView;
-    private GL3DBuffer positionVBO;
+    private int positionBufferID;
     private GL3DBuffer indexVBO;
-    private List<GL3DVec3d> positions;
     private List<Integer> indices;
 
     public GL3DImageSphere(GL3DImageTextureView imageTextureView, GL3DImageLayer imageLayer, boolean showSphere, boolean showCorona, boolean restoreColorMask) {
@@ -51,6 +53,7 @@ public class GL3DImageSphere extends GL3DShape {
                 ImageTextureRecapturedReason reason = aEvent.getLastChangedReasonByType(ImageTextureRecapturedReason.class);
                 if (reason != null) {
                     markAsChanged();
+                    // Log.debug("GL3DImageMesh.reshape: "+getName()+" Reason="+reason+", Event="+aEvent);
                 }
             }
         });
@@ -76,21 +79,80 @@ public class GL3DImageSphere extends GL3DShape {
         }
         ShaderFactory.filter(gl);
 
-        // If Mesh does not have any data, do not draw!
-        if (this.positions.size() < 1) {
-            return;
-        }
-
-        this.positionVBO.enable(state);
+        //Enable position VBO
+        enablePositionVBO(state);
         this.indexVBO.enable(state);
 
         gl.glDrawElements(GL2.GL_TRIANGLES, this.indexVBO.numberOfElements, this.indexVBO.dataType.id, 0);
-        this.positionVBO.disable(state);
+
+        disablePositionVBO(state);
 
         this.indexVBO.disable(state);
         if (restoreColorMask) {
             gl.glColorMask(true, true, true, true);
         }
+    }
+
+    private int generate(GL3DState state) {
+        int[] tmpId = new int[1];
+        state.gl.glGenBuffers(1, tmpId, 0);
+        return tmpId[0];
+    }
+
+    @Override
+    public void shapeInit(GL3DState state) {
+        ArrayList<GL3DVec3d> positions = new ArrayList<GL3DVec3d>();
+
+        indices = new ArrayList<Integer>();
+
+        this.createMesh(state, positions, indices);
+
+        positionBuffer = DoubleBuffer.allocate(positions.size() * 3);
+        for (GL3DVec3d vertex : positions) {
+            positionBuffer.put(vertex.x);
+            positionBuffer.put(vertex.y);
+            positionBuffer.put(vertex.z);
+        }
+        positionBuffer.flip();
+        positionBufferID = generate(state);
+        bufferPositionData(state);
+
+        this.indexVBO = GL3DBuffer.createIndexBuffer(state, indices);
+
+        this.imageTextureView.forceUpdate();
+
+    }
+
+    private void bufferPositionData(GL3DState state) {
+        state.gl.glBindBuffer(GL2.GL_ARRAY_BUFFER, positionBufferID);
+        state.gl.glBufferData(GL2.GL_ARRAY_BUFFER, positionBuffer.capacity() * Buffers.SIZEOF_DOUBLE, positionBuffer, GL2.GL_DYNAMIC_DRAW);
+    }
+
+    private void enablePositionVBO(GL3DState state) {
+        state.gl.glEnableClientState(GL2.GL_VERTEX_ARRAY);
+        state.gl.glBindBuffer(GL2.GL_ARRAY_BUFFER, positionBufferID);
+        state.gl.glVertexPointer(3, GL2.GL_DOUBLE, 3 * Buffers.SIZEOF_DOUBLE, 0);
+    }
+
+    private void disablePositionVBO(GL3DState state) {
+        state.gl.glDisableClientState(GL2.GL_VERTEX_ARRAY);
+    }
+
+    private void deletePositionVBO(GL3DState state) {
+        this.positionBuffer.clear();
+        this.positionBuffer = null;
+        state.gl.glDeleteBuffers(1, new int[] { this.positionBufferID }, 0);
+    }
+
+    public GL3DImageTextureView getImageTextureView() {
+        return imageTextureView;
+    }
+
+    DoubleBuffer positionBuffer;
+
+    protected void recreateMesh(GL3DState state) {
+        this.shapeDelete(state);
+        this.shapeInit(state);
     }
 
     @Override
@@ -99,34 +161,11 @@ public class GL3DImageSphere extends GL3DShape {
 
     @Override
     public void shapeDelete(GL3DState state) {
-        this.positionVBO.disable(state);
+        disablePositionVBO(state);
         this.indexVBO.disable(state);
-
-        this.positionVBO.delete(state);
+        deletePositionVBO(state);
         this.indexVBO.delete(state);
-
-        positions.clear();
         indices.clear();
-    }
-
-    public GL3DImageTextureView getImageTextureView() {
-        return imageTextureView;
-    }
-
-    @Override
-    public void shapeInit(GL3DState state) {
-        positions = new ArrayList<GL3DVec3d>();
-
-        indices = new ArrayList<Integer>();
-
-        this.createMesh(state, positions, indices);
-
-        this.positionVBO = GL3DBuffer.createPositionBuffer(state, positions);
-
-        this.indexVBO = GL3DBuffer.createIndexBuffer(state, indices);
-
-        this.imageTextureView.forceUpdate();
-
     }
 
     public void createMesh(GL3DState state, List<GL3DVec3d> positions, List<Integer> indices) {
