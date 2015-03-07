@@ -32,4 +32,5 @@ public class SWHVHEKPluginLauncher {
         JavaHelioViewer.main(args2, new SWHVHEKPlugin(false));
         // JavaHelioViewer.main(args2);
     }
+
 }
