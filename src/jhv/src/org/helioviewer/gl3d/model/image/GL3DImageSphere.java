@@ -271,7 +271,8 @@ public class GL3DImageSphere extends GL3DShape {
         }
     }
 
-    public void setCoronaVisiblity(boolean visible) {
+    public void setCoronaVisibility(boolean visible) {
         this.showCorona = visible;
     }
+
 }

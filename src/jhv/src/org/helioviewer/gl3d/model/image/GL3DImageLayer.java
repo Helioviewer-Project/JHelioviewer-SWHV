@@ -201,7 +201,7 @@ public class GL3DImageLayer extends GL3DGroup implements GL3DCameraListener {
     }
 
     public void setCoronaVisibility(boolean visible) {
-        this.getImageSphere().setCoronaVisiblity(visible);
+        this.getImageSphere().setCoronaVisibility(visible);
     }
 
 }
