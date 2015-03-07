@@ -239,30 +239,6 @@ public class GL3DImageLayer extends GL3DGroup implements GL3DCameraListener {
         return layerGroup;
     }
 
-    public GL3DVec3d convertViewportToPlane(GL3DVec3d viewportCoordinates, GL3DMat4d projectionMatrix) {
-        GL3DMat4d vpm = projectionMatrix.inverse();
-        GL3DVec3d planeCoordinates = vpm.multiply(viewportCoordinates);
-        return planeCoordinates;
-    }
-
-    public GL3DVec3d convertViewportToView(GL3DVec3d viewportCoordinates, GL3DMat4d projectionMatrix, GL3DMat4d translationMatrix, GL3DState state) {
-        GL3DMat4d vpm = projectionMatrix.inverse();
-        GL3DMat4d tli = translationMatrix.inverse();
-
-        GL3DVec4d centeredViewportCoordinates = new GL3DVec4d(2. * (viewportCoordinates.x / state.getViewportWidth()), 2. * (viewportCoordinates.y / state.getViewportHeight()), 0., 0.);
-        GL3DVec4d solarCoordinates = vpm.multiply(centeredViewportCoordinates);
-        solarCoordinates.w = 1.;
-        solarCoordinates = tli.multiply(solarCoordinates);
-        solarCoordinates.w = 0.;
-
-        double solarCoordinates3Dz = Math.sqrt(1 - solarCoordinates.dot(solarCoordinates));
-        if (solarCoordinates3Dz == Double.NaN) {
-            solarCoordinates3Dz = 0.;
-        }
-        GL3DVec3d solarCoordinates3D = new GL3DVec3d(solarCoordinates.x, solarCoordinates.y, solarCoordinates3Dz);
-        return solarCoordinates3D;
-    }
-
     public void setCoronaVisibility(boolean visible) {
         this.getImageSphere().setCoronaVisiblity(visible);
     }
