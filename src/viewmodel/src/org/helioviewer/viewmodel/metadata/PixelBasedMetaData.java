@@ -109,14 +109,14 @@ public class PixelBasedMetaData extends AbstractMetaData implements ImageSizeMet
     /**
      * {@inheritDoc}
      */
-    public synchronized Vector2dInt getResolution() {
+    public Vector2dInt getResolution() {
         return resolution;
     }
 
     /**
      * {@inheritDoc}
      */
-    public synchronized double getUnitsPerPixel() {
+    public double getUnitsPerPixel() {
         return unitsPerPixel;
     }
 
@@ -127,7 +127,7 @@ public class PixelBasedMetaData extends AbstractMetaData implements ImageSizeMet
      * @param region
      *            The region which this image should cover
      */
-    public synchronized void updatePhysicalRegion(Region region) {
+    public void updatePhysicalRegion(Region region) {
         double unitsPerPixelX = region.getWidth() / getResolution().getX();
         double unitsPerPixelY = region.getHeight() / getResolution().getY();
         double newUnitsPerPixel = Math.max(unitsPerPixelX, unitsPerPixelY);
@@ -135,4 +135,5 @@ public class PixelBasedMetaData extends AbstractMetaData implements ImageSizeMet
         setPhysicalLowerLeftCorner(new Vector2dDouble(region.getCornerX(), region.getCornerY() - getPhysicalImageHeight() + region.getHeight()));
         this.unitsPerPixel = newUnitsPerPixel;
     }
+
 }

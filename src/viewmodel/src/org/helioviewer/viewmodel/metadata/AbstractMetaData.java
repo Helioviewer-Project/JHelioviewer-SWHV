@@ -114,7 +114,7 @@ public abstract class AbstractMetaData implements MetaData {
     /**
      * {@inheritDoc}
      */
-    public synchronized Vector2dDouble getPhysicalImageSize() {
+    public Vector2dDouble getPhysicalImageSize() {
         return sizeVector;
     }
 
