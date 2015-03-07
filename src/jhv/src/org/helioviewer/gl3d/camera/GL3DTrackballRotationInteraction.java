@@ -28,10 +28,7 @@ public class GL3DTrackballRotationInteraction extends GL3DDefaultInteraction {
 
     @Override
     public void mouseDragged(MouseEvent e, GL3DCamera camera) {
-        this.currentRotationEndPoint = camera.getVectorFromSphere(e.getPoint());
-        if (this.currentRotationEndPoint == null) {
-            this.currentRotationEndPoint = camera.getVectorFromPlane(e.getPoint());
-        }
+        this.currentRotationEndPoint = camera.getVectorFromSphereAlt(e.getPoint());
         if (currentRotationStartPoint != null && currentRotationEndPoint != null) {
             currentDragRotation = GL3DQuatd.calcRotation(currentRotationStartPoint, currentRotationEndPoint);
         }
@@ -65,10 +62,7 @@ public class GL3DTrackballRotationInteraction extends GL3DDefaultInteraction {
         // because the
         // mouse should always point to the same Point on the Surface of the
         // sphere.
-        this.currentRotationStartPoint = camera.getVectorFromSphere(e.getPoint());
-        if (this.currentRotationStartPoint == null) {
-            this.currentRotationStartPoint = camera.getVectorFromPlane(e.getPoint());
-        }
+        this.currentRotationStartPoint = camera.getVectorFromSphereAlt(e.getPoint());
     }
 
 }
