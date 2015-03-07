@@ -170,7 +170,7 @@ public class GL3DPositionLoading {
                 i++;
             }
             this.positionDateTime = positionDateTimehelper;
-            Displayer.getSingletonInstance().render();
+            Displayer.getSingletonInstance().display();
         } catch (JSONException e) {
             this.fireLoaded(this.PARTIALSTATE);
             Log.warn("Problem Parsing the JSON Response.", e);
