@@ -17,9 +17,9 @@ import javax.swing.event.ChangeListener;
 
 import org.helioviewer.gl3d.scenegraph.GL3DDrawBits.Bit;
 import org.helioviewer.jhv.display.Displayer;
-import org.helioviewer.jhv.gui.components.base.WheelSupport;
 import org.helioviewer.jhv.gui.IconBank;
 import org.helioviewer.jhv.gui.IconBank.JHVIcon;
+import org.helioviewer.jhv.gui.components.base.WheelSupport;
 
 public abstract class GL3DCameraOptionPanel extends JPanel implements ActionListener {
 
@@ -90,7 +90,8 @@ public abstract class GL3DCameraOptionPanel extends JPanel implements ActionList
                     visibleButton.setIcon(IconBank.getIcon(JHVIcon.VISIBLE));
                 }
                 gridVisible = !gridVisible;
-                Displayer.getSingletonInstance().display();
+                Displayer.getSingletonInstance();
+                Displayer.display();
             }
         });
         visibleButton.setToolTipText("Toggle visibility");
@@ -104,7 +105,8 @@ public abstract class GL3DCameraOptionPanel extends JPanel implements ActionList
             @Override
             public void stateChanged(ChangeEvent e) {
                 camera.setGridResolutionX((Double) gridResolutionXSpinner.getValue());
-                Displayer.getSingletonInstance().render();
+                Displayer.getSingletonInstance();
+                Displayer.display();
             }
         });
         WheelSupport.installMouseWheelSupport(this.gridResolutionXSpinner);
@@ -118,7 +120,8 @@ public abstract class GL3DCameraOptionPanel extends JPanel implements ActionList
             @Override
             public void stateChanged(ChangeEvent e) {
                 camera.setGridResolutionY((Double) gridResolutionYSpinner.getValue());
-                Displayer.getSingletonInstance().render();
+                Displayer.getSingletonInstance();
+                Displayer.display();
             }
         });
         WheelSupport.installMouseWheelSupport(this.gridResolutionYSpinner);
@@ -131,7 +134,8 @@ public abstract class GL3DCameraOptionPanel extends JPanel implements ActionList
             @Override
             public void stateChanged(ChangeEvent e) {
                 camera.getGrid().setFontScale((Float) (fontSizeSpinner.getValue()));
-                Displayer.getSingletonInstance().render();
+                Displayer.getSingletonInstance();
+                Displayer.display();
             }
         });
         WheelSupport.installMouseWheelSupport(this.fontSizeSpinner);

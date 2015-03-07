@@ -34,9 +34,9 @@ import org.helioviewer.gl3d.plugin.pfss.settings.PfssSettings;
 import org.helioviewer.jhv.JHVGlobals;
 import org.helioviewer.jhv.Settings;
 import org.helioviewer.jhv.display.Displayer;
+import org.helioviewer.jhv.gui.components.base.WheelSupport;
 import org.helioviewer.jhv.layers.LayersListener;
 import org.helioviewer.jhv.layers.LayersModel;
-import org.helioviewer.jhv.gui.components.base.WheelSupport;
 import org.helioviewer.jhv.plugins.pfssplugin.PfssPlugin;
 import org.helioviewer.viewmodel.changeevent.ChangeEvent;
 import org.helioviewer.viewmodel.changeevent.SubImageDataChangedReason;
@@ -125,7 +125,7 @@ public class PfssPluginPanel extends OverlayPanel implements ActionListener, Lay
             @Override
             public void stateChanged(javax.swing.event.ChangeEvent e) {
                 PfssSettings.qualityReduction = 8 - ((Integer) qualitySpinner.getValue()).intValue();
-                Displayer.getSingletonInstance().render();
+                Displayer.getSingletonInstance().display();
             }
 
         });
@@ -140,7 +140,7 @@ public class PfssPluginPanel extends OverlayPanel implements ActionListener, Lay
             @Override
             public void itemStateChanged(ItemEvent e) {
                 PfssSettings.fixedColor = (e.getStateChange() == ItemEvent.SELECTED);
-                Displayer.getSingletonInstance().render();
+                Displayer.getSingletonInstance().display();
             }
         });
         helpPanel.add(fixedColors);
@@ -196,7 +196,7 @@ public class PfssPluginPanel extends OverlayPanel implements ActionListener, Lay
                 pfssCache.setVisible(true);
                 visibleButton.setIcon(new ImageIcon(PfssPlugin.getResourceUrl("/images/visible_dm.png")));
             }
-            Displayer.getSingletonInstance().render();
+            Displayer.getSingletonInstance().display();
         }
 
         if (act.getSource().equals(reloadButton)) {
