@@ -6,9 +6,6 @@ import java.util.HashMap;
 
 import javax.media.opengl.GL2;
 
-import org.helioviewer.gl3d.camera.GL3DCamera;
-import org.helioviewer.gl3d.math.GL3DMat4d;
-import org.helioviewer.gl3d.math.GL3DVec3d;
 import org.helioviewer.gl3d.scenegraph.GL3DDrawBits.Bit;
 import org.helioviewer.gl3d.scenegraph.GL3DGroup;
 import org.helioviewer.gl3d.scenegraph.GL3DNode;
@@ -77,9 +74,6 @@ public class GL3DImageLayers extends GL3DGroup {
         for (GL3DImageLayer layer : layers) {
             if (layer.getImageSphere() != null) {
                 layer.getImageSphere().draw(state);
-                state.gl.glDepthRange(1.f, 1.f);
-                layer.getImageCorona().draw(state);
-                state.gl.glDepthRange(0.f, 1.f);
             }
         }
         state.gl.glDisable(GL2.GL_BLEND);
@@ -88,20 +82,7 @@ public class GL3DImageLayers extends GL3DGroup {
     @Override
     public void shapeUpdate(GL3DState state) {
         super.shapeUpdate(state);
-        updateImageLayerPriorities(state);
         this.markAsChanged();
-    }
-
-    private void updateImageLayerPriorities(GL3DState state) {
-        GL3DCamera activeCamera = state.getActiveCamera();
-        GL3DMat4d VM = activeCamera.getVM();
-        GL3DVec3d LA = new GL3DVec3d();
-        GL3DVec3d LR = new GL3DVec3d();
-        GL3DVec3d LU = new GL3DVec3d();
-        GL3DVec3d EYE = new GL3DVec3d();
-
-        VM.readLookAt(EYE, LA, LU, LR);
-        LA.negate();
     }
 
     public void setCoronaVisibility(boolean visible) {

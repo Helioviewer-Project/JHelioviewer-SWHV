@@ -44,6 +44,7 @@ public class GL3DImageSphere extends GL3DShape {
     private int indexBufferSize;
 
     private List<Integer> indices;
+    private int positionBufferSize;
 
     public GL3DImageSphere(GL3DImageTextureView imageTextureView, GL3DImageLayer imageLayer, boolean showSphere, boolean showCorona, boolean restoreColorMask) {
         super("Sphere");
@@ -82,7 +83,16 @@ public class GL3DImageSphere extends GL3DShape {
 
         enablePositionVBO(state);
         enableIndexVBO(state);
-        gl.glDrawElements(GL2.GL_TRIANGLES, this.indexBufferSize, GL2.GL_UNSIGNED_INT, 0);
+        state.gl.glVertexPointer(3, GL2.GL_DOUBLE, 3 * Buffers.SIZEOF_DOUBLE, 0);
+        if (this.showCorona) {
+            state.gl.glDepthRange(1.f, 1.f);
+            gl.glDrawElements(GL2.GL_TRIANGLES, 6, GL2.GL_UNSIGNED_INT, (this.indexBufferSize - 6) * Buffers.SIZEOF_INT);
+            state.gl.glDepthRange(0.f, 1.f);
+        }
+        if (this.showSphere) {
+            gl.glDrawElements(GL2.GL_TRIANGLES, this.indexBufferSize - 6, GL2.GL_UNSIGNED_INT, 0);
+        }
+
         disableIndexVBO(state);
         disablePositionVBO(state);
 
@@ -112,10 +122,11 @@ public class GL3DImageSphere extends GL3DShape {
             positionBuffer.put(vertex.z);
         }
         positionBuffer.flip();
+        this.positionBufferSize = positionBuffer.capacity();
         positionBufferID = generate(state);
 
         state.gl.glBindBuffer(GL2.GL_ARRAY_BUFFER, positionBufferID);
-        state.gl.glBufferData(GL2.GL_ARRAY_BUFFER, positionBuffer.capacity() * Buffers.SIZEOF_DOUBLE, positionBuffer, GL2.GL_STATIC_DRAW);
+        state.gl.glBufferData(GL2.GL_ARRAY_BUFFER, this.positionBufferSize * Buffers.SIZEOF_DOUBLE, positionBuffer, GL2.GL_STATIC_DRAW);
 
         IntBuffer indexBuffer = IntBuffer.allocate(indices.size());
         for (Integer i : indices) {
@@ -141,7 +152,6 @@ public class GL3DImageSphere extends GL3DShape {
     private void enablePositionVBO(GL3DState state) {
         state.gl.glEnableClientState(GL2.GL_VERTEX_ARRAY);
         state.gl.glBindBuffer(GL2.GL_ARRAY_BUFFER, positionBufferID);
-        state.gl.glVertexPointer(3, GL2.GL_DOUBLE, 3 * Buffers.SIZEOF_DOUBLE, 0);
     }
 
     private void disablePositionVBO(GL3DState state) {
@@ -188,61 +198,63 @@ public class GL3DImageSphere extends GL3DShape {
             HelioviewerOcculterMetaData md = (HelioviewerOcculterMetaData) metaData;
             showSphere = false;
         }
-        if (showSphere) {
-            for (int latNumber = 0; latNumber <= resolutionX; latNumber++) {
-                double theta = latNumber * Math.PI / resolutionX;
-                double sinTheta = Math.sin(theta);
-                double cosTheta = Math.cos(theta);
-                for (int longNumber = 0; longNumber <= resolutionY; longNumber++) {
-                    double phi = longNumber * 2 * Math.PI / resolutionY;
-                    double sinPhi = Math.sin(phi);
-                    double cosPhi = Math.cos(phi);
+        for (int latNumber = 0; latNumber <= resolutionX; latNumber++) {
+            double theta = latNumber * Math.PI / resolutionX;
+            double sinTheta = Math.sin(theta);
+            double cosTheta = Math.cos(theta);
+            for (int longNumber = 0; longNumber <= resolutionY; longNumber++) {
+                double phi = longNumber * 2 * Math.PI / resolutionY;
+                double sinPhi = Math.sin(phi);
+                double cosPhi = Math.cos(phi);
 
-                    double x = cosPhi * sinTheta;
-                    double y = cosTheta;
-                    double z = sinPhi * sinTheta;
-                    positions.add(new GL3DVec3d(Constants.SunRadius * x, Constants.SunRadius * y, Constants.SunRadius * z));
-                    numberOfPositions++;
-                }
-            }
-
-            for (int latNumber = 0; latNumber < resolutionX; latNumber++) {
-                for (int longNumber = 0; longNumber < resolutionY; longNumber++) {
-                    int first = (latNumber * (resolutionY + 1)) + longNumber;
-                    int second = first + resolutionY + 1;
-                    indices.add(first);
-                    indices.add(first + 1);
-                    indices.add(second + 1);
-                    indices.add(first);
-                    indices.add(second + 1);
-                    indices.add(second);
-                }
+                double x = cosPhi * sinTheta;
+                double y = cosTheta;
+                double z = sinPhi * sinTheta;
+                positions.add(new GL3DVec3d(Constants.SunRadius * x, Constants.SunRadius * y, Constants.SunRadius * z));
+                numberOfPositions++;
             }
         }
+
+        for (int latNumber = 0; latNumber < resolutionX; latNumber++) {
+            for (int longNumber = 0; longNumber < resolutionY; longNumber++) {
+                int first = (latNumber * (resolutionY + 1)) + longNumber;
+                int second = first + resolutionY + 1;
+                indices.add(first);
+                indices.add(first + 1);
+                indices.add(second + 1);
+                indices.add(first);
+                indices.add(second + 1);
+                indices.add(second);
+            }
+        }
+
         if (metaData instanceof HelioviewerPositionedMetaData) {
             HelioviewerPositionedMetaData md = (HelioviewerPositionedMetaData) metaData;
             if (md.getInstrument().contains("HMI")) {
                 showCorona = false;
             }
         }
-        if (showCorona) {
-            int beginPositionNumberCorona = numberOfPositions;
-            positions.add(new GL3DVec3d(-40., 40., 0.));
-            numberOfPositions++;
-            positions.add(new GL3DVec3d(40., 40., 0.));
-            numberOfPositions++;
-            positions.add(new GL3DVec3d(40., -40., 0.));
-            numberOfPositions++;
-            positions.add(new GL3DVec3d(-40., -40., 0.));
-            numberOfPositions++;
+        int beginPositionNumberCorona = numberOfPositions;
+        positions.add(new GL3DVec3d(-40., 40., 0.));
+        numberOfPositions++;
+        positions.add(new GL3DVec3d(40., 40., 0.));
+        numberOfPositions++;
+        positions.add(new GL3DVec3d(40., -40., 0.));
+        numberOfPositions++;
+        positions.add(new GL3DVec3d(-40., -40., 0.));
+        numberOfPositions++;
 
-            indices.add(beginPositionNumberCorona + 0);
-            indices.add(beginPositionNumberCorona + 2);
-            indices.add(beginPositionNumberCorona + 1);
+        indices.add(beginPositionNumberCorona + 0);
+        indices.add(beginPositionNumberCorona + 2);
+        indices.add(beginPositionNumberCorona + 1);
 
-            indices.add(beginPositionNumberCorona + 2);
-            indices.add(beginPositionNumberCorona + 0);
-            indices.add(beginPositionNumberCorona + 3);
-        }
+        indices.add(beginPositionNumberCorona + 2);
+        indices.add(beginPositionNumberCorona + 0);
+        indices.add(beginPositionNumberCorona + 3);
+
+    }
+
+    public void setCoronaVisiblity(boolean visible) {
+        this.showCorona = visible;
     }
 }

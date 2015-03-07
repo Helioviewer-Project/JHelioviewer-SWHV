@@ -11,7 +11,6 @@ import org.helioviewer.gl3d.math.GL3DMat4d;
 import org.helioviewer.gl3d.math.GL3DQuatd;
 import org.helioviewer.gl3d.math.GL3DVec3d;
 import org.helioviewer.gl3d.math.GL3DVec4d;
-import org.helioviewer.gl3d.scenegraph.GL3DDrawBits.Bit;
 import org.helioviewer.gl3d.scenegraph.GL3DGroup;
 import org.helioviewer.gl3d.scenegraph.GL3DState;
 import org.helioviewer.viewmodel.changeevent.ChangeEvent;
@@ -35,7 +34,6 @@ import org.helioviewer.viewmodel.view.opengl.GL3DView;
 public class GL3DImageLayer extends GL3DGroup implements GL3DCameraListener {
 
     private GL3DImageSphere sphere;
-    private GL3DImageSphere corona;
     private static int nextLayerId = 0;
     private final int layerId;
     private GL3DVec4d direction = new GL3DVec4d(0, 0, 1, 0);
@@ -102,26 +100,12 @@ public class GL3DImageLayer extends GL3DGroup implements GL3DCameraListener {
     }
 
     private void createImageMeshNodes(GL2 gl) {
-        sphere = new GL3DImageSphere(imageTextureView, this, true, false, false);
-        corona = new GL3DImageSphere(imageTextureView, this, false, true, true);
+        sphere = new GL3DImageSphere(imageTextureView, this, true, true, false);
         this.addNode(sphere);
-        this.addNode(corona);
     }
 
     protected GL3DImageSphere getImageSphere() {
         return this.sphere;
-    }
-
-    public GL3DImageSphere getImageCorona() {
-        return this.corona;
-    }
-
-    public void setCoronaVisibility(boolean visible) {
-        if (!visible) {
-            this.corona.getDrawBits().on(Bit.Hidden);
-        } else {
-            this.corona.getDrawBits().off(Bit.Hidden);
-        }
     }
 
     @Override
@@ -277,6 +261,10 @@ public class GL3DImageLayer extends GL3DGroup implements GL3DCameraListener {
         }
         GL3DVec3d solarCoordinates3D = new GL3DVec3d(solarCoordinates.x, solarCoordinates.y, solarCoordinates3Dz);
         return solarCoordinates3D;
+    }
+
+    public void setCoronaVisibility(boolean visible) {
+        this.getImageSphere().setCoronaVisiblity(visible);
     }
 
 }
