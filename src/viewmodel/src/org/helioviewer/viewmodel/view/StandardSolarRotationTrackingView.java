@@ -81,51 +81,43 @@ public class StandardSolarRotationTrackingView extends AbstractBasicView impleme
      * {@inheritDoc}
      */
     public void viewChanged(View sender, ChangeEvent aEvent) {
+        TimestampChangedReason timestampReason = aEvent.getLastChangedReasonByType(TimestampChangedReason.class);
+        if ((timestampReason != null) && (timestampReason.getView() instanceof TimedMovieView) && LinkedMovieManager.getActiveInstance().isMaster((TimedMovieView) timestampReason.getView())) {
+            currentDate = timestampReason.getNewDateTime().getTime();
 
-        synchronized (this) {
-            TimestampChangedReason timestampReason = aEvent.getLastChangedReasonByType(TimestampChangedReason.class);
+            if (!enabled || !startPositionIsInsideDisc) {
+                notifyViewListeners(aEvent);
+                return;
+            }
 
-            if ((timestampReason != null) && (timestampReason.getView() instanceof TimedMovieView) && LinkedMovieManager.getActiveInstance().isMaster((TimedMovieView) timestampReason.getView())) {
-                currentDate = timestampReason.getNewDateTime().getTime();
+            GregorianCalendar currentCalendarDate = new GregorianCalendar();
+            currentCalendarDate.setTime(currentDate);
+            if (startDate != null) {
+                long timeDiff = (currentDate.getTime() - startDate.getTime()) / 1000;
 
-                if (!enabled || !startPositionIsInsideDisc) {
+                if (timeDiff == 0) {
                     notifyViewListeners(aEvent);
                     return;
                 }
 
-                GregorianCalendar currentCalendarDate = new GregorianCalendar();
-                currentCalendarDate.setTime(currentDate);
+                StonyhurstHeliographicCoordinates currentPosition = DifferentialRotation.calculateNextPosition(startPosition, timeDiff);
 
-                if (startDate != null) {
-                    long timeDiff = (currentDate.getTime() - startDate.getTime()) / 1000;
-
-                    if (timeDiff == 0) {
-                        notifyViewListeners(aEvent);
-                        return;
-                    }
-
-                    StonyhurstHeliographicCoordinates currentPosition = DifferentialRotation.calculateNextPosition(startPosition, timeDiff);
-
-                    // Move to "parking position" while on the back side of the
-                    // sun
-                    if ((currentPosition.phi > 90 && currentPosition.phi < 180) || (currentPosition.phi > -270 && currentPosition.phi < -180)) {
-
-                        currentPosition = new StonyhurstHeliographicCoordinates(currentPosition.theta, 90, currentPosition.r);
-
-                    } else if ((currentPosition.phi >= 180 && currentPosition.phi < 270) || (currentPosition.phi >= -180 && currentPosition.phi < -90)) {
-
-                        currentPosition = new StonyhurstHeliographicCoordinates(currentPosition.theta, 270, currentPosition.r);
-                    }
-
-                    HeliocentricCartesianCoordinatesFromEarth currentHCC = new HeliocentricCartesianCoordinatesFromEarth(currentPosition, currentCalendarDate);
-
-                    Region currentRegion = regionView.getRegion();
-                    Vector2dDouble currentCenter = currentHCC.getCartesianCoordinatesOnDisc();
-                    Region newRegion = StaticRegion.createAdaptedRegion(currentCenter.subtract(currentRegion.getSize().scale(0.5)), currentRegion.getSize());
-                    regionView.setRegion(newRegion, new ChangeEvent());
-                } else {
-                    resetStartPosition();
+                // Move to "parking position" while on the back side of the
+                // sun
+                if ((currentPosition.phi > 90 && currentPosition.phi < 180) || (currentPosition.phi > -270 && currentPosition.phi < -180)) {
+                    currentPosition = new StonyhurstHeliographicCoordinates(currentPosition.theta, 90, currentPosition.r);
+                } else if ((currentPosition.phi >= 180 && currentPosition.phi < 270) || (currentPosition.phi >= -180 && currentPosition.phi < -90)) {
+                    currentPosition = new StonyhurstHeliographicCoordinates(currentPosition.theta, 270, currentPosition.r);
                 }
+
+                HeliocentricCartesianCoordinatesFromEarth currentHCC = new HeliocentricCartesianCoordinatesFromEarth(currentPosition, currentCalendarDate);
+
+                Region currentRegion = regionView.getRegion();
+                Vector2dDouble currentCenter = currentHCC.getCartesianCoordinatesOnDisc();
+                Region newRegion = StaticRegion.createAdaptedRegion(currentCenter.subtract(currentRegion.getSize().scale(0.5)), currentRegion.getSize());
+                regionView.setRegion(newRegion, new ChangeEvent());
+            } else {
+                resetStartPosition();
             }
         }
 
@@ -151,7 +143,6 @@ public class StandardSolarRotationTrackingView extends AbstractBasicView impleme
     public Region getRegion() {
         if (regionView != null)
             return regionView.getRegion();
-
         return null;
     }
 
@@ -185,7 +176,7 @@ public class StandardSolarRotationTrackingView extends AbstractBasicView impleme
         resetStartPosition(region, idt.getTime());
     }
 
-    private synchronized void resetStartPosition(Region newRegion, Date startDate) {
+    private void resetStartPosition(Region newRegion, Date startDate) {
         if (startDate == null || newRegion == null) {
             return;
         }
@@ -203,4 +194,5 @@ public class StandardSolarRotationTrackingView extends AbstractBasicView impleme
         HeliocentricCartesianCoordinatesFromEarth hcc = new HeliocentricCartesianCoordinatesFromEarth(center, startCalendarDate);
         startPosition = new StonyhurstHeliographicCoordinates(hcc);
     }
+
 }
