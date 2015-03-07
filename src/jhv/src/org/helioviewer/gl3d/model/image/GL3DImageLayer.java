@@ -60,23 +60,9 @@ public class GL3DImageLayer extends GL3DGroup implements GL3DCameraListener {
         layerId = nextLayerId++;
 
         this.mainLayerView = mainLayerView;
-        if (this.mainLayerView == null) {
-            throw new NullPointerException("Cannot create GL3DImageLayer from null Layer");
-        }
-
         this.imageTextureView = this.mainLayerView.getAdapter(GL3DImageTextureView.class);
-        if (this.imageTextureView == null) {
-            throw new IllegalStateException("Cannot create GL3DImageLayer when no GL3DImageTextureView is present in Layer");
-        }
-
         this.metaDataView = this.mainLayerView.getAdapter(MetaDataView.class);
-        if (this.metaDataView == null) {
-            throw new IllegalStateException("Cannot create GL3DImageLayer when no MetaDataView is present in Layer");
-        }
         this.regionView = this.mainLayerView.getAdapter(RegionView.class);
-        if (this.regionView == null) {
-            throw new IllegalStateException("Cannot create GL3DImageLayer when no RegionView is present in Layer");
-        }
 
         this.doUpdateROI = true;
         this.markAsChanged();
