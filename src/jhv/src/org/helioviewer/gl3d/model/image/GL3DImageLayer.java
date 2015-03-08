@@ -6,7 +6,6 @@ import javax.media.opengl.GL2;
 
 import org.helioviewer.base.physics.Constants;
 import org.helioviewer.gl3d.camera.GL3DCamera;
-import org.helioviewer.gl3d.camera.GL3DCameraListener;
 import org.helioviewer.gl3d.math.GL3DMat4d;
 import org.helioviewer.gl3d.math.GL3DQuatd;
 import org.helioviewer.gl3d.math.GL3DVec3d;
@@ -30,7 +29,7 @@ import org.helioviewer.viewmodel.view.opengl.GL3DView;
  * @author Simon Spoerri (simon.spoerri@fhnw.ch)
  *
  */
-public class GL3DImageLayer extends GL3DGroup implements GL3DCameraListener {
+public class GL3DImageLayer extends GL3DGroup {
 
     private GL3DImageSphere sphere;
     private static int nextLayerId = 0;
@@ -46,8 +45,6 @@ public class GL3DImageLayer extends GL3DGroup implements GL3DCameraListener {
     protected RegionView regionView;
     public double minZ = -Constants.SunRadius;
     public double maxZ = Constants.SunRadius;
-
-    private final double lastViewAngle = 0.0;
 
     private final int resolution = 6;
     private final double[][] pointlist = new double[(resolution + 1) * 2 * 2][2];
@@ -104,19 +101,6 @@ public class GL3DImageLayer extends GL3DGroup implements GL3DCameraListener {
     public void shapeUpdate(GL3DState state) {
         super.shapeUpdate(state);
         this.updateROI(state);
-    }
-
-    @Override
-    public void cameraMoved(GL3DCamera camera) {
-    }
-
-    public double getLastViewAngle() {
-        return lastViewAngle;
-    }
-
-    @Override
-    public void cameraMoving(GL3DCamera camera) {
-
     }
 
     public void updateROI(GL3DState state) {
