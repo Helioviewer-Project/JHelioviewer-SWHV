@@ -22,7 +22,7 @@ import org.helioviewer.viewmodelplugin.filter.FilterPlugin;
  *
  * @author Stephan Pagel
  */
-public class InternalFilterPlugin extends FilterPlugin implements InternalPlugin {
+public class InternalFilterPlugin extends FilterPlugin {
 
     /**
      * Default constructor.

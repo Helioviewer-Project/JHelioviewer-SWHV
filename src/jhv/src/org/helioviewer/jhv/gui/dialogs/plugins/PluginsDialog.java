@@ -35,7 +35,7 @@ import org.helioviewer.jhv.gui.ViewchainFactory;
 import org.helioviewer.jhv.gui.dialogs.pluginsOLD.FilterPluginDialog;
 import org.helioviewer.jhv.gui.dialogs.pluginsOLD.OverlayPluginDialog;
 import org.helioviewer.jhv.gui.interfaces.ShowableDialog;
-import org.helioviewer.jhv.internal_plugins.InternalPlugin;
+import org.helioviewer.jhv.internal_plugins.InternalFilterPlugin;
 import org.helioviewer.viewmodel.factory.ViewFactory;
 import org.helioviewer.viewmodel.view.ImageInfoView;
 import org.helioviewer.viewmodel.view.LayeredView;
@@ -288,7 +288,7 @@ public class PluginsDialog extends JDialog implements ShowableDialog, ActionList
         pluginList.removeAllEntries();
 
         for (final PluginContainer plugin : plugins) {
-            if (!(plugin.getPlugin() instanceof InternalPlugin)) {
+            if (!(plugin.getPlugin() instanceof InternalFilterPlugin)) {
                 if (filterIndex == 0 || (plugin.isActive() && filterIndex == 1) || (!plugin.isActive() && filterIndex == 2)) {
                     pluginList.addEntry(plugin.getName(), new PluginListEntry(plugin, pluginList));
                 }
