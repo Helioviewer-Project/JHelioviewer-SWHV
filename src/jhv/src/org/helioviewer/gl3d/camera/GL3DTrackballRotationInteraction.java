@@ -35,7 +35,6 @@ public class GL3DTrackballRotationInteraction extends GL3DDefaultInteraction {
         camera.rotateCurrentDragRotation(currentDragRotation);
         this.camera.updateCameraTransformation(false);
 
-        camera.fireCameraMoving();
         Displayer.getSingletonInstance().display();
     }
 
@@ -44,8 +43,6 @@ public class GL3DTrackballRotationInteraction extends GL3DDefaultInteraction {
         this.currentRotationStartPoint = null;
         this.currentRotationEndPoint = null;
 
-        camera.fireCameraMoved();
-        Displayer.getSingletonInstance().display();
     }
 
     @Override

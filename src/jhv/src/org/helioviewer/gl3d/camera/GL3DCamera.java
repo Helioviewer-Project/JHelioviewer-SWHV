@@ -1,8 +1,6 @@
 package org.helioviewer.gl3d.camera;
 
 import java.awt.Point;
-import java.util.ArrayList;
-import java.util.List;
 
 import javax.media.opengl.GL2;
 import javax.media.opengl.glu.GLU;
@@ -42,8 +40,6 @@ public abstract class GL3DCamera {
 
     public int currentMouseX = 0;
     public int currentMouseY = 0;
-
-    private final List<GL3DCameraListener> listeners = new ArrayList<GL3DCameraListener>();
 
     private GL3DMat4d cameraTransformation;
 
@@ -367,10 +363,6 @@ public abstract class GL3DCamera {
 
         cameraTransformation = GL3DMat4d.translation(this.translation);
         cameraTransformation.multiply(this.rotation.toMatrix());
-
-        if (fireEvent) {
-            fireCameraMoved();
-        }
     }
 
     public void applyCamera(GL3DState state) {
@@ -427,26 +419,6 @@ public abstract class GL3DCamera {
     @Override
     public String toString() {
         return getName();
-    }
-
-    public void addCameraListener(GL3DCameraListener listener) {
-        this.listeners.add(listener);
-    }
-
-    public void removeCameraListener(GL3DCameraListener listener) {
-        this.listeners.remove(listener);
-    }
-
-    protected void fireCameraMoved() {
-        for (GL3DCameraListener l : this.listeners) {
-            l.cameraMoved(this);
-        }
-    }
-
-    protected void fireCameraMoving() {
-        for (GL3DCameraListener l : this.listeners) {
-            l.cameraMoving(this);
-        }
     }
 
     public void updateRotation(long dateMillis) {
