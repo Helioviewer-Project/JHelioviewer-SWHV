@@ -56,9 +56,7 @@ public class GL3DImageLayers extends GL3DGroup {
         state.gl.glEnable(GL2.GL_DEPTH_TEST);
 
         for (GL3DImageLayer layer : layers) {
-            if (layer.getImageSphere() != null) {
-                layer.getImageSphere().draw(state);
-            }
+            layer.draw(state);
         }
         state.gl.glDisable(GL2.GL_FRAGMENT_PROGRAM_ARB);
         state.gl.glDisable(GL2.GL_VERTEX_PROGRAM_ARB);
