@@ -13,9 +13,9 @@ import org.helioviewer.viewmodel.view.opengl.GL3DSceneGraphView;
 /**
  * Standard panning interaction, moves the camera proportionally to the mouse
  * movement when dragging
- * 
+ *
  * @author Simon Spoerri (simon.spoerri@fhnw.ch)
- * 
+ *
  */
 public class GL3DPanInteraction extends GL3DDefaultInteraction {
 
@@ -25,10 +25,12 @@ public class GL3DPanInteraction extends GL3DDefaultInteraction {
         super(camera, sceneGraph);
     }
 
+    @Override
     public void mousePressed(MouseEvent e, GL3DCamera camera) {
         this.lastMousePoint = e.getPoint();
     }
 
+    @Override
     public void mouseDragged(MouseEvent e, GL3DCamera camera) {
         int x = (e.getPoint().x - this.lastMousePoint.x);
         int y = (e.getPoint().y - this.lastMousePoint.y);
@@ -43,13 +45,11 @@ public class GL3DPanInteraction extends GL3DDefaultInteraction {
         this.lastMousePoint = e.getPoint();
         camera.updateCameraTransformation();
 
-        camera.fireCameraMoving();
         Displayer.getSingletonInstance().display();
     }
 
     @Override
     public void mouseReleased(MouseEvent e, GL3DCamera camera) {
-        camera.fireCameraMoved();
         Displayer.getSingletonInstance().display();
     }
 

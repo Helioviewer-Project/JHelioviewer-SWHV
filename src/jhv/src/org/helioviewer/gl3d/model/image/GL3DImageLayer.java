@@ -60,7 +60,6 @@ public class GL3DImageLayer extends GL3DShape {
     private final double[][] pointlist = new double[(resolution + 1) * 2 * 2][2];
     private final boolean showSphere;
     private boolean showCorona;
-    private final boolean restoreColorMask;
     private int positionBufferID;
     private int indexBufferID;
     private int indexBufferSize;
@@ -103,7 +102,6 @@ public class GL3DImageLayer extends GL3DShape {
             }
         });
         this.markAsChanged();
-        this.restoreColorMask = restoreColorMask;
         this.showSphere = showSphere;
         this.showCorona = showCorona;
     }
@@ -249,9 +247,8 @@ public class GL3DImageLayer extends GL3DShape {
         disableIndexVBO(state);
         disablePositionVBO(state);
 
-        if (restoreColorMask) {
-            gl.glColorMask(true, true, true, true);
-        }
+        gl.glColorMask(true, true, true, true);
+
     }
 
     private int generate(GL3DState state) {

@@ -1,8 +1,6 @@
 package org.helioviewer.viewmodel.view.opengl;
 
 import java.awt.event.KeyEvent;
-import java.util.ArrayList;
-import java.util.List;
 
 import javax.media.opengl.GL2;
 
@@ -10,9 +8,7 @@ import org.helioviewer.base.logging.Log;
 import org.helioviewer.gl3d.GL3DKeyController;
 import org.helioviewer.gl3d.GL3DKeyController.GL3DKeyListener;
 import org.helioviewer.gl3d.camera.GL3DCamera;
-import org.helioviewer.gl3d.camera.GL3DCameraListener;
 import org.helioviewer.gl3d.scenegraph.GL3DState;
-import org.helioviewer.viewmodel.changeevent.CameraChangeChangedReason;
 import org.helioviewer.viewmodel.changeevent.ChangeEvent;
 import org.helioviewer.viewmodel.view.View;
 
@@ -25,10 +21,8 @@ import org.helioviewer.viewmodel.view.View;
  * @author Simon Spoerri (simon.spoerri@fhnw.ch)
  *
  */
-public class GL3DCameraView extends AbstractGL3DView implements GL3DView, GL3DCameraListener {
+public class GL3DCameraView extends AbstractGL3DView implements GL3DView {
     private GL3DCamera camera;
-
-    private final List<GL3DCameraListener> listeners = new ArrayList<GL3DCameraListener>();
 
     public GL3DCameraView() {
         // Register short keys for changing the interaction
@@ -90,36 +84,9 @@ public class GL3DCameraView extends AbstractGL3DView implements GL3DView, GL3DCa
     }
 
     public void setCurrentCamera(GL3DCamera cam) {
-        if (this.camera != null) {
-            this.camera.removeCameraListener(this);
-        }
         cam.activate(this.camera);
         this.camera = cam;
-        this.camera.addCameraListener(this);
         Log.debug("GL3DCameraView: Set Current Camera to " + this.camera);
-        notifyViewListeners(new ChangeEvent(new CameraChangeChangedReason(this, this.camera)));
-    }
-
-    @Override
-    public void cameraMoved(GL3DCamera camera) {
-        for (GL3DCameraListener l : this.listeners) {
-            l.cameraMoved(camera);
-        }
-    }
-
-    @Override
-    public void cameraMoving(GL3DCamera camera) {
-        for (GL3DCameraListener l : this.listeners) {
-            l.cameraMoving(camera);
-        }
-    }
-
-    public void addCameraListener(GL3DCameraListener listener) {
-        this.listeners.add(listener);
-    }
-
-    public void removeCameraListener(GL3DCameraListener listener) {
-        this.listeners.remove(listener);
     }
 
     @Override
