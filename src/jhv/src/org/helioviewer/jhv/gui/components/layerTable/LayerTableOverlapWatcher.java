@@ -92,7 +92,7 @@ public class LayerTableOverlapWatcher implements LayersListener {
                     isGoodOverlap = false;
                 }
 
-                Log.debug("Overlap fraction for layer " + curLayer + " is " + fraction);
+                //Log.debug("Overlap fraction for layer " + curLayer + " is " + fraction);
 
             }
 
