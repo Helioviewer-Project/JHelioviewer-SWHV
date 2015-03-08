@@ -138,4 +138,5 @@ public class JHVUpdate implements Runnable {
     public void setVerbose(boolean verbose) {
         this.verbose = verbose;
     }
+
 }
