@@ -26,7 +26,7 @@ import org.helioviewer.jhv.gui.IconBank;
 import org.helioviewer.jhv.gui.IconBank.JHVIcon;
 import org.helioviewer.jhv.gui.ImageViewerGui;
 import org.helioviewer.jhv.gui.interfaces.ShowableDialog;
-import org.helioviewer.jhv.internal_plugins.InternalPlugin;
+import org.helioviewer.jhv.internal_plugins.InternalFilterPlugin;
 import org.helioviewer.viewmodelplugin.controller.PluginContainer;
 import org.helioviewer.viewmodelplugin.controller.PluginManager;
 import org.helioviewer.viewmodelplugin.interfaces.Plugin;
@@ -98,7 +98,7 @@ public final class AboutDialog extends JDialog implements ActionListener, Showab
 
         for (PluginContainer pluginContainer : PluginManager.getSingletonInstance().getAllPlugins()) {
             Plugin plugin = pluginContainer.getPlugin();
-            if (!(plugin instanceof InternalPlugin)) {
+            if (!(plugin instanceof InternalFilterPlugin)) {
                 String pluginName = plugin.getName();
                 String pluginAboutLicense = plugin.getAboutLicenseText();
 
