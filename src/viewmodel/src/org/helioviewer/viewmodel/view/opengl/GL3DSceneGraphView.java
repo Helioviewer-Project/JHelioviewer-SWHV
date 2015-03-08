@@ -210,7 +210,6 @@ public class GL3DSceneGraphView extends AbstractGL3DView implements GL3DView {
 
     private void removeLayersFromSceneGraph(GL3DState state) {
         for (GL3DImageTextureView imageTextureView : this.layersToRemove) {
-            getAdapter(GL3DCameraView.class).removeCameraListener(this.imageLayers.getImageLayerForView(imageTextureView));
             this.imageLayers.removeLayer(state, imageTextureView);
         }
         this.layersToRemove.clear();
@@ -221,7 +220,6 @@ public class GL3DSceneGraphView extends AbstractGL3DView implements GL3DView {
 
         for (GL3DImageTextureView imageTextureView : this.layersToAdd) {
             GL3DImageLayer imageLayer = GL3DImageLayerFactory.createImageLayer(state, imageTextureView);
-            getAdapter(GL3DCameraView.class).addCameraListener(imageLayer);
             this.imageLayers.insertLayer(imageLayer);
         }
 
