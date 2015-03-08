@@ -263,13 +263,13 @@ public class JavaHelioViewer {
 
         // Check for updates in parallel, if newer version is available a small
         // message is displayed
-        try {
+        /* try {
             JHVUpdate update = new JHVUpdate();
             update.check();
         } catch (MalformedURLException e) {
             // Should never happen
             Log.error("Error retrieving internal update URL", e);
-        }
+        } */
 
         splash.setProgressText("Start main window...");
         splash.nextStep();

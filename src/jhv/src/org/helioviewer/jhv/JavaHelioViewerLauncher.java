@@ -162,7 +162,7 @@ public class JavaHelioViewerLauncher {
         int versionNum2 = Integer.parseInt(versionString.substring(firstDot + 1, secondDot));
 
         // version too old
-        if (versionNum1 < 1 || (versionNum1 == 1 && versionNum2 < 5)) {
+        if (versionNum1 < 1 || (versionNum1 == 1 && versionNum2 < 6)) {
             System.out.println("JavaHelioviewerLauncher > Java version too old to run JHelioviewer");
             JEditorPane messagePane = new JEditorPane("text/html", "Your Java version needs to be updated in order to use JHelioviewer.<br>" + "You can get the latest version at <br>" + "<a href=\"http://www.java.com/download\"> http://www.java.com/download </a><br>" + "Your Java version: " + versionString + "<br>" + "Required version: 1.5 or greater");
 
