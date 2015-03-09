@@ -374,7 +374,6 @@ public class GLPhysicalRenderGraphics extends AbstractPhysicalRenderGraphics {
         r.rotate(-Math.asin(y / targetDir.length()), GL3DVec3d.XAxis);
         gl.glEnable(GL2.GL_BLEND);
         gl.glBlendFunc(GL2.GL_SRC_ALPHA, GL2.GL_ONE_MINUS_SRC_ALPHA);
-        gl.glDisable(GL2.GL_DEPTH_TEST);
         gl.glEnable(GL2.GL_CULL_FACE);
         gl.glEnable(GL2.GL_TEXTURE_2D);
 
@@ -406,7 +405,6 @@ public class GLPhysicalRenderGraphics extends AbstractPhysicalRenderGraphics {
         gl.glEnd();
 
         gl.glDisable(GL2.GL_BLEND);
-        gl.glEnable(GL2.GL_DEPTH_TEST);
         gl.glDisable(GL2.GL_CULL_FACE);
         gl.glEnable(GL2.GL_BLEND);
     }
@@ -415,7 +413,6 @@ public class GLPhysicalRenderGraphics extends AbstractPhysicalRenderGraphics {
     public void fillPolygon(Vector3dDouble[] points) {
         gl.glBindTexture(GL2.GL_TEXTURE_2D, 0);
 
-        gl.glDisable(GL2.GL_DEPTH_TEST);
         gl.glEnable(GL2.GL_BLEND);
         gl.glBlendFunc(GL2.GL_SRC_ALPHA, GL2.GL_ONE_MINUS_SRC_ALPHA);
         gl.glEnable(GL2.GL_CULL_FACE);
@@ -429,7 +426,6 @@ public class GLPhysicalRenderGraphics extends AbstractPhysicalRenderGraphics {
         gl.glEnd();
 
         gl.glDisable(GL2.GL_BLEND);
-        gl.glEnable(GL2.GL_DEPTH_TEST);
         gl.glDisable(GL2.GL_CULL_FACE);
     }
 

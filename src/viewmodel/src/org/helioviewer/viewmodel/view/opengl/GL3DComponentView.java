@@ -202,7 +202,6 @@ public class GL3DComponentView extends AbstractComponentView implements GLEventL
         @Override
         public final void displayBody(GL2 gl, View v, int width, int height) {
             gl.glClear(GL2.GL_COLOR_BUFFER_BIT | GL2.GL_DEPTH_BUFFER_BIT);
-            gl.glEnable(GL2.GL_DEPTH_TEST);
 
             ((GL3DView) v).renderGL(gl, true);
         }
@@ -213,7 +212,7 @@ public class GL3DComponentView extends AbstractComponentView implements GLEventL
 
         @Override
         public final void init(GL2 gl) {
-            gl.glDisable(GL2.GL_DEPTH_TEST);
+            gl.glEnable(GL2.GL_DEPTH_TEST);
             gl.glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
             gl.glEnable(GL2.GL_TEXTURE_1D);
             gl.glEnable(GL2.GL_TEXTURE_2D);

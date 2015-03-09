@@ -220,7 +220,6 @@ public class GL3DImageLayer extends GL3DShape {
     public void shapeDraw(GL3DState state) {
         GL2 gl = state.gl;
         gl.glEnable(GL2.GL_CULL_FACE);
-        gl.glEnable(GL2.GL_DEPTH_TEST);
         gl.glEnable(GL2.GL_BLEND);
         GLFilterView glfilter = this.imageTextureView.getAdapter(GLFilterView.class);
 
