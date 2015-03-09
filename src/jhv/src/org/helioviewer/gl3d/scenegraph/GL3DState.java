@@ -119,11 +119,6 @@ public class GL3DState {
             if (glErrorCode == GL2.GL_INVALID_OPERATION) {
                 // Find the error position
                 int[] err = new int[1];
-                gl.glGetIntegerv(GL2.GL_PROGRAM_ERROR_POSITION_ARB, err, 0);
-                if (err[0] >= 0) {
-                    String error = gl.glGetString(GL2.GL_PROGRAM_ERROR_STRING_ARB);
-                    Log.error("GL error at " + err[0] + ":\n" + error);
-                }
             }
             return true;
         } else {
@@ -148,11 +143,6 @@ public class GL3DState {
             if (glErrorCode == GL2.GL_INVALID_OPERATION) {
                 // Find the error position
                 int[] err = new int[1];
-                gl.glGetIntegerv(GL2.GL_PROGRAM_ERROR_POSITION_ARB, err, 0);
-                if (err[0] >= 0) {
-                    String error = gl.glGetString(GL2.GL_PROGRAM_ERROR_STRING_ARB);
-                    Log.error("GL error at " + err[0] + ":\n" + error);
-                }
             }
             return true;
         } else {
