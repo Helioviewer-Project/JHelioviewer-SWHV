@@ -56,7 +56,7 @@ public class GLSLShader {
             String fragmentText = FileUtils.convertStreamToString(fragmentStream);
             InputStream vertexStream = FileUtils.getResourceInputStream("/data/vertex3d.glsl");
             String vertexText = FileUtils.convertStreamToString(vertexStream);
-            ;
+
             attachVertexShader(gl, vertexText);
             attachFragmentShader(gl, fragmentText);
 
@@ -324,4 +324,5 @@ public class GLSLShader {
     public static void setTruncationValue(float truncationValue) {
         truncationValueFloat[0] = truncationValue;
     }
-};
+
+}

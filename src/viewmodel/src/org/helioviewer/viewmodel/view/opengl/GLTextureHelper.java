@@ -15,8 +15,6 @@ import javax.media.opengl.GL2;
 
 import org.helioviewer.base.logging.Log;
 import org.helioviewer.base.math.Vector2dDouble;
-import org.helioviewer.jhv.gui.states.StateController;
-import org.helioviewer.jhv.gui.states.ViewStateEnum;
 import org.helioviewer.viewmodel.imagedata.ImageData;
 import org.helioviewer.viewmodel.imageformat.ARGB32ImageFormat;
 import org.helioviewer.viewmodel.imageformat.ImageFormat;
@@ -40,24 +38,6 @@ public class GLTextureHelper {
 
     private final static int[] formatMap = { GL2.GL_LUMINANCE4, GL2.GL_LUMINANCE4, GL2.GL_LUMINANCE4, GL2.GL_LUMINANCE4, GL2.GL_LUMINANCE8, GL2.GL_LUMINANCE8, GL2.GL_LUMINANCE8, GL2.GL_LUMINANCE8, GL2.GL_LUMINANCE12, GL2.GL_LUMINANCE12, GL2.GL_LUMINANCE12, GL2.GL_LUMINANCE12, GL2.GL_LUMINANCE16, GL2.GL_LUMINANCE16, GL2.GL_LUMINANCE16, GL2.GL_LUMINANCE16 };
 
-    private static boolean is3D = true;
-
-    /**
-     * Initializes the helper.
-     *
-     * This function has to be called before using any other helper function,
-     * except {@link #setTextureNonPowerOfTwo(boolean)}, which should be called
-     * before.
-     *
-     * @param gl
-     *            Valid reference to the current gl object
-     */
-    public static void initHelper(GL2 gl) {
-        if (StateController.getInstance().getCurrentState().getType() == ViewStateEnum.View2D) {
-            is3D = false;
-        }
-    }
-
     private static void genTexture2D(GL2 gl, int texID, int internalFormat, int width, int height, int inputFormat, int inputType, Buffer buffer) {
         gl.glBindTexture(GL2.GL_TEXTURE_2D, texID);
 
@@ -67,50 +47,6 @@ public class GLTextureHelper {
         gl.glTexParameteri(GL2.GL_TEXTURE_2D, GL2.GL_TEXTURE_MAG_FILTER, GL2.GL_LINEAR);
         gl.glTexParameteri(GL2.GL_TEXTURE_2D, GL2.GL_TEXTURE_WRAP_S, GL2.GL_CLAMP_TO_EDGE);
         gl.glTexParameteri(GL2.GL_TEXTURE_2D, GL2.GL_TEXTURE_WRAP_T, GL2.GL_CLAMP_TO_EDGE);
-    }
-
-    /**
-     * Renders the texture currently loaded to the given region.
-     *
-     * The given texture it is drawn onto a surface using the position and size
-     * of the given region. That way, OpenGL handles the scaling and positioning
-     * of different layers automatically.
-     *
-     * <p>
-     * The texture has to be smaller than the maximum texture size
-     * (GL_MAX_TEXTURE_SIZE).
-     *
-     * @param gl
-     *            Valid reference to the current gl object
-     * @param region
-     *            Position and size to draw the texture
-     */
-    private static void renderTextureToScreen(GL2 gl, Region region) {
-        if (is3D) {
-            return;
-        }
-
-        Vector2dDouble lowerleftCorner = region.getLowerLeftCorner();
-        Vector2dDouble size = region.getSize();
-
-        float x0 = (float) lowerleftCorner.getX();
-        float y0 = (float) lowerleftCorner.getY();
-        float x1 = x0 + (float) size.getX();
-        float y1 = y0 + (float) size.getY();
-
-        gl.glBegin(GL2.GL_QUADS);
-        {
-            gl.glTexCoord2f(0.0f, 1.0f);
-            gl.glVertex2f(x0, y0);
-            gl.glTexCoord2f(1.0f, 1.0f);
-            gl.glVertex2f(x1, y0);
-            gl.glTexCoord2f(1.0f, 0.0f);
-            gl.glVertex2f(x1, y1);
-            gl.glTexCoord2f(0.0f, 0.0f);
-            gl.glVertex2f(x0, y1);
-        }
-        gl.glEnd();
-        gl.glColorMask(true, true, true, true);
     }
 
     /**
@@ -140,7 +76,6 @@ public class GLTextureHelper {
 
         if (width <= GLInfo.maxTextureSize && height <= GLInfo.maxTextureSize) {
             moveImageDataToGLTexture(gl, source, 0, 0, width, height, tex);
-            renderTextureToScreen(gl, region);
         } else {
             Log.error(">> GLTextureHelper.renderImageDataToScreen(GL) > Image data too big: [" + width + "," + height + "]");
         }
