@@ -5,7 +5,7 @@ import javax.media.opengl.GL2;
 import org.helioviewer.viewmodel.filter.AbstractFilter;
 import org.helioviewer.viewmodel.filter.Filter;
 import org.helioviewer.viewmodel.imagedata.ColorMask;
-import org.helioviewer.viewmodel.view.opengl.shader.ShaderFactory;
+import org.helioviewer.viewmodel.view.opengl.shader.GLSLShader;
 
 /**
  * Filter for modifying the color mask of an image.
@@ -34,7 +34,7 @@ public class ChannelMixerFilter extends AbstractFilter implements Filter {
      */
     void setPanel(ChannelMixerPanel panel) {
         this.panel = panel;
-        panel.setValue(ShaderFactory.colorMask);
+        panel.setValue(GLSLShader.colorMask);
     }
 
     /**
@@ -49,10 +49,10 @@ public class ChannelMixerFilter extends AbstractFilter implements Filter {
      */
     void setColorMask(boolean showRed, boolean showGreen, boolean showBlue) {
         ColorMask newColorMask = new ColorMask(showRed, showGreen, showBlue);
-        if (ShaderFactory.colorMask == newColorMask) {
+        if (GLSLShader.colorMask == newColorMask) {
             return;
         }
-        ShaderFactory.colorMask = newColorMask;
+        GLSLShader.colorMask = newColorMask;
         notifyAllListeners();
     }
 
@@ -78,7 +78,7 @@ public class ChannelMixerFilter extends AbstractFilter implements Filter {
         }
 
         setColorMask(Boolean.parseBoolean(values[0]), Boolean.parseBoolean(values[1]), Boolean.parseBoolean(values[2]));
-        panel.setValue(ShaderFactory.colorMask);
+        panel.setValue(GLSLShader.colorMask);
     }
 
     /**
@@ -86,7 +86,7 @@ public class ChannelMixerFilter extends AbstractFilter implements Filter {
      */
     @Override
     public String getState() {
-        return ShaderFactory.colorMask.showRed() + " " + ShaderFactory.colorMask.showGreen() + " " + ShaderFactory.colorMask.showBlue();
+        return GLSLShader.colorMask.showRed() + " " + GLSLShader.colorMask.showGreen() + " " + GLSLShader.colorMask.showBlue();
     }
 
 }

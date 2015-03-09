@@ -15,7 +15,6 @@ import org.helioviewer.viewmodel.imagetransport.Short16ImageTransport;
 import org.helioviewer.viewmodel.view.jp2view.JHVJP2View;
 import org.helioviewer.viewmodel.view.jp2view.JHVJPXView;
 import org.helioviewer.viewmodel.view.opengl.GLTextureHelper;
-import org.helioviewer.viewmodel.view.opengl.shader.ShaderFactory;
 
 /**
  * Filter for applying a color table to a single channel image.
@@ -136,7 +135,6 @@ public class SOHOLUTFilter extends AbstractFilter implements FrameFilter, Filter
     @Override
     public void applyGL(GL2 gl) {
         gl.glActiveTexture(GL2.GL_TEXTURE1);
-        gl.glBindProgramARB(GL2.GL_FRAGMENT_PROGRAM_ARB, ShaderFactory.getFragmentId());
 
         LUT currlut;
         // Note: The lookup table will always be power of two,

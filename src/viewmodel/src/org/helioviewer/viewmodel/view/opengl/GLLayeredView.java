@@ -9,7 +9,7 @@ import org.helioviewer.viewmodel.view.AbstractLayeredView;
 import org.helioviewer.viewmodel.view.View;
 import org.helioviewer.viewmodel.view.ViewHelper;
 import org.helioviewer.viewmodel.view.jp2view.JHVJP2View;
-import org.helioviewer.viewmodel.view.opengl.shader.ShaderFactory;
+import org.helioviewer.viewmodel.view.opengl.shader.GLSLShader;
 
 /**
  * Implementation of LayeredView for rendering in OpenGL mode.
@@ -26,13 +26,13 @@ import org.helioviewer.viewmodel.view.opengl.shader.ShaderFactory;
  *
  */
 public class GLLayeredView extends AbstractLayeredView implements GLView {
-    private final int shaderID = -1;
 
     /**
      * {@inheritDoc}
      */
     @Override
     public void renderGL(GL2 gl, boolean nextView) {
+        GLSLShader.bind(gl);
         for (View v : layers) {
             Layer layer = viewLookup.get(v);
             if (!layer.visibility) {
@@ -40,12 +40,15 @@ public class GLLayeredView extends AbstractLayeredView implements GLView {
             }
             // if layer is GLView, go on, otherwise render now
             if (v instanceof GLView) {
-                ShaderFactory.filter(gl);
+                GLSLShader.bindVars(gl);
+                GLSLShader.filter(gl);
                 ((GLView) v).renderGL(gl, true);
             } else {
                 GLTextureHelper.renderImageDataToScreen(gl, layer.regionView.getRegion(), layer.subimageDataView.getSubimageData(), v.getAdapter(JHVJP2View.class).tex);
             }
         }
+        GLSLShader.unbind(gl);
+
     }
 
     /**

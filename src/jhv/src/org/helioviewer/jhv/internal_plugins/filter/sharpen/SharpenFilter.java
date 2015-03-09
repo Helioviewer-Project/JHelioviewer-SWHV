@@ -4,7 +4,7 @@ import javax.media.opengl.GL2;
 
 import org.helioviewer.viewmodel.filter.AbstractFilter;
 import org.helioviewer.viewmodel.filter.GLImageSizeFilter;
-import org.helioviewer.viewmodel.view.opengl.shader.ShaderFactory;
+import org.helioviewer.viewmodel.view.opengl.shader.GLSLShader;
 
 /**
  * Filter for sharpen an image.
@@ -107,6 +107,6 @@ public class SharpenFilter extends AbstractFilter implements GLImageSizeFilter {
     public void setImageSize(int width, int height) {
         pixelWidth = 1.0f / width;
         pixelHeight = 1.0f / height;
-        ShaderFactory.setFactors(weighting, pixelWidth, pixelHeight, span);
+        GLSLShader.setFactors(weighting, pixelWidth, pixelHeight, span);
     }
 }

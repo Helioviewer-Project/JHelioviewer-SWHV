@@ -12,24 +12,23 @@ import org.helioviewer.viewmodel.view.jp2view.J2KRenderGlobalOptions;
 
 /**
  * Class to check and manage some OpenGL properties.
- * 
+ *
  * @author Markus Langenberg
  * @author Andre Dau
- * 
+ *
  */
 public class GLInfo {
 
-/*
-        TBD
-
-        - pixel scale at startup
-        - fix render mode status
-
-        if (!GLInfo.glIsUsable()) {
-            Message.err("Could not initialize OpenGL", "OpenGL could not be initialized properly during startup.
-            JHelioviewer will start in Software Mode. For detailed information please read the log output. ", false);
-        }
-*/
+    /*
+     * TBD
+     * 
+     * - pixel scale at startup - fix render mode status
+     * 
+     * if (!GLInfo.glIsUsable()) { Message.err("Could not initialize OpenGL",
+     * "OpenGL could not be initialized properly during startup. JHelioviewer
+     * will start in Software Mode. For detailed information please read the log
+     * output. ", false); }
+     */
 
     // data
     private static boolean glUsable = true;
@@ -45,13 +44,13 @@ public class GLInfo {
 
     public static String shaderTmpPath;
 
-    public static int[] pixelScale = new int[] {1,1};
+    public static int[] pixelScale = new int[] { 1, 1 };
 
     /**
      * Updates the OpenGL settings by reading the OpenGL properties.
-     * 
+     *
      * By default, activates OpenGL if possible.
-     * 
+     *
      * @param gl
      *            Valid reference to the current gl object
      * @see #setGlEnabled(boolean)
@@ -77,25 +76,8 @@ public class GLInfo {
             glUsable = false;
         }
 
-        if (!gl.isExtensionAvailable("GL_ARB_multitexture")) {
-            Log.error(">> GLInfo.update(GL) > GL_ARB_multitexture extension not supported. JHelioviewer will run in software mode.");
-            glUsable = false;
-        }
-
-        if (!gl.isExtensionAvailable("GL_ARB_fragment_program")) {
-            Log.error(">> GLInfo.update(GL) > GL_ARB_fragment_program extension not supported. JHelioviewer will run in software mode.");
-            glUsable = false;
-        }
-
         if (glUsable == true) {
             int[] out = new int[1];
-
-            gl.glGetProgramivARB(GL2.GL_VERTEX_PROGRAM_ARB, GL2.GL_MAX_PROGRAM_INSTRUCTIONS_ARB, out, 0);
-            Log.debug(">> GLInfo > GL_MAX_PROGRAM_INSTRUCTIONS = " + out[0]);
-            gl.glGetProgramivARB(GL2.GL_VERTEX_PROGRAM_ARB, GL2.GL_MAX_PROGRAM_PARAMETERS_ARB, out, 0);
-            Log.debug(">> GLInfo > GL_MAX_PROGRAM_PARAMETERS   = " + out[0]);
-            gl.glGetProgramivARB(GL2.GL_VERTEX_PROGRAM_ARB, GL2.GL_MAX_PROGRAM_TEMPORARIES_ARB, out, 0);
-            Log.debug(">> GLInfo > GL_MAX_PROGRAM_TEMPORARIES   = " + out[0]);
 
             out[0] = 0;
             gl.glGetIntegerv(GL2.GL_MAX_DRAW_BUFFERS, out, 0);
@@ -116,16 +98,6 @@ public class GLInfo {
             maxConstantRegisters = out[0];
             Log.debug(">> GLInfo > max fragment uniform components arb: " + out[0]);
 
-            out[0] = 0;
-            gl.glGetIntegerv(GL2.GL_MAX_VERTEX_ATTRIBS_ARB, out, 0);
-            maxVertexAttributes = out[0];
-            Log.debug(">> GLInfo > max vertex attributes arb: " + out[0]);
-
-            out[0] = 0;
-            gl.glGetProgramivARB(GL2.GL_FRAGMENT_PROGRAM_ARB, GL2.GL_MAX_PROGRAM_TEX_INDIRECTIONS_ARB, out, 0);
-            maxTextureIndirections = out[0];
-            Log.debug(">> GLInfo > max texture indirections: " + out[0]);
-
             shaderTmpPath = JHVDirectory.TEMP.getPath();
             Log.debug(">> GLInfo > shader temp path: " + shaderTmpPath);
 
@@ -141,7 +113,7 @@ public class GLInfo {
 
     /**
      * Returns the OpenGL version available on this machine.
-     * 
+     *
      * @return OpenGL version
      */
     public static String getVersion() {

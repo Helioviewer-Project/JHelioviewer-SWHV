@@ -4,7 +4,7 @@ import javax.media.opengl.GL2;
 
 import org.helioviewer.viewmodel.filter.AbstractFilter;
 import org.helioviewer.viewmodel.filter.Filter;
-import org.helioviewer.viewmodel.view.opengl.shader.ShaderFactory;
+import org.helioviewer.viewmodel.view.opengl.shader.GLSLShader;
 
 /**
  * Filter for enhancing the contrast of the image.
@@ -60,7 +60,7 @@ public class ContrastFilter extends AbstractFilter implements Filter {
             return;
         }
         contrast = newContrast;
-        ShaderFactory.setContrast(contrast);
+        GLSLShader.setContrast(contrast);
         notifyAllListeners();
     }
 
@@ -69,7 +69,7 @@ public class ContrastFilter extends AbstractFilter implements Filter {
      */
     @Override
     public void applyGL(GL2 gl) {
-        ShaderFactory.setContrast(contrast);
+        GLSLShader.setContrast(contrast);
     }
 
     /**

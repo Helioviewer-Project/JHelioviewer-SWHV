@@ -4,7 +4,7 @@ import javax.media.opengl.GL2;
 
 import org.helioviewer.viewmodel.filter.AbstractFilter;
 import org.helioviewer.viewmodel.filter.Filter;
-import org.helioviewer.viewmodel.view.opengl.shader.ShaderFactory;
+import org.helioviewer.viewmodel.view.opengl.shader.GLSLShader;
 
 /**
  * Filter for applying gamma correction.
@@ -68,7 +68,7 @@ public class GammaCorrectionFilter extends AbstractFilter implements Filter {
      */
     @Override
     public void applyGL(GL2 gl) {
-        ShaderFactory.setGamma(gamma);
+        GLSLShader.setGamma(gamma);
     }
 
     /**

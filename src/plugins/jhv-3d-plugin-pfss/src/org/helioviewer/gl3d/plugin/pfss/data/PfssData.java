@@ -238,9 +238,6 @@ public class PfssData {
         gl.glEnableClientState(GL2.GL_VERTEX_ARRAY);
         gl.glEnableClientState(GL2.GL_COLOR_ARRAY);
 
-        gl.glDisable(GL2.GL_FRAGMENT_PROGRAM_ARB);
-        gl.glDisable(GL2.GL_VERTEX_PROGRAM_ARB);
-
         gl.glDisable(GL2.GL_TEXTURE_2D);
         gl.glDisable(GL2.GL_TEXTURE_1D);
 
