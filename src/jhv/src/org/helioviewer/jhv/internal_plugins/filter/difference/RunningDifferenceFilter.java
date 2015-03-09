@@ -14,7 +14,7 @@ import org.helioviewer.viewmodel.imagedata.ImageData;
 import org.helioviewer.viewmodel.view.jp2view.JHVJP2View;
 import org.helioviewer.viewmodel.view.jp2view.JHVJPXView;
 import org.helioviewer.viewmodel.view.opengl.GLTextureHelper;
-import org.helioviewer.viewmodel.view.opengl.shader.ShaderFactory;
+import org.helioviewer.viewmodel.view.opengl.shader.GLSLShader;
 
 /**
  * Filter applying running difference to some movie
@@ -106,22 +106,22 @@ public class RunningDifferenceFilter implements FrameFilter, Filter {
             if (StateController.getInstance().getCurrentState().getType() == ViewStateEnum.View3D) {
                 if (jpxView.getBaseDifferenceMode()) {
                     if (this.baseDifferenceNoRot) {
-                        ShaderFactory.setIsDifference(0.26f);
+                        GLSLShader.setIsDifference(0.26f);
                     } else {
-                        ShaderFactory.setIsDifference(0.99f);
+                        GLSLShader.setIsDifference(0.99f);
                     }
                 } else {
                     if (this.runDiffNoRot) {
-                        ShaderFactory.setIsDifference(0.25f);
+                        GLSLShader.setIsDifference(0.25f);
                     } else {
-                        ShaderFactory.setIsDifference(1.0f);
+                        GLSLShader.setIsDifference(1.0f);
                     }
                 }
             } else {
                 if (jpxView.getBaseDifferenceMode()) {
-                    ShaderFactory.setIsDifference(0.26f);
+                    GLSLShader.setIsDifference(0.26f);
                 } else {
-                    ShaderFactory.setIsDifference(0.25f);
+                    GLSLShader.setIsDifference(0.25f);
                 }
             }
             ImageData previousFrame;
@@ -131,14 +131,14 @@ public class RunningDifferenceFilter implements FrameFilter, Filter {
                 previousFrame = jpxView.getBaseDifferenceImageData();
             }
             if (this.currentFrame != previousFrame) {
-                ShaderFactory.setTruncationValue(this.truncationValue);
+                GLSLShader.setTruncationValue(this.truncationValue);
 
                 gl.glActiveTexture(GL2.GL_TEXTURE2);
                 GLTextureHelper.moveImageDataToGLTexture(gl, previousFrame, 0, 0, previousFrame.getWidth(), previousFrame.getHeight(), tex);
                 gl.glActiveTexture(GL2.GL_TEXTURE0);
             }
         } else {
-            ShaderFactory.setIsDifference(0.0f);
+            GLSLShader.setIsDifference(0.0f);
         }
     }
 

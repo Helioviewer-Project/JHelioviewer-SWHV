@@ -11,6 +11,7 @@ import org.helioviewer.gl3d.scenegraph.GL3DGroup;
 import org.helioviewer.gl3d.scenegraph.GL3DNode;
 import org.helioviewer.gl3d.scenegraph.GL3DState;
 import org.helioviewer.viewmodel.view.opengl.GL3DImageTextureView;
+import org.helioviewer.viewmodel.view.opengl.shader.GLSLShader;
 
 /**
  * The {@link GL3DImageLayers} node offers special capabilities for grouping
@@ -50,15 +51,13 @@ public class GL3DImageLayers extends GL3DGroup {
 
         state.gl.glEnable(GL2.GL_BLEND);
         state.gl.glBlendFunc(GL2.GL_SRC_ALPHA, GL2.GL_ONE_MINUS_SRC_ALPHA);
-
-        state.gl.glEnable(GL2.GL_FRAGMENT_PROGRAM_ARB);
-        state.gl.glEnable(GL2.GL_VERTEX_PROGRAM_ARB);
+        GLSLShader.bind(state.gl);
 
         for (GL3DImageLayer layer : layers) {
             layer.draw(state);
         }
-        state.gl.glDisable(GL2.GL_FRAGMENT_PROGRAM_ARB);
-        state.gl.glDisable(GL2.GL_VERTEX_PROGRAM_ARB);
+        GLSLShader.unbind(state.gl);
+
         state.gl.glDisable(GL2.GL_BLEND);
         state.gl.glDisable(GL2.GL_BLEND);
     }

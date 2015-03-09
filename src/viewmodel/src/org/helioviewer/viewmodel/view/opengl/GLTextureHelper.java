@@ -1,6 +1,5 @@
 package org.helioviewer.viewmodel.view.opengl;
 
-import java.awt.Rectangle;
 import java.awt.image.BufferedImage;
 import java.awt.image.DataBuffer;
 import java.awt.image.DataBufferByte;
@@ -14,12 +13,10 @@ import java.nio.ShortBuffer;
 
 import javax.media.opengl.GL2;
 
-import org.helioviewer.jhv.gui.states.StateController;
-import org.helioviewer.jhv.gui.states.ViewStateEnum;
-
 import org.helioviewer.base.logging.Log;
 import org.helioviewer.base.math.Vector2dDouble;
-import org.helioviewer.viewmodel.imagedata.ColorMask;
+import org.helioviewer.jhv.gui.states.StateController;
+import org.helioviewer.jhv.gui.states.ViewStateEnum;
 import org.helioviewer.viewmodel.imagedata.ImageData;
 import org.helioviewer.viewmodel.imageformat.ARGB32ImageFormat;
 import org.helioviewer.viewmodel.imageformat.ImageFormat;
@@ -63,6 +60,7 @@ public class GLTextureHelper {
 
     private static void genTexture2D(GL2 gl, int texID, int internalFormat, int width, int height, int inputFormat, int inputType, Buffer buffer) {
         gl.glBindTexture(GL2.GL_TEXTURE_2D, texID);
+
         gl.glTexImage2D(GL2.GL_TEXTURE_2D, 0, internalFormat, width, height, 0, inputFormat, inputType, buffer);
 
         gl.glTexParameteri(GL2.GL_TEXTURE_2D, GL2.GL_TEXTURE_MIN_FILTER, GL2.GL_LINEAR);
@@ -394,6 +392,7 @@ public class GLTextureHelper {
             return texID;
         }
 
+        @Override
         protected void finalize() {
             if (texID != -1) {
                 gl.glDeleteTextures(1, new int[] { texID }, 0);

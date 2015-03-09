@@ -24,7 +24,7 @@ import org.helioviewer.viewmodel.view.SubimageDataView;
 import org.helioviewer.viewmodel.view.View;
 import org.helioviewer.viewmodel.view.ViewListener;
 import org.helioviewer.viewmodel.view.jp2view.JHVJPXView;
-import org.helioviewer.viewmodel.view.opengl.shader.ShaderFactory;
+import org.helioviewer.viewmodel.view.opengl.shader.GLSLShader;
 
 public class GL3DImageTextureView extends AbstractGL3DView implements GL3DView {
 
@@ -79,8 +79,8 @@ public class GL3DImageTextureView extends AbstractGL3DView implements GL3DView {
             theta = -md.getStonyhurstLatitude() / MathUtils.radeg;
         }
 
-        ShaderFactory.changeRect(xOffset, yOffset, xScale, yScale);
-        ShaderFactory.changeAngles(theta, phi);
+        GLSLShader.changeRect(xOffset, yOffset, xScale, yScale);
+        GLSLShader.changeAngles(theta, phi);
 
         JHVJPXView jhvjpx = this.getAdapter(JHVJPXView.class);
         if (jhvjpx != null) {
@@ -107,8 +107,8 @@ public class GL3DImageTextureView extends AbstractGL3DView implements GL3DView {
                 double diffTheta = -Astronomy.getB0InRadians(diffDate);
                 double diffPhi = Astronomy.getL0Radians(diffDate);
 
-                ShaderFactory.setDifferenceRect(diffXOffset, diffYOffset, diffXScale, diffYScale);
-                ShaderFactory.changeDifferenceAngles(diffTheta, diffPhi);
+                GLSLShader.setDifferenceRect(diffXOffset, diffYOffset, diffXScale, diffYScale);
+                GLSLShader.changeDifferenceAngles(diffTheta, diffPhi);
             }
         }
 
@@ -120,7 +120,7 @@ public class GL3DImageTextureView extends AbstractGL3DView implements GL3DView {
             outerCutOff = md.getOuterPhysicalOcculterRadius();
         }
 
-        ShaderFactory.setCutOffRadius(innerCutOff, outerCutOff);
+        GLSLShader.setCutOffRadius(innerCutOff, outerCutOff);
 
         this.recaptureRequested = false;
         return region;

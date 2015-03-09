@@ -28,7 +28,7 @@ import org.helioviewer.viewmodel.view.ViewListener;
 import org.helioviewer.viewmodel.view.opengl.GL3DImageTextureView;
 import org.helioviewer.viewmodel.view.opengl.GL3DView;
 import org.helioviewer.viewmodel.view.opengl.GLFilterView;
-import org.helioviewer.viewmodel.view.opengl.shader.ShaderFactory;
+import org.helioviewer.viewmodel.view.opengl.shader.GLSLShader;
 
 import com.jogamp.common.nio.Buffers;
 
@@ -219,16 +219,18 @@ public class GL3DImageLayer extends GL3DShape {
     @Override
     public void shapeDraw(GL3DState state) {
         GL2 gl = state.gl;
+        GLSLShader.bind(state.gl);
+        GLSLShader.bindVars(state.gl);
+
         gl.glEnable(GL2.GL_CULL_FACE);
         gl.glEnable(GL2.GL_BLEND);
         GLFilterView glfilter = this.imageTextureView.getAdapter(GLFilterView.class);
 
-        ShaderFactory.bindVertexShader(gl);
-        ShaderFactory.bindFragmentShader(gl);
         if (glfilter != null) {
             glfilter.renderGL(gl, true);
         }
-        ShaderFactory.filter(gl);
+        GLSLShader.filter(gl);
+        GLSLShader.bind(state.gl);
 
         enablePositionVBO(state);
         enableIndexVBO(state);
@@ -245,6 +247,7 @@ public class GL3DImageLayer extends GL3DShape {
         }
         disableIndexVBO(state);
         disablePositionVBO(state);
+        GLSLShader.unbind(state.gl);
 
         gl.glColorMask(true, true, true, true);
 

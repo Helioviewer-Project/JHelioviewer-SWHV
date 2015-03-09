@@ -78,8 +78,6 @@ public class GLFilterView extends StandardFilterView implements GLView {
         updatePrecomputedViews();
         refilterPrepare();
 
-        gl.glEnable(GL2.GL_FRAGMENT_PROGRAM_ARB);
-
         filter.applyGL(gl);
         if (view instanceof GLView) {
             ((GLView) view).renderGL(gl, true);

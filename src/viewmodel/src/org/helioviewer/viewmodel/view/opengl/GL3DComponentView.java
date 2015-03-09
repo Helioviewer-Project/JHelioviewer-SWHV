@@ -36,7 +36,7 @@ import org.helioviewer.viewmodel.view.RegionView;
 import org.helioviewer.viewmodel.view.View;
 import org.helioviewer.viewmodel.view.jp2view.JHVJP2View;
 import org.helioviewer.viewmodel.view.jp2view.JHVJPXView;
-import org.helioviewer.viewmodel.view.opengl.shader.ShaderFactory;
+import org.helioviewer.viewmodel.view.opengl.shader.GLSLShader;
 
 import com.jogamp.opengl.util.TileRenderer;
 import com.jogamp.opengl.util.awt.AWTGLPixelBuffer;
@@ -253,7 +253,7 @@ public class GL3DComponentView extends AbstractComponentView implements GLEventL
 
         GLInfo.update((GLCanvas) drawable);
 
-        ShaderFactory.initShader(gl);
+        GLSLShader.initShader(gl);
         GL3DState.create(gl);
         GLTextureHelper.initHelper(gl);
 
@@ -328,11 +328,10 @@ public class GL3DComponentView extends AbstractComponentView implements GLEventL
             gl.glTranslatef(0.0f, height, 0.0f);
             gl.glScalef(1.0f, -1.0f, 1.0f);
             gl.glColor4f(1, 1, 1, 0);
-            gl.glDisable(GL2.GL_DEPTH_TEST);
             gl.glEnable(GL2.GL_TEXTURE_2D);
 
             GLScreenRenderGraphics glRenderer = new GLScreenRenderGraphics(gl);
-            /*synchronized (postRenderers)*/ {
+            /* synchronized (postRenderers) */{
                 for (ScreenRenderer r : postRenderers) {
                     r.render(glRenderer);
                 }
