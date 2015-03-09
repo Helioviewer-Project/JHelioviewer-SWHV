@@ -28,4 +28,7 @@ public interface MultiFrameMetaDataContainer extends MetaDataContainer {
      * @return value corresponding to the key, null if the key does not exist
      */
     public String get(String key, int frameNumber) throws IOException;
+
+    public int getNumberFrames();
+
 }

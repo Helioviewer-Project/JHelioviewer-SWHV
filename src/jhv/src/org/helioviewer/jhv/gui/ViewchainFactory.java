@@ -16,7 +16,6 @@ import org.helioviewer.viewmodel.view.ComponentView;
 import org.helioviewer.viewmodel.view.FilterView;
 import org.helioviewer.viewmodel.view.ImageInfoView;
 import org.helioviewer.viewmodel.view.LayeredView;
-import org.helioviewer.viewmodel.view.MetaDataView;
 import org.helioviewer.viewmodel.view.ModifiableInnerViewView;
 import org.helioviewer.viewmodel.view.MovieView;
 import org.helioviewer.viewmodel.view.StandardSolarRotationTrackingView;
@@ -51,7 +50,7 @@ import org.helioviewer.viewmodelplugin.overlay.OverlayPanel;
  */
 public class ViewchainFactory {
 
-    private ViewFactory viewFactory;
+    private final ViewFactory viewFactory;
 
     /**
      * Default constructor.

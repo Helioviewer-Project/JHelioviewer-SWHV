@@ -6,6 +6,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.SocketTimeoutException;
 import java.net.URI;
+
+import java.util.ArrayList;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.concurrent.locks.Lock;
@@ -184,6 +186,7 @@ public class JP2Image implements MultiFrameMetaDataContainer {
         createKakaduMachinery();
 
         xmlCache = new NodeList[layerRange.getEnd() + 1];
+        cacheXMLs();
     }
 
     /**
@@ -420,11 +423,14 @@ public class JP2Image implements MultiFrameMetaDataContainer {
      * @return True, if the image contains multiple frames, false otherwise
      */
     public boolean isMultiFrame() {
-        int frameCount = getCompositionLayerRange().getEnd() - getCompositionLayerRange().getStart() + 1;// fix
-                                                                                                         // for
-                                                                                                         // 2
-                                                                                                         // images
+        int frameCount = layerRange.getEnd() + 1;
         return isJpx && frameCount > 1;
+    }
+
+    public int getNumberFrames() {
+        if (!isJpx)
+            return 1;
+        return layerRange.getEnd() + 1;
     }
 
     public Jp2_threadsafe_family_src getFamilySrc() {
@@ -447,29 +453,12 @@ public class JP2Image implements MultiFrameMetaDataContainer {
         return getValueFromXML(_keyword, _box, boxNumber);
     }
 
-    /**
-     * Method that returns value of specified _keyword from specified _box.
-     *
-     * @param _keyword
-     * @param _box
-     * @param _boxNumber
-     * @throws JHV_KduException
-     */
-    public String getValueFromXML(String _keyword, String _box, int _boxNumber) throws JHV_KduException {
+    private void cacheXMLs() throws JHV_KduException {
+        String xml;
+        ArrayList<String> xmls = KakaduUtils.getAllXMLs(familySrc, xmlCache.length);
 
-        if (xmlCache[_boxNumber - 1] == null) {
-            String xml = null;
-
-            lock.lock();
-            try {
-                xml = KakaduUtils.getXml(familySrc, _boxNumber);
-            } catch (JHV_KduException e) {
-                throw e;
-            } finally {
-                lock.unlock();
-            }
-
-            if (xml == null) {
+        for (int i = 0; i < xmlCache.length; i++) {
+            if ((xml = xmls.get(i)) == null) {
                 throw new JHV_KduException("No XML data present");
             } else if (!xml.contains("</meta>")) {
                 throw new JHV_KduException("XML data incomplete");
@@ -487,13 +476,22 @@ public class JP2Image implements MultiFrameMetaDataContainer {
             try {
                 DocumentBuilder builder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
                 Document doc = builder.parse(in);
-
-                xmlCache[_boxNumber - 1] = doc.getElementsByTagName("meta");
+                xmlCache[i] = doc.getElementsByTagName("meta");
             } catch (Exception e) {
                 throw new JHV_KduException("Failed parsing XML data", e);
             }
         }
+    }
 
+    /**
+     * Method that returns value of specified _keyword from specified _box.
+     *
+     * @param _keyword
+     * @param _box
+     * @param _boxNumber
+     * @throws JHV_KduException
+     */
+    public String getValueFromXML(String _keyword, String _box, int _boxNumber) throws JHV_KduException {
         try {
             NodeList nodes = ((Element) xmlCache[_boxNumber - 1].item(0)).getElementsByTagName(_box);
             NodeList value = ((Element) nodes.item(0)).getElementsByTagName(_keyword);
@@ -615,7 +613,6 @@ public class JP2Image implements MultiFrameMetaDataContainer {
      */
     @Override
     public double tryGetDouble(String key) {
-
         String string = get(key);
         if (string != null) {
             try {
@@ -633,7 +630,6 @@ public class JP2Image implements MultiFrameMetaDataContainer {
      */
     @Override
     public int tryGetInt(String key) {
-
         String string = get(key);
         if (string != null) {
             try {
@@ -659,7 +655,6 @@ public class JP2Image implements MultiFrameMetaDataContainer {
      */
     @Override
     public int getPixelWidth() {
-
         return getResolutionSet().getResolutionLevel(0).getResolutionBounds().width;
     }
 
@@ -774,14 +769,13 @@ public class JP2Image implements MultiFrameMetaDataContainer {
      * Deactivates the internal color lookup table for the given composition
      * layer.
      *
-     * It is not allowed to call this function for a layer, which is not loaded
+     * It is not allowed to call this function for a layer which is not loaded
      * yet.
      *
      * @param numLayer
      *            composition layer to deactivate internal color lookup for
      */
     void deactivateColorLookupTable(int numLayer) {
-
         try {
             lock.lock();
             Jpx_codestream_source jpxStream = jpxSrc.Access_codestream(0);
@@ -831,4 +825,5 @@ public class JP2Image implements MultiFrameMetaDataContainer {
     static int numJP2ImagesInUse() {
         return numJP2Images;
     }
+
 }
