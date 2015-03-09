@@ -5,6 +5,8 @@ import java.io.EOFException;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 
+import java.util.ArrayList;
+
 import kdu_jni.Jp2_input_box;
 import kdu_jni.Jp2_locator;
 import kdu_jni.Jp2_threadsafe_family_src;
@@ -146,7 +148,7 @@ public class KakaduUtils {
      * @return Box found and its superbox if one was opened
      * @throws JHV_KduException
      */
-    public static Jp2_input_box[] findBox(Jp2_threadsafe_family_src _familySrc, long _boxType, int _boxNumber) throws JHV_KduException {
+    private static Jp2_input_box[] findBox(Jp2_threadsafe_family_src _familySrc, long _boxType, int _boxNumber) throws JHV_KduException {
         Jp2_locator jp2Locator = null;
         Jp2_input_box box = null, box_final = null;
         Jp2_input_box result[] = { null, null };
@@ -235,7 +237,7 @@ public class KakaduUtils {
      * @return Box found
      * @throws JHV_KduException
      */
-    public static Jp2_input_box findBox2(Jp2_input_box _supBox, long _boxType, int _boxNumber) throws JHV_KduException {
+    private static Jp2_input_box findBox2(Jp2_input_box _supBox, long _boxType, int _boxNumber) throws JHV_KduException {
         Jp2_input_box box = null;
 
         try {
@@ -352,6 +354,79 @@ public class KakaduUtils {
         return xml;
     }
 
+    private static String xmlBox2xml(Jp2_input_box xmlBox) throws JHV_KduException {
+        String xml = null;
+
+        try {
+            // Grab the xml data if available
+            if (xmlBox.Get_remaining_bytes() > 0) {
+                int len = (int) xmlBox.Get_remaining_bytes();
+                byte[] buf = new byte[len];
+                xmlBox.Read(buf, len);
+                xml = new String(buf, "UTF-8");
+            }
+        } catch (KduException ex) {
+            throw new JHV_KduException("Kakadu core error: " + ex.getMessage(), ex);
+        } catch (UnsupportedEncodingException ex) {
+            ex.printStackTrace();
+            xml = null;
+        }
+
+        if (xml != null) {
+            try {
+                if (xml.indexOf("<?xml version=\"1.0\" encoding=\"UTF-8\"?>") != 0)
+                    xml = xml.substring(xml.indexOf("<meta>"));
+                if (xml.indexOf("<?xml version=\"1.0\" encoding=\"UTF-8\"?>") != 0)
+                    xml = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" + xml;
+            } catch (Exception ex) {
+                throw new JHV_KduException("Failed parsing XML data", ex);
+            }
+        }
+
+        return xml;
+    }
+
+    public static ArrayList<String> getAllXMLs(Jp2_threadsafe_family_src _familySrc, int num) throws JHV_KduException {
+        Jp2_input_box findBoxResult[], assocBox, xmlBox;
+        ArrayList<String> xmls = new ArrayList<String>(num);
+
+        findBoxResult = KakaduUtils.findBox(_familySrc, Kdu_global.jp2_association_4cc, 1);
+        assocBox = findBoxResult[0];
+
+        if (assocBox != null) {
+            for (int i = 0; i < num; i++) {
+                xmlBox = KakaduUtils.findBox2(assocBox, Kdu_global.jp2_xml_4cc, 1);
+                if (xmlBox != null) {
+                    xmls.add(i, xmlBox2xml(xmlBox));
+                    xmlBox.Native_destroy();
+                }
+
+                try {
+                    assocBox.Close();
+                    assocBox.Open_next();
+                } catch (KduException ex) {
+                    throw new JHV_KduException("Kakadu core error: " + ex.getMessage(), ex);
+                }
+            }
+        } else { // JP2
+            findBoxResult = KakaduUtils.findBox(_familySrc, Kdu_global.jp2_xml_4cc, 1);
+            xmlBox = findBoxResult[0];
+            if (xmlBox != null)
+                xmls.add(0, xmlBox2xml(xmlBox));
+        }
+
+        if (findBoxResult[1] != null) {
+            findBoxResult[1].Native_destroy();
+        }
+
+        if (findBoxResult[0] != null) {
+            findBoxResult[0].Native_destroy();
+        }
+
+        return xmls;
+    }
+
+
     /**
      * This method updates the server cache model. The JPIPSocket object should
      * be connected already.
@@ -377,4 +452,5 @@ public class KakaduUtils {
 
         _cache.addJPIPResponseData(res);
     }
-};
+
+}
