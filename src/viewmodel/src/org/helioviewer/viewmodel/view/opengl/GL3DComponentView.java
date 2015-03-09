@@ -255,7 +255,6 @@ public class GL3DComponentView extends AbstractComponentView implements GLEventL
 
         GLSLShader.initShader(gl);
         GL3DState.create(gl);
-        GLTextureHelper.initHelper(gl);
 
         draw.init(gl);
     }
