@@ -32,9 +32,7 @@ public class GL3DCameraFOV extends GL3DMesh {
     @Override
     public void shapeDraw(GL3DState state) {
         this.markAsChanged();
-        state.gl.glDisable(GL2.GL_DEPTH_TEST);
         state.gl.glColor3d(1., 0., 0.);
-        state.gl.glEnable(GL2.GL_DEPTH_TEST);
         GL2 gl = state.gl;
         gl.glLineWidth(2.5f);
         gl.glColor3d(0.0f, 1.0f, 0.0f);
