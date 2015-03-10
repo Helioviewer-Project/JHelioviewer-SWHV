@@ -9,7 +9,6 @@ import org.helioviewer.viewmodel.imagedata.ColorMask;
 
 public class GLSLShader {
 
-    private static final int MAX_TEXTURES = 10;
     private static int vertexID;
     private static int fragmentID;
     private static int progID;
