@@ -1,8 +1,6 @@
 package org.helioviewer.jhv.gui.states;
 
-import org.helioviewer.base.logging.Log;
 import org.helioviewer.gl3d.gui.GL3DCameraMouseController;
-import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.gui.GL3DViewchainFactory;
 import org.helioviewer.jhv.gui.components.statusplugins.RenderModeStatusPanel;
 import org.helioviewer.jhv.gui.interfaces.ImagePanelInputController;
@@ -18,26 +16,6 @@ public class GuiState implements State {
 
     public GuiState(boolean is3d) {
         this.is3d = is3d;
-    }
-
-    @Override
-    public void createViewChains() {
-        Log.info("Start creating view chains");
-
-        // Create main view chain
-
-    }
-
-    @Override
-    public boolean recreateViewChains(State previousState) {
-        Displayer.getSingletonInstance().removeListeners();
-
-        if (mainComponentView == null) {
-            this.createViewChains();
-            return true;
-        } else {
-            return false;
-        }
     }
 
     @Override
