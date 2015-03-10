@@ -9,9 +9,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
-import java.util.ArrayList;
 import java.util.LinkedList;
-import java.util.List;
 
 import javax.swing.BoxLayout;
 import javax.swing.DefaultListModel;
@@ -26,7 +24,6 @@ import org.helioviewer.jhv.gui.ImageViewerGui;
 import org.helioviewer.jhv.gui.ViewchainFactory;
 import org.helioviewer.jhv.gui.interfaces.ShowableDialog;
 import org.helioviewer.jhv.gui.states.StateController;
-import org.helioviewer.viewmodel.view.ComponentView;
 import org.helioviewer.viewmodel.view.ImageInfoView;
 import org.helioviewer.viewmodel.view.LayeredView;
 import org.helioviewer.viewmodel.view.ModifiableInnerViewView;
@@ -41,7 +38,7 @@ import org.helioviewer.viewmodelplugin.interfaces.Container;
  * {@link Container}. {@link Container} can be moved between those both status.
  * When the dialog will be closed, it saves the latest settings and rebuilds the
  * view chains.
- * 
+ *
  * @author Stephan Pagel
  */
 public abstract class AbstractPluginDialog extends JDialog implements ShowableDialog, ActionListener, WindowListener {
@@ -73,7 +70,7 @@ public abstract class AbstractPluginDialog extends JDialog implements ShowableDi
 
     /**
      * Basic constructor which has to be called from inherited class.
-     * 
+     *
      * @param title
      *            Title which should be displayed in the dialog header.
      */
@@ -272,7 +269,6 @@ public abstract class AbstractPluginDialog extends JDialog implements ShowableDi
         // filters will be added to the corresponding sub chains.
         LayeredView mainLayeredView = ImageViewerGui.getSingletonInstance().getMainView().getAdapter(LayeredView.class);
         LinkedList<ImageInfoView> newImageInfoViews = new LinkedList<ImageInfoView>();
-        List<ImageInfoView> synchronizedInfoViews = new ArrayList<ImageInfoView>();
 
         while (mainLayeredView.getNumLayers() > 0) {
             // detach image info views from main view chain in order to reuse
@@ -310,7 +306,7 @@ public abstract class AbstractPluginDialog extends JDialog implements ShowableDi
      * Adds a button to the activated list. The button will occur below the
      * list. The event the button will cause has to deal with the data of the
      * activated list.
-     * 
+     *
      * @param button
      *            Button which has to be added to the activated list.
      */
@@ -322,7 +318,7 @@ public abstract class AbstractPluginDialog extends JDialog implements ShowableDi
      * Adds a button to the available list. The button will occur below the
      * list. The event the button will cause has to deal with the data of the
      * available list.
-     * 
+     *
      * @param button
      *            Button which has to be added to the available list.
      */
@@ -332,7 +328,7 @@ public abstract class AbstractPluginDialog extends JDialog implements ShowableDi
 
     /**
      * Sets a tool tip text to the activate button.
-     * 
+     *
      * @param text
      *            Text to display as tool tip.
      */
@@ -342,7 +338,7 @@ public abstract class AbstractPluginDialog extends JDialog implements ShowableDi
 
     /**
      * Sets a tool tip text to the deactivate button.
-     * 
+     *
      * @param text
      *            Text to display as tool tip.
      */
@@ -385,6 +381,7 @@ public abstract class AbstractPluginDialog extends JDialog implements ShowableDi
     /**
      * React on clicked buttons.
      */
+    @Override
     public void actionPerformed(ActionEvent arg0) {
         if (arg0.getSource() == closeButton) {
             closeDialog();
@@ -402,6 +399,7 @@ public abstract class AbstractPluginDialog extends JDialog implements ShowableDi
     /**
      * {@inheritDoc}
      */
+    @Override
     public void showDialog() {
         pack();
         setSize(getPreferredSize());
@@ -413,25 +411,32 @@ public abstract class AbstractPluginDialog extends JDialog implements ShowableDi
     // Window Listener
     // ////////////////////////////////////////////////////////////////
 
+    @Override
     public void windowActivated(WindowEvent e) {
     }
 
+    @Override
     public void windowClosed(WindowEvent e) {
     }
 
+    @Override
     public void windowClosing(WindowEvent e) {
         closeDialog();
     }
 
+    @Override
     public void windowDeactivated(WindowEvent e) {
     }
 
+    @Override
     public void windowDeiconified(WindowEvent e) {
     }
 
+    @Override
     public void windowIconified(WindowEvent e) {
     }
 
+    @Override
     public void windowOpened(WindowEvent e) {
     }
 }
