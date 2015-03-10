@@ -21,10 +21,6 @@ import javax.swing.event.ChangeListener;
 
 import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.gui.components.base.WheelSupport;
-import org.helioviewer.jhv.gui.states.State;
-import org.helioviewer.jhv.gui.states.StateController;
-import org.helioviewer.jhv.gui.states.StateController.StateChangeListener;
-import org.helioviewer.jhv.gui.states.ViewStateEnum;
 import org.helioviewer.viewmodel.filter.Filter;
 import org.helioviewer.viewmodelplugin.filter.FilterPanel;
 import org.helioviewer.viewmodelplugin.filter.FilterTabPanelManager.Area;
@@ -35,7 +31,7 @@ import org.helioviewer.viewmodelplugin.filter.FilterTabPanelManager.Area;
  * @author Helge Dietert
  *
  */
-public class RunningDifferencePanel extends FilterPanel implements ChangeListener, StateChangeListener {
+public class RunningDifferencePanel extends FilterPanel implements ChangeListener {
     /**
      * Generated serial id from Eclipse
      */
@@ -52,7 +48,6 @@ public class RunningDifferencePanel extends FilterPanel implements ChangeListene
      * valid filter has been set.
      */
     public RunningDifferencePanel() {
-        StateController.getInstance().addStateChangeListener(this);
 
         this.setLayout(new BoxLayout(this, BoxLayout.PAGE_AXIS));
         addRadioButtons();
@@ -202,15 +197,6 @@ public class RunningDifferencePanel extends FilterPanel implements ChangeListene
             setEnabled(true);
         } else {
             setEnabled(false);
-        }
-    }
-
-    @Override
-    public void stateChanged(State newState, State oldState, StateController stateController) {
-        if (newState.getType() == ViewStateEnum.View3D) {
-            diffRot.setVisible(true);
-        } else {
-            diffRot.setVisible(false);
         }
     }
 
