@@ -96,7 +96,7 @@ public class RunningDifferencePanel extends FilterPanel implements ChangeListene
                     radRunDiff.setSelected(false);
                     radBaseDiff.setSelected(false);
                 }
-                Displayer.getSingletonInstance().display();
+                Displayer.display();
             }
         });
 
@@ -114,7 +114,7 @@ public class RunningDifferencePanel extends FilterPanel implements ChangeListene
                     radNone.setSelected(false);
                     radBaseDiff.setSelected(false);
                 }
-                Displayer.getSingletonInstance().display();
+                Displayer.display();
             }
         });
 
@@ -131,7 +131,7 @@ public class RunningDifferencePanel extends FilterPanel implements ChangeListene
                     radNone.setSelected(false);
                     radRunDiff.setSelected(false);
                 }
-                Displayer.getSingletonInstance().display();
+                Displayer.display();
             }
         });
 
@@ -144,7 +144,7 @@ public class RunningDifferencePanel extends FilterPanel implements ChangeListene
                     filter.setRunDiffNoRot(!diffRot.isSelected());
                 }
 
-                Displayer.getSingletonInstance().display();
+                Displayer.display();
             }
         });
 
@@ -171,7 +171,7 @@ public class RunningDifferencePanel extends FilterPanel implements ChangeListene
         if (filter != null) {
             float value = ((SpinnerNumberModel) truncateSpinner.getModel()).getNumber().floatValue();
             filter.setTruncationvalue(1 - value);
-            Displayer.getSingletonInstance().display();
+            Displayer.display();
         }
     }
 
