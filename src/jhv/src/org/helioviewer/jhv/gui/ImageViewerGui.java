@@ -246,7 +246,20 @@ public class ImageViewerGui {
      * Initializes the main view chain.
      */
     public void createViewchains() {
-        this.activateState(StateController.getInstance().getCurrentState(), null);
+        State newState = StateController.getInstance().getCurrentState();
+        GuiState.mainComponentView = GuiState.viewchainFactory.createViewchainMain(GuiState.mainComponentView, false);
+        GL3DCameraSelectorModel.getInstance().activate(GuiState.mainComponentView.getAdapter(GL3DSceneGraphView.class));
+        GL3DPluginController.getInstance().setPluginConfiguration(new GL3DInternalPluginConfiguration());
+        GL3DPluginController.getInstance().loadPlugins();
+        renderModeStatus.updateStatus();
+
+        // prepare gui again
+        updateComponentPanels();
+        mainImagePanel.setInputController(newState.getDefaultInputController());
+        newState.getMainComponentView().activate();
+        mainFrame.validate();
+
+        this.activateState(newState, null);
         packAndShow(true);
         mainFrame.validate();
     }
@@ -415,20 +428,6 @@ public class ImageViewerGui {
      * @param stateEnum
      */
     private void activateState(final State newState, State oldState) {
-        if (GuiState.mainComponentView == null) {
-            GuiState.mainComponentView = GuiState.viewchainFactory.createViewchainMain(GuiState.mainComponentView, false);
-            GL3DCameraSelectorModel.getInstance().activate(GuiState.mainComponentView.getAdapter(GL3DSceneGraphView.class));
-            GL3DPluginController.getInstance().setPluginConfiguration(new GL3DInternalPluginConfiguration());
-            GL3DPluginController.getInstance().loadPlugins();
-            renderModeStatus.updateStatus();
-
-            // prepare gui again
-            updateComponentPanels();
-            mainImagePanel.setInputController(newState.getDefaultInputController());
-            newState.getMainComponentView().activate();
-
-            mainFrame.validate();
-        }
         if (newState.getType() == ViewStateEnum.View3D) {
             leftPane.add("Camera Adjustments", cameraOptionsPanel, false);
         } else {
