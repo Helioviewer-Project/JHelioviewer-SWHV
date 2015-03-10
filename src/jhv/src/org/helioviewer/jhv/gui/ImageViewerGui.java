@@ -120,6 +120,8 @@ public class ImageViewerGui {
 
     private final GL3DTopToolBar topToolBar;
 
+    private ComponentView mainComponentView;
+
     /**
      * The private constructor that creates and positions all the gui
      * components.
@@ -247,8 +249,8 @@ public class ImageViewerGui {
      */
     public void createViewchains() {
         State newState = StateController.getInstance().getCurrentState();
-        GuiState.mainComponentView = GuiState.viewchainFactory.createViewchainMain(GuiState.mainComponentView, false);
-        GL3DCameraSelectorModel.getInstance().activate(GuiState.mainComponentView.getAdapter(GL3DSceneGraphView.class));
+        mainComponentView = GuiState.viewchainFactory.createNewViewchainMain();
+        GL3DCameraSelectorModel.getInstance().activate(mainComponentView.getAdapter(GL3DSceneGraphView.class));
         GL3DPluginController.getInstance().setPluginConfiguration(new GL3DInternalPluginConfiguration());
         GL3DPluginController.getInstance().loadPlugins();
         renderModeStatus.updateStatus();
@@ -256,7 +258,7 @@ public class ImageViewerGui {
         // prepare gui again
         updateComponentPanels();
         mainImagePanel.setInputController(newState.getDefaultInputController());
-        newState.getMainComponentView().activate();
+        mainComponentView.activate();
         mainFrame.validate();
 
         this.activateState(newState, null);
@@ -312,7 +314,7 @@ public class ImageViewerGui {
      * @return instance of the main ComponentView.
      */
     public ComponentView getMainView() {
-        return StateController.getInstance().getCurrentState().getMainComponentView();
+        return mainComponentView;
     }
 
     /**

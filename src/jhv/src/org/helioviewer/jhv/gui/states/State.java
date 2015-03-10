@@ -2,7 +2,6 @@ package org.helioviewer.jhv.gui.states;
 
 import org.helioviewer.jhv.gui.GL3DViewchainFactory;
 import org.helioviewer.jhv.gui.interfaces.ImagePanelInputController;
-import org.helioviewer.viewmodel.view.ComponentView;
 
 /**
  * State Interface
@@ -26,8 +25,6 @@ public interface State {
      * @return ViewStateEnum type
      */
     public ViewStateEnum getType();
-
-    public ComponentView getMainComponentView();
 
     public ImagePanelInputController getDefaultInputController();
 
