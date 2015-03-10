@@ -439,7 +439,6 @@ public class ImageViewerGui {
                 }
             }
             oldState.deactivate();
-            contentPanel.remove(oldState.getTopToolBar());
         }
 
         newState.recreateViewChains(oldState);
@@ -462,7 +461,9 @@ public class ImageViewerGui {
         TopToolBar toolBar = newState.getTopToolBar();
         toolBar.updateStateButtons();
         toolBar.setDisplayMode(null);
-        contentPanel.add(toolBar, BorderLayout.PAGE_START);
+        if (toolBar.getParent() != contentPanel) {
+            contentPanel.add(toolBar, BorderLayout.PAGE_START);
+        }
     }
 
     private void updateComponentPanels() {
