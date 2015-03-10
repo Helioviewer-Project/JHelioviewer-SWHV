@@ -254,14 +254,11 @@ public abstract class GL3DCamera {
         }
 
         GL3DMat4d vpmi = this.orthoMatrix.inverse();
-        GL3DMat4d tli = GL3DMat4d.identity();
 
         double aspect = state.getViewportWidth() / (double) state.getViewportHeight();
         GL3DVec4d centeredViewportCoordinates = new GL3DVec4d(GLInfo.pixelScale[0] * (2. * viewportCoordinates.getX() / state.getViewportWidth() - 0.5) * aspect, -GLInfo.pixelScale[1] * (2. * viewportCoordinates.getY() / state.getViewportHeight() - 0.5), 0., 0.);
 
         GL3DVec4d solarCoordinates = vpmi.multiply(centeredViewportCoordinates);
-        solarCoordinates.w = 1.;
-        solarCoordinates = tli.multiply(solarCoordinates);
         solarCoordinates.w = 0.;
         GL3DMat4d roti = this.getRotation().toMatrix().inverse();
 
