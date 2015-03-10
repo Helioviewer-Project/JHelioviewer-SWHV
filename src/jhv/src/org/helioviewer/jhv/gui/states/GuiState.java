@@ -62,10 +62,6 @@ public class GuiState implements State {
         return mainComponentView;
     }
 
-    public RenderModeStatusPanel getRenderModeStatus() {
-        return renderModeStatus;
-    }
-
     @Override
     public GL3DViewchainFactory getViewchainFactory() {
         return viewchainFactory;
