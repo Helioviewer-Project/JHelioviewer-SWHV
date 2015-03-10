@@ -46,7 +46,7 @@ public abstract class GL3DDefaultInteraction extends GL3DInteraction {
 
         camera.setCameraFOV(camera.getCameraFOV() + ZOOM_WHEEL_FACTOR * wr);
         if (previousFOV != camera.getCameraFOV()) {
-            Displayer.getSingletonInstance().display();
+            Displayer.display();
         }
     }
 

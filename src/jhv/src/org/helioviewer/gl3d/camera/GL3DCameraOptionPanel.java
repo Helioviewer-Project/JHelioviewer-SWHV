@@ -90,7 +90,6 @@ public abstract class GL3DCameraOptionPanel extends JPanel implements ActionList
                     visibleButton.setIcon(IconBank.getIcon(JHVIcon.VISIBLE));
                 }
                 gridVisible = !gridVisible;
-                Displayer.getSingletonInstance();
                 Displayer.display();
             }
         });
@@ -105,7 +104,6 @@ public abstract class GL3DCameraOptionPanel extends JPanel implements ActionList
             @Override
             public void stateChanged(ChangeEvent e) {
                 camera.setGridResolutionX((Double) gridResolutionXSpinner.getValue());
-                Displayer.getSingletonInstance();
                 Displayer.display();
             }
         });
@@ -120,7 +118,6 @@ public abstract class GL3DCameraOptionPanel extends JPanel implements ActionList
             @Override
             public void stateChanged(ChangeEvent e) {
                 camera.setGridResolutionY((Double) gridResolutionYSpinner.getValue());
-                Displayer.getSingletonInstance();
                 Displayer.display();
             }
         });
@@ -134,7 +131,6 @@ public abstract class GL3DCameraOptionPanel extends JPanel implements ActionList
             @Override
             public void stateChanged(ChangeEvent e) {
                 camera.getGrid().setFontScale((Float) (fontSizeSpinner.getValue()));
-                Displayer.getSingletonInstance();
                 Displayer.display();
             }
         });

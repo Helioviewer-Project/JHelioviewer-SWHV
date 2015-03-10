@@ -66,7 +66,7 @@ public class GL3DSceneGraphView extends AbstractGL3DView implements GL3DView {
             @Override
             public void keyHit(KeyEvent e) {
                 root.getDrawBits().toggle(Bit.BoundingBox);
-                Displayer.getSingletonInstance().display();
+                Displayer.display();
                 Log.debug("Toggling BoundingBox");
             }
         }, KeyEvent.VK_B);
@@ -75,7 +75,7 @@ public class GL3DSceneGraphView extends AbstractGL3DView implements GL3DView {
             @Override
             public void keyHit(KeyEvent e) {
                 toggleCoronaVisibility();
-                Displayer.getSingletonInstance().display();
+                Displayer.display();
                 Log.debug("Toggling Corona Visibility");
             }
         }, KeyEvent.VK_X);

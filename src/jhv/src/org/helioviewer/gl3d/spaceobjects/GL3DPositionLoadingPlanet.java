@@ -159,7 +159,7 @@ public class GL3DPositionLoadingPlanet {
                 positionDateTimehelper[i] = new GL3DPositionDateTime(calendar.getTimeInMillis(), vec);
             }
             this.positionDateTime = positionDateTimehelper;
-            Displayer.getSingletonInstance().display();
+            Displayer.display();
         } catch (JSONException e) {
             this.fireLoaded(this.PARTIALSTATE);
             Log.warn("Problem Parsing the JSON Response.", e);
@@ -203,7 +203,6 @@ public class GL3DPositionLoadingPlanet {
 
     public void addListener(GL3DPositionLoadingListener listener) {
         listeners.add(listener);
-
     }
 
     public void fireLoaded(final String state) {

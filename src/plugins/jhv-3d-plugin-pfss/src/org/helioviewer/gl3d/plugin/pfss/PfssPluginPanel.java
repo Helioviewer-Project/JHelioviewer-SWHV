@@ -125,9 +125,8 @@ public class PfssPluginPanel extends OverlayPanel implements ActionListener, Lay
             @Override
             public void stateChanged(javax.swing.event.ChangeEvent e) {
                 PfssSettings.qualityReduction = 8 - ((Integer) qualitySpinner.getValue()).intValue();
-                Displayer.getSingletonInstance().display();
+                Displayer.display();
             }
-
         });
         WheelSupport.installMouseWheelSupport(qualitySpinner);
 
@@ -140,7 +139,7 @@ public class PfssPluginPanel extends OverlayPanel implements ActionListener, Lay
             @Override
             public void itemStateChanged(ItemEvent e) {
                 PfssSettings.fixedColor = (e.getStateChange() == ItemEvent.SELECTED);
-                Displayer.getSingletonInstance().display();
+                Displayer.display();
             }
         });
         helpPanel.add(fixedColors);
@@ -196,7 +195,7 @@ public class PfssPluginPanel extends OverlayPanel implements ActionListener, Lay
                 pfssCache.setVisible(true);
                 visibleButton.setIcon(new ImageIcon(PfssPlugin.getResourceUrl("/images/visible_dm.png")));
             }
-            Displayer.getSingletonInstance().display();
+            Displayer.display();
         }
 
         if (act.getSource().equals(reloadButton)) {

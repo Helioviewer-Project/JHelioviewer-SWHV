@@ -129,7 +129,7 @@ public class SWHVHEKData implements LayersListener, JHVEventHandler {
                 }
             }
             this.events = events;
-            Displayer.getSingletonInstance().display();
+            Displayer.display();
         }
     }
 
