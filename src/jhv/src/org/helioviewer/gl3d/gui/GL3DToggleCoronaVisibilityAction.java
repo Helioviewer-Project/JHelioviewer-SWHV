@@ -34,7 +34,7 @@ public class GL3DToggleCoronaVisibilityAction extends AbstractAction {
         GL3DSceneGraphView sceneGraph = ImageViewerGui.getSingletonInstance().getMainView().getAdapter(GL3DSceneGraphView.class);
         if (sceneGraph != null) {
             sceneGraph.toggleCoronaVisibility();
-            Displayer.getSingletonInstance().display();
+            Displayer.display();
         }
     }
 

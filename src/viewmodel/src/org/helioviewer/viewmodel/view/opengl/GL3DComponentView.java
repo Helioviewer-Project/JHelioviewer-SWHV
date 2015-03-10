@@ -111,7 +111,7 @@ public class GL3DComponentView extends AbstractComponentView implements GLEventL
             if (movieView != null) {
                 movieView.playMovie();
             } else {
-                Displayer.getSingletonInstance().render();
+                Displayer.render();
             }
         } else {
             exportMovieDialog.fail();
@@ -141,7 +141,7 @@ public class GL3DComponentView extends AbstractComponentView implements GLEventL
 
     public void startScreenshot() {
         screenshotMode = true;
-        Displayer.getSingletonInstance().render();
+        Displayer.render();
     }
 
     public void stopScreenshot() {
@@ -336,7 +336,7 @@ public class GL3DComponentView extends AbstractComponentView implements GLEventL
     public void viewChanged(View sender, ChangeEvent aEvent) {
         SubImageDataChangedReason sidReason = aEvent.getLastChangedReasonByType(SubImageDataChangedReason.class);
         if (sidReason != null) {
-            Displayer.getSingletonInstance().display();
+            Displayer.display();
         }
 
         ViewListenerDistributor.getSingletonInstance().viewChanged(this, aEvent);

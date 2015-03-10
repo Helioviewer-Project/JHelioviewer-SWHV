@@ -377,7 +377,7 @@ public class MainImagePanel extends BasicImagePanel implements ViewListener {
                     public void run() {
                         currentPearlPos++;
                         repaint();
-                        Displayer.getSingletonInstance().display();
+                        Displayer.display();
                     }
                 }, 0, 200);
             }

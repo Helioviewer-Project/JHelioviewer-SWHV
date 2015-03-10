@@ -75,7 +75,7 @@ public class GL3DCameraOptionsPanel extends JPanel implements GL3DCameraSelectio
         changeCamera(newCamera);
         cameraSelectorModel.setCurrentCamera(newCamera);
         optionsPanel = cameraOptionsAttributeManager.getCameraOptionAttributePanel(newCamera);
-        Displayer.getSingletonInstance().display();
+        Displayer.display();
         tab.setComponentAt(0, optionsPanel);
         tab.setSelectedIndex(0);
     }
@@ -99,7 +99,7 @@ public class GL3DCameraOptionsPanel extends JPanel implements GL3DCameraSelectio
         ((GL3DCameraOptionPanel) optionsPanel).getGridResolutionXSpinner().setValue(resx);
         ((GL3DCameraOptionPanel) optionsPanel).getGridResolutionYSpinner().setValue(resy);
 
-        Displayer.getSingletonInstance().display();
+        Displayer.display();
     }
 
     private JPanel infoPanel() {

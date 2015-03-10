@@ -146,7 +146,7 @@ public class GL3DFollowObjectCameraOptionPanel extends GL3DCameraOptionPanel imp
             @Override
             public void stateChanged(ChangeEvent e) {
                 camera.setFOVangleDegrees((Double) fovSpinner.getValue());
-                Displayer.getSingletonInstance().display();
+                Displayer.display();
             }
         });
         WheelSupport.installMouseWheelSupport(this.fovSpinner);
@@ -167,7 +167,7 @@ public class GL3DFollowObjectCameraOptionPanel extends GL3DCameraOptionPanel imp
                     visibleFovButton.setIcon(IconBank.getIcon(JHVIcon.VISIBLE));
                 }
                 fovVisible = !fovVisible;
-                Displayer.getSingletonInstance().display();
+                Displayer.display();
             }
         });
         visibleFovButton.setToolTipText("Toggle visibility");
@@ -199,7 +199,7 @@ public class GL3DFollowObjectCameraOptionPanel extends GL3DCameraOptionPanel imp
             @Override
             public void actionPerformed(ActionEvent e) {
                 syncWithLayerCurrentTime();
-                Displayer.getSingletonInstance().display();
+                Displayer.display();
             }
         });
         buttonPanel = new JPanel();
@@ -262,7 +262,7 @@ public class GL3DFollowObjectCameraOptionPanel extends GL3DCameraOptionPanel imp
             public void focusLost(FocusEvent arg0) {
                 beginDatePicker.checkDateStringInTextField();
                 setBeginTime(true);
-                Displayer.getSingletonInstance().display();
+                Displayer.display();
             }
         });
         beginTimePicker = new TimeTextField();
@@ -277,14 +277,14 @@ public class GL3DFollowObjectCameraOptionPanel extends GL3DCameraOptionPanel imp
             @Override
             public void actionPerformed(JHVCalendarEvent e) {
                 setBeginTime(true);
-                Displayer.getSingletonInstance().display();
+                Displayer.display();
             }
         });
         beginTimePicker.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 setBeginTime(true);
-                Displayer.getSingletonInstance().display();
+                Displayer.display();
             }
         });
         addBeginDatePanel.add(beginDatePicker);
@@ -372,7 +372,7 @@ public class GL3DFollowObjectCameraOptionPanel extends GL3DCameraOptionPanel imp
             public void focusLost(FocusEvent arg0) {
                 beginDatePicker.checkDateStringInTextField();
                 setEndTime(true);
-                Displayer.getSingletonInstance().display();
+                Displayer.display();
             }
         });
         endTimePicker = new TimeTextField();
@@ -386,14 +386,14 @@ public class GL3DFollowObjectCameraOptionPanel extends GL3DCameraOptionPanel imp
             @Override
             public void actionPerformed(JHVCalendarEvent e) {
                 setEndTime(true);
-                Displayer.getSingletonInstance().display();
+                Displayer.display();
             }
         });
         endTimePicker.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 setEndTime(true);
-                Displayer.getSingletonInstance().display();
+                Displayer.display();
             }
         });
         addEndDatePanel.add(endDatePicker);

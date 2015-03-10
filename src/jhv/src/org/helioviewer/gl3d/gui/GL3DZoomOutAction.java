@@ -27,6 +27,7 @@ public class GL3DZoomOutAction extends ZoomOutAction {
         GL3DCamera camera = GL3DState.get().getActiveCamera();
         camera.setCameraFOV(camera.getCameraFOV() / 0.95);
         camera.updateCameraTransformation(true);
-        Displayer.getSingletonInstance().display();
+        Displayer.display();
     }
+
 }

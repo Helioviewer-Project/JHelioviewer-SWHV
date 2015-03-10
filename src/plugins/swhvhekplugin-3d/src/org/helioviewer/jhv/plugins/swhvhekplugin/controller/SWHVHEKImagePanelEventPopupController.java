@@ -169,7 +169,7 @@ public class SWHVHEKImagePanelEventPopupController implements KeyEventDispatcher
                     aPressed = true;
                 }
                 if (ke.getKeyCode() == KeyEvent.VK_R) {
-                    Displayer.getSingletonInstance().display();
+                    Displayer.display();
                 }
                 break;
 

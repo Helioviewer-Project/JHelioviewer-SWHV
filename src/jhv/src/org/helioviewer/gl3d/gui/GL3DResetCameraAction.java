@@ -31,6 +31,7 @@ public class GL3DResetCameraAction extends AbstractAction {
     @Override
     public void actionPerformed(ActionEvent e) {
         GL3DCameraSelectorModel.getInstance().getCurrentCamera().reset();
-        Displayer.getSingletonInstance().render();
+        Displayer.render();
     }
+
 }

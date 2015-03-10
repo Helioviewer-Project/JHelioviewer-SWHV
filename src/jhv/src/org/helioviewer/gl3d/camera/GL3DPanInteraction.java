@@ -46,12 +46,12 @@ public class GL3DPanInteraction extends GL3DDefaultInteraction {
         this.lastMousePoint = e.getPoint();
         camera.updateCameraTransformation();
 
-        Displayer.getSingletonInstance().display();
+        Displayer.display();
     }
 
     @Override
     public void mouseReleased(MouseEvent e, GL3DCamera camera) {
-        Displayer.getSingletonInstance().display();
+        Displayer.display();
     }
 
 }

@@ -80,14 +80,14 @@ public class GL3DZoomBoxInteraction extends GL3DDefaultInteraction {
     @Override
     public void mouseDragged(MouseEvent e, GL3DCamera camera) {
         this.zoomBoxEndPoint = camera.getVectorFromSphere(e.getPoint());
-        Displayer.getSingletonInstance().display();
+        Displayer.display();
     }
 
     @Override
     public void mouseReleased(MouseEvent e, GL3DCamera camera) {
         this.zoomBoxEndPoint = null;
         this.zoomBoxStartPoint = null;
-        Displayer.getSingletonInstance().display();
+        Displayer.display();
     }
 
     private boolean isCompletelyOnSphere() {

@@ -35,14 +35,13 @@ public class GL3DTrackballRotationInteraction extends GL3DDefaultInteraction {
         camera.rotateCurrentDragRotation(currentDragRotation);
         this.camera.updateCameraTransformation(false);
 
-        Displayer.getSingletonInstance().display();
+        Displayer.display();
     }
 
     @Override
     public void mouseReleased(MouseEvent e, GL3DCamera camera) {
         this.currentRotationStartPoint = null;
         this.currentRotationEndPoint = null;
-
     }
 
     @Override
