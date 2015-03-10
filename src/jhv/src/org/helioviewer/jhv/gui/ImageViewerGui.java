@@ -472,13 +472,6 @@ public class ImageViewerGui {
         mainFrame.validate();
     }
 
-    /*
-     * public void changeState(ViewStateEnum stateEnum) {
-     * if(stateEnum==this.currentState.getType()) {
-     * Log.debug("No State Change required, already in requested Gui State");
-     * return; } this.activateState(stateEnum); }
-     */
-
     /**
      * Loads the images which have to be displayed when the program starts.
      *
