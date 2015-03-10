@@ -460,7 +460,6 @@ public class ImageViewerGui {
 
         TopToolBar toolBar = newState.getTopToolBar();
         toolBar.updateStateButtons();
-        toolBar.setDisplayMode(null);
         if (toolBar.getParent() != contentPanel) {
             contentPanel.add(toolBar, BorderLayout.PAGE_START);
         }
