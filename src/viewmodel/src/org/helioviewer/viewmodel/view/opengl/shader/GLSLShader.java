@@ -259,11 +259,6 @@ public class GLSLShader {
         rectVertex[3] = (float) yScale;
     }
 
-    public static void changeDifferenceAngles(double theta, double phi) {
-        differenceThetaVertex[0] = (float) theta;
-        differencePhiVertex[0] = (float) phi;
-    }
-
     public static void setDifferenceRect(double differenceXOffset, double differenceYOffset, double differenceXScale, double differenceYScale) {
         differenceRectVertex[0] = (float) differenceXOffset;
         differenceRectVertex[1] = (float) differenceYOffset;
@@ -294,8 +289,13 @@ public class GLSLShader {
     }
 
     public static void changeAngles(double theta, double phi) {
-        thetaParamFloat[0] = (float) theta;
+        thetaParamFloat[0] = (float) (0 * theta);
         phiParamFloat[0] = (float) -phi;
+    }
+
+    public static void changeDifferenceAngles(double theta, double phi) {
+        differenceThetaVertex[0] = (float) (0 * theta);
+        differencePhiVertex[0] = (float) -phi;
     }
 
     public static void setAlpha(float alpha) {
