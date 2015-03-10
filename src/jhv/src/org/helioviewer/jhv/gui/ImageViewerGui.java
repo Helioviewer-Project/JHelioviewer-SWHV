@@ -24,7 +24,10 @@ import javax.swing.JTabbedPane;
 
 import org.helioviewer.base.message.Message;
 import org.helioviewer.gl3d.camera.GL3DCameraOptionsPanel;
+import org.helioviewer.gl3d.gui.GL3DCameraSelectorModel;
 import org.helioviewer.gl3d.gui.GL3DTopToolBar;
+import org.helioviewer.gl3d.model.GL3DInternalPluginConfiguration;
+import org.helioviewer.gl3d.plugin.GL3DPluginController;
 import org.helioviewer.gl3d.spaceobjects.PlanetOptionsPanel;
 import org.helioviewer.jhv.JHVSplashScreen;
 import org.helioviewer.jhv.gui.actions.ExitProgramAction;
@@ -47,6 +50,7 @@ import org.helioviewer.jhv.gui.components.statusplugins.RenderModeStatusPanel;
 import org.helioviewer.jhv.gui.components.statusplugins.ZoomStatusPanel;
 import org.helioviewer.jhv.gui.controller.ZoomController;
 import org.helioviewer.jhv.gui.dialogs.observation.ObservationDialog;
+import org.helioviewer.jhv.gui.states.GuiState;
 import org.helioviewer.jhv.gui.states.State;
 import org.helioviewer.jhv.gui.states.StateController;
 import org.helioviewer.jhv.gui.states.StateController.StateChangeListener;
@@ -71,6 +75,7 @@ import org.helioviewer.viewmodel.view.LayeredView;
 import org.helioviewer.viewmodel.view.MetaDataView;
 import org.helioviewer.viewmodel.view.MovieView;
 import org.helioviewer.viewmodel.view.View;
+import org.helioviewer.viewmodel.view.opengl.GL3DSceneGraphView;
 import org.helioviewer.viewmodelplugin.filter.FilterTabPanelManager;
 
 /**
@@ -410,17 +415,20 @@ public class ImageViewerGui {
      * @param stateEnum
      */
     private void activateState(final State newState, State oldState) {
+        if (GuiState.mainComponentView == null) {
+            GuiState.mainComponentView = GuiState.viewchainFactory.createViewchainMain(GuiState.mainComponentView, false);
+            GL3DCameraSelectorModel.getInstance().activate(GuiState.mainComponentView.getAdapter(GL3DSceneGraphView.class));
+            GL3DPluginController.getInstance().setPluginConfiguration(new GL3DInternalPluginConfiguration());
+            GL3DPluginController.getInstance().loadPlugins();
+            renderModeStatus.updateStatus();
 
-        newState.recreateViewChains(oldState);
-        renderModeStatus.updateStatus();
+            // prepare gui again
+            updateComponentPanels();
+            mainImagePanel.setInputController(newState.getDefaultInputController());
+            newState.getMainComponentView().activate();
 
-        // prepare gui again
-        updateComponentPanels();
-        mainImagePanel.setInputController(newState.getDefaultInputController());
-        newState.getMainComponentView().activate();
-
-        mainFrame.validate();
-
+            mainFrame.validate();
+        }
         if (newState.getType() == ViewStateEnum.View3D) {
             leftPane.add("Camera Adjustments", cameraOptionsPanel, false);
         } else {

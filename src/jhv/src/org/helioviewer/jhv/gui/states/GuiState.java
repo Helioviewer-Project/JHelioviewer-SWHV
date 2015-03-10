@@ -2,22 +2,18 @@ package org.helioviewer.jhv.gui.states;
 
 import org.helioviewer.base.logging.Log;
 import org.helioviewer.gl3d.gui.GL3DCameraMouseController;
-import org.helioviewer.gl3d.gui.GL3DCameraSelectorModel;
-import org.helioviewer.gl3d.model.GL3DInternalPluginConfiguration;
-import org.helioviewer.gl3d.plugin.GL3DPluginController;
 import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.gui.GL3DViewchainFactory;
 import org.helioviewer.jhv.gui.components.statusplugins.RenderModeStatusPanel;
 import org.helioviewer.jhv.gui.interfaces.ImagePanelInputController;
 import org.helioviewer.viewmodel.view.ComponentView;
-import org.helioviewer.viewmodel.view.opengl.GL3DSceneGraphView;
 
 public class GuiState implements State {
 
     private final boolean is3d;
     public static GL3DViewchainFactory viewchainFactory = new GL3DViewchainFactory();
 
-    private static ComponentView mainComponentView;
+    public static ComponentView mainComponentView;
     private RenderModeStatusPanel renderModeStatus;
 
     public GuiState(boolean is3d) {
@@ -29,10 +25,7 @@ public class GuiState implements State {
         Log.info("Start creating view chains");
 
         // Create main view chain
-        mainComponentView = viewchainFactory.createViewchainMain(mainComponentView, false);
-        GL3DCameraSelectorModel.getInstance().activate(this.mainComponentView.getAdapter(GL3DSceneGraphView.class));
-        GL3DPluginController.getInstance().setPluginConfiguration(new GL3DInternalPluginConfiguration());
-        GL3DPluginController.getInstance().loadPlugins();
+
     }
 
     @Override
