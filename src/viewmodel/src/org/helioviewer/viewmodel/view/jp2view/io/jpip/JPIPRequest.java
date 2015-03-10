@@ -9,6 +9,7 @@ import org.helioviewer.viewmodel.view.jp2view.io.http.HTTPRequest;
  * @author Juan Pablo
  */
 public class JPIPRequest extends HTTPRequest {
+
     /** The query in string form. */
     private String query = null;
 
@@ -60,4 +61,5 @@ public class JPIPRequest extends HTTPRequest {
     public void setQuery(Object _query) {
         query = _query.toString();
     }
+
 }

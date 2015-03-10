@@ -1,5 +1,6 @@
 package org.helioviewer.viewmodel.view.jp2view.io.jpip;
 
+import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.net.URI;
 import java.util.HashMap;
@@ -103,8 +104,7 @@ public class JPIPSocket extends HTTPSocket {
             throw new IOException("The client currently only supports http transport.");
 
         return res;
-
-    };
+    }
 
     /** Closes the JPIPSocket */
     @Override
@@ -129,7 +129,6 @@ public class JPIPSocket extends HTTPSocket {
         } finally {
             super.close();
         }
-
     }
 
     /**
@@ -201,18 +200,25 @@ public class JPIPSocket extends HTTPSocket {
 
         if (res.getCode() != 200)
             throw new IOException("Invalid status code returned (" + res.getCode() + ")");
-        if ((res.getHeader("Transfer-Encoding") == null) || (!res.getHeader("Transfer-Encoding").equals("chunked")))
+
+        String field;
+
+        field = res.getHeader("Transfer-Encoding");
+        if (field == null || !field.equals("chunked"))
             throw new IOException("Only chunked responses are supported");
-        if (res.getHeader("Content-Type") != null && !res.getHeader("Content-Type").equals("image/jpp-stream"))
+
+        field = res.getHeader("Content-Type");
+        if (field != null && !field.equals("image/jpp-stream"))
             throw new IOException("Expected image/jpp-stream content!");
 
         replyTextTm = System.currentTimeMillis();
 
-        ChunkedInputStream input = new ChunkedInputStream(getInputStream());
-        JPIPDataInputStream jpip = new JPIPDataInputStream(input);
+        ChunkedInputStream input = new ChunkedInputStream(new BufferedInputStream(getInputStream()));
+
+        JPIPDataInputStream jpip;
+        jpip = new JPIPDataInputStream(input);
 
         JPIPDataSegment seg;
-
         while ((seg = jpip.readSegment()) != null)
             res.addJpipDataSegment(seg);
 
@@ -261,4 +267,4 @@ public class JPIPSocket extends HTTPSocket {
         return receivedData;
     }
 
-};
+}
