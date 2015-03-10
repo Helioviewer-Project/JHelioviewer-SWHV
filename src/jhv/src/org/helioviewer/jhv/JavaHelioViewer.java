@@ -1,13 +1,11 @@
 package org.helioviewer.jhv;
 
 import java.awt.EventQueue;
-
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.lang.reflect.Method;
-import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.HashSet;
@@ -263,13 +261,11 @@ public class JavaHelioViewer {
 
         // Check for updates in parallel, if newer version is available a small
         // message is displayed
-        /* try {
-            JHVUpdate update = new JHVUpdate();
-            update.check();
-        } catch (MalformedURLException e) {
-            // Should never happen
-            Log.error("Error retrieving internal update URL", e);
-        } */
+        /*
+         * try { JHVUpdate update = new JHVUpdate(); update.check(); } catch
+         * (MalformedURLException e) { // Should never happen
+         * Log.error("Error retrieving internal update URL", e); }
+         */
 
         splash.setProgressText("Start main window...");
         splash.nextStep();
