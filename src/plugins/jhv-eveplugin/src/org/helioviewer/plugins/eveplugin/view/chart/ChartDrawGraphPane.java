@@ -11,8 +11,6 @@ import java.awt.RenderingHints;
 import java.awt.Toolkit;
 import java.awt.event.ComponentEvent;
 import java.awt.event.ComponentListener;
-import java.awt.event.KeyEvent;
-import java.awt.event.KeyListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseWheelEvent;
 import java.awt.event.MouseWheelListener;
@@ -59,10 +57,10 @@ import org.helioviewer.viewmodel.view.LinkedMovieManager;
 import org.helioviewer.viewmodel.view.jp2view.datetime.ImmutableDateTime;
 
 /**
- * 
+ *
  * @author Stephan Pagel
  * */
-public class ChartDrawGraphPane extends JComponent implements MouseInputListener, ComponentListener, DrawControllerListener, ChartModelListener, MouseWheelListener, KeyListener, WindowFocusListener {
+public class ChartDrawGraphPane extends JComponent implements MouseInputListener, ComponentListener, DrawControllerListener, ChartModelListener, MouseWheelListener, WindowFocusListener {
 
     // //////////////////////////////////////////////////////////////////////////////
     // Definitions
@@ -90,8 +88,7 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
     private final PlotAreaSpaceManager plotAreaSpaceManager;
     private final EventModel eventModel;
     private Rectangle leftAxisArea;
-    private boolean ctrlPressed = false;
-    private boolean shiftPressed = false;
+
     private SwingWorker<Integer, Integer> currentSwingWorker;
     private static final Cursor closedHandCursor = Toolkit.getDefaultToolkit().createCustomCursor(IconBank.getIcon(JHVIcon.CLOSED_HAND).getImage(), new Point(16, 0), IconBank.getIcon(JHVIcon.CLOSED_HAND).toString());
     private static final Cursor openHandCursor = Toolkit.getDefaultToolkit().createCustomCursor(IconBank.getIcon(JHVIcon.OPEN_HAND).getImage(), new Point(16, 0), IconBank.getIcon(JHVIcon.OPEN_HAND).toString());
@@ -893,33 +890,15 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
                 }
                 if (startValue <= endValue /* && startTime <= endTime */&& startValue >= myPlotAreaSpace.getScaledMinValue() && startValue <= myPlotAreaSpace.getScaledMaxValue() && endValue >= myPlotAreaSpace.getScaledMinValue() && endValue <= myPlotAreaSpace.getScaledMaxValue() // &&
 
-                // startTime >= myPlotAreaSpace.getScaledMinTime()
-                // && endTime <= myPlotAreaSpace.getScaledMaxTime() && startTime
-                // <= myPlotAreaSpace.getScaledMaxTime()
-                // && endTime >= myPlotAreaSpace.getScaledMinTime()) {
-                ) {
+                        // startTime >= myPlotAreaSpace.getScaledMinTime()
+                        // && endTime <= myPlotAreaSpace.getScaledMaxTime() && startTime
+                        // <= myPlotAreaSpace.getScaledMaxTime()
+                        // && endTime >= myPlotAreaSpace.getScaledMinTime()) {
+                        ) {
                     myPlotAreaSpace.setScaledSelectedTimeAndValue(startTime, endTime, startValue, endValue);
                 }
             }
         }
-    }
-
-    @Override
-    public void keyTyped(KeyEvent e) {
-        // TODO Auto-generated method stub
-
-    }
-
-    @Override
-    public void keyPressed(KeyEvent e) {
-        ctrlPressed = e.isControlDown();
-        shiftPressed = e.isShiftDown();
-    }
-
-    @Override
-    public void keyReleased(KeyEvent e) {
-        ctrlPressed = e.isControlDown();
-        shiftPressed = e.isShiftDown();
     }
 
     @Override

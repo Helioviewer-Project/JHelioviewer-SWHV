@@ -89,8 +89,6 @@ public class ChartConstants {
         return RANGE_SELECTION_WIDTH;
     }
 
-    private static int scale = -1;
-
     public static int getScreenfactor() {
         return GLInfo.pixelScale[0];
     }
