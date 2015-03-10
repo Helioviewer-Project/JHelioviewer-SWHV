@@ -8,7 +8,6 @@ import org.helioviewer.gl3d.plugin.GL3DPluginController;
 import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.gui.GL3DViewchainFactory;
 import org.helioviewer.jhv.gui.components.statusplugins.RenderModeStatusPanel;
-import org.helioviewer.jhv.gui.controller.MainImagePanelMousePanController;
 import org.helioviewer.jhv.gui.interfaces.ImagePanelInputController;
 import org.helioviewer.viewmodel.view.ComponentView;
 import org.helioviewer.viewmodel.view.opengl.GL3DSceneGraphView;
@@ -72,7 +71,7 @@ public class GuiState implements State {
         if (is3d) {
             return new GL3DCameraMouseController();
         } else {
-            return new MainImagePanelMousePanController();
+            return new GL3DCameraMouseController();
         }
     }
 
