@@ -1,5 +1,6 @@
 package org.helioviewer.jhv.gui.states;
 
+import org.helioviewer.jhv.gui.ViewchainFactory;
 import org.helioviewer.jhv.gui.interfaces.ImagePanelInputController;
 import org.helioviewer.viewmodel.view.ComponentView;
 
@@ -23,6 +24,14 @@ public interface State {
      * @return Sucess
      */
     public boolean recreateViewChains(State previousState);
+
+    /**
+     * The ViewchainFactory is dependent on the state, as a different Viewchain
+     * is required for 3D and 2D Modes.
+     *
+     * @return viewchainFactory to use
+     */
+    public ViewchainFactory getViewchainFactory();
 
     /**
      * To get the type of the state
