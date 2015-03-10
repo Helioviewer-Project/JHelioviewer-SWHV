@@ -438,7 +438,6 @@ public class ImageViewerGui {
                     ((MoviePanel) c).setPlaying(false, true);
                 }
             }
-            oldState.deactivate();
         }
 
         newState.recreateViewChains(oldState);
@@ -456,7 +455,6 @@ public class ImageViewerGui {
         } else {
             leftPane.remove(GL3DCameraOptionsPanel.class);
         }
-        newState.activate();
 
         TopToolBar toolBar = newState.getTopToolBar();
         toolBar.updateStateButtons();

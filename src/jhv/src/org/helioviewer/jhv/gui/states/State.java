@@ -47,8 +47,4 @@ public interface State {
 
     public TopToolBar getTopToolBar();
 
-    public void activate();
-
-    public void deactivate();
-
 }
