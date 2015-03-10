@@ -293,6 +293,7 @@ public class TopToolBar extends JToolBar implements MouseListener {
         this.rotateButton.setEnabled(StateController.getInstance().getCurrentState() == ViewStateEnum.View3D.getState());
         resetCamera.setEnabled(StateController.getInstance().getCurrentState() == ViewStateEnum.View3D.getState());
         this.zoomBoxButton.setEnabled(StateController.getInstance().getCurrentState() == ViewStateEnum.View2D.getState());
+        this.repaint();
     }
 
     public void updateStateButtons(State currentState) {
