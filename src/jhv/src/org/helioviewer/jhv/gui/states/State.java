@@ -1,6 +1,6 @@
 package org.helioviewer.jhv.gui.states;
 
-import org.helioviewer.jhv.gui.ViewchainFactory;
+import org.helioviewer.jhv.gui.GL3DViewchainFactory;
 import org.helioviewer.jhv.gui.interfaces.ImagePanelInputController;
 import org.helioviewer.viewmodel.view.ComponentView;
 
@@ -31,7 +31,7 @@ public interface State {
      *
      * @return viewchainFactory to use
      */
-    public ViewchainFactory getViewchainFactory();
+    public GL3DViewchainFactory getViewchainFactory();
 
     /**
      * To get the type of the state

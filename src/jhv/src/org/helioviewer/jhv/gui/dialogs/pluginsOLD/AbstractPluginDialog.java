@@ -20,8 +20,8 @@ import javax.swing.JList;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 
+import org.helioviewer.jhv.gui.GL3DViewchainFactory;
 import org.helioviewer.jhv.gui.ImageViewerGui;
-import org.helioviewer.jhv.gui.ViewchainFactory;
 import org.helioviewer.jhv.gui.interfaces.ShowableDialog;
 import org.helioviewer.jhv.gui.states.StateController;
 import org.helioviewer.viewmodel.view.ImageInfoView;
@@ -262,7 +262,7 @@ public abstract class AbstractPluginDialog extends JDialog implements ShowableDi
     private void recreateViewChains() {
 
         // ViewchainFactory chainFactory = new ViewchainFactory();
-        ViewchainFactory chainFactory = StateController.getInstance().getCurrentState().getViewchainFactory();
+        GL3DViewchainFactory chainFactory = StateController.getInstance().getCurrentState().getViewchainFactory();
 
         // Memorize all ImageInfoViews, remove all existing layers and add the
         // memorized ImageInfoViews as new layers again. Activated and needed

@@ -7,7 +7,6 @@ import org.helioviewer.gl3d.model.GL3DInternalPluginConfiguration;
 import org.helioviewer.gl3d.plugin.GL3DPluginController;
 import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.gui.GL3DViewchainFactory;
-import org.helioviewer.jhv.gui.ViewchainFactory;
 import org.helioviewer.jhv.gui.components.statusplugins.RenderModeStatusPanel;
 import org.helioviewer.jhv.gui.controller.MainImagePanelMousePanController;
 import org.helioviewer.jhv.gui.interfaces.ImagePanelInputController;
@@ -70,7 +69,7 @@ public class GuiState implements State {
     }
 
     @Override
-    public ViewchainFactory getViewchainFactory() {
+    public GL3DViewchainFactory getViewchainFactory() {
         return viewchainFactory;
     }
 
