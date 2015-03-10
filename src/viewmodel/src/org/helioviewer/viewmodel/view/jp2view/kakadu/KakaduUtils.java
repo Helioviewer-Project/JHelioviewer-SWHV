@@ -386,22 +386,44 @@ public class KakaduUtils {
         return xml;
     }
 
-    public static ArrayList<String> getAllXMLs(Jp2_threadsafe_family_src _familySrc, int num) throws JHV_KduException {
-        Jp2_input_box findBoxResult[], assocBox, xmlBox;
-        ArrayList<String> xmls = new ArrayList<String>(num);
-
-        findBoxResult = KakaduUtils.findBox(_familySrc, Kdu_global.jp2_association_4cc, 1);
-        assocBox = findBoxResult[0];
-
-        if (assocBox != null) {
-            for (int i = 0; i < num; i++) {
-                xmlBox = KakaduUtils.findBox2(assocBox, Kdu_global.jp2_xml_4cc, 1);
-                if (xmlBox != null) {
-                    xmls.add(i, xmlBox2xml(xmlBox));
-                    xmlBox.Native_destroy();
+    private static boolean myFindBox2(Jp2_input_box box, Jp2_input_box _supBox, long _boxType, int _boxNumber) throws JHV_KduException {
+        try {
+            if (!box.Open(_supBox))
+                throw new JHV_KduException("Box not open: " + _boxNumber);
+            else {
+                int i = 1;
+                while ((box.Get_box_type() != _boxType || i < _boxNumber) && box.Exists()) {
+                    if (box.Get_box_type() == _boxType)
+                        i++;
+                    box.Close();
+                    box.Open_next();
                 }
 
+                if (!box.Exists() || box.Get_box_type() != _boxType) {
+                    return false;
+                }
+            }
+        } catch (KduException ex) {
+            throw new JHV_KduException("Internal Kakadu Error(myFindBox2 " + _boxNumber + "): " + ex.getMessage(), ex);
+        }
+        return true;
+    }
+
+    public static ArrayList<String> getAllXMLs(Jp2_threadsafe_family_src _familySrc, int num) throws JHV_KduException {
+        Jp2_input_box findBoxResult[], assocBox;
+        Jp2_input_box xmlBox = new Jp2_input_box();
+        ArrayList<String> xmls = new ArrayList<String>(num);
+
+        findBoxResult = findBox(_familySrc, Kdu_global.jp2_association_4cc, 1);
+        assocBox = findBoxResult[0];
+        if (assocBox != null) {
+            for (int i = 0; i < num; i++) {
                 try {
+                    if (myFindBox2(xmlBox, assocBox, Kdu_global.jp2_xml_4cc, 1) == true) {
+                        xmls.add(i, xmlBox2xml(xmlBox));
+                    }
+
+                    xmlBox.Close();
                     assocBox.Close();
                     assocBox.Open_next();
                 } catch (KduException ex) {
@@ -413,6 +435,10 @@ public class KakaduUtils {
             xmlBox = findBoxResult[0];
             if (xmlBox != null)
                 xmls.add(0, xmlBox2xml(xmlBox));
+        }
+
+        if (xmlBox != null) {
+            xmlBox.Native_destroy();
         }
 
         if (findBoxResult[1] != null) {
