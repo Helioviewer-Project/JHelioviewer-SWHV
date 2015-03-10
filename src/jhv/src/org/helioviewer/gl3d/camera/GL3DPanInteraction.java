@@ -32,8 +32,8 @@ public class GL3DPanInteraction extends GL3DDefaultInteraction {
 
     @Override
     public void mouseDragged(MouseEvent e, GL3DCamera camera) {
-        int x = (e.getPoint().x - this.lastMousePoint.x);
-        int y = (e.getPoint().y - this.lastMousePoint.y);
+        int x = (e.getPoint().x - this.lastMousePoint.x) * 2;
+        int y = (e.getPoint().y - this.lastMousePoint.y) * 2;
         if (sceneGraphView.getAdapter(RegionView.class).getRegion() != null) {
             Vector2dDouble imageDisplacement = ViewHelper.convertScreenToImageDisplacement(x, y, sceneGraphView.getAdapter(RegionView.class).getRegion(), ViewHelper.calculateViewportImageSize(sceneGraphView));
             camera.translation.x += imageDisplacement.getX();
