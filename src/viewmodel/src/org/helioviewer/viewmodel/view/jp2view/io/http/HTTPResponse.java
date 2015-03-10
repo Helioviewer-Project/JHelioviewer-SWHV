@@ -47,4 +47,4 @@ public class HTTPResponse extends HTTPMessage {
         return false;
     }
 
-};
+}
