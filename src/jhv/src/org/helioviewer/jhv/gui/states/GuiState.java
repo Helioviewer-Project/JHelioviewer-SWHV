@@ -17,7 +17,6 @@ import org.helioviewer.jhv.gui.interfaces.ImagePanelInputController;
 import org.helioviewer.viewmodel.view.ComponentView;
 import org.helioviewer.viewmodel.view.opengl.GL3DSceneGraphView;
 
-
 public class GuiState implements State {
 
     private final boolean is3d;
@@ -81,7 +80,7 @@ public class GuiState implements State {
         if (previousState == null || previousState.getMainComponentView() == null) {
             return this.createViewChains();
         } else {
-            mainComponentView = getViewchainFactory().createViewchainFromExistingViewchain(previousState.getMainComponentView(), this.mainComponentView, false);
+            mainComponentView = previousState.getMainComponentView();
             return false;
         }
     }
