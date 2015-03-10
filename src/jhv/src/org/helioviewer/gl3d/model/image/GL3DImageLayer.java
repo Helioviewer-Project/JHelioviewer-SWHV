@@ -225,33 +225,38 @@ public class GL3DImageLayer extends GL3DShape {
         GLSLShader.bindVars(state.gl);
 
         gl.glEnable(GL2.GL_CULL_FACE);
-        gl.glEnable(GL2.GL_BLEND);
-        GLFilterView glfilter = this.imageTextureView.getAdapter(GLFilterView.class);
-
-        if (glfilter != null) {
-            glfilter.renderGL(gl, true);
-        }
-        GLSLShader.filter(gl);
-        GLSLShader.bind(state.gl);
-
-        enablePositionVBO(state);
-        enableIndexVBO(state);
         {
-            state.gl.glVertexPointer(3, GL2.GL_FLOAT, 3 * Buffers.SIZEOF_FLOAT, 0);
-            if (this.showCorona) {
-                state.gl.glDepthRange(1.f, 1.f);
-                gl.glDrawElements(GL2.GL_TRIANGLES, 6, GL2.GL_UNSIGNED_INT, (this.indexBufferSize - 6) * Buffers.SIZEOF_INT);
-                state.gl.glDepthRange(0.f, 1.f);
-            }
-            if (this.showSphere && StateController.getInstance().getCurrentState() == ViewStateEnum.View3D.getState()) {
-                gl.glDrawElements(GL2.GL_TRIANGLES, this.indexBufferSize - 6, GL2.GL_UNSIGNED_INT, 0);
-            }
-        }
-        disableIndexVBO(state);
-        disablePositionVBO(state);
-        GLSLShader.unbind(state.gl);
+            gl.glCullFace(GL2.GL_BACK);
 
-        gl.glColorMask(true, true, true, true);
+            gl.glEnable(GL2.GL_BLEND);
+            GLFilterView glfilter = this.imageTextureView.getAdapter(GLFilterView.class);
+
+            if (glfilter != null) {
+                glfilter.renderGL(gl, true);
+            }
+            GLSLShader.filter(gl);
+            GLSLShader.bind(state.gl);
+
+            enablePositionVBO(state);
+            enableIndexVBO(state);
+            {
+                state.gl.glVertexPointer(3, GL2.GL_FLOAT, 3 * Buffers.SIZEOF_FLOAT, 0);
+                if (this.showCorona) {
+                    state.gl.glDepthRange(1.f, 1.f);
+                    gl.glDrawElements(GL2.GL_TRIANGLES, 6, GL2.GL_UNSIGNED_INT, (this.indexBufferSize - 6) * Buffers.SIZEOF_INT);
+                    state.gl.glDepthRange(0.f, 1.f);
+                }
+                if (this.showSphere && StateController.getInstance().getCurrentState() == ViewStateEnum.View3D.getState()) {
+                    gl.glDrawElements(GL2.GL_TRIANGLES, this.indexBufferSize - 6, GL2.GL_UNSIGNED_INT, 0);
+                }
+            }
+            disableIndexVBO(state);
+            disablePositionVBO(state);
+            GLSLShader.unbind(state.gl);
+
+            gl.glColorMask(true, true, true, true);
+        }
+        gl.glDisable(GL2.GL_CULL_FACE);
 
     }
 

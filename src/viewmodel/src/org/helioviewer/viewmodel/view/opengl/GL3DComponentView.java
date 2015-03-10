@@ -25,12 +25,10 @@ import org.helioviewer.jhv.gui.dialogs.ExportMovieDialog;
 import org.helioviewer.jhv.layers.LayersModel;
 import org.helioviewer.viewmodel.changeevent.ChangeEvent;
 import org.helioviewer.viewmodel.changeevent.SubImageDataChangedReason;
-import org.helioviewer.viewmodel.region.Region;
 import org.helioviewer.viewmodel.renderer.screen.GLScreenRenderGraphics;
 import org.helioviewer.viewmodel.renderer.screen.ScreenRenderer;
 import org.helioviewer.viewmodel.view.AbstractComponentView;
 import org.helioviewer.viewmodel.view.ComponentView;
-import org.helioviewer.viewmodel.view.RegionView;
 import org.helioviewer.viewmodel.view.View;
 import org.helioviewer.viewmodel.view.jp2view.JHVJP2View;
 import org.helioviewer.viewmodel.view.jp2view.JHVJPXView;
@@ -181,10 +179,6 @@ public class GL3DComponentView extends AbstractComponentView implements GLEventL
             gl.glEnable(GL2.GL_COLOR_MATERIAL);
 
             gl.glEnable(GL2.GL_NORMALIZE);
-            // gl.glEnable(GL2.GL_CULL_FACE);
-            gl.glCullFace(GL2.GL_BACK);
-            gl.glFrontFace(GL2.GL_CCW);
-            // gl.glDepthFunc(GL2.GL_LESS);
             gl.glDepthFunc(GL2.GL_LEQUAL);
         }
 
@@ -199,45 +193,6 @@ public class GL3DComponentView extends AbstractComponentView implements GLEventL
             ((GL3DView) v).renderGL(gl, true);
         }
 
-    }
-
-    private static class Draw2DInterface implements DrawInterface {
-
-        @Override
-        public final void init(GL2 gl) {
-            gl.glEnable(GL2.GL_DEPTH_TEST);
-            gl.glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
-            gl.glEnable(GL2.GL_TEXTURE_1D);
-            gl.glEnable(GL2.GL_TEXTURE_2D);
-            gl.glEnable(GL2.GL_BLEND);
-            gl.glEnable(GL2.GL_POINT_SMOOTH);
-            gl.glBlendFunc(GL2.GL_SRC_ALPHA, GL2.GL_ONE_MINUS_SRC_ALPHA);
-        }
-
-        @Override
-        public final void reshapeView(GL2 gl, int width, int height) {
-            gl.glMatrixMode(GL2.GL_PROJECTION);
-            gl.glLoadIdentity();
-
-            gl.glOrtho(0, width, 0, height, -1, 1);
-
-            gl.glMatrixMode(GL2.GL_MODELVIEW);
-            gl.glLoadIdentity();
-        }
-
-        @Override
-        public final void displayBody(GL2 gl, View v, int width, int height) {
-            gl.glClear(GL2.GL_COLOR_BUFFER_BIT);
-
-            Region region = v.getAdapter(RegionView.class).getRegion();
-
-            if (region != null) {
-                gl.glScalef(width / (float) region.getWidth(), height / (float) region.getHeight(), 1.0f);
-                gl.glTranslatef((float) -region.getCornerX(), (float) -region.getCornerY(), 0.0f);
-
-                ((GLView) v).renderGL(gl, true);
-            }
-        }
     }
 
     @Override
