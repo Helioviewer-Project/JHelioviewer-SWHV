@@ -35,7 +35,6 @@ public class EventPanel implements DrawableElement {
 
     @Override
     public void draw(Graphics2D g, Graphics2D leftAxis, Rectangle graphArea, Rectangle leftAxisArea, Point mousePosition) {
-        long start = System.currentTimeMillis();
         if (EventModel.getSingletonInstance().isEventsVisible()) {
             EventTypePlotConfiguration etpc = EventModel.getSingletonInstance().getEventTypePlotConfiguration();
             Map<String, List<EventPlotConfiguration>> epcs = etpc.getEventPlotConfigurations();

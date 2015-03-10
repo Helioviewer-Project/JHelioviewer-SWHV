@@ -825,7 +825,6 @@ public class LayersModel implements ViewListener {
         }
 
         File downloadDestination = fileDownloader.getDefaultDownloadLocation(view.getAdapter(ImageInfoView.class).getUri());
-        JHVJP2View mainView = view.getAdapter(JHVJP2View.class);
         try {
             if (!fileDownloader.get(source, downloadDestination, "Downloading " + view.getAdapter(ImageInfoView.class).getName())) {
                 return;
@@ -1263,7 +1262,7 @@ public class LayersModel implements ViewListener {
         /*
          * ImageInfoView imageInfoView = view.getAdapter(ImageInfoView.class);
          * String typeString; String intervalString;
-         * 
+         *
          * if (imageInfoView != null) { SimpleDateFormat format = new
          * SimpleDateFormat("yyyy/MM/dd HH:mm"); Interval<Date> interval =
          * imageInfoView.getDateRange(); if (interval != null) { typeString =

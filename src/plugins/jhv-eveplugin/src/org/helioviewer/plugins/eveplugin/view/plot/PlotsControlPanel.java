@@ -115,13 +115,10 @@ public class PlotsControlPanel extends JPanel implements ZoomControllerListener,
         calendar.setTime(startDate);
         calendar.add(Calendar.YEAR, 1);
         calendar.add(Calendar.HOUR, 1);
-        final boolean years = interval.containsPointInclusive(calendar.getTime());
 
         calendar.clear();
         calendar.setTime(startDate);
         calendar.add(Calendar.MONTH, 3);
-        ;
-        final boolean months = interval.containsPointInclusive(calendar.getTime());
 
         final DefaultComboBoxModel model = (DefaultComboBoxModel) zoomComboBox.getModel();
         model.removeAllElements();

@@ -86,9 +86,7 @@ public class Astronomy {
         double diff = (lamda - k) / radeg;
         double x = Math.atan(-Math.cos(lamda2 / radeg) * Math.tan(ob1t / radeg)) * radeg;
         double y = Math.atan(-Math.cos(diff) * Math.tan(i / radeg)) * radeg;
-        double pa = x + y;
 
-        double lat0 = Math.asin(Math.sin(diff) * Math.sin(i / radeg)) * radeg;
         y = -Math.sin(diff) * Math.cos(i / radeg);
         x = -Math.cos(diff);
         double eta = Math.atan2(y, x) * radeg + 360.;

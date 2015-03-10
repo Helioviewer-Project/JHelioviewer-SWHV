@@ -43,7 +43,7 @@ public class GL3DInternalPluginConfiguration implements GL3DPluginConfiguration 
          * "org.helioviewer.gl3d.plugin.hekplugin.HEKPlugin")); entries.add(new
          * PluginEntry("C:\\Projects\\JHelioViewer\\pfss_plugin.jar",
          * "org.helioviewer.gl3d.plugin.pfss.PfssPlugin"));
-         *
+         * 
          * for(PluginEntry entry : entries) { GL3DModelPlugin p =
          * loadPlugin(entry.path, entry.clazz); if(p != null && p instanceof
          * GL3DModelPlugin) plugins.add((GL3DModelPlugin) p); }
@@ -71,7 +71,6 @@ public class GL3DInternalPluginConfiguration implements GL3DPluginConfiguration 
 
     // @Override
     public List<GL3DModelPlugin> findPlugins2() {
-        File pfss = new File("C:\\Users\\jf\\Desktop\\PfssPlugin.jar");
         // File vectors = new File("C:\\Users\\jf\\Desktop\\VectorsPlugin.jar");
         // File hek = new File("C:\\Users\\jf\\Desktop\\HEKPlugin.jar");
         // File hek = new

@@ -28,19 +28,19 @@ import org.helioviewer.jhv.gui.ImageViewerGui;
 
 /**
  * Popup displaying informations about a HEK event.
- * 
+ *
  * <p>
  * This panel is a JDialog, so that it can be displayed on top of an GLCanvas,
  * which is not possible for other swing components.
- * 
+ *
  * <p>
  * For further informations about solar events, see
  * {@link org.helioviewer.jhv.solarevents}.
- * 
+ *
  * @author Markus Langenberg
  * @author Malte Nuhn
  * @author Bram.Bourgoignie (Bram.Bourgoignie@oma.be)
- * 
+ *
  */
 public class SWEKEventInformationDialog extends JDialog implements WindowFocusListener, FocusListener, WindowListener, DataCollapsiblePanelModelListener {
 
@@ -63,15 +63,13 @@ public class SWEKEventInformationDialog extends JDialog implements WindowFocusLi
 
     private Integer nrOfWindowsOpened;
 
-    private final SWEKEventInformationDialog parent;
-
     private final DataCollapsiblePanelModel model;
 
     // CollapsiblePanels
 
     /**
-     * 
-     * 
+     *
+     *
      * @param event
      */
     public SWEKEventInformationDialog(JHVEvent event) {
@@ -79,7 +77,6 @@ public class SWEKEventInformationDialog extends JDialog implements WindowFocusLi
         model = new DataCollapsiblePanelModel();
         model.addListener(this);
         initDialog(event);
-        parent = null;
 
     }
 
@@ -88,7 +85,6 @@ public class SWEKEventInformationDialog extends JDialog implements WindowFocusLi
         model = new DataCollapsiblePanelModel();
         model.addListener(this);
         initDialog(event);
-        this.parent = parent;
     }
 
     @Override
@@ -205,7 +201,7 @@ public class SWEKEventInformationDialog extends JDialog implements WindowFocusLi
 
     /**
      * initialize the allTablePanel
-     * 
+     *
      */
     private void initAllTablePanel() {
         allTablePanel = new JPanel();

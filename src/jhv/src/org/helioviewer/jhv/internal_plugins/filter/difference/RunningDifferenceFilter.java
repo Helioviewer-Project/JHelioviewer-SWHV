@@ -42,7 +42,6 @@ public class RunningDifferenceFilter implements FrameFilter, Filter {
     private ImageData currentFrame;
     private float truncationValue = 0.2f;
     private JHVJPXView jpxView;
-    private JHVJP2View jp2View;
 
     /**
      * @see org.helioviewer.viewmodel.filter.ObservableFilter#addFilterListener(org.helioviewer.viewmodel.filter.FilterListener)
@@ -85,7 +84,6 @@ public class RunningDifferenceFilter implements FrameFilter, Filter {
 
     @Override
     public void setJP2View(JHVJP2View jp2View) {
-        this.jp2View = jp2View;
         if (jp2View instanceof JHVJPXView) {
             this.jpxView = (JHVJPXView) jp2View;
         }

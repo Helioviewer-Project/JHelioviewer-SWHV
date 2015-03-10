@@ -16,9 +16,7 @@ import org.helioviewer.viewmodel.imagedata.ImageData;
 import org.helioviewer.viewmodel.imagedata.SingleChannelByte8ImageData;
 import org.helioviewer.viewmodel.imagetransport.Byte8ImageTransport;
 import org.helioviewer.viewmodel.imagetransport.Int32ImageTransport;
-import org.helioviewer.viewmodel.metadata.HelioviewerMetaData;
 import org.helioviewer.viewmodel.view.ImageInfoView;
-import org.helioviewer.viewmodel.view.MetaDataView;
 import org.helioviewer.viewmodel.view.View;
 import org.helioviewer.viewmodel.view.ViewListener;
 import org.helioviewer.viewmodel.view.jp2view.JHVJP2CallistoView;
@@ -201,7 +199,6 @@ public class DownloadedJPXData implements ViewListener, FilterModelListener {
         if (view != null) {
             JHVJP2CallistoView jp2CallistoView = view.getAdapter(JHVJP2CallistoView.class);
             if (jp2CallistoView != null) {
-                MetaDataView metaDataView = view.getAdapter(MetaDataView.class);
                 ImageData imData = FilterModel.getInstance().colorFilter(jp2CallistoView.getSubimageData());
                 if (imData instanceof ARGBInt32ImageData) {
                     int[] data = new int[0];
@@ -219,7 +216,6 @@ public class DownloadedJPXData implements ViewListener, FilterModelListener {
                     if (imageData != null) {
                         Byte8ImageTransport bytetrs = (Byte8ImageTransport) imageData.getImageTransport();
                         data = bytetrs.getByte8PixelData();
-                        HelioviewerMetaData md = (HelioviewerMetaData) metaDataView.getMetaData();
                         byte[] copyData = Arrays.copyOf(data, data.length);
                         data = new byte[0];
                         // Log.debug("dworker" + nr + ": new result");

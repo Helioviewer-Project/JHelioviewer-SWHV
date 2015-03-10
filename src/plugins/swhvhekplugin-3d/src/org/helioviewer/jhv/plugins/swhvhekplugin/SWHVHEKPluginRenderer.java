@@ -11,7 +11,6 @@ import java.util.List;
 import javax.media.opengl.GL2;
 import javax.swing.ImageIcon;
 
-import org.helioviewer.base.physics.Astronomy;
 import org.helioviewer.jhv.data.datatype.event.JHVCoordinateSystem;
 import org.helioviewer.jhv.data.datatype.event.JHVEvent;
 import org.helioviewer.jhv.data.datatype.event.JHVPoint;
@@ -58,8 +57,6 @@ public class SWHVHEKPluginRenderer implements PhysicalRenderer {
         JHVPoint oldBoundaryPoint3d = null;
 
         for (JHVPoint point : points) {
-            double theta = point.getCoordinate2() / 180. * Math.PI;// - Astronomy.getB0InRadians(new Date((evt.getStartDate().getTime() + evt.getEndDate().getTime()) / 2));
-            double phi = point.getCoordinate1() / 180. * Math.PI - Astronomy.getL0Radians(new Date((evt.getStartDate().getTime() + evt.getEndDate().getTime()) / 2));
 
             int divpoints = 10;
             Color evtColor = evt.getEventRelationShip().getRelationshipColor();

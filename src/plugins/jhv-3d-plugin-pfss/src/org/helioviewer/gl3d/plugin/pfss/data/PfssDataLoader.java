@@ -21,7 +21,6 @@ public class PfssDataLoader implements Runnable {
     @Override
     public void run() {
         String baseUrl = PfssSettings.baseUrl;
-        String m = (dayAndTime.getMonth()) < 9 ? "0" + (dayAndTime.getMonth() + 1) : (dayAndTime.getMonth() + 1) + "";
         String url = baseUrl + dayAndTime.getUrl();
         fitsFile.loadFile(url);
     }
