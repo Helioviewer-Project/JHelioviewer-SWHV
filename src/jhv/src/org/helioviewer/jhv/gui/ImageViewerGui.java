@@ -1,7 +1,6 @@
 package org.helioviewer.jhv.gui;
 
 import java.awt.BorderLayout;
-import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.GraphicsEnvironment;
@@ -411,13 +410,6 @@ public class ImageViewerGui {
      * @param stateEnum
      */
     private void activateState(final State newState, State oldState) {
-        if (oldState != null) {
-            for (Component c : moviePanelContainer.getComponents()) {
-                if (c instanceof MoviePanel) {
-                    ((MoviePanel) c).setPlaying(false, true);
-                }
-            }
-        }
 
         newState.recreateViewChains(oldState);
         renderModeStatus.updateStatus();
