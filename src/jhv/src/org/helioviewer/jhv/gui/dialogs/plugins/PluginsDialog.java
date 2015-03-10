@@ -28,10 +28,10 @@ import javax.swing.filechooser.FileFilter;
 import org.helioviewer.base.FileUtils;
 import org.helioviewer.base.message.Message;
 import org.helioviewer.jhv.JHVDirectory;
+import org.helioviewer.jhv.gui.GL3DViewchainFactory;
 import org.helioviewer.jhv.gui.IconBank;
 import org.helioviewer.jhv.gui.IconBank.JHVIcon;
 import org.helioviewer.jhv.gui.ImageViewerGui;
-import org.helioviewer.jhv.gui.ViewchainFactory;
 import org.helioviewer.jhv.gui.dialogs.pluginsOLD.FilterPluginDialog;
 import org.helioviewer.jhv.gui.dialogs.pluginsOLD.OverlayPluginDialog;
 import org.helioviewer.jhv.gui.interfaces.ShowableDialog;
@@ -250,7 +250,8 @@ public class PluginsDialog extends JDialog implements ShowableDialog, ActionList
      * parts from plug ins.
      */
     private void recreateViewChains() {
-        ViewchainFactory chainFactory = new ViewchainFactory();
+        Thread.dumpStack();
+        GL3DViewchainFactory chainFactory = new GL3DViewchainFactory();
         ViewFactory viewFactory = chainFactory.getUsedViewFactory();
 
         // Memorize all ImageInfoViews, remove all existing layers and add the
