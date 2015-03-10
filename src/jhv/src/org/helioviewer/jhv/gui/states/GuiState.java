@@ -30,14 +30,6 @@ public class GuiState implements State {
     }
 
     @Override
-    public void activate() {
-    }
-
-    @Override
-    public void deactivate() {
-    }
-
-    @Override
     public boolean createViewChains() {
         Log.info("Start creating view chains");
 
