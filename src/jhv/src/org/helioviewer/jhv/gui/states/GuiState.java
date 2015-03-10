@@ -18,7 +18,7 @@ public class GuiState implements State {
     private final boolean is3d;
     public static GL3DViewchainFactory viewchainFactory = new GL3DViewchainFactory();
 
-    private ComponentView mainComponentView;
+    private static ComponentView mainComponentView;
     private RenderModeStatusPanel renderModeStatus;
 
     public GuiState(boolean is3d) {
@@ -26,26 +26,24 @@ public class GuiState implements State {
     }
 
     @Override
-    public boolean createViewChains() {
+    public void createViewChains() {
         Log.info("Start creating view chains");
 
-        boolean firstTime = (mainComponentView == null);
         // Create main view chain
         mainComponentView = viewchainFactory.createViewchainMain(mainComponentView, false);
         GL3DCameraSelectorModel.getInstance().activate(this.mainComponentView.getAdapter(GL3DSceneGraphView.class));
         GL3DPluginController.getInstance().setPluginConfiguration(new GL3DInternalPluginConfiguration());
         GL3DPluginController.getInstance().loadPlugins();
-        return firstTime;
     }
 
     @Override
     public boolean recreateViewChains(State previousState) {
         Displayer.getSingletonInstance().removeListeners();
 
-        if (previousState == null || previousState.getMainComponentView() == null) {
-            return this.createViewChains();
+        if (mainComponentView == null) {
+            this.createViewChains();
+            return true;
         } else {
-            mainComponentView = previousState.getMainComponentView();
             return false;
         }
     }

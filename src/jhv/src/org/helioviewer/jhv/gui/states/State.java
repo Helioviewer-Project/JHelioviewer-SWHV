@@ -12,7 +12,7 @@ import org.helioviewer.viewmodel.view.ComponentView;
  */
 public interface State {
 
-    public boolean createViewChains();
+    public void createViewChains();
 
     /**
      * Create a new Viewchain based on the already existing view chain from the
