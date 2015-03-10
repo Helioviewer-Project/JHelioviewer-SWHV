@@ -202,4 +202,4 @@ public class HTTPSocket extends Socket {
         return lastUsedHost;
     }
 
-};
+}

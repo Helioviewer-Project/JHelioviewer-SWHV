@@ -105,4 +105,5 @@ public abstract class HTTPMessage {
     public final void clearHeaders() {
         headers.clear();
     }
-};
+
+}

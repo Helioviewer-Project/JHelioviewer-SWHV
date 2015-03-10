@@ -452,7 +452,6 @@ public class KakaduUtils {
         return xmls;
     }
 
-
     /**
      * This method updates the server cache model. The JPIPSocket object should
      * be connected already.
