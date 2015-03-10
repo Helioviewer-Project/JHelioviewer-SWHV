@@ -38,9 +38,6 @@ public abstract class GL3DCamera {
     private double fov = INITFOV;
     private double aspect = 0.0;
 
-    public int currentMouseX = 0;
-    public int currentMouseY = 0;
-
     private GL3DMat4d cameraTransformation;
 
     protected GL3DQuatd rotation;
