@@ -91,7 +91,7 @@ public class JPIPConstants {
     /**
      * The minimum length in bytes of a JPIP request.
      */
-    public static final int MIN_REQUEST_LEN = 100000;
+    public static final int MIN_REQUEST_LEN = 1000;
 
     /**
      * Maximum number of layers that can be requested at the same time.

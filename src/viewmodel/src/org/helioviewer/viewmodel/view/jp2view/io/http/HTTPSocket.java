@@ -62,6 +62,7 @@ public class HTTPSocket extends Socket {
         lastUsedHost = _uri.getHost();
         super.setSoTimeout(10000);
         super.setKeepAlive(true);
+        super.setTcpNoDelay(true);
         super.connect(new InetSocketAddress(lastUsedHost, lastUsedPort), 10000);
         return null;
     }
