@@ -43,7 +43,6 @@ public abstract class StandardViewFactory implements ViewFactory {
         // FilterView
         if (pattern.isAssignableFrom(FilterView.class)) {
             return (T) new StandardFilterView();
-            // SolarRotationTrackingView
         } else {
             return null;
         }

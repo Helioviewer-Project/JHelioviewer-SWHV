@@ -80,12 +80,7 @@ public class GL3DViewFactory extends StandardViewFactory {
             }
         } else if (source instanceof ComponentView) {
             return (T) new GL3DComponentView();
-
-        }
-
-        else {
-            System.out.println(source);
-            System.exit(1);
+        } else {
             return null;
         }
     }
