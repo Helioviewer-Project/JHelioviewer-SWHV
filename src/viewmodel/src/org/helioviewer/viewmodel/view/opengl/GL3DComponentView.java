@@ -22,8 +22,6 @@ import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.gui.ImageViewerGui;
 import org.helioviewer.jhv.gui.ViewListenerDistributor;
 import org.helioviewer.jhv.gui.dialogs.ExportMovieDialog;
-import org.helioviewer.jhv.gui.states.StateController;
-import org.helioviewer.jhv.gui.states.ViewStateEnum;
 import org.helioviewer.jhv.layers.LayersModel;
 import org.helioviewer.viewmodel.changeevent.ChangeEvent;
 import org.helioviewer.viewmodel.changeevent.SubImageDataChangedReason;
@@ -73,13 +71,8 @@ public class GL3DComponentView extends AbstractComponentView implements GLEventL
 
     @Override
     public void activate() {
-        if ((view instanceof GLView) == false)
-            throw new NullPointerException("View is not an instance of GLView");
 
-        if (StateController.getInstance().getCurrentState().getType() == ViewStateEnum.View3D)
-            draw = new Draw3DInterface();
-        else
-            draw = new Draw2DInterface();
+        draw = new Draw3DInterface();
 
         canvas.addGLEventListener(this);
         Displayer.getSingletonInstance().addListener(this);
