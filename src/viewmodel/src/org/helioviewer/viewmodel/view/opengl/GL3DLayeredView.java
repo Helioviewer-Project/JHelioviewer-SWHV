@@ -5,6 +5,7 @@ import javax.media.opengl.GL2;
 import org.helioviewer.gl3d.scenegraph.GL3DState;
 import org.helioviewer.viewmodel.changeevent.ChangeEvent;
 import org.helioviewer.viewmodel.region.StaticRegion;
+import org.helioviewer.viewmodel.view.AbstractLayeredView;
 import org.helioviewer.viewmodel.view.MovieView;
 import org.helioviewer.viewmodel.view.View;
 import org.helioviewer.viewmodel.view.ViewHelper;
@@ -18,7 +19,7 @@ import org.helioviewer.viewmodel.viewport.ViewportAdapter;
  * @author Simon Spoerri (simon.spoerri@fhnw.ch)
  *
  */
-public class GL3DLayeredView extends GLLayeredView implements GL3DView {
+public class GL3DLayeredView extends AbstractLayeredView implements GL3DView {
 
     @Override
     public void addLayer(View newLayer, int newIndex) {
@@ -67,6 +68,11 @@ public class GL3DLayeredView extends GLLayeredView implements GL3DView {
                 ((GL3DView) layerView).renderGL(gl, true);
             }
         }
+    }
+
+    @Override
+    public void renderGL(GL2 gl, boolean nextView) {
+        renderGL(gl);
     }
 
     /**
