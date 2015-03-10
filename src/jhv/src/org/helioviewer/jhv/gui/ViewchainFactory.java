@@ -21,9 +21,7 @@ import org.helioviewer.viewmodel.view.MovieView;
 import org.helioviewer.viewmodel.view.StandardSolarRotationTrackingView;
 import org.helioviewer.viewmodel.view.SubimageDataView;
 import org.helioviewer.viewmodel.view.View;
-import org.helioviewer.viewmodel.view.ViewListener;
 import org.helioviewer.viewmodel.view.jp2view.JP2View;
-import org.helioviewer.viewmodel.view.opengl.GLLayeredView;
 import org.helioviewer.viewmodel.view.opengl.GLOverlayView;
 import org.helioviewer.viewmodelplugin.controller.PluginManager;
 import org.helioviewer.viewmodelplugin.filter.FilterContainer;
@@ -112,11 +110,7 @@ public class ViewchainFactory {
      * @return instance of the ComponentView of the new created view chain.
      */
     public ComponentView createViewchainMain(ComponentView currentMainImagePanelView, boolean keepSource) {
-        if (currentMainImagePanelView == null) {
-            return createNewViewchainMain();
-        } else {
-            return createViewchainFromExistingViewchain(currentMainImagePanelView, null, keepSource);
-        }
+        return createNewViewchainMain();
     }
 
     /**
@@ -318,35 +312,6 @@ public class ViewchainFactory {
         return componentView;
     }
 
-    /**
-     * Builds up a new view chain on the basis of an existing one depending on
-     * the selected mode.
-     *
-     * The new view chain will have the the same structure as the original one.
-     *
-     * @param sourceImagePanelView
-     *            The topmost view of the original view chain.
-     * @param mainImagePanelView
-     *            The topmost view of the main view chain.
-     * @return The topmost view of the new created view chain.
-     */
-    public ComponentView createViewchainFromExistingViewchain(ComponentView sourceImagePanelView, ComponentView mainImagePanelView, boolean keepSource) {
-        reinsertSolarRotationTrackingView(sourceImagePanelView);
-
-        ComponentView newView = viewFactory.createViewFromSource(sourceImagePanelView, keepSource);
-        createViewchainFromExistingViewchain(sourceImagePanelView.getView(), newView, mainImagePanelView, keepSource);
-
-        LayeredView layeredView = sourceImagePanelView.getAdapter(LayeredView.class);
-        GLLayeredView newLayeredView = (GLLayeredView) newView.getAdapter(LayeredView.class);
-        for (int i = 0; i < layeredView.getNumLayers(); i++) {
-            if (!layeredView.isVisible(layeredView.getLayer(i))) {
-                newLayeredView.toggleVisibility(newLayeredView.getLayer(i));
-            }
-        }
-
-        return newView;
-    }
-
     private void reinsertSolarRotationTrackingView(ComponentView sourceImagePanelView) {
         ViewFactory viewFactory = getUsedViewFactory();
         // find view before Layered View
@@ -362,72 +327,6 @@ public class ViewchainFactory {
         StandardSolarRotationTrackingView solarRotationView = viewFactory.createNewView(StandardSolarRotationTrackingView.class);
         solarRotationView.setView(layeredViewPredecessor.getView());
         layeredViewPredecessor.setView(solarRotationView);
-    }
-
-    /**
-     * Method goes recursively through a view chain and creates a new one with
-     * the same structure.
-     *
-     * @param sourceView
-     *            current view of the view chain which has to be transfered to
-     *            the new view chain.
-     * @param targetView
-     *            equivalent view in the new view chain to the source view.
-     * @param mainImagePanelView
-     *            topmost view of the main view chain.
-     */
-    protected void createViewchainFromExistingViewchain(View sourceView, View targetView, ComponentView mainImagePanelView, boolean keepSource) {
-        View newView;
-        // if sourceView is an ImageInfoView (such as JHVJP2View), remove all
-        // ViewListeners from the
-        // old view chain and use the sourceView as input for the new view chain
-        if (sourceView instanceof ImageInfoView && !keepSource) {
-            AbstractList<ViewListener> listeners = sourceView.getAllViewListeners();
-            for (int i = listeners.size() - 1; i >= 0; i--) {
-                if (listeners.get(i) instanceof View) {
-                    sourceView.removeViewListener(listeners.get(i));
-                }
-            }
-            newView = sourceView;
-            // otherwise create new view - if null, skip it
-        } else if (sourceView instanceof GLOverlayView) {
-            newView = new GLOverlayView();
-            ((GLOverlayView) newView).setOverlays(((GLOverlayView) sourceView).getOverlays());
-        } else {
-            newView = viewFactory.createViewFromSource(sourceView, keepSource);
-
-            if (newView == null) {
-                if (sourceView instanceof ModifiableInnerViewView) {
-                    createViewchainFromExistingViewchain(((ModifiableInnerViewView) sourceView).getView(), targetView, mainImagePanelView, keepSource);
-                }
-                return;
-            }
-        }
-
-        // insert newView in new view chain
-        if (targetView instanceof ModifiableInnerViewView) {
-            ((ModifiableInnerViewView) targetView).setView(newView);
-        } else if (targetView instanceof LayeredView) {
-
-            if (sourceView instanceof ModifiableInnerViewView) {
-                createViewchainFromExistingViewchain(((ModifiableInnerViewView) sourceView).getView(), newView, mainImagePanelView, keepSource);
-            }
-
-            ((LayeredView) targetView).addLayer(newView);
-            return;
-        }
-
-        // go on with the next view
-        if (sourceView instanceof ModifiableInnerViewView) {
-            createViewchainFromExistingViewchain(((ModifiableInnerViewView) sourceView).getView(), newView, mainImagePanelView, keepSource);
-        } else if (sourceView instanceof LayeredView) {
-            LayeredView layeredView = (LayeredView) sourceView;
-            for (int i = 0; i < layeredView.getNumLayers(); i++) {
-                if (layeredView.getLayer(i) != null) {
-                    createViewchainFromExistingViewchain(layeredView.getLayer(i), newView, mainImagePanelView, keepSource);
-                }
-            }
-        }
     }
 
 }
