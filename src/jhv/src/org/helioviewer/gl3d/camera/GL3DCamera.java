@@ -242,7 +242,7 @@ public abstract class GL3DCamera {
         double w = -translation.z * Math.tan(fov / 2.);
         gl.glOrtho(-this.aspect * w, this.aspect * w, -w, w, this.clipNear, this.clipFar);
         this.orthoMatrix = GL3DMat4d.ortho(-w, w, -w, w, this.clipNear, this.clipFar);
-
+        this.orthoMatrix.translate(new GL3DVec3d(this.translation.x, this.translation.y, 0.));
         gl.glMatrixMode(GL2.GL_MODELVIEW);
     }
 
