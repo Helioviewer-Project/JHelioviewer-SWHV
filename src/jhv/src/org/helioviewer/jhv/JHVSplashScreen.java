@@ -13,13 +13,9 @@ import javax.swing.JProgressBar;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
-import org.helioviewer.base.logging.Log;
-import org.helioviewer.base.message.Message;
 import org.helioviewer.jhv.gui.IconBank;
 import org.helioviewer.jhv.gui.IconBank.JHVIcon;
-import org.helioviewer.jhv.gui.components.StatusPanel;
 import org.helioviewer.jhv.gui.components.StatusPanel.StatusTextListener;
-import org.helioviewer.viewmodel.view.opengl.GLInfo;
 
 /**
  * Represents the splash screen which will be displayed when program is

@@ -3,9 +3,7 @@ package org.helioviewer.jhv.plugins.swhvhekplugin;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
-import java.util.Date;
 
-import org.helioviewer.base.math.Interval;
 import org.helioviewer.jhv.gui.ImageViewerGui;
 import org.helioviewer.jhv.plugins.swhvhekplugin.cache.SWHVHEKData;
 import org.helioviewer.jhv.plugins.swhvhekplugin.controller.SWHVHEKImagePanelEventPopupController;

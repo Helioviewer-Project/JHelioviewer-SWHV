@@ -2,7 +2,6 @@ package org.helioviewer.jhv.gui.components.layerTable;
 
 import java.util.Date;
 
-import org.helioviewer.base.logging.Log;
 import org.helioviewer.base.math.Interval;
 import org.helioviewer.base.message.Message;
 import org.helioviewer.jhv.layers.LayersListener;
@@ -14,31 +13,31 @@ import org.helioviewer.viewmodel.view.jp2view.datetime.ImmutableDateTime;
  * This class performs checks if the added layers fit the rest of the already
  * added layers (concerning the timespan covered) and notifies the user if he
  * might have made a bad decision.
- * 
+ *
  * @author mnuhn
  */
 public class LayerTableOverlapWatcher implements LayersListener {
 
     /**
      * @see LayerTableOverlapWatcher#layerAdded
-     * 
+     *
      *      Parameter for determining partially overlapping (with respect to
      *      time) layers
-     * 
+     *
      *      Value must be between 0.0 and 1.0
      */
     public final static double smallestValidCoverageFraction = 0.7;
 
     /**
-     * 
+     *
      * {@inheritDoc}
-     * 
+     *
      * This implementation performs checks if the newly added layer fits the
      * rest of the already added layers and notifies the user if he might have
      * made a bad decision.
-     * 
+     *
      * The basic algorithm works as follows:
-     * 
+     *
      * - Calulate the total timespan covered by all layers together by taking
      * the date of the earliest frame and the latest frame - Calulate the length
      * of this total timespan - For each layer, calulate the length of it's
@@ -46,16 +45,17 @@ public class LayerTableOverlapWatcher implements LayersListener {
      * and the total timespan is smaller than a given
      * (smallestValidCoverageFraction) value, the algorithm decides that the
      * movies do not overlap nicely
-     * 
+     *
      * Note:
-     * 
+     *
      * - The maximum coverage ratio is 1.0, the minimum is 0.0
-     * 
+     *
      * @see LayerTableOverlapWatcher#smallestValidCoverageFraction
-     * 
+     *
      *      In addition to this, a warning is shown if no timing information is
      *      available for the newly added layer.
      */
+    @Override
     public void layerAdded(int idx) {
 
         // check if some of the layers do not really overlap
@@ -109,42 +109,49 @@ public class LayerTableOverlapWatcher implements LayersListener {
     /**
      * {@inheritDoc}
      */
+    @Override
     public void activeLayerChanged(int idx) {
     }
 
     /**
      * {@inheritDoc}
      */
+    @Override
     public void viewportGeometryChanged() {
     }
 
     /**
      * {@inheritDoc}
      */
+    @Override
     public void timestampChanged(int idx) {
     }
 
     /**
      * {@inheritDoc}
      */
+    @Override
     public void subImageDataChanged() {
     }
 
     /**
      * {@inheritDoc}
      */
+    @Override
     public void layerChanged(int idx) {
     }
 
     /**
      * {@inheritDoc}
      */
+    @Override
     public void layerRemoved(View oldView, int oldIdx) {
     }
 
     /**
      * {@inheritDoc}
      */
+    @Override
     public void layerDownloaded(int idx) {
     }
 

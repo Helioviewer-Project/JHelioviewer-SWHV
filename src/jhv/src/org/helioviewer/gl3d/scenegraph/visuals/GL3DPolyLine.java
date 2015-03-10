@@ -2,8 +2,6 @@ package org.helioviewer.gl3d.scenegraph.visuals;
 
 import java.util.List;
 
-import javax.media.opengl.GL2;
-
 import org.helioviewer.gl3d.math.GL3DVec2d;
 import org.helioviewer.gl3d.math.GL3DVec3d;
 import org.helioviewer.gl3d.math.GL3DVec4d;

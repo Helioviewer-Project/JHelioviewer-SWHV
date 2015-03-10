@@ -34,7 +34,6 @@ import javax.swing.SwingConstants;
 import javax.swing.event.ChangeListener;
 import javax.swing.plaf.basic.BasicSliderUI;
 
-import org.helioviewer.base.logging.Log;
 import org.helioviewer.jhv.gui.ButtonCreator;
 import org.helioviewer.jhv.gui.IconBank;
 import org.helioviewer.jhv.gui.IconBank.JHVIcon;
@@ -60,26 +59,26 @@ import org.helioviewer.viewmodel.view.jp2view.datetime.ImmutableDateTime;
 
 /**
  * Panel containing the movie controls.
- * 
+ *
  * <p>
  * This panel provides the capability to start and stop an movie, step to
  * certain frames and switch the movie speed as well as the movie mode.
- * 
+ *
  * <p>
  * Apart from that, this component is responsible for playing multiple movie
  * simultaneous. This is done by actual playing only one movie, the one with the
  * most frames per time. All other image series just jump to the frame being
  * closest to the current frame of the series currently playing. That way, it is
  * impossible that different series get asynchronous.
- * 
+ *
  * <p>
  * For further information about image series, see
  * {@link org.helioviewer.viewmodel.view.MovieView} and
  * {@link org.helioviewer.viewmodel.view.TimedMovieView}.
- * 
+ *
  * @author Markus Langenberg
  * @author Malte Nuhn
- * 
+ *
  */
 public class MoviePanel extends JPanel implements ActionListener, ChangeListener, MouseListener, MouseWheelListener, ViewListener {
 
@@ -170,7 +169,7 @@ public class MoviePanel extends JPanel implements ActionListener, ChangeListener
 
     /**
      * Default constructor.
-     * 
+     *
      * @param movieView
      *            Associated movie view
      */
@@ -338,7 +337,7 @@ public class MoviePanel extends JPanel implements ActionListener, ChangeListener
 
     /**
      * Returns the movie panel for the given view
-     * 
+     *
      * @return movie panel if available, else null
      */
     public static MoviePanel getMoviePanel(MovieView view) {
@@ -356,7 +355,7 @@ public class MoviePanel extends JPanel implements ActionListener, ChangeListener
 
     /**
      * Jumps to the specified frame
-     * 
+     *
      * @param frame
      *            the number of the frame
      */
@@ -370,7 +369,7 @@ public class MoviePanel extends JPanel implements ActionListener, ChangeListener
 
     /**
      * Returns the current frame number
-     * 
+     *
      * @return the current frame number
      */
     public int getCurrentFrameNumber() {
@@ -419,11 +418,11 @@ public class MoviePanel extends JPanel implements ActionListener, ChangeListener
 
     /**
      * Locks or unlocks the movie, Should only be called by LayersModel
-     * 
+     *
      * In future developments, the concept of linked movies might either be
      * dropped (when introducing a global timestamp/timeline) or be moved to
      * LayersModel
-     * 
+     *
      * @param link
      *            true, if it should be locked, else false
      */
@@ -646,7 +645,7 @@ public class MoviePanel extends JPanel implements ActionListener, ChangeListener
 
     /**
      * Abstract base class for all static movie actions.
-     * 
+     *
      * Static movie actions are supposed be integrated into {@link MenuBar},
      * also to provide shortcuts. They always refer to the active layer.
      */
@@ -656,7 +655,7 @@ public class MoviePanel extends JPanel implements ActionListener, ChangeListener
 
         /**
          * Default constructor.
-         * 
+         *
          * @param name
          *            name of the action that shall be displayed on a button
          * @param icon
@@ -727,10 +726,10 @@ public class MoviePanel extends JPanel implements ActionListener, ChangeListener
 
         /**
          * Searches the movie panel corresponding to the given view.
-         * 
+         *
          * All static movie actions are performed by accessing the movie panel
          * of the active and basically clicking on the corresponding button.
-         * 
+         *
          * @param view
          *            View to search panel for
          */
@@ -754,7 +753,7 @@ public class MoviePanel extends JPanel implements ActionListener, ChangeListener
 
     /**
      * Action to play or pause the active layer, if it is an image series.
-     * 
+     *
      * Static movie actions are supposed be integrated into {@link MenuBar},
      * also to provide shortcuts. They always refer to the active layer.
      */
@@ -798,7 +797,7 @@ public class MoviePanel extends JPanel implements ActionListener, ChangeListener
     /**
      * Action to step to the previous frame for the active layer, if it is an
      * image series.
-     * 
+     *
      * Static movie actions are supposed be integrated into {@link MenuBar},
      * also to provide shortcuts. They always refer to the active layer.
      */
@@ -828,7 +827,7 @@ public class MoviePanel extends JPanel implements ActionListener, ChangeListener
     /**
      * Action to step to the next frame for the active layer, if it is an image
      * series.
-     * 
+     *
      * Static movie actions are supposed be integrated into {@link MenuBar},
      * also to provide shortcuts. They always refer to the active layer.
      */
@@ -857,7 +856,7 @@ public class MoviePanel extends JPanel implements ActionListener, ChangeListener
 
     /**
      * Class to synchronize linked image series.
-     * 
+     *
      * Synchronize the GUI elements as well as the actual movie.
      */
     private static class LinkedMovieManager {
@@ -867,10 +866,10 @@ public class MoviePanel extends JPanel implements ActionListener, ChangeListener
 
         /**
          * Adds an image series to the set of series playing simultaneous.
-         * 
+         *
          * <p>
          * The master movie panel may change.
-         * 
+         *
          * @param newPanel
          *            Panel to add
          */
@@ -907,10 +906,10 @@ public class MoviePanel extends JPanel implements ActionListener, ChangeListener
 
         /**
          * Removes an image series from the set of series playing simultaneous.
-         * 
+         *
          * <p>
          * The master movie panel may change.
-         * 
+         *
          * @param panel
          *            Panel to remove
          */
@@ -922,7 +921,7 @@ public class MoviePanel extends JPanel implements ActionListener, ChangeListener
         /**
          * Copies the value from the speed spinner of the given panel to all
          * other linked panels.
-         * 
+         *
          * @param copyFrom
          *            Panel dominating the other ones right now
          */
@@ -935,7 +934,7 @@ public class MoviePanel extends JPanel implements ActionListener, ChangeListener
         /**
          * Copies the value from the speed unit combobox of the given panel to
          * all other linked panels.
-         * 
+         *
          * @param copyFrom
          *            Panel dominating the other ones right now
          */
@@ -948,7 +947,7 @@ public class MoviePanel extends JPanel implements ActionListener, ChangeListener
         /**
          * Copies the value from the animation mode combobox of the given panel
          * to all other linked panels.
-         * 
+         *
          * @param copyFrom
          *            Panel dominating the other ones right now
          */
@@ -962,7 +961,7 @@ public class MoviePanel extends JPanel implements ActionListener, ChangeListener
 
     /**
      * Extension of JSlider displaying the caching status on the track.
-     * 
+     *
      * This element provides its own look and feel. Therefore, it is independent
      * from the global look and feel.
      */
@@ -979,7 +978,7 @@ public class MoviePanel extends JPanel implements ActionListener, ChangeListener
 
         /**
          * Default constructor
-         * 
+         *
          * @param orientation
          *            specified orientation
          * @param min
@@ -1003,10 +1002,10 @@ public class MoviePanel extends JPanel implements ActionListener, ChangeListener
 
         /**
          * Sets the frame number, to which partial information is loaded.
-         * 
+         *
          * Partial information means, that the image already can be shown, but
          * not yet in full quality.
-         * 
+         *
          * @param cachedUntil
          *            Frame number, to which partial information is loaded.
          */
@@ -1017,10 +1016,10 @@ public class MoviePanel extends JPanel implements ActionListener, ChangeListener
 
         /**
          * Sets the frame number, to which complete information is loaded.
-         * 
+         *
          * Complete information means, that the image can be shown in full
          * quality.
-         * 
+         *
          * @param cachedUntil
          *            Frame number, to which complete information is loaded.
          */
@@ -1036,14 +1035,14 @@ public class MoviePanel extends JPanel implements ActionListener, ChangeListener
 
         /**
          * Extension of BasicSliderUI overriding some drawing functions.
-         * 
+         *
          * All functions for size calculations stay the same.
          */
         private class TimeSliderUI extends BasicSliderUI {
 
             /**
              * Default constructor.
-             * 
+             *
              * @param component
              *            the component where this UI delegate is being
              *            installed
@@ -1082,7 +1081,7 @@ public class MoviePanel extends JPanel implements ActionListener, ChangeListener
 
             /**
              * {@inheritDoc}
-             * 
+             *
              * Draws the different region (no/partial/complete information
              * loaded) in different colors.
              */

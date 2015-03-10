@@ -14,7 +14,6 @@ import java.nio.ShortBuffer;
 import javax.media.opengl.GL2;
 
 import org.helioviewer.base.logging.Log;
-import org.helioviewer.base.math.Vector2dDouble;
 import org.helioviewer.viewmodel.imagedata.ImageData;
 import org.helioviewer.viewmodel.imageformat.ARGB32ImageFormat;
 import org.helioviewer.viewmodel.imageformat.ImageFormat;

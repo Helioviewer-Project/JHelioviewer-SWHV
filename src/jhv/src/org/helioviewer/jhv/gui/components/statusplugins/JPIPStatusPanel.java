@@ -10,27 +10,26 @@ import javax.swing.JWindow;
 import org.helioviewer.jhv.gui.IconBank;
 import org.helioviewer.jhv.gui.IconBank.JHVIcon;
 import org.helioviewer.jhv.layers.LayersModel;
-import org.helioviewer.viewmodel.view.View;
 
 /**
  * Status panel for displaying the status of the JPIP connection.
- * 
+ *
  * <p>
  * If the status changes, a small popup will appear.
- * 
+ *
  * <p>
  * The information of this panel is always shown for the active layer.
- * 
+ *
  * <p>
  * This panel is not visible, if the active layer is not an remote JPIP image.
- * 
+ *
  * @author Markus Langenberg
  */
 public class JPIPStatusPanel extends ViewStatusPanelPlugin {
 
     private static final long serialVersionUID = 1L;
     private ConnectionStatus lastStatus = ConnectionStatus.CONNECTED;
-    private StatusChangedWindow statusChangedWindow = new StatusChangedWindow();
+    private final StatusChangedWindow statusChangedWindow = new StatusChangedWindow();
 
     private static final Icon connectedIcon = IconBank.getIcon(JHVIcon.CONNECTED);
     private static final Icon disconnectedIcon = IconBank.getIcon(JHVIcon.DISCONNECTED);
@@ -74,7 +73,7 @@ public class JPIPStatusPanel extends ViewStatusPanelPlugin {
 
     /**
      * Internal function for accessing this pane from within the popup.
-     * 
+     *
      * @return Reference to this
      */
     private JLabel getLabel() {
@@ -91,7 +90,7 @@ public class JPIPStatusPanel extends ViewStatusPanelPlugin {
 
         /**
          * Shows the popup.
-         * 
+         *
          * @param newStatus
          *            New status to show
          */
@@ -119,6 +118,7 @@ public class JPIPStatusPanel extends ViewStatusPanelPlugin {
         /**
          * Closes the popup after three seconds
          */
+        @Override
         public void run() {
             try {
                 Thread.sleep(3000);
@@ -129,22 +129,18 @@ public class JPIPStatusPanel extends ViewStatusPanelPlugin {
         }
     }
 
-
     private void updateStatus(int layer) {
-    /*
-        if (LayersModel.getSingletonInstance().isValidIndex(layer)) {
-            View view = LayersModel.getSingletonInstance().getLayer(layer);
-            boolean connected = LayersModel.getSingletonInstance().isConnectedToJPIP(view);
-            boolean isRemote = LayersModel.getSingletonInstance().isRemote(view);
-
-            if (isRemote) {
-                // updateStatus(connected ? ConnectionStatus.CONNECTED :
-                // ConnectionStatus.DISCONNECTED);
-            } else {
-                // updateStatus(ConnectionStatus.LOCAL);
-            }
-        }
-    */
+        /*
+         * if (LayersModel.getSingletonInstance().isValidIndex(layer)) { View
+         * view = LayersModel.getSingletonInstance().getLayer(layer); boolean
+         * connected =
+         * LayersModel.getSingletonInstance().isConnectedToJPIP(view); boolean
+         * isRemote = LayersModel.getSingletonInstance().isRemote(view);
+         * 
+         * if (isRemote) { // updateStatus(connected ?
+         * ConnectionStatus.CONNECTED : // ConnectionStatus.DISCONNECTED); }
+         * else { // updateStatus(ConnectionStatus.LOCAL); } }
+         */
     }
 
     /**
@@ -154,31 +150,30 @@ public class JPIPStatusPanel extends ViewStatusPanelPlugin {
      * If the layer is not valid : hide the Panel.
      */
 
+    @Override
     public void layerChanged(int idx) {
-    /*
-        if (isVisible()) {
-            if (LayersModel.getSingletonInstance().isValidIndex(idx)) {
-                updateStatus(idx);
-            } else {
-                setVisible(false);
-            }
-        }
-    */
+        /*
+         * if (isVisible()) { if
+         * (LayersModel.getSingletonInstance().isValidIndex(idx)) {
+         * updateStatus(idx); } else { setVisible(false); } }
+         */
     }
 
     /**
      * As long as the new active layer is valid, update the connection panel
      */
 
+    @Override
     public void activeLayerChanged(int idx) {
-    //    updateStatus(idx);
+        //    updateStatus(idx);
     }
 
     /**
      * {@inheritDoc}
      */
+    @Override
     public void layerDownloaded(int idx) {
-    //    updateStatus(idx);
+        //    updateStatus(idx);
     }
 
 }
