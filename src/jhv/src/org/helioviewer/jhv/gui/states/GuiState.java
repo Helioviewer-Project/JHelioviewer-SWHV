@@ -7,6 +7,7 @@ import org.helioviewer.gl3d.model.GL3DInternalPluginConfiguration;
 import org.helioviewer.gl3d.plugin.GL3DPluginController;
 import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.gui.GL3DViewchainFactory;
+import org.helioviewer.jhv.gui.ViewchainFactory;
 import org.helioviewer.jhv.gui.components.statusplugins.RenderModeStatusPanel;
 import org.helioviewer.jhv.gui.controller.MainImagePanelMousePanController;
 import org.helioviewer.jhv.gui.interfaces.ImagePanelInputController;
@@ -16,6 +17,7 @@ import org.helioviewer.viewmodel.view.opengl.GL3DSceneGraphView;
 public class GuiState implements State {
 
     private final boolean is3d;
+    public static GL3DViewchainFactory viewchainFactory = new GL3DViewchainFactory();
 
     private ComponentView mainComponentView;
     private RenderModeStatusPanel renderModeStatus;
@@ -30,8 +32,7 @@ public class GuiState implements State {
 
         boolean firstTime = (mainComponentView == null);
         // Create main view chain
-        GL3DViewchainFactory mainFactory = new GL3DViewchainFactory();
-        mainComponentView = mainFactory.createViewchainMain(mainComponentView, false);
+        mainComponentView = viewchainFactory.createViewchainMain(mainComponentView, false);
         GL3DCameraSelectorModel.getInstance().activate(this.mainComponentView.getAdapter(GL3DSceneGraphView.class));
         GL3DPluginController.getInstance().setPluginConfiguration(new GL3DInternalPluginConfiguration());
         GL3DPluginController.getInstance().loadPlugins();
@@ -66,6 +67,11 @@ public class GuiState implements State {
 
     public RenderModeStatusPanel getRenderModeStatus() {
         return renderModeStatus;
+    }
+
+    @Override
+    public ViewchainFactory getViewchainFactory() {
+        return viewchainFactory;
     }
 
     @Override
