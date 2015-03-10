@@ -47,9 +47,7 @@ import com.jogamp.opengl.util.awt.ImageUtil;
  *
  */
 public class GL3DComponentView extends AbstractComponentView implements GLEventListener, ComponentView, DisplayListener {
-    private static DrawInterface draw;
 
-    // general
     private GLCanvas canvas;
     private final AWTGLPixelBuffer.SingleAWTGLPixelBufferProvider pixelBufferProvider = new AWTGLPixelBuffer.SingleAWTGLPixelBufferProvider(true);
 
@@ -69,9 +67,6 @@ public class GL3DComponentView extends AbstractComponentView implements GLEventL
 
     @Override
     public void activate() {
-
-        draw = new Draw3DInterface();
-
         canvas.addGLEventListener(this);
         Displayer.getSingletonInstance().addListener(this);
     }
@@ -155,46 +150,6 @@ public class GL3DComponentView extends AbstractComponentView implements GLEventL
         return true;
     }
 
-    private static interface DrawInterface {
-
-        public void init(GL2 gl);
-
-        public void reshapeView(GL2 gl, int width, int height);
-
-        public void displayBody(GL2 gl, View v, int width, int height);
-
-    }
-
-    private static class Draw3DInterface implements DrawInterface {
-
-        @Override
-        public final void init(GL2 gl) {
-            gl.glHint(GL2.GL_LINE_SMOOTH_HINT, GL2.GL_NICEST);
-
-            gl.glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
-            gl.glClear(GL2.GL_COLOR_BUFFER_BIT | GL2.GL_DEPTH_BUFFER_BIT);
-
-            gl.glEnable(GL2.GL_BLEND);
-            gl.glEnable(GL2.GL_POINT_SMOOTH);
-            gl.glEnable(GL2.GL_COLOR_MATERIAL);
-
-            gl.glEnable(GL2.GL_NORMALIZE);
-            gl.glDepthFunc(GL2.GL_LEQUAL);
-        }
-
-        @Override
-        public final void reshapeView(GL2 gl, int width, int height) {
-        }
-
-        @Override
-        public final void displayBody(GL2 gl, View v, int width, int height) {
-            gl.glClear(GL2.GL_COLOR_BUFFER_BIT | GL2.GL_DEPTH_BUFFER_BIT);
-
-            ((GL3DView) v).renderGL(gl, true);
-        }
-
-    }
-
     @Override
     public void init(GLAutoDrawable drawable) {
         final GL2 gl = drawable.getGL().getGL2();
@@ -204,17 +159,29 @@ public class GL3DComponentView extends AbstractComponentView implements GLEventL
         GLSLShader.initShader(gl);
         GL3DState.create(gl);
 
-        draw.init(gl);
+        gl.glHint(GL2.GL_LINE_SMOOTH_HINT, GL2.GL_NICEST);
+
+        gl.glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
+        gl.glClear(GL2.GL_COLOR_BUFFER_BIT | GL2.GL_DEPTH_BUFFER_BIT);
+
+        gl.glEnable(GL2.GL_BLEND);
+        gl.glEnable(GL2.GL_POINT_SMOOTH);
+
+        gl.glEnable(GL2.GL_NORMALIZE);
+        gl.glDepthFunc(GL2.GL_LEQUAL);
     }
 
     @Override
     public void reshape(GLAutoDrawable drawable, int x, int y, int width, int height) {
-        draw.reshapeView(drawable.getGL().getGL2(), width, height);
+    }
+
+    private static void displayBody(GL2 gl, View v, int width, int height) {
+        gl.glClear(GL2.GL_COLOR_BUFFER_BIT | GL2.GL_DEPTH_BUFFER_BIT);
+        ((GL3DView) v).renderGL(gl, true);
     }
 
     @Override
     public void display(GLAutoDrawable drawable) {
-
         JHVJP2View mv = null;
         if (exportMode || screenshotMode) {
             View v = LayersModel.getSingletonInstance().getActiveView();
@@ -259,7 +226,7 @@ public class GL3DComponentView extends AbstractComponentView implements GLEventL
         }
 
         gl.glPushMatrix();
-        draw.displayBody(gl, view, width, height);
+        displayBody(gl, view, width, height);
         gl.glPopMatrix();
 
         if (!this.postRenderers.isEmpty()) {
