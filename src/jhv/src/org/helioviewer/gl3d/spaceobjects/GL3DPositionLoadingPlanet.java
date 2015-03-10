@@ -101,7 +101,6 @@ public class GL3DPositionLoadingPlanet {
                         JSONArray jsonResult = new JSONArray(new JSONTokener(reader));
                         parseData(jsonResult);
                         if (positionDateTime.length > 0) {
-                            List<Integer> el = new ArrayList<Integer>();
                             setLoaded(true);
                         }
                     } else {

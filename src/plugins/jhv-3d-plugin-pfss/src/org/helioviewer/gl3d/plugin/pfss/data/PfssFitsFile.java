@@ -35,7 +35,6 @@ public class PfssFitsFile implements Serializable {
         try {
             URL u = new URL(url);
             URLConnection uc = u.openConnection();
-            int contentLength = uc.getContentLength();
             InputStream raw;
             if (uc.getHeaderField("Content-Encoding") != null && uc.getHeaderField("Content-Encoding").equals("gzip")) {
                 raw = new GZIPInputStream(uc.getInputStream());

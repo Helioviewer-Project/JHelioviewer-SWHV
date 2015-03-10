@@ -116,10 +116,7 @@ public class GL3DState {
         if (glErrorCode != GL2.GL_NO_ERROR) {
             GLU glu = new GLU();
             Log.error("GL Error (" + glErrorCode + "): " + glu.gluErrorString(glErrorCode) + " - @" + message);
-            if (glErrorCode == GL2.GL_INVALID_OPERATION) {
-                // Find the error position
-                int[] err = new int[1];
-            }
+
             return true;
         } else {
             return false;
@@ -140,10 +137,7 @@ public class GL3DState {
         if (glErrorCode != GL2.GL_NO_ERROR) {
             GLU glu = new GLU();
             Log.error("GL Error (" + glErrorCode + "): " + glu.gluErrorString(glErrorCode));
-            if (glErrorCode == GL2.GL_INVALID_OPERATION) {
-                // Find the error position
-                int[] err = new int[1];
-            }
+
             return true;
         } else {
             return false;
