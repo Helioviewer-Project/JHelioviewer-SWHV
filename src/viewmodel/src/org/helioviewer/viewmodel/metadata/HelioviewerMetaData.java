@@ -5,6 +5,8 @@ import org.helioviewer.base.math.MathUtils;
 import org.helioviewer.base.math.Vector2dDouble;
 import org.helioviewer.base.math.Vector2dInt;
 import org.helioviewer.base.physics.Constants;
+import org.helioviewer.jhv.gui.states.StateController;
+import org.helioviewer.jhv.gui.states.ViewStateEnum;
 import org.helioviewer.viewmodel.region.Region;
 import org.helioviewer.viewmodel.region.StaticRegion;
 import org.helioviewer.viewmodel.view.cache.HelioviewerDateTimeCache;
@@ -257,9 +259,7 @@ public class HelioviewerMetaData extends AbstractMetaData implements SunMetaData
     }
 
     public Region roiToRegion(SubImage roi, double zoompercent) {
-        return StaticRegion.createAdaptedRegion((roi.x / zoompercent - sunPixelPositionImage.getX()) * meterPerPixel,
-                                                (roi.y / zoompercent - sunPixelPositionImage.getY()) * meterPerPixel,
-                                                roi.width * meterPerPixel / zoompercent, roi.height * meterPerPixel / zoompercent);
+        return StaticRegion.createAdaptedRegion((roi.x / zoompercent - sunPixelPositionImage.getX()) * meterPerPixel, (roi.y / zoompercent - sunPixelPositionImage.getY()) * meterPerPixel, roi.width * meterPerPixel / zoompercent, roi.height * meterPerPixel / zoompercent);
     }
 
     /**
@@ -376,11 +376,15 @@ public class HelioviewerMetaData extends AbstractMetaData implements SunMetaData
     }
 
     public double getPhi() {
-        return this.phi;
+        if (StateController.getInstance().getCurrentState() == ViewStateEnum.View3D.getState())
+            return this.phi;
+        return 0.;
     }
 
     public double getTheta() {
-        return this.theta;
+        if (StateController.getInstance().getCurrentState() == ViewStateEnum.View3D.getState())
+            return this.theta;
+        return 0.;
     }
 
 }
