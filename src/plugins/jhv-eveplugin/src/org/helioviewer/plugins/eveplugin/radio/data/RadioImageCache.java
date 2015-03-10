@@ -73,7 +73,6 @@ public class RadioImageCache {
 
     public void remove(Long ID, String plotIdentifier) {
         synchronized (instance) {
-            Long id = System.currentTimeMillis();
             if (radioImageCacheData.containsKey(plotIdentifier)) {
                 RadioImageCacheData cacheData = radioImageCacheData.get(plotIdentifier);
                 DownloadedJPXData data = cacheData.getDataCache().get(ID);

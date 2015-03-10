@@ -105,11 +105,6 @@ public class JPXBench implements ViewListener {
 
     public static void main(String[] args) {
         jhvMain(args);
-        String inputFile = args[0];
-        int resolution = Integer.parseInt(args[1]);
-
-        JPXBench jpxbench = new JPXBench(inputFile, resolution);
-
     }
 
     private static void jhvMain(String[] args) {

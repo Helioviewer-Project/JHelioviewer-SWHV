@@ -77,7 +77,7 @@ public class MovieExport {
         //BufferedImage bufferedImage = new BufferedImage(width, height, BufferedImage.TYPE_3BYTE_BGR);
         /*
          * Graphics2D g2d = bufferedImage.createGraphics();
-         * 
+         *
          * g2d.drawString("Iets van text", 100, 100); g2d.dispose();
          */
         try {
@@ -262,8 +262,7 @@ public class MovieExport {
 
         // Directories where to search for lib config files
         URI libs = JHVDirectory.LIBS.getFile().toURI();
-        URI defaultPlugins = JHVDirectory.PLUGINS.getFile().toURI();
-        URI defaultPluginsBackup = JHVDirectory.PLUGINS_LAST_CONFIG.getFile().toURI();
+
         URI libsBackup = JHVDirectory.LIBS_LAST_CONFIG.getFile().toURI();
         URI libsRemote = null;
         try {

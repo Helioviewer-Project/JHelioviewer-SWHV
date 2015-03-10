@@ -7,9 +7,9 @@ import java.net.HttpURLConnection;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 import java.util.Vector;
@@ -56,9 +56,7 @@ import org.helioviewer.viewmodel.view.View;
 import org.helioviewer.viewmodel.view.ViewHelper;
 import org.helioviewer.viewmodel.view.ViewListener;
 import org.helioviewer.viewmodel.view.jp2view.JHVJP2View;
-import org.helioviewer.viewmodel.view.jp2view.JP2Image;
 import org.helioviewer.viewmodel.view.jp2view.datetime.ImmutableDateTime;
-import org.helioviewer.viewmodel.view.jp2view.kakadu.JHV_KduException;
 import org.xml.sax.Attributes;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
@@ -837,17 +835,6 @@ public class LayersModel implements ViewListener {
             return;
         }
 
-        try {
-            ImageViewerGui.getSingletonInstance().getMainImagePanel().setLoading(true);
-            JP2Image localImage = new JP2Image(downloadDestination.toURI());
-        } catch (IOException e) {
-            e.printStackTrace();
-        } catch (JHV_KduException e) {
-            e.printStackTrace();
-        } finally {
-            ImageViewerGui.getSingletonInstance().getMainImagePanel().setLoading(false);
-        }
-
         /*
          * if(view.getAdapter(ImageInfoView.class).getUri().getScheme().
          * equalsIgnoreCase("file")) { this.fireLayerChanged(getNumLayers()); }
@@ -1276,7 +1263,7 @@ public class LayersModel implements ViewListener {
         /*
          * ImageInfoView imageInfoView = view.getAdapter(ImageInfoView.class);
          * String typeString; String intervalString;
-         *
+         * 
          * if (imageInfoView != null) { SimpleDateFormat format = new
          * SimpleDateFormat("yyyy/MM/dd HH:mm"); Interval<Date> interval =
          * imageInfoView.getDateRange(); if (interval != null) { typeString =

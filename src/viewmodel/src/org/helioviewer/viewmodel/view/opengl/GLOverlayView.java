@@ -94,7 +94,6 @@ public class GLOverlayView extends AbstractGLView implements OverlayView {
     public void viewChanged(View sender, ChangeEvent aEvent) {
         if (aEvent != null) {
             if (aEvent.reasonOccurred(RegionChangedReason.class)) {
-                GL3DLayeredView layeredView = sender.getAdapter(GL3DLayeredView.class);
                 Iterator<OverlayPluginContainer> iterator = this.overlays.iterator();
                 // Region region = sender.getAdapter(RegionView.class);
                 while (iterator.hasNext()) {
