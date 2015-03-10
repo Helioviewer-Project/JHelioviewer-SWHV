@@ -23,6 +23,7 @@ import org.helioviewer.viewmodel.view.SubimageDataView;
 import org.helioviewer.viewmodel.view.View;
 import org.helioviewer.viewmodel.view.jp2view.JP2View;
 import org.helioviewer.viewmodel.view.opengl.GL3DCameraView;
+import org.helioviewer.viewmodel.view.opengl.GL3DComponentView;
 import org.helioviewer.viewmodel.view.opengl.GL3DSceneGraphView;
 import org.helioviewer.viewmodel.view.opengl.GLOverlayView;
 import org.helioviewer.viewmodelplugin.controller.PluginManager;
@@ -72,7 +73,7 @@ public class GL3DViewchainFactory {
      * @return instance of the ComponentView of the new created view chain.
      */
 
-    public ComponentView createViewchainMain(ComponentView currentMainImagePanelView, boolean keepSource) {
+    public ComponentView createViewchainMain(GL3DComponentView currentMainImagePanelView, boolean keepSource) {
         return createNewViewchainMain();
     }
 
