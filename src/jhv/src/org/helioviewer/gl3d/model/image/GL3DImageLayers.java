@@ -49,17 +49,17 @@ public class GL3DImageLayers extends GL3DGroup {
             node = node.getNext();
         }
 
-        state.gl.glEnable(GL2.GL_BLEND);
-        state.gl.glBlendFunc(GL2.GL_SRC_ALPHA, GL2.GL_ONE_MINUS_SRC_ALPHA);
-        GLSLShader.bind(state.gl);
+        GL2 gl = state.gl;
+        gl.glEnable(GL2.GL_BLEND);
+        gl.glBlendFunc(GL2.GL_SRC_ALPHA, GL2.GL_ONE_MINUS_SRC_ALPHA);
 
+        GLSLShader.bind(gl);
         for (GL3DImageLayer layer : layers) {
             layer.draw(state);
         }
-        GLSLShader.unbind(state.gl);
+        GLSLShader.unbind(gl);
 
-        state.gl.glDisable(GL2.GL_BLEND);
-        state.gl.glDisable(GL2.GL_BLEND);
+        gl.glDisable(GL2.GL_BLEND);
     }
 
     @Override

@@ -32,11 +32,12 @@ public class GL3DCameraFOV extends GL3DMesh {
     @Override
     public void shapeDraw(GL3DState state) {
         this.markAsChanged();
-        state.gl.glColor3d(1., 0., 0.);
+
         GL2 gl = state.gl;
         gl.glLineWidth(2.5f);
         gl.glColor3d(0.0f, 1.0f, 0.0f);
         gl.glBegin(GL2.GL_LINE_LOOP);
+
         double bw = width * scale / 2.;
         double bh = height * scale / 2.;
         int subdivisions = 10;
@@ -48,7 +49,6 @@ public class GL3DCameraFOV extends GL3DMesh {
                 z += Math.sqrt(1 - x * x - y * y);
             }
             gl.glVertex3d(x, y, z);
-
         }
         for (int i = 0; i <= subdivisions; i++) {
             double x = bw;

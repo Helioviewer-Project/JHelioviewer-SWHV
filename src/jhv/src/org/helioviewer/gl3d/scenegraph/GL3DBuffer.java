@@ -258,28 +258,30 @@ public class GL3DBuffer {
 
     public void enable(GL3DState state) {
         if (this.isInUse) {
+            GL2 gl = state.gl;
+
             // Index Buffer does not need to be enabled
             if (this.attribute != GL3DBufferAttribute.NONE) {
-                state.gl.glEnableClientState(this.attribute.id);
+                gl.glEnableClientState(this.attribute.id);
             }
 
-            state.gl.glBindBuffer(this.type.id, this.id);
+            gl.glBindBuffer(this.type.id, this.id);
 
             switch (this.attribute) {
             case VERTEX:
-                state.gl.glVertexPointer(this.elementSize, this.dataType.id, this.stride * this.dataType.size, this.offset);
+                gl.glVertexPointer(this.elementSize, this.dataType.id, this.stride * this.dataType.size, this.offset);
                 // Log.debug("GL3DBuffer.enable Vertex   id="+this.id);
                 break;
             case NORMAL:
-                state.gl.glNormalPointer(this.dataType.id, this.stride * this.dataType.size, this.offset);
+                gl.glNormalPointer(this.dataType.id, this.stride * this.dataType.size, this.offset);
                 // Log.debug("GL3DBuffer.enable Normal   id="+this.id);
                 break;
             case COLOR:
-                state.gl.glColorPointer(this.elementSize, this.dataType.id, this.stride * this.dataType.size, this.offset);
+                gl.glColorPointer(this.elementSize, this.dataType.id, this.stride * this.dataType.size, this.offset);
                 // Log.debug("GL3DBuffer.enable Color    id="+this.id);
                 break;
             case TEXTURE:
-                state.gl.glTexCoordPointer(this.elementSize, this.dataType.id, this.stride * this.dataType.size, this.offset);
+                gl.glTexCoordPointer(this.elementSize, this.dataType.id, this.stride * this.dataType.size, this.offset);
                 // Log.debug("GL3DBuffer.enable TexCoord id="+this.id);
                 break;
             case NONE:
