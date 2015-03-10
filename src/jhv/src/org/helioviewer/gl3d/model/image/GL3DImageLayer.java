@@ -15,6 +15,8 @@ import org.helioviewer.gl3d.math.GL3DQuatd;
 import org.helioviewer.gl3d.math.GL3DVec3d;
 import org.helioviewer.gl3d.scenegraph.GL3DShape;
 import org.helioviewer.gl3d.scenegraph.GL3DState;
+import org.helioviewer.jhv.gui.states.StateController;
+import org.helioviewer.jhv.gui.states.ViewStateEnum;
 import org.helioviewer.viewmodel.changeevent.ChangeEvent;
 import org.helioviewer.viewmodel.changeevent.ImageTextureRecapturedReason;
 import org.helioviewer.viewmodel.metadata.HelioviewerMetaData;
@@ -241,7 +243,7 @@ public class GL3DImageLayer extends GL3DShape {
                 gl.glDrawElements(GL2.GL_TRIANGLES, 6, GL2.GL_UNSIGNED_INT, (this.indexBufferSize - 6) * Buffers.SIZEOF_INT);
                 state.gl.glDepthRange(0.f, 1.f);
             }
-            if (this.showSphere) {
+            if (this.showSphere && StateController.getInstance().getCurrentState() == ViewStateEnum.View3D.getState()) {
                 gl.glDrawElements(GL2.GL_TRIANGLES, this.indexBufferSize - 6, GL2.GL_UNSIGNED_INT, 0);
             }
         }
