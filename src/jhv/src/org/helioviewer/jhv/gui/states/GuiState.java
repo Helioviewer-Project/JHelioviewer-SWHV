@@ -7,7 +7,6 @@ import org.helioviewer.gl3d.gui.GL3DTopToolBar;
 import org.helioviewer.gl3d.model.GL3DInternalPluginConfiguration;
 import org.helioviewer.gl3d.plugin.GL3DPluginController;
 import org.helioviewer.jhv.display.Displayer;
-import org.helioviewer.jhv.gui.GL3DViewchainFactory;
 import org.helioviewer.jhv.gui.ViewchainFactory;
 import org.helioviewer.jhv.gui.components.TopToolBar;
 import org.helioviewer.jhv.gui.components.statusplugins.RenderModeStatusPanel;
@@ -25,14 +24,9 @@ public class GuiState implements State {
     private ComponentView mainComponentView;
     private RenderModeStatusPanel renderModeStatus;
 
-    public GuiState(ViewchainFactory viewchainFactory) {
+    public GuiState(ViewchainFactory viewchainFactory, boolean is3d) {
         this.viewchainFactory = viewchainFactory;
-
-        if (viewchainFactory instanceof GL3DViewchainFactory) {
-            is3d = true;
-        } else {
-            is3d = false;
-        }
+        this.is3d = is3d;
     }
 
     @Override

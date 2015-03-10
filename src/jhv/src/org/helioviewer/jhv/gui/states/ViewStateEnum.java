@@ -10,7 +10,7 @@ import org.helioviewer.jhv.gui.GL3DViewchainFactory;
  */
 public enum ViewStateEnum {
 
-    View2D(new GuiState(new GL3DViewchainFactory())), View3D(new GuiState(new GL3DViewchainFactory()));
+    View2D(new GuiState(new GL3DViewchainFactory(), false)), View3D(new GuiState(new GL3DViewchainFactory(), true));
 
     private final State state;
 
