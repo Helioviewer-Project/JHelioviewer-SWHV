@@ -31,16 +31,10 @@ public class GuiState implements State {
 
     @Override
     public void activate() {
-        if (is3d) {
-            GL3DCameraSelectorModel.getInstance().activate(this.mainComponentView.getAdapter(GL3DSceneGraphView.class));
-            GL3DPluginController.getInstance().setPluginConfiguration(new GL3DInternalPluginConfiguration());
-            GL3DPluginController.getInstance().loadPlugins();
-        }
     }
 
     @Override
     public void deactivate() {
-        getMainComponentView().deactivate();
     }
 
     @Override
@@ -51,7 +45,9 @@ public class GuiState implements State {
         // Create main view chain
         ViewchainFactory mainFactory = this.viewchainFactory;
         mainComponentView = mainFactory.createViewchainMain(mainComponentView, false);
-
+        GL3DCameraSelectorModel.getInstance().activate(this.mainComponentView.getAdapter(GL3DSceneGraphView.class));
+        GL3DPluginController.getInstance().setPluginConfiguration(new GL3DInternalPluginConfiguration());
+        GL3DPluginController.getInstance().loadPlugins();
         return firstTime;
     }
 
