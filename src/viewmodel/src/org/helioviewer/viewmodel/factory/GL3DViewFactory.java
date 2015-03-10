@@ -1,6 +1,7 @@
 package org.helioviewer.viewmodel.factory;
 
 import org.helioviewer.viewmodel.view.ComponentView;
+import org.helioviewer.viewmodel.view.FilterView;
 import org.helioviewer.viewmodel.view.LayeredView;
 import org.helioviewer.viewmodel.view.OverlayView;
 import org.helioviewer.viewmodel.view.View;
@@ -10,6 +11,7 @@ import org.helioviewer.viewmodel.view.opengl.GL3DImageTextureView;
 import org.helioviewer.viewmodel.view.opengl.GL3DLayeredView;
 import org.helioviewer.viewmodel.view.opengl.GL3DSceneGraphView;
 import org.helioviewer.viewmodel.view.opengl.GL3DView;
+import org.helioviewer.viewmodel.view.opengl.GLFilterView;
 //import org.helioviewer.viewmodel.view.opengl.GL3DViewportView;
 import org.helioviewer.viewmodel.view.opengl.GLOverlayView;
 
@@ -22,7 +24,7 @@ import org.helioviewer.viewmodel.view.opengl.GLOverlayView;
  * @author Simon Spoerri (simon.spoerri@fhnw.ch)
  *
  */
-public class GL3DViewFactory extends GLViewFactory {
+public class GL3DViewFactory extends StandardViewFactory {
 
     /**
      * {@inheritDoc}
@@ -34,8 +36,10 @@ public class GL3DViewFactory extends GLViewFactory {
             return (T) new GL3DSceneGraphView();
         } else if (pattern.isAssignableFrom(GL3DCameraView.class)) {
             return (T) new GL3DCameraView();
-        /* } else if (pattern.isAssignableFrom(GL3DViewportView.class)) {
-            return (T) new GL3DViewportView(); */
+            /*
+             * } else if (pattern.isAssignableFrom(GL3DViewportView.class)) {
+             * return (T) new GL3DViewportView();
+             */
         } else if (pattern.isAssignableFrom(GL3DImageTextureView.class)) {
             return (T) new GL3DImageTextureView();
         } else if (pattern.isAssignableFrom(ComponentView.class)) {
@@ -44,6 +48,8 @@ public class GL3DViewFactory extends GLViewFactory {
             return (T) new GL3DLayeredView();
         } else if (pattern.isAssignableFrom(OverlayView.class)) {
             return (T) new GLOverlayView();
+        } else if (pattern.isAssignableFrom(FilterView.class)) {
+            return (T) new GLFilterView();
         } else {
             return super.createNewView(pattern);
         }
@@ -63,8 +69,10 @@ public class GL3DViewFactory extends GLViewFactory {
                 return (T) new GL3DSceneGraphView();
             } else if (source instanceof GL3DCameraView) {
                 return (T) new GL3DCameraView();
-            /* } else if (source instanceof GL3DViewportView) {
-                return (T) new GL3DViewportView(); */
+                /*
+                 * } else if (source instanceof GL3DViewportView) { return (T)
+                 * new GL3DViewportView();
+                 */
             } else if (source instanceof GL3DImageTextureView) {
                 return (T) new GL3DImageTextureView();
             } else {
@@ -72,8 +80,13 @@ public class GL3DViewFactory extends GLViewFactory {
             }
         } else if (source instanceof ComponentView) {
             return (T) new GL3DComponentView();
-        } else {
-            return super.createViewFromSourceImpl(source);
+
+        }
+
+        else {
+            System.out.println(source);
+            System.exit(1);
+            return null;
         }
     }
 
