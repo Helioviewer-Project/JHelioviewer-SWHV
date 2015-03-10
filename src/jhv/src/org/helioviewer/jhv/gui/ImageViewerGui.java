@@ -193,31 +193,6 @@ public class ImageViewerGui {
 
             renderModeStatus.updateStatus();
         }
-
-        // ///////////////////////////////////////////////////////////////////////////////
-        // STATUS PANEL
-        // ///////////////////////////////////////////////////////////////////////////////
-        // ZoomStatusPanel zoomStatusPanel = new ZoomStatusPanel();
-        // QualityStatusPanel qualityStatusPanel = new QualityStatusPanel();
-        // FramerateStatusPanel framerateStatus = new FramerateStatusPanel();
-        // PositionStatusPanel positionStatusPanel = new
-        // PositionStatusPanel(mainImagePanel);
-        // MetaDataStatusPanel jhvXMLStatusPanel = new MetaDataStatusPanel();
-        // renderModeStatus = new RenderModeStatusPanel();
-        // JPIPStatusPanel jpipStatusPanel = new JPIPStatusPanel();
-        //
-        // StatusPanel statusPanel = new StatusPanel(SIDE_PANEL_WIDTH + 20, 5);
-        // statusPanel.addPlugin(zoomStatusPanel, StatusPanel.Alignment.LEFT);
-        // statusPanel.addPlugin(qualityStatusPanel,
-        // StatusPanel.Alignment.LEFT);
-        // statusPanel.addPlugin(framerateStatus, StatusPanel.Alignment.LEFT);
-        // statusPanel.addPlugin(renderModeStatus, StatusPanel.Alignment.RIGHT);
-        // statusPanel.addPlugin(jhvXMLStatusPanel,
-        // StatusPanel.Alignment.RIGHT);
-        // statusPanel.addPlugin(jpipStatusPanel, StatusPanel.Alignment.RIGHT);
-        // statusPanel.addPlugin(positionStatusPanel,
-        // StatusPanel.Alignment.RIGHT);
-        // contentPanel.add(statusPanel, BorderLayout.PAGE_END);
     }
 
     /**
@@ -456,11 +431,8 @@ public class ImageViewerGui {
             leftPane.remove(GL3DCameraOptionsPanel.class);
         }
 
-        TopToolBar toolBar = newState.getTopToolBar();
-        toolBar.updateStateButtons();
-        if (toolBar.getParent() != contentPanel) {
-            contentPanel.add(toolBar, BorderLayout.PAGE_START);
-        }
+        this.getTopToolBar().updateStateButtons();
+
     }
 
     private void updateComponentPanels() {
