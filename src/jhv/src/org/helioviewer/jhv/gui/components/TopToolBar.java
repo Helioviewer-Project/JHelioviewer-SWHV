@@ -29,7 +29,6 @@ import org.helioviewer.jhv.gui.IconBank;
 import org.helioviewer.jhv.gui.IconBank.JHVIcon;
 import org.helioviewer.jhv.gui.actions.SetPanSelectionAction;
 import org.helioviewer.jhv.gui.actions.SetZoomBoxSelectionAction;
-import org.helioviewer.jhv.gui.actions.ToggleSolarRotationTrackingAction;
 import org.helioviewer.jhv.gui.actions.View2DAction;
 import org.helioviewer.jhv.gui.actions.View3DAction;
 import org.helioviewer.jhv.gui.actions.Zoom1to1Action;
@@ -70,7 +69,6 @@ public class TopToolBar extends JToolBar implements MouseListener {
     private JToggleButton trackSolarRotationButton;
     private JToggleButton trackSolarRotationButton3D;
     private JToggleButton coronaVisibilityButton;
-    private ToggleSolarRotationTrackingAction toggleSolarRotationTrackingAction;
     private JButton resetCamera;
     protected JToggleButton view2d;
     protected JToggleButton view3d;
@@ -223,24 +221,12 @@ public class TopToolBar extends JToolBar implements MouseListener {
 
         addSeparator();
 
-        if (StateController.getInstance().getCurrentState().getType() == ViewStateEnum.View2D) {
-            boolean solarRotationWasEnabled = (trackSolarRotationButton != null && trackSolarRotationButton.isSelected());
-            toggleSolarRotationTrackingAction = new ToggleSolarRotationTrackingAction(solarRotationWasEnabled);
-            trackSolarRotationButton = new JToggleButton(toggleSolarRotationTrackingAction);
-            trackSolarRotationButton.setSelected(false);
-            trackSolarRotationButton.setIcon(IconBank.getIcon(JHVIcon.FOCUS));
-            trackSolarRotationButton.setSelectedIcon(IconBank.getIcon(JHVIcon.FOCUS_SELECTED));
-            trackSolarRotationButton.setToolTipText("Enable Solar Rotation Tracking");
-            addButton(trackSolarRotationButton);
-            trackSolarRotationButton.setEnabled(true);
-        } else {
-            trackSolarRotationButton3D = new JToggleButton(new GL3DToggleSolarRotationAction());
-            trackSolarRotationButton3D.setSelected(false);
-            trackSolarRotationButton3D.setIcon(IconBank.getIcon(JHVIcon.FOCUS));
-            trackSolarRotationButton3D.setSelectedIcon(IconBank.getIcon(JHVIcon.FOCUS_SELECTED));
-            trackSolarRotationButton3D.setToolTipText("Enable Solar Rotation Tracking");
-            addButton(trackSolarRotationButton3D);
-        }
+        trackSolarRotationButton3D = new JToggleButton(new GL3DToggleSolarRotationAction());
+        trackSolarRotationButton3D.setSelected(false);
+        trackSolarRotationButton3D.setIcon(IconBank.getIcon(JHVIcon.FOCUS));
+        trackSolarRotationButton3D.setSelectedIcon(IconBank.getIcon(JHVIcon.FOCUS_SELECTED));
+        trackSolarRotationButton3D.setToolTipText("Enable Solar Rotation Tracking");
+        addButton(trackSolarRotationButton3D);
 
         // coronaVisibilityButton =
         coronaVisibilityButton = new JToggleButton(new GL3DToggleCoronaVisibilityAction());

@@ -11,7 +11,6 @@ import org.helioviewer.viewmodel.view.ImageInfoView;
 import org.helioviewer.viewmodel.view.JHVSimpleImageView;
 import org.helioviewer.viewmodel.view.OverlayView;
 import org.helioviewer.viewmodel.view.StandardFilterView;
-import org.helioviewer.viewmodel.view.StandardSolarRotationTrackingView;
 import org.helioviewer.viewmodel.view.View;
 import org.helioviewer.viewmodel.view.fitsview.JHVFITSView;
 import org.helioviewer.viewmodel.view.jp2view.JHVJP2View;
@@ -45,8 +44,6 @@ public abstract class StandardViewFactory implements ViewFactory {
         if (pattern.isAssignableFrom(FilterView.class)) {
             return (T) new StandardFilterView();
             // SolarRotationTrackingView
-        } else if (pattern.isAssignableFrom(StandardSolarRotationTrackingView.class)) {
-            return (T) new StandardSolarRotationTrackingView();
         } else {
             return null;
         }
@@ -169,8 +166,6 @@ public abstract class StandardViewFactory implements ViewFactory {
         if (source instanceof FilterView) {
             return (T) new StandardFilterView();
             // SolarRotationTrackingView
-        } else if (source instanceof StandardSolarRotationTrackingView) {
-            return (T) new StandardSolarRotationTrackingView();
         } else {
             return null;
         }
