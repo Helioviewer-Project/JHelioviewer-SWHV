@@ -787,7 +787,6 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
             EventQueue.invokeLater(new Runnable() {
                 @Override
                 public void run() {
-                    long start = System.currentTimeMillis();
                     updateGraph();
                     // Log.error("repaint request");
                     repaint();
@@ -797,7 +796,6 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
             });
         } else {
             // Log.debug("Called in eventQueue");
-            long start = System.currentTimeMillis();
             updateGraph();
             repaint();
             // Log.debug("draw request time: " + (System.currentTimeMillis() -

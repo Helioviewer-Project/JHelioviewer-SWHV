@@ -367,7 +367,6 @@ public class GLPhysicalRenderGraphics extends AbstractPhysicalRenderGraphics {
         GL3DVec3d sourceDir = new GL3DVec3d(0, 0, 1);
         GL3DVec3d targetDir = new GL3DVec3d(x, y, z);
 
-        double angle = Math.acos(sourceDir.dot(targetDir) / (sourceDir.length() * targetDir.length()));
         GL3DVec3d axis = sourceDir.cross(targetDir);
         axis.normalize();
         GL3DMat4d r = GL3DMat4d.rotation(Math.atan2(x, z), GL3DVec3d.YAxis);

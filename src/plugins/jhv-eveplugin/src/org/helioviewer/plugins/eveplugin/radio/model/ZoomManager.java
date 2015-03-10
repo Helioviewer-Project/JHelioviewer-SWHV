@@ -128,7 +128,7 @@ public class ZoomManager implements ZoomControllerListener, PlotAreaSpaceListene
      * have the coordinates (0,0,0,0) and are meaningless, the destination
      * coordinates are corresponding with the time interval and the taking the
      * complete height of the plot area.
-     * 
+     *
      * @param startDate
      *            The start date of the interval
      * @param endDate
@@ -154,8 +154,8 @@ public class ZoomManager implements ZoomControllerListener, PlotAreaSpaceListene
      * interval and frequency interval. The frequency gets the complete height,
      * the time gets the portion of the width of the screen corresponding with
      * the portion of the complete time interval it takes.
-     * 
-     * 
+     *
+     *
      * @param startDate
      *            The start date of the requested time interval
      * @param endDate
@@ -177,7 +177,6 @@ public class ZoomManager implements ZoomControllerListener, PlotAreaSpaceListene
      */
     public Rectangle getAvailableSpaceForInterval(Date startDate, Date endDate, int startFreq, int endFreq, long downloadId, String plotIdentifier) {
         ZoomManagerData zmd = getZoomManagerData(plotIdentifier);
-        ZoomDataConfig zdc = zmd.getZoomDataConfigMap().get(downloadId);
         YValueModel yValueModel = yValueModelManager.getYValueModel(plotIdentifier);
         synchronized (intervalLock) {
             if (currentInterval.containsPointInclusive(startDate) && currentInterval.containsPointInclusive(endDate) && (startFreq >= yValueModel.getAvailableYMin() && startFreq <= yValueModel.getAvailableYMax()) && (endFreq >= yValueModel.getAvailableYMin() && endFreq <= yValueModel.getAvailableYMax())) {
@@ -247,7 +246,7 @@ public class ZoomManager implements ZoomControllerListener, PlotAreaSpaceListene
 
     /**
      * Remove the zoom manager data from the zoom manager.
-     * 
+     *
      * @param downloadID
      *            The download identifier to remove from the zoom manager
      * @param plotIdentifier

@@ -6,11 +6,10 @@ import java.awt.event.KeyEvent;
 import javax.swing.AbstractAction;
 import javax.swing.KeyStroke;
 
-import org.helioviewer.jhv.gui.states.StateController;
-import org.helioviewer.jhv.gui.states.ViewStateEnum;
-
 import org.helioviewer.jhv.gui.dialogs.HelpDialog;
 import org.helioviewer.jhv.gui.interfaces.ShowableDialog;
+import org.helioviewer.jhv.gui.states.StateController;
+import org.helioviewer.jhv.gui.states.ViewStateEnum;
 
 /**
  * Action to show any given dialog.
@@ -23,7 +22,6 @@ public class ShowDialogAction extends AbstractAction {
     private static final long serialVersionUID = 1L;
     private final Class<ShowableDialog> dialogToShow;
     private ShowableDialog dialog, dialog3D;
-    private Class<ShowableDialog> dialogToShow3D;
     private boolean differentiated;
 
     /**
@@ -50,7 +48,6 @@ public class ShowDialogAction extends AbstractAction {
         super(name);
 
         dialogToShow = (Class<ShowableDialog>) dialog;
-        dialogToShow3D = (Class<ShowableDialog>) dialog3D;
         differentiated = true;
         if (dialog.isAssignableFrom(HelpDialog.class)) {
             putValue(ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_F1, 0));
@@ -63,8 +60,7 @@ public class ShowDialogAction extends AbstractAction {
     @Override
     public void actionPerformed(ActionEvent e) {
         try {
-            if (!differentiated ||
-                StateController.getInstance().getCurrentState().getType() == ViewStateEnum.View2D) {
+            if (!differentiated || StateController.getInstance().getCurrentState().getType() == ViewStateEnum.View2D) {
                 if (dialog == null)
                     dialog = dialogToShow.newInstance();
                 dialog.init();

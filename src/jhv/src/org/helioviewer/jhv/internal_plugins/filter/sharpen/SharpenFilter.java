@@ -50,8 +50,6 @@ public class SharpenFilter extends AbstractFilter implements GLImageSizeFilter {
 
     private SharpenPanel panel;
 
-    private final int convolveX[] = null;
-    private final int convolveY[] = null;
     private float pixelWidth, pixelHeight;
 
     /**
