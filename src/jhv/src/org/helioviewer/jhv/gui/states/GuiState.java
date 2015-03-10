@@ -21,7 +21,7 @@ public class GuiState implements State {
     private final boolean is3d;
     private final ViewchainFactory viewchainFactory;
 
-    private TopToolBar topToolBar;
+    private static TopToolBar topToolBar;
     private ComponentView mainComponentView;
     private RenderModeStatusPanel renderModeStatus;
 
