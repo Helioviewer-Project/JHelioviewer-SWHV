@@ -66,7 +66,6 @@ public class TopToolBar extends JToolBar implements MouseListener {
     private JToggleButton rotateButton;
     private JToggleButton zoomBoxButton;
 
-    private JToggleButton trackSolarRotationButton;
     private JToggleButton trackSolarRotationButton3D;
     private JToggleButton coronaVisibilityButton;
     private JButton resetCamera;
