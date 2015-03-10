@@ -236,10 +236,6 @@ public class TopToolBar extends JToolBar implements MouseListener {
         coronaVisibilityButton.setToolTipText("Toggle Corona Visibility");
         addButton(coronaVisibilityButton);
 
-        // VSO Export - DEACTIVATED FOR NOW
-        // addSeparator();
-        // addButton(new JButton(new NewQueryAction(true)));
-
         addSeparator();
 
         ButtonGroup stateGroup = new ButtonGroup();
