@@ -221,8 +221,8 @@ public class GL3DImageLayer extends GL3DShape {
     @Override
     public void shapeDraw(GL3DState state) {
         GL2 gl = state.gl;
-        GLSLShader.bind(state.gl);
-        GLSLShader.bindVars(state.gl);
+        GLSLShader.bind(gl);
+        GLSLShader.bindVars(gl);
 
         gl.glEnable(GL2.GL_CULL_FACE);
         {
@@ -235,16 +235,16 @@ public class GL3DImageLayer extends GL3DShape {
                 glfilter.renderGL(gl, true);
             }
             GLSLShader.filter(gl);
-            GLSLShader.bind(state.gl);
+            GLSLShader.bind(gl);
 
             enablePositionVBO(state);
             enableIndexVBO(state);
             {
-                state.gl.glVertexPointer(3, GL2.GL_FLOAT, 3 * Buffers.SIZEOF_FLOAT, 0);
+                gl.glVertexPointer(3, GL2.GL_FLOAT, 3 * Buffers.SIZEOF_FLOAT, 0);
                 if (this.showCorona) {
-                    state.gl.glDepthRange(1.f, 1.f);
+                    gl.glDepthRange(1.f, 1.f);
                     gl.glDrawElements(GL2.GL_TRIANGLES, 6, GL2.GL_UNSIGNED_INT, (this.indexBufferSize - 6) * Buffers.SIZEOF_INT);
-                    state.gl.glDepthRange(0.f, 1.f);
+                    gl.glDepthRange(0.f, 1.f);
                 }
                 if (this.showSphere && StateController.getInstance().getCurrentState() == ViewStateEnum.View3D.getState()) {
                     gl.glDrawElements(GL2.GL_TRIANGLES, this.indexBufferSize - 6, GL2.GL_UNSIGNED_INT, 0);
@@ -252,12 +252,11 @@ public class GL3DImageLayer extends GL3DShape {
             }
             disableIndexVBO(state);
             disablePositionVBO(state);
-            GLSLShader.unbind(state.gl);
+            GLSLShader.unbind(gl);
 
             gl.glColorMask(true, true, true, true);
         }
         gl.glDisable(GL2.GL_CULL_FACE);
-
     }
 
     private int generate(GL3DState state) {

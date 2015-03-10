@@ -27,21 +27,20 @@ public class GL3DCameraView extends AbstractGL3DView implements GL3DView {
     public GL3DCameraView() {
         // Register short keys for changing the interaction
         GL3DKeyController.getInstance().addListener(new GL3DKeyListener() {
-
             @Override
             public void keyHit(KeyEvent e) {
                 camera.setCurrentInteraction(camera.getPanInteraction());
             }
         }, KeyEvent.VK_P);
-        GL3DKeyController.getInstance().addListener(new GL3DKeyListener() {
 
+        GL3DKeyController.getInstance().addListener(new GL3DKeyListener() {
             @Override
             public void keyHit(KeyEvent e) {
                 camera.setCurrentInteraction(camera.getRotateInteraction());
             }
         }, KeyEvent.VK_R);
-        GL3DKeyController.getInstance().addListener(new GL3DKeyListener() {
 
+        GL3DKeyController.getInstance().addListener(new GL3DKeyListener() {
             @Override
             public void keyHit(KeyEvent e) {
                 camera.setCurrentInteraction(camera.getZoomInteraction());
@@ -50,7 +49,6 @@ public class GL3DCameraView extends AbstractGL3DView implements GL3DView {
 
         // Center Image when pressing alt+c
         GL3DKeyController.getInstance().addListener(new GL3DKeyListener() {
-
             @Override
             public void keyHit(KeyEvent e) {
                 if (e.isAltDown()) {
@@ -59,7 +57,6 @@ public class GL3DCameraView extends AbstractGL3DView implements GL3DView {
                 }
             }
         }, KeyEvent.VK_C);
-
     }
 
     @Override
@@ -95,4 +92,5 @@ public class GL3DCameraView extends AbstractGL3DView implements GL3DView {
             ((GLView) view).renderGL(gl, false);
         }
     }
+
 }

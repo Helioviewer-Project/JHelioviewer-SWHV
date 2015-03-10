@@ -116,12 +116,12 @@ public class GL3DSceneGraphView extends AbstractGL3DView implements GL3DView {
         state.getActiveCamera().applyCamera(state);
 
         if (overlayView != null)
-            overlayView.preRender3D(state.gl);
+            overlayView.preRender3D(gl);
 
         this.root.draw(state);
 
         if (overlayView != null)
-            overlayView.postRender3D(state.gl);
+            overlayView.postRender3D(gl);
 
         // Draw the camera or its interaction feedbacks
         state.getActiveCamera().drawCamera(state);

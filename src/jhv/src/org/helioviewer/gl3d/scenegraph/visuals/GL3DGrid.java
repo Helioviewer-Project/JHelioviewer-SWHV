@@ -85,8 +85,9 @@ public class GL3DGrid extends GL3DGroup {
     @Override
     public void shapeDraw(GL3DState state) {
         this.markAsChanged();
-        state.gl.glColor3d(1., 1., 0.);
+
         GL2 gl = state.gl;
+        gl.glColor3d(1., 1., 0.);
 
         super.shapeDraw(state);
         float relhi = (float) (state.getActiveCamera().INITFOV / (state.getActiveCamera().getCameraFOV())) * scale;
