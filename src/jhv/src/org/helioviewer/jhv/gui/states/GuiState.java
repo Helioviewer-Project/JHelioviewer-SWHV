@@ -9,7 +9,6 @@ import org.helioviewer.gl3d.plugin.GL3DPluginController;
 import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.gui.GL3DViewchainFactory;
 import org.helioviewer.jhv.gui.ViewchainFactory;
-import org.helioviewer.jhv.gui.components.SideContentPane;
 import org.helioviewer.jhv.gui.components.TopToolBar;
 import org.helioviewer.jhv.gui.components.statusplugins.RenderModeStatusPanel;
 import org.helioviewer.jhv.gui.controller.MainImagePanelMousePanController;
@@ -34,17 +33,6 @@ public class GuiState implements State {
         } else {
             is3d = false;
         }
-    }
-
-    @Override
-    public void addStateSpecificComponents(SideContentPane sideContentPane) {
-        if (is3d) {
-            GL3DCameraSelectorModel.getInstance();
-        }
-    }
-
-    @Override
-    public void removeStateSpecificComponents(SideContentPane sideContentPane) {
     }
 
     @Override
