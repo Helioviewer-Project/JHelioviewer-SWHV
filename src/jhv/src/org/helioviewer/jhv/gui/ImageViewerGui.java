@@ -25,6 +25,7 @@ import javax.swing.JTabbedPane;
 
 import org.helioviewer.base.message.Message;
 import org.helioviewer.gl3d.camera.GL3DCameraOptionsPanel;
+import org.helioviewer.gl3d.gui.GL3DTopToolBar;
 import org.helioviewer.gl3d.spaceobjects.PlanetOptionsPanel;
 import org.helioviewer.jhv.JHVSplashScreen;
 import org.helioviewer.jhv.gui.actions.ExitProgramAction;
@@ -113,6 +114,8 @@ public class ImageViewerGui {
     public static final int SIDE_PADDING = 10;
     private final ObservationDialog observationDialog;
 
+    private final GL3DTopToolBar topToolBar;
+
     /**
      * The private constructor that creates and positions all the gui
      * components.
@@ -132,6 +135,7 @@ public class ImageViewerGui {
 
         mainFrame.setJMenuBar(menuBar);
         mainFrame.setFocusable(true);
+        topToolBar = new GL3DTopToolBar();
     }
 
     public void prepareGui() {
@@ -398,7 +402,7 @@ public class ImageViewerGui {
     }
 
     public TopToolBar getTopToolBar() {
-        return StateController.getInstance().getCurrentState().getTopToolBar();
+        return this.topToolBar;
     }
 
     /**

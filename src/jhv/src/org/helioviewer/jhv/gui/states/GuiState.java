@@ -3,12 +3,10 @@ package org.helioviewer.jhv.gui.states;
 import org.helioviewer.base.logging.Log;
 import org.helioviewer.gl3d.gui.GL3DCameraMouseController;
 import org.helioviewer.gl3d.gui.GL3DCameraSelectorModel;
-import org.helioviewer.gl3d.gui.GL3DTopToolBar;
 import org.helioviewer.gl3d.model.GL3DInternalPluginConfiguration;
 import org.helioviewer.gl3d.plugin.GL3DPluginController;
 import org.helioviewer.jhv.display.Displayer;
-import org.helioviewer.jhv.gui.ViewchainFactory;
-import org.helioviewer.jhv.gui.components.TopToolBar;
+import org.helioviewer.jhv.gui.GL3DViewchainFactory;
 import org.helioviewer.jhv.gui.components.statusplugins.RenderModeStatusPanel;
 import org.helioviewer.jhv.gui.controller.MainImagePanelMousePanController;
 import org.helioviewer.jhv.gui.interfaces.ImagePanelInputController;
@@ -18,14 +16,11 @@ import org.helioviewer.viewmodel.view.opengl.GL3DSceneGraphView;
 public class GuiState implements State {
 
     private final boolean is3d;
-    private final ViewchainFactory viewchainFactory;
 
-    private static TopToolBar topToolBar;
     private ComponentView mainComponentView;
     private RenderModeStatusPanel renderModeStatus;
 
-    public GuiState(ViewchainFactory viewchainFactory, boolean is3d) {
-        this.viewchainFactory = viewchainFactory;
+    public GuiState(boolean is3d) {
         this.is3d = is3d;
     }
 
@@ -35,7 +30,7 @@ public class GuiState implements State {
 
         boolean firstTime = (mainComponentView == null);
         // Create main view chain
-        ViewchainFactory mainFactory = this.viewchainFactory;
+        GL3DViewchainFactory mainFactory = new GL3DViewchainFactory();
         mainComponentView = mainFactory.createViewchainMain(mainComponentView, false);
         GL3DCameraSelectorModel.getInstance().activate(this.mainComponentView.getAdapter(GL3DSceneGraphView.class));
         GL3DPluginController.getInstance().setPluginConfiguration(new GL3DInternalPluginConfiguration());
@@ -65,30 +60,12 @@ public class GuiState implements State {
     }
 
     @Override
-    public TopToolBar getTopToolBar() {
-        if (topToolBar == null) {
-            if (is3d) {
-                topToolBar = new GL3DTopToolBar();
-            } else {
-                topToolBar = new TopToolBar();
-            }
-        }
-
-        return topToolBar;
-    }
-
-    @Override
     public ComponentView getMainComponentView() {
         return mainComponentView;
     }
 
     public RenderModeStatusPanel getRenderModeStatus() {
         return renderModeStatus;
-    }
-
-    @Override
-    public ViewchainFactory getViewchainFactory() {
-        return this.viewchainFactory;
     }
 
     @Override
