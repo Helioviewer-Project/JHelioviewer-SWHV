@@ -31,6 +31,8 @@ import org.helioviewer.base.logging.Log;
 import org.helioviewer.base.math.Interval;
 import org.helioviewer.base.math.MathUtils;
 import org.helioviewer.viewmodel.io.APIResponseDump;
+import org.helioviewer.viewmodel.metadata.MetaData;
+import org.helioviewer.viewmodel.metadata.MetaDataConstructor;
 import org.helioviewer.viewmodel.metadata.MultiFrameMetaDataContainer;
 import org.helioviewer.viewmodel.view.cache.ImageCacheStatus;
 import org.helioviewer.viewmodel.view.jp2view.image.ResolutionSet;
@@ -110,6 +112,7 @@ public class JP2Image implements MultiFrameMetaDataContainer {
     /** cache path */
     private static File cachePath;
 
+    public ArrayList<MetaData> metaDataList;
     public NodeList[] xmlCache;
 
     private JHVJP2View parentView;
@@ -184,6 +187,7 @@ public class JP2Image implements MultiFrameMetaDataContainer {
 
         createKakaduMachinery();
 
+        metaDataList = new ArrayList<MetaData>(layerRange.getEnd() + 1);
         xmlCache = new NodeList[layerRange.getEnd() + 1];
         cacheXMLs();
     }
@@ -253,7 +257,6 @@ public class JP2Image implements MultiFrameMetaDataContainer {
         } finally {
             Timer timer = new Timer("WaitForCloseSocket");
             timer.schedule(new TimerTask() {
-
                 @Override
                 public synchronized void run() {
                     if (socket != null) {
@@ -276,7 +279,6 @@ public class JP2Image implements MultiFrameMetaDataContainer {
      * @throws IOException
      */
     private void initLocal() throws JHV_KduException, IOException {
-
         // Source is local so it must be a file
         File file = new File(uri);
 
@@ -439,9 +441,19 @@ public class JP2Image implements MultiFrameMetaDataContainer {
 
     private void cacheXMLs() throws JHV_KduException {
         String xml;
-        ArrayList<String> xmls = KakaduUtils.getAllXMLs(familySrc, xmlCache.length);
+        int num = metaDataList.size();
+        ArrayList<String> xmls = KakaduUtils.getAllXMLs(familySrc, num);
 
-        for (int i = 0; i < xmlCache.length; i++) {
+        boolean isSWAP = false;
+        boolean isLASCO = false;
+        try {
+            isSWAP = checkForSwap();
+            isLASCO = checkForLasco();
+        } catch (Exception ex) {
+                ex.printStackTrace();
+        }
+
+        for (int i = 0; i < num; i++) {
             if ((xml = xmls.get(i)) == null) {
                 throw new JHV_KduException("No XML data present");
             } else if (!xml.contains("</meta>")) {
@@ -459,12 +471,29 @@ public class JP2Image implements MultiFrameMetaDataContainer {
 
             try {
                 DocumentBuilder builder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
-                Document doc = builder.parse(in);
-                xmlCache[i] = doc.getElementsByTagName("meta");
+                NodeList node = builder.parse(in).getElementsByTagName("meta");
+
+                uglyFrameNumber = i;
+                MetaData metaData = MetaDataConstructor.getMetaData(this);
+                metaData.setParsedDateTime(MetaDataConstructor.parseDateTime(this, i, isSWAP, isLASCO));
+
+                metaDataList.add(i, metaData);
             } catch (Exception e) {
                 throw new JHV_KduException("Failed parsing XML data", e);
             }
         }
+    }
+
+    private boolean checkForSwap() throws IOException {
+        String instrument = this.get("INSTRUME", 0);
+        boolean isSWAP = instrument != null && (instrument.contains("SWAP") || instrument.contains("CALLISTO") || instrument.contains("NRH"));
+        return isSWAP;
+    }
+
+    private boolean checkForLasco() throws IOException {
+        String instrument = this.get("INSTRUME", 0);
+        boolean isLASCO = (instrument != null && instrument.trim().equalsIgnoreCase("LASCO"));
+        return isLASCO;
     }
 
     /**
@@ -557,10 +586,6 @@ public class JP2Image implements MultiFrameMetaDataContainer {
     }
 
     private int uglyFrameNumber = 0;
-
-    public void setUglyFrameNumber(int frameNumber) {
-        uglyFrameNumber = frameNumber;
-    }
 
     /**
      * {@inheritDoc}
