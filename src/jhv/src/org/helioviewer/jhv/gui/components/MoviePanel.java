@@ -210,8 +210,8 @@ public class MoviePanel extends JPanel implements ActionListener, ChangeListener
         speedUnitComboBox.addActionListener(this);
 
         if (view instanceof CachedMovieView) {
-            timeSlider.setPartialCachedUntil(Math.min(((CachedMovieView) view).getImageCacheStatus().getImageCachedPartiallyUntil(), ((CachedMovieView) view).getDateTimeCache().getMetaStatus()));
-            timeSlider.setCompleteCachedUntil(Math.min(((CachedMovieView) view).getImageCacheStatus().getImageCachedCompletelyUntil(), ((CachedMovieView) view).getDateTimeCache().getMetaStatus()));
+            timeSlider.setPartialCachedUntil(((CachedMovieView) view).getImageCacheStatus().getImageCachedPartiallyUntil());
+            timeSlider.setCompleteCachedUntil(((CachedMovieView) view).getImageCacheStatus().getImageCachedCompletelyUntil());
         }
 
         ViewListenerDistributor.getSingletonInstance().addViewListener(this);

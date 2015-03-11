@@ -34,10 +34,10 @@ import org.helioviewer.viewmodel.view.jp2view.kakadu.KakaduUtils;
  * retrieve image data from a JPIP server (if the image is remote). The second
  * is that all view-changed signals are routed through this thread... so it must
  * forward them to the J2KRender thread through that threads signal.
- * 
+ *
  * TODO The server may change the parameters of the request, and we should take
  * it into account...
- * 
+ *
  * @author caplins
  * @author Juan Pablo
  * @author Markus Langenberg
@@ -80,7 +80,7 @@ class J2KReader implements Runnable {
 
     /**
      * The constructor. Creates and connects the socket if image is remote.
-     * 
+     *
      * @param _imageViewRef
      * @throws IOException
      * @throws JHV_KduException
@@ -376,7 +376,7 @@ class J2KReader implements Runnable {
                                     num_steps++;
 
                                 int lpf = 0,
-                                lpi = 0;
+                                        lpi = 0;
                                 stepQuerys = new JPIPQuery[num_steps];
 
                                 // create queries for packages containing
@@ -525,35 +525,8 @@ class J2KReader implements Runnable {
                                 // select next query, based on strategy
                                 switch (strategy) {
                                 case MISSINGFRAMESFIRST:
+                                    current_step++;
 
-                                    int metaStatus = ((CachedMovieView) parentViewRef).getDateTimeCache().getMetaStatus();
-
-                                    if (metaStatus >= Math.min((current_step + 1) * JPIPConstants.MAX_REQ_LAYERS, layers.getEnd())) {
-
-                                        // if(metaStatus < num_layers-1) {
-                                        // float loadPerSecond =
-                                        // (float)metaStatus /
-                                        // (System.currentTimeMillis() - time) *
-                                        // 1000.0f;
-                                        // int remainingFrames = num_layers -
-                                        // metaStatus;
-                                        // float remainingTime = remainingFrames
-                                        // / loadPerSecond;
-                                        // float playTime = (num_layers -
-                                        // currParams.compositionLayer) / 20.0f;
-                                        // System.out.println(remainingTime +
-                                        // " " + playTime);
-                                        // if(playTime >= remainingTime) {
-                                        // ((CachedMovieView)
-                                        // parentViewRef).playMovie();
-                                        // } else {
-                                        // ((CachedMovieView)
-                                        // parentViewRef).pauseMovie();
-                                        // }
-                                        // }
-
-                                        current_step++;
-                                    }
                                     break;
 
                                 case ALLFRAMESEQUALLY:

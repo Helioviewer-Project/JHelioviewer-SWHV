@@ -1,5 +1,6 @@
 package org.helioviewer.viewmodel.view.jp2view;
 
+import java.util.ArrayList;
 import java.util.Date;
 
 import org.helioviewer.base.math.Interval;
@@ -7,11 +8,10 @@ import org.helioviewer.viewmodel.changeevent.ChangeEvent;
 import org.helioviewer.viewmodel.changeevent.PlayStateChangedReason;
 import org.helioviewer.viewmodel.imagedata.ImageData;
 import org.helioviewer.viewmodel.metadata.HelioviewerMetaData;
+import org.helioviewer.viewmodel.metadata.MetaData;
 import org.helioviewer.viewmodel.view.CachedMovieView;
 import org.helioviewer.viewmodel.view.LinkedMovieManager;
 import org.helioviewer.viewmodel.view.TimedMovieView;
-import org.helioviewer.viewmodel.view.cache.DateTimeCache;
-import org.helioviewer.viewmodel.view.cache.HelioviewerDateTimeCache;
 import org.helioviewer.viewmodel.view.cache.ImageCacheStatus;
 import org.helioviewer.viewmodel.view.cache.ImageCacheStatus.CacheStatus;
 import org.helioviewer.viewmodel.view.cache.LocalImageCacheStatus;
@@ -77,7 +77,6 @@ public class JHVJPXView extends JHVJP2View implements TimedMovieView, CachedMovi
         if (!isMainView) {
             super.setJP2Image(newJP2Image);
             imageCacheStatus = ((JHVJPXView) jp2Image.getParentView()).getImageCacheStatus();
-            dateTimeCache = ((JHVJPXView) jp2Image.getParentView()).getDateTimeCache();
             return;
         }
 
@@ -94,19 +93,7 @@ public class JHVJPXView extends JHVJP2View implements TimedMovieView, CachedMovi
         }
         jp2Image.setImageCacheStatus(imageCacheStatus);
 
-        dateTimeCache = new HelioviewerDateTimeCache(this, jp2Image);
-
         super.setJP2Image(newJP2Image);
-
-        dateTimeCache.startParsing();
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public DateTimeCache getDateTimeCache() {
-        return dateTimeCache;
 
     }
 
@@ -177,15 +164,14 @@ public class JHVJPXView extends JHVJP2View implements TimedMovieView, CachedMovi
         int frameNumber = -1;
         long timeMillis = time.getMillis();
         long lastDiff, currentDiff = -Long.MAX_VALUE;
-
         do {
             lastDiff = currentDiff;
 
-            if (dateTimeCache.getDateTime(++frameNumber) == null) {
+            if (getMetaDataList().get(++frameNumber).getParsedDateTime() == null) {
                 return;
             }
 
-            currentDiff = dateTimeCache.getDateTime(frameNumber).getMillis() - timeMillis;
+            currentDiff = getMetaDataList().get(frameNumber).getParsedDateTime().getMillis() - timeMillis;
         } while (currentDiff < 0 && frameNumber < jp2Image.getCompositionLayerRange().getEnd());
 
         if (-lastDiff < currentDiff) {
@@ -216,10 +202,11 @@ public class JHVJPXView extends JHVJP2View implements TimedMovieView, CachedMovi
      */
     @Override
     public int getMaximumAccessibleFrameNumber() {
-        if (dateTimeCache == null || imageCacheStatus == null) {
+        if (imageCacheStatus == null) {
             return -1;
+
         }
-        return Math.min(dateTimeCache.getMetaStatus(), imageCacheStatus.getImageCachedPartiallyUntil());
+        return imageCacheStatus.getImageCachedPartiallyUntil();
     }
 
     /**
@@ -227,7 +214,7 @@ public class JHVJPXView extends JHVJP2View implements TimedMovieView, CachedMovi
      */
     @Override
     public ImmutableDateTime getCurrentFrameDateTime() {
-        return dateTimeCache.getDateTime(getCurrentFrameNumber());
+        return getMetaDataList().get(getCurrentFrameNumber()).getParsedDateTime();
     }
 
     /**
@@ -235,7 +222,7 @@ public class JHVJPXView extends JHVJP2View implements TimedMovieView, CachedMovi
      */
     @Override
     public ImmutableDateTime getFrameDateTime(int frameNumber) {
-        return dateTimeCache.getDateTime(frameNumber);
+        return getMetaDataList().get(frameNumber).getParsedDateTime();
     }
 
     /**
@@ -389,7 +376,6 @@ public class JHVJPXView extends JHVJP2View implements TimedMovieView, CachedMovi
             linkedMovieManager.unlinkMovie(this);
         }
         pauseMovie();
-        dateTimeCache.stopParsing();
         super.abolish();
     }
 
@@ -505,5 +491,10 @@ public class JHVJPXView extends JHVJP2View implements TimedMovieView, CachedMovi
     @Override
     public int getDesiredRelativeSpeed() {
         return this.render.getMovieRelativeSpeed();
+    }
+
+    @Override
+    public ArrayList<MetaData> getMetaDataList() {
+        return metaDataList;
     }
 }
