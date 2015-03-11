@@ -78,8 +78,6 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
     private Rectangle graphArea = new Rectangle();
     private Rectangle plotArea = new Rectangle();
     private double ratioX = 0;
-    private int lastKnownWidth = -1;
-    private int lastKnownHeight = -1;
     private BufferedImage screenImage = null;
     private final ZoomManager zoomManager;
     private final String identifier;
@@ -701,8 +699,6 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
 
     @Override
     public void componentResized(ComponentEvent e) {
-        lastKnownWidth = getWidth();
-        lastKnownHeight = getHeight();
         updateGraph();
     }
 
