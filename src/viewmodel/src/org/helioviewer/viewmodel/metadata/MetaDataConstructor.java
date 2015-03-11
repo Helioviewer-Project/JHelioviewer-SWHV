@@ -1,5 +1,10 @@
 package org.helioviewer.viewmodel.metadata;
 
+import java.util.ArrayList;
+
+import org.helioviewer.viewmodel.view.jp2view.JHVJP2View;
+import org.helioviewer.viewmodel.view.jp2view.JP2Image;
+
 /**
  * Factory for creating meta data out of a meta data container.
  *
@@ -49,5 +54,22 @@ public class MetaDataConstructor {
         } else {
             return hvMetaData;
         }
+    }
+
+    public static ArrayList<MetaData> getMetaDataList(JP2Image mdc, JHVJP2View jp2v) {
+        ArrayList<MetaData> metaDataList = new ArrayList<MetaData>();
+        int numberOfLayers = mdc.getNumberFrames();
+        synchronized (jp2v.imageViewParams) {
+            for (int i = 0; i <= numberOfLayers; i++) {
+                MetaData md = getMetaData(mdc);
+                metaDataList.add(md);
+
+                //jpxv.setCurrentFrameNumber(i, null, false);
+                jp2v.imageViewParams.compositionLayer = i;
+            }
+
+            jp2v.getImageViewParams().compositionLayer = 0;
+        }
+        return metaDataList;
     }
 }

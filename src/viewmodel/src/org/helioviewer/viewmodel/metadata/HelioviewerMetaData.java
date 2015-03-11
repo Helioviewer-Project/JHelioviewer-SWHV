@@ -25,7 +25,7 @@ import org.helioviewer.viewmodel.view.jp2view.image.SubImage;
  * @author Andre Dau
  *
  */
-public class HelioviewerMetaData extends AbstractMetaData implements SunMetaData, ObserverMetaData, ImageSizeMetaData, NonConstantMetaData {
+public class HelioviewerMetaData extends AbstractMetaData implements SunMetaData, ObserverMetaData, ImageSizeMetaData {
 
     protected MetaDataContainer metaDataContainer;
     private String instrument = "";
@@ -363,16 +363,6 @@ public class HelioviewerMetaData extends AbstractMetaData implements SunMetaData
     @Override
     public ImmutableDateTime getDateTime() {
         return time;
-    }
-
-    /**
-     * {@inheritDoc}
-     *
-     * In this case, the resolution and the solar pixel position are checked.
-     */
-    @Override
-    public boolean checkForModifications() {
-        return updatePixelParameters();
     }
 
     public double getPhi() {

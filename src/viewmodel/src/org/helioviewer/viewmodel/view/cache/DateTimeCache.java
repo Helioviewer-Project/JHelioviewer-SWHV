@@ -12,27 +12,27 @@ import org.helioviewer.viewmodel.view.jp2view.datetime.ImmutableDateTime;
 
 /**
  * Cache to parse and buffer all timestamps from all images of an image series.
- * 
+ *
  * <p>
  * To parse the time stamps, this class has its own thread.
- * 
+ *
  * @author Markus Langenberg
- * 
+ *
  */
 public abstract class DateTimeCache {
 
     protected CachedMovieView parent;
 
-    private ImmutableDateTime[] cache;
+    private final ImmutableDateTime[] cache;
 
     protected boolean stopParsing = false;
 
     protected int nextDateToParse = 0;
-    private Thread parsingThread = null;
+    private final Thread parsingThread = null;
 
     /**
      * Default constructor.
-     * 
+     *
      * @param _parent
      *            parent view
      */
@@ -46,7 +46,7 @@ public abstract class DateTimeCache {
 
     /**
      * Returns the last layer, whose meta data is already parsed.
-     * 
+     *
      * @return Last layer, whose meta data is already parsed
      */
     public int getMetaStatus() {
@@ -55,13 +55,13 @@ public abstract class DateTimeCache {
 
     /**
      * Reads date and time for the given frame number from the cache.
-     * 
+     *
      * If the cache does not contain the value yet and the function was not
      * called by the thread responsible for parsing, waits until the value is
      * available. When the function is called by the thread responsible for
      * parsing, goes on parsing until the value is available. So, any case,
      * returns the correct value.
-     * 
+     *
      * @param frameNumber
      *            Frame number to fetch date and time for
      * @return Date and time of the given frame
@@ -85,36 +85,19 @@ public abstract class DateTimeCache {
      * Starts the parsing thread
      */
     public void startParsing() {
-        if (parsingThread != null) {
-            stopParsing();
-        }
-
-        parsingThread = new Thread(new Runnable() {
-            public void run() {
-                parseAll();
-            }
-        }, "DateTime Parser");
-        parsingThread.start();
+        parseAll();
     }
 
     /**
      * Stops the parsing thread
      */
     public void stopParsing() {
-        stopParsing = true;
 
-        if (parsingThread != null && parsingThread.isAlive()) {
-            try {
-                parsingThread.join();
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-        }
     }
 
     /**
      * Parses all time stamps.
-     * 
+     *
      * This function is called from the parsing thread. It test first, whether
      * the time stamps are available via an API response. If that is not the
      * cause, it waits until the meta data are loaded, so it can read the time
@@ -178,10 +161,10 @@ public abstract class DateTimeCache {
 
     /**
      * Parses the date and time of the given frame number.
-     * 
+     *
      * Since depends on the format of the meta data very much, this function is
      * abstract and should be implemented by a specialized class.
-     * 
+     *
      * @param frameNumber
      *            Frame number to parse date and time for
      * @return Date and time of the given frame
