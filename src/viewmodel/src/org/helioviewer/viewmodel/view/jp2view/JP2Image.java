@@ -437,22 +437,6 @@ public class JP2Image implements MultiFrameMetaDataContainer {
         return familySrc;
     }
 
-    /**
-     * Method that executes getValueFromXML(_keyword, _box, <currentBoxNumber>).
-     * This will get the xml box from the currently shown frame
-     *
-     * @param _keyword
-     * @param _box
-     * @throws JHV_KduException
-     */
-    public String getValueFromXML(String _keyword, String _box) throws JHV_KduException {
-        int boxNumber = 1;
-        if (parentView != null && parentView.getImageViewParams() != null) {
-            boxNumber = parentView.getImageViewParams().compositionLayer + 1;
-        }
-        return getValueFromXML(_keyword, _box, boxNumber);
-    }
-
     private void cacheXMLs() throws JHV_KduException {
         String xml;
         ArrayList<String> xmls = KakaduUtils.getAllXMLs(familySrc, xmlCache.length);
@@ -572,13 +556,19 @@ public class JP2Image implements MultiFrameMetaDataContainer {
         return resolutionSet;
     }
 
+    private int uglyFrameNumber = 0;
+
+    public void setUglyFrameNumber(int frameNumber) {
+        uglyFrameNumber = frameNumber;
+    }
+
     /**
      * {@inheritDoc}
      */
     @Override
     public String get(String key) {
         try {
-            String value = getValueFromXML(key, "fits");
+            String value = getValueFromXML(key, "fits", uglyFrameNumber + 1);
             return value;
         } catch (JHV_KduException e) {
             if (e.getMessage() == "XML data incomplete" || e.getMessage().toLowerCase().contains("box not open")) {

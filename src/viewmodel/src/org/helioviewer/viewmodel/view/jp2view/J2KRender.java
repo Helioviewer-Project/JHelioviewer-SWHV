@@ -272,11 +272,7 @@ class J2KRender implements Runnable {
 
             if (lastCompositionLayerRendered != numLayer) {
                 lastCompositionLayerRendered = numLayer;
-
                 parentImageRef.updateResolutionSet(numLayer);
-
-                parentViewRef.setMetaData(numLayer);
-
             }
 
             compositorRef.Set_surface_initialization_mode(false);
