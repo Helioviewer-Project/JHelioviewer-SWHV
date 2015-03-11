@@ -300,20 +300,6 @@ public class LayersModel implements ViewListener {
         return result;
     }
 
-    public String getObservatory(View view) {
-        if (view == null) {
-            return null;
-        }
-
-        ImageInfoView imageInfoView = view.getAdapter(ImageInfoView.class);
-        if (imageInfoView != null && imageInfoView.getMetadata() instanceof HelioviewerMetaData) {
-            HelioviewerMetaData metaData = (HelioviewerMetaData) imageInfoView.getMetadata();
-            return metaData.getObservatory();
-        } else {
-            return view.toString();
-        }
-    }
-
     /**
      * Return the timestamp of the first available image data of the layer in
      * question
@@ -1280,7 +1266,6 @@ public class LayersModel implements ViewListener {
         ld.isVisible = layersModel.isVisible(view);
         ld.isTimed = layersModel.isTimed(view);
         ld.title = layersModel.getName(view);
-        ld.observatory = layersModel.getObservatory(view);
         ld.timestamp = layersModel.getCurrentFrameTimestampString(view);
 
         return ld;

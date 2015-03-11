@@ -13,7 +13,6 @@ public class LayerDescriptor {
     public boolean isTimed = false;
 
     public String title = "";
-    public String observatory = "";
     public String timestamp = "";
     public String interval;
     public String type;
