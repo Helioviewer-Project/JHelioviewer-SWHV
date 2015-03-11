@@ -112,9 +112,9 @@ public class JHVFITSView extends AbstractView implements ViewportView, RegionVie
         } else {
             subImageData = new ARGBInt32ImageData(bi, new ColorMask());
         }
+        subImageData.setMETADATA(m);
 
         region = StaticRegion.createAdaptedRegion(m.getPhysicalLowerLeft().getX(), m.getPhysicalLowerLeft().getY(), m.getPhysicalImageSize().getX(), m.getPhysicalImageSize().getY());
-
         viewport = StaticViewport.createAdaptedViewport(100, 100);
     }
 
@@ -294,14 +294,4 @@ public class JHVFITSView extends AbstractView implements ViewportView, RegionVie
         return this.range;
     }
 
-    public void setDateRange(Interval<Date> range) {
-        // TODO Auto-generated method stub
-        this.range = range;
-    }
-
-    @Override
-    public MetaData getMetadata() {
-        // TODO Auto-generated method stub
-        return m;
-    }
 }

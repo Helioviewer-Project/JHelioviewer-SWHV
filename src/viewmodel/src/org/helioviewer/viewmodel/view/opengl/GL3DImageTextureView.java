@@ -72,7 +72,8 @@ public class GL3DImageTextureView extends AbstractGL3DView implements GL3DView {
 
         double theta = -Astronomy.getB0InRadians(dt);
         double phi = Astronomy.getL0Radians(dt);
-        MetaData metadata = imageView.getMetadata();
+
+        MetaData metadata = image.getMETADATA();
         if (metadata instanceof HelioviewerPositionedMetaData) {
             HelioviewerPositionedMetaData md = (HelioviewerPositionedMetaData) metadata;
             phi -= md.getStonyhurstLongitude() / MathUtils.radeg;

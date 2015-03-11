@@ -468,7 +468,7 @@ public class JHVJPXView extends JHVJP2View implements TimedMovieView, CachedMovi
 
     @Override
     public long getCurrentDateMillis() {
-        HelioviewerMetaData metadata = (HelioviewerMetaData) this.getMetadata();
+        HelioviewerMetaData metadata = (HelioviewerMetaData) this.metaData;
         return metadata.getDateTime().getMillis();
     }
 
