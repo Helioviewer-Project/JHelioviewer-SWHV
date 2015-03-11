@@ -3,7 +3,6 @@ package org.helioviewer.viewmodel.metadata;
 import java.io.IOException;
 import java.util.ArrayList;
 
-import org.helioviewer.viewmodel.view.jp2view.JHVJP2View;
 import org.helioviewer.viewmodel.view.jp2view.JP2Image;
 import org.helioviewer.viewmodel.view.jp2view.datetime.ImmutableDateTime;
 
@@ -58,23 +57,23 @@ public class MetaDataConstructor {
         }
     }
 
-    public static ArrayList<MetaData> getMetaDataList(JP2Image mdc, JHVJP2View jp2v) {
-        ArrayList<MetaData> metaDataList = new ArrayList<MetaData>();
-        int numberOfLayers = mdc.getNumberFrames();
+    public static ArrayList<MetaData> getMetaDataList(JP2Image mdc) {
+        int num = mdc.getNumberFrames();
         boolean isSWAP = checkForSwap(mdc);
         boolean isLASCO = checkForLasco(mdc);
-        for (int i = 0; i <= numberOfLayers; i++) {
-            MetaData md = getMetaData(mdc);
-            metaDataList.add(md);
 
-            //jpxv.setCurrentFrameNumber(i, null, false);
-            jp2v.imageViewParams.compositionLayer = i;
+        ArrayList<MetaData> metaDataList = new ArrayList<MetaData>(num);
+        for (int i = 0; i < num; i++) {
+            mdc.setUglyFrameNumber(i);
+
+            MetaData md = getMetaData(mdc);
             md.setParsedDateTime(parseDateTime(mdc, i, isSWAP, isLASCO));
+
+            metaDataList.add(i, md);
         }
 
-        jp2v.getImageViewParams().compositionLayer = 0;
-
         mdc.xmlCache = null;
+
         return metaDataList;
     }
 
