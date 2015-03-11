@@ -59,5 +59,4 @@ public interface ImageInfoView extends View {
 
     public Interval<Date> getDateRange();
 
-    public MetaData getMetadata();
 }

@@ -96,9 +96,9 @@ public class JHVSimpleImageView extends AbstractView implements ViewportView, Re
         }
 
         pixelBasedMetaData = new PixelBasedMetaData(bufferedImage.getWidth(), bufferedImage.getHeight());
+        subImageData.setMETADATA(pixelBasedMetaData);
 
         region = StaticRegion.createAdaptedRegion(0, 0, bufferedImage.getWidth(), bufferedImage.getHeight());
-
         viewport = StaticViewport.createAdaptedViewport(100, 100);
 
         updateImageData(new ChangeEvent());
@@ -252,16 +252,6 @@ public class JHVSimpleImageView extends AbstractView implements ViewportView, Re
     @Override
     public Interval<Date> getDateRange() {
         return this.range;
-    }
-
-    @Override
-    public MetaData getMetadata() {
-        // TODO Auto-generated method stub
-        return pixelBasedMetaData;
-    }
-
-    public void setDateRange(Interval<Date> range) {
-        // TODO Auto-generated method stub
     }
 
 }

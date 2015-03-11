@@ -721,7 +721,7 @@ public class JHVJP2View extends AbstractView implements JP2View, ViewportView, R
      */
     void setSubimageData(ImageData newImageData, SubImage roi, int compositionLayer, double zoompercent, boolean fullyLoaded) {
         if (metaData instanceof ObserverMetaData) {
-            ImmutableDateTime dtc = this.getMetaDataList().get(compositionLayer).getParsedDateTime();
+            ImmutableDateTime dtc = metaDataList.get(compositionLayer).getParsedDateTime();
             event.addReason(new TimestampChangedReason(this, dtc));
         }
         if (compositionLayer == 0) {
@@ -741,6 +741,8 @@ public class JHVJP2View extends AbstractView implements JP2View, ViewportView, R
         } else if (this.imageData != null && compositionLayer == this.imageData.getFrameNumber() - 1) {
             this.previousImageData = this.imageData;
         }
+        newImageData.setMETADATA(metaDataList.get(compositionLayer));
+
         this.imageData = newImageData;
 
         subImageBuffer.setLastRegion(roi);
@@ -860,12 +862,6 @@ public class JHVJP2View extends AbstractView implements JP2View, ViewportView, R
         return this.range;
     }
 
-    @Override
-    public MetaData getMetadata() {
-        // TODO Auto-generated method stub
-        return metaData;
-    }
-
     public ImageData getImageData() {
         return this.imageData;
     }
@@ -896,7 +892,7 @@ public class JHVJP2View extends AbstractView implements JP2View, ViewportView, R
     }
 
     public void setMetaData(int numLayer) {
-        this.metaData = getMetaDataList().get(numLayer);
+        this.metaData = metaDataList.get(numLayer);
     }
 
     public ArrayList<MetaData> getMetaDataList() {
