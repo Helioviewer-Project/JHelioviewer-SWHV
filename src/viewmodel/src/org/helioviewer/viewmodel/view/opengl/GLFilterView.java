@@ -75,13 +75,13 @@ public class GLFilterView extends StandardFilterView implements GLView {
      */
     @Override
     public void renderGL(GL2 gl, boolean nextView) {
-
         filter.applyGL(gl);
+
         if (view instanceof GLView) {
             ((GLView) view).renderGL(gl, true);
         } else {
             if (subimageDataView != null) {
-                GLTextureHelper.renderImageDataToScreen(gl, regionView.getRegion(), subimageDataView.getSubimageData(), jp2View.tex);
+                GLTextureHelper.renderImageDataToScreen(gl, subimageDataView.getSubimageData(), jp2View.tex);
             }
         }
 

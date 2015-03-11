@@ -2,7 +2,9 @@ package org.helioviewer.viewmodel.view;
 
 import org.helioviewer.viewmodel.changeevent.ChangeEvent;
 import org.helioviewer.viewmodel.changeevent.FilterChangedReason;
+import org.helioviewer.viewmodel.changeevent.RegionChangedReason;
 import org.helioviewer.viewmodel.changeevent.SubImageDataChangedReason;
+import org.helioviewer.viewmodel.changeevent.ViewChainChangedReason;
 import org.helioviewer.viewmodel.filter.Filter;
 import org.helioviewer.viewmodel.filter.FilterListener;
 import org.helioviewer.viewmodel.imagedata.ImageData;
@@ -30,7 +32,6 @@ public class StandardFilterView extends AbstractBasicView implements FilterView,
     protected Filter filter;
 
     protected ImageData filteredData;
-    protected RegionView regionView;
     protected SubimageDataView subimageDataView;
 
     /**
@@ -140,6 +141,12 @@ public class StandardFilterView extends AbstractBasicView implements FilterView,
      */
     @Override
     public void viewChanged(View sender, ChangeEvent aEvent) {
+        if (aEvent.reasonOccurred(ViewChainChangedReason.class)) {
+            updatePrecomputedViews();
+            refilter();
+        } else if (aEvent.reasonOccurred(RegionChangedReason.class) || aEvent.reasonOccurred(SubImageDataChangedReason.class)) {
+            refilter();
+        }
 
         notifyViewListeners(aEvent);
     }
@@ -165,7 +172,6 @@ public class StandardFilterView extends AbstractBasicView implements FilterView,
      * when doing this every frame.
      */
     protected void updatePrecomputedViews() {
-        regionView = ViewHelper.getViewAdapter(view, RegionView.class);
         subimageDataView = ViewHelper.getViewAdapter(view, SubimageDataView.class);
     }
 

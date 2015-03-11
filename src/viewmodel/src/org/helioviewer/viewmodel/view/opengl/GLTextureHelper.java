@@ -22,7 +22,6 @@ import org.helioviewer.viewmodel.imageformat.SingleChannelImageFormat;
 import org.helioviewer.viewmodel.imagetransport.Byte8ImageTransport;
 import org.helioviewer.viewmodel.imagetransport.Int32ImageTransport;
 import org.helioviewer.viewmodel.imagetransport.Short16ImageTransport;
-import org.helioviewer.viewmodel.region.Region;
 
 /**
  * Helper class to handle OpenGL textures.
@@ -66,8 +65,8 @@ public class GLTextureHelper {
      * @param source
      *            Image data to draw to the screen
      */
-    public static void renderImageDataToScreen(GL2 gl, Region region, ImageData source, GLTexture tex) {
-        if (source == null || region == null)
+    public static void renderImageDataToScreen(GL2 gl, ImageData source, GLTexture tex) {
+        if (source == null)
             return;
 
         int width = source.getWidth();
