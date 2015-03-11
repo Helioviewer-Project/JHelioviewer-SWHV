@@ -1,7 +1,6 @@
 package org.helioviewer.viewmodel.view;
 
 import org.helioviewer.viewmodel.changeevent.ChangeEvent;
-import org.helioviewer.viewmodel.changeevent.FilterChangedReason;
 import org.helioviewer.viewmodel.changeevent.RegionChangedReason;
 import org.helioviewer.viewmodel.changeevent.SubImageDataChangedReason;
 import org.helioviewer.viewmodel.changeevent.ViewChainChangedReason;
@@ -52,7 +51,6 @@ public class StandardFilterView extends AbstractBasicView implements FilterView,
         }
 
         filter = f;
-
         if (filter != null) {
             filter.addFilterListener(this);
         }
@@ -61,7 +59,6 @@ public class StandardFilterView extends AbstractBasicView implements FilterView,
 
         // join change reasons to a change event
         ChangeEvent event = new ChangeEvent();
-        event.addReason(new FilterChangedReason(this, filter));
         event.addReason(new SubImageDataChangedReason(this));
 
         notifyViewListeners(event);
@@ -159,9 +156,7 @@ public class StandardFilterView extends AbstractBasicView implements FilterView,
         refilter();
 
         ChangeEvent event = new ChangeEvent();
-        event.addReason(new FilterChangedReason(this, filter));
         event.addReason(new SubImageDataChangedReason(this));
-
         notifyViewListeners(event);
     }
 
