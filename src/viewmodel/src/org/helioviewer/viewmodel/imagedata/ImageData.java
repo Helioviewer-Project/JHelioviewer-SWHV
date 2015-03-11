@@ -1,5 +1,7 @@
 package org.helioviewer.viewmodel.imagedata;
 
+import java.awt.image.BufferedImage;
+
 import org.helioviewer.viewmodel.imageformat.ImageFormat;
 import org.helioviewer.viewmodel.imagetransport.ImageTransport;
 import org.helioviewer.viewmodel.region.Region;
@@ -60,15 +62,25 @@ public interface ImageData {
     public void setDateMillis(long dateMillis);
 
     public void setFrameNumber(int framenumber);
+
     public int getFrameNumber();
+
     public void setZoomPercent(double percent);
+
     public double getZoomPercent();
+
     public void setSubImage(SubImage subImage);
+
     public SubImage getSubImage();
+
     public Region getRegion();
+
     public void setRegion(Region r);
 
     boolean getFullyLoaded();
+
     void setFullyLoaded(boolean fullyLoaded);
+
+    public BufferedImage getBufferedImage();
 
 }
