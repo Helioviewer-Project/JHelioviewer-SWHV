@@ -7,7 +7,6 @@ import org.helioviewer.base.math.RectangleDouble;
 import org.helioviewer.viewmodel.changeevent.ChangeEvent;
 import org.helioviewer.viewmodel.changeevent.LayerChangedReason;
 import org.helioviewer.viewmodel.changeevent.LayerChangedReason.LayerChangeType;
-import org.helioviewer.viewmodel.changeevent.NonConstantMetaDataChangedReason;
 import org.helioviewer.viewmodel.changeevent.RegionChangedReason;
 import org.helioviewer.viewmodel.changeevent.RegionUpdatedReason;
 import org.helioviewer.viewmodel.changeevent.SubImageDataChangedReason;
@@ -413,10 +412,6 @@ public abstract class AbstractLayeredView extends AbstractView implements Layere
             for (Layer layer : viewLookup.values()) {
                 layer.update();
             }
-        }
-        if (aEvent.reasonOccurred(NonConstantMetaDataChangedReason.class)) {
-            recalculateMetaData();
-            recalculateRegionsAndViewports(new ChangeEvent(aEvent));
         }
 
         if ((aEvent.reasonOccurred(RegionChangedReason.class) || aEvent.reasonOccurred(SubImageDataChangedReason.class) || aEvent.reasonOccurred(ViewChainChangedReason.class)) && sender != null) {

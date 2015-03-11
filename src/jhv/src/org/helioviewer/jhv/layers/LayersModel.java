@@ -30,7 +30,6 @@ import org.helioviewer.viewmodel.changeevent.ChangeEvent;
 import org.helioviewer.viewmodel.changeevent.ChangedReason;
 import org.helioviewer.viewmodel.changeevent.LayerChangedReason;
 import org.helioviewer.viewmodel.changeevent.LayerChangedReason.LayerChangeType;
-import org.helioviewer.viewmodel.changeevent.NonConstantMetaDataChangedReason;
 import org.helioviewer.viewmodel.changeevent.RegionChangedReason;
 import org.helioviewer.viewmodel.changeevent.SubImageDataChangedReason;
 import org.helioviewer.viewmodel.changeevent.TimestampChangedReason;
@@ -673,11 +672,10 @@ public class LayersModel implements ViewListener {
     }
 
     private void handleViewportPositionChanges(View sender, ChangeEvent aEvent) {
-        ChangedReason reason = aEvent.getLastChangedReasonByType(NonConstantMetaDataChangedReason.class);
-        ChangedReason reason2 = aEvent.getLastChangedReasonByType(RegionChangedReason.class);
-        ChangedReason reason3 = aEvent.getLastChangedReasonByType(ViewportChangedReason.class);
+        ChangedReason reason1 = aEvent.getLastChangedReasonByType(RegionChangedReason.class);
+        ChangedReason reason2 = aEvent.getLastChangedReasonByType(ViewportChangedReason.class);
 
-        if (reason != null || reason2 != null || reason3 != null) {
+        if (reason1 != null || reason2 != null) {
             this.fireViewportGeometryChanged();
         }
     }
