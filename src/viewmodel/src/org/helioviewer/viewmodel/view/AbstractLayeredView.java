@@ -1,7 +1,7 @@
 package org.helioviewer.viewmodel.view;
 
-import java.util.HashMap;
 import java.util.ArrayList;
+import java.util.HashMap;
 
 import org.helioviewer.base.math.RectangleDouble;
 import org.helioviewer.viewmodel.changeevent.ChangeEvent;
@@ -402,47 +402,7 @@ public abstract class AbstractLayeredView extends AbstractView implements Layere
      *            ChangeEvent to collect history of all following changes
      * @return true, if at least one region or viewport changed
      */
-    protected boolean recalculateRegionsAndViewports(ChangeEvent event) {
-        return recalculateRegionsAndViewports(event, true);
-    }
-
-    /**
-     * Recalculates the regions and viewports of all layers.
-     *
-     * <p>
-     * Sets the regions and viewports of all layers according to the region and
-     * viewport of the LayeredView. Also, calculates the offset of the layers to
-     * each other.
-     *
-     * @param event
-     *            ChangeEvent to collect history of all following changes
-     * @return true, if at least one region or viewport changed
-     */
-    private boolean recalculateRegionsAndViewports(ChangeEvent event, boolean includePixelBasedImages) {
-        boolean changed = false;
-        if (region == null && metaData != null) {
-            region = StaticRegion.createAdaptedRegion(metaData.getPhysicalRectangle());
-        }
-
-        if (viewport != null && region != null) {
-            ViewportImageSize oldViewportImageSize = viewportImageSize;
-            viewportImageSize = ViewHelper.calculateViewportImageSize(viewport, region);
-            changed |= viewportImageSize == null ? oldViewportImageSize == null : viewportImageSize.equals(oldViewportImageSize);
-
-            for (Layer layer : viewLookup.values()) {
-                MetaData m = layer.metaDataView.getMetaData();
-                if (includePixelBasedImages || !(m instanceof PixelBasedMetaData)) {
-                    Region layerRegion = ViewHelper.cropInnerRegionToOuterRegion(m.getPhysicalRegion(), region);
-                    Viewport layerViewport = ViewHelper.calculateInnerViewport(layerRegion, region, viewportImageSize);
-
-                    changed |= layer.regionView.setRegion(layerRegion, event);
-                    changed |= layer.viewportView.setViewport(layerViewport, event);
-                }
-            }
-        }
-
-        return changed;
-    }
+    protected abstract boolean recalculateRegionsAndViewports(ChangeEvent event);
 
     /**
      * {@inheritDoc}
