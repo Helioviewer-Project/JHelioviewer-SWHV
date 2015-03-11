@@ -15,6 +15,8 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.Vector;
+import java.util.concurrent.Callable;
+import java.util.concurrent.atomic.AtomicReference;
 
 import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
@@ -30,6 +32,7 @@ import javax.swing.ListCellRenderer;
 import javax.swing.SpinnerNumberModel;
 import javax.swing.border.EmptyBorder;
 
+import org.helioviewer.base.EventDispatchQueue;
 import org.helioviewer.base.logging.Log;
 import org.helioviewer.base.message.Message;
 import org.helioviewer.jhv.Settings;
@@ -255,17 +258,14 @@ public class ImageDataPanel extends ObservationDialogPanel implements DataSource
      * GUI which represents the image.
      * */
     private void loadImage() {
-
         // show loading animation
         ImageViewerGui.getSingletonInstance().getMainImagePanel().setLoading(true);
 
         // download and open the requested image in a separated thread and hide
         // loading animation when finished
         Thread thread = new Thread(new Runnable() {
-
             @Override
             public void run() {
-
                 try {
                     APIRequestManager.requestAndOpenRemoteFile(true, null, getStartTime(), "", getObservation(), getInstrument(), getDetector(), getMeasurement(), true);
                 } catch (IOException e) {
@@ -276,7 +276,6 @@ public class ImageDataPanel extends ObservationDialogPanel implements DataSource
                 }
             }
         }, "LoadNewImage");
-
         thread.start();
     }
 
@@ -285,16 +284,13 @@ public class ImageDataPanel extends ObservationDialogPanel implements DataSource
      * the GUI which represents the image series.
      * */
     private void loadMovie() {
-
         // show loading animation
         ImageViewerGui.getSingletonInstance().getTopToolBar().disableStateButton();
-
         ImageViewerGui.getSingletonInstance().getMainImagePanel().setLoading(true);
 
         // download and open the requested movie in a separated thread and hide
         // loading animation when finished
         Thread thread = new Thread(new Runnable() {
-
             @Override
             public void run() {
                 try {
@@ -305,11 +301,9 @@ public class ImageDataPanel extends ObservationDialogPanel implements DataSource
                 } finally {
                     ImageViewerGui.getSingletonInstance().getMainImagePanel().setLoading(false);
                     ImageViewerGui.getSingletonInstance().getTopToolBar().enableStateButton();
-
                 }
             }
         }, "LoadNewMovie");
-
         thread.start();
     }
 
@@ -387,7 +381,6 @@ public class ImageDataPanel extends ObservationDialogPanel implements DataSource
         Thread t = new Thread(new Runnable() {
             @Override
             public void run() {
-
                 try {
                     instrumentsPanel.setupSources();
 
@@ -395,7 +388,6 @@ public class ImageDataPanel extends ObservationDialogPanel implements DataSource
                     if (isSelected) {
                         ImageViewerGui.getSingletonInstance().getObservationDialog().setLoadButtonEnabled(enableLoadButton);
                     }
-
                     // Check if we were able to set it up
                     if (instrumentsPanel.validSelection()) {
                         if (!donotloadStartup) {
@@ -406,7 +398,6 @@ public class ImageDataPanel extends ObservationDialogPanel implements DataSource
                             while (ImageViewerGui.getSingletonInstance() == null || ImageViewerGui.getSingletonInstance().getMainView() == null) {
                                 Thread.sleep(100);
                             }
-
                             loadMovie();
                         }
                     } else {
@@ -526,6 +517,23 @@ public class ImageDataPanel extends ObservationDialogPanel implements DataSource
             // add(textEndTime);
         }
 
+
+        private class LatestImageDateCall implements Callable<Date> {
+            final AtomicReference<InstrumentsPanel> refPanel = new AtomicReference<InstrumentsPanel>();
+
+            public LatestImageDateCall(InstrumentsPanel panel) {
+                this.refPanel.set(panel);
+            }
+
+            public Date call() {
+                return APIRequestManager.getLatestImageDate(refPanel.get().getObservatory(),
+                                                            refPanel.get().getInstrument(),
+                                                            refPanel.get().getDetector(),
+                                                            refPanel.get().getMeasurement(),
+                                                            true);
+            }
+        }
+
         /**
          * Sets the latest available image (or now if fails) to the end time and
          * the start 24h earlier.
@@ -541,23 +549,16 @@ public class ImageDataPanel extends ObservationDialogPanel implements DataSource
          *             From inserting into the AWT Queue
          */
         public void setupTime() throws InterruptedException, InvocationTargetException {
-            final Date endDate = APIRequestManager.getLatestImageDate(instrumentsPanel.getObservatory(), instrumentsPanel.getInstrument(), instrumentsPanel.getDetector(), instrumentsPanel.getMeasurement(), true);
+            final Date endDate = EventDispatchQueue.invokeAndWait(new LatestImageDateCall(instrumentsPanel));
+
             final GregorianCalendar gregorianCalendar = new GregorianCalendar();
             gregorianCalendar.setTime(endDate);
+
             gregorianCalendar.add(GregorianCalendar.SECOND, cadencePanel.getCadence());
-            // The data is there, now just set
-            EventQueue.invokeAndWait(new Runnable() {
-                @Override
-                public void run() {
-                    // calendarEndDate.setDate(gregorianCalendar.getTime());
-                    // textEndTime.setText(TimeTextField.formatter.format(gregorianCalendar.getTime()));
-                    setEndDate(gregorianCalendar.getTime(), false);
-                    gregorianCalendar.add(GregorianCalendar.DAY_OF_MONTH, -1);
-                    // calendarStartDate.setDate(gregorianCalendar.getTime());
-                    // textStartTime.setText(TimeTextField.formatter.format(gregorianCalendar.getTime()));
-                    setStartDate(gregorianCalendar.getTime(), false);
-                }
-            });
+            setEndDate(gregorianCalendar.getTime(), false);
+
+            gregorianCalendar.add(GregorianCalendar.DAY_OF_MONTH, -1);
+            setStartDate(gregorianCalendar.getTime(), false);
         }
 
         /**
@@ -739,7 +740,6 @@ public class ImageDataPanel extends ObservationDialogPanel implements DataSource
          * Sets up the visual sub components and the component itself.
          * */
         private void initVisualComponents() {
-
             // set basic layout
             setLayout(new GridLayout(1, 2, GRIDLAYOUT_HGAP, GRIDLAYOUT_VGAP));
             setBorder(new EmptyBorder(3, 0, 0, 0));
@@ -778,7 +778,6 @@ public class ImageDataPanel extends ObservationDialogPanel implements DataSource
          * @return number of seconds of the selected cadence.
          * */
         public int getCadence() {
-
             int value = ((SpinnerNumberModel) spinnerCadence.getModel()).getNumber().intValue();
 
             switch (comboUnit.getSelectedIndex()) {
@@ -1002,7 +1001,6 @@ public class ImageDataPanel extends ObservationDialogPanel implements DataSource
                 }
             }
             container.setSelectedIndex(0);
-
         }
 
         /**

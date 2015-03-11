@@ -220,10 +220,8 @@ public class ImageViewerGui {
         splash.setProgressText("Loading Images...");
 
         Thread thread = new Thread(new Runnable() {
-
             @Override
             public void run() {
-
                 loadImagesAtStartup();
 
                 // show GUI
@@ -237,10 +235,8 @@ public class ImageViewerGui {
                 // remove splash screen
                 splash.dispose();
                 // splash.setVisible(false);
-
             }
         }, "LoadImagesOnStartUp");
-
         thread.start();
     }
 
@@ -276,7 +272,6 @@ public class ImageViewerGui {
 
         frame.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
         frame.addWindowListener(new WindowAdapter() {
-
             @Override
             public void windowClosing(WindowEvent arg0) {
                 ExitProgramAction exitAction = new ExitProgramAction();
