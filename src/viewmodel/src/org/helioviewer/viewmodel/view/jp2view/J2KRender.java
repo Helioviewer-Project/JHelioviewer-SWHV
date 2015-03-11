@@ -14,11 +14,9 @@ import org.helioviewer.viewmodel.changeevent.ChangeEvent;
 import org.helioviewer.viewmodel.imagedata.ARGBInt32ImageData;
 import org.helioviewer.viewmodel.imagedata.ColorMask;
 import org.helioviewer.viewmodel.imagedata.SingleChannelByte8ImageData;
-import org.helioviewer.viewmodel.view.CachedMovieView;
 import org.helioviewer.viewmodel.view.LinkedMovieManager;
 import org.helioviewer.viewmodel.view.MovieView;
 import org.helioviewer.viewmodel.view.MovieView.AnimationMode;
-import org.helioviewer.viewmodel.view.cache.DateTimeCache;
 import org.helioviewer.viewmodel.view.jp2view.image.JP2ImageParameter;
 import org.helioviewer.viewmodel.view.jp2view.image.SubImage;
 import org.helioviewer.viewmodel.view.jp2view.kakadu.JHV_Kdu_thread_env;
@@ -616,13 +614,11 @@ class J2KRender implements Runnable {
 
     private class AbsoluteFrameChooser implements FrameChooser {
 
-        private final DateTimeCache dateTimeCache = ((CachedMovieView) parentViewRef).getDateTimeCache();
-
-        private long absoluteStartTime = dateTimeCache.getDateTime(currParams.compositionLayer).getMillis();
+        private long absoluteStartTime = parentViewRef.getMetaDataList().get(currParams.compositionLayer).getParsedDateTime().getMillis();
         private long systemStartTime = System.currentTimeMillis();
 
         public void resetStartTime(int frameNumber) {
-            absoluteStartTime = dateTimeCache.getDateTime(frameNumber).getMillis();
+            absoluteStartTime = parentViewRef.getMetaDataList().get(frameNumber).getParsedDateTime().getMillis();
             systemStartTime = System.currentTimeMillis();
         }
 
@@ -636,7 +632,7 @@ class J2KRender implements Runnable {
                 nextCandidate = nextFrameCandidateChooser.getNextCandidate(nextCandidate);
 
                 lastDiff = nextDiff;
-                nextDiff = Math.abs(dateTimeCache.getDateTime(nextCandidate).getMillis() - absoluteStartTime) - ((System.currentTimeMillis() - systemStartTime) * movieSpeed);
+                nextDiff = Math.abs(parentViewRef.getMetaDataList().get(nextCandidate).getParsedDateTime().getMillis() - absoluteStartTime) - ((System.currentTimeMillis() - systemStartTime) * movieSpeed);
             } while (nextDiff < 0);
 
             if (-lastDiff < nextDiff) {

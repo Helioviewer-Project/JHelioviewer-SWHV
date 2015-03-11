@@ -16,7 +16,6 @@ import org.helioviewer.viewmodel.view.LinkedMovieManager;
 import org.helioviewer.viewmodel.view.TimedMovieView;
 import org.helioviewer.viewmodel.view.View;
 import org.helioviewer.viewmodel.view.ViewListener;
-import org.helioviewer.viewmodel.view.cache.DateTimeCache;
 import org.helioviewer.viewmodel.view.jp2view.JHVJP2View;
 import org.helioviewer.viewmodel.view.jp2view.JHVJPXView;
 import org.helioviewer.viewmodel.view.jp2view.datetime.ImmutableDateTime;
@@ -221,11 +220,10 @@ public class GL3DFollowObjectCamera extends GL3DSolarRotationTrackingTrackballCa
 
                 JHVJPXView jpxView = nextView.getAdapter(JHVJPXView.class);
                 if (jpxView != null) {
-                    DateTimeCache dtc = jpxView.getDateTimeCache();
                     Date beginDate = null;
                     Date endDate = null;
                     for (int frame = 0; frame < jpxView.getMaximumFrameNumber(); frame++) {
-                        ImmutableDateTime date = dtc.getDateTime(frame);
+                        ImmutableDateTime date = jpxView.getMetaDataList().get(frame).getParsedDateTime();
                         if (beginDate == null || date.getTime().getTime() < beginDate.getTime()) {
                             beginDate = date.getTime();
                         }

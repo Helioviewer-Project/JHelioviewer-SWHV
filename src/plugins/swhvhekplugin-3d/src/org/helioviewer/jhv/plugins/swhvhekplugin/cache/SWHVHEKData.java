@@ -15,7 +15,6 @@ import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.layers.LayersListener;
 import org.helioviewer.jhv.layers.LayersModel;
 import org.helioviewer.viewmodel.view.View;
-import org.helioviewer.viewmodel.view.cache.DateTimeCache;
 import org.helioviewer.viewmodel.view.jp2view.JHVJPXView;
 import org.helioviewer.viewmodel.view.jp2view.datetime.ImmutableDateTime;
 
@@ -65,9 +64,8 @@ public class SWHVHEKData implements LayersListener, JHVEventHandler {
             View nextView = LayersModel.getSingletonInstance().getLayer(i);
             JHVJPXView jpxView = nextView.getAdapter(JHVJPXView.class);
             if (jpxView != null) {
-                DateTimeCache dtc = jpxView.getDateTimeCache();
                 for (int frame = 0; frame < jpxView.getMaximumFrameNumber(); frame++) {
-                    ImmutableDateTime date = dtc.getDateTime(frame);
+                    ImmutableDateTime date = jpxView.getMetaDataList().get(frame).getParsedDateTime();
                     if (beginDate == null || date.getTime().getTime() < beginDate.getTime()) {
                         beginDate = date.getTime();
                     }

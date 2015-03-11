@@ -9,22 +9,22 @@ import org.helioviewer.viewmodel.view.CachedMovieView;
 
 /**
  * Implementation of JP2CacheStatus for remote movies.
- * 
+ *
  * @author Markus Langenberg
- * 
+ *
  */
 public class RemoteImageCacheStatus implements ImageCacheStatus {
 
-    private CachedMovieView parent;
-    private CacheStatus[] imageStatus;
+    private final CachedMovieView parent;
+    private final CacheStatus[] imageStatus;
     private int imagePartialUntil = -1;
     private int imageCompleteUntil = -1;
 
-    private ReentrantLock lock = new ReentrantLock();
+    private final ReentrantLock lock = new ReentrantLock();
 
     /**
      * Default constructor
-     * 
+     *
      * @param _parent
      *            JP2Image, whose cache status is managed
      */
@@ -36,6 +36,7 @@ public class RemoteImageCacheStatus implements ImageCacheStatus {
     /**
      * {@inheritDoc}
      */
+    @Override
     public void setImageStatus(int compositionLayer, CacheStatus newStatus) {
 
         ChangeEvent changeEvent = null;
@@ -60,9 +61,8 @@ public class RemoteImageCacheStatus implements ImageCacheStatus {
 
                     imagePartialUntil = tempImagePartialUntil;
 
-                    if (imagePartialUntil <= parent.getDateTimeCache().getMetaStatus()) {
-                        changeEvent = new ChangeEvent(new CacheStatusChangedReason(parent, CacheType.PARTIAL, imagePartialUntil));
-                    }
+                    changeEvent = new ChangeEvent(new CacheStatusChangedReason(parent, CacheType.PARTIAL, imagePartialUntil));
+
                 }
 
                 // COMPLETE
@@ -85,9 +85,8 @@ public class RemoteImageCacheStatus implements ImageCacheStatus {
                         imagePartialUntil = imageCompleteUntil;
                     }
 
-                    if (imageCompleteUntil <= parent.getDateTimeCache().getMetaStatus()) {
-                        changeEvent = new ChangeEvent(new CacheStatusChangedReason(parent, CacheType.COMPLETE, imageCompleteUntil));
-                    }
+                    changeEvent = new ChangeEvent(new CacheStatusChangedReason(parent, CacheType.COMPLETE, imageCompleteUntil));
+
                 }
 
                 // HEADER
@@ -106,6 +105,7 @@ public class RemoteImageCacheStatus implements ImageCacheStatus {
     /**
      * {@inheritDoc}
      */
+    @Override
     public void downgradeImageStatus(int compositionLayer) {
         ChangeEvent changeEvent = null;
         lock.lock();
@@ -130,9 +130,8 @@ public class RemoteImageCacheStatus implements ImageCacheStatus {
 
                 imageCompleteUntil = tempImageCompleteUntil;
 
-                if (imageCompleteUntil <= parent.getDateTimeCache().getMetaStatus()) {
-                    changeEvent = new ChangeEvent(new CacheStatusChangedReason(parent, CacheType.COMPLETE, imageCompleteUntil));
-                }
+                changeEvent = new ChangeEvent(new CacheStatusChangedReason(parent, CacheType.COMPLETE, imageCompleteUntil));
+
             }
         } finally {
             lock.unlock();
@@ -145,6 +144,7 @@ public class RemoteImageCacheStatus implements ImageCacheStatus {
     /**
      * {@inheritDoc}
      */
+    @Override
     public CacheStatus getImageStatus(int compositionLayer) {
         CacheStatus res = null;
         lock.lock();
@@ -159,6 +159,7 @@ public class RemoteImageCacheStatus implements ImageCacheStatus {
     /**
      * {@inheritDoc}
      */
+    @Override
     public int getImageCachedPartiallyUntil() {
         return imagePartialUntil;
     }
@@ -166,6 +167,7 @@ public class RemoteImageCacheStatus implements ImageCacheStatus {
     /**
      * {@inheritDoc}
      */
+    @Override
     public int getImageCachedCompletelyUntil() {
         return imageCompleteUntil;
     }

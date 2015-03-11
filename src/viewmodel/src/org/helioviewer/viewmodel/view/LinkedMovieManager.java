@@ -10,23 +10,23 @@ import org.helioviewer.viewmodel.view.jp2view.datetime.ImmutableDateTime;
 
 /**
  * Class managing all linked movies.
- * 
+ *
  * <p>
  * This class is responsible for synchronizing all linked movies. Therefore, all
  * linked movies have to call the various functions of this class. Then, all
  * other linked movies are set according to the new values.
- * 
+ *
  * <p>
  * When actually playing a movie instead of just scrolling around, a master
  * movie is chosen, based on the average cadence of all linked movies. Only the
  * master movie is actually playing, all other movies are just set to the frame
  * closest to the one from the master movie.
- * 
+ *
  * <p>
  * It is possible to manage multiple sets of linked movies. Therefore, the
  * LinkedMovieManager manages multiple sets of itself, one per set of linked
  * movies. The default instance (id = 0) always exists and can not be deleted.
- * 
+ *
  * @author Markus Langenberg
  */
 public class LinkedMovieManager {
@@ -48,11 +48,11 @@ public class LinkedMovieManager {
 
     private static Vector<LinkedMovieManager> instances = new Vector<LinkedMovieManager>();
     private static int activeInstance = 0;
-    private LinkedList<TimedMovieView> linkedMovies = new LinkedList<TimedMovieView>();
+    private final LinkedList<TimedMovieView> linkedMovies = new LinkedList<TimedMovieView>();
     private TimedMovieView masterView;
-    private Semaphore updateSemaphore = new Semaphore(1);
-    private Semaphore isPlayingSemaphore = new Semaphore(1);
-    private ReentrantLock isPlayingLock = new ReentrantLock();
+    private final Semaphore updateSemaphore = new Semaphore(1);
+    private final Semaphore isPlayingSemaphore = new Semaphore(1);
+    private final ReentrantLock isPlayingLock = new ReentrantLock();
 
     /**
      * Default constructor
@@ -62,10 +62,10 @@ public class LinkedMovieManager {
 
     /**
      * Returns the active instance of the LinkedMovieManager.
-     * 
+     *
      * There can only be one instance active at a time, but it is possible to
      * manage multiple groups of linked movies by switching the active instance.
-     * 
+     *
      * @return The active instance of this class.
      * @see #setActiveInstance(int)
      * @see #createNewInstance()
@@ -81,7 +81,7 @@ public class LinkedMovieManager {
 
     /**
      * Sets the active instance of the LinkedMovieManager to use.
-     * 
+     *
      * @param instance
      *            ID of the new active instance.
      * @see #getActiveInstance()
@@ -96,9 +96,9 @@ public class LinkedMovieManager {
 
     /**
      * Creates a new instance and returns its id.
-     * 
+     *
      * The active instance will not change.
-     * 
+     *
      * @return Id of the new instance.
      * @see #getActiveInstance()
      * @see #setActiveInstance(int)
@@ -118,10 +118,10 @@ public class LinkedMovieManager {
 
     /**
      * Deletes an existing instance.
-     * 
+     *
      * If the deleted instance was the active instance, sets the active instance
      * to the default instance (0).
-     * 
+     *
      * @param instance
      *            Id of instance to delete
      * @see #getActiveInstance()
@@ -146,7 +146,7 @@ public class LinkedMovieManager {
 
     /**
      * Adds the given movie view to the set of linked movies.
-     * 
+     *
      * @param movieView
      *            View to add to the set of linked movies.
      */
@@ -160,7 +160,7 @@ public class LinkedMovieManager {
 
     /**
      * Removes the given movie view from the set of linked movies.
-     * 
+     *
      * @param movieView
      *            View to remove from the set of linked movies.
      */
@@ -178,7 +178,7 @@ public class LinkedMovieManager {
 
     /**
      * Returns, whether the given view is the master view.
-     * 
+     *
      * @param movieView
      *            View to test
      * @return True, if the given view is the master view, false otherwise.
@@ -193,7 +193,7 @@ public class LinkedMovieManager {
 
     /**
      * Returns the current master movie
-     * 
+     *
      * @return current master movie
      */
     public TimedMovieView getMasterMovie() {
@@ -202,7 +202,7 @@ public class LinkedMovieManager {
 
     /**
      * Returns, whether the set of linked movies is playing.
-     * 
+     *
      * @return True, if the set of linked movies is playing, false otherwise.
      */
     public boolean isPlaying() {
@@ -228,14 +228,14 @@ public class LinkedMovieManager {
 
     /**
      * Starts to play the set of linked movies.
-     * 
+     *
      * This function can be called directly from the movie view in its
      * playMovie()-function, hiding this functionality.
-     * 
+     *
      * <p>
      * Note, that this function will block recursive calls. The return value
      * indicates whether this function is already called.
-     * 
+     *
      * @return True, if the function was not called so far and therefore
      *         performed successful, false otherwise.
      */
@@ -259,14 +259,14 @@ public class LinkedMovieManager {
 
     /**
      * Stops to play the set of linked movies.
-     * 
+     *
      * This function can be called directly from the movie view in its
      * pauseMovie()-function, hiding this functionality.
-     * 
+     *
      * <p>
      * Note, that this function will block recursive calls. The return value
      * indicates whether this function is already called.
-     * 
+     *
      * @return True, if the function was not called so far and therefore
      *         performed successful, false otherwise.
      */
@@ -289,14 +289,14 @@ public class LinkedMovieManager {
     /**
      * Updates all linked movies according to the current frame of the master
      * frame.
-     * 
+     *
      * This function can be called directly from the movie view in its
      * rendering-function, hiding this functionality.
-     * 
+     *
      * <p>
      * Note, that this function will block recursive calls. The return value
      * indicates whether this function is already called.
-     * 
+     *
      * @param event
      *            ChangeEvent to append new reasons to.
      */
@@ -322,14 +322,14 @@ public class LinkedMovieManager {
 
     /**
      * Updates all linked movies according to the given time stamp.
-     * 
+     *
      * This function can be called directly from the movie view, hiding this
      * functionality.
-     * 
+     *
      * <p>
      * Note, that this function will block recursive calls. The return value
      * indicates whether this function is already called.
-     * 
+     *
      * @param dateTime
      *            time which should be matches as close as possible
      * @param event
@@ -356,7 +356,7 @@ public class LinkedMovieManager {
 
     /**
      * Recalculates the master view.
-     * 
+     *
      * The master view is the view, whose movie is actually playing, whereas all
      * other movies just jump to the frame closest to the current frame from the
      * master panel.
@@ -386,11 +386,7 @@ public class LinkedMovieManager {
 
             do {
 
-                if (movieView instanceof CachedMovieView) {
-                    lastAvailableFrame = ((CachedMovieView) movieView).getDateTimeCache().getMetaStatus();
-                } else {
-                    lastAvailableFrame = movieView.getMaximumFrameNumber();
-                }
+                lastAvailableFrame = movieView.getMaximumFrameNumber();
 
                 if (lastAvailableFrame > 0) {
                     break;

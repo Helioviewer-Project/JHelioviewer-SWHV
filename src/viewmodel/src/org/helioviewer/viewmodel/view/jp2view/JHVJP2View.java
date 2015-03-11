@@ -35,7 +35,6 @@ import org.helioviewer.viewmodel.view.SubimageDataView;
 import org.helioviewer.viewmodel.view.View;
 import org.helioviewer.viewmodel.view.ViewHelper;
 import org.helioviewer.viewmodel.view.ViewportView;
-import org.helioviewer.viewmodel.view.cache.DateTimeCache;
 import org.helioviewer.viewmodel.view.jp2view.J2KRender.RenderReasons;
 import org.helioviewer.viewmodel.view.jp2view.concurrency.BooleanSignal;
 import org.helioviewer.viewmodel.view.jp2view.concurrency.ReasonSignal;
@@ -106,8 +105,7 @@ public class JHVJP2View extends AbstractView implements JP2View, ViewportView, R
     private ImageData previousImageData;
 
     private ImageData baseDifferenceImageData;
-    protected DateTimeCache dateTimeCache;
-    ArrayList<MetaData> metaDataList;
+    protected ArrayList<MetaData> metaDataList;
 
     /**
      * Default constructor.
@@ -190,7 +188,7 @@ public class JHVJP2View extends AbstractView implements JP2View, ViewportView, R
         }
 
         metaDataList = MetaDataConstructor.getMetaDataList(newJP2Image, this);
-        metaData = metaDataList.get(0);
+        metaData = getMetaDataList().get(0);
     }
 
     /**
@@ -723,12 +721,8 @@ public class JHVJP2View extends AbstractView implements JP2View, ViewportView, R
      */
     void setSubimageData(ImageData newImageData, SubImage roi, int compositionLayer, double zoompercent, boolean fullyLoaded) {
         if (metaData instanceof ObserverMetaData) {
-            ObserverMetaData observerMetaData = (ObserverMetaData) metaData;
-            if (dateTimeCache != null) {
-                ImmutableDateTime dtc = dateTimeCache.getDateTime(compositionLayer);
-                observerMetaData.updateDateTime(dtc);
-            }
-            event.addReason(new TimestampChangedReason(this, observerMetaData.getDateTime()));
+            ImmutableDateTime dtc = this.getMetaDataList().get(compositionLayer).getParsedDateTime();
+            event.addReason(new TimestampChangedReason(this, dtc));
         }
         if (compositionLayer == 0) {
             this.baseDifferenceImageData = newImageData;
@@ -902,7 +896,11 @@ public class JHVJP2View extends AbstractView implements JP2View, ViewportView, R
     }
 
     public void setMetaData(int numLayer) {
-        this.metaData = metaDataList.get(numLayer);
+        this.metaData = getMetaDataList().get(numLayer);
+    }
+
+    public ArrayList<MetaData> getMetaDataList() {
+        return metaDataList;
     }
 
 }

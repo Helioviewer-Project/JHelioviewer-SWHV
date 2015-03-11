@@ -4,22 +4,24 @@ import org.helioviewer.base.math.RectangleDouble;
 import org.helioviewer.base.math.Vector2dDouble;
 import org.helioviewer.viewmodel.region.Region;
 import org.helioviewer.viewmodel.region.StaticRegion;
+import org.helioviewer.viewmodel.view.jp2view.datetime.ImmutableDateTime;
 
 /**
  * Abstract base class implementing MetaData.
- * 
+ *
  * <p>
  * This class implements the all functions of meta data. The lower left corner
  * and the size are saved, which contains all information needed. The other
  * corners are calculates based on the lower left corner and the size.
- * 
+ *
  * @author Ludwig Schmidt
- * 
+ *
  */
 public abstract class AbstractMetaData implements MetaData {
 
     private Vector2dDouble lowerLeftCorner;
     private Vector2dDouble sizeVector;
+    private ImmutableDateTime parsedDateTime;
 
     /**
      * Default constructor, does not set size or position.
@@ -31,7 +33,7 @@ public abstract class AbstractMetaData implements MetaData {
 
     /**
      * Constructor, setting size and position.
-     * 
+     *
      * @param newLowerLeftCorner
      *            Physical lower left corner of the corresponding image
      * @param newSizeVector
@@ -44,7 +46,7 @@ public abstract class AbstractMetaData implements MetaData {
 
     /**
      * Constructor, setting size and position.
-     * 
+     *
      * @param newLowerLeftCornerX
      *            Physical lower left x-coordinate of the corresponding image
      * @param newLowerLeftCornerY
@@ -61,7 +63,7 @@ public abstract class AbstractMetaData implements MetaData {
 
     /**
      * Constructor, setting size and position.
-     * 
+     *
      * @param newLowerLeftCorner
      *            Physical lower left corner of the corresponding image
      * @param newWidth
@@ -76,7 +78,7 @@ public abstract class AbstractMetaData implements MetaData {
 
     /**
      * Constructor, setting size and position.
-     * 
+     *
      * @param newLowerLeftCornerX
      *            Physical lower left x-coordinate of the corresponding image
      * @param newLowerLeftCornerY
@@ -91,7 +93,7 @@ public abstract class AbstractMetaData implements MetaData {
 
     /**
      * Constructor, setting size and position.
-     * 
+     *
      * @param newRectangle
      *            Full physical rectangle of the corresponding image
      */
@@ -102,7 +104,7 @@ public abstract class AbstractMetaData implements MetaData {
 
     /**
      * Copy constructor
-     * 
+     *
      * @param original
      *            Object to copy
      */
@@ -114,6 +116,7 @@ public abstract class AbstractMetaData implements MetaData {
     /**
      * {@inheritDoc}
      */
+    @Override
     public Vector2dDouble getPhysicalImageSize() {
         return sizeVector;
     }
@@ -121,6 +124,7 @@ public abstract class AbstractMetaData implements MetaData {
     /**
      * {@inheritDoc}
      */
+    @Override
     public Vector2dDouble getPhysicalLowerLeft() {
         return lowerLeftCorner;
     }
@@ -128,6 +132,7 @@ public abstract class AbstractMetaData implements MetaData {
     /**
      * {@inheritDoc}
      */
+    @Override
     public double getPhysicalImageHeight() {
         return sizeVector.getY();
     }
@@ -135,6 +140,7 @@ public abstract class AbstractMetaData implements MetaData {
     /**
      * {@inheritDoc}
      */
+    @Override
     public double getPhysicalImageWidth() {
         return sizeVector.getX();
     }
@@ -142,6 +148,7 @@ public abstract class AbstractMetaData implements MetaData {
     /**
      * {@inheritDoc}
      */
+    @Override
     public Vector2dDouble getPhysicalLowerRight() {
         return lowerLeftCorner.add(sizeVector.getXVector());
     }
@@ -149,6 +156,7 @@ public abstract class AbstractMetaData implements MetaData {
     /**
      * {@inheritDoc}
      */
+    @Override
     public Vector2dDouble getPhysicalUpperLeft() {
         return lowerLeftCorner.add(sizeVector.getYVector());
     }
@@ -156,6 +164,7 @@ public abstract class AbstractMetaData implements MetaData {
     /**
      * {@inheritDoc}
      */
+    @Override
     public Vector2dDouble getPhysicalUpperRight() {
         return lowerLeftCorner.add(sizeVector);
     }
@@ -163,6 +172,7 @@ public abstract class AbstractMetaData implements MetaData {
     /**
      * {@inheritDoc}
      */
+    @Override
     public RectangleDouble getPhysicalRectangle() {
         return new RectangleDouble(lowerLeftCorner, sizeVector);
     }
@@ -170,13 +180,14 @@ public abstract class AbstractMetaData implements MetaData {
     /**
      * {@inheritDoc}
      */
+    @Override
     public Region getPhysicalRegion() {
         return StaticRegion.createAdaptedRegion(lowerLeftCorner, sizeVector);
     }
 
     /**
      * Sets the physical size of the corresponding image.
-     * 
+     *
      * @param newImageSize
      *            Physical size of the corresponding image
      */
@@ -186,7 +197,7 @@ public abstract class AbstractMetaData implements MetaData {
 
     /**
      * Sets the physical lower left corner the corresponding image.
-     * 
+     *
      * @param newlLowerLeftCorner
      *            Physical lower left corner the corresponding image
      */
@@ -194,4 +205,13 @@ public abstract class AbstractMetaData implements MetaData {
         lowerLeftCorner = newlLowerLeftCorner;
     }
 
+    @Override
+    public void setParsedDateTime(ImmutableDateTime dt) {
+        this.parsedDateTime = dt;
+    }
+
+    @Override
+    public ImmutableDateTime getParsedDateTime() {
+        return this.parsedDateTime;
+    }
 }
