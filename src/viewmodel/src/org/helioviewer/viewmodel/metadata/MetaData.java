@@ -89,7 +89,8 @@ public interface MetaData {
      */
     public Region getPhysicalRegion();
 
-    public void setParsedDateTime(ImmutableDateTime parseDateTime);
+    public void setDateTime(ImmutableDateTime dt);
 
-    public ImmutableDateTime getParsedDateTime();
+    public ImmutableDateTime getDateTime();
+
 }

@@ -21,7 +21,7 @@ public abstract class AbstractMetaData implements MetaData {
 
     private Vector2dDouble lowerLeftCorner;
     private Vector2dDouble sizeVector;
-    private ImmutableDateTime parsedDateTime;
+    private ImmutableDateTime dateTime;
 
     /**
      * Default constructor, does not set size or position.
@@ -206,12 +206,13 @@ public abstract class AbstractMetaData implements MetaData {
     }
 
     @Override
-    public void setParsedDateTime(ImmutableDateTime dt) {
-        this.parsedDateTime = dt;
+    public void setDateTime(ImmutableDateTime dt) {
+        this.dateTime = dt;
     }
 
     @Override
-    public ImmutableDateTime getParsedDateTime() {
-        return this.parsedDateTime;
+    public ImmutableDateTime getDateTime() {
+        return this.dateTime;
     }
+
 }

@@ -167,11 +167,11 @@ public class JHVJPXView extends JHVJP2View implements TimedMovieView, CachedMovi
         do {
             lastDiff = currentDiff;
 
-            if (jp2Image.metaDataList.get(++frameNumber).getParsedDateTime() == null) {
+            if (jp2Image.metaDataList.get(++frameNumber).getDateTime() == null) {
                 return;
             }
 
-            currentDiff = jp2Image.metaDataList.get(frameNumber).getParsedDateTime().getMillis() - timeMillis;
+            currentDiff = jp2Image.metaDataList.get(frameNumber).getDateTime().getMillis() - timeMillis;
         } while (currentDiff < 0 && frameNumber < jp2Image.getCompositionLayerRange().getEnd());
 
         if (-lastDiff < currentDiff) {
@@ -214,7 +214,7 @@ public class JHVJPXView extends JHVJP2View implements TimedMovieView, CachedMovi
      */
     @Override
     public ImmutableDateTime getCurrentFrameDateTime() {
-        return jp2Image.metaDataList.get(getCurrentFrameNumber()).getParsedDateTime();
+        return jp2Image.metaDataList.get(getCurrentFrameNumber()).getDateTime();
     }
 
     /**
@@ -222,7 +222,7 @@ public class JHVJPXView extends JHVJP2View implements TimedMovieView, CachedMovi
      */
     @Override
     public ImmutableDateTime getFrameDateTime(int frameNumber) {
-        return jp2Image.metaDataList.get(frameNumber).getParsedDateTime();
+        return jp2Image.metaDataList.get(frameNumber).getDateTime();
     }
 
     /**

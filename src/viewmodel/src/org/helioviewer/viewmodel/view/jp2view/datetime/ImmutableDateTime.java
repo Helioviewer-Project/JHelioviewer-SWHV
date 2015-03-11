@@ -120,7 +120,6 @@ public class ImmutableDateTime implements Comparable<ImmutableDateTime> {
 
     /** Overridden equals method */
     public boolean equals(ImmutableDateTime _dt) {
-
         if (_dt == null)
             return false;
 
@@ -141,6 +140,6 @@ public class ImmutableDateTime implements Comparable<ImmutableDateTime> {
             this.cachedDate = dateFormat.format(calendar.getTime());
         }
         return this.cachedDate;
-
     }
-};
+
+}
