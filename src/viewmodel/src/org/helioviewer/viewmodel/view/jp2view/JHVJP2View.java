@@ -22,7 +22,6 @@ import org.helioviewer.viewmodel.changeevent.ViewportChangedReason;
 import org.helioviewer.viewmodel.imagedata.ImageData;
 import org.helioviewer.viewmodel.metadata.HelioviewerMetaData;
 import org.helioviewer.viewmodel.metadata.MetaData;
-import org.helioviewer.viewmodel.metadata.MetaDataConstructor;
 import org.helioviewer.viewmodel.metadata.ObserverMetaData;
 import org.helioviewer.viewmodel.metadata.PixelBasedMetaData;
 import org.helioviewer.viewmodel.region.Region;
@@ -155,7 +154,7 @@ public class JHVJP2View extends AbstractView implements JP2View, ViewportView, R
         MetaData metaData = newJP2Image.metaDataList.get(0);
         if (region == null) {
             if (!(metaData instanceof PixelBasedMetaData)) {
-                region = StaticRegion.createAdaptedRegion(getMetaData().getPhysicalLowerLeft(), getMetaData().getPhysicalImageSize());
+                region = StaticRegion.createAdaptedRegion(metaData.getPhysicalLowerLeft(), metaData.getPhysicalImageSize());
             }
 
             if (viewport == null) {
@@ -314,7 +313,12 @@ public class JHVJP2View extends AbstractView implements JP2View, ViewportView, R
      */
     @Override
     public MetaData getMetaData() {
-        return jp2Image.metaDataList.get(imageData.getFrameNumber());
+        int frameNumber = 0;
+        if (imageData != null) {
+            frameNumber = imageData.getFrameNumber();
+        }
+
+        return jp2Image.metaDataList.get(frameNumber);
     }
 
     /**
@@ -389,8 +393,12 @@ public class JHVJP2View extends AbstractView implements JP2View, ViewportView, R
      */
     @Override
     public String getName() {
-        MetaData metaData = jp2Image.metaDataList.get(imageData.getFrameNumber());
+        int frameNumber = 0;
+        if (imageData != null) {
+            frameNumber = imageData.getFrameNumber();
+        }
 
+        MetaData metaData = jp2Image.metaDataList.get(frameNumber);
         if (metaData instanceof ObserverMetaData) {
             ObserverMetaData observerMetaData = (ObserverMetaData) metaData;
             return observerMetaData.getFullName();
@@ -548,7 +556,7 @@ public class JHVJP2View extends AbstractView implements JP2View, ViewportView, R
      */
     protected JP2ImageParameter calculateParameter(Viewport v, Region r, int numQualityLayers, int frameNumber) {
         ViewportImageSize imageViewportDimension = ViewHelper.calculateViewportImageSize(v, r);
-        MetaData metaData = getMetaData();
+        MetaData metaData = jp2Image.metaDataList.get(frameNumber);
 
         // calculate total resolution of the image necessary to
         // have the requested resolution in the subimage
@@ -890,8 +898,4 @@ public class JHVJP2View extends AbstractView implements JP2View, ViewportView, R
         Displayer.getSingletonInstance().removeRenderListener(this);
     }
 
-/*    public ArrayList<MetaData> getMetaDataList() {
-        return metaDataList;
-    }
-*/
 }

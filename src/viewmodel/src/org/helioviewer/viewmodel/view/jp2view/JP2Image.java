@@ -189,7 +189,12 @@ public class JP2Image implements MultiFrameMetaDataContainer {
 
         metaDataList = new ArrayList<MetaData>(layerRange.getEnd() + 1);
         xmlCache = new NodeList[layerRange.getEnd() + 1];
-        cacheXMLs();
+
+        try {
+            cacheXMLs();
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
     }
 
     /**
@@ -441,17 +446,12 @@ public class JP2Image implements MultiFrameMetaDataContainer {
 
     private void cacheXMLs() throws JHV_KduException {
         String xml;
-        int num = metaDataList.size();
+        int num = layerRange.getEnd() + 1;
         ArrayList<String> xmls = KakaduUtils.getAllXMLs(familySrc, num);
 
+        boolean first = true;
         boolean isSWAP = false;
         boolean isLASCO = false;
-        try {
-            isSWAP = checkForSwap();
-            isLASCO = checkForLasco();
-        } catch (Exception ex) {
-                ex.printStackTrace();
-        }
 
         for (int i = 0; i < num; i++) {
             if ((xml = xmls.get(i)) == null) {
@@ -462,19 +462,20 @@ public class JP2Image implements MultiFrameMetaDataContainer {
 
             xml = xml.trim().replace("&", "&amp;").replace("$OBS", "");
 
-            InputStream in = null;
             try {
-                in = new ByteArrayInputStream(xml.getBytes("UTF-8"));
-            } catch (Exception ex) {
-                ex.printStackTrace();
-            }
-
-            try {
+                InputStream in = new ByteArrayInputStream(xml.getBytes("UTF-8"));
                 DocumentBuilder builder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
-                NodeList node = builder.parse(in).getElementsByTagName("meta");
+                // NodeList node =
+                xmlCache[i] = builder.parse(in).getElementsByTagName("meta");
 
-                uglyFrameNumber = i;
+                uglyFrameNumber = i + 1;
                 MetaData metaData = MetaDataConstructor.getMetaData(this);
+
+                if (first == true) {
+                    first = false;
+                    isSWAP = checkForSwap();
+                    isLASCO = checkForLasco();
+                }
                 metaData.setParsedDateTime(MetaDataConstructor.parseDateTime(this, i, isSWAP, isLASCO));
 
                 metaDataList.add(i, metaData);
@@ -585,7 +586,7 @@ public class JP2Image implements MultiFrameMetaDataContainer {
         return resolutionSet;
     }
 
-    private int uglyFrameNumber = 0;
+    private int uglyFrameNumber = 1;
 
     /**
      * {@inheritDoc}
@@ -593,7 +594,7 @@ public class JP2Image implements MultiFrameMetaDataContainer {
     @Override
     public String get(String key) {
         try {
-            String value = getValueFromXML(key, "fits", uglyFrameNumber + 1);
+            String value = getValueFromXML(key, "fits", uglyFrameNumber);
             return value;
         } catch (JHV_KduException e) {
             if (e.getMessage() == "XML data incomplete" || e.getMessage().toLowerCase().contains("box not open")) {
