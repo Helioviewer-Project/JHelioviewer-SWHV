@@ -75,8 +75,6 @@ public class GLFilterView extends StandardFilterView implements GLView {
      */
     @Override
     public void renderGL(GL2 gl, boolean nextView) {
-        updatePrecomputedViews();
-        refilterPrepare();
 
         filter.applyGL(gl);
         if (view instanceof GLView) {
@@ -133,6 +131,7 @@ public class GLFilterView extends StandardFilterView implements GLView {
         super.updatePrecomputedViews();
         viewportView = ViewHelper.getViewAdapter(view, ViewportView.class);
         jp2View = ViewHelper.getViewAdapter(view, JHVJP2View.class);
+
     }
 
     /**
