@@ -10,7 +10,7 @@ import nom.tam.util.Cursor;
 
 import org.helioviewer.viewmodel.imagedata.ARGBInt32ImageData;
 import org.helioviewer.viewmodel.imagedata.ColorMask;
-import org.helioviewer.viewmodel.imagedata.JavaBufferedImageData;
+import org.helioviewer.viewmodel.imagedata.ImageData;
 import org.helioviewer.viewmodel.imagedata.SingleChannelByte8ImageData;
 import org.helioviewer.viewmodel.imagedata.SingleChannelShortImageData;
 import org.helioviewer.viewmodel.metadata.MetaDataContainer;
@@ -18,7 +18,7 @@ import org.helioviewer.viewmodel.metadata.MetaDataContainer;
 /**
  * This class provides access to any FITS file and makes the image data
  * available.
- * 
+ *
  * @author Andreas Hoelzl
  * @author Stephan Pagel
  * */
@@ -40,7 +40,7 @@ public class FITSImage implements MetaDataContainer {
 
     /**
      * Default constructor.
-     * 
+     *
      * @param url
      *            Specifies the location of the FITS file.
      * @throws Exception
@@ -145,7 +145,7 @@ public class FITSImage implements MetaDataContainer {
             }
 
             // create buffered image from row data
-            JavaBufferedImageData imageData = new ARGBInt32ImageData(false, width, height, data, new ColorMask());
+            ImageData imageData = new ARGBInt32ImageData(false, width, height, data, new ColorMask());
             image = imageData.getBufferedImage();
 
         } else if (bitsPerPixel == BasicHDU.BITPIX_FLOAT) {
@@ -216,7 +216,7 @@ public class FITSImage implements MetaDataContainer {
 
     /**
      * Returns the image data of the specified area as an image object.
-     * 
+     *
      * @param x
      *            X pixel coordinate of the top left point of the region.
      * @param y
@@ -246,7 +246,7 @@ public class FITSImage implements MetaDataContainer {
 
     /**
      * Returns the FITS header information as XML string.
-     * 
+     *
      * @return XML string including all FITS header information.
      * */
     public String getHeaderAsXML() {

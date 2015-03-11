@@ -13,7 +13,7 @@ import org.helioviewer.viewmodel.view.jp2view.image.SubImage;
  *
  * @author Markus Langenberg
  */
-public abstract class AbstractImageData implements JavaBufferedImageData {
+public abstract class AbstractImageData implements ImageData {
 
     protected int width, height;
     protected BufferedImage image = null;
