@@ -6,15 +6,12 @@ import org.helioviewer.viewmodel.changeevent.ChangeEvent;
 import org.helioviewer.viewmodel.changeevent.SubImageDataChangedReason;
 import org.helioviewer.viewmodel.filter.Filter;
 import org.helioviewer.viewmodel.filter.FrameFilter;
-import org.helioviewer.viewmodel.filter.GLImageSizeFilter;
 import org.helioviewer.viewmodel.filter.GLPostFilter;
 import org.helioviewer.viewmodel.imagedata.ImageData;
 import org.helioviewer.viewmodel.view.StandardFilterView;
 import org.helioviewer.viewmodel.view.View;
 import org.helioviewer.viewmodel.view.ViewHelper;
-import org.helioviewer.viewmodel.view.ViewportView;
 import org.helioviewer.viewmodel.view.jp2view.JHVJP2View;
-import org.helioviewer.viewmodel.viewport.Viewport;
 
 /**
  * Implementation of FilterView for rendering in OpenGL mode.
@@ -46,8 +43,6 @@ import org.helioviewer.viewmodel.viewport.Viewport;
  */
 public class GLFilterView extends StandardFilterView implements GLView {
 
-    protected ViewportView viewportView;
-
     protected boolean filteredDataIsUpToDate = false;
     private JHVJP2View jp2View;
 
@@ -61,12 +56,6 @@ public class GLFilterView extends StandardFilterView implements GLView {
             ((FrameFilter) filter).setJP2View(jp2View);
         }
         super.refilterPrepare();
-        if (filter instanceof GLImageSizeFilter && viewportView != null) {
-            Viewport viewport = viewportView.getViewport();
-            if (viewport != null) {
-                ((GLImageSizeFilter) filter).setImageSize(viewport.getWidth(), viewport.getHeight());
-            }
-        }
     }
 
     /**
@@ -126,7 +115,6 @@ public class GLFilterView extends StandardFilterView implements GLView {
     @Override
     protected void updatePrecomputedViews() {
         super.updatePrecomputedViews();
-        viewportView = ViewHelper.getViewAdapter(view, ViewportView.class);
         jp2View = ViewHelper.getViewAdapter(view, JHVJP2View.class);
 
     }

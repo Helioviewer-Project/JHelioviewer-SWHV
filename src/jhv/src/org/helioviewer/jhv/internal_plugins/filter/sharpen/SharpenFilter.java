@@ -3,7 +3,6 @@ package org.helioviewer.jhv.internal_plugins.filter.sharpen;
 import javax.media.opengl.GL2;
 
 import org.helioviewer.viewmodel.filter.AbstractFilter;
-import org.helioviewer.viewmodel.filter.GLImageSizeFilter;
 import org.helioviewer.viewmodel.view.opengl.shader.GLSLShader;
 
 /**
@@ -38,7 +37,7 @@ import org.helioviewer.viewmodel.view.opengl.shader.GLSLShader;
  * @author Markus Langenberg
  *
  */
-public class SharpenFilter extends AbstractFilter implements GLImageSizeFilter {
+public class SharpenFilter extends AbstractFilter {
 
     // /////////////////////////
     // GENERAL //
@@ -99,9 +98,9 @@ public class SharpenFilter extends AbstractFilter implements GLImageSizeFilter {
      */
     @Override
     public void applyGL(GL2 gl) {
+        this.setImageSize(512, 512);
     }
 
-    @Override
     public void setImageSize(int width, int height) {
         pixelWidth = 1.0f / width;
         pixelHeight = 1.0f / height;
