@@ -2,6 +2,7 @@ package org.helioviewer.viewmodel.imagedata;
 
 import java.awt.image.BufferedImage;
 
+import org.helioviewer.viewmodel.metadata.MetaData;
 import org.helioviewer.viewmodel.region.Region;
 import org.helioviewer.viewmodel.view.jp2view.image.SubImage;
 
@@ -19,8 +20,11 @@ public abstract class AbstractImageData implements ImageData {
     protected BufferedImage image = null;
     protected ColorMask colorMask;
     private long dateMillis;
+
     private Region region;
     private SubImage subImage;
+    private MetaData metadata;
+
     private int frameNumber;
     private double zoomPercent;
     private boolean fullyLoaded;
@@ -152,6 +156,16 @@ public abstract class AbstractImageData implements ImageData {
     }
 
     @Override
+    public MetaData getMETADATA() {
+        return this.metadata;
+    }
+
+    @Override
+    public void setMETADATA(MetaData m) {
+        this.metadata = m;
+    }
+
+    @Override
     public void setFullyLoaded(boolean fullyLoaded) {
         this.fullyLoaded = fullyLoaded;
     }
@@ -160,4 +174,5 @@ public abstract class AbstractImageData implements ImageData {
     public boolean getFullyLoaded() {
         return fullyLoaded;
     }
+
 }
