@@ -11,12 +11,9 @@ import kdu_jni.Kdu_region_compositor;
 import org.helioviewer.base.logging.Log;
 import org.helioviewer.base.math.Interval;
 import org.helioviewer.viewmodel.changeevent.ChangeEvent;
-import org.helioviewer.viewmodel.changeevent.NonConstantMetaDataChangedReason;
 import org.helioviewer.viewmodel.imagedata.ARGBInt32ImageData;
 import org.helioviewer.viewmodel.imagedata.ColorMask;
 import org.helioviewer.viewmodel.imagedata.SingleChannelByte8ImageData;
-import org.helioviewer.viewmodel.metadata.MetaData;
-import org.helioviewer.viewmodel.metadata.NonConstantMetaData;
 import org.helioviewer.viewmodel.view.CachedMovieView;
 import org.helioviewer.viewmodel.view.LinkedMovieManager;
 import org.helioviewer.viewmodel.view.MovieView;
@@ -280,13 +277,8 @@ class J2KRender implements Runnable {
 
                 parentImageRef.updateResolutionSet(numLayer);
 
-                MetaData metaData = parentViewRef.getMetaData();
+                parentViewRef.setMetaData(numLayer);
 
-                if (metaData instanceof NonConstantMetaData && ((NonConstantMetaData) metaData).checkForModifications()) {
-                    parentViewRef.updateParameter();
-                    currParams = parentViewRef.getImageViewParams();
-                    parentViewRef.addChangedReason(new NonConstantMetaDataChangedReason(parentViewRef, metaData));
-                }
             }
 
             compositorRef.Set_surface_initialization_mode(false);

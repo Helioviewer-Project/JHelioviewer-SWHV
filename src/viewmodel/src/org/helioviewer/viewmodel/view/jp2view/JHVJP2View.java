@@ -3,6 +3,7 @@ package org.helioviewer.viewmodel.view.jp2view;
 import java.awt.Dimension;
 import java.awt.EventQueue;
 import java.net.URI;
+import java.util.ArrayList;
 import java.util.Date;
 
 import kdu_jni.Jp2_palette;
@@ -87,7 +88,7 @@ public class JHVJP2View extends AbstractView implements JP2View, ViewportView, R
     protected boolean isMainView;
     protected boolean isPersistent;
     protected JP2Image jp2Image;
-    protected volatile JP2ImageParameter imageViewParams;
+    public volatile JP2ImageParameter imageViewParams;
 
     // Reader
     protected J2KReader reader;
@@ -106,6 +107,7 @@ public class JHVJP2View extends AbstractView implements JP2View, ViewportView, R
 
     private ImageData baseDifferenceImageData;
     protected DateTimeCache dateTimeCache;
+    ArrayList<MetaData> metaDataList;
 
     /**
      * Default constructor.
@@ -155,6 +157,7 @@ public class JHVJP2View extends AbstractView implements JP2View, ViewportView, R
         }
 
         metaData = MetaDataConstructor.getMetaData(newJP2Image);
+
         if (region == null) {
             if (!(metaData instanceof PixelBasedMetaData)) {
                 region = StaticRegion.createAdaptedRegion(getMetaData().getPhysicalLowerLeft(), getMetaData().getPhysicalImageSize());
@@ -167,25 +170,27 @@ public class JHVJP2View extends AbstractView implements JP2View, ViewportView, R
             if (metaData instanceof ObserverMetaData) {
                 event.addReason(new TimestampChangedReason(this, ((ObserverMetaData) metaData).getDateTime()));
             }
-
-            jp2Image = newJP2Image;
-
-            imageViewParams = calculateParameter(newJP2Image.getQualityLayerRange().getEnd(), 0);
-
-            if (isMainView) {
-                jp2Image.setParentView(this);
-            }
-
-            jp2Image.addReference();
-
-            try {
-                reader = new J2KReader(this);
-                render = new J2KRender(this);
-                startDecoding();
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
         }
+        jp2Image = newJP2Image;
+
+        imageViewParams = calculateParameter(newJP2Image.getQualityLayerRange().getEnd(), 0);
+
+        if (isMainView) {
+            jp2Image.setParentView(this);
+        }
+
+        jp2Image.addReference();
+
+        try {
+            reader = new J2KReader(this);
+            render = new J2KRender(this);
+            startDecoding();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        metaDataList = MetaDataConstructor.getMetaDataList(newJP2Image, this);
+        metaData = metaDataList.get(0);
     }
 
     /**
@@ -688,7 +693,7 @@ public class JHVJP2View extends AbstractView implements JP2View, ViewportView, R
      *
      * @return Current set of parameters
      */
-    JP2ImageParameter getImageViewParams() {
+    public JP2ImageParameter getImageViewParams() {
         return imageViewParams;
     }
 
@@ -894,6 +899,10 @@ public class JHVJP2View extends AbstractView implements JP2View, ViewportView, R
 
     public void removeRenderListener() {
         Displayer.getSingletonInstance().removeRenderListener(this);
+    }
+
+    public void setMetaData(int numLayer) {
+        this.metaData = metaDataList.get(numLayer);
     }
 
 }
