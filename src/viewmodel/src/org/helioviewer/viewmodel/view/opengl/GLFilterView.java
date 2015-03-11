@@ -3,7 +3,6 @@ package org.helioviewer.viewmodel.view.opengl;
 import javax.media.opengl.GL2;
 
 import org.helioviewer.viewmodel.changeevent.ChangeEvent;
-import org.helioviewer.viewmodel.changeevent.FilterChangedReason;
 import org.helioviewer.viewmodel.changeevent.SubImageDataChangedReason;
 import org.helioviewer.viewmodel.filter.Filter;
 import org.helioviewer.viewmodel.filter.FrameFilter;
@@ -117,9 +116,7 @@ public class GLFilterView extends StandardFilterView implements GLView {
         filteredDataIsUpToDate = false;
 
         ChangeEvent event = new ChangeEvent();
-        event.addReason(new FilterChangedReason(this, filter));
         event.addReason(new SubImageDataChangedReason(this));
-
         notifyViewListeners(event);
     }
 
