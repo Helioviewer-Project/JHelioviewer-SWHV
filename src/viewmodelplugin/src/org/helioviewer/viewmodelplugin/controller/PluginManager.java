@@ -1,6 +1,5 @@
 package org.helioviewer.viewmodelplugin.controller;
 
-import java.awt.EventQueue;
 import java.lang.reflect.InvocationTargetException;
 import java.util.concurrent.Callable;
 import java.util.concurrent.atomic.AtomicReference;
@@ -22,6 +21,7 @@ import java.util.Set;
 import java.util.jar.JarFile;
 import java.util.jar.Manifest;
 
+import org.helioviewer.base.EventDispatchQueue;
 import org.helioviewer.base.logging.Log;
 import org.helioviewer.viewmodelplugin.filter.FilterContainer;
 import org.helioviewer.viewmodelplugin.interfaces.Plugin;
@@ -417,45 +417,21 @@ public class PluginManager {
         return false;
     }
 
-    // http://kotek.net/blog/swingutilities.invokeandwait_with_return_value
-    private static <E> E invokeAndWait(final Callable<E> r) throws InterruptedException, InvocationTargetException {
-        final AtomicReference<E> ret = new AtomicReference<E>();
-        final AtomicReference<Exception> except = new AtomicReference<Exception>();
-
-        EventQueue.invokeAndWait(new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    ret.set(r.call());
-                } catch (Exception e) {
-                    //pass exception to original thread
-                    except.set(e);
-                }
-            }});
-
-        if (except.get() != null)
-            //there was an exception in EDT thread, rethrow it
-            throw new RuntimeException(except.get());
-        else
-            return ret.get();
-    }
-
     private class LoadPluginCall implements Callable<Boolean> {
-        final AtomicReference<URI> theURI = new AtomicReference<URI>();
+        final AtomicReference<URI> refURI = new AtomicReference<URI>();
 
         public LoadPluginCall(URI location) {
-            this.theURI.set(location);
+            this.refURI.set(location);
         }
 
         public Boolean call() {
-            return loadPlugin_raw(this.theURI.get());
+            return loadPlugin_raw(this.refURI.get());
         }
     }
 
     public boolean loadPlugin(URI location) throws InterruptedException, InvocationTargetException {
-        return invokeAndWait(new LoadPluginCall(location));
+        return EventDispatchQueue.invokeAndWait(new LoadPluginCall(location));
     }
-
 
     /**
      * Adds an internal plug-in to the list of all loaded plug-ins. Internal
