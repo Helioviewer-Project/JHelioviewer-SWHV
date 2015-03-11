@@ -106,4 +106,5 @@ public class SharpenFilter extends AbstractFilter {
         pixelHeight = 1.0f / height;
         GLSLShader.setFactors(weighting, pixelWidth, pixelHeight, span);
     }
+
 }

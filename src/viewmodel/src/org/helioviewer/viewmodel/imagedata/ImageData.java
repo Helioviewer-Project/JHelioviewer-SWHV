@@ -4,6 +4,7 @@ import java.awt.image.BufferedImage;
 
 import org.helioviewer.viewmodel.imageformat.ImageFormat;
 import org.helioviewer.viewmodel.imagetransport.ImageTransport;
+import org.helioviewer.viewmodel.metadata.MetaData;
 import org.helioviewer.viewmodel.region.Region;
 import org.helioviewer.viewmodel.view.jp2view.image.SubImage;
 
@@ -76,6 +77,10 @@ public interface ImageData {
     public Region getRegion();
 
     public void setRegion(Region r);
+
+    public MetaData getMETADATA();
+
+    public void setMETADATA(MetaData r);
 
     boolean getFullyLoaded();
 
