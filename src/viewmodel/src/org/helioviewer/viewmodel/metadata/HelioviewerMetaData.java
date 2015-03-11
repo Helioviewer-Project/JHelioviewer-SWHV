@@ -37,7 +37,6 @@ public class HelioviewerMetaData extends AbstractMetaData implements SunMetaData
     private Vector2dDouble sunPixelPosition = new Vector2dDouble();
 
     private double meterPerPixel;
-    private ImmutableDateTime time;
     protected double theta;
     protected double phi;
     private Vector2dDouble sunPixelPositionImage = new Vector2dDouble();
@@ -271,7 +270,7 @@ public class HelioviewerMetaData extends AbstractMetaData implements SunMetaData
             observedDate += "T" + metaDataContainer.get("TIME_OBS");
         }
 
-        time = parseDateTime(observedDate);
+        dateTime = parseDateTime(observedDate);
     }
 
     public static ImmutableDateTime parseDateTime(String dateTime) {
@@ -369,14 +368,6 @@ public class HelioviewerMetaData extends AbstractMetaData implements SunMetaData
     @Override
     public double getUnitsPerPixel() {
         return meterPerPixel;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public ImmutableDateTime getDateTime() {
-        return time;
     }
 
     public double getPhi() {
