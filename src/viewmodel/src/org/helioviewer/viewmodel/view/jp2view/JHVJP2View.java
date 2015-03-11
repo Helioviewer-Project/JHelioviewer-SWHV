@@ -161,9 +161,9 @@ public class JHVJP2View extends AbstractView implements JP2View, ViewportView, R
                 viewport = StaticViewport.createAdaptedViewport(100, 100);
             }
 
-            if (metaData instanceof ObserverMetaData) {
-                event.addReason(new TimestampChangedReason(this, ((ObserverMetaData) metaData).getDateTime()));
-            }
+            ImmutableDateTime dt = metaData.getDateTime();
+            if (dt != null)
+                event.addReason(new TimestampChangedReason(this, dt));
         }
         jp2Image = newJP2Image;
 
@@ -725,7 +725,7 @@ public class JHVJP2View extends AbstractView implements JP2View, ViewportView, R
         MetaData metaData = jp2Image.metaDataList.get(compositionLayer);
 
         if (metaData instanceof ObserverMetaData) {
-            ImmutableDateTime dtc = metaData.getParsedDateTime();
+            ImmutableDateTime dtc = metaData.getDateTime();
             event.addReason(new TimestampChangedReason(this, dtc));
         }
 

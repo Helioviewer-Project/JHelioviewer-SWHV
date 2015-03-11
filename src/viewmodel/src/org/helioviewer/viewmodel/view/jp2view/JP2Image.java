@@ -33,7 +33,7 @@ import org.helioviewer.base.math.MathUtils;
 import org.helioviewer.viewmodel.io.APIResponseDump;
 import org.helioviewer.viewmodel.metadata.MetaData;
 import org.helioviewer.viewmodel.metadata.MetaDataConstructor;
-import org.helioviewer.viewmodel.metadata.MultiFrameMetaDataContainer;
+import org.helioviewer.viewmodel.metadata.MetaDataContainer;
 import org.helioviewer.viewmodel.view.cache.ImageCacheStatus;
 import org.helioviewer.viewmodel.view.jp2view.image.ResolutionSet;
 import org.helioviewer.viewmodel.view.jp2view.io.jpip.JPIPResponse;
@@ -56,7 +56,7 @@ import org.w3c.dom.NodeList;
  * @author Benjamin Wamsler
  * @author Juan Pablo
  */
-public class JP2Image implements MultiFrameMetaDataContainer {
+public class JP2Image implements MetaDataContainer {
 
     /** An array of the file extensions this class currently supports */
     public static final String[] SUPPORTED_EXTENSIONS = { ".JP2", ".JPX" };
@@ -433,13 +433,6 @@ public class JP2Image implements MultiFrameMetaDataContainer {
         return isJpx && frameCount > 1;
     }
 
-    @Override
-    public int getNumberFrames() {
-        if (!isJpx)
-            return 1;
-        return layerRange.getEnd() + 1;
-    }
-
     public Jp2_threadsafe_family_src getFamilySrc() {
         return familySrc;
     }
@@ -448,10 +441,6 @@ public class JP2Image implements MultiFrameMetaDataContainer {
         String xml;
         int num = layerRange.getEnd() + 1;
         ArrayList<String> xmls = KakaduUtils.getAllXMLs(familySrc, num);
-
-        boolean first = true;
-        boolean isSWAP = false;
-        boolean isLASCO = false;
 
         for (int i = 0; i < num; i++) {
             if ((xml = xmls.get(i)) == null) {
@@ -469,32 +458,12 @@ public class JP2Image implements MultiFrameMetaDataContainer {
                 xmlCache[i] = builder.parse(in).getElementsByTagName("meta");
 
                 uglyFrameNumber = i + 1;
-                MetaData metaData = MetaDataConstructor.getMetaData(this);
 
-                if (first == true) {
-                    first = false;
-                    isSWAP = checkForSwap();
-                    isLASCO = checkForLasco();
-                }
-                metaData.setParsedDateTime(MetaDataConstructor.parseDateTime(this, i, isSWAP, isLASCO));
-
-                metaDataList.add(i, metaData);
+                metaDataList.add(i, MetaDataConstructor.getMetaData(this));
             } catch (Exception e) {
                 throw new JHV_KduException("Failed parsing XML data", e);
             }
         }
-    }
-
-    private boolean checkForSwap() throws IOException {
-        String instrument = this.get("INSTRUME", 0);
-        boolean isSWAP = instrument != null && (instrument.contains("SWAP") || instrument.contains("CALLISTO") || instrument.contains("NRH"));
-        return isSWAP;
-    }
-
-    private boolean checkForLasco() throws IOException {
-        String instrument = this.get("INSTRUME", 0);
-        boolean isLASCO = (instrument != null && instrument.trim().equalsIgnoreCase("LASCO"));
-        return isLASCO;
     }
 
     /**
@@ -614,7 +583,7 @@ public class JP2Image implements MultiFrameMetaDataContainer {
     /**
      * {@inheritDoc}
      */
-    @Override
+    // @Override
     public String get(String key, int frameNumber) throws IOException {
         try {
             String value = getValueFromXML(key, "fits", frameNumber + 1);

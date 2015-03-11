@@ -1,10 +1,5 @@
 package org.helioviewer.viewmodel.metadata;
 
-import java.io.IOException;
-
-import org.helioviewer.viewmodel.view.jp2view.JP2Image;
-import org.helioviewer.viewmodel.view.jp2view.datetime.ImmutableDateTime;
-
 /**
  * Factory for creating meta data out of a meta data container.
  *
@@ -54,58 +49,6 @@ public class MetaDataConstructor {
         } else {
             return hvMetaData;
         }
-    }
-
-    /**
-     * {@inheritDoc} This class implements this function for helioviewer images.
-     */
-    public static ImmutableDateTime parseDateTime(JP2Image source, int frameNumber, boolean isSWAP, boolean isLASCO) {
-        try {
-            String observedDate;
-            if (isSWAP) {
-                observedDate = source.get("DATE-OBS", frameNumber);
-            } else {
-                observedDate = source.get("DATE_OBS", frameNumber);
-            }
-            if (isLASCO) {
-                observedDate += "T" + source.get("TIME_OBS", frameNumber);
-            }
-            return parseDateTime(observedDate);
-
-        } catch (IOException e) {
-            if (e.getMessage() == "No XML data present") {
-                return new ImmutableDateTime(0, 0, 0, 0, 0, 0);
-            }
-            return null;
-        }
-    }
-
-    public static ImmutableDateTime parseDateTime(String dateTime) {
-        int year = 0, month = 0, day = 0, hour = 0, minute = 0, second = 0;
-
-        if (dateTime != null) {
-            try {
-                String[] firstDivide = dateTime.split("T");
-                String[] secondDivide1 = firstDivide[0].split("[-/]");
-                String[] secondDivide2 = firstDivide[1].split(":");
-                String[] thirdDivide = secondDivide2[2].split("\\.");
-                year = Integer.valueOf(secondDivide1[0]);
-                month = Integer.valueOf(secondDivide1[1]);
-                day = Integer.valueOf(secondDivide1[2]);
-                hour = Integer.valueOf(secondDivide2[0]);
-                minute = Integer.valueOf(secondDivide2[1]);
-                second = Integer.valueOf(thirdDivide[0]);
-            } catch (Exception e) {
-                year = 0;
-                month = 0;
-                day = 0;
-                hour = 0;
-                minute = 0;
-                second = 0;
-            }
-        }
-
-        return new ImmutableDateTime(year, month != 0 ? month - 1 : 0, day, hour, minute, second);
     }
 
 }

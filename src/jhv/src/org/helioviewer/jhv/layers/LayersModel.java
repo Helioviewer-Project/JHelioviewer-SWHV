@@ -39,7 +39,6 @@ import org.helioviewer.viewmodel.io.APIResponse;
 import org.helioviewer.viewmodel.io.APIResponseDump;
 import org.helioviewer.viewmodel.metadata.HelioviewerMetaData;
 import org.helioviewer.viewmodel.metadata.MetaData;
-import org.helioviewer.viewmodel.metadata.ObserverMetaData;
 import org.helioviewer.viewmodel.region.Region;
 import org.helioviewer.viewmodel.region.StaticRegion;
 import org.helioviewer.viewmodel.view.ComponentView;
@@ -199,17 +198,11 @@ public class LayersModel implements ViewListener {
      *         information is available
      */
     public String getCurrentFrameTimestampString(View view) {
-        if (view == null) {
-            return null;
-        }
-
-        MetaData md = view.getAdapter(MetaDataView.class).getMetaData();
-        if (md instanceof ObserverMetaData) {
-            ImmutableDateTime dt = getCurrentFrameTimestamp(view);
+        ImmutableDateTime dt = getCurrentFrameTimestamp(view);
+        if (dt != null) {
             return dt.getCachedDate();
-        } else {
-            return "N/A";
         }
+        return "N/A";
     }
 
     /**
@@ -234,17 +227,10 @@ public class LayersModel implements ViewListener {
      * @return timestamp, null if no timing information is available
      */
     public ImmutableDateTime getCurrentFrameTimestamp(View view) {
-        if (view == null) {
-            return null;
+        if (view != null) {
+            return view.getAdapter(MetaDataView.class).getMetaData().getDateTime(); // null for PixelBasedMetaData
         }
-
-        MetaData md = view.getAdapter(MetaDataView.class).getMetaData();
-        if (md instanceof ObserverMetaData) {
-            ObserverMetaData obsMetaData = (ObserverMetaData) md;
-            return obsMetaData.getDateTime();
-        } else {
-            return null;
-        }
+        return null;
     }
 
     /**
@@ -290,11 +276,7 @@ public class LayersModel implements ViewListener {
         MetaDataView mdv = view.getAdapter(MetaDataView.class);
 
         if (mdv != null) {
-            MetaData md = mdv.getMetaData();
-            if (md instanceof ObserverMetaData) {
-                ObserverMetaData omd = (ObserverMetaData) md;
-                result = omd.getDateTime();
-            }
+            result = mdv.getMetaData().getDateTime(); // null for PixelBasedMetaData
         }
 
         return result;
@@ -1003,17 +985,10 @@ public class LayersModel implements ViewListener {
      * @return true if the layer in question has timing information
      */
     public boolean isTimed(View view) {
-        if (view == null) {
-            return false;
+        if (getCurrentFrameTimestamp(view) != null) {
+            return true;
         }
-
-        MetaDataView metaDataView = view.getAdapter(MetaDataView.class);
-        if (metaDataView != null) {
-            MetaData md = view.getAdapter(MetaDataView.class).getMetaData();
-            return (md instanceof ObserverMetaData);
-        } else {
-            return false;
-        }
+        return false;
     }
 
     /**

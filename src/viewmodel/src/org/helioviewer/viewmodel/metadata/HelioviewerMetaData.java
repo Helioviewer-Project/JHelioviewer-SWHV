@@ -9,7 +9,6 @@ import org.helioviewer.jhv.gui.states.StateController;
 import org.helioviewer.jhv.gui.states.ViewStateEnum;
 import org.helioviewer.viewmodel.region.Region;
 import org.helioviewer.viewmodel.region.StaticRegion;
-import org.helioviewer.viewmodel.view.cache.HelioviewerDateTimeCache;
 import org.helioviewer.viewmodel.view.jp2view.datetime.ImmutableDateTime;
 import org.helioviewer.viewmodel.view.jp2view.image.SubImage;
 
@@ -117,7 +116,6 @@ public class HelioviewerMetaData extends AbstractMetaData implements SunMetaData
         }
 
         else if (detector.equals("C2") || detector.equals("C3")) {
-
             String measurement1 = m.get("FILTER");
             String measurement2 = m.get("POLAR");
             measurement = measurement1 + " " + measurement2;
@@ -262,11 +260,7 @@ public class HelioviewerMetaData extends AbstractMetaData implements SunMetaData
         return StaticRegion.createAdaptedRegion((roi.x / zoompercent - sunPixelPositionImage.getX()) * meterPerPixel, (roi.y / zoompercent - sunPixelPositionImage.getY()) * meterPerPixel, roi.width * meterPerPixel / zoompercent, roi.height * meterPerPixel / zoompercent);
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void updateDateTime() {
+    private void updateDateTime() {
         String observedDate;
         if (instrument.contains("SWAP") || instrument.contains("NRH") || instrument.contains("GONG") || instrument.contains("VSM") || instrument.contains("CALLISTO")) {
             observedDate = metaDataContainer.get("DATE-OBS");
@@ -277,15 +271,35 @@ public class HelioviewerMetaData extends AbstractMetaData implements SunMetaData
             observedDate += "T" + metaDataContainer.get("TIME_OBS");
         }
 
-        time = HelioviewerDateTimeCache.parseDateTime(observedDate);
+        time = parseDateTime(observedDate);
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void updateDateTime(ImmutableDateTime newDateTime) {
-        time = newDateTime;
+    public static ImmutableDateTime parseDateTime(String dateTime) {
+        int year = 0, month = 0, day = 0, hour = 0, minute = 0, second = 0;
+
+        if (dateTime != null) {
+            try {
+                String[] firstDivide = dateTime.split("T");
+                String[] secondDivide1 = firstDivide[0].split("[-/]");
+                String[] secondDivide2 = firstDivide[1].split(":");
+                String[] thirdDivide = secondDivide2[2].split("\\.");
+                year = Integer.valueOf(secondDivide1[0]);
+                month = Integer.valueOf(secondDivide1[1]);
+                day = Integer.valueOf(secondDivide1[2]);
+                hour = Integer.valueOf(secondDivide2[0]);
+                minute = Integer.valueOf(secondDivide2[1]);
+                second = Integer.valueOf(thirdDivide[0]);
+            } catch (Exception e) {
+                year = 0;
+                month = 0;
+                day = 0;
+                hour = 0;
+                minute = 0;
+                second = 0;
+            }
+        }
+
+        return new ImmutableDateTime(year, month != 0 ? month - 1 : 0, day, hour, minute, second);
     }
 
     /**

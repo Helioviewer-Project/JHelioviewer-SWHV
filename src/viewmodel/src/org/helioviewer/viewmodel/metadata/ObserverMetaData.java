@@ -17,39 +17,6 @@ import org.helioviewer.viewmodel.view.jp2view.datetime.ImmutableDateTime;
 public interface ObserverMetaData {
 
     /**
-     * Returns date and time when the picture was taken.
-     * 
-     * @return Date and time when the picture was taken.
-     */
-    public ImmutableDateTime getDateTime();
-
-    /**
-     * Updates the observation time by reparsing the information from the meta
-     * data container.
-     * 
-     * <p>
-     * This might be necessary for image series: An image series contains
-     * multiple images from different times, but there is only one visible at a
-     * moment. If the visible image changes, the meta data has to be updated,
-     * too.
-     */
-    public void updateDateTime();
-
-    /**
-     * Updates the observation time by resetting it to the given time.
-     * 
-     * <p>
-     * This might be necessary for image series: An image series contains
-     * multiple images from different times, but there is only one visible at a
-     * moment. If the visible image changes, the meta data has to be updated,
-     * too.
-     * 
-     * @param newDateTime
-     *            New date and time to save
-     */
-    public void updateDateTime(ImmutableDateTime newDateTime);
-
-    /**
      * Returns the observatory used to take the picture.
      * 
      * @return Observatory used to take the picture.
@@ -85,4 +52,5 @@ public interface ObserverMetaData {
      * @return Full name of the instrument
      */
     public String getFullName();
+
 }
