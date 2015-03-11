@@ -40,15 +40,11 @@ public class JHVJPXView extends JHVJP2View implements TimedMovieView, CachedMovi
     // Caching
     protected ImageCacheStatus imageCacheStatus;
     protected int lastRenderedCompositionLayer = -1;
-    /*
-     * Set to true if you want to use the displaylock.
-     */
-    private boolean blockingMode;
+
     /**
      * Linking movies, if the movie is not linked, this has to be null
      */
     protected LinkedMovieManager linkedMovieManager;
-    private boolean fullyLoadedMode = false;
     private boolean differenceMode = false;
     private boolean baseDifferenceMode = false;
 
@@ -67,14 +63,10 @@ public class JHVJPXView extends JHVJP2View implements TimedMovieView, CachedMovi
      */
     public JHVJPXView(boolean isMainView, Interval<Date> range, boolean blockingMode) {
         super(isMainView, range);
-        this.blockingMode = blockingMode;
-
     }
 
     public JHVJPXView(boolean isMainView, Interval<Date> range) {
         super(isMainView, range);
-        this.blockingMode = false;
-
     }
 
     /**
@@ -494,16 +486,8 @@ public class JHVJPXView extends JHVJP2View implements TimedMovieView, CachedMovi
         return metadata.getDateTime().getMillis();
     }
 
-    public void setBlocking(boolean blockingMode) {
-        this.blockingMode = blockingMode;
-    }
-
     public void setDifferenceMode(boolean differenceMode) {
         this.differenceMode = differenceMode;
-    }
-
-    public void setFullyLoadedMode(boolean fullyLoadedMode) {
-        this.fullyLoadedMode = fullyLoadedMode;
     }
 
     public boolean getDifferenceMode() {

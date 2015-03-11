@@ -78,7 +78,6 @@ public class RunningDifferenceFilter implements FrameFilter, Filter {
     public void setActive(boolean isActive) {
         this.isActive = isActive;
         jpxView.setDifferenceMode(isActive);
-        jpxView.setFullyLoadedMode(isActive);
         notifyAllListeners();
     }
 
