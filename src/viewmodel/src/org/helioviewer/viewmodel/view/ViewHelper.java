@@ -484,13 +484,11 @@ public final class ViewHelper {
         String[] parts = uri.toString().split("\\.");
         String ending = parts[parts.length - 1];
 
-        if (ending.equals("jpeg") || ending.equals("jpg") || ending.equals("JPEG") || ending.equals("JPG") || ending.equals("png")
-                || ending.equals("PNG")) {
-
+        if (ending.equals("jpeg") || ending.equals("jpg") || ending.equals("JPEG") || ending.equals("JPG") ||
+            ending.equals("png")  || ending.equals("PNG")) {
             return new JHVSimpleImageView(uri, null);
 
         } else if (ending.equals("fits") || ending.equals("FITS") || ending.equals("fts") || ending.equals("FTS")) {
-
             try {
                 return new JHVFITSView(uri, null);
             } catch (Exception e) {
