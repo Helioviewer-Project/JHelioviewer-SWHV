@@ -105,8 +105,6 @@ public class JHVJP2View extends AbstractView implements JP2View, ViewportView, R
     private ImageData previousImageData;
     private ImageData baseDifferenceImageData;
 
-    protected ArrayList<MetaData> metaDataList;
-
     /**
      * Default constructor.
      *
@@ -154,9 +152,7 @@ public class JHVJP2View extends AbstractView implements JP2View, ViewportView, R
             abolish();
         }
 
-        metaDataList = MetaDataConstructor.getMetaDataList(newJP2Image);
-
-        MetaData metaData = metaDataList.get(0);
+        MetaData metaData = newJP2Image.metaDataList.get(0);
         if (region == null) {
             if (!(metaData instanceof PixelBasedMetaData)) {
                 region = StaticRegion.createAdaptedRegion(getMetaData().getPhysicalLowerLeft(), getMetaData().getPhysicalImageSize());
@@ -318,7 +314,7 @@ public class JHVJP2View extends AbstractView implements JP2View, ViewportView, R
      */
     @Override
     public MetaData getMetaData() {
-        return metaDataList.get(imageData.getFrameNumber());
+        return jp2Image.metaDataList.get(imageData.getFrameNumber());
     }
 
     /**
@@ -393,7 +389,7 @@ public class JHVJP2View extends AbstractView implements JP2View, ViewportView, R
      */
     @Override
     public String getName() {
-        MetaData metaData = metaDataList.get(imageData.getFrameNumber());
+        MetaData metaData = jp2Image.metaDataList.get(imageData.getFrameNumber());
 
         if (metaData instanceof ObserverMetaData) {
             ObserverMetaData observerMetaData = (ObserverMetaData) metaData;
@@ -718,10 +714,10 @@ public class JHVJP2View extends AbstractView implements JP2View, ViewportView, R
      *            {@link org.helioviewer.viewmodel.region.Region}
      */
     void setSubimageData(ImageData newImageData, SubImage roi, int compositionLayer, double zoompercent, boolean fullyLoaded) {
-        MetaData metaData = metaDataList.get(compositionLayer);
+        MetaData metaData = jp2Image.metaDataList.get(compositionLayer);
 
         if (metaData instanceof ObserverMetaData) {
-            ImmutableDateTime dtc = metaDataList.get(compositionLayer).getParsedDateTime();
+            ImmutableDateTime dtc = metaData.getParsedDateTime();
             event.addReason(new TimestampChangedReason(this, dtc));
         }
 
@@ -894,8 +890,8 @@ public class JHVJP2View extends AbstractView implements JP2View, ViewportView, R
         Displayer.getSingletonInstance().removeRenderListener(this);
     }
 
-    public ArrayList<MetaData> getMetaDataList() {
+/*    public ArrayList<MetaData> getMetaDataList() {
         return metaDataList;
     }
-
+*/
 }

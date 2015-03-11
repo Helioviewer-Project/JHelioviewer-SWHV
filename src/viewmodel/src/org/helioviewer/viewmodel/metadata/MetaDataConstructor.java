@@ -1,7 +1,6 @@
 package org.helioviewer.viewmodel.metadata;
 
 import java.io.IOException;
-import java.util.ArrayList;
 
 import org.helioviewer.viewmodel.view.jp2view.JP2Image;
 import org.helioviewer.viewmodel.view.jp2view.datetime.ImmutableDateTime;
@@ -57,48 +56,10 @@ public class MetaDataConstructor {
         }
     }
 
-    public static ArrayList<MetaData> getMetaDataList(JP2Image mdc) {
-        int num = mdc.getNumberFrames();
-        boolean isSWAP = checkForSwap(mdc);
-        boolean isLASCO = checkForLasco(mdc);
-
-        ArrayList<MetaData> metaDataList = new ArrayList<MetaData>(num);
-        for (int i = 0; i < num; i++) {
-            mdc.setUglyFrameNumber(i);
-
-            MetaData md = getMetaData(mdc);
-            md.setParsedDateTime(parseDateTime(mdc, i, isSWAP, isLASCO));
-
-            metaDataList.add(i, md);
-        }
-
-        mdc.xmlCache = null;
-
-        return metaDataList;
-    }
-
-    static private boolean checkForSwap(JP2Image source) {
-        String instrument = source.get("INSTRUME");
-        boolean isSWAP = instrument != null && (instrument.contains("SWAP") || instrument.contains("CALLISTO") || instrument.contains("NRH"));
-        return isSWAP;
-    }
-
-    /**
-     * Checks, whether the given image was taken by the instrument LASCO. This
-     * is necessary, since date and time within the LASCO meta data are given in
-     * different format.
-     */
-    static private boolean checkForLasco(JP2Image source) {
-        String instrument = source.get("INSTRUME");
-        boolean isLASCO = (instrument != null && instrument.trim().equalsIgnoreCase("LASCO"));
-        return isLASCO;
-    }
-
     /**
      * {@inheritDoc} This class implements this function for helioviewer images.
      */
-    static private ImmutableDateTime parseDateTime(JP2Image source, int frameNumber, boolean isSWAP, boolean isLASCO) {
-
+    public static ImmutableDateTime parseDateTime(JP2Image source, int frameNumber, boolean isSWAP, boolean isLASCO) {
         try {
             String observedDate;
             if (isSWAP) {
@@ -120,7 +81,6 @@ public class MetaDataConstructor {
     }
 
     public static ImmutableDateTime parseDateTime(String dateTime) {
-
         int year = 0, month = 0, day = 0, hour = 0, minute = 0, second = 0;
 
         if (dateTime != null) {
@@ -147,4 +107,5 @@ public class MetaDataConstructor {
 
         return new ImmutableDateTime(year, month != 0 ? month - 1 : 0, day, hour, minute, second);
     }
+
 }

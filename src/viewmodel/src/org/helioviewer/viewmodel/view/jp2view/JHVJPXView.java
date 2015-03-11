@@ -167,11 +167,11 @@ public class JHVJPXView extends JHVJP2View implements TimedMovieView, CachedMovi
         do {
             lastDiff = currentDiff;
 
-            if (getMetaDataList().get(++frameNumber).getParsedDateTime() == null) {
+            if (jp2Image.metaDataList.get(++frameNumber).getParsedDateTime() == null) {
                 return;
             }
 
-            currentDiff = getMetaDataList().get(frameNumber).getParsedDateTime().getMillis() - timeMillis;
+            currentDiff = jp2Image.metaDataList.get(frameNumber).getParsedDateTime().getMillis() - timeMillis;
         } while (currentDiff < 0 && frameNumber < jp2Image.getCompositionLayerRange().getEnd());
 
         if (-lastDiff < currentDiff) {
@@ -214,7 +214,7 @@ public class JHVJPXView extends JHVJP2View implements TimedMovieView, CachedMovi
      */
     @Override
     public ImmutableDateTime getCurrentFrameDateTime() {
-        return getMetaDataList().get(getCurrentFrameNumber()).getParsedDateTime();
+        return jp2Image.metaDataList.get(getCurrentFrameNumber()).getParsedDateTime();
     }
 
     /**
@@ -222,7 +222,7 @@ public class JHVJPXView extends JHVJP2View implements TimedMovieView, CachedMovi
      */
     @Override
     public ImmutableDateTime getFrameDateTime(int frameNumber) {
-        return getMetaDataList().get(frameNumber).getParsedDateTime();
+        return jp2Image.metaDataList.get(frameNumber).getParsedDateTime();
     }
 
     /**
@@ -468,7 +468,7 @@ public class JHVJPXView extends JHVJP2View implements TimedMovieView, CachedMovi
 
     @Override
     public long getCurrentDateMillis() {
-        HelioviewerMetaData metadata = (HelioviewerMetaData) this.metaDataList.get(imageData.getFrameNumber());
+        HelioviewerMetaData metadata = (HelioviewerMetaData) jp2Image.metaDataList.get(imageData.getFrameNumber());
         return metadata.getDateTime().getMillis();
     }
 
@@ -495,6 +495,7 @@ public class JHVJPXView extends JHVJP2View implements TimedMovieView, CachedMovi
 
     @Override
     public ArrayList<MetaData> getMetaDataList() {
-        return metaDataList;
+        return jp2Image.metaDataList;
     }
+
 }

@@ -64,4 +64,5 @@ public interface MetaDataContainer {
      * @return height of the image in pixels
      */
     public int getPixelHeight();
+
 }
