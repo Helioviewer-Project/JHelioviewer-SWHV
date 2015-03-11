@@ -6,7 +6,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.SocketTimeoutException;
 import java.net.URI;
-
 import java.util.ArrayList;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -111,7 +110,7 @@ public class JP2Image implements MultiFrameMetaDataContainer {
     /** cache path */
     private static File cachePath;
 
-    private final NodeList[] xmlCache;
+    public NodeList[] xmlCache;
 
     private JHVJP2View parentView;
     private final ReentrantLock lock = new ReentrantLock();
@@ -427,6 +426,7 @@ public class JP2Image implements MultiFrameMetaDataContainer {
         return isJpx && frameCount > 1;
     }
 
+    @Override
     public int getNumberFrames() {
         if (!isJpx)
             return 1;
