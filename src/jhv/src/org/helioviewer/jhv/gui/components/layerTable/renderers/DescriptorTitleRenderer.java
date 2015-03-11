@@ -50,7 +50,7 @@ public class DescriptorTitleRenderer extends DefaultTableCellRenderer {
     public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
         if (value instanceof LayerDescriptor) {
             LayerDescriptor descriptor = (LayerDescriptor) value;
-            String layerName = descriptor.observatory + " " + descriptor.title;
+            String layerName = descriptor.title;
             JLabel label = (JLabel) super.getTableCellRendererComponent(table, layerName, isSelected, hasFocus, row, column);
             label.setToolTipText("Layer name: " + layerName);
             //if (drawLine && row > 0) {
