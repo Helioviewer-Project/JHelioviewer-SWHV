@@ -70,6 +70,7 @@ public class MetaDataConstructor {
 
             jp2v.getImageViewParams().compositionLayer = 0;
         }
+        mdc.xmlCache = null;
         return metaDataList;
     }
 }
