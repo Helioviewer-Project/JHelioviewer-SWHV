@@ -7,7 +7,6 @@ import javax.swing.JPanel;
 import javax.swing.JTabbedPane;
 
 import org.helioviewer.jhv.gui.components.MoviePanel;
-import org.helioviewer.jhv.internal_plugins.selectedLayer.SelectedLayerPanel;
 import org.helioviewer.jhv.layers.LayersModel;
 import org.helioviewer.viewmodel.factory.GL3DViewFactory;
 import org.helioviewer.viewmodel.factory.ViewFactory;
@@ -122,8 +121,6 @@ public class GL3DViewchainFactory {
 
             FilterTabPanelManager compactPanelManager = new FilterTabPanelManager();
             tabList.add(new FilterTab(FilterTabDescriptor.Type.COMPACT_FILTER, "Color", compactPanelManager));
-
-            compactPanelManager.add(new SelectedLayerPanel(newLayer));
 
             // Add filter to view chain
             AbstractList<FilterContainer> filterContainerList = PluginManager.getSingletonInstance().getFilterContainers(true);
