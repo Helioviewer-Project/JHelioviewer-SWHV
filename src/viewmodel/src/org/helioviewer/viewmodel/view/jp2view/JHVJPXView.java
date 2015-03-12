@@ -281,10 +281,8 @@ public class JHVJPXView extends JHVJP2View implements TimedMovieView, CachedMovi
      */
     @Override
     public float getActualFramerate() {
-
         if (render != null)
             return render.getActualMovieFramerate();
-
         return 0;
     }
 

@@ -1,7 +1,5 @@
 package org.helioviewer.gl3d.spaceobjects;
 
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -26,7 +24,6 @@ import org.helioviewer.viewmodel.view.TimedMovieView;
 import org.helioviewer.viewmodel.view.View;
 import org.helioviewer.viewmodel.view.ViewListener;
 import org.helioviewer.viewmodel.view.jp2view.JHVJPXView;
-import org.helioviewer.viewmodel.view.jp2view.kakadu.JHV_KduException;
 
 public class Planet extends GL3DSphere implements LayersListener, ViewListener, GL3DPositionLoadingListener {
 
@@ -56,53 +53,28 @@ public class Planet extends GL3DSphere implements LayersListener, ViewListener, 
         this.drawBits.set(Bit.Wireframe, true);
     }
 
-    private Date parseDate(String dateOBS) {
-        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS");
-        try {
-            return sdf.parse(dateOBS);
-        } catch (ParseException e) {
-            Log.warn("Could not parse date:" + dateOBS + ". Returned null.");
-            return null;
-        }
-    }
-
     @Override
     public void layerAdded(int idx) {
-        try {
-            List<Date> requestDates = new ArrayList<Date>();
+        List<Date> requestDates = new ArrayList<Date>();
 
-            View activeView = LayersModel.getSingletonInstance().getActiveView();
-            JHVJPXView jpxView = activeView.getAdapter(JHVJPXView.class);
-            if (jpxView != null) {
-                for (int frame = 1; frame <= jpxView.getMaximumFrameNumber(); frame++) {
-                    String dateOBS = jpxView.getJP2Image().getValueFromXML("DATE-OBS", "fits", frame);
-                    if (dateOBS == null) {
-                        dateOBS = jpxView.getJP2Image().getValueFromXML("DATE_OBS", "fits", frame);
-                    }
-                    if (dateOBS != null) {
-                        Date parsedDate = parseDate(dateOBS);
-                        if (parsedDate != null) {
-                            requestDates.add(parsedDate);
-                        }
-                    } else {
-                        Log.error("Destroy myself with handgrenade. No date-obs in whatever dialect could be found");
-                    }
-                }
+        View activeView = LayersModel.getSingletonInstance().getActiveView();
+        JHVJPXView jpxView = activeView.getAdapter(JHVJPXView.class);
+        if (jpxView != null) {
+            for (int frame = 1; frame <= jpxView.getMaximumFrameNumber(); frame++) {
+                requestDates.add(jpxView.getFrameDateTime(frame).getTime());
             }
-            if (requestDates.size() > 0) {
-                if (this.beginDate == null || requestDates.get(0).getTime() < this.beginDate.getTime()) {
-                    this.beginDate = requestDates.get(0);
-                }
-                if (this.endDate == null || requestDates.get(0).getTime() > this.endDate.getTime()) {
-                    this.endDate = requestDates.get(requestDates.size() - 1);
-                }
-                //this.positionLoading.setBeginDate(beginDate);
-                //this.positionLoading.setEndDate(endDate);
-                //this.positionLoadingalt.setBeginDate(beginDate);
-                //this.positionLoadingalt.setEndDate(endDate);
+        }
+        if (requestDates.size() > 0) {
+            if (this.beginDate == null || requestDates.get(0).getTime() < this.beginDate.getTime()) {
+                this.beginDate = requestDates.get(0);
             }
-        } catch (JHV_KduException ex) {
-            Log.error("Received an kakadu exception. " + ex);
+            if (this.endDate == null || requestDates.get(0).getTime() > this.endDate.getTime()) {
+                this.endDate = requestDates.get(requestDates.size() - 1);
+            }
+            //this.positionLoading.setBeginDate(beginDate);
+            //this.positionLoading.setEndDate(endDate);
+            //this.positionLoadingalt.setBeginDate(beginDate);
+            //this.positionLoadingalt.setEndDate(endDate);
         }
     }
 

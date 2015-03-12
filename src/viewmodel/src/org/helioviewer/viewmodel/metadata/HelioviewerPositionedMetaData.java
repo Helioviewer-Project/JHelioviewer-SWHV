@@ -144,4 +144,5 @@ public class HelioviewerPositionedMetaData extends HelioviewerMetaData implement
     public double getStonyhurstLongitude() {
         return stonyhurstLongitude;
     }
+
 }

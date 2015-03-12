@@ -301,7 +301,6 @@ public class JP2Image implements MetaDataContainer {
      * @throws JHV_KduException
      */
     private void createKakaduMachinery() throws JHV_KduException {
-
         // The amount of cache to allocate to each codestream
         final int CODESTREAM_CACHE_THRESHOLD = 1024 * 256;
 
@@ -474,7 +473,7 @@ public class JP2Image implements MetaDataContainer {
      * @param _boxNumber
      * @throws JHV_KduException
      */
-    public String getValueFromXML(String _keyword, String _box, int _boxNumber) throws JHV_KduException {
+    private String getValueFromXML(String _keyword, String _box, int _boxNumber) throws JHV_KduException {
         try {
             NodeList nodes = ((Element) xmlCache[_boxNumber - 1].item(0)).getElementsByTagName(_box);
             NodeList value = ((Element) nodes.item(0)).getElementsByTagName(_keyword);
