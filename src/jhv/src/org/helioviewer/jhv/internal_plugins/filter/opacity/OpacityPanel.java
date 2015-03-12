@@ -1,9 +1,10 @@
 package org.helioviewer.jhv.internal_plugins.filter.opacity;
 
+import java.awt.Dimension;
+
 import javax.swing.BoxLayout;
-import javax.swing.JSpinner;
-import javax.swing.JTextField;
-import javax.swing.SpinnerNumberModel;
+import javax.swing.JLabel;
+import javax.swing.JSlider;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
@@ -22,7 +23,10 @@ import org.helioviewer.viewmodelplugin.filter.FilterTabPanelManager.Area;
 public class OpacityPanel extends FilterPanel implements ChangeListener, FilterAlignmentDetails {
 
     private static final long serialVersionUID = 1L;
-    private final JSpinner opacitySpinner;
+
+    private final JSlider opacitySlider;
+    private final JLabel opacityLabel;
+    private final JLabel title;
     private OpacityFilter filter;
 
     /**
@@ -32,67 +36,29 @@ public class OpacityPanel extends FilterPanel implements ChangeListener, FilterA
     public OpacityPanel() {
         setLayout(new BoxLayout(this, BoxLayout.LINE_AXIS));
 
-        // title.setPreferredSize(new Dimension(AbstractFilterPanel.titleWidth,
-        // AbstractFilterPanel.height));
-        // add(title);
+        title = new JLabel("Opacity:");
+        title.setPreferredSize(new Dimension(FilterPanel.titleWidth, FilterPanel.height));
+        add(title);
 
-        opacitySpinner = new JSpinner();
-        opacitySpinner.setModel(new ClippingNumberModel(new Float(1), new Float(0), new Float(1), new Float(0.05f)));
-        opacitySpinner.addChangeListener(this);
+        opacitySlider = new JSlider(JSlider.HORIZONTAL, 0, 100, 0);
+        opacitySlider.setMajorTickSpacing(20);
+        opacitySlider.setPaintTicks(true);
+        opacitySlider.setPreferredSize(new Dimension(150, opacitySlider.getPreferredSize().height));
+        opacitySlider.addChangeListener(this);
+        WheelSupport.installMouseWheelSupport(opacitySlider);
+        add(opacitySlider);
 
-        JSpinner.NumberEditor editor = new JSpinner.NumberEditor(opacitySpinner, "0%");
-        opacitySpinner.setEditor(editor);
-        editor.getTextField().setColumns(3);
-        editor.getTextField().setHorizontalAlignment(JTextField.CENTER);
-
-        WheelSupport.installMouseWheelSupport(opacitySpinner);
-        add(opacitySpinner);
+        opacityLabel = new JLabel("0%");
+        opacityLabel.setHorizontalAlignment(JLabel.RIGHT);
+        opacityLabel.setPreferredSize(new Dimension(FilterPanel.valueWidth, FilterPanel.height));
+        add(opacityLabel);
 
         setEnabled(false);
-    }
-
-    private class ClippingNumberModel extends SpinnerNumberModel {
-        Object min, max;
-
-        public ClippingNumberModel(Number value, Comparable minimum, Comparable maximum, Number stepSize) {
-            super(value, minimum, maximum, stepSize);
-            min = minimum;
-            max = maximum;
-        }
-
-        public Object getNextValue() {
-            Object value = super.getNextValue();
-            if (value == null) {
-                value = max;
-            }
-            return value;
-        }
-
-        public Object getPreviousValue() {
-            Object value = super.getPreviousValue();
-            if (value == null) {
-                value = min;
-            }
-            return value;
-        }
-
-    }
-
-
-    /**
-     * Override the setEnabled method in order to keep the containing
-     * components' enabledState synced with the enabledState of this component.
-     */
-    @Override
-    public void setEnabled(boolean enabled) {
-        super.setEnabled(enabled);
-        opacitySpinner.setEnabled(enabled);
     }
 
     /**
      * {@inheritDoc}
      */
-
     @Override
     public void setFilter(Filter filter) {
         if (filter instanceof OpacityFilter) {
@@ -114,35 +80,43 @@ public class OpacityPanel extends FilterPanel implements ChangeListener, FilterA
     }
 
     /**
-     * Sets the opacity of the image.
+     * Sets the weighting of the sharpening.
      */
     @Override
     public void stateChanged(ChangeEvent e) {
-        if (filter != null) {
-            float value = ((SpinnerNumberModel) opacitySpinner.getModel()).getNumber().floatValue();
-            filter.setOpacity(value);
-        }
+        filter.setOpacity(opacitySlider.getValue() / 100.f);
+        opacityLabel.setText(opacitySlider.getValue() + "%");
+    }
+
+    @Override
+    public int getDetails() {
+        return FilterAlignmentDetails.POSITION_OPACITY;
     }
 
     /**
-     * Sets the opacity value.
+     * Override the setEnabled method in order to keep the containing
+     * components' enabledState synced with the enabledState of this component.
+     */
+
+    @Override
+    public void setEnabled(boolean enabled) {
+        super.setEnabled(enabled);
+        opacitySlider.setEnabled(enabled);
+        opacityLabel.setEnabled(enabled);
+        title.setEnabled(enabled);
+    }
+
+    /**
+     * Sets the sharpen value.
      *
      * This may be useful, if the opacity is changed from another source than
      * the slider itself.
      *
-     * @param opacity
-     *            New opacity value. Must be within [0, 100]
+     * @param sharpen
+     *            New opacity value. Must be within [0, 1]
      */
     void setValue(float opacity) {
-        ((SpinnerNumberModel) opacitySpinner.getModel()).setValue(opacity);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public int getDetails() {
-        return FilterAlignmentDetails.POSITION_OPACITY;
+        opacitySlider.setValue((int) (opacity * 100.f));
     }
 
 }

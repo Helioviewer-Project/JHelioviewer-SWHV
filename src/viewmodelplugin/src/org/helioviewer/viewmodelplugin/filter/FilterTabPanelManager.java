@@ -23,10 +23,6 @@ import javax.swing.JPanel;
  */
 public class FilterTabPanelManager {
 
-    // ////////////////////////////////////////////////////////////////
-    // Definitions
-    // ////////////////////////////////////////////////////////////////
-
     public enum Area {
         TOP, CENTER, BOTTOM
     }
@@ -34,10 +30,6 @@ public class FilterTabPanelManager {
     private LinkedList<Component> topList = new LinkedList<Component>();
     private LinkedList<Component> centerList = new LinkedList<Component>();
     private LinkedList<Component> bottomList = new LinkedList<Component>();
-
-    // ////////////////////////////////////////////////////////////////
-    // Methods
-    // ////////////////////////////////////////////////////////////////
 
     /**
      * Adds a component to the manager. This function calls
@@ -155,47 +147,19 @@ public class FilterTabPanelManager {
                  * handcrafted and hardcoded :(
                  */
                 if (details.getDetails() == FilterAlignmentDetails.POSITION_OPACITY) {
-                    c.fill = GridBagConstraints.NONE;
-                    c.anchor = GridBagConstraints.WEST;
-                    c.gridx = 2;
-                    c.gridy = 1;
-                    c.weightx = 0;
-                    c.gridwidth = 1;
-                    compactPanel.add(comp, c);
-                    c.gridy = 0;
-                    compactPanel.add(new JLabel("Opacity:"), c);
-                } else if (details.getDetails() == FilterAlignmentDetails.POSITION_QUALITY) {
-                    c.fill = GridBagConstraints.NONE;
-                    c.anchor = GridBagConstraints.EAST;
-                    c.gridwidth = 1;
-                    c.gridx = 1;
-                    c.gridy = 1;
-                    c.weightx = 0;
-                    compactPanel.add(comp, c);
-                    c.gridy = 0;
-                    compactPanel.add(new JLabel("Quality:"), c);
-                } else if (details.getDetails() == FilterAlignmentDetails.POSITION_COLORTABLES) {
                     c.gridwidth = 3;
-                    c.gridx = 0;
-                    c.gridy = 6;
-                    c.weightx = 1;
-                    c.fill = GridBagConstraints.HORIZONTAL;
-                    compactPanel.add(comp, c);
-                } else if (details.getDetails() == FilterAlignmentDetails.POSITION_LAYERNAME) {
-                    c.gridwidth = 1;
                     c.weightx = 1;
                     c.gridx = 0;
                     c.gridy = 0;
                     c.anchor = GridBagConstraints.WEST;
-                    compactPanel.add(new JLabel("Selected Layer:"), c);
-                    c.gridy = 1;
                     c.fill = GridBagConstraints.HORIZONTAL;
                     compactPanel.add(comp, c);
+                    c.gridy = 0;
                 } else if (details.getDetails() == FilterAlignmentDetails.POSITION_SHARPEN) {
                     c.gridwidth = 3;
                     c.weightx = 1;
                     c.gridx = 0;
-                    c.gridy = 3;
+                    c.gridy = 1;
                     c.anchor = GridBagConstraints.WEST;
                     c.fill = GridBagConstraints.HORIZONTAL;
                     compactPanel.add(comp, c);
@@ -203,7 +167,7 @@ public class FilterTabPanelManager {
                     c.gridwidth = 3;
                     c.weightx = 1;
                     c.gridx = 0;
-                    c.gridy = 4;
+                    c.gridy = 2;
                     c.anchor = GridBagConstraints.WEST;
                     c.fill = GridBagConstraints.HORIZONTAL;
                     compactPanel.add(comp, c);
@@ -211,7 +175,15 @@ public class FilterTabPanelManager {
                     c.gridwidth = 3;
                     c.weightx = 1;
                     c.gridx = 0;
-                    c.gridy = 5;
+                    c.gridy = 3;
+                    c.anchor = GridBagConstraints.WEST;
+                    c.fill = GridBagConstraints.HORIZONTAL;
+                    compactPanel.add(comp, c);
+                } else if (details.getDetails() == FilterAlignmentDetails.POSITION_COLORTABLES) {
+                    c.gridwidth = 3;
+                    c.weightx = 1;
+                    c.gridx = 0;
+                    c.gridy = 4;
                     c.anchor = GridBagConstraints.WEST;
                     c.fill = GridBagConstraints.HORIZONTAL;
                     compactPanel.add(comp, c);
@@ -219,7 +191,7 @@ public class FilterTabPanelManager {
                     c.gridwidth = 3;
                     c.weightx = 1;
                     c.gridx = 0;
-                    c.gridy = 7;
+                    c.gridy = 5;
                     c.anchor = GridBagConstraints.WEST;
                     c.fill = GridBagConstraints.HORIZONTAL;
                     compactPanel.add(comp, c);
@@ -228,4 +200,5 @@ public class FilterTabPanelManager {
         }
         return compactPanel;
     }
+
 }
