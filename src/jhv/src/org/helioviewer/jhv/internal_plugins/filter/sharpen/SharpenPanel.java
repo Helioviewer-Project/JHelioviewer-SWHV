@@ -58,7 +58,6 @@ public class SharpenPanel extends FilterPanel implements ChangeListener, FilterA
     /**
      * {@inheritDoc}
      */
-
     @Override
     public void setFilter(Filter filter) {
         if (filter instanceof SharpenFilter) {
@@ -73,7 +72,6 @@ public class SharpenPanel extends FilterPanel implements ChangeListener, FilterA
     /**
      * {@inheritDoc}
      */
-
     @Override
     public Area getArea() {
         return Area.TOP;
@@ -84,7 +82,7 @@ public class SharpenPanel extends FilterPanel implements ChangeListener, FilterA
      */
     @Override
     public void stateChanged(ChangeEvent e) {
-        filter.setWeighting(sharpeningSlider.getValue() / 10.0f);
+        filter.setWeighting(sharpeningSlider.getValue() / 10.f);
         sharpeningLabel.setText(sharpeningSlider.getValue() + "%");
     }
 
@@ -97,7 +95,6 @@ public class SharpenPanel extends FilterPanel implements ChangeListener, FilterA
      * Override the setEnabled method in order to keep the containing
      * components' enabledState synced with the enabledState of this component.
      */
-
     @Override
     public void setEnabled(boolean enabled) {
         super.setEnabled(enabled);
@@ -109,14 +106,14 @@ public class SharpenPanel extends FilterPanel implements ChangeListener, FilterA
     /**
      * Sets the sharpen value.
      *
-     * This may be useful, if the opacity is changed from another source than
+     * This may be useful if the sharpen value is changed from another source than
      * the slider itself.
      *
      * @param sharpen
-     *            New opacity value. Must be within [0, 10]
+     *            New sharpen value. Must be within [0, 10]
      */
     void setValue(float sharpen) {
-        sharpeningSlider.setValue((int) (sharpen * 10));
+        sharpeningSlider.setValue((int) (sharpen * 10.f));
     }
 
 }
