@@ -151,7 +151,7 @@ public class JHVJP2View extends AbstractView implements JP2View, ViewportView, R
             abolish();
         }
 
-        MetaData metaData = newJP2Image.metaDataList.get(0);
+        MetaData metaData = newJP2Image.metaDataList[0];
         if (region == null) {
             if (!(metaData instanceof PixelBasedMetaData)) {
                 region = StaticRegion.createAdaptedRegion(metaData.getPhysicalLowerLeft(), metaData.getPhysicalImageSize());
@@ -319,7 +319,7 @@ public class JHVJP2View extends AbstractView implements JP2View, ViewportView, R
             frameNumber = imageData.getFrameNumber();
         }
 
-        return jp2Image.metaDataList.get(frameNumber);
+        return jp2Image.metaDataList[frameNumber];
     }
 
     /**
@@ -399,7 +399,7 @@ public class JHVJP2View extends AbstractView implements JP2View, ViewportView, R
             frameNumber = imageData.getFrameNumber();
         }
 
-        MetaData metaData = jp2Image.metaDataList.get(frameNumber);
+        MetaData metaData = jp2Image.metaDataList[frameNumber];
         if (metaData instanceof ObserverMetaData) {
             ObserverMetaData observerMetaData = (ObserverMetaData) metaData;
             return observerMetaData.getFullName();
@@ -557,7 +557,7 @@ public class JHVJP2View extends AbstractView implements JP2View, ViewportView, R
      */
     protected JP2ImageParameter calculateParameter(Viewport v, Region r, int numQualityLayers, int frameNumber) {
         ViewportImageSize imageViewportDimension = ViewHelper.calculateViewportImageSize(v, r);
-        MetaData metaData = jp2Image.metaDataList.get(frameNumber);
+        MetaData metaData = jp2Image.metaDataList[frameNumber];
 
         // calculate total resolution of the image necessary to
         // have the requested resolution in the subimage
@@ -723,7 +723,7 @@ public class JHVJP2View extends AbstractView implements JP2View, ViewportView, R
      *            {@link org.helioviewer.viewmodel.region.Region}
      */
     void setSubimageData(ImageData newImageData, SubImage roi, int compositionLayer, double zoompercent, boolean fullyLoaded) {
-        MetaData metaData = jp2Image.metaDataList.get(compositionLayer);
+        MetaData metaData = jp2Image.metaDataList[compositionLayer];
 
         if (metaData instanceof ObserverMetaData) {
             ImmutableDateTime dtc = metaData.getDateTime();

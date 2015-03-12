@@ -254,29 +254,7 @@ public class LayersModel implements ViewListener {
             result = tmv.getFrameDateTime(0);
         } else {
             // else try to acces a timestamp by assuming it is a plain image
-            result = getImageTimestamp(view);
-        }
-
-        return result;
-    }
-
-    /**
-     * Retrieve the timestamp from an imageView which contains metaData
-     *
-     * @param view
-     * @return timestamp associated with the image data currently presented
-     */
-    private ImmutableDateTime getImageTimestamp(View view) {
-        ImmutableDateTime result = null;
-
-        if (view == null) {
-            return null;
-        }
-
-        MetaDataView mdv = view.getAdapter(MetaDataView.class);
-
-        if (mdv != null) {
-            result = mdv.getMetaData().getDateTime(); // null for PixelBasedMetaData
+            result = getCurrentFrameTimestamp(view);
         }
 
         return result;
@@ -345,7 +323,7 @@ public class LayersModel implements ViewListener {
             result = tmv.getFrameDateTime(lastFrame);
         } else {
             // else try to acces a timestamp by assuming it is a plain image
-            result = getImageTimestamp(view);
+            result = getCurrentFrameTimestamp(view);
         }
 
         return result;
