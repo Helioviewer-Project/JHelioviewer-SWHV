@@ -1,7 +1,5 @@
 package org.helioviewer.jhv.plugins.swek.request;
 
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -13,7 +11,6 @@ import org.helioviewer.jhv.layers.LayersModel;
 import org.helioviewer.jhv.plugins.swek.receive.SWEKEventHandler;
 import org.helioviewer.viewmodel.view.View;
 import org.helioviewer.viewmodel.view.jp2view.JHVJPXView;
-import org.helioviewer.viewmodel.view.jp2view.kakadu.JHV_KduException;
 
 /**
  * This class intercepts changes of the layers and request data from the
@@ -51,30 +48,15 @@ public class OutgoingRequestManager implements LayersListener {
 
     @Override
     public void layerAdded(int idx) {
-        try {
-            View activeView = LayersModel.getSingletonInstance().getActiveView();
-            List<Date> requestDates = new ArrayList<Date>();
-            JHVJPXView jpxView = activeView.getAdapter(JHVJPXView.class);
-            if (jpxView != null) {
-                for (int frame = 1; frame <= jpxView.getMaximumFrameNumber(); frame++) {
-                    String dateOBS = jpxView.getJP2Image().getValueFromXML("DATE-OBS", "fits", frame);
-                    if (dateOBS == null) {
-                        dateOBS = jpxView.getJP2Image().getValueFromXML("DATE_OBS", "fits", frame);
-                    }
-                    if (dateOBS != null) {
-                        Date parsedDate = parseDate(dateOBS);
-                        if (parsedDate != null) {
-                            requestDates.add(parsedDate);
-                        }
-                    } else {
-                        Log.error("Destroy myself with handgrenade. No date-obs in whatever dialect could be found");
-                    }
-                }
+        View activeView = LayersModel.getSingletonInstance().getActiveView();
+        List<Date> requestDates = new ArrayList<Date>();
+        JHVJPXView jpxView = activeView.getAdapter(JHVJPXView.class);
+        if (jpxView != null) {
+            for (int frame = 0; frame <= jpxView.getMaximumFrameNumber(); frame++) {
+                requestDates.add(jpxView.getFrameDateTime(frame).getTime());
             }
-            JHVEventContainer.getSingletonInstance().requestForDateList(requestDates, swekEventHandler);
-        } catch (JHV_KduException ex) {
-            Log.error("Received an kakadu exception. " + ex);
         }
+        JHVEventContainer.getSingletonInstance().requestForDateList(requestDates, swekEventHandler);
     }
 
     @Override
@@ -117,24 +99,6 @@ public class OutgoingRequestManager implements LayersListener {
     public void layerDownloaded(int idx) {
         // TODO Auto-generated method stub
 
-    }
-
-    /**
-     * Parses a date in string with the format yyyy-MM-dd'T'HH:mm:ss.SSS into a
-     * date object.
-     * 
-     * @param dateOBS
-     *            the date to parse
-     * @return The parsed date
-     */
-    private Date parseDate(String dateOBS) {
-        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS");
-        try {
-            return sdf.parse(dateOBS);
-        } catch (ParseException e) {
-            Log.warn("Could not parse date:" + dateOBS + ". Returned null.");
-            return null;
-        }
     }
 
 }

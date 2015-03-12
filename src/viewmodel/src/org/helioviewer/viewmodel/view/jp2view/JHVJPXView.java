@@ -491,9 +491,4 @@ public class JHVJPXView extends JHVJP2View implements TimedMovieView, CachedMovi
         return this.render.getMovieRelativeSpeed();
     }
 
-    @Override
-    public ArrayList<MetaData> getMetaDataList() {
-        return jp2Image.metaDataList;
-    }
-
 }
