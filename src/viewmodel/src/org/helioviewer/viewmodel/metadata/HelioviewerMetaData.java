@@ -26,7 +26,7 @@ import org.helioviewer.viewmodel.view.jp2view.image.SubImage;
  */
 public class HelioviewerMetaData extends AbstractMetaData implements SunMetaData, ObserverMetaData, ImageSizeMetaData {
 
-    protected MetaDataContainer metaDataContainer;
+    protected MetaDataContainer m;
     private String instrument = "";
     private String detector = "";
     private String measurement = " ";
@@ -49,8 +49,8 @@ public class HelioviewerMetaData extends AbstractMetaData implements SunMetaData
      * @param m
      *            Meta data container serving as a base for the construction
      */
-    public HelioviewerMetaData(MetaDataContainer m) {
-        metaDataContainer = m;
+    public HelioviewerMetaData(MetaDataContainer metaDataContainer) {
+        m = metaDataContainer;
 
         if (m.get("INSTRUME") == null)
             return;
@@ -158,8 +158,8 @@ public class HelioviewerMetaData extends AbstractMetaData implements SunMetaData
     protected boolean updatePixelParameters() {
         boolean changed = false;
 
-        if (pixelImageSize.getX() != metaDataContainer.getPixelWidth() || pixelImageSize.getY() != metaDataContainer.getPixelHeight()) {
-            pixelImageSize = new Vector2dInt(metaDataContainer.getPixelWidth(), metaDataContainer.getPixelHeight());
+        if (pixelImageSize.getX() != m.getPixelWidth() || pixelImageSize.getY() != m.getPixelHeight()) {
+            pixelImageSize = new Vector2dInt(m.getPixelWidth(), m.getPixelHeight());
             changed = true;
         }
 
@@ -170,8 +170,8 @@ public class HelioviewerMetaData extends AbstractMetaData implements SunMetaData
         double allowedRelativeDifference = 0.005;
 
         if (instrument.contains("HMI") || instrument.contains("AIA") || instrument.contains("SWAP") || instrument.contains("VSM") || instrument.contains("NRH") || instrument.contains("GONG") || instrument.contains("H-alpha") || instrument.contains("CALLISTO")) {
-            double arcsecPerPixelX = metaDataContainer.tryGetDouble("CDELT1");
-            double arcsecPerPixelY = metaDataContainer.tryGetDouble("CDELT2");
+            double arcsecPerPixelX = m.tryGetDouble("CDELT1");
+            double arcsecPerPixelY = m.tryGetDouble("CDELT2");
             if (Double.isNaN(arcsecPerPixelX)) {
                 if (Double.isNaN(arcsecPerPixelY)) {
                     Log.warn(">> HelioviewerMetaData.readPixelParameters() > Both CDELT1 and CDELT2 are NaN. Use 0.6 as default value.");
@@ -185,12 +185,12 @@ public class HelioviewerMetaData extends AbstractMetaData implements SunMetaData
                 Log.warn(">> HelioviewerMetaData.readPixelParameters() > CDELT1 and CDELT2 have different values. CDELT1 is used.");
             }
             // distance to sun in meters
-            double distanceToSun = metaDataContainer.tryGetDouble("DSUN_OBS");
+            double distanceToSun = m.tryGetDouble("DSUN_OBS");
             double radiusSunInArcsec = Math.atan(Constants.SunRadiusInMeter / distanceToSun) * MathUtils.radeg * 3600;
             newSolarPixelRadius = radiusSunInArcsec / arcsecPerPixelX;
 
         } else if (instrument.equals("EIT")) {
-            newSolarPixelRadius = metaDataContainer.tryGetDouble("SOLAR_R");
+            newSolarPixelRadius = m.tryGetDouble("SOLAR_R");
 
             if (newSolarPixelRadius == 0) {
                 if (pixelImageWidth == 1024) {
@@ -201,7 +201,7 @@ public class HelioviewerMetaData extends AbstractMetaData implements SunMetaData
             }
 
         } else if (detector.equals("C2") || detector.equals("C3")) {
-            newSolarPixelRadius = metaDataContainer.tryGetDouble("RSUN");
+            newSolarPixelRadius = m.tryGetDouble("RSUN");
             allowedRelativeDifference = 0.05;
 
             if (newSolarPixelRadius == 0) {
@@ -214,12 +214,12 @@ public class HelioviewerMetaData extends AbstractMetaData implements SunMetaData
             }
 
         } else if (instrument.equals("MDI")) {
-            newSolarPixelRadius = metaDataContainer.tryGetDouble("R_SUN");
+            newSolarPixelRadius = m.tryGetDouble("R_SUN");
 
         } else if (detector.equals("COR1") || detector.equals("COR2") || detector.equals("EUVI")) {
-            double solarRadiusArcSec = metaDataContainer.tryGetDouble("RSUN");
-            double arcSecPerPixel = metaDataContainer.tryGetDouble("CDELT1");
-            double arcSecPerPixel2 = metaDataContainer.tryGetDouble("CDELT2");
+            double solarRadiusArcSec = m.tryGetDouble("RSUN");
+            double arcSecPerPixel = m.tryGetDouble("CDELT1");
+            double arcSecPerPixel2 = m.tryGetDouble("CDELT2");
             if (arcSecPerPixel != arcSecPerPixel2) {
                 Log.warn("HelioviewerMetaData: STEREO Meta Data inconsistent! Resolution not the same in x and y direction! (1: " + arcSecPerPixel + ", 2: " + arcSecPerPixel2 + ")");
             }
@@ -234,8 +234,8 @@ public class HelioviewerMetaData extends AbstractMetaData implements SunMetaData
         }
 
         double allowedCenterPixelDistance = 1.;
-        double sunX = metaDataContainer.tryGetDouble("CRPIX1") - 1;
-        double sunY = metaDataContainer.tryGetDouble("CRPIX2") - 1;
+        double sunX = m.tryGetDouble("CRPIX1") - 1;
+        double sunY = m.tryGetDouble("CRPIX2") - 1;
         double dX = sunPixelPosition.getX() - sunX;
         double dY = sunPixelPosition.getY() - sunY;
 
@@ -260,12 +260,12 @@ public class HelioviewerMetaData extends AbstractMetaData implements SunMetaData
     }
 
     private void updateDateTime() {
-        String observedDate = metaDataContainer.get("DATE-OBS");
+        String observedDate = m.get("DATE-OBS");
         if (observedDate == null) {
-            observedDate = metaDataContainer.get("DATE_OBS");
+            observedDate = m.get("DATE_OBS");
 
             if (observedDate != null && instrument.equals("LASCO")) {
-                observedDate += "T" + metaDataContainer.get("TIME_OBS");
+                observedDate += "T" + m.get("TIME_OBS");
             }
         }
 

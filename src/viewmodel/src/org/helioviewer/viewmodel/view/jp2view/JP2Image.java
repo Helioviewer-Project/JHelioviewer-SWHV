@@ -51,7 +51,7 @@ import org.w3c.dom.NodeList;
  * @author Benjamin Wamsler
  * @author Juan Pablo
  */
-public class JP2Image implements MetaDataContainer {
+public class JP2Image {
 
     /** An array of the file extensions this class currently supports */
     public static final String[] SUPPORTED_EXTENSIONS = { ".JP2", ".JPX" };
@@ -109,6 +109,7 @@ public class JP2Image implements MetaDataContainer {
 
     public MetaData[] metaDataList;
     private NodeList[] xmlCache;
+    private hvXMLMetadata hvMetadata = new hvXMLMetadata();
 
     private JHVJP2View parentView;
     private final ReentrantLock lock = new ReentrantLock();
@@ -434,9 +435,91 @@ public class JP2Image implements MetaDataContainer {
         KakaduUtils.parseAllXMLs(familySrc, xmlCache, num);
 
         for (int i = 0; i < num; i++) {
-            uglyFrameNumber = i + 1;
-            metaDataList[i] = MetaDataConstructor.getMetaData(this);
+            hvMetadata.setNode(xmlCache[i]);
+            metaDataList[i] = MetaDataConstructor.getMetaData(hvMetadata);
         }
+    }
+
+    private static class hvXMLMetadata implements MetaDataContainer {
+
+        private static NodeList nodeList;
+
+        public void setNode(NodeList nodeList) {
+            this.nodeList = nodeList;
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public String get(String key) {
+            try {
+                String value = getValueFromXML(nodeList, key, "fits");
+                return value;
+            } catch (JHV_KduException e) {
+                if (e.getMessage() == "XML data incomplete" || e.getMessage().toLowerCase().contains("box not open")) {
+                    try {
+                        Thread.sleep(500);
+                    } catch (InterruptedException e1) {}
+
+                    get(key);
+                } else if (e.getMessage() != "No XML data present") {
+                    e.printStackTrace();
+                }
+            }
+            return null;
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public double tryGetDouble(String key) {
+            String string = get(key);
+            if (string != null) {
+                try {
+                    return Double.parseDouble(string);
+                } catch (NumberFormatException e) {
+                    Log.warn("NumberFormatException while trying to parse value \"" + string + "\" of key " + key);
+                    return 0.0;
+                }
+            }
+            return 0.0;
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public int tryGetInt(String key) {
+            String string = get(key);
+            if (string != null) {
+                try {
+                    return Integer.parseInt(string);
+                } catch (NumberFormatException e) {
+                    Log.warn("NumberFormatException while trying to parse value \"" + string + "\" of key " + key);
+                    return 0;
+                }
+            }
+            return 0;
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public int getPixelHeight() {
+            return tryGetInt("NAXIS2");
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public int getPixelWidth() {
+            return tryGetInt("NAXIS1");
+        }
+
     }
 
     /**
@@ -447,10 +530,10 @@ public class JP2Image implements MetaDataContainer {
      * @param _boxNumber
      * @throws JHV_KduException
      */
-    private String getValueFromXML(String _keyword, String _box, int _boxNumber) throws JHV_KduException {
+    private static String getValueFromXML(NodeList nodeList, String _keyword, String _box) throws JHV_KduException {
         try {
-            NodeList nodes = ((Element) xmlCache[_boxNumber - 1].item(0)).getElementsByTagName(_box);
-            NodeList value = ((Element) nodes.item(0)).getElementsByTagName(_keyword);
+            NodeList nodes = ((Element) nodeList.item(0)).getElementsByTagName(_box);
+            NodeList value = ((Element) nodeList.item(0)).getElementsByTagName(_keyword);
             Element line = (Element) value.item(0);
 
             if (line == null)
@@ -528,94 +611,6 @@ public class JP2Image implements MetaDataContainer {
         return resolutionSet;
     }
 
-    private int uglyFrameNumber = 1;
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public String get(String key) {
-        try {
-            String value = getValueFromXML(key, "fits", uglyFrameNumber);
-            return value;
-        } catch (JHV_KduException e) {
-            if (e.getMessage() == "XML data incomplete" || e.getMessage().toLowerCase().contains("box not open")) {
-                try {
-                    Thread.sleep(500);
-                } catch (InterruptedException e1) {
-                }
-
-                get(key);
-            } else if (e.getMessage() != "No XML data present") {
-                e.printStackTrace();
-            }
-        }
-        return null;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    // @Override
-    public String get(String key, int frameNumber) throws IOException {
-        try {
-            String value = getValueFromXML(key, "fits", frameNumber + 1);
-            return value;
-        } catch (JHV_KduException e) {
-            throw new IOException(e.getMessage());
-        }
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public double tryGetDouble(String key) {
-        String string = get(key);
-        if (string != null) {
-            try {
-                return Double.parseDouble(string);
-            } catch (NumberFormatException e) {
-                Log.warn("NumberFormatException while trying to parse value \"" + string + "\" of key " + key + " from meta data of\n" + getURI());
-                return 0.0;//Double.NaN;
-            }
-        }
-        return 0.0;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public int tryGetInt(String key) {
-        String string = get(key);
-        if (string != null) {
-            try {
-                return Integer.parseInt(string);
-            } catch (NumberFormatException e) {
-                Log.warn("NumberFormatException while trying to parse value \"" + string + "\" of key " + key + " from meta data of\n" + getURI());
-                return 0;
-            }
-        }
-        return 0;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public int getPixelHeight() {
-        return getResolutionSet().getResolutionLevel(0).getResolutionBounds().height;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public int getPixelWidth() {
-        return getResolutionSet().getResolutionLevel(0).getResolutionBounds().width;
-    }
-
     public static void setCachePath(File newCachePath) {
         cachePath = newCachePath;
     }
@@ -643,14 +638,11 @@ public class JP2Image implements MetaDataContainer {
      */
     public synchronized void abolish() {
         referenceCounter--;
-
         if (referenceCounter > 0)
             return;
-
         if (referenceCounter < 0) {
             throw new IllegalStateException("JP2Image abolished more than once: " + uri);
         }
-
         numJP2Images--;
 
         APIResponseDump.getSingletonInstance().removeResponse(uri);
@@ -685,7 +677,7 @@ public class JP2Image implements MetaDataContainer {
         }
     }
 
-    boolean updateResolutionSet(int compositionLayerCurrentlyInUse) {
+    protected boolean updateResolutionSet(int compositionLayerCurrentlyInUse) {
         if (resolutionSetCompositionLayer == compositionLayerCurrentlyInUse)
             return false;
 
@@ -701,9 +693,14 @@ public class JP2Image implements MetaDataContainer {
             if (!compositor.Get_total_composition_dims(dims))
                 return false;
 
-            Kdu_coords size = dims.Access_size();
-            if (resolutionSet != null && size.Get_x() == getPixelWidth() && size.Get_y() == getPixelHeight())
-                return false;
+            if (resolutionSet != null) {
+                int pixelWidth = resolutionSet.getResolutionLevel(0).getResolutionBounds().width;
+                int pixelHeight = resolutionSet.getResolutionLevel(0).getResolutionBounds().height;
+
+                Kdu_coords size = dims.Access_size();
+                if (size.Get_x() == pixelWidth && size.Get_y() == pixelHeight)
+                    return false;
+            }
 
             resolutionSet = new ResolutionSet(maxDWT + 1);
             resolutionSet.addResolutionLevel(0, KakaduUtils.kdu_dimsToRect(dims));
@@ -715,7 +712,6 @@ public class JP2Image implements MetaDataContainer {
                     break;
                 resolutionSet.addResolutionLevel(i, KakaduUtils.kdu_dimsToRect(dims));
             }
-
         } catch (KduException e) {
             e.printStackTrace();
         }

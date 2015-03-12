@@ -38,33 +38,33 @@ public class HelioviewerPositionedMetaData extends HelioviewerMetaData implement
     }
 
     private void updatePosition() {
-        this.heeqX = metaDataContainer.tryGetDouble("HEQX_OBS");
-        this.heeqY = metaDataContainer.tryGetDouble("HEQY_OBS");
-        this.heeqZ = metaDataContainer.tryGetDouble("HEQZ_OBS");
+        this.heeqX = m.tryGetDouble("HEQX_OBS");
+        this.heeqY = m.tryGetDouble("HEQY_OBS");
+        this.heeqZ = m.tryGetDouble("HEQZ_OBS");
         this.heeqAvailable = this.heeqX != 0.0 || this.heeqY != 0.0 || this.heeqZ != 0.0;
 
-        this.heeX = metaDataContainer.tryGetDouble("HEEX_OBS");
-        this.heeY = metaDataContainer.tryGetDouble("HEEY_OBS");
-        this.heeZ = metaDataContainer.tryGetDouble("HEEZ_OBS");
+        this.heeX = m.tryGetDouble("HEEX_OBS");
+        this.heeY = m.tryGetDouble("HEEY_OBS");
+        this.heeZ = m.tryGetDouble("HEEZ_OBS");
         this.heeAvailable = this.heeX != 0.0 || this.heeY != 0.0 || this.heeZ != 0.0;
 
-        this.crlt = metaDataContainer.tryGetDouble("CRLT_OBS");
-        this.crln = metaDataContainer.tryGetDouble("CRLN_OBS");
-        this.dobs = metaDataContainer.tryGetDouble("DSUN_OBS");
+        this.crlt = m.tryGetDouble("CRLT_OBS");
+        this.crln = m.tryGetDouble("CRLN_OBS");
+        this.dobs = m.tryGetDouble("DSUN_OBS");
         this.carringtonAvailable = this.crlt != 0.0 || this.crln != 0.0;
 
-        this.refb0 = metaDataContainer.tryGetDouble("REF_B0");
-        this.refl0 = metaDataContainer.tryGetDouble("REF_L0");
+        this.refb0 = m.tryGetDouble("REF_B0");
+        this.refl0 = m.tryGetDouble("REF_L0");
         this.refAvailable = this.refb0 != 0.0 || this.refl0 != 0.0;
 
-        this.stonyhurstLatitude = metaDataContainer.tryGetDouble("HGLT_OBS");
+        this.stonyhurstLatitude = m.tryGetDouble("HGLT_OBS");
         if (this.stonyhurstLatitude == 0) {
             this.stonyhurstLatitude = this.crlt;
             if (this.stonyhurstLatitude == 0) {
                 this.stonyhurstLatitude = this.refb0;
             }
         }
-        this.stonyhurstLongitude = metaDataContainer.tryGetDouble("HGLN_OBS");
+        this.stonyhurstLongitude = m.tryGetDouble("HGLN_OBS");
         if (this.refl0 != 0.) {
             this.stonyhurstLongitude = this.refl0 - Astronomy.getL0Degree(this.getDateTime().getTime());
         }
