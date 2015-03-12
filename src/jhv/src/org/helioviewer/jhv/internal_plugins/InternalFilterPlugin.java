@@ -87,4 +87,5 @@ public class InternalFilterPlugin extends FilterPlugin {
     public String getAboutLicenseText() {
         return null;
     }
+
 }

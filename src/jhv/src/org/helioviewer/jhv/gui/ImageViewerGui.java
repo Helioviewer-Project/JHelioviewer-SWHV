@@ -61,7 +61,6 @@ import org.helioviewer.jhv.internal_plugins.filter.gammacorrection.GammaCorrecti
 import org.helioviewer.jhv.internal_plugins.filter.opacity.OpacityFilter;
 import org.helioviewer.jhv.internal_plugins.filter.opacity.OpacityPanel;
 import org.helioviewer.jhv.internal_plugins.filter.sharpen.SharpenPanel;
-import org.helioviewer.jhv.internal_plugins.selectedLayer.SelectedLayerPanel;
 import org.helioviewer.jhv.io.APIRequestManager;
 import org.helioviewer.jhv.io.CommandLineProcessor;
 import org.helioviewer.jhv.io.FileDownloader;
@@ -342,7 +341,6 @@ public class ImageViewerGui {
             FilterTabPanelManager compactPanelManager = new FilterTabPanelManager();
             compactPanelManager.add(new OpacityPanel());
             compactPanelManager.add(new SOHOLUTPanel());
-            compactPanelManager.add(new SelectedLayerPanel(null));
             compactPanelManager.add(new GammaCorrectionPanel());
             compactPanelManager.add(new ContrastPanel());
             compactPanelManager.add(new SharpenPanel());
