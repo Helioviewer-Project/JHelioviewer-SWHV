@@ -112,8 +112,8 @@ public class JP2Image implements MetaDataContainer {
     /** cache path */
     private static File cachePath;
 
-    public ArrayList<MetaData> metaDataList;
-    public NodeList[] xmlCache;
+    public MetaData[] metaDataList;
+    private NodeList[] xmlCache;
 
     private JHVJP2View parentView;
     private final ReentrantLock lock = new ReentrantLock();
@@ -187,7 +187,7 @@ public class JP2Image implements MetaDataContainer {
 
         createKakaduMachinery();
 
-        metaDataList = new ArrayList<MetaData>(layerRange.getEnd() + 1);
+        metaDataList = new MetaData[layerRange.getEnd() + 1];
         xmlCache = new NodeList[layerRange.getEnd() + 1];
 
         try {
@@ -458,7 +458,7 @@ public class JP2Image implements MetaDataContainer {
 
                 uglyFrameNumber = i + 1;
 
-                metaDataList.add(i, MetaDataConstructor.getMetaData(this));
+                metaDataList[i] = MetaDataConstructor.getMetaData(this);
             } catch (Exception e) {
                 throw new JHV_KduException("Failed parsing XML data", e);
             }

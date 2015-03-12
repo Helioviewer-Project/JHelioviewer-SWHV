@@ -193,7 +193,6 @@ class J2KRender implements Runnable {
     }
 
     public void setMovieMode(boolean val) {
-
         if (movieMode) {
             myThread.interrupt();
             System.gc();
@@ -203,11 +202,9 @@ class J2KRender implements Runnable {
         if (frameChooser instanceof AbsoluteFrameChooser) {
             ((AbsoluteFrameChooser) frameChooser).resetStartTime(currParams.compositionLayer);
         }
-
     }
 
     public void setMovieRelativeSpeed(int framesPerSecond) {
-
         if (movieMode && lastSleepTime > 1000) {
             myThread.interrupt();
         }
@@ -217,7 +214,6 @@ class J2KRender implements Runnable {
     }
 
     public void setMovieAbsoluteSpeed(int secondsPerSecond) {
-
         if (movieMode && lastSleepTime > 1000) {
             myThread.interrupt();
         }
@@ -328,10 +324,7 @@ class J2KRender implements Runnable {
                 }
 
                 localIntBuffer = newPixels > localIntBuffer.length ? new int[newPixels << 1] : localIntBuffer;
-
                 compositorBuf.Get_region(newRegion, localIntBuffer);
-                // Log.debug("Local Int Buffer : " +
-                // Arrays.toString(localIntBuffer));
 
                 int srcIdx = 0;
                 int destIdx = newOffset.Get_x() + newOffset.Get_y() * roi.width;
@@ -347,8 +340,6 @@ class J2KRender implements Runnable {
                         System.arraycopy(localIntBuffer, srcIdx, intBuffer[currentIntBuffer], destIdx, newWidth);
                     }
                 }
-                // Log.debug("byteBuffer : " +
-                // Arrays.toString(byteBuffer[currentByteBuffer]));
             }
 
             if (parentImageRef.getNumComponents() == 2) {
@@ -370,10 +361,7 @@ class J2KRender implements Runnable {
                     }
 
                     localIntBuffer = newPixels > localIntBuffer.length ? new int[newPixels << 1] : localIntBuffer;
-
                     compositorBuf.Get_region(newRegion, localIntBuffer);
-                    // Log.debug("Local Int Buffer : " +
-                    // Arrays.toString(localIntBuffer));
 
                     int srcIdx = 0;
                     int destIdx = newOffset.Get_x() + newOffset.Get_y() * roi.width;
@@ -386,8 +374,6 @@ class J2KRender implements Runnable {
                             intBuffer[currentByteBuffer][destIdx + col] = (intBuffer[currentByteBuffer][destIdx + col] & 0x00FFFFFF) | ((localIntBuffer[srcIdx + col] & 0x00FF0000) << 8);
                         }
                     }
-                    // Log.debug("byteBuffer : " +
-                    // Arrays.toString(byteBuffer[currentByteBuffer]));
                 }
             }
 
@@ -400,7 +386,6 @@ class J2KRender implements Runnable {
         } finally {
             parentImageRef.getLock().unlock();
         }
-
     }
 
     /**
@@ -422,7 +407,6 @@ class J2KRender implements Runnable {
             }
 
             currParams = parentViewRef.getImageViewParams();
-
             nextFrameCandidateChooser.updateRange();
 
             while (!Thread.interrupted() && !stop) {
@@ -509,6 +493,7 @@ class J2KRender implements Runnable {
                     }
                 }
             }
+
             numFrames += currParams.compositionLayer - lastFrame;
             lastFrame = currParams.compositionLayer;
             if (lastFrame > currParams.compositionLayer) {
@@ -550,7 +535,6 @@ class J2KRender implements Runnable {
     }
 
     private class NextFrameCandidateLoopChooser extends NextFrameCandidateChooser {
-
         @Override
         public int getNextCandidate(int lastCandidate) {
             if (++lastCandidate > layers.getEnd()) {
@@ -563,7 +547,6 @@ class J2KRender implements Runnable {
     }
 
     private class NextFrameCandidateStopChooser extends NextFrameCandidateChooser {
-
         @Override
         public int getNextCandidate(int lastCandidate) {
             if (++lastCandidate > layers.getEnd()) {
@@ -610,11 +593,11 @@ class J2KRender implements Runnable {
 
     private class AbsoluteFrameChooser implements FrameChooser {
 
-        private long absoluteStartTime = parentViewRef.jp2Image.metaDataList.get(currParams.compositionLayer).getDateTime().getMillis();
+        private long absoluteStartTime = parentViewRef.jp2Image.metaDataList[currParams.compositionLayer].getDateTime().getMillis();
         private long systemStartTime = System.currentTimeMillis();
 
         public void resetStartTime(int frameNumber) {
-            absoluteStartTime = parentViewRef.jp2Image.metaDataList.get(frameNumber).getDateTime().getMillis();
+            absoluteStartTime = parentViewRef.jp2Image.metaDataList[frameNumber].getDateTime().getMillis();
             systemStartTime = System.currentTimeMillis();
         }
 
@@ -628,7 +611,7 @@ class J2KRender implements Runnable {
                 nextCandidate = nextFrameCandidateChooser.getNextCandidate(nextCandidate);
 
                 lastDiff = nextDiff;
-                nextDiff = Math.abs(parentViewRef.jp2Image.metaDataList.get(nextCandidate).getDateTime().getMillis() - absoluteStartTime) - ((System.currentTimeMillis() - systemStartTime) * movieSpeed);
+                nextDiff = Math.abs(parentViewRef.jp2Image.metaDataList[nextCandidate].getDateTime().getMillis() - absoluteStartTime) - ((System.currentTimeMillis() - systemStartTime) * movieSpeed);
             } while (nextDiff < 0);
 
             if (-lastDiff < nextDiff) {
