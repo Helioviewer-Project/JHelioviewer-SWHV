@@ -42,7 +42,7 @@ public class GammaCorrectionPanel extends FilterPanel implements ChangeListener,
     public GammaCorrectionPanel() {
         setLayout(new BoxLayout(this, BoxLayout.LINE_AXIS));
 
-        title = new JLabel("Gamma:");
+        title = new JLabel("Gamma");
         title.setPreferredSize(new Dimension(FilterPanel.titleWidth, FilterPanel.height));
         add(title);
 

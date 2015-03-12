@@ -36,7 +36,7 @@ public class OpacityPanel extends FilterPanel implements ChangeListener, FilterA
     public OpacityPanel() {
         setLayout(new BoxLayout(this, BoxLayout.LINE_AXIS));
 
-        title = new JLabel("Opacity:");
+        title = new JLabel("Opacity");
         title.setPreferredSize(new Dimension(FilterPanel.titleWidth, FilterPanel.height));
         add(title);
 
