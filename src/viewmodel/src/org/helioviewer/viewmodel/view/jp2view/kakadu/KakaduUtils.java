@@ -419,10 +419,9 @@ public class KakaduUtils {
         else if (!xml.contains("</meta>")) {
             throw new JHV_KduException("XML data incomplete");
         }
-        xml = xml.trim().replace("&", "&amp;").replace("$OBS", "");
 
         try {
-            InputStream in = new ByteArrayInputStream(xml.getBytes("UTF-8"));
+            InputStream in = new ByteArrayInputStream(xml.trim().replace("&", "&amp;").getBytes("UTF-8"));
             DocumentBuilder builder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
             return builder.parse(in).getElementsByTagName("meta");
 

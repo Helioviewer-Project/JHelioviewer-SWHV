@@ -260,20 +260,19 @@ public class HelioviewerMetaData extends AbstractMetaData implements SunMetaData
     }
 
     private void updateDateTime() {
-        String observedDate;
-        if (instrument.contains("SWAP") || instrument.contains("NRH") || instrument.contains("GONG") || instrument.contains("VSM") || instrument.contains("CALLISTO")) {
-            observedDate = metaDataContainer.get("DATE-OBS");
-        } else {
+        String observedDate = metaDataContainer.get("DATE-OBS");
+        if (observedDate == null) {
             observedDate = metaDataContainer.get("DATE_OBS");
-        }
-        if (detector.equals("C2") || detector.equals("C3")) {
-            observedDate += "T" + metaDataContainer.get("TIME_OBS");
+
+            if (observedDate != null && instrument.equals("LASCO")) {
+                observedDate += "T" + metaDataContainer.get("TIME_OBS");
+            }
         }
 
         dateTime = parseDateTime(observedDate);
     }
 
-    public static ImmutableDateTime parseDateTime(String dateTime) {
+    private static ImmutableDateTime parseDateTime(String dateTime) {
         int year = 0, month = 0, day = 0, hour = 0, minute = 0, second = 0;
 
         if (dateTime != null) {
