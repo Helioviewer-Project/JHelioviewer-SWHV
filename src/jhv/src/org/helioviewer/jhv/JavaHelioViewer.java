@@ -226,17 +226,7 @@ public class JavaHelioViewer {
         Log.info("Update settings");
         Settings.getSingletonInstance().update();
 
-        /* ----------Setup CG ----------- */
-        Log.info("Try to install CG Compiler");
-        if (null == ResourceLoader.getSingletonInstance().loadResource("cgc", libsRemote, libs, libs, libsBackup, System.getProperties())) {
-            Log.error("Could not install CG Compiler");
-            Message.err("Error installing CG Compiler", "The CG Compiler could not be installed. JHelioviewer will not work.", false);
-        } else {
-            Log.info("Successfully installed CG Compiler");
-        }
-
         /* ----------Setup FFmpeg ----------- */
-
         splash.nextStep();
         splash.setProgressText("Initialize FFmpeg...");
         // Load/download ffmpeg
