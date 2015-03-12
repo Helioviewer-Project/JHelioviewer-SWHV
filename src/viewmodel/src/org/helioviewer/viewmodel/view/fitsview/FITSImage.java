@@ -24,19 +24,10 @@ import org.helioviewer.viewmodel.metadata.MetaDataContainer;
  * */
 public class FITSImage implements MetaDataContainer {
 
-    // /////////////////////////////////////////////////////////////////////////
-    // Definitions
-    // /////////////////////////////////////////////////////////////////////////
-
     private static final float MDI_THRESHOLD = 2000f;
 
     private Header header = null;
-
     private BufferedImage image = null;
-
-    // /////////////////////////////////////////////////////////////////////////
-    // Methods
-    // /////////////////////////////////////////////////////////////////////////
 
     /**
      * Default constructor.
@@ -47,7 +38,6 @@ public class FITSImage implements MetaDataContainer {
      *             when an error occurred during reading the fits file.
      * */
     public FITSImage(String url) throws Exception {
-
         // access the FITS file
         Fits fits = new Fits(url);
 
@@ -57,14 +47,11 @@ public class FITSImage implements MetaDataContainer {
         header = hdu.getHeader();
 
         if (bitsPerPixel == BasicHDU.BITPIX_BYTE) {
-
             // get image row data
             byte[][] data2D = (byte[][]) ((hdu).getKernel());
-
             // get width and height of image
             int width = data2D[0].length;
             int height = data2D.length;
-
             // transform image row data into 1D image row data
             byte[] data = new byte[width * height];
 
@@ -79,7 +66,6 @@ public class FITSImage implements MetaDataContainer {
             // create buffered image from row data
             SingleChannelByte8ImageData imageData = new SingleChannelByte8ImageData(width, height, data, new ColorMask());
             image = imageData.getBufferedImage();
-
         } else if (bitsPerPixel == BasicHDU.BITPIX_SHORT) {
 
             // get image row data
@@ -125,14 +111,11 @@ public class FITSImage implements MetaDataContainer {
             image = imageData.getBufferedImage();
 
         } else if (bitsPerPixel == BasicHDU.BITPIX_INT) {
-
             // get image row data
             int[][] data2D = (int[][]) ((hdu).getKernel());
-
             // get width and height of image
             int width = data2D[0].length;
             int height = data2D.length;
-
             // transform image row data into 1D image row data
             int[] data = new int[width * height];
 
@@ -149,14 +132,11 @@ public class FITSImage implements MetaDataContainer {
             image = imageData.getBufferedImage();
 
         } else if (bitsPerPixel == BasicHDU.BITPIX_FLOAT) {
-
             // get image row data
             float[][] data2D = (float[][]) ((hdu).getKernel());
-
             // get width and height of image
             int width = data2D[0].length;
             int height = data2D.length;
-
             // transform image row data into 1D image row data
             short[] data = new short[width * height];
 
@@ -168,7 +148,6 @@ public class FITSImage implements MetaDataContainer {
             String measurement = header.getStringValue("DPC_OBSR");
 
             if (instrument != null && measurement != null && instrument.equals("MDI") && measurement.equals("FD_Magnetogram_Sum")) {
-
                 int counter = 0;
                 float doubleThreshold = MDI_THRESHOLD * 2.0f;
 
@@ -183,14 +162,12 @@ public class FITSImage implements MetaDataContainer {
                 }
 
             } else {
-
                 // get the minimum and maximum value from current data
                 float minValue = Float.MAX_VALUE;
                 float maxValue = Float.MIN_VALUE;
 
                 for (int h = 0; h < height; h++) {
                     for (int w = 0; w < width; w++) {
-
                         minValue = data2D[h][w] < minValue ? data2D[h][w] : minValue;
                         maxValue = data2D[h][w] > maxValue ? data2D[h][w] : maxValue;
                     }
@@ -230,7 +207,6 @@ public class FITSImage implements MetaDataContainer {
      *         parameter is less than 1 pixel.
      * */
     public BufferedImage getImage(int x, int y, int height, int width) {
-
         // check parameters and image source
         if (image == null || width <= 0 || height <= 0) {
             return null;
@@ -250,7 +226,6 @@ public class FITSImage implements MetaDataContainer {
      * @return XML string including all FITS header information.
      * */
     public String getHeaderAsXML() {
-
         final String sep = System.getProperty("line.separator");
         StringBuilder builder = new StringBuilder("<?xml version=\"1.0\" encoding=\"UTF-8\"?>" + sep + "<meta>" + sep + "<fits>" + sep);
 
@@ -261,7 +236,6 @@ public class FITSImage implements MetaDataContainer {
                 builder.append("<" + headerCard.getKey() + ">" + headerCard.getValue() + "</" + headerCard.getKey() + ">" + sep);
             }
         }
-
         builder.append("</fits>" + sep + "</meta>");
 
         return builder.toString();
@@ -272,7 +246,6 @@ public class FITSImage implements MetaDataContainer {
      */
     @Override
     public String get(String key) {
-
         return header.getStringValue(key);
     }
 
@@ -281,7 +254,6 @@ public class FITSImage implements MetaDataContainer {
      */
     @Override
     public double tryGetDouble(String key) {
-
         return header.getDoubleValue(key);
     }
 
@@ -290,7 +262,6 @@ public class FITSImage implements MetaDataContainer {
      */
     @Override
     public int tryGetInt(String key) {
-
         return header.getIntValue(key);
     }
 
@@ -299,10 +270,8 @@ public class FITSImage implements MetaDataContainer {
      */
     @Override
     public int getPixelHeight() {
-
         if (image == null)
             return 0;
-
         return image.getHeight();
     }
 
@@ -311,10 +280,9 @@ public class FITSImage implements MetaDataContainer {
      */
     @Override
     public int getPixelWidth() {
-
         if (image == null)
             return 0;
-
         return image.getWidth();
     }
+
 }
