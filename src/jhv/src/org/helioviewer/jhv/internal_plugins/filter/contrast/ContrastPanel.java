@@ -37,7 +37,7 @@ public class ContrastPanel extends FilterPanel implements ChangeListener, MouseL
     public ContrastPanel() {
         setLayout(new BoxLayout(this, BoxLayout.LINE_AXIS));
 
-        title = new JLabel("Contrast:");
+        title = new JLabel("Contrast");
         title.setPreferredSize(new Dimension(FilterPanel.titleWidth, FilterPanel.height));
         add(title);
 
@@ -161,4 +161,5 @@ public class ContrastPanel extends FilterPanel implements ChangeListener, MouseL
     void setValue(float contrast) {
         contrastSlider.setValue((int) (contrast * sliderToContrastScale));
     }
+
 }

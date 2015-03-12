@@ -39,7 +39,7 @@ public class ChannelMixerPanel extends FilterPanel implements ItemListener, Filt
     public ChannelMixerPanel() {
         setLayout(new BoxLayout(this, BoxLayout.LINE_AXIS));
 
-        title = new JLabel("Channels:");
+        title = new JLabel("Channels");
         title.setPreferredSize(new Dimension(FilterPanel.titleWidth, FilterPanel.height));
         add(title);
 
@@ -133,4 +133,5 @@ public class ChannelMixerPanel extends FilterPanel implements ItemListener, Filt
         greenCheckBox.setSelected(colorMask.showGreen());
         blueCheckBox.setSelected(colorMask.showBlue());
     }
+
 }

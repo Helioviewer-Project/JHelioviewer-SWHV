@@ -62,7 +62,7 @@ public class SOHOLUTPanel extends FilterPanel implements ActionListener, FilterA
 
         setLayout(new BoxLayout(this, BoxLayout.LINE_AXIS));
 
-        title = new JLabel("Color:");
+        title = new JLabel("Color");
         title.setPreferredSize(new Dimension(FilterPanel.titleWidth, FilterPanel.height));
         add(title);
 
@@ -213,4 +213,5 @@ public class SOHOLUTPanel extends FilterPanel implements ActionListener, FilterA
             invertButton.setBorder(BorderFactory.createBevelBorder(BevelBorder.RAISED));
         }
     }
+
 }

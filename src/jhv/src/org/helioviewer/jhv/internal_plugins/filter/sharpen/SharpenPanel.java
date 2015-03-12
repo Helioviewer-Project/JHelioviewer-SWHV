@@ -35,7 +35,7 @@ public class SharpenPanel extends FilterPanel implements ChangeListener, FilterA
     public SharpenPanel() {
         setLayout(new BoxLayout(this, BoxLayout.LINE_AXIS));
 
-        title = new JLabel("Sharpen:");
+        title = new JLabel("Sharpen");
         title.setPreferredSize(new Dimension(FilterPanel.titleWidth, FilterPanel.height));
         add(title);
 
