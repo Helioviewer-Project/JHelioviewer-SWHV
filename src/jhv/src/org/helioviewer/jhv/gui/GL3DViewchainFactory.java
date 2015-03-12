@@ -7,7 +7,6 @@ import javax.swing.JPanel;
 import javax.swing.JTabbedPane;
 
 import org.helioviewer.jhv.gui.components.MoviePanel;
-import org.helioviewer.jhv.gui.components.QualitySpinner;
 import org.helioviewer.jhv.internal_plugins.selectedLayer.SelectedLayerPanel;
 import org.helioviewer.jhv.layers.LayersModel;
 import org.helioviewer.viewmodel.factory.GL3DViewFactory;
@@ -123,11 +122,6 @@ public class GL3DViewchainFactory {
 
             FilterTabPanelManager compactPanelManager = new FilterTabPanelManager();
             tabList.add(new FilterTab(FilterTabDescriptor.Type.COMPACT_FILTER, "Color", compactPanelManager));
-
-            // If JP2View, add QualitySlider
-            if (newLayer instanceof JP2View) {
-                compactPanelManager.add(new QualitySpinner((JP2View) newLayer));
-            }
 
             compactPanelManager.add(new SelectedLayerPanel(newLayer));
 

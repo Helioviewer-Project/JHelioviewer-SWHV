@@ -37,7 +37,6 @@ import org.helioviewer.jhv.gui.components.MainContentPanel;
 import org.helioviewer.jhv.gui.components.MainImagePanel;
 import org.helioviewer.jhv.gui.components.MenuBar;
 import org.helioviewer.jhv.gui.components.MoviePanel;
-import org.helioviewer.jhv.gui.components.QualitySpinner;
 import org.helioviewer.jhv.gui.components.SideContentPane;
 import org.helioviewer.jhv.gui.components.StatusPanel;
 import org.helioviewer.jhv.gui.components.TopToolBar;
@@ -342,7 +341,6 @@ public class ImageViewerGui {
             // Image adjustments and filters
             FilterTabPanelManager compactPanelManager = new FilterTabPanelManager();
             compactPanelManager.add(new OpacityPanel());
-            compactPanelManager.add(new QualitySpinner(null));
             compactPanelManager.add(new SOHOLUTPanel());
             compactPanelManager.add(new SelectedLayerPanel(null));
             compactPanelManager.add(new GammaCorrectionPanel());
