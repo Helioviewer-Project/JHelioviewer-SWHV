@@ -1,9 +1,6 @@
 package org.helioviewer.viewmodel.view;
 
-import java.util.ArrayList;
-
 import org.helioviewer.viewmodel.changeevent.ChangeEvent;
-import org.helioviewer.viewmodel.metadata.MetaData;
 import org.helioviewer.viewmodel.view.cache.ImageCacheStatus;
 
 /**
@@ -32,10 +29,4 @@ public interface CachedMovieView extends MovieView {
      */
     public ImageCacheStatus getImageCacheStatus();
 
-    /**
-     * Returns the date time cache, extracted from the meta data.
-     *
-     * @return date time cache
-     */
-    public ArrayList<MetaData> getMetaDataList();
 }

@@ -64,8 +64,8 @@ public class SWHVHEKData implements LayersListener, JHVEventHandler {
             View nextView = LayersModel.getSingletonInstance().getLayer(i);
             JHVJPXView jpxView = nextView.getAdapter(JHVJPXView.class);
             if (jpxView != null) {
-                for (int frame = 0; frame < jpxView.getMaximumFrameNumber(); frame++) {
-                    ImmutableDateTime date = jpxView.getMetaDataList().get(frame).getParsedDateTime();
+                for (int frame = 0; frame <= jpxView.getMaximumFrameNumber(); frame++) {
+                    ImmutableDateTime date = jpxView.getFrameDateTime(frame);
                     if (beginDate == null || date.getTime().getTime() < beginDate.getTime()) {
                         beginDate = date.getTime();
                     }

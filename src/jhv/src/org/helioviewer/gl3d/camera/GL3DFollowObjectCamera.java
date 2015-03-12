@@ -222,8 +222,8 @@ public class GL3DFollowObjectCamera extends GL3DSolarRotationTrackingTrackballCa
                 if (jpxView != null) {
                     Date beginDate = null;
                     Date endDate = null;
-                    for (int frame = 0; frame < jpxView.getMaximumFrameNumber(); frame++) {
-                        ImmutableDateTime date = jpxView.getMetaDataList().get(frame).getDateTime();
+                    for (int frame = 0; frame <= jpxView.getMaximumFrameNumber(); frame++) {
+                        ImmutableDateTime date = jpxView.getFrameDateTime(frame);
                         if (beginDate == null || date.getTime().getTime() < beginDate.getTime()) {
                             beginDate = date.getTime();
                         }
