@@ -7,7 +7,6 @@ import javax.media.opengl.GL2;
 import javax.media.opengl.awt.GLCanvas;
 
 import org.helioviewer.base.logging.Log;
-import org.helioviewer.jhv.JHVDirectory;
 import org.helioviewer.viewmodel.view.jp2view.J2KRenderGlobalOptions;
 
 /**
@@ -30,20 +29,9 @@ public class GLInfo {
      * output. ", false); }
      */
 
-    // data
-    private static boolean glUsable = true;
-    private static boolean glActivated = true;
-    private static boolean glInitiated = false;
     private static String version;
 
     public static int maxTextureSize;
-    public static int maxTexUnits;
-    public static int maxConstantRegisters;
-    public static int maxVertexAttributes;
-    public static int maxTextureIndirections;
-
-    public static String shaderTmpPath;
-
     public static int[] pixelScale = new int[] { 1, 1 };
 
     /**
@@ -70,7 +58,7 @@ public class GLInfo {
         String extensionStr = gl.glGetString(GL2.GL_EXTENSIONS);
         Log.debug(">> GLInfo.update(GL) > Extensions: " + extensionStr);
 
-        glUsable = true;
+        boolean glUsable = true;
         if (!gl.isExtensionAvailable("GL_VERSION_1_3")) {
             Log.error(">> GLInfo.update(GL) > OpenGL 1.3 not supported. JHelioviewer will run in software mode.");
             glUsable = false;
@@ -80,26 +68,9 @@ public class GLInfo {
             int[] out = new int[1];
 
             out[0] = 0;
-            gl.glGetIntegerv(GL2.GL_MAX_DRAW_BUFFERS, out, 0);
-            Log.debug(">> GLInfo > GL_MAX_DRAW_BUFFERS = " + out[0]);
-
-            out[0] = 0;
             gl.glGetIntegerv(GL2.GL_MAX_TEXTURE_SIZE, out, 0);
             maxTextureSize = out[0];
             Log.debug(">> GLInfo > max texture size: " + out[0]);
-
-            out[0] = 0;
-            gl.glGetIntegerv(GL2.GL_MAX_TEXTURE_IMAGE_UNITS, out, 0);
-            maxTexUnits = out[0];
-            Log.debug(">> GLInfo > max texture image units: " + out[0]);
-
-            out[0] = 0;
-            gl.glGetIntegerv(GL2.GL_MAX_FRAGMENT_UNIFORM_COMPONENTS, out, 0);
-            maxConstantRegisters = out[0];
-            Log.debug(">> GLInfo > max fragment uniform components arb: " + out[0]);
-
-            shaderTmpPath = JHVDirectory.TEMP.getPath();
-            Log.debug(">> GLInfo > shader temp path: " + shaderTmpPath);
 
             pixelScale = canvas.getCurrentSurfaceScale(pixelScale);
 
