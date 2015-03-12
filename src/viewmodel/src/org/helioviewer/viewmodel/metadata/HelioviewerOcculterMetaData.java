@@ -8,7 +8,7 @@ import org.helioviewer.base.physics.Constants;
  * <p>
  * This special implementation also provides informations about the occulting
  * disc. The {@link MetaDataConstructor} should only produce this
- * implementation, if there is there is actual information about the occulting
+ * implementation if there is there is actual information about the occulting
  * disc present, so it is possible to test this via instanceof.
  * 
  * @author Markus Langenberg
@@ -18,7 +18,6 @@ public class HelioviewerOcculterMetaData extends HelioviewerMetaData implements 
 
     private double innerRadius;
     private double outerRadius;
-    // private double flatDistance;
 
     /**
      * Default constructor.
@@ -43,14 +42,6 @@ public class HelioviewerOcculterMetaData extends HelioviewerMetaData implements 
                 outerRadius = 31.5 * Constants.SunRadius;
             }
         }
-
-        /*
-        if (getDetector().equals("C2")) {
-            flatDistance = 6.2 * Constants.SunRadius;
-        } else if (getDetector().equals("C3")) {
-            flatDistance = 38 * Constants.SunRadius;
-        }
-        */
     }
 
     /**
@@ -66,12 +57,5 @@ public class HelioviewerOcculterMetaData extends HelioviewerMetaData implements 
     public double getOuterPhysicalOcculterRadius() {
         return outerRadius;
     }
-
-    /**
-     * {@inheritDoc}
-     */
-    /* public double getPhysicalFlatOcculterSize() {
-        return flatDistance;
-    } */
 
 }

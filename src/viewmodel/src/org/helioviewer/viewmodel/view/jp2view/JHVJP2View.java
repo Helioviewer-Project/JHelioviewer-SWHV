@@ -161,6 +161,7 @@ public class JHVJP2View extends AbstractView implements JP2View, ViewportView, R
                 viewport = StaticViewport.createAdaptedViewport(100, 100);
             }
 
+            // maybe ??
             ImmutableDateTime dt = metaData.getDateTime();
             if (dt != null)
                 event.addReason(new TimestampChangedReason(this, dt));
