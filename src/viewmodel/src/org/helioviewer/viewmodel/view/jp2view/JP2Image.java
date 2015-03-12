@@ -1,9 +1,7 @@
 package org.helioviewer.viewmodel.view.jp2view;
 
-import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
 import java.net.SocketTimeoutException;
 import java.net.URI;
 import java.util.ArrayList;
@@ -11,9 +9,6 @@ import java.util.Timer;
 import java.util.TimerTask;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
-
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
 
 import kdu_jni.Jp2_palette;
 import kdu_jni.Jp2_threadsafe_family_src;
@@ -43,7 +38,7 @@ import org.helioviewer.viewmodel.view.jp2view.kakadu.JHV_Kdu_cache;
 import org.helioviewer.viewmodel.view.jp2view.kakadu.JHV_Kdu_thread_env;
 import org.helioviewer.viewmodel.view.jp2view.kakadu.KakaduUtils;
 import org.w3c.dom.CharacterData;
-import org.w3c.dom.Document;
+
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -190,11 +185,7 @@ public class JP2Image implements MetaDataContainer {
         metaDataList = new MetaData[layerRange.getEnd() + 1];
         xmlCache = new NodeList[layerRange.getEnd() + 1];
 
-        try {
-            cacheXMLs();
-        } catch (Exception ex) {
-            ex.printStackTrace();
-        }
+        cacheXMLs();
     }
 
     /**
@@ -439,29 +430,12 @@ public class JP2Image implements MetaDataContainer {
     private void cacheXMLs() throws JHV_KduException {
         String xml;
         int num = layerRange.getEnd() + 1;
-        ArrayList<String> xmls = KakaduUtils.getAllXMLs(familySrc, num);
+
+        KakaduUtils.parseAllXMLs(familySrc, xmlCache, num);
 
         for (int i = 0; i < num; i++) {
-            if ((xml = xmls.get(i)) == null) {
-                throw new JHV_KduException("No XML data present");
-            } else if (!xml.contains("</meta>")) {
-                throw new JHV_KduException("XML data incomplete");
-            }
-
-            xml = xml.trim().replace("&", "&amp;").replace("$OBS", "");
-
-            try {
-                InputStream in = new ByteArrayInputStream(xml.getBytes("UTF-8"));
-                DocumentBuilder builder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
-                // NodeList node =
-                xmlCache[i] = builder.parse(in).getElementsByTagName("meta");
-
-                uglyFrameNumber = i + 1;
-
-                metaDataList[i] = MetaDataConstructor.getMetaData(this);
-            } catch (Exception e) {
-                throw new JHV_KduException("Failed parsing XML data", e);
-            }
+            uglyFrameNumber = i + 1;
+            metaDataList[i] = MetaDataConstructor.getMetaData(this);
         }
     }
 

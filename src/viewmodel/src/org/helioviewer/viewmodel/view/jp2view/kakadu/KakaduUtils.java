@@ -5,8 +5,6 @@ import java.io.EOFException;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 
-import java.util.ArrayList;
-
 import kdu_jni.Jp2_input_box;
 import kdu_jni.Jp2_locator;
 import kdu_jni.Jp2_threadsafe_family_src;
@@ -14,6 +12,12 @@ import kdu_jni.KduException;
 import kdu_jni.Kdu_coords;
 import kdu_jni.Kdu_dims;
 import kdu_jni.Kdu_global;
+
+import java.io.ByteArrayInputStream;
+import java.io.InputStream;
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import org.w3c.dom.NodeList;
 
 import org.helioviewer.viewmodel.view.jp2view.image.SubImage;
 import org.helioviewer.viewmodel.view.jp2view.io.jpip.JPIPConstants;
@@ -409,10 +413,27 @@ public class KakaduUtils {
         return true;
     }
 
-    public static ArrayList<String> getAllXMLs(Jp2_threadsafe_family_src _familySrc, int num) throws JHV_KduException {
+    private static NodeList parseXML(String xml) throws JHV_KduException {
+        if (xml == null)
+            throw new JHV_KduException("No XML data present");
+        else if (!xml.contains("</meta>")) {
+            throw new JHV_KduException("XML data incomplete");
+        }
+        xml = xml.trim().replace("&", "&amp;").replace("$OBS", "");
+
+        try {
+            InputStream in = new ByteArrayInputStream(xml.getBytes("UTF-8"));
+            DocumentBuilder builder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
+            return builder.parse(in).getElementsByTagName("meta");
+
+        } catch (Exception e) {
+            throw new JHV_KduException("Failed parsing XML data", e);
+        }
+    }
+
+    public static void parseAllXMLs(Jp2_threadsafe_family_src _familySrc, NodeList[] cache, int num) throws JHV_KduException {
         Jp2_input_box findBoxResult[], assocBox;
         Jp2_input_box xmlBox = new Jp2_input_box();
-        ArrayList<String> xmls = new ArrayList<String>(num);
 
         findBoxResult = findBox(_familySrc, Kdu_global.jp2_association_4cc, 1);
         assocBox = findBoxResult[0];
@@ -420,7 +441,7 @@ public class KakaduUtils {
             for (int i = 0; i < num; i++) {
                 try {
                     if (myFindBox2(xmlBox, assocBox, Kdu_global.jp2_xml_4cc, 1) == true) {
-                        xmls.add(i, xmlBox2xml(xmlBox));
+                        cache[i] = parseXML(xmlBox2xml(xmlBox));
                     }
 
                     xmlBox.Close();
@@ -433,23 +454,20 @@ public class KakaduUtils {
         } else { // JP2
             findBoxResult = KakaduUtils.findBox(_familySrc, Kdu_global.jp2_xml_4cc, 1);
             xmlBox = findBoxResult[0];
-            if (xmlBox != null)
-                xmls.add(0, xmlBox2xml(xmlBox));
+            if (xmlBox != null) {
+                cache[0] = parseXML(xmlBox2xml(xmlBox));
+            }
         }
 
         if (xmlBox != null) {
             xmlBox.Native_destroy();
         }
-
         if (findBoxResult[1] != null) {
             findBoxResult[1].Native_destroy();
         }
-
         if (findBoxResult[0] != null) {
             findBoxResult[0].Native_destroy();
         }
-
-        return xmls;
     }
 
     /**
