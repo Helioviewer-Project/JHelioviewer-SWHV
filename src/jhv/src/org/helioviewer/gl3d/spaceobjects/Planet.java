@@ -60,7 +60,7 @@ public class Planet extends GL3DSphere implements LayersListener, ViewListener, 
         View activeView = LayersModel.getSingletonInstance().getActiveView();
         JHVJPXView jpxView = activeView.getAdapter(JHVJPXView.class);
         if (jpxView != null) {
-            for (int frame = 1; frame <= jpxView.getMaximumFrameNumber(); frame++) {
+            for (int frame = 0; frame <= jpxView.getMaximumFrameNumber(); frame++) {
                 requestDates.add(jpxView.getFrameDateTime(frame).getTime());
             }
         }
