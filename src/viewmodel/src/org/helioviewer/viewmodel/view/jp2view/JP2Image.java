@@ -27,8 +27,6 @@ import org.helioviewer.base.math.Interval;
 import org.helioviewer.base.math.MathUtils;
 import org.helioviewer.viewmodel.io.APIResponseDump;
 import org.helioviewer.viewmodel.metadata.MetaData;
-import org.helioviewer.viewmodel.metadata.MetaDataConstructor;
-import org.helioviewer.viewmodel.metadata.MetaDataContainer;
 import org.helioviewer.viewmodel.view.cache.ImageCacheStatus;
 import org.helioviewer.viewmodel.view.jp2view.image.ResolutionSet;
 import org.helioviewer.viewmodel.view.jp2view.io.jpip.JPIPResponse;
@@ -37,11 +35,6 @@ import org.helioviewer.viewmodel.view.jp2view.kakadu.JHV_KduException;
 import org.helioviewer.viewmodel.view.jp2view.kakadu.JHV_Kdu_cache;
 import org.helioviewer.viewmodel.view.jp2view.kakadu.JHV_Kdu_thread_env;
 import org.helioviewer.viewmodel.view.jp2view.kakadu.KakaduUtils;
-import org.w3c.dom.CharacterData;
-
-import org.w3c.dom.Element;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
 
 /**
  * This class can open JPEG2000 images, yeah baby! Modified to improve the JPIP
@@ -108,8 +101,6 @@ public class JP2Image {
     private static File cachePath;
 
     public MetaData[] metaDataList;
-    private NodeList[] xmlCache;
-    private hvXMLMetadata hvMetadata = new hvXMLMetadata();
 
     private JHVJP2View parentView;
     private final ReentrantLock lock = new ReentrantLock();
@@ -184,9 +175,7 @@ public class JP2Image {
         createKakaduMachinery();
 
         metaDataList = new MetaData[layerRange.getEnd() + 1];
-        xmlCache = new NodeList[layerRange.getEnd() + 1];
-
-        cacheXMLs();
+        KakaduUtils.cacheMetaData(familySrc, metaDataList);
     }
 
     /**
@@ -426,128 +415,6 @@ public class JP2Image {
 
     public Jp2_threadsafe_family_src getFamilySrc() {
         return familySrc;
-    }
-
-    private void cacheXMLs() throws JHV_KduException {
-        String xml;
-        int num = layerRange.getEnd() + 1;
-
-        KakaduUtils.parseAllXMLs(familySrc, xmlCache, num);
-
-        for (int i = 0; i < num; i++) {
-            hvMetadata.setNode(xmlCache[i]);
-            metaDataList[i] = MetaDataConstructor.getMetaData(hvMetadata);
-        }
-    }
-
-    private static class hvXMLMetadata implements MetaDataContainer {
-
-        private static NodeList nodeList;
-
-        public void setNode(NodeList nodeList) {
-            this.nodeList = nodeList;
-        }
-
-        /**
-         * {@inheritDoc}
-         */
-        @Override
-        public String get(String key) {
-            try {
-                String value = getValueFromXML(nodeList, key, "fits");
-                return value;
-            } catch (JHV_KduException e) {
-                if (e.getMessage() == "XML data incomplete" || e.getMessage().toLowerCase().contains("box not open")) {
-                    try {
-                        Thread.sleep(500);
-                    } catch (InterruptedException e1) {}
-
-                    get(key);
-                } else if (e.getMessage() != "No XML data present") {
-                    e.printStackTrace();
-                }
-            }
-            return null;
-        }
-
-        /**
-         * {@inheritDoc}
-         */
-        @Override
-        public double tryGetDouble(String key) {
-            String string = get(key);
-            if (string != null) {
-                try {
-                    return Double.parseDouble(string);
-                } catch (NumberFormatException e) {
-                    Log.warn("NumberFormatException while trying to parse value \"" + string + "\" of key " + key);
-                    return 0.0;
-                }
-            }
-            return 0.0;
-        }
-
-        /**
-         * {@inheritDoc}
-         */
-        @Override
-        public int tryGetInt(String key) {
-            String string = get(key);
-            if (string != null) {
-                try {
-                    return Integer.parseInt(string);
-                } catch (NumberFormatException e) {
-                    Log.warn("NumberFormatException while trying to parse value \"" + string + "\" of key " + key);
-                    return 0;
-                }
-            }
-            return 0;
-        }
-
-        /**
-         * {@inheritDoc}
-         */
-        @Override
-        public int getPixelHeight() {
-            return tryGetInt("NAXIS2");
-        }
-
-        /**
-         * {@inheritDoc}
-         */
-        @Override
-        public int getPixelWidth() {
-            return tryGetInt("NAXIS1");
-        }
-
-    }
-
-    /**
-     * Method that returns value of specified _keyword from specified _box.
-     *
-     * @param _keyword
-     * @param _box
-     * @param _boxNumber
-     * @throws JHV_KduException
-     */
-    private static String getValueFromXML(NodeList nodeList, String _keyword, String _box) throws JHV_KduException {
-        try {
-            NodeList nodes = ((Element) nodeList.item(0)).getElementsByTagName(_box);
-            NodeList value = ((Element) nodeList.item(0)).getElementsByTagName(_keyword);
-            Element line = (Element) value.item(0);
-
-            if (line == null)
-                return null;
-
-            Node child = line.getFirstChild();
-            if (child instanceof CharacterData) {
-                CharacterData cd = (CharacterData) child;
-                return cd.getData();
-            }
-            return null;
-        } catch (Exception e) {
-            throw new JHV_KduException("Failed parsing XML data", e);
-        }
     }
 
     /**
