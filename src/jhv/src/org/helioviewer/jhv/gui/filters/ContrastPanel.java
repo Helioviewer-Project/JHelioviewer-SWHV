@@ -11,7 +11,6 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
 import org.helioviewer.jhv.gui.components.base.WheelSupport;
-import org.helioviewer.viewmodel.view.jp2view.JHVJP2View;
 import org.helioviewer.viewmodelplugin.filter.FilterAlignmentDetails;
 import org.helioviewer.viewmodelplugin.filter.FilterPanel;
 import org.helioviewer.viewmodelplugin.filter.FilterTabPanelManager.Area;
@@ -29,7 +28,6 @@ public class ContrastPanel extends AbstractFilterPanel implements ChangeListener
     private final JSlider contrastSlider;
     private final JLabel title;
     private final JLabel contrastLabel;
-    private JHVJP2View jp2view;
 
     /**
      * Default constructor.
