@@ -400,6 +400,8 @@ public class PluginManager {
             Log.info("PluginManager: Load plugin class :" + className);
             Object o = classLoader.loadClass(className).newInstance();
 
+            jarFile.close();
+
             if (o instanceof Plugin) {
                 addPlugin(classLoader, (Plugin) o, pluginLocation);
                 return true;

@@ -181,7 +181,6 @@ public class MetaDataDialog extends JDialog implements ActionListener, ShowableD
      * @see #addDataItem(String)
      */
     public void setMetaData(MetaDataView metaDataView) {
-
         if (metaDataView == null)
             return;
 
@@ -227,15 +226,8 @@ public class MetaDataDialog extends JDialog implements ActionListener, ShowableD
             }
 
             if (xmlText != null) {
-                String xml = xmlText.trim().replace("&", "&amp;").replace("$OBS", "");
-
-                InputStream in = null;
                 try {
-                    in = new ByteArrayInputStream(xml.getBytes("UTF-8"));
-                } catch (Exception ex) {
-                    ex.printStackTrace();
-                }
-                try {
+                    InputStream in = new ByteArrayInputStream(xmlText.trim().replace("&", "&amp;").getBytes("UTF-8"));
                     DocumentBuilder builder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
                     Document doc = builder.parse(in);
 
@@ -377,7 +369,6 @@ public class MetaDataDialog extends JDialog implements ActionListener, ShowableD
         } catch (IOException e) {
             Log.error("Fail at closing file." + e);
         }
-        ;
 
         return true;
     }
@@ -385,4 +376,5 @@ public class MetaDataDialog extends JDialog implements ActionListener, ShowableD
     @Override
     public void init() {
     }
+
 }
