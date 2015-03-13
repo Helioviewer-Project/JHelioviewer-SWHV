@@ -10,6 +10,7 @@ import javax.swing.event.ChangeListener;
 
 import org.helioviewer.jhv.gui.components.base.WheelSupport;
 import org.helioviewer.jhv.internal_plugins.filter.opacity.OpacityFilter;
+import org.helioviewer.viewmodel.view.jp2view.JHVJP2View;
 import org.helioviewer.viewmodelplugin.filter.FilterAlignmentDetails;
 import org.helioviewer.viewmodelplugin.filter.FilterPanel;
 import org.helioviewer.viewmodelplugin.filter.FilterTabPanelManager.Area;
@@ -100,4 +101,9 @@ public class OpacityPanel extends AbstractFilterPanel implements ChangeListener,
         opacitySlider.setValue((int) (opacity * 100.f));
     }
 
+    @Override
+    public void setJP2View(JHVJP2View jp2view) {
+        super.setJP2View(jp2view);
+        setValue(jp2view.getOpacity());
+    }
 }

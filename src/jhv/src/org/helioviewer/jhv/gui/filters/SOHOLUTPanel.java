@@ -23,6 +23,7 @@ import org.helioviewer.jhv.gui.IconBank.JHVIcon;
 import org.helioviewer.jhv.internal_plugins.filter.SOHOLUTFilterPlugin.GGRFilter;
 import org.helioviewer.jhv.internal_plugins.filter.SOHOLUTFilterPlugin.GradientError;
 import org.helioviewer.jhv.internal_plugins.filter.SOHOLUTFilterPlugin.LUT;
+import org.helioviewer.viewmodel.view.jp2view.JHVJP2View;
 import org.helioviewer.viewmodelplugin.filter.FilterAlignmentDetails;
 import org.helioviewer.viewmodelplugin.filter.FilterPanel;
 import org.helioviewer.viewmodelplugin.filter.FilterTabPanelManager.Area;
@@ -195,4 +196,9 @@ public class SOHOLUTPanel extends AbstractFilterPanel implements ActionListener,
         }
     }
 
+    @Override
+    public void setJP2View(JHVJP2View jp2view) {
+        super.setJP2View(jp2view);
+        setValue(jp2view.getLUT(), jp2view.getInvertLUT());
+    }
 }

@@ -193,6 +193,9 @@ public class FilterTabPanelManager implements LayersListener {
 
     @Override
     public void activeLayerChanged(int idx) {
+        if (LayersModel.getSingletonInstance().getActiveView() == null) {
+            return;
+        }
         JHVJP2View jp2view = LayersModel.getSingletonInstance().getActiveView().getAdapter(JHVJP2View.class);
 
         for (AbstractFilterPanel c : this.abstractFilterPanels) {
