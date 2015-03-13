@@ -48,19 +48,19 @@ public class ChannelMixerPanel extends FilterPanel implements ItemListener, Filt
 
         redCheckBox = new JCheckBox("Red", true);
         redCheckBox.setPreferredSize(new Dimension(redCheckBox.getPreferredSize().width, FilterPanel.height));
-        redCheckBox.setToolTipText("Unchecked to omit the red color channel when drawing this layer");
+        redCheckBox.setToolTipText("Uncheck to omit the red color channel when drawing this layer");
         redCheckBox.addItemListener(this);
         boxPanel.add(redCheckBox, BorderLayout.WEST);
 
         greenCheckBox = new JCheckBox("Green", true);
         greenCheckBox.setPreferredSize(new Dimension(greenCheckBox.getPreferredSize().width, FilterPanel.height));
-        greenCheckBox.setToolTipText("Unchecked to omit the green color channel when drawing this layer");
+        greenCheckBox.setToolTipText("Uncheck to omit the green color channel when drawing this layer");
         greenCheckBox.addItemListener(this);
         boxPanel.add(greenCheckBox, BorderLayout.CENTER);
 
         blueCheckBox = new JCheckBox("Blue", true);
         blueCheckBox.setPreferredSize(new Dimension(blueCheckBox.getPreferredSize().width, FilterPanel.height));
-        blueCheckBox.setToolTipText("Unchecked to omit the blue color channel when drawing this layer");
+        blueCheckBox.setToolTipText("Uncheck to omit the blue color channel when drawing this layer");
         blueCheckBox.addItemListener(this);
         boxPanel.add(blueCheckBox, BorderLayout.EAST);
 
