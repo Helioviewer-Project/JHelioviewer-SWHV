@@ -30,9 +30,21 @@ import org.helioviewer.viewmodel.view.jp2view.JHVJP2CallistoView;
 import org.helioviewer.viewmodel.view.jp2view.JHVJP2View;
 import org.helioviewer.viewmodel.view.jp2view.JHVJP2View.ReaderMode;
 import org.helioviewer.viewmodel.view.jp2view.JP2Image;
+import org.helioviewer.viewmodel.view.jp2view.datetime.ImmutableDateTime;
 import org.helioviewer.viewmodel.view.jp2view.image.ResolutionSet;
+import org.helioviewer.viewmodel.view.jp2view.kakadu.KakaduUtils;
 import org.helioviewer.viewmodel.viewport.StaticViewport;
 import org.helioviewer.viewmodel.viewport.ViewportAdapter;
+
+import java.io.ByteArrayInputStream;
+import java.io.InputStream;
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import org.w3c.dom.CharacterData;
+import org.w3c.dom.Element;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+import org.helioviewer.viewmodel.view.jp2view.kakadu.JHV_KduException;
 
 /**
  * The radio data manager manages all the downloaded data for radio
@@ -646,6 +658,62 @@ public class RadioDataManager implements RadioDownloaderListener {
         }
     }
 
+    /* temporarily copied here */
+    private static NodeList parseXML(String xml) throws JHV_KduException {
+        if (xml == null)
+            throw new JHV_KduException("No XML data present");
+        else if (!xml.contains("</meta>")) {
+            throw new JHV_KduException("XML data incomplete");
+        }
+
+        try {
+            InputStream in = new ByteArrayInputStream(xml.trim().replace("&", "&amp;").getBytes("UTF-8"));
+            DocumentBuilder builder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
+            return builder.parse(in).getElementsByTagName("meta");
+
+        } catch (Exception e) {
+            throw new JHV_KduException("Failed parsing XML data", e);
+        }
+    }
+
+    private static String getValueFromXML(NodeList nodeList, String _keyword, String _box) throws JHV_KduException {
+        try {
+            NodeList nodes = ((Element) nodeList.item(0)).getElementsByTagName(_box);
+            NodeList value = ((Element) nodeList.item(0)).getElementsByTagName(_keyword);
+            Element line = (Element) value.item(0);
+
+            if (line == null)
+                return null;
+
+            Node child = line.getFirstChild();
+            if (child instanceof CharacterData) {
+                CharacterData cd = (CharacterData) child;
+                return cd.getData();
+            }
+            return null;
+        } catch (Exception e) {
+            throw new JHV_KduException("Failed parsing XML data", e);
+        }
+    }
+
+    private static String getKey(NodeList nodeList, String key) {
+        try {
+            String value = getValueFromXML(nodeList, key, "fits");
+            return value;
+        } catch (JHV_KduException e) {
+            if (e.getMessage() == "XML data incomplete" || e.getMessage().toLowerCase().contains("box not open")) {
+                try {
+                    Thread.sleep(500);
+                } catch (InterruptedException e1) {}
+
+                getKey(nodeList, key);
+            } else if (e.getMessage() != "No XML data present") {
+                e.printStackTrace();
+            }
+        }
+        return null;
+    }
+
     /**
      * Handles newly downloaded jpx-data.
      * 
@@ -668,22 +736,20 @@ public class RadioDataManager implements RadioDownloaderListener {
             ResolutionSet rs = image.getResolutionSet();
             Interval<Integer> interval = image.getCompositionLayerRange();
             LineDataSelectorModel.getSingletonInstance().downloadStarted(drd);
+
             for (int i = interval.getStart(); i <= interval.getEnd(); i++) {
                 try {
-                    FrequencyInterval fi = new FrequencyInterval(Integer.parseInt(image.get("STARTFRQ", i)), Integer.parseInt(image.get("END-FREQ", i)));
-                    Date start = null;
-                    Date end = null;
-                    try {
-                        start = sdf.parse(image.get("DATE-OBS", i));
-                        end = sdf.parse(image.get("DATE-END", i));
-                    } catch (ParseException e) {
-                        e.printStackTrace();
-                        Log.error("Could not parse  " + image.get("DATE-OBS", i) + " or " + image.get("DATE-END", i));
-                    }
+                    NodeList nodeList = parseXML(KakaduUtils.getXml(image.getFamilySrc(), i));
+
+                    Double freqStart = Double.parseDouble(getKey(nodeList, "STARTFRQ"));
+                    Double freqEnd = Double.parseDouble(getKey(nodeList, "END-FREQ"));
+
+                    FrequencyInterval fi = new FrequencyInterval((int) Math.round(freqStart), (int) Math.round(freqEnd));
+                    Date start = ImmutableDateTime.parseDateTime(getKey(nodeList, "DATE-OBS")).getTime();
+                    Date end = ImmutableDateTime.parseDateTime(getKey(nodeList, "DATE-END")).getTime();
+
                     List<ResolutionSetting> resolutionSettings = new ArrayList<ResolutionSetting>();
                     if (start != null && end != null) {
-                        Double freqStart = Double.parseDouble(image.get("STARTFRQ", i));
-                        Double freqEnd = Double.parseDouble(image.get("END-FREQ", i));
                         Interval<Date> dateInterval = new Interval<Date>(start, end);
                         for (int j = 0; j <= rs.getMaxResolutionLevels(); j++) {
                             ResolutionSetting tempResSet = new ResolutionSetting((1.0 * (end.getTime() - start.getTime()) / rs.getResolutionLevel(j).getResolutionBounds().width), ((freqEnd - freqStart) / rs.getResolutionLevel(j).getResolutionBounds().height), j, rs.getResolutionLevel(j).getResolutionBounds().width, rs.getResolutionLevel(j).getResolutionBounds().height, rs.getResolutionLevel(j).getZoomLevel());
@@ -706,7 +772,7 @@ public class RadioDataManager implements RadioDownloaderListener {
                     } else {
                         Log.error("Start and/or stop is null");
                     }
-                } catch (IOException e) {
+                } catch (JHV_KduException e) {
                     Log.error("Some of the metadata could not be read aborting...");
                     return;
                 }
@@ -743,22 +809,20 @@ public class RadioDataManager implements RadioDownloaderListener {
             ResolutionSet rs = image.getResolutionSet();
             Interval<Integer> interval = image.getCompositionLayerRange();
             LineDataSelectorModel.getSingletonInstance().downloadStarted(drd);
+
             for (int i = interval.getStart(); i <= interval.getEnd(); i++) {
                 try {
-                    FrequencyInterval fi = new FrequencyInterval(Integer.parseInt(image.get("STARTFRQ", i)), Integer.parseInt(image.get("END-FREQ", i)));
-                    Date start = null;
-                    Date end = null;
-                    try {
-                        start = sdf.parse(image.get("DATE-OBS", i));
-                        end = sdf.parse(image.get("DATE-END", i));
-                    } catch (ParseException e) {
-                        e.printStackTrace();
-                        Log.error("Could not parse  " + image.get("DATE-OBS", i) + " or " + image.get("DATE-END", i));
-                    }
+                    NodeList nodeList = parseXML(KakaduUtils.getXml(image.getFamilySrc(), i));
+
+                    Double freqStart = Double.parseDouble(getKey(nodeList, "STARTFRQ"));
+                    Double freqEnd = Double.parseDouble(getKey(nodeList, "END-FREQ"));
+
+                    FrequencyInterval fi = new FrequencyInterval((int) Math.round(freqStart), (int) Math.round(freqEnd));
+                    Date start = ImmutableDateTime.parseDateTime(getKey(nodeList, "DATE-OBS")).getTime();
+                    Date end = ImmutableDateTime.parseDateTime(getKey(nodeList, "DATE-END")).getTime();
+
                     List<ResolutionSetting> resolutionSettings = new ArrayList<ResolutionSetting>();
                     if (start != null && end != null) {
-                        Double freqStart = Double.parseDouble(image.get("STARTFRQ", i));
-                        Double freqEnd = Double.parseDouble(image.get("END-FREQ", i));
                         Interval<Date> dateInterval = new Interval<Date>(start, end);
                         for (int j = 0; j <= rs.getMaxResolutionLevels(); j++) {
                             ResolutionSetting tempResSet = new ResolutionSetting((1.0 * (end.getTime() - start.getTime()) / rs.getResolutionLevel(j).getResolutionBounds().width), ((freqEnd - freqStart) / rs.getResolutionLevel(j).getResolutionBounds().height), j, rs.getResolutionLevel(j).getResolutionBounds().width, rs.getResolutionLevel(j).getResolutionBounds().height, rs.getResolutionLevel(j).getZoomLevel());
@@ -774,7 +838,7 @@ public class RadioDataManager implements RadioDownloaderListener {
                     } else {
                         Log.error("Start and/or stop is null");
                     }
-                } catch (IOException e) {
+                } catch (JHV_KduException e) {
                     return;
                 }
             }
