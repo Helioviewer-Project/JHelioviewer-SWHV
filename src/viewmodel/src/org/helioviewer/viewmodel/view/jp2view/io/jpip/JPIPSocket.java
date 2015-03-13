@@ -1,6 +1,5 @@
 package org.helioviewer.viewmodel.view.jp2view.io.jpip;
 
-import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.net.URI;
 import java.util.HashMap;
@@ -216,7 +215,7 @@ public class JPIPSocket extends HTTPSocket {
 
         replyTextTm = System.currentTimeMillis();
 
-        ChunkedInputStream input = new ChunkedInputStream(new BufferedInputStream(getInputStream()));
+        ChunkedInputStream input = new ChunkedInputStream(bufferedStream);
 
         JPIPDataInputStream jpip;
         field = res.getHeader("Content-Encoding");
