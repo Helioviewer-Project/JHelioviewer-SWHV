@@ -26,8 +26,6 @@ import org.helioviewer.base.message.Message;
 import org.helioviewer.gl3d.camera.GL3DCameraOptionsPanel;
 import org.helioviewer.gl3d.gui.GL3DCameraSelectorModel;
 import org.helioviewer.gl3d.gui.GL3DTopToolBar;
-import org.helioviewer.gl3d.model.GL3DInternalPluginConfiguration;
-import org.helioviewer.gl3d.plugin.GL3DPluginController;
 import org.helioviewer.gl3d.spaceobjects.PlanetOptionsPanel;
 import org.helioviewer.jhv.JHVSplashScreen;
 import org.helioviewer.jhv.gui.actions.ExitProgramAction;
@@ -245,8 +243,6 @@ public class ImageViewerGui {
         State newState = StateController.getInstance().getCurrentState();
         mainComponentView = GuiState.viewchainFactory.createNewViewchainMain();
         GL3DCameraSelectorModel.getInstance().activate(mainComponentView.getAdapter(GL3DSceneGraphView.class));
-        GL3DPluginController.getInstance().setPluginConfiguration(new GL3DInternalPluginConfiguration());
-        GL3DPluginController.getInstance().loadPlugins();
         renderModeStatus.updateStatus();
 
         // prepare gui again
