@@ -37,12 +37,9 @@ import org.helioviewer.viewmodel.changeevent.ViewChainChangedReason;
 import org.helioviewer.viewmodel.changeevent.ViewportChangedReason;
 import org.helioviewer.viewmodel.io.APIResponse;
 import org.helioviewer.viewmodel.io.APIResponseDump;
-import org.helioviewer.viewmodel.metadata.HelioviewerMetaData;
-import org.helioviewer.viewmodel.metadata.MetaData;
 import org.helioviewer.viewmodel.region.Region;
 import org.helioviewer.viewmodel.region.StaticRegion;
 import org.helioviewer.viewmodel.view.ComponentView;
-import org.helioviewer.viewmodel.view.FilterView;
 import org.helioviewer.viewmodel.view.ImageInfoView;
 import org.helioviewer.viewmodel.view.LayeredView;
 import org.helioviewer.viewmodel.view.LinkedMovieManager;
@@ -1199,7 +1196,7 @@ public class LayersModel implements ViewListener {
         /*
          * ImageInfoView imageInfoView = view.getAdapter(ImageInfoView.class);
          * String typeString; String intervalString;
-         *
+         * 
          * if (imageInfoView != null) { SimpleDateFormat format = new
          * SimpleDateFormat("yyyy/MM/dd HH:mm"); Interval<Date> interval =
          * imageInfoView.getDateRange(); if (interval != null) { typeString =
@@ -1372,7 +1369,6 @@ public class LayersModel implements ViewListener {
                 xml.append(tab).append("<layer id=\"").append(i).append("\">\n");
 
                 ImageInfoView currentImageInfoView = currentView.getAdapter(ImageInfoView.class);
-                FilterView currentFilterView = currentView.getAdapter(FilterView.class);
 
                 // add tab
                 tab = tab + "\t";
@@ -1391,12 +1387,6 @@ public class LayersModel implements ViewListener {
 
                 // add tab
                 tab = tab + "\t";
-                while (currentFilterView != null) {
-                    String filterName = currentFilterView.getFilter().getClass().getName();
-                    String filterState = currentFilterView.getFilter().getState();
-                    xml.append(tab).append("<filter name=\"").append(filterName).append("\">").append(filterState).append("</filter>\n");
-                    currentFilterView = currentFilterView.getView().getAdapter(FilterView.class);
-                }
 
                 // remove last tab
                 tab = tab.substring(0, tab.length() - 1);
@@ -1592,36 +1582,6 @@ public class LayersModel implements ViewListener {
         }
 
         /**
-         * Find and Setup the Filter with the given name that is associated with
-         * the given view and set it's state according to the given StateString
-         *
-         * @param view
-         *            - View to which the filter in question can be associated
-         *            with
-         * @param filterName
-         *            - Class name of the filter in question
-         * @param filterState
-         *            - State string to be passed to the filter in question
-         */
-        private void setupFilters(View view, Vector<FilterState> filterStates) {
-            FilterView currentFilterView = view.getAdapter(FilterView.class);
-
-            // loop over all FilterView objects reachable from the given view
-            while (currentFilterView != null) {
-                String curFilterName = currentFilterView.getFilter().getClass().getName();
-
-                // Loop over all available filter states
-                for (FilterState curFilterState : filterStates) {
-                    // if we found a suitable filter state, apply it
-                    if (curFilterState.name.equals(curFilterName)) {
-                        currentFilterView.getFilter().setState(curFilterState.stateString.toString());
-                    }
-                }
-                currentFilterView = currentFilterView.getView().getAdapter(FilterView.class);
-            }
-        }
-
-        /**
          * Add a new Layer and initialize it according to the given LayerSetting
          * object, including filters
          *
@@ -1699,10 +1659,6 @@ public class LayersModel implements ViewListener {
                         }
                     }
 
-                    // newView should always be != null
-                    if (newView != null) {
-                        setupFilters(newView, layerSetting.filterSettings);
-                    }
                 } else {
                     // this case is executed, if an error occured while adding
                     // the layer
