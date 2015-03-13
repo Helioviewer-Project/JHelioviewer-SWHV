@@ -17,7 +17,6 @@ import javax.swing.filechooser.FileFilter;
 import org.helioviewer.base.FileUtils;
 import org.helioviewer.base.message.Message;
 import org.helioviewer.jhv.JHVDirectory;
-import org.helioviewer.jhv.internal_plugins.InternalFilterPlugin;
 import org.helioviewer.viewmodelplugin.controller.PluginContainer;
 import org.helioviewer.viewmodelplugin.controller.PluginManager;
 
@@ -82,9 +81,8 @@ public class PluginDialog extends AbstractPluginDialog implements ListSelectionL
         AbstractList<PluginContainer> activatedPlugins = PluginManager.getSingletonInstance().getPlugins(true);
 
         for (PluginContainer container : activatedPlugins) {
-            if (!(container.getPlugin() instanceof InternalFilterPlugin)) {
-                activatedPluginsListModel.addElement(container);
-            }
+            activatedPluginsListModel.addElement(container);
+
         }
 
         // show available plug-ins in corresponding list
@@ -92,9 +90,7 @@ public class PluginDialog extends AbstractPluginDialog implements ListSelectionL
         AbstractList<PluginContainer> availablePlugins = PluginManager.getSingletonInstance().getPlugins(false);
 
         for (PluginContainer container : availablePlugins) {
-            if (!(container.getPlugin() instanceof InternalFilterPlugin)) {
-                availablePluginsListModel.addElement(container);
-            }
+            availablePluginsListModel.addElement(container);
         }
     }
 

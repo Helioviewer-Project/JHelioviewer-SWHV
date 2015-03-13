@@ -26,7 +26,6 @@ import org.helioviewer.jhv.gui.IconBank;
 import org.helioviewer.jhv.gui.IconBank.JHVIcon;
 import org.helioviewer.jhv.gui.ImageViewerGui;
 import org.helioviewer.jhv.gui.interfaces.ShowableDialog;
-import org.helioviewer.jhv.internal_plugins.InternalFilterPlugin;
 import org.helioviewer.viewmodelplugin.controller.PluginContainer;
 import org.helioviewer.viewmodelplugin.controller.PluginManager;
 import org.helioviewer.viewmodelplugin.interfaces.Plugin;
@@ -98,21 +97,20 @@ public final class AboutDialog extends JDialog implements ActionListener, Showab
 
         for (PluginContainer pluginContainer : PluginManager.getSingletonInstance().getAllPlugins()) {
             Plugin plugin = pluginContainer.getPlugin();
-            if (!(plugin instanceof InternalFilterPlugin)) {
-                String pluginName = plugin.getName();
-                String pluginAboutLicense = plugin.getAboutLicenseText();
+            String pluginName = plugin.getName();
+            String pluginAboutLicense = plugin.getAboutLicenseText();
 
-                if (pluginName == null || pluginName.equals("")) {
-                    pluginName = "Unknown Plugin";
-                }
-
-                if (pluginAboutLicense == null || pluginAboutLicense.equals("")) {
-                    pluginAboutLicense = "No License Text Available.";
-                }
-
-                text += "<p>============ Plugin: " + pluginName + " ============<br>";
-                text += pluginAboutLicense;
+            if (pluginName == null || pluginName.equals("")) {
+                pluginName = "Unknown Plugin";
             }
+
+            if (pluginAboutLicense == null || pluginAboutLicense.equals("")) {
+                pluginAboutLicense = "No License Text Available.";
+            }
+
+            text += "<p>============ Plugin: " + pluginName + " ============<br>";
+            text += pluginAboutLicense;
+
         }
 
         JEditorPane license = new JEditorPane("text/html", text);
