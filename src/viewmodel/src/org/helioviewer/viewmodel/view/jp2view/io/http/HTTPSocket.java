@@ -1,5 +1,6 @@
 package org.helioviewer.viewmodel.view.jp2view.io.http;
 
+import java.io.BufferedInputStream;
 import java.io.EOFException;
 import java.io.IOException;
 import java.io.InputStream;
@@ -46,6 +47,8 @@ public class HTTPSocket extends Socket {
     /** The string representation of the CRLF codes */
     static public final String CRLF = new String(CRLFBytes);
 
+    protected BufferedInputStream bufferedStream;
+
     /** Default constructor */
     public HTTPSocket() {
         super();
@@ -64,6 +67,7 @@ public class HTTPSocket extends Socket {
         super.setKeepAlive(true);
         super.setTcpNoDelay(true);
         super.connect(new InetSocketAddress(lastUsedHost, lastUsedPort), 10000);
+        bufferedStream = new BufferedInputStream(getInputStream());
         return null;
     }
 
@@ -74,6 +78,7 @@ public class HTTPSocket extends Socket {
      */
     public void reconnect() throws IOException {
         super.connect(new InetSocketAddress(lastUsedHost, lastUsedPort), 10000);
+        bufferedStream = new BufferedInputStream(getInputStream());
     }
 
     /**
@@ -134,8 +139,7 @@ public class HTTPSocket extends Socket {
         String line;
         String parts[];
 
-        InputStream input = getInputStream();
-        StringInputStream lineInput = new StringInputStream(input);
+        StringInputStream lineInput = new StringInputStream(bufferedStream);
 
         line = lineInput.readLine();
         if (line == null)
