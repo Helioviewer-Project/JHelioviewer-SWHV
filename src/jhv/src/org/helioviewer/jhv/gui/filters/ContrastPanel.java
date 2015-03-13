@@ -11,6 +11,7 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
 import org.helioviewer.jhv.gui.components.base.WheelSupport;
+import org.helioviewer.viewmodel.view.jp2view.JHVJP2View;
 import org.helioviewer.viewmodelplugin.filter.FilterAlignmentDetails;
 import org.helioviewer.viewmodelplugin.filter.FilterPanel;
 import org.helioviewer.viewmodelplugin.filter.FilterTabPanelManager.Area;
@@ -105,4 +106,9 @@ public class ContrastPanel extends AbstractFilterPanel implements ChangeListener
         contrastSlider.setValue((int) (contrast * sliderToContrastScale));
     }
 
+    @Override
+    public void setJP2View(JHVJP2View jp2view) {
+        super.setJP2View(jp2view);
+        setValue(jp2view.getContrast());
+    }
 }

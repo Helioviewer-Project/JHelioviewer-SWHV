@@ -155,6 +155,7 @@ public class JHVJP2View extends AbstractView implements JP2View, ViewportView, R
      * @param newJP2Image
      */
     public void setJP2Image(JP2Image newJP2Image) {
+
         if (jp2Image != null && reader != null) {
             abolish();
         }
@@ -190,6 +191,8 @@ public class JHVJP2View extends AbstractView implements JP2View, ViewportView, R
         } catch (Exception e) {
             e.printStackTrace();
         }
+        setStartLUT();
+
     }
 
     /**
@@ -1000,9 +1003,6 @@ public class JHVJP2View extends AbstractView implements JP2View, ViewportView, R
         if ((this instanceof JHVJPXView) && ((JHVJPXView) this).getDifferenceMode()) {
             currlut = gray;
         } else {
-            if (lut == null) {
-                setStartLUT();
-            }
             currlut = lut;
         }
 
@@ -1110,5 +1110,29 @@ public class JHVJP2View extends AbstractView implements JP2View, ViewportView, R
 
     public void setTruncation(float truncation) {
         this.truncation = truncation;
+    }
+
+    public float getOpacity() {
+        return opacity;
+    }
+
+    public float getContrast() {
+        return contrast;
+    }
+
+    public float getGamma() {
+        return gamma;
+    }
+
+    public ColorMask getColorMask() {
+        return colorMask;
+    }
+
+    public LUT getLUT() {
+        return lut;
+    }
+
+    public boolean getInvertLUT() {
+        return invertLUT;
     }
 }
