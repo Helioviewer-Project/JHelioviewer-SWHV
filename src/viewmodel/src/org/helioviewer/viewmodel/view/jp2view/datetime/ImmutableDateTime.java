@@ -142,4 +142,32 @@ public class ImmutableDateTime implements Comparable<ImmutableDateTime> {
         return this.cachedDate;
     }
 
+    public static ImmutableDateTime parseDateTime(String dateTime) {
+        int year = 0, month = 0, day = 0, hour = 0, minute = 0, second = 0;
+
+        if (dateTime != null) {
+            try {
+                String[] firstDivide = dateTime.split("T");
+                String[] secondDivide1 = firstDivide[0].split("[-/]");
+                String[] secondDivide2 = firstDivide[1].split(":");
+                String[] thirdDivide = secondDivide2[2].split("\\.");
+                year = Integer.valueOf(secondDivide1[0]);
+                month = Integer.valueOf(secondDivide1[1]);
+                day = Integer.valueOf(secondDivide1[2]);
+                hour = Integer.valueOf(secondDivide2[0]);
+                minute = Integer.valueOf(secondDivide2[1]);
+                second = Integer.valueOf(thirdDivide[0]);
+            } catch (Exception e) {
+                year = 0;
+                month = 0;
+                day = 0;
+                hour = 0;
+                minute = 0;
+                second = 0;
+            }
+        }
+
+        return new ImmutableDateTime(year, month != 0 ? month - 1 : 0, day, hour, minute, second);
+    }
+
 }
