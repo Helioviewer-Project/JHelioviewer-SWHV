@@ -47,7 +47,7 @@ public class GammaCorrectionPanel extends FilterPanel implements ChangeListener,
         add(title);
 
         gammaSlider = new JSlider(JSlider.HORIZONTAL, -100, 100, 0);
-        gammaSlider.setMajorTickSpacing(20);
+        gammaSlider.setMajorTickSpacing(25 * 2); // twice wider
         gammaSlider.setPaintTicks(true);
         gammaSlider.setPreferredSize(new Dimension(150, gammaSlider.getPreferredSize().height));
         gammaSlider.addChangeListener(this);

@@ -42,7 +42,7 @@ public class ContrastPanel extends FilterPanel implements ChangeListener, MouseL
         add(title);
 
         contrastSlider = new JSlider(JSlider.HORIZONTAL, -100, 100, 0);
-        contrastSlider.setMajorTickSpacing(20);
+        contrastSlider.setMajorTickSpacing(25 * 2); // twice wider
         contrastSlider.setPaintTicks(true);
         contrastSlider.setPreferredSize(new Dimension(150, contrastSlider.getPreferredSize().height));
         contrastSlider.addMouseListener(this);

@@ -40,7 +40,7 @@ public class SharpenPanel extends FilterPanel implements ChangeListener, FilterA
         add(title);
 
         sharpeningSlider = new JSlider(JSlider.HORIZONTAL, 0, 100, 0);
-        sharpeningSlider.setMajorTickSpacing(20);
+        sharpeningSlider.setMajorTickSpacing(25);
         sharpeningSlider.setPaintTicks(true);
         sharpeningSlider.setPreferredSize(new Dimension(150, sharpeningSlider.getPreferredSize().height));
         sharpeningSlider.addChangeListener(this);
