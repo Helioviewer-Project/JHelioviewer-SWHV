@@ -10,7 +10,6 @@ import org.helioviewer.viewmodel.view.FilterView;
 import org.helioviewer.viewmodel.view.ImageInfoView;
 import org.helioviewer.viewmodel.view.JHVSimpleImageView;
 import org.helioviewer.viewmodel.view.OverlayView;
-import org.helioviewer.viewmodel.view.StandardFilterView;
 import org.helioviewer.viewmodel.view.View;
 import org.helioviewer.viewmodel.view.fitsview.JHVFITSView;
 import org.helioviewer.viewmodel.view.jp2view.JHVJP2View;
@@ -38,15 +37,7 @@ public abstract class StandardViewFactory implements ViewFactory {
      */
     @Override
     @SuppressWarnings("unchecked")
-    public <T extends View> T createNewView(Class<T> pattern) {
-
-        // FilterView
-        if (pattern.isAssignableFrom(FilterView.class)) {
-            return (T) new StandardFilterView();
-        } else {
-            return null;
-        }
-    }
+    public abstract <T extends View> T createNewView(Class<T> pattern);
 
     /**
      * {@inheritDoc}
@@ -146,27 +137,4 @@ public abstract class StandardViewFactory implements ViewFactory {
      */
     protected abstract <T extends View> T createViewFromSourceImpl(T source);
 
-    /**
-     * Internal function to create independent views based on a pattern
-     * implementation.
-     *
-     * This function may be called by subclasses of StandardFactory, when they
-     * do not support the given pattern.
-     *
-     * @param <T>
-     *            interface type of new view
-     * @param source
-     *            pattern to create new view
-     * @return implementation equivalent to source
-     */
-    @SuppressWarnings("unchecked")
-    protected <T extends View> T createStandardViewFromSource(T source) {
-        // FilterView
-        if (source instanceof FilterView) {
-            return (T) new StandardFilterView();
-            // SolarRotationTrackingView
-        } else {
-            return null;
-        }
-    }
 }
