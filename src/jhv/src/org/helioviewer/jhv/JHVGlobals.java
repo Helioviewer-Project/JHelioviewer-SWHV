@@ -31,11 +31,6 @@ public class JHVGlobals {
 
     public static final String GLibVersionTool = "glibc-version";
     public static final String ffmpeg = "ffmpeg";
-    public static final String cgc = "cgc";
-
-    public static void gc() {
-        System.gc();
-    }
 
     private static final String[] browsers = { "firefox", "opera", "konqueror", "epiphany", "seamonkey", "galeon", "kazehakase", "mozilla", "netscape" };
 
@@ -47,7 +42,6 @@ public class JHVGlobals {
 
     /** Constructor is private to prevent instantiation. */
     private JHVGlobals() {
-
     }
 
     /**
