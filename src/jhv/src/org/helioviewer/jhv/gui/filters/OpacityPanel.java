@@ -9,7 +9,6 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
 import org.helioviewer.jhv.gui.components.base.WheelSupport;
-import org.helioviewer.jhv.internal_plugins.filter.opacity.OpacityFilter;
 import org.helioviewer.viewmodel.view.jp2view.JHVJP2View;
 import org.helioviewer.viewmodelplugin.filter.FilterAlignmentDetails;
 import org.helioviewer.viewmodelplugin.filter.FilterPanel;
@@ -28,7 +27,6 @@ public class OpacityPanel extends AbstractFilterPanel implements ChangeListener,
     private final JSlider opacitySlider;
     private final JLabel opacityLabel;
     private final JLabel title;
-    private OpacityFilter filter;
 
     /**
      * Default constructor.

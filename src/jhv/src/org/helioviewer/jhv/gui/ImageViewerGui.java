@@ -59,14 +59,12 @@ import org.helioviewer.jhv.gui.states.State;
 import org.helioviewer.jhv.gui.states.StateController;
 import org.helioviewer.jhv.gui.states.StateController.StateChangeListener;
 import org.helioviewer.jhv.gui.states.ViewStateEnum;
-import org.helioviewer.jhv.internal_plugins.filter.opacity.OpacityFilter;
 import org.helioviewer.jhv.io.APIRequestManager;
 import org.helioviewer.jhv.io.CommandLineProcessor;
 import org.helioviewer.jhv.io.FileDownloader;
 import org.helioviewer.jhv.io.JHVRequest;
 import org.helioviewer.viewmodel.metadata.ImageSizeMetaData;
 import org.helioviewer.viewmodel.view.ComponentView;
-import org.helioviewer.viewmodel.view.FilterView;
 import org.helioviewer.viewmodel.view.ImageInfoView;
 import org.helioviewer.viewmodel.view.LayeredView;
 import org.helioviewer.viewmodel.view.MetaDataView;
@@ -494,30 +492,6 @@ public class ImageViewerGui {
                                             throw new InvalidViewException();
                                         }
                                         moviePanel.setMovieLink(true);
-                                    }
-                                }
-
-                                // opacity
-
-                                // find opacity filter view
-                                FilterView filterView = subView.getAdapter(FilterView.class);
-
-                                while (filterView != null) {
-
-                                    // if opacity filter has been found set
-                                    // opacity value
-                                    if (filterView.getFilter() instanceof OpacityFilter) {
-                                        ((OpacityFilter) (filterView.getFilter())).setState(Float.toString(jhvRequest.imageLayers[layer].opacity / 100.0f));
-                                        break;
-                                    }
-
-                                    // find next filter view
-                                    View view = filterView.getView();
-
-                                    if (view == null) {
-                                        filterView = null;
-                                    } else {
-                                        filterView = view.getAdapter(FilterView.class);
                                     }
                                 }
 

@@ -21,7 +21,6 @@ import org.helioviewer.base.logging.LogSettings;
 import org.helioviewer.base.message.Message;
 import org.helioviewer.jhv.gui.ImageViewerGui;
 import org.helioviewer.jhv.gui.components.layerTable.LayerTableOverlapWatcher;
-import org.helioviewer.jhv.internal_plugins.InternalFilterPlugin;
 import org.helioviewer.jhv.io.CommandLineProcessor;
 import org.helioviewer.jhv.layers.LayersModel;
 import org.helioviewer.jhv.resourceloader.ResourceLoader;
@@ -314,10 +313,6 @@ public class JavaHelioViewer {
         // Load Plug ins at the very last point
         Log.info("Load plugin settings");
         PluginManager.getSingletonInstance().loadSettings(JHVDirectory.PLUGINS.getPath());
-
-        Log.info("Add internal plugin: " + "FilterPlugin");
-        Plugin internalPlugin = new InternalFilterPlugin();
-        PluginManager.getSingletonInstance().addInternalPlugin(internalPlugin.getClass().getClassLoader(), internalPlugin);
 
         if (builtinPlugins != null) {
             for (int i = 0; i < builtinPlugins.length; ++i) {
