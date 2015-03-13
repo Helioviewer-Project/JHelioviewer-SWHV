@@ -15,8 +15,6 @@ import org.helioviewer.base.math.Interval;
 import org.helioviewer.base.math.Vector2dInt;
 import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.display.RenderListener;
-import org.helioviewer.jhv.gui.states.StateController;
-import org.helioviewer.jhv.gui.states.ViewStateEnum;
 import org.helioviewer.jhv.internal_plugins.filter.SOHOLUTFilterPlugin.DefaultTable;
 import org.helioviewer.jhv.internal_plugins.filter.SOHOLUTFilterPlugin.LUT;
 import org.helioviewer.viewmodel.changeevent.ChangeEvent;
@@ -1045,27 +1043,20 @@ public class JHVJP2View extends AbstractView implements JP2View, ViewportView, R
 
     private void applyRunningDifferenceGL(GL2 gl) {
         if (this.baseDifferenceMode || this.differenceMode) {
-            if (StateController.getInstance().getCurrentState().getType() == ViewStateEnum.View3D) {
-                if (this.baseDifferenceMode) {
-                    if (this.baseDifferenceNoRot) {
-                        GLSLShader.setIsDifference(0.26f);
-                    } else {
-                        GLSLShader.setIsDifference(0.99f);
-                    }
-                } else {
-                    if (this.runningDifferenceNoRot) {
-                        GLSLShader.setIsDifference(0.25f);
-                    } else {
-                        GLSLShader.setIsDifference(1.0f);
-                    }
-                }
-            } else {
-                if (this.baseDifferenceMode) {
+            if (this.baseDifferenceMode) {
+                if (this.baseDifferenceNoRot) {
                     GLSLShader.setIsDifference(0.26f);
                 } else {
+                    GLSLShader.setIsDifference(0.99f);
+                }
+            } else {
+                if (this.runningDifferenceNoRot) {
                     GLSLShader.setIsDifference(0.25f);
+                } else {
+                    GLSLShader.setIsDifference(1.0f);
                 }
             }
+
             ImageData previousFrame;
             if (!this.baseDifferenceMode) {
                 previousFrame = this.getPreviousImageData();
