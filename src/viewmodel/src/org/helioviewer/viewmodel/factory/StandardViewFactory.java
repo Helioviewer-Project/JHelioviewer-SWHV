@@ -3,10 +3,8 @@ package org.helioviewer.viewmodel.factory;
 import java.util.LinkedList;
 
 import org.helioviewer.base.logging.Log;
-import org.helioviewer.viewmodel.filter.Filter;
 import org.helioviewer.viewmodel.renderer.screen.ScreenRenderer;
 import org.helioviewer.viewmodel.view.ComponentView;
-import org.helioviewer.viewmodel.view.FilterView;
 import org.helioviewer.viewmodel.view.ImageInfoView;
 import org.helioviewer.viewmodel.view.JHVSimpleImageView;
 import org.helioviewer.viewmodel.view.OverlayView;
@@ -68,20 +66,6 @@ public abstract class StandardViewFactory implements ViewFactory {
 
             return (T) newOverlay;
 
-            // FilterView
-        } else if (source instanceof FilterView) {
-            FilterView sourceFilter = (FilterView) source;
-            FilterView newFilter = (FilterView) createViewFromSourceImpl(source);
-
-            Filter filter = sourceFilter.getFilter();
-            if (!keepSource) {
-                sourceFilter.setFilter(null);
-            }
-            newFilter.setFilter(filter);
-
-            return (T) newFilter;
-
-            // ImageInfoView
         } else if (source instanceof ImageInfoView) {
             if (source instanceof JHVJPXView) {
                 JHVJPXView sourceJPX = (JHVJPXView) source;

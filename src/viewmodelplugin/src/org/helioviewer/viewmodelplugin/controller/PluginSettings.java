@@ -19,7 +19,6 @@ import javax.xml.transform.stream.StreamResult;
 
 import org.helioviewer.viewmodel.filter.Filter;
 import org.helioviewer.viewmodel.renderer.physical.PhysicalRenderer;
-import org.helioviewer.viewmodelplugin.filter.FilterContainer;
 import org.helioviewer.viewmodelplugin.overlay.OverlayContainer;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -30,7 +29,7 @@ import org.xml.sax.SAXException;
 /**
  * This class handles to write and read the settings made to plug-ins into a
  * specific file.
- * 
+ *
  * @author Stephan Pagel
  */
 public class PluginSettings {
@@ -81,7 +80,7 @@ public class PluginSettings {
 
     /**
      * Method returns the sole instance of this class.
-     * 
+     *
      * @return the only instance of this class.
      * */
     public static PluginSettings getSingletonInstance() {
@@ -90,7 +89,7 @@ public class PluginSettings {
 
     /**
      * Loads the saved settings from the corresponding file.
-     * 
+     *
      * @param settingsFilePath
      *            Path of the directory where the plug-in settings file is
      *            saved.
@@ -168,7 +167,7 @@ public class PluginSettings {
 
     /**
      * Removes a plugin from the XML settings file
-     * 
+     *
      * @param pluginContainer
      *            Container of the plugin which should be removed
      */
@@ -184,7 +183,7 @@ public class PluginSettings {
      * Adds or updates the information of a passed plug-in to the internal XML
      * document. This method does not save the XML document to the corresponding
      * settings file!
-     * 
+     *
      * @param pluginContainer
      *            Plug-in container whose information have to be updated in the
      *            internal XML document.
@@ -202,7 +201,7 @@ public class PluginSettings {
 
     /**
      * Adds the information of a plug-in to the XML document.
-     * 
+     *
      * @param pluginContainer
      *            Plug-in container whose information have to be added to the
      *            internal XML document.
@@ -224,7 +223,7 @@ public class PluginSettings {
 
     /**
      * Updates the information of a passed plug-in to the internal XML document.
-     * 
+     *
      * @param pluginNode
      *            Corresponding plug-in node of the given plug-in.
      * @param pluginContainer
@@ -242,103 +241,10 @@ public class PluginSettings {
     }
 
     /**
-     * Adds or updates the information of a passed filter to the internal XML
-     * document. This method does not save the XML document to the corresponding
-     * settings file!
-     * 
-     * @param pluginLocation
-     *            location of the plug-in where the filter comes from.
-     * @param filterContainer
-     *            Filter container whose information have to be updated in the
-     *            internal XML document.
-     * @see #savePluginSettings()
-     */
-    public void filterSettingsToXML(URI pluginLocation, FilterContainer filterContainer) {
-
-        if (pluginLocation == null)
-            return;
-
-        Node pluginNode = findNode(pluginsRootNode, "PluginLocation", pluginLocation.getPath());
-
-        if (pluginNode == null)
-            return;
-
-        Node filterNode = findNode(pluginNode, NODES_FILTERNAME, filterContainer.getFilterClass().getName());
-
-        if (filterNode == null) {
-            addFilterToXML(pluginNode, filterContainer);
-        } else {
-            editFilterInXML(filterNode, filterContainer);
-        }
-    }
-
-    /**
-     * Adds the information of a filter to the XML document.
-     * 
-     * @param pluginNode
-     *            Corresponding plug-in node of the given filter.
-     * @param filterContainer
-     *            Filter container whose information have to be added to the
-     *            internal XML document.
-     */
-    private void addFilterToXML(Node pluginNode, FilterContainer filterContainer) {
-
-        NodeList filters = ((Element) pluginNode).getElementsByTagName(NODES_FILTERS);
-        Node filtersNode;
-
-        if (filters.getLength() == 1) {
-            filtersNode = filters.item(0);
-        } else {
-            filtersNode = xmlDocument.createElement(NODES_FILTERS);
-            pluginNode.appendChild(filtersNode);
-        }
-
-        Node filterNode = xmlDocument.createElement(NODES_FILTER);
-        Node nameNode = xmlDocument.createElement(NODES_FILTERNAME);
-        Node activatedNode = xmlDocument.createElement(NODES_FILTERACTIVATED);
-        Node positionNode = xmlDocument.createElement(NODES_FILTERPOSITION);
-
-        filtersNode.appendChild(filterNode);
-        filterNode.appendChild(nameNode);
-        filterNode.appendChild(activatedNode);
-        filterNode.appendChild(positionNode);
-
-        nameNode.appendChild(xmlDocument.createTextNode(filterContainer.getFilterClass().getName()));
-        activatedNode.appendChild(xmlDocument.createTextNode(Boolean.toString(filterContainer.isActive())));
-        positionNode.appendChild(xmlDocument.createTextNode(Integer.toString(filterContainer.getPosition())));
-    }
-
-    /**
-     * Updates the information of a passed filter to the internal XML document.
-     * 
-     * @param filterNode
-     *            Corresponding filter node of the given filter.
-     * @param filterContainer
-     *            Filter container whose information have to be updated in the
-     *            internal XML document.
-     */
-    private void editFilterInXML(Node filterNode, FilterContainer filterContainer) {
-
-        NodeList list = ((Element) filterNode).getElementsByTagName(NODES_FILTERACTIVATED);
-
-        if (list.getLength() == 1) {
-            Node textNode = list.item(0).getFirstChild();
-            textNode.setNodeValue(Boolean.toString(filterContainer.isActive()));
-        }
-
-        list = ((Element) filterNode).getElementsByTagName(NODES_FILTERPOSITION);
-
-        if (list.getLength() == 1) {
-            Node textNode = list.item(0).getFirstChild();
-            textNode.setNodeValue(Integer.toString(filterContainer.getPosition()));
-        }
-    }
-
-    /**
      * Adds or updates the information of a passed overlay to the internal XML
      * document. This method does not save the XML document to the corresponding
      * settings file!
-     * 
+     *
      * @param pluginLocation
      *            location of the plug-in where the filter comes from.
      * @param overlayContainer
@@ -367,7 +273,7 @@ public class PluginSettings {
 
     /**
      * Adds the information of a overlay to the XML document.
-     * 
+     *
      * @param pluginNode
      *            Corresponding plug-in node of the given overlay.
      * @param overlayContainer
@@ -403,7 +309,7 @@ public class PluginSettings {
 
     /**
      * Updates the information of a passed overlay to the internal XML document.
-     * 
+     *
      * @param overlayNode
      *            Corresponding overlay node of the given overlay.
      * @param overlayContainer
@@ -451,7 +357,7 @@ public class PluginSettings {
 
     /**
      * Checks if for a given plug-in an entry can be found in the XML document.
-     * 
+     *
      * @param pluginLocation
      *            location of the file where the plug-in comes from.
      * @return true if an entry exists in the XML document; otherwise false.
@@ -463,7 +369,7 @@ public class PluginSettings {
     /**
      * Checks the activated value of a given plug-in in the XML document. If
      * there is no entry in the XML document the return value is false.
-     * 
+     *
      * @param pluginLocation
      *            location of the file where the plug-in comes from.
      * @return boolean value as it is in the XML document or false if no entry
@@ -489,7 +395,7 @@ public class PluginSettings {
      * Checks the activated value of a given filter in the XML document. If
      * there is no entry in the XML document the return value is the passed
      * default value.
-     * 
+     *
      * @param pluginLocation
      *            location of the file where the plug-in comes from.
      * @param filterClass
@@ -522,7 +428,7 @@ public class PluginSettings {
      * Checks the activated value of a given overlay in the XML document. If
      * there is no entry in the XML document the return value is the passed
      * default value.
-     * 
+     *
      * @param pluginLocation
      *            location of the file where the plug-in comes from.
      * @param overlayClass
@@ -553,7 +459,7 @@ public class PluginSettings {
 
     /**
      * Reads the saved position of a given filter from the XML document.
-     * 
+     *
      * @param pluginLocation
      *            location of the file where the plug-in comes from.
      * @param filterClass
@@ -592,7 +498,7 @@ public class PluginSettings {
 
     /**
      * Reads the saved position of a given overlay from the XML document.
-     * 
+     *
      * @param pluginLocation
      *            location of the file where the plug-in comes from.
      * @param overlayClass
@@ -632,7 +538,7 @@ public class PluginSettings {
     /**
      * Method checks all child nodes of a given node recursively if there text
      * node has a specific value.
-     * 
+     *
      * @param root
      *            Check all child nodes of this node.
      * @param nodeName
@@ -658,7 +564,7 @@ public class PluginSettings {
     /**
      * Method checks all child nodes of a given node recursively for there text
      * node and returns the corresponding boolean value.
-     * 
+     *
      * @param root
      *            Check all child nodes of this node.
      * @param nodeName

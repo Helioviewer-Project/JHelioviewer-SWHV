@@ -32,7 +32,6 @@ import org.helioviewer.jhv.gui.GL3DViewchainFactory;
 import org.helioviewer.jhv.gui.IconBank;
 import org.helioviewer.jhv.gui.IconBank.JHVIcon;
 import org.helioviewer.jhv.gui.ImageViewerGui;
-import org.helioviewer.jhv.gui.dialogs.pluginsOLD.FilterPluginDialog;
 import org.helioviewer.jhv.gui.dialogs.pluginsOLD.OverlayPluginDialog;
 import org.helioviewer.jhv.gui.interfaces.ShowableDialog;
 import org.helioviewer.viewmodel.factory.ViewFactory;
@@ -73,7 +72,6 @@ public class PluginsDialog extends JDialog implements ShowableDialog, ActionList
     private final JPanel listContainerPane = new JPanel();
     private final CardLayout listLayout = new CardLayout();
 
-    private final JButton filterButton = new JButton("Filter");
     private final JButton overlayButton = new JButton("Overlays");
 
     private final JButton okButton = new JButton("Ok", IconBank.getIcon(JHVIcon.CHECK));
@@ -163,18 +161,10 @@ public class PluginsDialog extends JDialog implements ShowableDialog, ActionList
         final JPanel managePane = new JPanel();
         managePane.setLayout(new FlowLayout(FlowLayout.LEFT));
         managePane.setBorder(BorderFactory.createTitledBorder(" Filter and Overlays "));
-        managePane.add(filterButton);
         managePane.add(overlayButton);
 
-        final int width = Math.max(filterButton.getPreferredSize().width, overlayButton.getPreferredSize().width);
-        final int height = Math.max(filterButton.getPreferredSize().height, overlayButton.getPreferredSize().height);
-        filterButton.setPreferredSize(new Dimension(width, height));
-        overlayButton.setPreferredSize(new Dimension(width, height));
+        overlayButton.setToolTipText("Opens a dialog where all available overlays can be managed.");
 
-        filterButton.setToolTipText("Opens an dialog where all available filter can be managed.");
-        overlayButton.setToolTipText("Opens an dialog where all available overlays can be managed.");
-
-        filterButton.addActionListener(this);
         overlayButton.addActionListener(this);
 
         // center
@@ -222,7 +212,6 @@ public class PluginsDialog extends JDialog implements ShowableDialog, ActionList
             listLayout.show(listContainerPane, "empty");
         }
 
-        filterButton.setEnabled(PluginManager.getSingletonInstance().getNumberOfFilter() > 0);
         overlayButton.setEnabled(PluginManager.getSingletonInstance().getNumberOfOverlays() > 0);
     }
 
@@ -395,8 +384,6 @@ public class PluginsDialog extends JDialog implements ShowableDialog, ActionList
             importPlugin();
         } else if (e.getSource().equals(downloadButton)) {
             downloadPlugins();
-        } else if (e.getSource().equals(filterButton)) {
-            new FilterPluginDialog().showDialog();
         } else if (e.getSource().equals(overlayButton)) {
             new OverlayPluginDialog().showDialog();
         } else if (e.getSource().equals(filterComboBox)) {
