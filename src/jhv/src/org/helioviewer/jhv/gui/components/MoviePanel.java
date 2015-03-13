@@ -242,19 +242,19 @@ public class MoviePanel extends JPanel implements ActionListener, ChangeListener
         JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 1, 1));
         buttonPanel.setBorder(BorderFactory.createEmptyBorder(0, 0, 0, 0));
 
-        previousFrameButton = ButtonCreator.createButton(IconBank.getIcon(JHVIcon.BACK), "Step to Previous Frame", this);
+        previousFrameButton = ButtonCreator.createButton(IconBank.getIcon(JHVIcon.BACK), "Step to previous frame", this);
         buttonPanel.add(previousFrameButton);
 
         playPauseButton = ButtonCreator.createButton(playIcon, "Play movie", this);
         buttonPanel.add(playPauseButton);
 
-        nextFrameButton = ButtonCreator.createButton(IconBank.getIcon(JHVIcon.FORWARD), "Step to Next Frame", this);
+        nextFrameButton = ButtonCreator.createButton(IconBank.getIcon(JHVIcon.FORWARD), "Step to next frame", this);
         buttonPanel.add(nextFrameButton);
         secondLine.add(buttonPanel, BorderLayout.WEST);
 
         buttonPanel.add(new JSeparator(SwingConstants.VERTICAL));
 
-        advancedButton = ButtonCreator.createTextButton(IconBank.getIcon(JHVIcon.SHOW_MORE), "More Options", "More Options to Control Playback", this);
+        advancedButton = ButtonCreator.createTextButton(IconBank.getIcon(JHVIcon.SHOW_MORE), "More options", "More options to control playback", this);
         buttonPanel.add(advancedButton);
 
         // Current frame number
@@ -273,7 +273,7 @@ public class MoviePanel extends JPanel implements ActionListener, ChangeListener
         // Speed
         speedPanel = new JPanel(new BorderLayout());
         speedPanel.add(new JSeparator(SwingConstants.VERTICAL), BorderLayout.PAGE_START);
-        speedPanel.add(new JLabel("Speed:     "), BorderLayout.WEST);
+        speedPanel.add(new JLabel("Speed        "), BorderLayout.WEST);
 
         speedSpinner = new JSpinner(new SpinnerNumberModel(20, 1, 99, 1));
         speedSpinner.addChangeListener(this);
@@ -291,7 +291,7 @@ public class MoviePanel extends JPanel implements ActionListener, ChangeListener
 
         // Animation mode
         modePanel = new JPanel(new BorderLayout());
-        modePanel.add(new JLabel("Animation mode:"), BorderLayout.WEST);
+        modePanel.add(new JLabel("Animation mode"), BorderLayout.WEST);
 
         AnimationMode[] modi = { AnimationMode.LOOP, AnimationMode.STOP, AnimationMode.SWING };
         animationModeComboBox = new JComboBox(modi);
@@ -808,7 +808,7 @@ public class MoviePanel extends JPanel implements ActionListener, ChangeListener
          * Default constructor.
          */
         public StaticPreviousFrameAction() {
-            super("Step to Previous Frame", IconBank.getIcon(JHVIcon.BACK));
+            super("Step to previous frame", IconBank.getIcon(JHVIcon.BACK));
             putValue(MNEMONIC_KEY, KeyEvent.VK_P);
             putValue(ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_B, KeyEvent.ALT_MASK));
         }
@@ -838,7 +838,7 @@ public class MoviePanel extends JPanel implements ActionListener, ChangeListener
          * Default constructor.
          */
         public StaticNextFrameAction() {
-            super("Step to Next Frame", IconBank.getIcon(JHVIcon.FORWARD));
+            super("Step to next frame", IconBank.getIcon(JHVIcon.FORWARD));
             putValue(MNEMONIC_KEY, KeyEvent.VK_N);
             putValue(ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_N, KeyEvent.ALT_MASK));
         }

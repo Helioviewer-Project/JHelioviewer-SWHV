@@ -57,13 +57,13 @@ public class CollapsiblePaneWithButton extends CollapsiblePane {
     }
 
     private void initActions() {
-        addLayerAction = new AbstractAction("Add Layer", IconBank.getIcon(JHVIcon.ADD)) {
+        addLayerAction = new AbstractAction("Add layer", IconBank.getIcon(JHVIcon.ADD)) {
             /**
              *
              */
             private static final long serialVersionUID = 1L;
             {
-                putValue(SHORT_DESCRIPTION, "Add a new Layer");
+                putValue(SHORT_DESCRIPTION, "Add a new layer");
             }
 
             /**

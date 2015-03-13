@@ -70,13 +70,13 @@ public class ImageSelectorPanel extends JPanel implements LayersListener {
      * Action to add a new layer. If there is a current active layer which much
      * different time, the dates will be updated.
      */
-    private final Action addLayerAction = new AbstractAction("Add Layer", IconBank.getIcon(JHVIcon.ADD)) {
+    private final Action addLayerAction = new AbstractAction("Add layer", IconBank.getIcon(JHVIcon.ADD)) {
         /**
          *
          */
         private static final long serialVersionUID = 1L;
         {
-            putValue(SHORT_DESCRIPTION, "Add a new Layer");
+            putValue(SHORT_DESCRIPTION, "Add a new layer");
         }
 
         /**
@@ -155,7 +155,7 @@ public class ImageSelectorPanel extends JPanel implements LayersListener {
          */
         private static final long serialVersionUID = 1L;
         {
-            putValue(SHORT_DESCRIPTION, "Download the currently selected Layer");
+            putValue(SHORT_DESCRIPTION, "Download the selected layer");
             putValue(SMALL_ICON, IconBank.getIcon(JHVIcon.DOWNLOAD));
         }
 
@@ -187,7 +187,7 @@ public class ImageSelectorPanel extends JPanel implements LayersListener {
          */
         private static final long serialVersionUID = 1L;
         {
-            putValue(SHORT_DESCRIPTION, "Move the currently selected Layer down");
+            putValue(SHORT_DESCRIPTION, "Move down the selected layer");
             putValue(SMALL_ICON, IconBank.getIcon(JHVIcon.DOWN));
         }
 
@@ -217,7 +217,7 @@ public class ImageSelectorPanel extends JPanel implements LayersListener {
          */
         private static final long serialVersionUID = 1L;
         {
-            putValue(SHORT_DESCRIPTION, "Move the currently selected Layer up");
+            putValue(SHORT_DESCRIPTION, "Move up the selected layer");
             putValue(SMALL_ICON, IconBank.getIcon(JHVIcon.UP));
         }
 
@@ -248,7 +248,7 @@ public class ImageSelectorPanel extends JPanel implements LayersListener {
          */
         private static final long serialVersionUID = 1L;
         {
-            putValue(SHORT_DESCRIPTION, "Show the Metainformation of the currently selected Layer");
+            putValue(SHORT_DESCRIPTION, "Show the metadata of the selected layer");
             putValue(SMALL_ICON, IconBank.getIcon(JHVIcon.INFO));
         }
 
@@ -290,7 +290,7 @@ public class ImageSelectorPanel extends JPanel implements LayersListener {
         JScrollPane scrollPane = new JScrollPane(layerTable, JScrollPane.VERTICAL_SCROLLBAR_ALWAYS, JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
         scrollPane.setBorder(BorderFactory.createEmptyBorder(0, 0, 0, 0));
 
-        JLabel emptyLabel = new JLabel("No Layers Added yet", JLabel.CENTER);
+        JLabel emptyLabel = new JLabel("No layers added yet", JLabel.CENTER);
         emptyLabel.setFont(emptyLabel.getFont().deriveFont(Font.ITALIC));
         emptyLabel.setHorizontalTextPosition(JLabel.CENTER);
         emptyLabel.setOpaque(true);
