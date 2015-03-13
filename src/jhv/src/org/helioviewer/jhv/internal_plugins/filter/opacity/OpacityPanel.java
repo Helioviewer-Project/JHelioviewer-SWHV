@@ -10,6 +10,7 @@ import javax.swing.event.ChangeListener;
 
 import org.helioviewer.jhv.gui.components.base.WheelSupport;
 import org.helioviewer.viewmodel.filter.Filter;
+import org.helioviewer.viewmodel.view.jp2view.JHVJP2View;
 import org.helioviewer.viewmodelplugin.filter.FilterAlignmentDetails;
 import org.helioviewer.viewmodelplugin.filter.FilterPanel;
 import org.helioviewer.viewmodelplugin.filter.FilterTabPanelManager.Area;
@@ -28,6 +29,7 @@ public class OpacityPanel extends FilterPanel implements ChangeListener, FilterA
     private final JLabel opacityLabel;
     private final JLabel title;
     private OpacityFilter filter;
+    private JHVJP2View jp2view;
 
     /**
      * Default constructor.

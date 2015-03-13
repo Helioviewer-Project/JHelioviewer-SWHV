@@ -1,16 +1,19 @@
 package org.helioviewer.viewmodelplugin.filter;
 
-import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
+import java.util.ArrayList;
 import java.util.LinkedList;
 
-import javax.swing.BorderFactory;
-import javax.swing.BoxLayout;
-import javax.swing.JLabel;
 import javax.swing.JPanel;
+
+import org.helioviewer.jhv.gui.filters.AbstractFilterPanel;
+import org.helioviewer.jhv.layers.LayersListener;
+import org.helioviewer.jhv.layers.LayersModel;
+import org.helioviewer.viewmodel.view.View;
+import org.helioviewer.viewmodel.view.jp2view.JHVJP2View;
 
 /**
  * This manager collects all filter control components and creates a panel where
@@ -18,36 +21,40 @@ import javax.swing.JPanel;
  * <p>
  * There are three different areas: Top, Center, Bottom. Within the areas the
  * components will be occur below each other as they were added before.
- * 
+ *
  * @author Stephan Pagel
  */
-public class FilterTabPanelManager {
+public class FilterTabPanelManager implements LayersListener {
 
     public enum Area {
         TOP, CENTER, BOTTOM
     }
 
-    private LinkedList<Component> topList = new LinkedList<Component>();
-    private LinkedList<Component> centerList = new LinkedList<Component>();
-    private LinkedList<Component> bottomList = new LinkedList<Component>();
+    private final LinkedList<Component> topList = new LinkedList<Component>();
+    private final LinkedList<Component> centerList = new LinkedList<Component>();
+    private final LinkedList<Component> bottomList = new LinkedList<Component>();
+    private final ArrayList<AbstractFilterPanel> abstractFilterPanels = new ArrayList<AbstractFilterPanel>();
 
     /**
      * Adds a component to the manager. This function calls
      * {@link #add(Component, Area)} with CENTER as default value for the area.
-     * 
+     *
      * @param comp
      *            Component to add.
      * @see #add(Component, Area)
      */
     public void add(Component comp) {
         add(comp, Area.CENTER);
+        if (comp instanceof AbstractFilterPanel) {
+            this.addAbstractFilterPanel((AbstractFilterPanel) comp);
+        }
     }
 
     /**
      * Adds a component to the manager at the given area. By using
      * {@link #createPanel()} a panel will be created where the component will
      * be occur at the specified area.
-     * 
+     *
      * @param comp
      *            Component to add.
      * @param area
@@ -66,49 +73,19 @@ public class FilterTabPanelManager {
             bottomList.add(comp);
             break;
         }
+        if (comp instanceof AbstractFilterPanel) {
+            this.addAbstractFilterPanel((AbstractFilterPanel) comp);
+        }
     }
 
-    /**
-     * Creates a panel which contains all added components add the specified
-     * positions.
-     * <p>
-     * Components have to be added before creating the panel. Additional
-     * components should not be added to the returned panel.
-     * 
-     * @return panel which contains the added components.
-     */
-    public JPanel createPanel() {
-
-        JPanel panel = new JPanel(new BorderLayout());
-        JPanel top = new JPanel();
-        JPanel center = new JPanel();
-        JPanel bottom = new JPanel();
-
-        top.setLayout(new BoxLayout(top, BoxLayout.Y_AXIS));
-        center.setLayout(new BoxLayout(center, BoxLayout.Y_AXIS));
-        bottom.setLayout(new BoxLayout(bottom, BoxLayout.Y_AXIS));
-
-        panel.add(top, BorderLayout.NORTH);
-        panel.add(center, BorderLayout.CENTER);
-        panel.add(bottom, BorderLayout.SOUTH);
-        panel.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
-
-        for (Component comp : topList)
-            top.add(comp);
-
-        for (Component comp : centerList)
-            center.add(comp);
-
-        for (Component comp : bottomList)
-            bottom.add(comp);
-
-        return panel;
+    public void addAbstractFilterPanel(AbstractFilterPanel abstractFilterPanel) {
+        this.abstractFilterPanels.add(abstractFilterPanel);
     }
 
     /**
      * Setup a new CompactPanel based on all Components added to the center
      * list, that implement the FilterAlignmentDetails interface
-     * 
+     *
      * @see org.helioviewer.viewmodelplugin.filter# FilterAlignmentDetails
      * @return A JPanel containing all suitable components added to the center
      *         list
@@ -125,11 +102,11 @@ public class FilterTabPanelManager {
              * component.
              */
 
+            @Override
             public void setEnabled(boolean enabled) {
                 for (Component c : this.getComponents()) {
                     c.setEnabled(enabled);
                 }
-
             }
         };
 
@@ -198,7 +175,47 @@ public class FilterTabPanelManager {
                 }
             }
         }
+        LayersModel.getSingletonInstance().addLayersListener(this);
         return compactPanel;
+    }
+
+    @Override
+    public void layerAdded(int idx) {
+    }
+
+    @Override
+    public void layerRemoved(View oldView, int oldIdx) {
+    }
+
+    @Override
+    public void layerChanged(int idx) {
+    }
+
+    @Override
+    public void activeLayerChanged(int idx) {
+        JHVJP2View jp2view = LayersModel.getSingletonInstance().getActiveView().getAdapter(JHVJP2View.class);
+
+        for (AbstractFilterPanel c : this.abstractFilterPanels) {
+            c.setEnabled(true);
+            c.setJP2View(jp2view);
+        }
+
+    }
+
+    @Override
+    public void viewportGeometryChanged() {
+    }
+
+    @Override
+    public void timestampChanged(int idx) {
+    }
+
+    @Override
+    public void subImageDataChanged() {
+    }
+
+    @Override
+    public void layerDownloaded(int idx) {
     }
 
 }

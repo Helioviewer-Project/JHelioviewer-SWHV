@@ -27,9 +27,9 @@ import org.helioviewer.viewmodel.view.MetaDataView;
 import org.helioviewer.viewmodel.view.RegionView;
 import org.helioviewer.viewmodel.view.View;
 import org.helioviewer.viewmodel.view.ViewListener;
+import org.helioviewer.viewmodel.view.jp2view.JHVJP2View;
 import org.helioviewer.viewmodel.view.opengl.GL3DImageTextureView;
 import org.helioviewer.viewmodel.view.opengl.GL3DView;
-import org.helioviewer.viewmodel.view.opengl.GLFilterView;
 import org.helioviewer.viewmodel.view.opengl.shader.GLSLShader;
 
 import com.jogamp.common.nio.Buffers;
@@ -220,6 +220,7 @@ public class GL3DImageLayer extends GL3DShape {
 
     @Override
     public void shapeDraw(GL3DState state) {
+
         GL2 gl = state.gl;
         GLSLShader.bind(gl);
         GLSLShader.bindVars(gl);
@@ -229,10 +230,10 @@ public class GL3DImageLayer extends GL3DShape {
             gl.glCullFace(GL2.GL_BACK);
 
             gl.glEnable(GL2.GL_BLEND);
-            GLFilterView glfilter = this.imageTextureView.getAdapter(GLFilterView.class);
+            JHVJP2View jp2view = this.imageTextureView.getAdapter(JHVJP2View.class);
 
-            if (glfilter != null) {
-                glfilter.renderGL(gl, true);
+            if (jp2view != null) {
+                jp2view.applyFilters(gl);
             }
             GLSLShader.filter(gl);
             GLSLShader.bind(gl);

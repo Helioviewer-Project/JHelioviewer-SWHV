@@ -4,5 +4,6 @@
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/viewmodel"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/jhv"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/jhv-display"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

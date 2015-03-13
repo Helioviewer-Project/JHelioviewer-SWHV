@@ -7,7 +7,6 @@ import org.helioviewer.viewmodel.changeevent.ChangeEvent;
 import org.helioviewer.viewmodel.changeevent.PlayStateChangedReason;
 import org.helioviewer.viewmodel.imagedata.ImageData;
 import org.helioviewer.viewmodel.metadata.HelioviewerMetaData;
-import org.helioviewer.viewmodel.metadata.MetaData;
 import org.helioviewer.viewmodel.view.CachedMovieView;
 import org.helioviewer.viewmodel.view.LinkedMovieManager;
 import org.helioviewer.viewmodel.view.TimedMovieView;
@@ -44,8 +43,6 @@ public class JHVJPXView extends JHVJP2View implements TimedMovieView, CachedMovi
      * Linking movies, if the movie is not linked, this has to be null
      */
     protected LinkedMovieManager linkedMovieManager;
-    private boolean differenceMode = false;
-    private boolean baseDifferenceMode = false;
 
     /**
      * Default constructor.
@@ -456,22 +453,6 @@ public class JHVJPXView extends JHVJP2View implements TimedMovieView, CachedMovi
     public long getCurrentDateMillis() {
         HelioviewerMetaData metadata = (HelioviewerMetaData) jp2Image.metaDataList[getCurrentFrameNumber()];
         return metadata.getDateTime().getMillis();
-    }
-
-    public void setDifferenceMode(boolean differenceMode) {
-        this.differenceMode = differenceMode;
-    }
-
-    public boolean getDifferenceMode() {
-        return this.differenceMode;
-    }
-
-    public void setBaseDifferenceMode(boolean selected) {
-        this.baseDifferenceMode = selected;
-    }
-
-    public boolean getBaseDifferenceMode() {
-        return baseDifferenceMode;
     }
 
     @Override
