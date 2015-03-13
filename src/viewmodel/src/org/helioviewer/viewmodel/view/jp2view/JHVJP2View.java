@@ -958,6 +958,7 @@ public class JHVJP2View extends AbstractView implements JP2View, ViewportView, R
 
     public void applyFilters(GL2 gl) {
         applyRunningDifferenceGL(gl);
+        GLSLShader.colorMask = colorMask;
         GLSLShader.setContrast(contrast);
         GLSLShader.setGamma(gamma);
         GLSLShader.setAlpha(opacity);
