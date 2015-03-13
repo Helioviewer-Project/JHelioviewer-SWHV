@@ -154,14 +154,10 @@ public class ObservationDialog extends JDialog implements ActionListener, Showab
     private void resetContentPane() {
         contentPane.removeAll();
 
-        if (uiMap.size() > 1) {
-            contentPane.add(uiSelectionPane);
-        }
-
+        contentPane.add(uiSelectionPane);
         if (selectedPane != null) {
             contentPane.add(selectedPane);
         }
-
         contentPane.add(buttonPane);
 
         contentPane.revalidate();
@@ -277,4 +273,5 @@ public class ObservationDialog extends JDialog implements ActionListener, Showab
     @Override
     public void init() {
     }
+
 }
