@@ -2,16 +2,11 @@ package org.helioviewer.jhv.gui;
 
 import java.util.AbstractList;
 
-import javax.swing.BoxLayout;
-import javax.swing.JPanel;
-import javax.swing.JTabbedPane;
-
 import org.helioviewer.jhv.gui.components.MoviePanel;
 import org.helioviewer.jhv.layers.LayersModel;
 import org.helioviewer.viewmodel.factory.GL3DViewFactory;
 import org.helioviewer.viewmodel.factory.ViewFactory;
 import org.helioviewer.viewmodel.view.ComponentView;
-import org.helioviewer.viewmodel.view.FilterView;
 import org.helioviewer.viewmodel.view.ImageInfoView;
 import org.helioviewer.viewmodel.view.LayeredView;
 import org.helioviewer.viewmodel.view.ModifiableInnerViewView;
@@ -19,18 +14,11 @@ import org.helioviewer.viewmodel.view.MovieView;
 import org.helioviewer.viewmodel.view.OverlayView;
 import org.helioviewer.viewmodel.view.SubimageDataView;
 import org.helioviewer.viewmodel.view.View;
-import org.helioviewer.viewmodel.view.jp2view.JP2View;
 import org.helioviewer.viewmodel.view.opengl.GL3DCameraView;
 import org.helioviewer.viewmodel.view.opengl.GL3DComponentView;
 import org.helioviewer.viewmodel.view.opengl.GL3DSceneGraphView;
 import org.helioviewer.viewmodel.view.opengl.GLOverlayView;
 import org.helioviewer.viewmodelplugin.controller.PluginManager;
-import org.helioviewer.viewmodelplugin.filter.FilterContainer;
-import org.helioviewer.viewmodelplugin.filter.FilterTab;
-import org.helioviewer.viewmodelplugin.filter.FilterTabDescriptor;
-import org.helioviewer.viewmodelplugin.filter.FilterTabDescriptor.Type;
-import org.helioviewer.viewmodelplugin.filter.FilterTabList;
-import org.helioviewer.viewmodelplugin.filter.FilterTabPanelManager;
 import org.helioviewer.viewmodelplugin.overlay.OverlayContainer;
 import org.helioviewer.viewmodelplugin.overlay.OverlayControlComponent;
 import org.helioviewer.viewmodelplugin.overlay.OverlayControlComponentManager;
@@ -112,70 +100,10 @@ public class GL3DViewchainFactory {
 
             }
 
-            // Create list which manages all filter tabs
-            FilterTabList tabList = new FilterTabList();
-
-            // Adjust Panel for basic functions
-            JPanel adjustPanel = new JPanel();
-            adjustPanel.setLayout(new BoxLayout(adjustPanel, BoxLayout.PAGE_AXIS));
-
-            FilterTabPanelManager compactPanelManager = new FilterTabPanelManager();
-            tabList.add(new FilterTab(FilterTabDescriptor.Type.COMPACT_FILTER, "Color", compactPanelManager));
-
-            // Add filter to view chain
-            AbstractList<FilterContainer> filterContainerList = PluginManager.getSingletonInstance().getFilterContainers(true);
             View nextView = newLayer;
-
-            for (int i = filterContainerList.size() - 1; i >= 0; i--) {
-                FilterContainer container = filterContainerList.get(i);
-
-                FilterView filterView = viewFactory.createNewView(FilterView.class);
-                filterView.setView(nextView);
-
-                container.installFilter(filterView, tabList);
-
-                if (filterView.getFilter() != null) {
-                    nextView = filterView;
-                } else {
-                    filterView.setView(null);
-                }
-            }
 
             // Add layer
             layeredView.addLayer(nextView);
-
-            // Add JTabbedPane
-            JTabbedPane tabbedPane = new JTabbedPane() {
-
-                private static final long serialVersionUID = 1L;
-
-                /**
-                 * Override the setEnabled method in order to keep the
-                 * containing components' enabledState synced with the
-                 * enabledState of this component.
-                 */
-                @Override
-                public void setEnabled(boolean enabled) {
-                    for (int i = 0; i < this.getTabCount(); i++) {
-                        this.getComponentAt(i).setEnabled(enabled);
-                    }
-                }
-            };
-
-            // tabbedPane.setTabPlacement(JTabbedPane.BOTTOM);
-
-            for (int i = 0; i < tabList.size(); i++) {
-                FilterTab filterTab = tabList.get(i);
-                if (filterTab.getType() == Type.COMPACT_FILTER) {
-                    tabbedPane.add(filterTab.getTitle(), filterTab.getPaneManager().createCompactPanel());
-                }
-            }
-            for (int i = 0; i < tabList.size(); i++) {
-                FilterTab filterTab = tabList.get(i);
-                if (filterTab.getType() != Type.COMPACT_FILTER) {
-                    tabbedPane.add(filterTab.getTitle(), filterTab.getPaneManager().createPanel());
-                }
-            }
 
             ImageInfoView imageInfoView = nextView.getAdapter(ImageInfoView.class);
 
@@ -192,7 +120,6 @@ public class GL3DViewchainFactory {
                 ImageViewerGui.getSingletonInstance().getMoviePanelContainer().addLayer(imageInfoView, moviePanel);
             }
 
-            ImageViewerGui.getSingletonInstance().getFilterPanelContainer().addLayer(imageInfoView, tabbedPane);
             ImageViewerGui.getSingletonInstance().getLeftContentPane().expand(ImageViewerGui.getSingletonInstance().getFilterPanelContainer());
             LayersModel.getSingletonInstance().setActiveLayer(imageInfoView);
         }

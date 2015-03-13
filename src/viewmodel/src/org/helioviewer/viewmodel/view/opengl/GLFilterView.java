@@ -6,7 +6,6 @@ import org.helioviewer.viewmodel.changeevent.ChangeEvent;
 import org.helioviewer.viewmodel.changeevent.SubImageDataChangedReason;
 import org.helioviewer.viewmodel.filter.Filter;
 import org.helioviewer.viewmodel.filter.FrameFilter;
-import org.helioviewer.viewmodel.filter.GLPostFilter;
 import org.helioviewer.viewmodel.imagedata.ImageData;
 import org.helioviewer.viewmodel.view.StandardFilterView;
 import org.helioviewer.viewmodel.view.View;
@@ -73,9 +72,6 @@ public class GLFilterView extends StandardFilterView implements GLView {
             }
         }
 
-        if (filter instanceof GLPostFilter) {
-            ((GLPostFilter) filter).postApplyGL(gl);
-        }
     }
 
     /**

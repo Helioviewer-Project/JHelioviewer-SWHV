@@ -1,4 +1,4 @@
-package org.helioviewer.jhv.internal_plugins.filter.opacity;
+package org.helioviewer.jhv.gui.filters;
 
 import java.awt.Dimension;
 
@@ -9,8 +9,7 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
 import org.helioviewer.jhv.gui.components.base.WheelSupport;
-import org.helioviewer.viewmodel.filter.Filter;
-import org.helioviewer.viewmodel.view.jp2view.JHVJP2View;
+import org.helioviewer.jhv.internal_plugins.filter.opacity.OpacityFilter;
 import org.helioviewer.viewmodelplugin.filter.FilterAlignmentDetails;
 import org.helioviewer.viewmodelplugin.filter.FilterPanel;
 import org.helioviewer.viewmodelplugin.filter.FilterTabPanelManager.Area;
@@ -21,7 +20,7 @@ import org.helioviewer.viewmodelplugin.filter.FilterTabPanelManager.Area;
  * @author Markus Langenberg
  * @author Malte Nuhn
  */
-public class OpacityPanel extends FilterPanel implements ChangeListener, FilterAlignmentDetails {
+public class OpacityPanel extends AbstractFilterPanel implements ChangeListener, FilterAlignmentDetails {
 
     private static final long serialVersionUID = 1L;
 
@@ -29,7 +28,6 @@ public class OpacityPanel extends FilterPanel implements ChangeListener, FilterA
     private final JLabel opacityLabel;
     private final JLabel title;
     private OpacityFilter filter;
-    private JHVJP2View jp2view;
 
     /**
      * Default constructor.
@@ -58,25 +56,6 @@ public class OpacityPanel extends FilterPanel implements ChangeListener, FilterA
         setEnabled(false);
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void setFilter(Filter filter) {
-        if (filter instanceof OpacityFilter) {
-            this.filter = (OpacityFilter) filter;
-            this.filter.setPanel(this);
-            setEnabled(true);
-        } else {
-            setEnabled(false);
-        }
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-
-    @Override
     public Area getArea() {
         return Area.TOP;
     }
@@ -86,7 +65,7 @@ public class OpacityPanel extends FilterPanel implements ChangeListener, FilterA
      */
     @Override
     public void stateChanged(ChangeEvent e) {
-        filter.setOpacity(opacitySlider.getValue() / 100.f);
+        jp2view.setOpacity(opacitySlider.getValue() / 100.f);
         opacityLabel.setText(opacitySlider.getValue() + "%");
     }
 
