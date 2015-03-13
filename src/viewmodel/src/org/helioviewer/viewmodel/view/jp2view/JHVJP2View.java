@@ -192,7 +192,6 @@ public class JHVJP2View extends AbstractView implements JP2View, ViewportView, R
             e.printStackTrace();
         }
         setStartLUT();
-
     }
 
     /**
@@ -960,7 +959,7 @@ public class JHVJP2View extends AbstractView implements JP2View, ViewportView, R
     }
 
     public void applyFilters(GL2 gl) {
-        //applyRunningDifferenceGL(gl);
+        applyRunningDifferenceGL(gl);
         GLSLShader.setContrast(contrast);
         GLSLShader.setGamma(gamma);
         GLSLShader.setAlpha(opacity);
@@ -1073,7 +1072,7 @@ public class JHVJP2View extends AbstractView implements JP2View, ViewportView, R
             } else {
                 previousFrame = this.getBaseDifferenceImageData();
             }
-            if (this.imageData != previousFrame) {
+            if (this.imageData != previousFrame && previousFrame != null) {
                 GLSLShader.setTruncationValue(this.truncation);
                 gl.glActiveTexture(GL2.GL_TEXTURE2);
                 GLTextureHelper.moveImageDataToGLTexture(gl, previousFrame, 0, 0, previousFrame.getWidth(), previousFrame.getHeight(), diffTex);

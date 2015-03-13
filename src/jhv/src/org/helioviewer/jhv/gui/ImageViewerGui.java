@@ -51,6 +51,7 @@ import org.helioviewer.jhv.gui.filters.ChannelMixerPanel;
 import org.helioviewer.jhv.gui.filters.ContrastPanel;
 import org.helioviewer.jhv.gui.filters.GammaCorrectionPanel;
 import org.helioviewer.jhv.gui.filters.OpacityPanel;
+import org.helioviewer.jhv.gui.filters.RunningDifferencePanel;
 import org.helioviewer.jhv.gui.filters.SOHOLUTPanel;
 import org.helioviewer.jhv.gui.filters.SharpenPanel;
 import org.helioviewer.jhv.gui.states.GuiState;
@@ -341,12 +342,16 @@ public class ImageViewerGui {
             compactPanelManager.add(new ContrastPanel());
             compactPanelManager.add(new SharpenPanel());
             compactPanelManager.add(new ChannelMixerPanel());
+            RunningDifferencePanel runningDifferencePanel = new RunningDifferencePanel();
+            compactPanelManager.addAbstractFilterPanel(runningDifferencePanel);
 
             JPanel compactPanel = compactPanelManager.createCompactPanel();
 
             JTabbedPane tab = new JTabbedPane();
             tab.addTab("Color", compactPanel);
-            tab.setEnabled(false);
+            tab.addTab("Movie", runningDifferencePanel);
+
+            tab.setEnabled(true);
 
             filterPanelContainer = new ControlPanelContainer();
             filterPanelContainer.setDefaultPanel(tab);
