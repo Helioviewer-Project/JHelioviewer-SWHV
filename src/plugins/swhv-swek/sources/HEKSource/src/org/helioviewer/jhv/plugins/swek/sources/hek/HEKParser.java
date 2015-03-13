@@ -579,6 +579,7 @@ public class HEKParser implements SWEKParser {
         if (value.toLowerCase().contains("polygon")) {
             String coordinatesString = value.substring(value.indexOf('(') + 1, value.lastIndexOf(')'));
             String coordinates = coordinatesString.substring(coordinatesString.indexOf('(') + 1, coordinatesString.lastIndexOf(')'));
+
             Scanner s = new Scanner(coordinates);
             s.useDelimiter(",");
             while (s.hasNext()) {
@@ -588,6 +589,7 @@ public class HEKParser implements SWEKParser {
                     polygonPoints.add(tempPoint);
                 }
             }
+            s.close();
         }
         return polygonPoints;
     }
@@ -616,14 +618,16 @@ public class HEKParser implements SWEKParser {
      * @return the JHVPoint or null of it could not be parsed
      */
     private JHVPoint parseCoordinates(String coordinateString) {
-        Scanner coordinatesScanner = new Scanner(coordinateString);
-        coordinatesScanner.useDelimiter(" ");
         Double coordinate1 = 0.0;
         Double coordinate2 = 0.0;
         Double coordinate3 = 0.0;
         boolean coordinate1OK = false;
         boolean coordinate2OK = false;
         boolean coordinate3OK = false;
+
+        Scanner coordinatesScanner = new Scanner(coordinateString);
+        coordinatesScanner.useDelimiter(" ");
+
         if (coordinatesScanner.hasNext()) {
             coordinate1 = coordinatesScanner.nextDouble();
             coordinate1OK = true;
@@ -636,6 +640,9 @@ public class HEKParser implements SWEKParser {
             coordinate3 = coordinatesScanner.nextDouble();
             coordinate3OK = true;
         }
+
+        coordinatesScanner.close();
+
         if (coordinate1OK && coordinate2OK && coordinate3OK) {
             return new JHVPoint(coordinate1, coordinate2, coordinate3);
         } else if (coordinate1OK && coordinate2OK) {

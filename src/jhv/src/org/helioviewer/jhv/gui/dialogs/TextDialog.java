@@ -30,10 +30,10 @@ public class TextDialog extends JDialog implements ActionListener, ShowableDialo
 
         try {
             Scanner scanner = new Scanner(new BufferedReader(new InputStreamReader(textFile.openStream())));
-
             while (scanner.hasNext()) {
                 text += scanner.nextLine() + linebreak;
             }
+            scanner.close();
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -74,4 +74,5 @@ public class TextDialog extends JDialog implements ActionListener, ShowableDialo
     @Override
     public void init() {
     }
+
 }
