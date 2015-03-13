@@ -1,7 +1,6 @@
 package org.helioviewer.viewmodel.factory;
 
 import org.helioviewer.viewmodel.view.ComponentView;
-import org.helioviewer.viewmodel.view.FilterView;
 import org.helioviewer.viewmodel.view.LayeredView;
 import org.helioviewer.viewmodel.view.OverlayView;
 import org.helioviewer.viewmodel.view.View;
@@ -11,7 +10,6 @@ import org.helioviewer.viewmodel.view.opengl.GL3DImageTextureView;
 import org.helioviewer.viewmodel.view.opengl.GL3DLayeredView;
 import org.helioviewer.viewmodel.view.opengl.GL3DSceneGraphView;
 import org.helioviewer.viewmodel.view.opengl.GL3DView;
-import org.helioviewer.viewmodel.view.opengl.GLFilterView;
 //import org.helioviewer.viewmodel.view.opengl.GL3DViewportView;
 import org.helioviewer.viewmodel.view.opengl.GLOverlayView;
 
@@ -48,10 +46,8 @@ public class GL3DViewFactory extends StandardViewFactory {
             return (T) new GL3DLayeredView();
         } else if (pattern.isAssignableFrom(OverlayView.class)) {
             return (T) new GLOverlayView();
-        } else if (pattern.isAssignableFrom(FilterView.class)) {
-            return (T) new GLFilterView();
         } else {
-            return super.createNewView(pattern);
+            return null;
         }
     }
 
