@@ -17,6 +17,7 @@ import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.display.RenderListener;
 import org.helioviewer.jhv.gui.states.StateController;
 import org.helioviewer.jhv.gui.states.ViewStateEnum;
+import org.helioviewer.jhv.internal_plugins.filter.SOHOLUTFilterPlugin.DefaultTable;
 import org.helioviewer.jhv.internal_plugins.filter.SOHOLUTFilterPlugin.LUT;
 import org.helioviewer.viewmodel.changeevent.ChangeEvent;
 import org.helioviewer.viewmodel.changeevent.ChangedReason;
@@ -973,6 +974,24 @@ public class JHVJP2View extends AbstractView implements JP2View, ViewportView, R
         colorMask = new ColorMask(redColormask, greenColormask, blueColormask);
     }
 
+    public void setStartLUT() {
+        int[] builtIn = this.getBuiltInLUT();
+        if (builtIn != null) {
+            LUT builtInLut = new LUT("built-in", builtIn, builtIn);
+            lut = builtInLut;
+            return;
+        }
+
+        MetaData metaData = jp2Image.metaDataList[0];
+        if (metaData instanceof HelioviewerMetaData) {
+            HelioviewerMetaData hvMetaData = (HelioviewerMetaData) metaData;
+            String colorKey = DefaultTable.getSingletonInstance().getColorTable(hvMetaData);
+            if (colorKey != null) {
+                lut = LUT.getStandardList().get(colorKey);
+            }
+        }
+    }
+
     private void applyGLLUT(GL2 gl) {
         gl.glActiveTexture(GL2.GL_TEXTURE1);
 
@@ -981,7 +1000,10 @@ public class JHVJP2View extends AbstractView implements JP2View, ViewportView, R
         if ((this instanceof JHVJPXView) && ((JHVJPXView) this).getDifferenceMode()) {
             currlut = gray;
         } else {
-            currlut = gray;
+            if (lut == null) {
+                setStartLUT();
+            }
+            currlut = lut;
         }
 
         gl.glBindTexture(GL2.GL_TEXTURE_1D, lutTex.get(gl));
