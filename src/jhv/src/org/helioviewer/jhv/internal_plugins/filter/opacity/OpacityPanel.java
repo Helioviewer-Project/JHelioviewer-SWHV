@@ -41,7 +41,7 @@ public class OpacityPanel extends FilterPanel implements ChangeListener, FilterA
         add(title);
 
         opacitySlider = new JSlider(JSlider.HORIZONTAL, 0, 100, 0);
-        opacitySlider.setMajorTickSpacing(20);
+        opacitySlider.setMajorTickSpacing(25);
         opacitySlider.setPaintTicks(true);
         opacitySlider.setPreferredSize(new Dimension(150, opacitySlider.getPreferredSize().height));
         opacitySlider.addChangeListener(this);
