@@ -138,7 +138,7 @@ public class GL3DImageLayer extends GL3DShape {
     public void shapeUpdate(GL3DState state) {
     }
 
-    public void updateROI(GL3DState state) {
+    private void updateROI(GL3DState state) {
         MetaData metaData = metaDataView.getMetaData();
         GL3DCamera activeCamera = state.getActiveCamera();
         HelioviewerMetaData hvmd = null;
@@ -180,6 +180,7 @@ public class GL3DImageLayer extends GL3DShape {
                 }
             }
         }
+
         double widthxAdd = Math.abs((maxPhysicalX - minPhysicalX) * 0.1);
         double widthyAdd = Math.abs((maxPhysicalY - minPhysicalY) * 0.1);
         minPhysicalX = minPhysicalX - widthxAdd;
@@ -209,11 +210,11 @@ public class GL3DImageLayer extends GL3DShape {
         } else {
             newRegion = StaticRegion.createAdaptedRegion(metLLX, metLLY, metURX - metLLX, metURY - metLLY);
         }
-        this.regionView.setRegion(newRegion, new ChangeEvent());
+        this.regionView.setRegion(newRegion, null);
+
         Viewport layerViewport = new ViewportAdapter(new StaticViewport(state.getViewportWidth(), state.getViewportHeight()));
         this.regionView.setViewport(layerViewport, null);
-        this.markAsChanged();
-
+        // this.markAsChanged();
     }
 
     protected GL3DImageTextureView getImageTextureView() {
@@ -259,7 +260,6 @@ public class GL3DImageLayer extends GL3DShape {
             gl.glColorMask(true, true, true, true);
         }
         gl.glDisable(GL2.GL_CULL_FACE);
-        this.updateROI(state);
     }
 
     private int generate(GL3DState state) {
@@ -413,4 +413,5 @@ public class GL3DImageLayer extends GL3DShape {
     public void setCoronaVisibility(boolean visible) {
         this.showCorona = visible;
     }
+
 }
