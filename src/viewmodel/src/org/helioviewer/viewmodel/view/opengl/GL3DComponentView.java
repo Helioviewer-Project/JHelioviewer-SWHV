@@ -199,8 +199,8 @@ public class GL3DComponentView extends AbstractComponentView implements GLEventL
         }
 
         GL2 gl = drawable.getGL().getGL2();
-        int width = drawable.getSurfaceWidth();
-        int height = drawable.getSurfaceHeight();
+        int width = canvas.getWidth();
+        int height = canvas.getHeight();
 
         GL3DState.setUpdated(gl, width, height);
 
