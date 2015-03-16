@@ -119,7 +119,7 @@ public abstract class AbstractLayeredView extends AbstractView implements Layere
         Layer layer = viewLookup.get(view);
         if (layer != null) {
             layer.visibility = !layer.visibility;
-            redrawBuffer(new ChangeEvent(new LayerChangedReason(this, LayerChangeType.LAYER_VISIBILITY, view)));
+            notifyViewListeners(new ChangeEvent(new LayerChangedReason(this, LayerChangeType.LAYER_VISIBILITY, view)));
         }
     }
 
@@ -139,16 +139,15 @@ public abstract class AbstractLayeredView extends AbstractView implements Layere
         if (newLayer == null) {
             return;
         }
-        LinkedMovieManager.getActiveInstance().pauseLinkedMovies();
 
-        ChangeEvent changeEvent = new ChangeEvent(new LayerChangedReason(this, LayerChangeType.LAYER_ADDED, newLayer));
+        LinkedMovieManager.getActiveInstance().pauseLinkedMovies();
 
         layers.add(newIndex, newLayer);
         newLayer.addViewListener(this);
-
         viewLookup.put(newLayer, new Layer(newLayer));
 
-        redrawBuffer(changeEvent);
+        ChangeEvent event = new ChangeEvent(new LayerChangedReason(this, LayerChangeType.LAYER_ADDED, newLayer));
+        notifyViewListeners(event);
     }
 
     /**
@@ -196,23 +195,23 @@ public abstract class AbstractLayeredView extends AbstractView implements Layere
         if (index == -1) {
             return;
         }
+
         LinkedMovieManager.getActiveInstance().pauseLinkedMovies();
 
         layers.remove(view);
         viewLookup.remove(view);
         view.removeViewListener(this);
 
-        JHVJP2View jhvjp2 = view.getAdapter(JHVJP2View.class);
-        if (jhvjp2 != null) {
+        JHVJP2View jp2 = view.getAdapter(JHVJP2View.class);
+        if (jp2 != null) {
             if (needAbolish) {
-                jhvjp2.abolish();
+                jp2.abolish();
             }
-            jhvjp2.removeRenderListener();
+            jp2.removeRenderListener();
         }
 
         ChangeEvent event = new ChangeEvent(new LayerChangedReason(this, LayerChangeType.LAYER_REMOVED, view, index));
-
-        redrawBuffer(event);
+        notifyViewListeners(event);
     }
 
     /**
@@ -230,22 +229,25 @@ public abstract class AbstractLayeredView extends AbstractView implements Layere
      */
     @Override
     public void removeAllLayers() {
-        ChangeEvent event = new ChangeEvent();
-
         LinkedMovieManager.getActiveInstance().pauseLinkedMovies();
+
+        ChangeEvent event = new ChangeEvent();
         for (View view : layers) {
             int index = layers.indexOf(view);
             view.removeViewListener(this);
-            if (view.getAdapter(JHVJP2View.class) != null) {
-                view.getAdapter(JHVJP2View.class).abolish();
+
+            JHVJP2View jp2 = view.getAdapter(JHVJP2View.class);
+            if (jp2 != null) {
+                jp2.abolish();
+                jp2.removeRenderListener();
             }
+
             event.addReason(new LayerChangedReason(this, LayerChangeType.LAYER_REMOVED, view, index));
         }
-
         layers.clear();
         viewLookup.clear();
 
-        redrawBuffer(event);
+        notifyViewListeners(event);
     }
 
     /**
@@ -265,31 +267,14 @@ public abstract class AbstractLayeredView extends AbstractView implements Layere
      * {@inheritDoc}
      */
     @Override
-    public void viewChanged(View sender, ChangeEvent aEvent) {
-        if (aEvent.reasonOccurred(ViewChainChangedReason.class)) {
+    public void viewChanged(View sender, ChangeEvent event) {
+        if (event.reasonOccurred(ViewChainChangedReason.class)) {
             for (Layer layer : viewLookup.values()) {
                 layer.update();
             }
         }
 
-        if ((aEvent.reasonOccurred(RegionChangedReason.class) || aEvent.reasonOccurred(SubImageDataChangedReason.class) || aEvent.reasonOccurred(ViewChainChangedReason.class)) && sender != null) {
-            redrawBuffer(aEvent);
-        } else {
-            notifyViewListeners(aEvent);
-        }
-    }
-
-    /**
-     * Redraws the scene.
-     *
-     * Calls the implementation specific function redrawBufferImpl(). A
-     * SubImageDataChangedReason will be appended to the given ChangeEvent.
-     *
-     * @param aEvent
-     *            ChangeEvent to collect history
-     */
-    protected void redrawBuffer(ChangeEvent aEvent) {
-        notifyViewListeners(aEvent);
+        notifyViewListeners(event);
     }
 
     /**
@@ -297,12 +282,13 @@ public abstract class AbstractLayeredView extends AbstractView implements Layere
      */
     @Override
     public void moveView(View view, int newLevel) {
-        ChangeEvent changeEvent = new ChangeEvent(new LayerChangedReason(this, LayerChangeType.LAYER_MOVED, view, newLevel));
 
         if (layers.contains(view)) {
             layers.remove(view);
             layers.add(newLevel, view);
-            redrawBuffer(changeEvent);
+
+            ChangeEvent event = new ChangeEvent(new LayerChangedReason(this, LayerChangeType.LAYER_MOVED, view, newLevel));
+            notifyViewListeners(event);
         }
     }
 

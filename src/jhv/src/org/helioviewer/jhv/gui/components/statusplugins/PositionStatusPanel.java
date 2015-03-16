@@ -77,7 +77,12 @@ public class PositionStatusPanel extends ViewStatusPanelPlugin implements MouseM
      * @param position
      *            Position on the screen.
      */
+
+    // workaround TBD
     private void updatePosition(Point position) {
+    }
+
+    private void updatePosition1(Point position) {
 
         // check region and viewport
         Region r = regionView.getRegion();
