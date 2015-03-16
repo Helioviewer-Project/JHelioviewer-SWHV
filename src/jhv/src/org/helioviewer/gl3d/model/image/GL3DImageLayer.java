@@ -27,7 +27,6 @@ import org.helioviewer.viewmodel.view.MetaDataView;
 import org.helioviewer.viewmodel.view.View;
 import org.helioviewer.viewmodel.view.ViewListener;
 import org.helioviewer.viewmodel.view.jp2view.JHVJP2View;
-import org.helioviewer.viewmodel.view.jp2view.JHVJPXView;
 import org.helioviewer.viewmodel.view.opengl.GL3DImageTextureView;
 import org.helioviewer.viewmodel.view.opengl.GL3DView;
 import org.helioviewer.viewmodel.view.opengl.shader.GLSLShader;
@@ -57,7 +56,7 @@ public class GL3DImageLayer extends GL3DShape {
     protected GL3DView mainLayerView;
     protected GL3DImageTextureView imageTextureView;
     protected MetaDataView metaDataView;
-    protected JHVJPXView regionView;
+    protected JHVJP2View regionView;
     public double minZ = -Constants.SunRadius;
     public double maxZ = Constants.SunRadius;
 
@@ -78,7 +77,7 @@ public class GL3DImageLayer extends GL3DShape {
         this.mainLayerView = mainLayerView;
         this.imageTextureView = this.mainLayerView.getAdapter(GL3DImageTextureView.class);
         this.metaDataView = this.mainLayerView.getAdapter(MetaDataView.class);
-        this.regionView = this.mainLayerView.getAdapter(JHVJPXView.class);
+        this.regionView = this.mainLayerView.getAdapter(JHVJP2View.class);
 
         this.markAsChanged();
         int count = 0;
