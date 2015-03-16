@@ -9,7 +9,6 @@ import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.viewmodel.view.RegionView;
 import org.helioviewer.viewmodel.view.ViewHelper;
 import org.helioviewer.viewmodel.view.opengl.GL3DSceneGraphView;
-import org.helioviewer.viewmodel.view.opengl.GLInfo;
 
 /**
  * Standard panning interaction, moves the camera proportionally to the mouse
@@ -33,8 +32,8 @@ public class GL3DPanInteraction extends GL3DDefaultInteraction {
 
     @Override
     public void mouseDragged(MouseEvent e, GL3DCamera camera) {
-        int x = (e.getPoint().x - this.lastMousePoint.x) * GLInfo.pixelScale[0];
-        int y = (e.getPoint().y - this.lastMousePoint.y) * GLInfo.pixelScale[1];
+        int x = e.getPoint().x - this.lastMousePoint.x;
+        int y = e.getPoint().y - this.lastMousePoint.y;
         if (sceneGraphView.getAdapter(RegionView.class).getRegion() != null) {
             Vector2dDouble imageDisplacement = ViewHelper.convertScreenToImageDisplacement(x, y, sceneGraphView.getAdapter(RegionView.class).getRegion(), ViewHelper.calculateViewportImageSize(sceneGraphView));
             camera.translation.x += imageDisplacement.getX();
