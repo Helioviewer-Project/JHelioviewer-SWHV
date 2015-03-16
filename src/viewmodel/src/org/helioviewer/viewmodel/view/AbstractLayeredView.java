@@ -3,20 +3,14 @@ package org.helioviewer.viewmodel.view;
 import java.util.ArrayList;
 import java.util.HashMap;
 
-import org.helioviewer.base.math.RectangleDouble;
 import org.helioviewer.viewmodel.changeevent.ChangeEvent;
 import org.helioviewer.viewmodel.changeevent.LayerChangedReason;
 import org.helioviewer.viewmodel.changeevent.LayerChangedReason.LayerChangeType;
 import org.helioviewer.viewmodel.changeevent.RegionChangedReason;
-import org.helioviewer.viewmodel.changeevent.RegionUpdatedReason;
 import org.helioviewer.viewmodel.changeevent.SubImageDataChangedReason;
 import org.helioviewer.viewmodel.changeevent.ViewChainChangedReason;
-import org.helioviewer.viewmodel.metadata.ImageSizeMetaData;
 import org.helioviewer.viewmodel.metadata.MetaData;
-import org.helioviewer.viewmodel.metadata.PixelBasedMetaData;
 import org.helioviewer.viewmodel.region.Region;
-import org.helioviewer.viewmodel.region.RegionAdapter;
-import org.helioviewer.viewmodel.region.StaticRegion;
 import org.helioviewer.viewmodel.view.jp2view.JHVJP2View;
 import org.helioviewer.viewmodel.viewport.Viewport;
 import org.helioviewer.viewmodel.viewportimagesize.ViewportImageSize;
@@ -162,23 +156,6 @@ public abstract class AbstractLayeredView extends AbstractView implements Layere
 
         viewLookup.put(newLayer, new Layer(newLayer));
 
-        if (layers.size() > 1) {
-            recalculateMetaData(false);
-            for (Layer layer : viewLookup.values()) {
-                MetaData m = layer.metaDataView.getMetaData();
-                if (m instanceof PixelBasedMetaData) {
-                    PixelBasedMetaData p = (PixelBasedMetaData) m;
-                    p.updatePhysicalRegion(metaData.getPhysicalRegion());
-                }
-            }
-        }
-        recalculateMetaData();
-        region = metaData.getPhysicalRegion();
-        if (viewport != null)
-            region = ViewHelper.expandRegionToViewportAspectRatio(viewport, region, metaData);
-        if (region != null)
-            region = new RegionAdapter(new StaticRegion(-0.5 * region.getWidth(), -0.5 * region.getHeight(), region.getSize()));
-        recalculateRegionsAndViewports(new ChangeEvent());
         redrawBuffer(changeEvent);
     }
 
@@ -243,26 +220,6 @@ public abstract class AbstractLayeredView extends AbstractView implements Layere
 
         ChangeEvent event = new ChangeEvent(new LayerChangedReason(this, LayerChangeType.LAYER_REMOVED, view, index));
 
-        recalculateMetaData(false);
-        if (metaData != null) {
-            for (Layer layer : viewLookup.values()) {
-                MetaData m = layer.metaDataView.getMetaData();
-                if (m instanceof PixelBasedMetaData) {
-                    PixelBasedMetaData p = (PixelBasedMetaData) m;
-                    p.updatePhysicalRegion(metaData.getPhysicalRegion());
-                }
-            }
-        }
-        recalculateMetaData();
-        if (metaData != null) {
-            Region bound = metaData.getPhysicalRegion();
-            double lowerLeftX = Math.max(bound.getCornerX(), region.getCornerX());
-            double lowerLeftY = Math.max(bound.getCornerY(), region.getCornerY());
-            Region newRegion = ViewHelper.cropInnerRegionToOuterRegion(StaticRegion.createAdaptedRegion(lowerLeftX, lowerLeftY, region.getSize()), bound);
-            setRegion(newRegion, event);
-        } else {
-            recalculateRegionsAndViewports(event);
-        }
         redrawBuffer(event);
     }
 
@@ -296,8 +253,6 @@ public abstract class AbstractLayeredView extends AbstractView implements Layere
         layers.clear();
         viewLookup.clear();
 
-        recalculateMetaData();
-        recalculateRegionsAndViewports(event);
         redrawBuffer(event);
     }
 
@@ -327,31 +282,7 @@ public abstract class AbstractLayeredView extends AbstractView implements Layere
      */
     @Override
     public boolean setRegion(Region r, ChangeEvent event) {
-        if (event == null) {
-            event = new ChangeEvent(new RegionUpdatedReason(this, r));
-        } else {
-            event.addReason(new RegionUpdatedReason(this, r));
-        }
 
-        // check if region is valid
-        if (region == null || r == null || r.getWidth() < minimalRegionSize || r.getHeight() < minimalRegionSize) {
-            notifyViewListeners(event);
-            return false;
-        }
-        // check if region to small or viewport
-        r = ViewHelper.expandRegionToViewportAspectRatio(viewport, r, metaData);
-
-        // check if region has changed
-        if (region.getCornerX() == r.getCornerX() && region.getCornerY() == r.getCornerY() && region.getWidth() == r.getWidth() && region.getHeight() == r.getHeight()) {
-            notifyViewListeners(event);
-            return false;
-        }
-
-        event.addReason(new RegionChangedReason(this, r));
-
-        region = r;
-        recalculateRegionsAndViewports(event);
-        redrawBuffer(event);
         return true;
     }
 
@@ -367,41 +298,9 @@ public abstract class AbstractLayeredView extends AbstractView implements Layere
      * {@inheritDoc}
      */
     @Override
-    public boolean setViewport(Viewport v, ChangeEvent event) {
-        // check if viewport has changed
-        if (viewport != null && v != null && viewport.getWidth() == v.getWidth() && viewport.getHeight() == v.getHeight())
-            return false;
-
-        viewport = v;
-
-        if (!setRegion(region, event)) {
-            recalculateRegionsAndViewports(event);
-            redrawBuffer(event);
-        }
-        return true;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
     public MetaData getMetaData() {
         return metaData;
     }
-
-    /**
-     * Recalculates the regions and viewports of all layers.
-     *
-     * <p>
-     * Sets the regions and viewports of all layers according to the region and
-     * viewport of the LayeredView. Also, calculates the offset of the layers to
-     * each other.
-     *
-     * @param event
-     *            ChangeEvent to collect history of all following changes
-     * @return true, if at least one region or viewport changed
-     */
-    protected abstract boolean recalculateRegionsAndViewports(ChangeEvent event);
 
     /**
      * {@inheritDoc}
@@ -422,53 +321,6 @@ public abstract class AbstractLayeredView extends AbstractView implements Layere
     }
 
     /**
-     * Recalculates the meta data of the LayeredView.
-     *
-     * The region of the LayeredView is set to the bounding box of all layers.
-     */
-    protected void recalculateMetaData() {
-        recalculateMetaData(true);
-    }
-
-    /**
-     * Recalculates the meta data of the LayeredView.
-     *
-     * The region of the LayeredView is set to the bounding box of all layers.
-     */
-    protected void recalculateMetaData(boolean includePixelBasedImages) {
-        if (layers.size() == 0) {
-            metaData = null;
-            return;
-        }
-
-        RectangleDouble bounds = null;
-        minimalRegionSize = 0.0f;
-
-        for (Layer layer : viewLookup.values()) {
-            if (layer.metaDataView != null) {
-                if (includePixelBasedImages || !(layer.metaDataView.getMetaData() instanceof PixelBasedMetaData)) {
-                    RectangleDouble metaDataRectangle = layer.metaDataView.getMetaData().getPhysicalRectangle();
-                    if (bounds == null) {
-                        bounds = metaDataRectangle;
-                    } else {
-                        bounds = bounds.getBoundingRectangle(metaDataRectangle);
-                    }
-
-                    double unitsPerPixel = ((ImageSizeMetaData) layer.metaDataView.getMetaData()).getUnitsPerPixel();
-                    if (unitsPerPixel > minimalRegionSize) {
-                        minimalRegionSize = unitsPerPixel;
-                    }
-                }
-            }
-        }
-
-        if (bounds != null)
-            metaData = new PixelBasedMetaData(bounds);
-
-        minimalRegionSize *= 2.0f;
-    }
-
-    /**
      * Redraws the scene.
      *
      * Calls the implementation specific function redrawBufferImpl(). A
@@ -478,11 +330,6 @@ public abstract class AbstractLayeredView extends AbstractView implements Layere
      *            ChangeEvent to collect history
      */
     protected void redrawBuffer(ChangeEvent aEvent) {
-        // add reason to change event
-        if (aEvent == null)
-            aEvent = new ChangeEvent();
-
-        aEvent.addReason(new SubImageDataChangedReason(this));
         notifyViewListeners(aEvent);
     }
 
@@ -500,4 +347,17 @@ public abstract class AbstractLayeredView extends AbstractView implements Layere
         }
     }
 
+    @Override
+    public boolean setViewport(Viewport v, ChangeEvent event) {
+        // check if viewport has changed
+        if (viewport != null && v != null && viewport.getWidth() == v.getWidth() && viewport.getHeight() == v.getHeight())
+            return false;
+
+        viewport = v;
+
+        if (!setRegion(region, event)) {
+            redrawBuffer(event);
+        }
+        return true;
+    }
 }

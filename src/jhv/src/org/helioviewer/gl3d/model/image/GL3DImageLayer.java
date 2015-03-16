@@ -24,13 +24,16 @@ import org.helioviewer.viewmodel.metadata.MetaData;
 import org.helioviewer.viewmodel.region.Region;
 import org.helioviewer.viewmodel.region.StaticRegion;
 import org.helioviewer.viewmodel.view.MetaDataView;
-import org.helioviewer.viewmodel.view.RegionView;
 import org.helioviewer.viewmodel.view.View;
 import org.helioviewer.viewmodel.view.ViewListener;
 import org.helioviewer.viewmodel.view.jp2view.JHVJP2View;
+import org.helioviewer.viewmodel.view.jp2view.JHVJPXView;
 import org.helioviewer.viewmodel.view.opengl.GL3DImageTextureView;
 import org.helioviewer.viewmodel.view.opengl.GL3DView;
 import org.helioviewer.viewmodel.view.opengl.shader.GLSLShader;
+import org.helioviewer.viewmodel.viewport.StaticViewport;
+import org.helioviewer.viewmodel.viewport.Viewport;
+import org.helioviewer.viewmodel.viewport.ViewportAdapter;
 
 import com.jogamp.common.nio.Buffers;
 
@@ -54,7 +57,7 @@ public class GL3DImageLayer extends GL3DShape {
     protected GL3DView mainLayerView;
     protected GL3DImageTextureView imageTextureView;
     protected MetaDataView metaDataView;
-    protected RegionView regionView;
+    protected JHVJPXView regionView;
     public double minZ = -Constants.SunRadius;
     public double maxZ = Constants.SunRadius;
 
@@ -75,7 +78,7 @@ public class GL3DImageLayer extends GL3DShape {
         this.mainLayerView = mainLayerView;
         this.imageTextureView = this.mainLayerView.getAdapter(GL3DImageTextureView.class);
         this.metaDataView = this.mainLayerView.getAdapter(MetaDataView.class);
-        this.regionView = this.mainLayerView.getAdapter(RegionView.class);
+        this.regionView = this.mainLayerView.getAdapter(JHVJPXView.class);
 
         this.markAsChanged();
         int count = 0;
@@ -134,7 +137,6 @@ public class GL3DImageLayer extends GL3DShape {
 
     @Override
     public void shapeUpdate(GL3DState state) {
-        this.updateROI(state);
     }
 
     public void updateROI(GL3DState state) {
@@ -209,7 +211,8 @@ public class GL3DImageLayer extends GL3DShape {
             newRegion = StaticRegion.createAdaptedRegion(metLLX, metLLY, metURX - metLLX, metURY - metLLY);
         }
         this.regionView.setRegion(newRegion, new ChangeEvent());
-
+        Viewport layerViewport = new ViewportAdapter(new StaticViewport(state.getViewportWidth(), state.getViewportHeight()));
+        this.regionView.setViewport(layerViewport, null);
         this.markAsChanged();
 
     }
@@ -220,7 +223,6 @@ public class GL3DImageLayer extends GL3DShape {
 
     @Override
     public void shapeDraw(GL3DState state) {
-
         GL2 gl = state.gl;
         GLSLShader.bind(gl);
         GLSLShader.bindVars(gl);
@@ -258,6 +260,7 @@ public class GL3DImageLayer extends GL3DShape {
             gl.glColorMask(true, true, true, true);
         }
         gl.glDisable(GL2.GL_CULL_FACE);
+        this.updateROI(state);
     }
 
     private int generate(GL3DState state) {
