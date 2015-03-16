@@ -282,7 +282,6 @@ public abstract class AbstractLayeredView extends AbstractView implements Layere
      */
     @Override
     public void moveView(View view, int newLevel) {
-
         if (layers.contains(view)) {
             layers.remove(view);
             layers.add(newLevel, view);
