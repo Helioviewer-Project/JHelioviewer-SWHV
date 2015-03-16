@@ -4,8 +4,6 @@ import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.Graphics;
 import java.awt.Image;
-import java.awt.event.ComponentEvent;
-import java.awt.event.ComponentListener;
 import java.awt.event.KeyListener;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
@@ -18,17 +16,8 @@ import javax.swing.JPanel;
 
 import org.helioviewer.jhv.gui.interfaces.ImagePanelInputController;
 import org.helioviewer.jhv.gui.interfaces.ImagePanelPlugin;
-import org.helioviewer.viewmodel.changeevent.ChangeEvent;
-import org.helioviewer.viewmodel.metadata.MetaData;
-import org.helioviewer.viewmodel.region.Region;
 import org.helioviewer.viewmodel.renderer.screen.ScreenRenderer;
 import org.helioviewer.viewmodel.view.ComponentView;
-import org.helioviewer.viewmodel.view.MetaDataView;
-import org.helioviewer.viewmodel.view.RegionView;
-import org.helioviewer.viewmodel.view.ViewHelper;
-import org.helioviewer.viewmodel.view.ViewportView;
-import org.helioviewer.viewmodel.viewport.StaticViewport;
-import org.helioviewer.viewmodel.viewport.Viewport;
 
 /**
  * This class represents a basic image component that is used to display the
@@ -37,18 +26,11 @@ import org.helioviewer.viewmodel.viewport.Viewport;
  * @author Stephan Pagel
  *
  * */
-public class BasicImagePanel extends JPanel implements ComponentListener {
-
-    // ////////////////////////////////////////////////////////////////
-    // Definitions
-    // ////////////////////////////////////////////////////////////////
+public class BasicImagePanel extends JPanel {
 
     private static final long serialVersionUID = 1L;
 
     protected ComponentView componentView;
-    protected ViewportView viewportView;
-    protected RegionView regionView;
-    protected MetaDataView metaDataView;
 
     protected ImagePanelInputController inputController;
 
@@ -58,13 +40,8 @@ public class BasicImagePanel extends JPanel implements ComponentListener {
 
     protected AbstractList<ScreenRenderer> postRenderers;
 
-    protected boolean updateViewportView = true;
-
     protected Image backgroundImage;
 
-    // ////////////////////////////////////////////////////////////////
-    // Methods
-    // ////////////////////////////////////////////////////////////////
 
     /**
      * Default constructor.
@@ -78,13 +55,6 @@ public class BasicImagePanel extends JPanel implements ComponentListener {
 
         // initialize container for post renderer
         postRenderers = new LinkedList<ScreenRenderer>();
-
-        // add component listener
-        addComponentListener(this);
-    }
-
-    public void setUpdateViewportView(boolean doUpdate) {
-        updateViewportView = doUpdate;
     }
 
     public void setBackgroundImage(Image img) {
@@ -178,53 +148,26 @@ public class BasicImagePanel extends JPanel implements ComponentListener {
 
         componentView = newView;
 
-        viewportView = ViewHelper.getViewAdapter(componentView, ViewportView.class);
-        regionView = ViewHelper.getViewAdapter(componentView, RegionView.class);
-        metaDataView = ViewHelper.getViewAdapter(componentView, MetaDataView.class);
-
         if (componentView != null) {
             componentView.setComponent(renderedImageComponent);
             setInputController(inputController);
             setPostRenderers();
-            componentView.getAdapter(ViewportView.class).setViewport(getViewport(), new ChangeEvent());
         }
 
         for (ImagePanelPlugin p : plugins) {
             p.setImagePanel(this);
             p.setView(componentView);
         }
-        if (viewportView != null && regionView != null && metaDataView != null) {
-            if (updateViewportView)
-                viewportView.setViewport(getViewport(), new ChangeEvent());
-
-            Viewport v = viewportView.getViewport();
-            Region r = regionView.getRegion();
-            MetaData m = metaDataView.getMetaData();
-
-            if (v != null && r != null && m != null)
-                regionView.setRegion(ViewHelper.expandRegionToViewportAspectRatio(v, r, m), new ChangeEvent());
-        }
-        repaint();
     }
 
     /**
      * Sets the existing post renderer to the (new) component view.
      */
     private void setPostRenderers() {
-
         if (componentView != null) {
             for (ScreenRenderer r : postRenderers)
                 componentView.addPostRenderer(r);
         }
-    }
-
-    /**
-     * Returns the provided viewport of this component
-     *
-     * @return provided viewport of this component.
-     * */
-    public Viewport getViewport() {
-        return StaticViewport.createAdaptedViewport(Math.max(1, getWidth()), Math.max(1, getHeight()));
     }
 
     /**
@@ -284,7 +227,6 @@ public class BasicImagePanel extends JPanel implements ComponentListener {
      * @see #addPlugin(ImagePanelPlugin)
      */
     public void setInputController(ImagePanelInputController newInputController) {
-
         addPlugin(newInputController);
 
         if (renderedImageComponent != null) {
@@ -342,53 +284,6 @@ public class BasicImagePanel extends JPanel implements ComponentListener {
             if (componentView != null)
                 componentView.removePostRenderer(postRenderer);
         }
-    }
-
-    // ////////////////////////////////////////////////////////////////
-    // Component Listener
-    // ////////////////////////////////////////////////////////////////
-
-    /**
-     * Method will be called when component was hidden.
-     */
-    @Override
-    public void componentHidden(ComponentEvent e) {
-    }
-
-    /**
-     * Method will be called when component was moved.
-     */
-    @Override
-    public void componentMoved(ComponentEvent e) {
-    }
-
-    /**
-     * Method will be called when component was resized. Resets the viewport and
-     * region.
-     */
-    @Override
-    public void componentResized(ComponentEvent e) {
-        if (viewportView != null && regionView != null && metaDataView != null) {
-            if (updateViewportView)
-                viewportView.setViewport(getViewport(), new ChangeEvent());
-
-            Viewport v = viewportView.getViewport();
-            Region r = regionView.getRegion();
-            MetaData m = metaDataView.getMetaData();
-
-            if (v != null && r != null && m != null) {
-                regionView.setRegion(ViewHelper.expandRegionToViewportAspectRatio(v, r, m), new ChangeEvent());
-            }
-        } else {
-            repaint();
-        }
-    }
-
-    /**
-     * Method will be called when component was shown.
-     */
-    @Override
-    public void componentShown(ComponentEvent e) {
     }
 
 }

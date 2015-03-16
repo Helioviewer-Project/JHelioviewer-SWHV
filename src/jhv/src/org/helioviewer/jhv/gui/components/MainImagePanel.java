@@ -203,20 +203,6 @@ public class MainImagePanel extends BasicImagePanel implements ViewListener {
     }
 
     /**
-     * {@inheritDoc}
-     *
-     * Centers the no image loaded image when component was resized.
-     */
-
-    @Override
-    public void componentResized(ComponentEvent e) {
-        noImagePostRenderer.setContainerSize(getWidth(), getHeight());
-        loadingPostRenderer.setContainerSize(getWidth(), getHeight());
-        repaint();
-        super.componentResized(e);
-    }
-
-    /**
      * A post renderer which displays an image which shows that no image (layer)
      * is loaded.
      *
