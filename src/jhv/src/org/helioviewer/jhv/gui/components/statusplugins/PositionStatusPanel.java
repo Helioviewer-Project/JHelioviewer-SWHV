@@ -15,11 +15,9 @@ import org.helioviewer.jhv.gui.interfaces.ImagePanelPlugin;
 import org.helioviewer.jhv.layers.LayersModel;
 import org.helioviewer.viewmodel.metadata.MetaData;
 import org.helioviewer.viewmodel.region.Region;
-import org.helioviewer.viewmodel.view.MetaDataView;
-import org.helioviewer.viewmodel.view.RegionView;
+import org.helioviewer.viewmodel.view.jp2view.JHVJP2View;
 import org.helioviewer.viewmodel.view.View;
 import org.helioviewer.viewmodel.view.ViewHelper;
-import org.helioviewer.viewmodel.view.ViewportView;
 import org.helioviewer.viewmodel.viewport.Viewport;
 import org.helioviewer.viewmodel.viewportimagesize.ViewportImageSize;
 
@@ -42,9 +40,7 @@ public class PositionStatusPanel extends ViewStatusPanelPlugin implements MouseM
     private static final long serialVersionUID = 1L;
 
     private View view;
-    private RegionView regionView;
-    private ViewportView viewportView;
-    private MetaDataView metaDataView;
+
     private BasicImagePanel imagePanel;
     private Point lastPosition;
 
@@ -78,16 +74,20 @@ public class PositionStatusPanel extends ViewStatusPanelPlugin implements MouseM
      *            Position on the screen.
      */
 
-    // workaround TBD
     private void updatePosition(Point position) {
-    }
 
-    private void updatePosition1(Point position) {
+        // to be improved
+        if (LayersModel.getSingletonInstance().getActiveView() == null)
+            return;
+
+        JHVJP2View jp2View = ViewHelper.getViewAdapter(LayersModel.getSingletonInstance().getActiveView(), JHVJP2View.class);
+        if (jp2View == null)
+            return;
 
         // check region and viewport
-        Region r = regionView.getRegion();
-        Viewport v = viewportView.getViewport();
-        MetaData m = metaDataView.getMetaData();
+        Region r = jp2View.getRegion();
+        Viewport v = jp2View.getViewport();
+        MetaData m = jp2View.getMetaData();
 
         if (r == null || v == null || m == null) {
             setText("(x, y) = " + "(" + position.x + "," + position.y + ")");
@@ -101,10 +101,10 @@ public class PositionStatusPanel extends ViewStatusPanelPlugin implements MouseM
         // negative area; real pixel based image at 0
         if (m.getPhysicalLowerLeft().getX() < 0) {
 
-            Vector2dInt solarcenter = ViewHelper.convertImageToScreenDisplacement(regionView.getRegion().getUpperLeftCorner().negateX(), regionView.getRegion(), vis);
+            Vector2dInt solarcenter = ViewHelper.convertImageToScreenDisplacement(r.getUpperLeftCorner().negateX(), r, vis);
 
             Vector2dDouble scaling = new Vector2dDouble(Constants.SunRadius, Constants.SunRadius);
-            Vector2dDouble solarRadius = new Vector2dDouble(ViewHelper.convertImageToScreenDisplacement(scaling, regionView.getRegion(), vis));
+            Vector2dDouble solarRadius = new Vector2dDouble(ViewHelper.convertImageToScreenDisplacement(scaling, r, vis));
 
             Vector2dDouble pos = new Vector2dDouble(position.x - solarcenter.getX(), -position.y + solarcenter.getY()).invertedScale(solarRadius).scale(959.705);
 
@@ -140,9 +140,6 @@ public class PositionStatusPanel extends ViewStatusPanelPlugin implements MouseM
     @Override
     public void setView(View newView) {
         view = newView;
-        regionView = ViewHelper.getViewAdapter(newView, RegionView.class);
-        viewportView = ViewHelper.getViewAdapter(newView, ViewportView.class);
-        metaDataView = ViewHelper.getViewAdapter(newView, MetaDataView.class);
     }
 
     /**

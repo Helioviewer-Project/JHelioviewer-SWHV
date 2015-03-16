@@ -5,11 +5,8 @@ import java.awt.event.MouseEvent;
 import org.helioviewer.base.math.Vector2dInt;
 import org.helioviewer.jhv.gui.components.BasicImagePanel;
 import org.helioviewer.jhv.gui.interfaces.ImagePanelInputController;
-import org.helioviewer.viewmodel.view.MetaDataView;
-import org.helioviewer.viewmodel.view.RegionView;
 import org.helioviewer.viewmodel.view.View;
 import org.helioviewer.viewmodel.view.ViewHelper;
-import org.helioviewer.viewmodel.view.ViewportView;
 
 /**
  * Abstract base class implementing ImagePanelInputController.
@@ -29,9 +26,6 @@ public abstract class AbstractImagePanelMouseController implements ImagePanelInp
     // ///////////////////////////////////////////////////////////////////////////
 
     protected View view;
-    protected RegionView regionView;
-    protected ViewportView viewportView;
-    protected MetaDataView metaDataView;
     protected BasicImagePanel imagePanel;
     protected Vector2dInt mousePosition = null;
 
@@ -79,9 +73,6 @@ public abstract class AbstractImagePanelMouseController implements ImagePanelInp
     @Override
     public void setView(View newView) {
         view = newView;
-        regionView = ViewHelper.getViewAdapter(view, RegionView.class);
-        viewportView = ViewHelper.getViewAdapter(view, ViewportView.class);
-        metaDataView = ViewHelper.getViewAdapter(view, MetaDataView.class);
     }
 
     /**
@@ -114,4 +105,5 @@ public abstract class AbstractImagePanelMouseController implements ImagePanelInp
     public Vector2dInt getMousePosition() {
         return mousePosition;
     }
+
 }
