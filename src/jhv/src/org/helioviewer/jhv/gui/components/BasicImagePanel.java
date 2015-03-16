@@ -27,7 +27,6 @@ import org.helioviewer.viewmodel.view.MetaDataView;
 import org.helioviewer.viewmodel.view.RegionView;
 import org.helioviewer.viewmodel.view.ViewHelper;
 import org.helioviewer.viewmodel.view.ViewportView;
-import org.helioviewer.viewmodel.view.opengl.GLInfo;
 import org.helioviewer.viewmodel.viewport.StaticViewport;
 import org.helioviewer.viewmodel.viewport.Viewport;
 
@@ -225,7 +224,7 @@ public class BasicImagePanel extends JPanel implements ComponentListener {
      * @return provided viewport of this component.
      * */
     public Viewport getViewport() {
-        return StaticViewport.createAdaptedViewport(Math.max(1, GLInfo.pixelScale[0] * getWidth() - 2), Math.max(1, GLInfo.pixelScale[1] * getHeight() - 2));
+        return StaticViewport.createAdaptedViewport(Math.max(1, getWidth()), Math.max(1, getHeight()));
     }
 
     /**
