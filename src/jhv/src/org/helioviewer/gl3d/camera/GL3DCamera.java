@@ -344,7 +344,6 @@ public abstract class GL3DCamera {
 
     public void updateCameraTransformation(GL3DMat4d transformation) {
         this.cameraTransformation = transformation;
-        // fireCameraMoved();
     }
 
     /**
