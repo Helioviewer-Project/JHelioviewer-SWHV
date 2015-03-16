@@ -30,12 +30,9 @@ import org.helioviewer.viewmodel.renderer.screen.ScreenRenderer;
 import org.helioviewer.viewmodel.view.AbstractComponentView;
 import org.helioviewer.viewmodel.view.ComponentView;
 import org.helioviewer.viewmodel.view.View;
-import org.helioviewer.viewmodel.view.ViewportView;
 import org.helioviewer.viewmodel.view.jp2view.JHVJP2View;
 import org.helioviewer.viewmodel.view.jp2view.JHVJPXView;
 import org.helioviewer.viewmodel.view.opengl.shader.GLSLShader;
-import org.helioviewer.viewmodel.viewport.StaticViewport;
-import org.helioviewer.viewmodel.viewport.Viewport;
 
 import com.jogamp.opengl.util.TileRenderer;
 import com.jogamp.opengl.util.awt.AWTGLPixelBuffer;
@@ -56,8 +53,6 @@ public class GL3DComponentView extends AbstractComponentView implements GLEventL
 
     private Color backgroundColor = Color.BLACK;
     private boolean backGroundColorChanged = false;
-
-    private ViewportView viewportView;
 
     // screenshot & movie
     private TileRenderer tileRenderer;
@@ -178,9 +173,6 @@ public class GL3DComponentView extends AbstractComponentView implements GLEventL
 
     @Override
     public void reshape(GLAutoDrawable drawable, int x, int y, int width, int height) {
-        int w = canvas.getWidth();
-        int h = canvas.getHeight();
-        viewportView.setViewport(StaticViewport.createAdaptedViewport(w, h), null);
     }
 
     private static void displayBody(GL2 gl, View v, int width, int height) {
@@ -324,7 +316,6 @@ public class GL3DComponentView extends AbstractComponentView implements GLEventL
 
     @Override
     protected void setViewSpecificImplementation(View newView, ChangeEvent changeEvent) {
-        viewportView = getAdapter(ViewportView.class);
     }
 
 }
