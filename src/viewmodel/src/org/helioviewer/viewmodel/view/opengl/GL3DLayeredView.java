@@ -3,15 +3,9 @@ package org.helioviewer.viewmodel.view.opengl;
 import javax.media.opengl.GL2;
 
 import org.helioviewer.gl3d.scenegraph.GL3DState;
-import org.helioviewer.viewmodel.changeevent.ChangeEvent;
-import org.helioviewer.viewmodel.region.StaticRegion;
 import org.helioviewer.viewmodel.view.AbstractLayeredView;
 import org.helioviewer.viewmodel.view.MovieView;
 import org.helioviewer.viewmodel.view.View;
-import org.helioviewer.viewmodel.view.ViewHelper;
-import org.helioviewer.viewmodel.viewport.StaticViewport;
-import org.helioviewer.viewmodel.viewport.Viewport;
-import org.helioviewer.viewmodel.viewport.ViewportAdapter;
 
 /**
  * The GL3DLayeredView makes sure to add all required sub-views to a new layer.
@@ -73,36 +67,6 @@ public class GL3DLayeredView extends AbstractLayeredView implements GL3DView {
     @Override
     public void renderGL(GL2 gl, boolean nextView) {
         renderGL(gl);
-    }
-
-    /**
-     * Recalculates the regions and viewports of all layers.
-     *
-     * <p>
-     * Sets the regions and viewports of all layers according to the region and
-     * viewport of the LayeredView. Also, calculates the offset of the layers to
-     * each other.
-     *
-     * @param event
-     *            ChangeEvent to collect history of all following changes
-     * @return true, if at least one region or viewport changed
-     */
-    @Override
-    protected boolean recalculateRegionsAndViewports(ChangeEvent event) {
-        boolean changed = false;
-        if (region == null && metaData != null) {
-            region = StaticRegion.createAdaptedRegion(metaData.getPhysicalRectangle());
-        }
-
-        if (viewport != null && region != null) {
-            viewportImageSize = ViewHelper.calculateViewportImageSize(viewport, region);
-
-            for (Layer layer : viewLookup.values()) {
-                Viewport layerViewport = new ViewportAdapter(new StaticViewport(viewportImageSize.getWidth(), viewportImageSize.getHeight()));
-                changed |= layer.viewportView.setViewport(layerViewport, event);
-            }
-        }
-        return changed;
     }
 
 }
