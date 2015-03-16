@@ -24,7 +24,6 @@ import org.helioviewer.viewmodelplugin.overlay.OverlayControlComponent;
 import org.helioviewer.viewmodelplugin.overlay.OverlayControlComponentManager;
 import org.helioviewer.viewmodelplugin.overlay.OverlayPanel;
 
-//import org.helioviewer.viewmodel.view.opengl.GL3DViewportView;
 
 public class GL3DViewchainFactory {
 
@@ -185,12 +184,9 @@ public class GL3DViewchainFactory {
         GL3DCameraView cameraView = viewFactory.createNewView(GL3DCameraView.class);
         cameraView.setView(overlayView);
 
-        //GL3DViewportView viewportView = viewFactory.createNewView(GL3DViewportView.class);
-        //viewportView.setView(cameraView);
-
         GL3DSceneGraphView sceneGraph = new GL3DSceneGraphView();
         currentSceneGraph = sceneGraph;
-        sceneGraph.setView(/* viewportView */cameraView);
+        sceneGraph.setView(cameraView);
         sceneGraph.setGLOverlayView((GLOverlayView) overlayView);
 
         ComponentView componentView = viewFactory.createNewView(ComponentView.class);

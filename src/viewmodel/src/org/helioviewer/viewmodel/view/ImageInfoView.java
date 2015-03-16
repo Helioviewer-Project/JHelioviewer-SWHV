@@ -14,8 +14,7 @@ import org.helioviewer.viewmodel.metadata.MetaData;
  * possible to use another view as an input for this view.
  *
  * <p>
- * Usually, it is expected to have at least one {@link RegionView}, one
- * {@link ViewportView} an one {@link MetaDataView} per path within the view
+ * Usually, it is expected to have at least one {@link RegionView} per path within the view
  * chain, so it might be a good idea to always implement them together with the
  * ImageInfoView, since every path starts at an ImageInfoView.
  *
