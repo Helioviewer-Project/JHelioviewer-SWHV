@@ -192,8 +192,6 @@ public final class ViewHelper {
         double screenMeterPerPixel;
         double screenSubImageWidth;
         double screenSubImageHeight;
-        System.out.println(r);
-        System.out.println(v);
         // fit region of interest into viewport
         if ((double) v.getWidth() / (double) v.getHeight() < r.getWidth() / r.getHeight()) {
             screenMeterPerPixel = r.getHeight() / v.getHeight();
@@ -204,8 +202,6 @@ public final class ViewHelper {
             screenSubImageWidth = v.getWidth();
             screenSubImageHeight = r.getHeight() / screenMeterPerPixel;
         }
-        System.out.println(screenSubImageWidth + " " + screenSubImageHeight);
-
         return StaticViewportImageSize.createAdaptedViewportImageSize((int) Math.round(screenSubImageWidth), (int) Math.round(screenSubImageHeight));
     }
 
