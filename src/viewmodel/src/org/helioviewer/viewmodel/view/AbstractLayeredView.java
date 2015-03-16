@@ -32,18 +32,10 @@ import org.helioviewer.viewmodel.viewportimagesize.ViewportImageSize;
  * @author Markus Langenberg
  *
  */
-public abstract class AbstractLayeredView extends AbstractView implements LayeredView, RegionView, ViewportView, MetaDataView, ViewListener {
+public abstract class AbstractLayeredView extends AbstractView implements LayeredView, ViewListener {
 
     protected ArrayList<View> layers = new ArrayList<View>();
     protected HashMap<View, Layer> viewLookup = new HashMap<View, Layer>();
-
-    protected ViewportImageSize viewportImageSize;
-
-    protected Viewport viewport;
-    protected Region region;
-    protected MetaData metaData;
-
-    private double minimalRegionSize;
 
     /**
      * Buffer for precomputed values for each layer.
@@ -273,39 +265,6 @@ public abstract class AbstractLayeredView extends AbstractView implements Layere
      * {@inheritDoc}
      */
     @Override
-    public Region getRegion() {
-        return region;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public boolean setRegion(Region r, ChangeEvent event) {
-
-        return true;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public Viewport getViewport() {
-        return viewport;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public MetaData getMetaData() {
-        return metaData;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
     public void viewChanged(View sender, ChangeEvent aEvent) {
         if (aEvent.reasonOccurred(ViewChainChangedReason.class)) {
             for (Layer layer : viewLookup.values()) {
@@ -347,17 +306,4 @@ public abstract class AbstractLayeredView extends AbstractView implements Layere
         }
     }
 
-    @Override
-    public boolean setViewport(Viewport v, ChangeEvent event) {
-        // check if viewport has changed
-        if (viewport != null && v != null && viewport.getWidth() == v.getWidth() && viewport.getHeight() == v.getHeight())
-            return false;
-
-        viewport = v;
-
-        if (!setRegion(region, event)) {
-            redrawBuffer(event);
-        }
-        return true;
-    }
 }
