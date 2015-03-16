@@ -87,6 +87,7 @@ public class RunningDifferencePanel extends AbstractFilterPanel implements Chang
                     jp2view.setDifferenceMode(false);
                     radRunDiff.setSelected(false);
                     radBaseDiff.setSelected(false);
+                    jp2view.setBaseDifferenceMode(false);
                 }
                 Displayer.display();
             }
@@ -135,7 +136,6 @@ public class RunningDifferencePanel extends AbstractFilterPanel implements Chang
                 } else {
                     jp2view.setRunDiffNoRot(!diffRot.isSelected());
                 }
-
                 Displayer.display();
             }
         });
