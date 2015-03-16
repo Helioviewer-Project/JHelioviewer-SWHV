@@ -15,11 +15,7 @@ package org.helioviewer.viewmodel.view;
  * <p>
  * The position of the layers in relation to each other is calculated based on
  * their regions. Thus, every view that is connected as a layer must provide a
- * {@link RegionView}. Also, every layer has to provide a {@link MetaDataView}
- * and a {@link ViewportView}. To take care of this requirement, implement the
- * {@link ImageInfoView} as recommended. Since a LayeredView can be used as a
- * layer itself, its implementation also should implement {@link RegionView},
- * {@link ViewportView} and {@link MetaDataView} as well.
+ * {@link RegionView}.
  *
  * <p>
  * As an additional feature, the LayeredView support hiding layers.
