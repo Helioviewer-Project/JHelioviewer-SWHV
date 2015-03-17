@@ -128,7 +128,7 @@ public class GL3DImageLayer extends GL3DShape {
         state.gl.glBufferData(GL2.GL_ELEMENT_ARRAY_BUFFER, indexBuffer.capacity() * Buffers.SIZEOF_INT, indexBuffer, GL2.GL_STATIC_DRAW);
         this.imageTextureView.forceUpdate();
 
-        this.markAsChanged();
+        //this.markAsChanged();
         updateROI(state);
 
         state.getActiveCamera().updateCameraTransformation();
@@ -214,7 +214,7 @@ public class GL3DImageLayer extends GL3DShape {
 
         Viewport layerViewport = new ViewportAdapter(new StaticViewport(state.getViewportWidth(), state.getViewportHeight()));
         this.regionView.setViewport(layerViewport, null);
-        // this.markAsChanged();
+        this.markAsChanged();
     }
 
     protected GL3DImageTextureView getImageTextureView() {
@@ -260,6 +260,7 @@ public class GL3DImageLayer extends GL3DShape {
             gl.glColorMask(true, true, true, true);
         }
         gl.glDisable(GL2.GL_CULL_FACE);
+        this.updateROI(state);
     }
 
     private int generate(GL3DState state) {

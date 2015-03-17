@@ -254,8 +254,8 @@ public abstract class GL3DCamera {
 
         GL3DMat4d vpmi = this.orthoMatrix.inverse();
 
-        GL3DVec4d centeredViewportCoordinates = new GL3DVec4d((viewportCoordinates.getX() / (double) state.getViewportWidth() - 0.5) * aspect,
-                                                             -(viewportCoordinates.getY() / (double) state.getViewportHeight() - 0.5) * aspect, 0., 0.);
+        GL3DVec4d centeredViewportCoordinates = new GL3DVec4d(2. * (viewportCoordinates.getX() / (double) state.getViewportWidth() - 0.5),
+                                                             -2. * (viewportCoordinates.getY() / (double) state.getViewportHeight() - 0.5), 0., 0.);
 
         GL3DVec4d solarCoordinates = vpmi.multiply(centeredViewportCoordinates);
         solarCoordinates.w = 0.;
@@ -284,8 +284,8 @@ public abstract class GL3DCamera {
         GL3DMat4d vpmi = this.orthoMatrix.inverse();
         GL3DMat4d tli = GL3DMat4d.identity();
 
-        GL3DVec4d centeredViewportCoordinates = new GL3DVec4d((viewportCoordinates.getX() / (double) state.getViewportWidth() - 0.5) * aspect,
-                                                             -(viewportCoordinates.getY() / (double) state.getViewportHeight() - 0.5) * aspect, 0., 0.);
+        GL3DVec4d centeredViewportCoordinates = new GL3DVec4d(2. * (viewportCoordinates.getX() / (double) state.getViewportWidth() - 0.5),
+                                                             -2. * (viewportCoordinates.getY() / (double) state.getViewportHeight() - 0.5), 0., 0.);
 
         GL3DVec4d solarCoordinates = vpmi.multiply(centeredViewportCoordinates);
         solarCoordinates.w = 1.;
@@ -314,10 +314,10 @@ public abstract class GL3DCamera {
         GL3DMat4d roti = this.getRotation().toMatrix().inverse();
         GL3DMat4d vpmi = this.orthoMatrix.inverse();
 
-        GL3DVec4d centeredViewportCoordinates1 = new GL3DVec4d((viewportCoordinates.getX() / (double) state.getViewportWidth() - 0.5) * aspect,
-                                                              -(viewportCoordinates.getY() / (double) state.getViewportHeight() - 0.5) * aspect, -1., 1.);
-        GL3DVec4d centeredViewportCoordinates2 = new GL3DVec4d((viewportCoordinates.getX() / (double) state.getViewportWidth() - 0.5) * aspect,
-                                                              -(viewportCoordinates.getY() / (double) state.getViewportHeight() - 0.5) * aspect, 1., 1.);
+        GL3DVec4d centeredViewportCoordinates1 = new GL3DVec4d(2. * (viewportCoordinates.getX() / (double) state.getViewportWidth() - 0.5),
+                                                              -2. * (viewportCoordinates.getY() / (double) state.getViewportHeight() - 0.5), -1., 1.);
+        GL3DVec4d centeredViewportCoordinates2 = new GL3DVec4d(2. * (viewportCoordinates.getX() / (double) state.getViewportWidth() - 0.5),
+                                                              -2. * (viewportCoordinates.getY() / (double) state.getViewportHeight() - 0.5), 1., 1.);
 
         GL3DVec4d up1 = roti.multiply(vpmi.multiply(centeredViewportCoordinates1));
         GL3DVec4d up2 = roti.multiply(vpmi.multiply(centeredViewportCoordinates2));
