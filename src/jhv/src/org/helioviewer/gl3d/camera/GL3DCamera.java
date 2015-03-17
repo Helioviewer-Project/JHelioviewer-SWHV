@@ -240,7 +240,6 @@ public abstract class GL3DCamera {
         gl.glLoadIdentity();
 
         double w = -translation.z * Math.tan(fov / 2.);
-
         if (w == 0.)
             w = 1.;
 
@@ -263,7 +262,6 @@ public abstract class GL3DCamera {
         double len2 = solarCoordinates.length2();
         if (len2 > 1.)
             return null;
-
         solarCoordinates.z = Math.sqrt(1 - len2);
 
         GL3DMat4d roti = this.getRotation().toMatrix().inverse();
@@ -278,21 +276,16 @@ public abstract class GL3DCamera {
                                                              -2. * (viewportCoordinates.getY() / (double) state.getViewportHeight() - 0.5), 0., 0.);
 
         GL3DMat4d vpmi = this.orthoMatrix.inverse();
-        GL3DMat4d tli = GL3DMat4d.identity();
         GL3DVec4d solarCoordinates = vpmi.multiply(centeredViewportCoordinates);
-        solarCoordinates.w = 1.;
-        solarCoordinates = tli.multiply(solarCoordinates);
         solarCoordinates.w = 0.;
 
         double len2 = solarCoordinates.length2();
         if (len2 > 1.)
             return null;
-
         solarCoordinates.z = Math.sqrt(1 - len2);
 
         GL3DMat4d roti = this.getCurrentDragRotation().toMatrix().inverse();
         GL3DVec4d notRotated = roti.multiply(solarCoordinates);
-        GL3DVec3d solarCoordinates3D = new GL3DVec3d(notRotated.x, notRotated.y, notRotated.z);
 
         return new GL3DVec3d(notRotated.x, notRotated.y, notRotated.z);
     }
