@@ -224,20 +224,18 @@ public class GL3DVec3d {
 
         // take shortcut, reasonably close to 1
         len2 = this.x * this.x + this.y * this.y + this.z * this.z;
-        len = Math.sqrt(len2);
-        if (len2 <= 1.0 && len <= 1.0)
+        if (len2 <= 1.0)
             return;
 
         // errors up to 2ulp found in testing
-        double next = Math.nextAfter(len, len + 1.0);
+        double next = Math.sqrt(Math.nextAfter(len2, len2 + 1.0));
         this.x /= next;
         this.y /= next;
         this.z /= next;
 
         // take shortcut, reasonably close to 1
         len2 = this.x * this.x + this.y * this.y + this.z * this.z;
-        len = Math.sqrt(len2);
-        if (len2 <= 1.0 && len <= 1.0)
+        if (len2 <= 1.0)
             return;
 
         // can't happen / something is really messed up
