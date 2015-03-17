@@ -238,87 +238,75 @@ public abstract class GL3DCamera {
 
         gl.glPushMatrix();
         gl.glLoadIdentity();
+        this.orthoMatrix = GL3DMat4d.identity();
+
         double w = -translation.z * Math.tan(fov / 2.);
-        gl.glOrtho(-this.aspect * w, this.aspect * w, -w, w, this.clipNear, this.clipFar);
-        this.orthoMatrix = GL3DMat4d.ortho(-w, w, -w, w, this.clipNear, this.clipFar);
+        if (w != 0) {
+            gl.glOrtho(-this.aspect * w, this.aspect * w, -w, w, this.clipNear, this.clipFar);
+            this.orthoMatrix = GL3DMat4d.ortho(-w, w, -w, w, this.clipNear, this.clipFar);
+        }
+
         this.orthoMatrix.translate(new GL3DVec3d(this.translation.x, this.translation.y, 0.));
         gl.glMatrixMode(GL2.GL_MODELVIEW);
     }
 
     public GL3DVec3d getVectorFromSphere(Point viewportCoordinates) {
         GL3DState state = GL3DState.get();
-        /* workaround for null GL3DState on startup */
-        if (state == null) {
-            return null;
-        }
-
-        GL3DMat4d vpmi = this.orthoMatrix.inverse();
-
         GL3DVec4d centeredViewportCoordinates = new GL3DVec4d(2. * (viewportCoordinates.getX() / (double) state.getViewportWidth() - 0.5),
                                                              -2. * (viewportCoordinates.getY() / (double) state.getViewportHeight() - 0.5), 0., 0.);
 
+        GL3DMat4d vpmi = this.orthoMatrix.inverse();
         GL3DVec4d solarCoordinates = vpmi.multiply(centeredViewportCoordinates);
         solarCoordinates.w = 0.;
+
+        double len2 = solarCoordinates.length2();
+        if (len2 > 1.)
+            return null;
+
+        solarCoordinates.z = Math.sqrt(1 - len2);
+
         GL3DMat4d roti = this.getRotation().toMatrix().inverse();
-
-        double solarCoordinates3Dz = Math.sqrt(1 - solarCoordinates.dot(solarCoordinates));
-
-        solarCoordinates.z = solarCoordinates3Dz;
         GL3DVec4d notRotated = roti.multiply(solarCoordinates);
 
-        if (Double.isNaN(notRotated.z)) {
-            return null;
-        }
-        GL3DVec3d solarCoordinates3D = new GL3DVec3d(notRotated.x, notRotated.y, notRotated.z);
-
-        return solarCoordinates3D;
+        return new GL3DVec3d(notRotated.x, notRotated.y, notRotated.z);
     }
 
     public GL3DVec3d getVectorFromSphereAlt(Point viewportCoordinates) {
         GL3DState state = GL3DState.get();
-        /* workaround for null GL3DState on startup */
-        if (state == null) {
-            return null;
-        }
-
-        GL3DMat4d vpmi = this.orthoMatrix.inverse();
-        GL3DMat4d tli = GL3DMat4d.identity();
-
         GL3DVec4d centeredViewportCoordinates = new GL3DVec4d(2. * (viewportCoordinates.getX() / (double) state.getViewportWidth() - 0.5),
                                                              -2. * (viewportCoordinates.getY() / (double) state.getViewportHeight() - 0.5), 0., 0.);
 
+        GL3DMat4d vpmi = this.orthoMatrix.inverse();
+        GL3DMat4d tli = GL3DMat4d.identity();
         GL3DVec4d solarCoordinates = vpmi.multiply(centeredViewportCoordinates);
         solarCoordinates.w = 1.;
         solarCoordinates = tli.multiply(solarCoordinates);
         solarCoordinates.w = 0.;
-        GL3DMat4d roti = this.getCurrentDragRotation().toMatrix().inverse();
 
-        double solarCoordinates3Dz = Math.sqrt(1 - solarCoordinates.dot(solarCoordinates));
-
-        solarCoordinates.z = solarCoordinates3Dz;
-        if (Double.isNaN(solarCoordinates.z)) {
-            solarCoordinates.z = 0;
-        }
-        GL3DVec4d notRotated = roti.multiply(solarCoordinates);
-
-        if (Double.isNaN(notRotated.z)) {
+        double len2 = solarCoordinates.length2();
+        if (len2 > 1.)
             return null;
-        }
+
+        solarCoordinates.z = Math.sqrt(1 - len2);
+
+        GL3DMat4d roti = this.getCurrentDragRotation().toMatrix().inverse();
+        GL3DVec4d notRotated = roti.multiply(solarCoordinates);
         GL3DVec3d solarCoordinates3D = new GL3DVec3d(notRotated.x, notRotated.y, notRotated.z);
 
-        return solarCoordinates3D;
+        return new GL3DVec3d(notRotated.x, notRotated.y, notRotated.z);
     }
 
     public GL3DVec3d getVectorFromPlane(Point viewportCoordinates) {
         GL3DState state = GL3DState.get();
-        GL3DMat4d roti = this.getRotation().toMatrix().inverse();
-        GL3DMat4d vpmi = this.orthoMatrix.inverse();
 
         GL3DVec4d centeredViewportCoordinates1 = new GL3DVec4d(2. * (viewportCoordinates.getX() / (double) state.getViewportWidth() - 0.5),
                                                               -2. * (viewportCoordinates.getY() / (double) state.getViewportHeight() - 0.5), -1., 1.);
         GL3DVec4d centeredViewportCoordinates2 = new GL3DVec4d(2. * (viewportCoordinates.getX() / (double) state.getViewportWidth() - 0.5),
                                                               -2. * (viewportCoordinates.getY() / (double) state.getViewportHeight() - 0.5), 1., 1.);
 
+
+        GL3DMat4d roti = this.getRotation().toMatrix().inverse();
+        GL3DMat4d vpmi = this.orthoMatrix.inverse();
         GL3DVec4d up1 = roti.multiply(vpmi.multiply(centeredViewportCoordinates1));
         GL3DVec4d up2 = roti.multiply(vpmi.multiply(centeredViewportCoordinates2));
         GL3DVec4d linevec = GL3DVec4d.subtract(up2, up1);
@@ -326,9 +314,7 @@ public abstract class GL3DCamera {
         double fact = -GL3DVec4d.dot3d(up1, normal) / GL3DVec4d.dot3d(linevec, normal);
         GL3DVec4d notRotated = GL3DVec4d.add(up1, GL3DVec4d.multiply(linevec, fact));
 
-        GL3DVec3d solarCoordinates3D = new GL3DVec3d(notRotated.x, notRotated.y, notRotated.z);
-
-        return solarCoordinates3D;
+        return new GL3DVec3d(notRotated.x, notRotated.y, notRotated.z);
     }
 
     public void resumePerspective(GL3DState state) {
