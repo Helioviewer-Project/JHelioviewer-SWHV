@@ -40,6 +40,10 @@ public class GL3DMat4d {
         return new GL3DMat4d(1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1);
     }
 
+    public final static GL3DMat4d orthoIdentity() {
+        return new GL3DMat4d(1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1);
+    }
+
     public final GL3DMat4d set(GL3DMat4d A) {
         m[0] = A.m[0];
         m[4] = A.m[4];
