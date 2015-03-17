@@ -280,8 +280,9 @@ public abstract class GL3DCamera {
 
         double len2 = solarCoordinates.length2();
         if (len2 > 1.)
-            return null;
-        solarCoordinates.z = Math.sqrt(1 - len2);
+            solarCoordinates.z = 0;
+        else
+            solarCoordinates.z = Math.sqrt(1 - len2);
 
         GL3DMat4d roti = this.getCurrentDragRotation().toMatrix().inverse();
         GL3DVec4d notRotated = roti.multiply(solarCoordinates);
