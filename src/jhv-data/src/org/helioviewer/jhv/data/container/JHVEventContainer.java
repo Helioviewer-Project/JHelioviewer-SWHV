@@ -1,12 +1,12 @@
 package org.helioviewer.jhv.data.container;
 
-import java.awt.EventQueue;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.NavigableMap;
 import java.util.Set;
+import java.util.logging.Logger;
 
 import org.helioviewer.jhv.data.container.cache.JHVEventCache;
 import org.helioviewer.jhv.data.container.cache.JHVEventHandlerCache;
@@ -125,27 +125,20 @@ public class JHVEventContainer {
      *            the handler
      */
     public void requestForInterval(final Date startDate, final Date endDate, final JHVEventHandler handler) {
-        // Logger.getLogger(JHVEventContainer.class.getName()).info("Request for interval : ["
-        // + startDate + "," + endDate + "]");
-        // Logger.getLogger(JHVEventContainer.class.getName()).info("handler : "
-        // + handler);
-        // Thread.dumpStack();
-        EventQueue.invokeLater(new Runnable() {
-            @Override
-            public void run() {
-                if (startDate != null && endDate != null) {
-                    Long requestID = nextDownloadID();
-                    Long previousRequestID = eventHandlerCache.add(handler, startDate, endDate, requestID);
-                    Map<String, NavigableMap<Date, NavigableMap<Date, List<JHVEvent>>>> events = eventCache.get(startDate, endDate);
-                    // AssociationsPrinter.print(events);
-                    handler.newEventsReceived(events);
-                    if (previousRequestID != null) {
-                        removeIntervalForRequestID(previousRequestID);
-                    }
-                    requestEvents(startDate, endDate, requestID);
-                }
+        Logger.getLogger(JHVEventContainer.class.getName()).info("Request for interval : [" + startDate + "," + endDate + "]");
+        Logger.getLogger(JHVEventContainer.class.getName()).info("handler : " + handler);
+        Thread.dumpStack();
+        if (startDate != null && endDate != null) {
+            Long requestID = nextDownloadID();
+            Long previousRequestID = eventHandlerCache.add(handler, startDate, endDate, requestID);
+            Map<String, NavigableMap<Date, NavigableMap<Date, List<JHVEvent>>>> events = eventCache.get(startDate, endDate);
+            // AssociationsPrinter.print(events);
+            handler.newEventsReceived(events);
+            if (previousRequestID != null) {
+                removeIntervalForRequestID(previousRequestID);
             }
-        });
+            requestEvents(startDate, endDate, requestID);
+        }
     }
 
     /**
