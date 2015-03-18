@@ -4,7 +4,6 @@ import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
-import java.awt.EventQueue;
 import java.awt.FlowLayout;
 import java.awt.Font;
 import java.awt.event.ActionEvent;
@@ -40,22 +39,6 @@ import org.helioviewer.viewmodel.view.jp2view.datetime.ImmutableDateTime;
  * <p>
  * This panel plays are very central role: It manages all visible layers,
  * <p>
- * Except the LayersListener this is a GUI class expecting to be run in the
- * EventQueue.
- * <p>
- * 
- * TODO: Low-Importance - Fix the issue that everything runs in the EventQueue
- * 
- * At the moment, a lot of GUI calls are not fired on the EventDispatchThread
- * According to the Java specifications, this IS NOT ALLOWED and could cause
- * problems!
- * 
- * In order to fix this use SwingUtilities.invokeLater or
- * Swingutilities.invokeAndWait to make GUI interactions
- * 
- * Ludwig already tried to fix all of this "with one line of code" by adding
- * invokeLater to the ViewListenerDistributor However, this calls TOO MUCH stuff
- * on the event queue - and the GUI becomes unresponsive
  * 
  * @author Markus Langenberg
  * @author Malte Nuhn
@@ -322,16 +305,11 @@ public class ImageSelectorPanel extends JPanel implements LayersListener {
      * runs in the EventQueue.
      */
     private void activateActions() {
-        EventQueue.invokeLater(new Runnable() {
-            @Override
-            public void run() {
-                boolean e = LayersModel.getSingletonInstance().getActiveView() != null;
-                downloadLayerAction.setEnabled(e);
-                moveLayerDownAction.setEnabled(e);
-                moveLayerUpAction.setEnabled(e);
-                showMetaAction.setEnabled(e);
-            }
-        });
+        boolean e = LayersModel.getSingletonInstance().getActiveView() != null;
+        downloadLayerAction.setEnabled(e);
+        moveLayerDownAction.setEnabled(e);
+        moveLayerUpAction.setEnabled(e);
+        showMetaAction.setEnabled(e);
     }
 
     /**

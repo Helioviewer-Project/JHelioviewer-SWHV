@@ -40,8 +40,6 @@ public class CollapsiblePaneWithButton extends CollapsiblePane {
 
     public CollapsiblePaneWithButton(String title, Component component, boolean startExpanded) {
         super(title, component, startExpanded);
-        // observationImagePane =
-        // ImageViewerGui.getSingletonInstance().getImageSelectorPanel().getObservationImagePane();
         initActions();
     }
 
@@ -51,9 +49,6 @@ public class CollapsiblePaneWithButton extends CollapsiblePane {
         topButtonsPanel.setLayout(new BorderLayout());
         topButtonsPanel.add(toggleButton, BorderLayout.WEST);
         add(topButtonsPanel, BorderLayout.PAGE_START);
-        // addLayerButton=new JButton(addLayerAction);
-        // addLayerButton.setHorizontalAlignment(SwingConstants.LEFT);
-        // topButtonsPanel.add(addLayerButton, BorderLayout.EAST);
     }
 
     private void initActions() {
