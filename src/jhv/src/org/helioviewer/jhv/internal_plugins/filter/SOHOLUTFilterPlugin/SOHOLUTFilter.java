@@ -30,9 +30,6 @@ import org.helioviewer.viewmodel.view.opengl.GLTextureHelper;
  * @author Helge Dietert
  */
 public class SOHOLUTFilter implements FrameFilter, Filter {
-    // /////////////////////////
-    // GENERAL //
-    // /////////////////////////
 
     private SOHOLUTPanel panel;
     private IntBuffer buffer;
@@ -88,9 +85,7 @@ public class SOHOLUTFilter implements FrameFilter, Filter {
         this.changed = true;
     }
 
-    // /////////////////////////
-    // STANDARD //
-    // /////////////////////////
+    // STANDARD
 
     /**
      * {@inheritDoc}
@@ -117,9 +112,7 @@ public class SOHOLUTFilter implements FrameFilter, Filter {
         return null;
     }
 
-    // /////////////////////////
-    // OPENGL //
-    // /////////////////////////
+    // OPENGL
     private final GLTextureHelper.GLTexture tex = new GLTextureHelper.GLTexture();
     private LUT lastLut = null;
     private boolean lastInverted = false;
@@ -178,29 +171,6 @@ public class SOHOLUTFilter implements FrameFilter, Filter {
         changed = false;
 
         gl.glActiveTexture(GL2.GL_TEXTURE0);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void setState(String state) {
-        String[] values = state.trim().split(" ");
-        String tableString = values[0];
-        String invertString = values[values.length - 1];
-        for (int i = 1; i < values.length - 1; i++) {
-            tableString += " " + values[i];
-        }
-        setLUT(LUT.getStandardList().get(tableString.replaceAll("ANGSTROM", Character.toString(LUT.angstrom))), Boolean.parseBoolean(invertString));
-        panel.setValue(lut, invertLUT);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public String getState() {
-        return lut.getName().replaceAll(Character.toString(LUT.angstrom), "ANGSTROM") + " " + invertLUT;
     }
 
     @Override

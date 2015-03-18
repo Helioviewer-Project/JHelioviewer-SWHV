@@ -24,9 +24,6 @@ public class LUT {
 
     public final static char angstrom = '\u212B';
 
-    /**
-     * Giving a name of the lut
-     */
     private final String lutName;
 
     /**
@@ -305,9 +302,10 @@ public class LUT {
             }
             br.close();
             return intArray;
-        } catch (Exception e) {// Catch exception if any
+        } catch (Exception e) {
             Log.error("Error open internal color table " + name, e);
             return null;
         }
     }
+
 }

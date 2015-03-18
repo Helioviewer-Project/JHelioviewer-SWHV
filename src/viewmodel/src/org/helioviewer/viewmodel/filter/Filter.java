@@ -18,29 +18,6 @@ import javax.media.opengl.GL2;
  */
 public interface Filter {
 
-    /**
-     * Sets the filter state.
-     *
-     * The format of the state is determined by the filter itself. It should
-     * encode all necessary values to restore the filter.
-     *
-     * @param state
-     *            The new filter state
-     * @see #getState()
-     */
-    public void setState(String state);
-
-    /**
-     * Gets the filter state.
-     *
-     * The format of the state is determined by the filter itself. It should
-     * encode all necessary values to restore the filter.
-     *
-     * @param state
-     *            The new filter state
-     * @see #setState()
-     */
-    public String getState();
-
     public void applyGL(GL2 gl);
+
 }
