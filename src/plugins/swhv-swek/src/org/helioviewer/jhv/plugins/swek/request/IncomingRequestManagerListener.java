@@ -19,32 +19,23 @@ public interface IncomingRequestManagerListener {
      * 
      * @param date
      *            the date for which the request was done
-     * @param requestID
      */
-    public abstract void newRequestForDate(Date date, Long requestID);
+    public abstract void newRequestForDate(Date date);
 
     /**
      * New request for an interval was issued.
      * 
      * @param interval
      *            the interval for which the request was done
-     * @param requestID
      */
-    public abstract void newRequestForInterval(Interval<Date> interval, Long requestID);
+    public abstract void newRequestForInterval(Interval<Date> interval);
 
     /**
      * New request for a list of dates was issued.
      * 
      * @param dates
      *            the list of dates for which the request was done
-     * @param requestID
      */
-    public abstract void newRequestForDateList(List<Date> dates, Long requestID);
+    public abstract void newRequestForDateList(List<Date> dates);
 
-    /**
-     * 
-     * 
-     * @param requestID
-     */
-    public abstract void stopRequest(Long requestID);
 }

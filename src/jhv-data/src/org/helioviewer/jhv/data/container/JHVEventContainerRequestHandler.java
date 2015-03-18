@@ -18,9 +18,8 @@ public interface JHVEventContainerRequestHandler {
      * 
      * @param date
      *            the date to handle the request for
-     * @param requestID2
      */
-    public abstract void handleRequestForDate(Date date, Long requestID2);
+    public abstract void handleRequestForDate(Date date);
 
     /**
      * Handle request for an interval.
@@ -29,9 +28,8 @@ public interface JHVEventContainerRequestHandler {
      *            the start date of the interval
      * @param endDate
      *            the end date of the interval
-     * @param requestID
      */
-    public abstract void handleRequestForInterval(Date startDate, Date endDate, Long requestID);
+    public abstract void handleRequestForInterval(Date startDate, Date endDate);
 
     /**
      * Handle request for a list of dates
@@ -39,12 +37,5 @@ public interface JHVEventContainerRequestHandler {
      * @param dates
      *            the list of dates
      */
-    public abstract void handleRequestForDateList(List<Date> dates, Long requestID);
-
-    /**
-     * 
-     * 
-     * @param requestID
-     */
-    public abstract void removeRequestID(Long requestID);
+    public abstract void handleRequestForDateList(List<Date> dates);
 }
