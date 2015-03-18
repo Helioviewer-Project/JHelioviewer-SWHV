@@ -406,10 +406,28 @@ public class DownloadWorker implements Runnable {
      */
     private void fireDownloadWorkerForcedStopped() {
         if (!isFireForceStoppedCalled) {
-            for (DownloadWorkerListener l : listeners) {
-                l.workerForcedToStop(this);
+            try {
+                EventQueue.invokeAndWait(new Runnable() {
+
+                    @Override
+                    public void run() {
+                        // TODO Auto-generated method stub
+                        for (DownloadWorkerListener l : listeners) {
+                            l.workerForcedToStop(DownloadWorker.this);
+                        }
+
+                    }
+
+                });
+            } catch (InvocationTargetException e) {
+                Log.error("Invoke and wait called from event queue", e);
+                e.printStackTrace();
+            } catch (InterruptedException e) {
+                Log.error("Invoke and wait interrupted", e);
+                e.printStackTrace();
             }
             isFireForceStoppedCalled = true;
+
         }
     }
 
@@ -417,18 +435,50 @@ public class DownloadWorker implements Runnable {
      * Inform the download worker listeners the download worker has finished.
      */
     private void fireDownloadWorkerFinished() {
-        for (DownloadWorkerListener l : listeners) {
-            l.workerFinished(this);
+        try {
+            EventQueue.invokeAndWait(new Runnable() {
+
+                @Override
+                public void run() {
+                    for (DownloadWorkerListener l : listeners) {
+                        l.workerFinished(DownloadWorker.this);
+                    }
+                }
+
+            });
+        } catch (InvocationTargetException e) {
+            Log.error("Invoke and wait called from event queue", e);
+            e.printStackTrace();
+        } catch (InterruptedException e) {
+            Log.error("Invoke and wait interrupted", e);
+            e.printStackTrace();
         }
+
     }
 
     /**
      * Inform the download worker listener the download worker has started.
      */
     private void fireDownloadWorkerStarted() {
-        for (DownloadWorkerListener l : listeners) {
-            l.workerStarted(this);
+        try {
+            EventQueue.invokeAndWait(new Runnable() {
+
+                @Override
+                public void run() {
+                    for (DownloadWorkerListener l : listeners) {
+                        l.workerStarted(DownloadWorker.this);
+                    }
+                }
+
+            });
+        } catch (InvocationTargetException e) {
+            Log.error("Invoke and wait called from event queue", e);
+            e.printStackTrace();
+        } catch (InterruptedException e) {
+            Log.error("Invoke and wait interrupted", e);
+            e.printStackTrace();
         }
+
     }
 
 }
