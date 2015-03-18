@@ -3,7 +3,6 @@ package org.helioviewer.jhv.plugins.swek.request;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -25,7 +24,7 @@ public class IncomingRequestManager implements JHVEventContainerRequestHandler {
     private final List<IncomingRequestManagerListener> listeners;
 
     /** List of requested intervals */
-    private final List<Interval<Date>> intervalList;
+    // private final List<Interval<Date>> intervalList;
 
     /** List of requested dates */
     private final List<Date> dateList;
@@ -40,7 +39,7 @@ public class IncomingRequestManager implements JHVEventContainerRequestHandler {
         eventContainer = JHVEventContainer.getSingletonInstance();
         eventContainer.registerHandler(this);
         listeners = new ArrayList<IncomingRequestManagerListener>();
-        intervalList = new ArrayList<Interval<Date>>();
+        // intervalList = new ArrayList<Interval<Date>>();
         dateList = new ArrayList<Date>();
         uniqueInterval = new HashMap<Date, Set<Date>>();
     }
@@ -93,11 +92,10 @@ public class IncomingRequestManager implements JHVEventContainerRequestHandler {
      * 
      * @return the list of requested intervals
      */
-    public List<Interval<Date>> getAllRequestedIntervals() {
-        synchronized (SWEKPluginLocks.requestLock) {
-            return intervalList;
-        }
-    }
+    /*
+     * public List<Interval<Date>> getAllRequestedIntervals() { synchronized
+     * (SWEKPluginLocks.requestLock) { return intervalList; } }
+     */
 
     @Override
     public void handleRequestForDate(Date date) {
@@ -111,19 +109,19 @@ public class IncomingRequestManager implements JHVEventContainerRequestHandler {
 
     @Override
     public void handleRequestForInterval(Date startDate, Date endDate) {
-        synchronized (SWEKPluginLocks.requestLock) {
-            if (addToUniqueInterval(startDate, endDate)) {
-                Interval<Date> interval = new Interval<Date>(startDate, endDate);
-                for (Interval<Date> inter : intervalList) {
-                    if (inter.containsInclusive(interval)) {
-                        return;
-                    }
-                }
-                intervalList.add(interval);
-                fireNewIntervalRequested(interval);
-
-            }
-        }
+        /*
+         * synchronized (SWEKPluginLocks.requestLock) { if
+         * (addToUniqueInterval(startDate, endDate)) {
+         */
+        Interval<Date> interval = new Interval<Date>(startDate, endDate);
+        /*
+         * for (Interval<Date> inter : intervalList) { if
+         * (inter.containsInclusive(interval)) { return; } }
+         * intervalList.add(interval);
+         */
+        fireNewIntervalRequested(interval);
+        // }
+        // }
     }
 
     @Override
@@ -184,17 +182,13 @@ public class IncomingRequestManager implements JHVEventContainerRequestHandler {
      * @return true if the start and end date were added, false if the interval
      *         was already in the list.
      */
-    private boolean addToUniqueInterval(Date startDate, Date endDate) {
-        Set<Date> uniqueEndDates = new HashSet<Date>();
-        if (uniqueInterval.containsKey(startDate)) {
-            uniqueEndDates = uniqueInterval.get(startDate);
-            if (uniqueEndDates.contains(endDate)) {
-                return false;
-            }
-        }
-        uniqueEndDates.add(endDate);
-        uniqueInterval.put(startDate, uniqueEndDates);
-        return true;
-    }
+    /*
+     * private boolean addToUniqueInterval(Date startDate, Date endDate) {
+     * Set<Date> uniqueEndDates = new HashSet<Date>(); if
+     * (uniqueInterval.containsKey(startDate)) { uniqueEndDates =
+     * uniqueInterval.get(startDate); if (uniqueEndDates.contains(endDate)) {
+     * return false; } } uniqueEndDates.add(endDate);
+     * uniqueInterval.put(startDate, uniqueEndDates); return true; }
+     */
 
 }

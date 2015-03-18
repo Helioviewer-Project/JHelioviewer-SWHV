@@ -1,6 +1,7 @@
 package org.helioviewer.jhv.plugins.swek.download;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -379,7 +380,7 @@ public class SWEKDownloadManager implements DownloadWorkerListener, IncomingRequ
             startDownloadEventType(eventType, swekSource, date, supplier);
         }
 
-        List<Interval<Date>> allIntervals = requestManager.getAllRequestedIntervals();
+        Collection<Interval<Date>> allIntervals = JHVEventContainer.getSingletonInstance().getAllRequestIntervals();
         for (Interval<Date> interval : allIntervals) {
             startDownloadEventType(eventType, swekSource, interval, supplier);
         }

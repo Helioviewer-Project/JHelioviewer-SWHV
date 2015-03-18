@@ -1,12 +1,12 @@
 package org.helioviewer.jhv.data.container;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.NavigableMap;
 import java.util.Set;
-import java.util.logging.Logger;
 
 import org.helioviewer.base.math.Interval;
 import org.helioviewer.jhv.data.container.cache.JHVEventCache;
@@ -123,8 +123,10 @@ public class JHVEventContainer {
      *            the handler
      */
     public void requestForInterval(final Date startDate, final Date endDate, final JHVEventHandler handler) {
-        Logger.getLogger(JHVEventContainer.class.getName()).info("Request for interval : [" + startDate + "," + endDate + "]");
-        Logger.getLogger(JHVEventContainer.class.getName()).info("handler : " + handler);
+        // Logger.getLogger(JHVEventContainer.class.getName()).info("Request for interval : ["
+        // + startDate + "," + endDate + "]");
+        // Logger.getLogger(JHVEventContainer.class.getName()).info("handler : "
+        // + handler);
         if (startDate != null && endDate != null) {
             eventHandlerCache.add(handler);
             JHVEventCacheResult result = eventCache.get(startDate, endDate);
@@ -132,6 +134,7 @@ public class JHVEventContainer {
             // AssociationsPrinter.print(events);
             handler.newEventsReceived(events);
             for (Interval<Date> missing : result.getMissingIntervals()) {
+                // Log.debug("Missing interval: " + missing);
                 requestEvents(missing.getStart(), missing.getEnd());
             }
         }
@@ -207,5 +210,9 @@ public class JHVEventContainer {
             handler.cacheUpdated();
         }
 
+    }
+
+    public Collection<Interval<Date>> getAllRequestIntervals() {
+        return JHVEventCache.getSingletonInstance().getRequestCache().values();
     }
 }
