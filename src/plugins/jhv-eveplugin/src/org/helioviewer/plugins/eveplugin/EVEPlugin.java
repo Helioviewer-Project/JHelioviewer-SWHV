@@ -1,6 +1,5 @@
 package org.helioviewer.plugins.eveplugin;
 
-import java.awt.EventQueue;
 import java.net.URL;
 import java.util.LinkedList;
 
@@ -33,31 +32,24 @@ public class EVEPlugin implements Plugin, MainContentPanelPlugin {
 
     @Override
     public void installPlugin() {
-        EventQueue.invokeLater(new Runnable() {
+        EventRequester eventRequester = EventRequester.getSingletonInstance();
+        ZoomController.getSingletonInstance().addZoomControllerListener(eventRequester);
+        eventRequester.addListener(EventModel.getSingletonInstance());
+        ZoomController.getSingletonInstance().addZoomControllerListener(EventModel.getSingletonInstance());
+        if (mainPanel == null) {
+            mainPanel = new MainPanel();
+        }
 
-            @Override
-            public void run() {
-                EventRequester eventRequester = EventRequester.getSingletonInstance();
-                ZoomController.getSingletonInstance().addZoomControllerListener(eventRequester);
-                eventRequester.addListener(EventModel.getSingletonInstance());
-                ZoomController.getSingletonInstance().addZoomControllerListener(EventModel.getSingletonInstance());
-                if (mainPanel == null) {
-                    mainPanel = new MainPanel();
-                }
+        pluginPanes.add(mainPanel);
 
-                pluginPanes.add(mainPanel);
+        ImageViewerGui.getSingletonInstance().getLeftContentPane().add("Timeline Layers", new TimelinePluginPanel(), true);
 
-                ImageViewerGui.getSingletonInstance().getLeftContentPane().add("Timeline Layers", new TimelinePluginPanel(), true);
-
-                ImageViewerGui.getSingletonInstance().getMainContentPanel().addPlugin(EVEPlugin.this);
-                ImageViewerGui.getSingletonInstance().getObservationDialog().addUserInterface(EVESettings.OBSERVATION_UI_NAME, new ObservationDialogUIPanel(mainPanel.getPlotContainerPanel()));
-                ImageViewerGui.getSingletonInstance().getObservationDialog().addUserInterface(EVESettings.RADIO_OBSERVATION_UI_NAME, new RadioObservationDialogUIPanel(mainPanel.getPlotContainerPanel()));
-                // initialize database connection
-                RadioPlotModel.getSingletonInstance();
-                EventModel.getSingletonInstance().activateEvents();
-            }
-        });
-
+        ImageViewerGui.getSingletonInstance().getMainContentPanel().addPlugin(EVEPlugin.this);
+        ImageViewerGui.getSingletonInstance().getObservationDialog().addUserInterface(EVESettings.OBSERVATION_UI_NAME, new ObservationDialogUIPanel(mainPanel.getPlotContainerPanel()));
+        ImageViewerGui.getSingletonInstance().getObservationDialog().addUserInterface(EVESettings.RADIO_OBSERVATION_UI_NAME, new RadioObservationDialogUIPanel(mainPanel.getPlotContainerPanel()));
+        // initialize database connection
+        RadioPlotModel.getSingletonInstance();
+        EventModel.getSingletonInstance().activateEvents();
     }
 
     @Override
@@ -122,4 +114,5 @@ public class EVEPlugin implements Plugin, MainContentPanelPlugin {
         // TODO SP: Implement getState for EVEPlugin
         return "";
     }
+
 }

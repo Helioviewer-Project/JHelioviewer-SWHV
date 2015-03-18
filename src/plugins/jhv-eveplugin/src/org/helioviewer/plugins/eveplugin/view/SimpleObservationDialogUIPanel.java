@@ -1,7 +1,6 @@
 package org.helioviewer.plugins.eveplugin.view;
 
 import java.awt.BorderLayout;
-import java.awt.EventQueue;
 import java.awt.GridLayout;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -70,28 +69,23 @@ public abstract class SimpleObservationDialogUIPanel extends ObservationDialogPa
         this.plotsContainerPanel = plotsContainerPanel;
         ObservationDialogDateModel.getInstance().addListener(this);
 
-        EventQueue.invokeLater(new Runnable() {
-            @Override
-            public void run() {
-                // long start = System.currentTimeMillis();
-                labelStartDate = new JLabel("Start Date");
-                // labelEndDate = new JLabel("End Date");
-                calendarStartDate = new JHVCalendarDatePicker();
-                // calendarEndDate = new JHVCalendarDatePicker();
+        // long start = System.currentTimeMillis();
+        labelStartDate = new JLabel("Start Date");
+        // labelEndDate = new JLabel("End Date");
+        calendarStartDate = new JHVCalendarDatePicker();
+        // calendarEndDate = new JHVCalendarDatePicker();
 
-                // plotComboBox = new JComboBox(new String[] { "Plot 1",
-                // "Plot 2" });
+        // plotComboBox = new JComboBox(new String[] { "Plot 1",
+        // "Plot 2" });
 
-                comboBoxGroup = new JComboBox(new DefaultComboBoxModel());
-                comboBoxData = new JComboBox(new DefaultComboBoxModel());
-                timePane = new JPanel();
-                plotPane = new JPanel();
-                initVisualComponents();
-                // Log.debug("SimpleObservationDialogUIPanel time : " +
-                // (System.currentTimeMillis() - start));
-                LayersModel.getSingletonInstance().addLayersListener(SimpleObservationDialogUIPanel.this);
-            }
-        });
+        comboBoxGroup = new JComboBox(new DefaultComboBoxModel());
+        comboBoxData = new JComboBox(new DefaultComboBoxModel());
+        timePane = new JPanel();
+        plotPane = new JPanel();
+        initVisualComponents();
+        // Log.debug("SimpleObservationDialogUIPanel time : " +
+        // (System.currentTimeMillis() - start));
+        LayersModel.getSingletonInstance().addLayersListener(SimpleObservationDialogUIPanel.this);
 
         // initGroups();
     }
@@ -347,43 +341,36 @@ public abstract class SimpleObservationDialogUIPanel extends ObservationDialogPa
     @Override
     public void layerRemoved(View oldView, int oldIdx) {
         // TODO Auto-generated method stub
-
     }
 
     @Override
     public void layerChanged(int idx) {
         // TODO Auto-generated method stub
-
     }
 
     @Override
     public void activeLayerChanged(int idx) {
         // TODO Auto-generated method stub
-
     }
 
     @Override
     public void viewportGeometryChanged() {
         // TODO Auto-generated method stub
-
     }
 
     @Override
     public void timestampChanged(int idx) {
         // TODO Auto-generated method stub
-
     }
 
     @Override
     public void subImageDataChanged() {
         // TODO Auto-generated method stub
-
     }
 
     @Override
     public void layerDownloaded(int idx) {
         // TODO Auto-generated method stub
-
     }
 
     @Override
@@ -393,6 +380,6 @@ public abstract class SimpleObservationDialogUIPanel extends ObservationDialogPa
 
     @Override
     public void endDateChanged(Date endDate) {
-
     }
+
 }
