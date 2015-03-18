@@ -1,11 +1,14 @@
 package org.helioviewer.jhv.plugins.swek.download;
 
+import java.awt.EventQueue;
 import java.io.InputStream;
+import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
+import org.helioviewer.base.logging.Log;
 import org.helioviewer.base.math.Interval;
 import org.helioviewer.jhv.data.container.JHVEventContainer;
 import org.helioviewer.jhv.plugins.swek.config.SWEKEventType;
@@ -265,13 +268,31 @@ public class DownloadWorker implements Runnable {
      * Sends the events to the event container.
      * 
      * @param swekEventStream
+     * @throws InterruptedException
+     * @throws InvocationTargetException
      */
-    private void distributeData(SWEKEventStream eventStream) {
+    private void distributeData(final SWEKEventStream eventStream) {
         if (!isStopped) {
             if (eventStream != null) {
-                while (eventStream.hasEvents() && !isStopped) {
-                    eventContainer.addEvent(eventStream.next());
+                try {
+                    EventQueue.invokeAndWait(new Runnable() {
+
+                        @Override
+                        public void run() {
+                            while (eventStream.hasEvents() && !isStopped) {
+                                eventContainer.addEvent(eventStream.next());
+                            }
+                        }
+
+                    });
+                } catch (InvocationTargetException e) {
+                    Log.error("Invoke and wait called from event queue", e);
+                    e.printStackTrace();
+                } catch (InterruptedException e) {
+                    Log.error("Invoke and wait interrupted", e);
+                    e.printStackTrace();
                 }
+
             }
         } else {
             fireDownloadWorkerForcedStopped();
