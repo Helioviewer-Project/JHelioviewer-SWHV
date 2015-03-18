@@ -181,7 +181,7 @@ public class RequestCacheTest {
         expectedMissingInterval.add(new Interval<Date>(date8, date11));
         expectedMissingInterval.add(new Interval<Date>(date12, date22));
         expectedRequestCache.put(date9, new Interval<Date>(date9, date22));
-        System.out.println("Interval starts in first interval and finishes after thirt interval");
+        System.out.println("Interval starts in first interval and finishes after third interval");
         assertRequestCache("Testing an empty request cache", expectedRequestCache, cache.getRequestCache());
         assertMissingInterval("Testing missing interval", expectedMissingInterval, result.getMissingIntervals());
 
