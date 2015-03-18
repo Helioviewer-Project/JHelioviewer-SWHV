@@ -1,10 +1,10 @@
 package org.helioviewer.jhv.plugins.swek.request;
 
+import java.awt.EventQueue;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-import org.helioviewer.base.logging.Log;
 import org.helioviewer.jhv.data.container.JHVEventContainer;
 import org.helioviewer.jhv.layers.LayersListener;
 import org.helioviewer.jhv.layers.LayersModel;
@@ -49,14 +49,20 @@ public class OutgoingRequestManager implements LayersListener {
     @Override
     public void layerAdded(int idx) {
         View activeView = LayersModel.getSingletonInstance().getActiveView();
-        List<Date> requestDates = new ArrayList<Date>();
+        final List<Date> requestDates = new ArrayList<Date>();
         JHVJPXView jpxView = activeView.getAdapter(JHVJPXView.class);
         if (jpxView != null) {
             for (int frame = 0; frame <= jpxView.getMaximumFrameNumber(); frame++) {
                 requestDates.add(jpxView.getFrameDateTime(frame).getTime());
             }
         }
-        JHVEventContainer.getSingletonInstance().requestForDateList(requestDates, swekEventHandler);
+        EventQueue.invokeLater(new Runnable() {
+            @Override
+            public void run() {
+                JHVEventContainer.getSingletonInstance().requestForDateList(requestDates, swekEventHandler);
+            }
+        });
+
     }
 
     @Override
