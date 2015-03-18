@@ -95,18 +95,20 @@ public class JHVEventCache {
      */
     public Map<String, NavigableMap<Date, NavigableMap<Date, List<JHVEvent>>>> get(Date date) {
         Map<String, NavigableMap<Date, NavigableMap<Date, List<JHVEvent>>>> eventsResult = new HashMap<String, NavigableMap<Date, NavigableMap<Date, List<JHVEvent>>>>();
-        Calendar reference = Calendar.getInstance();
-        reference.setTime(date);
-        for (Date sDate : events.keySet()) {
-            Calendar tempS = Calendar.getInstance();
-            tempS.setTime(sDate);
-            if (tempS.compareTo(reference) <= 0) {
-                Map<Date, List<JHVEvent>> eventOnEndTime = events.get(sDate);
-                for (Date eDate : eventOnEndTime.keySet()) {
-                    Calendar tempE = Calendar.getInstance();
-                    tempE.setTime(eDate);
-                    if (tempE.compareTo(reference) >= 0) {
-                        addEventsToResult(eventsResult, eventOnEndTime.get(eDate));
+        if (!activeEventTypes.isEmpty()) {
+            Calendar reference = Calendar.getInstance();
+            reference.setTime(date);
+            for (Date sDate : events.keySet()) {
+                Calendar tempS = Calendar.getInstance();
+                tempS.setTime(sDate);
+                if (tempS.compareTo(reference) <= 0) {
+                    Map<Date, List<JHVEvent>> eventOnEndTime = events.get(sDate);
+                    for (Date eDate : eventOnEndTime.keySet()) {
+                        Calendar tempE = Calendar.getInstance();
+                        tempE.setTime(eDate);
+                        if (tempE.compareTo(reference) >= 0) {
+                            addEventsToResult(eventsResult, eventOnEndTime.get(eDate));
+                        }
                     }
                 }
             }
@@ -121,16 +123,12 @@ public class JHVEventCache {
      *            list of dates for which events are requested
      * @return the list of events that are available for the dates
      */
-    /*
-     * public List<JHVEvent> get(List<Date> dates) { synchronized
-     * (JHVEventContainerLocks.cacheLock) { List<JHVEvent> events = new
-     * ArrayList<JHVEvent>(); for (Date date : dates) {
-     * events.addAll(get(date)); } return events; } }
-     */
     public Map<String, NavigableMap<Date, NavigableMap<Date, List<JHVEvent>>>> get(List<Date> dates) {
         Map<String, NavigableMap<Date, NavigableMap<Date, List<JHVEvent>>>> eventsResult = new HashMap<String, NavigableMap<Date, NavigableMap<Date, List<JHVEvent>>>>();
-        for (Date date : dates) {
-            eventsResult = mergeMaps(eventsResult, get(date));
+        if (!activeEventTypes.isEmpty()) {
+            for (Date date : dates) {
+                eventsResult = mergeMaps(eventsResult, get(date));
+            }
         }
         return eventsResult;
 
@@ -147,30 +145,32 @@ public class JHVEventCache {
      */
     public Map<String, NavigableMap<Date, NavigableMap<Date, List<JHVEvent>>>> get(Date startDate, Date endDate) {
         Map<String, NavigableMap<Date, NavigableMap<Date, List<JHVEvent>>>> eventsResult = new HashMap<String, NavigableMap<Date, NavigableMap<Date, List<JHVEvent>>>>();
-        Calendar intervalS = Calendar.getInstance();
-        intervalS.setTime(startDate);
-        Calendar intervalE = Calendar.getInstance();
-        intervalE.setTime(endDate);
-        for (Date sDate : events.keySet()) {
-            Calendar tempS = Calendar.getInstance();
-            tempS.setTime(sDate);
-            // event starts after interval start but before interval end
-            if (intervalS.compareTo(tempS) <= 0 && intervalE.compareTo(tempS) >= 0) {
-                for (List<JHVEvent> tempEvent : events.get(sDate).values()) {
-                    addEventsToResult(eventsResult, tempEvent);
+        if (!activeEventTypes.isEmpty()) {
+            Calendar intervalS = Calendar.getInstance();
+            intervalS.setTime(startDate);
+            Calendar intervalE = Calendar.getInstance();
+            intervalE.setTime(endDate);
+            for (Date sDate : events.keySet()) {
+                Calendar tempS = Calendar.getInstance();
+                tempS.setTime(sDate);
+                // event starts after interval start but before interval end
+                if (intervalS.compareTo(tempS) <= 0 && intervalE.compareTo(tempS) >= 0) {
+                    for (List<JHVEvent> tempEvent : events.get(sDate).values()) {
+                        addEventsToResult(eventsResult, tempEvent);
+                    }
                 }
-            }
-            // event start before interval start and end after interval
-            // start
-            Map<Date, List<JHVEvent>> endDatesEvents = events.get(sDate);
-            for (Date eDate : endDatesEvents.keySet()) {
-                Calendar tempE = Calendar.getInstance();
-                tempE.setTime(eDate);
-                if (intervalS.compareTo(tempS) >= 0 && intervalS.compareTo(tempE) <= 0) {
-                    addEventsToResult(eventsResult, endDatesEvents.get(eDate));
+                // event start before interval start and end after interval
+                // start
+                Map<Date, List<JHVEvent>> endDatesEvents = events.get(sDate);
+                for (Date eDate : endDatesEvents.keySet()) {
+                    Calendar tempE = Calendar.getInstance();
+                    tempE.setTime(eDate);
+                    if (intervalS.compareTo(tempS) >= 0 && intervalS.compareTo(tempE) <= 0) {
+                        addEventsToResult(eventsResult, endDatesEvents.get(eDate));
+                    }
                 }
-            }
 
+            }
         }
         return eventsResult;
     }
