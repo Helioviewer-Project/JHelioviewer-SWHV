@@ -20,7 +20,6 @@ import org.helioviewer.base.logging.Log;
 import org.helioviewer.base.message.Message;
 import org.helioviewer.jhv.gui.IconBank;
 import org.helioviewer.jhv.gui.IconBank.JHVIcon;
-import org.helioviewer.viewmodel.filter.Filter;
 import org.helioviewer.viewmodelplugin.filter.FilterAlignmentDetails;
 import org.helioviewer.viewmodelplugin.filter.FilterPanel;
 import org.helioviewer.viewmodelplugin.filter.FilterTabPanelManager.Area;
@@ -37,7 +36,7 @@ public class SOHOLUTPanel extends FilterPanel implements ActionListener, FilterA
 
     private static final Icon invertIcon = IconBank.getIcon(JHVIcon.INVERT);
 
-    private SOHOLUTFilter filter;
+    private SOHOLUTFilter filter = new SOHOLUTFilter();
     private final Map<String, LUT> lutMap;
     private int lastSelectedIndex;
 
@@ -84,21 +83,6 @@ public class SOHOLUTPanel extends FilterPanel implements ActionListener, FilterA
         add(invertButton);
 
         setEnabled(false);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-
-    @Override
-    public void setFilter(Filter filter) {
-        if (filter instanceof SOHOLUTFilter) {
-            this.filter = (SOHOLUTFilter) filter;
-            this.filter.setPanel(this);
-            setEnabled(true);
-        } else {
-            setEnabled(false);
-        }
     }
 
     /**
