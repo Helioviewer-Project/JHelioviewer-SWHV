@@ -19,7 +19,6 @@ import org.helioviewer.jhv.data.datatype.event.JHVEventRelation;
 import org.helioviewer.jhv.data.datatype.event.JHVEventRelationShipRule;
 import org.helioviewer.jhv.data.datatype.event.JHVEventType;
 import org.helioviewer.jhv.data.datatype.event.JHVRelatedOn;
-import org.helioviewer.jhv.data.lock.JHVEventContainerLocks;
 
 public class JHVEventCache {
     /** singleton instance of JHVevent cache */
@@ -70,20 +69,17 @@ public class JHVEventCache {
      *            the event to add
      */
     public void add(JHVEvent event) {
-        synchronized (JHVEventContainerLocks.cacheLock) {
-            if (!eventIDs.contains(event.getUniqueID())) {
-                allEvents.put(event.getUniqueID(), event);
-                Date startDate = DateUtil.getCurrentDate(event.getStartDate());
-                Date endDate = DateUtil.getNextDate(event.getEndDate());
-                addToList(startDate, endDate, event);
-                eventIDs.add(event.getUniqueID());
-                checkAndFixRelationShip(event);
-            } else {
-                JHVEvent savedEvent = allEvents.get(event.getUniqueID());
-                savedEvent.merge(event);
-            }
+        if (!eventIDs.contains(event.getUniqueID())) {
+            allEvents.put(event.getUniqueID(), event);
+            Date startDate = DateUtil.getCurrentDate(event.getStartDate());
+            Date endDate = DateUtil.getNextDate(event.getEndDate());
+            addToList(startDate, endDate, event);
+            eventIDs.add(event.getUniqueID());
+            checkAndFixRelationShip(event);
+        } else {
+            JHVEvent savedEvent = allEvents.get(event.getUniqueID());
+            savedEvent.merge(event);
         }
-
     }
 
     /**
@@ -107,26 +103,24 @@ public class JHVEventCache {
      * eventsResult; } }
      */
     public Map<String, NavigableMap<Date, NavigableMap<Date, List<JHVEvent>>>> get(Date date) {
-        synchronized (JHVEventContainerLocks.cacheLock) {
-            Map<String, NavigableMap<Date, NavigableMap<Date, List<JHVEvent>>>> eventsResult = new HashMap<String, NavigableMap<Date, NavigableMap<Date, List<JHVEvent>>>>();
-            Calendar reference = Calendar.getInstance();
-            reference.setTime(date);
-            for (Date sDate : events.keySet()) {
-                Calendar tempS = Calendar.getInstance();
-                tempS.setTime(sDate);
-                if (tempS.compareTo(reference) <= 0) {
-                    Map<Date, List<JHVEvent>> eventOnEndTime = events.get(sDate);
-                    for (Date eDate : eventOnEndTime.keySet()) {
-                        Calendar tempE = Calendar.getInstance();
-                        tempE.setTime(eDate);
-                        if (tempE.compareTo(reference) >= 0) {
-                            addEventsToResult(eventsResult, eventOnEndTime.get(eDate));
-                        }
+        Map<String, NavigableMap<Date, NavigableMap<Date, List<JHVEvent>>>> eventsResult = new HashMap<String, NavigableMap<Date, NavigableMap<Date, List<JHVEvent>>>>();
+        Calendar reference = Calendar.getInstance();
+        reference.setTime(date);
+        for (Date sDate : events.keySet()) {
+            Calendar tempS = Calendar.getInstance();
+            tempS.setTime(sDate);
+            if (tempS.compareTo(reference) <= 0) {
+                Map<Date, List<JHVEvent>> eventOnEndTime = events.get(sDate);
+                for (Date eDate : eventOnEndTime.keySet()) {
+                    Calendar tempE = Calendar.getInstance();
+                    tempE.setTime(eDate);
+                    if (tempE.compareTo(reference) >= 0) {
+                        addEventsToResult(eventsResult, eventOnEndTime.get(eDate));
                     }
                 }
             }
-            return eventsResult;
         }
+        return eventsResult;
     }
 
     /**
@@ -143,13 +137,12 @@ public class JHVEventCache {
      * events.addAll(get(date)); } return events; } }
      */
     public Map<String, NavigableMap<Date, NavigableMap<Date, List<JHVEvent>>>> get(List<Date> dates) {
-        synchronized (JHVEventContainerLocks.cacheLock) {
-            Map<String, NavigableMap<Date, NavigableMap<Date, List<JHVEvent>>>> eventsResult = new HashMap<String, NavigableMap<Date, NavigableMap<Date, List<JHVEvent>>>>();
-            for (Date date : dates) {
-                eventsResult = mergeMaps(eventsResult, get(date));
-            }
-            return eventsResult;
+        Map<String, NavigableMap<Date, NavigableMap<Date, List<JHVEvent>>>> eventsResult = new HashMap<String, NavigableMap<Date, NavigableMap<Date, List<JHVEvent>>>>();
+        for (Date date : dates) {
+            eventsResult = mergeMaps(eventsResult, get(date));
         }
+        return eventsResult;
+
     }
 
     /**
@@ -182,35 +175,33 @@ public class JHVEventCache {
      * } return eventsResult; } }
      */
     public Map<String, NavigableMap<Date, NavigableMap<Date, List<JHVEvent>>>> get(Date startDate, Date endDate) {
-        synchronized (JHVEventContainerLocks.cacheLock) {
-            Map<String, NavigableMap<Date, NavigableMap<Date, List<JHVEvent>>>> eventsResult = new HashMap<String, NavigableMap<Date, NavigableMap<Date, List<JHVEvent>>>>();
-            Calendar intervalS = Calendar.getInstance();
-            intervalS.setTime(startDate);
-            Calendar intervalE = Calendar.getInstance();
-            intervalE.setTime(endDate);
-            for (Date sDate : events.keySet()) {
-                Calendar tempS = Calendar.getInstance();
-                tempS.setTime(sDate);
-                // event starts after interval start but before interval end
-                if (intervalS.compareTo(tempS) <= 0 && intervalE.compareTo(tempS) >= 0) {
-                    for (List<JHVEvent> tempEvent : events.get(sDate).values()) {
-                        addEventsToResult(eventsResult, tempEvent);
-                    }
+        Map<String, NavigableMap<Date, NavigableMap<Date, List<JHVEvent>>>> eventsResult = new HashMap<String, NavigableMap<Date, NavigableMap<Date, List<JHVEvent>>>>();
+        Calendar intervalS = Calendar.getInstance();
+        intervalS.setTime(startDate);
+        Calendar intervalE = Calendar.getInstance();
+        intervalE.setTime(endDate);
+        for (Date sDate : events.keySet()) {
+            Calendar tempS = Calendar.getInstance();
+            tempS.setTime(sDate);
+            // event starts after interval start but before interval end
+            if (intervalS.compareTo(tempS) <= 0 && intervalE.compareTo(tempS) >= 0) {
+                for (List<JHVEvent> tempEvent : events.get(sDate).values()) {
+                    addEventsToResult(eventsResult, tempEvent);
                 }
-                // event start before interval start and end after interval
-                // start
-                Map<Date, List<JHVEvent>> endDatesEvents = events.get(sDate);
-                for (Date eDate : endDatesEvents.keySet()) {
-                    Calendar tempE = Calendar.getInstance();
-                    tempE.setTime(eDate);
-                    if (intervalS.compareTo(tempS) >= 0 && intervalS.compareTo(tempE) <= 0) {
-                        addEventsToResult(eventsResult, endDatesEvents.get(eDate));
-                    }
-                }
-
             }
-            return eventsResult;
+            // event start before interval start and end after interval
+            // start
+            Map<Date, List<JHVEvent>> endDatesEvents = events.get(sDate);
+            for (Date eDate : endDatesEvents.keySet()) {
+                Calendar tempE = Calendar.getInstance();
+                tempE.setTime(eDate);
+                if (intervalS.compareTo(tempS) >= 0 && intervalS.compareTo(tempE) <= 0) {
+                    addEventsToResult(eventsResult, endDatesEvents.get(eDate));
+                }
+            }
+
         }
+        return eventsResult;
     }
 
     /**
@@ -220,29 +211,26 @@ public class JHVEventCache {
      *            the event type to remove
      */
     public void removeEventType(JHVEventType eventType) {
-        synchronized (JHVEventContainerLocks.cacheLock) {
-            for (Map<Date, List<JHVEvent>> endDateEvents : events.values()) {
-                for (List<JHVEvent> eventList : endDateEvents.values()) {
-                    List<JHVEvent> deleteList = new ArrayList<JHVEvent>();
-                    for (JHVEvent event : eventList) {
-                        if (event.getJHVEventType().equals(eventType)) {
-                            deleteList.add(event);
-                            eventIDs.remove(event.getUniqueID());
-                            allEvents.remove(event.getUniqueID());
-                            missingEventsInEventRelations.remove(event.getUniqueID());
-                            eventsWithRelationRules.remove(event);
-                            for (JHVEventRelation relation : event.getEventRelationShip().getRelatedEventsByRule().values()) {
-                                if (relation.getTheEvent() != null) {
-                                    relation.getTheEvent().getEventRelationShip().getRelatedEventsByRule().remove(event.getUniqueID());
-                                }
+        for (Map<Date, List<JHVEvent>> endDateEvents : events.values()) {
+            for (List<JHVEvent> eventList : endDateEvents.values()) {
+                List<JHVEvent> deleteList = new ArrayList<JHVEvent>();
+                for (JHVEvent event : eventList) {
+                    if (event.getJHVEventType().equals(eventType)) {
+                        deleteList.add(event);
+                        eventIDs.remove(event.getUniqueID());
+                        allEvents.remove(event.getUniqueID());
+                        missingEventsInEventRelations.remove(event.getUniqueID());
+                        eventsWithRelationRules.remove(event);
+                        for (JHVEventRelation relation : event.getEventRelationShip().getRelatedEventsByRule().values()) {
+                            if (relation.getTheEvent() != null) {
+                                relation.getTheEvent().getEventRelationShip().getRelatedEventsByRule().remove(event.getUniqueID());
                             }
                         }
                     }
-                    eventList.removeAll(deleteList);
                 }
+                eventList.removeAll(deleteList);
             }
         }
-
     }
 
     private void checkAndFixRelationShip(JHVEvent event) {
