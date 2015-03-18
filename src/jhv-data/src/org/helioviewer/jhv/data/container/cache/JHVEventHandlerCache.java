@@ -11,7 +11,6 @@ import java.util.Set;
 
 import org.helioviewer.jhv.data.container.JHVEventHandler;
 import org.helioviewer.jhv.data.container.util.DateUtil;
-import org.helioviewer.jhv.data.lock.JHVEventContainerLocks;
 
 /**
  * 
@@ -62,28 +61,26 @@ public class JHVEventHandlerCache {
      * @param previousRequestID
      */
     public Long add(JHVEventHandler handler, Date date, Long requestID) {
-        synchronized (JHVEventContainerLocks.eventHandlerCacheLock) {
-            if (date != null && handler != null) {
-                Date roundedDate = DateUtil.getCurrentDate(date);
-                Set<JHVEventHandler> tempSet = new HashSet<JHVEventHandler>();
-                if (interestInDate.containsKey(roundedDate)) {
-                    tempSet = interestInDate.get(roundedDate);
-                }
-                tempSet.add(handler);
-                interestInDate.put(roundedDate, tempSet);
-                if (allJHVeventHandlers.containsKey(handler)) {
-                    Long previousRequestID = allJHVeventHandlers.get(handler);
-                    allJHVeventHandlers.put(handler, requestID);
-                    return previousRequestID;
-                } else {
-                    return null;
-                }
+        if (date != null && handler != null) {
+            Date roundedDate = DateUtil.getCurrentDate(date);
+            Set<JHVEventHandler> tempSet = new HashSet<JHVEventHandler>();
+            if (interestInDate.containsKey(roundedDate)) {
+                tempSet = interestInDate.get(roundedDate);
+            }
+            tempSet.add(handler);
+            interestInDate.put(roundedDate, tempSet);
+            if (allJHVeventHandlers.containsKey(handler)) {
+                Long previousRequestID = allJHVeventHandlers.get(handler);
+                allJHVeventHandlers.put(handler, requestID);
+                return previousRequestID;
             } else {
-                // This should be logged, but the log system is part of the
-                // complete program. Should be stripped of.
-                System.err.println("The date or handler was null");
                 return null;
             }
+        } else {
+            // This should be logged, but the log system is part of the
+            // complete program. Should be stripped of.
+            System.err.println("The date or handler was null");
+            return null;
         }
     }
 
@@ -93,9 +90,7 @@ public class JHVEventHandlerCache {
      * @return a set with all event handlers
      */
     public Set<JHVEventHandler> getAllJHVEventHandlers() {
-        synchronized (JHVEventContainerLocks.eventHandlerCacheLock) {
-            return allJHVeventHandlers.keySet();
-        }
+        return allJHVeventHandlers.keySet();
     }
 
     /**
@@ -111,28 +106,26 @@ public class JHVEventHandlerCache {
      * @return
      */
     public Long add(JHVEventHandler handler, Date startDate, Date endDate, Long requestID) {
-        synchronized (JHVEventContainerLocks.eventHandlerCacheLock) {
-            Date roundedStartDate = DateUtil.getCurrentDate(startDate);
-            Date roundedEndDate = DateUtil.getNextDate(endDate);
-            Map<Date, Set<JHVEventHandler>> eventHandlerEnd = new HashMap<Date, Set<JHVEventHandler>>();
-            Set<JHVEventHandler> eventHandlers = new HashSet<JHVEventHandler>();
-            if (interestInInterval.containsKey(roundedStartDate)) {
-                eventHandlerEnd = interestInInterval.get(roundedStartDate);
-                if (eventHandlerEnd.containsKey(roundedEndDate)) {
-                    eventHandlers = eventHandlerEnd.get(roundedEndDate);
-                }
+        Date roundedStartDate = DateUtil.getCurrentDate(startDate);
+        Date roundedEndDate = DateUtil.getNextDate(endDate);
+        Map<Date, Set<JHVEventHandler>> eventHandlerEnd = new HashMap<Date, Set<JHVEventHandler>>();
+        Set<JHVEventHandler> eventHandlers = new HashSet<JHVEventHandler>();
+        if (interestInInterval.containsKey(roundedStartDate)) {
+            eventHandlerEnd = interestInInterval.get(roundedStartDate);
+            if (eventHandlerEnd.containsKey(roundedEndDate)) {
+                eventHandlers = eventHandlerEnd.get(roundedEndDate);
             }
-            eventHandlers.add(handler);
-            eventHandlerEnd.put(roundedEndDate, eventHandlers);
-            interestInInterval.put(roundedStartDate, eventHandlerEnd);
-            if (allJHVeventHandlers.containsKey(handler)) {
-                Long previousRequestID = allJHVeventHandlers.get(handler);
-                allJHVeventHandlers.put(handler, requestID);
-                return previousRequestID;
-            } else {
-                allJHVeventHandlers.put(handler, requestID);
-                return null;
-            }
+        }
+        eventHandlers.add(handler);
+        eventHandlerEnd.put(roundedEndDate, eventHandlers);
+        interestInInterval.put(roundedStartDate, eventHandlerEnd);
+        if (allJHVeventHandlers.containsKey(handler)) {
+            Long previousRequestID = allJHVeventHandlers.get(handler);
+            allJHVeventHandlers.put(handler, requestID);
+            return previousRequestID;
+        } else {
+            allJHVeventHandlers.put(handler, requestID);
+            return null;
         }
     }
 
@@ -144,13 +137,12 @@ public class JHVEventHandlerCache {
      * @return a set containing all the handlers
      */
     public List<JHVEventHandler> getJHVEventHandlersForDate(Date date) {
-        synchronized (JHVEventContainerLocks.eventHandlerCacheLock) {
-            List<JHVEventHandler> handlers = new ArrayList<JHVEventHandler>();
-            Date roundedDate = DateUtil.getCurrentDate(date);
-            handlers.addAll(getEventHandlersFromDate(roundedDate));
-            handlers.addAll(getEventHandlersFromInterval(roundedDate));
-            return handlers;
-        }
+        List<JHVEventHandler> handlers = new ArrayList<JHVEventHandler>();
+        Date roundedDate = DateUtil.getCurrentDate(date);
+        handlers.addAll(getEventHandlersFromDate(roundedDate));
+        handlers.addAll(getEventHandlersFromInterval(roundedDate));
+        return handlers;
+
     }
 
     /**
