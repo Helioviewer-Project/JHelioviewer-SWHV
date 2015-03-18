@@ -8,7 +8,9 @@ import java.util.NavigableMap;
 import java.util.Set;
 import java.util.logging.Logger;
 
+import org.helioviewer.base.math.Interval;
 import org.helioviewer.jhv.data.container.cache.JHVEventCache;
+import org.helioviewer.jhv.data.container.cache.JHVEventCacheResult;
 import org.helioviewer.jhv.data.container.cache.JHVEventHandlerCache;
 import org.helioviewer.jhv.data.datatype.event.JHVEvent;
 import org.helioviewer.jhv.data.datatype.event.JHVEventType;
@@ -82,9 +84,12 @@ public class JHVEventContainer {
      */
     public void requestForDate(final Date date, final JHVEventHandler handler) {
         eventHandlerCache.add(handler);
-        Map<String, NavigableMap<Date, NavigableMap<Date, List<JHVEvent>>>> events = eventCache.get(date);
+        JHVEventCacheResult result = eventCache.get(date);
+        Map<String, NavigableMap<Date, NavigableMap<Date, List<JHVEvent>>>> events = result.getAvailableEvents();
         handler.newEventsReceived(events);
-        requestEvents(date);
+        for (Date missingDate : result.getMissingDates()) {
+            requestEvents(missingDate);
+        }
     }
 
     /**
@@ -123,10 +128,13 @@ public class JHVEventContainer {
         Thread.dumpStack();
         if (startDate != null && endDate != null) {
             eventHandlerCache.add(handler);
-            Map<String, NavigableMap<Date, NavigableMap<Date, List<JHVEvent>>>> events = eventCache.get(startDate, endDate);
+            JHVEventCacheResult result = eventCache.get(startDate, endDate);
+            Map<String, NavigableMap<Date, NavigableMap<Date, List<JHVEvent>>>> events = result.getAvailableEvents();
             // AssociationsPrinter.print(events);
             handler.newEventsReceived(events);
-            requestEvents(startDate, endDate);
+            for (Interval<Date> missing : result.getMissingIntervals()) {
+                requestEvents(missing.getStart(), missing.getEnd());
+            }
         }
     }
 
