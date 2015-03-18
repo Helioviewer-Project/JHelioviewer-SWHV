@@ -42,29 +42,5 @@ public interface Filter {
      */
     public String getState();
 
-    /**
-     * Adds a filter listener.
-     *
-     * This listener will be called on every change within this filter, such as
-     * changing parameters.
-     *
-     * @param l
-     *            the listener to add
-     * @see #removeFilterListener(FilterListener)
-     */
-    public void addFilterListener(FilterListener l);
-
-    /**
-     * Removes a filter listener.
-     *
-     * This listener will no longer be called on every change within this
-     * filter, such as changing parameters.
-     *
-     * @param l
-     *            the listener to add
-     * @see #addFilterListener(FilterListener)
-     */
-    public void removeFilterListener(FilterListener l);
-
     public void applyGL(GL2 gl);
 }

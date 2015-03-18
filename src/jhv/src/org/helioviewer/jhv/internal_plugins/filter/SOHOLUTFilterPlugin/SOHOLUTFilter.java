@@ -4,7 +4,6 @@ import java.nio.IntBuffer;
 
 import javax.media.opengl.GL2;
 
-import org.helioviewer.viewmodel.filter.AbstractFilter;
 import org.helioviewer.viewmodel.filter.Filter;
 import org.helioviewer.viewmodel.filter.FrameFilter;
 import org.helioviewer.viewmodel.imagedata.ARGBInt32ImageData;
@@ -30,7 +29,7 @@ import org.helioviewer.viewmodel.view.opengl.GLTextureHelper;
  *
  * @author Helge Dietert
  */
-public class SOHOLUTFilter extends AbstractFilter implements FrameFilter, Filter {
+public class SOHOLUTFilter implements FrameFilter, Filter {
     // /////////////////////////
     // GENERAL //
     // /////////////////////////
@@ -87,7 +86,6 @@ public class SOHOLUTFilter extends AbstractFilter implements FrameFilter, Filter
         lut = newLUT;
         invertLUT = invert;
         this.changed = true;
-        notifyAllListeners();
     }
 
     // /////////////////////////
