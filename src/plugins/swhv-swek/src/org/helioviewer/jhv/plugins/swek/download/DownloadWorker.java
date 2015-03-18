@@ -48,12 +48,6 @@ public class DownloadWorker implements Runnable {
     /** The source manager */
     private final SWEKSourceManager sourceManager;
 
-    /** The input stream from where the raw downloaded events are coming. */
-    private InputStream downloadInputStream;
-
-    /** The stream from where the parsed events are coming */
-    private SWEKEventStream eventStream;
-
     /** Worker start download date */
     private final Date downloadStartDate;
 
@@ -112,8 +106,7 @@ public class DownloadWorker implements Runnable {
      *            the parameters to use in the downloader
      * 
      */
-    public DownloadWorker(SWEKEventType eventType, SWEKSource swekSource, SWEKSupplier supplier, Date date, List<SWEKParam> params,
-            List<SWEKRelatedEvents> relatedEventRules) {
+    public DownloadWorker(SWEKEventType eventType, SWEKSource swekSource, SWEKSupplier supplier, Date date, List<SWEKParam> params, List<SWEKRelatedEvents> relatedEventRules) {
         isStopped = false;
         this.swekSource = swekSource;
         this.eventType = eventType;
@@ -144,8 +137,7 @@ public class DownloadWorker implements Runnable {
      * @param prams
      *            the parameters to use in the download
      */
-    public DownloadWorker(SWEKEventType eventType, SWEKSource swekSource, SWEKSupplier supplier, Interval<Date> interval,
-            List<SWEKParam> params, List<SWEKRelatedEvents> relatedEventRules) {
+    public DownloadWorker(SWEKEventType eventType, SWEKSource swekSource, SWEKSupplier supplier, Interval<Date> interval, List<SWEKParam> params, List<SWEKRelatedEvents> relatedEventRules) {
         // Log.debug("Create dw " + this + " downloading interval " + interval);
         // Thread.dumpStack();
         isStopped = false;
@@ -209,11 +201,12 @@ public class DownloadWorker implements Runnable {
         int page = 0;
         do {
             // download the data
-            downloadData(page);
+            InputStream downloadInputStream = downloadData(page);
             // parse the data
-            moreDownloads = parseData();
+            SWEKEventStream swekEventStream = parseData(downloadInputStream);
+            moreDownloads = swekEventStream.additionalDownloadNeeded();
             // distribute the data
-            distributeData();
+            distributeData(swekEventStream);
             page++;
         } while (moreDownloads);
         // inform JHVEventContainer data finished downloading
@@ -270,8 +263,10 @@ public class DownloadWorker implements Runnable {
 
     /**
      * Sends the events to the event container.
+     * 
+     * @param swekEventStream
      */
-    private void distributeData() {
+    private void distributeData(SWEKEventStream eventStream) {
         if (!isStopped) {
             if (eventStream != null) {
                 while (eventStream.hasEvents() && !isStopped) {
@@ -288,16 +283,16 @@ public class DownloadWorker implements Runnable {
      * 
      * @return
      */
-    private boolean parseData() {
+    private SWEKEventStream parseData(InputStream downloadInputStream) {
         if (!isStopped) {
-            eventStream = parser.parseEventStream(downloadInputStream, eventType, swekSource, supplier, relatedEvents);
-            return eventStream.additionalDownloadNeeded();
+            return parser.parseEventStream(downloadInputStream, eventType, swekSource, supplier, relatedEvents);
+            // return eventStream.additionalDownloadNeeded();
         } else {
             if (parser != null) {
                 parser.stopParser();
             }
             fireDownloadWorkerForcedStopped();
-            return false;
+            return null;
         }
     }
 
@@ -305,15 +300,17 @@ public class DownloadWorker implements Runnable {
      * Downloads the data from the source.
      * 
      * @param page
+     * @return
      */
-    private void downloadData(int page) {
+    private InputStream downloadData(int page) {
         if (!isStopped) {
-            downloadInputStream = downloader.downloadData(eventType, downloadStartDate, downloadEndDate, params, page);
+            return downloader.downloadData(eventType, downloadStartDate, downloadEndDate, params, page);
         } else {
             if (downloader != null) {
                 downloader.stopDownload();
             }
             fireDownloadWorkerForcedStopped();
+            return null;
         }
     }
 
