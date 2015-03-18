@@ -1,5 +1,6 @@
 package org.helioviewer.jhv.plugins.swek.sources.hek;
 
+import org.helioviewer.base.logging.Log;
 import org.helioviewer.jhv.data.datatype.event.JHVEventType;
 
 /**
@@ -61,9 +62,18 @@ public class HEKEventType implements JHVEventType {
     }
 
     @Override
-    public boolean equals(JHVEventType otherEventType) {
-        return otherEventType.getEventType().equals(eventType) && otherEventType.getEventSource().equals(eventSource)
-                && otherEventType.getEventProvider().equals(eventProvider);
+    public boolean equals(Object otherEventType) {
+        if (otherEventType instanceof JHVEventType) {
+            JHVEventType otherHekEvent = (JHVEventType) otherEventType;
+            return otherHekEvent.getEventType().equals(eventType) && otherHekEvent.getEventSource().equals(eventSource) && otherHekEvent.getEventProvider().equals(eventProvider);
+        } else {
+            return false;
+        }
     }
 
+    @Override
+    public int hashCode() {
+        Log.debug(("" + eventType + eventSource + "" + eventProvider).hashCode());
+        return ("" + eventType + eventSource + "" + eventProvider).hashCode();
+    }
 }

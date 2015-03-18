@@ -62,9 +62,18 @@ public class ComesepEventType implements JHVEventType {
     }
 
     @Override
-    public boolean equals(JHVEventType eventType) {
-        return eventType.getEventType().equals(this.eventType) && eventType.getEventProvider().equals(eventProvider)
-                && eventType.getEventSource().equals(eventSource);
+    public boolean equals(Object eventType) {
+        if (eventType instanceof JHVEventType) {
+            JHVEventType otherComesepEvent = (JHVEventType) eventType;
+            return otherComesepEvent.getEventType().equals(this.eventType) && otherComesepEvent.getEventProvider().equals(eventProvider) && otherComesepEvent.getEventSource().equals(eventSource);
+        } else {
+            return false;
+        }
+    }
+
+    @Override
+    public int hashCode() {
+        return ("" + eventType + eventSource + eventProvider).hashCode();
     }
 
 }
