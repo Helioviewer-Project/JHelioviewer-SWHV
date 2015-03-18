@@ -1,5 +1,6 @@
 package org.helioviewer.jhv.plugins.swhvhekplugin.cache;
 
+import java.awt.EventQueue;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -21,9 +22,9 @@ import org.helioviewer.viewmodel.view.jp2view.datetime.ImmutableDateTime;
 /**
  * This class intercepts changes of the layers and request data from the
  * JHVEventContainer.
- *
+ * 
  * @author Bram Bourgoignie (Bram.Bourgoignie@oma.be)
- *
+ * 
  */
 public class SWHVHEKData implements LayersListener, JHVEventHandler {
 
@@ -45,7 +46,7 @@ public class SWHVHEKData implements LayersListener, JHVEventHandler {
 
     /**
      * Gets the singleton instance of the outgoing request manager
-     *
+     * 
      * @return the singleton instance
      */
     public static SWHVHEKData getSingletonInstance() {
@@ -74,7 +75,14 @@ public class SWHVHEKData implements LayersListener, JHVEventHandler {
                     }
                 }
                 if (beginDate != null && endDate != null) {
-                    JHVEventContainer.getSingletonInstance().requestForInterval(beginDate, endDate, this);
+                    EventQueue.invokeLater(new Runnable() {
+
+                        @Override
+                        public void run() {
+                            JHVEventContainer.getSingletonInstance().requestForInterval(beginDate, endDate, SWHVHEKData.this);
+                        }
+                    });
+
                 }
             }
         }
