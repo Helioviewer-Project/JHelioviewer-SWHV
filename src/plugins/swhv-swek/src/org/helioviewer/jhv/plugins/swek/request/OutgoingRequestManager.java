@@ -1,6 +1,5 @@
 package org.helioviewer.jhv.plugins.swek.request;
 
-import java.awt.EventQueue;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -56,55 +55,43 @@ public class OutgoingRequestManager implements LayersListener {
                 requestDates.add(jpxView.getFrameDateTime(frame).getTime());
             }
         }
-        EventQueue.invokeLater(new Runnable() {
-            @Override
-            public void run() {
-                JHVEventContainer.getSingletonInstance().requestForDateList(requestDates, swekEventHandler);
-            }
-        });
 
+        JHVEventContainer.getSingletonInstance().requestForDateList(requestDates, swekEventHandler);
     }
 
     @Override
     public void layerRemoved(View oldView, int oldIdx) {
         // TODO Auto-generated method stub
-
     }
 
     @Override
     public void layerChanged(int idx) {
         // TODO Auto-generated method stub
-
     }
 
     @Override
     public void activeLayerChanged(int idx) {
         // TODO Auto-generated method stub
-
     }
 
     @Override
     public void viewportGeometryChanged() {
         // TODO Auto-generated method stub
-
     }
 
     @Override
     public void timestampChanged(int idx) {
         // TODO Auto-generated method stub
-
     }
 
     @Override
     public void subImageDataChanged() {
         // TODO Auto-generated method stub
-
     }
 
     @Override
     public void layerDownloaded(int idx) {
         // TODO Auto-generated method stub
-
     }
 
 }
