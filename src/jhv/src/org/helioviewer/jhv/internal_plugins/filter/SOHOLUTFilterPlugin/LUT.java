@@ -145,7 +145,7 @@ public class LUT {
      * @throws FileNotFoundException
      *             From opening the file
      */
-    public static LUT readGimpGradientFile(File file) throws GradientError, IOException, FileNotFoundException {
+    public static LUT readGimpGradientFile(File file) throws Exception, IOException, FileNotFoundException {
         FileInputStream fr = null;
         LUT l;
         try {
@@ -168,7 +168,7 @@ public class LUT {
      * @throws IOException
      *             From opening the file
      */
-    public static LUT readGimpGradientStream(InputStream is) throws GradientError, IOException {
+    public static LUT readGimpGradientStream(InputStream is) throws Exception, IOException {
         BufferedReader in = new BufferedReader(new InputStreamReader(is, "UTF-8"));
         GimpGradient gg = new GimpGradient(in);
         int[] lut8 = new int[256];
@@ -230,11 +230,7 @@ public class LUT {
                 try {
                     LUT l = readGimpGradientStream(FileUtils.getResourceInputStream("/ggr/" + file + ".ggr"));
                     standardList.put(l.getName(), l);
-                } catch (FileNotFoundException e) {
-                    Log.warn("Could not restore gimp gradient file " + file, e);
-                } catch (GradientError e) {
-                    Log.warn("Could not restore gimp gradient file " + file, e);
-                } catch (IOException e) {
+                } catch (Exception e) {
                     Log.warn("Could not restore gimp gradient file " + file, e);
                 }
             }
@@ -245,11 +241,7 @@ public class LUT {
                 try {
                     LUT l = readGimpGradientFile(f);
                     standardList.put(l.getName(), l);
-                } catch (FileNotFoundException e) {
-                    Log.warn("Error loading color table plugin dir", e);
-                } catch (GradientError e) {
-                    Log.warn("Error loading color table plugin dir", e);
-                } catch (IOException e) {
+                } catch (Exception e) {
                     Log.warn("Error loading color table plugin dir", e);
                 }
             }

@@ -87,7 +87,7 @@ public class GimpGradientSegment {
      * @throws GradientEvaluationError
      *             Error when format is wrong
      */
-    public int getGradientColor(double x) throws GradientEvaluationError {
+    public int getGradientColor(double x) throws Exception {
         // Normalize the segment geometry.
         double mid = (midStop - leftStop) / (rightStop - leftStop);
         double pos = (x - leftStop) / (rightStop - leftStop);
@@ -110,7 +110,7 @@ public class GimpGradientSegment {
         } else if (blendingType == 4) { // Spherical decreasing
             f = 1.0 - Math.sqrt(1 - f * f);
         } else if (blendingType != 0) {
-            throw new GradientEvaluationError("Unknown blending type " + blendingType + " for gimp gradient file");
+            throw new Exception("Unknown blending type " + blendingType + " for gimp gradient file");
         }
 
         // Ignore foreground/background stuff
@@ -143,7 +143,7 @@ public class GimpGradientSegment {
                         lHSV[0] += 1.0;
                 }
             } else {
-                throw new GradientEvaluationError("Unknown blending color " + blendingColor + " for gimp gradient file");
+                throw new Exception("Unknown blending color " + blendingColor + " for gimp gradient file");
             }
             r = Color.HSBtoRGB(lHSV[0], lHSV[1], lHSV[1]);
         }
@@ -162,4 +162,5 @@ public class GimpGradientSegment {
     private int appD(double x) {
         return ((int) (x * 0xff)) & 0xff;
     }
+
 }

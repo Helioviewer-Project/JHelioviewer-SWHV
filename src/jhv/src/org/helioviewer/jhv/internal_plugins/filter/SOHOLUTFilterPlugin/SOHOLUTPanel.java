@@ -38,7 +38,6 @@ public class SOHOLUTPanel extends FilterPanel implements ActionListener, FilterA
 
     private SOHOLUTFilter filter = new SOHOLUTFilter();
     private final Map<String, LUT> lutMap;
-    private int lastSelectedIndex;
 
     /**
      * Shown combobox to choose
@@ -66,12 +65,10 @@ public class SOHOLUTPanel extends FilterPanel implements ActionListener, FilterA
         add(title);
 
         // Add add entry
-        lutMap.put("<Load new GIMP gradient file>", null);
         combobox = new JComboBox(lutMap.keySet().toArray());
         combobox.setToolTipText("Choose a color table");
         combobox.setPreferredSize(new Dimension(150, combobox.getPreferredSize().height));
         combobox.addActionListener(this);
-        lastSelectedIndex = 0;
         add(combobox);
 
         add(Box.createHorizontalStrut(14));
@@ -106,33 +103,9 @@ public class SOHOLUTPanel extends FilterPanel implements ActionListener, FilterA
                 invertButton.setBorder(BorderFactory.createBevelBorder(BevelBorder.RAISED));
             }
         }
-        // NULL map means a new gradient
+
         LUT newMap = lutMap.get(combobox.getSelectedItem());
-        if (newMap == null) {
-            // Add new color table
-            JFileChooser fc = new JFileChooser();
-            fc.setFileFilter(new GGRFilter());
-            fc.setMultiSelectionEnabled(false);
-            int state = fc.showOpenDialog(null);
-            if (state == JFileChooser.APPROVE_OPTION) {
-                try {
-                    Log.info("Load gradient file " + fc.getSelectedFile());
-                    addLut(LUT.readGimpGradientFile(fc.getSelectedFile()));
-                    lastSelectedIndex = combobox.getSelectedIndex();
-                } catch (IOException ex) {
-                    Message.warn("Error loading gradient file", "Error loading gradient file: " + fc.getSelectedFile() + "\n\n" + ex.getMessage());
-                    Log.warn("Error loading gradient file: " + fc.getSelectedFile() + " - " + ex.getMessage());
-                } catch (GradientError ex) {
-                    Message.warn("Error applying gradient file", "Error loading gradient file: " + fc.getSelectedFile() + "\n\n" + ex.getMessage());
-                    Log.warn("Error applying gradient file: " + fc.getSelectedFile() + " - " + ex.getMessage());
-                }
-            } else {
-                combobox.setSelectedIndex(lastSelectedIndex);
-            }
-        } else {
-            filter.setLUT(newMap, invertButton.isSelected());
-            lastSelectedIndex = combobox.getSelectedIndex();
-        }
+        filter.setLUT(newMap, invertButton.isSelected());
     }
 
     /**

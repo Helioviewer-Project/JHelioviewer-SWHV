@@ -42,13 +42,13 @@ public class GimpGradient {
      * @throws GradientEvaluationError
      *             Error for evaluating the color
      */
-    public int getGradientColor(double x) throws GradientEvaluationError {
+    public int getGradientColor(double x) throws Exception {
         for (GimpGradientSegment s : segments) {
             if (s.leftStop <= x && x <= s.rightStop) {
                 return s.getGradientColor(x);
             }
         }
-        throw new GradientEvaluationError("Cannot find segment for point " + x);
+        throw new Exception("Cannot find segment for point " + x);
     }
 
     /**
@@ -57,14 +57,15 @@ public class GimpGradient {
      * 
      * @param ggr
      */
-    public GimpGradient(BufferedReader ggr) throws GradientFileParsingError, IOException {
+    public GimpGradient(BufferedReader ggr) throws Exception, IOException {
         String ln = ggr.readLine();
         if (!ln.equals("GIMP Gradient"))
-            throw new GradientFileParsingError("Not a GIMP gradient file");
+            throw new Exception("Not a GIMP gradient file");
 
         ln = ggr.readLine();
         if (!ln.startsWith("Name: "))
-            throw new GradientFileParsingError("Not a GIMP gradient file");
+            throw new Exception("Not a GIMP gradient file");
+
         name = ln.substring(6);
         ln = ggr.readLine();
         int nSeg = Integer.parseInt(ln);
@@ -79,7 +80,8 @@ public class GimpGradient {
             else if (nL.length == 13)
                 segments.add(new GimpGradientSegment(Double.parseDouble(nL[0]), Double.parseDouble(nL[1]), Double.parseDouble(nL[2]), Double.parseDouble(nL[3]), Double.parseDouble(nL[4]), Double.parseDouble(nL[5]), Double.parseDouble(nL[6]), Double.parseDouble(nL[7]), Double.parseDouble(nL[8]), Double.parseDouble(nL[9]), Double.parseDouble(nL[10]), Integer.parseInt(nL[11]), Integer.parseInt(nL[12]), 0, 0));
             else
-                throw new GradientFileParsingError("Parsing error in segment " + i);
+                throw new Exception("Parsing error in segment " + i);
         }
     }
+
 }
