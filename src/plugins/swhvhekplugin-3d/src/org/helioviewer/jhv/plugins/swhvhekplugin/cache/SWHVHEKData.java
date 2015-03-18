@@ -1,6 +1,5 @@
 package org.helioviewer.jhv.plugins.swhvhekplugin.cache;
 
-import java.awt.EventQueue;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -75,15 +74,9 @@ public class SWHVHEKData implements LayersListener, JHVEventHandler {
                         endDate = date.getTime();
                     }
                 }
+
                 if (beginDate != null && endDate != null) {
-                    EventQueue.invokeLater(new Runnable() {
-
-                        @Override
-                        public void run() {
-                            JHVEventContainer.getSingletonInstance().requestForInterval(beginDate, endDate, SWHVHEKData.this);
-                        }
-                    });
-
+                    JHVEventContainer.getSingletonInstance().requestForInterval(beginDate, endDate, SWHVHEKData.this);
                 }
             }
         }
