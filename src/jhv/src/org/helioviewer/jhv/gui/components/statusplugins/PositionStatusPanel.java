@@ -76,11 +76,11 @@ public class PositionStatusPanel extends ViewStatusPanelPlugin implements MouseM
 
     private void updatePosition(Point position) {
 
-        // to be improved
-        if (LayersModel.getSingletonInstance().getActiveView() == null)
+        View view = LayersModel.getSingletonInstance().getActiveView();
+        if (view == null)
             return;
 
-        JHVJP2View jp2View = ViewHelper.getViewAdapter(LayersModel.getSingletonInstance().getActiveView(), JHVJP2View.class);
+        JHVJP2View jp2View = ViewHelper.getViewAdapter(view, JHVJP2View.class);
         if (jp2View == null)
             return;
 
