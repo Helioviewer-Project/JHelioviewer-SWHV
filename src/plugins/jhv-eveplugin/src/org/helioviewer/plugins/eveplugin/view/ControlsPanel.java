@@ -2,7 +2,6 @@ package org.helioviewer.plugins.eveplugin.view;
 
 import java.awt.Color;
 import java.awt.Dimension;
-import java.awt.EventQueue;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
@@ -51,9 +50,6 @@ import org.helioviewer.viewmodel.view.jp2view.JHVJPXView;
  */
 public class ControlsPanel extends JPanel implements ActionListener, LayersListener, EventModelListener, ZoomControllerListener, LineDataSelectorModelListener {
 
-    /**
-     *
-     */
     private static final long serialVersionUID = 3639870635351984819L;
 
     private static ControlsPanel singletongInstance;
@@ -198,59 +194,22 @@ public class ControlsPanel extends JPanel implements ActionListener, LayersListe
 
     @Override
     public void layerAdded(int idx) {
-        if (EventQueue.isDispatchThread()) {
-            setSelectedIntervalOnLayerNotification();
-        } else {
-            EventQueue.invokeLater(new Runnable() {
-
-                @Override
-                public void run() {
-                    setSelectedIntervalOnLayerNotification();
-                }
-
-            });
-
-        }
+        setSelectedIntervalOnLayerNotification();
     }
 
     @Override
     public void layerRemoved(View oldView, int oldIdx) {
-        if (EventQueue.isDispatchThread()) {
-            setEnabledStateOfPeriodMovieButton();
-        } else {
-            EventQueue.invokeLater(new Runnable() {
-
-                @Override
-                public void run() {
-                    setEnabledStateOfPeriodMovieButton();
-                }
-
-            });
-
-        }
+        setEnabledStateOfPeriodMovieButton();
     }
 
     @Override
     public void layerChanged(int idx) {
         // TODO Auto-generated method stub
-
     }
 
     @Override
     public void activeLayerChanged(int idx) {
-        if (EventQueue.isDispatchThread()) {
-            setSelectedIntervalOnLayerNotification();
-        } else {
-            EventQueue.invokeLater(new Runnable() {
-
-                @Override
-                public void run() {
-                    setSelectedIntervalOnLayerNotification();
-                }
-
-            });
-
-        }
+        setSelectedIntervalOnLayerNotification();
     }
 
     private void setSelectedIntervalOnLayerNotification() {
@@ -279,25 +238,21 @@ public class ControlsPanel extends JPanel implements ActionListener, LayersListe
     @Override
     public void viewportGeometryChanged() {
         // TODO Auto-generated method stub
-
     }
 
     @Override
     public void timestampChanged(int idx) {
         // TODO Auto-generated method stub
-
     }
 
     @Override
     public void subImageDataChanged() {
         // TODO Auto-generated method stub
-
     }
 
     @Override
     public void layerDownloaded(int idx) {
         // TODO Auto-generated method stub
-
     }
 
     @Override
@@ -319,7 +274,6 @@ public class ControlsPanel extends JPanel implements ActionListener, LayersListe
         calendar.clear();
         calendar.setTime(startDate);
         calendar.add(Calendar.MONTH, 3);
-        ;
 
         final DefaultComboBoxModel model = (DefaultComboBoxModel) zoomComboBox.getModel();
         model.removeAllElements();
@@ -353,7 +307,6 @@ public class ControlsPanel extends JPanel implements ActionListener, LayersListe
         addElementToModel(model, startDate, interval, Calendar.HOUR, 12, ZOOM.Hour);
         addElementToModel(model, startDate, interval, Calendar.HOUR, 6, ZOOM.Hour);
         addElementToModel(model, startDate, interval, Calendar.HOUR, 1, ZOOM.Hour);
-
     }
 
     private boolean addCarringtonRotationToModel(final DefaultComboBoxModel model, final Date startDate, final Interval<Date> interval, final int numberOfRotations) {
@@ -464,19 +417,16 @@ public class ControlsPanel extends JPanel implements ActionListener, LayersListe
     @Override
     public void selectedResolutionChanged(API_RESOLUTION_AVERAGES newResolution) {
         // TODO Auto-generated method stub
-
     }
 
     @Override
     public void downloadStartded(LineDataSelectorElement element) {
         // TODO Auto-generated method stub
-
     }
 
     @Override
     public void downloadFinished(LineDataSelectorElement element) {
         // TODO Auto-generated method stub
-
     }
 
     @Override
@@ -494,6 +444,6 @@ public class ControlsPanel extends JPanel implements ActionListener, LayersListe
     @Override
     public void lineDataUpdated(LineDataSelectorElement element) {
         // TODO Auto-generated method stub
-
     }
+
 }
