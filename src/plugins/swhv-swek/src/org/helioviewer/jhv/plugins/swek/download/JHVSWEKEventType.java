@@ -62,9 +62,18 @@ public class JHVSWEKEventType implements JHVEventType {
     }
 
     @Override
-    public boolean equals(JHVEventType otherEventType) {
-        return otherEventType.getEventType().equals(eventType) && otherEventType.getEventSource().equals(eventSource)
-                && otherEventType.getEventProvider().equals(eventProvider);
+    public boolean equals(Object otherEventType) {
+        if (otherEventType instanceof JHVEventType) {
+            JHVEventType otherJHVEventType = (JHVEventType) otherEventType;
+            return otherJHVEventType.getEventType().equals(eventType) && otherJHVEventType.getEventSource().equals(eventSource) && otherJHVEventType.getEventProvider().equals(eventProvider);
+        } else {
+            return false;
+        }
+    }
+
+    @Override
+    public int hashCode() {
+        return ("" + eventType + eventSource + eventProvider).hashCode();
     }
 
 }
