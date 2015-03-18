@@ -24,7 +24,6 @@ import org.helioviewer.viewmodel.imagetransport.Short16ImageTransport;
  */
 public class SOHOLUTFilter {
 
-    private SOHOLUTPanel panel;
     private IntBuffer buffer;
 
     /**
@@ -49,17 +48,6 @@ public class SOHOLUTFilter {
      */
     public SOHOLUTFilter(LUT startWithLut) {
         lut = startWithLut;
-    }
-
-    /**
-     * Sets the corresponding SOHOLUT panel.
-     *
-     * @param panel
-     *            Corresponding panel.
-     */
-    void setPanel(SOHOLUTPanel panel) {
-        this.panel = panel;
-        panel.setValue(lut, invertLUT);
     }
 
     /**
