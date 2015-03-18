@@ -1,7 +1,6 @@
 package org.helioviewer.plugins.eveplugin.view;
 
 import java.awt.BorderLayout;
-import java.awt.EventQueue;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.event.ActionEvent;
@@ -55,22 +54,17 @@ public class ObservationDialogUIPanel extends SimpleObservationDialogUIPanel imp
 
     public ObservationDialogUIPanel(final PlotsContainerPanel plotsContainerPanel) {
         super(plotsContainerPanel);
-        EventQueue.invokeLater(new Runnable() {
-            @Override
-            public void run() {
-                // long start = System.currentTimeMillis();
-                labelGroup = new JLabel("Group");
-                labelData = new JLabel();
-                comboBoxGroup = new JComboBox(new DefaultComboBoxModel());
-                comboBoxData = new JComboBox(new DefaultComboBoxModel());
-                dataPane = new JPanel();
-                initVisualComponents();
-                initGroups();
-                // Log.debug("ObservationDialogUIPanel time: " +
-                // (System.currentTimeMillis() - start));
-            }
-        });
 
+        // long start = System.currentTimeMillis();
+        labelGroup = new JLabel("Group");
+        labelData = new JLabel();
+        comboBoxGroup = new JComboBox(new DefaultComboBoxModel());
+        comboBoxData = new JComboBox(new DefaultComboBoxModel());
+        dataPane = new JPanel();
+        initVisualComponents();
+        initGroups();
+        // Log.debug("ObservationDialogUIPanel time: " +
+        // (System.currentTimeMillis() - start));
     }
 
     private void initVisualComponents() {
