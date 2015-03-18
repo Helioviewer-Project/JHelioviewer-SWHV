@@ -147,4 +147,5 @@ public class GLCommonRenderGraphics {
             return 2 * string.hashCode() + font.hashCode();
         }
     }
+
 }
