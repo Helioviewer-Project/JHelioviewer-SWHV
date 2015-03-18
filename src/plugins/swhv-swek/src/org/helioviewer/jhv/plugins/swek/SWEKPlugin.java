@@ -1,9 +1,5 @@
-/**
- *
- */
 package org.helioviewer.jhv.plugins.swek;
 
-import java.awt.EventQueue;
 import java.io.File;
 
 import org.helioviewer.jhv.data.container.JHVEventContainer;
@@ -99,7 +95,6 @@ public class SWEKPlugin implements Plugin {
     @Override
     public void setState(String state) {
         // TODO Auto-generated method stub
-
     }
 
     @Override
@@ -133,26 +128,18 @@ public class SWEKPlugin implements Plugin {
      * Configures the SWEK plugin.
      */
     private void configurePlugin() {
-        EventQueue.invokeLater(new Runnable() {
-
-            @Override
-            public void run() {
-                SWEKConfig.loadConfiguration();
-                SWEKSources.loadSources();
-                // LayersModel.getSingletonInstance().addLayersListener(outgoingRequestManager);
-                eventContainer.registerHandler(incomingRequestManager);
-                ImageViewerGui.getSingletonInstance().getLeftContentPane()
-                        .add("Space Weather Event Knowledgebase", SWEKPluginPanel.getSWEKPluginPanelInstance(), false);
-                ImageViewerGui.getSingletonInstance().getLeftContentPane().revalidate();
-            }
-        });
-
+        SWEKConfig.loadConfiguration();
+        SWEKSources.loadSources();
+        // LayersModel.getSingletonInstance().addLayersListener(outgoingRequestManager);
+        eventContainer.registerHandler(incomingRequestManager);
+        ImageViewerGui.getSingletonInstance().getLeftContentPane()
+                .add("Space Weather Event Knowledgebase", SWEKPluginPanel.getSWEKPluginPanelInstance(), false);
+        ImageViewerGui.getSingletonInstance().getLeftContentPane().revalidate();
     }
 
     @Override
     public void uninstallPlugin() {
         // TODO Auto-generated method stub
-
     }
 
 }
