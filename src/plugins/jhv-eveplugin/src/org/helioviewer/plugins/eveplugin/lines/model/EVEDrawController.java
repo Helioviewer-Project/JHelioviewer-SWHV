@@ -1,7 +1,6 @@
 package org.helioviewer.plugins.eveplugin.lines.model;
 
 import java.awt.Color;
-import java.awt.EventQueue;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -395,20 +394,13 @@ public class EVEDrawController implements BandControllerListener, ZoomController
 
     @Override
     public void timestampChanged(final int idx) {
-        EventQueue.invokeLater(new Runnable() {
-
-            @Override
-            public void run() {
-                // long start = System.currentTimeMillis();
-                final ImmutableDateTime timestamp = LayersModel.getSingletonInstance().getCurrentFrameTimestamp(idx);
-                if (timestamp != null) {
-                    fireRedrawRequestMovieFrameChanged(timestamp.getTime());
-                }
-                // Log.debug("timestamp changed time: " +
-                // (System.currentTimeMillis() - start));
-            }
-        });
-
+        // long start = System.currentTimeMillis();
+        final ImmutableDateTime timestamp = LayersModel.getSingletonInstance().getCurrentFrameTimestamp(idx);
+        if (timestamp != null) {
+            fireRedrawRequestMovieFrameChanged(timestamp.getTime());
+        }
+        // Log.debug("timestamp changed time: " +
+        // (System.currentTimeMillis() - start));
     }
 
     @Override
@@ -444,6 +436,6 @@ public class EVEDrawController implements BandControllerListener, ZoomController
     public void availablePlotAreaSpaceChanged(double oldMinValue, double oldMaxValue, double oldMinTime, double oldMaxTime,
             double newMinValue, double newMaxValue, double newMinTime, double newMaxTime) {
         // TODO Auto-generated method stub
-
     }
+
 }
