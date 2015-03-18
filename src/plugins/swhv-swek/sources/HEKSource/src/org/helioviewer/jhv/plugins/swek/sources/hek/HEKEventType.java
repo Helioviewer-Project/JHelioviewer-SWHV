@@ -73,7 +73,6 @@ public class HEKEventType implements JHVEventType {
 
     @Override
     public int hashCode() {
-        Log.debug(("" + eventType + eventSource + "" + eventProvider).hashCode());
         return ("" + eventType + eventSource + "" + eventProvider).hashCode();
     }
 }

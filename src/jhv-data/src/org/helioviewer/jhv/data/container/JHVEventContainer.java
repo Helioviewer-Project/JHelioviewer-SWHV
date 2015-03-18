@@ -125,7 +125,6 @@ public class JHVEventContainer {
     public void requestForInterval(final Date startDate, final Date endDate, final JHVEventHandler handler) {
         Logger.getLogger(JHVEventContainer.class.getName()).info("Request for interval : [" + startDate + "," + endDate + "]");
         Logger.getLogger(JHVEventContainer.class.getName()).info("handler : " + handler);
-        Thread.dumpStack();
         if (startDate != null && endDate != null) {
             eventHandlerCache.add(handler);
             JHVEventCacheResult result = eventCache.get(startDate, endDate);
