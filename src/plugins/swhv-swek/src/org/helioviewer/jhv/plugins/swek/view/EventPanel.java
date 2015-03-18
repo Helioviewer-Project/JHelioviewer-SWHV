@@ -2,7 +2,6 @@ package org.helioviewer.jhv.plugins.swek.view;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
-import java.awt.EventQueue;
 import java.awt.Point;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -131,18 +130,10 @@ public class EventPanel extends JPanel implements MouseListener, SWEKTreeModelLi
 
     @Override
     public void mouseClicked(final MouseEvent e) {
-        EventQueue.invokeLater(new Runnable() {
-
-            @Override
-            public void run() {
-                int clickedOnRow = eventTypeTree.getRowForLocation(e.getX(), e.getY());
-                eventPanelModel.rowClicked(clickedOnRow);
-                eventTypeTree.revalidate();
-                eventTypeTree.repaint();
-            }
-
-        });
-
+        int clickedOnRow = eventTypeTree.getRowForLocation(e.getX(), e.getY());
+        eventPanelModel.rowClicked(clickedOnRow);
+        eventTypeTree.revalidate();
+        eventTypeTree.repaint();
     }
 
     @Override
