@@ -11,6 +11,7 @@ import org.helioviewer.base.logging.Log;
 import org.helioviewer.jhv.data.container.JHVEventContainer;
 import org.helioviewer.jhv.data.container.JHVEventHandler;
 import org.helioviewer.jhv.data.container.cache.JHVEventCache;
+import org.helioviewer.jhv.data.container.cache.JHVEventCacheResult;
 import org.helioviewer.jhv.data.datatype.event.JHVEvent;
 import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.layers.LayersListener;
@@ -123,7 +124,8 @@ public class SWHVHEKData implements LayersListener, JHVEventHandler {
     @Override
     public void cacheUpdated() {
         if (beginDate != null && endDate != null) {
-            data = JHVEventCache.getSingletonInstance().get(beginDate, endDate);
+            JHVEventCacheResult result = JHVEventCache.getSingletonInstance().get(beginDate, endDate);
+            data = result.getAvailableEvents();
             ArrayList<JHVEvent> events = new ArrayList<JHVEvent>();
             for (String eventType : data.keySet()) {
                 for (Date sDate : data.get(eventType).keySet()) {

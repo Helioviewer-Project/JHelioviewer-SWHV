@@ -12,6 +12,7 @@ import java.util.NavigableMap;
 import java.util.Set;
 import java.util.TreeMap;
 
+import org.helioviewer.base.math.Interval;
 import org.helioviewer.jhv.data.container.util.DateUtil;
 import org.helioviewer.jhv.data.datatype.event.JHVEvent;
 import org.helioviewer.jhv.data.datatype.event.JHVEventParameter;
@@ -40,6 +41,8 @@ public class JHVEventCache {
 
     private final Set<JHVEventType> activeEventTypes;
 
+    private final Map<Date, Interval<Date>> requestCache;
+
     /**
      * private default constructor
      */
@@ -51,6 +54,7 @@ public class JHVEventCache {
         idsPerColor = new HashMap<Color, Set<String>>();
         eventsWithRelationRules = new ArrayList<JHVEvent>();
         activeEventTypes = new HashSet<JHVEventType>();
+        requestCache = new TreeMap<Date, Interval<Date>>();
     }
 
     /**
@@ -93,7 +97,7 @@ public class JHVEventCache {
      *            The date in which the event should have happened
      * @return the list of events happened on the given date
      */
-    public Map<String, NavigableMap<Date, NavigableMap<Date, List<JHVEvent>>>> get(Date date) {
+    public JHVEventCacheResult get(Date date) {
         Map<String, NavigableMap<Date, NavigableMap<Date, List<JHVEvent>>>> eventsResult = new HashMap<String, NavigableMap<Date, NavigableMap<Date, List<JHVEvent>>>>();
         if (!activeEventTypes.isEmpty()) {
             Calendar reference = Calendar.getInstance();
@@ -113,7 +117,8 @@ public class JHVEventCache {
                 }
             }
         }
-        return eventsResult;
+
+        return new JHVEventCacheResult(eventsResult, new ArrayList<Interval<Date>>(), new ArrayList<Date>());
     }
 
     /**
@@ -123,15 +128,14 @@ public class JHVEventCache {
      *            list of dates for which events are requested
      * @return the list of events that are available for the dates
      */
-    public Map<String, NavigableMap<Date, NavigableMap<Date, List<JHVEvent>>>> get(List<Date> dates) {
+    public JHVEventCacheResult get(List<Date> dates) {
         Map<String, NavigableMap<Date, NavigableMap<Date, List<JHVEvent>>>> eventsResult = new HashMap<String, NavigableMap<Date, NavigableMap<Date, List<JHVEvent>>>>();
         if (!activeEventTypes.isEmpty()) {
             for (Date date : dates) {
-                eventsResult = mergeMaps(eventsResult, get(date));
+                eventsResult = mergeMaps(eventsResult, get(date).getAvailableEvents());
             }
         }
-        return eventsResult;
-
+        return new JHVEventCacheResult(eventsResult, new ArrayList<Interval<Date>>(), new ArrayList<Date>());
     }
 
     /**
@@ -143,7 +147,7 @@ public class JHVEventCache {
      *            end date of the interval
      * @return the list of events that are available in the interval
      */
-    public Map<String, NavigableMap<Date, NavigableMap<Date, List<JHVEvent>>>> get(Date startDate, Date endDate) {
+    public JHVEventCacheResult get(Date startDate, Date endDate) {
         Map<String, NavigableMap<Date, NavigableMap<Date, List<JHVEvent>>>> eventsResult = new HashMap<String, NavigableMap<Date, NavigableMap<Date, List<JHVEvent>>>>();
         if (!activeEventTypes.isEmpty()) {
             Calendar intervalS = Calendar.getInstance();
@@ -172,7 +176,9 @@ public class JHVEventCache {
 
             }
         }
-        return eventsResult;
+        List<Interval<Date>> missingIntervals = adaptRequestCache(startDate, endDate);
+        List<Date> missingDates = new ArrayList<Date>();
+        return new JHVEventCacheResult(eventsResult, missingIntervals, missingDates);
     }
 
     /**
@@ -510,4 +516,222 @@ public class JHVEventCache {
         }
         return eventsResult;
     }
+
+    private List<Interval<Date>> adaptRequestCache(Date startDate, Date endDate) {
+        ArrayList<Interval<Date>> missingIntervals = new ArrayList<Interval<Date>>();
+        Date currentStartDate = startDate;
+        boolean endDateUsed = false;
+        if (requestCache.isEmpty()) {
+            missingIntervals.add(new Interval<Date>(startDate, endDate));
+            requestCache.put(startDate, new Interval<Date>(startDate, endDate));
+        } else {
+            Interval<Date> previousInterval = null;
+            for (Date iStartDate : requestCache.keySet()) {
+                if (currentStartDate.before(iStartDate)) {
+                    if (previousInterval == null) {
+                        // No previous interval check if endate is also before
+                        // startdate
+                        if (endDate.before(iStartDate)) {
+                            // complete new interval
+                            missingIntervals.add(new Interval<Date>(startDate, endDate));
+                            previousInterval = requestCache.get(iStartDate);
+                            break;
+                        } else {
+                            // overlapping interval => missing interval =
+                            // {startDate, iStartDate}
+                            // continue with interval = {iStartDate, endDate}
+                            currentStartDate = iStartDate;
+                            missingIntervals.add(new Interval<Date>(startDate, iStartDate));
+                            previousInterval = requestCache.get(iStartDate);
+                            continue;
+                        }
+                    } else {
+                        // 1) start time before or equal previous end time
+                        // 2) start time after previous end time
+                        if (previousInterval.containsPointInclusive(currentStartDate)) {
+                            // 1)
+                            // look at end time
+                            // 1) end time before or equal previous end time:
+                            // internal interval => do nothing break.
+                            // 2) end time after previous end time : partial
+                            // overlapping internal continue with interval
+                            // {previousendtime, endtime}
+
+                            if (previousInterval.containsPointInclusive(endDate)) {
+                                // 1))
+                                break;
+                            } else {
+                                if (endDate.before(iStartDate)) {
+                                    missingIntervals.add(new Interval<Date>(previousInterval.getEnd(), endDate));
+                                    endDateUsed = true;
+                                    break;
+                                } else {
+                                    missingIntervals.add(new Interval<Date>(previousInterval.getEnd(), iStartDate));
+                                    currentStartDate = iStartDate;
+                                }
+                                previousInterval = requestCache.get(iStartDate);
+                                continue;
+                            }
+
+                        } else {
+                            // 2)
+                            // look at end time
+                            // 1) endDate before or equal current start time:
+                            // missing interval: {previousendtime, enddate}
+                            // 2) endDate after current start time : missing
+                            // interval: {previous end date, current start
+                            // date}, continue with interval: {current start
+                            // time, end time}
+                            if (!previousInterval.containsPointInclusive(endDate)) {
+                                if (endDate.before(iStartDate) || endDate.equals(iStartDate)) {
+                                    // 1)
+                                    if (currentStartDate.after(previousInterval.getEnd())) {
+                                        missingIntervals.add(new Interval<Date>(currentStartDate, endDate));
+                                    } else {
+                                        missingIntervals.add(new Interval<Date>(previousInterval.getEnd(), endDate));
+                                    }
+                                    endDateUsed = true;
+                                    break;
+                                } else {
+                                    // 2)
+                                    missingIntervals.add(new Interval<Date>(currentStartDate, iStartDate));
+                                    previousInterval = requestCache.get(iStartDate);
+                                    currentStartDate = iStartDate;
+                                    continue;
+                                }
+                            } else {
+                                endDateUsed = true;
+                                break;
+                            }
+                        }
+                    }
+                } else {
+                    previousInterval = requestCache.get(iStartDate);
+                }
+            }
+            // check if current start date is after or equal previous (last
+            // interval) start date
+            if (!endDateUsed && (currentStartDate.after(previousInterval.getStart()) || currentStartDate.equals(previousInterval.getStart()))) {
+                // Check if start date is after end date of previous (last)
+                // interval
+                // 1) true: missing interval : {currentStartDate, endDate}
+                // 2) false: check end date
+                if (currentStartDate.after(previousInterval.getEnd()) || currentStartDate.equals(previousInterval.getEnd())) {
+                    // 1)
+                    missingIntervals.add(new Interval<Date>(currentStartDate, endDate));
+                } else {
+                    // 2)
+                    // 1) endDate after previous end date: missing interval =
+                    // {previousenddate, endDate}
+                    // 2) internal interval do nothing
+                    if (endDate.after(previousInterval.getEnd())) {
+                        missingIntervals.add(new Interval<Date>(previousInterval.getEnd(), endDate));
+                    }
+                }
+            }
+            updateRequestCache(startDate, endDate);
+        }
+        return missingIntervals;
+    }
+
+    private void updateRequestCache(Date startDate, Date endDate) {
+        List<Date> intervalsToRemove = new ArrayList<Date>();
+        Interval<Date> intervalToAdd = new Interval<Date>(startDate, endDate);
+        Interval<Date> previousInterval = null;
+        boolean startFound = false;
+        boolean endFound = false;
+        for (Date iStartDate : requestCache.keySet()) {
+            // define start
+            if (!startFound) {
+                if (startDate.before(iStartDate)) {
+                    if (previousInterval == null) {
+                        startFound = true;
+                        previousInterval = requestCache.get(iStartDate);
+                    } else {
+                        // There was a previous interval. Check if start lies
+                        // within previous interval
+                        if (previousInterval.containsPointInclusive(startDate)) {
+                            intervalToAdd.setStart(previousInterval.getStart());
+                            if (previousInterval.containsPointInclusive(endDate)) {
+                                intervalToAdd.setEnd(previousInterval.getEnd());
+                                endFound = true;
+                                break;
+                            } else {
+                                if (endDate.before(iStartDate)) {
+                                    intervalToAdd.setEnd(endDate);
+                                    break;
+                                } else {
+                                    intervalsToRemove.add(iStartDate);
+                                    previousInterval = requestCache.get(iStartDate);
+                                }
+                            }
+                            startFound = true;
+                        } else {
+                            intervalToAdd.setStart(startDate);
+                            startFound = true;
+                            if (endDate.before(iStartDate)) {
+                                intervalToAdd.setEnd(endDate);
+                                endFound = true;
+                                break;
+                            }
+                            previousInterval = requestCache.get(iStartDate);
+                        }
+                    }
+                } else {
+                    previousInterval = requestCache.get(iStartDate);
+                }
+            } else {
+                // define end
+                if (endDate.before(previousInterval.getStart())) {
+                    endFound = true;
+                    break;
+                } else {
+                    if (previousInterval.containsPointInclusive(endDate)) {
+                        intervalsToRemove.add(previousInterval.getStart());
+                        intervalToAdd.setEnd(previousInterval.getEnd());
+                        endFound = true;
+                        break;
+                    } else {
+                        intervalsToRemove.add(previousInterval.getStart());
+                        previousInterval = requestCache.get(iStartDate);
+                        continue;
+                    }
+                }
+            }
+        }
+        if (!startFound) {
+            if (previousInterval.containsPointInclusive(startDate)) {
+                if (!previousInterval.containsPointInclusive(endDate)) {
+                    intervalsToRemove.add(previousInterval.getStart());
+                    intervalToAdd.setStart(previousInterval.getStart());
+                } else {
+                    intervalToAdd = previousInterval;
+                    endFound = true;
+                }
+            }
+        }
+        if (!endFound) {
+            if (endDate.before(previousInterval.getStart())) {
+                endFound = true;
+            } else {
+                if (previousInterval.containsPointInclusive(endDate)) {
+                    intervalsToRemove.add(previousInterval.getStart());
+                    intervalToAdd.setEnd(previousInterval.getEnd());
+                } else {
+                    if (!startDate.after(previousInterval.getEnd())) {
+                        intervalsToRemove.add(previousInterval.getStart());
+                    }
+                }
+            }
+        }
+        for (Date toRemove : intervalsToRemove) {
+            requestCache.remove(toRemove);
+        }
+        requestCache.put(intervalToAdd.getStart(), intervalToAdd);
+    }
+
+    public Map<Date, Interval<Date>> getRequestCache() {
+        return requestCache;
+    }
+
 }
