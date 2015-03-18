@@ -42,9 +42,6 @@ public class CenterImageAction extends AbstractAction {
         View view = LayersModel.getSingletonInstance().getActiveView();
 
         if (view != null) {
-
-            // ViewHelper.getViewAdapter(ImageViewerGui.getSingletonInstance().getImageSelectorPanel().getActiveImageInfoView(),
-            // MetaDataView.class);
             MetaDataView baseView = view.getAdapter(MetaDataView.class);
             if (baseView == null) {
                 return;
@@ -58,9 +55,7 @@ public class CenterImageAction extends AbstractAction {
             Vector2dDouble newLowerLeftCorner = baseRegion.getLowerLeftCorner().add(baseRegion.getSize().subtract(targetRegion.getSize()).scale(0.5));
 
             targetView.setRegion(StaticRegion.createAdaptedRegion(newLowerLeftCorner, targetRegion.getSize()), new ChangeEvent());
-
         }
-
     }
 
 }
