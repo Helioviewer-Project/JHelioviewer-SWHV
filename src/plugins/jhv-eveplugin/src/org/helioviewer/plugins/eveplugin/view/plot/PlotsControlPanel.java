@@ -1,7 +1,6 @@
 package org.helioviewer.plugins.eveplugin.view.plot;
 
 import java.awt.BorderLayout;
-import java.awt.EventQueue;
 import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -192,27 +191,20 @@ public class PlotsControlPanel extends JPanel implements ZoomControllerListener,
 
     @Override
     public void layerAdded(int idx) {
-        EventQueue.invokeLater(new Runnable() {
-
-            @Override
-            public void run() {
-                // long start = System.currentTimeMillis();
-                if (setDefaultPeriod || TimeIntervalLockModel.getInstance().isLocked()) {
-                    setDefaultPeriod = false;
-                    final Interval<Date> interval = new Interval<Date>(LayersModel.getSingletonInstance().getFirstDate(), LayersModel.getSingletonInstance().getLastDate());
-                    ZoomController.getSingletonInstance().setAvailableInterval(interval);
-                    if (TimeIntervalLockModel.getInstance().isLocked()) {
-                        ZoomController.getSingletonInstance().setSelectedInterval(interval, false);
-                    }
-                    // PlotTimeSpace.getInstance().setSelectedMinAndMaxTime(interval.getStart(),
-                    // interval.getEnd());
-                }
-
-                // Log.debug("layer added time : " + (System.currentTimeMillis()
-                // - start));
+        // long start = System.currentTimeMillis();
+        if (setDefaultPeriod || TimeIntervalLockModel.getInstance().isLocked()) {
+            setDefaultPeriod = false;
+            final Interval<Date> interval = new Interval<Date>(LayersModel.getSingletonInstance().getFirstDate(), LayersModel.getSingletonInstance().getLastDate());
+            ZoomController.getSingletonInstance().setAvailableInterval(interval);
+            if (TimeIntervalLockModel.getInstance().isLocked()) {
+                ZoomController.getSingletonInstance().setSelectedInterval(interval, false);
             }
-        });
+            // PlotTimeSpace.getInstance().setSelectedMinAndMaxTime(interval.getStart(),
+            // interval.getEnd());
+        }
 
+        // Log.debug("layer added time : " + (System.currentTimeMillis()
+        // - start));
     }
 
     @Override
@@ -369,4 +361,5 @@ public class PlotsControlPanel extends JPanel implements ZoomControllerListener,
             return "Custom";
         }
     }
+
 }
