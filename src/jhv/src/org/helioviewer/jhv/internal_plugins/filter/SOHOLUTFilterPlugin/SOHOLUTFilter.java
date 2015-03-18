@@ -1,7 +1,5 @@
 package org.helioviewer.jhv.internal_plugins.filter.SOHOLUTFilterPlugin;
 
-import java.nio.IntBuffer;
-
 import org.helioviewer.viewmodel.imagedata.ARGBInt32ImageData;
 import org.helioviewer.viewmodel.imagedata.ImageData;
 import org.helioviewer.viewmodel.imageformat.SingleChannelImageFormat;
@@ -23,9 +21,6 @@ import org.helioviewer.viewmodel.imagetransport.Short16ImageTransport;
  * @author Helge Dietert
  */
 public class SOHOLUTFilter {
-
-    private IntBuffer buffer;
-
     /**
      * Used lut
      */
@@ -82,8 +77,7 @@ public class SOHOLUTFilter {
             short[] pixelData = ((Short16ImageTransport) data.getImageTransport()).getShort16PixelData();
             int[] resultPixelData = new int[pixelData.length];
             lut.lookup16(pixelData, resultPixelData, invertLUT);
-            data = new ARGBInt32ImageData(data, resultPixelData);
-            return data;
+            return new ARGBInt32ImageData(data, resultPixelData);
         }
         return null;
     }
