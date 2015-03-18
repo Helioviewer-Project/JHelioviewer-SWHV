@@ -9,7 +9,7 @@
 	<classpathentry combineaccessrules="false" kind="src" path="/viewmodelplugin"/>
 	<classpathentry kind="lib" path="../lib/gluegen-rt.jar">
 		<attributes>
-			<attribute name="org.eclipse.jdt.launching.CLASSPATH_ATTR_LIBRARY_PATH_ENTRY" value="../nativelib/jogl/macosx-universal"/>
+			<attribute name="org.eclipse.jdt.launching.CLASSPATH_ATTR_LIBRARY_PATH_ENTRY" value="/Users/bramb/Documents/OMA/jhelioviewer/git/client/jhv-3d-wcs/nativelib/jogl/macosx-universal"/>
 		</attributes>
 	</classpathentry>
 	<classpathentry kind="lib" path="../resources"/>
@@ -17,7 +17,7 @@
 	<classpathentry combineaccessrules="false" kind="src" path="/jhv-display"/>
 	<classpathentry kind="lib" path="../lib/jogl.jar">
 		<attributes>
-			<attribute name="org.eclipse.jdt.launching.CLASSPATH_ATTR_LIBRARY_PATH_ENTRY" value="../nativelib/jogl/macosx-universal"/>
+			<attribute name="org.eclipse.jdt.launching.CLASSPATH_ATTR_LIBRARY_PATH_ENTRY" value="/Users/bramb/Documents/OMA/jhelioviewer/git/client/jhv-3d-wcs/nativelib/jogl/macosx-universal"/>
 		</attributes>
 	</classpathentry>
 	<classpathentry combineaccessrules="false" kind="src" path="/jhv-data"/>
