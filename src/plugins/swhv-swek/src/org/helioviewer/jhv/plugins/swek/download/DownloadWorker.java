@@ -207,14 +207,31 @@ public class DownloadWorker implements Runnable {
             InputStream downloadInputStream = downloadData(page);
             // parse the data
             SWEKEventStream swekEventStream = parseData(downloadInputStream);
-            moreDownloads = swekEventStream.additionalDownloadNeeded();
+            if (swekEventStream != null) {
+                moreDownloads = swekEventStream.additionalDownloadNeeded();
+            }
             // distribute the data
             distributeData(swekEventStream);
             page++;
         } while (moreDownloads);
         // inform JHVEventContainer data finished downloading
         if (!isStopped) {
-            eventContainer.finishedDownload();
+            try {
+                EventQueue.invokeAndWait(new Runnable() {
+
+                    @Override
+                    public void run() {
+                        eventContainer.finishedDownload();
+                    }
+                });
+            } catch (InvocationTargetException e) {
+                Log.error("Invoke and wait called from event queue", e);
+                e.printStackTrace();
+            } catch (InterruptedException e) {
+                Log.error("Invoke and wait interrupted", e);
+                e.printStackTrace();
+            }
+
         }
         fireDownloadWorkerFinished();
     }
