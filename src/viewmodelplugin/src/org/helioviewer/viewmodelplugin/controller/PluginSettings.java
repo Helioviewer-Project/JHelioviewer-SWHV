@@ -17,7 +17,6 @@ import javax.xml.transform.TransformerFactoryConfigurationError;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 
-import org.helioviewer.viewmodel.filter.Filter;
 import org.helioviewer.viewmodel.renderer.physical.PhysicalRenderer;
 import org.helioviewer.viewmodelplugin.overlay.OverlayContainer;
 import org.w3c.dom.Document;
@@ -34,19 +33,10 @@ import org.xml.sax.SAXException;
  */
 public class PluginSettings {
 
-    // ////////////////////////////////////////////////////////////////
-    // Definitions
-    // ////////////////////////////////////////////////////////////////
-
     private static final String NODES_PLUGINS = "Plugins";
     private static final String NODES_PLUGIN = "Plugin";
     private static final String NODES_PLUGINLOCATION = "PluginLocation";
     private static final String NODES_PLUGINACTIVATED = "PluginActivated";
-    private static final String NODES_FILTERS = "Filters";
-    private static final String NODES_FILTER = "Filter";
-    private static final String NODES_FILTERNAME = "FilterName";
-    private static final String NODES_FILTERACTIVATED = "FilterActivated";
-    private static final String NODES_FILTERPOSITION = "FilterPosition";
     private static final String NODES_OVERLAYS = "Overlays";
     private static final String NODES_OVERLAY = "Overlay";
     private static final String NODES_OVERLAYNAME = "OverlayName";
@@ -61,10 +51,6 @@ public class PluginSettings {
 
     private Document xmlDocument;
     private Node pluginsRootNode;
-
-    // ////////////////////////////////////////////////////////////////
-    // Methods
-    // ////////////////////////////////////////////////////////////////
 
     /**
      * The private constructor to support the singleton pattern.
@@ -143,7 +129,6 @@ public class PluginSettings {
      * entry will be removed.
      */
     private void cleanUpXMLFile() {
-
         NodeList pluginNodes = ((Element) pluginsRootNode).getElementsByTagName(NODES_PLUGIN);
 
         for (int i = 0; i < pluginNodes.getLength(); i++) {
@@ -207,7 +192,6 @@ public class PluginSettings {
      *            internal XML document.
      */
     private void addPluginToXML(PluginContainer pluginContainer) {
-
         Node pluginNode = xmlDocument.createElement(NODES_PLUGIN);
         Node locationNode = xmlDocument.createElement(NODES_PLUGINLOCATION);
         Node activatedNode = xmlDocument.createElement(NODES_PLUGINACTIVATED);
@@ -253,7 +237,6 @@ public class PluginSettings {
      * @see #savePluginSettings()
      */
     public void overlaySettingsToXML(URI pluginLocation, OverlayContainer overlayContainer) {
-
         if (pluginLocation == null)
             return;
 
@@ -281,7 +264,6 @@ public class PluginSettings {
      *            internal XML document.
      */
     private void addOverlayToXML(Node pluginNode, OverlayContainer overlayContainer) {
-
         NodeList overlays = ((Element) pluginNode).getElementsByTagName(NODES_OVERLAYS);
         Node overlaysNode;
 
@@ -317,7 +299,6 @@ public class PluginSettings {
      *            internal XML document.
      */
     private void editOverlayInXML(Node overlayNode, OverlayContainer overlayContainer) {
-
         NodeList list = ((Element) overlayNode).getElementsByTagName(NODES_OVERLAYACTIVATED);
 
         if (list.getLength() == 1) {
@@ -376,7 +357,6 @@ public class PluginSettings {
      *         exists.
      */
     public boolean isPluginActivated(URI pluginLocation) {
-
         // This is to activate plugins automatically during the debugging phase
         // in eclipse
         if (pluginLocation == null) {
@@ -389,39 +369,6 @@ public class PluginSettings {
             return isActivated(pluginNode, NODES_PLUGINACTIVATED);
 
         return true;
-    }
-
-    /**
-     * Checks the activated value of a given filter in the XML document. If
-     * there is no entry in the XML document the return value is the passed
-     * default value.
-     *
-     * @param pluginLocation
-     *            location of the file where the plug-in comes from.
-     * @param filterClass
-     *            Class of the filter which has to be checked in the XML
-     *            document.
-     * @param defaultValue
-     *            value which has to be returned if there is no entry for the
-     *            given filter in the XML document.
-     * @return boolean value as it is in the XML document or the passed default
-     *         value if no entry exists.
-     */
-    public boolean isFilterInPluginActivated(URI pluginLocation, Class<? extends Filter> filterClass, boolean defaultValue) {
-
-        Node pluginNode = findNode(pluginsRootNode, NODES_PLUGINLOCATION, pluginLocation.getPath());
-
-        if (pluginNode == null)
-            return defaultValue;
-
-        if (isActivated(pluginNode, NODES_PLUGINACTIVATED)) {
-
-            Node filterNode = findNode(pluginNode, NODES_FILTERNAME, filterClass.getName());
-            if (filterNode != null)
-                return isActivated(filterNode, NODES_FILTERACTIVATED);
-        }
-
-        return defaultValue;
     }
 
     /**
@@ -441,7 +388,6 @@ public class PluginSettings {
      *         value if no entry exists.
      */
     public boolean isOverlayInPluginActivated(URI pluginLocation, Class<? extends PhysicalRenderer> overlayClass, boolean defaultValue) {
-
         Node pluginNode = findNode(pluginsRootNode, NODES_PLUGINLOCATION, pluginLocation.getPath());
 
         if (pluginNode == null)
@@ -458,45 +404,6 @@ public class PluginSettings {
     }
 
     /**
-     * Reads the saved position of a given filter from the XML document.
-     *
-     * @param pluginLocation
-     *            location of the file where the plug-in comes from.
-     * @param filterClass
-     *            Class of the filter which has to be checked in the XML
-     *            document.
-     * @return The position of the filter or -1 if there is no entry for the
-     *         given filter.
-     */
-    public int getFilterPosition(URI pluginLocation, Class<? extends Filter> filterClass) {
-
-        Node pluginNode = findNode(pluginsRootNode, NODES_PLUGINLOCATION, pluginLocation.getPath());
-
-        if (pluginNode == null)
-            return -1;
-
-        if (isActivated(pluginNode, NODES_PLUGINACTIVATED)) {
-
-            Node filterNode = findNode(pluginNode, NODES_FILTERNAME, filterClass.getName());
-            if (filterNode != null) {
-                NodeList list = ((Element) filterNode).getElementsByTagName(NODES_FILTERPOSITION);
-
-                if (list.getLength() == 1) {
-                    Node child = list.item(0).getFirstChild();
-                    if (child != null && child.getNodeType() == Node.TEXT_NODE) {
-                        try {
-                            return Integer.parseInt(child.getNodeValue());
-                        } catch (NumberFormatException e) {
-                        }
-                    }
-                }
-            }
-        }
-
-        return -1;
-    }
-
-    /**
      * Reads the saved position of a given overlay from the XML document.
      *
      * @param pluginLocation
@@ -508,7 +415,6 @@ public class PluginSettings {
      *         given overlay.
      */
     public int getOverlayPosition(URI pluginLocation, Class<? extends PhysicalRenderer> overlayClass) {
-
         Node pluginNode = findNode(pluginsRootNode, NODES_PLUGINLOCATION, pluginLocation.getPath());
 
         if (pluginNode == null)
@@ -583,4 +489,5 @@ public class PluginSettings {
 
         return false;
     }
+
 }

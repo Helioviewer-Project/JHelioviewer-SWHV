@@ -2,8 +2,6 @@ package org.helioviewer.viewmodelplugin.filter;
 
 import javax.swing.JPanel;
 
-import org.helioviewer.viewmodel.filter.Filter;
-
 /**
  * Basic class for all visual filter controls. All control elements of a filter
  * have to be placed on this kind of a panel.
@@ -11,10 +9,6 @@ import org.helioviewer.viewmodel.filter.Filter;
  * @author Stephan Pagel
  */
 public abstract class FilterPanel extends JPanel {
-
-    // ////////////////////////////////////////////////////////////////
-    // Definitions
-    // ////////////////////////////////////////////////////////////////
 
     private static final long serialVersionUID = 1L;
 
@@ -33,20 +27,6 @@ public abstract class FilterPanel extends JPanel {
      */
     public static final int height = 20;
 
-    // ////////////////////////////////////////////////////////////////
-    // Methods
-    // ////////////////////////////////////////////////////////////////
-
-    /**
-     * Sets the reference of the filter which has to be controlled by to this
-     * panel.
-     * 
-     * @param filter
-     *            Reference of the filter which has to be controlled by this
-     *            component.
-     */
-    public abstract void setFilter(Filter filter);
-
     /**
      * Returns the position where to add the filter control component at the
      * panel of all filters.
@@ -54,4 +34,5 @@ public abstract class FilterPanel extends JPanel {
      * @return position of filter control component.
      */
     public abstract FilterTabPanelManager.Area getArea();
+
 }

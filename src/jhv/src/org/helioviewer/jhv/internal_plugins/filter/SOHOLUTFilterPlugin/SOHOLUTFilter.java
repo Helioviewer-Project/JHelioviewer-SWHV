@@ -2,18 +2,11 @@ package org.helioviewer.jhv.internal_plugins.filter.SOHOLUTFilterPlugin;
 
 import java.nio.IntBuffer;
 
-import javax.media.opengl.GL2;
-
-import org.helioviewer.viewmodel.filter.Filter;
-import org.helioviewer.viewmodel.filter.FrameFilter;
 import org.helioviewer.viewmodel.imagedata.ARGBInt32ImageData;
 import org.helioviewer.viewmodel.imagedata.ImageData;
 import org.helioviewer.viewmodel.imageformat.SingleChannelImageFormat;
 import org.helioviewer.viewmodel.imagetransport.Byte8ImageTransport;
 import org.helioviewer.viewmodel.imagetransport.Short16ImageTransport;
-import org.helioviewer.viewmodel.view.jp2view.JHVJP2View;
-import org.helioviewer.viewmodel.view.jp2view.JHVJPXView;
-import org.helioviewer.viewmodel.view.opengl.GLTextureHelper;
 
 /**
  * Filter for applying a color table to a single channel image.
@@ -29,7 +22,7 @@ import org.helioviewer.viewmodel.view.opengl.GLTextureHelper;
  *
  * @author Helge Dietert
  */
-public class SOHOLUTFilter implements FrameFilter, Filter {
+public class SOHOLUTFilter {
 
     private SOHOLUTPanel panel;
     private IntBuffer buffer;
@@ -40,7 +33,6 @@ public class SOHOLUTFilter implements FrameFilter, Filter {
     private LUT lut;
     private final LUT gray = LUT.getStandardList().get("Gray");
     private boolean invertLUT = false;
-    private boolean changed;
 
     /**
      * LUT is set to Gray as default table.
@@ -82,10 +74,7 @@ public class SOHOLUTFilter implements FrameFilter, Filter {
         }
         lut = newLUT;
         invertLUT = invert;
-        this.changed = true;
     }
-
-    // STANDARD
 
     /**
      * {@inheritDoc}
@@ -108,74 +97,7 @@ public class SOHOLUTFilter implements FrameFilter, Filter {
             data = new ARGBInt32ImageData(data, resultPixelData);
             return data;
         }
-
         return null;
-    }
-
-    // OPENGL
-    private final GLTextureHelper.GLTexture tex = new GLTextureHelper.GLTexture();
-    private LUT lastLut = null;
-    private boolean lastInverted = false;
-    private JHVJP2View jp2View;
-
-    /**
-     * {@inheritDoc}
-     *
-     * In this case, also updates the color table, if necessary.
-     */
-    @Override
-    public void applyGL(GL2 gl) {
-        gl.glActiveTexture(GL2.GL_TEXTURE1);
-
-        LUT currlut;
-        // Note: The lookup table will always be power of two,
-        // so we won't get any problems here.
-        if ((jp2View instanceof JHVJPXView) && ((JHVJPXView) jp2View).getDifferenceMode()) {
-            currlut = gray;
-        } else {
-            currlut = lut;
-        }
-
-        gl.glBindTexture(GL2.GL_TEXTURE_1D, tex.get(gl));
-
-        if (changed || lastLut != currlut || invertLUT != lastInverted) {
-            int[] intLUT;
-
-            if (invertLUT) {
-                int[] sourceLUT = currlut.getLut8();
-                intLUT = new int[sourceLUT.length];
-
-                int offset = sourceLUT.length - 1;
-                for (int i = 0; i < sourceLUT.length / 2; i++) {
-                    intLUT[i] = sourceLUT[offset - i];
-                    intLUT[offset - i] = sourceLUT[i];
-                }
-            } else {
-                intLUT = currlut.getLut8();
-            }
-
-            buffer = IntBuffer.wrap(intLUT);
-            lastLut = currlut;
-            lastInverted = invertLUT;
-
-            gl.glPixelStorei(GL2.GL_UNPACK_SKIP_PIXELS, 0);
-            gl.glPixelStorei(GL2.GL_UNPACK_SKIP_ROWS, 0);
-            gl.glPixelStorei(GL2.GL_UNPACK_ROW_LENGTH, 0);
-            gl.glPixelStorei(GL2.GL_UNPACK_ALIGNMENT, 4);
-
-            gl.glTexImage1D(GL2.GL_TEXTURE_1D, 0, GL2.GL_RGBA, buffer.limit(), 0, GL2.GL_BGRA, GL2.GL_UNSIGNED_INT_8_8_8_8_REV, buffer);
-            gl.glTexParameteri(GL2.GL_TEXTURE_1D, GL2.GL_TEXTURE_MIN_FILTER, GL2.GL_NEAREST);
-            gl.glTexParameteri(GL2.GL_TEXTURE_1D, GL2.GL_TEXTURE_MAG_FILTER, GL2.GL_NEAREST);
-            gl.glTexParameteri(GL2.GL_TEXTURE_1D, GL2.GL_TEXTURE_WRAP_S, GL2.GL_CLAMP_TO_EDGE);
-        }
-        changed = false;
-
-        gl.glActiveTexture(GL2.GL_TEXTURE0);
-    }
-
-    @Override
-    public void setJP2View(JHVJP2View jp2View) {
-        this.jp2View = jp2View;
     }
 
 }
