@@ -12,7 +12,6 @@ import org.helioviewer.jhv.data.container.cache.JHVEventCache;
 import org.helioviewer.jhv.data.container.cache.JHVEventHandlerCache;
 import org.helioviewer.jhv.data.datatype.event.JHVEvent;
 import org.helioviewer.jhv.data.datatype.event.JHVEventType;
-import org.helioviewer.jhv.data.lock.JHVEventContainerLocks;
 
 public class JHVEventContainer {
 
@@ -42,7 +41,7 @@ public class JHVEventContainer {
 
     /**
      * Gets the singleton instance of the JHVEventContainer
-     *
+     * 
      * @return the singleton instance
      */
     public static JHVEventContainer getSingletonInstance() {
@@ -54,27 +53,23 @@ public class JHVEventContainer {
 
     /**
      * Register a JHV event container request handler.
-     *
-     *
+     * 
+     * 
      * @param handler
      *            the handler to register
      */
     public void registerHandler(JHVEventContainerRequestHandler handler) {
-        synchronized (JHVEventContainerLocks.requestHandlerLock) {
-            requestHandlers.add(handler);
-        }
+        requestHandlers.add(handler);
     }
 
     /**
      * Removes the JHV event container request handler.
-     *
+     * 
      * @param handler
      *            the handler to remove
      */
     public void removeHandler(JHVEventContainerRequestHandler handler) {
-        synchronized (JHVEventContainerLocks.requestHandlerLock) {
-            requestHandlers.remove(handler);
-        }
+        requestHandlers.remove(handler);
     }
 
     /**
@@ -82,27 +77,21 @@ public class JHVEventContainer {
      * will be send to the given handler. Events already available will directly
      * be send to the handler. Events becoming available will also be send to
      * the handler in the future.
-     *
+     * 
      * @param date
      *            the date to send events for
      * @param handler
      *            the handler to send events to
      */
     public void requestForDate(final Date date, final JHVEventHandler handler) {
-        EventQueue.invokeLater(new Runnable() {
-
-            @Override
-            public void run() {
-                Long requestID = nextDownloadID();
-                Long previousRequestID = eventHandlerCache.add(handler, date, requestID);
-                Map<String, NavigableMap<Date, NavigableMap<Date, List<JHVEvent>>>> events = eventCache.get(date);
-                handler.newEventsReceived(events);
-                if (previousRequestID != null) {
-                    removeIntervalForRequestID(previousRequestID);
-                }
-                requestEvents(date, requestID);
-            }
-        });
+        Long requestID = nextDownloadID();
+        Long previousRequestID = eventHandlerCache.add(handler, date, requestID);
+        Map<String, NavigableMap<Date, NavigableMap<Date, List<JHVEvent>>>> events = eventCache.get(date);
+        handler.newEventsReceived(events);
+        if (previousRequestID != null) {
+            removeIntervalForRequestID(previousRequestID);
+        }
+        requestEvents(date, requestID);
     }
 
     /**
@@ -110,23 +99,16 @@ public class JHVEventContainer {
      * The events will be send to the given handler. Events already available
      * will directly be send to the handler. Events becoming available will also
      * be send to the handler in the future.
-     *
+     * 
      * @param dateList
      *            the list of dates to send events for
      * @param handler
      *            the handler to send events to
      */
     public void requestForDateList(final List<Date> dateList, final JHVEventHandler handler) {
-        EventQueue.invokeLater(new Runnable() {
-
-            @Override
-            public void run() {
-                // Logger.getLogger(JHVEventContainer.class.getName()).info("Request for date list :");
-                for (Date date : dateList) {
-                    requestForDate(date, handler);
-                }
-            }
-        });
+        for (Date date : dateList) {
+            requestForDate(date, handler);
+        }
     }
 
     /**
@@ -134,7 +116,7 @@ public class JHVEventContainer {
      * The events will be send to the given handler. Events already available
      * will directly be send to the handler. Events becoming available will also
      * be send to the handler in the future.
-     *
+     * 
      * @param startDate
      *            the start date of the interval
      * @param endDate
@@ -168,20 +150,12 @@ public class JHVEventContainer {
 
     /**
      * Add an event to the event cache.
-     *
+     * 
      * @param event
      *            the event to add to the event cache
      */
     public void addEvent(final JHVEvent event) {
-        EventQueue.invokeLater(new Runnable() {
-
-            @Override
-            public void run() {
-                eventCache.add(event);
-            }
-
-        });
-
+        eventCache.add(event);
     }
 
     /**
@@ -190,51 +164,36 @@ public class JHVEventContainer {
      * downloaded events to the event handlers.
      */
     public void finishedDownload() {
-        EventQueue.invokeLater(new Runnable() {
-
-            @Override
-            public void run() {
-                fireEventCacheChanged();
-            }
-        });
+        fireEventCacheChanged();
     }
 
     /**
      * Removes the events of the given eventType from the event cache.
-     *
+     * 
      * @param eventType
      *            the event type to remove from the cache.
      */
     public void removeEvents(final JHVEventType eventType) {
-        // Logger.getLogger(JHVEventContainer.class.getName()).severe("remove events called");
-        EventQueue.invokeLater(new Runnable() {
-
-            @Override
-            public void run() {
-                // Logger.getLogger(JHVEventContainer.class.getName()).severe("remove events executed");
-                eventCache.removeEventType(eventType);
-                fireEventCacheChanged();
-            }
-        });
+        eventCache.removeEventType(eventType);
+        fireEventCacheChanged();
     }
 
     /**
      * Request data from the request handlers for a date.
-     *
+     * 
      * @param date
      *            the date for which to request the data
      */
     private void requestEvents(Date date, Long requestID2) {
-        synchronized (JHVEventContainerLocks.requestHandlerLock) {
-            for (JHVEventContainerRequestHandler handler : requestHandlers) {
-                handler.handleRequestForDate(date, requestID2);
-            }
+        for (JHVEventContainerRequestHandler handler : requestHandlers) {
+            handler.handleRequestForDate(date, requestID2);
         }
+
     }
 
     /**
      * Request data from the request handlers over an interval.
-     *
+     * 
      * @param startDate
      *            the start of the interval
      * @param endDate
@@ -242,17 +201,15 @@ public class JHVEventContainer {
      * @param requestID2
      */
     private void requestEvents(Date startDate, Date endDate, Long requestID2) {
-        synchronized (JHVEventContainerLocks.requestHandlerLock) {
-            for (JHVEventContainerRequestHandler handler : requestHandlers) {
-                handler.handleRequestForInterval(startDate, endDate, requestID);
-            }
+        for (JHVEventContainerRequestHandler handler : requestHandlers) {
+            handler.handleRequestForInterval(startDate, endDate, requestID);
         }
     }
 
     /**
      * Notify the interested JHVEventhandler of about the cache that was
      * changed.
-     *
+     * 
      * @param date
      *            the date for which the cache was changed.
      */
@@ -266,25 +223,20 @@ public class JHVEventContainer {
         // Logger.getLogger(JHVEventContainer.class.getName()).severe("event cache changed");
         // Thread.dumpStack();
         Set<JHVEventHandler> handlers = eventHandlerCache.getAllJHVEventHandlers();
-        synchronized (JHVEventContainerLocks.eventHandlerCacheLock) {
-            for (JHVEventHandler handler : handlers) {
-                handler.cacheUpdated();
-            }
+        for (JHVEventHandler handler : handlers) {
+            handler.cacheUpdated();
         }
+
     }
 
     private void removeIntervalForRequestID(Long previousRequestID) {
-        synchronized (JHVEventContainerLocks.eventHandlerCacheLock) {
-            for (JHVEventContainerRequestHandler handler : requestHandlers) {
-                handler.removeRequestID(requestID);
-            }
+        for (JHVEventContainerRequestHandler handler : requestHandlers) {
+            handler.removeRequestID(requestID);
         }
     }
 
     private Long nextDownloadID() {
-        synchronized (requestID) {
-            return requestID++;
-        }
+        return requestID++;
     }
 
 }
