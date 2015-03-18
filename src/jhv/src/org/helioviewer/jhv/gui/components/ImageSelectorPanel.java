@@ -300,9 +300,6 @@ public class ImageSelectorPanel extends JPanel implements LayersListener {
     /**
      * Checks if there is a current active layer and activates the buttons
      * accordingly.
-     * <p>
-     * Since the events can come from different threads it takes care that this
-     * runs in the EventQueue.
      */
     private void activateActions() {
         boolean e = LayersModel.getSingletonInstance().getActiveView() != null;
