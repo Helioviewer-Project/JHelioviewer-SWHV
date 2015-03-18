@@ -214,14 +214,6 @@ public class JHVEventContainer {
      *            the date for which the cache was changed.
      */
     private void fireEventCacheChanged() {
-        /**
-         * List<JHVEventHandler> jhvEventHandlers =
-         * eventHandlerCache.getJHVEventHandlersForDate(date); for
-         * (JHVEventHandler handler : jhvEventHandlers) {
-         * handler.cacheUpdated(); }
-         */
-        // Logger.getLogger(JHVEventContainer.class.getName()).severe("event cache changed");
-        // Thread.dumpStack();
         Set<JHVEventHandler> handlers = eventHandlerCache.getAllJHVEventHandlers();
         for (JHVEventHandler handler : handlers) {
             handler.cacheUpdated();
