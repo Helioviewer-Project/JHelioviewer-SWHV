@@ -8,8 +8,6 @@ import java.util.concurrent.ExecutionException;
 import javax.swing.SwingWorker;
 
 import org.helioviewer.base.logging.Log;
-import org.helioviewer.plugins.eveplugin.radio.filter.FilterModel;
-import org.helioviewer.plugins.eveplugin.radio.filter.FilterModelListener;
 import org.helioviewer.viewmodel.changeevent.ChangeEvent;
 import org.helioviewer.viewmodel.imagedata.ARGBInt32ImageData;
 import org.helioviewer.viewmodel.imagedata.ImageData;
@@ -21,7 +19,7 @@ import org.helioviewer.viewmodel.view.View;
 import org.helioviewer.viewmodel.view.ViewListener;
 import org.helioviewer.viewmodel.view.jp2view.JHVJP2CallistoView;
 
-public class DownloadedJPXData implements ViewListener, FilterModelListener {
+public class DownloadedJPXData implements ViewListener {
     private ImageInfoView view;
     private Long imageID;
     private Date startDate;
@@ -34,7 +32,6 @@ public class DownloadedJPXData implements ViewListener, FilterModelListener {
 
     public DownloadedJPXData(ImageInfoView view, Long imageID, Date startDate, Date endDate, String plotIdentifier, Long downloadID) {
         super();
-        FilterModel.getInstance().addFilterModelListener(this);
         this.view = view;
         this.imageID = imageID;
         this.startDate = startDate;
@@ -117,7 +114,8 @@ public class DownloadedJPXData implements ViewListener, FilterModelListener {
                     if (!isCancelled()) {
                         DownloadedJPXDataWorkerResult result = get();
                         if (result != null) {
-                            radioDataManager.dataForIDReceived(result.getData(), result.getImageID(), result.getDownloadID(), result.getDataSize());
+                            // Log.debug(result.getData().length);
+                            radioDataManager.dataForIDReceived(result.getByteData(), result.getImageID(), result.getDownloadID(), result.getDataSize());
                         }
 
                     }
@@ -137,69 +135,13 @@ public class DownloadedJPXData implements ViewListener, FilterModelListener {
         worker.execute();
     }
 
-    @Override
-    public void colorLUTChanged() {
-        while (worker != null && !worker.isDone()) {
-            try {
-                // Log.debug("dworker is busy sleep 10ms");
-                Thread.sleep(10);
-            } catch (InterruptedException e) {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
-            }
-        }
-
-        worker = new SwingWorker<DownloadedJPXDataWorkerResult, Void>() {
-
-            private int nr;
-
-            @Override
-            protected DownloadedJPXDataWorkerResult doInBackground() {
-                Thread.currentThread().setName("DownloadedJPXDataWorkerResult2--EVE");
-                return getJPXData(view);
-            }
-
-            public SwingWorker<DownloadedJPXDataWorkerResult, Void> init(int workernumber) {
-                nr = workernumber;
-                return this;
-            }
-
-            @Override
-            protected void done() {
-                try {
-                    if (!isCancelled()) {
-                        DownloadedJPXDataWorkerResult result = get();
-                        if (result != null) {
-                            if (!result.isByteData()) {
-                                radioDataManager.dataForIDReceived(result.getData(), result.getImageID(), result.getDownloadID(), result.getDataSize());
-                            } else {
-                                radioDataManager.dataForIDReceived(result.getByteData(), result.getImageID(), result.getDownloadID(), result.getDataSize());
-                            }
-                            radioDataManager.finishedDownloadingID(imageID, downloadID);
-                        }
-                    }
-                } catch (InterruptedException e) {
-                    // TODO Auto-generated catch block
-                    Log.error("dWorker" + nr + " interrupted " + e.getMessage());
-                    e.printStackTrace();
-                } catch (ExecutionException e) {
-                    Log.error("dWorker " + nr + "execution error " + e.getMessage());
-                    e.printStackTrace();
-                }
-
-            }
-
-        }.init(workernumber++);
-
-        worker.execute();
-
-    }
-
     private DownloadedJPXDataWorkerResult getJPXData(View view) {
         if (view != null) {
             JHVJP2CallistoView jp2CallistoView = view.getAdapter(JHVJP2CallistoView.class);
             if (jp2CallistoView != null) {
-                ImageData imData = FilterModel.getInstance().colorFilter(jp2CallistoView.getSubimageData());
+                // ImageData imData =
+                // FilterModel.getInstance().colorFilter(jp2CallistoView.getSubimageData());
+                ImageData imData = jp2CallistoView.getSubimageData();
                 if (imData instanceof ARGBInt32ImageData) {
                     int[] data = new int[0];
                     ARGBInt32ImageData imageData = (ARGBInt32ImageData) (imData);
@@ -242,7 +184,6 @@ public class DownloadedJPXData implements ViewListener, FilterModelListener {
                 calView.abolish();
             }
         }
-        FilterModel.getInstance().removeFilterModelListener(this);
         view = null;
     }
 }

@@ -1,21 +1,24 @@
 package org.helioviewer.plugins.eveplugin.radio.filter;
 
+import java.awt.image.DataBuffer;
+import java.awt.image.IndexColorModel;
 import java.util.HashSet;
 import java.util.Set;
 
 import org.helioviewer.jhv.internal_plugins.filter.SOHOLUTFilterPlugin.LUT;
-import org.helioviewer.jhv.internal_plugins.filter.SOHOLUTFilterPlugin.SOHOLUTFilter;
-import org.helioviewer.viewmodel.imagedata.ImageData;
 
 public class FilterModel {
     private static FilterModel instance;
 
-    private SOHOLUTFilter lutFilter;
+    private LUT lut;
+
+    private IndexColorModel indexColorModel;
 
     private final Set<FilterModelListener> listeners;
 
     private FilterModel() {
-        lutFilter = new SOHOLUTFilter(LUT.getStandardList().get("Rainbow 2"));
+        lut = LUT.getStandardList().get("Rainbow 2");
+        indexColorModel = createIndexColorModelFromLUT(lut);
         listeners = new HashSet<FilterModelListener>();
     }
 
@@ -35,17 +38,22 @@ public class FilterModel {
     }
 
     public void setLUT(LUT newLUT) {
-        lutFilter = new SOHOLUTFilter(newLUT);
+        lut = newLUT;
+        indexColorModel = createIndexColorModelFromLUT(lut);
         fireLUTChanged();
-    }
-
-    public ImageData colorFilter(ImageData data) {
-        return lutFilter.apply(data);
     }
 
     private void fireLUTChanged() {
         for (FilterModelListener l : listeners) {
             l.colorLUTChanged();
         }
+    }
+
+    public IndexColorModel getColorModel() {
+        return indexColorModel;
+    }
+
+    private IndexColorModel createIndexColorModelFromLUT(LUT lut2) {
+        return new IndexColorModel(8, lut2.getLut8().length, lut2.getLut8(), 0, false, -1, DataBuffer.TYPE_BYTE);
     }
 }
