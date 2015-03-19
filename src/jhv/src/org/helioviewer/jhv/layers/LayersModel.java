@@ -1,5 +1,7 @@
 package org.helioviewer.jhv.layers;
 
+import java.awt.EventQueue;
+
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -89,6 +91,11 @@ public class LayersModel implements ViewListener {
      * @return the only instance of this class.
      * */
     public static LayersModel getSingletonInstance() {
+        if (!EventQueue.isDispatchThread()) {
+            System.out.println(">>> You have been naughty: " + Thread.currentThread().getName());
+            Thread.dumpStack();
+            System.exit(1);
+        }
         return layersModel;
     }
 
