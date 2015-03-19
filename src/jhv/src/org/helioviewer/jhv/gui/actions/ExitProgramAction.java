@@ -43,7 +43,6 @@ public class ExitProgramAction extends AbstractAction {
      */
     @Override
     public void actionPerformed(ActionEvent e) {
-
         if (ImageViewerGui.getSingletonInstance().getMainView() != null) {
             if (ImageViewerGui.getSingletonInstance().getMainView().getAdapter(LayeredView.class).getNumberOfVisibleLayer() > 0) {
                 int option = JOptionPane.showConfirmDialog(ImageViewerGui.getMainFrame(), "Are you sure you want to quit?", "Confirm", JOptionPane.OK_CANCEL_OPTION);
@@ -54,19 +53,6 @@ public class ExitProgramAction extends AbstractAction {
         }
 
         final ExecutorService executor = Executors.newFixedThreadPool(4);
-
-        Future<?> futureLayersRemove = executor.submit(new Runnable() {
-            @Override
-            public void run() {
-                if (ImageViewerGui.getSingletonInstance().getMainView() != null) {
-                    LayeredView layeredView = ImageViewerGui.getSingletonInstance().getMainView().getAdapter(LayeredView.class);
-
-                    while (layeredView.getNumLayers() > 0) {
-                        layeredView.removeLayer(0);
-                    }
-                }
-            }
-        });
         Future<?> futureFileDelete = executor.submit(new Runnable() {
             @Override
             public void run() {
@@ -80,17 +66,6 @@ public class ExitProgramAction extends AbstractAction {
         executor.shutdown();
 
         try {
-            futureLayersRemove.get(1500, TimeUnit.MILLISECONDS);
-        } catch (InterruptedException e1) {
-            Log.warn("LayersRemove job was interrupted");
-        } catch (ExecutionException e2) {
-            Log.warn("Caught exception on LayersRemove: " + e);
-        } catch (TimeoutException e3) {
-            futureLayersRemove.cancel(true);
-            Log.warn("Timeout upon deleting layers");
-        }
-
-        try {
             futureFileDelete.get(1500, TimeUnit.MILLISECONDS);
         } catch (InterruptedException e1) {
             Log.warn("FileDelete job was interrupted");
@@ -98,7 +73,7 @@ public class ExitProgramAction extends AbstractAction {
             Log.warn("Caught exception on FileDelete: " + e);
         } catch (TimeoutException e3) {
             futureFileDelete.cancel(true);
-            Log.warn("Timeout upon deleting layers");
+            Log.warn("Timeout upon deleting temporary files");
         }
 
         System.exit(0);
