@@ -14,7 +14,7 @@ import javax.swing.JPanel;
 
 import org.helioviewer.base.logging.Log;
 import org.helioviewer.base.message.Message;
-import org.helioviewer.jhv.internal_plugins.filter.SOHOLUTFilterPlugin.LUT;
+import org.helioviewer.jhv.gui.filters.lut.LUT;
 import org.helioviewer.plugins.eveplugin.radio.filter.FilterModel;
 
 public class RadioOptionsPanel extends JPanel implements ActionListener {

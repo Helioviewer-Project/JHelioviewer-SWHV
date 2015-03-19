@@ -1,4 +1,4 @@
-package org.helioviewer.jhv.internal_plugins.filter.SOHOLUTFilterPlugin;
+package org.helioviewer.jhv.gui.filters.lut;
 
 import java.io.File;
 
@@ -35,4 +35,5 @@ public class GGRFilter extends FileFilter implements java.io.FileFilter {
     public String getDescription() {
         return "GIMP gradient files (\".ggr\")";
     }
+
 }
