@@ -1,4 +1,4 @@
-package org.helioviewer.jhv.internal_plugins.filter.SOHOLUTFilterPlugin;
+package org.helioviewer.jhv.gui.filters.lut;
 
 import java.io.BufferedReader;
 import java.io.IOException;

@@ -5,7 +5,7 @@ import java.awt.image.IndexColorModel;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.helioviewer.jhv.internal_plugins.filter.SOHOLUTFilterPlugin.LUT;
+import org.helioviewer.jhv.gui.filters.lut.LUT;
 
 public class FilterModel {
     private static FilterModel instance;
@@ -56,4 +56,5 @@ public class FilterModel {
     private IndexColorModel createIndexColorModelFromLUT(LUT lut2) {
         return new IndexColorModel(8, lut2.getLut8().length, lut2.getLut8(), 0, false, -1, DataBuffer.TYPE_BYTE);
     }
+
 }

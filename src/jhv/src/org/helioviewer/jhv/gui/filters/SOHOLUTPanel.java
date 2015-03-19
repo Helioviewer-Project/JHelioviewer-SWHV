@@ -20,7 +20,7 @@ import org.helioviewer.base.logging.Log;
 import org.helioviewer.base.message.Message;
 import org.helioviewer.jhv.gui.IconBank;
 import org.helioviewer.jhv.gui.IconBank.JHVIcon;
-import org.helioviewer.jhv.internal_plugins.filter.SOHOLUTFilterPlugin.LUT;
+import org.helioviewer.jhv.gui.filters.lut.LUT;
 import org.helioviewer.viewmodel.view.jp2view.JHVJP2View;
 import org.helioviewer.viewmodelplugin.filter.FilterAlignmentDetails;
 import org.helioviewer.viewmodelplugin.filter.FilterPanel;
