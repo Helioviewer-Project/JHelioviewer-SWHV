@@ -39,7 +39,6 @@ import org.helioviewer.jhv.layers.LayersListener;
 import org.helioviewer.jhv.layers.LayersModel;
 import org.helioviewer.jhv.plugins.pfssplugin.PfssPlugin;
 import org.helioviewer.viewmodel.changeevent.ChangeEvent;
-import org.helioviewer.viewmodel.changeevent.SubImageDataChangedReason;
 import org.helioviewer.viewmodel.view.LinkedMovieManager;
 import org.helioviewer.viewmodel.view.TimedMovieView;
 import org.helioviewer.viewmodel.view.View;
@@ -87,18 +86,10 @@ public class PfssPluginPanel extends OverlayPanel implements ActionListener, Lay
     }
 
     /**
-     * Force a redraw of the main window
-     */
-    private void fireRedraw() {
-        LayersModel.getSingletonInstance().UIviewChanged(null, new ChangeEvent(new SubImageDataChangedReason(null)));
-    }
-
-    /**
      * Sets up the visual sub components and the visual part of the component
      * itself.
      * */
     private void initVisualComponents() {
-
         // set general appearance
         GridBagLayout gridBagLayout = new GridBagLayout();
         gridBagLayout.columnWidths = new int[] { 0, 0, 0 };
@@ -176,12 +167,6 @@ public class PfssPluginPanel extends OverlayPanel implements ActionListener, Lay
         gbc.gridy = 2;
         gbc.anchor = GridBagConstraints.WEST;
         this.add(availabilityButton, gbc);
-    }
-
-    /**
-     * Updates components.
-     * */
-    public void updateComponents() {
     }
 
     @Override
@@ -329,12 +314,6 @@ public class PfssPluginPanel extends OverlayPanel implements ActionListener, Lay
 
     @Override
     public void viewportGeometryChanged() {
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public void regionChanged() {
     }
 
     /**
