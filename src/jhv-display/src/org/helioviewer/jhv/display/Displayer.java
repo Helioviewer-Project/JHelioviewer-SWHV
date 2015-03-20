@@ -3,6 +3,7 @@ package org.helioviewer.jhv.display;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
+import java.util.Date;
 
 import javax.swing.Timer;
 
@@ -17,8 +18,9 @@ public class Displayer implements JHVEventHighlightListener {
         return instance;
     }
 
-    private final ArrayList<DisplayListener> listeners = new ArrayList<DisplayListener>();
-    private final ArrayList<RenderListener> renderListeners = new ArrayList<RenderListener>();
+    private final static ArrayList<DisplayListener> listeners = new ArrayList<DisplayListener>();
+    private final static ArrayList<RenderListener> renderListeners = new ArrayList<RenderListener>();
+    private final static ArrayList<TimeListener> timeListeners = new ArrayList<TimeListener>();
 
     private static boolean torender = false;
     private static boolean todisplay = false;
@@ -74,6 +76,20 @@ public class Displayer implements JHVEventHighlightListener {
 
     public void removeRenderListener(final RenderListener renderListener) {
         renderListeners.remove(renderListener);
+    }
+
+    public void addTimeListener(final TimeListener timeListener) {
+        timeListeners.add(timeListener);
+    }
+
+    public void removeTimeListener(final TimeListener timeListener) {
+        timeListeners.remove(timeListener);
+    }
+
+    public static void fireTimeChanged(Date date) {
+        for (final TimeListener listener : timeListeners) {
+            listener.timeChanged(date);
+        }
     }
 
     @Override
