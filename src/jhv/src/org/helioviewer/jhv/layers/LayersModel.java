@@ -592,9 +592,10 @@ public class LayersModel implements UIViewListener {
         LayerChangedReason layerReason = aEvent.getLastChangedReasonByType(LayerChangedReason.class);
 
         // if layers were changed, perform same operations on GUI
-        if (layerReason != null) {
+        if (layerReason != null && !layerReason.getProcessed()) {
+            LayerChangeType type = layerReason.getLayerChangeType();
             // If layer was deleted, delete corresponding panel
-            if ((!layerReason.getProcessed()) && layerReason.getLayerChangeType() == LayerChangedReason.LayerChangeType.LAYER_ADDED) {
+            if (type == LayerChangedReason.LayerChangeType.LAYER_ADDED) {
                 layerReason.setProcessed(true);
                 View view = layerReason.getSubView();
                 int newIndex = findView(view);
@@ -602,21 +603,20 @@ public class LayersModel implements UIViewListener {
                     this.setActiveLayer(newIndex);
                     this.fireLayerAdded(newIndex);
                 }
-            } else if ((!layerReason.getProcessed()) && layerReason.getLayerChangeType() == LayerChangedReason.LayerChangeType.LAYER_REMOVED) {
+            } else if (type == LayerChangedReason.LayerChangeType.LAYER_REMOVED) {
                 layerReason.setProcessed(true);
                 int oldIndex = this.invertIndexDeleted(layerReason.getLayerIndex());
                 this.fireLayerRemoved(layerReason.getView(), oldIndex);
                 int newIndex = determineNewActiveLayer(oldIndex);
                 this.setActiveLayer(newIndex);
-
-            } else if ((!layerReason.getProcessed()) && layerReason.getLayerChangeType() == LayerChangedReason.LayerChangeType.LAYER_VISIBILITY) {
+            } else if (type == LayerChangedReason.LayerChangeType.LAYER_VISIBILITY) {
                 layerReason.setProcessed(true);
                 View view = layerReason.getSubView();
                 int idx = findView(view);
                 if (idx != -1) {
                     this.fireLayerChanged(idx);
                 }
-            } else if ((!layerReason.getProcessed()) && layerReason.getLayerChangeType() == LayerChangedReason.LayerChangeType.LAYER_DOWNLOADED) {
+            } else if (type == LayerChangedReason.LayerChangeType.LAYER_DOWNLOADED) {
                 layerReason.setProcessed(true);
                 View view = layerReason.getSubView();
                 int idx = findView(view);
@@ -1233,22 +1233,6 @@ public class LayersModel implements UIViewListener {
      * @return LayerDescriptor of the current state of the layer in question
      */
     public LayerDescriptor getDescriptor(View view) {
-        /*
-         * ImageInfoView imageInfoView = view.getAdapter(ImageInfoView.class);
-         * String typeString; String intervalString;
-         * 
-         * if (imageInfoView != null) { SimpleDateFormat format = new
-         * SimpleDateFormat("yyyy/MM/dd HH:mm"); Interval<Date> interval =
-         * imageInfoView.getDateRange(); if (interval != null) { typeString =
-         * "JPEG2000-movie"; String beginDate =
-         * format.format(interval.getStart()); String endDate =
-         * format.format(interval.getEnd()); intervalString = beginDate + "-" +
-         * endDate; } else { intervalString =
-         * layersModel.getCurrentFrameTimestampString(view); typeString =
-         * "Single image"; } } else { intervalString =
-         * layersModel.getCurrentFrameTimestampString(view); typeString =
-         * "JPEG200-movie"; }
-         */
         LayerDescriptor ld = new LayerDescriptor("sd", "sdf");
 
         ld.isMovie = layersModel.isMovie(view);
@@ -1422,15 +1406,6 @@ public class LayersModel implements UIViewListener {
                     String xmlApiResponse = apiResponse.getXMLRepresentation();
                     xml.append(tab).append("<apiresponse>\n").append(tab).append("\t").append(xmlApiResponse).append("\n").append(tab).append("</apiresponse>\n");
                 }
-
-                xml.append(tab).append("<filters>\n");
-
-                // add tab
-                tab = tab + "\t";
-
-                // remove last tab
-                tab = tab.substring(0, tab.length() - 1);
-                xml.append(tab).append("</filters>\n");
 
                 // remove last tab
                 tab = tab.substring(0, tab.length() - 1);
