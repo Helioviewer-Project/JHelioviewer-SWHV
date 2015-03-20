@@ -48,7 +48,7 @@ public class PfssPlugin3dRenderer extends PhysicalRenderer3d {
                     pfssData.display(gl);
                 }
             }
-            GL3DState.get().checkGLErrors("PfssPlugin3dRenderer.afterRender");
+            // GL3DState.get().checkGLErrors("PfssPlugin3dRenderer.afterRender");
         }
     }
 
