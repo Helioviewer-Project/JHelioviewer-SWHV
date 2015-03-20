@@ -13,7 +13,6 @@ import org.helioviewer.gl3d.math.GL3DVec4f;
 import org.helioviewer.gl3d.scenegraph.GL3DDrawBits.Bit;
 import org.helioviewer.gl3d.scenegraph.GL3DState;
 import org.helioviewer.gl3d.scenegraph.visuals.GL3DSphere;
-import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.display.TimeListener;
 import org.helioviewer.jhv.layers.LayersListener;
 import org.helioviewer.jhv.layers.LayersModel;
@@ -45,8 +44,6 @@ public class Planet extends GL3DSphere implements LayersListener, TimeListener, 
         positionLoading.requestData();
         this.layerAdded(0);
         this.drawBits.set(Bit.Wireframe, true);
-
-        // Displayer.addTimeListener(this); - not active
     }
 
     @Override
