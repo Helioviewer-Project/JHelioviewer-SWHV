@@ -43,7 +43,6 @@ import org.helioviewer.viewmodel.changeevent.SubImageDataChangedReason;
 import org.helioviewer.viewmodel.view.LinkedMovieManager;
 import org.helioviewer.viewmodel.view.TimedMovieView;
 import org.helioviewer.viewmodel.view.View;
-import org.helioviewer.viewmodel.view.ViewListener;
 import org.helioviewer.viewmodelplugin.overlay.OverlayPanel;
 
 /**
@@ -51,7 +50,7 @@ import org.helioviewer.viewmodelplugin.overlay.OverlayPanel;
  *
  * @author Stefan Meier (stefan.meier@fhnw.ch)
  * */
-public class PfssPluginPanel extends OverlayPanel implements ActionListener, LayersListener, ViewListener {
+public class PfssPluginPanel extends OverlayPanel implements ActionListener, LayersListener {
 
     private static final long serialVersionUID = 1L;
     private static final String VOIDDATELABEL = "Model time: ****-**-**T**:**:**";
@@ -91,7 +90,7 @@ public class PfssPluginPanel extends OverlayPanel implements ActionListener, Lay
      * Force a redraw of the main window
      */
     private void fireRedraw() {
-        LayersModel.getSingletonInstance().viewChanged(null, new ChangeEvent(new SubImageDataChangedReason(null)));
+        LayersModel.getSingletonInstance().UIviewChanged(null, new ChangeEvent(new SubImageDataChangedReason(null)));
     }
 
     /**
@@ -343,10 +342,6 @@ public class PfssPluginPanel extends OverlayPanel implements ActionListener, Lay
      */
     @Override
     public void layerDownloaded(int idx) {
-    }
-
-    @Override
-    public void viewChanged(View sender, ChangeEvent aEvent) {
     }
 
     public static void main(String[] args) {
