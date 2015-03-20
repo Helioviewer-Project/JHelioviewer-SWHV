@@ -392,7 +392,6 @@ public abstract class GL3DCamera {
     }
 
     public void updateRotation(long dateMillis) {
-
     }
 
     public void setTimeDelay(long timeDelay) {
