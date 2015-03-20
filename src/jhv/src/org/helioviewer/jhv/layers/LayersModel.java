@@ -22,6 +22,7 @@ import org.helioviewer.base.logging.Log;
 import org.helioviewer.base.math.Interval;
 import org.helioviewer.base.message.Message;
 import org.helioviewer.jhv.Settings;
+import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.gui.ImageViewerGui;
 import org.helioviewer.jhv.gui.UIViewListener;
 import org.helioviewer.jhv.gui.UIViewListenerDistributor;
@@ -234,9 +235,8 @@ public class LayersModel implements UIViewListener {
      */
     public ImmutableDateTime getCurrentFrameTimestamp(View view) {
         if (view != null) {
-            return view.getAdapter(MetaDataView.class).getMetaData().getDateTime(); // null
-                                                                                    // for
-                                                                                    // PixelBasedMetaData
+            // null for PixelBasedMetaData
+            return view.getAdapter(MetaDataView.class).getMetaData().getDateTime();
         }
         return null;
     }
@@ -654,6 +654,10 @@ public class LayersModel implements UIViewListener {
                         lastTimestamp = currentFrameTimestamp.getTime();
                     } else {
                         currentFrameTimestamp = null;
+                    }
+
+                    if (idx == activeLayer) {
+                        Displayer.fireTimeChanged(currentFrameTimestamp.getTime());
                     }
                 }
             }

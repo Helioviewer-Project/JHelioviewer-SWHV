@@ -12,8 +12,8 @@ import java.util.Set;
 import org.helioviewer.base.math.Interval;
 import org.helioviewer.jhv.data.datatype.event.JHVEvent;
 import org.helioviewer.jhv.data.datatype.event.JHVEventHighlightListener;
-import org.helioviewer.jhv.gui.UIViewListener;
-import org.helioviewer.jhv.gui.UIViewListenerDistributor;
+import org.helioviewer.jhv.display.Displayer;
+import org.helioviewer.jhv.display.TimeListener;
 import org.helioviewer.jhv.layers.LayersListener;
 import org.helioviewer.jhv.layers.LayersModel;
 import org.helioviewer.plugins.eveplugin.base.Range;
@@ -24,28 +24,23 @@ import org.helioviewer.plugins.eveplugin.settings.EVEAPI.API_RESOLUTION_AVERAGES
 import org.helioviewer.plugins.eveplugin.view.linedataselector.LineDataSelectorElement;
 import org.helioviewer.plugins.eveplugin.view.linedataselector.LineDataSelectorModel;
 import org.helioviewer.plugins.eveplugin.view.linedataselector.LineDataSelectorModelListener;
-import org.helioviewer.viewmodel.changeevent.ChangeEvent;
-import org.helioviewer.viewmodel.changeevent.TimestampChangedReason;
-import org.helioviewer.viewmodel.view.LinkedMovieManager;
-import org.helioviewer.viewmodel.view.TimedMovieView;
 import org.helioviewer.viewmodel.view.View;
 
-public class DrawController implements ZoomControllerListener, LineDataSelectorModelListener, UIViewListener, JHVEventHighlightListener, LayersListener {
+public class DrawController implements ZoomControllerListener, LineDataSelectorModelListener, JHVEventHighlightListener, LayersListener, TimeListener {
 
     private static DrawController instance;
     private final Map<String, DrawControllerData> drawControllerData;
     private Interval<Date> interval;
     private final List<DrawControllerListener> forAllPlotIdentifiers;
     private Thread viewChangedThread;
-    private Date previousTimestamp;
 
     private DrawController() {
         drawControllerData = Collections.synchronizedMap(new HashMap<String, DrawControllerData>());
         ZoomController.getSingletonInstance().addZoomControllerListener(this);
         LineDataSelectorModel.getSingletonInstance().addLineDataSelectorModelListener(this);
         forAllPlotIdentifiers = new ArrayList<DrawControllerListener>();
-        UIViewListenerDistributor.getSingletonInstance().addViewListener(this);
         LayersModel.getSingletonInstance().addLayersListener(this);
+        Displayer.getSingletonInstance().addTimeListener(this);
     }
 
     public static DrawController getSingletonInstance() {
@@ -234,7 +229,6 @@ public class DrawController implements ZoomControllerListener, LineDataSelectorM
     @Override
     public void availableIntervalChanged(Interval<Date> newInterval) {
         // TODO Auto-generated method stub
-
     }
 
     @Override
@@ -245,25 +239,21 @@ public class DrawController implements ZoomControllerListener, LineDataSelectorM
     @Override
     public void selectedResolutionChanged(API_RESOLUTION_AVERAGES newResolution) {
         // TODO Auto-generated method stub
-
     }
 
     @Override
     public void downloadStartded(LineDataSelectorElement element) {
         // TODO Auto-generated method stub
-
     }
 
     @Override
     public void downloadFinished(LineDataSelectorElement element) {
         // TODO Auto-generated method stub
-
     }
 
     @Override
     public void lineDataAdded(LineDataSelectorElement element) {
         fireRedrawRequest(element.getPlotIdentifier());
-
     }
 
     @Override
@@ -286,26 +276,9 @@ public class DrawController implements ZoomControllerListener, LineDataSelectorM
         }
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see
-     * org.helioviewer.viewmodel.view.ViewListener#viewChanged(org.helioviewer
-     * .viewmodel.view.View, org.helioviewer.viewmodel.changeevent.ChangeEvent)
-     */
-
-    // this notification comes on AWT-EventQueue thread
-
     @Override
-    public void UIviewChanged(View sender, ChangeEvent aEvent) {
-        TimestampChangedReason timestampReason = aEvent.getLastChangedReasonByType(TimestampChangedReason.class);
-        if ((timestampReason != null) && (timestampReason.getView() instanceof TimedMovieView) && LinkedMovieManager.getActiveInstance().isMaster((TimedMovieView) timestampReason.getView())) {
-            Date date = timestampReason.getNewDateTime().getTime();
-            if ((previousTimestamp == null || date == null) || previousTimestamp.getTime() != date.getTime()) {
-                fireRedrawRequestMovieFrameChanged(date);
-                previousTimestamp = date;
-            }
-        }
+    public void timeChanged(Date date) {
+        fireRedrawRequestMovieFrameChanged(date);
     }
 
     public Date getLastDateWithData() {
@@ -330,7 +303,6 @@ public class DrawController implements ZoomControllerListener, LineDataSelectorM
     @Override
     public void layerAdded(int idx) {
         // TODO Auto-generated method stub
-
     }
 
     @Override
@@ -344,37 +316,31 @@ public class DrawController implements ZoomControllerListener, LineDataSelectorM
     @Override
     public void layerChanged(int idx) {
         // TODO Auto-generated method stub
-
     }
 
     @Override
     public void activeLayerChanged(int idx) {
         // TODO Auto-generated method stub
-
     }
 
     @Override
     public void viewportGeometryChanged() {
         // TODO Auto-generated method stub
-
     }
 
     @Override
     public void timestampChanged(int idx) {
         // TODO Auto-generated method stub
-
     }
 
     @Override
     public void subImageDataChanged() {
         // TODO Auto-generated method stub
-
     }
 
     @Override
     public void layerDownloaded(int idx) {
         // TODO Auto-generated method stub
-
     }
 
 }
