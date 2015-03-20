@@ -15,7 +15,6 @@ import javax.swing.SwingWorker;
 
 import org.helioviewer.base.logging.Log;
 import org.helioviewer.base.math.Interval;
-import org.helioviewer.base.message.Message;
 import org.helioviewer.jhv.io.APIRequestManager;
 import org.helioviewer.viewmodel.view.ImageInfoView;
 
@@ -159,7 +158,7 @@ public class RadioDownloader {
     /**
      * Instructs the radio downloader listeners to remove the spectrograms from
      * the plot identified by the plot identifier
-     *
+     * 
      * @param identifier
      *            The identifier of the plot from which the radio spectrograms
      *            should be removed.
@@ -203,7 +202,9 @@ public class RadioDownloader {
                                     }
                                 }
                                 if (!(inRequestCache || cache.containsDate(startDate, plotIdentifier))) {
-                                    ImageInfoView v = APIRequestManager.requestAndOpenRemoteFile(false, null, createDateString(startDate), createDateString(startDate), "ROB-Humain", "CALLISTO", "CALLISTO", "RADIOGRAM", false);
+                                    ImageInfoView v = null;
+
+                                    v = APIRequestManager.requestAndOpenRemoteFile(false, null, createDateString(startDate), createDateString(startDate), "ROB-Humain", "CALLISTO", "CALLISTO", "RADIOGRAM", false);
                                     if (v != null) {
                                         Long imageID = getNextID();
                                         DownloadedJPXData newJPXData = new DownloadedJPXData(v, imageID, startDate, endDate, plotIdentifier, downloadId);
@@ -224,7 +225,6 @@ public class RadioDownloader {
                         return new ImageDownloadWorkerResult(jpxList, noDataList, false, new Interval<Date>(requestedStartDate, endDate), downloadId);
                     } catch (IOException e) {
                         Log.error("An error occured while opening the remote file!", e);
-                        Message.err("An error occured while opening the remote file!", e.getMessage(), false);
                         return null;
                     }
                 }
