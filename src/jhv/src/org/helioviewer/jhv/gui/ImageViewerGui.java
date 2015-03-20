@@ -360,11 +360,13 @@ public class ImageViewerGui {
             cameraTab.addTab("Camera Adjustments", cameraOptionsPanel);
             cameraTab.setEnabled(false);
             // leftPane.add("Camera Options", cameraOptionsPanel, false);
-            JTabbedPane planetTab = new JTabbedPane();
-            PlanetOptionsPanel planetOptionsPanel = new PlanetOptionsPanel();
-            planetTab.addTab("Planet Options", planetOptionsPanel);
-            planetTab.setEnabled(false);
+
+            // JTabbedPane planetTab = new JTabbedPane();
+            // PlanetOptionsPanel planetOptionsPanel = new PlanetOptionsPanel();
+            // planetTab.addTab("Planet Options", planetOptionsPanel);
+            // planetTab.setEnabled(false);
             // leftPane.add("Object Options", planetOptionsPanel, false);
+
             return leftPane;
         }
     }

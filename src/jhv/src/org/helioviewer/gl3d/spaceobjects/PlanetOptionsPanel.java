@@ -13,6 +13,7 @@ import javax.swing.JList;
 import javax.swing.JPanel;
 
 import org.helioviewer.gl3d.camera.GL3DSpaceObject;
+import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.gui.GL3DViewchainFactory;
 import org.helioviewer.jhv.layers.LayersModel;
 
@@ -71,13 +72,13 @@ public class PlanetOptionsPanel extends JPanel {
     public void addPlanet(Planet planet) {
         GL3DViewchainFactory.currentSceneGraph.getRoot().addNode(planet);
         this.planetListModel.addElement(planet);
-        GL3DViewchainFactory.currentSceneGraph.addViewListener(planet);
+        Displayer.addTimeListener(planet);
         LayersModel.getSingletonInstance().addLayersListener(planet);
     }
 
     public void removePlanet(Planet planet) {
         GL3DViewchainFactory.currentSceneGraph.getRoot().removeNode(planet);
-        GL3DViewchainFactory.currentSceneGraph.removeViewListener(planet);
+        Displayer.removeTimeListener(planet);
         LayersModel.getSingletonInstance().removeLayersListener(planet);
         this.planetListModel.removeElement(planet);
     }
