@@ -8,24 +8,17 @@ import org.helioviewer.base.physics.Constants;
 import org.helioviewer.gl3d.math.GL3DQuatd;
 import org.helioviewer.gl3d.math.GL3DVec3d;
 import org.helioviewer.gl3d.scenegraph.GL3DDrawBits.Bit;
+import org.helioviewer.jhv.display.Displayer;
+import org.helioviewer.jhv.display.TimeListener;
 import org.helioviewer.jhv.layers.LayersListener;
 import org.helioviewer.jhv.layers.LayersModel;
-import org.helioviewer.viewmodel.changeevent.ChangeEvent;
-import org.helioviewer.viewmodel.changeevent.TimestampChangedReason;
-import org.helioviewer.viewmodel.view.LinkedMovieManager;
-import org.helioviewer.viewmodel.view.TimedMovieView;
 import org.helioviewer.viewmodel.view.View;
-import org.helioviewer.viewmodel.view.ViewListener;
-import org.helioviewer.viewmodel.view.jp2view.JHVJP2View;
 import org.helioviewer.viewmodel.view.jp2view.JHVJPXView;
 import org.helioviewer.viewmodel.view.jp2view.datetime.ImmutableDateTime;
 import org.helioviewer.viewmodel.view.opengl.GL3DSceneGraphView;
 
-public class GL3DFollowObjectCamera extends GL3DSolarRotationTrackingTrackballCamera implements GL3DPositionLoadingListener, LayersListener, ViewListener {
+public class GL3DFollowObjectCamera extends GL3DSolarRotationTrackingTrackballCamera implements GL3DPositionLoadingListener, LayersListener, TimeListener {
 
-    private Date currentDate = null;
-    private double currentRotation = 0.0;
-    private long timediff;
     private final ArrayList<GL3DFollowObjectCameraListener> followObjectCameraListeners = new ArrayList<GL3DFollowObjectCameraListener>();
     private final GL3DPositionLoading positionLoading;
     private double FOVangle;
@@ -33,8 +26,7 @@ public class GL3DFollowObjectCamera extends GL3DSolarRotationTrackingTrackballCa
     private double currentB = 0.;
     private double currentDistance = Constants.SunMeanDistanceToEarth / Constants.SunRadius;
 
-    private long currentCameraTime;
-    private double lratio;
+    private Date cameraDate;
     private boolean interpolation;
     private boolean fovhidden = false;
 
@@ -64,17 +56,17 @@ public class GL3DFollowObjectCamera extends GL3DSolarRotationTrackingTrackballCa
     public void activate() {
         super.activate();
         this.cameraFOVDraw.getDrawBits().set(Bit.Hidden, this.fovhidden);
-        getSceneGraphView().addViewListener(this);
-    };
+        Displayer.addTimeListener(this);
+    }
 
     @Override
     public void deactivate() {
         super.deactivate();
         this.fovhidden = this.cameraFOVDraw.getDrawBits().get(Bit.Hidden);
         this.cameraFOVDraw.getDrawBits().on(Bit.Hidden);
-        getSceneGraphView().removeViewListener(this);
         this.cameraFOVDraw.getDrawBits().set(Bit.Hidden, true);
-    };
+        Displayer.removeTimeListener(this);
+    }
 
     public void createNewFOV(GL3DSceneGraphView gv) {
         boolean hidden = this.cameraFOVDraw.getDrawBits().get(Bit.Hidden);
@@ -91,70 +83,57 @@ public class GL3DFollowObjectCamera extends GL3DSolarRotationTrackingTrackballCa
     }
 
     @Override
-    public void viewChanged(View sender, ChangeEvent aEvent) {
+    public void timeChanged(Date date) {
         if (this.positionLoading.isLoaded() && !this.getTrackingMode()) {
-            TimestampChangedReason timestampReason = aEvent.getLastChangedReasonByType(TimestampChangedReason.class);
-            if (timestampReason != null && LayersModel.getSingletonInstance().getActiveView() != null) {
-                boolean isjp2 = LayersModel.getSingletonInstance().getActiveView().getAdapter(JHVJP2View.class).getClass() == JHVJP2View.class;
-                if (isjp2 || ((timestampReason.getView() instanceof TimedMovieView) && LinkedMovieManager.getActiveInstance().isMaster((TimedMovieView) timestampReason.getView()))) {
-                    currentDate = timestampReason.getNewDateTime().getTime();
-                    //Layer times
-                    long t1 = LayersModel.getSingletonInstance().getFirstDate().getTime();
-                    long t2 = LayersModel.getSingletonInstance().getLastDate().getTime();
-                    //Camera times
-                    long t3 = this.positionLoading.getBeginDate().getTime();
-                    long t4 = this.positionLoading.getEndDate().getTime();
-                    if (interpolation) {
-                        if (t4 != t3) {
-                            currentCameraTime = (long) ((t3 + 1. * (t4 - t3) * (timestampReason.getNewDateTime().getMillis() - t1) / (t2 - t1)));
-                        } else {
-                            currentCameraTime = t4;
-                        }
-                    } else {
-                        currentCameraTime = timestampReason.getNewDateTime().getMillis();
-                    }
-                    this.setTime(currentCameraTime);
+            //Layer times
+            long t1 = LayersModel.getSingletonInstance().getFirstDate().getTime();
+            long t2 = LayersModel.getSingletonInstance().getLastDate().getTime();
+            //Camera times
+            long t3 = this.positionLoading.getBeginDate().getTime();
+            long t4 = this.positionLoading.getEndDate().getTime();
 
-                    this.fireCameratTime(new Date(currentCameraTime));
-
-                    GL3DVec3d position = this.positionLoading.getInterpolatedPosition(currentCameraTime);
-                    if (position != null) {
-                        currentL = position.y;
-                        currentB = -position.z;
-                        currentDistance = position.x;
-                        GL3DVec3d initPosition = this.positionLoading.getInterpolatedPosition(t3);
-                        lratio = initPosition.x / position.x;
-
-                        updateRotation();
-                        setFOV(currentDistance * Math.tan(FOVangle));
-                    }
+            long currentCameraTime, dateTime = date.getTime();
+            if (interpolation) {
+                if (t4 != t3) {
+                    currentCameraTime = (long) ((t3 + 1. * (t4 - t3) * (dateTime - t1) / (t2 - t1)));
+                } else {
+                    currentCameraTime = t4;
                 }
+            } else {
+                currentCameraTime = dateTime;
             }
 
+            cameraDate = new Date(currentCameraTime);
+            for (GL3DFollowObjectCameraListener listener : followObjectCameraListeners) {
+                listener.fireCameraTime(cameraDate);
+            }
+
+            this.setTime(currentCameraTime);
+
+            GL3DVec3d position = this.positionLoading.getInterpolatedPosition(currentCameraTime);
+            if (position != null) {
+                currentL = position.y;
+                currentB = -position.z;
+                currentDistance = position.x;
+
+                updateRotation(date);
+            }
         }
     }
 
-    private void setFOV(double scale) {
-        this.cameraFOVDraw.scale(scale);
-        this.cameraFOVDraw.setAngles(this.currentB, this.currentRotation);
-    }
-
-    private void fireCameratTime(Date currentCameraTime) {
-        for (GL3DFollowObjectCameraListener listener : followObjectCameraListeners) {
-            listener.fireCameraTime(currentCameraTime);
-        }
-    }
-
-    public void updateRotation() {
-        if (this.positionLoading.isLoaded() && currentDate != null) {
-            this.currentRotation = (-currentL + Astronomy.getL0Radians(new Date(currentCameraTime))) % (Math.PI * 2.0);
+    private void updateRotation(Date date) {
+        if (this.positionLoading.isLoaded()) {
+            double currentRotation = (-currentL + Astronomy.getL0Radians(date)) % (Math.PI * 2.0);
 
             GL3DQuatd newRotation = GL3DQuatd.createRotation(-currentB, GL3DVec3d.XAxis);
-            newRotation.rotate(GL3DQuatd.createRotation(this.currentRotation, GL3DVec3d.YAxis));
+            newRotation.rotate(GL3DQuatd.createRotation(currentRotation, GL3DVec3d.YAxis));
 
             this.setLocalRotation(newRotation);
             this.setZTranslation(-currentDistance);
             this.updateCameraTransformation();
+
+            this.cameraFOVDraw.scale(currentDistance * Math.tan(FOVangle));
+            this.cameraFOVDraw.setAngles(currentB, currentRotation);
         }
     }
 
@@ -176,7 +155,7 @@ public class GL3DFollowObjectCamera extends GL3DSolarRotationTrackingTrackballCa
     @Override
     public void fireNewDate() {
         for (GL3DFollowObjectCameraListener listener : followObjectCameraListeners) {
-            listener.fireNewDate(new Date(this.currentCameraTime));
+            listener.fireNewDate(cameraDate);
         }
     }
 
