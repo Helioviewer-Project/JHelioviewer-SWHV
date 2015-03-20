@@ -126,7 +126,7 @@ public class JHVJP2View extends AbstractView implements JP2View, ViewportView, R
     public JHVJP2View(boolean isMainView, Interval<Date> range) {
         this.isMainView = isMainView;
         if (isMainView) {
-            Displayer.getSingletonInstance().addRenderListener(this);
+            Displayer.addRenderListener(this);
         }
         isPersistent = isMainView;
         this.range = range;

@@ -40,7 +40,7 @@ public class DrawController implements ZoomControllerListener, LineDataSelectorM
         LineDataSelectorModel.getSingletonInstance().addLineDataSelectorModelListener(this);
         forAllPlotIdentifiers = new ArrayList<DrawControllerListener>();
         LayersModel.getSingletonInstance().addLayersListener(this);
-        Displayer.getSingletonInstance().addTimeListener(this);
+        Displayer.addTimeListener(this);
     }
 
     public static DrawController getSingletonInstance() {
