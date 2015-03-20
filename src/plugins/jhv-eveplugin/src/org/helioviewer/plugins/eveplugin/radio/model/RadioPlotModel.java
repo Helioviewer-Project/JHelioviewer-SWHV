@@ -219,6 +219,7 @@ public class RadioPlotModel implements RadioDataManagerListener, ZoomDataConfigL
             Map<Long, DownloadRequestData> downloadRequestData = rpmd.getDownloadRequestData();
             Map<Long, Map<Long, PlotConfig>> plotConfigList = rpmd.getPlotConfigList();
             BufferedImage newImage = createBufferedImage(area.width, area.height, data);
+            data = new int[0];
             bufferedImages.put(radioImageID, newImage);
             rpmd.getRadioImagePane().setIntervalTooBig(false);
             // Log.trace("+===============================================================+");
@@ -253,6 +254,7 @@ public class RadioPlotModel implements RadioDataManagerListener, ZoomDataConfigL
             Map<Long, DownloadRequestData> downloadRequestData = rpmd.getDownloadRequestData();
             Map<Long, Map<Long, PlotConfig>> plotConfigList = rpmd.getPlotConfigList();
             BufferedImage newImage = createBufferedImage(area.width, area.height, byteData);
+            byteData = new byte[0];
             bufferedImages.put(radioImageID, newImage);
             rpmd.getRadioImagePane().setIntervalTooBig(false);
             // Log.trace("+===============================================================+");
