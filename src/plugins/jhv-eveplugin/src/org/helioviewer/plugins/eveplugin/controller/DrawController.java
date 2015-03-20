@@ -12,7 +12,8 @@ import java.util.Set;
 import org.helioviewer.base.math.Interval;
 import org.helioviewer.jhv.data.datatype.event.JHVEvent;
 import org.helioviewer.jhv.data.datatype.event.JHVEventHighlightListener;
-import org.helioviewer.jhv.gui.ViewListenerDistributor;
+import org.helioviewer.jhv.gui.UIViewListener;
+import org.helioviewer.jhv.gui.UIViewListenerDistributor;
 import org.helioviewer.jhv.layers.LayersListener;
 import org.helioviewer.jhv.layers.LayersModel;
 import org.helioviewer.plugins.eveplugin.base.Range;
@@ -28,9 +29,8 @@ import org.helioviewer.viewmodel.changeevent.TimestampChangedReason;
 import org.helioviewer.viewmodel.view.LinkedMovieManager;
 import org.helioviewer.viewmodel.view.TimedMovieView;
 import org.helioviewer.viewmodel.view.View;
-import org.helioviewer.viewmodel.view.ViewListener;
 
-public class DrawController implements ZoomControllerListener, LineDataSelectorModelListener, ViewListener, JHVEventHighlightListener, LayersListener {
+public class DrawController implements ZoomControllerListener, LineDataSelectorModelListener, UIViewListener, JHVEventHighlightListener, LayersListener {
 
     private static DrawController instance;
     private final Map<String, DrawControllerData> drawControllerData;
@@ -44,7 +44,7 @@ public class DrawController implements ZoomControllerListener, LineDataSelectorM
         ZoomController.getSingletonInstance().addZoomControllerListener(this);
         LineDataSelectorModel.getSingletonInstance().addLineDataSelectorModelListener(this);
         forAllPlotIdentifiers = new ArrayList<DrawControllerListener>();
-        ViewListenerDistributor.getSingletonInstance().addViewListener(this);
+        UIViewListenerDistributor.getSingletonInstance().addViewListener(this);
         LayersModel.getSingletonInstance().addLayersListener(this);
     }
 
@@ -297,7 +297,7 @@ public class DrawController implements ZoomControllerListener, LineDataSelectorM
     // this notification comes on AWT-EventQueue thread
 
     @Override
-    public void viewChanged(View sender, ChangeEvent aEvent) {
+    public void UIviewChanged(View sender, ChangeEvent aEvent) {
         TimestampChangedReason timestampReason = aEvent.getLastChangedReasonByType(TimestampChangedReason.class);
         if ((timestampReason != null) && (timestampReason.getView() instanceof TimedMovieView) && LinkedMovieManager.getActiveInstance().isMaster((TimedMovieView) timestampReason.getView())) {
             Date date = timestampReason.getNewDateTime().getTime();
