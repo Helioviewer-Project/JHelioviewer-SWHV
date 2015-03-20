@@ -22,9 +22,7 @@ public class RadioImage {
     private boolean isDownloading;
     private Rectangle lastDataSize;
 
-    public RadioImage(DownloadedJPXData jpxData, long downloadID, Long radioImageID, Interval<Date> timeInterval,
-            FrequencyInterval freqInterval, int frameInJPX, ResolutionSet rs, List<ResolutionSetting> resolutionSettings,
-            String plotIdentifier, boolean isDownloading) {
+    public RadioImage(DownloadedJPXData jpxData, long downloadID, Long radioImageID, Interval<Date> timeInterval, FrequencyInterval freqInterval, int frameInJPX, ResolutionSet rs, List<ResolutionSetting> resolutionSettings, String plotIdentifier, boolean isDownloading) {
         super();
         this.downloadID = downloadID;
         imageTimeInterval = timeInterval;
@@ -143,16 +141,20 @@ public class RadioImage {
     public ResolutionSetting defineBestResolutionSetting(double ratioX, double ratioY) {
         ResolutionSetting currentBest = null;
         int highestLevel = 0;
-        for (ResolutionSetting rs : resolutionSettings) {
-            if (rs.getxRatio() < ratioX || rs.getyRatio() < ratioY) {
-                if (rs.getResolutionLevel() > highestLevel) {
-                    highestLevel = rs.getResolutionLevel();
+        if (ratioX != 0 && ratioY != 0) {
+            for (ResolutionSetting rs : resolutionSettings) {
+                if (rs.getxRatio() < ratioX || rs.getyRatio() < ratioY) {
+                    if (rs.getResolutionLevel() > highestLevel) {
+                        highestLevel = rs.getResolutionLevel();
+                        currentBest = rs;
+                    }
+                }
+                if (rs.getResolutionLevel() == 0 && currentBest == null) {
                     currentBest = rs;
                 }
             }
-            if (rs.getResolutionLevel() == 0 && currentBest == null) {
-                currentBest = rs;
-            }
+        } else {
+            return resolutionSettings.get(resolutionSettings.size() - 1);
         }
         return currentBest;
     }
@@ -203,8 +205,7 @@ public class RadioImage {
             // Log.trace("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@");
         } else {
             Interval<Date> tempInterval = new Interval<Date>(visibleXStart, visibleXEnd);
-            if (tempInterval.containsPointInclusive(imageTimeInterval.getStart())
-                    || tempInterval.containsPointInclusive(imageTimeInterval.getEnd())) {
+            if (tempInterval.containsPointInclusive(imageTimeInterval.getStart()) || tempInterval.containsPointInclusive(imageTimeInterval.getEnd())) {
                 // case image interval completely in requested interval
                 Date tempStartX = new Date(tempInterval.squeeze(imageTimeInterval.getStart()).getTime());
                 Date tempEndX = new Date(tempInterval.squeeze(imageTimeInterval.getEnd()).getTime());
@@ -251,13 +252,11 @@ public class RadioImage {
             double timePerPix = 1.0 * imageTimesize / maxImageWidth;
             double freqPerPix = 1.0 * imageFrequencySize / maxImageHeight;
 
-            int x0 = (int) Math
-                    .round((visibleImageTimeInterval.getStart().getTime() - imageTimeInterval.getStart().getTime()) / timePerPix);
+            int x0 = (int) Math.round((visibleImageTimeInterval.getStart().getTime() - imageTimeInterval.getStart().getTime()) / timePerPix);
             // int y0 =
             // (int)Math.round((visibleImageFreqInterval.getStart()-imageFreqInterval.getStart())/freqPerPix);
             int y0 = (int) Math.round((imageFreqInterval.getEnd() - visibleImageFreqInterval.getEnd()) / freqPerPix);
-            int width = (int) Math.round((visibleImageTimeInterval.getEnd().getTime() - visibleImageTimeInterval.getStart().getTime())
-                    / timePerPix);
+            int width = (int) Math.round((visibleImageTimeInterval.getEnd().getTime() - visibleImageTimeInterval.getStart().getTime()) / timePerPix);
             int height = (int) Math.round((visibleImageFreqInterval.getEnd() - visibleImageFreqInterval.getStart()) / freqPerPix);
             return new Rectangle(x0, y0, width, height);
         } else {
