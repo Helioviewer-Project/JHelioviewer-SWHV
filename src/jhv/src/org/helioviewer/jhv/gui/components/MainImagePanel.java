@@ -15,7 +15,8 @@ import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.gui.IconBank;
 import org.helioviewer.jhv.gui.IconBank.JHVIcon;
 import org.helioviewer.jhv.gui.ImageViewerGui;
-import org.helioviewer.jhv.gui.ViewListenerDistributor;
+import org.helioviewer.jhv.gui.UIViewListener;
+import org.helioviewer.jhv.gui.UIViewListenerDistributor;
 import org.helioviewer.viewmodel.changeevent.ChangeEvent;
 import org.helioviewer.viewmodel.changeevent.LayerChangedReason;
 import org.helioviewer.viewmodel.renderer.screen.ScreenRenderGraphics;
@@ -24,7 +25,6 @@ import org.helioviewer.viewmodel.view.ComponentView;
 import org.helioviewer.viewmodel.view.LayeredView;
 import org.helioviewer.viewmodel.view.View;
 import org.helioviewer.viewmodel.view.ViewHelper;
-import org.helioviewer.viewmodel.view.ViewListener;
 import org.helioviewer.viewmodel.view.opengl.GLSharedDrawable;
 
 /**
@@ -37,7 +37,7 @@ import org.helioviewer.viewmodel.view.opengl.GLSharedDrawable;
  * @author Stephan Pagel
  * @author Markus Langenberg
  */
-public class MainImagePanel extends BasicImagePanel implements ViewListener {
+public class MainImagePanel extends BasicImagePanel implements UIViewListener {
 
     // ///////////////////////////////////////////////////////////////////////////
     // Definitions
@@ -75,7 +75,7 @@ public class MainImagePanel extends BasicImagePanel implements ViewListener {
         noImagePostRendererSet = true;
 
         loadingPostRenderer.setContainerSize(getWidth(), getHeight());
-        ViewListenerDistributor.getSingletonInstance().addViewListener(this);
+        UIViewListenerDistributor.getSingletonInstance().addViewListener(this);
     }
 
     /**
@@ -178,7 +178,7 @@ public class MainImagePanel extends BasicImagePanel implements ViewListener {
      */
 
     @Override
-    public void viewChanged(View sender, ChangeEvent aEvent) {
+    public void UIviewChanged(View sender, ChangeEvent aEvent) {
         // checks if at least one layer is available - if not the post renderer
         // for displaying that no image was selected will be added
         if (aEvent.reasonOccurred(LayerChangedReason.class)) {

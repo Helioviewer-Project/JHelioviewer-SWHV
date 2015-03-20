@@ -4,7 +4,6 @@ import java.util.ArrayList;
 
 import org.helioviewer.viewmodel.changeevent.ChangeEvent;
 import org.helioviewer.viewmodel.view.View;
-import org.helioviewer.viewmodel.view.ViewListener;
 
 /**
  * This class distributes changes from the associated view chain to all
@@ -16,17 +15,17 @@ import org.helioviewer.viewmodel.view.ViewListener;
  *
  * @author Markus Langenberg
  */
-public class ViewListenerDistributor {
+public class UIViewListenerDistributor {
 
-    private final static ViewListenerDistributor singletonObject = new ViewListenerDistributor();
-    private final ArrayList<ViewListener> listeners = new ArrayList<ViewListener>();
+    private final static UIViewListenerDistributor singletonObject = new UIViewListenerDistributor();
+    private final ArrayList<UIViewListener> listeners = new ArrayList<UIViewListener>();
 
     /**
      * Returns the only instance of this class.
      *
      * @return the only instance of this class.
      */
-    public static ViewListenerDistributor getSingletonInstance() {
+    public static UIViewListenerDistributor getSingletonInstance() {
         return singletonObject;
     }
 
@@ -40,7 +39,7 @@ public class ViewListenerDistributor {
      *            the listener to add
      * @see #removeViewListener(ViewListener)
      */
-    public void addViewListener(ViewListener l) {
+    public void addViewListener(UIViewListener l) {
         listeners.add(l);
     }
 
@@ -54,7 +53,7 @@ public class ViewListenerDistributor {
      *            the listener to remove
      * @see #addViewListener(ViewListener)
      */
-    public void removeViewListener(ViewListener l) {
+    public void removeViewListener(UIViewListener l) {
         listeners.remove(l);
     }
 
@@ -73,8 +72,8 @@ public class ViewListenerDistributor {
      *            event which contains the associated reasons.
      */
     public void viewChanged(View sender, ChangeEvent aEvent) {
-        for (ViewListener listener : listeners) {
-            listener.viewChanged(sender, aEvent);
+        for (UIViewListener listener : listeners) {
+            listener.UIviewChanged(sender, aEvent);
         }
     }
 

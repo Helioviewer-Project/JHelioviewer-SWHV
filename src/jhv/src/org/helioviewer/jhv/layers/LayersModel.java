@@ -23,7 +23,8 @@ import org.helioviewer.base.math.Interval;
 import org.helioviewer.base.message.Message;
 import org.helioviewer.jhv.Settings;
 import org.helioviewer.jhv.gui.ImageViewerGui;
-import org.helioviewer.jhv.gui.ViewListenerDistributor;
+import org.helioviewer.jhv.gui.UIViewListener;
+import org.helioviewer.jhv.gui.UIViewListenerDistributor;
 import org.helioviewer.jhv.gui.components.MoviePanel;
 import org.helioviewer.jhv.gui.dialogs.MetaDataDialog;
 import org.helioviewer.jhv.io.APIRequestManager;
@@ -51,7 +52,6 @@ import org.helioviewer.viewmodel.view.RegionView;
 import org.helioviewer.viewmodel.view.TimedMovieView;
 import org.helioviewer.viewmodel.view.View;
 import org.helioviewer.viewmodel.view.ViewHelper;
-import org.helioviewer.viewmodel.view.ViewListener;
 import org.helioviewer.viewmodel.view.jp2view.JHVJP2View;
 import org.helioviewer.viewmodel.view.jp2view.datetime.ImmutableDateTime;
 import org.xml.sax.Attributes;
@@ -75,7 +75,7 @@ import org.xml.sax.helpers.XMLReaderFactory;
  *
  * @author Malte Nuhn
  */
-public class LayersModel implements ViewListener {
+public class LayersModel implements UIViewListener {
 
     private static final LayersModel layersModel = new LayersModel();
 
@@ -100,7 +100,7 @@ public class LayersModel implements ViewListener {
     }
 
     private LayersModel() {
-        ViewListenerDistributor.getSingletonInstance().addViewListener(this);
+        UIViewListenerDistributor.getSingletonInstance().addViewListener(this);
     }
 
     /**
@@ -673,7 +673,7 @@ public class LayersModel implements ViewListener {
      *
      */
     @Override
-    public void viewChanged(View sender, ChangeEvent aEvent) {
+    public void UIviewChanged(View sender, ChangeEvent aEvent) {
         handleSubImageDataChanges(sender, aEvent);
         handleTimestampChanges(sender, aEvent);
         handleViewportPositionChanges(sender, aEvent);
@@ -730,20 +730,29 @@ public class LayersModel implements ViewListener {
      * @param view
      *            - View that can be associated with the layer in question
      */
-    public void downloadLayer(final View view) {
+    public void downloadLayer(View view) {
         if (view == null) {
             return;
         }
 
-        final ImageInfoView infoView = view.getAdapter(ImageInfoView.class);
+        ImageInfoView infoView = view.getAdapter(ImageInfoView.class);
 
         Thread downloadThread = new Thread(new Runnable() {
+            private ImageInfoView theInfoView;
+            private View theSubView;
+
             @Override
             public void run() {
-                downloadFromJPIP(infoView);
-                ViewListenerDistributor.getSingletonInstance().viewChanged(infoView, new ChangeEvent(new LayerChangedReason(infoView, LayerChangeType.LAYER_DOWNLOADED, view)));
+                downloadFromJPIP(theInfoView, theSubView);
             }
-        }, "DownloadFromJPIPThread");
+
+            public Runnable init(ImageInfoView theInfoView, View theSubView) {
+                this.theInfoView = theInfoView;
+                this.theSubView = theSubView;
+                return this;
+            }
+        }.init(infoView, view), "DownloadFromJPIPThread");
+
         downloadThread.start();
     }
 
@@ -753,28 +762,29 @@ public class LayersModel implements ViewListener {
      * Changes the source of the ImageInfoView afterwards, since a local file is
      * always faster.
      */
-    private void downloadFromJPIP(ImageInfoView view) {
-        if (view == null) {
+    private void downloadFromJPIP(ImageInfoView infoView, View subView) {
+        if (infoView == null) {
             return;
         }
 
         FileDownloader fileDownloader = new FileDownloader();
-        URI source = view.getAdapter(ImageInfoView.class).getDownloadURI();
+        URI downloadUri = infoView.getDownloadURI();
+        URI uri = infoView.getUri();
 
         // the http server to download the file from is unknown
-        if (view.getAdapter(ImageInfoView.class).getDownloadURI().equals(view.getAdapter(ImageInfoView.class).getUri()) && !view.getAdapter(ImageInfoView.class).getDownloadURI().toString().contains("delphi.nascom.nasa.gov")) {
-            String inputValue = JOptionPane.showInputDialog("To download this file, please specify a concurrent HTTP server address to the JPIP server: ", view.getAdapter(ImageInfoView.class).getUri());
+        if (downloadUri.equals(uri) && !downloadUri.toString().contains("delphi.nascom.nasa.gov")) {
+            String inputValue = JOptionPane.showInputDialog("To download this file, please specify a concurrent HTTP server address to the JPIP server: ", uri);
             if (inputValue != null) {
                 try {
-                    source = new URI(inputValue);
+                    downloadUri = new URI(inputValue);
                 } catch (URISyntaxException e) {
                 }
             }
         }
 
-        File downloadDestination = fileDownloader.getDefaultDownloadLocation(view.getAdapter(ImageInfoView.class).getUri());
+        File downloadDestination = fileDownloader.getDefaultDownloadLocation(uri);
         try {
-            if (!fileDownloader.get(source, downloadDestination, "Downloading " + view.getAdapter(ImageInfoView.class).getName())) {
+            if (!fileDownloader.get(downloadUri, downloadDestination, "Downloading " + infoView.getName())) {
                 return;
             }
         } catch (IOException e) {
@@ -782,10 +792,22 @@ public class LayersModel implements ViewListener {
             return;
         }
 
-        /*
-         * if(view.getAdapter(ImageInfoView.class).getUri().getScheme().
-         * equalsIgnoreCase("file")) { this.fireLayerChanged(getNumLayers()); }
-         */
+        EventQueue.invokeLater(new Runnable() {
+            private ImageInfoView theInfoView;
+            private View theSubView;
+
+            @Override
+            public void run() {
+                UIViewListenerDistributor.getSingletonInstance().viewChanged(theInfoView,
+                    new ChangeEvent(new LayerChangedReason(theInfoView, LayerChangeType.LAYER_DOWNLOADED, theSubView)));
+            }
+
+            public Runnable init(ImageInfoView theInfoView, View theSubView) {
+                this.theInfoView = theInfoView;
+                this.theSubView = theSubView;
+                return this;
+            }
+        }.init(infoView, subView));
     }
 
     /**

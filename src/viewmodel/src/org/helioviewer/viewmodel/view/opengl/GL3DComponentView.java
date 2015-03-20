@@ -20,7 +20,7 @@ import org.helioviewer.gl3d.scenegraph.GL3DState;
 import org.helioviewer.jhv.display.DisplayListener;
 import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.gui.ImageViewerGui;
-import org.helioviewer.jhv.gui.ViewListenerDistributor;
+import org.helioviewer.jhv.gui.UIViewListenerDistributor;
 import org.helioviewer.jhv.gui.dialogs.ExportMovieDialog;
 import org.helioviewer.jhv.layers.LayersModel;
 import org.helioviewer.viewmodel.changeevent.ChangeEvent;
@@ -306,7 +306,7 @@ public class GL3DComponentView extends AbstractComponentView implements GLEventL
             Displayer.display();
         }
 
-        ViewListenerDistributor.getSingletonInstance().viewChanged(this, aEvent);
+        UIViewListenerDistributor.getSingletonInstance().viewChanged(sender, aEvent);
     }
 
     @Override

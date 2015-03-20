@@ -38,7 +38,8 @@ import org.helioviewer.jhv.gui.ButtonCreator;
 import org.helioviewer.jhv.gui.IconBank;
 import org.helioviewer.jhv.gui.IconBank.JHVIcon;
 import org.helioviewer.jhv.gui.ImageViewerGui;
-import org.helioviewer.jhv.gui.ViewListenerDistributor;
+import org.helioviewer.jhv.gui.UIViewListener;
+import org.helioviewer.jhv.gui.UIViewListenerDistributor;
 import org.helioviewer.jhv.layers.LayersListener;
 import org.helioviewer.jhv.layers.LayersModel;
 import org.helioviewer.viewmodel.changeevent.CacheStatusChangedReason;
@@ -54,7 +55,6 @@ import org.helioviewer.viewmodel.view.MovieView;
 import org.helioviewer.viewmodel.view.MovieView.AnimationMode;
 import org.helioviewer.viewmodel.view.TimedMovieView;
 import org.helioviewer.viewmodel.view.View;
-import org.helioviewer.viewmodel.view.ViewListener;
 import org.helioviewer.viewmodel.view.jp2view.datetime.ImmutableDateTime;
 
 /**
@@ -80,7 +80,7 @@ import org.helioviewer.viewmodel.view.jp2view.datetime.ImmutableDateTime;
  * @author Malte Nuhn
  *
  */
-public class MoviePanel extends JPanel implements ActionListener, ChangeListener, MouseListener, MouseWheelListener, ViewListener {
+public class MoviePanel extends JPanel implements ActionListener, ChangeListener, MouseListener, MouseWheelListener, UIViewListener {
 
     private static final long serialVersionUID = 1L;
 
@@ -214,7 +214,7 @@ public class MoviePanel extends JPanel implements ActionListener, ChangeListener
             timeSlider.setCompleteCachedUntil(((CachedMovieView) view).getImageCacheStatus().getImageCachedCompletelyUntil());
         }
 
-        ViewListenerDistributor.getSingletonInstance().addViewListener(this);
+        UIViewListenerDistributor.getSingletonInstance().addViewListener(this);
         this.setEnabled(true);
     }
 
@@ -580,7 +580,7 @@ public class MoviePanel extends JPanel implements ActionListener, ChangeListener
     }
 
     @Override
-    public void viewChanged(View sender, ChangeEvent aEvent) {
+    public void UIviewChanged(View sender, ChangeEvent aEvent) {
         //Log.debug("Sender : " + sender);
         //Log.debug("Event : " + aEvent);
         // Stop movie, when the layer was removed.
