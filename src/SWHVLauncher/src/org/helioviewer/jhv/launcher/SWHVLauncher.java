@@ -1,5 +1,7 @@
 package org.helioviewer.jhv.launcher;
 
+import java.awt.EventQueue;
+
 import org.helioviewer.base.JavaCompatibility;
 import org.helioviewer.jhv.JavaHelioViewer;
 import org.helioviewer.jhv.JavaHelioViewerLauncher;
@@ -32,8 +34,16 @@ public class SWHVLauncher {
 
         JavaHelioViewer.main(args2, new SWEKPlugin(false));
 
-        PluginManager.getSingletonInstance().addPlugin(EVEPluginLauncher.class.getClassLoader(), new EVEPlugin(), null);
-        PluginManager.getSingletonInstance().addPlugin(SWHVHEKPlugin.class.getClassLoader(), new SWHVHEKPlugin(), null);
+        EventQueue.invokeLater(new Runnable() {
+
+            @Override
+            public void run() {
+                // TODO Auto-generated method stub
+                PluginManager.getSingletonInstance().addPlugin(EVEPluginLauncher.class.getClassLoader(), new EVEPlugin(), null);
+                PluginManager.getSingletonInstance().addPlugin(SWHVHEKPlugin.class.getClassLoader(), new SWHVHEKPlugin(), null);
+            }
+
+        });
     }
 
 }
