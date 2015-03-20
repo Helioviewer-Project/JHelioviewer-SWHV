@@ -138,15 +138,15 @@ public class JPIPDataInputStream {
             // Assign larger array if needed.
             seg.data = seg.data.length < seg.length ? new byte[seg.length] : seg.data;
 
-            int i, b;
-            for (i = 0; i < seg.length; i++) {
-                if ((b = in.read()) == -1)
-                    break;
-                seg.data[i] = (byte) b;
-            }
+            int offset = 0;
+            int len = seg.length;
 
-            if (i < seg.length) {
-                throw new EOFException("EOF reached before read " + seg.length + " bytes");
+            while (len != 0) {
+                int read = in.read(seg.data, offset, len);
+                if (read == -1)
+                    throw new EOFException("Unexpected EOF");
+                len -= read;
+                offset += read;
             }
         }
 
