@@ -50,7 +50,6 @@ public class GL3DEarthCamera extends GL3DSolarRotationTrackingTrackballCamera im
     @Override
     public void timeChanged(Date date) {
         if (!this.getTrackingMode()) {
-            this.setTime(date.getTime());
             updateRotation(date);
         }
     }
@@ -63,6 +62,7 @@ public class GL3DEarthCamera extends GL3DSolarRotationTrackingTrackballCamera im
         this.localRotation.rotate(GL3DQuatd.createRotation(currentRotation, GL3DVec3d.YAxis));
 
         this.updateCameraTransformation();
+        this.setTime(date.getTime());
     }
 
 }
