@@ -12,15 +12,15 @@ import org.helioviewer.jhv.data.datatype.event.JHVEventHighlightListener;
 
 public class Displayer implements JHVEventHighlightListener {
 
-    private final static Displayer instance = new Displayer();
+    private static final Displayer instance = new Displayer();
 
     public static Displayer getSingletonInstance() {
         return instance;
     }
 
-    private final static ArrayList<DisplayListener> listeners = new ArrayList<DisplayListener>();
-    private final static ArrayList<RenderListener> renderListeners = new ArrayList<RenderListener>();
-    private final static ArrayList<TimeListener> timeListeners = new ArrayList<TimeListener>();
+    private static final ArrayList<DisplayListener> listeners = new ArrayList<DisplayListener>();
+    private static final ArrayList<RenderListener> renderListeners = new ArrayList<RenderListener>();
+    private static final ArrayList<TimeListener> timeListeners = new ArrayList<TimeListener>();
 
     private static boolean torender = false;
     private static boolean todisplay = false;
@@ -58,31 +58,31 @@ public class Displayer implements JHVEventHighlightListener {
         }
     }
 
-    public void addListener(final DisplayListener listener) {
+    public static void addListener(final DisplayListener listener) {
         listeners.add(listener);
     }
 
-    public void removeListener(final DisplayListener listener) {
+    public static void removeListener(final DisplayListener listener) {
         listeners.remove(listener);
     }
 
-    public void removeListeners() {
+    public static void removeListeners() {
         listeners.clear();
     }
 
-    public void addRenderListener(final RenderListener renderListener) {
+    public static void addRenderListener(final RenderListener renderListener) {
         renderListeners.add(renderListener);
     }
 
-    public void removeRenderListener(final RenderListener renderListener) {
+    public static void removeRenderListener(final RenderListener renderListener) {
         renderListeners.remove(renderListener);
     }
 
-    public void addTimeListener(final TimeListener timeListener) {
+    public static void addTimeListener(final TimeListener timeListener) {
         timeListeners.add(timeListener);
     }
 
-    public void removeTimeListener(final TimeListener timeListener) {
+    public static void removeTimeListener(final TimeListener timeListener) {
         timeListeners.remove(timeListener);
     }
 

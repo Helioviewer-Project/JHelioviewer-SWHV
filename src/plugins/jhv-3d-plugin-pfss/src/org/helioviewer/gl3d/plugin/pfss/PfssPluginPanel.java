@@ -302,6 +302,7 @@ public class PfssPluginPanel extends OverlayPanel implements ActionListener, Lay
 
     @Override
     public void timestampChanged(int idx) {
+
         // Not used anymore
         TimedMovieView masterView = LinkedMovieManager.getActiveInstance().getMasterMovie();
         if (masterView != null) {

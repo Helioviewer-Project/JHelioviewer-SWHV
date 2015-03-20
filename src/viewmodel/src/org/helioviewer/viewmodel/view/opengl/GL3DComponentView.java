@@ -68,7 +68,7 @@ public class GL3DComponentView extends AbstractComponentView implements GLEventL
     @Override
     public void activate() {
         canvas.addGLEventListener(this);
-        Displayer.getSingletonInstance().addListener(this);
+        Displayer.addListener(this);
     }
 
     @Override
@@ -79,7 +79,7 @@ public class GL3DComponentView extends AbstractComponentView implements GLEventL
         }
         tileRenderer = null;
 
-        Displayer.getSingletonInstance().removeListener(this);
+        Displayer.removeListener(this);
         canvas.removeGLEventListener(this);
     }
 
