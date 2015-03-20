@@ -8,8 +8,6 @@ import java.util.Map;
 
 import org.helioviewer.base.logging.Log;
 import org.helioviewer.base.math.Interval;
-import org.helioviewer.jhv.layers.LayersListener;
-import org.helioviewer.jhv.layers.LayersModel;
 import org.helioviewer.plugins.eveplugin.base.Range;
 import org.helioviewer.plugins.eveplugin.controller.DrawController;
 import org.helioviewer.plugins.eveplugin.controller.ZoomController;
@@ -27,13 +25,11 @@ import org.helioviewer.plugins.eveplugin.model.PlotAreaSpace;
 import org.helioviewer.plugins.eveplugin.model.PlotAreaSpaceListener;
 import org.helioviewer.plugins.eveplugin.model.PlotAreaSpaceManager;
 import org.helioviewer.plugins.eveplugin.settings.EVEAPI.API_RESOLUTION_AVERAGES;
-import org.helioviewer.viewmodel.view.View;
-import org.helioviewer.viewmodel.view.jp2view.datetime.ImmutableDateTime;
 
 /**
  * @author Stephan Pagel
  * */
-public class EVEDrawController implements BandControllerListener, ZoomControllerListener, EVECacheControllerListener, LayersListener,
+public class EVEDrawController implements BandControllerListener, ZoomControllerListener, EVECacheControllerListener,
         PlotAreaSpaceListener {
 
     // //////////////////////////////////////////////////////////////////////////////
@@ -65,7 +61,7 @@ public class EVEDrawController implements BandControllerListener, ZoomController
         BandController.getSingletonInstance().addBandControllerListener(this);
         ZoomController.getSingletonInstance().addZoomControllerListener(this);
         EVECacheController.getSingletonInstance().addControllerListener(this);
-        LayersModel.getSingletonInstance().addLayersListener(this);
+
         drawController = DrawController.getSingletonInstance();
         eveDrawableElementMap = new HashMap<String, EVEDrawableElement>();
         yAxisElementMap = new HashMap<String, YAxisElement>();
@@ -278,12 +274,6 @@ public class EVEDrawController implements BandControllerListener, ZoomController
         }
     }
 
-    private void fireRedrawRequestMovieFrameChanged(final Date time) {
-        for (EVEDrawControllerListener listener : listeners) {
-            listener.drawRequest(time);
-        }
-    }
-
     private final DownloadedData retrieveData(final Band band, final Interval<Date> interval) {
         return band.getBandType().getDataDownloader().downloadData(band, interval);
     }
@@ -366,49 +356,6 @@ public class EVEDrawController implements BandControllerListener, ZoomController
                 fireRedrawRequest(true);
             }
         }
-    }
-
-    // //////////////////////////////////////////////////////////////////////////////
-    // Layers Listener
-    // //////////////////////////////////////////////////////////////////////////////
-
-    @Override
-    public void layerAdded(int idx) {
-    }
-
-    @Override
-    public void layerRemoved(View oldView, int oldIdx) {
-    }
-
-    @Override
-    public void layerChanged(int idx) {
-    }
-
-    @Override
-    public void activeLayerChanged(int idx) {
-    }
-
-    @Override
-    public void viewportGeometryChanged() {
-    }
-
-    @Override
-    public void timestampChanged(final int idx) {
-        // long start = System.currentTimeMillis();
-        final ImmutableDateTime timestamp = LayersModel.getSingletonInstance().getCurrentFrameTimestamp(idx);
-        if (timestamp != null) {
-            fireRedrawRequestMovieFrameChanged(timestamp.getTime());
-        }
-        // Log.debug("timestamp changed time: " +
-        // (System.currentTimeMillis() - start));
-    }
-
-    @Override
-    public void subImageDataChanged() {
-    }
-
-    @Override
-    public void layerDownloaded(int idx) {
     }
 
     @Override
