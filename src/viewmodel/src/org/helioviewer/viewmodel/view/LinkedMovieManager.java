@@ -31,21 +31,6 @@ import org.helioviewer.viewmodel.view.jp2view.datetime.ImmutableDateTime;
  */
 public class LinkedMovieManager {
 
-    // public static class Instance {
-    // private static int nextID = 0;
-    // private int id;
-    //
-    // public Instance() {
-    // id = getNextID();
-    // }
-    //
-    // private static synchronized int getNextID() {
-    // return nextID++;
-    // }
-    // }
-    //
-    // public static final Instance DEFAULTINSTANCE = new Instance();
-
     private static Vector<LinkedMovieManager> instances = new Vector<LinkedMovieManager>();
     private static int activeInstance = 0;
     private final LinkedList<TimedMovieView> linkedMovies = new LinkedList<TimedMovieView>();
