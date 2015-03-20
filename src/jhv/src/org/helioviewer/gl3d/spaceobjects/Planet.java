@@ -2,9 +2,7 @@ package org.helioviewer.gl3d.spaceobjects;
 
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.List;
 
-import org.helioviewer.base.logging.Log;
 import org.helioviewer.base.physics.Astronomy;
 import org.helioviewer.base.physics.Constants;
 import org.helioviewer.gl3d.camera.GL3DFollowObjectCamera;
@@ -15,24 +13,20 @@ import org.helioviewer.gl3d.math.GL3DVec4f;
 import org.helioviewer.gl3d.scenegraph.GL3DDrawBits.Bit;
 import org.helioviewer.gl3d.scenegraph.GL3DState;
 import org.helioviewer.gl3d.scenegraph.visuals.GL3DSphere;
+import org.helioviewer.jhv.display.Displayer;
+import org.helioviewer.jhv.display.TimeListener;
 import org.helioviewer.jhv.layers.LayersListener;
 import org.helioviewer.jhv.layers.LayersModel;
-import org.helioviewer.viewmodel.changeevent.ChangeEvent;
-import org.helioviewer.viewmodel.changeevent.TimestampChangedReason;
-import org.helioviewer.viewmodel.view.LinkedMovieManager;
-import org.helioviewer.viewmodel.view.TimedMovieView;
 import org.helioviewer.viewmodel.view.View;
-import org.helioviewer.viewmodel.view.ViewListener;
 import org.helioviewer.viewmodel.view.jp2view.JHVJPXView;
 
-public class Planet extends GL3DSphere implements LayersListener, ViewListener, GL3DPositionLoadingListener {
+public class Planet extends GL3DSphere implements LayersListener, TimeListener, GL3DPositionLoadingListener {
 
     private final GL3DPositionLoadingPlanet positionLoading;
     private final GL3DPositionLoadingPlanet positionLoadingalt;
 
     private Date beginDate;
     private Date endDate;
-    private Date currentDate;
     private boolean loaded;
     private GL3DVec3d position;
     private final GL3DSpaceObject spaceObject;
@@ -51,11 +45,13 @@ public class Planet extends GL3DSphere implements LayersListener, ViewListener, 
         positionLoading.requestData();
         this.layerAdded(0);
         this.drawBits.set(Bit.Wireframe, true);
+
+        // Displayer.addTimeListener(this); - not active
     }
 
     @Override
     public void layerAdded(int idx) {
-        List<Date> requestDates = new ArrayList<Date>();
+        ArrayList<Date> requestDates = new ArrayList<Date>();
 
         View activeView = LayersModel.getSingletonInstance().getActiveView();
         JHVJPXView jpxView = activeView.getAdapter(JHVJPXView.class);
@@ -107,18 +103,15 @@ public class Planet extends GL3DSphere implements LayersListener, ViewListener, 
     }
 
     @Override
-    public void viewChanged(View sender, ChangeEvent aEvent) {
-        TimestampChangedReason timestampReason = aEvent.getLastChangedReasonByType(TimestampChangedReason.class);
-        if ((timestampReason != null) && (timestampReason.getView() instanceof TimedMovieView) && LinkedMovieManager.getActiveInstance().isMaster((TimedMovieView) timestampReason.getView())) {
-            currentDate = timestampReason.getNewDateTime().getTime();
-            updatePosition();
-        }
+    public void timeChanged(Date date) {
+        updatePosition(date);
     }
 
-    private void updatePosition() {
+    private void updatePosition(Date date) {
         if (this.positionLoading.isLoaded() && this.positionLoadingalt.isLoaded()) {
-            GL3DVec3d position = this.positionLoading.getInterpolatedPosition(currentDate.getTime());
-            GL3DVec3d positionalt = this.positionLoadingalt.getInterpolatedPosition(currentDate.getTime());
+            long time = date.getTime();
+            GL3DVec3d position = this.positionLoading.getInterpolatedPosition(time);
+            GL3DVec3d positionalt = this.positionLoadingalt.getInterpolatedPosition(time);
 
             this.position = new GL3DVec3d(position.x - positionalt.x, position.y - positionalt.y, position.z - positionalt.z);
         }
