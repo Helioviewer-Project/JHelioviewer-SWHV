@@ -63,11 +63,6 @@ public interface LayersListener {
     public void timestampChanged(int idx);
 
     /**
-     * Gets fired if any image data changed.
-     */
-    public void subImageDataChanged();
-
-    /**
      * Gets fired if a remote jp2 image or movie was downloaded and now becomes
      * a local image
      * 

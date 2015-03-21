@@ -24,10 +24,6 @@ import org.helioviewer.viewmodel.view.View;
  * */
 public class ZoomController implements PlotAreaSpaceListener, LayersListener {
 
-    // //////////////////////////////////////////////////////////////////////////////
-    // Definitions
-    // //////////////////////////////////////////////////////////////////////////////
-
     /** the sole instance of this class */
     private static final ZoomController singletonInstance = new ZoomController();
 
@@ -43,10 +39,6 @@ public class ZoomController implements PlotAreaSpaceListener, LayersListener {
     private API_RESOLUTION_AVERAGES selectedResolution = API_RESOLUTION_AVERAGES.MINUTE_1;
 
     private final PlotAreaSpaceManager plotAreaSpaceManager;
-
-    // //////////////////////////////////////////////////////////////////////////////
-    // Methods
-    // //////////////////////////////////////////////////////////////////////////////
 
     /**
      * The private constructor to support the singleton pattern.
@@ -79,7 +71,6 @@ public class ZoomController implements PlotAreaSpaceListener, LayersListener {
     }
 
     public void setAvailableInterval(final Interval<Date> interval) {
-
         availableInterval = makeCompleteDay(interval);
         // Log.debug("New available interval : " + availableInterval);
         fireAvailableIntervalChanged(availableInterval);
@@ -176,7 +167,6 @@ public class ZoomController implements PlotAreaSpaceListener, LayersListener {
             }
 
             updatePlotAreaSpace(selectedInterval);
-
             fireSelectedIntervalChanged(selectedInterval, useFullValueSpace);
 
             return selectedInterval;
@@ -309,7 +299,6 @@ public class ZoomController implements PlotAreaSpaceListener, LayersListener {
 
     public void setSelectedResolution(final API_RESOLUTION_AVERAGES resolution) {
         selectedResolution = resolution;
-
         fireSelectedResolutionChanged(selectedResolution);
     }
 
@@ -343,7 +332,6 @@ public class ZoomController implements PlotAreaSpaceListener, LayersListener {
                 }
             }
         }
-
     }
 
     private void updatePlotAreaSpace(Interval<Date> selectedInterval) {
@@ -371,7 +359,6 @@ public class ZoomController implements PlotAreaSpaceListener, LayersListener {
 
             setAvailableInterval(new Interval<Date>(tempStartDate, tempEndDate));
         }
-
     }
 
     @Override
@@ -395,42 +382,31 @@ public class ZoomController implements PlotAreaSpaceListener, LayersListener {
     @Override
     public void layerRemoved(View oldView, int oldIdx) {
         // TODO Auto-generated method stub
-
     }
 
     @Override
     public void layerChanged(int idx) {
         // TODO Auto-generated method stub
-
     }
 
     @Override
     public void activeLayerChanged(int idx) {
         // TODO Auto-generated method stub
-
     }
 
     @Override
     public void viewportGeometryChanged() {
         // TODO Auto-generated method stub
-
     }
 
     @Override
     public void timestampChanged(int idx) {
         // TODO Auto-generated method stub
-
-    }
-
-    @Override
-    public void subImageDataChanged() {
-        // TODO Auto-generated method stub
-
     }
 
     @Override
     public void layerDownloaded(int idx) {
         // TODO Auto-generated method stub
-
     }
+
 }

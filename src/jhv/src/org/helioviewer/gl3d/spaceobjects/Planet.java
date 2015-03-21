@@ -92,10 +92,6 @@ public class Planet extends GL3DSphere implements LayersListener, TimeListener, 
     }
 
     @Override
-    public void subImageDataChanged() {
-    }
-
-    @Override
     public void layerDownloaded(int idx) {
     }
 

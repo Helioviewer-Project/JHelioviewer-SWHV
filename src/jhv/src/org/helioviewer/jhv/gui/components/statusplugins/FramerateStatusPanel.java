@@ -51,8 +51,4 @@ public class FramerateStatusPanel extends ViewStatusPanelPlugin {
         updateFramerate();
     }
 
-    public void subImageDataChanged() {
-        updateFramerate();
-    }
-
 }

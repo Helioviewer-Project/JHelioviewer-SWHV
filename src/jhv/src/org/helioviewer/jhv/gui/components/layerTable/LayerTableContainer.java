@@ -92,12 +92,6 @@ public class LayerTableContainer extends JPanel implements LayersListener {
     /**
      * {@inheritDoc}
      */
-    public void subImageDataChanged() {
-    }
-
-    /**
-     * {@inheritDoc}
-     */
     public void timestampChanged(int idx) {
     }
 

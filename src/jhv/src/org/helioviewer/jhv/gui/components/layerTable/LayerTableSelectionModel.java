@@ -81,12 +81,6 @@ public class LayerTableSelectionModel extends DefaultListSelectionModel implemen
     /**
      * {@inheritDoc}
      */
-    public void subImageDataChanged() {
-    }
-
-    /**
-     * {@inheritDoc}
-     */
     public void timestampChanged(int idx) {
     }
 

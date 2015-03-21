@@ -228,10 +228,6 @@ public class PlotsControlPanel extends JPanel implements ZoomControllerListener,
     }
 
     @Override
-    public void subImageDataChanged() {
-    }
-
-    @Override
     public void layerDownloaded(int idx) {
     }
 

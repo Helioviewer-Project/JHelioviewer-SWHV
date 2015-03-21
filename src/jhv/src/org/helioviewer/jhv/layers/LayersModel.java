@@ -35,7 +35,6 @@ import org.helioviewer.viewmodel.changeevent.ChangedReason;
 import org.helioviewer.viewmodel.changeevent.LayerChangedReason;
 import org.helioviewer.viewmodel.changeevent.LayerChangedReason.LayerChangeType;
 import org.helioviewer.viewmodel.changeevent.RegionChangedReason;
-import org.helioviewer.viewmodel.changeevent.SubImageDataChangedReason;
 import org.helioviewer.viewmodel.changeevent.TimestampChangedReason;
 import org.helioviewer.viewmodel.changeevent.ViewChainChangedReason;
 import org.helioviewer.viewmodel.changeevent.ViewportChangedReason;
@@ -664,12 +663,6 @@ public class LayersModel implements UIViewListener {
         }
     }
 
-    private void handleSubImageDataChanges(View sender, ChangeEvent aEvent) {
-        if (aEvent.reasonOccurred(SubImageDataChangedReason.class)) {
-            this.fireSubImageDataChanged();
-        }
-    }
-
     private void handleViewChainChanges(View sender, ChangeEvent aEvent) {
         if (aEvent.getLastChangedReasonByType(ViewChainChangedReason.class) != null) {
             this.fireAllLayersChanged();
@@ -684,7 +677,6 @@ public class LayersModel implements UIViewListener {
      */
     @Override
     public void UIviewChanged(View sender, ChangeEvent aEvent) {
-        handleSubImageDataChanges(sender, aEvent);
         handleTimestampChanges(sender, aEvent);
         handleViewportPositionChanges(sender, aEvent);
         handleLayerChanges(sender, aEvent);
@@ -1313,15 +1305,6 @@ public class LayersModel implements UIViewListener {
     private void fireTimestampChanged(final int idx) {
         for (LayersListener ll : layerListeners) {
             ll.timestampChanged(idx);
-        }
-    }
-
-    /**
-     * Notify all LayersListeners
-     */
-    private void fireSubImageDataChanged() {
-        for (LayersListener ll : layerListeners) {
-            ll.subImageDataChanged();
         }
     }
 

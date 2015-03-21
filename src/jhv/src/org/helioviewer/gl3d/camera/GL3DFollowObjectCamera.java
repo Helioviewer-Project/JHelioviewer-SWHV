@@ -226,10 +226,6 @@ public class GL3DFollowObjectCamera extends GL3DSolarRotationTrackingTrackballCa
     }
 
     @Override
-    public void subImageDataChanged() {
-    }
-
-    @Override
     public void layerDownloaded(int idx) {
     }
 

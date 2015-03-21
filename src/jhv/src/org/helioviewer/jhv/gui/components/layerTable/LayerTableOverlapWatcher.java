@@ -131,13 +131,6 @@ public class LayerTableOverlapWatcher implements LayersListener {
      * {@inheritDoc}
      */
     @Override
-    public void subImageDataChanged() {
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
     public void layerChanged(int idx) {
     }
 

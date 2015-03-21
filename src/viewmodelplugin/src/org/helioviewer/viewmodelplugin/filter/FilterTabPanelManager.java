@@ -214,10 +214,6 @@ public class FilterTabPanelManager implements LayersListener {
     }
 
     @Override
-    public void subImageDataChanged() {
-    }
-
-    @Override
     public void layerDownloaded(int idx) {
     }
 
