@@ -84,10 +84,4 @@ public class LayerTableSelectionModel extends DefaultListSelectionModel implemen
     public void timestampChanged(int idx) {
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    public void layerDownloaded(int idx) {
-    }
-
 }

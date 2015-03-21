@@ -353,13 +353,6 @@ public class ImageSelectorPanel extends JPanel implements LayersListener {
     public void viewportGeometryChanged() {
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void layerDownloaded(int idx) {
-    }
-
     public ImageDataPanel getObservationImagePane() {
         return observationImagePane;
     }

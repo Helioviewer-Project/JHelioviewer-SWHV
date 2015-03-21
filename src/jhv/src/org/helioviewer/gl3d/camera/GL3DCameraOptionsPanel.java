@@ -204,9 +204,4 @@ public class GL3DCameraOptionsPanel extends JPanel implements GL3DCameraSelectio
         // TODO Auto-generated method stub
     }
 
-    @Override
-    public void layerDownloaded(int idx) {
-        // TODO Auto-generated method stub
-    }
-
 }

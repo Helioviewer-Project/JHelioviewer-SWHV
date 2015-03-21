@@ -213,8 +213,4 @@ public class FilterTabPanelManager implements LayersListener {
     public void timestampChanged(int idx) {
     }
 
-    @Override
-    public void layerDownloaded(int idx) {
-    }
-
 }

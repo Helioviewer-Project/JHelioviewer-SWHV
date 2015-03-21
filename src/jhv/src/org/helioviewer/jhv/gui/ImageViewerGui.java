@@ -39,7 +39,6 @@ import org.helioviewer.jhv.gui.components.SideContentPane;
 import org.helioviewer.jhv.gui.components.StatusPanel;
 import org.helioviewer.jhv.gui.components.TopToolBar;
 import org.helioviewer.jhv.gui.components.statusplugins.FramerateStatusPanel;
-import org.helioviewer.jhv.gui.components.statusplugins.JPIPStatusPanel;
 import org.helioviewer.jhv.gui.components.statusplugins.PositionStatusPanel;
 import org.helioviewer.jhv.gui.components.statusplugins.ZoomStatusPanel;
 import org.helioviewer.jhv.gui.controller.ZoomController;
@@ -173,12 +172,10 @@ public class ImageViewerGui {
             // Position panel only needed in 2D View State
             // if(this.currentState.getType().equals(ViewStateEnum.View2D))
             positionStatusPanel = new PositionStatusPanel(getMainImagePanel());
-            JPIPStatusPanel jpipStatusPanel = new JPIPStatusPanel();
 
             StatusPanel statusPanel = new StatusPanel(SIDE_PANEL_WIDTH + 20, 5);
             statusPanel.addPlugin(zoomStatusPanel, StatusPanel.Alignment.LEFT);
             statusPanel.addPlugin(framerateStatus, StatusPanel.Alignment.LEFT);
-            statusPanel.addPlugin(jpipStatusPanel, StatusPanel.Alignment.RIGHT);
             statusPanel.addPlugin(positionStatusPanel, StatusPanel.Alignment.RIGHT);
 
             contentPanel.add(statusPanel, BorderLayout.PAGE_END);
