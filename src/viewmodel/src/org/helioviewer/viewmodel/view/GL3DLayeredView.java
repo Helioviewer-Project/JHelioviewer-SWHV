@@ -226,7 +226,6 @@ public class GL3DLayeredView extends AbstractView implements LayeredView, ViewLi
      */
     @Override
     public void viewChanged(View sender, ChangeEvent event) {
-
         notifyViewListeners(event);
     }
 
@@ -274,6 +273,7 @@ public class GL3DLayeredView extends AbstractView implements LayeredView, ViewLi
             View layerView = this.getLayer(i);
             if (layerView instanceof GL3DView) {
                 ((GL3DView) layerView).renderGL(gl, true);
+                System.out.println(layerView);
             }
         }
     }

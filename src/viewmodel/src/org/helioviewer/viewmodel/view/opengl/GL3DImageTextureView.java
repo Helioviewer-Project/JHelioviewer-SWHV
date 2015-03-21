@@ -9,7 +9,6 @@ import org.helioviewer.base.physics.Astronomy;
 import org.helioviewer.gl3d.scenegraph.GL3DState;
 import org.helioviewer.viewmodel.changeevent.CacheStatusChangedReason;
 import org.helioviewer.viewmodel.changeevent.ChangeEvent;
-import org.helioviewer.viewmodel.changeevent.ImageTextureRecapturedReason;
 import org.helioviewer.viewmodel.changeevent.RegionChangedReason;
 import org.helioviewer.viewmodel.changeevent.RegionUpdatedReason;
 import org.helioviewer.viewmodel.changeevent.SubImageDataChangedReason;
@@ -18,7 +17,6 @@ import org.helioviewer.viewmodel.metadata.HelioviewerOcculterMetaData;
 import org.helioviewer.viewmodel.metadata.HelioviewerPositionedMetaData;
 import org.helioviewer.viewmodel.metadata.MetaData;
 import org.helioviewer.viewmodel.region.Region;
-import org.helioviewer.viewmodel.region.StaticRegion;
 import org.helioviewer.viewmodel.view.ImageInfoView;
 import org.helioviewer.viewmodel.view.SubimageDataView;
 import org.helioviewer.viewmodel.view.View;
@@ -31,7 +29,6 @@ public class GL3DImageTextureView extends AbstractGL3DView implements GL3DView {
     private boolean recaptureRequested = true;
     private boolean regionChanged = true;
     private boolean forceUpdate = false;
-    private Region capturedRegion = null;
 
     @Override
     public void renderGL(GL2 gl, boolean nextView) {
@@ -40,18 +37,15 @@ public class GL3DImageTextureView extends AbstractGL3DView implements GL3DView {
 
     @Override
     public void render3D(GL3DState state) {
-        if (this.getView() != null) {
-            // Only copy Framebuffer if necessary
-            if (forceUpdate || recaptureRequested || regionChanged) {
-                this.capturedRegion = copyScreenToTexture(state);
-                if (forceUpdate) {
-                    this.notifyViewListeners(new ChangeEvent(new ImageTextureRecapturedReason(this, StaticRegion.createAdaptedRegion(this.capturedRegion.getRectangle()))));
-                }
-                regionChanged = false;
-                forceUpdate = false;
-                recaptureRequested = false;
-            }
+        // Only copy Framebuffer if necessary
+        if (forceUpdate || recaptureRequested || regionChanged) {
+            copyScreenToTexture(state);
+
+            regionChanged = false;
+            forceUpdate = false;
+            recaptureRequested = false;
         }
+
     }
 
     private Region copyScreenToTexture(GL3DState state) {
@@ -144,10 +138,6 @@ public class GL3DImageTextureView extends AbstractGL3DView implements GL3DView {
                 }
             }
         });
-    }
-
-    public Region getCapturedRegion() {
-        return capturedRegion;
     }
 
     public void forceUpdate() {
