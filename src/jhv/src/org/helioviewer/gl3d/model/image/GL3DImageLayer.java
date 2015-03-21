@@ -23,7 +23,6 @@ import org.helioviewer.viewmodel.region.Region;
 import org.helioviewer.viewmodel.region.StaticRegion;
 import org.helioviewer.viewmodel.view.MetaDataView;
 import org.helioviewer.viewmodel.view.jp2view.JHVJP2View;
-import org.helioviewer.viewmodel.view.opengl.GL3DImageTextureView;
 import org.helioviewer.viewmodel.view.opengl.shader.GLSLShader;
 import org.helioviewer.viewmodel.viewport.StaticViewport;
 import org.helioviewer.viewmodel.viewport.Viewport;
@@ -48,7 +47,6 @@ public class GL3DImageLayer extends GL3DShape {
         return layerId;
     }
 
-    protected GL3DImageTextureView imageTextureView;
     protected MetaDataView metaDataView;
     protected JHVJP2View regionView;
     public double minZ = -Constants.SunRadius;
@@ -63,14 +61,14 @@ public class GL3DImageLayer extends GL3DShape {
     private int indexBufferSize;
 
     private int positionBufferSize;
+    private final JHVJP2View mainLayerView;
 
-    public GL3DImageLayer(String name, GL3DImageTextureView mainLayerView, boolean showSphere, boolean showCorona, boolean restoreColorMask) {
+    public GL3DImageLayer(String name, JHVJP2View mainLayerView, boolean showSphere, boolean showCorona, boolean restoreColorMask) {
         super(name);
         layerId = nextLayerId++;
-
-        this.imageTextureView = mainLayerView;
-        this.metaDataView = this.imageTextureView.getAdapter(MetaDataView.class);
-        this.regionView = this.imageTextureView.getAdapter(JHVJP2View.class);
+        this.mainLayerView = mainLayerView;
+        this.metaDataView = mainLayerView.getAdapter(MetaDataView.class);
+        this.regionView = mainLayerView.getAdapter(JHVJP2View.class);
 
         this.markAsChanged();
         int count = 0;
@@ -199,10 +197,6 @@ public class GL3DImageLayer extends GL3DShape {
         this.regionView.setViewport(layerViewport, null);
     }
 
-    public GL3DImageTextureView getImageTextureView() {
-        return this.imageTextureView;
-    }
-
     @Override
     public void shapeDraw(GL3DState state) {
         if (!this.isInitialised) {
@@ -216,7 +210,7 @@ public class GL3DImageLayer extends GL3DShape {
             gl.glCullFace(GL2.GL_BACK);
 
             gl.glEnable(GL2.GL_BLEND);
-            JHVJP2View jp2view = this.imageTextureView.getAdapter(JHVJP2View.class);
+            JHVJP2View jp2view = this.mainLayerView;
 
             if (jp2view != null) {
                 jp2view.applyFilters(gl);
