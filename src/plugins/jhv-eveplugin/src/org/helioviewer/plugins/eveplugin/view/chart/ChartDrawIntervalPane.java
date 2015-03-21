@@ -755,8 +755,4 @@ public class ChartDrawIntervalPane extends JComponent implements ZoomControllerL
     public void viewportGeometryChanged() {
     }
 
-    @Override
-    public void timestampChanged(int idx) {
-    }
-
 }

@@ -81,7 +81,6 @@ public class ControlPanelContainer extends JPanel implements LayersListener {
      * {@inheritDoc}
      */
     public void layerChanged(int index) {
-
         // this is called very often. refine the events to layer visibility
         // changed?
         boolean visible = LayersModel.getSingletonInstance().isVisible(index);
@@ -89,7 +88,6 @@ public class ControlPanelContainer extends JPanel implements LayersListener {
         ImageInfoView imageInfoView = view != null ? view.getAdapter(ImageInfoView.class) : null;
 
         Component c = this.getViewComponent(imageInfoView);
-
         if (c != null) {
             c.setEnabled(visible);
         }
@@ -105,12 +103,6 @@ public class ControlPanelContainer extends JPanel implements LayersListener {
      * {@inheritDoc}
      */
     public void viewportGeometryChanged() {
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public void timestampChanged(int idx) {
     }
 
 }

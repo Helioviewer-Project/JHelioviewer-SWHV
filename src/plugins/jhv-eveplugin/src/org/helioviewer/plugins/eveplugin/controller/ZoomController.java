@@ -381,27 +381,18 @@ public class ZoomController implements PlotAreaSpaceListener, LayersListener {
 
     @Override
     public void layerRemoved(View oldView, int oldIdx) {
-        // TODO Auto-generated method stub
     }
 
     @Override
     public void layerChanged(int idx) {
-        // TODO Auto-generated method stub
     }
 
     @Override
     public void activeLayerChanged(int idx) {
-        // TODO Auto-generated method stub
     }
 
     @Override
     public void viewportGeometryChanged() {
-        // TODO Auto-generated method stub
-    }
-
-    @Override
-    public void timestampChanged(int idx) {
-        // TODO Auto-generated method stub
     }
 
 }

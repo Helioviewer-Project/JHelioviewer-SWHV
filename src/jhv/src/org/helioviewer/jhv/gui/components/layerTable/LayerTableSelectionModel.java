@@ -55,8 +55,6 @@ public class LayerTableSelectionModel extends DefaultListSelectionModel implemen
      * {@inheritDoc}
      */
     public void layerAdded(int newIndex) {
-        // Log.debug("LayerTableSelection: Layer Added, selecting " +
-        // layersModel.getActiveLayer());
     }
 
     /**
@@ -69,19 +67,12 @@ public class LayerTableSelectionModel extends DefaultListSelectionModel implemen
      * {@inheritDoc}
      */
     public void layerRemoved(View oldView, int oldIndex) {
-        // Log.debug("LayerTableSelection: Layer Removed");
     }
 
     /**
      * {@inheritDoc}
      */
     public void viewportGeometryChanged() {
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public void timestampChanged(int idx) {
     }
 
 }

@@ -302,7 +302,6 @@ public class DrawController implements ZoomControllerListener, LineDataSelectorM
 
     @Override
     public void layerAdded(int idx) {
-        // TODO Auto-generated method stub
     }
 
     @Override
@@ -315,22 +314,14 @@ public class DrawController implements ZoomControllerListener, LineDataSelectorM
 
     @Override
     public void layerChanged(int idx) {
-        // TODO Auto-generated method stub
     }
 
     @Override
     public void activeLayerChanged(int idx) {
-        // TODO Auto-generated method stub
     }
 
     @Override
     public void viewportGeometryChanged() {
-        // TODO Auto-generated method stub
-    }
-
-    @Override
-    public void timestampChanged(int idx) {
-        // TODO Auto-generated method stub
     }
 
 }

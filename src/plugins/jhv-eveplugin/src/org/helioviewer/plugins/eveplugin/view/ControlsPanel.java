@@ -204,7 +204,6 @@ public class ControlsPanel extends JPanel implements ActionListener, LayersListe
 
     @Override
     public void layerChanged(int idx) {
-        // TODO Auto-generated method stub
     }
 
     @Override
@@ -237,12 +236,6 @@ public class ControlsPanel extends JPanel implements ActionListener, LayersListe
 
     @Override
     public void viewportGeometryChanged() {
-        // TODO Auto-generated method stub
-    }
-
-    @Override
-    public void timestampChanged(int idx) {
-        // TODO Auto-generated method stub
     }
 
     @Override
@@ -406,17 +399,14 @@ public class ControlsPanel extends JPanel implements ActionListener, LayersListe
 
     @Override
     public void selectedResolutionChanged(API_RESOLUTION_AVERAGES newResolution) {
-        // TODO Auto-generated method stub
     }
 
     @Override
     public void downloadStartded(LineDataSelectorElement element) {
-        // TODO Auto-generated method stub
     }
 
     @Override
     public void downloadFinished(LineDataSelectorElement element) {
-        // TODO Auto-generated method stub
     }
 
     @Override
@@ -433,7 +423,6 @@ public class ControlsPanel extends JPanel implements ActionListener, LayersListe
 
     @Override
     public void lineDataUpdated(LineDataSelectorElement element) {
-        // TODO Auto-generated method stub
     }
 
 }

@@ -54,12 +54,4 @@ public interface LayersListener {
      */
     public void viewportGeometryChanged();
 
-    /**
-     * Gets fired if the timestamp changed.
-     * 
-     * @param idx
-     *            - index of the new active layer
-     */
-    public void timestampChanged(int idx);
-
 }
