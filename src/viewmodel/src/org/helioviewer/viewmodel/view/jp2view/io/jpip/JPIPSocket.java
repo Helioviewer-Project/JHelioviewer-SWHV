@@ -143,8 +143,8 @@ public class JPIPSocket extends HTTPSocket {
         // Adds some default headers if they were not already added.
         if (!_req.headerExists(HTTPHeaderKey.USER_AGENT.toString()))
             _req.setHeader(HTTPHeaderKey.USER_AGENT.toString(), "JHelioviewer-SWHV");
-        if (!_req.headerExists(HTTPHeaderKey.ACCEPT_ENCODING.toString()))
-            _req.setHeader(HTTPHeaderKey.ACCEPT_ENCODING.toString(), "gzip");
+        //if (!_req.headerExists(HTTPHeaderKey.ACCEPT_ENCODING.toString()))
+        //    _req.setHeader(HTTPHeaderKey.ACCEPT_ENCODING.toString(), "gzip");
         if (!_req.headerExists(HTTPHeaderKey.CACHE_CONTROL.toString()))
             _req.setHeader(HTTPHeaderKey.CACHE_CONTROL.toString(), "no-cache");
         if (!_req.headerExists(HTTPHeaderKey.HOST.toString()))
