@@ -8,7 +8,6 @@ import org.helioviewer.viewmodel.changeevent.ChangeEvent;
 import org.helioviewer.viewmodel.changeevent.RegionChangedReason;
 import org.helioviewer.viewmodel.changeevent.RegionUpdatedReason;
 import org.helioviewer.viewmodel.changeevent.SubImageDataChangedReason;
-import org.helioviewer.viewmodel.region.Region;
 import org.helioviewer.viewmodel.view.View;
 import org.helioviewer.viewmodel.view.ViewListener;
 
@@ -27,17 +26,12 @@ public class GL3DImageTextureView extends AbstractGL3DView implements GL3DView {
     public void render3D(GL3DState state) {
         // Only copy Framebuffer if necessary
         if (forceUpdate || recaptureRequested || regionChanged) {
-            copyScreenToTexture(state);
 
             regionChanged = false;
             forceUpdate = false;
             recaptureRequested = false;
         }
 
-    }
-
-    private Region copyScreenToTexture(GL3DState state) {
-        return null;
     }
 
     @Override

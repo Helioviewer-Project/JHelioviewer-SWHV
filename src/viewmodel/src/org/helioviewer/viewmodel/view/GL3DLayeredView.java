@@ -12,7 +12,6 @@ import org.helioviewer.viewmodel.changeevent.LayerChangedReason.LayerChangeType;
 import org.helioviewer.viewmodel.view.jp2view.JHVJP2View;
 import org.helioviewer.viewmodel.view.opengl.GL3DImageTextureView;
 import org.helioviewer.viewmodel.view.opengl.GL3DView;
-import org.helioviewer.viewmodel.view.opengl.GLView;
 
 public class GL3DLayeredView extends AbstractView implements LayeredView, ViewListener, GL3DView {
 
@@ -93,6 +92,7 @@ public class GL3DLayeredView extends AbstractView implements LayeredView, ViewLi
 
         if (newLayer.getAdapter(GL3DImageTextureView.class) == null) {
             GL3DImageTextureView imageToTextureView = new GL3DImageTextureView();
+            System.out.println(newLayer);
             imageToTextureView.setView(newLayer);
             newLayer = imageToTextureView;
         }
@@ -245,14 +245,6 @@ public class GL3DLayeredView extends AbstractView implements LayeredView, ViewLi
 
     @Override
     public void render3D(GL3DState state) {
-        for (int i = 0; i < this.getNumLayers(); i++) {
-            View layerView = this.getLayer(i);
-            if (layerView instanceof GL3DView) {
-                ((GL3DView) layerView).render3D(state);
-            } else if (layerView instanceof GLView) {
-                ((GLView) layerView).renderGL(state.gl, true);
-            }
-        }
     }
 
     @Override
@@ -268,12 +260,7 @@ public class GL3DLayeredView extends AbstractView implements LayeredView, ViewLi
         }
     }
 
-    public void renderGL(GL2 gl) {
-
-    }
-
     @Override
     public void renderGL(GL2 gl, boolean nextView) {
-        renderGL(gl);
     }
 }
