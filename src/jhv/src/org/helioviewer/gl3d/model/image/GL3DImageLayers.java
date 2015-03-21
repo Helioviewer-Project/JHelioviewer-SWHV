@@ -1,8 +1,6 @@
 package org.helioviewer.gl3d.model.image;
 
 import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
 
 import javax.media.opengl.GL2;
 
@@ -10,7 +8,6 @@ import org.helioviewer.gl3d.scenegraph.GL3DDrawBits.Bit;
 import org.helioviewer.gl3d.scenegraph.GL3DGroup;
 import org.helioviewer.gl3d.scenegraph.GL3DNode;
 import org.helioviewer.gl3d.scenegraph.GL3DState;
-import org.helioviewer.viewmodel.view.opengl.GL3DImageTextureView;
 import org.helioviewer.viewmodel.view.opengl.shader.GLSLShader;
 
 /**
@@ -23,13 +20,10 @@ import org.helioviewer.viewmodel.view.opengl.shader.GLSLShader;
  */
 public class GL3DImageLayers extends GL3DGroup {
 
-    private final HashMap<GL3DImageTextureView, GL3DImageLayer> imageLayerMap;
-
     private boolean coronaVisibility = true;
 
     public GL3DImageLayers() {
         super("Images");
-        imageLayerMap = new HashMap<GL3DImageTextureView, GL3DImageLayer>();
     }
 
     @Override
@@ -84,37 +78,7 @@ public class GL3DImageLayers extends GL3DGroup {
     }
 
     public void insertLayer(GL3DImageLayer layer) {
-        imageLayerMap.put(layer.getImageTextureView(), layer);
         this.addNode(layer);
-    }
-
-    public void removeLayer(GL3DState state, GL3DImageTextureView view) {
-        GL3DImageLayer layer = getImageLayerForView(view);
-        layer.delete(state);
-        imageLayerMap.remove(view);
-    }
-
-    public void moveImages(GL3DImageTextureView view, int index) {
-        GL3DImageLayer layer = getImageLayerForView(view);
-        /* workaround for view still on layerToAdd */
-        if (layer != null) {
-            layer.getParent().moveNode(layer, index);
-        }
-    }
-
-    public GL3DImageLayer getImageLayerForView(GL3DImageTextureView view) {
-        return imageLayerMap.get(view);
-    }
-
-    public Collection<GL3DImageLayer> getLayers() {
-        GL3DNode node = this.getFirst();
-        ArrayList<GL3DImageLayer> layers = new ArrayList<GL3DImageLayer>();
-        for (; node != null; node = node.getNext()) {
-            if (node instanceof GL3DImageLayer) {
-                layers.add((GL3DImageLayer) node);
-            }
-        }
-        return layers;
     }
 
 }

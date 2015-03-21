@@ -24,7 +24,6 @@ import org.helioviewer.viewmodel.region.StaticRegion;
 import org.helioviewer.viewmodel.view.MetaDataView;
 import org.helioviewer.viewmodel.view.jp2view.JHVJP2View;
 import org.helioviewer.viewmodel.view.opengl.GL3DImageTextureView;
-import org.helioviewer.viewmodel.view.opengl.GL3DView;
 import org.helioviewer.viewmodel.view.opengl.shader.GLSLShader;
 import org.helioviewer.viewmodel.viewport.StaticViewport;
 import org.helioviewer.viewmodel.viewport.Viewport;
@@ -49,7 +48,6 @@ public class GL3DImageLayer extends GL3DShape {
         return layerId;
     }
 
-    protected GL3DView mainLayerView;
     protected GL3DImageTextureView imageTextureView;
     protected MetaDataView metaDataView;
     protected JHVJP2View regionView;
@@ -66,14 +64,13 @@ public class GL3DImageLayer extends GL3DShape {
 
     private int positionBufferSize;
 
-    public GL3DImageLayer(String name, GL3DView mainLayerView, boolean showSphere, boolean showCorona, boolean restoreColorMask) {
+    public GL3DImageLayer(String name, GL3DImageTextureView mainLayerView, boolean showSphere, boolean showCorona, boolean restoreColorMask) {
         super(name);
         layerId = nextLayerId++;
 
-        this.mainLayerView = mainLayerView;
-        this.imageTextureView = this.mainLayerView.getAdapter(GL3DImageTextureView.class);
-        this.metaDataView = this.mainLayerView.getAdapter(MetaDataView.class);
-        this.regionView = this.mainLayerView.getAdapter(JHVJP2View.class);
+        this.imageTextureView = mainLayerView;
+        this.metaDataView = this.imageTextureView.getAdapter(MetaDataView.class);
+        this.regionView = this.imageTextureView.getAdapter(JHVJP2View.class);
 
         this.markAsChanged();
         int count = 0;
@@ -208,6 +205,9 @@ public class GL3DImageLayer extends GL3DShape {
 
     @Override
     public void shapeDraw(GL3DState state) {
+        if (!this.isInitialised) {
+            this.init(state);
+        }
         GL2 gl = state.gl;
         GLSLShader.bind(gl);
 
@@ -245,6 +245,7 @@ public class GL3DImageLayer extends GL3DShape {
             gl.glColorMask(true, true, true, true);
         }
         gl.glDisable(GL2.GL_CULL_FACE);
+        updateROI(state);
     }
 
     private int generate(GL3DState state) {

@@ -89,7 +89,6 @@ public class GL3DSceneGraphView extends AbstractGL3DView implements GL3DView {
         gl.glBlendEquation(GL2.GL_FUNC_ADD);
 
         deleteNodes(state);
-
         if (this.getView() != null) {
             state.pushMV();
             this.renderChild(gl);
@@ -182,7 +181,6 @@ public class GL3DSceneGraphView extends AbstractGL3DView implements GL3DView {
                 removeLayer(imageTextureView);
                 break;
             case LAYER_VISIBILITY:
-                toggleLayerVisibility(imageTextureView);
                 break;
             case LAYER_MOVED:
                 moveLayerToIndex(imageTextureView, reason.getLayerIndex());
@@ -197,20 +195,11 @@ public class GL3DSceneGraphView extends AbstractGL3DView implements GL3DView {
 
     private void moveLayerToIndex(GL3DImageTextureView view, int layerIndex) {
         Log.debug("GL3DSceneGraphView.moveLayerToIndex " + layerIndex);
-        this.imageLayers.moveImages(view, layerIndex);
-    }
-
-    private void toggleLayerVisibility(GL3DImageTextureView view) {
-        GL3DNode node = this.imageLayers.getImageLayerForView(view);
-        /* workaround for view still on layerToAdd */
-        if (node != null) {
-            node.getDrawBits().toggle(Bit.Hidden);
-        }
     }
 
     private void removeLayersFromSceneGraph(GL3DState state) {
         for (GL3DImageTextureView imageTextureView : this.layersToRemove) {
-            this.imageLayers.removeLayer(state, imageTextureView);
+            //this.imageLayers.removeLayer(state, imageTextureView);
         }
         this.layersToRemove.clear();
     }
@@ -220,7 +209,7 @@ public class GL3DSceneGraphView extends AbstractGL3DView implements GL3DView {
 
         for (GL3DImageTextureView imageTextureView : this.layersToAdd) {
             GL3DImageLayer imageLayer = new GL3DImageLayer("", imageTextureView, true, true, true);
-            this.imageLayers.insertLayer(imageLayer);
+            //this.imageLayers.insertLayer(imageLayer);
         }
 
         if (!this.layersToAdd.isEmpty()) {
@@ -241,7 +230,7 @@ public class GL3DSceneGraphView extends AbstractGL3DView implements GL3DView {
     }
 
     private void removeLayer(GL3DImageTextureView imageTextureView) {
-        if (!this.layersToRemove.contains(imageTextureView) && this.imageLayers.getImageLayerForView(imageTextureView) != null) {
+        if (!this.layersToRemove.contains(imageTextureView)) {
             this.layersToRemove.add(imageTextureView);
         }
     }
@@ -319,7 +308,7 @@ public class GL3DSceneGraphView extends AbstractGL3DView implements GL3DView {
         /*
          * GL3DNode sibling = node; while((sibling = sibling.getNext()) != null)
          * { for(int i=0; i<level; ++i) System.out.print("   ");
-         *
+         * 
          * System.out.println("Sibling: " + sibling.getClass().getName() + " ("
          * + node.getName() + ")"); }
          */
