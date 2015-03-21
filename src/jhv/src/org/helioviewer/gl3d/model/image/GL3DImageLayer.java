@@ -113,7 +113,6 @@ public class GL3DImageLayer extends GL3DShape {
         indexBufferSize = indexBuffer.capacity();
         state.gl.glBindBuffer(GL2.GL_ELEMENT_ARRAY_BUFFER, indexBufferID);
         state.gl.glBufferData(GL2.GL_ELEMENT_ARRAY_BUFFER, indexBuffer.capacity() * Buffers.SIZEOF_INT, indexBuffer, GL2.GL_STATIC_DRAW);
-        this.imageTextureView.forceUpdate();
 
         this.markAsChanged();
 
