@@ -23,14 +23,9 @@ public class GL3DLayeredView extends AbstractView implements LayeredView, ViewLi
     private final ArrayList<GL3DImageLayer> imageLayers = new ArrayList<GL3DImageLayer>();
 
     protected class Layer {
-        public final View view;
-
-        public JHVJP2View jp2View;
-
         public boolean visibility = true;
 
         public Layer(View base) {
-            view = base;
         }
 
     }
@@ -104,7 +99,7 @@ public class GL3DLayeredView extends AbstractView implements LayeredView, ViewLi
         jp2viewLookup.put(imageToTextureView, new Layer(newLayer));
 
         imageToTextureView.addViewListener(this);
-        GL3DImageLayer imageLayer = new GL3DImageLayer("", imageToTextureView, true, true, true);
+        GL3DImageLayer imageLayer = new GL3DImageLayer("", (JHVJP2View) newLayer, true, true, true);
         this.imageLayers.add(imageLayer);
         ChangeEvent event = new ChangeEvent(new LayerChangedReason(this, LayerChangeType.LAYER_ADDED, imageToTextureView));
         notifyViewListeners(event);
