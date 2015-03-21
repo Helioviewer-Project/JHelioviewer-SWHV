@@ -338,10 +338,6 @@ public class GL3DSceneGraphView extends AbstractGL3DView implements GL3DView {
     @Override
     protected void renderChild(GL2 gl) {
         ((GLView) view).renderGL(gl, true);
-        for (GL3DImageLayer layer : this.imageLayers.getLayers()) {
-            GL3DImageTextureView layerView = layer.getImageTextureView();
-            layerView.renderGL(gl, true);
-        }
     }
 
 }
