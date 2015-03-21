@@ -9,12 +9,9 @@ import org.helioviewer.base.logging.Log;
 import org.helioviewer.base.physics.Constants;
 import org.helioviewer.gl3d.GL3DKeyController;
 import org.helioviewer.gl3d.GL3DKeyController.GL3DKeyListener;
-import org.helioviewer.gl3d.camera.GL3DCamera;
 import org.helioviewer.gl3d.math.GL3DVec3d;
 import org.helioviewer.gl3d.math.GL3DVec4f;
 import org.helioviewer.gl3d.model.GL3DArtificialObjects;
-import org.helioviewer.gl3d.model.image.GL3DImageLayer;
-import org.helioviewer.gl3d.model.image.GL3DImageLayers;
 import org.helioviewer.gl3d.scenegraph.GL3DDrawBits.Bit;
 import org.helioviewer.gl3d.scenegraph.GL3DGroup;
 import org.helioviewer.gl3d.scenegraph.GL3DModel;
@@ -24,13 +21,8 @@ import org.helioviewer.gl3d.scenegraph.GL3DState;
 import org.helioviewer.gl3d.scenegraph.visuals.GL3DArrow;
 import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.viewmodel.changeevent.ChangeEvent;
-import org.helioviewer.viewmodel.changeevent.LayerChangedReason;
-import org.helioviewer.viewmodel.region.Region;
 import org.helioviewer.viewmodel.view.GL3DLayeredView;
-import org.helioviewer.viewmodel.view.LayeredView;
-import org.helioviewer.viewmodel.view.MetaDataView;
 import org.helioviewer.viewmodel.view.View;
-import org.helioviewer.viewmodel.view.ViewListener;
 
 /**
  * This is the most important view in the 3D viewchain. It assembles all 3D
@@ -49,11 +41,8 @@ public class GL3DSceneGraphView extends AbstractGL3DView implements GL3DView {
 
     // private GL3DImageGroup imageMeshes;
     private GLOverlayView overlayView = null;
-    private GL3DImageLayers imageLayers;
     private GL3DGroup artificialObjects;
 
-    private final ArrayList<GL3DImageTextureView> layersToAdd = new ArrayList<GL3DImageTextureView>();
-    private final ArrayList<GL3DImageTextureView> layersToRemove = new ArrayList<GL3DImageTextureView>();
     private final ArrayList<GL3DNode> nodesToDelete = new ArrayList<GL3DNode>();
 
     public GL3DSceneGraphView() {
@@ -92,8 +81,6 @@ public class GL3DSceneGraphView extends AbstractGL3DView implements GL3DView {
         if (this.getView() != null) {
             state.pushMV();
             this.renderChild(gl);
-            this.addLayersToSceneGraph(state);
-            this.removeLayersFromSceneGraph(state);
             state.popMV();
         }
 
@@ -142,97 +129,6 @@ public class GL3DSceneGraphView extends AbstractGL3DView implements GL3DView {
 
     @Override
     protected void setViewSpecificImplementation(View newView, ChangeEvent changeEvent) {
-        Log.debug("GL3DSceneGraphView.ViewChanged: Sender=" + newView + " Event=" + changeEvent);
-
-        // Add Handler of Layer Events. Automatically add new Meshes for each
-        // Layer
-        if (newView.getAdapter(LayeredView.class) != null) {
-            LayeredView layeredView = newView.getAdapter(LayeredView.class);
-
-            layeredView.addViewListener(new ViewListener() {
-                @Override
-                public void viewChanged(View sender, ChangeEvent aEvent) {
-                    // Log.debug("viewChange: sender : " + sender);
-                    if (aEvent.reasonOccurred(LayerChangedReason.class)) {
-                        LayerChangedReason reason = aEvent.getLastChangedReasonByType(LayerChangedReason.class);
-                        handleLayerChange(reason);
-                    }
-                }
-            });
-
-            for (int i = 0; i < layeredView.getNumLayers(); i++) {
-                View layer = layeredView.getLayer(i);
-                if (layer != null)
-                    this.addNewLayer(layer.getAdapter(GL3DImageTextureView.class));
-                Log.debug("GL3DSceneGraphView: Adding Layer to Scene from LayeredView " + layer);
-            }
-        }
-    }
-
-    private void handleLayerChange(LayerChangedReason reason) {
-        GL3DImageTextureView imageTextureView = reason.getSubView().getAdapter(GL3DImageTextureView.class);
-
-        if (imageTextureView != null) {
-            switch (reason.getLayerChangeType()) {
-            case LAYER_ADDED:
-                addNewLayer(imageTextureView);
-                break;
-            case LAYER_REMOVED:
-                removeLayer(imageTextureView);
-                break;
-            case LAYER_VISIBILITY:
-                break;
-            case LAYER_MOVED:
-                moveLayerToIndex(imageTextureView, reason.getLayerIndex());
-                break;
-            default:
-                break;
-            }
-        } else {
-            Log.warn("GL3DSceneGraphView: Cannot handle Layer Change for Layers without a GL3DImageTextureView!");
-        }
-    }
-
-    private void moveLayerToIndex(GL3DImageTextureView view, int layerIndex) {
-        Log.debug("GL3DSceneGraphView.moveLayerToIndex " + layerIndex);
-    }
-
-    private void removeLayersFromSceneGraph(GL3DState state) {
-        for (GL3DImageTextureView imageTextureView : this.layersToRemove) {
-            //this.imageLayers.removeLayer(state, imageTextureView);
-        }
-        this.layersToRemove.clear();
-    }
-
-    private void addLayersToSceneGraph(GL3DState state) {
-        GL3DCamera camera = state.getActiveCamera();
-
-        for (GL3DImageTextureView imageTextureView : this.layersToAdd) {
-            GL3DImageLayer imageLayer = new GL3DImageLayer("", imageTextureView, true, true, true);
-            //this.imageLayers.insertLayer(imageLayer);
-        }
-
-        if (!this.layersToAdd.isEmpty()) {
-            MetaDataView metaDataView = getAdapter(MetaDataView.class);
-            if (metaDataView != null && metaDataView.getMetaData() != null) {
-                Region region = metaDataView.getMetaData().getPhysicalRegion();
-                double halfWidth = region.getWidth() / 2;
-                double halfFOVRad = Math.toRadians(camera.getCameraFOV() / 2);
-                double distance = halfWidth * Math.sin(Math.PI / 2 - halfFOVRad) / Math.sin(halfFOVRad);
-                distance = -distance - camera.getZTranslation();
-            }
-        }
-        this.layersToAdd.clear();
-    }
-
-    private void addNewLayer(GL3DImageTextureView imageTextureView) {
-        this.layersToAdd.add(imageTextureView);
-    }
-
-    private void removeLayer(GL3DImageTextureView imageTextureView) {
-        if (!this.layersToRemove.contains(imageTextureView)) {
-            this.layersToRemove.add(imageTextureView);
-        }
     }
 
     public int getNumberOfModels() {
@@ -264,8 +160,6 @@ public class GL3DSceneGraphView extends AbstractGL3DView implements GL3DView {
 
         artificialObjects = new GL3DArtificialObjects();
 
-        this.imageLayers = new GL3DImageLayers();
-        root.addNode(this.imageLayers);
         root.addNode(artificialObjects);
 
         GL3DGroup indicatorArrows = new GL3DModel("Arrows", "Arrows indicating the viewspace axes");
@@ -283,7 +177,6 @@ public class GL3DSceneGraphView extends AbstractGL3DView implements GL3DView {
     }
 
     public void toggleCoronaVisibility() {
-        this.imageLayers.setCoronaVisibility(!this.imageLayers.getCoronaVisibility());
     }
 
     public void printScenegraph() {
