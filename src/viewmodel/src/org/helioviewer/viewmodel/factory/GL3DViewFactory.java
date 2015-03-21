@@ -1,13 +1,13 @@
 package org.helioviewer.viewmodel.factory;
 
 import org.helioviewer.viewmodel.view.ComponentView;
+import org.helioviewer.viewmodel.view.GL3DLayeredView;
 import org.helioviewer.viewmodel.view.LayeredView;
 import org.helioviewer.viewmodel.view.OverlayView;
 import org.helioviewer.viewmodel.view.View;
 import org.helioviewer.viewmodel.view.opengl.GL3DCameraView;
 import org.helioviewer.viewmodel.view.opengl.GL3DComponentView;
 import org.helioviewer.viewmodel.view.opengl.GL3DImageTextureView;
-import org.helioviewer.viewmodel.view.opengl.GL3DLayeredView;
 import org.helioviewer.viewmodel.view.opengl.GL3DSceneGraphView;
 import org.helioviewer.viewmodel.view.opengl.GL3DView;
 import org.helioviewer.viewmodel.view.opengl.GLOverlayView;
