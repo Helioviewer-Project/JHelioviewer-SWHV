@@ -40,10 +40,7 @@ import org.helioviewer.jhv.gui.components.StatusPanel;
 import org.helioviewer.jhv.gui.components.TopToolBar;
 import org.helioviewer.jhv.gui.components.statusplugins.FramerateStatusPanel;
 import org.helioviewer.jhv.gui.components.statusplugins.JPIPStatusPanel;
-import org.helioviewer.jhv.gui.components.statusplugins.MetaDataStatusPanel;
 import org.helioviewer.jhv.gui.components.statusplugins.PositionStatusPanel;
-import org.helioviewer.jhv.gui.components.statusplugins.QualityStatusPanel;
-import org.helioviewer.jhv.gui.components.statusplugins.RenderModeStatusPanel;
 import org.helioviewer.jhv.gui.components.statusplugins.ZoomStatusPanel;
 import org.helioviewer.jhv.gui.controller.ZoomController;
 import org.helioviewer.jhv.gui.dialogs.observation.ObservationDialog;
@@ -89,8 +86,6 @@ public class ImageViewerGui {
     /** The sole instance of this class. */
     private static final ImageViewerGui singletonImageViewer = new ImageViewerGui();
 
-    // private ComponentView mainComponentView;
-
     private static JFrame mainFrame;
     private JPanel contentPanel;
     private JSplitPane midSplitPane;
@@ -100,7 +95,6 @@ public class ImageViewerGui {
     protected MainImagePanel mainImagePanel;
 
     private SideContentPane leftPane;
-    private RenderModeStatusPanel renderModeStatus;
     private ImageSelectorPanel imageSelectorPanel;
     private MoviePanel moviePanel;
     private ControlPanelContainer moviePanelContainer;
@@ -172,7 +166,6 @@ public class ImageViewerGui {
             // ///////////////////////////////////////////////////////////////////////////////
 
             ZoomStatusPanel zoomStatusPanel = new ZoomStatusPanel();
-            QualityStatusPanel qualityStatusPanel = new QualityStatusPanel();
             FramerateStatusPanel framerateStatus = new FramerateStatusPanel();
 
             PositionStatusPanel positionStatusPanel = null;
@@ -180,23 +173,15 @@ public class ImageViewerGui {
             // Position panel only needed in 2D View State
             // if(this.currentState.getType().equals(ViewStateEnum.View2D))
             positionStatusPanel = new PositionStatusPanel(getMainImagePanel());
-
-            MetaDataStatusPanel jhvXMLStatusPanel = new MetaDataStatusPanel();
-            renderModeStatus = new RenderModeStatusPanel();
             JPIPStatusPanel jpipStatusPanel = new JPIPStatusPanel();
 
             StatusPanel statusPanel = new StatusPanel(SIDE_PANEL_WIDTH + 20, 5);
             statusPanel.addPlugin(zoomStatusPanel, StatusPanel.Alignment.LEFT);
-            statusPanel.addPlugin(qualityStatusPanel, StatusPanel.Alignment.LEFT);
             statusPanel.addPlugin(framerateStatus, StatusPanel.Alignment.LEFT);
-            statusPanel.addPlugin(renderModeStatus, StatusPanel.Alignment.RIGHT);
-            statusPanel.addPlugin(jhvXMLStatusPanel, StatusPanel.Alignment.RIGHT);
             statusPanel.addPlugin(jpipStatusPanel, StatusPanel.Alignment.RIGHT);
             statusPanel.addPlugin(positionStatusPanel, StatusPanel.Alignment.RIGHT);
 
             contentPanel.add(statusPanel, BorderLayout.PAGE_END);
-
-            renderModeStatus.updateStatus();
         }
     }
 
@@ -242,7 +227,6 @@ public class ImageViewerGui {
         State newState = StateController.getInstance().getCurrentState();
         mainComponentView = GuiState.viewchainFactory.createNewViewchainMain();
         GL3DCameraSelectorModel.getInstance().activate(mainComponentView.getAdapter(GL3DSceneGraphView.class));
-        renderModeStatus.updateStatus();
 
         // prepare gui again
         updateComponentPanels();
@@ -607,14 +591,6 @@ public class ImageViewerGui {
      * */
     public JScrollPane getLeftScrollPane() {
         return leftScrollPane;
-    }
-
-    /**
-     * Calls the update methods of sub components of the main frame so they can
-     * e.g. reload data.
-     */
-    public void updateComponents() {
-        renderModeStatus.updateStatus();
     }
 
     /**
