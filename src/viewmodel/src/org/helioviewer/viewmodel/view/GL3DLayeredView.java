@@ -99,8 +99,8 @@ public class GL3DLayeredView extends AbstractView implements LayeredView, ViewLi
         LinkedMovieManager.getActiveInstance().pauseLinkedMovies();
 
         layers.add(newIndex, newLayer);
-        newLayer.addViewListener(this);
         viewLookup.put(newLayer, new Layer(newLayer));
+        newLayer.addViewListener(this);
 
         ChangeEvent event = new ChangeEvent(new LayerChangedReason(this, LayerChangeType.LAYER_ADDED, newLayer));
         notifyViewListeners(event);
@@ -236,7 +236,6 @@ public class GL3DLayeredView extends AbstractView implements LayeredView, ViewLi
         if (layers.contains(view)) {
             layers.remove(view);
             layers.add(newLevel, view);
-
             ChangeEvent event = new ChangeEvent(new LayerChangedReason(this, LayerChangeType.LAYER_MOVED, view, newLevel));
             notifyViewListeners(event);
         }

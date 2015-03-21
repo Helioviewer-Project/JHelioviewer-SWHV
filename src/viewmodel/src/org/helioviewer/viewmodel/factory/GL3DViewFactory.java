@@ -7,7 +7,6 @@ import org.helioviewer.viewmodel.view.OverlayView;
 import org.helioviewer.viewmodel.view.View;
 import org.helioviewer.viewmodel.view.opengl.GL3DCameraView;
 import org.helioviewer.viewmodel.view.opengl.GL3DComponentView;
-import org.helioviewer.viewmodel.view.opengl.GL3DImageTextureView;
 import org.helioviewer.viewmodel.view.opengl.GL3DSceneGraphView;
 import org.helioviewer.viewmodel.view.opengl.GL3DView;
 import org.helioviewer.viewmodel.view.opengl.GLOverlayView;
@@ -33,8 +32,6 @@ public class GL3DViewFactory extends StandardViewFactory {
             return (T) new GL3DSceneGraphView();
         } else if (pattern.isAssignableFrom(GL3DCameraView.class)) {
             return (T) new GL3DCameraView();
-        } else if (pattern.isAssignableFrom(GL3DImageTextureView.class)) {
-            return (T) new GL3DImageTextureView();
         } else if (pattern.isAssignableFrom(ComponentView.class)) {
             return (T) new GL3DComponentView();
         } else if (pattern.isAssignableFrom(LayeredView.class)) {
@@ -60,8 +57,6 @@ public class GL3DViewFactory extends StandardViewFactory {
                 return (T) new GL3DSceneGraphView();
             } else if (source instanceof GL3DCameraView) {
                 return (T) new GL3DCameraView();
-            } else if (source instanceof GL3DImageTextureView) {
-                return (T) new GL3DImageTextureView();
             } else {
                 throw new IllegalArgumentException("Cannot create View from Source " + source);
             }
