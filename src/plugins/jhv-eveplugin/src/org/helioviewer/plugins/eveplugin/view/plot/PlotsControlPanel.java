@@ -223,10 +223,6 @@ public class PlotsControlPanel extends JPanel implements ZoomControllerListener,
     public void viewportGeometryChanged() {
     }
 
-    @Override
-    public void timestampChanged(int idx) {
-    }
-
     // //////////////////////////////////////////////////////////////////////////////
     // Period Picker Listener
     // //////////////////////////////////////////////////////////////////////////////

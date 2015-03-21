@@ -186,22 +186,14 @@ public class GL3DCameraOptionsPanel extends JPanel implements GL3DCameraSelectio
 
     @Override
     public void layerChanged(int idx) {
-        // TODO Auto-generated method stub
     }
 
     @Override
     public void activeLayerChanged(int idx) {
-        // TODO Auto-generated method stub
     }
 
     @Override
     public void viewportGeometryChanged() {
-        // TODO Auto-generated method stub
-    }
-
-    @Override
-    public void timestampChanged(int idx) {
-        // TODO Auto-generated method stub
     }
 
 }

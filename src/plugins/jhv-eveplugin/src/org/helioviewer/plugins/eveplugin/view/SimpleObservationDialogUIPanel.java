@@ -291,7 +291,6 @@ public abstract class SimpleObservationDialogUIPanel extends ObservationDialogPa
 
     @Override
     public void actionPerformed(final JHVCalendarEvent e) {
-
         if (e.getSource() == calendarStartDate && calendarStartDate.getDate() != null) {
             ObservationDialogDateModel.getInstance().setStartDate(calendarStartDate.getDate(), true);
         }
@@ -340,27 +339,18 @@ public abstract class SimpleObservationDialogUIPanel extends ObservationDialogPa
 
     @Override
     public void layerRemoved(View oldView, int oldIdx) {
-        // TODO Auto-generated method stub
     }
 
     @Override
     public void layerChanged(int idx) {
-        // TODO Auto-generated method stub
     }
 
     @Override
     public void activeLayerChanged(int idx) {
-        // TODO Auto-generated method stub
     }
 
     @Override
     public void viewportGeometryChanged() {
-        // TODO Auto-generated method stub
-    }
-
-    @Override
-    public void timestampChanged(int idx) {
-        // TODO Auto-generated method stub
     }
 
     @Override

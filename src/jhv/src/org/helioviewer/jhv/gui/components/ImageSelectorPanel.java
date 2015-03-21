@@ -343,13 +343,6 @@ public class ImageSelectorPanel extends JPanel implements LayersListener {
      * {@inheritDoc}
      */
     @Override
-    public void timestampChanged(int idx) {
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
     public void viewportGeometryChanged() {
     }
 

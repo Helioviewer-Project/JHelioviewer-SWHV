@@ -39,10 +39,4 @@ public abstract class ViewStatusPanelPlugin extends JLabel implements StatusPane
     public void viewportGeometryChanged() {
     }
 
-    /**
-     * NOP default implementation
-     */
-    public void timestampChanged(int idx) {
-    }
-
 }

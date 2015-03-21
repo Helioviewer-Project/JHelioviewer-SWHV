@@ -26,6 +26,7 @@ import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.gui.ImageViewerGui;
 import org.helioviewer.jhv.gui.UIViewListener;
 import org.helioviewer.jhv.gui.UIViewListenerDistributor;
+import org.helioviewer.jhv.gui.components.layerTable.LayerTableModel;
 import org.helioviewer.jhv.gui.components.MoviePanel;
 import org.helioviewer.jhv.gui.dialogs.MetaDataDialog;
 import org.helioviewer.jhv.io.APIRequestManager;
@@ -638,7 +639,8 @@ public class LayersModel implements UIViewListener {
             if (timestampView != null) {
                 int idx = findView(timestampView);
                 if (isValidIndex(idx)) {
-                    this.fireTimestampChanged(idx);
+                    // update LayerTableModel (timestamp labels)
+                    LayerTableModel.getSingletonInstance().fireTableRowsUpdated(idx, idx);
 
                     // store last timestamp displayed and fire TimeChanged
                     ImmutableDateTime currentFrameTimestamp = getCurrentFrameTimestamp(idx);
@@ -750,7 +752,7 @@ public class LayersModel implements UIViewListener {
 
     /**
      * Downloads the complete image from the JPIP server.
-     * 
+     *
      * Changes the source of the ImageInfoView afterwards, since a local file is
      * always faster.
      */
@@ -1280,15 +1282,6 @@ public class LayersModel implements UIViewListener {
     private void fireViewportGeometryChanged() {
         for (LayersListener ll : layerListeners) {
             ll.viewportGeometryChanged();
-        }
-    }
-
-    /**
-     * Notify all LayersListeners
-     */
-    private void fireTimestampChanged(final int idx) {
-        for (LayersListener ll : layerListeners) {
-            ll.timestampChanged(idx);
         }
     }
 

@@ -170,16 +170,6 @@ public class LayerTableModel extends AbstractTableModel implements LayersListene
     }
 
     /**
-     * Method part of the LayersListener interface, itself calling the
-     * appropriate TableModel notification methods
-     */
-    @Override
-    public void timestampChanged(final int idx) {
-        updateData();
-        fireTableRowsUpdated(idx, idx);
-    }
-
-    /**
      * {@inheritDoc}
      */
     @Override
