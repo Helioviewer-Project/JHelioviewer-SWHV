@@ -3,7 +3,6 @@ package org.helioviewer.viewmodel.view.jp2view.io.http;
 import java.io.BufferedInputStream;
 import java.io.EOFException;
 import java.io.IOException;
-import java.io.InputStream;
 import java.net.InetSocketAddress;
 import java.net.ProtocolException;
 import java.net.Socket;
@@ -146,9 +145,9 @@ public class HTTPSocket extends Socket {
             return null;
 
         parts = line.split(" ", 3);
-
-        if (parts.length != 3)
+        if (parts.length != 3) {
             throw new ProtocolException("Invalid HTTP message");
+        }
 
         if (parts[0].startsWith("HTTP/")) {
 
