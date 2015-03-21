@@ -216,7 +216,7 @@ public class GL3DImageLayer extends GL3DShape {
         this.regionView.setViewport(layerViewport, null);
     }
 
-    protected GL3DImageTextureView getImageTextureView() {
+    public GL3DImageTextureView getImageTextureView() {
         return this.imageTextureView;
     }
 
@@ -224,7 +224,6 @@ public class GL3DImageLayer extends GL3DShape {
     public void shapeDraw(GL3DState state) {
         GL2 gl = state.gl;
         GLSLShader.bind(gl);
-        GLSLShader.bindVars(gl);
 
         gl.glEnable(GL2.GL_CULL_FACE);
         {
@@ -238,6 +237,7 @@ public class GL3DImageLayer extends GL3DShape {
             }
             GLSLShader.filter(gl);
             GLSLShader.bind(gl);
+            GLSLShader.bindVars(gl);
 
             enablePositionVBO(state);
             enableIndexVBO(state);

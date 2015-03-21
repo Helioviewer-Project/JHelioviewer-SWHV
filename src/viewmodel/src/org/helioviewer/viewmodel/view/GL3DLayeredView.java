@@ -269,13 +269,7 @@ public class GL3DLayeredView extends AbstractView implements LayeredView, ViewLi
     }
 
     public void renderGL(GL2 gl) {
-        for (int i = 0; i < this.getNumLayers(); i++) {
-            View layerView = this.getLayer(i);
-            if (layerView instanceof GL3DView) {
-                ((GL3DView) layerView).renderGL(gl, true);
-                System.out.println(layerView);
-            }
-        }
+
     }
 
     @Override

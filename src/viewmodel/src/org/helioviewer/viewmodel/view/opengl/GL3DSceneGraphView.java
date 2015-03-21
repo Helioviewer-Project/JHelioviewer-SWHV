@@ -27,6 +27,7 @@ import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.viewmodel.changeevent.ChangeEvent;
 import org.helioviewer.viewmodel.changeevent.LayerChangedReason;
 import org.helioviewer.viewmodel.region.Region;
+import org.helioviewer.viewmodel.view.GL3DLayeredView;
 import org.helioviewer.viewmodel.view.LayeredView;
 import org.helioviewer.viewmodel.view.MetaDataView;
 import org.helioviewer.viewmodel.view.View;
@@ -336,8 +337,10 @@ public class GL3DSceneGraphView extends AbstractGL3DView implements GL3DView {
 
     @Override
     protected void renderChild(GL2 gl) {
-        if (view instanceof GLView) {
-            ((GLView) view).renderGL(gl, true);
+        ((GLView) view).renderGL(gl, true);
+        for (GL3DImageLayer layer : this.imageLayers.getLayers()) {
+            GL3DImageTextureView layerView = layer.getImageTextureView();
+            layerView.renderGL(gl, true);
         }
     }
 
