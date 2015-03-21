@@ -21,7 +21,6 @@ import org.helioviewer.viewmodel.metadata.HelioviewerMetaData;
 import org.helioviewer.viewmodel.metadata.MetaData;
 import org.helioviewer.viewmodel.region.Region;
 import org.helioviewer.viewmodel.region.StaticRegion;
-import org.helioviewer.viewmodel.view.MetaDataView;
 import org.helioviewer.viewmodel.view.jp2view.JHVJP2View;
 import org.helioviewer.viewmodel.view.opengl.shader.GLSLShader;
 import org.helioviewer.viewmodel.viewport.StaticViewport;
@@ -47,8 +46,6 @@ public class GL3DImageLayer extends GL3DShape {
         return layerId;
     }
 
-    protected MetaDataView metaDataView;
-    protected JHVJP2View regionView;
     public double minZ = -Constants.SunRadius;
     public double maxZ = Constants.SunRadius;
 
@@ -67,8 +64,6 @@ public class GL3DImageLayer extends GL3DShape {
         super(name);
         layerId = nextLayerId++;
         this.mainLayerView = mainLayerView;
-        this.metaDataView = mainLayerView.getAdapter(MetaDataView.class);
-        this.regionView = mainLayerView.getAdapter(JHVJP2View.class);
 
         this.markAsChanged();
         int count = 0;
@@ -120,7 +115,7 @@ public class GL3DImageLayer extends GL3DShape {
     }
 
     private void updateROI(GL3DState state) {
-        MetaData metaData = metaDataView.getMetaData();
+        MetaData metaData = mainLayerView.getMetaData();
         GL3DCamera activeCamera = state.getActiveCamera();
         HelioviewerMetaData hvmd = null;
         if (metaData instanceof HelioviewerMetaData) {
@@ -191,10 +186,10 @@ public class GL3DImageLayer extends GL3DShape {
         } else {
             newRegion = StaticRegion.createAdaptedRegion(metLLX, metLLY, metURX - metLLX, metURY - metLLY);
         }
-        this.regionView.setRegion(newRegion, null);
+        this.mainLayerView.setRegion(newRegion, null);
 
         Viewport layerViewport = new ViewportAdapter(new StaticViewport(state.getViewportWidth(), state.getViewportHeight()));
-        this.regionView.setViewport(layerViewport, null);
+        this.mainLayerView.setViewport(layerViewport, null);
     }
 
     @Override
