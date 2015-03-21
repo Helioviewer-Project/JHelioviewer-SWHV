@@ -225,10 +225,6 @@ public class GL3DFollowObjectCamera extends GL3DSolarRotationTrackingTrackballCa
     public void timestampChanged(int idx) {
     }
 
-    @Override
-    public void layerDownloaded(int idx) {
-    }
-
     public Date getBeginTime() {
         return this.positionLoading.getBeginDate();
     }

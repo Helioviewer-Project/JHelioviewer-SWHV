@@ -333,9 +333,4 @@ public class DrawController implements ZoomControllerListener, LineDataSelectorM
         // TODO Auto-generated method stub
     }
 
-    @Override
-    public void layerDownloaded(int idx) {
-        // TODO Auto-generated method stub
-    }
-
 }

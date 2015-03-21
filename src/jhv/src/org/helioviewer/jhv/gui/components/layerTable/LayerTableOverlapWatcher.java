@@ -141,11 +141,4 @@ public class LayerTableOverlapWatcher implements LayersListener {
     public void layerRemoved(View oldView, int oldIdx) {
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void layerDownloaded(int idx) {
-    }
-
 }

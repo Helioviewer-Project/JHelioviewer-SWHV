@@ -615,13 +615,6 @@ public class LayersModel implements UIViewListener {
                 if (idx != -1) {
                     this.fireLayerChanged(idx);
                 }
-            } else if (type == LayerChangedReason.LayerChangeType.LAYER_DOWNLOADED) {
-                layerReason.setProcessed(true);
-                View view = layerReason.getSubView();
-                int idx = findView(view);
-                if (idx != -1) {
-                    this.fireLayerDownloaded(idx);
-                }
             }
         }
     }
@@ -1232,12 +1225,6 @@ public class LayersModel implements UIViewListener {
         ld.timestamp = layersModel.getCurrentFrameTimestampString(view);
 
         return ld;
-    }
-
-    private void fireLayerDownloaded(final int index) {
-        for (LayersListener ll : layerListeners) {
-            ll.layerDownloaded(index);
-        }
     }
 
     /**

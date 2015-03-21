@@ -45,10 +45,4 @@ public abstract class ViewStatusPanelPlugin extends JLabel implements StatusPane
     public void timestampChanged(int idx) {
     }
 
-    /**
-     * NOP default implementation
-     */
-    public void layerDownloaded(int idx) {
-    }
-
 }

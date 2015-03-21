@@ -404,9 +404,4 @@ public class ZoomController implements PlotAreaSpaceListener, LayersListener {
         // TODO Auto-generated method stub
     }
 
-    @Override
-    public void layerDownloaded(int idx) {
-        // TODO Auto-generated method stub
-    }
-
 }

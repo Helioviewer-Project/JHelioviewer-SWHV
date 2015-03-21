@@ -62,12 +62,4 @@ public interface LayersListener {
      */
     public void timestampChanged(int idx);
 
-    /**
-     * Gets fired if a remote jp2 image or movie was downloaded and now becomes
-     * a local image
-     * 
-     * @param idx
-     */
-    public void layerDownloaded(int idx);
-
 }
