@@ -439,14 +439,12 @@ public class MoviePanel extends JPanel implements ActionListener, ChangeListener
      */
     @Override
     public void actionPerformed(ActionEvent e) {
-
         if (e.getSource() == advancedButton) {
             this.setAdvanced(!MoviePanel.isAdvanced);
             ImageViewerGui.getSingletonInstance().getMoviePanelContainer().updateActiveView();
 
             // Toggle play/pause
         } else if (e.getSource() == playPauseButton) {
-
             togglePlayPause();
 
             // Previous frame
@@ -454,7 +452,6 @@ public class MoviePanel extends JPanel implements ActionListener, ChangeListener
             if (isPlaying) {
                 togglePlayPause();
             }
-
             jumpToFrameNumber(getCurrentFrameNumber() - 1);
 
             // Next frame
@@ -462,8 +459,8 @@ public class MoviePanel extends JPanel implements ActionListener, ChangeListener
             if (isPlaying) {
                 togglePlayPause();
             }
-
             jumpToFrameNumber(getCurrentFrameNumber() + 1);
+
             // Change animation speed
         } else if (e.getSource() == ((JSpinner.DefaultEditor) speedSpinner.getEditor()).getTextField()) {
             try {
@@ -471,24 +468,19 @@ public class MoviePanel extends JPanel implements ActionListener, ChangeListener
             } catch (ParseException e1) {
                 e1.printStackTrace();
             }
-
             linkedMovieManager.updateSpeedSpinnerLinkedMovies(this);
-
             updateMovieSpeed();
 
             // Change animation speed unit
         } else if (e.getSource() == speedUnitComboBox) {
-
             linkedMovieManager.updateSpeedUnitComboBoxLinkedMovies(this);
             updateMovieSpeed();
 
             // Change animation mode
         } else if (e.getSource() == animationModeComboBox) {
-
             linkedMovieManager.updateAnimationModeComboBoxLinkedMovies(this);
             view.setAnimationMode((AnimationMode) animationModeComboBox.getSelectedItem());
         }
-
     }
 
     // This is needed for the CardLayout
@@ -701,13 +693,6 @@ public class MoviePanel extends JPanel implements ActionListener, ChangeListener
          */
         @Override
         public void viewportGeometryChanged() {
-        }
-
-        /**
-         * {@inheritDoc}
-         */
-        @Override
-        public void subImageDataChanged() {
         }
 
         /**

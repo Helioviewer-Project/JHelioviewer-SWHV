@@ -297,10 +297,6 @@ public class PfssPluginPanel extends OverlayPanel implements ActionListener, Lay
     }
 
     @Override
-    public void subImageDataChanged() {
-    }
-
-    @Override
     public void timestampChanged(int idx) {
 
         // Not used anymore

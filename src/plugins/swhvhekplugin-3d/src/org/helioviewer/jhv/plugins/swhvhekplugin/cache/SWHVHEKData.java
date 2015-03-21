@@ -103,10 +103,6 @@ public class SWHVHEKData implements LayersListener, JHVEventHandler {
     }
 
     @Override
-    public void subImageDataChanged() {
-    }
-
-    @Override
     public void layerDownloaded(int idx) {
     }
 

@@ -364,11 +364,6 @@ public abstract class SimpleObservationDialogUIPanel extends ObservationDialogPa
     }
 
     @Override
-    public void subImageDataChanged() {
-        // TODO Auto-generated method stub
-    }
-
-    @Override
     public void layerDownloaded(int idx) {
         // TODO Auto-generated method stub
     }

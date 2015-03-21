@@ -48,12 +48,6 @@ public abstract class ViewStatusPanelPlugin extends JLabel implements StatusPane
     /**
      * NOP default implementation
      */
-    public void subImageDataChanged() {
-    }
-
-    /**
-     * NOP default implementation
-     */
     public void layerDownloaded(int idx) {
     }
 

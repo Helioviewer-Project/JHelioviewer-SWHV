@@ -85,11 +85,6 @@ public class OutgoingRequestManager implements LayersListener {
     }
 
     @Override
-    public void subImageDataChanged() {
-        // TODO Auto-generated method stub
-    }
-
-    @Override
     public void layerDownloaded(int idx) {
         // TODO Auto-generated method stub
     }

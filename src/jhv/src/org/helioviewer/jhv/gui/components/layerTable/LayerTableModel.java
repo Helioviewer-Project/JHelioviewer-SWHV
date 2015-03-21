@@ -197,13 +197,6 @@ public class LayerTableModel extends AbstractTableModel implements LayersListene
      * {@inheritDoc}
      */
     @Override
-    public void subImageDataChanged() {
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
     public void layerDownloaded(int idx) {
     }
 
