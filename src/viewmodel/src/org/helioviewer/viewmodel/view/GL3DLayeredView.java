@@ -3,82 +3,33 @@ package org.helioviewer.viewmodel.view;
 import java.util.ArrayList;
 import java.util.HashMap;
 
+import javax.media.opengl.GL2;
+
+import org.helioviewer.gl3d.scenegraph.GL3DState;
 import org.helioviewer.viewmodel.changeevent.ChangeEvent;
 import org.helioviewer.viewmodel.changeevent.LayerChangedReason;
 import org.helioviewer.viewmodel.changeevent.LayerChangedReason.LayerChangeType;
-import org.helioviewer.viewmodel.changeevent.RegionChangedReason;
-import org.helioviewer.viewmodel.changeevent.SubImageDataChangedReason;
-import org.helioviewer.viewmodel.changeevent.ViewChainChangedReason;
-import org.helioviewer.viewmodel.metadata.MetaData;
-import org.helioviewer.viewmodel.region.Region;
 import org.helioviewer.viewmodel.view.jp2view.JHVJP2View;
-import org.helioviewer.viewmodel.viewport.Viewport;
-import org.helioviewer.viewmodel.viewportimagesize.ViewportImageSize;
+import org.helioviewer.viewmodel.view.opengl.GL3DImageTextureView;
+import org.helioviewer.viewmodel.view.opengl.GL3DView;
+import org.helioviewer.viewmodel.view.opengl.GLView;
 
-/**
- * Abstract base class implementing LayeredView, providing some common
- * functions.
- *
- * <p>
- * This class provides most of the functionality of a LayeredView, since most of
- * its behavior is independent from the render mode. Because of that, the whole
- * management of the stack of layers is centralized in this abstract class.
- * <p>
- * To improve performance, many intermediate results are cached.
- * <p>
- * For further informations about how to use layers, see {@link LayeredView}.
- *
- * @author Ludwig Schmidt
- * @author Markus Langenberg
- *
- */
-public abstract class AbstractLayeredView extends AbstractView implements LayeredView, ViewListener {
+public class GL3DLayeredView extends AbstractView implements LayeredView, ViewListener, GL3DView {
 
     protected ArrayList<View> layers = new ArrayList<View>();
     protected HashMap<View, Layer> viewLookup = new HashMap<View, Layer>();
 
-    /**
-     * Buffer for precomputed values for each layer.
-     *
-     * <p>
-     * This container saves some values per layer, such as its visibility and
-     * precomputed view adapters.
-     *
-     */
     protected class Layer {
         public final View view;
 
-        public RegionView regionView;
-        public ViewportView viewportView;
-        public MetaDataView metaDataView;
-        public SubimageDataView subimageDataView;
+        public JHVJP2View jp2View;
 
         public boolean visibility = true;
 
-        /**
-         * Default constructor.
-         *
-         * Computes view adapters for this layer.
-         *
-         * @param base
-         *            layer to save
-         */
         public Layer(View base) {
             view = base;
-            update();
         }
 
-        /**
-         * Recalculates the view adapters, in case the view chain has changed.
-         */
-        public void update() {
-            if (view != null) {
-                regionView = view.getAdapter(RegionView.class);
-                viewportView = view.getAdapter(ViewportView.class);
-                metaDataView = view.getAdapter(MetaDataView.class);
-                subimageDataView = view.getAdapter(SubimageDataView.class);
-            }
-        }
     }
 
     /**
@@ -134,10 +85,16 @@ public abstract class AbstractLayeredView extends AbstractView implements Layere
     /**
      * {@inheritDoc}
      */
+
     @Override
     public void addLayer(View newLayer, int newIndex) {
-        if (newLayer == null) {
+        if (newLayer == null)
             return;
+
+        if (newLayer.getAdapter(GL3DImageTextureView.class) == null) {
+            GL3DImageTextureView imageToTextureView = new GL3DImageTextureView();
+            imageToTextureView.setView(newLayer);
+            newLayer = imageToTextureView;
         }
 
         LinkedMovieManager.getActiveInstance().pauseLinkedMovies();
@@ -148,6 +105,7 @@ public abstract class AbstractLayeredView extends AbstractView implements Layere
 
         ChangeEvent event = new ChangeEvent(new LayerChangedReason(this, LayerChangeType.LAYER_ADDED, newLayer));
         notifyViewListeners(event);
+
     }
 
     /**
@@ -268,11 +226,6 @@ public abstract class AbstractLayeredView extends AbstractView implements Layere
      */
     @Override
     public void viewChanged(View sender, ChangeEvent event) {
-        if (event.reasonOccurred(ViewChainChangedReason.class)) {
-            for (Layer layer : viewLookup.values()) {
-                layer.update();
-            }
-        }
 
         notifyViewListeners(event);
     }
@@ -291,4 +244,42 @@ public abstract class AbstractLayeredView extends AbstractView implements Layere
         }
     }
 
+    @Override
+    public void render3D(GL3DState state) {
+        for (int i = 0; i < this.getNumLayers(); i++) {
+            View layerView = this.getLayer(i);
+            if (layerView instanceof GL3DView) {
+                ((GL3DView) layerView).render3D(state);
+            } else if (layerView instanceof GLView) {
+                ((GLView) layerView).renderGL(state.gl, true);
+            }
+        }
+    }
+
+    @Override
+    public void deactivate(GL3DState state) {
+        for (int i = 0; i < getNumLayers(); i++) {
+            if (getLayer(i).getAdapter(GL3DView.class) != null) {
+                MovieView movieView = getLayer(i).getAdapter(MovieView.class);
+                if (movieView != null) {
+                    movieView.pauseMovie();
+                }
+                getLayer(i).getAdapter(GL3DView.class).deactivate(state);
+            }
+        }
+    }
+
+    public void renderGL(GL2 gl) {
+        for (int i = 0; i < this.getNumLayers(); i++) {
+            View layerView = this.getLayer(i);
+            if (layerView instanceof GL3DView) {
+                ((GL3DView) layerView).renderGL(gl, true);
+            }
+        }
+    }
+
+    @Override
+    public void renderGL(GL2 gl, boolean nextView) {
+        renderGL(gl);
+    }
 }
