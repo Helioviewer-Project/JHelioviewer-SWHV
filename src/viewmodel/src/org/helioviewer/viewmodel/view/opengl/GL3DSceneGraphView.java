@@ -14,7 +14,6 @@ import org.helioviewer.gl3d.math.GL3DVec3d;
 import org.helioviewer.gl3d.math.GL3DVec4f;
 import org.helioviewer.gl3d.model.GL3DArtificialObjects;
 import org.helioviewer.gl3d.model.image.GL3DImageLayer;
-import org.helioviewer.gl3d.model.image.GL3DImageLayerFactory;
 import org.helioviewer.gl3d.model.image.GL3DImageLayers;
 import org.helioviewer.gl3d.scenegraph.GL3DDrawBits.Bit;
 import org.helioviewer.gl3d.scenegraph.GL3DGroup;
@@ -220,12 +219,11 @@ public class GL3DSceneGraphView extends AbstractGL3DView implements GL3DView {
         GL3DCamera camera = state.getActiveCamera();
 
         for (GL3DImageTextureView imageTextureView : this.layersToAdd) {
-            GL3DImageLayer imageLayer = GL3DImageLayerFactory.createImageLayer(state, imageTextureView);
+            GL3DImageLayer imageLayer = new GL3DImageLayer("", imageTextureView, true, true, true);
             this.imageLayers.insertLayer(imageLayer);
         }
 
         if (!this.layersToAdd.isEmpty()) {
-            // If there is data, zoom to fit
             MetaDataView metaDataView = getAdapter(MetaDataView.class);
             if (metaDataView != null && metaDataView.getMetaData() != null) {
                 Region region = metaDataView.getMetaData().getPhysicalRegion();
@@ -233,7 +231,6 @@ public class GL3DSceneGraphView extends AbstractGL3DView implements GL3DView {
                 double halfFOVRad = Math.toRadians(camera.getCameraFOV() / 2);
                 double distance = halfWidth * Math.sin(Math.PI / 2 - halfFOVRad) / Math.sin(halfFOVRad);
                 distance = -distance - camera.getZTranslation();
-                // Log.debug("GL3DZoomFitAction: Distance = "+distance+" Existing Distance: "+camera.getZTranslation());
             }
         }
         this.layersToAdd.clear();
@@ -322,7 +319,7 @@ public class GL3DSceneGraphView extends AbstractGL3DView implements GL3DView {
         /*
          * GL3DNode sibling = node; while((sibling = sibling.getNext()) != null)
          * { for(int i=0; i<level; ++i) System.out.print("   ");
-         * 
+         *
          * System.out.println("Sibling: " + sibling.getClass().getName() + " ("
          * + node.getName() + ")"); }
          */
