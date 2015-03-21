@@ -11,14 +11,12 @@ import org.helioviewer.viewmodel.changeevent.ChangeEvent;
 import org.helioviewer.viewmodel.changeevent.LayerChangedReason;
 import org.helioviewer.viewmodel.changeevent.LayerChangedReason.LayerChangeType;
 import org.helioviewer.viewmodel.view.jp2view.JHVJP2View;
-import org.helioviewer.viewmodel.view.opengl.GL3DImageTextureView;
 import org.helioviewer.viewmodel.view.opengl.GL3DView;
 import org.helioviewer.viewmodel.view.opengl.shader.GLSLShader;
 
 public class GL3DLayeredView extends AbstractView implements LayeredView, ViewListener, GL3DView {
 
     protected ArrayList<View> layers = new ArrayList<View>();
-    protected HashMap<View, Layer> viewLookup = new HashMap<View, Layer>();
     protected HashMap<View, Layer> jp2viewLookup = new HashMap<View, Layer>();
     private final ArrayList<GL3DImageLayer> imageLayers = new ArrayList<GL3DImageLayer>();
 
@@ -89,21 +87,16 @@ public class GL3DLayeredView extends AbstractView implements LayeredView, ViewLi
         if (newLayer == null)
             return;
 
-        GL3DImageTextureView imageToTextureView = new GL3DImageTextureView();
-        imageToTextureView.setView(newLayer);
-
         LinkedMovieManager.getActiveInstance().pauseLinkedMovies();
 
-        layers.add(newIndex, imageToTextureView);
-        viewLookup.put(imageToTextureView, new Layer(imageToTextureView));
-        jp2viewLookup.put(imageToTextureView, new Layer(newLayer));
+        layers.add(newIndex, newLayer);
+        jp2viewLookup.put(newLayer, new Layer(newLayer));
 
-        imageToTextureView.addViewListener(this);
+        newLayer.addViewListener(this);
         GL3DImageLayer imageLayer = new GL3DImageLayer("", (JHVJP2View) newLayer, true, true, true);
         this.imageLayers.add(imageLayer);
-        ChangeEvent event = new ChangeEvent(new LayerChangedReason(this, LayerChangeType.LAYER_ADDED, imageToTextureView));
+        ChangeEvent event = new ChangeEvent(new LayerChangedReason(this, LayerChangeType.LAYER_ADDED, newLayer));
         notifyViewListeners(event);
-
     }
 
     /**
@@ -155,7 +148,6 @@ public class GL3DLayeredView extends AbstractView implements LayeredView, ViewLi
         LinkedMovieManager.getActiveInstance().pauseLinkedMovies();
 
         layers.remove(view);
-        viewLookup.remove(view);
         jp2viewLookup.remove(view);
         view.removeViewListener(this);
 
@@ -202,7 +194,6 @@ public class GL3DLayeredView extends AbstractView implements LayeredView, ViewLi
             event.addReason(new LayerChangedReason(this, LayerChangeType.LAYER_REMOVED, view, index));
         }
         layers.clear();
-        viewLookup.clear();
         jp2viewLookup.clear();
 
         notifyViewListeners(event);

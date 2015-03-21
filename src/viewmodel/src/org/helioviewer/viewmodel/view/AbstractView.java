@@ -7,23 +7,24 @@ import org.helioviewer.viewmodel.changeevent.ChangeEvent;
 
 /**
  * Abstract base class implementing View, managing view listeners.
- * 
+ *
  * <p>
  * This class provides the functionality to manage and notify all view
  * listeners.
- * 
+ *
  * <p>
  * For further information about views, see {@link View}.
- * 
+ *
  * @author Markus Langenberg
  */
 public abstract class AbstractView implements View {
 
-    private final AbstractList<ViewListener> listeners = new ArrayList<ViewListener>();
+    protected final AbstractList<ViewListener> listeners = new ArrayList<ViewListener>();
 
     /**
      * {@inheritDoc}
      */
+    @Override
     public void addViewListener(ViewListener l) {
         listeners.add(l);
     }
@@ -31,6 +32,7 @@ public abstract class AbstractView implements View {
     /**
      * {@inheritDoc}
      */
+    @Override
     public AbstractList<ViewListener> getAllViewListeners() {
         AbstractList<ViewListener> listenersCopy = new ArrayList<ViewListener>(listeners);
         return listenersCopy;
@@ -39,13 +41,14 @@ public abstract class AbstractView implements View {
     /**
      * {@inheritDoc}
      */
+    @Override
     public void removeViewListener(ViewListener l) {
         listeners.remove(l);
     }
 
     /**
      * Sends a new ChangeEvent to all registered view listeners.
-     * 
+     *
      * @param aEvent
      *            ChangeEvent to send
      */
