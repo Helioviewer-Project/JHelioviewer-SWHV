@@ -1,28 +1,16 @@
 package org.helioviewer.viewmodel.view.opengl;
 
-import java.util.Date;
-
 import javax.media.opengl.GL2;
 
-import org.helioviewer.base.math.MathUtils;
-import org.helioviewer.base.physics.Astronomy;
 import org.helioviewer.gl3d.scenegraph.GL3DState;
 import org.helioviewer.viewmodel.changeevent.CacheStatusChangedReason;
 import org.helioviewer.viewmodel.changeevent.ChangeEvent;
 import org.helioviewer.viewmodel.changeevent.RegionChangedReason;
 import org.helioviewer.viewmodel.changeevent.RegionUpdatedReason;
 import org.helioviewer.viewmodel.changeevent.SubImageDataChangedReason;
-import org.helioviewer.viewmodel.imagedata.ImageData;
-import org.helioviewer.viewmodel.metadata.HelioviewerOcculterMetaData;
-import org.helioviewer.viewmodel.metadata.HelioviewerPositionedMetaData;
-import org.helioviewer.viewmodel.metadata.MetaData;
 import org.helioviewer.viewmodel.region.Region;
-import org.helioviewer.viewmodel.view.ImageInfoView;
-import org.helioviewer.viewmodel.view.SubimageDataView;
 import org.helioviewer.viewmodel.view.View;
 import org.helioviewer.viewmodel.view.ViewListener;
-import org.helioviewer.viewmodel.view.jp2view.JHVJPXView;
-import org.helioviewer.viewmodel.view.opengl.shader.GLSLShader;
 
 public class GL3DImageTextureView extends AbstractGL3DView implements GL3DView {
 
@@ -49,76 +37,7 @@ public class GL3DImageTextureView extends AbstractGL3DView implements GL3DView {
     }
 
     private Region copyScreenToTexture(GL3DState state) {
-        ImageInfoView imageView = this.getAdapter(ImageInfoView.class);
-        ImageData image = imageView.getAdapter(SubimageDataView.class).getSubimageData();
-        Region region = image.getRegion();
-
-        if (region == null) {
-            regionChanged = false;
-            return null;
-        }
-
-        double xOffset = region.getLowerLeftCorner().getX();
-        double yOffset = region.getLowerLeftCorner().getY();
-        double xScale = 1. / region.getWidth();
-        double yScale = 1. / region.getHeight();
-        Date dt = new Date(image.getDateMillis());
-
-        double theta = -Astronomy.getB0InRadians(dt);
-        double phi = Astronomy.getL0Radians(dt);
-
-        MetaData metadata = image.getMETADATA();
-        if (metadata instanceof HelioviewerPositionedMetaData) {
-            HelioviewerPositionedMetaData md = (HelioviewerPositionedMetaData) metadata;
-            phi -= md.getStonyhurstLongitude() / MathUtils.radeg;
-            theta = -md.getStonyhurstLatitude() / MathUtils.radeg;
-        }
-
-        GLSLShader.changeRect(xOffset, yOffset, xScale, yScale);
-        GLSLShader.changeAngles(theta, phi);
-
-        JHVJPXView jhvjpx = this.getAdapter(JHVJPXView.class);
-        if (jhvjpx != null) {
-            boolean diffMode = false;
-            Region diffRegion = null;
-            Date diffDate = null;
-
-            if (!jhvjpx.getBaseDifferenceMode() && jhvjpx.getPreviousImageData() != null) {
-                diffMode = true;
-                diffRegion = jhvjpx.getPreviousImageData().getRegion();
-                diffDate = new Date(jhvjpx.getPreviousImageData().getDateMillis());
-            } else if (jhvjpx.getBaseDifferenceMode() && jhvjpx.getBaseDifferenceImageData() != null) {
-                diffMode = true;
-                diffRegion = jhvjpx.getBaseDifferenceImageData().getRegion();
-                diffDate = new Date(jhvjpx.getBaseDifferenceImageData().getDateMillis());
-            }
-
-            if (diffMode) {
-                double diffXOffset = diffRegion.getLowerLeftCorner().getX();
-                double diffYOffset = diffRegion.getLowerLeftCorner().getY();
-                double diffXScale = 1. / diffRegion.getWidth();
-                double diffYScale = 1. / diffRegion.getHeight();
-
-                double diffTheta = -Astronomy.getB0InRadians(diffDate);
-                double diffPhi = Astronomy.getL0Radians(diffDate);
-
-                GLSLShader.setDifferenceRect(diffXOffset, diffYOffset, diffXScale, diffYScale);
-                GLSLShader.changeDifferenceAngles(diffTheta, diffPhi);
-            }
-        }
-
-        double innerCutOff = 0;
-        double outerCutOff = 40;
-        if (metadata instanceof HelioviewerOcculterMetaData) {
-            HelioviewerOcculterMetaData md = (HelioviewerOcculterMetaData) metadata;
-            innerCutOff = md.getInnerPhysicalOcculterRadius();
-            outerCutOff = md.getOuterPhysicalOcculterRadius();
-        }
-
-        GLSLShader.setCutOffRadius(innerCutOff, outerCutOff);
-
-        this.recaptureRequested = false;
-        return region;
+        return null;
     }
 
     @Override

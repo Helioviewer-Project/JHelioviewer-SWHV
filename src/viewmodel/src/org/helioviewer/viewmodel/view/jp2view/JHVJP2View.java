@@ -12,7 +12,9 @@ import kdu_jni.Jp2_palette;
 import kdu_jni.KduException;
 
 import org.helioviewer.base.math.Interval;
+import org.helioviewer.base.math.MathUtils;
 import org.helioviewer.base.math.Vector2dInt;
+import org.helioviewer.base.physics.Astronomy;
 import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.display.RenderListener;
 import org.helioviewer.jhv.gui.filters.lut.DefaultTable;
@@ -26,6 +28,8 @@ import org.helioviewer.viewmodel.changeevent.ViewportChangedReason;
 import org.helioviewer.viewmodel.imagedata.ColorMask;
 import org.helioviewer.viewmodel.imagedata.ImageData;
 import org.helioviewer.viewmodel.metadata.HelioviewerMetaData;
+import org.helioviewer.viewmodel.metadata.HelioviewerOcculterMetaData;
+import org.helioviewer.viewmodel.metadata.HelioviewerPositionedMetaData;
 import org.helioviewer.viewmodel.metadata.MetaData;
 import org.helioviewer.viewmodel.metadata.ObserverMetaData;
 import org.helioviewer.viewmodel.metadata.PixelBasedMetaData;
@@ -957,6 +961,7 @@ public class JHVJP2View extends AbstractView implements JP2View, ViewportView, R
     }
 
     public void applyFilters(GL2 gl) {
+        copyScreenToTexture(gl);
         applyRunningDifferenceGL(gl);
         GLSLShader.colorMask = colorMask;
         GLSLShader.setContrast(contrast);
@@ -1125,5 +1130,67 @@ public class JHVJP2View extends AbstractView implements JP2View, ViewportView, R
 
     public boolean getInvertLUT() {
         return invertLUT;
+    }
+
+    private void copyScreenToTexture(GL2 gl) {
+        ImageData image = this.getSubimageData();
+        Region region = image.getRegion();
+
+        double xOffset = region.getLowerLeftCorner().getX();
+        double yOffset = region.getLowerLeftCorner().getY();
+        double xScale = 1. / region.getWidth();
+        double yScale = 1. / region.getHeight();
+        Date dt = new Date(image.getDateMillis());
+
+        double theta = -Astronomy.getB0InRadians(dt);
+        double phi = Astronomy.getL0Radians(dt);
+
+        MetaData metadata = image.getMETADATA();
+        if (metadata instanceof HelioviewerPositionedMetaData) {
+            HelioviewerPositionedMetaData md = (HelioviewerPositionedMetaData) metadata;
+            phi -= md.getStonyhurstLongitude() / MathUtils.radeg;
+            theta = -md.getStonyhurstLatitude() / MathUtils.radeg;
+        }
+
+        GLSLShader.changeRect(xOffset, yOffset, xScale, yScale);
+        GLSLShader.changeAngles(theta, phi);
+
+        boolean diffMode = false;
+        Region diffRegion = null;
+        Date diffDate = null;
+
+        if (!this.getBaseDifferenceMode() && this.getPreviousImageData() != null) {
+            diffMode = true;
+            diffRegion = this.getPreviousImageData().getRegion();
+            diffDate = new Date(this.getPreviousImageData().getDateMillis());
+        } else if (this.getBaseDifferenceMode() && this.getBaseDifferenceImageData() != null) {
+            diffMode = true;
+            diffRegion = this.getBaseDifferenceImageData().getRegion();
+            diffDate = new Date(this.getBaseDifferenceImageData().getDateMillis());
+        }
+
+        if (diffMode) {
+            double diffXOffset = diffRegion.getLowerLeftCorner().getX();
+            double diffYOffset = diffRegion.getLowerLeftCorner().getY();
+            double diffXScale = 1. / diffRegion.getWidth();
+            double diffYScale = 1. / diffRegion.getHeight();
+
+            double diffTheta = -Astronomy.getB0InRadians(diffDate);
+            double diffPhi = Astronomy.getL0Radians(diffDate);
+
+            GLSLShader.setDifferenceRect(diffXOffset, diffYOffset, diffXScale, diffYScale);
+            GLSLShader.changeDifferenceAngles(diffTheta, diffPhi);
+        }
+
+        double innerCutOff = 0;
+        double outerCutOff = 40;
+        if (metadata instanceof HelioviewerOcculterMetaData) {
+            HelioviewerOcculterMetaData md = (HelioviewerOcculterMetaData) metadata;
+            innerCutOff = md.getInnerPhysicalOcculterRadius();
+            outerCutOff = md.getOuterPhysicalOcculterRadius();
+        }
+
+        GLSLShader.setCutOffRadius(innerCutOff, outerCutOff);
+
     }
 }
