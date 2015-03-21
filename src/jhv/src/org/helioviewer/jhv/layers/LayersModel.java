@@ -640,23 +640,20 @@ public class LayersModel implements UIViewListener {
 
         // if meta data has changed, update label
         for (TimestampChangedReason timestampReason : timestampReasons) {
-            if (timestampReason.getView() != null) {
-                View timestampView = timestampReason.getView();
+            View timestampView = timestampReason.getView();
 
+            if (timestampView != null) {
                 int idx = findView(timestampView);
                 if (isValidIndex(idx)) {
                     this.fireTimestampChanged(idx);
 
-                    // store last timestamp displayed
+                    // store last timestamp displayed and fire TimeChanged
                     ImmutableDateTime currentFrameTimestamp = getCurrentFrameTimestamp(idx);
                     if (currentFrameTimestamp != null) {
                         lastTimestamp = currentFrameTimestamp.getTime();
-                    } else {
-                        currentFrameTimestamp = null;
-                    }
-
-                    if (idx == activeLayer) {
-                        Displayer.fireTimeChanged(currentFrameTimestamp.getTime());
+                        if (idx == activeLayer) {
+                            Displayer.fireTimeChanged(lastTimestamp);
+                        }
                     }
                 }
             }
