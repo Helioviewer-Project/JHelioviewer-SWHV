@@ -21,7 +21,7 @@ public class GLInfo {
     /*
      * TBD
      * 
-     * - pixel scale at startup - fix render mode status
+     * - pixel scale at startup
      * 
      * if (!GLInfo.glIsUsable()) { Message.err("Could not initialize OpenGL",
      * "OpenGL could not be initialized properly during startup. JHelioviewer
@@ -29,24 +29,17 @@ public class GLInfo {
      * output. ", false); }
      */
 
-    private static String version;
-
     public static int maxTextureSize;
     public static int[] pixelScale = new int[] { 1, 1 };
 
     /**
      * Updates the OpenGL settings by reading the OpenGL properties.
      *
-     * By default, activates OpenGL if possible.
-     *
-     * @param gl
-     *            Valid reference to the current gl object
-     * @see #setGlEnabled(boolean)
      */
     public static void update(GLCanvas canvas) {
         final GL2 gl = canvas.getGL().getGL2();
 
-        version = gl.glGetString(GL2.GL_VERSION);
+        String version = gl.glGetString(GL2.GL_VERSION);
         Log.debug(">> GLInfo > Version string: " + version);
         Matcher versionMatcher = Pattern.compile("\\d+(\\.(\\d+))*").matcher(version);
         if (!versionMatcher.find()) {
@@ -76,19 +69,6 @@ public class GLInfo {
 
             J2KRenderGlobalOptions.setDoubleBufferingOption(true);
         }
-    }
-
-    public static boolean glIsEnabled() {
-        return true;
-    }
-
-    /**
-     * Returns the OpenGL version available on this machine.
-     *
-     * @return OpenGL version
-     */
-    public static String getVersion() {
-        return version;
     }
 
 }

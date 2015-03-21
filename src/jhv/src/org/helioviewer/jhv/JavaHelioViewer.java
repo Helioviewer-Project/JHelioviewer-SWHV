@@ -266,7 +266,6 @@ public class JavaHelioViewer {
                 @Override
                 public void run() {
                     ImageViewerGui.getSingletonInstance().prepareGui();
-                    ImageViewerGui.getSingletonInstance().updateComponents();
                     // ImageViewerGui.getSingletonInstance().createViewchains();
 
                     LayerTableOverlapWatcher overlapWatcher = new LayerTableOverlapWatcher();

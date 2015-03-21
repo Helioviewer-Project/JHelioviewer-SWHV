@@ -69,8 +69,6 @@ public class PreferencesDialog extends JDialog implements ShowableDialog {
     private final JLabel occupiedSizeLabel = new JLabel();
     private final JTextField maxCacheBox = new JTextField("0.0");
     private final JLabel maxCacheBoxLabel = new JLabel(" Mbytes");
-    private JCheckBox useOpenGLIfAvailable;
-    private JCheckBox useOpenGLIfAvailableExportMovie;
     private JComboBox debugFileCombo = null;
     private JComboBox debugConsoleCombo = null;
     private JTextField debugFileTextField = null;
@@ -90,7 +88,6 @@ public class PreferencesDialog extends JDialog implements ShowableDialog {
      * The private constructor that sets the fields and the dialog.
      */
     public PreferencesDialog() {
-
         super(ImageViewerGui.getMainFrame(), "Preferences", true);
         setResizable(false);
 
@@ -120,9 +117,9 @@ public class PreferencesDialog extends JDialog implements ShowableDialog {
         JPanel btnPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
         btnPanel.setBorder(BorderFactory.createEmptyBorder(10, 0, 0, 0));
 
-        JButton acceptBtn = new JButton(" Accept ");
-        JButton cancelBtn = new JButton(" Cancel ");
-        JButton resetBtn = new JButton(" Reset ");
+        JButton acceptBtn = new JButton("Accept");
+        JButton cancelBtn = new JButton("Cancel");
+        JButton resetBtn = new JButton("Reset");
 
         acceptBtn.addActionListener(new ActionListener() {
             @Override
@@ -143,7 +140,6 @@ public class PreferencesDialog extends JDialog implements ShowableDialog {
                 }
 
                 saveSettings();
-                ImageViewerGui.getSingletonInstance().updateComponents();
                 dispose();
             }
         });
@@ -163,8 +159,6 @@ public class PreferencesDialog extends JDialog implements ShowableDialog {
                 if (JOptionPane.showConfirmDialog(null, "Do you really want to reset the setting values?", "Attention", JOptionPane.YES_NO_OPTION) == JOptionPane.YES_OPTION) {
                     defaultsPanel.resetSettings();
                     loadDefaultMovieOnStartUp.setSelected(true);
-                    useOpenGLIfAvailable.setSelected(true);
-                    useOpenGLIfAvailableExportMovie.setSelected(true);
                     maxCacheBox.setText("0.0");
                     dateFormatField.setText(defaultDateFormat);
 
@@ -210,7 +204,6 @@ public class PreferencesDialog extends JDialog implements ShowableDialog {
      * @return boolean value if pattern is supported.
      */
     private boolean isDateFormatValid(String format) {
-
         // go through all signs of pattern
         for (int i = 0; i < format.length(); i++) {
             char sign = format.charAt(i);
@@ -233,7 +226,6 @@ public class PreferencesDialog extends JDialog implements ShowableDialog {
      */
     @Override
     public void showDialog() {
-
         loadSettings();
 
         pack();
@@ -248,7 +240,6 @@ public class PreferencesDialog extends JDialog implements ShowableDialog {
      * @return Array containing allowed look and feels
      */
     private UIManager.LookAndFeelInfo[] getAllowedLookAndFeels() {
-
         UIManager.LookAndFeelInfo[] lafs = UIManager.getInstalledLookAndFeels();
 
         // erase disallowed look and feels:
@@ -271,8 +262,6 @@ public class PreferencesDialog extends JDialog implements ShowableDialog {
      *            Entry to select
      */
     private void setLookAndFeelCombo(String lafClassName) {
-        // UIManager.LookAndFeelInfo[] lafs =
-        // UIManager.getInstalledLookAndFeels();
         UIManager.LookAndFeelInfo[] lafs = getAllowedLookAndFeels();
 
         for (int i = 0; i < lafs.length; i++) {
@@ -292,7 +281,6 @@ public class PreferencesDialog extends JDialog implements ShowableDialog {
      * all gui elements according to them.
      */
     private void loadSettings() {
-
         // In principle the settings have been previously loaded
         // settings.load();
 
@@ -305,10 +293,6 @@ public class PreferencesDialog extends JDialog implements ShowableDialog {
 
         // Look and feel
         setLookAndFeelCombo(settings.getProperty("display.laf"));
-
-        // OpenGL options
-        useOpenGLIfAvailable.setSelected(Boolean.parseBoolean(settings.getProperty("opengl.enabled")));
-        useOpenGLIfAvailableExportMovie.setSelected(!Boolean.parseBoolean(settings.getProperty("export.software.rendering")));
 
         // Debug options
         LogSettings logSettings = LogSettings.getSingletonInstance();
@@ -353,17 +337,12 @@ public class PreferencesDialog extends JDialog implements ShowableDialog {
      * Writes the informations to {@link org.helioviewer.jhv.Settings}.
      */
     private void saveSettings() {
-
         // Start up
         settings.setProperty("startup.loadmovie", Boolean.toString(loadDefaultMovieOnStartUp.isSelected()));
 
         // Look and feel
         UIManager.LookAndFeelInfo[] lafs = getAllowedLookAndFeels();
         settings.setProperty("display.laf", lafs[lafCombo.getSelectedIndex()].getClassName());
-
-        // OpenGL options
-        settings.setProperty("opengl.enabled", Boolean.toString(useOpenGLIfAvailable.isSelected()));
-        settings.setProperty("export.software.rendering", Boolean.toString(!useOpenGLIfAvailableExportMovie.isSelected()));
 
         // Debug options
         LogSettings logSettings = LogSettings.getSingletonInstance();
@@ -403,7 +382,6 @@ public class PreferencesDialog extends JDialog implements ShowableDialog {
      * @return String showing the size of the cache currently used
      */
     private String getCacheSizeText() {
-
         long len = 0;
         File[] list = JHV_Kdu_cache.getCacheFiles(JHVDirectory.CACHE.getFile());
 
@@ -424,7 +402,6 @@ public class PreferencesDialog extends JDialog implements ShowableDialog {
      * @return JPIP cache panel
      */
     private JPanel createJPIPCachePanel() {
-
         JPanel cachePanel = new JPanel(new GridLayout(0, 1));
         cachePanel.setBorder(BorderFactory.createTitledBorder(" JPIP Cache "));
 
@@ -499,8 +476,6 @@ public class PreferencesDialog extends JDialog implements ShowableDialog {
             @Override
             public void actionPerformed(ActionEvent e) {
                 JComboBox source = (JComboBox) e.getSource();
-                // UIManager.LookAndFeelInfo[] lafs =
-                // UIManager.getInstalledLookAndFeels();
                 UIManager.LookAndFeelInfo[] lafs = getAllowedLookAndFeels();
                 UIManager.LookAndFeelInfo selectedLaf = lafs[source.getSelectedIndex()];
 
@@ -538,22 +513,6 @@ public class PreferencesDialog extends JDialog implements ShowableDialog {
 
         row2.add(dateFormatInfo);
         paramsPanel.add(row2);
-
-        JPanel row3 = new JPanel(new FlowLayout(FlowLayout.LEADING));
-        row3.add(new JLabel("OpenGL: "));
-
-        useOpenGLIfAvailable = new JCheckBox("Use if available");
-
-        row3.add(useOpenGLIfAvailable);
-        paramsPanel.add(row3);
-
-        JPanel row3b = new JPanel(new FlowLayout(FlowLayout.LEADING));
-        row3b.add(new JLabel("OpenGL for exporting movies: "));
-
-        useOpenGLIfAvailableExportMovie = new JCheckBox("Use if available");
-
-        row3b.add(useOpenGLIfAvailableExportMovie);
-        paramsPanel.add(row3b);
 
         LogSettings logSettings = LogSettings.getSingletonInstance();
         Level fileLoggingLevel = logSettings.getLoggingLevel(LogSettings.getSingletonInstance().FILE_LOGGER);
@@ -597,7 +556,6 @@ public class PreferencesDialog extends JDialog implements ShowableDialog {
      * @return Default save directories panel
      */
     private JPanel createDefaultSaveDirPanel() {
-
         JPanel panel = new JPanel(new BorderLayout());
         panel.setBorder(BorderFactory.createTitledBorder(" Defaults "));
 
@@ -666,9 +624,7 @@ public class PreferencesDialog extends JDialog implements ShowableDialog {
         }
 
         public void loadSettings() {
-
             TableModel model = table.getModel();
-
             Settings settings = Settings.getSingletonInstance();
 
             model.setValueAt(settings.getProperty("default.save.path"), 0, 1);
@@ -677,9 +633,7 @@ public class PreferencesDialog extends JDialog implements ShowableDialog {
         }
 
         public void saveSettings() {
-
             TableModel model = table.getModel();
-
             Settings settings = Settings.getSingletonInstance();
 
             settings.setProperty("default.save.path", model.getValueAt(0, 1).toString());
@@ -688,7 +642,6 @@ public class PreferencesDialog extends JDialog implements ShowableDialog {
         }
 
         public void resetSettings() {
-
             TableModel model = table.getModel();
 
             model.setValueAt(JHVDirectory.EXPORTS.getPath(), 0, 1);
@@ -700,4 +653,5 @@ public class PreferencesDialog extends JDialog implements ShowableDialog {
     @Override
     public void init() {
     }
+
 }
