@@ -92,7 +92,6 @@ public class GL3DLayeredView extends AbstractView implements LayeredView, ViewLi
 
         if (newLayer.getAdapter(GL3DImageTextureView.class) == null) {
             GL3DImageTextureView imageToTextureView = new GL3DImageTextureView();
-            System.out.println(newLayer);
             imageToTextureView.setView(newLayer);
             newLayer = imageToTextureView;
         }
