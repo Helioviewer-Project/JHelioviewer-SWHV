@@ -60,8 +60,10 @@ public class ZoomStatusPanel extends ViewStatusPanelPlugin {
         updateZoomLevel();
     }
 
+/*
     public void viewportGeometryChanged() {
         updateZoomLevel();
     }
+*/
 
 }

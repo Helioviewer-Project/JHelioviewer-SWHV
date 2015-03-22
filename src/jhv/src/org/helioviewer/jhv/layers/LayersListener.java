@@ -48,10 +48,4 @@ public interface LayersListener {
      */
     public void activeLayerChanged(int idx);
 
-    /**
-     * Gets fired if the viewport geometry changed (which might e.g. be
-     * interesting for updating Zoomlevel information etc.).
-     */
-    public void viewportGeometryChanged();
-
 }

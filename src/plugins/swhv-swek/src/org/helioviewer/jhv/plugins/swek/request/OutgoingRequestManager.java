@@ -71,8 +71,4 @@ public class OutgoingRequestManager implements LayersListener {
     public void activeLayerChanged(int idx) {
     }
 
-    @Override
-    public void viewportGeometryChanged() {
-    }
-
 }

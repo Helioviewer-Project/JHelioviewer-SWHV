@@ -235,10 +235,6 @@ public class ControlsPanel extends JPanel implements ActionListener, LayersListe
     }
 
     @Override
-    public void viewportGeometryChanged() {
-    }
-
-    @Override
     public void eventsDeactivated() {
         repaint();
     }

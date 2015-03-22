@@ -83,10 +83,4 @@ public class LayerTableContainer extends JPanel implements LayersListener {
     public void layerChanged(int index) {
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    public void viewportGeometryChanged() {
-    }
-
 }

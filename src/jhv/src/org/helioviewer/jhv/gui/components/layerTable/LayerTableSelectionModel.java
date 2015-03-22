@@ -69,10 +69,4 @@ public class LayerTableSelectionModel extends DefaultListSelectionModel implemen
     public void layerRemoved(View oldView, int oldIndex) {
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    public void viewportGeometryChanged() {
-    }
-
 }

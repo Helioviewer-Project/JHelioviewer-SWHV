@@ -84,10 +84,6 @@ public class Planet extends GL3DSphere implements LayersListener, TimeListener, 
     }
 
     @Override
-    public void viewportGeometryChanged() {
-    }
-
-    @Override
     public void timeChanged(Date date) {
         updatePosition(date);
     }

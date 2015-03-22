@@ -311,10 +311,6 @@ public class PfssPluginPanel extends OverlayPanel implements ActionListener, Lay
     }
 */
 
-    @Override
-    public void viewportGeometryChanged() {
-    }
-
     public void setDate(String date) {
         if (date == "" || date == null) {
             this.dateLabel.setText(VOIDDATELABEL);

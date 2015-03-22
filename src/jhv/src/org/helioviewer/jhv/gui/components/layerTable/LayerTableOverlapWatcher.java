@@ -117,13 +117,6 @@ public class LayerTableOverlapWatcher implements LayersListener {
      * {@inheritDoc}
      */
     @Override
-    public void viewportGeometryChanged() {
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
     public void layerChanged(int idx) {
     }
 

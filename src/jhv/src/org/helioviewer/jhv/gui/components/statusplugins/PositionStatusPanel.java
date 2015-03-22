@@ -190,10 +190,7 @@ public class PositionStatusPanel extends ViewStatusPanelPlugin implements MouseM
         }
     }
 
-    /**
-     * {@inheritDoc}
-     */
-
+/*
     @Override
     public void viewportGeometryChanged() {
         // a view change (e.g. a zoom) can change the coordinates in the
@@ -203,6 +200,7 @@ public class PositionStatusPanel extends ViewStatusPanelPlugin implements MouseM
             updatePosition(lastPosition);
         }
     }
+*/
 
     @Override
     public void detach() {

@@ -35,10 +35,8 @@ import org.helioviewer.viewmodel.changeevent.ChangeEvent;
 import org.helioviewer.viewmodel.changeevent.ChangedReason;
 import org.helioviewer.viewmodel.changeevent.LayerChangedReason;
 import org.helioviewer.viewmodel.changeevent.LayerChangedReason.LayerChangeType;
-import org.helioviewer.viewmodel.changeevent.RegionChangedReason;
 import org.helioviewer.viewmodel.changeevent.TimestampChangedReason;
 import org.helioviewer.viewmodel.changeevent.ViewChainChangedReason;
-import org.helioviewer.viewmodel.changeevent.ViewportChangedReason;
 import org.helioviewer.viewmodel.io.APIResponse;
 import org.helioviewer.viewmodel.io.APIResponseDump;
 import org.helioviewer.viewmodel.region.Region;
@@ -620,15 +618,6 @@ public class LayersModel implements UIViewListener {
         }
     }
 
-    private void handleViewportPositionChanges(View sender, ChangeEvent aEvent) {
-        ChangedReason reason1 = aEvent.getLastChangedReasonByType(RegionChangedReason.class);
-        ChangedReason reason2 = aEvent.getLastChangedReasonByType(ViewportChangedReason.class);
-
-        if (reason1 != null || reason2 != null) {
-            this.fireViewportGeometryChanged();
-        }
-    }
-
     private void handleTimestampChanges(View sender, ChangeEvent aEvent) {
         List<TimestampChangedReason> timestampReasons = aEvent.getAllChangedReasonsByType(TimestampChangedReason.class);
 
@@ -670,7 +659,6 @@ public class LayersModel implements UIViewListener {
     @Override
     public void UIviewChanged(View sender, ChangeEvent aEvent) {
         handleTimestampChanges(sender, aEvent);
-        handleViewportPositionChanges(sender, aEvent);
         handleLayerChanges(sender, aEvent);
         handleViewChainChanges(sender, aEvent);
     }
@@ -1273,15 +1261,6 @@ public class LayersModel implements UIViewListener {
     private void fireActiveLayerChanged(final int index) {
         for (LayersListener ll : layerListeners) {
             ll.activeLayerChanged(index);
-        }
-    }
-
-    /**
-     * Notify all LayersListeners
-     */
-    private void fireViewportGeometryChanged() {
-        for (LayersListener ll : layerListeners) {
-            ll.viewportGeometryChanged();
         }
     }
 

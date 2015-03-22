@@ -350,10 +350,6 @@ public abstract class SimpleObservationDialogUIPanel extends ObservationDialogPa
     }
 
     @Override
-    public void viewportGeometryChanged() {
-    }
-
-    @Override
     public void startDateChanged(Date startDate) {
         calendarStartDate.setDate(startDate);
     }

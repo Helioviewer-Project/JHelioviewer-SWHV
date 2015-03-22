@@ -689,13 +689,6 @@ public class MoviePanel extends JPanel implements ActionListener, ChangeListener
         }
 
         /**
-         * {@inheritDoc}
-         */
-        @Override
-        public void viewportGeometryChanged() {
-        }
-
-        /**
          * Searches the movie panel corresponding to the given view.
          *
          * All static movie actions are performed by accessing the movie panel
