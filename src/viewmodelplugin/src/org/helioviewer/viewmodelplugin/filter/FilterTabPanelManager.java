@@ -205,8 +205,4 @@ public class FilterTabPanelManager implements LayersListener {
         }
     }
 
-    @Override
-    public void viewportGeometryChanged() {
-    }
-
 }

@@ -217,10 +217,6 @@ public class GL3DFollowObjectCamera extends GL3DSolarRotationTrackingTrackballCa
         }
     }
 
-    @Override
-    public void viewportGeometryChanged() {
-    }
-
     public Date getBeginTime() {
         return this.positionLoading.getBeginDate();
     }

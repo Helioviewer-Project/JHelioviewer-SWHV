@@ -176,13 +176,6 @@ public class LayerTableModel extends AbstractTableModel implements LayersListene
     public void activeLayerChanged(final int index) {
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void viewportGeometryChanged() {
-    }
-
     private void updateData() {
         LayeredView lv = LayersModel.getSingletonInstance().getLayeredView();
         views.clear();
