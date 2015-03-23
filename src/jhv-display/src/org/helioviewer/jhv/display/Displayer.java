@@ -9,10 +9,12 @@ import javax.swing.Timer;
 
 import org.helioviewer.jhv.data.datatype.event.JHVEvent;
 import org.helioviewer.jhv.data.datatype.event.JHVEventHighlightListener;
+import org.helioviewer.jhv.plugin.renderable.RenderableContainer;
 
 public class Displayer implements JHVEventHighlightListener {
 
     private static final Displayer instance = new Displayer();
+    private static final RenderableContainer renderableContainer = new RenderableContainer();
 
     public static Displayer getSingletonInstance() {
         return instance;
@@ -95,6 +97,10 @@ public class Displayer implements JHVEventHighlightListener {
     @Override
     public void eventHightChanged(JHVEvent event) {
         this.display();
+    }
+
+    public static RenderableContainer getRenderablecontainer() {
+        return renderableContainer;
     }
 
 }
