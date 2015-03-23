@@ -33,7 +33,7 @@ public class RenderableGrid implements Renderable {
     private final Color thirdColor = Color.YELLOW;
     private final float lineWidth = 1.2f;
     private final RenderableType renderableType;
-    private final Component optionsPanel = new RenderableGridOptionsPanel();
+    private final Component optionsPanel;
 
     public RenderableGrid(RenderableType renderableType, double lonstepDegrees, double latstepDegrees, boolean followCamera) {
         this.renderableType = renderableType;
@@ -55,6 +55,7 @@ public class RenderableGrid implements Renderable {
         renderer = new TextRenderer(font, false, true);//, new CustomRenderDelegate(0, Color.WHITE));
         renderer.setUseVertexArrays(true);
         renderer.getSmoothing();
+        optionsPanel = new RenderableGridOptionsPanel(this);
     }
 
     @Override
