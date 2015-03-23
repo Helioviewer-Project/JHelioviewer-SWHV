@@ -43,8 +43,6 @@ import org.helioviewer.viewmodel.view.GL3DLayeredView;
 import org.helioviewer.viewmodel.view.ImageInfoView;
 import org.helioviewer.viewmodel.view.LayeredView;
 import org.helioviewer.viewmodel.view.LinkedMovieManager;
-import org.helioviewer.viewmodel.view.MetaDataView;
-import org.helioviewer.viewmodel.view.MovieView;
 import org.helioviewer.viewmodel.view.RegionView;
 import org.helioviewer.viewmodel.view.TimedMovieView;
 import org.helioviewer.viewmodel.view.View;
@@ -657,7 +655,7 @@ public class LayersModel implements UIViewListener {
      *            - index of the layer in question
      */
     public void downloadLayer(int idx) {
-        View view = getLayeredView().getLayer(idx);
+        JHVJP2View view = getLayeredView().getLayer(idx);
         downloadLayer(view);
     }
 
@@ -667,9 +665,8 @@ public class LayersModel implements UIViewListener {
      * @param view
      *            - View that can be associated with the layer in question
      */
-    public void downloadLayer(View view) {
-        ImageInfoView infoView;
-        if (view == null || (infoView = view.getAdapter(ImageInfoView.class)) == null) {
+    public void downloadLayer(JHVJP2View view) {
+        if (view == null) {
             return;
         }
 
@@ -685,7 +682,7 @@ public class LayersModel implements UIViewListener {
                 this.theInfoView = theInfoView;
                 return this;
             }
-        }.init(infoView), "DownloadFromJPIPThread");
+        }.init(view), "DownloadFromJPIPThread");
 
         downloadThread.start();
     }
@@ -731,7 +728,7 @@ public class LayersModel implements UIViewListener {
      *            - index of the layer in question
      */
     public void showMetaInfo(int idx) {
-        View view = getLayer(idx);
+        JHVJP2View view = getLayer(idx);
         showMetaInfo(view);
     }
 
@@ -744,13 +741,13 @@ public class LayersModel implements UIViewListener {
      *
      * @see org.helioviewer.jhv.gui.dialogs.MetaDataDialog
      */
-    public void showMetaInfo(View view) {
+    public void showMetaInfo(JHVJP2View view) {
         if (view == null) {
             return;
         }
 
         MetaDataDialog dialog = new MetaDataDialog();
-        dialog.setMetaData(view.getAdapter(MetaDataView.class));
+        dialog.setMetaData(view);
         dialog.showDialog();
     }
 
@@ -790,13 +787,8 @@ public class LayersModel implements UIViewListener {
             return;
         }
 
-        if (!this.isTimed(view)) {
-            return;
-        }
-
-        MovieView view2 = view.getAdapter(MovieView.class);
-        if (view2 != null) {
-            MoviePanel moviePanel = MoviePanel.getMoviePanel(view2);
+        if (view instanceof JHVJPXView) {
+            MoviePanel moviePanel = MoviePanel.getMoviePanel((JHVJPXView) view);
             if (moviePanel != null) {
                 moviePanel.setMovieLink(link);
             }
