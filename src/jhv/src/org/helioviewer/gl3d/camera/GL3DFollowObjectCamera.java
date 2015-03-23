@@ -15,7 +15,6 @@ import org.helioviewer.jhv.layers.LayersModel;
 import org.helioviewer.viewmodel.view.View;
 import org.helioviewer.viewmodel.view.jp2view.JHVJPXView;
 import org.helioviewer.viewmodel.view.jp2view.datetime.ImmutableDateTime;
-import org.helioviewer.viewmodel.view.opengl.GL3DSceneGraphView;
 
 public class GL3DFollowObjectCamera extends GL3DSolarRotationTrackingTrackballCamera implements GL3DPositionLoadingListener, LayersListener, TimeListener {
 
@@ -32,12 +31,11 @@ public class GL3DFollowObjectCamera extends GL3DSolarRotationTrackingTrackballCa
 
     protected GL3DCameraFOV cameraFOVDraw;
 
-    public GL3DFollowObjectCamera(GL3DSceneGraphView sceneGraphView) {
-        super(sceneGraphView);
+    public GL3DFollowObjectCamera() {
+        super();
         positionLoading = new GL3DPositionLoading();
         positionLoading.addListener(this);
         this.cameraFOVDraw = new GL3DCameraFOV(1., 1.);
-        this.sceneGraphView.getRoot().addNode(this.cameraFOVDraw);
         this.cameraFOVDraw.getDrawBits().set(Bit.Hidden, fovhidden);
         LayersModel.getSingletonInstance().addLayersListener(this);
     }
@@ -68,12 +66,10 @@ public class GL3DFollowObjectCamera extends GL3DSolarRotationTrackingTrackballCa
         Displayer.removeTimeListener(this);
     }
 
-    public void createNewFOV(GL3DSceneGraphView gv) {
+    public void createNewFOV() {
         boolean hidden = this.cameraFOVDraw.getDrawBits().get(Bit.Hidden);
-        this.sceneGraphView.getRoot().removeNode(this.cameraFOVDraw);
         GL3DCameraFOV newFOVDraw = new GL3DCameraFOV(1., 1.);
         newFOVDraw.getDrawBits().set(Bit.Hidden, hidden);
-        gv.getRoot().addNode(newFOVDraw);
         this.cameraFOVDraw = newFOVDraw;
     }
 

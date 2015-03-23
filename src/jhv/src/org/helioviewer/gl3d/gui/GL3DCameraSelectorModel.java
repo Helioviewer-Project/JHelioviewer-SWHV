@@ -16,7 +16,6 @@ import org.helioviewer.gl3d.scenegraph.GL3DDrawBits.Bit;
 import org.helioviewer.jhv.gui.ImageViewerGui;
 import org.helioviewer.viewmodel.view.ComponentView;
 import org.helioviewer.viewmodel.view.opengl.GL3DCameraView;
-import org.helioviewer.viewmodel.view.opengl.GL3DSceneGraphView;
 
 /**
  * Can be used as the global singleton for all available and the currently
@@ -45,7 +44,7 @@ public class GL3DCameraSelectorModel extends AbstractListModel implements ComboB
     private GL3DObserverCamera observerCamera;
 
     private GL3DFollowObjectCamera followObjectCamera;
-    private ArrayList<GL3DCameraSelectionModelListener> listeners = new ArrayList<GL3DCameraSelectionModelListener>();
+    private final ArrayList<GL3DCameraSelectionModelListener> listeners = new ArrayList<GL3DCameraSelectionModelListener>();
 
     public static GL3DCameraSelectorModel getInstance() {
         if (instance == null) {
@@ -54,43 +53,38 @@ public class GL3DCameraSelectorModel extends AbstractListModel implements ComboB
         return instance;
     }
 
-    public void activate(GL3DSceneGraphView sceneGraphView) {
-        if (sceneGraphView != null) {
-            if (earthCamera == null) {
-                earthCamera = new GL3DEarthCamera(sceneGraphView);
-                observerCamera = new GL3DObserverCamera(sceneGraphView);
-                followObjectCamera = new GL3DFollowObjectCamera(sceneGraphView);
-                defaultCamera = observerCamera;
-                lastCamera = defaultCamera;
-                cameras.add(earthCamera);
-                cameras.add(observerCamera);
-                cameras.add(followObjectCamera);
+    public void activate() {
+        if (earthCamera == null) {
+            earthCamera = new GL3DEarthCamera();
+            observerCamera = new GL3DObserverCamera();
+            followObjectCamera = new GL3DFollowObjectCamera();
+            defaultCamera = observerCamera;
+            lastCamera = defaultCamera;
+            cameras.add(earthCamera);
+            cameras.add(observerCamera);
+            cameras.add(followObjectCamera);
 
-                defaultCamera = observerCamera;
-            } else {
-                earthCamera.createNewGrid(sceneGraphView);
-                earthCamera.setSceneGraphView(sceneGraphView);
-                observerCamera.createNewGrid(sceneGraphView);
-                observerCamera.setSceneGraphView(sceneGraphView);
+            defaultCamera = observerCamera;
+        } else {
+            earthCamera.createNewGrid();
+            observerCamera.createNewGrid();
 
-                followObjectCamera.createNewGrid(sceneGraphView);
-                followObjectCamera.createNewFOV(sceneGraphView);
-                followObjectCamera.setSceneGraphView(sceneGraphView);
+            followObjectCamera.createNewGrid();
+            followObjectCamera.createNewFOV();
 
-                earthCamera.getGrid().getDrawBits().set(Bit.Hidden, true);
-                earthCamera.getFollowGrid().getDrawBits().set(Bit.Hidden, true);
-                observerCamera.getGrid().getDrawBits().set(Bit.Hidden, true);
-                observerCamera.getFollowGrid().getDrawBits().set(Bit.Hidden, true);
-                followObjectCamera.getGrid().getDrawBits().set(Bit.Hidden, true);
-                followObjectCamera.getFollowGrid().getDrawBits().set(Bit.Hidden, true);
+            earthCamera.getGrid().getDrawBits().set(Bit.Hidden, true);
+            earthCamera.getFollowGrid().getDrawBits().set(Bit.Hidden, true);
+            observerCamera.getGrid().getDrawBits().set(Bit.Hidden, true);
+            observerCamera.getFollowGrid().getDrawBits().set(Bit.Hidden, true);
+            followObjectCamera.getGrid().getDrawBits().set(Bit.Hidden, true);
+            followObjectCamera.getFollowGrid().getDrawBits().set(Bit.Hidden, true);
 
-                setCurrentCamera(observerCamera);
-            }
-            if (lastCamera != null) {
-                setCurrentCamera(lastCamera);
-            } else {
-                setCurrentCamera(defaultCamera);
-            }
+            setCurrentCamera(observerCamera);
+        }
+        if (lastCamera != null) {
+            setCurrentCamera(lastCamera);
+        } else {
+            setCurrentCamera(defaultCamera);
         }
 
         this.fireInit();

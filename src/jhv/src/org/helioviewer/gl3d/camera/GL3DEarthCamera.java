@@ -3,11 +3,11 @@ package org.helioviewer.gl3d.camera;
 import java.util.Date;
 
 import org.helioviewer.base.physics.Astronomy;
+import org.helioviewer.base.physics.DifferentialRotation;
 import org.helioviewer.gl3d.math.GL3DQuatd;
 import org.helioviewer.gl3d.math.GL3DVec3d;
 import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.display.TimeListener;
-import org.helioviewer.viewmodel.view.opengl.GL3DSceneGraphView;
 
 /**
  * This camera is used when solar rotation tracking is enabled. It extends the
@@ -20,8 +20,8 @@ import org.helioviewer.viewmodel.view.opengl.GL3DSceneGraphView;
  */
 public class GL3DEarthCamera extends GL3DSolarRotationTrackingTrackballCamera implements TimeListener {
 
-    public GL3DEarthCamera(GL3DSceneGraphView sceneGraphView) {
-        super(sceneGraphView);
+    public GL3DEarthCamera() {
+        super();
     }
 
     @Override

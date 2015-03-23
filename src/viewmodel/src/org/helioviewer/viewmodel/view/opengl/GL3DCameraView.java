@@ -15,8 +15,7 @@ import org.helioviewer.viewmodel.view.View;
 /**
  * The {@link GL3DCameraView} is responsible for applying the currently active
  * {@link GL3DCamera}. Since applying the view space transformation is the first
- * transformation to be applied in a scene, this view must be executed before
- * the {@link GL3DSceneGraphView}.
+ * transformation to be applied in a scene
  *
  * @author Simon Spoerri (simon.spoerri@fhnw.ch)
  *

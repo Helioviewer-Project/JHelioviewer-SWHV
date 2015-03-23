@@ -5,6 +5,7 @@ import java.util.Date;
 import org.helioviewer.base.math.MathUtils;
 import org.helioviewer.base.physics.Astronomy;
 import org.helioviewer.base.physics.Constants;
+import org.helioviewer.base.physics.DifferentialRotation;
 import org.helioviewer.gl3d.math.GL3DQuatd;
 import org.helioviewer.gl3d.math.GL3DVec3d;
 import org.helioviewer.jhv.display.Displayer;
@@ -13,7 +14,6 @@ import org.helioviewer.jhv.layers.LayersModel;
 import org.helioviewer.viewmodel.metadata.HelioviewerPositionedMetaData;
 import org.helioviewer.viewmodel.metadata.MetaData;
 import org.helioviewer.viewmodel.view.MetaDataView;
-import org.helioviewer.viewmodel.view.opengl.GL3DSceneGraphView;
 
 /**
  * This camera is used when solar rotation tracking is enabled. It extends the
@@ -26,8 +26,8 @@ import org.helioviewer.viewmodel.view.opengl.GL3DSceneGraphView;
  */
 public class GL3DObserverCamera extends GL3DSolarRotationTrackingTrackballCamera implements TimeListener {
 
-    public GL3DObserverCamera(GL3DSceneGraphView sceneGraphView) {
-        super(sceneGraphView);
+    public GL3DObserverCamera() {
+        super();
     }
 
     @Override

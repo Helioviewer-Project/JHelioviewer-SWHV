@@ -16,7 +16,6 @@ import org.helioviewer.viewmodel.view.SubimageDataView;
 import org.helioviewer.viewmodel.view.View;
 import org.helioviewer.viewmodel.view.opengl.GL3DCameraView;
 import org.helioviewer.viewmodel.view.opengl.GL3DComponentView;
-import org.helioviewer.viewmodel.view.opengl.GL3DSceneGraphView;
 import org.helioviewer.viewmodel.view.opengl.GLOverlayView;
 import org.helioviewer.viewmodelplugin.controller.PluginManager;
 import org.helioviewer.viewmodelplugin.overlay.OverlayContainer;
@@ -24,11 +23,9 @@ import org.helioviewer.viewmodelplugin.overlay.OverlayControlComponent;
 import org.helioviewer.viewmodelplugin.overlay.OverlayControlComponentManager;
 import org.helioviewer.viewmodelplugin.overlay.OverlayPanel;
 
-
 public class GL3DViewchainFactory {
 
     private final ViewFactory viewFactory;
-    public static GL3DSceneGraphView currentSceneGraph;
 
     public GL3DViewchainFactory() {
         this.viewFactory = new GL3DViewFactory();
@@ -184,13 +181,8 @@ public class GL3DViewchainFactory {
         GL3DCameraView cameraView = viewFactory.createNewView(GL3DCameraView.class);
         cameraView.setView(overlayView);
 
-        GL3DSceneGraphView sceneGraph = new GL3DSceneGraphView();
-        currentSceneGraph = sceneGraph;
-        sceneGraph.setView(cameraView);
-        sceneGraph.setGLOverlayView((GLOverlayView) overlayView);
-
         ComponentView componentView = viewFactory.createNewView(ComponentView.class);
-        componentView.setView(sceneGraph);
+        componentView.setView(cameraView);
 
         // add Overlays (OverlayView added before LayeredView and after GL3DCameraView)
         updateOverlayViewsInViewchainMain((GLOverlayView) overlayView);

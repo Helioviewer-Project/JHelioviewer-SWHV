@@ -12,7 +12,6 @@ import org.helioviewer.viewmodel.view.RegionView;
 import org.helioviewer.viewmodel.view.View;
 import org.helioviewer.viewmodel.view.ViewHelper;
 import org.helioviewer.viewmodel.view.ViewportView;
-import org.helioviewer.viewmodel.view.opengl.GL3DSceneGraphView;
 import org.helioviewer.viewmodel.viewport.Viewport;
 import org.helioviewer.viewmodel.viewportimagesize.ViewportImageSize;
 
@@ -27,8 +26,8 @@ public class GL3DPanInteraction extends GL3DDefaultInteraction {
 
     private Point lastMousePoint;
 
-    protected GL3DPanInteraction(GL3DSolarRotationTrackingTrackballCamera camera, GL3DSceneGraphView sceneGraph) {
-        super(camera, sceneGraph);
+    protected GL3DPanInteraction(GL3DSolarRotationTrackingTrackballCamera camera) {
+        super(camera);
     }
 
     @Override
@@ -49,8 +48,7 @@ public class GL3DPanInteraction extends GL3DDefaultInteraction {
         Viewport viewport;
         ViewportView viewportView = view.getAdapter(ViewportView.class);
 
-        if (regionView != null && (region = regionView.getRegion()) != null &&
-            viewportView != null && (viewport = viewportView.getViewport()) != null) {
+        if (regionView != null && (region = regionView.getRegion()) != null && viewportView != null && (viewport = viewportView.getViewport()) != null) {
 
             ViewportImageSize vis = ViewHelper.calculateViewportImageSize(viewport, region);
             Vector2dDouble imageDisplacement = ViewHelper.convertScreenToImageDisplacement(x, y, region, vis);

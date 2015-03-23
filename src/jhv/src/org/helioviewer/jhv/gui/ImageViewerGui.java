@@ -26,7 +26,6 @@ import org.helioviewer.base.message.Message;
 import org.helioviewer.gl3d.camera.GL3DCameraOptionsPanel;
 import org.helioviewer.gl3d.gui.GL3DCameraSelectorModel;
 import org.helioviewer.gl3d.gui.GL3DTopToolBar;
-import org.helioviewer.gl3d.spaceobjects.PlanetOptionsPanel;
 import org.helioviewer.jhv.JHVSplashScreen;
 import org.helioviewer.jhv.gui.actions.ExitProgramAction;
 import org.helioviewer.jhv.gui.components.ControlPanelContainer;
@@ -66,7 +65,6 @@ import org.helioviewer.viewmodel.view.LayeredView;
 import org.helioviewer.viewmodel.view.MetaDataView;
 import org.helioviewer.viewmodel.view.MovieView;
 import org.helioviewer.viewmodel.view.View;
-import org.helioviewer.viewmodel.view.opengl.GL3DSceneGraphView;
 import org.helioviewer.viewmodelplugin.filter.FilterTabPanelManager;
 
 /**
@@ -223,7 +221,7 @@ public class ImageViewerGui {
     public void createViewchains() {
         State newState = StateController.getInstance().getCurrentState();
         mainComponentView = GuiState.viewchainFactory.createNewViewchainMain();
-        GL3DCameraSelectorModel.getInstance().activate(mainComponentView.getAdapter(GL3DSceneGraphView.class));
+        GL3DCameraSelectorModel.getInstance().activate();
 
         // prepare gui again
         updateComponentPanels();
