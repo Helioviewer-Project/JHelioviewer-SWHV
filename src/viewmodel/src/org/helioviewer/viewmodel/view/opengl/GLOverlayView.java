@@ -116,7 +116,6 @@ public class GLOverlayView extends AbstractGLView implements OverlayView {
 
     @Override
     public void removeOverlay(int index) {
-        // TODO Auto-generated method stub
     }
 
     @Override
