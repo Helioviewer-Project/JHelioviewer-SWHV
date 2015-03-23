@@ -15,7 +15,6 @@ public abstract class GL3DNode {
 
     protected GL3DNode next;
     protected GL3DNode previous;
-    protected GL3DGroup parent;
 
     protected int depth;
 
@@ -53,15 +52,8 @@ public abstract class GL3DNode {
         return this.next;
     }
 
-    public GL3DGroup getParent() {
-        return this.parent;
-    }
-
     public void markAsChanged() {
         this.hasChanged = true;
-        if (this.parent != null) {
-            this.parent.markAsChanged();
-        }
     }
 
     public boolean hasChanged() {
