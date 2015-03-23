@@ -1,10 +1,6 @@
 package org.helioviewer.gl3d.scenegraph;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import org.helioviewer.gl3d.scenegraph.GL3DDrawBits.Bit;
-import org.helioviewer.gl3d.scenegraph.visuals.GL3DPolyLine;
 
 /**
  * A {@link GL3DGroup} allows introducing a hierarchy within the scene graph. A
@@ -22,13 +18,9 @@ public class GL3DGroup extends GL3DShape {
 
     private int numberOfNodes;
 
-    private final List<GL3DPolyLine> nodesToAdd;
-    private final List<GL3DPolyLine> nodesToDelete;
-
     public GL3DGroup(String name) {
         super(name);
-        this.nodesToAdd = new ArrayList<GL3DPolyLine>();
-        this.nodesToDelete = new ArrayList<GL3DPolyLine>();
+
     }
 
     @Override
@@ -50,12 +42,6 @@ public class GL3DGroup extends GL3DShape {
             node.draw(state);
             node = node.next;
         }
-
-        for (GL3DNode toAdd : nodesToAdd) {
-            addNode(toAdd);
-        }
-
-        nodesToAdd.clear();
     }
 
     @Override
@@ -280,14 +266,6 @@ public class GL3DGroup extends GL3DShape {
 
     public GL3DNode getFirst() {
         return first;
-    }
-
-    public void addNodeToAddList(GL3DPolyLine node) {
-        nodesToAdd.add(node);
-    }
-
-    public void addNodeToRemoveList(GL3DPolyLine node) {
-        nodesToDelete.add(node);
     }
 
 }
