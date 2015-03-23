@@ -16,4 +16,10 @@ public interface Renderable {
 
     public Component getOptionsPanel();
 
+    public String getName();
+
+    public boolean isVisible();
+
+    public void setVisible(boolean b);
+
 }

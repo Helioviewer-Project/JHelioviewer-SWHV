@@ -27,6 +27,7 @@ import org.helioviewer.gl3d.camera.GL3DCameraOptionsPanel;
 import org.helioviewer.gl3d.gui.GL3DCameraSelectorModel;
 import org.helioviewer.gl3d.gui.GL3DTopToolBar;
 import org.helioviewer.jhv.JHVSplashScreen;
+import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.gui.actions.ExitProgramAction;
 import org.helioviewer.jhv.gui.components.ControlPanelContainer;
 import org.helioviewer.jhv.gui.components.ImageSelectorPanel;
@@ -332,7 +333,9 @@ public class ImageViewerGui {
 
             filterPanelContainer = new ControlPanelContainer();
             filterPanelContainer.setDefaultPanel(tab);
+
             leftPane.add("Image Adjustments", filterPanelContainer, false);
+            leftPane.add("Renderable", Displayer.getRenderableContainerPanel(), false);
 
             JTabbedPane cameraTab = new JTabbedPane();
             cameraOptionsPanel = new GL3DCameraOptionsPanel();
@@ -345,7 +348,6 @@ public class ImageViewerGui {
             // planetTab.addTab("Planet Options", planetOptionsPanel);
             // planetTab.setEnabled(false);
             // leftPane.add("Object Options", planetOptionsPanel, false);
-
             return leftPane;
         }
     }

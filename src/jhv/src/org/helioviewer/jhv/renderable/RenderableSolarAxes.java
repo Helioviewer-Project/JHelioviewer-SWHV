@@ -12,6 +12,8 @@ public class RenderableSolarAxes implements Renderable {
 
     private final RenderableType renderableType;
     private final Component optionsPanel = new RenderableSolarAxesOptionsPanel();
+    private final String name = "Solar axes";
+    private boolean isVisible = true;
 
     public RenderableSolarAxes(RenderableType renderableType) {
         this.renderableType = renderableType;
@@ -23,6 +25,8 @@ public class RenderableSolarAxes implements Renderable {
 
     @Override
     public void render(GL3DState state) {
+        if (!isVisible)
+            return;
         GL2 gl = state.gl;
         gl.glColor4d(0., 0., 1., 1.);
         gl.glBegin(GL2.GL_LINES);
@@ -49,4 +53,18 @@ public class RenderableSolarAxes implements Renderable {
         return optionsPanel;
     }
 
+    @Override
+    public String getName() {
+        return name;
+    }
+
+    @Override
+    public boolean isVisible() {
+        return this.isVisible;
+    }
+
+    @Override
+    public void setVisible(boolean isVisible) {
+        this.isVisible = isVisible;
+    }
 }
