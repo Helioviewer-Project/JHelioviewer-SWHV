@@ -3,10 +3,10 @@ package org.helioviewer.gl3d.camera;
 import javax.media.opengl.GL2;
 
 import org.helioviewer.gl3d.math.GL3DMat4d;
-import org.helioviewer.gl3d.scenegraph.GL3DShape;
+import org.helioviewer.gl3d.scenegraph.GL3DNode;
 import org.helioviewer.gl3d.scenegraph.GL3DState;
 
-public class GL3DCameraFOV extends GL3DShape {
+public class GL3DCameraFOV extends GL3DNode {
 
     private final double width;
     private final double height;

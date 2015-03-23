@@ -17,12 +17,12 @@ import org.helioviewer.gl3d.math.GL3DQuatd;
 import org.helioviewer.gl3d.math.GL3DVec3d;
 import org.helioviewer.gl3d.math.GL3DVec4d;
 import org.helioviewer.gl3d.math.GL3DVec4f;
-import org.helioviewer.gl3d.scenegraph.GL3DShape;
+import org.helioviewer.gl3d.scenegraph.GL3DNode;
 import org.helioviewer.gl3d.scenegraph.GL3DState;
 
 import com.jogamp.opengl.util.awt.TextRenderer;
 
-public class GL3DGrid extends GL3DShape {
+public class GL3DGrid extends GL3DNode {
 
     private final double lonstepDegrees;
     private final double latstepDegrees;

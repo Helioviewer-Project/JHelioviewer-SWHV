@@ -71,7 +71,7 @@ public abstract class GL3DNode {
     }
 
     public boolean isDrawBitOn(Bit bit) {
-        return this.drawBits.get(bit);// || (this.parent != null && this.parent instanceof GL3DShape && ((GL3DShape) this.parent).isDrawBitOn(bit));
+        return this.drawBits.get(bit);// || (this.parent != null && this.parent instanceof GL3DNode && ((GL3DNode) this.parent).isDrawBitOn(bit));
     }
 
     public void clearDrawBit(Bit bit) {
