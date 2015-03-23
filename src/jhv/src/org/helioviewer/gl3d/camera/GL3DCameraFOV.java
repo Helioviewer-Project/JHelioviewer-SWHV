@@ -1,17 +1,12 @@
 package org.helioviewer.gl3d.camera;
 
-import java.util.List;
-
 import javax.media.opengl.GL2;
 
 import org.helioviewer.gl3d.math.GL3DMat4d;
-import org.helioviewer.gl3d.math.GL3DVec2d;
-import org.helioviewer.gl3d.math.GL3DVec3d;
-import org.helioviewer.gl3d.math.GL3DVec4d;
-import org.helioviewer.gl3d.scenegraph.GL3DMesh;
+import org.helioviewer.gl3d.scenegraph.GL3DShape;
 import org.helioviewer.gl3d.scenegraph.GL3DState;
 
-public class GL3DCameraFOV extends GL3DMesh {
+public class GL3DCameraFOV extends GL3DShape {
 
     private final double width;
     private final double height;
@@ -84,15 +79,22 @@ public class GL3DCameraFOV extends GL3DMesh {
         this.scale = s;
     }
 
-    @Override
-    public GL3DMeshPrimitive createMesh(GL3DState state, List<GL3DVec3d> positions, List<GL3DVec3d> normals, List<GL3DVec2d> textCoords, List<Integer> indices, List<GL3DVec4d> colors) {
-        return GL3DMeshPrimitive.LINE_LOOP;
-    }
-
     public void setAngles(double currentB, double currentL) {
         this.m = GL3DMat4d.identity();
         this.m.rotate(-currentL, 0., 1., 0.);
         this.m.rotate(currentB, 1., 0., 0.);
+    }
+
+    @Override
+    public void shapeDelete(GL3DState state) {
+    }
+
+    @Override
+    public void shapeInit(GL3DState state) {
+    }
+
+    @Override
+    public void shapeUpdate(GL3DState state) {
     }
 
 }
