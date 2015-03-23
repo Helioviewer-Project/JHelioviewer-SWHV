@@ -110,7 +110,7 @@ public class LayersModel implements UIViewListener {
      *
      * @return View associated with the active Layer
      */
-    public View getActiveView() {
+    public JHVJP2View getActiveView() {
         return getLayer(activeLayer);
     }
 
@@ -171,7 +171,7 @@ public class LayersModel implements UIViewListener {
      *         information is available
      */
     public String getCurrentFrameTimestampString(int idx) {
-        View view = this.getLayer(idx);
+        JHVJP2View view = this.getLayer(idx);
         return getCurrentFrameTimestampString(view);
     }
 
@@ -184,7 +184,7 @@ public class LayersModel implements UIViewListener {
      * @return String representation of the timestamp, empty String if no timing
      *         information is available
      */
-    public String getCurrentFrameTimestampString(View view) {
+    public String getCurrentFrameTimestampString(JHVJP2View view) {
         ImmutableDateTime dt = getCurrentFrameTimestamp(view);
         if (dt != null) {
             return dt.getCachedDate();
@@ -201,7 +201,7 @@ public class LayersModel implements UIViewListener {
      * @return timestamp, null if no timing information is available
      */
     public ImmutableDateTime getCurrentFrameTimestamp(int idx) {
-        View view = this.getLayer(idx);
+        JHVJP2View view = this.getLayer(idx);
         return getCurrentFrameTimestamp(view);
     }
 
@@ -213,10 +213,10 @@ public class LayersModel implements UIViewListener {
      *            - View that can be associated with the layer in question
      * @return timestamp, null if no timing information is available
      */
-    public ImmutableDateTime getCurrentFrameTimestamp(View view) {
+    public ImmutableDateTime getCurrentFrameTimestamp(JHVJP2View view) {
         if (view != null) {
             // null for PixelBasedMetaData
-            return view.getAdapter(MetaDataView.class).getMetaData().getDateTime();
+            return view.getMetaData().getDateTime();
         }
         return null;
     }
@@ -230,7 +230,7 @@ public class LayersModel implements UIViewListener {
      * @return timestamp of the first available image data, null if no
      *         information available
      */
-    public ImmutableDateTime getStartDate(View view) {
+    public ImmutableDateTime getStartDate(JHVJP2View view) {
         ImmutableDateTime result = null;
 
         if (view == null) {
@@ -258,7 +258,7 @@ public class LayersModel implements UIViewListener {
      *         information available
      */
     public ImmutableDateTime getStartDate(int idx) {
-        View view = this.getLayer(idx);
+        JHVJP2View view = this.getLayer(idx);
         return this.getStartDate(view);
     }
 
@@ -297,7 +297,7 @@ public class LayersModel implements UIViewListener {
      * @return timestamp of the last available image data, null if no
      *         information available
      */
-    public ImmutableDateTime getEndDate(View view) {
+    public ImmutableDateTime getEndDate(JHVJP2View view) {
         ImmutableDateTime result = null;
 
         if (view == null) {
@@ -350,7 +350,7 @@ public class LayersModel implements UIViewListener {
      *         information available
      */
     public ImmutableDateTime getEndDate(int idx) {
-        View view = this.getLayer(idx);
+        JHVJP2View view = this.getLayer(idx);
         return this.getEndDate(view);
     }
 
@@ -803,7 +803,7 @@ public class LayersModel implements UIViewListener {
      * @param link
      *            - true if the layer in question should be linked
      */
-    public void setLink(View view, boolean link) {
+    public void setLink(JHVJP2View view, boolean link) {
         if (view == null) {
             return;
         }
@@ -832,7 +832,7 @@ public class LayersModel implements UIViewListener {
      *            - true if the layer in question should be linked
      */
     public void setLink(int idx, boolean link) {
-        View view = this.getLayer(idx);
+        JHVJP2View view = this.getLayer(idx);
         this.setLink(view, link);
     }
 
@@ -918,7 +918,7 @@ public class LayersModel implements UIViewListener {
      *            - View that can be associated with the layer in question
      * @return true if the layer in question has timing information
      */
-    public boolean isTimed(View view) {
+    public boolean isTimed(JHVJP2View view) {
         if (getCurrentFrameTimestamp(view) != null) {
             return true;
         }

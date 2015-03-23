@@ -19,7 +19,7 @@ import org.helioviewer.jhv.gui.dialogs.observation.ImageDataPanel;
 import org.helioviewer.jhv.layers.LayersModel;
 import org.helioviewer.viewmodel.view.MovieView;
 import org.helioviewer.viewmodel.view.TimedMovieView;
-import org.helioviewer.viewmodel.view.View;
+import org.helioviewer.viewmodel.view.jp2view.JHVJP2View;
 import org.helioviewer.viewmodel.view.jp2view.datetime.ImmutableDateTime;
 
 public class CollapsiblePaneWithButton extends CollapsiblePane {
@@ -70,27 +70,7 @@ public class CollapsiblePaneWithButton extends CollapsiblePane {
                     observationImagePane = new ImageDataPanel();
                 }
                 // Check the dates if possible
-                final View activeView = LayersModel.getSingletonInstance().getActiveView();
-
-                /*
-                 * TODO: Code Simplification - Cleanup Date selection when
-                 * clicking on "add images", e.g. use
-                 * LayersModel.getLatestDate(...), ...
-                 * 
-                 * Here are some more comments by Helge:
-                 * 
-                 * If it is a local file, the timestamps are read from the
-                 * parsed JPX movie, i.e. a call will pause until the whole
-                 * movie has finished loading.
-                 * 
-                 * If it has been reading through the API the frame time stamps
-                 * already have been returned and it is not bad. For the time
-                 * being it will only update if its already loaded.
-                 * 
-                 * I think there should be a better solution? Maybe a wait
-                 * dialog? etc.?
-                 */
-
+                final JHVJP2View activeView = LayersModel.getSingletonInstance().getActiveView();
                 if (activeView != null) {
                     MovieView tmv = activeView.getAdapter(TimedMovieView.class);
                     if (tmv != null && tmv.getMaximumAccessibleFrameNumber() == tmv.getMaximumFrameNumber()) {

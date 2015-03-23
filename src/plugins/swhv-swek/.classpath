@@ -11,5 +11,6 @@
 	<classpathentry combineaccessrules="false" kind="src" path="/HEKSource"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/ComesepSource"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/jhv-display"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
