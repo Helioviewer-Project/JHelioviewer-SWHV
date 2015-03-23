@@ -34,8 +34,7 @@ import org.helioviewer.viewmodel.view.jp2view.JHVJP2View;
 import org.helioviewer.viewmodel.view.jp2view.JHVJPXView;
 import org.helioviewer.viewmodel.view.opengl.shader.GLSLShader;
 
-import com.jogamp.opengl.util.TileRenderer;
-import com.jogamp.opengl.util.awt.AWTGLPixelBuffer;
+import com.jogamp.opengl.util.awt.AWTGLReadBufferUtil;
 import com.jogamp.opengl.util.awt.ImageUtil;
 
 /**
@@ -49,13 +48,11 @@ import com.jogamp.opengl.util.awt.ImageUtil;
 public class GL3DComponentView extends AbstractComponentView implements GLEventListener, ComponentView, DisplayListener {
 
     private GLCanvas canvas;
-    private final AWTGLPixelBuffer.SingleAWTGLPixelBufferProvider pixelBufferProvider = new AWTGLPixelBuffer.SingleAWTGLPixelBufferProvider(true);
 
     private Color backgroundColor = Color.BLACK;
     private boolean backGroundColorChanged = false;
 
     // screenshot & movie
-    private TileRenderer tileRenderer;
     private BufferedImage screenshot;
     private int previousScreenshot = -1;
 
@@ -77,7 +74,6 @@ public class GL3DComponentView extends AbstractComponentView implements GLEventL
             screenshot.flush();
             screenshot = null;
         }
-        tileRenderer = null;
 
         Displayer.removeListener(this);
         canvas.removeGLEventListener(this);
@@ -187,14 +183,8 @@ public class GL3DComponentView extends AbstractComponentView implements GLEventL
             View v = LayersModel.getSingletonInstance().getActiveView();
             if (v != null) {
                 mv = v.getAdapter(JHVJP2View.class);
-                if (tileRenderer == null) {
-                    tileRenderer = new TileRenderer();
-                } else if (!tileRenderer.isSetup()) {
-                    tileRenderer.reset();
-                }
             } else {
                 stopExport();
-                Log.warn("Premature stop of video export: no active layer found");
             }
         }
 
@@ -203,22 +193,6 @@ public class GL3DComponentView extends AbstractComponentView implements GLEventL
         int height = canvas.getHeight();
 
         GL3DState.setUpdated(gl, width, height);
-
-        AWTGLPixelBuffer pixelBuffer = null;
-        if ((screenshotMode || exportMode) && mv != null) {
-            tileRenderer.setTileSize(width, height, 0);
-            tileRenderer.setImageSize(width, height);
-            pixelBuffer = pixelBufferProvider.allocate(gl, AWTGLPixelBuffer.awtPixelAttributesIntRGB3, width, height, 1, true, 0);
-            tileRenderer.setImageBuffer(pixelBuffer);
-            int tileNum = 0;
-            while (!tileRenderer.eot()) {
-                ++tileNum;
-                if (tileNum > 1) {
-                    break;
-                }
-                tileRenderer.beginTile(gl);
-            }
-        }
 
         if (backGroundColorChanged) {
             gl.glClearColor(backgroundColor.getRed() / 255.0f, backgroundColor.getGreen() / 255.0f, backgroundColor.getBlue() / 255.0f, backgroundColor.getAlpha() / 255.0f);
@@ -260,9 +234,9 @@ public class GL3DComponentView extends AbstractComponentView implements GLEventL
                 currentScreenshot = ((JHVJPXView) mv).getCurrentFrameNumber();
                 maxframeno = ((JHVJPXView) mv).getMaximumFrameNumber();
             }
-            tileRenderer.endTile(gl);
-            screenshot = pixelBuffer.image;
-            ImageUtil.flipImageVertically(screenshot);
+
+            AWTGLReadBufferUtil rbu = new AWTGLReadBufferUtil(drawable.getGLProfile(), false);
+            screenshot = ImageUtil.createThumbnail(rbu.readPixelsToBufferedImage(gl, true), width);
             if (currentScreenshot != previousScreenshot) {
                 export.writeImage(screenshot);
             }
@@ -275,9 +249,8 @@ public class GL3DComponentView extends AbstractComponentView implements GLEventL
         }
 
         if (screenshotMode && mv != null) {
-            tileRenderer.endTile(gl);
-            screenshot = pixelBuffer.image;
-            ImageUtil.flipImageVertically(screenshot);
+            AWTGLReadBufferUtil rbu = new AWTGLReadBufferUtil(drawable.getGLProfile(), false);
+            screenshot = ImageUtil.createThumbnail(rbu.readPixelsToBufferedImage(gl, true), width);
             try {
                 ImageIO.write(screenshot, "png", outputFile);
             } catch (IOException e) {
@@ -285,7 +258,6 @@ public class GL3DComponentView extends AbstractComponentView implements GLEventL
             }
             stopScreenshot();
         }
-
     }
 
     @Override
