@@ -13,7 +13,7 @@ import org.helioviewer.gl3d.camera.GL3DCamera;
 import org.helioviewer.gl3d.math.GL3DMat4d;
 import org.helioviewer.gl3d.math.GL3DQuatd;
 import org.helioviewer.gl3d.math.GL3DVec3d;
-import org.helioviewer.gl3d.scenegraph.GL3DShape;
+import org.helioviewer.gl3d.scenegraph.GL3DNode;
 import org.helioviewer.gl3d.scenegraph.GL3DState;
 import org.helioviewer.jhv.gui.states.StateController;
 import org.helioviewer.jhv.gui.states.ViewStateEnum;
@@ -37,7 +37,7 @@ import com.jogamp.common.nio.Buffers;
  * @author Simon Spoerri (simon.spoerri@fhnw.ch)
  *
  */
-public class GL3DImageLayer extends GL3DShape {
+public class GL3DImageLayer extends GL3DNode {
 
     private static int nextLayerId = 0;
     private final int layerId;
