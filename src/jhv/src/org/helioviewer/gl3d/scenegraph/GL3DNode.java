@@ -1,5 +1,6 @@
 package org.helioviewer.gl3d.scenegraph;
 
+import org.helioviewer.gl3d.math.GL3DMat4d;
 import org.helioviewer.gl3d.scenegraph.GL3DDrawBits.Bit;
 
 /**
@@ -26,18 +27,19 @@ public abstract class GL3DNode {
 
     protected GL3DDrawBits drawBits;
 
+    // Model Matrix
+    protected GL3DMat4d m;
+
+    // World Matrix
+    protected GL3DMat4d wm;
+
     public GL3DNode(String name) {
         this.name = name;
         this.drawBits = new GL3DDrawBits();
+
+        this.m = GL3DMat4d.identity();
+        this.wm = GL3DMat4d.identity();
     }
-
-    public abstract void init(GL3DState state);
-
-    public abstract void draw(GL3DState state);
-
-    public abstract void update(GL3DState state);
-
-    public abstract void delete(GL3DState state);
 
     @Override
     public String toString() {
@@ -74,6 +76,59 @@ public abstract class GL3DNode {
 
     public void clearDrawBit(Bit bit) {
         this.drawBits.off(bit);
+    }
+
+    public void init(GL3DState state) {
+        state.pushMV();
+        this.wm = state.multiplyMV(this.m);
+
+        this.shapeInit(state);
+        this.isInitialised = true;
+        state.popMV();
+    }
+
+    public void update(GL3DState state) {
+        if (!this.isInitialised) {
+            this.init(state);
+        }
+        if (this.hasChanged()) {
+            state.pushMV();
+            // this.updateMatrix(state);
+            this.wm = state.multiplyMV(this.m);
+            this.shapeUpdate(state);
+            this.setUnchanged();
+            //this.buildAABB();
+            state.popMV();
+        }
+    }
+
+    public void updateMatrix(GL3DState state) {
+
+    }
+
+    public void draw(GL3DState state) {
+        if (!isDrawBitOn(Bit.Hidden)) {
+            state.pushMV();
+            state.multiplyMV(this.m);
+            this.shapeDraw(state);
+            state.popMV();
+        }
+    }
+
+    public void delete(GL3DState state) {
+        shapeDelete(state);
+    }
+
+    public abstract void shapeDelete(GL3DState state);
+
+    public abstract void shapeInit(GL3DState state);
+
+    public abstract void shapeDraw(GL3DState state);
+
+    public abstract void shapeUpdate(GL3DState state);
+
+    public GL3DMat4d modelView() {
+        return this.m;
     }
 
 }
