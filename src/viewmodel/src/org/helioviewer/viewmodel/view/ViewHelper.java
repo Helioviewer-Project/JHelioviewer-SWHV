@@ -14,7 +14,6 @@ import org.helioviewer.viewmodel.imagedata.ImageData;
 import org.helioviewer.viewmodel.metadata.MetaData;
 import org.helioviewer.viewmodel.region.Region;
 import org.helioviewer.viewmodel.region.StaticRegion;
-import org.helioviewer.viewmodel.view.fitsview.JHVFITSView;
 import org.helioviewer.viewmodel.view.jp2view.JHVJP2CallistoView;
 import org.helioviewer.viewmodel.view.jp2view.JHVJP2View;
 import org.helioviewer.viewmodel.view.jp2view.JHVJPXCallistoView;
@@ -401,7 +400,7 @@ public final class ViewHelper {
      *             if anything went wrong (e.g. type not supported, image not
      *             found, etc.)
      */
-    public static ImageInfoView loadView(URI uri, Interval<Date> range) throws IOException {
+    public static JHVJP2View loadView(URI uri, Interval<Date> range) throws IOException {
         return loadView(uri, true, range);
     }
 
@@ -422,7 +421,7 @@ public final class ViewHelper {
      *             if anything went wrong (e.g. type not supported, image not
      *             found, etc.)
      */
-    public static ImageInfoView loadView(URI uri, boolean isMainView, Interval<Date> range) throws IOException {
+    public static JHVJP2View loadView(URI uri, boolean isMainView, Interval<Date> range) throws IOException {
         return loadView(uri, uri, isMainView, range);
     }
 
@@ -444,7 +443,7 @@ public final class ViewHelper {
      *             if anything went wrong (e.g. type not supported, image not
      *             found, etc.)
      */
-    public static ImageInfoView loadView(URI uri, URI downloadURI, Interval<Date> range) throws IOException {
+    public static JHVJP2View loadView(URI uri, URI downloadURI, Interval<Date> range) throws IOException {
         return loadView(uri, downloadURI, true, range);
     }
 
@@ -467,25 +466,14 @@ public final class ViewHelper {
      *             if anything went wrong (e.g. type not supported, image not
      *             found, etc.)
      */
-    public static ImageInfoView loadView(URI uri, URI downloadURI, boolean isMainView, Interval<Date> range) throws IOException {
+    public static JHVJP2View loadView(URI uri, URI downloadURI, boolean isMainView, Interval<Date> range) throws IOException {
         if (uri == null || uri.getScheme() == null || uri.toString() == null) {
             throw new IOException("Invalid URI.");
         }
 
         String[] parts = uri.toString().split("\\.");
         String ending = parts[parts.length - 1];
-
-        if (ending.equals("jpeg") || ending.equals("jpg") || ending.equals("JPEG") || ending.equals("JPG") || ending.equals("png") || ending.equals("PNG")) {
-            return new JHVSimpleImageView(uri, null);
-
-        } else if (ending.equals("fits") || ending.equals("FITS") || ending.equals("fts") || ending.equals("FTS")) {
-            try {
-                return new JHVFITSView(uri, null);
-            } catch (Exception e) {
-                throw new IOException(e.getMessage());
-            }
-
-        } else if (downloadURI.toString().toLowerCase().contains("callisto")) {
+        if (downloadURI.toString().toLowerCase().contains("callisto")) {
             try {
                 JP2Image jp2Image = new JP2Image(uri, downloadURI);
 

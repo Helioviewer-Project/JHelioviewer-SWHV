@@ -7,11 +7,11 @@ import javax.swing.AbstractAction;
 import org.helioviewer.jhv.gui.IconBank;
 import org.helioviewer.jhv.gui.IconBank.JHVIcon;
 import org.helioviewer.jhv.layers.LayersModel;
-import org.helioviewer.viewmodel.view.View;
+import org.helioviewer.viewmodel.view.jp2view.JHVJP2View;
 
 /**
  * Action for a specific layer to move up a given layer.
- * 
+ *
  * @author Malte Nuhn
  */
 public class MoveLayerUpAction extends AbstractAction {
@@ -20,15 +20,15 @@ public class MoveLayerUpAction extends AbstractAction {
     /**
      * Controlled layer by this action.
      */
-    private final View view;
+    private final JHVJP2View view;
 
     /**
      * Creates a action to move a layer up
-     * 
+     *
      * @param view
      *            Layer to move up
      */
-    public MoveLayerUpAction(View view) {
+    public MoveLayerUpAction(JHVJP2View view) {
         super("Move Layer Up", IconBank.getIcon(JHVIcon.UP));
         this.view = view;
     }

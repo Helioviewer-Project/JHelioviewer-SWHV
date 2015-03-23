@@ -26,11 +26,11 @@ import org.helioviewer.jhv.gui.components.layerTable.renderers.DescriptorTimesta
 import org.helioviewer.jhv.gui.components.layerTable.renderers.DescriptorTitleRenderer;
 import org.helioviewer.jhv.gui.components.layerTable.renderers.IconRenderer;
 import org.helioviewer.jhv.layers.LayersModel;
-import org.helioviewer.viewmodel.view.View;
+import org.helioviewer.viewmodel.view.jp2view.JHVJP2View;
 
 /**
  * Extended JTable, showing the Layers currently being used
- * 
+ *
  * @author Malte Nuhn
  * @author Helge Dietert
  */
@@ -73,7 +73,7 @@ public class LayerTable extends JTable {
 
             /**
              * Handle with right-click menus
-             * 
+             *
              * @param e
              */
             public void handlePopup(MouseEvent e) {
@@ -87,7 +87,7 @@ public class LayerTable extends JTable {
                     source.changeSelection(row, column, false, false);
                 }
 
-                View view = LayersModel.getSingletonInstance().getLayer(row);
+                JHVJP2View view = LayersModel.getSingletonInstance().getLayer(row);
 
                 if (view != null) {
                     menu.add(new MoveLayerUpAction(view));

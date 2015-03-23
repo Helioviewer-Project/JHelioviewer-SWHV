@@ -7,13 +7,12 @@ import org.helioviewer.jhv.layers.LayersModel;
 import org.helioviewer.viewmodel.factory.GL3DViewFactory;
 import org.helioviewer.viewmodel.factory.ViewFactory;
 import org.helioviewer.viewmodel.view.ComponentView;
-import org.helioviewer.viewmodel.view.ImageInfoView;
 import org.helioviewer.viewmodel.view.LayeredView;
 import org.helioviewer.viewmodel.view.ModifiableInnerViewView;
 import org.helioviewer.viewmodel.view.MovieView;
 import org.helioviewer.viewmodel.view.OverlayView;
-import org.helioviewer.viewmodel.view.SubimageDataView;
 import org.helioviewer.viewmodel.view.View;
+import org.helioviewer.viewmodel.view.jp2view.JHVJP2View;
 import org.helioviewer.viewmodel.view.opengl.GL3DCameraView;
 import org.helioviewer.viewmodel.view.opengl.GL3DComponentView;
 import org.helioviewer.viewmodel.view.opengl.GLOverlayView;
@@ -78,16 +77,16 @@ public class GL3DViewchainFactory {
      *            LayeredView.
      */
 
-    public void addLayerToViewchainMain(ImageInfoView newLayer, View attachToViewchain) {
+    public void addLayerToViewchainMain(JHVJP2View newLayer, View attachToViewchain) {
         if (newLayer == null || attachToViewchain == null)
             return;
 
         // Fetch LayeredView
-        LayeredView layeredView = attachToViewchain.getAdapter(LayeredView.class);
+        LayeredView layeredView = LayersModel.getSingletonInstance().getLayeredView();
 
         synchronized (layeredView) {
             // wait until image is loaded
-            while (newLayer.getAdapter(SubimageDataView.class).getSubimageData() == null) {
+            while (newLayer.getSubimageData() == null) {
                 try {
                     Thread.sleep(100);
                 } catch (InterruptedException e) {
@@ -96,12 +95,8 @@ public class GL3DViewchainFactory {
 
             }
 
-            View nextView = newLayer;
-
             // Add layer
-            layeredView.addLayer(nextView);
-
-            ImageInfoView imageInfoView = nextView.getAdapter(ImageInfoView.class);
+            layeredView.addLayer(newLayer);
 
             // If MoviewView, add MoviePanel
             if (newLayer instanceof MovieView) {
@@ -110,14 +105,14 @@ public class GL3DViewchainFactory {
                     LayersModel.getSingletonInstance().setLink(newLayer, true);
                 }
 
-                ImageViewerGui.getSingletonInstance().getMoviePanelContainer().addLayer(imageInfoView, moviePanel);
+                ImageViewerGui.getSingletonInstance().getMoviePanelContainer().addLayer(newLayer, moviePanel);
             } else {
                 MoviePanel moviePanel = new MoviePanel(null);
-                ImageViewerGui.getSingletonInstance().getMoviePanelContainer().addLayer(imageInfoView, moviePanel);
+                ImageViewerGui.getSingletonInstance().getMoviePanelContainer().addLayer(newLayer, moviePanel);
             }
 
             ImageViewerGui.getSingletonInstance().getLeftContentPane().expand(ImageViewerGui.getSingletonInstance().getFilterPanelContainer());
-            LayersModel.getSingletonInstance().setActiveLayer(imageInfoView);
+            LayersModel.getSingletonInstance().setActiveLayer(newLayer);
         }
     }
 

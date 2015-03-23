@@ -9,13 +9,14 @@ import org.helioviewer.jhv.layers.LayersListener;
 import org.helioviewer.jhv.layers.LayersModel;
 import org.helioviewer.viewmodel.view.LayeredView;
 import org.helioviewer.viewmodel.view.View;
+import org.helioviewer.viewmodel.view.jp2view.JHVJP2View;
 
 /**
  * A TableModel representing the state of visible Layers, internally using the
  * LayersModel
- * 
+ *
  * @author Malte Nuhn
- * 
+ *
  */
 public class LayerTableModel extends AbstractTableModel implements LayersListener {
 
@@ -29,11 +30,11 @@ public class LayerTableModel extends AbstractTableModel implements LayersListene
     /** The sole instance of this class. */
     private static final LayerTableModel layerTableModel = new LayerTableModel();
 
-    private final List<View> views;
+    private final List<JHVJP2View> views;
 
     /**
      * Returns the only instance of this class.
-     * 
+     *
      * @return the only instance of this class.
      * */
     public static LayerTableModel getSingletonInstance() {
@@ -41,7 +42,7 @@ public class LayerTableModel extends AbstractTableModel implements LayersListene
     }
 
     private LayerTableModel() {
-        views = new ArrayList<View>();
+        views = new ArrayList<JHVJP2View>();
         LayersModel.getSingletonInstance().addLayersListener(this);
     }
 

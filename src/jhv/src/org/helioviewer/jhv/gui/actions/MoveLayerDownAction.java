@@ -7,11 +7,11 @@ import javax.swing.AbstractAction;
 import org.helioviewer.jhv.gui.IconBank;
 import org.helioviewer.jhv.gui.IconBank.JHVIcon;
 import org.helioviewer.jhv.layers.LayersModel;
-import org.helioviewer.viewmodel.view.View;
+import org.helioviewer.viewmodel.view.jp2view.JHVJP2View;
 
 /**
  * Action for a specific layer to move down a given layer.
- * 
+ *
  * @author Malte Nuhn
  */
 public class MoveLayerDownAction extends AbstractAction {
@@ -20,15 +20,15 @@ public class MoveLayerDownAction extends AbstractAction {
     /**
      * Controlled layer by this action.
      */
-    private final View view;
+    private final JHVJP2View view;
 
     /**
      * Creates a action to move a layer down
-     * 
+     *
      * @param view
      *            Layer to move down
      */
-    public MoveLayerDownAction(View view) {
+    public MoveLayerDownAction(JHVJP2View view) {
         super("Move Layer Down", IconBank.getIcon(JHVIcon.DOWN));
         this.view = view;
     }

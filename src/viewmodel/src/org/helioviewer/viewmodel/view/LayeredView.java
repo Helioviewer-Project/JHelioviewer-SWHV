@@ -1,5 +1,7 @@
 package org.helioviewer.viewmodel.view;
 
+import org.helioviewer.viewmodel.view.jp2view.JHVJP2View;
+
 /**
  * View to merged multiple Views.
  *
@@ -44,7 +46,7 @@ public interface LayeredView extends View {
      * @return True if the view is visible
      * @see #toggleVisibility
      */
-    public boolean isVisible(View view);
+    public boolean isVisible(JHVJP2View view);
 
     /**
      * Returns number of layers currently visible.
@@ -67,7 +69,7 @@ public interface LayeredView extends View {
      *            View to toggle visibility
      * @see #isVisible
      */
-    public void toggleVisibility(View view);
+    public void toggleVisibility(JHVJP2View view);
 
     /**
      * Adds a view as a new layer to the LayeredView.
@@ -79,7 +81,7 @@ public interface LayeredView extends View {
      *            View to add as a new layer
      * @see #removeLayer
      */
-    public void addLayer(View newLayer);
+    public void addLayer(JHVJP2View newLayer);
 
     /**
      * Adds a view as a new layer to the LayeredView.
@@ -90,7 +92,7 @@ public interface LayeredView extends View {
      *            View to add as a new layer
      * @see #removeLayer
      */
-    public void addLayer(View newLayer, int newIndex);
+    public void addLayer(JHVJP2View newLayer, int newIndex);
 
     /**
      * Removes a layer from the LayeredView.
@@ -111,8 +113,9 @@ public interface LayeredView extends View {
      *            View to remove from the LayeredView
      * @see #addLayer
      */
-    public void removeLayer(View view);
-    public void removeLayer(View view, boolean needAbolish);
+    public void removeLayer(JHVJP2View view);
+
+    public void removeLayer(JHVJP2View view, boolean needAbolish);
 
     /**
      * Removes all layers of the layered view. This method should be preferred
@@ -131,7 +134,7 @@ public interface LayeredView extends View {
      * @return Position of the view within stack
      * @see #moveView
      */
-    public int getLayerLevel(View view);
+    public int getLayerLevel(JHVJP2View view);
 
     /**
      * Returns the view at a given position within the stack of layers.
@@ -140,7 +143,7 @@ public interface LayeredView extends View {
      *            Position within the stack of layers
      * @return View at given position
      */
-    public View getLayer(int index);
+    public JHVJP2View getLayer(int index);
 
     /**
      * Moves a layer to a different position within the stack of layers.
@@ -155,6 +158,6 @@ public interface LayeredView extends View {
      * @see #getLayerLevel
      * @see #getLayer
      */
-    public void moveView(View view, int newLevel);
+    public void moveView(JHVJP2View view, int newLevel);
 
 }
