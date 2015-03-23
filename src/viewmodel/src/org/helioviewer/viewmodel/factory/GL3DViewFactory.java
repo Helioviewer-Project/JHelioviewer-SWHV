@@ -19,7 +19,7 @@ import org.helioviewer.viewmodel.view.opengl.GLOverlayView;
  * @author Simon Spoerri (simon.spoerri@fhnw.ch)
  *
  */
-public class GL3DViewFactory extends StandardViewFactory {
+public class GL3DViewFactory implements ViewFactory {
 
     /**
      * {@inheritDoc}
