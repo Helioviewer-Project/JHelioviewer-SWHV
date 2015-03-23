@@ -7,7 +7,6 @@ import org.helioviewer.viewmodel.view.OverlayView;
 import org.helioviewer.viewmodel.view.View;
 import org.helioviewer.viewmodel.view.opengl.GL3DCameraView;
 import org.helioviewer.viewmodel.view.opengl.GL3DComponentView;
-import org.helioviewer.viewmodel.view.opengl.GL3DSceneGraphView;
 import org.helioviewer.viewmodel.view.opengl.GLOverlayView;
 
 /**
@@ -27,9 +26,7 @@ public class GL3DViewFactory implements ViewFactory {
     @Override
     @SuppressWarnings("unchecked")
     public <T extends View> T createNewView(Class<T> pattern) {
-        if (pattern.isAssignableFrom(GL3DSceneGraphView.class)) {
-            return (T) new GL3DSceneGraphView();
-        } else if (pattern.isAssignableFrom(GL3DCameraView.class)) {
+        if (pattern.isAssignableFrom(GL3DCameraView.class)) {
             return (T) new GL3DCameraView();
         } else if (pattern.isAssignableFrom(ComponentView.class)) {
             return (T) new GL3DComponentView();

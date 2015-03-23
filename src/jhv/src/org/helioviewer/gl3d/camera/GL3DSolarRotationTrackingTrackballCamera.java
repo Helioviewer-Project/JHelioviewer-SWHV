@@ -3,7 +3,6 @@ package org.helioviewer.gl3d.camera;
 import org.helioviewer.base.physics.Constants;
 import org.helioviewer.gl3d.math.GL3DMat4d;
 import org.helioviewer.gl3d.scenegraph.GL3DState;
-import org.helioviewer.viewmodel.view.opengl.GL3DSceneGraphView;
 
 /**
  * The trackball camera provides a trackball rotation behavior (
@@ -23,13 +22,10 @@ public class GL3DSolarRotationTrackingTrackballCamera extends GL3DCamera {
 
     protected GL3DInteraction currentInteraction;
 
-    protected GL3DSceneGraphView lastScenegraph;
-
-    public GL3DSolarRotationTrackingTrackballCamera(GL3DSceneGraphView sceneGraphView) {
-        super(sceneGraphView);
-        this.rotationInteraction = new GL3DTrackballRotationInteraction(this, sceneGraphView);
-        this.panInteraction = new GL3DPanInteraction(this, sceneGraphView);
-        this.zoomBoxInteraction = new GL3DZoomBoxInteraction(this, sceneGraphView);
+    public GL3DSolarRotationTrackingTrackballCamera() {
+        this.rotationInteraction = new GL3DTrackballRotationInteraction(this);
+        this.panInteraction = new GL3DPanInteraction(this);
+        this.zoomBoxInteraction = new GL3DZoomBoxInteraction(this);
         this.currentInteraction = this.rotationInteraction;
     }
 

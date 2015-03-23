@@ -5,7 +5,6 @@ import java.awt.event.MouseEvent;
 import org.helioviewer.gl3d.math.GL3DQuatd;
 import org.helioviewer.gl3d.math.GL3DVec3d;
 import org.helioviewer.jhv.display.Displayer;
-import org.helioviewer.viewmodel.view.opengl.GL3DSceneGraphView;
 
 /**
  * This interaction is used by the {@link GL3DEarthCamera} as its rotation
@@ -22,8 +21,8 @@ public class GL3DTrackballRotationInteraction extends GL3DDefaultInteraction {
     private GL3DVec3d currentRotationEndPoint;
     private GL3DQuatd currentDragRotation;
 
-    protected GL3DTrackballRotationInteraction(GL3DSolarRotationTrackingTrackballCamera camera, GL3DSceneGraphView sceneGraph) {
-        super(camera, sceneGraph);
+    protected GL3DTrackballRotationInteraction(GL3DSolarRotationTrackingTrackballCamera camera) {
+        super(camera);
     }
 
     @Override

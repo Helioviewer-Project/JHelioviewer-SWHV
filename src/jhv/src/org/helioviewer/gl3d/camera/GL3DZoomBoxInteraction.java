@@ -7,7 +7,6 @@ import javax.media.opengl.GL2;
 import org.helioviewer.gl3d.math.GL3DVec3d;
 import org.helioviewer.gl3d.scenegraph.GL3DState;
 import org.helioviewer.jhv.display.Displayer;
-import org.helioviewer.viewmodel.view.opengl.GL3DSceneGraphView;
 
 /**
  * The zoom box interaction allows the user to select a region of interest in
@@ -25,8 +24,8 @@ public class GL3DZoomBoxInteraction extends GL3DDefaultInteraction {
     private GL3DVec3d zoomBoxStartPoint;
     private GL3DVec3d zoomBoxEndPoint;
 
-    public GL3DZoomBoxInteraction(GL3DSolarRotationTrackingTrackballCamera camera, GL3DSceneGraphView sceneGraph) {
-        super(camera, sceneGraph);
+    public GL3DZoomBoxInteraction(GL3DSolarRotationTrackingTrackballCamera camera) {
+        super(camera);
     }
 
     @Override
