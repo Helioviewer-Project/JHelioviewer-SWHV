@@ -5,8 +5,11 @@ import java.util.HashMap;
 
 import javax.media.opengl.GL2;
 
+import org.helioviewer.gl3d.math.GL3DVec4d;
+import org.helioviewer.gl3d.math.GL3DVec4f;
 import org.helioviewer.gl3d.model.image.GL3DImageLayer;
 import org.helioviewer.gl3d.scenegraph.GL3DState;
+import org.helioviewer.gl3d.scenegraph.visuals.GL3DGrid;
 import org.helioviewer.viewmodel.changeevent.ChangeEvent;
 import org.helioviewer.viewmodel.changeevent.LayerChangedReason;
 import org.helioviewer.viewmodel.changeevent.LayerChangedReason.LayerChangeType;
@@ -16,14 +19,19 @@ import org.helioviewer.viewmodel.view.opengl.shader.GLSLShader;
 
 public class GL3DLayeredView extends AbstractView implements LayeredView, ViewListener, GL3DView {
 
-    protected ArrayList<View> layers = new ArrayList<View>();
-    protected HashMap<View, Layer> jp2viewLookup = new HashMap<View, Layer>();
+    protected ArrayList<JHVJP2View> layers = new ArrayList<JHVJP2View>();
+    protected HashMap<JHVJP2View, Layer> jp2viewLookup = new HashMap<JHVJP2View, Layer>();
     private final ArrayList<GL3DImageLayer> imageLayers = new ArrayList<GL3DImageLayer>();
+    private final GL3DGrid grid;
+
+    public GL3DLayeredView() {
+        this.grid = new GL3DGrid("", 15., 15., new GL3DVec4f(1f, 0f, 0f, 1f), new GL3DVec4d(1, 0, 0., 1.), false);
+    }
 
     protected class Layer {
         public boolean visibility = true;
 
-        public Layer(View base) {
+        public Layer(JHVJP2View base) {
         }
 
     }
@@ -32,7 +40,7 @@ public class GL3DLayeredView extends AbstractView implements LayeredView, ViewLi
      * {@inheritDoc}
      */
     @Override
-    public boolean isVisible(View view) {
+    public boolean isVisible(JHVJP2View view) {
         Layer layer = jp2viewLookup.get(view);
 
         if (layer != null)
@@ -60,7 +68,7 @@ public class GL3DLayeredView extends AbstractView implements LayeredView, ViewLi
      * {@inheritDoc}
      */
     @Override
-    public void toggleVisibility(View view) {
+    public void toggleVisibility(JHVJP2View view) {
         LinkedMovieManager.getActiveInstance().pauseLinkedMovies();
 
         Layer layer = jp2viewLookup.get(view);
@@ -74,7 +82,7 @@ public class GL3DLayeredView extends AbstractView implements LayeredView, ViewLi
      * {@inheritDoc}
      */
     @Override
-    public void addLayer(View newLayer) {
+    public void addLayer(JHVJP2View newLayer) {
         addLayer(newLayer, layers.size());
     }
 
@@ -83,7 +91,7 @@ public class GL3DLayeredView extends AbstractView implements LayeredView, ViewLi
      */
 
     @Override
-    public void addLayer(View newLayer, int newIndex) {
+    public void addLayer(JHVJP2View newLayer, int newIndex) {
         if (newLayer == null)
             return;
 
@@ -93,7 +101,7 @@ public class GL3DLayeredView extends AbstractView implements LayeredView, ViewLi
         jp2viewLookup.put(newLayer, new Layer(newLayer));
 
         newLayer.addViewListener(this);
-        GL3DImageLayer imageLayer = new GL3DImageLayer("", (JHVJP2View) newLayer, true, true, true);
+        GL3DImageLayer imageLayer = new GL3DImageLayer("", newLayer, true, true, true);
         this.imageLayers.add(imageLayer);
         ChangeEvent event = new ChangeEvent(new LayerChangedReason(this, LayerChangeType.LAYER_ADDED, newLayer));
         notifyViewListeners(event);
@@ -103,7 +111,7 @@ public class GL3DLayeredView extends AbstractView implements LayeredView, ViewLi
      * {@inheritDoc}
      */
     @Override
-    public View getLayer(int index) {
+    public JHVJP2View getLayer(int index) {
         if (index >= 0 && index < layers.size()) {
             return layers.get(index);
         }
@@ -122,7 +130,7 @@ public class GL3DLayeredView extends AbstractView implements LayeredView, ViewLi
      * {@inheritDoc}
      */
     @Override
-    public int getLayerLevel(View view) {
+    public int getLayerLevel(JHVJP2View view) {
         return layers.indexOf(view);
     }
 
@@ -130,12 +138,12 @@ public class GL3DLayeredView extends AbstractView implements LayeredView, ViewLi
      * {@inheritDoc}
      */
     @Override
-    public void removeLayer(View view) {
+    public void removeLayer(JHVJP2View view) {
         removeLayer(view, true);
     }
 
     @Override
-    public void removeLayer(View view, boolean needAbolish) {
+    public void removeLayer(JHVJP2View view, boolean needAbolish) {
         if (view == null) {
             return;
         }
@@ -224,7 +232,7 @@ public class GL3DLayeredView extends AbstractView implements LayeredView, ViewLi
      * {@inheritDoc}
      */
     @Override
-    public void moveView(View view, int newLevel) {
+    public void moveView(JHVJP2View view, int newLevel) {
         if (layers.contains(view)) {
             layers.remove(view);
             layers.add(newLevel, view);
@@ -265,7 +273,7 @@ public class GL3DLayeredView extends AbstractView implements LayeredView, ViewLi
         gl.glVertex3d(0, 1.2, 0);
         gl.glVertex3d(0, 1., 0);
         gl.glEnd();
-
+        grid.draw(state);
         state.getActiveCamera().drawCamera(state);
         state.getActiveCamera().resumePerspective(state);
 

@@ -10,11 +10,11 @@ import org.helioviewer.jhv.gui.IconBank;
 import org.helioviewer.jhv.gui.components.layerTable.renderers.DescriptorIconRenderer;
 import org.helioviewer.jhv.layers.LayerDescriptor;
 import org.helioviewer.jhv.layers.LayersModel;
-import org.helioviewer.viewmodel.view.View;
+import org.helioviewer.viewmodel.view.jp2view.JHVJP2View;
 
 /**
  * Action to hide the given layer.
- * 
+ *
  * @author Malte Nuhn
  */
 public class HideLayerAction extends AbstractAction {
@@ -23,15 +23,15 @@ public class HideLayerAction extends AbstractAction {
     /**
      * Controlled layer by this action.
      */
-    private View view;
+    private final JHVJP2View view;
 
     /**
      * Creates a action to hide a given layer
-     * 
+     *
      * @param view
      *            Layer to control
      */
-    public HideLayerAction(View view) {
+    public HideLayerAction(JHVJP2View view) {
         super("Hide Layer");
 
         LayerDescriptor ld = LayersModel.getSingletonInstance().getDescriptor(view);
@@ -47,6 +47,7 @@ public class HideLayerAction extends AbstractAction {
     /**
      * {@inheritDoc}
      */
+    @Override
     public void actionPerformed(ActionEvent e) {
         LayersModel.getSingletonInstance().setVisibleLink(view, false);
     }

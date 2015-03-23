@@ -304,14 +304,14 @@ public class APIRequestManager {
      *         file.
      * @throws IOException
      */
-    public static ImageInfoView newLoad(URI uri, boolean addToViewChain, Interval<Date> range) throws IOException {
+    public static JHVJP2View newLoad(URI uri, boolean addToViewChain, Interval<Date> range) throws IOException {
         if (uri == null) {
             return null;
         }
 
         // Load new view and assign it to view chain of Main Image
 
-        ImageInfoView view = ViewHelper.loadView(uri, range);
+        JHVJP2View view = ViewHelper.loadView(uri, range);
 
         if (addToViewChain) {
             addToViewchain(view);
@@ -334,14 +334,14 @@ public class APIRequestManager {
      *         file.
      * @throws IOException
      */
-    public static ImageInfoView newLoad(URI uri, URI downloadURI, boolean addToViewChain, Interval<Date> range) throws IOException {
+    public static JHVJP2View newLoad(URI uri, URI downloadURI, boolean addToViewChain, Interval<Date> range) throws IOException {
         if (uri == null) {
             return null;
         }
 
         // Load new view and assign it to view chain of Main Image
 
-        ImageInfoView view = ViewHelper.loadView(uri, downloadURI, range);
+        JHVJP2View view = ViewHelper.loadView(uri, downloadURI, range);
 
         if (addToViewChain) {
             addToViewchain(view);
@@ -349,9 +349,9 @@ public class APIRequestManager {
         return view;
     }
 
-    private static void addToViewchain(ImageInfoView view) {
+    private static void addToViewchain(JHVJP2View view) {
         EventQueue.invokeLater(new Runnable() {
-            private ImageInfoView theView;
+            private JHVJP2View theView;
 
             @Override
             public void run() {
@@ -359,7 +359,7 @@ public class APIRequestManager {
                 factory.addLayerToViewchainMain(theView, ImageViewerGui.getSingletonInstance().getMainView());
             }
 
-            public Runnable init(ImageInfoView theView) {
+            public Runnable init(JHVJP2View theView) {
                 this.theView = theView;
                 return this;
             }

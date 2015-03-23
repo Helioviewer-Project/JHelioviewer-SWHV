@@ -126,7 +126,7 @@ public class LayersModel implements UIViewListener {
      *            - Index of the layer to be retrieved
      * @return View associated with the given index
      */
-    public View getLayer(int idx) {
+    public JHVJP2View getLayer(int idx) {
         idx = invertIndex(idx);
         if (idx >= 0 && idx < getNumLayers()) {
             return layeredView.getLayer(idx);
@@ -140,7 +140,7 @@ public class LayersModel implements UIViewListener {
      *
      * @param view
      */
-    public void setActiveLayer(View view) {
+    public void setActiveLayer(JHVJP2View view) {
         int i = this.findView(view);
         setActiveLayer(i);
     }
@@ -361,7 +361,7 @@ public class LayersModel implements UIViewListener {
      *            - View that can be associated with the layer in question
      * @return index of the layer that can be associated with the given view
      */
-    public int findView(View view) {
+    public int findView(JHVJP2View view) {
         int idx = -1;
         if (view != null) {
             idx = layeredView.getLayerLevel(view);
@@ -435,7 +435,7 @@ public class LayersModel implements UIViewListener {
      * @param visible
      *            - the new visibility state
      */
-    public void setVisibleLink(View view, boolean visible) {
+    public void setVisibleLink(JHVJP2View view, boolean visible) {
         this.setVisible(view, visible);
         this.setLink(view, visible);
 
@@ -454,7 +454,7 @@ public class LayersModel implements UIViewListener {
      *            - the new visibility state
      */
     public void setVisibleLink(int idx, boolean visible) {
-        View view = this.getLayer(idx);
+        JHVJP2View view = this.getLayer(idx);
         this.setVisibleLink(view, visible);
     }
 
@@ -466,7 +466,7 @@ public class LayersModel implements UIViewListener {
      * @param visible
      *            - the new visibility state
      */
-    public void setVisible(View view, boolean visible) {
+    public void setVisible(JHVJP2View view, boolean visible) {
         LayeredView lv = getLayeredView();
         if (lv != null) {
             if (lv.isVisible(view) != visible) {
@@ -500,7 +500,7 @@ public class LayersModel implements UIViewListener {
      *
      * @return true if the layer is visible
      */
-    public boolean isVisible(View view) {
+    public boolean isVisible(JHVJP2View view) {
         LayeredView lv = getLayeredView();
         if (lv != null) {
             return lv.isVisible(view);
@@ -568,7 +568,7 @@ public class LayersModel implements UIViewListener {
             // If layer was deleted, delete corresponding panel
             if (type == LayerChangedReason.LayerChangeType.LAYER_ADDED) {
                 layerReason.setProcessed(true);
-                View view = layerReason.getSubView();
+                JHVJP2View view = (JHVJP2View) layerReason.getSubView();
                 int newIndex = findView(view);
                 if (newIndex != -1) {
                     this.setActiveLayer(newIndex);
@@ -582,7 +582,7 @@ public class LayersModel implements UIViewListener {
                 this.setActiveLayer(newIndex);
             } else if (type == LayerChangedReason.LayerChangeType.LAYER_VISIBILITY) {
                 layerReason.setProcessed(true);
-                View view = layerReason.getSubView();
+                JHVJP2View view = (JHVJP2View) layerReason.getSubView();
                 int idx = findView(view);
                 if (idx != -1) {
                     this.fireLayerChanged(idx);
@@ -596,7 +596,7 @@ public class LayersModel implements UIViewListener {
 
         // if meta data has changed, update label
         for (TimestampChangedReason timestampReason : timestampReasons) {
-            View timestampView = timestampReason.getView();
+            JHVJP2View timestampView = (JHVJP2View) timestampReason.getView();
 
             if (timestampView != null) {
                 int idx = findView(timestampView);
@@ -790,7 +790,7 @@ public class LayersModel implements UIViewListener {
      * @param view
      *            - View that can be associated with the layer in question
      */
-    public void removeLayer(View view) {
+    public void removeLayer(JHVJP2View view) {
         int index = this.findView(view);
         removeLayer(index);
     }
@@ -931,7 +931,7 @@ public class LayersModel implements UIViewListener {
      * @param view
      *            - View that can be associated with the layer in question
      */
-    public void moveLayerUp(View view) {
+    public void moveLayerUp(JHVJP2View view) {
         if (view == null) {
             return;
         }
@@ -953,7 +953,7 @@ public class LayersModel implements UIViewListener {
      * @param view
      *            - View that can be associated with the layer in question
      */
-    public void moveLayerDown(View view) {
+    public void moveLayerDown(JHVJP2View view) {
         if (view == null) {
             return;
         }
@@ -1140,7 +1140,7 @@ public class LayersModel implements UIViewListener {
      * @return LayerDescriptor of the current state of the layer in question
      */
     public LayerDescriptor getDescriptor(int idx) {
-        View view = this.getLayer(idx);
+        JHVJP2View view = this.getLayer(idx);
         return getDescriptor(view);
     }
 
@@ -1151,7 +1151,7 @@ public class LayersModel implements UIViewListener {
      *            - View that can be associated with the layer in question
      * @return LayerDescriptor of the current state of the layer in question
      */
-    public LayerDescriptor getDescriptor(View view) {
+    public LayerDescriptor getDescriptor(JHVJP2View view) {
         LayerDescriptor ld = new LayerDescriptor("sd", "sdf");
 
         ld.isMovie = layersModel.isMovie(view);
