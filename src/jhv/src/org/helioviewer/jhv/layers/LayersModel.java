@@ -44,7 +44,6 @@ import org.helioviewer.viewmodel.view.ImageInfoView;
 import org.helioviewer.viewmodel.view.LayeredView;
 import org.helioviewer.viewmodel.view.LinkedMovieManager;
 import org.helioviewer.viewmodel.view.RegionView;
-import org.helioviewer.viewmodel.view.TimedMovieView;
 import org.helioviewer.viewmodel.view.View;
 import org.helioviewer.viewmodel.view.jp2view.JHVJP2View;
 import org.helioviewer.viewmodel.view.jp2view.JHVJPXView;
@@ -819,7 +818,7 @@ public class LayersModel implements UIViewListener {
      *            - true if the layer in question should play
      */
     public void setPlaying(int idx, boolean play) {
-        View view = this.getLayer(idx);
+        JHVJP2View view = this.getLayer(idx);
         this.setPlaying(view, play);
     }
 
@@ -831,13 +830,13 @@ public class LayersModel implements UIViewListener {
      * @param play
      *            - true if the layer in question should play
      */
-    public void setPlaying(View view, boolean play) {
+    public void setPlaying(JHVJP2View view, boolean play) {
         if (view == null) {
             return;
         }
 
-        TimedMovieView timedMovieView = view.getAdapter(TimedMovieView.class);
-        if (timedMovieView != null) {
+        if (view instanceof JHVJPXView) {
+            JHVJPXView timedMovieView = (JHVJPXView) view;
             if (play) {
                 timedMovieView.playMovie();
             } else {
