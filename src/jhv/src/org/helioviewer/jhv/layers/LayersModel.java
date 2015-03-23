@@ -713,27 +713,24 @@ public class LayersModel implements UIViewListener {
      *            - View that can be associated with the layer in question
      */
     public void downloadLayer(View view) {
-        if (view == null) {
+        ImageInfoView infoView;
+        if (view == null || (infoView = view.getAdapter(ImageInfoView.class)) == null) {
             return;
         }
 
-        ImageInfoView infoView = view.getAdapter(ImageInfoView.class);
-
         Thread downloadThread = new Thread(new Runnable() {
             private ImageInfoView theInfoView;
-            private View theSubView;
 
             @Override
             public void run() {
-                downloadFromJPIP(theInfoView, theSubView);
+                downloadFromJPIP(theInfoView);
             }
 
-            public Runnable init(ImageInfoView theInfoView, View theSubView) {
+            public Runnable init(ImageInfoView theInfoView) {
                 this.theInfoView = theInfoView;
-                this.theSubView = theSubView;
                 return this;
             }
-        }.init(infoView, view), "DownloadFromJPIPThread");
+        }.init(infoView), "DownloadFromJPIPThread");
 
         downloadThread.start();
     }
@@ -744,11 +741,7 @@ public class LayersModel implements UIViewListener {
      * Changes the source of the ImageInfoView afterwards, since a local file is
      * always faster.
      */
-    private void downloadFromJPIP(ImageInfoView infoView, View subView) {
-        if (infoView == null) {
-            return;
-        }
-
+    private void downloadFromJPIP(ImageInfoView infoView) {
         FileDownloader fileDownloader = new FileDownloader();
         URI downloadUri = infoView.getDownloadURI();
         URI uri = infoView.getUri();
@@ -773,23 +766,6 @@ public class LayersModel implements UIViewListener {
             e.printStackTrace();
             return;
         }
-
-        EventQueue.invokeLater(new Runnable() {
-            private ImageInfoView theInfoView;
-            private View theSubView;
-
-            @Override
-            public void run() {
-                UIViewListenerDistributor.getSingletonInstance().viewChanged(theInfoView,
-                    new ChangeEvent(new LayerChangedReason(theInfoView, LayerChangeType.LAYER_DOWNLOADED, theSubView)));
-            }
-
-            public Runnable init(ImageInfoView theInfoView, View theSubView) {
-                this.theInfoView = theInfoView;
-                this.theSubView = theSubView;
-                return this;
-            }
-        }.init(infoView, subView));
     }
 
     /**
@@ -833,7 +809,6 @@ public class LayersModel implements UIViewListener {
         idx = invertIndex(idx);
         LayeredView lv = getLayeredView();
         lv.removeLayer(idx);
-        Log.debug(">> LayersModel.removeLayer()");
     }
 
     /**
@@ -932,7 +907,6 @@ public class LayersModel implements UIViewListener {
      * @return true if the layer in question is a movie
      */
     public boolean isMovie(int idx) {
-        Log.debug(">> LayersModel.isMovie(" + idx + ")");
         View view = this.getLayer(idx);
         return isMovie(view);
     }
