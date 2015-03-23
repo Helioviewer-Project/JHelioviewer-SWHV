@@ -17,12 +17,12 @@ import org.helioviewer.gl3d.math.GL3DQuatd;
 import org.helioviewer.gl3d.math.GL3DVec3d;
 import org.helioviewer.gl3d.math.GL3DVec4d;
 import org.helioviewer.gl3d.math.GL3DVec4f;
-import org.helioviewer.gl3d.scenegraph.GL3DGroup;
+import org.helioviewer.gl3d.scenegraph.GL3DShape;
 import org.helioviewer.gl3d.scenegraph.GL3DState;
 
 import com.jogamp.opengl.util.awt.TextRenderer;
 
-public class GL3DGrid extends GL3DGroup {
+public class GL3DGrid extends GL3DShape {
 
     private final double lonstepDegrees;
     private final double latstepDegrees;
@@ -89,7 +89,6 @@ public class GL3DGrid extends GL3DGroup {
         GL2 gl = state.gl;
         gl.glColor3d(1., 1., 0.);
 
-        super.shapeDraw(state);
         float relhi = (float) (state.getActiveCamera().INITFOV / (state.getActiveCamera().getCameraFOV())) * scale;
         float cfontsize = this.fontsize * relhi;
 
@@ -296,6 +295,18 @@ public class GL3DGrid extends GL3DGroup {
 
     public void setThirdColor(Color color) {
         this.thirdColor = color;
+    }
+
+    @Override
+    public void shapeDelete(GL3DState state) {
+    }
+
+    @Override
+    public void shapeInit(GL3DState state) {
+    }
+
+    @Override
+    public void shapeUpdate(GL3DState state) {
     }
 
 }
