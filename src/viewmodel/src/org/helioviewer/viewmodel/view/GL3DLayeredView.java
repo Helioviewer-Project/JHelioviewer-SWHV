@@ -5,11 +5,9 @@ import java.util.HashMap;
 
 import javax.media.opengl.GL2;
 
-import org.helioviewer.gl3d.math.GL3DVec4d;
-import org.helioviewer.gl3d.math.GL3DVec4f;
 import org.helioviewer.gl3d.model.image.GL3DImageLayer;
 import org.helioviewer.gl3d.scenegraph.GL3DState;
-import org.helioviewer.gl3d.scenegraph.visuals.GL3DGrid;
+import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.viewmodel.changeevent.ChangeEvent;
 import org.helioviewer.viewmodel.changeevent.LayerChangedReason;
 import org.helioviewer.viewmodel.changeevent.LayerChangedReason.LayerChangeType;
@@ -22,10 +20,8 @@ public class GL3DLayeredView extends AbstractView implements LayeredView, ViewLi
     protected ArrayList<JHVJP2View> layers = new ArrayList<JHVJP2View>();
     protected HashMap<JHVJP2View, Layer> jp2viewLookup = new HashMap<JHVJP2View, Layer>();
     private final ArrayList<GL3DImageLayer> imageLayers = new ArrayList<GL3DImageLayer>();
-    private final GL3DGrid grid;
 
     public GL3DLayeredView() {
-        this.grid = new GL3DGrid("", 15., 15., new GL3DVec4f(1f, 0f, 0f, 1f), new GL3DVec4d(1, 0, 0., 1.), false);
     }
 
     protected class Layer {
@@ -263,17 +259,8 @@ public class GL3DLayeredView extends AbstractView implements LayeredView, ViewLi
         }
         GLSLShader.unbind(gl);
         gl.glDisable(GL2.GL_TEXTURE_2D);
-
         gl.glDisable(GL2.GL_BLEND);
-        gl.glColor4d(0., 0., 1., 1.);
-        gl.glBegin(GL2.GL_LINES);
-        gl.glVertex3d(0, -1.2, 0);
-        gl.glVertex3d(0, -1., 0);
-        gl.glColor4d(1., 0., 0., 1.);
-        gl.glVertex3d(0, 1.2, 0);
-        gl.glVertex3d(0, 1., 0);
-        gl.glEnd();
-        grid.draw(state);
+        Displayer.getRenderablecontainer().render(state);
         state.getActiveCamera().drawCamera(state);
         state.getActiveCamera().resumePerspective(state);
 
