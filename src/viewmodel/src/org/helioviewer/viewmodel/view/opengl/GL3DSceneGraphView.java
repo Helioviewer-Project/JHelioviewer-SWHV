@@ -94,7 +94,7 @@ public class GL3DSceneGraphView extends AbstractGL3DView implements GL3DView {
 
         state.pushMV();
         state.loadIdentity();
-        this.root.update(state);
+        //this.root.update(state);
         state.popMV();
 
         state.pushMV();
@@ -104,7 +104,7 @@ public class GL3DSceneGraphView extends AbstractGL3DView implements GL3DView {
         if (overlayView != null)
             overlayView.preRender3D(gl);
 
-        this.root.draw(state);
+        //this.root.draw(state);
 
         if (overlayView != null)
             overlayView.postRender3D(gl);
@@ -201,7 +201,7 @@ public class GL3DSceneGraphView extends AbstractGL3DView implements GL3DView {
         /*
          * GL3DNode sibling = node; while((sibling = sibling.getNext()) != null)
          * { for(int i=0; i<level; ++i) System.out.print("   ");
-         * 
+         *
          * System.out.println("Sibling: " + sibling.getClass().getName() + " ("
          * + node.getName() + ")"); }
          */

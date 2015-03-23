@@ -254,8 +254,18 @@ public class GL3DLayeredView extends AbstractView implements LayeredView, ViewLi
             layer.draw(state);
         }
         GLSLShader.unbind(gl);
+        gl.glDisable(GL2.GL_TEXTURE_2D);
 
         gl.glDisable(GL2.GL_BLEND);
+        gl.glColor4d(0., 0., 1., 1.);
+        gl.glBegin(GL2.GL_LINES);
+        gl.glVertex3d(0, -1.2, 0);
+        gl.glVertex3d(0, -1., 0);
+        gl.glColor4d(1., 0., 0., 1.);
+        gl.glVertex3d(0, 1.2, 0);
+        gl.glVertex3d(0, 1., 0);
+        gl.glEnd();
+
         state.getActiveCamera().drawCamera(state);
         state.getActiveCamera().resumePerspective(state);
 

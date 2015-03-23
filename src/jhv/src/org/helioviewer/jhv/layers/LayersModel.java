@@ -40,7 +40,7 @@ import org.helioviewer.viewmodel.io.APIResponse;
 import org.helioviewer.viewmodel.io.APIResponseDump;
 import org.helioviewer.viewmodel.region.Region;
 import org.helioviewer.viewmodel.region.StaticRegion;
-import org.helioviewer.viewmodel.view.ComponentView;
+import org.helioviewer.viewmodel.view.GL3DLayeredView;
 import org.helioviewer.viewmodel.view.ImageInfoView;
 import org.helioviewer.viewmodel.view.LayeredView;
 import org.helioviewer.viewmodel.view.LinkedMovieManager;
@@ -82,6 +82,8 @@ public class LayersModel implements UIViewListener {
 
     private Date lastTimestamp;
 
+    private final GL3DLayeredView layeredView;
+
     /**
      * Method returns the sole instance of this class.
      *
@@ -97,19 +99,11 @@ public class LayersModel implements UIViewListener {
     }
 
     private LayersModel() {
+        layeredView = new GL3DLayeredView();
         UIViewListenerDistributor.getSingletonInstance().addViewListener(this);
     }
 
     public LayeredView getLayeredView() {
-        ImageViewerGui imageViewer = ImageViewerGui.getSingletonInstance();
-        if (imageViewer == null) {
-            return null;
-        }
-        ComponentView mainView = imageViewer.getMainView();
-        if (mainView == null) {
-            return null;
-        }
-        LayeredView layeredView = mainView.getAdapter(LayeredView.class);
         return layeredView;
     }
 
@@ -136,11 +130,9 @@ public class LayersModel implements UIViewListener {
      */
     public View getLayer(int idx) {
         idx = invertIndex(idx);
-        LayeredView lv = getLayeredView();
-        if (lv != null && idx >= 0 && idx < getNumLayers()) {
-            return lv.getLayer(idx);
+        if (idx >= 0 && idx < getNumLayers()) {
+            return layeredView.getLayer(idx);
         }
-
         return null;
     }
 
@@ -423,8 +415,7 @@ public class LayersModel implements UIViewListener {
      */
     private int invertIndexDeleted(int idx) {
         int num = this.getNumLayers();
-        // invert indices, based on the indices before one layer was removed
-        if (idx >= 0 && num >= 0) {
+        if (idx >= 0) {
             idx = num - idx;
         }
         return idx;
@@ -436,13 +427,7 @@ public class LayersModel implements UIViewListener {
      * @return number of layers
      */
     public int getNumLayers() {
-        LayeredView lv = getLayeredView();
-
-        if (lv != null) {
-            return lv.getNumLayers();
-        } else {
-            return 0;
-        }
+        return layeredView.getNumLayers();
     }
 
     /**
