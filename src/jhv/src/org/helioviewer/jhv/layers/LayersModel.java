@@ -1,7 +1,6 @@
 package org.helioviewer.jhv.layers;
 
 import java.awt.EventQueue;
-
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -26,8 +25,8 @@ import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.gui.ImageViewerGui;
 import org.helioviewer.jhv.gui.UIViewListener;
 import org.helioviewer.jhv.gui.UIViewListenerDistributor;
-import org.helioviewer.jhv.gui.components.layerTable.LayerTableModel;
 import org.helioviewer.jhv.gui.components.MoviePanel;
+import org.helioviewer.jhv.gui.components.layerTable.LayerTableModel;
 import org.helioviewer.jhv.gui.dialogs.MetaDataDialog;
 import org.helioviewer.jhv.io.APIRequestManager;
 import org.helioviewer.jhv.io.FileDownloader;
@@ -64,14 +63,14 @@ import org.xml.sax.helpers.XMLReaderFactory;
  * This class is a (redundant) representation of the LayeredView + ViewChain
  * state, and, in addition to this, introduces the concept of an "activeLayer",
  * which is the Layer that is currently operated on by the user/GUI.
- * 
+ *
  * This class is mainly used by the LayerTable(Model) as an abstraction to the
  * ViewChain.
- * 
+ *
  * Future development plans still have to show if it is worth to keep this
  * class, or if the abstraction should be avoided and direct access to the
  * viewChain/layeredView should be used in all GUI classes.
- * 
+ *
  * @author Malte Nuhn
  */
 public class LayersModel implements UIViewListener {
@@ -81,12 +80,11 @@ public class LayersModel implements UIViewListener {
     private int activeLayer = -1;
     private final ArrayList<LayersListener> layerListeners = new ArrayList<LayersListener>();
 
-    // store the last updated timestamp
     private Date lastTimestamp;
 
     /**
      * Method returns the sole instance of this class.
-     * 
+     *
      * @return the only instance of this class.
      * */
     public static LayersModel getSingletonInstance() {
@@ -102,12 +100,6 @@ public class LayersModel implements UIViewListener {
         UIViewListenerDistributor.getSingletonInstance().addViewListener(this);
     }
 
-    /**
-     * Get the layeredView object. Returns null if the ImageViewerGui, the
-     * mainView or the layeredView are not yet initialized.
-     * 
-     * @return reference to the LayeredView object, null if an error occurs
-     */
     public LayeredView getLayeredView() {
         ImageViewerGui imageViewer = ImageViewerGui.getSingletonInstance();
         if (imageViewer == null) {
@@ -123,7 +115,7 @@ public class LayersModel implements UIViewListener {
 
     /**
      * Return the view associated with the active Layer
-     * 
+     *
      * @return View associated with the active Layer
      */
     public View getActiveView() {
@@ -155,7 +147,7 @@ public class LayersModel implements UIViewListener {
     /**
      * Set the activeLayer to the Layer that can be associated to the given
      * view, do nothing if the view cannot be associated with any layer
-     * 
+     *
      * @param view
      */
     public void setActiveLayer(View view) {
@@ -165,7 +157,7 @@ public class LayersModel implements UIViewListener {
 
     /**
      * Set the activeLayer to the Layer associated with the given index
-     * 
+     *
      * @param idx
      *            - index of the layer to be set as active Layer
      */
@@ -182,7 +174,7 @@ public class LayersModel implements UIViewListener {
     /**
      * Return a String containing the current timestamp of the given layer,
      * return an empty string if no timing information is available
-     * 
+     *
      * @param idx
      *            - Index of the layer in question
      * @return String representation of the timestamp, empty String if no timing
@@ -196,7 +188,7 @@ public class LayersModel implements UIViewListener {
     /**
      * Return a String containing the current timestamp of the given layer,
      * return an empty string if no timing information is available
-     * 
+     *
      * @param view
      *            - View that can be associated with the layer in question
      * @return String representation of the timestamp, empty String if no timing
@@ -213,7 +205,7 @@ public class LayersModel implements UIViewListener {
     /**
      * Return the current timestamp of the given layer, return an empty string
      * if no timing information is available
-     * 
+     *
      * @param idx
      *            - Index of the layer in question
      * @return timestamp, null if no timing information is available
@@ -226,7 +218,7 @@ public class LayersModel implements UIViewListener {
     /**
      * Return the current timestamp of the given layer, return an empty string
      * if no timing information is available
-     * 
+     *
      * @param view
      *            - View that can be associated with the layer in question
      * @return timestamp, null if no timing information is available
@@ -242,7 +234,7 @@ public class LayersModel implements UIViewListener {
     /**
      * Return the timestamp of the first available image data of the layer in
      * question
-     * 
+     *
      * @param view
      *            - View that can be associated with the layer in question
      * @return timestamp of the first available image data, null if no
@@ -269,7 +261,7 @@ public class LayersModel implements UIViewListener {
     /**
      * Return the timestamp of the first available image data of the layer in
      * question
-     * 
+     *
      * @param idx
      *            - index of the layer in question
      * @return timestamp of the first available image data, null if no
@@ -286,7 +278,7 @@ public class LayersModel implements UIViewListener {
 
     /**
      * Return the timestamp of the first available image data
-     * 
+     *
      * @return timestamp of the first available image data, null if no
      *         information available
      */
@@ -309,7 +301,7 @@ public class LayersModel implements UIViewListener {
     /**
      * Return the timestamp of the last available image data of the layer in
      * question
-     * 
+     *
      * @param view
      *            - View that can be associated with the layer in question
      * @return timestamp of the last available image data, null if no
@@ -338,7 +330,7 @@ public class LayersModel implements UIViewListener {
 
     /**
      * Return the timestamp of the last available image data
-     * 
+     *
      * @return timestamp of the last available image data, null if no
      *         information available
      */
@@ -361,7 +353,7 @@ public class LayersModel implements UIViewListener {
     /**
      * Return the timestamp of the last available image data of the layer in
      * question
-     * 
+     *
      * @param idx
      *            - index of the layer in question
      * @return timestamp of the last available image data, null if no
@@ -374,7 +366,7 @@ public class LayersModel implements UIViewListener {
 
     /**
      * Find the index of the layer that can be associated with the given view
-     * 
+     *
      * @param view
      *            - View that can be associated with the layer in question
      * @return index of the layer that can be associated with the given view
@@ -393,15 +385,15 @@ public class LayersModel implements UIViewListener {
      * Important internal method to convert between LayersModel indexing and
      * LayeredView indexing. Calling it twice should form the identity
      * operation.
-     * 
+     *
      * LayersModel indices go from 0 .. (LayerCount - 1), with 0 being the
      * uppermost layer
-     * 
+     *
      * whereas
-     * 
+     *
      * LayeredView indies go from (LayerCount - 1) .. 0, with 0 being the layer
      * at the bottom.
-     * 
+     *
      * @param idx
      *            to be converted from LayersModel to LayeredView or the other
      *            direction.
@@ -419,11 +411,11 @@ public class LayersModel implements UIViewListener {
     /**
      * Important internal method to convert between LayersModel indexing and
      * LayeredView indexing.
-     * 
+     *
      * Since this index transformation involves the number of layers, this
      * transformation has to pay respect to situation where the number of layers
      * has changed.
-     * 
+     *
      * @param idx
      *            to be converted from LayersModel to LayeredView or the other
      *            direction after a layer has been deleted
@@ -440,7 +432,7 @@ public class LayersModel implements UIViewListener {
 
     /**
      * Return the number of layers currently available
-     * 
+     *
      * @return number of layers
      */
     public int getNumLayers() {
@@ -456,7 +448,7 @@ public class LayersModel implements UIViewListener {
     /**
      * Change the visibility of the layer in question, and automatically
      * (un)link + play/pause the layer
-     * 
+     *
      * @param view
      *            - View that can be associated with the layer in question
      * @param visible
@@ -474,7 +466,7 @@ public class LayersModel implements UIViewListener {
     /**
      * Change the visibility of the layer in question, and automatically
      * (un)link + play/pause the layer
-     * 
+     *
      * @param idx
      *            - index of the layer in question
      * @param visible
@@ -487,7 +479,7 @@ public class LayersModel implements UIViewListener {
 
     /**
      * Change the visibility of the layer in question
-     * 
+     *
      * @param view
      *            - View that can be associated with the layer in question
      * @param visible
@@ -504,7 +496,7 @@ public class LayersModel implements UIViewListener {
 
     /**
      * Change the visibility of the layer in question
-     * 
+     *
      * @param idx
      *            - index of the layer in question
      * @param visible
@@ -521,10 +513,10 @@ public class LayersModel implements UIViewListener {
 
     /**
      * Get the visibility of the layer in question
-     * 
+     *
      * @param view
      *            - View that can be associated with the layer in question
-     * 
+     *
      * @return true if the layer is visible
      */
     public boolean isVisible(View view) {
@@ -538,7 +530,7 @@ public class LayersModel implements UIViewListener {
 
     /**
      * Get the visibility of the layer in question
-     * 
+     *
      * @param idx
      *            - index of the layer in question
      * @return true if the layer is visible
@@ -554,7 +546,7 @@ public class LayersModel implements UIViewListener {
 
     /**
      * Get the name of the layer in question
-     * 
+     *
      * @param view
      *            - View that can be associated with the layer in question
      * @return name of the layer, the views default String representation if no
@@ -575,7 +567,7 @@ public class LayersModel implements UIViewListener {
 
     /**
      * Get the name of the layer in question
-     * 
+     *
      * @param idx
      *            - index of the layer in question
      * @return name of the layer, the views default String representation if no
@@ -652,9 +644,9 @@ public class LayersModel implements UIViewListener {
 
     /**
      * View changed handler.
-     * 
+     *
      * Internally forwards (an abstraction) of the events to the LayersListener
-     * 
+     *
      */
     @Override
     public void UIviewChanged(View sender, ChangeEvent aEvent) {
@@ -666,7 +658,7 @@ public class LayersModel implements UIViewListener {
     /**
      * Check if the given index is valid, given the current state of the
      * LayeredView/ViewChain
-     * 
+     *
      * @param idx
      *            - index of the layer in question
      * @return true if the index is valid
@@ -680,7 +672,7 @@ public class LayersModel implements UIViewListener {
 
     /**
      * Calulate a new activeLayer after the old Layer has been deleted
-     * 
+     *
      * @param oldActiveLayerIdx
      *            - index of old active, but deleted, layer
      * @return the index of the new active layer to choose, or -1 if no suitable
@@ -697,7 +689,7 @@ public class LayersModel implements UIViewListener {
 
     /**
      * Trigger downloading the layer in question
-     * 
+     *
      * @param idx
      *            - index of the layer in question
      */
@@ -708,7 +700,7 @@ public class LayersModel implements UIViewListener {
 
     /**
      * Trigger downloading the layer in question
-     * 
+     *
      * @param view
      *            - View that can be associated with the layer in question
      */
@@ -771,7 +763,7 @@ public class LayersModel implements UIViewListener {
     /**
      * Trigger showing a dialog displaying the meta data of the layer in
      * question.
-     * 
+     *
      * @param idx
      *            - index of the layer in question
      */
@@ -783,10 +775,10 @@ public class LayersModel implements UIViewListener {
     /**
      * Trigger showing a dialog displaying the meta data of the layer in
      * question.
-     * 
+     *
      * @param view
      *            - View that can be associated with the layer in question
-     * 
+     *
      * @see org.helioviewer.jhv.gui.dialogs.MetaDataDialog
      */
     public void showMetaInfo(View view) {
@@ -801,7 +793,7 @@ public class LayersModel implements UIViewListener {
 
     /**
      * Remove the layer in question
-     * 
+     *
      * @param idx
      *            - index of the layer in question
      */
@@ -813,7 +805,7 @@ public class LayersModel implements UIViewListener {
 
     /**
      * Remove the layer in question
-     * 
+     *
      * @param view
      *            - View that can be associated with the layer in question
      */
@@ -824,7 +816,7 @@ public class LayersModel implements UIViewListener {
 
     /**
      * Set the link-state of the layer in question
-     * 
+     *
      * @param view
      *            - View that can be associated with the layer in question
      * @param link
@@ -852,7 +844,7 @@ public class LayersModel implements UIViewListener {
 
     /**
      * Set the link-state of the layer in question
-     * 
+     *
      * @param idx
      *            - index of the layer in question
      * @param link
@@ -865,7 +857,7 @@ public class LayersModel implements UIViewListener {
 
     /**
      * Set the play-state of the layer in question
-     * 
+     *
      * @param idx
      *            - index of the layer in question
      * @param play
@@ -878,7 +870,7 @@ public class LayersModel implements UIViewListener {
 
     /**
      * Set the play-state of the layer in question
-     * 
+     *
      * @param view
      *            - View that can be associated with the layer in question
      * @param play
@@ -901,7 +893,7 @@ public class LayersModel implements UIViewListener {
 
     /**
      * Check whether the layer in question is a movie
-     * 
+     *
      * @param idx
      *            - index of the layer in question
      * @return true if the layer in question is a movie
@@ -913,7 +905,7 @@ public class LayersModel implements UIViewListener {
 
     /**
      * Check whether the layer in question is a movie
-     * 
+     *
      * @param view
      *            - View that can be associated with the layer in question
      * @return true if the layer in question is a movie
@@ -929,7 +921,7 @@ public class LayersModel implements UIViewListener {
 
     /**
      * Check whether the layer in question has timing information
-     * 
+     *
      * @param idx
      *            - index of the layer in question
      * @return true if the layer in question has timing information
@@ -940,7 +932,7 @@ public class LayersModel implements UIViewListener {
 
     /**
      * Check whether the layer in question has timing information
-     * 
+     *
      * @param view
      *            - View that can be associated with the layer in question
      * @return true if the layer in question has timing information
@@ -954,7 +946,7 @@ public class LayersModel implements UIViewListener {
 
     /**
      * Move the layer in question up
-     * 
+     *
      * @param view
      *            - View that can be associated with the layer in question
      */
@@ -976,7 +968,7 @@ public class LayersModel implements UIViewListener {
 
     /**
      * Move the layer in question down
-     * 
+     *
      * @param view
      *            - View that can be associated with the layer in question
      */
@@ -998,7 +990,7 @@ public class LayersModel implements UIViewListener {
 
     /**
      * Check whether the layer in question is currently playing
-     * 
+     *
      * @param idx
      *            - index of the layer in question
      * @return true if the layer in question is currently playing
@@ -1010,7 +1002,7 @@ public class LayersModel implements UIViewListener {
 
     /**
      * Check whether the layer in question is currently playing
-     * 
+     *
      * @param view
      *            - View that can be associated with the layer in question
      * @return true if the layer in question is currently playing
@@ -1029,7 +1021,7 @@ public class LayersModel implements UIViewListener {
 
     /**
      * Return the current framerate for the layer in question
-     * 
+     *
      * @param idx
      *            - index of the layer in question
      * @return the current framerate or 0.0 if the movie is not playing, or if
@@ -1042,7 +1034,7 @@ public class LayersModel implements UIViewListener {
 
     /**
      * Return the current framerate for the layer in question
-     * 
+     *
      * @param view
      *            - View that can be associated with the layer in question
      * @return the current framerate or 0.0 if the movie is not playing, or if
@@ -1068,7 +1060,7 @@ public class LayersModel implements UIViewListener {
     /**
      * Check whether the layer in question is a Master in the list of linked
      * movies
-     * 
+     *
      * @param idx
      *            - index of the layer in question
      * @return true if the layer in question is a master
@@ -1081,7 +1073,7 @@ public class LayersModel implements UIViewListener {
     /**
      * Check whether the layer in question is a Master in the list of linked
      * movies
-     * 
+     *
      * @param view
      *            - View that can be associated with the layer in question
      * @return true if the layer in question is a master
@@ -1097,7 +1089,7 @@ public class LayersModel implements UIViewListener {
 
     /**
      * Check whether the layer in question is a Remote View
-     * 
+     *
      * @param view
      *            - View that can be associated with the layer in question
      * @return true if the layer in question is a remote view
@@ -1117,7 +1109,7 @@ public class LayersModel implements UIViewListener {
 
     /**
      * Check whether the layer in question is a Remote View
-     * 
+     *
      * @param idx
      *            - index of the layer in question
      * @return true if the layer in question is a remote view
@@ -1129,7 +1121,7 @@ public class LayersModel implements UIViewListener {
 
     /**
      * Check whether the layer in question is connected to a JPIP server
-     * 
+     *
      * @param idx
      *            - index of the layer in question
      * @return true if the layer is connected to a JPIP server
@@ -1141,7 +1133,7 @@ public class LayersModel implements UIViewListener {
 
     /**
      * Check whether the layer in question is connected to a JPIP server
-     * 
+     *
      * @param view
      *            - View that can be associated with the layer in question
      * @return true if the layer is connected to a JPIP server
@@ -1161,7 +1153,7 @@ public class LayersModel implements UIViewListener {
 
     /**
      * Return a representation of the layer in question
-     * 
+     *
      * @param idx
      *            - index of the layer in question
      * @return LayerDescriptor of the current state of the layer in question
@@ -1173,7 +1165,7 @@ public class LayersModel implements UIViewListener {
 
     /**
      * Return a representation of the layer in question
-     * 
+     *
      * @param view
      *            - View that can be associated with the layer in question
      * @return LayerDescriptor of the current state of the layer in question
@@ -1247,7 +1239,7 @@ public class LayersModel implements UIViewListener {
 
     /**
      * Remove LayersListener
-     * 
+     *
      * * @author Carlos Martin
      */
     public void removeLayersListener(LayersListener layerListener) {
@@ -1256,7 +1248,7 @@ public class LayersModel implements UIViewListener {
 
     /**
      * Get last Frame
-     * 
+     *
      * @return
      */
     public Date getLastUpdatedTimestamp() {
@@ -1275,7 +1267,7 @@ public class LayersModel implements UIViewListener {
     /**
      * Return a XML representation of the current layers. This also includes the
      * filter state for each layer.
-     * 
+     *
      * @see org.helioviewer.viewmodel.filter.Filter#getState
      * @param tab
      *            - String to be prepended to each line of the xml
@@ -1336,7 +1328,7 @@ public class LayersModel implements UIViewListener {
     /**
      * Restore the JHV state from the given file. This will overwrite the
      * current JHV state without further notice!
-     * 
+     *
      * @param stateURL
      *            - URL to read the JHV state from
      */
@@ -1384,7 +1376,7 @@ public class LayersModel implements UIViewListener {
 
         /**
          * Default Constructor
-         * 
+         *
          * @param xmlSource
          */
         public StateParser(InputSource xmlSource) {
@@ -1512,7 +1504,7 @@ public class LayersModel implements UIViewListener {
         /**
          * Add a new Layer and initialize it according to the given LayerSetting
          * object, including filters
-         * 
+         *
          * @param layerSetting
          *            - LayerSetting describing the new layer to be set-up
          * @see LayerState
@@ -1597,7 +1589,7 @@ public class LayersModel implements UIViewListener {
         /**
          * Finally setup the viewchain, filters, ... according to the internal
          * FullSetting representation
-         * 
+         *
          * @see FullState
          */
         public void setupLayers() {

@@ -8,7 +8,6 @@ import org.helioviewer.viewmodel.view.View;
 import org.helioviewer.viewmodel.view.opengl.GL3DCameraView;
 import org.helioviewer.viewmodel.view.opengl.GL3DComponentView;
 import org.helioviewer.viewmodel.view.opengl.GL3DSceneGraphView;
-import org.helioviewer.viewmodel.view.opengl.GL3DView;
 import org.helioviewer.viewmodel.view.opengl.GLOverlayView;
 
 /**
@@ -43,44 +42,4 @@ public class GL3DViewFactory extends StandardViewFactory {
         }
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    @SuppressWarnings("unchecked")
-    protected <T extends View> T createViewFromSourceImpl(T source) {
-        // Check if a GL3DView is requested
-        if (source instanceof LayeredView) {
-            return (T) createLayeredViewFromExisting((LayeredView) source);
-        } else if (source instanceof GL3DView) {
-            if (source instanceof GL3DSceneGraphView) {
-                return (T) new GL3DSceneGraphView();
-            } else if (source instanceof GL3DCameraView) {
-                return (T) new GL3DCameraView();
-            } else {
-                throw new IllegalArgumentException("Cannot create View from Source " + source);
-            }
-        } else if (source instanceof ComponentView) {
-            return (T) new GL3DComponentView();
-        } else {
-            return null;
-        }
-    }
-
-    /**
-     * Creates a 3D layered view and copies the existing layers to the new view.
-     *
-     * @param layeredView
-     *            old LayeredView
-     * @return new GL3DLayeredView
-     */
-    private GL3DLayeredView createLayeredViewFromExisting(LayeredView layeredView) {
-        GL3DLayeredView gl3dLayeredView = new GL3DLayeredView();
-
-        for (int i = 0; i < layeredView.getNumLayers(); i++) {
-            if (layeredView.getLayer(i) != null)
-                gl3dLayeredView.addLayer(layeredView.getLayer(i));
-        }
-        return gl3dLayeredView;
-    }
 }

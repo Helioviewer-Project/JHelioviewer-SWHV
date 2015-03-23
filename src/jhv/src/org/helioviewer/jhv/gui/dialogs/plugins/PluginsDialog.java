@@ -12,7 +12,6 @@ import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
 import java.io.File;
 import java.io.IOException;
-import java.util.LinkedList;
 
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
@@ -28,16 +27,11 @@ import javax.swing.filechooser.FileFilter;
 import org.helioviewer.base.FileUtils;
 import org.helioviewer.base.message.Message;
 import org.helioviewer.jhv.JHVDirectory;
-import org.helioviewer.jhv.gui.GL3DViewchainFactory;
 import org.helioviewer.jhv.gui.IconBank;
 import org.helioviewer.jhv.gui.IconBank.JHVIcon;
 import org.helioviewer.jhv.gui.ImageViewerGui;
 import org.helioviewer.jhv.gui.dialogs.pluginsOLD.OverlayPluginDialog;
 import org.helioviewer.jhv.gui.interfaces.ShowableDialog;
-import org.helioviewer.viewmodel.factory.ViewFactory;
-import org.helioviewer.viewmodel.view.ImageInfoView;
-import org.helioviewer.viewmodel.view.LayeredView;
-import org.helioviewer.viewmodel.view.opengl.GLOverlayView;
 import org.helioviewer.viewmodelplugin.controller.PluginContainer;
 import org.helioviewer.viewmodelplugin.controller.PluginManager;
 
@@ -222,45 +216,12 @@ public class PluginsDialog extends JDialog implements ShowableDialog, ActionList
      */
     private void closeDialog() {
         if (changesMade) {
-            // rebuild the view chains
-            recreateViewChains();
-
             // save plug-in settings to XML file
             PluginManager.getSingletonInstance().saveSettings();
         }
 
         // close dialog
         dispose();
-    }
-
-    /**
-     * Rebuilds the existing view chains and removes and adds corresponding
-     * parts from plug ins.
-     */
-    private void recreateViewChains() {
-        Thread.dumpStack();
-        GL3DViewchainFactory chainFactory = new GL3DViewchainFactory();
-        ViewFactory viewFactory = chainFactory.getUsedViewFactory();
-
-        // Memorize all ImageInfoViews, remove all existing layers and add the
-        // memorized ImageInfoViews as new layers again. Activated and needed
-        // filters will be added to the corresponding sub chains.
-        LayeredView mainLayeredView = ImageViewerGui.getSingletonInstance().getMainView().getAdapter(LayeredView.class);
-        LinkedList<ImageInfoView> newImageInfoViews = new LinkedList<ImageInfoView>();
-
-        while (mainLayeredView.getNumLayers() > 0) {
-            newImageInfoViews.add(viewFactory.createViewFromSource(mainLayeredView.getLayer(0).getAdapter(ImageInfoView.class), true));
-            mainLayeredView.removeLayer(0);
-        }
-
-        for (ImageInfoView imageView : newImageInfoViews) {
-            chainFactory.addLayerToViewchainMain(imageView, mainLayeredView);
-        }
-
-        // Update all OverlayViews which are included in the view chain above
-        // the layered view
-        GLOverlayView overlayView = ImageViewerGui.getSingletonInstance().getMainView().getAdapter(GLOverlayView.class);
-        chainFactory.updateOverlayViewsInViewchainMain(overlayView);
     }
 
     /**
