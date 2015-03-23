@@ -1,7 +1,7 @@
 package org.helioviewer.viewmodel.factory;
 
+import org.helioviewer.jhv.layers.LayersModel;
 import org.helioviewer.viewmodel.view.ComponentView;
-import org.helioviewer.viewmodel.view.GL3DLayeredView;
 import org.helioviewer.viewmodel.view.LayeredView;
 import org.helioviewer.viewmodel.view.OverlayView;
 import org.helioviewer.viewmodel.view.View;
@@ -34,7 +34,7 @@ public class GL3DViewFactory implements ViewFactory {
         } else if (pattern.isAssignableFrom(ComponentView.class)) {
             return (T) new GL3DComponentView();
         } else if (pattern.isAssignableFrom(LayeredView.class)) {
-            return (T) new GL3DLayeredView();
+            return (T) LayersModel.getSingletonInstance().getLayeredView();
         } else if (pattern.isAssignableFrom(OverlayView.class)) {
             return (T) new GLOverlayView();
         } else {
