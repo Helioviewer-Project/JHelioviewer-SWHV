@@ -31,7 +31,6 @@ import org.helioviewer.jhv.gui.dialogs.MetaDataDialog;
 import org.helioviewer.jhv.io.APIRequestManager;
 import org.helioviewer.jhv.io.FileDownloader;
 import org.helioviewer.viewmodel.changeevent.ChangeEvent;
-import org.helioviewer.viewmodel.changeevent.ChangedReason;
 import org.helioviewer.viewmodel.changeevent.LayerChangedReason;
 import org.helioviewer.viewmodel.changeevent.LayerChangedReason.LayerChangeType;
 import org.helioviewer.viewmodel.changeevent.TimestampChangedReason;
@@ -49,7 +48,6 @@ import org.helioviewer.viewmodel.view.MovieView;
 import org.helioviewer.viewmodel.view.RegionView;
 import org.helioviewer.viewmodel.view.TimedMovieView;
 import org.helioviewer.viewmodel.view.View;
-import org.helioviewer.viewmodel.view.ViewHelper;
 import org.helioviewer.viewmodel.view.jp2view.JHVJP2View;
 import org.helioviewer.viewmodel.view.jp2view.datetime.ImmutableDateTime;
 import org.xml.sax.Attributes;
@@ -364,11 +362,9 @@ public class LayersModel implements UIViewListener {
      * @return index of the layer that can be associated with the given view
      */
     public int findView(View view) {
-        LayeredView lv = getLayeredView();
         int idx = -1;
-        if (lv != null) {
-            View theView = ViewHelper.findLastViewBeforeLayeredView(view);
-            idx = lv.getLayerLevel(theView);
+        if (view != null) {
+            idx = layeredView.getLayerLevel(view);
         }
         return invertIndex(idx);
     }
