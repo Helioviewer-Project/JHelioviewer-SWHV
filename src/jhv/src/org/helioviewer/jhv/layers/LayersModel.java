@@ -49,6 +49,7 @@ import org.helioviewer.viewmodel.view.RegionView;
 import org.helioviewer.viewmodel.view.TimedMovieView;
 import org.helioviewer.viewmodel.view.View;
 import org.helioviewer.viewmodel.view.jp2view.JHVJP2View;
+import org.helioviewer.viewmodel.view.jp2view.JHVJPXView;
 import org.helioviewer.viewmodel.view.jp2view.datetime.ImmutableDateTime;
 import org.xml.sax.Attributes;
 import org.xml.sax.InputSource;
@@ -233,15 +234,10 @@ public class LayersModel implements UIViewListener {
     public ImmutableDateTime getStartDate(JHVJP2View view) {
         ImmutableDateTime result = null;
 
-        if (view == null) {
-            return result;
-        }
-
-        TimedMovieView tmv = view.getAdapter(TimedMovieView.class);
-        if (tmv != null) {
+        if (view instanceof JHVJPXView && view != null) {
+            JHVJPXView tmv = (JHVJPXView) view;
             result = tmv.getFrameDateTime(0);
         } else {
-            // else try to acces a timestamp by assuming it is a plain image
             result = getCurrentFrameTimestamp(view);
         }
 
@@ -300,21 +296,13 @@ public class LayersModel implements UIViewListener {
     public ImmutableDateTime getEndDate(JHVJP2View view) {
         ImmutableDateTime result = null;
 
-        if (view == null) {
-            return result;
-        }
-
-        TimedMovieView tmv = view.getAdapter(TimedMovieView.class);
-        if (tmv != null) {
+        if (view instanceof JHVJPXView && view != null) {
+            JHVJPXView tmv = (JHVJPXView) view;
             int lastFrame = tmv.getMaximumFrameNumber();
-            // the following call will block if the meta is not yet available -
-            // and will cause deadlocks if called form the wrong thread
             result = tmv.getFrameDateTime(lastFrame);
         } else {
-            // else try to acces a timestamp by assuming it is a plain image
             result = getCurrentFrameTimestamp(view);
         }
-
         return result;
     }
 
@@ -533,17 +521,11 @@ public class LayersModel implements UIViewListener {
      * @return name of the layer, the views default String representation if no
      *         name is available
      */
-    public String getName(View view) {
+    public String getName(JHVJP2View view) {
         if (view == null) {
             return null;
         }
-
-        ImageInfoView imageInfoView = view.getAdapter(ImageInfoView.class);
-        if (imageInfoView != null) {
-            return imageInfoView.getName();
-        } else {
-            return view.toString();
-        }
+        return view.toString();
     }
 
     /**
@@ -555,7 +537,7 @@ public class LayersModel implements UIViewListener {
      *         name is available
      */
     public String getName(int idx) {
-        View view = this.getLayer(idx);
+        JHVJP2View view = this.getLayer(idx);
         return this.getName(view);
     }
 
@@ -880,7 +862,7 @@ public class LayersModel implements UIViewListener {
      * @return true if the layer in question is a movie
      */
     public boolean isMovie(int idx) {
-        View view = this.getLayer(idx);
+        JHVJP2View view = this.getLayer(idx);
         return isMovie(view);
     }
 
@@ -891,13 +873,8 @@ public class LayersModel implements UIViewListener {
      *            - View that can be associated with the layer in question
      * @return true if the layer in question is a movie
      */
-    public boolean isMovie(View view) {
-        if (view == null) {
-            return false;
-        }
-
-        MovieView view2 = view.getAdapter(MovieView.class);
-        return (view2 != null);
+    public boolean isMovie(JHVJP2View view) {
+        return view instanceof JHVJPXView;
     }
 
     /**
@@ -977,7 +954,7 @@ public class LayersModel implements UIViewListener {
      * @return true if the layer in question is currently playing
      */
     public boolean isPlaying(int idx) {
-        View view = getLayer(idx);
+        JHVJP2View view = getLayer(idx);
         return isPlaying(view);
     }
 
@@ -988,12 +965,12 @@ public class LayersModel implements UIViewListener {
      *            - View that can be associated with the layer in question
      * @return true if the layer in question is currently playing
      */
-    public boolean isPlaying(View view) {
+    public boolean isPlaying(JHVJP2View view) {
         if (view == null) {
             return false;
         }
         if (isMovie(view)) {
-            MovieView movieView = view.getAdapter(MovieView.class);
+            JHVJPXView movieView = (JHVJPXView) view;
             return movieView.isMoviePlaying();
         } else {
             return false;
@@ -1009,7 +986,7 @@ public class LayersModel implements UIViewListener {
      *         an error occurs
      */
     public double getFPS(int idx) {
-        View view = getLayer(idx);
+        JHVJP2View view = getLayer(idx);
         return getFPS(view);
     }
 
@@ -1021,7 +998,7 @@ public class LayersModel implements UIViewListener {
      * @return the current framerate or 0.0 if the movie is not playing, or if
      *         an error occurs
      */
-    public double getFPS(View view) {
+    public double getFPS(JHVJP2View view) {
         double result = 0.0;
 
         if (view == null) {
@@ -1029,7 +1006,7 @@ public class LayersModel implements UIViewListener {
         }
 
         if (isMovie(view)) {
-            MovieView movieView = view.getAdapter(MovieView.class);
+            JHVJPXView movieView = (JHVJPXView) view;
             if (isPlaying(view)) {
                 result = Math.round(movieView.getActualFramerate() * 100) / 100;
             }
@@ -1064,8 +1041,8 @@ public class LayersModel implements UIViewListener {
             return false;
         }
 
-        TimedMovieView timedMovieView = view.getAdapter(TimedMovieView.class);
-        return LinkedMovieManager.getActiveInstance().isMaster(timedMovieView);
+        JHVJPXView movieView = (JHVJPXView) view;
+        return LinkedMovieManager.getActiveInstance().isMaster(movieView);
     }
 
     /**
@@ -1075,14 +1052,10 @@ public class LayersModel implements UIViewListener {
      *            - View that can be associated with the layer in question
      * @return true if the layer in question is a remote view
      */
-    public boolean isRemote(View view) {
-        if (view == null) {
-            return false;
-        }
+    public boolean isRemote(JHVJP2View view) {
 
-        JHVJP2View jp2View = view.getAdapter(JHVJP2View.class);
-        if (jp2View != null) {
-            return jp2View.isRemote();
+        if (view != null) {
+            return view.isRemote();
         } else {
             return false;
         }
@@ -1096,7 +1069,7 @@ public class LayersModel implements UIViewListener {
      * @return true if the layer in question is a remote view
      */
     public boolean isRemote(int idx) {
-        View view = getLayer(idx);
+        JHVJP2View view = getLayer(idx);
         return isRemote(view);
     }
 
@@ -1108,7 +1081,7 @@ public class LayersModel implements UIViewListener {
      * @return true if the layer is connected to a JPIP server
      */
     public boolean isConnectedToJPIP(int idx) {
-        View view = getLayer(idx);
+        JHVJP2View view = getLayer(idx);
         return isConnectedToJPIP(view);
     }
 
@@ -1119,14 +1092,9 @@ public class LayersModel implements UIViewListener {
      *            - View that can be associated with the layer in question
      * @return true if the layer is connected to a JPIP server
      */
-    public boolean isConnectedToJPIP(View view) {
-        if (view == null) {
-            return false;
-        }
-
-        JHVJP2View jp2View = view.getAdapter(JHVJP2View.class);
-        if (jp2View != null) {
-            return jp2View.isConnectedToJPIP();
+    public boolean isConnectedToJPIP(JHVJP2View view) {
+        if (view != null) {
+            return view.isConnectedToJPIP();
         } else {
             return false;
         }
