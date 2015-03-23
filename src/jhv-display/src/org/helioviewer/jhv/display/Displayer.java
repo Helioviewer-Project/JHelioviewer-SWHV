@@ -10,11 +10,13 @@ import javax.swing.Timer;
 import org.helioviewer.jhv.data.datatype.event.JHVEvent;
 import org.helioviewer.jhv.data.datatype.event.JHVEventHighlightListener;
 import org.helioviewer.jhv.plugin.renderable.RenderableContainer;
+import org.helioviewer.jhv.plugin.renderable.RenderableContainerPanel;
 
 public class Displayer implements JHVEventHighlightListener {
 
     private static final Displayer instance = new Displayer();
     private static final RenderableContainer renderableContainer = new RenderableContainer();
+    private static final RenderableContainerPanel renderableContainerPanel = new RenderableContainerPanel(renderableContainer);
 
     public static Displayer getSingletonInstance() {
         return instance;
@@ -101,6 +103,10 @@ public class Displayer implements JHVEventHighlightListener {
 
     public static RenderableContainer getRenderablecontainer() {
         return renderableContainer;
+    }
+
+    public static RenderableContainerPanel getRenderableContainerPanel() {
+        return renderableContainerPanel;
     }
 
 }

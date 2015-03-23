@@ -46,7 +46,7 @@ public class RenderableGridOptionsPanel extends JPanel {
         gridResolutionXSpinner.addChangeListener(new ChangeListener() {
             @Override
             public void stateChanged(ChangeEvent e) {
-                //grid.setGridResolutionX((Double) gridResolutionYSpinner.getValue());
+                grid.setGridResolutionX((Double) gridResolutionYSpinner.getValue());
                 Displayer.display();
             }
         });
@@ -59,7 +59,7 @@ public class RenderableGridOptionsPanel extends JPanel {
         gridResolutionYSpinner.addChangeListener(new ChangeListener() {
             @Override
             public void stateChanged(ChangeEvent e) {
-                //grid.setGridResolutionY((Double) gridResolutionYSpinner.getValue());
+                grid.setGridResolutionY((Double) gridResolutionYSpinner.getValue());
                 Displayer.display();
             }
         });

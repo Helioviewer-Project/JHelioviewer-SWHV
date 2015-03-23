@@ -20,8 +20,8 @@ import com.jogamp.opengl.util.awt.TextRenderer;
 
 public class RenderableGrid implements Renderable {
 
-    private final double lonstepDegrees;
-    private final double latstepDegrees;
+    private double lonstepDegrees;
+    private double latstepDegrees;
     private final int lineres = 120;
     private final float scale = .8f;
     private Font font;
@@ -34,6 +34,8 @@ public class RenderableGrid implements Renderable {
     private final float lineWidth = 1.2f;
     private final RenderableType renderableType;
     private final Component optionsPanel;
+    private final String name = "Grid";
+    private boolean isVisible = true;
 
     public RenderableGrid(RenderableType renderableType, double lonstepDegrees, double latstepDegrees, boolean followCamera) {
         this.renderableType = renderableType;
@@ -56,10 +58,13 @@ public class RenderableGrid implements Renderable {
         renderer.setUseVertexArrays(true);
         renderer.getSmoothing();
         optionsPanel = new RenderableGridOptionsPanel(this);
+
     }
 
     @Override
     public void render(GL3DState state) {
+        if (!isVisible)
+            return;
         GL2 gl = state.gl;
         gl.glColor3d(1., 1., 0.);
 
@@ -264,4 +269,26 @@ public class RenderableGrid implements Renderable {
         return optionsPanel;
     }
 
+    public void setGridResolutionY(Double lonstepDegrees) {
+        this.lonstepDegrees = lonstepDegrees;
+    }
+
+    public void setGridResolutionX(Double value) {
+        this.latstepDegrees = lonstepDegrees;
+    }
+
+    @Override
+    public String getName() {
+        return name;
+    }
+
+    @Override
+    public boolean isVisible() {
+        return this.isVisible;
+    }
+
+    @Override
+    public void setVisible(boolean isVisible) {
+        this.isVisible = isVisible;
+    }
 }
