@@ -4,7 +4,6 @@ import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 import java.io.File;
-import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
@@ -43,15 +42,11 @@ public class SaveScreenshotAction extends AbstractAction {
      */
     @Override
     public void actionPerformed(ActionEvent e) {
-        try {
-            String filename = new String(JHVDirectory.EXPORTS.getPath() + getDefaultFileName() + ".png");
-            if (ImageViewerGui.getSingletonInstance().getMainView().saveScreenshot("png", new File(filename))) {
-                JTextArea text = new JTextArea("Saved screenshot at: " + filename);
-                text.setBackground(null);
-                JOptionPane.showMessageDialog(ImageViewerGui.getMainFrame(), text);
-            }
-        } catch (IOException e1) {
-            e1.printStackTrace();
+        String filename = new String(JHVDirectory.EXPORTS.getPath() + getDefaultFileName() + ".png");
+        if (ImageViewerGui.getSingletonInstance().getMainView().saveScreenshot("png", new File(filename))) {
+            JTextArea text = new JTextArea("Saved screenshot at: " + filename);
+            text.setBackground(null);
+            JOptionPane.showMessageDialog(ImageViewerGui.getMainFrame(), text);
         }
     }
 
@@ -63,10 +58,10 @@ public class SaveScreenshotAction extends AbstractAction {
      */
     static String getDefaultFileName() {
         String output = new String("JHV_screenshot_created_");
-
         SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd_HH.mm.ss");
         output += dateFormat.format(new Date());
 
         return output;
     }
+
 }

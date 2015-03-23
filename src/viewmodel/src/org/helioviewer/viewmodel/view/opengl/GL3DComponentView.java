@@ -53,13 +53,11 @@ public class GL3DComponentView extends AbstractComponentView implements GLEventL
     private boolean backGroundColorChanged = false;
 
     // screenshot & movie
-    private BufferedImage screenshot;
-    private int previousScreenshot = -1;
-
     private ExportMovieDialog exportMovieDialog;
     private MovieExport export;
     private boolean exportMode = false;
     private boolean screenshotMode = false;
+    private int previousScreenshot = -1;
     private File outputFile;
 
     @Override
@@ -70,80 +68,8 @@ public class GL3DComponentView extends AbstractComponentView implements GLEventL
 
     @Override
     public void deactivate() {
-        if (screenshot != null) {
-            screenshot.flush();
-            screenshot = null;
-        }
-
         Displayer.removeListener(this);
         canvas.removeGLEventListener(this);
-    }
-
-    @Override
-    public void dispose(GLAutoDrawable drawable) {
-    }
-
-    @Override
-    public void startExport(ExportMovieDialog exportMovieDialog) {
-        this.exportMovieDialog = exportMovieDialog;
-        ImageViewerGui.getSingletonInstance().getLeftContentPane().setEnabled(false);
-        View v = LayersModel.getSingletonInstance().getActiveView();
-        if (v != null) {
-            JHVJPXView movieView = v.getAdapter(JHVJPXView.class);
-            if (movieView != null) {
-                movieView.pauseMovie();
-                movieView.setCurrentFrame(0, new ChangeEvent());
-            }
-
-            export = new MovieExport(canvas.getWidth(), canvas.getHeight());
-            export.createProcess();
-            exportMode = true;
-
-            if (movieView != null) {
-                movieView.playMovie();
-            } else {
-                Displayer.render();
-            }
-        } else {
-            exportMovieDialog.fail();
-            exportMovieDialog = null;
-        }
-    }
-
-    public void stopExport() {
-        View v = LayersModel.getSingletonInstance().getActiveView();
-        JHVJPXView movieView = v.getAdapter(JHVJPXView.class);
-
-        exportMode = false;
-        previousScreenshot = -1;
-        export.finishProcess();
-
-        JTextArea text = new JTextArea("Exported movie at: " + export.getFileName());
-        text.setBackground(null);
-        JOptionPane.showMessageDialog(ImageViewerGui.getSingletonInstance().getMainImagePanel(), text);
-
-        ImageViewerGui.getSingletonInstance().getLeftContentPane().setEnabled(true);
-        if (movieView != null) {
-            movieView.pauseMovie();
-        }
-        exportMovieDialog.reset3D();
-        exportMovieDialog = null;
-    }
-
-    public void startScreenshot() {
-        screenshotMode = true;
-        Displayer.render();
-    }
-
-    public void stopScreenshot() {
-        screenshotMode = false;
-    }
-
-    @Override
-    public boolean saveScreenshot(String imageFormat, File outputFile) throws IOException {
-        this.outputFile = outputFile;
-        startScreenshot();
-        return true;
     }
 
     @Override
@@ -168,6 +94,10 @@ public class GL3DComponentView extends AbstractComponentView implements GLEventL
     }
 
     @Override
+    public void dispose(GLAutoDrawable drawable) {
+    }
+
+    @Override
     public void reshape(GLAutoDrawable drawable, int x, int y, int width, int height) {
     }
 
@@ -178,16 +108,6 @@ public class GL3DComponentView extends AbstractComponentView implements GLEventL
 
     @Override
     public void display(GLAutoDrawable drawable) {
-        JHVJP2View mv = null;
-        if (exportMode || screenshotMode) {
-            View v = LayersModel.getSingletonInstance().getActiveView();
-            if (v != null) {
-                mv = v.getAdapter(JHVJP2View.class);
-            } else {
-                stopExport();
-            }
-        }
-
         GL2 gl = drawable.getGL().getGL2();
         int width = canvas.getWidth();
         int height = canvas.getHeight();
@@ -227,36 +147,8 @@ public class GL3DComponentView extends AbstractComponentView implements GLEventL
             gl.glPopMatrix();
         }
 
-        if (exportMode && mv != null) {
-            int currentScreenshot = 1;
-            int maxframeno = 1;
-            if (mv instanceof JHVJPXView) {
-                currentScreenshot = ((JHVJPXView) mv).getCurrentFrameNumber();
-                maxframeno = ((JHVJPXView) mv).getMaximumFrameNumber();
-            }
-
-            AWTGLReadBufferUtil rbu = new AWTGLReadBufferUtil(drawable.getGLProfile(), false);
-            screenshot = ImageUtil.createThumbnail(rbu.readPixelsToBufferedImage(gl, true), width);
-            if (currentScreenshot != previousScreenshot) {
-                export.writeImage(screenshot);
-            }
-            exportMovieDialog.setLabelText("Exporting frame " + (currentScreenshot + 1) + " / " + (maxframeno + 1));
-
-            if ((!(mv instanceof JHVJPXView)) || (mv instanceof JHVJPXView && currentScreenshot < previousScreenshot)) {
-                stopExport();
-            }
-            previousScreenshot = currentScreenshot;
-        }
-
-        if (screenshotMode && mv != null) {
-            AWTGLReadBufferUtil rbu = new AWTGLReadBufferUtil(drawable.getGLProfile(), false);
-            screenshot = ImageUtil.createThumbnail(rbu.readPixelsToBufferedImage(gl, true), width);
-            try {
-                ImageIO.write(screenshot, "png", outputFile);
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-            stopScreenshot();
+        if (exportMode || screenshotMode) {
+            exportFrame();
         }
     }
 
@@ -279,6 +171,107 @@ public class GL3DComponentView extends AbstractComponentView implements GLEventL
         }
 
         UIViewListenerDistributor.getSingletonInstance().viewChanged(sender, aEvent);
+    }
+
+    private void exportFrame() {
+        View v;
+        JHVJP2View mv;
+
+        if ((v = LayersModel.getSingletonInstance().getActiveView()) == null ||
+            (mv = v.getAdapter(JHVJP2View.class)) == null) {
+            stopExport();
+            return;
+        }
+
+        AWTGLReadBufferUtil rbu = new AWTGLReadBufferUtil(canvas.getGLProfile(), false);
+        GL2 gl = canvas.getGL().getGL2();
+        int width = canvas.getWidth();
+
+        BufferedImage screenshot;
+
+        if (exportMode) {
+            int currentScreenshot = 1;
+            int maxframeno = 1;
+            if (mv instanceof JHVJPXView) {
+                currentScreenshot = ((JHVJPXView) mv).getCurrentFrameNumber();
+                maxframeno = ((JHVJPXView) mv).getMaximumFrameNumber();
+            }
+
+            screenshot = ImageUtil.createThumbnail(rbu.readPixelsToBufferedImage(gl, true), width);
+            if (currentScreenshot != previousScreenshot) {
+                export.writeImage(screenshot);
+            }
+            exportMovieDialog.setLabelText("Exporting frame " + (currentScreenshot + 1) + " / " + (maxframeno + 1));
+
+            if ((!(mv instanceof JHVJPXView)) || (mv instanceof JHVJPXView && currentScreenshot < previousScreenshot)) {
+                stopExport();
+            }
+            previousScreenshot = currentScreenshot;
+        }
+
+        if (screenshotMode) {
+            screenshot = ImageUtil.createThumbnail(rbu.readPixelsToBufferedImage(gl, true), width);
+            try {
+                ImageIO.write(screenshot, "png", outputFile);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            screenshotMode = false;
+        }
+    }
+
+    @Override
+    public void startExport(ExportMovieDialog exportMovieDialog) {
+        this.exportMovieDialog = exportMovieDialog;
+        ImageViewerGui.getSingletonInstance().getLeftContentPane().setEnabled(false);
+        View v = LayersModel.getSingletonInstance().getActiveView();
+        if (v != null) {
+            JHVJPXView movieView = v.getAdapter(JHVJPXView.class);
+            if (movieView != null) {
+                movieView.pauseMovie();
+                movieView.setCurrentFrame(0, new ChangeEvent());
+            }
+
+            export = new MovieExport(canvas.getWidth(), canvas.getHeight());
+            export.createProcess();
+            exportMode = true;
+
+            if (movieView != null) {
+                movieView.playMovie();
+            } else {
+                Displayer.render();
+            }
+        } else {
+            exportMovieDialog.fail();
+            exportMovieDialog = null;
+        }
+    }
+
+    private void stopExport() {
+        View v = LayersModel.getSingletonInstance().getActiveView();
+        JHVJPXView movieView = v.getAdapter(JHVJPXView.class);
+
+        exportMode = false;
+        previousScreenshot = -1;
+        export.finishProcess();
+
+        JTextArea text = new JTextArea("Exported movie at: " + export.getFileName());
+        text.setBackground(null);
+        JOptionPane.showMessageDialog(ImageViewerGui.getSingletonInstance().getMainImagePanel(), text);
+
+        ImageViewerGui.getSingletonInstance().getLeftContentPane().setEnabled(true);
+        if (movieView != null) {
+            movieView.pauseMovie();
+        }
+        exportMovieDialog.reset3D();
+        exportMovieDialog = null;
+    }
+
+    @Override
+    public boolean saveScreenshot(String imageFormat, File outputFile) {
+        this.outputFile = outputFile;
+        screenshotMode = true;
+        return true;
     }
 
     @Override

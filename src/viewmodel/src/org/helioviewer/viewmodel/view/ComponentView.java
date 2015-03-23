@@ -3,7 +3,6 @@ package org.helioviewer.viewmodel.view;
 import java.awt.Color;
 import java.awt.Component;
 import java.io.File;
-import java.io.IOException;
 import java.util.AbstractList;
 
 import org.helioviewer.viewmodel.renderer.screen.ScreenRenderer;
@@ -68,7 +67,7 @@ public interface ComponentView extends ModifiableInnerViewView, ViewListener {
      * @throws IOException
      *             is thrown, if the given output file is not valid
      */
-    public boolean saveScreenshot(String imageFormat, File outputFile) throws IOException;
+    public boolean saveScreenshot(String imageFormat, File outputFile);
 
     /**
      * Sets the background color.
@@ -115,4 +114,5 @@ public interface ComponentView extends ModifiableInnerViewView, ViewListener {
      * @see #removePostRenderer(ScreenRenderer)
      */
     public AbstractList<ScreenRenderer> getAllPostRenderer();
+
 }
