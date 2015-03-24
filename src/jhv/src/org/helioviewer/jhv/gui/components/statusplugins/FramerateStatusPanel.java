@@ -23,12 +23,8 @@ public class FramerateStatusPanel extends JLabel implements StatusPanelPlugin {
     private static final long serialVersionUID = 1L;
     private static final FramerateStatusPanel instance = new FramerateStatusPanel();
 
-    /**
-     * Default constructor.
-     */
     private FramerateStatusPanel() {
         setBorder(BorderFactory.createEtchedBorder());
-
         setPreferredSize(new Dimension(70, 20));
         setText("fps:");
 
