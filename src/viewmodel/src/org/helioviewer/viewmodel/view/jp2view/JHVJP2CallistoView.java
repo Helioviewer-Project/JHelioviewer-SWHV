@@ -108,7 +108,7 @@ public class JHVJP2CallistoView extends JHVJP2View {
     protected JP2ImageParameter calculateParameter(int numQualityLayers, int frameNumber) {
         int maxHeight = jp2Image.getResolutionSet().getResolutionLevel(0).getResolutionBounds().height;
         int maxWidth = jp2Image.getResolutionSet().getResolutionLevel(0).getResolutionBounds().width;
-        Thread.dumpStack();
+        // Thread.dumpStack();
         // Log.debug("Region : " + region);
         // Log.debug("Viewport: " + viewport);
         // Log.debug("Available dimension : " + new Dimension((int)

@@ -100,7 +100,7 @@ public class DownloadedJPXData implements ViewListener {
             @Override
             protected DownloadedJPXDataWorkerResult doInBackground() {
                 Thread.currentThread().setName("DownloadedJPXDataWorkerResult1--EVE");
-                Log.debug("Event " + aEvent);
+                // Log.debug("Event " + aEvent);
                 return getJPXData(sender);
             }
 
@@ -159,7 +159,9 @@ public class DownloadedJPXData implements ViewListener {
                     if (imageData != null) {
                         Byte8ImageTransport bytetrs = (Byte8ImageTransport) imageData.getImageTransport();
                         data = bytetrs.getByte8PixelData();
-                        Log.debug("Data size : " + data.length + " Image size: " + imageData.getHeight() + " x " + imageData.getWidth());
+                        // Log.debug("Data size : " + data.length +
+                        // " Image size: " + imageData.getHeight() + " x " +
+                        // imageData.getWidth());
                         byte[] copyData = Arrays.copyOf(data, data.length);
                         data = new byte[0];
                         // Log.debug("dworker" + nr + ": new result");

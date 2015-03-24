@@ -1,14 +1,17 @@
 package org.helioviewer.plugins.eveplugin.radio.data;
 
 import java.awt.Rectangle;
-import java.io.IOException;
-import java.text.ParseException;
+import java.io.ByteArrayInputStream;
+import java.io.InputStream;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
 
 import org.helioviewer.base.logging.Log;
 import org.helioviewer.base.math.Interval;
@@ -32,19 +35,14 @@ import org.helioviewer.viewmodel.view.jp2view.JHVJP2View.ReaderMode;
 import org.helioviewer.viewmodel.view.jp2view.JP2Image;
 import org.helioviewer.viewmodel.view.jp2view.datetime.ImmutableDateTime;
 import org.helioviewer.viewmodel.view.jp2view.image.ResolutionSet;
+import org.helioviewer.viewmodel.view.jp2view.kakadu.JHV_KduException;
 import org.helioviewer.viewmodel.view.jp2view.kakadu.KakaduUtils;
 import org.helioviewer.viewmodel.viewport.StaticViewport;
 import org.helioviewer.viewmodel.viewport.ViewportAdapter;
-
-import java.io.ByteArrayInputStream;
-import java.io.InputStream;
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
 import org.w3c.dom.CharacterData;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
-import org.helioviewer.viewmodel.view.jp2view.kakadu.JHV_KduException;
 
 /**
  * The radio data manager manages all the downloaded data for radio
@@ -227,6 +225,7 @@ public class RadioDataManager implements RadioDownloaderListener {
      *            The identifier of the plot for which new data is requested
      */
     public void requestForData(Date xStart, Date xEnd, double yStart, double yEnd, double xRatio, double yRatio, List<Long> iDs, String plotIdentifier) {
+        Long start = System.currentTimeMillis();
         if (!eveState.isMouseTimeIntervalDragging() && !eveState.isMouseValueIntervalDragging()) {
             if (!requestBuffer.hasData() && !requestForDataBusy) {
                 requestForDataBusy = true;
@@ -240,6 +239,7 @@ public class RadioDataManager implements RadioDownloaderListener {
                 requestBuffer.addRequestConfig(new RequestConfig(xStart, xEnd, yStart, yEnd, xRatio, yRatio, iDs));
             }
         }
+        Log.debug("Request for data took : " + (System.currentTimeMillis() - start));
     }
 
     /**
@@ -660,9 +660,9 @@ public class RadioDataManager implements RadioDownloaderListener {
 
     /* temporarily copied here */
     private static NodeList parseXML(String xml) throws JHV_KduException {
-        if (xml == null)
+        if (xml == null) {
             throw new JHV_KduException("No XML data present");
-        else if (!xml.contains("</meta>")) {
+        } else if (!xml.contains("</meta>")) {
             throw new JHV_KduException("XML data incomplete");
         }
 
@@ -682,8 +682,9 @@ public class RadioDataManager implements RadioDownloaderListener {
             NodeList value = ((Element) nodeList.item(0)).getElementsByTagName(_keyword);
             Element line = (Element) value.item(0);
 
-            if (line == null)
+            if (line == null) {
                 return null;
+            }
 
             Node child = line.getFirstChild();
             if (child instanceof CharacterData) {
@@ -704,7 +705,8 @@ public class RadioDataManager implements RadioDownloaderListener {
             if (e.getMessage() == "XML data incomplete" || e.getMessage().toLowerCase().contains("box not open")) {
                 try {
                     Thread.sleep(500);
-                } catch (InterruptedException e1) {}
+                } catch (InterruptedException e1) {
+                }
 
                 getKey(nodeList, key);
             } else if (e.getMessage() != "No XML data present") {
