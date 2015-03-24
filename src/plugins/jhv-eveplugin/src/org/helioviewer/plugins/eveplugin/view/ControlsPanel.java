@@ -359,7 +359,7 @@ public class ControlsPanel extends JPanel implements ActionListener, LayersListe
             case Year:
                 return Integer.toString(number) + " Year" + plural;
             case Carrington:
-                return Integer.toString(number) + " Carrington Rotation" + plural;
+                return "Carrington Rotation" + plural;
             default:
                 break;
             }
