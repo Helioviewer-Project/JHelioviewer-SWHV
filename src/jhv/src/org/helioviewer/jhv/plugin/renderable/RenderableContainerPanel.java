@@ -103,7 +103,7 @@ public class RenderableContainerPanel extends JPanel {
                     Displayer.display();
                 }
                 if (col == TITLEROW || col == VISIBLEROW) {
-                    Renderable renderable = (Renderable) model.getValueAt(row, col);
+                    Renderable renderable = (Renderable) Displayer.getRenderablecontainer().getValueAt(row, col);
                     setOptionsPanel(renderable);
                 }
                 if (col == REMOVEROW) {

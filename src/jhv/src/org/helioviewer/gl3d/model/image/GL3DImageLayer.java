@@ -15,11 +15,11 @@ import org.helioviewer.gl3d.camera.GL3DCamera;
 import org.helioviewer.gl3d.math.GL3DMat4d;
 import org.helioviewer.gl3d.math.GL3DQuatd;
 import org.helioviewer.gl3d.math.GL3DVec3d;
-import org.helioviewer.gl3d.scenegraph.GL3DNode;
 import org.helioviewer.gl3d.scenegraph.GL3DState;
 import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.gui.states.StateController;
 import org.helioviewer.jhv.gui.states.ViewStateEnum;
+import org.helioviewer.jhv.layers.LayersModel;
 import org.helioviewer.jhv.plugin.renderable.Renderable;
 import org.helioviewer.jhv.plugin.renderable.RenderableType;
 import org.helioviewer.jhv.renderable.RenderableImageType;
@@ -43,7 +43,7 @@ import com.jogamp.common.nio.Buffers;
  * @author Simon Spoerri (simon.spoerri@fhnw.ch)
  *
  */
-public class GL3DImageLayer extends GL3DNode implements Renderable {
+public class GL3DImageLayer implements Renderable {
 
     private static int nextLayerId = 0;
     private final int layerId;
@@ -66,14 +66,13 @@ public class GL3DImageLayer extends GL3DNode implements Renderable {
     private int positionBufferSize;
     private final JHVJP2View mainLayerView;
     private final RenderableType type;
+    private boolean isVisible = true;;
 
     public GL3DImageLayer(String name, JHVJP2View mainLayerView, boolean showSphere, boolean showCorona, boolean restoreColorMask) {
-        super(name);
         this.type = new RenderableImageType(mainLayerView.getName());
         layerId = nextLayerId++;
         this.mainLayerView = mainLayerView;
 
-        this.markAsChanged();
         int count = 0;
         for (int i = 0; i <= this.resolution; i++) {
             for (int j = 0; j <= 1; j++) {
@@ -90,14 +89,13 @@ public class GL3DImageLayer extends GL3DNode implements Renderable {
             }
         }
 
-        this.markAsChanged();
         this.showSphere = showSphere;
         this.showCorona = showCorona;
         Displayer.getRenderablecontainer().addRenderable(this);
     }
 
     @Override
-    public void shapeInit(GL3DState state) {
+    public void init(GL3DState state) {
         Pair<FloatBuffer, IntBuffer> bufferPair = this.makeIcosphere(3);
         FloatBuffer positionBuffer = bufferPair.a;
         IntBuffer indexBuffer = bufferPair.b;
@@ -112,15 +110,7 @@ public class GL3DImageLayer extends GL3DNode implements Renderable {
         indexBufferSize = indexBuffer.capacity();
         state.gl.glBindBuffer(GL2.GL_ELEMENT_ARRAY_BUFFER, indexBufferID);
         state.gl.glBufferData(GL2.GL_ELEMENT_ARRAY_BUFFER, indexBuffer.capacity() * Buffers.SIZEOF_INT, indexBuffer, GL2.GL_STATIC_DRAW);
-
-        this.markAsChanged();
-
         state.getActiveCamera().updateCameraTransformation();
-    }
-
-    @Override
-    public void shapeUpdate(GL3DState state) {
-        updateROI(state);
     }
 
     private void updateROI(GL3DState state) {
@@ -202,7 +192,7 @@ public class GL3DImageLayer extends GL3DNode implements Renderable {
     }
 
     @Override
-    public void shapeDraw(GL3DState state) {
+    public void render(GL3DState state) {
         GL2 gl = state.gl;
 
         gl.glEnable(GL2.GL_BLEND);
@@ -210,9 +200,6 @@ public class GL3DImageLayer extends GL3DNode implements Renderable {
 
         GLSLShader.bind(gl);
         {
-            if (!this.isInitialised) {
-                this.init(state);
-            }
 
             gl.glEnable(GL2.GL_CULL_FACE);
             {
@@ -288,11 +275,14 @@ public class GL3DImageLayer extends GL3DNode implements Renderable {
     }
 
     @Override
-    public void shapeDelete(GL3DState state) {
+    public void remove(GL3DState state) {
         disablePositionVBO(state);
         disableIndexVBO(state);
         deletePositionVBO(state);
         deleteIndexVBO(state);
+        LayersModel.getSingletonInstance().removeLayer(mainLayerView);
+        System.out.println(mainLayerView);
+
     }
 
     private Pair<FloatBuffer, IntBuffer> makeIcosphere(int level) {
@@ -408,16 +398,6 @@ public class GL3DImageLayer extends GL3DNode implements Renderable {
     }
 
     @Override
-    public void render(GL3DState state) {
-        this.draw(state);
-    }
-
-    @Override
-    public void remove(GL3DState state) {
-        this.shapeDelete(state);
-    }
-
-    @Override
     public RenderableType getType() {
         return this.type;
     }
@@ -429,11 +409,17 @@ public class GL3DImageLayer extends GL3DNode implements Renderable {
 
     @Override
     public boolean isVisible() {
-        return false;
+        return isVisible;
     }
 
     @Override
-    public void setVisible(boolean b) {
+    public void setVisible(boolean isVisible) {
+        this.isVisible = isVisible;
+    }
+
+    @Override
+    public String getName() {
+        return mainLayerView.getName();
     }
 
 }

@@ -249,7 +249,6 @@ public class GL3DLayeredView extends AbstractView implements LayeredView, ViewLi
         state.pushMV();
         state.getActiveCamera().applyPerspective(state);
         state.getActiveCamera().applyCamera(state);
-
         Displayer.getRenderablecontainer().render(state);
         state.getActiveCamera().drawCamera(state);
         state.getActiveCamera().resumePerspective(state);
