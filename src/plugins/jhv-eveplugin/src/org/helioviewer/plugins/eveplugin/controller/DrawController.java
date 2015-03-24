@@ -89,7 +89,7 @@ public class DrawController implements ZoomControllerListener, LineDataSelectorM
         synchronized (drawControllerData) {
             DrawControllerData dcd = getDrawControllerData(identifier);
             dcd.addDrawControllerListener(listener);
-            listener.drawRequest();
+            // listener.drawRequest();
         }
     }
 
@@ -111,7 +111,9 @@ public class DrawController implements ZoomControllerListener, LineDataSelectorM
             removeDrawableElement(drawableElement, identifier, false);
             this.addDrawableElement(drawableElement, identifier, false);
         }
-        this.fireRedrawRequest(identifier);
+        if (drawableElement.hasElementsToDraw()) {
+            this.fireRedrawRequest(identifier);
+        }
     }
 
     private void addDrawableElement(DrawableElement element, String identifier, boolean redraw) {
@@ -187,17 +189,15 @@ public class DrawController implements ZoomControllerListener, LineDataSelectorM
         return interval;
     }
 
-    public void setAvailableRange(Range availableRange) {
-        fireRedrawRequest();
-    }
-
     public void setSelectedRange(Range selectedRange) {
         fireRedrawRequest();
     }
 
     public void setInterval(Interval<Date> interval) {
-        this.interval = interval;
-        fireRedrawRequest();
+        if (this.interval == null || !this.interval.equals(interval)) {
+            this.interval = interval;
+            fireRedrawRequest();
+        }
     }
 
     private void fireRedrawRequest() {
@@ -253,7 +253,6 @@ public class DrawController implements ZoomControllerListener, LineDataSelectorM
 
     @Override
     public void lineDataAdded(LineDataSelectorElement element) {
-        fireRedrawRequest(element.getPlotIdentifier());
     }
 
     @Override
