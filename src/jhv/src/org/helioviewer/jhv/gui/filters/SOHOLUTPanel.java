@@ -3,7 +3,6 @@ package org.helioviewer.jhv.gui.filters;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.io.IOException;
 import java.util.Map;
 
 import javax.swing.BorderFactory;
@@ -11,13 +10,11 @@ import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.Icon;
 import javax.swing.JComboBox;
-import javax.swing.JFileChooser;
 import javax.swing.JLabel;
 import javax.swing.JToggleButton;
 import javax.swing.border.BevelBorder;
 
-import org.helioviewer.base.logging.Log;
-import org.helioviewer.base.message.Message;
+import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.gui.IconBank;
 import org.helioviewer.jhv.gui.IconBank.JHVIcon;
 import org.helioviewer.jhv.gui.filters.lut.LUT;
@@ -102,6 +99,7 @@ public class SOHOLUTPanel extends AbstractFilterPanel implements ActionListener,
 
         LUT newMap = lutMap.get(combobox.getSelectedItem());
         jp2view.setLUT(newMap, invertButton.isSelected());
+        Displayer.display();
     }
 
     /**

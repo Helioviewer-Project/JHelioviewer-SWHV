@@ -8,6 +8,7 @@ import javax.swing.JSlider;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
+import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.gui.components.base.WheelSupport;
 import org.helioviewer.viewmodelplugin.filter.FilterAlignmentDetails;
 import org.helioviewer.viewmodelplugin.filter.FilterPanel;
@@ -64,6 +65,7 @@ public class SharpenPanel extends AbstractFilterPanel implements ChangeListener,
     public void stateChanged(ChangeEvent e) {
         jp2view.setWeighting(sharpeningSlider.getValue() / 10.f);
         sharpeningLabel.setText(sharpeningSlider.getValue() + "%");
+        Displayer.display();
     }
 
     @Override

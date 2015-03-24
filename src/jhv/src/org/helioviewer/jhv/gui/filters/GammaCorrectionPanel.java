@@ -10,6 +10,7 @@ import javax.swing.JSlider;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
+import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.gui.components.base.WheelSupport;
 import org.helioviewer.viewmodel.view.jp2view.JHVJP2View;
 import org.helioviewer.viewmodelplugin.filter.FilterAlignmentDetails;
@@ -87,6 +88,7 @@ public class GammaCorrectionPanel extends AbstractFilterPanel implements ChangeL
             label = label.substring(0, 3);
         }
         gammaLabel.setText(label);
+        Displayer.display();
     }
 
     /**
