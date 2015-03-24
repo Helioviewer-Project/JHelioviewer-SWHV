@@ -75,7 +75,6 @@ public class DownloadedJPXData implements ViewListener {
 
     @Override
     public void viewChanged(final View sender, final ChangeEvent aEvent) {
-        Log.debug("Event " + aEvent);
         while (worker != null && !worker.isDone()) {
             try {
                 Thread.sleep(10);
