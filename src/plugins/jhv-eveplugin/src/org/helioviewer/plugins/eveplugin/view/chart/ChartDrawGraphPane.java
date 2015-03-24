@@ -47,8 +47,6 @@ import org.helioviewer.plugins.eveplugin.draw.DrawableElement;
 import org.helioviewer.plugins.eveplugin.draw.DrawableType;
 import org.helioviewer.plugins.eveplugin.draw.YAxisElement;
 import org.helioviewer.plugins.eveplugin.events.model.EventModel;
-import org.helioviewer.plugins.eveplugin.model.ChartModel;
-import org.helioviewer.plugins.eveplugin.model.ChartModelListener;
 import org.helioviewer.plugins.eveplugin.model.PlotAreaSpace;
 import org.helioviewer.plugins.eveplugin.model.PlotAreaSpaceManager;
 import org.helioviewer.plugins.eveplugin.model.TimeIntervalLockModel;
@@ -61,7 +59,7 @@ import org.helioviewer.viewmodel.view.jp2view.datetime.ImmutableDateTime;
  * 
  * @author Stephan Pagel
  * */
-public class ChartDrawGraphPane extends JComponent implements MouseInputListener, ComponentListener, DrawControllerListener, ChartModelListener, MouseWheelListener, WindowFocusListener {
+public class ChartDrawGraphPane extends JComponent implements MouseInputListener, ComponentListener, DrawControllerListener, MouseWheelListener, WindowFocusListener {
 
     // //////////////////////////////////////////////////////////////////////////////
     // Definitions
@@ -83,7 +81,6 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
     private final ZoomManager zoomManager;
     private final String identifier;
     private int twoYAxis = 0;
-    private final ChartModel chartModel;
     private final PlotAreaSpaceManager plotAreaSpaceManager;
     private final EventModel eventModel;
     private Rectangle leftAxisArea;
@@ -110,7 +107,6 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
     public ChartDrawGraphPane(String identifier) {
         created = System.currentTimeMillis();
         drawLabelsOperarionTime = 0;
-        chartModel = ChartModel.getSingletonInstance();
         this.identifier = identifier;
         drawController = DrawController.getSingletonInstance();
         initVisualComponents();
@@ -122,7 +118,6 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
         zoomManager = ZoomManager.getSingletonInstance();
         yRatios = new HashMap<YAxisElement, Double>();
         drawController.addDrawControllerListener(this, identifier);
-        chartModel.addChartModelListener(this);
         plotAreaSpaceManager = PlotAreaSpaceManager.getInstance();
         eventModel = EventModel.getSingletonInstance();
         // ImageViewerGui.getMainFrame().addWindowFocusListener(this);
@@ -152,15 +147,19 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
     }
 
     private void updateGraph() {
+        Log.debug("Update graph : " + Thread.currentThread().getName());
+        Thread.dumpStack();
         if (currentSwingWorker != null && !currentSwingWorker.isDone()) {
+            Log.debug("Reschedule");
             reschedule = true;
             return;
         }
-
+        Log.debug("Create swingworker");
         currentSwingWorker = new SwingWorker<Integer, Integer>() {
             @Override
             public Integer doInBackground() {
                 Thread.currentThread().setName("ChartdrawGraph--EVE");
+                Log.debug("do in background");
                 updateDrawInformation();
                 redrawGraph();
                 return 1;
@@ -244,8 +243,8 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
     }
 
     private void drawLabels(final Graphics2D g) {
-        Log.debug("Draw Labels");
-        Thread.dumpStack();
+        // Log.debug("Draw Labels");
+        // Thread.dumpStack();
         long start = System.currentTimeMillis();
         Set<YAxisElement> yAxisElements = drawController.getYAxisElements(identifier);
         List<YAxisElement> orderedList = orderYAxes(yAxisElements);
@@ -333,7 +332,9 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
         long timeTaken = System.currentTimeMillis() - start;
         drawLabelsOperarionTime += timeTaken;
         double timeOverTotalTime = 1.0 * drawLabelsOperarionTime / (System.currentTimeMillis() - created);
-        Log.debug("Time to draw labels: " + (System.currentTimeMillis() - start) + " total time: " + drawLabelsOperarionTime + " total time over running time : " + timeOverTotalTime);
+        // Log.debug("Time to draw labels: " + (System.currentTimeMillis() -
+        // start) + " total time: " + drawLabelsOperarionTime +
+        // " total time over running time : " + timeOverTotalTime);
     }
 
     private List<YAxisElement> orderYAxes(Set<YAxisElement> yAxisElements) {
@@ -507,16 +508,22 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
         }
     }
 
-    private void updateMovieLineInformation() {
+    private boolean updateMovieLineInformation() {
+        int newMovieLine = -1;
         Interval<Date> interval = drawController.getInterval();
         if (movieTimestamp == null || !drawController.getIntervalAvailable()) {
-            movieLinePosition = -1;
-            return;
+            newMovieLine = -1;
+        } else {
+            newMovieLine = (int) ((movieTimestamp.getTime() - interval.getStart().getTime()) * ratioX) + graphArea.x;
+            if (newMovieLine < graphArea.x || newMovieLine > (graphArea.x + graphArea.width)) {
+                newMovieLine = -1;
+            }
         }
-        movieLinePosition = (int) ((movieTimestamp.getTime() - interval.getStart().getTime()) * ratioX) + graphArea.x;
-        if (movieLinePosition < graphArea.x || movieLinePosition > (graphArea.x + graphArea.width)) {
-            movieLinePosition = -1;
+        if (newMovieLine != movieLinePosition) {
+            movieLinePosition = newMovieLine;
+            return true;
         }
+        return false;
     }
 
     private void updateGraphEvents() {
@@ -687,7 +694,8 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
             setCursor(new Cursor(Cursor.E_RESIZE_CURSOR));
         } else if (eventModel.getEventAtPosition(new Point(e.getPoint().x - ChartConstants.getGraphLeftSpace(), e.getPoint().y - ChartConstants.getGraphTopSpace())) != null) {
             setCursor(new Cursor(Cursor.HAND_CURSOR));
-            redrawGraph();
+            // redrawGraph();
+            updateGraph();
             mouseOverEvent = true;
         } else if (e.getPoint().x >= graphArea.x && e.getPoint().x <= graphArea.x + graphArea.width && e.getPoint().y >= graphArea.y && e.getPoint().y <= graphArea.y + graphArea.height) {
             setCursor(openHandCursor);
@@ -816,23 +824,22 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
     }
 
     @Override
-    public void chartRedrawRequested() {
-        this.redrawGraph();
-    }
-
-    @Override
     public void drawMovieLineRequest(Date time) {
         if (movieTimestamp == null || !movieTimestamp.equals(time)) {
             movieTimestamp = time;
             if (!TimeIntervalLockModel.getInstance().isLocked()) {
-                updateMovieLineInformation();
-                chartRedrawRequested();
+                if (updateMovieLineInformation()) {
+                    updateGraph();
+                } else {
+                    Log.debug("Movieline not in view no redraw");
+                }
             }
         }
         if (time == null) {
             movieTimestamp = null;
-            updateMovieLineInformation();
-            chartRedrawRequested();
+            if (updateMovieLineInformation()) {
+                updateGraph();
+            }
         }
     }
 
