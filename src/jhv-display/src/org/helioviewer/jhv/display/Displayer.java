@@ -10,6 +10,7 @@ import javax.swing.Timer;
 import org.helioviewer.jhv.layers.LayersModel;
 import org.helioviewer.jhv.gui.components.layerTable.LayerTableModel;
 import org.helioviewer.jhv.gui.components.MoviePanel;
+import org.helioviewer.jhv.gui.components.statusplugins.FramerateStatusPanel;
 import org.helioviewer.viewmodel.view.jp2view.JHVJP2View;
 import org.helioviewer.viewmodel.view.jp2view.datetime.ImmutableDateTime;
 
@@ -117,6 +118,7 @@ public class Displayer implements JHVEventHighlightListener {
             if (idx == layersModel.getActiveLayer() && dateTime != null) {
                 MoviePanel.setFrameSlider(view);
                 fireTimeChanged(dateTime.getTime());
+                FramerateStatusPanel.getSingletonInstance().updateFramerate(layersModel.getFPS(idx));
             }
             display();
         }

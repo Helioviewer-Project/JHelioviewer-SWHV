@@ -166,13 +166,8 @@ public class ImageViewerGui {
             // ///////////////////////////////////////////////////////////////////////////////
 
             ZoomStatusPanel zoomStatusPanel = new ZoomStatusPanel();
-            FramerateStatusPanel framerateStatus = new FramerateStatusPanel();
-
-            PositionStatusPanel positionStatusPanel = null;
-
-            // Position panel only needed in 2D View State
-            // if(this.currentState.getType().equals(ViewStateEnum.View2D))
-            positionStatusPanel = new PositionStatusPanel(getMainImagePanel());
+            FramerateStatusPanel framerateStatus = FramerateStatusPanel.getSingletonInstance();
+            PositionStatusPanel positionStatusPanel = new PositionStatusPanel(getMainImagePanel());
 
             StatusPanel statusPanel = new StatusPanel(SIDE_PANEL_WIDTH + 20, 5);
             statusPanel.addPlugin(zoomStatusPanel, StatusPanel.Alignment.LEFT);
