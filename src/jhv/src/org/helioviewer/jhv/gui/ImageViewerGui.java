@@ -165,9 +165,10 @@ public class ImageViewerGui {
             // STATUS PANEL
             // ///////////////////////////////////////////////////////////////////////////////
 
-            ZoomStatusPanel zoomStatusPanel = new ZoomStatusPanel();
+            ZoomStatusPanel zoomStatusPanel = ZoomStatusPanel.getSingletonInstance();
             FramerateStatusPanel framerateStatus = FramerateStatusPanel.getSingletonInstance();
-            PositionStatusPanel positionStatusPanel = new PositionStatusPanel(getMainImagePanel());
+            PositionStatusPanel positionStatusPanel = PositionStatusPanel.getSingletonInstance();
+            getMainImagePanel().addPlugin(positionStatusPanel);
 
             StatusPanel statusPanel = new StatusPanel(SIDE_PANEL_WIDTH + 20, 5);
             statusPanel.addPlugin(zoomStatusPanel, StatusPanel.Alignment.LEFT);

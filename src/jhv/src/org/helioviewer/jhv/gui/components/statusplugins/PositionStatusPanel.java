@@ -38,30 +38,27 @@ import org.helioviewer.viewmodel.viewportimagesize.ViewportImageSize;
 public class PositionStatusPanel extends ViewStatusPanelPlugin implements MouseMotionListener, ImagePanelPlugin {
 
     private static final long serialVersionUID = 1L;
+    private static final PositionStatusPanel instance = new PositionStatusPanel();
 
     private View view;
+    private JHVJP2View jp2View;
 
     private BasicImagePanel imagePanel;
     private Point lastPosition;
 
     private final char PRIME = '\u2032';
 
-    /**
-     * Default constructor.
-     *
-     * @param imagePanel
-     *            ImagePanel to show mouse position for
-     */
-    public PositionStatusPanel(BasicImagePanel imagePanel) {
+    private PositionStatusPanel() {
         setBorder(BorderFactory.createEtchedBorder());
-
         setPreferredSize(new Dimension(170, 20));
 
-        LayersModel.getSingletonInstance().addLayersListener(this);
-
-        imagePanel.addPlugin(this);
-
         setText("(x, y) = " + "(    0" + PRIME + PRIME + ",    0" + PRIME + PRIME + ")");
+
+        LayersModel.getSingletonInstance().addLayersListener(this);
+    }
+
+    public static PositionStatusPanel getSingletonInstance() {
+        return instance;
     }
 
     /**
@@ -75,12 +72,6 @@ public class PositionStatusPanel extends ViewStatusPanelPlugin implements MouseM
      */
 
     private void updatePosition(Point position) {
-
-        View view = LayersModel.getSingletonInstance().getActiveView();
-        if (view == null)
-            return;
-
-        JHVJP2View jp2View = ViewHelper.getViewAdapter(view, JHVJP2View.class);
         if (jp2View == null)
             return;
 
@@ -111,7 +102,6 @@ public class PositionStatusPanel extends ViewStatusPanelPlugin implements MouseM
             String text = String.format("(x, y) = (% 5d\u2032\u2032, % 5d\u2032\u2032)", (int) Math.round(pos.getX()), (int) Math.round(pos.getY()));
             setText(text);
         } else {
-
             // computes pixel position for simple images (e.g. jpg and png)
             // where cursor points at
 
@@ -184,23 +174,18 @@ public class PositionStatusPanel extends ViewStatusPanelPlugin implements MouseM
     @Override
     public void activeLayerChanged(int idx) {
         if (LayersModel.getSingletonInstance().isValidIndex(idx)) {
+            jp2View = ViewHelper.getViewAdapter(LayersModel.getSingletonInstance().getLayer(idx), JHVJP2View.class);
             setVisible(true);
         } else {
             setVisible(false);
         }
     }
 
-/*
-    @Override
-    public void viewportGeometryChanged() {
-        // a view change (e.g. a zoom) can change the coordinates in the
-        // picture,
-        // so we have to recalculate the position
+    public void updatePosition() {
         if (lastPosition != null) {
             updatePosition(lastPosition);
         }
     }
-*/
 
     @Override
     public void detach() {

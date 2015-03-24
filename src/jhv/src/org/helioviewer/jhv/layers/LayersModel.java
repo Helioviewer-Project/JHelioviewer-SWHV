@@ -26,13 +26,18 @@ import org.helioviewer.jhv.gui.ImageViewerGui;
 import org.helioviewer.jhv.gui.UIViewListener;
 import org.helioviewer.jhv.gui.UIViewListenerDistributor;
 import org.helioviewer.jhv.gui.components.MoviePanel;
+import org.helioviewer.jhv.gui.components.statusplugins.PositionStatusPanel;
+import org.helioviewer.jhv.gui.components.statusplugins.ZoomStatusPanel;
 import org.helioviewer.jhv.gui.dialogs.MetaDataDialog;
 import org.helioviewer.jhv.io.APIRequestManager;
 import org.helioviewer.jhv.io.FileDownloader;
 import org.helioviewer.viewmodel.changeevent.ChangeEvent;
+import org.helioviewer.viewmodel.changeevent.ChangedReason;
 import org.helioviewer.viewmodel.changeevent.LayerChangedReason;
 import org.helioviewer.viewmodel.changeevent.LayerChangedReason.LayerChangeType;
+import org.helioviewer.viewmodel.changeevent.RegionChangedReason;
 import org.helioviewer.viewmodel.changeevent.ViewChainChangedReason;
+import org.helioviewer.viewmodel.changeevent.ViewportChangedReason;
 import org.helioviewer.viewmodel.io.APIResponse;
 import org.helioviewer.viewmodel.io.APIResponseDump;
 import org.helioviewer.viewmodel.region.Region;
@@ -568,6 +573,14 @@ public class LayersModel implements UIViewListener {
         }
     }
 
+    private void handleViewportPositionChanges(View sender, ChangeEvent aEvent) {
+        ChangedReason reason1 = aEvent.getLastChangedReasonByType(RegionChangedReason.class);
+        ChangedReason reason2 = aEvent.getLastChangedReasonByType(ViewportChangedReason.class);
+
+        PositionStatusPanel.getSingletonInstance().updatePosition();
+        ZoomStatusPanel.getSingletonInstance().updateZoomLevel(activeLayer);
+    }
+
     private void handleViewChainChanges(View sender, ChangeEvent aEvent) {
         if (aEvent.getLastChangedReasonByType(ViewChainChangedReason.class) != null) {
             this.fireAllLayersChanged();
@@ -583,6 +596,7 @@ public class LayersModel implements UIViewListener {
     @Override
     public void UIviewChanged(View sender, ChangeEvent aEvent) {
         handleLayerChanges(sender, aEvent);
+        handleViewportPositionChanges(sender, aEvent);
         handleViewChainChanges(sender, aEvent);
     }
 

@@ -24,25 +24,25 @@ import org.helioviewer.viewmodel.view.View;
 public class ZoomStatusPanel extends ViewStatusPanelPlugin {
 
     private static final long serialVersionUID = 1L;
+    private static final ZoomStatusPanel instance = new ZoomStatusPanel();
 
-    /**
-     * Default constructor.
-     */
-    public ZoomStatusPanel() {
+    private ZoomStatusPanel() {
         setBorder(BorderFactory.createEtchedBorder());
-
         setPreferredSize(new Dimension(100, 20));
         setText("Zoom:");
 
         LayersModel.getSingletonInstance().addLayersListener(this);
     }
 
+    public static ZoomStatusPanel getSingletonInstance() {
+        return instance;
+    }
+
     /**
      * Updates the displayed zoom.
      */
-    private void updateZoomLevel() {
-        View view = LayersModel.getSingletonInstance().getActiveView();
-
+    public void updateZoomLevel(int idx) {
+        View view = LayersModel.getSingletonInstance().getLayer(idx);
         if (view != null) {
             long zoom = Math.round(ZoomController.getZoom(view) * 100);
             if (zoom != 0.0) {
@@ -57,13 +57,7 @@ public class ZoomStatusPanel extends ViewStatusPanelPlugin {
     }
 
     public void activeLayerChanged(int idx) {
-        updateZoomLevel();
+        updateZoomLevel(idx);
     }
-
-/*
-    public void viewportGeometryChanged() {
-        updateZoomLevel();
-    }
-*/
 
 }
