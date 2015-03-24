@@ -1,11 +1,9 @@
 package org.helioviewer.jhv.plugin.renderable;
 
-import java.awt.Color;
 import java.awt.Component;
 
 import javax.swing.JLabel;
 import javax.swing.JTable;
-import javax.swing.border.MatteBorder;
 import javax.swing.table.DefaultTableCellRenderer;
 
 import org.helioviewer.jhv.gui.IconBank;
@@ -21,7 +19,7 @@ public class RenderableVisibleCellRenderer extends DefaultTableCellRenderer {
         } else {
             label.setIcon(IconBank.getIcon(JHVIcon.HIDDEN));
         }
-        label.setBorder(new MatteBorder(1, 0, 0, 0, Color.BLACK));
+        label.setBorder(RenderableContainerPanel.commonBorder);
         label.setText("");
         return label;
 

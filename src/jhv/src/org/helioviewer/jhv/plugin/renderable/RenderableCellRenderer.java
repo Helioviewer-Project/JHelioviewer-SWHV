@@ -1,11 +1,9 @@
 package org.helioviewer.jhv.plugin.renderable;
 
-import java.awt.Color;
 import java.awt.Component;
 
 import javax.swing.JLabel;
 import javax.swing.JTable;
-import javax.swing.border.MatteBorder;
 import javax.swing.table.DefaultTableCellRenderer;
 
 import org.helioviewer.jhv.layers.LayerDescriptor;
@@ -26,7 +24,7 @@ public class RenderableCellRenderer extends DefaultTableCellRenderer {
         JLabel label = (JLabel) super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
 
         label.setText(((Renderable) value).getName());
-        label.setBorder(new MatteBorder(1, 0, 0, 0, Color.BLACK));
+        label.setBorder(RenderableContainerPanel.commonBorder);
         return label;
     }
 }

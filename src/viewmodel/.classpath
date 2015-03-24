@@ -5,10 +5,10 @@
 	<classpathentry kind="lib" path="../lib/kdu_jni.jar"/>
 	<classpathentry kind="lib" path="../lib/log4j-1.2.16.jar"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
+	<classpathentry kind="src" path="/jhv-display"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/jhv-data"/>
 	<classpathentry kind="lib" path="../lib/gluegen-rt.jar"/>
 	<classpathentry kind="lib" path="../lib/json.jar"/>
-	<classpathentry kind="src" path="/jhv-display"/>
 	<classpathentry kind="lib" path="../lib/bzip2.jar"/>
 	<classpathentry kind="lib" path="../lib/jogl.jar"/>
 	<classpathentry kind="src" path="/jhv"/>
