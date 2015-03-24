@@ -26,8 +26,9 @@ public class RenderableContainerPanel extends JPanel {
 
     private static final int VISIBLEROW = 0;
     private static final int TITLEROW = 1;
-    private static final int REMOVEROW = 2;
-    public static final int NUMBEROFCOLUMNS = 3;
+    private static final int TIMEROW = 2;
+    private static final int REMOVEROW = 3;
+    public static final int NUMBEROFCOLUMNS = 4;
 
     public final JTable grid;
     private Component optionsPanel = new JPanel();
@@ -57,6 +58,11 @@ public class RenderableContainerPanel extends JPanel {
         grid.getColumnModel().getColumn(VISIBLEROW).setMaxWidth(ICON_WIDTH);
 
         grid.getColumnModel().getColumn(TITLEROW).setCellRenderer(new RenderableCellRenderer());
+        grid.getColumnModel().getColumn(TITLEROW).setPreferredWidth(80);
+        grid.getColumnModel().getColumn(TITLEROW).setMaxWidth(80);
+
+        grid.getColumnModel().getColumn(TIMEROW).setCellRenderer(new RenderableTimeCellRenderer());
+
         grid.getColumnModel().getColumn(REMOVEROW).setCellRenderer(new RenderableRemoveCellRenderer());
         grid.getColumnModel().getColumn(REMOVEROW).setPreferredWidth(ICON_WIDTH);
         grid.getColumnModel().getColumn(REMOVEROW).setMaxWidth(ICON_WIDTH);
@@ -102,7 +108,7 @@ public class RenderableContainerPanel extends JPanel {
                     model.fireTableCellUpdated(row, col);
                     Displayer.display();
                 }
-                if (col == TITLEROW || col == VISIBLEROW) {
+                if (col == TITLEROW || col == VISIBLEROW || col == TIMEROW) {
                     Renderable renderable = (Renderable) Displayer.getRenderablecontainer().getValueAt(row, col);
                     setOptionsPanel(renderable);
                 }

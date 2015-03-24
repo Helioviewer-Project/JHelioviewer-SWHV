@@ -298,4 +298,9 @@ public class RenderableGrid implements Renderable {
     public void setLatstepDegrees(double latstepDegrees) {
         this.latstepDegrees = latstepDegrees;
     }
+
+    @Override
+    public String getTimeString() {
+        return "";
+    }
 }

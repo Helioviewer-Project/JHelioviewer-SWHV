@@ -199,6 +199,10 @@ public class FilterTabPanelManager implements LayersListener {
         }
 
         JHVJP2View jp2view = view.getAdapter(JHVJP2View.class);
+        setActivejp2(jp2view);
+    }
+
+    public void setActivejp2(JHVJP2View jp2view) {
         for (AbstractFilterPanel c : this.abstractFilterPanels) {
             c.setEnabled(true);
             c.setJP2View(jp2view);
