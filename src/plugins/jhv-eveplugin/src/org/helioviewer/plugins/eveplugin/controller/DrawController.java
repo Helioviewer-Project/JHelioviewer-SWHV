@@ -26,7 +26,7 @@ import org.helioviewer.viewmodel.view.View;
 
 public class DrawController implements ZoomControllerListener, LineDataSelectorModelListener, JHVEventHighlightListener, LayersListener, TimeListener {
 
-    private static DrawController instance;
+    private static final DrawController instance = new DrawController();;
     private final DrawControllerData drawControllerData;
     private Interval<Date> interval;
     private final List<DrawControllerListener> forAllPlotIdentifiers;
@@ -41,9 +41,6 @@ public class DrawController implements ZoomControllerListener, LineDataSelectorM
     }
 
     public static DrawController getSingletonInstance() {
-        if (instance == null) {
-            instance = new DrawController();
-        }
         return instance;
     }
 
