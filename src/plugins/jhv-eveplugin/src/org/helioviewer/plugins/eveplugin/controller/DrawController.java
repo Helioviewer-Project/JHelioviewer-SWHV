@@ -82,10 +82,6 @@ public class DrawController implements ZoomControllerListener, LineDataSelectorM
         removeDrawableElement(element, true);
     }
 
-    public int getNumberOfYAxis() {
-        return drawControllerData.getyAxisSet().size();
-    }
-
     public Set<YAxisElement> getYAxisElements() {
         return drawControllerData.getyAxisSet();
     }
