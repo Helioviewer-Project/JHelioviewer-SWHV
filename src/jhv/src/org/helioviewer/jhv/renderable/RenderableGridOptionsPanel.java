@@ -23,8 +23,8 @@ public class RenderableGridOptionsPanel extends JPanel {
         grid = renderableGrid;
         setLayout(new BoxLayout(this, BoxLayout.LINE_AXIS));
         add(new JLabel("Grid "));
-        createGridResolutionX();
-        createGridResolutionY();
+        createGridResolutionX(renderableGrid);
+        createGridResolutionY(renderableGrid);
 
         gridResolutionXSpinner.setMinimumSize(new Dimension(42, 20));
         gridResolutionXSpinner.setPreferredSize(new Dimension(62, 22));
@@ -40,26 +40,26 @@ public class RenderableGridOptionsPanel extends JPanel {
         add(Box.createHorizontalGlue());
     }
 
-    public void createGridResolutionX() {
+    public void createGridResolutionX(RenderableGrid renderableGrid) {
         gridResolutionXSpinner = new JSpinner();
-        gridResolutionXSpinner.setModel(new SpinnerNumberModel(new Double(13.2), new Double(1), new Double(90), new Double(0.1)));
+        gridResolutionXSpinner.setModel(new SpinnerNumberModel(new Double(renderableGrid.getLonstepDegrees()), new Double(1), new Double(90), new Double(0.1)));
         gridResolutionXSpinner.addChangeListener(new ChangeListener() {
             @Override
             public void stateChanged(ChangeEvent e) {
-                grid.setGridResolutionX((Double) gridResolutionYSpinner.getValue());
+                grid.setLonstepDegrees((Double) gridResolutionXSpinner.getValue());
                 Displayer.display();
             }
         });
         WheelSupport.installMouseWheelSupport(gridResolutionXSpinner);
     }
 
-    public void createGridResolutionY() {
+    public void createGridResolutionY(RenderableGrid renderableGrid) {
         gridResolutionYSpinner = new JSpinner();
-        gridResolutionYSpinner.setModel(new SpinnerNumberModel(new Double(15.), new Double(1), new Double(90), new Double(0.1)));
+        gridResolutionYSpinner.setModel(new SpinnerNumberModel(new Double(renderableGrid.getLatstepDegrees()), new Double(1), new Double(90), new Double(0.1)));
         gridResolutionYSpinner.addChangeListener(new ChangeListener() {
             @Override
             public void stateChanged(ChangeEvent e) {
-                grid.setGridResolutionY((Double) gridResolutionYSpinner.getValue());
+                grid.setLatstepDegrees((Double) gridResolutionYSpinner.getValue());
                 Displayer.display();
             }
         });
