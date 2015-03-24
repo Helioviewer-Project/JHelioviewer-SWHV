@@ -56,7 +56,7 @@ public class EventModel implements ZoomControllerListener, EventRequesterListene
     private Map<String, NavigableMap<Date, NavigableMap<Date, List<JHVEvent>>>> events;
 
     /** plotIdentifier */
-    private String plot;
+    private final String plot;
 
     /** The event panel */
     private final EventPanel eventPanel;
@@ -183,17 +183,6 @@ public class EventModel implements ZoomControllerListener, EventRequesterListene
     }
 
     public void setPlotIdentifier(String plotIdentifier) {
-        if (!plot.equals(plotIdentifier)) {
-            if (eventsActivated) {
-                DrawController.getSingletonInstance().removeDrawableElement(eventPanel, plot);
-                DrawController.getSingletonInstance().addDrawableElement(eventPanel, plotIdentifier);
-                LineDataSelectorModel.getSingletonInstance().removeLineData(eventSelectorElement);
-                plot = plotIdentifier;
-                LineDataSelectorModel.getSingletonInstance().addLineData(eventSelectorElement);
-            } else {
-                plot = plotIdentifier;
-            }
-        }
     }
 
     public JHVEvent getEventAtPosition(Point point) {
