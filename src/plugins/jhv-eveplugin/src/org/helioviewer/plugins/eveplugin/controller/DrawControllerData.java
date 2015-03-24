@@ -1,7 +1,6 @@
 package org.helioviewer.plugins.eveplugin.controller;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -18,12 +17,12 @@ public class DrawControllerData {
     private int nrOfDrawableElements;
     private Set<YAxisElement> yAxisSet;
     private final Map<DrawableType, Set<DrawableElement>> drawableElements;
-    private List<DrawControllerListener> listeners;
+    private final List<DrawControllerListener> listeners;
 
     public DrawControllerData() {
         nrOfDrawableElements = 0;
         drawableElements = new HashMap<DrawableType, Set<DrawableElement>>();
-        listeners = Collections.synchronizedList(new ArrayList<DrawControllerListener>());
+        listeners = new ArrayList<DrawControllerListener>();
         yAxisSet = new HashSet<YAxisElement>();
     }
 
@@ -36,9 +35,7 @@ public class DrawControllerData {
     }
 
     public Set<YAxisElement> getyAxisSet() {
-        synchronized (yAxisSet) {
-            return yAxisSet;
-        }
+        return yAxisSet;
     }
 
     public void setyAxisSet(Set<YAxisElement> yAxisSet) {
@@ -50,36 +47,23 @@ public class DrawControllerData {
     }
 
     public List<DrawControllerListener> getListeners() {
-        synchronized (listeners) {
-            List<DrawControllerListener> temp = new ArrayList<DrawControllerListener>(listeners);
-            return temp;
-        }
+        List<DrawControllerListener> temp = new ArrayList<DrawControllerListener>(listeners);
+        return temp;
 
-    }
-
-    public void setListeners(List<DrawControllerListener> listeners) {
-        synchronized (this.listeners) {
-            this.listeners = listeners;
-        }
     }
 
     public void addDrawControllerListener(DrawControllerListener listener) {
-        synchronized (listeners) {
-            listeners.add(listener);
-        }
+        listeners.add(listener);
     }
 
     public void removeDrawControllerListener(DrawControllerListener listener) {
-        synchronized (listeners) {
-            listeners.remove(listener);
-        }
-
+        listeners.remove(listener);
     }
 
     public void addDrawableElement(final DrawableElement element) {
         Set<DrawableElement> elements = drawableElements.get(element.getDrawableElementType().getLevel());
         if (elements == null) {
-            elements = Collections.synchronizedSet(new HashSet<DrawableElement>());
+            elements = new HashSet<DrawableElement>();
             drawableElements.put(element.getDrawableElementType().getLevel(), elements);
         }
 
@@ -96,14 +80,11 @@ public class DrawControllerData {
     public void removeDrawableElement(final DrawableElement element) {
         Set<DrawableElement> elements = drawableElements.get(element.getDrawableElementType().getLevel());
         if (elements != null) {
-            synchronized (elements) {
-                elements.remove(element);
-                nrOfDrawableElements--;
-                synchronized (yAxisSet) {
-                    createYAxisSet();
-                }
-            }
+            elements.remove(element);
+            nrOfDrawableElements--;
+            createYAxisSet();
         }
+
     }
 
     public Date getLastDateWithData() {
