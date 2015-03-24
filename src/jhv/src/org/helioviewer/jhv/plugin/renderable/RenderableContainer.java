@@ -102,6 +102,7 @@ public class RenderableContainer extends DefaultTableModel implements Reorderabl
 
     @Override
     public void removeRow(int row) {
+        this.removedRenderables.add(renderables.get(row));
         renderables.remove(row);
         fireTableRowsDeleted(row, row);
     }
