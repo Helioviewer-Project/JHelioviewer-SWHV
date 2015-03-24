@@ -12,18 +12,16 @@ public class ZoomDataConfig implements ZoomManagerListener, PlotAreaSpaceListene
     private Date maxX;
     private Rectangle displaySize;
     private long ID;
-    private final String plotIdentifier;
     private final YValueModel yValueModel;
 
     private final List<ZoomDataConfigListener> listeners;
 
-    public ZoomDataConfig(Date minX, Date maxX, Rectangle displaySize, long ID, String plotIdentifier) {
+    public ZoomDataConfig(Date minX, Date maxX, Rectangle displaySize, long ID) {
         listeners = new ArrayList<ZoomDataConfigListener>();
 
         this.maxX = maxX;
         this.minX = minX;
-        this.plotIdentifier = plotIdentifier;
-        yValueModel = YValueModelManager.getInstance().getYValueModel(plotIdentifier);
+        yValueModel = YValueModel.getSingletonInstance();
         this.displaySize = displaySize;
         if (displaySize != null) {
             requestData();
@@ -35,7 +33,7 @@ public class ZoomDataConfig implements ZoomManagerListener, PlotAreaSpaceListene
         listeners.add(l);
         double xRatio = 1.0 * (maxX.getTime() - minX.getTime()) / displaySize.getWidth();
         double yRatio = 1.0 * (yValueModel.getSelectedYMax() - yValueModel.getSelectedYMin()) / displaySize.getHeight();
-        l.requestData(minX, maxX, yValueModel.getSelectedYMin(), yValueModel.getSelectedYMax(), xRatio, yRatio, ID, plotIdentifier);
+        l.requestData(minX, maxX, yValueModel.getSelectedYMin(), yValueModel.getSelectedYMax(), xRatio, yRatio, ID);
     }
 
     public long getID() {
@@ -89,7 +87,7 @@ public class ZoomDataConfig implements ZoomManagerListener, PlotAreaSpaceListene
         double xRatio = 1.0 * (maxX.getTime() - minX.getTime()) / displaySize.getWidth();
         double yRatio = 1.0 * (yValueModel.getSelectedYMax() - yValueModel.getSelectedYMin()) / displaySize.getHeight();
         for (ZoomDataConfigListener l : listeners) {
-            l.requestData(minX, maxX, yValueModel.getSelectedYMin(), yValueModel.getSelectedYMax(), xRatio, yRatio, ID, plotIdentifier);
+            l.requestData(minX, maxX, yValueModel.getSelectedYMin(), yValueModel.getSelectedYMax(), xRatio, yRatio, ID);
         }
     }
 
@@ -103,23 +101,19 @@ public class ZoomDataConfig implements ZoomManagerListener, PlotAreaSpaceListene
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder();
-        sb.append("MinX = ").append(minX).append("\n").append("MaxX = ").append(maxX).append("\n").append("DisplaySize = ")
-                .append(displaySize).append("\n");
+        sb.append("MinX = ").append(minX).append("\n").append("MaxX = ").append(maxX).append("\n").append("DisplaySize = ").append(displaySize).append("\n");
         return sb.toString();
     }
 
     @Override
-    public void plotAreaSpaceChanged(double scaledMinValue, double scaledMaxValue, double scaledMinTime, double scaledMaxTime,
-            double scaledSelectedMinValue, double scaledSelectedMaxValue, double scaledSelectedMinTime, double scaledSelectedMaxTime,
-            boolean forced) {
+    public void plotAreaSpaceChanged(double scaledMinValue, double scaledMaxValue, double scaledMinTime, double scaledMaxTime, double scaledSelectedMinValue, double scaledSelectedMaxValue, double scaledSelectedMinTime, double scaledSelectedMaxTime, boolean forced) {
         synchronized (this) {
             requestData();
         }
     }
 
     @Override
-    public void availablePlotAreaSpaceChanged(double oldMinValue, double oldMaxValue, double oldMinTime, double oldMaxTime,
-            double newMinValue, double newMaxValue, double newMinTime, double newMaxTime) {
+    public void availablePlotAreaSpaceChanged(double oldMinValue, double oldMaxValue, double oldMinTime, double oldMaxTime, double newMinValue, double newMaxValue, double newMinTime, double newMaxTime) {
         // TODO Auto-generated method stub
 
     }

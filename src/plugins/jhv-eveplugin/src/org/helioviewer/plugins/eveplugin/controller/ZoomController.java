@@ -13,7 +13,6 @@ import org.helioviewer.plugins.eveplugin.lines.data.BandController;
 import org.helioviewer.plugins.eveplugin.lines.data.DownloadController;
 import org.helioviewer.plugins.eveplugin.model.PlotAreaSpace;
 import org.helioviewer.plugins.eveplugin.model.PlotAreaSpaceListener;
-import org.helioviewer.plugins.eveplugin.model.PlotAreaSpaceManager;
 import org.helioviewer.plugins.eveplugin.settings.BandType;
 //import org.helioviewer.plugins.eveplugin.model.PlotTimeSpace;
 import org.helioviewer.plugins.eveplugin.settings.EVEAPI.API_RESOLUTION_AVERAGES;
@@ -39,14 +38,14 @@ public class ZoomController implements PlotAreaSpaceListener, LayersListener {
 
     private API_RESOLUTION_AVERAGES selectedResolution = API_RESOLUTION_AVERAGES.MINUTE_1;
 
-    private final PlotAreaSpaceManager plotAreaSpaceManager;
+    private final PlotAreaSpace pas;
 
     /**
      * The private constructor to support the singleton pattern.
      * */
     private ZoomController() {
-        plotAreaSpaceManager = PlotAreaSpaceManager.getInstance();
-        plotAreaSpaceManager.addPlotAreaSpaceListenerToAllSpaces(this);
+        pas = PlotAreaSpace.getSingletonInstance();
+        pas.addPlotAreaSpaceListener(this);
         LayersModel.getSingletonInstance().addLayersListener(this);
     }
 
@@ -333,14 +332,11 @@ public class ZoomController implements PlotAreaSpaceListener, LayersListener {
 
     private void updatePlotAreaSpace(Interval<Date> selectedInterval) {
         if (availableInterval != null && availableInterval.getStart() != null && availableInterval.getEnd() != null && selectedInterval != null && selectedInterval.getStart() != null && selectedInterval.getEnd() != null) {
-            for (PlotAreaSpace pas : plotAreaSpaceManager.getAllPlotAreaSpaces()) {
-                long diffAvailable = availableInterval.getEnd().getTime() - availableInterval.getStart().getTime();
-                double diffPlotAreaTime = pas.getScaledMaxTime() - pas.getScaledMinTime();
-                double scaledSelectedStart = pas.getScaledMinTime() + (1.0 * (selectedInterval.getStart().getTime() - availableInterval.getStart().getTime()) * diffPlotAreaTime / diffAvailable);
-                double scaledSelectedEnd = pas.getScaledMinTime() + (1.0 * (selectedInterval.getEnd().getTime() - availableInterval.getStart().getTime()) * diffPlotAreaTime / diffAvailable);
-                pas.setScaledSelectedTimeAndValue(scaledSelectedStart, scaledSelectedEnd, pas.getScaledMinValue(), pas.getScaledMaxValue());
-
-            }
+            long diffAvailable = availableInterval.getEnd().getTime() - availableInterval.getStart().getTime();
+            double diffPlotAreaTime = pas.getScaledMaxTime() - pas.getScaledMinTime();
+            double scaledSelectedStart = pas.getScaledMinTime() + (1.0 * (selectedInterval.getStart().getTime() - availableInterval.getStart().getTime()) * diffPlotAreaTime / diffAvailable);
+            double scaledSelectedEnd = pas.getScaledMinTime() + (1.0 * (selectedInterval.getEnd().getTime() - availableInterval.getStart().getTime()) * diffPlotAreaTime / diffAvailable);
+            pas.setScaledSelectedTimeAndValue(scaledSelectedStart, scaledSelectedEnd, pas.getScaledMinValue(), pas.getScaledMaxValue());
         }
     }
 

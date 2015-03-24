@@ -3,7 +3,6 @@ package org.helioviewer.plugins.eveplugin.view.linedataselector;
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 
-import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JProgressBar;
 
@@ -18,9 +17,6 @@ public class LineDataSelectorPanel extends JPanel implements LineDataSelectorMod
     private static final String PROGRESSBAR_TOOLTIP_ACTIVEDOWNLOAD = "Downloading data from server.";
     private static final String PROGRESSBAR_TOOLTIP_INACTIVEDOWNLOAD = "No data selected to download from server.";
 
-    private final String identifier;
-
-    private final JLabel groupLabel = new JLabel(" ");
     private final JProgressBar progressBar = new JProgressBar();
     private final LineDataContainer bandsContainer;
 
@@ -30,9 +26,8 @@ public class LineDataSelectorPanel extends JPanel implements LineDataSelectorMod
     // Methods
     // //////////////////////////////////////////////////////////////////////////////
 
-    public LineDataSelectorPanel(final String identifer, final String plotName) {
-        identifier = identifer;
-        bandsContainer = new LineDataContainer(identifier);
+    public LineDataSelectorPanel(final String plotName) {
+        bandsContainer = new LineDataContainer();
 
         initVisualComponents(plotName);
 
@@ -50,14 +45,11 @@ public class LineDataSelectorPanel extends JPanel implements LineDataSelectorMod
     }
 
     public void bandGroupChanged(final String identifer) {
-        if (identifier.equals(identifer)) {
-            // groupLabel.setText(BandController.getSingletonInstance().getSelectedGroup(identifer).getGroupLabel());
-        }
     }
 
     @Override
     public void downloadStartded(LineDataSelectorElement element) {
-        if (element.getPlotIdentifier().equals(identifier) && element.isAvailable()) {
+        if (element.isAvailable()) {
             progressBar.setIndeterminate(true);
             progressBar.setToolTipText(PROGRESSBAR_TOOLTIP_ACTIVEDOWNLOAD);
         }
@@ -65,14 +57,12 @@ public class LineDataSelectorPanel extends JPanel implements LineDataSelectorMod
 
     @Override
     public void downloadFinished(LineDataSelectorElement element) {
-        if (element.getPlotIdentifier().equals(identifier)) {
-            boolean active = model.atLeastOneDownloading(element.getPlotIdentifier());
+        boolean active = model.atLeastOneDownloading();
 
-            progressBar.setIndeterminate(active);
+        progressBar.setIndeterminate(active);
 
-            if (!active) {
-                progressBar.setToolTipText(PROGRESSBAR_TOOLTIP_INACTIVEDOWNLOAD);
-            }
+        if (!active) {
+            progressBar.setToolTipText(PROGRESSBAR_TOOLTIP_INACTIVEDOWNLOAD);
         }
 
     }

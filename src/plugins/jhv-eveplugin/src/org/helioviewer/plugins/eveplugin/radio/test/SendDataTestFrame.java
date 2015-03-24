@@ -204,7 +204,7 @@ public class SendDataTestFrame extends JFrame implements RadioDataManagerListene
     }
 
     @Override
-    public void downloadRequestAnswered(Interval<Date> timeInterval, long ID, String identifier) {
+    public void downloadRequestAnswered(Interval<Date> timeInterval, long ID) {
         // TODO Auto-generated method stub
 
     }
@@ -222,7 +222,7 @@ public class SendDataTestFrame extends JFrame implements RadioDataManagerListene
     }
 
     @Override
-    public void dataNotChanged(Interval<Date> timeInterval, FrequencyInterval freqInterval, Rectangle area, List<Long> IDList, String identifier, long radioImageID) {
+    public void dataNotChanged(Interval<Date> timeInterval, FrequencyInterval freqInterval, Rectangle area, List<Long> IDList, long radioImageID) {
         // TODO Auto-generated method stub
 
     }
@@ -234,7 +234,7 @@ public class SendDataTestFrame extends JFrame implements RadioDataManagerListene
     }
 
     @Override
-    public void newDataReceived(byte[] data, Interval<Date> timeInterval, FrequencyInterval freqInterval, Rectangle area, List<Long> ID, String identifier, Long radioImageID) {
+    public void newDataReceived(byte[] data, Interval<Date> timeInterval, FrequencyInterval freqInterval, Rectangle area, List<Long> ID, Long radioImageID) {
         BufferedImage bi = createBufferedImage(rs.getWidth(), rs.getHeight(), data, 0);
         TestRadioPane tempPane = new TestRadioPane(bi);
         tempPane.setMinimumSize(new Dimension(rs.getWidth(), rs.getHeight()));
@@ -248,7 +248,7 @@ public class SendDataTestFrame extends JFrame implements RadioDataManagerListene
     }
 
     @Override
-    public void clearAllSavedImages(String plotIdntifier) {
+    public void clearAllSavedImages() {
         // TODO Auto-generated method stub
 
     }
@@ -266,25 +266,25 @@ public class SendDataTestFrame extends JFrame implements RadioDataManagerListene
     }
 
     @Override
-    public void newDataForIDReceived(int[] data, Interval<Date> timeInterval, FrequencyInterval freqInterval, Rectangle area, Long ID, String identifier, Long imageID) {
+    public void newDataForIDReceived(int[] data, Interval<Date> timeInterval, FrequencyInterval freqInterval, Rectangle area, Long ID, Long imageID) {
         // TODO Auto-generated method stub
 
     }
 
     @Override
-    public void clearAllSavedImagesForID(Long downloadID, Long imageID, String plotIdentifier) {
+    public void clearAllSavedImagesForID(Long downloadID, Long imageID) {
         // TODO Auto-generated method stub
 
     }
 
     @Override
-    public void intervalTooBig(long iD, String identifier) {
+    public void intervalTooBig(long iD) {
         // TODO Auto-generated method stub
 
     }
 
     @Override
-    public void noDataInterval(List<Interval<Date>> noDataList, Long downloadID, String plotIdentifier) {
+    public void noDataInterval(List<Interval<Date>> noDataList, Long downloadID) {
         // TODO Auto-generated method stub
 
     }
@@ -298,13 +298,13 @@ public class SendDataTestFrame extends JFrame implements RadioDataManagerListene
      * org.helioviewer.plugins.eveplugin.radio.data.FrequencyInterval)
      */
     @Override
-    public void frequencyIntervalUpdated(String plotIdentifier, FrequencyInterval maxFrequencyInterval) {
+    public void frequencyIntervalUpdated(FrequencyInterval maxFrequencyInterval) {
         // TODO Auto-generated method stub
 
     }
 
     @Override
-    public void newDataForIDReceived(byte[] byteData, Interval<Date> visibleImageTimeInterval, FrequencyInterval visibleImageFreqInterval, Rectangle dataSize, long downloadID, String plotIdentifier, long imageID) {
+    public void newDataForIDReceived(byte[] byteData, Interval<Date> visibleImageTimeInterval, FrequencyInterval visibleImageFreqInterval, Rectangle dataSize, long downloadID, long imageID) {
         // TODO Auto-generated method stub
 
     }

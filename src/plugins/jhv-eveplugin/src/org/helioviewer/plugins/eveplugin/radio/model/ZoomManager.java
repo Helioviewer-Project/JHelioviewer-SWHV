@@ -1,6 +1,7 @@
 package org.helioviewer.plugins.eveplugin.radio.model;
 
 import java.awt.Rectangle;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -9,27 +10,35 @@ import java.util.Map;
 import org.helioviewer.base.math.Interval;
 import org.helioviewer.plugins.eveplugin.controller.ZoomController;
 import org.helioviewer.plugins.eveplugin.controller.ZoomControllerListener;
+import org.helioviewer.plugins.eveplugin.model.PlotAreaSpace;
 import org.helioviewer.plugins.eveplugin.model.PlotAreaSpaceListener;
-import org.helioviewer.plugins.eveplugin.model.PlotAreaSpaceManager;
 import org.helioviewer.plugins.eveplugin.settings.EVEAPI.API_RESOLUTION_AVERAGES;
 
 public class ZoomManager implements ZoomControllerListener, PlotAreaSpaceListener {
     private static ZoomManager instance;
-    private final Map<String, ZoomManagerData> zoomManagerData;
     private final ZoomController zoomController;
     private Interval<Date> currentInterval;
-    private final PlotAreaSpaceManager plotAreaSpaceManager;
+    private final PlotAreaSpace plotAreaSpace;
     private final Object intervalLock;
-    private final YValueModelManager yValueModelManager;
+    private final YValueModel yValueModel;
+
+    private final Map<Long, ZoomDataConfig> zoomDataConfigMap;
+    private boolean isAreaInitialized;
+    private final List<ZoomManagerListener> listeners;
+    private Rectangle displaySize;
 
     private ZoomManager() {
         // currentInterval = new Interval<Date>(new Date(), new Date());
         zoomController = ZoomController.getSingletonInstance();
         zoomController.addZoomControllerListener(this);
-        zoomManagerData = new HashMap<String, ZoomManagerData>();
-        plotAreaSpaceManager = PlotAreaSpaceManager.getInstance();
+        plotAreaSpace = PlotAreaSpace.getSingletonInstance();
         intervalLock = new Object();
-        yValueModelManager = YValueModelManager.getInstance();
+        yValueModel = YValueModel.getSingletonInstance();
+
+        zoomDataConfigMap = new HashMap<Long, ZoomDataConfig>();
+        listeners = new ArrayList<ZoomManagerListener>();
+        isAreaInitialized = false;
+        displaySize = new Rectangle();
 
     }
 
@@ -40,18 +49,16 @@ public class ZoomManager implements ZoomControllerListener, PlotAreaSpaceListene
         return instance;
     }
 
-    public Rectangle getDisplaySize(String identifier) {
-        ZoomManagerData zmd = getZoomManagerData(identifier);
-        return zmd.getDisplaySize();
-    }
-
-    public void setDisplaySize(Rectangle displaySize, String identifier) {
-        ZoomManagerData zmd = getZoomManagerData(identifier);
-        Rectangle idenSize = zmd.getDisplaySize();
-        if (!idenSize.equals(displaySize)) {
-            zmd.setDisplaySize(displaySize);
-            fireDisplaySizeChanged(identifier);
+    public void setDisplaySize(Rectangle newDisplaySize) {
+        if (!displaySize.equals(newDisplaySize)) {
+            displaySize = newDisplaySize;
+            for (ZoomDataConfig zsc : zoomDataConfigMap.values()) {
+                zsc.setDisplaySize(newDisplaySize);
+            }
+            isAreaInitialized = true;
+            fireDisplaySizeChanged();
         }
+
     }
 
     public void calculateZoomXDirection() {
@@ -66,49 +73,34 @@ public class ZoomManager implements ZoomControllerListener, PlotAreaSpaceListene
 
     }
 
-    public void addZoomDataConfig(Interval<Date> interval, ZoomDataConfigListener zoomDataConfigListener, long ID, String identifier) {
-        ZoomManagerData zmd = getZoomManagerData(identifier);
+    public void addZoomDataConfig(Interval<Date> interval, ZoomDataConfigListener zoomDataConfigListener, long ID) {
         synchronized (intervalLock) {
             if (currentInterval == null) {
                 currentInterval = interval;
             }
             if (interval != null) {
                 ZoomDataConfig config;
-                if (zmd.isAreaInitialized()) {
-                    config = new ZoomDataConfig(currentInterval.getStart(), currentInterval.getEnd(), zmd.getDisplaySize(), ID, identifier);
+                if (isAreaInitialized) {
+                    config = new ZoomDataConfig(currentInterval.getStart(), currentInterval.getEnd(), displaySize, ID);
                 } else {
-                    config = new ZoomDataConfig(currentInterval.getStart(), currentInterval.getStart(), null, ID, identifier);
+                    config = new ZoomDataConfig(currentInterval.getStart(), currentInterval.getStart(), null, ID);
                 }
-                plotAreaSpaceManager.getPlotAreaSpace(identifier).addPlotAreaSpaceListener(config);
+                plotAreaSpace.addPlotAreaSpaceListener(config);
                 // Log.trace("PlotAreaSpaceListener added");
-                zmd.addToZoomDataConfigMap(ID, config);
+                zoomDataConfigMap.put(ID, config);
                 config.addListener(zoomDataConfigListener);
             }
         }
     }
 
-    public void addZoomManagerListener(ZoomManagerListener listener, String identifier) {
-        ZoomManagerData zmd = getZoomManagerData(identifier);
-        zmd.getListeners().add(listener);
-    }
-
-    public void removeZoomManagerListener(ZoomManagerListener listener, String identifier) {
-        ZoomManagerData zmd = getZoomManagerData(identifier);
-        zmd.getListeners().remove(listener);
-    }
-
-    public void fireDisplaySizeChanged(String identifier) {
-        ZoomManagerData zmd = getZoomManagerData(identifier);
-        List<ZoomManagerListener> zoomManagerListeners = zmd.getListeners();
-        for (ZoomManagerListener l : zoomManagerListeners) {
-            l.displaySizeChanged(zmd.getDisplaySize());
+    public void fireDisplaySizeChanged() {
+        for (ZoomManagerListener l : listeners) {
+            l.displaySizeChanged(displaySize);
         }
     }
 
-    public DrawableAreaMap getDrawableAreaMap(Date startDate, Date endDate, int startFrequency, int endFrequency, Rectangle area, long downloadID, String plotIdentifier) {
-        ZoomManagerData zmd = getZoomManagerData(plotIdentifier);
-        ZoomDataConfig zdc = zmd.getZoomDataConfigMap().get(downloadID);
-        YValueModel yValueModel = yValueModelManager.getYValueModel(plotIdentifier);
+    public DrawableAreaMap getDrawableAreaMap(Date startDate, Date endDate, int startFrequency, int endFrequency, Rectangle area, long downloadID) {
+        ZoomDataConfig zdc = zoomDataConfigMap.get(downloadID);
         int sourceX0 = defineXInSourceArea(startDate, startDate, endDate, area);
         int sourceY0 = defineYInSourceArea((int) yValueModel.getSelectedYMax(), startFrequency, endFrequency, area, zdc);
         int sourceX1 = defineXInSourceArea(endDate, startDate, endDate, area);
@@ -128,7 +120,7 @@ public class ZoomManager implements ZoomControllerListener, PlotAreaSpaceListene
      * have the coordinates (0,0,0,0) and are meaningless, the destination
      * coordinates are corresponding with the time interval and the taking the
      * complete height of the plot area.
-     *
+     * 
      * @param startDate
      *            The start date of the interval
      * @param endDate
@@ -139,13 +131,12 @@ public class ZoomManager implements ZoomControllerListener, PlotAreaSpaceListene
      *            The plot identifier of the request
      * @return Drawable area map with the correct coordinates
      */
-    public DrawableAreaMap getDrawableAreaMap(Date startDate, Date endDate, long downloadID, String plotIdentifier) {
-        ZoomManagerData zmd = getZoomManagerData(plotIdentifier);
-        ZoomDataConfig zdc = zmd.getZoomDataConfigMap().get(downloadID);
+    public DrawableAreaMap getDrawableAreaMap(Date startDate, Date endDate, long downloadID) {
+        ZoomDataConfig zdc = zoomDataConfigMap.get(downloadID);
         int destX0 = defineXInDestinationArea(startDate, zdc);
         int destY0 = 0;
         int destX1 = defineXInDestinationArea(endDate, zdc);
-        int destY1 = zmd.getDisplaySize().height;
+        int destY1 = displaySize.height;
         return new DrawableAreaMap(0, 0, 0, 0, destX0, destY0, destX1, destY1, downloadID);
     }
 
@@ -154,8 +145,8 @@ public class ZoomManager implements ZoomControllerListener, PlotAreaSpaceListene
      * interval and frequency interval. The frequency gets the complete height,
      * the time gets the portion of the width of the screen corresponding with
      * the portion of the complete time interval it takes.
-     *
-     *
+     * 
+     * 
      * @param startDate
      *            The start date of the requested time interval
      * @param endDate
@@ -166,8 +157,6 @@ public class ZoomManager implements ZoomControllerListener, PlotAreaSpaceListene
      *            The end frequency of the requested frequency interval
      * @param downloadId
      *            The download id that requests the space
-     * @param plotIdentifier
-     *            The plot for which the space is requested
      * @return A rectangle with the dimensions of the available space for the
      *         requested intervals
      * @throws IllegalArgumentException
@@ -175,13 +164,12 @@ public class ZoomManager implements ZoomControllerListener, PlotAreaSpaceListene
      *             interval or the given start frequency or end frequency fall
      *             outside the minimum and maximum frequency.
      */
-    public Rectangle getAvailableSpaceForInterval(Date startDate, Date endDate, int startFreq, int endFreq, long downloadId, String plotIdentifier) {
-        ZoomManagerData zmd = getZoomManagerData(plotIdentifier);
-        YValueModel yValueModel = yValueModelManager.getYValueModel(plotIdentifier);
+    public Rectangle getAvailableSpaceForInterval(Date startDate, Date endDate, int startFreq, int endFreq, long downloadId) {
+        YValueModel yValueModel = YValueModel.getSingletonInstance();
         synchronized (intervalLock) {
             if (currentInterval.containsPointInclusive(startDate) && currentInterval.containsPointInclusive(endDate) && (startFreq >= yValueModel.getAvailableYMin() && startFreq <= yValueModel.getAvailableYMax()) && (endFreq >= yValueModel.getAvailableYMin() && endFreq <= yValueModel.getAvailableYMax())) {
-                int height = zmd.getDisplaySize().height;
-                double ratio = 1.0 * zmd.getDisplaySize().getWidth() / (currentInterval.getEnd().getTime() - currentInterval.getStart().getTime());
+                int height = displaySize.height;
+                double ratio = 1.0 * displaySize.getWidth() / (currentInterval.getEnd().getTime() - currentInterval.getStart().getTime());
                 int width = (int) Math.round((endDate.getTime() - startDate.getTime()) * ratio);
                 return new Rectangle(width, height);
             } else {
@@ -217,12 +205,11 @@ public class ZoomManager implements ZoomControllerListener, PlotAreaSpaceListene
     public void selectedIntervalChanged(Interval<Date> newInterval, boolean keepFullValueSpace) {
         synchronized (intervalLock) {
             currentInterval = newInterval;
-            for (ZoomManagerData zmd : zoomManagerData.values()) {
-                for (ZoomDataConfig zdc : zmd.getZoomDataConfigMap().values()) {
-                    zdc.setMinX(newInterval.getStart());
-                    zdc.setMaxX(newInterval.getEnd());
-                    zdc.update();
-                }
+
+            for (ZoomDataConfig zdc : zoomDataConfigMap.values()) {
+                zdc.setMinX(newInterval.getStart());
+                zdc.setMaxX(newInterval.getEnd());
+                zdc.update();
             }
         }
     }
@@ -231,38 +218,34 @@ public class ZoomManager implements ZoomControllerListener, PlotAreaSpaceListene
     public void selectedResolutionChanged(API_RESOLUTION_AVERAGES newResolution) {
     }
 
-    private ZoomManagerData getZoomManagerData(String identifier) {
-        ZoomManagerData zwd = zoomManagerData.get(identifier);
-        if (zwd == null) {
-            zwd = new ZoomManagerData();
-            zoomManagerData.put(identifier, zwd);
-        }
-        return zwd;
-    }
-
     @Override
     public void plotAreaSpaceChanged(double scaledMinValue, double scaledMaxValue, double scaledMinTime, double scaledMaxTime, double scaledSelectedMinValue, double scaledSelectedMaxValue, double scaledSelectedMinTime, double scaledSelectedMaxTime, boolean forced) {
     }
 
     /**
      * Remove the zoom manager data from the zoom manager.
-     *
+     * 
      * @param downloadID
      *            The download identifier to remove from the zoom manager
      * @param plotIdentifier
      *            The plot identifier for which the download identifier should
      *            be removed
      */
-    public void removeZoomManagerDataConfig(long downloadID, String plotIdentifier) {
-        ZoomManagerData zmd = zoomManagerData.get(plotIdentifier);
-        if (zmd != null) {
-            Map<Long, ZoomDataConfig> zoomDataConfigMap = zmd.getZoomDataConfigMap();
-            plotAreaSpaceManager.getPlotAreaSpace(plotIdentifier).removePlotAreaSpaceListener(zoomDataConfigMap.get(downloadID));
-            zmd.getZoomDataConfigMap().remove(downloadID);
-        }
+    public void removeZoomManagerDataConfig(long downloadID) {
+        PlotAreaSpace.getSingletonInstance().removePlotAreaSpaceListener(zoomDataConfigMap.get(downloadID));
+        zoomDataConfigMap.remove(downloadID);
+
     }
 
     @Override
     public void availablePlotAreaSpaceChanged(double oldMinValue, double oldMaxValue, double oldMinTime, double oldMaxTime, double newMinValue, double newMaxValue, double newMinTime, double newMaxTime) {
+    }
+
+    public void addZoomManagerListener(ZoomManagerListener listener) {
+        listeners.add(listener);
+    }
+
+    public void removeZoomManagerListener(ZoomManagerListener listener) {
+        listeners.remove(listener);
     }
 }

@@ -26,11 +26,11 @@ public class PlotPanel extends JPanel {
     // Methods
     // //////////////////////////////////////////////////////////////////////////////
 
-    public PlotPanel(final String identifier, final String plotName) {
+    public PlotPanel(final String plotName) {
 
-        drawController = new EVEDrawController(identifier);
+        drawController = new EVEDrawController();
 
-        graphPane = new ChartDrawGraphPane(identifier);
+        graphPane = new ChartDrawGraphPane();
         initVisualComponents();
     }
 

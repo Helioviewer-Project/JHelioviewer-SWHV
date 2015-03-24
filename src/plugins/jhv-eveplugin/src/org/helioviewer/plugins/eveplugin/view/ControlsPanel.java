@@ -38,7 +38,6 @@ import org.helioviewer.plugins.eveplugin.view.linedataselector.LineDataSelectorE
 import org.helioviewer.plugins.eveplugin.view.linedataselector.LineDataSelectorModel;
 import org.helioviewer.plugins.eveplugin.view.linedataselector.LineDataSelectorModelListener;
 import org.helioviewer.plugins.eveplugin.view.linedataselector.LineDataSelectorPanel;
-import org.helioviewer.plugins.eveplugin.view.plot.PlotsContainerPanel;
 import org.helioviewer.viewmodel.view.View;
 import org.helioviewer.viewmodel.view.jp2view.JHVJPXView;
 
@@ -412,7 +411,7 @@ public class ControlsPanel extends JPanel implements ActionListener, LayersListe
 
     @Override
     public void lineDataRemoved(LineDataSelectorElement element) {
-        if (LineDataSelectorModel.getSingletonInstance().getNumberOfAvailableLineData(PlotsContainerPanel.PLOT_IDENTIFIER_MASTER) == 0) {
+        if (LineDataSelectorModel.getSingletonInstance().getNumberOfAvailableLineData() == 0) {
             zoomComboBox.setEnabled(false);
         }
     }

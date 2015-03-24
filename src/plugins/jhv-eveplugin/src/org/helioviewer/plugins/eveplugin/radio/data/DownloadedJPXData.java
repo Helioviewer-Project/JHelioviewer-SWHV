@@ -24,19 +24,17 @@ public class DownloadedJPXData implements ViewListener {
     private Long imageID;
     private Date startDate;
     private Date endDate;
-    private String plotIdentifier;
     private final RadioDataManager radioDataManager;
     private final Long downloadID;
     private SwingWorker<DownloadedJPXDataWorkerResult, Void> worker;
     private int workernumber;
 
-    public DownloadedJPXData(ImageInfoView view, Long imageID, Date startDate, Date endDate, String plotIdentifier, Long downloadID) {
+    public DownloadedJPXData(ImageInfoView view, Long imageID, Date startDate, Date endDate, Long downloadID) {
         super();
         this.view = view;
         this.imageID = imageID;
         this.startDate = startDate;
         this.endDate = endDate;
-        this.plotIdentifier = plotIdentifier;
         radioDataManager = RadioDataManager.getSingletonInstance();
         this.downloadID = downloadID;
         view.addViewListener(this);
@@ -73,14 +71,6 @@ public class DownloadedJPXData implements ViewListener {
 
     public void setEndDate(Date endDate) {
         this.endDate = endDate;
-    }
-
-    public String getPlotIdentifier() {
-        return plotIdentifier;
-    }
-
-    public void setPlotIdentifier(String plotIdentifier) {
-        this.plotIdentifier = plotIdentifier;
     }
 
     @Override

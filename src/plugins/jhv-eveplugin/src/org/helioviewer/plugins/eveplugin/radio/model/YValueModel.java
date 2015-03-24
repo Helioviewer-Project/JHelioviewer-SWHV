@@ -5,7 +5,6 @@ package org.helioviewer.plugins.eveplugin.radio.model;
 
 import org.helioviewer.plugins.eveplugin.model.PlotAreaSpace;
 import org.helioviewer.plugins.eveplugin.model.PlotAreaSpaceListener;
-import org.helioviewer.plugins.eveplugin.model.PlotAreaSpaceManager;
 
 /**
  * Keeps the y value information for one plot identifier.
@@ -29,11 +28,20 @@ public class YValueModel implements PlotAreaSpaceListener {
     /** The plot area space corresponding with the y-value model */
     private final PlotAreaSpace pas;
 
+    private static YValueModel singletonInstance;
+
     /**
      * Constructor
      */
-    public YValueModel(String plotIdentifier) {
-        pas = PlotAreaSpaceManager.getInstance().getPlotAreaSpace(plotIdentifier);
+    private YValueModel() {
+        pas = PlotAreaSpace.getSingletonInstance();
+    }
+
+    public static YValueModel getSingletonInstance() {
+        if (singletonInstance == null) {
+            singletonInstance = new YValueModel();
+        }
+        return singletonInstance;
     }
 
     /**
@@ -117,9 +125,7 @@ public class YValueModel implements PlotAreaSpaceListener {
      * PlotAreaSpaceListener
      */
     @Override
-    public void plotAreaSpaceChanged(double scaledMinValue, double scaledMaxValue, double scaledMinTime, double scaledMaxTime,
-            double scaledSelectedMinValue, double scaledSelectedMaxValue, double scaledSelectedMinTime, double scaledSelectedMaxTime,
-            boolean forced) {
+    public void plotAreaSpaceChanged(double scaledMinValue, double scaledMaxValue, double scaledMinTime, double scaledMaxTime, double scaledSelectedMinValue, double scaledSelectedMaxValue, double scaledSelectedMinTime, double scaledSelectedMaxTime, boolean forced) {
         double scaledDiff = scaledMaxValue - scaledMinValue;
         double absDiff = availableYMax - availableYMin;
         double freqPerScaled = absDiff / scaledDiff;
@@ -140,8 +146,7 @@ public class YValueModel implements PlotAreaSpaceListener {
     }
 
     @Override
-    public void availablePlotAreaSpaceChanged(double oldMinValue, double oldMaxValue, double oldMinTime, double oldMaxTime,
-            double newMinValue, double newMaxValue, double newMinTime, double newMaxTime) {
+    public void availablePlotAreaSpaceChanged(double oldMinValue, double oldMaxValue, double oldMinTime, double oldMaxTime, double newMinValue, double newMaxValue, double newMinTime, double newMaxTime) {
         // TODO Auto-generated method stub
 
     }
