@@ -57,7 +57,7 @@ import org.helioviewer.viewmodel.view.LinkedMovieManager;
 import org.helioviewer.viewmodel.view.jp2view.datetime.ImmutableDateTime;
 
 /**
- *
+ * 
  * @author Stephan Pagel
  * */
 public class ChartDrawGraphPane extends JComponent implements MouseInputListener, ComponentListener, DrawControllerListener, ChartModelListener, MouseWheelListener, WindowFocusListener {
@@ -93,6 +93,9 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
     private boolean reschedule = false;
     private Point mousePosition;
     private boolean mouseOverEvent;
+    private int lastWidth;
+    private int lastHeight;
+    private BufferedImage screenTempImage;
 
     // //////////////////////////////////////////////////////////////////////////////
     // Methods
@@ -165,7 +168,10 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
         int height = screenfactor * getHeight();
 
         if (width > 0 && height > 0 && screenfactor * (ChartConstants.getGraphTopSpace() + ChartConstants.getGraphBottomSpace() + 1) < height && screenfactor * (ChartConstants.getGraphLeftSpace() + ChartConstants.getGraphRightSpace() + 1) < width) {
-            BufferedImage screenTempImage = new BufferedImage(width, height, BufferedImage.OPAQUE);
+            if (width != lastWidth && height != lastHeight) {
+                screenTempImage = new BufferedImage(width, height, BufferedImage.OPAQUE);
+                screenImage = new BufferedImage(width, height, BufferedImage.OPAQUE);
+            }
             final Graphics2D g = screenTempImage.createGraphics();
             AffineTransform tf = g.getTransform();
             tf.preConcatenate(AffineTransform.getScaleInstance(screenfactor, screenfactor));
@@ -181,6 +187,11 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
             drawData(gplotPart, g, gleftAxisPart, mousePosition);
             // drawZoomBox(g);
             screenImage = screenTempImage;
+            lastWidth = width;
+            lastHeight = height;
+            BufferedImage screenTempTempImage = screenImage;
+            screenImage = screenTempImage;
+            screenTempImage = screenTempTempImage;
         }
         this.repaint();
         // Log.info("Run time: " + (System.currentTimeMillis() - start));
@@ -884,11 +895,11 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
                 }
                 if (startValue <= endValue /* && startTime <= endTime */&& startValue >= myPlotAreaSpace.getScaledMinValue() && startValue <= myPlotAreaSpace.getScaledMaxValue() && endValue >= myPlotAreaSpace.getScaledMinValue() && endValue <= myPlotAreaSpace.getScaledMaxValue() // &&
 
-                        // startTime >= myPlotAreaSpace.getScaledMinTime()
-                        // && endTime <= myPlotAreaSpace.getScaledMaxTime() && startTime
-                        // <= myPlotAreaSpace.getScaledMaxTime()
-                        // && endTime >= myPlotAreaSpace.getScaledMinTime()) {
-                        ) {
+                // startTime >= myPlotAreaSpace.getScaledMinTime()
+                // && endTime <= myPlotAreaSpace.getScaledMaxTime() && startTime
+                // <= myPlotAreaSpace.getScaledMaxTime()
+                // && endTime >= myPlotAreaSpace.getScaledMinTime()) {
+                ) {
                     myPlotAreaSpace.setScaledSelectedTimeAndValue(startTime, endTime, startValue, endValue);
                 }
             }
