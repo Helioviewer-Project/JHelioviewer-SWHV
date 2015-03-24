@@ -37,7 +37,6 @@ public class ChangeEvent {
         // initialize global objects
         history = new LinkedList<ChangedReason>();
         availableChangeReasons = new HashSet<Class<? extends ChangedReason>>();
-
         // assign an unique id of the object
         changeEventID = getNextID();
     }
@@ -80,7 +79,7 @@ public class ChangeEvent {
      * 
      * @return New unique change event id.
      * */
-    private synchronized static long getNextID() {
+    private static long getNextID() {
         return ++changeEventIDCounter;
     }
 
@@ -96,17 +95,14 @@ public class ChangeEvent {
      * @see #hashCode()
      */
 
-    synchronized public boolean equals(Object obj) {
+    public boolean equals(Object obj) {
         if (obj == null)
             return false;
-
         if (obj == this)
             return true;
-
         if (obj instanceof ChangeEvent) {
             return this.changeEventID == ((ChangeEvent) obj).changeEventID;
         }
-
         return false;
     }
 
@@ -118,7 +114,7 @@ public class ChangeEvent {
      * @see #equals(Object)
      * */
 
-    synchronized public int hashCode() {
+    public int hashCode() {
         return (int) (changeEventID ^ (changeEventID >>> 32));
     }
 
@@ -131,11 +127,10 @@ public class ChangeEvent {
      *            A change reason which should be added to the change event
      *            container.
      * */
-    synchronized public void addReason(ChangedReason aReason) {
+    public void addReason(ChangedReason aReason) {
         if (aReason != null) {
             // add reason type to hash
             availableChangeReasons.add(aReason.getClass());
-
             // add reason to history
             history.addFirst(aReason);
         }
@@ -147,7 +142,7 @@ public class ChangeEvent {
      * @return the latest added change reason or null if no change reason is
      *         available.
      * */
-    synchronized public ChangedReason getLatestReason() {
+    public ChangedReason getLatestReason() {
         return history.getFirst();
     }
 
@@ -164,7 +159,7 @@ public class ChangeEvent {
      *         Checks if the ChangeReason class (type) exists in the change
      *         event and returns a boolean value.
      * */
-    synchronized public <T extends ChangedReason> boolean reasonOccurred(Class<T> aReasonClass) {
+    public <T extends ChangedReason> boolean reasonOccurred(Class<T> aReasonClass) {
         return availableChangeReasons.contains(aReasonClass);
     }
 
@@ -180,13 +175,12 @@ public class ChangeEvent {
      * @see #getLastChangedReasonByTypeAndView(Class, View)
      */
     @SuppressWarnings(value = { "unchecked" })
-    synchronized public <T extends ChangedReason> T getLastChangedReasonByType(Class<T> aReasonClass) {
+    public <T extends ChangedReason> T getLastChangedReasonByType(Class<T> aReasonClass) {
         // go through history from latest to eldest entry
         for (ChangedReason r : history) {
             if (aReasonClass.isInstance(r))
                 return (T) r;
         }
-
         return null;
     }
 
@@ -204,13 +198,12 @@ public class ChangeEvent {
      * @see #getLastChangedReasonByType(Class)
      */
     @SuppressWarnings(value = { "unchecked" })
-    synchronized public <T extends ChangedReason> T getLastChangedReasonByTypeAndView(Class<T> aReasonClass, View view) {
+    public <T extends ChangedReason> T getLastChangedReasonByTypeAndView(Class<T> aReasonClass, View view) {
         // go through history from latest to eldest entry
         for (ChangedReason r : history) {
             if (aReasonClass.isInstance(r) && r.getView() == view)
                 return (T) r;
         }
-
         return null;
     }
 
@@ -226,7 +219,7 @@ public class ChangeEvent {
      *         empty, but is never null.
      */
     @SuppressWarnings("unchecked")
-    synchronized public <T extends ChangedReason> List<T> getAllChangedReasonsByType(Class<T> aReasonClass) {
+    public <T extends ChangedReason> List<T> getAllChangedReasonsByType(Class<T> aReasonClass) {
         LinkedList<T> outputList = new LinkedList<T>();
 
         for (ChangedReason r : history) {
@@ -234,21 +227,20 @@ public class ChangeEvent {
                 outputList.addFirst((T) r);
             }
         }
-
         return outputList;
     }
 
-    public synchronized void reinitialize() {
+    public void reinitialize() {
         history.clear();
         availableChangeReasons.clear();
         changeEventID = getNextID();
     }
 
-    public synchronized boolean isEmpty() {
+    public boolean isEmpty() {
         return history.isEmpty() && availableChangeReasons.isEmpty();
     }
 
-    public synchronized ChangeEvent clone() {
+    public ChangeEvent clone() {
         ChangeEvent res = new ChangeEvent();
         res.history.addAll(history);
         res.availableChangeReasons.addAll(availableChangeReasons);
@@ -256,11 +248,11 @@ public class ChangeEvent {
         return res;
     }
 
-    public synchronized String toString() {
+    public String toString() {
         return availableChangeReasons.toString();
     }
 
-    public synchronized void copyFrom(ChangeEvent event) {
+    public void copyFrom(ChangeEvent event) {
         if (event != null) {
             this.history.addAll(event.history);
             this.availableChangeReasons.addAll(event.availableChangeReasons);
