@@ -34,7 +34,7 @@ public class RenderableContainerPanel extends JPanel {
     GridBagConstraints gc = new GridBagConstraints();
     private final JPanel optionsPanelWrapper;
 
-    public RenderableContainerPanel(RenderableContainer renderableContainer) {
+    public RenderableContainerPanel(final RenderableContainer renderableContainer) {
         this.setLayout(new GridBagLayout());
         gc.gridx = 0;
         gc.gridy = 0;
@@ -79,7 +79,7 @@ public class RenderableContainerPanel extends JPanel {
 
             /**
              * Handle with right-click menus
-             *
+             * 
              * @param e
              */
             public void handlePopup(MouseEvent e) {
@@ -114,8 +114,8 @@ public class RenderableContainerPanel extends JPanel {
         grid.setDropMode(DropMode.INSERT_ROWS);
         grid.setTransferHandler(new TableRowTransferHandler(grid));
 
-        this.optionsPanelWrapper = new JPanel();
-        this.optionsPanelWrapper.setBorder(BorderFactory.createTitledBorder("Options"));
+        optionsPanelWrapper = new JPanel();
+        optionsPanelWrapper.setBorder(BorderFactory.createTitledBorder("Options"));
         optionsPanelWrapper.add(optionsPanel);
         gc.gridy = 1;
         add(optionsPanelWrapper, gc);
