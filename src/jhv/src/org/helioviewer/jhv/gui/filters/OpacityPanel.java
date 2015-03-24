@@ -8,6 +8,7 @@ import javax.swing.JSlider;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
+import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.gui.components.base.WheelSupport;
 import org.helioviewer.viewmodel.view.jp2view.JHVJP2View;
 import org.helioviewer.viewmodelplugin.filter.FilterAlignmentDetails;
@@ -66,6 +67,7 @@ public class OpacityPanel extends AbstractFilterPanel implements ChangeListener,
     public void stateChanged(ChangeEvent e) {
         jp2view.setOpacity(opacitySlider.getValue() / 100.f);
         opacityLabel.setText(opacitySlider.getValue() + "%");
+        Displayer.display();
     }
 
     @Override

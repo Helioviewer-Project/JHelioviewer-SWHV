@@ -11,6 +11,7 @@ import javax.swing.JCheckBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 
+import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.viewmodel.imagedata.ColorMask;
 import org.helioviewer.viewmodel.view.jp2view.JHVJP2View;
 import org.helioviewer.viewmodelplugin.filter.FilterAlignmentDetails;
@@ -77,6 +78,7 @@ public class ChannelMixerPanel extends AbstractFilterPanel implements ItemListen
     @Override
     public void itemStateChanged(ItemEvent e) {
         jp2view.setColorMask(redCheckBox.isSelected(), greenCheckBox.isSelected(), blueCheckBox.isSelected());
+        Displayer.display();
     }
 
     @Override
