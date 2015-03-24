@@ -225,7 +225,6 @@ public class RadioDataManager implements RadioDownloaderListener {
      *            The identifier of the plot for which new data is requested
      */
     public void requestForData(Date xStart, Date xEnd, double yStart, double yEnd, double xRatio, double yRatio, List<Long> iDs, String plotIdentifier) {
-        Long start = System.currentTimeMillis();
         if (!eveState.isMouseTimeIntervalDragging() && !eveState.isMouseValueIntervalDragging()) {
             if (!requestBuffer.hasData() && !requestForDataBusy) {
                 requestForDataBusy = true;
@@ -239,7 +238,6 @@ public class RadioDataManager implements RadioDownloaderListener {
                 requestBuffer.addRequestConfig(new RequestConfig(xStart, xEnd, yStart, yEnd, xRatio, yRatio, iDs));
             }
         }
-        Log.debug("Request for data took : " + (System.currentTimeMillis() - start));
     }
 
     /**
