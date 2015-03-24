@@ -92,19 +92,13 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
     private boolean reschedule = false;
     private Point mousePosition;
     private boolean mouseOverEvent;
-<<<<<<< HEAD
     private int lastWidth;
     private int lastHeight;
     private BufferedImage screenTempImage;
-=======
     private final long created;
     private long drawLabelsOperarionTime;
-<<<<<<< HEAD
->>>>>>> Some debug info
-=======
     private boolean updateRequestReceived;
     private final Timer timer;
->>>>>>> Implement timer functionality in eve plugin
 
     // //////////////////////////////////////////////////////////////////////////////
     // Methods
