@@ -36,7 +36,6 @@ import javax.swing.JComponent;
 import javax.swing.SwingWorker;
 import javax.swing.event.MouseInputListener;
 
-import org.helioviewer.base.logging.Log;
 import org.helioviewer.base.math.Interval;
 import org.helioviewer.jhv.data.datatype.event.JHVEvent;
 import org.helioviewer.jhv.data.guielements.SWEKEventInformationDialog;
@@ -845,8 +844,6 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
             if (!TimeIntervalLockModel.getInstance().isLocked()) {
                 if (updateMovieLineInformation()) {
                     updateGraph();
-                } else {
-                    Log.debug("Movieline not in view no redraw");
                 }
             }
         }
