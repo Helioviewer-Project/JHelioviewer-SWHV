@@ -20,8 +20,8 @@ import com.jogamp.opengl.util.awt.TextRenderer;
 
 public class RenderableGrid implements Renderable {
 
-    private double lonstepDegrees;
-    private double latstepDegrees;
+    private double lonstepDegrees = 13.2;
+    private double latstepDegrees = 20.;
     private final int lineres = 120;
     private final float scale = .8f;
     private Font font;
@@ -37,11 +37,10 @@ public class RenderableGrid implements Renderable {
     private final String name = "Grid";
     private boolean isVisible = true;
 
-    public RenderableGrid(RenderableType renderableType, double lonstepDegrees, double latstepDegrees, boolean followCamera) {
+    public RenderableGrid(RenderableType renderableType, boolean followCamera) {
         this.renderableType = renderableType;
         this.followCamera = followCamera;
-        this.lonstepDegrees = lonstepDegrees;
-        this.latstepDegrees = latstepDegrees;
+
         InputStream is = FileUtils.getResourceInputStream("/fonts/DroidSans-Bold.ttf");
         try {
             font = Font.createFont(Font.TRUETYPE_FONT, is);
@@ -89,7 +88,7 @@ public class RenderableGrid implements Renderable {
         gl.glColor3f((float) (firstColor.getRed() / 255.), (float) (firstColor.getGreen() / 255.), (float) (firstColor.getBlue() / 255.));
 
         double phi = Math.PI / 2.;
-        double latstep = latstepDegrees / 180. * Math.PI;
+        double latstep = getLatstepDegrees() / 180. * Math.PI;
         for (; phi < Math.PI; phi = phi + latstep) {
             gl.glBegin(GL2.GL_LINE_LOOP);
             for (int i = 0; i <= lineres; i++) {
@@ -139,7 +138,7 @@ public class RenderableGrid implements Renderable {
 
         //longitude positive
         double theta = 0.;
-        double lonstep = lonstepDegrees / 180. * Math.PI;
+        double lonstep = getLonstepDegrees() / 180. * Math.PI;
         for (; theta <= Math.PI; theta = theta + lonstep) {
             gl.glBegin(GL2.GL_LINE_STRIP);
             for (int i = 0; i <= lineres; i++) {
@@ -193,7 +192,7 @@ public class RenderableGrid implements Renderable {
         double zdist = 0.0;
         renderer.setColor(Color.WHITE);
         renderer.begin3DRendering();
-        for (double phi = 0; phi <= 90; phi = phi + this.latstepDegrees) {
+        for (double phi = 0; phi <= 90; phi = phi + this.getLatstepDegrees()) {
             double angle = (90 - phi) * Math.PI / 180.;
             String txt = String.format("%.1f", phi);
             if (txt.substring(txt.length() - 1, txt.length()).equals("0")) {
@@ -204,7 +203,7 @@ public class RenderableGrid implements Renderable {
                 renderer.draw3D(txt, (float) (-Math.sin(angle) * size - scale * 0.03f * txt.length() * 20. / font.getSize()), (float) (Math.cos(angle) * size - scale * 0.02f * 20. / font.getSize()), (float) zdist, scale * 0.08f / font.getSize());
             }
         }
-        for (double phi = -this.latstepDegrees; phi >= -90; phi = phi - this.latstepDegrees) {
+        for (double phi = -this.getLatstepDegrees(); phi >= -90; phi = phi - this.getLatstepDegrees()) {
             double angle = (90 - phi) * Math.PI / 180.;
             String txt = String.format("%.1f", phi);
             if (txt.substring(txt.length() - 1, txt.length()).equals("0")) {
@@ -219,7 +218,7 @@ public class RenderableGrid implements Renderable {
 
         size = Constants.SunRadius * 1.02;
 
-        for (double theta = 0; theta <= 180.; theta = theta + this.lonstepDegrees) {
+        for (double theta = 0; theta <= 180.; theta = theta + this.getLonstepDegrees()) {
             String txt = String.format("%.1f", theta);
             if (txt.substring(txt.length() - 1, txt.length()).equals("0")) {
                 txt = txt.substring(0, txt.length() - 2);
@@ -234,7 +233,7 @@ public class RenderableGrid implements Renderable {
             renderer.end3DRendering();
             gl.glPopMatrix();
         }
-        for (double theta = -this.lonstepDegrees; theta > -180.; theta = theta - this.lonstepDegrees) {
+        for (double theta = -this.getLonstepDegrees(); theta > -180.; theta = theta - this.getLonstepDegrees()) {
             String txt = String.format("%.1f", theta);
             if (txt.substring(txt.length() - 1, txt.length()).equals("0")) {
                 txt = txt.substring(0, txt.length() - 2);
@@ -269,14 +268,6 @@ public class RenderableGrid implements Renderable {
         return optionsPanel;
     }
 
-    public void setGridResolutionY(Double lonstepDegrees) {
-        this.lonstepDegrees = lonstepDegrees;
-    }
-
-    public void setGridResolutionX(Double value) {
-        this.latstepDegrees = lonstepDegrees;
-    }
-
     @Override
     public String getName() {
         return name;
@@ -290,5 +281,21 @@ public class RenderableGrid implements Renderable {
     @Override
     public void setVisible(boolean isVisible) {
         this.isVisible = isVisible;
+    }
+
+    public double getLonstepDegrees() {
+        return lonstepDegrees;
+    }
+
+    public void setLonstepDegrees(double lonstepDegrees) {
+        this.lonstepDegrees = lonstepDegrees;
+    }
+
+    public double getLatstepDegrees() {
+        return latstepDegrees;
+    }
+
+    public void setLatstepDegrees(double latstepDegrees) {
+        this.latstepDegrees = latstepDegrees;
     }
 }

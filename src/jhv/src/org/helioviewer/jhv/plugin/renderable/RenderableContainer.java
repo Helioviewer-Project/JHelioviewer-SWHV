@@ -23,10 +23,10 @@ public class RenderableContainer extends DefaultTableModel implements Reorderabl
         RenderableSolarAxesType solarAxesType = new RenderableSolarAxesType("Solar Axes");
         addRenderable(new RenderableSolarAxes(solarAxesType));
         RenderableSolarAxesType gridType = new RenderableSolarAxesType("Grids");
-        addRenderable(new RenderableGrid(gridType, 20, 20, false));
+        addRenderable(new RenderableGrid(gridType, false));
 
         addRenderable(new RenderableSolarAxes(solarAxesType));
-        addRenderable(new RenderableGrid(gridType, 20, 20, false));
+        addRenderable(new RenderableGrid(gridType, false));
 
     }
 
