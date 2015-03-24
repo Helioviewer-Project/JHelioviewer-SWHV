@@ -100,6 +100,7 @@ public class DownloadedJPXData implements ViewListener {
             @Override
             protected DownloadedJPXDataWorkerResult doInBackground() {
                 Thread.currentThread().setName("DownloadedJPXDataWorkerResult1--EVE");
+                Log.debug("Event " + aEvent);
                 return getJPXData(sender);
             }
 
