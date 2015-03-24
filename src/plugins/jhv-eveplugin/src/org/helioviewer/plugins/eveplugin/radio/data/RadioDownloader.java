@@ -170,9 +170,6 @@ public class RadioDownloader {
     }
 
     public void requestAndOpenIntervals(List<Interval<Date>> intervals, final Long downloadId, final String plotIdentifier, final double ratioX, final double ratioY) {
-        Log.debug("Current thread : " + Thread.currentThread().getName());
-        Log.debug("request for intervals " + intervals.size());
-
         final List<Date> toDownloadStartDates = new ArrayList<Date>();
         for (final Interval<Date> interval : intervals) {
             Date startDate = interval.getStart();
