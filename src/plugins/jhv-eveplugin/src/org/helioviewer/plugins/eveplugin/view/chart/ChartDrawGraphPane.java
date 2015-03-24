@@ -155,25 +155,8 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
     }
 
     private void timerRedrawGraph() {
-        // Log.debug("Update graph : " + Thread.currentThread().getName());
-        // Thread.dumpStack();
-        if (currentSwingWorker != null && !currentSwingWorker.isDone()) {
-            // Log.debug("Reschedule");
-            reschedule = true;
-            return;
-        }
-        // Log.debug("Create swingworker");
-        currentSwingWorker = new SwingWorker<Integer, Integer>() {
-            @Override
-            public Integer doInBackground() {
-                // Thread.currentThread().setName("ChartdrawGraph--EVE");
-                // Log.debug("do in background");
-                updateDrawInformation();
-                redrawGraph();
-                return 1;
-            }
-        };
-        currentSwingWorker.execute();
+        updateDrawInformation();
+        redrawGraph();
     }
 
     private void redrawGraph() {
@@ -712,7 +695,7 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
         }
         if (mouseOverEvent && (eventModel.getEventAtPosition(new Point(e.getPoint().x - ChartConstants.getGraphLeftSpace(), e.getPoint().y - ChartConstants.getGraphTopSpace())) == null)) {
             mouseOverEvent = false;
-            redrawGraph();
+            updateGraph();
         }
     }
 
