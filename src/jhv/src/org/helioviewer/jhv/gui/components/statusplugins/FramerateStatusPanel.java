@@ -3,8 +3,9 @@ package org.helioviewer.jhv.gui.components.statusplugins;
 import java.awt.Dimension;
 
 import javax.swing.BorderFactory;
+import javax.swing.JLabel;
 
-import org.helioviewer.jhv.layers.LayersModel;
+import org.helioviewer.jhv.gui.interfaces.StatusPanelPlugin;
 
 /**
  * Status panel for displaying the framerate for image series.
@@ -17,38 +18,29 @@ import org.helioviewer.jhv.layers.LayersModel;
  * 
  * @author Markus Langenberg
  */
-public class FramerateStatusPanel extends ViewStatusPanelPlugin {
+public class FramerateStatusPanel extends JLabel implements StatusPanelPlugin {
 
     private static final long serialVersionUID = 1L;
+    private static final FramerateStatusPanel instance = new FramerateStatusPanel();
 
     /**
      * Default constructor.
      */
-    public FramerateStatusPanel() {
+    private FramerateStatusPanel() {
         setBorder(BorderFactory.createEtchedBorder());
 
         setPreferredSize(new Dimension(70, 20));
         setText("fps:");
 
         setVisible(true);
-        LayersModel.getSingletonInstance().addLayersListener(this);
     }
 
-    private void updateFramerate() {
-        int idx = LayersModel.getSingletonInstance().getActiveLayer();
-        if (LayersModel.getSingletonInstance().isValidIndex(idx)) {
-            double fps = LayersModel.getSingletonInstance().getFPS(idx);
-            String fpsString = Double.toString(fps);
-
-            setVisible(true);
-            setText("fps: " + fpsString);
-        } else {
-            setVisible(false);
-        }
+    public static FramerateStatusPanel getSingletonInstance() {
+        return instance;
     }
 
-    public void activeLayerChanged(int idx) {
-        updateFramerate();
+    public void updateFramerate(double fps) {
+        setText("fps: " + Double.toString(fps));
     }
 
 }
