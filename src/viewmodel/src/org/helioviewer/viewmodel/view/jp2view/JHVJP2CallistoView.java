@@ -3,7 +3,6 @@ package org.helioviewer.viewmodel.view.jp2view;
 import java.awt.Dimension;
 import java.util.Date;
 
-import org.helioviewer.base.logging.Log;
 import org.helioviewer.base.math.Interval;
 import org.helioviewer.viewmodel.changeevent.ChangeEvent;
 import org.helioviewer.viewmodel.changeevent.ViewportChangedReason;
@@ -99,7 +98,8 @@ public class JHVJP2CallistoView extends JHVJP2View {
         SubImage subImage = new SubImage((int) (1.0 * region.getCornerX() / maxWidth * res.getResolutionBounds().width), (int) (1.0 * region.getCornerY() / maxHeight * res.getResolutionBounds().height), (int) (1.0 * region.getWidth() / maxWidth * res.getResolutionBounds().width), (int) (1.0 * region.getHeight() / maxHeight * res.getResolutionBounds().height));
         // subImageBuffer.putSubImage(subImage, region);
 
-        Log.debug("SubImage : " + subImage + ", resolutionLevel: " + res + " quality layers " + getCurrentNumQualityLayers());
+        // Log.debug("SubImage : " + subImage + ", resolutionLevel: " + res +
+        // " quality layers " + getCurrentNumQualityLayers());
 
         return new JP2ImageParameter(subImage, res, getCurrentNumQualityLayers(), 0);
     }
