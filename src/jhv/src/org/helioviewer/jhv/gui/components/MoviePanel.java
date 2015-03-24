@@ -47,7 +47,6 @@ import org.helioviewer.viewmodel.changeevent.ChangeEvent;
 import org.helioviewer.viewmodel.changeevent.LayerChangedReason;
 import org.helioviewer.viewmodel.changeevent.LayerChangedReason.LayerChangeType;
 import org.helioviewer.viewmodel.changeevent.PlayStateChangedReason;
-import org.helioviewer.viewmodel.changeevent.SubImageDataChangedReason;
 import org.helioviewer.viewmodel.metadata.ObserverMetaData;
 import org.helioviewer.viewmodel.view.CachedMovieView;
 import org.helioviewer.viewmodel.view.MetaDataView;
@@ -584,16 +583,6 @@ public class MoviePanel extends JPanel implements ActionListener, ChangeListener
             linkedMovieManager.unlinkMoviePanel(this);
             panelList.remove(this);
             return;
-        }
-
-        // Update time slider and linked frames
-        SubImageDataChangedReason subImageDataChangedReason = aEvent.getLastChangedReasonByTypeAndView(SubImageDataChangedReason.class, view);
-        if (subImageDataChangedReason != null) {
-            if (!isDragging) {
-                //Thread.dumpStack();
-                //Log.debug(view.getCurrentFrameNumber());
-                timeSlider.setValue(view.getCurrentFrameNumber());
-            }
         }
 
         // Update start-stop-button. In animation mode "stop", it has to change
