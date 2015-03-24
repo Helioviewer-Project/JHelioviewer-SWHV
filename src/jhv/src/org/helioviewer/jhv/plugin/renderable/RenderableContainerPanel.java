@@ -97,7 +97,7 @@ public class RenderableContainerPanel extends JPanel {
                 RenderableContainer model = (RenderableContainer) grid.getModel();
 
                 if (col == VISIBLEROW) {
-                    Renderable renderable = (Renderable) renderableContainer.getValueAt(row, col);
+                    Renderable renderable = (Renderable) Displayer.getRenderablecontainer().getValueAt(row, col);
                     renderable.setVisible(!renderable.isVisible());
                     model.fireTableCellUpdated(row, col);
                     Displayer.display();
