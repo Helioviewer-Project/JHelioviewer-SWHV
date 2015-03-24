@@ -7,7 +7,6 @@ import java.nio.IntBuffer;
 import java.util.ArrayList;
 
 import javax.media.opengl.GL2;
-import javax.swing.JPanel;
 
 import org.helioviewer.base.math.Pair;
 import org.helioviewer.base.physics.Constants;
@@ -17,6 +16,7 @@ import org.helioviewer.gl3d.math.GL3DQuatd;
 import org.helioviewer.gl3d.math.GL3DVec3d;
 import org.helioviewer.gl3d.scenegraph.GL3DState;
 import org.helioviewer.jhv.display.Displayer;
+import org.helioviewer.jhv.gui.ImageViewerGui;
 import org.helioviewer.jhv.gui.states.StateController;
 import org.helioviewer.jhv.gui.states.ViewStateEnum;
 import org.helioviewer.jhv.layers.LayersModel;
@@ -281,8 +281,6 @@ public class GL3DImageLayer implements Renderable {
         deletePositionVBO(state);
         deleteIndexVBO(state);
         LayersModel.getSingletonInstance().removeLayer(mainLayerView);
-        System.out.println(mainLayerView);
-
     }
 
     private Pair<FloatBuffer, IntBuffer> makeIcosphere(int level) {
@@ -404,7 +402,9 @@ public class GL3DImageLayer implements Renderable {
 
     @Override
     public Component getOptionsPanel() {
-        return new JPanel();
+        ImageViewerGui ivg = ImageViewerGui.getSingletonInstance();
+        ivg.getFilterTabPanelManager().setActivejp2(mainLayerView);
+        return ivg.getFilterPanelContainer();
     }
 
     @Override
@@ -420,6 +420,11 @@ public class GL3DImageLayer implements Renderable {
     @Override
     public String getName() {
         return mainLayerView.getName();
+    }
+
+    @Override
+    public String getTimeString() {
+        return mainLayerView.getMetaData().getDateTime().getFormattedDate();
     }
 
 }

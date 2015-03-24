@@ -67,4 +67,9 @@ public class RenderableSolarAxes implements Renderable {
     public void setVisible(boolean isVisible) {
         this.isVisible = isVisible;
     }
+
+    @Override
+    public String getTimeString() {
+        return "";
+    }
 }

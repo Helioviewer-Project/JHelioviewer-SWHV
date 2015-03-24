@@ -22,4 +22,6 @@ public interface Renderable {
 
     public void setVisible(boolean b);
 
+    public String getTimeString();
+
 }

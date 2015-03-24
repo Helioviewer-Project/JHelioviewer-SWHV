@@ -109,6 +109,8 @@ public class ImageViewerGui {
 
     private ComponentView mainComponentView;
 
+    private FilterTabPanelManager filterTabPanelManager;
+
     /**
      * The private constructor that creates and positions all the gui
      * components.
@@ -310,20 +312,20 @@ public class ImageViewerGui {
             // Layer control
             imageSelectorPanel = new ImageSelectorPanel();
 
-            leftPane.add("Image Layers", imageSelectorPanel, true);
+            leftPane.add("Image Layers", imageSelectorPanel, false);
 
             // Image adjustments and filters
-            FilterTabPanelManager compactPanelManager = new FilterTabPanelManager();
-            compactPanelManager.add(new OpacityPanel());
-            compactPanelManager.add(new SOHOLUTPanel());
-            compactPanelManager.add(new GammaCorrectionPanel());
-            compactPanelManager.add(new ContrastPanel());
-            compactPanelManager.add(new SharpenPanel());
-            compactPanelManager.add(new ChannelMixerPanel());
+            filterTabPanelManager = new FilterTabPanelManager();
+            getFilterTabPanelManager().add(new OpacityPanel());
+            getFilterTabPanelManager().add(new SOHOLUTPanel());
+            getFilterTabPanelManager().add(new GammaCorrectionPanel());
+            getFilterTabPanelManager().add(new ContrastPanel());
+            getFilterTabPanelManager().add(new SharpenPanel());
+            getFilterTabPanelManager().add(new ChannelMixerPanel());
             RunningDifferencePanel runningDifferencePanel = new RunningDifferencePanel();
-            compactPanelManager.addAbstractFilterPanel(runningDifferencePanel);
+            getFilterTabPanelManager().addAbstractFilterPanel(runningDifferencePanel);
 
-            JPanel compactPanel = compactPanelManager.createCompactPanel();
+            JPanel compactPanel = getFilterTabPanelManager().createCompactPanel();
 
             JTabbedPane tab = new JTabbedPane();
             tab.addTab("Color", compactPanel);
@@ -334,8 +336,8 @@ public class ImageViewerGui {
             filterPanelContainer = new ControlPanelContainer();
             filterPanelContainer.setDefaultPanel(tab);
 
-            leftPane.add("Image Adjustments", filterPanelContainer, false);
-            leftPane.add("Renderable", Displayer.getRenderableContainerPanel(), false);
+            //leftPane.add("Image Adjustments", filterPanelContainer, false);
+            leftPane.add("Renderable", Displayer.getRenderableContainerPanel(), true);
 
             JTabbedPane cameraTab = new JTabbedPane();
             cameraOptionsPanel = new GL3DCameraOptionsPanel();
@@ -624,6 +626,10 @@ public class ImageViewerGui {
 
     public ObservationDialog getObservationDialog() {
         return this.observationDialog;
+    }
+
+    public FilterTabPanelManager getFilterTabPanelManager() {
+        return filterTabPanelManager;
     }
 
 }
