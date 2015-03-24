@@ -735,7 +735,7 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
 
     @Override
     public void componentShown(ComponentEvent e) {
-        repaint();
+        updateGraph();
     }
 
     // //////////////////////////////////////////////////////////////////////////////
