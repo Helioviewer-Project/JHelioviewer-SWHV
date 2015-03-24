@@ -2,6 +2,7 @@ package org.helioviewer.jhv.plugin.renderable;
 
 import java.util.ArrayList;
 
+import javax.swing.event.TableModelEvent;
 import javax.swing.event.TableModelListener;
 import javax.swing.table.DefaultTableModel;
 
@@ -10,7 +11,7 @@ import org.helioviewer.jhv.renderable.RenderableGrid;
 import org.helioviewer.jhv.renderable.RenderableSolarAxes;
 import org.helioviewer.jhv.renderable.RenderableSolarAxesType;
 
-public class RenderableContainer extends DefaultTableModel {
+public class RenderableContainer extends DefaultTableModel implements Reorderable {
     private final ArrayList<Renderable> renderables = new ArrayList<Renderable>();
     private final ArrayList<Renderable> newRenderables = new ArrayList<Renderable>();
     private final ArrayList<Renderable> removedRenderables = new ArrayList<Renderable>();
@@ -22,6 +23,9 @@ public class RenderableContainer extends DefaultTableModel {
         RenderableSolarAxesType solarAxesType = new RenderableSolarAxesType("Solar Axes");
         addRenderable(new RenderableSolarAxes(solarAxesType));
         RenderableSolarAxesType gridType = new RenderableSolarAxesType("Grids");
+        addRenderable(new RenderableGrid(gridType, 20, 20, false));
+
+        addRenderable(new RenderableSolarAxes(solarAxesType));
         addRenderable(new RenderableGrid(gridType, 20, 20, false));
 
     }
@@ -101,4 +105,27 @@ public class RenderableContainer extends DefaultTableModel {
         fireTableRowsDeleted(row, row);
     }
 
+    public void insertRow(int row, Renderable rowData) {
+        if (row > renderables.size()) {
+            renderables.add(rowData);
+            fireTableRowsInserted(renderables.size() - 1, renderables.size() - 1);
+        } else {
+            renderables.add(row, rowData);
+        }
+        this.fireTableChanged(new TableModelEvent(this));
+    }
+
+    @Override
+    public void reorder(int fromIndex, int toIndex) {
+        if (toIndex > renderables.size()) {
+            return;
+        }
+        Renderable toMove = this.renderables.get(fromIndex);
+        this.removeRow(fromIndex);
+        if (fromIndex < toIndex) {
+            this.insertRow(toIndex - 1, toMove);
+        } else {
+            this.insertRow(toIndex, toMove);
+        }
+    }
 }

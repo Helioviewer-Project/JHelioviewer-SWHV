@@ -10,8 +10,10 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 
 import javax.swing.BorderFactory;
+import javax.swing.DropMode;
 import javax.swing.JPanel;
 import javax.swing.JTable;
+import javax.swing.ListSelectionModel;
 import javax.swing.border.Border;
 
 import org.helioviewer.jhv.display.Displayer;
@@ -42,6 +44,7 @@ public class RenderableContainerPanel extends JPanel {
         grid.setTableHeader(null);
         grid.setShowGrid(false);
         grid.setRowSelectionAllowed(true);
+        grid.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         grid.setColumnSelectionAllowed(false);
         grid.setIntercellSpacing(new Dimension(0, 0));
 
@@ -105,6 +108,9 @@ public class RenderableContainerPanel extends JPanel {
                 }
             }
         });
+        grid.setDragEnabled(true);
+        grid.setDropMode(DropMode.INSERT_ROWS);
+        grid.setTransferHandler(new TableRowTransferHandler(grid));
 
         this.optionsPanelWrapper = new JPanel();
         this.optionsPanelWrapper.setBorder(BorderFactory.createTitledBorder("Options"));
