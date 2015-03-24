@@ -59,7 +59,6 @@ public class EventsSelectorElement implements LineDataSelectorElement {
 
     @Override
     public void setPlotIndentifier(String plotIdentifier) {
-        eventModel.setPlotIdentifier(plotIdentifier);
     }
 
     @Override
