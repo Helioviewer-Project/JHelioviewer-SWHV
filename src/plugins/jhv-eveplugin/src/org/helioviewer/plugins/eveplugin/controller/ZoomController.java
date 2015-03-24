@@ -356,18 +356,7 @@ public class ZoomController implements PlotAreaSpaceListener, LayersListener {
 
     @Override
     public void layerAdded(int idx) {
-        if (EventQueue.isDispatchThread()) {
-            handleLayerAdded();
-        } else {
-            EventQueue.invokeLater(new Runnable() {
-
-                @Override
-                public void run() {
-                    handleLayerAdded();
-                }
-
-            });
-        }
+        handleLayerAdded();
     }
 
     private void handleLayerAdded() {
