@@ -12,7 +12,6 @@ import org.helioviewer.gl3d.camera.GL3DEarthCamera;
 import org.helioviewer.gl3d.camera.GL3DFollowObjectCamera;
 import org.helioviewer.gl3d.camera.GL3DObserverCamera;
 import org.helioviewer.gl3d.camera.GL3DSolarRotationTrackingTrackballCamera;
-import org.helioviewer.gl3d.scenegraph.GL3DDrawBits.Bit;
 import org.helioviewer.jhv.gui.ImageViewerGui;
 import org.helioviewer.viewmodel.view.ComponentView;
 import org.helioviewer.viewmodel.view.opengl.GL3DCameraView;
@@ -66,18 +65,8 @@ public class GL3DCameraSelectorModel extends AbstractListModel implements ComboB
 
             defaultCamera = observerCamera;
         } else {
-            earthCamera.createNewGrid();
-            observerCamera.createNewGrid();
 
-            followObjectCamera.createNewGrid();
             followObjectCamera.createNewFOV();
-
-            earthCamera.getGrid().getDrawBits().set(Bit.Hidden, true);
-            earthCamera.getFollowGrid().getDrawBits().set(Bit.Hidden, true);
-            observerCamera.getGrid().getDrawBits().set(Bit.Hidden, true);
-            observerCamera.getFollowGrid().getDrawBits().set(Bit.Hidden, true);
-            followObjectCamera.getGrid().getDrawBits().set(Bit.Hidden, true);
-            followObjectCamera.getFollowGrid().getDrawBits().set(Bit.Hidden, true);
 
             setCurrentCamera(observerCamera);
         }

@@ -79,7 +79,7 @@ public class RenderableContainerPanel extends JPanel {
 
             /**
              * Handle with right-click menus
-             * 
+             *
              * @param e
              */
             public void handlePopup(MouseEvent e) {
@@ -101,10 +101,12 @@ public class RenderableContainerPanel extends JPanel {
                     renderable.setVisible(!renderable.isVisible());
                     model.fireTableCellUpdated(row, col);
                     Displayer.display();
-                } else if (col == TITLEROW) {
+                }
+                if (col == TITLEROW || col == VISIBLEROW) {
                     Renderable renderable = (Renderable) model.getValueAt(row, col);
                     setOptionsPanel(renderable);
-                } else if (col == REMOVEROW) {
+                }
+                if (col == REMOVEROW) {
                     model.removeRow(row);
                     Displayer.display();
                 }
