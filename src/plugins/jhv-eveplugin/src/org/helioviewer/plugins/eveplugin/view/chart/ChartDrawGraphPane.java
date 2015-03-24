@@ -28,6 +28,8 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import javax.swing.ImageIcon;
 import javax.swing.JComponent;
@@ -98,13 +100,19 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
 =======
     private final long created;
     private long drawLabelsOperarionTime;
+<<<<<<< HEAD
 >>>>>>> Some debug info
+=======
+    private boolean updateRequestReceived;
+    private final Timer timer;
+>>>>>>> Implement timer functionality in eve plugin
 
     // //////////////////////////////////////////////////////////////////////////////
     // Methods
     // //////////////////////////////////////////////////////////////////////////////
 
     public ChartDrawGraphPane(String identifier) {
+        updateRequestReceived = false;
         created = System.currentTimeMillis();
         drawLabelsOperarionTime = 0;
         this.identifier = identifier;
@@ -121,6 +129,8 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
         plotAreaSpaceManager = PlotAreaSpaceManager.getInstance();
         eventModel = EventModel.getSingletonInstance();
         // ImageViewerGui.getMainFrame().addWindowFocusListener(this);
+        timer = new Timer("ChartDrawGraphPane redraw timer");
+        timer.schedule(new RedrawTimerTask(), 0, (long) (1000.0 / 30));
     }
 
     private void initVisualComponents() {
@@ -147,19 +157,24 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
     }
 
     private void updateGraph() {
-        Log.debug("Update graph : " + Thread.currentThread().getName());
-        Thread.dumpStack();
+        // Log.debug("Update request received");
+        updateRequestReceived = true;
+    }
+
+    private void timerRedrawGraph() {
+        // Log.debug("Update graph : " + Thread.currentThread().getName());
+        // Thread.dumpStack();
         if (currentSwingWorker != null && !currentSwingWorker.isDone()) {
-            Log.debug("Reschedule");
+            // Log.debug("Reschedule");
             reschedule = true;
             return;
         }
-        Log.debug("Create swingworker");
+        // Log.debug("Create swingworker");
         currentSwingWorker = new SwingWorker<Integer, Integer>() {
             @Override
             public Integer doInBackground() {
-                Thread.currentThread().setName("ChartdrawGraph--EVE");
-                Log.debug("do in background");
+                // Thread.currentThread().setName("ChartdrawGraph--EVE");
+                // Log.debug("do in background");
                 updateDrawInformation();
                 redrawGraph();
                 return 1;
@@ -927,4 +942,16 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
         // TODO Auto-generated method stub
 
     }
+
+    private class RedrawTimerTask extends TimerTask {
+        @Override
+        public void run() {
+            if (updateRequestReceived) {
+                // Log.debug("Do drawing");
+                updateRequestReceived = false;
+                timerRedrawGraph();
+            }
+        }
+    }
+
 }
