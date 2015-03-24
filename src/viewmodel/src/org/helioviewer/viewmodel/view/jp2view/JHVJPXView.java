@@ -293,13 +293,8 @@ public class JHVJPXView extends JHVJP2View implements TimedMovieView, CachedMovi
         }
 
         // send notification
-        ChangeEvent fireEvent = null;
-        synchronized (event) {
-            fireEvent = event.clone();
-            event.reinitialize();
-        }
-        fireEvent.addReason(new PlayStateChangedReason(this, this.linkedMovieManager, false));
-        fireChangeEvent(fireEvent);
+        ChangeEvent event = new ChangeEvent(new PlayStateChangedReason(this, this.linkedMovieManager, false));
+        fireChangeEvent(event);
     }
 
     /**
@@ -318,14 +313,10 @@ public class JHVJPXView extends JHVJP2View implements TimedMovieView, CachedMovi
                         renderRequestedSignal.signal(RenderReasons.MOVIE_PLAY);
                     }
                 }
+
                 // send notification
-                ChangeEvent fireEvent = null;
-                synchronized (event) {
-                    fireEvent = event.clone();
-                    event.reinitialize();
-                }
-                fireEvent.addReason(new PlayStateChangedReason(this, this.linkedMovieManager, true));
-                fireChangeEvent(fireEvent);
+                ChangeEvent event = new ChangeEvent(new PlayStateChangedReason(this, this.linkedMovieManager, true));
+                fireChangeEvent(event);
             }
         }
     }
@@ -394,7 +385,6 @@ public class JHVJPXView extends JHVJP2View implements TimedMovieView, CachedMovi
      */
     public boolean setCurrentFrameNumber(int frameNumber, ChangeEvent event, boolean forceSignal) {
         if (frameNumber != imageViewParams.compositionLayer || forceSignal) {
-
             imageViewParams.compositionLayer = frameNumber;
             while (getMaximumAccessibleFrameNumber() < imageViewParams.compositionLayer) {
                 try {
@@ -404,7 +394,6 @@ public class JHVJPXView extends JHVJP2View implements TimedMovieView, CachedMovi
                 }
             }
 
-            this.event.copyFrom(event);
             readerSignal.signal();
             if (readerMode != ReaderMode.ONLYFIREONCOMPLETE) {
                 renderRequestedSignal.signal(RenderReasons.MOVIE_PLAY);
