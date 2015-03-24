@@ -15,11 +15,15 @@ import javax.swing.JPanel;
 import javax.swing.JTable;
 import javax.swing.ListSelectionModel;
 import javax.swing.border.Border;
+import javax.swing.border.MatteBorder;
 
 import org.helioviewer.jhv.display.Displayer;
 
 public class RenderableContainerPanel extends JPanel {
+    static final Border commonBorder = new MatteBorder(1, 0, 0, 0, Color.BLACK);
     private static final int ROW_HEIGHT = 20;
+    private static final int ICON_WIDTH = 16;
+
     private static final int VISIBLEROW = 0;
     private static final int TITLEROW = 1;
     private static final int REMOVEROW = 2;
@@ -32,7 +36,6 @@ public class RenderableContainerPanel extends JPanel {
 
     public RenderableContainerPanel(RenderableContainer renderableContainer) {
         this.setLayout(new GridBagLayout());
-        Border lineBorder = BorderFactory.createLineBorder(Color.black);
         gc.gridx = 0;
         gc.gridy = 0;
         gc.weightx = 1;
@@ -40,7 +43,6 @@ public class RenderableContainerPanel extends JPanel {
         gc.fill = GridBagConstraints.BOTH;
         grid = new JTable(renderableContainer);
         this.add(grid, gc);
-        grid.setBorder(lineBorder);
         grid.setTableHeader(null);
         grid.setShowGrid(false);
         grid.setRowSelectionAllowed(true);
@@ -51,13 +53,13 @@ public class RenderableContainerPanel extends JPanel {
         grid.setRowHeight(ROW_HEIGHT);
         grid.setBackground(Color.white);
         grid.getColumnModel().getColumn(VISIBLEROW).setCellRenderer(new RenderableVisibleCellRenderer());
-        grid.getColumnModel().getColumn(VISIBLEROW).setPreferredWidth(25);
-        grid.getColumnModel().getColumn(VISIBLEROW).setMaxWidth(25);
+        grid.getColumnModel().getColumn(VISIBLEROW).setPreferredWidth(ICON_WIDTH);
+        grid.getColumnModel().getColumn(VISIBLEROW).setMaxWidth(ICON_WIDTH);
 
         grid.getColumnModel().getColumn(TITLEROW).setCellRenderer(new RenderableCellRenderer());
         grid.getColumnModel().getColumn(REMOVEROW).setCellRenderer(new RenderableRemoveCellRenderer());
-        grid.getColumnModel().getColumn(REMOVEROW).setPreferredWidth(25);
-        grid.getColumnModel().getColumn(REMOVEROW).setMaxWidth(25);
+        grid.getColumnModel().getColumn(REMOVEROW).setPreferredWidth(ICON_WIDTH);
+        grid.getColumnModel().getColumn(REMOVEROW).setMaxWidth(ICON_WIDTH);
 
         grid.addMouseListener(new MouseAdapter() {
 
