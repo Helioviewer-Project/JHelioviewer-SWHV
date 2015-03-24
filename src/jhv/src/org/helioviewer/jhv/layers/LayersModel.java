@@ -26,14 +26,12 @@ import org.helioviewer.jhv.gui.ImageViewerGui;
 import org.helioviewer.jhv.gui.UIViewListener;
 import org.helioviewer.jhv.gui.UIViewListenerDistributor;
 import org.helioviewer.jhv.gui.components.MoviePanel;
-import org.helioviewer.jhv.gui.components.layerTable.LayerTableModel;
 import org.helioviewer.jhv.gui.dialogs.MetaDataDialog;
 import org.helioviewer.jhv.io.APIRequestManager;
 import org.helioviewer.jhv.io.FileDownloader;
 import org.helioviewer.viewmodel.changeevent.ChangeEvent;
 import org.helioviewer.viewmodel.changeevent.LayerChangedReason;
 import org.helioviewer.viewmodel.changeevent.LayerChangedReason.LayerChangeType;
-import org.helioviewer.viewmodel.changeevent.TimestampChangedReason;
 import org.helioviewer.viewmodel.changeevent.ViewChainChangedReason;
 import org.helioviewer.viewmodel.io.APIResponse;
 import org.helioviewer.viewmodel.io.APIResponseDump;
@@ -570,32 +568,6 @@ public class LayersModel implements UIViewListener {
         }
     }
 
-    private void handleTimestampChanges(View sender, ChangeEvent aEvent) {
-        List<TimestampChangedReason> timestampReasons = aEvent.getAllChangedReasonsByType(TimestampChangedReason.class);
-
-        // if meta data has changed, update label
-        for (TimestampChangedReason timestampReason : timestampReasons) {
-            JHVJP2View timestampView = (JHVJP2View) timestampReason.getView();
-
-            if (timestampView != null) {
-                int idx = findView(timestampView);
-                if (isValidIndex(idx)) {
-                    // update LayerTableModel (timestamp labels)
-                    LayerTableModel.getSingletonInstance().fireTableRowsUpdated(idx, idx);
-
-                    // store last timestamp displayed and fire TimeChanged
-                    ImmutableDateTime currentFrameTimestamp = getCurrentFrameTimestamp(idx);
-                    if (currentFrameTimestamp != null) {
-                        lastTimestamp = currentFrameTimestamp.getTime();
-                        if (idx == activeLayer) {
-                            Displayer.fireTimeChanged(lastTimestamp);
-                        }
-                    }
-                }
-            }
-        }
-    }
-
     private void handleViewChainChanges(View sender, ChangeEvent aEvent) {
         if (aEvent.getLastChangedReasonByType(ViewChainChangedReason.class) != null) {
             this.fireAllLayersChanged();
@@ -610,7 +582,6 @@ public class LayersModel implements UIViewListener {
      */
     @Override
     public void UIviewChanged(View sender, ChangeEvent aEvent) {
-        handleTimestampChanges(sender, aEvent);
         handleLayerChanges(sender, aEvent);
         handleViewChainChanges(sender, aEvent);
     }

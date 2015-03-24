@@ -353,6 +353,13 @@ public class MoviePanel extends JPanel implements ActionListener, ChangeListener
         return null;
     }
 
+    public static void setFrameSlider(View view) {
+        if (view instanceof MovieView) {
+            MovieView mv = (MovieView) view;
+            getMoviePanel(mv).timeSlider.setValue(mv.getCurrentFrameNumber());
+        }
+    }
+
     /**
      * Jumps to the specified frame
      *
@@ -384,7 +391,6 @@ public class MoviePanel extends JPanel implements ActionListener, ChangeListener
     }
 
     public void setPlaying(boolean playing, boolean onlyGUI) {
-
         isPlaying = playing;
 
         if (!isPlaying) {
@@ -497,7 +503,6 @@ public class MoviePanel extends JPanel implements ActionListener, ChangeListener
      */
     @Override
     public void stateChanged(javax.swing.event.ChangeEvent e) {
-
         // Jump to different frame
         if (e.getSource() == timeSlider) {
             jumpToFrameNumber(timeSlider.getValue());
@@ -573,11 +578,8 @@ public class MoviePanel extends JPanel implements ActionListener, ChangeListener
 
     @Override
     public void UIviewChanged(View sender, ChangeEvent aEvent) {
-        //Log.debug("Sender : " + sender);
-        //Log.debug("Event : " + aEvent);
         // Stop movie, when the layer was removed.
         LayerChangedReason layerReason = aEvent.getLastChangedReasonByType(LayerChangedReason.class);
-
         if (layerReason != null && layerReason.getSubView().getAdapter(MovieView.class) == view && layerReason.getLayerChangeType() == LayerChangeType.LAYER_REMOVED) {
             linkedMovieManager.unlinkMoviePanel(this);
             panelList.remove(this);
@@ -598,26 +600,19 @@ public class MoviePanel extends JPanel implements ActionListener, ChangeListener
         // when the movie stops after reaching the last frame.
         if (aEvent.reasonOccurred(PlayStateChangedReason.class)) {
             PlayStateChangedReason pscr = aEvent.getLastChangedReasonByType(PlayStateChangedReason.class);
-
             // check if the event belongs to the same group of linked movies
             if (timedView.getLinkedMovieManager() == pscr.getLinkedMovieManager()) {
-
                 if (pscr.isPlaying() != isPlaying) {
-
                     if (!isDragging && !(linkedMovieManager.someoneIsDragging)) {
-
                         // only update GUI
                         // Log.debug("Switching to " + pscr.isPlaying());
                         setPlaying(pscr.isPlaying(), true);
-
                     } else {
                         // Log.debug("Not switching because of dragging");
                     }
-
                 } else {
                     // Log.debug("Playstate already ok");
                 }
-
             }
         }
 
@@ -655,7 +650,6 @@ public class MoviePanel extends JPanel implements ActionListener, ChangeListener
          */
         public StaticMovieAction(String name, Icon icon) {
             super(name, icon);
-
             LayersModel.getSingletonInstance().addLayersListener(this);
         }
 
@@ -838,7 +832,6 @@ public class MoviePanel extends JPanel implements ActionListener, ChangeListener
          *            Panel to add
          */
         public void linkMoviePanel(MoviePanel newPanel) {
-
             if (newPanel.timedView == null) {
                 return;
             }
@@ -855,11 +848,9 @@ public class MoviePanel extends JPanel implements ActionListener, ChangeListener
                 newPanel.animationModeComboBox.setSelectedItem(copyFrom.animationModeComboBox.getSelectedItem());
 
                 // move frame
-                ImmutableDateTime maxAvialableDateTime = newPanel.timedView.getFrameDateTime(newPanel.view.getMaximumAccessibleFrameNumber());
-
-                if (maxAvialableDateTime.getMillis() >= copyFrom.timedView.getCurrentFrameDateTime().getMillis()) {
+                ImmutableDateTime maxAvailableDateTime = newPanel.timedView.getFrameDateTime(newPanel.view.getMaximumAccessibleFrameNumber());
+                if (maxAvailableDateTime.getMillis() >= copyFrom.timedView.getCurrentFrameDateTime().getMillis()) {
                     newPanel.timedView.setCurrentFrame(copyFrom.timedView.getCurrentFrameDateTime(), new ChangeEvent());
-
                 } else {
                     newPanel.timedView.setCurrentFrame(newPanel.view.getMaximumAccessibleFrameNumber(), new ChangeEvent());
                 }
@@ -1049,26 +1040,19 @@ public class MoviePanel extends JPanel implements ActionListener, ChangeListener
              */
             @Override
             public void paintTrack(Graphics g) {
-
                 int height = getSize().height / 4;
                 int offset = (getSize().height - height) / 2;
-
                 int partialCachedOffset = (int) ((float) (partialCachedUntil) / (getMaximum() - getMinimum()) * trackRect.width);
-
                 int completeCachedOffset = (int) ((float) (completeCachedUntil) / (getMaximum() - getMinimum()) * trackRect.width);
+
                 Graphics2D g2d = (Graphics2D) g;
                 g2d.setStroke(new BasicStroke(4));
 
                 g2d.setColor(notCachedColor);
                 g2d.drawLine(trackRect.x + partialCachedOffset, offset + getSize().height / 8, trackRect.x + trackRect.width - 0, offset + getSize().height / 8);
 
-                // g.fillRect(trackRect.x + partialCachedOffset, offset ,
-                // trackRect.x + partialCachedO, offset + getSize().height / 8);
-
                 g2d.setColor(partialCachedColor);
                 g2d.drawLine(trackRect.x + completeCachedOffset, offset + getSize().height / 8, trackRect.x + partialCachedOffset, offset + getSize().height / 8);
-                // g.fillRect(trackRect.x + completeCachedOffset, offset,
-                // partialCachedOffset - completeCachedOffset, height);
 
                 g2d.setColor(completeCachedColor);
                 g2d.drawLine(trackRect.x, offset + getSize().height / 8, trackRect.x + completeCachedOffset, offset + getSize().height / 8);

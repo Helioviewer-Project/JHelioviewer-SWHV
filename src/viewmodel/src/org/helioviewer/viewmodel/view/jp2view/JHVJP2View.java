@@ -737,10 +737,9 @@ public class JHVJP2View extends AbstractView implements JP2View, ViewportView, R
     void setSubimageData(ImageData newImageData, SubImage roi, int compositionLayer, double zoompercent, boolean fullyLoaded) {
         MetaData metaData = jp2Image.metaDataList[compositionLayer];
 
-        if (metaData instanceof ObserverMetaData) {
-            ImmutableDateTime dtc = metaData.getDateTime();
-            event.addReason(new TimestampChangedReason(this, dtc));
-        }
+        ImmutableDateTime dtc = null;
+        if (metaData instanceof ObserverMetaData)
+            dtc = metaData.getDateTime();
 
         if (compositionLayer == 0) {
             this.baseDifferenceImageData = newImageData;
@@ -766,16 +765,26 @@ public class JHVJP2View extends AbstractView implements JP2View, ViewportView, R
         this.imageData = newImageData;
 
         subImageBuffer.setLastRegion(roi);
-        event.addReason(new SubImageDataChangedReason(this));
 
-        this.event.addReason(new RegionUpdatedReason(this, lastRegion));
+        fireFrameChanged(this, dtc);
+    }
 
-        ChangeEvent fireEvent = null;
-        synchronized (event) {
-            fireEvent = event.clone();
-            event.reinitialize();
-        }
-        fireChangeEvent(fireEvent);
+    private void fireFrameChanged(JHVJP2View aView, ImmutableDateTime aDateTime) {
+        EventQueue.invokeLater(new Runnable() {
+            private JHVJP2View theView;
+            private ImmutableDateTime theDateTime;
+
+            @Override
+            public void run() {
+                Displayer.fireFrameChanged(theView, theDateTime);
+            }
+
+            public Runnable init(JHVJP2View theView, ImmutableDateTime theDateTime) {
+                this.theView = theView;
+                this.theDateTime = theDateTime;
+                return this;
+            }
+        }.init(aView, aDateTime));
     }
 
     /**
@@ -805,19 +814,6 @@ public class JHVJP2View extends AbstractView implements JP2View, ViewportView, R
      */
     void updateParameter() {
         setImageViewParams(calculateParameter());
-    }
-
-    /**
-     * Adds a ChangedReason to the current event.
-     *
-     * The event will be fired during the next call of
-     * {@link #setSubimageData(ImageData, SubImage, int)}.
-     *
-     * @param reason
-     *            The ChangedReason to add
-     */
-    void addChangedReason(ChangedReason reason) {
-        event.addReason(reason);
     }
 
     /**

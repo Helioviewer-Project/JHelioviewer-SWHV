@@ -7,6 +7,12 @@ import java.util.Date;
 
 import javax.swing.Timer;
 
+import org.helioviewer.jhv.layers.LayersModel;
+import org.helioviewer.jhv.gui.components.layerTable.LayerTableModel;
+import org.helioviewer.jhv.gui.components.MoviePanel;
+import org.helioviewer.viewmodel.view.jp2view.JHVJP2View;
+import org.helioviewer.viewmodel.view.jp2view.datetime.ImmutableDateTime;
+
 import org.helioviewer.jhv.data.datatype.event.JHVEvent;
 import org.helioviewer.jhv.data.datatype.event.JHVEventHighlightListener;
 import org.helioviewer.jhv.plugin.renderable.RenderableContainer;
@@ -30,7 +36,13 @@ public class Displayer implements JHVEventHighlightListener {
     private static boolean todisplay = false;
     private final MyListener timerListener = new MyListener();
 
+    private static LayersModel layersModel;
+    private static LayerTableModel tableModel;
+
     private Displayer() {
+        layersModel = LayersModel.getSingletonInstance();
+        tableModel = LayerTableModel.getSingletonInstance();
+
         Timer timer = new Timer(1000 / 20, timerListener);
         timer.start();
     }
@@ -90,9 +102,23 @@ public class Displayer implements JHVEventHighlightListener {
         timeListeners.remove(timeListener);
     }
 
-    public static void fireTimeChanged(Date date) {
+    public static void fireTimeChanged(Date time) {
         for (final TimeListener listener : timeListeners) {
-            listener.timeChanged(date);
+            listener.timeChanged(time);
+        }
+    }
+
+    public static void fireFrameChanged(JHVJP2View view, ImmutableDateTime dateTime) {
+        int idx = layersModel.findView(view);
+        if (layersModel.isValidIndex(idx)) {
+            // update LayerTableModel (timestamp labels)
+            tableModel.fireTableRowsUpdated(idx, idx);
+
+            if (idx == layersModel.getActiveLayer() && dateTime != null) {
+                MoviePanel.setFrameSlider(view);
+                fireTimeChanged(dateTime.getTime());
+            }
+            display();
         }
     }
 
