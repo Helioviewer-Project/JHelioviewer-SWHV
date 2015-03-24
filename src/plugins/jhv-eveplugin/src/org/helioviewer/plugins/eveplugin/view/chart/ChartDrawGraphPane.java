@@ -140,7 +140,6 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
             g2.drawImage(screenImage, 0, 0, getWidth(), getHeight(), 0, 0, screenImage.getWidth(), screenImage.getHeight(), null);
             drawMovieLine(g2);
         }
-
         if (reschedule && !TimeIntervalLockModel.getInstance().isLocked()) {
             reschedule = false;
             updateGraph();
