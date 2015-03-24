@@ -124,6 +124,7 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
         // ImageViewerGui.getMainFrame().addWindowFocusListener(this);
         timer = new Timer("ChartDrawGraphPane redraw timer");
         timer.schedule(new RedrawTimerTask(), 0, (long) (1000.0 / 30));
+        // timer.schedule(new RedrawTimerTask(), 0, (long) (3000.0));
     }
 
     private void initVisualComponents() {
@@ -155,12 +156,20 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
     }
 
     private void timerRedrawGraph() {
-        updateDrawInformation();
-        redrawGraph();
+        EventQueue.invokeLater(new Runnable() {
+
+            @Override
+            public void run() {
+                updateDrawInformation();
+                redrawGraph();
+            }
+        });
+
     }
 
     private void redrawGraph() {
-        // long start = System.currentTimeMillis();
+        BufferedImage localScreenImage = screenImage;
+        screenImage = null;
         int screenfactor = ChartConstants.getScreenfactor();
         int width = screenfactor * getWidth();
         int height = screenfactor * getHeight();
@@ -168,7 +177,7 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
         if (width > 0 && height > 0 && screenfactor * (ChartConstants.getGraphTopSpace() + ChartConstants.getGraphBottomSpace() + 1) < height && screenfactor * (ChartConstants.getGraphLeftSpace() + ChartConstants.getGraphRightSpace() + 1) < width) {
             if (width != lastWidth && height != lastHeight) {
                 screenTempImage = new BufferedImage(width, height, BufferedImage.OPAQUE);
-                screenImage = new BufferedImage(width, height, BufferedImage.OPAQUE);
+                localScreenImage = new BufferedImage(width, height, BufferedImage.OPAQUE);
             }
             final Graphics2D g = screenTempImage.createGraphics();
             AffineTransform tf = g.getTransform();
@@ -184,14 +193,15 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
             gleftAxisPart.setTransform(tf);
             drawData(gplotPart, g, gleftAxisPart, mousePosition);
             // drawZoomBox(g);
-            screenImage = screenTempImage;
             lastWidth = width;
             lastHeight = height;
-            BufferedImage screenTempTempImage = screenImage;
-            screenImage = screenTempImage;
+            BufferedImage screenTempTempImage = localScreenImage;
+            localScreenImage = screenTempImage;
             screenTempImage = screenTempTempImage;
         }
+        screenImage = localScreenImage;
         this.repaint();
+
         // Log.info("Run time: " + (System.currentTimeMillis() - start));
     }
 
