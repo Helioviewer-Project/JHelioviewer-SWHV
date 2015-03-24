@@ -16,7 +16,9 @@ public class PlotAreaSpace {
 
     private final List<PlotAreaSpaceListener> listeners;
 
-    public PlotAreaSpace() {
+    private static PlotAreaSpace singletonInstance;
+
+    private PlotAreaSpace() {
         listeners = new ArrayList<PlotAreaSpaceListener>();
 
         scaledMinValue = 0.0;
@@ -27,6 +29,13 @@ public class PlotAreaSpace {
         scaledSelectedMaxValue = 1.0;
         scaledSelectedMinTime = 0.0;
         scaledSelectedMaxTime = 1.0;
+    }
+
+    public static PlotAreaSpace getSingletonInstance() {
+        if (singletonInstance == null) {
+            singletonInstance = new PlotAreaSpace();
+        }
+        return singletonInstance;
     }
 
     public void addPlotAreaSpaceListener(PlotAreaSpaceListener listener) {

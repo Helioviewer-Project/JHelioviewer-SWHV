@@ -11,28 +11,25 @@ public class DownloadRequestData implements LineDataSelectorElement {
     private Map<Long, RadioImage> radioImages;
     private Long downloadID;
     private boolean isDownloading;
-    private String plotIdentifier = "plot.identifier.master";
     private boolean isVisible;
 
     private RadioDataManager radioDataManager;
 
-    public DownloadRequestData(long ID, String plotIdentifier) {
-        this.radioDataManager = RadioDataManager.getSingletonInstance();
-        this.downloadID = ID;
-        this.radioImages = new HashMap<Long, RadioImage>();
-        this.plotIdentifier = plotIdentifier;
-        this.isVisible = true;
+    public DownloadRequestData(long ID) {
+        radioDataManager = RadioDataManager.getSingletonInstance();
+        downloadID = ID;
+        radioImages = new HashMap<Long, RadioImage>();
+        isVisible = true;
     }
 
-    public DownloadRequestData(long ID, Map<Long, RadioImage> radioImages, String plotIdentifier) {
-        this.downloadID = ID;
+    public DownloadRequestData(long ID, Map<Long, RadioImage> radioImages) {
+        downloadID = ID;
         this.radioImages = radioImages;
-        this.plotIdentifier = plotIdentifier;
-        this.isVisible = true;
+        isVisible = true;
     }
 
     public void addRadioImage(RadioImage radioImage) {
-        this.radioImages.put(radioImage.getRadioImageID(), radioImage);
+        radioImages.put(radioImage.getRadioImageID(), radioImage);
     }
 
     public Map<Long, RadioImage> getRadioImages() {
@@ -59,14 +56,14 @@ public class DownloadRequestData implements LineDataSelectorElement {
 
     @Override
     public void setVisibility(boolean visible) {
-        this.isVisible = visible;
+        isVisible = visible;
         radioDataManager.downloadRequestDataVisibilityChanged(this);
 
     }
 
     @Override
     public boolean isVisible() {
-        return this.isVisible;
+        return isVisible;
     }
 
     @Override
@@ -86,17 +83,6 @@ public class DownloadRequestData implements LineDataSelectorElement {
     @Override
     public boolean isDownloading() {
         return isDownloading;
-    }
-
-    @Override
-    public String getPlotIdentifier() {
-        return plotIdentifier;
-    }
-
-    @Override
-    public void setPlotIndentifier(String plotIdentifier) {
-        // TODO Auto-generated method stub
-
     }
 
     @Override
@@ -126,7 +112,7 @@ public class DownloadRequestData implements LineDataSelectorElement {
      *            The download request data to be merged in this
      */
     public void mergeDownloadRequestData(DownloadRequestData downloadRequestData) {
-        if (downloadRequestData.getDownloadID() == downloadID && downloadRequestData.getPlotIdentifier() == plotIdentifier) {
+        if (downloadRequestData.getDownloadID() == downloadID) {
             radioImages.putAll(downloadRequestData.getRadioImages());
         }
     }

@@ -2,19 +2,17 @@ package org.helioviewer.plugins.eveplugin.view.linedataselector;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 public class LineDataSelectorModel {
     private final List<LineDataSelectorModelListener> listeners;
-    private final Map<String, List<LineDataSelectorElement>> elementMap;
+    private final List<LineDataSelectorElement> elements;
 
     private static LineDataSelectorModel instance;
 
     private LineDataSelectorModel() {
         listeners = Collections.synchronizedList(new ArrayList<LineDataSelectorModelListener>());
-        elementMap = new HashMap<String, List<LineDataSelectorElement>>();
+        elements = new ArrayList<LineDataSelectorElement>();
     }
 
     public static LineDataSelectorModel getSingletonInstance() {
@@ -40,48 +38,36 @@ public class LineDataSelectorModel {
         fireDownloadFinished(element);
     }
 
-    public int getNumberOfAvailableLineData(String identifier) {
-        synchronized (elementMap) {
-            List<LineDataSelectorElement> tempList = elementMap.get(identifier);
-            return tempList == null ? 0 : tempList.size();
+    public int getNumberOfAvailableLineData() {
+        synchronized (elements) {
+            return elements == null ? 0 : elements.size();
         }
     }
 
     public synchronized void addLineData(LineDataSelectorElement element) {
-        synchronized (elementMap) {
-            if (elementMap.containsKey(element.getPlotIdentifier())) {
-                elementMap.get(element.getPlotIdentifier()).add(element);
-            } else {
-                ArrayList<LineDataSelectorElement> tempList = new ArrayList<LineDataSelectorElement>();
-                tempList.add(element);
-                elementMap.put(element.getPlotIdentifier(), tempList);
-            }
+        synchronized (elements) {
+            elements.add(element);
             fireLineDataSelectorElementAdded(element);
         }
     }
 
-    public List<LineDataSelectorElement> getAllLineDataSelectorElements(String identifier) {
-        synchronized (elementMap) {
-            return elementMap.get(identifier);
+    public List<LineDataSelectorElement> getAllLineDataSelectorElements() {
+        synchronized (elements) {
+            return elements;
         }
     }
 
     public void removeLineData(LineDataSelectorElement element) {
-        synchronized (elementMap) {
-            List<LineDataSelectorElement> elements = elementMap.get(element.getPlotIdentifier());
+        synchronized (elements) {
             if (elements != null) {
                 elements.remove(element);
-                if (elements.size() == 0) {
-                    elementMap.remove(element.getPlotIdentifier());
-                }
             }
-
             fireLineDataSelectorElementRemoved(element);
         }
     }
 
     public void lineDataElementUpdated(LineDataSelectorElement element) {
-        synchronized (elementMap) {
+        synchronized (elements) {
             fireLineDataSelectorElementUpdated(element);
         }
     }
@@ -90,13 +76,11 @@ public class LineDataSelectorModel {
 
     }
 
-    public boolean atLeastOneDownloading(String identifier) {
-        synchronized (elementMap) {
-            if (elementMap.containsKey(identifier)) {
-                for (LineDataSelectorElement el : elementMap.get(identifier)) {
-                    if (el.isDownloading()) {
-                        return true;
-                    }
+    public boolean atLeastOneDownloading() {
+        synchronized (elements) {
+            for (LineDataSelectorElement el : elements) {
+                if (el.isDownloading()) {
+                    return true;
                 }
             }
             return false;

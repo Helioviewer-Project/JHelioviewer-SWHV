@@ -23,20 +23,16 @@ import org.helioviewer.plugins.eveplugin.lines.data.EVEValues;
 import org.helioviewer.plugins.eveplugin.lines.gui.EVEDrawableElement;
 import org.helioviewer.plugins.eveplugin.model.PlotAreaSpace;
 import org.helioviewer.plugins.eveplugin.model.PlotAreaSpaceListener;
-import org.helioviewer.plugins.eveplugin.model.PlotAreaSpaceManager;
 import org.helioviewer.plugins.eveplugin.settings.EVEAPI.API_RESOLUTION_AVERAGES;
 
 /**
  * @author Stephan Pagel
  * */
-public class EVEDrawController implements BandControllerListener, ZoomControllerListener, EVECacheControllerListener,
-        PlotAreaSpaceListener {
+public class EVEDrawController implements BandControllerListener, ZoomControllerListener, EVECacheControllerListener, PlotAreaSpaceListener {
 
     // //////////////////////////////////////////////////////////////////////////////
     // Definitions
     // //////////////////////////////////////////////////////////////////////////////
-
-    private final String identifier;
 
     private final LinkedList<EVEDrawControllerListener> listeners = new LinkedList<EVEDrawControllerListener>();
     private final Map<String, Map<Band, DownloadedData>> dataMapPerUnitLabel = new HashMap<String, Map<Band, DownloadedData>>();
@@ -55,8 +51,7 @@ public class EVEDrawController implements BandControllerListener, ZoomController
     // Methods
     // //////////////////////////////////////////////////////////////////////////////
 
-    public EVEDrawController(final String identifier) {
-        this.identifier = identifier;
+    public EVEDrawController() {
 
         BandController.getSingletonInstance().addBandControllerListener(this);
         ZoomController.getSingletonInstance().addZoomControllerListener(this);
@@ -69,7 +64,7 @@ public class EVEDrawController implements BandControllerListener, ZoomController
         availableRangeMap.put("", new Range());
         yAxisElementMap.put("", new YAxisElement());
         eveDrawableElementMap.put("", new EVEDrawableElement());
-        plotAreaSpace = PlotAreaSpaceManager.getInstance().getPlotAreaSpace(identifier);
+        plotAreaSpace = PlotAreaSpace.getSingletonInstance();
         plotAreaSpace.addPlotAreaSpaceListener(this);
     }
 
@@ -101,7 +96,7 @@ public class EVEDrawController implements BandControllerListener, ZoomController
                     availableRangeMap.remove(band.getUnitLabel());
                     selectedRangeMap.remove(band.getUnitLabel());
                     yAxisElementMap.remove(band.getUnitLabel());
-                    drawController.removeDrawableElement(removed, identifier);
+                    drawController.removeDrawableElement(removed);
                 }
                 fireRedrawRequest(true);
             }
@@ -126,12 +121,10 @@ public class EVEDrawController implements BandControllerListener, ZoomController
         }
         availableRangeMap.get(band.getUnitLabel()).setMin(data.getMinimumValue());
         availableRangeMap.get(band.getUnitLabel()).setMax(data.getMaximumValue());
-        if (oldAvailableRange.min != availableRangeMap.get(band.getUnitLabel()).min
-                || oldAvailableRange.max != availableRangeMap.get(band.getUnitLabel()).max) {
+        if (oldAvailableRange.min != availableRangeMap.get(band.getUnitLabel()).min || oldAvailableRange.max != availableRangeMap.get(band.getUnitLabel()).max) {
             // Log.trace("update band available range changed so we change the plotareaSpace");
             checkSelectedRange(availableRangeMap.get(band.getUnitLabel()), selectedRangeMap.get(band.getUnitLabel()));
-            updatePlotAreaSpace(availableRangeMap.get(band.getUnitLabel()), selectedRangeMap.get(band.getUnitLabel()), keepFullValueRange,
-                    isLog);
+            updatePlotAreaSpace(availableRangeMap.get(band.getUnitLabel()), selectedRangeMap.get(band.getUnitLabel()), keepFullValueRange, isLog);
         } else {
             // Log.trace("Same available range");
         }
@@ -188,8 +181,7 @@ public class EVEDrawController implements BandControllerListener, ZoomController
                 selectedRangeMap.put(unitLabel, new Range());
             }
             checkSelectedRange(availableRangeMap.get(unitLabel), selectedRangeMap.get(unitLabel));
-            if (oldAvailableRange.min != availableRangeMap.get(unitLabel).min
-                    || oldAvailableRange.max != availableRangeMap.get(unitLabel).max) {
+            if (oldAvailableRange.min != availableRangeMap.get(unitLabel).min || oldAvailableRange.max != availableRangeMap.get(unitLabel).max) {
                 Log.error("Available range changed in redraw request. So update plotAreaSpace");
                 Log.error("old range : " + oldAvailableRange.toString());
                 Log.error("new available range : " + availableRangeMap.get(unitLabel).toString());
@@ -198,22 +190,19 @@ public class EVEDrawController implements BandControllerListener, ZoomController
             }
 
             for (EVEDrawControllerListener listener : listeners) {
-                listener.drawRequest(interval, bands, values.toArray(new EVEValues[0]), availableRangeMap.get(unitLabel),
-                        selectedRangeMap.get(unitLabel));
+                listener.drawRequest(interval, bands, values.toArray(new EVEValues[0]), availableRangeMap.get(unitLabel), selectedRangeMap.get(unitLabel));
             }
             YAxisElement yAxisElement = new YAxisElement();
             if (yAxisElementMap.containsKey(unitLabel)) {
                 yAxisElement = yAxisElementMap.get(unitLabel);
             }
-            yAxisElement.set(selectedRangeMap.get(unitLabel), availableRangeMap.get(unitLabel), unitLabel,
-                    selectedRangeMap.get(unitLabel).min, selectedRangeMap.get(unitLabel).max, Color.PINK, isLog,
-                    yAxisElement.getActivationTime());
+            yAxisElement.set(selectedRangeMap.get(unitLabel), availableRangeMap.get(unitLabel), unitLabel, selectedRangeMap.get(unitLabel).min, selectedRangeMap.get(unitLabel).max, Color.PINK, isLog, yAxisElement.getActivationTime());
             yAxisElementMap.put(unitLabel, yAxisElement);
             eveDrawableElementMap.get(unitLabel).set(interval, bands, values.toArray(new EVEValues[0]), yAxisElement);
             if (bands.length > 0) {
-                drawController.updateDrawableElement(eveDrawableElementMap.get(unitLabel), identifier);
+                drawController.updateDrawableElement(eveDrawableElementMap.get(unitLabel));
             } else {
-                drawController.removeDrawableElement(eveDrawableElementMap.get(unitLabel), identifier);
+                drawController.removeDrawableElement(eveDrawableElementMap.get(unitLabel));
             }
         }
     }
@@ -302,46 +291,38 @@ public class EVEDrawController implements BandControllerListener, ZoomController
     // //////////////////////////////////////////////////////////////////////////////
 
     @Override
-    public void bandAdded(final Band band, final String identifier) {
-        if (this.identifier.equals(identifier)) {
-            addToMap(band);
-        }
+    public void bandAdded(final Band band) {
+        addToMap(band);
     }
 
     @Override
-    public void bandRemoved(final Band band, final String identifier) {
-        if (this.identifier.equals(identifier)) {
+    public void bandRemoved(final Band band) {
+        removeFromMap(band);
+    }
+
+    @Override
+    public void bandUpdated(final Band band) {
+        if (band.isVisible()) {
+            addToMap(band);
+        } else {
             removeFromMap(band);
         }
     }
 
     @Override
-    public void bandUpdated(final Band band, final String identifier) {
-        if (this.identifier.equals(identifier)) {
-            if (band.isVisible()) {
-                addToMap(band);
-            } else {
-                removeFromMap(band);
+    public void bandGroupChanged() {
+        dataMapPerUnitLabel.clear();
+
+        final Band[] activeBands = BandController.getSingletonInstance().getBands();
+
+        for (final Band band : activeBands) {
+            if (!dataMapPerUnitLabel.containsKey(band.getUnitLabel())) {
+                dataMapPerUnitLabel.put(band.getUnitLabel(), new HashMap<Band, DownloadedData>());
             }
+            dataMapPerUnitLabel.get(band.getUnitLabel()).put(band, retrieveData(band, interval));
         }
-    }
 
-    @Override
-    public void bandGroupChanged(final String identifier) {
-        if (this.identifier.equals(identifier)) {
-            dataMapPerUnitLabel.clear();
-
-            final Band[] activeBands = BandController.getSingletonInstance().getBands(identifier);
-
-            for (final Band band : activeBands) {
-                if (!dataMapPerUnitLabel.containsKey(band.getUnitLabel())) {
-                    dataMapPerUnitLabel.put(band.getUnitLabel(), new HashMap<Band, DownloadedData>());
-                }
-                dataMapPerUnitLabel.get(band.getUnitLabel()).put(band, retrieveData(band, interval));
-            }
-
-            fireRedrawRequest(true);
-        }
+        fireRedrawRequest(true);
     }
 
     // //////////////////////////////////////////////////////////////////////////////
@@ -359,18 +340,14 @@ public class EVEDrawController implements BandControllerListener, ZoomController
     }
 
     @Override
-    public void plotAreaSpaceChanged(double scaledMinValue, double scaledMaxValue, double scaledMinTime, double scaledMaxTime,
-            double scaledSelectedMinValue, double scaledSelectedMaxValue, double scaledSelectedMinTime, double scaledSelectedMaxTime,
-            boolean forced) {
+    public void plotAreaSpaceChanged(double scaledMinValue, double scaledMaxValue, double scaledMinTime, double scaledMaxTime, double scaledSelectedMinValue, double scaledSelectedMaxValue, double scaledSelectedMinTime, double scaledSelectedMaxTime, boolean forced) {
         for (String unitLabel : yAxisElementMap.keySet()) {
             double diffScaledAvailable = scaledMaxValue - scaledMinValue;
             double diffAvaliable = Math.log10(availableRangeMap.get(unitLabel).max) - Math.log10(availableRangeMap.get(unitLabel).min);
             double diffSelectedStart = scaledSelectedMinValue - scaledMinValue;
             double diffSelectedEnd = scaledSelectedMaxValue - scaledMinValue;
-            double selectedStart = Math.pow(10, Math.log10(availableRangeMap.get(unitLabel).min) + diffSelectedStart / diffScaledAvailable
-                    * diffAvaliable);
-            double selectedEnd = Math.pow(10, Math.log10(availableRangeMap.get(unitLabel).min) + diffSelectedEnd / diffScaledAvailable
-                    * diffAvaliable);
+            double selectedStart = Math.pow(10, Math.log10(availableRangeMap.get(unitLabel).min) + diffSelectedStart / diffScaledAvailable * diffAvaliable);
+            double selectedEnd = Math.pow(10, Math.log10(availableRangeMap.get(unitLabel).min) + diffSelectedEnd / diffScaledAvailable * diffAvaliable);
             if (selectedStart != selectedRangeMap.get(unitLabel).min || selectedEnd != selectedRangeMap.get(unitLabel).max) {
                 setSelectedRange(new Range(selectedStart, selectedEnd), unitLabel);
             } else {
@@ -380,8 +357,7 @@ public class EVEDrawController implements BandControllerListener, ZoomController
     }
 
     @Override
-    public void availablePlotAreaSpaceChanged(double oldMinValue, double oldMaxValue, double oldMinTime, double oldMaxTime,
-            double newMinValue, double newMaxValue, double newMinTime, double newMaxTime) {
+    public void availablePlotAreaSpaceChanged(double oldMinValue, double oldMaxValue, double oldMinTime, double oldMaxTime, double newMinValue, double newMaxValue, double newMinTime, double newMaxTime) {
         // TODO Auto-generated method stub
     }
 

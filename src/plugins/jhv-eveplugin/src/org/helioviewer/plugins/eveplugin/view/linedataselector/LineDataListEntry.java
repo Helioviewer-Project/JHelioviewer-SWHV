@@ -39,7 +39,7 @@ public class LineDataListEntry extends JPanel implements MouseListener {
     // Methods
     // //////////////////////////////////////////////////////////////////////////////
 
-    public LineDataListEntry(final LineDataList list, final LineDataSelectorElement element, final String identifier) {
+    public LineDataListEntry(final LineDataList list, final LineDataSelectorElement element) {
         this.element = element;
         this.list = list;
         initVisualComponents();

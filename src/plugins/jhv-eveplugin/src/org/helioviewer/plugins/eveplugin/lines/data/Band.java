@@ -20,8 +20,6 @@ public class Band implements LineDataSelectorElement {
     private boolean isVisible = true;
     private Color graphColor = Color.BLACK;
 
-    private String plotIdentifier = "plot.identifier.master";
-
     // //////////////////////////////////////////////////////////////////////////////
     // Methods
     // //////////////////////////////////////////////////////////////////////////////
@@ -38,6 +36,7 @@ public class Band implements LineDataSelectorElement {
         return bandType.getLabel();
     }
 
+    @Override
     public boolean isVisible() {
         return isVisible;
     }
@@ -56,11 +55,13 @@ public class Band implements LineDataSelectorElement {
 
     @Override
     public boolean equals(Object obj) {
-        if (obj == null)
+        if (obj == null) {
             return false;
+        }
 
-        if (!(obj instanceof Band))
+        if (!(obj instanceof Band)) {
             return false;
+        }
 
         return bandType.equals(((Band) obj).bandType);
     }
@@ -72,13 +73,13 @@ public class Band implements LineDataSelectorElement {
 
     @Override
     public void removeLineData() {
-        BandController.getSingletonInstance().removeBand(plotIdentifier, this);
+        BandController.getSingletonInstance().removeBand(this);
     }
 
     @Override
     public void setVisibility(boolean visible) {
         this.setVisible(visible);
-        BandController.getSingletonInstance().setBandVisibility(plotIdentifier, bandType, visible);
+        BandController.getSingletonInstance().setBandVisibility(bandType, visible);
     }
 
     @Override
@@ -103,19 +104,8 @@ public class Band implements LineDataSelectorElement {
     }
 
     @Override
-    public String getPlotIdentifier() {
-        return this.plotIdentifier;
-    }
-
-    @Override
-    public void setPlotIndentifier(String identifier) {
-        this.plotIdentifier = identifier;
-
-    }
-
-    @Override
     public boolean isAvailable() {
-        return BandController.getSingletonInstance().isBandAvailable(plotIdentifier, this);
+        return BandController.getSingletonInstance().isBandAvailable(this);
     }
 
     @Override

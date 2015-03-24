@@ -25,12 +25,12 @@ public class RadioPlotModelData {
     /** Map containing per download id a list of no data configurations */
     private Map<Long, List<NoDataConfig>> noDataConfigList;
 
-    public RadioPlotModelData(String plotIdentifier) {
-        yAxisElement = new RadioYAxisElement(plotIdentifier);
+    public RadioPlotModelData() {
+        yAxisElement = new RadioYAxisElement();
         yAxisElement.setColor(Color.BLACK);
         yAxisElement.setLabel("MHz");
         yAxisElement.setIsLogScale(false);
-        radioImagePane = new RadioImagePane(plotIdentifier);
+        radioImagePane = new RadioImagePane();
         radioImagePane.setYAxisElement(yAxisElement);
         downloadRequestData = new HashMap<Long, DownloadRequestData>();
         plotConfigList = new HashMap<Long, Map<Long, PlotConfig>>();

@@ -3,7 +3,6 @@
  */
 package org.helioviewer.plugins.eveplugin.model;
 
-import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -29,7 +28,7 @@ public class TimeIntervalLockModel implements ZoomControllerListener, DrawContro
     private final DrawController drawController;
 
     /** Instance of the plot area space manager */
-    private final PlotAreaSpaceManager plotAreaSpaceManager;
+    private final PlotAreaSpace plotAreaSpace;
 
     /** Is the time interval locked */
     private boolean isLocked;
@@ -54,14 +53,14 @@ public class TimeIntervalLockModel implements ZoomControllerListener, DrawContro
     private TimeIntervalLockModel() {
         zoomController = ZoomController.getSingletonInstance();
         drawController = DrawController.getSingletonInstance();
-        plotAreaSpaceManager = PlotAreaSpaceManager.getInstance();
+        plotAreaSpace = PlotAreaSpace.getSingletonInstance();
         isLocked = false;
         // currentAvailableInterval = new Interval<Date>(null, null);
         zoomController.addZoomControllerListener(this);
-        drawController.addDrawControllerListenerForAllIdentifiers(this);
+        drawController.addDrawControllerListener(this);
         selectedSpaceWidth = new HashMap<PlotAreaSpace, Double>();
         previousMovieTime = new Date();
-        plotAreaSpaceManager.addPlotAreaSpaceListenerToAllSpaces(this);
+        plotAreaSpace.addPlotAreaSpaceListener(this);
     }
 
     /**
@@ -96,10 +95,7 @@ public class TimeIntervalLockModel implements ZoomControllerListener, DrawContro
     public void setLocked(boolean isLocked) {
         this.isLocked = isLocked;
         if (isLocked) {
-            Collection<PlotAreaSpace> spaces = plotAreaSpaceManager.getAllPlotAreaSpaces();
-            for (PlotAreaSpace space : spaces) {
-                selectedSpaceWidth.put(space, space.getScaledSelectedMaxTime() - space.getScaledSelectedMinTime());
-            }
+            selectedSpaceWidth.put(plotAreaSpace, plotAreaSpace.getScaledSelectedMaxTime() - plotAreaSpace.getScaledSelectedMinTime());
             if (latestMovieTime != null) {
                 drawMovieLineRequest(latestMovieTime);
             }
@@ -135,38 +131,34 @@ public class TimeIntervalLockModel implements ZoomControllerListener, DrawContro
             previousMovieTime = time;
             Map<PlotAreaSpace, Double> selectedStartTimes = new HashMap<PlotAreaSpace, Double>();
             Map<PlotAreaSpace, Double> selectedEndTimes = new HashMap<PlotAreaSpace, Double>();
-            Collection<PlotAreaSpace> spaces = plotAreaSpaceManager.getAllPlotAreaSpaces();
-            for (PlotAreaSpace space : spaces) {
-                double selectedIntervalWidth = selectedSpaceWidth.get(space);
-                // Log.debug("Selected interval width: " +
-                // selectedIntervalWidth);
+            double selectedIntervalWidth = selectedSpaceWidth.get(plotAreaSpace);
+            // Log.debug("Selected interval width: " +
+            // selectedIntervalWidth);
 
-                long movieTimeDiff = time.getTime() - currentAvailableInterval.getStart().getTime();
-                double availableIntervalWidthScaled = space.getScaledMaxTime() - space.getScaledMinTime();
-                long availableIntervalWidthAbs = currentAvailableInterval.getEnd().getTime() - currentAvailableInterval.getStart().getTime();
-                // Log.debug("Available interval abs: " +
-                // availableIntervalWidthAbs);
-                // Log.debug("Available interval scaled: " +
-                // availableIntervalWidthScaled);
-                double scaledPerTime = availableIntervalWidthScaled / availableIntervalWidthAbs;
-                double scaledMoviePosition = space.getScaledMinTime() + movieTimeDiff * scaledPerTime;
-                // double newSelectedScaledStart =
-                // Math.max(space.getScaledMinTime(), scaledMoviePosition -
-                // (selectedIntervalWidth / 2));
-                double newSelectedScaledStart = scaledMoviePosition - (selectedIntervalWidth / 2);
-                // double newSelectedScaledEnd =
-                // Math.min(space.getScaledMaxTime(), scaledMoviePosition +
-                // (selectedIntervalWidth / 2));
-                double newSelectedScaledEnd = scaledMoviePosition + (selectedIntervalWidth / 2);
-                // Log.debug("Old selected width, new selected width: " +
-                // selectedIntervalWidth + ", " + (newSelectedScaledEnd -
-                // newSelectedScaledStart));
-                selectedStartTimes.put(space, newSelectedScaledStart);
-                selectedEndTimes.put(space, newSelectedScaledEnd);
-            }
-            for (PlotAreaSpace space : spaces) {
-                space.setScaledSelectedTime(selectedStartTimes.get(space), selectedEndTimes.get(space), false);
-            }
+            long movieTimeDiff = time.getTime() - currentAvailableInterval.getStart().getTime();
+            double availableIntervalWidthScaled = plotAreaSpace.getScaledMaxTime() - plotAreaSpace.getScaledMinTime();
+            long availableIntervalWidthAbs = currentAvailableInterval.getEnd().getTime() - currentAvailableInterval.getStart().getTime();
+            // Log.debug("Available interval abs: " +
+            // availableIntervalWidthAbs);
+            // Log.debug("Available interval scaled: " +
+            // availableIntervalWidthScaled);
+            double scaledPerTime = availableIntervalWidthScaled / availableIntervalWidthAbs;
+            double scaledMoviePosition = plotAreaSpace.getScaledMinTime() + movieTimeDiff * scaledPerTime;
+            // double newSelectedScaledStart =
+            // Math.max(space.getScaledMinTime(), scaledMoviePosition -
+            // (selectedIntervalWidth / 2));
+            double newSelectedScaledStart = scaledMoviePosition - (selectedIntervalWidth / 2);
+            // double newSelectedScaledEnd =
+            // Math.min(space.getScaledMaxTime(), scaledMoviePosition +
+            // (selectedIntervalWidth / 2));
+            double newSelectedScaledEnd = scaledMoviePosition + (selectedIntervalWidth / 2);
+            // Log.debug("Old selected width, new selected width: " +
+            // selectedIntervalWidth + ", " + (newSelectedScaledEnd -
+            // newSelectedScaledStart));
+            selectedStartTimes.put(plotAreaSpace, newSelectedScaledStart);
+            selectedEndTimes.put(plotAreaSpace, newSelectedScaledEnd);
+            plotAreaSpace.setScaledSelectedTime(selectedStartTimes.get(plotAreaSpace), selectedEndTimes.get(plotAreaSpace), false);
+
         }
     }
 
@@ -212,12 +204,7 @@ public class TimeIntervalLockModel implements ZoomControllerListener, DrawContro
 
     @Override
     public void plotAreaSpaceChanged(double scaledMinValue, double scaledMaxValue, double scaledMinTime, double scaledMaxTime, double scaledSelectedMinValue, double scaledSelectedMaxValue, double scaledSelectedMinTime, double scaledSelectedMaxTime, boolean forced) {
-        Collection<PlotAreaSpace> spaces = plotAreaSpaceManager.getAllPlotAreaSpaces();
-        // Log.debug("PlotAreaSpace Changed : width : " + (scaledSelectedMaxTime
-        // - scaledSelectedMinTime));
-        for (PlotAreaSpace space : spaces) {
-            selectedSpaceWidth.put(space, scaledSelectedMaxTime - scaledSelectedMinTime);
-        }
+        selectedSpaceWidth.put(plotAreaSpace, scaledSelectedMaxTime - scaledSelectedMinTime);
     }
 
     @Override

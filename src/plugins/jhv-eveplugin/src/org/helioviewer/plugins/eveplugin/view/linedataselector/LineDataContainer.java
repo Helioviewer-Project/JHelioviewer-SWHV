@@ -20,8 +20,6 @@ public class LineDataContainer extends JPanel implements LineDataSelectorModelLi
 
     private static final long serialVersionUID = 1L;
 
-    private final String identifier;
-
     private final CardLayout layout = new CardLayout();
 
     private final LineDataList list;
@@ -30,7 +28,7 @@ public class LineDataContainer extends JPanel implements LineDataSelectorModelLi
     private final JScrollPane listScrollPane;
     private final JScrollPane emptyScrollPane = new JScrollPane(emptyLabel, JScrollPane.VERTICAL_SCROLLBAR_ALWAYS, JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
 
-    private LineDataSelectorModel lineDataModel;
+    private final LineDataSelectorModel lineDataModel;
 
     // //////////////////////////////////////////////////////////////////////////////
     // Methods
@@ -39,12 +37,11 @@ public class LineDataContainer extends JPanel implements LineDataSelectorModelLi
     /**
      * Default constructor.
      * */
-    public LineDataContainer(final String identifier) {
-        this.identifier = identifier;
+    public LineDataContainer() {
 
         lineDataModel = LineDataSelectorModel.getSingletonInstance();
         lineDataModel.addLineDataSelectorModelListener(this);
-        list = new LineDataList(identifier);
+        list = new LineDataList();
         listScrollPane = new JScrollPane(list, JScrollPane.VERTICAL_SCROLLBAR_ALWAYS, JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
         initVisualComponent();
     }
@@ -76,7 +73,7 @@ public class LineDataContainer extends JPanel implements LineDataSelectorModelLi
      * 
      * */
     private void update() {
-        if (lineDataModel.getNumberOfAvailableLineData(identifier) > 0) {
+        if (lineDataModel.getNumberOfAvailableLineData() > 0) {
             layout.show(this, "list");
             listScrollPane.revalidate();
             listScrollPane.repaint();

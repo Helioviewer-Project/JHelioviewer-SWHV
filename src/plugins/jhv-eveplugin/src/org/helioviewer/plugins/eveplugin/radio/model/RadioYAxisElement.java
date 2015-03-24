@@ -19,10 +19,7 @@ import org.helioviewer.plugins.eveplugin.draw.YAxisElement;
 public class RadioYAxisElement extends YAxisElement {
 
     /** Instance of the y-value model manager. */
-    private final YValueModelManager yValueModelManager;
-
-    /** The plot identifier for this radio y-axis element. */
-    private final String plotIdentifier;
+    private final YValueModel yValueModel;
 
     /**
      * Default constructor.
@@ -30,14 +27,7 @@ public class RadioYAxisElement extends YAxisElement {
      */
     public RadioYAxisElement() {
         super();
-        yValueModelManager = YValueModelManager.getInstance();
-        plotIdentifier = "";
-    }
-
-    public RadioYAxisElement(String plotIdentifier) {
-        super();
-        yValueModelManager = YValueModelManager.getInstance();
-        this.plotIdentifier = plotIdentifier;
+        yValueModel = YValueModel.getSingletonInstance();
     }
 
     /**
@@ -60,34 +50,28 @@ public class RadioYAxisElement extends YAxisElement {
      * @param plotIdentifier
      *            The plot identifier for this radio y-axis element
      */
-    public RadioYAxisElement(Range selectedRange, Range availableRange, String label, double minValue, double maxValue, Color color,
-            String plotIdentifier, long activationTime) {
+    public RadioYAxisElement(Range selectedRange, Range availableRange, String label, double minValue, double maxValue, Color color, long activationTime) {
         super(selectedRange, availableRange, label, minValue, maxValue, color, false, activationTime);
-        yValueModelManager = YValueModelManager.getInstance();
-        this.plotIdentifier = plotIdentifier;
+        yValueModel = YValueModel.getSingletonInstance();
     }
 
     @Override
     public Range getSelectedRange() {
-        YValueModel yvm = yValueModelManager.getYValueModel(plotIdentifier);
-        return new Range(yvm.getSelectedYMax(), yvm.getSelectedYMin());
+        return new Range(yValueModel.getSelectedYMax(), yValueModel.getSelectedYMin());
     }
 
     @Override
     public Range getAvailableRange() {
-        YValueModel yvm = yValueModelManager.getYValueModel(plotIdentifier);
-        return new Range(yvm.getAvailableYMax(), yvm.getAvailableYMin());
+        return new Range(yValueModel.getAvailableYMax(), yValueModel.getAvailableYMin());
     }
 
     @Override
     public double getMinValue() {
-        YValueModel yvm = yValueModelManager.getYValueModel(plotIdentifier);
-        return yvm.getSelectedYMax();
+        return yValueModel.getSelectedYMax();
     }
 
     @Override
     public double getMaxValue() {
-        YValueModel yvm = yValueModelManager.getYValueModel(plotIdentifier);
-        return yvm.getSelectedYMin();
+        return yValueModel.getSelectedYMin();
     }
 }

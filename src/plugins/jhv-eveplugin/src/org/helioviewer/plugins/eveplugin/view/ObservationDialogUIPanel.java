@@ -41,12 +41,12 @@ public class ObservationDialogUIPanel extends SimpleObservationDialogUIPanel imp
     // //////////////////////////////////////////////////////////////////////////////
 
     private static final long serialVersionUID = 8932098719271808631L;
-    private JLabel labelGroup;
-    private JLabel labelData;
-    private JComboBox comboBoxGroup;
-    private JComboBox comboBoxData;
+    private final JLabel labelGroup;
+    private final JLabel labelData;
+    private final JComboBox comboBoxGroup;
+    private final JComboBox comboBoxData;
 
-    private JPanel dataPane;
+    private final JPanel dataPane;
 
     // //////////////////////////////////////////////////////////////////////////////
     // Methods
@@ -115,13 +115,12 @@ public class ObservationDialogUIPanel extends SimpleObservationDialogUIPanel imp
         final BandController bandController = BandController.getSingletonInstance();
         final DefaultComboBoxModel model = (DefaultComboBoxModel) comboBoxData.getModel();
         final BandGroup selectedGroup = (BandGroup) comboBoxGroup.getSelectedItem();
-        final String identifier = PlotsContainerPanel.PLOT_IDENTIFIER_MASTER;
         final BandType[] values = BandTypeAPI.getSingletonInstance().getBandTypes(selectedGroup);
 
         model.removeAllElements();
 
         for (final BandType value : values) {
-            if (bandController.getBand(identifier, value) == null) {
+            if (bandController.getBand(value) == null) {
                 model.addElement(value);
             }
         }
@@ -170,12 +169,11 @@ public class ObservationDialogUIPanel extends SimpleObservationDialogUIPanel imp
     private boolean updateBandController() {
         final BandController bandController = BandController.getSingletonInstance();
 
-        final String identifier = PlotsContainerPanel.PLOT_IDENTIFIER_MASTER;
         final BandGroup group = (BandGroup) comboBoxGroup.getSelectedItem();
         final BandType bandType = (BandType) comboBoxData.getSelectedItem();
         bandType.setDataDownloader(EVECacheController.getSingletonInstance());
 
-        Set<YAxisElement> yAxisElements = DrawController.getSingletonInstance().getYAxisElements(identifier);
+        Set<YAxisElement> yAxisElements = DrawController.getSingletonInstance().getYAxisElements();
         if (yAxisElements.size() >= 2) {
             boolean present = false;
             for (YAxisElement el : yAxisElements) {
@@ -196,12 +194,9 @@ public class ObservationDialogUIPanel extends SimpleObservationDialogUIPanel imp
          * bandController.removeAllBands(identifier); }
          */
 
-        bandController.selectBandGroup(identifier, group);
-        bandController.addBand(identifier, bandType);
+        bandController.selectBandGroup(group);
+        bandController.addBand(bandType);
 
-        if (identifier.equals(PlotsContainerPanel.PLOT_IDENTIFIER_SLAVE)) {
-            plotsContainerPanel.setPlot2Visible(true);
-        }
         return true;
     }
 

@@ -2,14 +2,11 @@ package org.helioviewer.plugins.eveplugin.controller;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.helioviewer.base.logging.Log;
 import org.helioviewer.base.math.Interval;
 import org.helioviewer.jhv.data.datatype.event.JHVEvent;
 import org.helioviewer.jhv.data.datatype.event.JHVEventHighlightListener;
@@ -30,13 +27,12 @@ import org.helioviewer.viewmodel.view.View;
 public class DrawController implements ZoomControllerListener, LineDataSelectorModelListener, JHVEventHighlightListener, LayersListener, TimeListener {
 
     private static DrawController instance;
-    private final Map<String, DrawControllerData> drawControllerData;
+    private final DrawControllerData drawControllerData;
     private Interval<Date> interval;
     private final List<DrawControllerListener> forAllPlotIdentifiers;
-    private Thread viewChangedThread;
 
     private DrawController() {
-        drawControllerData = Collections.synchronizedMap(new HashMap<String, DrawControllerData>());
+        drawControllerData = new DrawControllerData();
         ZoomController.getSingletonInstance().addZoomControllerListener(this);
         LineDataSelectorModel.getSingletonInstance().addLineDataSelectorModelListener(this);
         forAllPlotIdentifiers = new ArrayList<DrawControllerListener>();
@@ -51,95 +47,55 @@ public class DrawController implements ZoomControllerListener, LineDataSelectorM
         return instance;
     }
 
-    private DrawControllerData getDrawControllerData(String identifier) {
-        Log.debug("Called by " + Thread.currentThread().getName());
-        Thread.dumpStack();
-        DrawControllerData dcd = new DrawControllerData();
-        if (drawControllerData.containsKey(identifier)) {
-            dcd = drawControllerData.get(identifier);
-        } else {
-            for (DrawControllerListener l : forAllPlotIdentifiers) {
-                dcd.addDrawControllerListener(l);
-            }
-            drawControllerData.put(identifier, dcd);
-        }
-        return dcd;
+    public void addDrawControllerListener(DrawControllerListener listener) {
+        drawControllerData.addDrawControllerListener(listener);
     }
 
-    public void addDrawControllerListenerForAllIdentifiers(DrawControllerListener listener) {
-        forAllPlotIdentifiers.add(listener);
-        for (String identifier : drawControllerData.keySet()) {
-            DrawControllerData dcd = getDrawControllerData(identifier);
-            dcd.addDrawControllerListener(listener);
-        }
-
+    public void removeDrawControllerListener(DrawControllerListener listener) {
+        drawControllerData.removeDrawControllerListener(listener);
     }
 
-    public void removeDrawControllerListenerForAllIdentifiers(DrawControllerListener listener) {
-        forAllPlotIdentifiers.remove(listener);
-        for (String identifier : drawControllerData.keySet()) {
-            DrawControllerData dcd = getDrawControllerData(identifier);
-            dcd.removeDrawControllerListener(listener);
-        }
-
-    }
-
-    public void addDrawControllerListener(DrawControllerListener listener, String identifier) {
-        DrawControllerData dcd = getDrawControllerData(identifier);
-        dcd.addDrawControllerListener(listener);
-    }
-
-    public void removeDrawControllerListener(DrawControllerListener listener, String identifier) {
-        DrawControllerData dcd = getDrawControllerData(identifier);
-        dcd.removeDrawControllerListener(listener);
-    }
-
-    public void updateDrawableElement(DrawableElement drawableElement, String identifier) {
-        removeDrawableElement(drawableElement, identifier, false);
-        this.addDrawableElement(drawableElement, identifier, false);
+    public void updateDrawableElement(DrawableElement drawableElement) {
+        removeDrawableElement(drawableElement, false);
+        this.addDrawableElement(drawableElement, false);
 
         if (drawableElement.hasElementsToDraw()) {
-            this.fireRedrawRequest(identifier);
+            this.fireRedrawRequest();
         }
     }
 
-    private void addDrawableElement(DrawableElement element, String identifier, boolean redraw) {
-        DrawControllerData dcd = getDrawControllerData(identifier);
-        dcd.addDrawableElement(element);
+    private void addDrawableElement(DrawableElement element, boolean redraw) {
+        drawControllerData.addDrawableElement(element);
         if (redraw) {
-            this.fireRedrawRequest(identifier);
+            this.fireRedrawRequest();
         }
     }
 
-    private void removeDrawableElement(DrawableElement element, String identifier, boolean redraw) {
-        DrawControllerData dcd = getDrawControllerData(identifier);
-        dcd.removeDrawableElement(element);
+    private void removeDrawableElement(DrawableElement element, boolean redraw) {
+        drawControllerData.removeDrawableElement(element);
         if (redraw) {
-            this.fireRedrawRequest(identifier);
+            this.fireRedrawRequest();
         }
     }
 
-    public void removeDrawableElement(DrawableElement element, String identifier) {
-        removeDrawableElement(element, identifier, true);
+    public void removeDrawableElement(DrawableElement element) {
+        removeDrawableElement(element, true);
     }
 
-    public int getNumberOfYAxis(String identifier) {
-        DrawControllerData dcd = getDrawControllerData(identifier);
-        return dcd.getyAxisSet().size();
+    public int getNumberOfYAxis() {
+        return drawControllerData.getyAxisSet().size();
     }
 
-    public Set<YAxisElement> getYAxisElements(String identifier) {
-        DrawControllerData dcd = getDrawControllerData(identifier);
-        return dcd.getyAxisSet();
+    public Set<YAxisElement> getYAxisElements() {
+        return drawControllerData.getyAxisSet();
     }
 
-    public Map<DrawableType, Set<DrawableElement>> getDrawableElements(String identifier) {
-        DrawControllerData dcd = getDrawControllerData(identifier);
-        return dcd.getDrawableElements();
+    public Map<DrawableType, Set<DrawableElement>> getDrawableElements() {
+        return drawControllerData.getDrawableElements();
     }
 
-    public List<DrawableElement> getAllDrawableElements(String identifier) {
-        Collection<Set<DrawableElement>> allValues = getDrawableElements(identifier).values();
+    public List<DrawableElement> getAllDrawableElements() {
+        Collection<Set<DrawableElement>> allValues = getDrawableElements().values();
         ArrayList<DrawableElement> deList = new ArrayList<DrawableElement>();
         for (Set<DrawableElement> tempList : allValues) {
             deList.addAll(tempList);
@@ -147,8 +103,8 @@ public class DrawController implements ZoomControllerListener, LineDataSelectorM
         return deList;
     }
 
-    public boolean hasElementsToBeDrawn(String identifier) {
-        List<DrawableElement> allElements = this.getAllDrawableElements(identifier);
+    public boolean hasElementsToBeDrawn() {
+        List<DrawableElement> allElements = this.getAllDrawableElements();
         return !allElements.isEmpty();
     }
 
@@ -176,16 +132,7 @@ public class DrawController implements ZoomControllerListener, LineDataSelectorM
     }
 
     private void fireRedrawRequest() {
-        for (DrawControllerData dcd : drawControllerData.values()) {
-            for (DrawControllerListener l : dcd.getListeners()) {
-                l.drawRequest();
-            }
-        }
-    }
-
-    private void fireRedrawRequest(String identifier) {
-        DrawControllerData dcd = getDrawControllerData(identifier);
-        for (DrawControllerListener l : dcd.getListeners()) {
+        for (DrawControllerListener l : drawControllerData.getListeners()) {
             l.drawRequest();
         }
     }
@@ -217,19 +164,17 @@ public class DrawController implements ZoomControllerListener, LineDataSelectorM
 
     @Override
     public void lineDataRemoved(LineDataSelectorElement element) {
-        fireRedrawRequest(element.getPlotIdentifier());
+        fireRedrawRequest();
     }
 
     @Override
     public void lineDataUpdated(LineDataSelectorElement element) {
-        fireRedrawRequest(element.getPlotIdentifier());
+        fireRedrawRequest();
     }
 
     private void fireRedrawRequestMovieFrameChanged(final Date time) {
-        for (DrawControllerData dcd : drawControllerData.values()) {
-            for (DrawControllerListener l : dcd.getListeners()) {
-                l.drawMovieLineRequest(time);
-            }
+        for (DrawControllerListener l : drawControllerData.getListeners()) {
+            l.drawMovieLineRequest(time);
         }
     }
 
@@ -240,13 +185,12 @@ public class DrawController implements ZoomControllerListener, LineDataSelectorM
 
     public Date getLastDateWithData() {
         Date lastDate = null;
-        for (DrawControllerData dcd : drawControllerData.values()) {
-            if (dcd.getLastDateWithData() != null) {
-                if (lastDate == null || lastDate.before(dcd.getLastDateWithData())) {
-                    lastDate = dcd.getLastDateWithData();
-                }
+        if (drawControllerData.getLastDateWithData() != null) {
+            if (lastDate == null || lastDate.before(drawControllerData.getLastDateWithData())) {
+                lastDate = drawControllerData.getLastDateWithData();
             }
         }
+
         return lastDate;
     }
 

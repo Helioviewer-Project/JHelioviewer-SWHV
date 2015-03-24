@@ -7,25 +7,19 @@ import org.helioviewer.base.math.Interval;
 
 public interface RadioDownloaderListener {
 
-    public abstract void intervalTooBig(Date requestedStartTime, Date requestedEndTime, long ID, String identifier);
+    public abstract void intervalTooBig(Date requestedStartTime, Date requestedEndTime, long ID);
 
-    public abstract void newJPXFilesDownloaded(List<DownloadedJPXData> jpxFiles, Date requestedStartTime, Date requestedEndTime,
-            Long downloadID, String identifier);
+    public abstract void newJPXFilesDownloaded(List<DownloadedJPXData> jpxFiles, Date requestedStartTime, Date requestedEndTime, Long downloadID);
 
-    public abstract void newAdditionalDataDownloaded(List<DownloadedJPXData> jpxFiles, Long downloadID, String plotIdentifier,
-            double ratioX, double ratioY);
+    public abstract void newAdditionalDataDownloaded(List<DownloadedJPXData> jpxFiles, Long downloadID, double ratioX, double ratioY);
 
-    public abstract void newNoData(List<Interval<Date>> noDataList, String identifier, long downloadID);
+    public abstract void newNoData(List<Interval<Date>> noDataList, long downloadID);
 
     /**
      * Instructs the radio downloader listener to remove all the spectrograms
      * for the plot identifier by the identifier.
-     * 
-     * @param identifier
-     *            The identifier of the plot from which the spectrograms should
-     *            be removed
      */
-    public abstract void removeSpectrograms(String identifier);
+    public abstract void removeSpectrograms();
 
-    public abstract void noDataInDownloadInterval(Interval<Date> requestInterval, Long downloadID, String identifier);
+    public abstract void noDataInDownloadInterval(Interval<Date> requestInterval, Long downloadID);
 }

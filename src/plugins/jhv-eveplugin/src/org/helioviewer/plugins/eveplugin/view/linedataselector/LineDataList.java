@@ -22,8 +22,6 @@ public class LineDataList extends JPanel implements LineDataSelectorModelListene
 
     private static final long serialVersionUID = 1L;
 
-    private final String identifier;
-
     private final Color selectionBackgroundColor = new JList().getSelectionBackground();
     private final Color selectionForegroundColor = new JList().getSelectionForeground();
     private final LinkedList<LineDataListEntry> entryList = new LinkedList<LineDataListEntry>();
@@ -34,8 +32,7 @@ public class LineDataList extends JPanel implements LineDataSelectorModelListene
     // Methods
     // //////////////////////////////////////////////////////////////////////////////
 
-    public LineDataList(final String identifier) {
-        this.identifier = identifier;
+    public LineDataList() {
         model = LineDataSelectorModel.getSingletonInstance();
         initVisualComponents();
 
@@ -53,7 +50,7 @@ public class LineDataList extends JPanel implements LineDataSelectorModelListene
         }
         entryList.clear();
 
-        final List<LineDataSelectorElement> elements = model.getAllLineDataSelectorElements(identifier);
+        final List<LineDataSelectorElement> elements = model.getAllLineDataSelectorElements();
 
         for (final LineDataSelectorElement el : elements) {
             addEntry(el);
@@ -84,7 +81,7 @@ public class LineDataList extends JPanel implements LineDataSelectorModelListene
         }
 
         element.setDataColor(BandColors.getNextColor());
-        final LineDataListEntry entry = new LineDataListEntry(this, element, identifier);
+        final LineDataListEntry entry = new LineDataListEntry(this, element);
         add(entry);
         entryList.add(entry);
         selectItem(entryList.size() - 1);
@@ -135,20 +132,19 @@ public class LineDataList extends JPanel implements LineDataSelectorModelListene
     // Band Controller Listener
     // //////////////////////////////////////////////////////////////////////////////
 
-    public void bandAdded(final Band band, final String identifier) {
+    public void bandAdded(final Band band) {
 
     }
 
-    public void bandRemoved(final Band band, final String identifier) {
-        if (this.identifier.equals(identifier)) {
-            removeEntry(band);
+    public void bandRemoved(final Band band) {
+        removeEntry(band);
 
-            repaint();
-        }
+        repaint();
+
     }
 
-    public void bandUpdated(final Band band, final String identifier) {
-        if (this.identifier.equals(identifier) && band != null) {
+    public void bandUpdated(final Band band) {
+        if (band != null) {
             for (final LineDataListEntry entry : entryList) {
                 if (entry.getLineDataSelectorElement().equals(band)) {
                     entry.updateVisualComponentValues();
@@ -157,11 +153,11 @@ public class LineDataList extends JPanel implements LineDataSelectorModelListene
         }
     }
 
-    public void bandGroupChanged(final String identifier) {
-        if (this.identifier.equals(identifier)) {
-            refillListEntries();
-            selectItem(0);
-        }
+    public void bandGroupChanged() {
+
+        refillListEntries();
+        selectItem(0);
+
     }
 
     @Override
@@ -184,18 +180,18 @@ public class LineDataList extends JPanel implements LineDataSelectorModelListene
 
     @Override
     public void lineDataAdded(LineDataSelectorElement element) {
-        if (element.getPlotIdentifier().equals(identifier)) {
-            addEntry(element);
-            selectItem(element);
 
-            repaint();
-        }
+        addEntry(element);
+        selectItem(element);
+
+        repaint();
+
     }
 
     @Override
     public void lineDataRemoved(LineDataSelectorElement element) {
         LineDataListEntry toRemove = null;
-        if (identifier.equals(element.getPlotIdentifier()) && element != null) {
+        if (element != null) {
             for (final LineDataListEntry entry : entryList) {
                 if (entry.getLineDataSelectorElement().equals(element)) {
                     entry.updateVisualComponentValues();

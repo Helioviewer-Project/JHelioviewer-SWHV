@@ -49,17 +49,13 @@ public abstract class SimpleObservationDialogUIPanel extends ObservationDialogPa
 
     protected boolean enableLoadButton = true;
 
-    private JLabel labelStartDate;
-    private JHVCalendarDatePicker calendarStartDate;
-    // private JHVCalendarDatePicker calendarEndDate;
-
-    // protected JComboBox plotComboBox;
-
+    private final JLabel labelStartDate;
+    private final JHVCalendarDatePicker calendarStartDate;
     protected JComboBox comboBoxGroup;
     protected JComboBox comboBoxData;
 
-    private JPanel timePane;
-    private JPanel plotPane;
+    private final JPanel timePane;
+    private final JPanel plotPane;
 
     // //////////////////////////////////////////////////////////////////////////////
     // Methods
@@ -69,22 +65,13 @@ public abstract class SimpleObservationDialogUIPanel extends ObservationDialogPa
         this.plotsContainerPanel = plotsContainerPanel;
         ObservationDialogDateModel.getInstance().addListener(this);
 
-        // long start = System.currentTimeMillis();
         labelStartDate = new JLabel("Start Date");
-        // labelEndDate = new JLabel("End Date");
         calendarStartDate = new JHVCalendarDatePicker();
-        // calendarEndDate = new JHVCalendarDatePicker();
-
-        // plotComboBox = new JComboBox(new String[] { "Plot 1",
-        // "Plot 2" });
-
         comboBoxGroup = new JComboBox(new DefaultComboBoxModel());
         comboBoxData = new JComboBox(new DefaultComboBoxModel());
         timePane = new JPanel();
         plotPane = new JPanel();
         initVisualComponents();
-        // Log.debug("SimpleObservationDialogUIPanel time : " +
-        // (System.currentTimeMillis() - start));
         LayersModel.getSingletonInstance().addLayersListener(SimpleObservationDialogUIPanel.this);
 
         // initGroups();
@@ -95,10 +82,6 @@ public abstract class SimpleObservationDialogUIPanel extends ObservationDialogPa
         calendarStartDate.setDateFormat(Settings.getSingletonInstance().getProperty("default.date.format"));
         calendarStartDate.addJHVCalendarListener(this);
         calendarStartDate.setToolTipText("Date in UTC starting the observation");
-
-        // calendarEndDate.setDateFormat(Settings.getSingletonInstance().getProperty("default.date.format"));
-        // calendarEndDate.addJHVCalendarListener(this);
-        // calendarEndDate.setToolTipText("Date in UTC ending the observation.");
 
         final JPanel startDatePane = new JPanel(new BorderLayout());
         startDatePane.add(labelStartDate, BorderLayout.PAGE_START);
@@ -118,44 +101,9 @@ public abstract class SimpleObservationDialogUIPanel extends ObservationDialogPa
         calendarStartDate.setDate(start);
     }
 
-    /*
-     * public void setEndDate(final Date end) { calendarEndDate.setDate(end); }
-     */
-
     public Date getDate() {
         return calendarStartDate.getDate();
     }
-
-    /*
-     * public Date getEndDate() { return calendarEndDate.getDate(); }
-     */
-
-    /**
-     * Checks if the selected start date is before selected or equal to end
-     * date. The methods checks the entered times when the dates are equal. If
-     * the start time is greater than the end time the method will return false.
-     *
-     * @return boolean value if selected start date is before selected end date.
-     */
-    /*
-     * private boolean isStartDateBeforeOrEqualEndDate() { final
-     * GregorianCalendar calendar = new GregorianCalendar();
-     * calendar.setTime(getStartDate());
-     * 
-     * final GregorianCalendar calendar2 = new
-     * GregorianCalendar(calendar.get(Calendar.YEAR),
-     * calendar.get(Calendar.MONTH), calendar.get(Calendar.DAY_OF_MONTH)); final
-     * long start = calendar2.getTimeInMillis();
-     * 
-     * calendar.clear(); calendar2.clear();
-     * 
-     * calendar.setTime(getEndDate());
-     * calendar2.set(calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH),
-     * calendar.get(Calendar.DAY_OF_MONTH)); final long end =
-     * calendar2.getTimeInMillis();
-     * 
-     * return start <= end; }
-     */
 
     private void updateZoomController() {
         Interval<Date> interval = defineInterval(getDate());
@@ -202,19 +150,7 @@ public abstract class SimpleObservationDialogUIPanel extends ObservationDialogPa
         }
     }
 
-    // private void updateBandController() {
-
-    /*
-     * final String identifier = plotComboBox.getSelectedIndex() == 0 ?
-     * PlotsContainerPanel.PLOT_IDENTIFIER_MASTER :
-     * PlotsContainerPanel.PLOT_IDENTIFIER_SLAVE; if
-     * (identifier.equals(PlotsContainerPanel.PLOT_IDENTIFIER_SLAVE)) {
-     * plotsContainerPanel.setPlot2Visible(true); }
-     */
-    // }
-
     private void startRadioDownload() {
-        final String identifier = PlotsContainerPanel.PLOT_IDENTIFIER_MASTER;
         DateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
         Interval<Date> selectedInterval = ZoomController.getSingletonInstance().getSelectedInterval();
         String isoStart = df.format(selectedInterval.getStart());
@@ -224,7 +160,7 @@ public abstract class SimpleObservationDialogUIPanel extends ObservationDialogPa
         end.set(Calendar.MINUTE, 59);
         end.set(Calendar.SECOND, 59);
         String isoEnd = df.format(end.getTime());
-        RadioDownloader.getSingletonInstance().requestAndOpenRemoteFile(isoStart, isoEnd, identifier);
+        RadioDownloader.getSingletonInstance().requestAndOpenRemoteFile(isoStart, isoEnd);
     }
 
     @Override
@@ -259,7 +195,7 @@ public abstract class SimpleObservationDialogUIPanel extends ObservationDialogPa
          * "", JOptionPane.ERROR_MESSAGE); return false; }
          */
         ObservationDialogDateModel.getInstance().setStartDate(getDate(), true);
-        Set<YAxisElement> yAxisElements = DrawController.getSingletonInstance().getYAxisElements(PlotsContainerPanel.PLOT_IDENTIFIER_MASTER);
+        Set<YAxisElement> yAxisElements = DrawController.getSingletonInstance().getYAxisElements();
         boolean downloadOK = false;
         if (yAxisElements.size() >= 2) {
             for (YAxisElement el : yAxisElements) {

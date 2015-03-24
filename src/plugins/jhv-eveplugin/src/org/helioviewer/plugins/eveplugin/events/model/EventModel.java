@@ -24,7 +24,6 @@ import org.helioviewer.plugins.eveplugin.events.gui.EventPanel;
 import org.helioviewer.plugins.eveplugin.events.gui.EventsSelectorElement;
 import org.helioviewer.plugins.eveplugin.settings.EVEAPI.API_RESOLUTION_AVERAGES;
 import org.helioviewer.plugins.eveplugin.view.linedataselector.LineDataSelectorModel;
-import org.helioviewer.plugins.eveplugin.view.plot.PlotsContainerPanel;
 
 /**
  * 
@@ -55,9 +54,6 @@ public class EventModel implements ZoomControllerListener, EventRequesterListene
     /** current events */
     private Map<String, NavigableMap<Date, NavigableMap<Date, List<JHVEvent>>>> events;
 
-    /** plotIdentifier */
-    private final String plot;
-
     /** The event panel */
     private final EventPanel eventPanel;
 
@@ -78,7 +74,6 @@ public class EventModel implements ZoomControllerListener, EventRequesterListene
         eventPlotConfiguration = new EventTypePlotConfiguration();
         events = new HashMap<String, NavigableMap<Date, NavigableMap<Date, List<JHVEvent>>>>();
         eventsVisible = false;
-        plot = PlotsContainerPanel.PLOT_IDENTIFIER_MASTER;
         eventPanel = new EventPanel();
         currentSwingWorker = null;
         eventSelectorElement = new EventsSelectorElement(this);
@@ -157,7 +152,7 @@ public class EventModel implements ZoomControllerListener, EventRequesterListene
     public void setEventsVisible(boolean visible) {
         if (eventsVisible != visible) {
             eventsVisible = visible;
-            DrawController.getSingletonInstance().updateDrawableElement(eventPanel, plot);
+            DrawController.getSingletonInstance().updateDrawableElement(eventPanel);
             LineDataSelectorModel.getSingletonInstance().lineDataElementUpdated(eventSelectorElement);
         }
 
@@ -167,7 +162,7 @@ public class EventModel implements ZoomControllerListener, EventRequesterListene
         if (eventsActivated) {
             eventsVisible = false;
             eventsActivated = false;
-            DrawController.getSingletonInstance().removeDrawableElement(eventPanel, plot);
+            DrawController.getSingletonInstance().removeDrawableElement(eventPanel);
             // LineDataSelectorModel.getSingletonInstance().removeLineData(eventSelectorElement);
             fireEventsDeactivated();
         }
@@ -177,7 +172,7 @@ public class EventModel implements ZoomControllerListener, EventRequesterListene
         if (!eventsActivated) {
             eventsVisible = true;
             eventsActivated = true;
-            DrawController.getSingletonInstance().updateDrawableElement(eventPanel, plot);
+            DrawController.getSingletonInstance().updateDrawableElement(eventPanel);
             // LineDataSelectorModel.getSingletonInstance().addLineData(eventSelectorElement);
         }
     }
@@ -294,7 +289,7 @@ public class EventModel implements ZoomControllerListener, EventRequesterListene
                         // (eventPlotConfiguration.getEventPlotConfigurations().size()
                         // > 0) {
                         if (eventPlotConfiguration != null && EventModel.getSingletonInstance().isEventsVisible()) {
-                            DrawController.getSingletonInstance().updateDrawableElement(eventPanel, plot);
+                            DrawController.getSingletonInstance().updateDrawableElement(eventPanel);
                         }
                         // }
                     } else {
@@ -354,10 +349,6 @@ public class EventModel implements ZoomControllerListener, EventRequesterListene
         double selectedDuration = 1.0 * (selectedInterval.getEnd().getTime() - selectedInterval.getStart().getTime());
         double position = 1.0 * (date.getTime() - selectedInterval.getStart().getTime());
         return position / selectedDuration;
-    }
-
-    public String getPlotIdentifier() {
-        return plot;
     }
 
     private void fireEventsDeactivated() {
