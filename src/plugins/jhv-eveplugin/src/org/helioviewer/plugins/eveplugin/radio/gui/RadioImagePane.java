@@ -102,7 +102,7 @@ public class RadioImagePane implements ImageObserver, RadioPlotModelListener, Dr
 
     @Override
     public boolean hasElementsToDraw() {
-        return !(RadioPlotModel.getSingletonInstance().getPlotConfigurations(plotIdentifier) == null || RadioPlotModel.getSingletonInstance().getPlotConfigurations(plotIdentifier).isEmpty());
+        return !(RadioPlotModel.getSingletonInstance().getPlotConfigurations(plotIdentifier) == null || !RadioPlotModel.getSingletonInstance().getPlotConfigurations(plotIdentifier).isEmpty() || !RadioPlotModel.getSingletonInstance().getNoDataConfigurations(plotIdentifier).isEmpty());
     }
 
     public void setIntervalTooBig(boolean b) {
