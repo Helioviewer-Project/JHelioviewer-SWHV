@@ -1,6 +1,5 @@
 package org.helioviewer.plugins.eveplugin.controller;
 
-import java.awt.EventQueue;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
@@ -356,10 +355,6 @@ public class ZoomController implements PlotAreaSpaceListener, LayersListener {
 
     @Override
     public void layerAdded(int idx) {
-        handleLayerAdded();
-    }
-
-    private void handleLayerAdded() {
         final Interval<Date> interval = new Interval<Date>(LayersModel.getSingletonInstance().getFirstDate(), LayersModel.getSingletonInstance().getLastDate());
         if (availableInterval == null || availableInterval.getStart() == null || availableInterval.getEnd() == null) {
             availableInterval = interval;
