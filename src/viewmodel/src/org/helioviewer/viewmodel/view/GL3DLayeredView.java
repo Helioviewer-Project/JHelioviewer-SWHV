@@ -13,7 +13,6 @@ import org.helioviewer.viewmodel.changeevent.LayerChangedReason;
 import org.helioviewer.viewmodel.changeevent.LayerChangedReason.LayerChangeType;
 import org.helioviewer.viewmodel.view.jp2view.JHVJP2View;
 import org.helioviewer.viewmodel.view.opengl.GL3DView;
-import org.helioviewer.viewmodel.view.opengl.shader.GLSLShader;
 
 public class GL3DLayeredView extends AbstractView implements LayeredView, ViewListener, GL3DView {
 
@@ -250,16 +249,7 @@ public class GL3DLayeredView extends AbstractView implements LayeredView, ViewLi
         state.pushMV();
         state.getActiveCamera().applyPerspective(state);
         state.getActiveCamera().applyCamera(state);
-        gl.glEnable(GL2.GL_BLEND);
-        gl.glBlendFunc(GL2.GL_SRC_ALPHA, GL2.GL_ONE_MINUS_SRC_ALPHA);
 
-        GLSLShader.bind(gl);
-        for (GL3DImageLayer layer : imageLayers) {
-            layer.draw(state);
-        }
-        GLSLShader.unbind(gl);
-        gl.glDisable(GL2.GL_TEXTURE_2D);
-        gl.glDisable(GL2.GL_BLEND);
         Displayer.getRenderablecontainer().render(state);
         state.getActiveCamera().drawCamera(state);
         state.getActiveCamera().resumePerspective(state);

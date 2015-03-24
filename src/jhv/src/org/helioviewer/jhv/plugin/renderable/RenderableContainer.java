@@ -59,6 +59,7 @@ public class RenderableContainer extends DefaultTableModel implements Reorderabl
         for (Renderable renderable : removedRenderables) {
             renderable.remove(state);
         }
+        removedRenderables.clear();
     }
 
     @Override

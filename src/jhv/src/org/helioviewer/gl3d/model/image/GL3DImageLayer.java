@@ -1,11 +1,13 @@
 package org.helioviewer.gl3d.model.image;
 
+import java.awt.Component;
 import java.awt.Point;
 import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
 import java.util.ArrayList;
 
 import javax.media.opengl.GL2;
+import javax.swing.JPanel;
 
 import org.helioviewer.base.math.Pair;
 import org.helioviewer.base.physics.Constants;
@@ -15,8 +17,12 @@ import org.helioviewer.gl3d.math.GL3DQuatd;
 import org.helioviewer.gl3d.math.GL3DVec3d;
 import org.helioviewer.gl3d.scenegraph.GL3DNode;
 import org.helioviewer.gl3d.scenegraph.GL3DState;
+import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.gui.states.StateController;
 import org.helioviewer.jhv.gui.states.ViewStateEnum;
+import org.helioviewer.jhv.plugin.renderable.Renderable;
+import org.helioviewer.jhv.plugin.renderable.RenderableType;
+import org.helioviewer.jhv.renderable.RenderableImageType;
 import org.helioviewer.viewmodel.metadata.HelioviewerMetaData;
 import org.helioviewer.viewmodel.metadata.MetaData;
 import org.helioviewer.viewmodel.region.Region;
@@ -37,7 +43,7 @@ import com.jogamp.common.nio.Buffers;
  * @author Simon Spoerri (simon.spoerri@fhnw.ch)
  *
  */
-public class GL3DImageLayer extends GL3DNode {
+public class GL3DImageLayer extends GL3DNode implements Renderable {
 
     private static int nextLayerId = 0;
     private final int layerId;
@@ -59,9 +65,11 @@ public class GL3DImageLayer extends GL3DNode {
 
     private int positionBufferSize;
     private final JHVJP2View mainLayerView;
+    private final RenderableType type;
 
     public GL3DImageLayer(String name, JHVJP2View mainLayerView, boolean showSphere, boolean showCorona, boolean restoreColorMask) {
         super(name);
+        this.type = new RenderableImageType(mainLayerView.getName());
         layerId = nextLayerId++;
         this.mainLayerView = mainLayerView;
 
@@ -85,6 +93,7 @@ public class GL3DImageLayer extends GL3DNode {
         this.markAsChanged();
         this.showSphere = showSphere;
         this.showCorona = showCorona;
+        Displayer.getRenderablecontainer().addRenderable(this);
     }
 
     @Override
@@ -194,46 +203,55 @@ public class GL3DImageLayer extends GL3DNode {
 
     @Override
     public void shapeDraw(GL3DState state) {
-        if (!this.isInitialised) {
-            this.init(state);
-        }
         GL2 gl = state.gl;
+
+        gl.glEnable(GL2.GL_BLEND);
+        gl.glBlendFunc(GL2.GL_SRC_ALPHA, GL2.GL_ONE_MINUS_SRC_ALPHA);
+
         GLSLShader.bind(gl);
-
-        gl.glEnable(GL2.GL_CULL_FACE);
         {
-            gl.glCullFace(GL2.GL_BACK);
-
-            gl.glEnable(GL2.GL_BLEND);
-            JHVJP2View jp2view = this.mainLayerView;
-
-            if (jp2view != null) {
-                jp2view.applyFilters(gl);
+            if (!this.isInitialised) {
+                this.init(state);
             }
-            GLSLShader.filter(gl);
-            GLSLShader.bind(gl);
-            GLSLShader.bindVars(gl);
 
-            enablePositionVBO(state);
-            enableIndexVBO(state);
+            gl.glEnable(GL2.GL_CULL_FACE);
             {
-                gl.glVertexPointer(3, GL2.GL_FLOAT, 3 * Buffers.SIZEOF_FLOAT, 0);
-                if (this.showCorona) {
-                    gl.glDepthRange(1.f, 1.f);
-                    gl.glDrawElements(GL2.GL_TRIANGLES, 6, GL2.GL_UNSIGNED_INT, (this.indexBufferSize - 6) * Buffers.SIZEOF_INT);
-                    gl.glDepthRange(0.f, 1.f);
-                }
-                if (this.showSphere && StateController.getInstance().getCurrentState() == ViewStateEnum.View3D.getState()) {
-                    gl.glDrawElements(GL2.GL_TRIANGLES, this.indexBufferSize - 6, GL2.GL_UNSIGNED_INT, 0);
-                }
-            }
-            disableIndexVBO(state);
-            disablePositionVBO(state);
-            GLSLShader.unbind(gl);
+                gl.glCullFace(GL2.GL_BACK);
 
-            gl.glColorMask(true, true, true, true);
+                gl.glEnable(GL2.GL_BLEND);
+                JHVJP2View jp2view = this.mainLayerView;
+
+                if (jp2view != null) {
+                    jp2view.applyFilters(gl);
+                }
+                GLSLShader.filter(gl);
+                GLSLShader.bind(gl);
+                GLSLShader.bindVars(gl);
+
+                enablePositionVBO(state);
+                enableIndexVBO(state);
+                {
+                    gl.glVertexPointer(3, GL2.GL_FLOAT, 3 * Buffers.SIZEOF_FLOAT, 0);
+                    if (this.showCorona) {
+                        gl.glDepthRange(1.f, 1.f);
+                        gl.glDrawElements(GL2.GL_TRIANGLES, 6, GL2.GL_UNSIGNED_INT, (this.indexBufferSize - 6) * Buffers.SIZEOF_INT);
+                        gl.glDepthRange(0.f, 1.f);
+                    }
+                    if (this.showSphere && StateController.getInstance().getCurrentState() == ViewStateEnum.View3D.getState()) {
+                        gl.glDrawElements(GL2.GL_TRIANGLES, this.indexBufferSize - 6, GL2.GL_UNSIGNED_INT, 0);
+                    }
+                }
+                disableIndexVBO(state);
+                disablePositionVBO(state);
+                GLSLShader.unbind(gl);
+
+                gl.glColorMask(true, true, true, true);
+            }
+            gl.glDisable(GL2.GL_CULL_FACE);
         }
-        gl.glDisable(GL2.GL_CULL_FACE);
+        GLSLShader.unbind(gl);
+        gl.glDisable(GL2.GL_TEXTURE_2D);
+        gl.glDisable(GL2.GL_BLEND);
         updateROI(state);
     }
 
@@ -387,6 +405,35 @@ public class GL3DImageLayer extends GL3DNode {
 
     public void setCoronaVisibility(boolean visible) {
         this.showCorona = visible;
+    }
+
+    @Override
+    public void render(GL3DState state) {
+        this.draw(state);
+    }
+
+    @Override
+    public void remove(GL3DState state) {
+        this.shapeDelete(state);
+    }
+
+    @Override
+    public RenderableType getType() {
+        return this.type;
+    }
+
+    @Override
+    public Component getOptionsPanel() {
+        return new JPanel();
+    }
+
+    @Override
+    public boolean isVisible() {
+        return false;
+    }
+
+    @Override
+    public void setVisible(boolean b) {
     }
 
 }
