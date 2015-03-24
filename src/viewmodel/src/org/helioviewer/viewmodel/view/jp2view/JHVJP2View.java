@@ -86,7 +86,6 @@ public class JHVJP2View extends AbstractView implements JP2View, ViewportView, R
     protected ImageData imageData;
 
     protected CircularSubImageBuffer subImageBuffer = new CircularSubImageBuffer();
-    protected volatile ChangeEvent event = new ChangeEvent();
 
     // Member related to JP2
     protected boolean isMainView;
@@ -281,20 +280,24 @@ public class JHVJP2View extends AbstractView implements JP2View, ViewportView, R
      * {@inheritDoc}
      */
     @Override
-    public boolean setViewport(Viewport v, ChangeEvent event) {
+    public boolean setViewport(Viewport v, ChangeEvent aEvent) {
+        ChangeEvent event = new ChangeEvent();
         boolean viewportChanged = (viewport == null ? v == null : !viewport.equals(v));
         viewport = v;
 
         if (setImageViewParams(calculateParameter())) {
             // sub image data will change because resolution level changed
             // -> memorize change event till sub image data has changed
-            this.event.copyFrom(event);
-            this.event.addReason(new ViewportChangedReason(this, v));
+            event.copyFrom(aEvent);
+            event.addReason(new ViewportChangedReason(this, v));
+            fireChangeEvent(event);
 
             return true;
         } else if (viewportChanged && imageViewParams.resolution.getZoomLevel() == jp2Image.getResolutionSet().getMaxResolutionLevels()) {
-            this.event.copyFrom(event);
-            this.event.addReason(new ViewportChangedReason(this, v));
+            event.copyFrom(aEvent);
+            event.addReason(new ViewportChangedReason(this, v));
+            fireChangeEvent(event);
+
             renderRequestedSignal.signal(RenderReasons.OTHER);
 
             return true;
@@ -370,11 +373,15 @@ public class JHVJP2View extends AbstractView implements JP2View, ViewportView, R
      * {@inheritDoc}
      */
     @Override
-    public boolean setRegion(Region r, ChangeEvent event) {
+    public boolean setRegion(Region r, ChangeEvent aEvent) {
         boolean changed = region == null ? r == null : !region.equals(r);
         region = r;
         changed |= setImageViewParams(calculateParameter());
-        this.event.copyFrom(event);
+
+        ChangeEvent event = new ChangeEvent();
+        event.copyFrom(aEvent);
+        fireChangeEvent(event);
+
         return changed;
     }
 

@@ -32,39 +32,41 @@ public class JHVJP2CallistoView extends JHVJP2View {
     }
 
     @Override
-    public boolean setViewport(Viewport v, ChangeEvent event) {
+    public boolean setViewport(Viewport v, ChangeEvent aEvent) {
         // Log.debug("Set viewport: " + v);
         // Thread.dumpStack();
         boolean viewportChanged = (viewport == null ? v == null : !viewport.equals(v));
         viewportSet = true;
         viewport = v;
+
         if (regionSet) {
+            ChangeEvent event = new ChangeEvent();
+
             if (setImageViewParams(calculateParameter())) {
                 // sub image data will change because resolution level changed
                 // -> memorize change event till sub image data has changed
-
-                this.event.copyFrom(event);
-
-                this.event.addReason(new ViewportChangedReason(this, v));
+                event.copyFrom(aEvent);
+                event.addReason(new ViewportChangedReason(this, v));
+                fireChangeEvent(event);
 
                 return true;
 
             } else if (viewportChanged && imageViewParams.resolution.getZoomLevel() == jp2Image.getResolutionSet().getMaxResolutionLevels()) {
+                event.copyFrom(aEvent);
+                event.addReason(new ViewportChangedReason(this, v));
+                fireChangeEvent(event);
 
-                this.event.copyFrom(event);
-
-                this.event.addReason(new ViewportChangedReason(this, v));
                 renderRequestedSignal.signal(RenderReasons.OTHER);
 
                 return true;
             }
         }
-        return viewportChanged;
 
+        return viewportChanged;
     }
 
     @Override
-    public boolean setRegion(Region r, ChangeEvent event) {
+    public boolean setRegion(Region r, ChangeEvent aEvent) {
         // Log.debug("Set region : " + r);
         // Thread.dumpStack();
         boolean changed = region == null ? r == null : !region.equals(r);
@@ -73,7 +75,11 @@ public class JHVJP2CallistoView extends JHVJP2View {
         if (viewportSet) {
             changed |= setImageViewParams(calculateParameter());
         }
-        this.event.copyFrom(event);
+
+        ChangeEvent event = new ChangeEvent();
+        event.copyFrom(aEvent);
+        fireChangeEvent(event);
+
         return changed;
     }
 
