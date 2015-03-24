@@ -34,6 +34,7 @@ import javax.swing.JComponent;
 import javax.swing.SwingWorker;
 import javax.swing.event.MouseInputListener;
 
+import org.helioviewer.base.logging.Log;
 import org.helioviewer.base.math.Interval;
 import org.helioviewer.jhv.data.datatype.event.JHVEvent;
 import org.helioviewer.jhv.data.guielements.SWEKEventInformationDialog;
@@ -93,15 +94,22 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
     private boolean reschedule = false;
     private Point mousePosition;
     private boolean mouseOverEvent;
+<<<<<<< HEAD
     private int lastWidth;
     private int lastHeight;
     private BufferedImage screenTempImage;
+=======
+    private final long created;
+    private long drawLabelsOperarionTime;
+>>>>>>> Some debug info
 
     // //////////////////////////////////////////////////////////////////////////////
     // Methods
     // //////////////////////////////////////////////////////////////////////////////
 
     public ChartDrawGraphPane(String identifier) {
+        created = System.currentTimeMillis();
+        drawLabelsOperarionTime = 0;
         chartModel = ChartModel.getSingletonInstance();
         this.identifier = identifier;
         drawController = DrawController.getSingletonInstance();
@@ -236,6 +244,9 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
     }
 
     private void drawLabels(final Graphics2D g) {
+        Log.debug("Draw Labels");
+        Thread.dumpStack();
+        long start = System.currentTimeMillis();
         Set<YAxisElement> yAxisElements = drawController.getYAxisElements(identifier);
         List<YAxisElement> orderedList = orderYAxes(yAxisElements);
         Interval<Date> interval = drawController.getInterval();
@@ -319,17 +330,10 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
             g.drawString(text, x, y);
 
         }
-
-        // TODO fit this somewhere in here :-)
-        /*
-         * final String text = "No data available"; final int textWidth = (int)
-         * g.getFontMetrics().getStringBounds(text, g).getWidth(); final int x =
-         * graphArea.x + (graphArea.width / 2) - (textWidth / 2); final int y =
-         * graphArea.y + graphArea.height / 2;
-         * g.setColor(ChartConstants.LABEL_TEXT_COLOR); g.drawString(text, x,
-         * y);
-         */
-
+        long timeTaken = System.currentTimeMillis() - start;
+        drawLabelsOperarionTime += timeTaken;
+        double timeOverTotalTime = 1.0 * drawLabelsOperarionTime / (System.currentTimeMillis() - created);
+        Log.debug("Time to draw labels: " + (System.currentTimeMillis() - start) + " total time: " + drawLabelsOperarionTime + " total time over running time : " + timeOverTotalTime);
     }
 
     private List<YAxisElement> orderYAxes(Set<YAxisElement> yAxisElements) {
