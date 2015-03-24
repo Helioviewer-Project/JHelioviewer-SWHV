@@ -20,10 +20,6 @@ import org.helioviewer.jhv.display.RenderListener;
 import org.helioviewer.jhv.gui.filters.lut.DefaultTable;
 import org.helioviewer.jhv.gui.filters.lut.LUT;
 import org.helioviewer.viewmodel.changeevent.ChangeEvent;
-import org.helioviewer.viewmodel.changeevent.ChangedReason;
-import org.helioviewer.viewmodel.changeevent.RegionUpdatedReason;
-import org.helioviewer.viewmodel.changeevent.SubImageDataChangedReason;
-import org.helioviewer.viewmodel.changeevent.TimestampChangedReason;
 import org.helioviewer.viewmodel.changeevent.ViewportChangedReason;
 import org.helioviewer.viewmodel.imagedata.ColorMask;
 import org.helioviewer.viewmodel.imagedata.ImageData;
@@ -167,15 +163,9 @@ public class JHVJP2View extends AbstractView implements JP2View, ViewportView, R
             if (!(metaData instanceof PixelBasedMetaData)) {
                 region = StaticRegion.createAdaptedRegion(metaData.getPhysicalLowerLeft(), metaData.getPhysicalImageSize());
             }
-
             if (viewport == null) {
                 viewport = StaticViewport.createAdaptedViewport(100, 100);
             }
-
-            // maybe ??
-            ImmutableDateTime dt = metaData.getDateTime();
-            if (dt != null)
-                event.addReason(new TimestampChangedReason(this, dt));
         }
         jp2Image = newJP2Image;
 
@@ -1187,6 +1177,6 @@ public class JHVJP2View extends AbstractView implements JP2View, ViewportView, R
         }
 
         GLSLShader.setCutOffRadius(innerCutOff, outerCutOff);
-
     }
+
 }
