@@ -56,7 +56,7 @@ import org.helioviewer.viewmodel.view.LinkedMovieManager;
 import org.helioviewer.viewmodel.view.jp2view.datetime.ImmutableDateTime;
 
 /**
- *
+ * 
  * @author Stephan Pagel
  * */
 public class ChartDrawGraphPane extends JComponent implements MouseInputListener, ComponentListener, DrawControllerListener, MouseWheelListener, WindowFocusListener {
@@ -147,7 +147,6 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
     }
 
     private void updateGraph() {
-        // Log.debug("Update request received");
         updateRequestReceived = true;
     }
 
@@ -164,7 +163,6 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
     }
 
     private void redrawGraph() {
-        System.out.println(Thread.currentThread().getName());
         BufferedImage localScreenImage = screenImage;
         screenImage = null;
         int screenfactor = ChartConstants.getScreenfactor();
@@ -900,11 +898,11 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
                 }
                 if (startValue <= endValue /* && startTime <= endTime */&& startValue >= plotAreaSpace.getScaledMinValue() && startValue <= plotAreaSpace.getScaledMaxValue() && endValue >= plotAreaSpace.getScaledMinValue() && endValue <= plotAreaSpace.getScaledMaxValue() // &&
 
-                        // startTime >= myPlotAreaSpace.getScaledMinTime()
-                        // && endTime <= myPlotAreaSpace.getScaledMaxTime() && startTime
-                        // <= myPlotAreaSpace.getScaledMaxTime()
-                        // && endTime >= myPlotAreaSpace.getScaledMinTime()) {
-                        ) {
+                // startTime >= myPlotAreaSpace.getScaledMinTime()
+                // && endTime <= myPlotAreaSpace.getScaledMaxTime() && startTime
+                // <= myPlotAreaSpace.getScaledMaxTime()
+                // && endTime >= myPlotAreaSpace.getScaledMinTime()) {
+                ) {
                     plotAreaSpace.setScaledSelectedTimeAndValue(startTime, endTime, startValue, endValue);
                 }
             }
