@@ -22,6 +22,7 @@ public class ImageDownloadWorkerResult {
     private final Interval<Date> requestInterval;
     /** The download id */
     private final Long downloadID;
+    private final List<Date> datesToRemoveFromRequestCache;
 
     /**
      * Creates an image downloader result for the given image info views, no
@@ -35,14 +36,19 @@ public class ImageDownloadWorkerResult {
      *            indication the interval was too big
      * @param requestInterval
      *            the request interval
+     * @param datesToDownload
      */
-    public ImageDownloadWorkerResult(List<DownloadedJPXData> imageInfoViews, List<Interval<Date>> noDataIntervals, boolean intervalTooBig,
-            Interval<Date> requestInterval, long downloadID) {
+    public ImageDownloadWorkerResult(List<DownloadedJPXData> imageInfoViews, List<Interval<Date>> noDataIntervals, boolean intervalTooBig, Interval<Date> requestInterval, long downloadID, List<Date> datesToRemoveFromRequestCache) {
         this.imageInfoViews = imageInfoViews;
         this.intervalTooBig = intervalTooBig;
         this.noDataIntervals = noDataIntervals;
         this.requestInterval = requestInterval;
         this.downloadID = downloadID;
+        this.datesToRemoveFromRequestCache = datesToRemoveFromRequestCache;
+    }
+
+    public List<Date> getDatesToRemoveFromRequestCache() {
+        return datesToRemoveFromRequestCache;
     }
 
     /**
