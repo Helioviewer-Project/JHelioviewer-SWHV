@@ -100,12 +100,6 @@ public class DrawController implements ZoomControllerListener, LineDataSelectorM
         }
     }
 
-    public void addDrawableElement(DrawableElement element, String identifier) {
-        synchronized (drawControllerData) {
-            addDrawableElement(element, identifier, true);
-        }
-    }
-
     public void updateDrawableElement(DrawableElement drawableElement, String identifier) {
         synchronized (drawControllerData) {
             removeDrawableElement(drawableElement, identifier, false);
