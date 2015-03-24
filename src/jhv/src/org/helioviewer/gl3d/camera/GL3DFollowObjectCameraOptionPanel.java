@@ -75,11 +75,10 @@ public class GL3DFollowObjectCameraOptionPanel extends GL3DCameraOptionPanel imp
     protected boolean fovVisible = true;
 
     public GL3DFollowObjectCameraOptionPanel(final GL3DFollowObjectCamera camera) {
-        super(camera);
+        super();
         this.camera = camera;
         setLayout(new BoxLayout(this, BoxLayout.PAGE_AXIS));
         this.setBorder(BorderFactory.createEmptyBorder(0, 4, 0, 4));
-        this.createGridOptions();
         add(new JSeparator(SwingConstants.HORIZONTAL));
         this.createFOV();
 

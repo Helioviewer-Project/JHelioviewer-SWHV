@@ -14,7 +14,6 @@ import javax.swing.event.ChangeListener;
 
 import org.helioviewer.gl3d.gui.GL3DCameraSelectionModelListener;
 import org.helioviewer.gl3d.gui.GL3DCameraSelectorModel;
-import org.helioviewer.gl3d.scenegraph.GL3DDrawBits.Bit;
 import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.gui.IconBank;
 import org.helioviewer.jhv.gui.IconBank.JHVIcon;
@@ -81,24 +80,13 @@ public class GL3DCameraOptionsPanel extends JPanel implements GL3DCameraSelectio
     }
 
     private void changeCamera(GL3DCamera newCamera) {
-        boolean hidden = cameraSelectorModel.getCurrentCamera().getGrid().getDrawBits().get(Bit.Hidden);
-        double resx = cameraSelectorModel.getCurrentCamera().getGridResolutionX();
-        double resy = cameraSelectorModel.getCurrentCamera().getGridResolutionY();
 
-        cameraSelectorModel.getCurrentCamera().getGrid().getDrawBits().set(Bit.Hidden, true);
-        cameraSelectorModel.getCurrentCamera().getFollowGrid().getDrawBits().set(Bit.Hidden, true);
         cameraSelectorModel.getCurrentCamera().deactivate();
         boolean trackingMode = cameraSelectorModel.getCurrentCamera().getTrackingMode();
         newCamera.setTrackingMode(trackingMode);
         cameraSelectorModel.setCurrentCamera(newCamera);
         cameraSelectorModel.getCurrentCamera().activate();
-        cameraSelectorModel.getCurrentCamera().getGrid().getDrawBits().set(Bit.Hidden, hidden);
-        cameraSelectorModel.getCurrentCamera().getFollowGrid().getDrawBits().set(Bit.Hidden, hidden);
         optionsPanel = cameraOptionsAttributeManager.getCameraOptionAttributePanel(cameraSelectorModel.getCurrentCamera());
-        ((GL3DCameraOptionPanel) optionsPanel).setGridVisible(!hidden);
-        ((GL3DCameraOptionPanel) optionsPanel).getGridResolutionXSpinner().setValue(resx);
-        ((GL3DCameraOptionPanel) optionsPanel).getGridResolutionYSpinner().setValue(resy);
-
         Displayer.display();
     }
 
