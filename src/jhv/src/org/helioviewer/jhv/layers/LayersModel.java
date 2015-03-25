@@ -958,10 +958,10 @@ public class LayersModel implements UIViewListener {
      *
      * @param idx
      *            - index of the layer in question
-     * @return the current framerate or 0.0 if the movie is not playing, or if
+     * @return the current framerate or 0 if the movie is not playing, or if
      *         an error occurs
      */
-    public double getFPS(int idx) {
+    public int getFPS(int idx) {
         JHVJP2View view = getLayer(idx);
         return getFPS(view);
     }
@@ -971,12 +971,11 @@ public class LayersModel implements UIViewListener {
      *
      * @param view
      *            - View that can be associated with the layer in question
-     * @return the current framerate or 0.0 if the movie is not playing, or if
+     * @return the current framerate or 0 if the movie is not playing, or if
      *         an error occurs
      */
-    public double getFPS(JHVJP2View view) {
-        double result = 0.0;
-
+    public int getFPS(JHVJP2View view) {
+        int result = 0;
         if (view == null) {
             return result;
         }
@@ -984,7 +983,7 @@ public class LayersModel implements UIViewListener {
         if (isMovie(view)) {
             JHVJPXView movieView = (JHVJPXView) view;
             if (isPlaying(view)) {
-                result = Math.round(movieView.getActualFramerate() * 100) / 100;
+                result = (int) (Math.round(movieView.getActualFramerate() * 100) / 100);
             }
         }
 
