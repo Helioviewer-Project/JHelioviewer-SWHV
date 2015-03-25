@@ -493,15 +493,6 @@ public class DownloadController {
 
                 in.close();
 
-                // try {
-                // BufferedWriter out = new BufferedWriter(new FileWriter("D:\\"
-                // + band.getBandType().toString() + ".json"));
-                // out.write(sb.toString());
-                // out.close();
-                // }
-                // catch (IOException e) {
-                // e.printStackTrace();
-                // }
                 EventQueue.invokeLater(new Runnable() {
 
                     @Override
