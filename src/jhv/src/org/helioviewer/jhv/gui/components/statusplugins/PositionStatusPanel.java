@@ -72,7 +72,7 @@ public class PositionStatusPanel extends ViewStatusPanelPlugin implements MouseM
      */
 
     private void updatePosition(Point position) {
-        if (jp2View == null)
+        if (jp2View == null || position == lastPosition)
             return;
 
         // check region and viewport

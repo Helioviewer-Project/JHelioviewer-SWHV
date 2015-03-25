@@ -118,7 +118,7 @@ public class Displayer implements JHVEventHighlightListener {
             if (idx == layersModel.getActiveLayer() && dateTime != null) {
                 MoviePanel.setFrameSlider(view);
                 fireTimeChanged(dateTime.getTime());
-                FramerateStatusPanel.getSingletonInstance().updateFramerate(layersModel.getFPS(idx));
+                FramerateStatusPanel.getSingletonInstance().updateFramerate(layersModel.getFPS(view));
             }
             display();
         }
