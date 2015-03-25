@@ -45,9 +45,6 @@ public class EventModel implements ZoomControllerListener, EventRequesterListene
     /** event plot configurations */
     private EventTypePlotConfiguration eventPlotConfiguration;
 
-    /** the interval lock */
-    private final Object intervalLock;
-
     /** events visible */
     private boolean eventsVisible;
 
@@ -70,7 +67,6 @@ public class EventModel implements ZoomControllerListener, EventRequesterListene
      * Private default constructor.
      */
     private EventModel() {
-        intervalLock = new Object();
         eventPlotConfiguration = new EventTypePlotConfiguration();
         events = new HashMap<String, NavigableMap<Date, NavigableMap<Date, List<JHVEvent>>>>();
         eventsVisible = false;
@@ -105,9 +101,7 @@ public class EventModel implements ZoomControllerListener, EventRequesterListene
 
     @Override
     public void availableIntervalChanged(Interval<Date> newInterval) {
-        synchronized (intervalLock) {
-            availableInterval = newInterval;
-        }
+        availableInterval = newInterval;
     }
 
     @Override
@@ -120,29 +114,24 @@ public class EventModel implements ZoomControllerListener, EventRequesterListene
 
     @Override
     public void selectedResolutionChanged(API_RESOLUTION_AVERAGES newResolution) {
-        synchronized (intervalLock) {
-
-        }
     }
 
     @Override
     public void newEventsReceived(Map<String, NavigableMap<Date, NavigableMap<Date, List<JHVEvent>>>> events) {
-        synchronized (intervalLock) {
-            this.events = events;
-            if (selectedInterval != null && availableInterval != null) {
-                createEventPlotConfiguration();
-            }
+        this.events = events;
+        if (selectedInterval != null && availableInterval != null) {
+            createEventPlotConfiguration();
         }
     }
 
     public EventTypePlotConfiguration getEventTypePlotConfiguration() {
-        synchronized (intervalLock) {
-            if (eventPlotConfiguration != null) {
-                return eventPlotConfiguration;
-            } else {
-                return new EventTypePlotConfiguration();
-            }
+
+        if (eventPlotConfiguration != null) {
+            return eventPlotConfiguration;
+        } else {
+            return new EventTypePlotConfiguration();
         }
+
     }
 
     public boolean isEventsVisible() {
