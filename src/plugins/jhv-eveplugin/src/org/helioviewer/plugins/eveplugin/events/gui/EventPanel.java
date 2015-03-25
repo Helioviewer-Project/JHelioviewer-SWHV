@@ -83,7 +83,7 @@ public class EventPanel implements DrawableElement {
 
     @Override
     public boolean hasElementsToDraw() {
-        return !EventModel.getSingletonInstance().getEventTypePlotConfiguration().getEventPlotConfigurations().isEmpty();
+        return EventModel.getSingletonInstance().hasElementsToDraw();
     }
 
     @Override
