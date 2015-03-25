@@ -150,12 +150,10 @@ public class PlotAreaSpace {
     }
 
     public void setScaledSelectedValue(double scaledSelectedMinValue, double scaledSelectedMaxValue, boolean forced) {
-        synchronized (this) {
-            if (forced || !(this.scaledSelectedMinValue == scaledSelectedMinValue && this.scaledSelectedMaxValue == scaledSelectedMaxValue)) {
-                this.scaledSelectedMinValue = scaledSelectedMinValue;
-                this.scaledSelectedMaxValue = scaledSelectedMaxValue;
-                firePlotAreaSpaceChanged(forced);
-            }
+        if (forced || !(this.scaledSelectedMinValue == scaledSelectedMinValue && this.scaledSelectedMaxValue == scaledSelectedMaxValue)) {
+            this.scaledSelectedMinValue = scaledSelectedMinValue;
+            this.scaledSelectedMaxValue = scaledSelectedMaxValue;
+            firePlotAreaSpaceChanged(forced);
         }
     }
 
