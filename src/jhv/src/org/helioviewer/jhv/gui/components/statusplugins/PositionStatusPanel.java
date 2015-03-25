@@ -54,7 +54,7 @@ public class PositionStatusPanel extends ViewStatusPanelPlugin implements MouseM
 
         setText("(x, y) = " + "(    0" + PRIME + PRIME + ",    0" + PRIME + PRIME + ")");
 
-        LayersModel.getSingletonInstance().addLayersListener(this);
+        // LayersModel.getSingletonInstance().addLayersListener(this);
     }
 
     public static PositionStatusPanel getSingletonInstance() {
@@ -91,12 +91,9 @@ public class PositionStatusPanel extends ViewStatusPanelPlugin implements MouseM
         // Helioviewer images have there physical lower left corner in a
         // negative area; real pixel based image at 0
         if (m.getPhysicalLowerLeft().getX() < 0) {
-
             Vector2dInt solarcenter = ViewHelper.convertImageToScreenDisplacement(r.getUpperLeftCorner().negateX(), r, vis);
-
             Vector2dDouble scaling = new Vector2dDouble(Constants.SunRadius, Constants.SunRadius);
             Vector2dDouble solarRadius = new Vector2dDouble(ViewHelper.convertImageToScreenDisplacement(scaling, r, vis));
-
             Vector2dDouble pos = new Vector2dDouble(position.x - solarcenter.getX(), -position.y + solarcenter.getY()).invertedScale(solarRadius).scale(959.705);
 
             String text = String.format("(x, y) = (% 5d\u2032\u2032, % 5d\u2032\u2032)", (int) Math.round(pos.getX()), (int) Math.round(pos.getY()));
