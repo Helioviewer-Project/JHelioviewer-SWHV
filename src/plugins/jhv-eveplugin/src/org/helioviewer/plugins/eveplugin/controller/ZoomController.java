@@ -58,15 +58,11 @@ public class ZoomController implements PlotAreaSpaceListener, LayersListener {
     }
 
     public boolean addZoomControllerListener(final ZoomControllerListener listener) {
-        synchronized (listeners) {
-            return listeners.add(listener);
-        }
+        return listeners.add(listener);
     }
 
     public boolean removeControllerListener(final ZoomControllerListener listener) {
-        synchronized (listeners) {
-            return listeners.remove(listener);
-        }
+        return listeners.remove(listener);
     }
 
     public void setAvailableInterval(final Interval<Date> interval) {
@@ -144,32 +140,30 @@ public class ZoomController implements PlotAreaSpaceListener, LayersListener {
     }
 
     public Interval<Date> setSelectedInterval(final Interval<Date> newSelectedInterval, boolean useFullValueSpace) {
-        synchronized (selectedInterval) {
-            if (availableInterval.getStart() == null || availableInterval.getEnd() == null) {
-                selectedInterval = new Interval<Date>(null, null);
-            } else if (newSelectedInterval.getStart() == null || newSelectedInterval.getEnd() == null) {
+        if (availableInterval.getStart() == null || availableInterval.getEnd() == null) {
+            selectedInterval = new Interval<Date>(null, null);
+        } else if (newSelectedInterval.getStart() == null || newSelectedInterval.getEnd() == null) {
+            selectedInterval = availableInterval;
+        } else if (availableInterval.containsInclusive(newSelectedInterval)) {
+            selectedInterval = newSelectedInterval;
+        } else {
+            Date start = newSelectedInterval.getStart();
+            Date end = newSelectedInterval.getEnd();
+
+            start = availableInterval.containsPointInclusive(start) ? start : availableInterval.getStart();
+            end = availableInterval.containsPointInclusive(end) ? end : availableInterval.getEnd();
+
+            if (start.equals(end)) {
                 selectedInterval = availableInterval;
-            } else if (availableInterval.containsInclusive(newSelectedInterval)) {
-                selectedInterval = newSelectedInterval;
             } else {
-                Date start = newSelectedInterval.getStart();
-                Date end = newSelectedInterval.getEnd();
-
-                start = availableInterval.containsPointInclusive(start) ? start : availableInterval.getStart();
-                end = availableInterval.containsPointInclusive(end) ? end : availableInterval.getEnd();
-
-                if (start.equals(end)) {
-                    selectedInterval = availableInterval;
-                } else {
-                    selectedInterval = new Interval<Date>(start, end);
-                }
+                selectedInterval = new Interval<Date>(start, end);
             }
-
-            updatePlotAreaSpace(selectedInterval);
-            fireSelectedIntervalChanged(selectedInterval, useFullValueSpace);
-
-            return selectedInterval;
         }
+
+        updatePlotAreaSpace(selectedInterval);
+        fireSelectedIntervalChanged(selectedInterval, useFullValueSpace);
+
+        return selectedInterval;
     }
 
     public Interval<Date> zoomTo(final ZOOM zoom, final int value) {
@@ -285,10 +279,8 @@ public class ZoomController implements PlotAreaSpaceListener, LayersListener {
     }
 
     private void fireSelectedIntervalChanged(final Interval<Date> newInterval, boolean keepFullValueSpace) {
-        synchronized (listeners) {
-            for (ZoomControllerListener listener : listeners) {
-                listener.selectedIntervalChanged(newInterval, keepFullValueSpace);
-            }
+        for (ZoomControllerListener listener : listeners) {
+            listener.selectedIntervalChanged(newInterval, keepFullValueSpace);
         }
     }
 
@@ -302,29 +294,25 @@ public class ZoomController implements PlotAreaSpaceListener, LayersListener {
     }
 
     private void fireSelectedResolutionChanged(final API_RESOLUTION_AVERAGES reolution) {
-        synchronized (listeners) {
-            for (ZoomControllerListener listener : listeners) {
-                listener.selectedResolutionChanged(reolution);
-            }
+        for (ZoomControllerListener listener : listeners) {
+            listener.selectedResolutionChanged(reolution);
         }
     }
 
     @Override
     public void plotAreaSpaceChanged(double scaledMinValue, double scaledMaxValue, double scaledMinTime, double scaledMaxTime, double scaledSelectedMinValue, double scaledSelectedMaxValue, double scaledSelectedMinTime, double scaledSelectedMaxTime, boolean forced) {
         if (availableInterval.getStart() != null && availableInterval.getEnd() != null && selectedInterval.getStart() != null && selectedInterval.getEnd() != null) {
-            synchronized (selectedInterval) {
-                long diffTime = availableInterval.getEnd().getTime() - availableInterval.getStart().getTime();
-                double scaleDiff = scaledMaxTime - scaledMinTime;
-                double selectedMin = (scaledSelectedMinTime - scaledMinTime) / scaleDiff;
-                double selectedMax = (scaledSelectedMaxTime - scaledMinTime) / scaleDiff;
-                Date newSelectedStartTime = new Date(availableInterval.getStart().getTime() + Math.round(diffTime * selectedMin));
-                Date newSelectedEndTime = new Date(availableInterval.getStart().getTime() + Math.round(diffTime * selectedMax));
-                // Log.info("plotareachanged starttime: " + newSelectedStartTime
-                // + " endtime: " + newSelectedEndTime);
-                if (forced || !(newSelectedEndTime.equals(selectedInterval.getEnd()) && newSelectedStartTime.equals(selectedInterval.getStart()))) {
-                    selectedInterval = new Interval<Date>(newSelectedStartTime, newSelectedEndTime);
-                    fireSelectedIntervalChanged(selectedInterval, false);
-                }
+            long diffTime = availableInterval.getEnd().getTime() - availableInterval.getStart().getTime();
+            double scaleDiff = scaledMaxTime - scaledMinTime;
+            double selectedMin = (scaledSelectedMinTime - scaledMinTime) / scaleDiff;
+            double selectedMax = (scaledSelectedMaxTime - scaledMinTime) / scaleDiff;
+            Date newSelectedStartTime = new Date(availableInterval.getStart().getTime() + Math.round(diffTime * selectedMin));
+            Date newSelectedEndTime = new Date(availableInterval.getStart().getTime() + Math.round(diffTime * selectedMax));
+            // Log.info("plotareachanged starttime: " + newSelectedStartTime
+            // + " endtime: " + newSelectedEndTime);
+            if (forced || !(newSelectedEndTime.equals(selectedInterval.getEnd()) && newSelectedStartTime.equals(selectedInterval.getStart()))) {
+                selectedInterval = new Interval<Date>(newSelectedStartTime, newSelectedEndTime);
+                fireSelectedIntervalChanged(selectedInterval, false);
             }
         }
     }
