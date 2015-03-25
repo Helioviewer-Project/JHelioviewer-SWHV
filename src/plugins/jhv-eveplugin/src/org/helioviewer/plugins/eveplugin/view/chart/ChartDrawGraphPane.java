@@ -254,17 +254,16 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
 
         // draw vertical ticks
         int counter = 0;
-        synchronized (yAxisElements) {
-            for (YAxisElement yAxisElement : orderedList) {
-                if (!(yAxisElement.getAvailableRange().max == Double.MIN_VALUE && yAxisElement.getAvailableRange().min == Double.MAX_VALUE)) {
 
-                    drawVerticalLabels(g, yAxisElement, counter == 0 ? 0 : 1);
+        for (YAxisElement yAxisElement : orderedList) {
+            if (!(yAxisElement.getAvailableRange().max == Double.MIN_VALUE && yAxisElement.getAvailableRange().min == Double.MAX_VALUE)) {
 
-                    if (counter > 1) {
-                        break;
-                    }
-                    counter++;
+                drawVerticalLabels(g, yAxisElement, counter == 0 ? 0 : 1);
+
+                if (counter > 1) {
+                    break;
                 }
+                counter++;
             }
         }
 
