@@ -1,5 +1,6 @@
 package org.helioviewer.plugins.eveplugin.lines.data;
 
+import java.awt.EventQueue;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -27,7 +28,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 /**
- *
+ * 
  * @author Stephan Pagel
  * */
 public class DownloadController {
@@ -304,8 +305,9 @@ public class DownloadController {
 
                 LinkedList<Interval<Date>> list = downloadMap.get(band);
 
-                if (list == null)
+                if (list == null) {
                     list = new LinkedList<Interval<Date>>();
+                }
 
                 list.add(interval);
 
@@ -445,16 +447,17 @@ public class DownloadController {
         // //////////////////////////////////////////////////////////////////////////
 
         public DownloadThread(final DownloadJob job, final Semaphore semaphore) {
-            this.interval = job.getInterval();
-            this.band = job.getBand();
+            interval = job.getInterval();
+            band = job.getBand();
             this.semaphore = semaphore;
         }
 
         @Override
         public void run() {
             try {
-                if (interval != null && interval.getStart() != null && interval.getEnd() != null && band != null)
+                if (interval != null && interval.getStart() != null && interval.getEnd() != null && band != null) {
                     requestData();
+                }
             } finally {
                 semaphore.release();
                 downloadFinished(band, interval);
@@ -470,8 +473,9 @@ public class DownloadController {
                 Log.error("Error Creating the EVE URL.", e);
             }
 
-            if (url == null)
+            if (url == null) {
                 return;
+            }
 
             // Log.debug("Requesting EVE Data: " + url);
 
@@ -480,7 +484,7 @@ public class DownloadController {
                 DownloadStream ds = new DownloadStream(url, JHVGlobals.getStdConnectTimeout(), JHVGlobals.getStdReadTimeout());
 
                 BufferedReader in = new BufferedReader(new InputStreamReader(ds.getInput()));
-                StringBuilder sb = new StringBuilder();
+                final StringBuilder sb = new StringBuilder();
                 String str;
 
                 while ((str = in.readLine()) != null) {
@@ -498,12 +502,20 @@ public class DownloadController {
                 // catch (IOException e) {
                 // e.printStackTrace();
                 // }
+                EventQueue.invokeLater(new Runnable() {
 
-                addDataToCache(new JSONObject(sb.toString()), band);
+                    @Override
+                    public void run() {
+                        try {
+                            addDataToCache(new JSONObject(sb.toString()), band);
+                        } catch (JSONException e) {
+                            Log.error("Error Parsing the EVE Response.", e);
+                        }
+                    }
+                });
+
             } catch (final IOException e1) {
                 Log.error("Error Parsing the EVE Response.", e1);
-            } catch (final JSONException e2) {
-                Log.error("Error Parsing the EVE Response.", e2);
             }
         }
 
