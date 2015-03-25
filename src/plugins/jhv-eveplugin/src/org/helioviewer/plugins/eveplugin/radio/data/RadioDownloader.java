@@ -226,8 +226,10 @@ public class RadioDownloader {
                         if (!result.getImageInfoViews().isEmpty()) {
                             for (DownloadedJPXData jpxData : result.getImageInfoViews()) {
                                 cache.add(jpxData);
+                                ArrayList<DownloadedJPXData> temp = new ArrayList<DownloadedJPXData>();
+                                temp.add(jpxData);
+                                fireAdditionalJPXDataAvailable(temp, downloadId, ratioX, ratioY);
                             }
-                            fireAdditionalJPXDataAvailable(result.getImageInfoViews(), downloadId, ratioX, ratioY);
                         }
                         List<Interval<Date>> noDataToFire = new ArrayList<Interval<Date>>();
                         for (Interval<Date> noDataInterval : result.getNoDataIntervals()) {
