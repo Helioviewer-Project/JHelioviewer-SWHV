@@ -57,4 +57,5 @@ public class DescriptorTimestampRenderer extends DefaultTableCellRenderer {
             return super.getTableCellRendererComponent(table, "Error", isSelected, hasFocus, row, column);
         }
     }
+
 }

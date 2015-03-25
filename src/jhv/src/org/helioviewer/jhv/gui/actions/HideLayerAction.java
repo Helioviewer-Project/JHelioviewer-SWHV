@@ -35,7 +35,7 @@ public class HideLayerAction extends AbstractAction {
         LayerDescriptor ld = LayersModel.getSingletonInstance().getDescriptor(view);
         ld.isVisible = false;
 
-        this.putValue(Action.SMALL_ICON, DescriptorIconRenderer.getIcon(ld));
+        this.putValue(Action.SMALL_ICON, DescriptorIconRenderer.getIconTooltip(ld).a);
         this.view = view;
     }
 
