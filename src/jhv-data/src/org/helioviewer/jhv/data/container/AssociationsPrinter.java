@@ -58,7 +58,7 @@ public class AssociationsPrinter {
         }
     }
 
-    public synchronized static void print(Map<String, NavigableMap<Date, NavigableMap<Date, List<JHVEvent>>>> events) {
+    public static void print(Map<String, NavigableMap<Date, NavigableMap<Date, List<JHVEvent>>>> events) {
         BufferedWriter writer;
         try {
             writer = new BufferedWriter(new FileWriter("/Users/bramb/ass" + fileNumber + ".txt", true));

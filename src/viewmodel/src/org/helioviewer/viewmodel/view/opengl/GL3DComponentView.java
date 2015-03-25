@@ -123,7 +123,7 @@ public class GL3DComponentView extends AbstractComponentView implements GLEventL
         displayBody(gl, view, width, height);
         gl.glPopMatrix();
 
-        if (!this.postRenderers.isEmpty()) {
+        if (!postRenderers.isEmpty()) {
             gl.glPushMatrix();
 
             gl.glMatrixMode(GL2.GL_PROJECTION);
@@ -139,10 +139,8 @@ public class GL3DComponentView extends AbstractComponentView implements GLEventL
             gl.glEnable(GL2.GL_TEXTURE_2D);
 
             GLScreenRenderGraphics glRenderer = new GLScreenRenderGraphics(gl);
-            /* synchronized (postRenderers) */{
-                for (ScreenRenderer r : postRenderers) {
-                    r.render(glRenderer);
-                }
+            for (ScreenRenderer r : postRenderers) {
+                r.render(glRenderer);
             }
             gl.glPopMatrix();
         }

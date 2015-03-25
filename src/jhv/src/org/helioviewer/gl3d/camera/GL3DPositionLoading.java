@@ -195,7 +195,7 @@ public class GL3DPositionLoading {
         }
     }
 
-    synchronized public void applyChanges() {
+    public void applyChanges() {
         this.setLoaded(false);
         this.positionDateTime = null;
         this.requestData();
@@ -244,7 +244,7 @@ public class GL3DPositionLoading {
         return this.endDatems;
     }
 
-    synchronized public GL3DVec3d getInterpolatedPosition(long currentCameraTime) {
+    public GL3DVec3d getInterpolatedPosition(long currentCameraTime) {
         if (this.isLoaded && this.positionDateTime.length > 0) {
             long t3 = this.getBeginDate().getTime();
             long t4 = this.getEndDate().getTime();
