@@ -49,25 +49,23 @@ public class RadioImageCache {
     }
 
     public void add(DownloadedJPXData jpxData) {
-        synchronized (instance) {
-            if (dataCache.size() > CACHE_SIZE) {
-                Long key = useCache.firstKey();
-                DownloadedJPXData oldestJPXData = useCache.get(key);
-                dataCache.remove(oldestJPXData.getImageID());
-                startDates.remove(oldestJPXData.getStartDate());
-                useCache.remove(key);
-                reverseUseCache.remove(oldestJPXData);
-                oldestJPXData.remove();
-                Log.debug("remove oldest jpx data " + oldestJPXData + " imageID " + oldestJPXData.getImageID());
-            }
-
-            dataCache.put(jpxData.getImageID(), jpxData);
-            useCache.put(cacheCounter, jpxData);
-            reverseUseCache.put(jpxData, cacheCounter);
-            startDates.put(jpxData.getStartDate(), jpxData);
-            noDataCache.remove(jpxData.getStartDate());
-            cacheCounter++;
+        if (dataCache.size() > CACHE_SIZE) {
+            Long key = useCache.firstKey();
+            DownloadedJPXData oldestJPXData = useCache.get(key);
+            dataCache.remove(oldestJPXData.getImageID());
+            startDates.remove(oldestJPXData.getStartDate());
+            useCache.remove(key);
+            reverseUseCache.remove(oldestJPXData);
+            oldestJPXData.remove();
+            Log.debug("remove oldest jpx data " + oldestJPXData + " imageID " + oldestJPXData.getImageID());
         }
+
+        dataCache.put(jpxData.getImageID(), jpxData);
+        useCache.put(cacheCounter, jpxData);
+        reverseUseCache.put(jpxData, cacheCounter);
+        startDates.put(jpxData.getStartDate(), jpxData);
+        noDataCache.remove(jpxData.getStartDate());
+        cacheCounter++;
     }
 
     public void remove(DownloadedJPXData jpxData) {
@@ -75,16 +73,14 @@ public class RadioImageCache {
     }
 
     public void remove(Long ID) {
-        synchronized (instance) {
-            if (dataCache.containsKey(ID)) {
-                DownloadedJPXData data = dataCache.get(ID);
-                Log.debug("Data for ID : " + data);
-                dataCache.remove(ID);
-                useCache.remove(reverseUseCache.get(data));
-                reverseUseCache.remove(data);
-                startDates.remove(data.getStartDate());
-                data.remove();
-            }
+        if (dataCache.containsKey(ID)) {
+            DownloadedJPXData data = dataCache.get(ID);
+            Log.debug("Data for ID : " + data);
+            dataCache.remove(ID);
+            useCache.remove(reverseUseCache.get(data));
+            reverseUseCache.remove(data);
+            startDates.remove(data.getStartDate());
+            data.remove();
         }
     }
 
@@ -103,34 +99,31 @@ public class RadioImageCache {
     }
 
     public RadioImageCacheResult getRadioImageCacheResultForInterval(Date start, Date end, Long stepsize) {
-        synchronized (instance) {
-            Date localStart = findStartDate(start, stepsize);
-            List<Interval<Date>> intervalList = new ArrayList<Interval<Date>>();
-            List<DownloadedJPXData> dataList = new ArrayList<DownloadedJPXData>();
-            List<Long> toRemove = new ArrayList<Long>(dataCache.keySet());
-            List<Interval<Date>> noDataInterval = new ArrayList<Interval<Date>>();
-            while (localStart.before(end) || localStart.equals(end)) {
-                if (!startDates.containsKey(localStart) && !noDataCache.containsKey(localStart)) {
-                    intervalList.add(new Interval<Date>(localStart, new Date(localStart.getTime() + stepsize)));
-                } else {
-                    if (startDates.containsKey(localStart)) {
-                        DownloadedJPXData tempData = startDates.get(localStart);
-                        useCache.remove(reverseUseCache.get(tempData));
-                        useCache.put(cacheCounter, tempData);
-                        reverseUseCache.put(tempData, cacheCounter);
-                        dataList.add(tempData);
-                        toRemove.remove(tempData.getImageID());
-                        cacheCounter++;
-                    }
+        Date localStart = findStartDate(start, stepsize);
+        List<Interval<Date>> intervalList = new ArrayList<Interval<Date>>();
+        List<DownloadedJPXData> dataList = new ArrayList<DownloadedJPXData>();
+        List<Long> toRemove = new ArrayList<Long>(dataCache.keySet());
+        List<Interval<Date>> noDataInterval = new ArrayList<Interval<Date>>();
+        while (localStart.before(end) || localStart.equals(end)) {
+            if (!startDates.containsKey(localStart) && !noDataCache.containsKey(localStart)) {
+                intervalList.add(new Interval<Date>(localStart, new Date(localStart.getTime() + stepsize)));
+            } else {
+                if (startDates.containsKey(localStart)) {
+                    DownloadedJPXData tempData = startDates.get(localStart);
+                    useCache.remove(reverseUseCache.get(tempData));
+                    useCache.put(cacheCounter, tempData);
+                    reverseUseCache.put(tempData, cacheCounter);
+                    dataList.add(tempData);
+                    toRemove.remove(tempData.getImageID());
+                    cacheCounter++;
                 }
-                if (noDataCache.containsKey(localStart)) {
-                    noDataInterval.add(noDataCache.get(localStart));
-                }
-                localStart = new Date(localStart.getTime() + stepsize);
             }
-            return new RadioImageCacheResult(dataList, intervalList, new ArrayList<Long>(toRemove), noDataInterval);
-
+            if (noDataCache.containsKey(localStart)) {
+                noDataInterval.add(noDataCache.get(localStart));
+            }
+            localStart = new Date(localStart.getTime() + stepsize);
         }
+        return new RadioImageCacheResult(dataList, intervalList, new ArrayList<Long>(toRemove), noDataInterval);
     }
 
     public boolean containsDate(Date date) {
@@ -138,10 +131,8 @@ public class RadioImageCache {
     }
 
     public boolean addNoDataInterval(Interval<Date> interval) {
-        synchronized (instance) {
-            boolean added = noDataCache.containsKey(interval.getStart());
-            noDataCache.put(interval.getStart(), interval);
-            return !added;
-        }
+        boolean added = noDataCache.containsKey(interval.getStart());
+        noDataCache.put(interval.getStart(), interval);
+        return !added;
     }
 }
