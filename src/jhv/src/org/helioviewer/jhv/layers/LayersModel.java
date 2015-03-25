@@ -575,7 +575,7 @@ public class LayersModel implements UIViewListener {
         ChangedReason reason1 = aEvent.getLastChangedReasonByType(RegionChangedReason.class);
         ChangedReason reason2 = aEvent.getLastChangedReasonByType(ViewportChangedReason.class);
 
-        PositionStatusPanel.getSingletonInstance().updatePosition();
+        // PositionStatusPanel.getSingletonInstance().updatePosition();
         ZoomStatusPanel.getSingletonInstance().updateZoomLevel(activeLayer);
     }
 
