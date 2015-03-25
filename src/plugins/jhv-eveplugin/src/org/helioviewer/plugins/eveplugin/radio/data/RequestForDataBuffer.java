@@ -15,55 +15,49 @@ public class RequestForDataBuffer {
     }
 
     public void addRequestConfig(RequestConfig data) {
-        synchronized (this) {
-            if (!newData) {
-                if (useData1) {
-                    data1 = data;
-                } else {
-                    data2 = data;
-                }
-                newData = true;
+        if (!newData) {
+            if (useData1) {
+                data1 = data;
             } else {
-                if (useData1) {
-                    data2 = data;
-                } else {
-                    data1 = data;
-                }
-                extraData = true;
+                data2 = data;
             }
+            newData = true;
+        } else {
+            if (useData1) {
+                data2 = data;
+            } else {
+                data1 = data;
+            }
+            extraData = true;
         }
     }
 
     public RequestConfig getData() {
-        synchronized (this) {
-            if (extraData) {
+        if (extraData) {
+            if (useData1) {
+                extraData = false;
+                useData1 = false;
+                return data1;
+            } else {
+                extraData = false;
+                useData1 = true;
+                return data2;
+            }
+        } else {
+            if (newData) {
+                newData = false;
                 if (useData1) {
-                    extraData = false;
-                    useData1 = false;
                     return data1;
                 } else {
-                    extraData = false;
-                    useData1 = true;
                     return data2;
                 }
             } else {
-                if (newData) {
-                    newData = false;
-                    if (useData1) {
-                        return data1;
-                    } else {
-                        return data2;
-                    }
-                } else {
-                    return null;
-                }
+                return null;
             }
         }
     }
 
     public boolean hasData() {
-        //synchronized (this) {
-            return newData;
-        //}
+        return newData;
     }
 }
