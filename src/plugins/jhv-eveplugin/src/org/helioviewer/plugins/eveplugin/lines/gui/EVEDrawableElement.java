@@ -7,7 +7,6 @@ import java.awt.Point;
 import java.awt.Rectangle;
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -26,7 +25,7 @@ import org.helioviewer.plugins.eveplugin.lines.data.EVEValues;
 
 public class EVEDrawableElement implements DrawableElement {
 
-    private final List<GraphPolyline> graphPolylines = Collections.synchronizedList(new LinkedList<EVEDrawableElement.GraphPolyline>());
+    private final List<GraphPolyline> graphPolylines = new LinkedList<EVEDrawableElement.GraphPolyline>();
     private boolean intervalAvailable = false;
     private Band[] bands = new Band[0];
     private EVEValues[] values = null;
@@ -138,19 +137,17 @@ public class EVEDrawableElement implements DrawableElement {
     }
 
     private void drawGraphs(final Graphics g, Rectangle graphArea) {
-        synchronized (graphPolylines) {
-            Iterator<GraphPolyline> i = graphPolylines.iterator();
-            while (i.hasNext()) {
-                GraphPolyline line = i.next();
-                g.setColor(line.color);
-                for (int k = 0; k < line.xPoints.size(); k++) {
-                    g.drawPolyline(line.xPointsArray.get(k), line.yPointsArray.get(k), line.yPoints.get(k).size());
-                }
+        Iterator<GraphPolyline> i = graphPolylines.iterator();
+        while (i.hasNext()) {
+            GraphPolyline line = i.next();
+            g.setColor(line.color);
+            for (int k = 0; k < line.xPoints.size(); k++) {
+                g.drawPolyline(line.xPointsArray.get(k), line.yPointsArray.get(k), line.yPoints.get(k).size());
+            }
 
-                for (int j = 0; j < line.warnLevels.length; j++) {
-                    g.drawLine(graphArea.x, line.warnLevels[j], graphArea.x + graphArea.width, line.warnLevels[j]);
-                    g.drawString(line.warnLabels[j], graphArea.x, line.warnLevels[j]);
-                }
+            for (int j = 0; j < line.warnLevels.length; j++) {
+                g.drawLine(graphArea.x, line.warnLevels[j], graphArea.x + graphArea.width, line.warnLevels[j]);
+                g.drawString(line.warnLabels[j], graphArea.x, line.warnLevels[j]);
             }
         }
     }
