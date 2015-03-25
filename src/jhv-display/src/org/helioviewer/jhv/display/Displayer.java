@@ -32,6 +32,7 @@ public class Displayer implements JHVEventHighlightListener {
     private static final ArrayList<DisplayListener> listeners = new ArrayList<DisplayListener>();
     private static final ArrayList<RenderListener> renderListeners = new ArrayList<RenderListener>();
     private static final ArrayList<TimeListener> timeListeners = new ArrayList<TimeListener>();
+    private static Date lastTimestamp;
 
     private static boolean torender = false;
     private static boolean todisplay = false;
@@ -117,10 +118,24 @@ public class Displayer implements JHVEventHighlightListener {
 
             if (idx == layersModel.getActiveLayer() && dateTime != null) {
                 MoviePanel.setFrameSlider(view);
-                fireTimeChanged(dateTime.getTime());
+                lastTimestamp = dateTime.getTime();
+                fireTimeChanged(lastTimestamp);
                 FramerateStatusPanel.getSingletonInstance().updateFramerate(layersModel.getFPS(view));
             }
             display();
+        }
+    }
+
+    public static Date getLastUpdatedTimestamp() {
+        if (lastTimestamp == null) {
+            Date lastDate = layersModel.getLastDate();
+            if (lastDate != null) {
+                lastTimestamp = layersModel.getLastDate();
+                return lastTimestamp;
+            }
+            return null;
+        } else {
+            return lastTimestamp;
         }
     }
 
