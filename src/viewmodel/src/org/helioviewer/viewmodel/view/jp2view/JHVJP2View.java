@@ -987,8 +987,11 @@ public class JHVJP2View extends AbstractView implements JP2View, ViewportView, R
             String colorKey = DefaultTable.getSingletonInstance().getColorTable(hvMetaData);
             if (colorKey != null) {
                 lut = LUT.getStandardList().get(colorKey);
+                return;
             }
         }
+        // no LUT found, try gray as last resort
+        lut = gray;
     }
 
     private void applyGLLUT(GL2 gl) {
