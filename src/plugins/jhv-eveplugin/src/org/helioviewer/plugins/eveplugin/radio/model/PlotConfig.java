@@ -4,7 +4,7 @@ import java.awt.Graphics;
 import java.awt.image.BufferedImage;
 
 public class PlotConfig {
-    private final BufferedImage image;
+    private BufferedImage image;
     private final DrawableAreaMap map;
     private boolean visible;
     private Long downloadID;
@@ -23,8 +23,7 @@ public class PlotConfig {
         if (visible) {
             // Thread.dumpStack();
             // Log.trace("Draw image on : " + map);
-            g.drawImage(image, map.getDestinationX0(), map.getDestinationY0(), map.getDestinationX1(), map.getDestinationY1(),
-                    map.getSourceX0(), map.getSourceY0(), map.getSourceX1(), map.getSourceY1(), null);
+            g.drawImage(image, map.getDestinationX0(), map.getDestinationY0(), map.getDestinationX1(), map.getDestinationY1(), map.getSourceX0(), map.getSourceY0(), map.getSourceX1(), map.getSourceY1(), null);
         }
     }
 
@@ -54,6 +53,10 @@ public class PlotConfig {
 
     public void setImageId(Long imageId) {
         this.imageId = imageId;
+    }
+
+    public void setBufferedImage(BufferedImage bufferedImage) {
+        image = bufferedImage;
     }
 
 }
