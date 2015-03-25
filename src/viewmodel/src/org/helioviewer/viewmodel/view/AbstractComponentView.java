@@ -16,12 +16,10 @@ public abstract class AbstractComponentView extends AbstractBasicView implements
     @Override
     public void addPostRenderer(ScreenRenderer postRenderer) {
         if (postRenderer != null) {
-            /* synchronized (postRenderers) */ {
-                if (!containsPostRenderer(postRenderer)) {
-                    postRenderers.add(postRenderer);
-                    if (postRenderer instanceof ViewListener) {
-                        addViewListener((ViewListener) postRenderer);
-                    }
+            if (!containsPostRenderer(postRenderer)) {
+                postRenderers.add(postRenderer);
+                if (postRenderer instanceof ViewListener) {
+                    addViewListener((ViewListener) postRenderer);
                 }
             }
         }
@@ -42,14 +40,12 @@ public abstract class AbstractComponentView extends AbstractBasicView implements
     @Override
     public void removePostRenderer(ScreenRenderer postRenderer) {
         if (postRenderer != null) {
-            /* synchronized (postRenderers) */ {
-                do {
-                    postRenderers.remove(postRenderer);
-                    if (postRenderer instanceof ViewListener) {
-                        removeViewListener((ViewListener) postRenderer);
-                    }
-                } while (postRenderers.contains(postRenderer));
-            }
+            do {
+                postRenderers.remove(postRenderer);
+                if (postRenderer instanceof ViewListener) {
+                    removeViewListener((ViewListener) postRenderer);
+                }
+            } while (postRenderers.contains(postRenderer));
         }
     }
 

@@ -80,10 +80,8 @@ public class GL3DCameraSelectorModel extends AbstractListModel implements ComboB
     }
 
     private void fireInit() {
-        synchronized (listeners) {
-            for (GL3DCameraSelectionModelListener listener : listeners) {
-                listener.fireInit();
-            }
+        for (GL3DCameraSelectionModelListener listener : listeners) {
+            listener.fireInit();
         }
     }
 
