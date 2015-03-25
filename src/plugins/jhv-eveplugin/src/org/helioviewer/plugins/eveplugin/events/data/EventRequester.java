@@ -7,11 +7,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.NavigableMap;
 
+import org.helioviewer.base.logging.Log;
 import org.helioviewer.base.math.Interval;
 import org.helioviewer.jhv.data.container.JHVEventContainer;
 import org.helioviewer.jhv.data.container.JHVEventHandler;
 import org.helioviewer.jhv.data.datatype.event.JHVEvent;
-import org.helioviewer.plugins.eveplugin.EVEState;
 import org.helioviewer.plugins.eveplugin.controller.ZoomController;
 import org.helioviewer.plugins.eveplugin.controller.ZoomControllerListener;
 import org.helioviewer.plugins.eveplugin.settings.EVEAPI.API_RESOLUTION_AVERAGES;
@@ -35,7 +35,7 @@ public class EventRequester implements ZoomControllerListener, JHVEventHandler {
     private Interval<Date> selectedInterval;
 
     /** the available interval */
-    private Interval<Date> availableInterval;
+    private final Interval<Date> availableInterval;
 
     /** The listeners */
     private final List<EventRequesterListener> listeners;
@@ -86,43 +86,23 @@ public class EventRequester implements ZoomControllerListener, JHVEventHandler {
 
     @Override
     public void availableIntervalChanged(final Interval<Date> newInterval) {
-        availableInterval = newInterval;
-        EventQueue.invokeLater(new Runnable() {
-
-            @Override
-            public void run() {
-                eventContainer.requestForInterval(newInterval.getStart(), newInterval.getEnd(), EventRequester.this);
-            }
-        });
+        if (!EventQueue.isDispatchThread()) {
+            Log.error("Called by other thread than event queue : " + Thread.currentThread().getName());
+            Thread.dumpStack();
+            System.exit(666);
+        }
+        eventContainer.requestForInterval(newInterval.getStart(), newInterval.getEnd(), EventRequester.this);
     }
 
     @Override
     public void selectedIntervalChanged(Interval<Date> newInterval, boolean keepFullValueSpace) {
-        selectedInterval = newInterval;
-        // Log.info("selectedInterval : " + newInterval);
-        if (!EVEState.getSingletonInstance().isMouseTimeIntervalDragging()) {
-            EventQueue.invokeLater(new Runnable() {
-                private Interval<Date> interval;
-                private JHVEventHandler eventHandler;
-
-                public Runnable init(Interval<Date> interval, JHVEventHandler eventHandler) {
-                    this.interval = interval;
-                    this.eventHandler = eventHandler;
-                    return this;
-                }
-
-                @Override
-                public void run() {
-                    // long start = System.currentTimeMillis();
-                    JHVEventContainer.getSingletonInstance().requestForInterval(interval.getStart(), interval.getEnd(), eventHandler);
-                    // Log.debug("selectedIntervalChanged" +
-                    // (System.currentTimeMillis() - start));
-                }
-
-            }.init(newInterval, this));
-        } else {
-            // Log.info("Mouse dragging");
+        if (!EventQueue.isDispatchThread()) {
+            Log.error("Called by other thread than event queue : " + Thread.currentThread().getName());
+            Thread.dumpStack();
+            System.exit(666);
         }
+        selectedInterval = newInterval;
+        JHVEventContainer.getSingletonInstance().requestForInterval(newInterval.getStart(), newInterval.getEnd(), this);
     }
 
     @Override
@@ -132,38 +112,22 @@ public class EventRequester implements ZoomControllerListener, JHVEventHandler {
 
     @Override
     public void newEventsReceived(final Map<String, NavigableMap<Date, NavigableMap<Date, List<JHVEvent>>>> eventList) {
-
-        EventQueue.invokeLater(new Runnable() {
-
-            @Override
-            public void run() {
-                fireNewEventsReceived(eventList);
-            }
-
-        });
-
+        if (!EventQueue.isDispatchThread()) {
+            Log.error("Called by other thread than event queue : " + Thread.currentThread().getName());
+            Thread.dumpStack();
+            System.exit(666);
+        }
+        fireNewEventsReceived(eventList);
     }
 
     @Override
     public void cacheUpdated() {
-        EventQueue.invokeLater((new Runnable() {
-
-            private Interval<Date> selectedInterval;
-            private JHVEventHandler eventHandler;
-
-            public Runnable init(Interval<Date> selectedInterval, JHVEventHandler eventHandler) {
-                this.selectedInterval = selectedInterval;
-                this.eventHandler = eventHandler;
-                return this;
-            }
-
-            @Override
-            public void run() {
-                eventContainer.requestForInterval(selectedInterval.getStart(), selectedInterval.getEnd(), eventHandler);
-            }
-
-        }).init(selectedInterval, this));
-
+        if (!EventQueue.isDispatchThread()) {
+            Log.error("Called by other thread than event queue : " + Thread.currentThread().getName());
+            Thread.dumpStack();
+            System.exit(666);
+        }
+        eventContainer.requestForInterval(selectedInterval.getStart(), selectedInterval.getEnd(), this);
     }
 
     private void fireNewEventsReceived(Map<String, NavigableMap<Date, NavigableMap<Date, List<JHVEvent>>>> events) {
