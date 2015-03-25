@@ -426,7 +426,20 @@ public class RadioPlotModel implements RadioDataManagerListener, ZoomDataConfigL
             newBufferedImages.put(index, newIm);
         }
         bufferedImages = newBufferedImages;
+        updatePlotConfigurations();
         fireDrawNewBufferedImage();
+    }
+
+    private void updatePlotConfigurations() {
+        for (Long downloadID : radioPlotModelData.getPlotConfigList().keySet()) {
+            for (Long imageID : radioPlotModelData.getPlotConfigList().get(downloadID).keySet()) {
+                PlotConfig tempPC = radioPlotModelData.getPlotConfigList().get(downloadID).get(imageID);
+                if (bufferedImages.containsKey(imageID)) {
+                    tempPC.setBufferedImage(bufferedImages.get(imageID));
+                }
+            }
+        }
+
     }
 
 }
