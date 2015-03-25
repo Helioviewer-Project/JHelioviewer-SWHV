@@ -1,5 +1,6 @@
 package org.helioviewer.plugins.eveplugin.controller;
 
+import java.awt.EventQueue;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
@@ -58,14 +59,26 @@ public class ZoomController implements PlotAreaSpaceListener, LayersListener {
     }
 
     public boolean addZoomControllerListener(final ZoomControllerListener listener) {
+        if (!EventQueue.isDispatchThread()) {
+            Thread.dumpStack();
+            System.exit(200);
+        }
         return listeners.add(listener);
     }
 
     public boolean removeControllerListener(final ZoomControllerListener listener) {
+        if (!EventQueue.isDispatchThread()) {
+            Thread.dumpStack();
+            System.exit(200);
+        }
         return listeners.remove(listener);
     }
 
     public void setAvailableInterval(final Interval<Date> interval) {
+        if (!EventQueue.isDispatchThread()) {
+            Thread.dumpStack();
+            System.exit(200);
+        }
         availableInterval = makeCompleteDay(interval);
         // Log.debug("New available interval : " + availableInterval);
         fireAvailableIntervalChanged(availableInterval);
@@ -128,18 +141,25 @@ public class ZoomController implements PlotAreaSpaceListener, LayersListener {
     }
 
     public final Interval<Date> getAvailableInterval() {
+        if (!EventQueue.isDispatchThread()) {
+            Thread.dumpStack();
+            System.exit(200);
+        }
         return availableInterval;
     }
 
     private void fireAvailableIntervalChanged(final Interval<Date> newInterval) {
-        synchronized (listeners) {
-            for (ZoomControllerListener listener : listeners) {
-                listener.availableIntervalChanged(newInterval);
-            }
+        for (ZoomControllerListener listener : listeners) {
+            listener.availableIntervalChanged(newInterval);
         }
+
     }
 
     public Interval<Date> setSelectedInterval(final Interval<Date> newSelectedInterval, boolean useFullValueSpace) {
+        if (!EventQueue.isDispatchThread()) {
+            Thread.dumpStack();
+            System.exit(200);
+        }
         if (availableInterval.getStart() == null || availableInterval.getEnd() == null) {
             selectedInterval = new Interval<Date>(null, null);
         } else if (newSelectedInterval.getStart() == null || newSelectedInterval.getEnd() == null) {
@@ -167,6 +187,10 @@ public class ZoomController implements PlotAreaSpaceListener, LayersListener {
     }
 
     public Interval<Date> zoomTo(final ZOOM zoom, final int value) {
+        if (!EventQueue.isDispatchThread()) {
+            Thread.dumpStack();
+            System.exit(200);
+        }
         Interval<Date> newInterval = new Interval<Date>(null, null);
         switch (zoom) {
         case CUSTOM:
@@ -275,6 +299,10 @@ public class ZoomController implements PlotAreaSpaceListener, LayersListener {
     }
 
     public Interval<Date> getSelectedInterval() {
+        if (!EventQueue.isDispatchThread()) {
+            Thread.dumpStack();
+            System.exit(200);
+        }
         return selectedInterval;
     }
 
@@ -285,11 +313,19 @@ public class ZoomController implements PlotAreaSpaceListener, LayersListener {
     }
 
     public void setSelectedResolution(final API_RESOLUTION_AVERAGES resolution) {
+        if (!EventQueue.isDispatchThread()) {
+            Thread.dumpStack();
+            System.exit(200);
+        }
         selectedResolution = resolution;
         fireSelectedResolutionChanged(selectedResolution);
     }
 
     public API_RESOLUTION_AVERAGES getSelectedResolution() {
+        if (!EventQueue.isDispatchThread()) {
+            Thread.dumpStack();
+            System.exit(200);
+        }
         return selectedResolution;
     }
 
@@ -301,6 +337,10 @@ public class ZoomController implements PlotAreaSpaceListener, LayersListener {
 
     @Override
     public void plotAreaSpaceChanged(double scaledMinValue, double scaledMaxValue, double scaledMinTime, double scaledMaxTime, double scaledSelectedMinValue, double scaledSelectedMaxValue, double scaledSelectedMinTime, double scaledSelectedMaxTime, boolean forced) {
+        if (!EventQueue.isDispatchThread()) {
+            Thread.dumpStack();
+            System.exit(200);
+        }
         if (availableInterval.getStart() != null && availableInterval.getEnd() != null && selectedInterval.getStart() != null && selectedInterval.getEnd() != null) {
             long diffTime = availableInterval.getEnd().getTime() - availableInterval.getStart().getTime();
             double scaleDiff = scaledMaxTime - scaledMinTime;
@@ -329,6 +369,10 @@ public class ZoomController implements PlotAreaSpaceListener, LayersListener {
 
     @Override
     public void availablePlotAreaSpaceChanged(double oldMinValue, double oldMaxValue, double oldMinTime, double oldMaxTime, double newMinValue, double newMaxValue, double newMinTime, double newMaxTime) {
+        if (!EventQueue.isDispatchThread()) {
+            Thread.dumpStack();
+            System.exit(200);
+        }
         if (availableInterval != null && availableInterval.getStart() != null && availableInterval.getEnd() != null && (oldMinTime > newMinTime || oldMaxTime < newMaxTime)) {
             double timeRatio = (availableInterval.getEnd().getTime() - availableInterval.getStart().getTime()) / (oldMaxTime - oldMinTime);
             double startDifference = oldMinTime - newMinTime;
@@ -343,6 +387,10 @@ public class ZoomController implements PlotAreaSpaceListener, LayersListener {
 
     @Override
     public void layerAdded(int idx) {
+        if (!EventQueue.isDispatchThread()) {
+            Thread.dumpStack();
+            System.exit(200);
+        }
         final Interval<Date> interval = new Interval<Date>(LayersModel.getSingletonInstance().getFirstDate(), LayersModel.getSingletonInstance().getLastDate());
         if (availableInterval == null || availableInterval.getStart() == null || availableInterval.getEnd() == null) {
             availableInterval = interval;
