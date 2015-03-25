@@ -2,6 +2,7 @@ package org.helioviewer.jhv.gui.components.layerTable.renderers;
 
 import java.awt.Component;
 
+import javax.swing.Icon;
 import javax.swing.JLabel;
 import javax.swing.JTable;
 import javax.swing.border.Border;
@@ -67,12 +68,10 @@ public class DescriptorIconRenderer extends DefaultTableCellRenderer {
      */
     public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
         if (value instanceof LayerDescriptor) {
-            // Everything is fine
-
             // Setup label
             LayerDescriptor descriptor = (LayerDescriptor) value;
             JLabel label = (JLabel) super.getTableCellRendererComponent(table, null, isSelected, hasFocus, row, column);
-            label.setIcon(IconBank.getIcon(DescriptorIconRenderer.getIcon(descriptor)));
+            label.setIcon(DescriptorIconRenderer.getIcon(descriptor));
             label.setToolTipText(DescriptorIconRenderer.getTooltipText(descriptor));
             label.setBorder(border);
 
@@ -121,6 +120,18 @@ public class DescriptorIconRenderer extends DefaultTableCellRenderer {
         return tooltip;
     }
 
+    private static final Icon iconLAYER_MOVIE_TIME_MASTER = IconBank.getIcon(JHVIcon.LAYER_MOVIE_TIME_MASTER);
+    private static final Icon iconLAYER_MOVIE_TIME = IconBank.getIcon(JHVIcon.LAYER_MOVIE_TIME);
+    private static final Icon iconLAYER_MOVIE_TIME_OFF = IconBank.getIcon(JHVIcon.LAYER_MOVIE_TIME_OFF);
+    private static final Icon iconLAYER_MOVIE = IconBank.getIcon(JHVIcon.LAYER_MOVIE);
+    private static final Icon iconLAYER_MOVIE_OFF = IconBank.getIcon(JHVIcon.LAYER_MOVIE_OFF);
+
+    private static final Icon iconLAYER_IMAGE_TIME_MASTER = IconBank.getIcon(JHVIcon.LAYER_IMAGE_TIME_MASTER);
+    private static final Icon iconLAYER_IMAGE_TIME = IconBank.getIcon(JHVIcon.LAYER_IMAGE_TIME);
+    private static final Icon iconLAYER_IMAGE_TIME_OFF = IconBank.getIcon(JHVIcon.LAYER_IMAGE_TIME_OFF);
+    private static final Icon iconLAYER_IMAGE = IconBank.getIcon(JHVIcon.LAYER_IMAGE);
+    private static final Icon iconLAYER_IMAGE_OFF = IconBank.getIcon(JHVIcon.LAYER_IMAGE_OFF);
+
     /**
      * Choose the right icon for the given LayerDescriptor
      * 
@@ -128,36 +139,37 @@ public class DescriptorIconRenderer extends DefaultTableCellRenderer {
      *            - LayerDescriptor to base the selection on
      * @return the JHVIcon to draw
      */
-    public static JHVIcon getIcon(LayerDescriptor descriptor) {
+    public static Icon getIcon(LayerDescriptor descriptor) {
         boolean isMovie = descriptor.isMovie;
         boolean isMaster = descriptor.isMaster;
         boolean isTimed = descriptor.isTimed;
         boolean isVisible = descriptor.isVisible;
 
-        JHVIcon icon = null;
+        Icon icon = null;
 
         if (isMovie && isTimed && isVisible && isMaster)
-            icon = JHVIcon.LAYER_MOVIE_TIME_MASTER;
+            icon = iconLAYER_MOVIE_TIME_MASTER;
         if (isMovie && isTimed && isVisible && !isMaster)
-            icon = JHVIcon.LAYER_MOVIE_TIME;
+            icon = iconLAYER_MOVIE_TIME;
         if (isMovie && isTimed && !isVisible)
-            icon = JHVIcon.LAYER_MOVIE_TIME_OFF;
+            icon = iconLAYER_MOVIE_TIME_OFF;
         if (isMovie && !isTimed && isVisible)
-            icon = JHVIcon.LAYER_MOVIE;
+            icon = iconLAYER_MOVIE;
         if (isMovie && !isTimed && !isVisible)
-            icon = JHVIcon.LAYER_MOVIE_OFF;
+            icon = iconLAYER_MOVIE_OFF;
 
         if (!isMovie && isTimed && isVisible && isMaster)
-            icon = JHVIcon.LAYER_IMAGE_TIME_MASTER;
+            icon = iconLAYER_IMAGE_TIME_MASTER;
         if (!isMovie && isTimed && isVisible && !isMaster)
-            icon = JHVIcon.LAYER_IMAGE_TIME;
+            icon = iconLAYER_IMAGE_TIME;
         if (!isMovie && isTimed && !isVisible)
-            icon = JHVIcon.LAYER_IMAGE_TIME_OFF;
+            icon = iconLAYER_IMAGE_TIME_OFF;
         if (!isMovie && !isTimed && isVisible)
-            icon = JHVIcon.LAYER_IMAGE;
+            icon = iconLAYER_IMAGE;
         if (!isMovie && !isTimed && !isVisible)
-            icon = JHVIcon.LAYER_IMAGE_OFF;
+            icon = iconLAYER_IMAGE_OFF;
 
         return icon;
     }
+
 }

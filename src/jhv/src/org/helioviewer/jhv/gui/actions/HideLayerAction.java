@@ -4,9 +4,7 @@ import java.awt.event.ActionEvent;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
-import javax.swing.Icon;
 
-import org.helioviewer.jhv.gui.IconBank;
 import org.helioviewer.jhv.gui.components.layerTable.renderers.DescriptorIconRenderer;
 import org.helioviewer.jhv.layers.LayerDescriptor;
 import org.helioviewer.jhv.layers.LayersModel;
@@ -37,10 +35,7 @@ public class HideLayerAction extends AbstractAction {
         LayerDescriptor ld = LayersModel.getSingletonInstance().getDescriptor(view);
         ld.isVisible = false;
 
-        Icon icon = IconBank.getIcon(DescriptorIconRenderer.getIcon(ld));
-
-        this.putValue(Action.SMALL_ICON, icon);
-
+        this.putValue(Action.SMALL_ICON, DescriptorIconRenderer.getIcon(ld));
         this.view = view;
     }
 

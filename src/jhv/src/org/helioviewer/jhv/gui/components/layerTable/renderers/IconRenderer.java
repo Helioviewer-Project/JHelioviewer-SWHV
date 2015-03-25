@@ -80,4 +80,5 @@ public class IconRenderer extends DefaultTableCellRenderer {
         table.getColumnModel().getColumn(column).setMinWidth(width);
         table.getColumnModel().getColumn(column).setMaxWidth(width);
     }
+
 }
