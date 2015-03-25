@@ -95,6 +95,7 @@ public class YValueModel implements PlotAreaSpaceListener {
         if (!EventQueue.isDispatchThread()) {
             Log.error("Function called by other thread than eventqueue : " + Thread.currentThread().getName());
             Thread.dumpStack();
+            System.exit(444);
         }
         return selectedYMin;
     }
@@ -105,7 +106,7 @@ public class YValueModel implements PlotAreaSpaceListener {
      * @param selectedYMin
      *            The new selected minimum y-value
      */
-    public synchronized void setSelectedYMin(double selectedYMin) {
+    public void setSelectedYMin(double selectedYMin) {
         this.selectedYMin = selectedYMin;
     }
 
@@ -114,7 +115,12 @@ public class YValueModel implements PlotAreaSpaceListener {
      * 
      * @return The selected maximum y-value
      */
-    public synchronized double getSelectedYMax() {
+    public double getSelectedYMax() {
+        if (!EventQueue.isDispatchThread()) {
+            Log.error("Function called by other thread than eventqueue : " + Thread.currentThread().getName());
+            Thread.dumpStack();
+            System.exit(3333);
+        }
         return selectedYMax;
     }
 
