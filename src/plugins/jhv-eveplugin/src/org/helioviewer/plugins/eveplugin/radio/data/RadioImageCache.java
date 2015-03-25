@@ -76,12 +76,15 @@ public class RadioImageCache {
 
     public void remove(Long ID) {
         synchronized (instance) {
-            DownloadedJPXData data = dataCache.get(ID);
-            dataCache.remove(ID);
-            useCache.remove(reverseUseCache.get(data));
-            reverseUseCache.remove(data);
-            startDates.remove(data.getStartDate());
-            data.remove();
+            if (dataCache.containsKey(ID)) {
+                DownloadedJPXData data = dataCache.get(ID);
+                Log.debug("Data for ID : " + data);
+                dataCache.remove(ID);
+                useCache.remove(reverseUseCache.get(data));
+                reverseUseCache.remove(data);
+                startDates.remove(data.getStartDate());
+                data.remove();
+            }
         }
     }
 
