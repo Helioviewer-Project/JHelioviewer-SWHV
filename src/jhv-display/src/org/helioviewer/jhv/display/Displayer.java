@@ -38,13 +38,11 @@ public class Displayer implements JHVEventHighlightListener {
     private static boolean todisplay = false;
     private final MyListener timerListener = new MyListener();
 
-    private static LayersModel layersModel;
-    private static LayerTableModel tableModel;
+    private static final LayersModel layersModel = LayersModel.getSingletonInstance();
+    private static final LayerTableModel tableModel = LayerTableModel.getSingletonInstance();
+    private static final FramerateStatusPanel framerateStatus = FramerateStatusPanel.getSingletonInstance();
 
     private Displayer() {
-        layersModel = LayersModel.getSingletonInstance();
-        tableModel = LayerTableModel.getSingletonInstance();
-
         Timer timer = new Timer(1000 / 20, timerListener);
         timer.start();
     }
@@ -104,12 +102,6 @@ public class Displayer implements JHVEventHighlightListener {
         timeListeners.remove(timeListener);
     }
 
-    public static void fireTimeChanged(Date time) {
-        for (final TimeListener listener : timeListeners) {
-            listener.timeChanged(time);
-        }
-    }
-
     public static void fireFrameChanged(JHVJP2View view, ImmutableDateTime dateTime) {
         int idx = layersModel.findView(view);
         if (layersModel.isValidIndex(idx)) {
@@ -117,10 +109,14 @@ public class Displayer implements JHVEventHighlightListener {
             tableModel.fireTableRowsUpdated(idx, idx);
 
             if (idx == layersModel.getActiveLayer() && dateTime != null) {
+                framerateStatus.updateFramerate(layersModel.getFPS(view));
                 MoviePanel.setFrameSlider(view);
+
                 lastTimestamp = dateTime.getTime();
-                fireTimeChanged(lastTimestamp);
-                FramerateStatusPanel.getSingletonInstance().updateFramerate(layersModel.getFPS(view));
+                // fire TimeChanged
+                for (final TimeListener listener : timeListeners) {
+                    listener.timeChanged(lastTimestamp);
+                }
             }
             display();
         }
