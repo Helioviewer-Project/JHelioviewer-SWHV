@@ -61,4 +61,5 @@ public class DescriptorTitleRenderer extends DefaultTableCellRenderer {
             return super.getTableCellRendererComponent(table, "Error", isSelected, hasFocus, row, column);
         }
     }
+
 }

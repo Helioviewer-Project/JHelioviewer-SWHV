@@ -8,6 +8,7 @@ import javax.swing.JTable;
 import javax.swing.border.Border;
 import javax.swing.table.DefaultTableCellRenderer;
 
+import org.helioviewer.base.Pair;
 import org.helioviewer.jhv.gui.IconBank;
 import org.helioviewer.jhv.gui.IconBank.JHVIcon;
 import org.helioviewer.jhv.layers.LayerDescriptor;
@@ -71,53 +72,16 @@ public class DescriptorIconRenderer extends DefaultTableCellRenderer {
             // Setup label
             LayerDescriptor descriptor = (LayerDescriptor) value;
             JLabel label = (JLabel) super.getTableCellRendererComponent(table, null, isSelected, hasFocus, row, column);
-            label.setIcon(DescriptorIconRenderer.getIcon(descriptor));
-            label.setToolTipText(DescriptorIconRenderer.getTooltipText(descriptor));
+
+            Pair<Icon, String> pair = DescriptorIconRenderer.getIconTooltip(descriptor);
+            label.setIcon(pair.a);
+            label.setToolTipText(pair.b);
             label.setBorder(border);
 
             return label;
         } else {
             return super.getTableCellRendererComponent(table, "Error", isSelected, hasFocus, row, column);
         }
-    }
-
-    private static String getTooltipText(LayerDescriptor descriptor) {
-        boolean isMovie = descriptor.isMovie;
-        boolean isMaster = descriptor.isMaster;
-        boolean isTimed = descriptor.isTimed;
-        boolean isVisible = descriptor.isVisible;
-
-        String tooltip = "";
-
-        if (isMovie && isTimed && isVisible && isMaster)
-            tooltip = "Master Layer (Movie)";
-        if (isMovie && isTimed && isVisible && !isMaster)
-            tooltip = "Slave Layer (Movie)";
-        if (isMovie && isTimed && !isVisible)
-            tooltip = "Invisible Layer (Movie)";
-        if (isMovie && !isTimed && isVisible)
-            tooltip = "Layer (Movie, No timing Information)";
-        if (isMovie && !isTimed && !isVisible)
-            tooltip = "Invisible Layer (Movie, No timing Information)";
-
-        if (!isMovie && isTimed && isVisible && isMaster)
-            tooltip = "Master Layer (Image)";
-        if (!isMovie && isTimed && isVisible && !isMaster)
-            tooltip = "Slave Layer (Image)";
-        if (!isMovie && isTimed && !isVisible)
-            tooltip = "Invisible Layer (Image)";
-        if (!isMovie && !isTimed && isVisible)
-            tooltip = "Layer (Image, No timing Information)";
-        if (!isMovie && !isTimed && !isVisible)
-            tooltip = "Invisible Layer (Image, No timing Information)";
-
-        if (isVisible) {
-            tooltip = tooltip + " - Click to Hide";
-        } else {
-            tooltip = tooltip + " - Click to Unhide";
-        }
-
-        return tooltip;
     }
 
     private static final Icon iconLAYER_MOVIE_TIME_MASTER = IconBank.getIcon(JHVIcon.LAYER_MOVIE_TIME_MASTER);
@@ -139,37 +103,64 @@ public class DescriptorIconRenderer extends DefaultTableCellRenderer {
      *            - LayerDescriptor to base the selection on
      * @return the JHVIcon to draw
      */
-    public static Icon getIcon(LayerDescriptor descriptor) {
+    public static Pair<Icon, String> getIconTooltip(LayerDescriptor descriptor) {
         boolean isMovie = descriptor.isMovie;
         boolean isMaster = descriptor.isMaster;
         boolean isTimed = descriptor.isTimed;
         boolean isVisible = descriptor.isVisible;
 
         Icon icon = null;
+        String tooltip = "";
 
-        if (isMovie && isTimed && isVisible && isMaster)
+        if (isMovie && isTimed && isVisible && isMaster) {
             icon = iconLAYER_MOVIE_TIME_MASTER;
-        if (isMovie && isTimed && isVisible && !isMaster)
+            tooltip = "Master layer (movie)";
+        }
+        if (isMovie && isTimed && isVisible && !isMaster) {
             icon = iconLAYER_MOVIE_TIME;
-        if (isMovie && isTimed && !isVisible)
+            tooltip = "Slave layer (movie)";
+        }
+        if (isMovie && isTimed && !isVisible) {
             icon = iconLAYER_MOVIE_TIME_OFF;
-        if (isMovie && !isTimed && isVisible)
+            tooltip = "Invisible layer (movie)";
+        }
+        if (isMovie && !isTimed && isVisible) {
             icon = iconLAYER_MOVIE;
-        if (isMovie && !isTimed && !isVisible)
+            tooltip = "Layer (movie, no timing information)";
+        }
+        if (isMovie && !isTimed && !isVisible) {
             icon = iconLAYER_MOVIE_OFF;
+            tooltip = "Invisible layer (movie, no timing information)";
+        }
 
-        if (!isMovie && isTimed && isVisible && isMaster)
+        if (!isMovie && isTimed && isVisible && isMaster) {
             icon = iconLAYER_IMAGE_TIME_MASTER;
-        if (!isMovie && isTimed && isVisible && !isMaster)
+            tooltip = "Master layer (image)";
+        }
+        if (!isMovie && isTimed && isVisible && !isMaster) {
             icon = iconLAYER_IMAGE_TIME;
-        if (!isMovie && isTimed && !isVisible)
+            tooltip = "Slave layer (image)";
+        }
+        if (!isMovie && isTimed && !isVisible) {
             icon = iconLAYER_IMAGE_TIME_OFF;
-        if (!isMovie && !isTimed && isVisible)
+            tooltip = "Invisible layer (image)";
+        }
+        if (!isMovie && !isTimed && isVisible) {
             icon = iconLAYER_IMAGE;
-        if (!isMovie && !isTimed && !isVisible)
+            tooltip = "Layer (image, no timing information)";
+        }
+        if (!isMovie && !isTimed && !isVisible) {
             icon = iconLAYER_IMAGE_OFF;
+            tooltip = "Invisible layer (image, no timing information)";
+        }
 
-        return icon;
+        if (isVisible) {
+            tooltip += " - click to hide";
+        } else {
+            tooltip += " - click to unhide";
+        }
+
+        return new Pair<Icon, String>(icon, tooltip);
     }
 
 }
