@@ -1,7 +1,6 @@
 package org.helioviewer.plugins.eveplugin.view.linedataselector;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 public class LineDataSelectorModel {
@@ -11,7 +10,7 @@ public class LineDataSelectorModel {
     private static LineDataSelectorModel instance;
 
     private LineDataSelectorModel() {
-        listeners = Collections.synchronizedList(new ArrayList<LineDataSelectorModelListener>());
+        listeners = new ArrayList<LineDataSelectorModelListener>();
         elements = new ArrayList<LineDataSelectorElement>();
     }
 
@@ -39,37 +38,27 @@ public class LineDataSelectorModel {
     }
 
     public int getNumberOfAvailableLineData() {
-        synchronized (elements) {
-            return elements == null ? 0 : elements.size();
-        }
+        return elements == null ? 0 : elements.size();
     }
 
-    public synchronized void addLineData(LineDataSelectorElement element) {
-        synchronized (elements) {
-            elements.add(element);
-            fireLineDataSelectorElementAdded(element);
-        }
+    public void addLineData(LineDataSelectorElement element) {
+        elements.add(element);
+        fireLineDataSelectorElementAdded(element);
     }
 
     public List<LineDataSelectorElement> getAllLineDataSelectorElements() {
-        synchronized (elements) {
-            return elements;
-        }
+        return elements;
     }
 
     public void removeLineData(LineDataSelectorElement element) {
-        synchronized (elements) {
-            if (elements != null) {
-                elements.remove(element);
-            }
-            fireLineDataSelectorElementRemoved(element);
+        if (elements != null) {
+            elements.remove(element);
         }
+        fireLineDataSelectorElementRemoved(element);
     }
 
     public void lineDataElementUpdated(LineDataSelectorElement element) {
-        synchronized (elements) {
-            fireLineDataSelectorElementUpdated(element);
-        }
+        fireLineDataSelectorElementUpdated(element);
     }
 
     public void lineDataGroupChanged() {
@@ -77,42 +66,40 @@ public class LineDataSelectorModel {
     }
 
     public boolean atLeastOneDownloading() {
-        synchronized (elements) {
-            for (LineDataSelectorElement el : elements) {
-                if (el.isDownloading()) {
-                    return true;
-                }
+        for (LineDataSelectorElement el : elements) {
+            if (el.isDownloading()) {
+                return true;
             }
-            return false;
         }
+        return false;
     }
 
-    private synchronized void fireLineDataSelectorElementRemoved(LineDataSelectorElement element) {
+    private void fireLineDataSelectorElementRemoved(LineDataSelectorElement element) {
         for (LineDataSelectorModelListener listener : listeners) {
             listener.lineDataRemoved(element);
         }
 
     }
 
-    private synchronized void fireLineDataSelectorElementAdded(LineDataSelectorElement element) {
+    private void fireLineDataSelectorElementAdded(LineDataSelectorElement element) {
         for (LineDataSelectorModelListener listener : listeners) {
             listener.lineDataAdded(element);
         }
     }
 
-    private synchronized void fireDownloadStarted(LineDataSelectorElement element) {
+    private void fireDownloadStarted(LineDataSelectorElement element) {
         for (LineDataSelectorModelListener listener : listeners) {
             listener.downloadStartded(element);
         }
     }
 
-    private synchronized void fireDownloadFinished(LineDataSelectorElement element) {
+    private void fireDownloadFinished(LineDataSelectorElement element) {
         for (LineDataSelectorModelListener listener : listeners) {
             listener.downloadFinished(element);
         }
     }
 
-    private synchronized void fireLineDataSelectorElementUpdated(LineDataSelectorElement element) {
+    private void fireLineDataSelectorElementUpdated(LineDataSelectorElement element) {
         for (LineDataSelectorModelListener listener : listeners) {
             listener.lineDataUpdated(element);
         }
