@@ -63,6 +63,8 @@ public class EventModel implements ZoomControllerListener, EventRequesterListene
 
     private boolean eventsActivated;
 
+    private boolean prevNoPlotConfig;
+
     /**
      * Private default constructor.
      */
@@ -265,7 +267,7 @@ public class EventModel implements ZoomControllerListener, EventRequesterListene
 
                     return new EventTypePlotConfiguration(events.size(), maxNrLines, linesPerEventType, eventPlotConfigPerEventType, tempLastDateWithData);
                 } else {
-                    return null;
+                    return new EventTypePlotConfiguration();
                 }
             }
 
@@ -274,11 +276,18 @@ public class EventModel implements ZoomControllerListener, EventRequesterListene
                 try {
                     if (!isCancelled()) {
                         eventPlotConfiguration = get();
-                        // if
-                        // (eventPlotConfiguration.getEventPlotConfigurations().size()
-                        // > 0) {
+                        if (eventPlotConfiguration.getEventPlotConfigurations().size() != 0 && prevNoPlotConfig) {
+                            prevNoPlotConfig = false;
+                        }
                         if (eventPlotConfiguration != null && EventModel.getSingletonInstance().isEventsVisible()) {
                             DrawController.getSingletonInstance().updateDrawableElement(eventPanel);
+                        } else {
+
+                            if (eventPlotConfiguration == null) {
+                                Log.debug("event plot configurations null");
+                            } else {
+                                Log.debug("event plot configurations not visible");
+                            }
                         }
                         // }
                     } else {
@@ -344,5 +353,13 @@ public class EventModel implements ZoomControllerListener, EventRequesterListene
         for (EventModelListener l : listeners) {
             l.eventsDeactivated();
         }
+    }
+
+    public boolean hasElementsToDraw() {
+        boolean tempPrevZero = prevNoPlotConfig;
+        if (eventPlotConfiguration.getEventPlotConfigurations().isEmpty()) {
+            prevNoPlotConfig = true;
+        }
+        return !tempPrevZero || !eventPlotConfiguration.getEventPlotConfigurations().isEmpty();
     }
 }
