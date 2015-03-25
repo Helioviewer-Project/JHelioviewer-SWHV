@@ -77,7 +77,7 @@ public class SendDataTestFrame extends JFrame implements RadioDataManagerListene
         setVisible(true);
     }
 
-    public synchronized void viewChanged(View sender, ChangeEvent aEvent) {
+    public void viewChanged(View sender, ChangeEvent aEvent) {
         StringBuffer text = new StringBuffer();
         text.append("Sender object = " + sender).append("\n");
         text.append("Event number : " + aEvent.hashCode()).append("\n");
@@ -196,7 +196,7 @@ public class SendDataTestFrame extends JFrame implements RadioDataManagerListene
         this.rs = rs;
     }
 
-    public synchronized void changeToFrame(int frame) {
+    public void changeToFrame(int frame) {
         StringBuffer str = new StringBuffer("Jumped to frame " + frame);
         imageTabbedPane.add(new TextImageTestPanel(str), "Framejump " + count);
         count++;
