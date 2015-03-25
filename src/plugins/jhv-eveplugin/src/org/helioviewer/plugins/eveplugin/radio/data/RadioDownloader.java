@@ -179,9 +179,12 @@ public class RadioDownloader {
                         inRequestCache = false;
                         requestDateCache.add(startDate);
                     }
-
                     if (!(inRequestCache || cache.containsDate(startDate))) {
                         toDownloadStartDates.add(startDate);
+                    } else {
+                        if (cache.containsDate(startDate)) {
+                            requestDateCache.remove(startDate);
+                        }
                     }
                     startDate = calculateOneDayFurtherAsDate(startDate);
                 }
