@@ -167,6 +167,7 @@ public class LayerTable extends JTable {
 
         getColumnModel().getColumn(LayerTableModel.COLUMN_TIMESTAMP).setCellRenderer(new DescriptorTimestampRenderer(true));
         // getColumnModel().getColumn(LayerTableModel.COLUMN_TIMESTAMP).setPreferredWidth(15);
+
         Border removeIconBorder = border;
         IconRenderer iconRenderer = new IconRenderer("Remove Layer", IconBank.getIcon(JHVIcon.REMOVE_LAYER), removeIconBorder);
         iconRenderer.setFixedWidth(this, LayerTableModel.COLUMN_BUTTON_REMOVE);
