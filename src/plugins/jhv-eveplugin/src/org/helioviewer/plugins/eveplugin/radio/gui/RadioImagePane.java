@@ -57,14 +57,11 @@ public class RadioImagePane implements ImageObserver, RadioPlotModelListener, Dr
         // Thread.dumpStack();
         if (!intervalTooBig) {
             Collection<NoDataConfig> noDataConfigs = RadioPlotModel.getSingletonInstance().getNoDataConfigurations();
-            // Log.trace("Draw no data configs. Size: " + noDataConfigs.size());
             for (NoDataConfig ndc : noDataConfigs) {
                 ndc.draw(g);
             }
             Collection<PlotConfig> configs = RadioPlotModel.getSingletonInstance().getPlotConfigurations();
-            // Log.trace("Number of plotconfigs: " + configs.size());
             for (PlotConfig pc : configs) {
-                // Log.trace("imageID" + pc.getImageId());
                 pc.draw(g);
             }
         } else {
@@ -98,7 +95,7 @@ public class RadioImagePane implements ImageObserver, RadioPlotModelListener, Dr
 
     @Override
     public boolean hasElementsToDraw() {
-        return !(RadioPlotModel.getSingletonInstance().getPlotConfigurations() == null || !RadioPlotModel.getSingletonInstance().getPlotConfigurations().isEmpty() || !RadioPlotModel.getSingletonInstance().getNoDataConfigurations().isEmpty());
+        return (RadioPlotModel.getSingletonInstance().getPlotConfigurations() != null && !RadioPlotModel.getSingletonInstance().getPlotConfigurations().isEmpty()) || !RadioPlotModel.getSingletonInstance().getNoDataConfigurations().isEmpty();
     }
 
     public void setIntervalTooBig(boolean b) {
