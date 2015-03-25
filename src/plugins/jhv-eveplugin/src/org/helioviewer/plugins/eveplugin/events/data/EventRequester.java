@@ -38,9 +38,6 @@ public class EventRequester implements ZoomControllerListener, JHVEventHandler {
     /** the available interval */
     private Interval<Date> availableInterval;
 
-    /** interval lock */
-    private final Object intervalLock;
-
     /** The listeners */
     private final List<EventRequesterListener> listeners;
 
@@ -53,7 +50,6 @@ public class EventRequester implements ZoomControllerListener, JHVEventHandler {
         ZoomController.getSingletonInstance().addZoomControllerListener(this);
         availableInterval = new Interval<Date>(new Date(), new Date());
         selectedInterval = new Interval<Date>(new Date(), new Date());
-        intervalLock = new Object();
         listeners = new ArrayList<EventRequesterListener>();
     }
 
@@ -91,17 +87,14 @@ public class EventRequester implements ZoomControllerListener, JHVEventHandler {
 
     @Override
     public void availableIntervalChanged(final Interval<Date> newInterval) {
-        synchronized (intervalLock) {
-            availableInterval = newInterval;
-            EventQueue.invokeLater(new Runnable() {
+        availableInterval = newInterval;
+        EventQueue.invokeLater(new Runnable() {
 
-                @Override
-                public void run() {
-                    eventContainer.requestForInterval(newInterval.getStart(), newInterval.getEnd(), EventRequester.this);
-                }
-            });
-
-        }
+            @Override
+            public void run() {
+                eventContainer.requestForInterval(newInterval.getStart(), newInterval.getEnd(), EventRequester.this);
+            }
+        });
     }
 
     @Override
