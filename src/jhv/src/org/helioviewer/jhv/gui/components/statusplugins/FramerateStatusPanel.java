@@ -35,8 +35,8 @@ public class FramerateStatusPanel extends JLabel implements StatusPanelPlugin {
         return instance;
     }
 
-    public void updateFramerate(double fps) {
-        setText("fps: " + Double.toString(fps));
+    public void updateFramerate(int fps) {
+        setText(String.format("fps: %d", fps));
     }
 
 }
