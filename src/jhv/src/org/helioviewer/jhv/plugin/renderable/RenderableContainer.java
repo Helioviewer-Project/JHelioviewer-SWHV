@@ -40,8 +40,8 @@ public class RenderableContainer extends DefaultTableModel implements Reorderabl
     }
 
     public void render(GL3DState state) {
-        initRenderables(state);
         removeRenderables(state);
+        initRenderables(state);
         for (Renderable renderable : renderables) {
             renderable.render(state);
         }
@@ -123,7 +123,8 @@ public class RenderableContainer extends DefaultTableModel implements Reorderabl
             return;
         }
         Renderable toMove = this.renderables.get(fromIndex);
-        this.removeRow(fromIndex);
+        renderables.remove(fromIndex);
+        fireTableRowsDeleted(fromIndex, fromIndex);
         if (fromIndex < toIndex) {
             this.insertRow(toIndex - 1, toMove);
         } else {
