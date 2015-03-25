@@ -1,4 +1,4 @@
-package org.helioviewer.base.math;
+package org.helioviewer.base;
 
 public class Pair<A, B> {
     public final A a;
@@ -8,4 +8,5 @@ public class Pair<A, B> {
         this.a = a;
         this.b = b;
     }
-};
+
+}

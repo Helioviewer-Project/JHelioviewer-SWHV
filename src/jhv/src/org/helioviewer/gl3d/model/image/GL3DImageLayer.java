@@ -8,7 +8,7 @@ import java.util.ArrayList;
 
 import javax.media.opengl.GL2;
 
-import org.helioviewer.base.math.Pair;
+import org.helioviewer.base.Pair;
 import org.helioviewer.base.physics.Constants;
 import org.helioviewer.gl3d.camera.GL3DCamera;
 import org.helioviewer.gl3d.math.GL3DMat4d;
