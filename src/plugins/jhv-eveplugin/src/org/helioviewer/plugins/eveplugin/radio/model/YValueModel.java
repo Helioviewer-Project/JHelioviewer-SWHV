@@ -3,6 +3,9 @@
  */
 package org.helioviewer.plugins.eveplugin.radio.model;
 
+import java.awt.EventQueue;
+
+import org.helioviewer.base.logging.Log;
 import org.helioviewer.plugins.eveplugin.model.PlotAreaSpace;
 import org.helioviewer.plugins.eveplugin.model.PlotAreaSpaceListener;
 
@@ -49,7 +52,7 @@ public class YValueModel implements PlotAreaSpaceListener {
      * 
      * @return The available minimum y-value
      */
-    public synchronized double getAvailableYMin() {
+    public double getAvailableYMin() {
         return availableYMin;
     }
 
@@ -59,7 +62,7 @@ public class YValueModel implements PlotAreaSpaceListener {
      * @param availableYMin
      *            The new available minimum y-value
      */
-    public synchronized void setAvailableYMin(double availableYMin) {
+    public void setAvailableYMin(double availableYMin) {
         this.availableYMin = availableYMin;
         recalculateSelectedInterval();
     }
@@ -69,7 +72,7 @@ public class YValueModel implements PlotAreaSpaceListener {
      * 
      * @return The new available maximum y-value
      */
-    public synchronized double getAvailableYMax() {
+    public double getAvailableYMax() {
         return availableYMax;
     }
 
@@ -78,7 +81,7 @@ public class YValueModel implements PlotAreaSpaceListener {
      * 
      * @param availableYMax
      */
-    public synchronized void setAvailableYMax(double availableYMax) {
+    public void setAvailableYMax(double availableYMax) {
         this.availableYMax = availableYMax;
         recalculateSelectedInterval();
     }
@@ -88,7 +91,11 @@ public class YValueModel implements PlotAreaSpaceListener {
      * 
      * @return The selected minimum y-value
      */
-    public synchronized double getSelectedYMin() {
+    public double getSelectedYMin() {
+        if (!EventQueue.isDispatchThread()) {
+            Log.error("Function called by other thread than eventqueue : " + Thread.currentThread().getName());
+            Thread.dumpStack();
+        }
         return selectedYMin;
     }
 
