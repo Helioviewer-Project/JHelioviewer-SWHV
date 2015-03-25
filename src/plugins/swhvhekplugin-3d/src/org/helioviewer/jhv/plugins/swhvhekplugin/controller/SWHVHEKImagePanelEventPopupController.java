@@ -26,7 +26,6 @@ import org.helioviewer.jhv.gui.components.BasicImagePanel;
 import org.helioviewer.jhv.gui.interfaces.ImagePanelPlugin;
 import org.helioviewer.jhv.gui.states.StateController;
 import org.helioviewer.jhv.gui.states.ViewStateEnum;
-import org.helioviewer.jhv.layers.LayersModel;
 import org.helioviewer.jhv.plugins.swhvhekplugin.cache.SWHVHEKData;
 import org.helioviewer.viewmodel.view.RegionView;
 import org.helioviewer.viewmodel.view.View;
@@ -252,7 +251,7 @@ public class SWHVHEKImagePanelEventPopupController implements KeyEventDispatcher
     @Override
     public void mouseMoved(MouseEvent e) {
         JHVEvent lastJHVEvent = mouseOverJHVEvent;
-        Date currentDate = LayersModel.getSingletonInstance().getLastUpdatedTimestamp();
+        Date currentDate = Displayer.getLastUpdatedTimestamp();
 
         GL3DVec3d hitpoint = null;
         mouseOverJHVEvent = null;

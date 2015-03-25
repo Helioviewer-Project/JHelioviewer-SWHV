@@ -79,8 +79,6 @@ public class LayersModel implements UIViewListener {
     private int activeLayer = -1;
     private final ArrayList<LayersListener> layerListeners = new ArrayList<LayersListener>();
 
-    private Date lastTimestamp;
-
     private final GL3DLayeredView layeredView;
 
     /**
@@ -1168,24 +1166,6 @@ public class LayersModel implements UIViewListener {
      */
     public void removeLayersListener(LayersListener layerListener) {
         layerListeners.remove(layerListener);
-    }
-
-    /**
-     * Get last Frame
-     *
-     * @return
-     */
-    public Date getLastUpdatedTimestamp() {
-        if (lastTimestamp == null) {
-            Date lastDate = this.getLastDate();
-            if (lastDate != null) {
-                lastTimestamp = this.getLastDate();
-                return lastTimestamp;
-            }
-            return null;
-        } else {
-            return lastTimestamp;
-        }
     }
 
     /**
