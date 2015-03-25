@@ -796,26 +796,7 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
 
     @Override
     public void drawRequest() {
-        if (!EventQueue.isDispatchThread()) {
-            // Log.debug("Called outside the Event queue");
-            EventQueue.invokeLater(new Runnable() {
-                @Override
-                public void run() {
-                    updateGraph();
-                    // Log.error("repaint request");
-                    repaint();
-                    // Log.debug("draw request time: " +
-                    // (System.currentTimeMillis() - start));
-                }
-            });
-        } else {
-            // Log.debug("Called in eventQueue");
-            updateGraph();
-            repaint();
-            // Log.debug("draw request time: " + (System.currentTimeMillis() -
-            // start));
-        }
-
+        updateGraph();
     }
 
     @Override
