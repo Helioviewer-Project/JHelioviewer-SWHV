@@ -104,7 +104,7 @@ public class Displayer implements JHVEventHighlightListener {
 
     public static void fireFrameChanged(JHVJP2View view, ImmutableDateTime dateTime) {
         int idx = layersModel.findView(view);
-        if (layersModel.isValidIndex(idx)) {
+        if (idx != -1 /*layersModel.isValidIndex(idx)*/) {
             // update LayerTableModel (timestamp labels)
             tableModel.fireTableRowsUpdated(idx, idx);
 
