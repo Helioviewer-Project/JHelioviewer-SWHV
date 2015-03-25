@@ -182,6 +182,9 @@ public abstract class GL3DCamera {
 
     public GL3DVec3d getVectorFromSphere(Point viewportCoordinates) {
         GL3DState state = GL3DState.get();
+        // workaround for null state on startup
+        if (state == null)
+            return null;
         GL3DVec4d centeredViewportCoordinates = new GL3DVec4d(2. * (viewportCoordinates.getX() / state.getViewportWidth() - 0.5), -2. * (viewportCoordinates.getY() / state.getViewportHeight() - 0.5), 0., 0.);
 
         GL3DMat4d vpmi = this.orthoMatrix.inverse();
@@ -201,8 +204,11 @@ public abstract class GL3DCamera {
 
     public GL3DVec3d getVectorFromSphereAlt(Point viewportCoordinates) {
         GL3DState state = GL3DState.get();
+        // workaround for null state on startup
+        if (state == null)
+            return null;
         GL3DVec4d centeredViewportCoordinates = new GL3DVec4d(2. * (viewportCoordinates.getX() / state.getViewportWidth() - 0.5), -2. * (viewportCoordinates.getY() / state.getViewportHeight() - 0.5), 0., 0.);
-        //System.out.println("x" + viewportCoordinates.getX() + " y" + viewportCoordinates.getY() + " w" + state.getViewportWidth() + " h" + state.getViewportHeight());
+
         GL3DMat4d vpmi = this.orthoMatrix.inverse();
         GL3DVec4d solarCoordinates = vpmi.multiply(centeredViewportCoordinates);
         solarCoordinates.w = 0.;

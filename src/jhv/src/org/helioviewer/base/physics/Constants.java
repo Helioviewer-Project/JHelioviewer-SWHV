@@ -11,8 +11,9 @@ public class Constants {
 
     public static final double SunMeanDistanceToEarth = 149597870700.0;
 
-    public static final double SunRadius2 = Constants.SunRadius * Constants.SunRadius;
+    public static final double SunRadius2 = SunRadius * SunRadius;
 
     // 1 jan 2000 in seconds since 1970 (as computed by java)
     public static final long referenceDate = 949363201;
+
 }
