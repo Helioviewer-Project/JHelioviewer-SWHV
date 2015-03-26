@@ -1,14 +1,13 @@
 package org.helioviewer.viewmodel.view.jp2view.io.http;
 
-import java.io.BufferedInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.EOFException;
+import java.io.InputStream;
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.net.ProtocolException;
 import java.net.Socket;
 import java.net.URI;
-
-import org.helioviewer.viewmodel.view.jp2view.io.StringInputStream;
 
 /**
  *
@@ -46,8 +45,6 @@ public class HTTPSocket extends Socket {
     /** The string representation of the CRLF codes */
     static public final String CRLF = new String(CRLFBytes);
 
-    protected BufferedInputStream bufferedStream;
-
     /** Default constructor */
     public HTTPSocket() {
         super();
@@ -66,7 +63,7 @@ public class HTTPSocket extends Socket {
         super.setKeepAlive(true);
         super.setTcpNoDelay(true);
         super.connect(new InetSocketAddress(lastUsedHost, lastUsedPort), 10000);
-        bufferedStream = new BufferedInputStream(getInputStream());
+
         return null;
     }
 
@@ -77,7 +74,6 @@ public class HTTPSocket extends Socket {
      */
     public void reconnect() throws IOException {
         super.connect(new InetSocketAddress(lastUsedHost, lastUsedPort), 10000);
-        bufferedStream = new BufferedInputStream(getInputStream());
     }
 
     /**
@@ -118,7 +114,6 @@ public class HTTPSocket extends Socket {
 
             // Writes the result to the output stream.
             getOutputStream().write(str.toString().getBytes());
-
         } else {
             throw new ProtocolException("Responses sending not yet supported!");
         }
@@ -138,9 +133,9 @@ public class HTTPSocket extends Socket {
         String line;
         String parts[];
 
-        StringInputStream lineInput = new StringInputStream(bufferedStream);
+        InputStream lineInput = getInputStream();
 
-        line = lineInput.readLine();
+        line = readLine(lineInput);
         if (line == null)
             return null;
 
@@ -150,14 +145,12 @@ public class HTTPSocket extends Socket {
         }
 
         if (parts[0].startsWith("HTTP/")) {
-
             // Parses HTTP version
             try {
                 ver = Double.parseDouble(parts[0].substring(5));
             } catch (NumberFormatException ex) {
                 throw new ProtocolException("Invalid HTTP version format");
             }
-
             if ((ver < 1) || (ver > version))
                 throw new ProtocolException("HTTP version not supported");
 
@@ -173,26 +166,57 @@ public class HTTPSocket extends Socket {
 
             // Parses HTTP headers
             for (;;) {
-                line = lineInput.readLine();
-
+                line = readLine(lineInput);
                 if (line == null)
                     throw new EOFException("End of stream reached before end of HTTP message");
                 else if (line.length() <= 0)
                     break;
 
                 parts = line.split(": ", 2);
-
                 if (parts.length != 2)
                     throw new ProtocolException("Invalid HTTP header format");
 
                 res.setHeader(parts[0], parts[1]);
             }
-
             return res;
-
         } else {
             throw new ProtocolException("Requests receiving not yet supported!");
         }
+    }
+
+    private static byte[] readRawLine(InputStream inputStream) throws IOException {
+        ByteArrayOutputStream buf = new ByteArrayOutputStream();
+        int ch;
+        while ((ch = inputStream.read()) >= 0) {
+            buf.write(ch);
+            if (ch == '\n') {
+                break;
+            }
+        }
+        if (buf.size() == 0) {
+            return null;
+        }
+        return buf.toByteArray();
+    }
+
+    private static String readLine(InputStream inputStream) throws IOException {
+        byte[] rawdata = readRawLine(inputStream);
+        if (rawdata == null) {
+            return null;
+        }
+        int len = rawdata.length;
+        int offset = 0;
+        if (len > 0) {
+            if (rawdata[len - 1] == '\n') {
+                offset++;
+                if (len > 1) {
+                    if (rawdata[len - 2] == '\r') {
+                        offset++;
+                    }
+                }
+            }
+        }
+        return new String(rawdata, 0, len - offset, "US-ASCII");
     }
 
     /** Returns the lastUsedPort */
