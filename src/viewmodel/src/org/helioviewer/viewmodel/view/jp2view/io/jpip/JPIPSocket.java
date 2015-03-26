@@ -1,11 +1,12 @@
 package org.helioviewer.viewmodel.view.jp2view.io.jpip;
 
+import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.net.URI;
 import java.util.HashMap;
 import java.util.zip.GZIPInputStream;
 
-import org.helioviewer.viewmodel.view.jp2view.io.ChunkedInputStream;
+import org.helioviewer.viewmodel.view.jp2view.io.ChunkedInputStreamAlt;
 import org.helioviewer.viewmodel.view.jp2view.io.http.HTTPHeaderKey;
 import org.helioviewer.viewmodel.view.jp2view.io.http.HTTPRequest;
 import org.helioviewer.viewmodel.view.jp2view.io.http.HTTPRequest.Method;
@@ -215,7 +216,7 @@ public class JPIPSocket extends HTTPSocket {
 
         replyTextTm = System.currentTimeMillis();
 
-        ChunkedInputStream input = new ChunkedInputStream(bufferedStream);
+        ChunkedInputStreamAlt input = new ChunkedInputStreamAlt(new BufferedInputStream(getInputStream(), 65536));
 
         JPIPDataInputStream jpip;
         field = res.getHeader("Content-Encoding");
