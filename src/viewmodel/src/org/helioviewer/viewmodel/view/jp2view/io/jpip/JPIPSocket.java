@@ -68,6 +68,8 @@ public class JPIPSocket extends HTTPSocket {
         query.setField(JPIPRequestField.CNEW.toString(), "http");
         query.setField(JPIPRequestField.TYPE.toString(), "jpp-stream");
         query.setField(JPIPRequestField.TID.toString(), "0");
+        /* deliberately small */
+        query.setField(JPIPRequestField.LEN.toString(), "512");
         req.setQuery(query.toString());
 
         JPIPResponse res = null;
