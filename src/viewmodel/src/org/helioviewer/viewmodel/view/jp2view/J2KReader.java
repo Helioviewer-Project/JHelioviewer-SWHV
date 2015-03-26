@@ -108,7 +108,7 @@ class J2KReader implements Runnable {
             // otherwise there can be a weird bug where the meta data seems
             // missing
             // if (!parentImageRef.isMultiFrame())
-            KakaduUtils.updateServerCacheModel(socket, cacheRef, true);
+            // KakaduUtils.updateServerCacheModel(socket, cacheRef, true);
 
         } else {
             socket = null;
@@ -278,9 +278,9 @@ class J2KReader implements Runnable {
                     try {
                         socket = new JPIPSocket();
                         socket.connect(parentImageRef.getURI());
-                        if (!parentImageRef.isMultiFrame()) {
-                            KakaduUtils.updateServerCacheModel(socket, cacheRef, true);
-                        }
+                        //if (!parentImageRef.isMultiFrame()) {
+                        //    KakaduUtils.updateServerCacheModel(socket, cacheRef, true);
+                        //}
 
                     } catch (IOException e) {
                         if (verbose) {
@@ -297,9 +297,9 @@ class J2KReader implements Runnable {
 
                         // Send signal to try again
                         parentViewRef.readerSignal.signal();
-                    } catch (JHV_KduException e) {
+                    }/* catch (JHV_KduException e) {
                         e.printStackTrace();
-                    }
+                    } */
                 }
 
                 // if socket is open, get image data
