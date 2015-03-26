@@ -343,11 +343,7 @@ public class GL3DMat4d {
     }
 
     public final static GL3DMat4d translation(GL3DVec3d t) {
-        GL3DMat4d tr = GL3DMat4d.identity();
-        tr.set(12, t.x);
-        tr.set(13, t.y);
-        tr.set(14, t.z);
-        return tr;
+        return new GL3DMat4d(1, 0, 0, t.x, 0, 1, 0, t.y, 0, 0, 1, t.z, 0, 0, 0, 1);
     }
 
     public final static GL3DMat4d scaling(double sx, double sy, double sz) {
