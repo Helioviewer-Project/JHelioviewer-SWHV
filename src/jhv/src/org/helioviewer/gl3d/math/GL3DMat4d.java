@@ -241,11 +241,39 @@ public class GL3DMat4d {
     // }
 
     public final GL3DMat4d translate(GL3DVec3d t) {
-        return this.multiply(GL3DMat4d.translation(t));
+        m[12] += t.x;
+        m[13] += t.y;
+        m[14] += t.z;
+        return this;
     }
 
     public final GL3DMat4d translate(double x, double y, double z) {
-        return this.multiply(GL3DMat4d.translation(new GL3DVec3d(x, y, z)));
+        m[12] += x;
+        m[13] += y;
+        m[14] += z;
+        return this;
+    }
+
+    public final static GL3DMat4d translation(GL3DVec3d t) {
+        return new GL3DMat4d(1, 0, 0, t.x, 0, 1, 0, t.y, 0, 0, 1, t.z, 0, 0, 0, 1);
+    }
+
+    public final GL3DMat4d scale(GL3DVec3d s) {
+        m[0] *= s.x;
+        m[5] *= s.y;
+        m[10] *= s.z;
+        return this;
+    }
+
+    public final GL3DMat4d scale(double sx, double sy, double sz) {
+        m[0] *= sx;
+        m[5] *= sy;
+        m[10] *= sz;
+        return this;
+    }
+
+    public final static GL3DMat4d scaling(double sx, double sy, double sz) {
+        return new GL3DMat4d(sx, 0, 0, 0, 0, sy, 0, 0, 0, 0, sz, 0, 0, 0, 0, 1);
     }
 
     public final GL3DMat4d rotate(double angle, GL3DVec3d axis) {
@@ -254,14 +282,6 @@ public class GL3DMat4d {
 
     public final GL3DMat4d rotate(double angle, double axisx, double axisy, double axisz) {
         return this.multiply(GL3DMat4d.rotation(angle, axisx, axisy, axisz));
-    }
-
-    public final GL3DMat4d scale(GL3DVec3d s) {
-        return this.scale(s.x, s.y, s.z);
-    }
-
-    public final GL3DMat4d scale(double sx, double sy, double sz) {
-        return this.multiply(GL3DMat4d.scaling(sx, sy, sz));
     }
 
     public final GL3DMat4d invert() {
@@ -340,18 +360,6 @@ public class GL3DMat4d {
         }
 
         set(VX.x, VY.x, VZ.x, pos.x, VX.y, VY.y, VZ.y, pos.y, VX.z, VY.z, VZ.z, pos.z, 0, 0, 0, 1);
-    }
-
-    public final static GL3DMat4d translation(GL3DVec3d t) {
-        return new GL3DMat4d(1, 0, 0, t.x, 0, 1, 0, t.y, 0, 0, 1, t.z, 0, 0, 0, 1);
-    }
-
-    public final static GL3DMat4d scaling(double sx, double sy, double sz) {
-        GL3DMat4d s = GL3DMat4d.identity();
-        s.set(0, sx);
-        s.set(5, sy);
-        s.set(10, sy);
-        return s;
     }
 
     private final static GL3DMat4d rotation(GL3DQuatd q) {

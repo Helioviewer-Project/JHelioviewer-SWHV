@@ -1095,12 +1095,12 @@ public class LayersModel implements UIViewListener {
     public LayerDescriptor getDescriptor(JHVJP2View view) {
         LayerDescriptor ld = new LayerDescriptor("sd", "sdf");
 
-        ld.isMovie = layersModel.isMovie(view);
-        ld.isMaster = layersModel.isMaster(view);
-        ld.isVisible = layersModel.isVisible(view);
-        ld.isTimed = layersModel.isTimed(view);
-        ld.title = layersModel.getName(view);
-        ld.timestamp = layersModel.getCurrentFrameTimestampString(view);
+        ld.isMovie = isMovie(view);
+        ld.isMaster = isMaster(view);
+        ld.isVisible = isVisible(view);
+        ld.isTimed = isTimed(view);
+        ld.title = getName(view);
+        ld.timestamp = getCurrentFrameTimestampString(view);
 
         return ld;
     }
