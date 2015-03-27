@@ -12,6 +12,7 @@ import java.util.NavigableMap;
 import java.util.Set;
 import java.util.TreeMap;
 
+import org.helioviewer.base.logging.Log;
 import org.helioviewer.base.math.Interval;
 import org.helioviewer.jhv.data.container.util.DateUtil;
 import org.helioviewer.jhv.data.datatype.event.JHVEvent;
@@ -735,7 +736,7 @@ public class JHVEventCache {
     }
 
     public void removeRequestedIntervals(Interval<Date> remInterval) {
-
+        Log.debug("remove interval : " + remInterval);
         List<Interval<Date>> intervalsToAdd = new ArrayList<Interval<Date>>();
         List<Date> intervalsToRemove = new ArrayList<Date>();
         Date start = remInterval.getStart();
