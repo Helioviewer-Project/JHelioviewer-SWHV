@@ -288,7 +288,7 @@ public abstract class AbstractPluginDialog extends JDialog implements ShowableDi
             }
 
             // delete current layer
-            mainLayeredView.removeLayer(0);
+            // mainLayeredView.removeLayer(0);
         }
 
         // re-add layers in order to rebuild viewchain

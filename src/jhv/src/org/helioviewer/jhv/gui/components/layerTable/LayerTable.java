@@ -88,7 +88,6 @@ public class LayerTable extends JTable {
                 }
 
                 JHVJP2View view = LayersModel.getSingletonInstance().getLayer(row);
-
                 if (view != null) {
                     menu.add(new MoveLayerUpAction(view));
                     menu.add(new MoveLayerDownAction(view));
@@ -101,20 +100,14 @@ public class LayerTable extends JTable {
                     menu.add(new JSeparator());
 
                     if (LayersModel.getSingletonInstance().isVisible(view)) {
-
                         menu.add(new HideLayerAction(view));
-
                     } else {
-
                         menu.add(new UnHideLayerAction(view));
-
                     }
 
                     menu.add(new RemoveLayerAction(view));
-
                     menu.show(e.getComponent(), e.getX(), e.getY());
                 }
-
             }
 
             /**
@@ -126,26 +119,18 @@ public class LayerTable extends JTable {
 
                 int row = rowAtPoint(new Point(e.getX(), e.getY()));
                 int col = columnAtPoint(new Point(e.getX(), e.getY()));
-
                 if (col < 0 || row < 0) {
                     return;
                 }
-
                 int index = row;
 
                 if (col == LayerTableModel.COLUMN_VISIBILITY) {
-
                     LayerTableModel.getSingletonInstance().setVisible(index, !layersModel.isVisible(index));
-
                 } else if (col == LayerTableModel.COLUMN_BUTTON_REMOVE) {
-
                     LayerTableModel.getSingletonInstance().removeLayer(index);
-
                 }
-
             }
         });
-
     }
 
     /**

@@ -9,12 +9,10 @@ import org.helioviewer.base.FileUtils;
 import org.helioviewer.jhv.gui.actions.CenterImageAction;
 import org.helioviewer.jhv.gui.actions.CheckUpdateAction;
 import org.helioviewer.jhv.gui.actions.ExitProgramAction;
-import org.helioviewer.jhv.gui.actions.LoadStateAction;
 import org.helioviewer.jhv.gui.actions.OpenLocalFileAction;
 import org.helioviewer.jhv.gui.actions.OpenURLinBrowserAction;
 import org.helioviewer.jhv.gui.actions.SaveScreenshotAction;
 import org.helioviewer.jhv.gui.actions.SaveScreenshotAsAction;
-import org.helioviewer.jhv.gui.actions.SaveStateAction;
 import org.helioviewer.jhv.gui.actions.ShowDialogAction;
 import org.helioviewer.jhv.gui.actions.ToggleFullscreenAction;
 import org.helioviewer.jhv.gui.actions.Zoom1to1Action;
@@ -53,19 +51,6 @@ public class MenuBar extends JMenuBar {
         fileMenu.add(new ShowDialogAction("Open Remote Image...", OpenRemoteFileDialog.class));
         fileMenu.addSeparator();
 
-        JMenu exampleMenu = new JMenu("Load Example");
-        exampleMenu.add(new LoadStateAction("SDO/AIA Prominence Eruption (2010/12/06)", FileUtils.getResourceUrl("/examples/SDO_AIA_Prominence_Eruption_2010_12_06.jhv")));
-        exampleMenu.add(new LoadStateAction("SDO/AIA Flare (2010/11/11)", FileUtils.getResourceUrl("/examples/SDO_AIA_Flare_Nov2010.jhv")));
-        exampleMenu.add(new LoadStateAction("SOHO Halloween Storms (2003)", FileUtils.getResourceUrl("/examples/SOHO_Halloween_Storms_2003.jhv")));
-        exampleMenu.add(new LoadStateAction("SOHO Comet Neat (February 2003)", FileUtils.getResourceUrl("/examples/SOHO_Comet_Neat_Feb2003.jhv")));
-        exampleMenu.add(new LoadStateAction("SOHO Bastille Day flare (July 2000)", FileUtils.getResourceUrl("/examples/SOHO_Bastille_Day_Flare_July2000.jhv")));
-        exampleMenu.add(new LoadStateAction("SOHO Lightbulb CME (February 2000)", FileUtils.getResourceUrl("/examples/SOHO_Lightbulb_CME_Feb2000.jhv")));
-        exampleMenu.add(new LoadStateAction("SOHO CMEs (May 1998)", FileUtils.getResourceUrl("/examples/SOHO_CMEs_May1998.jhv")));
-
-        fileMenu.add(exampleMenu);
-        fileMenu.add(new LoadStateAction());
-        fileMenu.add(new SaveStateAction());
-        fileMenu.addSeparator();
         fileMenu.add(new SaveScreenshotAction());
         fileMenu.add(new SaveScreenshotAsAction());
         fileMenu.add(new ShowDialogAction("Export Movie...", ExportMovieDialog.class, ExportMovieDialog.class));

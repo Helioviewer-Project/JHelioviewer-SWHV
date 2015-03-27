@@ -97,15 +97,6 @@ public interface LayeredView extends View {
     /**
      * Removes a layer from the LayeredView.
      *
-     * @param index
-     *            position of the layer within the stack of layers.
-     * @see #addLayer
-     */
-    public void removeLayer(int index);
-
-    /**
-     * Removes a layer from the LayeredView.
-     *
      * If the given view is not a direct child of the LayeredView, nothing
      * happens.
      *
