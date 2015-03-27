@@ -158,6 +158,7 @@ public class SWEKDownloadManager implements DownloadWorkerListener, IncomingRequ
             treeModel.setStopLoading(worker.getEventType());
             removeWorkerFromMap(worker);
             removeFromBusyAndFinishedJobs(worker.getEventType(), worker.getSupplier(), worker.getDownloadStartDate());
+            JHVEventContainer.getSingletonInstance().intervalsNotDownloaded(worker.getRequestInterval());
         }
     }
 
