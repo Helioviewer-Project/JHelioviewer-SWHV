@@ -99,13 +99,13 @@ public class ImageDataPanel extends ObservationDialogPanel implements DataSource
 
         final JPanel timePane = new JPanel();
         timePane.setLayout(new BoxLayout(timePane, BoxLayout.PAGE_AXIS));
-        timePane.setBorder(BorderFactory.createTitledBorder(" Select time range of interest "));
+        timePane.setBorder(BorderFactory.createEtchedBorder());
         timePane.add(timeSelectionPanel);
         timePane.add(cadencePanel);
 
         final JPanel instrumentsPane = new JPanel();
         instrumentsPane.setLayout(new BorderLayout());
-        instrumentsPane.setBorder(BorderFactory.createTitledBorder(" Choose experiment specific data source "));
+        instrumentsPane.setBorder(BorderFactory.createEtchedBorder());
         instrumentsPane.add(instrumentsPanel, BorderLayout.CENTER);
 
         add(timePane);
@@ -335,7 +335,7 @@ public class ImageDataPanel extends ObservationDialogPanel implements DataSource
     public boolean loadButtonPressed() {
         // Add some data if its nice
         if (!instrumentsPanel.validSelection()) {
-            Message.err("Data is not selected", "There is no information what to add", false);
+            Message.err("Data is not selected", "There is no information on what to add", false);
             return false;
         }
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
@@ -353,7 +353,7 @@ public class ImageDataPanel extends ObservationDialogPanel implements DataSource
         } else {
             // check if start date is before end date -> if not show message
             if (!timeSelectionPanel.isStartDateBeforeEndDate()) {
-                JOptionPane.showMessageDialog(null, "End date is before start date!", "", JOptionPane.ERROR_MESSAGE);
+                JOptionPane.showMessageDialog(null, "End date is before start date", "", JOptionPane.ERROR_MESSAGE);
                 return false;
             }
             loadMovie();
@@ -433,10 +433,10 @@ public class ImageDataPanel extends ObservationDialogPanel implements DataSource
 
         private static final long serialVersionUID = 1L;
 
-        private final JLabel labelStartDate = new JLabel("Start Date");
-        private final JLabel labelStartTime = new JLabel("Start Time");
-        private final JLabel labelEndDate = new JLabel("End Date");
-        private final JLabel labelEndTime = new JLabel("End Time");
+        private final JLabel labelStartDate = new JLabel("Start date");
+        private final JLabel labelStartTime = new JLabel("Start time");
+        private final JLabel labelEndDate = new JLabel("End date");
+        private final JLabel labelEndTime = new JLabel("End time");
 
         private TimeTextField textStartTime;
         private TimeTextField textEndTime;
@@ -466,21 +466,21 @@ public class ImageDataPanel extends ObservationDialogPanel implements DataSource
             calendarEndDate = new JHVCalendarDatePicker();
             calendarEndDate.setDateFormat(Settings.getSingletonInstance().getProperty("default.date.format"));
             calendarEndDate.addJHVCalendarListener(this);
-            calendarEndDate.setToolTipText("Date in UTC ending the observation.\nIf its equal the start a single image closest to the time will be added.");
+            calendarEndDate.setToolTipText("UTC date for observation end");
 
             // create end time field
             textEndTime = new TimeTextField();
-            textEndTime.setToolTipText("Time in UTC ending the observation.\nIf its equal the start a single image closest to the time will be added.");
+            textEndTime.setToolTipText("UTC time for observation end.\nIf equal to start time, a single image closest to the time will be added.");
 
             // create start date picker
             calendarStartDate = new JHVCalendarDatePicker();
             calendarStartDate.setDateFormat(Settings.getSingletonInstance().getProperty("default.date.format"));
             calendarStartDate.addJHVCalendarListener(this);
-            calendarStartDate.setToolTipText("Date in UTC starting the observation");
+            calendarStartDate.setToolTipText("UTC date for observation start");
 
             // create start time field
             textStartTime = new TimeTextField();
-            textStartTime.setToolTipText("Time in UTC starting the observation");
+            textStartTime.setToolTipText("UTC time for observation start");
 
             // set date format to components
             updateDateFormat();
@@ -716,7 +716,7 @@ public class ImageDataPanel extends ObservationDialogPanel implements DataSource
         private final static int TIMESTEP_DAYS = 3;
         private final static int TIMESTEP_ALL = 4;
 
-        private final JLabel labelTimeStep = new JLabel("Time Step");
+        private final JLabel labelTimeStep = new JLabel("Time step");
         private final JSpinner spinnerCadence = new JSpinner();
         private final JComboBox comboUnit = new JComboBox(timeStepUnitStrings);
 

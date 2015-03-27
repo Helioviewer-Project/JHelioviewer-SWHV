@@ -101,7 +101,7 @@ public class EVEPlugin implements Plugin, MainContentPanelPlugin {
 
     @Override
     public String getTabName() {
-        return "1-D and 2-D Time Series";
+        return "1D and 2D Time Series";
     }
 
     @Override

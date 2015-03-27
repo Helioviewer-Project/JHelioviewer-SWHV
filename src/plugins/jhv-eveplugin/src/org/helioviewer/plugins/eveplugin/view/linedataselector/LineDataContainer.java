@@ -23,7 +23,7 @@ public class LineDataContainer extends JPanel implements LineDataSelectorModelLi
     private final CardLayout layout = new CardLayout();
 
     private final LineDataList list;
-    private final JLabel emptyLabel = new JLabel("No Bands Added yet", JLabel.CENTER);
+    private final JLabel emptyLabel = new JLabel("No bands added yet", JLabel.CENTER);
 
     private final JScrollPane listScrollPane;
     private final JScrollPane emptyScrollPane = new JScrollPane(emptyLabel, JScrollPane.VERTICAL_SCROLLBAR_ALWAYS, JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
