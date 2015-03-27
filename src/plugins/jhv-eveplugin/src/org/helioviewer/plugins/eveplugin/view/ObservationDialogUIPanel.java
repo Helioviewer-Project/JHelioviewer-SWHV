@@ -81,7 +81,7 @@ public class ObservationDialogUIPanel extends SimpleObservationDialogUIPanel imp
         c.fill = GridBagConstraints.HORIZONTAL;
         c.weightx = 0.5;
 
-        dataPane.setBorder(BorderFactory.createTitledBorder(" Choose experiment specific data source "));
+        dataPane.setBorder(BorderFactory.createEtchedBorder());
         dataPane.add(labelGroup, c);
 
         c.gridx = 1;
@@ -238,4 +238,5 @@ public class ObservationDialogUIPanel extends SimpleObservationDialogUIPanel imp
             updateGroupValues();
         }
     }
+
 }

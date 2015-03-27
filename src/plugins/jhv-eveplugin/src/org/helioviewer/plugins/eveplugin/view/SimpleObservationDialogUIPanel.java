@@ -65,7 +65,7 @@ public abstract class SimpleObservationDialogUIPanel extends ObservationDialogPa
         this.plotsContainerPanel = plotsContainerPanel;
         ObservationDialogDateModel.getInstance().addListener(this);
 
-        labelStartDate = new JLabel("Start Date");
+        labelStartDate = new JLabel("Start date");
         calendarStartDate = new JHVCalendarDatePicker();
         comboBoxGroup = new JComboBox(new DefaultComboBoxModel());
         comboBoxData = new JComboBox(new DefaultComboBoxModel());
@@ -81,14 +81,14 @@ public abstract class SimpleObservationDialogUIPanel extends ObservationDialogPa
         // set up time settings
         calendarStartDate.setDateFormat(Settings.getSingletonInstance().getProperty("default.date.format"));
         calendarStartDate.addJHVCalendarListener(this);
-        calendarStartDate.setToolTipText("Date in UTC starting the observation");
+        calendarStartDate.setToolTipText("UTC date for observation start");
 
         final JPanel startDatePane = new JPanel(new BorderLayout());
         startDatePane.add(labelStartDate, BorderLayout.PAGE_START);
         startDatePane.add(calendarStartDate, BorderLayout.CENTER);
 
         timePane.setLayout(new GridLayout(1, 2, GRIDLAYOUT_HGAP, GRIDLAYOUT_VGAP));
-        timePane.setBorder(BorderFactory.createTitledBorder(" Select the date of interest "));
+        timePane.setBorder(BorderFactory.createEtchedBorder());
         timePane.add(startDatePane);
 
         // set basic layout

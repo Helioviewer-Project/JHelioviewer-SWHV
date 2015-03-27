@@ -238,7 +238,7 @@ public class ImageSelectorPanel extends JPanel implements LayersListener {
      */
     public ImageSelectorPanel() {
         // set up observation dialog
-        ImageViewerGui.getSingletonInstance().getObservationDialog().addUserInterface("Image Data", observationImagePane);
+        ImageViewerGui.getSingletonInstance().getObservationDialog().addUserInterface("Image data", observationImagePane);
 
         // add components
         JPanel southPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));

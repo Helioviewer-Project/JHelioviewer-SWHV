@@ -35,7 +35,7 @@ public class RadioObservationDialogUIPanel extends SimpleObservationDialogUIPane
 
     private void initVisualComponents() {
         JPanel container = new JPanel();
-        container.setBorder(BorderFactory.createTitledBorder("Choose experiment specific data source"));
+        container.setBorder(BorderFactory.createEtchedBorder());
         container.setLayout(new GridLayout(1, 2, GRIDLAYOUT_HGAP, GRIDLAYOUT_VGAP));
         container.add(labelServer);
         container.add(comboServer);
@@ -59,4 +59,5 @@ public class RadioObservationDialogUIPanel extends SimpleObservationDialogUIPane
         setFromOutside = true;
         comboServer.setSelectedItem(DataSourceServers.getSingletonInstance().getSelectedServer());
     }
+
 }

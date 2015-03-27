@@ -54,7 +54,7 @@ public class ControlsPanel extends JPanel implements ActionListener, LayersListe
     private static ControlsPanel singletongInstance;
     private final JPanel lineDataSelectorContainer = new JPanel();
     private final ImageIcon addIcon = IconBank.getIcon(JHVIcon.ADD);
-    private final JButton addLayerButton = new JButton("Add Layer", addIcon);
+    private final JButton addLayerButton = new JButton("Add layer", addIcon);
 
     private final JComboBox zoomComboBox = new JComboBox(new DefaultComboBoxModel());
     private Interval<Date> selectedIntervalByZoombox = null;

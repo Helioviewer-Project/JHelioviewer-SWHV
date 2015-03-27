@@ -47,7 +47,7 @@ public class ObservationDialog extends JDialog implements ActionListener, Showab
     private final JPanel uiSelectionPane = new JPanel();
     private final JComboBox uiSelectionComboBox = new JComboBox();
     private final JPanel buttonPane = new JPanel();
-    private final JButton btnImages = new JButton("Add Layer");
+    private final JButton btnImages = new JButton("Add layer");
     private final JButton btnClose = new JButton("Cancel");
 
     private ObservationDialogPanel selectedPane = null;
@@ -73,7 +73,7 @@ public class ObservationDialog extends JDialog implements ActionListener, Showab
      * */
     private void initVisualComponents() {
         // set dialog settings
-        setTitle("Add Layer");
+        setTitle("Add layer");
         setContentPane(contentPane);
 
         // set basic layout
@@ -83,7 +83,7 @@ public class ObservationDialog extends JDialog implements ActionListener, Showab
 
         // set up components
         uiSelectionPane.setLayout(new FlowLayout(FlowLayout.LEFT, 5, 0));
-        uiSelectionPane.setBorder(BorderFactory.createTitledBorder(" Choose type of data to add "));
+        uiSelectionPane.setBorder(BorderFactory.createEtchedBorder());
         uiSelectionPane.add(new JLabel("Data type"));
         uiSelectionPane.add(uiSelectionComboBox);
         availabilityButton = new JButton("Available data");
@@ -92,15 +92,15 @@ public class ObservationDialog extends JDialog implements ActionListener, Showab
             @Override
             public void actionPerformed(ActionEvent e) {
                 String str = (String) (uiSelectionComboBox.getSelectedItem());
-                if (str == "Image Data") {
+                if (str == "Image data") {
                     String url = Settings.getSingletonInstance().getProperty("availability.images.url");
                     JHVGlobals.openURL(url);
                 }
-                if (str == "1-D Time Series") {
+                if (str == "1D time series") {
                     String url = Settings.getSingletonInstance().getProperty("availability.timelines.url");
                     JHVGlobals.openURL(url);
                 }
-                if (str == "Radio Data") {
+                if (str == "Radio data") {
                     String url = Settings.getSingletonInstance().getProperty("availability.radio.url");
                     JHVGlobals.openURL(url);
                 }
@@ -116,7 +116,7 @@ public class ObservationDialog extends JDialog implements ActionListener, Showab
         btnImages.setToolTipText("Request the selected data and display it");
 
         btnClose.setIcon(IconBank.getIcon(JHVIcon.REMOVE_LAYER));
-        btnClose.setToolTipText("Close this Dialog");
+        btnClose.setToolTipText("Close this dialog");
 
         final int btnWidth = Math.max(btnClose.getPreferredSize().getSize().width, btnImages.getPreferredSize().getSize().width);
 
