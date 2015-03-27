@@ -205,10 +205,6 @@ public class DrawController implements ZoomControllerListener, LineDataSelectorM
     }
 
     @Override
-    public void layerChanged(int idx) {
-    }
-
-    @Override
     public void activeLayerChanged(View view) {
     }
 

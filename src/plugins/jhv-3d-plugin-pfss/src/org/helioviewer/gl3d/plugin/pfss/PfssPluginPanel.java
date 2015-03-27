@@ -286,10 +286,6 @@ public class PfssPluginPanel extends OverlayPanel implements ActionListener, Lay
     }
 
     @Override
-    public void layerChanged(int idx) {
-    }
-
-    @Override
     public void layerRemoved(View oldView, int oldIdx) {
         if (LayersModel.getSingletonInstance().getNumLayers() == 0) {
             enableComponents(this, false);

@@ -150,11 +150,6 @@ public class LayerTableModel extends AbstractTableModel implements LayersListene
         fireTableRowsInserted(newIndex, newIndex);
     }
 
-    /**
-     * Method part of the LayersListener interface, itself calling the
-     * appropriate TableModel notification methods
-     */
-    @Override
     public void layerChanged(int idx) {
         updateData();
         fireTableRowsUpdated(idx, idx);

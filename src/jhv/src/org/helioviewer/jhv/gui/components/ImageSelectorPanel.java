@@ -311,13 +311,6 @@ public class ImageSelectorPanel extends JPanel implements LayersListener {
      * {@inheritDoc}
      */
     @Override
-    public void layerChanged(int index) {
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
     public void layerRemoved(View oldView, int oldIndex) {
         activateActions();
     }

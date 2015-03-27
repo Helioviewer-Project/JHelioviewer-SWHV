@@ -26,6 +26,7 @@ import org.helioviewer.jhv.gui.ImageViewerGui;
 import org.helioviewer.jhv.gui.UIViewListener;
 import org.helioviewer.jhv.gui.UIViewListenerDistributor;
 import org.helioviewer.jhv.gui.components.MoviePanel;
+import org.helioviewer.jhv.gui.components.layerTable.LayerTableModel;
 import org.helioviewer.jhv.gui.components.statusplugins.PositionStatusPanel;
 import org.helioviewer.jhv.gui.components.statusplugins.ZoomStatusPanel;
 import org.helioviewer.jhv.gui.dialogs.MetaDataDialog;
@@ -36,7 +37,6 @@ import org.helioviewer.viewmodel.changeevent.ChangedReason;
 import org.helioviewer.viewmodel.changeevent.LayerChangedReason;
 import org.helioviewer.viewmodel.changeevent.LayerChangedReason.LayerChangeType;
 import org.helioviewer.viewmodel.changeevent.RegionChangedReason;
-import org.helioviewer.viewmodel.changeevent.ViewChainChangedReason;
 import org.helioviewer.viewmodel.changeevent.ViewportChangedReason;
 import org.helioviewer.viewmodel.io.APIResponse;
 import org.helioviewer.viewmodel.io.APIResponseDump;
@@ -565,7 +565,8 @@ public class LayersModel implements UIViewListener {
                 JHVJP2View view = (JHVJP2View) layerReason.getSubView();
                 int idx = findView(view);
                 if (idx != -1) {
-                    this.fireLayerChanged(idx);
+                    ImageViewerGui.getSingletonInstance().getMoviePanelContainer().layerChanged(idx);
+                    LayerTableModel.getSingletonInstance().layerChanged(idx);
                 }
             }
         }
@@ -575,13 +576,9 @@ public class LayersModel implements UIViewListener {
         ChangedReason reason1 = aEvent.getLastChangedReasonByType(RegionChangedReason.class);
         ChangedReason reason2 = aEvent.getLastChangedReasonByType(ViewportChangedReason.class);
 
-        // PositionStatusPanel.getSingletonInstance().updatePosition();
-        ZoomStatusPanel.getSingletonInstance().updateZoomLevel(getActiveView());
-    }
-
-    private void handleViewChainChanges(View sender, ChangeEvent aEvent) {
-        if (aEvent.getLastChangedReasonByType(ViewChainChangedReason.class) != null) {
-            this.fireAllLayersChanged();
+        if (reason1 != null || reason2 != null) {
+            // PositionStatusPanel.getSingletonInstance().updatePosition();
+            ZoomStatusPanel.getSingletonInstance().updateZoomLevel(getActiveView());
         }
     }
 
@@ -595,7 +592,6 @@ public class LayersModel implements UIViewListener {
     public void UIviewChanged(View sender, ChangeEvent aEvent) {
         handleLayerChanges(sender, aEvent);
         handleViewportPositionChanges(sender, aEvent);
-        handleViewChainChanges(sender, aEvent);
     }
 
     /**
@@ -775,8 +771,6 @@ public class LayersModel implements UIViewListener {
                 moviePanel.setMovieLink(link);
             }
         }
-
-        this.fireAllLayersChanged();
     }
 
     /**
@@ -1120,26 +1114,6 @@ public class LayersModel implements UIViewListener {
     private void fireLayerAdded(final int newIndex) {
         for (LayersListener ll : layerListeners) {
             ll.layerAdded(newIndex);
-        }
-    }
-
-    /**
-     * Notify all LayersListeners
-     */
-    private void fireLayerChanged(final int index) {
-        for (LayersListener ll : layerListeners) {
-            ll.layerChanged(index);
-        }
-    }
-
-    /**
-     * Notify all LayersListeners
-     */
-    private void fireAllLayersChanged() {
-        for (LayersListener ll : layerListeners) {
-            for (int index = 0; index < getNumLayers(); index++) {
-                ll.layerChanged(index);
-            }
         }
     }
 

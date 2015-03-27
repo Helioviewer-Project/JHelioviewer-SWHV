@@ -720,11 +720,6 @@ public class ChartDrawIntervalPane extends JComponent implements ZoomControllerL
     }
 
     @Override
-    public void layerChanged(int idx) {
-        repaintOnLayerNotification();
-    }
-
-    @Override
     public void activeLayerChanged(View view) {
         if (view instanceof JHVJPXView) {
             JHVJPXView jpxView = (JHVJPXView) view;

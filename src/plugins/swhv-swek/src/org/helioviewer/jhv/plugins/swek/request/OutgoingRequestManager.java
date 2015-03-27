@@ -54,10 +54,6 @@ public class OutgoingRequestManager implements LayersListener {
     }
 
     @Override
-    public void layerChanged(int idx) {
-    }
-
-    @Override
     public void activeLayerChanged(View view) {
         if (view instanceof JHVJPXView) {
             JHVJPXView jpxView = (JHVJPXView) view;
