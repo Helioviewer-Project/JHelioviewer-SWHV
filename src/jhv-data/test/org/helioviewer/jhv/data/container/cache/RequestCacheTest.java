@@ -653,7 +653,6 @@ public class RequestCacheTest {
 
         JHVEventCache cache = JHVEventCache.getSingletonInstance();
         HashMap<Date, Interval<Date>> expectedRequestCache = new HashMap<Date, Interval<Date>>();
-        List<Interval<Date>> intervalsToRemove = new ArrayList<Interval<Date>>();
 
         //
         // No interval in cache
@@ -662,8 +661,7 @@ public class RequestCacheTest {
         // Remove from empty request cache
         Date date7 = new GregorianCalendar(2014, 1, 7, 14, 15, 00).getTime();
         Date date10 = new GregorianCalendar(2014, 1, 10, 14, 15, 00).getTime();
-        intervalsToRemove.add(new Interval<Date>(date7, date10));
-        cache.removeRequestedIntervals(intervalsToRemove);
+        cache.removeRequestedIntervals(new Interval<Date>(date7, date10));
         System.out.println("remove interval from empty request cache");
         assertRequestCache("Testing an empty request cache", expectedRequestCache, cache.getRequestCache());
 
@@ -675,7 +673,7 @@ public class RequestCacheTest {
         prepareForOneInterval(cache);
         Date date15 = new GregorianCalendar(2014, 1, 15, 14, 15, 00).getTime();
         Date date20 = new GregorianCalendar(2014, 1, 20, 14, 15, 00).getTime();
-        cache.removeRequestedIntervals(intervalsToRemove);
+        cache.removeRequestedIntervals(new Interval<Date>(date7, date10));
         expectedRequestCache.put(date15, new Interval<Date>(date15, date20));
         System.out.println("remove interval before interval in request cache");
         assertRequestCache("Testing an empty request cache", expectedRequestCache, cache.getRequestCache());
@@ -683,9 +681,7 @@ public class RequestCacheTest {
         // remove start before end in interval in request cache
         prepareForOneInterval(cache);
         Date date17 = new GregorianCalendar(2014, 1, 17, 14, 15, 00).getTime();
-        intervalsToRemove.clear();
-        intervalsToRemove.add(new Interval<Date>(date10, date17));
-        cache.removeRequestedIntervals(intervalsToRemove);
+        cache.removeRequestedIntervals(new Interval<Date>(date10, date17));
         expectedRequestCache.clear();
         expectedRequestCache.put(date17, new Interval<Date>(date17, date20));
         System.out.println("remove start before end in interval in request cache");
@@ -694,9 +690,7 @@ public class RequestCacheTest {
         // remove start equals request cache start and remove end equals request
         // cache end
         prepareForOneInterval(cache);
-        intervalsToRemove.clear();
-        intervalsToRemove.add(new Interval<Date>(date15, date20));
-        cache.removeRequestedIntervals(intervalsToRemove);
+        cache.removeRequestedIntervals(new Interval<Date>(date15, date20));
         expectedRequestCache.clear();
         System.out.println("remove start equals request cache start and remove end equals request cache end");
         assertRequestCache("Testing an empty request cache", expectedRequestCache, cache.getRequestCache());
@@ -704,11 +698,9 @@ public class RequestCacheTest {
         // remove start in request cache interval and remove end in request
         // cache interval
         prepareForOneInterval(cache);
-        intervalsToRemove.clear();
         Date date16 = new GregorianCalendar(2014, 1, 16, 14, 15, 00).getTime();
         Date date19 = new GregorianCalendar(2014, 1, 19, 14, 15, 00).getTime();
-        intervalsToRemove.add(new Interval<Date>(date16, date19));
-        cache.removeRequestedIntervals(intervalsToRemove);
+        cache.removeRequestedIntervals(new Interval<Date>(date16, date19));
         expectedRequestCache.clear();
         expectedRequestCache.put(date15, new Interval<Date>(date15, date16));
         expectedRequestCache.put(date19, new Interval<Date>(date19, date20));
@@ -718,10 +710,8 @@ public class RequestCacheTest {
         // remove start in request cache interval and remove end after request
         // cache interval
         prepareForOneInterval(cache);
-        intervalsToRemove.clear();
         Date date22 = new GregorianCalendar(2014, 1, 22, 14, 15, 00).getTime();
-        intervalsToRemove.add(new Interval<Date>(date16, date22));
-        cache.removeRequestedIntervals(intervalsToRemove);
+        cache.removeRequestedIntervals(new Interval<Date>(date16, date22));
         expectedRequestCache.clear();
         expectedRequestCache.put(date15, new Interval<Date>(date15, date16));
         System.out.println("remove start in request cache interval and remove end after request cache interval");
@@ -730,10 +720,8 @@ public class RequestCacheTest {
         // remove start after request cache interval and remove end after
         // request cache interval
         prepareForOneInterval(cache);
-        intervalsToRemove.clear();
         Date date26 = new GregorianCalendar(2014, 1, 26, 14, 15, 00).getTime();
-        intervalsToRemove.add(new Interval<Date>(date22, date26));
-        cache.removeRequestedIntervals(intervalsToRemove);
+        cache.removeRequestedIntervals(new Interval<Date>(date22, date26));
         expectedRequestCache.clear();
         expectedRequestCache.put(date15, new Interval<Date>(date15, date20));
         System.out.println("remove start after request cache interval and remove end after request cache interval");
@@ -745,13 +733,11 @@ public class RequestCacheTest {
 
         // remove start and end before first interval
         prepareForTwoInterval(cache);
-        intervalsToRemove.clear();
         Date date2 = new GregorianCalendar(2014, 1, 2, 14, 15, 00).getTime();
         Date date3 = new GregorianCalendar(2014, 1, 2, 14, 15, 00).getTime();
         Date date5 = new GregorianCalendar(2014, 1, 5, 14, 15, 00).getTime();
         Date date9 = new GregorianCalendar(2014, 1, 9, 14, 15, 00).getTime();
-        intervalsToRemove.add(new Interval<Date>(date2, date3));
-        cache.removeRequestedIntervals(intervalsToRemove);
+        cache.removeRequestedIntervals(new Interval<Date>(date2, date3));
         expectedRequestCache.clear();
         expectedRequestCache.put(date5, new Interval<Date>(date5, date9));
         expectedRequestCache.put(date15, new Interval<Date>(date15, date20));
@@ -760,10 +746,8 @@ public class RequestCacheTest {
 
         // remove start and end between first and second interval
         prepareForTwoInterval(cache);
-        intervalsToRemove.clear();
         Date date11 = new GregorianCalendar(2014, 1, 11, 14, 15, 00).getTime();
-        intervalsToRemove.add(new Interval<Date>(date10, date11));
-        cache.removeRequestedIntervals(intervalsToRemove);
+        cache.removeRequestedIntervals(new Interval<Date>(date10, date11));
         expectedRequestCache.clear();
         expectedRequestCache.put(date5, new Interval<Date>(date5, date9));
         expectedRequestCache.put(date15, new Interval<Date>(date15, date20));
@@ -772,9 +756,7 @@ public class RequestCacheTest {
 
         // remove start and end after second interval
         prepareForTwoInterval(cache);
-        intervalsToRemove.clear();
-        intervalsToRemove.add(new Interval<Date>(date22, date26));
-        cache.removeRequestedIntervals(intervalsToRemove);
+        cache.removeRequestedIntervals(new Interval<Date>(date22, date26));
         expectedRequestCache.clear();
         expectedRequestCache.put(date5, new Interval<Date>(date5, date9));
         expectedRequestCache.put(date15, new Interval<Date>(date15, date20));
@@ -783,10 +765,8 @@ public class RequestCacheTest {
 
         // remove start before first interval and end in first interval
         prepareForTwoInterval(cache);
-        intervalsToRemove.clear();
         Date date6 = new GregorianCalendar(2014, 1, 6, 14, 15, 00).getTime();
-        intervalsToRemove.add(new Interval<Date>(date2, date6));
-        cache.removeRequestedIntervals(intervalsToRemove);
+        cache.removeRequestedIntervals(new Interval<Date>(date2, date6));
         expectedRequestCache.clear();
         expectedRequestCache.put(date6, new Interval<Date>(date6, date9));
         expectedRequestCache.put(date15, new Interval<Date>(date15, date20));
@@ -796,9 +776,7 @@ public class RequestCacheTest {
         // remove start before first interval and ends between first and second
         // interval
         prepareForTwoInterval(cache);
-        intervalsToRemove.clear();
-        intervalsToRemove.add(new Interval<Date>(date2, date10));
-        cache.removeRequestedIntervals(intervalsToRemove);
+        cache.removeRequestedIntervals(new Interval<Date>(date2, date10));
         expectedRequestCache.clear();
         expectedRequestCache.put(date15, new Interval<Date>(date15, date20));
         System.out.println("remove start before first interval and ends between first and second interval");
@@ -806,18 +784,14 @@ public class RequestCacheTest {
 
         // remove start before first interval and ends after second interval
         prepareForTwoInterval(cache);
-        intervalsToRemove.clear();
-        intervalsToRemove.add(new Interval<Date>(date2, date22));
-        cache.removeRequestedIntervals(intervalsToRemove);
+        cache.removeRequestedIntervals(new Interval<Date>(date2, date22));
         expectedRequestCache.clear();
         System.out.println("remove start before first interval and ends after second interval");
         assertRequestCache("Testing an empty request cache", expectedRequestCache, cache.getRequestCache());
 
         // remove start in first interval and ends in first interval
         prepareForTwoInterval(cache);
-        intervalsToRemove.clear();
-        intervalsToRemove.add(new Interval<Date>(date6, date7));
-        cache.removeRequestedIntervals(intervalsToRemove);
+        cache.removeRequestedIntervals(new Interval<Date>(date6, date7));
         expectedRequestCache.clear();
         expectedRequestCache.put(date5, new Interval<Date>(date5, date6));
         expectedRequestCache.put(date7, new Interval<Date>(date7, date9));
@@ -828,9 +802,7 @@ public class RequestCacheTest {
         // remove start in first interval and ends between first and second
         // interval
         prepareForTwoInterval(cache);
-        intervalsToRemove.clear();
-        intervalsToRemove.add(new Interval<Date>(date6, date11));
-        cache.removeRequestedIntervals(intervalsToRemove);
+        cache.removeRequestedIntervals(new Interval<Date>(date6, date11));
         expectedRequestCache.clear();
         expectedRequestCache.put(date5, new Interval<Date>(date5, date6));
         expectedRequestCache.put(date15, new Interval<Date>(date15, date20));
@@ -840,9 +812,7 @@ public class RequestCacheTest {
         // remove start in first interval and ends in second
         // interval
         prepareForTwoInterval(cache);
-        intervalsToRemove.clear();
-        intervalsToRemove.add(new Interval<Date>(date6, date17));
-        cache.removeRequestedIntervals(intervalsToRemove);
+        cache.removeRequestedIntervals(new Interval<Date>(date6, date17));
         expectedRequestCache.clear();
         expectedRequestCache.put(date5, new Interval<Date>(date5, date6));
         expectedRequestCache.put(date17, new Interval<Date>(date17, date20));
@@ -852,9 +822,7 @@ public class RequestCacheTest {
         // remove start in first interval and ends after second
         // interval
         prepareForTwoInterval(cache);
-        intervalsToRemove.clear();
-        intervalsToRemove.add(new Interval<Date>(date6, date22));
-        cache.removeRequestedIntervals(intervalsToRemove);
+        cache.removeRequestedIntervals(new Interval<Date>(date6, date22));
         expectedRequestCache.clear();
         expectedRequestCache.put(date5, new Interval<Date>(date5, date6));
         System.out.println("remove start in first interval and ends after second interval");
@@ -863,9 +831,7 @@ public class RequestCacheTest {
         // remove start in between first and second interval and ends in between
         // first and second interval
         prepareForTwoInterval(cache);
-        intervalsToRemove.clear();
-        intervalsToRemove.add(new Interval<Date>(date10, date11));
-        cache.removeRequestedIntervals(intervalsToRemove);
+        cache.removeRequestedIntervals(new Interval<Date>(date10, date11));
         expectedRequestCache.clear();
         expectedRequestCache.put(date5, new Interval<Date>(date5, date9));
         expectedRequestCache.put(date15, new Interval<Date>(date15, date20));
@@ -875,9 +841,7 @@ public class RequestCacheTest {
         // remove start in between first and second interval and ends in second
         // interval
         prepareForTwoInterval(cache);
-        intervalsToRemove.clear();
-        intervalsToRemove.add(new Interval<Date>(date10, date17));
-        cache.removeRequestedIntervals(intervalsToRemove);
+        cache.removeRequestedIntervals(new Interval<Date>(date10, date17));
         expectedRequestCache.clear();
         expectedRequestCache.put(date5, new Interval<Date>(date5, date9));
         expectedRequestCache.put(date17, new Interval<Date>(date17, date20));
@@ -887,9 +851,7 @@ public class RequestCacheTest {
         // remove start in between first and second interval and ends after
         // second interval
         prepareForTwoInterval(cache);
-        intervalsToRemove.clear();
-        intervalsToRemove.add(new Interval<Date>(date10, date22));
-        cache.removeRequestedIntervals(intervalsToRemove);
+        cache.removeRequestedIntervals(new Interval<Date>(date10, date22));
         expectedRequestCache.clear();
         expectedRequestCache.put(date5, new Interval<Date>(date5, date9));
         System.out.println("remove start in between first and second interval and ends after second interval");
@@ -897,9 +859,7 @@ public class RequestCacheTest {
 
         // remove start in second interval and ends in second interval
         prepareForTwoInterval(cache);
-        intervalsToRemove.clear();
-        intervalsToRemove.add(new Interval<Date>(date16, date17));
-        cache.removeRequestedIntervals(intervalsToRemove);
+        cache.removeRequestedIntervals(new Interval<Date>(date16, date17));
         expectedRequestCache.clear();
         expectedRequestCache.put(date5, new Interval<Date>(date5, date9));
         expectedRequestCache.put(date15, new Interval<Date>(date15, date16));
@@ -909,9 +869,7 @@ public class RequestCacheTest {
 
         // remove start in second interval and ends after second interval
         prepareForTwoInterval(cache);
-        intervalsToRemove.clear();
-        intervalsToRemove.add(new Interval<Date>(date16, date22));
-        cache.removeRequestedIntervals(intervalsToRemove);
+        cache.removeRequestedIntervals(new Interval<Date>(date16, date22));
         expectedRequestCache.clear();
         expectedRequestCache.put(date5, new Interval<Date>(date5, date9));
         expectedRequestCache.put(date15, new Interval<Date>(date15, date16));
@@ -920,9 +878,7 @@ public class RequestCacheTest {
 
         // remove start after second interval and ends after second interval
         prepareForTwoInterval(cache);
-        intervalsToRemove.clear();
-        intervalsToRemove.add(new Interval<Date>(date22, date26));
-        cache.removeRequestedIntervals(intervalsToRemove);
+        cache.removeRequestedIntervals(new Interval<Date>(date22, date26));
         expectedRequestCache.clear();
         expectedRequestCache.put(date5, new Interval<Date>(date5, date9));
         expectedRequestCache.put(date15, new Interval<Date>(date15, date20));

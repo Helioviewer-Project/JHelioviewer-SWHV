@@ -221,7 +221,7 @@ public class JHVEventContainer {
         return JHVEventCache.getSingletonInstance().getRequestCache().values();
     }
 
-    public void intervalsNotDownloaded(List<Interval<Date>> intervals) {
-        JHVEventCache.getSingletonInstance().removeRequestedIntervals(intervals);
+    public void intervalsNotDownloaded(Interval<Date> interval) {
+        JHVEventCache.getSingletonInstance().removeRequestedIntervals(interval);
     }
 }
