@@ -32,14 +32,6 @@ public interface LayersListener {
     public void layerRemoved(View oldView, int oldIdx);
 
     /**
-     * Gets fired if a layer has changed.
-     * 
-     * @param idx
-     *            - index of the layer that changed
-     */
-    public void layerChanged(int idx);
-
-    /**
      * Gets fired if the active layer has changed (meaning, a new layer has
      * become the new active layer).
      * 

@@ -87,10 +87,6 @@ public class SWHVHEKData implements LayersListener, JHVEventHandler {
     }
 
     @Override
-    public void layerChanged(int idx) {
-    }
-
-    @Override
     public void activeLayerChanged(View view) {
     }
 

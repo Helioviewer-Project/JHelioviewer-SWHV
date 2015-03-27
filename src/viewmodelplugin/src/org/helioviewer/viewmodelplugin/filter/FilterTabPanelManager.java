@@ -188,10 +188,6 @@ public class FilterTabPanelManager implements LayersListener {
     }
 
     @Override
-    public void layerChanged(int idx) {
-    }
-
-    @Override
     public void activeLayerChanged(View view) {
         if (view instanceof JHVJP2View) {
             setActivejp2((JHVJP2View) view);

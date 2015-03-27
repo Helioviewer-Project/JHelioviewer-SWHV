@@ -184,10 +184,6 @@ public class GL3DFollowObjectCamera extends GL3DSolarRotationTrackingTrackballCa
     }
 
     @Override
-    public void layerChanged(int idx) {
-    }
-
-    @Override
     public void activeLayerChanged(View view) {
         if (!interpolation && view instanceof JHVJPXView) {
             JHVJPXView jpxView = (JHVJPXView) view;

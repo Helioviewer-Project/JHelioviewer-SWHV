@@ -660,13 +660,6 @@ public class MoviePanel extends JPanel implements ActionListener, ChangeListener
          * {@inheritDoc}
          */
         @Override
-        public void layerChanged(int idx) {
-        }
-
-        /**
-         * {@inheritDoc}
-         */
-        @Override
         public void activeLayerChanged(View view) {
             this.searchCorrespondingMoviePanel(view);
         }

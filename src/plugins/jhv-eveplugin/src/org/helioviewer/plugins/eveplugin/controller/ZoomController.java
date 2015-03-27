@@ -412,10 +412,6 @@ public class ZoomController implements PlotAreaSpaceListener, LayersListener {
     }
 
     @Override
-    public void layerChanged(int idx) {
-    }
-
-    @Override
     public void activeLayerChanged(View view) {
     }
 
