@@ -74,6 +74,9 @@ public class DownloadWorker implements Runnable {
     /** The related event rules */
     private final List<SWEKRelatedEvents> relatedEvents;
 
+    /** The request interval */
+    private final Interval<Date> requestInterval;
+
     /**
      * Default constructor.
      */
@@ -82,6 +85,7 @@ public class DownloadWorker implements Runnable {
         eventType = null;
         swekSource = null;
         supplier = null;
+        requestInterval = new Interval<Date>(new Date(), new Date());
         eventRequestDate = new Date();
         downloadStartDate = new Date();
         downloadEndDate = new Date();
@@ -114,6 +118,7 @@ public class DownloadWorker implements Runnable {
         this.swekSource = swekSource;
         this.eventType = eventType;
         this.supplier = supplier;
+        requestInterval = new Interval<Date>(date, date);
         eventRequestDate = date;
         downloadStartDate = new Date(getCurrentDate(eventRequestDate).getTime() - this.eventType.getRequestIntervalExtension());
         downloadEndDate = new Date(getNextDate(eventRequestDate).getTime() + this.eventType.getRequestIntervalExtension());
@@ -144,6 +149,7 @@ public class DownloadWorker implements Runnable {
         // Log.debug("Create dw " + this + " downloading interval " + interval);
         // Thread.dumpStack();
         isStopped = false;
+        requestInterval = interval;
         this.swekSource = swekSource;
         this.eventType = eventType;
         downloadStartDate = new Date(interval.getStart().getTime() - this.eventType.getRequestIntervalExtension());
@@ -279,6 +285,10 @@ public class DownloadWorker implements Runnable {
      */
     public SWEKSupplier getSupplier() {
         return supplier;
+    }
+
+    public Interval<Date> getRequestInterval() {
+        return requestInterval;
     }
 
     /**
