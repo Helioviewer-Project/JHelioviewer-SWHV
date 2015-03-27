@@ -18,17 +18,10 @@ public class GL3DLayeredView extends AbstractView implements LayeredView, ViewLi
 
     protected ArrayList<JHVJP2View> layers = new ArrayList<JHVJP2View>();
     protected HashMap<JHVJP2View, Layer> jp2viewLookup = new HashMap<JHVJP2View, Layer>();
-    private final ArrayList<GL3DImageLayer> imageLayers = new ArrayList<GL3DImageLayer>();
-
-    public GL3DLayeredView() {
-    }
+    // private final ArrayList<GL3DImageLayer> imageLayers = new ArrayList<GL3DImageLayer>();
 
     protected class Layer {
         public boolean visibility = true;
-
-        public Layer(JHVJP2View base) {
-        }
-
     }
 
     /**
@@ -37,7 +30,6 @@ public class GL3DLayeredView extends AbstractView implements LayeredView, ViewLi
     @Override
     public boolean isVisible(JHVJP2View view) {
         Layer layer = jp2viewLookup.get(view);
-
         if (layer != null)
             return layer.visibility;
         else
@@ -93,11 +85,11 @@ public class GL3DLayeredView extends AbstractView implements LayeredView, ViewLi
         LinkedMovieManager.getActiveInstance().pauseLinkedMovies();
 
         layers.add(newIndex, newLayer);
-        jp2viewLookup.put(newLayer, new Layer(newLayer));
+        jp2viewLookup.put(newLayer, new Layer());
 
         newLayer.addViewListener(this);
         GL3DImageLayer imageLayer = new GL3DImageLayer("", newLayer, true, true, true);
-        this.imageLayers.add(imageLayer);
+        //this.imageLayers.add(imageLayer);
         ChangeEvent event = new ChangeEvent(new LayerChangedReason(this, LayerChangeType.LAYER_ADDED, newLayer));
         notifyViewListeners(event);
     }
@@ -107,10 +99,11 @@ public class GL3DLayeredView extends AbstractView implements LayeredView, ViewLi
      */
     @Override
     public JHVJP2View getLayer(int index) {
-        if (index >= 0 && index < layers.size()) {
+        try {
             return layers.get(index);
+        } catch (Exception e) {
+            return null;
         }
-        return null;
     }
 
     /**
@@ -171,8 +164,9 @@ public class GL3DLayeredView extends AbstractView implements LayeredView, ViewLi
      */
     @Override
     public void removeLayer(int index) {
-        if (index >= 0 && index < layers.size()) {
+        try {
             removeLayer(layers.get(index));
+        } catch (Exception e) {
         }
     }
 
@@ -275,4 +269,5 @@ public class GL3DLayeredView extends AbstractView implements LayeredView, ViewLi
     public void renderGL(GL2 gl, boolean nextView) {
         this.render3D(GL3DState.get());
     }
+
 }
