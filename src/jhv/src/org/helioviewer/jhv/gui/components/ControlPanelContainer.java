@@ -5,7 +5,6 @@ import java.awt.Component;
 import java.util.HashMap;
 
 import javax.swing.JPanel;
-import javax.swing.SwingUtilities;
 
 import org.helioviewer.jhv.layers.LayersListener;
 import org.helioviewer.jhv.layers.LayersModel;
@@ -37,16 +36,12 @@ public class ControlPanelContainer extends JPanel implements LayersListener {
     }
 
     public void updateActiveView() {
-        final View activeView = LayersModel.getSingletonInstance().getActiveView();
-        final ImageInfoView view = activeView != null ? activeView.getAdapter(ImageInfoView.class) : null;
-        final CardLayout cl = (CardLayout) (this.getLayout());
-        final ControlPanelContainer thisComp = this;
-        SwingUtilities.invokeLater(new Runnable() {
-            public void run() {
-                cl.show(thisComp, view == null ? "null" : view.toString());
-                thisComp.ensureSize();
-            }
-        });
+        View activeView = LayersModel.getSingletonInstance().getActiveView();
+        ImageInfoView view = activeView != null ? activeView.getAdapter(ImageInfoView.class) : null;
+
+        CardLayout cl = (CardLayout) this.getLayout();
+        cl.show(this, view == null ? "null" : view.toString());
+        this.ensureSize();
     }
 
     private void ensureSize() {
