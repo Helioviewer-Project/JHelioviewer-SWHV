@@ -734,4 +734,47 @@ public class JHVEventCache {
         return requestCache;
     }
 
+    public void removeRequestedIntervals(List<Interval<Date>> intervals) {
+        for (Interval<Date> remInterval : intervals) {
+            List<Interval<Date>> intervalsToAdd = new ArrayList<Interval<Date>>();
+            List<Date> intervalsToRemove = new ArrayList<Date>();
+            Date start = remInterval.getStart();
+            for (Date isDate : requestCache.keySet()) {
+                Interval<Date> rcInterval = requestCache.get(isDate);
+                if (start.before(rcInterval.getStart()) || start.equals(rcInterval.getStart())) {
+                    if (remInterval.getEnd().after(rcInterval.getStart())) {
+                        intervalsToRemove.add(isDate);
+                        if (remInterval.getEnd().before(rcInterval.getEnd()) || remInterval.getEnd().equals(rcInterval.getEnd())) {
+                            if (!start.equals(rcInterval.getStart())) {
+                                intervalsToAdd.add(new Interval<Date>(remInterval.getEnd(), rcInterval.getEnd()));
+                            }
+                            break;
+                        } else {
+                            start = rcInterval.getEnd();
+                        }
+                    }
+                } else {
+                    if (rcInterval.getEnd().after(start)) {
+                        intervalsToRemove.add(isDate);
+                        if (remInterval.getEnd().before(rcInterval.getEnd())) {
+                            intervalsToAdd.add(new Interval<Date>(rcInterval.getStart(), start));
+                            intervalsToAdd.add(new Interval<Date>(remInterval.getEnd(), rcInterval.getEnd()));
+                            break;
+                        } else {
+                            intervalsToAdd.add(new Interval<Date>(rcInterval.getStart(), start));
+                            start = rcInterval.getEnd();
+                        }
+                    }
+                }
+
+            }
+            for (Date date : intervalsToRemove) {
+                requestCache.remove(date);
+            }
+            for (Interval<Date> intToAdd : intervalsToAdd) {
+                requestCache.put(intToAdd.getStart(), intToAdd);
+            }
+
+        }
+    }
 }
