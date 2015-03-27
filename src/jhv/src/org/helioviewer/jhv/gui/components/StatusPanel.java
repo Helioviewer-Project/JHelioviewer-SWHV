@@ -3,7 +3,6 @@ package org.helioviewer.jhv.gui.components;
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
-import java.util.LinkedList;
 
 import javax.swing.BorderFactory;
 import javax.swing.JLabel;
@@ -39,7 +38,6 @@ public class StatusPanel extends JPanel {
     private JPanel rightPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
 
     private static JLabel statusInfoLabel = new JLabel("");
-    private static LinkedList<StatusTextListener> statusTextListeners = new LinkedList<StatusTextListener>();
 
     public enum Alignment {
         LEFT, RIGHT
@@ -112,67 +110,6 @@ public class StatusPanel extends JPanel {
 
         leftPanel.remove((JLabel) oldPlugin);
         rightPanel.remove((JLabel) oldPlugin);
-    }
-
-    /**
-     * Sets the status text.
-     * 
-     * All StatusTextListener will be notified.
-     * 
-     * @param text
-     *            Status text
-     */
-    public static void setStatusInfoText(String text) {
-        statusInfoLabel.setText(text);
-
-        for (StatusTextListener listener : statusTextListeners) {
-            listener.statusTextChanged(text);
-        }
-    }
-
-    /**
-     * Adds a StatusTextListener.
-     * 
-     * The listener will be notified on every call of
-     * {@link #setStatusInfoText(String)}.
-     * 
-     * @param listener
-     *            The new listener
-     */
-    public static void addStatusTextListener(StatusTextListener listener) {
-        if (!statusTextListeners.contains(listener)) {
-            statusTextListeners.add(listener);
-        }
-    }
-
-    /**
-     * Removes a StatusTextListener.
-     * 
-     * The listener will not be notified any more on every call of
-     * {@link #setStatusInfoText(String)}.
-     * 
-     * @param listener
-     *            The listener to remove
-     */
-    public static void removeStatusTextListener(StatusTextListener listener) {
-        statusTextListeners.remove(listener);
-    }
-
-    /**
-     * A listener to receive status texts.
-     * 
-     * @author Markus Langenberg
-     */
-    public interface StatusTextListener {
-
-        /**
-         * Callback function which will be called on every change of the status
-         * text.
-         * 
-         * @param newStatusText
-         *            The new status text
-         */
-        public void statusTextChanged(String newStatusText);
     }
 
 }
