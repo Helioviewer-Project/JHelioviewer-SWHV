@@ -7,6 +7,7 @@ package org.helioviewer.jhv.layers;
  * @author Freek Verstringe
  */
 public class LayerDescriptor {
+
     public boolean isMaster = false;
     public boolean isMovie = false;
     public boolean isVisible = false;
@@ -14,20 +15,5 @@ public class LayerDescriptor {
 
     public String title = "";
     public String timestamp = "";
-    public String interval;
-    public String type;
-
-    public LayerDescriptor(String interval, String type) {
-        this.interval = interval;
-        this.type = type;
-    }
-
-    public String getInterval() {
-        return this.interval;
-    }
-
-    public String getType() {
-        return this.type;
-    }
 
 }
