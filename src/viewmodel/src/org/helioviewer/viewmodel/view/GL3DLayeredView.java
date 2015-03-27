@@ -8,20 +8,44 @@ import javax.media.opengl.GL2;
 import org.helioviewer.gl3d.model.image.GL3DImageLayer;
 import org.helioviewer.gl3d.scenegraph.GL3DState;
 import org.helioviewer.jhv.display.Displayer;
+import org.helioviewer.jhv.layers.LayerDescriptor;
 import org.helioviewer.viewmodel.changeevent.ChangeEvent;
 import org.helioviewer.viewmodel.changeevent.LayerChangedReason;
 import org.helioviewer.viewmodel.changeevent.LayerChangedReason.LayerChangeType;
 import org.helioviewer.viewmodel.view.jp2view.JHVJP2View;
+import org.helioviewer.viewmodel.view.jp2view.JHVJPXView;
+import org.helioviewer.viewmodel.view.jp2view.datetime.ImmutableDateTime;
 import org.helioviewer.viewmodel.view.opengl.GL3DView;
 
 public class GL3DLayeredView extends AbstractView implements LayeredView, ViewListener, GL3DView {
 
     protected ArrayList<JHVJP2View> layers = new ArrayList<JHVJP2View>();
     protected HashMap<JHVJP2View, Layer> jp2viewLookup = new HashMap<JHVJP2View, Layer>();
-    // private final ArrayList<GL3DImageLayer> imageLayers = new ArrayList<GL3DImageLayer>();
 
     protected class Layer {
-        public boolean visibility = true;
+        public LayerDescriptor ld = new LayerDescriptor();
+
+        public Layer(JHVJP2View view) {
+            ImmutableDateTime dt = view.getMetaData().getDateTime();
+
+            ld.isMovie = view instanceof JHVJPXView;
+            ld.isMaster = ld.isMovie ? LinkedMovieManager.getActiveInstance().isMaster((JHVJPXView) view) : false;
+            ld.isVisible = true;
+            ld.isTimed = dt != null;
+            ld.title = view.toString();
+            ld.timestamp = ld.isTimed ? dt.getCachedDate() : null;
+        }
+    }
+
+    public LayerDescriptor getLayerDescriptor(JHVJP2View view) {
+        Layer layer = jp2viewLookup.get(view);
+        if (layer != null) {
+            LayerDescriptor ld = layer.ld;
+            ld.isMaster = ld.isMovie ? LinkedMovieManager.getActiveInstance().isMaster((JHVJPXView) view) : false;
+            ld.timestamp = ld.isTimed ? view.getMetaData().getDateTime().getCachedDate() : null;
+            return ld;
+        }
+        return null;
     }
 
     /**
@@ -31,7 +55,7 @@ public class GL3DLayeredView extends AbstractView implements LayeredView, ViewLi
     public boolean isVisible(JHVJP2View view) {
         Layer layer = jp2viewLookup.get(view);
         if (layer != null)
-            return layer.visibility;
+            return layer.ld.isVisible;
         else
             return false;
     }
@@ -43,7 +67,7 @@ public class GL3DLayeredView extends AbstractView implements LayeredView, ViewLi
     public int getNumberOfVisibleLayer() {
         int result = 0;
         for (Layer layer : jp2viewLookup.values()) {
-            if (layer.visibility) {
+            if (layer.ld.isVisible) {
                 result++;
             }
         }
@@ -60,7 +84,7 @@ public class GL3DLayeredView extends AbstractView implements LayeredView, ViewLi
 
         Layer layer = jp2viewLookup.get(view);
         if (layer != null) {
-            layer.visibility = !layer.visibility;
+            layer.ld.isVisible = !layer.ld.isVisible;
             notifyViewListeners(new ChangeEvent(new LayerChangedReason(this, LayerChangeType.LAYER_VISIBILITY, view)));
         }
     }
@@ -78,19 +102,19 @@ public class GL3DLayeredView extends AbstractView implements LayeredView, ViewLi
      */
 
     @Override
-    public void addLayer(JHVJP2View newLayer, int newIndex) {
-        if (newLayer == null)
+    public void addLayer(JHVJP2View newView, int newIndex) {
+        if (newView == null)
             return;
 
         LinkedMovieManager.getActiveInstance().pauseLinkedMovies();
 
-        layers.add(newIndex, newLayer);
-        jp2viewLookup.put(newLayer, new Layer());
+        layers.add(newIndex, newView);
+        jp2viewLookup.put(newView, new Layer(newView));
 
-        newLayer.addViewListener(this);
-        GL3DImageLayer imageLayer = new GL3DImageLayer("", newLayer, true, true, true);
-        //this.imageLayers.add(imageLayer);
-        ChangeEvent event = new ChangeEvent(new LayerChangedReason(this, LayerChangeType.LAYER_ADDED, newLayer));
+        newView.addViewListener(this);
+        GL3DImageLayer imageLayer = new GL3DImageLayer("", newView, true, true, true);
+
+        ChangeEvent event = new ChangeEvent(new LayerChangedReason(this, LayerChangeType.LAYER_ADDED, newView));
         notifyViewListeners(event);
     }
 
