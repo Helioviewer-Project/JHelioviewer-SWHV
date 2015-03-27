@@ -267,9 +267,7 @@ public abstract class GL3DCamera {
     public void updateCameraTransformation(boolean fireEvent) {
         this.rotation = this.currentDragRotation.copy();
         this.rotation.rotate(this.localRotation);
-
-        cameraTransformation = GL3DMat4d.translation(this.translation);
-        cameraTransformation.multiply(this.rotation.toMatrix());
+        cameraTransformation = this.rotation.toMatrix().translate(this.translation);
     }
 
     public void applyCamera(GL3DState state) {
