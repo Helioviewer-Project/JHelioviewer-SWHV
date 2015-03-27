@@ -53,12 +53,11 @@ public class RenderableGrid implements Renderable {
             font = new Font("Serif", Font.PLAIN, fontsize);
         } finally {
         }
-        renderer = new TextRenderer(font, false, true);//, new CustomRenderDelegate(0, Color.WHITE));
-        renderer.setUseVertexArrays(true);
-        renderer.getSmoothing();
-        optionsPanel = new RenderableGridOptionsPanel(this);
 
+        optionsPanel = new RenderableGridOptionsPanel(this);
     }
+
+    private float oldrelhi = -1;
 
     @Override
     public void render(GL3DState state) {
@@ -68,16 +67,22 @@ public class RenderableGrid implements Renderable {
         gl.glColor3d(1., 1., 0.);
 
         float relhi = (float) (state.getActiveCamera().INITFOV / (state.getActiveCamera().getCameraFOV())) * scale;
-        float cfontsize = this.fontsize * relhi;
+        if (relhi != oldrelhi) {
+            oldrelhi = relhi;
 
-        cfontsize = cfontsize < 10.f ? 10.f : cfontsize;
-        font = font.deriveFont(cfontsize);
-        renderer = new TextRenderer(font, false, true);
-        renderer.setUseVertexArrays(true);
-        renderer.getSmoothing();
+            float cfontsize = this.fontsize * relhi;
+            cfontsize = cfontsize < 10.f ? 10.f : cfontsize;
+            font = font.deriveFont(cfontsize);
+
+            renderer = new TextRenderer(font, true, false);
+            renderer.setUseVertexArrays(true);
+            //renderer.setSmoothing(true);
+        }
+
         if (!followCamera) {
             drawText(gl);
         }
+
         drawCircles(gl);
     }
 
@@ -303,4 +308,5 @@ public class RenderableGrid implements Renderable {
     public String getTimeString() {
         return "";
     }
+
 }
