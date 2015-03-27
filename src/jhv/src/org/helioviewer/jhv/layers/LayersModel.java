@@ -1087,7 +1087,7 @@ public class LayersModel implements UIViewListener {
      * @return LayerDescriptor of the current state of the layer in question
      */
     public LayerDescriptor getDescriptor(JHVJP2View view) {
-        LayerDescriptor ld = new LayerDescriptor("sd", "sdf");
+        LayerDescriptor ld = new LayerDescriptor();
 
         ld.isMovie = isMovie(view);
         ld.isMaster = isMaster(view);
