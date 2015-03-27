@@ -71,7 +71,7 @@ public class LayerTableContainer extends JPanel implements LayersListener {
     /**
      * {@inheritDoc}
      */
-    public void activeLayerChanged(int index) {
+    public void activeLayerChanged(View view) {
     }
 
     /**

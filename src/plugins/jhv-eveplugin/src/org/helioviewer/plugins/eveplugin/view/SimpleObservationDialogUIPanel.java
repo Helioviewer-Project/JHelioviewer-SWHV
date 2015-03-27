@@ -282,7 +282,7 @@ public abstract class SimpleObservationDialogUIPanel extends ObservationDialogPa
     }
 
     @Override
-    public void activeLayerChanged(int idx) {
+    public void activeLayerChanged(View view) {
     }
 
     @Override

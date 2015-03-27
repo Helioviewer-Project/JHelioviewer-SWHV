@@ -192,7 +192,7 @@ public class PfssPluginPanel extends OverlayPanel implements ActionListener, Lay
     }
 
     @Override
-    public void activeLayerChanged(int idx) {
+    public void activeLayerChanged(View view) {
     }
 
     public void enableComponents(Container container, boolean enable) {

@@ -169,9 +169,9 @@ public class PositionStatusPanel extends ViewStatusPanelPlugin implements MouseM
      * {@inheritDoc}
      */
     @Override
-    public void activeLayerChanged(int idx) {
-        if (LayersModel.getSingletonInstance().isValidIndex(idx)) {
-            jp2View = ViewHelper.getViewAdapter(LayersModel.getSingletonInstance().getLayer(idx), JHVJP2View.class);
+    public void activeLayerChanged(View view) {
+        if (view instanceof JHVJP2View) {
+            jp2View = (JHVJP2View) view;
             setVisible(true);
         } else {
             setVisible(false);

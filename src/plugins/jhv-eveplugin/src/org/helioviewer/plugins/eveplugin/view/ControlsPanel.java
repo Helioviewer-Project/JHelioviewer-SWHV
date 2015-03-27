@@ -206,7 +206,7 @@ public class ControlsPanel extends JPanel implements ActionListener, LayersListe
     }
 
     @Override
-    public void activeLayerChanged(int idx) {
+    public void activeLayerChanged(View view) {
         setSelectedIntervalOnLayerNotification();
     }
 

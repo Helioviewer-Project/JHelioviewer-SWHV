@@ -667,8 +667,8 @@ public class MoviePanel extends JPanel implements ActionListener, ChangeListener
          * {@inheritDoc}
          */
         @Override
-        public void activeLayerChanged(int idx) {
-            this.searchCorrespondingMoviePanel(LayersModel.getSingletonInstance().getLayer(idx));
+        public void activeLayerChanged(View view) {
+            this.searchCorrespondingMoviePanel(view);
         }
 
         /**
@@ -732,8 +732,8 @@ public class MoviePanel extends JPanel implements ActionListener, ChangeListener
          * {@inheritDoc}
          */
         @Override
-        public void activeLayerChanged(int idx) {
-            super.activeLayerChanged(idx);
+        public void activeLayerChanged(View view) {
+            super.activeLayerChanged(view);
             if (activePanel != null && getValue(SMALL_ICON) != activePanel.playPauseButton.getIcon()) {
                 putValue(NAME, activePanel.playPauseButton.getToolTipText());
                 putValue(SMALL_ICON, activePanel.playPauseButton.getIcon());

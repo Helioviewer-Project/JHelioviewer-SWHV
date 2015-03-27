@@ -177,7 +177,7 @@ public class GL3DCameraOptionsPanel extends JPanel implements GL3DCameraSelectio
     }
 
     @Override
-    public void activeLayerChanged(int idx) {
+    public void activeLayerChanged(View view) {
     }
 
 }
