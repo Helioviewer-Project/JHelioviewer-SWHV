@@ -212,7 +212,16 @@ public class JHVEventContainer {
 
     }
 
+    /**
+     * Gets all the intervals that were requested.
+     * 
+     * @return A list with intervals
+     */
     public Collection<Interval<Date>> getAllRequestIntervals() {
         return JHVEventCache.getSingletonInstance().getRequestCache().values();
+    }
+
+    public void intervalsNotDownloaded(List<Interval<Date>> intervals) {
+        JHVEventCache.getSingletonInstance().removeRequestedIntervals(intervals);
     }
 }
