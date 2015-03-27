@@ -453,11 +453,8 @@ public class LayersModel implements UIViewListener {
      *            - the new visibility state
      */
     public void setVisible(JHVJP2View view, boolean visible) {
-        LayeredView lv = getLayeredView();
-        if (lv != null) {
-            if (lv.isVisible(view) != visible) {
-                lv.toggleVisibility(view);
-            }
+        if (layeredView.isVisible(view) != visible) {
+            layeredView.toggleVisibility(view);
         }
     }
 
@@ -470,12 +467,7 @@ public class LayersModel implements UIViewListener {
      *            - the new visibility state
      */
     public void setVisible(int idx, boolean visible) {
-        LayeredView lv = getLayeredView();
-        if (lv != null) {
-            if (lv.isVisible(getLayer(idx)) != visible) {
-                lv.toggleVisibility(getLayer(idx));
-            }
-        }
+        setVisible(getLayer(idx), visible);
     }
 
     /**
@@ -487,12 +479,7 @@ public class LayersModel implements UIViewListener {
      * @return true if the layer is visible
      */
     public boolean isVisible(JHVJP2View view) {
-        LayeredView lv = getLayeredView();
-        if (lv != null) {
-            return lv.isVisible(view);
-        } else {
-            return false;
-        }
+        return layeredView.isVisible(view);
     }
 
     /**
@@ -503,12 +490,7 @@ public class LayersModel implements UIViewListener {
      * @return true if the layer is visible
      */
     public boolean isVisible(int idx) {
-        LayeredView lv = getLayeredView();
-        if (lv != null) {
-            return lv.isVisible(getLayer(idx));
-        } else {
-            return false;
-        }
+        return isVisible(getLayer(idx));
     }
 
     /**
@@ -633,8 +615,7 @@ public class LayersModel implements UIViewListener {
      *            - index of the layer in question
      */
     public void downloadLayer(int idx) {
-        JHVJP2View view = getLayeredView().getLayer(idx);
-        downloadLayer(view);
+        downloadLayer(layeredView.getLayer(idx));
     }
 
     /**
@@ -737,8 +718,7 @@ public class LayersModel implements UIViewListener {
      */
     public void removeLayer(int idx) {
         idx = invertIndex(idx);
-        LayeredView lv = getLayeredView();
-        lv.removeLayer(idx);
+        layeredView.removeLayer(idx);
     }
 
     /**
@@ -823,29 +803,6 @@ public class LayersModel implements UIViewListener {
     }
 
     /**
-     * Check whether the layer in question is a movie
-     *
-     * @param idx
-     *            - index of the layer in question
-     * @return true if the layer in question is a movie
-     */
-    public boolean isMovie(int idx) {
-        JHVJP2View view = this.getLayer(idx);
-        return isMovie(view);
-    }
-
-    /**
-     * Check whether the layer in question is a movie
-     *
-     * @param view
-     *            - View that can be associated with the layer in question
-     * @return true if the layer in question is a movie
-     */
-    public boolean isMovie(JHVJP2View view) {
-        return view instanceof JHVJPXView;
-    }
-
-    /**
      * Check whether the layer in question has timing information
      *
      * @param idx
@@ -880,15 +837,14 @@ public class LayersModel implements UIViewListener {
         if (view == null) {
             return;
         }
-        // Operates on the (inverted) LayeredView indices
-        LayeredView lv = this.getLayeredView();
 
-        int level = lv.getLayerLevel(view);
-        if (level < lv.getNumLayers() - 1) {
+        // Operates on the (inverted) LayeredView indices
+        int level = layeredView.getLayerLevel(view);
+        if (level < layeredView.getNumLayers() - 1) {
             level++;
         }
 
-        lv.moveView(view, level);
+        layeredView.moveView(view, level);
         this.setActiveLayer(invertIndex(level));
     }
 
@@ -902,15 +858,14 @@ public class LayersModel implements UIViewListener {
         if (view == null) {
             return;
         }
-        // Operates on the (inverted) LayeredView indices
-        LayeredView lv = this.getLayeredView();
 
-        int level = lv.getLayerLevel(view);
+        // Operates on the (inverted) LayeredView indices
+        int level = layeredView.getLayerLevel(view);
         if (level > 0) {
             level--;
         }
 
-        lv.moveView(view, level);
+        layeredView.moveView(view, level);
         this.setActiveLayer(invertIndex(level));
     }
 
@@ -934,12 +889,8 @@ public class LayersModel implements UIViewListener {
      * @return true if the layer in question is currently playing
      */
     public boolean isPlaying(JHVJP2View view) {
-        if (view == null) {
-            return false;
-        }
-        if (isMovie(view)) {
-            JHVJPXView movieView = (JHVJPXView) view;
-            return movieView.isMoviePlaying();
+        if (view instanceof JHVJPXView) {
+            return ((JHVJPXView) view).isMoviePlaying();
         } else {
             return false;
         }
@@ -968,48 +919,10 @@ public class LayersModel implements UIViewListener {
      */
     public int getFPS(JHVJP2View view) {
         int result = 0;
-        if (view == null) {
-            return result;
+        if (view instanceof JHVJPXView) {
+            result = (int) (Math.round(((JHVJPXView) view).getActualFramerate() * 100) / 100);
         }
-
-        if (isMovie(view)) {
-            JHVJPXView movieView = (JHVJPXView) view;
-            if (isPlaying(view)) {
-                result = (int) (Math.round(movieView.getActualFramerate() * 100) / 100);
-            }
-        }
-
         return result;
-    }
-
-    /**
-     * Check whether the layer in question is a Master in the list of linked
-     * movies
-     *
-     * @param idx
-     *            - index of the layer in question
-     * @return true if the layer in question is a master
-     */
-    public boolean isMaster(int idx) {
-        View view = getLayer(idx);
-        return isMaster(view);
-    }
-
-    /**
-     * Check whether the layer in question is a Master in the list of linked
-     * movies
-     *
-     * @param view
-     *            - View that can be associated with the layer in question
-     * @return true if the layer in question is a master
-     */
-    public boolean isMaster(View view) {
-        if (view == null) {
-            return false;
-        }
-
-        JHVJPXView movieView = (JHVJPXView) view;
-        return LinkedMovieManager.getActiveInstance().isMaster(movieView);
     }
 
     /**
@@ -1020,7 +933,6 @@ public class LayersModel implements UIViewListener {
      * @return true if the layer in question is a remote view
      */
     public boolean isRemote(JHVJP2View view) {
-
         if (view != null) {
             return view.isRemote();
         } else {
@@ -1087,16 +999,7 @@ public class LayersModel implements UIViewListener {
      * @return LayerDescriptor of the current state of the layer in question
      */
     public LayerDescriptor getDescriptor(JHVJP2View view) {
-        LayerDescriptor ld = new LayerDescriptor();
-
-        ld.isMovie = isMovie(view);
-        ld.isMaster = isMaster(view);
-        ld.isVisible = isVisible(view);
-        ld.isTimed = isTimed(view);
-        ld.title = getName(view);
-        ld.timestamp = getCurrentFrameTimestampString(view);
-
-        return ld;
+        return layeredView.getLayerDescriptor(view);
     }
 
     /**
@@ -1446,7 +1349,6 @@ public class LayersModel implements UIViewListener {
 
                 // check if we could load add a new layer/view
                 if (newView != null) {
-                    LayeredView layeredView = LayersModel.getSingletonInstance().getLayeredView();
                     for (int i = 0; i < layeredView.getNumLayers(); i++) {
                         View subView = layeredView.getLayer(i);
 
@@ -1503,7 +1405,7 @@ public class LayersModel implements UIViewListener {
             if (fullSetting.regionViewState != null) {
                 Log.info(">> LayersModel.StateParser.setupLayers() > Setting up RegionView");
                 RegionViewState regionViewState = fullSetting.regionViewState;
-                RegionView regionView = LayersModel.getSingletonInstance().getLayeredView().getAdapter(RegionView.class);
+                RegionView regionView = layeredView.getAdapter(RegionView.class);
                 Region region = StaticRegion.createAdaptedRegion(regionViewState.regionX, regionViewState.regionY, regionViewState.regionWidth, regionViewState.regionHeight);
                 regionView.setRegion(region, new ChangeEvent());
             } else {
