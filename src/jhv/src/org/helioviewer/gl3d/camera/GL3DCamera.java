@@ -172,11 +172,13 @@ public abstract class GL3DCamera {
         if (w == 0.)
             w = 1.;
 
-        gl.glOrtho(-w, w, -w / this.aspect, w / this.aspect, this.clipNear, this.clipFar);
+        double waspect = w / aspect;
 
-        this.orthoMatrix = GL3DMat4d.ortho(-w, w, -w / this.aspect, w / this.aspect, this.clipNear, this.clipFar);
+        gl.glOrtho(-w, w, -waspect, waspect, clipNear, clipFar);
 
-        this.orthoMatrix.translate(new GL3DVec3d(this.translation.x, this.translation.y, 0.));
+        orthoMatrix = GL3DMat4d.ortho(-w, w, -waspect, waspect, clipNear, clipFar);
+        orthoMatrix.translate(translation.x, translation.y, 0.);
+
         gl.glMatrixMode(GL2.GL_MODELVIEW);
     }
 
