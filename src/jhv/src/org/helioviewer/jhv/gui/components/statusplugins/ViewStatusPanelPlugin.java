@@ -12,7 +12,7 @@ public abstract class ViewStatusPanelPlugin extends JLabel implements StatusPane
     /**
      * NOP default implementation
      */
-    public void activeLayerChanged(int idx) {
+    public void activeLayerChanged(View view) {
     }
 
     /**

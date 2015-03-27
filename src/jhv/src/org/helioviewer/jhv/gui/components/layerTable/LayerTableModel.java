@@ -145,7 +145,7 @@ public class LayerTableModel extends AbstractTableModel implements LayersListene
      * appropriate TableModel notification methods
      */
     @Override
-    public void layerAdded(final int newIndex) {
+    public void layerAdded(int newIndex) {
         updateData();
         fireTableRowsInserted(newIndex, newIndex);
     }
@@ -155,7 +155,7 @@ public class LayerTableModel extends AbstractTableModel implements LayersListene
      * appropriate TableModel notification methods
      */
     @Override
-    public void layerChanged(final int idx) {
+    public void layerChanged(int idx) {
         updateData();
         fireTableRowsUpdated(idx, idx);
     }
@@ -165,7 +165,7 @@ public class LayerTableModel extends AbstractTableModel implements LayersListene
      * appropriate TableModel notification methods
      */
     @Override
-    public void layerRemoved(View oldView, final int oldIndex) {
+    public void layerRemoved(View oldView, int oldIndex) {
         updateData();
         fireTableRowsDeleted(oldIndex, oldIndex);
     }
@@ -174,7 +174,7 @@ public class LayerTableModel extends AbstractTableModel implements LayersListene
      * {@inheritDoc}
      */
     @Override
-    public void activeLayerChanged(final int index) {
+    public void activeLayerChanged(View view) {
     }
 
     private void updateData() {

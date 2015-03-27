@@ -36,13 +36,17 @@ public class ControlPanelContainer extends JPanel implements LayersListener {
     }
 
     public void updateActiveView() {
-        View activeView = LayersModel.getSingletonInstance().getActiveView();
-        ImageInfoView view = activeView != null ? activeView.getAdapter(ImageInfoView.class) : null;
+        updateActiveView(LayersModel.getSingletonInstance().getActiveView());
+    }
+
+    public void updateActiveView(View view) {
+        ImageInfoView infoView = view instanceof ImageInfoView ? (ImageInfoView) view : null;
 
         CardLayout cl = (CardLayout) this.getLayout();
-        cl.show(this, view == null ? "null" : view.toString());
+        cl.show(this, infoView == null ? "null" : infoView.toString());
         this.ensureSize();
     }
+
 
     private void ensureSize() {
         for (Component comp : this.getComponents()) {
@@ -61,8 +65,8 @@ public class ControlPanelContainer extends JPanel implements LayersListener {
     /**
      * {@inheritDoc}
      */
-    public void activeLayerChanged(int index) {
-        this.updateActiveView();
+    public void activeLayerChanged(View view) {
+        this.updateActiveView(view);
     }
 
     /**

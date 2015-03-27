@@ -296,7 +296,7 @@ public class ImageSelectorPanel extends JPanel implements LayersListener {
      * {@inheritDoc}
      */
     @Override
-    public void activeLayerChanged(int index) {
+    public void activeLayerChanged(View view) {
     }
 
     /**

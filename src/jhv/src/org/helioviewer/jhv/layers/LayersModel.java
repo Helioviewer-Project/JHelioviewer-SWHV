@@ -157,7 +157,7 @@ public class LayersModel implements UIViewListener {
         }
 
         activeLayer = idx;
-        fireActiveLayerChanged(idx);
+        fireActiveLayerChanged(view);
     }
 
     /**
@@ -576,7 +576,7 @@ public class LayersModel implements UIViewListener {
         ChangedReason reason2 = aEvent.getLastChangedReasonByType(ViewportChangedReason.class);
 
         // PositionStatusPanel.getSingletonInstance().updatePosition();
-        ZoomStatusPanel.getSingletonInstance().updateZoomLevel(activeLayer);
+        ZoomStatusPanel.getSingletonInstance().updateZoomLevel(getActiveView());
     }
 
     private void handleViewChainChanges(View sender, ChangeEvent aEvent) {
@@ -1146,9 +1146,9 @@ public class LayersModel implements UIViewListener {
     /**
      * Notify all LayersListeners
      */
-    private void fireActiveLayerChanged(final int index) {
+    private void fireActiveLayerChanged(View view) {
         for (LayersListener ll : layerListeners) {
-            ll.activeLayerChanged(index);
+            ll.activeLayerChanged(view);
         }
     }
 

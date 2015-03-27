@@ -188,28 +188,22 @@ public class GL3DFollowObjectCamera extends GL3DSolarRotationTrackingTrackballCa
     }
 
     @Override
-    public void activeLayerChanged(final int idx) {
-        if (!interpolation) {
-            View nextView = LayersModel.getSingletonInstance().getLayer(idx);
-            if (nextView != null) {
+    public void activeLayerChanged(View view) {
+        if (!interpolation && view instanceof JHVJPXView) {
+            JHVJPXView jpxView = (JHVJPXView) view;
+            Date beginDate = null, endDate = null;
 
-                JHVJPXView jpxView = nextView.getAdapter(JHVJPXView.class);
-                if (jpxView != null) {
-                    Date beginDate = null;
-                    Date endDate = null;
-                    for (int frame = 0; frame <= jpxView.getMaximumFrameNumber(); frame++) {
-                        ImmutableDateTime date = jpxView.getFrameDateTime(frame);
-                        if (beginDate == null || date.getTime().getTime() < beginDate.getTime()) {
-                            beginDate = date.getTime();
-                        }
-                        if (endDate == null || date.getTime().getTime() > endDate.getTime()) {
-                            endDate = date.getTime();
-                        }
-                    }
-                    positionLoading.setBeginDate(beginDate, false);
-                    positionLoading.setEndDate(endDate, true);
+            for (int frame = 0; frame <= jpxView.getMaximumFrameNumber(); frame++) {
+                ImmutableDateTime date = jpxView.getFrameDateTime(frame);
+                if (beginDate == null || date.getTime().getTime() < beginDate.getTime()) {
+                    beginDate = date.getTime();
+                }
+                if (endDate == null || date.getTime().getTime() > endDate.getTime()) {
+                    endDate = date.getTime();
                 }
             }
+            positionLoading.setBeginDate(beginDate, false);
+            positionLoading.setEndDate(endDate, true);
         }
     }
 

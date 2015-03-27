@@ -110,7 +110,7 @@ public class LayerTableOverlapWatcher implements LayersListener {
      * {@inheritDoc}
      */
     @Override
-    public void activeLayerChanged(int idx) {
+    public void activeLayerChanged(View view) {
     }
 
     /**

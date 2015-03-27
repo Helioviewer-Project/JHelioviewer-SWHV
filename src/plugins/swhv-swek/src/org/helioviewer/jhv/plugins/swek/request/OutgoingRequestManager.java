@@ -47,16 +47,6 @@ public class OutgoingRequestManager implements LayersListener {
 
     @Override
     public void layerAdded(int idx) {
-        View activeView = LayersModel.getSingletonInstance().getActiveView();
-        final List<Date> requestDates = new ArrayList<Date>();
-        JHVJPXView jpxView = activeView.getAdapter(JHVJPXView.class);
-        if (jpxView != null) {
-            for (int frame = 0; frame <= jpxView.getMaximumFrameNumber(); frame++) {
-                requestDates.add(jpxView.getFrameDateTime(frame).getTime());
-            }
-        }
-
-        JHVEventContainer.getSingletonInstance().requestForDateList(requestDates, swekEventHandler);
     }
 
     @Override
@@ -68,7 +58,15 @@ public class OutgoingRequestManager implements LayersListener {
     }
 
     @Override
-    public void activeLayerChanged(int idx) {
+    public void activeLayerChanged(View view) {
+        if (view instanceof JHVJPXView) {
+            JHVJPXView jpxView = (JHVJPXView) view;
+            List<Date> requestDates = new ArrayList<Date>();
+            for (int frame = 0; frame <= jpxView.getMaximumFrameNumber(); frame++) {
+                requestDates.add(jpxView.getFrameDateTime(frame).getTime());
+            }
+            JHVEventContainer.getSingletonInstance().requestForDateList(requestDates, swekEventHandler);
+        }
     }
 
 }

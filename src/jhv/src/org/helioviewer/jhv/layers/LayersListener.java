@@ -43,9 +43,9 @@ public interface LayersListener {
      * Gets fired if the active layer has changed (meaning, a new layer has
      * become the new active layer).
      * 
-     * @param idx
-     *            - index of the new active layer
+     * @param view
+     *            - view of the new active layer, null if none
      */
-    public void activeLayerChanged(int idx);
+    public void activeLayerChanged(View view);
 
 }
