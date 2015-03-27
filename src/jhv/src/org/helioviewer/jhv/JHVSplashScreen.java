@@ -15,22 +15,17 @@ import javax.swing.event.ChangeListener;
 
 import org.helioviewer.jhv.gui.IconBank;
 import org.helioviewer.jhv.gui.IconBank.JHVIcon;
-import org.helioviewer.jhv.gui.components.StatusPanel.StatusTextListener;
 
 /**
  * Represents the splash screen which will be displayed when program is
  * starting.
  *
  * The splash screen manages a progress bar and a label, representing the
- * current state of starting JHV. It is connected to
- * {@link org.helioviewer.jhv.gui.components.StatusPanel}, so every call to
- * {@link org.helioviewer.jhv.gui.components.StatusPanel#setStatusInfoText(String)}
- * results in updating the splash screen to. This behavior is useful for
- * plugins.
+ * current state of starting JHV.
  *
  * @author Stephan Pagel
  */
-public class JHVSplashScreen extends JFrame implements StatusTextListener {
+public class JHVSplashScreen extends JFrame {
 
     // ////////////////////////////////////////////////////////////////
     // Definitions
@@ -177,18 +172,6 @@ public class JHVSplashScreen extends JFrame implements StatusTextListener {
     }
 
     /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void statusTextChanged(String newStatusText) {
-        if (newStatusText.length() > 0) {
-            setProgressText(newStatusText);
-            setProgressSteps(steps + 1);
-            nextStep();
-        }
-    }
-
-    /**
      * Returns a progress bar object. The values which will be set to this
      * progress bar will be mapped to the progress bar which is displayed on the
      * splash screen.
@@ -196,11 +179,9 @@ public class JHVSplashScreen extends JFrame implements StatusTextListener {
      * @return progress bar object.
      * */
     public JProgressBar getProgressBar() {
-
         JProgressBar progressBar = new JProgressBar();
 
         progressBar.addChangeListener(new ChangeListener() {
-
             @Override
             public void stateChanged(ChangeEvent e) {
                 int value = ((JProgressBar) e.getSource()).getValue();
@@ -209,7 +190,6 @@ public class JHVSplashScreen extends JFrame implements StatusTextListener {
                 setProgressValue((int) ((float) value / (float) max * 100.0f));
             }
         });
-
         return progressBar;
     }
 
