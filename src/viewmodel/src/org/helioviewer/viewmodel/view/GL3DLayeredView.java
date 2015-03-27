@@ -33,7 +33,7 @@ public class GL3DLayeredView extends AbstractView implements LayeredView, ViewLi
             ld.isVisible = true;
             ld.isTimed = dt != null;
             ld.title = view.toString();
-            ld.timestamp = ld.isTimed ? dt.getCachedDate() : null;
+            ld.timestamp = ld.isTimed ? dt.getCachedDate() : "N/A";
         }
     }
 
@@ -42,7 +42,7 @@ public class GL3DLayeredView extends AbstractView implements LayeredView, ViewLi
         if (layer != null) {
             LayerDescriptor ld = layer.ld;
             ld.isMaster = ld.isMovie ? LinkedMovieManager.getActiveInstance().isMaster((JHVJPXView) view) : false;
-            ld.timestamp = ld.isTimed ? view.getMetaData().getDateTime().getCachedDate() : null;
+            ld.timestamp = ld.isTimed ? view.getMetaData().getDateTime().getCachedDate() : "N/A";
             return ld;
         }
         return null;
@@ -181,17 +181,6 @@ public class GL3DLayeredView extends AbstractView implements LayeredView, ViewLi
 
         ChangeEvent event = new ChangeEvent(new LayerChangedReason(this, LayerChangeType.LAYER_REMOVED, view, index));
         notifyViewListeners(event);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void removeLayer(int index) {
-        try {
-            removeLayer(layers.get(index));
-        } catch (Exception e) {
-        }
     }
 
     /**
