@@ -150,7 +150,7 @@ public class LayerTableModel extends AbstractTableModel implements LayersListene
         fireTableRowsInserted(newIndex, newIndex);
     }
 
-    public void layerChanged(int idx) {
+    public void layerVisibilityChanged(int idx) {
         updateData();
         fireTableRowsUpdated(idx, idx);
     }
