@@ -44,8 +44,6 @@ public class RenderableContainerPanel extends JPanel {
         gc.fill = GridBagConstraints.BOTH;
         grid = new JTable(renderableContainer);
         renderableContainer.addTableModelListener(grid);
-        renderableContainer.addTableModelListener(grid);
-        grid.createDefaultColumnsFromModel();
         this.add(grid, gc);
         grid.setTableHeader(null);
         grid.setShowGrid(false);
