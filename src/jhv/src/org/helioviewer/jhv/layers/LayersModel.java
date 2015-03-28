@@ -437,7 +437,7 @@ public class LayersModel implements UIViewListener {
                 int idx = findView(view);
                 if (idx != -1) {
                     ImageViewerGui.getSingletonInstance().getMoviePanelContainer().layerVisibilityChanged(view);
-                    LayerTableModel.getSingletonInstance().layerChanged(idx);
+                    LayerTableModel.getSingletonInstance().layerVisibilityChanged(idx);
                 }
             }
         }
