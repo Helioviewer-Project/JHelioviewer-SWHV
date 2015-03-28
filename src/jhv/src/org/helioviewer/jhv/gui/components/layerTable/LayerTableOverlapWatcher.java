@@ -57,7 +57,6 @@ public class LayerTableOverlapWatcher implements LayersListener {
      */
     @Override
     public void layerAdded(int idx) {
-
         // check if some of the layers do not really overlap
         boolean isGoodOverlap = true;
 

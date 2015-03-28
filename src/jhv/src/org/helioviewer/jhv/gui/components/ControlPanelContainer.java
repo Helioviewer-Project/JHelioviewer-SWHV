@@ -10,6 +10,7 @@ import org.helioviewer.jhv.layers.LayersListener;
 import org.helioviewer.jhv.layers.LayersModel;
 import org.helioviewer.viewmodel.view.ImageInfoView;
 import org.helioviewer.viewmodel.view.View;
+import org.helioviewer.viewmodel.view.jp2view.JHVJP2View;
 
 public class ControlPanelContainer extends JPanel implements LayersListener {
 
@@ -62,6 +63,16 @@ public class ControlPanelContainer extends JPanel implements LayersListener {
         this.controlMap.put(null, comp);
     }
 
+    public void layerVisibilityChanged(View view) {
+        boolean visible = LayersModel.getSingletonInstance().isVisible((JHVJP2View) view);
+        ImageInfoView imageInfoView = view != null ? view.getAdapter(ImageInfoView.class) : null;
+
+        Component c = this.getViewComponent(imageInfoView);
+        if (c != null) {
+            c.setEnabled(visible);
+        }
+    }
+
     /**
      * {@inheritDoc}
      */
@@ -74,22 +85,6 @@ public class ControlPanelContainer extends JPanel implements LayersListener {
      */
     public void layerAdded(int newIndex) {
         this.updateActiveView();
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public void layerChanged(int index) {
-        // this is called very often. refine the events to layer visibility
-        // changed?
-        boolean visible = LayersModel.getSingletonInstance().isVisible(index);
-        View view = LayersModel.getSingletonInstance().getLayer(index);
-        ImageInfoView imageInfoView = view != null ? view.getAdapter(ImageInfoView.class) : null;
-
-        Component c = this.getViewComponent(imageInfoView);
-        if (c != null) {
-            c.setEnabled(visible);
-        }
     }
 
     /**
