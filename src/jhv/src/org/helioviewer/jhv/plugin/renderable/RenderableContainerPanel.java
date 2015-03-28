@@ -43,6 +43,9 @@ public class RenderableContainerPanel extends JPanel {
         gc.weighty = 0;
         gc.fill = GridBagConstraints.BOTH;
         grid = new JTable(renderableContainer);
+        renderableContainer.addTableModelListener(grid);
+        renderableContainer.addTableModelListener(grid);
+        grid.createDefaultColumnsFromModel();
         this.add(grid, gc);
         grid.setTableHeader(null);
         grid.setShowGrid(false);
@@ -105,7 +108,6 @@ public class RenderableContainerPanel extends JPanel {
                 if (col == VISIBLEROW) {
                     Renderable renderable = (Renderable) Displayer.getRenderablecontainer().getValueAt(row, col);
                     renderable.setVisible(!renderable.isVisible());
-                    model.fireTableCellUpdated(row, col);
                     Displayer.display();
                 }
                 if (col == TITLEROW || col == VISIBLEROW || col == TIMEROW) {

@@ -4,14 +4,14 @@ import java.util.ArrayList;
 
 import javax.swing.event.TableModelEvent;
 import javax.swing.event.TableModelListener;
-import javax.swing.table.DefaultTableModel;
+import javax.swing.table.TableModel;
 
 import org.helioviewer.gl3d.scenegraph.GL3DState;
 import org.helioviewer.jhv.renderable.RenderableGrid;
 import org.helioviewer.jhv.renderable.RenderableSolarAxes;
 import org.helioviewer.jhv.renderable.RenderableSolarAxesType;
 
-public class RenderableContainer extends DefaultTableModel implements Reorderable {
+public class RenderableContainer implements TableModel, Reorderable {
     private final ArrayList<Renderable> renderables = new ArrayList<Renderable>();
     private final ArrayList<Renderable> newRenderables = new ArrayList<Renderable>();
     private final ArrayList<Renderable> removedRenderables = new ArrayList<Renderable>();
@@ -31,12 +31,15 @@ public class RenderableContainer extends DefaultTableModel implements Reorderabl
     }
 
     public void addRenderable(Renderable renderable) {
+        renderables.add(renderable);
         newRenderables.add(renderable);
+        fireListeners();
     }
 
     public void removeRenderable(Renderable renderable) {
         renderables.remove(renderable);
         removedRenderables.add(renderable);
+        fireListeners();
     }
 
     public void render(GL3DState state) {
@@ -50,7 +53,6 @@ public class RenderableContainer extends DefaultTableModel implements Reorderabl
     private void initRenderables(GL3DState state) {
         for (Renderable renderable : newRenderables) {
             renderable.init(state);
-            renderables.add(renderable);
         }
         newRenderables.clear();
     }
@@ -62,59 +64,12 @@ public class RenderableContainer extends DefaultTableModel implements Reorderabl
         removedRenderables.clear();
     }
 
-    @Override
-    public int getRowCount() {
-        if (renderables != null)
-            return renderables.size();
-        else
-            return 0;
-    }
-
-    @Override
-    public int getColumnCount() {
-        return RenderableContainerPanel.NUMBEROFCOLUMNS;
-    }
-
-    @Override
-    public String getColumnName(int columnIndex) {
-        return "DC";
-    }
-
-    @Override
-    public Class<?> getColumnClass(int columnIndex) {
-        return Renderable.class;
-    }
-
-    @Override
-    public boolean isCellEditable(int rowIndex, int columnIndex) {
-        return true;
-    }
-
-    @Override
-    public Object getValueAt(int rowIndex, int columnIndex) {
-        return renderables.get(rowIndex);
-    }
-
-    @Override
-    public void setValueAt(Object aValue, int rowIndex, int columnIndex) {
-        renderables.set(rowIndex, (Renderable) aValue);
-    }
-
-    @Override
-    public void removeRow(int row) {
-        this.removedRenderables.add(renderables.get(row));
-        renderables.remove(row);
-        fireTableRowsDeleted(row, row);
-    }
-
-    public void insertRow(int row, Renderable rowData) {
+    private void insertRow(int row, Renderable rowData) {
         if (row > renderables.size()) {
             renderables.add(rowData);
-            fireTableRowsInserted(renderables.size() - 1, renderables.size() - 1);
         } else {
             renderables.add(row, rowData);
         }
-        this.fireTableChanged(new TableModelEvent(this));
     }
 
     @Override
@@ -124,11 +79,69 @@ public class RenderableContainer extends DefaultTableModel implements Reorderabl
         }
         Renderable toMove = this.renderables.get(fromIndex);
         renderables.remove(fromIndex);
-        fireTableRowsDeleted(fromIndex, fromIndex);
         if (fromIndex < toIndex) {
             this.insertRow(toIndex - 1, toMove);
         } else {
             this.insertRow(toIndex, toMove);
+        }
+        fireListeners();
+    }
+
+    @Override
+    public int getRowCount() {
+        return this.renderables.size();
+    }
+
+    @Override
+    public int getColumnCount() {
+        return RenderableContainerPanel.NUMBEROFCOLUMNS;
+    }
+
+    @Override
+    public String getColumnName(int columnIndex) {
+        return "" + columnIndex;
+    }
+
+    @Override
+    public Class<?> getColumnClass(int columnIndex) {
+        return Renderable.class;
+    }
+
+    @Override
+    public boolean isCellEditable(int rowIndex, int columnIndex) {
+        return false;
+    }
+
+    @Override
+    public Object getValueAt(int rowIndex, int columnIndex) {
+        return renderables.get(rowIndex);
+    }
+
+    @Override
+    public void setValueAt(Object aValue, int rowIndex, int columnIndex) {
+        renderables.add(rowIndex, (Renderable) aValue);
+        fireListeners();
+    }
+
+    @Override
+    public void addTableModelListener(TableModelListener l) {
+        this.listeners.add(l);
+    }
+
+    @Override
+    public void removeTableModelListener(TableModelListener l) {
+        this.listeners.remove(l);
+    }
+
+    public void removeRow(int row) {
+        this.renderables.remove(row);
+        fireListeners();
+    }
+
+    private void fireListeners() {
+        for (TableModelListener listener : this.listeners) {
+            TableModelEvent e = new TableModelEvent(this);
+            listener.tableChanged(e);
         }
     }
 }
