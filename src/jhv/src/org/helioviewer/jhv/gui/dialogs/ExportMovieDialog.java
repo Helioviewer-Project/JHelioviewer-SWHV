@@ -17,7 +17,6 @@ import org.helioviewer.base.message.Message;
 import org.helioviewer.jhv.gui.ImageViewerGui;
 import org.helioviewer.jhv.gui.interfaces.ShowableDialog;
 import org.helioviewer.viewmodel.view.AbstractComponentView;
-import org.helioviewer.viewmodel.view.opengl.GL3DComponentView;
 
 /**
  * Dialog o export movies to standard video formats.
@@ -42,7 +41,7 @@ public class ExportMovieDialog extends JDialog implements ActionListener, Showab
         this.movieLabel.setText(exportingText);
     }
 
-    public void reset3D() {
+    public void reset() {
         setVisible(false);
         remove(movieLabel);
         this.exportButton.setEnabled(true);
@@ -52,7 +51,7 @@ public class ExportMovieDialog extends JDialog implements ActionListener, Showab
     private class CloseDialogTask extends TimerTask {
         @Override
         public void run() {
-            reset3D();
+            reset();
         }
     }
 
@@ -69,7 +68,7 @@ public class ExportMovieDialog extends JDialog implements ActionListener, Showab
         super(ImageViewerGui.getMainFrame(), "Export Movie", true);
         ImageViewerGui.getSingletonInstance().getLeftContentPane().setEnabled(false);
 
-        final AbstractComponentView component = ImageViewerGui.getSingletonInstance().getMainView().getAdapter(GL3DComponentView.class);
+        final AbstractComponentView component = (AbstractComponentView) ImageViewerGui.getSingletonInstance().getMainView();
         final ExportMovieDialog exportMovieDialog = this;
 
         exportButton.addActionListener(new ActionListener() {
@@ -95,7 +94,6 @@ public class ExportMovieDialog extends JDialog implements ActionListener, Showab
      */
     @Override
     public void showDialog() {
-
         if (!FileUtils.isExecutableRegistered("mp4box")) {
             Message.err("Could not find MP4Box tool", "The MP4Box tool could not be found. Exported movie will not contain subtitles.", false);
             Log.error(">> ExportMovieDialog > The MP4Box tool could not be found. Exported movie will not contain subtitles.");
@@ -114,13 +112,8 @@ public class ExportMovieDialog extends JDialog implements ActionListener, Showab
         repaint();
     }
 
-    synchronized public void release3d() {
-        dispose();
-    }
-
     @Override
     public void actionPerformed(ActionEvent e) {
-        // TODO Auto-generated method stub
     }
 
 }

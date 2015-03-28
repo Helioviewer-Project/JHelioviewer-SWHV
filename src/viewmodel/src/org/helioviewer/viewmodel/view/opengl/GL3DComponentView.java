@@ -261,7 +261,7 @@ public class GL3DComponentView extends AbstractComponentView implements GLEventL
         if (movieView != null) {
             movieView.pauseMovie();
         }
-        exportMovieDialog.reset3D();
+        exportMovieDialog.reset();
         exportMovieDialog = null;
     }
 
