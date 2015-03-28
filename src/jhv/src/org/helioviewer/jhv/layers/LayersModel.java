@@ -437,7 +437,7 @@ public class LayersModel implements UIViewListener {
                 JHVJP2View view = (JHVJP2View) layerReason.getSubView();
                 int idx = findView(view);
                 if (idx != -1) {
-                    ImageViewerGui.getSingletonInstance().getMoviePanelContainer().layerChanged(idx);
+                    ImageViewerGui.getSingletonInstance().getMoviePanelContainer().layerVisibilityChanged(view);
                     LayerTableModel.getSingletonInstance().layerChanged(idx);
                 }
             }
@@ -496,16 +496,6 @@ public class LayersModel implements UIViewListener {
         }
 
         return candidate;
-    }
-
-    /**
-     * Trigger downloading the layer in question
-     *
-     * @param idx
-     *            - index of the layer in question
-     */
-    public void downloadLayer(int idx) {
-        downloadLayer(layeredView.getLayer(idx));
     }
 
     /**
@@ -620,32 +610,6 @@ public class LayersModel implements UIViewListener {
     }
 
     /**
-     * Set the link-state of the layer in question
-     *
-     * @param idx
-     *            - index of the layer in question
-     * @param link
-     *            - true if the layer in question should be linked
-     */
-    public void setLink(int idx, boolean link) {
-        JHVJP2View view = this.getLayer(idx);
-        this.setLink(view, link);
-    }
-
-    /**
-     * Set the play-state of the layer in question
-     *
-     * @param idx
-     *            - index of the layer in question
-     * @param play
-     *            - true if the layer in question should play
-     */
-    public void setPlaying(int idx, boolean play) {
-        JHVJP2View view = this.getLayer(idx);
-        this.setPlaying(view, play);
-    }
-
-    /**
      * Set the play-state of the layer in question
      *
      * @param view
@@ -738,18 +702,6 @@ public class LayersModel implements UIViewListener {
     /**
      * Check whether the layer in question is currently playing
      *
-     * @param idx
-     *            - index of the layer in question
-     * @return true if the layer in question is currently playing
-     */
-    public boolean isPlaying(int idx) {
-        JHVJP2View view = getLayer(idx);
-        return isPlaying(view);
-    }
-
-    /**
-     * Check whether the layer in question is currently playing
-     *
      * @param view
      *            - View that can be associated with the layer in question
      * @return true if the layer in question is currently playing
@@ -760,19 +712,6 @@ public class LayersModel implements UIViewListener {
         } else {
             return false;
         }
-    }
-
-    /**
-     * Return the current framerate for the layer in question
-     *
-     * @param idx
-     *            - index of the layer in question
-     * @return the current framerate or 0 if the movie is not playing, or if
-     *         an error occurs
-     */
-    public int getFPS(int idx) {
-        JHVJP2View view = getLayer(idx);
-        return getFPS(view);
     }
 
     /**
@@ -807,30 +746,6 @@ public class LayersModel implements UIViewListener {
     }
 
     /**
-     * Check whether the layer in question is a Remote View
-     *
-     * @param idx
-     *            - index of the layer in question
-     * @return true if the layer in question is a remote view
-     */
-    public boolean isRemote(int idx) {
-        JHVJP2View view = getLayer(idx);
-        return isRemote(view);
-    }
-
-    /**
-     * Check whether the layer in question is connected to a JPIP server
-     *
-     * @param idx
-     *            - index of the layer in question
-     * @return true if the layer is connected to a JPIP server
-     */
-    public boolean isConnectedToJPIP(int idx) {
-        JHVJP2View view = getLayer(idx);
-        return isConnectedToJPIP(view);
-    }
-
-    /**
      * Check whether the layer in question is connected to a JPIP server
      *
      * @param view
@@ -848,18 +763,6 @@ public class LayersModel implements UIViewListener {
     /**
      * Return a representation of the layer in question
      *
-     * @param idx
-     *            - index of the layer in question
-     * @return LayerDescriptor of the current state of the layer in question
-     */
-    public LayerDescriptor getDescriptor(int idx) {
-        JHVJP2View view = this.getLayer(idx);
-        return getDescriptor(view);
-    }
-
-    /**
-     * Return a representation of the layer in question
-     *
      * @param view
      *            - View that can be associated with the layer in question
      * @return LayerDescriptor of the current state of the layer in question
@@ -868,45 +771,28 @@ public class LayersModel implements UIViewListener {
         return layeredView.getLayerDescriptor(view);
     }
 
-    /**
-     * Notify all LayersListeners
-     */
     private void fireLayerRemoved(final View oldView, final int oldIndex) {
         for (LayersListener ll : layerListeners) {
             ll.layerRemoved(oldView, oldIndex);
         }
     }
 
-    /**
-     * Notify all LayersListeners
-     */
     private void fireLayerAdded(final int newIndex) {
         for (LayersListener ll : layerListeners) {
             ll.layerAdded(newIndex);
         }
     }
 
-    /**
-     * Notify all LayersListeners
-     */
     private void fireActiveLayerChanged(View view) {
         for (LayersListener ll : layerListeners) {
             ll.activeLayerChanged(view);
         }
     }
 
-    /**
-     * Notify all LayersListeners
-     */
     public void addLayersListener(LayersListener layerListener) {
         layerListeners.add(layerListener);
     }
 
-    /**
-     * Remove LayersListener
-     *
-     * * @author Carlos Martin
-     */
     public void removeLayersListener(LayersListener layerListener) {
         layerListeners.remove(layerListener);
     }
