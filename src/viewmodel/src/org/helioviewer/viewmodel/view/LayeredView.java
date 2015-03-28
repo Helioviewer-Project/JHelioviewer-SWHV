@@ -40,7 +40,7 @@ import org.helioviewer.viewmodel.view.opengl.GL3DView;
  *
  */
 
-public class GL3DLayeredView extends AbstractView implements LayeredView, ViewListener, GL3DView {
+public class LayeredView extends AbstractView implements ViewListener, GL3DView {
 
     protected ArrayList<JHVJP2View> layers = new ArrayList<JHVJP2View>();
     protected HashMap<JHVJP2View, Layer> jp2viewLookup = new HashMap<JHVJP2View, Layer>();
@@ -82,7 +82,6 @@ public class GL3DLayeredView extends AbstractView implements LayeredView, ViewLi
      * @return True if the view is visible
      * @see #toggleVisibility
      */
-    @Override
     public boolean isVisible(JHVJP2View view) {
         Layer layer = jp2viewLookup.get(view);
         if (layer != null)
@@ -100,7 +99,6 @@ public class GL3DLayeredView extends AbstractView implements LayeredView, ViewLi
      * @return Number of visible layers
      * @see #getNumLayers
      */
-    @Override
     public int getNumberOfVisibleLayer() {
         int result = 0;
         for (Layer layer : jp2viewLookup.values()) {
@@ -122,7 +120,6 @@ public class GL3DLayeredView extends AbstractView implements LayeredView, ViewLi
      *            View to toggle visibility
      * @see #isVisible
      */
-    @Override
     public void toggleVisibility(JHVJP2View view) {
         LinkedMovieManager.getActiveInstance().pauseLinkedMovies();
 
@@ -143,7 +140,6 @@ public class GL3DLayeredView extends AbstractView implements LayeredView, ViewLi
      *            View to add as a new layer
      * @see #removeLayer
      */
-    @Override
     public void addLayer(JHVJP2View newLayer) {
         addLayer(newLayer, layers.size());
     }
@@ -157,7 +153,6 @@ public class GL3DLayeredView extends AbstractView implements LayeredView, ViewLi
      *            View to add as a new layer
      * @see #removeLayer
      */
-    @Override
     public void addLayer(JHVJP2View newView, int newIndex) {
         if (newView == null)
             return;
@@ -181,7 +176,6 @@ public class GL3DLayeredView extends AbstractView implements LayeredView, ViewLi
      *            Position within the stack of layers
      * @return View at given position
      */
-    @Override
     public JHVJP2View getLayer(int index) {
         try {
             return layers.get(index);
@@ -196,7 +190,6 @@ public class GL3DLayeredView extends AbstractView implements LayeredView, ViewLi
      * @return Number of layers
      * @see #getNumberOfVisibleLayer
      */
-    @Override
     public int getNumLayers() {
         return layers.size();
     }
@@ -212,7 +205,6 @@ public class GL3DLayeredView extends AbstractView implements LayeredView, ViewLi
      * @return Position of the view within stack
      * @see #moveView
      */
-    @Override
     public int getLayerLevel(JHVJP2View view) {
         return layers.indexOf(view);
     }
@@ -227,12 +219,10 @@ public class GL3DLayeredView extends AbstractView implements LayeredView, ViewLi
      *            View to remove from the LayeredView
      * @see #addLayer
      */
-    @Override
     public void removeLayer(JHVJP2View view) {
         removeLayer(view, true);
     }
 
-    @Override
     public void removeLayer(JHVJP2View view, boolean needAbolish) {
         if (view == null) {
             return;
@@ -265,7 +255,6 @@ public class GL3DLayeredView extends AbstractView implements LayeredView, ViewLi
      * Removes all layers of the layered view. This method should be preferred
      * over calling removeLayer(View) for every single layer.
      */
-    @Override
     public void removeAllLayers() {
         LinkedMovieManager.getActiveInstance().pauseLinkedMovies();
 
@@ -322,7 +311,6 @@ public class GL3DLayeredView extends AbstractView implements LayeredView, ViewLi
      * @see #getLayerLevel
      * @see #getLayer
      */
-    @Override
     public void moveView(JHVJP2View view, int newLevel) {
         if (layers.contains(view)) {
             layers.remove(view);

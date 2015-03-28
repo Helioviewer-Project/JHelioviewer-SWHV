@@ -26,7 +26,6 @@ import org.helioviewer.viewmodel.changeevent.LayerChangedReason;
 import org.helioviewer.viewmodel.changeevent.LayerChangedReason.LayerChangeType;
 import org.helioviewer.viewmodel.changeevent.RegionChangedReason;
 import org.helioviewer.viewmodel.changeevent.ViewportChangedReason;
-import org.helioviewer.viewmodel.view.GL3DLayeredView;
 import org.helioviewer.viewmodel.view.ImageInfoView;
 import org.helioviewer.viewmodel.view.LayeredView;
 import org.helioviewer.viewmodel.view.View;
@@ -55,7 +54,7 @@ public class LayersModel implements UIViewListener {
     private int activeLayer = -1;
     private final ArrayList<LayersListener> layerListeners = new ArrayList<LayersListener>();
 
-    private final GL3DLayeredView layeredView;
+    private final LayeredView layeredView;
 
     /**
      * Method returns the sole instance of this class.
@@ -72,7 +71,7 @@ public class LayersModel implements UIViewListener {
     }
 
     private LayersModel() {
-        layeredView = new GL3DLayeredView();
+        layeredView = new LayeredView();
         UIViewListenerDistributor.getSingletonInstance().addViewListener(this);
     }
 
