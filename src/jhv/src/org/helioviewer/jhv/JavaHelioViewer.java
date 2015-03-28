@@ -222,9 +222,6 @@ public class JavaHelioViewer {
         Log.info("Use cache directory: " + JHVDirectory.CACHE.getPath());
         JP2Image.setCachePath(JHVDirectory.CACHE.getFile());
 
-        Log.info("Update settings");
-        Settings.getSingletonInstance().update();
-
         /* ----------Setup FFmpeg ----------- */
         splash.nextStep();
         splash.setProgressText("Initialize FFmpeg...");
@@ -270,6 +267,8 @@ public class JavaHelioViewer {
 
                     LayerTableOverlapWatcher overlapWatcher = new LayerTableOverlapWatcher();
                     LayersModel.getSingletonInstance().addLayersListener(overlapWatcher);
+
+                    Settings.getSingletonInstance().update();
                 }
             });
         } catch (Exception ex) {
