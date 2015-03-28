@@ -25,9 +25,6 @@ public class RenderableContainer implements TableModel, Reorderable {
         RenderableSolarAxesType gridType = new RenderableSolarAxesType("Grids");
         addRenderable(new RenderableGrid(gridType, false));
 
-        addRenderable(new RenderableSolarAxes(solarAxesType));
-        addRenderable(new RenderableGrid(gridType, false));
-
     }
 
     public void addRenderable(Renderable renderable) {
