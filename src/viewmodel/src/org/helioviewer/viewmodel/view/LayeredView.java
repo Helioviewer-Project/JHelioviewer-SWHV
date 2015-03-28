@@ -315,8 +315,6 @@ public class LayeredView extends AbstractView implements ViewListener, GL3DView 
         if (layers.contains(view)) {
             layers.remove(view);
             layers.add(newLevel, view);
-            ChangeEvent event = new ChangeEvent(new LayerChangedReason(this, LayerChangeType.LAYER_MOVED, view, newLevel));
-            notifyViewListeners(event);
         }
     }
 
