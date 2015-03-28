@@ -11,7 +11,7 @@ import org.helioviewer.viewmodel.view.View;
 public class LayerChangedReason implements ChangedReason {
 
     public enum LayerChangeType {
-        LAYER_ADDED, LAYER_REMOVED, LAYER_VISIBILITY, LAYER_MOVED
+        LAYER_ADDED, LAYER_REMOVED, LAYER_VISIBILITY
     }
 
     // memorizes the associated view which has generated the ChangeReason
@@ -37,7 +37,6 @@ public class LayerChangedReason implements ChangedReason {
      *            First sub view of the layer which has changed.
      * */
     public LayerChangedReason(View aView, LayerChangeType aType, View aSubView) {
-
         // memorize passed values
         view = aView;
         type = aType;
