@@ -25,14 +25,14 @@ public class GL3DLayeredView extends AbstractView implements LayeredView, ViewLi
     protected class Layer {
         public LayerDescriptor ld = new LayerDescriptor();
 
-        public Layer(JHVJP2View view) {
+        public Layer(JHVJP2View view, String name) {
             ImmutableDateTime dt = view.getMetaData().getDateTime();
 
             ld.isMovie = view instanceof JHVJPXView;
             ld.isMaster = ld.isMovie ? LinkedMovieManager.getActiveInstance().isMaster((JHVJPXView) view) : false;
             ld.isVisible = true;
             ld.isTimed = dt != null;
-            ld.title = view.toString();
+            ld.title = name;
             ld.timestamp = ld.isTimed ? dt.getCachedDate() : "N/A";
         }
     }
@@ -108,11 +108,11 @@ public class GL3DLayeredView extends AbstractView implements LayeredView, ViewLi
 
         LinkedMovieManager.getActiveInstance().pauseLinkedMovies();
 
-        layers.add(newIndex, newView);
-        jp2viewLookup.put(newView, new Layer(newView));
-
-        newView.addViewListener(this);
         GL3DImageLayer imageLayer = new GL3DImageLayer("", newView, true, true, true);
+
+        layers.add(newIndex, newView);
+        jp2viewLookup.put(newView, new Layer(newView, imageLayer.getName()));
+        newView.addViewListener(this);
 
         ChangeEvent event = new ChangeEvent(new LayerChangedReason(this, LayerChangeType.LAYER_ADDED, newView));
         notifyViewListeners(event);
