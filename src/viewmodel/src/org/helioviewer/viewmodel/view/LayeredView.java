@@ -121,12 +121,10 @@ public class LayeredView extends AbstractView implements ViewListener, GL3DView 
      * @see #isVisible
      */
     public void toggleVisibility(JHVJP2View view) {
-        LinkedMovieManager.getActiveInstance().pauseLinkedMovies();
-
         Layer layer = jp2viewLookup.get(view);
         if (layer != null) {
+            LinkedMovieManager.getActiveInstance().pauseLinkedMovies();
             layer.ld.isVisible = !layer.ld.isVisible;
-            notifyViewListeners(new ChangeEvent(new LayerChangedReason(this, LayerChangeType.LAYER_VISIBILITY, view)));
         }
     }
 

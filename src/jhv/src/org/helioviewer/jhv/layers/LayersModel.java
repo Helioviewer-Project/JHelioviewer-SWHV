@@ -398,6 +398,10 @@ public class LayersModel extends AbstractTableModel implements UIViewListener {
     public void setVisible(JHVJP2View view, boolean visible) {
         if (layeredView.isVisible(view) != visible) {
             layeredView.toggleVisibility(view);
+
+            ImageViewerGui.getSingletonInstance().getMoviePanelContainer().layerVisibilityChanged(view);
+            int idx = findView(view);
+            fireTableRowsUpdated(idx, idx);
         }
     }
 
@@ -451,15 +455,6 @@ public class LayersModel extends AbstractTableModel implements UIViewListener {
 
                 updateData();
                 fireTableRowsDeleted(oldIndex, oldIndex);
-            } else if (type == LayerChangedReason.LayerChangeType.LAYER_VISIBILITY) {
-                layerReason.setProcessed(true);
-                JHVJP2View view = (JHVJP2View) layerReason.getSubView();
-                int idx = findView(view);
-                if (idx != -1) {
-                    ImageViewerGui.getSingletonInstance().getMoviePanelContainer().layerVisibilityChanged(view);
-
-                    fireTableRowsUpdated(idx, idx);
-                }
             }
         }
     }
