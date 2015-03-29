@@ -176,35 +176,6 @@ public class LayersModel extends AbstractTableModel implements UIViewListener {
     }
 
     /**
-     * Return the current timestamp of the given layer, return an empty string
-     * if no timing information is available
-     *
-     * @param idx
-     *            - Index of the layer in question
-     * @return timestamp, null if no timing information is available
-     */
-    public ImmutableDateTime getCurrentFrameTimestamp(int idx) {
-        JHVJP2View view = this.getLayer(idx);
-        return getCurrentFrameTimestamp(view);
-    }
-
-    /**
-     * Return the current timestamp of the given layer, return an empty string
-     * if no timing information is available
-     *
-     * @param view
-     *            - View that can be associated with the layer in question
-     * @return timestamp, null if no timing information is available
-     */
-    public ImmutableDateTime getCurrentFrameTimestamp(JHVJP2View view) {
-        if (view != null) {
-            // null for PixelBasedMetaData
-            return view.getMetaData().getDateTime();
-        }
-        return null;
-    }
-
-    /**
      * Return the timestamp of the first available image data of the layer in
      * question
      *
@@ -219,7 +190,7 @@ public class LayersModel extends AbstractTableModel implements UIViewListener {
         if (view instanceof JHVJPXView) {
             result = ((JHVJPXView) view).getFrameDateTime(0);
         } else {
-            result = getCurrentFrameTimestamp(view);
+            result = view.getMetaData().getDateTime();
         }
 
         return result;
@@ -235,8 +206,7 @@ public class LayersModel extends AbstractTableModel implements UIViewListener {
      *         information available
      */
     public ImmutableDateTime getStartDate(int idx) {
-        JHVJP2View view = this.getLayer(idx);
-        return this.getStartDate(view);
+        return getStartDate(getLayer(idx));
     }
 
     public Interval<Date> getFrameInterval() {
@@ -282,7 +252,7 @@ public class LayersModel extends AbstractTableModel implements UIViewListener {
             int lastFrame = tmv.getMaximumFrameNumber();
             result = tmv.getFrameDateTime(lastFrame);
         } else {
-            result = getCurrentFrameTimestamp(view);
+            result = view.getMetaData().getDateTime();
         }
         return result;
     }
@@ -319,8 +289,7 @@ public class LayersModel extends AbstractTableModel implements UIViewListener {
      *         information available
      */
     public ImmutableDateTime getEndDate(int idx) {
-        JHVJP2View view = this.getLayer(idx);
-        return this.getEndDate(view);
+        return getEndDate(getLayer(idx));
     }
 
     /**
@@ -695,7 +664,7 @@ public class LayersModel extends AbstractTableModel implements UIViewListener {
      * @return true if the layer in question has timing information
      */
     public boolean isTimed(int idx) {
-        return isTimed(this.getLayer(idx));
+        return isTimed(getLayer(idx));
     }
 
     /**
@@ -706,10 +675,7 @@ public class LayersModel extends AbstractTableModel implements UIViewListener {
      * @return true if the layer in question has timing information
      */
     public boolean isTimed(JHVJP2View view) {
-        if (getCurrentFrameTimestamp(view) != null) {
-            return true;
-        }
-        return false;
+        return layeredView.getLayerDescriptor(view).isTimed;
     }
 
     /**
