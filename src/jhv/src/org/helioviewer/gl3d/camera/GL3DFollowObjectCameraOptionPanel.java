@@ -331,11 +331,10 @@ public class GL3DFollowObjectCameraOptionPanel extends GL3DCameraOptionPanel imp
     }
 
     private void syncWithLayerCurrentTime() {
-        ImmutableDateTime helpDate = null;
-        helpDate = LayersModel.getSingletonInstance().getCurrentFrameTimestamp(LayersModel.getSingletonInstance().getActiveLayer());
+        Date lastDate = Displayer.getLastUpdatedTimestamp();
         Date currentDate = null;
-        if (helpDate != null) {
-            currentDate = helpDate.getTime();
+        if (lastDate != null) {
+            currentDate = lastDate;
         }
         if (currentDate == null) {
             currentDate = new Date(System.currentTimeMillis());

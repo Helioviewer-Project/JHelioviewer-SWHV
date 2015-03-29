@@ -47,8 +47,8 @@ public class LayerTableSelectionModel extends DefaultListSelectionModel implemen
     }
 
     public void activeLayerChanged(View view) {
-        super.setSelectionInterval(LayersModel.getSingletonInstance().getActiveLayer(),
-                                   LayersModel.getSingletonInstance().getActiveLayer());
+        int idx = LayersModel.getSingletonInstance().getActiveLayer();
+        super.setSelectionInterval(idx, idx);
     }
 
     /**
