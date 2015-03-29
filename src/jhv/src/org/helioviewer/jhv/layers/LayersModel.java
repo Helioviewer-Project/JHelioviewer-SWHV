@@ -9,13 +9,13 @@ import java.util.ArrayList;
 import java.util.Date;
 
 import javax.swing.JOptionPane;
+import javax.swing.table.AbstractTableModel;
 
 import org.helioviewer.base.math.Interval;
 import org.helioviewer.jhv.gui.ImageViewerGui;
 import org.helioviewer.jhv.gui.UIViewListener;
 import org.helioviewer.jhv.gui.UIViewListenerDistributor;
 import org.helioviewer.jhv.gui.components.MoviePanel;
-import org.helioviewer.jhv.gui.components.layerTable.LayerTableModel;
 //import org.helioviewer.jhv.gui.components.statusplugins.PositionStatusPanel;
 import org.helioviewer.jhv.gui.components.statusplugins.ZoomStatusPanel;
 import org.helioviewer.jhv.gui.dialogs.MetaDataDialog;
@@ -47,7 +47,7 @@ import org.helioviewer.viewmodel.view.jp2view.datetime.ImmutableDateTime;
  *
  * @author Malte Nuhn
  */
-public class LayersModel implements UIViewListener {
+public class LayersModel extends AbstractTableModel implements UIViewListener {
 
     private static final LayersModel layersModel = new LayersModel();
 
@@ -55,6 +55,7 @@ public class LayersModel implements UIViewListener {
     private final ArrayList<LayersListener> layerListeners = new ArrayList<LayersListener>();
 
     private static final LayeredView layeredView = new LayeredView();
+    private static final ArrayList<JHVJP2View> views = new ArrayList<JHVJP2View>();
 
     /**
      * Method returns the sole instance of this class.
@@ -77,6 +78,46 @@ public class LayersModel implements UIViewListener {
     public LayeredView getLayeredView() {
         return layeredView;
     }
+
+    /* <LayerTableModel> */
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public int getRowCount() {
+        return views.size();
+    }
+
+    /**
+     * {@inheritDoc} Hardcoded value of columns. This value is dependent on the
+     * actual design of the LayerTable
+     */
+    @Override
+    public int getColumnCount() {
+        return 4;
+    }
+
+    /**
+     * Return the LayerDescriptor for the given row of the table, regardless
+     * which column is requested.
+     */
+    @Override
+    public Object getValueAt(int idx, int col) {
+        if (idx >= 0 && idx < views.size()) {
+            return layeredView.getLayerDescriptor(views.get(idx));
+        }
+        return null;
+    }
+
+    private void updateData() {
+        views.clear();
+        for (int i = layeredView.getNumLayers() - 1; i >= 0; i--) {
+            views.add(layeredView.getLayer(i));
+        }
+    }
+
+    /* </LayerTableModel> */
 
     /**
      * Return the view associated with the active Layer
@@ -372,6 +413,11 @@ public class LayersModel implements UIViewListener {
         }
     }
 
+    public void setVisibleLink(int idx, boolean visible) {
+        setVisibleLink(getLayer(idx), visible);
+    }
+
+
     /**
      * Change the visibility of the layer in question
      *
@@ -423,6 +469,9 @@ public class LayersModel implements UIViewListener {
                 if (newIndex != -1) {
                     this.setActiveLayer(newIndex);
                     this.fireLayerAdded(newIndex);
+
+                    updateData();
+                    fireTableRowsInserted(newIndex, newIndex);
                 }
             } else if (type == LayerChangedReason.LayerChangeType.LAYER_REMOVED) {
                 layerReason.setProcessed(true);
@@ -430,13 +479,17 @@ public class LayersModel implements UIViewListener {
                 this.fireLayerRemoved(layerReason.getView(), oldIndex);
                 int newIndex = determineNewActiveLayer(oldIndex);
                 this.setActiveLayer(newIndex);
+
+                updateData();
+                fireTableRowsDeleted(oldIndex, oldIndex);
             } else if (type == LayerChangedReason.LayerChangeType.LAYER_VISIBILITY) {
                 layerReason.setProcessed(true);
                 JHVJP2View view = (JHVJP2View) layerReason.getSubView();
                 int idx = findView(view);
                 if (idx != -1) {
                     ImageViewerGui.getSingletonInstance().getMoviePanelContainer().layerVisibilityChanged(view);
-                    LayerTableModel.getSingletonInstance().layerVisibilityChanged(idx);
+
+                    fireTableRowsUpdated(idx, idx);
                 }
             }
         }
@@ -586,6 +639,10 @@ public class LayersModel implements UIViewListener {
         layeredView.removeLayer(view);
     }
 
+    public void removeLayer(int idx) {
+        layeredView.removeLayer(getLayer(idx));
+    }
+
     /**
      * Set the link-state of the layer in question
      *
@@ -673,7 +730,12 @@ public class LayersModel implements UIViewListener {
         }
 
         layeredView.moveView(view, level);
+        updateData();
         this.setActiveLayer(invertIndex(level));
+    }
+
+    public void moveLayerUp(int idx) {
+        moveLayerUp(getLayer(idx));
     }
 
     /**
@@ -694,7 +756,12 @@ public class LayersModel implements UIViewListener {
         }
 
         layeredView.moveView(view, level);
+        updateData();
         this.setActiveLayer(invertIndex(level));
+    }
+
+    public void moveLayerDown(int idx) {
+        moveLayerDown(getLayer(idx));
     }
 
     /**
