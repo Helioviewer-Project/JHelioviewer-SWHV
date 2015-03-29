@@ -186,9 +186,10 @@ public class ControlsPanel extends JPanel implements ActionListener, LayersListe
     }
 
     private void setEnabledStateOfPeriodMovieButton() {
-        final Interval<Date> frameInterval = LayersModel.getSingletonInstance().getFrameInterval();
+        Date start = LayersModel.getSingletonInstance().getFirstDate();
+        Date end = LayersModel.getSingletonInstance().getLastDate();
 
-        periodFromLayersButton.setEnabled(frameInterval.getStart() != null && frameInterval.getEnd() != null);
+        periodFromLayersButton.setEnabled(start != null && end != null);
     }
 
     @Override
