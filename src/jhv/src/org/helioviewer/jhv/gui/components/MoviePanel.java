@@ -446,7 +446,7 @@ public class MoviePanel extends JPanel implements ActionListener, ChangeListener
     public void actionPerformed(ActionEvent e) {
         if (e.getSource() == advancedButton) {
             this.setAdvanced(!MoviePanel.isAdvanced);
-            ImageViewerGui.getSingletonInstance().getMoviePanelContainer().updateActiveView();
+            ImageViewerGui.getSingletonInstance().getMoviePanelContainer().ensureSize();
 
             // Toggle play/pause
         } else if (e.getSource() == playPauseButton) {
