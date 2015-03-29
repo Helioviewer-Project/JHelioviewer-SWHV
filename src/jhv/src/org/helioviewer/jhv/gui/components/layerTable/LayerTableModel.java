@@ -42,14 +42,14 @@ public class LayerTableModel extends AbstractTableModel implements LayersListene
 
     public boolean isVisible(int index) {
         if (index >= 0 && index < views.size()) {
-            return layersModel.isVisible(views.get(index));
+            return layeredView.isVisible(views.get(index));
         }
         return false;
     }
 
     public void removeLayer(int index) {
         if (index >= 0 && index < views.size()) {
-            layersModel.removeLayer(views.get(index));
+            layeredView.removeLayer(views.get(index));
         }
     }
 
@@ -110,7 +110,7 @@ public class LayerTableModel extends AbstractTableModel implements LayersListene
     @Override
     public Object getValueAt(int idx, int col) {
         if (idx >= 0 && idx < views.size()) {
-            return layersModel.getDescriptor(views.get(idx));
+            return layeredView.getLayerDescriptor(views.get(idx));
         }
         return null;
     }

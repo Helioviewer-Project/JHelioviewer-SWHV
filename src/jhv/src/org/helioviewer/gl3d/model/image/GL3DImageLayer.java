@@ -66,7 +66,7 @@ public class GL3DImageLayer implements Renderable {
     private int positionBufferSize;
     private final JHVJP2View mainLayerView;
     private final RenderableType type;
-    private boolean isVisible = true;;
+    private boolean isVisible = true;
 
     public GL3DImageLayer(String name, JHVJP2View mainLayerView, boolean showSphere, boolean showCorona, boolean restoreColorMask) {
         this.type = new RenderableImageType(mainLayerView.getName());
