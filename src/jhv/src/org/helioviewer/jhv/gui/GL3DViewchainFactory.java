@@ -77,8 +77,8 @@ public class GL3DViewchainFactory {
      *            LayeredView.
      */
 
-    public void addLayerToViewchainMain(JHVJP2View newLayer, View attachToViewchain) {
-        if (newLayer == null || attachToViewchain == null)
+    public void addLayerToViewchainMain(JHVJP2View newLayer) {
+        if (newLayer == null)
             return;
 
         // Fetch LayeredView

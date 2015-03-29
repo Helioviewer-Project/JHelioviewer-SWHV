@@ -356,7 +356,7 @@ public class APIRequestManager {
             @Override
             public void run() {
                 GL3DViewchainFactory factory = StateController.getInstance().getCurrentState().getViewchainFactory();
-                factory.addLayerToViewchainMain(theView, ImageViewerGui.getSingletonInstance().getMainView());
+                factory.addLayerToViewchainMain(theView);
             }
 
             public Runnable init(JHVJP2View theView) {
@@ -399,4 +399,5 @@ public class APIRequestManager {
             return loadImageSeries(addToViewChain, observatory, instrument, detector, measurement, startTime, endTime, cadence, message);
         }
     }
+
 }
