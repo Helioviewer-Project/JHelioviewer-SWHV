@@ -27,10 +27,11 @@ public class LayerTableModel extends AbstractTableModel implements LayersListene
     public static final int COLUMN_TIMESTAMP = 2;
     public static final int COLUMN_BUTTON_REMOVE = 3;
 
-    /** The sole instance of this class. */
     private static final LayerTableModel layerTableModel = new LayerTableModel();
 
-    private final List<JHVJP2View> views;
+    private final LayersModel layersModel = LayersModel.getSingletonInstance();
+    private final LayeredView layeredView = layersModel.getLayeredView();
+    private static final ArrayList<JHVJP2View> views = new ArrayList<JHVJP2View>();
 
     /**
      * Returns the only instance of this class.
@@ -42,26 +43,25 @@ public class LayerTableModel extends AbstractTableModel implements LayersListene
     }
 
     private LayerTableModel() {
-        views = new ArrayList<JHVJP2View>();
-        LayersModel.getSingletonInstance().addLayersListener(this);
+        layersModel.addLayersListener(this);
     }
 
     public void setVisible(int index, boolean visible) {
         if (index >= 0 && index < views.size()) {
-            LayersModel.getSingletonInstance().setVisibleLink(views.get(index), visible);
+            layersModel.setVisibleLink(views.get(index), visible);
         }
     }
 
     public boolean isVisible(int index) {
         if (index >= 0 && index < views.size()) {
-            return LayersModel.getSingletonInstance().isVisible(views.get(index));
+            return layersModel.isVisible(views.get(index));
         }
         return false;
     }
 
     public void removeLayer(int index) {
         if (index >= 0 && index < views.size()) {
-            LayersModel.getSingletonInstance().removeLayer(views.get(index));
+            layersModel.removeLayer(views.get(index));
         }
     }
 
@@ -78,11 +78,11 @@ public class LayerTableModel extends AbstractTableModel implements LayersListene
             if (newLevel < views.size() - 1) {
                 newLevel++;
             }
-            LayeredView lv = LayersModel.getSingletonInstance().getLayeredView();
-            if (lv != null) {
-                lv.moveView(views.get(index), newLevel);
-                LayersModel.getSingletonInstance().setActiveLayer(invertIndex(newLevel));
-            }
+
+            layeredView.moveView(views.get(index), newLevel);
+            updateData();
+            layersModel.setActiveLayer(views.get(newLevel));
+            fireTableRowsUpdated(0, views.size()); // tbd
         }
     }
 
@@ -92,20 +92,12 @@ public class LayerTableModel extends AbstractTableModel implements LayersListene
             if (newLevel > 0) {
                 newLevel--;
             }
-            LayeredView lv = LayersModel.getSingletonInstance().getLayeredView();
-            if (lv != null) {
-                lv.moveView(views.get(index), newLevel);
-                LayersModel.getSingletonInstance().setActiveLayer(invertIndex(newLevel));
-            }
-        }
-    }
 
-    private int invertIndex(int idx) {
-        // invert indices
-        if (idx >= 0 && views.size() > 0) {
-            idx = views.size() - 1 - idx;
+            layeredView.moveView(views.get(index), newLevel);
+            updateData();
+            layersModel.setActiveLayer(views.get(newLevel));
+            fireTableRowsUpdated(0, views.size()); // tbd
         }
-        return idx;
     }
 
     /**
@@ -130,14 +122,11 @@ public class LayerTableModel extends AbstractTableModel implements LayersListene
      * which column is requested.
      */
     @Override
-    public Object getValueAt(int row, int col) {
-        int idx = row;
+    public Object getValueAt(int idx, int col) {
         if (idx >= 0 && idx < views.size()) {
-            return LayersModel.getSingletonInstance().getDescriptor(views.get(idx));
-        } else {
-            return null;
+            return layersModel.getDescriptor(views.get(idx));
         }
-
+        return null;
     }
 
     /**
@@ -148,11 +137,6 @@ public class LayerTableModel extends AbstractTableModel implements LayersListene
     public void layerAdded(int newIndex) {
         updateData();
         fireTableRowsInserted(newIndex, newIndex);
-    }
-
-    public void layerVisibilityChanged(int idx) {
-        updateData();
-        fireTableRowsUpdated(idx, idx);
     }
 
     /**
@@ -172,13 +156,14 @@ public class LayerTableModel extends AbstractTableModel implements LayersListene
     public void activeLayerChanged(View view) {
     }
 
+    public void layerVisibilityChanged(int idx) {
+        fireTableRowsUpdated(idx, idx);
+    }
+
     private void updateData() {
-        LayeredView lv = LayersModel.getSingletonInstance().getLayeredView();
         views.clear();
-        if (lv != null) {
-            for (int i = lv.getNumLayers() - 1; i >= 0; i--) {
-                views.add(lv.getLayer(i));
-            }
+        for (int i = layeredView.getNumLayers() - 1; i >= 0; i--) {
+            views.add(layeredView.getLayer(i));
         }
     }
 
