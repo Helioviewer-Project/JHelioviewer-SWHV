@@ -597,11 +597,22 @@ public class LayersModel extends AbstractTableModel implements UIViewListener {
      *            - View that can be associated with the layer in question
      */
     public void removeLayer(JHVJP2View view) {
+        if (view == null) {
+            return;
+        }
+
+        if (view instanceof JHVJPXView) {
+            MoviePanel moviePanel = MoviePanel.getMoviePanel((JHVJPXView) view);
+            if (moviePanel != null) {
+                moviePanel.remove();
+            }
+        }
+
         layeredView.removeLayer(view);
     }
 
     public void removeLayer(int idx) {
-        layeredView.removeLayer(getLayer(idx));
+        removeLayer(getLayer(idx));
     }
 
     /**
