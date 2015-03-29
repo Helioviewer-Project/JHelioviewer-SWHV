@@ -10,8 +10,6 @@ import org.helioviewer.gl3d.scenegraph.GL3DState;
 import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.layers.LayerDescriptor;
 import org.helioviewer.viewmodel.changeevent.ChangeEvent;
-import org.helioviewer.viewmodel.changeevent.LayerChangedReason;
-import org.helioviewer.viewmodel.changeevent.LayerChangedReason.LayerChangeType;
 import org.helioviewer.viewmodel.view.jp2view.JHVJP2View;
 import org.helioviewer.viewmodel.view.jp2view.JHVJPXView;
 import org.helioviewer.viewmodel.view.jp2view.datetime.ImmutableDateTime;
@@ -138,8 +136,8 @@ public class LayeredView extends AbstractView implements ViewListener, GL3DView 
      *            View to add as a new layer
      * @see #removeLayer
      */
-    public void addLayer(JHVJP2View newLayer) {
-        addLayer(newLayer, layers.size());
+    public int addLayer(JHVJP2View newLayer) {
+        return addLayer(newLayer, layers.size());
     }
 
     /**
@@ -151,9 +149,9 @@ public class LayeredView extends AbstractView implements ViewListener, GL3DView 
      *            View to add as a new layer
      * @see #removeLayer
      */
-    public void addLayer(JHVJP2View newView, int newIndex) {
+    public int addLayer(JHVJP2View newView, int newIndex) {
         if (newView == null)
-            return;
+            return -1;
 
         LinkedMovieManager.getActiveInstance().pauseLinkedMovies();
 
@@ -163,8 +161,7 @@ public class LayeredView extends AbstractView implements ViewListener, GL3DView 
         jp2viewLookup.put(newView, new Layer(newView, imageLayer.getName()));
         newView.addViewListener(this);
 
-        ChangeEvent event = new ChangeEvent(new LayerChangedReason(this, LayerChangeType.LAYER_ADDED, newView));
-        notifyViewListeners(event);
+        return newIndex;
     }
 
     /**
@@ -217,18 +214,18 @@ public class LayeredView extends AbstractView implements ViewListener, GL3DView 
      *            View to remove from the LayeredView
      * @see #addLayer
      */
-    public void removeLayer(JHVJP2View view) {
-        removeLayer(view, true);
+    public int removeLayer(JHVJP2View view) {
+        return removeLayer(view, true);
     }
 
-    public void removeLayer(JHVJP2View view, boolean needAbolish) {
+    public int removeLayer(JHVJP2View view, boolean needAbolish) {
         if (view == null) {
-            return;
+            return -1;
         }
 
         int index = layers.indexOf(view);
         if (index == -1) {
-            return;
+            return -1;
         }
 
         LinkedMovieManager.getActiveInstance().pauseLinkedMovies();
@@ -245,34 +242,7 @@ public class LayeredView extends AbstractView implements ViewListener, GL3DView 
             jp2.removeRenderListener();
         }
 
-        ChangeEvent event = new ChangeEvent(new LayerChangedReason(this, LayerChangeType.LAYER_REMOVED, view, index));
-        notifyViewListeners(event);
-    }
-
-    /**
-     * Removes all layers of the layered view. This method should be preferred
-     * over calling removeLayer(View) for every single layer.
-     */
-    public void removeAllLayers() {
-        LinkedMovieManager.getActiveInstance().pauseLinkedMovies();
-
-        ChangeEvent event = new ChangeEvent();
-        for (View view : layers) {
-            int index = layers.indexOf(view);
-            view.removeViewListener(this);
-
-            JHVJP2View jp2 = view.getAdapter(JHVJP2View.class);
-            if (jp2 != null) {
-                jp2.abolish();
-                jp2.removeRenderListener();
-            }
-
-            event.addReason(new LayerChangedReason(this, LayerChangeType.LAYER_REMOVED, view, index));
-        }
-        layers.clear();
-        jp2viewLookup.clear();
-
-        notifyViewListeners(event);
+        return index;
     }
 
     /**

@@ -81,39 +81,26 @@ public class GL3DViewchainFactory {
         if (newLayer == null)
             return;
 
-        // Fetch LayeredView
-        LayeredView layeredView = LayersModel.getSingletonInstance().getLayeredView();
+        LayersModel lm = LayersModel.getSingletonInstance();
+        ImageViewerGui ivg = ImageViewerGui.getSingletonInstance();
 
-        synchronized (layeredView) {
-            // wait until image is loaded
-            while (newLayer.getSubimageData() == null) {
-                try {
-                    Thread.sleep(100);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
+        lm.addLayer(newLayer);
 
+        // If MoviewView, add MoviePanel
+        if (newLayer instanceof MovieView) {
+            MoviePanel moviePanel = new MoviePanel((MovieView) newLayer);
+            if (lm.isTimed(newLayer)) {
+                lm.setLink(newLayer, true);
             }
 
-            // Add layer
-            layeredView.addLayer(newLayer);
-
-            // If MoviewView, add MoviePanel
-            if (newLayer instanceof MovieView) {
-                MoviePanel moviePanel = new MoviePanel((MovieView) newLayer);
-                if (LayersModel.getSingletonInstance().isTimed(newLayer)) {
-                    LayersModel.getSingletonInstance().setLink(newLayer, true);
-                }
-
-                ImageViewerGui.getSingletonInstance().getMoviePanelContainer().addLayer(newLayer, moviePanel);
-            } else {
-                MoviePanel moviePanel = new MoviePanel(null);
-                ImageViewerGui.getSingletonInstance().getMoviePanelContainer().addLayer(newLayer, moviePanel);
-            }
-
-            ImageViewerGui.getSingletonInstance().getLeftContentPane().expand(ImageViewerGui.getSingletonInstance().getFilterPanelContainer());
-            LayersModel.getSingletonInstance().setActiveLayer(newLayer);
+            ivg.getMoviePanelContainer().addLayer(newLayer, moviePanel);
+        } else {
+            MoviePanel moviePanel = new MoviePanel(null);
+            ivg.getMoviePanelContainer().addLayer(newLayer, moviePanel);
         }
+
+        ivg.getLeftContentPane().expand(ivg.getFilterPanelContainer());
+        lm.setActiveLayer(newLayer);
     }
 
     /**
