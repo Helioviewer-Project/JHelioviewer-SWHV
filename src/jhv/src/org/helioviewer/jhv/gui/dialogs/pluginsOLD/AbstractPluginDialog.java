@@ -260,7 +260,6 @@ public abstract class AbstractPluginDialog extends JDialog implements ShowableDi
      * parts from plug ins.
      */
     private void recreateViewChains() {
-
         // ViewchainFactory chainFactory = new ViewchainFactory();
         GL3DViewchainFactory chainFactory = StateController.getInstance().getCurrentState().getViewchainFactory();
 
@@ -293,7 +292,7 @@ public abstract class AbstractPluginDialog extends JDialog implements ShowableDi
 
         // re-add layers in order to rebuild viewchain
         for (JHVJP2View imageView : newImageInfoViews) {
-            chainFactory.addLayerToViewchainMain(imageView, mainLayeredView);
+            chainFactory.addLayerToViewchainMain(imageView);
         }
 
         // Update all OverlayViews which are included in the view chain above
