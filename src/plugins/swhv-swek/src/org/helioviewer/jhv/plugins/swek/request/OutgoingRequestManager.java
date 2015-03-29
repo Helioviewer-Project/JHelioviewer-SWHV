@@ -30,7 +30,7 @@ public class OutgoingRequestManager implements LayersListener {
      * private constructor
      */
     private OutgoingRequestManager() {
-        swekEventHandler = SWEKEventHandler.getSingletonInstace();
+        swekEventHandler = SWEKEventHandler.getSingletonInstance();
     }
 
     /**
