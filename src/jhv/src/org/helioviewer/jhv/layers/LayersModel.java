@@ -419,39 +419,6 @@ public class LayersModel extends AbstractTableModel implements UIViewListener {
         return isVisible(getLayer(idx));
     }
 
-    private void handleLayerChanges(View sender, ChangeEvent aEvent) {
-        LayerChangedReason layerReason = aEvent.getLastChangedReasonByType(LayerChangedReason.class);
-
-        // if layers were changed, perform same operations on GUI
-        if (layerReason != null && !layerReason.getProcessed()) {
-            LayerChangeType type = layerReason.getLayerChangeType();
-            // If layer was deleted, delete corresponding panel
-            if (type == LayerChangedReason.LayerChangeType.LAYER_ADDED) {
-                layerReason.setProcessed(true);
-
-                JHVJP2View view = (JHVJP2View) layerReason.getSubView();
-                int newIndex = findView(view);
-                if (newIndex != -1) {
-                    this.setActiveLayer(newIndex);
-                    this.fireLayerAdded(newIndex);
-
-                    updateData();
-                    fireTableRowsInserted(newIndex, newIndex);
-                }
-            } else if (type == LayerChangedReason.LayerChangeType.LAYER_REMOVED) {
-                layerReason.setProcessed(true);
-                int oldIndex = this.invertIndexDeleted(layerReason.getLayerIndex());
-
-                this.fireLayerRemoved(oldIndex);
-                int newIndex = determineNewActiveLayer(oldIndex);
-                this.setActiveLayer(newIndex);
-
-                updateData();
-                fireTableRowsDeleted(oldIndex, oldIndex);
-            }
-        }
-    }
-
     /**
      * View changed handler.
      *
@@ -460,7 +427,6 @@ public class LayersModel extends AbstractTableModel implements UIViewListener {
      */
     @Override
     public void UIviewChanged(View sender, ChangeEvent aEvent) {
-        handleLayerChanges(sender, aEvent);
     }
 
     /**
@@ -575,6 +541,21 @@ public class LayersModel extends AbstractTableModel implements UIViewListener {
         dialog.showDialog();
     }
 
+
+    public void addLayer(JHVJP2View view) {
+        if (view == null) {
+            return;
+        }
+
+        int newIndex = invertIndex(layeredView.addLayer(view));
+        fireLayerAdded(newIndex);
+
+        setActiveLayer(newIndex);
+
+        updateData();
+        fireTableRowsInserted(newIndex, newIndex);
+    }
+
     /**
      * Remove the layer in question
      *
@@ -593,7 +574,14 @@ public class LayersModel extends AbstractTableModel implements UIViewListener {
             }
         }
 
-        layeredView.removeLayer(view);
+        int oldIndex = invertIndexDeleted(layeredView.removeLayer(view));
+        fireLayerRemoved(oldIndex);
+
+        int newIndex = determineNewActiveLayer(oldIndex);
+        setActiveLayer(newIndex);
+
+        updateData();
+        fireTableRowsDeleted(oldIndex, oldIndex);
     }
 
     public void removeLayer(int idx) {
