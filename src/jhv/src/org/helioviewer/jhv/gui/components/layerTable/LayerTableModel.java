@@ -20,24 +20,8 @@ import org.helioviewer.viewmodel.view.jp2view.JHVJP2View;
  */
 public class LayerTableModel extends AbstractTableModel implements LayersListener {
 
-    private static final long serialVersionUID = 1167923521718778146L;
-
-    public static final int COLUMN_VISIBILITY = 0;
-    public static final int COLUMN_TITLE = 1;
-    public static final int COLUMN_TIMESTAMP = 2;
-    public static final int COLUMN_BUTTON_REMOVE = 3;
-
     private static final LayerTableModel layerTableModel = new LayerTableModel();
 
-    private final LayersModel layersModel = LayersModel.getSingletonInstance();
-    private final LayeredView layeredView = layersModel.getLayeredView();
-    private static final ArrayList<JHVJP2View> views = new ArrayList<JHVJP2View>();
-
-    /**
-     * Returns the only instance of this class.
-     *
-     * @return the only instance of this class.
-     * */
     public static LayerTableModel getSingletonInstance() {
         return layerTableModel;
     }
@@ -45,6 +29,10 @@ public class LayerTableModel extends AbstractTableModel implements LayersListene
     private LayerTableModel() {
         layersModel.addLayersListener(this);
     }
+
+    private final LayersModel layersModel = LayersModel.getSingletonInstance();
+    private final LayeredView layeredView = layersModel.getLayeredView();
+    private static final ArrayList<JHVJP2View> views = new ArrayList<JHVJP2View>();
 
     public void setVisible(int index, boolean visible) {
         if (index >= 0 && index < views.size()) {
