@@ -60,7 +60,7 @@ public class LayerTableSelectionModel extends DefaultListSelectionModel implemen
     /**
      * {@inheritDoc}
      */
-    public void layerRemoved(View oldView, int oldIndex) {
+    public void layerRemoved(int oldIndex) {
     }
 
 }

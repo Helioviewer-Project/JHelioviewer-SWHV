@@ -24,7 +24,7 @@ public abstract class ViewStatusPanelPlugin extends JLabel implements StatusPane
     /**
      * NOP default implementation
      */
-    public void layerRemoved(View oldView, int oldIdx) {
+    public void layerRemoved(int oldIdx) {
     }
 
 }

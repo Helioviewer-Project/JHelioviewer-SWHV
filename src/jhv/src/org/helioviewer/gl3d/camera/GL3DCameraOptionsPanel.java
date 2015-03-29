@@ -160,13 +160,13 @@ public class GL3DCameraOptionsPanel extends JPanel implements GL3DCameraSelectio
 
     @Override
     public void layerAdded(int idx) {
-        if (LayersModel.getSingletonInstance().getNumLayers() >= 0) {
+        if (LayersModel.getSingletonInstance().getNumLayers() > 0) {
             this.visactivate();
         }
     }
 
     @Override
-    public void layerRemoved(View oldView, int oldIdx) {
+    public void layerRemoved(int oldIdx) {
         if (LayersModel.getSingletonInstance().getNumLayers() == 0) {
             this.visdeactivate();
         }
