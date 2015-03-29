@@ -198,7 +198,7 @@ public class ControlsPanel extends JPanel implements ActionListener, LayersListe
     }
 
     @Override
-    public void layerRemoved(View oldView, int oldIdx) {
+    public void layerRemoved(int oldIdx) {
         setEnabledStateOfPeriodMovieButton();
     }
 

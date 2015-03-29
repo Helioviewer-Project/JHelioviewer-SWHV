@@ -408,7 +408,7 @@ public class ZoomController implements PlotAreaSpaceListener, LayersListener {
     }
 
     @Override
-    public void layerRemoved(View oldView, int oldIdx) {
+    public void layerRemoved(int oldIdx) {
     }
 
     @Override

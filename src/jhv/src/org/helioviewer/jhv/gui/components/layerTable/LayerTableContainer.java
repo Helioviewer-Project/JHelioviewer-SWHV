@@ -46,7 +46,7 @@ public class LayerTableContainer extends JPanel implements LayersListener {
     /**
      * Sync the state of this component with the state of the LayersModel
      */
-    public void update() {
+    private void update() {
         if (LayersModel.getSingletonInstance().getNumLayers() == 0) {
             cl.show(this, "empty");
         } else {
@@ -64,7 +64,7 @@ public class LayerTableContainer extends JPanel implements LayersListener {
     /**
      * Sync the state of this component if a layer has been added or removed
      */
-    public void layerRemoved(View oldView, int oldIndex) {
+    public void layerRemoved(int oldIndex) {
         update();
     }
 

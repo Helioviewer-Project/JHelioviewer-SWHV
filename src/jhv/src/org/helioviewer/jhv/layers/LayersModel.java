@@ -432,6 +432,7 @@ public class LayersModel extends AbstractTableModel implements UIViewListener {
             // If layer was deleted, delete corresponding panel
             if (type == LayerChangedReason.LayerChangeType.LAYER_ADDED) {
                 layerReason.setProcessed(true);
+
                 JHVJP2View view = (JHVJP2View) layerReason.getSubView();
                 int newIndex = findView(view);
                 if (newIndex != -1) {
@@ -444,7 +445,8 @@ public class LayersModel extends AbstractTableModel implements UIViewListener {
             } else if (type == LayerChangedReason.LayerChangeType.LAYER_REMOVED) {
                 layerReason.setProcessed(true);
                 int oldIndex = this.invertIndexDeleted(layerReason.getLayerIndex());
-                this.fireLayerRemoved(layerReason.getView(), oldIndex);
+
+                this.fireLayerRemoved(oldIndex);
                 int newIndex = determineNewActiveLayer(oldIndex);
                 this.setActiveLayer(newIndex);
 
@@ -792,9 +794,9 @@ public class LayersModel extends AbstractTableModel implements UIViewListener {
         return layeredView.getLayerDescriptor(view);
     }
 
-    private void fireLayerRemoved(View oldView, int oldIndex) {
+    private void fireLayerRemoved(int oldIndex) {
         for (LayersListener ll : layerListeners) {
-            ll.layerRemoved(oldView, oldIndex);
+            ll.layerRemoved(oldIndex);
         }
     }
 

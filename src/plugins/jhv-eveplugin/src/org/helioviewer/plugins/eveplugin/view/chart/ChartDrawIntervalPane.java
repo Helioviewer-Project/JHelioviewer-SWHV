@@ -710,7 +710,7 @@ public class ChartDrawIntervalPane extends JComponent implements ZoomControllerL
     }
 
     @Override
-    public void layerRemoved(View oldView, int oldIdx) {
+    public void layerRemoved(int oldIdx) {
         movieInterval = new Interval<Date>(LayersModel.getSingletonInstance().getFirstDate(), LayersModel.getSingletonInstance().getLastDate());
         View activeView = LayersModel.getSingletonInstance().getActiveView();
         if (activeView != null) {

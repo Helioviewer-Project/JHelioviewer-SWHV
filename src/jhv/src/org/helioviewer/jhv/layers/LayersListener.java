@@ -29,7 +29,7 @@ public interface LayersListener {
      * @param oldIdx
      *            - (old) index of the layer that has been removed
      */
-    public void layerRemoved(View oldView, int oldIdx);
+    public void layerRemoved(int oldIdx);
 
     /**
      * Gets fired if the active layer has changed (meaning, a new layer has

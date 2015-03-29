@@ -184,7 +184,7 @@ public class FilterTabPanelManager implements LayersListener {
     }
 
     @Override
-    public void layerRemoved(View oldView, int oldIdx) {
+    public void layerRemoved(int oldIdx) {
     }
 
     @Override

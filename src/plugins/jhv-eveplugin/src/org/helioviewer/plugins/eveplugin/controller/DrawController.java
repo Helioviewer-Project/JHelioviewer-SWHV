@@ -197,9 +197,8 @@ public class DrawController implements ZoomControllerListener, LineDataSelectorM
     }
 
     @Override
-    public void layerRemoved(View oldView, int oldIdx) {
-        View activeView = LayersModel.getSingletonInstance().getActiveView();
-        if (activeView == null) {
+    public void layerRemoved(int oldIdx) {
+        if (LayersModel.getSingletonInstance().getNumLayers() == 0) {
             fireRedrawRequestMovieFrameChanged(null);
         }
     }

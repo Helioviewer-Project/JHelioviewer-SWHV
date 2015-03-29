@@ -90,7 +90,7 @@ public class ControlPanelContainer extends JPanel implements LayersListener {
     /**
      * {@inheritDoc}
      */
-    public void layerRemoved(View oldView, int oldIndex) {
+    public void layerRemoved(int oldIndex) {
     }
 
 }
