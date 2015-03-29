@@ -8,7 +8,6 @@ import java.util.Date;
 import javax.swing.Timer;
 
 import org.helioviewer.jhv.layers.LayersModel;
-import org.helioviewer.jhv.gui.components.layerTable.LayerTableModel;
 import org.helioviewer.jhv.gui.components.MoviePanel;
 import org.helioviewer.jhv.gui.components.statusplugins.FramerateStatusPanel;
 import org.helioviewer.viewmodel.view.jp2view.JHVJP2View;
@@ -40,7 +39,6 @@ public class Displayer implements JHVEventHighlightListener {
     private final Timer timer = new Timer(1000 / 20, new MyListener());
 
     private static final LayersModel layersModel = LayersModel.getSingletonInstance();
-    private static final LayerTableModel tableModel = LayerTableModel.getSingletonInstance();
     private static final FramerateStatusPanel framerateStatus = FramerateStatusPanel.getSingletonInstance();
 
     private Displayer() {
@@ -105,8 +103,8 @@ public class Displayer implements JHVEventHighlightListener {
     public static void fireFrameChanged(JHVJP2View view, ImmutableDateTime dateTime) {
         int idx = layersModel.findView(view);
         if (idx != -1 /*layersModel.isValidIndex(idx)*/) {
-            // update LayerTableModel (timestamp labels)
-            tableModel.fireTableRowsUpdated(idx, idx);
+            // update timestamp labels
+            layersModel.fireTableRowsUpdated(idx, idx);
 
             if (idx == layersModel.getActiveLayer() && dateTime != null) {
                 framerateStatus.updateFramerate(layersModel.getFPS(view));

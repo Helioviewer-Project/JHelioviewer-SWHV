@@ -44,7 +44,7 @@ public class LayerTable extends JTable {
     public static final int ROW_HEIGHT = 25;
 
     public LayerTable() {
-        super(LayerTableModel.getSingletonInstance());
+        super(LayersModel.getSingletonInstance());
         this.setSelectionModel(LayerTableSelectionModel.getSingletonInstance());
 
         this.setTableHeader(null);
@@ -128,9 +128,9 @@ public class LayerTable extends JTable {
                 int index = row;
 
                 if (col == COLUMN_VISIBILITY) {
-                    LayerTableModel.getSingletonInstance().setVisible(index, !layersModel.isVisible(index));
+                    layersModel.setVisibleLink(index, !layersModel.isVisible(index));
                 } else if (col == COLUMN_BUTTON_REMOVE) {
-                    LayerTableModel.getSingletonInstance().removeLayer(index);
+                    layersModel.removeLayer(index);
                 }
             }
         });

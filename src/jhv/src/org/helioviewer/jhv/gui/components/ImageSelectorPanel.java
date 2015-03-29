@@ -24,7 +24,6 @@ import org.helioviewer.jhv.gui.IconBank.JHVIcon;
 import org.helioviewer.jhv.gui.ImageViewerGui;
 import org.helioviewer.jhv.gui.components.layerTable.LayerTable;
 import org.helioviewer.jhv.gui.components.layerTable.LayerTableContainer;
-import org.helioviewer.jhv.gui.components.layerTable.LayerTableModel;
 import org.helioviewer.jhv.gui.dialogs.model.ObservationDialogDateModel;
 import org.helioviewer.jhv.gui.dialogs.observation.ImageDataPanel;
 import org.helioviewer.jhv.layers.LayersListener;
@@ -163,7 +162,7 @@ public class ImageSelectorPanel extends JPanel implements LayersListener {
         @Override
         public void actionPerformed(ActionEvent arg0) {
             if (LayersModel.getSingletonInstance().getActiveView() != null) {
-                LayerTableModel.getSingletonInstance().moveLayerDown(layerTable.getSelectedRow());
+                LayersModel.getSingletonInstance().moveLayerDown(layerTable.getSelectedRow());
             }
         }
     };
@@ -193,8 +192,7 @@ public class ImageSelectorPanel extends JPanel implements LayersListener {
         @Override
         public void actionPerformed(ActionEvent arg0) {
             if (LayersModel.getSingletonInstance().getActiveView() != null) {
-                LayerTableModel.getSingletonInstance().moveLayerUp(layerTable.getSelectedRow());
-
+                LayersModel.getSingletonInstance().moveLayerUp(layerTable.getSelectedRow());
             }
         }
     };
