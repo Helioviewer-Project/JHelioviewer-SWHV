@@ -35,7 +35,11 @@ import org.helioviewer.viewmodel.view.jp2view.JHVJP2View;
  * @author Helge Dietert
  */
 public class LayerTable extends JTable {
-    private static final long serialVersionUID = 1L;
+
+    private static final int COLUMN_VISIBILITY = 0;
+    private static final int COLUMN_TITLE = 1;
+    private static final int COLUMN_TIMESTAMP = 2;
+    private static final int COLUMN_BUTTON_REMOVE = 3;
 
     public static final int ROW_HEIGHT = 25;
 
@@ -43,7 +47,6 @@ public class LayerTable extends JTable {
         super(LayerTableModel.getSingletonInstance());
         this.setSelectionModel(LayerTableSelectionModel.getSingletonInstance());
 
-        // set proper layout
         this.setTableHeader(null);
         this.setShowGrid(false);
         this.setRowSelectionAllowed(true);
@@ -124,9 +127,9 @@ public class LayerTable extends JTable {
                 }
                 int index = row;
 
-                if (col == LayerTableModel.COLUMN_VISIBILITY) {
+                if (col == COLUMN_VISIBILITY) {
                     LayerTableModel.getSingletonInstance().setVisible(index, !layersModel.isVisible(index));
-                } else if (col == LayerTableModel.COLUMN_BUTTON_REMOVE) {
+                } else if (col == COLUMN_BUTTON_REMOVE) {
                     LayerTableModel.getSingletonInstance().removeLayer(index);
                 }
             }
@@ -143,20 +146,20 @@ public class LayerTable extends JTable {
         Border border = BorderFactory.createMatteBorder(0, 0, 1, 0, Color.gray);
         Border descriptionIconBorder = border;
         DescriptorIconRenderer descriptorIconRenderer = new DescriptorIconRenderer(descriptionIconBorder);
-        descriptorIconRenderer.setFixedWidth(this, LayerTableModel.COLUMN_VISIBILITY);
-        getColumnModel().getColumn(LayerTableModel.COLUMN_VISIBILITY).setCellRenderer(descriptorIconRenderer);
+        descriptorIconRenderer.setFixedWidth(this, COLUMN_VISIBILITY);
+        getColumnModel().getColumn(COLUMN_VISIBILITY).setCellRenderer(descriptorIconRenderer);
 
-        getColumnModel().getColumn(LayerTableModel.COLUMN_TITLE).setCellRenderer(new DescriptorTitleRenderer(true));
-        getColumnModel().getColumn(LayerTableModel.COLUMN_TITLE).setPreferredWidth(38);
-        // getColumnModel().getColumn(LayerTableModel.COLUMN_TITLE).setWidth(5);
+        getColumnModel().getColumn(COLUMN_TITLE).setCellRenderer(new DescriptorTitleRenderer(true));
+        getColumnModel().getColumn(COLUMN_TITLE).setPreferredWidth(38);
+        // getColumnModel().getColumn(COLUMN_TITLE).setWidth(5);
 
-        getColumnModel().getColumn(LayerTableModel.COLUMN_TIMESTAMP).setCellRenderer(new DescriptorTimestampRenderer(true));
-        // getColumnModel().getColumn(LayerTableModel.COLUMN_TIMESTAMP).setPreferredWidth(15);
+        getColumnModel().getColumn(COLUMN_TIMESTAMP).setCellRenderer(new DescriptorTimestampRenderer(true));
+        // getColumnModel().getColumn(COLUMN_TIMESTAMP).setPreferredWidth(15);
 
         Border removeIconBorder = border;
         IconRenderer iconRenderer = new IconRenderer("Remove Layer", IconBank.getIcon(JHVIcon.REMOVE_LAYER), removeIconBorder);
-        iconRenderer.setFixedWidth(this, LayerTableModel.COLUMN_BUTTON_REMOVE);
-        getColumnModel().getColumn(LayerTableModel.COLUMN_BUTTON_REMOVE).setCellRenderer(iconRenderer);
+        iconRenderer.setFixedWidth(this, COLUMN_BUTTON_REMOVE);
+        getColumnModel().getColumn(COLUMN_BUTTON_REMOVE).setCellRenderer(iconRenderer);
     }
 
 }
