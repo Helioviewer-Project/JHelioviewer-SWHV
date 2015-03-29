@@ -36,14 +36,14 @@ public class Displayer implements JHVEventHighlightListener {
 
     private static boolean torender = false;
     private static boolean todisplay = false;
-    private final MyListener timerListener = new MyListener();
+
+    private final Timer timer = new Timer(1000 / 20, new MyListener());
 
     private static final LayersModel layersModel = LayersModel.getSingletonInstance();
     private static final LayerTableModel tableModel = LayerTableModel.getSingletonInstance();
     private static final FramerateStatusPanel framerateStatus = FramerateStatusPanel.getSingletonInstance();
 
     private Displayer() {
-        Timer timer = new Timer(1000 / 20, timerListener);
         timer.start();
     }
 

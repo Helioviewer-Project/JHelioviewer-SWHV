@@ -54,7 +54,7 @@ public class LayersModel implements UIViewListener {
     private int activeLayer = -1;
     private final ArrayList<LayersListener> layerListeners = new ArrayList<LayersListener>();
 
-    private final LayeredView layeredView;
+    private static final LayeredView layeredView = new LayeredView();
 
     /**
      * Method returns the sole instance of this class.
@@ -71,7 +71,6 @@ public class LayersModel implements UIViewListener {
     }
 
     private LayersModel() {
-        layeredView = new LayeredView();
         UIViewListenerDistributor.getSingletonInstance().addViewListener(this);
     }
 
