@@ -1,7 +1,6 @@
 package org.helioviewer.jhv.gui.components.layerTable;
 
 import java.util.ArrayList;
-import java.util.List;
 
 import javax.swing.table.AbstractTableModel;
 
@@ -40,24 +39,10 @@ public class LayerTableModel extends AbstractTableModel implements LayersListene
         }
     }
 
-    public boolean isVisible(int index) {
-        if (index >= 0 && index < views.size()) {
-            return layeredView.isVisible(views.get(index));
-        }
-        return false;
-    }
-
     public void removeLayer(int index) {
         if (index >= 0 && index < views.size()) {
             layeredView.removeLayer(views.get(index));
         }
-    }
-
-    public View getViewAt(int index) {
-        if (index >= 0 && index < views.size()) {
-            return views.get(index);
-        }
-        return null;
     }
 
     public void moveLayerUp(int index) {

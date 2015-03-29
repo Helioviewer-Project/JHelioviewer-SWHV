@@ -10,17 +10,16 @@ import org.helioviewer.jhv.data.container.JHVEventHandler;
 import org.helioviewer.jhv.data.datatype.event.JHVEvent;
 
 public class SWEKEventHandler implements JHVEventHandler {
-    /** Singleton instance of the SWEKEventHandler */
-    private static SWEKEventHandler instance;
+
+    private static final SWEKEventHandler instance = new SWEKEventHandler();
 
     /** the listeners */
-    private final List<SWEKEventHandlerListener> listeners;
+    private static final ArrayList<SWEKEventHandlerListener> listeners = new ArrayList<SWEKEventHandlerListener>();
 
     /**
      * Private default constructor
      */
     private SWEKEventHandler() {
-        listeners = new ArrayList<SWEKEventHandlerListener>();
     }
 
     /**
@@ -28,10 +27,7 @@ public class SWEKEventHandler implements JHVEventHandler {
      *
      * @return the singleton instance
      */
-    public static SWEKEventHandler getSingletonInstace() {
-        if (instance == null) {
-            instance = new SWEKEventHandler();
-        }
+    public static SWEKEventHandler getSingletonInstance() {
         return instance;
     }
 
@@ -61,6 +57,6 @@ public class SWEKEventHandler implements JHVEventHandler {
 
     @Override
     public void cacheUpdated() {
-
     }
+
 }
