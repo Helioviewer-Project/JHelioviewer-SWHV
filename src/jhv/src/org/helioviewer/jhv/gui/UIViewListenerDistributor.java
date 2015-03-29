@@ -2,7 +2,12 @@ package org.helioviewer.jhv.gui;
 
 import java.util.ArrayList;
 
+//import org.helioviewer.jhv.gui.components.statusplugins.PositionStatusPanel;
+import org.helioviewer.jhv.gui.components.statusplugins.ZoomStatusPanel;
 import org.helioviewer.viewmodel.changeevent.ChangeEvent;
+import org.helioviewer.viewmodel.changeevent.ChangedReason;
+import org.helioviewer.viewmodel.changeevent.RegionChangedReason;
+import org.helioviewer.viewmodel.changeevent.ViewportChangedReason;
 import org.helioviewer.viewmodel.view.View;
 
 /**
@@ -72,8 +77,16 @@ public class UIViewListenerDistributor {
      *            event which contains the associated reasons.
      */
     public void viewChanged(View sender, ChangeEvent aEvent) {
-        for (UIViewListener listener : listeners) {
-            listener.UIviewChanged(sender, aEvent);
+        ChangedReason reason1 = aEvent.getLastChangedReasonByType(RegionChangedReason.class);
+        ChangedReason reason2 = aEvent.getLastChangedReasonByType(ViewportChangedReason.class);
+
+        if (reason1 != null || reason2 != null) {
+            // PositionStatusPanel.getSingletonInstance().updatePosition();
+            ZoomStatusPanel.getSingletonInstance().updateZoomLevel();
+        } else {
+            for (UIViewListener listener : listeners) {
+                listener.UIviewChanged(sender, aEvent);
+            }
         }
     }
 
