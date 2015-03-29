@@ -63,28 +63,26 @@ public class LayerTableModel extends AbstractTableModel implements LayersListene
     public void moveLayerUp(int index) {
         if (index >= 0 && index < views.size()) {
             int newLevel = index;
-            if (newLevel < views.size() - 1) {
-                newLevel++;
+            if (newLevel > 0) {
+                newLevel--;
             }
 
-            layeredView.moveView(views.get(index), newLevel);
+            layeredView.moveView(views.get(index), views.size() - 1 - newLevel);
             updateData();
             layersModel.setActiveLayer(views.get(newLevel));
-            fireTableRowsUpdated(0, views.size()); // tbd
         }
     }
 
     public void moveLayerDown(int index) {
         if (index >= 0 && index < views.size()) {
             int newLevel = index;
-            if (newLevel > 0) {
-                newLevel--;
+            if (newLevel < views.size() - 1) {
+                newLevel++;
             }
 
-            layeredView.moveView(views.get(index), newLevel);
+            layeredView.moveView(views.get(index), views.size() - 1 - newLevel);
             updateData();
             layersModel.setActiveLayer(views.get(newLevel));
-            fireTableRowsUpdated(0, views.size()); // tbd
         }
     }
 
