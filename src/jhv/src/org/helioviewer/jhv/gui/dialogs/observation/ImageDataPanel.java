@@ -545,9 +545,8 @@ public class ImageDataPanel extends ObservationDialogPanel implements DataSource
          *             From inserting into the AWT Queue
          */
         public void setupTime() throws InterruptedException, InvocationTargetException {
-            final Date endDate = EventDispatchQueue.invokeAndWait(new LatestImageDateCall(instrumentsPanel));
-
-            final GregorianCalendar gregorianCalendar = new GregorianCalendar();
+            Date endDate = EventDispatchQueue.invokeAndWait(new LatestImageDateCall(instrumentsPanel));
+            GregorianCalendar gregorianCalendar = new GregorianCalendar();
             gregorianCalendar.setTime(endDate);
 
             gregorianCalendar.add(GregorianCalendar.SECOND, cadencePanel.getCadence());
