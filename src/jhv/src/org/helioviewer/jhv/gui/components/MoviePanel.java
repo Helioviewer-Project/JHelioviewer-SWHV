@@ -44,8 +44,6 @@ import org.helioviewer.jhv.layers.LayersListener;
 import org.helioviewer.jhv.layers.LayersModel;
 import org.helioviewer.viewmodel.changeevent.CacheStatusChangedReason;
 import org.helioviewer.viewmodel.changeevent.ChangeEvent;
-import org.helioviewer.viewmodel.changeevent.LayerChangedReason;
-import org.helioviewer.viewmodel.changeevent.LayerChangedReason.LayerChangeType;
 import org.helioviewer.viewmodel.changeevent.PlayStateChangedReason;
 import org.helioviewer.viewmodel.metadata.ObserverMetaData;
 import org.helioviewer.viewmodel.view.CachedMovieView;
@@ -571,20 +569,16 @@ public class MoviePanel extends JPanel implements ActionListener, ChangeListener
         if (isPlaying) {
             view.playMovie();
         }
-
         linkedMovieManager.someoneIsDragging = false;
+    }
+
+    public void remove() {
+        linkedMovieManager.unlinkMoviePanel(this);
+        panelList.remove(this);
     }
 
     @Override
     public void UIviewChanged(View sender, ChangeEvent aEvent) {
-        // Stop movie, when the layer was removed.
-        LayerChangedReason layerReason = aEvent.getLastChangedReasonByType(LayerChangedReason.class);
-        if (layerReason != null && layerReason.getSubView().getAdapter(MovieView.class) == view && layerReason.getLayerChangeType() == LayerChangeType.LAYER_REMOVED) {
-            linkedMovieManager.unlinkMoviePanel(this);
-            panelList.remove(this);
-            return;
-        }
-
         // Update start-stop-button. In animation mode "stop", it has to change
         // when the movie stops after reaching the last frame.
         if (aEvent.reasonOccurred(PlayStateChangedReason.class)) {
