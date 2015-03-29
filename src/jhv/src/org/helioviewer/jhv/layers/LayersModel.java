@@ -836,13 +836,13 @@ public class LayersModel extends AbstractTableModel implements UIViewListener {
         return layeredView.getLayerDescriptor(view);
     }
 
-    private void fireLayerRemoved(final View oldView, final int oldIndex) {
+    private void fireLayerRemoved(View oldView, int oldIndex) {
         for (LayersListener ll : layerListeners) {
             ll.layerRemoved(oldView, oldIndex);
         }
     }
 
-    private void fireLayerAdded(final int newIndex) {
+    private void fireLayerAdded(int newIndex) {
         for (LayersListener ll : layerListeners) {
             ll.layerAdded(newIndex);
         }

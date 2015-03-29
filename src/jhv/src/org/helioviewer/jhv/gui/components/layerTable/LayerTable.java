@@ -58,6 +58,8 @@ public class LayerTable extends JTable {
 
         this.setupColumns();
 
+        final LayersModel layersModel = LayersModel.getSingletonInstance();
+
         this.addMouseListener(new MouseAdapter() {
 
             @Override
@@ -90,7 +92,7 @@ public class LayerTable extends JTable {
                     source.changeSelection(row, column, false, false);
                 }
 
-                JHVJP2View view = LayersModel.getSingletonInstance().getLayer(row);
+                JHVJP2View view = layersModel.getLayer(row);
                 if (view != null) {
                     menu.add(new MoveLayerUpAction(view));
                     menu.add(new MoveLayerDownAction(view));
@@ -102,7 +104,7 @@ public class LayerTable extends JTable {
 
                     menu.add(new JSeparator());
 
-                    if (LayersModel.getSingletonInstance().isVisible(view)) {
+                    if (layersModel.isVisible(view)) {
                         menu.add(new HideLayerAction(view));
                     } else {
                         menu.add(new UnHideLayerAction(view));
@@ -118,8 +120,6 @@ public class LayerTable extends JTable {
              */
             @Override
             public void mouseClicked(MouseEvent e) {
-                LayersModel layersModel = LayersModel.getSingletonInstance();
-
                 int row = rowAtPoint(new Point(e.getX(), e.getY()));
                 int col = columnAtPoint(new Point(e.getX(), e.getY()));
                 if (col < 0 || row < 0) {
