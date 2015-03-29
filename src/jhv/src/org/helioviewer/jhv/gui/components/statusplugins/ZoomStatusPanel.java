@@ -41,7 +41,7 @@ public class ZoomStatusPanel extends ViewStatusPanelPlugin {
     /**
      * Updates the displayed zoom.
      */
-    public void updateZoomLevel(View view) {
+    private void updateZoomLevel(View view) {
         if (view != null) {
             long zoom = Math.round(ZoomController.getZoom(view) * 100);
             if (zoom != 0.0) {
@@ -53,6 +53,10 @@ public class ZoomStatusPanel extends ViewStatusPanelPlugin {
         } else {
             setVisible(false);
         }
+    }
+
+    public void updateZoomLevel() {
+        updateZoomLevel(LayersModel.getSingletonInstance().getActiveView());
     }
 
     public void activeLayerChanged(View view) {
