@@ -11,7 +11,6 @@ import java.util.Date;
 import javax.swing.JOptionPane;
 import javax.swing.table.AbstractTableModel;
 
-import org.helioviewer.base.math.Interval;
 import org.helioviewer.jhv.gui.ImageViewerGui;
 import org.helioviewer.jhv.gui.UIViewListener;
 import org.helioviewer.jhv.gui.UIViewListenerDistributor;
@@ -207,10 +206,6 @@ public class LayersModel extends AbstractTableModel implements UIViewListener {
      */
     public ImmutableDateTime getStartDate(int idx) {
         return getStartDate(getLayer(idx));
-    }
-
-    public Interval<Date> getFrameInterval() {
-        return new Interval<Date>(getFirstDate(), getLastDate());
     }
 
     /**
