@@ -12,15 +12,9 @@ import javax.swing.JOptionPane;
 import javax.swing.table.AbstractTableModel;
 
 import org.helioviewer.jhv.gui.ImageViewerGui;
-import org.helioviewer.jhv.gui.UIViewListener;
-import org.helioviewer.jhv.gui.UIViewListenerDistributor;
 import org.helioviewer.jhv.gui.components.MoviePanel;
 import org.helioviewer.jhv.gui.dialogs.MetaDataDialog;
 import org.helioviewer.jhv.io.FileDownloader;
-import org.helioviewer.viewmodel.changeevent.ChangeEvent;
-import org.helioviewer.viewmodel.changeevent.ChangedReason;
-import org.helioviewer.viewmodel.changeevent.LayerChangedReason;
-import org.helioviewer.viewmodel.changeevent.LayerChangedReason.LayerChangeType;
 import org.helioviewer.viewmodel.view.ImageInfoView;
 import org.helioviewer.viewmodel.view.LayeredView;
 import org.helioviewer.viewmodel.view.View;
@@ -42,7 +36,7 @@ import org.helioviewer.viewmodel.view.jp2view.datetime.ImmutableDateTime;
  *
  * @author Malte Nuhn
  */
-public class LayersModel extends AbstractTableModel implements UIViewListener {
+public class LayersModel extends AbstractTableModel {
 
     private static final LayersModel layersModel = new LayersModel();
 
@@ -67,7 +61,6 @@ public class LayersModel extends AbstractTableModel implements UIViewListener {
     }
 
     private LayersModel() {
-        UIViewListenerDistributor.getSingletonInstance().addViewListener(this);
     }
 
     public LayeredView getLayeredView() {
@@ -417,16 +410,6 @@ public class LayersModel extends AbstractTableModel implements UIViewListener {
      */
     public boolean isVisible(int idx) {
         return isVisible(getLayer(idx));
-    }
-
-    /**
-     * View changed handler.
-     *
-     * Internally forwards (an abstraction) of the events to the LayersListener
-     *
-     */
-    @Override
-    public void UIviewChanged(View sender, ChangeEvent aEvent) {
     }
 
     /**
