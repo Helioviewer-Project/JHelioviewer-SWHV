@@ -23,7 +23,7 @@ public class RenderableGrid implements Renderable {
     private double lonstepDegrees = 13.2;
     private double latstepDegrees = 20.;
     private final int lineres = 120;
-    private final float scale = .8f;
+    private final float scale = 0.8f;
     private Font font;
     private TextRenderer renderer;
     private final int fontsize = 20;
@@ -41,10 +41,9 @@ public class RenderableGrid implements Renderable {
         this.renderableType = renderableType;
         this.followCamera = followCamera;
 
-        InputStream is = FileUtils.getResourceInputStream("/fonts/DroidSans-Bold.ttf");
+        InputStream is = FileUtils.getResourceInputStream("/fonts/RobotoCondensed-Regular.ttf");
         try {
             font = Font.createFont(Font.TRUETYPE_FONT, is);
-            font = font.deriveFont(20.f);
         } catch (FontFormatException e) {
             Log.warn("Font Not loaded correctly, fallback to default");
             font = new Font("Serif", Font.PLAIN, fontsize);
@@ -77,6 +76,7 @@ public class RenderableGrid implements Renderable {
             renderer = new TextRenderer(font, true, false);
             renderer.setUseVertexArrays(true);
             //renderer.setSmoothing(true);
+            renderer.setColor(Color.WHITE);
         }
 
         if (!followCamera) {
@@ -195,7 +195,6 @@ public class RenderableGrid implements Renderable {
     private void drawText(GL2 gl) {
         double size = Constants.SunRadius * 1.06;
         double zdist = 0.0;
-        renderer.setColor(Color.WHITE);
         renderer.begin3DRendering();
         for (double phi = 0; phi <= 90; phi = phi + this.getLatstepDegrees()) {
             double angle = (90 - phi) * Math.PI / 180.;
