@@ -147,4 +147,11 @@ public class RenderableContainer implements TableModel, Reorderable {
             listener.tableChanged(e);
         }
     }
+
+    public void fireTimeUpdated() {
+        for (TableModelListener listener : this.listeners) {
+            TableModelEvent e = new TableModelEvent(this);
+            listener.tableChanged(e);
+        }
+    }
 }

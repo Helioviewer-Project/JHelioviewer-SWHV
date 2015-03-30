@@ -426,7 +426,7 @@ public class GL3DImageLayer implements Renderable {
 
     @Override
     public String getTimeString() {
-        return mainLayerView.getMetaData().getDateTime().getFormattedDate();
+        return mainLayerView.getMetaData().getDateTime().getCachedDate();
     }
 
 }

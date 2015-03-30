@@ -13,6 +13,8 @@ public class RenderableTimeCellRenderer extends DefaultTableCellRenderer {
         JLabel label = (JLabel) super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
         label.setText(((Renderable) value).getTimeString());
         label.setBorder(RenderableContainerPanel.commonBorder);
+        label.setToolTipText("UTC observation time");
+
         return label;
     }
 }

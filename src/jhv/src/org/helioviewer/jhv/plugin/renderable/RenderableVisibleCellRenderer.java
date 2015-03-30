@@ -16,8 +16,10 @@ public class RenderableVisibleCellRenderer extends DefaultTableCellRenderer {
         JLabel label = (JLabel) super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
         if (renderable.isVisible()) {
             label.setIcon(IconBank.getIcon(JHVIcon.VISIBLE));
+            label.setToolTipText("Click to hide");
         } else {
             label.setIcon(IconBank.getIcon(JHVIcon.HIDDEN));
+            label.setToolTipText("Click to show");
         }
         label.setBorder(RenderableContainerPanel.commonBorder);
         label.setText("");
