@@ -10,11 +10,11 @@ import org.helioviewer.jhv.plugins.swek.config.SWEKEventType;
 /**
  * This model manages all the SWEKEventTypeTreeModels and delegate events. This
  * was primarily created to handle the selection in the distributed event trees.
- * 
+ *
  * The SWEKTreeModel is the central point of access.
- * 
+ *
  * @author Bram Bourgoignie (Bram.Bourgoignie@oma.be)
- * 
+ *
  */
 public class SWEKTreeModel {
     /** The singleton instance of the SWEKTreeModel */
@@ -40,7 +40,7 @@ public class SWEKTreeModel {
 
     /**
      * Adds a new SWEK tree model listener.
-     * 
+     *
      * @param swekTreeModelListener
      *            the listener to add
      */
@@ -50,7 +50,7 @@ public class SWEKTreeModel {
 
     /**
      * removes a SWEK tree model listener.
-     * 
+     *
      * @param swekTreeModelListener
      *            the listener to remove
      */
@@ -74,43 +74,39 @@ public class SWEKTreeModel {
 
     /**
      * Sets the event type to start loading.
-     * 
+     *
      * @param eventType
      *            the event type that started loading
      */
     public void setStartLoading(SWEKEventType eventType) {
-        synchronized (loadingTypes) {
-            if (loadingTypes.containsKey(eventType)) {
-                Integer i = loadingTypes.get(eventType);
-                i++;
-                loadingTypes.put(eventType, i);
-            } else {
-                loadingTypes.put(eventType, 1);
-                fireEventTypeStartLoading(eventType);
-            }
+        if (loadingTypes.containsKey(eventType)) {
+            Integer i = loadingTypes.get(eventType);
+            i++;
+            loadingTypes.put(eventType, i);
+        } else {
+            loadingTypes.put(eventType, 1);
+            fireEventTypeStartLoading(eventType);
         }
     }
 
     /**
      * Sets the event type to stop loading.
-     * 
+     *
      * @param eventType
      *            the event type that stopped loading
      */
     public void setStopLoading(SWEKEventType eventType) {
-        synchronized (loadingTypes) {
-            if (loadingTypes.containsKey(eventType)) {
-                Integer i = loadingTypes.get(eventType);
-                i--;
-                if (i == 0) {
-                    loadingTypes.remove(eventType);
-                    fireEventTypeStopLoading(eventType);
-                } else {
-                    loadingTypes.put(eventType, i);
-                }
-            } else {
+        if (loadingTypes.containsKey(eventType)) {
+            Integer i = loadingTypes.get(eventType);
+            i--;
+            if (i == 0) {
+                loadingTypes.remove(eventType);
                 fireEventTypeStopLoading(eventType);
+            } else {
+                loadingTypes.put(eventType, i);
             }
+        } else {
+            fireEventTypeStopLoading(eventType);
         }
     }
 
@@ -125,7 +121,7 @@ public class SWEKTreeModel {
 
     /**
      * Inform the tree model listeners an event type started loading.
-     * 
+     *
      * @param eventType
      *            the event type that started loading
      */
@@ -137,7 +133,7 @@ public class SWEKTreeModel {
 
     /**
      * Inform the tree model listeners an event type stopped loading.
-     * 
+     *
      * @param eventType
      *            the event type that stopped loading
      */
