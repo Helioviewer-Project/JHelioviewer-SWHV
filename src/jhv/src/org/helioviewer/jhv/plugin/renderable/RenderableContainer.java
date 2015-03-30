@@ -8,6 +8,7 @@ import javax.swing.table.TableModel;
 
 import org.helioviewer.gl3d.model.image.GL3DImageLayer;
 import org.helioviewer.gl3d.scenegraph.GL3DState;
+import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.renderable.RenderableGrid;
 import org.helioviewer.jhv.renderable.RenderableImageType;
 import org.helioviewer.jhv.renderable.RenderableSolarAxes;
@@ -45,6 +46,7 @@ public class RenderableContainer implements TableModel, Reorderable {
             GL3DImageLayer ri = ((GL3DImageLayer) renderable);
             ri.getMainLayerView().setOpacity((float) (1. / (1. + countImagelayers)));
         }
+        Displayer.getRenderableContainerPanel().setOptionsPanel(renderable);
         fireListeners();
     }
 

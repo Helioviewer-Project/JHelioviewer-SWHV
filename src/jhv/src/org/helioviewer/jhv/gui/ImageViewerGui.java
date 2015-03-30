@@ -308,7 +308,7 @@ public class ImageViewerGui {
             // Layer control
             imageSelectorPanel = new ImageSelectorPanel();
 
-            leftPane.add("Image Layers", imageSelectorPanel, false);
+            //leftPane.add("Image Layers", imageSelectorPanel, false);
 
             // Image adjustments and filters
             filterTabPanelManager = new FilterTabPanelManager();
@@ -323,9 +323,10 @@ public class ImageViewerGui {
 
             JPanel compactPanel = getFilterTabPanelManager().createCompactPanel();
 
-            JTabbedPane tab = new JTabbedPane();
-            tab.addTab("Color", compactPanel);
-            tab.addTab("Movie", runningDifferencePanel);
+            JPanel tab = new JPanel(new BorderLayout());
+            tab.add(runningDifferencePanel, BorderLayout.NORTH);
+
+            tab.add(compactPanel, BorderLayout.CENTER);
 
             tab.setEnabled(true);
 

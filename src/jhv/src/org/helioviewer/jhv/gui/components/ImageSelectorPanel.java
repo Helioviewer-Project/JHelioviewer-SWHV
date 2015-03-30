@@ -52,7 +52,7 @@ public class ImageSelectorPanel extends JPanel implements LayersListener {
      * Action to add a new layer. If there is a current active layer which much
      * different time, the dates will be updated.
      */
-    private final Action addLayerAction = new AbstractAction("Add layer", IconBank.getIcon(JHVIcon.ADD)) {
+    public final Action addLayerAction = new AbstractAction("Add layer", IconBank.getIcon(JHVIcon.ADD)) {
         /**
          *
          */
@@ -105,7 +105,7 @@ public class ImageSelectorPanel extends JPanel implements LayersListener {
     /**
      * Button to add new layers
      */
-    private final JButton addLayerButton = new JButton(addLayerAction);
+    private final JButton addLayerButton = new JButton(getAddLayerAction());
 
     /**
      * Action to download the current layer. If there is no active layer, the
@@ -314,6 +314,10 @@ public class ImageSelectorPanel extends JPanel implements LayersListener {
 
     public ImageDataPanel getObservationImagePane() {
         return observationImagePane;
+    }
+
+    public Action getAddLayerAction() {
+        return addLayerAction;
     }
 
 }
