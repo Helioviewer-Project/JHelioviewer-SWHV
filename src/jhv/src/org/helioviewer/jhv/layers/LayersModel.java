@@ -343,8 +343,8 @@ public class LayersModel extends AbstractTableModel {
         boolean visible = layeredView.isVisible(view);
         setLink(view, visible);
 
-        if (!visible) {
-            this.setPlaying(view, false);
+        if (!visible && view instanceof JHVJPXView) {
+            ((JHVJPXView) view).pauseMovie();
         }
     }
 
@@ -373,7 +373,7 @@ public class LayersModel extends AbstractTableModel {
      * @return true if the index is valid
      */
     private boolean isValidIndex(int idx) {
-        if (idx >= 0 && idx < this.getNumLayers()) {
+        if (idx >= 0 && idx < getNumLayers()) {
             return true;
         }
         return false;
@@ -390,7 +390,7 @@ public class LayersModel extends AbstractTableModel {
     private int determineNewActiveLayer(int oldActiveLayerIdx) {
         int candidate = oldActiveLayerIdx;
         if (!isValidIndex(candidate)) {
-            candidate = this.getNumLayers() - 1;
+            candidate = getNumLayers() - 1;
         }
 
         return candidate;
@@ -530,7 +530,6 @@ public class LayersModel extends AbstractTableModel {
 
         int oldIndex = invertIndexDeleted(layeredView.removeLayer(view));
         fireLayerRemoved(oldIndex);
-
         fireTableRowsDeleted(oldIndex, oldIndex);
 
         int newIndex = determineNewActiveLayer(oldIndex);
@@ -558,29 +557,6 @@ public class LayersModel extends AbstractTableModel {
             MoviePanel moviePanel = MoviePanel.getMoviePanel((JHVJPXView) view);
             if (moviePanel != null) {
                 moviePanel.setMovieLink(link);
-            }
-        }
-    }
-
-    /**
-     * Set the play-state of the layer in question
-     *
-     * @param view
-     *            - View that can be associated with the layer in question
-     * @param play
-     *            - true if the layer in question should play
-     */
-    public void setPlaying(JHVJP2View view, boolean play) {
-        if (view == null) {
-            return;
-        }
-
-        if (view instanceof JHVJPXView) {
-            JHVJPXView timedMovieView = (JHVJPXView) view;
-            if (play) {
-                timedMovieView.playMovie();
-            } else {
-                timedMovieView.pauseMovie();
             }
         }
     }
@@ -655,21 +631,6 @@ public class LayersModel extends AbstractTableModel {
 
     public void moveLayerDown(int idx) {
         moveLayerDown(getLayer(idx));
-    }
-
-    /**
-     * Check whether the layer in question is currently playing
-     *
-     * @param view
-     *            - View that can be associated with the layer in question
-     * @return true if the layer in question is currently playing
-     */
-    public boolean isPlaying(JHVJP2View view) {
-        if (view instanceof JHVJPXView) {
-            return ((JHVJPXView) view).isMoviePlaying();
-        } else {
-            return false;
-        }
     }
 
     /**
