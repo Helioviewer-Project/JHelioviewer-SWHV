@@ -1,6 +1,5 @@
 package org.helioviewer.plugins.eveplugin.lines.data;
 
-import java.awt.EventQueue;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
@@ -13,8 +12,8 @@ import org.helioviewer.plugins.eveplugin.download.DataDownloader;
 import org.helioviewer.plugins.eveplugin.download.DownloadedData;
 
 /**
- * 
- * 
+ *
+ *
  * @author Stephan Pagel
  * */
 public class EVECacheController implements DataDownloader {
@@ -44,7 +43,7 @@ public class EVECacheController implements DataDownloader {
 
     /**
      * Method returns the sole instance of this class.
-     * 
+     *
      * @return the only instance of this class.
      * */
     public static EVECacheController getSingletonInstance() {
@@ -91,25 +90,14 @@ public class EVECacheController implements DataDownloader {
         GregorianCalendar calendar = new GregorianCalendar();
         calendar.setTime(date);
 
-        GregorianCalendar day = new GregorianCalendar(calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH),
-                calendar.get(Calendar.DAY_OF_MONTH));
+        GregorianCalendar day = new GregorianCalendar(calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH), calendar.get(Calendar.DAY_OF_MONTH));
         return day.getTime();
     }
 
     private void fireDataAdded(final Band band) {
-        EventQueue.invokeLater(new Runnable() {
-
-            @Override
-            public void run() {
-                // long start = System.currentTimeMillis();
-                for (EVECacheControllerListener listener : controllerListeners) {
-                    listener.dataAdded(band);
-                }
-                // Log.debug("fireDataAdded time" + (System.currentTimeMillis()
-                // - start));
-            }
-        });
-
+        for (EVECacheControllerListener listener : controllerListeners) {
+            listener.dataAdded(band);
+        }
     }
 
     @Override
