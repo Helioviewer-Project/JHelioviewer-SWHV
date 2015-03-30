@@ -91,7 +91,7 @@ public class GL3DImageLayer implements Renderable {
 
         this.showSphere = showSphere;
         this.showCorona = showCorona;
-        Displayer.getRenderablecontainer().addRenderable(this);
+        Displayer.getRenderablecontainer().addBeforeRenderable(this);
     }
 
     @Override
@@ -193,6 +193,8 @@ public class GL3DImageLayer implements Renderable {
 
     @Override
     public void render(GL3DState state) {
+        if (!this.isVisible)
+            return;
         GL2 gl = state.gl;
 
         gl.glEnable(GL2.GL_BLEND);

@@ -27,6 +27,12 @@ public class RenderableContainer implements TableModel, Reorderable {
 
     }
 
+    public void addBeforeRenderable(Renderable renderable) {
+        renderables.add(0, renderable);
+        newRenderables.add(renderable);
+        fireListeners();
+    }
+
     public void addRenderable(Renderable renderable) {
         renderables.add(renderable);
         newRenderables.add(renderable);
