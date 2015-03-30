@@ -1,6 +1,5 @@
 package org.helioviewer.jhv.data.datatype.event;
 
-import java.awt.EventQueue;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -40,15 +39,8 @@ public abstract class AbstractJHVEvent implements JHVEvent {
     }
 
     private void fireHighlightChanged() {
-        // TODO Auto-generated method stub
-        EventQueue.invokeLater(new Runnable() {
-
-            @Override
-            public void run() {
-                for (JHVEventHighlightListener l : listeners) {
-                    l.eventHightChanged(AbstractJHVEvent.this);
-                }
-            }
-        });
+        for (JHVEventHighlightListener l : listeners) {
+            l.eventHightChanged(AbstractJHVEvent.this);
+        }
     }
 }
