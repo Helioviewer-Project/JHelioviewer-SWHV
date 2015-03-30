@@ -18,6 +18,7 @@ public class RenderableRemoveCellRenderer extends DefaultTableCellRenderer {
         label.setIcon(IconBank.getIcon(JHVIcon.REMOVE_LAYER));
         label.setBorder(RenderableContainerPanel.commonBorder);
         label.setText("");
+        label.setToolTipText("Click to remove");
 
         return label;
 
