@@ -282,7 +282,7 @@ public class ImageSelectorPanel extends JPanel implements LayersListener {
      * accordingly.
      */
     private void activateActions() {
-        boolean e = LayersModel.getSingletonInstance().getActiveView() != null;
+        boolean e = LayersModel.getSingletonInstance().getNumLayers() != 0;
         downloadLayerAction.setEnabled(e);
         moveLayerDownAction.setEnabled(e);
         moveLayerUpAction.setEnabled(e);
