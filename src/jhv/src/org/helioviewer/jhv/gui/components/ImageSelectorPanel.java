@@ -28,10 +28,9 @@ import org.helioviewer.jhv.gui.dialogs.model.ObservationDialogDateModel;
 import org.helioviewer.jhv.gui.dialogs.observation.ImageDataPanel;
 import org.helioviewer.jhv.layers.LayersListener;
 import org.helioviewer.jhv.layers.LayersModel;
-import org.helioviewer.viewmodel.view.MovieView;
-import org.helioviewer.viewmodel.view.TimedMovieView;
 import org.helioviewer.viewmodel.view.View;
 import org.helioviewer.viewmodel.view.jp2view.JHVJP2View;
+import org.helioviewer.viewmodel.view.jp2view.JHVJPXView;
 import org.helioviewer.viewmodel.view.jp2view.datetime.ImmutableDateTime;
 
 /**
@@ -68,13 +67,13 @@ public class ImageSelectorPanel extends JPanel implements LayersListener {
         @Override
         public void actionPerformed(ActionEvent arg0) {
             // Check the dates if possible
-            final JHVJP2View activeView = LayersModel.getSingletonInstance().getActiveView();
+            JHVJP2View activeView = LayersModel.getSingletonInstance().getActiveView();
 
-            if (activeView != null) {
-                MovieView tmv = activeView.getAdapter(TimedMovieView.class);
-                if (tmv != null && tmv.getMaximumAccessibleFrameNumber() == tmv.getMaximumFrameNumber()) {
-                    final ImmutableDateTime start = LayersModel.getSingletonInstance().getStartDate(activeView);
-                    final ImmutableDateTime end = LayersModel.getSingletonInstance().getEndDate(activeView);
+            if (activeView instanceof JHVJPXView) {
+                JHVJPXView jpxView = (JHVJPXView) activeView;
+                if (jpxView.getMaximumAccessibleFrameNumber() == jpxView.getMaximumFrameNumber()) {
+                    ImmutableDateTime start = LayersModel.getSingletonInstance().getStartDate(activeView);
+                    ImmutableDateTime end = LayersModel.getSingletonInstance().getEndDate(activeView);
                     if (start != null && end != null) {
                         try {
                             Date startDate = start.getTime();
