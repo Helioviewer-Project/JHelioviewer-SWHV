@@ -95,11 +95,9 @@ public class SWEKEventInformationDialog extends JDialog implements WindowFocusLi
 
     @Override
     public void windowLostFocus(WindowEvent e) {
-        synchronized (nrOfWindowsOpened) {
-            if (nrOfWindowsOpened == 0) {
-                this.setVisible(false);
-                this.dispose();
-            }
+        if (nrOfWindowsOpened == 0) {
+            this.setVisible(false);
+            this.dispose();
         }
     }
 
@@ -111,11 +109,9 @@ public class SWEKEventInformationDialog extends JDialog implements WindowFocusLi
 
     @Override
     public void focusLost(FocusEvent arg0) {
-        synchronized (nrOfWindowsOpened) {
-            if (nrOfWindowsOpened == 0) {
-                this.setVisible(false);
-                this.dispose();
-            }
+        if (nrOfWindowsOpened == 0) {
+            this.setVisible(false);
+            this.dispose();
         }
     }
 
@@ -354,15 +350,11 @@ public class SWEKEventInformationDialog extends JDialog implements WindowFocusLi
     }
 
     private void incrementNrOfWindows() {
-        synchronized (nrOfWindowsOpened) {
-            nrOfWindowsOpened++;
-        }
+        nrOfWindowsOpened++;
     }
 
     private void decrementNrOfWindows() {
-        synchronized (nrOfWindowsOpened) {
-            nrOfWindowsOpened--;
-        }
+        nrOfWindowsOpened--;
     }
 
     @Override
