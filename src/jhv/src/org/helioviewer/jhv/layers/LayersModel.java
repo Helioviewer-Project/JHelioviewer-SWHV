@@ -596,14 +596,12 @@ public class LayersModel extends AbstractTableModel {
             return;
         }
 
-        // Operates on the (inverted) LayeredView indices
         int level = layeredView.getLayerLevel(view);
         if (level < layeredView.getNumLayers() - 1) {
             level++;
+            layeredView.moveView(view, level);
+            setActiveLayer(invertIndex(level));
         }
-
-        layeredView.moveView(view, level);
-        setActiveLayer(invertIndex(level));
     }
 
     public void moveLayerUp(int idx) {
@@ -621,14 +619,12 @@ public class LayersModel extends AbstractTableModel {
             return;
         }
 
-        // Operates on the (inverted) LayeredView indices
         int level = layeredView.getLayerLevel(view);
         if (level > 0) {
             level--;
+            layeredView.moveView(view, level);
+            setActiveLayer(invertIndex(level));
         }
-
-        layeredView.moveView(view, level);
-        setActiveLayer(invertIndex(level));
     }
 
     public void moveLayerDown(int idx) {
