@@ -44,7 +44,6 @@ public class RenderableContainer implements TableModel, Reorderable {
         if (renderable instanceof GL3DImageLayer) {
             GL3DImageLayer ri = ((GL3DImageLayer) renderable);
             ri.getMainLayerView().setOpacity((float) (1. / (1. + countImagelayers)));
-            System.out.println((float) (1. / (1. + countImagelayers)) + "opacity");
         }
         fireListeners();
     }
