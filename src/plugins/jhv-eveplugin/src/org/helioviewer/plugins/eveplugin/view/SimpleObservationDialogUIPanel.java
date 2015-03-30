@@ -250,25 +250,23 @@ public abstract class SimpleObservationDialogUIPanel extends ObservationDialogPa
 
     @Override
     public void layerAdded(int idx) {
-        Date beginDate = null;
-        Date endDate = null;
-        View nextView = LayersModel.getSingletonInstance().getLayer(LayersModel.getSingletonInstance().getActiveLayer());
-        if (nextView != null) {
-            JHVJPXView jpxView = nextView.getAdapter(JHVJPXView.class);
-            if (jpxView != null) {
-                for (int frame = 0; frame <= jpxView.getMaximumFrameNumber(); frame++) {
-                    ImmutableDateTime date = jpxView.getFrameDateTime(frame);
-                    if (beginDate == null || date.getTime().getTime() < beginDate.getTime()) {
-                        beginDate = date.getTime();
-                    }
-                    if (endDate == null || date.getTime().getTime() > endDate.getTime()) {
-                        endDate = date.getTime();
-                    }
+        View view = LayersModel.getSingletonInstance().getActiveView();
+        if (view instanceof JHVJPXView) {
+            JHVJPXView jpxView = (JHVJPXView) view;
+            Date beginDate = null, endDate = null;
+
+            for (int frame = 0; frame <= jpxView.getMaximumFrameNumber(); frame++) {
+                ImmutableDateTime date = jpxView.getFrameDateTime(frame);
+                if (beginDate == null || date.getTime().getTime() < beginDate.getTime()) {
+                    beginDate = date.getTime();
                 }
-                if (beginDate != null && endDate != null) {
-                    calendarStartDate.setDate(beginDate);
-                    ObservationDialogDateModel.getInstance().setStartDate(beginDate, false);
+                if (endDate == null || date.getTime().getTime() > endDate.getTime()) {
+                    endDate = date.getTime();
                 }
+            }
+            if (beginDate != null && endDate != null) {
+                calendarStartDate.setDate(beginDate);
+                ObservationDialogDateModel.getInstance().setStartDate(beginDate, false);
             }
         }
     }
