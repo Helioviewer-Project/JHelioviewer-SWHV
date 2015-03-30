@@ -117,7 +117,7 @@ public class LayersModel extends AbstractTableModel {
      *            - Index of the layer to be retrieved
      * @return View associated with the given index
      */
-    public JHVJP2View getLayer(int idx) {
+    private JHVJP2View getLayer(int idx) {
         idx = invertIndex(idx);
         if (idx >= 0 && idx < getNumLayers()) {
             return layeredView.getLayer(idx);
@@ -579,7 +579,9 @@ public class LayersModel extends AbstractTableModel {
      *            - View that can be associated with the layer in question
      * @return true if the layer in question has timing information
      */
-    public boolean isTimed(JHVJP2View view) {
+    private boolean isTimed(JHVJP2View view) {
+        if (view == null)
+            return false;
         return layeredView.getLayerDescriptor(view).isTimed;
     }
 
