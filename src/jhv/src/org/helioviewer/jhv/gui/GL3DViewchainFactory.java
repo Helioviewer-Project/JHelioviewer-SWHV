@@ -77,13 +77,10 @@ public class GL3DViewchainFactory {
         if (newLayer == null)
             return;
 
-        LayersModel lm = LayersModel.getSingletonInstance();
+        LayersModel.getSingletonInstance().addLayer(newLayer);
+
         ImageViewerGui ivg = ImageViewerGui.getSingletonInstance();
-
-        lm.addLayer(newLayer);
-
         ivg.getLeftContentPane().expand(ivg.getFilterPanelContainer());
-        lm.setActiveLayer(newLayer);
     }
 
     /**
