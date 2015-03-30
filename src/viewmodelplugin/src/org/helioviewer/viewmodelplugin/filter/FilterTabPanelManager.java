@@ -123,7 +123,7 @@ public class FilterTabPanelManager implements LayersListener {
         c.insets = new Insets(2, 5, 2, 5);
         c.weightx = 1;
         c.gridx = 0;
-        c.gridwidth = 3;
+        c.gridwidth = 1;
         c.anchor = GridBagConstraints.WEST;
         c.fill = GridBagConstraints.HORIZONTAL;
 

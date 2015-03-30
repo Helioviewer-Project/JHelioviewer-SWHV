@@ -3,6 +3,7 @@ package org.helioviewer.jhv.plugin.renderable;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
+import java.awt.FlowLayout;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Point;
@@ -11,6 +12,7 @@ import java.awt.event.MouseEvent;
 
 import javax.swing.BorderFactory;
 import javax.swing.DropMode;
+import javax.swing.JButton;
 import javax.swing.JPanel;
 import javax.swing.JTable;
 import javax.swing.ListSelectionModel;
@@ -18,6 +20,7 @@ import javax.swing.border.Border;
 import javax.swing.border.MatteBorder;
 
 import org.helioviewer.jhv.display.Displayer;
+import org.helioviewer.jhv.gui.ImageViewerGui;
 
 public class RenderableContainerPanel extends JPanel {
     static final Border commonBorder = new MatteBorder(1, 0, 0, 0, Color.BLACK);
@@ -126,11 +129,17 @@ public class RenderableContainerPanel extends JPanel {
         optionsPanelWrapper.setBorder(BorderFactory.createTitledBorder("Options"));
         optionsPanelWrapper.add(optionsPanel);
         gc.gridy = 1;
+        JPanel addLayerButtonWrapper = new JPanel(new FlowLayout(FlowLayout.RIGHT, 0, 0));
+        JButton addLayerButton = new JButton(ImageViewerGui.getSingletonInstance().getImageSelectorPanel().addLayerAction);
+        addLayerButtonWrapper.add(addLayerButton);
+        add(addLayerButtonWrapper, gc);
+
+        gc.gridy = 2;
         add(optionsPanelWrapper, gc);
 
     }
 
-    private void setOptionsPanel(Renderable renderable) {
+    void setOptionsPanel(Renderable renderable) {
         optionsPanelWrapper.remove(optionsPanel);
         optionsPanel = renderable.getOptionsPanel();
         optionsPanelWrapper.add(optionsPanel);
