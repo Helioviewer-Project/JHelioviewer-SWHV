@@ -59,20 +59,6 @@ public class SideContentPane extends JComponent {
     }
 
     /**
-     * Add new component into a new {@link CollapsiblePane} at the end.
-     *
-     * @param title
-     *            Text on the toggle button
-     * @param component
-     *            Component to manage
-     * @param startExpanded
-     *            if true, the component will be visible right from the start
-     */
-    public void addWithButton(String title, Component component, boolean startExpanded) {
-        addWithButton(title, component, -1, startExpanded);
-    }
-
-    /**
      * Add new component into a new {@link CollapsiblePane}.
      *
      * @param title
@@ -87,30 +73,6 @@ public class SideContentPane extends JComponent {
      */
     public void add(String title, Component component, int index, boolean startExpanded) {
         CollapsiblePane newPane = new CollapsiblePane(title, component, startExpanded);
-        map.put(component, newPane);
-
-        if (index < 0) {
-            add(newPane, getComponentCount() - 1);
-        } else {
-            add(newPane, index);
-        }
-    }
-
-    /**
-     * Add new component into a new {@link CollapsiblePane}.
-     *
-     * @param title
-     *            Text on the toggle button
-     * @param component
-     *            Component to manage
-     * @param index
-     *            the position in the container's list at which to insert the
-     *            component; -1 means insert at the end component
-     * @param startExpanded
-     *            if true, the component will be visible right from the start
-     */
-    public void addWithButton(String title, Component component, int index, boolean startExpanded) {
-        CollapsiblePane newPane = new CollapsiblePaneWithButton(title, component, startExpanded);
         map.put(component, newPane);
 
         if (index < 0) {
