@@ -19,11 +19,11 @@ import org.helioviewer.jhv.gui.ImageViewerGui;
 
 /**
  * Panel managing a collapsible area.
- * 
+ *
  * <p>
  * This panel consists of a toggle button and one arbitrary component. Clicking
  * the toggle button will toggle the visibility of the component.
- * 
+ *
  * @author Markus Langenberg
  */
 public class CollapsiblePane extends JComponent implements ActionListener {
@@ -34,12 +34,13 @@ public class CollapsiblePane extends JComponent implements ActionListener {
     private static final ImageIcon collapsedIcon = IconBank.getIcon(JHVIcon.RIGHT2);
 
     protected JToggleButton toggleButton;
-    private Component component;
+    private final Component component;
     protected JPanel topButtonsPanel;
+    static final int BUTTONHEIGHT = 20;
 
     /**
      * Default constructor.
-     * 
+     *
      * @param title
      *            Text on the toggle button
      * @param component
@@ -49,17 +50,19 @@ public class CollapsiblePane extends JComponent implements ActionListener {
      */
     public CollapsiblePane(String title, Component component, boolean startExpanded) {
         setLayout(new BorderLayout());
+        this.getMaximumSize().height = BUTTONHEIGHT;
 
         toggleButton = new JToggleButton(title);
         toggleButton.setHorizontalAlignment(SwingConstants.LEFT);
         toggleButton.setSelected(startExpanded);
-        toggleButton.setFont(new Font("SansSerif", Font.BOLD, 12));
+        toggleButton.setFont(new Font("SansSerif", Font.BOLD, 10));
+        toggleButton.getMaximumSize().height = 12;
         if (startExpanded) {
             toggleButton.setIcon(IconBank.getIcon(JHVIcon.DOWN2));
         } else {
             toggleButton.setIcon(IconBank.getIcon(JHVIcon.RIGHT2));
         }
-        toggleButton.setPreferredSize(new Dimension(ImageViewerGui.SIDE_PANEL_WIDTH, (int) toggleButton.getPreferredSize().getHeight()));
+        toggleButton.setPreferredSize(new Dimension(ImageViewerGui.SIDE_PANEL_WIDTH, BUTTONHEIGHT));
         toggleButton.addActionListener(this);
 
         this.component = component;
@@ -67,6 +70,7 @@ public class CollapsiblePane extends JComponent implements ActionListener {
         add(component, BorderLayout.CENTER);
         setButtons();
         setMaximumSize(new Dimension(Short.MAX_VALUE, getPreferredSize().height));
+
     }
 
     public void setButtons() {
@@ -78,7 +82,7 @@ public class CollapsiblePane extends JComponent implements ActionListener {
 
     /**
      * Sets the text on the toggle button
-     * 
+     *
      * @param title
      *            Text on the toggle button
      * */
@@ -109,6 +113,7 @@ public class CollapsiblePane extends JComponent implements ActionListener {
     /**
      * {@inheritDoc}
      */
+    @Override
     public void actionPerformed(ActionEvent e) {
         if (component.isVisible()) {
             collapse();
