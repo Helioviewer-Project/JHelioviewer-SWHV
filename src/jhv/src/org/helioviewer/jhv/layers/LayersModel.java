@@ -44,7 +44,6 @@ public class LayersModel extends AbstractTableModel {
     private final ArrayList<LayersListener> layerListeners = new ArrayList<LayersListener>();
 
     private static final LayeredView layeredView = new LayeredView();
-    private static final ArrayList<JHVJP2View> views = new ArrayList<JHVJP2View>();
 
     /**
      * Method returns the sole instance of this class.
@@ -74,7 +73,7 @@ public class LayersModel extends AbstractTableModel {
      */
     @Override
     public int getRowCount() {
-        return views.size();
+        return layeredView.getNumLayers();
     }
 
     /**
@@ -92,17 +91,7 @@ public class LayersModel extends AbstractTableModel {
      */
     @Override
     public Object getValueAt(int idx, int col) {
-        if (idx >= 0 && idx < views.size()) {
-            return layeredView.getLayerDescriptor(views.get(idx));
-        }
-        return null;
-    }
-
-    private void updateData() {
-        views.clear();
-        for (int i = layeredView.getNumLayers() - 1; i >= 0; i--) {
-            views.add(layeredView.getLayer(i));
-        }
+        return layeredView.getLayerDescriptor(getLayer(idx));
     }
 
     /* </LayerTableModel> */
@@ -509,7 +498,6 @@ public class LayersModel extends AbstractTableModel {
             ivg.getMoviePanelContainer().addLayer(view, moviePanel);
         }
 
-        updateData();
         fireTableRowsInserted(newIndex, newIndex);
 
         setActiveLayer(newIndex);
@@ -536,7 +524,6 @@ public class LayersModel extends AbstractTableModel {
         int oldIndex = invertIndexDeleted(layeredView.removeLayer(view));
         fireLayerRemoved(oldIndex);
 
-        updateData();
         fireTableRowsDeleted(oldIndex, oldIndex);
 
         int newIndex = determineNewActiveLayer(oldIndex);
@@ -619,7 +606,7 @@ public class LayersModel extends AbstractTableModel {
      * @param view
      *            - View that can be associated with the layer in question
      */
-    public void moveLayerUp(JHVJP2View view) {
+    private void moveLayerUp(JHVJP2View view) {
         if (view == null) {
             return;
         }
@@ -631,8 +618,7 @@ public class LayersModel extends AbstractTableModel {
         }
 
         layeredView.moveView(view, level);
-        updateData();
-        this.setActiveLayer(invertIndex(level));
+        setActiveLayer(invertIndex(level));
     }
 
     public void moveLayerUp(int idx) {
@@ -645,7 +631,7 @@ public class LayersModel extends AbstractTableModel {
      * @param view
      *            - View that can be associated with the layer in question
      */
-    public void moveLayerDown(JHVJP2View view) {
+    private void moveLayerDown(JHVJP2View view) {
         if (view == null) {
             return;
         }
@@ -657,8 +643,7 @@ public class LayersModel extends AbstractTableModel {
         }
 
         layeredView.moveView(view, level);
-        updateData();
-        this.setActiveLayer(invertIndex(level));
+        setActiveLayer(invertIndex(level));
     }
 
     public void moveLayerDown(int idx) {
