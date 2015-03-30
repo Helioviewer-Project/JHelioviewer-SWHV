@@ -3,11 +3,9 @@ package org.helioviewer.jhv.gui.components;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Point;
-import java.awt.event.ComponentEvent;
 import java.awt.event.MouseMotionListener;
 import java.awt.image.BufferedImage;
-import java.util.AbstractList;
-import java.util.LinkedList;
+import java.util.ArrayList;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -15,10 +13,8 @@ import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.gui.IconBank;
 import org.helioviewer.jhv.gui.IconBank.JHVIcon;
 import org.helioviewer.jhv.gui.ImageViewerGui;
-import org.helioviewer.jhv.gui.UIViewListener;
-import org.helioviewer.jhv.gui.UIViewListenerDistributor;
-import org.helioviewer.viewmodel.changeevent.ChangeEvent;
-import org.helioviewer.viewmodel.changeevent.LayerChangedReason;
+import org.helioviewer.jhv.layers.LayersListener;
+import org.helioviewer.jhv.layers.LayersModel;
 import org.helioviewer.viewmodel.renderer.screen.ScreenRenderGraphics;
 import org.helioviewer.viewmodel.renderer.screen.ScreenRenderer;
 import org.helioviewer.viewmodel.view.ComponentView;
@@ -37,7 +33,7 @@ import org.helioviewer.viewmodel.view.opengl.GLSharedDrawable;
  * @author Stephan Pagel
  * @author Markus Langenberg
  */
-public class MainImagePanel extends BasicImagePanel implements UIViewListener {
+public class MainImagePanel extends BasicImagePanel implements LayersListener {
 
     // ///////////////////////////////////////////////////////////////////////////
     // Definitions
@@ -52,7 +48,7 @@ public class MainImagePanel extends BasicImagePanel implements UIViewListener {
     private final LoadingPostRendererSwitch loadingPostRenderer = new LoadingPostRendererSwitch();
     private int loadingTasks = 0;
 
-    private final AbstractList<MouseMotionListener> mouseMotionListeners = new LinkedList<MouseMotionListener>();
+    private final ArrayList<MouseMotionListener> mouseMotionListeners = new ArrayList<MouseMotionListener>();
 
     // ///////////////////////////////////////////////////////////////////////////
     // Methods
@@ -75,7 +71,7 @@ public class MainImagePanel extends BasicImagePanel implements UIViewListener {
         noImagePostRendererSet = true;
 
         loadingPostRenderer.setContainerSize(getWidth(), getHeight());
-        UIViewListenerDistributor.getSingletonInstance().addViewListener(this);
+        LayersModel.getSingletonInstance().addLayersListener(this);
     }
 
     /**
@@ -170,36 +166,26 @@ public class MainImagePanel extends BasicImagePanel implements UIViewListener {
             mouseMotionListeners.remove(l);
     }
 
-    /**
-     * {@inheritDoc}
-     *
-     * Adds and removes a post renderer which displays the no image loaded sign
-     * when there is no image available.
-     */
+    @Override
+    public void layerAdded(int idx) {
+        if (!noImagePostRendererSet) {
+            addPostRenderer(noImagePostRenderer);
+            noImagePostRendererSet = true;
+        }
+        loadingPostRenderer.useCenterRenderer(LayersModel.getSingletonInstance().getNumLayers() == 0);
+    }
 
     @Override
-    public void UIviewChanged(View sender, ChangeEvent aEvent) {
-        // checks if at least one layer is available - if not the post renderer
-        // for displaying that no image was selected will be added
-        if (aEvent.reasonOccurred(LayerChangedReason.class)) {
-            LayeredView layeredView = ViewHelper.getViewAdapter(sender, LayeredView.class);
-            if (layeredView != null) {
-                if (layeredView.getNumLayers() > 0 || loadingTasks > 0) {
-                    // remove
-                    if (noImagePostRendererSet) {
-                        removePostRenderer(noImagePostRenderer);
-                        noImagePostRendererSet = false;
-                    }
-                } else {
-                    // add
-                    if (!noImagePostRendererSet) {
-                        addPostRenderer(noImagePostRenderer);
-                        noImagePostRendererSet = true;
-                    }
-                }
-                loadingPostRenderer.useCenterRenderer(layeredView.getNumLayers() == 0);
-            }
+    public void layerRemoved(int oldIdx) {
+        if (noImagePostRendererSet) {
+            removePostRenderer(noImagePostRenderer);
+            noImagePostRendererSet = false;
         }
+        loadingPostRenderer.useCenterRenderer(LayersModel.getSingletonInstance().getNumLayers() == 0);
+    }
+
+    @Override
+    public void activeLayerChanged(View view) {
     }
 
     /**
