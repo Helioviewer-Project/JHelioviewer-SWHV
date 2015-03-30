@@ -7,26 +7,16 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 
 import javax.swing.BorderFactory;
-import javax.swing.JPopupMenu;
-import javax.swing.JSeparator;
 import javax.swing.JTable;
 import javax.swing.border.Border;
 
 import org.helioviewer.jhv.gui.IconBank;
 import org.helioviewer.jhv.gui.IconBank.JHVIcon;
-import org.helioviewer.jhv.gui.actions.DownloadJPIPOfView;
-import org.helioviewer.jhv.gui.actions.HideLayerAction;
-import org.helioviewer.jhv.gui.actions.MoveLayerDownAction;
-import org.helioviewer.jhv.gui.actions.MoveLayerUpAction;
-import org.helioviewer.jhv.gui.actions.RemoveLayerAction;
-import org.helioviewer.jhv.gui.actions.ShowMetainfoOfView;
-import org.helioviewer.jhv.gui.actions.UnHideLayerAction;
 import org.helioviewer.jhv.gui.components.layerTable.renderers.DescriptorIconRenderer;
 import org.helioviewer.jhv.gui.components.layerTable.renderers.DescriptorTimestampRenderer;
 import org.helioviewer.jhv.gui.components.layerTable.renderers.DescriptorTitleRenderer;
 import org.helioviewer.jhv.gui.components.layerTable.renderers.IconRenderer;
 import org.helioviewer.jhv.layers.LayersModel;
-import org.helioviewer.viewmodel.view.jp2view.JHVJP2View;
 
 /**
  * Extended JTable, showing the Layers currently being used
@@ -61,60 +51,6 @@ public class LayerTable extends JTable {
         final LayersModel layersModel = LayersModel.getSingletonInstance();
 
         this.addMouseListener(new MouseAdapter() {
-
-            @Override
-            public void mouseReleased(MouseEvent e) {
-                if (e.isPopupTrigger()) {
-                    handlePopup(e);
-                }
-            }
-
-            @Override
-            public void mousePressed(MouseEvent e) {
-                if (e.isPopupTrigger()) {
-                    handlePopup(e);
-                }
-            }
-
-            /**
-             * Handle with right-click menus
-             *
-             * @param e
-             */
-            public void handlePopup(MouseEvent e) {
-                JPopupMenu menu = new JPopupMenu();
-
-                JTable source = (JTable) e.getSource();
-                int row = source.rowAtPoint(e.getPoint());
-                int column = source.columnAtPoint(e.getPoint());
-
-                if (!source.isRowSelected(row)) {
-                    source.changeSelection(row, column, false, false);
-                }
-
-                JHVJP2View view = layersModel.getLayer(row);
-                if (view != null) {
-                    menu.add(new MoveLayerUpAction(view));
-                    menu.add(new MoveLayerDownAction(view));
-
-                    menu.add(new JSeparator());
-
-                    menu.add(new ShowMetainfoOfView(view));
-                    menu.add(new DownloadJPIPOfView(view));
-
-                    menu.add(new JSeparator());
-
-                    if (layersModel.isVisible(view)) {
-                        menu.add(new HideLayerAction(view));
-                    } else {
-                        menu.add(new UnHideLayerAction(view));
-                    }
-
-                    menu.add(new RemoveLayerAction(view));
-                    menu.show(e.getComponent(), e.getX(), e.getY());
-                }
-            }
-
             /**
              * Handle with clicks on hide/show/remove layer icons
              */
@@ -128,7 +64,7 @@ public class LayerTable extends JTable {
                 int index = row;
 
                 if (col == COLUMN_VISIBILITY) {
-                    layersModel.setVisibleLink(index, !layersModel.isVisible(index));
+                    layersModel.toggleVisibility(index);
                 } else if (col == COLUMN_BUTTON_REMOVE) {
                     layersModel.removeLayer(index);
                 }
