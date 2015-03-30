@@ -88,7 +88,7 @@ public class RadioPlotModel implements RadioDataManagerListener, ZoomDataConfigL
     /**
      * Creates a collection of no data configurations for a specific plot
      * identifier
-     * 
+     *
      * @return A collection containing all the no data configurations.
      */
     public Collection<NoDataConfig> getNoDataConfigurations() {
@@ -311,40 +311,14 @@ public class RadioPlotModel implements RadioDataManagerListener, ZoomDataConfigL
 
     @Override
     public void requestData(Date xStart, Date xEnd, double yStart, double yEnd, double xRatio, double yRatio, long ID) {
-        // Log.debug("Request for data in : " + xStart + " - " + xEnd);
-        // Thread.dumpStack();
-
-        EventQueue.invokeLater(new Runnable() {
-
-            Date xStart;
-            Date xEnd;
-            double yStart;
-            double yEnd;
-            double xRatio;
-            double yRatio;
-            Long ID;
-
-            @Override
-            public void run() {
-                List<Long> idList = new ArrayList<Long>();
-                idList.add(ID);
-                radioDataManager.requestForData(xStart, xEnd, yStart, yEnd, xRatio, yRatio, idList);
-                // Log.debug("requestData time:" + (System.currentTimeMillis() -
-                // start));
-            }
-
-            public Runnable init(Date xStart, Date xEnd, double yStart, double yEnd, double ratioX, double ratioY, Long ID) {
-                this.xStart = xStart;
-                this.xEnd = xEnd;
-                this.yStart = yStart;
-                this.yEnd = yEnd;
-                xRatio = ratioX;
-                yRatio = ratioY;
-                this.ID = ID;
-                return this;
-            }
-
-        }.init(xStart, xEnd, yStart, yEnd, xRatio, yRatio, ID));
+        if (!EventQueue.isDispatchThread()) {
+            Log.error("Called by other thread than event queue : " + Thread.currentThread().getName());
+            Thread.dumpStack();
+            System.exit(666);
+        }
+        List<Long> idList = new ArrayList<Long>();
+        idList.add(ID);
+        radioDataManager.requestForData(xStart, xEnd, yStart, yEnd, xRatio, yRatio, idList);
         counter++;
         updateNoDataConfig(ID);
     }
