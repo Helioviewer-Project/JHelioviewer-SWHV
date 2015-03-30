@@ -6,6 +6,7 @@ import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.LinkedList;
 
+import org.helioviewer.base.logging.Log;
 import org.helioviewer.base.math.Interval;
 import org.helioviewer.jhv.layers.LayersListener;
 import org.helioviewer.jhv.layers.LayersModel;
@@ -19,7 +20,7 @@ import org.helioviewer.plugins.eveplugin.settings.EVEAPI.API_RESOLUTION_AVERAGES
 import org.helioviewer.viewmodel.view.View;
 
 /**
- * 
+ *
  * @author Stephan Pagel
  * */
 public class ZoomController implements PlotAreaSpaceListener, LayersListener {
@@ -51,7 +52,7 @@ public class ZoomController implements PlotAreaSpaceListener, LayersListener {
 
     /**
      * Method returns the sole instance of this class.
-     * 
+     *
      * @return the only instance of this class.
      * */
     public static ZoomController getSingletonInstance() {
@@ -60,24 +61,27 @@ public class ZoomController implements PlotAreaSpaceListener, LayersListener {
 
     public boolean addZoomControllerListener(final ZoomControllerListener listener) {
         if (!EventQueue.isDispatchThread()) {
+            Log.error("Called by other thread than event queue : " + Thread.currentThread().getName());
             Thread.dumpStack();
-            System.exit(200);
+            System.exit(666);
         }
         return listeners.add(listener);
     }
 
     public boolean removeControllerListener(final ZoomControllerListener listener) {
         if (!EventQueue.isDispatchThread()) {
+            Log.error("Called by other thread than event queue : " + Thread.currentThread().getName());
             Thread.dumpStack();
-            System.exit(200);
+            System.exit(666);
         }
         return listeners.remove(listener);
     }
 
     public void setAvailableInterval(final Interval<Date> interval) {
         if (!EventQueue.isDispatchThread()) {
+            Log.error("Called by other thread than event queue : " + Thread.currentThread().getName());
             Thread.dumpStack();
-            System.exit(200);
+            System.exit(666);
         }
         availableInterval = makeCompleteDay(interval);
         // Log.debug("New available interval : " + availableInterval);
@@ -142,8 +146,9 @@ public class ZoomController implements PlotAreaSpaceListener, LayersListener {
 
     public final Interval<Date> getAvailableInterval() {
         if (!EventQueue.isDispatchThread()) {
+            Log.error("Called by other thread than event queue : " + Thread.currentThread().getName());
             Thread.dumpStack();
-            System.exit(200);
+            System.exit(666);
         }
         return availableInterval;
     }
@@ -157,8 +162,9 @@ public class ZoomController implements PlotAreaSpaceListener, LayersListener {
 
     public Interval<Date> setSelectedInterval(final Interval<Date> newSelectedInterval, boolean useFullValueSpace) {
         if (!EventQueue.isDispatchThread()) {
+            Log.error("Called by other thread than event queue : " + Thread.currentThread().getName());
             Thread.dumpStack();
-            System.exit(200);
+            System.exit(666);
         }
         if (availableInterval.getStart() == null || availableInterval.getEnd() == null) {
             selectedInterval = new Interval<Date>(null, null);
@@ -188,8 +194,9 @@ public class ZoomController implements PlotAreaSpaceListener, LayersListener {
 
     public Interval<Date> zoomTo(final ZOOM zoom, final int value) {
         if (!EventQueue.isDispatchThread()) {
+            Log.error("Called by other thread than event queue : " + Thread.currentThread().getName());
             Thread.dumpStack();
-            System.exit(200);
+            System.exit(666);
         }
         Interval<Date> newInterval = new Interval<Date>(null, null);
         switch (zoom) {
@@ -300,8 +307,9 @@ public class ZoomController implements PlotAreaSpaceListener, LayersListener {
 
     public Interval<Date> getSelectedInterval() {
         if (!EventQueue.isDispatchThread()) {
+            Log.error("Called by other thread than event queue : " + Thread.currentThread().getName());
             Thread.dumpStack();
-            System.exit(200);
+            System.exit(666);
         }
         return selectedInterval;
     }
@@ -314,8 +322,9 @@ public class ZoomController implements PlotAreaSpaceListener, LayersListener {
 
     public void setSelectedResolution(final API_RESOLUTION_AVERAGES resolution) {
         if (!EventQueue.isDispatchThread()) {
+            Log.error("Called by other thread than event queue : " + Thread.currentThread().getName());
             Thread.dumpStack();
-            System.exit(200);
+            System.exit(666);
         }
         selectedResolution = resolution;
         fireSelectedResolutionChanged(selectedResolution);
@@ -323,8 +332,9 @@ public class ZoomController implements PlotAreaSpaceListener, LayersListener {
 
     public API_RESOLUTION_AVERAGES getSelectedResolution() {
         if (!EventQueue.isDispatchThread()) {
+            Log.error("Called by other thread than event queue : " + Thread.currentThread().getName());
             Thread.dumpStack();
-            System.exit(200);
+            System.exit(666);
         }
         return selectedResolution;
     }
@@ -338,8 +348,9 @@ public class ZoomController implements PlotAreaSpaceListener, LayersListener {
     @Override
     public void plotAreaSpaceChanged(double scaledMinValue, double scaledMaxValue, double scaledMinTime, double scaledMaxTime, double scaledSelectedMinValue, double scaledSelectedMaxValue, double scaledSelectedMinTime, double scaledSelectedMaxTime, boolean forced) {
         if (!EventQueue.isDispatchThread()) {
+            Log.error("Called by other thread than event queue : " + Thread.currentThread().getName());
             Thread.dumpStack();
-            System.exit(200);
+            System.exit(666);
         }
         if (availableInterval.getStart() != null && availableInterval.getEnd() != null && selectedInterval.getStart() != null && selectedInterval.getEnd() != null) {
             long diffTime = availableInterval.getEnd().getTime() - availableInterval.getStart().getTime();
@@ -370,8 +381,9 @@ public class ZoomController implements PlotAreaSpaceListener, LayersListener {
     @Override
     public void availablePlotAreaSpaceChanged(double oldMinValue, double oldMaxValue, double oldMinTime, double oldMaxTime, double newMinValue, double newMaxValue, double newMinTime, double newMaxTime) {
         if (!EventQueue.isDispatchThread()) {
+            Log.error("Called by other thread than event queue : " + Thread.currentThread().getName());
             Thread.dumpStack();
-            System.exit(200);
+            System.exit(666);
         }
         if (availableInterval != null && availableInterval.getStart() != null && availableInterval.getEnd() != null && (oldMinTime > newMinTime || oldMaxTime < newMaxTime)) {
             double timeRatio = (availableInterval.getEnd().getTime() - availableInterval.getStart().getTime()) / (oldMaxTime - oldMinTime);
@@ -388,8 +400,9 @@ public class ZoomController implements PlotAreaSpaceListener, LayersListener {
     @Override
     public void layerAdded(int idx) {
         if (!EventQueue.isDispatchThread()) {
+            Log.error("Called by other thread than event queue : " + Thread.currentThread().getName());
             Thread.dumpStack();
-            System.exit(200);
+            System.exit(666);
         }
         final Interval<Date> interval = new Interval<Date>(LayersModel.getSingletonInstance().getFirstDate(), LayersModel.getSingletonInstance().getLastDate());
         if (availableInterval == null || availableInterval.getStart() == null || availableInterval.getEnd() == null) {
