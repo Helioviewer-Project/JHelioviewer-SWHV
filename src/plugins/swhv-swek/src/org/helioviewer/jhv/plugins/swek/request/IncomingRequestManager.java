@@ -10,7 +10,6 @@ import java.util.Set;
 import org.helioviewer.base.math.Interval;
 import org.helioviewer.jhv.data.container.JHVEventContainer;
 import org.helioviewer.jhv.data.container.JHVEventContainerRequestHandler;
-import org.helioviewer.jhv.plugins.swek.SWEKPluginLocks;
 
 public class IncomingRequestManager implements JHVEventContainerRequestHandler {
 
@@ -82,29 +81,17 @@ public class IncomingRequestManager implements JHVEventContainerRequestHandler {
      * @return the list of all requested dates
      */
     public List<Date> getAllRequestedDates() {
-        synchronized (SWEKPluginLocks.requestLock) {
-            return dateList;
-        }
-    }
+        return dateList;
 
-    /**
-     * Gets all the requested intervals
-     *
-     * @return the list of requested intervals
-     */
-    /*
-     * public List<Interval<Date>> getAllRequestedIntervals() { synchronized
-     * (SWEKPluginLocks.requestLock) { return intervalList; } }
-     */
+    }
 
     @Override
     public void handleRequestForDate(Date date) {
-        synchronized (SWEKPluginLocks.requestLock) {
-            ArrayList<Date> dates = new ArrayList<Date>();
-            dates.add(date);
-            dateList.addAll(dates);
-            fireNewDateRequested(date);
-        }
+        ArrayList<Date> dates = new ArrayList<Date>();
+        dates.add(date);
+        dateList.addAll(dates);
+        fireNewDateRequested(date);
+
     }
 
     @Override
@@ -115,11 +102,8 @@ public class IncomingRequestManager implements JHVEventContainerRequestHandler {
 
     @Override
     public void handleRequestForDateList(List<Date> dates) {
-        synchronized (SWEKPluginLocks.requestLock) {
-            dateList.addAll(dates);
-            firedNewDateListRequested(dates);
-        }
-
+        dateList.addAll(dates);
+        firedNewDateListRequested(dates);
     }
 
     /**
@@ -160,24 +144,5 @@ public class IncomingRequestManager implements JHVEventContainerRequestHandler {
             l.newRequestForDateList(dates);
         }
     }
-
-    /**
-     * Adds the start and end time to the unique start and end times.
-     *
-     * @param startDate
-     *            the start date to add
-     * @param endDate
-     *            the end date to add
-     * @return true if the start and end date were added, false if the interval
-     *         was already in the list.
-     */
-    /*
-     * private boolean addToUniqueInterval(Date startDate, Date endDate) {
-     * Set<Date> uniqueEndDates = new HashSet<Date>(); if
-     * (uniqueInterval.containsKey(startDate)) { uniqueEndDates =
-     * uniqueInterval.get(startDate); if (uniqueEndDates.contains(endDate)) {
-     * return false; } } uniqueEndDates.add(endDate);
-     * uniqueInterval.put(startDate, uniqueEndDates); return true; }
-     */
 
 }
