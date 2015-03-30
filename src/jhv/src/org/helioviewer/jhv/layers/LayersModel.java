@@ -483,7 +483,14 @@ public class LayersModel extends AbstractTableModel {
         }
 
         int newIndex = invertIndex(layeredView.addLayer(view));
-        fireLayerAdded(newIndex);
+        // wtf
+        while (view.getSubimageData() == null) {
+            try {
+                Thread.sleep(100);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
 
         ImageViewerGui ivg = ImageViewerGui.getSingletonInstance();
         // If MoviewView, add MoviePanel
@@ -498,8 +505,8 @@ public class LayersModel extends AbstractTableModel {
             ivg.getMoviePanelContainer().addLayer(view, moviePanel);
         }
 
+        fireLayerAdded(newIndex);
         fireTableRowsInserted(newIndex, newIndex);
-
         setActiveLayer(newIndex);
     }
 
