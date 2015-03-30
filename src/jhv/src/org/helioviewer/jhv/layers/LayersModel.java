@@ -370,7 +370,6 @@ public class LayersModel extends AbstractTableModel {
         setVisibleLink(getLayer(idx), visible);
     }
 
-
     /**
      * Change the visibility of the layer in question
      *
@@ -379,7 +378,7 @@ public class LayersModel extends AbstractTableModel {
      * @param visible
      *            - the new visibility state
      */
-    public void setVisible(JHVJP2View view, boolean visible) {
+    private void setVisible(JHVJP2View view, boolean visible) {
         if (layeredView.isVisible(view) != visible) {
             layeredView.toggleVisibility(view);
 
@@ -533,6 +532,19 @@ public class LayersModel extends AbstractTableModel {
         int newIndex = invertIndex(layeredView.addLayer(view));
         fireLayerAdded(newIndex);
 
+        ImageViewerGui ivg = ImageViewerGui.getSingletonInstance();
+        // If MoviewView, add MoviePanel
+        if (view instanceof JHVJPXView) {
+            MoviePanel moviePanel = new MoviePanel((JHVJPXView) view);
+            if (isTimed(view)) {
+                setLink(view, true);
+            }
+            ivg.getMoviePanelContainer().addLayer(view, moviePanel);
+        } else {
+            MoviePanel moviePanel = new MoviePanel(null);
+            ivg.getMoviePanelContainer().addLayer(view, moviePanel);
+        }
+
         setActiveLayer(newIndex);
 
         updateData();
@@ -579,7 +591,7 @@ public class LayersModel extends AbstractTableModel {
      * @param link
      *            - true if the layer in question should be linked
      */
-    public void setLink(JHVJP2View view, boolean link) {
+    private void setLink(JHVJP2View view, boolean link) {
         if (view == null) {
             return;
         }

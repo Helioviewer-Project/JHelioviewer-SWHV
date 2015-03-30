@@ -2,16 +2,12 @@ package org.helioviewer.jhv.gui;
 
 import java.util.AbstractList;
 
-import org.helioviewer.jhv.gui.components.MoviePanel;
 import org.helioviewer.jhv.layers.LayersModel;
 import org.helioviewer.viewmodel.factory.GL3DViewFactory;
 import org.helioviewer.viewmodel.factory.ViewFactory;
 import org.helioviewer.viewmodel.view.ComponentView;
 import org.helioviewer.viewmodel.view.LayeredView;
-import org.helioviewer.viewmodel.view.ModifiableInnerViewView;
-import org.helioviewer.viewmodel.view.MovieView;
 import org.helioviewer.viewmodel.view.OverlayView;
-import org.helioviewer.viewmodel.view.View;
 import org.helioviewer.viewmodel.view.jp2view.JHVJP2View;
 import org.helioviewer.viewmodel.view.opengl.GL3DCameraView;
 import org.helioviewer.viewmodel.view.opengl.GL3DComponentView;
@@ -86,19 +82,6 @@ public class GL3DViewchainFactory {
 
         lm.addLayer(newLayer);
 
-        // If MoviewView, add MoviePanel
-        if (newLayer instanceof MovieView) {
-            MoviePanel moviePanel = new MoviePanel((MovieView) newLayer);
-            if (lm.isTimed(newLayer)) {
-                lm.setLink(newLayer, true);
-            }
-
-            ivg.getMoviePanelContainer().addLayer(newLayer, moviePanel);
-        } else {
-            MoviePanel moviePanel = new MoviePanel(null);
-            ivg.getMoviePanelContainer().addLayer(newLayer, moviePanel);
-        }
-
         ivg.getLeftContentPane().expand(ivg.getFilterPanelContainer());
         lm.setActiveLayer(newLayer);
     }
@@ -170,15 +153,6 @@ public class GL3DViewchainFactory {
         updateOverlayViewsInViewchainMain((GLOverlayView) overlayView);
 
         return componentView;
-    }
-
-    protected View getViewNextToOverlayView(ComponentView componentView) {
-        return componentView.getAdapter(LayeredView.class);
-    }
-
-    protected ModifiableInnerViewView getViewBeforeToOverlayView(ComponentView componentView) {
-        return componentView.getAdapter(GL3DCameraView.class);
-        // return componentView;
     }
 
 }
