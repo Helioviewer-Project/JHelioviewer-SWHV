@@ -46,7 +46,7 @@ public class IncomingRequestManager implements JHVEventContainerRequestHandler {
 
     /**
      * Gets the singleton instance.
-     * 
+     *
      * @return the singleton instance
      */
     public static IncomingRequestManager getSingletonInstance() {
@@ -58,7 +58,7 @@ public class IncomingRequestManager implements JHVEventContainerRequestHandler {
 
     /**
      * Add a request manager listener.
-     * 
+     *
      * @param l
      *            the listener to add
      */
@@ -68,7 +68,7 @@ public class IncomingRequestManager implements JHVEventContainerRequestHandler {
 
     /**
      * Removes request manager listener.
-     * 
+     *
      * @param l
      *            the listener to remove
      */
@@ -78,7 +78,7 @@ public class IncomingRequestManager implements JHVEventContainerRequestHandler {
 
     /**
      * Gets all the requested dates
-     * 
+     *
      * @return the list of all requested dates
      */
     public List<Date> getAllRequestedDates() {
@@ -89,7 +89,7 @@ public class IncomingRequestManager implements JHVEventContainerRequestHandler {
 
     /**
      * Gets all the requested intervals
-     * 
+     *
      * @return the list of requested intervals
      */
     /*
@@ -109,19 +109,8 @@ public class IncomingRequestManager implements JHVEventContainerRequestHandler {
 
     @Override
     public void handleRequestForInterval(Date startDate, Date endDate) {
-        /*
-         * synchronized (SWEKPluginLocks.requestLock) { if
-         * (addToUniqueInterval(startDate, endDate)) {
-         */
         Interval<Date> interval = new Interval<Date>(startDate, endDate);
-        /*
-         * for (Interval<Date> inter : intervalList) { if
-         * (inter.containsInclusive(interval)) { return; } }
-         * intervalList.add(interval);
-         */
         fireNewIntervalRequested(interval);
-        // }
-        // }
     }
 
     @Override
@@ -135,7 +124,7 @@ public class IncomingRequestManager implements JHVEventContainerRequestHandler {
 
     /**
      * Informs the listeners about a new date that was requested
-     * 
+     *
      * @param date
      *            the date that was requested
      * @param requestID
@@ -148,7 +137,7 @@ public class IncomingRequestManager implements JHVEventContainerRequestHandler {
 
     /**
      * Informs the listeners about a new interval that was requested.
-     * 
+     *
      * @param interval
      *            interval that was requested
      * @param requestID
@@ -161,7 +150,7 @@ public class IncomingRequestManager implements JHVEventContainerRequestHandler {
 
     /**
      * Informs the listeners about a new date list that was requested.
-     * 
+     *
      * @param dates
      *            list of dates that was requested
      * @param requestID
@@ -174,7 +163,7 @@ public class IncomingRequestManager implements JHVEventContainerRequestHandler {
 
     /**
      * Adds the start and end time to the unique start and end times.
-     * 
+     *
      * @param startDate
      *            the start date to add
      * @param endDate
