@@ -32,8 +32,8 @@ public class ZoomFitAction extends AbstractAction {
      *            icon for the action
      */
     public ZoomFitAction(boolean small) {
-        super("Zoom to Fit", small ? IconBank.getIcon(JHVIcon.ZOOM_FIT_SMALL) : IconBank.getIcon(JHVIcon.ZOOM_FIT));
-        putValue(SHORT_DESCRIPTION, "Zoom to Fit");
+        super("Zoom to fit", small ? IconBank.getIcon(JHVIcon.ZOOM_FIT_SMALL) : IconBank.getIcon(JHVIcon.ZOOM_FIT));
+        putValue(SHORT_DESCRIPTION, "Zoom to fit");
         putValue(MNEMONIC_KEY, KeyEvent.VK_F);
         putValue(ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_K, KeyEvent.ALT_MASK));
     }

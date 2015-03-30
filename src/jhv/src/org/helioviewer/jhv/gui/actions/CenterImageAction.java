@@ -29,7 +29,7 @@ public class CenterImageAction extends AbstractAction {
      * Default constructor.
      */
     public CenterImageAction() {
-        super("Center Image");
+        super("Center image");
         putValue(SHORT_DESCRIPTION, "Center the image");
         putValue(MNEMONIC_KEY, KeyEvent.VK_C);
         putValue(ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_C, KeyEvent.ALT_MASK));

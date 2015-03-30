@@ -23,7 +23,7 @@ public class ShowMetainfoOfView extends AbstractAction {
      * Default constructor.
      */
     public ShowMetainfoOfView(JHVJP2View view) {
-        super("Show Metainfo", IconBank.getIcon(JHVIcon.INFO));
+        super("Show metadata", IconBank.getIcon(JHVIcon.INFO));
         this.view = view;
     }
 

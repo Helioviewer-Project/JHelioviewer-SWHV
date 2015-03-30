@@ -30,7 +30,7 @@ public class UnHideLayerAction extends AbstractAction {
      *            Layer to control
      */
     public UnHideLayerAction(JHVJP2View view) {
-        super("Show Layer");
+        super("Show layer");
 
         LayerDescriptor ld = LayersModel.getSingletonInstance().getDescriptor(view);
         ld.isVisible = false;

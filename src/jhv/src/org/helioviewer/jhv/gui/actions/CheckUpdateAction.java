@@ -20,8 +20,8 @@ public class CheckUpdateAction extends AbstractAction {
     private static final long serialVersionUID = 1L;
 
     public CheckUpdateAction() {
-        super("Check for Updates...");
-        putValue(SHORT_DESCRIPTION, "Check for Newer Releases");
+        super("Check for updates...");
+        putValue(SHORT_DESCRIPTION, "Check for newer releases");
     }
 
     /**
@@ -35,7 +35,7 @@ public class CheckUpdateAction extends AbstractAction {
             update.check();
         } catch (MalformedURLException e) {
             // Should not happen
-            Log.error("Error while parsing update url " + e.getLocalizedMessage(), e);
+            Log.error("Error while parsing update URL " + e.getLocalizedMessage(), e);
         }
     }
 }

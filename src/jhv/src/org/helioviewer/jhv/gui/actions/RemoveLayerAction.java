@@ -29,7 +29,7 @@ public class RemoveLayerAction extends AbstractAction {
      *            Layer to control
      */
     public RemoveLayerAction(JHVJP2View view) {
-        super("Close Layer", IconBank.getIcon(JHVIcon.REMOVE_LAYER));
+        super("Close layer", IconBank.getIcon(JHVIcon.REMOVE_LAYER));
         this.view = view;
     }
 

@@ -24,7 +24,7 @@ public class ToggleFullscreenAction extends AbstractAction {
      * Default constructor.
      */
     public ToggleFullscreenAction() {
-        super("Toggle Fullscreen");
+        super("Toggle fullscreen");
         putValue(SHORT_DESCRIPTION, "Toggle fullscreen");
         putValue(MNEMONIC_KEY, KeyEvent.VK_T);
         putValue(ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_T, KeyEvent.ALT_MASK));
