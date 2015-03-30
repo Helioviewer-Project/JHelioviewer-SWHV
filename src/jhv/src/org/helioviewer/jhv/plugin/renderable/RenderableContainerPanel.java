@@ -26,7 +26,7 @@ public class RenderableContainerPanel extends JPanel {
 
     private static final int VISIBLEROW = 0;
     private static final int TITLEROW = 1;
-    private static final int TIMEROW = 2;
+    public static final int TIMEROW = 2;
     private static final int REMOVEROW = 3;
     public static final int NUMBEROFCOLUMNS = 4;
 

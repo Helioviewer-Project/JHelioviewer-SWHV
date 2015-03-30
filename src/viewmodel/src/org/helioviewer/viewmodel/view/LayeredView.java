@@ -156,7 +156,7 @@ public class LayeredView extends AbstractView implements ViewListener, GL3DView 
         LinkedMovieManager.getActiveInstance().pauseLinkedMovies();
 
         GL3DImageLayer imageLayer = new GL3DImageLayer("", newView, true, true, true);
-
+        newView.setImageLayer(imageLayer);
         layers.add(newIndex, newView);
         jp2viewLookup.put(newView, new Layer(newView, imageLayer.getName()));
         newView.addViewListener(this);

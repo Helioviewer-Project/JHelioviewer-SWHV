@@ -15,6 +15,7 @@ import org.helioviewer.base.math.Interval;
 import org.helioviewer.base.math.MathUtils;
 import org.helioviewer.base.math.Vector2dInt;
 import org.helioviewer.base.physics.Astronomy;
+import org.helioviewer.gl3d.model.image.GL3DImageLayer;
 import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.display.RenderListener;
 import org.helioviewer.jhv.gui.filters.lut.DefaultTable;
@@ -108,6 +109,7 @@ public class JHVJP2View extends AbstractView implements JP2View, ViewportView, R
 
     private ImageData previousImageData;
     private ImageData baseDifferenceImageData;
+    private GL3DImageLayer imageLayer;
 
     /**
      * Default constructor.
@@ -129,6 +131,14 @@ public class JHVJP2View extends AbstractView implements JP2View, ViewportView, R
         }
         isPersistent = isMainView;
         this.range = range;
+    }
+
+    public void setImageLayer(GL3DImageLayer imageLayer) {
+        this.imageLayer = imageLayer;
+    }
+
+    public GL3DImageLayer getImageLayer() {
+        return imageLayer;
     }
 
     /**
