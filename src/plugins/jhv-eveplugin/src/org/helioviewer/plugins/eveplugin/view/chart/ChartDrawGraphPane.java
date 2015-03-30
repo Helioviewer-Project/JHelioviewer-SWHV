@@ -523,7 +523,6 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
     }
 
     private void updateGraphEvents() {
-
         // Prepare an ImageIcons to be used with JComponents or drawImage()
         Calendar cal = Calendar.getInstance();
         cal.add(Calendar.DATE, -1);
@@ -786,10 +785,10 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
         // //////////////////////////////////////////////////////////////////////////
 
         public GraphEvent(Calendar beginDate, Calendar endDate) {
-            URL url = EVEPlugin.getResourceUrl("/images/ar_icon.png");
-            if (icon == null) {
+            /* if (icon == null) {
+                URL url = EVEPlugin.getResourceUrl("/images/ar_icon.png");
                 icon = new ImageIcon(url);
-            }
+            } */
         }
     }
 
@@ -897,7 +896,6 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
     @Override
     public void windowLostFocus(WindowEvent e) {
         // TODO Auto-generated method stub
-
     }
 
     private class RedrawTimerTask extends TimerTask {
