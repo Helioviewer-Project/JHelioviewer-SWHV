@@ -212,7 +212,7 @@ public class ImageSelectorPanel extends JPanel implements LayersListener {
          */
         private static final long serialVersionUID = 1L;
         {
-            putValue(SHORT_DESCRIPTION, "Show the metadata of the selected layer");
+            putValue(SHORT_DESCRIPTION, "Show metadata of the selected layer");
             putValue(SMALL_ICON, IconBank.getIcon(JHVIcon.INFO));
         }
 

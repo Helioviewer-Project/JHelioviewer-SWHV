@@ -143,7 +143,7 @@ public class LayersModel extends AbstractTableModel {
      * @param view
      */
     public void setActiveLayer(JHVJP2View view) {
-        int i = this.findView(view);
+        int i = findView(view);
         setActiveLayer(i);
     }
 

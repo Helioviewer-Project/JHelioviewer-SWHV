@@ -29,7 +29,7 @@ public class MoveLayerDownAction extends AbstractAction {
      *            Layer to move down
      */
     public MoveLayerDownAction(JHVJP2View view) {
-        super("Move Layer Down", IconBank.getIcon(JHVIcon.DOWN));
+        super("Move layer down", IconBank.getIcon(JHVIcon.DOWN));
         this.view = view;
     }
 

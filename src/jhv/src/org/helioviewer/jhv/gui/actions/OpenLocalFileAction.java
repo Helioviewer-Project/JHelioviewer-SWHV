@@ -39,7 +39,7 @@ public class OpenLocalFileAction extends AbstractAction {
      */
     public OpenLocalFileAction() {
         super("Open...");
-        putValue(SHORT_DESCRIPTION, "Open New Image");
+        putValue(SHORT_DESCRIPTION, "Open new image");
         putValue(ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_O, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
     }
 

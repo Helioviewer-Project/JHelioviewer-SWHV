@@ -30,7 +30,7 @@ public class HideLayerAction extends AbstractAction {
      *            Layer to control
      */
     public HideLayerAction(JHVJP2View view) {
-        super("Hide Layer");
+        super("Hide layer");
 
         LayerDescriptor ld = LayersModel.getSingletonInstance().getDescriptor(view);
         ld.isVisible = false;

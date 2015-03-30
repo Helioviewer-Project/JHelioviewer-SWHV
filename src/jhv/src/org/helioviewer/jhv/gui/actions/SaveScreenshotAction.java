@@ -32,8 +32,8 @@ public class SaveScreenshotAction extends AbstractAction {
      * Default constructor.
      */
     public SaveScreenshotAction() {
-        super("Save Screenshot");
-        putValue(SHORT_DESCRIPTION, "Save Screenshot to Default Folder");
+        super("Save screenshot");
+        putValue(SHORT_DESCRIPTION, "Save screenshot to default folder");
         putValue(ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_S, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
     }
 

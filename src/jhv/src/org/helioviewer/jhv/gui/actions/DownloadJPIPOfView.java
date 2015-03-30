@@ -26,7 +26,7 @@ public class DownloadJPIPOfView extends AbstractAction {
      *            - view of which the available image data should be downloaded
      */
     public DownloadJPIPOfView(JHVJP2View view) {
-        super("Download Movie", IconBank.getIcon(JHVIcon.DOWNLOAD));
+        super("Download movie", IconBank.getIcon(JHVIcon.DOWNLOAD));
         this.view = view;
     }
 
