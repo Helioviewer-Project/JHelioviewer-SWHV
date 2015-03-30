@@ -7,16 +7,15 @@ import java.util.Date;
 
 import javax.swing.Timer;
 
-import org.helioviewer.jhv.layers.LayersModel;
-import org.helioviewer.jhv.gui.components.MoviePanel;
-import org.helioviewer.jhv.gui.components.statusplugins.FramerateStatusPanel;
-import org.helioviewer.viewmodel.view.jp2view.JHVJP2View;
-import org.helioviewer.viewmodel.view.jp2view.datetime.ImmutableDateTime;
-
 import org.helioviewer.jhv.data.datatype.event.JHVEvent;
 import org.helioviewer.jhv.data.datatype.event.JHVEventHighlightListener;
+import org.helioviewer.jhv.gui.components.MoviePanel;
+import org.helioviewer.jhv.gui.components.statusplugins.FramerateStatusPanel;
+import org.helioviewer.jhv.layers.LayersModel;
 import org.helioviewer.jhv.plugin.renderable.RenderableContainer;
 import org.helioviewer.jhv.plugin.renderable.RenderableContainerPanel;
+import org.helioviewer.viewmodel.view.jp2view.JHVJP2View;
+import org.helioviewer.viewmodel.view.jp2view.datetime.ImmutableDateTime;
 
 public class Displayer implements JHVEventHighlightListener {
 
@@ -105,7 +104,7 @@ public class Displayer implements JHVEventHighlightListener {
         if (idx != -1 /* layersModel.isValidIndex(idx) */) {
             // update timestamp labels
             layersModel.fireTableRowsUpdated(idx, idx);
-            Displayer.getRenderablecontainer().fireTimeUpdated();
+            Displayer.getRenderablecontainer().fireTimeUpdated(view.getImageLayer());
 
             if (idx == layersModel.getActiveLayer() && dateTime != null) {
                 framerateStatus.updateFramerate(layersModel.getFPS(view));
