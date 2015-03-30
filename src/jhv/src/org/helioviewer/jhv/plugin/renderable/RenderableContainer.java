@@ -6,8 +6,10 @@ import javax.swing.event.TableModelEvent;
 import javax.swing.event.TableModelListener;
 import javax.swing.table.TableModel;
 
+import org.helioviewer.gl3d.model.image.GL3DImageLayer;
 import org.helioviewer.gl3d.scenegraph.GL3DState;
 import org.helioviewer.jhv.renderable.RenderableGrid;
+import org.helioviewer.jhv.renderable.RenderableImageType;
 import org.helioviewer.jhv.renderable.RenderableSolarAxes;
 import org.helioviewer.jhv.renderable.RenderableSolarAxesType;
 
@@ -28,8 +30,22 @@ public class RenderableContainer implements TableModel, Reorderable {
     }
 
     public void addBeforeRenderable(Renderable renderable) {
-        renderables.add(0, renderable);
+        int countImagelayers = 0;
+        int lastImagelayerIndex = -1;
+        int size = renderables.size();
+        for (int i = 0; i < size; i++) {
+            if (renderables.get(i).getType() instanceof RenderableImageType) {
+                countImagelayers++;
+                lastImagelayerIndex = i;
+            }
+        }
+        renderables.add(lastImagelayerIndex + 1, renderable);
         newRenderables.add(renderable);
+        if (renderable instanceof GL3DImageLayer) {
+            GL3DImageLayer ri = ((GL3DImageLayer) renderable);
+            ri.getMainLayerView().setOpacity((float) (1. / (1. + countImagelayers)));
+            System.out.println((float) (1. / (1. + countImagelayers)) + "opacity");
+        }
         fireListeners();
     }
 
@@ -48,6 +64,7 @@ public class RenderableContainer implements TableModel, Reorderable {
     public void render(GL3DState state) {
         removeRenderables(state);
         initRenderables(state);
+
         for (Renderable renderable : renderables) {
             renderable.render(state);
         }

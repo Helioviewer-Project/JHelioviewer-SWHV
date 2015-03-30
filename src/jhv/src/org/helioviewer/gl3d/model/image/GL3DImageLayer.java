@@ -114,7 +114,7 @@ public class GL3DImageLayer implements Renderable {
     }
 
     private void updateROI(GL3DState state) {
-        MetaData metaData = mainLayerView.getMetaData();
+        MetaData metaData = getMainLayerView().getMetaData();
         GL3DCamera activeCamera = state.getActiveCamera();
         HelioviewerMetaData hvmd = null;
         if (metaData instanceof HelioviewerMetaData) {
@@ -185,10 +185,10 @@ public class GL3DImageLayer implements Renderable {
         } else {
             newRegion = StaticRegion.createAdaptedRegion(metLLX, metLLY, metURX - metLLX, metURY - metLLY);
         }
-        this.mainLayerView.setRegion(newRegion, null);
+        this.getMainLayerView().setRegion(newRegion, null);
 
         Viewport layerViewport = new ViewportAdapter(new StaticViewport(state.getViewportWidth(), state.getViewportHeight()));
-        this.mainLayerView.setViewport(layerViewport, null);
+        this.getMainLayerView().setViewport(layerViewport, null);
     }
 
     @Override
@@ -208,7 +208,7 @@ public class GL3DImageLayer implements Renderable {
                 gl.glCullFace(GL2.GL_BACK);
 
                 gl.glEnable(GL2.GL_BLEND);
-                JHVJP2View jp2view = this.mainLayerView;
+                JHVJP2View jp2view = this.getMainLayerView();
 
                 if (jp2view != null) {
                     jp2view.applyFilters(gl);
@@ -282,7 +282,7 @@ public class GL3DImageLayer implements Renderable {
         disableIndexVBO(state);
         deletePositionVBO(state);
         deleteIndexVBO(state);
-        LayersModel.getSingletonInstance().removeLayer(mainLayerView);
+        LayersModel.getSingletonInstance().removeLayer(getMainLayerView());
     }
 
     private Pair<FloatBuffer, IntBuffer> makeIcosphere(int level) {
@@ -405,7 +405,7 @@ public class GL3DImageLayer implements Renderable {
     @Override
     public Component getOptionsPanel() {
         ImageViewerGui ivg = ImageViewerGui.getSingletonInstance();
-        ivg.getFilterTabPanelManager().setActivejp2(mainLayerView);
+        ivg.getFilterTabPanelManager().setActivejp2(getMainLayerView());
         return ivg.getFilterPanelContainer();
     }
 
@@ -421,12 +421,16 @@ public class GL3DImageLayer implements Renderable {
 
     @Override
     public String getName() {
-        return mainLayerView.getName();
+        return getMainLayerView().getName();
     }
 
     @Override
     public String getTimeString() {
-        return mainLayerView.getMetaData().getDateTime().getCachedDate();
+        return getMainLayerView().getMetaData().getDateTime().getCachedDate();
+    }
+
+    public JHVJP2View getMainLayerView() {
+        return mainLayerView;
     }
 
 }
