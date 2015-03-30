@@ -354,38 +354,24 @@ public class LayersModel extends AbstractTableModel {
      *
      * @param view
      *            - View that can be associated with the layer in question
-     * @param visible
-     *            - the new visibility state
      */
-    public void setVisibleLink(JHVJP2View view, boolean visible) {
-        this.setVisible(view, visible);
-        this.setLink(view, visible);
+    public void toggleVisibility(JHVJP2View view) {
+        layeredView.toggleVisibility(view);
+
+        ImageViewerGui.getSingletonInstance().getMoviePanelContainer().layerVisibilityChanged(view);
+        int idx = findView(view);
+        fireTableRowsUpdated(idx, idx);
+
+        boolean visible = layeredView.isVisible(view);
+        setLink(view, visible);
 
         if (!visible) {
             this.setPlaying(view, false);
         }
     }
 
-    public void setVisibleLink(int idx, boolean visible) {
-        setVisibleLink(getLayer(idx), visible);
-    }
-
-    /**
-     * Change the visibility of the layer in question
-     *
-     * @param view
-     *            - View that can be associated with the layer in question
-     * @param visible
-     *            - the new visibility state
-     */
-    private void setVisible(JHVJP2View view, boolean visible) {
-        if (layeredView.isVisible(view) != visible) {
-            layeredView.toggleVisibility(view);
-
-            ImageViewerGui.getSingletonInstance().getMoviePanelContainer().layerVisibilityChanged(view);
-            int idx = findView(view);
-            fireTableRowsUpdated(idx, idx);
-        }
+    public void toggleVisibility(int idx) {
+        toggleVisibility(getLayer(idx));
     }
 
     /**
@@ -401,17 +387,6 @@ public class LayersModel extends AbstractTableModel {
     }
 
     /**
-     * Get the visibility of the layer in question
-     *
-     * @param idx
-     *            - index of the layer in question
-     * @return true if the layer is visible
-     */
-    public boolean isVisible(int idx) {
-        return isVisible(getLayer(idx));
-    }
-
-    /**
      * Check if the given index is valid, given the current state of the
      * LayeredView/ViewChain
      *
@@ -419,7 +394,7 @@ public class LayersModel extends AbstractTableModel {
      *            - index of the layer in question
      * @return true if the index is valid
      */
-    public boolean isValidIndex(int idx) {
+    private boolean isValidIndex(int idx) {
         if (idx >= 0 && idx < this.getNumLayers()) {
             return true;
         }
