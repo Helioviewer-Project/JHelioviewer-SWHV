@@ -137,17 +137,6 @@ public class LayersModel extends AbstractTableModel {
     }
 
     /**
-     * Set the activeLayer to the Layer that can be associated to the given
-     * view, do nothing if the view cannot be associated with any layer
-     *
-     * @param view
-     */
-    public void setActiveLayer(JHVJP2View view) {
-        int i = findView(view);
-        setActiveLayer(i);
-    }
-
-    /**
      * Set the activeLayer to the Layer associated with the given index
      *
      * @param idx
@@ -520,10 +509,10 @@ public class LayersModel extends AbstractTableModel {
             ivg.getMoviePanelContainer().addLayer(view, moviePanel);
         }
 
-        setActiveLayer(newIndex);
-
         updateData();
         fireTableRowsInserted(newIndex, newIndex);
+
+        setActiveLayer(newIndex);
     }
 
     /**
@@ -547,11 +536,11 @@ public class LayersModel extends AbstractTableModel {
         int oldIndex = invertIndexDeleted(layeredView.removeLayer(view));
         fireLayerRemoved(oldIndex);
 
-        int newIndex = determineNewActiveLayer(oldIndex);
-        setActiveLayer(newIndex);
-
         updateData();
         fireTableRowsDeleted(oldIndex, oldIndex);
+
+        int newIndex = determineNewActiveLayer(oldIndex);
+        setActiveLayer(newIndex);
     }
 
     public void removeLayer(int idx) {
