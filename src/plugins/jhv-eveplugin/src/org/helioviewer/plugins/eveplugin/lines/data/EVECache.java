@@ -31,7 +31,7 @@ public class EVECache {
         GregorianCalendar calendar = new GregorianCalendar();
         if (values != null) {
             for (int i = 0; i < values.length; i++) {
-                calendar.setTime(new Date(dates[i]));
+                calendar.setTimeInMillis(dates[i]);
                 final Integer key = new Integer(calendar.get(Calendar.YEAR) * 1000 + calendar.get(Calendar.DAY_OF_YEAR));
 
                 EVEDataOfDay cache = cacheMap.get(key);

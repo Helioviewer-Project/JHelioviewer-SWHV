@@ -80,7 +80,9 @@ public class EVEDrawableElement implements DrawableElement {
 
             for (int i = 0; i < bands.length; ++i) {
                 if (bands[i].isVisible()) {
-                    Pair<ArrayList<Long>, ArrayList<Double>> eveValues = values[i].getValues();
+
+                    int num = values[i].getNumberOfValues();
+
                     final ArrayList<Point> pointList = new ArrayList<Point>();
                     final LinkedList<Integer> warnLevels = new LinkedList<Integer>();
                     final LinkedList<String> warnLabels = new LinkedList<String>();
@@ -102,11 +104,8 @@ public class EVEDrawableElement implements DrawableElement {
                     }
 
                     int counter = 0;
-                    ArrayList<Double> evevalues = eveValues.b;
-                    ArrayList<Long> evedates = eveValues.a;
-
-                    for (int j = 0; j < evevalues.size(); j++) {
-                        double value = evevalues.get(j);
+                    for (int j = 0; j < num; j++) {
+                        double value = values[i].values[j];
 
                         if (yAxisElement.isLogScale() && value < 10e-50) {
                             if (counter > 1) {
@@ -119,7 +118,8 @@ public class EVEDrawableElement implements DrawableElement {
                             continue;
                         }
 
-                        int x = (int) ((evedates.get(j) - intervalStartTime) * ratioX) + graphArea.x;
+                        long date = values[i].dates[j];
+                        int x = (int) ((date - intervalStartTime) * ratioX) + graphArea.x;
                         int y = dY;
                         if (yAxisElement.isLogScale()) {
                             y -= computeY(Math.log10(value), ratioY, log10minValue);
@@ -127,8 +127,8 @@ public class EVEDrawableElement implements DrawableElement {
                             y -= computeY(value, ratioY, minValue);
                         }
                         final Point point = new Point(x, y);
-                        if (evedates.get(j) > lastMilliWithData) {
-                            lastMilliWithData = evedates.get(j);
+                        if (date > lastMilliWithData) {
+                            lastMilliWithData = date;
                         }
                         pointList.add(point);
                         counter++;
