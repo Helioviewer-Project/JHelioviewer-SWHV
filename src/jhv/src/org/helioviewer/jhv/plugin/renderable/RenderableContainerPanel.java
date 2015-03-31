@@ -21,6 +21,8 @@ import javax.swing.border.Border;
 import javax.swing.border.MatteBorder;
 
 import org.helioviewer.jhv.display.Displayer;
+import org.helioviewer.jhv.gui.IconBank;
+import org.helioviewer.jhv.gui.IconBank.JHVIcon;
 import org.helioviewer.jhv.gui.ImageViewerGui;
 
 public class RenderableContainerPanel extends JPanel {
@@ -136,6 +138,10 @@ public class RenderableContainerPanel extends JPanel {
         gc.gridy = 1;
         JPanel addLayerButtonWrapper = new JPanel(new FlowLayout(FlowLayout.RIGHT, 0, 0));
         JButton addLayerButton = new JButton(ImageViewerGui.getSingletonInstance().getImageSelectorPanel().addLayerAction);
+        addLayerButton.setText("");
+        addLayerButton.setToolTipText("Click to add extra layers");
+        addLayerButton.setIcon(IconBank.getIcon(JHVIcon.ADD));
+        addLayerButton.setBorder(null);
         addLayerButtonWrapper.add(addLayerButton);
         add(addLayerButtonWrapper, gc);
 
