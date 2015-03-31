@@ -1,13 +1,14 @@
 package org.helioviewer.plugins.eveplugin.lines.data;
 
+import java.util.ArrayList;
 import java.util.Date;
-import java.util.LinkedList;
 
+import org.helioviewer.base.Pair;
 import org.helioviewer.base.math.Interval;
 import org.helioviewer.plugins.eveplugin.download.DownloadedData;
 
 /**
- * 
+ *
  * @author Stephan Pagel
  * */
 public class EVEValues implements DownloadedData {
@@ -16,7 +17,8 @@ public class EVEValues implements DownloadedData {
     // Definitions
     // //////////////////////////////////////////////////////////////////////////////
 
-    private final LinkedList<EVEValue> values = new LinkedList<EVEValue>();
+    ArrayList<Long> dates = new ArrayList<Long>();
+    ArrayList<Double> values = new ArrayList<Double>();
     private double minValue = Double.MAX_VALUE;
     private double maxValue = Double.MIN_VALUE;
 
@@ -24,28 +26,31 @@ public class EVEValues implements DownloadedData {
     // Methods
     // //////////////////////////////////////////////////////////////////////////////
 
-    public void addValue(final EVEValue value) {
+    public void addValue(final long date, final double value) {
         values.add(value);
+        dates.add(date);
 
-        if (Double.isNaN(value.value))
+        if (Double.isNaN(value))
             return;
 
-        minValue = value.value < minValue ? value.value : minValue;
-        maxValue = value.value > maxValue ? value.value : maxValue;
+        minValue = value < minValue ? value : minValue;
+        maxValue = value > maxValue ? value : maxValue;
     }
 
-    public EVEValue[] getValues() {
-        return values.toArray(new EVEValue[0]);
+    public Pair<ArrayList<Long>, ArrayList<Double>> getValues() {
+        return new Pair<ArrayList<Long>, ArrayList<Double>>(dates, values);
     }
 
     public int getNumberOfValues() {
         return values.size();
     }
 
+    @Override
     public double getMinimumValue() {
         return minValue;
     }
 
+    @Override
     public double getMaximumValue() {
         return maxValue;
     }
@@ -55,7 +60,6 @@ public class EVEValues implements DownloadedData {
             return new Interval<Date>(null, null);
         }
 
-        return new Interval<Date>(new Date(values.getFirst().milli), new Date(values.getLast().milli));
+        return new Interval<Date>(new Date(dates.get(0)), new Date(dates.get(dates.size() - 1)));
     }
-
 }

@@ -5,6 +5,7 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
 
+import org.helioviewer.base.Pair;
 import org.helioviewer.base.math.Interval;
 import org.helioviewer.plugins.eveplugin.base.Range;
 
@@ -22,7 +23,9 @@ public class EVEDataOfDay {
 
     private final int MINUTES_PER_DAY = 1440;
 
-    private final EVEValue[] values = new EVEValue[MINUTES_PER_DAY];
+    private final double[] values = new double[MINUTES_PER_DAY];
+    private final long[] dates = new long[MINUTES_PER_DAY];
+
     private final Range valueRange = new Range();
     private int posMin = -1;
     private int posMax = -1;
@@ -31,23 +34,12 @@ public class EVEDataOfDay {
     // Methods
     // //////////////////////////////////////////////////////////////////////////////
 
-    /**
-     * Default constructor. The represented day has to be defined.
-     *
-     * @param year
-     *            Year describing the day associated with the {@link EVEValue}s.
-     * @param month
-     *            Month describing the day associated with the {@link EVEValue}
-     *            s.
-     * @param dayOfMonth
-     *            Day of month describing the day associated with the
-     *            {@link EVEValue}s.
-     * */
     public EVEDataOfDay(final int year, final int month, final int dayOfMonth) {
         final GregorianCalendar calendar = new GregorianCalendar(year, month, dayOfMonth);
 
         for (int i = 0; i < values.length; i++) {
-            values[i] = new EVEValue(calendar.getTime().getTime(), Double.NaN);
+            values[i] = Double.NaN;
+            dates[i] = calendar.getTime().getTime();
             calendar.add(Calendar.MINUTE, 1);
         }
     }
@@ -63,7 +55,7 @@ public class EVEDataOfDay {
         calendar.setTimeInMillis(date);
         final int minuteOfDay = calendar.get(Calendar.HOUR_OF_DAY) * 60 + calendar.get(Calendar.MINUTE);
 
-        values[minuteOfDay].value = value;
+        values[minuteOfDay] = value;
 
         if (minuteOfDay == posMin) {
             recomputeMinMax();
@@ -88,7 +80,7 @@ public class EVEDataOfDay {
         posMax = -1;
 
         for (int i = 0; i < values.length; ++i) {
-            final double value = values[i].value;
+            final double value = values[i];
 
             if (valueRange.setMin(value)) {
                 posMin = i;
@@ -108,16 +100,16 @@ public class EVEDataOfDay {
      *
      * @return Values within the given interval.
      * */
-    public EVEValue[] getValuesInInterval(final Interval<Date> interval) {
-        Date dateFirst = new Date(values[0].milli);
-        Date dateLast = new Date(values[MINUTES_PER_DAY - 1].milli);
+    public Pair<long[], double[]> getValuesInInterval(final Interval<Date> interval) {
+        Date dateFirst = new Date(dates[0]);
+        Date dateLast = new Date(dates[MINUTES_PER_DAY - 1]);
 
         if (dateLast.compareTo(interval.getStart()) < 0) {
-            return Arrays.copyOfRange(values, MINUTES_PER_DAY - 3, MINUTES_PER_DAY - 1);
+            return new Pair(Arrays.copyOfRange(dates, MINUTES_PER_DAY - 3, MINUTES_PER_DAY - 1), Arrays.copyOfRange(values, MINUTES_PER_DAY - 3, MINUTES_PER_DAY - 1));
         }
 
         if (dateFirst.compareTo(interval.getEnd()) > 0) {
-            return Arrays.copyOfRange(values, 0, 2);
+            return new Pair(Arrays.copyOfRange(dates, 0, 2), Arrays.copyOfRange(values, 0, 2));
         }
 
         int indexFrom = 0;
@@ -139,7 +131,7 @@ public class EVEDataOfDay {
             indexTo = Math.min(indexTo + 3, MINUTES_PER_DAY - 1);
         }
 
-        return Arrays.copyOfRange(values, indexFrom, indexTo);
+        return new Pair(Arrays.copyOfRange(dates, indexFrom, indexTo), Arrays.copyOfRange(values, indexFrom, indexTo));
     }
 
     /**
@@ -163,8 +155,8 @@ public class EVEDataOfDay {
      *         given interval.
      * */
     public Range getMinMaxInInterval(final Interval<Date> interval) {
-        Date dateFirst = new Date(values[0].milli);
-        Date dateLast = new Date(values[MINUTES_PER_DAY - 1].milli);
+        Date dateFirst = new Date(dates[0]);
+        Date dateLast = new Date(dates[MINUTES_PER_DAY - 1]);
 
         if (dateLast.compareTo(interval.getStart()) < 0 || dateFirst.compareTo(interval.getEnd()) > 0) {
             return new Range();
@@ -193,7 +185,7 @@ public class EVEDataOfDay {
 
         final Range range = new Range();
         for (int i = indexFrom; i <= indexTo; ++i) {
-            range.setMinMax(values[i].value);
+            range.setMinMax(values[i]);
         }
 
         return range;

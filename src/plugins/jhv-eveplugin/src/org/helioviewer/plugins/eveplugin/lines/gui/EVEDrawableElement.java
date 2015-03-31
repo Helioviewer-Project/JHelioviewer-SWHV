@@ -15,12 +15,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import org.helioviewer.base.Pair;
 import org.helioviewer.base.math.Interval;
 import org.helioviewer.plugins.eveplugin.draw.DrawableElement;
 import org.helioviewer.plugins.eveplugin.draw.DrawableElementType;
 import org.helioviewer.plugins.eveplugin.draw.YAxisElement;
 import org.helioviewer.plugins.eveplugin.lines.data.Band;
-import org.helioviewer.plugins.eveplugin.lines.data.EVEValue;
 import org.helioviewer.plugins.eveplugin.lines.data.EVEValues;
 
 public class EVEDrawableElement implements DrawableElement {
@@ -80,7 +80,7 @@ public class EVEDrawableElement implements DrawableElement {
 
             for (int i = 0; i < bands.length; ++i) {
                 if (bands[i].isVisible()) {
-                    final EVEValue[] eveValues = values[i].getValues();
+                    Pair<ArrayList<Long>, ArrayList<Double>> eveValues = values[i].getValues();
                     final ArrayList<Point> pointList = new ArrayList<Point>();
                     final LinkedList<Integer> warnLevels = new LinkedList<Integer>();
                     final LinkedList<String> warnLabels = new LinkedList<String>();
@@ -102,9 +102,11 @@ public class EVEDrawableElement implements DrawableElement {
                     }
 
                     int counter = 0;
+                    ArrayList<Double> evevalues = eveValues.b;
+                    ArrayList<Long> evedates = eveValues.a;
 
-                    for (int j = 0; j < eveValues.length; j++) {
-                        double value = eveValues[j].value;
+                    for (int j = 0; j < evevalues.size(); j++) {
+                        double value = evevalues.get(j);
 
                         if (yAxisElement.isLogScale() && value < 10e-50) {
                             if (counter > 1) {
@@ -117,7 +119,7 @@ public class EVEDrawableElement implements DrawableElement {
                             continue;
                         }
 
-                        int x = (int) ((eveValues[j].milli - intervalStartTime) * ratioX) + graphArea.x;
+                        int x = (int) ((evedates.get(j) - intervalStartTime) * ratioX) + graphArea.x;
                         int y = dY;
                         if (yAxisElement.isLogScale()) {
                             y -= computeY(Math.log10(value), ratioY, log10minValue);
@@ -125,8 +127,8 @@ public class EVEDrawableElement implements DrawableElement {
                             y -= computeY(value, ratioY, minValue);
                         }
                         final Point point = new Point(x, y);
-                        if (eveValues[j].milli > lastMilliWithData) {
-                            lastMilliWithData = eveValues[j].milli;
+                        if (evedates.get(j) > lastMilliWithData) {
+                            lastMilliWithData = evedates.get(j);
                         }
                         pointList.add(point);
                         counter++;

@@ -535,7 +535,6 @@ public class DownloadController {
                     // used time system in data is TAI -> compute to UTC
                     final long millis = ((long) entry.getDouble(0)) * 1000;// -
                     // 378691234000L;
-                    // final long millis = ((long) entry.getDouble(0)*1000);
                     values[i] = entry.getDouble(1) * multiplier;
                     dates[i] = millis;
                 }
