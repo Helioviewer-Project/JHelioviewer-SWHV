@@ -87,7 +87,6 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
     private boolean mouseOverEvent;
     private int lastWidth;
     private int lastHeight;
-    private BufferedImage screenTempImage;
     private final long created;
     private long drawLabelsOperarionTime;
     private boolean updateRequestReceived;
@@ -125,7 +124,6 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
 
     @Override
     protected void paintComponent(Graphics g) {
-
         Graphics2D g2 = (Graphics2D) g;
 
         super.paintComponent(g2);
@@ -158,42 +156,35 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
     }
 
     private void redrawGraph() {
-        BufferedImage localScreenImage = screenImage;
-        screenImage = null;
         int screenfactor = ChartConstants.getScreenfactor();
         int width = screenfactor * getWidth();
         int height = screenfactor * getHeight();
 
         if (width > 0 && height > 0 && screenfactor * (ChartConstants.getGraphTopSpace() + ChartConstants.getGraphBottomSpace() + 1) < height && screenfactor * (ChartConstants.getGraphLeftSpace() + ChartConstants.getGraphRightSpace() + 1) < width) {
             if (width != lastWidth || height != lastHeight) {
-                screenTempImage = new BufferedImage(width, height, BufferedImage.OPAQUE);
-                localScreenImage = new BufferedImage(width, height, BufferedImage.OPAQUE);
+                screenImage = new BufferedImage(width, height, BufferedImage.OPAQUE);
+                lastWidth = width;
+                lastHeight = height;
             }
-            final Graphics2D g = screenTempImage.createGraphics();
+
+            final Graphics2D g = screenImage.createGraphics();
             AffineTransform tf = g.getTransform();
             tf.preConcatenate(AffineTransform.getScaleInstance(screenfactor, screenfactor));
             g.setTransform(tf);
             drawBackground(g);
 
-            BufferedImage plotPart = screenTempImage.getSubimage(screenfactor * ChartConstants.getGraphLeftSpace(), screenfactor * ChartConstants.getGraphTopSpace(), width - screenfactor * ChartConstants.getGraphLeftSpace() - screenfactor * ChartConstants.getGraphRightSpace() - screenfactor * twoYAxis * ChartConstants.getTwoAxisGraphRight(), height - screenfactor * ChartConstants.getGraphTopSpace() - screenfactor * ChartConstants.getGraphBottomSpace());
+            BufferedImage plotPart = screenImage.getSubimage(screenfactor * ChartConstants.getGraphLeftSpace(), screenfactor * ChartConstants.getGraphTopSpace(), width - screenfactor * ChartConstants.getGraphLeftSpace() - screenfactor * ChartConstants.getGraphRightSpace() - screenfactor * twoYAxis * ChartConstants.getTwoAxisGraphRight(), height - screenfactor * ChartConstants.getGraphTopSpace() - screenfactor * ChartConstants.getGraphBottomSpace());
             Graphics2D gplotPart = plotPart.createGraphics();
             gplotPart.setTransform(tf);
-            BufferedImage leftAxisPart = screenTempImage.getSubimage(0, 0, 2 * ChartConstants.getGraphLeftSpace(), height);
+            BufferedImage leftAxisPart = screenImage.getSubimage(0, 0, 2 * ChartConstants.getGraphLeftSpace(), height);
             Graphics2D gleftAxisPart = leftAxisPart.createGraphics();
             gleftAxisPart.setTransform(tf);
             drawData(gplotPart, g, gleftAxisPart, mousePosition);
             gplotPart.dispose();
             gleftAxisPart.dispose();
             g.dispose();
-            lastWidth = width;
-            lastHeight = height;
-            BufferedImage screenTempTempImage = localScreenImage;
-            localScreenImage = screenTempImage;
-            screenTempImage = screenTempTempImage;
         }
-        screenImage = localScreenImage;
         this.repaint();
-
         // Log.info("Run time: " + (System.currentTimeMillis() - start));
     }
 
