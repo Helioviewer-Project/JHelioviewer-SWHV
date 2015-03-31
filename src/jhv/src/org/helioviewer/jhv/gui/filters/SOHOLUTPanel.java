@@ -1,5 +1,6 @@
 package org.helioviewer.jhv.gui.filters;
 
+import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -169,5 +170,23 @@ public class SOHOLUTPanel extends AbstractFilterPanel implements ActionListener,
     public void setJP2View(JHVJP2View jp2view) {
         super.setJP2View(jp2view);
         setValue(jp2view.getLUT(), jp2view.getInvertLUT());
+    }
+
+    @Override
+    public Component getTitle() {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Override
+    public Component getSlider() {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Override
+    public Component getValue() {
+        // TODO Auto-generated method stub
+        return null;
     }
 }

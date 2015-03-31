@@ -1,5 +1,6 @@
 package org.helioviewer.jhv.gui.filters;
 
+import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
@@ -166,5 +167,20 @@ public class GammaCorrectionPanel extends AbstractFilterPanel implements ChangeL
     public void setJP2View(JHVJP2View jp2view) {
         super.setJP2View(jp2view);
         setValue(jp2view.getGamma());
+    }
+
+    @Override
+    public Component getTitle() {
+        return title;
+    }
+
+    @Override
+    public Component getSlider() {
+        return gammaSlider;
+    }
+
+    @Override
+    public Component getValue() {
+        return gammaLabel;
     }
 }

@@ -1,5 +1,6 @@
 package org.helioviewer.jhv.gui.filters;
 
+import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
@@ -112,5 +113,21 @@ public class ContrastPanel extends AbstractFilterPanel implements ChangeListener
     public void setJP2View(JHVJP2View jp2view) {
         super.setJP2View(jp2view);
         setValue(jp2view.getContrast());
+    }
+
+    @Override
+    public Component getTitle() {
+        return title;
+    }
+
+    @Override
+    public Component getSlider() {
+        return this.contrastSlider;
+    }
+
+    @Override
+    public Component getValue() {
+        // TODO Auto-generated method stub
+        return this.contrastLabel;
     }
 }

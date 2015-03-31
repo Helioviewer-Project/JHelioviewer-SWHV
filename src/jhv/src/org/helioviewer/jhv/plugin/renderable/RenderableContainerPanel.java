@@ -1,5 +1,6 @@
 package org.helioviewer.jhv.plugin.renderable;
 
+import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
@@ -26,7 +27,10 @@ import org.helioviewer.jhv.gui.IconBank.JHVIcon;
 import org.helioviewer.jhv.gui.ImageViewerGui;
 
 public class RenderableContainerPanel extends JPanel {
-    static final Border commonBorder = new MatteBorder(1, 0, 0, 0, Color.BLACK);
+    static final Border commonBorder = new MatteBorder(0, 0, 1, 0, Color.LIGHT_GRAY);
+    static final Border commonLeftBorder = new MatteBorder(0, 0, 1, 0, Color.LIGHT_GRAY);
+    static final Border commonRightBorder = new MatteBorder(0, 0, 1, 0, Color.LIGHT_GRAY);
+
     private static final int ROW_HEIGHT = 20;
     private static final int ICON_WIDTH = 16;
 
@@ -54,7 +58,10 @@ public class RenderableContainerPanel extends JPanel {
         jsp.setPreferredSize(new Dimension(ImageViewerGui.SIDE_PANEL_WIDTH, ROW_HEIGHT * 5 + 2));
 
         renderableContainer.addTableModelListener(grid);
-        this.add(jsp, gc);
+        JPanel jspContainer = new JPanel(new BorderLayout());
+        jspContainer.setBorder(BorderFactory.createTitledBorder(""));
+        jspContainer.add(jsp, BorderLayout.NORTH);
+        this.add(jspContainer, gc);
         grid.setTableHeader(null);
         grid.setShowGrid(false);
         grid.setRowSelectionAllowed(true);
@@ -135,7 +142,6 @@ public class RenderableContainerPanel extends JPanel {
         optionsPanelWrapper = new JPanel();
         optionsPanelWrapper.setBorder(BorderFactory.createTitledBorder("Options"));
         optionsPanelWrapper.add(optionsPanel);
-        gc.gridy = 1;
         JPanel addLayerButtonWrapper = new JPanel(new FlowLayout(FlowLayout.RIGHT, 0, 0));
         JButton addLayerButton = new JButton(ImageViewerGui.getSingletonInstance().getImageSelectorPanel().addLayerAction);
         addLayerButton.setText("");
@@ -143,9 +149,9 @@ public class RenderableContainerPanel extends JPanel {
         addLayerButton.setIcon(IconBank.getIcon(JHVIcon.ADD));
         addLayerButton.setBorder(null);
         addLayerButtonWrapper.add(addLayerButton);
-        add(addLayerButtonWrapper, gc);
+        jspContainer.add(addLayerButtonWrapper, BorderLayout.CENTER);
 
-        gc.gridy = 2;
+        gc.gridy = 1;
         add(optionsPanelWrapper, gc);
 
     }

@@ -1,5 +1,6 @@
 package org.helioviewer.viewmodelplugin.filter;
 
+import java.awt.Color;
 import java.awt.Component;
 import java.awt.FlowLayout;
 import java.awt.GridBagConstraints;
@@ -89,6 +90,28 @@ public class FilterTabPanelManager implements LayersListener {
         this.abstractFilterPanels.add(abstractFilterPanel);
     }
 
+    private void addToGridBag(GridBagConstraints c, JPanel compactPanel, FilterAlignmentDetails details) {
+        c.gridwidth = 1;
+
+        c.gridx = 0;
+        c.weightx = 1.0;
+        c.anchor = GridBagConstraints.LINE_START;
+
+        //((JLabel) details.getTitle()).setHorizontalAlignment(SwingConstants.LEFT);
+        compactPanel.add(details.getTitle(), c);
+        c.gridx = 1;
+        c.weightx = 1.;
+        c.anchor = GridBagConstraints.CENTER;
+
+        compactPanel.add(details.getSlider(), c);
+        c.gridx = 2;
+        c.weightx = 0.0;
+        c.anchor = GridBagConstraints.LINE_END;
+        details.getValue().setBackground(Color.blue);
+        compactPanel.add(details.getValue(), c);
+
+    }
+
     /**
      * Setup a new CompactPanel based on all Components added to the center
      * list, that implement the FilterAlignmentDetails interface
@@ -120,11 +143,11 @@ public class FilterTabPanelManager implements LayersListener {
         compactPanel.setLayout(new GridBagLayout());
 
         GridBagConstraints c = new GridBagConstraints();
-        c.insets = new Insets(2, 5, 2, 5);
+        c.insets = new Insets(0, 0, 0, 0);
         c.weightx = 1;
         c.gridx = 0;
         c.gridwidth = 1;
-        c.anchor = GridBagConstraints.WEST;
+        c.anchor = GridBagConstraints.CENTER;
         c.fill = GridBagConstraints.HORIZONTAL;
 
         for (Component comp : centerList) {
@@ -133,33 +156,41 @@ public class FilterTabPanelManager implements LayersListener {
 
                 if (details.getDetails() == FilterAlignmentDetails.POSITION_OPACITY) {
                     c.gridy = 0;
-                    compactPanel.add(comp, c);
+                    this.addToGridBag(c, compactPanel, details);
                 } else if (details.getDetails() == FilterAlignmentDetails.POSITION_SHARPEN) {
                     c.gridy = 1;
-                    compactPanel.add(comp, c);
+                    this.addToGridBag(c, compactPanel, details);
                 } else if (details.getDetails() == FilterAlignmentDetails.POSITION_GAMMA) {
                     c.gridy = 2;
-                    compactPanel.add(comp, c);
+                    this.addToGridBag(c, compactPanel, details);
                 } else if (details.getDetails() == FilterAlignmentDetails.POSITION_CONTRAST) {
                     c.gridy = 3;
-                    compactPanel.add(comp, c);
+                    this.addToGridBag(c, compactPanel, details);
                 } else if (details.getDetails() == FilterAlignmentDetails.POSITION_COLORTABLES) {
                     c.gridy = 4;
+                    c.gridx = 0;
+                    c.gridwidth = 3;
+
                     compactPanel.add(comp, c);
                 } else if (details.getDetails() == FilterAlignmentDetails.POSITION_CHANNELMIXER) {
                     c.gridy = 5;
+                    c.gridx = 0;
+                    c.gridwidth = 3;
+                    c.insets = new Insets(4, 0, 4, 0);
+
                     compactPanel.add(comp, c);
                 }
             }
             c.insets = new Insets(0, 0, 0, 0);
             c.gridy = 6;
+            c.gridwidth = 3;
 
             JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
             buttonPanel.setOpaque(false);
             buttonPanel.add(downloadLayerButton);
             buttonPanel.add(showMetaButton);
 
-            compactPanel.add(buttonPanel, c);
+            //compactPanel.add(buttonPanel, c);
         }
         LayersModel.getSingletonInstance().addLayersListener(this);
 

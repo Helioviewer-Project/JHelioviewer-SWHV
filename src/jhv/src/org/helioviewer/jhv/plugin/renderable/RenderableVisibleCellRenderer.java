@@ -21,7 +21,7 @@ public class RenderableVisibleCellRenderer extends DefaultTableCellRenderer {
             label.setIcon(IconBank.getIcon(JHVIcon.HIDDEN));
             label.setToolTipText("Click to show");
         }
-        label.setBorder(RenderableContainerPanel.commonBorder);
+        label.setBorder(RenderableContainerPanel.commonLeftBorder);
         label.setText("");
         return label;
 
