@@ -555,6 +555,7 @@ public class KakaduUtils {
                     if (myFindBox2(xmlBox, assocBox, Kdu_global.jp2_xml_4cc, 1) == true) {
                         hvMetaData.setNode(parseXML(xmlBox2xml(xmlBox)));
                         metaDataList[i] = MetaDataConstructor.getMetaData(hvMetaData);
+                        hvMetaData.setNode(null);
                     }
 
                     xmlBox.Close();
@@ -570,6 +571,7 @@ public class KakaduUtils {
             if (xmlBox != null) {
                 hvMetaData.setNode(parseXML(xmlBox2xml(xmlBox)));
                 metaDataList[0] = MetaDataConstructor.getMetaData(hvMetaData);
+                hvMetaData.setNode(null);
             }
         }
 
@@ -582,6 +584,7 @@ public class KakaduUtils {
         if (findBoxResult[0] != null) {
             findBoxResult[0].Native_destroy();
         }
+        hvMetaData = null;
     }
 
     /**
