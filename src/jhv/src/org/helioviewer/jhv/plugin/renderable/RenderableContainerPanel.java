@@ -65,8 +65,8 @@ public class RenderableContainerPanel extends JPanel {
         grid.setRowHeight(ROW_HEIGHT);
         grid.setBackground(Color.white);
         grid.getColumnModel().getColumn(VISIBLEROW).setCellRenderer(new RenderableVisibleCellRenderer());
-        grid.getColumnModel().getColumn(VISIBLEROW).setPreferredWidth(ICON_WIDTH);
-        grid.getColumnModel().getColumn(VISIBLEROW).setMaxWidth(ICON_WIDTH);
+        grid.getColumnModel().getColumn(VISIBLEROW).setPreferredWidth(ICON_WIDTH + 3);
+        grid.getColumnModel().getColumn(VISIBLEROW).setMaxWidth(ICON_WIDTH + 3);
 
         grid.getColumnModel().getColumn(TITLEROW).setCellRenderer(new RenderableCellRenderer());
         grid.getColumnModel().getColumn(TITLEROW).setPreferredWidth(80);
