@@ -31,7 +31,7 @@ public class EVEDrawableElement implements DrawableElement {
     private EVEValues[] values = null;
     private Interval<Date> interval;
     private YAxisElement yAxisElement;
-    private Date lastDateWithData;
+    private long lastMilliWithData;
 
     public EVEDrawableElement(Interval<Date> interval, Band[] bands, EVEValues[] values, YAxisElement yAxisElement) {
         this.interval = interval;
@@ -39,7 +39,7 @@ public class EVEDrawableElement implements DrawableElement {
         this.values = values;
         this.yAxisElement = yAxisElement;
         intervalAvailable = interval.getStart() != null && interval.getEnd() != null;
-        lastDateWithData = null;
+        lastMilliWithData = 0;
     }
 
     public EVEDrawableElement() {
@@ -117,7 +117,7 @@ public class EVEDrawableElement implements DrawableElement {
                             continue;
                         }
 
-                        int x = (int) ((eveValues[j].date.getTime() - intervalStartTime) * ratioX) + graphArea.x;
+                        int x = (int) ((eveValues[j].milli - intervalStartTime) * ratioX) + graphArea.x;
                         int y = dY;
                         if (yAxisElement.isLogScale()) {
                             y -= computeY(Math.log10(value), ratioY, log10minValue);
@@ -125,8 +125,8 @@ public class EVEDrawableElement implements DrawableElement {
                             y -= computeY(value, ratioY, minValue);
                         }
                         final Point point = new Point(x, y);
-                        if (lastDateWithData == null || eveValues[j].date.after(lastDateWithData)) {
-                            lastDateWithData = eveValues[j].date;
+                        if (eveValues[j].milli > lastMilliWithData) {
+                            lastMilliWithData = eveValues[j].milli;
                         }
                         pointList.add(point);
                         counter++;
@@ -275,7 +275,7 @@ public class EVEDrawableElement implements DrawableElement {
 
     @Override
     public Date getLastDateWithData() {
-        return lastDateWithData;
+        return new Date(lastMilliWithData);
     }
 
 }

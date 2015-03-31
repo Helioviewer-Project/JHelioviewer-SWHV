@@ -535,7 +535,7 @@ public class DownloadController {
                     final long millis = ((long) entry.getDouble(0)) * 1000;// -
                     // 378691234000L;
                     // final long millis = ((long) entry.getDouble(0)*1000);
-                    values[i] = new EVEValue(new Date(millis), entry.getDouble(1) * multiplier);
+                    values[i] = new EVEValue(millis, entry.getDouble(1) * multiplier);
                     if (test) {
                         test = false;
                         System.out.println(new Date(millis));
