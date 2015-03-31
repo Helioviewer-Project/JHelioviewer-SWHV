@@ -61,18 +61,22 @@ public class EVEDrawableElement implements DrawableElement {
     }
 
     private void updateGraphsData(Interval<Date> interval, Rectangle graphArea) {
-        double minValue = yAxisElement.getMinValue();
-        double maxValue = yAxisElement.getMaxValue();
+        double minValue = yAxisElement.getMinValue(), log10minValue = Math.log10(minValue);
+        double maxValue = yAxisElement.getMaxValue(), log10maxValue = Math.log10(maxValue);
+
         if (!yAxisElement.isLogScale() || (yAxisElement.isLogScale() && minValue > 10e-50 && maxValue > 10e-50)) {
             double ratioX = !intervalAvailable ? 0 : (double) graphArea.width / (double) (interval.getEnd().getTime() - interval.getStart().getTime());
             double ratioY = 0.0;
             if (yAxisElement.isLogScale()) {
-                ratioY = Math.log10(maxValue) < Math.log10(minValue) ? 0 : graphArea.height / (Math.log10(maxValue) - Math.log10(minValue));
+                ratioY = log10maxValue < log10minValue ? 0 : graphArea.height / (log10maxValue - log10minValue);
             } else {
                 ratioY = maxValue < minValue ? 0 : graphArea.height / (maxValue - minValue);
             }
 
             graphPolylines.clear();
+
+            long intervalStartTime = interval.getStart().getTime();
+            int dY = graphArea.y + graphArea.height;
 
             for (int i = 0; i < bands.length; ++i) {
                 if (bands[i].isVisible()) {
@@ -87,10 +91,10 @@ public class EVEDrawableElement implements DrawableElement {
                         Map.Entry<String, Double> pairs = it.next();
                         if (yAxisElement.isLogScale()) {
                             if (pairs.getValue() > 10e-50) {
-                                warnLevels.add(computeY(Math.log10(pairs.getValue()), interval, graphArea, ratioY, Math.log10(minValue)));
+                                warnLevels.add(dY - computeY(Math.log10(pairs.getValue()), ratioY, log10minValue));
                             }
                         } else {
-                            warnLevels.add(computeY(pairs.getValue(), interval, graphArea, ratioY, minValue));
+                            warnLevels.add(dY - computeY(pairs.getValue(), ratioY, minValue));
                         }
                         warnLabels.add(pairs.getKey());
                         // it.remove(); // avoids a
@@ -100,9 +104,9 @@ public class EVEDrawableElement implements DrawableElement {
                     int counter = 0;
 
                     for (int j = 0; j < eveValues.length; j++) {
-                        final Double value = eveValues[j].getValue();
+                        double value = eveValues[j].value;
 
-                        if (value == null || (yAxisElement.isLogScale() && value < 10e-50)) {
+                        if (yAxisElement.isLogScale() && value < 10e-50) {
                             if (counter > 1) {
                                 graphPolylines.add(new GraphPolyline(pointList, bands[i].getGraphColor(), warnLevels, warnLabels, ratioX, graphArea.getWidth()));
                             }
@@ -113,16 +117,16 @@ public class EVEDrawableElement implements DrawableElement {
                             continue;
                         }
 
-                        final int x = computeX(eveValues[j].getDate(), interval, graphArea, ratioX);
-                        int y = 0;
+                        int x = (int) ((eveValues[j].date.getTime() - intervalStartTime) * ratioX) + graphArea.x;
+                        int y = dY;
                         if (yAxisElement.isLogScale()) {
-                            y = computeY(Math.log10(eveValues[j].getValue().doubleValue()), interval, graphArea, ratioY, Math.log10(minValue));
+                            y -= computeY(Math.log10(value), ratioY, log10minValue);
                         } else {
-                            y = computeY(eveValues[j].getValue().doubleValue(), interval, graphArea, ratioY, minValue);
+                            y -= computeY(value, ratioY, minValue);
                         }
                         final Point point = new Point(x, y);
-                        if (lastDateWithData == null || eveValues[j].getDate().after(lastDateWithData)) {
-                            lastDateWithData = eveValues[j].getDate();
+                        if (lastDateWithData == null || eveValues[j].date.after(lastDateWithData)) {
+                            lastDateWithData = eveValues[j].date;
                         }
                         pointList.add(point);
                         counter++;
@@ -134,6 +138,10 @@ public class EVEDrawableElement implements DrawableElement {
                 }
             }
         }
+    }
+
+    private int computeY(double orig, double ratioY, double minV) {
+        return (int) (ratioY * (orig - minV));
     }
 
     private void drawGraphs(final Graphics g, Rectangle graphArea) {
@@ -150,14 +158,6 @@ public class EVEDrawableElement implements DrawableElement {
                 g.drawString(line.warnLabels[j], graphArea.x, line.warnLevels[j]);
             }
         }
-    }
-
-    private int computeX(Date orig, Interval<Date> interval, Rectangle graphArea, double ratioX) {
-        return (int) ((orig.getTime() - interval.getStart().getTime()) * ratioX) + graphArea.x;
-    }
-
-    private int computeY(double orig, Interval<Date> interval, Rectangle graphArea, double ratioY, double logMinValue) {
-        return graphArea.y + graphArea.height - (int) (ratioY * (orig - logMinValue));
     }
 
     // //////////////////////////////////////////////////////////////////////////////
@@ -277,4 +277,5 @@ public class EVEDrawableElement implements DrawableElement {
     public Date getLastDateWithData() {
         return lastDateWithData;
     }
+
 }

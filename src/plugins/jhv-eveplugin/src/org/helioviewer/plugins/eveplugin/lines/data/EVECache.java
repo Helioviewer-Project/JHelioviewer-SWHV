@@ -66,8 +66,8 @@ public class EVECache {
 
             final EVEValue[] values = cache.getValuesInInterval(interval);
             for (int i = 0; i < values.length; i++) {
-                if (values[i] != null && values[i].value != null) {
-                    values[i].value = values[i].value;// *multiplier;
+                if (values[i] != null && !Double.isNaN(values[i].value)) {
+                    // values[i].value = values[i].value * multiplier;
                     result.addValue(values[i]);
                 }
             }

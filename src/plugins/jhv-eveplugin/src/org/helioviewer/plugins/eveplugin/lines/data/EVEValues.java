@@ -27,11 +27,11 @@ public class EVEValues implements DownloadedData {
     public void addValue(final EVEValue value) {
         values.add(value);
 
-        if (value.value == null)
+        if (Double.isNaN(value.value))
             return;
 
-        minValue = value.value.doubleValue() < minValue ? value.value.doubleValue() : minValue;
-        maxValue = value.value.doubleValue() > maxValue ? value.value.doubleValue() : maxValue;
+        minValue = value.value < minValue ? value.value : minValue;
+        maxValue = value.value > maxValue ? value.value : maxValue;
     }
 
     public EVEValue[] getValues() {
@@ -55,6 +55,7 @@ public class EVEValues implements DownloadedData {
             return new Interval<Date>(null, null);
         }
 
-        return new Interval<Date>(values.getFirst().date, values.getLast().getDate());
+        return new Interval<Date>(values.getFirst().date, values.getLast().date);
     }
+
 }

@@ -115,7 +115,7 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
         eventModel = EventModel.getSingletonInstance();
         // ImageViewerGui.getMainFrame().addWindowFocusListener(this);
         timer = new Timer("ChartDrawGraphPane redraw timer");
-        timer.schedule(new RedrawTimerTask(), 0, (long) (1000.0 / 30));
+        timer.schedule(new RedrawTimerTask(), 0, (long) (1000.0 / 20));
         // timer.schedule(new RedrawTimerTask(), 0, (long) (3000.0));
     }
 
