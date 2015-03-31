@@ -7,27 +7,16 @@ import org.helioviewer.base.Pair;
 import org.helioviewer.base.math.Interval;
 import org.helioviewer.plugins.eveplugin.download.DownloadedData;
 
-/**
- *
- * @author Stephan Pagel
- * */
 public class EVEValues implements DownloadedData {
 
-    // //////////////////////////////////////////////////////////////////////////////
-    // Definitions
-    // //////////////////////////////////////////////////////////////////////////////
-
-    public long[] dates = new long[0];
-    public double[] values = new double[0];
     private int index = 0;
     private final int increment = 1440;
 
+    public long[] dates = new long[increment];
+    public double[] values = new double[increment];
+
     private double minValue = Double.MAX_VALUE;
     private double maxValue = Double.MIN_VALUE;
-
-    // //////////////////////////////////////////////////////////////////////////////
-    // Methods
-    // //////////////////////////////////////////////////////////////////////////////
 
     public void addValue(final long date, final double value) {
         if (index == dates.length) {
@@ -37,7 +26,6 @@ public class EVEValues implements DownloadedData {
 
         values[index] = value;
         dates[index] = date;
-
         index++;
 
         if (Double.isNaN(value))
@@ -65,7 +53,7 @@ public class EVEValues implements DownloadedData {
         if (index == 0) {
             return new Interval<Date>(null, null);
         }
-
         return new Interval<Date>(new Date(dates[0]), new Date(dates[index - 1]));
     }
+
 }
