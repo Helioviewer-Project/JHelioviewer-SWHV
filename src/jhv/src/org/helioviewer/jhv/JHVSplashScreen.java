@@ -47,6 +47,10 @@ public class JHVSplashScreen extends JFrame {
     // Methods
     // ////////////////////////////////////////////////////////////////
 
+    public void destroy() {
+        instance = null;
+    }
+
     /**
      * Default constructor.
      * */

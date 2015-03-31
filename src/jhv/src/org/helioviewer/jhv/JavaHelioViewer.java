@@ -356,6 +356,7 @@ public class JavaHelioViewer {
             ex.printStackTrace();
         }
 
+        splash.destroy();
     }
 
 }
