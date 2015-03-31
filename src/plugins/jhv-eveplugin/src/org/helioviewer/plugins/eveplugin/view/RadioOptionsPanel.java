@@ -15,7 +15,7 @@ import javax.swing.JPanel;
 import org.helioviewer.base.logging.Log;
 import org.helioviewer.base.message.Message;
 import org.helioviewer.jhv.gui.filters.lut.LUT;
-import org.helioviewer.plugins.eveplugin.radio.filter.FilterModel;
+import org.helioviewer.plugins.eveplugin.radio.model.ColorLookupModel;
 
 public class RadioOptionsPanel extends JPanel implements ActionListener {
 
@@ -61,7 +61,7 @@ public class RadioOptionsPanel extends JPanel implements ActionListener {
     @Override
     public void actionPerformed(ActionEvent e) {
         LUT newMap = lutMap.get(lut.getSelectedItem());
-        FilterModel.getInstance().setLUT(LUT.getStandardList().get((lut.getSelectedItem())));
+        ColorLookupModel.getInstance().setLUT(LUT.getStandardList().get((lut.getSelectedItem())));
     }
 
     /**
@@ -75,7 +75,7 @@ public class RadioOptionsPanel extends JPanel implements ActionListener {
             lut.addItem(newLut.getName());
         }
         lut.setSelectedItem(newLut.getName());
-        FilterModel.getInstance().setLUT(newLut);
+        ColorLookupModel.getInstance().setLUT(newLut);
     }
 
 }

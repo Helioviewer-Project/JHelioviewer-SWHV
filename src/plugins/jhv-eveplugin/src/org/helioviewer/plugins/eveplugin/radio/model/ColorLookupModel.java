@@ -1,4 +1,4 @@
-package org.helioviewer.plugins.eveplugin.radio.filter;
+package org.helioviewer.plugins.eveplugin.radio.model;
 
 import java.awt.image.DataBuffer;
 import java.awt.image.IndexColorModel;
@@ -7,33 +7,33 @@ import java.util.Set;
 
 import org.helioviewer.jhv.gui.filters.lut.LUT;
 
-public class FilterModel {
-    private static FilterModel instance;
+public class ColorLookupModel {
+    private static ColorLookupModel instance;
 
     private LUT lut;
 
     private IndexColorModel indexColorModel;
 
-    private final Set<FilterModelListener> listeners;
+    private final Set<ColorLookupModelListener> listeners;
 
-    private FilterModel() {
+    private ColorLookupModel() {
         lut = LUT.getStandardList().get("Rainbow 2");
         indexColorModel = createIndexColorModelFromLUT(lut);
-        listeners = new HashSet<FilterModelListener>();
+        listeners = new HashSet<ColorLookupModelListener>();
     }
 
-    public static FilterModel getInstance() {
+    public static ColorLookupModel getInstance() {
         if (instance == null) {
-            instance = new FilterModel();
+            instance = new ColorLookupModel();
         }
         return instance;
     }
 
-    public void addFilterModelListener(FilterModelListener listener) {
+    public void addFilterModelListener(ColorLookupModelListener listener) {
         listeners.add(listener);
     }
 
-    public void removeFilterModelListener(FilterModelListener listener) {
+    public void removeFilterModelListener(ColorLookupModelListener listener) {
         listeners.remove(listener);
     }
 
@@ -44,7 +44,7 @@ public class FilterModel {
     }
 
     private void fireLUTChanged() {
-        for (FilterModelListener l : listeners) {
+        for (ColorLookupModelListener l : listeners) {
             l.colorLUTChanged();
         }
     }
