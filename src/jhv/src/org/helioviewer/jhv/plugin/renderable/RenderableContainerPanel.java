@@ -14,6 +14,7 @@ import javax.swing.BorderFactory;
 import javax.swing.DropMode;
 import javax.swing.JButton;
 import javax.swing.JPanel;
+import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.ListSelectionModel;
 import javax.swing.border.Border;
@@ -46,8 +47,12 @@ public class RenderableContainerPanel extends JPanel {
         gc.weighty = 0;
         gc.fill = GridBagConstraints.BOTH;
         grid = new JTable(renderableContainer);
+        JScrollPane jsp = new JScrollPane(grid, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+        jsp.setBorder(BorderFactory.createEmptyBorder(0, 0, 0, 0));
+        jsp.setPreferredSize(new Dimension(ImageViewerGui.SIDE_PANEL_WIDTH, ROW_HEIGHT * 5 + 2));
+
         renderableContainer.addTableModelListener(grid);
-        this.add(grid, gc);
+        this.add(jsp, gc);
         grid.setTableHeader(null);
         grid.setShowGrid(false);
         grid.setRowSelectionAllowed(true);

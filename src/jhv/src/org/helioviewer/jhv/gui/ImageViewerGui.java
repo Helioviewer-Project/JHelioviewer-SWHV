@@ -334,7 +334,7 @@ public class ImageViewerGui {
             filterPanelContainer.setDefaultPanel(tab);
 
             //leftPane.add("Image Adjustments", filterPanelContainer, false);
-            leftPane.add("Renderable", Displayer.getRenderableContainerPanel(), true);
+            leftPane.add("Layers", Displayer.getRenderableContainerPanel(), true);
 
             JTabbedPane cameraTab = new JTabbedPane();
             cameraOptionsPanel = new GL3DCameraOptionsPanel();
