@@ -24,11 +24,9 @@ import org.helioviewer.plugins.eveplugin.radio.data.DownloadRequestData;
 import org.helioviewer.plugins.eveplugin.radio.data.FrequencyInterval;
 import org.helioviewer.plugins.eveplugin.radio.data.RadioDataManager;
 import org.helioviewer.plugins.eveplugin.radio.data.RadioDataManagerListener;
-import org.helioviewer.plugins.eveplugin.radio.filter.FilterModel;
-import org.helioviewer.plugins.eveplugin.radio.filter.FilterModelListener;
 import org.helioviewer.plugins.eveplugin.radio.gui.RadioImagePane;
 
-public class RadioPlotModel implements RadioDataManagerListener, ZoomDataConfigListener, FilterModelListener {
+public class RadioPlotModel implements RadioDataManagerListener, ZoomDataConfigListener, ColorLookupModelListener {
     private static RadioPlotModel instance;
     private final RadioDataManager radioDataManager;
     private final ZoomManager zoomManager;
@@ -40,7 +38,7 @@ public class RadioPlotModel implements RadioDataManagerListener, ZoomDataConfigL
     private final RadioPlotModelData radioPlotModelData;
 
     private RadioPlotModel() {
-        FilterModel.getInstance().addFilterModelListener(this);
+        ColorLookupModel.getInstance().addFilterModelListener(this);
         radioDataManager = RadioDataManager.getSingletonInstance();
         radioDataManager.addRadioManagerListener(this);
         zoomManager = ZoomManager.getSingletonInstance();
@@ -354,7 +352,7 @@ public class RadioPlotModel implements RadioDataManagerListener, ZoomDataConfigL
             Log.error("Data array was to small created white image");
             useData = new byte[width * height];
         }
-        BufferedImage newImage = new BufferedImage(width, height, BufferedImage.TYPE_BYTE_INDEXED, FilterModel.getInstance().getColorModel());
+        BufferedImage newImage = new BufferedImage(width, height, BufferedImage.TYPE_BYTE_INDEXED, ColorLookupModel.getInstance().getColorModel());
         DataBufferByte dataBuffer = new DataBufferByte(useData, width * height);
         useData = new byte[0];
         Raster raster = Raster.createPackedRaster(dataBuffer, width, height, width, new int[] { 0xff }, new Point(0, 0));
@@ -392,7 +390,7 @@ public class RadioPlotModel implements RadioDataManagerListener, ZoomDataConfigL
 
     @Override
     public void colorLUTChanged() {
-        ColorModel cm = FilterModel.getInstance().getColorModel();
+        ColorModel cm = ColorLookupModel.getInstance().getColorModel();
         Map<Long, BufferedImage> newBufferedImages = new HashMap<Long, BufferedImage>();
         for (Long index : bufferedImages.keySet()) {
             BufferedImage old = bufferedImages.get(index);
@@ -401,7 +399,9 @@ public class RadioPlotModel implements RadioDataManagerListener, ZoomDataConfigL
         }
         bufferedImages = newBufferedImages;
         updatePlotConfigurations();
-        fireDrawNewBufferedImage();
+        if (!getPlotConfigurations().isEmpty()) {
+            fireDrawNewBufferedImage();
+        }
     }
 
     private void updatePlotConfigurations() {
