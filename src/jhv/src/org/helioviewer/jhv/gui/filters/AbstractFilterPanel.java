@@ -14,5 +14,4 @@ public abstract class AbstractFilterPanel extends JPanel {
             this.jp2view = jp2view;
         }
     }
-
 }
