@@ -1,6 +1,7 @@
 package org.helioviewer.jhv.gui.filters;
 
 import java.awt.BorderLayout;
+import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.GridLayout;
 import java.awt.event.ItemEvent;
@@ -119,5 +120,23 @@ public class ChannelMixerPanel extends AbstractFilterPanel implements ItemListen
     public void setJP2View(JHVJP2View jp2view) {
         super.setJP2View(jp2view);
         setValue(jp2view.getColorMask());
+    }
+
+    @Override
+    public Component getTitle() {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Override
+    public Component getSlider() {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Override
+    public Component getValue() {
+        // TODO Auto-generated method stub
+        return null;
     }
 }

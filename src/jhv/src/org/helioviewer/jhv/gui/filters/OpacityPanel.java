@@ -1,5 +1,6 @@
 package org.helioviewer.jhv.gui.filters;
 
+import java.awt.Component;
 import java.awt.Dimension;
 
 import javax.swing.BoxLayout;
@@ -38,7 +39,7 @@ public class OpacityPanel extends AbstractFilterPanel implements ChangeListener,
 
         title = new JLabel("Opacity");
         title.setPreferredSize(new Dimension(FilterPanel.titleWidth, FilterPanel.height));
-        add(title);
+        //add(title);
 
         opacitySlider = new JSlider(JSlider.HORIZONTAL, 0, 100, 0);
         opacitySlider.setMajorTickSpacing(25);
@@ -46,14 +47,14 @@ public class OpacityPanel extends AbstractFilterPanel implements ChangeListener,
         opacitySlider.setPreferredSize(new Dimension(150, opacitySlider.getPreferredSize().height));
         opacitySlider.addChangeListener(this);
         WheelSupport.installMouseWheelSupport(opacitySlider);
-        add(opacitySlider);
+        //add(opacitySlider);
 
         opacityLabel = new JLabel("0%");
         opacityLabel.setHorizontalAlignment(JLabel.RIGHT);
         opacityLabel.setPreferredSize(new Dimension(FilterPanel.valueWidth, FilterPanel.height));
-        add(opacityLabel);
+        //add(opacityLabel);
 
-        setEnabled(false);
+        //setEnabled(false);
     }
 
     public Area getArea() {
@@ -105,5 +106,20 @@ public class OpacityPanel extends AbstractFilterPanel implements ChangeListener,
     public void setJP2View(JHVJP2View jp2view) {
         super.setJP2View(jp2view);
         setValue(jp2view.getOpacity());
+    }
+
+    @Override
+    public Component getTitle() {
+        return title;
+    }
+
+    @Override
+    public Component getSlider() {
+        return opacitySlider;
+    }
+
+    @Override
+    public Component getValue() {
+        return opacityLabel;
     }
 }

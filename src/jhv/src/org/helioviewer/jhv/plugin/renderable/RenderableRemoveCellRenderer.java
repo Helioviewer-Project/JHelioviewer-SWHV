@@ -16,7 +16,7 @@ public class RenderableRemoveCellRenderer extends DefaultTableCellRenderer {
         JLabel label = (JLabel) super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
 
         label.setIcon(IconBank.getIcon(JHVIcon.REMOVE_LAYER));
-        label.setBorder(RenderableContainerPanel.commonBorder);
+        label.setBorder(RenderableContainerPanel.commonRightBorder);
         label.setText("");
         label.setToolTipText("Click to remove");
 

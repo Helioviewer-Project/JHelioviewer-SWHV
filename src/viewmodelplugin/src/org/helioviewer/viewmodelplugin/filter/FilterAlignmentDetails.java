@@ -1,8 +1,10 @@
 package org.helioviewer.viewmodelplugin.filter;
 
+import java.awt.Component;
+
 /**
  * Interface to provide positioning information in the compact-panel
- * 
+ *
  * @author mnuhn
  */
 public interface FilterAlignmentDetails {
@@ -50,9 +52,15 @@ public interface FilterAlignmentDetails {
     /**
      * Each plugin added to the compact panel needs to specify the position it
      * should be located.
-     * 
+     *
      * @return - position value
      */
     public int getDetails();
+
+    public Component getTitle();
+
+    public Component getSlider();
+
+    public Component getValue();
 
 }

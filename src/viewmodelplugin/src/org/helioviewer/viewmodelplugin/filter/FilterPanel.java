@@ -5,7 +5,7 @@ import javax.swing.JPanel;
 /**
  * Basic class for all visual filter controls. All control elements of a filter
  * have to be placed on this kind of a panel.
- * 
+ *
  * @author Stephan Pagel
  */
 public abstract class FilterPanel extends JPanel {
@@ -30,7 +30,7 @@ public abstract class FilterPanel extends JPanel {
     /**
      * Returns the position where to add the filter control component at the
      * panel of all filters.
-     * 
+     *
      * @return position of filter control component.
      */
     public abstract FilterTabPanelManager.Area getArea();

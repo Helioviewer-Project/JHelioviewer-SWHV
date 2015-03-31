@@ -36,7 +36,7 @@ public class CollapsiblePane extends JComponent implements ActionListener {
     protected CollapsiblePaneButton toggleButton;
     private final Component component;
     protected JPanel topButtonsPanel;
-    static final int BUTTONHEIGHT = 20;
+    static final int BUTTONHEIGHT = 18;
 
     /**
      * Default constructor.
