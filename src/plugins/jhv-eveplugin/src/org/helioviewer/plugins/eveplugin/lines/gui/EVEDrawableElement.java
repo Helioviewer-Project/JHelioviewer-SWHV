@@ -15,7 +15,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import org.helioviewer.base.Pair;
 import org.helioviewer.base.math.Interval;
 import org.helioviewer.plugins.eveplugin.draw.DrawableElement;
 import org.helioviewer.plugins.eveplugin.draw.DrawableElementType;
@@ -120,16 +119,19 @@ public class EVEDrawableElement implements DrawableElement {
 
                         long date = values[i].dates[j];
                         int x = (int) ((date - intervalStartTime) * ratioX) + graphArea.x;
+
                         int y = dY;
                         if (yAxisElement.isLogScale()) {
                             y -= computeY(Math.log10(value), ratioY, log10minValue);
                         } else {
                             y -= computeY(value, ratioY, minValue);
                         }
-                        final Point point = new Point(x, y);
+
                         if (date > lastMilliWithData) {
                             lastMilliWithData = date;
                         }
+
+                        final Point point = new Point(x, y);
                         pointList.add(point);
                         counter++;
                     }
