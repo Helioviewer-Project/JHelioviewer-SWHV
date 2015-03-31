@@ -28,7 +28,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 /**
- * 
+ *
  * @author Stephan Pagel
  * */
 public class DownloadController {
@@ -516,7 +516,7 @@ public class DownloadController {
             return new URL(type.getBaseUrl() + EVEAPI.API_URL_PARAMETER_STARTDATE + eveAPIDateFormat.format(interval.getStart()) + "&" + EVEAPI.API_URL_PARAMETER_ENDDATE + eveAPIDateFormat.format(interval.getEnd()) + "&" + EVEAPI.API_URL_PARAMETER_TYPE + type.getName() + "&" + EVEAPI.API_URL_PARAMETER_FORMAT + EVEAPI.API_URL_PARAMETER_FORMAT_VALUES.JSON);
         }
 
-        private boolean test = true;
+        private final boolean test = true;
 
         private void addDataToCache(final JSONObject json, final Band band) {
             try {
@@ -526,7 +526,8 @@ public class DownloadController {
                 }
                 final JSONArray data = json.getJSONArray("data");
                 // Log.warn(data.toString());
-                final EVEValue[] values = new EVEValue[data.length()];
+                final double[] values = new double[data.length()];
+                final long[] dates = new long[data.length()];
 
                 for (int i = 0; i < data.length(); i++) {
                     final JSONArray entry = data.getJSONArray(i);
@@ -535,14 +536,11 @@ public class DownloadController {
                     final long millis = ((long) entry.getDouble(0)) * 1000;// -
                     // 378691234000L;
                     // final long millis = ((long) entry.getDouble(0)*1000);
-                    values[i] = new EVEValue(millis, entry.getDouble(1) * multiplier);
-                    if (test) {
-                        test = false;
-                        System.out.println(new Date(millis));
-                    }
+                    values[i] = entry.getDouble(1) * multiplier;
+                    dates[i] = millis;
                 }
 
-                EVECacheController.getSingletonInstance().addToCache(values, band);
+                EVECacheController.getSingletonInstance().addToCache(values, dates, band);
             } catch (JSONException e) {
                 Log.error("", e);
             }

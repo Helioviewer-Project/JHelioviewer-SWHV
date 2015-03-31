@@ -11,7 +11,7 @@ import org.helioviewer.base.math.Interval;
 import org.helioviewer.plugins.eveplugin.base.Range;
 
 /**
- * 
+ *
  * @author Stephan Pagel
  * */
 public class EVECache {
@@ -26,11 +26,11 @@ public class EVECache {
     // Methods
     // //////////////////////////////////////////////////////////////////////////////
 
-    public void add(final EVEValue[] values) {
+    public void add(final double[] values, final long[] dates) {
         GregorianCalendar calendar = new GregorianCalendar();
         if (values != null) {
             for (int i = 0; i < values.length; i++) {
-                calendar.setTimeInMillis(values[i].milli);
+                calendar.setTime(new Date(dates[i]));
                 final Integer key = new Integer(calendar.get(Calendar.YEAR) * 1000 + calendar.get(Calendar.DAY_OF_YEAR));
 
                 EVEDataOfDay cache = cacheMap.get(key);
@@ -40,7 +40,7 @@ public class EVECache {
                     cacheMap.put(key, cache);
                 }
 
-                cache.setValue(values[i]);
+                cache.setValue(values[i], dates[i]);
             }
         }
     }
