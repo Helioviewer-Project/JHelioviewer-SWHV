@@ -1,28 +1,22 @@
 package org.helioviewer.gl3d.camera;
 
-import org.helioviewer.gl3d.math.GL3DVec3d;
-
 public class GL3DPositionDateTime {
 
-    private final GL3DVec3d position;
-    private final long timestamp;
+    public final double x;
+    public final double y;
+    public final double z;
+    public final long timestamp;
 
-    public GL3DPositionDateTime(long timestamp, GL3DVec3d position) {
+    public GL3DPositionDateTime(long timestamp, double x, double y, double z) {
         this.timestamp = timestamp;
-        this.position = position;
-    }
-
-    public GL3DVec3d getPosition() {
-        return position;
-    }
-
-    public long getTimestamp() {
-        return timestamp;
+        this.x = x;
+        this.y = y;
+        this.z = z;
     }
 
     @Override
     public String toString() {
-        return timestamp + " " + this.position;
+        return String.format("%d [%f,%f,%f]", timestamp, x, y, z);
     }
 
 }
