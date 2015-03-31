@@ -42,7 +42,7 @@ public class LUT {
     /**
      * LUT for 16 bit
      */
-    private final int[] lut16;
+    //private final int[] lut16; -- disabled, saves 7MB
 
     /**
      * Creates a lookup table with the given table, use e.g. for int[]
@@ -55,10 +55,10 @@ public class LUT {
      * @param lookup16
      *            Array of lookup values for 16 bit lookup
      */
-    public LUT(String name, int[] lookup8, int[] lookup16) {
+    public LUT(String name, int[] lookup8/*, int[] lookup16*/) {
         lutName = name;
         this.lut8 = lookup8;
-        this.lut16 = lookup16;
+        //this.lut16 = lookup16;
     }
 
     /**
@@ -102,7 +102,7 @@ public class LUT {
      * @param invert
      *            If true, the color table is inverted, false otherwise
      */
-    public void lookup16(short[] shortBuf, int[] intBuf, boolean invert) {
+/*    public void lookup16(short[] shortBuf, int[] intBuf, boolean invert) {
         if (invert) {
             int offset = lut16.length - 1;
             for (int i = 0; i < shortBuf.length; ++i) {
@@ -114,7 +114,7 @@ public class LUT {
             }
         }
     }
-
+*/
     /**
      * Gives back LUT for 8bit
      * 
@@ -129,10 +129,10 @@ public class LUT {
      * 
      * @return table
      */
-    public int[] getLut16() {
+/*    public int[] getLut16() {
         return lut16;
     }
-
+*/
     /**
      * Reads in a gimp gradient file as a gradient filter
      * 
@@ -172,15 +172,15 @@ public class LUT {
         BufferedReader in = new BufferedReader(new InputStreamReader(is, "UTF-8"));
         GimpGradient gg = new GimpGradient(in);
         int[] lut8 = new int[256];
-        int[] lut16 = new int[65536];
+        //int[] lut16 = new int[65536];
         int i;
         for (i = 0; i < 256; i++) {
             lut8[i] = gg.getGradientColor(i / 255.0);
         }
-        for (i = 0; i < 65536; i++) {
+        /*for (i = 0; i < 65536; i++) {
             lut16[i] = gg.getGradientColor(i / 65535.0);
-        }
-        return new LUT(gg.getName(), lut8, lut16);
+        }*/
+        return new LUT(gg.getName(), lut8/*, lut16*/);
     }
 
     /**
@@ -261,7 +261,7 @@ public class LUT {
      *            Filename for 16 bit
      */
     private static void addStdLut(String name, String fname, int... lookup8) {
-        LUT l = new LUT(name, lookup8, internal16Readin(fname));
+        LUT l = new LUT(name, lookup8/*, internal16Readin(fname)*/);
         standardList.put(name, l);
     }
 

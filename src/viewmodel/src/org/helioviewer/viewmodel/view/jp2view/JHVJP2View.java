@@ -986,7 +986,7 @@ public class JHVJP2View extends AbstractView implements JP2View, ViewportView, R
     public void setStartLUT() {
         int[] builtIn = this.getBuiltInLUT();
         if (builtIn != null) {
-            LUT builtInLut = new LUT("built-in", builtIn, builtIn);
+            LUT builtInLut = new LUT("built-in", builtIn/*, builtIn*/);
             lut = builtInLut;
             return;
         }
