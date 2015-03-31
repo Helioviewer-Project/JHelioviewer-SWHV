@@ -60,8 +60,7 @@ public class EVEDataOfDay {
      * */
     public void setValue(final double value, final long date) {
         final GregorianCalendar calendar = new GregorianCalendar();
-        calendar.setTimeInMillis(value.milli);
-
+        calendar.setTimeInMillis(date);
         final int minuteOfDay = calendar.get(Calendar.HOUR_OF_DAY) * 60 + calendar.get(Calendar.MINUTE);
 
         values[minuteOfDay].value = value;
