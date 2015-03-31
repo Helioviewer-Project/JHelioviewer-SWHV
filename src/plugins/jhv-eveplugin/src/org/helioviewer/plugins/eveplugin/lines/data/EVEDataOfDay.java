@@ -47,7 +47,7 @@ public class EVEDataOfDay {
         final GregorianCalendar calendar = new GregorianCalendar(year, month, dayOfMonth);
 
         for (int i = 0; i < values.length; i++) {
-            values[i] = new EVEValue(calendar.getTime(), null);
+            values[i] = new EVEValue(calendar.getTime(), Double.NaN);
             calendar.add(Calendar.MINUTE, 1);
         }
     }
@@ -89,16 +89,13 @@ public class EVEDataOfDay {
         posMax = -1;
 
         for (int i = 0; i < values.length; ++i) {
-            if (values[i].value != null) {
-                final double value = values[i].value;
+            final double value = values[i].value;
 
-                if (valueRange.setMin(value)) {
-                    posMin = i;
-                }
-
-                if (valueRange.setMax(value)) {
-                    posMax = i;
-                }
+            if (valueRange.setMin(value)) {
+                posMin = i;
+            }
+            if (valueRange.setMax(value)) {
+                posMax = i;
             }
         }
     }
