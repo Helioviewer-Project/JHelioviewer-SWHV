@@ -9,7 +9,7 @@ import org.helioviewer.base.math.Interval;
 import org.helioviewer.plugins.eveplugin.base.Range;
 
 /**
- * 
+ *
  * @author Stephan Pagel
  * */
 public class EVEBandCache {
@@ -24,7 +24,7 @@ public class EVEBandCache {
     // Methods
     // //////////////////////////////////////////////////////////////////////////////
 
-    public void add(final Band band, final EVEValue[] values) {
+    public void add(Band band, double[] values, long[] dates) {
         EVECache cache = cacheMap.get(band);
 
         if (cache == null) {
@@ -32,7 +32,7 @@ public class EVEBandCache {
             cacheMap.put(band, cache);
         }
 
-        cache.add(values);
+        cache.add(values, dates);
     }
 
     public EVEValues getValuesInInterval(final Band band, final Interval<Date> interval) {
@@ -69,4 +69,5 @@ public class EVEBandCache {
 
         return cache.getMissingDatesInInterval(interval);
     }
+
 }

@@ -11,7 +11,7 @@ import org.helioviewer.plugins.eveplugin.base.Range;
 /**
  * Manages the {@link EVEValue}s for one specific day. This class allows quick
  * access to the values.
- * 
+ *
  * @author Stephan Pagel
  * */
 public class EVEDataOfDay {
@@ -33,7 +33,7 @@ public class EVEDataOfDay {
 
     /**
      * Default constructor. The represented day has to be defined.
-     * 
+     *
      * @param year
      *            Year describing the day associated with the {@link EVEValue}s.
      * @param month
@@ -54,27 +54,27 @@ public class EVEDataOfDay {
 
     /**
      * Sets the given value and updates the minimum and maximum values.
-     * 
+     *
      * @param value
      *            The new value.
      * */
-    public void setValue(final EVEValue value) {
+    public void setValue(final double value, final long date) {
         final GregorianCalendar calendar = new GregorianCalendar();
         calendar.setTimeInMillis(value.milli);
 
         final int minuteOfDay = calendar.get(Calendar.HOUR_OF_DAY) * 60 + calendar.get(Calendar.MINUTE);
 
-        values[minuteOfDay].value = value.value;
+        values[minuteOfDay].value = value;
 
         if (minuteOfDay == posMin) {
             recomputeMinMax();
-        } else if (valueRange.setMin(value.value)) {
+        } else if (valueRange.setMin(value)) {
             posMin = minuteOfDay;
         }
 
         if (minuteOfDay == posMax) {
             recomputeMinMax();
-        } else if (valueRange.setMax(value.value)) {
+        } else if (valueRange.setMax(value)) {
             posMax = minuteOfDay;
         }
     }
@@ -102,11 +102,11 @@ public class EVEDataOfDay {
 
     /**
      * Returns all values within the given interval.
-     * 
+     *
      * @param interval
      *            Only values of corresponding time stamps within the given
      *            interval will be considered.
-     * 
+     *
      * @return Values within the given interval.
      * */
     public EVEValue[] getValuesInInterval(final Interval<Date> interval) {
@@ -145,7 +145,7 @@ public class EVEDataOfDay {
 
     /**
      * Returns the current minimum and maximum value of all available values.
-     * 
+     *
      * @return The minimum and maximum value of all available values.
      * */
     public Range getMinMax() {
@@ -155,11 +155,11 @@ public class EVEDataOfDay {
     /**
      * Returns the current minimum and maximum value of all available values
      * within the given interval.
-     * 
+     *
      * @param interval
      *            Only values of corresponding time stamps within the given
      *            interval will be considered for minimum and maximum value.
-     * 
+     *
      * @return The minimum and maximum value of all available values within the
      *         given interval.
      * */
