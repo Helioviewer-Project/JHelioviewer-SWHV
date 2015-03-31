@@ -19,8 +19,6 @@ import java.awt.event.WindowFocusListener;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
-import java.net.URL;
-import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.HashMap;
@@ -31,7 +29,6 @@ import java.util.Set;
 import java.util.Timer;
 import java.util.TimerTask;
 
-import javax.swing.ImageIcon;
 import javax.swing.JComponent;
 import javax.swing.SwingWorker;
 import javax.swing.event.MouseInputListener;
@@ -41,7 +38,6 @@ import org.helioviewer.jhv.data.datatype.event.JHVEvent;
 import org.helioviewer.jhv.data.guielements.SWEKEventInformationDialog;
 import org.helioviewer.jhv.gui.IconBank;
 import org.helioviewer.jhv.gui.IconBank.JHVIcon;
-import org.helioviewer.plugins.eveplugin.EVEPlugin;
 import org.helioviewer.plugins.eveplugin.controller.DrawController;
 import org.helioviewer.plugins.eveplugin.controller.DrawControllerListener;
 import org.helioviewer.plugins.eveplugin.draw.DrawableElement;
@@ -56,7 +52,7 @@ import org.helioviewer.viewmodel.view.LinkedMovieManager;
 import org.helioviewer.viewmodel.view.jp2view.datetime.ImmutableDateTime;
 
 /**
- * 
+ *
  * @author Stephan Pagel
  * */
 public class ChartDrawGraphPane extends JComponent implements MouseInputListener, ComponentListener, DrawControllerListener, MouseWheelListener, WindowFocusListener {
@@ -67,7 +63,6 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
 
     private static final long serialVersionUID = 1L;
     private final DrawController drawController;
-    private GraphEvent[] events;
     private Map<YAxisElement, Double> yRatios;
     private Date movieTimestamp = null;
     private int movieLinePosition = -1;
@@ -231,7 +226,6 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
         updateGraphArea();
         updateRatios();
         updateMovieLineInformation();
-        updateGraphEvents();
     }
 
     private void drawBackground(final Graphics2D g) {
@@ -522,16 +516,6 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
         return false;
     }
 
-    private void updateGraphEvents() {
-        // Prepare an ImageIcons to be used with JComponents or drawImage()
-        Calendar cal = Calendar.getInstance();
-        cal.add(Calendar.DATE, -1);
-        Calendar cal2 = Calendar.getInstance();
-        GraphEvent event = new GraphEvent(cal, cal2);
-        events = new GraphEvent[1];
-        events[0] = event;
-    }
-
     private void setMovieFrameManually(final Point point) {
         Interval<Date> interval = drawController.getInterval();
         if (movieTimestamp == null || !drawController.getIntervalAvailable()) {
@@ -768,30 +752,6 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
         }
     }
 
-    // //////////////////////////////////////////////////////////////////////////////
-    // Graph Event
-    // //////////////////////////////////////////////////////////////////////////////
-
-    private class GraphEvent {
-
-        // //////////////////////////////////////////////////////////////////////////
-        // Definitions
-        // //////////////////////////////////////////////////////////////////////////
-
-        private ImageIcon icon;
-
-        // //////////////////////////////////////////////////////////////////////////
-        // Methods
-        // //////////////////////////////////////////////////////////////////////////
-
-        public GraphEvent(Calendar beginDate, Calendar endDate) {
-            /* if (icon == null) {
-                URL url = EVEPlugin.getResourceUrl("/images/ar_icon.png");
-                icon = new ImageIcon(url);
-            } */
-        }
-    }
-
     @Override
     public void drawRequest() {
         updateGraph();
@@ -877,11 +837,11 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
                 }
                 if (startValue <= endValue /* && startTime <= endTime */&& startValue >= plotAreaSpace.getScaledMinValue() && startValue <= plotAreaSpace.getScaledMaxValue() && endValue >= plotAreaSpace.getScaledMinValue() && endValue <= plotAreaSpace.getScaledMaxValue() // &&
 
-                // startTime >= myPlotAreaSpace.getScaledMinTime()
-                // && endTime <= myPlotAreaSpace.getScaledMaxTime() && startTime
-                // <= myPlotAreaSpace.getScaledMaxTime()
-                // && endTime >= myPlotAreaSpace.getScaledMinTime()) {
-                ) {
+                        // startTime >= myPlotAreaSpace.getScaledMinTime()
+                        // && endTime <= myPlotAreaSpace.getScaledMaxTime() && startTime
+                        // <= myPlotAreaSpace.getScaledMaxTime()
+                        // && endTime >= myPlotAreaSpace.getScaledMinTime()) {
+                        ) {
                     plotAreaSpace.setScaledSelectedTimeAndValue(startTime, endTime, startValue, endValue);
                 }
             }
