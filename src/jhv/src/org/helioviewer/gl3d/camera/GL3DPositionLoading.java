@@ -38,7 +38,7 @@ public class GL3DPositionLoading {
     private boolean isLoaded = false;
     private URL url;
     private JSONObject jsonResult;
-    public GL3DPositionDateTime[] positionDateTime;
+    private GL3DPositionDateTime[] positionDateTime;
     private final SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS");
     private String beginDate = "2014-05-28T00:00:00";
     private String endDate = "2014-05-28T00:00:00";
