@@ -55,7 +55,7 @@ public class EVEValues implements DownloadedData {
             return new Interval<Date>(null, null);
         }
 
-        return new Interval<Date>(values.getFirst().date, values.getLast().date);
+        return new Interval<Date>(new Date(values.getFirst().milli), new Date(values.getLast().milli));
     }
 
 }

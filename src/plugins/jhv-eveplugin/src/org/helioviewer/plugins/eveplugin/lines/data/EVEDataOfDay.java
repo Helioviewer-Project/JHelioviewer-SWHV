@@ -47,7 +47,7 @@ public class EVEDataOfDay {
         final GregorianCalendar calendar = new GregorianCalendar(year, month, dayOfMonth);
 
         for (int i = 0; i < values.length; i++) {
-            values[i] = new EVEValue(calendar.getTime(), Double.NaN);
+            values[i] = new EVEValue(calendar.getTime().getTime(), Double.NaN);
             calendar.add(Calendar.MINUTE, 1);
         }
     }
@@ -60,7 +60,7 @@ public class EVEDataOfDay {
      * */
     public void setValue(final EVEValue value) {
         final GregorianCalendar calendar = new GregorianCalendar();
-        calendar.setTime(value.date);
+        calendar.setTimeInMillis(value.milli);
 
         final int minuteOfDay = calendar.get(Calendar.HOUR_OF_DAY) * 60 + calendar.get(Calendar.MINUTE);
 
@@ -110,18 +110,21 @@ public class EVEDataOfDay {
      * @return Values within the given interval.
      * */
     public EVEValue[] getValuesInInterval(final Interval<Date> interval) {
-        if (values[MINUTES_PER_DAY - 1].date.compareTo(interval.getStart()) < 0) {
+        Date dateFirst = new Date(values[0].milli);
+        Date dateLast = new Date(values[MINUTES_PER_DAY - 1].milli);
+
+        if (dateLast.compareTo(interval.getStart()) < 0) {
             return Arrays.copyOfRange(values, MINUTES_PER_DAY - 3, MINUTES_PER_DAY - 1);
         }
 
-        if (values[0].date.compareTo(interval.getEnd()) > 0) {
+        if (dateFirst.compareTo(interval.getEnd()) > 0) {
             return Arrays.copyOfRange(values, 0, 2);
         }
 
         int indexFrom = 0;
         int indexTo = MINUTES_PER_DAY - 1;
 
-        final Interval<Date> available = new Interval<Date>(values[0].date, values[MINUTES_PER_DAY - 1].date);
+        final Interval<Date> available = new Interval<Date>(dateFirst, dateLast);
 
         if (available.containsPointInclusive(interval.getStart())) {
             GregorianCalendar calendar = new GregorianCalendar();
@@ -161,14 +164,17 @@ public class EVEDataOfDay {
      *         given interval.
      * */
     public Range getMinMaxInInterval(final Interval<Date> interval) {
-        if (values[MINUTES_PER_DAY - 1].date.compareTo(interval.getStart()) < 0 || values[0].date.compareTo(interval.getEnd()) > 0) {
+        Date dateFirst = new Date(values[0].milli);
+        Date dateLast = new Date(values[MINUTES_PER_DAY - 1].milli);
+
+        if (dateLast.compareTo(interval.getStart()) < 0 || dateFirst.compareTo(interval.getEnd()) > 0) {
             return new Range();
         }
 
         int indexFrom = 0;
         int indexTo = MINUTES_PER_DAY - 1;
 
-        final Interval<Date> available = new Interval<Date>(values[0].date, values[MINUTES_PER_DAY - 1].date);
+        final Interval<Date> available = new Interval<Date>(dateFirst, dateLast);
 
         if (available.containsPointInclusive(interval.getStart())) {
             GregorianCalendar calendar = new GregorianCalendar();

@@ -10,11 +10,11 @@ import java.util.Date;
  * */
 public class EVEValue {
 
-    public Date date;
+    public long milli;
     public double value;
 
-    public EVEValue(Date date, double value) {
-        this.date = date;
+    public EVEValue(long milli, double value) {
+        this.milli = milli;
         this.value = value;
     }
 
