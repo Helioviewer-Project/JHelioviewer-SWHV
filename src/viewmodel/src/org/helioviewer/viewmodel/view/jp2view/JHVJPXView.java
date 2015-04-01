@@ -104,15 +104,15 @@ public class JHVJPXView extends JHVJP2View implements TimedMovieView, CachedMovi
      * {@inheritDoc}
      */
     @Override
-    public void setCurrentFrame(int frameNumber, ChangeEvent event) {
-        setCurrentFrame(frameNumber, event, false);
+    public void setCurrentFrame(int frameNumber) {
+        setCurrentFrame(frameNumber, false);
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public void setCurrentFrame(int frameNumber, ChangeEvent event, boolean forceSignal) {
+    public void setCurrentFrame(int frameNumber, boolean forceSignal) {
         frameNumber = Math.max(0, Math.min(getMaximumFrameNumber(), frameNumber));
 
         if (forceSignal && linkedMovieManager != null) {
@@ -123,12 +123,12 @@ public class JHVJPXView extends JHVJP2View implements TimedMovieView, CachedMovi
                     e.printStackTrace();
                 }
             }
-            linkedMovieManager.setCurrentFrame(getFrameDateTime(frameNumber), event, forceSignal);
+            linkedMovieManager.setCurrentFrame(getFrameDateTime(frameNumber), forceSignal);
         } else {
             boolean changed;
-            changed = setCurrentFrameNumber(frameNumber, event, forceSignal);
+            changed = setCurrentFrameNumber(frameNumber, forceSignal);
             if (changed && linkedMovieManager != null) {
-                linkedMovieManager.setCurrentFrame(getFrameDateTime(frameNumber), event, forceSignal);
+                linkedMovieManager.setCurrentFrame(getFrameDateTime(frameNumber), forceSignal);
             }
         }
     }
@@ -137,18 +137,18 @@ public class JHVJPXView extends JHVJP2View implements TimedMovieView, CachedMovi
      * {@inheritDoc}
      */
     @Override
-    public void setCurrentFrame(ImmutableDateTime time, ChangeEvent event) {
-        setCurrentFrame(time, event, false);
+    public void setCurrentFrame(ImmutableDateTime time) {
+        setCurrentFrame(time, false);
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public void setCurrentFrame(ImmutableDateTime time, ChangeEvent event, boolean forceSignal) {
+    public void setCurrentFrame(ImmutableDateTime time, boolean forceSignal) {
         if (time == null)
             return;
-        if (linkedMovieManager != null && linkedMovieManager.setCurrentFrame(time, event, forceSignal)) {
+        if (linkedMovieManager != null && linkedMovieManager.setCurrentFrame(time, forceSignal)) {
             return;
         }
 
@@ -166,9 +166,9 @@ public class JHVJPXView extends JHVJP2View implements TimedMovieView, CachedMovi
         } while (currentDiff < 0 && frameNumber < jp2Image.getCompositionLayerRange().getEnd());
 
         if (-lastDiff < currentDiff) {
-            setCurrentFrameNumber(frameNumber - 1, event, forceSignal);
+            setCurrentFrameNumber(frameNumber - 1, forceSignal);
         } else {
-            setCurrentFrameNumber(frameNumber, event, forceSignal);
+            setCurrentFrameNumber(frameNumber, forceSignal);
         }
     }
 
@@ -383,7 +383,7 @@ public class JHVJPXView extends JHVJP2View implements TimedMovieView, CachedMovi
      * @param frameNumber
      * @return true, if the frame number has changed
      */
-    public boolean setCurrentFrameNumber(int frameNumber, ChangeEvent event, boolean forceSignal) {
+    public boolean setCurrentFrameNumber(int frameNumber, boolean forceSignal) {
         if (frameNumber != imageViewParams.compositionLayer || forceSignal) {
             imageViewParams.compositionLayer = frameNumber;
             while (getMaximumAccessibleFrameNumber() < imageViewParams.compositionLayer) {

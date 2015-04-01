@@ -5,7 +5,6 @@ import java.util.Vector;
 import java.util.concurrent.Semaphore;
 import java.util.concurrent.locks.ReentrantLock;
 
-import org.helioviewer.viewmodel.changeevent.ChangeEvent;
 import org.helioviewer.viewmodel.view.jp2view.datetime.ImmutableDateTime;
 
 /**
@@ -60,7 +59,6 @@ public class LinkedMovieManager {
         if (instances.isEmpty()) {
             instances.add(new LinkedMovieManager());
         }
-
         return instances.get(activeInstance);
     }
 
@@ -115,14 +113,12 @@ public class LinkedMovieManager {
      */
     public static void deleteInstance(int instance) {
         if (instance != 0 && instance < instances.size() && instances.get(instance) != null) {
-
             LinkedList<TimedMovieView> linkedMovies = instances.get(instance).linkedMovies;
             while (!linkedMovies.isEmpty()) {
                 linkedMovies.element().unlinkMovie();
             }
 
             instances.set(instance, null);
-
             if (activeInstance == instance) {
                 setActiveInstance(0);
             }
@@ -138,7 +134,6 @@ public class LinkedMovieManager {
     public synchronized void linkMovie(TimedMovieView movieView) {
         if (movieView.getMaximumFrameNumber() > 0 && !linkedMovies.contains(movieView)) {
             linkedMovies.add(movieView);
-
             updateMaster();
         }
     }
@@ -152,7 +147,6 @@ public class LinkedMovieManager {
     public synchronized void unlinkMovie(TimedMovieView movieView) {
         if (linkedMovies.contains(movieView)) {
             linkedMovies.remove(movieView);
-
             updateMaster();
 
             if (!linkedMovies.isEmpty()) {
@@ -191,12 +185,10 @@ public class LinkedMovieManager {
      * @return True, if the set of linked movies is playing, false otherwise.
      */
     public boolean isPlaying() {
-
         boolean isPlaying = false;
 
         try {
             isPlayingLock.lock();
-
             if (isPlayingSemaphore.tryAcquire()) {
                 try {
                     isPlaying = (masterView != null && masterView.isMoviePlaying());
@@ -229,7 +221,6 @@ public class LinkedMovieManager {
             return true;
 
         if (updateSemaphore.tryAcquire()) {
-
             try {
                 for (TimedMovieView movie : linkedMovies) {
                     movie.playMovie();
@@ -260,7 +251,6 @@ public class LinkedMovieManager {
             return true;
 
         if (updateSemaphore.tryAcquire()) {
-
             try {
                 masterView.pauseMovie();
             } finally {
@@ -285,18 +275,17 @@ public class LinkedMovieManager {
      * @param event
      *            ChangeEvent to append new reasons to.
      */
-    public synchronized void updateCurrentFrameToMaster(ChangeEvent event) {
+    public synchronized void updateCurrentFrameToMaster() {
         if (masterView == null)
             return;
 
         if (updateSemaphore.tryAcquire()) {
-
             try {
                 ImmutableDateTime masterTime = masterView.getCurrentFrameDateTime();
 
                 for (TimedMovieView movieView : linkedMovies) {
                     if (movieView != masterView) {
-                        movieView.setCurrentFrame(masterTime, new ChangeEvent(event));
+                        movieView.setCurrentFrame(masterTime);
                     }
                 }
             } finally {
@@ -325,11 +314,11 @@ public class LinkedMovieManager {
      * @return True, if the function was not called so far and therefore
      *         performed successful, false otherwise.
      */
-    public synchronized boolean setCurrentFrame(ImmutableDateTime dateTime, ChangeEvent event, boolean forceSignal) {
+    public synchronized boolean setCurrentFrame(ImmutableDateTime dateTime, boolean forceSignal) {
         if (updateSemaphore.tryAcquire()) {
             try {
                 for (TimedMovieView movieView : linkedMovies) {
-                    movieView.setCurrentFrame(dateTime, new ChangeEvent(event), forceSignal);
+                    movieView.setCurrentFrame(dateTime, forceSignal);
                 }
             } finally {
                 updateSemaphore.release();
@@ -347,7 +336,6 @@ public class LinkedMovieManager {
      * master panel.
      */
     private synchronized void updateMaster() {
-
         boolean isPlaying = (masterView != null && masterView.isMoviePlaying());
         masterView = null;
 
@@ -366,13 +354,9 @@ public class LinkedMovieManager {
         int lastAvailableFrame = 0;
 
         for (TimedMovieView movieView : linkedMovies) {
-
             lastAvailableFrame = 0;
-
             do {
-
                 lastAvailableFrame = movieView.getMaximumFrameNumber();
-
                 if (lastAvailableFrame > 0) {
                     break;
                 } else {
@@ -400,4 +384,5 @@ public class LinkedMovieManager {
             masterView.playMovie();
         }
     }
+
 }

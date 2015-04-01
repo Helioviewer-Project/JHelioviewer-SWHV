@@ -1,7 +1,5 @@
 package org.helioviewer.viewmodel.view;
 
-import org.helioviewer.viewmodel.changeevent.ChangeEvent;
-
 /**
  * View to interact with image series.
  *
@@ -56,7 +54,7 @@ public interface MovieView extends View {
      * @see #getMaximumFrameNumber
      * @see TimedMovieView#setCurrentFrame
      */
-    public void setCurrentFrame(int frameNumber, ChangeEvent event);
+    public void setCurrentFrame(int frameNumber);
 
     /**
      * Sets the frame currently shown.
@@ -74,7 +72,7 @@ public interface MovieView extends View {
      * @see #getMaximumFrameNumber
      * @see TimedMovieView#setCurrentFrame
      */
-    public void setCurrentFrame(int frameNumber, ChangeEvent event, boolean forceSignal);
+    public void setCurrentFrame(int frameNumber, boolean forceSignal);
 
     /**
      * Returns the current frame number.
@@ -186,4 +184,5 @@ public interface MovieView extends View {
     public long getCurrentDateMillis();
 
     public int getDesiredRelativeSpeed();
+
 }

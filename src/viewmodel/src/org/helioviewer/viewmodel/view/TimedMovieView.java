@@ -1,6 +1,5 @@
 package org.helioviewer.viewmodel.view;
 
-import org.helioviewer.viewmodel.changeevent.ChangeEvent;
 import org.helioviewer.viewmodel.view.jp2view.datetime.ImmutableDateTime;
 
 /**
@@ -43,7 +42,7 @@ public interface TimedMovieView extends MovieView {
      * @see #getCurrentFrameNumber
      * @see #getMaximumFrameNumber
      */
-    public void setCurrentFrame(ImmutableDateTime time, ChangeEvent event);
+    public void setCurrentFrame(ImmutableDateTime time);
 
     /**
      * Sets the frame currently shown.
@@ -61,7 +60,7 @@ public interface TimedMovieView extends MovieView {
      * @see #getCurrentFrameNumber
      * @see #getMaximumFrameNumber
      */
-    public void setCurrentFrame(ImmutableDateTime time, ChangeEvent event, boolean forceSignal);
+    public void setCurrentFrame(ImmutableDateTime time, boolean forceSignal);
 
     /**
      * Returns time stamp of the current frame.
