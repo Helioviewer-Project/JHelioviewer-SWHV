@@ -4,7 +4,6 @@ import java.awt.BorderLayout;
 
 import javax.swing.JPanel;
 
-import org.helioviewer.plugins.eveplugin.lines.model.EVEDrawController;
 import org.helioviewer.plugins.eveplugin.view.chart.ChartDrawGraphPane;
 import org.helioviewer.plugins.eveplugin.view.chart.ChartDrawIntervalPane;
 
@@ -16,8 +15,6 @@ public class PlotPanel extends JPanel {
 
     private static final long serialVersionUID = 1L;
 
-    private final EVEDrawController drawController;
-
     private final JPanel plotPane = new JPanel();
     private final ChartDrawGraphPane graphPane;
     private ChartDrawIntervalPane intervalPane = null;
@@ -27,8 +24,6 @@ public class PlotPanel extends JPanel {
     // //////////////////////////////////////////////////////////////////////////////
 
     public PlotPanel(final String plotName) {
-
-        drawController = new EVEDrawController();
 
         graphPane = new ChartDrawGraphPane();
         initVisualComponents();
