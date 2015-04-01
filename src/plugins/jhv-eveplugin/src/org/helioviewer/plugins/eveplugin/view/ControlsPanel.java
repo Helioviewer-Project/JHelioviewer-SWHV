@@ -20,7 +20,6 @@ import javax.swing.JComboBox;
 import javax.swing.JPanel;
 import javax.swing.JToggleButton;
 
-import org.helioviewer.base.logging.Log;
 import org.helioviewer.base.math.Interval;
 import org.helioviewer.jhv.gui.IconBank;
 import org.helioviewer.jhv.gui.IconBank.JHVIcon;
@@ -167,7 +166,6 @@ public class ControlsPanel extends JPanel implements ActionListener, LayersListe
                 selectedIntervalByZoombox = ZoomController.getSingletonInstance().zoomTo(item.getZoom(), item.getNumber());
             } else {
                 if (selectedIndexSetByProgram) {
-                    Log.debug("Make false");
                     selectedIndexSetByProgram = false;
                 }
             }
@@ -239,16 +237,9 @@ public class ControlsPanel extends JPanel implements ActionListener, LayersListe
     }
 
     private void fillZoomComboBox() {
-        selectedIndexSetByProgram = true;
-        Thread.dumpStack();
-
         final DefaultComboBoxModel model = (DefaultComboBoxModel) zoomComboBox.getModel();
         model.removeAllElements();
-        selectedIndexSetByProgram = true;
-        Thread.dumpStack();
         model.addElement(new ZoomComboboxItem(ZOOM.CUSTOM, 0));
-        selectedIndexSetByProgram = true;
-        Thread.dumpStack();
         model.addElement(new ZoomComboboxItem(ZOOM.All, 0));
 
         addElementToModel(model, Calendar.YEAR, 1, ZOOM.Year);
@@ -339,7 +330,6 @@ public class ControlsPanel extends JPanel implements ActionListener, LayersListe
             if (!selectedIntervalByZoombox.equals(newInterval)) {
                 try {
                     selectedIndexSetByProgram = true;
-                    Thread.dumpStack();
                     zoomComboBox.setSelectedIndex(0);
                 } catch (final IllegalArgumentException ex) {
                 }
