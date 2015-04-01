@@ -18,7 +18,6 @@ import javax.swing.JPanel;
 import org.helioviewer.jhv.gui.IconBank;
 import org.helioviewer.jhv.gui.IconBank.JHVIcon;
 import org.helioviewer.jhv.gui.filters.AbstractFilterPanel;
-import org.helioviewer.jhv.layers.LayersListener;
 import org.helioviewer.jhv.layers.LayersModel;
 import org.helioviewer.viewmodel.view.View;
 import org.helioviewer.viewmodel.view.jp2view.JHVJP2View;
@@ -32,7 +31,7 @@ import org.helioviewer.viewmodel.view.jp2view.JHVJP2View;
  *
  * @author Stephan Pagel
  */
-public class FilterTabPanelManager implements LayersListener {
+public class FilterTabPanelManager {
 
     public enum Area {
         TOP, CENTER, BOTTOM
@@ -69,7 +68,6 @@ public class FilterTabPanelManager implements LayersListener {
      *            Area where component should occur.
      */
     public void add(Component comp, Area area) {
-
         switch (area) {
         case TOP:
             topList.add(comp);
@@ -192,24 +190,8 @@ public class FilterTabPanelManager implements LayersListener {
 
             //compactPanel.add(buttonPanel, c);
         }
-        LayersModel.getSingletonInstance().addLayersListener(this);
 
         return compactPanel;
-    }
-
-    @Override
-    public void layerAdded(int idx) {
-    }
-
-    @Override
-    public void layerRemoved(int oldIdx) {
-    }
-
-    @Override
-    public void activeLayerChanged(View view) {
-        if (view instanceof JHVJP2View) {
-            //setActivejp2((JHVJP2View) view);
-        }
     }
 
     private Action downloadLayerAction;
