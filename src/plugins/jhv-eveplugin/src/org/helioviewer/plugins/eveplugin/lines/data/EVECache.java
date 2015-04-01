@@ -28,21 +28,19 @@ public class EVECache {
     // //////////////////////////////////////////////////////////////////////////////
 
     public void add(final double[] values, final long[] dates) {
-        final GregorianCalendar calendar = new GregorianCalendar();
+       GregorianCalendar calendar = new GregorianCalendar();
 
-        if (values != null) {
-            for (int i = 0; i < values.length; i++) {
-                calendar.setTimeInMillis(dates[i]);
-                final Integer key = new Integer(calendar.get(Calendar.YEAR) * 1000 + calendar.get(Calendar.DAY_OF_YEAR));
+        for (int i = 0; i < values.length; i++) {
+            calendar.setTimeInMillis(dates[i]);
+            final Integer key = new Integer(calendar.get(Calendar.YEAR) * 1000 + calendar.get(Calendar.DAY_OF_YEAR));
 
-                EVEDataOfDay cache = cacheMap.get(key);
-                if (cache == null) {
-                    cache = new EVEDataOfDay(calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH), calendar.get(Calendar.DAY_OF_MONTH));
-                    cacheMap.put(key, cache);
-                }
-
-                cache.setValue(calendar.get(Calendar.HOUR_OF_DAY) * 60 + calendar.get(Calendar.MINUTE), values[i], dates[i]);
+            EVEDataOfDay cache = cacheMap.get(key);
+            if (cache == null) {
+                cache = new EVEDataOfDay(calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH), calendar.get(Calendar.DAY_OF_MONTH));
+                cacheMap.put(key, cache);
             }
+
+            cache.setValue(calendar.get(Calendar.HOUR_OF_DAY) * 60 + calendar.get(Calendar.MINUTE), values[i], dates[i]);
         }
     }
 

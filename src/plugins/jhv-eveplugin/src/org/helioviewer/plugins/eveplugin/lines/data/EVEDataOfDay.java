@@ -35,10 +35,10 @@ public class EVEDataOfDay {
     // //////////////////////////////////////////////////////////////////////////////
 
     public EVEDataOfDay(final int year, final int month, final int dayOfMonth) {
-        final GregorianCalendar calendar = new GregorianCalendar(year, month, dayOfMonth);
+        GregorianCalendar calendar = new GregorianCalendar(year, month, dayOfMonth);
 
+        Arrays.fill(values, Double.NaN);
         for (int i = 0; i < values.length; i++) {
-            values[i] = Double.NaN;
             dates[i] = calendar.getTime().getTime();
             calendar.add(Calendar.MINUTE, 1);
         }
@@ -110,18 +110,16 @@ public class EVEDataOfDay {
 
         int indexFrom = 0;
         int indexTo = MINUTES_PER_DAY - 1;
-
+        GregorianCalendar calendar = new GregorianCalendar();
         final Interval<Date> available = new Interval<Date>(dateFirst, dateLast);
 
         if (available.containsPointInclusive(interval.getStart())) {
-            GregorianCalendar calendar = new GregorianCalendar();
             calendar.setTime(interval.getStart());
             indexFrom = calendar.get(Calendar.HOUR_OF_DAY) * 60 + calendar.get(Calendar.MINUTE);
             indexFrom = Math.max(0, indexFrom - 3);
         }
 
         if (available.containsPointInclusive(interval.getEnd())) {
-            GregorianCalendar calendar = new GregorianCalendar();
             calendar.setTime(interval.getEnd());
             indexTo = calendar.get(Calendar.HOUR_OF_DAY) * 60 + calendar.get(Calendar.MINUTE);
             indexTo = Math.min(indexTo + 3, MINUTES_PER_DAY - 1);
@@ -160,17 +158,15 @@ public class EVEDataOfDay {
 
         int indexFrom = 0;
         int indexTo = MINUTES_PER_DAY - 1;
-
+        GregorianCalendar calendar = new GregorianCalendar();
         final Interval<Date> available = new Interval<Date>(dateFirst, dateLast);
 
         if (available.containsPointInclusive(interval.getStart())) {
-            GregorianCalendar calendar = new GregorianCalendar();
             calendar.setTime(interval.getStart());
             indexFrom = calendar.get(Calendar.HOUR_OF_DAY) * 60 + calendar.get(Calendar.MINUTE);
         }
 
         if (available.containsPointInclusive(interval.getEnd())) {
-            GregorianCalendar calendar = new GregorianCalendar();
             calendar.setTime(interval.getEnd());
             indexTo = calendar.get(Calendar.HOUR_OF_DAY) * 60 + calendar.get(Calendar.MINUTE);
         }
