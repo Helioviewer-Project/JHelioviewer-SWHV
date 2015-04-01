@@ -35,13 +35,8 @@ import org.helioviewer.plugins.eveplugin.radio.data.RadioDownloader;
 import org.helioviewer.plugins.eveplugin.view.plot.PlotsContainerPanel;
 import org.helioviewer.viewmodel.view.View;
 import org.helioviewer.viewmodel.view.jp2view.JHVJPXView;
-import org.helioviewer.viewmodel.view.jp2view.datetime.ImmutableDateTime;
 
 public abstract class SimpleObservationDialogUIPanel extends ObservationDialogPanel implements JHVCalendarListener, LayersListener, ObservationDialogDateModelListener {
-
-    // //////////////////////////////////////////////////////////////////////////////
-    // Definitions
-    // //////////////////////////////////////////////////////////////////////////////
 
     private static final long serialVersionUID = 1L;
 
@@ -56,10 +51,6 @@ public abstract class SimpleObservationDialogUIPanel extends ObservationDialogPa
 
     private final JPanel timePane;
     private final JPanel plotPane;
-
-    // //////////////////////////////////////////////////////////////////////////////
-    // Methods
-    // //////////////////////////////////////////////////////////////////////////////
 
     public SimpleObservationDialogUIPanel(final PlotsContainerPanel plotsContainerPanel) {
         this.plotsContainerPanel = plotsContainerPanel;
@@ -250,23 +241,14 @@ public abstract class SimpleObservationDialogUIPanel extends ObservationDialogPa
 
     @Override
     public void layerAdded(int idx) {
-        View view = LayersModel.getSingletonInstance().getActiveView();
+        View view = LayersModel.getSingletonInstance().getLayer(idx);
         if (view instanceof JHVJPXView) {
             JHVJPXView jpxView = (JHVJPXView) view;
-            Date beginDate = null, endDate = null;
-
-            for (int frame = 0; frame <= jpxView.getMaximumFrameNumber(); frame++) {
-                ImmutableDateTime date = jpxView.getFrameDateTime(frame);
-                if (beginDate == null || date.getTime().getTime() < beginDate.getTime()) {
-                    beginDate = date.getTime();
-                }
-                if (endDate == null || date.getTime().getTime() > endDate.getTime()) {
-                    endDate = date.getTime();
-                }
-            }
-            if (beginDate != null && endDate != null) {
-                calendarStartDate.setDate(beginDate);
-                ObservationDialogDateModel.getInstance().setStartDate(beginDate, false);
+            Date start, end;
+            Interval<Date> range = jpxView.getDateRange();
+            if (range != null && (start = range.getStart()) != null && (end = range.getEnd()) != null) {
+                calendarStartDate.setDate(start);
+                ObservationDialogDateModel.getInstance().setStartDate(start, false);
             }
         }
     }

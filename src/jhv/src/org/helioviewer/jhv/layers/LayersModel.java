@@ -117,7 +117,7 @@ public class LayersModel extends AbstractTableModel {
      *            - Index of the layer to be retrieved
      * @return View associated with the given index
      */
-    private JHVJP2View getLayer(int idx) {
+    public JHVJP2View getLayer(int idx) {
         idx = invertIndex(idx);
         if (idx >= 0 && idx < getNumLayers()) {
             return layeredView.getLayer(idx);
