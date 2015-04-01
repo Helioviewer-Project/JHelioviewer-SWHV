@@ -18,21 +18,23 @@ public class EVEValues implements DownloadedData {
     private double minValue = Double.MAX_VALUE;
     private double maxValue = Double.MIN_VALUE;
 
-    public void addValue(final long date, final double value) {
-        if (index == dates.length) {
-            dates = Arrays.copyOf(dates, dates.length + increment);
-            values = Arrays.copyOf(values, values.length + increment);
+    public void addValues(final long[] indates, final double[] invalues) {
+        if (index + indates.length >= dates.length) {
+            dates = Arrays.copyOf(dates, index + indates.length + increment);
+            values = Arrays.copyOf(values, index + indates.length + increment);
         }
 
-        values[index] = value;
-        dates[index] = date;
-        index++;
+        for (int i = 0; i < indates.length; i++) {
+            double value = invalues[i];
+            if (!Double.isNaN(value)) {
+                values[index] = value;
+                dates[index] = indates[i];
+                index++;
 
-        if (Double.isNaN(value))
-            return;
-
-        minValue = value < minValue ? value : minValue;
-        maxValue = value > maxValue ? value : maxValue;
+                minValue = value < minValue ? value : minValue;
+                maxValue = value > maxValue ? value : maxValue;
+            }
+        }
     }
 
     public int getNumberOfValues() {

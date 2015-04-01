@@ -66,14 +66,8 @@ public class EVECache {
             }
 
             final Pair<long[], double[]> pair = cache.getValuesInInterval(interval);
-            double[] values = pair.b;
-            long[] dates = pair.a;
+            result.addValues(pair.a, pair.b);
 
-            for (int i = 0; i < values.length; i++) {
-                if (!Double.isNaN(values[i])) {
-                    result.addValue(dates[i], values[i]);
-                }
-            }
             calendar.add(Calendar.DAY_OF_YEAR, 1);
             key = new Integer(calendar.get(Calendar.YEAR) * 1000 + calendar.get(Calendar.DAY_OF_YEAR));
         }
