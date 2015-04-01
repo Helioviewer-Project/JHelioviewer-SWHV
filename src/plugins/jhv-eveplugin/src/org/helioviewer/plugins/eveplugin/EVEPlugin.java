@@ -11,6 +11,7 @@ import org.helioviewer.jhv.gui.interfaces.MainContentPanelPlugin;
 import org.helioviewer.plugins.eveplugin.controller.ZoomController;
 import org.helioviewer.plugins.eveplugin.events.data.EventRequester;
 import org.helioviewer.plugins.eveplugin.events.model.EventModel;
+import org.helioviewer.plugins.eveplugin.lines.model.EVEDrawController;
 import org.helioviewer.plugins.eveplugin.radio.model.RadioPlotModel;
 import org.helioviewer.plugins.eveplugin.settings.EVESettings;
 import org.helioviewer.plugins.eveplugin.view.ControlsPanel;
@@ -21,8 +22,8 @@ import org.helioviewer.plugins.eveplugin.view.TimelinePluginPanel;
 import org.helioviewer.viewmodelplugin.interfaces.Plugin;
 
 /**
- * 
- * 
+ *
+ *
  * @author Stephan Pagel
  * */
 public class EVEPlugin implements Plugin, MainContentPanelPlugin {
@@ -36,6 +37,8 @@ public class EVEPlugin implements Plugin, MainContentPanelPlugin {
         ZoomController.getSingletonInstance().addZoomControllerListener(eventRequester);
         eventRequester.addListener(EventModel.getSingletonInstance());
         ZoomController.getSingletonInstance().addZoomControllerListener(EventModel.getSingletonInstance());
+        // Create an instance of eveDrawController and leave it here.
+        EVEDrawController eveDrawController = new EVEDrawController();
         if (mainPanel == null) {
             mainPanel = new MainPanel();
         }
@@ -86,7 +89,7 @@ public class EVEPlugin implements Plugin, MainContentPanelPlugin {
 
     /**
      * Used for testing the plugin
-     * 
+     *
      * @see org.helioviewer.plugins.eveplugin.EVEPluginLauncher#main(String[])
      * @param args
      */
