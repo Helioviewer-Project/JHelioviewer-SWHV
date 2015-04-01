@@ -18,6 +18,12 @@ import org.helioviewer.viewmodel.view.jp2view.datetime.ImmutableDateTime;
  */
 public class LayerTableOverlapWatcher implements LayersListener {
 
+    private static final LayerTableOverlapWatcher instance = new LayerTableOverlapWatcher();
+
+    private LayerTableOverlapWatcher() {
+        LayersModel.getSingletonInstance().addLayersListener(this);
+    }
+
     /**
      * @see LayerTableOverlapWatcher#layerAdded
      *
