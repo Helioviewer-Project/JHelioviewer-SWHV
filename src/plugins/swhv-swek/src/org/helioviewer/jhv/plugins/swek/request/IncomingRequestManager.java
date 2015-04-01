@@ -2,10 +2,7 @@ package org.helioviewer.jhv.plugins.swek.request;
 
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-import java.util.Set;
 
 import org.helioviewer.base.math.Interval;
 import org.helioviewer.jhv.data.container.JHVEventContainer;
@@ -28,9 +25,6 @@ public class IncomingRequestManager implements JHVEventContainerRequestHandler {
     /** List of requested dates */
     private final List<Date> dateList;
 
-    /**  */
-    private final Map<Date, Set<Date>> uniqueInterval;
-
     /**
      * Private constructor.
      */
@@ -40,7 +34,6 @@ public class IncomingRequestManager implements JHVEventContainerRequestHandler {
         listeners = new ArrayList<IncomingRequestManagerListener>();
         // intervalList = new ArrayList<Interval<Date>>();
         dateList = new ArrayList<Date>();
-        uniqueInterval = new HashMap<Date, Set<Date>>();
     }
 
     /**
