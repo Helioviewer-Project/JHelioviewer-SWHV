@@ -33,7 +33,6 @@ public class RadioPlotModel implements RadioDataManagerListener, ZoomDataConfigL
     private final DrawController drawController;
     private Map<Long, BufferedImage> bufferedImages;
     private final YValueModel yValueModel;
-    private long counter;
 
     private final RadioPlotModelData radioPlotModelData;
 
@@ -317,7 +316,6 @@ public class RadioPlotModel implements RadioDataManagerListener, ZoomDataConfigL
         List<Long> idList = new ArrayList<Long>();
         idList.add(ID);
         radioDataManager.requestForData(xStart, xEnd, yStart, yEnd, xRatio, yRatio, idList);
-        counter++;
         updateNoDataConfig(ID);
     }
 
