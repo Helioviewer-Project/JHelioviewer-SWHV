@@ -648,36 +648,6 @@ public class LayersModel extends AbstractTableModel {
     }
 
     /**
-     * Check whether the layer in question is a Remote View
-     *
-     * @param view
-     *            - View that can be associated with the layer in question
-     * @return true if the layer in question is a remote view
-     */
-    public boolean isRemote(JHVJP2View view) {
-        if (view != null) {
-            return view.isRemote();
-        } else {
-            return false;
-        }
-    }
-
-    /**
-     * Check whether the layer in question is connected to a JPIP server
-     *
-     * @param view
-     *            - View that can be associated with the layer in question
-     * @return true if the layer is connected to a JPIP server
-     */
-    public boolean isConnectedToJPIP(JHVJP2View view) {
-        if (view != null) {
-            return view.isConnectedToJPIP();
-        } else {
-            return false;
-        }
-    }
-
-    /**
      * Return a representation of the layer in question
      *
      * @param view
