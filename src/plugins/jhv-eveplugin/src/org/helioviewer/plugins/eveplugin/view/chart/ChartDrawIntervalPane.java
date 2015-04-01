@@ -38,7 +38,7 @@ import org.helioviewer.viewmodel.view.View;
 import org.helioviewer.viewmodel.view.jp2view.JHVJPXView;
 
 /**
- * 
+ *
  * @author Stephan Pagel
  * */
 public class ChartDrawIntervalPane extends JComponent implements ZoomControllerListener, MouseInputListener, LayersListener {
@@ -686,37 +686,13 @@ public class ChartDrawIntervalPane extends JComponent implements ZoomControllerL
     // //////////////////////////////////////////////////////////////////////////////
     // Layers Listener
     // //////////////////////////////////////////////////////////////////////////////
-
-    private void repaintOnLayerNotification() {
-        View activeView = LayersModel.getSingletonInstance().getActiveView();
-        if (activeView != null) {
-            JHVJPXView jpxView = activeView.getAdapter(JHVJPXView.class);
-            if (jpxView != null) {
-                Date start, end;
-                Interval<Date> range = jpxView.getDateRange();
-
-                if (range != null && (start = range.getStart()) != null && (end = range.getEnd()) != null) {
-                    movieInterval = new Interval<Date>(start, end);
-                    repaint();
-                }
-            }
-        }
-    }
-
     @Override
     public void layerAdded(int idx) {
-        movieInterval = new Interval<Date>(LayersModel.getSingletonInstance().getFirstDate(), LayersModel.getSingletonInstance().getLastDate());
-        repaintOnLayerNotification();
+
     }
 
     @Override
     public void layerRemoved(int oldIdx) {
-        movieInterval = new Interval<Date>(LayersModel.getSingletonInstance().getFirstDate(), LayersModel.getSingletonInstance().getLastDate());
-        View activeView = LayersModel.getSingletonInstance().getActiveView();
-        if (activeView != null) {
-            movieInterval = null;
-            repaint();
-        }
     }
 
     @Override
