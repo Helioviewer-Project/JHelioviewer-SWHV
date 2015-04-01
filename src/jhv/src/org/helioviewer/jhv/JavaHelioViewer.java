@@ -20,9 +20,7 @@ import org.helioviewer.base.logging.Log;
 import org.helioviewer.base.logging.LogSettings;
 import org.helioviewer.base.message.Message;
 import org.helioviewer.jhv.gui.ImageViewerGui;
-import org.helioviewer.jhv.gui.components.layerTable.LayerTableOverlapWatcher;
 import org.helioviewer.jhv.io.CommandLineProcessor;
-import org.helioviewer.jhv.layers.LayersModel;
 import org.helioviewer.jhv.resourceloader.ResourceLoader;
 import org.helioviewer.jhv.resourceloader.SystemProperties;
 import org.helioviewer.viewmodel.view.jp2view.JP2Image;
@@ -264,9 +262,6 @@ public class JavaHelioViewer {
                 public void run() {
                     ImageViewerGui.getSingletonInstance().prepareGui();
                     // ImageViewerGui.getSingletonInstance().createViewchains();
-
-                    LayerTableOverlapWatcher overlapWatcher = new LayerTableOverlapWatcher();
-                    LayersModel.getSingletonInstance().addLayersListener(overlapWatcher);
 
                     Settings.getSingletonInstance().update();
                 }
