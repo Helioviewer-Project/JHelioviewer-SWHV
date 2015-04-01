@@ -223,22 +223,15 @@ public class GL3DComponentView extends AbstractComponentView implements GLEventL
         this.exportMovieDialog = exportMovieDialog;
         ImageViewerGui.getSingletonInstance().getLeftContentPane().setEnabled(false);
         View v = LayersModel.getSingletonInstance().getActiveView();
-        if (v != null) {
-            JHVJPXView movieView = v.getAdapter(JHVJPXView.class);
-            if (movieView != null) {
-                movieView.pauseMovie();
-                movieView.setCurrentFrame(0);
-            }
-
+        if (v instanceof JHVJPXView) {
             export = new MovieExport(canvas.getWidth(), canvas.getHeight());
             export.createProcess();
             exportMode = true;
 
-            if (movieView != null) {
-                movieView.playMovie();
-            } else {
-                Displayer.render();
-            }
+            JHVJPXView jpxView = (JHVJPXView) v;
+            jpxView.pauseMovie();
+            jpxView.setCurrentFrame(0);
+            jpxView.playMovie();
         } else {
             exportMovieDialog.fail();
             exportMovieDialog = null;
@@ -247,7 +240,7 @@ public class GL3DComponentView extends AbstractComponentView implements GLEventL
 
     private void stopExport() {
         View v = LayersModel.getSingletonInstance().getActiveView();
-        JHVJPXView movieView = v.getAdapter(JHVJPXView.class);
+        JHVJPXView jpxView = (JHVJPXView) v;
 
         exportMode = false;
         previousScreenshot = -1;
@@ -258,9 +251,8 @@ public class GL3DComponentView extends AbstractComponentView implements GLEventL
         JOptionPane.showMessageDialog(ImageViewerGui.getSingletonInstance().getMainImagePanel(), text);
 
         ImageViewerGui.getSingletonInstance().getLeftContentPane().setEnabled(true);
-        if (movieView != null) {
-            movieView.pauseMovie();
-        }
+
+        jpxView.pauseMovie();
         exportMovieDialog.reset();
         exportMovieDialog = null;
     }
