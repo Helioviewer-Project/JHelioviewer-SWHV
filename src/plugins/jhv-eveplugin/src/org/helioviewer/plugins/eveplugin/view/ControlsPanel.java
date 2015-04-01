@@ -195,7 +195,6 @@ public class ControlsPanel extends JPanel implements ActionListener, LayersListe
 
     @Override
     public void layerAdded(int idx) {
-        setSelectedIntervalOnLayerNotification();
     }
 
     @Override
