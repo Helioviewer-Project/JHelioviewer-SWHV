@@ -130,7 +130,6 @@ public class SWEKPlugin implements Plugin {
     private void configurePlugin() {
         SWEKConfig.loadConfiguration();
         SWEKSources.loadSources();
-        // LayersModel.getSingletonInstance().addLayersListener(outgoingRequestManager);
         eventContainer.registerHandler(incomingRequestManager);
         ImageViewerGui.getSingletonInstance().getLeftContentPane()
                 .add("Space Weather Event Knowledgebase", SWEKPluginPanel.getSWEKPluginPanelInstance(), false);
@@ -139,7 +138,6 @@ public class SWEKPlugin implements Plugin {
 
     @Override
     public void uninstallPlugin() {
-        // TODO Auto-generated method stub
     }
 
 }

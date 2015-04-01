@@ -372,15 +372,6 @@ public class MoviePanel extends JPanel implements ActionListener, ChangeListener
     }
 
     /**
-     * Returns the current frame number
-     *
-     * @return the current frame number
-     */
-    public int getCurrentFrameNumber() {
-        return view.getCurrentFrameNumber();
-    }
-
-    /**
      * Toggles between playing and not playing the animation.
      */
     public void togglePlayPause() {
@@ -455,14 +446,14 @@ public class MoviePanel extends JPanel implements ActionListener, ChangeListener
             if (isPlaying) {
                 togglePlayPause();
             }
-            jumpToFrameNumber(getCurrentFrameNumber() - 1);
+            jumpToFrameNumber(view.getCurrentFrameNumber() - 1);
 
             // Next frame
         } else if (e.getSource() == nextFrameButton) {
             if (isPlaying) {
                 togglePlayPause();
             }
-            jumpToFrameNumber(getCurrentFrameNumber() + 1);
+            jumpToFrameNumber(view.getCurrentFrameNumber() + 1);
 
             // Change animation speed
         } else if (e.getSource() == ((JSpinner.DefaultEditor) speedSpinner.getEditor()).getTextField()) {
@@ -503,8 +494,8 @@ public class MoviePanel extends JPanel implements ActionListener, ChangeListener
         // Jump to different frame
         if (e.getSource() == timeSlider) {
             jumpToFrameNumber(timeSlider.getValue());
-            frameNumberLabel.setText((getCurrentFrameNumber() + 1) + "/" + (timeSlider.getMaximum() + 1));
-            if (getCurrentFrameNumber() == timeSlider.getMinimum() && animationModeComboBox.getSelectedItem() == AnimationMode.STOP) {
+            frameNumberLabel.setText((view.getCurrentFrameNumber() + 1) + "/" + (timeSlider.getMaximum() + 1));
+            if (view.getCurrentFrameNumber() == timeSlider.getMinimum() && animationModeComboBox.getSelectedItem() == AnimationMode.STOP) {
                 togglePlayPause();
             }
             // Change animation speed
@@ -554,9 +545,9 @@ public class MoviePanel extends JPanel implements ActionListener, ChangeListener
     public void mouseWheelMoved(MouseWheelEvent e) {
         if (isEnabled()) {
             if (e.getWheelRotation() < 0) {
-                jumpToFrameNumber(getCurrentFrameNumber() + 1);
+                jumpToFrameNumber(view.getCurrentFrameNumber() + 1);
             } else if (e.getWheelRotation() > 0) {
-                jumpToFrameNumber(getCurrentFrameNumber() - 1);
+                jumpToFrameNumber(view.getCurrentFrameNumber() - 1);
             }
         }
     }

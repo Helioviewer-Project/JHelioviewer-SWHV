@@ -60,9 +60,10 @@ public class LayerTableOverlapWatcher implements LayersListener {
         // check if some of the layers do not really overlap
         boolean isGoodOverlap = true;
 
+        LayersModel layersModel = LayersModel.getSingletonInstance();
         // get the full timespan of all layers
-        Date first = LayersModel.getSingletonInstance().getFirstDate();
-        Date last = LayersModel.getSingletonInstance().getLastDate();
+        Date first = layersModel.getFirstDate();
+        Date last = layersModel.getLastDate();
 
         if (first == null || last == null)
             return;
@@ -72,9 +73,9 @@ public class LayerTableOverlapWatcher implements LayersListener {
 
         // loop over all individual layers and check which fraction of the full
         // timespan they cover
-        for (int curLayer = 0; curLayer < LayersModel.getSingletonInstance().getNumLayers(); curLayer++) {
-            ImmutableDateTime start = LayersModel.getSingletonInstance().getStartDate(curLayer);
-            ImmutableDateTime end = LayersModel.getSingletonInstance().getEndDate(curLayer);
+        for (int curLayer = 0; curLayer < layersModel.getNumLayers(); curLayer++) {
+            ImmutableDateTime start = layersModel.getStartDate(curLayer);
+            ImmutableDateTime end = layersModel.getEndDate(curLayer);
 
             // we have timing information
             if (start != null && end != null) {
@@ -90,15 +91,12 @@ public class LayerTableOverlapWatcher implements LayersListener {
                 if (fraction < smallestValidCoverageFraction) {
                     isGoodOverlap = false;
                 }
-
                 //Log.debug("Overlap fraction for layer " + curLayer + " is " + fraction);
-
             }
-
         }
 
         // Show a message if no timing information is available
-        if (!LayersModel.getSingletonInstance().isTimed(idx)) {
+        if (!layersModel.isTimed(idx)) {
             Message.warnTitle("No Timing Information", "This movie contains no timing information.\nIt can thus not be played in sync with other movies.");
         } else if (!isGoodOverlap) {
             Message.warnTitle("Movies Barely Overlap", "Some of the movies do not (or only partially) overlap.\nSome movies can thus not (or only partially) be played in sync.");
