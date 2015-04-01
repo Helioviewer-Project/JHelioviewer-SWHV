@@ -20,6 +20,7 @@ import javax.swing.JComboBox;
 import javax.swing.JPanel;
 import javax.swing.JToggleButton;
 
+import org.helioviewer.base.logging.Log;
 import org.helioviewer.base.math.Interval;
 import org.helioviewer.jhv.gui.IconBank;
 import org.helioviewer.jhv.gui.IconBank.JHVIcon;
@@ -42,10 +43,10 @@ import org.helioviewer.viewmodel.view.View;
 import org.helioviewer.viewmodel.view.jp2view.JHVJPXView;
 
 /**
- * 
- * 
+ *
+ *
  * @author Bram Bourgoignie (Bram.Bourgoignie@oma.be)
- * 
+ *
  */
 public class ControlsPanel extends JPanel implements ActionListener, LayersListener, EventModelListener, ZoomControllerListener, LineDataSelectorModelListener {
 
@@ -106,6 +107,7 @@ public class ControlsPanel extends JPanel implements ActionListener, LayersListe
         pageEndPanel.setBackground(Color.BLUE);
 
         zoomComboBox.setBorder(BorderFactory.createEmptyBorder(0, 0, 0, 0));
+        fillZoomComboBox();
         zoomComboBox.addActionListener(this);
         zoomComboBox.setEnabled(false);
 
@@ -165,6 +167,7 @@ public class ControlsPanel extends JPanel implements ActionListener, LayersListe
                 selectedIntervalByZoombox = ZoomController.getSingletonInstance().zoomTo(item.getZoom(), item.getNumber());
             } else {
                 if (selectedIndexSetByProgram) {
+                    Log.debug("Make false");
                     selectedIndexSetByProgram = false;
                 }
             }
@@ -237,80 +240,36 @@ public class ControlsPanel extends JPanel implements ActionListener, LayersListe
 
     private void fillZoomComboBox() {
         selectedIndexSetByProgram = true;
-        final Interval<Date> interval = ZoomController.getSingletonInstance().getAvailableInterval();
-        final Date startDate = interval.getStart();
-
-        final Calendar calendar = new GregorianCalendar();
-        calendar.clear();
-        calendar.setTime(startDate);
-        calendar.add(Calendar.YEAR, 1);
-        calendar.add(Calendar.HOUR, 1);
-
-        calendar.clear();
-        calendar.setTime(startDate);
-        calendar.add(Calendar.MONTH, 3);
+        Thread.dumpStack();
 
         final DefaultComboBoxModel model = (DefaultComboBoxModel) zoomComboBox.getModel();
         model.removeAllElements();
         selectedIndexSetByProgram = true;
+        Thread.dumpStack();
         model.addElement(new ZoomComboboxItem(ZOOM.CUSTOM, 0));
         selectedIndexSetByProgram = true;
+        Thread.dumpStack();
         model.addElement(new ZoomComboboxItem(ZOOM.All, 0));
 
-        // addElementToModel(model, startDate, interval, Calendar.YEAR, 10,
-        // ZOOM.Year);
-        // addElementToModel(model, startDate, interval, Calendar.YEAR, 5,
-        // ZOOM.Year);
+        addElementToModel(model, Calendar.YEAR, 1, ZOOM.Year);
+        addElementToModel(model, Calendar.MONTH, 6, ZOOM.Month);
+        addElementToModel(model, Calendar.MONTH, 3, ZOOM.Month);
+        addCarringtonRotationToModel(model, 1);
 
-        addElementToModel(model, startDate, interval, Calendar.YEAR, 1, ZOOM.Year);
-        addElementToModel(model, startDate, interval, Calendar.MONTH, 6, ZOOM.Month);
-        addElementToModel(model, startDate, interval, Calendar.MONTH, 3, ZOOM.Month);
-        // addElementToModel(model, startDate, interval, Calendar.MONTH, 1,
-        // ZOOM.Month);
+        addElementToModel(model, Calendar.DATE, 7, ZOOM.Day);
 
-        // addCarringtonRotationToModel(model, startDate, interval, 6);
-        // addCarringtonRotationToModel(model, startDate, interval, 3);
-        addCarringtonRotationToModel(model, startDate, interval, 1);
-
-        // if (!years) {
-        // addElementToModel(model, startDate, interval, Calendar.DATE, 14,
-        // ZOOM.Day);
-        addElementToModel(model, startDate, interval, Calendar.DATE, 7, ZOOM.Day);
-        // addElementToModel(model, startDate, interval, Calendar.DATE, 1,
-        // ZOOM.Day);
-
-        addElementToModel(model, startDate, interval, Calendar.HOUR, 12, ZOOM.Hour);
-        addElementToModel(model, startDate, interval, Calendar.HOUR, 6, ZOOM.Hour);
-        addElementToModel(model, startDate, interval, Calendar.HOUR, 1, ZOOM.Hour);
+        addElementToModel(model, Calendar.HOUR, 12, ZOOM.Hour);
+        addElementToModel(model, Calendar.HOUR, 6, ZOOM.Hour);
+        addElementToModel(model, Calendar.HOUR, 1, ZOOM.Hour);
     }
 
-    private boolean addCarringtonRotationToModel(final DefaultComboBoxModel model, final Date startDate, final Interval<Date> interval, final int numberOfRotations) {
-        final Calendar calendar = new GregorianCalendar();
-
-        calendar.clear();
-        calendar.setTime(new Date(startDate.getTime() + numberOfRotations * 2356585820l));
-
-        // if (interval.containsPointInclusive(calendar.getTime())) {
+    private void addCarringtonRotationToModel(final DefaultComboBoxModel model, final int numberOfRotations) {
         model.addElement(new ZoomComboboxItem(ZOOM.Carrington, numberOfRotations));
-        return true;
-        // }
-
-        // return false;
     }
 
-    private boolean addElementToModel(final DefaultComboBoxModel model, final Date startDate, final Interval<Date> interval, final int calendarField, final int calendarValue, final ZOOM zoom) {
-        final Calendar calendar = new GregorianCalendar();
-
-        calendar.clear();
-        calendar.setTime(startDate);
-        calendar.add(calendarField, calendarValue);
-
-        // if (interval.containsPointInclusive(calendar.getTime())) {
+    private boolean addElementToModel(final DefaultComboBoxModel model, final int calendarField, final int calendarValue, final ZOOM zoom) {
         model.addElement(new ZoomComboboxItem(zoom, calendarValue));
         return true;
-        // }
-
-        // return false;
     }
 
     private class ZoomComboboxItem {
@@ -371,8 +330,6 @@ public class ControlsPanel extends JPanel implements ActionListener, LayersListe
             calendar.clear();
             calendar.setTime(newInterval.getEnd());
             calendar.add(Calendar.DATE, -1);
-            selectedIndexSetByProgram = true;
-            fillZoomComboBox();
         }
     }
 
@@ -382,6 +339,7 @@ public class ControlsPanel extends JPanel implements ActionListener, LayersListe
             if (!selectedIntervalByZoombox.equals(newInterval)) {
                 try {
                     selectedIndexSetByProgram = true;
+                    Thread.dumpStack();
                     zoomComboBox.setSelectedIndex(0);
                 } catch (final IllegalArgumentException ex) {
                 }
