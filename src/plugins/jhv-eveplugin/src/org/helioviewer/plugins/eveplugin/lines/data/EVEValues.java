@@ -10,18 +10,18 @@ import org.helioviewer.plugins.eveplugin.download.DownloadedData;
 public class EVEValues implements DownloadedData {
 
     private int index = 0;
-    private final int increment = 1440;
+    private final int MINUTES_PER_DAY = 1440;
 
-    public long[] dates = new long[increment];
-    public double[] values = new double[increment];
+    public long[] dates = new long[MINUTES_PER_DAY];
+    public double[] values = new double[MINUTES_PER_DAY];
 
     private double minValue = Double.MAX_VALUE;
     private double maxValue = Double.MIN_VALUE;
 
     public void addValues(final long[] indates, final double[] invalues) {
         if (index + indates.length >= dates.length) {
-            dates = Arrays.copyOf(dates, index + indates.length + increment);
-            values = Arrays.copyOf(values, index + indates.length + increment);
+            dates = Arrays.copyOf(dates, index + indates.length + MINUTES_PER_DAY);
+            values = Arrays.copyOf(values, index + indates.length + MINUTES_PER_DAY);
         }
 
         for (int i = 0; i < indates.length; i++) {

@@ -28,20 +28,20 @@ public class EVECache {
     // //////////////////////////////////////////////////////////////////////////////
 
     public void add(final double[] values, final long[] dates) {
-        GregorianCalendar calendar = new GregorianCalendar();
+        final GregorianCalendar calendar = new GregorianCalendar();
+
         if (values != null) {
             for (int i = 0; i < values.length; i++) {
                 calendar.setTimeInMillis(dates[i]);
                 final Integer key = new Integer(calendar.get(Calendar.YEAR) * 1000 + calendar.get(Calendar.DAY_OF_YEAR));
 
                 EVEDataOfDay cache = cacheMap.get(key);
-
                 if (cache == null) {
                     cache = new EVEDataOfDay(calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH), calendar.get(Calendar.DAY_OF_MONTH));
                     cacheMap.put(key, cache);
                 }
 
-                cache.setValue(values[i], dates[i]);
+                cache.setValue(calendar.get(Calendar.HOUR_OF_DAY) * 60 + calendar.get(Calendar.MINUTE), values[i], dates[i]);
             }
         }
     }
@@ -51,16 +51,15 @@ public class EVECache {
     public EVEValues getValuesInInterval(final Interval<Date> interval) {
         final EVEValues result = new EVEValues();
 
-        final GregorianCalendar calendar = new GregorianCalendar();
-        calendar.setTime(interval.getEnd());
-        final Integer keyEnd = new Integer(calendar.get(Calendar.YEAR) * 1000 + calendar.get(Calendar.DAY_OF_YEAR));
+        GregorianCalendar calendar = new GregorianCalendar();
 
+        calendar.setTime(interval.getEnd());
+        Integer keyEnd = new Integer(calendar.get(Calendar.YEAR) * 1000 + calendar.get(Calendar.DAY_OF_YEAR));
         calendar.setTime(interval.getStart());
         Integer key = new Integer(calendar.get(Calendar.YEAR) * 1000 + calendar.get(Calendar.DAY_OF_YEAR));
 
         while (key <= keyEnd) {
             EVEDataOfDay cache = cacheMap.get(key);
-
             if (cache == null) {
                 cache = new EVEDataOfDay(calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH), calendar.get(Calendar.DAY_OF_MONTH));
             }
@@ -78,16 +77,15 @@ public class EVECache {
     public Range getMinMaxInInterval(final Interval<Date> interval) {
         final Range result = new Range();
 
-        final GregorianCalendar calendar = new GregorianCalendar();
-        calendar.setTime(interval.getEnd());
-        final Integer keyEnd = new Integer(calendar.get(Calendar.YEAR) * 1000 + calendar.get(Calendar.DAY_OF_YEAR));
+        GregorianCalendar calendar = new GregorianCalendar();
 
+        calendar.setTime(interval.getEnd());
+        Integer keyEnd = new Integer(calendar.get(Calendar.YEAR) * 1000 + calendar.get(Calendar.DAY_OF_YEAR));
         calendar.setTime(interval.getStart());
         Integer key = new Integer(calendar.get(Calendar.YEAR) * 1000 + calendar.get(Calendar.DAY_OF_YEAR));
 
         while (key <= keyEnd) {
-            final EVEDataOfDay cache = cacheMap.get(key);
-
+            EVEDataOfDay cache = cacheMap.get(key);
             if (cache == null) {
                 continue;
             }
@@ -105,9 +103,9 @@ public class EVECache {
         LinkedList<Interval<Date>> result = new LinkedList<Interval<Date>>();
 
         GregorianCalendar calendar = new GregorianCalendar();
+
         calendar.setTime(interval.getEnd());
         Integer keyEnd = new Integer(calendar.get(Calendar.YEAR) * 1000 + calendar.get(Calendar.DAY_OF_YEAR));
-
         calendar.setTime(interval.getStart());
         Integer key = new Integer(calendar.get(Calendar.YEAR) * 1000 + calendar.get(Calendar.DAY_OF_YEAR));
 
@@ -140,4 +138,5 @@ public class EVECache {
 
         return result;
     }
+
 }

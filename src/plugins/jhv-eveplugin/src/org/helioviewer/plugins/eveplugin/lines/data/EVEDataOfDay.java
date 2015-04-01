@@ -50,11 +50,7 @@ public class EVEDataOfDay {
      * @param value
      *            The new value.
      * */
-    public void setValue(final double value, final long date) {
-        final GregorianCalendar calendar = new GregorianCalendar();
-        calendar.setTimeInMillis(date);
-        final int minuteOfDay = calendar.get(Calendar.HOUR_OF_DAY) * 60 + calendar.get(Calendar.MINUTE);
-
+    public void setValue(final int minuteOfDay, final double value, final long date) {
         values[minuteOfDay] = value;
 
         if (minuteOfDay == posMin) {
@@ -190,4 +186,5 @@ public class EVEDataOfDay {
 
         return range;
     }
+
 }
