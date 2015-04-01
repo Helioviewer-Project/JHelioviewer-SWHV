@@ -127,7 +127,6 @@ public class ContrastPanel extends AbstractFilterPanel implements ChangeListener
 
     @Override
     public Component getValue() {
-        // TODO Auto-generated method stub
         return this.contrastLabel;
     }
 }
