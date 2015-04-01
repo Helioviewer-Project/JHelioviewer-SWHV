@@ -10,7 +10,6 @@ import kdu_jni.Kdu_region_compositor;
 
 import org.helioviewer.base.logging.Log;
 import org.helioviewer.base.math.Interval;
-import org.helioviewer.viewmodel.changeevent.ChangeEvent;
 import org.helioviewer.viewmodel.imagedata.ARGBInt32ImageData;
 import org.helioviewer.viewmodel.imagedata.ColorMask;
 import org.helioviewer.viewmodel.imagedata.SingleChannelByte8ImageData;
@@ -431,7 +430,7 @@ class J2KRender implements Runnable {
                     JHVJPXView jpxView = ((JHVJPXView) parentViewRef);
                     LinkedMovieManager movieManager = jpxView.getLinkedMovieManager();
                     if (movieManager != null && movieManager.isMaster(jpxView)) {
-                        movieManager.updateCurrentFrameToMaster(new ChangeEvent());
+                        movieManager.updateCurrentFrameToMaster();
                     }
                 }
 

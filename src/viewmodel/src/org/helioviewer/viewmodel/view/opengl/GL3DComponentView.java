@@ -227,7 +227,7 @@ public class GL3DComponentView extends AbstractComponentView implements GLEventL
             JHVJPXView movieView = v.getAdapter(JHVJPXView.class);
             if (movieView != null) {
                 movieView.pauseMovie();
-                movieView.setCurrentFrame(0, new ChangeEvent());
+                movieView.setCurrentFrame(0);
             }
 
             export = new MovieExport(canvas.getWidth(), canvas.getHeight());

@@ -368,7 +368,7 @@ public class MoviePanel extends JPanel implements ActionListener, ChangeListener
             frame = Math.min(frame, view.getMaximumAccessibleFrameNumber());
         }
         timeSlider.setValue(frame);
-        view.setCurrentFrame(frame, new ChangeEvent());
+        view.setCurrentFrame(frame);
     }
 
     /**
@@ -817,9 +817,9 @@ public class MoviePanel extends JPanel implements ActionListener, ChangeListener
                 // move frame
                 ImmutableDateTime maxAvailableDateTime = newPanel.timedView.getFrameDateTime(newPanel.view.getMaximumAccessibleFrameNumber());
                 if (maxAvailableDateTime.getMillis() >= copyFrom.timedView.getCurrentFrameDateTime().getMillis()) {
-                    newPanel.timedView.setCurrentFrame(copyFrom.timedView.getCurrentFrameDateTime(), new ChangeEvent());
+                    newPanel.timedView.setCurrentFrame(copyFrom.timedView.getCurrentFrameDateTime());
                 } else {
-                    newPanel.timedView.setCurrentFrame(newPanel.view.getMaximumAccessibleFrameNumber(), new ChangeEvent());
+                    newPanel.timedView.setCurrentFrame(newPanel.view.getMaximumAccessibleFrameNumber());
                 }
             }
 

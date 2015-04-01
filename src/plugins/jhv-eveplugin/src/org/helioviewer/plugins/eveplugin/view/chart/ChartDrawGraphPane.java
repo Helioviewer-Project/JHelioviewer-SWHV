@@ -47,7 +47,6 @@ import org.helioviewer.plugins.eveplugin.events.model.EventModel;
 import org.helioviewer.plugins.eveplugin.model.PlotAreaSpace;
 import org.helioviewer.plugins.eveplugin.model.TimeIntervalLockModel;
 import org.helioviewer.plugins.eveplugin.radio.model.ZoomManager;
-import org.helioviewer.viewmodel.changeevent.ChangeEvent;
 import org.helioviewer.viewmodel.view.LinkedMovieManager;
 import org.helioviewer.viewmodel.view.jp2view.datetime.ImmutableDateTime;
 
@@ -517,7 +516,7 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
         final long timestamp = ((long) ((x - graphArea.x) / ratioX) + interval.getStart().getTime()) / 1000;
 
         final LinkedMovieManager linkedMovieManager = LinkedMovieManager.getActiveInstance();
-        linkedMovieManager.setCurrentFrame(new ImmutableDateTime(timestamp), new ChangeEvent(), false);
+        linkedMovieManager.setCurrentFrame(new ImmutableDateTime(timestamp), false);
     }
 
     // //////////////////////////////////////////////////////////////////////////////
