@@ -60,7 +60,7 @@ public class EVECacheController implements DataDownloader {
         controllerListeners.remove(listener);
     }
 
-    public void addToCache(double[] values, long[] dates, Band band) {
+    public void addToCache(Band band, double[] values, long[] dates) {
         cache.add(band, values, dates);
         fireDataAdded(band);
     }

@@ -26,7 +26,6 @@ public class EVEBandCache {
 
     public void add(Band band, double[] values, long[] dates) {
         EVECache cache = cacheMap.get(band);
-
         if (cache == null) {
             cache = new EVECache();
             cacheMap.put(band, cache);
@@ -37,7 +36,6 @@ public class EVEBandCache {
 
     public EVEValues getValuesInInterval(final Band band, final Interval<Date> interval) {
         EVECache cache = cacheMap.get(band);
-
         if (cache == null) {
             return new EVEValues();
         }
@@ -49,8 +47,7 @@ public class EVEBandCache {
     }
 
     public Range getMinMaxInInterval(final Band band, final Interval<Date> interval) {
-        final EVECache cache = cacheMap.get(band);
-
+        EVECache cache = cacheMap.get(band);
         if (cache == null) {
             return new Range();
         }
@@ -60,7 +57,6 @@ public class EVEBandCache {
 
     public List<Interval<Date>> getMissingDatesInInterval(final Band band, final Interval<Date> interval) {
         EVECache cache = cacheMap.get(band);
-
         if (cache == null) {
             List<Interval<Date>> list = new LinkedList<Interval<Date>>();
             list.add(interval);
