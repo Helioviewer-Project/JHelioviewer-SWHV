@@ -1,7 +1,6 @@
 package org.helioviewer.viewmodel.view;
 
 import java.util.LinkedList;
-import java.util.Vector;
 import java.util.concurrent.Semaphore;
 import java.util.concurrent.locks.ReentrantLock;
 
@@ -21,109 +20,24 @@ import org.helioviewer.viewmodel.view.jp2view.datetime.ImmutableDateTime;
  * master movie is actually playing, all other movies are just set to the frame
  * closest to the one from the master movie.
  *
- * <p>
- * It is possible to manage multiple sets of linked movies. Therefore, the
- * LinkedMovieManager manages multiple sets of itself, one per set of linked
- * movies. The default instance (id = 0) always exists and can not be deleted.
- *
  * @author Markus Langenberg
  */
 public class LinkedMovieManager {
 
-    private static Vector<LinkedMovieManager> instances = new Vector<LinkedMovieManager>();
-    private static int activeInstance = 0;
+    private static final LinkedMovieManager instance = new LinkedMovieManager();
+
+    public static LinkedMovieManager getSingletonInstance() {
+        return instance;
+    }
+
+    private LinkedMovieManager() {
+    }
+
     private final LinkedList<TimedMovieView> linkedMovies = new LinkedList<TimedMovieView>();
     private TimedMovieView masterView;
     private final Semaphore updateSemaphore = new Semaphore(1);
     private final Semaphore isPlayingSemaphore = new Semaphore(1);
     private final ReentrantLock isPlayingLock = new ReentrantLock();
-
-    /**
-     * Default constructor
-     */
-    private LinkedMovieManager() {
-    }
-
-    /**
-     * Returns the active instance of the LinkedMovieManager.
-     *
-     * There can only be one instance active at a time, but it is possible to
-     * manage multiple groups of linked movies by switching the active instance.
-     *
-     * @return The active instance of this class.
-     * @see #setActiveInstance(int)
-     * @see #createNewInstance()
-     * @see #deleteInstance(int)
-     */
-    public static LinkedMovieManager getActiveInstance() {
-        if (instances.isEmpty()) {
-            instances.add(new LinkedMovieManager());
-        }
-        return instances.get(activeInstance);
-    }
-
-    /**
-     * Sets the active instance of the LinkedMovieManager to use.
-     *
-     * @param instance
-     *            ID of the new active instance.
-     * @see #getActiveInstance()
-     * @see #createNewInstance()
-     * @see #deleteInstance(int)
-     */
-    public static void setActiveInstance(int instance) {
-        if (instance < instances.size() && instances.get(instance) != null) {
-            activeInstance = instance;
-        }
-    }
-
-    /**
-     * Creates a new instance and returns its id.
-     *
-     * The active instance will not change.
-     *
-     * @return Id of the new instance.
-     * @see #getActiveInstance()
-     * @see #setActiveInstance(int)
-     * @see #deleteInstance(int)
-     */
-    public static int createNewInstance() {
-        for (int i = 0; i < instances.size(); i++) {
-            if (instances.get(i) == null) {
-                instances.set(i, new LinkedMovieManager());
-                return i;
-            }
-        }
-
-        instances.add(new LinkedMovieManager());
-        return instances.size() - 1;
-    }
-
-    /**
-     * Deletes an existing instance.
-     *
-     * If the deleted instance was the active instance, sets the active instance
-     * to the default instance (0).
-     *
-     * @param instance
-     *            Id of instance to delete
-     * @see #getActiveInstance()
-     * @see #setActiveInstance(int)
-     * @see #createNewInstance()
-     */
-    public static void deleteInstance(int instance) {
-        if (instance != 0 && instance < instances.size() && instances.get(instance) != null) {
-            LinkedList<TimedMovieView> linkedMovies = instances.get(instance).linkedMovies;
-            while (!linkedMovies.isEmpty()) {
-                linkedMovies.element().unlinkMovie();
-            }
-
-            instances.set(instance, null);
-            if (activeInstance == instance) {
-                setActiveInstance(0);
-            }
-        }
-    }
 
     /**
      * Adds the given movie view to the set of linked movies.

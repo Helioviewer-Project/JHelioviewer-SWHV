@@ -40,17 +40,19 @@ import org.helioviewer.viewmodel.view.opengl.GL3DView;
 
 public class LayeredView extends AbstractView implements ViewListener, GL3DView {
 
-    protected ArrayList<JHVJP2View> layers = new ArrayList<JHVJP2View>();
-    protected HashMap<JHVJP2View, Layer> jp2viewLookup = new HashMap<JHVJP2View, Layer>();
+    private final LinkedMovieManager movieManager = LinkedMovieManager.getSingletonInstance();
 
-    protected class Layer {
+    private ArrayList<JHVJP2View> layers = new ArrayList<JHVJP2View>();
+    private HashMap<JHVJP2View, Layer> jp2viewLookup = new HashMap<JHVJP2View, Layer>();
+
+    private class Layer {
         public LayerDescriptor ld = new LayerDescriptor();
 
         public Layer(JHVJP2View view, String name) {
             ImmutableDateTime dt = view.getMetaData().getDateTime();
 
             ld.isMovie = view instanceof JHVJPXView;
-            ld.isMaster = ld.isMovie ? LinkedMovieManager.getActiveInstance().isMaster((JHVJPXView) view) : false;
+            ld.isMaster = ld.isMovie ? movieManager.isMaster((JHVJPXView) view) : false;
             ld.isVisible = true;
             ld.isTimed = dt != null;
             ld.title = name;
@@ -62,7 +64,7 @@ public class LayeredView extends AbstractView implements ViewListener, GL3DView 
         Layer layer = jp2viewLookup.get(view);
         if (layer != null) {
             LayerDescriptor ld = layer.ld;
-            ld.isMaster = ld.isMovie ? LinkedMovieManager.getActiveInstance().isMaster((JHVJPXView) view) : false;
+            ld.isMaster = ld.isMovie ? movieManager.isMaster((JHVJPXView) view) : false;
             ld.timestamp = ld.isTimed ? view.getMetaData().getDateTime().getCachedDate() : "N/A";
             return ld;
         }
@@ -121,7 +123,7 @@ public class LayeredView extends AbstractView implements ViewListener, GL3DView 
     public void toggleVisibility(JHVJP2View view) {
         Layer layer = jp2viewLookup.get(view);
         if (layer != null) {
-            LinkedMovieManager.getActiveInstance().pauseLinkedMovies();
+            movieManager.pauseLinkedMovies();
             layer.ld.isVisible = !layer.ld.isVisible;
         }
     }
@@ -153,7 +155,7 @@ public class LayeredView extends AbstractView implements ViewListener, GL3DView 
         if (newView == null)
             return -1;
 
-        LinkedMovieManager.getActiveInstance().pauseLinkedMovies();
+        movieManager.pauseLinkedMovies();
 
         GL3DImageLayer imageLayer = new GL3DImageLayer("", newView, true, true, true);
         newView.setImageLayer(imageLayer);
@@ -228,7 +230,7 @@ public class LayeredView extends AbstractView implements ViewListener, GL3DView 
             return -1;
         }
 
-        LinkedMovieManager.getActiveInstance().pauseLinkedMovies();
+        movieManager.pauseLinkedMovies();
 
         layers.remove(view);
         jp2viewLookup.remove(view);
