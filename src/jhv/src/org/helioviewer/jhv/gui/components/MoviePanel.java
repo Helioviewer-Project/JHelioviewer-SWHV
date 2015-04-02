@@ -133,7 +133,7 @@ public class MoviePanel extends JPanel implements ActionListener, ChangeListener
     }
 
     // Linking movies to play simultaneously
-    private static LinkedMoviePanelManager linkedMoviePanelManager = new LinkedMoviePanelManager();
+    private static MoviePanelManager moviePanelManager = new MoviePanelManager();
     private static LinkedList<MoviePanel> panelList = new LinkedList<MoviePanel>();
 
     // Status
@@ -423,9 +423,9 @@ public class MoviePanel extends JPanel implements ActionListener, ChangeListener
      */
     public void setMovieLink(boolean link) {
         if (!link) {
-            linkedMoviePanelManager.unlinkMoviePanel(this);
+            moviePanelManager.unlinkMoviePanel(this);
         } else {
-            linkedMoviePanelManager.linkMoviePanel(this);
+            moviePanelManager.linkMoviePanel(this);
         }
     }
 
@@ -463,17 +463,17 @@ public class MoviePanel extends JPanel implements ActionListener, ChangeListener
             } catch (ParseException e1) {
                 e1.printStackTrace();
             }
-            linkedMoviePanelManager.updateSpeedSpinnerLinkedMovies(this);
+            moviePanelManager.updateSpeedSpinnerLinkedMovies(this);
             updateMovieSpeed();
 
             // Change animation speed unit
         } else if (e.getSource() == speedUnitComboBox) {
-            linkedMoviePanelManager.updateSpeedUnitComboBoxLinkedMovies(this);
+            moviePanelManager.updateSpeedUnitComboBoxLinkedMovies(this);
             updateMovieSpeed();
 
             // Change animation mode
         } else if (e.getSource() == animationModeComboBox) {
-            linkedMoviePanelManager.updateAnimationModeComboBoxLinkedMovies(this);
+            moviePanelManager.updateAnimationModeComboBoxLinkedMovies(this);
             view.setAnimationMode((AnimationMode) animationModeComboBox.getSelectedItem());
         }
     }
@@ -501,7 +501,7 @@ public class MoviePanel extends JPanel implements ActionListener, ChangeListener
             }
             // Change animation speed
         } else if (e.getSource() == speedSpinner) {
-            linkedMoviePanelManager.updateSpeedSpinnerLinkedMovies(this);
+            moviePanelManager.updateSpeedSpinnerLinkedMovies(this);
             updateMovieSpeed();
         }
     }
@@ -532,7 +532,7 @@ public class MoviePanel extends JPanel implements ActionListener, ChangeListener
      */
     @Override
     public void mousePressed(MouseEvent e) {
-        linkedMoviePanelManager.someoneIsDragging = true;
+        moviePanelManager.someoneIsDragging = true;
 
         if (isPlaying) {
             view.pauseMovie();
@@ -561,11 +561,11 @@ public class MoviePanel extends JPanel implements ActionListener, ChangeListener
         if (isPlaying) {
             view.playMovie();
         }
-        linkedMoviePanelManager.someoneIsDragging = false;
+        moviePanelManager.someoneIsDragging = false;
     }
 
     public void remove() {
-        linkedMoviePanelManager.unlinkMoviePanel(this);
+        moviePanelManager.unlinkMoviePanel(this);
         panelList.remove(this);
     }
 
@@ -578,7 +578,7 @@ public class MoviePanel extends JPanel implements ActionListener, ChangeListener
             // check if the event belongs to the same group of linked movies
             if (timedView.getLinkedMovieManager() == pscr.getLinkedMovieManager()) {
                 if (pscr.isPlaying() != isPlaying) {
-                    if (!isDragging && !(linkedMoviePanelManager.someoneIsDragging)) {
+                    if (!isDragging && !(moviePanelManager.someoneIsDragging)) {
                         // only update GUI
                         // Log.debug("Switching to " + pscr.isPlaying());
                         setPlaying(pscr.isPlaying(), true);
@@ -785,7 +785,7 @@ public class MoviePanel extends JPanel implements ActionListener, ChangeListener
      *
      * Synchronize the GUI elements as well as the actual movie.
      */
-    private static class LinkedMoviePanelManager {
+    private static class MoviePanelManager {
 
         private final LinkedList<MoviePanel> linkedMovies = new LinkedList<MoviePanel>();
         public boolean someoneIsDragging = false;

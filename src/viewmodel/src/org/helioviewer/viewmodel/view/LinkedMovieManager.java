@@ -35,7 +35,6 @@ public class LinkedMovieManager {
 
     private final LinkedList<TimedMovieView> linkedMovies = new LinkedList<TimedMovieView>();
     private TimedMovieView masterView;
-    private final Semaphore updateSemaphore = new Semaphore(1);
     private final Semaphore isPlayingSemaphore = new Semaphore(1);
     private final ReentrantLock isPlayingLock = new ReentrantLock();
 
@@ -136,10 +135,6 @@ public class LinkedMovieManager {
     /**
      * Updates all linked movies according to the current frame of the master
      * frame.
-     *
-     * This function can be called directly from the movie view in its
-     * rendering-function, hiding this functionality.
-     *
      */
     public void updateCurrentFrameToMaster() {
         if (masterView == null)
@@ -157,35 +152,16 @@ public class LinkedMovieManager {
     /**
      * Updates all linked movies according to the given time stamp.
      *
-     * This function can be called directly from the movie view, hiding this
-     * functionality.
-     *
-     * <p>
-     * Note, that this function will block recursive calls. The return value
-     * indicates whether this function is already called.
-     *
      * @param dateTime
      *            time which should be matches as close as possible
-     * @param event
-     *            ChangeEvent to append new reasons to.
      * @param forceSignal
      *            Forces a reader signal and depending on the reader mode a
      *            render signal regardless whether the frame changed
-     * @return True, if the function was not called so far and therefore
-     *         performed successful, false otherwise.
      */
-    public boolean setCurrentFrame(ImmutableDateTime dateTime, boolean forceSignal) {
-        if (updateSemaphore.tryAcquire()) {
-            try {
-                for (TimedMovieView movieView : linkedMovies) {
-                    movieView.setCurrentFrame(dateTime, forceSignal);
-                }
-            } finally {
-                updateSemaphore.release();
-            }
-            return true;
+    public void setCurrentFrame(ImmutableDateTime dateTime, boolean forceSignal) {
+        for (TimedMovieView movieView : linkedMovies) {
+            movieView.setCurrentFrame(dateTime, forceSignal);
         }
-        return false;
     }
 
     /**
