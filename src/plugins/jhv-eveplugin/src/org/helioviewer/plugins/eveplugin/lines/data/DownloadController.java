@@ -494,7 +494,6 @@ public class DownloadController {
                 in.close();
 
                 EventQueue.invokeLater(new Runnable() {
-
                     @Override
                     public void run() {
                         try {
@@ -548,4 +547,5 @@ public class DownloadController {
             }
         }
     }
+
 }

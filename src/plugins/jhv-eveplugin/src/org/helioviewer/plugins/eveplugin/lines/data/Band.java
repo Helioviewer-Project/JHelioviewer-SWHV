@@ -112,4 +112,5 @@ public class Band implements LineDataSelectorElement {
     public String getUnitLabel() {
         return bandType.getUnitLabel();
     }
+
 }
