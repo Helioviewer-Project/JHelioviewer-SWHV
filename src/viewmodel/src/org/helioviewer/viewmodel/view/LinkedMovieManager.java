@@ -69,11 +69,11 @@ public class LinkedMovieManager {
     }
 
     /**
-     * Returns, whether the given view is the master view.
+     * Returns whether the given view is the master view.
      *
      * @param movieView
      *            View to test
-     * @return True, if the given view is the master view, false otherwise.
+     * @return True if the given view is the master view, false otherwise.
      */
     public boolean isMaster(TimedMovieView movieView) {
         if (movieView == null) {

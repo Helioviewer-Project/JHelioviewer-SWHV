@@ -575,19 +575,16 @@ public class MoviePanel extends JPanel implements ActionListener, ChangeListener
         // when the movie stops after reaching the last frame.
         if (aEvent.reasonOccurred(PlayStateChangedReason.class)) {
             PlayStateChangedReason pscr = aEvent.getLastChangedReasonByType(PlayStateChangedReason.class);
-            // check if the event belongs to the same group of linked movies
-            if (timedView.getLinkedMovieManager() == pscr.getLinkedMovieManager()) {
-                if (pscr.isPlaying() != isPlaying) {
-                    if (!isDragging && !(moviePanelManager.someoneIsDragging)) {
-                        // only update GUI
-                        // Log.debug("Switching to " + pscr.isPlaying());
-                        setPlaying(pscr.isPlaying(), true);
-                    } else {
-                        // Log.debug("Not switching because of dragging");
-                    }
+            if (pscr.isPlaying() != isPlaying) {
+                if (!isDragging && !(moviePanelManager.someoneIsDragging)) {
+                    // only update GUI
+                    // Log.debug("Switching to " + pscr.isPlaying());
+                    setPlaying(pscr.isPlaying(), true);
                 } else {
-                    // Log.debug("Playstate already ok");
+                    // Log.debug("Not switching because of dragging");
                 }
+            } else {
+                // Log.debug("Playstate already ok");
             }
         }
 
