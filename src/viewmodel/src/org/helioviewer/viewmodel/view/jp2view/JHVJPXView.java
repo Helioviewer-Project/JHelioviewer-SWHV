@@ -248,7 +248,7 @@ public class JHVJPXView extends JHVJP2View implements TimedMovieView, CachedMovi
      */
     @Override
     public void linkMovie() {
-        linkedMovieManager = LinkedMovieManager.getActiveInstance();
+        linkedMovieManager = LinkedMovieManager.getSingletonInstance();
         linkedMovieManager.linkMovie(this);
     }
 
