@@ -1,8 +1,6 @@
 package org.helioviewer.viewmodel.view;
 
 import java.util.LinkedList;
-import java.util.concurrent.Semaphore;
-import java.util.concurrent.locks.ReentrantLock;
 
 import org.helioviewer.viewmodel.view.jp2view.datetime.ImmutableDateTime;
 
@@ -35,8 +33,6 @@ public class LinkedMovieManager {
 
     private final LinkedList<TimedMovieView> linkedMovies = new LinkedList<TimedMovieView>();
     private TimedMovieView masterView;
-    private final Semaphore isPlayingSemaphore = new Semaphore(1);
-    private final ReentrantLock isPlayingLock = new ReentrantLock();
 
     /**
      * Adds the given movie view to the set of linked movies.
@@ -93,27 +89,12 @@ public class LinkedMovieManager {
     }
 
     /**
-     * Returns, whether the set of linked movies is playing.
+     * Returns whether the set of linked movies is playing.
      *
-     * @return True, if the set of linked movies is playing, false otherwise.
+     * @return True if the set of linked movies is playing, false otherwise.
      */
     public boolean isPlaying() {
-        boolean isPlaying = false;
-
-        try {
-            isPlayingLock.lock();
-            if (isPlayingSemaphore.tryAcquire()) {
-                try {
-                    isPlaying = (masterView != null && masterView.isMoviePlaying());
-                } finally {
-                    isPlayingSemaphore.release();
-                }
-            }
-        } finally {
-            isPlayingLock.unlock();
-        }
-
-        return isPlaying;
+        return masterView != null && masterView.isMoviePlaying();
     }
 
     /**

@@ -309,7 +309,7 @@ public class JHVJPXView extends JHVJP2View implements TimedMovieView, CachedMovi
     @Override
     public boolean isMoviePlaying() {
         if (render != null) {
-            return render.isMovieMode() || linkedMovieManager.isPlaying();
+            return render.isMovieMode() || (this != linkedMovieManager.getMasterMovie() && linkedMovieManager.isPlaying());
         }
         return false;
     }
