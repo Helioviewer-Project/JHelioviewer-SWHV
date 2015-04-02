@@ -131,7 +131,7 @@ public class LinkedMovieManager {
      * @param movieView
      *            View to add to the set of linked movies.
      */
-    public synchronized void linkMovie(TimedMovieView movieView) {
+    public void linkMovie(TimedMovieView movieView) {
         if (movieView.getMaximumFrameNumber() > 0 && !linkedMovies.contains(movieView)) {
             linkedMovies.add(movieView);
             updateMaster();
@@ -144,7 +144,7 @@ public class LinkedMovieManager {
      * @param movieView
      *            View to remove from the set of linked movies.
      */
-    public synchronized void unlinkMovie(TimedMovieView movieView) {
+    public void unlinkMovie(TimedMovieView movieView) {
         if (linkedMovies.contains(movieView)) {
             linkedMovies.remove(movieView);
             updateMaster();
@@ -216,7 +216,7 @@ public class LinkedMovieManager {
      * @return True, if the function was not called so far and therefore
      *         performed successful, false otherwise.
      */
-    public synchronized boolean playLinkedMovies() {
+    public boolean playLinkedMovies() {
         if (masterView == null)
             return true;
 
@@ -246,7 +246,7 @@ public class LinkedMovieManager {
      * @return True, if the function was not called so far and therefore
      *         performed successful, false otherwise.
      */
-    public synchronized boolean pauseLinkedMovies() {
+    public boolean pauseLinkedMovies() {
         if (masterView == null)
             return true;
 
@@ -275,7 +275,7 @@ public class LinkedMovieManager {
      * @param event
      *            ChangeEvent to append new reasons to.
      */
-    public synchronized void updateCurrentFrameToMaster() {
+    public void updateCurrentFrameToMaster() {
         if (masterView == null)
             return;
 
@@ -314,7 +314,7 @@ public class LinkedMovieManager {
      * @return True, if the function was not called so far and therefore
      *         performed successful, false otherwise.
      */
-    public synchronized boolean setCurrentFrame(ImmutableDateTime dateTime, boolean forceSignal) {
+    public boolean setCurrentFrame(ImmutableDateTime dateTime, boolean forceSignal) {
         if (updateSemaphore.tryAcquire()) {
             try {
                 for (TimedMovieView movieView : linkedMovies) {
@@ -335,7 +335,7 @@ public class LinkedMovieManager {
      * other movies just jump to the frame closest to the current frame from the
      * master panel.
      */
-    private synchronized void updateMaster() {
+    private void updateMaster() {
         boolean isPlaying = (masterView != null && masterView.isMoviePlaying());
         masterView = null;
 

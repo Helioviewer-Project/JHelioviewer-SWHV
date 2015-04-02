@@ -144,14 +144,12 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
 
     private void timerRedrawGraph() {
         EventQueue.invokeLater(new Runnable() {
-
             @Override
             public void run() {
                 updateDrawInformation();
                 redrawGraph();
             }
         });
-
     }
 
     private void redrawGraph() {

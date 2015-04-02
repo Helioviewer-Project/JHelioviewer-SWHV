@@ -139,7 +139,6 @@ class J2KRender implements Runnable {
 
     /** Starts the J2KRender thread. */
     void start() {
-
         if (myThread != null) {
             stop(null);
         }
@@ -179,7 +178,6 @@ class J2KRender implements Runnable {
                 }
             }
         });
-
     }
 
     /**
@@ -413,9 +411,7 @@ class J2KRender implements Runnable {
                 int curLayer = currParams.compositionLayer;
 
                 if (parentViewRef instanceof MovieView) {
-
                     MovieView parent = (MovieView) parentViewRef;
-
                     if (parent.getMaximumAccessibleFrameNumber() < curLayer) {
                         try {
                             Thread.sleep(200);
@@ -427,11 +423,22 @@ class J2KRender implements Runnable {
                 }
 
                 if (movieMode && parentViewRef instanceof JHVJPXView) {
-                    JHVJPXView jpxView = ((JHVJPXView) parentViewRef);
-                    LinkedMovieManager movieManager = jpxView.getLinkedMovieManager();
-                    if (movieManager != null && movieManager.isMaster(jpxView)) {
-                        movieManager.updateCurrentFrameToMaster();
-                    }
+                    EventQueue.invokeLater(new Runnable() {
+                        private JHVJPXView jpxView;
+
+                        @Override
+                        public void run() {
+                            LinkedMovieManager movieManager = jpxView.getLinkedMovieManager();
+                            if (movieManager != null && movieManager.isMaster(jpxView)) {
+                                movieManager.updateCurrentFrameToMaster();
+                            }
+                        }
+
+                        public Runnable init(JHVJPXView jpxView) {
+                            this.jpxView = jpxView;
+                            return this;
+                        }
+                    }.init((JHVJPXView) parentViewRef));
                 }
 
                 renderLayer(curLayer);

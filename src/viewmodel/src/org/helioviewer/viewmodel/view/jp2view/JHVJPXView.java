@@ -157,11 +157,9 @@ public class JHVJPXView extends JHVJP2View implements TimedMovieView, CachedMovi
         long lastDiff, currentDiff = -Long.MAX_VALUE;
         do {
             lastDiff = currentDiff;
-
             if (jp2Image.metaDataList[++frameNumber].getDateTime() == null) {
                 return;
             }
-
             currentDiff = jp2Image.metaDataList[frameNumber].getDateTime().getMillis() - timeMillis;
         } while (currentDiff < 0 && frameNumber < jp2Image.getCompositionLayerRange().getEnd());
 
