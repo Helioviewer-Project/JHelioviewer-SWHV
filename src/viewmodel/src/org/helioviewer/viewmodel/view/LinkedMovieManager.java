@@ -156,16 +156,12 @@ public class LinkedMovieManager {
      * master panel.
      */
     private void updateMaster() {
-        boolean isPlaying = (masterView != null && masterView.isMoviePlaying());
         masterView = null;
 
         if (linkedMovies.isEmpty()) {
             return;
         } else if (linkedMovies.size() == 1) {
             masterView = linkedMovies.element();
-            if (isPlaying) {
-                masterView.playMovie();
-            }
             return;
         }
 
@@ -195,14 +191,9 @@ public class LinkedMovieManager {
                 minimalInterval = interval;
                 minimalIntervalView = movie;
             }
-
-            movie.pauseMovie();
         }
 
         masterView = minimalIntervalView;
-        if (isPlaying) {
-            masterView.playMovie();
-        }
     }
 
 }
