@@ -123,6 +123,7 @@ public class JHVJPXView extends JHVJP2View implements TimedMovieView, CachedMovi
             linkedMovieManager.setCurrentFrame(getFrameDateTime(frameNumber), forceSignal);
         } else {
             boolean changed = setCurrentFrameNumber(frameNumber, forceSignal);
+            // may come twice, but jpx.setCurrentFrameNumber has a check
             if (changed) {
                 linkedMovieManager.setCurrentFrame(getFrameDateTime(frameNumber), forceSignal);
             }
@@ -144,9 +145,6 @@ public class JHVJPXView extends JHVJP2View implements TimedMovieView, CachedMovi
     public void setCurrentFrame(ImmutableDateTime time, boolean forceSignal) {
         if (time == null)
             return;
-        if (linkedMovieManager.setCurrentFrame(time, forceSignal)) {
-            return;
-        }
 
         int frameNumber = -1;
         long timeMillis = time.getMillis();
@@ -382,7 +380,6 @@ public class JHVJPXView extends JHVJP2View implements TimedMovieView, CachedMovi
             if (readerMode != ReaderMode.ONLYFIREONCOMPLETE) {
                 renderRequestedSignal.signal(RenderReasons.MOVIE_PLAY);
             }
-
             return true;
         }
         return false;
