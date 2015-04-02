@@ -350,11 +350,6 @@ public class JHVJPXView extends JHVJP2View implements TimedMovieView, CachedMovi
         super.setSubimageData(newImageData, roi, compositionLayer, zoompercent, fullyLoaded);
     }
 
-    @Override
-    public LinkedMovieManager getLinkedMovieManager() {
-        return linkedMovieManager;
-    }
-
     /**
      * Internal function for setting the current frame number.
      *

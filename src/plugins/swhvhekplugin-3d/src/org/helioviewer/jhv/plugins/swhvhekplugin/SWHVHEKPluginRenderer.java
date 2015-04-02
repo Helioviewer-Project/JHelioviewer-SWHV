@@ -140,21 +140,19 @@ public class SWHVHEKPluginRenderer implements PhysicalRenderer {
     /**
      * {@inheritDoc}
      *
-     * Draws all available and visible solar events with there associated icon.
+     * Draws all available and visible solar events with their associated icon.
      */
     @Override
     public void render(PhysicalRenderGraphics g) {
-        TimedMovieView masterView = LinkedMovieManager.getActiveInstance().getMasterMovie();
+        TimedMovieView masterView = LinkedMovieManager.getSingletonInstance().getMasterMovie();
         if (masterView != null && masterView.getCurrentFrameDateTime() != null) {
             Date currentDate = masterView.getCurrentFrameDateTime().getTime();
-
             if (currentDate != null) {
                 ArrayList<JHVEvent> toDraw = SWHVHEKData.getSingletonInstance().getActiveEvents(currentDate);
 
                 for (JHVEvent evt : toDraw) {
                     drawPolygon(g, evt, currentDate);
                 }
-
                 for (JHVEvent evt : toDraw) {
                     drawIcon(g, evt, currentDate);
                 }

@@ -513,8 +513,7 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
         final int x = Math.max(graphArea.x, Math.min(graphArea.x + graphArea.width, point.x));
         final long timestamp = ((long) ((x - graphArea.x) / ratioX) + interval.getStart().getTime()) / 1000;
 
-        final LinkedMovieManager linkedMovieManager = LinkedMovieManager.getActiveInstance();
-        linkedMovieManager.setCurrentFrame(new ImmutableDateTime(timestamp), false);
+        LinkedMovieManager.getSingletonInstance().setCurrentFrame(new ImmutableDateTime(timestamp), false);
     }
 
     // //////////////////////////////////////////////////////////////////////////////

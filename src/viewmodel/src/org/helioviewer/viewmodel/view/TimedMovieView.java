@@ -105,6 +105,4 @@ public interface TimedMovieView extends MovieView {
      */
     public void unlinkMovie();
 
-    public LinkedMovieManager getLinkedMovieManager();
-
 }
