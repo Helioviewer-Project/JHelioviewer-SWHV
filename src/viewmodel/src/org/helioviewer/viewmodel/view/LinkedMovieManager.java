@@ -118,61 +118,19 @@ public class LinkedMovieManager {
     }
 
     /**
-     * Starts to play the set of linked movies.
-     *
-     * This function can be called directly from the movie view in its
-     * playMovie()-function, hiding this functionality.
-     *
-     * <p>
-     * Note, that this function will block recursive calls. The return value
-     * indicates whether this function is already called.
-     *
-     * @return True, if the function was not called so far and therefore
-     *         performed successful, false otherwise.
+     * Plays the set of linked movies.
      */
-    public boolean playLinkedMovies() {
-        if (masterView == null)
-            return true;
-
-        if (updateSemaphore.tryAcquire()) {
-            try {
-                for (TimedMovieView movie : linkedMovies) {
-                    movie.playMovie();
-                }
-            } finally {
-                updateSemaphore.release();
-            }
-            return true;
-        }
-        return false;
+    public void playLinkedMovies() {
+        if (masterView != null)
+            masterView.playMovie();
     }
 
     /**
-     * Stops to play the set of linked movies.
-     *
-     * This function can be called directly from the movie view in its
-     * pauseMovie()-function, hiding this functionality.
-     *
-     * <p>
-     * Note, that this function will block recursive calls. The return value
-     * indicates whether this function is already called.
-     *
-     * @return True, if the function was not called so far and therefore
-     *         performed successful, false otherwise.
+     * Pauses the set of linked movies.
      */
-    public boolean pauseLinkedMovies() {
-        if (masterView == null)
-            return true;
-
-        if (updateSemaphore.tryAcquire()) {
-            try {
-                masterView.pauseMovie();
-            } finally {
-                updateSemaphore.release();
-            }
-            return true;
-        }
-        return false;
+    public void pauseLinkedMovies() {
+        if (masterView != null)
+            masterView.pauseMovie();
     }
 
     /**
@@ -182,12 +140,6 @@ public class LinkedMovieManager {
      * This function can be called directly from the movie view in its
      * rendering-function, hiding this functionality.
      *
-     * <p>
-     * Note, that this function will block recursive calls. The return value
-     * indicates whether this function is already called.
-     *
-     * @param event
-     *            ChangeEvent to append new reasons to.
      */
     public void updateCurrentFrameToMaster() {
         if (masterView == null)
@@ -261,10 +213,10 @@ public class LinkedMovieManager {
         TimedMovieView minimalIntervalView = null;
         int lastAvailableFrame = 0;
 
-        for (TimedMovieView movieView : linkedMovies) {
+        for (TimedMovieView movie : linkedMovies) {
             lastAvailableFrame = 0;
             do {
-                lastAvailableFrame = movieView.getMaximumFrameNumber();
+                lastAvailableFrame = movie.getMaximumFrameNumber();
                 if (lastAvailableFrame > 0) {
                     break;
                 } else {
@@ -276,15 +228,15 @@ public class LinkedMovieManager {
                 }
             } while (true);
 
-            long interval = movieView.getFrameDateTime(lastAvailableFrame).getMillis() - movieView.getFrameDateTime(0).getMillis();
+            long interval = movie.getFrameDateTime(lastAvailableFrame).getMillis() - movie.getFrameDateTime(0).getMillis();
             interval /= (lastAvailableFrame + 1);
 
             if (interval < minimalInterval) {
                 minimalInterval = interval;
-                minimalIntervalView = movieView;
+                minimalIntervalView = movie;
             }
 
-            movieView.pauseMovie();
+            movie.pauseMovie();
         }
 
         masterView = minimalIntervalView;

@@ -39,10 +39,7 @@ public class JHVJPXView extends JHVJP2View implements TimedMovieView, CachedMovi
     protected ImageCacheStatus imageCacheStatus;
     protected int lastRenderedCompositionLayer = -1;
 
-    /**
-     * Linking movies, if the movie is not linked, this has to be null
-     */
-    protected LinkedMovieManager linkedMovieManager;
+    private LinkedMovieManager linkedMovieManager = LinkedMovieManager.getSingletonInstance();
 
     /**
      * Default constructor.
@@ -115,7 +112,7 @@ public class JHVJPXView extends JHVJP2View implements TimedMovieView, CachedMovi
     public void setCurrentFrame(int frameNumber, boolean forceSignal) {
         frameNumber = Math.max(0, Math.min(getMaximumFrameNumber(), frameNumber));
 
-        if (forceSignal && linkedMovieManager != null) {
+        if (forceSignal) {
             while (getMaximumAccessibleFrameNumber() < imageViewParams.compositionLayer) {
                 try {
                     Thread.sleep(200);
@@ -125,9 +122,8 @@ public class JHVJPXView extends JHVJP2View implements TimedMovieView, CachedMovi
             }
             linkedMovieManager.setCurrentFrame(getFrameDateTime(frameNumber), forceSignal);
         } else {
-            boolean changed;
-            changed = setCurrentFrameNumber(frameNumber, forceSignal);
-            if (changed && linkedMovieManager != null) {
+            boolean changed = setCurrentFrameNumber(frameNumber, forceSignal);
+            if (changed) {
                 linkedMovieManager.setCurrentFrame(getFrameDateTime(frameNumber), forceSignal);
             }
         }
@@ -148,7 +144,7 @@ public class JHVJPXView extends JHVJP2View implements TimedMovieView, CachedMovi
     public void setCurrentFrame(ImmutableDateTime time, boolean forceSignal) {
         if (time == null)
             return;
-        if (linkedMovieManager != null && linkedMovieManager.setCurrentFrame(time, forceSignal)) {
+        if (linkedMovieManager.setCurrentFrame(time, forceSignal)) {
             return;
         }
 
@@ -248,7 +244,6 @@ public class JHVJPXView extends JHVJP2View implements TimedMovieView, CachedMovi
      */
     @Override
     public void linkMovie() {
-        linkedMovieManager = LinkedMovieManager.getSingletonInstance();
         linkedMovieManager.linkMovie(this);
     }
 
@@ -257,11 +252,7 @@ public class JHVJPXView extends JHVJP2View implements TimedMovieView, CachedMovi
      */
     @Override
     public void unlinkMovie() {
-        if (linkedMovieManager != null) {
-            LinkedMovieManager temp = linkedMovieManager;
-            linkedMovieManager = null;
-            temp.unlinkMovie(this);
-        }
+        linkedMovieManager.unlinkMovie(this);
     }
 
     /**
@@ -282,9 +273,7 @@ public class JHVJPXView extends JHVJP2View implements TimedMovieView, CachedMovi
         if (!isMoviePlaying()) {
             return;
         }
-        if (linkedMovieManager != null) {
-            linkedMovieManager.pauseLinkedMovies();
-        }
+
         readerSignal.signal();
         if (render != null) {
             render.setMovieMode(false);
@@ -301,21 +290,18 @@ public class JHVJPXView extends JHVJP2View implements TimedMovieView, CachedMovi
     @Override
     public void playMovie() {
         if (getMaximumFrameNumber() > 0) {
-            if (linkedMovieManager == null || !linkedMovieManager.playLinkedMovies()) {
-                if (linkedMovieManager == null || linkedMovieManager.isMaster(this)) {
-                    if (render != null) {
-                        render.setMovieMode(true);
-                    }
-                    readerSignal.signal();
-                    if (readerMode != ReaderMode.ONLYFIREONCOMPLETE) {
-                        renderRequestedSignal.signal(RenderReasons.MOVIE_PLAY);
-                    }
+            if (linkedMovieManager.isMaster(this)) {
+                if (render != null) {
+                    render.setMovieMode(true);
                 }
-
-                // send notification
-                ChangeEvent event = new ChangeEvent(new PlayStateChangedReason(this, this.linkedMovieManager, true));
-                fireChangeEvent(event);
+                readerSignal.signal();
+                if (readerMode != ReaderMode.ONLYFIREONCOMPLETE) {
+                    renderRequestedSignal.signal(RenderReasons.MOVIE_PLAY);
+                }
             }
+            // send notification
+            ChangeEvent event = new ChangeEvent(new PlayStateChangedReason(this, this.linkedMovieManager, true));
+            fireChangeEvent(event);
         }
     }
 
@@ -325,7 +311,7 @@ public class JHVJPXView extends JHVJP2View implements TimedMovieView, CachedMovi
     @Override
     public boolean isMoviePlaying() {
         if (render != null) {
-            return render.isMovieMode() || (linkedMovieManager != null && linkedMovieManager.isPlaying());
+            return render.isMovieMode() || linkedMovieManager.isPlaying();
         }
         return false;
     }
@@ -345,7 +331,7 @@ public class JHVJPXView extends JHVJP2View implements TimedMovieView, CachedMovi
      *            true, if the movie should be unlinked before abolishing it
      */
     public void abolish(boolean unlinkMovie) {
-        if (unlinkMovie && linkedMovieManager != null) {
+        if (unlinkMovie) {
             linkedMovieManager.unlinkMovie(this);
         }
         pauseMovie();
