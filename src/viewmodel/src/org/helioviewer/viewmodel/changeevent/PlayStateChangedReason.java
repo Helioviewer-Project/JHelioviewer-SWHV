@@ -1,6 +1,5 @@
 package org.helioviewer.viewmodel.changeevent;
 
-import org.helioviewer.viewmodel.view.LinkedMovieManager;
 import org.helioviewer.viewmodel.view.View;
 
 /**
@@ -13,7 +12,6 @@ public class PlayStateChangedReason implements ChangedReason {
 
     // memorizes the associated view
     private View view;
-    private LinkedMovieManager linkedMovieManager;
     private boolean isPlaying;
 
     private long id;
@@ -28,10 +26,9 @@ public class PlayStateChangedReason implements ChangedReason {
      * @param isPlaying
      *            The new play-state
      */
-    public PlayStateChangedReason(View aView, LinkedMovieManager linkedMovieManager, boolean isPlaying) {
+    public PlayStateChangedReason(View aView, boolean isPlaying) {
         // memorize view
         this.view = aView;
-        this.linkedMovieManager = linkedMovieManager;
         this.isPlaying = isPlaying;
 
         id = idCount++;
@@ -61,16 +58,6 @@ public class PlayStateChangedReason implements ChangedReason {
      */
     public long getId() {
         return id;
-    }
-
-    /**
-     * Return a reference to the LinkedMovieManager object that was used by the
-     * view that changed its play-state, when the reason occured
-     * 
-     * @return LinkedMovieManager used by the view that changed its play-state
-     */
-    public LinkedMovieManager getLinkedMovieManager() {
-        return this.linkedMovieManager;
     }
 
 }

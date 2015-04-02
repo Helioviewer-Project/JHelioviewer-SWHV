@@ -4,14 +4,7 @@ import org.helioviewer.viewmodel.view.View;
 
 /**
  * Interface for GUI objects to react to changes of layers
- * <p>
- * The events come usually from the loading thread so the event calls are likely
- * to occur so the listener are responsible doing the gui work in the
- * EventThread
- * http://download.oracle.com/javase/6/docs/api/javax/swing/package-summary
- * .html#package_description}
- * 
- * @author Malte Nuhn
+ * The events come on the Event Dispatch Thread (EventQueue)
  */
 public interface LayersListener {
 
