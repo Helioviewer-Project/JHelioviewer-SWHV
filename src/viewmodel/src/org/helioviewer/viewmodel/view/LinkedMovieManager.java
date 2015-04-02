@@ -193,17 +193,11 @@ public class LinkedMovieManager {
         if (masterView == null)
             return;
 
-        if (updateSemaphore.tryAcquire()) {
-            try {
-                ImmutableDateTime masterTime = masterView.getCurrentFrameDateTime();
+        ImmutableDateTime masterTime = masterView.getCurrentFrameDateTime();
 
-                for (TimedMovieView movieView : linkedMovies) {
-                    if (movieView != masterView) {
-                        movieView.setCurrentFrame(masterTime);
-                    }
-                }
-            } finally {
-                updateSemaphore.release();
+        for (TimedMovieView movieView : linkedMovies) {
+            if (movieView != masterView) {
+                movieView.setCurrentFrame(masterTime);
             }
         }
     }
