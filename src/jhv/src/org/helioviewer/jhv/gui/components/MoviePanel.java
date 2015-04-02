@@ -44,7 +44,6 @@ import org.helioviewer.jhv.layers.LayersListener;
 import org.helioviewer.jhv.layers.LayersModel;
 import org.helioviewer.viewmodel.changeevent.CacheStatusChangedReason;
 import org.helioviewer.viewmodel.changeevent.ChangeEvent;
-import org.helioviewer.viewmodel.changeevent.PlayStateChangedReason;
 import org.helioviewer.viewmodel.metadata.ObserverMetaData;
 import org.helioviewer.viewmodel.view.CachedMovieView;
 import org.helioviewer.viewmodel.view.LinkedMovieManager;
@@ -139,7 +138,6 @@ public class MoviePanel extends JPanel implements ActionListener, ChangeListener
     // Status
     private static boolean isAdvanced = false;
     private boolean isPlaying = false;
-    private final boolean isDragging = false;
 
     // Gui elements
     private final TimeSlider timeSlider;
@@ -396,7 +394,6 @@ public class MoviePanel extends JPanel implements ActionListener, ChangeListener
                 LinkedMovieManager.getSingletonInstance().playLinkedMovies();
             }
         }
-
     }
 
     /**
@@ -569,25 +566,14 @@ public class MoviePanel extends JPanel implements ActionListener, ChangeListener
         panelList.remove(this);
     }
 
+    public void playStateChanged(boolean playing) {
+        if (playing != isPlaying && !moviePanelManager.someoneIsDragging) {
+            setPlaying(playing, true);
+        }
+    }
+
     @Override
     public void UIviewChanged(View sender, ChangeEvent aEvent) {
-        // Update start-stop-button. In animation mode "stop", it has to change
-        // when the movie stops after reaching the last frame.
-        if (aEvent.reasonOccurred(PlayStateChangedReason.class)) {
-            PlayStateChangedReason pscr = aEvent.getLastChangedReasonByType(PlayStateChangedReason.class);
-            if (pscr.isPlaying() != isPlaying) {
-                if (!isDragging && !(moviePanelManager.someoneIsDragging)) {
-                    // only update GUI
-                    // Log.debug("Switching to " + pscr.isPlaying());
-                    setPlaying(pscr.isPlaying(), true);
-                } else {
-                    // Log.debug("Not switching because of dragging");
-                }
-            } else {
-                // Log.debug("Playstate already ok");
-            }
-        }
-
         CacheStatusChangedReason cacheReason = aEvent.getLastChangedReasonByType(CacheStatusChangedReason.class);
         if (cacheReason != null && cacheReason.getView() == view) {
             switch (cacheReason.getType()) {

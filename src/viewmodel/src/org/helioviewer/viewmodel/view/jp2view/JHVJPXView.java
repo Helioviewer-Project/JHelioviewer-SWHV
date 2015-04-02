@@ -3,8 +3,7 @@ package org.helioviewer.viewmodel.view.jp2view;
 import java.util.Date;
 
 import org.helioviewer.base.math.Interval;
-import org.helioviewer.viewmodel.changeevent.ChangeEvent;
-import org.helioviewer.viewmodel.changeevent.PlayStateChangedReason;
+import org.helioviewer.jhv.gui.components.MoviePanel;
 import org.helioviewer.viewmodel.imagedata.ImageData;
 import org.helioviewer.viewmodel.metadata.HelioviewerMetaData;
 import org.helioviewer.viewmodel.view.CachedMovieView;
@@ -278,8 +277,7 @@ public class JHVJPXView extends JHVJP2View implements TimedMovieView, CachedMovi
         }
 
         // send notification
-        ChangeEvent event = new ChangeEvent(new PlayStateChangedReason(this, false));
-        fireChangeEvent(event);
+        MoviePanel.getMoviePanel(this).playStateChanged(false);
     }
 
     /**
@@ -297,9 +295,9 @@ public class JHVJPXView extends JHVJP2View implements TimedMovieView, CachedMovi
                     renderRequestedSignal.signal(RenderReasons.MOVIE_PLAY);
                 }
             }
+
             // send notification
-            ChangeEvent event = new ChangeEvent(new PlayStateChangedReason(this, true));
-            fireChangeEvent(event);
+            MoviePanel.getMoviePanel(this).playStateChanged(true);
         }
     }
 
