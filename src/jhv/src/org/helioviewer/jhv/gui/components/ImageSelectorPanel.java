@@ -139,66 +139,7 @@ public class ImageSelectorPanel extends JPanel implements LayersListener {
     private final JButton downloadLayerButton = new JButton(downloadLayerAction);
 
     private final LayerTable layerTable;
-    /**
-     * Action to move the current layer down. If there is no active layer, the
-     * action will do nothing.
-     * <p>
-     * Should be activated accordingly in the class
-     */
-    private final Action moveLayerDownAction = new AbstractAction() {
-        /**
-         *
-         */
-        private static final long serialVersionUID = 1L;
-        {
-            putValue(SHORT_DESCRIPTION, "Move down the selected layer");
-            putValue(SMALL_ICON, IconBank.getIcon(JHVIcon.DOWN));
-        }
 
-        /**
-         * {@inheritDoc}
-         */
-        @Override
-        public void actionPerformed(ActionEvent arg0) {
-            if (LayersModel.getSingletonInstance().getActiveView() != null) {
-                LayersModel.getSingletonInstance().moveLayerDown(layerTable.getSelectedRow());
-            }
-        }
-    };
-    /**
-     * Button to show {@link #moveLayerDownAction}
-     */
-    private final JButton moveLayerDownButton = new JButton(moveLayerDownAction);
-    /**
-     * Action to move the current layer up. If there is no active layer, the
-     * action will do nothing.
-     * <p>
-     * Should be activated accordingly in the class
-     */
-    private final Action moveLayerUpAction = new AbstractAction() {
-        /**
-         *
-         */
-        private static final long serialVersionUID = 1L;
-        {
-            putValue(SHORT_DESCRIPTION, "Move up the selected layer");
-            putValue(SMALL_ICON, IconBank.getIcon(JHVIcon.UP));
-        }
-
-        /**
-         * {@inheritDoc}
-         */
-        @Override
-        public void actionPerformed(ActionEvent arg0) {
-            if (LayersModel.getSingletonInstance().getActiveView() != null) {
-                LayersModel.getSingletonInstance().moveLayerUp(layerTable.getSelectedRow());
-            }
-        }
-    };
-    /**
-     * Button to show {@link #moveLayerUpAction}
-     */
-    private final JButton moveLayerUpButton = new JButton(moveLayerUpAction);
     /**
      * Action to show the meta data. If there is no active layer, the action
      * will do nothing.
@@ -241,8 +182,6 @@ public class ImageSelectorPanel extends JPanel implements LayersListener {
         JPanel southPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
 
         addLayerButton.setAlignmentX(Component.RIGHT_ALIGNMENT);
-        southPanel.add(moveLayerUpButton);
-        southPanel.add(moveLayerDownButton);
         southPanel.add(showMetaButton);
         southPanel.add(downloadLayerButton);
         southPanel.add(addLayerButton);
@@ -284,8 +223,6 @@ public class ImageSelectorPanel extends JPanel implements LayersListener {
     private void activateActions() {
         boolean e = LayersModel.getSingletonInstance().getNumLayers() != 0;
         downloadLayerAction.setEnabled(e);
-        moveLayerDownAction.setEnabled(e);
-        moveLayerUpAction.setEnabled(e);
         showMetaAction.setEnabled(e);
     }
 

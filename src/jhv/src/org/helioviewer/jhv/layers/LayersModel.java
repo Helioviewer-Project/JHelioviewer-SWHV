@@ -476,7 +476,6 @@ public class LayersModel extends AbstractTableModel {
         dialog.showDialog();
     }
 
-
     public void addLayer(JHVJP2View view) {
         if (view == null) {
             return;
@@ -586,63 +585,17 @@ public class LayersModel extends AbstractTableModel {
     }
 
     /**
-     * Move the layer in question up
-     *
-     * @param view
-     *            - View that can be associated with the layer in question
-     */
-    private void moveLayerUp(JHVJP2View view) {
-        if (view == null) {
-            return;
-        }
-
-        int level = layeredView.getLayerLevel(view);
-        if (level < layeredView.getNumLayers() - 1) {
-            level++;
-            layeredView.moveView(view, level);
-            setActiveLayer(invertIndex(level));
-        }
-    }
-
-    public void moveLayerUp(int idx) {
-        moveLayerUp(getLayer(idx));
-    }
-
-    /**
-     * Move the layer in question down
-     *
-     * @param view
-     *            - View that can be associated with the layer in question
-     */
-    private void moveLayerDown(JHVJP2View view) {
-        if (view == null) {
-            return;
-        }
-
-        int level = layeredView.getLayerLevel(view);
-        if (level > 0) {
-            level--;
-            layeredView.moveView(view, level);
-            setActiveLayer(invertIndex(level));
-        }
-    }
-
-    public void moveLayerDown(int idx) {
-        moveLayerDown(getLayer(idx));
-    }
-
-    /**
      * Return the current framerate for the layer in question
      *
      * @param view
      *            - View that can be associated with the layer in question
-     * @return the current framerate or 0 if the movie is not playing, or if
-     *         an error occurs
+     * @return the current framerate or 0 if the movie is not playing, or if an
+     *         error occurs
      */
     public int getFPS(JHVJP2View view) {
         int result = 0;
         if (view instanceof JHVJPXView) {
-            result = (int) (Math.round(((JHVJPXView) view).getActualFramerate() * 100) / 100);
+            result = Math.round(((JHVJPXView) view).getActualFramerate() * 100) / 100;
         }
         return result;
     }
