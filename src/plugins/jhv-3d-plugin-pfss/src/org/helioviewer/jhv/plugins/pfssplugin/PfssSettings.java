@@ -1,6 +1,4 @@
-package org.helioviewer.gl3d.plugin.pfss.settings;
-
-import org.helioviewer.gl3d.math.GL3DVec3f;
+package org.helioviewer.jhv.plugins.pfssplugin;
 
 /**
  * Important settings
@@ -23,31 +21,6 @@ public class PfssSettings {
      * Maximal preload of cache data.
      */
     public final static int CACHE_SIZE = 125;
-
-    /**
-     * Stepsize for the Loading data
-     */
-    public final static int LOD_STEPS = 1;
-
-    /**
-     * URL of the dataserver
-     */
-    public final static String INFOFILE_URL = "http://soleil.i4ds.ch/sol-win/";
-
-    /**
-     * Color of the line (from sunradius to outside)
-     */
-    public final static GL3DVec3f SUN_OUT_LINE_COLOR = new GL3DVec3f(0f, 1f, 0f);
-
-    /**
-     * Color of the line (from outside to sunradius)
-     */
-    public final static GL3DVec3f OUT_SUN_LINE_COLOR = new GL3DVec3f(1f, 0f, 1f);
-
-    /**
-     * Color of the line (from sunradius to sunradius)
-     */
-    public final static GL3DVec3f SUN_SUN_LINE_COLOR = new GL3DVec3f(1f, 1f, 1f);
 
     /**
      * Alpha-value of lines

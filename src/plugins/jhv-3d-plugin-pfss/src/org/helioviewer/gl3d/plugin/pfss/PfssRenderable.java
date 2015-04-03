@@ -6,22 +6,25 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
+import java.util.TimeZone;
 
 import javax.media.opengl.GL2;
 
+import org.helioviewer.base.logging.Log;
 import org.helioviewer.gl3d.plugin.pfss.data.PfssCache;
 import org.helioviewer.gl3d.plugin.pfss.data.PfssData;
-import org.helioviewer.gl3d.plugin.pfss.data.PfssFitsFile;
-import org.helioviewer.gl3d.plugin.pfss.settings.PfssSettings;
 import org.helioviewer.gl3d.scenegraph.GL3DState;
 import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.layers.LayersListener;
 import org.helioviewer.jhv.layers.LayersModel;
 import org.helioviewer.jhv.plugin.renderable.Renderable;
 import org.helioviewer.jhv.plugin.renderable.RenderableType;
+import org.helioviewer.jhv.plugins.pfssplugin.PfssSettings;
 import org.helioviewer.viewmodel.view.View;
 
 /**
@@ -53,10 +56,8 @@ public class PfssRenderable implements Renderable, LayersListener {
     public void render(GL3DState state) {
         if (isVisible) {
             GL2 gl = GL3DState.get().gl;
-            PfssFitsFile fitsToClear = pfssCache.getFitsToDelete();
-            if (fitsToClear != null)
-                fitsToClear.clear(gl);
-            PfssData pfssData = pfssCache.getData();
+
+            PfssData pfssData = pfssCache.getData(0);//state.getCurrentObservationDate().getTime());
             if (pfssData != null) {
                 pfssData.setInit(false);
                 pfssData.init(gl);
@@ -127,6 +128,8 @@ public class PfssRenderable implements Renderable, LayersListener {
             int endYear = endCal.get(Calendar.YEAR);
             int endMonth = endCal.get(Calendar.MONTH);
             boolean run = true;
+            SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
+            dateFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
 
             while (run) {
                 URL data;
@@ -144,10 +147,14 @@ public class PfssRenderable implements Renderable, LayersListener {
                     while ((inputLine = in.readLine()) != null) {
                         splitted = inputLine.split(" ");
                         url = splitted[1];
-                        splitted = splitted[0].split("T");
-                        date = splitted[0].split("-");
-                        time = splitted[1].split(":");
-                        pfssCache.addData(startYear, startMonth, Integer.parseInt(date[2]) * 1000000 + Integer.parseInt(time[0]) * 10000 + Integer.parseInt(time[1]) * 100 + Integer.parseInt(time[2]), url);
+
+                        try {
+                            Date dd = dateFormat.parse(url);
+                            System.out.println(url);
+                            pfssCache.preloadData(dd.getTime(), url);
+                        } catch (ParseException e) {
+                            Log.debug("Date could not be parsed from url " + url + "Exception was thrown : " + e);
+                        }
                     }
                     in.close();
 
@@ -158,7 +165,6 @@ public class PfssRenderable implements Renderable, LayersListener {
 
                 }
 
-                pfssCache.preloadData(startYear, startMonth, startCal.get(Calendar.DAY_OF_MONTH) * 1000000 + startCal.get(Calendar.HOUR_OF_DAY) * 10000 + startCal.get(Calendar.MINUTE) * 100 + startCal.get(Calendar.SECOND));
                 if (startYear == endYear && startMonth == endMonth)
                     run = false;
                 else if (startYear == endYear && startMonth < endMonth) {
