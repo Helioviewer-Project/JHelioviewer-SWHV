@@ -17,7 +17,7 @@ import nom.tam.fits.Fits;
 import nom.tam.fits.Header;
 
 import org.helioviewer.base.physics.Astronomy;
-import org.helioviewer.gl3d.plugin.pfss.settings.PfssSettings;
+import org.helioviewer.jhv.plugins.pfssplugin.PfssSettings;
 
 import com.jogamp.common.nio.Buffers;
 
@@ -27,9 +27,9 @@ import com.jogamp.common.nio.Buffers;
  * @author Stefan Meier (stefan.meier@fhnw.ch)
  * */
 public class PfssData {
-    Color OPENFIELDCOLOR = Color.RED;
-    Color LOOPCOLOR = Color.WHITE;
-    Color INSIDEFIELDCOLOR = Color.MAGENTA;
+    private final static Color OPENFIELDCOLOR = Color.RED;
+    private final static Color LOOPCOLOR = Color.WHITE;
+    private final static Color INSIDEFIELDCOLOR = Color.MAGENTA;
 
     private byte[] gzipFitsFile = null;
 
@@ -44,12 +44,23 @@ public class PfssData {
     private boolean lastFixedColor;
 
     private String dateString;
+    private final String url;
+    private final long time;
 
     /**
      * Constructor
+     *
+     * @param time
+     * @param url
      */
-    public PfssData(byte[] gzipFitsFile) {
+    public PfssData(byte[] gzipFitsFile, String url, long time) {
         this.gzipFitsFile = gzipFitsFile;
+        this.url = url;
+        this.time = time;
+    }
+
+    public long getTime() {
+        return time;
     }
 
     private void readFitsFile() {

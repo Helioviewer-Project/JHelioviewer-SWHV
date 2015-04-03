@@ -6,7 +6,6 @@ import java.net.URL;
 
 import org.helioviewer.gl3d.plugin.pfss.PfssRenderable;
 import org.helioviewer.gl3d.plugin.pfss.data.PfssCache;
-import org.helioviewer.gl3d.plugin.pfss.settings.PfssSettings;
 import org.helioviewer.viewmodelplugin.interfaces.Plugin;
 import org.helioviewer.viewmodelplugin.overlay.OverlayPlugin;
 
