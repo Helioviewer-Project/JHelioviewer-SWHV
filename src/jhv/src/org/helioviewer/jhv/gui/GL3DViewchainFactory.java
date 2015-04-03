@@ -70,8 +70,6 @@ public class GL3DViewchainFactory {
 
         LayersModel.getSingletonInstance().addLayer(newLayer);
 
-        ImageViewerGui ivg = ImageViewerGui.getSingletonInstance();
-        ivg.getLeftContentPane().expand(ivg.getFilterPanelContainer());
     }
 
     /**
