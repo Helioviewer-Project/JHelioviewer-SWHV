@@ -25,19 +25,34 @@ import org.helioviewer.jhv.data.datatype.event.JHVPositionInformation;
 import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.plugin.renderable.Renderable;
 import org.helioviewer.jhv.plugin.renderable.RenderableType;
-import org.helioviewer.viewmodel.renderer.GLCommonRenderGraphics;
 import org.helioviewer.viewmodel.view.LinkedMovieManager;
 import org.helioviewer.viewmodel.view.TimedMovieView;
+import org.helioviewer.viewmodel.view.opengl.GLTextureHelper;
+import org.helioviewer.viewmodel.view.opengl.GLTextureHelper.GLTexture;
 
 public class SWHVHEKPluginRenderable implements Renderable {
 
-    private final GLCommonRenderGraphics commonRenderGraphics = GLCommonRenderGraphics.getSingletonInstance();
-    private static HashMap<String, BufferedImage> iconCache = new HashMap<String, BufferedImage>();
+    private static HashMap<String, GLTexture> iconCacheId = new HashMap<String, GLTexture>();
 
     private boolean isVisible = true;
 
     public SWHVHEKPluginRenderable() {
         Displayer.getRenderablecontainer().addRenderable(this);
+    }
+
+    public void bindTexture(GL2 gl, String key, ImageIcon icon) {
+        GLTexture tex = iconCacheId.get(key);
+        if (tex == null) {
+            tex = new GLTextureHelper.GLTexture();
+            BufferedImage bi = new BufferedImage(icon.getIconWidth(), icon.getIconHeight(), BufferedImage.TYPE_INT_ARGB);
+            Graphics graph = bi.createGraphics();
+            icon.paintIcon(null, graph, 0, 0);
+            graph.dispose();
+            GLTextureHelper.moveBufferedImageToGLTexture(gl, bi, tex);
+            iconCacheId.put(key, tex);
+        }
+
+        gl.glBindTexture(GL2.GL_TEXTURE_2D, tex.get(gl));
     }
 
     public void drawCactusArc(GL2 gl, JHVEvent evt, Date now) {
@@ -187,37 +202,26 @@ public class SWHVHEKPluginRenderable implements Renderable {
     }
 
     public void drawIcon(GL2 gl, JHVEvent evt, Date now) {
-        BufferedImage bi;
         String type = evt.getJHVEventType().getEventType();
-        if (iconCache.containsKey(type)) {
-            bi = iconCache.get(type);
-        } else {
-            ImageIcon icon = evt.getIcon();
-            bi = new BufferedImage(icon.getIconWidth(), icon.getIconHeight(), BufferedImage.TYPE_INT_ARGB);
-            Graphics graph = bi.createGraphics();
-            icon.paintIcon(null, graph, 0, 0);
-            graph.dispose();
-            iconCache.put(type, bi);
-        }
         HashMap<JHVCoordinateSystem, JHVPositionInformation> pi = evt.getPositioningInformation();
 
         if (pi.containsKey(JHVCoordinateSystem.JHV)) {
             JHVPositionInformation el = pi.get(JHVCoordinateSystem.JHV);
             if (el.centralPoint() != null) {
                 JHVPoint pt = el.centralPoint();
+                bindTexture(gl, type, evt.getIcon());
                 if (evt.isHighlighted()) {
-                    this.drawImage3d(gl, bi, pt.getCoordinate1(), pt.getCoordinate2(), pt.getCoordinate3(), 0.16, 0.16);
+                    this.drawImage3d(gl, pt.getCoordinate1(), pt.getCoordinate2(), pt.getCoordinate3(), 0.16, 0.16);
                 } else {
-                    this.drawImage3d(gl, bi, pt.getCoordinate1(), pt.getCoordinate2(), pt.getCoordinate3(), 0.1, 0.1);
+                    this.drawImage3d(gl, pt.getCoordinate1(), pt.getCoordinate2(), pt.getCoordinate3(), 0.1, 0.1);
                 }
             }
         }
     }
 
-    public void drawImage3d(GL2 gl, BufferedImage image, double x, double y, double z, double width, double height) {
+    public void drawImage3d(GL2 gl, double x, double y, double z, double width, double height) {
         y = -y;
 
-        commonRenderGraphics.bindImage(gl, image);
         gl.glTexParameteri(GL2.GL_TEXTURE_2D, GL2.GL_TEXTURE_MAG_FILTER, GL2.GL_LINEAR);
 
         gl.glColor3f(1.0f, 1.0f, 1.0f);
