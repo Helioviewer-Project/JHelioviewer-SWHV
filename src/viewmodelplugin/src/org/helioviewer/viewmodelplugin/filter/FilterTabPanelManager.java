@@ -188,7 +188,7 @@ public class FilterTabPanelManager {
             buttonPanel.add(downloadLayerButton);
             buttonPanel.add(showMetaButton);
 
-            //compactPanel.add(buttonPanel, c);
+            compactPanel.add(buttonPanel, c);
         }
 
         return compactPanel;
