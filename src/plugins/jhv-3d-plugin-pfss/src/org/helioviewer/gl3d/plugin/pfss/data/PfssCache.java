@@ -1,8 +1,5 @@
 package org.helioviewer.gl3d.plugin.pfss.data;
 
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-
 /**
  * Datastructur to cache the Pfss-Data with preload function
  *
@@ -13,7 +10,6 @@ public class PfssCache {
 
     private final PfssData[] data = new PfssData[CACHE_SIZE];
     private int numberOfElementsInCache = 0;
-    private final static ExecutorService pfssPool = Executors.newFixedThreadPool(5);
 
     /**
      * The private constructor to support the singleton pattern.
@@ -23,17 +19,14 @@ public class PfssCache {
 
     public void preloadData(long time, String url) {
 
-        Thread t = new Thread(new PfssDataLoader(url, time, this), "PFFSLoader");
-        pfssPool.submit(t);
-
     }
 
     public void addData(PfssData pfssData) {
         if (numberOfElementsInCache < CACHE_SIZE) {
             this.data[numberOfElementsInCache] = pfssData;
+            numberOfElementsInCache++;
             bubbleSort();
         }
-        numberOfElementsInCache++;
     }
 
     public void bubbleSort() {
@@ -43,7 +36,7 @@ public class PfssCache {
         while (swapped) {
             swapped = false;
             j++;
-            for (int i = 0; i < data.length - j; i++) {
+            for (int i = 0; i < numberOfElementsInCache - j; i++) {
                 if (data[i].getTime() > data[i + 1].getTime()) {
                     tmp = data[i];
                     data[i] = data[i + 1];
@@ -55,16 +48,19 @@ public class PfssCache {
     }
 
     public PfssData getData(long timestamp) {
+        for (int i = 0; i < numberOfElementsInCache; i++) {
+            System.out.println(data[i].getTime());
+        }
         if (numberOfElementsInCache <= 0)
             return null;
         int found = binarySearch(timestamp);
         if (found < 0) {
             if (-found < numberOfElementsInCache) {
-                if (-found + 1 < numberOfElementsInCache) {
-                    long diff1 = Math.abs(data[-found + 1].getTime() - timestamp);
+                if (-found - 1 >= 0) {
+                    long diff1 = Math.abs(data[-found - 1].getTime() - timestamp);
                     long diff2 = Math.abs(data[-found].getTime() - timestamp);
                     if (diff1 < diff2) {
-                        return data[-found + 1];
+                        return data[-found - 1];
                     }
                 }
                 return data[-found];
