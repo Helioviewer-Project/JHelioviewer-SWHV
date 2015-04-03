@@ -10,6 +10,8 @@ import java.net.URL;
 import java.net.URLConnection;
 import java.util.zip.GZIPInputStream;
 
+import org.helioviewer.jhv.plugins.pfssplugin.PfssSettings;
+
 public class PfssDataLoader implements Runnable {
 
     private final String url;
@@ -30,7 +32,7 @@ public class PfssDataLoader implements Runnable {
     private void loadFile(String url, long time) {
         InputStream in = null;
         try {
-            URL u = new URL(url);
+            URL u = new URL(PfssSettings.baseUrl + url);
             URLConnection uc = u.openConnection();
             InputStream raw;
             if (uc.getHeaderField("Content-Encoding") != null && uc.getHeaderField("Content-Encoding").equals("gzip")) {

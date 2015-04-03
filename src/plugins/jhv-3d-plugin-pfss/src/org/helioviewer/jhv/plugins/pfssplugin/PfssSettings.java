@@ -1,5 +1,8 @@
 package org.helioviewer.jhv.plugins.pfssplugin;
 
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+
 /**
  * Important settings
  *
@@ -39,5 +42,7 @@ public class PfssSettings {
     public static int qualityReduction = 8;
 
     public static boolean fixedColor = false;
+    public final static ExecutorService pfssPool = Executors.newFixedThreadPool(5);
+    public final static ExecutorService pfssNewLoadPool = Executors.newFixedThreadPool(1);
 
 }
