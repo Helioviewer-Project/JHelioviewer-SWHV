@@ -28,7 +28,6 @@ import org.helioviewer.viewmodel.view.LayeredView;
 import org.helioviewer.viewmodel.view.ModifiableInnerViewView;
 import org.helioviewer.viewmodel.view.View;
 import org.helioviewer.viewmodel.view.jp2view.JHVJP2View;
-import org.helioviewer.viewmodel.view.opengl.GLOverlayView;
 import org.helioviewer.viewmodelplugin.controller.PluginManager;
 import org.helioviewer.viewmodelplugin.interfaces.Container;
 
@@ -294,11 +293,6 @@ public abstract class AbstractPluginDialog extends JDialog implements ShowableDi
         for (JHVJP2View imageView : newImageInfoViews) {
             chainFactory.addLayerToViewchainMain(imageView);
         }
-
-        // Update all OverlayViews which are included in the view chain above
-        // the layered view
-        GLOverlayView overlayView = ImageViewerGui.getSingletonInstance().getMainView().getAdapter(GLOverlayView.class);
-        chainFactory.updateOverlayViewsInViewchainMain(overlayView);
     }
 
     /**

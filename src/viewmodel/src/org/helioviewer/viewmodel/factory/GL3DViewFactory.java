@@ -3,11 +3,9 @@ package org.helioviewer.viewmodel.factory;
 import org.helioviewer.jhv.layers.LayersModel;
 import org.helioviewer.viewmodel.view.ComponentView;
 import org.helioviewer.viewmodel.view.LayeredView;
-import org.helioviewer.viewmodel.view.OverlayView;
 import org.helioviewer.viewmodel.view.View;
 import org.helioviewer.viewmodel.view.opengl.GL3DCameraView;
 import org.helioviewer.viewmodel.view.opengl.GL3DComponentView;
-import org.helioviewer.viewmodel.view.opengl.GLOverlayView;
 
 /**
  * The {@link ViewFactory} is responsible for creating new {@link View}s. The
@@ -32,8 +30,6 @@ public class GL3DViewFactory implements ViewFactory {
             return (T) new GL3DComponentView();
         } else if (pattern.isAssignableFrom(LayeredView.class)) {
             return (T) LayersModel.getSingletonInstance().getLayeredView();
-        } else if (pattern.isAssignableFrom(OverlayView.class)) {
-            return (T) new GLOverlayView();
         } else {
             return null;
         }
