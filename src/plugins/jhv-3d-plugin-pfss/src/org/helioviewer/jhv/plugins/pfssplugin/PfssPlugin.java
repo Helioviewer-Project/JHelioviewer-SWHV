@@ -4,12 +4,10 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 
-import org.helioviewer.gl3d.plugin.pfss.PfssPluginContainer;
+import org.helioviewer.gl3d.plugin.pfss.PfssPlugin3dRenderable;
+import org.helioviewer.gl3d.plugin.pfss.data.PfssCache;
 import org.helioviewer.gl3d.plugin.pfss.settings.PfssSettings;
-import org.helioviewer.viewmodelplugin.controller.PluginManager;
-import org.helioviewer.viewmodelplugin.controller.PluginSettings;
 import org.helioviewer.viewmodelplugin.interfaces.Plugin;
-import org.helioviewer.viewmodelplugin.overlay.OverlayContainer;
 import org.helioviewer.viewmodelplugin.overlay.OverlayPlugin;
 
 /**
@@ -18,11 +16,7 @@ import org.helioviewer.viewmodelplugin.overlay.OverlayPlugin;
 public class PfssPlugin extends OverlayPlugin implements Plugin {
 
     private boolean builtin_mode = false;
-
-    /**
-     * Reference to the eventPlugin
-     */
-    private final PfssPluginContainer eventPlugin;
+    private PfssCache pfssCache;
 
     /**
      * Default constructor.
@@ -34,7 +28,7 @@ public class PfssPlugin extends OverlayPlugin implements Plugin {
     /**
      * Constructor with debug flag. If debug flag is set, the plugin name shows
      * "Pfss Plugin Built-In Version"
-     * 
+     *
      * @param builtin_mode
      *            - debug flag
      */
@@ -46,9 +40,6 @@ public class PfssPlugin extends OverlayPlugin implements Plugin {
         } catch (URISyntaxException e) {
             e.printStackTrace();
         }
-
-        eventPlugin = new PfssPluginContainer(builtin_mode);
-        addOverlayContainer(eventPlugin);
     }
 
     /**
@@ -59,11 +50,8 @@ public class PfssPlugin extends OverlayPlugin implements Plugin {
      */
     @Override
     public void installPlugin() {
-        for (OverlayContainer overlay : overlayContainerList) {
-            overlay.setActive(PluginSettings.getSingletonInstance().isOverlayInPluginActivated(pluginLocation, overlay.getOverlayClass(), true));
-            overlay.setPosition(PluginSettings.getSingletonInstance().getOverlayPosition(pluginLocation, overlay.getOverlayClass()));
-            PluginManager.getSingletonInstance().addOverlayContainer(overlay);
-        }
+        pfssCache = new PfssCache();
+        new PfssPlugin3dRenderable(pfssCache);
     }
 
     /**
@@ -87,7 +75,7 @@ public class PfssPlugin extends OverlayPlugin implements Plugin {
 
     /**
      * {@inheritDoc}
-     * 
+     *
      * null because this is an internal plugin
      */
     @Override
