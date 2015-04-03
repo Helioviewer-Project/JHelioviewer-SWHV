@@ -1,21 +1,17 @@
 package org.helioviewer.gl3d.plugin.pfss;
 
 import org.helioviewer.gl3d.plugin.pfss.data.PfssCache;
-import org.helioviewer.viewmodel.renderer.physical.PhysicalRenderer;
-import org.helioviewer.viewmodel.view.OverlayView;
-import org.helioviewer.viewmodelplugin.overlay.OverlayContainer;
-import org.helioviewer.viewmodelplugin.overlay.OverlayControlComponentManager;
+import org.helioviewer.viewmodelplugin.interfaces.Plugin;
 
 /**
  * Plugincontainer for Pfss
  *
  * @author Stefan Meier
  */
-public class PfssPluginContainer extends OverlayContainer {
+public class PfssPluginContainer implements Plugin {
 
-    private PfssCache pfssCache;
-    private PfssPluginPanel pfssPluginPanel;
     private boolean builtin_mode = false;
+    private PfssCache pfssCache;
 
     public PfssPluginContainer(boolean builtin_mode) {
         this.builtin_mode = builtin_mode;
@@ -25,17 +21,8 @@ public class PfssPluginContainer extends OverlayContainer {
      * {@inheritDoc}
      */
     @Override
-    protected void installOverlayImpl(OverlayView overlayView, OverlayControlComponentManager controlList) {
-        pfssCache = new PfssCache();
-        new PfssPlugin3dRenderable(pfssCache);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
     public String getDescription() {
-        return null;
+        return "";
     }
 
     /**
@@ -47,8 +34,27 @@ public class PfssPluginContainer extends OverlayContainer {
     }
 
     @Override
-    public Class<? extends PhysicalRenderer> getOverlayClass() {
-        return null;
+    public void installPlugin() {
+        pfssCache = new PfssCache();
+        new PfssPlugin3dRenderable(pfssCache);
+    }
+
+    @Override
+    public void uninstallPlugin() {
+    }
+
+    @Override
+    public void setState(String state) {
+    }
+
+    @Override
+    public String getState() {
+        return "";
+    }
+
+    @Override
+    public String getAboutLicenseText() {
+        return "";
     }
 
 }
