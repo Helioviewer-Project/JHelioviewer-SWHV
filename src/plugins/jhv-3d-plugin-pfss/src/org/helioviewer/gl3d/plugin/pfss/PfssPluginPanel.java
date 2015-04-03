@@ -38,9 +38,6 @@ import org.helioviewer.jhv.gui.components.base.WheelSupport;
 import org.helioviewer.jhv.layers.LayersListener;
 import org.helioviewer.jhv.layers.LayersModel;
 import org.helioviewer.jhv.plugins.pfssplugin.PfssPlugin;
-import org.helioviewer.viewmodel.changeevent.ChangeEvent;
-import org.helioviewer.viewmodel.view.LinkedMovieManager;
-import org.helioviewer.viewmodel.view.TimedMovieView;
 import org.helioviewer.viewmodel.view.View;
 import org.helioviewer.viewmodelplugin.overlay.OverlayPanel;
 
@@ -231,6 +228,7 @@ public class PfssPluginPanel extends OverlayPanel implements ActionListener, Lay
                 try {
                     String m = (startMonth) < 9 ? "0" + (startMonth + 1) : (startMonth + 1) + "";
                     data = new URL(PfssSettings.baseUrl + startYear + "/" + m + "/list.txt");
+                    System.out.println(PfssSettings.baseUrl + startYear + "/" + m + "/list.txt");
                     BufferedReader in = new BufferedReader(new InputStreamReader(data.openStream()));
 
                     String inputLine;
@@ -291,21 +289,6 @@ public class PfssPluginPanel extends OverlayPanel implements ActionListener, Lay
             enableComponents(this, false);
         }
     }
-
-/*  to be fixed
-    @Override
-    public void timestampChanged(int idx) {
-
-        // Not used anymore
-        TimedMovieView masterView = LinkedMovieManager.getActiveInstance().getMasterMovie();
-        if (masterView != null) {
-            Date date = masterView.getCurrentFrameDateTime().getTime();
-            Calendar cal = GregorianCalendar.getInstance();
-            cal.setTime(date);
-            pfssCache.updateData(cal.get(Calendar.YEAR), cal.get(Calendar.MONTH), cal.get(Calendar.DAY_OF_MONTH) * 1000000 + cal.get(Calendar.HOUR_OF_DAY) * 10000 + cal.get(Calendar.MINUTE) * 100 + cal.get(Calendar.SECOND));
-        }
-    }
-*/
 
     public void setDate(String date) {
         if (date == "" || date == null) {
