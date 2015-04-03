@@ -284,7 +284,7 @@ public class SWHVHEKPluginRenderable implements Renderable {
     public void render(GL3DState state) {
         if (isVisible) {
             GL2 gl = state.gl;
-            TimedMovieView masterView = LinkedMovieManager.getActiveInstance().getMasterMovie();
+            TimedMovieView masterView = LinkedMovieManager.getSingletonInstance().getMasterMovie();
             if (masterView != null && masterView.getCurrentFrameDateTime() != null) {
                 Date currentDate = masterView.getCurrentFrameDateTime().getTime();
 
