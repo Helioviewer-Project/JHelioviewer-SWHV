@@ -252,19 +252,11 @@ public abstract class GL3DCamera {
         gl.glMatrixMode(GL2.GL_MODELVIEW);
     }
 
-    public void updateCameraTransformation() {
-        this.updateCameraTransformation(true);
-    }
-
-    public void updateCameraTransformation(GL3DMat4d transformation) {
-        this.cameraTransformation = transformation;
-    }
-
     /**
      * Updates the camera transformation by applying the rotation and
      * translation information.
      */
-    public void updateCameraTransformation(boolean fireEvent) {
+    public void updateCameraTransformation() {
         this.rotation = this.currentDragRotation.copy();
         this.rotation.rotate(this.localRotation);
         cameraTransformation = this.rotation.toMatrix().translate(this.translation);

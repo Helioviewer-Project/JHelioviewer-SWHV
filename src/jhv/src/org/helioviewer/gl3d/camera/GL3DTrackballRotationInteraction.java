@@ -32,7 +32,7 @@ public class GL3DTrackballRotationInteraction extends GL3DDefaultInteraction {
             currentDragRotation = GL3DQuatd.calcRotation(currentRotationStartPoint, currentRotationEndPoint);
         }
         camera.rotateCurrentDragRotation(currentDragRotation);
-        this.camera.updateCameraTransformation(false);
+        this.camera.updateCameraTransformation();
 
         Displayer.display();
     }
