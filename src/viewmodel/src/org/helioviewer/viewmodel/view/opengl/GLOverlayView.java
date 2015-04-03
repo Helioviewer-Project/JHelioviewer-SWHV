@@ -5,6 +5,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
 
 import javax.media.opengl.GL2;
 
+import org.helioviewer.gl3d.scenegraph.GL3DState;
 import org.helioviewer.viewmodel.changeevent.ChangeEvent;
 import org.helioviewer.viewmodel.changeevent.RegionChangedReason;
 import org.helioviewer.viewmodel.changeevent.ViewChainChangedReason;
@@ -47,19 +48,24 @@ public class GLOverlayView extends AbstractGLView implements OverlayView {
      */
     @Override
     public void renderGL(GL2 gl, boolean nextView) {
+        GL3DState state = GL3DState.get();
         renderChild(gl);
+        state.pushMV();
+        state.getActiveCamera().applyPerspective(state);
+        state.getActiveCamera().applyCamera(state);
 
-        if (nextView) {
-
-            GLPhysicalRenderGraphics glRenderGraphics = new GLPhysicalRenderGraphics(gl, view);
-            Iterator<OverlayPluginContainer> iterator = this.overlays.iterator();
-            while (iterator.hasNext()) {
-                OverlayPluginContainer overlay = iterator.next();
-                if (overlay.getRenderer() != null && (layeredView == null || layeredView.getNumLayers() > 0)) {
-                    overlay.getRenderer().render(glRenderGraphics);
-                }
+        GLPhysicalRenderGraphics glRenderGraphics = new GLPhysicalRenderGraphics(gl, view);
+        Iterator<OverlayPluginContainer> iterator = this.overlays.iterator();
+        while (iterator.hasNext()) {
+            OverlayPluginContainer overlay = iterator.next();
+            if (overlay.getRenderer3d() != null) {
+                overlay.getRenderer3d().render(glRenderGraphics);
             }
         }
+        state.getActiveCamera().drawCamera(state);
+        state.getActiveCamera().resumePerspective(state);
+
+        state.popMV();
     }
 
     public void postRender3D(GL2 gl) {
