@@ -1,13 +1,10 @@
 package org.helioviewer.viewmodel.view.opengl;
 
-import java.util.Iterator;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 import javax.media.opengl.GL2;
 
 import org.helioviewer.viewmodel.changeevent.ChangeEvent;
-import org.helioviewer.viewmodel.changeevent.RegionChangedReason;
-import org.helioviewer.viewmodel.changeevent.ViewChainChangedReason;
 import org.helioviewer.viewmodel.renderer.physical.PhysicalRenderer;
 import org.helioviewer.viewmodel.view.LayeredView;
 import org.helioviewer.viewmodel.view.OverlayView;
@@ -47,29 +44,6 @@ public class GLOverlayView extends AbstractGLView implements OverlayView {
     @Override
     public void renderGL(GL2 gl, boolean nextView) {
         renderChild(gl);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void viewChanged(View sender, ChangeEvent aEvent) {
-        if (aEvent != null) {
-            if (aEvent.reasonOccurred(RegionChangedReason.class)) {
-                Iterator<OverlayPluginContainer> iterator = this.overlays.iterator();
-                // Region region = sender.getAdapter(RegionView.class);
-                while (iterator.hasNext()) {
-                    OverlayPluginContainer overlay = iterator.next();
-                    if (overlay.getRenderer3d() != null) {
-                        overlay.getRenderer3d().viewChanged(sender);
-                    }
-                }
-            }
-            if (aEvent.reasonOccurred(ViewChainChangedReason.class)) {
-                layeredView = ViewHelper.getViewAdapter(view, LayeredView.class);
-            }
-        }
-        super.viewChanged(sender, aEvent);
     }
 
     @Override
