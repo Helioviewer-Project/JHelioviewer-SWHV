@@ -28,12 +28,10 @@ import org.helioviewer.jhv.plugin.renderable.RenderableType;
 import org.helioviewer.jhv.plugins.swhvhekplugin.cache.SWHVHEKData;
 import org.helioviewer.jhv.plugins.swhvhekplugin.settings.SWHVHEKSettings;
 import org.helioviewer.viewmodel.renderer.GLCommonRenderGraphics;
-import org.helioviewer.viewmodel.renderer.physical.PhysicalRenderGraphics;
-import org.helioviewer.viewmodel.renderer.physical.PhysicalRenderer3d;
 import org.helioviewer.viewmodel.view.LinkedMovieManager;
 import org.helioviewer.viewmodel.view.TimedMovieView;
 
-public class SWHVHEKPluginRenderable extends PhysicalRenderer3d implements Renderable {
+public class SWHVHEKPluginRenderable implements Renderable {
 
     private final GLCommonRenderGraphics commonRenderGraphics = GLCommonRenderGraphics.getSingletonInstance();
     private static HashMap<String, BufferedImage> iconCache = new HashMap<String, BufferedImage>();
@@ -272,16 +270,6 @@ public class SWHVHEKPluginRenderable extends PhysicalRenderer3d implements Rende
         gl.glEnable(GL2.GL_BLEND);
     }
 
-    /**
-     * {@inheritDoc}
-     *
-     * Draws all available and visible solar events with their associated icon.
-     */
-    @Override
-    public void render(PhysicalRenderGraphics g) {
-        //render(GL3DState.get());
-    }
-
     @Override
     public void init(GL3DState state) {
 
@@ -304,7 +292,6 @@ public class SWHVHEKPluginRenderable extends PhysicalRenderer3d implements Rende
                             drawPolygon(gl, evt, currentDate);
                             drawIcon(gl, evt, currentDate);
                         }
->>>>>>> Show the events
                     }
                 }
             }
