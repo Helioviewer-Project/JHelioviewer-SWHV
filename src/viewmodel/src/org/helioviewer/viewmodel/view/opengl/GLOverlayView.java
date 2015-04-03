@@ -56,15 +56,6 @@ public class GLOverlayView extends AbstractGLView implements OverlayView {
     }
 
     @Override
-    // Just implemented for exist plugin, for new one, pls don't use this
-    // function
-    public void setRenderer(PhysicalRenderer renderer) {
-        OverlayPluginContainer overlayPluginContainer = new OverlayPluginContainer();
-        overlayPluginContainer.setRenderer(renderer);
-        this.overlays.add(overlayPluginContainer);
-    }
-
-    @Override
     public View getView() {
         return view;
     }
