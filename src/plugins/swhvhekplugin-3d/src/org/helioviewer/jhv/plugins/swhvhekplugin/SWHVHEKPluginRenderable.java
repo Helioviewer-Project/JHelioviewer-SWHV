@@ -36,7 +36,10 @@ public class SWHVHEKPluginRenderable implements Renderable {
 
     private boolean isVisible = true;
 
+    private final RenderableType type;
+
     public SWHVHEKPluginRenderable() {
+        this.type = new RenderableType("HEK plugin");
         Displayer.getRenderablecontainer().addRenderable(this);
     }
 
@@ -307,7 +310,7 @@ public class SWHVHEKPluginRenderable implements Renderable {
 
     @Override
     public RenderableType getType() {
-        return new RenderableType("HEK plugin");
+        return type;
     }
 
     @Override

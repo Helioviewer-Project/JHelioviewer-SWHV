@@ -1,62 +1,99 @@
 package org.helioviewer.gl3d.plugin.pfss;
 
+import java.awt.Component;
+
 import javax.media.opengl.GL2;
+import javax.swing.JPanel;
 
 import org.helioviewer.gl3d.plugin.pfss.data.PfssCache;
 import org.helioviewer.gl3d.plugin.pfss.data.PfssData;
 import org.helioviewer.gl3d.plugin.pfss.data.PfssFitsFile;
 import org.helioviewer.gl3d.scenegraph.GL3DState;
-import org.helioviewer.viewmodel.renderer.physical.PhysicalRenderGraphics;
-import org.helioviewer.viewmodel.renderer.physical.PhysicalRenderer3d;
-import org.helioviewer.viewmodel.view.View;
+import org.helioviewer.jhv.display.Displayer;
+import org.helioviewer.jhv.plugin.renderable.Renderable;
+import org.helioviewer.jhv.plugin.renderable.RenderableType;
 
 /**
  * @author Stefan Meier (stefan.meier@fhnw.ch)
  * */
-public class PfssPlugin3dRenderer extends PhysicalRenderer3d {
+public class PfssPlugin3dRenderer implements Renderable {
 
     private PfssCache pfssCache = null;
-    private GL2 lastGl = null;
+    private boolean isVisible = false;
+    private final RenderableType type;
 
     /**
      * Default constructor.
      */
     public PfssPlugin3dRenderer(PfssCache pfssCache) {
+        type = new RenderableType("PFSS plugin");
         this.pfssCache = pfssCache;
+        Displayer.getRenderablecontainer().addRenderable(this);
     }
 
-    /**
-     * {@inheritDoc}
-     *
-     * Draws all available and visible solar events with there associated icon.
-     */
     @Override
-    public void render(PhysicalRenderGraphics g) {
-        if (pfssCache.isVisible()) {
-            GL2 gl = g.getGL();
+    public void init(GL3DState state) {
+        // TODO Auto-generated method stub
+
+    }
+
+    @Override
+    public void render(GL3DState state) {
+        if (isVisible) {
+            GL2 gl = GL3DState.get().gl;
             PfssFitsFile fitsToClear = pfssCache.getFitsToDelete();
             if (fitsToClear != null)
                 fitsToClear.clear(gl);
             PfssData pfssData = pfssCache.getData();
-
             if (pfssData != null) {
-                if (lastGl != gl)
-                    pfssData.setInit(false);
+                pfssData.setInit(false);
                 pfssData.init(gl);
-                lastGl = gl;
                 if (pfssData.isInit()) {
                     pfssData.display(gl);
                 }
             }
-            // GL3DState.get().checkGLErrors("PfssPlugin3dRenderer.afterRender");
         }
     }
 
-    public void setVisible() {
+    @Override
+    public void remove(GL3DState state) {
+
     }
 
     @Override
-    public void viewChanged(View view) {
+    public RenderableType getType() {
+        return type;
+    }
+
+    @Override
+    public Component getOptionsPanel() {
+        return new JPanel();
+    }
+
+    @Override
+    public String getName() {
+        return "PFSS data";
+    }
+
+    @Override
+    public boolean isVisible() {
+        return isVisible;
+    }
+
+    @Override
+    public void setVisible(boolean isVisible) {
+        this.isVisible = isVisible;
+
+    }
+
+    @Override
+    public String getTimeString() {
+        PfssData pfssData = pfssCache.getData();
+        if (pfssData != null) {
+            return pfssData.getDateString();
+        }
+        return "";
+
     }
 
 }

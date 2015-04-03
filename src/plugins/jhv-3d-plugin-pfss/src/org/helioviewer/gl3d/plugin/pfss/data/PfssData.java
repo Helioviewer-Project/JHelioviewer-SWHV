@@ -270,4 +270,8 @@ public class PfssData {
         this.init = init;
     }
 
+    public String getDateString() {
+        return dateString;
+    }
+
 }

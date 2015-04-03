@@ -3,9 +3,7 @@ package org.helioviewer.gl3d.plugin.pfss;
 import org.helioviewer.gl3d.plugin.pfss.data.PfssCache;
 import org.helioviewer.viewmodel.renderer.physical.PhysicalRenderer;
 import org.helioviewer.viewmodel.view.OverlayView;
-import org.helioviewer.viewmodel.view.opengl.OverlayPluginContainer;
 import org.helioviewer.viewmodelplugin.overlay.OverlayContainer;
-import org.helioviewer.viewmodelplugin.overlay.OverlayControlComponent;
 import org.helioviewer.viewmodelplugin.overlay.OverlayControlComponentManager;
 
 /**
@@ -29,11 +27,8 @@ public class PfssPluginContainer extends OverlayContainer {
     @Override
     protected void installOverlayImpl(OverlayView overlayView, OverlayControlComponentManager controlList) {
         pfssCache = new PfssCache();
+        new PfssPlugin3dRenderer(pfssCache);
         pfssPluginPanel = new PfssPluginPanel(pfssCache);
-        OverlayPluginContainer overlayPluginContainer = new OverlayPluginContainer();
-        overlayPluginContainer.setRenderer3d(new PfssPlugin3dRenderer(pfssCache));
-        overlayView.addOverlay(overlayPluginContainer);
-        controlList.add(new OverlayControlComponent(pfssPluginPanel, getName()));
     }
 
     /**
@@ -54,7 +49,7 @@ public class PfssPluginContainer extends OverlayContainer {
 
     @Override
     public Class<? extends PhysicalRenderer> getOverlayClass() {
-        return PfssPlugin3dRenderer.class;
+        return null;
     }
 
 }
