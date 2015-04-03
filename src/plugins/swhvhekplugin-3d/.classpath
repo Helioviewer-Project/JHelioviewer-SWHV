@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
+	<classpathentry combineaccessrules="false" kind="src" path="/jhv-data"/>
 	<classpathentry kind="src" path="src"/>
 	<classpathentry kind="lib" path="resources"/>
 	<classpathentry kind="lib" path="../lib/json.jar"/>
@@ -8,7 +9,6 @@
 	<classpathentry combineaccessrules="false" kind="src" path="/jhv"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/jhv-display"/>
 	<classpathentry kind="lib" path="../lib/gluegen-rt.jar"/>
-	<classpathentry combineaccessrules="false" kind="src" path="/jhv-data"/>
 	<classpathentry kind="lib" path="../lib/jogl.jar">
 		<attributes>
 			<attribute name="org.eclipse.jdt.launching.CLASSPATH_ATTR_LIBRARY_PATH_ENTRY" value="/Users/bramb/Documents/OMA/jhelioviewer/git/client/jhv-3d-wcs/resources/jogl/lib/macosx-universal"/>
