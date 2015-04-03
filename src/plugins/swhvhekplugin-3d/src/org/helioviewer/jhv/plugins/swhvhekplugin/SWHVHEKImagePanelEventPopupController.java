@@ -1,4 +1,4 @@
-package org.helioviewer.jhv.plugins.swhvhekplugin.controller;
+package org.helioviewer.jhv.plugins.swhvhekplugin;
 
 import java.awt.Cursor;
 import java.awt.KeyEventDispatcher;
@@ -26,7 +26,6 @@ import org.helioviewer.jhv.gui.components.BasicImagePanel;
 import org.helioviewer.jhv.gui.interfaces.ImagePanelPlugin;
 import org.helioviewer.jhv.gui.states.StateController;
 import org.helioviewer.jhv.gui.states.ViewStateEnum;
-import org.helioviewer.jhv.plugins.swhvhekplugin.cache.SWHVHEKData;
 import org.helioviewer.viewmodel.view.RegionView;
 import org.helioviewer.viewmodel.view.View;
 import org.helioviewer.viewmodel.view.ViewHelper;

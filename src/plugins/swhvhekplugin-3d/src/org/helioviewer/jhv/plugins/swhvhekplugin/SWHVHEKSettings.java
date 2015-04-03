@@ -1,4 +1,4 @@
-package org.helioviewer.jhv.plugins.swhvhekplugin.settings;
+package org.helioviewer.jhv.plugins.swhvhekplugin;
 
 import java.awt.Color;
 

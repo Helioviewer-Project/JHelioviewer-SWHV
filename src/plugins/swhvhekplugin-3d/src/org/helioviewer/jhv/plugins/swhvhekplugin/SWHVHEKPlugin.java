@@ -4,11 +4,7 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 
-import org.helioviewer.gl3d.plugin.swhvhekplugin.SWHVHEKPluginRenderable;
 import org.helioviewer.jhv.gui.ImageViewerGui;
-import org.helioviewer.jhv.plugins.swhvhekplugin.cache.SWHVHEKData;
-import org.helioviewer.jhv.plugins.swhvhekplugin.controller.SWHVHEKImagePanelEventPopupController;
-import org.helioviewer.jhv.plugins.swhvhekplugin.settings.SWHVHEKSettings;
 import org.helioviewer.viewmodelplugin.interfaces.Plugin;
 import org.helioviewer.viewmodelplugin.overlay.OverlayPlugin;
 
