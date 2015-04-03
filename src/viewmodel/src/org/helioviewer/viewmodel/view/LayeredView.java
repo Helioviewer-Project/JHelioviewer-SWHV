@@ -268,26 +268,6 @@ public class LayeredView extends AbstractView implements ViewListener, GL3DView 
         notifyViewListeners(event);
     }
 
-    /**
-     * Moves a layer to a different position within the stack of layers.
-     *
-     * If the given view is not a direct child of the LayeredView, nothing
-     * happens.
-     *
-     * @param view
-     *            Layer to move to a new position
-     * @param newLevel
-     *            new position
-     * @see #getLayerLevel
-     * @see #getLayer
-     */
-    public void moveView(JHVJP2View view, int newLevel) {
-        if (layers.contains(view)) {
-            layers.remove(view);
-            layers.add(newLevel, view);
-        }
-    }
-
     @Override
     public void render3D(GL3DState state) {
         GL2 gl = state.gl;
