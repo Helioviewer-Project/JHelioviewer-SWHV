@@ -28,7 +28,6 @@ public class PfssPluginContainer extends OverlayContainer {
     protected void installOverlayImpl(OverlayView overlayView, OverlayControlComponentManager controlList) {
         pfssCache = new PfssCache();
         new PfssPlugin3dRenderer(pfssCache);
-        pfssPluginPanel = new PfssPluginPanel(pfssCache);
     }
 
     /**

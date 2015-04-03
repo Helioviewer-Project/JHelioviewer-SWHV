@@ -17,7 +17,6 @@ import nom.tam.fits.Fits;
 import nom.tam.fits.Header;
 
 import org.helioviewer.base.physics.Astronomy;
-import org.helioviewer.gl3d.plugin.pfss.PfssPluginPanel;
 import org.helioviewer.gl3d.plugin.pfss.settings.PfssSettings;
 
 import com.jogamp.common.nio.Buffers;
@@ -228,7 +227,6 @@ public class PfssData {
     }
 
     public void display(GL2 gl) {
-        PfssPluginPanel.currentPluginPanel.setDate(this.dateString);
         if (PfssSettings.qualityReduction != this.lastQuality || PfssSettings.fixedColor != this.lastFixedColor) {
             this.clear(gl);
             this.init = false;
