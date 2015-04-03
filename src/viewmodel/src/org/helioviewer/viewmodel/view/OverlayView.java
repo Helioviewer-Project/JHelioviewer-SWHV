@@ -1,13 +1,11 @@
 package org.helioviewer.viewmodel.view;
 
-
 /**
  * View to add additional overlays to the image.
  *
  * <p>
  * This view provides the capability to add overlays such as markers or other
- * graphical figures enhancing the image. To keep the overlays customizable, a
- * {@link org.helioviewer.viewmodel.renderer.physical.PhysicalRenderer} is
+ * graphical figures enhancing the image. To keep the overlays customizable, is
  * required. The renderer will be called on every image data change within the
  * view chain, to update the overlays.
  *

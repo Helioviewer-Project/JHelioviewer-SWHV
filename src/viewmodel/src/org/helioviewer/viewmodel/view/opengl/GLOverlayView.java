@@ -3,7 +3,6 @@ package org.helioviewer.viewmodel.view.opengl;
 import javax.media.opengl.GL2;
 
 import org.helioviewer.viewmodel.changeevent.ChangeEvent;
-import org.helioviewer.viewmodel.renderer.physical.PhysicalRenderer;
 import org.helioviewer.viewmodel.view.OverlayView;
 import org.helioviewer.viewmodel.view.View;
 
@@ -12,8 +11,7 @@ import org.helioviewer.viewmodel.view.View;
  *
  * <p>
  * This class provides the capability to draw overlays in OpenGL2. Therefore it
- * manages a {@link PhysicalRenderer}, which is passed to the registered
- * renderer.
+ * manages a which is passed to the registered renderer.
  *
  * <p>
  * For further information about the role of the OverlayView within the view

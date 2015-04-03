@@ -13,7 +13,7 @@ import org.helioviewer.viewmodelplugin.interfaces.Container;
  * <p>
  * It handles the installation process of a contained overlay and manages its
  * current status.
- * 
+ *
  * @author Stephan Pagel
  */
 public abstract class OverlayContainer implements Container {
@@ -33,7 +33,7 @@ public abstract class OverlayContainer implements Container {
     /**
      * Method will be called from JHV to add a overlay to a {@link OverlayView}
      * of the view chain and add the visual part of the overlay to the GUI.
-     * 
+     *
      * @param overlayView
      *            OverlayView where to add the contained overlay.
      * @param controlList
@@ -48,7 +48,7 @@ public abstract class OverlayContainer implements Container {
     /**
      * This method installs the corresponding overlay and adds the visual
      * overlay control to the GUI.
-     * 
+     *
      * @param overlayView
      *            OverlayView where to add the contained overlay.
      * @param controlList
@@ -60,6 +60,7 @@ public abstract class OverlayContainer implements Container {
     /**
      * {@inheritDoc}
      */
+    @Override
     public boolean isActive() {
         return active;
     }
@@ -67,6 +68,7 @@ public abstract class OverlayContainer implements Container {
     /**
      * {@inheritDoc}
      */
+    @Override
     public void setActive(boolean active) {
         this.active = active;
     }
@@ -74,6 +76,7 @@ public abstract class OverlayContainer implements Container {
     /**
      * {@inheritDoc}
      */
+    @Override
     public void changeSettings() {
         saveOverlaySettings();
     }
@@ -82,13 +85,14 @@ public abstract class OverlayContainer implements Container {
      * {@inheritDoc}
      */
 
+    @Override
     public String toString() {
         return getName();
     }
 
     /**
      * This method returns the class of the contained overlay.
-     * 
+     *
      * @return Class of the contained overlay.
      */
     public abstract Class<? extends PhysicalRenderer> getOverlayClass();
@@ -99,7 +103,7 @@ public abstract class OverlayContainer implements Container {
      * the viewchain. The position 0 is the closest position to the
      * {@link org.helioviewer.viewmodel.view.LayeredView}, the position n is the
      * closest one to the {@link org.helioviewer.viewmodel.view.LayeredView}.
-     * 
+     *
      * @return Position of the filter among each other.
      */
     public int getPosition() {
@@ -108,7 +112,7 @@ public abstract class OverlayContainer implements Container {
 
     /**
      * Sets the position of the filter among each other.
-     * 
+     *
      * @param position
      *            New position of the filter among all other filters.
      * @see #getPosition()
@@ -119,7 +123,7 @@ public abstract class OverlayContainer implements Container {
 
     /**
      * Sets the location of the corresponding plug-in.
-     * 
+     *
      * @param pluginLocation
      *            Location of corresponding plug-in.
      */
