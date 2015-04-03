@@ -33,14 +33,14 @@ import org.helioviewer.viewmodel.renderer.physical.PhysicalRenderer3d;
 import org.helioviewer.viewmodel.view.LinkedMovieManager;
 import org.helioviewer.viewmodel.view.TimedMovieView;
 
-public class SWHVHEKPlugin3dRenderer extends PhysicalRenderer3d implements Renderable {
+public class SWHVHEKPluginRenderable extends PhysicalRenderer3d implements Renderable {
 
     private final GLCommonRenderGraphics commonRenderGraphics = GLCommonRenderGraphics.getSingletonInstance();
     private static HashMap<String, BufferedImage> iconCache = new HashMap<String, BufferedImage>();
 
     private boolean isVisible = true;
 
-    public SWHVHEKPlugin3dRenderer() {
+    public SWHVHEKPluginRenderable() {
         Displayer.getRenderablecontainer().addRenderable(this);
     }
 
