@@ -1,9 +1,7 @@
 package org.helioviewer.jhv.plugins.swhvhekplugin;
 
-import org.helioviewer.gl3d.plugin.swhvhekplugin.SWHVHEKPlugin3dRenderer;
 import org.helioviewer.viewmodel.renderer.physical.PhysicalRenderer;
 import org.helioviewer.viewmodel.view.OverlayView;
-import org.helioviewer.viewmodel.view.opengl.OverlayPluginContainer;
 import org.helioviewer.viewmodelplugin.overlay.OverlayContainer;
 import org.helioviewer.viewmodelplugin.overlay.OverlayControlComponentManager;
 
@@ -43,7 +41,7 @@ public class SWHVHEKPluginContainer extends OverlayContainer {
      */
     @Override
     public Class<? extends PhysicalRenderer> getOverlayClass() {
-        return SWHVHEKPluginRenderer.class;
+        return null;
     }
 
     /**
@@ -51,10 +49,6 @@ public class SWHVHEKPluginContainer extends OverlayContainer {
      */
     @Override
     protected void installOverlayImpl(OverlayView overlayView, OverlayControlComponentManager controlList) {
-        OverlayPluginContainer overlayPluginContainer = new OverlayPluginContainer();
-        overlayPluginContainer.setRenderer(new SWHVHEKPluginRenderer());
-        overlayPluginContainer.setRenderer3d(new SWHVHEKPlugin3dRenderer());
-        overlayView.addOverlay(overlayPluginContainer);
     }
 
     /**

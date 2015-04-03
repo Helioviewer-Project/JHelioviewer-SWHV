@@ -4,14 +4,12 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 
+import org.helioviewer.gl3d.plugin.swhvhekplugin.SWHVHEKPlugin3dRenderer;
 import org.helioviewer.jhv.gui.ImageViewerGui;
 import org.helioviewer.jhv.plugins.swhvhekplugin.cache.SWHVHEKData;
 import org.helioviewer.jhv.plugins.swhvhekplugin.controller.SWHVHEKImagePanelEventPopupController;
 import org.helioviewer.jhv.plugins.swhvhekplugin.settings.SWHVHEKSettings;
-import org.helioviewer.viewmodelplugin.controller.PluginManager;
-import org.helioviewer.viewmodelplugin.controller.PluginSettings;
 import org.helioviewer.viewmodelplugin.interfaces.Plugin;
-import org.helioviewer.viewmodelplugin.overlay.OverlayContainer;
 import org.helioviewer.viewmodelplugin.overlay.OverlayPlugin;
 
 /**
@@ -63,12 +61,10 @@ public class SWHVHEKPlugin extends OverlayPlugin implements Plugin {
      */
     @Override
     public void installPlugin() {
-        for (OverlayContainer overlay : overlayContainerList) {
-            overlay.setActive(PluginSettings.getSingletonInstance().isOverlayInPluginActivated(pluginLocation, overlay.getOverlayClass(), true));
-            overlay.setPosition(PluginSettings.getSingletonInstance().getOverlayPosition(pluginLocation, overlay.getOverlayClass()));
-            PluginManager.getSingletonInstance().addOverlayContainer(overlay);
-            ImageViewerGui.getSingletonInstance().getMainImagePanel().addPlugin(new SWHVHEKImagePanelEventPopupController());
-        }
+
+        ImageViewerGui.getSingletonInstance().getMainImagePanel().addPlugin(new SWHVHEKImagePanelEventPopupController());
+        new SWHVHEKPlugin3dRenderer();
+
     }
 
     /**
@@ -114,7 +110,6 @@ public class SWHVHEKPlugin extends OverlayPlugin implements Plugin {
      */
     @Override
     public void setState(String state) {
-        // TODO Implement setState for HEKPlugin
     }
 
     /**
@@ -122,7 +117,6 @@ public class SWHVHEKPlugin extends OverlayPlugin implements Plugin {
      */
     @Override
     public String getState() {
-        // TODO Implement getState for HEKPlugin
         return "";
     }
 
