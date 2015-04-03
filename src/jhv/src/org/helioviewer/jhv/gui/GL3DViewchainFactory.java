@@ -1,22 +1,13 @@
 package org.helioviewer.jhv.gui;
 
-import java.util.AbstractList;
-
 import org.helioviewer.jhv.layers.LayersModel;
 import org.helioviewer.viewmodel.factory.GL3DViewFactory;
 import org.helioviewer.viewmodel.factory.ViewFactory;
 import org.helioviewer.viewmodel.view.ComponentView;
 import org.helioviewer.viewmodel.view.LayeredView;
-import org.helioviewer.viewmodel.view.OverlayView;
 import org.helioviewer.viewmodel.view.jp2view.JHVJP2View;
 import org.helioviewer.viewmodel.view.opengl.GL3DCameraView;
 import org.helioviewer.viewmodel.view.opengl.GL3DComponentView;
-import org.helioviewer.viewmodel.view.opengl.GLOverlayView;
-import org.helioviewer.viewmodelplugin.controller.PluginManager;
-import org.helioviewer.viewmodelplugin.overlay.OverlayContainer;
-import org.helioviewer.viewmodelplugin.overlay.OverlayControlComponent;
-import org.helioviewer.viewmodelplugin.overlay.OverlayControlComponentManager;
-import org.helioviewer.viewmodelplugin.overlay.OverlayPanel;
 
 public class GL3DViewchainFactory {
 
@@ -84,48 +75,6 @@ public class GL3DViewchainFactory {
     }
 
     /**
-     * Updates all enabled overlay views in a given view chain. The method
-     * removes all existing from the view chain and after this it adds all
-     * enabled overlays.
-     *
-     * @param componentView
-     *            the ComponentView instance of the view chain where to update
-     *            the overlay views.
-     */
-
-    public void updateOverlayViewsInViewchainMain(GLOverlayView overlayView) {
-        // /////////////
-        // Remove all existing overlays
-        // /////////////
-
-        // remove overlay control components from GUI
-        ImageViewerGui.getSingletonInstance().getLeftContentPane().remove(OverlayPanel.class);
-
-        // /////////////
-        // Add all enabled overlays to view chain
-        // /////////////
-
-        // add overlay view to view chain
-        // S. Meier, must be fixed, use just one overlayView with more then one
-        // overlaysPlugin
-        AbstractList<OverlayContainer> overlayContainerList = PluginManager.getSingletonInstance().getOverlayContainers(true);
-        OverlayControlComponentManager manager = new OverlayControlComponentManager();
-
-        // View nextView = componentView.getView();
-
-        for (int i = overlayContainerList.size() - 1; i >= 0; i--) {
-            OverlayContainer container = overlayContainerList.get(i);
-            container.installOverlay(overlayView, manager);
-
-        }
-
-        // add overlay control components to view chain
-        for (OverlayControlComponent comp : manager.getAllControlComponents()) {
-            ImageViewerGui.getSingletonInstance().getLeftContentPane().add(comp.getTitle(), comp.getOverlayPanel(), false);
-        }
-    }
-
-    /**
      * Creates a new main view chain with the minimal needed views.
      *
      * @return a instance of a ComponentView which is the topmost view of the
@@ -137,17 +86,11 @@ public class GL3DViewchainFactory {
 
         LayeredView layeredView = viewFactory.createNewView(LayeredView.class);
 
-        OverlayView overlayView = viewFactory.createNewView(OverlayView.class);
-        overlayView.setView(layeredView);
-
         GL3DCameraView cameraView = viewFactory.createNewView(GL3DCameraView.class);
-        cameraView.setView(overlayView);
+        cameraView.setView(layeredView);
 
         ComponentView componentView = viewFactory.createNewView(ComponentView.class);
         componentView.setView(cameraView);
-
-        // add Overlays (OverlayView added before LayeredView and after GL3DCameraView)
-        updateOverlayViewsInViewchainMain((GLOverlayView) overlayView);
 
         return componentView;
     }
