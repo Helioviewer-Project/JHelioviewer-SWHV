@@ -4,7 +4,7 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 
-import org.helioviewer.gl3d.plugin.swhvhekplugin.SWHVHEKPlugin3dRenderer;
+import org.helioviewer.gl3d.plugin.swhvhekplugin.SWHVHEKPluginRenderable;
 import org.helioviewer.jhv.gui.ImageViewerGui;
 import org.helioviewer.jhv.plugins.swhvhekplugin.cache.SWHVHEKData;
 import org.helioviewer.jhv.plugins.swhvhekplugin.controller.SWHVHEKImagePanelEventPopupController;
@@ -59,7 +59,7 @@ public class SWHVHEKPlugin extends OverlayPlugin implements Plugin {
     public void installPlugin() {
 
         ImageViewerGui.getSingletonInstance().getMainImagePanel().addPlugin(new SWHVHEKImagePanelEventPopupController());
-        new SWHVHEKPlugin3dRenderer();
+        new SWHVHEKPluginRenderable();
 
     }
 
