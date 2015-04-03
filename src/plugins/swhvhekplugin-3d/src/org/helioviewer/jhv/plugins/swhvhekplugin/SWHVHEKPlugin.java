@@ -22,7 +22,6 @@ public class SWHVHEKPlugin extends OverlayPlugin implements Plugin {
     /**
      * Reference to the eventPlugin
      */
-    private final SWHVHEKPluginContainer eventPlugin;
 
     /**
      * Default constructor.
@@ -46,9 +45,6 @@ public class SWHVHEKPlugin extends OverlayPlugin implements Plugin {
         } catch (URISyntaxException e) {
             e.printStackTrace();
         }
-
-        eventPlugin = new SWHVHEKPluginContainer(builtin_mode);
-        addOverlayContainer(eventPlugin);
 
         SWHVHEKData.getSingletonInstance();
     }
