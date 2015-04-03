@@ -13,9 +13,9 @@ import org.helioviewer.viewmodelplugin.controller.PluginManager;
 
 /**
  * Class for launching jhv with several plugins added.
- * 
+ *
  * @author Bram.Bourgoignie (Bram.Bourgoignie@oma.be)
- * 
+ *
  */
 public class SWHVLauncher {
     public static void main(String[] args) {
