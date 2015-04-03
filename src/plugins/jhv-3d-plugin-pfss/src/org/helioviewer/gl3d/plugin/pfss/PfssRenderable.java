@@ -27,7 +27,7 @@ import org.helioviewer.viewmodel.view.View;
 /**
  * @author Stefan Meier (stefan.meier@fhnw.ch)
  * */
-public class PfssPlugin3dRenderable implements Renderable, LayersListener {
+public class PfssRenderable implements Renderable, LayersListener {
 
     private PfssCache pfssCache = null;
     private boolean isVisible = false;
@@ -37,7 +37,7 @@ public class PfssPlugin3dRenderable implements Renderable, LayersListener {
     /**
      * Default constructor.
      */
-    public PfssPlugin3dRenderable(PfssCache pfssCache) {
+    public PfssRenderable(PfssCache pfssCache) {
         type = new RenderableType("PFSS plugin");
         this.pfssCache = pfssCache;
         Displayer.getRenderablecontainer().addRenderable(this);
