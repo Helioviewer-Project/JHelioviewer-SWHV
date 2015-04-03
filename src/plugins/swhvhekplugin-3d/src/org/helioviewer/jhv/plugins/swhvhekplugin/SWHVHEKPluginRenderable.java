@@ -1,4 +1,4 @@
-package org.helioviewer.gl3d.plugin.swhvhekplugin;
+package org.helioviewer.jhv.plugins.swhvhekplugin;
 
 import java.awt.Color;
 import java.awt.Component;
@@ -25,8 +25,6 @@ import org.helioviewer.jhv.data.datatype.event.JHVPositionInformation;
 import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.plugin.renderable.Renderable;
 import org.helioviewer.jhv.plugin.renderable.RenderableType;
-import org.helioviewer.jhv.plugins.swhvhekplugin.cache.SWHVHEKData;
-import org.helioviewer.jhv.plugins.swhvhekplugin.settings.SWHVHEKSettings;
 import org.helioviewer.viewmodel.renderer.GLCommonRenderGraphics;
 import org.helioviewer.viewmodel.view.LinkedMovieManager;
 import org.helioviewer.viewmodel.view.TimedMovieView;
