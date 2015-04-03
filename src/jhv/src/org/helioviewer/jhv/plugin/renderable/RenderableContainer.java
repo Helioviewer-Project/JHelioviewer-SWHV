@@ -169,7 +169,6 @@ public class RenderableContainer implements TableModel, Reorderable {
     }
 
     public void fireTimeUpdated(Renderable renderable) {
-
         int idx = this.renderables.indexOf(renderable);
         if (idx < 0 || idx >= this.renderables.size())
             return;
