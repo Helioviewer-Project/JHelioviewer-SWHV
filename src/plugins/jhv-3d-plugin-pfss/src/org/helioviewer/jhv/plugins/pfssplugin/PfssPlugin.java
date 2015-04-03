@@ -4,7 +4,7 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 
-import org.helioviewer.gl3d.plugin.pfss.PfssPlugin3dRenderable;
+import org.helioviewer.gl3d.plugin.pfss.PfssRenderable;
 import org.helioviewer.gl3d.plugin.pfss.data.PfssCache;
 import org.helioviewer.gl3d.plugin.pfss.settings.PfssSettings;
 import org.helioviewer.viewmodelplugin.interfaces.Plugin;
@@ -51,7 +51,7 @@ public class PfssPlugin extends OverlayPlugin implements Plugin {
     @Override
     public void installPlugin() {
         pfssCache = new PfssCache();
-        new PfssPlugin3dRenderable(pfssCache);
+        new PfssRenderable(pfssCache);
     }
 
     /**
