@@ -20,22 +20,14 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JSeparator;
 import javax.swing.JSpinner;
-import javax.swing.SpinnerNumberModel;
 import javax.swing.SwingConstants;
-import javax.swing.event.ChangeEvent;
-import javax.swing.event.ChangeListener;
 
-import org.helioviewer.gl3d.scenegraph.GL3DDrawBits.Bit;
 import org.helioviewer.jhv.display.Displayer;
-import org.helioviewer.jhv.gui.IconBank;
-import org.helioviewer.jhv.gui.IconBank.JHVIcon;
 import org.helioviewer.jhv.gui.components.base.TimeTextField;
-import org.helioviewer.jhv.gui.components.base.WheelSupport;
 import org.helioviewer.jhv.gui.components.calendar.JHVCalendarDatePicker;
 import org.helioviewer.jhv.gui.components.calendar.JHVCalendarEvent;
 import org.helioviewer.jhv.gui.components.calendar.JHVCalendarListener;
 import org.helioviewer.jhv.layers.LayersModel;
-import org.helioviewer.viewmodel.view.jp2view.datetime.ImmutableDateTime;
 
 public class GL3DFollowObjectCameraOptionPanel extends GL3DCameraOptionPanel implements GL3DFollowObjectCameraListener {
 
@@ -80,7 +72,6 @@ public class GL3DFollowObjectCameraOptionPanel extends GL3DCameraOptionPanel imp
         setLayout(new BoxLayout(this, BoxLayout.PAGE_AXIS));
         this.setBorder(BorderFactory.createEmptyBorder(0, 4, 0, 4));
         add(new JSeparator(SwingConstants.HORIZONTAL));
-        this.createFOV();
 
         add(new JSeparator(SwingConstants.HORIZONTAL));
         JPanel cameraTimePanel = new JPanel();
@@ -131,48 +122,6 @@ public class GL3DFollowObjectCameraOptionPanel extends GL3DCameraOptionPanel imp
         this.camera.addFollowObjectCameraListener(this);
         this.syncWithLayerBeginTime(false);
         this.syncWithLayerEndTime(true);
-    }
-
-    private void createFOV() {
-        this.fovPanel = new JPanel();
-        this.fovPanel.setLayout(new BoxLayout(fovPanel, BoxLayout.LINE_AXIS));
-        this.fovPanel.add(new JLabel("FOV angle"));
-        this.fovSpinner = new JSpinner();
-        this.fovSpinner.setModel(new SpinnerNumberModel(new Double(0.8), new Double(0.0), new Double(180.), new Double(0.01)));
-        camera.setFOVangleDegrees((Double) fovSpinner.getValue());
-
-        this.fovSpinner.addChangeListener(new ChangeListener() {
-            @Override
-            public void stateChanged(ChangeEvent e) {
-                camera.setFOVangleDegrees((Double) fovSpinner.getValue());
-                Displayer.display();
-            }
-        });
-        WheelSupport.installMouseWheelSupport(this.fovSpinner);
-        this.fovPanel.add(this.fovSpinner);
-        this.fovPanel.add(new JLabel("degree"));
-
-        this.fovSpinner.setMaximumSize(new Dimension(6, 22));
-        this.fovPanel.add(Box.createHorizontalGlue());
-        visibleFovButton = new JButton(IconBank.getIcon(JHVIcon.VISIBLE));
-        visibleFovButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent evt) {
-                if (fovVisible) {
-                    camera.cameraFOVDraw.getDrawBits().on(Bit.Hidden);
-                    visibleFovButton.setIcon(IconBank.getIcon(JHVIcon.HIDDEN));
-                } else {
-                    camera.cameraFOVDraw.getDrawBits().off(Bit.Hidden);
-                    visibleFovButton.setIcon(IconBank.getIcon(JHVIcon.VISIBLE));
-                }
-                fovVisible = !fovVisible;
-                Displayer.display();
-            }
-        });
-        visibleFovButton.setToolTipText("Toggle visibility");
-        this.fovPanel.add(visibleFovButton);
-
-        add(this.fovPanel);
     }
 
     public void addSyncButtons() {

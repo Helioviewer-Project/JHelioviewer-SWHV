@@ -65,9 +65,6 @@ public class GL3DCameraSelectorModel extends AbstractListModel implements ComboB
 
             defaultCamera = observerCamera;
         } else {
-
-            followObjectCamera.createNewFOV();
-
             setCurrentCamera(observerCamera);
         }
         if (lastCamera != null) {
