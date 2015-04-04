@@ -167,19 +167,6 @@ public class JHVSimpleImageView extends AbstractView implements ViewportView, Re
      * {@inheritDoc}
      */
     @Override
-    @SuppressWarnings("unchecked")
-    public <T extends View> T getAdapter(Class<T> c) {
-        if (c.isInstance(this)) {
-            return (T) this;
-        } else {
-            return null;
-        }
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
     public Region getRegion() {
         return region;
     }

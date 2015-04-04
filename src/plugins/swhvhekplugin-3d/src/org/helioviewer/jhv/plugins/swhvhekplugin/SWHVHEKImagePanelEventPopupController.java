@@ -26,10 +26,10 @@ import org.helioviewer.jhv.gui.components.BasicImagePanel;
 import org.helioviewer.jhv.gui.interfaces.ImagePanelPlugin;
 import org.helioviewer.jhv.gui.states.StateController;
 import org.helioviewer.jhv.gui.states.ViewStateEnum;
-import org.helioviewer.viewmodel.view.RegionView;
 import org.helioviewer.viewmodel.view.View;
 import org.helioviewer.viewmodel.view.ViewHelper;
-import org.helioviewer.viewmodel.view.ViewportView;
+import org.helioviewer.viewmodel.view.jp2view.JHVJP2View;
+import org.helioviewer.viewmodel.view.opengl.GL3DComponentView;
 import org.helioviewer.viewmodel.view.opengl.GLInfo;
 import org.helioviewer.viewmodel.viewportimagesize.ViewportImageSize;
 
@@ -56,9 +56,7 @@ public class SWHVHEKImagePanelEventPopupController implements KeyEventDispatcher
     private static final int yOffset = 12;
     private boolean aPressed = false;
 
-    private View view;
-    private ViewportView viewportView;
-    private RegionView regionView;
+    private GL3DComponentView view;
 
     private BasicImagePanel imagePanel;
 
@@ -87,9 +85,7 @@ public class SWHVHEKImagePanelEventPopupController implements KeyEventDispatcher
      */
     @Override
     public void setView(View newView) {
-        view = newView;
-        viewportView = view.getAdapter(ViewportView.class);
-        regionView = view.getAdapter(RegionView.class);
+        view = (GL3DComponentView) newView;
     }
 
     /**
@@ -120,13 +116,14 @@ public class SWHVHEKImagePanelEventPopupController implements KeyEventDispatcher
      * @return Corresponding screen coordinate
      */
     private Vector2dInt convertPhysicalToScreen(double x, double y) {
-        if (regionView == null || viewportView == null) {
+        JHVJP2View lview = Displayer.getLayersModel().getActiveView();
+        if (view == null) {
             return null;
         }
-        ViewportImageSize viewportImageSize = ViewHelper.calculateViewportImageSize(viewportView.getViewport(), regionView.getRegion());
-        Vector2dInt offset = ViewHelper.convertImageToScreenDisplacement(-regionView.getRegion().getUpperLeftCorner().getX(), regionView.getRegion().getUpperLeftCorner().getY(), regionView.getRegion(), viewportImageSize);
+        ViewportImageSize viewportImageSize = ViewHelper.calculateViewportImageSize(lview.getViewport(), lview.getRegion());
+        Vector2dInt offset = ViewHelper.convertImageToScreenDisplacement(-lview.getRegion().getUpperLeftCorner().getX(), lview.getRegion().getUpperLeftCorner().getY(), lview.getRegion(), viewportImageSize);
 
-        return ViewHelper.convertImageToScreenDisplacement(x, y, regionView.getRegion(), viewportImageSize).add(offset);
+        return ViewHelper.convertImageToScreenDisplacement(x, y, lview.getRegion(), viewportImageSize).add(offset);
     }
 
     private Point calcWindowPosition(Point p) {

@@ -27,7 +27,6 @@ import org.helioviewer.viewmodel.view.ImageInfoView;
 import org.helioviewer.viewmodel.view.MetaDataView;
 import org.helioviewer.viewmodel.view.RegionView;
 import org.helioviewer.viewmodel.view.SubimageDataView;
-import org.helioviewer.viewmodel.view.View;
 import org.helioviewer.viewmodel.view.ViewHelper;
 import org.helioviewer.viewmodel.view.ViewportView;
 import org.helioviewer.viewmodel.viewport.StaticViewport;
@@ -52,7 +51,7 @@ public class JHVFITSView extends AbstractView implements ViewportView, RegionVie
     protected ImageData subImageData;
     protected MetaData m;
     private final URI uri;
-    private Interval<Date> range;
+    private final Interval<Date> range;
 
     /**
      * Constructor which loads a fits image from a given URI.
@@ -177,19 +176,6 @@ public class JHVFITSView extends AbstractView implements ViewportView, RegionVie
         notifyViewListeners(event);
 
         return true;
-    }
-
-    /**
-     * {@inheritDoc}
-     * */
-    @Override
-    @SuppressWarnings("unchecked")
-    public <T extends View> T getAdapter(Class<T> c) {
-        if (c.isInstance(this)) {
-            return (T) this;
-        } else {
-            return null;
-        }
     }
 
     /**

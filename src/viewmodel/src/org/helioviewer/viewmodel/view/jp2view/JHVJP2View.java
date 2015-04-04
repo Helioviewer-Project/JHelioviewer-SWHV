@@ -37,7 +37,6 @@ import org.helioviewer.viewmodel.view.ImageInfoView;
 import org.helioviewer.viewmodel.view.MetaDataView;
 import org.helioviewer.viewmodel.view.RegionView;
 import org.helioviewer.viewmodel.view.SubimageDataView;
-import org.helioviewer.viewmodel.view.View;
 import org.helioviewer.viewmodel.view.ViewHelper;
 import org.helioviewer.viewmodel.view.ViewportView;
 import org.helioviewer.viewmodel.view.jp2view.J2KRender.RenderReasons;
@@ -393,19 +392,6 @@ public class JHVJP2View extends AbstractView implements JP2View, ViewportView, R
         fireChangeEvent(event);
 
         return changed;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    @SuppressWarnings("unchecked")
-    public <T extends View> T getAdapter(Class<T> c) {
-        if (c.isInstance(this)) {
-            return (T) this;
-        } else {
-            return null;
-        }
     }
 
     /**
@@ -981,7 +967,7 @@ public class JHVJP2View extends AbstractView implements JP2View, ViewportView, R
     public void setStartLUT() {
         int[] builtIn = this.getBuiltInLUT();
         if (builtIn != null) {
-            LUT builtInLut = new LUT("built-in", builtIn/*, builtIn*/);
+            LUT builtInLut = new LUT("built-in", builtIn/* , builtIn */);
             lut = builtInLut;
             return;
         }

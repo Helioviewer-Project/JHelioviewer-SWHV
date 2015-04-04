@@ -10,7 +10,6 @@ import org.helioviewer.base.logging.Log;
 import org.helioviewer.base.math.Interval;
 import org.helioviewer.base.math.Vector2dDouble;
 import org.helioviewer.base.math.Vector2dInt;
-import org.helioviewer.viewmodel.imagedata.ImageData;
 import org.helioviewer.viewmodel.metadata.MetaData;
 import org.helioviewer.viewmodel.region.Region;
 import org.helioviewer.viewmodel.region.StaticRegion;
@@ -111,64 +110,6 @@ public final class ViewHelper {
     }
 
     /**
-     * Returns a View of given interface or class, starting search at given
-     * view.
-     *
-     * If the given view implements the given interface itself, it returns that
-     * very same view, otherwise it returns a suitable view (for example another
-     * view located deeper within the view chain, that can provide the desired
-     * information, or null, if that is not possible).
-     *
-     * @param <T>
-     *            Subclass of {@link View}
-     * @param v
-     *            First view to analyze
-     * @param c
-     *            Class or interface to search for
-     * @return View implementing given class or interface, if available, null
-     *         otherwise
-     */
-    public static <T extends View> T getViewAdapter(View v, Class<T> c) {
-        return v == null ? null : v.getAdapter(c);
-    }
-
-    /**
-     * Returns an ImageData object of given class or interface.
-     *
-     * <p>
-     * The function searches the next {@link SubimageDataView}, fetches its
-     * ImageData object and tests, whether it satisfies the given class or
-     * interface. If so, it returns the ImageData object, otherwise, it returns
-     * null
-     *
-     * @param <T>
-     *            Subclass of
-     *            {@link org.helioviewer.viewmodel.imagedata.ImageData}
-     * @param v
-     *            First view to analyze
-     * @param c
-     *            Class or interface to search for
-     * @return ImageData implementing given class or interface, if available,
-     *         null otherwise
-     */
-    @SuppressWarnings("unchecked")
-    public static <T extends ImageData> T getImageDataAdapter(View v, Class<T> c) {
-
-        SubimageDataView dataView = getViewAdapter(v, SubimageDataView.class);
-
-        if (dataView == null) {
-            return null;
-
-        } else if (dataView.getSubimageData() == null) {
-            return null;
-        } else if (!c.isInstance(dataView.getSubimageData())) {
-            return null;
-        } else {
-            return (T) dataView.getSubimageData();
-        }
-    }
-
-    /**
      * Calculates the final size of a given region within the viewport.
      *
      * <p>
@@ -222,8 +163,8 @@ public final class ViewHelper {
      * @return resulting image size of the region within the viewport
      */
     public static ViewportImageSize calculateViewportImageSize(View v) {
-        RegionView regionView = ViewHelper.getViewAdapter(v, RegionView.class);
-        ViewportView viewportView = ViewHelper.getViewAdapter(v, ViewportView.class);
+        RegionView regionView = (RegionView) v;
+        ViewportView viewportView = (ViewportView) v;
         if (regionView == null || viewportView == null) {
             return null;
         }
