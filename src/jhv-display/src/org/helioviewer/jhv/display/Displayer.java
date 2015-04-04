@@ -103,7 +103,6 @@ public class Displayer implements JHVEventHighlightListener {
         int idx = layersModel.findView(view);
         if (idx != -1 /* layersModel.isValidIndex(idx) */) {
             // update timestamp labels
-            layersModel.fireTableRowsUpdated(idx, idx);
             Displayer.getRenderablecontainer().fireTimeUpdated(view.getImageLayer());
 
             if (idx == layersModel.getActiveLayer() && dateTime != null) {

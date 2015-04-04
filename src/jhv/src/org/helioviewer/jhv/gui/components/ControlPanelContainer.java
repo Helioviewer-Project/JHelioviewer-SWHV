@@ -10,7 +10,6 @@ import org.helioviewer.jhv.layers.LayersListener;
 import org.helioviewer.jhv.layers.LayersModel;
 import org.helioviewer.viewmodel.view.ImageInfoView;
 import org.helioviewer.viewmodel.view.View;
-import org.helioviewer.viewmodel.view.jp2view.JHVJP2View;
 
 public class ControlPanelContainer extends JPanel implements LayersListener {
 
@@ -58,19 +57,10 @@ public class ControlPanelContainer extends JPanel implements LayersListener {
         this.controlMap.put(null, comp);
     }
 
-    public void layerVisibilityChanged(View view) {
-        boolean visible = LayersModel.getSingletonInstance().isVisible((JHVJP2View) view);
-        ImageInfoView imageInfoView = view != null ? view.getAdapter(ImageInfoView.class) : null;
-
-        Component c = this.getViewComponent(imageInfoView);
-        if (c != null) {
-            c.setEnabled(visible);
-        }
-    }
-
     /**
      * {@inheritDoc}
      */
+    @Override
     public void activeLayerChanged(View view) {
         updateActiveView(view);
     }
@@ -78,12 +68,14 @@ public class ControlPanelContainer extends JPanel implements LayersListener {
     /**
      * {@inheritDoc}
      */
+    @Override
     public void layerAdded(int newIndex) {
     }
 
     /**
      * {@inheritDoc}
      */
+    @Override
     public void layerRemoved(int oldIndex) {
     }
 

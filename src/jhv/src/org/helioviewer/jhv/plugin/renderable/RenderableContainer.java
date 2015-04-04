@@ -19,6 +19,7 @@ public class RenderableContainer implements TableModel, Reorderable {
     private final ArrayList<Renderable> newRenderables = new ArrayList<Renderable>();
     private final ArrayList<Renderable> removedRenderables = new ArrayList<Renderable>();
     private final ArrayList<TableModelListener> listeners = new ArrayList<TableModelListener>();
+    private int countImagelayers = 0;
 
     public RenderableContainer() {
         super();
@@ -31,12 +32,10 @@ public class RenderableContainer implements TableModel, Reorderable {
     }
 
     public void addBeforeRenderable(Renderable renderable) {
-        int countImagelayers = 0;
         int lastImagelayerIndex = -1;
         int size = renderables.size();
         for (int i = 0; i < size; i++) {
             if (renderables.get(i).getType() instanceof RenderableImageType) {
-                countImagelayers++;
                 lastImagelayerIndex = i;
             }
         }
@@ -45,6 +44,7 @@ public class RenderableContainer implements TableModel, Reorderable {
         if (renderable instanceof GL3DImageLayer) {
             GL3DImageLayer ri = ((GL3DImageLayer) renderable);
             ri.getMainLayerView().setOpacity((float) (1. / (1. + countImagelayers)));
+            countImagelayers++;
         }
         Displayer.getRenderableContainerPanel().setOptionsPanel(renderable);
         fireListeners();
@@ -57,6 +57,9 @@ public class RenderableContainer implements TableModel, Reorderable {
     }
 
     public void removeRenderable(Renderable renderable) {
+        if (renderable instanceof GL3DImageLayer) {
+            countImagelayers--;
+        }
         renderables.remove(renderable);
         removedRenderables.add(renderable);
         fireListeners();
@@ -176,5 +179,9 @@ public class RenderableContainer implements TableModel, Reorderable {
             TableModelEvent e = new TableModelEvent(this, idx, idx, RenderableContainerPanel.TIMEROW, TableModelEvent.UPDATE);
             listener.tableChanged(e);
         }
+    }
+
+    public int countImageLayers() {
+        return countImagelayers;
     }
 }

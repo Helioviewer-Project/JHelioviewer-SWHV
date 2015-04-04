@@ -7,9 +7,9 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.LinkedList;
 
 import javax.swing.JOptionPane;
-import javax.swing.table.AbstractTableModel;
 
 import org.helioviewer.jhv.gui.ImageViewerGui;
 import org.helioviewer.jhv.gui.components.MoviePanel;
@@ -17,6 +17,7 @@ import org.helioviewer.jhv.gui.dialogs.MetaDataDialog;
 import org.helioviewer.jhv.io.FileDownloader;
 import org.helioviewer.viewmodel.view.ImageInfoView;
 import org.helioviewer.viewmodel.view.LayeredView;
+import org.helioviewer.viewmodel.view.TimedMovieView;
 import org.helioviewer.viewmodel.view.View;
 import org.helioviewer.viewmodel.view.jp2view.JHVJP2View;
 import org.helioviewer.viewmodel.view.jp2view.JHVJPXView;
@@ -36,7 +37,7 @@ import org.helioviewer.viewmodel.view.jp2view.datetime.ImmutableDateTime;
  *
  * @author Malte Nuhn
  */
-public class LayersModel extends AbstractTableModel {
+public class LayersModel {
 
     private static final LayersModel layersModel = new LayersModel();
 
@@ -65,36 +66,6 @@ public class LayersModel extends AbstractTableModel {
     public LayeredView getLayeredView() {
         return layeredView;
     }
-
-    /* <LayerTableModel> */
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public int getRowCount() {
-        return layeredView.getNumLayers();
-    }
-
-    /**
-     * {@inheritDoc} Hardcoded value of columns. This value is dependent on the
-     * actual design of the LayerTable
-     */
-    @Override
-    public int getColumnCount() {
-        return 4;
-    }
-
-    /**
-     * Return the LayerDescriptor for the given row of the table, regardless
-     * which column is requested.
-     */
-    @Override
-    public Object getValueAt(int idx, int col) {
-        return layeredView.getLayerDescriptor(getLayer(idx));
-    }
-
-    /* </LayerTableModel> */
 
     /**
      * Return the view associated with the active Layer
@@ -327,18 +298,6 @@ public class LayersModel extends AbstractTableModel {
     }
 
     /**
-     * Get the visibility of the layer in question
-     *
-     * @param view
-     *            - View that can be associated with the layer in question
-     *
-     * @return true if the layer is visible
-     */
-    public boolean isVisible(JHVJP2View view) {
-        return layeredView.isVisible(view);
-    }
-
-    /**
      * Check if the given index is valid, given the current state of the
      * LayeredView/ViewChain
      *
@@ -457,21 +416,13 @@ public class LayersModel extends AbstractTableModel {
 
         int newIndex = invertIndex(layeredView.addLayer(view));
         // wtf
-        while (view.getSubimageData() == null) {
-            try {
-                Thread.sleep(100);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-        }
 
         ImageViewerGui ivg = ImageViewerGui.getSingletonInstance();
         // If MoviewView, add MoviePanel
         if (view instanceof JHVJPXView) {
             MoviePanel moviePanel = new MoviePanel((JHVJPXView) view);
-            if (isTimed(view)) {
-                setLink(view, true);
-            }
+            setLink(view, true);
+
             ivg.getMoviePanelContainer().addLayer(view, moviePanel);
         } else {
             MoviePanel moviePanel = new MoviePanel(null);
@@ -479,7 +430,6 @@ public class LayersModel extends AbstractTableModel {
         }
 
         fireLayerAdded(newIndex);
-        fireTableRowsInserted(newIndex, newIndex);
         setActiveLayer(newIndex);
     }
 
@@ -503,7 +453,6 @@ public class LayersModel extends AbstractTableModel {
 
         int oldIndex = invertIndexDeleted(layeredView.removeLayer(view));
         fireLayerRemoved(oldIndex);
-        fireTableRowsDeleted(oldIndex, oldIndex);
 
         int newIndex = determineNewActiveLayer(oldIndex);
         setActiveLayer(newIndex);
@@ -535,30 +484,6 @@ public class LayersModel extends AbstractTableModel {
     }
 
     /**
-     * Check whether the layer in question has timing information
-     *
-     * @param idx
-     *            - index of the layer in question
-     * @return true if the layer in question has timing information
-     */
-    public boolean isTimed(int idx) {
-        return isTimed(getLayer(idx));
-    }
-
-    /**
-     * Check whether the layer in question has timing information
-     *
-     * @param view
-     *            - View that can be associated with the layer in question
-     * @return true if the layer in question has timing information
-     */
-    private boolean isTimed(JHVJP2View view) {
-        if (view == null)
-            return false;
-        return layeredView.getLayerDescriptor(view).isTimed;
-    }
-
-    /**
      * Return the current framerate for the layer in question
      *
      * @param view
@@ -572,17 +497,6 @@ public class LayersModel extends AbstractTableModel {
             result = Math.round(((JHVJPXView) view).getActualFramerate() * 100) / 100;
         }
         return result;
-    }
-
-    /**
-     * Return a representation of the layer in question
-     *
-     * @param view
-     *            - View that can be associated with the layer in question
-     * @return LayerDescriptor of the current state of the layer in question
-     */
-    public LayerDescriptor getDescriptor(JHVJP2View view) {
-        return layeredView.getLayerDescriptor(view);
     }
 
     private void fireLayerRemoved(int oldIndex) {
@@ -609,6 +523,10 @@ public class LayersModel extends AbstractTableModel {
 
     public void removeLayersListener(LayersListener layerListener) {
         layerListeners.remove(layerListener);
+    }
+
+    public LinkedList<TimedMovieView> getLayers() {
+        return null;
     }
 
 }
