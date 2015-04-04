@@ -30,7 +30,6 @@ import org.helioviewer.jhv.JHVSplashScreen;
 import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.gui.actions.ExitProgramAction;
 import org.helioviewer.jhv.gui.components.ControlPanelContainer;
-import org.helioviewer.jhv.gui.components.ImageSelectorPanel;
 import org.helioviewer.jhv.gui.components.MainContentPanel;
 import org.helioviewer.jhv.gui.components.MainImagePanel;
 import org.helioviewer.jhv.gui.components.MenuBar;
@@ -41,6 +40,7 @@ import org.helioviewer.jhv.gui.components.TopToolBar;
 import org.helioviewer.jhv.gui.components.statusplugins.FramerateStatusPanel;
 import org.helioviewer.jhv.gui.components.statusplugins.ZoomStatusPanel;
 import org.helioviewer.jhv.gui.controller.ZoomController;
+import org.helioviewer.jhv.gui.dialogs.observation.ImageDataPanel;
 import org.helioviewer.jhv.gui.dialogs.observation.ObservationDialog;
 import org.helioviewer.jhv.gui.filters.ChannelMixerPanel;
 import org.helioviewer.jhv.gui.filters.ContrastPanel;
@@ -93,7 +93,6 @@ public class ImageViewerGui {
     protected MainImagePanel mainImagePanel;
 
     private SideContentPane leftPane;
-    private ImageSelectorPanel imageSelectorPanel;
     private MoviePanel moviePanel;
     private ControlPanelContainer moviePanelContainer;
     private ControlPanelContainer filterPanelContainer;
@@ -114,6 +113,8 @@ public class ImageViewerGui {
     private LayeredView layeredView;
 
     private GL3DCameraView cameraView;
+
+    private final ImageDataPanel imageObservationPanel = new ImageDataPanel();
 
     /**
      * The private constructor that creates and positions all the gui
@@ -319,7 +320,7 @@ public class ImageViewerGui {
             leftPane.add("Movie Controls", moviePanelContainer, true);
 
             // Layer control
-            imageSelectorPanel = new ImageSelectorPanel();
+            ImageViewerGui.getSingletonInstance().getObservationDialog().addUserInterface("Image data", imageObservationPanel);
 
             //leftPane.add("Image Layers", imageSelectorPanel, false);
 
@@ -362,15 +363,6 @@ public class ImageViewerGui {
             // leftPane.add("Object Options", planetOptionsPanel, false);
             return leftPane;
         }
-    }
-
-    /**
-     * Returns the instance of the ImageSelectorPanel.
-     *
-     * @return instance of the image selector panel.
-     * */
-    public ImageSelectorPanel getImageSelectorPanel() {
-        return imageSelectorPanel;
     }
 
     /**
@@ -645,6 +637,10 @@ public class ImageViewerGui {
 
     public LayeredView getLayeredView() {
         return layeredView;
+    }
+
+    public ImageDataPanel getObservationImagePane() {
+        return imageObservationPanel;
     }
 
 }
