@@ -17,6 +17,6 @@ package org.helioviewer.viewmodel.view;
  * @author Markus Langenberg
  *
  */
-public interface OverlayView extends ModifiableInnerViewView, ViewListener {
+public interface OverlayView extends ViewListener {
 
 }

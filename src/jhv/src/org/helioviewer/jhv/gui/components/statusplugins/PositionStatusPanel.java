@@ -14,7 +14,7 @@ import org.helioviewer.jhv.gui.components.BasicImagePanel;
 import org.helioviewer.jhv.gui.interfaces.ImagePanelPlugin;
 import org.helioviewer.viewmodel.metadata.MetaData;
 import org.helioviewer.viewmodel.region.Region;
-import org.helioviewer.viewmodel.view.View;
+import org.helioviewer.viewmodel.view.ComponentView;
 import org.helioviewer.viewmodel.view.ViewHelper;
 import org.helioviewer.viewmodel.view.jp2view.JHVJP2View;
 import org.helioviewer.viewmodel.viewport.Viewport;
@@ -39,7 +39,7 @@ public class PositionStatusPanel extends ViewStatusPanelPlugin implements MouseM
     private static final long serialVersionUID = 1L;
     private static final PositionStatusPanel instance = new PositionStatusPanel();
 
-    private View view;
+    private ComponentView view;
     private JHVJP2View jp2View;
 
     private BasicImagePanel imagePanel;
@@ -116,7 +116,7 @@ public class PositionStatusPanel extends ViewStatusPanelPlugin implements MouseM
      * {@inheritDoc}
      */
     @Override
-    public View getView() {
+    public ComponentView getView() {
         return view;
     }
 
@@ -124,7 +124,7 @@ public class PositionStatusPanel extends ViewStatusPanelPlugin implements MouseM
      * {@inheritDoc}
      */
     @Override
-    public void setView(View newView) {
+    public void setView(ComponentView newView) {
         view = newView;
     }
 

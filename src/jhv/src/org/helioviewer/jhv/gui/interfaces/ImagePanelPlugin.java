@@ -1,6 +1,7 @@
 package org.helioviewer.jhv.gui.interfaces;
 
 import org.helioviewer.jhv.gui.components.BasicImagePanel;
+import org.helioviewer.viewmodel.view.ComponentView;
 import org.helioviewer.viewmodel.view.View;
 
 /**
@@ -26,7 +27,7 @@ public interface ImagePanelPlugin {
      *            Topmost view of the view chain
      * @see #getView()
      */
-    public void setView(View newView);
+    public void setView(ComponentView newView);
 
     /**
      * Returns the topmost view of the view chain associated with this plugin.
@@ -34,7 +35,7 @@ public interface ImagePanelPlugin {
      * @return Topmost view of the view chain
      * @see #setView(View)
      */
-    public View getView();
+    public ComponentView getView();
 
     /**
      * Sets the image panel to which the plugin is attached.

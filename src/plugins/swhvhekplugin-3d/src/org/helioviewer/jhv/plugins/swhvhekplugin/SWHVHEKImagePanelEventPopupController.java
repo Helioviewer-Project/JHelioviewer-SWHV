@@ -26,7 +26,7 @@ import org.helioviewer.jhv.gui.components.BasicImagePanel;
 import org.helioviewer.jhv.gui.interfaces.ImagePanelPlugin;
 import org.helioviewer.jhv.gui.states.StateController;
 import org.helioviewer.jhv.gui.states.ViewStateEnum;
-import org.helioviewer.viewmodel.view.View;
+import org.helioviewer.viewmodel.view.ComponentView;
 import org.helioviewer.viewmodel.view.ViewHelper;
 import org.helioviewer.viewmodel.view.jp2view.JHVJP2View;
 import org.helioviewer.viewmodel.view.opengl.GL3DComponentView;
@@ -76,7 +76,7 @@ public class SWHVHEKImagePanelEventPopupController implements KeyEventDispatcher
      * {@inheritDoc}
      */
     @Override
-    public View getView() {
+    public ComponentView getView() {
         return view;
     }
 
@@ -84,7 +84,7 @@ public class SWHVHEKImagePanelEventPopupController implements KeyEventDispatcher
      * {@inheritDoc}
      */
     @Override
-    public void setView(View newView) {
+    public void setView(ComponentView newView) {
         view = (GL3DComponentView) newView;
     }
 
