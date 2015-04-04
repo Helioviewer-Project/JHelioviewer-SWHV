@@ -14,7 +14,6 @@ import javax.media.opengl.awt.GLCanvas;
 import javax.swing.JOptionPane;
 import javax.swing.JTextArea;
 
-import org.helioviewer.base.logging.Log;
 import org.helioviewer.gl3d.movie.MovieExport;
 import org.helioviewer.gl3d.scenegraph.GL3DState;
 import org.helioviewer.jhv.display.DisplayListener;
@@ -102,8 +101,26 @@ public class GL3DComponentView extends AbstractComponentView implements GLEventL
     }
 
     private static void displayBody(GL2 gl, View v, int width, int height) {
+        GL3DState state = GL3DState.get();
         gl.glClear(GL2.GL_COLOR_BUFFER_BIT | GL2.GL_DEPTH_BUFFER_BIT);
-        ((GL3DView) v).renderGL(gl, true);
+        ImageViewerGui.getSingletonInstance().getCameraView().render3D(state);
+        ImageViewerGui.getSingletonInstance().getLayeredView().render3D(state);
+        gl.glBlendFunc(GL2.GL_SRC_ALPHA, GL2.GL_ONE_MINUS_SRC_ALPHA);
+        gl.glBlendEquation(GL2.GL_FUNC_ADD);
+
+        gl.glDisable(GL2.GL_BLEND);
+        gl.glEnable(GL2.GL_DEPTH_TEST);
+
+        state.pushMV();
+        state.getActiveCamera().applyPerspective(state);
+        state.getActiveCamera().applyCamera(state);
+        Displayer.getRenderablecontainer().render(state);
+        state.getActiveCamera().drawCamera(state);
+        state.getActiveCamera().resumePerspective(state);
+
+        state.popMV();
+
+        gl.glEnable(GL2.GL_BLEND);
     }
 
     @Override
@@ -175,8 +192,7 @@ public class GL3DComponentView extends AbstractComponentView implements GLEventL
         View v;
         JHVJP2View mv;
 
-        if ((v = LayersModel.getSingletonInstance().getActiveView()) == null ||
-            (mv = v.getAdapter(JHVJP2View.class)) == null) {
+        if ((v = LayersModel.getSingletonInstance().getActiveView()) == null || (mv = v.getAdapter(JHVJP2View.class)) == null) {
             stopExport();
             return;
         }
