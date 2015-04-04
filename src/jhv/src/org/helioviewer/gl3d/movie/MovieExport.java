@@ -103,12 +103,12 @@ public class MovieExport {
         args.add("-s");
         args.add("" + width + "x" + height);
         args.add("-r");
+
         JHVJP2View activeView = Displayer.getLayersModel().getActiveView();
-        JHVJPXView movieView;
         if (activeView instanceof JHVJPXView) {
-            movieView = (JHVJPXView) activeView;
-            framerate = movieView.getDesiredRelativeSpeed();
+            framerate = ((JHVJPXView) activeView).getDesiredRelativeSpeed();
         }
+
         if (framerate <= 0 || framerate > 60) {
             framerate = 20;
             Log.warn("Resetting framerate to reasonable value");
@@ -130,20 +130,17 @@ public class MovieExport {
         JHVDirectory exportdir = JHVDirectory.EXPORTS;
         String exportPath = exportdir.getPath();
         int i = 0;
-        JHVJP2View av = Displayer.getLayersModel().getActiveView();
-        JHVJPXView jpx = null;
-        if (av instanceof JHVJPXView) {
-            jpx = (JHVJPXView) av;
-        }
+
         String path;
-        if (jpx != null) {
+        if (activeView instanceof JHVJPXView) {
             SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd'T'HHmmss");
             Date d = new Date(System.currentTimeMillis());
             String dateString = format.format(d);
-            path = "JHV_" + (jpx.getName().replace(" ", "_")) + "__" + dateString;
+            path = "JHV_" + ((JHVJPXView) activeView).getName().replace(" ", "_") + "__" + dateString;
         } else {
             path = "JHV_movie_" + i;
         }
+
         filename = exportPath + path + ".mp4";
         File f = new File(filename);
         while (f.exists()) {
@@ -174,7 +171,6 @@ public class MovieExport {
     }
 
     public void release() {
-
         if (ffmpegStdin != null) {
             try {
                 ffmpegStdin.close();
@@ -310,4 +306,5 @@ public class MovieExport {
     public String getFileName() {
         return filename;
     }
+
 }

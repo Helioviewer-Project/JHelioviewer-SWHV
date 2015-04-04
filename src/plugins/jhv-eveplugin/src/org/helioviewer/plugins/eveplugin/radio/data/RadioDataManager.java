@@ -550,8 +550,8 @@ public class RadioDataManager implements RadioDownloaderListener {
                 FrequencyInterval visibleFrequencyInterval = ri.getVisibleImageFreqInterval();
                 if (!visibleDateInterval.getStart().equals(visibleDateInterval.getEnd())) {
                     Rectangle viewport = zoomManager.getAvailableSpaceForInterval(visibleDateInterval.getStart(), visibleDateInterval.getEnd(), visibleFrequencyInterval.getStart(), visibleFrequencyInterval.getEnd(), id);
-                    View v = jpxData.getView();
-                    JHVJP2View jp2View = (JHVJP2View) v;
+
+                    JHVJP2View jp2View = (JHVJP2View) jpxData.getView();
                     if (jp2View != null) {
                         jp2View.setViewport(new ViewportAdapter(new StaticViewport(new Vector2dInt(viewport.width, viewport.height))), new ChangeEvent());
                         Rectangle roi = ri.getROI();
