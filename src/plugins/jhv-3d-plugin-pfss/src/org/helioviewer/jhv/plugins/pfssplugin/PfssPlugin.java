@@ -8,12 +8,11 @@ import org.helioviewer.gl3d.plugin.pfss.PfssRenderable;
 import org.helioviewer.gl3d.plugin.pfss.data.PfssCache;
 import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.viewmodelplugin.interfaces.Plugin;
-import org.helioviewer.viewmodelplugin.overlay.OverlayPlugin;
 
 /**
  * @author Stefan Meier (stefan.meier@fhnw.ch)
  * */
-public class PfssPlugin extends OverlayPlugin implements Plugin {
+public class PfssPlugin implements Plugin {
 
     private boolean builtin_mode = false;
     private PfssCache pfssCache;
@@ -35,12 +34,6 @@ public class PfssPlugin extends OverlayPlugin implements Plugin {
      */
     public PfssPlugin(boolean builtin_mode) {
         this.builtin_mode = builtin_mode;
-
-        try {
-            this.pluginLocation = new URI(PfssSettings.PLUGIN_LOCATION);
-        } catch (URISyntaxException e) {
-            e.printStackTrace();
-        }
     }
 
     /**
@@ -57,7 +50,6 @@ public class PfssPlugin extends OverlayPlugin implements Plugin {
 
     @Override
     public void uninstallPlugin() {
-        super.uninstallPlugin();
         Displayer.getSingletonInstance().getRenderablecontainer().removeRenderable(renderable);
         pfssCache = null;
     }
@@ -78,7 +70,7 @@ public class PfssPlugin extends OverlayPlugin implements Plugin {
      */
     @Override
     public String getName() {
-        return "PFSS Overlay Plugin " + "$Rev$" + (builtin_mode ? " Built-In Version" : "");
+        return "PFSS Plugin " + "$Rev$" + (builtin_mode ? " Built-In Version" : "");
     }
 
     /**
