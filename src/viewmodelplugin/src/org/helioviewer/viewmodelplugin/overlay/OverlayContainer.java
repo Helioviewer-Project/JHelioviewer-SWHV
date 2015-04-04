@@ -100,9 +100,7 @@ public abstract class OverlayContainer implements Container {
     /**
      * Returns the current order position of the overlay. The position is
      * related to the position of the {@link OverlayView}s among each other in
-     * the viewchain. The position 0 is the closest position to the
-     * {@link org.helioviewer.viewmodel.view.LayeredView}, the position n is the
-     * closest one to the {@link org.helioviewer.viewmodel.view.LayeredView}.
+     * the viewchain.
      *
      * @return Position of the filter among each other.
      */

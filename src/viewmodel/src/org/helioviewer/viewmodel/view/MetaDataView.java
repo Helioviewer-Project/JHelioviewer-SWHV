@@ -11,7 +11,7 @@ import org.helioviewer.viewmodel.metadata.MetaData;
  * 
  * <p>
  * Usually, the implementation of this interface generates new images, so
- * usually it is also either a {@link ImageInfoView} or a {@link LayeredView}.
+ * usually it is also a {@link ImageInfoView}.
  * 
  * <p>
  * Note, that it is expected to have at least one MetaDataView in every path of

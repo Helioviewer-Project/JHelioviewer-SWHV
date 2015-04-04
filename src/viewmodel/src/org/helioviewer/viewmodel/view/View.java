@@ -11,7 +11,7 @@ import java.util.AbstractList;
  * {@link ImageInfoView}s as leafs. Along every path through the view chain, the
  * image data is changed, for example by applying filters (see
  * {@link FilterView}), adding overlays (see {@link OverlayView} or merging
- * several partial images into one resulting image (see {@link LayeredView}. The
+ * several partial images into one resulting image. The
  * different views communicate via {@link ViewListener}s.
  *
  * <p>
@@ -19,8 +19,7 @@ import java.util.AbstractList;
  * there exist one requirement has to hold: After finishing the construction of
  * any view chain, no call to getAdapter for {@link RegionView},
  * {@link ViewportView} or {@link MetaDataView} is allowed to return null, thus
- * every path of the view chain must contain all three views. To ensure that,
- * refer to {@link ImageInfoView} and {@link LayeredView}
+ * every path of the view chain must contain all three views.
  *
  * <p>
  * This interface is essential for ever view. It provides functions to add and
