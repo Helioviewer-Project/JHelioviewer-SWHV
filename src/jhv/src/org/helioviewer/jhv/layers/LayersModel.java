@@ -16,7 +16,6 @@ import org.helioviewer.jhv.gui.components.MoviePanel;
 import org.helioviewer.jhv.gui.dialogs.MetaDataDialog;
 import org.helioviewer.jhv.io.FileDownloader;
 import org.helioviewer.viewmodel.view.ImageInfoView;
-import org.helioviewer.viewmodel.view.LayeredView;
 import org.helioviewer.viewmodel.view.LinkedMovieManager;
 import org.helioviewer.viewmodel.view.TimedMovieView;
 import org.helioviewer.viewmodel.view.jp2view.JHVJP2View;
@@ -24,7 +23,7 @@ import org.helioviewer.viewmodel.view.jp2view.JHVJPXView;
 import org.helioviewer.viewmodel.view.jp2view.datetime.ImmutableDateTime;
 
 /**
- * This class is a (redundant) representation of the LayeredView + ViewChain
+ * This class is a (redundant) representation of the ViewChain
  * state, and, in addition to this, introduces the concept of an "activeLayer",
  * which is the Layer that is currently operated on by the user/GUI.
  *
@@ -33,7 +32,7 @@ import org.helioviewer.viewmodel.view.jp2view.datetime.ImmutableDateTime;
  *
  * Future development plans still have to show if it is worth to keep this
  * class, or if the abstraction should be avoided and direct access to the
- * viewChain/layeredView should be used in all GUI classes.
+ * viewChain should be used in all GUI classes.
  *
  * @author Malte Nuhn
  */
@@ -44,13 +43,7 @@ public class LayersModel {
     private int activeLayer = -1;
     private final ArrayList<LayersListener> layerListeners = new ArrayList<LayersListener>();
 
-    private static final LayeredView layeredView = new LayeredView();
-
     public LayersModel() {
-    }
-
-    public LayeredView getLayeredView() {
-        return layeredView;
     }
 
     /**
@@ -214,7 +207,7 @@ public class LayersModel {
 
     /**
      * Check if the given index is valid, given the current state of the
-     * LayeredView/ViewChain
+     * ViewChain
      *
      * @param idx
      *            - index of the layer in question
@@ -464,7 +457,7 @@ public class LayersModel {
     }
 
     /**
-     * Returns number of layers currently connected to the LayeredView.
+     * Returns number of layers
      *
      * @return Number of layers
      * @see #getNumberOfVisibleLayer
@@ -477,7 +470,7 @@ public class LayersModel {
      * Returns the position of the view within the stack of layers.
      *
      * Zero indicates the most bottom view. If the given view is not a direct
-     * child of the LayeredView, the function returns -1.
+     * child, the function returns -1.
      *
      * @param view
      *            View to search for within the stack of layers

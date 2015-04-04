@@ -2,7 +2,6 @@ package org.helioviewer.viewmodel.view;
 
 import java.io.IOException;
 import java.net.URI;
-import java.util.AbstractList;
 import java.util.Date;
 
 import org.helioviewer.base.logging.Log;
@@ -448,35 +447,6 @@ public final class ViewHelper {
                 throw new IOException(e.getMessage());
             }
         }
-    }
-
-    /**
-     * Searches the direct successor of the LayeredView being a predecessor of
-     * the given view. Therefore, this functions traverses recursively through
-     * all the view listeners of the given view.
-     *
-     * @param aView
-     *            Starting view for the search
-     * @return View being a direct successor of the LayeredView and a
-     *         predecessor of the given view
-     */
-    public static View findLastViewBeforeLayeredView(View aView) {
-        AbstractList<ViewListener> viewListeners = aView.getAllViewListeners();
-
-        for (ViewListener v : viewListeners) {
-            if (v instanceof LayeredView) {
-                return aView;
-            } else {
-                if (v instanceof View) {
-                    View result = findLastViewBeforeLayeredView((View) v);
-                    if (result != null) {
-                        return result;
-                    }
-                }
-            }
-        }
-
-        return null;
     }
 
 }

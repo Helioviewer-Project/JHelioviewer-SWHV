@@ -223,7 +223,6 @@ public class ImageViewerGui {
         State newState = StateController.getInstance().getCurrentState();
 
         cameraView = new GL3DCameraView();
-        //getCameraView().setView(layeredView);
 
         //ComponentView componentView = viewFactory.createNewView(ComponentView.class);
         mainComponentView = new GL3DComponentView();
