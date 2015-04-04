@@ -7,8 +7,7 @@ import org.helioviewer.gl3d.math.GL3DVec3d;
 import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.gui.actions.ZoomFitAction;
 import org.helioviewer.viewmodel.region.Region;
-import org.helioviewer.viewmodel.view.MetaDataView;
-import org.helioviewer.viewmodel.view.View;
+import org.helioviewer.viewmodel.view.jp2view.JHVJP2View;
 
 /**
  * Action that zooms in or out to fit the currently displayed image layers to
@@ -28,10 +27,10 @@ public class GL3DZoomFitAction extends ZoomFitAction {
 
     @Override
     public void actionPerformed(ActionEvent e) {
-        View view = Displayer.getLayersModel().getActiveView();
+        JHVJP2View view = Displayer.getLayersModel().getActiveView();
         GL3DCamera camera = GL3DCameraSelectorModel.getInstance().getCurrentCamera();
         if (view != null) {
-            Region region = view.getAdapter(MetaDataView.class).getMetaData().getPhysicalRegion();
+            Region region = view.getMetaData().getPhysicalRegion();
             if (region != null) {
                 double halfWidth = region.getWidth() / 2;
                 double halfFOVRad = Math.toRadians(camera.getCameraFOV() / 2.0);
