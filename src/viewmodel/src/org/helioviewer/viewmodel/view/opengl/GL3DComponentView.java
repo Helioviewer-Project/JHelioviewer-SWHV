@@ -182,10 +182,8 @@ public class GL3DComponentView extends AbstractComponentView implements GLEventL
     }
 
     private void exportFrame() {
-        JHVJP2View v;
-        JHVJP2View mv;
-
-        if ((v = Displayer.getLayersModel().getActiveView()) == null || (mv = v) == null) {
+        JHVJP2View mv = Displayer.getLayersModel().getActiveView();
+        if (mv == null) {
             stopExport();
             return;
         }
@@ -231,13 +229,14 @@ public class GL3DComponentView extends AbstractComponentView implements GLEventL
     public void startExport(ExportMovieDialog exportMovieDialog) {
         this.exportMovieDialog = exportMovieDialog;
         ImageViewerGui.getSingletonInstance().getLeftContentPane().setEnabled(false);
-        View v = Displayer.getLayersModel().getActiveView();
-        if (v instanceof JHVJPXView) {
+
+        JHVJP2View mv = Displayer.getLayersModel().getActiveView();
+        if (mv instanceof JHVJPXView) {
             export = new MovieExport(canvas.getWidth(), canvas.getHeight());
             export.createProcess();
             exportMode = true;
 
-            JHVJPXView jpxView = (JHVJPXView) v;
+            JHVJPXView jpxView = (JHVJPXView) mv;
             jpxView.pauseMovie();
             jpxView.setCurrentFrame(0);
             jpxView.playMovie();
@@ -248,8 +247,7 @@ public class GL3DComponentView extends AbstractComponentView implements GLEventL
     }
 
     private void stopExport() {
-        View v = Displayer.getLayersModel().getActiveView();
-        JHVJPXView jpxView = (JHVJPXView) v;
+        JHVJP2View mv = Displayer.getLayersModel().getActiveView();
 
         exportMode = false;
         previousScreenshot = -1;
@@ -261,7 +259,7 @@ public class GL3DComponentView extends AbstractComponentView implements GLEventL
 
         ImageViewerGui.getSingletonInstance().getLeftContentPane().setEnabled(true);
 
-        jpxView.pauseMovie();
+        ((JHVJPXView) mv).pauseMovie();
         exportMovieDialog.reset();
         exportMovieDialog = null;
     }

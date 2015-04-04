@@ -464,8 +464,7 @@ public class ImageViewerGui {
 
                                 // Lock movie
                                 if (jhvRequest.linked) {
-                                    if (subView != null && subView instanceof JHVJPXView && ((JHVJPXView) subView).getMaximumFrameNumber() > 0) {
-
+                                    if (subView instanceof JHVJPXView && ((JHVJPXView) subView).getMaximumFrameNumber() > 0) {
                                         MoviePanel moviePanel = MoviePanel.getMoviePanel((JHVJPXView) subView);
                                         if (moviePanel == null) {
                                             throw new InvalidViewException();

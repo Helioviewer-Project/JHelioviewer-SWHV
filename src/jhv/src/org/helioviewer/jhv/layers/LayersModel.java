@@ -342,6 +342,8 @@ public class LayersModel {
      *            - View that can be associated with the layer in question
      */
     public void removeLayer(JHVJP2View view) {
+        if (view == null)
+            return;
 
         if (view instanceof JHVJPXView) {
             MoviePanel moviePanel = MoviePanel.getMoviePanel((JHVJPXView) view);
@@ -349,16 +351,14 @@ public class LayersModel {
                 moviePanel.remove();
             }
         }
+
         int index = layers.indexOf(view);
 
         movieManager.pauseLinkedMovies();
 
         layers.remove(view);
-
-        if (view != null) {
-            view.abolish();
-            view.removeRenderListener();
-        }
+        view.abolish();
+        view.removeRenderListener();
 
         fireLayerRemoved(index);
 
