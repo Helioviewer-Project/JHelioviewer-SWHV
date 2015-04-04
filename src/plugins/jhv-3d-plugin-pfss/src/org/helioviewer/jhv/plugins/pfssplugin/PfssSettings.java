@@ -1,8 +1,5 @@
 package org.helioviewer.jhv.plugins.pfssplugin;
 
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-
 /**
  * Important settings
  *
@@ -25,14 +22,8 @@ public class PfssSettings {
      */
     public final static int CACHE_SIZE = 125;
 
-    /**
-     * Alpha-value of lines
-     */
     public final static float LINE_ALPHA = 1.0f;
 
-    /**
-     * Linewidth for the OpenGL visualization
-     */
     public final static float LINE_WIDTH = 0.6f;
 
     public final static int POINTS_PER_LINE = 40;
@@ -42,7 +33,5 @@ public class PfssSettings {
     public static int qualityReduction = 8;
 
     public static boolean fixedColor = false;
-    public final static ExecutorService pfssPool = Executors.newFixedThreadPool(5);
-    public final static ExecutorService pfssNewLoadPool = Executors.newFixedThreadPool(1);
 
 }
