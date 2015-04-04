@@ -5,7 +5,6 @@ import java.net.URI;
 import java.util.AbstractList;
 import java.util.Date;
 
-import org.helioviewer.base.JavaCompatibility;
 import org.helioviewer.base.logging.Log;
 import org.helioviewer.base.math.Interval;
 import org.helioviewer.base.math.Vector2dDouble;
@@ -70,7 +69,7 @@ public final class ViewHelper {
 
         double viewportRatio = v.getAspectRatio();
 
-        if (Math.abs(r.getWidth() / r.getHeight() - viewportRatio) > JavaCompatibility.DOUBLE_MIN_NORMAL * 4) {
+        if (Math.abs(r.getWidth() / r.getHeight() - viewportRatio) > Double.MIN_NORMAL * 4) {
             return cropRegionToImage(StaticRegion.createAdaptedRegion(r.getRectangle().expandToAspectRatioKeepingCenter(viewportRatio)), m);
         } else {
             return r;
@@ -102,7 +101,7 @@ public final class ViewHelper {
 
         double viewportRatio = v.getAspectRatio();
 
-        if (Math.abs(r.getWidth() / r.getHeight() - viewportRatio) > JavaCompatibility.DOUBLE_MIN_NORMAL * 4) {
+        if (Math.abs(r.getWidth() / r.getHeight() - viewportRatio) > Double.MIN_NORMAL * 4) {
             return cropRegionToImage(StaticRegion.createAdaptedRegion(r.getRectangle().contractToAspectRatioKeepingCenter(viewportRatio)), m);
         } else {
             return r;

@@ -1,7 +1,5 @@
 package org.helioviewer.viewmodel.view;
 
-import javax.swing.event.ChangeEvent;
-
 /**
  * Abstract base class implementing ModifiableInnerViewView and ViewListener,
  * providing common functions for most views.
@@ -40,7 +38,5 @@ public abstract class AbstractBasicView extends AbstractView implements Modifiab
             view.addViewListener(this);
         }
     }
-
-    protected abstract void setViewSpecificImplementation(View newView, ChangeEvent changeEvent);
 
 }
