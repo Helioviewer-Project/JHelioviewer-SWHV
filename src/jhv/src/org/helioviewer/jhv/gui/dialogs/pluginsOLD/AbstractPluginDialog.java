@@ -9,7 +9,6 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
-import java.util.ArrayList;
 
 import javax.swing.BoxLayout;
 import javax.swing.DefaultListModel;
@@ -20,14 +19,8 @@ import javax.swing.JList;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 
-import org.helioviewer.jhv.gui.GL3DViewchainFactory;
 import org.helioviewer.jhv.gui.ImageViewerGui;
 import org.helioviewer.jhv.gui.interfaces.ShowableDialog;
-import org.helioviewer.jhv.gui.states.StateController;
-import org.helioviewer.viewmodel.view.LayeredView;
-import org.helioviewer.viewmodel.view.ModifiableInnerViewView;
-import org.helioviewer.viewmodel.view.View;
-import org.helioviewer.viewmodel.view.jp2view.JHVJP2View;
 import org.helioviewer.viewmodelplugin.controller.PluginManager;
 import org.helioviewer.viewmodelplugin.interfaces.Container;
 
@@ -259,40 +252,6 @@ public abstract class AbstractPluginDialog extends JDialog implements ShowableDi
      * parts from plug ins.
      */
     private void recreateViewChains() {
-        // ViewchainFactory chainFactory = new ViewchainFactory();
-        GL3DViewchainFactory chainFactory = StateController.getInstance().getCurrentState().getViewchainFactory();
-
-        // Memorize all ImageInfoViews, remove all existing layers and add the
-        // memorized ImageInfoViews as new layers again. Activated and needed
-        // filters will be added to the corresponding sub chains.
-        LayeredView mainLayeredView = ImageViewerGui.getSingletonInstance().getMainView().getAdapter(LayeredView.class);
-        ArrayList<JHVJP2View> newImageInfoViews = new ArrayList<JHVJP2View>();
-
-        while (mainLayeredView.getNumLayers() > 0) {
-            // detach image info views from main view chain in order to reuse
-            // them
-            View curView = mainLayeredView.getLayer(0);
-            View lastView = null;
-            while (curView != null && !(curView instanceof JHVJP2View) && curView instanceof ModifiableInnerViewView) {
-                lastView = curView;
-                curView = ((ModifiableInnerViewView) curView).getView();
-            }
-            if (curView != null && curView instanceof JHVJP2View) {
-                JHVJP2View imageInfoView = (JHVJP2View) curView;
-                newImageInfoViews.add(imageInfoView);
-                if (lastView != null && lastView instanceof ModifiableInnerViewView) {
-                    ((ModifiableInnerViewView) lastView).setView(null);
-                }
-            }
-
-            // delete current layer
-            // mainLayeredView.removeLayer(0);
-        }
-
-        // re-add layers in order to rebuild viewchain
-        for (JHVJP2View imageView : newImageInfoViews) {
-            chainFactory.addLayerToViewchainMain(imageView);
-        }
     }
 
     /**
