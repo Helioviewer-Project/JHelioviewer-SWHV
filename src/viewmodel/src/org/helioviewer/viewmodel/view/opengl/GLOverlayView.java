@@ -1,8 +1,7 @@
 package org.helioviewer.viewmodel.view.opengl;
 
-import javax.media.opengl.GL2;
-
 import org.helioviewer.viewmodel.changeevent.ChangeEvent;
+import org.helioviewer.viewmodel.view.AbstractBasicView;
 import org.helioviewer.viewmodel.view.OverlayView;
 import org.helioviewer.viewmodel.view.View;
 
@@ -19,7 +18,7 @@ import org.helioviewer.viewmodel.view.View;
  *
  * @author Markus Langenberg
  */
-public class GLOverlayView extends AbstractGLView implements OverlayView {
+public class GLOverlayView extends AbstractBasicView implements OverlayView {
 
     /**
      * {@inheritDoc}
@@ -28,12 +27,7 @@ public class GLOverlayView extends AbstractGLView implements OverlayView {
     protected void setViewSpecificImplementation(View newView, ChangeEvent changeEvent) {
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
-    public void renderGL(GL2 gl, boolean nextView) {
-        renderChild(gl);
+    public void viewChanged(View sender, ChangeEvent aEvent) {
     }
-
 }
