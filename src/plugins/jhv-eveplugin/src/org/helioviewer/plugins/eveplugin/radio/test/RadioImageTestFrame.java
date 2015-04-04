@@ -95,7 +95,7 @@ public class RadioImageTestFrame extends JFrame implements ViewListener {
         Log.debug("What event" + aEvent);
         text.append("What event : ").append(aEvent).append("\n");
         if (rs != null) {
-            JHVJPXView jpxView = sender.getAdapter(JHVJPXView.class);
+            JHVJPXView jpxView = (JHVJPXView) sender;
             if (jpxView != null) {
                 byte[] data = new byte[0];
                 SingleChannelByte8ImageData imageData = (SingleChannelByte8ImageData) (jpxView.getSubimageData());
@@ -118,7 +118,7 @@ public class RadioImageTestFrame extends JFrame implements ViewListener {
                     Log.debug("image data was null " + count);
                 }
             } else {
-                JHVJP2View jp2View = sender.getAdapter(JHVJP2View.class);
+                JHVJP2View jp2View = (JHVJP2View) sender;
                 byte[] data = new byte[0];
                 SingleChannelByte8ImageData imageData = (SingleChannelByte8ImageData) (jp2View.getSubimageData());
                 if (imageData != null) {

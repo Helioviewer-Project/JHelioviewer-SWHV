@@ -82,7 +82,7 @@ public class DownloadedJPXData implements ViewListener {
 
     private DownloadedJPXDataWorkerResult getJPXData(View view) {
         if (view != null) {
-            JHVJP2CallistoView jp2CallistoView = view.getAdapter(JHVJP2CallistoView.class);
+            JHVJP2CallistoView jp2CallistoView = (JHVJP2CallistoView) view;
             if (jp2CallistoView != null) {
                 // ImageData imData =
                 // FilterModel.getInstance().colorFilter(jp2CallistoView.getSubimageData());
@@ -127,7 +127,7 @@ public class DownloadedJPXData implements ViewListener {
         }
         if (view != null) {
             view.removeViewListener(this);
-            JHVJP2CallistoView calView = view.getAdapter(JHVJP2CallistoView.class);
+            JHVJP2CallistoView calView = (JHVJP2CallistoView) view;
             if (calView != null) {
                 calView.abolish();
             }

@@ -362,10 +362,9 @@ public class LayersModel {
 
         layers.remove(view);
 
-        JHVJP2View jp2 = view.getAdapter(JHVJP2View.class);
-        if (jp2 != null) {
-            jp2.abolish();
-            jp2.removeRenderListener();
+        if (view != null) {
+            view.abolish();
+            view.removeRenderListener();
         }
 
         fireLayerRemoved(index);

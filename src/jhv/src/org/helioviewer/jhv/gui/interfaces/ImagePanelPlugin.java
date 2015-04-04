@@ -5,7 +5,7 @@ import org.helioviewer.viewmodel.view.View;
 
 /**
  * Interface representing a plugin for an image panel.
- * 
+ *
  * <p>
  * A plugin gets access to the view chain and can read or even modify the view
  * chain.
@@ -14,14 +14,14 @@ public interface ImagePanelPlugin {
 
     /**
      * Sets the topmost view of the view chain.
-     * 
+     *
      * That way the plugin can access the whole view chain.
-     * 
+     *
      * <p>
      * This function is called during
      * {@link org.helioviewer.jhv.gui.components.BasicImagePanel#addPlugin(ImagePanelPlugin)}
      * , so usually the user does not have to take care of this.
-     * 
+     *
      * @param newView
      *            Topmost view of the view chain
      * @see #getView()
@@ -30,7 +30,7 @@ public interface ImagePanelPlugin {
 
     /**
      * Returns the topmost view of the view chain associated with this plugin.
-     * 
+     *
      * @return Topmost view of the view chain
      * @see #setView(View)
      */
@@ -38,14 +38,14 @@ public interface ImagePanelPlugin {
 
     /**
      * Sets the image panel to which the plugin is attached.
-     * 
+     *
      * That way the plugin can access the image panel.
-     * 
+     *
      * <p>
      * This function is called during
      * {@link org.helioviewer.jhv.gui.components.BasicImagePanel#addPlugin(ImagePanelPlugin)}
      * , so usually the user does not have to take care of this.
-     * 
+     *
      * @param newImagePanel
      *            Image panel to which the plugin is attached
      * @see #getImagePanel()
@@ -54,7 +54,7 @@ public interface ImagePanelPlugin {
 
     /**
      * Returns the image panel to which the plugin is attached.
-     * 
+     *
      * @return Image panel to which the plugin is attached
      * @see #setImagePanel(BasicImagePanel)
      */

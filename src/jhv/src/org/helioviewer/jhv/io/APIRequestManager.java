@@ -26,7 +26,6 @@ import org.helioviewer.viewmodel.io.APIResponseDump;
 import org.helioviewer.viewmodel.metadata.HelioviewerMetaData;
 import org.helioviewer.viewmodel.metadata.MetaData;
 import org.helioviewer.viewmodel.view.ImageInfoView;
-import org.helioviewer.viewmodel.view.MetaDataView;
 import org.helioviewer.viewmodel.view.ViewHelper;
 import org.helioviewer.viewmodel.view.jp2view.JHVJP2View;
 
@@ -63,12 +62,12 @@ public class APIRequestManager {
         SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
         Date date = new Date();
         boolean readDate = false;
-        ImageInfoView view = null;
+        JHVJP2View view = null;
 
         try {
             view = loadImage(false, observatory, instrument, detector, measurement, formatter.format(date), message);
             if (view != null) {
-                MetaData metaData = view.getAdapter(MetaDataView.class).getMetaData();
+                MetaData metaData = view.getMetaData();
                 if (metaData instanceof HelioviewerMetaData) {
                     HelioviewerMetaData helioviewerMetaData = (HelioviewerMetaData) metaData;
                     date = helioviewerMetaData.getDateTime().getTime();
@@ -77,7 +76,7 @@ public class APIRequestManager {
                     Log.error(">> APIRequestManager.getLatestImageDate() > Could not find Helioviewer meta data in latest image. Use current date as initial end date.", new Exception());
                 }
                 if (view instanceof JHVJP2View) {
-                    ((JHVJP2View) view).abolish();
+                    view.abolish();
                 }
             } else {
                 Log.error(">> APIRequestManager.getLatestImageDate() > Could not load latest image. Use current date as initial end date.", new Exception());
@@ -118,7 +117,7 @@ public class APIRequestManager {
      * @throws MalformedURLException
      * @throws IOException
      */
-    public static ImageInfoView loadImage(boolean addToViewChain, String observatory, String instrument, String detector, String measurement, String startTime, boolean message) throws MalformedURLException, IOException {
+    public static JHVJP2View loadImage(boolean addToViewChain, String observatory, String instrument, String detector, String measurement, String startTime, boolean message) throws MalformedURLException, IOException {
         String fileRequest = Settings.getSingletonInstance().getProperty("API.jp2images.path") + "?action=getJP2Image&observatory=" + observatory + "&instrument=" + instrument + "&detector=" + detector + "&measurement=" + measurement + "&date=" + startTime + "&json=true";
         String jpipRequest = fileRequest + "&jpip=true";
 
@@ -234,7 +233,7 @@ public class APIRequestManager {
      * @return The ImageInfoView corresponding to the file whose location was
      *         returned by the server
      */
-    public static ImageInfoView requestData(boolean addToViewChain, URL jpipRequest, URI downloadUri, Interval<Date> range, boolean errorMessage) throws IOException {
+    public static JHVJP2View requestData(boolean addToViewChain, URL jpipRequest, URI downloadUri, Interval<Date> range, boolean errorMessage) throws IOException {
         try {
             DownloadStream ds = new DownloadStream(jpipRequest, JHVGlobals.getStdConnectTimeout(), JHVGlobals.getStdReadTimeout());
             APIResponse response = new APIResponse(new BufferedReader(new InputStreamReader(ds.getInput())));

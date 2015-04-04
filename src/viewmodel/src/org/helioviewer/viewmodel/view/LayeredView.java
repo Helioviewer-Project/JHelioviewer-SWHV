@@ -1,10 +1,6 @@
 package org.helioviewer.viewmodel.view;
 
-import java.util.ArrayList;
-
-import org.helioviewer.gl3d.model.image.GL3DImageLayer;
 import org.helioviewer.viewmodel.changeevent.ChangeEvent;
-import org.helioviewer.viewmodel.view.jp2view.JHVJP2View;
 
 /**
  * View to merged multiple Views.
@@ -30,21 +26,6 @@ import org.helioviewer.viewmodel.view.jp2view.JHVJP2View;
  */
 
 public class LayeredView extends AbstractView implements ViewListener {
-
-
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    @SuppressWarnings(value = { "unchecked" })
-    public <T extends View> T getAdapter(Class<T> c) {
-        if (c.isInstance(this)) {
-            return (T) this;
-        } else {
-            return null;
-        }
-    }
 
     /**
      * {@inheritDoc}

@@ -62,7 +62,7 @@ public class GL3DObserverCamera extends GL3DSolarRotationTrackingTrackballCamera
         double addl0 = 0.;
         double addb0 = 0.;
 
-        MetaDataView mdv = Displayer.getLayersModel().getActiveView().getAdapter(MetaDataView.class);
+        MetaDataView mdv = Displayer.getLayersModel().getActiveView();
         if (mdv != null) {
             MetaData metadata = mdv.getMetaData();
             if (metadata instanceof HelioviewerPositionedMetaData) {
