@@ -60,9 +60,8 @@ import org.helioviewer.jhv.io.JHVRequest;
 import org.helioviewer.viewmodel.metadata.ImageSizeMetaData;
 import org.helioviewer.viewmodel.view.ComponentView;
 import org.helioviewer.viewmodel.view.ImageInfoView;
-import org.helioviewer.viewmodel.view.MetaDataView;
-import org.helioviewer.viewmodel.view.MovieView;
-import org.helioviewer.viewmodel.view.View;
+import org.helioviewer.viewmodel.view.jp2view.JHVJP2View;
+import org.helioviewer.viewmodel.view.jp2view.JHVJPXView;
 import org.helioviewer.viewmodel.view.opengl.GL3DCameraView;
 import org.helioviewer.viewmodel.view.opengl.GL3DComponentView;
 import org.helioviewer.viewmodelplugin.filter.FilterTabPanelManager;
@@ -454,21 +453,21 @@ public class ImageViewerGui {
                         // view and try to find the
                         // view chain of the corresponding image info view
                         for (int i = 0; i < Displayer.getLayersModel().getNumLayers(); i++) {
-                            View subView = Displayer.getLayersModel().getLayer(i);
+                            JHVJP2View subView = Displayer.getLayersModel().getLayer(i);
 
                             // if view has been found
-                            if (imageInfoView.equals(subView.getAdapter(ImageInfoView.class))) {
+                            if (imageInfoView.equals(subView)) {
 
                                 // Set the correct image scale
-                                ImageSizeMetaData imageSizeMetaData = (ImageSizeMetaData) imageInfoView.getAdapter(MetaDataView.class).getMetaData();
+                                ImageSizeMetaData imageSizeMetaData = (ImageSizeMetaData) subView.getMetaData();
                                 ZoomController zoomController = new ZoomController();
                                 zoomController.zoom(ImageViewerGui.getSingletonInstance().getMainView(), imageSizeMetaData.getUnitsPerPixel() / (jhvRequest.imageScale * 1000.0));
 
                                 // Lock movie
                                 if (jhvRequest.linked) {
-                                    MovieView movieView = subView.getAdapter(MovieView.class);
-                                    if (movieView != null && movieView.getMaximumFrameNumber() > 0) {
-                                        MoviePanel moviePanel = MoviePanel.getMoviePanel(movieView);
+                                    if (subView != null && subView instanceof JHVJPXView && ((JHVJPXView) subView).getMaximumFrameNumber() > 0) {
+
+                                        MoviePanel moviePanel = MoviePanel.getMoviePanel((JHVJPXView) subView);
                                         if (moviePanel == null) {
                                             throw new InvalidViewException();
                                         }
@@ -507,11 +506,11 @@ public class ImageViewerGui {
                         // view and try to find the
                         // view chain of the corresponding image info view
                         for (int i = 0; i < Displayer.getLayersModel().getNumLayers(); i++) {
-                            View subView = Displayer.getLayersModel().getLayer(i);
+                            JHVJP2View subView = Displayer.getLayersModel().getLayer(i);
 
                             // if view has been found
-                            if (imageInfoView.equals(subView.getAdapter(ImageInfoView.class))) {
-                                MovieView movieView = subView.getAdapter(MovieView.class);
+                            if (imageInfoView.equals(subView) && subView instanceof JHVJPXView) {
+                                JHVJPXView movieView = (JHVJPXView) subView;
                                 MoviePanel moviePanel = MoviePanel.getMoviePanel(movieView);
                                 if (moviePanel == null) {
                                     throw new InvalidViewException();

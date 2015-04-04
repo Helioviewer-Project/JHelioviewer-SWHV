@@ -7,10 +7,8 @@ import org.helioviewer.base.math.Vector2dDouble;
 import org.helioviewer.base.physics.Constants;
 import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.viewmodel.region.Region;
-import org.helioviewer.viewmodel.view.RegionView;
-import org.helioviewer.viewmodel.view.View;
 import org.helioviewer.viewmodel.view.ViewHelper;
-import org.helioviewer.viewmodel.view.ViewportView;
+import org.helioviewer.viewmodel.view.jp2view.JHVJP2View;
 import org.helioviewer.viewmodel.viewport.Viewport;
 import org.helioviewer.viewmodel.viewportimagesize.ViewportImageSize;
 
@@ -39,15 +37,11 @@ public class GL3DPanInteraction extends GL3DDefaultInteraction {
         int x = e.getPoint().x - this.lastMousePoint.x;
         int y = e.getPoint().y - this.lastMousePoint.y;
 
-        View view = Displayer.getLayersModel().getActiveView();
+        JHVJP2View jp2view = Displayer.getLayersModel().getActiveView();
 
         Region region;
-        RegionView regionView = view.getAdapter(RegionView.class);
-
         Viewport viewport;
-        ViewportView viewportView = view.getAdapter(ViewportView.class);
-
-        if (regionView != null && (region = regionView.getRegion()) != null && viewportView != null && (viewport = viewportView.getViewport()) != null) {
+        if (jp2view != null && (region = jp2view.getRegion()) != null && (viewport = jp2view.getViewport()) != null) {
 
             ViewportImageSize vis = ViewHelper.calculateViewportImageSize(viewport, region);
             Vector2dDouble imageDisplacement = ViewHelper.convertScreenToImageDisplacement(x, y, region, vis);

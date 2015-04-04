@@ -182,10 +182,10 @@ public class GL3DComponentView extends AbstractComponentView implements GLEventL
     }
 
     private void exportFrame() {
-        View v;
+        JHVJP2View v;
         JHVJP2View mv;
 
-        if ((v = Displayer.getLayersModel().getActiveView()) == null || (mv = v.getAdapter(JHVJP2View.class)) == null) {
+        if ((v = Displayer.getLayersModel().getActiveView()) == null || (mv = v) == null) {
             stopExport();
             return;
         }

@@ -5,8 +5,6 @@ import java.awt.event.KeyEvent;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 
-import org.helioviewer.base.FileUtils;
-import org.helioviewer.jhv.gui.actions.CenterImageAction;
 import org.helioviewer.jhv.gui.actions.CheckUpdateAction;
 import org.helioviewer.jhv.gui.actions.ExitProgramAction;
 import org.helioviewer.jhv.gui.actions.OpenLocalFileAction;
@@ -65,7 +63,6 @@ public class MenuBar extends JMenuBar {
 
         JMenu viewMenu = new JMenu("View");
         viewMenu.setMnemonic(KeyEvent.VK_V);
-        viewMenu.add(new CenterImageAction());
         viewMenu.add(new ToggleFullscreenAction());
         viewMenu.addSeparator();
         viewMenu.add(new ZoomInAction(true));

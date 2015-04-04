@@ -39,6 +39,7 @@ import org.helioviewer.plugins.eveplugin.view.linedataselector.LineDataSelectorM
 import org.helioviewer.plugins.eveplugin.view.linedataselector.LineDataSelectorModelListener;
 import org.helioviewer.plugins.eveplugin.view.linedataselector.LineDataSelectorPanel;
 import org.helioviewer.viewmodel.view.View;
+import org.helioviewer.viewmodel.view.jp2view.JHVJP2View;
 import org.helioviewer.viewmodel.view.jp2view.JHVJPXView;
 
 /**
@@ -173,9 +174,9 @@ public class ControlsPanel extends JPanel implements ActionListener, LayersListe
     }
 
     private void setDateRange() {
-        View activeView = Displayer.getLayersModel().getActiveView();
-        JHVJPXView jpxView = activeView.getAdapter(JHVJPXView.class);
-        if (jpxView != null) {
+        JHVJP2View activeView = Displayer.getLayersModel().getActiveView();
+        if (activeView instanceof JHVJPXView) {
+            JHVJPXView jpxView = (JHVJPXView) activeView;
             Date start, end;
             Interval<Date> range = jpxView.getDateRange();
             if (range != null && (start = range.getStart()) != null && (end = range.getEnd()) != null) {
