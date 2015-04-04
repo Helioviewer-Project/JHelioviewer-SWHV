@@ -11,32 +11,6 @@ package org.helioviewer.viewmodel.view;
  * @author Markus Langenberg
  *
  */
-public abstract class AbstractBasicView extends AbstractView implements ModifiableInnerViewView, ViewListener {
-
-    protected View view;
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public View getView() {
-        return view;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void setView(View newView) {
-        if (view != null) {
-            view.removeViewListener(this);
-        }
-
-        view = newView;
-
-        if (view != null) {
-            view.addViewListener(this);
-        }
-    }
+public abstract class AbstractBasicView extends AbstractView implements ViewListener {
 
 }

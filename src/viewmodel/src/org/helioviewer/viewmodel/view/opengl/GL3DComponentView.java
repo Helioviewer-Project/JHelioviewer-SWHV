@@ -98,7 +98,7 @@ public class GL3DComponentView extends AbstractComponentView implements GLEventL
     public void reshape(GLAutoDrawable drawable, int x, int y, int width, int height) {
     }
 
-    private static void displayBody(GL2 gl, View v, int width, int height) {
+    private static void displayBody(GL2 gl, int width, int height) {
         GL3DState state = GL3DState.get();
         GL3DCamera camera = ImageViewerGui.getSingletonInstance().getCameraView().getCurrentCamera();
         state.setActiveChamera(camera);
@@ -130,7 +130,7 @@ public class GL3DComponentView extends AbstractComponentView implements GLEventL
         gl.glClear(GL2.GL_COLOR_BUFFER_BIT | GL2.GL_DEPTH_BUFFER_BIT);
 
         gl.glPushMatrix();
-        displayBody(gl, view, width, height);
+        displayBody(gl, width, height);
         gl.glPopMatrix();
 
         if (!postRenderers.isEmpty()) {
