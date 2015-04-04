@@ -13,7 +13,6 @@ import org.helioviewer.gl3d.camera.GL3DFollowObjectCamera;
 import org.helioviewer.gl3d.camera.GL3DObserverCamera;
 import org.helioviewer.gl3d.camera.GL3DSolarRotationTrackingTrackballCamera;
 import org.helioviewer.jhv.gui.ImageViewerGui;
-import org.helioviewer.viewmodel.view.ComponentView;
 import org.helioviewer.viewmodel.view.opengl.GL3DCameraView;
 
 /**
@@ -83,10 +82,7 @@ public class GL3DCameraSelectorModel extends AbstractListModel implements ComboB
     }
 
     public GL3DCamera getCurrentCamera() {
-        GL3DCameraView cameraView = getCameraView();
-        if (cameraView != null)
-            return cameraView.getCurrentCamera();
-        return null;
+        return ImageViewerGui.getSingletonInstance().getCameraView().getCurrentCamera();
     }
 
     @Override
@@ -101,7 +97,7 @@ public class GL3DCameraSelectorModel extends AbstractListModel implements ComboB
 
     @Override
     public GL3DCamera getSelectedItem() {
-        GL3DCameraView cameraView = getCameraView();
+        GL3DCameraView cameraView = ImageViewerGui.getSingletonInstance().getCameraView();
         if (cameraView != null) {
             return cameraView.getCurrentCamera();
         }
@@ -109,7 +105,7 @@ public class GL3DCameraSelectorModel extends AbstractListModel implements ComboB
     }
 
     public void setCurrentCamera(GL3DCamera camera) {
-        GL3DCameraView cameraView = getCameraView();
+        GL3DCameraView cameraView = ImageViewerGui.getSingletonInstance().getCameraView();
         if (cameraView != null) {
             lastCamera = camera;
             cameraView.setCurrentCamera(camera);
@@ -123,19 +119,6 @@ public class GL3DCameraSelectorModel extends AbstractListModel implements ComboB
         } else {
             throw new IllegalArgumentException("Cannot set Selected Camera to an object of Type other than " + GL3DCamera.class + ". Given Object is " + anItem);
         }
-    }
-
-    private GL3DCameraView getCameraView() {
-        ImageViewerGui imageViewer = ImageViewerGui.getSingletonInstance();
-        if (imageViewer == null)
-            return null;
-
-        ComponentView mainView = imageViewer.getMainView();
-        if (mainView != null) {
-            return mainView.getAdapter(GL3DCameraView.class);
-        }
-
-        return null;
     }
 
     public GL3DObserverCamera getObserverCamera() {
