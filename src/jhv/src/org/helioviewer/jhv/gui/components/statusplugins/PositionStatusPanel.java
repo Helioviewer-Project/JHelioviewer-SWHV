@@ -169,7 +169,7 @@ public class PositionStatusPanel extends ViewStatusPanelPlugin implements MouseM
      */
     @Override
     public void activeLayerChanged(JHVJP2View view) {
-        if (view instanceof JHVJP2View) {
+        if (view != null) {
             jp2View = view;
             setVisible(true);
         } else {
