@@ -6,18 +6,20 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
+import org.helioviewer.gl3d.gui.GL3DCameraMouseController;
+
 /**
  * This singleton receives all KeyEvents by the
  * {@link GL3DCameraMouseController}. Register a GL3DKeyListener to be informed
  * about KeyEvents.
- * 
+ *
  * @author Simon Spoerri (simon.spoerri@fhnw.ch)
- * 
+ *
  */
 public class GL3DKeyController extends KeyAdapter {
     private static final GL3DKeyController instance = new GL3DKeyController();
 
-    private HashMap<Integer, List<GL3DKeyListener>> listenerMap = new HashMap<Integer, List<GL3DKeyListener>>();
+    private final HashMap<Integer, List<GL3DKeyListener>> listenerMap = new HashMap<Integer, List<GL3DKeyListener>>();
 
     private GL3DKeyController() {
     }
@@ -26,6 +28,7 @@ public class GL3DKeyController extends KeyAdapter {
         return instance;
     }
 
+    @Override
     public void keyPressed(KeyEvent e) {
         // Log.debug("GL3DKeyController: KeyTyped: "+e.getKeyChar()+", "+e.getKeyCode());
         if (listenerMap.containsKey(e.getKeyCode())) {
@@ -39,7 +42,7 @@ public class GL3DKeyController extends KeyAdapter {
 
     /**
      * Use the java.awt.event.KeyEvent constants as Keys
-     * 
+     *
      * @param listener
      * @param key
      */

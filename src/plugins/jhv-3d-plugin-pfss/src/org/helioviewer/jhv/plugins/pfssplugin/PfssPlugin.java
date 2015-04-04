@@ -6,6 +6,7 @@ import java.net.URL;
 
 import org.helioviewer.gl3d.plugin.pfss.PfssRenderable;
 import org.helioviewer.gl3d.plugin.pfss.data.PfssCache;
+import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.viewmodelplugin.interfaces.Plugin;
 import org.helioviewer.viewmodelplugin.overlay.OverlayPlugin;
 
@@ -16,6 +17,7 @@ public class PfssPlugin extends OverlayPlugin implements Plugin {
 
     private boolean builtin_mode = false;
     private PfssCache pfssCache;
+    private PfssRenderable renderable;
 
     /**
      * Default constructor.
@@ -50,7 +52,14 @@ public class PfssPlugin extends OverlayPlugin implements Plugin {
     @Override
     public void installPlugin() {
         pfssCache = new PfssCache();
-        new PfssRenderable(pfssCache);
+        renderable = new PfssRenderable(pfssCache);
+    }
+
+    @Override
+    public void uninstallPlugin() {
+        super.uninstallPlugin();
+        Displayer.getSingletonInstance().getRenderablecontainer().removeRenderable(renderable);
+        pfssCache = null;
     }
 
     /**

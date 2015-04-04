@@ -48,9 +48,6 @@ public class PfssCache {
     }
 
     public PfssData getData(long timestamp) {
-        for (int i = 0; i < numberOfElementsInCache; i++) {
-            System.out.println(data[i].getTime());
-        }
         if (numberOfElementsInCache <= 0)
             return null;
         int found = binarySearch(timestamp);
@@ -78,14 +75,14 @@ public class PfssCache {
 
         while (low <= high) {
             int mid = (low + high) >>> 1;
-            long midVal = data[mid].getTime();
+                    long midVal = data[mid].getTime();
 
-            if (midVal < timestamp)
-                low = mid + 1;
-            else if (midVal > timestamp)
-                high = mid - 1;
-            else
-                return mid;
+                    if (midVal < timestamp)
+                        low = mid + 1;
+                    else if (midVal > timestamp)
+                        high = mid - 1;
+                    else
+                        return mid;
         }
         return -(low + 1);
     }
