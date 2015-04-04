@@ -1,5 +1,7 @@
 package org.helioviewer.viewmodel.view;
 
+import javax.swing.event.ChangeEvent;
+
 /**
  * Abstract base class implementing ModifiableInnerViewView and ViewListener,
  * providing common functions for most views.
@@ -39,33 +41,6 @@ public abstract class AbstractBasicView extends AbstractView implements Modifiab
         }
     }
 
-    /**
-<<<<<<< HEAD
-     * {@inheritDoc}
-     */
-    @SuppressWarnings("unchecked")
-    public final <T extends View> T getAdapter(Class<T> c) {
-        if (c.isInstance(this))
-            return (T) this;
-        else if (view != null)
-            return view.getAdapter(c);
-        else
-            return null;
-    }
-=======
-     * Performs the view specific tasks necessary during setView.
-     *
-     * This function is called from within setView and should contain only
-     * implementation specific tasks such as precomputing adapters and
-     * reapplying image operations.
-     *
-     * @param newView
-     *            The new direct successor of this view
-     * @param changeEvent
-     *            ChangeEvent that will be fired by setView. Additional reasons
-     *            may be added.
-     */
     protected abstract void setViewSpecificImplementation(View newView, ChangeEvent changeEvent);
->>>>>>> Nuke getAdapter
 
 }
