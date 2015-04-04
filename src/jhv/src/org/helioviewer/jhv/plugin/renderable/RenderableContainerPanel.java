@@ -8,9 +8,14 @@ import java.awt.FlowLayout;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Point;
+import java.awt.event.ActionEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.text.ParseException;
+import java.util.Date;
 
+import javax.swing.AbstractAction;
+import javax.swing.Action;
 import javax.swing.BorderFactory;
 import javax.swing.DropMode;
 import javax.swing.JButton;
@@ -21,10 +26,17 @@ import javax.swing.ListSelectionModel;
 import javax.swing.border.Border;
 import javax.swing.border.MatteBorder;
 
+import org.helioviewer.base.logging.Log;
 import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.gui.IconBank;
 import org.helioviewer.jhv.gui.IconBank.JHVIcon;
 import org.helioviewer.jhv.gui.ImageViewerGui;
+import org.helioviewer.jhv.gui.dialogs.model.ObservationDialogDateModel;
+import org.helioviewer.jhv.gui.dialogs.observation.ImageDataPanel;
+import org.helioviewer.jhv.layers.LayersModel;
+import org.helioviewer.viewmodel.view.jp2view.JHVJP2View;
+import org.helioviewer.viewmodel.view.jp2view.JHVJPXView;
+import org.helioviewer.viewmodel.view.jp2view.datetime.ImmutableDateTime;
 
 public class RenderableContainerPanel extends JPanel {
     static final Border commonBorder = new MatteBorder(0, 0, 1, 0, Color.LIGHT_GRAY);
@@ -40,6 +52,56 @@ public class RenderableContainerPanel extends JPanel {
     private static final int REMOVEROW = 3;
     public static final int NUMBEROFCOLUMNS = 4;
 
+    private final Action addLayerAction = new AbstractAction("Add layer", IconBank.getIcon(JHVIcon.ADD)) {
+        /**
+         *
+         */
+        private static final long serialVersionUID = 1L;
+        {
+            putValue(SHORT_DESCRIPTION, "Add a new layer");
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public void actionPerformed(ActionEvent arg0) {
+            // Check the dates if possible
+            JHVJP2View activeView = LayersModel.getSingletonInstance().getActiveView();
+
+            if (activeView instanceof JHVJPXView) {
+                JHVJPXView jpxView = (JHVJPXView) activeView;
+                if (jpxView.getMaximumAccessibleFrameNumber() == jpxView.getMaximumFrameNumber()) {
+                    ImmutableDateTime start = LayersModel.getSingletonInstance().getStartDate(activeView);
+                    ImmutableDateTime end = LayersModel.getSingletonInstance().getEndDate(activeView);
+                    if (start != null && end != null) {
+                        try {
+                            Date startDate = start.getTime();
+                            Date endDate = end.getTime();
+                            Date obsStartDate = ImageDataPanel.apiDateFormat.parse(ImageViewerGui.getSingletonInstance().getObservationImagePane().getStartTime());
+                            Date obsEndDate = ImageDataPanel.apiDateFormat.parse(ImageViewerGui.getSingletonInstance().getObservationImagePane().getEndTime());
+                            // only updates if its really necessary with a
+                            // tolerance of an hour
+                            final int tolerance = 60 * 60 * 1000;
+                            if (Math.abs(startDate.getTime() - obsStartDate.getTime()) > tolerance || Math.abs(endDate.getTime() - obsEndDate.getTime()) > tolerance) {
+                                if (ObservationDialogDateModel.getInstance().getStartDate() == null || !ObservationDialogDateModel.getInstance().isStartDateSetByUser()) {
+                                    ObservationDialogDateModel.getInstance().setStartDate(startDate, false);
+                                }
+                                if (ObservationDialogDateModel.getInstance().getEndDate() == null || !ObservationDialogDateModel.getInstance().isEndDateSetByUser()) {
+                                    ObservationDialogDateModel.getInstance().setEndDate(endDate, false);
+                                }
+                            }
+                        } catch (ParseException e) {
+                            // Should not happen
+                            Log.error("Cannot update observation dialog", e);
+                        }
+                    }
+                }
+            }
+            // Show dialog
+            ImageViewerGui.getSingletonInstance().getObservationDialog().showDialog();
+        }
+    };
     public final JTable grid;
     private Component optionsPanel = new JPanel();
     GridBagConstraints gc = new GridBagConstraints();
@@ -143,7 +205,7 @@ public class RenderableContainerPanel extends JPanel {
         optionsPanelWrapper.setBorder(BorderFactory.createTitledBorder("Options"));
         optionsPanelWrapper.add(optionsPanel);
         JPanel addLayerButtonWrapper = new JPanel(new FlowLayout(FlowLayout.RIGHT, 0, 0));
-        JButton addLayerButton = new JButton(ImageViewerGui.getSingletonInstance().getImageSelectorPanel().addLayerAction);
+        JButton addLayerButton = new JButton(addLayerAction);
         addLayerButton.setText("");
         addLayerButton.setToolTipText("Click to add extra layers");
         addLayerButton.setIcon(IconBank.getIcon(JHVIcon.ADD));
