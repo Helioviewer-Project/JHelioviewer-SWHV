@@ -49,7 +49,6 @@ import org.helioviewer.jhv.gui.filters.OpacityPanel;
 import org.helioviewer.jhv.gui.filters.RunningDifferencePanel;
 import org.helioviewer.jhv.gui.filters.SOHOLUTPanel;
 import org.helioviewer.jhv.gui.filters.SharpenPanel;
-import org.helioviewer.jhv.gui.states.GuiState;
 import org.helioviewer.jhv.gui.states.State;
 import org.helioviewer.jhv.gui.states.StateController;
 import org.helioviewer.jhv.gui.states.StateController.StateChangeListener;
@@ -65,6 +64,8 @@ import org.helioviewer.viewmodel.view.LayeredView;
 import org.helioviewer.viewmodel.view.MetaDataView;
 import org.helioviewer.viewmodel.view.MovieView;
 import org.helioviewer.viewmodel.view.View;
+import org.helioviewer.viewmodel.view.opengl.GL3DCameraView;
+import org.helioviewer.viewmodel.view.opengl.GL3DComponentView;
 import org.helioviewer.viewmodelplugin.filter.FilterTabPanelManager;
 
 /**
@@ -109,6 +110,10 @@ public class ImageViewerGui {
     private ComponentView mainComponentView;
 
     private FilterTabPanelManager filterTabPanelManager;
+
+    private LayeredView layeredView;
+
+    private GL3DCameraView cameraView;
 
     /**
      * The private constructor that creates and positions all the gui
@@ -219,7 +224,15 @@ public class ImageViewerGui {
      */
     public void createViewchains() {
         State newState = StateController.getInstance().getCurrentState();
-        mainComponentView = GuiState.viewchainFactory.createNewViewchainMain();
+        layeredView = new LayeredView();
+
+        cameraView = new GL3DCameraView();
+        //getCameraView().setView(layeredView);
+
+        //ComponentView componentView = viewFactory.createNewView(ComponentView.class);
+        mainComponentView = new GL3DComponentView();
+        mainComponentView.setView(getCameraView());
+
         GL3DCameraSelectorModel.getInstance().activate();
 
         // prepare gui again
@@ -449,7 +462,6 @@ public class ImageViewerGui {
                     ImageInfoView imageInfoView = APIRequestManager.requestAndOpenRemoteFile(true, jhvRequest.cadence, jhvRequest.startTime, jhvRequest.endTime, jhvRequest.imageLayers[layer].observatory, jhvRequest.imageLayers[layer].instrument, jhvRequest.imageLayers[layer].detector, jhvRequest.imageLayers[layer].measurement, true);
                     if (imageInfoView != null && getMainView() != null) {
                         // get the layered view
-                        LayeredView layeredView = getMainView().getAdapter(LayeredView.class);
 
                         // go through all sub view chains of the layered
                         // view and try to find the
@@ -503,8 +515,6 @@ public class ImageViewerGui {
                 try {
                     ImageInfoView imageInfoView = APIRequestManager.newLoad(jpxUrl, true, null);
                     if (imageInfoView != null && getMainView() != null) {
-                        // get the layered view
-                        LayeredView layeredView = getMainView().getAdapter(LayeredView.class);
 
                         // go through all sub view chains of the layered
                         // view and try to find the
@@ -627,6 +637,14 @@ public class ImageViewerGui {
 
     public FilterTabPanelManager getFilterTabPanelManager() {
         return filterTabPanelManager;
+    }
+
+    public GL3DCameraView getCameraView() {
+        return cameraView;
+    }
+
+    public LayeredView getLayeredView() {
+        return layeredView;
     }
 
 }

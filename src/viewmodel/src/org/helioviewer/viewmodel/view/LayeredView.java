@@ -7,7 +7,6 @@ import javax.media.opengl.GL2;
 
 import org.helioviewer.gl3d.model.image.GL3DImageLayer;
 import org.helioviewer.gl3d.scenegraph.GL3DState;
-import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.layers.LayerDescriptor;
 import org.helioviewer.viewmodel.changeevent.ChangeEvent;
 import org.helioviewer.viewmodel.view.jp2view.JHVJP2View;
@@ -42,8 +41,8 @@ public class LayeredView extends AbstractView implements ViewListener, GL3DView 
 
     private final LinkedMovieManager movieManager = LinkedMovieManager.getSingletonInstance();
 
-    private ArrayList<JHVJP2View> layers = new ArrayList<JHVJP2View>();
-    private HashMap<JHVJP2View, Layer> jp2viewLookup = new HashMap<JHVJP2View, Layer>();
+    private final ArrayList<JHVJP2View> layers = new ArrayList<JHVJP2View>();
+    private final HashMap<JHVJP2View, Layer> jp2viewLookup = new HashMap<JHVJP2View, Layer>();
 
     private class Layer {
         public LayerDescriptor ld = new LayerDescriptor();
@@ -270,24 +269,6 @@ public class LayeredView extends AbstractView implements ViewListener, GL3DView 
 
     @Override
     public void render3D(GL3DState state) {
-        GL2 gl = state.gl;
-
-        gl.glBlendFunc(GL2.GL_SRC_ALPHA, GL2.GL_ONE_MINUS_SRC_ALPHA);
-        gl.glBlendEquation(GL2.GL_FUNC_ADD);
-
-        gl.glDisable(GL2.GL_BLEND);
-        gl.glEnable(GL2.GL_DEPTH_TEST);
-
-        state.pushMV();
-        state.getActiveCamera().applyPerspective(state);
-        state.getActiveCamera().applyCamera(state);
-        Displayer.getRenderablecontainer().render(state);
-        state.getActiveCamera().drawCamera(state);
-        state.getActiveCamera().resumePerspective(state);
-
-        state.popMV();
-
-        gl.glEnable(GL2.GL_BLEND);
     }
 
     @Override
