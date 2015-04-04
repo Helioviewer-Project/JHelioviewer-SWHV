@@ -6,7 +6,7 @@ import java.util.LinkedList;
 import org.helioviewer.jhv.gui.dialogs.ExportMovieDialog;
 import org.helioviewer.viewmodel.renderer.screen.ScreenRenderer;
 
-public abstract class AbstractComponentView extends AbstractBasicView implements ComponentView {
+public abstract class AbstractComponentView extends AbstractView implements ComponentView {
 
     protected AbstractList<ScreenRenderer> postRenderers = new LinkedList<ScreenRenderer>();
 
