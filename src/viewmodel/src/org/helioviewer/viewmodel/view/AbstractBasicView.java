@@ -1,8 +1,5 @@
 package org.helioviewer.viewmodel.view;
 
-import org.helioviewer.viewmodel.changeevent.ChangeEvent;
-import org.helioviewer.viewmodel.changeevent.ViewChainChangedReason;
-
 /**
  * Abstract base class implementing ModifiableInnerViewView and ViewListener,
  * providing common functions for most views.
@@ -28,8 +25,6 @@ public abstract class AbstractBasicView extends AbstractView implements Modifiab
     /**
      * {@inheritDoc}
      * 
-     * {@link #setViewSpecificImplementation(View, ChangeEvent)} is called
-     * during this function.
      */
     public void setView(View newView) {
         if (view != null) {
@@ -38,29 +33,10 @@ public abstract class AbstractBasicView extends AbstractView implements Modifiab
 
         view = newView;
 
-        ChangeEvent changeEvent = new ChangeEvent(new ViewChainChangedReason(this));
-        setViewSpecificImplementation(newView, changeEvent);
-        notifyViewListeners(changeEvent);
-
         if (view != null) {
             view.addViewListener(this);
         }
     }
-
-    /**
-     * Performs the view specific tasks necessary during setView.
-     * 
-     * This function is called from within setView and should contain only
-     * implementation specific tasks such as precomputing adapters and
-     * reapplying image operations.
-     * 
-     * @param newView
-     *            The new direct successor of this view
-     * @param changeEvent
-     *            ChangeEvent that will be fired by setView. Additional reasons
-     *            may be added.
-     */
-    protected abstract void setViewSpecificImplementation(View newView, ChangeEvent changeEvent);
 
     /**
      * {@inheritDoc}

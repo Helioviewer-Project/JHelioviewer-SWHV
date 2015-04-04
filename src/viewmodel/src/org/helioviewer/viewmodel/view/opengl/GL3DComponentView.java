@@ -278,8 +278,4 @@ public class GL3DComponentView extends AbstractComponentView implements GLEventL
         canvas = (GLCanvas) component;
     }
 
-    @Override
-    protected void setViewSpecificImplementation(View newView, ChangeEvent changeEvent) {
-    }
-
 }
