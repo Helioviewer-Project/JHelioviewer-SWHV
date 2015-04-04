@@ -24,8 +24,6 @@ import org.helioviewer.jhv.gui.dialogs.ExportMovieDialog;
 import org.helioviewer.jhv.layers.LayersModel;
 import org.helioviewer.viewmodel.changeevent.ChangeEvent;
 import org.helioviewer.viewmodel.changeevent.SubImageDataChangedReason;
-import org.helioviewer.viewmodel.renderer.screen.GLScreenRenderGraphics;
-import org.helioviewer.viewmodel.renderer.screen.ScreenRenderer;
 import org.helioviewer.viewmodel.view.AbstractComponentView;
 import org.helioviewer.viewmodel.view.ComponentView;
 import org.helioviewer.viewmodel.view.View;
@@ -154,10 +152,10 @@ public class GL3DComponentView extends AbstractComponentView implements GLEventL
             gl.glColor4f(1, 1, 1, 0);
             gl.glEnable(GL2.GL_TEXTURE_2D);
 
-            GLScreenRenderGraphics glRenderer = new GLScreenRenderGraphics(gl);
-            for (ScreenRenderer r : postRenderers) {
-                r.render(glRenderer);
-            }
+            //GLScreenRenderGraphics glRenderer = new GLScreenRenderGraphics(gl);
+            //for (ScreenRenderer r : postRenderers) {
+            //    r.render(glRenderer);
+            //}
             gl.glPopMatrix();
         }
 
