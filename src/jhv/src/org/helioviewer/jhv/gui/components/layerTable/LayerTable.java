@@ -64,7 +64,6 @@ public class LayerTable extends JTable {
                 int index = row;
 
                 if (col == COLUMN_VISIBILITY) {
-                    layersModel.toggleVisibility(index);
                 } else if (col == COLUMN_BUTTON_REMOVE) {
                     layersModel.removeLayer(index);
                 }

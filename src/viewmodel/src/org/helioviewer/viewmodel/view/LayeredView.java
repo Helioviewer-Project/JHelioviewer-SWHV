@@ -106,24 +106,6 @@ public class LayeredView extends AbstractView implements ViewListener {
     }
 
     /**
-     * Toggles the visibility if the given view.
-     *
-     * If the given view is not a direct child of the LayeredView, nothing
-     * happens.
-     *
-     * @param view
-     *            View to toggle visibility
-     * @see #isVisible
-     */
-    public void toggleVisibility(JHVJP2View view) {
-        Layer layer = jp2viewLookup.get(view);
-        if (layer != null) {
-            movieManager.pauseLinkedMovies();
-            layer.ld.isVisible = !layer.ld.isVisible;
-        }
-    }
-
-    /**
      * Adds a view as a new layer to the LayeredView.
      *
      * The new layer is inserted on top of the current stack, thus will be drawn
