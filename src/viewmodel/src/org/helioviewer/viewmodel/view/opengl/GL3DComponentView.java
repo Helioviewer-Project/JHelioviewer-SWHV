@@ -104,7 +104,6 @@ public class GL3DComponentView extends AbstractComponentView implements GLEventL
         GL3DState state = GL3DState.get();
         gl.glClear(GL2.GL_COLOR_BUFFER_BIT | GL2.GL_DEPTH_BUFFER_BIT);
         ImageViewerGui.getSingletonInstance().getCameraView().render3D(state);
-        ImageViewerGui.getSingletonInstance().getLayeredView().render3D(state);
         gl.glBlendFunc(GL2.GL_SRC_ALPHA, GL2.GL_ONE_MINUS_SRC_ALPHA);
         gl.glBlendEquation(GL2.GL_FUNC_ADD);
 
