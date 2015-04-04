@@ -1,6 +1,5 @@
 package org.helioviewer.jhv.gui.states;
 
-import org.helioviewer.jhv.gui.GL3DViewchainFactory;
 import org.helioviewer.jhv.gui.interfaces.ImagePanelInputController;
 
 /**
@@ -10,14 +9,6 @@ import org.helioviewer.jhv.gui.interfaces.ImagePanelInputController;
  *
  */
 public interface State {
-
-    /**
-     * The ViewchainFactory is dependent on the state, as a different Viewchain
-     * is required for 3D and 2D Modes.
-     *
-     * @return viewchainFactory to use
-     */
-    public GL3DViewchainFactory getViewchainFactory();
 
     /**
      * To get the type of the state

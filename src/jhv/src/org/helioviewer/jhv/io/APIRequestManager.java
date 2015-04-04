@@ -20,9 +20,7 @@ import org.helioviewer.base.math.Interval;
 import org.helioviewer.base.message.Message;
 import org.helioviewer.jhv.JHVGlobals;
 import org.helioviewer.jhv.Settings;
-import org.helioviewer.jhv.gui.GL3DViewchainFactory;
-import org.helioviewer.jhv.gui.ImageViewerGui;
-import org.helioviewer.jhv.gui.states.StateController;
+import org.helioviewer.jhv.layers.LayersModel;
 import org.helioviewer.viewmodel.io.APIResponse;
 import org.helioviewer.viewmodel.io.APIResponseDump;
 import org.helioviewer.viewmodel.metadata.HelioviewerMetaData;
@@ -355,8 +353,7 @@ public class APIRequestManager {
 
             @Override
             public void run() {
-                GL3DViewchainFactory factory = StateController.getInstance().getCurrentState().getViewchainFactory();
-                factory.addLayerToViewchainMain(theView);
+                LayersModel.getSingletonInstance().addLayer(theView);
             }
 
             public Runnable init(JHVJP2View theView) {

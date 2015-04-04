@@ -1,12 +1,9 @@
 package org.helioviewer.jhv.gui;
 
-import org.helioviewer.jhv.layers.LayersModel;
 import org.helioviewer.viewmodel.factory.GL3DViewFactory;
 import org.helioviewer.viewmodel.factory.ViewFactory;
 import org.helioviewer.viewmodel.view.ComponentView;
-import org.helioviewer.viewmodel.view.LayeredView;
 import org.helioviewer.viewmodel.view.jp2view.JHVJP2View;
-import org.helioviewer.viewmodel.view.opengl.GL3DCameraView;
 import org.helioviewer.viewmodel.view.opengl.GL3DComponentView;
 
 public class GL3DViewchainFactory {
@@ -68,27 +65,12 @@ public class GL3DViewchainFactory {
         if (newLayer == null)
             return;
 
-        LayersModel.getSingletonInstance().addLayer(newLayer);
-
     }
 
-    /**
-     * Creates a new main view chain with the minimal needed views.
-     *
-     * @return a instance of a ComponentView which is the topmost view of the
-     *         new chain.
-     */
-
     protected ComponentView createNewViewchainMain() {
-        ViewFactory viewFactory = getUsedViewFactory();
-
-        LayeredView layeredView = viewFactory.createNewView(LayeredView.class);
-
-        GL3DCameraView cameraView = viewFactory.createNewView(GL3DCameraView.class);
-        cameraView.setView(layeredView);
 
         ComponentView componentView = viewFactory.createNewView(ComponentView.class);
-        componentView.setView(cameraView);
+        //componentView.setView(cameraView);
 
         return componentView;
     }
