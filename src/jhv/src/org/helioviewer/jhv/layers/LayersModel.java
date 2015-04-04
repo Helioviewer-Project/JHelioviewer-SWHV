@@ -38,13 +38,8 @@ import org.helioviewer.viewmodel.view.jp2view.datetime.ImmutableDateTime;
  */
 public class LayersModel {
 
-    private static final LayersModel layersModel = new LayersModel();
-
     private int activeLayer = -1;
     private final ArrayList<LayersListener> layerListeners = new ArrayList<LayersListener>();
-
-    public LayersModel() {
-    }
 
     /**
      * Return the view associated with the active Layer
