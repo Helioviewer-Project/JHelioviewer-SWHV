@@ -327,32 +327,6 @@ public class LayersModel extends AbstractTableModel {
     }
 
     /**
-     * Change the visibility of the layer in question, and automatically
-     * (un)link + play/pause the layer
-     *
-     * @param view
-     *            - View that can be associated with the layer in question
-     */
-    public void toggleVisibility(JHVJP2View view) {
-        layeredView.toggleVisibility(view);
-
-        ImageViewerGui.getSingletonInstance().getMoviePanelContainer().layerVisibilityChanged(view);
-        int idx = findView(view);
-        fireTableRowsUpdated(idx, idx);
-
-        boolean visible = layeredView.isVisible(view);
-        setLink(view, visible);
-
-        if (!visible && view instanceof JHVJPXView) {
-            ((JHVJPXView) view).pauseMovie();
-        }
-    }
-
-    public void toggleVisibility(int idx) {
-        toggleVisibility(getLayer(idx));
-    }
-
-    /**
      * Get the visibility of the layer in question
      *
      * @param view
