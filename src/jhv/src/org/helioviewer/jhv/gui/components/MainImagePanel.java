@@ -99,8 +99,7 @@ public class MainImagePanel extends BasicImagePanel implements LayersListener {
                 removePostRenderer(loadingPostRenderer);
                 loadingPostRenderer.stopAnimation();
 
-                LayeredView layeredView = ImageViewerGui.getSingletonInstance().getLayeredView();
-                if (layeredView.getNumberOfVisibleLayer() == 0) {
+                if (Displayer.getRenderablecontainer().countImageLayers() == 0) {
                     addPostRenderer(noImagePostRenderer);
                     noImagePostRendererSet = true;
                 }

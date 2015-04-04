@@ -1,14 +1,10 @@
 package org.helioviewer.viewmodel.view;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 
 import org.helioviewer.gl3d.model.image.GL3DImageLayer;
-import org.helioviewer.jhv.layers.LayerDescriptor;
 import org.helioviewer.viewmodel.changeevent.ChangeEvent;
 import org.helioviewer.viewmodel.view.jp2view.JHVJP2View;
-import org.helioviewer.viewmodel.view.jp2view.JHVJPXView;
-import org.helioviewer.viewmodel.view.jp2view.datetime.ImmutableDateTime;
 
 /**
  * View to merged multiple Views.
@@ -38,72 +34,6 @@ public class LayeredView extends AbstractView implements ViewListener {
     private final LinkedMovieManager movieManager = LinkedMovieManager.getSingletonInstance();
 
     private final ArrayList<JHVJP2View> layers = new ArrayList<JHVJP2View>();
-    private final HashMap<JHVJP2View, Layer> jp2viewLookup = new HashMap<JHVJP2View, Layer>();
-
-    private class Layer {
-        public LayerDescriptor ld = new LayerDescriptor();
-
-        public Layer(JHVJP2View view, String name) {
-            ImmutableDateTime dt = view.getMetaData().getDateTime();
-
-            ld.isMovie = view instanceof JHVJPXView;
-            ld.isMaster = ld.isMovie ? movieManager.isMaster((JHVJPXView) view) : false;
-            ld.isVisible = true;
-            ld.isTimed = dt != null;
-            ld.title = name;
-            ld.timestamp = ld.isTimed ? dt.getCachedDate() : "N/A";
-        }
-    }
-
-    public LayerDescriptor getLayerDescriptor(JHVJP2View view) {
-        Layer layer = jp2viewLookup.get(view);
-        if (layer != null) {
-            LayerDescriptor ld = layer.ld;
-            ld.isMaster = ld.isMovie ? movieManager.isMaster((JHVJPXView) view) : false;
-            ld.timestamp = ld.isTimed ? view.getMetaData().getDateTime().getCachedDate() : "N/A";
-            return ld;
-        }
-        return null;
-    }
-
-    /**
-     * Returns whether the given view is visible.
-     *
-     * If the given view is not a direct child of the LayeredView, returns false
-     * in any case.
-     *
-     * @param view
-     *            View to test for visibility
-     * @return True if the view is visible
-     * @see #toggleVisibility
-     */
-    public boolean isVisible(JHVJP2View view) {
-        Layer layer = jp2viewLookup.get(view);
-        if (layer != null)
-            return layer.ld.isVisible;
-        else
-            return false;
-    }
-
-    /**
-     * Returns number of layers currently visible.
-     *
-     * This number is lesser or equal to the number of total layers currently
-     * connected to the LayeredView.
-     *
-     * @return Number of visible layers
-     * @see #getNumLayers
-     */
-    public int getNumberOfVisibleLayer() {
-        int result = 0;
-        for (Layer layer : jp2viewLookup.values()) {
-            if (layer.ld.isVisible) {
-                result++;
-            }
-        }
-
-        return result;
-    }
 
     /**
      * Adds a view as a new layer to the LayeredView.
@@ -137,7 +67,6 @@ public class LayeredView extends AbstractView implements ViewListener {
         GL3DImageLayer imageLayer = new GL3DImageLayer("", newView, true, true, true);
         newView.setImageLayer(imageLayer);
         layers.add(newIndex, newView);
-        jp2viewLookup.put(newView, new Layer(newView, imageLayer.getName()));
         newView.addViewListener(this);
 
         return newIndex;
@@ -210,7 +139,6 @@ public class LayeredView extends AbstractView implements ViewListener {
         movieManager.pauseLinkedMovies();
 
         layers.remove(view);
-        jp2viewLookup.remove(view);
         view.removeViewListener(this);
 
         JHVJP2View jp2 = view.getAdapter(JHVJP2View.class);
