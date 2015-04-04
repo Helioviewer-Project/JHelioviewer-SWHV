@@ -3,16 +3,12 @@ package org.helioviewer.viewmodel.view;
 import java.util.ArrayList;
 import java.util.HashMap;
 
-import javax.media.opengl.GL2;
-
 import org.helioviewer.gl3d.model.image.GL3DImageLayer;
-import org.helioviewer.gl3d.scenegraph.GL3DState;
 import org.helioviewer.jhv.layers.LayerDescriptor;
 import org.helioviewer.viewmodel.changeevent.ChangeEvent;
 import org.helioviewer.viewmodel.view.jp2view.JHVJP2View;
 import org.helioviewer.viewmodel.view.jp2view.JHVJPXView;
 import org.helioviewer.viewmodel.view.jp2view.datetime.ImmutableDateTime;
-import org.helioviewer.viewmodel.view.opengl.GL3DView;
 
 /**
  * View to merged multiple Views.
@@ -37,7 +33,7 @@ import org.helioviewer.viewmodel.view.opengl.GL3DView;
  *
  */
 
-public class LayeredView extends AbstractView implements ViewListener, GL3DView {
+public class LayeredView extends AbstractView implements ViewListener {
 
     private final LinkedMovieManager movieManager = LinkedMovieManager.getSingletonInstance();
 
@@ -265,28 +261,6 @@ public class LayeredView extends AbstractView implements ViewListener, GL3DView 
     @Override
     public void viewChanged(View sender, ChangeEvent event) {
         notifyViewListeners(event);
-    }
-
-    @Override
-    public void render3D(GL3DState state) {
-    }
-
-    @Override
-    public void deactivate(GL3DState state) {
-        for (int i = 0; i < getNumLayers(); i++) {
-            if (getLayer(i).getAdapter(GL3DView.class) != null) {
-                MovieView movieView = getLayer(i).getAdapter(MovieView.class);
-                if (movieView != null) {
-                    movieView.pauseMovie();
-                }
-                getLayer(i).getAdapter(GL3DView.class).deactivate(state);
-            }
-        }
-    }
-
-    @Override
-    public void renderGL(GL2 gl, boolean nextView) {
-        this.render3D(GL3DState.get());
     }
 
 }
