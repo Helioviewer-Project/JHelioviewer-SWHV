@@ -232,7 +232,6 @@ public class ImageViewerGui {
 
         //ComponentView componentView = viewFactory.createNewView(ComponentView.class);
         mainComponentView = new GL3DComponentView();
-        mainComponentView.setView(getCameraView());
 
         GL3DCameraSelectorModel.getInstance().activate();
 
