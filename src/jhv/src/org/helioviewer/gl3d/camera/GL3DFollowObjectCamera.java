@@ -7,7 +7,6 @@ import org.helioviewer.base.physics.Astronomy;
 import org.helioviewer.base.physics.Constants;
 import org.helioviewer.gl3d.math.GL3DQuatd;
 import org.helioviewer.gl3d.math.GL3DVec3d;
-import org.helioviewer.gl3d.scenegraph.GL3DDrawBits.Bit;
 import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.display.TimeListener;
 import org.helioviewer.jhv.layers.LayersListener;
@@ -20,23 +19,17 @@ public class GL3DFollowObjectCamera extends GL3DSolarRotationTrackingTrackballCa
 
     private final ArrayList<GL3DFollowObjectCameraListener> followObjectCameraListeners = new ArrayList<GL3DFollowObjectCameraListener>();
     private final GL3DPositionLoading positionLoading;
-    private double FOVangle;
     private double currentL = 0.;
     private double currentB = 0.;
     private double currentDistance = Constants.SunMeanDistanceToEarth / Constants.SunRadius;
 
     private Date cameraDate;
     private boolean interpolation;
-    private boolean fovhidden = false;
-
-    protected GL3DCameraFOV cameraFOVDraw;
 
     public GL3DFollowObjectCamera() {
         super();
         positionLoading = new GL3DPositionLoading();
         positionLoading.addListener(this);
-        this.cameraFOVDraw = new GL3DCameraFOV(1., 1.);
-        this.cameraFOVDraw.getDrawBits().set(Bit.Hidden, fovhidden);
         LayersModel.getSingletonInstance().addLayersListener(this);
     }
 
@@ -53,24 +46,13 @@ public class GL3DFollowObjectCamera extends GL3DSolarRotationTrackingTrackballCa
     @Override
     public void activate() {
         super.activate();
-        this.cameraFOVDraw.getDrawBits().set(Bit.Hidden, this.fovhidden);
         Displayer.addTimeListener(this);
     }
 
     @Override
     public void deactivate() {
         super.deactivate();
-        this.fovhidden = this.cameraFOVDraw.getDrawBits().get(Bit.Hidden);
-        this.cameraFOVDraw.getDrawBits().on(Bit.Hidden);
-        this.cameraFOVDraw.getDrawBits().set(Bit.Hidden, true);
         Displayer.removeTimeListener(this);
-    }
-
-    public void createNewFOV() {
-        boolean hidden = this.cameraFOVDraw.getDrawBits().get(Bit.Hidden);
-        GL3DCameraFOV newFOVDraw = new GL3DCameraFOV(1., 1.);
-        newFOVDraw.getDrawBits().set(Bit.Hidden, hidden);
-        this.cameraFOVDraw = newFOVDraw;
     }
 
     @Override
@@ -127,9 +109,6 @@ public class GL3DFollowObjectCamera extends GL3DSolarRotationTrackingTrackballCa
             this.setLocalRotation(newRotation);
             this.setZTranslation(-currentDistance);
             this.updateCameraTransformation();
-
-            this.cameraFOVDraw.scale(currentDistance * Math.tan(FOVangle));
-            this.cameraFOVDraw.setAngles(currentB, currentRotation);
         }
     }
 
@@ -165,10 +144,6 @@ public class GL3DFollowObjectCamera extends GL3DSolarRotationTrackingTrackballCa
 
     public void setObservingObject(String object, boolean applyChanges) {
         this.positionLoading.setObserver(object, applyChanges);
-    }
-
-    public void setFOVangleDegrees(double fovAngle) {
-        this.FOVangle = fovAngle * Math.PI / 180.0;
     }
 
     public void setInterpolation(boolean interpolation) {
