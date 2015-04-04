@@ -14,17 +14,14 @@ import org.helioviewer.jhv.data.container.cache.JHVEventCacheResult;
 import org.helioviewer.jhv.data.datatype.event.JHVEvent;
 import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.layers.LayersListener;
-import org.helioviewer.jhv.layers.LayersModel;
-import org.helioviewer.viewmodel.view.View;
-import org.helioviewer.viewmodel.view.jp2view.JHVJPXView;
-import org.helioviewer.viewmodel.view.jp2view.datetime.ImmutableDateTime;
+import org.helioviewer.viewmodel.view.jp2view.JHVJP2View;
 
 /**
  * This class intercepts changes of the layers and request data from the
  * JHVEventContainer.
- * 
+ *
  * @author Bram Bourgoignie (Bram.Bourgoignie@oma.be)
- * 
+ *
  */
 public class SWHVHEKData implements LayersListener, JHVEventHandler {
 
@@ -46,7 +43,7 @@ public class SWHVHEKData implements LayersListener, JHVEventHandler {
 
     /**
      * Gets the singleton instance of the outgoing request manager
-     * 
+     *
      * @return the singleton instance
      */
     public static SWHVHEKData getSingletonInstance() {
@@ -80,7 +77,7 @@ public class SWHVHEKData implements LayersListener, JHVEventHandler {
     }
 
     @Override
-    public void activeLayerChanged(View view) {
+    public void activeLayerChanged(JHVJP2View view) {
     }
 
     @Override

@@ -45,7 +45,7 @@ public class Zoom1to1Action extends AbstractAction {
             zoomController = new ZoomController();
             zoomController.setImagePanel(ImageViewerGui.getSingletonInstance().getMainImagePanel());
         }
-        zoomController.zoom1to1(ImageViewerGui.getSingletonInstance().getMainView(), Displayer.getLayersModel().getActiveView());
+        zoomController.zoom1to1(Displayer.getLayersModel().getActiveView(), Displayer.getLayersModel().getActiveView());
     }
 
 }

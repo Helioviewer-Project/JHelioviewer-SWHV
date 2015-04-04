@@ -12,12 +12,11 @@ import org.helioviewer.base.math.Vector2dInt;
 import org.helioviewer.base.physics.Constants;
 import org.helioviewer.jhv.gui.components.BasicImagePanel;
 import org.helioviewer.jhv.gui.interfaces.ImagePanelPlugin;
-import org.helioviewer.jhv.layers.LayersModel;
 import org.helioviewer.viewmodel.metadata.MetaData;
 import org.helioviewer.viewmodel.region.Region;
-import org.helioviewer.viewmodel.view.jp2view.JHVJP2View;
 import org.helioviewer.viewmodel.view.View;
 import org.helioviewer.viewmodel.view.ViewHelper;
+import org.helioviewer.viewmodel.view.jp2view.JHVJP2View;
 import org.helioviewer.viewmodel.viewport.Viewport;
 import org.helioviewer.viewmodel.viewportimagesize.ViewportImageSize;
 
@@ -169,9 +168,9 @@ public class PositionStatusPanel extends ViewStatusPanelPlugin implements MouseM
      * {@inheritDoc}
      */
     @Override
-    public void activeLayerChanged(View view) {
+    public void activeLayerChanged(JHVJP2View view) {
         if (view instanceof JHVJP2View) {
-            jp2View = (JHVJP2View) view;
+            jp2View = view;
             setVisible(true);
         } else {
             setVisible(false);

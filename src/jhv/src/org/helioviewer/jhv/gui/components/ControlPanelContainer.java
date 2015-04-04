@@ -10,6 +10,7 @@ import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.layers.LayersListener;
 import org.helioviewer.viewmodel.view.ImageInfoView;
 import org.helioviewer.viewmodel.view.View;
+import org.helioviewer.viewmodel.view.jp2view.JHVJP2View;
 
 public class ControlPanelContainer extends JPanel implements LayersListener {
 
@@ -61,7 +62,7 @@ public class ControlPanelContainer extends JPanel implements LayersListener {
      * {@inheritDoc}
      */
     @Override
-    public void activeLayerChanged(View view) {
+    public void activeLayerChanged(JHVJP2View view) {
         updateActiveView(view);
     }
 

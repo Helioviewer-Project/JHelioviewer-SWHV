@@ -34,7 +34,7 @@ import org.helioviewer.plugins.eveplugin.controller.ZoomController;
 import org.helioviewer.plugins.eveplugin.controller.ZoomControllerListener;
 import org.helioviewer.plugins.eveplugin.model.PlotAreaSpace;
 import org.helioviewer.plugins.eveplugin.settings.EVEAPI.API_RESOLUTION_AVERAGES;
-import org.helioviewer.viewmodel.view.View;
+import org.helioviewer.viewmodel.view.jp2view.JHVJP2View;
 import org.helioviewer.viewmodel.view.jp2view.JHVJPXView;
 
 /**
@@ -696,7 +696,7 @@ public class ChartDrawIntervalPane extends JComponent implements ZoomControllerL
     }
 
     @Override
-    public void activeLayerChanged(View view) {
+    public void activeLayerChanged(JHVJP2View view) {
         if (view instanceof JHVJPXView) {
             JHVJPXView jpxView = (JHVJPXView) view;
             Date start, end;

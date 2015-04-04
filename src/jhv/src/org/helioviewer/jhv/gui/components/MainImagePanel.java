@@ -17,7 +17,7 @@ import org.helioviewer.jhv.layers.LayersModel;
 import org.helioviewer.viewmodel.renderer.screen.ScreenRenderGraphics;
 import org.helioviewer.viewmodel.renderer.screen.ScreenRenderer;
 import org.helioviewer.viewmodel.view.ComponentView;
-import org.helioviewer.viewmodel.view.View;
+import org.helioviewer.viewmodel.view.jp2view.JHVJP2View;
 import org.helioviewer.viewmodel.view.opengl.GLSharedDrawable;
 
 /**
@@ -181,7 +181,7 @@ public class MainImagePanel extends BasicImagePanel implements LayersListener {
     }
 
     @Override
-    public void activeLayerChanged(View view) {
+    public void activeLayerChanged(JHVJP2View view) {
     }
 
     /**

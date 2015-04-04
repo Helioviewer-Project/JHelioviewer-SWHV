@@ -17,7 +17,7 @@ import org.helioviewer.plugins.eveplugin.model.PlotAreaSpaceListener;
 import org.helioviewer.plugins.eveplugin.settings.BandType;
 //import org.helioviewer.plugins.eveplugin.model.PlotTimeSpace;
 import org.helioviewer.plugins.eveplugin.settings.EVEAPI.API_RESOLUTION_AVERAGES;
-import org.helioviewer.viewmodel.view.View;
+import org.helioviewer.viewmodel.view.jp2view.JHVJP2View;
 
 /**
  *
@@ -425,7 +425,7 @@ public class ZoomController implements PlotAreaSpaceListener, LayersListener {
     }
 
     @Override
-    public void activeLayerChanged(View view) {
+    public void activeLayerChanged(JHVJP2View view) {
     }
 
 }
