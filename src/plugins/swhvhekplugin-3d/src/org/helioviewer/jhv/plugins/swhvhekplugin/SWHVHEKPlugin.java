@@ -6,12 +6,11 @@ import java.net.URL;
 
 import org.helioviewer.jhv.gui.ImageViewerGui;
 import org.helioviewer.viewmodelplugin.interfaces.Plugin;
-import org.helioviewer.viewmodelplugin.overlay.OverlayPlugin;
 
 /**
  * @author Malte Nuhn
  * */
-public class SWHVHEKPlugin extends OverlayPlugin implements Plugin {
+public class SWHVHEKPlugin implements Plugin {
 
     private boolean builtin_mode = false;
 
@@ -35,13 +34,6 @@ public class SWHVHEKPlugin extends OverlayPlugin implements Plugin {
      */
     public SWHVHEKPlugin(boolean builtin_mode) {
         this.builtin_mode = builtin_mode;
-
-        try {
-            this.pluginLocation = new URI(SWHVHEKSettings.PLUGIN_LOCATION);
-        } catch (URISyntaxException e) {
-            e.printStackTrace();
-        }
-
         SWHVHEKData.getSingletonInstance();
     }
 
@@ -53,10 +45,15 @@ public class SWHVHEKPlugin extends OverlayPlugin implements Plugin {
      */
     @Override
     public void installPlugin() {
-
         ImageViewerGui.getSingletonInstance().getMainImagePanel().addPlugin(new SWHVHEKImagePanelEventPopupController());
         new SWHVHEKPluginRenderable();
+    }
 
+    @Override
+    public void uninstallPlugin() {
+        // tbd
+        // ImageViewerGui.getSingletonInstance().getMainImagePanel().addPlugin(new SWHVHEKImagePanelEventPopupController());
+        // new SWHVHEKPluginRenderable();
     }
 
     /**
@@ -75,7 +72,7 @@ public class SWHVHEKPlugin extends OverlayPlugin implements Plugin {
      */
     @Override
     public String getName() {
-        return "SWHV HEK Overlay Plugin " + "$Rev$" + (builtin_mode ? " Built-In Version" : "");
+        return "SWHV HEK Plugin " + "$Rev$" + (builtin_mode ? " Built-In Version" : "");
     }
 
     /**

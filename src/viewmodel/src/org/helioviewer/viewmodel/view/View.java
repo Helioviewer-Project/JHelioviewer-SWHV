@@ -8,10 +8,7 @@ import java.util.AbstractList;
  * <p>
  * A view represents an knot within the view chain. The view chain is a tree of
  * multiple views, usually with a {@link ComponentView} as a root and several
- * {@link ImageInfoView}s as leafs. Along every path through the view chain, the
- * image data is changed, for example by applying filters (see
- * {@link FilterView}), adding overlays (see {@link OverlayView} or merging
- * several partial images into one resulting image. The
+ * {@link ImageInfoView}s as leafs. The
  * different views communicate via {@link ViewListener}s.
  *
  * <p>
